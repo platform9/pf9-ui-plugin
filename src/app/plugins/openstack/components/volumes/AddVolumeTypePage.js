@@ -1,9 +1,9 @@
 import React from 'react'
 import requiresAuthentication from '../../util/requiresAuthentication'
-import FormWrapper from 'core/common/FormWrapper'
+import FormWrapper from 'core/components/FormWrapper'
 import AddVolumeTypeForm from './AddVolumeTypeForm'
 import { withRouter } from 'react-router-dom'
-import { compose, keyValueArrToObj } from 'core/fp'
+import { compose, keyValueArrToObj } from 'core/../../../../utils/fp'
 import { withAppContext } from 'core/AppContext'
 import { loadVolumeTypes } from './actions'
 

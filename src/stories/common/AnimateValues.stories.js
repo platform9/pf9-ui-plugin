@@ -1,7 +1,7 @@
 import React from 'react'
 import { addStoriesFromModule } from '../helpers'
 
-import AnimateValues from 'core/common/AnimateValues'
+import AnimateValues from 'core/components/AnimateValues'
 
 const addStories = addStoriesFromModule(module)
 

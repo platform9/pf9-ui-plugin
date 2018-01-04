@@ -1,6 +1,6 @@
 import React from 'react'
 import { addStoriesFromModule } from '../helpers'
-import InfoPanel from 'core/common/InfoPanel'
+import InfoPanel from 'core/components/InfoPanel'
 
 const addStories = addStoriesFromModule(module)
 

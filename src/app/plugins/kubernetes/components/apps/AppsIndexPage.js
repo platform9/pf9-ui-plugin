@@ -1,6 +1,6 @@
 import React from 'react'
-import Tabs from 'core/common/Tabs'
-import Tab from 'core/common/Tab'
+import Tabs from 'core/components/Tabs'
+import Tab from 'core/components/Tab'
 
 const AppCatalogListPage = () => <h1>TODO: App Catalog List Page</h1>
 const DeployedAppsListPage = () => <h1>TODO: Deployed Apps List Page</h1>

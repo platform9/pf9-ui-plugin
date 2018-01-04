@@ -5,7 +5,7 @@ import { addStoriesFromModule, randomInt, range } from '../helpers'
 import { BrowserRouter as Router } from 'react-router-dom'
 import fakeNavbarItem from './fakeNavbarItem'
 import { omit } from 'ramda'
-import Navbar from 'core/common/Navbar'
+import Navbar from 'core/components/Navbar'
 
 const addStories = addStoriesFromModule(module)
 

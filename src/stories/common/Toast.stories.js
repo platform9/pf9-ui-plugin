@@ -1,6 +1,6 @@
 import React from 'react'
 import { addStoriesFromModule } from '../helpers'
-import { withToast } from 'core/common/ToastProvider'
+import { withToast } from 'core/providers/ToastProvider'
 import Button from '@material-ui/core/Button/Button'
 
 const addStories = addStoriesFromModule(module)

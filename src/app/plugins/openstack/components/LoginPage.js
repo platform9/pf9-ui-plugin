@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react'
 import PropTypes from 'prop-types'
-import { compose } from 'core/fp'
+import { compose } from 'core/../../../utils/fp'
 import { withRouter } from 'react-router'
 import { withStyles } from '@material-ui/core/styles'
 import { withAppContext } from 'core/AppContext'
@@ -13,7 +13,7 @@ import {
   TextField,
   Typography,
 } from '@material-ui/core'
-import Alert from 'core/common/Alert'
+import Alert from 'core/components/Alert'
 
 const styles = theme => ({
   root: {

@@ -1,5 +1,5 @@
 import React from 'react'
-import { compose } from 'core/fp'
+import { compose } from 'core/../../../../utils/fp'
 import ImageListContainer from './ImageListContainer'
 import requiresAuthentication from '../../util/requiresAuthentication'
 import DataLoader from 'core/DataLoader'

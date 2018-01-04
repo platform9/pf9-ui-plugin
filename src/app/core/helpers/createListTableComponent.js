@@ -1,5 +1,5 @@
 import React from 'react'
-import ListTable from 'core/common/list_table/ListTable'
+import ListTable from 'core/components/listTable/ListTable'
 import { compose } from 'ramda'
 import { withScopedPreferences } from 'core/PreferencesProvider'
 import { withRouter } from 'react-router-dom'

@@ -1,11 +1,11 @@
 import React, { Fragment } from 'react'
 import { withRouter } from 'react-router-dom'
-import { compose } from 'core/fp'
-import FormWrapper from 'core/common/FormWrapper'
+import { compose } from 'core/../../../../utils/fp'
+import FormWrapper from 'core/components/FormWrapper'
 import requiresAuthentication from '../../util/requiresAuthentication'
 import { createMuiTheme, MuiThemeProvider, withStyles } from '@material-ui/core/styles'
 import { Divider, Typography } from '@material-ui/core'
-import ListTable from 'core/common/list_table/ListTable'
+import ListTable from 'core/components/listTable/ListTable'
 
 const styles = theme => ({
   code: {

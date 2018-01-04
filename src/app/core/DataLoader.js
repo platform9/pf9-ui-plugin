@@ -1,9 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import DisplayError from 'core/common/DisplayError'
-import Loader from 'core/common/Loader'
+import DisplayError from 'core/components/DisplayError'
+import Loader from 'core/components/Loader'
 import { all, partition, pick, props } from 'ramda'
-import { ensureArray, exists, propExists } from 'core/fp'
+import { ensureArray, exists, propExists } from 'core/../utils/fp'
 import { withAppContext } from 'core/AppContext'
 
 class DataLoaderBase extends React.Component {

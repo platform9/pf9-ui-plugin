@@ -1,13 +1,13 @@
 import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { decorateAction } from '@storybook/addon-actions'
-import { compose } from 'core/fp'
+import { compose } from 'core/../app/utils/fp'
 import AppContext, { withAppContext } from 'core/AppContext'
 import { withTheme } from 'app/theme'
 
 import 'app/app.css'
-import HotKeysContext from 'core/common/HotKeysProvider'
-import { ToastProvider } from 'core/common/ToastProvider'
+import HotKeysContext from 'core/components/HotKeysProvider'
+import { ToastProvider } from 'core/providers/ToastProvider'
 
 const objToJsonDetails = obj => JSON.stringify(obj, null, 4)
 const isArray = x => x instanceof Array

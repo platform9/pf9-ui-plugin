@@ -1,7 +1,7 @@
 import React from 'react'
 import { addStoriesFromModule } from '../helpers'
 
-import Loader from 'core/common/Loader'
+import Loader from 'core/components/Loader'
 
 const addStories = addStoriesFromModule(module)
 

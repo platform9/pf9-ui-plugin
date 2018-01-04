@@ -1,7 +1,7 @@
 import React from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import { Toolbar } from '@material-ui/core'
-import SearchBar from 'core/common/SearchBar'
+import SearchBar from 'core/components/SearchBar'
 
 const styles = theme => ({
   root: {

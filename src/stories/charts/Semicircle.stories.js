@@ -1,5 +1,5 @@
 import React from 'react'
-import SemiCircle from 'core/common/dashboard_graphs/SemiCircle'
+import SemiCircle from 'core/components/dashboardGraphs/SemiCircle'
 import { addStoriesFromModule } from '../helpers'
 
 const addStories = addStoriesFromModule(module)

@@ -1,5 +1,5 @@
 import React from 'react'
-import { compose } from 'core/fp'
+import { compose } from 'core/../../../../utils/fp'
 import requiresAuthentication from 'openstack/util/requiresAuthentication'
 import DataLoader from 'core/DataLoader'
 import { loadServiceCatalog } from './actions'

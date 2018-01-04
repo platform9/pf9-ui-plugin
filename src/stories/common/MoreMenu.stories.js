@@ -1,7 +1,7 @@
 import React from 'react'
 import ReplayIcon from '@material-ui/icons/Replay'
 import PlayArrowIcon from '@material-ui/icons/PlayArrow'
-import MoreMenu from 'core/common/MoreMenu'
+import MoreMenu from 'core/components/MoreMenu'
 import { action } from '@storybook/addon-actions'
 import { addStoriesFromModule } from '../helpers'
 

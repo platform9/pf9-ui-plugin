@@ -1,8 +1,8 @@
 /* eslint-disable camelcase */
 import React from 'react'
 import PropTypes from 'prop-types'
-import CRUDListContainer from 'core/common/CRUDListContainer'
-import { compose, keyValueArrToObj } from 'core/fp'
+import CRUDListContainer from 'core/components/CRUDListContainer'
+import { compose, keyValueArrToObj } from 'core/../../../../utils/fp'
 import { withAppContext } from 'core/AppContext'
 import createListTableComponent from 'core/helpers/createListTableComponent'
 

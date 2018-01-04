@@ -1,11 +1,11 @@
 import React from 'react'
-import FormWrapper from 'core/common/FormWrapper'
+import FormWrapper from 'core/components/FormWrapper'
 import requiresAuthentication from 'openstack/util/requiresAuthentication'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import createFormComponent from 'core/helpers/createFormComponent'
 import { withRouter } from 'react-router-dom'
 import { withAppContext } from 'core/AppContext'
-import { compose } from 'core/fp'
+import { compose } from 'core/../../utils/fp'
 
 const createAddComponents = options => {
   const defaults = {}

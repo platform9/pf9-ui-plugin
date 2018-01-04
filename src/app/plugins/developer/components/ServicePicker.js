@@ -1,8 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import Picklist from 'core/common/Picklist'
+import Picklist from 'core/components/Picklist'
 import { prop } from 'ramda'
-import { arrToObjByKey, compose } from 'core/fp'
+import { arrToObjByKey, compose } from 'core/../../../utils/fp'
 import { withAppContext } from 'core/AppContext'
 import { loadServiceCatalog } from 'openstack/components/api-access/actions'
 

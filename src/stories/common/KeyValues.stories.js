@@ -1,7 +1,7 @@
 import React from 'react'
 import { addStoriesFromModule } from '../helpers'
 
-import KeyValues from 'core/common/KeyValues'
+import KeyValues from 'core/components/KeyValues'
 
 const addStories = addStoriesFromModule(module)
 

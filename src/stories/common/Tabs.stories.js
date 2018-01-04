@@ -1,7 +1,7 @@
 import React from 'react'
 import { addStoriesFromModule } from '../helpers'
-import Tabs from 'core/common/Tabs'
-import Tab from 'core/common/Tab'
+import Tabs from 'core/components/Tabs'
+import Tab from 'core/components/Tab'
 
 const addStories = addStoriesFromModule(module)
 

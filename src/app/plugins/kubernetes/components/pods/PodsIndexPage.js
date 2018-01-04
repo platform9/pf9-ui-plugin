@@ -1,6 +1,6 @@
 import React from 'react'
-import Tabs from 'core/common/Tabs'
-import Tab from 'core/common/Tab'
+import Tabs from 'core/components/Tabs'
+import Tab from 'core/components/Tab'
 
 const PodsListPage = () => <h1>TODO: Pods List Page</h1>
 const DeploymentsListPage = () => <h1>TODO: Deployments List Page</h1>

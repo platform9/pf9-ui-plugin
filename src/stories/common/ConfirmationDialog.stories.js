@@ -2,7 +2,7 @@ import React from 'react'
 import { action } from '@storybook/addon-actions'
 import { addStoriesFromModule } from '../helpers'
 
-import ConfirmationDialog from 'core/common/ConfirmationDialog'
+import ConfirmationDialog from 'core/components/ConfirmationDialog'
 
 const addStories = addStoriesFromModule(module)
 

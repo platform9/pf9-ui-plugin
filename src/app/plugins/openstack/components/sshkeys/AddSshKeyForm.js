@@ -1,7 +1,7 @@
 import React from 'react'
-import SubmitButton from 'core/common/SubmitButton'
-import ValidatedForm from 'core/common/validated_form/ValidatedForm'
-import TextField from 'core/common/validated_form/TextField'
+import SubmitButton from 'core/components/SubmitButton'
+import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
+import TextField from 'core/components/validatedForm/TextField'
 
 const AddSshKeyForm = ({ onComplete }) =>
   <ValidatedForm

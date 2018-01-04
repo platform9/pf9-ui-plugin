@@ -5,7 +5,7 @@ import { withAppContext } from 'core/AppContext'
 import { AppBar, Dialog, IconButton, Slide, Toolbar, Typography } from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles'
 import CloseIcon from '@material-ui/icons/Close'
-import SimpleLink from 'core/common/SimpleLink'
+import SimpleLink from 'core/components/SimpleLink'
 
 const styles = {
   appBar: {

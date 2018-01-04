@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { compose } from 'core/fp'
+import { compose } from 'core/../../../../utils/fp'
 import HostsListContainer from './HostsListContainer'
 import requiresAuthentication from '../../util/requiresAuthentication'
 import DataLoader from 'core/DataLoader'

@@ -1,6 +1,6 @@
 import React from 'react'
-import InfoPanel from 'core/common/InfoPanel'
-import UsageWidget from 'core/common/dashboard_graphs/UsageWidget'
+import InfoPanel from 'core/components/InfoPanel'
+import UsageWidget from 'core/components/dashboardGraphs/UsageWidget'
 import clusterUsageStats from './clusterUsageStats'
 import { Grid } from '@material-ui/core'
 import { compose } from 'ramda'

@@ -1,6 +1,6 @@
 import React from 'react'
 import { addStoriesFromModule } from '../helpers'
-import ProgressBar from 'core/common/ProgressBar'
+import ProgressBar from 'core/components/ProgressBar'
 
 const addStories = addStoriesFromModule(module)
 

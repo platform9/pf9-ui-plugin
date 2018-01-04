@@ -1,13 +1,13 @@
 import React from 'react'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { loadInfrastructure } from './actions'
-import { maybeFnOrNull } from 'core/fp'
+import { maybeFnOrNull } from 'core/../../../../utils/fp'
 import { pathOr, pipe } from 'ramda'
-import HostStatus from 'core/common/HostStatus'
-import SimpleLink from 'core/common/SimpleLink'
+import HostStatus from 'core/components/HostStatus'
+import SimpleLink from 'core/components/SimpleLink'
 import { localizeRoles } from 'api-client/ResMgr'
 import { castBoolToStr, castFuzzyBool, columnPathLookup } from 'utils/misc'
-import ProgressBar from 'core/common/ProgressBar'
+import ProgressBar from 'core/components/ProgressBar'
 
 const renderStatus = (_, node) => (<HostStatus host={node.combined} />)
 const isMaster = pipe(castFuzzyBool, castBoolToStr())

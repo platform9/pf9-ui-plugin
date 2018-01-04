@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import React from 'react'
 import PropTypes from 'prop-types'
-import CRUDListContainer from 'core/common/CRUDListContainer'
+import CRUDListContainer from 'core/components/CRUDListContainer'
 import createListTableComponent from 'core/helpers/createListTableComponent'
 
 const columns = [

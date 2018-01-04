@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import DataLoader from 'core/DataLoader'
-import { compose } from 'core/fp'
+import { compose } from 'core/../utils/fp'
 import { withAppContext } from 'core/AppContext'
 import { withRouter } from 'react-router'
 

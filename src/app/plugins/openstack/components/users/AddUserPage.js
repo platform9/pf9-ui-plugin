@@ -1,11 +1,11 @@
 import React from 'react'
 import createAddComponents from 'core/helpers/createAddComponents'
-import SubmitButton from 'core/common/SubmitButton'
-import ValidatedForm from 'core/common/validated_form/ValidatedForm'
-import TextField from 'core/common/validated_form/TextField'
-import NoAutofillHack from 'core/common/NoAutofillHack'
+import SubmitButton from 'core/components/SubmitButton'
+import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
+import TextField from 'core/components/validatedForm/TextField'
+import NoAutofillHack from 'core/components/NoAutofillHack'
 import TenantRolesContainer
-  from 'core/common/validated_form/TenantRolesContainer'
+  from 'core/components/validatedForm/TenantRolesContainer'
 import { createUser, loadUsers } from './actions'
 import { loadTenants } from '../tenants/actions'
 

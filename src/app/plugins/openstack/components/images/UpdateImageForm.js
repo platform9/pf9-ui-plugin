@@ -1,8 +1,8 @@
 import React from 'react'
 import { Button } from '@material-ui/core'
-import ValidatedForm from 'core/common/validated_form/ValidatedForm'
-import TextField from 'core/common/validated_form/TextField'
-import Checkbox from 'core/common/validated_form/Checkbox'
+import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
+import TextField from 'core/components/validatedForm/TextField'
+import Checkbox from 'core/components/validatedForm/Checkbox'
 
 const UpdateImageForm = ({ image, onSubmit }) =>
   <ValidatedForm

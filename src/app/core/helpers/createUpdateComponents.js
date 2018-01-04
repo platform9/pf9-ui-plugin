@@ -1,10 +1,10 @@
 import React from 'react'
-import FormWrapper from 'core/common/FormWrapper'
-import Loader from 'core/common/Loader'
+import FormWrapper from 'core/components/FormWrapper'
+import Loader from 'core/components/Loader'
 import requiresAuthentication from 'openstack/util/requiresAuthentication'
 import { withRouter } from 'react-router-dom'
 import { withAppContext } from 'core/AppContext'
-import { compose } from 'core/fp'
+import { compose } from 'core/../../utils/fp'
 
 const createUpdateComponents = options => {
   const defaults = {

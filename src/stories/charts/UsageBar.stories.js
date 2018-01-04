@@ -1,5 +1,5 @@
 import React from 'react'
-import UsageBar from 'core/common/dashboard_graphs/UsageBar'
+import UsageBar from 'core/components/dashboardGraphs/UsageBar'
 import { addStoriesFromModule } from '../helpers'
 
 const addStories = addStoriesFromModule(module)

@@ -1,9 +1,9 @@
 import React from 'react'
 import createAddComponents from 'core/helpers/createAddComponents'
-import SubmitButton from 'core/common/SubmitButton'
-import ValidatedForm from 'core/common/validated_form/ValidatedForm'
-import Checkbox from 'core/common/validated_form/Checkbox'
-import TextField from 'core/common/validated_form/TextField'
+import SubmitButton from 'core/components/SubmitButton'
+import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
+import Checkbox from 'core/components/validatedForm/Checkbox'
+import TextField from 'core/components/validatedForm/TextField'
 import { createRouter, loadRouters } from './actions'
 
 export const AddRouterForm = ({ onComplete }) => (

@@ -1,6 +1,6 @@
 import React from 'react'
-import Selector from 'core/common/Selector'
-import { compose } from 'core/fp'
+import Selector from 'core/components/Selector'
+import { compose } from 'core/../../../../utils/fp'
 import { loadUserTenants } from './actions'
 import { assoc } from 'ramda'
 import moize from 'moize'

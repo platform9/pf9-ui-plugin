@@ -4,7 +4,7 @@ import {
   BrowserRouter as Router, Redirect, Route, Switch,
 } from 'react-router-dom'
 import { MuiThemeProvider } from '@material-ui/core/styles'
-import AppContainer from 'core/common/AppContainer'
+import AppContainer from 'core/components/AppContainer'
 import LogoutPage from 'openstack/components/LogoutPage'
 import './app.css'
 import theme from './theme'
@@ -12,12 +12,12 @@ import { setupFromConfig } from './utils/registry'
 import config from '../../config'
 import AppContext from 'core/AppContext'
 import ApiClient from '../api-client'
-import HotKeysProvider from 'core/common/HotKeysProvider'
+import HotKeysProvider from 'core/components/HotKeysProvider'
 import { apply, toPairs } from 'ramda'
 import SessionManager from 'openstack/components/SessionManager'
 import DeveloperToolsEmbed from 'developer/components/DeveloperToolsEmbed'
 import PreferencesProvider from 'core/PreferencesProvider'
-import { ToastProvider } from 'core/common/ToastProvider'
+import { ToastProvider } from 'core/providers/ToastProvider'
 
 setupFromConfig(config)
 window.process = process

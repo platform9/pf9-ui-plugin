@@ -1,9 +1,9 @@
 import React from 'react'
-import FormWrapper from 'core/common/FormWrapper'
+import FormWrapper from 'core/components/FormWrapper'
 import requiresAuthentication from '../../util/requiresAuthentication'
 import DataUpdater from 'core/DataUpdater'
 import UpdateImageForm from './UpdateImageForm'
-import { compose } from 'core/fp'
+import { compose } from 'core/../../../../utils/fp'
 import { loadImages, updateImage } from './actions'
 
 const UpdateImagePage = props => (

@@ -2,7 +2,7 @@ import React from 'react'
 import VolumesListContainer from './VolumesListContainer'
 import requiresAuthentication from '../../util/requiresAuthentication'
 import DataLoader from 'core/DataLoader'
-import { compose } from 'core/fp'
+import { compose } from 'core/../../../../utils/fp'
 import { loadVolumes } from './actions'
 
 const VolumesListPage = () =>

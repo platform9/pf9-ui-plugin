@@ -1,6 +1,6 @@
 import React from 'react'
-import Tabs from 'core/common/Tabs'
-import Tab from 'core/common/Tab'
+import Tabs from 'core/components/Tabs'
+import Tab from 'core/components/Tab'
 
 const TenantsListPage = () => <h1>TODO: Tenants List Page</h1>
 const UsersListPage = () => <h1>TODO: Users List Page</h1>

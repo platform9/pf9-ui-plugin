@@ -1,9 +1,9 @@
 import React from 'react'
 import DownloadKubeConfigLink from './DownloadKubeConfigLink'
 import KubeCLI from './KubeCLI'
-import SimpleLink from 'core/common/SimpleLink'
+import SimpleLink from 'core/components/SimpleLink'
 import clusterUsageStats from './clusterUsageStats'
-import UsageBar from 'core/common/dashboard_graphs/UsageBar'
+import UsageBar from 'core/components/dashboardGraphs/UsageBar'
 import {
   AddToQueue as AttachIcon,
   RemoveFromQueue as DetachIcon,

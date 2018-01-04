@@ -1,10 +1,10 @@
 import React from 'react'
 import { withRouter } from 'react-router'
-import { compose } from 'core/fp'
+import { compose } from 'core/../../../utils/fp'
 import { withAppContext } from 'core/AppContext'
 import LoginPage from 'openstack/components/LoginPage'
 
-import { getStorage, setStorage } from 'core/common/pf9-storage'
+import { getStorage, setStorage } from 'core/util/pf9-storage'
 import { loadUserTenants } from 'openstack/components/tenants/actions'
 import { withPreferences } from 'core/PreferencesProvider'
 import { pathOr } from 'ramda'

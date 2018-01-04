@@ -10,7 +10,7 @@ import {
 import { withStyles } from '@material-ui/core/styles'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 
-import { compose } from 'core/fp'
+import { compose } from 'core/../../../utils/fp'
 import ContextViewer from 'developer/components/ContextViewer'
 import ApiHelper from 'developer/components/ApiHelper'
 
