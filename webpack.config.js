@@ -3,9 +3,14 @@ const path = require('path')
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 
 const contextPath = path.resolve(__dirname, './src/app')
 const outputPath = path.resolve(__dirname, './build')
+
+const env = process.env.NODE_ENV || 'development'
+const isDev = env === 'development'
+const isProd = env === 'production'
 
 const plugins = [
   new HtmlWebpackPlugin({
@@ -18,14 +23,23 @@ const plugins = [
 const appEntry = []
 
 // dev only stuff
-appEntry.push('react-hot-loader/patch')
-appEntry.push('webpack-hot-middleware/client')
-appEntry.push('babel-polyfill')
-plugins.push(
-  new webpack.HotModuleReplacementPlugin(),
-  new webpack.NamedModulesPlugin(),
-  new webpack.NoEmitOnErrorsPlugin(),
-)
+if (isDev) {
+  appEntry.push('react-hot-loader/patch')
+  appEntry.push('webpack-hot-middleware/client')
+  appEntry.push('babel-polyfill')
+  plugins.push(
+    new webpack.HotModuleReplacementPlugin(),
+    new webpack.NamedModulesPlugin(),
+    new webpack.NoEmitOnErrorsPlugin(),
+  )
+}
+
+if (isProd) {
+  plugins.push(new UglifyJSPlugin({ sourceMap: true }))
+  plugins.push(new webpack.DefinePlugin({
+    'process.env.NODE_ENV': JSON.stringify('production')
+  }))
+}
 
 // main entry point
 appEntry.push('./index.js')
@@ -34,7 +48,7 @@ module.exports = {
   entry: {
     app: appEntry,
   },
-  devtool: 'inline-source-map',
+  devtool: isProd ? 'source-map' : 'inline-source-map',
   output: {
     filename: '[name]-bundle.js',
     publicPath: '/',

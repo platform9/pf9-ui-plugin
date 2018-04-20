@@ -11,7 +11,6 @@
     "lodash": "^4.17.5",
     "material-ui": "^1.0.0-beta.41",
     "material-ui-icons": "^1.0.0-beta.17",
-    "npm": "^5.8.0",
     "prop-types": "^15.6.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
@@ -64,12 +63,13 @@
     "standard": "^10.0.3",
     "storybook-addon-redux-listener": "^0.1.7",
     "style-loader": "^0.20.1",
+    "uglifyjs-webpack-plugin": "^1.2.5",
     "webpack": "^3.10.0",
     "webpack-dev-middleware": "^2.0.4",
     "webpack-hot-middleware": "^2.21.0"
   },
   "scripts": {
-    "build": "./node_modules/.bin/webpack",
+    "build": "NODE_ENV=production ./node_modules/.bin/webpack",
     "build-storybook": "build-storybook",
     "dev": "NODE_ENV=development npm start",
     "lint": "./node_modules/.bin/eslint src",
