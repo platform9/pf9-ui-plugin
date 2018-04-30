@@ -14,7 +14,7 @@ const isProd = env === 'production'
 
 const plugins = [
   new HtmlWebpackPlugin({
-    inject: true,
+    inject: false,
     template: './index.html',
   }),
   new CopyWebpackPlugin([{ from: './static' }])

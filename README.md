@@ -8,6 +8,30 @@ This is the new home for all things Platform9 UI related.
 `npm install`
 
 
+# Loader
+
+The loader bootstraps the app loading process.  It is the very first code to
+run and determines which version of the UI to load.
+
+Normally, the UI is loaded from an S3 bucket.  Multiple versions of the UI are
+stored in different folders and the loader selects which one to use.
+
+It does this using a combination of query parameters, `localStorage`, and
+defaults (in that order).
+
+By default it will select the released version (branch mode).
+
+To switch to a specific branch you can use `?branch=[BRANCH]`.
+
+To switch to a specific version you can used `?version=vX.Y`.
+
+To use the lastest *edge* version use `?branch=master`.  This option will have
+the latest passing commit from `master` and is the absolute latest version.
+
+To use the local dev version you will need to append `?dev=true` to
+the browser URL.  This will switch from loading the bundle from an S3
+bucket and request it from the local dev server.
+
 # OpenStack Simulator
 
 The OpenStack Simulator is used during UI tests to create a mock OpenStack
