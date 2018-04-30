@@ -25,7 +25,7 @@ function getQueryParams () {
 }
 
 function getSavedSettings (params) {
-  const saved = window.localStorage.getItem(localStorageKey)
+  var saved = window.localStorage.getItem(localStorageKey)
   return saved ? JSON.parse(saved) : null
 }
 
