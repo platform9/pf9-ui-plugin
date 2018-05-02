@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import {
   BrowserRouter as Router,
   Link,
+  Redirect,
   Route,
   Switch,
 } from 'react-router-dom'
@@ -59,6 +60,7 @@ class App extends React.Component {
                   const Component = component
                   return <Route key={route.name} path={link.path} exact={link.exact || false} component={Component} />
                 })}
+                <Redirect to={pluginManager.getDefaultRoute()} />
               </Switch>
             </div>
             {showFooter && renderFooter()}

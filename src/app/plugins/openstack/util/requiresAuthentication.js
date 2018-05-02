@@ -22,7 +22,7 @@ const requiresAuthentication = WrappedComponent => {
 
           // Otherwise force the user to log in
           if (!restored) {
-            history.push('/login')
+            history.push('/ui/openstack/login')
           }
         }
       }

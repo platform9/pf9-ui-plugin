@@ -31,65 +31,71 @@ OpenStack.__name__ = 'openstack'
 
 OpenStack.registerPlugin = pluginManager => {
   pluginManager.registerRoutes(
-    {
-      name: 'Dashboard',
-      link: { path: '/', exact: true },
-      component: DashboardPage
-    },
-    {
-      name: 'Login',
-      link: { path: '/login' },
-      component: LoginPage
-    },
-    {
-      name: 'Tenants',
-      link: { path: '/tenants', exact: true },
-      component: TenantsPage
-    },
-    {
-      name: 'AddTenant',
-      link: { path: '/tenants/add' },
-      component: AddTenantPage
-    },
-    {
-      name: 'Users',
-      link: { path: '/users', exact: true },
-      component: UsersPage
-    },
-    {
-      name: 'AddUser',
-      link: { path: '/users/add' },
-      component: AddUserPage
-    },
-    {
-      name: 'Flavors',
-      link: { path: '/flavors', exact: true },
-      component: FlavorsPage
-    },
-    {
-      name: 'Flavors',
-      link: { path: '/flavors/add' },
-      component: AddFlavorPage
-    },
+    '/ui/openstack',
+    [
+      {
+        name: 'Dashboard',
+        link: { path: '/', exact: true, default: true },
+        component: DashboardPage
+      },
+      {
+        name: 'Login',
+        link: { path: '/login' },
+        component: LoginPage
+      },
+      {
+        name: 'Tenants',
+        link: { path: '/tenants', exact: true },
+        component: TenantsPage
+      },
+      {
+        name: 'AddTenant',
+        link: { path: '/tenants/add' },
+        component: AddTenantPage
+      },
+      {
+        name: 'Users',
+        link: { path: '/users', exact: true },
+        component: UsersPage
+      },
+      {
+        name: 'AddUser',
+        link: { path: '/users/add' },
+        component: AddUserPage
+      },
+      {
+        name: 'Flavors',
+        link: { path: '/flavors', exact: true },
+        component: FlavorsPage
+      },
+      {
+        name: 'Flavors',
+        link: { path: '/flavors/add' },
+        component: AddFlavorPage
+      },
+    ]
   )
 
   pluginManager.registerNavItems(
-    {
-      name: 'Dashboard',
-      link: { path: '/' }
-    },
-    {
-      name: 'Tenants',
-      link: { path: '/tenants' }
-    },
-    {
-      name: 'Users',
-      link: { path: '/users' }
-    },
-    {
-      name: 'Flavors',
-      link: { path: '/flavors' }
-    },
+    '/ui/openstack',
+    [
+      {
+        name: 'Dashboard',
+        link: { path: '/' }
+      },
+      {
+        name: 'Tenants',
+        link: { path: '/tenants' }
+      },
+      {
+        name: 'Users',
+        link: { path: '/users' }
+      },
+      {
+        name: 'Flavors',
+        link: { path: '/flavors' }
+      },
+    ]
   )
 }
 
