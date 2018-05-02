@@ -31,8 +31,6 @@ const pluginManager = {
     components
       .map(c => ({ ...c, link: prefixLink(c.link) }))
       .forEach(component => data.routes.push(component))
-
-    console.log(data.routes)
   },
 
   registerNavItems (prefix, items=[]) {

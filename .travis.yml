@@ -16,6 +16,7 @@ before_script:
 - cp config.example.js config.js
 script:
 - NODE_ENV=production npm run build
+- npm run test
 deploy:
   provider: s3
   region: us-west-1
