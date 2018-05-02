@@ -1,15 +1,19 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 import { addFlavor } from '../../actions/flavors'
 import AddFlavorForm from './AddFlavorForm'
 
 const mapStateToProps = state => ({})
 
+@withRouter
 @connect(mapStateToProps)
 class AddFlavorPage extends React.Component {
-  handleSubmit = () => {
+  handleSubmit = flavor => {
+    const { dispatch, history } = this.props
     try {
-      this.props.dispatch(addFlavor(this.state))
+      dispatch(addFlavor(flavor))
+      history.push('/flavors')
     } catch (err) {
       console.error(err)
     }

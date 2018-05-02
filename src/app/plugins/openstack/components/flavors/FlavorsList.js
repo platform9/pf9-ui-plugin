@@ -12,7 +12,7 @@ const columns = [
 
 class FlavorsList extends React.Component {
   render () {
-    const { onAdd, flavors } = this.props
+    const { onAdd, onDelete, flavors } = this.props
 
     if (!flavors || flavors.length === 0) {
       return (<h1>No flavors found</h1>)
@@ -24,6 +24,8 @@ class FlavorsList extends React.Component {
         columns={columns}
         data={flavors}
         onAdd={onAdd}
+        onDelete={onDelete}
+        actions={['delete']}
       />
     )
   }
@@ -35,6 +37,9 @@ FlavorsList.propTypes = {
 
   /** What to do when the add button is clicked */
   onAdd: PropTypes.func.isRequired,
+
+  /** Called onClick of delete icon for a flavor row */
+  onDelete: PropTypes.func.isRequired,
 }
 
 FlavorsList.defaultProps = {
