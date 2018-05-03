@@ -16,7 +16,7 @@ export const addFlavor = flavor => async dispatch => {
     flavor.id = flavorId
     dispatch({ type: ADD_FLAVOR, payload: flavor })
   } else {
-    alert ('failed to add flavor')
+    alert('failed to add flavor')
   }
 }
 
