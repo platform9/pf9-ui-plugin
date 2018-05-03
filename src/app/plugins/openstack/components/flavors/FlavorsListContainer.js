@@ -23,7 +23,7 @@ class FlavorsListContainer extends React.Component {
   }
 
   redirectToAdd = () => {
-    this.props.history.push('/flavors/add')
+    this.props.history.push('/ui/openstack/flavors/add')
   }
 
   handleDelete = selectedIds => {
@@ -48,14 +48,27 @@ class FlavorsListContainer extends React.Component {
       return
     }
     const flavorNames = flavorsToDelete.map(x => x.name).join(', ')
-    return `This will permanently delete the following flavor(s): ${flaorNames}`
+    return `This will permanently delete the following flavor(s): ${flavorNames}`
   }
 
   render () {
     const { flavors } = this.props
 
     return (
-      <FlavorsList flavors={flavors} onAdd={this.redirectToAdd} onDelete={this.handleDelete} />
+      <div>
+        <ConfirmationDialog
+          open={this.state.showConfirmation}
+          text={this.deleteConfirmText()}
+          onCancel={this.handleDeleteCancel}
+          onConfirm={this.handleDeleteConfirm}
+        />
+
+        <FlavorsList
+          flavors={flavors}
+          onAdd={this.redirectToAdd}
+          onDelete={this.handleDelete}
+        />
+      </div>
     )
   }
 }

@@ -24,7 +24,7 @@ class TenantsListContainer extends React.Component {
   }
 
   redirectToAdd = () => {
-    this.props.history.push('/tenants/add')
+    this.props.history.push('/ui/openstack/tenants/add')
   }
 
   handleDelete = selectedIds => {

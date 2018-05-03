@@ -23,7 +23,7 @@ class UsersListContainer extends React.Component {
   }
 
   redirectToAdd = () => {
-    this.props.history.push('/users/add')
+    this.props.history.push('/ui/openstack/users/add')
   }
 
   handleDelete = selectedIds => {
