@@ -6,7 +6,6 @@ import { addStories, range } from '../helpers'
 import fakeFlavor from './fakeFlavor'
 import FlavorsList from 'openstack/components/flavors/FlavorsList'
 
-const addLogger = action('FlavorsList#onAdd')
 const addAction = linkTo('Flavor Management/Adding a flavor', 'Add a flavor')
 const someFlavors = range(3).map(fakeFlavor)
 const deleteAction = action('Delete flavor')
