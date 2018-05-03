@@ -8,8 +8,11 @@ describe('pluginManager', () => {
 
   test('registerRoutes', () => {
     pluginManager.registerRoutes(
-      { name: 'Dashboard', link: { path: '/', exact: true }, component: <h1>Dashboard</h1> },
-      { name: 'Login', link: { path: '/login' }, component: <h1>Login</h1> },
+      '',
+      [
+        { name: 'Dashboard', link: { path: '/', exact: true }, component: <h1>Dashboard</h1> },
+        { name: 'Login', link: { path: '/login' }, component: <h1>Login</h1> },
+      ]
     )
     const routes = pluginManager.getRoutes()
     expect(routes.length).toBe(2)
@@ -21,8 +24,11 @@ describe('pluginManager', () => {
 
   test('registerNavItems', () => {
     pluginManager.registerNavItems(
-      { name: 'Dashboard', link: { path: '/' } },
-      { name: 'Tenants', link: { path: '/tenants' } },
+      '',
+      [
+        { name: 'Dashboard', link: { path: '/' } },
+        { name: 'Tenants', link: { path: '/tenants' } },
+      ]
     )
     const navItems = pluginManager.getNavItems()
     expect(navItems.length).toBe(2)
@@ -33,12 +39,18 @@ describe('pluginManager', () => {
 
   test('clearAll', () => {
     pluginManager.registerRoutes(
-      { name: 'Dashboard', link: { path: '/', exact: true }, component: <h1>Dashboard</h1> },
-      { name: 'Login', link: { path: '/login' }, component: <h1>Login</h1> },
+      '',
+      [
+        { name: 'Dashboard', link: { path: '/', exact: true }, component: <h1>Dashboard</h1> },
+        { name: 'Login', link: { path: '/login' }, component: <h1>Login</h1> },
+      ]
     )
     pluginManager.registerNavItems(
-      { name: 'Dashboard', link: { path: '/' } },
-      { name: 'Tenants', link: { path: '/tenants' } },
+      '',
+      [
+        { name: 'Dashboard', link: { path: '/' } },
+        { name: 'Tenants', link: { path: '/tenants' } },
+      ]
     )
     expect(pluginManager.getNavItems().length).toEqual(2)
     expect(pluginManager.getRoutes().length).toEqual(2)
