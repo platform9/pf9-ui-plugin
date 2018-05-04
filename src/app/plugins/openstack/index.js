@@ -69,7 +69,7 @@ OpenStack.registerPlugin = pluginManager => {
         component: FlavorsPage
       },
       {
-        name: 'Flavors',
+        name: 'AddFlavor',
         link: { path: '/flavors/add' },
         component: AddFlavorPage
       },

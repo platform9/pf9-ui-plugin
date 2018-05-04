@@ -2,12 +2,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {
   BrowserRouter as Router,
-  Link,
   Redirect,
   Route,
   Switch,
 } from 'react-router-dom'
 import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles'
+import Navbar from 'core/common/Navbar'
 import './app.css'
 import { setupFromConfig } from './util/registry'
 import config from '../../config'
@@ -28,9 +28,7 @@ class App extends React.Component {
 
     const renderNavMenu = () => (
       <div id="_nav-menu">
-        <ul>
-          {pluginManager.getNavItems().map(navItem => <li key={navItem.name}><Link to={navItem.link.path}>{navItem.name}</Link></li>)}
-        </ul>
+        <Navbar links={pluginManager.getNavItems()} />
       </div>
     )
 
