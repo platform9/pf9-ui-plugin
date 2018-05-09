@@ -13,11 +13,15 @@ import AddUserPage from './components/users/AddUserPage'
 import FlavorsPage from './components/FlavorsPage'
 import AddFlavorPage from './components/flavors/AddFlavorPage'
 
+import NetworksPage from './components/NetworksPage'
+import AddNetworkPage from './components/networks/AddNetworkPage'
+
 import loginReducer from './reducers/login'
 import sessionReducer from './reducers/session'
 import tenantsReducer from './reducers/tenants'
 import usersReducer from './reducers/users'
 import flavorsReducer from './reducers/flavors'
+import networksReducer from './reducers/networks'
 
 class OpenStack extends React.Component {
   render () {
@@ -73,6 +77,16 @@ OpenStack.registerPlugin = pluginManager => {
         link: { path: '/flavors/add' },
         component: AddFlavorPage
       },
+      {
+        name: 'Networks',
+        link: { path: '/networks', exact: true },
+        component: NetworksPage
+      },
+      {
+        name: 'AddNetwork',
+        link: { path: '/networks/add' },
+        component: AddNetworkPage
+      },
     ]
   )
 
@@ -95,6 +109,10 @@ OpenStack.registerPlugin = pluginManager => {
         name: 'Flavors',
         link: { path: '/flavors' }
       },
+      {
+        name: 'Networks',
+        link: { path: '/networks' }
+      },
     ]
   )
 }
@@ -105,6 +123,7 @@ OpenStack.reducer = combineReducers({
   tenants: tenantsReducer,
   users: usersReducer,
   flavors: flavorsReducer,
+  networks: networksReducer,
 })
 
 export default OpenStack

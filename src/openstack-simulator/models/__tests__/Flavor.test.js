@@ -13,7 +13,7 @@ describe('Flavor', () => {
   })
 
   describe('asJson', () => {
-    it('creates a JSON version of the User', () => {
+    it('creates a JSON version of the Flavor', () => {
       const flavor = new Flavor({ name: 'test-flavor', ram: 1024, disk: 10, vcpus: 1 })
       expect(flavor.asJson()).toMatchObject({ name: 'test-flavor', ram: 1024, disk: 10, vcpus: 1 })
     })

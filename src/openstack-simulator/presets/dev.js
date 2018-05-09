@@ -5,6 +5,7 @@ import Role from '../models/Role'
 import Tenant from '../models/Tenant'
 import User from '../models/User'
 import Flavor from '../models/Flavor'
+import Network from '../models/Network'
 // import Token from '../models/Token'
 import { range } from '../util'
 
@@ -51,6 +52,9 @@ function loadPreset () {
   new Flavor({ name: 'm1.medium', ram: 4096, disk: 40, vcpus: 2 })
   new Flavor({ name: 'm1.large', ram: 8192, disk: 80, vcpus: 4 })
   new Flavor({ name: 'm1.xlarge', ram: 16384, disk: 160, vcpus: 8 })
+
+  // Networks
+  new Network({ name: 'default network' })
 }
 
 export default loadPreset
