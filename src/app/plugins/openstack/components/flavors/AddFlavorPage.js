@@ -13,7 +13,7 @@ class AddFlavorPage extends React.Component {
     const { dispatch, history } = this.props
     try {
       dispatch(addFlavor(flavor))
-      history.push('/flavors')
+      history.push('/ui/openstack/flavors')
     } catch (err) {
       console.error(err)
     }

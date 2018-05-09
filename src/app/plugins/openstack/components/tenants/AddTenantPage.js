@@ -13,7 +13,7 @@ class AddTenantPage extends React.Component {
     const { dispatch, history } = this.props
     try {
       dispatch(addTenant(tenant))
-      history.push('/tenants')
+      history.push('/ui/openstack/tenants')
     } catch (err) {
       console.error(err)
     }

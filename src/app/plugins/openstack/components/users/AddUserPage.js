@@ -13,7 +13,7 @@ class AddUserPage extends React.Component {
     const { dispatch, history } = this.props
     try {
       dispatch(addUser(user))
-      history.push('/users')
+      history.push('/ui/openstack/users')
     } catch (err) {
       console.error(err)
     }
