@@ -23,6 +23,10 @@ body {
   grid-area: main;
 }
 
+#_main-content {
+  padding-top: 64px;
+}
+
 #main-footer {
   grid-area: ft;
 }
