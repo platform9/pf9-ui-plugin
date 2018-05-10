@@ -1,7 +1,6 @@
 const path = require('path')
 
 const webpack = require('webpack')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 
@@ -13,10 +12,6 @@ const isDev = env === 'development'
 const isProd = env === 'production'
 
 const plugins = [
-  new HtmlWebpackPlugin({
-    inject: false,
-    template: './index.html',
-  }),
   new CopyWebpackPlugin([{ from: './static' }])
 ]
 

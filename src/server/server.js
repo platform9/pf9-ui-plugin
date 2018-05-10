@@ -25,7 +25,7 @@ if (isDev) {
 
   webpackDevMiddleware = require('webpack-dev-middleware')(compiler, {
     publicPath: webpackConfig.output.publicPath,
-    index: 'index.html',
+    index: 'static/ui/index.html',
     hot: true,
     noInfo: true,
     stats: {
@@ -39,7 +39,7 @@ if (isDev) {
 }
 
 app.all('*', (req, res) => {
-  res.write(webpackDevMiddleware.fileSystem.readFileSync(path.join(__dirname, '..', '..', 'build', 'index.html')))
+  res.write(webpackDevMiddleware.fileSystem.readFileSync(path.join(__dirname, '..', '..', 'build', 'ui', 'index.html')))
   res.end()
 })
 
