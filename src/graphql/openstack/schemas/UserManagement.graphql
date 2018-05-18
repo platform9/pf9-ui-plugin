@@ -1,0 +1,34 @@
+type Role {
+  id: ID!
+  name: String
+  description: String
+  displayName: String
+}
+
+type Tenant {
+  id: ID!
+  name: String!
+  description: String
+  users: [User!]!
+}
+
+type TenantRole {
+  user: User!
+  tenant: Tenant!
+  role: Role!
+}
+
+type User {
+  id: ID!
+  username: String!
+  displayname: String
+  name: String
+  email: String
+  password: String
+  tenantRoles: [TenantRole!]!
+}
+
+type Query {
+  tenants: [Tenant!]!
+  users: [User!]!
+}

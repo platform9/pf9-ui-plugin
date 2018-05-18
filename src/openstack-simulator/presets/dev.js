@@ -31,7 +31,7 @@ function loadPreset () {
 
   // Create an admin user
   const adminUser = new User({ name: 'admin@platform9.com', password: 'secret', tenant: serviceTenant })
-  adminUser.addRole(adminRole)
+  adminUser.addRole(serviceTenant, adminRole)
 
   // Create a bunch of misc users
   range(2).forEach(i => {
@@ -43,7 +43,7 @@ function loadPreset () {
       password: 'secret',
       tenant: serviceTenant,
     })
-    user.addRole(memberRole)
+    user.addRole(serviceTenant, memberRole)
   })
 
   // Flavors

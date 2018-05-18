@@ -23,6 +23,8 @@ import usersReducer from './reducers/users'
 import flavorsReducer from './reducers/flavors'
 import networksReducer from './reducers/networks'
 
+import openstackSchemas from 'schema/openstack'
+
 class OpenStack extends React.Component {
   render () {
     return (
@@ -115,6 +117,8 @@ OpenStack.registerPlugin = pluginManager => {
       },
     ]
   )
+
+  pluginManager.registerSchema(openstackSchemas)
 }
 
 OpenStack.reducer = combineReducers({

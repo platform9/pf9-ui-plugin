@@ -52,11 +52,12 @@ class ListTable extends React.Component {
   }
 
   sortData = (data) => {
+    let _data = [...data]
     const orderBy = this.state.orderBy || this.props.columns[0].id
     const sorted =
       this.state.order === 'desc'
-        ? data.sort((a, b) => (b[orderBy] < a[orderBy] ? -1 : 1))
-        : data.sort((a, b) => (a[orderBy] < b[orderBy] ? -1 : 1))
+        ? _data.sort((a, b) => (b[orderBy] < a[orderBy] ? -1 : 1))
+        : _data.sort((a, b) => (a[orderBy] < b[orderBy] ? -1 : 1))
     return sorted
   }
 

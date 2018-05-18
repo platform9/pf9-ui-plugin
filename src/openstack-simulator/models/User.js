@@ -37,7 +37,7 @@ class User extends ActiveModel {
   // TODO
   getTenants = () => []
 
-  addRole = role => this.roles.push(role)
+  addRole = (tenant, role) => this.roles.push({ tenant, role })
 
   asJson = () => {
     return {

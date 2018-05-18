@@ -61,6 +61,11 @@ module.exports = {
         exclude: /node_modules/,
         use: ['style-loader', 'css-loader']
       },
+      {
+        test: /\.graphql/,
+        exclude: /node_modules/,
+        use: ['graphql-tag/loader']
+      },
     ]
   },
   context: contextPath,
@@ -68,7 +73,10 @@ module.exports = {
   resolve: {
     alias: {
       core: path.resolve(__dirname, 'src/app/core'),
-      openstack: path.resolve(__dirname, 'src/app/plugins/openstack')
+      openstack: path.resolve(__dirname, 'src/app/plugins/openstack'),
+      k8s: path.resolve(__dirname, 'src/app/plugins/kubernetes'),
+      sim: path.resolve(__dirname, 'src/openstack-simulator'),
+      schema: path.resolve(__dirname, 'src/graphql')
     }
   }
 }

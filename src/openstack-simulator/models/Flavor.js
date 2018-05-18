@@ -11,6 +11,7 @@ class Flavor extends ActiveModel {
     this.disk = params.disk || 1
     this.ram = params.ram || 512
     this.vcpus = params.vcpus || 1
+    this.public = params.public !== undefined ? params.public : false
   }
 
   static getCollection = coll

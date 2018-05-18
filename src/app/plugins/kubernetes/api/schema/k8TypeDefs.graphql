@@ -1,0 +1,22 @@
+type K8Cluster {
+  id: ID!
+  name: String!
+  cloudProviderType: String!
+  cloudProviderUuid: String!
+  cloudProviderName: String!
+  numMasters: Int!
+  numWorkers: Int!
+}
+
+type Query {
+  K8Clusters: [K8Cluster!]!
+}
+
+type Mutation {
+  addK8Cluster(input: K8ClusterInput!) : K8Cluster
+}
+
+input K8ClusterInput {
+  id: ID!
+  name: String!
+}

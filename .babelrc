@@ -3,5 +3,6 @@
   "plugins": [
     "transform-decorators-legacy",
     "react-hot-loader/babel",
+    "babel-plugin-graphql-import"
   ]
 }

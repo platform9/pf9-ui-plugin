@@ -1,0 +1,14 @@
+type Flavor {
+	id: ID!
+	name: String!
+	# units in GB
+	disk: Int!
+	# units in MB
+	ram: Int!
+	vcpus: Int!
+	public: Boolean
+}
+
+type Query {
+  flavors: [Flavor!]!
+}

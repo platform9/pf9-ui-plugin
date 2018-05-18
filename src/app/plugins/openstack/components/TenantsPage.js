@@ -1,30 +1,46 @@
 import React from 'react'
-import requiresAuthentication from '../util/requiresAuthentication'
-import { connect } from 'react-redux'
+import { compose, graphql, withApollo } from 'react-apollo'
+import { gql } from 'apollo-boost'
 
 import Loader from 'core/common/Loader'
 import TenantsListContainer from './tenants/TenantsListContainer'
+import requiresAuthentication from '../util/requiresAuthentication'
 
-function mapStateToProps (state, ownProps) {
-  const { tenants } = state.openstack
-  return {
-    tenantsLoaded: tenants.tenantsLoaded,
+const GET_TENANTS = gql`
+  {
+    tenants {
+      id
+      name
+      description
+    }
   }
-}
+`
 
-@requiresAuthentication
-@connect(mapStateToProps)
-class TenantsPage extends React.Component {
-  render () {
-    const { tenantsLoaded } = this.props
+/*
+const REMOVE_TENANT = gql`
+  mutation removeTenant($id: ID) {
+    removeTenant(id: $id) {
+      id
+    }
+  }
+`
+*/
+
+const TenantsPage =
+  ({ data, loading, error, client }) => {
+    console.log(client)
     return (
       <div>
         <h1>Tenants Page</h1>
-        {!tenantsLoaded && <Loader />}
-        {tenantsLoaded && <TenantsListContainer />}
+        {loading && <Loader />}
+        {error && <h3>TODO: error handler</h3>}
+        {data && <TenantsListContainer tenants={data.tenants} />}
       </div>
     )
   }
-}
 
-export default TenantsPage
+export default compose(
+  requiresAuthentication,
+  graphql(GET_TENANTS),
+  withApollo,
+)(TenantsPage)

@@ -25,6 +25,11 @@ class Tenant extends ActiveModel {
     }
     return json
   }
+
+  asGraphQl = () => ({
+    ...this.asJson(),
+    __typename: 'Tenant',
+  })
 }
 
 export default Tenant

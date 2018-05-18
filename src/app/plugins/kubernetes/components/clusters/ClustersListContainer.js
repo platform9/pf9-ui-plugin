@@ -7,39 +7,47 @@ import gql from 'graphql-tag'
 import Loader from 'core/common/Loader'
 import DisplayError from 'core/common/DisplayError'
 import ConfirmationDialog from 'core/common/ConfirmationDialog'
-import FlavorsList from './FlavorsList'
+import ClustersList from './ClustersList'
 
-import { removeFlavor } from '../../actions/flavors'
+import { removeCluster } from '../../actions/clusters'
 
-const GET_FLAVORS = gql`
+const GET_K8CLUSTERS = gql`
   {
-    flavors {
+    K8Clusters @client {
       id
       name
-      ram
-      vcpus
-      disk
     }
+  }
+`
+
+const ADD_K8SCLUSTER = gql`
+  mutation AddK8sCluster {
+    id
+  }
+`
+
+const DELETE_K8SCLUSTER = gql`
+  mutation AddK8sCluster {
+    id
   }
 `
 
 @requiresAuthentication
 @withRouter
-// @connect(mapStateToProps)
-class FlavorsListContainer extends React.Component {
+class ClustersListContainer extends React.Component {
   state = {
     showConfirmation: false,
-    flavorsToDelete: null,
+    clustersToDelete: null,
   }
 
   redirectToAdd = () => {
-    this.props.history.push('/ui/openstack/flavors/add')
+    this.props.history.push('/ui/kubernetes/clusters/add')
   }
 
   handleDelete = selectedIds => {
     this.setState({ showConfirmation: true })
-    const selectedFlavors = this.props.flavors.filter(flavor => selectedIds.includes(flavor.id))
-    this.setState({ flavorsToDelete: selectedFlavors })
+    const selectedClusters = this.props.clusters.filter(cluster => selectedIds.includes(cluster.id))
+    this.setState({ clustersToDelete: selectedClusters })
   }
 
   handleDeleteCancel = () => {
@@ -48,21 +56,21 @@ class FlavorsListContainer extends React.Component {
 
   handleDeleteConfirm = () => {
     this.setState({ showConfirmation: false })
-    const flavors = this.state.flavorsToDelete || []
-    flavors.forEach(flavor => this.props.dispatch(removeFlavor(flavor.id)))
+    const clusters = this.state.clustersToDelete || []
+    clusters.forEach(cluster => this.props.dispatch(removeCluster(cluster.id)))
   }
 
   deleteConfirmText = () => {
-    const { flavorsToDelete } = this.state
-    if (!flavorsToDelete) {
+    const { clustersToDelete } = this.state
+    if (!clustersToDelete) {
       return
     }
-    const flavorNames = flavorsToDelete.map(x => x.name).join(', ')
-    return `This will permanently delete the following flavor(s): ${flavorNames}`
+    const clusterNames = clustersToDelete.map(x => x.name).join(', ')
+    return `This will permanently delete the following cluster(s): ${clusterNames}`
   }
 
   render () {
-    const { flavors } = this.props
+    const { clusters } = this.props
 
     return (
       <div>
@@ -73,8 +81,8 @@ class FlavorsListContainer extends React.Component {
           onConfirm={this.handleDeleteConfirm}
         />
 
-        <FlavorsList
-          flavors={flavors}
+        <ClustersList
+          clusters={clusters['K8Clusters']}
           onAdd={this.redirectToAdd}
           onDelete={this.handleDelete}
         />
@@ -89,18 +97,19 @@ const GraphqlCrudContainer = ({ query, actions, children, ...props }) => {
       {({ loading, error, data, client }) => {
         if (loading) { return <Loader /> }
         if (error) { return <DisplayError error={error} /> }
+        console.log(client)
         return children({ data, client, actions: {} })
       }}
     </Query>
   )
 }
 
-const GraphqlFlavorsList = () => (
-  <GraphqlCrudContainer query={GET_FLAVORS}>
+const GraphqlClustersList = () => (
+  <GraphqlCrudContainer query={GET_K8CLUSTERS} actions={{ add: ADD_K8SCLUSTER, delete: DELETE_K8SCLUSTER }}>
     {({ data, actions }) => (
-      <FlavorsListContainer flavors={data.flavors} />
+      <ClustersListContainer clusters={data} />
     )}
   </GraphqlCrudContainer>
 )
 
-export default GraphqlFlavorsList
+export default GraphqlClustersList

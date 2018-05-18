@@ -1,6 +1,7 @@
 import bodyParser from 'body-parser'
 import express from 'express'
 import http from 'http'
+import { mountGraphql } from './graphql'
 
 import {
   requestLogger,
@@ -35,6 +36,8 @@ export function startServer (config = defaultConfig) {
   app.use('/keystone', keystone)
   app.use('/nova', nova)
   app.use('/neutron', neutron)
+
+  mountGraphql(app)
 
   console.log(`Simulator server currently listening on port ${config.port}`)
   serverInstance = http.createServer(app).listen(config.port)
