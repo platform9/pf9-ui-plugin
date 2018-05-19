@@ -103,7 +103,9 @@ class ListTable extends React.Component {
       return
     }
 
-    onDelete(selected)
+    onDelete(selected).then(() => {
+      this.setState({ selected: [] })
+    })
   }
 
   isSelected = id => this.state.selected.includes(id)

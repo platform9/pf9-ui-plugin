@@ -15,9 +15,11 @@ class ActiveModel {
 
   destroy () {
     const col = this.constructor.getCollection()
-    const idx = col.findIndex(x => x.id === this.id)
+    const id = this.id
+    const idx = col.findIndex(x => x.id === id)
     if (idx > -1) {
       col.splice(idx, 1)
+      return id
     }
   }
 

@@ -16,8 +16,13 @@ const resolvers = {
     tenantRoles (user, args, context) {
       return context.getTenantRoles(user)
     },
-  }
+  },
 
+  Mutation: {
+    removeTenant: (obj, { id }, context) => {
+      return context.removeTenant(id)
+    }
+  }
 }
 
 const schema = makeExecutableSchema({

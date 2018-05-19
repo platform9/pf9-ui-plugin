@@ -1,8 +1,0 @@
-  type Foo {
-    id: ID!
-    name: String
-  }
-
-  type Query {
-    foos: [Foo!]!
-  }

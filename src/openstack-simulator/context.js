@@ -49,6 +49,12 @@ class Context {
   getTenants = () => {
     return Tenant.getCollection().map(x => x.asGraphQl())
   }
+
+  removeTenant = id => {
+    const tenant = Tenant.findById(id)
+    tenant.destroy()
+    return id
+  }
 }
 
 const context = new Context()

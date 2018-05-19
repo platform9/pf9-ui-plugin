@@ -1,13 +1,24 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import { withApollo } from 'react-apollo'
 import CRUDListContainer from 'core/common/CRUDListContainer'
 
 import TenantsList from './TenantsList'
+import { GET_TENANTS, REMOVE_TENANT } from './actions'
 
 class TenantsListContainer extends React.Component {
-  handleRemove = (id) => {
-    console.log(`Attempting to remove ${id}`)
+  handleRemove = async id => {
+    const { client } = this.props
+    client.mutate({
+      mutation: REMOVE_TENANT,
+      variables: { id },
+      update: cache => {
+        const data = cache.readQuery({ query: GET_TENANTS })
+        data.tenants = data.tenants.filter(x => x.id !== id)
+        cache.writeQuery({ query: GET_TENANTS, data })
+      }
+    })
   }
 
   render () {
@@ -33,4 +44,4 @@ TenantsListContainer.propTypes = {
   tenants: PropTypes.arrayOf(PropTypes.object)
 }
 
-export default TenantsListContainer
+export default withApollo(TenantsListContainer)

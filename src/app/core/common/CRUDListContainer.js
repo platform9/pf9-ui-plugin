@@ -23,6 +23,7 @@ class CRUDListContainer extends React.Component {
     this.setState({ showConfirmation: true })
     const selectedItems = this.props.items.filter(item => selectedIds.includes(item.id))
     this.setState({ selectedItems })
+    return new Promise(resolve => { this.resolveDelete = resolve })
   }
 
   handleDeleteCancel = () => {
@@ -33,6 +34,8 @@ class CRUDListContainer extends React.Component {
     this.setState({ showConfirmation: false })
     const items = this.state.selectedItems || []
     items.forEach(item => this.props.onRemove(item.id))
+    this.setState({ selectedItems: [] })
+    this.resolveDelete()
   }
 
   redirectToAdd = () => {
