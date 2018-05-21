@@ -1,48 +1,52 @@
+import bodyParser from 'body-parser'
 import express from 'express'
 import http from 'http'
-import path from 'path'
+import { mountGraphql } from './graphql'
 
-const app = express()
-const port = process.env.PORT || 3000
+import {
+  requestLogger,
+  enableAllCors,
+} from './middleware'
 
-console.log('Starting server')
+import keystone from './api/keystone'
+import nova from './api/nova'
+import neutron from './api/neutron'
 
-app.use((req, res, next) => {
-  console.log(`${req.method} ${req.url}`)
-  next()
-})
-
-const nodeEnv = process.env.NODE_ENV || 'development'
-const isDev = nodeEnv === 'development'
-
-let webpackDevMiddleware
-
-if (isDev) {
-  console.log('Webpack processing...')
-  const webpack = require('webpack')
-  const webpackConfig = require('../../webpack.config')
-  const compiler = webpack(webpackConfig)
-
-  webpackDevMiddleware = require('webpack-dev-middleware')(compiler, {
-    publicPath: webpackConfig.output.publicPath,
-    index: 'static/ui/index.html',
-    hot: true,
-    noInfo: true,
-    stats: {
-      colors: true
-    }
-  })
-  const webpackHotMiddleware = require('webpack-hot-middleware')(compiler)
-
-  app.use(webpackDevMiddleware)
-  app.use(webpackHotMiddleware)
+const defaultConfig = {
+  port: 4444,
+  verbose: process.env.VERBOSE === 'true' || false,
 }
 
-app.all('*', (req, res) => {
-  res.write(webpackDevMiddleware.fileSystem.readFileSync(path.join(__dirname, '..', '..', 'build', 'ui', 'index.html')))
-  res.end()
-})
+let serverInstance
 
-const server = http.createServer(app)
-server.listen(port)
-console.log(`Server listening on port ${port}`)
+export function startServer (config = defaultConfig) {
+  console.log('Starting simulator server.')
+  const app = express()
+
+  // Since simulator is on a different port CORS applies.
+  // Allow everything for the simulator.
+  app.use(enableAllCors)
+
+  app.use(bodyParser.urlencoded({ extended: true }))
+  app.use(bodyParser.json())
+
+  if (config.verbose) {
+    app.use(requestLogger)
+  }
+  app.use('/keystone', keystone)
+  app.use('/nova', nova)
+  app.use('/neutron', neutron)
+
+  mountGraphql(app)
+
+  console.log(`Simulator server currently listening on port ${config.port}`)
+  serverInstance = http.createServer(app).listen(config.port)
+}
+
+export function stopServer () {
+  if (serverInstance) {
+    console.log('Stopping simulator server.')
+    return serverInstance.close()
+  }
+  console.log('Simulator server is not currently running.')
+}
