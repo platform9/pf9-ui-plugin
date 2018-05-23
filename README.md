@@ -23,13 +23,19 @@ For local dev version, use `localhost:3000?dev=true` as the browser URL.
 
 ## Server
 
-The Server (previous OpenStack Simulator) is used during UI tests served as 
-frontend server and OpenStack environment. The server will expose API's that are 
-equivalent to those of OpenStack. It may not be 100% compatible but it should be 
-enough for testing and development purpose.
+The Server (previous OpenStack Simulator) serves as the API endpoint for the entire UI. Its roles are as follows:
 
-There are some presets that can be used to configure the initial OpenStack 
-environment.
+- GraphQL API endpoint
+
+- Proxies requests from GraphQL to the OpenStack REST API
+
+- Contains business logic
+
+- Testing simulator mock environment
+
+- Development mock environment
+
+There are some presets that can be used to configure the initial server status.
 
 
 ## Loader
