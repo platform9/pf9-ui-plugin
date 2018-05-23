@@ -43,7 +43,7 @@ There are some presets that can be used to configure the initial server status.
 The loader bootstraps the app loading process. It is the very first code to run 
 and determines which version of the UI to load.
 
-Normally, the UI is loaded from an S3 bucket. Multiple versions of the UI are 
+Currently, the UI is loaded from an S3 bucket. Multiple versions of the UI are 
 stored in different folders and the loader selects which one to use.
 
 It does this using a combination of query parameters, `localStorage`, and 
@@ -59,8 +59,7 @@ To use the latest *edge* version use `?branch=master`. This option will have the
 latest passing commit from `master` and is the absolute latest version.
 
 To use the local dev version you will need to append `?dev=true` to the browser 
-URL. This will switch from loading the bundle from an S3 bucket and request it 
-from the local dev server.
+URL. This will switch the bundle-loading source to local dev server. 
 
 
 # Storybook
@@ -107,12 +106,12 @@ To run them:
 `npm run test:unit`
 
 Unit tests are designed to run very fast.  Anything that can have an external 
-side effect is mocked out.  Jest will run the tests in parallel threads.
+side effect is mocked out. Jest will run the tests in parallel threads.
 
 During active development a developer should be following a TDD (write tests 
 first) paradigm and running these in watch mode.
 
-Unit tests should be run after each commit.  Ideally, locally before they are 
+Unit tests should be run after each commit. Ideally, locally before they are 
 pushed as well.
 
 100% test coverage with unit tests is validated during tests and PRs will be 
