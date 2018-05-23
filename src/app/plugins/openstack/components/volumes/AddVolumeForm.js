@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import NoAutofillHack from 'core/common/NoAutofillHack'
 import TextField from 'material-ui/TextField'
 import Button from 'material-ui/Button'
 
@@ -55,7 +54,6 @@ class AddVolumeForm extends React.Component {
   render () {
     return (
       <form noValidate>
-        <NoAutofillHack />
         {this.fields.map(this.renderField)}
         <div>
           <Button variant="raised" onClick={this.handleSubmit}>Submit</Button>
