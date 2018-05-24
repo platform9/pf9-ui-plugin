@@ -1,14 +1,14 @@
 import React from 'react'
-import { compose, graphql, withApollo } from 'react-apollo'
+import { compose, graphql } from 'react-apollo'
 
 import DisplayError from 'core/common/DisplayError'
 import Loader from 'core/common/Loader'
-import TenantsListContainer from './tenants/TenantsListContainer'
-import requiresAuthentication from '../util/requiresAuthentication'
-import { GET_TENANTS } from './tenants/actions'
+import TenantsListContainer from './TenantsListContainer'
+import requiresAuthentication from '../../util/requiresAuthentication'
+import { GET_TENANTS } from './actions'
 
 const TenantsPage =
-  ({ data, loading, error, client }) => {
+  ({ data, loading, error }) => {
     return (
       <div>
         <h1>Tenants Page</h1>
@@ -22,5 +22,4 @@ const TenantsPage =
 export default compose(
   requiresAuthentication,
   graphql(GET_TENANTS),
-  withApollo,
 )(TenantsPage)
