@@ -2,7 +2,6 @@
 export const formattedValue = (bytes, unit='Bytes', dicimalDigit=2) => {
   const units = ['Bytes', 'KB', 'MB', 'GB', 'TB']
   const addComma = (num) => {
-    console.log((num-Math.floor(num)))
     let floorPart = Math.floor(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
     let roundPart = Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
     let decimalPart = (num-Math.floor(num)).toFixed(dicimalDigit).substring(2)
