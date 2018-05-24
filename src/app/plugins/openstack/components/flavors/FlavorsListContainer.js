@@ -98,7 +98,7 @@ const GraphqlCrudContainer = ({ query, actions, children, ...props }) => {
 const GraphqlFlavorsList = () => (
   <GraphqlCrudContainer query={GET_FLAVORS}>
     {({ data, actions }) => (
-      <FlavorsListContainer flavors={data.flavors} />
+      <FlavorsListContainer flavors={data.flavors} catalog={data.serviceCatalog} />
     )}
   </GraphqlCrudContainer>
 )

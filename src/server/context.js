@@ -2,6 +2,7 @@ import { mapAsJson } from './helpers'
 import Role from './models/Role'
 import Tenant from './models/Tenant'
 import User from './models/User'
+import Catalog from './models/Catalog'
 
 const defaultQuota = {
   cores: 10,
@@ -55,6 +56,8 @@ class Context {
     tenant.destroy()
     return id
   }
+
+  getServiceCatalog = () => Catalog.getCatalog()
 }
 
 const context = new Context()

@@ -11,18 +11,22 @@ class EnhancedTableHead extends React.Component {
   }
 
   render () {
-    const { columns, onSelectAllClick, order, orderBy, numSelected, rowCount } = this.props
+    const { columns, onSelectAllClick, order, orderBy, numSelected, rowCount, showCheckboxes } = this.props
+
+    const headerCheckbox = showCheckboxes ? (
+      <TableCell padding="checkbox">
+        <Checkbox
+          indeterminate={numSelected > 0 && numSelected < rowCount}
+          checked={numSelected === rowCount}
+          onChange={onSelectAllClick}
+        />
+      </TableCell>
+    ) : null
 
     return (
       <TableHead>
         <TableRow>
-          <TableCell padding="checkbox">
-            <Checkbox
-              indeterminate={numSelected > 0 && numSelected < rowCount}
-              checked={numSelected === rowCount}
-              onChange={onSelectAllClick}
-            />
-          </TableCell>
+          {headerCheckbox}
           {columns.map(column => {
             return (
               <TableCell
@@ -61,6 +65,7 @@ EnhancedTableHead.propTypes = {
   order: PropTypes.string.isRequired,
   orderBy: PropTypes.string.isRequired,
   rowCount: PropTypes.number.isRequired,
+  showCheckboxes: PropTypes.bool,
 }
 
 export default EnhancedTableHead

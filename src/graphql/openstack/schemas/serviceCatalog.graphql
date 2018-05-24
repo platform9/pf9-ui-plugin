@@ -1,0 +1,17 @@
+type Service {
+  id: ID!
+  type: String!
+  name: String!
+  endpoints: [Endpoint]!
+}
+
+type Endpoint {
+  id: ID!
+  interface: String!
+  region: String!
+  url: String!
+}
+
+type Query {
+  serviceCatalog: [Service]!
+}

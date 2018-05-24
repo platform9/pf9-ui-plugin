@@ -16,6 +16,8 @@ import AddFlavorPage from './components/flavors/AddFlavorPage'
 import NetworksPage from './components/NetworksPage'
 import AddNetworkPage from './components/networks/AddNetworkPage'
 
+import ApiAccessPage from './components/ApiAccessPage'
+
 import loginReducer from './reducers/login'
 import sessionReducer from './reducers/session'
 import tenantsReducer from './reducers/tenants'
@@ -89,6 +91,11 @@ OpenStack.registerPlugin = pluginManager => {
         link: { path: '/networks/add' },
         component: AddNetworkPage
       },
+      {
+        name: 'ApiAccess',
+        link: { path: '/apiaccess' },
+        component: ApiAccessPage
+      }
     ]
   )
 
@@ -115,6 +122,10 @@ OpenStack.registerPlugin = pluginManager => {
         name: 'Networks',
         link: { path: '/networks' }
       },
+      {
+        name: 'API Access',
+        link: { path: '/apiaccess' },
+      }
     ]
   )
 

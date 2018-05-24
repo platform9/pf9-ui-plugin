@@ -127,21 +127,23 @@ class ListTable extends React.Component {
   }
 
   renderRow = row => {
-    const { columns } = this.props
-
+    const { columns, showCheckboxes } = this.props
     const isSelected = this.isSelected(row.id)
+
+    const checkboxProps = showCheckboxes ? {
+      onClick: this.handleClick(row.id),
+      role: 'checkbox',
+      tabIndex: -1,
+      selected: isSelected
+    } : {}
+
     return (
-      <TableRow
-        hover
-        onClick={this.handleClick(row.id)}
-        role="checkbox"
-        tabIndex={-1}
-        key={row.id}
-        selected={isSelected}
-      >
-        <TableCell padding="checkbox">
-          <Checkbox checked={isSelected} />
-        </TableCell>
+      <TableRow hover key={row.id} {...checkboxProps}>
+        {showCheckboxes &&
+          <TableCell padding="checkbox">
+            <Checkbox checked={isSelected} />
+          </TableCell>
+        }
         {columns.map((columnDef, colIdx) =>
           this.renderCell(columnDef, row[columnDef.id]))
         }
@@ -182,6 +184,10 @@ class ListTable extends React.Component {
       columns,
       data,
       title,
+      onAdd,
+      onDelete,
+      showCheckboxes,
+      paginate
     } = this.props
 
     const {
@@ -191,16 +197,16 @@ class ListTable extends React.Component {
     } = this.state
 
     const sortedData = this.sortData(data)
-    const paginatedData = this.paginate(sortedData)
-    const shouldShowPagination = sortedData.length > this.state.rowsPerPage
+    const paginatedData = paginate ? this.paginate(sortedData) : sortedData
+    const shouldShowPagination = paginate && sortedData.length > this.state.rowsPerPage
 
     return (
       <Paper className={classes.root}>
         <EnhancedTableToolbar
           numSelected={selected.length}
           title={title}
-          onAdd={this.handleAdd}
-          onDelete={this.handleDelete}
+          onAdd={onAdd && this.handleAdd}
+          onDelete={onDelete && this.handleDelete}
         />
         <div className={classes.tableWrapper}>
           <Table className={classes.table}>
@@ -213,6 +219,7 @@ class ListTable extends React.Component {
               onRequestSort={this.handleRequestSort}
               title={title}
               rowCount={sortedData.length}
+              showCheckboxes={showCheckboxes}
             />
             <TableBody>
               {paginatedData.map(this.renderRow)}
@@ -238,11 +245,15 @@ ListTable.propTypes = {
   title: PropTypes.string.isRequired,
   onAdd: PropTypes.func,
   onDelete: PropTypes.func,
+  paginate: PropTypes.bool,
+  showCheckboxes: PropTypes.bool
 }
 
 ListTable.defaultProps = {
   data: [],
   columns: [],
+  paginate: true,
+  showCheckboxes: true
 }
 
 export default ListTable
