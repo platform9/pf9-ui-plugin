@@ -1,16 +1,16 @@
 // Converting the value(bytes) to output unit(optional) with commas
-export const formattedValue = (bytes, unit='Bytes', dicimalDigit=2) => {
+export const formattedValue = (bytes, unit='Bytes', decimalDigits=2) => {
   const units = ['Bytes', 'KB', 'MB', 'GB', 'TB']
   const addComma = (num) => {
     let floorPart = Math.floor(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
     let roundPart = Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-    let decimalPart = (num-Math.floor(num)).toFixed(dicimalDigit).substring(2)
-    if (dicimalDigit===0) return roundPart
-    else if ((num-Math.floor(num)).toFixed(dicimalDigit).startsWith('1')) return roundPart+'.'+decimalPart
+    let decimalPart = (num-Math.floor(num)).toFixed(decimalDigits).substring(2)
+    if (decimalDigits===0) return roundPart
+    else if ((num-Math.floor(num)).toFixed(decimalDigits).startsWith('1')) return roundPart+'.'+decimalPart
     return floorPart+'.'+decimalPart
   }
   if (bytes===undefined || isNaN(bytes) || bytes<0) return 'Invalid value input.'
-  if (dicimalDigit<0) return 'Invalid decimal digits input.'
+  if (decimalDigits<0) return 'Invalid decimal digits input.'
   if (unit==='' || bytes===0) return addComma(bytes)+' Bytes'
   if (units.indexOf(unit)===-1) {
     return 'Output unit not found.'
