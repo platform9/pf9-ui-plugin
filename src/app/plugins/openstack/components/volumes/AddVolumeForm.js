@@ -28,13 +28,13 @@ class AddVolumeForm extends React.Component {
     { id: 'host', label: 'Host' },
     { id: 'instance', label: 'Instance' },
     { id: 'device', label: 'Device' },
-    { id: 'size', label: 'Capacity', type: 'number'},
+    { id: 'size', label: 'Capacity', type: 'number' },
     { id: 'bootable', label: 'Bootable' },
     { id: 'created', label: 'Created' },
     { id: 'id', label: 'OpenStack ID' },
     { id: 'attachedMode', label: 'attached_mode' },
     { id: 'readonly', label: 'readonly' },
-    { id: 'metadata', label: 'Metadata'}
+    { id: 'metadata', label: 'Metadata' }
   ]
 
   renderField = ({ id, label, type = 'text' }) => {
