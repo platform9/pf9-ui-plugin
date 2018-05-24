@@ -28,4 +28,3 @@ addStories('Volume management/Listing volumes', {
     )
   },
 })
-

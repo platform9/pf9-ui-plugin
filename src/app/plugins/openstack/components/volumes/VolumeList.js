@@ -19,12 +19,12 @@ const columns = [
   { id: 'id', label: 'OpenStack ID' },
   { id: 'attachedMode', label: 'attached_mode' },
   { id: 'readonly', label: 'readonly' },
-  { id: 'metadata', label: 'Metadata'}
+  { id: 'metadata', label: 'Metadata' }
 ]
 class VolumeList extends React.Component {
   render () {
     const { onAdd, onDelete, volumes } = this.props
-    if (!volumes || volumes.length === 0){
+    if (!volumes || volumes.length === 0) {
       return <h1>No volumes found.</h1>
     }
     return (
