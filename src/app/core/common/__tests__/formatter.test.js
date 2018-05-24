@@ -15,6 +15,7 @@ describe('Value Formatters Test', () => {
     expect(formattedValue(8481150, 'MB', 2)).toEqual('8.09 MB')
     expect(formattedValue(448115464604563263.36, 'GB', 8)).toEqual('417,340,048.22053319 GB')
     expect(formattedValue(448115464604563263.36, 'TB', 1)).toEqual('407,558.6 TB')
+    expect(formattedValue(2136746229.76, 'GB', 1)).toEqual('2.0 GB')
   })
 
   it('Value with wrong unit', () => {
