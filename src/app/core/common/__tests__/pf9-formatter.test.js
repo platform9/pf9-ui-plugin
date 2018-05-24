@@ -4,31 +4,28 @@ import {
 } from '../formatters'
 
 describe('Value Formatters Test', () => {
-  it('Value without unit', () => {
-    expect(formattedValue(0)).toEqual('0.00')
-    expect(formattedValue(158)).toEqual('158.00')
-    expect(formattedValue(246.21)).toEqual('246.21')
-    expect(formattedValue(12453)).toEqual('12,453.00')
-    expect(formattedValue(10578143.356)).toEqual('10,578,143.36')
+  it('Value without output unit', () => {
+    expect(formattedValue(0, '', 0)).toEqual('0 Bytes')
+    expect(formattedValue(158, '', 1)).toEqual('158.0 Bytes')
+    expect(formattedValue(12453.356, '', 2)).toEqual('12,453.36 Bytes')
   })
 
-  it('Value with unit', () => {
-    expect(formattedValue(0, 'Bytes')).toEqual('0.00 Bytes')
-    expect(formattedValue(850, 'MB')).toEqual('850.00 MB')
-    expect(formattedValue(1024, 'GB')).toEqual('1.00 TB')
-    expect(formattedValue(2458, 'MB')).toEqual('2.40 GB')
-    expect(formattedValue(11578, 'GB')).toEqual('11.31 TB')
-    expect(formattedValue(2048, 'TB')).toEqual('2,048.00 TB')
+  it('Value with output unit', () => {
+    expect(formattedValue(1248.4, 'Bytes', 1)).toEqual('1,248.4 Bytes')
+    expect(formattedValue(8481150, 'MB', 2)).toEqual('8.09 MB')
+    expect(formattedValue(448115464604563263.36, 'GB', 8)).toEqual('417,340,048.22053319 GB')
+    expect(formattedValue(448115464604563263.36, 'TB', 1)).toEqual('407,558.6 TB')
   })
 
   it('Value with wrong unit', () => {
-    expect(formattedValue(1, 'BYTEs')).toEqual('1.00')
-    expect(formattedValue(1024, 'mb')).toEqual('1,024.00')
+    expect(formattedValue(1, 'BYTEs')).toEqual('Output unit not found.')
+    expect(formattedValue(1024, 'mb')).toEqual('Output unit not found.')
   })
 
   it('Input error handling', () => {
-    expect(formattedValue(undefined)).toEqual('Wrong value input.')
-    expect(formattedValue(NaN)).toEqual('Wrong value input.')
+    expect(formattedValue(undefined)).toEqual('Invalid value input.')
+    expect(formattedValue(NaN)).toEqual('Invalid value input.')
+    expect(formattedValue(1024, 'KB', -1)).toEqual('Invalid decimal digits input.')
   })
 })
 
@@ -39,8 +36,8 @@ describe('Date Formatters Test', () => {
   })
 
   it('Input error handling', () => {
-    expect(formattedDate(new Date('1995,12-17T03:24:00'))).toEqual('Wrong date input.')
-    expect(formattedDate(undefined)).toEqual('Wrong date input.')
-    expect(formattedDate(NaN)).toEqual('Wrong date input.')
+    expect(formattedDate(new Date('1995,12-17T03:24:00'))).toEqual('Invalid date input.')
+    expect(formattedDate(undefined)).toEqual('Invalid date input.')
+    expect(formattedDate(NaN)).toEqual('Invalid date input.')
   })
 })

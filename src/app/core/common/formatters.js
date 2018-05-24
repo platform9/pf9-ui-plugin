@@ -1,24 +1,28 @@
-// Converting the value and unit(optional) to the most convinient unit with commas
-export const formattedValue = (value, unit='') => {
+// Converting the value(bytes) to output unit(optional) with commas
+export const formattedValue = (bytes, unit='Bytes', dicimalDigit=2) => {
   const units = ['Bytes', 'KB', 'MB', 'GB', 'TB']
-  const addComma = (num) => (num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','))
-  if (value === undefined || isNaN(value)) return 'Wrong value input.'
-  if (unit === '' || units.indexOf(unit) === -1) {
-    return addComma(value)
+  const addComma = (num) => {
+    console.log((num-Math.floor(num)))
+    let floorPart = Math.floor(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+    let roundPart = Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+    let decimalPart = (num-Math.floor(num)).toFixed(dicimalDigit).substring(2)
+    if (dicimalDigit===0) return roundPart
+    else if ((num-Math.floor(num)).toFixed(dicimalDigit).startsWith('1')) return roundPart+'.'+decimalPart
+    return floorPart+'.'+decimalPart
   }
-  if (unit.length>0) {
-    let pos = units.indexOf(unit)
-    while (value>=1024 && pos<units.length-1) {
-      value/=1024
-      pos++
-    }
-    return (addComma(value))+' '+units[pos]
+  if (bytes===undefined || isNaN(bytes) || bytes<0) return 'Invalid value input.'
+  if (dicimalDigit<0) return 'Invalid decimal digits input.'
+  if (unit==='' || bytes===0) return addComma(bytes)+' Bytes'
+  if (units.indexOf(unit)===-1) {
+    return 'Output unit not found.'
   }
+  let pos = units.indexOf(unit)
+  return addComma(bytes/Math.pow(1024, pos))+' '+unit
 }
 
 // Transfer date obj into string like 'Jan 1, 2018 12:10:24'
 export const formattedDate = (date) => {
-  if (date === undefined || isNaN(date)) return 'Wrong date input.'
+  if (date === undefined || isNaN(date)) return 'Invalid date input.'
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
   const leadingzero = (str) => (('0'+str).slice(-2))
   return months[date.getMonth()]+' '+date.getDate()+', '+date.getFullYear()+
