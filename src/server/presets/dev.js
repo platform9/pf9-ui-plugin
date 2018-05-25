@@ -6,6 +6,7 @@ import Tenant from '../models/Tenant'
 import User from '../models/User'
 import Flavor from '../models/Flavor'
 import Network from '../models/Network'
+import Volume from '../models/Volume'
 // import Token from '../models/Token'
 import { range } from '../util'
 
@@ -55,6 +56,14 @@ function loadPreset () {
 
   // Networks
   new Network({ name: 'default network' })
+
+  // Volumes
+  new Volume({ name: 'TestVolume1', description: 'Lalala', type: 'SOF', metadata: 'ad', size: 15, sizeUnit: 'GB', bootable: false, status: 'available', tenantId: 'a', tenant: 'DEV1', source: 'Image', host: '', instance: 'It1', instanceId: '', device: 'Nothing', attachedMode: 'rw', readonly: false })
+  new Volume({ name: 'TestVolume2', description: 'Yayaya', type: 'KOF', metadata: 'fe', size: 30, sizeUnit: 'GB', bootable: false, status: 'available', tenantId: 'b', tenant: 'DEV2', source: 'Snapshot', host: '', instance: 'It2', instanceId: '', device: 'Nothing', attachedMode: 'rw', readonly: false })
+  new Volume({ name: 'TestVolume3', description: 'Hahaha', type: 'NYC', metadata: 'ef', size: 45, sizeUnit: 'GB', bootable: false, status: 'available', tenantId: 'c', tenant: 'DEV3', source: 'Empty', host: '', instance: 'It3', instanceId: '', device: 'Nothing', attachedMode: 'rw', readonly: false })
+  new Volume({ name: 'TestVolume4', description: 'Tatata', type: 'MTV', metadata: 'df', size: 10, sizeUnit: 'GB', bootable: false, status: 'available', tenantId: 'd', tenant: 'DEV4', source: 'Image', host: '', instance: 'It4', instanceId: '', device: 'Nothing', attachedMode: 'rw', readonly: false })
+  new Volume({ name: 'TestVolume5', description: 'Nanana', type: 'CCTV', metadata: 'ad', size: 25, sizeUnit: 'GB', bootable: false, status: 'available', tenantId: 'e', tenant: 'DEV5', source: 'Empty', host: '', instance: 'It5', instanceId: '', device: 'Nothing', attachedMode: 'rw', readonly: false })
+  adminUser.addRole(adminRole)
 }
 
 export default loadPreset

@@ -33,6 +33,7 @@ class Context {
     this.resMgrRoles = []
     this.hostAggregates = []
     this.regions = []
+    this.volumes = []
 
     this.defaultQuota = { ...defaultQuota }
   }
