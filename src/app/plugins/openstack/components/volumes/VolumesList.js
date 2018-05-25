@@ -21,7 +21,7 @@ const columns = [
   { id: 'readonly', label: 'readonly' },
   { id: 'metadata', label: 'Metadata' }
 ]
-class VolumeList extends React.Component {
+class VolumesList extends React.Component {
   render () {
     const { onAdd, onDelete, volumes } = this.props
     if (!volumes || volumes.length === 0) {
@@ -40,7 +40,7 @@ class VolumeList extends React.Component {
   }
 }
 
-VolumeList.propTypes = {
+VolumesList.propTypes = {
   /** List of volumes [{ name, displayname, tenants, ... }] */
   volumes: PropTypes.array.isRequired,
 
@@ -51,8 +51,8 @@ VolumeList.propTypes = {
   onDelete: PropTypes.func.isRequired,
 }
 
-VolumeList.defaultProps = {
+VolumesList.defaultProps = {
   users: [],
 }
 
-export default VolumeList
+export default VolumesList
