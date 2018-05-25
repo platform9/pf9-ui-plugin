@@ -33,6 +33,13 @@ type Query {
   users: [User!]!
 }
 
+input TenantInput {
+  name: String!
+  description: String!
+}
+
 type Mutation {
-  removeTenant(id: ID): ID
+  createTenant(input: TenantInput): Tenant!
+  updateTenant(id: ID!, input: TenantInput): Tenant!
+  removeTenant(id: ID): ID!
 }

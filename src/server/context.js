@@ -38,23 +38,39 @@ class Context {
   }
 
   getFlavors = () => mapAsJson(this.flavors)
+
   getUsers = () => mapAsJson(this.users)
+
+  getTenants = () =>
+    Tenant.getCollection().map(x => x.asGraphQl())
+
+  createTenant = ({ input }) => {
+    const tenant = new Tenant({...input})
+    return tenant.asGraphQl()
+  }
+
+  updateTenant = (id, { input }) => {
+    const tenant = Tenant.findById(id)
+    if (!tenant) {
+      throw new Error('Unable to update non-existant tenant')
+    }
+  }
+
+  removeTenant = id => {
+    const tenant = Tenant.findById(id)
+    if (!tenant) {
+      throw new Error('Unable to remove non-existant tenant')
+    }
+    tenant.destroy()
+    return id
+  }
+
   getTenantRoles = userObj => {
     const user = User.findById(userObj.id)
     return user.roles.map(({ tenant, role }) => ({
       tenant: Tenant.findById(tenant.id).asGraphQl(),
       role: Role.findById(role.id).asGraphQl()
     }))
-  }
-
-  getTenants = () => {
-    return Tenant.getCollection().map(x => x.asGraphQl())
-  }
-
-  removeTenant = id => {
-    const tenant = Tenant.findById(id)
-    tenant.destroy()
-    return id
   }
 
   getServiceCatalog = () => Catalog.getCatalog()
