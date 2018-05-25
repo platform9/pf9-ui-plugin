@@ -57,7 +57,6 @@ class Context {
   }
 
   removeTenant = id => {
-    console.log(id)
     const tenant = Tenant.findById(id)
     if (!tenant) {
       throw new Error('Unable to remove non-existant tenant')
