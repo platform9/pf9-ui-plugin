@@ -44,12 +44,12 @@ class Context {
   getTenants = () =>
     Tenant.getCollection().map(x => x.asGraphQl())
 
-  createTenant = input => {
-    const tenant = new Tenant(input)
+  createTenant = ({ input }) => {
+    const tenant = new Tenant({...input})
     return tenant.asGraphQl()
   }
 
-  updateTenant = (id, input) => {
+  updateTenant = (id, { input }) => {
     const tenant = Tenant.findById(id)
     if (!tenant) {
       throw new Error('Unable to update non-existant tenant')
@@ -57,6 +57,7 @@ class Context {
   }
 
   removeTenant = id => {
+    console.log(id)
     const tenant = Tenant.findById(id)
     if (!tenant) {
       throw new Error('Unable to remove non-existant tenant')

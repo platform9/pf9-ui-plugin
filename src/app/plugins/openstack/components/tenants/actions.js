@@ -18,12 +18,12 @@ export const REMOVE_TENANT = gql`
 
 export const ADD_TENANT = gql`
   mutation CreateTenant($input: TenantInput!) {
-    createTenant(input: $input)
+    createTenant(input: $input) { id name description }
   }
 `
 
 export const UPDATE_TENANT = gql`
   mutation UpdateTenant($id: ID!, $input: TenantInput!) {
-    updateTenant(id: $id, input: $input)
+    updateTenant(id: $id, input: $input) { id name description }
   }
 `
