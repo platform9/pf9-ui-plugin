@@ -1,8 +1,9 @@
 import { mapAsJson } from './helpers'
+import Catalog from './models/Catalog'
+import Flavor from './models/Flavor'
 import Role from './models/Role'
 import Tenant from './models/Tenant'
 import User from './models/User'
-import Catalog from './models/Catalog'
 
 const defaultQuota = {
   cores: 10,
@@ -37,7 +38,28 @@ class Context {
     this.defaultQuota = { ...defaultQuota }
   }
 
-  getFlavors = () => mapAsJson(this.flavors)
+  getFlavors = () => Flavor.getCollection().map(x => x.asGraphQl())
+
+  createFlavor = ({ input }) => {
+    const flavor = new Flavor({...input})
+    return flavor.asGraphQl()
+  }
+
+  updateFlavor = (id, { input }) => {
+    const flavor = Flavor.findById(id)
+    if (!flavor) {
+      throw new Error('Unable to update non-existant flavor')
+    }
+  }
+
+  removeFlavor = id => {
+    const flavor = Flavor.findById(id)
+    if (!flavor) {
+      throw new Error('Unable to remove non-existant flavor')
+    }
+    flavor.destroy()
+    return id
+  }
 
   getUsers = () => mapAsJson(this.users)
 

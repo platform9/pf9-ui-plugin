@@ -1,106 +1,46 @@
 import React from 'react'
-import { withRouter } from 'react-router-dom'
-import { Query } from 'react-apollo'
-import requiresAuthentication from 'openstack/util/requiresAuthentication'
-import gql from 'graphql-tag'
+import PropTypes from 'prop-types'
 
-import Loader from 'core/common/Loader'
-import DisplayError from 'core/common/DisplayError'
-import ConfirmationDialog from 'core/common/ConfirmationDialog'
+import { withApollo } from 'react-apollo'
+import CRUDListContainer from 'core/common/CRUDListContainer'
+
 import FlavorsList from './FlavorsList'
+import { GET_FLAVORS, REMOVE_FLAVOR } from './actions'
 
-import { removeFlavor } from '../../actions/flavors'
-
-const GET_FLAVORS = gql`
-  {
-    flavors {
-      id
-      name
-      ram
-      vcpus
-      disk
-    }
-  }
-`
-
-@requiresAuthentication
-@withRouter
-// @connect(mapStateToProps)
 class FlavorsListContainer extends React.Component {
-  state = {
-    showConfirmation: false,
-    flavorsToDelete: null,
-  }
-
-  redirectToAdd = () => {
-    this.props.history.push('/ui/openstack/flavors/add')
-  }
-
-  handleDelete = selectedIds => {
-    this.setState({ showConfirmation: true })
-    const selectedFlavors = this.props.flavors.filter(flavor => selectedIds.includes(flavor.id))
-    this.setState({ flavorsToDelete: selectedFlavors })
-  }
-
-  handleDeleteCancel = () => {
-    this.setState({ showConfirmation: false })
-  }
-
-  handleDeleteConfirm = () => {
-    this.setState({ showConfirmation: false })
-    const flavors = this.state.flavorsToDelete || []
-    flavors.forEach(flavor => this.props.dispatch(removeFlavor(flavor.id)))
-  }
-
-  deleteConfirmText = () => {
-    const { flavorsToDelete } = this.state
-    if (!flavorsToDelete) {
-      return
-    }
-    const flavorNames = flavorsToDelete.map(x => x.name).join(', ')
-    return `This will permanently delete the following flavor(s): ${flavorNames}`
+  handleRemove = async id => {
+    const { client } = this.props
+    client.mutate({
+      mutation: REMOVE_FLAVOR,
+      variables: { id },
+      update: cache => {
+        const data = cache.readQuery({ query: GET_FLAVORS })
+        data.flavors = data.flavors.filter(x => x.id !== id)
+        cache.writeQuery({ query: GET_FLAVORS, data })
+      }
+    })
   }
 
   render () {
-    const { flavors } = this.props
-
     return (
-      <div>
-        <ConfirmationDialog
-          open={this.state.showConfirmation}
-          text={this.deleteConfirmText()}
-          onCancel={this.handleDeleteCancel}
-          onConfirm={this.handleDeleteConfirm}
-        />
-
-        <FlavorsList
-          flavors={flavors}
-          onAdd={this.redirectToAdd}
-          onDelete={this.handleDelete}
-        />
-      </div>
+      <CRUDListContainer
+        items={this.props.flavors}
+        onRemove={this.handleRemove}
+        addUrl="/ui/openstack/flavors/add"
+      >
+        {({ onDelete, onAdd }) => (
+          <FlavorsList
+            flavors={this.props.flavors}
+            onAdd={onAdd}
+            onDelete={onDelete}
+          />
+        )}
+      </CRUDListContainer>
     )
   }
 }
 
-const GraphqlCrudContainer = ({ query, actions, children, ...props }) => {
-  return (
-    <Query query={query}>
-      {({ loading, error, data, client }) => {
-        if (loading) { return <Loader /> }
-        if (error) { return <DisplayError error={error} /> }
-        return children({ data, client, actions: {} })
-      }}
-    </Query>
-  )
+FlavorsListContainer.propTypes = {
+  flavors: PropTypes.arrayOf(PropTypes.object)
 }
-
-const GraphqlFlavorsList = () => (
-  <GraphqlCrudContainer query={GET_FLAVORS}>
-    {({ data, actions }) => (
-      <FlavorsListContainer flavors={data.flavors} catalog={data.serviceCatalog} />
-    )}
-  </GraphqlCrudContainer>
-)
-
-export default GraphqlFlavorsList
+export default withApollo(FlavorsListContainer)

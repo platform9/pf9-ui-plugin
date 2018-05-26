@@ -1,14 +1,30 @@
 type Flavor {
   id: ID!
-	name: String!
-	# units in GB
-	disk: Int!
-	# units in MB
-	ram: Int!
-	vcpus: Int!
-	public: Boolean
+  name: String!
+  # Disk size in GB
+  disk: Int!
+  # RAM size in MB
+  ram: Int!
+  vcpus: Int!
+  public: Boolean
 }
 
 type Query {
   flavors: [Flavor!]!
+}
+
+input FlavorInput {
+  name: String!
+  # Disk size in GB
+  disk: Int!
+  # RAM size in MB
+  ram: Int!
+  vcpus: Int!
+  public: Boolean
+}
+
+type Mutation {
+  createFlavor(input: FlavorInput): Flavor!
+  updateFlavor(id: ID!, input: FlavorInput): Flavor!
+  removeFlavor(id: ID): ID!
 }

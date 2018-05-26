@@ -1,18 +1,25 @@
 import React from 'react'
-import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { addFlavor } from '../../actions/flavors'
 import AddFlavorForm from './AddFlavorForm'
+import { ADD_FLAVOR, GET_FLAVORS } from './actions'
+import { compose, withApollo } from 'react-apollo'
+import requiresAuthentication from '../../util/requiresAuthentication'
 
-const mapStateToProps = state => ({})
-
-@withRouter
-@connect(mapStateToProps)
 class AddFlavorPage extends React.Component {
   handleSubmit = flavor => {
-    const { dispatch, history } = this.props
+    const { client, history } = this.props
     try {
-      dispatch(addFlavor(flavor))
+      client.mutate({
+        mutation: ADD_FLAVOR,
+        variables: {
+          input: flavor
+        },
+        update: (proxy, { data: { createFlavor } }) => {
+          const data = proxy.readQuery({ query: GET_FLAVORS })
+          data.flavors.push(createFlavor)
+          proxy.writeQuery({ query: GET_FLAVORS, data })
+        }
+      })
       history.push('/ui/openstack/flavors')
     } catch (err) {
       console.error(err)
@@ -22,11 +29,15 @@ class AddFlavorPage extends React.Component {
   render () {
     return (
       <div>
-        <h1>Add Flavors Page</h1>
+        <h1>Add Flavor</h1>
         <AddFlavorForm onSubmit={this.handleSubmit} />
       </div>
     )
   }
 }
 
-export default AddFlavorPage
+export default compose(
+  requiresAuthentication,
+  withRouter,
+  withApollo,
+)(AddFlavorPage)

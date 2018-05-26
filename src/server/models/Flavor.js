@@ -27,8 +27,14 @@ class Flavor extends ActiveModel {
       disk: this.disk,
       ram: this.ram,
       vcpus: this.vcpus,
+      public: this.public,
     }
   }
+
+  asGraphQl = () => ({
+    ...this.asJson(),
+    __typename: 'Flavor',
+  })
 }
 
 export default Flavor
