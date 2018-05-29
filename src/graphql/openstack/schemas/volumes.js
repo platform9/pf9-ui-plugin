@@ -3,15 +3,10 @@ import { makeExecutableSchema } from 'graphql-tools'
 
 const resolvers = {
   Query: {
-    volumes (obj, args, context) {
-      return context.getVolumes()
-    }
+    volumes: (_, __, context) => context.getVolumes()
   }
 }
 
-const schema = makeExecutableSchema({
-  typeDefs,
-  resolvers,
-})
+const schema = makeExecutableSchema({ typeDefs, resolvers })
 
 export default schema
