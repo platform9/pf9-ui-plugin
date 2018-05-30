@@ -1,4 +1,4 @@
-import typeDefs from '../schemas/UserManagement.graphql'
+import typeDefs from './UserManagement.graphql'
 import { makeExecutableSchema } from 'graphql-tools'
 
 const resolvers = {
@@ -15,6 +15,10 @@ const resolvers = {
     createTenant: (obj, args, context) => context.createTenant(args),
     updateTenant: (obj, { id, input }, context) => context.updateTenant(id, input),
     removeTenant: (obj, { id }, context) => context.removeTenant(id),
+
+    createUser: (obj, args, context) => context.createUser(args),
+    updateUser: (obj, { id, input }, context) => context.updateUser(id, input),
+    removeUser: (obj, { id }, context) => context.removeUser(id),
   }
 }
 

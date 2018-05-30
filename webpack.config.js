@@ -62,9 +62,9 @@ module.exports = {
         use: ['style-loader', 'css-loader']
       },
       {
-        test: /\.graphql/,
+        test: /\.graphql$/,
         exclude: /node_modules/,
-        use: ['graphql-tag/loader']
+        use: 'graphql-tag/loader'
       },
     ]
   },

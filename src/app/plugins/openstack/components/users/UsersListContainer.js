@@ -1,76 +1,47 @@
 import React from 'react'
-import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
+import PropTypes from 'prop-types'
 
-import ConfirmationDialog from 'core/common/ConfirmationDialog'
+import { withApollo } from 'react-apollo'
+import CRUDListContainer from 'core/common/CRUDListContainer'
+
 import UsersList from './UsersList'
+import { GET_USERS, REMOVE_USER } from './actions'
 
-import { removeUser } from '../../actions/users'
-
-const mapStateToProps = state => {
-  const { users } = state.openstack
-  return {
-    users: users.users,
-  }
-}
-
-@withRouter
-@connect(mapStateToProps)
 class UsersListContainer extends React.Component {
-  state = {
-    showConfirmation: false,
-    userToDelete: null,
-  }
-
-  redirectToAdd = () => {
-    this.props.history.push('/ui/openstack/users/add')
-  }
-
-  handleDelete = selectedIds => {
-    this.setState({ showConfirmation: true })
-    const selectedUsers = this.props.users.filter(user => selectedIds.includes(user.id))
-    this.setState({ usersToDelete: selectedUsers })
-  }
-
-  handleDeleteCancel = () => {
-    this.setState({ showConfirmation: false })
-  }
-
-  handleDeleteConfirm = () => {
-    this.setState({ showConfirmation: false })
-    const users = this.state.usersToDelete || []
-    users.forEach(user => this.props.dispatch(removeUser(user.id)))
-  }
-
-  deleteConfirmText = () => {
-    const { usersToDelete } = this.state
-    if (!usersToDelete) {
-      return
-    }
-    const userNames = usersToDelete.map(x => x.name).join(', ')
-    return `This will permanently delete the following user(s): ${userNames}`
+  handleRemove = async id => {
+    const { client } = this.props
+    client.mutate({
+      mutation: REMOVE_USER,
+      variables: { id },
+      update: cache => {
+        const data = cache.readQuery({ query: GET_USERS })
+        data.users = data.users.filter(x => x.id !== id)
+        cache.writeQuery({ query: GET_USERS, data })
+      }
+    })
   }
 
   render () {
-    const { users } = this.props
-
     return (
-      <div>
-        <ConfirmationDialog
-          open={this.state.showConfirmation}
-          text={this.deleteConfirmText()}
-          onCancel={this.handleDeleteCancel}
-          onConfirm={this.handleDeleteConfirm}
-        />
-
-        <UsersList
-          users={users}
-          onAdd={this.redirectToAdd}
-          onDelete={this.handleDelete}
-        />
-      </div>
+      <CRUDListContainer
+        items={this.props.users}
+        onRemove={this.handleRemove}
+        addUrl="/ui/openstack/users/add"
+      >
+        {({ onDelete, onAdd }) => (
+          <UsersList
+            users={this.props.users}
+            onAdd={onAdd}
+            onDelete={onDelete}
+          />
+        )}
+      </CRUDListContainer>
     )
   }
 }
 
-export default UsersListContainer
+UsersListContainer.propTypes = {
+  users: PropTypes.arrayOf(PropTypes.object)
+}
+
+export default withApollo(UsersListContainer)
