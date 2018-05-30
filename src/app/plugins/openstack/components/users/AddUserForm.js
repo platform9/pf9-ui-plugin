@@ -27,7 +27,7 @@ class AddUserForm extends React.Component {
     if (type === 'text' || type === 'password') {
       return (
         <div key={id}>
-          <TextField id={id} type={type} label={label} value={this.state[id]} onChange={this.setField(id)} autoComplete="off" />
+          <TextField id={id} type={type} label={label} value={this.state[id]} onChange={this.setField(id)} autoComplete="new-password" />
         </div>
       )
     }
@@ -38,15 +38,11 @@ class AddUserForm extends React.Component {
   }
 
   // As of Chrome 66, Google has disabled the NoAutofillHack and still does
-  // not respect the HTML spec for disabling autocomplete.  It does not
-  // look like there is anything we can do to prevent Chrome from autofilling
-  // the admin's username and password for new users.
-  //
-  // I added the autoComplete attributes in hopes that some day Google will
-  // respect the spec.
+  // not respect the HTML spec for autocomplete="off".  After some experimentation
+  // it looks like autocomplete="new-password" works.
   render () {
     return (
-      <form noValidate autoComplete="off">
+      <form noValidate autoComplete="new-password">
         <NoAutofillHack />
         {this.fields.map(this.renderField)}
         <div>
