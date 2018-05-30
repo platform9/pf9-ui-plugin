@@ -1,25 +1,52 @@
 type Volume {
 	id: ID!
   name: String!
-  description: String!
+  description: String
   type: String!
-  metadata: String!
+  metadata: String
   size: Int!
   sizeUnit: String!
-  bootable: Boolean
-  status: String!
+  bootable: Boolean!
+  status: String
   tenantId: String!
   tenant: String!
-  source: String!
+  source: String
   host: String!
-  instance: String!
-  instanceId: String!
-  device: String!
+  instance: String
+  instanceId: String
+  device: String
   created: String!
-  attachedMode: String!
+  attachedMode: String
   readonly: Boolean
 }
 
 type Query {
   volumes: [Volume!]!
+}
+
+input VolumeInput {
+  name: String!
+  description: String
+  type: String!
+  metadata: String
+  size: Int!
+  sizeUnit: String!
+  bootable: Boolean!
+  status: String
+  tenantId: String!
+  tenant: String!
+  source: String
+  host: String!
+  instance: String
+  instanceId: String
+  device: String
+  created: String!
+  attachedMode: String
+  readonly: Boolean
+}
+
+type Mutation {
+  createVolume(input: VolumeInput): Volume!
+  updateVolume(id: ID!, input: VolumeInput): Volume!
+  removeVolume(id: ID!): ID!
 }

@@ -54,6 +54,11 @@ class Volume extends ActiveModel {
       readonly: this.readonly
     }
   }
+
+  asGraphQl = () => ({
+    ...this.asJson(),
+    __typename: 'Volume',
+  })
 }
 
 export default Volume

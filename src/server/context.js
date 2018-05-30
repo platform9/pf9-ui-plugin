@@ -3,6 +3,13 @@ import Flavor from './models/Flavor'
 import Role from './models/Role'
 import Tenant from './models/Tenant'
 import User from './models/User'
+<<<<<<< HEAD
+||||||| merged common ancestors
+import Catalog from './models/Catalog'
+=======
+import Catalog from './models/Catalog'
+import Volume from './models/Volume'
+>>>>>>> Add Volume CRUD model and components.
 
 const defaultQuota = {
   cores: 10,
