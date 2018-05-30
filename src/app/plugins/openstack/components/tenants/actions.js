@@ -11,7 +11,7 @@ export const GET_TENANTS = gql`
 `
 
 export const REMOVE_TENANT = gql`
-  mutation RemoveTenant($id: ID) {
+  mutation RemoveTenant($id: ID!) {
     removeTenant(id: $id)
   }
 `

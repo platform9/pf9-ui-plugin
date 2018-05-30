@@ -9,6 +9,7 @@ class AddFlavorForm extends React.Component {
     disk: 20,
     ram: 4096,
     vcpus: 2,
+    public: false,
   }
 
   setField = field => event => this.setState({ [field]: event.target.value })

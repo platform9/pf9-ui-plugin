@@ -10,7 +10,7 @@ import TenantsListPage from './components/tenants/TenantsListPage'
 import UsersPage from './components/UsersPage'
 import AddUserPage from './components/users/AddUserPage'
 
-import FlavorsPage from './components/FlavorsPage'
+import FlavorsListPage from './components/flavors/FlavorsListPage'
 import AddFlavorPage from './components/flavors/AddFlavorPage'
 
 import NetworksPage from './components/NetworksPage'
@@ -74,7 +74,7 @@ OpenStack.registerPlugin = pluginManager => {
       {
         name: 'Flavors',
         link: { path: '/flavors', exact: true },
-        component: FlavorsPage
+        component: FlavorsListPage
       },
       {
         name: 'AddFlavor',

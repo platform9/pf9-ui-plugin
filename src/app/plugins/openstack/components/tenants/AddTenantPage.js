@@ -29,7 +29,7 @@ class AddTenantPage extends React.Component {
   render () {
     return (
       <div>
-        <h1>Add Users Page</h1>
+        <h1>Add Tenant</h1>
         <AddTenantForm onSubmit={this.handleSubmit} />
       </div>
     )
