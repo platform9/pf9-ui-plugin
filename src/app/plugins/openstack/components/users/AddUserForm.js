@@ -7,6 +7,8 @@ import Button from 'material-ui/Button'
 class AddUserForm extends React.Component {
   state = {
     name: '',
+    email: '',
+    username: '',
     displayname: '',
     password: '',
   }
@@ -14,7 +16,9 @@ class AddUserForm extends React.Component {
   setField = field => event => this.setState({ [field]: event.target.value })
 
   fields = [
-    { id: 'name', label: 'Username' },
+    { id: 'name', label: 'Name' },
+    { id: 'email', label: 'Email' },
+    { id: 'username', label: 'Username' },
     { id: 'displayname', label: 'Display Name' },
     { id: 'password', label: 'Password', type: 'password' },
   ]
@@ -23,7 +27,7 @@ class AddUserForm extends React.Component {
     if (type === 'text' || type === 'password') {
       return (
         <div key={id}>
-          <TextField id={id} type={type} label={label} value={this.state[id]} onChange={this.setField(id)} />
+          <TextField id={id} type={type} label={label} value={this.state[id]} onChange={this.setField(id)} autoComplete="new-password" />
         </div>
       )
     }
@@ -33,9 +37,12 @@ class AddUserForm extends React.Component {
     this.props.onSubmit(this.state)
   }
 
+  // As of Chrome 66, Google has disabled the NoAutofillHack and still does
+  // not respect the HTML spec for autocomplete="off".  After some experimentation
+  // it looks like autocomplete="new-password" works.
   render () {
     return (
-      <form noValidate>
+      <form noValidate autoComplete="new-password">
         <NoAutofillHack />
         {this.fields.map(this.renderField)}
         <div>

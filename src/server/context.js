@@ -1,4 +1,3 @@
-import { mapAsJson } from './helpers'
 import Catalog from './models/Catalog'
 import Flavor from './models/Flavor'
 import Role from './models/Role'
@@ -61,8 +60,6 @@ class Context {
     return id
   }
 
-  getUsers = () => mapAsJson(this.users)
-
   getTenants = () =>
     Tenant.getCollection().map(x => x.asGraphQl())
 
@@ -93,6 +90,29 @@ class Context {
       tenant: Tenant.findById(tenant.id).asGraphQl(),
       role: Role.findById(role.id).asGraphQl()
     }))
+  }
+
+  getUsers = () => User.getCollection().map(x => x.asGraphQl())
+
+  createUser = ({ input }) => {
+    const user = new User(input)
+    return user.asGraphQl()
+  }
+
+  updateUser = (id, { input }) => {
+    const user = User.findById(id)
+    if (!user) {
+      throw new Error('Unable to update non-existant user')
+    }
+  }
+
+  removeUser = id => {
+    const user = User.findById(id)
+    if (!user) {
+      throw new Error('Unable to remove non-existant user')
+    }
+    user.destroy()
+    return id
   }
 
   getServiceCatalog = () => Catalog.getCatalog()

@@ -48,6 +48,11 @@ class User extends ActiveModel {
       username: this.username,
     }
   }
+
+  asGraphQl = () => ({
+    ...this.asJson(),
+    __typename: 'User',
+  })
 }
 
 export default User
