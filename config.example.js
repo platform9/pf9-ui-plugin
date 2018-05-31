@@ -1,3 +1,9 @@
+/*
+ * This is an example of how to set up config.js.
+ * Copy this file to config.js and edit.
+ * Do NOT rename this file, it will show up as
+ * a delete in git.
+ */
 const config = {
   production: {
     host: 'https://localhost',
@@ -14,7 +20,7 @@ const config = {
     }
   },
 
-  testing: {
+  test: {
     host: 'http://localhost:3000',
     apiHost: 'http://localhost:4444',
     simulator: {

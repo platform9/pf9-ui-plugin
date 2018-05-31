@@ -8,6 +8,7 @@
     "@material-ui/icons": "^1.1.0",
     "apollo-boost": "^0.1.6",
     "apollo-server-express": "^1.3.6",
+    "axios": "^0.18.0",
     "classnames": "^2.2.5",
     "cors": "^2.8.4",
     "graphql": "^0.13.2",
@@ -89,10 +90,12 @@
     "server": "./node_modules/.bin/babel-node src/server/main.js",
     "storybook": "start-storybook -p 9001 -c src/stories",
     "test": "npm run lint && npm run test:unit",
+    "test:client": "NODE_ENV=test jest src/openstack-client",
+    "test:client:watch": "NODE_ENV=test jest --watch src/openstack-client",
     "test:e2e": "NODE_ENV=test jest -i e2e-tests/",
     "test:integration": "NODE_ENV=test jest integration-tests/",
-    "test:unit": "NODE_ENV=test jest --coverage src",
-    "test:unit:watch": "NODE_ENV=test jest --watch --coverage src"
+    "test:unit": "NODE_ENV=test jest --coverage src/app src/server",
+    "test:unit:watch": "NODE_ENV=test jest --watch --coverage src/app src/server"
   },
   "keywords": [
     "Platform9",
