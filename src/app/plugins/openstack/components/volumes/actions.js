@@ -7,6 +7,7 @@ export const GET_VOLUMES = gql`
       name
       description
       type
+      status
       metadata
       size
       sizeUnit
