@@ -41,7 +41,7 @@ class VolumesList extends React.Component {
 }
 
 VolumesList.propTypes = {
-  /** List of volumes [{ name, displayname, tenants, ... }] */
+  /** List of volumes [{ id, name... }] */
   volumes: PropTypes.array.isRequired,
 
   /** What to do when the add button is clicked */
@@ -52,7 +52,7 @@ VolumesList.propTypes = {
 }
 
 VolumesList.defaultProps = {
-  users: [],
+  volumes: [],
 }
 
 export default VolumesList

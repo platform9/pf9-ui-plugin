@@ -16,6 +16,9 @@ import AddFlavorPage from './components/flavors/AddFlavorPage'
 import NetworksPage from './components/NetworksPage'
 import AddNetworkPage from './components/networks/AddNetworkPage'
 
+import VolumesListPage from './components/volumes/VolumesListPage'
+import AddVolumePage from './components/volumes/AddVolumePage'
+
 import ApiAccessPage from './components/ApiAccessPage'
 
 import loginReducer from './reducers/login'
@@ -95,6 +98,16 @@ OpenStack.registerPlugin = pluginManager => {
         name: 'ApiAccess',
         link: { path: '/apiaccess' },
         component: ApiAccessPage
+      },
+      {
+        name: 'Volumes',
+        link: { path: '/volumes', exact: true },
+        component: VolumesListPage
+      },
+      {
+        name: 'AddVolume',
+        link: { path: '/volumes/add', exact: true },
+        component: AddVolumePage
       }
     ]
   )
@@ -125,7 +138,11 @@ OpenStack.registerPlugin = pluginManager => {
       {
         name: 'API Access',
         link: { path: '/apiaccess' },
-      }
+      },
+      {
+        name: 'Volumes',
+        link: { path: '/volumes' },
+      },
     ]
   )
 

@@ -1,9 +1,8 @@
-/* eslint-disable no-unused-vars */
 import Volume from '../../models/Volume'
 
 const deleteVolume = (req, res) => {
   // TODO: account for tenancy
-  const { volumeId, tenantId } = req.params
+  const { volumeId } = req.params
   console.log('Attempting to delete volumeId: ', volumeId)
   const volume = Volume.findById(volumeId)
   if (!volume) {

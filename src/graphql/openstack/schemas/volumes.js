@@ -6,7 +6,7 @@ const resolvers = {
     volumes: (_, __, context) => context.getVolumes()
   },
 
-  Mutations: {
+  Mutation: {
     createVolume: (obj, args, context) => context.createVolume(args),
     updateVolume: (obj, { id, input }, context) => context.updateVolume(id, input),
     removeVolume: (obj, { id }, context) => context.removeVolume(id),

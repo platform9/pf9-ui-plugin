@@ -40,7 +40,6 @@ input VolumeInput {
   instance: String
   instanceId: String
   device: String
-  created: String!
   attachedMode: String
   readonly: Boolean
 }

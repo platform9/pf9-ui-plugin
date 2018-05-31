@@ -13,7 +13,7 @@ class AddVolumeForm extends React.Component {
     bootable: false,
     source: '',
     metadata: [],
-    created: Date.now(),
+    created: new Date().toISOString(),
   }
 
   setField = field => event => this.setState({ [field]: event.target.value })

@@ -16,7 +16,7 @@ class AddVolumePage extends React.Component {
         },
         update: (proxy, { data: { createVolume } }) => {
           const data = proxy.readQuery({ query: GET_VOLUMES })
-          data.users.push(createVolume)
+          data.volumes.push(createVolume)
           proxy.writeQuery({ query: GET_VOLUMES, data })
         }
       })

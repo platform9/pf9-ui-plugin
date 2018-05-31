@@ -24,6 +24,7 @@ class Volume extends ActiveModel {
     this.device = params.device || ''
     this.attachedMode = params.attachedMode || ''
     this.readonly = params.readonly !== undefined ? params.readonly : false
+    this.created = params.created || (new Date().toISOString())
   }
 
   static getCollection = coll
@@ -51,7 +52,8 @@ class Volume extends ActiveModel {
       instanceId: this.instanceId,
       device: this.device,
       attachedMode: this.attachedMode,
-      readonly: this.readonly
+      readonly: this.readonly,
+      created: this.created
     }
   }
 

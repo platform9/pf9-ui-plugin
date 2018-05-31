@@ -14,7 +14,7 @@ const VolumesListPage =
         <h1>Volumes Page</h1>
         {loading && <Loader />}
         {error && <DisplayError error={error} />}
-        {data && <VolumesListContainer users={data.volumes} />}
+        {data && <VolumesListContainer volumes={data.volumes} />}
       </div>
     )
   }

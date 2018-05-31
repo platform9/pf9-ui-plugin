@@ -30,7 +30,7 @@ class VolumesListContainer extends React.Component {
       >
         {({ onDelete, onAdd }) => (
           <VolumesList
-            users={this.props.users}
+            volumes={this.props.volumes}
             onAdd={onAdd}
             onDelete={onDelete}
           />
@@ -41,7 +41,7 @@ class VolumesListContainer extends React.Component {
 }
 
 VolumesListContainer.propTypes = {
-  users: PropTypes.arrayOf(PropTypes.object)
+  volumes: PropTypes.arrayOf(PropTypes.object)
 }
 
 export default withApollo(VolumesListContainer)
