@@ -1,13 +1,8 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import { Paper, Typography, Grid, FormControl, MenuItem, InputLabel, Select, TextField, Checkbox, FormControlLabel, Button } from '@material-ui/core'
 
 const styles = theme => ({
-  MuiModal: {
-    hidden: {
-      visibility: ['visible', '!important']
-    }
-  },
   root: {
     display: 'flex',
     position: 'absolute',
@@ -16,9 +11,9 @@ const styles = theme => ({
     overflow: 'auto'
   },
   paper: {
-    width: 400,
-    paddingLeft: 24,
-    paddingRight: 24,
+    // width: 400,
+    // paddingLeft: 24,
+    // paddingRight: 24,
     paddingBottom: 20
   },
   img: {
@@ -31,16 +26,16 @@ const styles = theme => ({
     marginRight: 'auto'
   },
   formControl: {
-    minWidth: 360,
+    minWidth: '100%',
     visibility: 'display'
   },
   form: {
-    marginLeft: 20,
-    marginRight: 20
+    marginLeft: '10%',
+    marginRight: '10%'
   },
   textField: {
-    marginTop: 20,
-    minWidth: 360
+    minWidth: '100%',
+    marginTop: 10
   },
   checkbox: {
     marginTop: 20,
@@ -50,7 +45,7 @@ const styles = theme => ({
     marginLeft: 30
   },
   signinButton: {
-    minWidth: 320,
+    minWidth: '80%',
     marginTop: 20,
     display: 'block',
     marginLeft: 'auto',
@@ -71,9 +66,19 @@ class Logon extends Component {
   state = {
     MFAcheckbox: false,
     method: '',
-    open: false
+    open: false,
+    SSOhidden: false
   }
   handleChange = name => event => {
+    if (event.target.value === 'Single sign-on') {
+      this.setState({
+        SSOhidden: true
+      })
+    } else {
+      this.setState({
+        SSOhidden: false
+      })
+    }
     this.setState({ [name]: event.target.value })
   }
 
@@ -102,6 +107,9 @@ class Logon extends Component {
       >
         <Grid
           item
+          md={4}
+          sm={6}
+          xs={12}
         >
           <Paper className={classes.paper}>
             <img src="../../Images/logo.png" className={classes.img} />
@@ -131,40 +139,57 @@ class Logon extends Component {
                 </Select>
               </FormControl>
               <br />
-              <TextField
-                required
-                id="email"
-                label="Email"
-                className={classes.textField}
-                placeholder="Email"
-                margin="normal"
-              />
-              <TextField
-                required
-                id="password"
-                label="Password"
-                className={classes.textField}
-                type="password"
-                margin="normal"
-              />
-              <FormControlLabel
-                className={classes.checkbox}
-                control={
-                  <Checkbox
-                    checked={this.state.MFAcheckbox}
-                    onChange={this.handleChangeBox('MFAcheckbox')}
-                    value="MFAcheckbox"
-                    color="primary"
+              { this.state.SSOhidden
+                ? null
+                : <Fragment>
+                  <TextField
+                    required
+                    id="email"
+                    label="Email"
+                    className={classes.textField}
+                    placeholder="Email"
+                    margin="normal"
                   />
-                }
-                label="I have a Multi-Factor Authentication (MFA) token."
-              />
-              <Typography
-                className={classes.moreInfo}
-                variant="caption"
-              >
-                <a href="http://www.platform9.com">(more info)</a>
-              </Typography>
+                  <br />
+                  <TextField
+                    required
+                    id="password"
+                    label="Password"
+                    className={classes.textField}
+                    type="password"
+                    margin="normal"
+                  />
+                  <FormControlLabel
+                    className={classes.checkbox}
+                    control={
+                      <Checkbox
+                        checked={this.state.MFAcheckbox}
+                        onChange={this.handleChangeBox('MFAcheckbox')}
+                        value="MFAcheckbox"
+                        color="primary"
+                      />
+                    }
+                    label="I have a Multi-Factor Authentication (MFA) token."
+                  />
+                  <Typography
+                    className={classes.moreInfo}
+                    variant="caption"
+                  >
+                    <a href="http://www.platform9.com">(more info)</a>
+                  </Typography>
+                  { !this.state.MFAcheckbox
+                    ? null
+                    : <TextField
+                      required={this.state.MFAcheckbox}
+                      id="MFA"
+                      label="MFA Code"
+                      className={classes.textField}
+                      placeholder="MFA Code"
+                      margin="normal"
+                    />
+                  }
+                </Fragment>
+              }
               <Button
                 className={classes.signinButton}
                 variant="contained"
