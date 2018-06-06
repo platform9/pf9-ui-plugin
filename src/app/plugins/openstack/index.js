@@ -19,7 +19,7 @@ import AddNetworkPage from './components/networks/AddNetworkPage'
 import VolumesListPage from './components/volumes/VolumesListPage'
 import AddVolumePage from './components/volumes/AddVolumePage'
 
-import ApiAccessPage from './components/ApiAccessPage'
+import ApiAccessPage from './components/api-access/ApiAccessListPage'
 
 import loginReducer from './reducers/login'
 import sessionReducer from './reducers/session'
