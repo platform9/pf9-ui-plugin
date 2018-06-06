@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react'
 import { withStyles } from '@material-ui/core/styles'
-import { Paper, Typography, Grid, FormControl, MenuItem, InputLabel, Select, TextField, Checkbox, FormControlLabel, Button } from '@material-ui/core'
+import { Paper, Typography, Grid, TextField, Button } from '@material-ui/core'
 
 const styles = theme => ({
   root: {
