@@ -1,3 +1,5 @@
+import moment from 'moment'
+
 // Converting the value(bytes) to output unit(optional) with commas
 export const formattedValue = (bytes, unit='Bytes', decimalDigits=2) => {
   const units = ['Bytes', 'KB', 'MB', 'GB', 'TB']
@@ -19,12 +21,8 @@ export const formattedValue = (bytes, unit='Bytes', decimalDigits=2) => {
   return addComma(bytes/Math.pow(1024, pos))+' '+unit
 }
 
-// Transfer date obj into string like 'Jan 1, 2018 12:10:24'
-export const formattedDate = (date) => {
-  if (date === undefined || isNaN(date)) return 'Invalid date input.'
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-  const leadingzero = (str) => (('0'+str).slice(-2))
-  return months[date.getMonth()]+' '+date.getDate()+', '+date.getFullYear()+
-  ' '+leadingzero(date.getHours())+':'+leadingzero(date.getMinutes())+':'+
-  leadingzero(date.getSeconds())
+// Transfer date string into string like 'Jan 1, 2018 12:10:24' in local time.
+export const formattedDate = (str) => {
+  if (str === undefined || (str === '') || !moment(str).isValid()) return 'Invalid date input.'
+  return moment(str, 'YYYY-MM-DDTHH:mm:ssZ').utc().local().format('lll')
 }

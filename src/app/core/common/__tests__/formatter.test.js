@@ -2,6 +2,7 @@ import {
   formattedValue,
   formattedDate
 } from '../formatters'
+import moment from 'moment'
 
 describe('Value Formatters Test', () => {
   it('Value without output unit', () => {
@@ -32,13 +33,13 @@ describe('Value Formatters Test', () => {
 
 describe('Date Formatters Test', () => {
   it('Date reformatting', () => {
-    expect(formattedDate(new Date('1995-12-17T03:24:00'))).toEqual('Dec 17, 1995 03:24:00')
-    expect(formattedDate(new Date('December 17, 1995 03:24:00'))).toEqual('Dec 17, 1995 03:24:00')
+    expect(formattedDate('1995-12-17T03:24:00Z')).toEqual(moment('1995-12-17T03:24:00Z', 'YYYY-MM-DDTHH:mm:ssZ').local().format('lll'))
+    expect(formattedDate('1995-12-17T03:24:00Z')).toEqual(moment('Dec 16, 1995 7:24 PM', '').utc().local().format('lll'))
   })
 
   it('Input error handling', () => {
-    expect(formattedDate(new Date('1995,12-17T03:24:00'))).toEqual('Invalid date input.')
+    expect(formattedDate('1995-13-17T03:24:00Z')).toEqual('Invalid date input.')
     expect(formattedDate(undefined)).toEqual('Invalid date input.')
-    expect(formattedDate(NaN)).toEqual('Invalid date input.')
+    expect(formattedDate('')).toEqual('Invalid date input.')
   })
 })
