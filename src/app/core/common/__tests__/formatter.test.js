@@ -33,8 +33,8 @@ describe('Value Formatters Test', () => {
 
 describe('Date Formatters Test', () => {
   it('Date reformatting', () => {
-    expect(formattedDate('1995-12-17T03:24:00Z')).toEqual(moment('1995-12-17T03:24:00Z', 'YYYY-MM-DDTHH:mm:ssZ').local().format('lll'))
-    expect(formattedDate('1995-12-17T03:24:00Z')).toEqual(moment('Dec 16, 1995 7:24 PM', '').utc().local().format('lll'))
+    expect(formattedDate('1998-12-17T03:24:00Z')).toEqual(moment('1998-12-17T03:24:00Z', 'YYYY-MM-DDTHH:mm:ssZ').local().format('lll'))
+    expect(formattedDate('1995-12-17T03:24:00Z')).toEqual(moment('1995-12-16T19:24:00', 'YYYY-MM-DDTHH:mm:ss').utc().local().format('lll'))
   })
 
   it('Input error handling', () => {
