@@ -38,7 +38,7 @@ describe('Date Formatters Test', () => {
   })
 
   it('Input error handling', () => {
-    expect(formattedDate('1995-13-17T03:24:00Z')).toEqual('Invalid date input.')
+    expect(formattedDate('1995-88-17T03:24:00Z')).toEqual('Invalid date input.')
     expect(formattedDate(undefined)).toEqual('Invalid date input.')
     expect(formattedDate('')).toEqual('Invalid date input.')
   })
