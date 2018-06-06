@@ -3,12 +3,19 @@ import { withStyles } from '@material-ui/core/styles'
 import { Paper, Typography, Grid, FormControl, MenuItem, InputLabel, Select, TextField, Checkbox, FormControlLabel, Button } from '@material-ui/core'
 
 const styles = theme => ({
+  MuiModal: {
+    hidden: {
+      visibility: ['visible', '!important']
+    }
+  },
   root: {
+    display: 'flex',
     position: 'absolute',
-    top: '20%'
+    top: '10%',
+    paddingBottom: 50,
+    overflow: 'auto'
   },
   paper: {
-
     width: 400,
     paddingLeft: 24,
     paddingRight: 24,
@@ -24,7 +31,8 @@ const styles = theme => ({
     marginRight: 'auto'
   },
   formControl: {
-    minWidth: 360
+    minWidth: 360,
+    visibility: 'display'
   },
   form: {
     marginLeft: 20,
@@ -105,6 +113,7 @@ class Logon extends Component {
               <FormControl className={classes.formControl}>
                 <InputLabel htmlFor="logonMethod">Logon method</InputLabel>
                 <Select
+                  anchorreference="anchorEl"
                   open={this.state.open}
                   onOpen={this.handleOpen}
                   onClose={this.handleClose}
@@ -114,7 +123,6 @@ class Logon extends Component {
                     id: 'logonMethod'
                   }}
                 >
-                  <MenuItem value={1}>'1'</MenuItem>
                   {methods.map(method =>
                     <MenuItem key={method} value={method}>
                       {method}
