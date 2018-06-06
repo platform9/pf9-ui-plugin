@@ -23,6 +23,6 @@ export const formattedValue = (bytes, unit='Bytes', decimalDigits=2) => {
 
 // Transfer UTC time string into string like 'Jan 1, 2018 12:10:24' in local time.
 export const formattedDate = (str) => {
-  if (str === undefined || (str === '') || !moment(str).isValid()) return 'Invalid date input.'
+  if (!str || !moment(str).isValid()) return 'Invalid date input.'
   return moment(str).format('lll')
 }
