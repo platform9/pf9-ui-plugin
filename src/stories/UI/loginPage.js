@@ -54,9 +54,66 @@ class LoginPage extends React.Component {
   state = {
     MFAcheckbox: false
   }
+
   handleChangeBox = name => event => {
     this.setState({ [name]: event.target.checked })
   }
+
+  renderInputfield = () => {
+    const { classes } = this.props
+    return <Fragment>
+      <TextField required id="email" label="Email" placeholder="Email" className={classes.textField} />
+      <TextField required id="password" label="Password" className={classes.textField} type="password" />
+    </Fragment>
+  }
+
+  renderMFACheckbox = () => {
+    const { classes } = this.props
+    return <Fragment>
+      <FormControlLabel
+        className={classes.checkbox}
+        control={
+          <Checkbox
+            checked={this.state.MFAcheckbox}
+            onChange={this.handleChangeBox('MFAcheckbox')}
+            color="primary"
+          />
+        }
+        label={
+          <div>
+            <span>I have a Multi-Factor Authentication (MFA) token. (</span>
+            <a href="http://www.platform9.com">more info</a>
+            <span>)</span>
+          </div>
+        }
+      />
+    </Fragment>
+  }
+
+  renderMFAInput = () => {
+    const { classes } = this.props
+    return <TextField
+      required={this.state.MFAcheckbox}
+      id="MFA"
+      label="MFA Code"
+      className={classes.textField}
+      placeholder="MFA Code"
+      margin="normal"
+    />
+  }
+
+  renderFooter = () => {
+    const { classes } = this.props
+    return <Fragment>
+      <Typography className={classes.paragraph} variant="caption" color="textSecondary">
+        By signing in, you agree to our <a href="http://www.platform9.com">Terms of Service</a>.
+      </Typography>
+      <Typography className={classes.paragraph} variant="caption" color="textSecondary">
+        © 2014-2018 Platform9 Systems, Inc.
+      </Typography>
+    </Fragment>
+  }
+
   render () {
     const { classes } = this.props
     return (
@@ -69,37 +126,9 @@ class LoginPage extends React.Component {
                 <Typography variant="subheading" align="center">
                   Please sign in
                 </Typography>
-                <Fragment>
-                  <TextField required id="email" label="Email" placeholder="Email" className={classes.textField} />
-                  <TextField required id="password" label="Password" className={classes.textField} type="password" />
-                  <FormControlLabel
-                    className={classes.checkbox}
-                    control={
-                      <Checkbox
-                        checked={this.state.MFAcheckbox}
-                        onChange={this.handleChangeBox('MFAcheckbox')}
-                        color="primary"
-                      />
-                    }
-                    label={
-                      <div>
-                        <span>I have a Multi-Factor Authentication (MFA) token.</span>
-                        <a href="http://www.platform9.com"> (more info)</a>
-                      </div>
-                    }
-                  />
-                  { !this.state.MFAcheckbox
-                    ? null
-                    : <TextField
-                      required={this.state.MFAcheckbox}
-                      id="MFA"
-                      label="MFA Code"
-                      className={classes.textField}
-                      placeholder="MFA Code"
-                      margin="normal"
-                    />
-                  }
-                </Fragment>
+                {this.renderInputfield()}
+                {this.renderMFACheckbox()}
+                {this.state.MFAcheckbox && this.renderMFAInput()}
                 <Button className={classes.signinButton} variant="contained" color="primary">
                   SIGN IN
                 </Button>
@@ -107,12 +136,7 @@ class LoginPage extends React.Component {
                   <a href="http://www.platform9.com">Forgot password?</a>
                 </Typography>
               </form>
-              <Typography className={classes.paragraph} variant="caption" color="textSecondary">
-                By signing in, you agree to our <a href="http://www.platform9.com">Terms of Service</a>.
-              </Typography>
-              <Typography className={classes.paragraph} variant="caption" color="textSecondary">
-                © 2014-2018 Platform9 Systems, Inc.
-              </Typography>
+              {this.renderFooter()}
             </Paper>
           </Grid>
         </Grid>
