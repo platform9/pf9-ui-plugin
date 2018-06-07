@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react'
 import { connect } from 'react-redux'
+import { compose } from 'redux'
 import Session from '../actions/session'
 import { withRouter } from 'react-router'
 import { withStyles } from '@material-ui/core/styles'
@@ -182,4 +183,8 @@ export class LoginPage extends React.Component {
   }
 }
 
-export default withRouter(connect(mapStateToProps)(withStyles(styles)(LoginPage)))
+export default compose(
+  withRouter,
+  connect(mapStateToProps),
+  withStyles(styles)
+)(LoginPage)
