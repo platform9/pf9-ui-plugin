@@ -4,26 +4,21 @@ import { Paper, Typography, Grid, TextField, Button, FormControlLabel, Checkbox 
 
 const styles = theme => ({
   root: {
-    marginTop: '5%',
-    paddingTop: theme.spacing.unit * 3,
-    paddingBottom: theme.spacing.unit * 4,
+    padding: theme.spacing.unit * 8,
     overflow: 'auto'
   },
   paper: {
-    paddingBottom: theme.spacing.unit * 3
+    padding: theme.spacing.unit * 4
   },
   img: {
-    maxHeight: '50%',
-    maxWidth: '50%',
+    maxHeight: '70%',
+    maxWidth: '70%',
     display: 'block',
-    paddingTop: theme.spacing.unit * 3,
     marginLeft: 'auto',
     marginRight: 'auto'
   },
   form: {
     paddingTop: theme.spacing.unit * 3,
-    marginLeft: '10%',
-    marginRight: '10%'
   },
   textField: {
     minWidth: '100%',
@@ -45,7 +40,6 @@ const styles = theme => ({
     textAlign: 'center'
   },
   paragraph: {
-    marginBottom: theme.spacing.unit,
     textAlign: 'center'
   }
 })
