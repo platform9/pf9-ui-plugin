@@ -27,6 +27,15 @@ class OpenstackClient {
     client.catalog = state.catalog
     return client
   }
+
+  getAuthHeaders (scoped = true) {
+    const token = scoped ? this.scopedToken : this.unscopedToken
+    return ({
+      headers: {
+        'X-Auth-Token': token
+      }
+    })
+  }
 }
 
 export default OpenstackClient

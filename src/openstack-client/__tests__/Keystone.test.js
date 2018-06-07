@@ -6,7 +6,7 @@ const keystoneEndpoint = 'http://localhost:4444/keystone'
 const makeClient = () => new OpenstackClient({ keystoneEndpoint })
 
 const getUserPass = () => {
-  const { username, password } = config
+  const { username, password } = config.simulator
   if (!username || !password) {
     throw new Error('username and/or password not specified in config.js')
   }
@@ -27,6 +27,7 @@ describe('Keystone', () => {
     beforeEach(() => {
       client = makeClient()
     })
+
     it('access the endpoint locally', () => {
       expect(client.keystone.endpoint).toEqual(keystoneEndpoint)
     })
@@ -56,9 +57,23 @@ describe('Keystone', () => {
   })
 
   describe('scoping', () => {
+    it('get a list of projects', async () => {
+      const client = await makeUnscopedClient()
+      const projects = await client.keystone.getProjects()
+      expect(projects).toBeDefined()
+      expect(projects.length).toBeGreaterThan(0)
+      expect(projects[0].name).toEqual('service')
+    })
+
     it('scope the client to a project', async () => {
-      await makeUnscopedClient()
-      // todo
+      const client = await makeUnscopedClient()
+      const projects = await client.keystone.getProjects()
+      const projectId = projects[0].id
+      const scopedToken = await client.keystone.changeProjectScope(projectId)
+      expect(scopedToken).toBeDefined()
+      expect(client.scopedToken).toBeDefined()
+      expect(client.scopedToken).toEqual(scopedToken)
+      expect(client.scopedToken).not.toEqual(client.unscopedToken)
     })
   })
 })
