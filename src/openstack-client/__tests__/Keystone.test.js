@@ -20,6 +20,13 @@ const makeUnscopedClient = async () => {
   return client
 }
 
+const makeScopedClient = async () => {
+  const client = await makeUnscopedClient()
+  const projects = await client.keystone.getProjects()
+  await client.keystone.changeProjectScope(projects[0].id)
+  return client
+}
+
 describe('Keystone', () => {
   let client
 
@@ -74,6 +81,76 @@ describe('Keystone', () => {
       expect(client.scopedToken).toBeDefined()
       expect(client.scopedToken).toEqual(scopedToken)
       expect(client.scopedToken).not.toEqual(client.unscopedToken)
+    })
+  })
+
+  describe('misc simple endpoints', () => {
+    // TODO: this is not implemented in the simulator yet so we can't test it
+    it.skip('service catalog', async () => {
+      const client = await makeScopedClient()
+      const catalog = await client.keystone.getServiceCatalog()
+      expect(catalog).toBeDefined()
+      expect(catalog.length).toBeGreaterThan(0)
+    })
+
+    it('regions', async () => {
+      const client = await makeScopedClient()
+      const regions = await client.keystone.getRegions()
+      expect(regions).toBeDefined()
+      expect(regions.length).toBeGreaterThan(0)
+    })
+  })
+
+  describe('users', () => {
+    it('list users', async () => {
+      const client = await makeScopedClient()
+      const users = await client.keystone.getUsers()
+      expect(users).toBeDefined()
+      expect(users.length).toBeGreaterThan(0)
+    })
+
+    it('create a user', async () => {
+      const client = await makeScopedClient()
+      const users = await client.keystone.getUsers()
+      const newUser = await client.keystone.createUser({
+        name: 'newUser@domain.com',
+        email: 'newUser@domain.com',
+        username: 'newUser@domain.com',
+        password: 'secret',
+        displayname: 'New User' // yes, it's lowercase in keystone
+      })
+      expect(newUser).toBeDefined()
+      expect(newUser.id).toBeDefined()
+      const newUsers = await client.keystone.getUsers()
+      expect(newUsers.length - 1).toEqual(users.length)
+      const lastUser = newUsers[newUsers.length - 1]
+      expect(lastUser.email).toEqual('newUser@domain.com')
+      expect(lastUser.displayname).toEqual('New User')
+      expect(lastUser.id).toEqual(newUser.id)
+    })
+
+    it('delete a user', async () => {
+      const client = await makeScopedClient()
+      const userToDelete = await client.keystone.createUser({
+        name: 'deleteMe@domain.com',
+        email: 'deleteMe@domain.com',
+        username: 'deleteMe@domain.com',
+        password: 'secret',
+        displayname: 'Delete me' // yes, it's lowercase in keystone
+      })
+      const users = await client.keystone.getUsers()
+      await client.keystone.deleteUser(userToDelete.id)
+      const refreshedUsers = await client.keystone.getUsers()
+      expect(refreshedUsers.length).toEqual(users.length - 1)
+    })
+
+    it('delete a non-existant user', async () => {
+      const client = await makeScopedClient()
+      try {
+        await client.keystone.deleteUser('invalidId')
+      } catch (err) {
+        expect(err.toString()).toMatch('Unable to delete non-existant user')
+      }
     })
   })
 })

@@ -33,9 +33,11 @@ class Keystone {
   get endpoint () { return this.client.options.keystoneEndpoint }
   get v3 () { return `${this.endpoint}/v3` }
 
+  get catalogUrl () { return `${this.v3}/auth/catalog` }
   get regionsUrl () { return `${this.v3}/regions` }
   get projectsUrl () { return `${this.v3}/auth/projects` }
   get tokensUrl () { return `${this.v3}/auth/tokens?nocatalog` }
+  get usersUrl () { return `${this.v3}/users` }
 
   async getProjects () {
     const response = await axios.get(this.projectsUrl, this.client.getAuthHeaders(false))
@@ -71,6 +73,33 @@ class Keystone {
   }
 
   async getRegions () {
+    const response = await axios.get(this.regionsUrl, this.client.getAuthHeaders())
+    return response.data.regions
+  }
+
+  async getServiceCatalog () {
+    const response = await axios.get(this.catalogUrl, this.client.getAuthHeaders())
+    return response.data.catalog
+  }
+
+  async getUsers () {
+    const response = await axios.get(this.usersUrl, this.client.getAuthHeaders())
+    return response.data.users
+  }
+
+  async createUser (params) {
+    const body = { user: params }
+    const response = await axios.post(this.usersUrl, body, this.client.getAuthHeaders())
+    return response.data.user
+  }
+
+  async deleteUser (userId) {
+    try {
+      await axios.delete(`${this.usersUrl}/${userId}`, this.client.getAuthHeaders())
+      return userId
+    } catch (err) {
+      throw new Error(`Unable to delete non-existant user`)
+    }
   }
 }
 
