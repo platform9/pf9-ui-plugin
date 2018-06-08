@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { TextField, Button } from '@material-ui/core'
+import { Button, TextField } from '@material-ui/core'
 
 class AddFlavorForm extends React.Component {
   state = {

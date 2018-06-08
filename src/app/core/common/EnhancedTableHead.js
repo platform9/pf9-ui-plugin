@@ -1,7 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-
-import { Tooltip, Checkbox, TableHead, TableRow, TableCell, TableSortLabel } from '@material-ui/core'
+import {
+  Checkbox,
+  TableCell,
+  TableHead,
+  TableRow,
+  TableSortLabel,
+  Tooltip
+} from '@material-ui/core'
 
 class EnhancedTableHead extends React.Component {
   createSortHandler = property => event => {

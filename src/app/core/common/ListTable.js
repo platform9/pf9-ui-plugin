@@ -1,7 +1,16 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/core/styles'
-import { Checkbox, Paper, Table, TableBody, TableCell, TableFooter, TablePagination, TableRow } from '@material-ui/core'
+import {
+  Checkbox,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableFooter,
+  TablePagination,
+  TableRow
+} from '@material-ui/core'
 import EnhancedTableHead from './EnhancedTableHead'
 import EnhancedTableToolbar from './EnhancedTableToolbar'
 

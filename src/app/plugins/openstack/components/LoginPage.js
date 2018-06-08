@@ -4,7 +4,15 @@ import { compose } from 'redux'
 import Session from '../actions/session'
 import { withRouter } from 'react-router'
 import { withStyles } from '@material-ui/core/styles'
-import { Paper, Typography, Grid, TextField, Button, FormControlLabel, Checkbox } from '@material-ui/core'
+import {
+  Button,
+  Checkbox,
+  FormControlLabel,
+  Grid,
+  Paper,
+  TextField,
+  Typography,
+} from '@material-ui/core'
 
 function mapStateToProps (state, ownProps) {
   const { login } = state.openstack

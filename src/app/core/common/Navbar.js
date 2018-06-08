@@ -2,10 +2,18 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/core/styles'
 import { withRouter } from 'react-router'
-
 import classNames from 'classnames'
-
-import { AppBar, Divider, Drawer, IconButton, Toolbar, Typography, ListItemText, MenuItem, MenuList } from '@material-ui/core'
+import {
+  AppBar,
+  Divider,
+  Drawer,
+  IconButton,
+  ListItemText,
+  MenuItem,
+  MenuList,
+  Toolbar,
+  Typography
+} from '@material-ui/core'
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
 import MenuIcon from '@material-ui/icons/Menu'
 
