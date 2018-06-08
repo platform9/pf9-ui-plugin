@@ -1,8 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import NoAutofillHack from 'core/common/NoAutofillHack'
-import TextField from 'material-ui/TextField'
-import Button from 'material-ui/Button'
+import { TextField, Button } from '@material-ui/core'
 
 class AddUserForm extends React.Component {
   state = {

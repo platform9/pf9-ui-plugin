@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import TextField from 'material-ui/TextField'
-import Button from 'material-ui/Button'
+import { TextField, Button } from '@material-ui/core'
 
 class AddClusterForm extends React.Component {
   state = {
