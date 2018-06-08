@@ -1,0 +1,41 @@
+type GlanceImage {
+  id: ID!
+  name: String!
+  status: String!
+  description: String
+  container_format: String!
+  disk_format: String!
+  created_at: String!
+  updated_at: String
+  visibility: String!
+  file: String!
+  size: Int!
+  self: String!
+  min_disk: Int!
+  min_ram: Int!
+  protected: Boolean!
+  checksum: String!
+  owner: String!
+  schema: String!
+  virtual_size: Int!
+  properties: String
+  tags: String
+}
+
+type Query {
+  glanceImages: [GlanceImage!]!
+}
+
+type GlanceImageInput {
+  name: String!
+  description: String
+  owner: String!
+  visibility: Boolean!
+  protected: Boolean!
+  tags: String
+}
+
+type Mutation {
+  updateGlanceImage(id: ID!, input: GlanceImageInput!): GlanceImage!
+  removeGlanceImage(id: ID!): ID!
+}
