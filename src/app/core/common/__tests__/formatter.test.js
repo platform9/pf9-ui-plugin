@@ -37,8 +37,12 @@ describe('Date Formatters Test', () => {
   })
 
   it('Input error handling', () => {
+    // There's a deprecation warning that we don't need to see in the test output so we're muting console.warn temporarily.
+    const originalWarn = console.warn
+    console.warn = jest.fn()
     expect(formattedDate('88-17T03:24:00Z')).toEqual('Invalid date input.')
     expect(formattedDate(undefined)).toEqual('Invalid date input.')
     expect(formattedDate('')).toEqual('Invalid date input.')
+    console.warn = originalWarn
   })
 })
