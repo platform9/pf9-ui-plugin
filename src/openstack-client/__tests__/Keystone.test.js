@@ -1,30 +1,10 @@
-import config from '../../../config'
-import OpenstackClient from '../OpenstackClient'
-
-const keystoneEndpoint = `${config.host}/keystone`
-const makeClient = () => new OpenstackClient({ keystoneEndpoint })
-
-const getUserPass = () => {
-  const { username, password } = config.simulator
-  if (!username || !password) {
-    throw new Error('username and/or password not specified in config.js')
-  }
-  return { username, password }
-}
-
-const makeUnscopedClient = async () => {
-  const { username, password } = getUserPass()
-  const client = makeClient()
-  await client.keystone.authenticate(username, password)
-  return client
-}
-
-const makeScopedClient = async () => {
-  const client = await makeUnscopedClient()
-  const projects = await client.keystone.getProjects()
-  await client.keystone.changeProjectScope(projects[0].id)
-  return client
-}
+import {
+  keystoneEndpoint,
+  makeClient,
+  getUserPass,
+  makeUnscopedClient,
+  makeScopedClient
+} from '../helpers'
 
 describe('Keystone', () => {
   let client
@@ -84,20 +64,38 @@ describe('Keystone', () => {
     })
   })
 
-  describe('misc simple endpoints', () => {
+  describe('regions', () => {
+    it('regions', async () => {
+      const client = await makeScopedClient()
+      const regions = await client.keystone.getRegions()
+      expect(regions).toBeDefined()
+      expect(regions.length).toBeGreaterThan(0)
+    })
+
+    it('set the currently active region', async () => {
+      const client = await makeScopedClient()
+      const regions = await client.keystone.getRegions()
+      client.setActiveRegion(regions[0].id)
+      expect(client.activeRegion).toEqual(regions[0].id)
+    })
+  })
+
+  describe('service catalog', () => {
     // TODO: this is not implemented in the simulator yet so we can't test it
-    it.skip('service catalog', async () => {
+    it('service catalog', async () => {
       const client = await makeScopedClient()
       const catalog = await client.keystone.getServiceCatalog()
       expect(catalog).toBeDefined()
       expect(catalog.length).toBeGreaterThan(0)
     })
 
-    it('regions', async () => {
+    it('services by region', async () => {
       const client = await makeScopedClient()
       const regions = await client.keystone.getRegions()
-      expect(regions).toBeDefined()
-      expect(regions.length).toBeGreaterThan(0)
+      client.setActiveRegion(regions[0].id)
+      const services = await client.keystone.getServicesForActiveRegion()
+      expect(services).toBeDefined()
+      expect(services.keystone.public.url).toBeDefined()
     })
   })
 

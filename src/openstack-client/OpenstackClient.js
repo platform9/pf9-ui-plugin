@@ -8,6 +8,7 @@ class OpenstackClient {
     }
     this.keystone = new Keystone(this)
     this.catalog = {}
+    this.activeRegion = null
   }
 
   serialize () {
@@ -17,6 +18,10 @@ class OpenstackClient {
       scopedToken: this.scopedToken,
       catalog: this.catalog,
     }
+  }
+
+  setActiveRegion (regionId) {
+    this.activeRegion = regionId
   }
 
   static hydrate (state) {

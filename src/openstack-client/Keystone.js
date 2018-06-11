@@ -25,6 +25,23 @@ const constructAuthBody = (method, ...args) => {
   return body
 }
 
+const groupByRegion = catalog => {
+  let regions = {}
+  catalog.forEach(service => {
+    const { name } = service
+    service.endpoints.forEach(endpoint => {
+      const { region } = endpoint
+      regions[region] = regions[region] || {}
+      regions[region][name] = regions[region][name] || {}
+      regions[region][name][endpoint.interface] = {
+        id: endpoint.id,
+        url: endpoint.url,
+      }
+    })
+  })
+  return regions
+}
+
 class Keystone {
   constructor (client) {
     this.client = client
@@ -79,7 +96,19 @@ class Keystone {
 
   async getServiceCatalog () {
     const response = await axios.get(this.catalogUrl, this.client.getAuthHeaders())
+    this.client.serviceCatalog = response.data.catalog
     return response.data.catalog
+  }
+
+  async getServicesForActiveRegion () {
+    if (!this.client.activeRegion) {
+      throw new Error('Must first select a region before getting services for that region')
+    }
+    if (!this.client.serviceCatalog) {
+      await this.getServiceCatalog()
+    }
+    const servicesByRegion = groupByRegion(this.client.serviceCatalog)
+    return servicesByRegion[this.client.activeRegion]
   }
 
   async getUsers () {
