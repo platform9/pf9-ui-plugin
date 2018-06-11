@@ -77,7 +77,8 @@ export class LoginPage extends React.Component {
     this.setState({ [key]: event.target.value })
   }
 
-  performLogin = async () => {
+  performLogin = async (event) => {
+    event.preventDefault()
     const { username, password } = this.state
     const { dispatch, history } = this.props
     const session = Session()
@@ -168,14 +169,14 @@ export class LoginPage extends React.Component {
           <Grid item md={4} lg={3}>
             <Paper className={classes.paper}>
               <img src="https://hostadvice.com/wp-content/uploads/2017/07/Platform9-LogoStacked-777x352.png" className={classes.img} />
-              <form className={classes.form}>
+              <form className={classes.form} onSubmit={this.performLogin}>
                 <Typography variant="subheading" align="center">
                   Please sign in
                 </Typography>
                 {this.renderInputfield()}
                 {this.renderMFACheckbox()}
                 {this.state.MFAcheckbox && this.renderMFAInput()}
-                <Button className={classes.signinButton} variant="contained" color="primary" onClick={this.performLogin}>
+                <Button type="submit" className={classes.signinButton} variant="contained" color="primary">
                   SIGN IN
                 </Button>
                 <Typography className={classes.forgotPwd} gutterBottom>
