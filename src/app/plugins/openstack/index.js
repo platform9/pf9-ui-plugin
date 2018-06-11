@@ -20,6 +20,8 @@ import AddNetworkPage from './components/networks/AddNetworkPage'
 import VolumesListPage from './components/volumes/VolumesListPage'
 import AddVolumePage from './components/volumes/AddVolumePage'
 
+import GlanceImageListPage from './components/glanceimages/GlanceImageListPage'
+
 import ApiAccessPage from './components/api-access/ApiAccessListPage'
 
 import loginReducer from './reducers/login'
@@ -114,6 +116,11 @@ OpenStack.registerPlugin = pluginManager => {
         name: 'AddVolume',
         link: { path: '/volumes/add', exact: true },
         component: AddVolumePage
+      },
+      {
+        name: 'Glance Images',
+        link: { path: '/glanceimages', exact: true },
+        component: GlanceImageListPage
       }
     ]
   )
@@ -149,6 +156,10 @@ OpenStack.registerPlugin = pluginManager => {
         name: 'Volumes',
         link: { path: '/volumes' },
       },
+      {
+        name: 'Glance Images',
+        link: { path: '/glanceimages' }
+      }
     ]
   )
 
