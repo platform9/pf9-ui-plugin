@@ -44,6 +44,13 @@ class CRUDListContainer extends React.Component {
     }
   }
 
+  redirectToEdit = (selectedIds) => {
+    if (this.props.editUrl) {
+      const selectedId = selectedIds[0]
+      this.props.history.push(`${this.props.editUrl}/${selectedId}`)
+    }
+  }
+
   render () {
     return (
       <div>
@@ -55,7 +62,8 @@ class CRUDListContainer extends React.Component {
         />
         {this.props.children({
           onDelete: this.handleDelete,
-          onAdd: this.redirectToAdd
+          onAdd: this.redirectToAdd,
+          onEdit: this.redirectToEdit
         })}
       </div>
     )
@@ -65,6 +73,7 @@ class CRUDListContainer extends React.Component {
 CRUDListContainer.propTypes = {
   onRemove: PropTypes.func,
   addUrl: PropTypes.string,
+  editUrl: PropTypes.string,
 }
 
 export default CRUDListContainer

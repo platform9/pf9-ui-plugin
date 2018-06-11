@@ -12,6 +12,7 @@ import {
 import { lighten } from '@material-ui/core/styles/colorManipulator'
 import AddIcon from '@material-ui/icons/Add'
 import DeleteIcon from '@material-ui/icons/Delete'
+import EditIcon from '@material-ui/icons/Edit'
 import FilterListIcon from '@material-ui/icons/FilterList'
 
 const toolbarStyles = theme => ({
@@ -39,7 +40,7 @@ const toolbarStyles = theme => ({
   },
 })
 
-const EnhancedTableToolbar = ({ classes, numSelected, title, onAdd, onDelete }) => (
+const EnhancedTableToolbar = ({ classes, numSelected, title, onAdd, onDelete, onEdit }) => (
   <Toolbar
     className={classNames(classes.root, {
       [classes.highlight]: numSelected > 0,
@@ -56,6 +57,13 @@ const EnhancedTableToolbar = ({ classes, numSelected, title, onAdd, onDelete }) 
     </div>
     <div className={classes.spacer} />
     <div className={classes.actions}>
+      {numSelected === 1 && onEdit &&
+        <Tooltip title="Edit">
+          <IconButton aria-label="Edit" onClick={onEdit}>
+            <EditIcon />
+          </IconButton>
+        </Tooltip>
+      }
       {numSelected > 0 && onDelete &&
         <Tooltip title="Delete">
           <IconButton aria-label="Delete" onClick={onDelete}>
@@ -85,6 +93,7 @@ EnhancedTableToolbar.propTypes = {
   title: PropTypes.string.isRequired,
   onAdd: PropTypes.func,
   onDelete: PropTypes.func,
+  onEdit: PropTypes.func,
 }
 
 export default withStyles(toolbarStyles)(EnhancedTableToolbar)

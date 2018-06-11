@@ -12,7 +12,7 @@ const columns = [
 
 class UsersList extends React.Component {
   render () {
-    const { onAdd, onDelete, users } = this.props
+    const { onAdd, onDelete, onEdit, users } = this.props
 
     if (!users || users.length === 0) {
       return (<h1>No users found</h1>)
@@ -25,6 +25,7 @@ class UsersList extends React.Component {
         data={users}
         onAdd={onAdd}
         onDelete={onDelete}
+        onEdit={onEdit}
         actions={['delete']}
       />
     )
@@ -40,6 +41,8 @@ UsersList.propTypes = {
 
   /** Called onClick of delete icon for a user row */
   onDelete: PropTypes.func.isRequired,
+
+  onEdit: PropTypes.func.isRequired,
 }
 
 UsersList.defaultProps = {

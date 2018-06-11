@@ -109,6 +109,11 @@ class ListTable extends React.Component {
     })
   }
 
+  handleEdit = () => {
+    const { selected } = this.state
+    this.props.onEdit(selected)
+  }
+
   isSelected = id => this.state.selected.includes(id)
 
   paginate = data => {
@@ -187,6 +192,7 @@ class ListTable extends React.Component {
       title,
       onAdd,
       onDelete,
+      onEdit,
       showCheckboxes,
       paginate
     } = this.props
@@ -208,6 +214,7 @@ class ListTable extends React.Component {
           title={title}
           onAdd={onAdd && this.handleAdd}
           onDelete={onDelete && this.handleDelete}
+          onEdit={onEdit && this.handleEdit}
         />
         <div className={classes.tableWrapper}>
           <Table className={classes.table}>
@@ -246,6 +253,7 @@ ListTable.propTypes = {
   title: PropTypes.string.isRequired,
   onAdd: PropTypes.func,
   onDelete: PropTypes.func,
+  onEdit: PropTypes.func,
   paginate: PropTypes.bool,
   showCheckboxes: PropTypes.bool
 }

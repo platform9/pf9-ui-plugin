@@ -49,14 +49,14 @@ class Context {
   updateFlavor = (id, { input }) => {
     const flavor = Flavor.findById(id)
     if (!flavor) {
-      throw new Error('Unable to update non-existant flavor')
+      throw new Error('Unable to update non-existent flavor')
     }
   }
 
   removeFlavor = id => {
     const flavor = Flavor.findById(id)
     if (!flavor) {
-      throw new Error('Unable to remove non-existant flavor')
+      throw new Error('Unable to remove non-existent flavor')
     }
     flavor.destroy()
     return id
@@ -73,14 +73,14 @@ class Context {
   updateTenant = (id, { input }) => {
     const tenant = Tenant.findById(id)
     if (!tenant) {
-      throw new Error('Unable to update non-existant tenant')
+      throw new Error('Unable to update non-existent tenant')
     }
   }
 
   removeTenant = id => {
     const tenant = Tenant.findById(id)
     if (!tenant) {
-      throw new Error('Unable to remove non-existant tenant')
+      throw new Error('Unable to remove non-existent tenant')
     }
     tenant.destroy()
     return id
@@ -94,6 +94,14 @@ class Context {
     }))
   }
 
+  getUser = (id) => {
+    const user = User.findById(id)
+    if (!user) {
+      throw new Error('Unable to find non-existent user')
+    }
+    return user.asGraphQl()
+  }
+
   getUsers = () => User.getCollection().map(x => x.asGraphQl())
 
   createUser = ({ input }) => {
@@ -101,17 +109,18 @@ class Context {
     return user.asGraphQl()
   }
 
-  updateUser = (id, { input }) => {
-    const user = User.findById(id)
+  updateUser = (id, input) => {
+    let user = User.updateById(id, input)
     if (!user) {
-      throw new Error('Unable to update non-existant user')
+      throw new Error('Unable to update non-existent user')
     }
+    return user.asGraphQl()
   }
 
   removeUser = id => {
     const user = User.findById(id)
     if (!user) {
-      throw new Error('Unable to remove non-existant user')
+      throw new Error('Unable to remove non-existent user')
     }
     user.destroy()
     return id
@@ -127,14 +136,14 @@ class Context {
   updateVolume = ({ id, input }) => {
     const volume = Volume.findById(id)
     if (!volume) {
-      throw new Error('Unable to update non-existant volume')
+      throw new Error('Unable to update non-existent volume')
     }
   }
 
   removeVolume = ({ id }) => {
     const volume = Volume.findById(id)
     if (!volume) {
-      throw new Error('Unable to delete non-existant volume')
+      throw new Error('Unable to delete non-existent volume')
     }
     volume.destroy()
     return id

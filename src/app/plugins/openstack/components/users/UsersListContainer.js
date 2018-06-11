@@ -27,12 +27,14 @@ class UsersListContainer extends React.Component {
         items={this.props.users}
         onRemove={this.handleRemove}
         addUrl="/ui/openstack/users/add"
+        editUrl="/ui/openstack/users/edit"
       >
-        {({ onDelete, onAdd }) => (
+        {({ onDelete, onAdd, onEdit }) => (
           <UsersList
             users={this.props.users}
             onAdd={onAdd}
             onDelete={onDelete}
+            onEdit={onEdit}
           />
         )}
       </CRUDListContainer>

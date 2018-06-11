@@ -1,6 +1,6 @@
 import context from '../context'
 import ActiveModel from './ActiveModel'
-import { findById } from '../helpers'
+import { findById, updateById } from '../helpers'
 
 const coll = () => context.users
 
@@ -22,6 +22,7 @@ class User extends ActiveModel {
   static getCollection = coll
   static clearCollection = () => coll().splice(0, coll().length)
   static findById = findById(coll)
+  static updateById = updateById(coll)
 
   static findByUsername = username => User.getCollection().find(x => x.username === username)
 

@@ -9,6 +9,7 @@ import TenantsListPage from './components/tenants/TenantsListPage'
 
 import UsersListPage from './components/users/UsersListPage'
 import AddUserPage from './components/users/AddUserPage'
+import UpdateUserPage from './components/users/UpdateUserPage'
 
 import FlavorsListPage from './components/flavors/FlavorsListPage'
 import AddFlavorPage from './components/flavors/AddFlavorPage'
@@ -73,6 +74,11 @@ OpenStack.registerPlugin = pluginManager => {
         name: 'AddUser',
         link: { path: '/users/add' },
         component: AddUserPage
+      },
+      {
+        name: 'EditUser',
+        link: { path: '/users/edit/:userId' },
+        component: UpdateUserPage
       },
       {
         name: 'Flavors',

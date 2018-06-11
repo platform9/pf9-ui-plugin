@@ -5,6 +5,7 @@ const resolvers = {
   Query: {
     tenants: (_, __, context) => context.getTenants(),
     users: (_, __, context) => context.getUsers(),
+    user: (obj, args, context) => context.getUser(args.id)
   },
 
   User: {
