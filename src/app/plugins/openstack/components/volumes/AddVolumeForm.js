@@ -9,7 +9,7 @@ class AddVolumeForm extends React.Component {
     type: '',
     size: 0,
     sizeUnit: 'GB',
-    bootable: false,
+    bootable: 'false',
     source: '',
     metadata: [],
     created: new Date().toISOString(),

@@ -21,6 +21,7 @@ import VolumesListPage from './components/volumes/VolumesListPage'
 import AddVolumePage from './components/volumes/AddVolumePage'
 
 import GlanceImageListPage from './components/glanceimages/GlanceImageListPage'
+import AddGlanceImagePage from './components/glanceimages/AddGlanceImagePage'
 
 import ApiAccessPage from './components/api-access/ApiAccessListPage'
 
@@ -118,9 +119,14 @@ OpenStack.registerPlugin = pluginManager => {
         component: AddVolumePage
       },
       {
-        name: 'Glance Images',
+        name: 'GlanceImages',
         link: { path: '/glanceimages', exact: true },
         component: GlanceImageListPage
+      },
+      {
+        name: 'AddGlanceImages',
+        link: { path: '/glanceimages/add', exact: true },
+        component: AddGlanceImagePage
       }
     ]
   )
