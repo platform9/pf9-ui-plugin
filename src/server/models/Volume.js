@@ -13,7 +13,7 @@ class Volume extends ActiveModel {
     this.metadata = params.metadata || ''
     this.size = params.size || 10
     this.sizeUnit = params.sizeUnit || 'GB'
-    this.bootable = params.bootable !== undefined ? params.bootable : false
+    this.bootable = params.bootable || 'false'
     this.status = params.status || ''
     this.tenantId = params.tenantId || ''
     this.tenant = params.tenant || ''
@@ -23,7 +23,7 @@ class Volume extends ActiveModel {
     this.instanceId = params.instanceId || ''
     this.device = params.device || ''
     this.attachedMode = params.attachedMode || ''
-    this.readonly = params.readonly !== undefined ? params.readonly : false
+    this.readonly = params.readonly || 'false'
     this.created = new Date().toISOString()
   }
 

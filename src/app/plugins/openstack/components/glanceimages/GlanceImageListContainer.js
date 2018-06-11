@@ -28,7 +28,7 @@ class GlanceImageContainer extends React.Component {
       >
         {({ onDelete, onAdd }) => (
           <GlanceImageList
-            volumes={this.props.glanceImages}
+            glanceImages={this.props.glanceImages}
             onAdd={onAdd}
             onDelete={onDelete}
           />

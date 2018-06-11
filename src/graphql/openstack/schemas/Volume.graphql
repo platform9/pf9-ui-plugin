@@ -6,7 +6,7 @@ type Volume {
   metadata: String
   size: Int!
   sizeUnit: String!
-  bootable: Boolean!
+  bootable: String!
   status: String
   tenantId: String!
   tenant: String!
@@ -17,7 +17,7 @@ type Volume {
   device: String
   created: String!
   attachedMode: String
-  readonly: Boolean
+  readonly: String
 }
 
 type Query {
@@ -31,7 +31,7 @@ input VolumeInput {
   metadata: String
   size: Int!
   sizeUnit: String!
-  bootable: Boolean!
+  bootable: String!
   status: String
   tenantId: String!
   tenant: String!
@@ -41,7 +41,7 @@ input VolumeInput {
   instanceId: String
   device: String
   attachedMode: String
-  readonly: Boolean
+  readonly: String
 }
 
 type Mutation {

@@ -19,7 +19,7 @@ class GlanceImage extends ActiveModel {
     this.self = params.self || ''
     this.min_disk = params.min_disk || 0
     this.min_ram = params.min_ram || 0
-    this.protected = params.protected || false
+    this.protected = params.protected || 'false'
     this.checksum = params.checksum || ''
     this.owner = params.owner || ''
     this.schema = params.schema || ''
