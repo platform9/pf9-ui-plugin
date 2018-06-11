@@ -26,7 +26,7 @@ type Query {
   glanceImages: [GlanceImage!]!
 }
 
-type GlanceImageInput {
+input GlanceImageInput {
   name: String!
   description: String
   owner: String!
@@ -36,6 +36,6 @@ type GlanceImageInput {
 }
 
 type Mutation {
-  updateGlanceImage(id: ID!, input: GlanceImageInput!): GlanceImage!
+  updateGlanceImage(id: ID!, input: GlanceImageInput): GlanceImage!
   removeGlanceImage(id: ID!): ID!
 }

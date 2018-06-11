@@ -4,6 +4,7 @@ import Role from './models/Role'
 import Tenant from './models/Tenant'
 import User from './models/User'
 import Volume from './models/Volume'
+import GlanceImage from './models/GlanceImage'
 
 const defaultQuota = {
   cores: 10,
@@ -23,7 +24,6 @@ class Context {
     this.hosts = []
     this.roles = []
     this.tokens = []
-    this.images = []
     this.tenants = []
     this.flavors = []
     this.servers = []
@@ -35,7 +35,7 @@ class Context {
     this.hostAggregates = []
     this.regions = []
     this.volumes = []
-
+    this.glanceImages = []
     this.defaultQuota = { ...defaultQuota }
   }
 
@@ -150,6 +150,24 @@ class Context {
   }
 
   getServiceCatalog = () => Catalog.getCatalog()
+
+  getGlanceImages = () => GlanceImage.getCollection().map(x => x.asGraphQl())
+
+  updateGlanceImage = ({ id, input }) => {
+    const glanceImage = GlanceImage.findById(id)
+    if (!glanceImage) {
+      throw new Error('Unable to update non-existant glance image')
+    }
+  }
+
+  removeGlanceImage = ({ id }) => {
+    const glanceImage = GlanceImage.findById(id)
+    if (!glanceImage) {
+      throw new Error('Unable to update non-existant glance image')
+    }
+    glanceImage.destroy()
+    return id
+  }
 }
 
 const context = new Context()

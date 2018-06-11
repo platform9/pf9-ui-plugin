@@ -1,13 +1,13 @@
 import typeDefs from './GlanceImage.graphql'
-import makeExecutableSchema from 'graphql-tools'
+import { makeExecutableSchema } from 'graphql-tools'
 
 const resolvers = {
   Query: {
     glanceImages: (_, __, context) => context.getGlanceImages()
   },
   Mutation: {
-    updateGlanceImage: (obj, { id, input }, context) => context.updateGlanceImage(id, input),
-    removeGlanceImage: (obj, { id }, context) => context.removeGlanceImage(id)
+    updateGlanceImage: (_, { id, input }, context) => context.updateGlanceImage(id, input),
+    removeGlanceImage: (_, { id }, context) => context.removeGlanceImage(id)
   }
 }
 

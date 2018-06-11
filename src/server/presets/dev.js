@@ -7,6 +7,7 @@ import User from '../models/User'
 import Flavor from '../models/Flavor'
 import Network from '../models/Network'
 import Volume from '../models/Volume'
+import GlanceImage from '../models/GlanceImage'
 // import Token from '../models/Token'
 import { range } from '../util'
 
@@ -63,6 +64,11 @@ function loadPreset () {
   new Volume({ name: 'TestVolume3', description: '', type: 'sfvol', metadata: '', size: 45, sizeUnit: 'GB', bootable: false, status: 'in-use', tenantId: '', tenant: 'Dev Team Tenant', source: 'Empty', host: 'host.company.sys', instance: 'Dev Instance 1', instanceId: '', device: '', attachedMode: 'rw', readonly: false })
   new Volume({ name: 'TestVolume4', description: 'Convert volume to ext.', type: 'sfvol', metadata: '', size: 1, sizeUnit: 'TB', bootable: false, status: 'available', tenantId: '', tenant: 'Dev Team Tenant', source: 'Image', host: 'host.company.sys', instance: 'Dev Instance 1', instanceId: '', device: '/dev/vdb', attachedMode: 'rw', readonly: false })
   new Volume({ name: 'TestVolume5', description: '', type: 'testType', metadata: '', size: 25, sizeUnit: 'GB', bootable: false, status: 'in-use', tenantId: '', tenant: 'Dev Team Tenant', source: 'Another Volume', host: 'host.company.sys', instance: 'Dev Instance 2', instanceId: '', device: '', attachedMode: '', readonly: false })
+
+  // Glance Images
+  new GlanceImage({ name: 'Test-Image-1', description: 'Base CentOS Image Version 5', status: 'OK', owner: 'Development Team Tenant', visibility: 'private', protected: false, disk_format: 'qcow2', virtual_size: 40, size: 15 })
+  new GlanceImage({ name: 'Test-Image-2', description: 'Version 1118', status: 'OK', owner: 'Development Team Tenant', visibility: 'public', protected: false, disk_format: 'qcow2', virtual_size: 50, size: 8 })
+  new GlanceImage({ name: 'Test-Image-3', description: 'A plain test image.', status: 'OK', owner: 'Development Team Tenant', visibility: 'private', protected: true, disk_format: 'qcow2', virtual_size: 100, size: 22 })
 
   adminUser.addRole(adminRole)
 }
