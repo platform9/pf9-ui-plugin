@@ -3,7 +3,7 @@ import {
 } from '../actions/session'
 
 const initialState = {
-  unsccopedToken: null,
+  unscopedToken: null,
   scopedToken: null,
   user: null,
   roles: null,
