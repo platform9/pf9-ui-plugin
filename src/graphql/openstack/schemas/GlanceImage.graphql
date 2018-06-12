@@ -15,7 +15,7 @@ type GlanceImage {
   min_ram: Int!
   protected: Boolean!
   checksum: String!
-  # TO_DO: owner should be a tenent type
+  # TODO: owner should be a tenant type
   owner: String!
   schema: String!
   virtual_size: Int!

@@ -10,38 +10,35 @@ const styles = theme => ({
   root: {
     padding: theme.spacing.unit * 8
   },
-  Typography: {
-    padding: theme.spacing.unit * 8
-  },
   code: {
     fontSize: '90%',
     padding: theme.spacing.unit * 0.25,
     color: theme.palette.primary.main,
     background: theme.palette.grey[100],
     borderRadius: '3px'
-  },
-  textspan: {
-    display: 'inline-block',
-    width: '17ch'
   }
 })
 
 const textTheme = createMuiTheme({
   typography: {
-    display1: {
-      lineHeight: 2
-    },
     title: {
       lineHeight: 2
     },
     body1: {
-      lineHeight: 2.5,
-      marginBottom: 10
+      lineHeight: 2.5
+    }
+  },
+  overrides: {
+    MuiDivider: {
+      root: {
+        marginTop: '1em',
+        marginBottom: '1em'
+      }
     }
   }
 })
 
-// Fake data. Should fetching data from host
+// Fake data. Should fetch data from host
 let id = 0
 function createData (name, ip, path) {
   id++
@@ -65,7 +62,7 @@ class AddGlanceImagePage extends React.Component {
     return (
       <Fragment>
         <Typography>
-            We support two ways to import images into your Glance Image Catalog:
+          We support two ways to import images into your Glance Image Catalog:
         </Typography>
         <Typography variant="title"> Manual Import </Typography>
         <Typography>
@@ -139,7 +136,14 @@ class AddGlanceImagePage extends React.Component {
       <MuiThemeProvider theme={textTheme}>
         <Fragment>
           <Paper className={classes.root}>
-            <Button variant="outlined" component={Link} to="/ui/openstack/glanceimages">&lt;&lt;&nbsp;Back to list</Button>
+            <Button
+              variant="outlined"
+              component={Link}
+              to="/ui/openstack/glanceimages"
+              style={{ marginBottom: '1em' }}
+            >
+              &lt;&lt;&nbsp;Back to list
+            </Button>
             <Typography variant="display1" color="primary">Import a New Image</Typography>
             <Divider />
             {this.renderManualImport()}
