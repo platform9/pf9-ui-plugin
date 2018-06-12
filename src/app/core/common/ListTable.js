@@ -127,7 +127,7 @@ class ListTable extends React.Component {
     const { cellProps = {} } = columnDef
     return (
       <TableCell key={columnDef.id} {...cellProps} >
-        {contents}
+        {(typeof contents === 'boolean') ? String(contents) : contents}
       </TableCell>
     )
   }

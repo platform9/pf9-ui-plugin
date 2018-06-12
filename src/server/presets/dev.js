@@ -66,9 +66,9 @@ function loadPreset () {
   new Volume({ name: 'TestVolume5', description: '', type: 'testType', metadata: '', size: 25, sizeUnit: 'GB', bootable: 'false', status: 'in-use', tenantId: '', tenant: 'Dev Team Tenant', source: 'Another Volume', host: 'host.company.sys', instance: 'Dev Instance 2', instanceId: '', device: '', attachedMode: '', readonly: 'false' })
 
   // Glance Images
-  new GlanceImage({ name: 'Test-Image-1', description: 'Base CentOS Image Version 5', status: 'OK', owner: 'Development Team Tenant', visibility: 'private', protected: 'false', disk_format: 'qcow2', virtual_size: 40, size: 15 })
-  new GlanceImage({ name: 'Test-Image-2', description: 'Version 1118', status: 'OK', owner: 'Development Team Tenant', visibility: 'public', protected: 'false', disk_format: 'qcow2', virtual_size: 50, size: 8 })
-  new GlanceImage({ name: 'Test-Image-3', description: 'A plain test image.', status: 'OK', owner: 'Development Team Tenant', visibility: 'private', protected: 'true', disk_format: 'qcow2', virtual_size: 100, size: 22 })
+  new GlanceImage({ name: 'Test-Image-1', description: 'Base CentOS Image Version 5', status: 'OK', owner: 'Development Team Tenant', visibility: 'private', protected: false, disk_format: 'qcow2', virtual_size: 40, size: 15 })
+  new GlanceImage({ name: 'Test-Image-2', description: 'Version 1118', status: 'OK', owner: 'Development Team Tenant', visibility: 'public', protected: false, disk_format: 'qcow2', virtual_size: 50, size: 8 })
+  new GlanceImage({ name: 'Test-Image-3', description: 'A plain test image.', status: 'OK', owner: 'Development Team Tenant', visibility: 'private', protected: true, disk_format: 'qcow2', virtual_size: 100, size: 22 })
 
   adminUser.addRole(adminRole)
 }

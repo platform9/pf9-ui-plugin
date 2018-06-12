@@ -13,7 +13,7 @@ type GlanceImage {
   self: String!
   min_disk: Int!
   min_ram: Int!
-  protected: String!
+  protected: Boolean!
   checksum: String!
   # TO_DO: owner should be a tenent type
   owner: String!
@@ -34,7 +34,7 @@ input GlanceImageInput {
   description: String
   owner: String!
   visibility: String!
-  protected: String!
+  protected: Boolean!
   tags: String
 }
 
