@@ -168,7 +168,7 @@ export class LoginPage extends React.Component {
         <Grid container justify="center" className={classes.root}>
           <Grid item md={4} lg={3}>
             <Paper className={classes.paper}>
-              <img src="https://hostadvice.com/wp-content/uploads/2017/07/Platform9-LogoStacked-777x352.png" className={classes.img} />
+              <img src="/images/logo-color.png" className={classes.img} />
               <form className={classes.form} onSubmit={this.performLogin}>
                 <Typography variant="subheading" align="center">
                   Please sign in
