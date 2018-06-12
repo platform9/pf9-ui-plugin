@@ -6,20 +6,19 @@ class AddVolumeForm extends React.Component {
   state = {
     name: '',
     description: '',
-    type: '',
+    volume_type: '',
     size: 0,
-    sizeUnit: 'GB',
-    bootable: 'false',
+    bootable: false,
     source: '',
     metadata: [],
-    created: new Date().toISOString(),
+    created_at: new Date().toISOString(),
   }
 
   setField = field => event => this.setState({ [field]: event.target.value })
 
   fields = [
     { id: 'name', label: 'Volume Name' },
-    { id: 'type', label: 'Volume Type' },
+    { id: 'volume_type', label: 'Volume Type' },
     { id: 'description', label: 'Description' },
     { id: 'status', label: 'Status' },
     { id: 'tenant', label: 'Tenant' },
@@ -29,7 +28,7 @@ class AddVolumeForm extends React.Component {
     { id: 'device', label: 'Device' },
     { id: 'size', label: 'Capacity', type: 'number' },
     { id: 'bootable', label: 'Bootable' },
-    { id: 'created', label: 'Created' },
+    { id: 'created_at', label: 'Created' },
     { id: 'id', label: 'OpenStack ID' },
     { id: 'attachedMode', label: 'attached_mode' },
     { id: 'readonly', label: 'readonly' },

@@ -9,22 +9,18 @@ class Volume extends ActiveModel {
     super(params)
     this.name = params.name || ''
     this.description = params.description || ''
-    this.type = params.type || ''
+    this.volume_type = params.volume_type || ''
     this.metadata = params.metadata || ''
     this.size = params.size || 10
-    this.sizeUnit = params.sizeUnit || 'GB'
-    this.bootable = params.bootable || 'false'
+    this.bootable = params.bootable || false
     this.status = params.status || ''
-    this.tenantId = params.tenantId || ''
     this.tenant = params.tenant || ''
-    this.source = params.source || 'Empty'
+    this.source = params.source || 'None'
     this.host = params.host || ''
     this.instance = params.instance || ''
-    this.instanceId = params.instanceId || ''
     this.device = params.device || ''
     this.attachedMode = params.attachedMode || ''
-    this.readonly = params.readonly || 'false'
-    this.created = new Date().toISOString()
+    this.readonly = params.readonly || false
   }
 
   static getCollection = coll
@@ -38,22 +34,19 @@ class Volume extends ActiveModel {
       ...super.asJson(),
       name: this.name,
       description: this.description,
-      type: this.type,
+      volume_type: this.volume_type,
       metadata: this.metadata,
       size: this.size,
-      sizeUnit: this.sizeUnit,
       bootable: this.bootable,
       status: this.status,
-      tenantId: this.tenantId,
       tenant: this.tenant,
       source: this.source,
       host: this.host,
       instance: this.instance,
-      instanceId: this.instanceId,
       device: this.device,
       attachedMode: this.attachedMode,
       readonly: this.readonly,
-      created: this.created
+      created_at: this.created_at
     }
   }
 

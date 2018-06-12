@@ -6,18 +6,17 @@ export const GET_VOLUMES = gql`
       id
       name
       description
-      type
+      volume_type
       status
       metadata
       size
-      sizeUnit
       bootable
       tenant
       source
       host
       instance
       device
-      created
+      created_at
       attachedMode
       readonly
     }

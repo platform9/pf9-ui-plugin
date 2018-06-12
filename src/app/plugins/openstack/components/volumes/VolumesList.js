@@ -5,7 +5,7 @@ import ListTable from 'core/common/ListTable'
 
 const columns = [
   { id: 'name', label: 'Name' },
-  { id: 'type', label: 'Volume Type' },
+  { id: 'volume_type', label: 'Volume Type' },
   { id: 'description', label: 'Description' },
   { id: 'status', label: 'Status' },
   { id: 'tenant', label: 'Tenant' },
@@ -15,7 +15,7 @@ const columns = [
   { id: 'device', label: 'Device' },
   { id: 'size', label: 'Capacity' },
   { id: 'bootable', label: 'Bootable' },
-  { id: 'created', label: 'Created' },
+  { id: 'created_at', label: 'Created' },
   { id: 'id', label: 'OpenStack ID' },
   { id: 'attachedMode', label: 'attached_mode' },
   { id: 'readonly', label: 'readonly' },
