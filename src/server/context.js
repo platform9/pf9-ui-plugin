@@ -156,14 +156,14 @@ class Context {
   updateGlanceImage = ({ id, input }) => {
     const glanceImage = GlanceImage.findById(id)
     if (!glanceImage) {
-      throw new Error('Unable to update non-existant glance image')
+      throw new Error('Unable to update non-existent glance image')
     }
   }
 
   removeGlanceImage = ({ id }) => {
     const glanceImage = GlanceImage.findById(id)
     if (!glanceImage) {
-      throw new Error('Unable to update non-existant glance image')
+      throw new Error('Unable to update non-existent glance image')
     }
     glanceImage.destroy()
     return id

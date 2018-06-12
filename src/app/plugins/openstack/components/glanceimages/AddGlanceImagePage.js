@@ -2,15 +2,15 @@ import React, { Fragment } from 'react'
 import { withRouter, Link } from 'react-router-dom'
 import { compose, withApollo } from 'react-apollo'
 import requiresAuthentication from '../../util/requiresAuthentication'
-import { withStyles } from '@material-ui/core/styles'
-import { Button, Divider, Paper, Typography as Tp } from '@material-ui/core'
+import { createMuiTheme, MuiThemeProvider, withStyles } from '@material-ui/core/styles'
+import { Button, Divider, Paper, Typography } from '@material-ui/core'
 import ListTable from 'core/common/ListTable'
 
 const styles = theme => ({
   root: {
     padding: theme.spacing.unit * 8
   },
-  Tp: {
+  Typography: {
     padding: theme.spacing.unit * 8
   },
   code: {
@@ -26,10 +26,25 @@ const styles = theme => ({
   }
 })
 
+const textTheme = createMuiTheme({
+  typography: {
+    display1: {
+      lineHeight: 2
+    },
+    title: {
+      lineHeight: 2
+    },
+    body1: {
+      lineHeight: 2.5,
+      marginBottom: 10
+    }
+  }
+})
+
 // Fake data. Should fetching data from host
 let id = 0
 function createData (name, ip, path) {
-  id += 1
+  id++
   return { id, name, ip, path }
 }
 
@@ -49,28 +64,30 @@ class AddGlanceImagePage extends React.Component {
     const { classes } = this.props
     return (
       <Fragment>
-        <Tp> We support two ways to import images into your Glance Image Catalog: </Tp>
-        <Tp variant="title"> Manual Import </Tp>
-        <Tp>
+        <Typography>
+            We support two ways to import images into your Glance Image Catalog:
+        </Typography>
+        <Typography variant="title"> Manual Import </Typography>
+        <Typography>
           The easiest way to populate your Image Catalog is by copying images into the image library watch folder on the host assigned with the Image Library role.
-        </Tp>
-        <Tp>  The following host is currently assigned the Image Library role: </Tp>
+          <br />
+          The following host is currently assigned the Image Library role:
+        </Typography>
         <ListTable title="Host List" columns={columns} data={data} />
-        <Tp>
+        <br />
+        <Typography>
           Please <span className={classes.code}>scp</span> the image(s) to this watch folder, and they will be automatically imported into your Glance Image Catalog.
-        </Tp>
-        <Tp>
+          <br />
           <b>Important</b>: Remove colons <span className={classes.code}>:</span> from image file names. Images with names containing colons may be falsely reported.
-        </Tp>
-        <Tp>
+          <br />
           If an image is <span className={classes.code}>raw</span>, and not in a format that is recognized by the <span className={classes.code}>qemu-img info</span> command, it must have one of the following extensions: .raw, .img, .dat, .bin.
-        </Tp>
-        <Tp>
+          <br />
+          If an image is <span className={classes.code}>raw</span>, and not in a format that is recognized by the <span className={classes.code}>qemu-img info</span> command, it must have one of the following extensions: .raw, .img, .dat, .bin.
+          <br />
           <b>Image Permissions</b>: Your image files must have the right permissions - world-readable or readable to <span className={classes.code}>company</span> user and <span className={classes.code}>company-group</span> group.
-        </Tp>
-        <Tp>
+          <br />
           You can use the following command on the image file: <span className={classes.code}>chown pf9:pf9group &lt;image-file-name&gt;</span>
-        </Tp>
+        </Typography>
       </Fragment>
     )
   }
@@ -79,21 +96,26 @@ class AddGlanceImagePage extends React.Component {
     const { classes } = this.props
     return (
       <Fragment>
-        <Tp variant="title">Using OpenStack Glance Client</Tp>
-        <Tp>Use the OpenStack Glance Client to import images into Platform9.</Tp>
-        <Tp>Example:</Tp>
-        <Tp className={classes.code}>
-          glance image-create&nbsp;&nbsp;--disk-format qcow2 \<br />
-          <span className={classes.textspan}>&nbsp;</span>--container-format bare \<br />
-          <span className={classes.textspan}>&nbsp;</span>--file ~/images/my-qcow2-img.img \<br />
-          <span className={classes.textspan}>&nbsp;</span>--visibility public \<br />
-          <span className={classes.textspan}>&nbsp;</span>--name myimage \<br />
-          <span className={classes.textspan}>&nbsp;</span>--property pf9_description='best image ever' \<br />
-          <span className={classes.textspan}>&nbsp;</span>--property virtual_size=41126400
-        </Tp>
-        <Tp>
+        <Typography variant="title">Using OpenStack Glance Client</Typography>
+        <Typography>
+          Use the OpenStack Glance Client to import images into Platform9.
+          <br />
+          Example:
+        </Typography>
+        <Typography className={classes.code}>
+          &nbsp;&nbsp;glance image-create&nbsp;&nbsp;--disk-format qcow2
+        </Typography>
+        <Typography className={classes.code} style={{paddingLeft: '18ch'}}>
+          --container-format bare \<br />
+          --file ~/images/my-qcow2-img.img \<br />
+          --visibility public \<br />
+          --name myimage \<br />
+          --property pf9_description='best image ever' \<br />
+          --property virtual_size=41126400
+        </Typography>
+        <Typography>
           See the following support article for details: <a href="https://platform9.com/support/managing-images-with-the-openstack-glance-client/"> Managing Images with the OpenStack Glance Client</a>.
-        </Tp>
+        </Typography>
       </Fragment>
     )
   }
@@ -101,11 +123,12 @@ class AddGlanceImagePage extends React.Component {
   renderCreateNewImage () {
     return (
       <Fragment>
-        <Tp variant="title">Creating a new image</Tp>
-        <Tp>If you wish to create an image from scratch you may follow this guide:</Tp>
-        <Tp>
+        <Typography variant="title">Creating a new image</Typography>
+        <Typography>
+          If you wish to create an image from scratch you may follow this guide:
+          <br />
           <a href="https://docs.openstack.org/image-guide/create-images-manually.html">Create any Virtual Machine Image from Scratch</a>
-        </Tp>
+        </Typography>
       </Fragment>
     )
   }
@@ -113,17 +136,19 @@ class AddGlanceImagePage extends React.Component {
   render () {
     const { classes } = this.props
     return (
-      <Fragment>
-        <Paper className={classes.root}>
-          <Button variant="outlined" component={Link} to="/ui/openstack/glanceimages">&lt;&lt;&nbsp;Back to list</Button>
-          <Tp variant="display3" color="primary">Import a New Image</Tp>
-          <Divider />
-          {this.renderManualImport()}
-          {this.renderGlancedClinet()}
-          <Divider />
-          {this.renderCreateNewImage()}
-        </Paper>
-      </Fragment>
+      <MuiThemeProvider theme={textTheme}>
+        <Fragment>
+          <Paper className={classes.root}>
+            <Button variant="outlined" component={Link} to="/ui/openstack/glanceimages">&lt;&lt;&nbsp;Back to list</Button>
+            <Typography variant="display1" color="primary">Import a New Image</Typography>
+            <Divider />
+            {this.renderManualImport()}
+            {this.renderGlancedClinet()}
+            <Divider />
+            {this.renderCreateNewImage()}
+          </Paper>
+        </Fragment>
+      </MuiThemeProvider>
     )
   }
 }
