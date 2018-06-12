@@ -12,7 +12,7 @@ const styles = theme => ({
   },
   code: {
     fontSize: '90%',
-    padding: theme.spacing.unit * 0.25,
+    padding: '2px 5px',
     color: theme.palette.primary.main,
     background: theme.palette.grey[100],
     borderRadius: '3px'
@@ -81,15 +81,15 @@ class AddGlanceImagePage extends React.Component {
           <br />
           If an image is <span className={classes.code}>raw</span>, and not in a format that is recognized by the <span className={classes.code}>qemu-img info</span> command, it must have one of the following extensions: .raw, .img, .dat, .bin.
           <br />
-          <b>Image Permissions</b>: Your image files must have the right permissions - world-readable or readable to <span className={classes.code}>company</span> user and <span className={classes.code}>company-group</span> group.
+          <b>Image Permissions</b>: Your image files must have the right permissions - world-readable or readable to <span className={classes.code}>company-name</span> user and <span className={classes.code}>company-group</span> group.
           <br />
-          You can use the following command on the image file: <span className={classes.code}>chown pf9:pf9group &lt;image-file-name&gt;</span>
+          You can use the following command on the image file: <span className={classes.code}>chown company-name:company-group &lt;image-file-name&gt;</span>
         </Typography>
       </Fragment>
     )
   }
 
-  renderGlancedClinet () {
+  renderGlanceClient () {
     const { classes } = this.props
     return (
       <Fragment>
@@ -107,7 +107,7 @@ class AddGlanceImagePage extends React.Component {
           --file ~/images/my-qcow2-img.img \<br />
           --visibility public \<br />
           --name myimage \<br />
-          --property pf9_description='best image ever' \<br />
+          --property companyName_description='best image ever' \<br />
           --property virtual_size=41126400
         </Typography>
         <Typography>
@@ -147,7 +147,7 @@ class AddGlanceImagePage extends React.Component {
             <Typography variant="display1" color="primary">Import a New Image</Typography>
             <Divider />
             {this.renderManualImport()}
-            {this.renderGlancedClinet()}
+            {this.renderGlanceClient()}
             <Divider />
             {this.renderCreateNewImage()}
           </Paper>
