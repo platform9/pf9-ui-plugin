@@ -1,6 +1,6 @@
 import context from '../context'
 import ActiveModel from './ActiveModel'
-import { findById } from '../helpers'
+import { findById, updateById } from '../helpers'
 
 const coll = () => context.volumes
 
@@ -26,6 +26,7 @@ class Volume extends ActiveModel {
   static getCollection = coll
   static clearCollection = () => coll().splice(0, coll().length)
   static findById = findById(coll)
+  static updateById = updateById(coll)
 
   static findByName = name => Volume.getCollection().find(x => x.name === name)
 

@@ -19,6 +19,7 @@ type Volume {
 
 type Query {
   volumes: [Volume!]!
+  volume(id: ID!): Volume
 }
 
 input VolumeInput {
@@ -38,8 +39,14 @@ input VolumeInput {
   readonly: Boolean
 }
 
+input UpdateInput {
+  name: String!
+  description: String
+  bootable: Boolean!
+}
+
 type Mutation {
   createVolume(input: VolumeInput): Volume!
-  updateVolume(id: ID!, input: VolumeInput): Volume!
+  updateVolume(id: ID!, input: UpdateInput): Volume!
   removeVolume(id: ID!): ID!
 }

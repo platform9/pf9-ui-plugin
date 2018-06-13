@@ -3,7 +3,8 @@ import { makeExecutableSchema } from 'graphql-tools'
 
 const resolvers = {
   Query: {
-    volumes: (_, __, context) => context.getVolumes()
+    volumes: (_, __, context) => context.getVolumes(),
+    volume: (obj, args, context) => context.getVolume(args.id)
   },
 
   Mutation: {

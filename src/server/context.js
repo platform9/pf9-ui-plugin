@@ -143,6 +143,14 @@ class Context {
     return network
   }
 
+  getVolume = (id) => {
+    const volume = Volume.findById(id)
+    if (!volume) {
+      throw new Error('Unable to find non-existent volume')
+    }
+    return volume.asGraphQl()
+  }
+
   getVolumes = () => Volume.getCollection().map(x => x.asGraphQl())
 
   createVolume = ({ input }) => {
