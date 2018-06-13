@@ -81,7 +81,6 @@ describe('Keystone', () => {
   })
 
   describe('service catalog', () => {
-    // TODO: this is not implemented in the simulator yet so we can't test it
     it('service catalog', async () => {
       const client = await makeScopedClient()
       const catalog = await client.keystone.getServiceCatalog()
@@ -96,6 +95,13 @@ describe('Keystone', () => {
       const services = await client.keystone.getServicesForActiveRegion()
       expect(services).toBeDefined()
       expect(services.keystone.public.url).toBeDefined()
+    })
+
+    it('list endpoints', async () => {
+      const client = await makeScopedClient()
+      const endpoints = await client.keystone.getEndpoints()
+      const endpoint = endpoints[0]
+      expect(Object.keys(endpoint).includes('region_id', 'region', 'interface', 'service_id')).toBe(true)
     })
   })
 

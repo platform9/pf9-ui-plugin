@@ -51,6 +51,7 @@ class Keystone {
   get v3 () { return `${this.endpoint}/v3` }
 
   get catalogUrl () { return `${this.v3}/auth/catalog` }
+  get endpointsUrl () { return `${this.v3}/endpoints` }
   get regionsUrl () { return `${this.v3}/regions` }
   get projectsUrl () { return `${this.v3}/auth/projects` }
   get tokensUrl () { return `${this.v3}/auth/tokens?nocatalog` }
@@ -98,6 +99,12 @@ class Keystone {
     const response = await axios.get(this.catalogUrl, this.client.getAuthHeaders())
     this.client.serviceCatalog = response.data.catalog
     return response.data.catalog
+  }
+
+  async getEndpoints () {
+    const response = await axios.get(this.endpointsUrl, this.client.getAuthHeaders())
+    this.client.endpoints = response.data.endpoints
+    return response.data.endpoints
   }
 
   async getServicesForActiveRegion () {

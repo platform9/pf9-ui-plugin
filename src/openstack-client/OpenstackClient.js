@@ -1,4 +1,5 @@
 import Keystone from './Keystone'
+import Glance from './Glance'
 
 class OpenstackClient {
   constructor (options = {}) {
@@ -7,6 +8,7 @@ class OpenstackClient {
       throw new Error('keystoneEndpoint required')
     }
     this.keystone = new Keystone(this)
+    this.glance = new Glance(this)
     this.catalog = {}
     this.activeRegion = null
   }

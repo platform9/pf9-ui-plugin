@@ -25,3 +25,11 @@ export const makeScopedClient = async () => {
   await client.keystone.changeProjectScope(projects[0].id)
   return client
 }
+
+export const makeRegionedClient = async () => {
+  const client = await makeScopedClient()
+  const regions = await client.keystone.getRegions()
+  client.setActiveRegion(regions[0].id)
+  await client.keystone.getServicesForActiveRegion()
+  return client
+}
