@@ -1,20 +1,28 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Button, TextField } from '@material-ui/core'
+import { Button, Checkbox, FormControl, TextField } from '@material-ui/core'
 
 class AddVolumeForm extends React.Component {
   state = {
     name: '',
     description: '',
     volume_type: '',
+    status: '',
+    tenant: '',
+    host: '',
+    instance: '',
+    device: '',
     size: 0,
     bootable: false,
+    attachedMode: '',
     source: '',
-    metadata: [],
-    created_at: new Date().toISOString(),
+    readonly: false,
+    metadata: ''
   }
 
   setField = field => event => this.setState({ [field]: event.target.value })
+
+  setCheckbox = field => event => this.setState({ [field]: event.target.checked })
 
   fields = [
     { id: 'name', label: 'Volume Name' },
@@ -27,11 +35,9 @@ class AddVolumeForm extends React.Component {
     { id: 'instance', label: 'Instance' },
     { id: 'device', label: 'Device' },
     { id: 'size', label: 'Capacity', type: 'number' },
-    { id: 'bootable', label: 'Bootable' },
-    { id: 'created_at', label: 'Created' },
-    { id: 'id', label: 'OpenStack ID' },
+    { id: 'bootable', label: 'Bootable', type: 'checkbox' },
     { id: 'attachedMode', label: 'attached_mode' },
-    { id: 'readonly', label: 'readonly' },
+    { id: 'readonly', label: 'readonly', type: 'checkbox' },
     { id: 'metadata', label: 'Metadata' }
   ]
 
@@ -40,6 +46,15 @@ class AddVolumeForm extends React.Component {
       return (
         <div key={id}>
           <TextField id={id} type={type} label={label} value={this.state[id]} onChange={this.setField(id)} />
+        </div>
+      )
+    } else {
+      return (
+        <div key={id}>
+          <FormControl>
+            {label}
+          </FormControl>
+          <Checkbox checked={this.state[id]} onChange={this.setCheckbox(id)} value="bootable" />
         </div>
       )
     }

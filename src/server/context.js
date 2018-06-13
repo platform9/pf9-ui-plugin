@@ -166,7 +166,7 @@ class Context {
     return volume.asGraphQl()
   }
 
-  removeVolume = ({ id }) => {
+  removeVolume = id => {
     const volume = Volume.findById(id)
     if (!volume) {
       throw new Error('Unable to delete non-existent volume')

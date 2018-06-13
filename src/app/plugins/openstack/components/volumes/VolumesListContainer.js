@@ -15,7 +15,7 @@ class VolumesListContainer extends React.Component {
       variables: { id },
       update: cache => {
         const data = cache.readQuery({ query: GET_VOLUMES })
-        data.users = data.users.filter(x => x.id !== id)
+        data.volumes = data.volumes.filter(x => x.id !== id)
         cache.writeQuery({ query: GET_VOLUMES, data })
       }
     })

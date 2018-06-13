@@ -42,7 +42,7 @@ export const REMOVE_VOLUME = gql`
 
 export const ADD_VOLUME = gql`
   mutation CreateVolume($input: VolumeInput!) {
-    createVolume(input: $input) { id name description }
+    createVolume(input: $input) { id name description volume_type status metadata size bootable tenant source host instance device created_at attachedMode readonly }
   }
 `
 
