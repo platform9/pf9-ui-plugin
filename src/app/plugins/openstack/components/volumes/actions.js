@@ -1,5 +1,16 @@
 import { gql } from 'apollo-boost'
 
+export const GET_VOLUME = gql`
+  query GetVolumeById($id: ID!) {
+    volume(id: $id) {
+      id
+      name
+      description
+      bootable
+    }
+  }
+`
+
 export const GET_VOLUMES = gql`
   {
     volumes {
@@ -36,7 +47,7 @@ export const ADD_VOLUME = gql`
 `
 
 export const UPDATE_VOLUME= gql`
-  mutation UpdateVolume($id: ID!, $input: VolumeInput!) {
-    updateVolume(id: $id, input: $input) { id name }
+  mutation UpdateVolume($id: ID!, $input: UpdateInput!) {
+    updateVolume(id: $id, input: $input) { id name description bootable }
   }
 `

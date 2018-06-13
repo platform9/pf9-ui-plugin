@@ -19,6 +19,7 @@ import AddNetworkPage from './components/networks/AddNetworkPage'
 
 import VolumesListPage from './components/volumes/VolumesListPage'
 import AddVolumePage from './components/volumes/AddVolumePage'
+import UpdateVolumePage from './components/volumes/UpdateVolumePage'
 
 import GlanceImageListPage from './components/glanceimages/GlanceImageListPage'
 import AddGlanceImagePage from './components/glanceimages/AddGlanceImagePage'
@@ -116,6 +117,11 @@ OpenStack.registerPlugin = pluginManager => {
         name: 'AddVolume',
         link: { path: '/volumes/add', exact: true },
         component: AddVolumePage
+      },
+      {
+        name: 'EditVolume',
+        link: { path: '/volumes/edit/:volumeId', exact: true },
+        component: UpdateVolumePage
       },
       {
         name: 'GlanceImages',

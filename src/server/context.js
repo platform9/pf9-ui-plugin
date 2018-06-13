@@ -158,11 +158,12 @@ class Context {
     return volume.asGraphQl()
   }
 
-  updateVolume = ({ id, input }) => {
-    const volume = Volume.findById(id)
+  updateVolume = (id, input) => {
+    let volume = Volume.updateById(id, input)
     if (!volume) {
       throw new Error('Unable to update non-existent volume')
     }
+    return volume.asGraphQl()
   }
 
   removeVolume = ({ id }) => {
