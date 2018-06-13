@@ -1,0 +1,17 @@
+type Network {
+  id: ID!
+  name: String!
+}
+
+type Query {
+  networks: [Network!]!
+}
+
+input NetworkInput {
+  name: String!
+}
+
+type Mutation {
+  createNetwork(input: NetworkInput): Network!
+  removeNetwork(id: ID): ID!
+}

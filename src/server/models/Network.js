@@ -22,6 +22,11 @@ class Network extends ActiveModel {
       name: this.name,
     }
   }
+
+  asGraphQl = () => ({
+    ...this.asJson(),
+    __typename: 'Network',
+  })
 }
 
 export default Network

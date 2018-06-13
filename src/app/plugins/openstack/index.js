@@ -14,7 +14,7 @@ import UpdateUserPage from './components/users/UpdateUserPage'
 import FlavorsListPage from './components/flavors/FlavorsListPage'
 import AddFlavorPage from './components/flavors/AddFlavorPage'
 
-import NetworksPage from './components/NetworksPage'
+import NetworksPage from './components/networks/NetworksListPage'
 import AddNetworkPage from './components/networks/AddNetworkPage'
 
 import VolumesListPage from './components/volumes/VolumesListPage'
@@ -30,7 +30,6 @@ import sessionReducer from './reducers/session'
 import tenantsReducer from './reducers/tenants'
 import usersReducer from './reducers/users'
 import flavorsReducer from './reducers/flavors'
-import networksReducer from './reducers/networks'
 
 import openstackSchemas from 'schema/openstack'
 
@@ -178,7 +177,6 @@ OpenStack.reducer = combineReducers({
   tenants: tenantsReducer,
   users: usersReducer,
   flavors: flavorsReducer,
-  networks: networksReducer,
 })
 
 export default OpenStack

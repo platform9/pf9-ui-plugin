@@ -5,6 +5,7 @@ import Tenant from './models/Tenant'
 import User from './models/User'
 import Volume from './models/Volume'
 import GlanceImage from './models/GlanceImage'
+import Network from './models/Network'
 
 const defaultQuota = {
   cores: 10,
@@ -124,6 +125,22 @@ class Context {
     }
     user.destroy()
     return id
+  }
+
+  getNetworks = () => Network.getCollection().map(x => x.asGraphQl())
+
+  createNetwork = ({ input }) => {
+    const network = new Network(input)
+    return network.asGraphQl()
+  }
+
+  removeNetwork = (id) => {
+    const network = Network.findById(id)
+    if (!network) {
+      throw new Error('Unable to remove non-existent network')
+    }
+    network.destroy()
+    return network
   }
 
   getVolumes = () => Volume.getCollection().map(x => x.asGraphQl())
