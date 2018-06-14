@@ -166,7 +166,7 @@ class ListTable extends React.Component {
       <TableRow hover key={row.id} {...checkboxProps}>
         {showCheckboxes &&
           <TableCell padding="checkbox">
-            <Checkbox checked={isSelected} />
+            <Checkbox checked={isSelected} color="primary" />
           </TableCell>
         }
         {columns.map((columnDef, colIdx) =>
@@ -225,7 +225,8 @@ class ListTable extends React.Component {
 
     const sortedData = this.sortData(data)
     const paginatedData = paginate ? this.paginate(sortedData) : sortedData
-    const shouldShowPagination = paginate && sortedData.length > this.state.rowsPerPage
+    // Always show pagination control bar to make sure the height doesn't change frequently.
+    // const shouldShowPagination = paginate && sortedData.length > this.state.rowsPerPage
 
     return (
       <Paper className={classes.root}>
@@ -253,13 +254,11 @@ class ListTable extends React.Component {
             <TableBody>
               {paginatedData.map(this.renderRow)}
             </TableBody>
-            {shouldShowPagination &&
-              <TableFooter>
-                <TableRow>
-                  {this.renderPaginationControls(sortedData.length)}
-                </TableRow>
-              </TableFooter>
-            }
+            <TableFooter>
+              <TableRow>
+                {this.renderPaginationControls(sortedData.length)}
+              </TableRow>
+            </TableFooter>
           </Table>
         </div>
       </Paper>

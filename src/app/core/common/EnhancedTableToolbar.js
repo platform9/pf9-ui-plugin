@@ -22,8 +22,8 @@ const toolbarStyles = theme => ({
   highlight:
     theme.palette.type === 'light'
       ? {
-        color: theme.palette.secondary.main,
-        backgroundColor: lighten(theme.palette.secondary.light, 0.85),
+        color: theme.palette.primary.main,
+        backgroundColor: lighten(theme.palette.primary.light, 0.85),
       }
       : {
         color: theme.palette.text.primary,
@@ -57,21 +57,21 @@ const EnhancedTableToolbar = ({ classes, numSelected, title, onAdd, onDelete, on
     </div>
     <div className={classes.spacer} />
     <div className={classes.actions}>
-      {numSelected === 1 && onEdit &&
-        <Tooltip title="Edit">
-          <IconButton aria-label="Edit" onClick={onEdit}>
-            <EditIcon />
-          </IconButton>
-        </Tooltip>
-      }
-      {numSelected > 0 && onDelete &&
-        <Tooltip title="Delete">
-          <IconButton aria-label="Delete" onClick={onDelete}>
-            <DeleteIcon />
-          </IconButton>
-        </Tooltip>
-      }
       <Toolbar>
+        {numSelected === 1 && onEdit &&
+          <Tooltip title="Edit">
+            <IconButton aria-label="Edit" onClick={onEdit}>
+              <EditIcon />
+            </IconButton>
+          </Tooltip>
+        }
+        {numSelected > 0 && onDelete &&
+          <Tooltip title="Delete">
+            <IconButton aria-label="Delete" onClick={onDelete}>
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
+        }
         <Tooltip title="Filter list">
           <IconButton aria-label="Filter list">
             <FilterListIcon />

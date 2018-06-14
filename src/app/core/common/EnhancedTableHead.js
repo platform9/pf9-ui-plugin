@@ -23,6 +23,7 @@ class EnhancedTableHead extends React.Component {
           indeterminate={numSelected > 0 && numSelected < rowCount}
           checked={checked}
           onChange={onSelectAllClick}
+          color='primary'
         />
       </TableCell>
     ) : null
