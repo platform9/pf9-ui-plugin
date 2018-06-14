@@ -38,6 +38,7 @@ class ListTable extends React.Component {
       page: 0,
       rowsPerPage: 5,
       selected: [],
+      selectedAll: false
     }
   }
 
@@ -64,8 +65,15 @@ class ListTable extends React.Component {
 
   handleSelectAllClick = (event, checked) => {
     const { data } = this.props
+    const { page, rowsPerPage } = this.state
+    let sortedData = this.sortData(data)
+    let startIdx = page * rowsPerPage
+    let endIdx = startIdx + rowsPerPage
     const getId = x => x.id
-    this.setState({ selected: checked ? data.map(getId) : [] })
+    this.setState({
+      selected: checked ? sortedData.slice(startIdx, endIdx).map(getId) : [],
+      selectedAll: !this.state.selectedAll
+    })
   }
 
   handleClick = id => event => {
@@ -98,14 +106,25 @@ class ListTable extends React.Component {
   }
 
   handleDelete = () => {
-    const { onDelete } = this.props
-    const { selected } = this.state
+    const { data, onDelete } = this.props
+    const { selected, page, rowsPerPage } = this.state
+    let maxPage = Math.ceil(data.length / rowsPerPage) - 1
+    let newPage = page
+    if (page === maxPage && selected.length === data.length % rowsPerPage) {
+      newPage--
+    } else if (selected.length === rowsPerPage) {
+      newPage--
+    }
     if (!onDelete) {
       return
     }
 
     onDelete(selected).then(() => {
-      this.setState({ selected: [] })
+      this.setState({
+        selected: [],
+        selectedAll: false,
+        page: newPage
+      })
     })
   }
 
@@ -203,6 +222,7 @@ class ListTable extends React.Component {
       order,
       orderBy,
       selected,
+      selectedAll
     } = this.state
 
     const sortedData = this.sortData(data)
@@ -227,6 +247,7 @@ class ListTable extends React.Component {
               orderBy={orderBy}
               onSelectAllClick={this.handleSelectAllClick}
               onRequestSort={this.handleRequestSort}
+              checked={selectedAll}
               title={title}
               rowCount={sortedData.length}
               showCheckboxes={showCheckboxes}
