@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/core/styles'
 import {
   Checkbox,
+  Grid,
   Paper,
   Table,
   TableBody,
@@ -17,10 +18,7 @@ import EnhancedTableToolbar from './EnhancedTableToolbar'
 const styles = theme => ({
   root: {
     width: '100%',
-    marginTop: theme.spacing.unit * 3,
-    maxWidth: '94%',
-    marginLeft: '3%',
-    marginRight: '3%'
+    marginTop: theme.spacing.unit * 3
   },
   table: {
     minWidth: 800,
@@ -232,39 +230,43 @@ class ListTable extends React.Component {
     // const shouldShowPagination = paginate && sortedData.length > this.state.rowsPerPage
 
     return (
-      <Paper className={classes.root}>
-        <EnhancedTableToolbar
-          numSelected={selected.length}
-          title={title}
-          onAdd={onAdd && this.handleAdd}
-          onDelete={onDelete && this.handleDelete}
-          onEdit={onEdit && this.handleEdit}
-        />
-        <div className={classes.tableWrapper}>
-          <Table className={classes.table}>
-            <EnhancedTableHead
-              columns={columns}
+      <Grid container justify="center">
+        <Grid item xs={11}>
+          <Paper className={classes.root}>
+            <EnhancedTableToolbar
               numSelected={selected.length}
-              order={order}
-              orderBy={orderBy}
-              onSelectAllClick={this.handleSelectAllClick}
-              onRequestSort={this.handleRequestSort}
-              checked={selectedAll}
               title={title}
-              rowCount={sortedData.length}
-              showCheckboxes={showCheckboxes}
+              onAdd={onAdd && this.handleAdd}
+              onDelete={onDelete && this.handleDelete}
+              onEdit={onEdit && this.handleEdit}
             />
-            <TableBody>
-              {paginatedData.map(this.renderRow)}
-            </TableBody>
-            <TableFooter>
-              <TableRow>
-                {this.renderPaginationControls(sortedData.length)}
-              </TableRow>
-            </TableFooter>
-          </Table>
-        </div>
-      </Paper>
+            <div className={classes.tableWrapper}>
+              <Table className={classes.table}>
+                <EnhancedTableHead
+                  columns={columns}
+                  numSelected={selected.length}
+                  order={order}
+                  orderBy={orderBy}
+                  onSelectAllClick={this.handleSelectAllClick}
+                  onRequestSort={this.handleRequestSort}
+                  checked={selectedAll}
+                  title={title}
+                  rowCount={sortedData.length}
+                  showCheckboxes={showCheckboxes}
+                />
+                <TableBody>
+                  {paginatedData.map(this.renderRow)}
+                </TableBody>
+                <TableFooter>
+                  <TableRow>
+                    {this.renderPaginationControls(sortedData.length)}
+                  </TableRow>
+                </TableFooter>
+              </Table>
+            </div>
+          </Paper>
+        </Grid>
+      </Grid>
     )
   }
 }
