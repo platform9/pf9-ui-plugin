@@ -44,15 +44,16 @@ class UpdateGlanceImageForm extends React.Component {
     }
   }
 
-  handleSubmit = () => {
+  handleSubmit = event => {
+    event.preventDefault()
     this.props.onSubmit(this.state)
   }
 
   render () {
     return (
-      <form>
+      <form onSubmit={this.handleSubmit}>
         {this.fields.map(this.renderField)}
-        <Button variant="raised" onClick={this.handleSubmit}>Submit</Button>
+        <Button variant="raised" type="submit">Submit</Button>
       </form>
     )
   }
