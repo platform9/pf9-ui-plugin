@@ -25,12 +25,14 @@ class GlanceImageContainer extends React.Component {
         items={this.props.glanceImages}
         onRemove={this.handleRemove}
         addUrl="/ui/openstack/glanceimages/add"
+        editUrl="/ui/openstack/glanceimages/edit"
       >
-        {({ onDelete, onAdd }) => (
+        {({ onDelete, onAdd, onEdit }) => (
           <GlanceImageList
             glanceImages={this.props.glanceImages}
             onAdd={onAdd}
             onDelete={onDelete}
+            onEdit={onEdit}
           />
         )}
       </CRUDListContainer>

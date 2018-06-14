@@ -1,6 +1,6 @@
 import context from '../context'
 import ActiveModel from './ActiveModel'
-import { findById } from '../helpers'
+import { findById, updateById } from '../helpers'
 
 const coll = () => context.glanceImages
 
@@ -30,6 +30,8 @@ class GlanceImage extends ActiveModel {
   static getCollection = coll
   static clearCollection = () => coll().splice(0, coll().length)
   static findById = findById(coll)
+  static updateById = updateById(coll)
+
   static findByName = name => GlanceImage.getCollection().find(x => x.name === name)
 
   asJson = () => {

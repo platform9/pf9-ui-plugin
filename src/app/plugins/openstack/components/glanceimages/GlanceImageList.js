@@ -19,7 +19,7 @@ const columns = [
 
 class GlanceImageList extends React.Component {
   render () {
-    const { onAdd, onDelete, glanceImages } = this.props
+    const { onAdd, onDelete, onEdit, glanceImages } = this.props
     if (!glanceImages || glanceImages.length === 0) {
       return <h1>No Glance Images Found.</h1>
     }
@@ -30,6 +30,7 @@ class GlanceImageList extends React.Component {
         data={glanceImages}
         onAdd={onAdd}
         onDelete={onDelete}
+        onEdit={onEdit}
         actions={['delete']}
       />
     )
@@ -45,6 +46,8 @@ GlanceImageList.propTypes = {
 
   /** Called onClick of delete icon for a glance image row */
   onDelete: PropTypes.func.isRequired,
+
+  onEdit: PropTypes.func.isRequired
 }
 
 GlanceImageList.defaultProps = {

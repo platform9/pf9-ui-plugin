@@ -1,5 +1,19 @@
 import { gql } from 'apollo-boost'
 
+export const GET_GLANCEIMAGE = gql`
+  query GetGlanceImageById($id: ID!) {
+    glanceImage(id: $id) {
+      id
+      name
+      description
+      visibility
+      owner
+      protected
+      tags
+    }
+  }
+`
+
 export const GET_GLANCEIMAGES = gql`
   {
     glanceImages {
@@ -19,7 +33,7 @@ export const GET_GLANCEIMAGES = gql`
 `
 export const UPDATE_GLANCEIMAGE = gql`
   mutation Update_GlanceImage ($id: ID!, $input: GlanceImageInput!) {
-    updateGlanceImage(id: $id, input: $input) { id name description owner visibility protected }
+    updateGlanceImage(id: $id, input: $input) { id name description owner visibility protected tags }
   }
 `
 

@@ -3,7 +3,8 @@ import { makeExecutableSchema } from 'graphql-tools'
 
 const resolvers = {
   Query: {
-    glanceImages: (_, __, context) => context.getGlanceImages()
+    glanceImages: (_, __, context) => context.getGlanceImages(),
+    glanceImage: (_, args, context) => context.getGlanceImage(args.id)
   },
   Mutation: {
     updateGlanceImage: (_, { id, input }, context) => context.updateGlanceImage(id, input),

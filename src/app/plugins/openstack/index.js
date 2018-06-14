@@ -23,6 +23,7 @@ import UpdateVolumePage from './components/volumes/UpdateVolumePage'
 
 import GlanceImageListPage from './components/glanceimages/GlanceImageListPage'
 import AddGlanceImagePage from './components/glanceimages/AddGlanceImagePage'
+import UpdateGlanceImagePage from './components/glanceimages/UpdateGlanceImagePage'
 
 import ApiAccessPage from './components/api-access/ApiAccessListPage'
 
@@ -132,6 +133,11 @@ OpenStack.registerPlugin = pluginManager => {
         name: 'AddGlanceImages',
         link: { path: '/glanceimages/add', exact: true },
         component: AddGlanceImagePage
+      },
+      {
+        name: 'EditGlanceImage',
+        link: { path: '/glanceimages/edit/:glanceImageId', exact: true },
+        component: UpdateGlanceImagePage
       }
     ]
   )

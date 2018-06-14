@@ -177,19 +177,28 @@ class Context {
 
   getServiceCatalog = () => Catalog.getCatalog()
 
+  getGlanceImage = (id) => {
+    const glanceImage = GlanceImage.findById(id)
+    if (!glanceImage) {
+      throw new Error('Unable to find non-existent glance image')
+    }
+    return glanceImage
+  }
+
   getGlanceImages = () => GlanceImage.getCollection().map(x => x.asGraphQl())
 
-  updateGlanceImage = ({ id, input }) => {
-    const glanceImage = GlanceImage.findById(id)
+  updateGlanceImage = (id, input) => {
+    const glanceImage = GlanceImage.updateById(id, input)
     if (!glanceImage) {
       throw new Error('Unable to update non-existent glance image')
     }
+    return glanceImage.asGraphQl()
   }
 
-  removeGlanceImage = ({ id }) => {
+  removeGlanceImage = id => {
     const glanceImage = GlanceImage.findById(id)
     if (!glanceImage) {
-      throw new Error('Unable to update non-existent glance image')
+      throw new Error('Unable to delete non-existent glance image')
     }
     glanceImage.destroy()
     return id

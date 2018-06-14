@@ -27,6 +27,7 @@ type GlanceImage {
 
 type Query {
   glanceImages: [GlanceImage!]!
+  glanceImage(id: ID!): GlanceImage!
 }
 
 input GlanceImageInput {
