@@ -137,9 +137,7 @@ class ListTable extends React.Component {
 
   paginate = data => {
     const { page, rowsPerPage } = this.state
-    const startIdx = (data.length > 0 && data.length <= page * rowsPerPage)
-      ? (page - 1) * rowsPerPage
-      : page * rowsPerPage
+    const startIdx = page * rowsPerPage
     const endIdx = startIdx + rowsPerPage
     return data.slice(startIdx, endIdx)
   }
