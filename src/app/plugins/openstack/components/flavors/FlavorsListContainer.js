@@ -27,12 +27,14 @@ class FlavorsListContainer extends React.Component {
         items={this.props.flavors}
         onRemove={this.handleRemove}
         addUrl="/ui/openstack/flavors/add"
+        editUrl="/ui/openstack/flavors/edit"
       >
-        {({ onDelete, onAdd }) => (
+        {({ onDelete, onAdd, onEdit }) => (
           <FlavorsList
             flavors={this.props.flavors}
             onAdd={onAdd}
             onDelete={onDelete}
+            onEdit={onEdit}
           />
         )}
       </CRUDListContainer>

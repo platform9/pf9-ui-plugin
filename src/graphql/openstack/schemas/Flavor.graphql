@@ -7,10 +7,12 @@ type Flavor {
   ram: Int!
   vcpus: Int!
   public: Boolean
+  tags: String
 }
 
 type Query {
   flavors: [Flavor!]!
+  flavor(id: ID!): Flavor
 }
 
 input FlavorInput {
@@ -21,10 +23,16 @@ input FlavorInput {
   ram: Int!
   vcpus: Int!
   public: Boolean
+  tags: String
+}
+
+input UpdateFlavorInput {
+  name: String
+  tags: String
 }
 
 type Mutation {
   createFlavor(input: FlavorInput): Flavor!
-  updateFlavor(id: ID!, input: FlavorInput): Flavor!
+  updateFlavor(id: ID!, input: UpdateFlavorInput): Flavor!
   removeFlavor(id: ID): ID!
 }

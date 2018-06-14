@@ -6,6 +6,17 @@ const commonFields = `
   ram
   vcpus
   public
+  tags
+`
+
+export const GET_FLAVOR = gql`
+  query GetFlavor($id: ID!) {
+    flavor(id: $id){
+      id
+      name
+      tags
+    }
+  }
 `
 
 export const GET_FLAVORS = gql`
@@ -30,7 +41,7 @@ export const ADD_FLAVOR = gql`
 `
 
 export const UPDATE_FLAVOR = gql`
-  mutation UpdateFlavor($id: ID!, $input: FlavorInput!) {
-    updateFlavor(id: $id, input: $input) { id ${commonFields} }
+  mutation UpdateFlavor($id: ID!, $input: UpdateFlavorInput!) {
+    updateFlavor(id: $id, input: $input) { id name tags }
   }
 `

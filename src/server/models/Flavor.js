@@ -1,6 +1,6 @@
 import context from '../context'
 import ActiveModel from './ActiveModel'
-import { findById } from '../helpers'
+import { findById, updateById } from '../helpers'
 
 const coll = () => context.flavors
 
@@ -12,11 +12,13 @@ class Flavor extends ActiveModel {
     this.ram = params.ram || 512
     this.vcpus = params.vcpus || 1
     this.public = params.public !== undefined ? params.public : false
+    this.tags = params.tags || ''
   }
 
   static getCollection = coll
   static clearCollection = () => coll().splice(0, coll().length)
   static findById = findById(coll)
+  static updateById = updateById(coll)
 
   static findByName = name => Flavor.getCollection().find(x => x.name === name)
 
@@ -28,6 +30,7 @@ class Flavor extends ActiveModel {
       ram: this.ram,
       vcpus: this.vcpus,
       public: this.public,
+      tags: this.tags
     }
   }
 

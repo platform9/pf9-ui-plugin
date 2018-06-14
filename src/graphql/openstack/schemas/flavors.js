@@ -1,9 +1,10 @@
-import typeDefs from '../schemas/Flavor.graphql'
+import typeDefs from './Flavor.graphql'
 import { makeExecutableSchema } from 'graphql-tools'
 
 const resolvers = {
   Query: {
     flavors: (_, __, context) => context.getFlavors(),
+    flavor: (_, { id }, context) => context.getFlavor(id)
   },
 
   Mutation: {

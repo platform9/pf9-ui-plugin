@@ -40,6 +40,14 @@ class Context {
     this.defaultQuota = { ...defaultQuota }
   }
 
+  getFlavor = id => {
+    const flavor = Flavor.findById(id)
+    if (!flavor) {
+      throw new Error('Unable to find non-existent flavor')
+    }
+    return flavor.asGraphQl()
+  }
+
   getFlavors = () => Flavor.getCollection().map(x => x.asGraphQl())
 
   createFlavor = ({ input }) => {
@@ -47,11 +55,12 @@ class Context {
     return flavor.asGraphQl()
   }
 
-  updateFlavor = (id, { input }) => {
-    const flavor = Flavor.findById(id)
+  updateFlavor = (id, input) => {
+    const flavor = Flavor.updateById(id, input)
     if (!flavor) {
       throw new Error('Unable to update non-existent flavor')
     }
+    return flavor.asGraphQl()
   }
 
   removeFlavor = id => {
