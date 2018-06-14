@@ -30,16 +30,17 @@ class AddFlavorForm extends React.Component {
     }
   }
 
-  handleSubmit = () => {
+  handleSubmit = event => {
+    event.preventDefault()
     this.props.onSubmit(this.state)
   }
 
   render () {
     return (
-      <form noValidate>
+      <form noValidate onSubmit={this.handleSubmit}>
         {this.fields.map(this.renderField)}
         <div>
-          <Button variant="raised" onClick={this.handleSubmit}>Submit</Button>
+          <Button variant="raised" type="submit">Submit</Button>
         </div>
       </form>
     )
