@@ -70,7 +70,7 @@ class AddGlanceImagePage extends React.Component {
           <br />
           The following host is currently assigned the Image Library role:
         </Typography>
-        <ListTable title="Host List" columns={columns} data={data} />
+        <ListTable title="Host List" columns={columns} data={data} showCheckboxes={false} />
         <br />
         <Typography>
           Please <span className={classes.code}>scp</span> the image(s) to this watch folder, and they will be automatically imported into your Glance Image Catalog.
