@@ -1,5 +1,12 @@
 import axios from 'axios'
 
+/*
+const op = op => (path, value) => ({ op: 'replace', path, value })
+const addOp = op('add')
+const removeOp = op('remove')
+const replaceOp = op('replace')
+*/
+
 class Glance {
   constructor (client) {
     this.client = client
@@ -23,6 +30,7 @@ class Glance {
 
   async createImage (params) {
     const url = await this.imagesUrl()
+    // TODO: support adding additional user properties
     try {
       const response = await axios.post(url, params, this.client.getAuthHeaders())
       return response.data
@@ -41,6 +49,17 @@ class Glance {
     const url = `${await this.v2()}/schemas/images`
     const response = await axios.get(url, this.client.getAuthHeaders())
     return response.data.properties.images
+  }
+
+  async updateImage (image) {
+    const url = `${await this.imagesUrl()}/${image.id}`
+    const headers = {
+      ...this.client.getAuthHeaders().headers,
+      'Content-Type': 'application/openstack-images-v2.1-json-patch',
+    }
+    const body = {}
+    const response = await axios.patch(url, body, { headers })
+    return response
   }
 
   // The user should not be able to edit these fields at all.
