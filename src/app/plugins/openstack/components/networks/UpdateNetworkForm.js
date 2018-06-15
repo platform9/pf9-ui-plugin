@@ -2,16 +2,13 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Button, Checkbox, FormControl, TextField } from '@material-ui/core'
 
-class AddNetworkForm extends React.Component {
+class UpdateNetworkForm extends React.Component {
   state = {
-    name: '',
-    subnets: '',
-    tenant: '',
-    shared: false,
-    port_security_enabled: false,
-    external: false,
-    admin_state_up: false,
-    status: ''
+    name: this.props.network.name || '',
+    admin_state_up: this.props.network.admin_state_up || false,
+    port_security_enabled: this.props.network.port_security_enabled || false,
+    shared: this.props.network.shared || false,
+    external: this.props.network.external || false
   }
 
   setField = field => event => this.setState({ [field]: event.target.value })
@@ -20,13 +17,10 @@ class AddNetworkForm extends React.Component {
 
   fields = [
     { id: 'name', label: 'Name' },
-    { id: 'subnets', label: 'Subnets Associated' },
-    { id: 'tenant', label: 'Tenant' },
-    { id: 'shared', label: 'Shared', type: 'checkbox' },
-    { id: 'port_security_enabled', label: 'Port Security', type: 'checkbox' },
-    { id: 'external', label: 'External Network', type: 'checkbox' },
     { id: 'admin_state_up', label: 'Admin State', type: 'checkbox' },
-    { id: 'status', label: 'Status' },
+    { id: 'port_security_enabled', label: 'Port Security', type: 'checkbox' },
+    { id: 'shared', label: 'Shared', type: 'checkbox' },
+    { id: 'external', label: 'External Network', type: 'checkbox' }
   ]
 
   renderField = ({ id, label, type = 'text' }) => {
@@ -53,7 +47,7 @@ class AddNetworkForm extends React.Component {
 
   render () {
     return (
-      <form noValidate onSubmit={this.handleSubmit}>
+      <form onSubmit={this.handleSubmit}>
         {this.fields.map(this.renderField)}
         <Button variant="raised" type="submit">Submit</Button>
       </form>
@@ -61,8 +55,8 @@ class AddNetworkForm extends React.Component {
   }
 }
 
-AddNetworkForm.propTypes = {
+UpdateNetworkForm.propTypes = {
   onSubmit: PropTypes.func.isRequired
 }
 
-export default AddNetworkForm
+export default UpdateNetworkForm

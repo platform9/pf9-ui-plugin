@@ -136,10 +136,26 @@ class Context {
     return id
   }
 
+  getNetwork = id => {
+    const network = Network.findById(id)
+    if (!network) {
+      throw new Error('Unable to get non-existent network')
+    }
+    return network.asGraphQl()
+  }
+
   getNetworks = () => Network.getCollection().map(x => x.asGraphQl())
 
   createNetwork = ({ input }) => {
     const network = new Network(input)
+    return network.asGraphQl()
+  }
+
+  updateNetwork = (id, input) => {
+    let network = Network.updateById(id, input)
+    if (!network) {
+      throw new Error('Unable to update non-existent network')
+    }
     return network.asGraphQl()
   }
 

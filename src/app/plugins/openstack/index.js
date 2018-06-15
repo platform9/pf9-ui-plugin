@@ -17,6 +17,7 @@ import UpdateFlavorPage from './components/flavors/UpdateFlavorPage'
 
 import NetworksPage from './components/networks/NetworksListPage'
 import AddNetworkPage from './components/networks/AddNetworkPage'
+import UpdateNetworkPage from './components/networks/UpdateNetworkPage'
 
 import VolumesListPage from './components/volumes/VolumesListPage'
 import AddVolumePage from './components/volumes/AddVolumePage'
@@ -109,6 +110,11 @@ OpenStack.registerPlugin = pluginManager => {
         name: 'AddNetwork',
         link: { path: '/networks/add' },
         component: AddNetworkPage
+      },
+      {
+        name: 'EditNetwork',
+        link: { path: '/networks/edit/:networkId', exact: true },
+        component: UpdateNetworkPage
       },
       {
         name: 'ApiAccess',
