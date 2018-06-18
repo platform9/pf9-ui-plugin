@@ -1,5 +1,6 @@
 import Keystone from './Keystone'
 import Glance from './Glance'
+import Volume from './Volume'
 
 class OpenstackClient {
   constructor (options = {}) {
@@ -9,6 +10,7 @@ class OpenstackClient {
     }
     this.keystone = new Keystone(this)
     this.glance = new Glance(this)
+    this.volume = new Volume(this)
     this.catalog = {}
     this.activeRegion = null
   }
