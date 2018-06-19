@@ -24,11 +24,17 @@ class Volume {
   async createVolume (params) {
     const url = await this.volumesUrl()
     try {
-      const response = await axios.post(url, params, this.client.getAuthHeaders())
-      return response.data
+      const response = await axios.post(url, {volume: params}, this.client.getAuthHeaders())
+      return response.data.volume
     } catch (err) {
-      console.err(err)
+      console.log(err)
     }
+  }
+
+  async deleteVolume (id) {
+    const url = `${await this.imagesUrl()}/${id}`
+    const response = await axios.delete(url, this.client.getAuthHeaders())
+    return response
   }
 }
 
