@@ -5,11 +5,9 @@ class Volume {
     this.client = client
   }
 
-  baseUrl = 'cinderv3'
-
   async endpoint () {
     const services = await this.client.keystone.getServicesForActiveRegion()
-    const endpoint = services[this.baseUrl].admin.url
+    const endpoint = services.cinderv3.admin.url
     return endpoint
   }
 
@@ -56,6 +54,46 @@ class Volume {
       console.log(err)
     }
   }
+
+  async waitForCreate (delay, maxRetries, id) {
+    const url = `${await this.volumesUrl()}/${id}`
+    let response = await axios.get(url, this.client.getAuthHeaders())
+    let flag = (response.data.volume.status === 'available')
+    if (!flag) {
+      let retries = 0
+      for (; retries <= maxRetries && !flag; retries++) {
+        await sleep(delay)
+        response = await axios.get(url, this.client.getAuthHeaders())
+        flag = (response.data.volume.status === 'available')
+      }
+      if (retries > maxRetries) {
+        throw new Error('Creation did not finish within set time.')
+      }
+    }
+    return flag
+  }
+
+  async waitForDelete (delay, maxRetries, id) {
+    const url = await this.volumesUrl()
+    let response = await axios.get(url, this.client.getAuthHeaders())
+    let flag = (response.data.volumes.find(x => x.id === id) === undefined)
+    if (!flag) {
+      let retries = 0
+      for (; retries <= maxRetries && !flag; retries++) {
+        await sleep(delay)
+        response = await axios.get(url, this.client.getAuthHeaders())
+        flag = (response.data.volumes.find(x => x.id === id) === undefined)
+      }
+      if (retries > maxRetries) {
+        throw new Error('Deletion did not finish within set time.')
+      }
+    }
+    return flag
+  }
+}
+
+function sleep (time) {
+  return new Promise((resolve) => setTimeout(resolve, time))
 }
 
 export default Volume

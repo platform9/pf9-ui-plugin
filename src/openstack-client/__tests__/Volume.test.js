@@ -4,7 +4,7 @@ import {
 
 describe('Volumes', () => {
   // It will take some for a newly created/deleted volume
-  // to change status before we can move on to other tests.
+  // to change status if working on real DUs.
   jest.setTimeout(20000)
 
   it('list volumes', async () => {
@@ -26,13 +26,12 @@ describe('Volumes', () => {
     expect(newVolume).toBeDefined()
 
     // Wait for new volume's status changing to 'available'
-    var wait = ms => new Promise((resolve, reject) => setTimeout(resolve, ms))
-    await wait(7000)
+    await client.volume.waitForCreate(1000, 20, newVolume.id)
     await client.volume.deleteVolume(newVolume.id)
 
-    await wait(7000)
+    await client.volume.waitForDelete(1000, 20, newVolume.id)
     const newVolumes = await client.volume.getVolumes()
-    expect(newVolumes.find(x => x.id === volume.id)).not.toBeDefined()
+    expect(newVolumes.find(x => x.id === newVolume.id)).not.toBeDefined()
   })
 
   it('create and update a volume, then delete it', async () => {
@@ -50,12 +49,11 @@ describe('Volumes', () => {
     expect(updatedVolume.name).toBe('NewName')
 
     // Wait for new volume's status changing to 'available'
-    var wait = ms => new Promise((resolve, reject) => setTimeout(resolve, ms))
-    await wait(7000)
+    await client.volume.waitForCreate(1000, 20, updatedVolume.id)
 
     await client.volume.deleteVolume(updatedVolume.id)
 
-    await wait(7000)
+    await client.volume.waitForDelete(1000, 20, updatedVolume.id)
     const newVolumes = await client.volume.getVolumes()
     expect(newVolumes.find(x => x.id === updatedVolume.id)).not.toBeDefined()
   })
