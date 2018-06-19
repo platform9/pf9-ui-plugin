@@ -4,7 +4,7 @@ import OpenstackClient from '../OpenstackClient'
 const keystoneEndpoint = `${config.host}/keystone`
 const makeClient = () => new OpenstackClient({ keystoneEndpoint })
 
-describe('OpenstackClient', () => {
+describe.skip('OpenstackClient', () => {
   it('create a client instance', () => {
     const client = new OpenstackClient({ keystoneEndpoint })
     expect(client).toBeDefined()

@@ -2,7 +2,7 @@ import {
   makeRegionedClient,
 } from '../helpers'
 
-describe('Glance', () => {
+describe.skip('Glance', () => {
   it('list images', async () => {
     const client = await makeRegionedClient()
     const images = await client.glance.getImages()

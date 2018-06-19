@@ -33,3 +33,17 @@ export const makeRegionedClient = async () => {
   await client.keystone.getServicesForActiveRegion()
   return client
 }
+
+export const waitUntil = async (condition, params, delay, maxRetries) =>
+  new Promise(async (resolve, reject) => {
+    let done = await condition(params)
+    let retry = 0
+    while (!done && retry++ < maxRetries) {
+      await sleep(delay)
+      done = await condition()
+    }
+    done ? resolve() : reject(new Error('Task not done within time.'))
+  })
+
+export const sleep = (delay) =>
+  new Promise(resolve => setTimeout(resolve, delay))

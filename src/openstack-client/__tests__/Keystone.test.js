@@ -6,7 +6,7 @@ import {
   makeScopedClient
 } from '../helpers'
 
-describe('Keystone', () => {
+describe.skip('Keystone', () => {
   let client
 
   describe('authentication', () => {
