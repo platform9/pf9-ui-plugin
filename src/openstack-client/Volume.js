@@ -54,49 +54,6 @@ class Volume {
       console.log(err)
     }
   }
-
-  async checkForCreate (id) {
-    const url = `${await this.volumesUrl()}/${id}`
-    let response = await axios.get(url, this.client.getAuthHeaders())
-    let flag = (response.data.volume.status === 'available')
-    // if (!flag) {
-    //   let retries = 0
-    //   for (; retries <= maxRetries && !flag; retries++) {
-    //     await sleep(delay)
-    //     response = await axios.get(url, this.client.getAuthHeaders())
-    //     flag = (response.data.volume.status === 'available')
-    //   }
-    //   if (retries > maxRetries) {
-    //     throw new Error('Creation did not finish within set time.')
-    //   }
-    // }
-    return flag
-  }
-
-  async waitForDelete (delay, maxRetries, id) {
-    let flag = false
-    const url = `${await this.volumesUrl()}/${id}`
-    await axios.get(url, this.client.getAuthHeaders()).catch(function (error) {
-      flag = error.response.status === 404
-    })
-    if (!flag) {
-      let retries = 0
-      for (; retries <= maxRetries && !flag; retries++) {
-        await sleep(delay)
-        await axios.get(url, this.client.getAuthHeaders()).catch(function (error) {
-          flag = error.response.status === 404
-        })
-      }
-      if (retries > maxRetries) {
-        throw new Error('Deletion did not finish within set time.')
-      }
-    }
-    return flag
-  }
-}
-
-function sleep (time) {
-  return new Promise((resolve) => setTimeout(resolve, time))
 }
 
 export default Volume
