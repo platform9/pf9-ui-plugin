@@ -19,8 +19,9 @@ class Volume {
     return response.data.volume
   }
 
+  // Get volumes with details
   async getVolumes () {
-    const url = await this.volumesUrl()
+    const url = await `${await this.volumesUrl()}/detail`
     const response = await axios.get(url, this.client.getAuthHeaders())
     return response.data.volumes
   }
