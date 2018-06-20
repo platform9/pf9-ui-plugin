@@ -1,13 +1,14 @@
 import {
   makeRegionedClient,
   waitUntil,
-  sleep
+  waitForCreate,
+  waitForDelete
 } from '../helpers'
 
-describe('Volumes', () => {
+describe('Volumes', async () => {
   // It will take some for a newly created/deleted volume
   // to change status if working on real DUs.
-  jest.setTimeout(30000)
+  jest.setTimeout(20000)
 
   it('list volumes', async () => {
     const client = await makeRegionedClient()
@@ -15,7 +16,7 @@ describe('Volumes', () => {
     expect(volumes).toBeDefined()
   })
 
-  it.only('create, get and delete a volume placeholder', async () => {
+  it('create, get and delete a volume placeholder', async () => {
     const client = await makeRegionedClient()
     const volume = await client.volume.createVolume({
       name: 'FeelFreeToDelete',
@@ -27,17 +28,14 @@ describe('Volumes', () => {
     const newVolume = await client.volume.getVolume(volume.id)
     expect(newVolume).toBeDefined()
 
-    waitUntil(client.volume.checkForCreate, newVolume.id, 1000, 20)
+    // Wait for new volume's status changing to 'available'
+    await waitUntil({ condition: waitForCreate(newVolume.id), delay: 1000, maxRetries: 20 })
+    await client.volume.deleteVolume(newVolume.id)
+
+    // Wait for new volume is fully deleted
+    await waitUntil({ condition: waitForDelete(newVolume.id), delay: 1000, maxRetries: 20 })
     const newVolumes = await client.volume.getVolumes()
-    console.log(newVolumes)
-
-    // // Wait for new volume's status changing to 'available'
-    // await client.volume.waitForCreate(1000, 20, newVolume.id)
-    // await client.volume.deleteVolume(newVolume.id)
-
-    // await client.volume.waitForDelete(1000, 20, newVolume.id)
-    // const newVolumes = await client.volume.getVolumes()
-    // expect(newVolumes.find(x => x.id === newVolume.id)).not.toBeDefined()
+    expect(newVolumes.find(x => x.id === newVolume.id)).not.toBeDefined()
   })
 
   it('create and update a volume, then delete it', async () => {
@@ -55,11 +53,11 @@ describe('Volumes', () => {
     expect(updatedVolume.name).toBe('NewName')
 
     // Wait for new volume's status changing to 'available'
-    await client.volume.waitForCreate(1000, 20, updatedVolume.id)
-
+    await waitUntil({ condition: waitForCreate(updatedVolume.id), delay: 1000, maxRetries: 20 })
     await client.volume.deleteVolume(updatedVolume.id)
 
-    await client.volume.waitForDelete(1000, 20, updatedVolume.id)
+    // Wait for new volume is fully deleted
+    await waitUntil({ condition: waitForDelete(updatedVolume.id), delay: 1000, maxRetries: 20 })
     const newVolumes = await client.volume.getVolumes()
     expect(newVolumes.find(x => x.id === updatedVolume.id)).not.toBeDefined()
   })
