@@ -1,5 +1,6 @@
 import React from 'react'
 import { withRouter } from 'react-router-dom'
+import FormWrapper from 'core/common/FormWrapper'
 import AddUserForm from './AddUserForm'
 import { ADD_USER, GET_USERS } from './actions'
 import { compose, withApollo } from 'react-apollo'
@@ -28,10 +29,9 @@ class AddUserPage extends React.Component {
 
   render () {
     return (
-      <div>
-        <h1>Add User</h1>
+      <FormWrapper title="Add User" backUrl="/ui/openstack/users">
         <AddUserForm onSubmit={this.handleSubmit} />
-      </div>
+      </FormWrapper>
     )
   }
 }

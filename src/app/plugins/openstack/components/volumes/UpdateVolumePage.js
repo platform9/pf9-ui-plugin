@@ -1,5 +1,6 @@
 import React from 'react'
 import { withRouter } from 'react-router-dom'
+import FormWrapper from 'core/common/FormWrapper'
 import UpdateVolumeForm from './UpdateVolumeForm'
 import { GET_VOLUME, UPDATE_VOLUME } from './actions'
 import { compose, withApollo } from 'react-apollo'
@@ -45,12 +46,11 @@ class UpdateVolumePage extends React.Component {
     const volume = this.state && this.state.volume
 
     return (
-      <div>
-        <h1>Update Volume</h1>
+      <FormWrapper title="Update Volume" backUrl="/ui/openstack/volumes">
         { volume &&
           <UpdateVolumeForm onSubmit={this.handleSubmit} volume={volume} />
         }
-      </div>
+      </FormWrapper>
     )
   }
 }

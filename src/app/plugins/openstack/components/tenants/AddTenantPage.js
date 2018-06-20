@@ -1,5 +1,6 @@
 import React from 'react'
 import { withRouter } from 'react-router-dom'
+import FormWrapper from 'core/common/FormWrapper'
 import AddTenantForm from './AddTenantForm'
 import { ADD_TENANT, GET_TENANTS } from './actions'
 import { compose, withApollo } from 'react-apollo'
@@ -28,10 +29,9 @@ class AddTenantPage extends React.Component {
 
   render () {
     return (
-      <div>
-        <h1>Add Tenant</h1>
+      <FormWrapper title="Add Tenant" backUrl="/ui/openstack/tenants">
         <AddTenantForm onSubmit={this.handleSubmit} />
-      </div>
+      </FormWrapper>
     )
   }
 }

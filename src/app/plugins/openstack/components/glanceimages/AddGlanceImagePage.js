@@ -3,12 +3,14 @@ import { withRouter, Link } from 'react-router-dom'
 import { compose, withApollo } from 'react-apollo'
 import requiresAuthentication from '../../util/requiresAuthentication'
 import { createMuiTheme, MuiThemeProvider, withStyles } from '@material-ui/core/styles'
-import { Button, Divider, Paper, Typography } from '@material-ui/core'
+import { Button, Divider, Grid, Paper, Typography } from '@material-ui/core'
 import ListTable from 'core/common/ListTable'
 
 const styles = theme => ({
   root: {
-    padding: theme.spacing.unit * 8
+    marginTop: theme.spacing.unit * 3,
+    marginBottom: theme.spacing.unit * 3,
+    padding: theme.spacing.unit * 5
   },
   code: {
     fontSize: '90%',
@@ -134,24 +136,32 @@ class AddGlanceImagePage extends React.Component {
     const { classes } = this.props
     return (
       <MuiThemeProvider theme={textTheme}>
-        <Fragment>
-          <Paper className={classes.root}>
-            <Button
-              variant="outlined"
-              component={Link}
-              to="/ui/openstack/glanceimages"
-              style={{ marginBottom: '1em' }}
-            >
-              &lt;&lt;&nbsp;Back to list
-            </Button>
-            <Typography variant="display1" color="primary">Import a New Image</Typography>
-            <Divider />
-            {this.renderManualImport()}
-            {this.renderGlanceClient()}
-            <Divider />
-            {this.renderCreateNewImage()}
-          </Paper>
-        </Fragment>
+        <Grid container justify="center">
+          <Grid item xs={11}>
+            <Paper className={classes.root}>
+              <Grid container justify="space-between">
+                <Grid>
+                  <Typography variant="display1" color="primary">Import a New Image</Typography>
+                </Grid>
+                <Grid>
+                  <Button
+                    variant="outlined"
+                    component={Link}
+                    to="/ui/openstack/glanceimages"
+                    style={{ marginBottom: '1em' }}
+                  >
+                    &lt;&lt;&nbsp;Back to list
+                  </Button>
+                </Grid>
+              </Grid>
+              <Divider />
+              {this.renderManualImport()}
+              {this.renderGlanceClient()}
+              <Divider />
+              {this.renderCreateNewImage()}
+            </Paper>
+          </Grid>
+        </Grid>
       </MuiThemeProvider>
     )
   }

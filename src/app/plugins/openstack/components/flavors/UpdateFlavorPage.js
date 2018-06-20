@@ -1,5 +1,6 @@
 import React from 'react'
 import { withRouter } from 'react-router-dom'
+import FormWrapper from 'core/common/FormWrapper'
 import UpdateFlavorForm from './UpdateFlavorForm'
 import { GET_FLAVOR, UPDATE_FLAVOR } from './actions'
 import { compose, withApollo } from 'react-apollo'
@@ -45,12 +46,11 @@ class UpdateFlavorPage extends React.Component {
     const flavor = this.state && this.state.flavor
 
     return (
-      <div>
-        <h1>Update Flavor</h1>
+      <FormWrapper title="Update Flave" backUrl="/ui/openstack/flavors">
         { flavor &&
           <UpdateFlavorForm onSubmit={this.handleSubmit} flavor={flavor} />
         }
-      </div>
+      </FormWrapper>
     )
   }
 }

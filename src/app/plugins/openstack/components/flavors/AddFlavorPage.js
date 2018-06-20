@@ -1,5 +1,6 @@
 import React from 'react'
 import { withRouter } from 'react-router-dom'
+import FormWrapper from 'core/common/FormWrapper'
 import AddFlavorForm from './AddFlavorForm'
 import { ADD_FLAVOR, GET_FLAVORS } from './actions'
 import { compose, withApollo } from 'react-apollo'
@@ -28,10 +29,9 @@ class AddFlavorPage extends React.Component {
 
   render () {
     return (
-      <div>
-        <h1>Add Flavor</h1>
+      <FormWrapper title="Add Flavor" backUrl="/ui/openstack/flavors">
         <AddFlavorForm onSubmit={this.handleSubmit} />
-      </div>
+      </FormWrapper>
     )
   }
 }

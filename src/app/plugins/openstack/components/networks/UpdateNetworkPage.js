@@ -2,6 +2,7 @@ import React from 'react'
 import { withRouter } from 'react-router-dom'
 import { compose, withApollo } from 'react-apollo'
 import { GET_NETWORK, UPDATE_NETWORK } from './actions'
+import FormWrapper from 'core/common/FormWrapper'
 import UpdateNetworkForm from './UpdateNetworkForm'
 import requiresAuthentication from '../../util/requiresAuthentication'
 
@@ -45,12 +46,11 @@ class UpdateNetworkPage extends React.Component {
     const network = this.state && this.state.network
 
     return (
-      <div>
-        <h1>Update Network</h1>
+      <FormWrapper title="Update Network" backUrl="/ui/openstack/networks">
         {network &&
           <UpdateNetworkForm onSubmit={this.handleSubmit} network={network} />
         }
-      </div>
+      </FormWrapper>
     )
   }
 }

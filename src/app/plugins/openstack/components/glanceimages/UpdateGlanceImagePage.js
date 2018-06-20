@@ -1,5 +1,6 @@
 import React from 'react'
 import { withRouter } from 'react-router-dom'
+import FormWrapper from 'core/common/FormWrapper'
 import UpdateGlanceImageForm from './UpdateGlanceImageForm'
 import { GET_GLANCEIMAGE, UPDATE_GLANCEIMAGE } from './actions'
 import { compose, withApollo } from 'react-apollo'
@@ -45,12 +46,11 @@ class UpdateGlanceImagePage extends React.Component {
     const glanceImage = this.state && this.state.glanceImage
 
     return (
-      <div>
-        <h1>Update Glance Image</h1>
+      <FormWrapper title="Update Glance Image" backUrl="/ui/openstack/glanceimages">
         { glanceImage &&
           <UpdateGlanceImageForm onSubmit={this.handleSubmit} glanceImage={glanceImage} />
         }
-      </div>
+      </FormWrapper>
     )
   }
 }

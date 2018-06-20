@@ -1,5 +1,6 @@
 import React from 'react'
 import { withRouter } from 'react-router-dom'
+import FormWrapper from 'core/common/FormWrapper'
 import AddNetworkForm from './AddNetworkForm'
 import { ADD_NETWORK, GET_NETWORKS } from './actions'
 import { compose, withApollo } from 'react-apollo'
@@ -28,10 +29,9 @@ class AddNetworkPage extends React.Component {
 
   render () {
     return (
-      <div>
-        <h1>Add Networks Page</h1>
+      <FormWrapper title="Add Network" backUrl="/ui/openstack/networks">
         <AddNetworkForm onSubmit={this.handleSubmit} />
-      </div>
+      </FormWrapper>
     )
   }
 }

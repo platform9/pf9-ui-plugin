@@ -29,7 +29,7 @@ class AddVolumePage extends React.Component {
 
   render () {
     return (
-      <FormWrapper title={'Add Volume'}>
+      <FormWrapper title="Add Volume" backUrl="/ui/openstack/volumes">
         <AddVolumeForm onSubmit={this.handleSubmit} />
       </FormWrapper>
     )

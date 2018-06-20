@@ -1,5 +1,6 @@
 import React from 'react'
 import { withRouter } from 'react-router-dom'
+import FormWrapper from 'core/common/FormWrapper'
 import UpdateUserForm from './UpdateUserForm'
 import { UPDATE_USER, GET_USER } from './actions'
 import { compose, withApollo } from 'react-apollo'
@@ -45,12 +46,11 @@ class UpdateUserPage extends React.Component {
     const user = this.state && this.state.user
 
     return (
-      <div>
-        <h1>Update User</h1>
+      <FormWrapper title="Update User" backUrl="/ui/openstack/users">
         { user &&
           <UpdateUserForm onSubmit={this.handleSubmit} user={user} />
         }
-      </div>
+      </FormWrapper>
     )
   }
 }
