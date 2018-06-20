@@ -1,5 +1,6 @@
 import React from 'react'
 import { withRouter } from 'react-router-dom'
+import FormWrapper from 'core/common/FormWrapper'
 import AddVolumeForm from './AddVolumeForm'
 import { ADD_VOLUME, GET_VOLUMES } from './actions'
 import { compose, withApollo } from 'react-apollo'
@@ -28,10 +29,9 @@ class AddVolumePage extends React.Component {
 
   render () {
     return (
-      <div>
-        <h1>Add volume</h1>
+      <FormWrapper title={'Add Volume'}>
         <AddVolumeForm onSubmit={this.handleSubmit} />
-      </div>
+      </FormWrapper>
     )
   }
 }
