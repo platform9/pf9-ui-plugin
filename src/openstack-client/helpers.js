@@ -1,5 +1,4 @@
 import config from '../../config'
-import axios from 'axios'
 import OpenstackClient from './OpenstackClient'
 
 export const keystoneEndpoint = `${config.host}/keystone`
@@ -48,24 +47,3 @@ export const waitUntil = async ({ condition, delay, maxRetries }) =>
 
 export const sleep = (delay) =>
   new Promise(resolve => setTimeout(resolve, delay))
-
-// TODO: Make this functions more generic
-export const waitForCreate = params => async () => {
-  const client = await makeRegionedClient()
-  const services = await client.keystone.getServicesForActiveRegion()
-  const url = `${services.cinderv3.admin.url}/volumes/${params}`
-  let response = await axios.get(url, client.getAuthHeaders())
-  let flag = (response.data.volume.status === 'available')
-  return flag
-}
-// TODO: Make this functions more generic
-export const waitForDelete = params => async () => {
-  const client = await makeRegionedClient()
-  const services = await client.keystone.getServicesForActiveRegion()
-  let flag = false
-  const url = `${services.cinderv3.admin.url}/volumes/${params}`
-  await axios.get(url, client.getAuthHeaders()).catch(function (error) {
-    flag = error.response.status === 404
-  })
-  return flag
-}

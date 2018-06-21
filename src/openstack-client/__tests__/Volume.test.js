@@ -1,9 +1,8 @@
 import {
   makeRegionedClient,
-  waitUntil,
-  waitForCreate,
-  waitForDelete
+  waitUntil
 } from '../helpers'
+import axios from 'axios'
 
 describe('Volumes', async () => {
   // It will take some for a newly created/deleted volume
@@ -62,3 +61,23 @@ describe('Volumes', async () => {
     expect(newVolumes.find(x => x.id === updatedVolume.id)).not.toBeDefined()
   })
 })
+
+const waitForCreate = params => async () => {
+  const client = await makeRegionedClient()
+  const services = await client.keystone.getServicesForActiveRegion()
+  const url = `${services.cinderv3.admin.url}/volumes/${params}`
+  let response = await axios.get(url, client.getAuthHeaders())
+  let flag = (response.data.volume.status === 'available')
+  return flag
+}
+
+const waitForDelete = params => async () => {
+  const client = await makeRegionedClient()
+  const services = await client.keystone.getServicesForActiveRegion()
+  let flag = false
+  const url = `${services.cinderv3.admin.url}/volumes/${params}`
+  await axios.get(url, client.getAuthHeaders()).catch(function (error) {
+    flag = error.response.status === 404
+  })
+  return flag
+}
