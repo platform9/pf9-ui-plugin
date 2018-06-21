@@ -8,7 +8,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableFooter,
   TablePagination,
   TableRow
 } from '@material-ui/core'
@@ -193,6 +192,7 @@ class ListTable extends React.Component {
     const { page, rowsPerPage } = this.state
     return (
       <TablePagination
+        component="div"
         count={count}
         rowsPerPage={rowsPerPage}
         page={page}
@@ -257,13 +257,9 @@ class ListTable extends React.Component {
                 <TableBody>
                   {paginatedData.map(this.renderRow)}
                 </TableBody>
-                <TableFooter>
-                  <TableRow>
-                    {this.renderPaginationControls(sortedData.length)}
-                  </TableRow>
-                </TableFooter>
               </Table>
             </div>
+            {this.renderPaginationControls(sortedData.length)}
           </Paper>
         </Grid>
       </Grid>
