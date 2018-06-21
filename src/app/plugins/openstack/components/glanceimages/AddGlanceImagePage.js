@@ -1,17 +1,13 @@
 import React, { Fragment } from 'react'
 import { withRouter, Link } from 'react-router-dom'
 import { compose, withApollo } from 'react-apollo'
+import FormWrapper from 'core/common/FormWrapper'
 import requiresAuthentication from '../../util/requiresAuthentication'
 import { createMuiTheme, MuiThemeProvider, withStyles } from '@material-ui/core/styles'
 import { Button, Divider, Grid, Paper, Typography } from '@material-ui/core'
 import ListTable from 'core/common/ListTable'
 
 const styles = theme => ({
-  root: {
-    marginTop: theme.spacing.unit * 3,
-    marginBottom: theme.spacing.unit * 3,
-    padding: theme.spacing.unit * 5
-  },
   code: {
     fontSize: '90%',
     padding: '2px 5px',
@@ -133,35 +129,14 @@ class AddGlanceImagePage extends React.Component {
   }
 
   render () {
-    const { classes } = this.props
     return (
       <MuiThemeProvider theme={textTheme}>
-        <Grid container justify="center">
-          <Grid item xs={11}>
-            <Paper className={classes.root}>
-              <Grid container justify="space-between">
-                <Grid>
-                  <Typography variant="display1" color="primary">Import a New Image</Typography>
-                </Grid>
-                <Grid>
-                  <Button
-                    variant="outlined"
-                    component={Link}
-                    to="/ui/openstack/glanceimages"
-                    style={{ marginBottom: '1em' }}
-                  >
-                    &lt;&lt;&nbsp;Back to list
-                  </Button>
-                </Grid>
-              </Grid>
-              <Divider />
-              {this.renderManualImport()}
-              {this.renderGlanceClient()}
-              <Divider />
-              {this.renderCreateNewImage()}
-            </Paper>
-          </Grid>
-        </Grid>
+        <FormWrapper title="Import a New Image" backUrl="/ui/openstack/glanceimages">
+          {this.renderManualImport()}
+          {this.renderGlanceClient()}
+          <Divider />
+          {this.renderCreateNewImage()}
+        </FormWrapper>
       </MuiThemeProvider>
     )
   }

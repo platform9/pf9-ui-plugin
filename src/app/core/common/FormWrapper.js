@@ -5,7 +5,8 @@ import { Button, Divider, Grid, Paper, Typography } from '@material-ui/core'
 
 const styles = theme => ({
   root: {
-    marginTop: theme.spacing.unit * 3,
+    marginTop: theme.spacing.unit * 5,
+    marginBottom: theme.spacing.unit * 5,
     padding: theme.spacing.unit * 5,
   },
   title: {
@@ -35,7 +36,7 @@ class FormWrapper extends React.Component {
         <Grid item xs={11}>
           <Paper className={classes.root}>
             <Grid container justify="space-between">
-              <Grid>
+              <Grid item>
                 <Typography
                   variant="display2"
                   className={classes.title}
@@ -43,14 +44,13 @@ class FormWrapper extends React.Component {
                   {title}
                 </Typography>
               </Grid>
-              <Grid>
+              <Grid item>
                 <Button
                   variant="outlined"
                   component={Link}
                   to={backUrl}
-                  style={{ marginBottom: '1em' }}
                 >
-                  &lt;&lt;&nbsp;Back to list
+                  &larr;&nbsp;Back to list
                 </Button>
               </Grid>
             </Grid>
