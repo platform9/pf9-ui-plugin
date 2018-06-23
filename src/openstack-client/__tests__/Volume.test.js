@@ -7,11 +7,23 @@ import axios from 'axios'
 describe('Volumes', async () => {
   // It will take some for a newly created/deleted volume
   // to change status if working on real DUs.
-  jest.setTimeout(20000)
+  jest.setTimeout(30000)
 
   it('list volumes', async () => {
     const client = await makeRegionedClient()
     const volumes = await client.volume.getVolumes()
+    expect(volumes).toBeDefined()
+  })
+
+  it('list volumes of all tenants', async () => {
+    const client = await makeRegionedClient()
+    const volumes = await client.volume.getAllVolumes()
+    expect(volumes).toBeDefined()
+  })
+
+  it('list volumes with params', async () => {
+    const client = await makeRegionedClient()
+    const volumes = await client.volume.getAllVolumesCount(500, true)
     expect(volumes).toBeDefined()
   })
 
@@ -28,11 +40,11 @@ describe('Volumes', async () => {
     expect(newVolume).toBeDefined()
 
     // Wait for new volume's status changing to 'available'
-    await waitUntil({ condition: waitForCreate(newVolume.id), delay: 1000, maxRetries: 20 })
+    await waitUntil({ condition: waitForVolumeCreate(newVolume.id), delay: 1000, maxRetries: 20 })
     await client.volume.deleteVolume(newVolume.id)
 
     // Wait for new volume is fully deleted
-    await waitUntil({ condition: waitForDelete(newVolume.id), delay: 1000, maxRetries: 20 })
+    await waitUntil({ condition: waitForVolumeDelete(newVolume.id), delay: 1000, maxRetries: 20 })
     const newVolumes = await client.volume.getVolumes()
     expect(newVolumes.find(x => x.id === newVolume.id)).not.toBeDefined()
   })
@@ -52,17 +64,176 @@ describe('Volumes', async () => {
     expect(updatedVolume.name).toBe('NewName')
 
     // Wait for new volume's status changing to 'available'
-    await waitUntil({ condition: waitForCreate(updatedVolume.id), delay: 1000, maxRetries: 20 })
+    await waitUntil({ condition: waitForVolumeCreate(updatedVolume.id), delay: 1000, maxRetries: 20 })
     await client.volume.deleteVolume(updatedVolume.id)
 
     // Wait for new volume is fully deleted
-    await waitUntil({ condition: waitForDelete(updatedVolume.id), delay: 1000, maxRetries: 20 })
+    await waitUntil({ condition: waitForVolumeDelete(updatedVolume.id), delay: 1000, maxRetries: 20 })
     const newVolumes = await client.volume.getVolumes()
     expect(newVolumes.find(x => x.id === updatedVolume.id)).not.toBeDefined()
   })
+
+  it('get volumetypes', async () => {
+    const client = await makeRegionedClient()
+    const volumeTypes = await client.volume.getVolumeTypes()
+    expect(volumeTypes).toBeDefined()
+  })
+
+  it('create a volumetype placeholder and delete it', async () => {
+    const client = await makeRegionedClient()
+    const numBefore = (await client.volume.getVolumeTypes()).length
+    await client.volume.createVolumeType({
+      name: 'Test VolumeType',
+      description: 'Just a test volumetype',
+      extra_specs: {}
+    })
+    let numAfter = (await client.volume.getVolumeTypes()).length
+    expect(numAfter).toBe(numBefore + 1)
+
+    await client.volume.deleteVolumeType((await client.volume.getVolumeType('Test VolumeType')).id)
+    numAfter = (await client.volume.getVolumeTypes()).length
+    expect(numAfter).toBe(numBefore)
+  })
+
+  it('create, update and delete a volumetype placeholder', async () => {
+    const client = await makeRegionedClient()
+    await client.volume.createVolumeType({
+      name: 'Test VolumeType for Specs',
+      description: 'Just a test volumetype',
+      extra_specs: {}
+    })
+    const id = (await client.volume.getVolumeType('Test VolumeType for Specs')).id
+    const response = await client.volume.updateVolumeType(id, {
+      TestKey: 'TestValue'
+    })
+    expect(response.TestKey).toBe('TestValue')
+
+    await client.volume.deleteVolumeType(id)
+  })
+
+  it('create a volumetype placeholder, unset its volumetype tag, then delete it', async () => {
+    const client = await makeRegionedClient()
+    await client.volume.createVolumeType({
+      name: 'Test VolumeType for Tags',
+      description: 'Just a test volumetype',
+      extra_specs: {
+        TestKey: 'TestValue'
+      }
+    })
+    const id = (await client.volume.getVolumeType('Test VolumeType for Tags')).id
+    await client.volume.unsetVolumeTypeTag(id, 'TestKey')
+    const updatedVolumeType = await client.volume.getVolumeType('Test VolumeType for Tags')
+    expect(updatedVolumeType.extra_specs).toEqual({})
+
+    await client.volume.deleteVolumeType(id)
+  })
+
+  it('list snapshots', async () => {
+    const client = await makeRegionedClient()
+    const snapshots = await client.volume.getSnapshots()
+    expect(snapshots).toBeDefined()
+  })
+
+  it('list snapshots of all tenants', async () => {
+    const client = await makeRegionedClient()
+    const snapshots = await client.volume.getAllSnapshots()
+    expect(snapshots).toBeDefined()
+  })
+
+  it('Create a volume placeholder, snapshot it and delete both', async () => {
+    const client = await makeRegionedClient()
+    const volume = await client.volume.createVolume({
+      name: 'Snapshot Test',
+      size: 1,
+      metadata: {}
+    })
+
+    await waitUntil({ condition: waitForVolumeCreate(volume.id), delay: 1000, maxRetries: 20 })
+    const snapshot = await client.volume.snapshotVolume({
+      volume_id: volume.id,
+      name: 'Test Snapshot',
+      description: 'Just for test'
+    })
+    expect(snapshot.id).toBeDefined()
+
+    await waitUntil({ condition: waitForSnapshotCreate(snapshot.id), delay: 1000, maxRetries: 20 })
+    await client.volume.deleteSnapshot(snapshot.id)
+
+    await waitUntil({ condition: waitForSnapshotDelete(snapshot.id), delay: 1000, maxRetries: 20 })
+    await client.volume.deleteVolume(volume.id)
+    await waitUntil({ condition: waitForVolumeDelete(volume.id), delay: 1000, maxRetries: 20 })
+    const volumes = await client.volume.getAllVolumes()
+    expect(volumes.find(x => x.id === volume.id)).not.toBeDefined()
+    const snapshots = await client.volume.getAllSnapshots()
+    expect(snapshots.find(x => x.id === snapshot.id)).not.toBeDefined()
+  })
+
+  it('Create a volume placeholder, snapshot and update the snapshot, then delete both', async () => {
+    const client = await makeRegionedClient()
+    const volume = await client.volume.createVolume({
+      name: 'Snapshot Update Test',
+      size: 1,
+      metadata: {}
+    })
+
+    await waitUntil({ condition: waitForVolumeCreate(volume.id), delay: 1000, maxRetries: 20 })
+    const snapshot = await client.volume.snapshotVolume({
+      volume_id: volume.id,
+      name: 'Test Snapshot Update',
+      description: 'Just for test'
+    })
+
+    await waitUntil({ condition: waitForSnapshotCreate(snapshot.id), delay: 1000, maxRetries: 20 })
+    const updatedSnapshot = await client.volume.updateSnapshot(snapshot.id, {
+      name: 'Renamed Snapshot'
+    })
+
+    await waitUntil({ condition: waitForSnapshotCreate(updatedSnapshot.id), delay: 1000, maxRetries: 20 })
+    expect(updatedSnapshot.name).toEqual('Renamed Snapshot')
+
+    await client.volume.deleteSnapshot(updatedSnapshot.id)
+    await waitUntil({ condition: waitForSnapshotDelete(updatedSnapshot.id), delay: 1000, maxRetries: 20 })
+    await client.volume.deleteVolume(volume.id)
+    await waitUntil({ condition: waitForVolumeDelete(volume.id), delay: 1000, maxRetries: 20 })
+    const volumes = await client.volume.getAllVolumes()
+    expect(volumes.find(x => x.id === volume.id)).not.toBeDefined()
+    const snapshots = await client.volume.getAllSnapshots()
+    expect(snapshots.find(x => x.id === updatedSnapshot.id)).not.toBeDefined()
+  })
+
+  it('Create a volume placeholder, snapshot and update metadata, then delete both', async () => {
+    const client = await makeRegionedClient()
+    const volume = await client.volume.createVolume({
+      name: 'Metadata Update Test',
+      size: 1,
+      metadata: {}
+    })
+
+    await waitUntil({ condition: waitForVolumeCreate(volume.id), delay: 1000, maxRetries: 20 })
+    const snapshot = await client.volume.snapshotVolume({
+      volume_id: volume.id,
+      name: 'Test Metadata Update',
+      description: 'Just for test'
+    })
+
+    await waitUntil({ condition: waitForSnapshotCreate(snapshot.id), delay: 1000, maxRetries: 20 })
+    const updatedSnapshotMetadata = await client.volume.updateSnapshotMetadata(snapshot.id, {
+      TestKey: 'TestValue'
+    })
+    expect(updatedSnapshotMetadata.TestKey).toEqual('TestValue')
+
+    await client.volume.deleteSnapshot(snapshot.id)
+    await waitUntil({ condition: waitForSnapshotDelete(snapshot.id), delay: 1000, maxRetries: 20 })
+    await client.volume.deleteVolume(volume.id)
+    await waitUntil({ condition: waitForVolumeDelete(volume.id), delay: 1000, maxRetries: 20 })
+    const volumes = await client.volume.getAllVolumes()
+    expect(volumes.find(x => x.id === volume.id)).not.toBeDefined()
+    const snapshots = await client.volume.getAllSnapshots()
+    expect(snapshots.find(x => x.id === snapshot.id)).not.toBeDefined()
+  })
 })
 
-const waitForCreate = params => async () => {
+const waitForVolumeCreate = params => async () => {
   const client = await makeRegionedClient()
   const services = await client.keystone.getServicesForActiveRegion()
   const url = `${services.cinderv3.admin.url}/volumes/${params}`
@@ -71,11 +242,31 @@ const waitForCreate = params => async () => {
   return flag
 }
 
-const waitForDelete = params => async () => {
+const waitForVolumeDelete = params => async () => {
   const client = await makeRegionedClient()
   const services = await client.keystone.getServicesForActiveRegion()
   let flag = false
   const url = `${services.cinderv3.admin.url}/volumes/${params}`
+  await axios.get(url, client.getAuthHeaders()).catch(function (error) {
+    flag = error.response.status === 404
+  })
+  return flag
+}
+
+const waitForSnapshotCreate = params => async () => {
+  const client = await makeRegionedClient()
+  const services = await client.keystone.getServicesForActiveRegion()
+  const url = `${services.cinderv3.admin.url}/snapshots/${params}`
+  let response = await axios.get(url, client.getAuthHeaders())
+  let flag = (response.data.snapshot.status === 'available')
+  return flag
+}
+
+const waitForSnapshotDelete = params => async () => {
+  const client = await makeRegionedClient()
+  const services = await client.keystone.getServicesForActiveRegion()
+  let flag = false
+  const url = `${services.cinderv3.admin.url}/snapshots/${params}`
   await axios.get(url, client.getAuthHeaders()).catch(function (error) {
     flag = error.response.status === 404
   })
