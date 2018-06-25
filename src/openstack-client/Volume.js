@@ -13,6 +13,15 @@ class Volume {
 
   volumesUrl = async () => `${await this.endpoint()}/volumes`
 
+  async setRegionUrls () {
+    const services = (await this.client.keystone.getServiceCatalog()).find(x => x.name === 'cinderv3').endpoints
+    let baseUrlsByRegion = {}
+    for (let service of services) {
+      baseUrlsByRegion[service.region] = service.url
+    }
+    return baseUrlsByRegion
+  }
+
   async getVolume (id) {
     const url = `${await this.volumesUrl()}/${id}`
     try {
@@ -97,16 +106,56 @@ class Volume {
     }
   }
 
-  // async setBootable (id) {
-  //   const url = `${await this.volumesUrl()}/${id}`
-  //   try {
-  //     const volume = await axios.get(url, this.client.getAuthHeaders())
-  //     const response = await axios.post(url, { 'os-set_bootable': { 'bootable': volume.bootable } }, this.client.getAuthHeaders())
-  //     return response.data.volume
-  //   } catch (err) {
-  //     console.log(err)
-  //   }
-  // }
+  async setBootable (id, bool) {
+    const url = `${await this.volumesUrl()}/${id}/action`
+    try {
+      const response = await axios.post(url, { 'os-set_bootable': { 'bootable': bool } }, this.client.getAuthHeaders())
+      return response.data.volume
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  // TODO: test case for extend function (API is currently down)
+  async extendVolume (id, size) {
+    const url = `${await this.volumesUrl()}/${id}/action`
+    try {
+      const response = await axios.post(url, { 'os-extend': { 'new-size': size } }, this.client.getAuthHeaders())
+      return response.data.volume
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  // TODO: test case for reset function (Attach function needed?)
+  async resetVolumeStatus (id) {
+    const url = `${await this.volumesUrl()}/${id}/action`
+    try {
+      const response = await axios.post(url, { 'os-reset_status': {
+        'status': 'available',
+        'attach_status': 'detached'
+      } }, this.client.getAuthHeaders())
+      return response.data.volume
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  // TODO: test case for upload function (Image implement needed)
+  async uploadVolumeAsImage (id, image) {
+    const url = `${await this.volumesUrl()}/${id}/action`
+    try {
+      const response = await axios.post(url, { 'os-volume_upload_image': {
+        'container_format': 'bare',
+        'force': image.force,
+        'image_name': image.name,
+        'disk_format': image.diskFormat || 'raw'
+      } }, this.client.getAuthHeaders())
+      return response.data.volume
+    } catch (err) {
+      console.log(err)
+    }
+  }
 
   async getVolumeTypes () {
     const url = `${await this.endpoint()}/types`
@@ -224,6 +273,72 @@ class Volume {
       console.log(err)
     }
   }
+
+  async getDefaultQuotas () {
+    const url = `${await this.endpoint()}/os-quota-class-sets/defaults`
+    try {
+
+    } catch (err) {
+      console.log(err)
+    }
+    const quotas = await axios.get(url, this.client.getAuthHeaders())
+    return quotas.data.quota_class_set
+  }
+
+  async getDefaultQuotasForRegion (region) {
+    const urls = await this.setRegionUrls()
+    const url = `${urls[region]}/os-quota-class-sets/defaults`
+    try {
+      const quotas = await axios.get(url, this.client.getAuthHeaders())
+      return quotas.data.quota_class_set
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async getQuotas (projectId) {
+    const url = `${await this.endpoint()}/os-quota-sets/${projectId}?usage=true`
+    try {
+      const quota = await axios.get(url, this.client.getAuthHeaders())
+      return quota.data.quota_set
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async getQuotasForRegion (projectId, region) {
+    const urls = await this.setRegionUrls()
+    const url = `${urls[region]}/os-quota-sets/${projectId}?usage=true`
+    try {
+      const quota = await axios.get(url, this.client.getAuthHeaders())
+      return quota.data.quota_set
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async setQuotas (params, projectId) {
+    const url = `${await this.endpoint()}/os-quota-sets/${projectId}`
+    try {
+      const quotas = await axios.put(url, { quota_set: params }, this.client.getAuthHeaders())
+      return quotas.data.quota_set
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async setQuotasForRegion (params, projectId, region) {
+    const urls = await this.setRegionUrls()
+    const url = `${urls[region]}/os-quota-sets/${projectId}`
+    try {
+      const quotas = await axios.put(url, {quota_set: params}, this.client.getAuthHeaders())
+      return quotas.data.quota_set
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  // TODO: getStorageStats(needs host implement first)
 }
 
 export default Volume

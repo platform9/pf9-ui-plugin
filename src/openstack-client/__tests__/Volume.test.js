@@ -168,6 +168,23 @@ describe('Volumes', async () => {
     expect(snapshots.find(x => x.id === snapshot.id)).not.toBeDefined()
   })
 
+  it('change bootable status of a volume placeholder', async () => {
+    const client = await makeRegionedClient()
+    const volume = await client.volume.createVolume({
+      name: 'Bootable Update Test',
+      size: 1,
+      bootable: false,
+      metadata: {}
+    })
+    await client.volume.setBootable(volume.id, true)
+    const newVolume = await client.volume.getVolume(volume.id)
+    expect(newVolume.bootable).toBe('true')
+
+    await waitUntil({ condition: waitForVolumeCreate(volume.id), delay: 1000, maxRetries: 20 })
+    await client.volume.deleteVolume(newVolume.id)
+    await waitUntil({ condition: waitForVolumeDelete(newVolume.id), delay: 1000, maxRetries: 20 })
+  })
+
   it('Create a volume placeholder, snapshot and update the snapshot, then delete both', async () => {
     const client = await makeRegionedClient()
     const volume = await client.volume.createVolume({
@@ -230,6 +247,66 @@ describe('Volumes', async () => {
     expect(volumes.find(x => x.id === volume.id)).not.toBeDefined()
     const snapshots = await client.volume.getAllSnapshots()
     expect(snapshots.find(x => x.id === snapshot.id)).not.toBeDefined()
+  })
+
+  it('get region urls', async () => {
+    const client = await makeRegionedClient()
+    const urls = await client.volume.setRegionUrls()
+    expect(urls).toBeDefined()
+  })
+
+  it('get default quotas', async () => {
+    const client = await makeRegionedClient()
+    const quotas = await client.volume.getDefaultQuotas()
+    expect(quotas).toBeDefined()
+  })
+
+  it('get region default quotas', async () => {
+    const client = await makeRegionedClient()
+    const quotas = await client.volume.getDefaultQuotasForRegion(client.activeRegion)
+    expect(quotas).toBeDefined()
+  })
+
+  it('get quotas', async () => {
+    const client = await makeRegionedClient()
+    const projectId = (await client.keystone.getProjects())[0].id
+    const quotas = await client.volume.getQuotas(projectId)
+    expect(quotas).toBeDefined()
+  })
+
+  it('get quotas for region', async () => {
+    const client = await makeRegionedClient()
+    const projectId = (await client.keystone.getProjects())[0].id
+    const quotas = await client.volume.getQuotasForRegion(projectId, client.activeRegion)
+    expect(quotas).toBeDefined()
+  })
+
+  it('set quotas', async () => {
+    const client = await makeRegionedClient()
+    const projectId = (await client.keystone.getProjects())[0].id
+    const oldValue = (await client.volume.getQuotas(projectId)).groups.limit
+    await client.volume.setQuotas({
+      groups: 10
+    }, projectId)
+    const newQuota = await client.volume.getQuotas(projectId)
+    expect(newQuota.groups.limit).toBe(10)
+    await client.volume.setQuotas({
+      groups: oldValue
+    }, projectId)
+  })
+
+  it('set quotas for region', async () => {
+    const client = await makeRegionedClient()
+    const projectId = (await client.keystone.getProjects())[0].id
+    const oldValue = (await client.volume.getQuotasForRegion(projectId, client.activeRegion)).groups.limit
+    await client.volume.setQuotasForRegion({
+      groups: 10
+    }, projectId, client.activeRegion)
+    const newQuota = await client.volume.getQuotasForRegion(projectId, client.activeRegion)
+    expect(newQuota.groups.limit).toBe(10)
+    await client.volume.setQuotasForRegion({
+      groups: oldValue
+    }, projectId, client.activeRegion)
   })
 })
 
