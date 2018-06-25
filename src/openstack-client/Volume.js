@@ -127,7 +127,7 @@ class Volume {
     }
   }
 
-  // TODO: test case for reset function (Attach function needed?)
+  // TODO: test case for reset function (Instance implement needed. Attach function needed?)
   async resetVolumeStatus (id) {
     const url = `${await this.volumesUrl()}/${id}/action`
     try {
