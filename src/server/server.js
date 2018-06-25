@@ -11,6 +11,7 @@ import {
 import keystone from './api/keystone'
 import nova from './api/nova'
 import neutron from './api/neutron'
+import cinder from './api/cinder'
 
 const defaultConfig = {
   port: 4444,
@@ -36,6 +37,7 @@ export function startServer (config = defaultConfig) {
   app.use('/keystone', keystone)
   app.use('/nova', nova)
   app.use('/neutron', neutron)
+  app.use('/cinder', cinder)
 
   mountGraphql(app)
 

@@ -6,13 +6,14 @@ import {
   Route,
   Switch,
 } from 'react-router-dom'
-import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles'
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core'
 import Navbar from 'core/common/Navbar'
 import './app.css'
 import { setupFromConfig } from './util/registry'
 import config from '../../config'
 
 setupFromConfig(config)
+window.process = process
 
 class App extends React.Component {
   render () {

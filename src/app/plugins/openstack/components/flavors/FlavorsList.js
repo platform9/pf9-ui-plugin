@@ -8,11 +8,12 @@ const columns = [
   { id: 'vcpus', label: 'VCPUs' },
   { id: 'ram', label: 'RAM' },
   { id: 'disk', label: 'Disk' },
+  { id: 'tags', label: 'tags' }
 ]
 
 class FlavorsList extends React.Component {
   render () {
-    const { onAdd, onDelete, flavors } = this.props
+    const { onAdd, onDelete, onEdit, flavors } = this.props
 
     if (!flavors || flavors.length === 0) {
       return (<h1>No flavors found</h1>)
@@ -25,6 +26,7 @@ class FlavorsList extends React.Component {
         data={flavors}
         onAdd={onAdd}
         onDelete={onDelete}
+        onEdit={onEdit}
         actions={['delete']}
       />
     )
@@ -40,6 +42,8 @@ FlavorsList.propTypes = {
 
   /** Called onClick of delete icon for a flavor row */
   onDelete: PropTypes.func.isRequired,
+
+  onEdit: PropTypes.func.isRequired
 }
 
 FlavorsList.defaultProps = {

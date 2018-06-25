@@ -68,6 +68,8 @@ export const renewUnscopedToken = async (unscopedToken) => {
 
 export const getRegions = () => authHttp.get(`${v3Base}/regions`).then(x => x.regions)
 
+export const getServiceCatalog = () => authHttp.get(`${v3Base}/auth/catalog`).then(x => x.catalog)
+
 export const createUser = user => {
   const body = {
     user: {

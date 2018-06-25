@@ -30,10 +30,11 @@ if (isDev) {
 
 if (isProd) {
   plugins.push(new UglifyJSPlugin({ sourceMap: true }))
-  plugins.push(new webpack.DefinePlugin({
-    'process.env.NODE_ENV': JSON.stringify('production')
-  }))
 }
+
+plugins.push(new webpack.DefinePlugin({
+  'process.env.NODE_ENV': JSON.stringify(env)
+}))
 
 // main entry point
 appEntry.push('babel-polyfill')
@@ -62,9 +63,9 @@ module.exports = {
         use: ['style-loader', 'css-loader']
       },
       {
-        test: /\.graphql/,
+        test: /\.graphql$/,
         exclude: /node_modules/,
-        use: ['graphql-tag/loader']
+        use: 'graphql-tag/loader'
       },
     ]
   },

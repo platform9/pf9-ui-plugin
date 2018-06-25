@@ -1,0 +1,52 @@
+type Volume {
+	id: ID!
+  name: String!
+  description: String
+  volume_type: String!
+  metadata: String
+  size: Int!
+  bootable: Boolean!
+  status: String
+  tenant: String!
+  source: String
+  host: String!
+  instance: String
+  device: String
+  created_at: String!
+  attachedMode: String
+  readonly: Boolean
+}
+
+type Query {
+  volumes: [Volume!]!
+  volume(id: ID!): Volume
+}
+
+input VolumeInput {
+  name: String!
+  description: String
+  volume_type: String!
+  metadata: String
+  size: Int!
+  bootable: Boolean!
+  status: String
+  tenant: String!
+  source: String
+  host: String!
+  instance: String
+  device: String
+  attachedMode: String
+  readonly: Boolean
+}
+
+input UpdateInput {
+  name: String!
+  description: String
+  bootable: Boolean!
+}
+
+type Mutation {
+  createVolume(input: VolumeInput): Volume!
+  updateVolume(id: ID!, input: UpdateInput): Volume!
+  removeVolume(id: ID!): ID!
+}

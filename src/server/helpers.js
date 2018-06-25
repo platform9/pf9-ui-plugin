@@ -5,6 +5,15 @@ export const notImplementedYet = (req, res) => res.status(500).send('Not impleme
 // present.
 export const findById = arr => id => (typeof arr === 'function' ? arr() : arr).find(x => x.id === id)
 
+export const updateById = (arr) => {
+  return (id, data) => {
+    let _arr = typeof arr === 'function' ? arr() : arr
+    let index = _arr.findIndex(x => x.id === id)
+    _arr[index] = Object.assign(_arr[index], data)
+    return _arr[index]
+  }
+}
+
 export const pluck = key => obj => obj[key]
 
 export const ensureArray = maybeArr => (maybeArr && maybeArr instanceof Array) ? maybeArr : []

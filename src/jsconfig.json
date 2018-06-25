@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+      "baseUrl": ".",
+      "paths": {
+        "core/*": ["./app/core/*"],
+        "openstack/*": ["./app/plugins/openstack/*"],
+        "k8s/*": ["./app/plugins/kubernetes/*"],
+        "sim/*": ["./src/openstack-simulator/*"],
+        "schema/*": ["./src/graphql/*"],
+      },
+      "experimentalDecorators": true
+    },
+    "exclude": [
+        "node_modules"
+    ]
+  }

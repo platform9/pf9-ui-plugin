@@ -31,8 +31,28 @@ type User {
 type Query {
   tenants: [Tenant!]!
   users: [User!]!
+  user(id: ID!): User
+}
+
+input TenantInput {
+  name: String!
+  description: String!
+}
+
+input UserInput {
+  username: String
+  displayname: String
+  name: String
+  email: String
+  password: String
 }
 
 type Mutation {
-  removeTenant(id: ID): ID
+  createTenant(input: TenantInput): Tenant!
+  updateTenant(id: ID!, input: TenantInput): Tenant!
+  removeTenant(id: ID): ID!
+
+  createUser(input: UserInput): User!
+  updateUser(id: ID!, input: UserInput): User!
+  removeUser(id: ID): ID!
 }

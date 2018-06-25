@@ -5,23 +5,35 @@ import DashboardPage from './components/DashboardPage'
 import LoginPage from './components/LoginPage'
 
 import AddTenantPage from './components/tenants/AddTenantPage'
-import TenantsPage from './components/TenantsPage'
+import TenantsListPage from './components/tenants/TenantsListPage'
 
-import UsersPage from './components/UsersPage'
+import UsersListPage from './components/users/UsersListPage'
 import AddUserPage from './components/users/AddUserPage'
+import UpdateUserPage from './components/users/UpdateUserPage'
 
-import FlavorsPage from './components/FlavorsPage'
+import FlavorsListPage from './components/flavors/FlavorsListPage'
 import AddFlavorPage from './components/flavors/AddFlavorPage'
+import UpdateFlavorPage from './components/flavors/UpdateFlavorPage'
 
-import NetworksPage from './components/NetworksPage'
+import NetworksPage from './components/networks/NetworksListPage'
 import AddNetworkPage from './components/networks/AddNetworkPage'
+import UpdateNetworkPage from './components/networks/UpdateNetworkPage'
+
+import VolumesListPage from './components/volumes/VolumesListPage'
+import AddVolumePage from './components/volumes/AddVolumePage'
+import UpdateVolumePage from './components/volumes/UpdateVolumePage'
+
+import GlanceImageListPage from './components/glanceimages/GlanceImageListPage'
+import AddGlanceImagePage from './components/glanceimages/AddGlanceImagePage'
+import UpdateGlanceImagePage from './components/glanceimages/UpdateGlanceImagePage'
+
+import ApiAccessPage from './components/api-access/ApiAccessListPage'
 
 import loginReducer from './reducers/login'
 import sessionReducer from './reducers/session'
 import tenantsReducer from './reducers/tenants'
 import usersReducer from './reducers/users'
 import flavorsReducer from './reducers/flavors'
-import networksReducer from './reducers/networks'
 
 import openstackSchemas from 'schema/openstack'
 
@@ -52,7 +64,7 @@ OpenStack.registerPlugin = pluginManager => {
       {
         name: 'Tenants',
         link: { path: '/tenants', exact: true },
-        component: TenantsPage
+        component: TenantsListPage
       },
       {
         name: 'AddTenant',
@@ -62,7 +74,7 @@ OpenStack.registerPlugin = pluginManager => {
       {
         name: 'Users',
         link: { path: '/users', exact: true },
-        component: UsersPage
+        component: UsersListPage
       },
       {
         name: 'AddUser',
@@ -70,14 +82,24 @@ OpenStack.registerPlugin = pluginManager => {
         component: AddUserPage
       },
       {
+        name: 'EditUser',
+        link: { path: '/users/edit/:userId' },
+        component: UpdateUserPage
+      },
+      {
         name: 'Flavors',
         link: { path: '/flavors', exact: true },
-        component: FlavorsPage
+        component: FlavorsListPage
       },
       {
         name: 'AddFlavor',
         link: { path: '/flavors/add' },
         component: AddFlavorPage
+      },
+      {
+        name: 'EditFlavor',
+        link: { path: '/flavors/edit/:flavorId', exact: true },
+        component: UpdateFlavorPage
       },
       {
         name: 'Networks',
@@ -89,6 +111,46 @@ OpenStack.registerPlugin = pluginManager => {
         link: { path: '/networks/add' },
         component: AddNetworkPage
       },
+      {
+        name: 'EditNetwork',
+        link: { path: '/networks/edit/:networkId', exact: true },
+        component: UpdateNetworkPage
+      },
+      {
+        name: 'ApiAccess',
+        link: { path: '/apiaccess' },
+        component: ApiAccessPage
+      },
+      {
+        name: 'Volumes',
+        link: { path: '/volumes', exact: true },
+        component: VolumesListPage
+      },
+      {
+        name: 'AddVolume',
+        link: { path: '/volumes/add', exact: true },
+        component: AddVolumePage
+      },
+      {
+        name: 'EditVolume',
+        link: { path: '/volumes/edit/:volumeId', exact: true },
+        component: UpdateVolumePage
+      },
+      {
+        name: 'GlanceImages',
+        link: { path: '/glanceimages', exact: true },
+        component: GlanceImageListPage
+      },
+      {
+        name: 'AddGlanceImages',
+        link: { path: '/glanceimages/add', exact: true },
+        component: AddGlanceImagePage
+      },
+      {
+        name: 'EditGlanceImage',
+        link: { path: '/glanceimages/edit/:glanceImageId', exact: true },
+        component: UpdateGlanceImagePage
+      }
     ]
   )
 
@@ -115,6 +177,18 @@ OpenStack.registerPlugin = pluginManager => {
         name: 'Networks',
         link: { path: '/networks' }
       },
+      {
+        name: 'API Access',
+        link: { path: '/apiaccess' },
+      },
+      {
+        name: 'Volumes',
+        link: { path: '/volumes' },
+      },
+      {
+        name: 'Glance Images',
+        link: { path: '/glanceimages' }
+      }
     ]
   )
 
@@ -127,7 +201,6 @@ OpenStack.reducer = combineReducers({
   tenants: tenantsReducer,
   users: usersReducer,
   flavors: flavorsReducer,
-  networks: networksReducer,
 })
 
 export default OpenStack

@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import TextField from 'material-ui/TextField'
-import Button from 'material-ui/Button'
+import { Button, TextField } from '@material-ui/core'
 
 class AddFlavorForm extends React.Component {
   state = {
@@ -9,6 +8,7 @@ class AddFlavorForm extends React.Component {
     disk: 20,
     ram: 4096,
     vcpus: 2,
+    public: false,
   }
 
   setField = field => event => this.setState({ [field]: event.target.value })
@@ -30,16 +30,17 @@ class AddFlavorForm extends React.Component {
     }
   }
 
-  handleSubmit = () => {
+  handleSubmit = event => {
+    event.preventDefault()
     this.props.onSubmit(this.state)
   }
 
   render () {
     return (
-      <form noValidate>
+      <form noValidate onSubmit={this.handleSubmit}>
         {this.fields.map(this.renderField)}
         <div>
-          <Button variant="raised" onClick={this.handleSubmit}>Submit</Button>
+          <Button variant="raised" type="submit">Submit</Button>
         </div>
       </form>
     )

@@ -1,20 +1,21 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { withStyles } from 'material-ui/styles'
+import { withStyles } from '@material-ui/core/styles'
 import { withRouter } from 'react-router'
-
 import classNames from 'classnames'
-
-import AppBar from 'material-ui/AppBar'
-import ChevronLeftIcon from 'material-ui-icons/ChevronLeft'
-import Divider from 'material-ui/Divider'
-import Drawer from 'material-ui/Drawer'
-import IconButton from 'material-ui/IconButton'
-import MenuIcon from 'material-ui-icons/Menu'
-import Toolbar from 'material-ui/Toolbar'
-import Typography from 'material-ui/Typography'
-import { ListItemText } from 'material-ui/List'
-import { MenuItem, MenuList } from 'material-ui/Menu'
+import {
+  AppBar,
+  Divider,
+  Drawer,
+  IconButton,
+  ListItemText,
+  MenuItem,
+  MenuList,
+  Toolbar,
+  Typography
+} from '@material-ui/core'
+import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
+import MenuIcon from '@material-ui/icons/Menu'
 
 const drawerWidth = 240
 

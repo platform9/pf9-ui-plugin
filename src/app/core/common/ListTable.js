@@ -1,22 +1,23 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { withStyles } from 'material-ui/styles'
-import Checkbox from 'material-ui/Checkbox'
-import Paper from 'material-ui/Paper'
-import Table, {
+import { withStyles } from '@material-ui/core/styles'
+import {
+  Checkbox,
+  Grid,
+  Paper,
+  Table,
   TableBody,
   TableCell,
-  TableFooter,
   TablePagination,
-  TableRow,
-} from 'material-ui/Table'
+  TableRow
+} from '@material-ui/core'
 import EnhancedTableHead from './EnhancedTableHead'
 import EnhancedTableToolbar from './EnhancedTableToolbar'
 
 const styles = theme => ({
   root: {
     width: '100%',
-    marginTop: theme.spacing.unit * 3,
+    marginTop: theme.spacing.unit * 3
   },
   table: {
     minWidth: 800,
@@ -37,6 +38,7 @@ class ListTable extends React.Component {
       page: 0,
       rowsPerPage: 5,
       selected: [],
+      selectedAll: false
     }
   }
 
@@ -63,8 +65,15 @@ class ListTable extends React.Component {
 
   handleSelectAllClick = (event, checked) => {
     const { data } = this.props
+    const { page, rowsPerPage } = this.state
+    let sortedData = this.sortData(data)
+    let startIdx = page * rowsPerPage
+    let endIdx = startIdx + rowsPerPage
     const getId = x => x.id
-    this.setState({ selected: checked ? data.map(getId) : [] })
+    this.setState({
+      selected: checked ? sortedData.slice(startIdx, endIdx).map(getId) : [],
+      selectedAll: !this.state.selectedAll
+    })
   }
 
   handleClick = id => event => {
@@ -97,15 +106,31 @@ class ListTable extends React.Component {
   }
 
   handleDelete = () => {
-    const { onDelete } = this.props
-    const { selected } = this.state
+    const { data, onDelete } = this.props
+    const { selected, page, rowsPerPage } = this.state
+    let maxPage = Math.ceil(data.length / rowsPerPage) - 1
+    let newPage = page
+    if (page === maxPage && selected.length === data.length % rowsPerPage) {
+      newPage--
+    } else if (selected.length === rowsPerPage) {
+      newPage--
+    }
     if (!onDelete) {
       return
     }
 
     onDelete(selected).then(() => {
-      this.setState({ selected: [] })
+      this.setState({
+        selected: [],
+        selectedAll: false,
+        page: newPage
+      })
     })
+  }
+
+  handleEdit = () => {
+    const { selected } = this.state
+    this.props.onEdit(selected)
   }
 
   isSelected = id => this.state.selected.includes(id)
@@ -121,27 +146,29 @@ class ListTable extends React.Component {
     const { cellProps = {} } = columnDef
     return (
       <TableCell key={columnDef.id} {...cellProps} >
-        {contents}
+        {(typeof contents === 'boolean') ? String(contents) : contents}
       </TableCell>
     )
   }
 
   renderRow = row => {
-    const { columns } = this.props
-
+    const { columns, showCheckboxes } = this.props
     const isSelected = this.isSelected(row.id)
+
+    const checkboxProps = showCheckboxes ? {
+      onClick: this.handleClick(row.id),
+      role: 'checkbox',
+      tabIndex: -1,
+      selected: isSelected
+    } : {}
+
     return (
-      <TableRow
-        hover
-        onClick={this.handleClick(row.id)}
-        role="checkbox"
-        tabIndex={-1}
-        key={row.id}
-        selected={isSelected}
-      >
-        <TableCell padding="checkbox">
-          <Checkbox checked={isSelected} />
-        </TableCell>
+      <TableRow hover key={row.id} {...checkboxProps}>
+        {showCheckboxes &&
+          <TableCell padding="checkbox">
+            <Checkbox checked={isSelected} color="primary" />
+          </TableCell>
+        }
         {columns.map((columnDef, colIdx) =>
           this.renderCell(columnDef, row[columnDef.id]))
         }
@@ -165,6 +192,7 @@ class ListTable extends React.Component {
     const { page, rowsPerPage } = this.state
     return (
       <TablePagination
+        component="div"
         count={count}
         rowsPerPage={rowsPerPage}
         page={page}
@@ -182,51 +210,59 @@ class ListTable extends React.Component {
       columns,
       data,
       title,
+      onAdd,
+      onDelete,
+      onEdit,
+      showCheckboxes,
+      paginate
     } = this.props
 
     const {
       order,
       orderBy,
       selected,
+      selectedAll
     } = this.state
 
     const sortedData = this.sortData(data)
-    const paginatedData = this.paginate(sortedData)
-    const shouldShowPagination = sortedData.length > this.state.rowsPerPage
+    const paginatedData = paginate ? this.paginate(sortedData) : sortedData
+    // Always show pagination control bar to make sure the height doesn't change frequently.
+    // const shouldShowPagination = paginate && sortedData.length > this.state.rowsPerPage
 
     return (
-      <Paper className={classes.root}>
-        <EnhancedTableToolbar
-          numSelected={selected.length}
-          title={title}
-          onAdd={this.handleAdd}
-          onDelete={this.handleDelete}
-        />
-        <div className={classes.tableWrapper}>
-          <Table className={classes.table}>
-            <EnhancedTableHead
-              columns={columns}
+      <Grid container justify="center">
+        <Grid item xs={11}>
+          <Paper className={classes.root}>
+            <EnhancedTableToolbar
               numSelected={selected.length}
-              order={order}
-              orderBy={orderBy}
-              onSelectAllClick={this.handleSelectAllClick}
-              onRequestSort={this.handleRequestSort}
               title={title}
-              rowCount={sortedData.length}
+              onAdd={onAdd && this.handleAdd}
+              onDelete={onDelete && this.handleDelete}
+              onEdit={onEdit && this.handleEdit}
             />
-            <TableBody>
-              {paginatedData.map(this.renderRow)}
-            </TableBody>
-            {shouldShowPagination &&
-              <TableFooter>
-                <TableRow>
-                  {this.renderPaginationControls(sortedData.length)}
-                </TableRow>
-              </TableFooter>
-            }
-          </Table>
-        </div>
-      </Paper>
+            <div className={classes.tableWrapper}>
+              <Table className={classes.table}>
+                <EnhancedTableHead
+                  columns={columns}
+                  numSelected={selected.length}
+                  order={order}
+                  orderBy={orderBy}
+                  onSelectAllClick={this.handleSelectAllClick}
+                  onRequestSort={this.handleRequestSort}
+                  checked={selectedAll}
+                  title={title}
+                  rowCount={sortedData.length}
+                  showCheckboxes={showCheckboxes}
+                />
+                <TableBody>
+                  {paginatedData.map(this.renderRow)}
+                </TableBody>
+              </Table>
+            </div>
+            {this.renderPaginationControls(sortedData.length)}
+          </Paper>
+        </Grid>
+      </Grid>
     )
   }
 }
@@ -238,11 +274,16 @@ ListTable.propTypes = {
   title: PropTypes.string.isRequired,
   onAdd: PropTypes.func,
   onDelete: PropTypes.func,
+  onEdit: PropTypes.func,
+  paginate: PropTypes.bool,
+  showCheckboxes: PropTypes.bool
 }
 
 ListTable.defaultProps = {
   data: [],
   columns: [],
+  paginate: true,
+  showCheckboxes: true
 }
 
 export default ListTable
