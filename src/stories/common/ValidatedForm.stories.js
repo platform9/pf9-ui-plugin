@@ -22,8 +22,13 @@ addStories('Form Handling/ValidatedForm', {
   ),
 
   'Field state gets propagated up': () => (
-    <ValidatedForm onSubmit={jsonDetailLogger('ValidatedForm#submit')}>
-      <TextField id="name" />
+    <ValidatedForm
+      onSubmit={jsonDetailLogger('ValidatedForm#submit')}
+      initialValue={{ name: 'existing name' }}
+    >
+      <TextField id="name" placeholder="Name" label="Name" />
+      <br />
+      <TextField id="description" placeholder="Description" />
       <button type="submit">Submit</button>
     </ValidatedForm>
   )
