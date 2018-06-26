@@ -1,58 +1,17 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Button, Checkbox, FormControl, TextField } from '@material-ui/core'
+import { Button } from '@material-ui/core'
+import ValidatedForm from 'core/common/ValidatedForm'
+import TextField from 'core/common/TextField'
+import Checkbox from 'core/common/Checkbox'
 
-class UpdateVolumeForm extends React.Component {
-  state = {
-    name: this.props.volume.name || '',
-    description: this.props.volume.description || '',
-    bootable: this.props.volume.bootable || false
-  }
-
-  setField = field => event => this.setState({ [field]: event.target.value })
-
-  setCheckbox = field => event => this.setState({ [field]: event.target.checked })
-
-  fields = [
-    { id: 'name', label: 'Name' },
-    { id: 'description', label: 'Description' },
-    { id: 'bootable', label: 'Bootable', type: 'checkbox' }
-  ]
-
-  renderField = ({ id, label, type = 'text' }) => {
-    if (type === 'text') {
-      return (
-        <div key={id}>
-          <TextField id={id} type={type} label={label} value={this.state[id]} onChange={this.setField(id)} />
-        </div>
-      )
-    } else if (type === 'checkbox') {
-      return (
-        <div key={id}>
-          <FormControl>
-            {label}
-          </FormControl>
-          <Checkbox checked={this.state[id]} onChange={this.setCheckbox(id)} value="bootable" />
-        </div>
-      )
-    }
-  }
-
-  handleSubmit = () => {
-    this.props.onSubmit(this.state)
-  }
-
-  render () {
-    return (
-      <form>
-        {this.fields.map(this.renderField)}
-        <div>
-          <Button variant="raised" onClick={this.handleSubmit}>Submit</Button>
-        </div>
-      </form>
-    )
-  }
-}
+const UpdateVolumeForm = ({ onSubmit, ...initialValue }) =>
+  <ValidatedForm initialValue={initialValue} onSubmit={onSubmit}>
+    <TextField id="name" label="Volume Name" />
+    <TextField id="description" label="Description" />
+    <Checkbox id="bootable" label="Bootable" />
+    <Button type="submit" variant="raised">Update Volume</Button>
+  </ValidatedForm>
 
 UpdateVolumeForm.propTypes = {
   onSubmit: PropTypes.func.isRequired

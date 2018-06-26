@@ -1,10 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { default as BaseTextField } from '@material-ui/core/TextField'
+import { FormControlLabel, Checkbox as BaseCheckbox } from '@material-ui/core'
 import { withFormContext } from 'core/common/ValidatedForm'
 import { pickMultiple, filterFields } from 'core/fp'
 
-class TextField extends React.Component {
+class Checkbox extends React.Component {
   constructor (props) {
     super(props)
     const spec = pickMultiple('validations')(props)
@@ -14,27 +14,32 @@ class TextField extends React.Component {
   get restFields () { return filterFields(...withFormContext.propsToExclude)(this.props) }
 
   render () {
-    const { id, value, setField } = this.props
+    const { id, value, label, setField } = this.props
     return (
       <div id={id}>
-        <BaseTextField
-          {...this.restFields}
-          value={value[id] !== undefined ? value[id] : ''}
-          onChange={e => setField(this.props.id, e.target.value)}
+        <FormControlLabel
+          label={label}
+          control={
+            <BaseCheckbox
+              {...this.restFields}
+              checked={value[id]}
+              onChange={e => setField(this.props.id, e.target.checked)}
+            />
+          }
         />
       </div>
     )
   }
 }
 
-TextField.defaultProps = {
+Checkbox.defaultProps = {
   validations: [],
 }
 
-TextField.propTypes = {
+Checkbox.propTypes = {
   id: PropTypes.string.isRequired,
   label: PropTypes.string,
   validations: PropTypes.arrayOf(PropTypes.object),
-  initialValue: PropTypes.string,
+  initialValue: PropTypes.bool,
 }
-export default withFormContext(TextField)
+export default withFormContext(Checkbox)
