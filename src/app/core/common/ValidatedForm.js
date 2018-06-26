@@ -51,7 +51,7 @@ class ValidatedForm extends React.Component {
   }
 
   validateField = (field, value, validations, spec) => {
-    console.log(field, value, validations)
+    // TODO: just a placeholder for now
     return true
   }
 
