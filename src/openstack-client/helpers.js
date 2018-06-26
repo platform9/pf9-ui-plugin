@@ -29,7 +29,7 @@ export const makeScopedClient = async () => {
 export const makeRegionedClient = async () => {
   const client = await makeScopedClient()
   const regions = await client.keystone.getRegions()
-  client.setActiveRegion(regions[0].id)
+  client.setActiveRegion(regions[5].id)
   await client.keystone.getServicesForActiveRegion()
   return client
 }

@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-class Network {
+class Neuron {
   constructor (client) {
     this.client = client
   }
@@ -15,9 +15,9 @@ class Network {
 
   async setRegionUrls () {
     const services = (await this.client.keystone.getServiceCatalog()).find(x => x.name === 'neutron').endpoints
-    const baseUrlsByRegion = services.reduce((res, service) => {
-      res[service.region] = service.url + '/v2.0'
-      return res
+    const baseUrlsByRegion = services.reduce((accum, service) => {
+      accum[service.region] = service.url + '/v2.0'
+      return accum
     }, {})
     return baseUrlsByRegion
   }
@@ -155,6 +155,104 @@ class Network {
       console.log(err)
     }
   }
+
+  async getFloatingIps () {
+    const url = `${await this.endpoint()}/v2.0/floatingips`
+    try {
+      const response = await axios.get(url, this.client.getAuthHeaders())
+      return response.data.floatingips
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async createFloatingIp (params) {
+    const url = `${await this.endpoint()}/v2.0/floatingips`
+    try {
+      const response = await axios.post(url, { floatingip: params }, this.client.getAuthHeaders())
+      return response.data.floatingip
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async removeFloatingIp (id) {
+    const url = `${await this.endpoint()}/v2.0/floatingips/${id}`
+    try {
+      const response = await axios.put(url, { floatingip: { port_id: null } }, this.client.getAuthHeaders())
+      return response.data.floatingip
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async deleteFloatingIp (id) {
+    const url = `${await this.endpoint()}/v2.0/floatingips/${id}`
+    try {
+      await axios.delete(url, this.client.getAuthHeaders())
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async networkIpAvailability (id) {
+    const url = `${await this.endpoint()}/v2.0/network-ip-availabilities/${id}`
+    try {
+      const response = await axios.get(url, this.client.getAuthHeaders())
+      return response.data.network_ip_availability
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async getSecurityGroups () {
+    const url = `${await this.endpoint()}/v2.0/security-groups`
+    try {
+      const response = await axios.get(url, this.client.getAuthHeaders())
+      return response.data.security_groups
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async createSecurityGroup (params) {
+    const url = `${await this.endpoint()}/v2.0/security-groups`
+    try {
+      const response = await axios.post(url, { security_group: params }, this.client.getAuthHeaders())
+      return response.data.security_group
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async updateSecurityGroup (id, params) {
+    const url = `${await this.endpoint()}/v2.0/security-groups/${id}`
+    try {
+      const response = await axios.put(url, { security_group: params }, this.client.getAuthHeaders())
+      return response.data.security_group
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async deleteSecurityGroup (id) {
+    const url = `${await this.endpoint()}/v2.0/security-groups/${id}`
+    try {
+      await axios.delete(url, this.client.getAuthHeaders())
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async getSecurityGroupRules () {
+    const url = `${await this.endpoint()}/v2.0/security-group-rules`
+    try {
+      const response = await axios.get(url, this.client.getAuthHeaders())
+      return response.data.security_group_rules
+    } catch (err) {
+      console.log(err)
+    }
+  }
 }
 
-export default Network
+export default Neuron

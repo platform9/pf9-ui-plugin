@@ -100,4 +100,68 @@ describe('Neutron', () => {
     await client.neutron.deletePort(updatedPort.id)
     await client.neutron.deleteNetwork(network.id)
   })
+
+  it('get floatingips', async () => {
+    const client = await makeRegionedClient()
+    const floatingips = await client.neutron.getFloatingIps()
+    expect(floatingips).toBeDefined()
+  })
+
+  // TODO: This test will probably fail on AWS.
+  it('create, remove and delete a floatingip placeholder', async () => {
+    const client = await makeRegionedClient()
+    const network = await client.neutron.createNetwork({
+      name: 'To Test FloatingIp',
+      'router:external': true
+    })
+    const subnet = await client.neutron.createSubnet({
+      name: 'Test Subnet',
+      ip_version: 4,
+      cidr: '10.0.3.0/24',
+      network_id: network.id
+    })
+    const floatingip = await client.neutron.createFloatingIp({
+      floating_network_id: network.id
+    })
+    const updatedFloatingIp = await client.neutron.removeFloatingIp(floatingip.id)
+    expect(updatedFloatingIp.port_id).toBe(null)
+    await client.neutron.deleteFloatingIp(updatedFloatingIp.id)
+    await client.neutron.deleteSubnet(subnet.id)
+    await client.neutron.deleteNetwork(network.id)
+  })
+
+  it('get network ip availability', async () => {
+    const client = await makeRegionedClient()
+    const network = await client.neutron.createNetwork({
+      name: 'To Test Availability'
+    })
+    const networkIpAvailability = await client.neutron.networkIpAvailability(network.id)
+    expect(networkIpAvailability).toBeDefined()
+    await client.neutron.deleteNetwork(network.id)
+  })
+
+  it('get security groups', async () => {
+    const client = await makeRegionedClient()
+    const securityGroups = await client.neutron.getSecurityGroups()
+    expect(securityGroups).toBeDefined()
+  })
+
+  it('create, update and delete security group placeholder', async () => {
+    const client = await makeRegionedClient()
+    const securityGroup = await client.neutron.createSecurityGroup({
+      name: 'Test Security Group'
+    })
+    expect(securityGroup.id).toBeDefined()
+    const updatedSecurityGroup = await client.neutron.updateSecurityGroup(securityGroup.id, {
+      name: 'Updated Test Security Group'
+    })
+    expect(updatedSecurityGroup.name).toBe('Updated Test Security Group')
+    await client.neutron.deleteSecurityGroup(updatedSecurityGroup.id)
+  })
+
+  it('get security group rules', async () => {
+    const client = await makeRegionedClient()
+    const securityGroupRules = await client.neutron.getSecurityGroupRules()
+    expect(securityGroupRules).toBeDefined()
+  })
 })
