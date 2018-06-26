@@ -19,6 +19,10 @@ import NetworksPage from './components/networks/NetworksListPage'
 import AddNetworkPage from './components/networks/AddNetworkPage'
 import UpdateNetworkPage from './components/networks/UpdateNetworkPage'
 
+import RoutersPage from './components/routers/RoutersListPage'
+import AddRouterPage from './components/routers/AddRouterPage'
+import UpdateRouterPage from './components/routers/UpdateRouterPage'
+
 import VolumesListPage from './components/volumes/VolumesListPage'
 import AddVolumePage from './components/volumes/AddVolumePage'
 import UpdateVolumePage from './components/volumes/UpdateVolumePage'
@@ -117,6 +121,21 @@ OpenStack.registerPlugin = pluginManager => {
         component: UpdateNetworkPage
       },
       {
+        name: 'Routers',
+        link: { path: '/routers', exact: true },
+        component: RoutersPage
+      },
+      {
+        name: 'AddRouter',
+        link: { path: '/routers/add' },
+        component: AddRouterPage
+      },
+      {
+        name: 'EditRouter',
+        link: { path: '/routers/edit/:routerId', exact: true },
+        component: UpdateRouterPage
+      },
+      {
         name: 'ApiAccess',
         link: { path: '/apiaccess' },
         component: ApiAccessPage
@@ -176,6 +195,10 @@ OpenStack.registerPlugin = pluginManager => {
       {
         name: 'Networks',
         link: { path: '/networks' }
+      },
+      {
+        name: 'Routers',
+        link: { path: '/routers' }
       },
       {
         name: 'API Access',

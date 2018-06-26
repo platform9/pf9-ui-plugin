@@ -6,6 +6,7 @@ import User from './models/User'
 import Volume from './models/Volume'
 import GlanceImage from './models/GlanceImage'
 import Network from './models/Network'
+import Router from './models/Router'
 
 const defaultQuota = {
   cores: 10,
@@ -29,6 +30,7 @@ class Context {
     this.flavors = []
     this.servers = []
     this.networks = []
+    this.routers = []
     this.instances = []
     this.hypervisors = []
     this.userRoles = []
@@ -166,6 +168,38 @@ class Context {
     }
     network.destroy()
     return network
+  }
+
+  getRouter = id => {
+    const router = Router.findById(id)
+    if (!router) {
+      throw new Error('Unable to get non-existent router')
+    }
+    return router.asGraphQl()
+  }
+
+  getRouters = () => Router.getCollection().map(x => x.asGraphQl())
+
+  createRouter = ({ input }) => {
+    const router = new Router(input)
+    return router.asGraphQl()
+  }
+
+  updateRouter = (id, input) => {
+    let router = Router.updateById(id, input)
+    if (!router) {
+      throw new Error('Unable to update non-existent router')
+    }
+    return router.asGraphQl()
+  }
+
+  removeRouter = (id) => {
+    const router = Router.findById(id)
+    if (!router) {
+      throw new Error('Unable to remove non-existent router')
+    }
+    router.destroy()
+    return router
   }
 
   getVolume = (id) => {

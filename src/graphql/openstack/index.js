@@ -2,6 +2,7 @@ import { mergeSchemas } from 'graphql-tools'
 
 import flavors from './schemas/flavors'
 import networks from './schemas/networks'
+import routers from './schemas/routers'
 import volumes from './schemas/volumes'
 import glanceImages from './schemas/glanceImages'
 import userManagement from './schemas/userManagement'
@@ -14,6 +15,7 @@ const mergedSchemas = mergeSchemas({
     glanceImages,
     userManagement,
     networks,
+    routers,
     serviceCatalog
   ]
 })

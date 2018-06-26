@@ -6,6 +6,7 @@ import Tenant from '../models/Tenant'
 import User from '../models/User'
 import Flavor from '../models/Flavor'
 import Network from '../models/Network'
+import Router from '../models/Router'
 import Volume from '../models/Volume'
 import GlanceImage from '../models/GlanceImage'
 // import Token from '../models/Token'
@@ -58,6 +59,9 @@ function loadPreset () {
   // Networks
   new Network({ name: 'Test network 1', subnets: '10.10.0.0/1', tenant: 'Dev Tenant', shared: false, port_security_enabled: true, external: true, admin_state_up: false, status: 'ACTIVE' })
   new Network({ name: 'Test network 2', subnets: '10.10.0.0/2', tenant: 'Test Tenant', shared: true, port_security_enabled: false, external: true, admin_state_up: true, status: 'ACTIVE' })
+
+  // Routers
+  new Router({ name: 'Test router 1', tenant_id: '1234abcd', project: 'Dev Tenant', admin_state_up: true, status: 'ACTIVE' })
 
   // Volumes
   new Volume({ name: 'TestVolume1', description: 'Docker storage test.', volume_type: 'sfvol', metadata: '', size: 15, bootable: false, status: 'available', tenant: 'Dev Team Tenant', source: 'Image', host: 'host.company.sys', instance: 'Test Instance 1', device: '/dev/vdb', attachedMode: 'rw', readonly: false })
