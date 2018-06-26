@@ -15,10 +15,10 @@ class Volume {
 
   async setRegionUrls () {
     const services = (await this.client.keystone.getServiceCatalog()).find(x => x.name === 'cinderv3').endpoints
-    let baseUrlsByRegion = {}
-    for (let service of services) {
-      baseUrlsByRegion[service.region] = service.url
-    }
+    const baseUrlsByRegion = services.reduce((res, service) => {
+      res[service.region] = service.url
+      return res
+    }, {})
     return baseUrlsByRegion
   }
 
@@ -54,20 +54,11 @@ class Volume {
   }
 
   async getAllVolumesCount (limit, allTenants, markerId) {
-    let url = `${await this.volumesUrl()}/detail`
-    if (allTenants) {
-      if (markerId) {
-        url += `?all_tenants=1&limit=${limit}&marker=${markerId}`
-      } else {
-        url += `?all_tenants=1&limit=${limit}`
-      }
-    } else {
-      if (markerId) {
-        url += `?limit=${limit}&marker=${markerId}`
-      } else {
-        url += `?limit=${limit}`
-      }
-    }
+    const baseUrl = `${await this.volumesUrl()}/detail`
+    const limitUrl = `?limit=${limit}`
+    const tenantUrl = allTenants ? '&all_tenants=1' : ''
+    const markerUrl = markerId ? `&marker=${markerId}` : ''
+    const url = baseUrl + limitUrl + tenantUrl + markerUrl
     try {
       const response = await axios.get(url, this.client.getAuthHeaders())
       return response.data.volumes
@@ -109,21 +100,24 @@ class Volume {
   async setBootable (id, bool) {
     const url = `${await this.volumesUrl()}/${id}/action`
     try {
-      const response = await axios.post(url, { 'os-set_bootable': { 'bootable': bool } }, this.client.getAuthHeaders())
+      const response = await axios.post(url, { 'os-set_bootable': { bootable: bool } }, this.client.getAuthHeaders())
       return response.data.volume
     } catch (err) {
       console.log(err)
     }
   }
 
-  // TODO: test case for extend function (API is currently down)
+  // TODO: test case for extend function
   async extendVolume (id, size) {
     const url = `${await this.volumesUrl()}/${id}/action`
-    try {
-      const response = await axios.post(url, { 'os-extend': { 'new-size': size } }, this.client.getAuthHeaders())
-      return response.data.volume
-    } catch (err) {
-      console.log(err)
+    if (this.client.activeRegion.startsWith('AWS' || 'aws')) {
+    } else {
+      try {
+        const response = await axios.post(url, { 'os-extend': { 'new-size': size } }, this.client.getAuthHeaders())
+        return response.data.volume
+      } catch (err) {
+        console.log(err)
+      }
     }
   }
 
@@ -132,8 +126,8 @@ class Volume {
     const url = `${await this.volumesUrl()}/${id}/action`
     try {
       const response = await axios.post(url, { 'os-reset_status': {
-        'status': 'available',
-        'attach_status': 'detached'
+        status: 'available',
+        attach_status: 'detached'
       } }, this.client.getAuthHeaders())
       return response.data.volume
     } catch (err) {
@@ -146,10 +140,10 @@ class Volume {
     const url = `${await this.volumesUrl()}/${id}/action`
     try {
       const response = await axios.post(url, { 'os-volume_upload_image': {
-        'container_format': 'bare',
-        'force': image.force,
-        'image_name': image.name,
-        'disk_format': image.diskFormat || 'raw'
+        container_format: 'bare',
+        force: image.force,
+        image_name: image.name,
+        disk_format: image.diskFormat || 'raw'
       } }, this.client.getAuthHeaders())
       return response.data.volume
     } catch (err) {
