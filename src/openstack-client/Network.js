@@ -15,10 +15,10 @@ class Network {
 
   async setRegionUrls () {
     const services = (await this.client.keystone.getServiceCatalog()).find(x => x.name === 'neutron').endpoints
-    let baseUrlsByRegion = {}
-    for (let service of services) {
-      baseUrlsByRegion[service.region] = service.url + '/v2.0'
-    }
+    const baseUrlsByRegion = services.reduce((res, service) => {
+      res[service.region] = service.url + '/v2.0'
+      return res
+    }, {})
     return baseUrlsByRegion
   }
 
@@ -73,6 +73,84 @@ class Network {
     try {
       const response = await axios.put(url, { network: params }, this.client.getAuthHeaders())
       return response.data.network
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async getSubnets () {
+    const url = `${await this.endpoint()}/v2.0/subnets`
+    try {
+      const response = await axios.get(url, this.client.getAuthHeaders())
+      return response.data.subnets
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async createSubnet (params) {
+    const url = `${await this.endpoint()}/v2.0/subnets`
+    try {
+      const response = await axios.post(url, { subnet: params }, this.client.getAuthHeaders())
+      return response.data.subnet
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async deleteSubnet (id) {
+    const url = `${await this.endpoint()}/v2.0/subnets/${id}`
+    try {
+      await axios.delete(url, this.client.getAuthHeaders())
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async updateSubnet (id, params) {
+    const url = `${await this.endpoint()}/v2.0/subnets/${id}`
+    try {
+      const response = await axios.put(url, { subnet: params }, this.client.getAuthHeaders())
+      return response.data.subnet
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async getPorts () {
+    const url = `${await this.endpoint()}/v2.0/ports`
+    try {
+      const response = await axios.get(url, this.client.getAuthHeaders())
+      return response.data.ports
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async createPort (params) {
+    const url = `${await this.endpoint()}/v2.0/ports`
+    try {
+      const response = await axios.post(url, { port: params }, this.client.getAuthHeaders())
+      return response.data.port
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async deletePort (id) {
+    const url = `${await this.endpoint()}/v2.0/ports/${id}`
+    try {
+      await axios.delete(url, this.client.getAuthHeaders())
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async updatePort (id, params) {
+    const url = `${await this.endpoint()}/v2.0/ports/${id}`
+    try {
+      const response = await axios.put(url, { port: params }, this.client.getAuthHeaders())
+      return response.data.port
     } catch (err) {
       console.log(err)
     }
