@@ -1,7 +1,7 @@
 import Keystone from './Keystone'
 import Glance from './Glance'
-import Network from './Network'
 import Cinder from './Cinder'
+import Neutron from './Neutron'
 
 class OpenstackClient {
   constructor (options = {}) {
@@ -11,8 +11,8 @@ class OpenstackClient {
     }
     this.keystone = new Keystone(this)
     this.glance = new Glance(this)
-    this.network = new Network(this)
     this.cinder = new Cinder(this)
+    this.neutron = new Neutron(this)
     this.catalog = {}
     this.activeRegion = null
   }
