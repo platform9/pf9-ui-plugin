@@ -15,9 +15,9 @@ class Volume {
 
   async setRegionUrls () {
     const services = (await this.client.keystone.getServiceCatalog()).find(x => x.name === 'cinderv3').endpoints
-    const baseUrlsByRegion = services.reduce((res, service) => {
-      res[service.region] = service.url
-      return res
+    const baseUrlsByRegion = services.reduce((accum, service) => {
+      accum[service.region] = service.url
+      return accum
     }, {})
     return baseUrlsByRegion
   }
@@ -107,17 +107,15 @@ class Volume {
     }
   }
 
-  // TODO: test case for extend function
+  // TODO: Test case for extend function
+  // TODO: Current API doesn't work on AWS. Need to implement check logic in test.
   async extendVolume (id, size) {
     const url = `${await this.volumesUrl()}/${id}/action`
-    if (this.client.activeRegion.startsWith('AWS' || 'aws')) {
-    } else {
-      try {
-        const response = await axios.post(url, { 'os-extend': { 'new-size': size } }, this.client.getAuthHeaders())
-        return response.data.volume
-      } catch (err) {
-        console.log(err)
-      }
+    try {
+      const response = await axios.post(url, { 'os-extend': { 'new-size': size } }, this.client.getAuthHeaders())
+      return response.data.volume
+    } catch (err) {
+      console.log(err)
     }
   }
 
@@ -332,7 +330,7 @@ class Volume {
     }
   }
 
-  // TODO: getStorageStats(needs host implement first)
+  // TODO: getStorageStats(need to implement host first)
 }
 
 export default Volume
