@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-class Volume {
+class Cinder {
   constructor (client) {
     this.client = client
   }
@@ -333,4 +333,4 @@ class Volume {
   // TODO: getStorageStats(need to implement host first)
 }
 
-export default Volume
+export default Cinder
