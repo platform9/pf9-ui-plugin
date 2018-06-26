@@ -3,9 +3,24 @@ import {
 } from '../helpers'
 
 describe('Networks', () => {
+  jest.setTimeout(30000)
+
+  it('set region urls', async () => {
+    const client = await makeRegionedClient()
+    const urls = await client.network.setRegionUrls()
+    console.log(urls)
+    expect(urls).toBeDefined()
+  })
+
   it('list networks', async () => {
     const client = await makeRegionedClient()
     const networks = await client.network.getNetworks()
+    expect(networks).toBeDefined()
+  })
+
+  it.only('list region networks', async () => {
+    const client = await makeRegionedClient()
+    const networks = await client.network.getNetworksForRegion(client.activeRegion)
     expect(networks).toBeDefined()
   })
 

@@ -13,6 +13,15 @@ class Network {
 
   networkUrl = async () => `${await this.endpoint()}/v2.0/networks`
 
+  async setRegionUrls () {
+    const services = (await this.client.keystone.getServiceCatalog()).find(x => x.name === 'neutron').endpoints
+    let baseUrlsByRegion = {}
+    for (let service of services) {
+      baseUrlsByRegion[service.region] = service.url + '/v2.0'
+    }
+    return baseUrlsByRegion
+  }
+
   async getNetwork (id) {
     const url = `${await this.networkUrl()}/${id}`
     const response = await axios.get(url, this.client.getAuthHeaders())
@@ -21,8 +30,22 @@ class Network {
 
   async getNetworks () {
     const url = await this.networkUrl()
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.networks
+    try {
+      const response = await axios.get(url, this.client.getAuthHeaders())
+      return response.data.networks
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async getNetworksForRegion (region) {
+    const url = `${(await this.setRegionUrls())[region]}/networks`
+    try {
+      const response = await axios.get(url, this.client.getAuthHeaders())
+      return response.data.networks
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   async createNetwork (params) {
