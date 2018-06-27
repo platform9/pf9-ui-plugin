@@ -56,9 +56,9 @@ class Cinder {
   async getAllVolumesCount (limit, allTenants, markerId) {
     const baseUrl = `${await this.volumesUrl()}/detail`
     const limitUrl = `?limit=${limit}`
-    const tenantUrl = allTenants ? '&all_tenants=1' : ''
+    const projectUrl = allTenants ? '&all_tenants=1' : ''
     const markerUrl = markerId ? `&marker=${markerId}` : ''
-    const url = baseUrl + limitUrl + tenantUrl + markerUrl
+    const url = baseUrl + limitUrl + projectUrl + markerUrl
     try {
       const response = await axios.get(url, this.client.getAuthHeaders())
       return response.data.volumes

@@ -253,6 +253,148 @@ class Neuron {
       console.log(err)
     }
   }
+
+  async createSecurityGroupRule (params) {
+    const url = `${await this.endpoint()}/v2.0/security-group-rules`
+    try {
+      const response = await axios.post(url, { security_group_rule: params }, this.client.getAuthHeaders())
+      return response.data.security_group_rule
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async deleteSecurityGroupRule (id) {
+    const url = `${await this.endpoint()}/v2.0/security-group-rules/${id}`
+    try {
+      await axios.delete(url, this.client.getAuthHeaders())
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async getRouters () {
+    const url = `${await this.endpoint()}/v2.0/routers`
+    try {
+      const response = await axios.get(url, this.client.getAuthHeaders())
+      return response.data.routers
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async createRouter (params) {
+    const url = `${await this.endpoint()}/v2.0/routers`
+    try {
+      const response = await axios.post(url, { router: params }, this.client.getAuthHeaders())
+      return response.data.router
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async updateRouter (id, params) {
+    const url = `${await this.endpoint()}/v2.0/routers/${id}`
+    try {
+      const response = await axios.put(url, { router: params }, this.client.getAuthHeaders())
+      return response.data.router
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async deleteRouter (id) {
+    const url = `${await this.endpoint()}/v2.0/routers/${id}`
+    try {
+      await axios.delete(url, this.client.getAuthHeaders())
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async addInterface (id, params) {
+    const url = `${await this.endpoint()}/v2.0/routers/${id}/add_router_interface`
+    try {
+      const response = await axios.put(url, params, this.client.getAuthHeaders())
+      return response.data
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async removeInterface (routerId, params) {
+    const url = `${await this.endpoint()}/v2.0/routers/${routerId}/remove_router_interface`
+    try {
+      const response = await axios.put(url, params, this.client.getAuthHeaders())
+      return response.data
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async getAllQuotas () {
+    const url = `${await this.endpoint()}/v2.0/quotas`
+    try {
+      const response = await axios.get(url, this.client.getAuthHeaders())
+      return response.data.quotas
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async getProjectQuota (id) {
+    const url = `${await this.endpoint()}/v2.0/quotas/${id}`
+    try {
+      const response = await axios.get(url, this.client.getAuthHeaders())
+      return response.data.quota
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async getProjectQuotaForRegion (id, region) {
+    const urls = await this.setRegionUrls()
+    const url = `${urls[region]}/quotas/${id}`
+    try {
+      const response = await axios.get(url, this.client.getAuthHeaders())
+      return response.data.quota
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async getDefaultQuotasForRegion (region) {
+    const projectId = (await this.client.keystone.getProjects())[0]
+    const urls = await this.setRegionUrls()
+    const url = `${urls[region]}/quotas/${projectId}`
+    try {
+      const response = await axios.get(url, this.client.getAuthHeaders())
+      return response.data.quota
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async setQuotas (projectId, params) {
+    const url = `${await this.endpoint()}/v2.0/quotas/${projectId}`
+    try {
+      const response = await axios.put(url, { quota: params }, this.client.getAuthHeaders())
+      return response.data.quota
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async setQuotasForRegion (projectId, region, params) {
+    const urls = await this.setRegionUrls()
+    const url = `${urls[region]}/quotas/${projectId}`
+    try {
+      const response = await axios.put(url, { quota: params }, this.client.getAuthHeaders())
+      return response.data.quota
+    } catch (err) {
+      console.log(err)
+    }
+  }
 }
 
 export default Neuron

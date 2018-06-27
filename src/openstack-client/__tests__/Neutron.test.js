@@ -3,28 +3,29 @@ import {
 } from '../helpers'
 
 describe('Neutron', () => {
+  let client
   jest.setTimeout(30000)
 
+  beforeEach(async () => {
+    client = await makeRegionedClient()
+  })
+
   it('set region urls', async () => {
-    const client = await makeRegionedClient()
     const urls = await client.neutron.setRegionUrls()
     expect(urls).toBeDefined()
   })
 
   it('list networks', async () => {
-    const client = await makeRegionedClient()
     const networks = await client.neutron.getNetworks()
     expect(networks).toBeDefined()
   })
 
   it('list region networks', async () => {
-    const client = await makeRegionedClient()
     const networks = await client.neutron.getNetworksForRegion(client.activeRegion)
     expect(networks).toBeDefined()
   })
 
   it('create, get and delete a network placeholder', async () => {
-    const client = await makeRegionedClient()
     const network = await client.neutron.createNetwork({})
     expect(network.id).toBeDefined()
 
@@ -38,7 +39,6 @@ describe('Neutron', () => {
   })
 
   it('create, update and delete a network placeholder', async () => {
-    const client = await makeRegionedClient()
     const network = await client.neutron.createNetwork({})
     expect(network.id).toBeDefined()
 
@@ -54,13 +54,12 @@ describe('Neutron', () => {
   })
 
   it('get subnets', async () => {
-    const client = await makeRegionedClient()
     const subnets = await client.neutron.getSubnets()
     expect(subnets).toBeDefined()
   })
 
   it('create, update and delete a subnet placeholder', async () => {
-    const client = await makeRegionedClient()
+    client = await makeRegionedClient()
     const network = await client.neutron.createNetwork({
       name: 'To Test Subnet'
     })
@@ -76,16 +75,16 @@ describe('Neutron', () => {
     expect(updatedSubnet.name).toBe('Updated Test Subnet')
     await client.neutron.deleteSubnet(updatedSubnet.id)
     await client.neutron.deleteNetwork(network.id)
+    const subnets = await client.neutron.getSubnets()
+    expect(subnets.find(x => x.id === updatedSubnet.id)).not.toBeDefined()
   })
 
   it('get ports', async () => {
-    const client = await makeRegionedClient()
     const ports = await client.neutron.getPorts()
     expect(ports).toBeDefined()
   })
 
   it('create, update and delete a port placeholder', async () => {
-    const client = await makeRegionedClient()
     const network = await client.neutron.createNetwork({
       name: 'To Test Port'
     })
@@ -99,17 +98,17 @@ describe('Neutron', () => {
     expect(updatedPort.name).toBe('Updated Test Port')
     await client.neutron.deletePort(updatedPort.id)
     await client.neutron.deleteNetwork(network.id)
+    const ports = await client.neutron.getPorts()
+    expect(ports.find(x => x.id === updatedPort.id)).not.toBeDefined()
   })
 
   it('get floatingips', async () => {
-    const client = await makeRegionedClient()
     const floatingips = await client.neutron.getFloatingIps()
     expect(floatingips).toBeDefined()
   })
 
   // TODO: This test will probably fail on AWS.
   it('create, remove and delete a floatingip placeholder', async () => {
-    const client = await makeRegionedClient()
     const network = await client.neutron.createNetwork({
       name: 'To Test FloatingIp',
       'router:external': true
@@ -131,7 +130,6 @@ describe('Neutron', () => {
   })
 
   it('get network ip availability', async () => {
-    const client = await makeRegionedClient()
     const network = await client.neutron.createNetwork({
       name: 'To Test Availability'
     })
@@ -141,13 +139,11 @@ describe('Neutron', () => {
   })
 
   it('get security groups', async () => {
-    const client = await makeRegionedClient()
     const securityGroups = await client.neutron.getSecurityGroups()
     expect(securityGroups).toBeDefined()
   })
 
-  it('create, update and delete security group placeholder', async () => {
-    const client = await makeRegionedClient()
+  it('create, update and delete a security group placeholder', async () => {
     const securityGroup = await client.neutron.createSecurityGroup({
       name: 'Test Security Group'
     })
@@ -157,11 +153,121 @@ describe('Neutron', () => {
     })
     expect(updatedSecurityGroup.name).toBe('Updated Test Security Group')
     await client.neutron.deleteSecurityGroup(updatedSecurityGroup.id)
+    const securityGroups = await client.neutron.getSecurityGroups()
+    expect(securityGroups.find(x => x.id === updatedSecurityGroup.id)).not.toBeDefined()
   })
 
   it('get security group rules', async () => {
-    const client = await makeRegionedClient()
     const securityGroupRules = await client.neutron.getSecurityGroupRules()
     expect(securityGroupRules).toBeDefined()
+  })
+
+  it('create and delete a security group rule placeholder', async () => {
+    const securityGroup = await client.neutron.createSecurityGroup({
+      name: 'To Test Security Group Rule'
+    })
+    const securityGroupRule = await client.neutron.createSecurityGroupRule({
+      direction: 'ingress',
+      security_group_id: securityGroup.id
+    })
+    expect(securityGroupRule.id).toBeDefined()
+    await client.neutron.deleteSecurityGroupRule(securityGroupRule.id)
+    await client.neutron.deleteSecurityGroup(securityGroup.id)
+    const securityGroupRules = await client.neutron.getSecurityGroupRules()
+    expect(securityGroupRules.find(x => x.id === securityGroupRule.id)).not.toBeDefined()
+  })
+
+  it('get routers', async () => {
+    const routers = await client.neutron.getRouters()
+    expect(routers).toBeDefined()
+  })
+
+  it('create, update and delete a router placeholder', async () => {
+    const router = await client.neutron.createRouter({
+      name: 'Test Router'
+    })
+    expect(router.id).toBeDefined()
+    const updatedRouter = await client.neutron.updateRouter(router.id, {
+      name: 'Updated Test Router'
+    })
+    expect(updatedRouter.name).toBe('Updated Test Router')
+    await client.neutron.deleteRouter(updatedRouter.id)
+    const routers = await client.neutron.getRouters()
+    expect(routers.find(x => x.id === updatedRouter.id)).not.toBeDefined()
+  })
+
+  it('create and delete an interface placeholder', async () => {
+    const network = await client.neutron.createNetwork({
+      name: 'To Test Interface'
+    })
+    const subnet = await client.neutron.createSubnet({
+      name: 'Test Subnet',
+      ip_version: 4,
+      cidr: '10.0.3.0/24',
+      network_id: network.id
+    })
+    const port = await client.neutron.createPort({
+      name: 'Test Port',
+      network_id: network.id
+    })
+    const router = await client.neutron.createRouter({
+      name: 'Test Router'
+    })
+    const iface = await client.neutron.addInterface(router.id, {
+      port_id: port.id
+    })
+    expect(iface).toBeDefined()
+    await client.neutron.removeInterface(router.id, {
+      port_id: port.id
+    })
+    await client.neutron.deleteRouter(router.id)
+    await client.neutron.deleteSubnet(subnet.id)
+    await client.neutron.deleteNetwork(network.id)
+  })
+
+  it('get all quotas', async () => {
+    const quotas = await client.neutron.getAllQuotas()
+    expect(quotas).toBeDefined()
+  })
+
+  it('get project quota', async () => {
+    const projectId = (await client.keystone.getProjects())[0].id
+    const quota = await client.neutron.getProjectQuota(projectId)
+    expect(quota).toBeDefined()
+  })
+
+  it('get project quota for region', async () => {
+    const projectId = (await client.keystone.getProjects())[0].id
+    const quota = await client.neutron.getProjectQuotaForRegion(projectId, client.activeRegion)
+    expect(quota).toBeDefined()
+  })
+
+  it('get default quota for region', async () => {
+    const quota = await client.neutron.getDefaultQuotasForRegion(client.activeRegion)
+    expect(quota).toBeDefined()
+  })
+
+  it('set quota and restore it', async () => {
+    const projectId = (await client.keystone.getProjects())[0].id
+    const originValue = (await client.neutron.getProjectQuota(projectId)).network
+    const updatedQuota = await client.neutron.setQuotas(projectId, {
+      network: originValue + 1
+    })
+    expect(updatedQuota.network).toBe(originValue + 1)
+    await client.neutron.setQuotas(projectId, {
+      network: originValue
+    })
+  })
+
+  it('set quota for region and restore it', async () => {
+    const projectId = (await client.keystone.getProjects())[0].id
+    const originValue = (await client.neutron.getProjectQuotaForRegion(projectId, client.activeRegion)).network
+    const updatedQuota = await client.neutron.setQuotasForRegion(projectId, client.activeRegion, {
+      network: originValue + 1
+    })
+    expect(updatedQuota.network).toBe(originValue + 1)
+    await client.neutron.setQuotasForRegion(projectId, client.activeRegion, {
+      network: originValue
+    })
   })
 })
