@@ -168,3 +168,28 @@ Mocha and Selenium for these tests.
 
 A server must be provisioned before each one of these tests. These tests are
 very expensive to run (several hours) and designed to be run occasionally.
+
+## Docker
+
+As of right now, the Docker image is a UI development demo.  It runs with the
+simulator built into the image so no DU is required.
+
+To build, tag, and publish the image:
+
+```
+npm run docker:build
+npm run docker:tag
+npm run docker:push
+```
+
+To run the image:
+
+`npm run docker:run`
+
+Alternatively, you can run the UI demo without checking out the Github repo at all:
+
+`docker run -p 3000:3000 -p 4444:4444 platform9/ui-dev`
+
+This will launch the simulator, graphql server, and a simple express HTTP server.
+
+Use the username: `admin@platform9.com` with the password: `secret` for the login.
