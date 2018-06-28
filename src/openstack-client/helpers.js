@@ -29,7 +29,8 @@ export const makeScopedClient = async () => {
 export const makeRegionedClient = async () => {
   const client = await makeScopedClient()
   const regions = await client.keystone.getRegions()
-  client.setActiveRegion(regions[5].id)
+  // currently set KVM-Neutron as default test environment
+  client.setActiveRegion(regions.find(x => x.id ==='KVM-Neutron').id || regions[0].id)
   await client.keystone.getServicesForActiveRegion()
   return client
 }
