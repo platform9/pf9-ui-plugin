@@ -21,14 +21,14 @@ const drawerWidth = 240
 
 const styles = theme => ({
   root: {
-    width: '100%',
-    zIndex: 1,
+    flexGrow: 1,
   },
   appFrame: {
+    zIndex: 1,
+    overflow: 'hidden',
     position: 'relative',
     display: 'flex',
     width: '100%',
-    height: '100%',
   },
   appBar: {
     position: 'absolute',
@@ -47,6 +47,9 @@ const styles = theme => ({
   'appBarShift-left': {
     marginLeft: drawerWidth,
   },
+  'appBarShift-right': {
+    marginRight: drawerWidth,
+  },
   menuButton: {
     marginLeft: 12,
     marginRight: 20,
@@ -55,8 +58,10 @@ const styles = theme => ({
     display: 'none',
   },
   drawerPaper: {
-    height: '100vh',
+    position: 'relative',
     width: drawerWidth,
+    height: '100%',
+    minHeight: '100vh',
   },
   drawerHeader: {
     display: 'flex',
@@ -64,6 +69,35 @@ const styles = theme => ({
     justifyContent: 'flex-end',
     padding: '0 8px',
     ...theme.mixins.toolbar,
+  },
+  content: {
+    maxWidth: 'calc(100% - 48px)',
+    overflowX: 'auto',
+    flexGrow: 1,
+    backgroundColor: theme.palette.background.default,
+    padding: theme.spacing.unit * 3,
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+  },
+  'content-left': {
+    marginLeft: -drawerWidth,
+  },
+  'content-right': {
+    marginRight: -drawerWidth,
+  },
+  contentShift: {
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  },
+  'contentShift-left': {
+    marginLeft: 0,
+  },
+  'contentShift-right': {
+    marginRight: 0,
   },
 })
 
@@ -85,7 +119,7 @@ class Navbar extends React.Component {
 
   navTo = link => () => {
     this.props.history.push(link)
-    this.setState({ open: false })
+    // this.setState({ open: false })
   }
 
   renderNavLink = ({ link, name }) => (
@@ -98,22 +132,20 @@ class Navbar extends React.Component {
 
     const drawer = (
       <Drawer
+        variant="persistent"
         classes={{ paper: classes.drawerPaper }}
         anchor="left"
         open={open}
-        onClose={this.handleDrawerClose}
       >
-        <div className={classes.drawerInner}>
-          <div className={classes.drawerHeader}>
-            <IconButton onClick={this.handleDrawerClose}>
-              <ChevronLeftIcon />
-            </IconButton>
-          </div>
-          <Divider />
-          <MenuList>
-            {links.map(this.renderNavLink)}
-          </MenuList>
+        <div className={classes.drawerHeader}>
+          <IconButton onClick={this.handleDrawerClose}>
+            <ChevronLeftIcon />
+          </IconButton>
         </div>
+        <Divider />
+        <MenuList>
+          {links.map(this.renderNavLink)}
+        </MenuList>
       </Drawer>
     )
 
@@ -129,17 +161,27 @@ class Navbar extends React.Component {
             <Toolbar disableGutters={!open}>
               <IconButton
                 color="default"
+                aria-label="open drawer"
                 onClick={this.handleDrawerOpen}
                 className={classNames(classes.menuButton, open && classes.hide)}
               >
                 <MenuIcon />
               </IconButton>
-              <Typography type="title" color="inherit" noWrap>
+              <Typography variant="title" color="inherit" noWrap>
                 Platform9
               </Typography>
             </Toolbar>
           </AppBar>
           {drawer}
+          <main
+            className={classNames(classes.content, classes['content-left'], {
+              [classes.contentShift]: open,
+              [classes['contentShift-left']]: open,
+            })}
+          >
+            <div className={classes.drawerHeader} />
+            <div>{this.props.children}</div>
+          </main>
         </div>
       </div>
     )
