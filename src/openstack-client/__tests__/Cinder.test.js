@@ -32,8 +32,7 @@ describe('Volumes', async () => {
   it('create, get and delete a volume placeholder', async () => {
     const volume = await client.cinder.createVolume({
       name: 'UITEST_TestVolume',
-      size: 1,
-      metadata: {}
+      size: 1
     })
     expect(volume.id).toBeDefined()
 
@@ -53,8 +52,7 @@ describe('Volumes', async () => {
   it('create and update a volume, then delete it', async () => {
     const volume = await client.cinder.createVolume({
       name: 'UITEST_TestVolume',
-      size: 1,
-      metadata: {}
+      size: 1
     })
     expect(volume.id).toBeDefined()
 
@@ -81,9 +79,7 @@ describe('Volumes', async () => {
   it('create a volumetype placeholder and delete it', async () => {
     const numBefore = (await client.cinder.getVolumeTypes()).length
     await client.cinder.createVolumeType({
-      name: 'UITEST_TestVolumeType',
-      description: 'Just a test volumetype',
-      extra_specs: {}
+      name: 'UITEST_TestVolumeType'
     })
     let numAfter = (await client.cinder.getVolumeTypes()).length
     expect(numAfter).toBe(numBefore + 1)
@@ -95,9 +91,7 @@ describe('Volumes', async () => {
 
   it('create, update and delete a volumetype placeholder', async () => {
     await client.cinder.createVolumeType({
-      name: 'UITEST_TestVolumeType',
-      description: 'Just a test volumetype',
-      extra_specs: {}
+      name: 'UITEST_TestVolumeType'
     })
     const id = (await client.cinder.getVolumeType('UITEST_TestVolumeType')).id
     const response = await client.cinder.updateVolumeType(id, {
@@ -111,7 +105,6 @@ describe('Volumes', async () => {
   it('create a volumetype placeholder, unset its volumetype tag, then delete it', async () => {
     await client.cinder.createVolumeType({
       name: 'UITEST_TestVolumeType',
-      description: 'Just a test volumetype',
       extra_specs: {
         TestKey: 'UITEST_TestValue'
       }
@@ -137,15 +130,13 @@ describe('Volumes', async () => {
   it('Create a volume placeholder, snapshot it and delete both', async () => {
     const volume = await client.cinder.createVolume({
       name: 'UITEST_TestSnapshot',
-      size: 1,
-      metadata: {}
+      size: 1
     })
 
     await waitUntil({ condition: waitForVolumeCreate(volume.id), delay: 1000, maxRetries: 20 })
     const snapshot = await client.cinder.snapshotVolume({
       volume_id: volume.id,
-      name: 'UITEST_TestSnapshot',
-      description: 'Just a test snapshot'
+      name: 'UITEST_TestSnapshot'
     })
     expect(snapshot.id).toBeDefined()
 
@@ -165,8 +156,7 @@ describe('Volumes', async () => {
     const volume = await client.cinder.createVolume({
       name: 'UITEST_TestVolume',
       size: 1,
-      bootable: false,
-      metadata: {}
+      bootable: false
     })
     await client.cinder.setBootable(volume.id, true)
     const newVolume = await client.cinder.getVolume(volume.id)
@@ -180,15 +170,13 @@ describe('Volumes', async () => {
   it('Create a volume placeholder, snapshot and update the snapshot, then delete both', async () => {
     const volume = await client.cinder.createVolume({
       name: 'UITEST_TestVolume',
-      size: 1,
-      metadata: {}
+      size: 1
     })
 
     await waitUntil({ condition: waitForVolumeCreate(volume.id), delay: 1000, maxRetries: 20 })
     const snapshot = await client.cinder.snapshotVolume({
       volume_id: volume.id,
-      name: 'UITEST_TestSnapshot',
-      description: 'Just a test snapshot'
+      name: 'UITEST_TestSnapshot'
     })
 
     await waitUntil({ condition: waitForSnapshotCreate(snapshot.id), delay: 1000, maxRetries: 20 })
@@ -212,15 +200,13 @@ describe('Volumes', async () => {
   it('Create a volume placeholder, snapshot and update metadata, then delete both', async () => {
     const volume = await client.cinder.createVolume({
       name: 'UITEST_TestVolume',
-      size: 1,
-      metadata: {}
+      size: 1
     })
 
     await waitUntil({ condition: waitForVolumeCreate(volume.id), delay: 1000, maxRetries: 20 })
     const snapshot = await client.cinder.snapshotVolume({
       volume_id: volume.id,
-      name: 'UITEST_TestSnapShot',
-      description: 'Just a test snapshot'
+      name: 'UITEST_TestSnapShot'
     })
 
     await waitUntil({ condition: waitForSnapshotCreate(snapshot.id), delay: 1000, maxRetries: 20 })
