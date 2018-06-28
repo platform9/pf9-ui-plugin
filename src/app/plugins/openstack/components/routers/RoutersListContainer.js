@@ -8,24 +8,14 @@ import RoutersList from './RoutersList'
 import { GET_ROUTERS, REMOVE_ROUTER } from './actions'
 
 class RoutersListContainer extends React.Component {
-  handleRemove = async id => {
-    const { client } = this.props
-    client.mutate({
-      mutation: REMOVE_ROUTER,
-      variables: { id },
-      update: cache => {
-        const data = cache.readQuery({ query: GET_ROUTERS })
-        data.routers = data.routers.filter(x => x.id !== id)
-        cache.writeQuery({ query: GET_ROUTERS, data })
-      }
-    })
-  }
-
   render () {
     return (
       <CRUDListContainer
         items={this.props.routers}
-        onRemove={this.handleRemove}
+        str="routers"
+        client={this.props.client}
+        getQuery={GET_ROUTERS}
+        removeQuery={REMOVE_ROUTER}
         addUrl="/ui/openstack/routers/add"
         editUrl="/ui/openstack/routers/edit"
       >

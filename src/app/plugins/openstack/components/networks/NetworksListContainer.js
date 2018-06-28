@@ -12,7 +12,7 @@ class NetworksListContainer extends React.Component {
     return (
       <CRUDListContainer
         items={this.props.networks}
-        item="networks"
+        str="networks"
         client={this.props.client}
         getQuery={GET_NETWORKS}
         removeQuery={REMOVE_NETWORK}

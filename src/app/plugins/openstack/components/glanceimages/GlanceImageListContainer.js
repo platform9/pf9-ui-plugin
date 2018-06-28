@@ -6,24 +6,14 @@ import GlanceImageList from './GlanceImageList'
 import { GET_GLANCEIMAGES, REMOVE_GLANCEIMAGE } from './actions'
 
 class GlanceImageContainer extends React.Component {
-  handleRemove = async id => {
-    const { client } = this.props
-    client.mutate({
-      mutation: REMOVE_GLANCEIMAGE,
-      variables: { id },
-      update: cache => {
-        const data = cache.readQuery({ query: GET_GLANCEIMAGES })
-        data.glanceImages = data.glanceImages.filter(x => x.id !== id)
-        cache.writeQuery({ query: GET_GLANCEIMAGES, data })
-      }
-    })
-  }
-
   render () {
     return (
       <CRUDListContainer
         items={this.props.glanceImages}
-        onRemove={this.handleRemove}
+        str="glanceImages"
+        client={this.props.client}
+        getQuery={GET_GLANCEIMAGES}
+        removeQuery={REMOVE_GLANCEIMAGE}
         addUrl="/ui/openstack/glanceimages/add"
         editUrl="/ui/openstack/glanceimages/edit"
       >

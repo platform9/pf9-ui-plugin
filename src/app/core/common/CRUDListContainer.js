@@ -33,18 +33,18 @@ class CRUDListContainer extends React.Component {
   handleDeleteConfirm = () => {
     this.setState({ showConfirmation: false })
     const items = this.state.selectedItems || []
-    items.forEach(item => this.handleRemove(item.id, this.props.item, this.props.removeQuery, this.props.getQuery))
+    items.forEach(item => this.handleRemove(item.id, this.props.str, this.props.removeQuery, this.props.getQuery))
     this.setState({ selectedItems: [] })
     this.resolveDelete()
   }
 
-  handleRemove = async (id, item, removeQuery, getQuery) => {
+  handleRemove = async (id, str, removeQuery, getQuery) => {
     this.props.client.mutate({
       mutation: removeQuery,
       variables: { id },
       update: cache => {
         const data = cache.readQuery({ query: getQuery })
-        data[`${item}`] = data[`${item}`].filter(x => x.id !== id)
+        data[`${str}`] = data[`${str}`].filter(x => x.id !== id)
         cache.writeQuery({ query: getQuery, data })
       }
     })
