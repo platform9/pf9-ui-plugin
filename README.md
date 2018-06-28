@@ -192,4 +192,8 @@ Alternatively, you can run the UI demo without checking out the Github repo at a
 
 This will launch the simulator, graphql server, and a simple express HTTP server.
 
+Be sure to specify the dev version in the loader by visiting this url:
+
+`http://localhost:3000/?dev=true`
+
 Use the username: `admin@platform9.com` with the password: `secret` for the login.
