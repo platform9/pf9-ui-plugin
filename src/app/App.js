@@ -25,19 +25,22 @@ class App extends React.Component {
 
     const { pluginManager } = this.context
     const options = pluginManager.getOptions()
-    const { showNavMenu, showSidebar, showFooter } = options
+    const { showFooter } = options
 
-    const renderNavMenu = () => (
-      <div id="_nav-menu">
-        <Navbar links={pluginManager.getNavItems()} />
-      </div>
-    )
+    // const options = pluginManager.getOptions()
+    // const { showNavMenu, showSidebar, showFooter } = options
 
-    const renderSidebar = () => (
-      <div id="_main-sidebar">
-        TODO: Sidebar
-      </div>
-    )
+    // const renderNavMenu = () => (
+    //   <div id="_nav-menu">
+    //     <Navbar links={pluginManager.getNavItems()} />
+    //   </div>
+    // )
+
+    // const renderSidebar = () => (
+    //   <div id="_main-sidebar">
+    //     TODO: Sidebar
+    //   </div>
+    // )
 
     const renderFooter = () => (
       <div id="_main-footer">
@@ -45,13 +48,34 @@ class App extends React.Component {
       </div>
     )
 
+    // return (
+    //   <Router>
+    //     <MuiThemeProvider theme={theme}>
+    //       <div id="_main-container">
+    //         {showNavMenu && renderNavMenu()}
+    //         {showSidebar && renderSidebar()}
+    //         <div id="_main-content">
+    //           {pluginManager.getComponents().map((PluginComponent, idx) => <PluginComponent key={idx} />)}
+    //           <Switch>
+    //             {pluginManager.getRoutes().map(route => {
+    //               const { component, link } = route
+    //               const Component = component
+    //               return <Route key={route.name} path={link.path} exact={link.exact || false} component={Component} />
+    //             })}
+    //             <Redirect to={pluginManager.getDefaultRoute()} />
+    //           </Switch>
+    //         </div>
+    //         {showFooter && renderFooter()}
+    //       </div>
+    //     </MuiThemeProvider>
+    //   </Router>
+    // )
+
     return (
       <Router>
         <MuiThemeProvider theme={theme}>
           <div id="_main-container">
-            {showNavMenu && renderNavMenu()}
-            {showSidebar && renderSidebar()}
-            <div id="_main-content">
+            <Navbar links={pluginManager.getNavItems()} >
               {pluginManager.getComponents().map((PluginComponent, idx) => <PluginComponent key={idx} />)}
               <Switch>
                 {pluginManager.getRoutes().map(route => {
@@ -61,8 +85,8 @@ class App extends React.Component {
                 })}
                 <Redirect to={pluginManager.getDefaultRoute()} />
               </Switch>
-            </div>
-            {showFooter && renderFooter()}
+              {showFooter && renderFooter()}
+            </Navbar>
           </div>
         </MuiThemeProvider>
       </Router>
