@@ -231,7 +231,7 @@ class ListTable extends React.Component {
 
     return (
       <Grid container justify="center">
-        <Grid item xs={11}>
+        <Grid item xs={12} zeroMinWidth>
           <Paper className={classes.root}>
             <EnhancedTableToolbar
               numSelected={selected.length}

@@ -11,7 +11,7 @@ class Checkbox extends React.Component {
     props.defineField(props.id, spec)
   }
 
-  get restFields () { return filterFields(...withFormContext.propsToExclude)(this.props) }
+  get restFields () { return filterFields(...withFormContext.propsToExclude, 'value')(this.props) }
 
   render () {
     const { id, value, label, setField } = this.props
