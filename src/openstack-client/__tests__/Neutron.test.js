@@ -26,7 +26,9 @@ describe('Neutron', () => {
   })
 
   it('create, get and delete a network placeholder', async () => {
-    const network = await client.neutron.createNetwork({})
+    const network = await client.neutron.createNetwork({
+      name: 'UITEST_TestNetwork'
+    })
     expect(network.id).toBeDefined()
 
     const newNetwork = await client.neutron.getNetwork(network.id)
@@ -39,13 +41,15 @@ describe('Neutron', () => {
   })
 
   it('create, update and delete a network placeholder', async () => {
-    const network = await client.neutron.createNetwork({})
+    const network = await client.neutron.createNetwork({
+      name: 'UITEST_TestNetwork'
+    })
     expect(network.id).toBeDefined()
 
     const updatedNetwork = await client.neutron.updateNetwork(network.id, {
-      name: 'New Name'
+      name: 'UITEST_UpdatedNetwork'
     })
-    expect(updatedNetwork.name).toBe('New Name')
+    expect(updatedNetwork.name).toBe('UITEST_UpdatedNetwork')
 
     await client.neutron.deleteNetwork(updatedNetwork.id)
 
@@ -61,18 +65,18 @@ describe('Neutron', () => {
   it('create, update and delete a subnet placeholder', async () => {
     client = await makeRegionedClient()
     const network = await client.neutron.createNetwork({
-      name: 'To Test Subnet'
+      name: 'UITEST_TestNetwork'
     })
     const subnet = await client.neutron.createSubnet({
-      name: 'Test Subnet',
+      name: 'UITEST_TestSubnet',
       ip_version: 4,
       cidr: '10.0.3.0/24',
       network_id: network.id
     })
     const updatedSubnet = await client.neutron.updateSubnet(subnet.id, {
-      name: 'Updated Test Subnet'
+      name: 'UITEST_UpdatedSubnet'
     })
-    expect(updatedSubnet.name).toBe('Updated Test Subnet')
+    expect(updatedSubnet.name).toBe('UITEST_UpdatedSubnet')
     await client.neutron.deleteSubnet(updatedSubnet.id)
     await client.neutron.deleteNetwork(network.id)
     const subnets = await client.neutron.getSubnets()
@@ -86,16 +90,16 @@ describe('Neutron', () => {
 
   it('create, update and delete a port placeholder', async () => {
     const network = await client.neutron.createNetwork({
-      name: 'To Test Port'
+      name: 'UITEST_TestNetwork'
     })
     const port = await client.neutron.createPort({
-      name: 'Test Port',
+      name: 'UITEST_TestPort',
       network_id: network.id
     })
     const updatedPort = await client.neutron.updatePort(port.id, {
-      name: 'Updated Test Port'
+      name: 'UITEST_UpdatedPort'
     })
-    expect(updatedPort.name).toBe('Updated Test Port')
+    expect(updatedPort.name).toBe('UITEST_UpdatedPort')
     await client.neutron.deletePort(updatedPort.id)
     await client.neutron.deleteNetwork(network.id)
     const ports = await client.neutron.getPorts()
@@ -110,11 +114,11 @@ describe('Neutron', () => {
   // TODO: This test will probably fail on AWS.
   it('create, remove and delete a floatingip placeholder', async () => {
     const network = await client.neutron.createNetwork({
-      name: 'To Test FloatingIp',
+      name: 'UITEST_TestNetwork',
       'router:external': true
     })
     const subnet = await client.neutron.createSubnet({
-      name: 'Test Subnet',
+      name: 'UITEST_TestSubnet',
       ip_version: 4,
       cidr: '10.0.3.0/24',
       network_id: network.id
@@ -131,7 +135,7 @@ describe('Neutron', () => {
 
   it('get network ip availability', async () => {
     const network = await client.neutron.createNetwork({
-      name: 'To Test Availability'
+      name: 'UITEST_TestNetwork'
     })
     const networkIpAvailability = await client.neutron.networkIpAvailability(network.id)
     expect(networkIpAvailability).toBeDefined()
@@ -145,13 +149,13 @@ describe('Neutron', () => {
 
   it('create, update and delete a security group placeholder', async () => {
     const securityGroup = await client.neutron.createSecurityGroup({
-      name: 'Test Security Group'
+      name: 'UITEST_TestSecurityGroup'
     })
     expect(securityGroup.id).toBeDefined()
     const updatedSecurityGroup = await client.neutron.updateSecurityGroup(securityGroup.id, {
-      name: 'Updated Test Security Group'
+      name: 'UITEST_UpdatedSecurityGroup'
     })
-    expect(updatedSecurityGroup.name).toBe('Updated Test Security Group')
+    expect(updatedSecurityGroup.name).toBe('UITEST_UpdatedSecurityGroup')
     await client.neutron.deleteSecurityGroup(updatedSecurityGroup.id)
     const securityGroups = await client.neutron.getSecurityGroups()
     expect(securityGroups.find(x => x.id === updatedSecurityGroup.id)).not.toBeDefined()
@@ -164,7 +168,7 @@ describe('Neutron', () => {
 
   it('create and delete a security group rule placeholder', async () => {
     const securityGroup = await client.neutron.createSecurityGroup({
-      name: 'To Test Security Group Rule'
+      name: 'UITEST_TestSecurityGroupRule'
     })
     const securityGroupRule = await client.neutron.createSecurityGroupRule({
       direction: 'ingress',
@@ -184,13 +188,13 @@ describe('Neutron', () => {
 
   it('create, update and delete a router placeholder', async () => {
     const router = await client.neutron.createRouter({
-      name: 'Test Router'
+      name: 'UITEST_TestRouter'
     })
     expect(router.id).toBeDefined()
     const updatedRouter = await client.neutron.updateRouter(router.id, {
-      name: 'Updated Test Router'
+      name: 'UITEST_UpdatedRouter'
     })
-    expect(updatedRouter.name).toBe('Updated Test Router')
+    expect(updatedRouter.name).toBe('UITEST_UpdatedRouter')
     await client.neutron.deleteRouter(updatedRouter.id)
     const routers = await client.neutron.getRouters()
     expect(routers.find(x => x.id === updatedRouter.id)).not.toBeDefined()
@@ -198,20 +202,20 @@ describe('Neutron', () => {
 
   it('create and delete an interface placeholder', async () => {
     const network = await client.neutron.createNetwork({
-      name: 'To Test Interface'
+      name: 'UITEST_TestInterface'
     })
     const subnet = await client.neutron.createSubnet({
-      name: 'Test Subnet',
+      name: 'UITEST_TestSubnet',
       ip_version: 4,
       cidr: '10.0.3.0/24',
       network_id: network.id
     })
     const port = await client.neutron.createPort({
-      name: 'Test Port',
+      name: 'UITEST_TestPort',
       network_id: network.id
     })
     const router = await client.neutron.createRouter({
-      name: 'Test Router'
+      name: 'UITEST_TestRouter'
     })
     const iface = await client.neutron.addInterface(router.id, {
       port_id: port.id
