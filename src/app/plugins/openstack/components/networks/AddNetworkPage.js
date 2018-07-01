@@ -28,9 +28,17 @@ class AddNetworkPage extends React.Component {
   }
 
   render () {
+    console.log(GET_NETWORKS)
     return (
       <FormWrapper title="Add Network" backUrl="/ui/openstack/networks">
-        <AddNetworkForm onSubmit={this.handleSubmit} />
+        <AddNetworkForm
+          client={this.props.client}
+          history={this.props.history}
+          backUr="/ui/openstack/networks"
+          type="add"
+          str="networks"
+          cacheStr="createNetwork"
+        />
       </FormWrapper>
     )
   }

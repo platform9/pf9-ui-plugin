@@ -61,13 +61,49 @@ class ValidatedForm extends React.Component {
   }
 
   handleSubmit = event => {
-    const { onSubmit } = this.props
     event.preventDefault()
 
     if (!this.validateForm()) { return }
+    // let inputObj = {...this.state.value}
+    // delete inputObj.id
+    // delete inputObj.__typename
+    // this.handle(inputObj)
+    this.handleAdd()
+  }
 
-    if (onSubmit) {
-      onSubmit(this.state.value)
+  handleAdd = () => {
+    const { client, history, addQuery, getQuery, backUrl, str, cacheStr } = this.props
+    try {
+      client.mutate({
+        mutation: addQuery,
+        variables: {
+          input: this.state.value
+        },
+        update: (proxy, { data }) => {
+          const tempData = proxy.readQuery({ query: getQuery })
+          tempData[str].push(data[cacheStr])
+          proxy.writeQuery({ query: getQuery, tempData })
+        }
+      })
+      history.push(backUrl)
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  handleUpdate = inputObj => {
+    const { client, history, workId, updateQuery, backUrl } = this.props
+    try {
+      client.mutate({
+        mutation: updateQuery,
+        variables: {
+          id: workId,
+          input: inputObj
+        }
+      })
+      history.push(backUrl)
+    } catch (err) {
+      console.error(err)
     }
   }
 
@@ -80,10 +116,6 @@ class ValidatedForm extends React.Component {
       </form>
     )
   }
-}
-
-ValidatedForm.propTypes = {
-  onSubmit: PropTypes.func
 }
 
 export default ValidatedForm

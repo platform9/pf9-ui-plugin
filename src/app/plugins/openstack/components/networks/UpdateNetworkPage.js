@@ -48,7 +48,14 @@ class UpdateNetworkPage extends React.Component {
     return (
       <FormWrapper title="Update Network" backUrl="/ui/openstack/networks">
         {network &&
-          <UpdateNetworkForm onSubmit={this.handleSubmit} network={network} />
+          <UpdateNetworkForm
+            network={network}
+            client={this.props.client}
+            history={this.props.history}
+            workId={this.props.match.params.networkId}
+            type="update"
+            backUrl="/ui/openstack/networks"
+          />
         }
       </FormWrapper>
     )
