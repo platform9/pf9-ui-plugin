@@ -1,20 +1,19 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import { UPDATE_NETWORK } from './actions'
 import { Button } from '@material-ui/core'
 import ValidatedForm from 'core/common/ValidatedForm'
 import TextField from 'core/common/TextField'
 import Checkbox from 'core/common/Checkbox'
 
-const UpdateNetworkForm = ({ network, client, history, workId, type, backUrl }) =>
+const UpdateNetworkForm = ({ network, client, history, workId }) =>
   <ValidatedForm
     initialValue={network}
     client={client}
     history={history}
     workId={workId}
-    type={type}
     updateQuery={UPDATE_NETWORK}
-    backUrl={backUrl}
+    type="update"
+    backUrl="/ui/openstack/networks"
   >
     <TextField id="name" label="Name" />
     <Checkbox id="admin_state_up" label="Admin State" />

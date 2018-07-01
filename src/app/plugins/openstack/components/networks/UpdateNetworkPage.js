@@ -1,7 +1,7 @@
 import React from 'react'
 import { withRouter } from 'react-router-dom'
 import { compose, withApollo } from 'react-apollo'
-import { GET_NETWORK, UPDATE_NETWORK } from './actions'
+import { GET_NETWORK } from './actions'
 import FormWrapper from 'core/common/FormWrapper'
 import UpdateNetworkForm from './UpdateNetworkForm'
 import requiresAuthentication from '../../util/requiresAuthentication'
@@ -24,24 +24,6 @@ class UpdateNetworkPage extends React.Component {
     })
   }
 
-  handleSubmit = network => {
-    const { client, history } = this.props
-    const networkId = this.props.match.params.networkId
-
-    try {
-      client.mutate({
-        mutation: UPDATE_NETWORK,
-        variables: {
-          id: networkId,
-          input: network
-        }
-      })
-      history.push('/ui/openstack/networks')
-    } catch (err) {
-      console.error(err)
-    }
-  }
-
   render () {
     const network = this.state && this.state.network
 
@@ -53,8 +35,6 @@ class UpdateNetworkPage extends React.Component {
             client={this.props.client}
             history={this.props.history}
             workId={this.props.match.params.networkId}
-            type="update"
-            backUrl="/ui/openstack/networks"
           />
         }
       </FormWrapper>

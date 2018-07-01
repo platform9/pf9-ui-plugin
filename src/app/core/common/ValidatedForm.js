@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 
 const ValidatedFormContext = React.createContext({})
 
@@ -61,14 +60,24 @@ class ValidatedForm extends React.Component {
   }
 
   handleSubmit = event => {
+    const { type } = this.props
     event.preventDefault()
 
     if (!this.validateForm()) { return }
-    // let inputObj = {...this.state.value}
-    // delete inputObj.id
-    // delete inputObj.__typename
-    // this.handle(inputObj)
-    this.handleAdd()
+
+    switch (type) {
+      case 'add':
+        this.handleAdd()
+        break
+      case `update`:
+        let inputObj = {...this.state.value}
+        delete inputObj.id
+        delete inputObj.__typename
+        this.handleUpdate(inputObj)
+        break
+      default:
+        console.log('Operation type needed.')
+    }
   }
 
   handleAdd = () => {
@@ -82,7 +91,7 @@ class ValidatedForm extends React.Component {
         update: (proxy, { data }) => {
           const tempData = proxy.readQuery({ query: getQuery })
           tempData[str].push(data[cacheStr])
-          proxy.writeQuery({ query: getQuery, tempData })
+          proxy.writeQuery({ query: getQuery, data: tempData })
         }
       })
       history.push(backUrl)
