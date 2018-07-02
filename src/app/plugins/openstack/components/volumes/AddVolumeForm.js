@@ -1,5 +1,5 @@
 import React from 'react'
-import PropTypes from 'prop-types'
+import { ADD_VOLUME, GET_VOLUMES } from './actions'
 import { Button } from '@material-ui/core'
 import ValidatedForm from 'core/common/ValidatedForm'
 import TextField from 'core/common/TextField'
@@ -11,8 +11,18 @@ const initialValue = {
   readonly: false,
 }
 
-const AddVolumeForm = ({ onSubmit }) =>
-  <ValidatedForm initialValue={initialValue} onSubmit={onSubmit}>
+const AddVolumeForm = ({ client, history }) =>
+  <ValidatedForm
+    initialValue={initialValue}
+    client={client}
+    history={history}
+    backUrl="/ui/openstack/volumes"
+    type="add"
+    addQuery={ADD_VOLUME}
+    getQuery={GET_VOLUMES}
+    str="volumes"
+    cacheStr="createVolume"
+  >
     <TextField id="name" label="Volume Name" />
     <TextField id="volume_type" label="Volume Type" />
     <TextField id="description" label="Description" />
@@ -27,11 +37,7 @@ const AddVolumeForm = ({ onSubmit }) =>
     <Checkbox id="attachedMode" label="Attached Mode" />
     <Checkbox id="readonly" label="Read only?" />
     <TextField id="metadata" label="Metadata" />
-    <Button type="submit" variant="raised">Add User</Button>
+    <Button type="submit" variant="raised">Add Volume</Button>
   </ValidatedForm>
-
-AddVolumeForm.propTypes = {
-  onSubmit: PropTypes.func.isRequired
-}
 
 export default AddVolumeForm

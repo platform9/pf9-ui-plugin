@@ -1,18 +1,23 @@
 import React from 'react'
-import PropTypes from 'prop-types'
+import { ADD_TENANT, GET_TENANTS } from './actions'
 import { Button } from '@material-ui/core'
 import ValidatedForm from 'core/common/ValidatedForm'
 import TextField from 'core/common/TextField'
 
-const AddTenantForm = ({ onSubmit }) =>
-  <ValidatedForm onSubmit={onSubmit}>
+const AddTenantForm = ({ client, history }) =>
+  <ValidatedForm
+    client={client}
+    history={history}
+    backUrl="/ui/openstack/tenants"
+    type="add"
+    addQuery={ADD_TENANT}
+    getQuery={GET_TENANTS}
+    str="tenants"
+    cacheStr="createTenant"
+  >
     <TextField id="name" label="Name" />
     <TextField id="description" label="Description" />
     <Button type="submit" variant="raised">Add Tenant</Button>
   </ValidatedForm>
-
-AddTenantForm.propTypes = {
-  onSubmit: PropTypes.func.isRequired
-}
 
 export default AddTenantForm
