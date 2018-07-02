@@ -1,45 +1,29 @@
 import React from 'react'
+import { Query } from 'react-apollo'
 import FormWrapper from 'core/common/FormWrapper'
 import UpdateUserForm from './UpdateUserForm'
 import { GET_USER } from './actions'
-import { compose, withApollo } from 'react-apollo'
 import requiresAuthentication from '../../util/requiresAuthentication'
 
 class UpdateUserPage extends React.Component {
-  componentDidMount () {
-    const { client } = this.props
-    const userId = this.props.match.params.userId
-
-    client.query({
-      query: GET_USER,
-      variables: {
-        id: userId
-      }
-    }).then((response) => {
-      const user = response.data.user
-      if (user) {
-        this.setState({ user })
-      }
-    })
-  }
-
   render () {
-    const user = this.state && this.state.user
+    const id = this.props.match.params.userId
 
     return (
-      <FormWrapper title="Update User" backUrl="/ui/openstack/users">
-        { user &&
-          <UpdateUserForm
-            user={user}
-            objId={this.props.match.params.userId}
-          />
+      <Query query={GET_USER} variables={{ id }}>
+        {({ data }) =>
+          <FormWrapper title="Update User" backUrl="/ui/openstack/users">
+            { data && data.user &&
+              <UpdateUserForm
+                user={data.user}
+                objId={id}
+              />
+            }
+          </FormWrapper>
         }
-      </FormWrapper>
+      </Query>
     )
   }
 }
 
-export default compose(
-  requiresAuthentication,
-  withApollo
-)(UpdateUserPage)
+export default requiresAuthentication(UpdateUserPage)

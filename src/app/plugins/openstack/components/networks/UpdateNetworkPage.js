@@ -11,18 +11,16 @@ class UpdateNetworkPage extends React.Component {
 
     return (
       <Query query={GET_NETWORK} variables={{ id }}>
-        {({ data }) => {
-          return (
-            <FormWrapper title="Update Network" backUrl="/ui/openstack/networks">
-              {data.network &&
-                <UpdateNetworkForm
-                  network={data.network}
-                  objId={id}
-                />
-              }
-            </FormWrapper>
-          )
-        }}
+        {({ data }) =>
+          <FormWrapper title="Update Network" backUrl="/ui/openstack/networks">
+            {data && data.network &&
+              <UpdateNetworkForm
+                network={data.network}
+                objId={id}
+              />
+            }
+          </FormWrapper>
+        }
       </Query>
     )
   }
