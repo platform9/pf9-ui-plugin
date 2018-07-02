@@ -4,10 +4,8 @@ export const GET_ROUTER = gql`
   query GetRouterById($id: ID!){
     router(id: $id) {
       id
-      tenant_id
       name
       admin_state_up
-      status
     }
   }
 `

@@ -1,56 +1,23 @@
 import React from 'react'
-import PropTypes from 'prop-types'
-import { Button, Checkbox, FormControl, TextField } from '@material-ui/core'
+import { UPDATE_ROUTER } from './actions'
+import { Button } from '@material-ui/core'
+import ValidatedForm from 'core/common/ValidatedForm'
+import TextField from 'core/common/TextField'
+import Checkbox from 'core/common/Checkbox'
 
-class UpdateRouterForm extends React.Component {
-  state = {
-    name: this.props.router.name || '',
-    admin_state_up: this.props.router.admin_state_up || false,
-  }
-
-  setField = field => event => this.setState({ [field]: event.target.value })
-
-  setCheckbox = field => event => this.setState({ [field]: event.target.checked })
-
-  fields = [
-    { id: 'name', label: 'Name' },
-    { id: 'admin_state_up', label: 'Admin State', type: 'checkbox' },
-  ]
-
-  renderField = ({ id, label, type = 'text' }) => {
-    if (type === 'text') {
-      return (
-        <div key={id}>
-          <TextField id={id} type={type} label={label} value={this.state[id]} onChange={this.setField(id)} />
-        </div>
-      )
-    } else if (type === 'checkbox') {
-      return (
-        <div key={id}>
-          <FormControl>{label}</FormControl>
-          <Checkbox checked={this.state[id]} onChange={this.setCheckbox(id)} value={id} />
-        </div>
-      )
-    }
-  }
-
-  handleSubmit = event => {
-    event.preventDefault()
-    this.props.onSubmit(this.state)
-  }
-
-  render () {
-    return (
-      <form onSubmit={this.handleSubmit}>
-        {this.fields.map(this.renderField)}
-        <Button variant="raised" type="submit">Submit</Button>
-      </form>
-    )
-  }
-}
-
-UpdateRouterForm.propTypes = {
-  onSubmit: PropTypes.func.isRequired
-}
+const UpdateRouterForm = ({ router, client, history, workId }) =>
+  <ValidatedForm
+    initialValue={router}
+    client={client}
+    history={history}
+    workId={workId}
+    updateQuery={UPDATE_ROUTER}
+    type="update"
+    backUrl="/ui/openstack/routers"
+  >
+    <TextField id="name" label="name" />
+    <Checkbox id="admin_state_up" label="Admin State" />
+    <Button type="submit" variant="raised">Update Router</Button>
+  </ValidatedForm>
 
 export default UpdateRouterForm
