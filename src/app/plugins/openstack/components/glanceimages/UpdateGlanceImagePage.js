@@ -1,5 +1,4 @@
 import React from 'react'
-import { withRouter } from 'react-router-dom'
 import FormWrapper from 'core/common/FormWrapper'
 import UpdateGlanceImageForm from './UpdateGlanceImageForm'
 import { GET_GLANCEIMAGE } from './actions'
@@ -32,9 +31,7 @@ class UpdateGlanceImagePage extends React.Component {
         { glanceImage &&
           <UpdateGlanceImageForm
             glanceImage={glanceImage}
-            client={this.props.client}
-            history={this.props.history}
-            workId={this.props.match.params.glanceImageId}
+            objId={this.props.match.params.glanceImageId}
           />
         }
       </FormWrapper>
@@ -44,6 +41,5 @@ class UpdateGlanceImagePage extends React.Component {
 
 export default compose(
   requiresAuthentication,
-  withRouter,
   withApollo
 )(UpdateGlanceImagePage)

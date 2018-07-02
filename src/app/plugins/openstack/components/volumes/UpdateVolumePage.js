@@ -1,5 +1,4 @@
 import React from 'react'
-import { withRouter } from 'react-router-dom'
 import FormWrapper from 'core/common/FormWrapper'
 import UpdateVolumeForm from './UpdateVolumeForm'
 import { GET_VOLUME } from './actions'
@@ -32,9 +31,7 @@ class UpdateVolumePage extends React.Component {
         { volume &&
           <UpdateVolumeForm
             volume={volume}
-            client={this.props.client}
-            history={this.props.history}
-            workId={this.props.match.params.volumeId}
+            objId={this.props.match.params.volumeId}
           />
         }
       </FormWrapper>
@@ -44,6 +41,5 @@ class UpdateVolumePage extends React.Component {
 
 export default compose(
   requiresAuthentication,
-  withRouter,
   withApollo
 )(UpdateVolumePage)

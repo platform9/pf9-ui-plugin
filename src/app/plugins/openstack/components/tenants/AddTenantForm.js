@@ -4,16 +4,14 @@ import { Button } from '@material-ui/core'
 import ValidatedForm from 'core/common/ValidatedForm'
 import TextField from 'core/common/TextField'
 
-const AddTenantForm = ({ client, history }) =>
+const AddTenantForm = () =>
   <ValidatedForm
-    client={client}
-    history={history}
     backUrl="/ui/openstack/tenants"
-    type="add"
+    action="add"
     addQuery={ADD_TENANT}
     getQuery={GET_TENANTS}
-    str="tenants"
-    cacheStr="createTenant"
+    objType="tenants"
+    cacheQuery="createTenant"
   >
     <TextField id="name" label="Name" />
     <TextField id="description" label="Description" />

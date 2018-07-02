@@ -1,5 +1,8 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { filterFields } from 'core/fp'
+import { withRouter } from 'react-router-dom'
+import { compose, withApollo } from 'react-apollo'
 
 const ValidatedFormContext = React.createContext({})
 
@@ -61,12 +64,12 @@ class ValidatedForm extends React.Component {
   }
 
   handleSubmit = event => {
-    const { type } = this.props
+    const { action } = this.props
     event.preventDefault()
 
     if (!this.validateForm()) { return }
 
-    switch (type) {
+    switch (action) {
       case 'add':
         this.handleAdd()
         break
@@ -80,7 +83,7 @@ class ValidatedForm extends React.Component {
   }
 
   handleAdd = () => {
-    const { client, history, addQuery, getQuery, backUrl, str, cacheStr } = this.props
+    const { client, history, addQuery, getQuery, backUrl, objType, cacheQuery } = this.props
     try {
       client.mutate({
         mutation: addQuery,
@@ -89,7 +92,7 @@ class ValidatedForm extends React.Component {
         },
         update: (proxy, { data }) => {
           const tempData = proxy.readQuery({ query: getQuery })
-          tempData[str].push(data[cacheStr])
+          tempData[objType].push(data[cacheQuery])
           proxy.writeQuery({ query: getQuery, data: tempData })
         }
       })
@@ -100,12 +103,12 @@ class ValidatedForm extends React.Component {
   }
 
   handleUpdate = inputObj => {
-    const { client, history, workId, updateQuery, backUrl } = this.props
+    const { client, history, objId, updateQuery, backUrl } = this.props
     try {
       client.mutate({
         mutation: updateQuery,
         variables: {
-          id: workId,
+          id: objId,
           input: inputObj
         }
       })
@@ -126,7 +129,29 @@ class ValidatedForm extends React.Component {
   }
 }
 
-export default ValidatedForm
+ValidatedForm.propTypes = {
+  // GraphQl query to add an object
+  addQuery: PropTypes.object,
+  // GraphQl query to get an object
+  getQuery: PropTypes.object,
+  // GraphQl query to update an object
+  updateQuery: PropTypes.object,
+  // Action to take(add/delete/update)
+  action: PropTypes.string,
+  // Url to go back when the operation ends
+  backUrl: PropTypes.string.isRequired,
+  // Type of objects to operate
+  objType: PropTypes.string,
+  // String of query to cache
+  cacheQuery: PropTypes.string,
+  // Id of object to update
+  objId: PropTypes.string
+}
+
+export default compose(
+  withRouter,
+  withApollo
+)(ValidatedForm)
 
 /**
  * withFormContext provides access to the form context through props.

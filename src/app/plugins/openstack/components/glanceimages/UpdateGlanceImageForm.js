@@ -5,14 +5,12 @@ import ValidatedForm from 'core/common/ValidatedForm'
 import TextField from 'core/common/TextField'
 import Checkbox from 'core/common/Checkbox'
 
-const UpdateGlanceImageForm = ({ glanceImage, client, history, workId }) =>
+const UpdateGlanceImageForm = ({ glanceImage, objId }) =>
   <ValidatedForm
     initialValue={glanceImage}
-    client={client}
-    history={history}
-    workId={workId}
+    objId={objId}
     updateQuery={UPDATE_GLANCEIMAGE}
-    type="update"
+    action="update"
     backUrl="/ui/openstack/glanceimages"
   >
     <TextField id="name" label="Name" />

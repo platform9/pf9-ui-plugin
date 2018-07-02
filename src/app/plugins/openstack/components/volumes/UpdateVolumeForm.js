@@ -5,14 +5,12 @@ import ValidatedForm from 'core/common/ValidatedForm'
 import TextField from 'core/common/TextField'
 import Checkbox from 'core/common/Checkbox'
 
-const UpdateVolumeForm = ({ volume, client, history, workId }) =>
+const UpdateVolumeForm = ({ volume, objId }) =>
   <ValidatedForm
     initialValue={volume}
-    client={client}
-    history={history}
-    workId={workId}
+    objId={objId}
     updateQuery={UPDATE_VOLUME}
-    type="update"
+    action="update"
     backUrl="/ui/openstack/volumes"
   >
     <TextField id="name" label="Volume Name" />

@@ -8,15 +8,13 @@ import TextField from 'core/common/TextField'
 // As of Chrome 66, Google has disabled the NoAutofillHack and still does
 // not respect the HTML spec for autocomplete="off".  After some experimentation
 // it looks like autocomplete="new-password" works.
-const UpdateUserForm = ({ user, client, history, workId }) =>
+const UpdateUserForm = ({ user, objId }) =>
   <ValidatedForm
     initialValue={user}
     autoComplete="new-password"
-    client={client}
-    history={history}
-    workId={workId}
+    objId={objId}
     updateQuery={UPDATE_USER}
-    type="update"
+    action="update"
     backUrl="/ui/openstack/users"
   >
     <NoAutofillHack />

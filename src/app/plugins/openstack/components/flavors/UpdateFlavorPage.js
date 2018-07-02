@@ -1,5 +1,4 @@
 import React from 'react'
-import { withRouter } from 'react-router-dom'
 import FormWrapper from 'core/common/FormWrapper'
 import UpdateFlavorForm from './UpdateFlavorForm'
 import { GET_FLAVOR } from './actions'
@@ -32,9 +31,7 @@ class UpdateFlavorPage extends React.Component {
         { flavor &&
           <UpdateFlavorForm
             flavor={flavor}
-            client={this.props.client}
-            history={this.props.history}
-            workId={this.props.match.params.flavorId}
+            objId={this.props.match.params.flavorId}
           />
         }
       </FormWrapper>
@@ -44,6 +41,5 @@ class UpdateFlavorPage extends React.Component {
 
 export default compose(
   requiresAuthentication,
-  withRouter,
   withApollo
 )(UpdateFlavorPage)

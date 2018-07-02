@@ -4,14 +4,12 @@ import { Button } from '@material-ui/core'
 import ValidatedForm from 'core/common/ValidatedForm'
 import TextField from 'core/common/TextField'
 
-const UpdateFlavorForm = ({ flavor, client, history, workId }) =>
+const UpdateFlavorForm = ({ flavor, objId }) =>
   <ValidatedForm
     initialValue={flavor}
-    client={client}
-    history={history}
-    workId={workId}
+    objId={objId}
     updateQuery={UPDATE_FLAVOR}
-    type="update"
+    action="update"
     backUrl="/ui/openstack/flavors"
   >
     <TextField id="name" label="Name" disabled />

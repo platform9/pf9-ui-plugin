@@ -1,5 +1,4 @@
 import React from 'react'
-import { withRouter } from 'react-router-dom'
 import FormWrapper from 'core/common/FormWrapper'
 import UpdateUserForm from './UpdateUserForm'
 import { GET_USER } from './actions'
@@ -32,9 +31,7 @@ class UpdateUserPage extends React.Component {
         { user &&
           <UpdateUserForm
             user={user}
-            client={this.props.client}
-            history={this.props.history}
-            workId={this.props.match.params.userId}
+            objId={this.props.match.params.userId}
           />
         }
       </FormWrapper>
@@ -44,6 +41,5 @@ class UpdateUserPage extends React.Component {
 
 export default compose(
   requiresAuthentication,
-  withRouter,
   withApollo
 )(UpdateUserPage)

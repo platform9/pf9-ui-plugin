@@ -1,5 +1,4 @@
 import React from 'react'
-import { withRouter } from 'react-router-dom'
 import { compose, withApollo } from 'react-apollo'
 import { GET_NETWORK } from './actions'
 import FormWrapper from 'core/common/FormWrapper'
@@ -32,9 +31,7 @@ class UpdateNetworkPage extends React.Component {
         {network &&
           <UpdateNetworkForm
             network={network}
-            client={this.props.client}
-            history={this.props.history}
-            workId={this.props.match.params.networkId}
+            objId={this.props.match.params.networkId}
           />
         }
       </FormWrapper>
@@ -44,6 +41,5 @@ class UpdateNetworkPage extends React.Component {
 
 export default compose(
   requiresAuthentication,
-  withRouter,
   withApollo
 )(UpdateNetworkPage)

@@ -12,17 +12,15 @@ const initialValue = {
   status: ''
 }
 
-const AddRouterForm = ({ client, history }) =>
+const AddRouterForm = () =>
   <ValidatedForm
     initialValue={initialValue}
-    client={client}
-    history={history}
     backUrl="/ui/openstack/routers"
-    type="add"
+    action="add"
     addQuery={ADD_ROUTER}
     getQuery={GET_ROUTERS}
-    str="routers"
-    cacheStr="createRouter"
+    objType="routers"
+    cacheQuery="createRouter"
   >
     <TextField id="name" label="Name" />
     <TextField id="tenant_id" label="Tenant ID" />

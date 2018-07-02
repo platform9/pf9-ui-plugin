@@ -11,17 +11,15 @@ const initialValue = {
   readonly: false,
 }
 
-const AddVolumeForm = ({ client, history }) =>
+const AddVolumeForm = () =>
   <ValidatedForm
     initialValue={initialValue}
-    client={client}
-    history={history}
     backUrl="/ui/openstack/volumes"
-    type="add"
+    action="add"
     addQuery={ADD_VOLUME}
     getQuery={GET_VOLUMES}
-    str="volumes"
-    cacheStr="createVolume"
+    objType="volumes"
+    cacheQuery="createVolume"
   >
     <TextField id="name" label="Volume Name" />
     <TextField id="volume_type" label="Volume Type" />

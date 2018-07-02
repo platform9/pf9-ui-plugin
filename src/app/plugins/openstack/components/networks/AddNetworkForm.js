@@ -16,17 +16,15 @@ const initialValue = {
   status: ''
 }
 
-const AddNetworkForm = ({ client, history }) =>
+const AddNetworkForm = () =>
   <ValidatedForm
     initialValue={initialValue}
-    client={client}
-    history={history}
     backUrl="/ui/openstack/networks"
-    type="add"
+    action="add"
     addQuery={ADD_NETWORK}
     getQuery={GET_NETWORKS}
-    str="networks"
-    cacheStr="createNetwork"
+    objType="networks"
+    cacheQuery="createNetwork"
   >
     <TextField id="name" label="Name" />
     <TextField id="subnets" label="Subnets Associated" />

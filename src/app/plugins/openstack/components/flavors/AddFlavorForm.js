@@ -12,17 +12,15 @@ const initialValue = {
   public: false,
 }
 
-const AddFlavorForm = ({ client, history }) =>
+const AddFlavorForm = () =>
   <ValidatedForm
     initialValue={initialValue}
-    client={client}
-    history={history}
     backUrl="/ui/openstack/flavors"
-    type="add"
+    action="add"
     addQuery={ADD_FLAVOR}
     getQuery={GET_FLAVORS}
-    str="flavors"
-    cacheStr="createFlavor"
+    objType="flavors"
+    cacheQuery="createFlavor"
   >
     <TextField id="name" label="Name" />
     <TextField id="vcpus" label="VCPUs" type="number" />

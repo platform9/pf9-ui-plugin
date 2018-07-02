@@ -5,14 +5,12 @@ import ValidatedForm from 'core/common/ValidatedForm'
 import TextField from 'core/common/TextField'
 import Checkbox from 'core/common/Checkbox'
 
-const UpdateNetworkForm = ({ network, client, history, workId }) =>
+const UpdateNetworkForm = ({ network, objId }) =>
   <ValidatedForm
     initialValue={network}
-    client={client}
-    history={history}
-    workId={workId}
+    objId={objId}
     updateQuery={UPDATE_NETWORK}
-    type="update"
+    action="update"
     backUrl="/ui/openstack/networks"
   >
     <TextField id="name" label="Name" />
