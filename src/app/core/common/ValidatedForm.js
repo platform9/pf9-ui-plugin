@@ -1,4 +1,5 @@
 import React from 'react'
+import { filterFields } from 'core/fp'
 
 const ValidatedFormContext = React.createContext({})
 
@@ -70,9 +71,7 @@ class ValidatedForm extends React.Component {
         this.handleAdd()
         break
       case `update`:
-        let inputObj = {...this.state.value}
-        delete inputObj.id
-        delete inputObj.__typename
+        let inputObj = filterFields('id', '__typename')(this.state.value)
         this.handleUpdate(inputObj)
         break
       default:
