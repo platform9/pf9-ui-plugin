@@ -1,45 +1,31 @@
 import React from 'react'
-import { compose, withApollo } from 'react-apollo'
+import { Query } from 'react-apollo'
 import { GET_NETWORK } from './actions'
 import FormWrapper from 'core/common/FormWrapper'
 import UpdateNetworkForm from './UpdateNetworkForm'
 import requiresAuthentication from '../../util/requiresAuthentication'
 
 class UpdateNetworkPage extends React.Component {
-  componentDidMount () {
-    const { client } = this.props
-    const networkId = this.props.match.params.networkId
-
-    client.query({
-      query: GET_NETWORK,
-      variables: {
-        id: networkId
-      }
-    }).then((response) => {
-      const network = response.data.network
-      if (network) {
-        this.setState({ network })
-      }
-    })
-  }
-
   render () {
-    const network = this.state && this.state.network
+    const id = this.props.match.params.networkId
 
     return (
-      <FormWrapper title="Update Network" backUrl="/ui/openstack/networks">
-        {network &&
-          <UpdateNetworkForm
-            network={network}
-            objId={this.props.match.params.networkId}
-          />
-        }
-      </FormWrapper>
+      <Query query={GET_NETWORK} variables={{ id }}>
+        {({ data }) => {
+          return (
+            <FormWrapper title="Update Network" backUrl="/ui/openstack/networks">
+              {data.network &&
+                <UpdateNetworkForm
+                  network={data.network}
+                  objId={id}
+                />
+              }
+            </FormWrapper>
+          )
+        }}
+      </Query>
     )
   }
 }
 
-export default compose(
-  requiresAuthentication,
-  withApollo
-)(UpdateNetworkPage)
+export default requiresAuthentication(UpdateNetworkPage)
