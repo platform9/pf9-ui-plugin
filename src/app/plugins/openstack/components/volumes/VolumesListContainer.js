@@ -1,9 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-
-import { withApollo } from 'react-apollo'
 import CRUDListContainer from 'core/common/CRUDListContainer'
-
 import VolumesList from './VolumesList'
 import { GET_VOLUMES, REMOVE_VOLUME } from './actions'
 
@@ -12,8 +9,7 @@ class VolumesListContainer extends React.Component {
     return (
       <CRUDListContainer
         items={this.props.volumes}
-        str="volumes"
-        client={this.props.client}
+        objType="volumes"
         getQuery={GET_VOLUMES}
         removeQuery={REMOVE_VOLUME}
         addUrl="/ui/openstack/volumes/add"
@@ -36,4 +32,4 @@ VolumesListContainer.propTypes = {
   volumes: PropTypes.arrayOf(PropTypes.object)
 }
 
-export default withApollo(VolumesListContainer)
+export default VolumesListContainer

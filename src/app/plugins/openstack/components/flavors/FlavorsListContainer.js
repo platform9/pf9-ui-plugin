@@ -1,9 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-
-import { withApollo } from 'react-apollo'
 import CRUDListContainer from 'core/common/CRUDListContainer'
-
 import FlavorsList from './FlavorsList'
 import { GET_FLAVORS, REMOVE_FLAVOR } from './actions'
 
@@ -12,8 +9,7 @@ class FlavorsListContainer extends React.Component {
     return (
       <CRUDListContainer
         items={this.props.flavors}
-        str="flavors"
-        client={this.props.client}
+        objType="flavors"
         getQuery={GET_FLAVORS}
         removeQuery={REMOVE_FLAVOR}
         addUrl="/ui/openstack/flavors/add"
@@ -35,4 +31,4 @@ class FlavorsListContainer extends React.Component {
 FlavorsListContainer.propTypes = {
   flavors: PropTypes.arrayOf(PropTypes.object)
 }
-export default withApollo(FlavorsListContainer)
+export default FlavorsListContainer

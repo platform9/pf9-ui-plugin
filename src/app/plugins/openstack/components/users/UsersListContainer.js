@@ -1,9 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-
-import { withApollo } from 'react-apollo'
 import CRUDListContainer from 'core/common/CRUDListContainer'
-
 import UsersList from './UsersList'
 import { GET_USERS, REMOVE_USER } from './actions'
 
@@ -12,8 +9,7 @@ class UsersListContainer extends React.Component {
     return (
       <CRUDListContainer
         items={this.props.users}
-        str="users"
-        client={this.props.client}
+        objType="users"
         getQuery={GET_USERS}
         removeQuery={REMOVE_USER}
         addUrl="/ui/openstack/users/add"
@@ -36,4 +32,4 @@ UsersListContainer.propTypes = {
   users: PropTypes.arrayOf(PropTypes.object)
 }
 
-export default withApollo(UsersListContainer)
+export default UsersListContainer

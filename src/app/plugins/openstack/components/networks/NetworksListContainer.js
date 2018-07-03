@@ -1,9 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-
-import { withApollo } from 'react-apollo'
 import CRUDListContainer from 'core/common/CRUDListContainer'
-
 import NetworksList from './NetworksList'
 import { GET_NETWORKS, REMOVE_NETWORK } from './actions'
 
@@ -12,8 +9,7 @@ class NetworksListContainer extends React.Component {
     return (
       <CRUDListContainer
         items={this.props.networks}
-        str="networks"
-        client={this.props.client}
+        objType="networks"
         getQuery={GET_NETWORKS}
         removeQuery={REMOVE_NETWORK}
         addUrl="/ui/openstack/networks/add"
@@ -36,4 +32,4 @@ NetworksListContainer.propTypes = {
   networks: PropTypes.arrayOf(PropTypes.object)
 }
 
-export default withApollo(NetworksListContainer)
+export default NetworksListContainer

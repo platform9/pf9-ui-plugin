@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { withApollo } from 'react-apollo'
 import CRUDListContainer from 'core/common/CRUDListContainer'
 import GlanceImageList from './GlanceImageList'
 import { GET_GLANCEIMAGES, REMOVE_GLANCEIMAGE } from './actions'
@@ -10,8 +9,7 @@ class GlanceImageContainer extends React.Component {
     return (
       <CRUDListContainer
         items={this.props.glanceImages}
-        str="glanceImages"
-        client={this.props.client}
+        objType="glanceImages"
         getQuery={GET_GLANCEIMAGES}
         removeQuery={REMOVE_GLANCEIMAGE}
         addUrl="/ui/openstack/glanceimages/add"
@@ -34,4 +32,4 @@ GlanceImageContainer.propTypes = {
   glanceImages: PropTypes.arrayOf(PropTypes.object)
 }
 
-export default withApollo(GlanceImageContainer)
+export default GlanceImageContainer

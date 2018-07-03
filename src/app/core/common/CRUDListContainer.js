@@ -1,9 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { withRouter } from 'react-router-dom'
+import { compose, withApollo } from 'react-apollo'
 import ConfirmationDialog from './ConfirmationDialog'
 
-@withRouter
 class CRUDListContainer extends React.Component {
   state = {
     showConfirmation: false,
@@ -31,20 +31,21 @@ class CRUDListContainer extends React.Component {
   }
 
   handleDeleteConfirm = () => {
+    const { client, objType, removeQuery, getQuery } = this.props
     this.setState({ showConfirmation: false })
     const items = this.state.selectedItems || []
-    items.forEach(item => this.handleRemove(item.id, this.props.str, this.props.removeQuery, this.props.getQuery))
+    items.forEach(item => this.handleRemove(client, item.id, objType, removeQuery, getQuery))
     this.setState({ selectedItems: [] })
     this.resolveDelete()
   }
 
-  handleRemove = async (id, str, removeQuery, getQuery) => {
-    this.props.client.mutate({
+  handleRemove = async (client, id, objType, removeQuery, getQuery) => {
+    client.mutate({
       mutation: removeQuery,
       variables: { id },
       update: cache => {
         const data = cache.readQuery({ query: getQuery })
-        data[str] = data[str].filter(x => x.id !== id)
+        data[objType] = data[objType].filter(x => x.id !== id)
         cache.writeQuery({ query: getQuery, data })
       }
     })
@@ -87,4 +88,7 @@ CRUDListContainer.propTypes = {
   editUrl: PropTypes.string,
 }
 
-export default CRUDListContainer
+export default compose(
+  withRouter,
+  withApollo
+)(CRUDListContainer)
