@@ -11,8 +11,7 @@ import {
   ListItemText,
   MenuItem,
   MenuList,
-  Toolbar,
-  Typography
+  Toolbar
 } from '@material-ui/core'
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
 import MenuIcon from '@material-ui/icons/Menu'
@@ -51,8 +50,8 @@ const styles = theme => ({
     marginRight: drawerWidth,
   },
   menuButton: {
-    marginLeft: 12,
-    marginRight: 20,
+    marginLeft: theme.spacing.unit * 1.5,
+    marginRight: theme.spacing.unit
   },
   hide: {
     display: 'none',
@@ -99,6 +98,9 @@ const styles = theme => ({
   'contentShift-right': {
     marginRight: 0,
   },
+  logo: {
+    maxHeight: theme.spacing.unit * 6.5
+  }
 })
 
 @withStyles(styles, { withTheme: true })
@@ -160,16 +162,14 @@ class Navbar extends React.Component {
           >
             <Toolbar disableGutters={!open}>
               <IconButton
-                color="default"
+                color="inherit"
                 aria-label="open drawer"
                 onClick={this.handleDrawerOpen}
                 className={classNames(classes.menuButton, open && classes.hide)}
               >
                 <MenuIcon />
               </IconButton>
-              <Typography variant="title" color="inherit" noWrap>
-                Platform9
-              </Typography>
+              <img src="/images/logo.png" className={classes.logo} align="middle" />
             </Toolbar>
           </AppBar>
           {drawer}
