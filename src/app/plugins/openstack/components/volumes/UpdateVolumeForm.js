@@ -11,7 +11,7 @@ const UpdateVolumeForm = ({ volume, objId }) =>
     objId={objId}
     updateQuery={UPDATE_VOLUME}
     action="update"
-    backUrl="/ui/openstack/volumes"
+    backUrl="/ui/openstack/storage#volumes"
   >
     <TextField id="name" label="Volume Name" />
     <TextField id="description" label="Description" />

@@ -6,7 +6,7 @@ import requiresAuthentication from '../../util/requiresAuthentication'
 class AddVolumePage extends React.Component {
   render () {
     return (
-      <FormWrapper title="Add Volume" backUrl="/ui/openstack/volumes">
+      <FormWrapper title="Add Volume" backUrl="/ui/openstack/storage#volumes">
         <AddVolumeForm />
       </FormWrapper>
     )

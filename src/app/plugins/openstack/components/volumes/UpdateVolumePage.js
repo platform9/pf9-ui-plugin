@@ -12,7 +12,7 @@ class UpdateVolumePage extends React.Component {
     return (
       <Query query={GET_VOLUME} variables={{ id }}>
         {({ data }) =>
-          <FormWrapper title="Update Volume" backUrl="/ui/openstack/volumes">
+          <FormWrapper title="Update Volume" backUrl="/ui/openstack/storage#volumes">
             { data && data.volume &&
               <UpdateVolumeForm
                 volume={data.volume}

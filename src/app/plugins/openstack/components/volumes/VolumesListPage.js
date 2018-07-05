@@ -11,7 +11,6 @@ const VolumesListPage =
   ({ data, loading, error }) => {
     return (
       <div>
-        <h1>Volumes Page</h1>
         {loading && <Loader />}
         {error && <DisplayError error={error} />}
         {data && <VolumesListContainer volumes={data.volumes} />}

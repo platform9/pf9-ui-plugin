@@ -14,7 +14,7 @@ const initialValue = {
 const AddVolumeForm = () =>
   <ValidatedForm
     initialValue={initialValue}
-    backUrl="/ui/openstack/volumes"
+    backUrl="/ui/openstack/storage#volumes"
     action="add"
     addQuery={ADD_VOLUME}
     getQuery={GET_VOLUMES}

@@ -23,6 +23,7 @@ import RoutersPage from './components/routers/RoutersListPage'
 import AddRouterPage from './components/routers/AddRouterPage'
 import UpdateRouterPage from './components/routers/UpdateRouterPage'
 
+import StorageIndex from './components/volumes/StorageIndex'
 import VolumesListPage from './components/volumes/VolumesListPage'
 import AddVolumePage from './components/volumes/AddVolumePage'
 import UpdateVolumePage from './components/volumes/UpdateVolumePage'
@@ -141,18 +142,23 @@ OpenStack.registerPlugin = pluginManager => {
         component: ApiAccessPage
       },
       {
+        name: 'storage',
+        link: { path: '/storage', exact: true },
+        component: StorageIndex
+      },
+      {
         name: 'Volumes',
-        link: { path: '/volumes', exact: true },
+        link: { path: '/storage#volumes', exact: true },
         component: VolumesListPage
       },
       {
         name: 'AddVolume',
-        link: { path: '/volumes/add', exact: true },
+        link: { path: '/storage/volumes/add', exact: true },
         component: AddVolumePage
       },
       {
         name: 'EditVolume',
-        link: { path: '/volumes/edit/:volumeId', exact: true },
+        link: { path: '/storage/volumes/edit/:volumeId', exact: true },
         component: UpdateVolumePage
       },
       {
@@ -206,7 +212,7 @@ OpenStack.registerPlugin = pluginManager => {
       },
       {
         name: 'Volumes',
-        link: { path: '/volumes' },
+        link: { path: '/storage' },
       },
       {
         name: 'Glance Images',

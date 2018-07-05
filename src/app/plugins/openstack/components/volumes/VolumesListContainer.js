@@ -12,8 +12,8 @@ class VolumesListContainer extends React.Component {
         objType="volumes"
         getQuery={GET_VOLUMES}
         removeQuery={REMOVE_VOLUME}
-        addUrl="/ui/openstack/volumes/add"
-        editUrl="/ui/openstack/volumes/edit"
+        addUrl="/ui/openstack/storage/volumes/add"
+        editUrl="/ui/openstack/storage/volumes/edit"
       >
         {({ onDelete, onAdd, onEdit }) => (
           <VolumesList
