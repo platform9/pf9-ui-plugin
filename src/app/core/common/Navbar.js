@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/core/styles'
 import { withRouter } from 'react-router'
+import { rootPath } from '../globals'
 import classNames from 'classnames'
 import {
   AppBar,
@@ -131,6 +132,7 @@ class Navbar extends React.Component {
   render () {
     const { classes, links } = this.props
     const { open } = this.state
+    const logoPath = rootPath+'images/logo.png'
 
     const drawer = (
       <Drawer
@@ -169,7 +171,7 @@ class Navbar extends React.Component {
               >
                 <MenuIcon />
               </IconButton>
-              <img src="/images/logo.png" className={classes.logo} align="middle" />
+              <img src={logoPath} className={classes.logo} align="middle" />
             </Toolbar>
           </AppBar>
           {drawer}

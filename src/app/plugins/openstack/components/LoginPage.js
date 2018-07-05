@@ -4,6 +4,7 @@ import { compose } from 'redux'
 import Session from '../actions/session'
 import { withRouter } from 'react-router'
 import { withStyles } from '@material-ui/core/styles'
+import { rootPath } from 'core/globals'
 import {
   Button,
   Checkbox,
@@ -163,12 +164,13 @@ export class LoginPage extends React.Component {
 
   render () {
     const { classes } = this.props
+    const logoPath = rootPath+'images/logo-color.png'
     return (
       <div className="login-page">
         <Grid container justify="center" className={classes.root}>
           <Grid item md={4} lg={3}>
             <Paper className={classes.paper}>
-              <img src="/images/logo-color.png" className={classes.img} />
+              <img src={logoPath} className={classes.img} />
               <form className={classes.form} onSubmit={this.performLogin}>
                 <Typography variant="subheading" align="center">
                   Please sign in
