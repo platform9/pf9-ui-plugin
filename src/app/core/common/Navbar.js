@@ -11,14 +11,17 @@ import {
   Divider,
   Drawer,
   IconButton,
+  InputAdornment,
   ListItemText,
   Menu,
   MenuItem,
   MenuList,
+  TextField,
   Toolbar,
   Typography
 } from '@material-ui/core'
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
+import SearchIcon from '@material-ui/icons/Search'
 import MenuIcon from '@material-ui/icons/Menu'
 import { LOCAL_STORAGE_NAMESPACE } from './pf9-storage'
 
@@ -107,9 +110,19 @@ const styles = theme => ({
   logo: {
     maxHeight: theme.spacing.unit * 6.5
   },
-  avatar: {
+  rightTools: {
     position: 'absolute',
-    right: 0
+    right: theme.spacing.unit * 2,
+    display: 'flex',
+    alignItems: 'center'
+  },
+  avatar: {
+    position: 'relative',
+    float: 'right'
+  },
+  selector: {
+    position: 'relative',
+    float: 'right'
   },
   avatarImg: {
     backgroundColor: theme.palette.primary.dark,
@@ -117,6 +130,10 @@ const styles = theme => ({
     fontSize: theme.spacing.unit * 2,
     height: theme.spacing.unit * 3,
     width: theme.spacing.unit * 3
+  },
+  menuSearch: {
+    outline: 'none',
+    padding: theme.spacing.unit * 2
   }
 })
 
@@ -126,7 +143,9 @@ class Navbar extends React.Component {
   state = {
     open: false,
     anchor: 'left',
-    anchorEl: null
+    anchorEl: null,
+    tenantAnchor: null,
+    regionAnchor: null
   }
 
   handleDrawerOpen = () => {
@@ -145,6 +164,22 @@ class Navbar extends React.Component {
     this.setState({ anchorEl: null })
   }
 
+  handleTenantClick = event => {
+    this.setState({ tenantAnchor: event.currentTarget })
+  }
+
+  handleTenantClose = () => {
+    this.setState({ tenantAnchor: null })
+  }
+
+  handleRegionClick = event => {
+    this.setState({ regionAnchor: event.currentTarget })
+  }
+
+  handleRegionClose = () => {
+    this.setState({ regionAnchor: null })
+  }
+
   navTo = link => () => {
     this.props.history.push(link)
     // this.setState({ open: false })
@@ -154,9 +189,84 @@ class Navbar extends React.Component {
     <MenuItem onClick={this.navTo(link.path)} key={link.path}><ListItemText primary={name} /></MenuItem>
   )
 
+  renderSelector = (name, list) => {
+    const { classes } = this.props
+    const selectorAnchor= name === 'Tenant'? this.state.tenantAnchor : this.state.regionAnchor
+    const selectorName = name+'-selector'
+    const clickFunc = name === 'Tenant'? this.handleTenantClick : this.handleRegionClick
+    const closeFunc = name === 'Tenant'? this.handleTenantClose : this.handleRegionClose
+    return <div className={classes.selector}>
+      <Button
+        aria-owns={selectorAnchor ? selectorName : null}
+        aria-haspopup="true"
+        onClick={clickFunc}
+        color="inherit"
+        disableRipple
+      >
+        <Typography color="inherit" variant="body1">
+          Current {name}  &#9662;
+        </Typography>
+      </Button>
+      <Menu
+        id={selectorName}
+        anchorEl={selectorAnchor}
+        open={Boolean(selectorAnchor)}
+        onClose={closeFunc}
+        getContentAnchorEl={null}
+        anchorOrigin={{vertical: 'bottom', horizontal: 'left'}}
+      >
+        <TextField
+          placeholder={'Search '+name}
+          className={classes.menuSearch}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+          }}
+        />
+        {list.map(item => (<MenuItem onClick={closeFunc} key={item}>{item}</MenuItem>))}
+      </Menu>
+    </div>
+  }
+
+  renderAvatar = () => {
+    const userName = JSON.parse(localStorage.getItem(LOCAL_STORAGE_NAMESPACE)).username
+    const { classes } = this.props
+    const { anchorEl } = this.state
+
+    return <div className={classes.avatar}>
+      <Button
+        aria-owns={anchorEl ? 'user-menu' : null}
+        aria-haspopup="true"
+        onClick={this.handleClick}
+        color="inherit"
+        disableRipple
+      >
+        <Avatar className={classes.avatarImg}>{userName.charAt(0)}</Avatar>
+        <Typography color="inherit" variant="body1">
+          {userName}
+        </Typography>
+      </Button>
+      <Menu
+        id="user-menu"
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={this.handleClose}
+        getContentAnchorEl={null}
+        anchorOrigin={{vertical: 'bottom', horizontal: 'left'}}
+      >
+        <MenuItem onClick={this.handleClose}>Change Password</MenuItem>
+        <MenuItem onClick={this.handleClose}>SSH Keys</MenuItem>
+        <MenuItem onClick={this.handleClose}>Sign Out</MenuItem>
+      </Menu>
+    </div>
+  }
+
   render () {
     const { classes, links } = this.props
-    const { open, anchorEl } = this.state
+    const { open } = this.state
     const logoPath = rootPath+'images/logo.png'
     const userName = JSON.parse(localStorage.getItem(LOCAL_STORAGE_NAMESPACE)).username || ''
 
@@ -226,7 +336,13 @@ class Navbar extends React.Component {
                 <MenuIcon />
               </IconButton>
               <img src={logoPath} className={classes.logo} align="middle" />
-              {localStorage[LOCAL_STORAGE_NAMESPACE] && avatar}
+              {localStorage[LOCAL_STORAGE_NAMESPACE] &&
+                <div className={classes.rightTools}>
+                  {this.renderSelector('Region', [`AWS-US-West-1-Test`, `KVM-Neutron`])}
+                  {this.renderSelector('Tenant', [`Dev Team Tenant`, `Test Tenant`])}
+                  {this.renderAvatar()}
+                </div>
+              }
             </Toolbar>
           </AppBar>
           {drawer}
