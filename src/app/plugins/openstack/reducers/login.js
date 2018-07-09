@@ -2,6 +2,7 @@ import {
   START_LOGIN,
   LOGIN_SUCCEEDED,
   LOGIN_FAILED,
+  LOG_OUT,
 } from '../actions/login'
 
 const initialState = {
@@ -35,6 +36,9 @@ const reducer = (state = initialState, action) => {
         startLogin: false,
         loginFailed: true,
       }
+
+    case LOG_OUT:
+      return initialState
 
     default:
       return state

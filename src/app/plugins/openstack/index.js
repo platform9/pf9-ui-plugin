@@ -2,7 +2,6 @@ import React from 'react'
 import { combineReducers } from 'redux'
 
 import DashboardPage from './components/DashboardPage'
-import LoginPage from './components/LoginPage'
 
 import AddTenantPage from './components/tenants/AddTenantPage'
 import TenantsListPage from './components/tenants/TenantsListPage'
@@ -60,11 +59,6 @@ OpenStack.registerPlugin = pluginManager => {
         name: 'Dashboard',
         link: { path: '/', exact: true, default: true },
         component: DashboardPage
-      },
-      {
-        name: 'Login',
-        link: { path: '/login' },
-        component: LoginPage
       },
       {
         name: 'Tenants',

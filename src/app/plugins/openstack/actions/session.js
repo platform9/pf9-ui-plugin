@@ -5,13 +5,14 @@ import {
   startLogin,
   loginSucceeded,
   loginFailed,
+  logOut,
 } from './login'
 
 import {
   setTenants,
 } from './tenants'
 
-import { getStorage, setStorage } from '../../../core/common/pf9-storage'
+import { getStorage, setStorage, clear } from '../../../core/common/pf9-storage'
 
 // redux flux actions
 export const setToken = token => { registry.setItem('token', token) }
@@ -123,6 +124,15 @@ const Session = (keystone = Keystone, mocks = {}) => {
     return true
   }
 
+  const signOut = () => dispatch => {
+    // Remove localStorage items
+    clear('username')
+    clear('unscopedToken')
+
+    // Remove from redux as well
+    dispatch(logOut())
+  }
+
   ctx = {
     authenticate,
     getLastRegion,
@@ -138,11 +148,13 @@ const Session = (keystone = Keystone, mocks = {}) => {
     setUnscopedToken,
     setUsername,
     signIn,
+    signOut,
     ...mocks // allow tests to override any of the above functions
   }
 
   return {
     signIn,
+    signOut,
     authenticate,
     restoreSession,
   }

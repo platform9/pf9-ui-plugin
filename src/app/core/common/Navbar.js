@@ -158,7 +158,7 @@ class Navbar extends React.Component {
     const { classes, links } = this.props
     const { open, anchorEl } = this.state
     const logoPath = rootPath+'images/logo.png'
-    const userName = JSON.parse(localStorage.getItem(LOCAL_STORAGE_NAMESPACE)).username
+    const userName = JSON.parse(localStorage.getItem(LOCAL_STORAGE_NAMESPACE)).username || ''
 
     const avatar = (
       <div className={classes.avatar}>
@@ -183,7 +183,7 @@ class Navbar extends React.Component {
         >
           <MenuItem onClick={this.handleClose}>Change Password</MenuItem>
           <MenuItem onClick={this.handleClose}>SSH Keys</MenuItem>
-          <MenuItem onClick={this.handleClose}>Sign Out</MenuItem>
+          <MenuItem onClick={this.navTo('/ui/logout')}>Sign Out</MenuItem>
         </Menu>
       </div>
     )

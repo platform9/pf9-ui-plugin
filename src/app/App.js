@@ -8,12 +8,16 @@ import {
 } from 'react-router-dom'
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core'
 import Navbar from 'core/common/Navbar'
+import LoginPage from 'openstack/components/LoginPage'
+import LogoutPage from 'openstack/components/LogoutPage'
 import './app.css'
 import { setupFromConfig } from './util/registry'
+import { connect } from 'react-redux'
 import config from '../../config'
 
 setupFromConfig(config)
 window.process = process
+const mapStateToProps = state => (state.openstack && state.openstack.login) || {}
 
 class App extends React.Component {
   render () {
@@ -43,18 +47,24 @@ class App extends React.Component {
       <Router>
         <MuiThemeProvider theme={theme}>
           <div id="_main-container">
-            <Navbar links={pluginManager.getNavItems()} >
-              {pluginManager.getComponents().map((PluginComponent, idx) => <PluginComponent key={idx} />)}
-              <Switch>
-                {pluginManager.getRoutes().map(route => {
-                  const { component, link } = route
-                  const Component = component
-                  return <Route key={route.name} path={link.path} exact={link.exact || false} component={Component} />
-                })}
-                <Redirect to={pluginManager.getDefaultRoute()} />
-              </Switch>
-              {showFooter && renderFooter()}
-            </Navbar>
+            {this.props.loginSucceeded &&
+              <Navbar links={pluginManager.getNavItems()} >
+                {pluginManager.getComponents().map((PluginComponent, idx) => <PluginComponent key={idx} />)}
+                <Switch>
+                  {pluginManager.getRoutes().map(route => {
+                    const { component, link } = route
+                    const Component = component
+                    return <Route key={route.name} path={link.path} exact={link.exact || false} component={Component} />
+                  })}
+                  <Route path="/ui/logout" exact component={LogoutPage} />
+                  <Redirect to={pluginManager.getDefaultRoute()} />
+                </Switch>
+                {showFooter && renderFooter()}
+              </Navbar>
+            }
+            {!this.props.loginSucceeded &&
+              <LoginPage />
+            }
           </div>
         </MuiThemeProvider>
       </Router>
@@ -66,4 +76,4 @@ App.contextTypes = {
   pluginManager: PropTypes.object
 }
 
-export default App
+export default connect(mapStateToProps)(App)
