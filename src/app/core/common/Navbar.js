@@ -291,13 +291,11 @@ class Navbar extends React.Component {
                 <MenuIcon />
               </IconButton>
               <img src={logoPath} className={classes.logo} align="middle" />
-              {localStorage[LOCAL_STORAGE_NAMESPACE] &&
-                <div className={classes.rightTools}>
-                  {this.renderSelector('Region', [`AWS-US-West-1-Test`, `KVM-Neutron`])}
-                  {this.renderSelector('Tenant', [`Dev Team Tenant`, `Test Tenant`])}
-                  {this.renderAvatar()}
-                </div>
-              }
+              <div className={classes.rightTools}>
+                {this.renderSelector('Region', [`AWS-US-West-1-Test`, `KVM-Neutron`])}
+                {this.renderSelector('Tenant', [`Dev Team Tenant`, `Test Tenant`])}
+                {this.renderAvatar()}
+              </div>
             </Toolbar>
           </AppBar>
           {drawer}
