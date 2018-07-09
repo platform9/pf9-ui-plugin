@@ -156,28 +156,12 @@ class Navbar extends React.Component {
     this.setState({ open: false })
   }
 
-  handleClick = event => {
-    this.setState({ anchorEl: event.currentTarget })
+  handleClick = anchor => event => {
+    this.setState({ [anchor]: event.currentTarget })
   }
 
-  handleClose = () => {
-    this.setState({ anchorEl: null })
-  }
-
-  handleTenantClick = event => {
-    this.setState({ tenantAnchor: event.currentTarget })
-  }
-
-  handleTenantClose = () => {
-    this.setState({ tenantAnchor: null })
-  }
-
-  handleRegionClick = event => {
-    this.setState({ regionAnchor: event.currentTarget })
-  }
-
-  handleRegionClose = () => {
-    this.setState({ regionAnchor: null })
+  handleClose = anchor => () => {
+    this.setState({ [anchor]: null })
   }
 
   navTo = link => () => {
@@ -191,15 +175,15 @@ class Navbar extends React.Component {
 
   renderSelector = (name, list) => {
     const { classes } = this.props
-    const selectorAnchor= name === 'Tenant'? this.state.tenantAnchor : this.state.regionAnchor
-    const selectorName = name+'-selector'
-    const clickFunc = name === 'Tenant'? this.handleTenantClick : this.handleRegionClick
-    const closeFunc = name === 'Tenant'? this.handleTenantClose : this.handleRegionClose
+    const anchorName = name === 'Tenant' ? 'tenantAnchor' : 'regionAnchor'
+    const selectorAnchor= name === 'Tenant'? this.state[anchorName] : this.state[anchorName]
+    const selectorName = `${name}-selector`
+
     return <div className={classes.selector}>
       <Button
         aria-owns={selectorAnchor ? selectorName : null}
         aria-haspopup="true"
-        onClick={clickFunc}
+        onClick={this.handleClick(anchorName)}
         color="inherit"
         disableRipple
       >
@@ -211,7 +195,7 @@ class Navbar extends React.Component {
         id={selectorName}
         anchorEl={selectorAnchor}
         open={Boolean(selectorAnchor)}
-        onClose={closeFunc}
+        onClose={this.handleClose(anchorName)}
         getContentAnchorEl={null}
         anchorOrigin={{vertical: 'bottom', horizontal: 'left'}}
       >
@@ -226,13 +210,13 @@ class Navbar extends React.Component {
             ),
           }}
         />
-        {list.map(item => (<MenuItem onClick={closeFunc} key={item}>{item}</MenuItem>))}
+        {list.map(item => (<MenuItem onClick={this.handleClose(anchorName)} key={item}>{item}</MenuItem>))}
       </Menu>
     </div>
   }
 
   renderAvatar = () => {
-    const userName = JSON.parse(localStorage.getItem(LOCAL_STORAGE_NAMESPACE)).username
+    const userName = JSON.parse(localStorage.getItem(LOCAL_STORAGE_NAMESPACE)).username || ''
     const { classes } = this.props
     const { anchorEl } = this.state
 
@@ -240,7 +224,7 @@ class Navbar extends React.Component {
       <Button
         aria-owns={anchorEl ? 'user-menu' : null}
         aria-haspopup="true"
-        onClick={this.handleClick}
+        onClick={this.handleClick('anchorEl')}
         color="inherit"
         disableRipple
       >
@@ -253,13 +237,13 @@ class Navbar extends React.Component {
         id="user-menu"
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
-        onClose={this.handleClose}
+        onClose={this.handleClose('anchorEl')}
         getContentAnchorEl={null}
         anchorOrigin={{vertical: 'bottom', horizontal: 'left'}}
       >
-        <MenuItem onClick={this.handleClose}>Change Password</MenuItem>
-        <MenuItem onClick={this.handleClose}>SSH Keys</MenuItem>
-        <MenuItem onClick={this.handleClose}>Sign Out</MenuItem>
+        <MenuItem onClick={this.handleClose('anchorEl')}>Change Password</MenuItem>
+        <MenuItem onClick={this.handleClose('anchorEl')}>SSH Keys</MenuItem>
+        <MenuItem onClick={this.navTo('/ui/logout')}>Sign Out</MenuItem>
       </Menu>
     </div>
   }
@@ -268,35 +252,6 @@ class Navbar extends React.Component {
     const { classes, links } = this.props
     const { open } = this.state
     const logoPath = rootPath+'images/logo.png'
-    const userName = JSON.parse(localStorage.getItem(LOCAL_STORAGE_NAMESPACE)).username || ''
-
-    const avatar = (
-      <div className={classes.avatar}>
-        <Button
-          aria-owns={anchorEl ? 'user-menu' : null}
-          aria-haspopup="true"
-          onClick={this.handleClick}
-          color="inherit"
-        >
-          <Avatar className={classes.avatarImg}>{userName.charAt(0)}</Avatar>
-          <Typography color="inherit" variant="body1">
-            {userName}
-          </Typography>
-        </Button>
-        <Menu
-          id="user-menu"
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={this.handleClose}
-          getContentAnchorEl={null}
-          anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
-        >
-          <MenuItem onClick={this.handleClose}>Change Password</MenuItem>
-          <MenuItem onClick={this.handleClose}>SSH Keys</MenuItem>
-          <MenuItem onClick={this.navTo('/ui/logout')}>Sign Out</MenuItem>
-        </Menu>
-      </div>
-    )
 
     const drawer = (
       <Drawer
