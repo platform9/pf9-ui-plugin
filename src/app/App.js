@@ -14,12 +14,17 @@ import './app.css'
 import { setupFromConfig } from './util/registry'
 import { connect } from 'react-redux'
 import config from '../../config'
+import Session from 'openstack/actions/session'
 
 setupFromConfig(config)
 window.process = process
 const mapStateToProps = state => (state.openstack && state.openstack.login) || {}
 
 class App extends React.Component {
+  componentDidMount () {
+    this.props.dispatch(Session().restoreSession)
+  }
+
   render () {
     const theme = createMuiTheme({
       palette: {
