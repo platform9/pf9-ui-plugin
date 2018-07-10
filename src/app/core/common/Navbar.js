@@ -5,24 +5,19 @@ import { withRouter } from 'react-router'
 import { rootPath } from '../globals'
 import classNames from 'classnames'
 import Avatar from './Avatar'
+import Selector from './Selector'
+import MenuIcon from '@material-ui/icons/Menu'
+import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
 import {
   AppBar,
-  Button,
   Divider,
   Drawer,
   IconButton,
-  InputAdornment,
   ListItemText,
-  Menu,
   MenuItem,
   MenuList,
-  TextField,
-  Toolbar,
-  Typography
+  Toolbar
 } from '@material-ui/core'
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
-import SearchIcon from '@material-ui/icons/Search'
-import MenuIcon from '@material-ui/icons/Menu'
 
 const drawerWidth = 240
 
@@ -114,14 +109,6 @@ const styles = theme => ({
     right: theme.spacing.unit * 2,
     display: 'flex',
     alignItems: 'center'
-  },
-  selector: {
-    position: 'relative',
-    float: 'right'
-  },
-  menuSearch: {
-    outline: 'none',
-    padding: theme.spacing.unit * 2
   }
 })
 
@@ -130,10 +117,7 @@ const styles = theme => ({
 class Navbar extends React.Component {
   state = {
     open: false,
-    anchor: 'left',
-    anchorEl: null,
-    tenantAnchor: null,
-    regionAnchor: null
+    anchor: 'left'
   }
 
   handleDrawerOpen = () => {
@@ -144,14 +128,6 @@ class Navbar extends React.Component {
     this.setState({ open: false })
   }
 
-  handleClick = anchor => event => {
-    this.setState({ [anchor]: event.currentTarget })
-  }
-
-  handleClose = anchor => () => {
-    this.setState({ [anchor]: null })
-  }
-
   navTo = link => () => {
     this.props.history.push(link)
     // this.setState({ open: false })
@@ -160,48 +136,6 @@ class Navbar extends React.Component {
   renderNavLink = ({ link, name }) => (
     <MenuItem onClick={this.navTo(link.path)} key={link.path}><ListItemText primary={name} /></MenuItem>
   )
-
-  renderSelector = (name, list) => {
-    const { classes } = this.props
-    const anchorName = name === 'Tenant' ? 'tenantAnchor' : 'regionAnchor'
-    const selectorAnchor= name === 'Tenant'? this.state[anchorName] : this.state[anchorName]
-    const selectorName = `${name}-selector`
-
-    return <div className={classes.selector}>
-      <Button
-        aria-owns={selectorAnchor ? selectorName : null}
-        aria-haspopup="true"
-        onClick={this.handleClick(anchorName)}
-        color="inherit"
-        disableRipple
-      >
-        <Typography color="inherit" variant="body1">
-          Current {name}  &#9662;
-        </Typography>
-      </Button>
-      <Menu
-        id={selectorName}
-        anchorEl={selectorAnchor}
-        open={Boolean(selectorAnchor)}
-        onClose={this.handleClose(anchorName)}
-        getContentAnchorEl={null}
-        anchorOrigin={{vertical: 'bottom', horizontal: 'left'}}
-      >
-        <TextField
-          placeholder={'Search '+name}
-          className={classes.menuSearch}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-        />
-        {list.map(item => (<MenuItem onClick={this.handleClose(anchorName)} key={item}>{item}</MenuItem>))}
-      </Menu>
-    </div>
-  }
 
   render () {
     const { classes, links } = this.props
@@ -247,8 +181,8 @@ class Navbar extends React.Component {
               </IconButton>
               <img src={logoPath} className={classes.logo} align="middle" />
               <div className={classes.rightTools}>
-                {this.renderSelector('Region', [`AWS-US-West-1-Test`, `KVM-Neutron`])}
-                {this.renderSelector('Tenant', [`Dev Team Tenant`, `Test Tenant`])}
+                <Selector name="Region" list={[`AWS-US-West-1-Test`, `KVM-Neutron`]} />
+                <Selector name="Tenant" list={[`Dev Team Tenant`, `Test Tenant`]} />
                 <Avatar />
               </div>
             </Toolbar>
