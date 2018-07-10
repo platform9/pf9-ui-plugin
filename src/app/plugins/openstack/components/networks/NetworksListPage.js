@@ -6,6 +6,7 @@ import Loader from 'core/common/Loader'
 import NetworksListContainer from './NetworksListContainer'
 import requiresAuthentication from '../../util/requiresAuthentication'
 import { GET_NETWORKS } from './actions'
+import ProgressCard from 'core/common/ProgressCard'
 
 const NetworksListPage =
   ({ data: { loading, error, networks } }) => {
@@ -15,6 +16,7 @@ const NetworksListPage =
         {loading && <Loader />}
         {error && <DisplayError error={error} />}
         {networks && <NetworksListContainer networks={networks} />}
+        <ProgressCard />
       </div>
     )
   }
