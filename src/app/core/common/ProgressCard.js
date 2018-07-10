@@ -1,19 +1,33 @@
 import React from 'react'
 import { withStyles } from '@material-ui/core/styles'
-import { Card, CardHeader, CardContent, CircularProgress, Typography } from '@material-ui/core'
+import { addComma } from './formatters'
+import {
+  Card,
+  CardContent,
+  CircularProgress,
+  Typography
+} from '@material-ui/core'
 
 const styles = theme => ({
   card: {
-    maxWidth: 400,
+    minWidth: 200,
+    maxHeight: 300,
+    marginTop: theme.spacing.unit * 3
+  },
+  title: {
+    backgroundColor: theme.palette.grey[50]
+  },
+  icon: {
+    float: 'right',
   },
   container: {
     position: 'relative',
+    left: 'calc(50% - 75px)',
     height: 120,
-    width: 120
+    width: 120,
   },
   progress: {
-    position: 'absolute',
-    // margin: theme.spacing.unit * 2,
+    position: 'absolute'
   },
   percentage: {
     position: 'absolute',
@@ -21,52 +35,54 @@ const styles = theme => ({
     left: '45%'
   },
   description: {
-    marginTop: 40
+    marginTop: theme.spacing.unit * 5,
   }
 })
 
 @withStyles(styles)
 class ProgressCard extends React.Component {
-  state = {
-    completed: 75,
-  };
-
   render () {
-    const { classes } = this.props
+    const { classes, card: { title, used, total, unit } } = this.props
+    const completed = Math.round(used/total * 100)
     return (
-      <div>
-        <Card className={classes.card}>
-          <CardHeader>ABC</CardHeader>
+      <div className={classes.card}>
+        <Card>
+          <CardContent className={classes.title}>
+            <Typography
+              variant="title"
+              align="center"
+              className={classes.title}
+            >
+              {title}
+            </Typography>
+          </CardContent>
           <CardContent>
-            <div>
-              <div className={classes.container}>
-                <CircularProgress
-                  className={classes.progress}
-                  variant="static"
-                  size={150}
-                  value={this.state.completed}
-                />
-                <Typography
-                  className={classes.percentage}
-                  variant="headline"
-                >
-                  {this.state.completed}%
-                </Typography>
-              </div>
-              <div>
-                <Typography
-                  className={classes.description}
-                  variant="subheading"
-                >
-                  dfasdf used of dfasd
-                </Typography>
-              </div>
+            <div className={classes.container}>
+              <CircularProgress
+                className={classes.progress}
+                variant="static"
+                size={150}
+                value={completed}
+              />
+              <Typography
+                className={classes.percentage}
+                variant="headline"
+              >
+                {completed}%
+              </Typography>
+            </div>
+            <div className={classes.description}>
+              <Typography
+                variant="subheading"
+                align="center"
+                noWrap
+              >
+                {addComma(used)} {unit} used of {addComma(total)} {unit}
+              </Typography>
             </div>
           </CardContent>
         </Card>
       </div>
-
-      
     )
   }
 }
