@@ -6,15 +6,15 @@ export const formattedValue = (bytes, unit='Bytes', decimalDigits=2) => {
 
   if (bytes===undefined || isNaN(bytes) || bytes<0) return 'Invalid value input.'
   if (decimalDigits<0) return 'Invalid decimal digits input.'
-  if (unit==='' || bytes===0) return addComma(bytes)+' Bytes'
+  if (unit==='' || bytes===0) return addComma(bytes, decimalDigits)+' Bytes'
   if (units.indexOf(unit)===-1) {
     return 'Output unit not found.'
   }
   let pos = units.indexOf(unit)
-  return addComma(bytes/Math.pow(1024, pos))+' '+unit
+  return addComma(bytes/Math.pow(1024, pos), decimalDigits)+' '+unit
 }
 
-export const addComma = (num, decimalDigits=0) => {
+export const addComma = (num, decimalDigits=2) => {
   let floorPart = Math.floor(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
   let roundPart = Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
   let decimalPart = (num-Math.floor(num)).toFixed(decimalDigits).substring(2)

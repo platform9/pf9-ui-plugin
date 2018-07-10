@@ -77,7 +77,7 @@ class ProgressCard extends React.Component {
                 align="center"
                 noWrap
               >
-                {addComma(used)} {unit} used of {addComma(total)} {unit}
+                {addComma(used, 0)} {unit} used of {addComma(total, 0)} {unit}
               </Typography>
             </div>
           </CardContent>
