@@ -9,12 +9,15 @@ const {
   OS_API_HOST,
   OS_USERNAME,
   OS_PASSWORD,
+  // controls which region the GraphQL server uses
+  OS_REGION,
 } = (process && process.env) || {}
 
 const config = {
   production: {
     host: 'https://localhost',
     apiHost: 'https://localhost',
+    region: OS_REGION,
   },
 
   development: {
@@ -24,7 +27,8 @@ const config = {
       preset: 'base',
       username: OS_USERNAME || 'user@domain.com',
       password: OS_PASSWORD || 'secret',
-    }
+    },
+    region: OS_REGION,
   },
 
   test: {
@@ -38,6 +42,7 @@ const config = {
     // Use the following for testing against a real DU
     username: OS_USERNAME || 'user@domain.com',
     password: OS_PASSWORD || 'secret',
+    region: OS_REGION,
   },
 }
 
