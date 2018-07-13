@@ -12,6 +12,7 @@ import store from './store'
 import plugins from './plugins'
 import pluginManager from './core/pluginManager'
 import PluginProvider from './core/PluginProvider'
+import { getStorage } from './core/common/pf9-storage'
 
 import { mergeSchemas } from 'graphql-tools'
 
@@ -25,7 +26,13 @@ const client = new ApolloClient({
   uri: 'http://localhost:4444/graphql',
   clientState: {
     ...mergedSchemas,
-  }
+  },
+  request: async op =>
+    op.setContext({
+      headers: {
+        'x-auth-token': getStorage('scopedToken') || getStorage('unscopedToken'),
+      }
+    })
 })
 
 const render = Component => {

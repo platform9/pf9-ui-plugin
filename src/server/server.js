@@ -6,6 +6,7 @@ import { mountGraphql } from './graphql'
 import {
   requestLogger,
   enableAllCors,
+  injectClientInfo,
 } from './middleware'
 
 import keystone from './api/keystone'
@@ -34,6 +35,8 @@ export function startServer (config = defaultConfig) {
   if (config.verbose) {
     app.use(requestLogger)
   }
+  app.use(injectClientInfo)
+
   app.use('/keystone', keystone)
   app.use('/nova', nova)
   app.use('/neutron', neutron)

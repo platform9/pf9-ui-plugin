@@ -1,12 +1,13 @@
-import Catalog from './models/Catalog'
-import Flavor from './models/Flavor'
-import Role from './models/Role'
-import Tenant from './models/Tenant'
-import User from './models/User'
-import Volume from './models/Volume'
-import GlanceImage from './models/GlanceImage'
-import Network from './models/Network'
-import Router from './models/Router'
+import Catalog from '../models/Catalog'
+import Flavor from '../models/Flavor'
+import Role from '../models/Role'
+import Tenant from '../models/Tenant'
+import User from '../models/User'
+import Volume from '../models/Volume'
+import GlanceImage from '../models/GlanceImage'
+import Network from '../models/Network'
+import Router from '../models/Router'
+import Token from '../models/Token'
 
 const defaultQuota = {
   cores: 10,
@@ -41,6 +42,8 @@ class Context {
     this.glanceImages = []
     this.defaultQuota = { ...defaultQuota }
   }
+
+  validateToken = id => Token.validateToken(id)
 
   getFlavor = id => {
     const flavor = Flavor.findById(id)

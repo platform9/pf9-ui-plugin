@@ -1,4 +1,5 @@
-import Token from './models/Token'
+import context from './context'
+import config from '../../config'
 
 export const requestLogger = (req, res, next) => {
   console.log(`${req.method} ${req.url}`)
@@ -7,11 +8,27 @@ export const requestLogger = (req, res, next) => {
 
 export const tokenValidator = (req, res, next) => {
   const authToken = req.headers['x-auth-token']
-  const fullToken = Token.validateToken(authToken)
+
+  // Simulator version
+  const fullToken = context.validateToken(authToken)
   if (!fullToken) {
     return res.status(401).send('Not authorized')
   }
   req.token = fullToken
+  next()
+}
+
+// The OpenStack API client needs the X-Auth-Token from the request
+// and which region to use (from config.js) for the service catalog.
+export const injectClientInfo = (req, res, next) => {
+  const authToken = req.headers['x-auth-token']
+  if (context.client) {
+    context.client.unscopedToken = authToken
+    context.client.scopedToken = authToken
+  }
+  if (config.region) {
+    context.client.setActiveRegion(config.region)
+  }
   next()
 }
 
