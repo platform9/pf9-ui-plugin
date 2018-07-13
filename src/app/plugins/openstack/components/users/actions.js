@@ -8,6 +8,7 @@ export const GET_USER = gql`
       displayname
       name
       email
+      rolePair
     }
   }
 `
@@ -20,6 +21,7 @@ export const GET_USERS = gql`
       displayname
       name
       email
+      rolePair
     }
   }
 `
@@ -32,12 +34,12 @@ export const REMOVE_USER = gql`
 
 export const ADD_USER = gql`
   mutation CreateUser($input: UserInput!) {
-    createUser(input: $input) { id username displayname name email }
+    createUser(input: $input) { id username displayname name email rolePair }
   }
 `
 
 export const UPDATE_USER = gql`
   mutation UpdateUser($id: ID!, $input: UserInput!) {
-    updateUser(id: $id, input: $input) { id username displayname name email }
+    updateUser(id: $id, input: $input) { id username displayname name email rolePair }
   }
 `

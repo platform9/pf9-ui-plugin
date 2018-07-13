@@ -15,8 +15,9 @@ class User extends ActiveModel {
     this.mfa = params.mfa || false
     this.password = params.password
     this.roles = params.roles || []
-    this.tenant = params.tenant
+    this.tenantId = params.tenantId || ''
     this.username = params.username || params.name || params.email || ''
+    this.rolePair = params.rolePair || []
   }
 
   static getCollection = coll
@@ -47,6 +48,9 @@ class User extends ActiveModel {
       email: this.email,
       name: this.name,
       username: this.username,
+      tenantId: this.tenantId,
+      roles: this.roles,
+      rolePair: this.rolePair
     }
   }
 

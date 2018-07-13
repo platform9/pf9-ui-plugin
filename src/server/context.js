@@ -99,11 +99,13 @@ class Context {
   }
 
   getTenantRoles = userObj => {
-    const user = User.findById(userObj.id)
-    return user.roles.map(({ tenant, role }) => ({
-      tenant: Tenant.findById(tenant.id).asGraphQl(),
-      role: Role.findById(role.id).asGraphQl()
-    }))
+    const user = User.findById(userObj.id).asJson()
+    return user.roles.map(({ tenant, role }) => (JSON.stringify({
+      // tenant: Tenant.findById(tenant.id).asGraphQl(),
+      // role: Role.findById(role.id).asGraphQl()
+      tenant: Tenant.findById(tenant.id).asJson().name,
+      role: Role.findById(role.id).asJson().name
+    })))
   }
 
   getUser = (id) => {

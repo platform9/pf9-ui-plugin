@@ -25,13 +25,15 @@ type User {
   name: String
   email: String
   password: String
-  tenantRoles: [TenantRole!]!
+  tenantId: String
+  rolePair: [String]
 }
 
 type Query {
   tenants: [Tenant!]!
   users: [User!]!
   user(id: ID!): User
+  tenantRoles: [String]
 }
 
 input TenantInput {
@@ -45,6 +47,8 @@ input UserInput {
   name: String
   email: String
   password: String
+  tenantId: String
+  rolePair: [String]
 }
 
 type Mutation {

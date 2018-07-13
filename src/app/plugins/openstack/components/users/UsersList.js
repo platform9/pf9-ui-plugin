@@ -7,7 +7,7 @@ const columns = [
   { id: 'name', label: 'Username' },
   { id: 'displayname', label: 'Display name' },
   { id: 'mfa', label: 'Two-factor authentication' },
-  { id: 'tenants', label: 'Tenants' },
+  { id: 'rolePair', label: 'Tenants & Roles' },
 ]
 
 class UsersList extends React.Component {

@@ -4,12 +4,9 @@ import { makeExecutableSchema } from 'graphql-tools'
 const resolvers = {
   Query: {
     tenants: (_, __, context) => context.getTenants(),
+    tenantRoles: user => context.getTenantRoles(user),
     users: (_, __, context) => context.getUsers(),
     user: (obj, args, context) => context.getUser(args.id)
-  },
-
-  User: {
-    tenantRoles: user => context.getTenantRoles(user),
   },
 
   Mutation: {
