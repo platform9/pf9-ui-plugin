@@ -16,45 +16,45 @@ class TenantRoleSelector extends React.Component {
     super(props)
     const spec = pickMultiple('validations')(props)
     props.defineField(props.id, spec)
-    this.state = {
-      ...this.parseInput()
-    }
   }
 
   handleChange = curTenant => async event => {
     const { id, setField } = this.props
-    await this.setState({
-      [curTenant.name]: event.target.value
-    })
-    setField(id, this.combineRoles())
+    setField(id, await this.combineRoles(curTenant, event.target.value))
   }
 
   parseInput = () => {
-    const { currentPairs } = this.props
-    if (!currentPairs) return
-    return currentPairs.reduce((acc, cur) => {
+    const { rolePair } = this.props.value
+    if (!rolePair) return {}
+    let result = rolePair.reduce((acc, cur) => {
+      cur = JSON.parse(cur)
       acc[cur.tenant] = cur.role
       return acc
     }, {})
+    return result
   }
 
-  combineRoles = () => {
-    const { tenants } = this.props
-    return tenants.reduce((acc, cur) => {
-      if (this.state[cur.name] && this.state[cur.name] !== 'None') {
-        acc.push(JSON.stringify({
-          tenant: cur.name,
-          role: this.state[cur.name]
-        }))
-      }
+  combineRoles = (curTenant, role) => {
+    let result = this.parseInput()
+    if (role === 'None') {
+      if (result[curTenant.name]) delete result[curTenant.name]
+    } else {
+      result[curTenant.name] = role
+    }
+    return Object.entries(result).reduce((acc, cur) => {
+      acc.push(JSON.stringify({
+        tenant: cur[0],
+        role: cur[1]
+      }))
       return acc
     }, [])
   }
 
   render () {
     const { id, classes, tenants } = this.props
+    const inputTenants = this.parseInput()
     return (
-      <div id={id}>
+      inputTenants && <div id={id}>
         <Table
           className={classes.table}
         >
@@ -72,7 +72,7 @@ class TenantRoleSelector extends React.Component {
                   <TableCell>
                     <FormControl className={classes.formControl} >
                       <Select
-                        value={this.state[tenant.name] || 'None'}
+                        value={inputTenants[tenant.name] || 'None'}
                         onChange={this.handleChange(tenant)}
                         inputProps={{
                           id: tenant.id
