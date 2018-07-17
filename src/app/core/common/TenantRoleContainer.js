@@ -10,7 +10,7 @@ import { pickMultiple } from 'core/fp'
 import { withFormContext } from 'core/common/ValidatedForm'
 import TenantRoleSelector from 'core/common/TenantRoleSelector'
 
-class TenantRoleSelectorContainer extends React.Component {
+class TenantRoleContainer extends React.Component {
   constructor (props) {
     super(props)
     const spec = pickMultiple('validations')(props)
@@ -21,17 +21,9 @@ class TenantRoleSelectorContainer extends React.Component {
     const { id, setField } = this.props
     setField(id, await this.combineRoles(curTenant, event.target.value))
   }
+
   // Sample of rolepair:
-  // input(array of strings):
-  // ["{tenant: 'test tenant', role: 'admin'}", "{tenant: 'test tenant2', role: 'user'}"]
-  // output(array of JSON objects):
-  // [{
-  //   tenant: 'test tenant',
-  //   role: 'admin'
-  // },{
-  //   tenant: 'test tenant2',
-  //   role: 'user'
-  // }]
+  // ["{tenant: 'service', role: 'admin'}"] -> { service: 'admin' }
   parseInput = () => {
     const { rolePair } = this.props.value
     if (!rolePair) return {}
@@ -45,12 +37,9 @@ class TenantRoleSelectorContainer extends React.Component {
     let result = this.parseInput()
     result[curTenant.name] = role
     return Object.entries(result)
-      .filter(entry => entry[1] !== 'None')
-      .reduce((acc, cur) => {
-        acc.push(JSON.stringify({
-          tenant: cur[0],
-          role: cur[1]
-        }))
+      .filter(([ tenant, role ]) => role !== 'None')
+      .reduce((acc, [ tenant, role ]) => {
+        acc.push(JSON.stringify({ tenant, role }))
         return acc
       }, [])
   }
@@ -86,4 +75,4 @@ class TenantRoleSelectorContainer extends React.Component {
   }
 }
 
-export default withFormContext(TenantRoleSelectorContainer)
+export default withFormContext(TenantRoleContainer)
