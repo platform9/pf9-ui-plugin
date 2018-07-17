@@ -43,8 +43,8 @@ class GlanceImageIndex extends React.Component {
               indicatorColor="primary"
               textColor="primary"
             >
-              <Tab value="/ui/openstack/glanceimages#images" label="Glance Images" href="#images" />
-              <Tab value="/ui/openstack/glanceimages#builtimages" label="Prebuilt Images" href="#builtimages" />
+              <Tab value="/ui/openstack/glanceimages#images" label="Imported Images" href="#images" />
+              <Tab value="/ui/openstack/glanceimages#builtimages" label="Download Prebuilt Images" href="#builtimages" />
             </Tabs>
             { value === '/ui/openstack/glanceimages#images' &&
               <TabContainer >
