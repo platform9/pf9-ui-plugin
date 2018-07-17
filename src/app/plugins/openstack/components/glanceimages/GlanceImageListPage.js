@@ -10,7 +10,6 @@ const GlanceImageListPage =
   ({ data, loading, error }) => {
     return (
       <div>
-        <h1>Glance Image Page</h1>
         {loading && <Loader />}
         {error && <DisplayError error={error} />}
         {data && <GlanceImageListContainer glanceImages={data.glanceImages} />}
