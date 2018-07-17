@@ -4,7 +4,7 @@ import NoAutofillHack from 'core/common/NoAutofillHack'
 import { Button } from '@material-ui/core'
 import ValidatedForm from 'core/common/ValidatedForm'
 import TextField from 'core/common/TextField'
-import TenantRoleContainer from 'core/common/TenantRoleContainer'
+import TenantRolesContainer from 'core/common/TenantRolesContainer'
 
 // As of Chrome 66, Google has disabled the NoAutofillHack and still does
 // not respect the HTML spec for autocomplete="off".  After some experimentation
@@ -26,7 +26,7 @@ class AddUserForm extends React.Component {
         <TextField id="username" label="Username" />
         <TextField id="displayname" label="Display Name" />
         <TextField id="password" label="Password" type="password" />
-        <TenantRoleContainer
+        <TenantRolesContainer
           id="rolePair"
           label="TenantRoleSelectors"
           tenants={this.props.tenants}

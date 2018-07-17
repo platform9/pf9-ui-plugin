@@ -10,7 +10,7 @@ import { pickMultiple } from 'core/fp'
 import { withFormContext } from 'core/common/ValidatedForm'
 import TenantRoleSelector from 'core/common/TenantRoleSelector'
 
-class TenantRoleContainer extends React.Component {
+class TenantRolesContainer extends React.Component {
   constructor (props) {
     super(props)
     const spec = pickMultiple('validations')(props)
@@ -75,4 +75,4 @@ class TenantRoleContainer extends React.Component {
   }
 }
 
-export default withFormContext(TenantRoleContainer)
+export default withFormContext(TenantRolesContainer)
