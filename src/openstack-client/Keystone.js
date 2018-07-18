@@ -53,13 +53,28 @@ class Keystone {
   get catalogUrl () { return `${this.v3}/auth/catalog` }
   get endpointsUrl () { return `${this.v3}/endpoints` }
   get regionsUrl () { return `${this.v3}/regions` }
-  get projectsUrl () { return `${this.v3}/auth/projects` }
+  get projectsUrl () { return `${this.v3}/projects` }
   get tokensUrl () { return `${this.v3}/auth/tokens?nocatalog` }
   get usersUrl () { return `${this.v3}/users` }
 
-  async getProjects () {
-    const response = await axios.get(this.projectsUrl, this.client.getAuthHeaders(false))
+  async getProjects (scoped = false) {
+    const response = await axios.get(this.projectsUrl, this.client.getAuthHeaders(scoped))
     return response.data.projects
+  }
+
+  async createProject (params) {
+    const body = { project: params }
+    const response = await axios.post(this.projectsUrl, body, this.client.getAuthHeaders())
+    return response.data.project
+  }
+
+  async deleteProject (projectId) {
+    try {
+      await axios.delete(`${this.projectsUrl}/${projectId}`, this.client.getAuthHeaders())
+      return projectId
+    } catch (err) {
+      throw new Error(`Unable to delete non-existant project`)
+    }
   }
 
   async changeProjectScope (projectId) {

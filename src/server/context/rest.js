@@ -9,9 +9,16 @@ class Context {
   validateToken = () => true
 
   getTenants = async () => {
-    const tenants = await this.client.keystone.getProjects()
+    const tenants = await this.client.keystone.getProjects(true)
     return tenants
   }
+
+  createTenant = async ({ input }) => {
+    const newTenant = await this.client.keystone.createProject(input)
+    return newTenant
+  }
+
+  removeTenant = id => this.client.keystone.deleteProject(id)
 }
 
 const context = new Context()
