@@ -5,6 +5,8 @@ import { withStyles } from '@material-ui/core/styles'
 import {
   Button,
   IconButton,
+  InputAdornment,
+  TextField,
   Toolbar,
   Tooltip,
   Typography
@@ -14,6 +16,7 @@ import AddIcon from '@material-ui/icons/Add'
 import DeleteIcon from '@material-ui/icons/Delete'
 import EditIcon from '@material-ui/icons/Edit'
 import FilterListIcon from '@material-ui/icons/FilterList'
+import SearchIcon from '@material-ui/icons/Search'
 
 const toolbarStyles = theme => ({
   root: {
@@ -38,9 +41,12 @@ const toolbarStyles = theme => ({
   title: {
     flex: '0 0 auto',
   },
+  searchBar: {
+    marginRight: theme.spacing.unit * 2.5
+  }
 })
 
-const EnhancedTableToolbar = ({ classes, numSelected, title, onAdd, onDelete, onEdit }) => (
+const EnhancedTableToolbar = ({ classes, numSelected, title, onAdd, onDelete, onEdit, onSearch }) => (
   <Toolbar
     className={classNames(classes.root, {
       [classes.highlight]: numSelected > 0,
@@ -58,6 +64,22 @@ const EnhancedTableToolbar = ({ classes, numSelected, title, onAdd, onDelete, on
     <div className={classes.spacer} />
     <div className={classes.actions}>
       <Toolbar>
+        {onSearch &&
+          <Tooltip title="Search">
+            <TextField
+              className={classes.searchBar}
+              placeholder="Search"
+              onChange={onSearch}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Tooltip>
+        }
         {numSelected === 1 && onEdit &&
           <Tooltip title="Edit">
             <IconButton aria-label="Edit" onClick={onEdit}>

@@ -38,7 +38,8 @@ class ListTable extends React.Component {
       page: 0,
       rowsPerPage: 5,
       selected: [],
-      selectedAll: false
+      selectedAll: false,
+      searchTerm: ''
     }
   }
 
@@ -133,6 +134,17 @@ class ListTable extends React.Component {
     this.props.onEdit(selected)
   }
 
+  handleSearch = event => {
+    this.setState({
+      searchTerm: event.target.value
+    })
+  }
+
+  filterBySearch = (data, target) => {
+    const { searchTerm } = this.state
+    return data.filter(ele => ele[target].match(new RegExp(searchTerm, 'i')) !== null)
+  }
+
   isSelected = id => this.state.selected.includes(id)
 
   paginate = data => {
@@ -214,6 +226,7 @@ class ListTable extends React.Component {
       onDelete,
       onEdit,
       showCheckboxes,
+      searchTarget,
       paginate
     } = this.props
 
@@ -221,11 +234,13 @@ class ListTable extends React.Component {
       order,
       orderBy,
       selected,
-      selectedAll
+      selectedAll,
+      searchTerm
     } = this.state
 
     const sortedData = this.sortData(data)
-    const paginatedData = paginate ? this.paginate(sortedData) : sortedData
+    const searchData = searchTerm === '' ? sortedData : this.filterBySearch(sortedData, searchTarget)
+    const paginatedData = paginate ? this.paginate(searchData) : searchData
     // Always show pagination control bar to make sure the height doesn't change frequently.
     // const shouldShowPagination = paginate && sortedData.length > this.state.rowsPerPage
 
@@ -239,6 +254,7 @@ class ListTable extends React.Component {
               onAdd={onAdd && this.handleAdd}
               onDelete={onDelete && this.handleDelete}
               onEdit={onEdit && this.handleEdit}
+              onSearch={searchTarget && this.handleSearch}
             />
             <div className={classes.tableWrapper}>
               <Table className={classes.table}>
@@ -259,7 +275,7 @@ class ListTable extends React.Component {
                 </TableBody>
               </Table>
             </div>
-            {this.renderPaginationControls(sortedData.length)}
+            {this.renderPaginationControls(searchData.length)}
           </Paper>
         </Grid>
       </Grid>
