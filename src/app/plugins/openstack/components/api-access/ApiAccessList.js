@@ -34,6 +34,7 @@ class ApiAccessList extends React.Component {
         data={_catalog}
         paginate={false}
         showCheckboxes={false}
+        searchTarget="name"
       />
     )
   }

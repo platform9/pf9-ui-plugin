@@ -27,6 +27,7 @@ class TenantsList extends React.Component {
         onAdd={onAdd}
         onDelete={onDelete}
         actions={['delete']}
+        searchTarget="name"
       />
     )
   }

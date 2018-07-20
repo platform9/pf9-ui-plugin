@@ -28,6 +28,7 @@ class FlavorsList extends React.Component {
         onDelete={onDelete}
         onEdit={onEdit}
         actions={['delete']}
+        searchTarget="name"
       />
     )
   }
