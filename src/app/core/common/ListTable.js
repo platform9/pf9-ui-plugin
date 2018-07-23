@@ -13,6 +13,12 @@ import {
 } from '@material-ui/core'
 import EnhancedTableHead from './EnhancedTableHead'
 import EnhancedTableToolbar from './EnhancedTableToolbar'
+import Session from 'openstack/actions/session'
+import { LOCAL_STORAGE_NAMESPACE } from './pf9-storage'
+
+const session = new Session()
+
+const userName = JSON.parse(localStorage.getItem(LOCAL_STORAGE_NAMESPACE)).username
 
 const styles = theme => ({
   root: {
@@ -36,7 +42,7 @@ class ListTable extends React.Component {
       order: 'asc',
       orderBy: this.props.columns[0].id,
       page: 0,
-      rowsPerPage: 5,
+      rowsPerPage: session.getLastPaginationLimit(userName) || 10,
       selected: [],
       selectedAll: false,
       searchTerm: ''
@@ -100,7 +106,10 @@ class ListTable extends React.Component {
 
   handleChangePage = (event, page) => this.setState({ page })
 
-  handleChangeRowsPerPage = event => this.setState({ rowsPerPage: event.target.value })
+  handleChangeRowsPerPage = event => {
+    session.setLastPaginationLimit(userName, event.target.value)
+    this.setState({ rowsPerPage: event.target.value })
+  }
 
   handleAdd = () => {
     this.props.onAdd()

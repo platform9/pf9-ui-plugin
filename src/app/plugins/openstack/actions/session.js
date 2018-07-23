@@ -54,6 +54,10 @@ const Session = (keystone = Keystone, mocks = {}) => {
   const getLastRegion = username => getStorage(regionStorageKey(username))
   const setLastRegion = (username, tenant) => ctx.setStorage(regionStorageKey(username), tenant)
 
+  const paginationStorageKey = username => `last-paginationlimit-used-${username}`
+  const getLastPaginationLimit = username => getStorage(paginationStorageKey(username))
+  const setLastPaginationLimit = (username, limit) => ctx.setStorage(paginationStorageKey(username), limit)
+
   const initialSetup = async ({ username, unscopedToken, dispatch }) => {
     // Store in the in-memory "registry"
     ctx.setUnscopedToken(unscopedToken)
@@ -78,6 +82,9 @@ const Session = (keystone = Keystone, mocks = {}) => {
     const lastRegion = ctx.getLastRegion(username)
     const region = ctx.getPreferredRegion(regions, lastRegion)
     setLastRegion(username, region)
+
+    const lastPaginationLimit = getLastPaginationLimit(username)
+    setLastPaginationLimit(username, lastPaginationLimit || 10)
 
     dispatch(ctx.setCurrentSession({
       region,
@@ -147,6 +154,8 @@ const Session = (keystone = Keystone, mocks = {}) => {
     setToken,
     setUnscopedToken,
     setUsername,
+    getLastPaginationLimit,
+    setLastPaginationLimit,
     signIn,
     signOut,
     ...mocks // allow tests to override any of the above functions
@@ -157,6 +166,8 @@ const Session = (keystone = Keystone, mocks = {}) => {
     signOut,
     authenticate,
     restoreSession,
+    getLastPaginationLimit,
+    setLastPaginationLimit
   }
 }
 
