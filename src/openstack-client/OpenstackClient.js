@@ -1,7 +1,8 @@
-import Keystone from './Keystone'
-import Glance from './Glance'
 import Cinder from './Cinder'
+import Glance from './Glance'
+import Keystone from './Keystone'
 import Neutron from './Neutron'
+import Nova from './Nova'
 
 class OpenstackClient {
   constructor (options = {}) {
@@ -9,10 +10,12 @@ class OpenstackClient {
     if (!options.keystoneEndpoint) {
       throw new Error('keystoneEndpoint required')
     }
-    this.keystone = new Keystone(this)
-    this.glance = new Glance(this)
     this.cinder = new Cinder(this)
+    this.glance = new Glance(this)
+    this.keystone = new Keystone(this)
     this.neutron = new Neutron(this)
+    this.nova = new Nova(this)
+
     this.catalog = {}
     this.activeRegion = null
   }

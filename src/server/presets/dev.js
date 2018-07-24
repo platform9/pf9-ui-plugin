@@ -36,7 +36,7 @@ function loadPreset () {
   // Create an admin user
   const adminUser = new User({ name: 'admin@platform9.com', password: 'secret', tenant: serviceTenant })
   adminUser.addRole(serviceTenant, adminRole)
-  adminUser.rolePair = context.getTenantRoles(adminUser)
+  adminUser.rolePair = context.getTenantRoles(adminUser.id)
 
   // Create a bunch of misc users
   range(2).forEach(i => {
@@ -50,7 +50,7 @@ function loadPreset () {
     })
     user.addRole(serviceTenant, memberRole)
     user.addRole(testTenant, memberRole)
-    user.rolePair = context.getTenantRoles(user)
+    user.rolePair = context.getTenantRoles(user.id)
   })
 
   // Flavors

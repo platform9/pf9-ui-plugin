@@ -57,6 +57,11 @@ class Keystone {
   get tokensUrl () { return `${this.v3}/auth/tokens?nocatalog` }
   get usersUrl () { return `${this.v3}/users` }
 
+  async getProject (id) {
+    const response = await axios.get(`${this.projectsUrl}/${id}`, this.client.getAuthHeaders())
+    return response.data.project
+  }
+
   async getProjects (scoped = false) {
     const response = await axios.get(this.projectsUrl, this.client.getAuthHeaders(scoped))
     return response.data.projects
@@ -65,6 +70,13 @@ class Keystone {
   async createProject (params) {
     const body = { project: params }
     const response = await axios.post(this.projectsUrl, body, this.client.getAuthHeaders())
+    return response.data.project
+  }
+
+  async updateProject (id, params) {
+    const body = { project: params }
+    const url = `${this.projectsUrl}/${id}`
+    const response = await axios.patch(url, body, this.client.getAuthHeaders())
     return response.data.project
   }
 
@@ -133,6 +145,11 @@ class Keystone {
     return servicesByRegion[this.client.activeRegion]
   }
 
+  async getUser (id) {
+    const response = await axios.get(`${this.usersUrl}/${id}`, this.client.getAuthHeaders())
+    return response.data.user
+  }
+
   async getUsers () {
     const response = await axios.get(this.usersUrl, this.client.getAuthHeaders())
     return response.data.users
@@ -141,6 +158,13 @@ class Keystone {
   async createUser (params) {
     const body = { user: params }
     const response = await axios.post(this.usersUrl, body, this.client.getAuthHeaders())
+    return response.data.user
+  }
+
+  async updateUser (id, params) {
+    const body = { user: params }
+    const url = `${this.usersUrl}/${id}`
+    const response = await axios.patch(url, body, this.client.getAuthHeaders())
     return response.data.user
   }
 

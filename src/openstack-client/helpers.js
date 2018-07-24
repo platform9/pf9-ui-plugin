@@ -5,7 +5,8 @@ export const keystoneEndpoint = `${config.host}/keystone`
 export const makeClient = () => new OpenstackClient({ keystoneEndpoint })
 
 export const getUserPass = () => {
-  const { username, password } = config.simulator
+  const username = config.username || config.simulator.username
+  const password = config.password || config.simulator.password
   if (!username || !password) {
     throw new Error('username and/or password not specified in config.js')
   }
@@ -22,7 +23,8 @@ export const makeUnscopedClient = async () => {
 export const makeScopedClient = async () => {
   const client = await makeUnscopedClient()
   const projects = await client.keystone.getProjects()
-  await client.keystone.changeProjectScope(projects[0].id)
+  const project = projects.find(x => x.name === 'Development Team Tenant') || projects[0]
+  await client.keystone.changeProjectScope(project.id)
   return client
 }
 

@@ -1,6 +1,14 @@
 import OpenstackClient from '../../openstack-client'
 import config from '../../../config'
 
+// The GraphQL schema does not like null values for disk, ram, and vcpus
+const sanitizeFlavor = flavor => ({
+  ...flavor,
+  disk: flavor.disk || 0,
+  ram: flavor.ram || 0,
+  vcpus: flavor.vcpus || 0,
+})
+
 class Context {
   resetContext () {}
 
@@ -8,17 +16,33 @@ class Context {
   // Don't check auth token in the server, let the REST API do that.
   validateToken = () => true
 
-  getTenants = async () => {
-    const tenants = await this.client.keystone.getProjects(true)
-    return tenants
-  }
+  getTenant = id => this.client.keystone.getTenant(id)
+  getTenants = () => this.client.keystone.getProjects(true)
+  updatetenant = (id, params) => this.client.keystone.updateProject(id, params)
+  removeTenant = id => this.client.keystone.deleteProject(id)
 
   createTenant = async ({ input }) => {
     const newTenant = await this.client.keystone.createProject(input)
     return newTenant
   }
 
-  removeTenant = id => this.client.keystone.deleteProject(id)
+  getUser = id => this.client.keystone.getUser(id)
+  createUser = ({ input }) => this.client.keystone.createUser(input)
+  updateUser = (id, params) => this.client.keystone.updateUser(id, params)
+  removeUser = id => this.client.keystone.deleteUser(id)
+
+  getUsers = async () => {
+    const users = (await this.client.keystone.getUsers() || [])
+    // Sometimes the API returns users without a username.  This violates
+    // the GraphQL schema (non-nullable) so just use an empty string.
+    const sanitized = users.map(user => ({...user, username: user.username || ''}))
+    return sanitized
+  }
+
+  getFlavor = async id => sanitizeFlavor(await this.client.nova.getFlavor(id))
+  getFlavors = async () => (await this.client.nova.getFlavors() || []).map(sanitizeFlavor)
+  createFlavor = ({ input }) => this.client.nova.createFlavor(input)
+  removeFlavor = id => this.client.nova.deleteFlavor(id)
 }
 
 const context = new Context()

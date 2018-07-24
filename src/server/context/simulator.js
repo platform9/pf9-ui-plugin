@@ -101,16 +101,14 @@ class Context {
     return id
   }
 
-  getTenantRoles = userObj => {
-    const user = User.findById(userObj.id).asJson()
-    let result = []
-    user.roles.map(({ tenant, role }) => (result.push(JSON.stringify({
+  getTenantRoles = id => {
+    const user = User.findById(id).asJson()
+    return user.roles.map(({ tenant, role }) => (JSON.stringify({
       // tenant: Tenant.findById(tenant.id).asGraphQl(),
       // role: Role.findById(role.id).asGraphQl()
       tenant: Tenant.findById(tenant.id).asJson().name,
       role: Role.findById(role.id).asJson().name
-    }))))
-    return result
+    })))
   }
 
   getUser = (id) => {
