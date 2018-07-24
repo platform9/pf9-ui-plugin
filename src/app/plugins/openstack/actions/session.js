@@ -54,9 +54,24 @@ const Session = (keystone = Keystone, mocks = {}) => {
   const getLastRegion = username => getStorage(regionStorageKey(username))
   const setLastRegion = (username, tenant) => ctx.setStorage(regionStorageKey(username), tenant)
 
-  const paginationStorageKey = username => `last-paginationlimit-used-${username}`
-  const getLastPaginationLimit = username => getStorage(paginationStorageKey(username))
-  const setLastPaginationLimit = (username, limit) => ctx.setStorage(paginationStorageKey(username), limit)
+  const userPreferenceKey = username => `user-preference-${username}`
+  const getUserPreference = () => {
+    const username = getStorage('username')
+    if (!username) {
+      console.log('No user found.')
+      return
+    }
+    return getStorage(userPreferenceKey(username)) || {}
+  }
+  const initUserPreference = (username, key, value) => ctx.setStorage(userPreferenceKey(username), { [key]: value })
+  const setUserPreference = (key, value) => {
+    const username = getStorage('username')
+    if (!username) {
+      console.log('No user found.')
+      return
+    }
+    setStorage(userPreferenceKey(username), { [key]: value })
+  }
 
   const initialSetup = async ({ username, unscopedToken, dispatch }) => {
     // Store in the in-memory "registry"
@@ -83,8 +98,9 @@ const Session = (keystone = Keystone, mocks = {}) => {
     const region = ctx.getPreferredRegion(regions, lastRegion)
     setLastRegion(username, region)
 
-    const lastPaginationLimit = getLastPaginationLimit(username)
-    setLastPaginationLimit(username, lastPaginationLimit || 10)
+    const userPerference = ctx.getUserPreference(username)
+    const perPage = userPerference ? userPerference['perPage'] : 10
+    initUserPreference(username, 'perPage', perPage)
 
     dispatch(ctx.setCurrentSession({
       region,
@@ -154,8 +170,8 @@ const Session = (keystone = Keystone, mocks = {}) => {
     setToken,
     setUnscopedToken,
     setUsername,
-    getLastPaginationLimit,
-    setLastPaginationLimit,
+    getUserPreference,
+    initUserPreference,
     signIn,
     signOut,
     ...mocks // allow tests to override any of the above functions
@@ -166,8 +182,8 @@ const Session = (keystone = Keystone, mocks = {}) => {
     signOut,
     authenticate,
     restoreSession,
-    getLastPaginationLimit,
-    setLastPaginationLimit
+    getUserPreference,
+    setUserPreference,
   }
 }
 

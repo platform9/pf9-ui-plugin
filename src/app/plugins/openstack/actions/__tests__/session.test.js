@@ -79,6 +79,9 @@ describe('signIn', () => {
     }
   })
 
+  // Ignore console.log messages
+  console.log = jest.fn()
+
   const performSignIn = () => {
     const session = Session(mockKeystone, mockSession)
     return session.signIn({ username: 'test@platform9.com', password: 'secret' })(mockDispatch)
