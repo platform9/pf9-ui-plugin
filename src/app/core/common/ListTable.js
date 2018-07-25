@@ -140,6 +140,8 @@ class ListTable extends React.Component {
     })
   }
 
+  handleClear = event => this.setState({ searchTerm: '' })
+
   filterBySearch = (data, target) => {
     const { searchTerm } = this.state
     return data.filter(ele => ele[target].match(new RegExp(searchTerm, 'i')) !== null)
@@ -255,6 +257,8 @@ class ListTable extends React.Component {
               onDelete={onDelete && this.handleDelete}
               onEdit={onEdit && this.handleEdit}
               onSearch={searchTarget && this.handleSearch}
+              onClear={this.handleClear}
+              searchTerm={this.state.searchTerm}
             />
             <div className={classes.tableWrapper}>
               <Table className={classes.table}>

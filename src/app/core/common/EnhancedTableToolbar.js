@@ -17,6 +17,8 @@ import DeleteIcon from '@material-ui/icons/Delete'
 import EditIcon from '@material-ui/icons/Edit'
 import FilterListIcon from '@material-ui/icons/FilterList'
 import SearchIcon from '@material-ui/icons/Search'
+import ClearIcon from '@material-ui/icons/Clear'
+import grey from '@material-ui/core/colors/grey'
 
 const toolbarStyles = theme => ({
   root: {
@@ -43,10 +45,18 @@ const toolbarStyles = theme => ({
   },
   searchBar: {
     marginRight: theme.spacing.unit * 2.5
+  },
+  clearIcon: {
+    '&:hover': {
+      color: grey[800],
+    },
+    '&:active': {
+      color: grey[200]
+    }
   }
 })
 
-const EnhancedTableToolbar = ({ classes, numSelected, title, onAdd, onDelete, onEdit, onSearch }) => (
+const EnhancedTableToolbar = ({ classes, numSelected, title, onAdd, onDelete, onEdit, onSearch, onClear, searchTerm }) => (
   <Toolbar
     className={classNames(classes.root, {
       [classes.highlight]: numSelected > 0,
@@ -65,20 +75,33 @@ const EnhancedTableToolbar = ({ classes, numSelected, title, onAdd, onDelete, on
     <div className={classes.actions}>
       <Toolbar>
         {onSearch &&
-          <Tooltip title="Search">
-            <TextField
-              className={classes.searchBar}
-              placeholder="Search"
-              onChange={onSearch}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Tooltip>
+          <TextField
+            className={classes.searchBar}
+            placeholder="Search"
+            value={searchTerm}
+            onChange={onSearch}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+              endAdornment: (
+                <InputAdornment
+                  position="end"
+                  style={{ visibility: searchTerm.length > 0 ? '': 'hidden' }}
+                >
+                  <Tooltip title="Clear search">
+                    <ClearIcon
+                      className={classes.clearIcon}
+                      color="action"
+                      onClick={onClear}
+                    />
+                  </Tooltip>
+                </InputAdornment>
+              )
+            }}
+          />
         }
         {numSelected === 1 && onEdit &&
           <Tooltip title="Edit">
