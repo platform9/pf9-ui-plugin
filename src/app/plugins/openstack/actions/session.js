@@ -59,7 +59,7 @@ const Session = (keystone = Keystone, mocks = {}) => {
     const username = getStorage('username')
     if (!username) {
       console.log('No user found.')
-      return
+      return {}
     }
     return getStorage(userPreferenceKey(username)) || {}
   }
@@ -99,7 +99,7 @@ const Session = (keystone = Keystone, mocks = {}) => {
     setLastRegion(username, region)
 
     const userPerference = ctx.getUserPreference(username)
-    const perPage = userPerference ? userPerference['perPage'] : 10
+    const perPage = userPerference ? userPerference.perPage : 10
     initUserPreference(username, 'perPage', perPage)
 
     dispatch(ctx.setCurrentSession({

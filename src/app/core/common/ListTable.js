@@ -39,7 +39,7 @@ class ListTable extends React.Component {
       order: 'asc',
       orderBy: this.props.columns[0].id,
       page: 0,
-      rowsPerPage: session.getUserPreference()['perPage'] || 10,
+      rowsPerPage: session.getUserPreference().perPage || 10,
       selected: [],
       selectedAll: false,
       searchTerm: ''

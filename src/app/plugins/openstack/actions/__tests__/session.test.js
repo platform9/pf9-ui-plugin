@@ -48,6 +48,7 @@ describe('getPreferredRegion', () => {
 describe('signIn', () => {
   let mockKeystone
   let mockSession
+  const originalLog = console.log
   const selectedTenant = mockedTenants.find(x => x.name === 'another')
   const selectedRegion = mockedRegions.find(x => x.id === 'Yet-Another-Region')
   const mockedScopedToken = {
@@ -61,6 +62,8 @@ describe('signIn', () => {
   }
 
   beforeEach(() => {
+    // Ignore console.log messages
+    console.log = jest.fn()
     mockKeystone = {
       getUnscopedToken: jest.fn().mockResolvedValue('secretToken'),
       getScopedProjects: jest.fn().mockResolvedValue(mockedTenants),
@@ -79,8 +82,9 @@ describe('signIn', () => {
     }
   })
 
-  // Ignore console.log messages
-  console.log = jest.fn()
+  afterEach(() => {
+    console.log = originalLog
+  })
 
   const performSignIn = () => {
     const session = Session(mockKeystone, mockSession)
