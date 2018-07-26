@@ -89,7 +89,7 @@ const EnhancedTableToolbar = ({ classes, numSelected, title, onAdd, onDelete, on
               endAdornment: (
                 <InputAdornment
                   position="end"
-                  style={{ visibility: searchTerm.length > 0 ? '': 'hidden' }}
+                  style={{ visibility: searchTerm.length > 0 ? '' : 'hidden' }}
                 >
                   <Tooltip title="Clear search">
                     <ClearIcon
