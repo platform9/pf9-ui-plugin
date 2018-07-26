@@ -68,7 +68,7 @@ const Session = (keystone = Keystone, mocks = {}) => {
     const username = getStorage('username')
     if (!username) {
       console.log('No user found.')
-      return
+      return {}
     }
     setStorage(userPreferenceKey(username), { [key]: value })
   }
