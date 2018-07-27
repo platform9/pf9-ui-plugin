@@ -1,0 +1,39 @@
+type Application {
+  id: ID!
+  name: String!
+  author: String!
+  tenant: String!
+  public: Boolean!
+  description: String
+  categories: String
+  tags: String
+}
+
+type Query {
+  applications: [Application!]!
+  application(id: ID!): Application
+}
+
+input ApplicationInput {
+  name: String!
+  author: String!
+  tenant: String!
+  public: Boolean!
+  description: String
+  categories: String
+  tags: String
+}
+
+input UpdateApplicationInput {
+  name: String!
+  description: String
+  categories: String
+  tags: String
+  public: Boolean!
+}
+
+type Mutation {
+  createApplication(input: ApplicationInput): Application!
+  updateApplication(id: ID!, input: UpdateApplicationInput): Application!
+  removeApplication(id: ID): ID!
+}

@@ -9,6 +9,7 @@ import Network from '../models/Network'
 import Router from '../models/Router'
 import Volume from '../models/Volume'
 import GlanceImage from '../models/GlanceImage'
+import Application from '../models/Application'
 // import Token from '../models/Token'
 import { range } from '../util'
 
@@ -79,7 +80,10 @@ function loadPreset () {
   new GlanceImage({ name: 'Test-Image-2', description: 'Version 1118', status: 'OK', owner: 'Development Team Tenant', visibility: 'public', protected: false, disk_format: 'qcow2', virtual_size: 50, size: 8 })
   new GlanceImage({ name: 'Test-Image-3', description: 'A plain test image.', status: 'OK', owner: 'Development Team Tenant', visibility: 'private', protected: true, disk_format: 'qcow2', virtual_size: 100, size: 22 })
 
-  adminUser.addRole(adminRole)
+  // Applications
+  new Application({ name: 'Test-Application-1', author: 'admin', public: true, tenant: 'Development Team Tenant', description: 'Some descriptions', categories: 'Web' })
+  new Application({ name: 'Test-Application-2', author: 'admin', public: true, tenant: 'Development Team Tenant', description: 'Some descriptions', categories: 'SAP' })
+  new Application({ name: 'Test-Application-3', author: 'user', public: true, tenant: 'Test Tenant', description: 'Some descriptions', categories: 'Databases' })
 }
 
 export default loadPreset

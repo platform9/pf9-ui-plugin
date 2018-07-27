@@ -8,6 +8,7 @@ import GlanceImage from '../models/GlanceImage'
 import Network from '../models/Network'
 import Router from '../models/Router'
 import Token from '../models/Token'
+import Application from '../models/Application'
 
 const defaultQuota = {
   cores: 10,
@@ -40,6 +41,7 @@ class Context {
     this.regions = []
     this.volumes = []
     this.glanceImages = []
+    this.applications = []
     this.defaultQuota = { ...defaultQuota }
   }
 
@@ -265,6 +267,38 @@ class Context {
       throw new Error('Unable to delete non-existent glance image')
     }
     glanceImage.destroy()
+    return id
+  }
+
+  getApplication = id => {
+    const application = Application.findById(id)
+    if (!application) {
+      throw new Error('Unable to find non-existent application')
+    }
+    return application.asGraphQl()
+  }
+
+  getApplications = () => Application.getCollection().map(x => x.asGraphQl())
+
+  createApplication = ({ input }) => {
+    const application = new Application(input)
+    return application.asGraphQl()
+  }
+
+  updateApplication = (id, input) => {
+    const application = Application.updateById(id, input)
+    if (!application) {
+      throw new Error('Unable to update non-existent application')
+    }
+    return application.asGraphQl()
+  }
+
+  removeApplication = id => {
+    const application = Application.findById(id)
+    if (!application) {
+      throw new Error('Unable to delete non-existent application')
+    }
+    application.destroy()
     return id
   }
 }

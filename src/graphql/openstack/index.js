@@ -7,6 +7,7 @@ import volumes from './schemas/volumes'
 import glanceImages from './schemas/glanceImages'
 import userManagement from './schemas/userManagement'
 import serviceCatalog from './schemas/serviceCatalog'
+import applications from './schemas/applications'
 
 const mergedSchemas = mergeSchemas({
   schemas: [
@@ -16,7 +17,8 @@ const mergedSchemas = mergeSchemas({
     userManagement,
     networks,
     routers,
-    serviceCatalog
+    serviceCatalog,
+    applications
   ]
 })
 
