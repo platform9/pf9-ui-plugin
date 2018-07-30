@@ -7,10 +7,7 @@ export const getInstance = () => {
   return JSON.parse(localStorage.getItem(LOCAL_STORAGE_NAMESPACE) ||'{}')
 }
 
-export const getStorage = key => {
-  const current = getInstance()
-  return current[key]
-}
+export const getStorage = key => getInstance()[key]
 
 export const setStorage = (key, value) => {
   const current = getInstance()
