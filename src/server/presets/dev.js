@@ -81,9 +81,9 @@ function loadPreset () {
   new GlanceImage({ name: 'Test-Image-3', description: 'A plain test image.', status: 'OK', owner: 'Development Team Tenant', visibility: 'private', protected: true, disk_format: 'qcow2', virtual_size: 100, size: 22 })
 
   // Applications
-  new Application({ name: 'Test-Application-1', author: 'admin', public: true, tenant: 'Development Team Tenant', description: 'Some descriptions', categories: 'Web' })
-  new Application({ name: 'Test-Application-2', author: 'admin', public: true, tenant: 'Development Team Tenant', description: 'Some descriptions', categories: 'SAP' })
-  new Application({ name: 'Test-Application-3', author: 'user', public: true, tenant: 'Test Tenant', description: 'Some descriptions', categories: 'Databases' })
+  new Application({ name: 'ApacheHttpServer', author: 'admin', public: true, tenant: 'Development Team Tenant', description: 'The Apache HTTP Server Project is a collaborative software development effort aimed at creating a robust, commercial-grade, featureful, and freely-available source code implementation of an HTTP (Web) server.', categories: 'Web' })
+  new Application({ name: 'WordPress', author: 'admin', public: true, tenant: 'Development Team Tenant', description: 'WordPress is a free and open-source content management system (CMS) based on PHP and MySQL.', categories: 'SAP' })
+  new Application({ name: 'MongoDB', author: 'user', public: true, tenant: 'Test Tenant', description: 'MongoDB is a cross-platform document-oriented database. Classified as a NoSQL database, MongoDB eschews the traditional table-based relational database structure in favor of JSON-like documents with dynamic schemas.', categories: 'Databases' })
 }
 
 export default loadPreset

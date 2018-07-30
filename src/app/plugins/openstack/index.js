@@ -34,6 +34,8 @@ import UpdateGlanceImagePage from './components/glanceimages/UpdateGlanceImagePa
 
 import ApiAccessPage from './components/api-access/ApiAccessListPage'
 
+import ApplicationsPage from './components/applications/ApplicationsListPage'
+
 import loginReducer from './reducers/login'
 import sessionReducer from './reducers/session'
 import tenantsReducer from './reducers/tenants'
@@ -175,6 +177,11 @@ OpenStack.registerPlugin = pluginManager => {
         name: 'EditGlanceImage',
         link: { path: '/glanceimages/edit/:glanceImageId', exact: true },
         component: UpdateGlanceImagePage
+      },
+      {
+        name: 'Applications',
+        link: { path: '/applications', exact: true },
+        component: ApplicationsPage
       }
     ]
   )
@@ -217,6 +224,10 @@ OpenStack.registerPlugin = pluginManager => {
       {
         name: 'Glance Images',
         link: { path: '/glanceimages' }
+      },
+      {
+        name: 'Applications',
+        link: { path: '/applications' }
       }
     ]
   )
