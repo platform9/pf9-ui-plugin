@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import CRUDListContainer from 'core/common/CRUDListContainer'
 import ApplicationsList from './ApplicationsList'
 import ApplicationCard from './ApplicationCard'
+import CardTable from './CardTable'
 import { Grid } from '@material-ui/core'
 
 class ApplicationsListContainer extends React.Component {
@@ -28,6 +29,10 @@ class ApplicationsListContainer extends React.Component {
           {this.props.applications &&
             this.props.applications.map(application => <ApplicationCard application={application} key={application.name} />)}
         </Grid>
+        {this.props.applications && <CardTable
+          data={this.props.applications}
+          searchTarget="name"
+        />}
       </div>
     )
   }

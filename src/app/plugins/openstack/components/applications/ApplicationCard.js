@@ -7,6 +7,8 @@ import {
   CardMedia,
   Divider,
   Grid,
+  Hidden,
+  Tooltip,
   Typography
 } from '@material-ui/core'
 import AddCircleIcon from '@material-ui/icons/AddCircle'
@@ -79,12 +81,20 @@ class ApplicationCard extends React.Component {
           </CardContent>
           <div className={classes.ActionContainer} align="center">
             <Button>
-              <AddCircleIcon className={classes.buttonIcon} />
-              Add to Environment
+              <Tooltip title="Add to Environment">
+                <AddCircleIcon className={classes.buttonIcon} />
+              </Tooltip>
+              <Hidden mdDown>
+                <div>Add to Environment</div>
+              </Hidden>
             </Button>
             <Button>
-              <PublishIcon className={classes.buttonIcon} />
-              1-click Deploy
+              <Tooltip title="1-click Deploy">
+                <PublishIcon className={classes.buttonIcon} />
+              </Tooltip>
+              <Hidden mdDown>
+                <div>1-click Deploy</div>
+              </Hidden>
             </Button>
           </div>
           <Divider className={classes.divider} />
