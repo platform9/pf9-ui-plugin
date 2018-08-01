@@ -3,32 +3,16 @@ import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/core/styles'
 import {
   Button,
-  InputAdornment,
   Menu,
   MenuItem,
-  TextField,
   Typography
 } from '@material-ui/core'
-import SearchIcon from '@material-ui/icons/Search'
-import ClearIcon from '@material-ui/icons/Clear'
-import grey from '@material-ui/core/colors/grey'
+import SearchBar from './SearchBar'
 
 const styles = theme => ({
   selector: {
     position: 'relative',
     float: 'right'
-  },
-  menuSearch: {
-    outline: 'none',
-    padding: theme.spacing.unit * 2
-  },
-  clearIcon: {
-    '&:hover': {
-      color: grey[800],
-    },
-    '&:active': {
-      color: grey[200]
-    }
   }
 })
 
@@ -91,30 +75,10 @@ class Selector extends React.Component {
           getContentAnchorEl={null}
           anchorOrigin={{vertical: 'bottom', horizontal: 'left'}}
         >
-          { searchTerm !== undefined && <TextField
-            placeholder='Search'
-            className={classes.menuSearch}
-            onChange={onSearch}
-            value={searchTerm}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-              endAdornment: (
-                <InputAdornment
-                  position="end"
-                  style={{ visibility: searchTerm.length > 0 ? '' : 'hidden' }}
-                >
-                  <ClearIcon
-                    className={classes.clearIcon}
-                    color="action"
-                    onClick={onClear}
-                  />
-                </InputAdornment>
-              )
-            }}
+          { searchTerm !== undefined && <SearchBar
+            onSearch={onSearch}
+            onClear={onClear}
+            searchTerm={searchTerm}
           />}
           {filteredList.map(item => (<MenuItem onClick={this.handleClose('anchor')} key={item}>{item}</MenuItem>))}
         </Menu>

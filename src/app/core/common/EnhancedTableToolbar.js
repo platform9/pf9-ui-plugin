@@ -5,8 +5,6 @@ import { withStyles } from '@material-ui/core/styles'
 import {
   Button,
   IconButton,
-  InputAdornment,
-  TextField,
   Toolbar,
   Tooltip,
   Typography
@@ -16,9 +14,7 @@ import AddIcon from '@material-ui/icons/Add'
 import DeleteIcon from '@material-ui/icons/Delete'
 import EditIcon from '@material-ui/icons/Edit'
 import FilterListIcon from '@material-ui/icons/FilterList'
-import SearchIcon from '@material-ui/icons/Search'
-import ClearIcon from '@material-ui/icons/Clear'
-import grey from '@material-ui/core/colors/grey'
+import SearchBar from 'core/common/SearchBar'
 
 const toolbarStyles = theme => ({
   root: {
@@ -42,17 +38,6 @@ const toolbarStyles = theme => ({
   },
   title: {
     flex: '0 0 auto',
-  },
-  searchBar: {
-    marginRight: theme.spacing.unit * 2.5
-  },
-  clearIcon: {
-    '&:hover': {
-      color: grey[800],
-    },
-    '&:active': {
-      color: grey[200]
-    }
   }
 })
 
@@ -75,32 +60,10 @@ const EnhancedTableToolbar = ({ classes, numSelected, title, onAdd, onDelete, on
     <div className={classes.actions}>
       <Toolbar>
         {onSearch &&
-          <TextField
-            className={classes.searchBar}
-            placeholder="Search"
-            value={searchTerm}
-            onChange={onSearch}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-              endAdornment: (
-                <InputAdornment
-                  position="end"
-                  style={{ visibility: searchTerm.length > 0 ? '' : 'hidden' }}
-                >
-                  <Tooltip title="Clear search">
-                    <ClearIcon
-                      className={classes.clearIcon}
-                      color="action"
-                      onClick={onClear}
-                    />
-                  </Tooltip>
-                </InputAdornment>
-              )
-            }}
+          <SearchBar
+            onSearch={onSearch}
+            onClear={onClear}
+            searchTerm={searchTerm}
           />
         }
         {numSelected === 1 && onEdit &&
