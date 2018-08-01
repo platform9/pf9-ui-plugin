@@ -14,6 +14,12 @@ export const Provider = ValidatedFormContext.Provider
  * data value schema and the validations.
  */
 class ValidatedForm extends React.Component {
+  constructor (props) {
+    super(props)
+    if (props.triggerSubmit) {
+      props.triggerSubmit(this.handleSubmit)
+    }
+  }
   /**
    * This stores the specification of the field, to be used for validation down the line.
    * This function will be called by the child components when they are initialized.
@@ -33,6 +39,7 @@ class ValidatedForm extends React.Component {
   /**
    * Child components invoke this from their 'onChange' (or equivalent).
    * Note: many components use event.target.value but we only need value here.
+   * Note: values can be passed up to parent component by supplying a setContext function prop
    */
   setField = (field, value) => {
     this.setState(
@@ -44,6 +51,10 @@ class ValidatedForm extends React.Component {
         },
       }),
     )
+    // Pass field up to parent if there is a parent
+    if (this.props.setContext) {
+      this.props.setContext(this.state.value)
+    }
   }
 
   state = {
@@ -64,10 +75,17 @@ class ValidatedForm extends React.Component {
   }
 
   handleSubmit = event => {
-    const { action } = this.props
-    event.preventDefault()
+    const { action, onSubmit } = this.props
+    const { value } = this.state
+    if (event) {
+      event.preventDefault()
+    }
 
     if (!this.validateForm()) { return }
+
+    if (onSubmit) {
+      onSubmit(value)
+    }
 
     switch (action) {
       case 'add':
@@ -139,14 +157,21 @@ ValidatedForm.propTypes = {
   // Action to take(add/delete/update)
   action: PropTypes.string,
   // Url to go back when the operation ends
-  backUrl: PropTypes.string.isRequired,
+  backUrl: PropTypes.string,
   // Type of objects to operate
   objType: PropTypes.string,
   // String of query to cache
   cacheQuery: PropTypes.string,
   // Id of object to update
-  objId: PropTypes.string
+  objId: PropTypes.string,
+  // Initial values
+  initialValue: PropTypes.object,
+  // Set parent context
+  onSubmit: PropTypes.func,
+  triggerSubmit: PropTypes.func,
 }
+
+export const PropKeys = Object.keys(ValidatedForm.propTypes)
 
 export default compose(
   withRouter,
