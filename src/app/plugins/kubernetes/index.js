@@ -25,6 +25,7 @@ Kubernetes.registerPlugin = pluginManager => {
     ]
   )
 
+  /*
   pluginManager.registerNavItems(
     '/ui/kubernetes',
     [
@@ -34,6 +35,7 @@ Kubernetes.registerPlugin = pluginManager => {
       },
     ]
   )
+  */
 
   pluginManager.registerSchema(k8Schema)
 }
