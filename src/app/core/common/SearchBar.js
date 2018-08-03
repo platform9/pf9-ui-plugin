@@ -25,14 +25,25 @@ const styles = theme => ({
 })
 
 @withStyles(styles)
+
+// The selector containing searchBar needs to keep state of searchBar in parent component.
+// To keep it aligned, please keep searchTerm in parent component of searchBar
 class SearchBar extends React.Component {
+  handleSearch = event => {
+    this.props.onChange(event.target.value)
+  }
+
+  handleClear = () => {
+    this.props.onChange('')
+  }
+
   render () {
-    const { classes, onSearch, onClear, searchTerm } = this.props
+    const { classes, searchTerm } = this.props
     return (
       searchTerm !== undefined && <TextField
         placeholder='Search'
         className={classes.SearchBar}
-        onChange={onSearch}
+        onChange={this.handleSearch}
         value={searchTerm}
         InputProps={{
           startAdornment: (
@@ -48,7 +59,7 @@ class SearchBar extends React.Component {
               <ClearIcon
                 className={classes.clearIcon}
                 color="action"
-                onClick={onClear}
+                onClick={this.handleClear}
               />
             </InputAdornment>
           )
@@ -59,8 +70,7 @@ class SearchBar extends React.Component {
 }
 
 SearchBar.propTypes = {
-  onSearch: PropTypes.func.isRequired,
-  onClear: PropTypes.func.isRequired
+  onChange: PropTypes.func.isRequired
 }
 
 export default SearchBar

@@ -138,13 +138,11 @@ class Navbar extends React.Component {
     })
   }
 
-  handleSearch = key => event => {
+  handleSearch = key => value => {
     this.setState({
-      [key]: event.target.value
+      [key]: value
     })
   }
-
-  handleClear = key => event => this.setState({ [key]: '' })
 
   navTo = link => () => {
     this.props.history.push(link)
@@ -203,16 +201,14 @@ class Navbar extends React.Component {
                   name={curRegion.length === 0 ? 'Current Reigion' : curRegion}
                   list={[`AWS-US-West-1-Test`, `KVM-Neutron`]}
                   onChoose={this.handleClick('curRegion')}
-                  onSearch={this.handleSearch('regionSearch')}
-                  onClear={this.handleClear('regionSearch')}
+                  onChange={this.handleSearch('regionSearch')}
                   searchTerm={regionSearch}
                 />
                 <Selector
                   name={curTenant.length === 0 ? 'Current Tenant' : curTenant}
                   list={[`Dev Team Tenant`, `Test Tenant`]}
                   onChoose={this.handleClick('curTenant')}
-                  onSearch={this.handleSearch('tenantSearch')}
-                  onClear={this.handleClear('tenantSearch')}
+                  onChange={this.handleSearch('tenantSearch')}
                   searchTerm={tenantSearch}
                 />
                 <Avatar />

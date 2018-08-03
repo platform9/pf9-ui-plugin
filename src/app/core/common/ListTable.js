@@ -140,13 +140,11 @@ class ListTable extends React.Component {
     this.props.onEdit(selected)
   }
 
-  handleSearch = event => {
+  handleSearch = value => {
     this.setState({
-      searchTerm: event.target.value
+      searchTerm: value
     })
   }
-
-  handleClear = event => this.setState({ searchTerm: '' })
 
   filterBySearch = (data, target) => {
     const { searchTerm } = this.state
@@ -263,8 +261,7 @@ class ListTable extends React.Component {
               onAdd={onAdd && this.handleAdd}
               onDelete={onDelete && this.handleDelete}
               onEdit={onEdit && this.handleEdit}
-              onSearch={searchTarget && this.handleSearch}
-              onClear={this.handleClear}
+              onChange={searchTarget && this.handleSearch}
               searchTerm={searchTerm}
             />
             <div className={classes.tableWrapper}>
