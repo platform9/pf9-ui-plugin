@@ -48,7 +48,7 @@ const styles = theme => ({
 class Alert extends React.Component {
   state = { open: true }
 
-  onClose = () => { this.setState({ open: false })}
+  onClose = () => { this.setState({ open: false }) }
   render () {
     if (!this.state.open) { return null }
 
