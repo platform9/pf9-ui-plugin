@@ -30,12 +30,12 @@ const styles = theme => ({
     marginRight: theme.spacing.unit
   },
   message: {
-    color: '#eee',
+    color: theme.palette.primary.contrastText,
     display: 'flex',
     alignItems: 'center',
   },
   container: {
-    color: '#eee',
+    color: theme.palette.primary.contrastText,
     display: 'flex',
     justifyContent: 'space-between',
     margin: `${theme.spacing.unit}px 0`,
