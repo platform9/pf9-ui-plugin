@@ -25,9 +25,9 @@ export const injectClientInfo = (req, res, next) => {
   if (context.client) {
     context.client.unscopedToken = authToken
     context.client.scopedToken = authToken
-  }
-  if (config.region) {
-    context.client.setActiveRegion(config.region)
+    if (config.region) {
+      context.client.setActiveRegion(config.region)
+    }
   }
   next()
 }
