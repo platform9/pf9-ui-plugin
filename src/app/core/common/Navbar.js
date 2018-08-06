@@ -201,14 +201,14 @@ class Navbar extends React.Component {
                   name={curRegion.length === 0 ? 'Current Reigion' : curRegion}
                   list={[`AWS-US-West-1-Test`, `KVM-Neutron`]}
                   onChoose={this.handleClick('curRegion')}
-                  onChange={this.handleSearch('regionSearch')}
+                  onSearchChange={this.handleSearch('regionSearch')}
                   searchTerm={regionSearch}
                 />
                 <Selector
                   name={curTenant.length === 0 ? 'Current Tenant' : curTenant}
                   list={[`Dev Team Tenant`, `Test Tenant`]}
                   onChoose={this.handleClick('curTenant')}
-                  onChange={this.handleSearch('tenantSearch')}
+                  onSearchChange={this.handleSearch('tenantSearch')}
                   searchTerm={tenantSearch}
                 />
                 <Avatar />

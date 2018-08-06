@@ -31,9 +31,9 @@ class Selector extends React.Component {
 
   // Clear search bar when selector is closed.
   handleClose = anchor => event => {
-    const { onChoose, onChange } = this.props
+    const { onChoose, onSearchChange } = this.props
     event.target.innerText && onChoose(event)
-    onChange('')
+    onSearchChange('')
     this.setState({ [anchor]: null })
   }
 
@@ -48,7 +48,7 @@ class Selector extends React.Component {
   }
 
   render () {
-    const { classes, name, list, searchTerm, onChange } = this.props
+    const { classes, name, list, searchTerm, onSearchChange } = this.props
     const { anchor } = this.state
     const selectorName = `${name}-selector`
 
@@ -77,7 +77,7 @@ class Selector extends React.Component {
           anchorOrigin={{vertical: 'bottom', horizontal: 'left'}}
         >
           { searchTerm !== undefined && <SearchBar
-            onChange={onChange}
+            onSearchChange={onSearchChange}
             searchTerm={searchTerm}
           />}
           {filteredList.map(item => (<MenuItem onClick={this.handleClose('anchor')} key={item}>{item}</MenuItem>))}

@@ -261,7 +261,7 @@ class ListTable extends React.Component {
               onAdd={onAdd && this.handleAdd}
               onDelete={onDelete && this.handleDelete}
               onEdit={onEdit && this.handleEdit}
-              onChange={searchTarget && this.handleSearch}
+              onSearchChange={searchTarget && this.handleSearch}
               searchTerm={searchTerm}
             />
             <div className={classes.tableWrapper}>

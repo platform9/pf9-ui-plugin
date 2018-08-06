@@ -41,7 +41,7 @@ const toolbarStyles = theme => ({
   }
 })
 
-const EnhancedTableToolbar = ({ classes, numSelected, title, onAdd, onDelete, onEdit, onChange, searchTerm }) => (
+const EnhancedTableToolbar = ({ classes, numSelected, title, onAdd, onDelete, onEdit, onSearchChange, searchTerm }) => (
   <Toolbar
     className={classNames(classes.root, {
       [classes.highlight]: numSelected > 0,
@@ -59,9 +59,9 @@ const EnhancedTableToolbar = ({ classes, numSelected, title, onAdd, onDelete, on
     <div className={classes.spacer} />
     <div className={classes.actions}>
       <Toolbar>
-        {onChange &&
+        {onSearchChange &&
           <SearchBar
-            onChange={onChange}
+            onSearchChange={onSearchChange}
             searchTerm={searchTerm}
           />
         }

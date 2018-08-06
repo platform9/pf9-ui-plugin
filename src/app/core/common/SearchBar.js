@@ -30,11 +30,11 @@ const styles = theme => ({
 // To keep it aligned, please keep searchTerm in parent component of searchBar
 class SearchBar extends React.Component {
   handleSearch = event => {
-    this.props.onChange(event.target.value)
+    this.props.onSearchChange(event.target.value)
   }
 
   handleClear = () => {
-    this.props.onChange('')
+    this.props.onSearchChange('')
   }
 
   render () {
@@ -70,7 +70,7 @@ class SearchBar extends React.Component {
 }
 
 SearchBar.propTypes = {
-  onChange: PropTypes.func.isRequired
+  onSearchChange: PropTypes.func.isRequired
 }
 
 export default SearchBar
