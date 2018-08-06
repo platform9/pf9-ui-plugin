@@ -14,6 +14,7 @@ import {
   TextField,
   Typography,
 } from '@material-ui/core'
+import Alert from 'core/common/Alert'
 
 function mapStateToProps (state, ownProps) {
   const { login } = state.openstack
@@ -71,7 +72,8 @@ export class LoginPage extends React.Component {
   state = {
     username: '',
     password: '',
-    MFAcheckbox: false
+    MFAcheckbox: false,
+    loginFailed: false,
   }
 
   updateValue = key => event => {
@@ -80,6 +82,7 @@ export class LoginPage extends React.Component {
 
   performLogin = async (event) => {
     event.preventDefault()
+    this.setState({ loginFailed: false })
     const { username, password } = this.state
     const { dispatch, history } = this.props
     const session = Session()
@@ -87,6 +90,8 @@ export class LoginPage extends React.Component {
     if (loginSuccessful) {
       // redirect to the dashboard page on successful login
       history.push('/')
+    } else {
+      this.setState({ loginFailed: true })
     }
   }
 
@@ -164,6 +169,7 @@ export class LoginPage extends React.Component {
 
   render () {
     const { classes } = this.props
+    const { loginFailed } = this.state
     const logoPath = rootPath+'images/logo-color.png'
     return (
       <div className="login-page">
@@ -178,6 +184,7 @@ export class LoginPage extends React.Component {
                 {this.renderInputfield()}
                 {this.renderMFACheckbox()}
                 {this.state.MFAcheckbox && this.renderMFAInput()}
+                {loginFailed && <Alert variant="error" message="Login failed" /> }
                 <Button type="submit" className={classes.signinButton} variant="contained" color="primary">
                   SIGN IN
                 </Button>
