@@ -21,7 +21,7 @@ import { rootPath } from 'core/globals'
 
 const styles = theme => ({
   card: {
-    marginTop: theme.spacing.unit,
+    margin: theme.spacing.unit,
     padding: 0
   },
   info: {
@@ -66,7 +66,7 @@ class ApplicationCard extends React.Component {
   render () {
     const { classes, application } = this.props
     return (
-      <Grid item md={6} lg={4}>
+      <Grid item sm={6} md={4} lg={4}>
         <Card className={classes.card}>
           <CardContent>
             <Typography variant="headline" paragraph>{application.name}</Typography>

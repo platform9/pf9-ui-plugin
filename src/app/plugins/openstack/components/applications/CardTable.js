@@ -2,14 +2,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/core/styles'
 import {
-  // Checkbox,
   Grid,
   Paper,
-  // Table,
-  // TableBody,
-  // TableCell,
   TablePagination,
-  // TableRow
 } from '@material-ui/core'
 import CardTableToolbar from './CardTableToolbar'
 import ApplicationCard from './ApplicationCard'
@@ -33,18 +28,24 @@ class CardTable extends React.Component {
     super(props)
     this.state = {
       page: 0,
-      rowsPerPage: 12,
+      rowsPerPage: 10,
       searchTerm: ''
     }
   }
 
-  handleSearch = event => {
+  handleSearch = value => {
     this.setState({
-      searchTerm: event.target.value
+      searchTerm: value
     })
   }
 
-  handleClear = event => this.setState({ searchTerm: '' })
+  handleChangePage = () => {
+    // TODO
+  }
+
+  handleChangeRowsPerPage = () => {
+    // TODO
+  }
 
   filterBySearch = (data, target) => {
     const { searchTerm } = this.state
@@ -61,9 +62,9 @@ class CardTable extends React.Component {
         page={page}
         backIconButtonProps={{ 'arial-label': 'Previous Page' }}
         nextIconButtonProps={{ 'arial-label': 'Next Page' }}
-        // onChangePage={this.handleChangePage}
-        // onChangeRowsPerPage={this.handleChangeRowsPerPage}
-        // rowsPerPageOptions={[5, 10, 25, 50, 100]}
+        onChangePage={this.handleChangePage}
+        onChangeRowsPerPage={this.handleChangeRowsPerPage}
+        rowsPerPageOptions={[5, 10, 25, 50, 100]}
       />
     )
   }
@@ -79,8 +80,7 @@ class CardTable extends React.Component {
         <Grid item xs={12} zeroMinWidth>
           <Paper className={classes.root}>
             <CardTableToolbar
-              onSearch={searchTarget && this.handleSearch}
-              onClear={this.handleClear}
+              onSearchChange={searchTarget && this.handleSearch}
               searchTerm={searchTerm}
             />
             <Grid container spacing={24} justify="flex-start">
