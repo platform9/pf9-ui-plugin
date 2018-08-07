@@ -41,7 +41,7 @@ export const ADD_APPLICATION = gql`
   } 
 `
 
-export const UPDAT_APPLICATION = gql`
+export const UPDATE_APPLICATION = gql`
   mutation UpdateApplication($id: ID!, $inut: UpdateApplicationInput!) {
     updateApplication(id: $id, input: $input) {
       id

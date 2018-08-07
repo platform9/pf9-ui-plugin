@@ -24,13 +24,10 @@ const styles = theme => ({
 
 @withStyles(styles)
 class CardTable extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      page: 0,
-      rowsPerPage: 10,
-      searchTerm: ''
-    }
+  state = {
+    page: 0,
+    rowsPerPage: 10,
+    searchTerm: ''
   }
 
   handleSearch = value => {
