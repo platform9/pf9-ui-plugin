@@ -21,7 +21,7 @@ class Nova {
   flavorsUrl = async () => `${await this.endpoint()}/flavors`
 
   async getFlavors () {
-    const url = await this.flavorsUrl()
+    const url = `${await this.flavorsUrl()}/detail`
     const response = await axios.get(url, this.client.getAuthHeaders())
     return response.data.flavors
   }
