@@ -198,7 +198,7 @@ class Navbar extends React.Component {
               <img src={logoPath} className={classes.logo} align="middle" />
               <div className={classes.rightTools}>
                 <Selector
-                  name={curRegion.length === 0 ? 'Current Reigion' : curRegion}
+                  name={curRegion.length === 0 ? 'Current Region' : curRegion}
                   list={[`AWS-US-West-1-Test`, `KVM-Neutron`]}
                   onChoose={this.handleClick('curRegion')}
                   onSearchChange={this.handleSearch('regionSearch')}

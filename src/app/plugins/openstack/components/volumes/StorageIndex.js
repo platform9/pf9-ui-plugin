@@ -44,7 +44,7 @@ class StorageIndex extends React.Component {
             >
               <Tab value="/ui/openstack/storage#volumes" label="Volumes" href="#volumes" />
               <Tab value="/ui/openstack/storage#volumetypes" label="Volume Types" href="#volumetypes" />
-              <Tab value="/ui/openstack/storage#snapshots" label="Volume Snapsshots" href="#snapshots" />
+              <Tab value="/ui/openstack/storage#snapshots" label="Volume Snapshots" href="#snapshots" />
             </Tabs>
             { value === '/ui/openstack/storage#volumes' && <TabContainer ><VolumePage /></TabContainer>}
             { value === '/ui/openstack/storage#volumetypes' && <TabContainer>TODO: Volume Types</TabContainer>}
