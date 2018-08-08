@@ -17,7 +17,7 @@ const AddVolumeForm = ({ onComplete }) =>
     {({ context, setContext, onNext }) => {
       return (
         <div>
-          <WizardStep stepId="basic">
+          <WizardStep stepId="basic" label="Basic">
             <ValidatedForm initialValue={context} onSubmit={setContext} triggerSubmit={onNext}>
               <TextField id="name" label="Volume Name" />
               <TextField id="volume_type" label="Volume Type" />
@@ -25,7 +25,7 @@ const AddVolumeForm = ({ onComplete }) =>
               <TextField id="status" label="Status" />
             </ValidatedForm>
           </WizardStep>
-          <WizardStep stepId="advanced">
+          <WizardStep stepId="advanced" label="Advanced">
             <ValidatedForm initialValue={context} onSubmit={setContext} triggerSubmit={onNext}>
               <TextField id="tenant" label="Tenant" />
               <TextField id="source" label="Source" />
@@ -34,7 +34,7 @@ const AddVolumeForm = ({ onComplete }) =>
               <TextField id="device" label="Device" />
             </ValidatedForm>
           </WizardStep>
-          <WizardStep stepId="config">
+          <WizardStep stepId="config" label="Config">
             <ValidatedForm initialValue={context} onSubmit={setContext} triggerSubmit={onNext}>
               <TextField id="size" label="Capacity" type="number" />
               <Checkbox id="bootable" label="Bootable" />

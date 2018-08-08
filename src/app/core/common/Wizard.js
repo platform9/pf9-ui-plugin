@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Button } from '@material-ui/core'
 import FormButtons from 'core/common/FormButtons'
+import ProgressTracker from 'core/common/ProgressTracker'
 
 const WizardContext = React.createContext({})
 
@@ -69,6 +70,7 @@ class Wizard extends React.Component {
     return (
       <div>
         <Provider value={this.state}>
+          <ProgressTracker steps={steps} activeStep={step} />
           {this.props.children({ context, setContext, onNext: this.onNext })}
           {steps[step] ? steps[step].contents : null}
           <FormButtons>

@@ -5,7 +5,7 @@ import { withWizardContext } from 'core/common/Wizard'
 class WizardStep extends React.Component {
   constructor (props) {
     super(props)
-    props.addStep({stepId: props.stepId, contents: props.children})
+    props.addStep({stepId: props.stepId, label: props.label, contents: props.children})
   }
 
   render = () => null
@@ -14,6 +14,7 @@ class WizardStep extends React.Component {
 // Validations should be an object with a rule definition
 WizardStep.propTypes = {
   stepId: PropTypes.string.isRequired,
+  label: PropTypes.string,
 }
 
 export default withWizardContext(WizardStep)
