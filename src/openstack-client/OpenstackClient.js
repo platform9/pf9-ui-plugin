@@ -3,6 +3,7 @@ import Glance from './Glance'
 import Keystone from './Keystone'
 import Neutron from './Neutron'
 import Nova from './Nova'
+import Murano from './Murano'
 
 class OpenstackClient {
   constructor (options = {}) {
@@ -15,6 +16,7 @@ class OpenstackClient {
     this.keystone = new Keystone(this)
     this.neutron = new Neutron(this)
     this.nova = new Nova(this)
+    this.murano = new Murano(this)
 
     this.catalog = {}
     this.activeRegion = null
