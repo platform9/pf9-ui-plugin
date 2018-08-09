@@ -11,6 +11,7 @@ class KeyValue extends React.Component {
     super(props)
     const entry = props.entry || {}
     this.state = {
+      id: entry.id || uuid.v4(),
       key: entry.key || '',
       value: entry.value || '',
     }
@@ -23,7 +24,7 @@ class KeyValue extends React.Component {
     const { onChange } = this.props
     this.setState(
       () => ({ [field]: value }),
-      () => onChange && onChange({ ...this.state, id: this.props.entry.id })
+      () => onChange && onChange(this.state)
     )
   }
 
@@ -64,17 +65,28 @@ class KeyValues extends React.Component {
     }))
   }
 
+  propogateChange = () => {
+    // Remove empty entries and strip out id
+    const noEmptyKeys = x => x.key.length > 0
+    const removeId = ({ key, value }) => ({ key, value })
+    const entries = (this.state.entries || []).filter(noEmptyKeys).map(removeId)
+    if (this.props.onChange) {
+      this.props.onChange(entries)
+    }
+  }
+
   deleteEntry = id => () => {
     this.setState(
-      state => ({ entries: state.entries.filter(x => x.id !== id) })
+      state => ({ entries: state.entries.filter(x => x.id !== id) }),
+      this.propogateChange
     )
   }
 
-  handleChange = id => entry => {
-    this.setState(state => ({
-      ...state,
-      entries: state.entries.map(x => (x.id === id) ? entry : x)
-    }))
+  handleChange = entry => {
+    this.setState(
+      state => ({ ...state, entries: state.entries.map(x => (x.id === entry.id) ? entry : x) }),
+      this.propogateChange
+    )
   }
 
   render () {
@@ -82,14 +94,13 @@ class KeyValues extends React.Component {
 
     return (
       <div>
-        <h1>Key Values</h1>
         {this.state.entries.map(entry => (
           <KeyValue
             key={entry.id}
             keySuggestions={keySuggestions}
             valueSuggestions={valueSuggestions}
             entry={entry}
-            onChange={this.handleChange(entry.id)}
+            onChange={this.handleChange}
             onDelete={this.deleteEntry(entry.id)}
           />
         ))}
@@ -110,6 +121,7 @@ KeyValues.propTypes = {
   keySuggestions: PropTypes.arrayOf(PropTypes.string),
   valueSuggestions: PropTypes.arrayOf(PropTypes.string),
   entries: PropTypes.arrayOf(EntryShape),
+  onChange: PropTypes.func,
 }
 
 export default KeyValues
