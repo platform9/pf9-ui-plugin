@@ -1,6 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import TextField from '@material-ui/core/TextField'
+import FormControl from '@material-ui/core/FormControl'
+import Input from '@material-ui/core/Input'
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown'
 import { withStyles } from '@material-ui/core/styles'
 import MenuList from '@material-ui/core/MenuList'
 import MenuItem from '@material-ui/core/MenuItem'
@@ -8,8 +10,12 @@ import Paper from '@material-ui/core/Paper'
 
 // This is being called 'Base' because it is standalone and does not
 // integrate with ValidatedForm.
-@withStyles({
-})
+@withStyles(theme => ({
+  dropdownButton: { cursor: 'pointer' },
+  container: { width: '350px' },
+  absolute: { position: 'absolute' },
+  relative: { position: 'relative' },
+}))
 class AutocompleteBase extends React.Component {
   state = {
     value: this.props.initialValue || '',
@@ -51,12 +57,19 @@ class AutocompleteBase extends React.Component {
     this.setState({ open: false })
   }
 
+  toggleOpen = () => {
+    this.setState(state => ({ open: !state.open }))
+  }
+
   renderSuggestions = suggestions => {
     const { open } = this.state
+    const { classes } = this.props
     if (!open || !suggestions || suggestions.length === 0) { return null }
     return (
-      <Paper>
-        <MenuList>
+      <Paper className={`${classes.container} ${classes.absolute}`}>
+        <MenuList
+          open
+          className={classes.container}>
           {suggestions.map(item => (
             <MenuItem key={item} onMouseDown={this.handleClick(item)}>{item}</MenuItem>
           ))}
@@ -68,16 +81,20 @@ class AutocompleteBase extends React.Component {
   render () {
     const matched = this.matchedSuggestions()
     const { value } = this.state
-    const { suggestions, onChange, initialValue, ...other } = this.props
+    const { classes, suggestions, onChange, initialValue, ...other } = this.props
+    const DropdownIcon = <ArrowDropDownIcon className={classes.dropdownButton} onClick={this.toggleOpen} />
 
     return (
-      <div>
-        <TextField
-          value={value}
-          onChange={this.handleChange}
-          onBlur={this.handleClose}
-          {...other}
-        />
+      <div className={classes.relative}>
+        <FormControl className={classes.container}>
+          <Input
+            value={value}
+            onChange={this.handleChange}
+            onBlur={this.handleClose}
+            endAdornment={DropdownIcon}
+            {...other}
+          />
+        </FormControl>
         {this.renderSuggestions(matched)}
       </div>
     )
