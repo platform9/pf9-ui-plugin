@@ -19,4 +19,10 @@ addStories('Common Components/KeyValues', {
       <KeyValues entries={entries} />
     )
   },
+
+  'Populated w/ suggestions': () => {
+    return (
+      <KeyValues entries={[]} keySuggestions={['one', 'two', 'three']} />
+    )
+  }
 })

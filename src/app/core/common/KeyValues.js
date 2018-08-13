@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import TextField from '@material-ui/core/TextField'
+import AutocompleteBase from 'core/common/AutocompleteBase'
 import Button from '@material-ui/core/Button'
 import IconButton from '@material-ui/core/IconButton'
 import DeleteIcon from '@material-ui/icons/Delete'
@@ -19,8 +19,7 @@ class KeyValue extends React.Component {
 
   // Unfortunate overloading of naming going on here.
   // field is one of ['key', 'value'], and value is the value of the field.
-  handleChange = field => event => {
-    const value = event.target.value
+  handleChange = field => value => {
     const { onChange } = this.props
     this.setState(
       () => ({ [field]: value }),
@@ -29,14 +28,24 @@ class KeyValue extends React.Component {
   }
 
   render () {
-    const { onDelete } = this.props
+    const { onDelete, keySuggestions, valueSuggestions } = this.props
     const { key, value } = this.state
 
     return (
-      <div>
-        <TextField label="Key" value={key} onChange={this.handleChange('key')} />
+      <div style={{ display: 'flex' }}>
+        <AutocompleteBase
+          label="Key"
+          value={key}
+          onChange={this.handleChange('key')}
+          suggestions={keySuggestions}
+        />
         &nbsp;
-        <TextField label="Value" value={value} onChange={this.handleChange('value')} />
+        <AutocompleteBase
+          label="Value"
+          value={value}
+          onChange={this.handleChange('value')}
+          suggestions={valueSuggestions}
+        />
         <IconButton onClick={onDelete}><DeleteIcon /></IconButton>
       </div>
     )

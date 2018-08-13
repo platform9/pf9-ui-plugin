@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import FormControl from '@material-ui/core/FormControl'
 import Input from '@material-ui/core/Input'
+import InputLabel from '@material-ui/core/InputLabel'
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown'
 import { withStyles } from '@material-ui/core/styles'
 import MenuList from '@material-ui/core/MenuList'
@@ -12,8 +13,16 @@ import Paper from '@material-ui/core/Paper'
 // integrate with ValidatedForm.
 @withStyles(theme => ({
   dropdownButton: { cursor: 'pointer' },
+
+  // Unfortunately the `anchorEl` system in Material-UI is extremely
+  // buggy.  The suggestions need to have a reference to the textfield
+  // to figure out what width to set itself to.  I wasted a lot of
+  // time and things still don't work.  For now I'm just hard-coding
+  // the width.  The fixed width allows us to make the textfield and
+  // the suggestions the same width.
   container: { width: '350px' },
-  absolute: { position: 'absolute' },
+
+  absolute: { position: 'absolute', zIndex: '9999' },
   relative: { position: 'relative' },
 }))
 class AutocompleteBase extends React.Component {
@@ -29,18 +38,19 @@ class AutocompleteBase extends React.Component {
       return suggestions
     }
     const r = new RegExp(value)
-    const matched = suggestions.filter(x => r.test(x))
+    const matched = (suggestions || []).filter(x => r.test(x))
     return matched
   }
 
   propogateChange = () => {
     if (this.props.onChange) {
-      this.props.onChange(this.value)
+      this.props.onChange(this.state.value)
     }
   }
 
   handleChange = event => {
-    const { value } = event.target
+    if (!event || !event.target) { return }
+    const value = event.target.value
     this.setState({ value, open: true }, this.propogateChange)
   }
 
@@ -50,7 +60,7 @@ class AutocompleteBase extends React.Component {
   // was never clicked.  `onBlur` does not happen until `onMouseUp` so this seems
   // to work.  Not sure about tap events.
   handleClick = item => () => {
-    this.setState({ value: item, open: false })
+    this.setState({ value: item, open: false, abc: 123 }, this.propogateChange)
   }
 
   handleClose = () => {
@@ -81,17 +91,19 @@ class AutocompleteBase extends React.Component {
   render () {
     const matched = this.matchedSuggestions()
     const { value } = this.state
-    const { classes, suggestions, onChange, initialValue, ...other } = this.props
-    const DropdownIcon = <ArrowDropDownIcon className={classes.dropdownButton} onClick={this.toggleOpen} />
+    const { classes, suggestions, onChange, initialValue, label, id, ...other } = this.props
+    const DropdownIcon = <ArrowDropDownIcon className={classes.dropdownButton} />
 
     return (
       <div className={classes.relative}>
-        <FormControl className={classes.container}>
+        <FormControl className={classes.container} onMouseDown={this.toggleOpen}>
+          {label && <InputLabel htmlFor={id}>{label}</InputLabel>}
           <Input
+            id={id}
             value={value}
             onChange={this.handleChange}
             onBlur={this.handleClose}
-            endAdornment={DropdownIcon}
+            endAdornment={suggestions && DropdownIcon}
             {...other}
           />
         </FormControl>
