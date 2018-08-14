@@ -1,7 +1,10 @@
 import React from 'react'
 import { Grid, Paper, Tabs, Tab, Typography } from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles'
-import VolumePage from './VolumesListPage'
+import VolumesListPage from './VolumesListPage'
+import VolumeTypesListPage from './VolumeTypesListPage'
+import { compose } from 'react-apollo'
+import { withRouter } from 'react-router'
 
 const styles = theme => ({
   root: {
@@ -22,7 +25,7 @@ function TabContainer ({ children, dir }) {
 
 class StorageIndex extends React.Component {
   state = {
-    value: '/ui/openstack/storage#volumes',
+    value: this.props.location.hash || '#volumes'
   }
 
   handleChange = (event, value) => {
@@ -42,13 +45,13 @@ class StorageIndex extends React.Component {
               indicatorColor="primary"
               textColor="primary"
             >
-              <Tab value="/ui/openstack/storage#volumes" label="Volumes" href="#volumes" />
-              <Tab value="/ui/openstack/storage#volumetypes" label="Volume Types" href="#volumetypes" />
-              <Tab value="/ui/openstack/storage#snapshots" label="Volume Snapshots" href="#snapshots" />
+              <Tab value="#volumes" label="Volumes" href="#volumes" />
+              <Tab value="#volumetypes" label="Volume Types" href="#volumetypes" />
+              <Tab value="#snapshots" label="Volume Snapshots" href="#snapshots" />
             </Tabs>
-            { value === '/ui/openstack/storage#volumes' && <TabContainer ><VolumePage /></TabContainer>}
-            { value === '/ui/openstack/storage#volumetypes' && <TabContainer>TODO: Volume Types</TabContainer>}
-            { value === '/ui/openstack/storage#snapshots' && <TabContainer>TODO: Volume Snapshots</TabContainer>}
+            { value === '#volumes' && <TabContainer ><VolumesListPage /></TabContainer>}
+            { value === '#volumetypes' && <TabContainer><VolumeTypesListPage /></TabContainer>}
+            { value === '#snapshots' && <TabContainer>TODO: Volume Snapshots</TabContainer>}
           </Paper>
         </Grid>
       </Grid>
@@ -56,4 +59,7 @@ class StorageIndex extends React.Component {
   }
 }
 
-export default withStyles(styles)(StorageIndex)
+export default compose(
+  withStyles(styles),
+  withRouter
+)(StorageIndex)

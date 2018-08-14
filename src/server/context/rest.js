@@ -9,6 +9,11 @@ const sanitizeFlavor = flavor => ({
   vcpus: flavor.vcpus || 0,
 })
 
+const sanitizeVolumeType = vt => ({
+  ...vt,
+  extra_specs: JSON.stringify((vt.extra_specs || {})),
+})
+
 class Context {
   resetContext () {}
 
@@ -43,6 +48,14 @@ class Context {
   getFlavors = async () => (await this.client.nova.getFlavors() || []).map(sanitizeFlavor)
   createFlavor = ({ input }) => this.client.nova.createFlavor(input)
   removeFlavor = id => this.client.nova.deleteFlavor(id)
+
+  getVolumes = () => this.client.cinder.getVolumes()
+
+  getVolumeTypes = async () => {
+    const volumeTypes = await this.client.cinder.getVolumeTypes()
+    const vts = (volumeTypes || []).map(sanitizeVolumeType)
+    return vts
+  }
 }
 
 const context = new Context()

@@ -4,7 +4,8 @@ import { makeExecutableSchema } from 'graphql-tools'
 const resolvers = {
   Query: {
     volumes: (_, __, context) => context.getVolumes(),
-    volume: (obj, args, context) => context.getVolume(args.id)
+    volume: (obj, args, context) => context.getVolume(args.id),
+    volumeTypes: (_, __, context) => context.getVolumeTypes()
   },
 
   Mutation: {

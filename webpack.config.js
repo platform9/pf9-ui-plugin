@@ -74,6 +74,7 @@ module.exports = {
   resolve: {
     alias: {
       core: path.resolve(__dirname, 'src/app/core'),
+      util: path.resolve(__dirname, 'src/app/util'),
       openstack: path.resolve(__dirname, 'src/app/plugins/openstack'),
       k8s: path.resolve(__dirname, 'src/app/plugins/kubernetes'),
       sim: path.resolve(__dirname, 'src/openstack-simulator'),

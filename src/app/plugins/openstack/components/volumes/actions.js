@@ -51,3 +51,15 @@ export const UPDATE_VOLUME= gql`
     updateVolume(id: $id, input: $input) { id name description bootable }
   }
 `
+
+export const GET_VOLUME_TYPES = gql`
+  {
+    volumeTypes {
+      id
+      name
+      description
+      is_public
+      extra_specs
+    }
+  }
+`
