@@ -27,6 +27,8 @@ import VolumesListPage from './components/volumes/VolumesListPage'
 import AddVolumePage from './components/volumes/AddVolumePage'
 import UpdateVolumePage from './components/volumes/UpdateVolumePage'
 
+// import AddVolumeTypePage from './components/volumes/AddVolumeTypePage'
+
 import GlanceImageIndex from './components/glanceimages/GlanceImageIndex'
 import GlanceImageListPage from './components/glanceimages/GlanceImageListPage'
 import AddGlanceImagePage from './components/glanceimages/AddGlanceImagePage'
@@ -158,6 +160,13 @@ OpenStack.registerPlugin = pluginManager => {
         link: { path: '/storage/volumes/edit/:volumeId', exact: true },
         component: UpdateVolumePage
       },
+      /*
+      {
+        name: 'AddVolumeType',
+        link: { path: '/storage/volumeTypes/add', exact: true },
+        component: AddVolumeTypePage
+      },
+      */
       {
         name: 'GlanceImages',
         link: { path: '/glanceimages', exact: true },

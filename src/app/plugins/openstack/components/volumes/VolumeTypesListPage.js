@@ -1,24 +1,22 @@
 import React from 'react'
-import { compose, graphql } from 'react-apollo'
 
-import DisplayError from 'core/common/DisplayError'
-import Loader from 'core/common/Loader'
+import { compose } from 'core/fp'
 import VolumeTypesListContainer from './VolumeTypesListContainer'
 import requiresAuthentication from '../../util/requiresAuthentication'
-import { GET_VOLUME_TYPES } from './actions'
+import DataLoader from 'core/DataLoader'
 
-const VolumesListPage =
-  ({ data, loading, error }) => {
-    return (
-      <div>
-        {loading && <Loader />}
-        {error && <DisplayError error={error} />}
-        {data && <VolumeTypesListContainer volumeTypes={data.volumeTypes} />}
-      </div>
-    )
-  }
+const loadVolumeTypes = async ({ setContext, context }) => {
+  console.log('22222222222222')
+  const volumeTypes = await context.openstackClient.cinder.getVolumeTypes()
+  console.log('3333333333')
+  setContext({ volumeTypes })
+}
+
+const VolumesListPage = () =>
+  <DataLoader dataKey="volumeTypes" loaderFn={loadVolumeTypes}>
+    {({ data }) => <VolumeTypesListContainer volumeTypes={data} />}
+  </DataLoader>
 
 export default compose(
   requiresAuthentication,
-  graphql(GET_VOLUME_TYPES),
 )(VolumesListPage)

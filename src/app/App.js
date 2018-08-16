@@ -8,17 +8,25 @@ import {
 } from 'react-router-dom'
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core'
 import Navbar from 'core/common/Navbar'
-import LoginPage from 'openstack/components/LoginPage'
 import LogoutPage from 'openstack/components/LogoutPage'
 import './app.css'
 import { setupFromConfig } from './util/registry'
 import { connect } from 'react-redux'
 import config from '../../config'
 import Session from 'openstack/actions/session'
+import AppContext from 'core/AppContext'
+import OpenstackClient from '../openstack-client'
+import SessionManager from './plugins/openstack/components/SessionManager'
 
 setupFromConfig(config)
 window.process = process
 const mapStateToProps = state => (state.openstack && state.openstack.login) || {}
+
+if (!config.apiHost) { throw new Error('config.js does not contain "apiHost"') }
+if (!config.region) { throw new Error('config.js does not contain "region"') }
+
+const openstackClient = new OpenstackClient({ keystoneEndpoint: `${config.apiHost}/keystone` })
+openstackClient.setActiveRegion(config.region)
 
 class App extends React.Component {
   componentDidMount () {
@@ -51,26 +59,25 @@ class App extends React.Component {
     return (
       <Router>
         <MuiThemeProvider theme={theme}>
-          <div id="_main-container">
-            {this.props.loginSucceeded &&
-              <Navbar links={pluginManager.getNavItems()} >
-                {pluginManager.getComponents().map((PluginComponent, idx) => <PluginComponent key={idx} />)}
-                <Switch>
-                  {pluginManager.getRoutes().map(route => {
-                    const { component, link } = route
-                    const Component = component
-                    return <Route key={route.name} path={link.path} exact={link.exact || false} component={Component} />
-                  })}
-                  <Route path="/ui/logout" exact component={LogoutPage} />
-                  <Redirect to={pluginManager.getDefaultRoute()} />
-                </Switch>
-                {showFooter && renderFooter()}
-              </Navbar>
-            }
-            {!this.props.loginSucceeded &&
-              <LoginPage />
-            }
-          </div>
+          <AppContext initialContext={{ openstackClient }}>
+            <div id="_main-container">
+              <SessionManager>
+                <Navbar links={pluginManager.getNavItems()} >
+                  {pluginManager.getComponents().map((PluginComponent, idx) => <PluginComponent key={idx} />)}
+                  <Switch>
+                    {pluginManager.getRoutes().map(route => {
+                      const { component, link } = route
+                      const Component = component
+                      return <Route key={route.name} path={link.path} exact={link.exact || false} component={Component} />
+                    })}
+                    <Route path="/ui/logout" exact component={LogoutPage} />
+                    <Redirect to={pluginManager.getDefaultRoute()} />
+                  </Switch>
+                  {showFooter && renderFooter()}
+                </Navbar>
+              </SessionManager>
+            </div>
+          </AppContext>
         </MuiThemeProvider>
       </Router>
     )

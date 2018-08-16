@@ -8,7 +8,7 @@ import requiresAuthentication from '../../util/requiresAuthentication'
 import { GET_VOLUMES } from './actions'
 
 const VolumesListPage =
-  ({ data, loading, error }) => {
+  ({ data, loading, error, context }) => {
     return (
       <div>
         {loading && <Loader />}
