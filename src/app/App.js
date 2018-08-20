@@ -13,7 +13,6 @@ import './app.css'
 import { setupFromConfig } from './util/registry'
 import { connect } from 'react-redux'
 import config from '../../config'
-import Session from 'openstack/actions/session'
 import AppContext from 'core/AppContext'
 import OpenstackClient from '../openstack-client'
 import SessionManager from './plugins/openstack/components/SessionManager'
@@ -29,10 +28,6 @@ const openstackClient = new OpenstackClient({ keystoneEndpoint: `${config.apiHos
 openstackClient.setActiveRegion(config.region)
 
 class App extends React.Component {
-  componentDidMount () {
-    this.props.dispatch(Session().restoreSession)
-  }
-
   render () {
     const theme = createMuiTheme({
       palette: {
@@ -70,6 +65,7 @@ class App extends React.Component {
                       const Component = component
                       return <Route key={route.name} path={link.path} exact={link.exact || false} component={Component} />
                     })}
+                    <Route path="/ui/openstack/login" component={null} />
                     <Route path="/ui/logout" exact component={LogoutPage} />
                     <Redirect to={pluginManager.getDefaultRoute()} />
                   </Switch>

@@ -45,9 +45,6 @@ class OpenstackClient {
   }
 
   getAuthHeaders (scoped = true) {
-    console.log('getAuthHeaders')
-    console.log(this.scopedToken)
-    console.log(this.unscopedToken)
     const token = scoped ? this.scopedToken : this.unscopedToken
     if (!token) {
       return { headers: {} }

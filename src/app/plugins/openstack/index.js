@@ -39,7 +39,6 @@ import ApiAccessPage from './components/api-access/ApiAccessListPage'
 import ApplicationsPage from './components/applications/ApplicationsListPage'
 
 import loginReducer from './reducers/login'
-import sessionReducer from './reducers/session'
 import tenantsReducer from './reducers/tenants'
 import usersReducer from './reducers/users'
 import flavorsReducer from './reducers/flavors'
@@ -246,7 +245,6 @@ OpenStack.registerPlugin = pluginManager => {
 
 OpenStack.reducer = combineReducers({
   login: loginReducer,
-  session: sessionReducer,
   tenants: tenantsReducer,
   users: usersReducer,
   flavors: flavorsReducer,

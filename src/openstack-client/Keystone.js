@@ -117,6 +117,19 @@ class Keystone {
     }
   }
 
+  async renewUnscopedToken (token) {
+    const body = constructAuthBody('token', token)
+    try {
+      const response = await axios.post(this.tokensUrl, body)
+      const unscopedToken = response.headers['x-subject-token']
+      this.client.unscopedToken = unscopedToken
+      return unscopedToken
+    } catch (err) {
+      // authentication failed
+      return null
+    }
+  }
+
   async getRegions () {
     const response = await axios.get(this.regionsUrl, this.client.getAuthHeaders())
     return response.data.regions

@@ -210,7 +210,7 @@ LoginPage.propTypes = {
   /**
    * Handler that is invoked upon successful authentication.
   */
-  onAuthSuccess: PropTypes.func.isRequired,
+  onAuthSuccess: PropTypes.func,
 }
 
 export default compose(

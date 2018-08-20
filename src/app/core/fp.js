@@ -1,5 +1,12 @@
 // functional programming helpers
 
+export const pluck = key => obj => obj[key]
+export const identity = x => x
+export const isTruthy = x => !!x
+export const exists = x => x !== undefined
+
+export const pluckAsync = key => promise => promise.then(obj => obj[key])
+
 export const compose = (...fns) => fns.reduce((f, g) => (...args) => f(g(...args)))
 export const pipe = (...fns) => compose(...fns.reverse())
 export const pick = key => obj => obj[key]

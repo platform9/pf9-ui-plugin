@@ -56,12 +56,12 @@ AppContext.defaultProps = {
 export const withAppContext = Component => props =>
   <Consumer>
     {
-      ({ setContext, getUserPreferences, setUserPreferences, ...rest }) =>
+      ({ setContext, getUserPreferences, setUserPreference, ...rest }) =>
         <Component
           {...props}
           setContext={setContext}
           context={rest}
-          setUserPreferences={setUserPreferences}
+          setUserPreference={setUserPreference}
           getUserPreferences={getUserPreferences}
         />
     }

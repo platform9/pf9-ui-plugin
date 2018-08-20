@@ -12,15 +12,27 @@ import { getStorage, setStorage } from 'core/common/pf9-storage'
  * Otherwise shows the <LoginPage>
  */
 class SessionManager extends React.Component {
-  componentDidMount () {
+  async componentDidMount () {
     // Attempt to restore the session
     const username = getStorage('username')
-    const unscopedToken = getStorage('unscopedToken')
-    if (!unscopedToken || !username) { return }
+    let unscopedToken = getStorage('unscopedToken')
+
+    if (!username || !unscopedToken) {
+      return this.props.history.push('/ui/openstack/login')
+    }
+
+    // We need to make sure the token has not expired.
+    unscopedToken = await this.keystone.renewUnscopedToken(unscopedToken)
+
+    if (!unscopedToken) {
+      return this.props.history.push('/ui/openstack/login')
+    }
+
     this.initialSetup({ username, unscopedToken })
   }
 
   get keystone () { return this.props.context.openstackClient.keystone }
+
   setSession (newState = {}) {
     this.props.setContext(state => ({
       ...state,
@@ -33,11 +45,12 @@ class SessionManager extends React.Component {
 
   // Handler that gets invoked on successful authentication
   initialSetup = ({ username, unscopedToken }) => {
-    const { history, context } = this.props
+    const { getUserPreferences, history } = this.props
+
     setStorage('username', username)
     setStorage('unscopedToken', unscopedToken)
 
-    const prefs = context.getUserPreferences(username)
+    const prefs = getUserPreferences(username)
     prefs.lastTenant = prefs.lastTenant || 'service'
 
     this.setSession({
@@ -47,7 +60,7 @@ class SessionManager extends React.Component {
       userPreferences: prefs,
     })
 
-    history.push('/')
+    history.push('/ui/openstack/dashboard')
   }
 
   render () {
