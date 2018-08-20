@@ -33,20 +33,18 @@ class SessionManager extends React.Component {
 
   // Handler that gets invoked on successful authentication
   initialSetup = ({ username, unscopedToken }) => {
-    const { history } = this.props
+    const { history, context } = this.props
     setStorage('username', username)
     setStorage('unscopedToken', unscopedToken)
-    const lastTenant = getStorage(`last-tenant-accessed-${username}`) || 'service'
-    const lastRegion = getStorage(`last-region-accessed-${username}`)
-    const userPreferences = getStorage(`user-preference-${username}`) || {}
+
+    const prefs = context.getUserPreferences(username)
+    prefs.lastTenant = prefs.lastTenant || 'service'
 
     this.setSession({
       unscopedToken,
       username,
       loginSuccessful: true,
-      lastTenant,
-      lastRegion,
-      userPreferences,
+      userPreferences: prefs,
     })
 
     history.push('/')
