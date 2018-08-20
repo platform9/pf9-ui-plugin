@@ -1,13 +1,7 @@
 import React from 'react'
-import { connect } from 'react-redux'
+import { compose } from 'core/fp'
 import requiresAuthentication from '../../openstack/util/requiresAuthentication'
 
-function mapStateToProps (state, ownProps) {
-  return {}
-}
-
-@requiresAuthentication
-@connect(mapStateToProps)
 class Dashboard extends React.Component {
   render () {
     return (
@@ -18,4 +12,6 @@ class Dashboard extends React.Component {
   }
 }
 
-export default Dashboard
+export default compose(
+  requiresAuthentication,
+)(Dashboard)

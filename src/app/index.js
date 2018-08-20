@@ -1,13 +1,11 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { AppContainer } from 'react-hot-loader'
-import { Provider } from 'react-redux'
 
 import ApolloClient from 'apollo-boost'
 import { ApolloProvider } from 'react-apollo'
 
 import App from './App'
-import store from './store'
 
 import plugins from './plugins'
 import pluginManager from './core/pluginManager'
@@ -38,15 +36,13 @@ const client = new ApolloClient({
 const render = Component => {
   ReactDOM.render(
     <ApolloProvider client={client}>
-      <Provider store={store}>
-        <AppContainer>
-          <div>
-            <PluginProvider pluginManager={pluginManager}>
-              <Component />
-            </PluginProvider>
-          </div>
-        </AppContainer>
-      </Provider>
+      <AppContainer>
+        <div>
+          <PluginProvider pluginManager={pluginManager}>
+            <Component />
+          </PluginProvider>
+        </div>
+      </AppContainer>
     </ApolloProvider>,
     document.getElementById('root')
   )

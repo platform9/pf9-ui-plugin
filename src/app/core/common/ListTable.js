@@ -32,12 +32,14 @@ const styles = theme => ({
 class ListTable extends React.Component {
   constructor (props) {
     super(props)
+    const { columns, getUserPreferences } = props
+    const prefs = (getUserPreferences && getUserPreferences()) || {}
 
     this.state = {
       order: 'asc',
-      orderBy: this.props.columns[0].id,
+      orderBy: columns[0].id,
       page: 0,
-      rowsPerPage: this.props.getUserPreferences().perPage || 10,
+      rowsPerPage: prefs.perPage || 10,
       selected: [],
       selectedAll: false,
       searchTerm: ''

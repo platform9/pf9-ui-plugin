@@ -1,15 +1,9 @@
 import React from 'react'
-import { connect } from 'react-redux'
 import requiresAuthentication from '../util/requiresAuthentication'
 import ProgressCardList from 'core/common/ProgressCardList'
 import DashboardGraphs from 'core/common/dashboard_graphs/DashboardGraphs'
+import { compose } from 'core/fp'
 
-function mapStateToProps (state, ownProps) {
-  return {}
-}
-
-@requiresAuthentication
-@connect(mapStateToProps)
 class Dashboard extends React.Component {
   render () {
     const testCards = [
@@ -43,4 +37,6 @@ class Dashboard extends React.Component {
   }
 }
 
-export default Dashboard
+export default compose(
+  requiresAuthentication
+)(Dashboard)

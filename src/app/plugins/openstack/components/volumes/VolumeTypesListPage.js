@@ -6,9 +6,7 @@ import requiresAuthentication from '../../util/requiresAuthentication'
 import DataLoader from 'core/DataLoader'
 
 const loadVolumeTypes = async ({ setContext, context }) => {
-  console.log('22222222222222')
   const volumeTypes = await context.openstackClient.cinder.getVolumeTypes()
-  console.log('3333333333')
   setContext({ volumeTypes })
 }
 

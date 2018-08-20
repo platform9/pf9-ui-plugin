@@ -9,8 +9,6 @@ import DisplayError from 'core/common/DisplayError'
 import ConfirmationDialog from 'core/common/ConfirmationDialog'
 import ClustersList from './ClustersList'
 
-import { removeCluster } from '../../actions/clusters'
-
 const GET_K8CLUSTERS = gql`
   {
     K8Clusters @client {
@@ -57,7 +55,7 @@ class ClustersListContainer extends React.Component {
   handleDeleteConfirm = () => {
     this.setState({ showConfirmation: false })
     const clusters = this.state.clustersToDelete || []
-    clusters.forEach(cluster => this.props.dispatch(removeCluster(cluster.id)))
+    clusters.forEach(cluster => { /* TODO: remove cluster */ })
   }
 
   deleteConfirmText = () => {

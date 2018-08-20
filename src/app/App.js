@@ -11,7 +11,6 @@ import Navbar from 'core/common/Navbar'
 import LogoutPage from 'openstack/components/LogoutPage'
 import './app.css'
 import { setupFromConfig } from './util/registry'
-import { connect } from 'react-redux'
 import config from '../../config'
 import AppContext from 'core/AppContext'
 import OpenstackClient from '../openstack-client'
@@ -19,7 +18,6 @@ import SessionManager from './plugins/openstack/components/SessionManager'
 
 setupFromConfig(config)
 window.process = process
-const mapStateToProps = state => (state.openstack && state.openstack.login) || {}
 
 if (!config.apiHost) { throw new Error('config.js does not contain "apiHost"') }
 if (!config.region) { throw new Error('config.js does not contain "region"') }
@@ -84,4 +82,4 @@ App.contextTypes = {
   pluginManager: PropTypes.object
 }
 
-export default connect(mapStateToProps)(App)
+export default App

@@ -1,7 +1,6 @@
 import React, { Fragment } from 'react'
 import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
-import { compose } from 'redux'
+import { compose } from 'core/fp'
 import { withRouter } from 'react-router'
 import { withStyles } from '@material-ui/core/styles'
 import { rootPath } from 'core/globals'
@@ -16,16 +15,6 @@ import {
   Typography,
 } from '@material-ui/core'
 import Alert from 'core/common/Alert'
-
-function mapStateToProps (state, ownProps) {
-  const { login } = state.openstack
-  const { startLogin, loginSucceeded, loginFailed } = login
-  return {
-    startLogin,
-    loginSucceeded,
-    loginFailed,
-  }
-}
 
 const styles = theme => ({
   root: {
@@ -100,12 +89,10 @@ export class LoginPage extends React.Component {
   }
 
   renderStatus = () => {
-    const { loginSucceeded, loginFailed } = this.props
-    const { loading } = this.state
+    const { loading, loginFailed } = this.state
     return (
       <div className="login-status">
         {loading && <div className="login-start">Attempting login...</div>}
-        {loginSucceeded && <div className="login-succeeded login-result">Successfully logged in.</div>}
         {loginFailed && <div className="login-failed login-result">Login attempt failed.</div>}
       </div>
     )
@@ -216,6 +203,5 @@ LoginPage.propTypes = {
 export default compose(
   withAppContext,
   withRouter,
-  connect(mapStateToProps),
   withStyles(styles)
 )(LoginPage)

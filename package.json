@@ -24,11 +24,8 @@
     "react": "^16.4.1",
     "react-apollo": "^2.1.4",
     "react-dom": "^16.4.1",
-    "react-redux": "^5.0.6",
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
-    "redux": "^3.7.2",
-    "redux-thunk": "^2.2.0",
     "uuid": "^3.2.1"
   },
   "devDependencies": {
@@ -75,7 +72,7 @@
     "react-test-renderer": "^16.4.1",
     "selenium-webdriver": "^4.0.0-alpha.1",
     "standard": "^10.0.3",
-    "storybook-addon-redux-listener": "^0.1.7",
+    "storybook-react-router": "^1.0.1",
     "style-loader": "^0.20.1",
     "uglifyjs-webpack-plugin": "^1.2.5",
     "webpack": "^3.10.0",

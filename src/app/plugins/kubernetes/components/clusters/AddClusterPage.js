@@ -1,18 +1,13 @@
 import React from 'react'
-import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { addCluster } from '../../actions/clusters'
 import AddClusterForm from './AddClusterForm'
+import { compose } from 'core/fp'
+import requiresAuthentication from 'openstack/util/requiresAuthentication'
 
-const mapStateToProps = state => ({})
-
-@withRouter
-@connect(mapStateToProps)
 class AddClusterPage extends React.Component {
   handleSubmit = cluster => {
-    const { dispatch, history } = this.props
     try {
-      dispatch(addCluster(cluster))
+      // TODO: add the cluster
       history.push('/ui/openstack/clusters')
     } catch (err) {
       console.error(err)
@@ -29,4 +24,7 @@ class AddClusterPage extends React.Component {
   }
 }
 
-export default AddClusterPage
+export default compose(
+  requiresAuthentication,
+  withRouter,
+)(AddClusterPage)

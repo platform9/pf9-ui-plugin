@@ -1,5 +1,4 @@
 import React from 'react'
-import { combineReducers } from 'redux'
 
 import DashboardPage from './components/DashboardPage'
 
@@ -37,11 +36,6 @@ import UpdateGlanceImagePage from './components/glanceimages/UpdateGlanceImagePa
 import ApiAccessPage from './components/api-access/ApiAccessListPage'
 
 import ApplicationsPage from './components/applications/ApplicationsListPage'
-
-import loginReducer from './reducers/login'
-import tenantsReducer from './reducers/tenants'
-import usersReducer from './reducers/users'
-import flavorsReducer from './reducers/flavors'
 
 import openstackSchemas from 'schema/openstack'
 
@@ -242,12 +236,5 @@ OpenStack.registerPlugin = pluginManager => {
 
   pluginManager.registerSchema(openstackSchemas)
 }
-
-OpenStack.reducer = combineReducers({
-  login: loginReducer,
-  tenants: tenantsReducer,
-  users: usersReducer,
-  flavors: flavorsReducer,
-})
 
 export default OpenStack
