@@ -1,0 +1,25 @@
+import React from 'react'
+import { withStyles } from '@material-ui/core/styles'
+
+const styles = theme => ({
+  network: {
+    fill: '#6ca2d1',
+    stroke: '#fff',
+    'stroke-width': '2'
+  }
+})
+
+@withStyles(styles)
+class SvgNetwork extends React.Component {
+  render () {
+    const { classes } = this.props
+    const side = 43
+    const transform = 'scale(1, 0.6) rotate(45)'
+
+    return (
+      <rect className={classes.network} width={side} height={side} transform={transform} />
+    )
+  }
+};
+
+export default SvgNetwork

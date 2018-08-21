@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import requiresAuthentication from '../util/requiresAuthentication'
 import ProgressCardList from 'core/common/ProgressCardList'
+import DashboardGraphs from 'core/common/dashboard_graphs/DashboardGraphs'
 
 function mapStateToProps (state, ownProps) {
   return {}
@@ -31,10 +32,12 @@ class Dashboard extends React.Component {
         unit: 'GB'
       }
     ]
+
     return (
       <div className="dashboard-page">
         <h1>This is the dashboard page</h1>
         <ProgressCardList cards={testCards} />
+        <DashboardGraphs />
       </div>
     )
   }
