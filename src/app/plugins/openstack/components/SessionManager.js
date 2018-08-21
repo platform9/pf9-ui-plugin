@@ -45,7 +45,7 @@ class SessionManager extends React.Component {
 
   // Handler that gets invoked on successful authentication
   initialSetup = ({ username, unscopedToken }) => {
-    const { getUserPreferences, history } = this.props
+    const { getUserPreferences, history, location } = this.props
 
     setStorage('username', username)
     setStorage('unscopedToken', unscopedToken)
@@ -60,7 +60,9 @@ class SessionManager extends React.Component {
       userPreferences: prefs,
     })
 
-    history.push('/ui/openstack/dashboard')
+    if (location.pathname === '/ui/openstack/login') {
+      history.push('/ui/openstack/dashboard')
+    }
   }
 
   render () {

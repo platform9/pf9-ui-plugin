@@ -1,8 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { filterFields } from 'core/fp'
+import { compose, filterFields, setStateLens } from 'core/fp'
 import { withRouter } from 'react-router-dom'
-import { compose, withApollo } from 'react-apollo'
+import { withApollo } from 'react-apollo'
 
 const ValidatedFormContext = React.createContext({})
 
@@ -25,15 +25,7 @@ class ValidatedForm extends React.Component {
    * This function will be called by the child components when they are initialized.
    */
   defineField = (field, spec) => {
-    this.setState(
-      state => ({
-        ...state,
-        fields: {
-          ...state.fields,
-          [field]: spec
-        }
-      })
-    )
+    this.setState(setStateLens(spec, ['fields', field]))
   }
 
   /**
@@ -42,15 +34,7 @@ class ValidatedForm extends React.Component {
    * Note: values can be passed up to parent component by supplying a setContext function prop
    */
   setField = (field, value) => {
-    this.setState(
-      state => ({
-        ...state,
-        value: {
-          ...state.value,
-          [field]: value,
-        },
-      }),
-    )
+    this.setState(setStateLens(value, ['value', field]))
     // Pass field up to parent if there is a parent
     if (this.props.setContext) {
       this.props.setContext(this.state.value)
@@ -95,8 +79,6 @@ class ValidatedForm extends React.Component {
         let inputObj = filterFields('id', '__typename')(this.state.value)
         this.handleUpdate(inputObj)
         break
-      default:
-        console.log('Operation type needed.')
     }
   }
 
