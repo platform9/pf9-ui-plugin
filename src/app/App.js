@@ -20,7 +20,6 @@ setupFromConfig(config)
 window.process = process
 
 if (!config.apiHost) { throw new Error('config.js does not contain "apiHost"') }
-if (!config.region) { throw new Error('config.js does not contain "region"') }
 
 const openstackClient = new OpenstackClient({ keystoneEndpoint: `${config.apiHost}/keystone` })
 openstackClient.setActiveRegion(config.region)
