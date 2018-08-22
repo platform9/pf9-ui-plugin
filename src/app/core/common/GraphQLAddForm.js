@@ -21,7 +21,7 @@ class GraphQLAddForm extends React.Component {
         variables: { input: value },
         update: (proxy, { data }) => {
           const tempData = proxy.readQuery({ query: getQuery })
-          const item = Object.entries(data[0][1])
+          const item = Object.entries(data)[0][1]
           tempData[objType].push(item)
           proxy.writeQuery({ query: getQuery, data: tempData })
         }
