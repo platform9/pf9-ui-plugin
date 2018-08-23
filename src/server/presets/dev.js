@@ -7,6 +7,7 @@ import User from '../models/User'
 import Flavor from '../models/Flavor'
 import Network from '../models/Network'
 import Router from '../models/Router'
+import FloatingIp from '../models/FloatingIp'
 import Volume from '../models/Volume'
 import GlanceImage from '../models/GlanceImage'
 import Application from '../models/Application'
@@ -68,6 +69,9 @@ function loadPreset () {
 
   // Routers
   new Router({ name: 'Test router 1', tenant_id: '1234abcd', project: 'Dev Tenant', admin_state_up: true, status: 'ACTIVE' })
+
+  // Floating IPs
+  new FloatingIp({ floating_ip_address: '123.234.123', subnet_id: 'qwertyuiop', port_id: 'asdfasdf', 'project_id': '1234abcd', 'tenant_id': '1234abcd', 'fixed_ip_address': '10.1.10.123', 'description': 'preset floating ip', 'floating_network_id': 'zxcvbnm', 'status': 'ACTIVE', 'router_id': 'awsd' })
 
   // Volumes
   new Volume({ name: 'TestVolume1', description: 'Docker storage test.', volume_type: 'sfvol', metadata: '', size: 15, bootable: false, status: 'available', tenant: 'Dev Team Tenant', source: 'Image', host: 'host.company.sys', instance: 'Test Instance 1', device: '/dev/vdb', attachedMode: 'rw', readonly: false })

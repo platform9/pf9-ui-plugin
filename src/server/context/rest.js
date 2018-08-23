@@ -56,6 +56,10 @@ class Context {
     const vts = (volumeTypes || []).map(sanitizeVolumeType)
     return vts
   }
+
+  getFloatingIps = () => this.client.neutron.getFloatingIps()
+  createFloatingIp = ({ input }) => this.client.neutron.createFloatingIp(input)
+  removeFloatingIp = id => this.client.neutron.deleteFloatingIp(id)
 }
 
 const context = new Context()

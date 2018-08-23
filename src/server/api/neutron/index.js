@@ -10,6 +10,11 @@ import getRouters from './getRouters'
 import postRouter from './postRouter'
 import deleteRouter from './deleteRouter'
 
+// Floating IPs
+import getFloatingIps from './getFloatingIps'
+import postFloatingIp from './postFloatingIp'
+import deleteFloatingIp from './deleteFloatingIp'
+
 import { tokenValidator } from '../../middleware'
 
 const router = express.Router()
@@ -21,5 +26,9 @@ router.delete('/v2.0/networks/:networkId', tokenValidator, deleteNetwork)
 router.get('/v2.0/routers', tokenValidator, getRouters)
 router.post('/v2.0/routers', tokenValidator, postRouter)
 router.delete('/v2.0/routers/:routerId', tokenValidator, deleteRouter)
+
+router.get('/v2.0/floatingips', tokenValidator, getFloatingIps)
+router.post('/v2.0/floatingips', tokenValidator, postFloatingIp)
+router.delete('/v2.0/floatingips/:floatingIpId', tokenValidator, deleteFloatingIp)
 
 export default router

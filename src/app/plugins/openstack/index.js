@@ -21,6 +21,10 @@ import RoutersPage from './components/routers/RoutersListPage'
 import AddRouterPage from './components/routers/AddRouterPage'
 import UpdateRouterPage from './components/routers/UpdateRouterPage'
 
+import FloatingIpsPage from './components/floatingips/FloatingIpsListPage'
+import AddFloatingIpPage from './components/floatingips/AddFloatingIpPage'
+import UpdateFloatingIpPage from './components/floatingips/UpdateFloatingIpPage'
+
 import StorageIndex from './components/volumes/StorageIndex'
 import VolumesListPage from './components/volumes/VolumesListPage'
 import AddVolumePage from './components/volumes/AddVolumePage'
@@ -132,6 +136,21 @@ OpenStack.registerPlugin = pluginManager => {
         component: UpdateRouterPage
       },
       {
+        name: 'FloatingIps',
+        link: { path: '/floatingips', exact: true },
+        component: FloatingIpsPage
+      },
+      {
+        name: 'AddFloatingIp',
+        link: { path: '/floatingips/add' },
+        component: AddFloatingIpPage
+      },
+      {
+        name: 'EditFloatingIp',
+        link: { path: '/floatingips/edit/:floatingIpId', exact: true },
+        component: UpdateFloatingIpPage
+      },
+      {
         name: 'ApiAccess',
         link: { path: '/apiaccess' },
         component: ApiAccessPage
@@ -227,6 +246,10 @@ OpenStack.registerPlugin = pluginManager => {
       {
         name: 'Routers',
         link: { path: '/routers' }
+      },
+      {
+        name: 'Floating IPs',
+        link: { path: '/floatingips' }
       },
       {
         name: 'API Access',

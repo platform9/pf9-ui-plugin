@@ -7,6 +7,7 @@ import Volume from '../models/Volume'
 import GlanceImage from '../models/GlanceImage'
 import Network from '../models/Network'
 import Router from '../models/Router'
+import FloatingIp from '../models/FloatingIp'
 import Token from '../models/Token'
 import Application from '../models/Application'
 import SshKey from '../models/SshKey'
@@ -34,6 +35,7 @@ class Context {
     this.servers = []
     this.networks = []
     this.routers = []
+    this.floatingIps = []
     this.instances = []
     this.hypervisors = []
     this.userRoles = []
@@ -209,6 +211,38 @@ class Context {
     }
     router.destroy()
     return router
+  }
+
+  getFloatingIp = id => {
+    const floatingIp = FloatingIp.findById(id)
+    if (!floatingIp) {
+      throw new Error('Unable to get non-existent floating IP')
+    }
+    return floatingIp.asGraphQl()
+  }
+
+  getFloatingIps = () => FloatingIp.getCollection().map(x => x.asGraphQl())
+
+  createFloatingIp = ({ input }) => {
+    const floatingIp = new FloatingIp(input)
+    return floatingIp.asGraphQl()
+  }
+
+  updateFloatingIp = (id, input) => {
+    let floatingIp = FloatingIp.updateById(id, input)
+    if (!floatingIp) {
+      throw new Error('Unable to update non-existent floating IP')
+    }
+    return floatingIp.asGraphQl()
+  }
+
+  removeFloatingIp = (id) => {
+    const floatingIp = FloatingIp.findById(id)
+    if (!floatingIp) {
+      throw new Error('Unable to remove non-existent floating IP')
+    }
+    floatingIp.destroy()
+    return floatingIp
   }
 
   getVolume = (id) => {

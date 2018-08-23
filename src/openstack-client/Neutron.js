@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-class Neuron {
+class Neutron {
   constructor (client) {
     this.client = client
   }
@@ -397,4 +397,4 @@ class Neuron {
   }
 }
 
-export default Neuron
+export default Neutron

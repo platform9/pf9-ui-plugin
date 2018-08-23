@@ -29,6 +29,9 @@ const styles = theme => ({
   },
 })
 
+// TODO: this component should take an optional sort function in the columns prop (eg. for IP addresses)
+
+@withStyles(styles)
 class ListTable extends React.Component {
   constructor (props) {
     super(props)
