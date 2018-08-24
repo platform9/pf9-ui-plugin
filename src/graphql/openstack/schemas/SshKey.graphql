@@ -1,0 +1,21 @@
+type SshKey {
+  id: ID!
+  name: String!
+  fingerprint: String
+  public_key: String
+}
+
+type Query {
+  sshKeys: [SshKey!]!
+  sshKey(id: ID!): SshKey
+}
+
+input SshKeyInput {
+  name: String!
+  public_key: String
+}
+
+type Mutation {
+  createSshKey(input: SshKeyInput): SshKey!
+  removeSshKey(id: ID!): ID
+}

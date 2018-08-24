@@ -8,6 +8,7 @@ import glanceImages from './schemas/glanceImages'
 import userManagement from './schemas/userManagement'
 import serviceCatalog from './schemas/serviceCatalog'
 import applications from './schemas/applications'
+import sshKeys from './schemas/sshKeys'
 
 const mergedSchemas = mergeSchemas({
   schemas: [
@@ -18,7 +19,8 @@ const mergedSchemas = mergeSchemas({
     networks,
     routers,
     serviceCatalog,
-    applications
+    applications,
+    sshKeys
   ]
 })
 

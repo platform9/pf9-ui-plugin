@@ -9,6 +9,7 @@ import Network from '../models/Network'
 import Router from '../models/Router'
 import Token from '../models/Token'
 import Application from '../models/Application'
+import SshKey from '../models/SshKey'
 
 const defaultQuota = {
   cores: 10,
@@ -42,6 +43,7 @@ class Context {
     this.volumes = []
     this.glanceImages = []
     this.applications = []
+    this.sshKeys = []
     this.defaultQuota = { ...defaultQuota }
   }
 
@@ -299,6 +301,30 @@ class Context {
       throw new Error('Unable to delete non-existent application')
     }
     application.destroy()
+    return id
+  }
+
+  getSshKey = id => {
+    const sshKey = SshKey.findById(id)
+    if (!sshKey) {
+      throw new Error('Unable to find non-existent ssh key')
+    }
+    return sshKey.asGraphQl()
+  }
+
+  getSshKeys = () => SshKey.getCollection().map(x => x.asGraphQl())
+
+  createSshKey = ({ input }) => {
+    const sshKey = new SshKey(input)
+    return sshKey.asGraphQl()
+  }
+
+  removeSshKey = id => {
+    const sshKey = SshKey.findById(id)
+    if (!sshKey) {
+      throw new Error('Unable to delete non-existent ssh key')
+    }
+    sshKey.destroy()
     return id
   }
 }

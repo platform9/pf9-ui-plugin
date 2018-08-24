@@ -10,6 +10,7 @@ import Router from '../models/Router'
 import Volume from '../models/Volume'
 import GlanceImage from '../models/GlanceImage'
 import Application from '../models/Application'
+import SshKey from '../models/SshKey'
 // import Token from '../models/Token'
 import { range } from '../util'
 
@@ -84,6 +85,10 @@ function loadPreset () {
   new Application({ name: 'ApacheHttpServer', author: 'admin', public: true, tenant: 'Development Team Tenant', description: 'The Apache HTTP Server Project is a collaborative software development effort aimed at creating a robust, commercial-grade, featureful, and freely-available source code implementation of an HTTP (Web) server.', categories: 'Web' })
   new Application({ name: 'WordPress', author: 'admin', public: true, tenant: 'Development Team Tenant', description: 'WordPress is a free and open-source content management system (CMS) based on PHP and MySQL.', categories: 'SAP' })
   new Application({ name: 'MongoDB', author: 'user', public: true, tenant: 'Test Tenant', description: 'MongoDB is a cross-platform document-oriented database. Classified as a NoSQL database, MongoDB eschews the traditional table-based relational database structure in favor of JSON-like documents with dynamic schemas.', categories: 'Databases' })
+
+  // SSH Keys
+  new SshKey({ name: 'test1', public_key: 'sa9d87hf90sa7d98h7f0a9s87hf8907hasdf' })
+  new SshKey({ name: 'test2', public_key: '8wekaf098kewf7s9dk7f98k7we98fs908d7f' })
 }
 
 export default loadPreset

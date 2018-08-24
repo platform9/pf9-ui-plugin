@@ -37,6 +37,9 @@ import ApiAccessPage from './components/api-access/ApiAccessListPage'
 
 import ApplicationsPage from './components/applications/ApplicationsListPage'
 
+import SshKeysPage from './components/sshkeys/SshKeysListPage'
+import AddSshKeyPage from './components/sshkeys/AddSshKeyPage'
+
 import openstackSchemas from 'schema/openstack'
 
 class OpenStack extends React.Component {
@@ -184,7 +187,17 @@ OpenStack.registerPlugin = pluginManager => {
         name: 'Applications',
         link: { path: '/applications', exact: true },
         component: ApplicationsPage
-      }
+      },
+      {
+        name: 'SshKeys',
+        link: { path: '/sshkeys', exact: true },
+        component: SshKeysPage
+      },
+      {
+        name: 'AddSshKey',
+        link: { path: '/sshkeys/add', exact: true },
+        component: AddSshKeyPage
+      },
     ]
   )
 
@@ -230,6 +243,10 @@ OpenStack.registerPlugin = pluginManager => {
       {
         name: 'Applications',
         link: { path: '/applications' }
+      },
+      {
+        name: 'SSH Keys',
+        link: { path: '/sshkeys' }
       }
     ]
   )
