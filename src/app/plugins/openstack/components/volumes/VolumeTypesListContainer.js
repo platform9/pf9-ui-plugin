@@ -36,14 +36,7 @@ class VolumeTypesListContainer extends React.Component {
         addUrl="/ui/openstack/storage/volumeTypes/add"
         editUrl="/ui/openstack/storage/volumeTypes/edit"
       >
-        {({ onDelete, onAdd, onEdit }) => (
-          <VolumeTypesList
-            volumeTypes={volumeTypes}
-            onAdd={onAdd}
-            onDelete={onDelete}
-            onEdit={onEdit}
-          />
-        )}
+        {handlers => <VolumeTypesList volumeTypes={volumeTypes} {...handlers} />}
       </CRUDListContainer>
     )
   }
