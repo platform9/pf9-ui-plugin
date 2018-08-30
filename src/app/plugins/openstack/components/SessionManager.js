@@ -22,7 +22,7 @@ class SessionManager extends React.Component {
     }
 
     // We need to make sure the token has not expired.
-    unscopedToken = await this.keystone.renewUnscopedToken(unscopedToken)
+    unscopedToken = await this.keystone.renewToken(unscopedToken)
 
     if (!unscopedToken) {
       return this.props.history.push('/ui/openstack/login')
