@@ -5,6 +5,12 @@ import { compose, withApollo } from 'react-apollo'
 import ConfirmationDialog from './ConfirmationDialog'
 
 class CRUDListContainer extends React.Component {
+  componentDidMount () {
+    if (this.props.getQuery) {
+      console.error(`TODO: remove getQuery usage from CRUDListContainer`)
+    }
+  }
+
   state = {
     showConfirmation: false,
     selectedItems: null,
@@ -23,6 +29,8 @@ class CRUDListContainer extends React.Component {
     this.setState({ showConfirmation: true })
     const selectedItems = this.props.items.filter(item => selectedIds.includes(item.id))
     this.setState({ selectedItems })
+    // Stash the promise resolver so it can used to resolve later on in
+    // response to user interaction (delete confirmation).
     return new Promise(resolve => { this.resolveDelete = resolve })
   }
 
@@ -31,24 +39,33 @@ class CRUDListContainer extends React.Component {
   }
 
   handleDeleteConfirm = () => {
-    const { client, objType, removeQuery, getQuery } = this.props
     this.setState({ showConfirmation: false })
     const items = this.state.selectedItems || []
-    items.forEach(item => this.handleRemove(client, item.id, objType, removeQuery, getQuery))
+    items.forEach(item => this.handleRemove(item.id))
     this.setState({ selectedItems: [] })
+    // The user resolves the promise by clicking "confirm".
     this.resolveDelete()
   }
 
-  handleRemove = async (client, id, objType, removeQuery, getQuery) => {
-    client.mutate({
-      mutation: removeQuery,
-      variables: { id },
-      update: cache => {
-        const data = cache.readQuery({ query: getQuery })
-        data[objType] = data[objType].filter(x => x.id !== id)
-        cache.writeQuery({ query: getQuery, data })
-      }
-    })
+  handleRemove = async id => {
+    const { client, getQuery, objType, removeQuery, onRemove } = this.props
+    if (getQuery) {
+      // TODO: refactor any code that uses this path so we can decouple
+      // GraphQL from CRUDListContainer
+      client.mutate({
+        mutation: removeQuery,
+        variables: { id },
+        update: cache => {
+          const data = cache.readQuery({ query: getQuery })
+          data[objType] = data[objType].filter(x => x.id !== id)
+          cache.writeQuery({ query: getQuery, data })
+        }
+      })
+    }
+
+    if (onRemove) {
+      onRemove(id)
+    }
   }
 
   redirectToAdd = () => {

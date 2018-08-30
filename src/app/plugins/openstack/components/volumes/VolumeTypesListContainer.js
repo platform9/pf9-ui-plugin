@@ -3,8 +3,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import CRUDListContainer from 'core/common/CRUDListContainer'
 import VolumeTypesList from './VolumeTypesList'
-import { GET_VOLUME_TYPES, REMOVE_VOLUME_TYPE } from './actions'
 import { parseJSON } from 'util/misc'
+import { compose } from 'core/fp'
+import { withAppContext } from 'core/AppContext'
 
 // Promote `volume_backend_name` from `extra_specs` into its own field
 // This is a rather tedious pattern.  If we are doing it elsewhere we
@@ -18,14 +19,19 @@ const convertVolumeType = x => {
 }
 
 class VolumeTypesListContainer extends React.Component {
+  handleRemove = async id => {
+    const { volumeTypes, setContext, openstackClient } = this.props
+    await openstackClient.cinder.deleteVolumeType(id)
+    const newVolumeTypes = volumeTypes.filter(x => x.id !== id)
+    setContext({ volumeTypes: newVolumeTypes })
+  }
+
   render () {
     const volumeTypes = (this.props.volumeTypes || []).map(convertVolumeType)
     return (
       <CRUDListContainer
         items={volumeTypes}
-        objType="volumeTypes"
-        getQuery={GET_VOLUME_TYPES}
-        removeQuery={REMOVE_VOLUME_TYPE}
+        onRemove={this.handleRemove}
         addUrl="/ui/openstack/storage/volumeTypes/add"
         editUrl="/ui/openstack/storage/volumeTypes/edit"
       >
@@ -46,4 +52,6 @@ VolumeTypesListContainer.propTypes = {
   volumeTypes: PropTypes.arrayOf(PropTypes.object)
 }
 
-export default VolumeTypesListContainer
+export default compose(
+  withAppContext,
+)(VolumeTypesListContainer)
