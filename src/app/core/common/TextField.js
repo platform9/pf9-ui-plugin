@@ -8,7 +8,11 @@ class TextField extends React.Component {
   constructor (props) {
     super(props)
     const spec = pickMultiple('validations')(props)
-    props.defineField(props.id, spec)
+    const { id, initialValue, setField } = this.props
+    props.defineField(id, spec)
+    if (initialValue !== undefined) {
+      setField(id, initialValue)
+    }
   }
 
   get restFields () { return filterFields(...withFormContext.propsToExclude)(this.props) }

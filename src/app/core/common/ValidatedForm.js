@@ -200,4 +200,4 @@ export const withFormContext = Component => props =>
     }
   </Consumer>
 
-withFormContext.propsToExclude = ['defineField', 'setField']
+withFormContext.propsToExclude = ['defineField', 'setField', 'initialValue']

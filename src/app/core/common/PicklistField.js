@@ -1,14 +1,21 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import Selector from 'core/common/Selector'
+import Picklist from 'core/common/Picklist'
 import { withFormContext } from 'core/common/ValidatedForm'
 import { pickMultiple, filterFields } from 'core/fp'
 
+/**
+ * PicklistField builds upon Picklist and adds integration with ValidatedForm
+ */
 class PicklistField extends React.Component {
   constructor (props) {
     super(props)
     const spec = pickMultiple('validations')(props)
-    props.defineField(props.id, spec)
+    const { id, initialValue, setField } = this.props
+    props.defineField(id, spec)
+    if (initialValue !== undefined) {
+      setField(id, initialValue)
+    }
   }
 
   get restFields () { return filterFields(...withFormContext.propsToExclude)(this.props) }
@@ -17,12 +24,13 @@ class PicklistField extends React.Component {
     const { id, label, options, value, setField } = this.props
     return (
       <div id={id}>
-        <Selector
-          name={label}
+        <Picklist
+          name={id}
+          label={label}
           {...this.restFields}
-          list={options}
+          options={options}
           value={value[id] !== undefined ? value[id] : ''}
-          onChoose={e => setField(this.props.id, e.target.value)}
+          onChange={e => setField(id, e.target.value)}
         />
       </div>
     )
@@ -36,7 +44,10 @@ PicklistField.defaultProps = {
 PicklistField.propTypes = {
   id: PropTypes.string.isRequired,
   label: PropTypes.string,
-  options: PropTypes.arrayOf(PropTypes.string).isRequired,
+  options: PropTypes.arrayOf(PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.object,
+  ])).isRequired,
   validations: PropTypes.arrayOf(PropTypes.object),
   initialValue: PropTypes.string,
 }

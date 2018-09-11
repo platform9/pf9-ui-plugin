@@ -7,6 +7,10 @@ import Select from '@material-ui/core/Select'
 import { withStyles } from '@material-ui/core/styles'
 import { compose } from 'core/fp'
 
+/**
+ * Picklist is a bare-bones widget-only implmentation.
+ * See PicklistField if you need ValidatedForm integration.
+ */
 const styles = theme => ({
   root: {
     display: 'flex',
@@ -23,20 +27,16 @@ const styles = theme => ({
 
 class Picklist extends React.Component {
   get options () {
-    const opts = this.props.options
-    if (opts.length === 0) { return [] }
-    if (typeof opts[0] === 'string') {
-      return opts.map(x => ({ value: x, label: x }))
-    }
-    return opts
+    return this.props.options.map(x =>
+      typeof x === 'string' ? ({ value: x, label: x }) : x
+    )
   }
 
-  handleChange = () => {
-    console.log('handleChange')
-  }
+  handleChange = value => this.props.onChange && this.props.onChange(value)
 
   render () {
     const { classes, label, name, value } = this.props
+
     return (
       <FormControl className={classes.formControl}>
         <InputLabel htmlFor={name}>{label}</InputLabel>
@@ -60,6 +60,7 @@ Picklist.propTypes = {
     PropTypes.object,
   ])).isRequired,
   value: PropTypes.string,
+  onChange: PropTypes.func,
 }
 
 export default compose(
