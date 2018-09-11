@@ -19,8 +19,12 @@ const columns = [
   { id: 'id', label: 'OpenStack ID' },
   { id: 'attachedMode', label: 'attached_mode' },
   { id: 'readonly', label: 'readonly' },
-  { id: 'metadata', label: 'Metadata' }
+
+  // TODO: We probably want to write a metadata renderer for this kind of format
+  // since we use it in a few places for tags / metadata.
+  { id: 'metadata', label: 'Metadata', render: data => JSON.stringify(data) }
 ]
+
 class VolumesList extends React.Component {
   render () {
     const { onAdd, onDelete, onEdit, volumes } = this.props

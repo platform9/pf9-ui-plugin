@@ -130,27 +130,44 @@ class ValidatedForm extends React.Component {
 }
 
 ValidatedForm.propTypes = {
-  // GraphQl query to add an object
-  addQuery: PropTypes.object,
-  // GraphQl query to get an object
-  getQuery: PropTypes.object,
-  // GraphQl query to update an object
-  updateQuery: PropTypes.object,
-  // Action to take(add/delete/update)
-  action: PropTypes.string,
   // Url to go back when the operation ends
   backUrl: PropTypes.string,
-  // Type of objects to operate
-  objType: PropTypes.string,
-  // String of query to cache
-  cacheQuery: PropTypes.string,
-  // Id of object to update
-  objId: PropTypes.string,
+
   // Initial values
   initialValue: PropTypes.object,
+
   // Set parent context
   onSubmit: PropTypes.func,
+
   triggerSubmit: PropTypes.func,
+
+  /**
+   * TODO: The props below are coupled to GraphQL
+   * specific logic.  The recommended way to use this
+   * component is to instrument what is needed somewhere
+   * else in the `onSubmit` handler.
+   */
+
+  /** @deprecated GraphQl query to add an object */
+  addQuery: PropTypes.object,
+
+  /** @deprecated GraphQl query to get an object */
+  getQuery: PropTypes.object,
+
+  /** @deprecated GraphQl query to update an object */
+  updateQuery: PropTypes.object,
+
+  /** @deprecated Action to take(add/delete/update) */
+  action: PropTypes.string,
+
+  /** @deprecated Type of objects to operate */
+  objType: PropTypes.string,
+
+  /** @deprecated String of query to cache */
+  cacheQuery: PropTypes.string,
+
+  /** @deprecated Id of object to update */
+  objId: PropTypes.string,
 }
 
 export const PropKeys = Object.keys(ValidatedForm.propTypes)

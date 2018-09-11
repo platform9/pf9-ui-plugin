@@ -3,6 +3,7 @@ import Wizard from 'core/common/Wizard'
 import WizardStep from 'core/common/WizardStep'
 import ValidatedForm from 'core/common/ValidatedForm'
 import TextField from 'core/common/TextField'
+import Picklist from 'core/common/Picklist'
 import Checkbox from 'core/common/Checkbox'
 
 const initialValue = {
@@ -10,6 +11,7 @@ const initialValue = {
   bootable: false,
   readonly: false,
 }
+const volumeSourceTypes = ['None (empty volume)', 'Snapshot', 'Another Volume', 'Image']
 
 // See if the data supplied to WizardStep can be raised up to AddVolumeForm state
 const AddVolumeForm = ({ onComplete }) =>
@@ -20,10 +22,11 @@ const AddVolumeForm = ({ onComplete }) =>
           <WizardStep stepId="basic" label="Basic">
             <ValidatedForm initialValue={context} onSubmit={setContext} triggerSubmit={onNext}>
               <TextField id="name" label="Volume Name" />
-              <TextField id="volume_type" label="Volume Type" />
+              <Picklist name="volume_type" label="Volume Type" options={volumeSourceTypes} />
               <TextField id="description" label="Description" />
               <TextField id="status" label="Status" />
             </ValidatedForm>
+            <pre>{JSON.stringify(context, null, 4)}</pre>
           </WizardStep>
           <WizardStep stepId="advanced" label="Advanced">
             <ValidatedForm initialValue={context} onSubmit={setContext} triggerSubmit={onNext}>

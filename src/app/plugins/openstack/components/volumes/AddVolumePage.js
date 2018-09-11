@@ -2,25 +2,16 @@ import React from 'react'
 import FormWrapper from 'core/common/FormWrapper'
 import AddVolumeForm from './AddVolumeForm'
 import { withRouter } from 'react-router-dom'
-import { compose, withApollo } from 'react-apollo'
+import { compose } from 'core/fp'
 import requiresAuthentication from '../../util/requiresAuthentication'
-import { ADD_VOLUME, GET_VOLUMES } from './actions'
+import { withAppContext } from 'core/AppContext'
 
 class AddVolumePage extends React.Component {
-  handleAdd = (input) => {
-    const { client, history } = this.props
+  handleAdd = async volume => {
+    const { setContext, context, history } = this.props
     try {
-      client.mutate({
-        mutation: ADD_VOLUME,
-        variables: {
-          input: input
-        },
-        update: (proxy, { data }) => {
-          const tempData = proxy.readQuery({ query: GET_VOLUMES })
-          tempData['volumes'].push(data['createVolume'])
-          proxy.writeQuery({ query: GET_VOLUMES, data: tempData })
-        }
-      })
+      const createdVolume = await context.openstackClient.cinder.createVolume(volume)
+      setContext({ volumes: [ ...context.volumes, createdVolume ] })
       history.push('/ui/openstack/storage#volumes')
     } catch (err) {
       console.error(err)
@@ -37,7 +28,7 @@ class AddVolumePage extends React.Component {
 }
 
 export default compose(
+  withAppContext,
   withRouter,
-  withApollo,
   requiresAuthentication
 )(AddVolumePage)

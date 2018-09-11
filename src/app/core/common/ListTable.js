@@ -33,7 +33,6 @@ const styles = theme => ({
 
 // TODO: this component should take an optional sort function in the columns prop (eg. for IP addresses)
 
-@withStyles(styles)
 class ListTable extends React.Component {
   constructor (props) {
     super(props)
@@ -103,12 +102,16 @@ class ListTable extends React.Component {
     let newSelected = []
 
     if (selectedIndex === -1) {
+      // not found
       newSelected = newSelected.concat(selected, row)
     } else if (selectedIndex === 0) {
+      // first
       newSelected = newSelected.concat(selected.slice(1))
     } else if (selectedIndex === selected.length - 1) {
+      // last
       newSelected = newSelected.concat(selected.slice(0, -1))
     } else if (selectedIndex > 0) {
+      // somewhere inbetween
       newSelected = newSelected.concat(
         selected.slice(0, selectedIndex),
         selected.slice(selectedIndex + 1),
@@ -178,10 +181,15 @@ class ListTable extends React.Component {
 
   renderCell = (columnDef, contents) => {
     const { cellProps = {} } = columnDef
+    let _contents = contents
+
+    if (typeof contents === 'boolean') { _contents = String(_contents) }
+
+    // Allow for customized rendering in the columnDef
+    if (columnDef.render) { _contents = columnDef.render(contents) }
+
     return (
-      <TableCell key={columnDef.id} {...cellProps} >
-        {(typeof contents === 'boolean') ? String(contents) : contents}
-      </TableCell>
+      <TableCell key={columnDef.id} {...cellProps}>{_contents}</TableCell>
     )
   }
 

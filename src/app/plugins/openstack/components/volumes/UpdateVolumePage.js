@@ -1,29 +1,26 @@
 import React from 'react'
-import { Query } from 'react-apollo'
 import FormWrapper from 'core/common/FormWrapper'
-import UpdateVolumeForm from './UpdateVolumeForm'
-import { GET_VOLUME } from './actions'
 import requiresAuthentication from '../../util/requiresAuthentication'
+import DataUpdater from 'core/DataUpdater'
+import UpdateVolumeForm from './UpdateVolumeForm'
+import { compose } from 'core/fp'
+import { loadVolumes, updateVolume } from './actions'
 
-class UpdateVolumePage extends React.Component {
-  render () {
-    const id = this.props.match.params.volumeId
+const UpdateVolumePage = props => (
+  <DataUpdater
+    dataKey="volumes"
+    loaderFn={loadVolumes}
+    updateFn={updateVolume}
+    objId={props.match.params.volumeId}
+  >
+    {({ data, onSubmit }) =>
+      <FormWrapper title="Update Volume" backUrl="/ui/openstack/storage#volumes">
+        <UpdateVolumeForm volume={data} onSubmit={onSubmit} />
+      </FormWrapper>
+    }
+  </DataUpdater>
+)
 
-    return (
-      <Query query={GET_VOLUME} variables={{ id }}>
-        {({ data }) =>
-          <FormWrapper title="Update Volume" backUrl="/ui/openstack/storage#volumes">
-            { data && data.volume &&
-              <UpdateVolumeForm
-                volume={data.volume}
-                objId={id}
-              />
-            }
-          </FormWrapper>
-        }
-      </Query>
-    )
-  }
-}
-
-export default requiresAuthentication(UpdateVolumePage)
+export default compose(
+  requiresAuthentication,
+)(UpdateVolumePage)

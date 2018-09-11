@@ -1,24 +1,15 @@
 import React from 'react'
-import { compose, graphql } from 'react-apollo'
-
-import DisplayError from 'core/common/DisplayError'
-import Loader from 'core/common/Loader'
 import VolumesListContainer from './VolumesListContainer'
 import requiresAuthentication from '../../util/requiresAuthentication'
-import { GET_VOLUMES } from './actions'
+import DataLoader from 'core/DataLoader'
+import { compose } from 'core/fp'
+import { loadVolumes } from './actions'
 
-const VolumesListPage =
-  ({ data, loading, error, context }) => {
-    return (
-      <div>
-        {loading && <Loader />}
-        {error && <DisplayError error={error} />}
-        {data && <VolumesListContainer volumes={data.volumes} />}
-      </div>
-    )
-  }
+const VolumesListPage = () =>
+  <DataLoader dataKey="volumes" loaderFn={loadVolumes}>
+    {({ data }) => <VolumesListContainer volumes={data} />}
+  </DataLoader>
 
 export default compose(
   requiresAuthentication,
-  graphql(GET_VOLUMES),
 )(VolumesListPage)
