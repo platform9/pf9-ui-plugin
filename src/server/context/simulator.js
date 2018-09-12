@@ -353,13 +353,13 @@ class Context {
     return sshKey.asGraphQl()
   }
 
-  removeSshKey = id => {
-    const sshKey = SshKey.findById(id)
+  removeSshKey = name => {
+    const sshKey = SshKey.findByName(name)
     if (!sshKey) {
       throw new Error('Unable to delete non-existent ssh key')
     }
     sshKey.destroy()
-    return id
+    return name
   }
 }
 

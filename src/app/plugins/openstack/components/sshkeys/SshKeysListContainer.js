@@ -13,6 +13,7 @@ class SshKeysListContainer extends React.Component {
         getQuery={GET_SSH_KEYS}
         removeQuery={REMOVE_SSH_KEY}
         addUrl="/ui/openstack/sshkeys/add"
+        uniqueIdentifier="name"
       >
         {({ onDelete, onAdd }) => (
           <SshKeysList

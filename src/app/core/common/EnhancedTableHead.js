@@ -20,7 +20,7 @@ class EnhancedTableHead extends React.Component {
     const headerCheckbox = showCheckboxes ? (
       <TableCell padding="checkbox">
         <Checkbox
-          indeterminate={numSelected > 0 && numSelected < rowCount}
+          indeterminate={!checked && numSelected > 0 && numSelected < rowCount}
           checked={checked}
           onChange={onSelectAllClick}
           color='primary'

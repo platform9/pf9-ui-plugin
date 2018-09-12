@@ -1,5 +1,4 @@
 type SshKey {
-  id: ID!
   name: String!
   fingerprint: String
   public_key: String
@@ -7,7 +6,7 @@ type SshKey {
 
 type Query {
   sshKeys: [SshKey!]!
-  sshKey(id: ID!): SshKey
+  sshKey(name: String!): SshKey
 }
 
 input SshKeyInput {
@@ -17,5 +16,5 @@ input SshKeyInput {
 
 type Mutation {
   createSshKey(input: SshKeyInput): SshKey!
-  removeSshKey(id: ID!): ID
+  removeSshKey(name: String!): String
 }

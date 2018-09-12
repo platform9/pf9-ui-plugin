@@ -25,10 +25,8 @@ class CRUDListContainer extends React.Component {
     return `This will permanently delete the following: ${selectedNames}`
   }
 
-  handleDelete = selectedIds => {
-    this.setState({ showConfirmation: true })
-    const selectedItems = this.props.items.filter(item => selectedIds.includes(item.id))
-    this.setState({ selectedItems })
+  handleDelete = selected => {
+    this.setState({ showConfirmation: true, selectedItems: selected })
     // Stash the promise resolver so it can used to resolve later on in
     // response to user interaction (delete confirmation).
     return new Promise(resolve => { this.resolveDelete = resolve })
@@ -39,16 +37,18 @@ class CRUDListContainer extends React.Component {
   }
 
   handleDeleteConfirm = () => {
+    const { uniqueIdentifier } = this.props
     this.setState({ showConfirmation: false })
     const items = this.state.selectedItems || []
-    items.forEach(item => this.handleRemove(item.id))
+    items.forEach(item => this.handleRemove(item[uniqueIdentifier]))
+
     this.setState({ selectedItems: [] })
     // The user resolves the promise by clicking "confirm".
     this.resolveDelete()
   }
 
   handleRemove = async id => {
-    const { client, getQuery, objType, removeQuery, onRemove } = this.props
+    const { client, getQuery, objType, removeQuery, onRemove, uniqueIdentifier } = this.props
     if (getQuery) {
       // TODO: refactor any code that uses this path so we can decouple
       // GraphQL from CRUDListContainer
@@ -57,7 +57,7 @@ class CRUDListContainer extends React.Component {
         variables: { id },
         update: cache => {
           const data = cache.readQuery({ query: getQuery })
-          data[objType] = data[objType].filter(x => x.id !== id)
+          data[objType] = data[objType].filter(x => x[uniqueIdentifier] !== id)
           cache.writeQuery({ query: getQuery, data })
         }
       })
@@ -103,6 +103,17 @@ class CRUDListContainer extends React.Component {
 CRUDListContainer.propTypes = {
   addUrl: PropTypes.string,
   editUrl: PropTypes.string,
+  /*
+    Some objects have a unique identifier other than 'id'
+    For example sshKeys have unique identifier of 'name' and the APIs
+    rely on using the name as part of the URI. Specify the unique identifier
+    in props if it is different from 'id'
+  */
+  uniqueIdentifier: PropTypes.string,
+}
+
+CRUDListContainer.defaultProps = {
+  uniqueIdentifier: 'id'
 }
 
 export default compose(

@@ -1,3 +1,5 @@
+/* eslint-disable react/no-did-update-set-state */
+
 import React from 'react'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/core/styles'
@@ -44,8 +46,7 @@ class ListTable extends React.Component {
       page: 0,
       rowsPerPage: prefs.perPage || 10,
       selected: [],
-      selectedAll: false,
-      searchTerm: ''
+      searchTerm: '',
     }
   }
 
@@ -70,26 +71,39 @@ class ListTable extends React.Component {
     return sorted
   }
 
+  areAllSelected = (data) => {
+    const { selected } = this.state
+    return data.every(row => selected.includes(row))
+  }
+
   handleSelectAllClick = (event, checked) => {
-    const { data } = this.props
-    const { page, rowsPerPage } = this.state
+    const { searchTarget, paginate, data } = this.props
+    const { selected, searchTerm } = this.state
+
     let sortedData = this.sortData(data)
-    let startIdx = page * rowsPerPage
-    let endIdx = startIdx + rowsPerPage
-    const getId = x => x.id
+    const searchData = searchTerm === '' ? sortedData : this.filterBySearch(sortedData, searchTarget)
+    const paginatedData = paginate ? this.paginate(searchData) : searchData
+
+    let newSelected
+    if (checked) {
+      // Add active paginated rows that are not already selected
+      newSelected = [...selected, ...paginatedData.filter(row => !selected.includes(row))]
+    } else {
+      // Remove active paginated rows from selected
+      newSelected = selected.filter(row => !paginatedData.includes(row))
+    }
     this.setState({
-      selected: checked ? sortedData.slice(startIdx, endIdx).map(getId) : [],
-      selectedAll: !this.state.selectedAll
+      selected: newSelected
     })
   }
 
-  handleClick = id => event => {
+  handleClick = row => event => {
     const { selected } = this.state
-    const selectedIndex = selected.indexOf(id)
+    const selectedIndex = selected.indexOf(row)
     let newSelected = []
 
     if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, id)
+      newSelected = newSelected.concat(selected, row)
     } else if (selectedIndex === 0) {
       newSelected = newSelected.concat(selected.slice(1))
     } else if (selectedIndex === selected.length - 1) {
@@ -116,7 +130,7 @@ class ListTable extends React.Component {
   }
 
   handleDelete = () => {
-    const { data, onDelete } = this.props
+    const { onDelete, data } = this.props
     const { selected, page, rowsPerPage } = this.state
     let maxPage = Math.ceil(data.length / rowsPerPage) - 1
     let newPage = page
@@ -132,7 +146,6 @@ class ListTable extends React.Component {
     onDelete(selected).then(() => {
       this.setState({
         selected: [],
-        selectedAll: false,
         page: newPage
       })
     })
@@ -154,7 +167,7 @@ class ListTable extends React.Component {
     return data.filter(ele => ele[target].match(new RegExp(searchTerm, 'i')) !== null)
   }
 
-  isSelected = id => this.state.selected.includes(id)
+  isSelected = row => this.state.selected.includes(row)
 
   paginate = data => {
     const { page, rowsPerPage } = this.state
@@ -174,10 +187,10 @@ class ListTable extends React.Component {
 
   renderRow = row => {
     const { columns, showCheckboxes } = this.props
-    const isSelected = this.isSelected(row.id)
+    const isSelected = this.isSelected(row)
 
     const checkboxProps = showCheckboxes ? {
-      onClick: this.handleClick(row.id),
+      onClick: this.handleClick(row),
       role: 'checkbox',
       tabIndex: -1,
       selected: isSelected
@@ -244,13 +257,17 @@ class ListTable extends React.Component {
       order,
       orderBy,
       selected,
-      selectedAll,
       searchTerm
     } = this.state
+
+    if (!data) {
+      return null
+    }
 
     const sortedData = this.sortData(data)
     const searchData = searchTerm === '' ? sortedData : this.filterBySearch(sortedData, searchTarget)
     const paginatedData = paginate ? this.paginate(searchData) : searchData
+    const selectedAll = this.areAllSelected(paginatedData)
     // Always show pagination control bar to make sure the height doesn't change frequently.
     // const shouldShowPagination = paginate && sortedData.length > this.state.rowsPerPage
 

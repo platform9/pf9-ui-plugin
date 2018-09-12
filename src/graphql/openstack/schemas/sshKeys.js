@@ -4,12 +4,12 @@ import { makeExecutableSchema } from 'graphql-tools'
 const resolvers = {
   Query: {
     sshKeys: (_, __, context) => context.getSshKeys(),
-    sshKey: (obj, args, context) => context.getSshKey(args.id),
+    sshKey: (obj, args, context) => context.getSshKey(args.name),
   },
 
   Mutation: {
     createSshKey: (obj, args, context) => context.createSshKey(args),
-    removeSshKey: (obj, { id }, context) => context.removeSshKey(id),
+    removeSshKey: (obj, { name }, context) => context.removeSshKey(name),
   }
 }
 
