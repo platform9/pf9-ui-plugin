@@ -18,7 +18,7 @@ const styles = theme => ({
   },
   formControl: {
     marginTop: theme.spacing.unit,
-    minWidth: 120,
+    minWidth: 200,
   },
   selectEmpty: {
     marginTop: theme.spacing.unit * 2,
@@ -26,26 +26,24 @@ const styles = theme => ({
 })
 
 class Picklist extends React.Component {
-  get options () {
-    return this.props.options.map(x =>
-      typeof x === 'string' ? ({ value: x, label: x }) : x
-    )
-  }
-
-  handleChange = value => this.props.onChange && this.props.onChange(value)
+  handleChange = e => this.props.onChange && this.props.onChange(e.target.value)
 
   render () {
     const { classes, label, name, value } = this.props
+
+    const options = this.props.options.map(x =>
+      typeof x === 'string' ? ({ value: x, label: x }) : x
+    )
 
     return (
       <FormControl className={classes.formControl}>
         <InputLabel htmlFor={name}>{label}</InputLabel>
         <Select
-          value={value || ''}
+          value={value}
           onChange={this.handleChange}
           inputProps={{ name: label, id: name }}
         >
-          {this.options.map(x => <MenuItem value={x.value} key={x.value}>{x.label}</MenuItem>)}
+          {options.map(x => <MenuItem value={x.value} key={x.value}>{x.label}</MenuItem>)}
         </Select>
       </FormControl>
     )

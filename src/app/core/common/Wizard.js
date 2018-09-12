@@ -66,13 +66,13 @@ class Wizard extends React.Component {
   render () {
     const { context, setContext, steps, step } = this.state
     const lastStep = this.state.steps.length - 1
+    const activeStepId = steps[step] && steps[step].stepId
 
     return (
       <div>
         <Provider value={this.state}>
           <ProgressTracker steps={steps} activeStep={step} />
-          {this.props.children({ context, setContext, onNext: this.onNext })}
-          {steps[step] ? steps[step].contents : null}
+          {this.props.children({ context, setContext, onNext: this.onNext, activeStepId })}
           <FormButtons>
             { step > 0 && <BackButton handleBack={this.handleBack} /> }
             { step < lastStep && <NextButton handleNext={this.handleNext}>Next</NextButton> }

@@ -3,12 +3,15 @@ import PropTypes from 'prop-types'
 import { withWizardContext } from 'core/common/Wizard'
 
 class WizardStep extends React.Component {
-  constructor (props) {
-    super(props)
-    props.addStep({stepId: props.stepId, label: props.label, contents: props.children})
+  componentDidMount () {
+    const { addStep, stepId, label } = this.props
+    addStep({ stepId, label })
   }
 
-  render = () => null
+  render () {
+    const { stepId, activeStepId, children } = this.props
+    return stepId === activeStepId ? children : null
+  }
 }
 
 // Validations should be an object with a rule definition
