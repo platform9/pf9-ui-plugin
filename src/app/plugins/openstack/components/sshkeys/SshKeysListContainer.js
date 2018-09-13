@@ -2,22 +2,22 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import CRUDListContainer from 'core/common/CRUDListContainer'
 import SshKeysList from './SshKeysList'
-import { GET_SSH_KEYS, REMOVE_SSH_KEY } from './actions'
+import { addIdsToCollection } from 'util/helpers'
 
 class SshKeysListContainer extends React.Component {
   render () {
+    const sshKeys = this.props.sshKeys ? addIdsToCollection(this.props.sshKeys) : []
+
     return (
       <CRUDListContainer
-        items={this.props.sshKeys}
+        items={sshKeys}
         objType="sshKeys"
-        getQuery={GET_SSH_KEYS}
-        removeQuery={REMOVE_SSH_KEY}
         addUrl="/ui/openstack/sshkeys/add"
         uniqueIdentifier="name"
       >
         {({ onDelete, onAdd }) => (
           <SshKeysList
-            sshKeys={this.props.sshKeys}
+            sshKeys={sshKeys}
             onAdd={onAdd}
             onDelete={onDelete}
           />

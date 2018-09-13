@@ -20,6 +20,7 @@ class Nova {
 
   flavorsUrl = async () => `${await this.endpoint()}/flavors`
   hypervisorsUrl = async () => `${await this.endpoint()}/os-hypervisors`
+  sshKeysUrl = async () => `${await this.endpoint()}/os-keypairs`
 
   async getFlavors () {
     const url = `${await this.flavorsUrl()}/detail`
@@ -46,6 +47,12 @@ class Nova {
     const url = `${await this.hypervisorsUrl()}/detail`
     const response = await axios.get(url, this.client.getAuthHeaders())
     return response.data.hypervisors
+  }
+
+  async getSshKeys () {
+    const url = `${await this.sshKeysUrl()}`
+    const response = await axios.get(url, this.client.getAuthHeaders())
+    return response.data.keypairs
   }
 }
 

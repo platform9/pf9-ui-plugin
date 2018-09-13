@@ -15,7 +15,7 @@ describe('SshKey', () => {
   describe('asJson', () => {
     it('creates a JSON version of the key', () => {
       const sshKey = new SshKey({ name: 'TestKey', public_key: 'qwertyuiop' })
-      expect(sshKey.asJson()).toMatchObject({ name: 'TestKey', fingerprint: '', public_key: 'qwertyuiop' })
+      expect(sshKey.asJson()).toMatchObject({ keypair: { name: 'TestKey', fingerprint: '', public_key: 'qwertyuiop' } })
     })
   })
 })

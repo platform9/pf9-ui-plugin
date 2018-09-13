@@ -7,7 +7,7 @@ const getSshKeys = (req, res) => {
   const { tenantId } = req.params
   const sshKeys = mapAsJson(SshKey.getCollection())
   // TODO: need to filter this list by what the user is allowed to see
-  return res.send({ sshKeys })
+  return res.send({ keypairs: sshKeys })
 }
 
 export default getSshKeys

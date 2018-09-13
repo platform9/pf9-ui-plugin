@@ -4,6 +4,7 @@ import express from 'express'
 import getFlavors from './getFlavors'
 import postFlavor from './postFlavor'
 import deleteFlavor from './deleteFlavor'
+import getSshKeys from './getSshKeys'
 
 // Hypervisors
 import getHypervisors from './getHypervisors'
@@ -18,5 +19,8 @@ router.delete('/v2.1/:tenantId/flavors/:flavorId', tokenValidator, deleteFlavor)
 
 // Hypervisors
 router.get('/v2.1/:tenantId/os-hypervisors/detail', tokenValidator, getHypervisors)
+
+// SSH Keys
+router.get('/v2.1/:tenantId/os-keypairs', tokenValidator, getSshKeys)
 
 export default router

@@ -19,9 +19,11 @@ class SshKey extends ActiveModel {
 
   asJson = () => {
     return {
-      fingerprint: this.fingerprint,
-      name: this.name,
-      public_key: this.public_key
+      keypair: {
+        fingerprint: this.fingerprint,
+        name: this.name,
+        public_key: this.public_key
+      }
     }
   }
 
