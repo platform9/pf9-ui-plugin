@@ -122,10 +122,7 @@ class Keystone {
     try {
       const response = await axios.post(this.tokensUrl, body)
       const newToken = response.headers['x-subject-token']
-      // We're not sure if this is a scoped or unscoped token but it should be
-      // fine to just set both of them here since scopedToken will be set later
-      // on if it needs to be.
-      this.client.unscopedToken = newToken
+      this.client.unscopedToken = token
       this.client.scopedToken = newToken
       return newToken
     } catch (err) {

@@ -1,4 +1,5 @@
 import uuid from 'uuid'
+const config = require('../../../config')
 
 const fakeTenantId = uuid.v4()
 
@@ -10,23 +11,23 @@ const Catalog = {
           {
             id: uuid.v4(),
             interface: 'admin',
-            region: 'master',
-            region_id: 'master',
-            url: '/neutron'
+            region: config.region,
+            region_id: config.region,
+            url: `${config.apiHost}/neutron`
           },
           {
             id: uuid.v4(),
             interface: 'internal',
-            region: 'master',
-            region_id: 'master',
-            url: '/neutron'
+            region: config.region,
+            region_id: config.region,
+            url: `${config.apiHost}/neutron`
           },
           {
             id: uuid.v4(),
             interface: 'public',
-            region: 'master',
-            region_id: 'master',
-            url: '/neutron'
+            region: config.region,
+            region_id: config.region,
+            url: `${config.apiHost}/neutron`
           }
         ],
         id: uuid.v4(),
@@ -38,23 +39,23 @@ const Catalog = {
           {
             id: uuid.v4(),
             interface: 'admin',
-            region: 'master',
-            region_id: 'master',
-            url: `/nova/v2.1/${fakeTenantId}`
+            region: config.region,
+            region_id: config.region,
+            url: `${config.apiHost}/nova/v2.1/${fakeTenantId}`
           },
           {
             id: uuid.v4(),
             interface: 'internal',
-            region: 'master',
-            region_id: 'master',
-            url: `/nova/v2.1/${fakeTenantId}`
+            region: config.region,
+            region_id: config.region,
+            url: `${config.apiHost}/nova/v2.1/${fakeTenantId}`
           },
           {
             id: uuid.v4(),
             interface: 'public',
-            region: 'master',
-            region_id: 'master',
-            url: `/nova/v2.1/${fakeTenantId}`
+            region: config.region,
+            region_id: config.region,
+            url: `${config.apiHost}/nova/v2.1/${fakeTenantId}`
           }
         ],
         id: uuid.v4(),

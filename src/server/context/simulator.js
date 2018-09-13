@@ -8,6 +8,8 @@ import GlanceImage from '../models/GlanceImage'
 import Network from '../models/Network'
 import Router from '../models/Router'
 import FloatingIp from '../models/FloatingIp'
+import Hypervisor from '../models/Hypervisor'
+import ResMgrHost from '../models/ResMgrHost'
 import Token from '../models/Token'
 import Application from '../models/Application'
 import SshKey from '../models/SshKey'
@@ -47,6 +49,8 @@ class Context {
     this.applications = []
     this.sshKeys = []
     this.defaultQuota = { ...defaultQuota }
+    this.resMgrHosts = []
+    this.resMgrRoles = {}
   }
 
   validateToken = id => Token.validateToken(id)
@@ -275,6 +279,42 @@ class Context {
     }
     volume.destroy()
     return id
+  }
+
+  getHypervisor = (id) => {
+    const hypervisor = Hypervisor.findById(id)
+    if (!hypervisor) {
+      throw new Error('Unable to find non-existent hypervisor')
+    }
+    return hypervisor.asGraphQl()
+  }
+
+  getHypervisors = () => Hypervisor.getCollection().map(x => x.asGraphQl())
+
+  getResMgrHost = (id) => {
+    const resMgrHost = ResMgrHost.findById(id)
+    if (!resMgrHost) {
+      throw new Error('Unable to find non-existent resMgrHost')
+    }
+    return resMgrHost.asJson()
+  }
+
+  getResMgrHosts = () => ResMgrHost.getCollection().map(x => x.asJson())
+
+  getResMgrHostRole = (id, role) => {
+    let hostRole = ResMgrHost.getHostRole(id, role)
+    if (!hostRole) {
+      throw new Error('Unable to find designated role for designated host')
+    }
+    return hostRole
+  }
+
+  updateResMgrRole = (id, role, input) => {
+    let hostRole = ResMgrHost.updateHostRole(id, role, input)
+    if (!hostRole) {
+      throw new Error('Unable to update non-existent resMgrHost')
+    }
+    return hostRole
   }
 
   getServiceCatalog = () => Catalog.getCatalog()

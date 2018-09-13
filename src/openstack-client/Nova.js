@@ -19,6 +19,7 @@ class Nova {
   }
 
   flavorsUrl = async () => `${await this.endpoint()}/flavors`
+  hypervisorsUrl = async () => `${await this.endpoint()}/os-hypervisors`
 
   async getFlavors () {
     const url = `${await this.flavorsUrl()}/detail`
@@ -39,6 +40,12 @@ class Nova {
     const url = `${await this.flavorsUrl()}/${id}`
     const response = await axios.delete(url, this.client.getAuthHeaders())
     return response
+  }
+
+  async getHypervisors () {
+    const url = `${await this.hypervisorsUrl()}/detail`
+    const response = await axios.get(url, this.client.getAuthHeaders())
+    return response.data.hypervisors
   }
 }
 

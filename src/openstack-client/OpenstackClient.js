@@ -4,6 +4,7 @@ import Keystone from './Keystone'
 import Neutron from './Neutron'
 import Nova from './Nova'
 import Murano from './Murano'
+import ResMgr from './ResMgr'
 
 class OpenstackClient {
   constructor (options = {}) {
@@ -17,6 +18,7 @@ class OpenstackClient {
     this.neutron = new Neutron(this)
     this.nova = new Nova(this)
     this.murano = new Murano(this)
+    this.resmgr = new ResMgr(this)
 
     this.catalog = {}
     this.activeRegion = null

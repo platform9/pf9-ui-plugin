@@ -32,6 +32,8 @@ import UpdateVolumePage from './components/volumes/UpdateVolumePage'
 
 // import AddVolumeTypePage from './components/volumes/AddVolumeTypePage'
 
+import HostsListPage from './components/hosts/HostsListPage'
+
 import GlanceImageIndex from './components/glanceimages/GlanceImageIndex'
 import GlanceImageListPage from './components/glanceimages/GlanceImageListPage'
 import AddGlanceImagePage from './components/glanceimages/AddGlanceImagePage'
@@ -217,6 +219,11 @@ OpenStack.registerPlugin = pluginManager => {
         link: { path: '/sshkeys/add', exact: true },
         component: AddSshKeyPage
       },
+      {
+        name: 'Hosts',
+        link: { path: '/hosts', exact: true },
+        component: HostsListPage
+      }
     ]
   )
 
@@ -270,6 +277,10 @@ OpenStack.registerPlugin = pluginManager => {
       {
         name: 'SSH Keys',
         link: { path: '/sshkeys' }
+      },
+      {
+        name: 'Hosts',
+        link: { path: '/hosts' }
       }
     ]
   )
