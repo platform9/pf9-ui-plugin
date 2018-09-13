@@ -45,3 +45,9 @@ export function setObjLens (obj, value, paths) {
 export const setStateLens = (value, paths) => state => {
   return setObjLens(state, value, paths)
 }
+
+export const range = (start, end) => {
+  let arr = []
+  for (let i=start; i<=end; i++) { arr.push(i) }
+  return arr
+}

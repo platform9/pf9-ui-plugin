@@ -1,14 +1,9 @@
 import React from 'react'
-
-import { compose } from 'core/fp'
 import VolumeTypesListContainer from './VolumeTypesListContainer'
 import requiresAuthentication from '../../util/requiresAuthentication'
 import DataLoader from 'core/DataLoader'
-
-const loadVolumeTypes = async ({ setContext, context }) => {
-  const volumeTypes = await context.openstackClient.cinder.getVolumeTypes()
-  setContext({ volumeTypes })
-}
+import { compose } from 'core/fp'
+import { loadVolumeTypes } from './actions'
 
 const VolumesListPage = () =>
   <DataLoader dataKey="volumeTypes" loaderFn={loadVolumeTypes}>

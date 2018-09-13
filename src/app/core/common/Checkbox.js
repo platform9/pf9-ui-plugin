@@ -13,8 +13,16 @@ class Checkbox extends React.Component {
 
   get restFields () { return filterFields(...withFormContext.propsToExclude, 'value')(this.props) }
 
+  handleChange = e => {
+    const { id, onChange, setField } = this.props
+    setField(id, e.target.checked)
+    if (onChange) {
+      onChange(e.target.checked)
+    }
+  }
+
   render () {
-    const { id, value, label, setField } = this.props
+    const { id, value, label } = this.props
     return (
       <div id={id}>
         <FormControlLabel
@@ -23,7 +31,7 @@ class Checkbox extends React.Component {
             <BaseCheckbox
               {...this.restFields}
               checked={value[id]}
-              onChange={e => setField(this.props.id, e.target.checked)}
+              onChange={this.handleChange}
             />
           }
         />
@@ -41,5 +49,6 @@ Checkbox.propTypes = {
   label: PropTypes.string,
   validations: PropTypes.arrayOf(PropTypes.object),
   initialValue: PropTypes.bool,
+  onChange: PropTypes.func,
 }
 export default withFormContext(Checkbox)

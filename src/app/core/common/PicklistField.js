@@ -30,7 +30,7 @@ class PicklistField extends React.Component {
           {...this.restFields}
           options={options}
           value={value[id] !== undefined ? value[id] : ''}
-          onChange={e => setField(id, e.target.value)}
+          onChange={value => setField(id, value)}
         />
       </div>
     )

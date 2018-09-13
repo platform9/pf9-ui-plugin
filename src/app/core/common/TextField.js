@@ -17,14 +17,20 @@ class TextField extends React.Component {
 
   get restFields () { return filterFields(...withFormContext.propsToExclude)(this.props) }
 
+  handleChange = e => {
+    const { id, onChange, setField } = this.props
+    setField(id, e.target.value)
+    if (onChange) { onChange(e.target.value) }
+  }
+
   render () {
-    const { id, value, setField } = this.props
+    const { id, value } = this.props
     return (
       <div id={id}>
         <BaseTextField
           {...this.restFields}
           value={value[id] !== undefined ? value[id] : ''}
-          onChange={e => setField(this.props.id, e.target.value)}
+          onChange={this.handleChange}
         />
       </div>
     )
@@ -40,5 +46,6 @@ TextField.propTypes = {
   label: PropTypes.string,
   validations: PropTypes.arrayOf(PropTypes.object),
   initialValue: PropTypes.string,
+  onChange: PropTypes.func,
 }
 export default withFormContext(TextField)
