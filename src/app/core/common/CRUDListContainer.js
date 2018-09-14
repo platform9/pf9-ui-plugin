@@ -103,6 +103,12 @@ class CRUDListContainer extends React.Component {
 CRUDListContainer.propTypes = {
   addUrl: PropTypes.string,
   editUrl: PropTypes.string,
+
+  /**
+   * Handler that is responsible for deleting the entity.
+   * It is passed the id of the entity.
+   */
+  onRemove: PropTypes.func,
   /*
     Some objects have a unique identifier other than 'id'
     For example sshKeys have unique identifier of 'name' and the APIs

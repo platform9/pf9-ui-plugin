@@ -24,6 +24,11 @@ const sourceTypes = [
 
 const schemaSamples = (prefix, num) => range(1, num).map(i => `${prefix}${i}`)
 
+/* placeholders */
+const nop = () => ({})
+const VolumeSnapshotChooser = () => <h2>Volume Snapshot Chooser</h2>
+/* end placeholders */
+
 // See if the data supplied to WizardStep can be raised up to AddVolumeForm state
 class AddVolumeForm extends React.Component {
   state = {
@@ -52,7 +57,12 @@ class AddVolumeForm extends React.Component {
                 <Picklist name="sourceType" label="Volume Source" value={sourceType} onChange={this.setField('sourceType')} options={sourceTypes} />
                 {sourceType === 'Snapshot' &&
                   <ValidatedForm initialValue={context} onSubmit={setContext} triggerSubmit={onNext}>
-                    <h1>Snapshot</h1>
+                    <DataLoader dataKey="volumeSnapshots" loaderFn={nop}>
+                      {({ data }) =>
+                        <VolumeSnapshotChooser snapshots={data} onChange={value => setContext({ volumeSnapshot: value })} />
+                      }
+                    </DataLoader>
+                    <h1>Volume Snapshots</h1>
                   </ValidatedForm>
                 }
                 {sourceType === 'Another Volume' &&
