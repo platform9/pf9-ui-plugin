@@ -83,7 +83,7 @@ class AddVolumeForm extends React.Component {
                     <ValidatedForm initialValue={context} onSubmit={setContext} triggerSubmit={onNext}>
                       <TextField id="name" label="Volume Name" onChange={this.setField('name')} />
                       <TextField id="description" label="Description" />
-                      <PicklistField id="volumeType" label="Volume Type" options={(data || []).map(x => x.name)} />
+                      <PicklistField id="volumeType" label="Volume Type" options={(data || []).map(x => x.name)} showNone />
                       <TextField id="size" label="Capacity (GB)" type="number" />
                       <Checkbox id="bootable" label="Bootable" />
                       <Checkbox id="createMultiple" label="Create multiple?" onChange={this.setField('createMultiple')} />
@@ -100,24 +100,11 @@ class AddVolumeForm extends React.Component {
                 </DataLoader>
               </WizardStep>
 
-              <WizardStep stepId="advanced" label="Advanced" activeStepId={activeStepId}>
+              <WizardStep stepId="metadata" label="Metadata" activeStepId={activeStepId}>
                 <ValidatedForm initialValue={context} onSubmit={setContext} triggerSubmit={onNext}>
-                  <TextField id="tenant" label="Tenant" />
-                  <TextField id="source" label="Source" />
-                  <TextField id="host" label="Host" />
-                  <TextField id="instance" label="Instance" />
-                  <TextField id="device" label="Device" />
-                </ValidatedForm>
-              </WizardStep>
-
-              <WizardStep stepId="config" label="Config" activeStepId={activeStepId}>
-                <ValidatedForm initialValue={context} onSubmit={setContext} triggerSubmit={onNext}>
-                  <Checkbox id="attachedMode" label="Attached Mode" />
-                  <Checkbox id="readonly" label="Read only?" />
                   <TextField id="metadata" label="Metadata" />
                 </ValidatedForm>
               </WizardStep>
-              <pre>{JSON.stringify(context, null, 4)}</pre>
             </div>
           )
         }}

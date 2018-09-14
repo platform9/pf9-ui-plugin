@@ -21,7 +21,8 @@ class PicklistField extends React.Component {
   get restFields () { return filterFields(...withFormContext.propsToExclude)(this.props) }
 
   render () {
-    const { id, label, options, value, setField } = this.props
+    const { id, label, value, setField, showNone } = this.props
+    const options = showNone ? [{ value: '', label: 'None' }, ...this.props.options] : this.props.options
     return (
       <div id={id}>
         <Picklist
@@ -50,5 +51,8 @@ PicklistField.propTypes = {
   ])).isRequired,
   validations: PropTypes.arrayOf(PropTypes.object),
   initialValue: PropTypes.string,
+
+  /** Create an option of 'None' as the first default choice */
+  showNone: PropTypes.bool,
 }
 export default withFormContext(PicklistField)

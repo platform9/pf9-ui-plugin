@@ -26,14 +26,27 @@ const styles = theme => ({
 })
 
 class Picklist extends React.Component {
-  handleChange = e => this.props.onChange && this.props.onChange(e.target.value)
+  handleChange = e => {
+    const { onChange } = this.props
+    // Hack to work around the fact that Material UI's "Select" will ignore
+    // an options with value of '' (empty string).
+    const value = e.target.value === '__none__' ? '' : e.target.value
+    onChange && onChange(value)
+  }
 
   render () {
-    const { classes, label, name, value } = this.props
+    const { classes, label, name } = this.props
 
     const options = this.props.options.map(x =>
       typeof x === 'string' ? ({ value: x, label: x }) : x
-    )
+    ).map(x => ({
+      label: x.label,
+      // Hack to work around Material UI's Select ignoring empty string as a value
+      value: x.value === '' ? '__none__' : x.value
+    }))
+
+    // Hack to work around Material UI's Select ignoring empty string as a value
+    const value = this.props.value === '' ? '__none__' : this.props.value
 
     return (
       <FormControl className={classes.formControl}>
@@ -42,6 +55,7 @@ class Picklist extends React.Component {
           value={value}
           onChange={this.handleChange}
           inputProps={{ name: label, id: name }}
+          displayEmpty
         >
           {options.map(x => <MenuItem value={x.value} key={x.value}>{x.label}</MenuItem>)}
         </Select>
