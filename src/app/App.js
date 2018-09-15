@@ -15,6 +15,7 @@ import config from '../../config'
 import AppContext from 'core/AppContext'
 import OpenstackClient from '../openstack-client'
 import SessionManager from './plugins/openstack/components/SessionManager'
+import AddVolumePage from 'openstack/components/volumes/AddVolumePage'
 
 setupFromConfig(config)
 window.process = process
@@ -38,7 +39,7 @@ class App extends React.Component {
       }
     })
 
-    const { pluginManager } = this.context
+    const { pluginManager } = this.props
     const options = pluginManager.getOptions()
     const { showFooter } = options
 
@@ -54,7 +55,7 @@ class App extends React.Component {
           <AppContext initialContext={{ openstackClient }}>
             <div id="_main-container">
               <SessionManager>
-                <Navbar links={pluginManager.getNavItems()} >
+                <Navbar links={pluginManager.getNavItems()}>
                   {pluginManager.getComponents().map((PluginComponent, idx) => <PluginComponent key={idx} />)}
                   <Switch>
                     {pluginManager.getRoutes().map(route => {
@@ -62,6 +63,7 @@ class App extends React.Component {
                       const Component = component
                       return <Route key={route.name} path={link.path} exact={link.exact || false} component={Component} />
                     })}
+                    <Route path="/ui/openstack/storage/volumes/add" component={AddVolumePage} />
                     <Route path="/ui/openstack/login" component={null} />
                     <Route path="/ui/logout" exact component={LogoutPage} />
                     <Redirect to={pluginManager.getDefaultRoute()} />
@@ -77,7 +79,7 @@ class App extends React.Component {
   }
 }
 
-App.contextTypes = {
+App.propTypes = {
   pluginManager: PropTypes.object
 }
 

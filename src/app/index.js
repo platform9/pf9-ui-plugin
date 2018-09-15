@@ -8,11 +8,11 @@ import { ApolloProvider } from 'react-apollo'
 import App from './App'
 
 import plugins from './plugins'
-import pluginManager from './core/pluginManager'
-import PluginProvider from './core/PluginProvider'
 import { getStorage } from './core/common/pf9-storage'
 
 import { mergeSchemas } from 'graphql-tools'
+
+let pluginManager = require('./core/pluginManager').default
 
 plugins.forEach(plugin => plugin.registerPlugin(pluginManager))
 
@@ -38,9 +38,7 @@ const render = Component => {
     <ApolloProvider client={client}>
       <AppContainer>
         <div>
-          <PluginProvider pluginManager={pluginManager}>
-            <Component />
-          </PluginProvider>
+          <Component pluginManager={pluginManager} />
         </div>
       </AppContainer>
     </ApolloProvider>,

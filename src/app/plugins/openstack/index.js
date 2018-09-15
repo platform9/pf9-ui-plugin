@@ -27,7 +27,7 @@ import UpdateFloatingIpPage from './components/floatingips/UpdateFloatingIpPage'
 
 import StorageIndex from './components/volumes/StorageIndex'
 import VolumesListPage from './components/volumes/VolumesListPage'
-import AddVolumePage from './components/volumes/AddVolumePage'
+// import AddVolumePage from './components/volumes/AddVolumePage'
 import UpdateVolumePage from './components/volumes/UpdateVolumePage'
 
 // import AddVolumeTypePage from './components/volumes/AddVolumeTypePage'
@@ -167,11 +167,13 @@ OpenStack.registerPlugin = pluginManager => {
         link: { path: '/storage#volumes', exact: true },
         component: VolumesListPage
       },
+      /*
       {
         name: 'AddVolume',
         link: { path: '/storage/volumes/add', exact: true },
         component: AddVolumePage
       },
+      */
       {
         name: 'EditVolume',
         link: { path: '/storage/volumes/edit/:volumeId', exact: true },
