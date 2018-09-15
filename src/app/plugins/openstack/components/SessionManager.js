@@ -44,8 +44,11 @@ class SessionManager extends React.Component {
   }
 
   // Handler that gets invoked on successful authentication
-  initialSetup = ({ username, unscopedToken }) => {
+  initialSetup = async ({ username, unscopedToken }) => {
     const { getUserPreferences, history, location } = this.props
+
+    // Set scoped token
+    await this.keystone.renewToken(unscopedToken)
 
     setStorage('username', username)
     setStorage('unscopedToken', unscopedToken)

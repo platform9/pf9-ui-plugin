@@ -124,7 +124,7 @@ class Keystone {
       const newToken = response.headers['x-subject-token']
       this.client.unscopedToken = token
       this.client.scopedToken = newToken
-      return newToken
+      return token
     } catch (err) {
       // authentication failed
       return null
