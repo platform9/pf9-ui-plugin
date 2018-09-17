@@ -68,7 +68,7 @@ class AnimateValues extends React.Component {
  *     values={{ arcAngle: [0, 360] }}
  *     duration={500}
  *    />
- *      {({ arcAngle }) => <div>Arc value: ${arc}</div>}
+ *      {({ arcAngle }) => <div>Arc value: ${arcAngle}</div>}
  *    </AnimateValues>
  */
 AnimateValues.propTypes = {
