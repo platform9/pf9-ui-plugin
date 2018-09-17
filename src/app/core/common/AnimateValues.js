@@ -11,6 +11,7 @@ class AnimateValues extends React.Component {
 
   calcEasing = (percent, method) => {
     switch (method) {
+      // TODO: add other easing methods
       case 'linear':
       default:
         return percent
