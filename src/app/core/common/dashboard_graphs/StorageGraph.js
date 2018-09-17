@@ -32,7 +32,7 @@ class StorageGraph extends React.Component {
     const { hover } = this.state
     // Placeholder value
     const percent = 75
-    const animationTimeMs = 500
+    const duration = 500
 
     return (
       <svg
@@ -41,7 +41,7 @@ class StorageGraph extends React.Component {
         onMouseEnter={this.mouseEnterUpdate}
         onMouseLeave={this.mouseLeaveUpdate}
       >
-        <SvgArc hover={hover ? 1 : 0} percent={percent} animationTimeMs={animationTimeMs} />
+        <SvgArc hover={hover ? 1 : 0} percent={percent} duration={duration} />
       </svg>
     )
   }

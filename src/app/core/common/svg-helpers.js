@@ -23,6 +23,4 @@ export const describeArc = (x, y, radius, startAngle, endAngle) => {
   return d
 }
 
-export const percentToAngle = (percent) => {
-  return percent * 3.6
-}
+export const percentToAngle = percent => percent * 3.6

@@ -16,9 +16,7 @@ class ServersGraph extends React.Component {
   }
 
   mouseEnterUpdate = () => {
-    this.setState((state) => {
-      return { hover: true }
-    })
+    this.setState(state => ({ hover: true }))
   }
 
   mouseLeaveUpdate = () => {
@@ -28,9 +26,10 @@ class ServersGraph extends React.Component {
   render () {
     const { classes } = this.props
     const { hover } = this.state
+
     // Placeholder value
     const percent = 45
-    const animationTimeMs = 500
+    const duration = 500
 
     return (
       <svg
@@ -39,7 +38,7 @@ class ServersGraph extends React.Component {
         onMouseEnter={this.mouseEnterUpdate}
         onMouseLeave={this.mouseLeaveUpdate}
       >
-        <SvgArc hover={hover ? 1 : 0} percent={percent} animationTimeMs={animationTimeMs} />
+        <SvgArc hover={hover ? 1 : 0} percent={percent} duration={duration} />
       </svg>
     )
   }
