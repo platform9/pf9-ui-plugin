@@ -75,7 +75,8 @@ class AnimateValues extends React.Component {
 AnimateValues.propTypes = {
   /**
    * Object of key values, where key is property name and
-   * value is array of [startValue, endValue]
+   * value is array of [startValue, endValue].
+   * These values will be interpolated over during the animation.
    */
   values: PropTypes.object.isRequired,
 
@@ -87,6 +88,13 @@ AnimateValues.propTypes = {
    * as specified in props.values
    */
   children: PropTypes.func.isRequired,
+
+  /** The easing method used to interpolate the values */
+  method: PropTypes.oneOf(['linear'])
+}
+
+AnimateValues.defaultProps = {
+  method: 'linear',
 }
 
 export default AnimateValues
