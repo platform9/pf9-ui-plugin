@@ -2,9 +2,21 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import CRUDListContainer from 'core/common/CRUDListContainer'
 import SshKeysList from './SshKeysList'
+import { compose } from 'core/fp'
+import { withAppContext } from 'core/AppContext'
 import { addIdsToCollection } from 'util/helpers'
 
+const sshKeyUniqueIdentifier = 'name'
+
 class SshKeysListContainer extends React.Component {
+  handleRemove = async id => {
+    const { sshKeys, setContext, context } = this.props
+    const { nova } = context.openstackClient
+    await nova.deleteSshKey(id)
+    const newSshKeys = sshKeys.filter(x => x[sshKeyUniqueIdentifier] !== id)
+    setContext({ sshKeys: newSshKeys })
+  }
+
   render () {
     const sshKeys = this.props.sshKeys ? addIdsToCollection(this.props.sshKeys) : []
 
@@ -13,7 +25,8 @@ class SshKeysListContainer extends React.Component {
         items={sshKeys}
         objType="sshKeys"
         addUrl="/ui/openstack/sshkeys/add"
-        uniqueIdentifier="name"
+        onRemove={this.handleRemove}
+        uniqueIdentifier={sshKeyUniqueIdentifier}
       >
         {({ onDelete, onAdd }) => (
           <SshKeysList
@@ -31,4 +44,6 @@ SshKeysListContainer.propTypes = {
   sshKeys: PropTypes.arrayOf(PropTypes.object)
 }
 
-export default SshKeysListContainer
+export default compose(
+  withAppContext,
+)(SshKeysListContainer)

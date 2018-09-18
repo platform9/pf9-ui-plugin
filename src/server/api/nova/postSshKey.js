@@ -6,7 +6,7 @@ const postSshKey = (req, res) => {
   const { tenantId } = req.params
   const sshKey = req.body.keypair
   const newSshKey = new SshKey(sshKey)
-  res.status(201).send({ keypair: newSshKey.asJson() })
+  res.status(201).send(newSshKey.asJson())
 }
 
 export default postSshKey

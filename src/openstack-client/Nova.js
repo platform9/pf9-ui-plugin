@@ -54,6 +54,18 @@ class Nova {
     const response = await axios.get(url, this.client.getAuthHeaders())
     return response.data.keypairs
   }
+
+  async createSshKey (params) {
+    const url = await this.sshKeysUrl()
+    const response = await axios.post(url, params, this.client.getAuthHeaders())
+    return response.data
+  }
+
+  async deleteSshKey (id) {
+    const url = `${await this.sshKeysUrl()}/${id}`
+    const response = await axios.delete(url, this.client.getAuthHeaders())
+    return response
+  }
 }
 
 export default Nova
