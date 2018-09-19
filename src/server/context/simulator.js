@@ -1,5 +1,6 @@
 import Catalog from '../models/Catalog'
 import Flavor from '../models/Flavor'
+import Instance from '../models/Instance'
 import Role from '../models/Role'
 import Tenant from '../models/Tenant'
 import User from '../models/User'
@@ -34,7 +35,7 @@ class Context {
     this.tokens = []
     this.tenants = []
     this.flavors = []
-    this.servers = []
+    this.instances = []
     this.networks = []
     this.routers = []
     this.floatingIps = []
@@ -76,6 +77,30 @@ class Context {
       throw new Error('Unable to update non-existent flavor')
     }
     return flavor.asGraphQl()
+  }
+
+  removeFlavor = id => {
+    const flavor = Flavor.findById(id)
+    if (!flavor) {
+      throw new Error('Unable to remove non-existent flavor')
+    }
+    flavor.destroy()
+    return id
+  }
+
+  getInstances = () => Instance.getCollection().map(x => x.asJson())
+
+  createInstance = ({ input }) => {
+    const instance = new Instance({...input})
+    return instance.asJson()
+  }
+
+  updateFlavor = (id, input) => {
+    const instance = Instance.updateById(id, input)
+    if (!instance) {
+      throw new Error('Unable to update non-existent instance')
+    }
+    return instance.asJson()
   }
 
   removeFlavor = id => {

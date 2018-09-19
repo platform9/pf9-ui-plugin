@@ -19,6 +19,7 @@ class Nova {
   }
 
   flavorsUrl = async () => `${await this.endpoint()}/flavors`
+  instancesUrl = async () => `${await this.endpoint()}/servers`
   hypervisorsUrl = async () => `${await this.endpoint()}/os-hypervisors`
   sshKeysUrl = async () => `${await this.endpoint()}/os-keypairs`
 
@@ -41,6 +42,13 @@ class Nova {
     const url = `${await this.flavorsUrl()}/${id}`
     const response = await axios.delete(url, this.client.getAuthHeaders())
     return response
+  }
+
+  async getInstances () {
+    const url = `${await this.instancesUrl()}/detail`
+    const response = await axios.get(url, this.client.getAuthHeaders())
+    const servers = response.data.servers.map(instance => renameKey('OS-EXT-STS:vm_state', 'state')(instance))
+    return servers
   }
 
   async getHypervisors () {

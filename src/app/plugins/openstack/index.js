@@ -13,6 +13,8 @@ import FlavorsListPage from './components/flavors/FlavorsListPage'
 import AddFlavorPage from './components/flavors/AddFlavorPage'
 import UpdateFlavorPage from './components/flavors/UpdateFlavorPage'
 
+import InstancesPage from './components/instances/InstancesListPage'
+
 import NetworksPage from './components/networks/NetworksListPage'
 import AddNetworkPage from './components/networks/AddNetworkPage'
 import UpdateNetworkPage from './components/networks/UpdateNetworkPage'
@@ -106,6 +108,11 @@ OpenStack.registerPlugin = pluginManager => {
         name: 'EditFlavor',
         link: { path: '/flavors/edit/:flavorId', exact: true },
         component: UpdateFlavorPage
+      },
+      {
+        name: 'Instances',
+        link: { path: '/instances', exact: true },
+        component: InstancesPage
       },
       {
         name: 'Networks',
@@ -245,6 +252,10 @@ OpenStack.registerPlugin = pluginManager => {
       {
         name: 'Flavors',
         link: { path: '/flavors' }
+      },
+      {
+        name: 'Instances',
+        link: { path: '/instances' }
       },
       {
         name: 'Networks',

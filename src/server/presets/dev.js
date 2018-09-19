@@ -5,6 +5,7 @@ import Role from '../models/Role'
 import Tenant from '../models/Tenant'
 import User from '../models/User'
 import Flavor from '../models/Flavor'
+import Instance from '../models/Instance'
 import Network from '../models/Network'
 import Router from '../models/Router'
 import FloatingIp from '../models/FloatingIp'
@@ -64,6 +65,11 @@ function loadPreset () {
   new Flavor({ name: 'm1.medium', ram: 4096, disk: 40, vcpus: 2 })
   new Flavor({ name: 'm1.large', ram: 8192, disk: 80, vcpus: 4, tags: '{key:value}' })
   new Flavor({ name: 'm1.xlarge', ram: 16384, disk: 160, vcpus: 8 })
+
+  // Instances
+  new Instance({ name: 'Test Instance 1', status: 'ACTIVE', state: 'active' })
+  new Instance({ name: 'Test Instance 2', status: 'ERROR', state: 'error' })
+  new Instance({ name: 'Test Instance 3', status: 'BUILD', state: 'building' })
 
   // Networks
   new Network({ name: 'Test network 1', subnets: '10.10.0.0/1', tenant: 'Dev Tenant', shared: false, port_security_enabled: true, external: true, admin_state_up: false, status: 'ACTIVE' })

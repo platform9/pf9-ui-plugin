@@ -8,6 +8,9 @@ import getSshKeys from './getSshKeys'
 import postSshKey from './postSshKey'
 import deleteSshKey from './deleteSshKey'
 
+// Instances
+import getInstances from './getInstances'
+
 // Hypervisors
 import getHypervisors from './getHypervisors'
 
@@ -18,6 +21,9 @@ const router = express.Router()
 router.get('/v2.1/:tenantId/flavors/detail', tokenValidator, getFlavors)
 router.post('/v2.1/:tenantId/flavors', tokenValidator, postFlavor)
 router.delete('/v2.1/:tenantId/flavors/:flavorId', tokenValidator, deleteFlavor)
+
+// Instances
+router.get('/v2.1/:tenantId/servers/detail', tokenValidator, getInstances)
 
 // Hypervisors
 router.get('/v2.1/:tenantId/os-hypervisors/detail', tokenValidator, getHypervisors)
