@@ -32,6 +32,7 @@ import AddVolumePage from './components/volumes/AddVolumePage'
 import UpdateVolumePage from './components/volumes/UpdateVolumePage'
 
 // import AddVolumeTypePage from './components/volumes/AddVolumeTypePage'
+import VolumeSnapshotsListPage from './components/volumes/VolumeSnapshotsListPage'
 
 import HostsListPage from './components/hosts/HostsListPage'
 
@@ -185,6 +186,11 @@ OpenStack.registerPlugin = pluginManager => {
         component: AddVolumeTypePage
       },
       */
+      {
+        name: 'VolumeSnapshots',
+        link: { path: '/storage#volumeSnapshots', exact: true },
+        component: VolumeSnapshotsListPage
+      },
       {
         name: 'GlanceImages',
         link: { path: '/glanceimages', exact: true },

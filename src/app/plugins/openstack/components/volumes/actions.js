@@ -10,3 +10,8 @@ export const loadVolumeTypes = async ({ setContext, context }) => {
   const volumeTypes = await context.openstackClient.cinder.getVolumeTypes()
   setContext({ volumeTypes })
 }
+
+export const loadVolumeSnapshots = async ({ setContext, context }) => {
+  const volumeSnapshots = await context.openstackClient.cinder.getSnapshots()
+  setContext({ volumeSnapshots })
+}

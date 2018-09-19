@@ -3,6 +3,7 @@ import { Grid, Paper, Tabs, Tab, Typography } from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles'
 import VolumesListPage from './VolumesListPage'
 import VolumeTypesListPage from './VolumeTypesListPage'
+import VolumeSnapshotsListPage from './VolumeSnapshotsListPage'
 import { compose } from 'react-apollo'
 import { withRouter } from 'react-router'
 
@@ -47,11 +48,11 @@ class StorageIndex extends React.Component {
             >
               <Tab value="#volumes" label="Volumes" href="#volumes" />
               <Tab value="#volumetypes" label="Volume Types" href="#volumetypes" />
-              <Tab value="#snapshots" label="Volume Snapshots" href="#snapshots" />
+              <Tab value="#volumeSnapshots" label="Volume Snapshots" href="#volumeSnapshots" />
             </Tabs>
             { value === '#volumes' && <TabContainer ><VolumesListPage /></TabContainer>}
             { value === '#volumetypes' && <TabContainer><VolumeTypesListPage /></TabContainer>}
-            { value === '#snapshots' && <TabContainer>TODO: Volume Snapshots</TabContainer>}
+            { value === '#volumeSnapshots' && <TabContainer><VolumeSnapshotsListPage /></TabContainer>}
           </Paper>
         </Grid>
       </Grid>
