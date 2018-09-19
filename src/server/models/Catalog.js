@@ -61,6 +61,34 @@ const Catalog = {
         id: uuid.v4(),
         name: 'nova',
         type: 'compute'
+      },
+      {
+        endpoints: [
+          {
+            id: uuid.v4(),
+            interface: 'admin',
+            region: config.region,
+            region_id: config.region,
+            url: `${config.apiHost}/cinder/v3/${fakeTenantId}`
+          },
+          {
+            id: uuid.v4(),
+            interface: 'internal',
+            region: config.region,
+            region_id: config.region,
+            url: `${config.apiHost}/cinder/v3/${fakeTenantId}`
+          },
+          {
+            id: uuid.v4(),
+            interface: 'public',
+            region: config.region,
+            region_id: config.region,
+            url: `${config.apiHost}/cinder/v3/${fakeTenantId}`
+          }
+        ],
+        id: uuid.v4(),
+        name: 'cinderv3',
+        type: 'volumev3'
       }
     ]
   }
