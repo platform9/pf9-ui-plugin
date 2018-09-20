@@ -1,25 +1,15 @@
 import React from 'react'
-import { compose, graphql } from 'react-apollo'
-
-import DisplayError from 'core/common/DisplayError'
-import Loader from 'core/common/Loader'
+import { compose } from 'react-apollo'
 import FlavorsListContainer from './FlavorsListContainer'
 import requiresAuthentication from '../../util/requiresAuthentication'
-import { GET_FLAVORS } from './actions'
+import DataLoader from 'core/DataLoader'
+import { loadFlavors } from './actions'
 
-const FlavorsPage =
-  ({ data, loading, error }) => {
-    return (
-      <div>
-        <h1>Flavors</h1>
-        {loading && <Loader />}
-        {error && <DisplayError error={error} />}
-        {data && <FlavorsListContainer flavors={data.flavors} />}
-      </div>
-    )
-  }
+const FlavorsListPage = () =>
+  <DataLoader dataKey="flavors" loaderFn={loadFlavors}>
+    {({ data }) => <FlavorsListContainer flavors={data} />}
+  </DataLoader>
 
 export default compose(
   requiresAuthentication,
-  graphql(GET_FLAVORS),
-)(FlavorsPage)
+)(FlavorsListPage)

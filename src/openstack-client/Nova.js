@@ -31,7 +31,7 @@ class Nova {
 
   async createFlavor (params) {
     // The Nova API has an unfortunately horribly named key for public.
-    const converted = renameKey('public', 'os-flavor-access:is_public')(params)
+    const converted = renameKey('public', 'os-flavor-access:is_public')(params.flavor)
     const body = { flavor: converted }
     const url = await this.flavorsUrl()
     const response = await axios.post(url, body, this.client.getAuthHeaders())

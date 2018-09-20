@@ -11,7 +11,6 @@ import UpdateUserPage from './components/users/UpdateUserPage'
 
 import FlavorsListPage from './components/flavors/FlavorsListPage'
 import AddFlavorPage from './components/flavors/AddFlavorPage'
-import UpdateFlavorPage from './components/flavors/UpdateFlavorPage'
 
 import InstancesPage from './components/instances/InstancesListPage'
 
@@ -103,11 +102,6 @@ OpenStack.registerPlugin = pluginManager => {
         name: 'AddFlavor',
         link: { path: '/flavors/add' },
         component: AddFlavorPage
-      },
-      {
-        name: 'EditFlavor',
-        link: { path: '/flavors/edit/:flavorId', exact: true },
-        component: UpdateFlavorPage
       },
       {
         name: 'Instances',
