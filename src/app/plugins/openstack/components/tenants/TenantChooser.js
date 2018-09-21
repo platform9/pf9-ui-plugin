@@ -17,7 +17,23 @@ class TenantChooser extends React.Component {
     })
   }
 
-  updateCurrentTenant = tenantName => {
+  resetTenantScopedContext = (tenant) => {
+    const { setContext } = this.props
+    // Clear any data that should change when the user changes tenant.
+    // The data will then be reloaded when it is needed.
+    // TODO: We might need a system to reset the current view as data
+    // is normally only fetched on `componentDidMount`.
+    setContext({
+      volumes: undefined,
+      volumeSnapshots: undefined,
+    }, () => {
+      // Fire off a custom event to notify components they should reload
+      const e = new CustomEvent('scopeChanged', { tenant })
+      window.dispatchEvent(e)
+    })
+  }
+
+  updateCurrentTenant = async tenantName => {
     const { context, setContext } = this.props
     const { tenants } = this.state
 
@@ -27,7 +43,8 @@ class TenantChooser extends React.Component {
     setContext({ currentTenant: tenant })
 
     const { keystone } = context.openstackClient
-    keystone.changeProjectScope(tenant.id)
+    await keystone.changeProjectScope(tenant.id)
+    this.resetTenantScopedContext(tenant)
   }
 
   handleChoose = tenantName => {
@@ -49,10 +66,10 @@ class TenantChooser extends React.Component {
   }
 
   async componentDidMount () {
-    const lastTenant = this.props.getUserPreference('lastTenant')
+    const lastTenant = this.props.getUserPreference('lastTenant') || 'service'
     const tenants = await this.loadTenants()
     if (!tenants) { return }
-    this.setState({ tenants }, () => this.updateCurrentTenant(lastTenant))
+    this.updateCurrentTenant(lastTenant)
   }
 
   render () {

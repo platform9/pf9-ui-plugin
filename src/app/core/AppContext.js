@@ -42,6 +42,12 @@ class AppContext extends React.Component {
     }
   }
 
+  componentDidMount () {
+    // For debugging and development convenience
+    window.context = this.state
+    window.setContext = this.state.setContext
+  }
+
   render () {
     return (
       <Provider value={this.state}>

@@ -5,6 +5,7 @@ import { withAppContext } from 'core/AppContext'
 import LoginPage from 'openstack/components/LoginPage'
 
 import { getStorage, setStorage } from 'core/common/pf9-storage'
+import { loadTenants } from 'openstack/components/tenants/actions'
 
 /**
  * Sets up the Openstack session.
@@ -44,14 +45,21 @@ class SessionManager extends React.Component {
   }
 
   // Handler that gets invoked on successful authentication
-  initialSetup = ({ username, unscopedToken }) => {
-    const { getUserPreferences, history, location } = this.props
+  initialSetup = async ({ username, unscopedToken }) => {
+    const { context, getUserPreferences, history, location, setContext } = this.props
 
     setStorage('username', username)
     setStorage('unscopedToken', unscopedToken)
 
     const prefs = getUserPreferences(username)
-    prefs.lastTenant = prefs.lastTenant || 'service'
+    const lastTenant = prefs.lastTenant || 'service'
+
+    // Set up the scopedToken
+    const tenants = await loadTenants({ context, setContext })
+    setContext({ tenants })
+    const activeTenant = tenants.find(x => x.name === lastTenant)
+    const { keystone } = context.openstackClient
+    await keystone.changeProjectScope(activeTenant.id)
 
     this.setSession({
       unscopedToken,

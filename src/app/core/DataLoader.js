@@ -11,6 +11,15 @@ class DataLoader extends React.Component {
   }
 
   componentDidMount () {
+    this.listener = window.addEventListener('scopeChanged', () => this.loadData())
+    this.loadData()
+  }
+
+  componentWillUnmount () {
+    window.removeEventListener(this.listener)
+  }
+
+  loadData = () => {
     const { dataKey, loaderFn, setContext, context } = this.props
     if (context[dataKey] === undefined) {
       this.setState({ loading: true })
@@ -40,9 +49,10 @@ class DataLoader extends React.Component {
   render () {
     const { loading, error } = this.state
     const { context, dataKey, children } = this.props
+    const data = context[dataKey]
     if (loading) { return <Loader /> }
     if (error) { return <DisplayError error={error} /> }
-    return children({ data: context[dataKey], loading, error, context })
+    return children({ data, loading, error, context })
   }
 }
 
