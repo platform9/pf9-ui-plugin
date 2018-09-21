@@ -117,14 +117,13 @@ class Keystone {
     }
   }
 
-  async renewToken (token) {
-    const body = constructAuthBody('token', token)
+  async renewToken (unscopedToken) {
+    const body = constructAuthBody('token', unscopedToken)
     try {
       const response = await axios.post(this.tokensUrl, body)
-      const newToken = response.headers['x-subject-token']
-      this.client.unscopedToken = token
-      this.client.scopedToken = newToken
-      return newToken
+      const newUnscopedToken = response.headers['x-subject-token']
+      this.client.unscopedToken = newUnscopedToken
+      return newUnscopedToken
     } catch (err) {
       // authentication failed
       return null

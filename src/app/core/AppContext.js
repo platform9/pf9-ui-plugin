@@ -31,6 +31,12 @@ class AppContext extends React.Component {
       setUserPrefs(username, prefs)
     },
 
+    getUserPreference: key => {
+      const { username } = this.state.session
+      const prefs = getUserPrefs(username)
+      return prefs[key]
+    },
+
     getUserPreferences: (username = this.state.session.username) => {
       return getUserPrefs(username)
     }
@@ -56,13 +62,14 @@ AppContext.defaultProps = {
 export const withAppContext = Component => props =>
   <Consumer>
     {
-      ({ setContext, getUserPreferences, setUserPreference, ...rest }) =>
+      ({ setContext, getUserPreferences, getUserPreference, setUserPreference, ...rest }) =>
         <Component
           {...props}
           setContext={setContext}
           context={rest}
           setUserPreference={setUserPreference}
           getUserPreferences={getUserPreferences}
+          getUserPreference={getUserPreference}
         />
     }
   </Consumer>

@@ -27,3 +27,11 @@ export const UPDATE_TENANT = gql`
     updateTenant(id: $id, input: $input) { id name description }
   }
 `
+
+export const loadTenants = async ({ setContext, context, reload }) => {
+  if (!reload && context.tenants) { return context.tenants }
+
+  const tenants = await context.openstackClient.keystone.getProjects()
+  setContext({ tenants })
+  return tenants
+}

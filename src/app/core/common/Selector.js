@@ -32,9 +32,12 @@ class Selector extends React.Component {
   // Clear search bar when selector is closed.
   handleClose = anchor => event => {
     const { onChoose, onSearchChange } = this.props
-    event.target.innerText && onChoose(event)
     onSearchChange('')
     this.setState({ [anchor]: null })
+    const value = event.target.innerText.trim()
+    if (value && onChoose) {
+      onChoose(value)
+    }
   }
 
   filterBySearch = list => {

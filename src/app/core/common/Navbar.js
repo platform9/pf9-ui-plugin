@@ -8,6 +8,7 @@ import Avatar from './Avatar'
 import Selector from './Selector'
 import MenuIcon from '@material-ui/icons/Menu'
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
+import TenantChooser from 'openstack/components/tenants/TenantChooser'
 import {
   AppBar,
   Divider,
@@ -119,9 +120,7 @@ class Navbar extends React.Component {
     open: false,
     anchor: 'left',
     curRegion: '',
-    curTenant: '',
     regionSearch: '',
-    tenantSearch: ''
   }
 
   handleDrawerOpen = () => {
@@ -155,7 +154,7 @@ class Navbar extends React.Component {
 
   render () {
     const { classes, links } = this.props
-    const { open, curRegion, curTenant, regionSearch, tenantSearch } = this.state
+    const { open, curRegion, regionSearch } = this.state
     const logoPath = rootPath+'images/logo.png'
 
     const drawer = (
@@ -204,13 +203,7 @@ class Navbar extends React.Component {
                   onSearchChange={this.handleSearch('regionSearch')}
                   searchTerm={regionSearch}
                 />
-                <Selector
-                  name={curTenant.length === 0 ? 'Current Tenant' : curTenant}
-                  list={[`Dev Team Tenant`, `Test Tenant`]}
-                  onChoose={this.handleClick('curTenant')}
-                  onSearchChange={this.handleSearch('tenantSearch')}
-                  searchTerm={tenantSearch}
-                />
+                <TenantChooser />
                 <Avatar />
               </div>
             </Toolbar>
