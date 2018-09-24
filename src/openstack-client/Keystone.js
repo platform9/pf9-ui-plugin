@@ -96,6 +96,7 @@ class Keystone {
       const response = await axios.post(this.tokensUrl, body)
       const scopedToken = response.headers['x-subject-token']
       this.client.scopedToken = scopedToken
+      await this.getServiceCatalog()
       return scopedToken
     } catch (err) {
       // authentication failed
