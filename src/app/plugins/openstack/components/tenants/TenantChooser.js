@@ -21,13 +21,12 @@ class TenantChooser extends React.Component {
     const { setContext } = this.props
     // Clear any data that should change when the user changes tenant.
     // The data will then be reloaded when it is needed.
-    // TODO: We might need a system to reset the current view as data
-    // is normally only fetched on `componentDidMount`.
     setContext({
       volumes: undefined,
       volumeSnapshots: undefined,
     }, () => {
-      // Fire off a custom event to notify components they should reload
+      // Fire off a custom event to notify components they should reload.
+      // See `DataLoader` to see how these events are consumed.
       const e = new CustomEvent('scopeChanged', { tenant })
       window.dispatchEvent(e)
     })
