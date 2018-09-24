@@ -75,8 +75,9 @@ class CRUDListContainer extends React.Component {
   }
 
   redirectToEdit = (selectedIds) => {
+    const { uniqueIdentifier } = this.props
     if (this.props.editUrl) {
-      const selectedId = selectedIds[0]
+      const selectedId = selectedIds[0][uniqueIdentifier]
       this.props.history.push(`${this.props.editUrl}/${selectedId}`)
     }
   }
