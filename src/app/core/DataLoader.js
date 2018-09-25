@@ -16,7 +16,7 @@ class DataLoader extends React.Component {
   }
 
   componentWillUnmount () {
-    window.removeEventListener(this.listener)
+    window.removeEventListener('scopeChanged', this.listener)
   }
 
   loadData = () => {
