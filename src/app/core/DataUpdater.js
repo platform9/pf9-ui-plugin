@@ -12,7 +12,7 @@ import { withAppContext } from 'core/AppContext'
  * Additionally, it handles loading as well through `DataLoader`.
  */
 class DataUpdater extends React.Component {
-  findById = (arr, id) => arr.find(x => x.id === id)
+  findById = (arr, id) => arr ? arr.find(x => x.id === id) : null
 
   handleSubmit = async data => {
     const { dataKey, updateFn, objId, context, setContext } = this.props
