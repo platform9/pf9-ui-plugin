@@ -8,8 +8,8 @@ import { withAppContext } from 'core/AppContext'
 class VolumeSnapshotsListContainer extends React.Component {
   handleRemove = async id => {
     const { context, setContext } = this.props
-    await context.openstackClient.cinder.deleteVolumeSnapshot(id)
-    const newVolumeSnapshots = context.volumes.filter(x => x.id !== id)
+    await context.openstackClient.cinder.deleteSnapshot(id)
+    const newVolumeSnapshots = context.volumeSnapshots.filter(x => x.id !== id)
     setContext({ volumeSnapshots: newVolumeSnapshots })
   }
 
@@ -18,11 +18,10 @@ class VolumeSnapshotsListContainer extends React.Component {
     return (
       <CRUDListContainer
         items={volumeSnapshots}
-        addUrl="/ui/openstack/storage/volumeSnapshots/add"
         editUrl="/ui/openstack/storage/volumeSnapshots/edit"
         onRemove={this.handleRemove}
       >
-        {handlers => <VolumeSnapshotsList volumes={volumeSnapshots} {...handlers} />}
+        {handlers => <VolumeSnapshotsList volumeSnapshots={volumeSnapshots} {...handlers} />}
       </CRUDListContainer>
     )
   }

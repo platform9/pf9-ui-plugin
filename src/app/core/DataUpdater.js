@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import DataLoader from 'core/DataLoader'
 import { compose } from 'core/fp'
 import { withAppContext } from 'core/AppContext'
+import { withRouter } from 'react-router'
 
 /* This is a convenience HOC to make updating the in-memory cache easier.
  * After updating we need to replace the in-memory cache that is normally an
@@ -12,14 +13,17 @@ import { withAppContext } from 'core/AppContext'
  * Additionally, it handles loading as well through `DataLoader`.
  */
 class DataUpdater extends React.Component {
-  findById = (arr, id) => arr.find(x => x.id === id)
+  findById = (arr = [], id) => arr.find(x => x.id === id)
 
   handleSubmit = async data => {
-    const { dataKey, updateFn, objId, context, setContext } = this.props
-    const updatedEntity = await updateFn(data)
+    const { dataKey, updateFn, objId, backUrl, context, setContext, history } = this.props
+    const updatedEntity = await updateFn(data, { context, setContext })
     setContext({
       [dataKey]: context[dataKey].map(x => x.id === objId ? updatedEntity : x)
     })
+    if (updatedEntity && backUrl) {
+      history.push(backUrl)
+    }
   }
 
   render () {
@@ -54,9 +58,23 @@ DataUpdater.propTypes = {
 
   updateFn: PropTypes.func.isRequired,
 
+  /**
+   * Unique identifier for the entity.  Leave blank for 'id'.
+   */
   objId: PropTypes.string.isRequired,
+
+  /**
+   * Where to navigate to upon successful update.  Usually back
+   * to the corresponding list page.
+   */
+  backUrl: PropTypes.string,
+}
+
+DataUpdater.defaultProps = {
+  objId: 'id',
 }
 
 export default compose(
   withAppContext,
+  withRouter,
 )(DataUpdater)

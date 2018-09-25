@@ -6,8 +6,8 @@ import { compose } from 'core/fp'
 import { loadVolumeSnapshots } from './actions'
 
 const VolumeSnapshotsListPage = () =>
-  <DataLoader dataKey="volumes" loaderFn={loadVolumeSnapshots}>
-    {({ data }) => <VolumeSnapshotsListContainer volumes={data} />}
+  <DataLoader dataKey="volumeSnapshots" loaderFn={loadVolumeSnapshots}>
+    {({ data }) => <VolumeSnapshotsListContainer volumeSnapshots={data} />}
   </DataLoader>
 
 export default compose(

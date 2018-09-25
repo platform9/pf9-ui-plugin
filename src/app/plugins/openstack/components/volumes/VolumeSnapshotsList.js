@@ -17,9 +17,11 @@ const columns = [
 class VolumeSnapshotsList extends React.Component {
   render () {
     const { onAdd, onDelete, onEdit, volumeSnapshots } = this.props
+
     if (!volumeSnapshots || volumeSnapshots.length === 0) {
       return <h1>No volume snapshots found.</h1>
     }
+
     return (
       <ListTable
         title="Volume Snapshots"

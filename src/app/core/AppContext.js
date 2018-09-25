@@ -16,7 +16,10 @@ class AppContext extends React.Component {
   state = {
     ...this.props.initialContext,
 
-    setContext: (...args) => this.setState(...args),
+    setContext: (...args) => {
+      this.setState(...args)
+      setImmediate(() => { window.context = this.state })
+    },
 
     // Utility function that sets both context.session.userPreferences[key] and
     // also sets it in localStorage.  We might want to move this into its own
