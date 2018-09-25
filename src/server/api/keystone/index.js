@@ -27,6 +27,7 @@ router.post('/v3/auth/tokens', postToken)
 // Everything past this point requires authentication
 
 router.get('/v3/auth/projects', tokenValidator, getProjects)
+router.get('/v3/projects', tokenValidator, getProjects)
 router.post('/v3/projects', tokenValidator, postProject)
 router.delete('/v3/projects/:projectId', tokenValidator, deleteProject)
 
