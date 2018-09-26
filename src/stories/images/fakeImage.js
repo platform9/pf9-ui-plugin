@@ -1,9 +1,9 @@
 import faker from 'faker'
 
-const fakeGlanceImage = () => ({
+const fakeImage = () => ({
   id: faker.random.uuid(),
   name: faker.random.word(),
-  description: faker.random.words(),
+  pf9_description: faker.random.words(),
   status: faker.random.arrayElement(['OK', 'Missing']),
   owner: faker.random.word(),
   visibility: faker.random.arrayElement(['private', 'public']),
@@ -14,4 +14,4 @@ const fakeGlanceImage = () => ({
   created_at: faker.date.past().toString()
 })
 
-export default fakeGlanceImage
+export default fakeImage
