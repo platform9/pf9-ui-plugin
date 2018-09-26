@@ -58,9 +58,6 @@ DataUpdater.propTypes = {
 
   updateFn: PropTypes.func.isRequired,
 
-  /**
-   * Unique identifier for the entity.  Leave blank for 'id'.
-   */
   objId: PropTypes.string.isRequired,
 
   /**
@@ -68,10 +65,6 @@ DataUpdater.propTypes = {
    * to the corresponding list page.
    */
   backUrl: PropTypes.string,
-}
-
-DataUpdater.defaultProps = {
-  objId: 'id',
 }
 
 export default compose(
