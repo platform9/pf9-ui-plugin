@@ -10,7 +10,7 @@ import Network from '../models/Network'
 import Router from '../models/Router'
 import FloatingIp from '../models/FloatingIp'
 import Volume from '../models/Volume'
-import GlanceImage from '../models/GlanceImage'
+import Image from '../models/Image'
 import Application from '../models/Application'
 import SshKey from '../models/SshKey'
 import Hypervisor from '../models/Hypervisor'
@@ -89,9 +89,9 @@ function loadPreset () {
   new Volume({ name: 'TestVolume5', description: '', volume_type: 'testType', metadata: '', size: 25, bootable: false, status: 'in-use', tenant: 'Dev Team Tenant', source: 'Another Volume', host: 'host.company.sys', instance: 'Dev Instance 2', device: '', attachedMode: '', readonly: false })
 
   // Glance Images
-  new GlanceImage({ name: 'Test-Image-1', description: 'Base CentOS Image Version 5', status: 'OK', owner: 'Development Team Tenant', visibility: 'private', protected: false, disk_format: 'qcow2', virtual_size: 40, size: 15 })
-  new GlanceImage({ name: 'Test-Image-2', description: 'Version 1118', status: 'OK', owner: 'Development Team Tenant', visibility: 'public', protected: false, disk_format: 'qcow2', virtual_size: 50, size: 8 })
-  new GlanceImage({ name: 'Test-Image-3', description: 'A plain test image.', status: 'OK', owner: 'Development Team Tenant', visibility: 'private', protected: true, disk_format: 'qcow2', virtual_size: 100, size: 22 })
+  new Image({ name: 'Test-Image-1', pf9_description: 'Base CentOS Image Version 5', status: 'OK', owner: 'Development Team Tenant', visibility: 'private', protected: false, disk_format: 'qcow2', virtual_size: 40, size: 15 })
+  new Image({ name: 'Test-Image-2', pf9_description: 'Version 1118', status: 'OK', owner: 'Development Team Tenant', visibility: 'public', protected: false, disk_format: 'qcow2', virtual_size: 50, size: 8 })
+  new Image({ name: 'Test-Image-3', pf9_description: 'A plain test image.', status: 'OK', owner: 'Development Team Tenant', visibility: 'private', protected: true, disk_format: 'qcow2', virtual_size: 100, size: 22 })
 
   // Applications
   new Application({ name: 'ApacheHttpServer', author: 'admin', public: true, tenant: 'Development Team Tenant', description: 'The Apache HTTP Server Project is a collaborative software development effort aimed at creating a robust, commercial-grade, featureful, and freely-available source code implementation of an HTTP (Web) server.', categories: 'Web' })

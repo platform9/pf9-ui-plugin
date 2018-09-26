@@ -5,7 +5,7 @@ import Role from '../models/Role'
 import Tenant from '../models/Tenant'
 import User from '../models/User'
 import Volume from '../models/Volume'
-import GlanceImage from '../models/GlanceImage'
+import Image from '../models/Image'
 import Network from '../models/Network'
 import Router from '../models/Router'
 import FloatingIp from '../models/FloatingIp'
@@ -46,7 +46,7 @@ class Context {
     this.hostAggregates = []
     this.regions = []
     this.volumes = []
-    this.glanceImages = []
+    this.images = []
     this.applications = []
     this.sshKeys = []
     this.defaultQuota = { ...defaultQuota }
@@ -344,30 +344,30 @@ class Context {
 
   getServiceCatalog = () => Catalog.getCatalog()
 
-  getGlanceImage = (id) => {
-    const glanceImage = GlanceImage.findById(id)
-    if (!glanceImage) {
-      throw new Error('Unable to find non-existent glance image')
+  getImage = (id) => {
+    const image = Image.findById(id)
+    if (!image) {
+      throw new Error('Unable to find non-existent image')
     }
-    return glanceImage
+    return image
   }
 
-  getGlanceImages = () => GlanceImage.getCollection().map(x => x.asGraphQl())
+  getImages = () => Image.getCollection().map(x => x.asJson())
 
-  updateGlanceImage = (id, input) => {
-    const glanceImage = GlanceImage.updateById(id, input)
-    if (!glanceImage) {
-      throw new Error('Unable to update non-existent glance image')
+  updateImage = (id, input) => {
+    const image = Image.updateById(id, input)
+    if (!image) {
+      throw new Error('Unable to update non-existent image')
     }
-    return glanceImage.asGraphQl()
+    return image.asJson()
   }
 
-  removeGlanceImage = id => {
-    const glanceImage = GlanceImage.findById(id)
-    if (!glanceImage) {
-      throw new Error('Unable to delete non-existent glance image')
+  removeImage = id => {
+    const image = Image.findById(id)
+    if (!image) {
+      throw new Error('Unable to delete non-existent image')
     }
-    glanceImage.destroy()
+    image.destroy()
     return id
   }
 

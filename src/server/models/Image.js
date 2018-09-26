@@ -2,14 +2,14 @@ import context from '../context'
 import ActiveModel from './ActiveModel'
 import { findById, updateById } from '../helpers'
 
-const coll = () => context.glanceImages
+const coll = () => context.images
 
-class GlanceImage extends ActiveModel {
+class Image extends ActiveModel {
   constructor (params = {}) {
     super(params)
     this.name = params.name || ''
     this.status = params.status || ''
-    this.description = params.description || ''
+    this.pf9_description = params.pf9_description || ''
     this.container_format = params.container_format || ''
     this.disk_format = params.disk_format || ''
     this.updated_at = params.updated_at || ''
@@ -30,16 +30,24 @@ class GlanceImage extends ActiveModel {
   static getCollection = coll
   static clearCollection = () => coll().splice(0, coll().length)
   static findById = findById(coll)
-  static updateById = updateById(coll)
+  static updateById = (imageId, attributes) => {
+    // Translate glance update body to objects with the attributes
+    // Need to account for deletes?
+    const data = attributes.reduce((data, attr) => {
+      data[attr.path.substring(1)] = attr.value
+      return data
+    }, {})
+    return updateById(coll)(imageId, data)
+  }
 
-  static findByName = name => GlanceImage.getCollection().find(x => x.name === name)
+  static findByName = name => Image.getCollection().find(x => x.name === name)
 
   asJson = () => {
     return {
       ...super.asJson(),
       name: this.name,
       status: this.status,
-      description: this.description,
+      pf9_description: this.pf9_description,
       container_format: this.container_format,
       disk_format: this.disk_format,
       updated_at: this.updated_at,
@@ -58,11 +66,6 @@ class GlanceImage extends ActiveModel {
       created_at: this.created_at
     }
   }
-
-  asGraphQl = () => ({
-    ...this.asJson(),
-    __typename: 'GlanceImage',
-  })
 }
 
-export default GlanceImage
+export default Image

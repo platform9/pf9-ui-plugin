@@ -89,6 +89,34 @@ const Catalog = {
         id: uuid.v4(),
         name: 'cinderv3',
         type: 'volumev3'
+      },
+      {
+        endpoints: [
+          {
+            id: uuid.v4(),
+            interface: 'admin',
+            region: config.region,
+            region_id: config.region,
+            url: `${config.apiHost}/glance`
+          },
+          {
+            id: uuid.v4(),
+            interface: 'internal',
+            region: config.region,
+            region_id: config.region,
+            url: `${config.apiHost}/glance`
+          },
+          {
+            id: uuid.v4(),
+            interface: 'public',
+            region: config.region,
+            region_id: config.region,
+            url: `${config.apiHost}/glance`
+          }
+        ],
+        id: uuid.v4(),
+        name: 'glance',
+        type: 'image'
       }
     ]
   }

@@ -1,7 +1,7 @@
 import React from 'react'
 import { Grid, Paper, Tabs, Tab, Typography } from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles'
-import GlanceImageListPage from './GlanceImageListPage'
+import ImageListPage from './ImageListPage'
 import ImageCardListPage from './ImageCardListPage'
 
 const styles = theme => ({
@@ -21,9 +21,9 @@ function TabContainer ({ children, dir }) {
   )
 }
 
-class GlanceImageIndex extends React.Component {
+class ImageIndex extends React.Component {
   state = {
-    value: '/ui/openstack/glanceimages#images',
+    value: '/ui/openstack/images#images',
   }
 
   handleChange = (event, value) => {
@@ -43,15 +43,15 @@ class GlanceImageIndex extends React.Component {
               indicatorColor="primary"
               textColor="primary"
             >
-              <Tab value="/ui/openstack/glanceimages#images" label="Imported Images" href="#images" />
-              <Tab value="/ui/openstack/glanceimages#builtimages" label="Download Prebuilt Images" href="#builtimages" />
+              <Tab value="/ui/openstack/images#images" label="Imported Images" href="#images" />
+              <Tab value="/ui/openstack/images#builtimages" label="Download Prebuilt Images" href="#builtimages" />
             </Tabs>
-            { value === '/ui/openstack/glanceimages#images' &&
+            { value === '/ui/openstack/images#images' &&
               <TabContainer >
-                <GlanceImageListPage />
+                <ImageListPage />
               </TabContainer>
             }
-            { value === '/ui/openstack/glanceimages#builtimages' &&
+            { value === '/ui/openstack/images#builtimages' &&
               <TabContainer>
                 <ImageCardListPage onChange={this.handleChange} />
               </TabContainer>
@@ -63,4 +63,4 @@ class GlanceImageIndex extends React.Component {
   }
 }
 
-export default withStyles(styles)(GlanceImageIndex)
+export default withStyles(styles)(ImageIndex)

@@ -54,13 +54,13 @@ const data = [
   createData('dev.company.sys', '11.11.11.11', '/var/opt/company/imagelibrary/data')
 ]
 
-class AddGlanceImagePage extends React.Component {
+class AddImagePage extends React.Component {
   renderManualImport () {
     const { classes } = this.props
     return (
       <Fragment>
         <Typography>
-          We support two ways to import images into your Glance Image Catalog:
+          We support two ways to import images into your Image Catalog:
         </Typography>
         <Typography variant="title"> Manual Import </Typography>
         <Typography>
@@ -71,7 +71,7 @@ class AddGlanceImagePage extends React.Component {
         <ListTable title="Host List" columns={columns} data={data} showCheckboxes={false} />
         <br />
         <Typography>
-          Please <span className={classes.code}>scp</span> the image(s) to this watch folder, and they will be automatically imported into your Glance Image Catalog.
+          Please <span className={classes.code}>scp</span> the image(s) to this watch folder, and they will be automatically imported into your Image Catalog.
           <br />
           <b>Important</b>: Remove colons <span className={classes.code}>:</span> from image file names. Images with names containing colons may be falsely reported.
           <br />
@@ -131,7 +131,7 @@ class AddGlanceImagePage extends React.Component {
   render () {
     return (
       <MuiThemeProvider theme={textTheme}>
-        <FormWrapper title="Import a New Image" backUrl="/ui/openstack/glanceimages">
+        <FormWrapper title="Import a New Image" backUrl="/ui/openstack/images">
           {this.renderManualImport()}
           {this.renderGlanceClient()}
           <Divider />
@@ -147,4 +147,4 @@ export default compose(
   withRouter,
   withApollo,
   withStyles(styles)
-)(AddGlanceImagePage)
+)(AddImagePage)

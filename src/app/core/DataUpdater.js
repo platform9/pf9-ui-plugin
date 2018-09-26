@@ -17,7 +17,7 @@ class DataUpdater extends React.Component {
 
   handleSubmit = async data => {
     const { dataKey, updateFn, objId, backUrl, context, setContext, history } = this.props
-    const updatedEntity = await updateFn(data, { context, setContext })
+    const updatedEntity = await updateFn(data, { context, setContext, objId, dataKey })
     setContext({
       [dataKey]: context[dataKey].map(x => x.id === objId ? updatedEntity : x)
     })

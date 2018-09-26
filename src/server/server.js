@@ -13,6 +13,7 @@ import keystone from './api/keystone'
 import nova from './api/nova'
 import neutron from './api/neutron'
 import cinder from './api/cinder'
+import glance from './api/glance'
 
 const defaultConfig = {
   port: 4444,
@@ -31,6 +32,7 @@ export function startServer (config = defaultConfig) {
 
   app.use(bodyParser.urlencoded({ extended: true }))
   app.use(bodyParser.json())
+  app.use(bodyParser.json({type: 'application/openstack-images-v2.1-json-patch'}))
 
   if (config.verbose) {
     app.use(requestLogger)
@@ -41,6 +43,7 @@ export function startServer (config = defaultConfig) {
   app.use('/nova', nova)
   app.use('/neutron', neutron)
   app.use('/cinder', cinder)
+  app.use('/glance', glance)
 
   mountGraphql(app)
 

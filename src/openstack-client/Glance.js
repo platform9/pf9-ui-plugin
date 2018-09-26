@@ -23,7 +23,7 @@ class Glance {
   imagesUrl = async () => `${await this.v2()}/images`
 
   async getImages () {
-    const url = await this.imagesUrl()
+    const url = `${await this.imagesUrl()}?limit=1000`
     const response = await axios.get(url, this.client.getAuthHeaders())
     return response.data.images
   }
@@ -51,15 +51,14 @@ class Glance {
     return response.data.properties.images
   }
 
-  async updateImage (image) {
-    const url = `${await this.imagesUrl()}/${image.id}`
+  async updateImage (image, imageId) {
+    const url = `${await this.imagesUrl()}/${imageId}`
     const headers = {
       ...this.client.getAuthHeaders().headers,
       'Content-Type': 'application/openstack-images-v2.1-json-patch',
     }
-    const body = {}
-    const response = await axios.patch(url, body, { headers })
-    return response
+    const response = await axios.patch(url, image, { headers })
+    return response.data
   }
 
   // The user should not be able to edit these fields at all.

@@ -13,7 +13,7 @@ const styles = theme => ({
 
 class ImageCardListPage extends React.Component {
   onClick = () => {
-    this.props.onChange(null, '/ui/openstack/glanceimages#images')
+    this.props.onChange(null, '/ui/openstack/images#images')
   }
 
   render () {

@@ -6,7 +6,7 @@ import ListTable from 'core/common/ListTable'
 const columns = [
   { id: 'id', label: 'OpenStack ID' },
   { id: 'name', label: 'Name' },
-  { id: 'description', label: 'Description' },
+  { id: 'pf9_description', label: 'Description' },
   { id: 'status', label: 'Status' },
   { id: 'owner', label: 'Tenant' },
   { id: 'visibility', label: 'Visibility' },
@@ -17,17 +17,17 @@ const columns = [
   { id: 'created_at', label: 'Created' }
 ]
 
-class GlanceImageList extends React.Component {
+class ImageList extends React.Component {
   render () {
-    const { onAdd, onDelete, onEdit, glanceImages } = this.props
-    if (!glanceImages || glanceImages.length === 0) {
-      return <h1>No Glance Images Found.</h1>
+    const { onAdd, onDelete, onEdit, images } = this.props
+    if (!images || images.length === 0) {
+      return <h1>No Images Found.</h1>
     }
     return (
       <ListTable
-        title="Glance Images"
+        title="Images"
         columns={columns}
-        data={glanceImages}
+        data={images}
         onAdd={onAdd}
         onDelete={onDelete}
         onEdit={onEdit}
@@ -38,21 +38,21 @@ class GlanceImageList extends React.Component {
   }
 }
 
-GlanceImageList.propTypes = {
-  /** List of glance images [{ id, name... }] */
-  glanceImages: PropTypes.array.isRequired,
+ImageList.propTypes = {
+  /** List of  images [{ id, name... }] */
+  images: PropTypes.array.isRequired,
 
   /** What to do when the add button is clicked */
   onAdd: PropTypes.func.isRequired,
 
-  /** Called onClick of delete icon for a glance image row */
+  /** Called onClick of delete icon for a  image row */
   onDelete: PropTypes.func.isRequired,
 
   onEdit: PropTypes.func.isRequired
 }
 
-GlanceImageList.defaultProps = {
-  glanceImages: [],
+ImageList.defaultProps = {
+  images: [],
 }
 
-export default GlanceImageList
+export default ImageList

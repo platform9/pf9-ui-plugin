@@ -37,10 +37,10 @@ import UpdateVolumeSnapshotPage from './components/volumes/UpdateVolumeSnapshotP
 
 import HostsListPage from './components/hosts/HostsListPage'
 
-import GlanceImageIndex from './components/glanceimages/GlanceImageIndex'
-import GlanceImageListPage from './components/glanceimages/GlanceImageListPage'
-import AddGlanceImagePage from './components/glanceimages/AddGlanceImagePage'
-import UpdateGlanceImagePage from './components/glanceimages/UpdateGlanceImagePage'
+import ImageIndex from './components/images/ImageIndex'
+import ImageListPage from './components/images/ImageListPage'
+import AddImagePage from './components/images/AddImagePage'
+import UpdateImagePage from './components/images/UpdateImagePage'
 
 import ApiAccessPage from './components/api-access/ApiAccessListPage'
 
@@ -198,24 +198,24 @@ OpenStack.registerPlugin = pluginManager => {
         component: UpdateVolumeSnapshotPage
       },
       {
-        name: 'GlanceImages',
-        link: { path: '/glanceimages', exact: true },
-        component: GlanceImageIndex
+        name: 'Images',
+        link: { path: '/images', exact: true },
+        component: ImageIndex
       },
       {
-        name: 'GlanceImagesList',
-        link: { path: '/glanceimages#images', exact: true },
-        component: GlanceImageListPage
+        name: 'ImagesList',
+        link: { path: '/images#images', exact: true },
+        component: ImageListPage
       },
       {
-        name: 'AddGlanceImages',
-        link: { path: '/glanceimages/add', exact: true },
-        component: AddGlanceImagePage
+        name: 'AddImages',
+        link: { path: '/images/add', exact: true },
+        component: AddImagePage
       },
       {
-        name: 'EditGlanceImage',
-        link: { path: '/glanceimages/edit/:glanceImageId', exact: true },
-        component: UpdateGlanceImagePage
+        name: 'EditImage',
+        link: { path: '/images/edit/:imageId', exact: true },
+        component: UpdateImagePage
       },
       {
         name: 'Applications',
@@ -284,8 +284,8 @@ OpenStack.registerPlugin = pluginManager => {
         link: { path: '/storage' },
       },
       {
-        name: 'Glance Images',
-        link: { path: '/glanceimages' }
+        name: 'Images',
+        link: { path: '/images' }
       },
       {
         name: 'Applications',
