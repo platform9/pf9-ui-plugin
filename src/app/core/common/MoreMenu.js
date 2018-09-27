@@ -15,7 +15,10 @@ class MoreMenu extends React.Component {
     this.setState({ anchorEl: e.currentTarget })
   }
 
-  handleClose = () => { this.setState({ anchorEl: null }) }
+  handleClose = e => {
+    e.stopPropagation()
+    this.setState({ anchorEl: null })
+  }
 
   handleClick = action => e => {
     e.stopPropagation()
