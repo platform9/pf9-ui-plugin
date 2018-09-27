@@ -8,8 +8,6 @@ const onDelete = action('delete')
 const onEdit = action('edit')
 const onRestart = action('restart')
 
-const handleSelect = action('selected')
-
 const items = [
   { label: 'Add', action: onAdd },
   { label: 'Delete', action: onDelete },
@@ -19,6 +17,6 @@ const items = [
 
 addStories('Common Components/MoreMenu', {
   'Specifying menu actions': () => (
-    <MoreMenu items={items} onSelect={handleSelect} />
+    <MoreMenu items={items} />
   )
 })

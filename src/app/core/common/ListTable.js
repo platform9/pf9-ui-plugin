@@ -15,8 +15,7 @@ import {
 } from '@material-ui/core'
 import EnhancedTableHead from './EnhancedTableHead'
 import EnhancedTableToolbar from './EnhancedTableToolbar'
-import IconButton from '@material-ui/core/IconButton'
-import MoreVertIcon from '@material-ui/icons/MoreVert'
+import MoreMenu from 'core/common/MoreMenu'
 import { compose } from 'core/fp'
 import { withAppContext } from 'core/AppContext'
 
@@ -199,14 +198,12 @@ class ListTable extends React.Component {
     e.stopPropagation()
   }
 
-  renderRowActions = () => {
+  renderRowActions = row => {
     const { rowActions } = this.props
     if (!rowActions) { return null }
     return (
       <TableCell>
-        <IconButton aria-label="Actions" onClick={this.handleRowActionsClick}>
-          <MoreVertIcon />
-        </IconButton>
+        <MoreMenu items={rowActions} data={row} />
       </TableCell>
     )
   }
@@ -232,7 +229,7 @@ class ListTable extends React.Component {
         {columns.map((columnDef, colIdx) =>
           this.renderCell(columnDef, row[columnDef.id]))
         }
-        {this.renderRowActions()}
+        {this.renderRowActions(row)}
       </TableRow>
     )
   }
@@ -349,6 +346,17 @@ ListTable.propTypes = {
   onDelete: PropTypes.func,
   onEdit: PropTypes.func,
   paginate: PropTypes.bool,
+
+  /**
+   * List of action items to make available to each row.
+   */
+  rowActions: PropTypes.arrayOf(
+    PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      action: PropTypes.func,
+    })
+  ),
+
   showCheckboxes: PropTypes.bool,
   searchTarget: PropTypes.string,
 }

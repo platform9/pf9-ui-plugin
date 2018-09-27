@@ -10,8 +10,18 @@ class MoreMenu extends React.Component {
     anchorEl: null
   }
 
-  handleOpen = e => { this.setState({ anchorEl: e.currentTarget }) }
+  handleOpen = e => {
+    e.stopPropagation()
+    this.setState({ anchorEl: e.currentTarget })
+  }
+
   handleClose = () => { this.setState({ anchorEl: null }) }
+
+  handleClick = action => e => {
+    e.stopPropagation()
+    this.handleClose()
+    action(this.props.data)
+  }
 
   render () {
     const { anchorEl } = this.state
@@ -32,7 +42,7 @@ class MoreMenu extends React.Component {
           onClose={this.handleClose}
         >
           {this.props.items.map(({ label, action }) =>
-            <MenuItem key={label} onClick={action}>{label}</MenuItem>
+            <MenuItem key={label} onClick={this.handleClick(action)}>{label}</MenuItem>
           )}
         </Menu>
       </div>
@@ -41,12 +51,20 @@ class MoreMenu extends React.Component {
 }
 
 MoreMenu.propTypes = {
+  /**
+   * MenuItems and their actions.  Actions will receive `data`.
+   */
   items: PropTypes.arrayOf(
     PropTypes.shape({
       label: PropTypes.string.isRequired,
       action: PropTypes.func,
     })
-  )
+  ),
+
+  /**
+   * Arbitrary data to pass to the `action` handler.
+   */
+  data: PropTypes.any,
 }
 
 export default MoreMenu
