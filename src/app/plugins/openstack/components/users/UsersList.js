@@ -26,7 +26,6 @@ class UsersList extends React.Component {
         onAdd={onAdd}
         onDelete={onDelete}
         onEdit={onEdit}
-        actions={['delete']}
         searchTarget="name"
       />
     )

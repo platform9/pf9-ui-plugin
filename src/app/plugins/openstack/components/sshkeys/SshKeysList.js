@@ -24,7 +24,6 @@ class SshKeysList extends React.Component {
         data={sshKeys}
         onAdd={onAdd}
         onDelete={onDelete}
-        actions={['delete']}
         searchTarget="name"
       />
     )

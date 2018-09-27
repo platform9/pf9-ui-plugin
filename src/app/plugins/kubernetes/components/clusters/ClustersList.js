@@ -22,7 +22,6 @@ class ClustersList extends React.Component {
         data={clusters}
         onAdd={onAdd}
         onDelete={onDelete}
-        actions={['delete']}
       />
     )
   }

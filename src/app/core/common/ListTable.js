@@ -15,6 +15,8 @@ import {
 } from '@material-ui/core'
 import EnhancedTableHead from './EnhancedTableHead'
 import EnhancedTableToolbar from './EnhancedTableToolbar'
+import IconButton from '@material-ui/core/IconButton'
+import MoreVertIcon from '@material-ui/icons/MoreVert'
 import { compose } from 'core/fp'
 import { withAppContext } from 'core/AppContext'
 
@@ -193,6 +195,22 @@ class ListTable extends React.Component {
     )
   }
 
+  handleRowActionsClick = e => {
+    e.stopPropagation()
+  }
+
+  renderRowActions = () => {
+    const { rowActions } = this.props
+    if (!rowActions) { return null }
+    return (
+      <TableCell>
+        <IconButton aria-label="Actions" onClick={this.handleRowActionsClick}>
+          <MoreVertIcon />
+        </IconButton>
+      </TableCell>
+    )
+  }
+
   renderRow = row => {
     const { columns, showCheckboxes } = this.props
     const isSelected = this.isSelected(row)
@@ -214,6 +232,7 @@ class ListTable extends React.Component {
         {columns.map((columnDef, colIdx) =>
           this.renderCell(columnDef, row[columnDef.id]))
         }
+        {this.renderRowActions()}
       </TableRow>
     )
   }
@@ -252,20 +271,21 @@ class ListTable extends React.Component {
       classes,
       columns,
       data,
-      title,
       onAdd,
       onDelete,
       onEdit,
-      showCheckboxes,
+      paginate,
+      rowActions,
       searchTarget,
-      paginate
+      showCheckboxes,
+      title,
     } = this.props
 
     const {
       order,
       orderBy,
+      searchTerm,
       selected,
-      searchTerm
     } = this.state
 
     if (!data) {
@@ -305,6 +325,7 @@ class ListTable extends React.Component {
                   title={title}
                   rowCount={sortedData.length}
                   showCheckboxes={showCheckboxes}
+                  showRowActions={!!rowActions}
                 />
                 <TableBody>
                   {paginatedData.map(this.renderRow)}
@@ -328,7 +349,8 @@ ListTable.propTypes = {
   onDelete: PropTypes.func,
   onEdit: PropTypes.func,
   paginate: PropTypes.bool,
-  showCheckboxes: PropTypes.bool
+  showCheckboxes: PropTypes.bool,
+  searchTarget: PropTypes.string,
 }
 
 ListTable.defaultProps = {
