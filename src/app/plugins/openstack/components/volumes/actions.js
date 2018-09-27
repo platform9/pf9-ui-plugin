@@ -1,3 +1,5 @@
+import { objToKeyValueArr, keyValueArrToObj } from 'core/fp'
+
 export const loadVolumes = async ({ setContext, context }) => {
   const volumes = await context.openstackClient.cinder.getVolumes()
   setContext({ volumes })
@@ -16,13 +18,20 @@ export const loadVolumeSnapshots = async ({ setContext, context, reload }) => {
   if (!reload && context.volumeSnapshots) { return context.volumeSnapshots }
 
   const volumeSnapshots = await context.openstackClient.cinder.getSnapshots()
-  setContext({ volumeSnapshots })
-  return volumeSnapshots
+
+  // Change metadata into array form
+  const converted = (volumeSnapshots || []).map(x => ({...x, metadata: objToKeyValueArr(x.metadata)}))
+  setContext({ volumeSnapshots: converted })
+  return converted
 }
 
 export const updateVolumeSnapshot = async (data, { context, setContext }) => {
   const { id } = data
-  const updated = await context.openstackClient.cinder.updateSnapshot(id, data)
+  const { cinder } = context.openstackClient
+  const updated = await cinder.updateSnapshot(id, data)
+  cinder.updateSnapshotMetadata(id, keyValueArrToObj(data.metadata))
+  updated.metadata = data.metadata
+
   setContext({
     volumeSnapshots: context.volumeSnapshots.map(x => x.id === id ? updated : x)
   })

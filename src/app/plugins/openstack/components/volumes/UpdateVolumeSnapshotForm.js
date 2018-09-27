@@ -2,6 +2,7 @@ import React from 'react'
 import { Button } from '@material-ui/core'
 import ValidatedForm from 'core/common/ValidatedForm'
 import TextField from 'core/common/TextField'
+import KeyValuesField from 'core/common/KeyValuesField'
 
 const UpdateVolumeSnapshotForm = ({ volumeSnapshot, onSubmit }) =>
   <ValidatedForm
@@ -11,6 +12,7 @@ const UpdateVolumeSnapshotForm = ({ volumeSnapshot, onSubmit }) =>
   >
     <TextField id="name" label="Volume Snapshot Name" />
     <TextField id="description" label="Description" />
+    <KeyValuesField id="metadata" label="Metadata" />
     <Button type="submit" variant="raised">Update Volume Snapshot</Button>
   </ValidatedForm>
 

@@ -30,12 +30,13 @@ class DataUpdater extends React.Component {
     const { dataKey, loaderFn, objId, children } = this.props
     return (
       <DataLoader dataKey={dataKey} loaderFn={loaderFn}>
-        {({ data }) =>
-          children({
+        {({ data }) => {
+          if (!data) { return null }
+          return children({
             data: this.findById(data, objId),
             onSubmit: this.handleSubmit
           })
-        }
+        }}
       </DataLoader>
     )
   }

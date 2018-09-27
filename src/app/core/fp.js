@@ -51,3 +51,15 @@ export const range = (start, end) => {
   for (let i=start; i<=end; i++) { arr.push(i) }
   return arr
 }
+
+// Converts from { foo: 'bar' } to [{ key: 'foo', value: 'bar' }]
+export const objToKeyValueArr = (obj = {}) => Object.entries(obj).map(([key, value]) => ({ key, value }))
+
+// Converts from [{ key: 'foo', value: 'bar' }] to { foo: 'bar' }
+export const keyValueArrToObj = (arr = []) => arr.reduce(
+  (accum, { key, value }) => {
+    accum[key] = value
+    return accum
+  },
+  {}
+)
