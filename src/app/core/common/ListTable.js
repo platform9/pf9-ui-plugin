@@ -354,6 +354,7 @@ ListTable.propTypes = {
     PropTypes.shape({
       label: PropTypes.string.isRequired,
       action: PropTypes.func,
+      icon: PropTypes.node,
     })
   ),
 

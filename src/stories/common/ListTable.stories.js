@@ -1,5 +1,6 @@
 import React from 'react'
 import ListTable from 'core/common/ListTable'
+import ReplayIcon from '@material-ui/icons/Replay'
 import { action } from '@storybook/addon-actions'
 import { addStories } from '../helpers'
 
@@ -20,7 +21,7 @@ const data = [
 ]
 
 const rowActions = [
-  { icon: 'replay', label: 'Restart', action: onRestart }
+  { icon: <ReplayIcon />, label: 'Restart', action: onRestart }
 ]
 
 const actions = { onAdd, onDelete, onEdit }
