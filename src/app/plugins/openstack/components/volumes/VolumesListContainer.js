@@ -5,6 +5,7 @@ import VolumesList from './VolumesList'
 import PhotoCameraIcon from '@material-ui/icons/PhotoCamera'
 import { compose } from 'core/fp'
 import { withAppContext } from 'core/AppContext'
+import { withRouter } from 'react-router'
 
 class VolumesListContainer extends React.Component {
   handleRemove = async id => {
@@ -15,8 +16,7 @@ class VolumesListContainer extends React.Component {
   }
 
   handleSnapshot = async volume => {
-    // const { cinder } = this.props.context.openstackClient
-    console.log('About to snapshot: ', volume)
+    this.props.history.push(`/ui/openstack/storage/volumes/snapshot/${volume.id}`)
   }
 
   render () {
@@ -43,4 +43,5 @@ VolumesListContainer.propTypes = {
 
 export default compose(
   withAppContext,
+  withRouter,
 )(VolumesListContainer)

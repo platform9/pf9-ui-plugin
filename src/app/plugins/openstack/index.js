@@ -32,6 +32,7 @@ import VolumesListPage from './components/volumes/VolumesListPage'
 import AddVolumePage from './components/volumes/AddVolumePage'
 import UpdateVolumePage from './components/volumes/UpdateVolumePage'
 
+import CreateSnapshotPage from './components/volumes/CreateSnapshotPage'
 import VolumeSnapshotsListPage from './components/volumes/VolumeSnapshotsListPage'
 import UpdateVolumeSnapshotPage from './components/volumes/UpdateVolumeSnapshotPage'
 
@@ -187,6 +188,11 @@ OpenStack.registerPlugin = pluginManager => {
         component: AddVolumeTypePage
       },
       */
+      {
+        name: 'CreateSnapshot',
+        link: { path: '/storage/volumes/snapshot/:volumeId', exact: true },
+        component: CreateSnapshotPage
+      },
       {
         name: 'VolumeSnapshots',
         link: { path: '/storage#volumeSnapshots', exact: true },
