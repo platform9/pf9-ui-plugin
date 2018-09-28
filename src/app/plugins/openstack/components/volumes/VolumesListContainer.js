@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import CRUDListContainer from 'core/common/CRUDListContainer'
 import VolumesList from './VolumesList'
+import PhotoCameraIcon from '@material-ui/icons/PhotoCamera'
 import { compose } from 'core/fp'
 import { withAppContext } from 'core/AppContext'
 
@@ -13,7 +14,16 @@ class VolumesListContainer extends React.Component {
     setContext({ volumes: newVolumes })
   }
 
+  handleSnapshot = async volume => {
+    // const { cinder } = this.props.context.openstackClient
+    console.log('About to snapshot: ', volume)
+  }
+
   render () {
+    const rowActions = [
+      { icon: <PhotoCameraIcon />, label: 'Snapshot', action: this.handleSnapshot }
+    ]
+
     return (
       <CRUDListContainer
         items={this.props.volumes}
@@ -21,7 +31,7 @@ class VolumesListContainer extends React.Component {
         editUrl="/ui/openstack/storage/volumes/edit"
         onRemove={this.handleRemove}
       >
-        {handlers => <VolumesList volumes={this.props.volumes} {...handlers} />}
+        {handlers => <VolumesList volumes={this.props.volumes} {...handlers} rowActions={rowActions} />}
       </CRUDListContainer>
     )
   }

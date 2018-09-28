@@ -22,7 +22,7 @@ class MoreMenu extends React.Component {
 
   handleClick = action => e => {
     e.stopPropagation()
-    this.handleClose()
+    this.handleClose(e)
     action(this.props.data)
   }
 

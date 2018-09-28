@@ -27,10 +27,11 @@ const columns = [
 
 class VolumesList extends React.Component {
   render () {
-    const { onAdd, onDelete, onEdit, volumes } = this.props
+    const { onAdd, onDelete, onEdit, rowActions, volumes } = this.props
     if (!volumes || volumes.length === 0) {
       return <h1>No volumes found.</h1>
     }
+
     return (
       <ListTable
         title="Volumes"
@@ -39,6 +40,7 @@ class VolumesList extends React.Component {
         onAdd={onAdd}
         onDelete={onDelete}
         onEdit={onEdit}
+        rowActions={rowActions}
         searchTarget="name"
       />
     )
@@ -56,6 +58,14 @@ VolumesList.propTypes = {
   onDelete: PropTypes.func.isRequired,
 
   onEdit: PropTypes.func.isRequired,
+
+  rowActions: PropTypes.arrayOf(
+    PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      action: PropTypes.func,
+      icon: PropTypes.node,
+    })
+  ),
 }
 
 VolumesList.defaultProps = {
