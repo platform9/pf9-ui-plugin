@@ -3,7 +3,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import CRUDListContainer from 'core/common/CRUDListContainer'
 import VolumeTypesList from './VolumeTypesList'
-import { parseJSON } from 'util/misc'
 import { compose } from 'core/fp'
 import { withAppContext } from 'core/AppContext'
 
@@ -12,9 +11,9 @@ import { withAppContext } from 'core/AppContext'
 // should probably create some utility function for it.
 const convertVolumeType = x => {
   let cloned = { ...x }
-  const { volume_backend_name, ...others } = parseJSON(x && x.extra_specs)
-  cloned.extra_specs = JSON.stringify(others)
-  cloned.volume_backend_name = volume_backend_name
+  const backendNameItem = x.extra_specs.find(x => x.key === 'volume_backend_name')
+  cloned.volume_backend_name = (backendNameItem && backendNameItem.value) || ''
+  cloned.extra_specs = x.extra_specs.filter(x => x.key !== 'volume_backend_name')
   return cloned
 }
 

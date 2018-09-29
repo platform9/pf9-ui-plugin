@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import axios from 'axios'
 
 class Cinder {
@@ -188,11 +189,16 @@ class Cinder {
     }
   }
 
-  async updateVolumeType (id, params) {
-    const url = `${await this.endpoint()}/types/${id}/extra_specs`
+  async updateVolumeType (id, params, keysToDelete = []) {
+    const url = `${await this.endpoint()}/types/${id}`
     try {
-      const response = await axios.post(url, { extra_specs: params }, this.client.getAuthHeaders())
-      return response.data.extra_specs
+      const { extra_specs, ...rest } = params
+      const baseResponse = await axios.put(url, { volume_type: rest }, this.client.getAuthHeaders())
+      await axios.post(`${url}/extra_specs`, { extra_specs }, this.client.getAuthHeaders())
+      keysToDelete.forEach(async key => {
+        await axios.delete(`${url}/extra_specs/${key}`, this.client.getAuthHeaders())
+      })
+      return baseResponse.data
     } catch (err) {
       console.log(err)
     }

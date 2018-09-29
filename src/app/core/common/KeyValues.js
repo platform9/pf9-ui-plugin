@@ -114,6 +114,7 @@ class KeyValues extends React.Component {
           />
         ))}
         <div>
+          <br />
           <Button variant="contained" color="primary" onClick={this.addBlankEntry}>Add key / value pair</Button>
         </div>
       </div>

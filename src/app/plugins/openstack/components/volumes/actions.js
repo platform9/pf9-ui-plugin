@@ -11,7 +11,12 @@ export const updateVolume = async ({ setContext }) => {
 
 export const loadVolumeTypes = async ({ setContext, context }) => {
   const volumeTypes = await context.openstackClient.cinder.getVolumeTypes()
-  setContext({ volumeTypes })
+
+  // Change metadata into array form
+  const converted = (volumeTypes || []).map(x => ({...x, extra_specs: objToKeyValueArr(x.extra_specs)}))
+  setContext({ volumeTypes: converted })
+
+  return converted
 }
 
 export const loadVolumeSnapshots = async ({ setContext, context, reload }) => {
@@ -35,5 +40,21 @@ export const updateVolumeSnapshot = async (data, { context, setContext }) => {
   setContext({
     volumeSnapshots: context.volumeSnapshots.map(x => x.id === id ? updated : x)
   })
+  return data
+}
+
+export const updateVolumeType = async (data, { context, setContext }) => {
+  const { id } = data
+  const { cinder } = context.openstackClient
+  const converted = {
+    name: data.name,
+    extra_specs: keyValueArrToObj(data.extra_specs),
+  }
+  const oldKeys = context.volumeTypes.find(x => x.id === id).extra_specs.map(x => x.key)
+  const newKeys = data.extra_specs.map(x => x.key)
+  const keysToDelete = oldKeys.filter(x => !newKeys.includes(x))
+  const updated = await cinder.updateVolumeType(id, converted, keysToDelete)
+  const volumeTypes = context.volumeTypes.map(x => x.id === id ? updated : x)
+  setContext({ volumeTypes })
   return data
 }

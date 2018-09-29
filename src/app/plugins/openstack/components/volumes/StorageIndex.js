@@ -47,11 +47,11 @@ class StorageIndex extends React.Component {
               textColor="primary"
             >
               <Tab value="#volumes" label="Volumes" href="#volumes" />
-              <Tab value="#volumetypes" label="Volume Types" href="#volumetypes" />
+              <Tab value="#volumeTypes" label="Volume Types" href="#volumeTypes" />
               <Tab value="#volumeSnapshots" label="Volume Snapshots" href="#volumeSnapshots" />
             </Tabs>
             { value === '#volumes' && <TabContainer ><VolumesListPage /></TabContainer>}
-            { value === '#volumetypes' && <TabContainer><VolumeTypesListPage /></TabContainer>}
+            { value === '#volumeTypes' && <TabContainer><VolumeTypesListPage /></TabContainer>}
             { value === '#volumeSnapshots' && <TabContainer><VolumeSnapshotsListPage /></TabContainer>}
           </Paper>
         </Grid>

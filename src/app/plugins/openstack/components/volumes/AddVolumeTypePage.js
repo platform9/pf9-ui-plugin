@@ -1,27 +1,24 @@
 import React from 'react'
+import requiresAuthentication from '../../util/requiresAuthentication'
 import FormWrapper from 'core/common/FormWrapper'
 import AddVolumeTypeForm from './AddVolumeTypeForm'
 import { withRouter } from 'react-router-dom'
-import { compose, withApollo } from 'react-apollo'
-import requiresAuthentication from '../../util/requiresAuthentication'
-import { ADD_VOLUME_TYPE, GET_VOLUME_TYPES } from './actions'
+import { compose, keyValueArrToObj } from 'core/fp'
+import { withAppContext } from 'core/AppContext'
+import { loadVolumeTypes } from './actions'
 
 class AddVolumeTypePage extends React.Component {
-  handleAdd = (input) => {
-    const { client, history } = this.props
+  handleAdd = async data => {
+    const { setContext, context, history } = this.props
     try {
-      client.mutate({
-        mutation: ADD_VOLUME_TYPE,
-        variables: {
-          input: input
-        },
-        update: (proxy, { data }) => {
-          const tempData = proxy.readQuery({ query: GET_VOLUME_TYPES })
-          tempData.volumeTypes.push(data.createVolume)
-          proxy.writeQuery({ query: GET_VOLUME_TYPES, data: tempData })
-        }
-      })
-      history.push('/ui/openstack/storage#volumetypes')
+      const volumeType = {
+        name: data.name,
+        extra_specs: keyValueArrToObj(data.metadata),
+      }
+      const createdVolumeType = await context.openstackClient.cinder.createVolumeType(volumeType)
+      const existingVolumeTypes = await loadVolumeTypes({ setContext, context })
+      setContext({ volumes: [ ...existingVolumeTypes, createdVolumeType ] })
+      history.push('/ui/openstack/storage#volumeTypes')
     } catch (err) {
       console.error(err)
     }
@@ -29,7 +26,7 @@ class AddVolumeTypePage extends React.Component {
 
   render () {
     return (
-      <FormWrapper title="Add Volume Type" backUrl="/ui/openstack/storage#volumetypes">
+      <FormWrapper title="Add Volume Type" backUrl="/ui/openstack/storage#volumes">
         <AddVolumeTypeForm onComplete={this.handleAdd} />
       </FormWrapper>
     )
@@ -37,7 +34,7 @@ class AddVolumeTypePage extends React.Component {
 }
 
 export default compose(
+  withAppContext,
   withRouter,
-  withApollo,
   requiresAuthentication
 )(AddVolumeTypePage)

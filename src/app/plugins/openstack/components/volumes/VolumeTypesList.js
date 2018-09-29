@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { keyValueArrToObj } from 'core/fp'
 
 import ListTable from 'core/common/ListTable'
 
@@ -8,7 +9,7 @@ const columns = [
   { id: 'description', label: 'Description' },
   { id: 'is_public', label: 'Public?' },
   { id: 'volume_backend_name', label: 'Volume Backend' },
-  { id: 'extra_specs', label: 'Metadata' },
+  { id: 'extra_specs', label: 'Metadata', render: data => JSON.stringify(keyValueArrToObj(data)) },
 ]
 
 class VolumeTypesList extends React.Component {
