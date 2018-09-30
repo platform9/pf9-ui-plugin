@@ -26,7 +26,7 @@ class AddVolumeTypePage extends React.Component {
 
   render () {
     return (
-      <FormWrapper title="Add Volume Type" backUrl="/ui/openstack/storage#volumes">
+      <FormWrapper title="Add Volume Type" backUrl="/ui/openstack/storage#volumeTypes">
         <AddVolumeTypeForm onComplete={this.handleAdd} />
       </FormWrapper>
     )
