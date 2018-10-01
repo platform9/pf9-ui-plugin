@@ -11,7 +11,7 @@ class FlavorsListContainer extends React.Component {
     const { nova } = context.openstackClient
     await nova.deleteFlavor(id)
     const newFlavors = flavors.filter(x => x.id !== id)
-    setContext({ flavors: newFlavors })
+    await setContext({ flavors: newFlavors })
   }
 
   render () {

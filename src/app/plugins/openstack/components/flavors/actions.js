@@ -1,4 +1,6 @@
-export const loadFlavors = async ({ setContext, context }) => {
+export const loadFlavors = async ({ setContext, context, reload }) => {
+  if (!reload && context.flavors) { return context.flavors }
   const flavors = await context.openstackClient.nova.getFlavors()
-  setContext({ flavors })
+  await setContext({ flavors })
+  return flavors
 }

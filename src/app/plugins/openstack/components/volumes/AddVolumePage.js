@@ -5,13 +5,15 @@ import { withRouter } from 'react-router-dom'
 import { compose } from 'core/fp'
 import requiresAuthentication from '../../util/requiresAuthentication'
 import { withAppContext } from 'core/AppContext'
+import { loadVolumes } from './actions'
 
 class AddVolumePage extends React.Component {
   handleAdd = async volume => {
     const { setContext, context, history } = this.props
     try {
-      const createdVolume = await context.openstackClient.cinder.createVolume(volume)
-      setContext({ volumes: [ ...context.volumes, createdVolume ] })
+      const existing = await loadVolumes({ setContext, context })
+      const created = await context.openstackClient.cinder.createVolume(volume)
+      setContext({ volumes: [ ...existing, created ] })
       history.push('/ui/openstack/storage#volumes')
     } catch (err) {
       console.error(err)

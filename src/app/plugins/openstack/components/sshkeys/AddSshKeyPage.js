@@ -5,15 +5,15 @@ import { withRouter } from 'react-router-dom'
 import { compose } from 'core/fp'
 import requiresAuthentication from '../../util/requiresAuthentication'
 import { withAppContext } from 'core/AppContext'
+import { loadSshKeys } from './actions'
 
 class AddSshKeyPage extends React.Component {
   handleAdd = async sshKey => {
     const { setContext, context, history } = this.props
     try {
-      const body = { keypair: sshKey }
-      const response = await context.openstackClient.nova.createSshKey(body)
-      const createdSshKey = response.keypair
-      setContext({ sshKeys: [ ...context.sshKeys, createdSshKey ] })
+      const existing = await loadSshKeys({ context, setContext })
+      const createdSshKey = await context.openstackClient.nova.createSshKey(sshKey)
+      setContext({ sshKeys: [ ...existing, createdSshKey ] })
       history.push('/ui/openstack/sshkeys')
     } catch (err) {
       console.error(err)

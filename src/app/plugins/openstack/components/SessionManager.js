@@ -34,8 +34,8 @@ class SessionManager extends React.Component {
 
   get keystone () { return this.props.context.openstackClient.keystone }
 
-  setSession (newState = {}) {
-    this.props.setContext(state => ({
+  setSession (newState = {}, cb) {
+    return this.props.setContext(state => ({
       ...state,
       session: {
         ...state.session,
@@ -61,12 +61,14 @@ class SessionManager extends React.Component {
     const { keystone } = context.openstackClient
     await keystone.changeProjectScope(activeTenant.id)
 
-    this.setSession({
+    await this.setSession({
       unscopedToken,
       username,
       loginSuccessful: true,
       userPreferences: prefs,
     })
+
+    setContext({ initialized: true })
 
     if (location.pathname === '/ui/openstack/login') {
       history.push('/ui/openstack/dashboard')
@@ -75,7 +77,11 @@ class SessionManager extends React.Component {
 
   render () {
     const { context, children } = this.props
-    const { session } = context
+    const { session, initialized } = context
+
+    if (!initialized) {
+      return <div>Loading app...</div>
+    }
 
     if (!session || !session.loginSuccessful) {
       return <LoginPage onAuthSuccess={this.initialSetup} />

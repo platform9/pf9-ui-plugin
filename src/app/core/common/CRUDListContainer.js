@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { withRouter } from 'react-router-dom'
 import { compose, withApollo } from 'react-apollo'
 import ConfirmationDialog from './ConfirmationDialog'
+import { asyncForEach } from 'core/fp'
 
 class CRUDListContainer extends React.Component {
   componentDidMount () {
@@ -36,11 +37,11 @@ class CRUDListContainer extends React.Component {
     this.setState({ showConfirmation: false })
   }
 
-  handleDeleteConfirm = () => {
+  handleDeleteConfirm = async () => {
     const { uniqueIdentifier } = this.props
     this.setState({ showConfirmation: false })
     const items = this.state.selectedItems || []
-    items.forEach(item => this.handleRemove(item[uniqueIdentifier]))
+    await asyncForEach(items, item => this.handleRemove(item[uniqueIdentifier]))
 
     this.setState({ selectedItems: [] })
     // The user resolves the promise by clicking "confirm".
@@ -64,7 +65,7 @@ class CRUDListContainer extends React.Component {
     }
 
     if (onRemove) {
-      onRemove(id)
+      await onRemove(id)
     }
   }
 

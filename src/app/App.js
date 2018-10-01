@@ -51,7 +51,7 @@ class App extends React.Component {
     return (
       <Router>
         <MuiThemeProvider theme={theme}>
-          <AppContext initialContext={{ openstackClient }}>
+          <AppContext initialContext={{ openstackClient, initialized: false }}>
             <div id="_main-container">
               <SessionManager>
                 <Navbar links={pluginManager.getNavItems()}>

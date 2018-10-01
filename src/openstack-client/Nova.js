@@ -24,14 +24,14 @@ class Nova {
   sshKeysUrl = async () => `${await this.endpoint()}/os-keypairs`
 
   async getFlavors () {
-    const url = `${await this.flavorsUrl()}/detail`
+    const url = `${await this.flavorsUrl()}/detail?is_public=no`
     const response = await axios.get(url, this.client.getAuthHeaders())
     return response.data.flavors
   }
 
   async createFlavor (params) {
     // The Nova API has an unfortunately horribly named key for public.
-    const converted = renameKey('public', 'os-flavor-access:is_public')(params.flavor)
+    const converted = renameKey('public', 'os-flavor-access:is_public')(params)
     const body = { flavor: converted }
     const url = await this.flavorsUrl()
     const response = await axios.post(url, body, this.client.getAuthHeaders())
@@ -60,13 +60,13 @@ class Nova {
   async getSshKeys () {
     const url = `${await this.sshKeysUrl()}`
     const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.keypairs
+    return response.data.keypairs.map(x => x.keypair)
   }
 
   async createSshKey (params) {
     const url = await this.sshKeysUrl()
-    const response = await axios.post(url, params, this.client.getAuthHeaders())
-    return response.data
+    const response = await axios.post(url, { keypair: params }, this.client.getAuthHeaders())
+    return response.data.keypair
   }
 
   async deleteSshKey (id) {

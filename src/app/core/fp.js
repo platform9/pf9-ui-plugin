@@ -63,3 +63,10 @@ export const keyValueArrToObj = (arr = []) => arr.reduce(
   },
   {}
 )
+
+// Wait for each iteration to complete before continuing to the next (serial)
+export const asyncForEach = async (arr, callback) => {
+  for (let i=0; i<arr.length; i++) {
+    await callback(arr[i], i, arr)
+  }
+}

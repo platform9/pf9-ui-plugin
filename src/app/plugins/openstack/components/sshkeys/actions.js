@@ -1,5 +1,5 @@
 export const loadSshKeys = async ({ setContext, context }) => {
-  const response = await context.openstackClient.nova.getSshKeys()
-  const sshKeys = response.map(key => key.keypair)
+  const sshKeys = await context.openstackClient.nova.getSshKeys()
   setContext({ sshKeys })
+  return sshKeys
 }

@@ -17,8 +17,15 @@ class AppContext extends React.Component {
     ...this.props.initialContext,
 
     setContext: (...args) => {
-      this.setState(...args)
-      setImmediate(() => { window.context = this.state })
+      // If the `setState` async callback is not passed in default to
+      // return a Promise.
+      return new Promise((resolve, reject) => {
+        if (args.length > 1) {
+          return this.setState(...args)
+        }
+        setImmediate(() => { window.context = this.state })
+        this.setState(...args, resolve)
+      })
     },
 
     // Utility function that sets both context.session.userPreferences[key] and

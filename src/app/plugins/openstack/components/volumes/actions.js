@@ -1,8 +1,10 @@
 import { objToKeyValueArr, keyValueArrToObj } from 'core/fp'
 
-export const loadVolumes = async ({ setContext, context }) => {
+export const loadVolumes = async ({ setContext, context, reload }) => {
+  if (!reload && context.volumes) { return context.volumes }
   const volumes = await context.openstackClient.cinder.getVolumes()
-  setContext({ volumes })
+  await setContext({ volumes })
+  return volumes
 }
 
 export const updateVolume = async ({ setContext }) => {
