@@ -11,11 +11,15 @@ import {
 
 class EnhancedTableHead extends React.Component {
   createSortHandler = property => event => {
-    this.props.onRequestSort(event, property)
+    const { onRequestSort } = this.props
+    if (onRequestSort) {
+      onRequestSort(event, property)
+    }
   }
 
   render () {
     const {
+      blankFirstColumn,
       checked,
       columns,
       numSelected,
@@ -38,10 +42,13 @@ class EnhancedTableHead extends React.Component {
       </TableCell>
     ) : null
 
+    const firstBlank = blankFirstColumn ? <TableCell padding="checkbox" key="_firstBlank" /> : null
+
     return (
       <TableHead>
         <TableRow>
           {headerCheckbox}
+          {firstBlank}
           {columns.map(column => {
             return (
               <TableCell
@@ -51,7 +58,7 @@ class EnhancedTableHead extends React.Component {
                 sortDirection={orderBy === column.id ? order : false}
               >
                 <Tooltip
-                  title="Sort"
+                  title={column.label}
                   placement={column.numeric ? 'bottom-end' : 'bottom-start'}
                   enterDelay={300}
                 >
@@ -75,14 +82,19 @@ class EnhancedTableHead extends React.Component {
 
 EnhancedTableHead.propTypes = {
   columns: PropTypes.arrayOf(PropTypes.object).isRequired,
-  numSelected: PropTypes.number.isRequired,
-  onRequestSort: PropTypes.func.isRequired,
-  onSelectAllClick: PropTypes.func.isRequired,
-  order: PropTypes.string.isRequired,
-  orderBy: PropTypes.string.isRequired,
-  rowCount: PropTypes.number.isRequired,
+  numSelected: PropTypes.number,
+  onRequestSort: PropTypes.func,
+  onSelectAllClick: PropTypes.func,
+  order: PropTypes.string,
+  orderBy: PropTypes.string,
+  rowCount: PropTypes.number,
   showCheckboxes: PropTypes.bool,
   showRowActions: PropTypes.bool,
+  blankFirstColumn: PropTypes.bool,
+}
+
+EnhancedTableHead.defaultProps = {
+  numSelected: 0,
 }
 
 export default EnhancedTableHead

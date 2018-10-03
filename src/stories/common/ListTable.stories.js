@@ -10,16 +10,15 @@ const onEdit = action('edit')
 const onRestart = action('restart')
 
 const columns = [
-  { id: 'word', label: 'Word' },
-  { id: 'integer', label: 'Integer' },
+  { id: 'id', label: 'integer' },
+  { id: 'word', label: 'word' },
 ]
 
 const data = [
-  { word: 'one', integer: 1 },
-  { word: 'two', integer: 2 },
-  { word: 'three', integer: 3 },
+  { id: 1, word: 'one' },
+  { id: 2, word: 'two' },
+  { id: 3, word: 'three' },
 ]
-
 const rowActions = [
   { icon: <ReplayIcon />, label: 'Restart', action: onRestart }
 ]
