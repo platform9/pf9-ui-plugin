@@ -2,18 +2,31 @@ import React from 'react'
 import FormWrapper from 'core/common/FormWrapper'
 import AddVolumeForm from './AddVolumeForm'
 import { withRouter } from 'react-router-dom'
-import { compose } from 'core/fp'
+import { asyncMap, compose, keyValueArrToObj, range } from 'core/fp'
 import requiresAuthentication from '../../util/requiresAuthentication'
 import { withAppContext } from 'core/AppContext'
 import { loadVolumes } from './actions'
+
+const constructBatch = (numVolumes, prefix, data) =>
+  range(1, numVolumes)
+    .map(i => `${prefix || data.name}${i}`)
+    .map(name => ({ ...data, name }))
+    .map(volume => ({
+      ...volume,
+      metadata: keyValueArrToObj(volume.metadata)
+    }))
 
 class AddVolumePage extends React.Component {
   handleAdd = async volume => {
     const { setContext, context, history } = this.props
     try {
+      const { createMultiple, numVolumes, volumeNamePrefix, ...rest } = volume
+      const volumesToCreate = constructBatch(numVolumes, volumeNamePrefix, rest)
       const existing = await loadVolumes({ setContext, context })
-      const created = await context.openstackClient.cinder.createVolume(volume)
-      setContext({ volumes: [ ...existing, created ] })
+      const createdVolumes = await asyncMap(volumesToCreate, data =>
+        context.openstackClient.cinder.createVolume(data, { setContext, context })
+      )
+      setContext({ volumes: [ ...existing, ...createdVolumes ] })
       history.push('/ui/openstack/storage#volumes')
     } catch (err) {
       console.error(err)

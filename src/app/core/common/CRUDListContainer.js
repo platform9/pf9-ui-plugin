@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { withRouter } from 'react-router-dom'
 import { compose, withApollo } from 'react-apollo'
 import ConfirmationDialog from './ConfirmationDialog'
-import { asyncForEach } from 'core/fp'
+import { asyncMap } from 'core/fp'
 
 class CRUDListContainer extends React.Component {
   componentDidMount () {
@@ -41,7 +41,7 @@ class CRUDListContainer extends React.Component {
     const { uniqueIdentifier } = this.props
     this.setState({ showConfirmation: false })
     const items = this.state.selectedItems || []
-    await asyncForEach(items, item => this.handleRemove(item[uniqueIdentifier]))
+    await asyncMap(items, item => this.handleRemove(item[uniqueIdentifier]))
 
     this.setState({ selectedItems: [] })
     // The user resolves the promise by clicking "confirm".

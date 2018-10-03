@@ -18,9 +18,13 @@ class TextField extends React.Component {
   get restFields () { return filterFields(...withFormContext.propsToExclude)(this.props) }
 
   handleChange = e => {
-    const { id, onChange, setField } = this.props
-    setField(id, e.target.value)
-    if (onChange) { onChange(e.target.value) }
+    const { id, onChange, setField, type } = this.props
+    // HTML specs says that <input type="number"> return strings but it's more useful if we
+    // convert it to a `Number` to reduce type casting all over the place.
+    const strVal = e.target.value
+    const value = (type && type.toLowerCase() === 'number' && strVal !== '') ? Number(strVal) : strVal
+    setField(id, value)
+    if (onChange) { onChange(value) }
   }
 
   render () {
@@ -45,7 +49,7 @@ TextField.propTypes = {
   id: PropTypes.string.isRequired,
   label: PropTypes.string,
   validations: PropTypes.arrayOf(PropTypes.object),
-  initialValue: PropTypes.string,
+  initialValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   onChange: PropTypes.func,
 }
 export default withFormContext(TextField)

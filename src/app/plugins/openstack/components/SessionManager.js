@@ -14,18 +14,21 @@ import { loadTenants } from 'openstack/components/tenants/actions'
  */
 class SessionManager extends React.Component {
   async componentDidMount () {
+    const { history, setContext } = this.props
     // Attempt to restore the session
     const username = getStorage('username')
     let unscopedToken = getStorage('unscopedToken')
 
     if (!username || !unscopedToken) {
-      return this.props.history.push('/ui/openstack/login')
+      setContext({ initialized: true })
+      return history.push('/ui/openstack/login')
     }
 
     // We need to make sure the token has not expired.
     unscopedToken = await this.keystone.renewToken(unscopedToken)
 
     if (!unscopedToken) {
+      setContext({ initialized: true })
       return this.props.history.push('/ui/openstack/login')
     }
 

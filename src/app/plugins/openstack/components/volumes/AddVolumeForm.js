@@ -7,13 +7,14 @@ import Picklist from 'core/common/Picklist'
 import PicklistField from 'core/common/PicklistField'
 import Checkbox from 'core/common/Checkbox'
 import DataLoader from 'core/DataLoader'
+import KeyValuesField from 'core/common/KeyValuesField'
+import VolumeSnapshotChooser from './VolumeSnapshotChooser'
 import { range } from 'core/fp'
-import { loadVolumeTypes } from './actions'
+import { loadVolumeSnapshots, loadVolumeTypes } from './actions'
 
 const initialValue = {
-  size: 0,
   bootable: false,
-  readonly: false,
+  numVolumes: 1,
 }
 const sourceTypes = [
   {value: 'None', label: 'None (empty volume)'},
@@ -23,11 +24,6 @@ const sourceTypes = [
 ]
 
 const schemaSamples = (prefix, num) => range(1, num).map(i => `${prefix}${i}`)
-
-/* placeholders */
-const nop = () => ({})
-const VolumeSnapshotChooser = () => <h2>Volume Snapshot Chooser</h2>
-/* end placeholders */
 
 // See if the data supplied to WizardStep can be raised up to AddVolumeForm state
 class AddVolumeForm extends React.Component {
@@ -57,7 +53,7 @@ class AddVolumeForm extends React.Component {
                 <Picklist name="sourceType" label="Volume Source" value={sourceType} onChange={this.setField('sourceType')} options={sourceTypes} />
                 {sourceType === 'Snapshot' &&
                   <ValidatedForm initialValue={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
-                    <DataLoader dataKey="volumeSnapshots" loaderFn={nop}>
+                    <DataLoader dataKey="volumeSnapshots" loaderFn={loadVolumeSnapshots}>
                       {({ data }) =>
                         <VolumeSnapshotChooser snapshots={data} onChange={value => setWizardContext({ volumeSnapshot: value })} />
                       }
@@ -84,12 +80,12 @@ class AddVolumeForm extends React.Component {
                       <TextField id="name" label="Volume Name" onChange={this.setField('name')} />
                       <TextField id="description" label="Description" />
                       <PicklistField id="volumeType" label="Volume Type" options={(data || []).map(x => x.name)} showNone />
-                      <TextField id="size" label="Capacity (GB)" type="number" />
+                      <TextField id="size" label="Capacity (GB)" type="number" initialValue={1} />
                       <Checkbox id="bootable" label="Bootable" />
                       <Checkbox id="createMultiple" label="Create multiple?" onChange={this.setField('createMultiple')} />
                       {createMultiple &&
                         <React.Fragment>
-                          <TextField id="numVolumes" label="Number of volumes" type="number" initialValue="1" onChange={this.setField('numVolumes')} />
+                          <TextField id="numVolumes" label="Number of volumes" type="number" onChange={this.setField('numVolumes')} />
                           <TextField id="volumeNamePrefix" label="Volume name prefix" initialValue={this.state.name} />
                           <br />
                           {schemaSamples(prefix, Math.min(numVolumes, 3)).map(str => <div key={str}>{str}</div>)}
@@ -102,7 +98,7 @@ class AddVolumeForm extends React.Component {
 
               <WizardStep stepId="metadata" label="Metadata">
                 <ValidatedForm initialValue={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
-                  <TextField id="metadata" label="Metadata" />
+                  <KeyValuesField id="metadata" label="Metadata" />
                 </ValidatedForm>
               </WizardStep>
             </div>

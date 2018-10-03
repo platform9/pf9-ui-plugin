@@ -60,3 +60,13 @@ export const updateVolumeType = async (data, { context, setContext }) => {
   setContext({ volumeTypes })
   return data
 }
+
+export const createVolume = async (data, { context, setContext }) => {
+  const { cinder } = context.openstackClient
+  const created = await cinder.createVolume(data)
+  if (data.bootable) {
+    await cinder.setBootable(created.id, true)
+    created.bootable = true
+  }
+  return created
+}
