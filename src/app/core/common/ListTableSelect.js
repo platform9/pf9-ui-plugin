@@ -26,7 +26,7 @@ const styles = theme => ({
 })
 
 class ListTableSelect extends React.Component {
-  state = { selected: null }
+  state = { selected: this.props.initialValue }
 
   handleClick = row => event => {
     const { onChange } = this.props
@@ -99,6 +99,7 @@ ListTableSelect.propTypes = {
   columns: PropTypes.arrayOf(PropTypes.object).isRequired,
   data: PropTypes.arrayOf(PropTypes.object).isRequired,
   onChange: PropTypes.func,
+  initialValue: PropTypes.any,
 }
 
 ListTableSelect.defaultProps = {

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 import ListTable from 'core/common/ListTable'
 
-const columns = [
+export const columns = [
   { id: 'id', label: 'OpenStack ID' },
   { id: 'name', label: 'Name' },
   { id: 'description', label: 'Description' },

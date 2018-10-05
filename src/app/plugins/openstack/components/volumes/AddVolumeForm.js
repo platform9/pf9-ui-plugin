@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import React from 'react'
 import Wizard from 'core/common/Wizard'
 import WizardStep from 'core/common/WizardStep'
@@ -8,9 +9,12 @@ import PicklistField from 'core/common/PicklistField'
 import Checkbox from 'core/common/Checkbox'
 import DataLoader from 'core/DataLoader'
 import KeyValuesField from 'core/common/KeyValuesField'
+import ImageChooser from '../images/ImageChooser.js'
+import VolumeChooser from './VolumeChooser'
 import VolumeSnapshotChooser from './VolumeSnapshotChooser'
 import { range } from 'core/fp'
-import { loadVolumeSnapshots, loadVolumeTypes } from './actions'
+import { loadVolumes, loadVolumeSnapshots, loadVolumeTypes } from './actions'
+import { loadImages } from '../images/actions'
 
 const initialValue = {
   bootable: false,
@@ -41,11 +45,20 @@ class AddVolumeForm extends React.Component {
     }
   }
 
-  render () {
+  handleComplete = data => {
     const { onComplete } = this.props
+    const { sourceType } = this.state
+    const { snapshot_id, volume_id, imageRef, ...volume } = data
+    if (sourceType === 'Snapshot') { volume.snapshot_id = snapshot_id }
+    if (sourceType === 'Another Volume') { volume.volume_id = volume_id }
+    if (sourceType === 'Image') { volume.imageRef = imageRef }
+    onComplete(volume)
+  }
+
+  render () {
     const { createMultiple, prefix, numVolumes, sourceType } = this.state
     return (
-      <Wizard onComplete={onComplete} context={initialValue} submitLabel="Add Volume">
+      <Wizard onComplete={this.handleComplete} context={initialValue} submitLabel="Add Volume">
         {({ wizardContext, setWizardContext, onNext }) => {
           return (
             <div>
@@ -55,20 +68,27 @@ class AddVolumeForm extends React.Component {
                   <ValidatedForm initialValue={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                     <DataLoader dataKey="volumeSnapshots" loaderFn={loadVolumeSnapshots}>
                       {({ data }) =>
-                        <VolumeSnapshotChooser snapshots={data} onChange={value => setWizardContext({ volumeSnapshot: value })} />
+                        <VolumeSnapshotChooser data={data} onChange={value => setWizardContext({ snapshot_id: value })} initialValue={wizardContext.snapshot_id} />
                       }
                     </DataLoader>
-                    <h1>Volume Snapshots</h1>
                   </ValidatedForm>
                 }
                 {sourceType === 'Another Volume' &&
                   <ValidatedForm initialValue={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
-                    <h1>Another Volume</h1>
+                    <DataLoader dataKey="volumes" loaderFn={loadVolumes}>
+                      {({ data }) =>
+                        <VolumeChooser data={data} onChange={value => setWizardContext({ volume_id: value })} initialValue={wizardContext.volume_id} />
+                      }
+                    </DataLoader>
                   </ValidatedForm>
                 }
                 {sourceType === 'Image' &&
                   <ValidatedForm initialValue={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
-                    <h1>Image</h1>
+                    <DataLoader dataKey="images" loaderFn={loadImages}>
+                      {({ data }) =>
+                        <ImageChooser data={data} onChange={value => setWizardContext({ imageRef: value })} initialValue={wizardContext.imageRef} />
+                      }
+                    </DataLoader>
                   </ValidatedForm>
                 }
               </WizardStep>

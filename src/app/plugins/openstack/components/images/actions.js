@@ -1,6 +1,8 @@
-export const loadImages = async ({ setContext, context }) => {
+export const loadImages = async ({ setContext, context, reload }) => {
+  if (!reload && context.images) { return context.images }
   const images = await context.openstackClient.glance.getImages()
   setContext({ images })
+  return images
 }
 
 export const updateImage = async (data, helpers) => {
