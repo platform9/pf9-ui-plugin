@@ -20,7 +20,7 @@ const convertVolumeType = x => {
 class VolumeTypesListContainer extends React.Component {
   handleRemove = async id => {
     const { volumeTypes, setContext, context } = this.props
-    const { cinder } = context.openstackClient
+    const { cinder } = context.apiClient
     await cinder.deleteVolumeType(id)
     const newVolumeTypes = volumeTypes.filter(x => x.id !== id)
     setContext({ volumeTypes: newVolumeTypes })

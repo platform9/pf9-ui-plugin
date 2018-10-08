@@ -1,6 +1,6 @@
 export const loadImages = async ({ setContext, context, reload }) => {
   if (!reload && context.images) { return context.images }
-  const images = await context.openstackClient.glance.getImages()
+  const images = await context.apiClient.glance.getImages()
   setContext({ images })
   return images
 }
@@ -20,7 +20,7 @@ export const updateImage = async (data, helpers) => {
 
   // TODO: tags
 
-  const updatedImage = await context.openstackClient.glance.updateImage(body, initialValue.id)
+  const updatedImage = await context.apiClient.glance.updateImage(body, initialValue.id)
 
   // This should return the response of the client
   return updatedImage

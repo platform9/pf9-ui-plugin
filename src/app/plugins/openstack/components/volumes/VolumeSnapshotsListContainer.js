@@ -8,7 +8,7 @@ import { withAppContext } from 'core/AppContext'
 class VolumeSnapshotsListContainer extends React.Component {
   handleRemove = async id => {
     const { context, setContext } = this.props
-    await context.openstackClient.cinder.deleteSnapshot(id)
+    await context.apiClient.cinder.deleteSnapshot(id)
     const newVolumeSnapshots = context.volumeSnapshots.filter(x => x.id !== id)
     setContext({ volumeSnapshots: newVolumeSnapshots })
   }

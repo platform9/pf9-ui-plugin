@@ -10,7 +10,7 @@ import { withRouter } from 'react-router'
 class VolumesListContainer extends React.Component {
   handleRemove = async id => {
     const { context, setContext } = this.props
-    await context.openstackClient.cinder.deleteVolume(id)
+    await context.apiClient.cinder.deleteVolume(id)
     const newVolumes = context.volumes.filter(x => x.id !== id)
     setContext({ volumes: newVolumes })
   }

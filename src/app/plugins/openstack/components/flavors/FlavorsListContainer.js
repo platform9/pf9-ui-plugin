@@ -8,8 +8,7 @@ import { withAppContext } from 'core/AppContext'
 class FlavorsListContainer extends React.Component {
   handleRemove = async id => {
     const { flavors, setContext, context } = this.props
-    const { nova } = context.openstackClient
-    await nova.deleteFlavor(id)
+    await context.apiClient.nova.deleteFlavor(id)
     const newFlavors = flavors.filter(x => x.id !== id)
     await setContext({ flavors: newFlavors })
   }

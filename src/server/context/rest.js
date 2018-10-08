@@ -1,4 +1,4 @@
-import OpenstackClient from '../../openstack-client'
+import ApiClient from '../../api-client'
 import config from '../../../config'
 
 // The GraphQL schema does not like null values for disk, ram, and vcpus
@@ -63,7 +63,7 @@ class Context {
 }
 
 const context = new Context()
-context.client = new OpenstackClient({
+context.client = new ApiClient({
   keystoneEndpoint: `${config.apiHost}/keystone`
 })
 

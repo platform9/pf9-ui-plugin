@@ -13,7 +13,7 @@ import './app.css'
 import { setupFromConfig } from './util/registry'
 import config from '../../config'
 import AppContext from 'core/AppContext'
-import OpenstackClient from '../openstack-client'
+import ApiClient from '../api-client'
 import SessionManager from './plugins/openstack/components/SessionManager'
 
 setupFromConfig(config)
@@ -21,8 +21,8 @@ window.process = process
 
 if (!config.apiHost) { throw new Error('config.js does not contain "apiHost"') }
 
-const openstackClient = new OpenstackClient({ keystoneEndpoint: `${config.apiHost}/keystone` })
-openstackClient.setActiveRegion(config.region)
+const apiClient = new ApiClient({ keystoneEndpoint: `${config.apiHost}/keystone` })
+apiClient.setActiveRegion(config.region)
 
 class App extends React.Component {
   render () {
@@ -51,7 +51,7 @@ class App extends React.Component {
     return (
       <Router>
         <MuiThemeProvider theme={theme}>
-          <AppContext initialContext={{ openstackClient, initialized: false }}>
+          <AppContext initialContext={{ apiClient, initialized: false }}>
             <div id="_main-container">
               <SessionManager>
                 <Navbar links={pluginManager.getNavItems()}>

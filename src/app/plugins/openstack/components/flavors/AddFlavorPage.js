@@ -12,7 +12,7 @@ class AddFlavorPage extends React.Component {
     const { setContext, context, history } = this.props
     try {
       const existing = await loadFlavors({ setContext, context })
-      const createdFlavor = await context.openstackClient.nova.createFlavor(flavor)
+      const createdFlavor = await context.apiClient.nova.createFlavor(flavor)
       setContext({ flavors: [ ...existing, createdFlavor ] })
       history.push('/ui/openstack/flavors')
     } catch (err) {

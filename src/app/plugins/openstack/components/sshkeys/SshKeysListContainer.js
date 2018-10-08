@@ -11,7 +11,7 @@ const sshKeyUniqueIdentifier = 'name'
 class SshKeysListContainer extends React.Component {
   handleRemove = async id => {
     const { sshKeys, setContext, context } = this.props
-    const { nova } = context.openstackClient
+    const { nova } = context.apiClient
     await nova.deleteSshKey(id)
     const newSshKeys = sshKeys.filter(x => x[sshKeyUniqueIdentifier] !== id)
     setContext({ sshKeys: newSshKeys })

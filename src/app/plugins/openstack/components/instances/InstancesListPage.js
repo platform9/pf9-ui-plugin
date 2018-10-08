@@ -6,7 +6,7 @@ import requiresAuthentication from '../../util/requiresAuthentication'
 import DataLoader from 'core/DataLoader'
 
 const loadInstances = async ({ setContext, context }) => {
-  const instances = await context.openstackClient.nova.getInstances()
+  const instances = await context.apiClient.nova.getInstances()
   setContext({ instances })
 }
 

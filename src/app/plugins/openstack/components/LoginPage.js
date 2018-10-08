@@ -75,7 +75,7 @@ export class LoginPage extends React.Component {
     event.preventDefault()
     const { onAuthSuccess, context } = this.props
     const { username, password } = this.state
-    const { keystone } = context.openstackClient
+    const { keystone } = context.apiClient
 
     this.setState({ loginFailed: false, loading: true })
     const unscopedToken = await keystone.authenticate(username, password)

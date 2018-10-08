@@ -6,8 +6,8 @@ import requiresAuthentication from '../../util/requiresAuthentication'
 import DataLoader from 'core/DataLoader'
 
 const loadHosts = async ({ setContext, context }) => {
-  // const hosts = await context.openstackClient.resmgr.getHosts()
-  const hosts = await context.openstackClient.nova.getHypervisors()
+  // const hosts = await context.apiClient.resmgr.getHosts()
+  const hosts = await context.apiClient.nova.getHypervisors()
   setContext({ hosts })
 }
 

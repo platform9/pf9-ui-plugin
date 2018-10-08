@@ -2,7 +2,7 @@ import { objToKeyValueArr, keyValueArrToObj } from 'core/fp'
 
 export const loadVolumes = async ({ setContext, context, reload }) => {
   if (!reload && context.volumes) { return context.volumes }
-  const volumes = await context.openstackClient.cinder.getVolumes()
+  const volumes = await context.apiClient.cinder.getVolumes()
   await setContext({ volumes })
   return volumes
 }
@@ -12,7 +12,7 @@ export const updateVolume = async ({ setContext }) => {
 }
 
 export const loadVolumeTypes = async ({ setContext, context }) => {
-  const volumeTypes = await context.openstackClient.cinder.getVolumeTypes()
+  const volumeTypes = await context.apiClient.cinder.getVolumeTypes()
 
   // Change metadata into array form
   const converted = (volumeTypes || []).map(x => ({...x, extra_specs: objToKeyValueArr(x.extra_specs)}))
@@ -24,7 +24,7 @@ export const loadVolumeTypes = async ({ setContext, context }) => {
 export const loadVolumeSnapshots = async ({ setContext, context, reload }) => {
   if (!reload && context.volumeSnapshots) { return context.volumeSnapshots }
 
-  const volumeSnapshots = await context.openstackClient.cinder.getSnapshots()
+  const volumeSnapshots = await context.apiClient.cinder.getSnapshots()
 
   // Change metadata into array form
   const converted = (volumeSnapshots || []).map(x => ({...x, metadata: objToKeyValueArr(x.metadata)}))
@@ -34,7 +34,7 @@ export const loadVolumeSnapshots = async ({ setContext, context, reload }) => {
 
 export const updateVolumeSnapshot = async (data, { context, setContext }) => {
   const { id } = data
-  const { cinder } = context.openstackClient
+  const { cinder } = context.apiClient
   const updated = await cinder.updateSnapshot(id, data)
   cinder.updateSnapshotMetadata(id, keyValueArrToObj(data.metadata))
   updated.metadata = data.metadata
@@ -47,7 +47,7 @@ export const updateVolumeSnapshot = async (data, { context, setContext }) => {
 
 export const updateVolumeType = async (data, { context, setContext }) => {
   const { id } = data
-  const { cinder } = context.openstackClient
+  const { cinder } = context.apiClient
   const converted = {
     name: data.name,
     extra_specs: keyValueArrToObj(data.extra_specs),
@@ -62,7 +62,7 @@ export const updateVolumeType = async (data, { context, setContext }) => {
 }
 
 export const createVolume = async (data, { context, setContext }) => {
-  const { cinder } = context.openstackClient
+  const { cinder } = context.apiClient
   const created = await cinder.createVolume(data)
   if (data.bootable) {
     await cinder.setBootable(created.id, true)

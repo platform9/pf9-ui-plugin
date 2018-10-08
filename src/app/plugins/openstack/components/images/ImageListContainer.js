@@ -8,7 +8,7 @@ import { withAppContext } from 'core/AppContext'
 class ImageListContainer extends React.Component {
   handleRemove = async id => {
     const { images, setContext, context } = this.props
-    const { glance } = context.openstackClient
+    const { glance } = context.apiClient
     await glance.deleteImage(id)
     const newImages = images.filter(x => x.id !== id)
     setContext({ images: newImages })

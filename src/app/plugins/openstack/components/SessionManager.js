@@ -35,7 +35,7 @@ class SessionManager extends React.Component {
     this.initialSetup({ username, unscopedToken })
   }
 
-  get keystone () { return this.props.context.openstackClient.keystone }
+  get keystone () { return this.props.context.apiClient.keystone }
 
   setSession (newState = {}, cb) {
     return this.props.setContext(state => ({
@@ -61,7 +61,7 @@ class SessionManager extends React.Component {
     const tenants = await loadTenants({ context, setContext })
     setContext({ tenants })
     const activeTenant = tenants.find(x => x.name === lastTenant)
-    const { keystone } = context.openstackClient
+    const { keystone } = context.apiClient
     await keystone.changeProjectScope(activeTenant.id)
 
     await this.setSession({

@@ -79,7 +79,7 @@ module.exports = {
       k8s: path.resolve(__dirname, 'src/app/plugins/kubernetes'),
       sim: path.resolve(__dirname, 'src/openstack-simulator'),
       schema: path.resolve(__dirname, 'src/graphql'),
-      'openstack-client': path.resolve(__dirname, 'src/openstack-client'),
+      'api-client': path.resolve(__dirname, 'src/api-client'),
     }
   }
 }

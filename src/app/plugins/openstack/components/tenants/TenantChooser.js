@@ -41,7 +41,7 @@ class TenantChooser extends React.Component {
     if (!tenant) { return }
     setContext({ currentTenant: tenant })
 
-    const { keystone } = context.openstackClient
+    const { keystone } = context.apiClient
     await keystone.changeProjectScope(tenant.id)
     this.resetTenantScopedContext(tenant)
   }

@@ -15,7 +15,7 @@ class AddVolumeTypePage extends React.Component {
         name: data.name,
         extra_specs: keyValueArrToObj(data.metadata),
       }
-      const createdVolumeType = await context.openstackClient.cinder.createVolumeType(volumeType)
+      const createdVolumeType = await context.apiClient.cinder.createVolumeType(volumeType)
       const existingVolumeTypes = await loadVolumeTypes({ setContext, context })
       setContext({ volumeTypes: [ ...existingVolumeTypes, createdVolumeType ] })
       history.push('/ui/openstack/storage#volumeTypes')

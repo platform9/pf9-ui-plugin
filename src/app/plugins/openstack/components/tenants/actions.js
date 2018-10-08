@@ -31,7 +31,7 @@ export const UPDATE_TENANT = gql`
 export const loadTenants = async ({ setContext, context, reload }) => {
   if (!reload && context.tenants) { return context.tenants }
 
-  const tenants = await context.openstackClient.keystone.getProjects()
+  const tenants = await context.apiClient.keystone.getProjects()
   setContext({ tenants })
   return tenants
 }
