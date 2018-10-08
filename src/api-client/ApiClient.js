@@ -9,7 +9,7 @@ import Nova from './Nova'
 import Qbert from './Qbert'
 import ResMgr from './ResMgr'
 
-class OpenstackClient {
+class ApiClient {
   constructor (options = {}) {
     this.options = options
     if (!options.keystoneEndpoint) {
@@ -46,7 +46,7 @@ class OpenstackClient {
     const options = {
       keystoneEndpoint: state.keystoneEndpoint
     }
-    const client = new OpenstackClient(options)
+    const client = new ApiClient(options)
     client.catalog = state.catalog
     return client
   }
@@ -100,4 +100,4 @@ class OpenstackClient {
   }
 }
 
-export default OpenstackClient
+export default ApiClient

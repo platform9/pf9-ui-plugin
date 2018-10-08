@@ -1,10 +1,10 @@
 import config from '../../config'
-import OpenstackClient from './OpenstackClient'
+import ApiClient from './ApiClient'
 
 const defaultTestTenant = 'Development Team Tenant'
 
 export const keystoneEndpoint = `${config.host}/keystone`
-export const makeClient = () => new OpenstackClient({ keystoneEndpoint })
+export const makeClient = () => new ApiClient({ keystoneEndpoint })
 
 export const getUserPass = () => {
   const username = config.username || config.simulator.username

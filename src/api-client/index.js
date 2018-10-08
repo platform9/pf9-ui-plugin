@@ -1,3 +1,3 @@
-import OpenstackClient from './OpenstackClient'
+import ApiClient from './ApiClient'
 
-export default OpenstackClient
+export default ApiClient

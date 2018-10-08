@@ -1,18 +1,18 @@
 import config from '../../../config'
-import OpenstackClient from '../OpenstackClient'
+import ApiClient from '../ApiClient'
 
 const keystoneEndpoint = `${config.host}/keystone`
-const makeClient = () => new OpenstackClient({ keystoneEndpoint })
+const makeClient = () => new ApiClient({ keystoneEndpoint })
 
-describe('OpenstackClient', () => {
+describe('ApiClient', () => {
   it('create a client instance', () => {
-    const client = new OpenstackClient({ keystoneEndpoint })
+    const client = new ApiClient({ keystoneEndpoint })
     expect(client).toBeDefined()
   })
 
   it('requires an endpoint to be set', () => {
-    expect(() => { new OpenstackClient() }).toThrow()
-    expect(() => { new OpenstackClient({ keystoneEndpoint }) }).not.toThrow()
+    expect(() => { new ApiClient() }).toThrow()
+    expect(() => { new ApiClient({ keystoneEndpoint }) }).not.toThrow()
   })
 
   it('includes the keystone API', () => {
@@ -30,7 +30,7 @@ describe('OpenstackClient', () => {
   it('supports hydration', () => {
     const client = makeClient()
     const state = client.serialize()
-    const newClient = OpenstackClient.hydrate(state)
+    const newClient = ApiClient.hydrate(state)
     const newState = newClient.serialize()
     expect(newState.keystoneEndpoint).toEqual(keystoneEndpoint)
   })
