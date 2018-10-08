@@ -95,6 +95,7 @@ class Keystone {
     try {
       const response = await axios.post(this.tokensUrl, body)
       const scopedToken = response.headers['x-subject-token']
+      this.client.activeProjectId = projectId
       this.client.scopedToken = scopedToken
       await this.getServiceCatalog()
       return scopedToken

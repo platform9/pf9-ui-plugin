@@ -1,6 +1,8 @@
 import config from '../../config'
 import OpenstackClient from './OpenstackClient'
 
+const defaultTestTenant = 'Development Team Tenant'
+
 export const keystoneEndpoint = `${config.host}/keystone`
 export const makeClient = () => new OpenstackClient({ keystoneEndpoint })
 
@@ -20,16 +22,16 @@ export const makeUnscopedClient = async () => {
   return client
 }
 
-export const makeScopedClient = async () => {
+export const makeScopedClient = async (tenantName = defaultTestTenant) => {
   const client = await makeUnscopedClient()
   const projects = await client.keystone.getProjects()
-  const project = projects.find(x => x.name === 'Development Team Tenant') || projects[0]
+  const project = projects.find(x => x.name === tenantName) || projects[0]
   await client.keystone.changeProjectScope(project.id)
   return client
 }
 
-export const makeRegionedClient = async () => {
-  const client = await makeScopedClient()
+export const makeRegionedClient = async (tenantName = defaultTestTenant) => {
+  const client = await makeScopedClient(tenantName)
   const regions = await client.keystone.getRegions()
   // currently set KVM-Neutron as default test environment
   client.setActiveRegion(regions.find(x => x.id ==='KVM-Neutron').id || regions[0].id)
