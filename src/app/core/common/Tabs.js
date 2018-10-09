@@ -1,5 +1,5 @@
 import React from 'react'
-import { Grid, Paper, Tabs as MDTabs, Tab as MDTab, Typography } from '@material-ui/core'
+import { Grid, Paper, Tabs as MDTabs, Tab as MDTab } from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles'
 import { withRouter } from 'react-router-dom'
 import { compose } from 'core/fp'
@@ -17,54 +17,52 @@ const styles = theme => ({
   }
 })
 
-const TabContainer = ({ children, dir }) => (
-  <Typography component="div" dir={dir} >{children}</Typography>
-)
-
-class Tab extends React.Component {
-  state = {
-    tabs: [],
-    value: this.props.location.hash,
+class Tabs extends React.Component {
+  addTab = tab => {
+    this.setState(state => ({ tabs: [...state.tabs, tab] }), this.activateDefaultTab)
   }
 
-  activeTab = () => {
+  state = {
+    tabs: [],
+    value: this.props.location.hash || false,
+    addTab: this.addTab,
+  }
+
+  activateDefaultTab = () => {
     const { tabs, value } = this.state
-    return tabs.find(tab => tab.id === value)
+    if (!value && tabs.length > 0) {
+      this.setState({ value: tabs[0].value })
+    }
   }
 
   handleChange = (e, value) => {
     this.setState({ value })
   }
 
-  renderActiveTab = () => {
-    const tab = this.activeTab()
-    if (!tab) { return null }
-    return (
-      <TabContainer>{tab}</TabContainer>
-    )
-  }
-
   render () {
     const { tabs, value } = this.state
+    const { children } = this.props
 
     return (
-      <Grid container justify="center">
-        <Grid item xs={12} zeroMinWidth>
-          <Paper className={this.props.classes.root}>
-            <MDTabs
-              value={value}
-              onChange={this.handleChange}
-              indicatorColor="primary"
-              textColor="primary"
-            >
-              {tabs.map(tab =>
-                <MDTab key={tab.id} value={tab.id} label={tab.label} href={tab.id} />
-              )}
-            </MDTabs>
-            {this.renderActiveTab()}
-          </Paper>
+      <Provider value={this.state}>
+        <Grid container justify="center">
+          <Grid item xs={12} zeroMinWidth>
+            <Paper className={this.props.classes.root}>
+              <MDTabs
+                value={value}
+                onChange={this.handleChange}
+                indicatorColor="primary"
+                textColor="primary"
+              >
+                {tabs.map(tab =>
+                  <MDTab key={tab.value} value={tab.value} label={tab.label} href={tab.value} />
+                )}
+              </MDTabs>
+              {children}
+            </Paper>
+          </Grid>
         </Grid>
-      </Grid>
+      </Provider>
     )
   }
 }
@@ -73,10 +71,11 @@ export const withTabContext = Component => props => {
   return (
     <Consumer>
       {
-        ({ activeTab }) =>
+        ({ value, addTab }) =>
           <Component
             {...props}
-            activeTab={activeTab}
+            activeTab={value}
+            addTab={addTab}
           />
       }
     </Consumer>
@@ -86,4 +85,4 @@ export const withTabContext = Component => props => {
 export default compose(
   withStyles(styles),
   withRouter
-)(Tab)
+)(Tabs)
