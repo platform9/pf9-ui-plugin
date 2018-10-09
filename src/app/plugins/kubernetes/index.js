@@ -1,5 +1,13 @@
 import React from 'react'
 
+import InfrastructurePage from './components/infrastructure/InfrastructurePage'
+import AppsIndexPage from './components/apps/AppsIndexPage'
+import PodsIndexPage from './components/pods/PodsIndexPage'
+import StorageClassesPage from './components/storage/StorageClassesPage'
+import NamespacesPage from './components/namespaces/NamespacesPage'
+import ApiAccessPage from './components/apiAccess/ApiAccessPage'
+import UserManagementIndexPage from './components/userManagement/UserManagementIndexPage'
+
 class Kubernetes extends React.Component {
   render () {
     return (
@@ -9,12 +17,6 @@ class Kubernetes extends React.Component {
 }
 
 Kubernetes.__name__ = 'kubernetes'
-
-const InfrastructurePage = () => <h1>Infrastructure Page</h1>
-const AppCatalogPage = () => <h1>App Catalog Page</h1>
-const PodsPage = () => <h1>Pods, Deployments, Services Page</h1>
-const StorageClassesPage = () => <h1>Storage Classes Page</h1>
-const NamespacesPage = () => <h1>Namespaces Page</h1>
 
 Kubernetes.registerPlugin = pluginManager => {
   pluginManager.registerRoutes(
@@ -28,12 +30,12 @@ Kubernetes.registerPlugin = pluginManager => {
       {
         name: 'App Catalog',
         link: { path: '/apps', exact: true },
-        component: AppCatalogPage
+        component: AppsIndexPage
       },
       {
         name: 'Pods, Deployments, Services',
         link: { path: '/pods', exact: true },
-        component: PodsPage
+        component: PodsIndexPage
       },
       {
         name: 'Storage Classes',
@@ -44,6 +46,16 @@ Kubernetes.registerPlugin = pluginManager => {
         name: 'Namespaces',
         link: { path: '/namespaces', exact: true },
         component: NamespacesPage
+      },
+      {
+        name: 'API Access',
+        link: { path: '/api_access', exact: true },
+        component: ApiAccessPage
+      },
+      {
+        name: 'Tenants & Users',
+        link: { path: '/user_management', exact: true },
+        component: UserManagementIndexPage
       },
     ]
   )
@@ -56,6 +68,8 @@ Kubernetes.registerPlugin = pluginManager => {
       { name: 'Pods, Deployments, Services', link: { path: '/pods' } },
       { name: 'Storage Classes', link: { path: '/storage_classes' } },
       { name: 'Namespaces', link: { path: '/namespaces' } },
+      { name: 'API Access', link: { path: '/api_access' } },
+      { name: 'Tenants & Users', link: { path: '/user_management' } },
     ]
   )
 }

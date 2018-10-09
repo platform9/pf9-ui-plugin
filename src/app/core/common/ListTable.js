@@ -209,7 +209,7 @@ class ListTable extends React.Component {
   }
 
   renderRow = row => {
-    const { columns, showCheckboxes } = this.props
+    const { columns, showCheckboxes, uniqueIdentifier } = this.props
     const isSelected = this.isSelected(row)
 
     const checkboxProps = showCheckboxes ? {
@@ -219,8 +219,10 @@ class ListTable extends React.Component {
       selected: isSelected
     } : {}
 
+    const uid = row[uniqueIdentifier]
+
     return (
-      <TableRow hover key={row.id} {...checkboxProps}>
+      <TableRow hover key={uid} {...checkboxProps}>
         {showCheckboxes &&
           <TableCell padding="checkbox">
             <Checkbox checked={isSelected} color="primary" />
@@ -347,6 +349,14 @@ ListTable.propTypes = {
   onEdit: PropTypes.func,
   paginate: PropTypes.bool,
 
+  /*
+    Some objects have a unique identifier other than 'id'
+    For example sshKeys have unique identifier of 'name' and the APIs
+    rely on using the name as part of the URI. Specify the unique identifier
+    in props if it is different from 'id'
+  */
+  uniqueIdentifier: PropTypes.string,
+
   /**
    * List of action items to make available to each row.
    */
@@ -366,7 +376,8 @@ ListTable.defaultProps = {
   data: [],
   columns: [],
   paginate: true,
-  showCheckboxes: true
+  showCheckboxes: true,
+  uniqueIdentifier: 'id',
 }
 
 export default compose(
