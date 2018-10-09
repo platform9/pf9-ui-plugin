@@ -6,6 +6,9 @@ import { withTabContext } from 'core/common/Tabs'
 class Tab extends React.Component {
   componentDidMount () {
     const { addTab, value, label } = this.props
+
+    // The hash is prefixed to make it compatible with hashes in the URL.
+    // This allows the page to be reloaded and the correct tab to be selected.
     addTab({ value: `#${value}`, label })
   }
 
