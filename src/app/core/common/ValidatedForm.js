@@ -130,7 +130,9 @@ class ValidatedForm extends React.Component {
 }
 
 ValidatedForm.propTypes = {
-  // Url to go back when the operation ends
+  // Url to go back when the operation ends.
+  // TODO: This should be deprecated.  This logic already happens in <FormWrapper />
+  // and can be implemented somewhere up the `onSubmit` chain.
   backUrl: PropTypes.string,
 
   // Initial values

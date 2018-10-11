@@ -52,14 +52,15 @@ class Alert extends React.Component {
   render () {
     if (!this.state.open) { return null }
 
-    const { classes, message, variant } = this.props
+    const { classes, children, message, variant } = this.props
     const Icon = variantIcon[variant]
 
     return (
       <div className={classNames(classes.container, classes[variant])}>
         <span className={classes.message}>
           <Icon className={classNames(classes.icon, classes.iconVariant)} />
-          <Typography variant="body1" color="inherit">{message}</Typography>
+          {message && <Typography variant="body1" color="inherit">{message}</Typography>}
+          {children}
         </span>
         <IconButton
           key='close'
@@ -76,7 +77,12 @@ class Alert extends React.Component {
 }
 
 Alert.propTypes = {
+  // Use children when we want to have larger amount of text and customized rendering.
+  children: PropTypes.any,
+
+  // Use message when it is just a short string of text.
   message: PropTypes.node,
+
   variant: PropTypes.oneOf(['success', 'warning', 'error', 'info']).isRequired,
 }
 

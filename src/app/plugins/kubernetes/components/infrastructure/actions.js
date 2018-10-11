@@ -12,6 +12,12 @@ export const loadCloudProviders = async ({ context, setContext, reload }) => {
   return cloudProviders
 }
 
+export const deleteCloudProvider = async ({ id, context, setContext }) => {
+  await context.apiClient.qbert.deleteCloudProvider(id)
+  const newCps = context.cloudProviders.filter(x => x.id !== id)
+  setContext({ cloudProviders: newCps })
+}
+
 export const loadNodes = async ({ context, setContext, reload }) => {
   if (!reload && context.nodes) { return context.nodes }
   // TODO: Get nodes is not yet implemented
