@@ -1,8 +1,18 @@
+import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { decorateAction } from '@storybook/addon-actions'
 import { withInfo } from '@storybook/addon-info'
 import { withKnobs } from '@storybook/addon-knobs'
 import StoryRouter from 'storybook-react-router'
+import { compose } from 'core/fp'
+import { withAppContext } from 'core/AppContext'
+import { withTheme } from 'app/theme'
+
+import 'app/app.css'
+
+// TODO: get rid of Apollo dependencies
+import { client } from 'app/apollo'
+import { ApolloProvider } from 'react-apollo'
 
 const objToJsonDetails = obj => JSON.stringify(obj, null, 4)
 const isArray = x => x instanceof Array
@@ -12,13 +22,27 @@ export const jsonDetailLogger = decorateAction([
   args => args.map(x => isObject(x) ? objToJsonDetails(x) : x)
 ])
 
-export const withDefaults = (...args) => withInfo()(...args)
+export const withApollo = Component => props =>
+  <ApolloProvider client={client}>
+    <Component {...props} />
+  </ApolloProvider>
+
+export const withWrappings = Component => compose(
+  withTheme,
+  withApollo, // TODO: get rid of this dependency once we remove GraphQL
+  withAppContext,
+)(Component)
+
+const Pf9StoryWrapper = withWrappings(({ children }) => (<div>{ children }</div>))
+
+export const pf9Decorators = storyFn => (<Pf9StoryWrapper>{ storyFn() }</Pf9StoryWrapper>)
 
 export const addStory = (section, subsection, story) =>
   storiesOf(section, module)
     .addDecorator(withKnobs)
     .addDecorator(StoryRouter())
-    .add(subsection, withDefaults(story))
+    .addDecorator(pf9Decorators)
+    .add(subsection, withInfo()(story))
 
 export const addStories = (section, stories) =>
   Object.entries(stories).forEach(

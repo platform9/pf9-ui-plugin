@@ -2,6 +2,7 @@ import React from 'react'
 import Alert from 'core/common/Alert'
 import ValidatedForm from 'core/common/ValidatedForm'
 import Picklist from 'core/common/Picklist'
+import TextField from 'core/common/TextField'
 import createAddComponents from 'core/createAddComponents'
 import { loadCloudProviders, createCloudProvider } from './actions'
 
@@ -48,6 +49,21 @@ export class AddCloudProviderForm extends React.Component {
 
   setField = key => value => { this.setState({ [key]: value }) }
 
+  AWSFields = () => (
+    <div>
+      <AWSHelpText />
+      <TextField id="name" label="Name" />
+      <TextField id="key" label="AWS Access Key ID" />
+      <TextField id="secret" label="Secret Key" />
+    </div>
+  )
+
+  OSFields = () => (
+    <div>
+      <h1>Openstack Fields TODO</h1>
+    </div>
+  )
+
   render () {
     const { type } = this.state
     const { onComplete } = this.props
@@ -59,7 +75,8 @@ export class AddCloudProviderForm extends React.Component {
           onChange={this.setField('type')}
           options={types}
         />
-        {type === 'Amazon AWS Provider' && <AWSHelpText />}
+        {type === 'Amazon AWS Provider' && this.AWSFields()}
+        {type === 'Openstack' && this.OSFields()}
       </ValidatedForm>
     )
   }

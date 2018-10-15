@@ -6,10 +6,11 @@ import {
   Route,
   Switch,
 } from 'react-router-dom'
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core'
+import { MuiThemeProvider } from '@material-ui/core'
 import Navbar from 'core/common/Navbar'
 import LogoutPage from 'openstack/components/LogoutPage'
 import './app.css'
+import theme from './theme'
 import { setupFromConfig } from './util/registry'
 import config from '../../config'
 import AppContext from 'core/AppContext'
@@ -26,18 +27,6 @@ apiClient.setActiveRegion(config.region)
 
 class App extends React.Component {
   render () {
-    const theme = createMuiTheme({
-      palette: {
-        type: this.props.theme,
-        primary: {
-          light: '#aee0ff',
-          main: '#4aa3df',
-          dark: '#1e699c',
-          contrastText: '#fff',
-        }
-      }
-    })
-
     const { pluginManager } = this.props
     const options = pluginManager.getOptions()
     const { showFooter } = options

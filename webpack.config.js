@@ -80,6 +80,6 @@ module.exports = {
       sim: path.resolve(__dirname, 'src/openstack-simulator'),
       schema: path.resolve(__dirname, 'src/graphql'),
       'api-client': path.resolve(__dirname, 'src/api-client'),
-    }
+    },
   }
 }
