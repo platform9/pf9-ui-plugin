@@ -18,10 +18,16 @@ class PicklistField extends React.Component {
     }
   }
 
+  handleChange = value => {
+    const { id, onChange, setField } = this.props
+    setField(id, value)
+    if (onChange) { onChange(value) }
+  }
+
   get restFields () { return filterFields(...withFormContext.propsToExclude)(this.props) }
 
   render () {
-    const { id, label, value, setField, showNone } = this.props
+    const { id, label, value, showNone } = this.props
     const options = showNone ? [{ value: '', label: 'None' }, ...this.props.options] : this.props.options
     return (
       <div id={id}>
@@ -31,7 +37,7 @@ class PicklistField extends React.Component {
           {...this.restFields}
           options={options}
           value={value[id] !== undefined ? value[id] : ''}
-          onChange={value => setField(id, value)}
+          onChange={this.handleChange}
         />
       </div>
     )
@@ -42,13 +48,18 @@ PicklistField.defaultProps = {
   validations: [],
 }
 
+const optionPropType = PropTypes.oneOfType([
+  PropTypes.string,
+  PropTypes.shape({
+    value: PropTypes.string,
+    label: PropTypes.string,
+  })
+])
+
 PicklistField.propTypes = {
   id: PropTypes.string.isRequired,
   label: PropTypes.string,
-  options: PropTypes.arrayOf(PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.object,
-  ])).isRequired,
+  options: PropTypes.arrayOf(optionPropType).isRequired,
   validations: PropTypes.arrayOf(PropTypes.object),
   initialValue: PropTypes.string,
 

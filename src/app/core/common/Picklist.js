@@ -64,13 +64,18 @@ class Picklist extends React.Component {
   }
 }
 
+const optionPropType = PropTypes.oneOfType([
+  PropTypes.string,
+  PropTypes.shape({
+    value: PropTypes.string,
+    label: PropTypes.string,
+  })
+])
+
 Picklist.propTypes = {
   name: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
-  options: PropTypes.arrayOf(PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.object,
-  ])).isRequired,
+  options: PropTypes.arrayOf(optionPropType).isRequired,
   value: PropTypes.string,
   onChange: PropTypes.func,
 }

@@ -1,15 +1,15 @@
 import React from 'react'
 import Alert from 'core/common/Alert'
 import ValidatedForm from 'core/common/ValidatedForm'
-import Picklist from 'core/common/Picklist'
+import PicklistField from 'core/common/PicklistField'
 import SubmitButton from 'core/common/SubmitButton'
 import TextField from 'core/common/TextField'
 import createAddComponents from 'core/createAddComponents'
 import { loadCloudProviders, createCloudProvider } from './actions'
 
 const types = [
-  'Openstack',
-  'Amazon AWS Provider',
+  { value: 'openstack', label: 'Openstack' },
+  { value: 'aws', label: 'Amazon AWS Provider' },
 ]
 
 const AWSHelpText = () => (
@@ -73,17 +73,11 @@ const OpenstackHelpText = () => (
 
 export class AddCloudProviderForm extends React.Component {
   state = {
-    type: types[0],
+    type: types[0].value,
   }
 
   setField = key => value => {
     this.setState({ [key]: value })
-  }
-
-  onTypeChange = value => {
-    this.setState({ type: value })
-    // Update ValidatedForm's data model as well
-    this.props.setField('type', value)
   }
 
   AWSFields = () => (
@@ -114,14 +108,14 @@ export class AddCloudProviderForm extends React.Component {
     const { onComplete } = this.props
     return (
       <ValidatedForm onSubmit={onComplete}>
-        <Picklist name="type"
+        <PicklistField id="type"
           label="Cloud Provider Type"
-          value={type}
-          onChange={this.onTypeChange}
+          onChange={this.setField('type')}
           options={types}
+          initialValue={type}
         />
-        {type === 'Amazon AWS Provider' && this.AWSFields()}
-        {type === 'Openstack' && this.OpenstackFields()}
+        {type === 'aws' && this.AWSFields()}
+        {type === 'openstack' && this.OpenstackFields()}
         <SubmitButton>Add Cloud Provider</SubmitButton>
       </ValidatedForm>
     )
