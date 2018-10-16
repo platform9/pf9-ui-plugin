@@ -2,13 +2,14 @@ import React from 'react'
 import Alert from 'core/common/Alert'
 import ValidatedForm from 'core/common/ValidatedForm'
 import Picklist from 'core/common/Picklist'
+import SubmitButton from 'core/common/SubmitButton'
 import TextField from 'core/common/TextField'
 import createAddComponents from 'core/createAddComponents'
 import { loadCloudProviders, createCloudProvider } from './actions'
 
 const types = [
-  'Amazon AWS Provider',
   'Openstack',
+  'Amazon AWS Provider',
 ]
 
 const AWSHelpText = () => (
@@ -42,12 +43,48 @@ const AWSHelpText = () => (
   </div>
 )
 
+const OpenstackHelpText = () => (
+  <div>
+    <p>
+      Create a new cloud provider to work with an existing OpenStack endpoint. This
+      cloud provider will work using your specified credentials for your OpenStack
+      environment.
+    </p>
+    <p>
+      You can create multiple OpenStack cloud providers - each OpenStack cloud provider
+      should be associated with unique OpenStack credentials.
+    </p>
+    <Alert variant="info">
+      <div>
+        <p>
+          The following services must be present in your OpenStack environment in
+          order to deploy fully automated Managed Kubernetes clusters.
+        </p>
+        <ul>
+          <li>Nova</li>
+          <li>Cinder</li>
+          <li>Neutron</li>
+          <li>Heat</li>
+        </ul>
+      </div>
+    </Alert>
+  </div>
+)
+
 export class AddCloudProviderForm extends React.Component {
   state = {
     type: types[0],
   }
 
-  setField = key => value => { this.setState({ [key]: value }) }
+  setField = key => value => {
+    this.setState({ [key]: value })
+  }
+
+  onTypeChange = value => {
+    this.setState({ type: value })
+    // Update ValidatedForm's data model as well
+    this.props.setField('type', value)
+  }
 
   AWSFields = () => (
     <div>
@@ -58,9 +95,17 @@ export class AddCloudProviderForm extends React.Component {
     </div>
   )
 
-  OSFields = () => (
+  OpenstackFields = () => (
     <div>
-      <h1>Openstack Fields TODO</h1>
+      <OpenstackHelpText />
+      <TextField id="name" label="Name" />
+      <TextField id="authUrl" label="Keystone URL" />
+      <TextField id="username" label="Username" />
+      <TextField id="password" label="Password" />
+      <TextField id="projectName" label="Project Name" />
+      <h4>Advanced Settings</h4>
+      <TextField id="userDomainName" label="User Domain Name" />
+      <TextField id="projectDomainName" label="Project Domain Name" />
     </div>
   )
 
@@ -72,11 +117,12 @@ export class AddCloudProviderForm extends React.Component {
         <Picklist name="type"
           label="Cloud Provider Type"
           value={type}
-          onChange={this.setField('type')}
+          onChange={this.onTypeChange}
           options={types}
         />
         {type === 'Amazon AWS Provider' && this.AWSFields()}
-        {type === 'Openstack' && this.OSFields()}
+        {type === 'Openstack' && this.OpenstackFields()}
+        <SubmitButton>Add Cloud Provider</SubmitButton>
       </ValidatedForm>
     )
   }
