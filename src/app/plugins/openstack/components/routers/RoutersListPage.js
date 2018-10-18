@@ -16,6 +16,7 @@ export const options = {
   title: 'Routers',
 }
 
-const { ListPage } = createCRUDComponents(options)
+const { ListPage, List } = createCRUDComponents(options)
+export const RoutersList = List
 
 export default ListPage

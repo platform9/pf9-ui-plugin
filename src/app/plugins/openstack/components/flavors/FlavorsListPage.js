@@ -17,6 +17,7 @@ export const options = {
   title: 'Flavors',
 }
 
-const { ListPage } = createCRUDComponents(options)
+const { ListPage, List } = createCRUDComponents(options)
+export const FlavorsList = List
 
 export default ListPage

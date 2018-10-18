@@ -20,6 +20,7 @@ export const options = {
   title: 'Networks',
 }
 
-const { ListPage } = createCRUDComponents(options)
+const { ListPage, List } = createCRUDComponents(options)
+export const NetworksList = List
 
 export default ListPage

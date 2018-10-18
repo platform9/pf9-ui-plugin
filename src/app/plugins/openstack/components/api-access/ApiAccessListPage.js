@@ -1,25 +1,39 @@
 import React from 'react'
-import { compose, graphql } from 'react-apollo'
+import { compose } from 'core/fp'
+import requiresAuthentication from 'openstack/util/requiresAuthentication'
+import DataLoader from 'core/DataLoader'
+import { loadServiceCatalog } from './actions'
+import ListTable from 'core/common/ListTable'
 
-import DisplayError from 'core/common/DisplayError'
-import Loader from 'core/common/Loader'
-import ApiAccessListContainer from './ApiAccessListContainer'
-import requiresAuthentication from '../../util/requiresAuthentication'
-import { GET_CATALOG } from './actions'
+const columns = [
+  { id: 'id', label: 'ID' },
+  { id: 'name', label: 'Name' },
+  { id: 'type', label: 'Type' },
+  { id: 'url', label: 'URL' },
+  { id: 'iface', label: 'Interface' },
+]
 
-const ApiAccessPage =
-  ({ data: { loading, error, serviceCatalog } }) => {
-    return (
-      <div>
-        <h1>API Access</h1>
-        {loading && <Loader />}
-        {error && <DisplayError error={error} />}
-        {serviceCatalog && <ApiAccessListContainer catalog={serviceCatalog} />}
-      </div>
-    )
-  }
+export const ServiceCatalogList = ({ services }) => {
+  return (
+    <ListTable
+      title="API Endpoints"
+      columns={columns}
+      data={services}
+      paginate={false}
+      showCheckboxes={false}
+      searchTarget="name"
+    />
+  )
+}
+
+const ApiAccessPage = () => {
+  return (
+    <DataLoader dataKey="serviceCatalog" loaderFn={loadServiceCatalog}>
+      {({ data }) => <ServiceCatalogList services={data} />}
+    </DataLoader>
+  )
+}
 
 export default compose(
   requiresAuthentication,
-  graphql(GET_CATALOG),
 )(ApiAccessPage)

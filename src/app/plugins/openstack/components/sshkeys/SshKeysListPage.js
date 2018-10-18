@@ -15,6 +15,7 @@ export const options = {
   title: 'SSH Keys',
 }
 
-const { ListPage } = createCRUDComponents(options)
+const { ListPage, List } = createCRUDComponents(options)
+export const SshKeysList = List
 
 export default ListPage

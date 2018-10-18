@@ -16,6 +16,7 @@ export const options = {
   title: 'Users',
 }
 
-const { ListPage } = createCRUDComponents(options)
+const { ListPage, List } = createCRUDComponents(options)
+export const UsersList = List
 
 export default ListPage

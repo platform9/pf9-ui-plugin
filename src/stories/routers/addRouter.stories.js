@@ -1,7 +1,7 @@
 import React from 'react'
 import { jsonDetailLogger, addStories } from '../helpers'
 
-import AddRouterForm from '../../app/plugins/openstack/components/routers/AddRouterForm'
+import { AddRouterForm } from 'openstack/components/routers/AddRouterPage'
 
 addStories('Router Management/Adding a router', {
   'Add a router': () => (

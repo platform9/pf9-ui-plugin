@@ -1,7 +1,7 @@
 import React from 'react'
 import { jsonDetailLogger, addStories } from '../helpers'
 
-import AddUserForm from 'openstack/components/users/AddUserForm'
+import { AddForm as AddUserForm } from 'openstack/components/users/AddUserPage'
 
 addStories('User management/Adding a user', {
   'Add a user': () => (

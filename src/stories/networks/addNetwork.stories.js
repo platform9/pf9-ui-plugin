@@ -1,7 +1,7 @@
 import React from 'react'
 import { jsonDetailLogger, addStories } from '../helpers'
 
-import AddNetworkForm from '../../app/plugins/openstack/components/networks/AddNetworkForm'
+import { AddNetworkForm } from 'openstack/components/networks/AddNetworkPage'
 
 addStories('Network Management/Adding a network', {
   'Add a network': () => (

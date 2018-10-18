@@ -20,6 +20,7 @@ export const options = {
   title: 'Floating IPs',
 }
 
-const { ListPage } = createCRUDComponents(options)
+const { ListPage, List } = createCRUDComponents(options)
+export const FloatingIpsList = List
 
 export default ListPage

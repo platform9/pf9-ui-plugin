@@ -36,6 +36,8 @@ const groupByRegion = catalog => {
       regions[region][name][endpoint.interface] = {
         id: endpoint.id,
         url: endpoint.url,
+        type: service.type,
+        iface: endpoint.interface,
       }
     })
   })

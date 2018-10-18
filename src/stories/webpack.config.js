@@ -9,11 +9,6 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.mjs$/,
-        include: /node_modules/,
-        type: 'javascript/auto',
-      },
-      {
         test: /\.css$/,
         include: includePath,
         exclude: /node_modules/,
@@ -30,6 +25,6 @@ module.exports = {
       schema: path.resolve(__dirname, '../graphql'),
       util: path.resolve(__dirname, '../app/util'),
     },
-    extensions: ['.webpack.js', '.web.js', '.mjs', '.js', '.json', '.css'],
+    extensions: ['.webpack.js', '.web.js', '.js', '.json', '.css'],
   }
 }

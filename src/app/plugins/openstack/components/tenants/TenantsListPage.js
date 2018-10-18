@@ -17,6 +17,7 @@ export const options = {
   title: 'Tenants',
 }
 
-const { ListPage } = createCRUDComponents(options)
+const { ListPage, List } = createCRUDComponents(options)
+export const TenantsList = List
 
 export default ListPage
