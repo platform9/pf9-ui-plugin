@@ -1,25 +1,25 @@
-import React from 'react'
-import { compose, graphql } from 'react-apollo'
+import createCRUDComponents from 'core/createCRUDComponents'
+import { deleteFloatingIp, loadFloatingIps } from './actions'
 
-import DisplayError from 'core/common/DisplayError'
-import Loader from 'core/common/Loader'
-import FloatingIpsListContainer from './FloatingIpsListContainer'
-import requiresAuthentication from '../../util/requiresAuthentication'
-import { GET_FLOATING_IPS } from './actions'
+export const options = {
+  baseUrl: '/ui/openstack/floatingips',
+  columns: [
+    { id: 'floating_ip_address', label: 'Floating IP' },
+    { id: 'subnet_id', label: 'Subnet ID' },
+    { id: 'tenant_id', label: 'Tenant ID' },
+    { id: 'fixed_ip_address', label: 'Fixed IP' },
+    { id: 'description', label: 'Description' },
+    { id: 'floating_network_id', label: 'Floating Network ID' },
+    { id: 'status', label: 'Status' },
+    { id: 'router_id', label: 'Router ID' },
+  ],
+  dataKey: 'floatingIps',
+  deleteFn: deleteFloatingIp,
+  loaderFn: loadFloatingIps,
+  name: 'FloatingIps',
+  title: 'Floating IPs',
+}
 
-const FloatingIpsListPage =
-  ({ data: { loading, error, floatingIps } }) => {
-    return (
-      <div>
-        <h1>Floating IPs Page</h1>
-        {loading && <Loader />}
-        {error && <DisplayError error={error} />}
-        {floatingIps && <FloatingIpsListContainer floatingIps={floatingIps} />}
-      </div>
-    )
-  }
+const { ListPage } = createCRUDComponents(options)
 
-export default compose(
-  requiresAuthentication,
-  graphql(GET_FLOATING_IPS),
-)(FloatingIpsListPage)
+export default ListPage

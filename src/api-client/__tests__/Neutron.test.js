@@ -126,7 +126,7 @@ describe('Neutron', () => {
     const floatingip = await client.neutron.createFloatingIp({
       floating_network_id: network.id
     })
-    const updatedFloatingIp = await client.neutron.removeFloatingIp(floatingip.id)
+    const updatedFloatingIp = await client.neutron.detachFloatingIp(floatingip.id)
     expect(updatedFloatingIp.port_id).toBe(null)
     await client.neutron.deleteFloatingIp(updatedFloatingIp.id)
     await client.neutron.deleteSubnet(subnet.id)

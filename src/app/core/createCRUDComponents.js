@@ -40,6 +40,7 @@ const createCRUDComponents = options => {
     deleteFn,
     loaderFn,
     name,
+    rowActions,
     title,
     uniqueIdentifier,
   } = { ...defaults, ...options }
@@ -47,7 +48,7 @@ const createCRUDComponents = options => {
   // List
   const List = ({ onAdd, onDelete, onEdit, rowActions, data }) => {
     if (!data || data.length === 0) {
-      return <h1>No clusters found.</h1>
+      return <h1>No data found.</h1>
     }
 
     return (
@@ -74,8 +75,6 @@ const createCRUDComponents = options => {
     }
 
     render () {
-      const rowActions = options.rowActions()
-
       let moreProps = {}
       if (rowActions && rowActions.length > 0) {
         moreProps.rowActions = rowActions

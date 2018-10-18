@@ -1,25 +1,21 @@
-import React from 'react'
-import { compose, graphql } from 'react-apollo'
+import createCRUDComponents from 'core/createCRUDComponents'
+import { deleteRouter, loadRouters } from './actions'
 
-import DisplayError from 'core/common/DisplayError'
-import Loader from 'core/common/Loader'
-import RoutersListContainer from './RoutersListContainer'
-import requiresAuthentication from '../../util/requiresAuthentication'
-import { GET_ROUTERS } from './actions'
+export const options = {
+  baseUrl: '/ui/openstack/routers',
+  columns: [
+    { id: 'name', label: 'Name' },
+    { id: 'tenant_id', label: 'Tenant' },
+    { id: 'admin_state_up', label: 'Admin State' },
+    { id: 'status', label: 'Status' },
+  ],
+  dataKey: 'routers',
+  deleteFn: deleteRouter,
+  loaderFn: loadRouters,
+  name: 'Routers',
+  title: 'Routers',
+}
 
-const RoutersListPage =
-  ({ data: { loading, error, routers } }) => {
-    return (
-      <div>
-        <h1>Routers Page</h1>
-        {loading && <Loader />}
-        {error && <DisplayError error={error} />}
-        {routers && <RoutersListContainer routers={routers} />}
-      </div>
-    )
-  }
+const { ListPage } = createCRUDComponents(options)
 
-export default compose(
-  requiresAuthentication,
-  graphql(GET_ROUTERS),
-)(RoutersListPage)
+export default ListPage

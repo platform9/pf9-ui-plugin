@@ -1,45 +1,19 @@
-import { gql } from 'apollo-boost'
+export const loadUsers = async ({ context, setContext, reload }) => {
+  if (!reload && context.users) { return context.users }
+  const users = await context.apiClient.keystone.getUsers()
+  setContext({ users })
+  return users
+}
 
-export const GET_USER = gql`
-  query GetUserById($id: ID!) {
-    user(id: $id) {
-      id
-      username
-      displayname
-      name
-      email
-      rolePair
-    }
-  }
-`
+export const createUser = async ({ data, context, setContext }) => {
+  const created = await context.apiClient.keystone.createUser(data)
+  const existing = await context.apiClient.keystone.getUsers()
+  setContext({ users: [ ...existing, created ] })
+  return created
+}
 
-export const GET_USERS = gql`
-  {
-    users {
-      id
-      username
-      displayname
-      name
-      email
-      rolePair
-    }
-  }
-`
-
-export const REMOVE_USER = gql`
-  mutation RemoveUser($id: ID!) {
-    removeUser(id: $id)
-  }
-`
-
-export const ADD_USER = gql`
-  mutation CreateUser($input: UserInput!) {
-    createUser(input: $input) { id username displayname name email rolePair }
-  }
-`
-
-export const UPDATE_USER = gql`
-  mutation UpdateUser($id: ID!, $input: UserInput!) {
-    updateUser(id: $id, input: $input) { id username displayname name email rolePair }
-  }
-`
+export const deleteUser = async ({ id, context, setContext }) => {
+  await context.apiClient.keystone.deleteUser(id)
+  const newList = context.users.filter(x => x.id !== id)
+  setContext({ users: newList })
+}

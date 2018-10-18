@@ -1,29 +1,31 @@
 import React from 'react'
-import { Query } from 'react-apollo'
-import { GET_ROUTER } from './actions'
-import FormWrapper from 'core/common/FormWrapper'
-import UpdateRouterForm from './UpdateRouterForm'
-import requiresAuthentication from '../../util/requiresAuthentication'
+import createUpdateComponents from 'core/createUpdateComponents'
+import SubmitButton from 'core/common/SubmitButton'
+import ValidatedForm from 'core/common/ValidatedForm'
+import Checkbox from 'core/common/Checkbox'
+import TextField from 'core/common/TextField'
+import { updateRouter, loadRouters } from './actions'
 
-class UpdateRouterPage extends React.Component {
-  render () {
-    const id = this.props.match.params.routerId
+export const UpdateRouterForm = ({ onComplete, initialValue }) => (
+  <ValidatedForm onSubmit={onComplete} initialValue={initialValue}>
+    <TextField id="name" label="Name" />
+    <TextField id="tenant_id" label="Tenant ID" />
+    <Checkbox id="admin_state_up" label="Admin State" />
+    <TextField id="status" label="Status" />
+    <SubmitButton>Update Router</SubmitButton>
+  </ValidatedForm>
+)
 
-    return (
-      <Query query={GET_ROUTER} variables={{ id }}>
-        {({ data }) =>
-          <FormWrapper title="Update Router" backUrl="/ui/openstack/routers">
-            {data && data.router &&
-              <UpdateRouterForm
-                router={data.router}
-                objId={id}
-              />
-            }
-          </FormWrapper>
-        }
-      </Query>
-    )
-  }
+export const options = {
+  FormComponent: UpdateRouterForm,
+  routeParamKey: 'routerId',
+  updateFn: updateRouter,
+  loaderFn: loadRouters,
+  listUrl: '/ui/openstack/routers',
+  name: 'UpdateRouter',
+  title: 'Update Router',
 }
 
-export default requiresAuthentication(UpdateRouterPage)
+const { UpdatePage } = createUpdateComponents(options)
+
+export default UpdatePage

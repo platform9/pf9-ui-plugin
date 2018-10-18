@@ -1,37 +1,29 @@
-import { gql } from 'apollo-boost'
+const dataKey = 'tenants'
 
-export const GET_TENANTS = gql`
-  {
-    tenants {
-      id
-      name
-      description
-    }
-  }
-`
+export const loadTenants = async ({ context, setContext, reload }) => {
+  if (!reload && context[dataKey]) { return context[dataKey] }
+  const existing = await context.apiClient.keystone.getProjects()
+  setContext({ [dataKey]: existing })
+  return existing
+}
 
-export const REMOVE_TENANT = gql`
-  mutation RemoveTenant($id: ID!) {
-    removeTenant(id: $id)
-  }
-`
+export const createTenant = async ({ data, context, setContext }) => {
+  const created = await context.apiClient.keystone.createTenant(data)
+  const existing = await loadTenants({ context, setContext })
+  setContext({ [dataKey]: [ ...existing, created ] })
+  return created
+}
 
-export const ADD_TENANT = gql`
-  mutation CreateTenant($input: TenantInput!) {
-    createTenant(input: $input) { id name description }
-  }
-`
+export const deleteTenant = async ({ id, context, setContext }) => {
+  await context.apiClient.keystone.deleteTenant(id)
+  const newList = context[dataKey].filter(x => x.id !== id)
+  setContext({ [dataKey]: newList })
+}
 
-export const UPDATE_TENANT = gql`
-  mutation UpdateTenant($id: ID!, $input: TenantInput!) {
-    updateTenant(id: $id, input: $input) { id name description }
-  }
-`
-
-export const loadTenants = async ({ setContext, context, reload }) => {
-  if (!reload && context.tenants) { return context.tenants }
-
-  const tenants = await context.apiClient.keystone.getProjects()
-  setContext({ tenants })
-  return tenants
+export const updateTenant = async ({ data, context, setContext }) => {
+  const { id } = data
+  const existing = await loadTenants({ context, setContext })
+  const updated = await context.apiClient.keystone.updateTenant(id, data)
+  const newList = existing.map(x => x.id === id ? x : updated)
+  setContext({ [dataKey]: newList })
 }

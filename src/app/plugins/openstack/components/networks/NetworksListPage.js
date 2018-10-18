@@ -1,25 +1,25 @@
-import React from 'react'
-import { compose, graphql } from 'react-apollo'
+import createCRUDComponents from 'core/createCRUDComponents'
+import { deleteNetwork, loadNetworks } from './actions'
 
-import DisplayError from 'core/common/DisplayError'
-import Loader from 'core/common/Loader'
-import NetworksListContainer from './NetworksListContainer'
-import requiresAuthentication from '../../util/requiresAuthentication'
-import { GET_NETWORKS } from './actions'
+export const options = {
+  baseUrl: '/ui/openstack/networks',
+  columns: [
+    { id: 'name', label: 'Name' },
+    { id: 'subnets', label: 'Subnets Associated' },
+    { id: 'tenant', label: 'Tenant' },
+    { id: 'shared', label: 'Shared' },
+    { id: 'port_security_enabled', label: 'Port Security' },
+    { id: 'external', label: 'External Network' },
+    { id: 'admin_state_up', label: 'Admin State' },
+    { id: 'status', label: 'Status' },
+  ],
+  dataKey: 'networks',
+  deleteFn: deleteNetwork,
+  loaderFn: loadNetworks,
+  name: 'Networks',
+  title: 'Networks',
+}
 
-const NetworksListPage =
-  ({ data: { loading, error, networks } }) => {
-    return (
-      <div>
-        <h1>Networks Page</h1>
-        {loading && <Loader />}
-        {error && <DisplayError error={error} />}
-        {networks && <NetworksListContainer networks={networks} />}
-      </div>
-    )
-  }
+const { ListPage } = createCRUDComponents(options)
 
-export default compose(
-  requiresAuthentication,
-  graphql(GET_NETWORKS),
-)(NetworksListPage)
+export default ListPage

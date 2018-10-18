@@ -1,8 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { compose, filterFields, setStateLens } from 'core/fp'
+import { compose, setStateLens } from 'core/fp'
 import { withRouter } from 'react-router-dom'
-import { withApollo } from 'react-apollo'
 
 const ValidatedFormContext = React.createContext({})
 
@@ -59,7 +58,7 @@ class ValidatedForm extends React.Component {
   }
 
   handleSubmit = event => {
-    const { action, onSubmit } = this.props
+    const { onSubmit } = this.props
     const { value } = this.state
     if (event) {
       event.preventDefault()
@@ -69,52 +68,6 @@ class ValidatedForm extends React.Component {
 
     if (onSubmit) {
       onSubmit(value)
-    }
-
-    switch (action) {
-      case 'add':
-        this.handleAdd()
-        break
-      case `update`:
-        let inputObj = filterFields('id', '__typename')(this.state.value)
-        this.handleUpdate(inputObj)
-        break
-    }
-  }
-
-  handleAdd = () => {
-    const { client, history, addQuery, getQuery, backUrl, objType, cacheQuery } = this.props
-    try {
-      client.mutate({
-        mutation: addQuery,
-        variables: {
-          input: this.state.value
-        },
-        update: (proxy, { data }) => {
-          const tempData = proxy.readQuery({ query: getQuery })
-          tempData[objType].push(data[cacheQuery])
-          proxy.writeQuery({ query: getQuery, data: tempData })
-        }
-      })
-      history.push(backUrl)
-    } catch (err) {
-      console.error(err)
-    }
-  }
-
-  handleUpdate = inputObj => {
-    const { client, history, objId, updateQuery, backUrl } = this.props
-    try {
-      client.mutate({
-        mutation: updateQuery,
-        variables: {
-          id: objId,
-          input: inputObj
-        }
-      })
-      history.push(backUrl)
-    } catch (err) {
-      console.error(err)
     }
   }
 
@@ -130,11 +83,6 @@ class ValidatedForm extends React.Component {
 }
 
 ValidatedForm.propTypes = {
-  // Url to go back when the operation ends.
-  // TODO: This should be deprecated.  This logic already happens in <FormWrapper />
-  // and can be implemented somewhere up the `onSubmit` chain.
-  backUrl: PropTypes.string,
-
   // Initial values
   initialValue: PropTypes.object,
 
@@ -142,41 +90,12 @@ ValidatedForm.propTypes = {
   onSubmit: PropTypes.func,
 
   triggerSubmit: PropTypes.func,
-
-  /**
-   * TODO: The props below are coupled to GraphQL
-   * specific logic.  The recommended way to use this
-   * component is to instrument what is needed somewhere
-   * else in the `onSubmit` handler.
-   */
-
-  /** @deprecated GraphQl query to add an object */
-  addQuery: PropTypes.object,
-
-  /** @deprecated GraphQl query to get an object */
-  getQuery: PropTypes.object,
-
-  /** @deprecated GraphQl query to update an object */
-  updateQuery: PropTypes.object,
-
-  /** @deprecated Action to take(add/delete/update) */
-  action: PropTypes.string,
-
-  /** @deprecated Type of objects to operate */
-  objType: PropTypes.string,
-
-  /** @deprecated String of query to cache */
-  cacheQuery: PropTypes.string,
-
-  /** @deprecated Id of object to update */
-  objId: PropTypes.string,
 }
 
 export const PropKeys = Object.keys(ValidatedForm.propTypes)
 
 export default compose(
   withRouter,
-  withApollo
 )(ValidatedForm)
 
 /**

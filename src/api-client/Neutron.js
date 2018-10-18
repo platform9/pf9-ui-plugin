@@ -176,7 +176,7 @@ class Neutron {
     }
   }
 
-  async removeFloatingIp (id) {
+  async detachFloatingIp (id) {
     const url = `${await this.endpoint()}/v2.0/floatingips/${id}`
     try {
       const response = await axios.put(url, { floatingip: { port_id: null } }, this.client.getAuthHeaders())

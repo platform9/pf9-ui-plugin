@@ -1,29 +1,28 @@
 import React from 'react'
-import { Query } from 'react-apollo'
-import { GET_FLOATING_IP } from './actions'
-import FormWrapper from 'core/common/FormWrapper'
-import UpdateFloatingIpForm from './UpdateFloatingIpForm'
-import requiresAuthentication from '../../util/requiresAuthentication'
+import createUpdateComponents from 'core/createUpdateComponents'
+import SubmitButton from 'core/common/SubmitButton'
+import ValidatedForm from 'core/common/ValidatedForm'
+import TextField from 'core/common/TextField'
+import { updateFloatingIp, loadFloatingIps } from './actions'
 
-class UpdateFloatingIpPage extends React.Component {
-  render () {
-    const id = this.props.match.params.floatingIpId
+export const UpdateFloatingIpForm = ({ onComplete, initialValue }) => (
+  <ValidatedForm onSubmit={onComplete} initialValue={initialValue}>
+    <TextField id="floating_ip_address" label="Floating IP Address" />
+    <TextField id="fixed_ip_address" label="Fixed IP Address" />
+    <SubmitButton>Update Floating IP</SubmitButton>
+  </ValidatedForm>
+)
 
-    return (
-      <Query query={GET_FLOATING_IP} variables={{ id }}>
-        {({ data }) =>
-          <FormWrapper title="Update Floating IP" backUrl="/ui/openstack/floatingips">
-            {data && data.floatingIp &&
-              <UpdateFloatingIpForm
-                floatingIp={data.floatingIp}
-                objId={id}
-              />
-            }
-          </FormWrapper>
-        }
-      </Query>
-    )
-  }
+export const options = {
+  FormComponent: UpdateFloatingIpForm,
+  routeParamKey: 'floatingIpId',
+  updateFn: updateFloatingIp,
+  loaderFn: loadFloatingIps,
+  listUrl: '/ui/openstack/floatingips',
+  name: 'UpdateFloatingIp',
+  title: 'Update Floating IP',
 }
 
-export default requiresAuthentication(UpdateFloatingIpPage)
+const { UpdatePage } = createUpdateComponents(options)
+
+export default UpdatePage

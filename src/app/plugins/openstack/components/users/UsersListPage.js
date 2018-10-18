@@ -1,25 +1,21 @@
-import React from 'react'
-import { compose, graphql } from 'react-apollo'
+import createCRUDComponents from 'core/createCRUDComponents'
+import { deleteUser, loadUsers } from './actions'
 
-import DisplayError from 'core/common/DisplayError'
-import Loader from 'core/common/Loader'
-import UsersListContainer from './UsersListContainer'
-import requiresAuthentication from '../../util/requiresAuthentication'
-import { GET_USERS } from './actions'
+export const options = {
+  baseUrl: '/ui/openstack/users',
+  columns: [
+    { id: 'name', label: 'Username' },
+    { id: 'displayname', label: 'Display name' },
+    { id: 'mfa', label: 'Two-factor authentication' },
+    { id: 'rolePair', label: 'Tenants & Roles' },
+  ],
+  dataKey: 'users',
+  deleteFn: deleteUser,
+  loaderFn: loadUsers,
+  name: 'Users',
+  title: 'Users',
+}
 
-const UsersListPage =
-  ({ data, loading, error }) => {
-    return (
-      <div>
-        <h1>Users Page</h1>
-        {loading && <Loader />}
-        {error && <DisplayError error={error} />}
-        {data && <UsersListContainer users={data.users} />}
-      </div>
-    )
-  }
+const { ListPage } = createCRUDComponents(options)
 
-export default compose(
-  requiresAuthentication,
-  graphql(GET_USERS),
-)(UsersListPage)
+export default ListPage

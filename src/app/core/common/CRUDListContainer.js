@@ -1,9 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { withRouter } from 'react-router-dom'
-import { compose, withApollo } from 'react-apollo'
 import ConfirmationDialog from './ConfirmationDialog'
-import { asyncMap } from 'core/fp'
+import { asyncMap, compose } from 'core/fp'
 
 class CRUDListContainer extends React.Component {
   componentDidMount () {
@@ -49,20 +48,7 @@ class CRUDListContainer extends React.Component {
   }
 
   handleRemove = async id => {
-    const { client, getQuery, objType, removeQuery, onRemove, uniqueIdentifier } = this.props
-    if (getQuery) {
-      // TODO: refactor any code that uses this path so we can decouple
-      // GraphQL from CRUDListContainer
-      client.mutate({
-        mutation: removeQuery,
-        variables: { id },
-        update: cache => {
-          const data = cache.readQuery({ query: getQuery })
-          data[objType] = data[objType].filter(x => x[uniqueIdentifier] !== id)
-          cache.writeQuery({ query: getQuery, data })
-        }
-      })
-    }
+    const { onRemove } = this.props
 
     if (onRemove) {
       await onRemove(id)
@@ -111,6 +97,7 @@ CRUDListContainer.propTypes = {
    * It is passed the id of the entity.
    */
   onRemove: PropTypes.func,
+
   /*
     Some objects have a unique identifier other than 'id'
     For example sshKeys have unique identifier of 'name' and the APIs
@@ -126,5 +113,4 @@ CRUDListContainer.defaultProps = {
 
 export default compose(
   withRouter,
-  withApollo
 )(CRUDListContainer)

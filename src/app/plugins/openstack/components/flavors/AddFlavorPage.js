@@ -1,36 +1,37 @@
 import React from 'react'
-import FormWrapper from 'core/common/FormWrapper'
-import AddFlavorForm from './AddFlavorForm'
-import { withRouter } from 'react-router-dom'
-import { compose } from 'core/fp'
-import requiresAuthentication from '../../util/requiresAuthentication'
-import { withAppContext } from 'core/AppContext'
-import { loadFlavors } from './actions'
+import createAddComponents from 'core/createAddComponents'
+import SubmitButton from 'core/common/SubmitButton'
+import ValidatedForm from 'core/common/ValidatedForm'
+import TextField from 'core/common/TextField'
+import { createFlavor, loadFlavors } from './actions'
 
-class AddFlavorPage extends React.Component {
-  handleAdd = async flavor => {
-    const { setContext, context, history } = this.props
-    try {
-      const existing = await loadFlavors({ setContext, context })
-      const createdFlavor = await context.apiClient.nova.createFlavor(flavor)
-      setContext({ flavors: [ ...existing, createdFlavor ] })
-      history.push('/ui/openstack/flavors')
-    } catch (err) {
-      console.error(err)
-    }
-  }
-
-  render () {
-    return (
-      <FormWrapper title="Add Flavor" backUrl="/ui/openstack/flavors">
-        <AddFlavorForm onComplete={this.handleAdd} />
-      </FormWrapper>
-    )
-  }
+const initialValue = {
+  name: '',
+  disk: 20,
+  ram: 4096,
+  vcpus: 2,
+  public: false,
 }
 
-export default compose(
-  withAppContext,
-  withRouter,
-  requiresAuthentication
-)(AddFlavorPage)
+export const AddFlavorForm = ({ onComplete }) => (
+  <ValidatedForm onSubmit={onComplete} initialValue={initialValue}>
+    <TextField id="name" label="Name" />
+    <TextField id="vcpus" label="VCPUs" type="number" />
+    <TextField id="ram" label="RAM" type="number" />
+    <TextField id="disk" label="Disk" type="number" />
+    <SubmitButton>Add Flavor</SubmitButton>
+  </ValidatedForm>
+)
+
+export const options = {
+  FormComponent: AddFlavorForm,
+  createFn: createFlavor,
+  loaderFn: loadFlavors,
+  listUrl: '/ui/openstack/flavors',
+  name: 'AddFlavor',
+  title: 'Add Flavor',
+}
+
+const { AddPage } = createAddComponents(options)
+
+export default AddPage

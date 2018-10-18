@@ -117,7 +117,7 @@ const styles = theme => ({
 @withRouter
 class Navbar extends React.Component {
   state = {
-    open: false,
+    open: true,
     anchor: 'left',
     curRegion: '',
     regionSearch: '',

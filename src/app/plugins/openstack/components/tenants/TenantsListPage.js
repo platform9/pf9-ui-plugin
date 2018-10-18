@@ -1,25 +1,22 @@
-import React from 'react'
-import { compose, graphql } from 'react-apollo'
+import createCRUDComponents from 'core/createCRUDComponents'
+import { deleteTenant, loadTenants } from './actions'
 
-import DisplayError from 'core/common/DisplayError'
-import Loader from 'core/common/Loader'
-import TenantsListContainer from './TenantsListContainer'
-import requiresAuthentication from '../../util/requiresAuthentication'
-import { GET_TENANTS } from './actions'
+export const options = {
+  baseUrl: '/ui/openstack/tenants',
+  columns: [
+    { id: 'name', label: 'Name' },
+    { id: 'description', label: 'Description' },
+    { id: 'computeUsage', label: 'Compute usage' },
+    { id: 'blockStorageUsage', label: 'Block storage usage' },
+    { id: 'networkUsage', label: 'Network usage' },
+  ],
+  dataKey: 'tenants',
+  deleteFn: deleteTenant,
+  loaderFn: loadTenants,
+  name: 'Tenants',
+  title: 'Tenants',
+}
 
-const TenantsPage =
-  ({ data, loading, error }) => {
-    return (
-      <div>
-        <h1>Tenants Page</h1>
-        {loading && <Loader />}
-        {error && <DisplayError error={error} />}
-        {data && <TenantsListContainer tenants={data.tenants} />}
-      </div>
-    )
-  }
+const { ListPage } = createCRUDComponents(options)
 
-export default compose(
-  requiresAuthentication,
-  graphql(GET_TENANTS),
-)(TenantsPage)
+export default ListPage

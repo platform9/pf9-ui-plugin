@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react'
 import { withRouter } from 'react-router-dom'
-import { compose, withApollo } from 'react-apollo'
+import { compose } from 'core/fp'
 import FormWrapper from 'core/common/FormWrapper'
 import requiresAuthentication from '../../util/requiresAuthentication'
 import { createMuiTheme, MuiThemeProvider, withStyles } from '@material-ui/core/styles'
@@ -145,6 +145,5 @@ class AddImagePage extends React.Component {
 export default compose(
   requiresAuthentication,
   withRouter,
-  withApollo,
   withStyles(styles)
 )(AddImagePage)

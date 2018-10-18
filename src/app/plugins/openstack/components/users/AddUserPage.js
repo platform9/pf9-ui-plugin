@@ -1,30 +1,44 @@
 import React from 'react'
-import { compose, graphql } from 'react-apollo'
-import DisplayError from 'core/common/DisplayError'
-import Loader from 'core/common/Loader'
-import FormWrapper from 'core/common/FormWrapper'
-import AddUserForm from './AddUserForm'
-import requiresAuthentication from '../../util/requiresAuthentication'
-import { GET_TENANTS } from '../tenants/actions'
+import createAddComponents from 'core/createAddComponents'
+import SubmitButton from 'core/common/SubmitButton'
+import ValidatedForm from 'core/common/ValidatedForm'
+import TextField from 'core/common/TextField'
+import NoAutofillHack from 'core/common/NoAutofillHack'
+import TenantRolesContainer from 'core/common/TenantRolesContainer'
+import { createUser, loadUsers } from './actions'
+import { loadTenants } from '../tenants/actions'
 
-class AddUserPage extends React.Component {
-  render () {
-    const { data, loading, error } = this.props
-    return (
-      <div>
-        {loading && <Loader />}
-        {error && <DisplayError error={error} />}
-        {data.tenants &&
-          <FormWrapper title="Add User" backUrl="/ui/openstack/users">
-            <AddUserForm tenants={data.tenants} />
-          </FormWrapper>
-        }
-      </div>
-    )
-  }
+// As of Chrome 66, Google has disabled the NoAutofillHack and still does
+// not respect the HTML spec for autocomplete="off".  After some experimentation
+// it looks like autocomplete="new-password" works.
+export const AddUserForm = ({ onComplete, context }) => (
+  <ValidatedForm onSubmit={onComplete}>
+    <NoAutofillHack />
+    <TextField id="name" label="Name" />
+    <TextField id="email" label="Email" />
+    <TextField id="username" label="Username" />
+    <TextField id="displayname" label="Display Name" />
+    <TextField id="password" label="Password" type="password" />
+    <TenantRolesContainer
+      id="rolePair"
+      label="TenantRoleSelectors"
+      tenants={context.tenants}
+      roles={['None', 'Role1', 'Role2', 'Role3']}
+    />
+    <SubmitButton>Add User</SubmitButton>
+  </ValidatedForm>
+)
+
+export const options = {
+  FormComponent: AddUserForm,
+  createFn: createUser,
+  loaderFn: loadUsers,
+  initFn: loadTenants,
+  listUrl: '/ui/openstack/users',
+  name: 'AddUser',
+  title: 'Add User',
 }
 
-export default compose(
-  requiresAuthentication,
-  graphql(GET_TENANTS)
-)(AddUserPage)
+const { AddPage } = createAddComponents(options)
+
+export default AddPage

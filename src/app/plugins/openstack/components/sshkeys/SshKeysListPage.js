@@ -1,15 +1,20 @@
-import React from 'react'
-import { compose } from 'react-apollo'
-import SshKeysListContainer from './SshKeysListContainer'
-import requiresAuthentication from '../../util/requiresAuthentication'
-import DataLoader from 'core/DataLoader'
-import { loadSshKeys } from './actions'
+import createCRUDComponents from 'core/createCRUDComponents'
+import { deleteSshKey, loadSshKeys } from './actions'
 
-const SshKeysListPage = () =>
-  <DataLoader dataKey="sshKeys" loaderFn={loadSshKeys}>
-    {({ data }) => <SshKeysListContainer sshKeys={data} />}
-  </DataLoader>
+export const options = {
+  baseUrl: '/ui/openstack/sshkeys',
+  columns: [
+    { id: 'name', label: 'Name' },
+    { id: 'fingerprint', label: 'Fingerprint' },
+    { id: 'public_key', label: 'Public Key' },
+  ],
+  dataKey: 'sshKeys',
+  deleteFn: deleteSshKey,
+  loaderFn: loadSshKeys,
+  name: 'SSHKeys',
+  title: 'SSH Keys',
+}
 
-export default compose(
-  requiresAuthentication,
-)(SshKeysListPage)
+const { ListPage } = createCRUDComponents(options)
+
+export default ListPage

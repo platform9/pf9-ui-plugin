@@ -1,22 +1,19 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { AppContainer } from 'react-hot-loader'
-import { ApolloProvider } from 'react-apollo'
-
-import { client } from './apollo'
 import App from './App'
+import plugins from './plugins'
 
 let pluginManager = require('./core/pluginManager').default
+plugins.forEach(plugin => plugin.registerPlugin(pluginManager))
 
 const render = Component => {
   ReactDOM.render(
-    <ApolloProvider client={client}>
-      <AppContainer>
-        <div>
-          <Component pluginManager={pluginManager} />
-        </div>
-      </AppContainer>
-    </ApolloProvider>,
+    <AppContainer>
+      <div>
+        <Component pluginManager={pluginManager} />
+      </div>
+    </AppContainer>,
     document.getElementById('root')
   )
 }

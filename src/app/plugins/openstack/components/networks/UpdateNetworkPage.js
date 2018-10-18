@@ -1,29 +1,32 @@
 import React from 'react'
-import { Query } from 'react-apollo'
-import { GET_NETWORK } from './actions'
-import FormWrapper from 'core/common/FormWrapper'
-import UpdateNetworkForm from './UpdateNetworkForm'
-import requiresAuthentication from '../../util/requiresAuthentication'
+import createUpdateComponents from 'core/createUpdateComponents'
+import SubmitButton from 'core/common/SubmitButton'
+import ValidatedForm from 'core/common/ValidatedForm'
+import Checkbox from 'core/common/Checkbox'
+import TextField from 'core/common/TextField'
+import { updateNetwork, loadNetworks } from './actions'
 
-class UpdateNetworkPage extends React.Component {
-  render () {
-    const id = this.props.match.params.networkId
+export const UpdateNetworkForm = ({ onComplete, initialValue }) => (
+  <ValidatedForm onSubmit={onComplete} initialValue={initialValue}>
+    <TextField id="name" label="Name" />
+    <Checkbox id="admin_state_up" label="Admin State" />
+    <Checkbox id="port_security_enabled" label="Port Security" />
+    <Checkbox id="shared" label="Shared" />
+    <Checkbox id="external" label="External Network" />
+    <SubmitButton>Update Network</SubmitButton>
+  </ValidatedForm>
+)
 
-    return (
-      <Query query={GET_NETWORK} variables={{ id }}>
-        {({ data }) =>
-          <FormWrapper title="Update Network" backUrl="/ui/openstack/networks">
-            {data && data.network &&
-              <UpdateNetworkForm
-                network={data.network}
-                objId={id}
-              />
-            }
-          </FormWrapper>
-        }
-      </Query>
-    )
-  }
+export const options = {
+  FormComponent: UpdateNetworkForm,
+  routeParamKey: 'networkId',
+  updateFn: updateNetwork,
+  loaderFn: loadNetworks,
+  listUrl: '/ui/openstack/networks',
+  name: 'UpdateNetwork',
+  title: 'Update Network',
 }
 
-export default requiresAuthentication(UpdateNetworkPage)
+const { UpdatePage } = createUpdateComponents(options)
+
+export default UpdatePage

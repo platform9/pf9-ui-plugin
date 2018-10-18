@@ -1,48 +1,27 @@
-import { gql } from 'apollo-boost'
+export const loadNetworks = async ({ context, setContext, reload }) => {
+  if (!reload && context.networks) { return context.networks }
+  const networks = await context.apiClient.neutron.getNetworks()
+  setContext({ networks })
+  return networks
+}
 
-export const GET_NETWORK = gql`
-  query GetNetworkById($id: ID!){
-    network(id: $id) {
-      id
-      name
-      shared
-      port_security_enabled
-      external
-      admin_state_up
-    }
-  }
-`
+export const createNetwork = async ({ data, context, setContext }) => {
+  const created = await context.apiClient.neutron.createNetwork(data)
+  const existing = await context.apiClient.neutron.getNetworks()
+  setContext({ networks: [ ...existing, created ] })
+  return created
+}
 
-export const GET_NETWORKS = gql`
-  {
-    networks {
-      id
-      name
-      subnets
-      tenant
-      shared
-      port_security_enabled
-      external
-      admin_state_up
-      status
-    }
-  }
-`
+export const deleteNetwork = async ({ id, context, setContext }) => {
+  await context.apiClient.neutron.deleteNetwork(id)
+  const newList = context.networks.filter(x => x.id !== id)
+  setContext({ networks: newList })
+}
 
-export const REMOVE_NETWORK = gql`
-  mutation RemoveNetwork($id: ID!) {
-    removeNetwork(id: $id)
-  }
-`
-
-export const ADD_NETWORK = gql`
-  mutation CreateNetwork($input: NetworkInput!) {
-    createNetwork(input: $input) { id name subnets tenant admin_state_up port_security_enabled shared external status}
-  }
-`
-
-export const UPDATE_NETWORK = gql`
-  mutation UpdateNetwork($id: ID!, $input: UpdateNetworkInput!){
-    updateNetwork(id: $id, input: $input) { id name admin_state_up port_security_enabled shared external}
-  }
-`
+export const updateNetwork = async ({ data, context, setContext }) => {
+  const { id } = data
+  const existing = await context.apiClient.neutron.getNetworks()
+  const updated = await context.apiClient.neutron.updateNetwork(id, data)
+  const newList = existing.map(x => x.id === id ? x : updated)
+  setContext({ networks: newList })
+}

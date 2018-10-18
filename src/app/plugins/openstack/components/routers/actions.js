@@ -1,41 +1,27 @@
-import { gql } from 'apollo-boost'
+export const loadRouters = async ({ context, setContext, reload }) => {
+  if (!reload && context.routers) { return context.routers }
+  const routers = await context.apiClient.neutron.getRouters()
+  setContext({ routers })
+  return routers
+}
 
-export const GET_ROUTER = gql`
-  query GetRouterById($id: ID!){
-    router(id: $id) {
-      id
-      name
-      admin_state_up
-    }
-  }
-`
+export const createRouter = async ({ data, context, setContext }) => {
+  const created = await context.apiClient.neutron.createRouter(data)
+  const existing = await context.apiClient.neutron.getRouters()
+  setContext({ routers: [ ...existing, created ] })
+  return created
+}
 
-export const GET_ROUTERS = gql`
-  {
-    routers {
-      id
-      tenant_id
-      name
-      admin_state_up
-      status
-    }
-  }
-`
+export const deleteRouter = async ({ id, context, setContext }) => {
+  await context.apiClient.neutron.deleteRouter(id)
+  const newList = context.routers.filter(x => x.id !== id)
+  setContext({ routers: newList })
+}
 
-export const REMOVE_ROUTER = gql`
-  mutation RemoveRouter($id: ID!) {
-    removeRouter(id: $id)
-  }
-`
-
-export const ADD_ROUTER = gql`
-  mutation CreateRouter($input: RouterInput!) {
-    createRouter(input: $input) { id name tenant_id admin_state_up status}
-  }
-`
-
-export const UPDATE_ROUTER = gql`
-  mutation UpdateRouter($id: ID!, $input: UpdateRouterInput!){
-    updateRouter(id: $id, input: $input) { id name tenant_id admin_state_up status}
-  }
-`
+export const updateRouter = async ({ data, context, setContext }) => {
+  const { id } = data
+  const existing = await context.apiClient.neutron.getRouters()
+  const updated = await context.apiClient.neutron.updateRouter(id, data)
+  const newList = existing.map(x => x.id === id ? x : updated)
+  setContext({ routers: newList })
+}

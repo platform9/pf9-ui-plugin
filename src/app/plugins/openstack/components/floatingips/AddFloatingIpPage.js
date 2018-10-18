@@ -1,16 +1,26 @@
 import React from 'react'
-import FormWrapper from 'core/common/FormWrapper'
-import AddFloatingIpForm from './AddFloatingIpForm'
-import requiresAuthentication from '../../util/requiresAuthentication'
+import createAddComponents from 'core/createAddComponents'
+import SubmitButton from 'core/common/SubmitButton'
+import ValidatedForm from 'core/common/ValidatedForm'
+import TextField from 'core/common/TextField'
+import { createFloatingIp, loadFloatingIps } from './actions'
 
-class AddFloatingIpPage extends React.Component {
-  render () {
-    return (
-      <FormWrapper title="Add Floating IP" backUrl="/ui/openstack/floatingips">
-        <AddFloatingIpForm />
-      </FormWrapper>
-    )
-  }
+export const AddFloatingIpForm = ({ onComplete }) => (
+  <ValidatedForm onSubmit={onComplete}>
+    <TextField id="floating_network_id" label="Floating Network ID" />
+    <SubmitButton>Add Floating IP</SubmitButton>
+  </ValidatedForm>
+)
+
+export const options = {
+  FormComponent: AddFloatingIpForm,
+  createFn: createFloatingIp,
+  loaderFn: loadFloatingIps,
+  listUrl: '/ui/openstack/floatingips',
+  name: 'AddFloatingIp',
+  title: 'Add Floating IP',
 }
 
-export default requiresAuthentication(AddFloatingIpPage)
+const { AddPage } = createAddComponents(options)
+
+export default AddPage

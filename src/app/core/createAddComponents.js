@@ -8,11 +8,12 @@ import { compose } from 'core/fp'
 const createAddComponents = options => {
   const defaults = {}
   const {
-    dataKey,
     FormComponent,
+    createFn,
+    dataKey,
+    initFn,
     listUrl,
     loaderFn,
-    createFn,
     name,
     title,
   } = { ...defaults, ...options }
@@ -22,6 +23,11 @@ const createAddComponents = options => {
       const { setContext, context, history } = this.props
       try {
         const existing = await loaderFn({ setContext, context })
+        if (initFn) {
+          // Sometimes a component needs more than just a single GET API call.
+          // This function allows for any amount of arbitrary initialization.
+          await initFn(this.props)
+        }
         const created = await createFn({ data, context, setContext })
         setContext({ [dataKey]: [...existing, ...created] })
         history.push(listUrl)
@@ -33,7 +39,7 @@ const createAddComponents = options => {
     render () {
       return (
         <FormWrapper title={title} backUrl={listUrl}>
-          <FormComponent onComplete={this.handleAdd} />
+          <FormComponent {...this.props} onComplete={this.handleAdd} />
         </FormWrapper>
       )
     }
