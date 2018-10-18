@@ -1,4 +1,4 @@
-import Tenant from '../models/Tenant'
+import Tenant from '../models/openstack/Tenant'
 
 import {
   ensureArray,

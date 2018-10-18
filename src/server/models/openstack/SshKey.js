@@ -1,5 +1,5 @@
-import context from '../context'
-import ActiveModel from './ActiveModel'
+import context from '../../context'
+import ActiveModel from '../ActiveModel'
 
 const coll = () => context.sshKeys
 

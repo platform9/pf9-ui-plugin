@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import FloatingIp from '../../models/FloatingIp'
+import FloatingIp from '../../models/openstack/FloatingIp'
 import { mapAsJson } from '../../helpers'
 
 const getFloatingIps = (req, res) => {

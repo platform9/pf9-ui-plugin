@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import Router from '../../models/Router'
+import Router from '../../models/openstack/Router'
 import { mapAsJson } from '../../helpers'
 
 const getRouters = (req, res) => {

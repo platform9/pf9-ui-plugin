@@ -1,4 +1,4 @@
-import Image from '../../models/Image'
+import Image from '../../models/openstack/Image'
 
 const deleteImage = (req, res) => {
   // TODO: account for tenancy

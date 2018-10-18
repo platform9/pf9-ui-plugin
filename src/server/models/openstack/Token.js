@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
-import context from '../context'
-import ActiveModel from './ActiveModel'
-import { findById, mapAsJson, jsonOrNull } from '../helpers'
+import context from '../../context'
+import ActiveModel from '../ActiveModel'
+import { findById, mapAsJson, jsonOrNull } from '../../helpers'
 
 const coll = () => context.tokens
 

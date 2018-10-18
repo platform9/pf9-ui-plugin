@@ -1,4 +1,4 @@
-import Volume from '../../models/Volume'
+import Volume from '../../models/openstack/Volume'
 import { mapAsJson } from '../../helpers'
 
 const getVolumes = (req, res) => {

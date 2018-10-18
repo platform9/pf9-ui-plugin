@@ -1,4 +1,4 @@
-import Tenant from '../../models/Tenant'
+import Tenant from '../../models/openstack/Tenant'
 
 const deleteProject = (req, res) => {
   const { projectId } = req.params

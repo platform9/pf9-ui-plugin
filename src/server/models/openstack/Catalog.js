@@ -1,5 +1,5 @@
 import uuid from 'uuid'
-const config = require('../../../config')
+const config = require('../../../../config')
 
 const fakeTenantId = uuid.v4()
 

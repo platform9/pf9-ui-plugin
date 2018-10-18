@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import Hypervisor from '../../models/Hypervisor'
+import Hypervisor from '../../models/openstack/Hypervisor'
 import { mapAsJson } from '../../helpers'
 
 const getHypervisors = (req, res) => {

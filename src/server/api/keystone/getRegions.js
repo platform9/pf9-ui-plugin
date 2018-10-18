@@ -1,4 +1,4 @@
-import Region from '../../models/Region'
+import Region from '../../models/openstack/Region'
 import { mapAsJson } from '../../helpers'
 
 const getRegions = (req, res) => {

@@ -1,11 +1,11 @@
 /* eslint-disable camelcase */
-import context from '../context'
-import ActiveModel from './ActiveModel'
-import { findById } from '../helpers'
+import context from '../../context'
+import ActiveModel from '../ActiveModel'
+import { findById } from '../../helpers'
 
-const coll = () => context.tenants
+const coll = () => context.regions
 
-class Tenant extends ActiveModel {
+class Region extends ActiveModel {
   constructor (params = {}) {
     super(params)
     this.name = params.name || ''
@@ -21,15 +21,9 @@ class Tenant extends ActiveModel {
     const json = {
       ...super.asJson(),
       name: this.name,
-      description: this.description,
     }
     return json
   }
-
-  asGraphQl = () => ({
-    ...this.asJson(),
-    __typename: 'Tenant',
-  })
 }
 
-export default Tenant
+export default Region

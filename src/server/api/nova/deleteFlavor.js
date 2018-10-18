@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import Flavor from '../../models/Flavor'
+import Flavor from '../../models/openstack/Flavor'
 
 const deleteFlavor = (req, res) => {
   // TODO: account for tenancy

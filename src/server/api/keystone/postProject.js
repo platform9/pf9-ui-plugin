@@ -1,4 +1,4 @@
-import Tenant from '../../models/Tenant'
+import Tenant from '../../models/openstack/Tenant'
 
 const postProject = (req, res) => {
   const project = req.body.project

@@ -1,5 +1,5 @@
 import ActiveModel from '../ActiveModel'
-import Tenant from '../Tenant'
+import Tenant from '../openstack/Tenant'
 
 const UUID_STRING_LENGTH = 36
 

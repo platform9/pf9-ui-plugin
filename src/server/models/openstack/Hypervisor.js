@@ -1,6 +1,6 @@
-import context from '../context'
-import ActiveModel from './ActiveModel'
-import { findById } from '../helpers'
+import context from '../../context'
+import ActiveModel from '../ActiveModel'
+import { findById } from '../../helpers'
 import uuid from 'uuid'
 
 const coll = () => context.hypervisors

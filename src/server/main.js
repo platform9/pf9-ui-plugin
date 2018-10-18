@@ -3,7 +3,7 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'development'
 const context = require('./context').default
 const server = require('./server')
 const config = require('../../config')
-const User = require('./models/User').default
+const User = require('./models/openstack/User').default
 
 server.startServer()
 context.resetContext()

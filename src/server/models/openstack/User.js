@@ -1,6 +1,6 @@
-import context from '../context'
-import ActiveModel from './ActiveModel'
-import { findById, updateById } from '../helpers'
+import context from '../../context'
+import ActiveModel from '../ActiveModel'
+import { findById, updateById } from '../../helpers'
 
 const coll = () => context.users
 

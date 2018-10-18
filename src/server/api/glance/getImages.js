@@ -1,4 +1,4 @@
-import Image from '../../models/Image'
+import Image from '../../models/openstack/Image'
 import { mapAsJson } from '../../helpers'
 
 const getImages = (req, res) => {

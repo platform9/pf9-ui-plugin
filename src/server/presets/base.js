@@ -1,11 +1,11 @@
 /* eslint-disable no-unused-vars */
 import context from '../context'
-import Region from '../models/Region'
-import Role from '../models/Role'
-import Tenant from '../models/Tenant'
-import User from '../models/User'
-import Flavor from '../models/Flavor'
-import Volume from '../models/Volume'
+import Region from '../models/openstack/Region'
+import Role from '../models/openstack/Role'
+import Tenant from '../models/openstack/Tenant'
+import User from '../models/openstack/User'
+import Flavor from '../models/openstack/Flavor'
+import Volume from '../models/openstack/Volume'
 // import Token from '../models/Token'
 
 function loadPreset () {

@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import Network from '../../models/Network'
+import Network from '../../models/openstack/Network'
 
 const postNetwork = (req, res) => {
   // TODO: account for tenancy

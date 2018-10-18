@@ -1,4 +1,4 @@
-import User from '../../models/User'
+import User from '../../models/openstack/User'
 import { mapAsJson } from '../../helpers'
 
 const getUsers = (req, res) => {

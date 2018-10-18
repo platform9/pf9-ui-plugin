@@ -1,4 +1,4 @@
-import User from '../../models/User'
+import User from '../../models/openstack/User'
 
 const postUser = (req, res) => {
   const user = req.body.user

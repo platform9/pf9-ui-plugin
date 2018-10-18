@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import Router from '../../models/Router'
+import Router from '../../models/openstack/Router'
 
 const deleteRouter = (req, res) => {
   // TODO: account for tenancy

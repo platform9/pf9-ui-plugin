@@ -1,4 +1,4 @@
-import Image from '../../models/Image'
+import Image from '../../models/openstack/Image'
 
 const patchImage = (req, res) => {
   // TODO: account for tenancy

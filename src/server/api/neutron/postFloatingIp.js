@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import FloatingIp from '../../models/FloatingIp'
+import FloatingIp from '../../models/openstack/FloatingIp'
 
 const postFloatingIp = (req, res) => {
   // TODO: account for tenancy

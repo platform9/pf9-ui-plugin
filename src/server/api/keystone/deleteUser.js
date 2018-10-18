@@ -1,4 +1,4 @@
-import User from '../../models/User'
+import User from '../../models/openstack/User'
 
 const deleteUser = (req, res) => {
   const { userId } = req.params

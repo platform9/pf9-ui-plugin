@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import SshKey from '../../models/SshKey'
+import SshKey from '../../models/openstack/SshKey'
 
 const postSshKey = (req, res) => {
   // TODO: account for tenancy

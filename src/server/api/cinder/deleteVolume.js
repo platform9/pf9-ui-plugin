@@ -1,4 +1,4 @@
-import Volume from '../../models/Volume'
+import Volume from '../../models/openstack/Volume'
 
 const deleteVolume = (req, res) => {
   // TODO: account for tenancy

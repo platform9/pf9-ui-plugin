@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import Network from '../../models/Network'
+import Network from '../../models/openstack/Network'
 import { mapAsJson } from '../../helpers'
 
 const getNetworks = (req, res) => {

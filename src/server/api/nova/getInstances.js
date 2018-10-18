@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import Instance from '../../models/Instance'
+import Instance from '../../models/openstack/Instance'
 import { mapAsJson } from '../../helpers'
 
 const getInstances = (req, res) => {

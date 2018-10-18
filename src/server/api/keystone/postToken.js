@@ -1,6 +1,6 @@
-import Tenant from '../../models/Tenant'
-import Token from '../../models/Token'
-import User from '../../models/User'
+import Tenant from '../../models/openstack/Tenant'
+import Token from '../../models/openstack/Token'
+import User from '../../models/openstack/User'
 
 const postToken = (req, res) => {
   const auth = req.body.auth

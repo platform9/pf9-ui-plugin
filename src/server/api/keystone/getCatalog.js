@@ -1,4 +1,4 @@
-import Catalog from '../../models/Catalog'
+import Catalog from '../../models/openstack/Catalog'
 
 const getCatalog = (req, res) => {
   const catalog = Catalog.getCatalog()

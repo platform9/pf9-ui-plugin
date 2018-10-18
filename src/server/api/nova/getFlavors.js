@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import Flavor from '../../models/Flavor'
+import Flavor from '../../models/openstack/Flavor'
 import { mapAsJson } from '../../helpers'
 
 const getFlavors = (req, res) => {
