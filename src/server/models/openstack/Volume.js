@@ -50,11 +50,6 @@ class Volume extends ActiveModel {
       created_at: this.created_at
     }
   }
-
-  asGraphQl = () => ({
-    ...this.asJson(),
-    __typename: 'Volume',
-  })
 }
 
 export default Volume

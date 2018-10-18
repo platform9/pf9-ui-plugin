@@ -53,8 +53,6 @@ import ApplicationsPage from './components/applications/ApplicationsListPage'
 import SshKeysPage from './components/sshkeys/SshKeysListPage'
 import AddSshKeyPage from './components/sshkeys/AddSshKeyPage'
 
-import openstackSchemas from 'schema/openstack'
-
 class OpenStack extends React.Component {
   render () {
     return (
@@ -313,8 +311,6 @@ OpenStack.registerPlugin = pluginManager => {
       }
     ]
   )
-
-  pluginManager.registerSchema(openstackSchemas)
 }
 
 export default OpenStack

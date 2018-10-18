@@ -37,11 +37,6 @@ class Network extends ActiveModel {
       status: this.status
     }
   }
-
-  asGraphQl = () => ({
-    ...this.asJson(),
-    __typename: 'Network',
-  })
 }
 
 export default Network

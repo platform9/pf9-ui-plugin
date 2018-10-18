@@ -53,11 +53,6 @@ class User extends ActiveModel {
       rolePair: this.rolePair
     }
   }
-
-  asGraphQl = () => ({
-    ...this.asJson(),
-    __typename: 'User',
-  })
 }
 
 export default User

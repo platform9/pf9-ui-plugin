@@ -33,11 +33,6 @@ class Flavor extends ActiveModel {
       tags: this.tags
     }
   }
-
-  asGraphQl = () => ({
-    ...this.asJson(),
-    __typename: 'Flavor',
-  })
 }
 
 export default Flavor

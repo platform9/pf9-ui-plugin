@@ -61,14 +61,14 @@ class Context {
     if (!flavor) {
       throw new Error('Unable to find non-existent flavor')
     }
-    return flavor.asGraphQl()
+    return flavor.asJson()
   }
 
-  getFlavors = () => Flavor.getCollection().map(x => x.asGraphQl())
+  getFlavors = () => Flavor.getCollection().map(x => x.asJson())
 
   createFlavor = ({ input }) => {
     const flavor = new Flavor({...input})
-    return flavor.asGraphQl()
+    return flavor.asJson()
   }
 
   updateFlavor = (id, input) => {
@@ -76,7 +76,7 @@ class Context {
     if (!flavor) {
       throw new Error('Unable to update non-existent flavor')
     }
-    return flavor.asGraphQl()
+    return flavor.asJson()
   }
 
   removeFlavor = id => {
@@ -113,11 +113,11 @@ class Context {
   }
 
   getTenants = () =>
-    Tenant.getCollection().map(x => x.asGraphQl())
+    Tenant.getCollection().map(x => x.asJson())
 
   createTenant = ({ input }) => {
     const tenant = new Tenant({...input})
-    return tenant.asGraphQl()
+    return tenant.asJson()
   }
 
   updateTenant = (id, { input }) => {
@@ -139,8 +139,8 @@ class Context {
   getTenantRoles = id => {
     const user = User.findById(id).asJson()
     return user.roles.map(({ tenant, role }) => (JSON.stringify({
-      // tenant: Tenant.findById(tenant.id).asGraphQl(),
-      // role: Role.findById(role.id).asGraphQl()
+      // tenant: Tenant.findById(tenant.id).asJson(),
+      // role: Role.findById(role.id).asJson()
       tenant: Tenant.findById(tenant.id).asJson().name,
       role: Role.findById(role.id).asJson().name
     })))
@@ -151,14 +151,14 @@ class Context {
     if (!user) {
       throw new Error('Unable to find non-existent user')
     }
-    return user.asGraphQl()
+    return user.asJson()
   }
 
-  getUsers = () => User.getCollection().map(x => x.asGraphQl())
+  getUsers = () => User.getCollection().map(x => x.asJson())
 
   createUser = ({ input }) => {
     const user = new User(input)
-    return user.asGraphQl()
+    return user.asJson()
   }
 
   updateUser = (id, input) => {
@@ -166,7 +166,7 @@ class Context {
     if (!user) {
       throw new Error('Unable to update non-existent user')
     }
-    return user.asGraphQl()
+    return user.asJson()
   }
 
   removeUser = id => {
@@ -183,14 +183,14 @@ class Context {
     if (!network) {
       throw new Error('Unable to get non-existent network')
     }
-    return network.asGraphQl()
+    return network.asJson()
   }
 
-  getNetworks = () => Network.getCollection().map(x => x.asGraphQl())
+  getNetworks = () => Network.getCollection().map(x => x.asJson())
 
   createNetwork = ({ input }) => {
     const network = new Network(input)
-    return network.asGraphQl()
+    return network.asJson()
   }
 
   updateNetwork = (id, input) => {
@@ -198,7 +198,7 @@ class Context {
     if (!network) {
       throw new Error('Unable to update non-existent network')
     }
-    return network.asGraphQl()
+    return network.asJson()
   }
 
   removeNetwork = (id) => {
@@ -215,14 +215,14 @@ class Context {
     if (!router) {
       throw new Error('Unable to get non-existent router')
     }
-    return router.asGraphQl()
+    return router.asJson()
   }
 
-  getRouters = () => Router.getCollection().map(x => x.asGraphQl())
+  getRouters = () => Router.getCollection().map(x => x.asJson())
 
   createRouter = ({ input }) => {
     const router = new Router(input)
-    return router.asGraphQl()
+    return router.asJson()
   }
 
   updateRouter = (id, input) => {
@@ -230,7 +230,7 @@ class Context {
     if (!router) {
       throw new Error('Unable to update non-existent router')
     }
-    return router.asGraphQl()
+    return router.asJson()
   }
 
   removeRouter = (id) => {
@@ -247,14 +247,14 @@ class Context {
     if (!floatingIp) {
       throw new Error('Unable to get non-existent floating IP')
     }
-    return floatingIp.asGraphQl()
+    return floatingIp.asJson()
   }
 
-  getFloatingIps = () => FloatingIp.getCollection().map(x => x.asGraphQl())
+  getFloatingIps = () => FloatingIp.getCollection().map(x => x.asJson())
 
   createFloatingIp = ({ input }) => {
     const floatingIp = new FloatingIp(input)
-    return floatingIp.asGraphQl()
+    return floatingIp.asJson()
   }
 
   updateFloatingIp = (id, input) => {
@@ -262,7 +262,7 @@ class Context {
     if (!floatingIp) {
       throw new Error('Unable to update non-existent floating IP')
     }
-    return floatingIp.asGraphQl()
+    return floatingIp.asJson()
   }
 
   removeFloatingIp = (id) => {
@@ -279,14 +279,14 @@ class Context {
     if (!volume) {
       throw new Error('Unable to find non-existent volume')
     }
-    return volume.asGraphQl()
+    return volume.asJson()
   }
 
-  getVolumes = () => Volume.getCollection().map(x => x.asGraphQl())
+  getVolumes = () => Volume.getCollection().map(x => x.asJson())
 
   createVolume = ({ input }) => {
     const volume = new Volume(input)
-    return volume.asGraphQl()
+    return volume.asJson()
   }
 
   updateVolume = (id, input) => {
@@ -294,7 +294,7 @@ class Context {
     if (!volume) {
       throw new Error('Unable to update non-existent volume')
     }
-    return volume.asGraphQl()
+    return volume.asJson()
   }
 
   removeVolume = id => {
@@ -311,10 +311,10 @@ class Context {
     if (!hypervisor) {
       throw new Error('Unable to find non-existent hypervisor')
     }
-    return hypervisor.asGraphQl()
+    return hypervisor.asJson()
   }
 
-  getHypervisors = () => Hypervisor.getCollection().map(x => x.asGraphQl())
+  getHypervisors = () => Hypervisor.getCollection().map(x => x.asJson())
 
   getResMgrHost = (id) => {
     const resMgrHost = ResMgrHost.findById(id)
@@ -376,14 +376,14 @@ class Context {
     if (!application) {
       throw new Error('Unable to find non-existent application')
     }
-    return application.asGraphQl()
+    return application.asJson()
   }
 
-  getApplications = () => Application.getCollection().map(x => x.asGraphQl())
+  getApplications = () => Application.getCollection().map(x => x.asJson())
 
   createApplication = ({ input }) => {
     const application = new Application(input)
-    return application.asGraphQl()
+    return application.asJson()
   }
 
   updateApplication = (id, input) => {
@@ -391,7 +391,7 @@ class Context {
     if (!application) {
       throw new Error('Unable to update non-existent application')
     }
-    return application.asGraphQl()
+    return application.asJson()
   }
 
   removeApplication = id => {
@@ -408,14 +408,14 @@ class Context {
     if (!sshKey) {
       throw new Error('Unable to find non-existent ssh key')
     }
-    return sshKey.asGraphQl()
+    return sshKey.asJson()
   }
 
-  getSshKeys = () => SshKey.getCollection().map(x => x.asGraphQl())
+  getSshKeys = () => SshKey.getCollection().map(x => x.asJson())
 
   createSshKey = ({ input }) => {
     const sshKey = new SshKey(input)
-    return sshKey.asGraphQl()
+    return sshKey.asJson()
   }
 
   removeSshKey = name => {

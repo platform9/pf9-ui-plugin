@@ -1,7 +1,7 @@
 import bodyParser from 'body-parser'
 import express from 'express'
 import http from 'http'
-import { mountGraphql } from './graphql'
+import cors from 'cors'
 
 import {
   requestLogger,
@@ -44,8 +44,7 @@ export function startServer (config = defaultConfig) {
   app.use('/neutron', neutron)
   app.use('/cinder', cinder)
   app.use('/glance', glance)
-
-  mountGraphql(app)
+  app.use(cors())
 
   console.log(`Simulator server currently listening on port ${config.port}`)
   serverInstance = http.createServer(app).listen(config.port)

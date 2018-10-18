@@ -35,11 +35,6 @@ class Application extends ActiveModel {
       categories: this.categories
     }
   }
-
-  asGraphQl = () => ({
-    ...this.asJson(),
-    __typename: 'Application',
-  })
 }
 
 export default Application

@@ -27,11 +27,6 @@ class Role extends ActiveModel {
     }
     return json
   }
-
-  asGraphQl = () => ({
-    ...this.asJson(),
-    __typename: 'Role',
-  })
 }
 
 export default Role

@@ -9,7 +9,6 @@ let data = {
   pluginList: [],
   routes: [],
   navItems: [],
-  schemas: [], // graphql schemas
   options: { ...defaultOptions },
 }
 
@@ -44,10 +43,6 @@ const pluginManager = {
       })
   },
 
-  registerSchema (schema) {
-    data.schemas.push(schema)
-  },
-
   getComponents () {
     return data.components
   },
@@ -58,10 +53,6 @@ const pluginManager = {
 
   getNavItems () {
     return data.navItems
-  },
-
-  getSchemas () {
-    return data.schemas
   },
 
   getOptions () {

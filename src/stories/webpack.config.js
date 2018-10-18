@@ -22,7 +22,6 @@ module.exports = {
       core: path.resolve(__dirname, '../app/core'),
       openstack: path.resolve(__dirname, '../app/plugins/openstack'),
       kubernetes: path.resolve(__dirname, '../app/plugins/kubernetes'),
-      schema: path.resolve(__dirname, '../graphql'),
       util: path.resolve(__dirname, '../app/util'),
     },
     extensions: ['.webpack.js', '.web.js', '.js', '.json', '.css'],

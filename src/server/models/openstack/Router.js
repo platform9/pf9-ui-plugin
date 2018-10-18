@@ -29,11 +29,6 @@ class Router extends ActiveModel {
       status: this.status
     }
   }
-
-  asGraphQl = () => ({
-    ...this.asJson(),
-    __typename: 'Router',
-  })
 }
 
 export default Router

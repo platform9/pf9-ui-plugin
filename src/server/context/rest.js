@@ -1,7 +1,7 @@
 import ApiClient from '../../api-client'
 import config from '../../../config'
 
-// The GraphQL schema does not like null values for disk, ram, and vcpus
+// Convert null values from API to 0.
 const sanitizeFlavor = flavor => ({
   ...flavor,
   disk: flavor.disk || 0,
@@ -38,8 +38,7 @@ class Context {
 
   getUsers = async () => {
     const users = (await this.client.keystone.getUsers() || [])
-    // Sometimes the API returns users without a username.  This violates
-    // the GraphQL schema (non-nullable) so just use an empty string.
+    // Sometimes the API returns users without a username.
     const sanitized = users.map(user => ({...user, username: user.username || ''}))
     return sanitized
   }

@@ -41,11 +41,6 @@ class FloatingIp extends ActiveModel {
       router_id: this.router_id
     }
   }
-
-  asGraphQl = () => ({
-    ...this.asJson(),
-    __typename: 'FloatingIp',
-  })
 }
 
 export default FloatingIp

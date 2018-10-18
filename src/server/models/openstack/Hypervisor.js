@@ -38,11 +38,6 @@ class Hypervisor extends ActiveModel {
       hypervisor_hostname: this.hypervisor_hostname
     }
   }
-
-  asGraphQl = () => ({
-    ...this.asJson(),
-    __typename: 'Hypervisor',
-  })
 }
 
 export default Hypervisor

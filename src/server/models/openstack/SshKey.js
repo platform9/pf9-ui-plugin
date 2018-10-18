@@ -26,11 +26,6 @@ class SshKey extends ActiveModel {
       }
     }
   }
-
-  asGraphQl = () => ({
-    ...this.asJson(),
-    __typename: 'SshKey',
-  })
 }
 
 export default SshKey
