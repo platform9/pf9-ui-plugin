@@ -2,7 +2,6 @@
   "presets": [ 'es2015', 'stage-0', 'react' ],
   "plugins": [
     "transform-decorators-legacy",
-    "react-hot-loader/babel",
-    "babel-plugin-graphql-import"
+    "react-hot-loader/babel"
   ]
 }
