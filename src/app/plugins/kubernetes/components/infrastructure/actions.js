@@ -19,6 +19,14 @@ export const createCloudProvider = async ({ data, context, setContext }) => {
   return created
 }
 
+export const updateCloudProvider = async ({ data, context, setContext }) => {
+  const { id } = data
+  const existing = await context.apiClient.qbert.getCloudProviders()
+  const updated = await context.apiClient.qbert.updateCloudProvider(id, data)
+  const newList = existing.map(x => x.id === id ? x : updated)
+  setContext({ routers: newList })
+}
+
 export const deleteCloudProvider = async ({ id, context, setContext }) => {
   await context.apiClient.qbert.deleteCloudProvider(id)
   const newCps = context.cloudProviders.filter(x => x.id !== id)

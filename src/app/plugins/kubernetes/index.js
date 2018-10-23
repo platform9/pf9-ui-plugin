@@ -2,6 +2,7 @@ import React from 'react'
 
 import InfrastructurePage from './components/infrastructure/InfrastructurePage'
 import AddCloudProviderPage from './components/infrastructure/AddCloudProviderPage'
+import UpdateCloudProviderPage from './components/infrastructure/UpdateCloudProviderPage'
 import AppsIndexPage from './components/apps/AppsIndexPage'
 import PodsIndexPage from './components/pods/PodsIndexPage'
 import StorageClassesPage from './components/storage/StorageClassesPage'
@@ -32,6 +33,11 @@ Kubernetes.registerPlugin = pluginManager => {
         name: 'Create Cloud Provider',
         link: { path: '/infrastructure/cloudProviders/add', exact: true },
         component: AddCloudProviderPage
+      },
+      {
+        name: 'Update Cloud Provider',
+        link: { path: '/infrastructure/cloudProviders/edit/:id', exact: true },
+        component: UpdateCloudProviderPage
       },
       {
         name: 'App Catalog',

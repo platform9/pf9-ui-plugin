@@ -9,6 +9,7 @@ import { compose } from 'core/fp'
 const createUpdateComponents = options => {
   const defaults = {
     uniqueIdentifier: 'id',
+    routeParamKey: 'id',
   }
 
   const {
@@ -19,6 +20,9 @@ const createUpdateComponents = options => {
     listUrl,
     loaderFn,
     name,
+
+    // This should match the id in the route.  Ex:
+    // '/prefix/entity/:entityId' would be 'entityId'
     routeParamKey,
     title,
     uniqueIdentifier,

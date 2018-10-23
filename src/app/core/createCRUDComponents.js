@@ -86,6 +86,7 @@ const createCRUDComponents = options => {
           addUrl={`${baseUrl}/add`}
           editUrl={`${baseUrl}/edit`}
           onRemove={this.handleRemove}
+          uniqueIdentifier={uniqueIdentifier}
         >
           {handlers => <List data={this.props.data} {...handlers} {...moreProps} />}
         </CRUDListContainer>
