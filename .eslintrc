@@ -23,6 +23,12 @@
     "react/prop-types": 0,
     "no-new": 0,
     "space-infix-ops": 0,
+
+    // Allow for "table" alignment, ex:
+    // { id: 'name',       type: 'string' }
+    // { id: 'longerName', type: 'string' }
+    "no-multi-spaces": [2, { exceptions: { "ObjectExpression": true } } ],
+    "key-spacing": [2, { mode: "minimum" }]
   },
 
   "settings": {

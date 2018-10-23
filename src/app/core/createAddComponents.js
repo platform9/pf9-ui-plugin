@@ -1,22 +1,29 @@
 import React from 'react'
 import FormWrapper from 'core/common/FormWrapper'
 import requiresAuthentication from 'openstack/util/requiresAuthentication'
+import createFormComponent from 'core/createFormComponent'
 import { withRouter } from 'react-router-dom'
 import { withAppContext } from 'core/AppContext'
 import { compose } from 'core/fp'
 
 const createAddComponents = options => {
   const defaults = {}
-  const {
+  let {
     FormComponent,
     createFn,
     dataKey,
+    formSpec,
     initFn,
     listUrl,
     loaderFn,
     name,
     title,
   } = { ...defaults, ...options }
+
+  if (!FormComponent && formSpec) {
+    formSpec.displayName = `${options.name}Form`
+    FormComponent = createFormComponent(formSpec)
+  }
 
   class AddPageBase extends React.Component {
     handleAdd = async data => {
