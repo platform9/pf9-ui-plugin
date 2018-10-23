@@ -7,8 +7,8 @@ const createFormComponent = ({ submitLabel, initialValue, displayName, fields })
   const mapField = spec => {
     const props = {
       ...spec,
-      key:   spec.id,
-      type:  spec.type || 'string',
+      key:  spec.id,
+      type: spec.type || 'string',
     }
     if (props.type === 'string' || props.type === 'number') { return <TextField {...props} /> }
   }

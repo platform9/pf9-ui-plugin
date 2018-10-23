@@ -10,8 +10,8 @@ const initialValue = {
 }
 
 export const options = {
-  initialValue,
   formSpec: {
+    initialValue,
     fields: [
       { id: 'name',  label: 'Name' },
       { id: 'vcpus', label: 'VCPUs', type: 'number' },
