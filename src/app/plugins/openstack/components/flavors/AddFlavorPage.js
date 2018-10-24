@@ -1,5 +1,4 @@
 import createAddComponents from 'core/createAddComponents'
-import { createFlavor, loadFlavors } from './actions'
 
 const initialValue = {
   name: '',
@@ -20,8 +19,7 @@ export const options = {
     ],
     submitLabel: 'Add Flavor',
   },
-  createFn: createFlavor,
-  loaderFn: loadFlavors,
+  actions: { service: 'nova', entity: 'flavors' },
   listUrl: '/ui/openstack/flavors',
   name: 'AddFlavor',
   title: 'Add Flavor',

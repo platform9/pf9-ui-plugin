@@ -23,13 +23,13 @@ class Nova {
   hypervisorsUrl = async () => `${await this.endpoint()}/os-hypervisors`
   sshKeysUrl = async () => `${await this.endpoint()}/os-keypairs`
 
-  async getFlavors () {
+  getFlavors = async () => {
     const url = `${await this.flavorsUrl()}/detail?is_public=no`
     const response = await axios.get(url, this.client.getAuthHeaders())
     return response.data.flavors
   }
 
-  async createFlavor (params) {
+  createFlavor = async (params) => {
     // The Nova API has an unfortunately horribly named key for public.
     const converted = renameKey('public', 'os-flavor-access:is_public')(params)
     const body = { flavor: converted }
@@ -38,10 +38,17 @@ class Nova {
     return response.data.flavor
   }
 
-  async deleteFlavor (id) {
+  deleteFlavor = async (id) => {
     const url = `${await this.flavorsUrl()}/${id}`
     const response = await axios.delete(url, this.client.getAuthHeaders())
     return response
+  }
+
+  // Allow these methods to be accessed programatically as well.
+  flavors = {
+    create: this.createFlavor,
+    list: this.getFlavors,
+    delete: this.deleteFlavor,
   }
 
   async getInstances () {

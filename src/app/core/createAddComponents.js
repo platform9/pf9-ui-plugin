@@ -1,6 +1,7 @@
 import React from 'react'
 import FormWrapper from 'core/common/FormWrapper'
 import requiresAuthentication from 'openstack/util/requiresAuthentication'
+import createCRUDActions from 'core/createCRUDActions'
 import createFormComponent from 'core/createFormComponent'
 import { withRouter } from 'react-router-dom'
 import { withAppContext } from 'core/AppContext'
@@ -10,6 +11,7 @@ const createAddComponents = options => {
   const defaults = {}
   let {
     FormComponent,
+    actions,
     createFn,
     dataKey,
     formSpec,
@@ -25,17 +27,19 @@ const createAddComponents = options => {
     FormComponent = createFormComponent(formSpec)
   }
 
+  const crudActions = actions ? createCRUDActions(actions) : null
+
   class AddPageBase extends React.Component {
     handleAdd = async data => {
       const { setContext, context, history } = this.props
       try {
-        const existing = await loaderFn({ setContext, context })
+        const existing = await (loaderFn || crudActions.list)({ setContext, context })
         if (initFn) {
           // Sometimes a component needs more than just a single GET API call.
           // This function allows for any amount of arbitrary initialization.
           await initFn(this.props)
         }
-        const created = await createFn({ data, context, setContext })
+        const created = await (createFn || crudActions.create)({ data, context, setContext })
         setContext({ [dataKey]: [...existing, ...created] })
         history.push(listUrl)
       } catch (err) {

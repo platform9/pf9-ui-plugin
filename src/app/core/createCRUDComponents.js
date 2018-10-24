@@ -3,6 +3,7 @@ import DataLoader from 'core/DataLoader'
 import CRUDListContainer from 'core/common/CRUDListContainer'
 import requiresAuthentication from 'openstack/util/requiresAuthentication'
 import ListTable from 'core/common/ListTable'
+import createCRUDActions from 'core/createCRUDActions'
 import { compose } from 'core/fp'
 import { withAppContext } from 'core/AppContext'
 import { withRouter } from 'react-router-dom'
@@ -34,6 +35,7 @@ const createCRUDComponents = options => {
   }
 
   const {
+    actions,
     baseUrl,
     columns,
     dataKey,
@@ -44,6 +46,8 @@ const createCRUDComponents = options => {
     title,
     uniqueIdentifier,
   } = { ...defaults, ...options }
+
+  const crudActions = actions ? createCRUDActions(actions) : null
 
   // List
   const List = ({ onAdd, onDelete, onEdit, rowActions, data }) => {
@@ -71,7 +75,7 @@ const createCRUDComponents = options => {
   class ContainerBase extends React.Component {
     handleRemove = id => {
       const { context, setContext } = this.props
-      return deleteFn({ id, context, setContext })
+      return (deleteFn || crudActions.delete)({ id, context, setContext })
     }
 
     render () {
@@ -103,7 +107,7 @@ const createCRUDComponents = options => {
 
   // ListPage
   const ListPage = requiresAuthentication(() =>
-    <DataLoader dataKey={dataKey} loaderFn={loaderFn}>
+    <DataLoader dataKey={dataKey} loaderFn={loaderFn || crudActions.list}>
       {({ data }) => <ListContainer data={data} />}
     </DataLoader>
   )

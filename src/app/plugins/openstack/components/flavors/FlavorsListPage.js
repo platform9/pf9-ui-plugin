@@ -1,5 +1,4 @@
 import createCRUDComponents from 'core/createCRUDComponents'
-import { deleteFlavor, loadFlavors } from './actions'
 
 export const options = {
   baseUrl: '/ui/openstack/flavors',
@@ -11,8 +10,7 @@ export const options = {
     { id: 'tags', label: 'tags' }
   ],
   dataKey: 'flavors',
-  deleteFn: deleteFlavor,
-  loaderFn: loadFlavors,
+  actions: { service: 'nova', entity: 'flavors' },
   name: 'Flavors',
   title: 'Flavors',
 }
