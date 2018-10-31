@@ -1,4 +1,4 @@
-import { asyncMap } from 'core/fp'
+import { asyncMap, asyncFlatMap, tap } from 'core/fp'
 
 export const loadClusters = async ({ context, setContext, reload }) => {
   if (!reload && context.clusters) { return context.clusters }
@@ -59,16 +59,16 @@ export const loadInfrastructure = async ({ context, setContext, reload }) => {
   if (reload || !context.namespaces || !context.clusters || !context.nodes) {
     // First `setContext` as the data arrive so we can at least render something.
     const qbert = context.apiClient.qbert
-    const [rawNodes, rawClusters] = await Promise.all([
-      qbert.getClusters().then(clusters => setContext({ clusters })),
-      qbert.getNodes().then(nodes => setContext({ nodes })),
+    const [rawClusters, nodes] = await Promise.all([
+      qbert.getClusters().then(tap(clusters => setContext({ clusters }))),
+      qbert.getNodes().then(tap(nodes => setContext({ nodes }))),
     ])
 
     // Then fill out the derived data
     const clusters = rawClusters.map(cluster => {
-      const nodesInCluster = rawNodes.filter(node => node.clusterId === cluster.id)
+      const nodesInCluster = nodes.filter(node => node.clusterUuid === cluster.uuid)
       const masterNodes = nodesInCluster.filter(node => node.isMaster === 1)
-      const healthyMasterNodes = masterNodes.filter(node => node.status === 'ok')
+      const healthyMasterNodes = masterNodes.filter(node => node.status === 'ok' && node.api_responding === 1)
       return {
         ...cluster,
         nodes,
@@ -78,17 +78,23 @@ export const loadInfrastructure = async ({ context, setContext, reload }) => {
         highlyAvailable: healthyMasterNodes.length > 2,
       }
     })
-    console.log(1)
     setContext({ clusters })
 
-    asyncMap(clusters.filter(x => x.hasMasterNode), async cluster => ({
-      ...cluster,
-      k8sVersion: await qbert.getKubernetesVersion(cluster.uuid),
-    })).then(clustersWithVersions => setContext({ clusters: clustersWithVersions })).then(x => console.log(2))
+    const masterNodeClusters = clusters.filter(x => x.hasMasterNode)
+    asyncMap(masterNodeClusters, async cluster => {
+      try {
+        return {
+          ...cluster,
+          k8sVersion: await qbert.getKubernetesVersion(cluster.uuid),
+        }
+      } catch (err) {
+        console.log(err)
+        return cluster
+      }
+    }).then(clustersWithVersions => setContext({ clusters: clustersWithVersions }))
 
-    console.log(3)
-
-    const nodes = rawNodes
+    asyncFlatMap(masterNodeClusters, cluster => qbert.getClusterNamespaces(cluster.uuid))
+      .then(namespaces => setContext({ namespaces }))
 
     return { nodes, clusters, namespaces: [] }
   }

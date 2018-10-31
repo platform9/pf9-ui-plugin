@@ -114,9 +114,10 @@ class Qbert {
 
       return data.items.map(x => ({
         ...x,
-        clusterId: x.uuid,
-        clusterName: x.name,
-        id: x.metadata.uuid,
+        clusterId: clusterId,
+        name: x.metadata.name,
+        created: x.metadata.creationTimestamp,
+        id: x.metadata.uid,
       }))
     } catch (err) {
       console.log(`Error getting cluster namespaces for clusterId: ${clusterId}`)
