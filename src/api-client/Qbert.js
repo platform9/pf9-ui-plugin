@@ -13,7 +13,6 @@ class Qbert {
   baseUrl = async () => `${await this.endpoint()}`
 
   /* Cloud Providers */
-
   async getCloudProviders () {
     return this.client.basicGet(`${await this.baseUrl()}/cloudProviders`)
   }
@@ -39,9 +38,19 @@ class Qbert {
   }
 
   /* Cloud Providers Types */
-
   async getCloudProviderTypes () {
     return this.client.basicGet(`${await this.baseUrl()}/cloudProvider/types`)
+  }
+
+  /* Nodes */
+  getNodes = async () => {
+    const nodes = await this.client.basicGet(`${await this.baseUrl()}/nodes`)
+    const scopedNodes = nodes.filter(x => x.projectId === this.client.activeProjectId)
+    return scopedNodes
+  }
+
+  nodes = {
+    list: this.getNodes,
   }
 
   /* SSH Keys */
@@ -50,8 +59,16 @@ class Qbert {
   }
 
   /* Clusters */
-  async getClusters () {
-    return this.client.basicGet(`${await this.baseUrl()}/clusters`)
+  getClusters = async () => {
+    const rawClusters = await this.client.basicGet(`${await this.baseUrl()}/clusters`)
+    const baseUrl = await this.baseUrl()
+    return rawClusters.map(cluster => ({
+      ...cluster,
+      endpoint: cluster.externalDnsName || cluster.masterIp,
+      kubeconfigUrl: `${baseUrl}/kubeconfig/${cluster.uuid}`,
+      isUpgrading: cluster.taskStatus === 'upgrading',
+      nodes: [],
+    }))
   }
 
   async getClusterDetails (clusterId) {
@@ -74,6 +91,10 @@ class Qbert {
     return this.client.basicDelete(`${await this.baseUrl()}/clusters/${clusterId}`)
   }
 
+  clusters = {
+    list: this.getClusters,
+  }
+
   async attach (clusterId, nodeIds) { /* TODO */ }
   async _detach (clusterId, nodeIds) { /* TODO */ }
   async detach (clusterId, nodeIds) { /* TODO */ }
@@ -88,7 +109,19 @@ class Qbert {
   }
 
   async getClusterNamespaces (clusterId) {
-    return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces`)
+    try {
+      const data = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces`)
+
+      return data.items.map(x => ({
+        ...x,
+        clusterId: x.uuid,
+        clusterName: x.name,
+        id: x.metadata.uuid,
+      }))
+    } catch (err) {
+      console.log(`Error getting cluster namespaces for clusterId: ${clusterId}`)
+      return []
+    }
   }
 
   async createNamespace (clusterId, body) {

@@ -53,14 +53,14 @@ class ApiClient {
 
   getAuthHeaders (scoped = true) {
     const token = scoped ? this.scopedToken : this.unscopedToken
-    if (!token) {
-      return { headers: {} }
+    // It's not necessary to send both headers but it's easier since we don't
+    // need to pass around the url and have conditional logic.
+    // Both APIs will ignore any headers they don't understand.
+    const headers = {
+      Authorization: `Bearer ${token}`, // required for k8s proxy api
+      'X-Auth-Token': token, // required for OpenStack
     }
-    return ({
-      headers: {
-        'X-Auth-Token': token
-      }
-    })
+    return { headers }
   }
 
   async basicGet (url) {

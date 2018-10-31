@@ -21,6 +21,8 @@ class AppContext extends React.Component {
       // return a Promise.
       return new Promise((resolve, reject) => {
         if (args.length > 1) {
+          // The Promise will never resolve when a callback is passed
+          // but that's ok, because we are using the callback not an await.
           return this.setState(...args)
         }
         setImmediate(() => { window.context = this.state })

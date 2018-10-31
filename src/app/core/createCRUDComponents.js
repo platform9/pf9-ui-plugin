@@ -39,6 +39,7 @@ const createCRUDComponents = options => {
     baseUrl,
     columns,
     dataKey,
+    debug,
     deleteFn,
     loaderFn,
     name,
@@ -106,11 +107,17 @@ const createCRUDComponents = options => {
   ListContainer.displayName = `${name}ListContainer`
 
   // ListPage
-  const ListPage = requiresAuthentication(() =>
+  const StandardListPage = () => (
     <DataLoader dataKey={dataKey} loaderFn={loaderFn || crudActions.list}>
-      {({ data }) => <ListContainer data={data} />}
+      {({ data }) =>
+        <React.Fragment>
+          <ListContainer data={data} />
+          {debug && <pre>{JSON.stringify(data, null, 4)}</pre>}
+        </React.Fragment>
+      }
     </DataLoader>
   )
+  const ListPage = requiresAuthentication(options.ListPage || StandardListPage)
   ListPage.displayName = `${name}ListPage`
 
   return {

@@ -6,7 +6,7 @@ import UpdateCloudProviderPage from './components/infrastructure/UpdateCloudProv
 import AppsIndexPage from './components/apps/AppsIndexPage'
 import PodsIndexPage from './components/pods/PodsIndexPage'
 import StorageClassesPage from './components/storage/StorageClassesPage'
-import NamespacesPage from './components/namespaces/NamespacesPage'
+import NamespacesListPage from './components/namespaces/NamespacesListPage'
 import ApiAccessPage from './components/apiAccess/ApiAccessPage'
 import UserManagementIndexPage from './components/userManagement/UserManagementIndexPage'
 
@@ -57,7 +57,7 @@ Kubernetes.registerPlugin = pluginManager => {
       {
         name: 'Namespaces',
         link: { path: '/namespaces', exact: true },
-        component: NamespacesPage
+        component: NamespacesListPage
       },
       {
         name: 'API Access',

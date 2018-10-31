@@ -72,3 +72,17 @@ export const asyncMap = async (arr, callback) => {
   }
   return newArr
 }
+
+export const asyncFlatMap = async (arr, callback) => {
+  let newArr = []
+  for (let i=0; i<arr.length; i++) {
+    // Array#flat is not widely supported so best to just implement ourselves.
+    const values = await callback(arr[i], i, arr)
+    if (values instanceof Array) {
+      values.forEach(item => newArr.push(item))
+    } else {
+      newArr.push(values)
+    }
+  }
+  return newArr
+}
