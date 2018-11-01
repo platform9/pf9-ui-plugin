@@ -107,17 +107,19 @@ class Qbert {
     return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/version`)
   }
 
+  convertCluster = clusterId => cluster => ({
+    ...cluster,
+    clusterId,
+    name: cluster.metadata.name,
+    created: cluster.metadata.creationTimestamp,
+    id: cluster.metadata.uid,
+  })
+
   async getClusterNamespaces (clusterId) {
     try {
       const data = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces`)
 
-      return data.items.map(x => ({
-        ...x,
-        clusterId: clusterId,
-        name: x.metadata.name,
-        created: x.metadata.creationTimestamp,
-        id: x.metadata.uid,
-      }))
+      return data.items.map(this.convertCluster(clusterId))
     } catch (err) {
       console.log(`Error getting cluster namespaces for clusterId: ${clusterId}`)
       return []
@@ -125,7 +127,9 @@ class Qbert {
   }
 
   async createNamespace (clusterId, body) {
-    return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces`, body)
+    const raw = await this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces`, body)
+    const converted = this.convertCluster(clusterId)(raw)
+    return converted
   }
 
   async deleteNamespace (clusterId, namespaceName) {

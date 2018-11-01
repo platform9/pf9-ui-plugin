@@ -4,6 +4,7 @@ import createCRUDComponents from 'core/createCRUDComponents'
 import Loader from 'core/common/Loader'
 import { withAppContext } from 'core/AppContext'
 import { loadInfrastructure } from '../infrastructure/actions'
+import { deleteNamespace } from './actions'
 
 let ListContainer = null
 
@@ -79,6 +80,7 @@ export const options = {
     { id: 'created', label: 'Created' },
   ],
   dataKey: 'namespaces',
+  deleteFn: deleteNamespace,
   name: 'Namespaces',
   title: 'Namespaces',
   ListPage: NamespacesListPage,
