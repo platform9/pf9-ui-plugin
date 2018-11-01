@@ -45,8 +45,7 @@ class Qbert {
   /* Nodes */
   getNodes = async () => {
     const nodes = await this.client.basicGet(`${await this.baseUrl()}/nodes`)
-    const scopedNodes = nodes.filter(x => x.projectId === this.client.activeProjectId)
-    return scopedNodes
+    return nodes
   }
 
   nodes = {
