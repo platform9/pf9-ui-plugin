@@ -18,7 +18,13 @@
   "extends": ["standard", "standard-react"],
 
   "rules": {
-    "comma-dangle": 0,
+    "comma-dangle": ["error", {
+      "arrays": "always-multiline",
+      "objects": "always-multiline",
+      "imports": "only-multiline",
+      "exports": "only-multiline",
+      "functions": "only-multiline"
+    }],
     "jsx-quotes": 0,
     "react/prop-types": 0,
     "no-new": 0,
