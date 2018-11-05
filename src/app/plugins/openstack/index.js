@@ -69,7 +69,7 @@ OpenStack.registerPlugin = pluginManager => {
     [
       {
         name: 'Dashboard',
-        link: { path: '/', exact: true, default: true },
+        link: { path: '/', exact: true, default: false },
         component: DashboardPage
       },
       {
@@ -253,6 +253,7 @@ OpenStack.registerPlugin = pluginManager => {
   pluginManager.registerNavItems(
     '/ui/openstack',
     [
+      /* Comment out the nav items since first UI release will be K8s only
       {
         name: 'Dashboard',
         link: { path: '/' }
@@ -309,6 +310,7 @@ OpenStack.registerPlugin = pluginManager => {
         name: 'Hosts',
         link: { path: '/hosts' }
       }
+      */
     ]
   )
 }

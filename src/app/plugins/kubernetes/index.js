@@ -27,7 +27,7 @@ Kubernetes.registerPlugin = pluginManager => {
     [
       {
         name: 'Infrastructure',
-        link: { path: '/infrastructure', exact: true },
+        link: { path: '/infrastructure', exact: true, default: true },
         component: InfrastructurePage
       },
       {
