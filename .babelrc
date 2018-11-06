@@ -1,7 +1,15 @@
 {
-  "presets": [ 'es2015', 'stage-0', 'react' ],
+  "presets": ["es2015", "stage-0", "react"],
   "plugins": [
     "transform-decorators-legacy",
-    "react-hot-loader/babel"
+    "react-hot-loader/babel",
+    [
+      "import",
+      {
+        "libraryName": "@material-ui/core",
+        "libraryDirectory": "components",
+        "camel2DashComponentName": false
+      }
+    ]
   ]
 }
