@@ -78,6 +78,16 @@ export const validators = {
 }
 
 export const parseValidator = (key, spec) => {
+  if (!validators.hasOwnProperty(key)) {
+    if (spec instanceof FieldValidator) {
+      return spec
+    }
+    // Custom validator
+    if (typeof spec === 'function') {
+      return customValidator(spec)
+    }
+    throw new Error(`Validator with key ${key} does not exist`)
+  }
   const validator = validators[key]
   if (spec === true) {
     return validator
