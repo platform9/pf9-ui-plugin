@@ -8,6 +8,7 @@ const initialValue = {
   public: false,
 }
 
+// prettier-ignore
 export const options = {
   formSpec: {
     initialValue,

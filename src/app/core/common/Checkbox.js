@@ -1,8 +1,20 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { FormControlLabel, Checkbox as BaseCheckbox } from '@material-ui/core'
+import {
+  Checkbox as BaseCheckbox,
+  FormControl,
+  FormControlLabel,
+  FormHelperText,
+  withStyles,
+} from '@material-ui/core'
 import { withFormContext } from 'core/common/ValidatedForm'
-import { pickMultiple, filterFields } from 'core/fp'
+import { compose, emptyObj, filterFields, pickMultiple } from 'core/fp'
+
+const styles = theme => ({
+  formControl: {
+    margin: theme.spacing.unit,
+  },
+})
 
 class Checkbox extends React.Component {
   constructor (props) {
@@ -11,7 +23,9 @@ class Checkbox extends React.Component {
     props.defineField(props.id, spec)
   }
 
-  get restFields () { return filterFields(...withFormContext.propsToExclude, 'value')(this.props) }
+  get restFields () {
+    return filterFields(...withFormContext.propsToExclude, 'value')(this.props)
+  }
 
   handleChange = e => {
     const { id, onChange, setField } = this.props
@@ -22,20 +36,23 @@ class Checkbox extends React.Component {
   }
 
   render () {
-    const { id, value, label } = this.props
+    const { id, value, label, errors, classes } = this.props
+    const { hasError, errorMessage } = errors[id] || emptyObj
     return (
-      <div id={id}>
+      <FormControl id={id} className={classes.formControl} error={hasError}>
         <FormControlLabel
           label={label}
           control={
             <BaseCheckbox
               {...this.restFields}
+              error={errorMessage}
               checked={value[id]}
               onChange={this.handleChange}
             />
           }
         />
-      </div>
+        <FormHelperText>{errorMessage}</FormHelperText>
+      </FormControl>
     )
   }
 }
@@ -51,4 +68,5 @@ Checkbox.propTypes = {
   initialValue: PropTypes.bool,
   onChange: PropTypes.func,
 }
-export default withFormContext(Checkbox)
+
+export default compose(withFormContext, withStyles(styles))(Checkbox)

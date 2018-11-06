@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { compose, setStateLens } from 'core/fp'
 import { withRouter } from 'react-router-dom'
+import { pathEq } from 'ramda'
 
 const ValidatedFormContext = React.createContext({})
 
@@ -33,38 +34,83 @@ class ValidatedForm extends React.Component {
    * Note: values can be passed up to parent component by supplying a setContext function prop
    */
   setField = (field, value) => {
-    this.setState(setStateLens(value, ['value', field]))
+    this.setState(setStateLens(value, ['value', field]), () => {
+      if (
+        this.state.showingErrors ||
+        (this.props.showErrorsOnBlur &&
+          pathEq(['errors', field, 'hasError'], true, this.state))
+      ) {
+        this.validateField(field)
+      }
+    })
     // Pass field up to parent if there is a parent
     if (this.props.setContext) {
       this.props.setContext(this.state.value)
     }
   }
 
-  state = {
-    value: this.props.initialValue || {},
-    fields: {}, // child fields inject data here
-    setField: this.setField,
-    defineField: this.defineField,
+  /**
+   * Store the error state of the field, which will be accessed by child components
+   */
+  showFieldErrors = (field, errorMessage) => {
+    this.setState(
+      setStateLens({ errorMessage, hasError: true }, ['errors', field])
+    )
   }
 
-  validateField = (field, value, validations, spec) => {
-    // TODO: just a placeholder for now
-    return true
+  clearFieldErrors = field => {
+    this.setState(setStateLens({ hasError: false }, ['errors', field]))
+  }
+
+  validateField = field => {
+    const { fields, value } = this.state
+    const fieldValue = value[field]
+    const { validations } = fields[field]
+    const failedValidation = validations.find(
+      validator => !validator.validate(fieldValue, value, field)
+    )
+    if (failedValidation) {
+      this.showFieldErrors(
+        field,
+        typeof failedValidation.errorMessage === 'function'
+          ? failedValidation.errorMessage(fieldValue, value, field)
+          : failedValidation.errorMessage
+      )
+    } else {
+      this.clearFieldErrors(field)
+    }
+  }
+
+  state = {
+    value: this.props.initialValue || {},
+    showingErrors: false,
+    showErrorsOnBlur: this.props.showErrorsOnBlur,
+    fields: {}, // child fields inject data here
+    errors: {},
+    setField: this.setField,
+    defineField: this.defineField,
+    validateField: this.validateField,
   }
 
   validateForm = () => {
     const { fields, value } = this.state
-    return Object.keys(fields).every(field => this.validateField(field, value[field], fields[field]))
+    const results = Object.keys(fields).map(field =>
+      this.validateField(field, value[field], fields[field])
+    )
+    return results.includes(true)
   }
 
   handleSubmit = event => {
     const { onSubmit } = this.props
-    const { value } = this.state
+    const { value, showingErrors } = this.state
     if (event) {
       event.preventDefault()
     }
 
-    if (!this.validateForm()) { return }
+    if (!this.validateForm() && !showingErrors) {
+      this.setState(prevState => ({ ...prevState, showingErrors: true }))
+      return
+    }
 
     if (onSubmit) {
       onSubmit(value)
@@ -74,9 +120,7 @@ class ValidatedForm extends React.Component {
   render () {
     return (
       <form onSubmit={this.handleSubmit}>
-        <Provider value={this.state}>
-          {this.props.children}
-        </Provider>
+        <Provider value={this.state}>{this.props.children}</Provider>
       </form>
     )
   }
@@ -90,13 +134,13 @@ ValidatedForm.propTypes = {
   onSubmit: PropTypes.func,
 
   triggerSubmit: PropTypes.func,
+
+  showErrorsOnBlur: PropTypes.bool,
 }
 
 export const PropKeys = Object.keys(ValidatedForm.propTypes)
 
-export default compose(
-  withRouter,
-)(ValidatedForm)
+export default compose(withRouter)(ValidatedForm)
 
 /**
  * withFormContext provides access to the form context through props.
@@ -108,17 +152,35 @@ export default compose(
  *
  * @param {Inject the form context into this Component through props.} Component
  */
-export const withFormContext = Component => props =>
+export const withFormContext = Component => props => (
   <Consumer>
-    {
-      ({ defineField, setField, value }) =>
-        <Component
-          {...props}
-          defineField={defineField}
-          setField={setField}
-          value={value}
-        />
-    }
+    {({
+      defineField,
+      setField,
+      value,
+      showErrorsOnBlur,
+      validateField,
+      errors,
+    }) => (
+      <Component
+        {...props}
+        defineField={defineField}
+        setField={setField}
+        value={value}
+        errors={errors}
+        showErrorsOnBlur={showErrorsOnBlur}
+        validateField={validateField}
+      />
+    )}
   </Consumer>
+)
 
-withFormContext.propsToExclude = ['defineField', 'setField', 'initialValue']
+withFormContext.propsToExclude = [
+  'defineField',
+  'setField',
+  'initialValue',
+  'validations',
+  'showErrorsOnBlur',
+  'errors',
+  'validateField',
+]
