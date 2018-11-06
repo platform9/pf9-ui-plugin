@@ -1,5 +1,6 @@
 import moize from 'moize'
 import { isNil } from 'ramda'
+import { isPlainObject } from 'util/misc'
 
 export default class FieldValidator {
   /**
@@ -18,9 +19,11 @@ export default class FieldValidator {
 export const customValidator = (validator, errorMessage) =>
   new FieldValidator(validator, errorMessage)
 
+const fieldIsEmpty = value => isNil(value) || value === '' || value === false
+
 export const emailValidator = new FieldValidator(
   email =>
-    !email ||
+    fieldIsEmpty(email) ||
     /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/i.test(
       email
     ),
@@ -28,7 +31,7 @@ export const emailValidator = new FieldValidator(
 )
 
 export const requiredValidator = new FieldValidator(
-  value => !isNil(value) && value !== '',
+  value => !fieldIsEmpty(value),
   'Field is required'
 )
 
@@ -40,21 +43,19 @@ export const matchFieldValidator = moize(
     )
 )
 
-export const lengthValidator = moize(
-  (minLength, maxLength) =>
-    new FieldValidator(
-      value =>
-        !value ||
-        (value.toString().length >= minLength &&
-          value.toString().length <= maxLength),
-      `Length must be between ${minLength} and ${maxLength}`
-    )
-)
+export const lengthValidator = (minLength, maxLength) =>
+  new FieldValidator(
+    value =>
+      fieldIsEmpty(value) ||
+      (value.toString().length >= minLength &&
+        value.toString().length <= maxLength),
+    `Length must be between ${minLength} and ${maxLength}`
+  )
 
 export const minLengthValidator = moize(
   minLength =>
     new FieldValidator(
-      value => !value || value.toString().length >= minLength,
+      value => fieldIsEmpty(value) || value.toString().length >= minLength,
       `Length must be greater than ${minLength}`
     )
 )
@@ -62,7 +63,34 @@ export const minLengthValidator = moize(
 export const maxLengthValidator = moize(
   maxLength =>
     new FieldValidator(
-      value => !value || value.toString().length <= maxLength,
+      value => fieldIsEmpty(value) || value.toString().length <= maxLength,
       `Length must be less than ${maxLength}`
     )
 )
+
+export const validators = {
+  email: emailValidator,
+  required: requiredValidator,
+  matchField: matchFieldValidator,
+  length: lengthValidator,
+  minLength: minLengthValidator,
+  maxLength: maxLengthValidator
+}
+
+export const parseValidator = (key, spec) => {
+  const validator = validators[key]
+  if (spec === true) {
+    return validator
+  }
+  if (isPlainObject(spec)) {
+    const { params, message } = spec
+    const validatorWithParams = params ? validator(...params) : validator
+    if (message) {
+      return validatorWithParams.withMessage(message)
+    }
+    return validatorWithParams
+  }
+  if (typeof validator === 'function') {
+    return validator(...Array.isArray(spec) ? spec : [spec])
+  }
+}

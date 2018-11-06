@@ -6,7 +6,7 @@ import {
   Route,
   Switch,
 } from 'react-router-dom'
-import { MuiThemeProvider } from '@material-ui/core'
+import { MuiThemeProvider } from '@material-ui/core/styles'
 import Navbar from 'core/common/Navbar'
 import LogoutPage from 'openstack/components/LogoutPage'
 import './app.css'

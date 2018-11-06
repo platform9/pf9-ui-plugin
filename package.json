@@ -75,9 +75,9 @@
     "webpack-hot-middleware": "^2.21.0"
   },
   "scripts": {
-    "build": "NODE_ENV=production ./node_modules/.bin/webpack",
+    "build": "cross-env NODE_ENV=production ./node_modules/.bin/webpack",
     "build-storybook": "build-storybook",
-    "dev": "NODE_ENV=development npm start",
+    "dev": "cross-env NODE_ENV=development npm start",
     "lint": "./node_modules/.bin/eslint src",
     "start": "./node_modules/.bin/babel-node src/devserver/server.js",
     "server": "./node_modules/.bin/babel-node src/server/main.js",

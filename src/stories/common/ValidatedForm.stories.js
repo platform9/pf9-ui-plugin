@@ -1,15 +1,12 @@
 import React from 'react'
-import { jsonDetailLogger, addStories } from '../helpers'
+import { addStories, jsonDetailLogger } from '../helpers'
 
 import ValidatedForm from 'core/common/ValidatedForm'
 import TextField from 'core/common/TextField'
 import {
   customValidator,
-  emailValidator,
-  lengthValidator,
   matchFieldValidator,
-  minLengthValidator,
-  requiredValidator,
+  requiredValidator
 } from 'core/FieldValidator'
 import Checkbox from 'core/common/Checkbox'
 
@@ -19,19 +16,22 @@ const renderForm = (props = {}) => () => (
       id="name"
       placeholder="Name"
       label="Name"
-      validations={[requiredValidator, lengthValidator(3, 10)]}
-    />
-    <TextField
-      id="email"
-      placeholder="Email"
-      label="Email"
-      validations={[requiredValidator, emailValidator]}
+      validations={{
+        required: true,
+        length: {
+          params: [3, 10],
+          message: 'Name must contain between 3 and 10 characters'
+        }
+      }}
     />
     <TextField
       id="password"
       placeholder="Password"
       label="Password"
-      validations={[requiredValidator, minLengthValidator(3)]}
+      validations={{
+        required: true,
+        minLength: [4]
+      }}
     />
     <TextField
       id="password_repeat"
@@ -39,7 +39,7 @@ const renderForm = (props = {}) => () => (
       label="Repeat password"
       validations={[
         requiredValidator,
-        matchFieldValidator('password').withMessage('Passwords do not match'),
+        matchFieldValidator('password').withMessage('Passwords do not match')
       ]}
     />
     <br />
@@ -55,18 +55,13 @@ const renderForm = (props = {}) => () => (
             `From here we have access to other form fields as well, like 'name' with value ${
               formFields['name']
             }`
-        ),
+        )
       ]}
     />
     <Checkbox
       id="accept_terms"
       label="Accept terms"
-      validations={[
-        {
-          validate: value => !!value,
-          errorMessage: 'You must accept the terms',
-        },
-      ]}
+      validations={{ required: { message: 'You must accept the terms' } }}
     />
     <br />
     <button type="submit">Submit</button>
@@ -103,8 +98,8 @@ addStories('Form Handling/ValidatedForm', {
   ),
 
   'Fields validation on blur and on submit': renderForm({
-    showErrorsOnBlur: true,
+    showErrorsOnBlur: true
   }),
 
-  'Fields validation just on submit': renderForm(),
+  'Fields validation just on submit': renderForm()
 })

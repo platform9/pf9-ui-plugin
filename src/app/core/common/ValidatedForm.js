@@ -2,7 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { compose, setStateLens } from 'core/fp'
 import { withRouter } from 'react-router-dom'
-import { pathEq } from 'ramda'
+import { pathEq, toPairs } from 'ramda'
+import { parseValidator } from 'core/FieldValidator'
 
 const ValidatedFormContext = React.createContext({})
 
@@ -66,7 +67,13 @@ class ValidatedForm extends React.Component {
     const { fields, value } = this.state
     const fieldValue = value[field]
     const { validations } = fields[field]
-    const failedValidation = validations.find(
+
+    const validationsArray = Array.isArray(validations)
+      ? validations
+      : toPairs(validations).map(([validationKey, validationSpec]) =>
+        parseValidator(validationKey, validationSpec)
+      )
+    const failedValidation = validationsArray.find(
       validator => !validator.validate(fieldValue, value, field)
     )
     if (failedValidation) {
@@ -89,7 +96,7 @@ class ValidatedForm extends React.Component {
     errors: {},
     setField: this.setField,
     defineField: this.defineField,
-    validateField: this.validateField,
+    validateField: this.validateField
   }
 
   validateForm = () => {
@@ -135,7 +142,7 @@ ValidatedForm.propTypes = {
 
   triggerSubmit: PropTypes.func,
 
-  showErrorsOnBlur: PropTypes.bool,
+  showErrorsOnBlur: PropTypes.bool
 }
 
 export const PropKeys = Object.keys(ValidatedForm.propTypes)
@@ -160,7 +167,7 @@ export const withFormContext = Component => props => (
       value,
       showErrorsOnBlur,
       validateField,
-      errors,
+      errors
     }) => (
       <Component
         {...props}
@@ -179,8 +186,8 @@ withFormContext.propsToExclude = [
   'defineField',
   'setField',
   'initialValue',
-  'validations',
   'showErrorsOnBlur',
+  'validations',
   'errors',
-  'validateField',
+  'validateField'
 ]

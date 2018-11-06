@@ -10,3 +10,6 @@ export const parseJSON = str => {
     return {}
   }
 }
+
+export const isPlainObject = obj =>
+  Object(obj) === obj && Object.getPrototypeOf(obj) === Object.prototype

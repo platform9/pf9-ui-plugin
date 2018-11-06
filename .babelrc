@@ -7,7 +7,7 @@
       "import",
       {
         "libraryName": "@material-ui/core",
-        "libraryDirectory": "components",
+        "libraryDirectory": "",
         "camel2DashComponentName": false
       }
     ]
