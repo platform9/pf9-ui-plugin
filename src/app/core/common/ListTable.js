@@ -180,14 +180,14 @@ class ListTable extends React.Component {
     return data.slice(startIdx, endIdx)
   }
 
-  renderCell = (columnDef, contents) => {
+  renderCell = (columnDef, contents, row) => {
     const { cellProps = {} } = columnDef
     let _contents = contents
 
     if (typeof contents === 'boolean') { _contents = String(_contents) }
 
     // Allow for customized rendering in the columnDef
-    if (columnDef.render) { _contents = columnDef.render(contents) }
+    if (columnDef.render) { _contents = columnDef.render(contents, row) }
 
     return (
       <TableCell key={columnDef.id} {...cellProps}>{_contents}</TableCell>
@@ -229,7 +229,7 @@ class ListTable extends React.Component {
           </TableCell>
         }
         {columns.map((columnDef, colIdx) =>
-          this.renderCell(columnDef, row[columnDef.id]))
+          this.renderCell(columnDef, row[columnDef.id], row))
         }
         {this.renderRowActions(row)}
       </TableRow>

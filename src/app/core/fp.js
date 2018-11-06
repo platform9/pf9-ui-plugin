@@ -37,6 +37,17 @@ export const filterFields = (...keys) => obj =>
     {}
   )
 
+// Deeply nested objects can be a pain to check every member for existence.
+// We might want to replace this with a library that has this functionality
+// already built in.
+export const existentialGet = (path, obj, defaultValue) => {
+  const [head, tail] = path
+  const newObj = obj[head]
+  if (newObj === undefined) { return defaultValue }
+  if (tail.length === 0) { return newObj }
+  return existentialGet(tail, newObj, defaultValue)
+}
+
 // Lens-style setter useful for setState operations
 // Allows for setting of values in a deeply nested object using cloning.
 // We can extend with other functionality like arrays and using
