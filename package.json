@@ -45,6 +45,7 @@
     "babel-preset-stage-0": "^6.24.1",
     "babel-runtime": "^7.0.0-beta.3",
     "copy-webpack-plugin": "^4.5.1",
+    "cross-env": "^5.2.0",
     "css-loader": "^0.28.9",
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",
@@ -87,12 +88,12 @@
     "docker:run": "docker run -p 3000:3000 -p 4444:4444 ui-dev",
     "storybook": "start-storybook -p 9001 -c src/stories",
     "test": "npm run lint && npm run test:unit",
-    "test:client": "NODE_ENV=test jest src/api-client",
-    "test:client:watch": "NODE_ENV=test jest --watch src/api-client",
-    "test:e2e": "NODE_ENV=test jest -i e2e-tests/",
-    "test:integration": "NODE_ENV=test jest integration-tests/",
-    "test:unit": "NODE_ENV=test jest --coverage src/app src/server",
-    "test:unit:watch": "NODE_ENV=test jest --watch --coverage src/app src/server"
+    "test:client": "cross-env NODE_ENV=test jest src/api-client",
+    "test:client:watch": "cross-env NODE_ENV=test jest --watch src/api-client",
+    "test:e2e": "cross-env NODE_ENV=test jest -i e2e-tests/",
+    "test:integration": "cross-env NODE_ENV=test jest integration-tests/",
+    "test:unit": "cross-env NODE_ENV=test jest --coverage src/app src/server",
+    "test:unit:watch": "cross-env NODE_ENV=test jest --watch --coverage src/app src/server"
   },
   "keywords": [
     "Platform9",
