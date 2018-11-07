@@ -20,13 +20,13 @@ const styles = theme => ({
 class Checkbox extends React.Component {
   constructor (props) {
     super(props)
-    const spec = props.required
-      ? {
-        validations: Array.isArray(props.validations)
-          ? [requiredValidator, ...props.validations]
-          : { required: true, ...props.validations }
-      }
-      : pickMultiple('validations')(props)
+    const spec = pickMultiple('validations', 'info')(props)
+
+    if (props.required) {
+      spec.validations = Array.isArray(props.validations)
+        ? [requiredValidator, ...props.validations]
+        : {required: true, ...props.validations}
+    }
 
     props.defineField(props.id, spec)
   }
@@ -48,13 +48,18 @@ class Checkbox extends React.Component {
     }
   }
 
+  showInfo = e => {
+    this.props.showInfo(this.props.info)
+  }
+
   render () {
-    const { id, value, label, errors, classes } = this.props
+    const { id, value, label, errors, classes, info } = this.props
     const { hasError, errorMessage } = errors[id] || emptyObj
     return (
       <FormControl id={id} className={classes.formControl} error={hasError}>
         <FormControlLabel
           label={label}
+          onMouseEnter={info && this.showInfo}
           control={
             <BaseCheckbox
               {...this.restFields}
@@ -71,12 +76,15 @@ class Checkbox extends React.Component {
 }
 
 Checkbox.defaultProps = {
-  validations: []
+  validations: [],
+  required: false
 }
 
 Checkbox.propTypes = {
   id: PropTypes.string.isRequired,
+  info: PropTypes.string,
   label: PropTypes.string,
+  required: PropTypes.bool,
   validations: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
   initialValue: PropTypes.bool,
   onChange: PropTypes.func

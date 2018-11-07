@@ -19,13 +19,14 @@ const styles = theme => ({
 class TextField extends React.Component {
   constructor (props) {
     super(props)
-    const spec = props.required
-      ? {
-        validations: Array.isArray(props.validations)
-          ? [requiredValidator, ...props.validations]
-          : { required: true, ...props.validations }
-      }
-      : pickMultiple('validations')(props)
+    const spec = pickMultiple('validations', 'info')(props)
+
+    if (props.required) {
+      spec.validations = Array.isArray(props.validations)
+        ? [requiredValidator, ...props.validations]
+        : {required: true, ...props.validations}
+    }
+
     const { id, initialValue, setField } = this.props
 
     props.defineField(id, spec)
@@ -64,8 +65,12 @@ class TextField extends React.Component {
     }
   }
 
+  showInfo = e => {
+    this.props.showInfo(this.props.info)
+  }
+
   render () {
-    const { id, value, classes, errors } = this.props
+    const { id, value, classes, errors, info } = this.props
     const { hasError, errorMessage } = errors[id] || emptyObj
     return (
       <FormControl id={id} className={classes.formControl} error={hasError}>
@@ -75,6 +80,7 @@ class TextField extends React.Component {
           value={value[id] !== undefined ? value[id] : ''}
           onChange={this.handleChange}
           onBlur={this.handleBlur}
+          onMouseEnter={info && this.showInfo}
         />
         <FormHelperText>{errorMessage}</FormHelperText>
       </FormControl>
@@ -89,6 +95,7 @@ TextField.defaultProps = {
 
 TextField.propTypes = {
   id: PropTypes.string.isRequired,
+  info: PropTypes.string,
   label: PropTypes.string,
   required: PropTypes.bool,
   validations: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),

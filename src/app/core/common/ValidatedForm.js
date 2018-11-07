@@ -4,11 +4,28 @@ import { compose, setStateLens } from 'core/fp'
 import { withRouter } from 'react-router-dom'
 import { pathEq, toPairs } from 'ramda'
 import { parseValidator } from 'core/FieldValidator'
+import { withStyles } from '@material-ui/core/styles'
+import Icon from '@material-ui/core/Icon/Icon'
 
 const ValidatedFormContext = React.createContext({})
 
 export const Consumer = ValidatedFormContext.Consumer
 export const Provider = ValidatedFormContext.Provider
+
+const styles = theme => ({
+  formControl: {
+    margin: theme.spacing.unit,
+  },
+  info: {
+    minWidth: '30%',
+    display: 'flex',
+    flexFlow: 'row nowrap',
+  },
+  infoIcon: {
+    fontSize: 'x-large',
+    paddingRight: '0.5rem',
+  }
+})
 
 /**
  * ValidatedForm is a HOC wrapper for forms.  The child components define the
@@ -88,6 +105,12 @@ class ValidatedForm extends React.Component {
     }
   }
 
+  setCurrentInfo = currentInfo =>
+    this.setState(prevState => ({
+      ...prevState,
+      currentInfo,
+    }))
+
   state = {
     value: this.props.initialValue || {},
     showingErrors: false,
@@ -96,7 +119,9 @@ class ValidatedForm extends React.Component {
     errors: {},
     setField: this.setField,
     defineField: this.defineField,
-    validateField: this.validateField
+    validateField: this.validateField,
+    currentInfo: '',
+    showInfo: this.setCurrentInfo,
   }
 
   validateForm = () => {
@@ -142,7 +167,7 @@ ValidatedForm.propTypes = {
 
   triggerSubmit: PropTypes.func,
 
-  showErrorsOnBlur: PropTypes.bool
+  showErrorsOnBlur: PropTypes.bool,
 }
 
 export const PropKeys = Object.keys(ValidatedForm.propTypes)
@@ -167,7 +192,8 @@ export const withFormContext = Component => props => (
       value,
       showErrorsOnBlur,
       validateField,
-      errors
+      errors,
+      showInfo,
     }) => (
       <Component
         {...props}
@@ -177,10 +203,26 @@ export const withFormContext = Component => props => (
         errors={errors}
         showErrorsOnBlur={showErrorsOnBlur}
         validateField={validateField}
+        showInfo={showInfo}
       />
     )}
   </Consumer>
 )
+
+export const FormInfoPlaceholder = compose(
+  withStyles(styles)
+)(({ classes, ...rest }) => (
+  <Consumer>
+    {({ currentInfo }) => (
+      currentInfo && <div className={classes.info} {...rest}>
+        <Icon className={classes.infoIcon} color="primary">
+          info
+        </Icon>
+        {currentInfo}
+      </div>
+    )}
+  </Consumer>
+))
 
 withFormContext.propsToExclude = [
   'defineField',
@@ -189,5 +231,6 @@ withFormContext.propsToExclude = [
   'showErrorsOnBlur',
   'validations',
   'errors',
-  'validateField'
+  'validateField',
+  'showInfo',
 ]
