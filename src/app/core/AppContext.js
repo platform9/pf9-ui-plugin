@@ -16,6 +16,8 @@ class AppContext extends React.Component {
   state = {
     ...this.props.initialContext,
 
+    session: {},
+
     setContext: (...args) => {
       // If the `setState` async callback is not passed in default to
       // return a Promise.

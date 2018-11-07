@@ -1,10 +1,10 @@
 import React from 'react'
-import { jsonDetailLogger, addStories } from '../helpers'
+import { addStories, jsonDetailLogger } from '../helpers'
 
-import { AddFlavorForm } from 'openstack/components/flavors/AddFlavorPage'
+import AddFlavorPage from 'openstack/components/flavors/AddFlavorPage'
 
 addStories('Flavor Management/Adding a flavor', {
   'Add a flavor': () => (
-    <AddFlavorForm onSubmit={jsonDetailLogger('AddFlavorForm#submit')} />
+    <AddFlavorPage onSubmit={jsonDetailLogger('AddFlavorForm#submit')} />
   )
 })

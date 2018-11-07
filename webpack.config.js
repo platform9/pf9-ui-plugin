@@ -73,6 +73,7 @@ module.exports = {
   plugins,
   resolve: {
     alias: {
+      app: path.resolve(__dirname, 'src/app'),
       core: path.resolve(__dirname, 'src/app/core'),
       util: path.resolve(__dirname, 'src/app/util'),
       openstack: path.resolve(__dirname, 'src/app/plugins/openstack'),

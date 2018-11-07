@@ -17,6 +17,10 @@ class TenantRolesContainer extends React.Component {
     props.defineField(props.id, spec)
   }
 
+  static defaultProps = {
+    tenants: []
+  }
+
   handleChange = curTenant => async event => {
     const { id, setField } = this.props
     setField(id, await this.combineRoles(curTenant, event.target.value))

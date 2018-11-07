@@ -9,23 +9,29 @@ import { withAppContext } from 'core/AppContext'
 import { withTheme } from 'app/theme'
 
 import 'app/app.css'
+import AppContext from 'app/core/AppContext'
 
 const objToJsonDetails = obj => JSON.stringify(obj, null, 4)
 const isArray = x => x instanceof Array
-const isObject = x => (typeof x === 'object') && !isArray(x)
+const isObject = x => typeof x === 'object' && !isArray(x)
 
 export const jsonDetailLogger = decorateAction([
-  args => args.map(x => isObject(x) ? objToJsonDetails(x) : x)
+  args => args.map(x => (isObject(x) ? objToJsonDetails(x) : x)),
 ])
 
-export const withWrappings = Component => compose(
-  withTheme,
-  withAppContext,
-)(Component)
+export const withWrappings = Component =>
+  compose(
+    withTheme,
+    withAppContext,
+  )(Component)
 
-const Pf9StoryWrapper = withWrappings(({ children }) => (<div>{ children }</div>))
+const Pf9StoryWrapper = withWrappings(({ children }) => <div>{children}</div>)
 
-export const pf9Decorators = storyFn => (<Pf9StoryWrapper>{ storyFn() }</Pf9StoryWrapper>)
+export const pf9Decorators = storyFn => (
+  <AppContext>
+    <Pf9StoryWrapper>{storyFn()}</Pf9StoryWrapper>
+  </AppContext>
+)
 
 export const addStory = (section, subsection, story) =>
   storiesOf(section, module)
@@ -35,13 +41,13 @@ export const addStory = (section, subsection, story) =>
     .add(subsection, withInfo()(story))
 
 export const addStories = (section, stories) =>
-  Object.entries(stories).forEach(
-    ([subsection, story]) => addStory(section, subsection, story)
+  Object.entries(stories).forEach(([subsection, story]) =>
+    addStory(section, subsection, story)
   )
 
 export const range = n => {
   let arr = []
-  for (let i=0; i<n; i++) {
+  for (let i = 0; i < n; i++) {
     arr.push(i)
   }
   return arr
