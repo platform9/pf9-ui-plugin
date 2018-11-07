@@ -106,9 +106,6 @@
       "git add"
     ]
   },
-  "prettier": {
-    "trailingComma": "es5"
-  },
   "keywords": [
     "Platform9",
     "ui",
