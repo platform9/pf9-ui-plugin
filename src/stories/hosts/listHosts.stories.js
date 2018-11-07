@@ -22,10 +22,13 @@ addStories('Host Management/Listing hosts', {
   ),
 
   'With pagination': () => {
-    const numHosts = number('numHosts', 7, { range: true, min: 0, max: 15, step: 1 })
+    const numHosts = number('numHosts', 7, {
+      range: true,
+      min: 0,
+      max: 15,
+      step: 1,
+    })
     const hosts = range(numHosts).map(fakeHost)
-    return (
-      <HostsList hosts={hosts} onAdd={addAction} onDelete={deleteAction} />
-    )
+    return <HostsList hosts={hosts} onAdd={addAction} onDelete={deleteAction} />
   },
 })

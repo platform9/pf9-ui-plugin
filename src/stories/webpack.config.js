@@ -12,7 +12,7 @@ module.exports = {
         test: /\.css$/,
         include: includePath,
         exclude: /node_modules/,
-        use: ['style-loader', 'css-loader']
+        use: ['style-loader', 'css-loader'],
       },
     ],
   },
@@ -25,5 +25,5 @@ module.exports = {
       util: path.resolve(__dirname, '../app/util'),
     },
     extensions: ['.webpack.js', '.web.js', '.js', '.json', '.css'],
-  }
+  },
 }

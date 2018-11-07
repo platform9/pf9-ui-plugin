@@ -32,7 +32,10 @@ describe('User', () => {
     })
 
     it('should exclude the password from the JSON output', () => {
-      const user = new User({ username: 'admin@platform9.com', password: 'secret' })
+      const user = new User({
+        username: 'admin@platform9.com',
+        password: 'secret',
+      })
       const json = user.asJson()
       expect(Object.keys(json).includes('password')).toBe(false)
     })
@@ -46,13 +49,19 @@ describe('User', () => {
 
     it('fails authentication when the password is incorrect', () => {
       new User({ username: 'admin@platform9.com', password: 'secret' })
-      const failedUser = User.getAuthenticatedUser('admin@platform9.com', 'bad-password')
+      const failedUser = User.getAuthenticatedUser(
+        'admin@platform9.com',
+        'bad-password'
+      )
       expect(failedUser).toBe(null)
     })
 
     it('returns the user when the username and password are correct', () => {
       new User({ username: 'admin@platform9.com', password: 'secret' })
-      const fetchedUser = User.getAuthenticatedUser('admin@platform9.com', 'secret')
+      const fetchedUser = User.getAuthenticatedUser(
+        'admin@platform9.com',
+        'secret'
+      )
       expect(fetchedUser instanceof User).toBe(true)
       expect(fetchedUser.username).toBe('admin@platform9.com')
     })

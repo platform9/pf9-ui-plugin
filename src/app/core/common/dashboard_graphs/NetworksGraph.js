@@ -3,10 +3,10 @@ import { withStyles } from '@material-ui/core/styles'
 import SvgNetwork from './SvgNetwork'
 
 const styles = theme => ({
-  'svg': {
+  svg: {
     'max-height': '100%',
-    position: 'absolute'
-  }
+    position: 'absolute',
+  },
 })
 
 @withStyles(styles)

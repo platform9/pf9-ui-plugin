@@ -8,9 +8,15 @@ const RepositoriesListPage = () => <h1>TODO: Repositories List Page</h1>
 
 const InfrastructurePage = () => (
   <Tabs>
-    <Tab value="appCatalog" label="App Catalog"><AppCatalogListPage /></Tab>
-    <Tab value="deployedApps" label="Deployed Apps"><DeployedAppsListPage /></Tab>
-    <Tab value="repositories" label="Repositories"><RepositoriesListPage /></Tab>
+    <Tab value="appCatalog" label="App Catalog">
+      <AppCatalogListPage />
+    </Tab>
+    <Tab value="deployedApps" label="Deployed Apps">
+      <DeployedAppsListPage />
+    </Tab>
+    <Tab value="repositories" label="Repositories">
+      <RepositoriesListPage />
+    </Tab>
   </Tabs>
 )
 

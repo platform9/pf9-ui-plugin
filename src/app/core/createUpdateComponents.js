@@ -50,7 +50,9 @@ const createUpdateComponents = options => {
         }
         const updated = await updateFn({ data, context, setContext })
         const uid = data[uniqueIdentifier]
-        const updatedList = existing.map(x => x[uniqueIdentifier] !== uid ? x : updated)
+        const updatedList = existing.map(
+          x => (x[uniqueIdentifier] !== uid ? x : updated)
+        )
         setContext({ [dataKey]: updatedList })
         history.push(listUrl)
       } catch (err) {
@@ -67,7 +69,11 @@ const createUpdateComponents = options => {
 
       return (
         <FormWrapper title={title} backUrl={listUrl}>
-          <FormComponent {...this.props} onComplete={this.handleComplete} initialValue={initialValue} />
+          <FormComponent
+            {...this.props}
+            onComplete={this.handleComplete}
+            initialValue={initialValue}
+          />
         </FormWrapper>
       )
     }
@@ -76,7 +82,7 @@ const createUpdateComponents = options => {
   const UpdatePage = compose(
     withAppContext,
     withRouter,
-    requiresAuthentication,
+    requiresAuthentication
   )(UpdatePageBase)
   UpdatePage.displayName = `Update${name}Page`
 

@@ -11,7 +11,7 @@ import {
   TableBody,
   TableCell,
   TablePagination,
-  TableRow
+  TableRow,
 } from '@material-ui/core'
 import EnhancedTableHead from './EnhancedTableHead'
 import EnhancedTableToolbar from './EnhancedTableToolbar'
@@ -22,7 +22,7 @@ import { withAppContext } from 'core/AppContext'
 const styles = theme => ({
   root: {
     width: '100%',
-    marginTop: theme.spacing.unit * 3
+    marginTop: theme.spacing.unit * 3,
   },
   table: {
     minWidth: 800,
@@ -61,7 +61,7 @@ class ListTable extends React.Component {
     this.setState({ order, orderBy })
   }
 
-  sortData = (data) => {
+  sortData = data => {
     let _data = [...data]
     const orderBy = this.state.orderBy || this.props.columns[0].id
     const sorted =
@@ -71,7 +71,7 @@ class ListTable extends React.Component {
     return sorted
   }
 
-  areAllSelected = (data) => {
+  areAllSelected = data => {
     const { selected } = this.state
     return data.every(row => selected.includes(row))
   }
@@ -81,19 +81,25 @@ class ListTable extends React.Component {
     const { selected, searchTerm } = this.state
 
     let sortedData = this.sortData(data)
-    const searchData = searchTerm === '' ? sortedData : this.filterBySearch(sortedData, searchTarget)
+    const searchData =
+      searchTerm === ''
+        ? sortedData
+        : this.filterBySearch(sortedData, searchTarget)
     const paginatedData = paginate ? this.paginate(searchData) : searchData
 
     let newSelected
     if (checked) {
       // Add active paginated rows that are not already selected
-      newSelected = [...selected, ...paginatedData.filter(row => !selected.includes(row))]
+      newSelected = [
+        ...selected,
+        ...paginatedData.filter(row => !selected.includes(row)),
+      ]
     } else {
       // Remove active paginated rows from selected
       newSelected = selected.filter(row => !paginatedData.includes(row))
     }
     this.setState({
-      selected: newSelected
+      selected: newSelected,
     })
   }
 
@@ -115,7 +121,7 @@ class ListTable extends React.Component {
       // somewhere inbetween
       newSelected = newSelected.concat(
         selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1),
+        selected.slice(selectedIndex + 1)
       )
     }
 
@@ -150,7 +156,7 @@ class ListTable extends React.Component {
     onDelete(selected).then(() => {
       this.setState({
         selected: [],
-        page: newPage
+        page: newPage,
       })
     })
   }
@@ -162,13 +168,15 @@ class ListTable extends React.Component {
 
   handleSearch = value => {
     this.setState({
-      searchTerm: value
+      searchTerm: value,
     })
   }
 
   filterBySearch = (data, target) => {
     const { searchTerm } = this.state
-    return data.filter(ele => ele[target].match(new RegExp(searchTerm, 'i')) !== null)
+    return data.filter(
+      ele => ele[target].match(new RegExp(searchTerm, 'i')) !== null
+    )
   }
 
   isSelected = row => this.state.selected.includes(row)
@@ -184,13 +192,19 @@ class ListTable extends React.Component {
     const { cellProps = {} } = columnDef
     let _contents = contents
 
-    if (typeof contents === 'boolean') { _contents = String(_contents) }
+    if (typeof contents === 'boolean') {
+      _contents = String(_contents)
+    }
 
     // Allow for customized rendering in the columnDef
-    if (columnDef.render) { _contents = columnDef.render(contents) }
+    if (columnDef.render) {
+      _contents = columnDef.render(contents)
+    }
 
     return (
-      <TableCell key={columnDef.id} {...cellProps}>{_contents}</TableCell>
+      <TableCell key={columnDef.id} {...cellProps}>
+        {_contents}
+      </TableCell>
     )
   }
 
@@ -200,7 +214,9 @@ class ListTable extends React.Component {
 
   renderRowActions = row => {
     const { rowActions } = this.props
-    if (!rowActions) { return null }
+    if (!rowActions) {
+      return null
+    }
     return (
       <TableCell>
         <MoreMenu items={rowActions} data={row} />
@@ -212,35 +228,34 @@ class ListTable extends React.Component {
     const { columns, showCheckboxes, uniqueIdentifier } = this.props
     const isSelected = this.isSelected(row)
 
-    const checkboxProps = showCheckboxes ? {
-      onClick: this.handleClick(row),
-      role: 'checkbox',
-      tabIndex: -1,
-      selected: isSelected
-    } : {}
+    const checkboxProps = showCheckboxes
+      ? {
+        onClick: this.handleClick(row),
+        role: 'checkbox',
+        tabIndex: -1,
+        selected: isSelected,
+      }
+      : {}
 
     const uid = row[uniqueIdentifier]
 
     return (
       <TableRow hover key={uid} {...checkboxProps}>
-        {showCheckboxes &&
+        {showCheckboxes && (
           <TableCell padding="checkbox">
             <Checkbox checked={isSelected} color="primary" />
           </TableCell>
-        }
+        )}
         {columns.map((columnDef, colIdx) =>
-          this.renderCell(columnDef, row[columnDef.id]))
-        }
+          this.renderCell(columnDef, row[columnDef.id])
+        )}
         {this.renderRowActions(row)}
       </TableRow>
     )
   }
 
   renderColumnHeader = (column, idx) => {
-    const {
-      headerProps = {},
-      name,
-    } = column
+    const { headerProps = {}, name } = column
     return (
       <TableCell key={idx} {...headerProps}>
         {name}
@@ -248,7 +263,7 @@ class ListTable extends React.Component {
     )
   }
 
-  renderPaginationControls = (count) => {
+  renderPaginationControls = count => {
     const { page, rowsPerPage } = this.state
     return (
       <TablePagination
@@ -280,19 +295,17 @@ class ListTable extends React.Component {
       title,
     } = this.props
 
-    const {
-      order,
-      orderBy,
-      searchTerm,
-      selected,
-    } = this.state
+    const { order, orderBy, searchTerm, selected } = this.state
 
     if (!data) {
       return null
     }
 
     const sortedData = this.sortData(data)
-    const searchData = searchTerm === '' ? sortedData : this.filterBySearch(sortedData, searchTarget)
+    const searchData =
+      searchTerm === ''
+        ? sortedData
+        : this.filterBySearch(sortedData, searchTarget)
     const paginatedData = paginate ? this.paginate(searchData) : searchData
     const selectedAll = this.areAllSelected(paginatedData)
     // Always show pagination control bar to make sure the height doesn't change frequently.
@@ -326,9 +339,7 @@ class ListTable extends React.Component {
                   showCheckboxes={showCheckboxes}
                   showRowActions={!!rowActions}
                 />
-                <TableBody>
-                  {paginatedData.map(this.renderRow)}
-                </TableBody>
+                <TableBody>{paginatedData.map(this.renderRow)}</TableBody>
               </Table>
             </div>
             {this.renderPaginationControls(searchData.length)}
@@ -382,5 +393,5 @@ ListTable.defaultProps = {
 
 export default compose(
   withStyles(styles),
-  withAppContext,
+  withAppContext
 )(ListTable)

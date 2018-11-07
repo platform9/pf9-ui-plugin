@@ -26,7 +26,7 @@ class Router extends ActiveModel {
       name: this.name,
       tenant_id: this.tenant_id,
       admin_state_up: this.admin_state_up,
-      status: this.status
+      status: this.status,
     }
   }
 }

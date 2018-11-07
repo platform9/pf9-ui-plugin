@@ -6,7 +6,5 @@ import { ServiceCatalogList } from 'openstack/components/api-access/ApiAccessLis
 const someServices = range(15).map(fakeService)
 
 addStories('Service Catalog/Listing services', {
-  'With some services': () => (
-    <ServiceCatalogList services={someServices} />
-  ),
+  'With some services': () => <ServiceCatalogList services={someServices} />,
 })

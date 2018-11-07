@@ -15,9 +15,11 @@ class AddVolumeTypePage extends React.Component {
         name: data.name,
         extra_specs: keyValueArrToObj(data.metadata),
       }
-      const createdVolumeType = await context.apiClient.cinder.createVolumeType(volumeType)
+      const createdVolumeType = await context.apiClient.cinder.createVolumeType(
+        volumeType
+      )
       const existingVolumeTypes = await loadVolumeTypes({ setContext, context })
-      setContext({ volumeTypes: [ ...existingVolumeTypes, createdVolumeType ] })
+      setContext({ volumeTypes: [...existingVolumeTypes, createdVolumeType] })
       history.push('/ui/openstack/storage#volumeTypes')
     } catch (err) {
       console.error(err)
@@ -26,7 +28,10 @@ class AddVolumeTypePage extends React.Component {
 
   render () {
     return (
-      <FormWrapper title="Add Volume Type" backUrl="/ui/openstack/storage#volumeTypes">
+      <FormWrapper
+        title="Add Volume Type"
+        backUrl="/ui/openstack/storage#volumeTypes"
+      >
         <AddVolumeTypeForm onComplete={this.handleAdd} />
       </FormWrapper>
     )

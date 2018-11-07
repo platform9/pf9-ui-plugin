@@ -63,7 +63,7 @@ class Image extends ActiveModel {
       schema: this.schema,
       virtual_size: this.virtual_size,
       tags: this.tags,
-      created_at: this.created_at
+      created_at: this.created_at,
     }
   }
 }

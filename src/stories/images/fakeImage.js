@@ -11,7 +11,7 @@ const fakeImage = () => ({
   disk_format: 'qw2',
   virtual_size: faker.random.number(),
   size: faker.random.number(),
-  created_at: faker.date.past().toString()
+  created_at: faker.date.past().toString(),
 })
 
 export default fakeImage

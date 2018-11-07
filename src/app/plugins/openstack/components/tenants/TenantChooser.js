@@ -8,28 +8,31 @@ class TenantChooser extends React.Component {
   state = {
     tenantSearch: '',
     currentTenantName: '',
-    tenants: null
+    tenants: null,
   }
 
   handleChange = key => value => {
     this.setState({
-      [key]: value
+      [key]: value,
     })
   }
 
-  resetTenantScopedContext = (tenant) => {
+  resetTenantScopedContext = tenant => {
     const { setContext } = this.props
     // Clear any data that should change when the user changes tenant.
     // The data will then be reloaded when it is needed.
-    setContext({
-      volumes: undefined,
-      volumeSnapshots: undefined,
-    }, () => {
-      // Fire off a custom event to notify components they should reload.
-      // See `DataLoader` to see how these events are consumed.
-      const e = new CustomEvent('scopeChanged', { tenant })
-      window.dispatchEvent(e)
-    })
+    setContext(
+      {
+        volumes: undefined,
+        volumeSnapshots: undefined,
+      },
+      () => {
+        // Fire off a custom event to notify components they should reload.
+        // See `DataLoader` to see how these events are consumed.
+        const e = new CustomEvent('scopeChanged', { tenant })
+        window.dispatchEvent(e)
+      }
+    )
   }
 
   updateCurrentTenant = async tenantName => {
@@ -38,7 +41,9 @@ class TenantChooser extends React.Component {
 
     this.setState({ currentTenantName: tenantName })
     const tenant = tenants.find(x => x.name === tenantName)
-    if (!tenant) { return }
+    if (!tenant) {
+      return
+    }
     setContext({ currentTenant: tenant })
 
     const { keystone } = context.apiClient
@@ -67,14 +72,18 @@ class TenantChooser extends React.Component {
   async componentDidMount () {
     const lastTenant = this.props.getUserPreference('lastTenant') || 'service'
     const tenants = await this.loadTenants()
-    if (!tenants) { return }
+    if (!tenants) {
+      return
+    }
     this.updateCurrentTenant(lastTenant)
   }
 
   render () {
     const { currentTenantName, tenantSearch, tenants } = this.state
 
-    if (!tenants) { return null }
+    if (!tenants) {
+      return null
+    }
 
     return (
       <Selector
@@ -88,6 +97,4 @@ class TenantChooser extends React.Component {
   }
 }
 
-export default compose(
-  withAppContext,
-)(TenantChooser)
+export default compose(withAppContext)(TenantChooser)

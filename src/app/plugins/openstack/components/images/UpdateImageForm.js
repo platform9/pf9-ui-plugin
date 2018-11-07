@@ -4,7 +4,7 @@ import ValidatedForm from 'core/common/ValidatedForm'
 import TextField from 'core/common/TextField'
 import Checkbox from 'core/common/Checkbox'
 
-const UpdateImageForm = ({ image, onSubmit }) =>
+const UpdateImageForm = ({ image, onSubmit }) => (
   <ValidatedForm
     initialValue={image}
     backUrl="/ui/openstack/images"
@@ -16,7 +16,10 @@ const UpdateImageForm = ({ image, onSubmit }) =>
     <TextField id="visibility" label="Visibility" />
     <Checkbox id="protected" label="Protected" />
     <TextField id="tags" label="Tags" />
-    <Button type="submit" variant="raised">Update Image</Button>
+    <Button type="submit" variant="raised">
+      Update Image
+    </Button>
   </ValidatedForm>
+)
 
 export default UpdateImageForm

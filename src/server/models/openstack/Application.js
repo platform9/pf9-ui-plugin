@@ -21,7 +21,8 @@ class Application extends ActiveModel {
   static findById = findById(coll)
   static updateById = updateById(coll)
 
-  static findByName = name => Application.getCollection().find(x => x.name === name)
+  static findByName = name =>
+    Application.getCollection().find(x => x.name === name)
 
   asJson = () => {
     return {
@@ -32,7 +33,7 @@ class Application extends ActiveModel {
       tags: this.tags,
       tenant: this.tenant,
       description: this.description,
-      categories: this.categories
+      categories: this.categories,
     }
   }
 }

@@ -14,14 +14,15 @@ const UpdateVolumeTypePage = props => (
     objId={props.match.params.volumeTypeId}
     backUrl="/ui/openstack/storage#volumeTypes"
   >
-    {({ data, onSubmit }) =>
-      <FormWrapper title="Update Volume Type" backUrl="/ui/openstack/storage#volumeTypes">
+    {({ data, onSubmit }) => (
+      <FormWrapper
+        title="Update Volume Type"
+        backUrl="/ui/openstack/storage#volumeTypes"
+      >
         <UpdateVolumeTypeForm volumeType={data} onSubmit={onSubmit} />
       </FormWrapper>
-    }
+    )}
   </DataUpdater>
 )
 
-export default compose(
-  requiresAuthentication,
-)(UpdateVolumeTypePage)
+export default compose(requiresAuthentication)(UpdateVolumeTypePage)

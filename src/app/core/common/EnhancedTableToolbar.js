@@ -7,7 +7,7 @@ import {
   IconButton,
   Toolbar,
   Tooltip,
-  Typography
+  Typography,
 } from '@material-ui/core'
 import { lighten } from '@material-ui/core/styles/colorManipulator'
 import AddIcon from '@material-ui/icons/Add'
@@ -38,10 +38,19 @@ const toolbarStyles = theme => ({
   },
   title: {
     flex: '0 0 auto',
-  }
+  },
 })
 
-const EnhancedTableToolbar = ({ classes, numSelected, title, onAdd, onDelete, onEdit, onSearchChange, searchTerm }) => (
+const EnhancedTableToolbar = ({
+  classes,
+  numSelected,
+  title,
+  onAdd,
+  onDelete,
+  onEdit,
+  onSearchChange,
+  searchTerm,
+}) => (
   <Toolbar
     className={classNames(classes.root, {
       [classes.highlight]: numSelected > 0,
@@ -59,36 +68,37 @@ const EnhancedTableToolbar = ({ classes, numSelected, title, onAdd, onDelete, on
     <div className={classes.spacer} />
     <div className={classes.actions}>
       <Toolbar>
-        {onSearchChange &&
-          <SearchBar
-            onSearchChange={onSearchChange}
-            searchTerm={searchTerm}
-          />
-        }
-        {numSelected === 1 && onEdit &&
-          <Tooltip title="Edit">
-            <IconButton aria-label="Edit" onClick={onEdit}>
-              <EditIcon />
-            </IconButton>
-          </Tooltip>
-        }
-        {numSelected > 0 && onDelete &&
-          <Tooltip title="Delete">
-            <IconButton aria-label="Delete" onClick={onDelete}>
-              <DeleteIcon />
-            </IconButton>
-          </Tooltip>
-        }
+        {onSearchChange && (
+          <SearchBar onSearchChange={onSearchChange} searchTerm={searchTerm} />
+        )}
+        {numSelected === 1 &&
+          onEdit && (
+            <Tooltip title="Edit">
+              <IconButton aria-label="Edit" onClick={onEdit}>
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
+          )}
+        {numSelected > 0 &&
+          onDelete && (
+            <Tooltip title="Delete">
+              <IconButton aria-label="Delete" onClick={onDelete}>
+                <DeleteIcon />
+              </IconButton>
+            </Tooltip>
+          )}
         <Tooltip title="Filter list">
           <IconButton aria-label="Filter list">
             <FilterListIcon />
           </IconButton>
         </Tooltip>
-        {onAdd &&
+        {onAdd && (
           <Tooltip title="Add">
-            <Button color="primary" onClick={onAdd}><AddIcon /> Add</Button>
+            <Button color="primary" onClick={onAdd}>
+              <AddIcon /> Add
+            </Button>
           </Tooltip>
-        }
+        )}
       </Toolbar>
     </div>
   </Toolbar>

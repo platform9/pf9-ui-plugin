@@ -23,11 +23,7 @@ const iconItems = [
 ]
 
 addStories('Common Components/MoreMenu', {
-  'Specifying menu actions': () => (
-    <MoreMenu items={items} />
-  ),
+  'Specifying menu actions': () => <MoreMenu items={items} />,
 
-  'w/ icons': () => (
-    <MoreMenu items={iconItems} />
-  )
+  'w/ icons': () => <MoreMenu items={iconItems} />,
 })

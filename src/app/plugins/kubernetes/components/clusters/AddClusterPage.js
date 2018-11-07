@@ -26,5 +26,5 @@ class AddClusterPage extends React.Component {
 
 export default compose(
   requiresAuthentication,
-  withRouter,
+  withRouter
 )(AddClusterPage)

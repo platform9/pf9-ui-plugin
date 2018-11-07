@@ -21,16 +21,19 @@ class VolumeSnapshotsListContainer extends React.Component {
         editUrl="/ui/openstack/storage/volumeSnapshots/edit"
         onRemove={this.handleRemove}
       >
-        {handlers => <VolumeSnapshotsList volumeSnapshots={volumeSnapshots} {...handlers} />}
+        {handlers => (
+          <VolumeSnapshotsList
+            volumeSnapshots={volumeSnapshots}
+            {...handlers}
+          />
+        )}
       </CRUDListContainer>
     )
   }
 }
 
 VolumeSnapshotsListContainer.propTypes = {
-  volumeSnapshots: PropTypes.arrayOf(PropTypes.object)
+  volumeSnapshots: PropTypes.arrayOf(PropTypes.object),
 }
 
-export default compose(
-  withAppContext,
-)(VolumeSnapshotsListContainer)
+export default compose(withAppContext)(VolumeSnapshotsListContainer)

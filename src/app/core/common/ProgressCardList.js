@@ -7,7 +7,7 @@ import ProgressCard from './ProgressCard'
 const styles = theme => ({
   root: {
     flexGrow: 1,
-  }
+  },
 })
 
 @withStyles(styles)

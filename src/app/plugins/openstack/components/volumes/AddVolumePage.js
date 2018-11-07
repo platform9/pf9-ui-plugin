@@ -13,7 +13,7 @@ const constructBatch = (numVolumes, prefix, data) =>
     .map(name => ({ ...data, name }))
     .map(volume => ({
       ...volume,
-      metadata: keyValueArrToObj(volume.metadata)
+      metadata: keyValueArrToObj(volume.metadata),
     }))
 
 class AddVolumePage extends React.Component {
@@ -26,7 +26,7 @@ class AddVolumePage extends React.Component {
       const createdVolumes = await asyncMap(volumesToCreate, data =>
         context.apiClient.cinder.createVolume(data, { setContext, context })
       )
-      setContext({ volumes: [ ...existing, ...createdVolumes ] })
+      setContext({ volumes: [...existing, ...createdVolumes] })
       history.push('/ui/openstack/storage#volumes')
     } catch (err) {
       console.error(err)

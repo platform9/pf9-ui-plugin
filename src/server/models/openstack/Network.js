@@ -34,7 +34,7 @@ class Network extends ActiveModel {
       port_security_enabled: this.port_security_enabled,
       external: this.external,
       admin_state_up: this.admin_state_up,
-      status: this.status
+      status: this.status,
     }
   }
 }

@@ -1,7 +1,4 @@
-import {
-  createTenant,
-  deleteTenant,
-} from '../api/keystone'
+import { createTenant, deleteTenant } from '../api/keystone'
 
 export const ADD_TENANT = 'ADD_TENANT'
 export const SET_TENANTS = 'SET_TENANTS'

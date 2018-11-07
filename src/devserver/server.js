@@ -29,8 +29,8 @@ if (isDev) {
     hot: true,
     noInfo: true,
     stats: {
-      colors: true
-    }
+      colors: true,
+    },
   })
   const webpackHotMiddleware = require('webpack-hot-middleware')(compiler)
 
@@ -39,7 +39,11 @@ if (isDev) {
 }
 
 app.all('*', (req, res) => {
-  res.write(webpackDevMiddleware.fileSystem.readFileSync(path.join(__dirname, '..', '..', 'build', 'ui', 'index.html')))
+  res.write(
+    webpackDevMiddleware.fileSystem.readFileSync(
+      path.join(__dirname, '..', '..', 'build', 'ui', 'index.html')
+    )
+  )
   res.end()
 })
 

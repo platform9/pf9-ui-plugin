@@ -11,7 +11,9 @@ const columns = [
 ]
 
 const VolumeChooser = ({ data, onChange, initialValue }) => {
-  if (!data) { return null }
+  if (!data) {
+    return null
+  }
   return (
     <ListTableSelect
       columns={columns}

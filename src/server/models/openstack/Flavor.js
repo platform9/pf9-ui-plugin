@@ -30,7 +30,7 @@ class Flavor extends ActiveModel {
       ram: this.ram,
       vcpus: this.vcpus,
       public: this.public,
-      tags: this.tags
+      tags: this.tags,
     }
   }
 }

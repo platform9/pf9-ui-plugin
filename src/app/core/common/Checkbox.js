@@ -5,7 +5,7 @@ import {
   Checkbox as BaseCheckbox,
   FormControl,
   FormControlLabel,
-  FormHelperText
+  FormHelperText,
 } from '@material-ui/core'
 import { withFormContext } from 'core/common/ValidatedForm'
 import { compose, emptyObj, filterFields, pickMultiple } from 'core/fp'
@@ -13,8 +13,8 @@ import { requiredValidator } from 'core/FieldValidator'
 
 const styles = theme => ({
   formControl: {
-    margin: theme.spacing.unit
-  }
+    margin: theme.spacing.unit,
+  },
 })
 
 class Checkbox extends React.Component {
@@ -24,7 +24,7 @@ class Checkbox extends React.Component {
       ? {
         validations: Array.isArray(props.validations)
           ? [requiredValidator, ...props.validations]
-          : { required: true, ...props.validations }
+          : { required: true, ...props.validations },
       }
       : pickMultiple('validations')(props)
 
@@ -71,7 +71,7 @@ class Checkbox extends React.Component {
 }
 
 Checkbox.defaultProps = {
-  validations: []
+  validations: [],
 }
 
 Checkbox.propTypes = {
@@ -79,7 +79,10 @@ Checkbox.propTypes = {
   label: PropTypes.string,
   validations: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
   initialValue: PropTypes.bool,
-  onChange: PropTypes.func
+  onChange: PropTypes.func,
 }
 
-export default compose(withFormContext, withStyles(styles))(Checkbox)
+export default compose(
+  withFormContext,
+  withStyles(styles)
+)(Checkbox)

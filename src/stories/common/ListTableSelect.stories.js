@@ -5,10 +5,7 @@ import { addStories } from '../helpers'
 
 const onChange = action('change')
 
-const columns = [
-  { id: 'id', label: 'integer' },
-  { id: 'word', label: 'word' },
-]
+const columns = [{ id: 'id', label: 'integer' }, { id: 'word', label: 'word' }]
 
 const data = [
   { id: 1, word: 'one' },
@@ -22,6 +19,11 @@ addStories('Common Components/ListTableSelect', {
   ),
 
   'w/ initialValue set': () => (
-    <ListTableSelect columns={columns} data={data} onChange={onChange} initialValue={data[1]} />
-  )
+    <ListTableSelect
+      columns={columns}
+      data={data}
+      onChange={onChange}
+      initialValue={data[1]}
+    />
+  ),
 })

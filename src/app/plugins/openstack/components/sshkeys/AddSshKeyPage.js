@@ -13,7 +13,7 @@ class AddSshKeyPage extends React.Component {
     try {
       const existing = await loadSshKeys({ context, setContext })
       const createdSshKey = await context.apiClient.nova.createSshKey(sshKey)
-      setContext({ sshKeys: [ ...existing, createdSshKey ] })
+      setContext({ sshKeys: [...existing, createdSshKey] })
       history.push('/ui/openstack/sshkeys')
     } catch (err) {
       console.error(err)

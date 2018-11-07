@@ -10,11 +10,10 @@ const loadInstances = async ({ setContext, context }) => {
   setContext({ instances })
 }
 
-const InstancesListPage = () =>
+const InstancesListPage = () => (
   <DataLoader dataKey="instances" loaderFn={loadInstances}>
     {({ data }) => <InstancesListContainer instances={data} />}
   </DataLoader>
+)
 
-export default compose(
-  requiresAuthentication,
-)(InstancesListPage)
+export default compose(requiresAuthentication)(InstancesListPage)

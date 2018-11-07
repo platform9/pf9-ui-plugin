@@ -5,11 +5,11 @@ const authConstructors = {
     user: {
       name: username,
       domain: { id: 'default' },
-      password
-    }
+      password,
+    },
   }),
 
-  token: token => ({ id: token })
+  token: token => ({ id: token }),
 }
 
 const constructAuthBody = (method, ...args) => {
@@ -17,9 +17,9 @@ const constructAuthBody = (method, ...args) => {
     auth: {
       identity: {
         methods: [method],
-        [method]: authConstructors[method](...args)
+        [method]: authConstructors[method](...args),
       },
-    }
+    },
   }
 
   return body
@@ -49,29 +49,55 @@ class Keystone {
     this.client = client
   }
 
-  get endpoint () { return this.client.options.keystoneEndpoint }
-  get v3 () { return `${this.endpoint}/v3` }
+  get endpoint () {
+    return this.client.options.keystoneEndpoint
+  }
+  get v3 () {
+    return `${this.endpoint}/v3`
+  }
 
-  get catalogUrl () { return `${this.v3}/auth/catalog` }
-  get endpointsUrl () { return `${this.v3}/endpoints` }
-  get regionsUrl () { return `${this.v3}/regions` }
-  get projectsUrl () { return `${this.v3}/projects` }
-  get tokensUrl () { return `${this.v3}/auth/tokens?nocatalog` }
-  get usersUrl () { return `${this.v3}/users` }
+  get catalogUrl () {
+    return `${this.v3}/auth/catalog`
+  }
+  get endpointsUrl () {
+    return `${this.v3}/endpoints`
+  }
+  get regionsUrl () {
+    return `${this.v3}/regions`
+  }
+  get projectsUrl () {
+    return `${this.v3}/projects`
+  }
+  get tokensUrl () {
+    return `${this.v3}/auth/tokens?nocatalog`
+  }
+  get usersUrl () {
+    return `${this.v3}/users`
+  }
 
   async getProject (id) {
-    const response = await axios.get(`${this.projectsUrl}/${id}`, this.client.getAuthHeaders())
+    const response = await axios.get(
+      `${this.projectsUrl}/${id}`,
+      this.client.getAuthHeaders()
+    )
     return response.data.project
   }
 
   async getProjects (scoped = false) {
-    const response = await axios.get(this.projectsUrl, this.client.getAuthHeaders(scoped))
+    const response = await axios.get(
+      this.projectsUrl,
+      this.client.getAuthHeaders(scoped)
+    )
     return response.data.projects
   }
 
   async createProject (params) {
     const body = { project: params }
-    const response = await axios.post(this.projectsUrl, body, this.client.getAuthHeaders())
+    const response = await axios.post(
+      this.projectsUrl,
+      body,
+      this.client.getAuthHeaders()
+    )
     return response.data.project
   }
 
@@ -84,7 +110,10 @@ class Keystone {
 
   async deleteProject (projectId) {
     try {
-      await axios.delete(`${this.projectsUrl}/${projectId}`, this.client.getAuthHeaders())
+      await axios.delete(
+        `${this.projectsUrl}/${projectId}`,
+        this.client.getAuthHeaders()
+      )
       return projectId
     } catch (err) {
       throw new Error(`Unable to delete non-existant project`)
@@ -135,25 +164,36 @@ class Keystone {
   }
 
   async getRegions () {
-    const response = await axios.get(this.regionsUrl, this.client.getAuthHeaders())
+    const response = await axios.get(
+      this.regionsUrl,
+      this.client.getAuthHeaders()
+    )
     return response.data.regions
   }
 
   async getServiceCatalog () {
-    const response = await axios.get(this.catalogUrl, this.client.getAuthHeaders())
+    const response = await axios.get(
+      this.catalogUrl,
+      this.client.getAuthHeaders()
+    )
     this.client.serviceCatalog = response.data.catalog
     return response.data.catalog
   }
 
   async getEndpoints () {
-    const response = await axios.get(this.endpointsUrl, this.client.getAuthHeaders())
+    const response = await axios.get(
+      this.endpointsUrl,
+      this.client.getAuthHeaders()
+    )
     this.client.endpoints = response.data.endpoints
     return response.data.endpoints
   }
 
   async getServicesForActiveRegion () {
     if (!this.client.activeRegion) {
-      throw new Error('Must first select a region before getting services for that region')
+      throw new Error(
+        'Must first select a region before getting services for that region'
+      )
     }
     if (!this.client.serviceCatalog) {
       await this.getServiceCatalog()
@@ -163,18 +203,28 @@ class Keystone {
   }
 
   async getUser (id) {
-    const response = await axios.get(`${this.usersUrl}/${id}`, this.client.getAuthHeaders())
+    const response = await axios.get(
+      `${this.usersUrl}/${id}`,
+      this.client.getAuthHeaders()
+    )
     return response.data.user
   }
 
   async getUsers () {
-    const response = await axios.get(this.usersUrl, this.client.getAuthHeaders())
+    const response = await axios.get(
+      this.usersUrl,
+      this.client.getAuthHeaders()
+    )
     return response.data.users
   }
 
   async createUser (params) {
     const body = { user: params }
-    const response = await axios.post(this.usersUrl, body, this.client.getAuthHeaders())
+    const response = await axios.post(
+      this.usersUrl,
+      body,
+      this.client.getAuthHeaders()
+    )
     return response.data.user
   }
 
@@ -187,7 +237,10 @@ class Keystone {
 
   async deleteUser (userId) {
     try {
-      await axios.delete(`${this.usersUrl}/${userId}`, this.client.getAuthHeaders())
+      await axios.delete(
+        `${this.usersUrl}/${userId}`,
+        this.client.getAuthHeaders()
+      )
       return userId
     } catch (err) {
       throw new Error(`Unable to delete non-existant user`)

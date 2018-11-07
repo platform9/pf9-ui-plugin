@@ -1,5 +1,5 @@
 import React from 'react'
-import { Grid, Paper, Tabs as MDTabs, Tab as MDTab } from '@material-ui/core'
+import { Grid, Paper, Tab as MDTab, Tabs as MDTabs } from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles'
 import { withRouter } from 'react-router-dom'
 import { compose } from 'core/fp'
@@ -13,13 +13,16 @@ const styles = theme => ({
     flexGrow: 1,
     width: '100%',
     boxShadow: '0 0 0 0',
-    backgroundColor: theme.palette.background.default
-  }
+    backgroundColor: theme.palette.background.default,
+  },
 })
 
 class Tabs extends React.Component {
   addTab = tab => {
-    this.setState(state => ({ tabs: [...state.tabs, tab] }), this.activateDefaultTab)
+    this.setState(
+      state => ({ tabs: [...state.tabs, tab] }),
+      this.activateDefaultTab
+    )
   }
 
   state = {
@@ -54,9 +57,14 @@ class Tabs extends React.Component {
                 indicatorColor="primary"
                 textColor="primary"
               >
-                {tabs.map(tab =>
-                  <MDTab key={tab.value} value={tab.value} label={tab.label} href={tab.value} />
-                )}
+                {tabs.map(tab => (
+                  <MDTab
+                    key={tab.value}
+                    value={tab.value}
+                    label={tab.label}
+                    href={tab.value}
+                  />
+                ))}
               </MDTabs>
               {children}
             </Paper>
@@ -70,14 +78,9 @@ class Tabs extends React.Component {
 export const withTabContext = Component => props => {
   return (
     <Consumer>
-      {
-        ({ value, addTab }) =>
-          <Component
-            {...props}
-            activeTab={value}
-            addTab={addTab}
-          />
-      }
+      {({ value, addTab }) => (
+        <Component {...props} activeTab={value} addTab={addTab} />
+      )}
     </Consumer>
   )
 }

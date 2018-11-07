@@ -36,7 +36,11 @@ class Murano {
   async uploadApplications (params) {
     const url = await this.uploadUrl()
     try {
-      const response = await axios.post(url, params, this.client.getAuthHeaders())
+      const response = await axios.post(
+        url,
+        params,
+        this.client.getAuthHeaders()
+      )
       return response.data
     } catch (err) {
       console.log(err)
@@ -56,7 +60,11 @@ class Murano {
   async updateApplication (id, params) {
     const url = `${await this.applicationUrl()}/${id}`
     try {
-      const response = await axios.put(url, { package: params }, this.client.getAuthHeaders())
+      const response = await axios.put(
+        url,
+        { package: params },
+        this.client.getAuthHeaders()
+      )
       return response.data.package
     } catch (err) {
       console.log(err)

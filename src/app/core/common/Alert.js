@@ -16,7 +16,7 @@ const variantIcon = {
   success: CheckCircleIcon,
   warning: WarningIcon,
   error: ErrorIcon,
-  info: InfoIcon
+  info: InfoIcon,
 }
 
 const styles = theme => ({
@@ -27,7 +27,7 @@ const styles = theme => ({
   icon: { fontSize: 20 },
   iconVariant: {
     opacity: 0.9,
-    marginRight: theme.spacing.unit
+    marginRight: theme.spacing.unit,
   },
   message: {
     color: theme.palette.primary.contrastText,
@@ -41,16 +41,20 @@ const styles = theme => ({
     margin: `${theme.spacing.unit}px 0`,
     padding: theme.spacing.unit,
     width: '100%',
-  }
+  },
 })
 
 @withStyles(styles)
 class Alert extends React.Component {
   state = { open: true }
 
-  onClose = () => { this.setState({ open: false }) }
+  onClose = () => {
+    this.setState({ open: false })
+  }
   render () {
-    if (!this.state.open) { return null }
+    if (!this.state.open) {
+      return null
+    }
 
     const { classes, children, message, variant } = this.props
     const Icon = variantIcon[variant]
@@ -59,13 +63,17 @@ class Alert extends React.Component {
       <div className={classNames(classes.container, classes[variant])}>
         <span className={classes.message}>
           <Icon className={classNames(classes.icon, classes.iconVariant)} />
-          {message && <Typography variant="body1" color="inherit">{message}</Typography>}
+          {message && (
+            <Typography variant="body1" color="inherit">
+              {message}
+            </Typography>
+          )}
           {children}
         </span>
         <IconButton
-          key='close'
-          aria-label='Close'
-          color='inherit'
+          key="close"
+          aria-label="Close"
+          color="inherit"
           className={classes.close}
           onClick={this.onClose}
         >

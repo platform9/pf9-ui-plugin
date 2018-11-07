@@ -34,6 +34,4 @@ const ApiAccessPage = () => {
   )
 }
 
-export default compose(
-  requiresAuthentication,
-)(ApiAccessPage)
+export default compose(requiresAuthentication)(ApiAccessPage)

@@ -3,7 +3,7 @@ import faker from 'faker'
 const fakeNavbarItem = () => ({
   name: faker.random.word(),
   link: {
-    path: faker.internet.url()
+    path: faker.internet.url(),
   },
 })
 

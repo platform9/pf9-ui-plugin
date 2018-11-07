@@ -12,9 +12,7 @@ class ListPage extends React.Component {
   state = {
     activeCluster: '__all__',
     namespaces: null,
-    clusterOptions: [
-      { label: 'all', value: '__all__' },
-    ],
+    clusterOptions: [{ label: 'all', value: '__all__' }],
   }
 
   async componentDidMount () {
@@ -25,13 +23,10 @@ class ListPage extends React.Component {
     const clusters = this.props.context.clusters.filter(x => x.hasMasterNode)
     const clusterOptions = clusters.map(cluster => ({
       label: cluster.name,
-      value: cluster.uuid
+      value: cluster.uuid,
     }))
     this.setState({
-      clusterOptions: [
-        { label: 'all', value: '__all__' },
-        ...clusterOptions
-      ]
+      clusterOptions: [{ label: 'all', value: '__all__' }, ...clusterOptions],
     })
   }
 
@@ -47,12 +42,15 @@ class ListPage extends React.Component {
   render () {
     const { activeCluster, clusterOptions } = this.state
     const { namespaces } = this.props.context
-    if (!namespaces) { return <Loader /> }
-    const filteredNamespaces = (activeCluster === '__all__' && namespaces) ||
+    if (!namespaces) {
+      return <Loader />
+    }
+    const filteredNamespaces =
+      (activeCluster === '__all__' && namespaces) ||
       namespaces.filter(namespace => namespace.clusterId === activeCluster)
     const withClusterNames = filteredNamespaces.map(ns => ({
       ...ns,
-      clusterName: this.findClusterName(ns.clusterId)
+      clusterName: this.findClusterName(ns.clusterId),
     }))
 
     return (

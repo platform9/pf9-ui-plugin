@@ -10,7 +10,7 @@ const urlWithHost = url => {
 const authTokenHeader = () => ({ 'X-Auth-Token': registry.getInstance().token })
 const jsonHeaders = () => ({
   'Content-Type': 'application/json',
-  'Accept': 'application/json',
+  Accept: 'application/json',
 })
 
 const http = {
@@ -24,10 +24,10 @@ const http = {
         headers: {
           ...jsonHeaders(),
           ...additionalHeaders,
-        }
+        },
       }
       return fetch(urlWithHost(url), params)
-    }
+    },
   },
 
   authenticated: {
@@ -36,8 +36,8 @@ const http = {
         const params = {
           method: 'GET',
           headers: {
-            ...authTokenHeader()
-          }
+            ...authTokenHeader(),
+          },
         }
         return fetch(urlWithHost(url), params).then(x => x.json())
       },
@@ -62,9 +62,9 @@ const http = {
           },
         }
         return fetch(urlWithHost(url), params)
-      }
-    }
-  }
+      },
+    },
+  },
 }
 
 export default http

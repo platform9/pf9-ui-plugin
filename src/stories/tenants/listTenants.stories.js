@@ -21,7 +21,12 @@ addStories('Tenants/Listing tenants', {
   ),
 
   'With pagination': () => {
-    const numTenants = number('numTenants', 7, { range: true, min: 0, max: 15, step: 1 })
+    const numTenants = number('numTenants', 7, {
+      range: true,
+      min: 0,
+      max: 15,
+      step: 1,
+    })
     const tenants = range(numTenants).map(fakeTenant)
     return (
       <TenantsList data={tenants} onAdd={addAction} onDelete={deleteAction} />

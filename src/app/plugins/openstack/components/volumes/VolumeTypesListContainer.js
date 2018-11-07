@@ -11,9 +11,13 @@ import { withAppContext } from 'core/AppContext'
 // should probably create some utility function for it.
 const convertVolumeType = x => {
   let cloned = { ...x }
-  const backendNameItem = x.extra_specs.find(x => x.key === 'volume_backend_name')
+  const backendNameItem = x.extra_specs.find(
+    x => x.key === 'volume_backend_name'
+  )
   cloned.volume_backend_name = (backendNameItem && backendNameItem.value) || ''
-  cloned.extra_specs = x.extra_specs.filter(x => x.key !== 'volume_backend_name')
+  cloned.extra_specs = x.extra_specs.filter(
+    x => x.key !== 'volume_backend_name'
+  )
   return cloned
 }
 
@@ -35,16 +39,16 @@ class VolumeTypesListContainer extends React.Component {
         addUrl="/ui/openstack/storage/volumeTypes/add"
         editUrl="/ui/openstack/storage/volumeTypes/edit"
       >
-        {handlers => <VolumeTypesList volumeTypes={volumeTypes} {...handlers} />}
+        {handlers => (
+          <VolumeTypesList volumeTypes={volumeTypes} {...handlers} />
+        )}
       </CRUDListContainer>
     )
   }
 }
 
 VolumeTypesListContainer.propTypes = {
-  volumeTypes: PropTypes.arrayOf(PropTypes.object)
+  volumeTypes: PropTypes.arrayOf(PropTypes.object),
 }
 
-export default compose(
-  withAppContext,
-)(VolumeTypesListContainer)
+export default compose(withAppContext)(VolumeTypesListContainer)

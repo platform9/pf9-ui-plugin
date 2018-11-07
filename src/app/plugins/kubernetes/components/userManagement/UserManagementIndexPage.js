@@ -9,10 +9,18 @@ const RolesListPage = () => <h1>TODO: Roles List Page</h1>
 
 const UserManagementIndexPage = () => (
   <Tabs>
-    <Tab value="tenants" label="Tenants"><TenantsListPage /></Tab>
-    <Tab value="users" label="Users"><UsersListPage /></Tab>
-    <Tab value="userGroups" label="Groups"><UserGroupsListPage /></Tab>
-    <Tab value="roles" label="Roles"><RolesListPage /></Tab>
+    <Tab value="tenants" label="Tenants">
+      <TenantsListPage />
+    </Tab>
+    <Tab value="users" label="Users">
+      <UsersListPage />
+    </Tab>
+    <Tab value="userGroups" label="Groups">
+      <UserGroupsListPage />
+    </Tab>
+    <Tab value="roles" label="Roles">
+      <RolesListPage />
+    </Tab>
   </Tabs>
 )
 

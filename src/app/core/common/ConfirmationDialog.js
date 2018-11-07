@@ -6,7 +6,7 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle
+  DialogTitle,
 } from '@material-ui/core'
 
 class ConfirmationDialog extends React.Component {
@@ -19,13 +19,7 @@ class ConfirmationDialog extends React.Component {
   }
 
   render () {
-    const {
-      open,
-      title,
-      text,
-      cancelText,
-      confirmText,
-    } = this.props
+    const { open, title, text, cancelText, confirmText } = this.props
 
     return (
       <Dialog

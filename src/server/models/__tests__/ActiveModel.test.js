@@ -51,8 +51,7 @@ describe('ActiveModel', () => {
   })
 
   it('warns when a subclass does not implement getCollection', () => {
-    class BadModel extends ActiveModel {
-    }
+    class BadModel extends ActiveModel {}
 
     const thrower = () => new BadModel()
     expect(thrower).toThrowError()
@@ -61,7 +60,9 @@ describe('ActiveModel', () => {
   describe('toString', () => {
     it('prints the pretty JSON representation by default', () => {
       const tenant = new Tenant({ name: 'foo' })
-      expect(tenant.toString()).toEqual(JSON.stringify(tenant.asJson(), null, 4))
+      expect(tenant.toString()).toEqual(
+        JSON.stringify(tenant.asJson(), null, 4)
+      )
     })
 
     it('allows a condensed version of the json', () => {

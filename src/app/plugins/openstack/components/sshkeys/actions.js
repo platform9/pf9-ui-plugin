@@ -5,7 +5,9 @@ const dataKey = 'sshKeys'
 const injectIds = x => ({ ...x, id: x.id || uuid.v4() })
 
 export const loadSshKeys = async ({ context, setContext, reload }) => {
-  if (!reload && context[dataKey]) { return context[dataKey] }
+  if (!reload && context[dataKey]) {
+    return context[dataKey]
+  }
   const existing = (await context.apiClient.nova.getSshKeys()).map(injectIds)
   setContext({ [dataKey]: existing })
   return existing
@@ -14,7 +16,7 @@ export const loadSshKeys = async ({ context, setContext, reload }) => {
 export const createSshKey = async ({ data, context, setContext }) => {
   const created = await context.apiClient.nova.createSshKey(data)
   const existing = await loadSshKeys({ context, setContext })
-  setContext({ [dataKey]: [ ...existing, created ] })
+  setContext({ [dataKey]: [...existing, created] })
   return created
 }
 

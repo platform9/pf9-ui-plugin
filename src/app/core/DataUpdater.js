@@ -16,10 +16,25 @@ class DataUpdater extends React.Component {
   findById = (arr = [], id) => arr.find(x => x.id === id)
 
   handleSubmit = async data => {
-    const { dataKey, updateFn, objId, backUrl, context, setContext, history } = this.props
-    const updatedEntity = await updateFn(data, { context, setContext, objId, dataKey })
+    const {
+      dataKey,
+      updateFn,
+      objId,
+      backUrl,
+      context,
+      setContext,
+      history,
+    } = this.props
+    const updatedEntity = await updateFn(data, {
+      context,
+      setContext,
+      objId,
+      dataKey,
+    })
     setContext({
-      [dataKey]: context[dataKey].map(x => x.id === objId ? updatedEntity : x)
+      [dataKey]: context[dataKey].map(
+        x => (x.id === objId ? updatedEntity : x)
+      ),
     })
     if (updatedEntity && backUrl) {
       history.push(backUrl)
@@ -31,10 +46,12 @@ class DataUpdater extends React.Component {
     return (
       <DataLoader dataKey={dataKey} loaderFn={loaderFn}>
         {({ data }) => {
-          if (!data) { return null }
+          if (!data) {
+            return null
+          }
           return children({
             data: this.findById(data, objId),
-            onSubmit: this.handleSubmit
+            onSubmit: this.handleSubmit,
           })
         }}
       </DataLoader>
@@ -54,7 +71,7 @@ DataUpdater.propTypes = {
   /**
    * This function is invoked when the data does not yet exist.
    * It is passed `setContext` to use for updating.
-  */
+   */
   loaderFn: PropTypes.func.isRequired,
 
   updateFn: PropTypes.func.isRequired,
@@ -70,5 +87,5 @@ DataUpdater.propTypes = {
 
 export default compose(
   withAppContext,
-  withRouter,
+  withRouter
 )(DataUpdater)

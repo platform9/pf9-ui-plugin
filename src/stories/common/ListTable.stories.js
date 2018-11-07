@@ -9,10 +9,7 @@ const onDelete = action('delete')
 const onEdit = action('edit')
 const onRestart = action('restart')
 
-const columns = [
-  { id: 'id', label: 'integer' },
-  { id: 'word', label: 'word' },
-]
+const columns = [{ id: 'id', label: 'integer' }, { id: 'word', label: 'word' }]
 
 const data = [
   { id: 1, word: 'one' },
@@ -20,7 +17,7 @@ const data = [
   { id: 3, word: 'three' },
 ]
 const rowActions = [
-  { icon: <ReplayIcon />, label: 'Restart', action: onRestart }
+  { icon: <ReplayIcon />, label: 'Restart', action: onRestart },
 ]
 
 const actions = { onAdd, onDelete, onEdit }
@@ -31,10 +28,20 @@ addStories('Common Components/ListTable', {
   ),
 
   'w/o checkboxes': () => (
-    <ListTable title="Numbers" columns={columns} data={data} showCheckboxes={false} />
+    <ListTable
+      title="Numbers"
+      columns={columns}
+      data={data}
+      showCheckboxes={false}
+    />
   ),
 
   'w/ row actions': () => (
-    <ListTable title="Numbers" columns={columns} data={data} rowActions={rowActions} />
-  )
+    <ListTable
+      title="Numbers"
+      columns={columns}
+      data={data}
+      rowActions={rowActions}
+    />
+  ),
 })

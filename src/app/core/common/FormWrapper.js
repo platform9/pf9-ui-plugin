@@ -11,11 +11,11 @@ const styles = theme => ({
   },
   title: {
     color: theme.palette.grey[700],
-    marginBottom: theme.spacing.unit * 2
+    marginBottom: theme.spacing.unit * 2,
   },
   divider: {
-    marginBottom: theme.spacing.unit * 2
-  }
+    marginBottom: theme.spacing.unit * 2,
+  },
 })
 
 @withStyles(styles)
@@ -24,7 +24,7 @@ class FormWrapper extends React.Component {
     super(props)
     this.state = {
       title: this.props.title,
-      backUrl: this.props.backUrl
+      backUrl: this.props.backUrl,
     }
   }
 
@@ -37,19 +37,12 @@ class FormWrapper extends React.Component {
           <Paper className={classes.root}>
             <Grid container justify="space-between">
               <Grid item>
-                <Typography
-                  variant="display2"
-                  className={classes.title}
-                >
+                <Typography variant="display2" className={classes.title}>
                   {title}
                 </Typography>
               </Grid>
               <Grid item>
-                <Button
-                  variant="outlined"
-                  component={Link}
-                  to={backUrl}
-                >
+                <Button variant="outlined" component={Link} to={backUrl}>
                   &larr;&nbsp;Back to list
                 </Button>
               </Grid>

@@ -8,7 +8,7 @@ export const constructTokenBody = method => (unscopedToken, tenantId) => {
         methods: [method],
         [method]: { id: unscopedToken },
       },
-    }
+    },
   }
 
   if (tenantId) {
@@ -24,8 +24,8 @@ export const constructPasswordMethod = (username, password) => ({
   user: {
     name: username,
     domain: { id: 'default' },
-    password
-  }
+    password,
+  },
 })
 
 export async function getUnscopedToken (username, password) {
@@ -34,41 +34,48 @@ export async function getUnscopedToken (username, password) {
       identity: {
         methods: ['password'],
         password: {
-          ...constructPasswordMethod(username, password)
-        }
-      }
-    }
+          ...constructPasswordMethod(username, password),
+        },
+      },
+    },
   }
   const response = await http.json.post(`${v3Base}/auth/tokens?nocatalog`, body)
   return response.headers.get('X-Subject-Token')
 }
 
-export const getScopedProjects = () => authHttp.get(`${v3Base}/auth/projects`).then(x => x.projects)
+export const getScopedProjects = () =>
+  authHttp.get(`${v3Base}/auth/projects`).then(x => x.projects)
 
 export const getToken = () => registry.getItem('token')
 
 export const getScopedToken = async tenantId => {
   const unscopedToken = getToken()
   const body = constructTokenBody('token')(unscopedToken, tenantId)
-  const response = await http.json.post(`${v3Base}/auth/tokens?nocatalog`, body, { 'x-auth-token': unscopedToken })
+  const response = await http.json.post(
+    `${v3Base}/auth/tokens?nocatalog`,
+    body,
+    { 'x-auth-token': unscopedToken }
+  )
   const responseBody = await response.json()
   const scopedToken = response.headers.get('x-subject-token')
   return {
     scopedToken,
-    token: responseBody.token // token = { user, roles }
+    token: responseBody.token, // token = { user, roles }
   }
 }
 
-export const renewUnscopedToken = async (unscopedToken) => {
+export const renewUnscopedToken = async unscopedToken => {
   const body = constructTokenBody('token')(unscopedToken)
   const response = await http.json.post(`${v3Base}/auth/tokens?nocatalog`, body)
   const newUnscopedToken = response.headers.get('x-subject-token')
   return newUnscopedToken || null
 }
 
-export const getRegions = () => authHttp.get(`${v3Base}/regions`).then(x => x.regions)
+export const getRegions = () =>
+  authHttp.get(`${v3Base}/regions`).then(x => x.regions)
 
-export const getServiceCatalog = () => authHttp.get(`${v3Base}/auth/catalog`).then(x => x.catalog)
+export const getServiceCatalog = () =>
+  authHttp.get(`${v3Base}/auth/catalog`).then(x => x.catalog)
 
 export const createUser = user => {
   const body = {
@@ -78,7 +85,7 @@ export const createUser = user => {
       email: user.name,
       password: user.password,
       default_project_id: 'TODO',
-    }
+    },
   }
   return authHttp.post(`${v3Base}/users`, body).then(json => json.user.id)
 }
@@ -93,13 +100,14 @@ export function createTenant (project) {
       name: project.name,
       description: project.description,
       domain_id: 'default',
-      is_domain: false
-    }
+      is_domain: false,
+    },
   }
   return authHttp.post(`${v3Base}/projects`, body)
 }
 
-export const deleteTenant = tenantId => authHttp.delete(`${v3Base}/projects/${tenantId}`)
+export const deleteTenant = tenantId =>
+  authHttp.delete(`${v3Base}/projects/${tenantId}`)
 
 /*
 import {

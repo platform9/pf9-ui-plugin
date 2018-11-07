@@ -9,8 +9,16 @@ const WizardContext = React.createContext({})
 export const Consumer = WizardContext.Consumer
 export const Provider = WizardContext.Provider
 
-const NextButton = ({ children, handleNext }) => <Button variant="outlined" onClick={handleNext}>{children}</Button>
-const BackButton = ({ handleBack }) => <Button variant="outlined" onClick={handleBack}>Back</Button>
+const NextButton = ({ children, handleNext }) => (
+  <Button variant="outlined" onClick={handleNext}>
+    {children}
+  </Button>
+)
+const BackButton = ({ handleBack }) => (
+  <Button variant="outlined" onClick={handleBack}>
+    Back
+  </Button>
+)
 
 class Wizard extends React.Component {
   isLastStep = () => this.state.step === this.state.steps.length - 1
@@ -35,13 +43,10 @@ class Wizard extends React.Component {
   }
 
   handleBack = () => {
-    this.setState(
-      state => ({ step: state.step - 1 }),
-      this.activateStep
-    )
+    this.setState(state => ({ step: state.step - 1 }), this.activateStep)
   }
 
-  onNext = (cb) => {
+  onNext = cb => {
     this.nextCb = cb
   }
 
@@ -64,9 +69,9 @@ class Wizard extends React.Component {
   }
 
   setWizardContext = newValues => {
-    this.setState(
-      state => ({ wizardContext: { ...state.wizardContext, ...newValues } })
-    )
+    this.setState(state => ({
+      wizardContext: { ...state.wizardContext, ...newValues },
+    }))
   }
 
   state = {
@@ -90,9 +95,15 @@ class Wizard extends React.Component {
           <ProgressTracker steps={steps} activeStep={step} />
           {children({ wizardContext, setWizardContext, onNext: this.onNext })}
           <FormButtons>
-            { this.hasBack() && <BackButton handleBack={this.handleBack} /> }
-            { this.hasNext() && <NextButton handleNext={this.handleNext}>Next</NextButton> }
-            { this.isLastStep() && <NextButton handleNext={this.handleNext}>{submitLabel}</NextButton> }
+            {this.hasBack() && <BackButton handleBack={this.handleBack} />}
+            {this.hasNext() && (
+              <NextButton handleNext={this.handleNext}>Next</NextButton>
+            )}
+            {this.isLastStep() && (
+              <NextButton handleNext={this.handleNext}>
+                {submitLabel}
+              </NextButton>
+            )}
           </FormButtons>
         </Provider>
       </div>
@@ -109,9 +120,11 @@ Wizard.propTypes = {
 Wizard.defaultProps = {
   submitLabel: 'Complete',
   onComplete: value => {
-    console.info('Wizard#onComplete handler not implemented.  Falling back to console.log')
+    console.info(
+      'Wizard#onComplete handler not implemented.  Falling back to console.log'
+    )
     console.log(value)
-  }
+  },
 }
 
 export default Wizard
@@ -129,18 +142,17 @@ export default Wizard
 export const withWizardContext = Component => props => {
   return (
     <Consumer>
-      {
-        ({ step, steps, handleBack, handleNext, addStep, activeStepId }) =>
-          <Component
-            {...props}
-            activeStepId={activeStepId}
-            step={step}
-            steps={steps}
-            handleBack={handleBack}
-            handleNext={handleNext}
-            addStep={addStep}
-          />
-      }
+      {({ step, steps, handleBack, handleNext, addStep, activeStepId }) => (
+        <Component
+          {...props}
+          activeStepId={activeStepId}
+          step={step}
+          steps={steps}
+          handleBack={handleBack}
+          handleNext={handleNext}
+          addStep={addStep}
+        />
+      )}
     </Consumer>
   )
 }

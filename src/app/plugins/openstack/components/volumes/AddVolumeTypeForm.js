@@ -4,7 +4,7 @@ import ValidatedForm from 'core/common/ValidatedForm'
 import TextField from 'core/common/TextField'
 import KeyValuesField from 'core/common/KeyValuesField'
 
-const AddVolumeTypeForm = ({ onComplete }) =>
+const AddVolumeTypeForm = ({ onComplete }) => (
   <ValidatedForm
     backUrl="/ui/openstack/storage#volumeTypes"
     onSubmit={onComplete}
@@ -12,8 +12,8 @@ const AddVolumeTypeForm = ({ onComplete }) =>
     <p>
       A Cinder Volume Type allows you to create a Storage Tier and optionally
       specify Quality of Service parameters specific to your Cinder endpoint.
-      Once created, a Volume Type can be used by end users during creation of
-      a Volume.
+      Once created, a Volume Type can be used by end users during creation of a
+      Volume.
     </p>
     <p>
       This Volume Type will be associated with your current default Cinder
@@ -25,5 +25,6 @@ const AddVolumeTypeForm = ({ onComplete }) =>
 
     <SubmitButton>Add Volume Type</SubmitButton>
   </ValidatedForm>
+)
 
 export default AddVolumeTypeForm

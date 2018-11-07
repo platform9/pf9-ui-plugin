@@ -14,14 +14,12 @@ const UpdateImagePage = props => (
     objId={props.match.params.imageId}
     backUrl="/ui/openstack/images"
   >
-    {({ data, onSubmit }) =>
+    {({ data, onSubmit }) => (
       <FormWrapper title="Update Image" backUrl="/ui/openstack/images">
         <UpdateImageForm image={data} onSubmit={onSubmit} />
       </FormWrapper>
-    }
+    )}
   </DataUpdater>
 )
 
-export default compose(
-  requiresAuthentication,
-)(UpdateImagePage)
+export default compose(requiresAuthentication)(UpdateImagePage)

@@ -20,7 +20,12 @@ addStories('Flavor Management/Listing flavors', {
   ),
 
   'With pagination': () => {
-    const numFlavors = number('numFlavors', 7, { range: true, min: 0, max: 15, step: 1 })
+    const numFlavors = number('numFlavors', 7, {
+      range: true,
+      min: 0,
+      max: 15,
+      step: 1,
+    })
     const flavors = range(numFlavors).map(fakeFlavor)
     return (
       <FlavorsList data={flavors} onAdd={addAction} onDelete={deleteAction} />

@@ -1,9 +1,9 @@
 import {
+  getUserPass,
   keystoneEndpoint,
   makeClient,
-  getUserPass,
+  makeScopedClient,
   makeUnscopedClient,
-  makeScopedClient
 } from '../helpers'
 
 describe('Keystone', () => {
@@ -101,7 +101,14 @@ describe('Keystone', () => {
       const client = await makeScopedClient()
       const endpoints = await client.keystone.getEndpoints()
       const endpoint = endpoints[0]
-      expect(Object.keys(endpoint).includes('region_id', 'region', 'interface', 'service_id')).toBe(true)
+      expect(
+        Object.keys(endpoint).includes(
+          'region_id',
+          'region',
+          'interface',
+          'service_id'
+        )
+      ).toBe(true)
     })
   })
 
@@ -121,7 +128,7 @@ describe('Keystone', () => {
         email: 'newUser@domain.com',
         username: 'newUser@domain.com',
         password: 'secret',
-        displayname: 'New User' // yes, it's lowercase in keystone
+        displayname: 'New User', // yes, it's lowercase in keystone
       })
       expect(newUser).toBeDefined()
       expect(newUser.id).toBeDefined()
@@ -141,7 +148,7 @@ describe('Keystone', () => {
         email: 'deleteMe@domain.com',
         username: 'deleteMe@domain.com',
         password: 'secret',
-        displayname: 'Delete me' // yes, it's lowercase in keystone
+        displayname: 'Delete me', // yes, it's lowercase in keystone
       })
       const users = await client.keystone.getUsers()
       await client.keystone.deleteUser(userToDelete.id)

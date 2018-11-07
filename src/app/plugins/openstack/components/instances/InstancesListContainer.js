@@ -27,7 +27,7 @@ class InstancesListContainer extends React.Component {
 }
 
 InstancesListContainer.propTypes = {
-  instances: PropTypes.arrayOf(PropTypes.object)
+  instances: PropTypes.arrayOf(PropTypes.object),
 }
 
 export default InstancesListContainer

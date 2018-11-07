@@ -5,11 +5,10 @@ import DataLoader from 'core/DataLoader'
 import { compose } from 'core/fp'
 import { loadVolumeSnapshots } from './actions'
 
-const VolumeSnapshotsListPage = () =>
+const VolumeSnapshotsListPage = () => (
   <DataLoader dataKey="volumeSnapshots" loaderFn={loadVolumeSnapshots}>
     {({ data }) => <VolumeSnapshotsListContainer volumeSnapshots={data} />}
   </DataLoader>
+)
 
-export default compose(
-  requiresAuthentication,
-)(VolumeSnapshotsListPage)
+export default compose(requiresAuthentication)(VolumeSnapshotsListPage)

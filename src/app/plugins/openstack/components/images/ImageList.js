@@ -14,7 +14,7 @@ const columns = [
   { id: 'disk_format', label: 'Disk Format' },
   { id: 'virtual_size', label: 'Virtual Disk Size' },
   { id: 'size', label: 'File Size' },
-  { id: 'created_at', label: 'Created' }
+  { id: 'created_at', label: 'Created' },
 ]
 
 class ImageList extends React.Component {
@@ -47,7 +47,7 @@ ImageList.propTypes = {
   /** Called onClick of delete icon for a  image row */
   onDelete: PropTypes.func.isRequired,
 
-  onEdit: PropTypes.func.isRequired
+  onEdit: PropTypes.func.isRequired,
 }
 
 ImageList.defaultProps = {

@@ -22,7 +22,7 @@ const columns = [
 
   // TODO: We probably want to write a metadata renderer for this kind of format
   // since we use it in a few places for tags / metadata.
-  { id: 'metadata', label: 'Metadata', render: data => JSON.stringify(data) }
+  { id: 'metadata', label: 'Metadata', render: data => JSON.stringify(data) },
 ]
 
 class VolumesList extends React.Component {

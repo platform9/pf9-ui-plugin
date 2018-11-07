@@ -4,7 +4,9 @@ import ListTableSelect from 'core/common/ListTableSelect'
 import { columns } from './VolumeSnapshotsList'
 
 const VolumeSnapshotChooser = ({ data, onChange, initialValue }) => {
-  if (!data) { return null }
+  if (!data) {
+    return null
+  }
   return (
     <div>
       <ListTableSelect

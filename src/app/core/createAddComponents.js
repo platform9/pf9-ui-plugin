@@ -33,13 +33,20 @@ const createAddComponents = options => {
     handleAdd = async data => {
       const { setContext, context, history } = this.props
       try {
-        const existing = await (loaderFn || crudActions.list)({ setContext, context })
+        const existing = await (loaderFn || crudActions.list)({
+          setContext,
+          context,
+        })
         if (initFn) {
           // Sometimes a component needs more than just a single GET API call.
           // This function allows for any amount of arbitrary initialization.
           await initFn(this.props)
         }
-        const created = await (createFn || crudActions.create)({ data, context, setContext })
+        const created = await (createFn || crudActions.create)({
+          data,
+          context,
+          setContext,
+        })
         setContext({ [dataKey]: [...existing, ...created] })
         history.push(listUrl)
       } catch (err) {
@@ -59,7 +66,7 @@ const createAddComponents = options => {
   const AddPage = compose(
     withAppContext,
     withRouter,
-    requiresAuthentication,
+    requiresAuthentication
   )(AddPageBase)
   AddPage.displayName = `Add${name}Page`
 

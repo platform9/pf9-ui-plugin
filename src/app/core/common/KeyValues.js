@@ -46,7 +46,9 @@ class KeyValue extends React.Component {
           onChange={this.handleChange('value')}
           suggestions={valueSuggestions}
         />
-        <IconButton onClick={onDelete}><DeleteIcon /></IconButton>
+        <IconButton onClick={onDelete}>
+          <DeleteIcon />
+        </IconButton>
       </div>
     )
   }
@@ -70,7 +72,7 @@ class KeyValues extends React.Component {
 
   addBlankEntry = () => {
     this.setState(state => ({
-      entries: [...state.entries, newEntry()]
+      entries: [...state.entries, newEntry()],
     }))
   }
 
@@ -93,7 +95,10 @@ class KeyValues extends React.Component {
 
   handleChange = entry => {
     this.setState(
-      state => ({ ...state, entries: state.entries.map(x => (x.id === entry.id) ? entry : x) }),
+      state => ({
+        ...state,
+        entries: state.entries.map(x => (x.id === entry.id ? entry : x)),
+      }),
       this.propogateChange
     )
   }
@@ -115,7 +120,13 @@ class KeyValues extends React.Component {
         ))}
         <div>
           <br />
-          <Button variant="contained" color="primary" onClick={this.addBlankEntry}>Add key / value pair</Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={this.addBlankEntry}
+          >
+            Add key / value pair
+          </Button>
         </div>
       </div>
     )

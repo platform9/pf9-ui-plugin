@@ -4,7 +4,7 @@ import {
   TableBody,
   TableCell,
   TableHead,
-  TableRow
+  TableRow,
 } from '@material-ui/core'
 import { pickMultiple } from 'core/fp'
 import { withFormContext } from 'core/common/ValidatedForm'
@@ -37,8 +37,8 @@ class TenantRolesContainer extends React.Component {
     let result = this.parseInput()
     result[curTenant.name] = role
     return Object.entries(result)
-      .filter(([ tenant, role ]) => role !== 'None')
-      .reduce((acc, [ tenant, role ]) => {
+      .filter(([tenant, role]) => role !== 'None')
+      .reduce((acc, [tenant, role]) => {
         acc.push(JSON.stringify({ tenant, role }))
         return acc
       }, [])
@@ -48,29 +48,31 @@ class TenantRolesContainer extends React.Component {
     const { id, tenants, roles } = this.props
     const inputTenants = this.parseInput()
     return (
-      inputTenants && <div id={id}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Tenants</TableCell>
-              <TableCell>Roles</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {tenants.map(tenant => {
-              return (
-                <TenantRoleSelector
-                  key={tenant.id}
-                  tenant={tenant}
-                  roles={roles}
-                  status={inputTenants}
-                  handleChange={this.handleChange}
-                />
-              )
-            })}
-          </TableBody>
-        </Table>
-      </div>
+      inputTenants && (
+        <div id={id}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Tenants</TableCell>
+                <TableCell>Roles</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {tenants.map(tenant => {
+                return (
+                  <TenantRoleSelector
+                    key={tenant.id}
+                    tenant={tenant}
+                    roles={roles}
+                    status={inputTenants}
+                    handleChange={this.handleChange}
+                  />
+                )
+              })}
+            </TableBody>
+          </Table>
+        </div>
+      )
     )
   }
 }

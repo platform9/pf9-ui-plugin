@@ -5,7 +5,7 @@ import PicklistField from 'core/common/PicklistField'
 import SubmitButton from 'core/common/SubmitButton'
 import TextField from 'core/common/TextField'
 import createAddComponents from 'core/createAddComponents'
-import { loadCloudProviders, createCloudProvider } from './actions'
+import { createCloudProvider, loadCloudProviders } from './actions'
 
 const types = [
   { value: 'openstack', label: 'Openstack' },
@@ -15,20 +15,20 @@ const types = [
 const AWSHelpText = () => (
   <div>
     <p>
-      Create a new cloud provider for your Amazon Web Services (AWS) public cloud.
-      This cloud provider will work using your existing AWS credentials to create and
-      manage Kubernetes clusters and associated resources within your AWS public
-      cloud environment.
+      Create a new cloud provider for your Amazon Web Services (AWS) public
+      cloud. This cloud provider will work using your existing AWS credentials
+      to create and manage Kubernetes clusters and associated resources within
+      your AWS public cloud environment.
     </p>
     <p>
-      You can create multiple AWS cloud providers - each AWS cloud provider should
-      be associated with a unique set of AWS credentials.
+      You can create multiple AWS cloud providers - each AWS cloud provider
+      should be associated with a unique set of AWS credentials.
     </p>
     <Alert variant="info">
       <div>
         <p>
-          The following permissions are required on your AWS account in order to deploy
-          fully automated Managed Kubernetes clusters:
+          The following permissions are required on your AWS account in order to
+          deploy fully automated Managed Kubernetes clusters:
         </p>
         <ul>
           <li>ELB Management</li>
@@ -46,19 +46,19 @@ const AWSHelpText = () => (
 const OpenstackHelpText = () => (
   <div>
     <p>
-      Create a new cloud provider to work with an existing OpenStack endpoint. This
-      cloud provider will work using your specified credentials for your OpenStack
-      environment.
+      Create a new cloud provider to work with an existing OpenStack endpoint.
+      This cloud provider will work using your specified credentials for your
+      OpenStack environment.
     </p>
     <p>
-      You can create multiple OpenStack cloud providers - each OpenStack cloud provider
-      should be associated with unique OpenStack credentials.
+      You can create multiple OpenStack cloud providers - each OpenStack cloud
+      provider should be associated with unique OpenStack credentials.
     </p>
     <Alert variant="info">
       <div>
         <p>
-          The following services must be present in your OpenStack environment in
-          order to deploy fully automated Managed Kubernetes clusters.
+          The following services must be present in your OpenStack environment
+          in order to deploy fully automated Managed Kubernetes clusters.
         </p>
         <ul>
           <li>Nova</li>
@@ -108,7 +108,8 @@ export class AddCloudProviderForm extends React.Component {
     const { onComplete } = this.props
     return (
       <ValidatedForm onSubmit={onComplete}>
-        <PicklistField id="type"
+        <PicklistField
+          id="type"
           label="Cloud Provider Type"
           onChange={this.setField('type')}
           options={types}

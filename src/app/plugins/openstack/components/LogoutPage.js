@@ -22,5 +22,5 @@ export class LogoutPage extends React.Component {
 
 export default compose(
   withRouter,
-  withAppContext,
+  withAppContext
 )(LogoutPage)

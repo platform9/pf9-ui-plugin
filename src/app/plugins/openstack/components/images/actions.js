@@ -1,5 +1,7 @@
 export const loadImages = async ({ setContext, context, reload }) => {
-  if (!reload && context.images) { return context.images }
+  if (!reload && context.images) {
+    return context.images
+  }
   const images = await context.apiClient.glance.getImages()
   setContext({ images })
   return images
@@ -14,13 +16,20 @@ export const updateImage = async (data, helpers) => {
   const body = []
   body.push({ op: 'replace', path: '/name', value: data.name })
   body.push({ op: 'replace', path: '/visibility', value: data.visibility })
-  body.push({ op: initialValue.pf9_description ? 'replace' : 'add', path: '/pf9_description', value: data.pf9_description })
+  body.push({
+    op: initialValue.pf9_description ? 'replace' : 'add',
+    path: '/pf9_description',
+    value: data.pf9_description,
+  })
   body.push({ op: 'replace', path: '/owner', value: data.owner })
   body.push({ op: 'replace', path: '/protected', value: data.protected })
 
   // TODO: tags
 
-  const updatedImage = await context.apiClient.glance.updateImage(body, initialValue.id)
+  const updatedImage = await context.apiClient.glance.updateImage(
+    body,
+    initialValue.id
+  )
 
   // This should return the response of the client
   return updatedImage

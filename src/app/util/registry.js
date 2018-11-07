@@ -5,7 +5,9 @@ export const getInstance = () => registry
 
 export const getItem = key => registry[key]
 
-export const setItem = (key, value) => { registry[key] = value }
+export const setItem = (key, value) => {
+  registry[key] = value
+}
 
 export const setupFromConfig = config => {
   registry.host = config.host

@@ -8,21 +8,19 @@ const handleCancel = action('canceled')
 const handleConfirm = action('confirmed')
 
 addStories('Common Components/ConfirmationDialog', {
-  'Default settings (closed)': () => (
-    <ConfirmationDialog open={false} />
+  'Default settings (closed)': () => <ConfirmationDialog open={false} />,
+
+  'Default settings (open)': () => <ConfirmationDialog open />,
+
+  Callbacks: () => (
+    <ConfirmationDialog
+      open
+      onCancel={handleCancel}
+      onConfirm={handleConfirm}
+    />
   ),
 
-  'Default settings (open)': () => (
-    <ConfirmationDialog open />
-  ),
-
-  'Callbacks': () => (
-    <ConfirmationDialog open onCancel={handleCancel} onConfirm={handleConfirm} />
-  ),
-
-  'Custom title': () => (
-    <ConfirmationDialog open title="Custom title" />
-  ),
+  'Custom title': () => <ConfirmationDialog open title="Custom title" />,
 
   'Custom text': () => (
     <ConfirmationDialog
@@ -37,5 +35,5 @@ addStories('Common Components/ConfirmationDialog', {
       cancelText="No, get me out of here!"
       confirmText="Yes, I'm sure!"
     />
-  )
+  ),
 })

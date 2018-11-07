@@ -4,9 +4,7 @@ import { addStories } from '../helpers'
 import KeyValues from 'core/common/KeyValues'
 
 addStories('Common Components/KeyValues', {
-  'Default settings': () => (
-    <KeyValues />
-  ),
+  'Default settings': () => <KeyValues />,
 
   'Pre-populated': () => {
     const entries = [
@@ -15,14 +13,10 @@ addStories('Common Components/KeyValues', {
       { key: 'bbb', value: '222' },
       { key: 'ccc', value: '333' },
     ]
-    return (
-      <KeyValues entries={entries} />
-    )
+    return <KeyValues entries={entries} />
   },
 
   'Populated w/ suggestions': () => {
-    return (
-      <KeyValues entries={[]} keySuggestions={['one', 'two', 'three']} />
-    )
-  }
+    return <KeyValues entries={[]} keySuggestions={['one', 'two', 'three']} />
+  },
 })

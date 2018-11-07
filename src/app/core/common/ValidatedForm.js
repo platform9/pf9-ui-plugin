@@ -96,7 +96,7 @@ class ValidatedForm extends React.Component {
     errors: {},
     setField: this.setField,
     defineField: this.defineField,
-    validateField: this.validateField
+    validateField: this.validateField,
   }
 
   validateForm = () => {
@@ -142,7 +142,7 @@ ValidatedForm.propTypes = {
 
   triggerSubmit: PropTypes.func,
 
-  showErrorsOnBlur: PropTypes.bool
+  showErrorsOnBlur: PropTypes.bool,
 }
 
 export const PropKeys = Object.keys(ValidatedForm.propTypes)
@@ -167,7 +167,7 @@ export const withFormContext = Component => props => (
       value,
       showErrorsOnBlur,
       validateField,
-      errors
+      errors,
     }) => (
       <Component
         {...props}
@@ -189,5 +189,5 @@ withFormContext.propsToExclude = [
   'showErrorsOnBlur',
   'validations',
   'errors',
-  'validateField'
+  'validateField',
 ]

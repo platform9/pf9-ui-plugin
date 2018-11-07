@@ -25,7 +25,7 @@ const pluginManager = {
     data.components.push(component)
   },
 
-  registerRoutes (prefix, components=[]) {
+  registerRoutes (prefix, components = []) {
     const prefixLink = link => ({ ...link, path: `${prefix}${link.path}` })
 
     components
@@ -33,14 +33,12 @@ const pluginManager = {
       .forEach(component => data.routes.push(component))
   },
 
-  registerNavItems (prefix, items=[]) {
+  registerNavItems (prefix, items = []) {
     const prefixLink = link => ({ ...link, path: `${prefix}${link.path}` })
 
-    items
-      .map(x => ({ ...x, link: prefixLink(x.link) }))
-      .forEach(item => {
-        data.navItems.push(item)
-      })
+    items.map(x => ({ ...x, link: prefixLink(x.link) })).forEach(item => {
+      data.navItems.push(item)
+    })
   },
 
   getComponents () {
@@ -69,7 +67,7 @@ const pluginManager = {
 
   getDefaultRoute () {
     return data.routes.find(r => r.link && r.link.default).link.path
-  }
+  },
 }
 
 export default pluginManager

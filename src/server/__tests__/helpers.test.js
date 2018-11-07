@@ -22,12 +22,12 @@ describe('helpers', () => {
 
   describe('findById', () => {
     it('finds the object with the id in the array', () => {
-      const arr = [ {id: 1, name: 'foo'}, {id: 2, name: 'bar'} ]
+      const arr = [{ id: 1, name: 'foo' }, { id: 2, name: 'bar' }]
       expect(findById(arr)(1).name).toEqual('foo')
     })
 
     it('can retrieve the array from a getter function as well', () => {
-      const arr = () => [ {id: 1, name: 'foo'}, {id: 2, name: 'bar'} ]
+      const arr = () => [{ id: 1, name: 'foo' }, { id: 2, name: 'bar' }]
       expect(findById(arr)(2).name).toEqual('bar')
     })
   })

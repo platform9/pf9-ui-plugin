@@ -3,16 +3,14 @@ import PropTypes from 'prop-types'
 
 import ListTable from 'core/common/ListTable'
 
-const columns = [
-  { id: 'name', label: 'Name' },
-]
+const columns = [{ id: 'name', label: 'Name' }]
 
 class ClustersList extends React.Component {
   render () {
     const { onAdd, onDelete, clusters } = this.props
 
     if (!clusters || clusters.length === 0) {
-      return (<h1>No clusters found</h1>)
+      return <h1>No clusters found</h1>
     }
 
     return (

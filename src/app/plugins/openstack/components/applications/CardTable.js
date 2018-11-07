@@ -1,18 +1,14 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/core/styles'
-import {
-  Grid,
-  Paper,
-  TablePagination,
-} from '@material-ui/core'
+import { Grid, Paper, TablePagination } from '@material-ui/core'
 import CardTableToolbar from './CardTableToolbar'
 import ApplicationCard from './ApplicationCard'
 
 const styles = theme => ({
   root: {
     width: '100%',
-    marginTop: theme.spacing.unit * 3
+    marginTop: theme.spacing.unit * 3,
   },
   table: {
     minWidth: 800,
@@ -27,12 +23,12 @@ class CardTable extends React.Component {
   state = {
     page: 0,
     rowsPerPage: 10,
-    searchTerm: ''
+    searchTerm: '',
   }
 
   handleSearch = value => {
     this.setState({
-      searchTerm: value
+      searchTerm: value,
     })
   }
 
@@ -46,10 +42,12 @@ class CardTable extends React.Component {
 
   filterBySearch = (data, target) => {
     const { searchTerm } = this.state
-    return data.filter(ele => ele[target].match(new RegExp(searchTerm, 'i')) !== null)
+    return data.filter(
+      ele => ele[target].match(new RegExp(searchTerm, 'i')) !== null
+    )
   }
 
-  renderPaginationControls = (count) => {
+  renderPaginationControls = count => {
     const { page, rowsPerPage } = this.state
     return (
       <TablePagination
@@ -70,7 +68,8 @@ class CardTable extends React.Component {
     const { classes, data, searchTarget } = this.props
     const { searchTerm } = this.state
 
-    const searchData = searchTerm === '' ? data : this.filterBySearch(data, searchTarget)
+    const searchData =
+      searchTerm === '' ? data : this.filterBySearch(data, searchTarget)
 
     return (
       <Grid container justify="center">
@@ -81,7 +80,9 @@ class CardTable extends React.Component {
               searchTerm={searchTerm}
             />
             <Grid container spacing={24} justify="flex-start">
-              {searchData.map(app => <ApplicationCard application={app} key={app.name} />)}
+              {searchData.map(app => (
+                <ApplicationCard application={app} key={app.name} />
+              ))}
             </Grid>
             {this.renderPaginationControls(15)}
           </Paper>
@@ -96,7 +97,7 @@ CardTable.propTypes = {
 }
 
 CardTable.defaultProps = {
-  data: []
+  data: [],
 }
 
 export default CardTable

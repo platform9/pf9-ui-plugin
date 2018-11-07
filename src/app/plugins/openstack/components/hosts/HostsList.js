@@ -6,7 +6,7 @@ import ListTable from 'core/common/ListTable'
 const columns = [
   { id: 'hypervisor_hostname', label: 'Hostname' },
   { id: 'status', label: 'Status' },
-  { id: 'host_ip', label: 'Host IP' }
+  { id: 'host_ip', label: 'Host IP' },
 ]
 
 class HostsList extends React.Component {

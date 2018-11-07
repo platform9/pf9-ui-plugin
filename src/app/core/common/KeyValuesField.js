@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import KeyValues from 'core/common/KeyValues'
 import { withFormContext } from 'core/common/ValidatedForm'
-import { pickMultiple, filterFields } from 'core/fp'
+import { filterFields, pickMultiple } from 'core/fp'
 
 class KeyValuesField extends React.Component {
   constructor (props) {
@@ -15,12 +15,16 @@ class KeyValuesField extends React.Component {
     }
   }
 
-  get restFields () { return filterFields(...withFormContext.propsToExclude)(this.props) }
+  get restFields () {
+    return filterFields(...withFormContext.propsToExclude)(this.props)
+  }
 
   handleChange = value => {
     const { id, onChange, setField } = this.props
     setField(id, value)
-    if (onChange) { onChange(value) }
+    if (onChange) {
+      onChange(value)
+    }
   }
 
   render () {

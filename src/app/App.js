@@ -20,9 +20,13 @@ import SessionManager from './plugins/openstack/components/SessionManager'
 setupFromConfig(config)
 window.process = process
 
-if (!config.apiHost) { throw new Error('config.js does not contain "apiHost"') }
+if (!config.apiHost) {
+  throw new Error('config.js does not contain "apiHost"')
+}
 
-const apiClient = new ApiClient({ keystoneEndpoint: `${config.apiHost}/keystone` })
+const apiClient = new ApiClient({
+  keystoneEndpoint: `${config.apiHost}/keystone`,
+})
 apiClient.setActiveRegion(config.region)
 
 class App extends React.Component {
@@ -31,11 +35,7 @@ class App extends React.Component {
     const options = pluginManager.getOptions()
     const { showFooter } = options
 
-    const renderFooter = () => (
-      <div id="_main-footer">
-        TODO: Footer
-      </div>
-    )
+    const renderFooter = () => <div id="_main-footer">TODO: Footer</div>
 
     return (
       <Router>
@@ -44,12 +44,21 @@ class App extends React.Component {
             <div id="_main-container">
               <SessionManager>
                 <Navbar links={pluginManager.getNavItems()}>
-                  {pluginManager.getComponents().map((PluginComponent, idx) => <PluginComponent key={idx} />)}
+                  {pluginManager.getComponents().map((PluginComponent, idx) => (
+                    <PluginComponent key={idx} />
+                  ))}
                   <Switch>
                     {pluginManager.getRoutes().map(route => {
                       const { component, link } = route
                       const Component = component
-                      return <Route key={route.name} path={link.path} exact={link.exact || false} component={Component} />
+                      return (
+                        <Route
+                          key={route.name}
+                          path={link.path}
+                          exact={link.exact || false}
+                          component={Component}
+                        />
+                      )
                     })}
                     <Route path="/ui/openstack/login" component={null} />
                     <Route path="/ui/logout" exact component={LogoutPage} />
@@ -67,7 +76,7 @@ class App extends React.Component {
 }
 
 App.propTypes = {
-  pluginManager: PropTypes.object
+  pluginManager: PropTypes.object,
 }
 
 export default App

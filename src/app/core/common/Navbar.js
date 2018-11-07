@@ -17,7 +17,7 @@ import {
   ListItemText,
   MenuItem,
   MenuList,
-  Toolbar
+  Toolbar,
 } from '@material-ui/core'
 
 const drawerWidth = 240
@@ -55,7 +55,7 @@ const styles = theme => ({
   },
   menuButton: {
     marginLeft: theme.spacing.unit * 1.5,
-    marginRight: theme.spacing.unit
+    marginRight: theme.spacing.unit,
   },
   hide: {
     display: 'none',
@@ -103,14 +103,14 @@ const styles = theme => ({
     marginRight: 0,
   },
   logo: {
-    maxHeight: theme.spacing.unit * 6.5
+    maxHeight: theme.spacing.unit * 6.5,
   },
   rightTools: {
     position: 'absolute',
     right: theme.spacing.unit * 2,
     display: 'flex',
-    alignItems: 'center'
-  }
+    alignItems: 'center',
+  },
 })
 
 @withStyles(styles, { withTheme: true })
@@ -133,13 +133,13 @@ class Navbar extends React.Component {
 
   handleClick = key => event => {
     this.setState({
-      [key]: event.target.innerText
+      [key]: event.target.innerText,
     })
   }
 
   handleSearch = key => value => {
     this.setState({
-      [key]: value
+      [key]: value,
     })
   }
 
@@ -149,13 +149,15 @@ class Navbar extends React.Component {
   }
 
   renderNavLink = ({ link, name }) => (
-    <MenuItem onClick={this.navTo(link.path)} key={link.path}><ListItemText primary={name} /></MenuItem>
+    <MenuItem onClick={this.navTo(link.path)} key={link.path}>
+      <ListItemText primary={name} />
+    </MenuItem>
   )
 
   render () {
     const { classes, links } = this.props
     const { open, curRegion, regionSearch } = this.state
-    const logoPath = rootPath+'images/logo.png'
+    const logoPath = rootPath + 'images/logo.png'
 
     const drawer = (
       <Drawer
@@ -170,9 +172,7 @@ class Navbar extends React.Component {
           </IconButton>
         </div>
         <Divider />
-        <MenuList>
-          {links.map(this.renderNavLink)}
-        </MenuList>
+        <MenuList>{links.map(this.renderNavLink)}</MenuList>
       </Drawer>
     )
 

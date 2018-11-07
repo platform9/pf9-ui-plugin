@@ -6,7 +6,7 @@ import ListTable from 'core/common/ListTable'
 const columns = [
   { id: 'name', label: 'Name' },
   { id: 'status', label: 'Status' },
-  { id: 'state', label: 'State' }
+  { id: 'state', label: 'State' },
 ]
 
 class InstancesList extends React.Component {

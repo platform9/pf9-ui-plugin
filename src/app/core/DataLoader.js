@@ -11,7 +11,9 @@ class DataLoader extends React.Component {
   }
 
   componentDidMount () {
-    this.listener = window.addEventListener('scopeChanged', () => this.loadData())
+    this.listener = window.addEventListener('scopeChanged', () =>
+      this.loadData()
+    )
     this.loadData()
   }
 
@@ -24,16 +26,24 @@ class DataLoader extends React.Component {
     if (context[dataKey] === undefined) {
       this.setState({ loading: true })
       const parseErr = err => {
-        if (typeof err === 'string') { return err }
-        if (err instanceof Error) { return err.message }
+        if (typeof err === 'string') {
+          return err
+        }
+        if (err instanceof Error) {
+          return err.message
+        }
       }
       if (loaderFn) {
         try {
           const promise = loaderFn({ setContext, context })
           if (promise && promise.then) {
             return promise.then(
-              () => { this.setState({ loading: false }) },
-              err => { this.setState({ loading: false, error: parseErr(err) }) }
+              () => {
+                this.setState({ loading: false })
+              },
+              err => {
+                this.setState({ loading: false, error: parseErr(err) })
+              }
             )
           }
           // loaderFn is sync so loading is done
@@ -50,8 +60,12 @@ class DataLoader extends React.Component {
     const { loading, error } = this.state
     const { context, dataKey, children } = this.props
     const data = context[dataKey]
-    if (loading) { return <Loader /> }
-    if (error) { return <DisplayError error={error} /> }
+    if (loading) {
+      return <Loader />
+    }
+    if (error) {
+      return <DisplayError error={error} />
+    }
     return children({ data, loading, error, context })
   }
 }
@@ -68,7 +82,7 @@ DataLoader.propTypes = {
   /**
    * This function is invoked when the data does not yet exist.
    * It is passed `setContext` to use for updating.
-  */
+   */
   loaderFn: PropTypes.func.isRequired,
 }
 

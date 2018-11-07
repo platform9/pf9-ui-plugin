@@ -1,6 +1,4 @@
-import {
-  makeRegionedClient,
-} from '../helpers'
+import { makeRegionedClient } from '../helpers'
 
 describe('Glance', () => {
   it('list images', async () => {

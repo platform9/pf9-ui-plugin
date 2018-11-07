@@ -9,17 +9,17 @@ import ServersGraph from './ServersGraph'
 const styles = theme => ({
   'dashboard-graphs': {
     display: 'flex',
-    'margin-top': '10px'
-  }
+    'margin-top': '10px',
+  },
 })
 
 const data = {
   servers: {
-    numServers: 6
+    numServers: 6,
   },
   storage: {
-    capacity: 15
-  }
+    capacity: 15,
+  },
 }
 
 @withStyles(styles)
@@ -44,6 +44,6 @@ class DashboardGraphs extends React.Component {
       </div>
     )
   }
-};
+}
 
 export default DashboardGraphs

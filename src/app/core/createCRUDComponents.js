@@ -93,7 +93,9 @@ const createCRUDComponents = options => {
           onRemove={this.handleRemove}
           uniqueIdentifier={uniqueIdentifier}
         >
-          {handlers => <List data={this.props.data} {...handlers} {...moreProps} />}
+          {handlers => (
+            <List data={this.props.data} {...handlers} {...moreProps} />
+          )}
         </CRUDListContainer>
       )
     }
@@ -101,7 +103,7 @@ const createCRUDComponents = options => {
 
   const ListContainer = compose(
     withAppContext,
-    withRouter,
+    withRouter
   )(ContainerBase)
 
   ListContainer.displayName = `${name}ListContainer`
@@ -109,12 +111,12 @@ const createCRUDComponents = options => {
   // ListPage
   const StandardListPage = () => (
     <DataLoader dataKey={dataKey} loaderFn={loaderFn || crudActions.list}>
-      {({ data }) =>
+      {({ data }) => (
         <React.Fragment>
           <ListContainer data={data} />
           {debug && <pre>{JSON.stringify(data, null, 4)}</pre>}
         </React.Fragment>
-      }
+      )}
     </DataLoader>
   )
   const ListPage = requiresAuthentication(options.ListPage || StandardListPage)

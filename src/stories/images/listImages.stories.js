@@ -20,7 +20,12 @@ addStories('Images/Listing images', {
   ),
 
   'With pagination': () => {
-    const numImages = number('numImages', 7, { range: true, min: 0, max: 15, step: 1 })
+    const numImages = number('numImages', 7, {
+      range: true,
+      min: 0,
+      max: 15,
+      step: 1,
+    })
     const images = range(numImages).map(fakeImage)
     return (
       <ImageList images={images} onAdd={addAction} onDelete={deleteAction} />

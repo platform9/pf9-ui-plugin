@@ -2,10 +2,11 @@ import axios from 'axios'
 
 // Returns a transducer function instead being passed the obj directly
 // so it can be used in Array#map/filter/etc as well.
-const renameKey = (srcKey, destKey) => obj => Object.keys(obj).reduce(
-  (accum, key) => ({...accum, [key === srcKey ? destKey : key]: obj[key]}),
-  {}
-)
+const renameKey = (srcKey, destKey) => obj =>
+  Object.keys(obj).reduce(
+    (accum, key) => ({ ...accum, [key === srcKey ? destKey : key]: obj[key] }),
+    {}
+  )
 
 class Nova {
   constructor (client) {
@@ -29,7 +30,7 @@ class Nova {
     return response.data.flavors
   }
 
-  createFlavor = async (params) => {
+  createFlavor = async params => {
     // The Nova API has an unfortunately horribly named key for public.
     const converted = renameKey('public', 'os-flavor-access:is_public')(params)
     const body = { flavor: converted }
@@ -38,7 +39,7 @@ class Nova {
     return response.data.flavor
   }
 
-  deleteFlavor = async (id) => {
+  deleteFlavor = async id => {
     const url = `${await this.flavorsUrl()}/${id}`
     const response = await axios.delete(url, this.client.getAuthHeaders())
     return response
@@ -54,7 +55,9 @@ class Nova {
   async getInstances () {
     const url = `${await this.instancesUrl()}/detail`
     const response = await axios.get(url, this.client.getAuthHeaders())
-    const servers = response.data.servers.map(instance => renameKey('OS-EXT-STS:vm_state', 'state')(instance))
+    const servers = response.data.servers.map(instance =>
+      renameKey('OS-EXT-STS:vm_state', 'state')(instance)
+    )
     return servers
   }
 
@@ -72,7 +75,11 @@ class Nova {
 
   async createSshKey (params) {
     const url = await this.sshKeysUrl()
-    const response = await axios.post(url, { keypair: params }, this.client.getAuthHeaders())
+    const response = await axios.post(
+      url,
+      { keypair: params },
+      this.client.getAuthHeaders()
+    )
     return response.data.keypair
   }
 

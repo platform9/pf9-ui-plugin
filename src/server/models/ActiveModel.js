@@ -5,11 +5,13 @@ import uuid from 'uuid'
 class ActiveModel {
   constructor (params = {}) {
     if (!this.constructor.getCollection) {
-      throw new Error(`${this.constructor.name} must implement class method 'getCollection'`)
+      throw new Error(
+        `${this.constructor.name} must implement class method 'getCollection'`
+      )
     }
     this.constructor.getCollection().push(this)
     this.id = params.id || uuid.v4()
-    this.created_at = params.created_at || (new Date().toISOString())
+    this.created_at = params.created_at || new Date().toISOString()
     return this
   }
 
@@ -25,15 +27,14 @@ class ActiveModel {
 
   asJson () {
     return {
-      id: this.id
+      id: this.id,
     }
   }
 
   toString = (pretty = true) => {
-    return (pretty
+    return pretty
       ? JSON.stringify(this.asJson(), null, 4)
       : JSON.stringify(this.asJson())
-    )
   }
 }
 

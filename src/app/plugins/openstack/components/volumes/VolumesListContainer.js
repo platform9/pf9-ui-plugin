@@ -16,12 +16,18 @@ class VolumesListContainer extends React.Component {
   }
 
   handleSnapshot = async volume => {
-    this.props.history.push(`/ui/openstack/storage/volumes/snapshot/${volume.id}`)
+    this.props.history.push(
+      `/ui/openstack/storage/volumes/snapshot/${volume.id}`
+    )
   }
 
   render () {
     const rowActions = [
-      { icon: <PhotoCameraIcon />, label: 'Snapshot', action: this.handleSnapshot }
+      {
+        icon: <PhotoCameraIcon />,
+        label: 'Snapshot',
+        action: this.handleSnapshot,
+      },
     ]
 
     return (
@@ -31,17 +37,23 @@ class VolumesListContainer extends React.Component {
         editUrl="/ui/openstack/storage/volumes/edit"
         onRemove={this.handleRemove}
       >
-        {handlers => <VolumesList volumes={this.props.volumes} {...handlers} rowActions={rowActions} />}
+        {handlers => (
+          <VolumesList
+            volumes={this.props.volumes}
+            {...handlers}
+            rowActions={rowActions}
+          />
+        )}
       </CRUDListContainer>
     )
   }
 }
 
 VolumesListContainer.propTypes = {
-  volumes: PropTypes.arrayOf(PropTypes.object)
+  volumes: PropTypes.arrayOf(PropTypes.object),
 }
 
 export default compose(
   withAppContext,
-  withRouter,
+  withRouter
 )(VolumesListContainer)

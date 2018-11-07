@@ -14,10 +14,10 @@ class Tab extends React.Component {
 
   render () {
     const { activeTab, value, children } = this.props
-    if (`#${value}` !== activeTab) { return null }
-    return (
-      <Typography component="div">{children}</Typography>
-    )
+    if (`#${value}` !== activeTab) {
+      return null
+    }
+    return <Typography component="div">{children}</Typography>
   }
 }
 

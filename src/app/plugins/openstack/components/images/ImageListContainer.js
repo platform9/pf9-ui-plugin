@@ -29,9 +29,7 @@ class ImageListContainer extends React.Component {
 }
 
 ImageListContainer.propTypes = {
-  images: PropTypes.arrayOf(PropTypes.object)
+  images: PropTypes.arrayOf(PropTypes.object),
 }
 
-export default compose(
-  withAppContext,
-)(ImageListContainer)
+export default compose(withAppContext)(ImageListContainer)

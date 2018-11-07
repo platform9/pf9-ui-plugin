@@ -1,7 +1,7 @@
 var defaultSettings = {
   branch: 'release',
   version: null,
-  dev: false
+  dev: false,
 }
 
 var bucketPrefix = 'https://s3-us-west-1.amazonaws.com/pf9-ui/'
@@ -19,7 +19,7 @@ function getQueryParams () {
   var params = {
     branch: branch,
     version: version,
-    dev: dev === 'true'
+    dev: dev === 'true',
   }
   return params
 }

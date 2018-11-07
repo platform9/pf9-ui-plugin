@@ -74,7 +74,7 @@ export const validators = {
   matchField: matchFieldValidator,
   length: lengthValidator,
   minLength: minLengthValidator,
-  maxLength: maxLengthValidator
+  maxLength: maxLengthValidator,
 }
 
 export const parseValidator = (key, spec) => {
@@ -101,6 +101,6 @@ export const parseValidator = (key, spec) => {
     return validatorWithParams
   }
   if (typeof validator === 'function') {
-    return validator(...Array.isArray(spec) ? spec : [spec])
+    return validator(...(Array.isArray(spec) ? spec : [spec]))
   }
 }

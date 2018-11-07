@@ -35,21 +35,29 @@ class SessionManager extends React.Component {
     this.initialSetup({ username, unscopedToken })
   }
 
-  get keystone () { return this.props.context.apiClient.keystone }
+  get keystone () {
+    return this.props.context.apiClient.keystone
+  }
 
   setSession (newState = {}, cb) {
     return this.props.setContext(state => ({
       ...state,
       session: {
         ...state.session,
-        ...newState
-      }
+        ...newState,
+      },
     }))
   }
 
   // Handler that gets invoked on successful authentication
   initialSetup = async ({ username, unscopedToken }) => {
-    const { context, getUserPreferences, history, location, setContext } = this.props
+    const {
+      context,
+      getUserPreferences,
+      history,
+      location,
+      setContext,
+    } = this.props
 
     setStorage('username', username)
     setStorage('unscopedToken', unscopedToken)
@@ -96,5 +104,5 @@ class SessionManager extends React.Component {
 
 export default compose(
   withAppContext,
-  withRouter,
+  withRouter
 )(SessionManager)

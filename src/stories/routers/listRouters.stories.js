@@ -20,7 +20,12 @@ addStories('Router Management/Listing routers', {
   ),
 
   'With pagination': () => {
-    const numRouters = number('numRouters', 7, { range: true, min: 0, max: 15, step: 1 })
+    const numRouters = number('numRouters', 7, {
+      range: true,
+      min: 0,
+      max: 15,
+      step: 1,
+    })
     const routers = range(numRouters).map(fakeRouter)
     return (
       <RoutersList data={routers} onAdd={addAction} onDelete={deleteAction} />

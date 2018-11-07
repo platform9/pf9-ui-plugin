@@ -49,7 +49,9 @@ class AutocompleteBase extends React.Component {
   }
 
   handleChange = event => {
-    if (!event || !event.target) { return }
+    if (!event || !event.target) {
+      return
+    }
     const value = event.target.value
     this.setState({ value, open: true }, this.propogateChange)
   }
@@ -74,14 +76,16 @@ class AutocompleteBase extends React.Component {
   renderSuggestions = suggestions => {
     const { open } = this.state
     const { classes } = this.props
-    if (!open || !suggestions || suggestions.length === 0) { return null }
+    if (!open || !suggestions || suggestions.length === 0) {
+      return null
+    }
     return (
       <Paper className={`${classes.container} ${classes.absolute}`}>
-        <MenuList
-          open
-          className={classes.container}>
+        <MenuList open className={classes.container}>
           {suggestions.map(item => (
-            <MenuItem key={item} onMouseDown={this.handleClick(item)}>{item}</MenuItem>
+            <MenuItem key={item} onMouseDown={this.handleClick(item)}>
+              {item}
+            </MenuItem>
           ))}
         </MenuList>
       </Paper>
@@ -91,12 +95,25 @@ class AutocompleteBase extends React.Component {
   render () {
     const matched = this.matchedSuggestions()
     const { value } = this.state
-    const { classes, suggestions, onChange, initialValue, label, id, ...other } = this.props
-    const DropdownIcon = <ArrowDropDownIcon className={classes.dropdownButton} />
+    const {
+      classes,
+      suggestions,
+      onChange,
+      initialValue,
+      label,
+      id,
+      ...other
+    } = this.props
+    const DropdownIcon = (
+      <ArrowDropDownIcon className={classes.dropdownButton} />
+    )
 
     return (
       <div className={classes.relative}>
-        <FormControl className={classes.container} onMouseDown={this.toggleOpen}>
+        <FormControl
+          className={classes.container}
+          onMouseDown={this.toggleOpen}
+        >
           {label && <InputLabel htmlFor={id}>{label}</InputLabel>}
           <Input
             id={id}

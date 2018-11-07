@@ -29,7 +29,9 @@ class CRUDListContainer extends React.Component {
     this.setState({ showConfirmation: true, selectedItems: selected })
     // Stash the promise resolver so it can used to resolve later on in
     // response to user interaction (delete confirmation).
-    return new Promise(resolve => { this.resolveDelete = resolve })
+    return new Promise(resolve => {
+      this.resolveDelete = resolve
+    })
   }
 
   handleDeleteCancel = () => {
@@ -61,7 +63,7 @@ class CRUDListContainer extends React.Component {
     }
   }
 
-  redirectToEdit = (selectedIds) => {
+  redirectToEdit = selectedIds => {
     const { uniqueIdentifier } = this.props
     if (this.props.editUrl) {
       const selectedId = selectedIds[0][uniqueIdentifier]
@@ -81,7 +83,7 @@ class CRUDListContainer extends React.Component {
         {this.props.children({
           onDelete: this.handleDelete,
           onAdd: this.redirectToAdd,
-          onEdit: this.redirectToEdit
+          onEdit: this.redirectToEdit,
         })}
       </div>
     )
@@ -108,9 +110,7 @@ CRUDListContainer.propTypes = {
 }
 
 CRUDListContainer.defaultProps = {
-  uniqueIdentifier: 'id'
+  uniqueIdentifier: 'id',
 }
 
-export default compose(
-  withRouter,
-)(CRUDListContainer)
+export default compose(withRouter)(CRUDListContainer)

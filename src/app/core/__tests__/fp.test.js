@@ -30,14 +30,20 @@ describe('functional programming utils', () => {
   it('compose', () => {
     const sq = x => x * x
     const half = x => x / 2
-    const value = compose(half, sq)(4)
+    const value = compose(
+      half,
+      sq
+    )(4)
     expect(value).toEqual(8)
   })
 
   it('pipe', () => {
     const sq = x => x * x
     const half = x => x / 2
-    const value = pipe(sq, half)(4)
+    const value = pipe(
+      sq,
+      half
+    )(4)
     expect(value).toEqual(8)
   })
 

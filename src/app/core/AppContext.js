@@ -6,7 +6,8 @@ import { getStorage, setStorage } from 'core/common/pf9-storage'
 
 const userPreferencesKey = username => `user-preferences-${username}`
 const getUserPrefs = username => getStorage(userPreferencesKey(username)) || {}
-const setUserPrefs = (username, prefs) => setStorage(userPreferencesKey(username), prefs)
+const setUserPrefs = (username, prefs) =>
+  setStorage(userPreferencesKey(username), prefs)
 
 const Context = React.createContext({})
 export const Consumer = Context.Consumer
@@ -25,7 +26,9 @@ class AppContext extends React.Component {
           // but that's ok, because we are using the callback not an await.
           return this.setState(...args)
         }
-        setImmediate(() => { window.context = this.state })
+        setImmediate(() => {
+          window.context = this.state
+        })
         this.setState(...args, resolve)
       })
     },
@@ -51,7 +54,7 @@ class AppContext extends React.Component {
 
     getUserPreferences: (username = this.state.session.username) => {
       return getUserPrefs(username)
-    }
+    },
   }
 
   componentDidMount () {
@@ -61,35 +64,37 @@ class AppContext extends React.Component {
   }
 
   render () {
-    return (
-      <Provider value={this.state}>
-        {this.props.children}
-      </Provider>
-    )
+    return <Provider value={this.state}>{this.props.children}</Provider>
   }
 }
 
 AppContext.propTypes = {
-  initialContext: PropTypes.object
+  initialContext: PropTypes.object,
 }
 
 AppContext.defaultProps = {
-  initialContext: {}
+  initialContext: {},
 }
 
-export const withAppContext = Component => props =>
+export const withAppContext = Component => props => (
   <Consumer>
-    {
-      ({ setContext, getUserPreferences, getUserPreference, setUserPreference, ...rest }) =>
-        <Component
-          {...props}
-          setContext={setContext}
-          context={rest}
-          setUserPreference={setUserPreference}
-          getUserPreferences={getUserPreferences}
-          getUserPreference={getUserPreference}
-        />
-    }
+    {({
+      setContext,
+      getUserPreferences,
+      getUserPreference,
+      setUserPreference,
+      ...rest
+    }) => (
+      <Component
+        {...props}
+        setContext={setContext}
+        context={rest}
+        setUserPreference={setUserPreference}
+        getUserPreferences={getUserPreferences}
+        getUserPreference={getUserPreference}
+      />
+    )}
   </Consumer>
+)
 
 export default AppContext

@@ -1,5 +1,7 @@
 export const loadNetworks = async ({ context, setContext, reload }) => {
-  if (!reload && context.networks) { return context.networks }
+  if (!reload && context.networks) {
+    return context.networks
+  }
   const networks = await context.apiClient.neutron.getNetworks()
   setContext({ networks })
   return networks
@@ -8,7 +10,7 @@ export const loadNetworks = async ({ context, setContext, reload }) => {
 export const createNetwork = async ({ data, context, setContext }) => {
   const created = await context.apiClient.neutron.createNetwork(data)
   const existing = await context.apiClient.neutron.getNetworks()
-  setContext({ networks: [ ...existing, created ] })
+  setContext({ networks: [...existing, created] })
   return created
 }
 
@@ -22,6 +24,6 @@ export const updateNetwork = async ({ data, context, setContext }) => {
   const { id } = data
   const existing = await context.apiClient.neutron.getNetworks()
   const updated = await context.apiClient.neutron.updateNetwork(id, data)
-  const newList = existing.map(x => x.id === id ? x : updated)
+  const newList = existing.map(x => (x.id === id ? x : updated))
   setContext({ networks: newList })
 }

@@ -1,4 +1,5 @@
 import uuid from 'uuid'
+
 const config = require('../../../../config')
 
 const fakeTenantId = uuid.v4()
@@ -13,26 +14,26 @@ const Catalog = {
             interface: 'admin',
             region: config.region,
             region_id: config.region,
-            url: `${config.apiHost}/neutron`
+            url: `${config.apiHost}/neutron`,
           },
           {
             id: uuid.v4(),
             interface: 'internal',
             region: config.region,
             region_id: config.region,
-            url: `${config.apiHost}/neutron`
+            url: `${config.apiHost}/neutron`,
           },
           {
             id: uuid.v4(),
             interface: 'public',
             region: config.region,
             region_id: config.region,
-            url: `${config.apiHost}/neutron`
-          }
+            url: `${config.apiHost}/neutron`,
+          },
         ],
         id: uuid.v4(),
         name: 'neutron',
-        type: 'network'
+        type: 'network',
       },
       {
         endpoints: [
@@ -41,26 +42,26 @@ const Catalog = {
             interface: 'admin',
             region: config.region,
             region_id: config.region,
-            url: `${config.apiHost}/nova/v2.1/${fakeTenantId}`
+            url: `${config.apiHost}/nova/v2.1/${fakeTenantId}`,
           },
           {
             id: uuid.v4(),
             interface: 'internal',
             region: config.region,
             region_id: config.region,
-            url: `${config.apiHost}/nova/v2.1/${fakeTenantId}`
+            url: `${config.apiHost}/nova/v2.1/${fakeTenantId}`,
           },
           {
             id: uuid.v4(),
             interface: 'public',
             region: config.region,
             region_id: config.region,
-            url: `${config.apiHost}/nova/v2.1/${fakeTenantId}`
-          }
+            url: `${config.apiHost}/nova/v2.1/${fakeTenantId}`,
+          },
         ],
         id: uuid.v4(),
         name: 'nova',
-        type: 'compute'
+        type: 'compute',
       },
       {
         endpoints: [
@@ -69,26 +70,26 @@ const Catalog = {
             interface: 'admin',
             region: config.region,
             region_id: config.region,
-            url: `${config.apiHost}/cinder/v3/${fakeTenantId}`
+            url: `${config.apiHost}/cinder/v3/${fakeTenantId}`,
           },
           {
             id: uuid.v4(),
             interface: 'internal',
             region: config.region,
             region_id: config.region,
-            url: `${config.apiHost}/cinder/v3/${fakeTenantId}`
+            url: `${config.apiHost}/cinder/v3/${fakeTenantId}`,
           },
           {
             id: uuid.v4(),
             interface: 'public',
             region: config.region,
             region_id: config.region,
-            url: `${config.apiHost}/cinder/v3/${fakeTenantId}`
-          }
+            url: `${config.apiHost}/cinder/v3/${fakeTenantId}`,
+          },
         ],
         id: uuid.v4(),
         name: 'cinderv3',
-        type: 'volumev3'
+        type: 'volumev3',
       },
       {
         endpoints: [
@@ -97,29 +98,29 @@ const Catalog = {
             interface: 'admin',
             region: config.region,
             region_id: config.region,
-            url: `${config.apiHost}/glance`
+            url: `${config.apiHost}/glance`,
           },
           {
             id: uuid.v4(),
             interface: 'internal',
             region: config.region,
             region_id: config.region,
-            url: `${config.apiHost}/glance`
+            url: `${config.apiHost}/glance`,
           },
           {
             id: uuid.v4(),
             interface: 'public',
             region: config.region,
             region_id: config.region,
-            url: `${config.apiHost}/glance`
-          }
+            url: `${config.apiHost}/glance`,
+          },
         ],
         id: uuid.v4(),
         name: 'glance',
-        type: 'image'
-      }
+        type: 'image',
+      },
     ]
-  }
+  },
 }
 
 export default Catalog

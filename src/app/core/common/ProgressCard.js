@@ -5,17 +5,17 @@ import {
   Card,
   CardContent,
   CircularProgress,
-  Typography
+  Typography,
 } from '@material-ui/core'
 
 const styles = theme => ({
   card: {
     minWidth: 200,
     maxHeight: 300,
-    marginTop: theme.spacing.unit * 3
+    marginTop: theme.spacing.unit * 3,
   },
   title: {
-    backgroundColor: theme.palette.grey[50]
+    backgroundColor: theme.palette.grey[50],
   },
   icon: {
     float: 'right',
@@ -27,23 +27,26 @@ const styles = theme => ({
     width: 120,
   },
   progress: {
-    position: 'absolute'
+    position: 'absolute',
   },
   percentage: {
     position: 'absolute',
     top: '50%',
-    left: '45%'
+    left: '45%',
   },
   description: {
     marginTop: theme.spacing.unit * 5,
-  }
+  },
 })
 
 @withStyles(styles)
 class ProgressCard extends React.Component {
   render () {
-    const { classes, card: { title, used, total, unit } } = this.props
-    const completed = Math.round(used/total * 100)
+    const {
+      classes,
+      card: { title, used, total, unit },
+    } = this.props
+    const completed = Math.round((used / total) * 100)
     return (
       <div className={classes.card}>
         <Card>
@@ -64,19 +67,12 @@ class ProgressCard extends React.Component {
                 size={150}
                 value={completed}
               />
-              <Typography
-                className={classes.percentage}
-                variant="headline"
-              >
+              <Typography className={classes.percentage} variant="headline">
                 {completed}%
               </Typography>
             </div>
             <div className={classes.description}>
-              <Typography
-                variant="subheading"
-                align="center"
-                noWrap
-              >
+              <Typography variant="subheading" align="center" noWrap>
                 {addComma(used, 0)} {unit} used of {addComma(total, 0)} {unit}
               </Typography>
             </div>

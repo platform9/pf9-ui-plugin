@@ -2,7 +2,7 @@ export const createNamespace = async ({ data, context, setContext }) => {
   const { clusterId, name } = data
   const body = { metadata: { name } }
   const created = await context.apiClient.qbert.createNamespace(clusterId, body)
-  setContext({ namespaces: [ ...context.namespaces, created ] })
+  setContext({ namespaces: [...context.namespaces, created] })
   return created
 }
 

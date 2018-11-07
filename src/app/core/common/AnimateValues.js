@@ -21,15 +21,12 @@ class AnimateValues extends React.Component {
   calcValues = timePercent => {
     const { values, method } = this.props
     const percent = this.calcEasing(timePercent, method)
-    return Object.keys(values).reduce(
-      (accum, key) => {
-        const [start, end] = values[key]
-        const delta = end - start
-        accum[key] = delta * percent
-        return accum
-      },
-      {}
-    )
+    return Object.keys(values).reduce((accum, key) => {
+      const [start, end] = values[key]
+      const delta = end - start
+      accum[key] = delta * percent
+      return accum
+    }, {})
   }
 
   state = {
@@ -90,7 +87,7 @@ AnimateValues.propTypes = {
   children: PropTypes.func.isRequired,
 
   /** The easing method used to interpolate the values */
-  method: PropTypes.oneOf(['linear'])
+  method: PropTypes.oneOf(['linear']),
 }
 
 AnimateValues.defaultProps = {

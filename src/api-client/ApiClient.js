@@ -44,7 +44,7 @@ class ApiClient {
 
   static hydrate (state) {
     const options = {
-      keystoneEndpoint: state.keystoneEndpoint
+      keystoneEndpoint: state.keystoneEndpoint,
     }
     const client = new ApiClient(options)
     client.catalog = state.catalog

@@ -10,7 +10,9 @@ const columns = [
 ]
 
 const ImageChooser = ({ data, onChange, initialValue }) => {
-  if (!data) { return null }
+  if (!data) {
+    return null
+  }
   return (
     <div>
       <ListTableSelect

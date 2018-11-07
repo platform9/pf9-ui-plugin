@@ -11,11 +11,10 @@ const loadHosts = async ({ setContext, context }) => {
   setContext({ hosts })
 }
 
-const HostsListPage = () =>
+const HostsListPage = () => (
   <DataLoader dataKey="hosts" loaderFn={loadHosts}>
     {({ data }) => <HostsListContainer hosts={data} />}
   </DataLoader>
+)
 
-export default compose(
-  requiresAuthentication,
-)(HostsListPage)
+export default compose(requiresAuthentication)(HostsListPage)

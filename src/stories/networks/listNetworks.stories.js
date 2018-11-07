@@ -16,11 +16,20 @@ addStories('Network Management/Listing networks', {
   ),
 
   'With some networks': () => (
-    <NetworksList data={someNetworks} onAdd={addAction} onDelete={deleteAction} />
+    <NetworksList
+      data={someNetworks}
+      onAdd={addAction}
+      onDelete={deleteAction}
+    />
   ),
 
   'With pagination': () => {
-    const numNetworks = number('numNetworks', 7, { range: true, min: 0, max: 15, step: 1 })
+    const numNetworks = number('numNetworks', 7, {
+      range: true,
+      min: 0,
+      max: 15,
+      step: 1,
+    })
     const networks = range(numNetworks).map(fakeNetwork)
     return (
       <NetworksList data={networks} onAdd={addAction} onDelete={deleteAction} />

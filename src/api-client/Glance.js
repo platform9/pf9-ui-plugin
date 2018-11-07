@@ -32,7 +32,11 @@ class Glance {
     const url = await this.imagesUrl()
     // TODO: support adding additional user properties
     try {
-      const response = await axios.post(url, params, this.client.getAuthHeaders())
+      const response = await axios.post(
+        url,
+        params,
+        this.client.getAuthHeaders()
+      )
       return response.data
     } catch (err) {
       console.log(err)
@@ -62,23 +66,13 @@ class Glance {
   }
 
   // The user should not be able to edit these fields at all.
-  blacklistedImageProperties = [
-    'locations',
-    'id'
-  ]
+  blacklistedImageProperties = ['locations', 'id']
 
   // We provide specific editors in the UI so don't let them be edited generically.
-  hiddenImageProperties = [
-    'owner',
-    'visibility',
-    'protected',
-  ]
+  hiddenImageProperties = ['owner', 'visibility', 'protected']
 
   get excludedImageFields () {
-    return [
-      ...this.blacklistedImageProperties,
-      ...this.hiddenImageProperties,
-    ]
+    return [...this.blacklistedImageProperties, ...this.hiddenImageProperties]
   }
 }
 

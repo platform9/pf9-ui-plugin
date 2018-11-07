@@ -19,43 +19,43 @@ import Alert from 'core/common/Alert'
 const styles = theme => ({
   root: {
     padding: theme.spacing.unit * 8,
-    overflow: 'auto'
+    overflow: 'auto',
   },
   paper: {
-    padding: theme.spacing.unit * 4
+    padding: theme.spacing.unit * 4,
   },
   img: {
     maxHeight: '70%',
     maxWidth: '70%',
     display: 'block',
     marginLeft: 'auto',
-    marginRight: 'auto'
+    marginRight: 'auto',
   },
   form: {
     paddingTop: theme.spacing.unit * 3,
   },
   textField: {
     minWidth: '100%',
-    marginTop: theme.spacing.unit
+    marginTop: theme.spacing.unit,
   },
   checkbox: {
-    marginTop: theme.spacing.unit * 3
+    marginTop: theme.spacing.unit * 3,
   },
   signinButton: {
     minWidth: '80%',
     marginTop: theme.spacing.unit * 3,
     display: 'block',
     marginLeft: 'auto',
-    marginRight: 'auto'
+    marginRight: 'auto',
   },
   forgotPwd: {
     marginTop: theme.spacing.unit * 2,
     marginBottom: theme.spacing.unit * 3,
-    textAlign: 'center'
+    textAlign: 'center',
   },
   paragraph: {
-    textAlign: 'center'
-  }
+    textAlign: 'center',
+  },
 })
 
 export class LoginPage extends React.Component {
@@ -71,7 +71,7 @@ export class LoginPage extends React.Component {
     this.setState({ [key]: event.target.value })
   }
 
-  performLogin = async (event) => {
+  performLogin = async event => {
     event.preventDefault()
     const { onAuthSuccess, context } = this.props
     const { username, password } = this.state
@@ -93,7 +93,9 @@ export class LoginPage extends React.Component {
     return (
       <div className="login-status">
         {loading && <div className="login-start">Attempting login...</div>}
-        {loginFailed && <div className="login-failed login-result">Login attempt failed.</div>}
+        {loginFailed && (
+          <div className="login-failed login-result">Login attempt failed.</div>
+        )}
       </div>
     )
   }
@@ -104,65 +106,96 @@ export class LoginPage extends React.Component {
 
   renderInputfield = () => {
     const { classes } = this.props
-    return <Fragment>
-      <TextField required id="email" label="Email" placeholder="Email" className={classes.textField} onChange={this.updateValue('username')} />
-      <TextField required id="password" label="Password" className={classes.textField} type="password" onChange={this.updateValue('password')} />
-    </Fragment>
+    return (
+      <Fragment>
+        <TextField
+          required
+          id="email"
+          label="Email"
+          placeholder="Email"
+          className={classes.textField}
+          onChange={this.updateValue('username')}
+        />
+        <TextField
+          required
+          id="password"
+          label="Password"
+          className={classes.textField}
+          type="password"
+          onChange={this.updateValue('password')}
+        />
+      </Fragment>
+    )
   }
 
   renderMFACheckbox = () => {
     const { classes } = this.props
-    return <Fragment>
-      <FormControlLabel
-        value="MFAcheckbox"
-        className={classes.checkbox}
-        control={
-          <Checkbox
-            checked={this.state.MFAcheckbox}
-            onChange={this.handleChangeBox('MFAcheckbox')}
-            value="MFAcheckbox"
-            color="primary"
-          />
-        }
-        label={
-          <div>
-            <span>I have a Multi-Factor Authentication (MFA) token. (</span>
-            <a href="http://www.platform9.com">more info</a>
-            <span>)</span>
-          </div>
-        }
-      />
-    </Fragment>
+    return (
+      <Fragment>
+        <FormControlLabel
+          value="MFAcheckbox"
+          className={classes.checkbox}
+          control={
+            <Checkbox
+              checked={this.state.MFAcheckbox}
+              onChange={this.handleChangeBox('MFAcheckbox')}
+              value="MFAcheckbox"
+              color="primary"
+            />
+          }
+          label={
+            <div>
+              <span>I have a Multi-Factor Authentication (MFA) token. (</span>
+              <a href="http://www.platform9.com">more info</a>
+              <span>)</span>
+            </div>
+          }
+        />
+      </Fragment>
+    )
   }
 
   renderMFAInput = () => {
     const { classes } = this.props
-    return <TextField
-      required={this.state.MFAcheckbox}
-      id="MFA"
-      label="MFA Code"
-      className={classes.textField}
-      placeholder="MFA Code"
-      margin="normal"
-    />
+    return (
+      <TextField
+        required={this.state.MFAcheckbox}
+        id="MFA"
+        label="MFA Code"
+        className={classes.textField}
+        placeholder="MFA Code"
+        margin="normal"
+      />
+    )
   }
 
   renderFooter = () => {
     const { classes } = this.props
-    return <Fragment>
-      <Typography className={classes.paragraph} variant="caption" color="textSecondary">
-        By signing in, you agree to our <a href="http://www.platform9.com">Terms of Service</a>.
-      </Typography>
-      <Typography className={classes.paragraph} variant="caption" color="textSecondary">
-        © 2014-2018 Platform9 Systems, Inc.
-      </Typography>
-    </Fragment>
+    return (
+      <Fragment>
+        <Typography
+          className={classes.paragraph}
+          variant="caption"
+          color="textSecondary"
+        >
+          By signing in, you agree to our{' '}
+          <a href="http://www.platform9.com">Terms of Service</a>.
+        </Typography>
+        <Typography
+          className={classes.paragraph}
+          variant="caption"
+          color="textSecondary"
+        >
+          © 2014-2018 Platform9 Systems, Inc.
+        </Typography>
+      </Fragment>
+    )
   }
 
   render () {
     const { classes } = this.props
     const { loginFailed } = this.state
-    const logoPath = rootPath+'images/logo-color.png'
+    const logoPath = rootPath + 'images/logo-color.png'
     return (
       <div className="login-page">
         <Grid container justify="center" className={classes.root}>
@@ -176,8 +209,15 @@ export class LoginPage extends React.Component {
                 {this.renderInputfield()}
                 {this.renderMFACheckbox()}
                 {this.state.MFAcheckbox && this.renderMFAInput()}
-                {loginFailed && <Alert variant="error" message="Login failed" /> }
-                <Button type="submit" className={classes.signinButton} variant="contained" color="primary">
+                {loginFailed && (
+                  <Alert variant="error" message="Login failed" />
+                )}
+                <Button
+                  type="submit"
+                  className={classes.signinButton}
+                  variant="contained"
+                  color="primary"
+                >
                   SIGN IN
                 </Button>
                 <Typography className={classes.forgotPwd} gutterBottom>
@@ -196,7 +236,7 @@ export class LoginPage extends React.Component {
 LoginPage.propTypes = {
   /**
    * Handler that is invoked upon successful authentication.
-  */
+   */
   onAuthSuccess: PropTypes.func,
 }
 

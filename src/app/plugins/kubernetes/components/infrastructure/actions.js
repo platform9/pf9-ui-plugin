@@ -1,14 +1,18 @@
-import { asyncMap, asyncFlatMap, tap } from 'core/fp'
+import { asyncFlatMap, asyncMap, tap } from 'core/fp'
 
 export const loadClusters = async ({ context, setContext, reload }) => {
-  if (!reload && context.clusters) { return context.clusters }
+  if (!reload && context.clusters) {
+    return context.clusters
+  }
   const clusters = await context.apiClient.qbert.getClusters()
   setContext({ clusters })
   return clusters
 }
 
 export const loadCloudProviders = async ({ context, setContext, reload }) => {
-  if (!reload && context.cloudProviders) { return context.cloudProviders }
+  if (!reload && context.cloudProviders) {
+    return context.cloudProviders
+  }
   const cloudProviders = await context.apiClient.qbert.getCloudProviders()
   setContext({ cloudProviders })
   return cloudProviders
@@ -17,7 +21,7 @@ export const loadCloudProviders = async ({ context, setContext, reload }) => {
 export const createCloudProvider = async ({ data, context, setContext }) => {
   const created = await context.apiClient.qbert.createCloudProvider(data)
   const existing = await context.apiClient.qbert.getCloudProviders()
-  setContext({ cloudProviders: [ ...existing, created ] })
+  setContext({ cloudProviders: [...existing, created] })
   return created
 }
 
@@ -25,7 +29,7 @@ export const updateCloudProvider = async ({ data, context, setContext }) => {
   const { id } = data
   const existing = await context.apiClient.qbert.getCloudProviders()
   const updated = await context.apiClient.qbert.updateCloudProvider(id, data)
-  const newList = existing.map(x => x.id === id ? x : updated)
+  const newList = existing.map(x => (x.id === id ? x : updated))
   setContext({ routers: newList })
 }
 
@@ -36,7 +40,9 @@ export const deleteCloudProvider = async ({ id, context, setContext }) => {
 }
 
 export const loadNodes = async ({ context, setContext, reload }) => {
-  if (!reload && context.nodes) { return context.nodes }
+  if (!reload && context.nodes) {
+    return context.nodes
+  }
   // TODO: Get nodes is not yet implemented
   // const nodes = await context.apiClient.qbert.getNodes()
   const nodes = []
@@ -66,9 +72,13 @@ export const loadInfrastructure = async ({ context, setContext, reload }) => {
 
     // Then fill out the derived data
     const clusters = rawClusters.map(cluster => {
-      const nodesInCluster = nodes.filter(node => node.clusterUuid === cluster.uuid)
+      const nodesInCluster = nodes.filter(
+        node => node.clusterUuid === cluster.uuid
+      )
       const masterNodes = nodesInCluster.filter(node => node.isMaster === 1)
-      const healthyMasterNodes = masterNodes.filter(node => node.status === 'ok' && node.api_responding === 1)
+      const healthyMasterNodes = masterNodes.filter(
+        node => node.status === 'ok' && node.api_responding === 1
+      )
       return {
         ...cluster,
         nodes,
@@ -91,10 +101,13 @@ export const loadInfrastructure = async ({ context, setContext, reload }) => {
         console.log(err)
         return cluster
       }
-    }).then(clustersWithVersions => setContext({ clusters: clustersWithVersions }))
+    }).then(clustersWithVersions =>
+      setContext({ clusters: clustersWithVersions })
+    )
 
-    asyncFlatMap(masterNodeClusters, cluster => qbert.getClusterNamespaces(cluster.uuid))
-      .then(namespaces => setContext({ namespaces }))
+    asyncFlatMap(masterNodeClusters, cluster =>
+      qbert.getClusterNamespaces(cluster.uuid)
+    ).then(namespaces => setContext({ namespaces }))
 
     return { nodes, clusters, namespaces: [] }
   }

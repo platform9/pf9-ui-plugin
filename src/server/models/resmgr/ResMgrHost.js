@@ -32,7 +32,7 @@ class ResMgrHost extends ActiveModel {
     return {
       ...super.asJson(),
       roles: this.roles,
-      info: this.info
+      info: this.info,
     }
   }
 }

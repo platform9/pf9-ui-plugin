@@ -22,8 +22,8 @@ class SshKey extends ActiveModel {
       keypair: {
         fingerprint: this.fingerprint,
         name: this.name,
-        public_key: this.public_key
-      }
+        public_key: this.public_key,
+      },
     }
   }
 }

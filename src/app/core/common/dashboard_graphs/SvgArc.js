@@ -8,8 +8,8 @@ const styles = theme => ({
   arc: {
     stroke: '#aee0ff',
     fill: 'transparent',
-    'stroke-width': '15'
-  }
+    'stroke-width': '15',
+  },
 })
 
 // Basic SVG circle drawing component, placeholder for future dashboard graph usage
@@ -19,9 +19,9 @@ const SvgArc = ({ classes, percent, duration }) => {
   const values = { angle: [0, endAngle] }
   return (
     <AnimateValues values={values} duration={duration}>
-      {({ angle }) =>
+      {({ angle }) => (
         <path className={classes.arc} d={describeArc(0, 0, 75, 0, angle)} />
-      }
+      )}
     </AnimateValues>
   )
 }

@@ -8,9 +8,15 @@ import CloudProvidersListPage from './CloudProvidersListPage'
 
 const InfrastructurePage = () => (
   <Tabs>
-    <Tab value="clusters" label="Clusters"><ClustersListPage /></Tab>
-    <Tab value="nodes" label="Nodes"><NodesListPage /></Tab>
-    <Tab value="cloudProviders" label="Cloud Providers"><CloudProvidersListPage /></Tab>
+    <Tab value="clusters" label="Clusters">
+      <ClustersListPage />
+    </Tab>
+    <Tab value="nodes" label="Nodes">
+      <NodesListPage />
+    </Tab>
+    <Tab value="cloudProviders" label="Cloud Providers">
+      <CloudProvidersListPage />
+    </Tab>
   </Tabs>
 )
 

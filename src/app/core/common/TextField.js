@@ -4,7 +4,7 @@ import { withStyles } from '@material-ui/core/styles'
 import {
   FormControl,
   FormHelperText,
-  TextField as BaseTextField
+  TextField as BaseTextField,
 } from '@material-ui/core'
 import { withFormContext } from 'core/common/ValidatedForm'
 import { compose, emptyObj, filterFields, pickMultiple } from 'core/fp'
@@ -12,8 +12,8 @@ import { requiredValidator } from 'core/FieldValidator'
 
 const styles = theme => ({
   formControl: {
-    margin: theme.spacing.unit
-  }
+    margin: theme.spacing.unit,
+  },
 })
 
 class TextField extends React.Component {
@@ -23,7 +23,7 @@ class TextField extends React.Component {
       ? {
         validations: Array.isArray(props.validations)
           ? [requiredValidator, ...props.validations]
-          : { required: true, ...props.validations }
+          : { required: true, ...props.validations },
       }
       : pickMultiple('validations')(props)
     const { id, initialValue, setField } = this.props
@@ -84,7 +84,7 @@ class TextField extends React.Component {
 
 TextField.defaultProps = {
   validations: [],
-  required: false
+  required: false,
 }
 
 TextField.propTypes = {
@@ -93,7 +93,10 @@ TextField.propTypes = {
   required: PropTypes.bool,
   validations: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
   initialValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  onChange: PropTypes.func
+  onChange: PropTypes.func,
 }
 
-export default compose(withFormContext, withStyles(styles))(TextField)
+export default compose(
+  withFormContext,
+  withStyles(styles)
+)(TextField)

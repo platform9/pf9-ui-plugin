@@ -15,22 +15,17 @@ const styles = theme => ({
   },
   title: {
     flex: '0 0 auto',
-  }
+  },
 })
 
 const CardTableToolbar = ({ classes, onSearchChange, searchTerm }) => (
-  <Toolbar
-    className={classes.root}
-  >
+  <Toolbar className={classes.root}>
     <div className={classes.spacer} />
     <div className={classes.actions}>
       <Toolbar>
-        {onSearchChange &&
-          <SearchBar
-            onSearchChange={onSearchChange}
-            searchTerm={searchTerm}
-          />
-        }
+        {onSearchChange && (
+          <SearchBar onSearchChange={onSearchChange} searchTerm={searchTerm} />
+        )}
       </Toolbar>
     </div>
   </Toolbar>

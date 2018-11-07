@@ -10,14 +10,17 @@ import { createNamespace } from './actions'
 export class AddNamespaceForm extends React.Component {
   state = {
     clusterId: null,
-    clustersOptions: null
+    clustersOptions: null,
   }
 
   async componentDidMount () {
     const { context, setContext } = this.props
     await loadInfrastructure({ context, setContext })
     // Make sure to use the new reference to context.  It changes after loadInfrastucture.
-    const clusterOptions = this.props.context.clusters.map(c => ({ value: c.uuid, label: c.name }))
+    const clusterOptions = this.props.context.clusters.map(c => ({
+      value: c.uuid,
+      label: c.name,
+    }))
     this.setState({ clusterOptions })
   }
 
@@ -27,12 +30,15 @@ export class AddNamespaceForm extends React.Component {
 
   render () {
     const { clusterOptions } = this.state
-    if (!clusterOptions) { return null }
+    if (!clusterOptions) {
+      return null
+    }
     const { onComplete } = this.props
     return (
       <ValidatedForm onSubmit={onComplete}>
         <TextField id="name" label="Name" />
-        <PicklistField id="clusterId"
+        <PicklistField
+          id="clusterId"
           label="cluster"
           onChange={this.setField('clusterId')}
           options={clusterOptions}

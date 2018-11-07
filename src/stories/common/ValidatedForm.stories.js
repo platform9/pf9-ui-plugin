@@ -6,7 +6,7 @@ import TextField from 'core/common/TextField'
 import {
   customValidator,
   matchFieldValidator,
-  requiredValidator
+  requiredValidator,
 } from 'core/FieldValidator'
 import Checkbox from 'core/common/Checkbox'
 
@@ -20,8 +20,8 @@ const renderForm = (props = {}) => () => (
         required: true,
         length: {
           params: [3, 10],
-          message: 'Name must contain between 3 and 10 characters'
-        }
+          message: 'Name must contain between 3 and 10 characters',
+        },
       }}
     />
     <TextField
@@ -30,7 +30,7 @@ const renderForm = (props = {}) => () => (
       label="Password"
       validations={{
         required: true,
-        minLength: [4]
+        minLength: [4],
       }}
     />
     <TextField
@@ -39,7 +39,7 @@ const renderForm = (props = {}) => () => (
       label="Repeat password"
       validations={[
         requiredValidator,
-        matchFieldValidator('password').withMessage('Passwords do not match')
+        matchFieldValidator('password').withMessage('Passwords do not match'),
       ]}
     />
     <br />
@@ -55,7 +55,7 @@ const renderForm = (props = {}) => () => (
             `From here we have access to other form fields as well, like 'name' with value ${
               formFields['name']
             }`
-        )
+        ),
       ]}
     />
     <Checkbox
@@ -98,8 +98,8 @@ addStories('Form Handling/ValidatedForm', {
   ),
 
   'Fields validation on blur and on submit': renderForm({
-    showErrorsOnBlur: true
+    showErrorsOnBlur: true,
   }),
 
-  'Fields validation just on submit': renderForm()
+  'Fields validation just on submit': renderForm(),
 })

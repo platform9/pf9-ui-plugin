@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Picklist from 'core/common/Picklist'
 import { withFormContext } from 'core/common/ValidatedForm'
-import { pickMultiple, filterFields } from 'core/fp'
+import { filterFields, pickMultiple } from 'core/fp'
 
 /**
  * PicklistField builds upon Picklist and adds integration with ValidatedForm
@@ -21,14 +21,20 @@ class PicklistField extends React.Component {
   handleChange = value => {
     const { id, onChange, setField } = this.props
     setField(id, value)
-    if (onChange) { onChange(value) }
+    if (onChange) {
+      onChange(value)
+    }
   }
 
-  get restFields () { return filterFields(...withFormContext.propsToExclude)(this.props) }
+  get restFields () {
+    return filterFields(...withFormContext.propsToExclude)(this.props)
+  }
 
   render () {
     const { id, label, value, showNone } = this.props
-    const options = showNone ? [{ value: '', label: 'None' }, ...this.props.options] : this.props.options
+    const options = showNone
+      ? [{ value: '', label: 'None' }, ...this.props.options]
+      : this.props.options
     return (
       <div id={id}>
         <Picklist
@@ -53,7 +59,7 @@ const optionPropType = PropTypes.oneOfType([
   PropTypes.shape({
     value: PropTypes.string,
     label: PropTypes.string,
-  })
+  }),
 ])
 
 PicklistField.propTypes = {

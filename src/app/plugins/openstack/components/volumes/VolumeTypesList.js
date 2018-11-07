@@ -9,7 +9,11 @@ const columns = [
   { id: 'description', label: 'Description' },
   { id: 'is_public', label: 'Public?' },
   { id: 'volume_backend_name', label: 'Volume Backend' },
-  { id: 'extra_specs', label: 'Metadata', render: data => JSON.stringify(keyValueArrToObj(data)) },
+  {
+    id: 'extra_specs',
+    label: 'Metadata',
+    render: data => JSON.stringify(keyValueArrToObj(data)),
+  },
 ]
 
 class VolumeTypesList extends React.Component {

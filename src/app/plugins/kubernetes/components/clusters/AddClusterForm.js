@@ -9,15 +9,19 @@ class AddClusterForm extends React.Component {
 
   setField = field => event => this.setState({ [field]: event.target.value })
 
-  fields = [
-    { id: 'name', label: 'Name' },
-  ]
+  fields = [{ id: 'name', label: 'Name' }]
 
   renderField = ({ id, label, type = 'text' }) => {
     if (type === 'text' || type === 'number') {
       return (
         <div key={id}>
-          <TextField id={id} type={type} label={label} value={this.state[id]} onChange={this.setField(id)} />
+          <TextField
+            id={id}
+            type={type}
+            label={label}
+            value={this.state[id]}
+            onChange={this.setField(id)}
+          />
         </div>
       )
     }
@@ -32,7 +36,9 @@ class AddClusterForm extends React.Component {
       <form noValidate>
         {this.fields.map(this.renderField)}
         <div>
-          <Button variant="raised" onClick={this.handleSubmit}>Submit</Button>
+          <Button variant="raised" onClick={this.handleSubmit}>
+            Submit
+          </Button>
         </div>
       </form>
     )
@@ -40,7 +46,7 @@ class AddClusterForm extends React.Component {
 }
 
 AddClusterForm.propTypes = {
-  onSubmit: PropTypes.func.isRequired
+  onSubmit: PropTypes.func.isRequired,
 }
 
 export default AddClusterForm

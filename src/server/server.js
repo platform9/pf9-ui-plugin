@@ -3,11 +3,7 @@ import express from 'express'
 import http from 'http'
 import cors from 'cors'
 
-import {
-  requestLogger,
-  enableAllCors,
-  injectClientInfo,
-} from './middleware'
+import { enableAllCors, injectClientInfo, requestLogger } from './middleware'
 
 import keystone from './api/keystone'
 import nova from './api/nova'
@@ -32,7 +28,9 @@ export function startServer (config = defaultConfig) {
 
   app.use(bodyParser.urlencoded({ extended: true }))
   app.use(bodyParser.json())
-  app.use(bodyParser.json({type: 'application/openstack-images-v2.1-json-patch'}))
+  app.use(
+    bodyParser.json({ type: 'application/openstack-images-v2.1-json-patch' })
+  )
 
   if (config.verbose) {
     app.use(requestLogger)

@@ -9,7 +9,7 @@ import {
   Grid,
   Hidden,
   Tooltip,
-  Typography
+  Typography,
 } from '@material-ui/core'
 import AddCircleIcon from '@material-ui/icons/AddCircle'
 import PublishIcon from '@material-ui/icons/Publish'
@@ -22,21 +22,21 @@ import { rootPath } from 'core/globals'
 const styles = theme => ({
   card: {
     margin: theme.spacing.unit,
-    padding: 0
+    padding: 0,
   },
   text: {
     display: 'inline-block',
     marginTop: theme.spacing.unit,
-    marginRight: theme.spacing.unit * 0.5
+    marginRight: theme.spacing.unit * 0.5,
   },
   rightText: {
-    display: 'inline-block'
+    display: 'inline-block',
   },
   ActionContainer: {
-    marginTop: -theme.spacing.unit
+    marginTop: -theme.spacing.unit,
   },
   CRUDContainer: {
-    marginBottom: theme.spacing.unit
+    marginBottom: theme.spacing.unit,
   },
   icon: {
     float: 'left',
@@ -45,11 +45,11 @@ const styles = theme => ({
     marginRight: theme.spacing.unit * 1.5,
   },
   buttonIcon: {
-    marginRight: theme.spacing.unit
+    marginRight: theme.spacing.unit,
   },
   divider: {
     marginTop: theme.spacing.unit,
-    marginBottom: theme.spacing.unit
+    marginBottom: theme.spacing.unit,
   },
   info: {
     overflow: 'hidden',
@@ -65,7 +65,7 @@ const styles = theme => ({
       content: "'...'",
       position: 'absolute',
       right: theme.spacing.unit,
-      bottom: 0
+      bottom: 0,
     },
     '&:after': {
       content: "''",
@@ -74,9 +74,9 @@ const styles = theme => ({
       width: '2em',
       height: '1em',
       marginTop: '0.2em',
-      background: 'white'
-    }
-  }
+      background: 'white',
+    },
+  },
 })
 
 class ApplicationCard extends React.Component {
@@ -110,17 +110,21 @@ class ApplicationCard extends React.Component {
       <Grid item sm={6} md={4} lg={4}>
         <Card className={classes.card}>
           <CardContent>
-            <Typography variant="headline" paragraph>{application.name}</Typography>
+            <Typography variant="headline" paragraph>
+              {application.name}
+            </Typography>
             <CardMedia
               className={classes.icon}
-              image={rootPath+'images/image_catalog/icon-ubuntu.png'}
+              image={rootPath + 'images/image_catalog/icon-ubuntu.png'}
               title="icon"
             />
-            <div className={classes.info}>
-              {application.description}
-            </div>
-            <Typography variant="body2" className={classes.text}>Tenant:</Typography>
-            <Typography variant="body1" className={classes.rightText}>{application.tenant}</Typography>
+            <div className={classes.info}>{application.description}</div>
+            <Typography variant="body2" className={classes.text}>
+              Tenant:
+            </Typography>
+            <Typography variant="body1" className={classes.rightText}>
+              {application.tenant}
+            </Typography>
           </CardContent>
           <div className={classes.ActionContainer} align="center">
             <Button onClick={this.handleAddToEnv}>

@@ -11,7 +11,7 @@ const sanitizeFlavor = flavor => ({
 
 const sanitizeVolumeType = vt => ({
   ...vt,
-  extra_specs: JSON.stringify((vt.extra_specs || {})),
+  extra_specs: JSON.stringify(vt.extra_specs || {}),
 })
 
 class Context {
@@ -37,14 +37,18 @@ class Context {
   removeUser = id => this.client.keystone.deleteUser(id)
 
   getUsers = async () => {
-    const users = (await this.client.keystone.getUsers() || [])
+    const users = (await this.client.keystone.getUsers()) || []
     // Sometimes the API returns users without a username.
-    const sanitized = users.map(user => ({...user, username: user.username || ''}))
+    const sanitized = users.map(user => ({
+      ...user,
+      username: user.username || '',
+    }))
     return sanitized
   }
 
   getFlavor = async id => sanitizeFlavor(await this.client.nova.getFlavor(id))
-  getFlavors = async () => (await this.client.nova.getFlavors() || []).map(sanitizeFlavor)
+  getFlavors = async () =>
+    ((await this.client.nova.getFlavors()) || []).map(sanitizeFlavor)
   createFlavor = ({ input }) => this.client.nova.createFlavor(input)
   removeFlavor = id => this.client.nova.deleteFlavor(id)
 
@@ -63,7 +67,7 @@ class Context {
 
 const context = new Context()
 context.client = new ApiClient({
-  keystoneEndpoint: `${config.apiHost}/keystone`
+  keystoneEndpoint: `${config.apiHost}/keystone`,
 })
 
 export default context

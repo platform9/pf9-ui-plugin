@@ -20,7 +20,12 @@ addStories('SSH Key Management/Listing keys', {
   ),
 
   'With pagination': () => {
-    const numSshKeys = number('numSshKeys', 7, { range: true, min: 0, max: 15, step: 1 })
+    const numSshKeys = number('numSshKeys', 7, {
+      range: true,
+      min: 0,
+      max: 15,
+      step: 1,
+    })
     const sshKeys = range(numSshKeys).map(fakeSshKey)
     return (
       <SshKeysList data={sshKeys} onAdd={addAction} onDelete={deleteAction} />

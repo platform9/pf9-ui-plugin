@@ -21,10 +21,13 @@ addStories('User management/Listing users', {
   ),
 
   'With pagination': () => {
-    const numUsers = number('numUsers', 7, { range: true, min: 0, max: 15, step: 1 })
+    const numUsers = number('numUsers', 7, {
+      range: true,
+      min: 0,
+      max: 15,
+      step: 1,
+    })
     const users = range(numUsers).map(fakeUser)
-    return (
-      <UsersList data={users} onAdd={addAction} onDelete={deleteAction} />
-    )
+    return <UsersList data={users} onAdd={addAction} onDelete={deleteAction} />
   },
 })

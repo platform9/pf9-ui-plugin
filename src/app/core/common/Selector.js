@@ -1,19 +1,14 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/core/styles'
-import {
-  Button,
-  Menu,
-  MenuItem,
-  Typography
-} from '@material-ui/core'
+import { Button, Menu, MenuItem, Typography } from '@material-ui/core'
 import SearchBar from './SearchBar'
 
 const styles = theme => ({
   selector: {
     position: 'relative',
-    float: 'right'
-  }
+    float: 'right',
+  },
 })
 
 @withStyles(styles)
@@ -21,7 +16,7 @@ class Selector extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      anchor: null
+      anchor: null,
     }
   }
 
@@ -56,7 +51,8 @@ class Selector extends React.Component {
     const selectorName = `${name}-selector`
 
     const sortedList = this.sortList(list)
-    const filteredList = searchTerm === '' ? sortedList : this.filterBySearch(sortedList)
+    const filteredList =
+      searchTerm === '' ? sortedList : this.filterBySearch(sortedList)
 
     return (
       <div className={classes.selector}>
@@ -68,7 +64,7 @@ class Selector extends React.Component {
           disableRipple
         >
           <Typography color="inherit" variant="body1">
-            {name}  &#9662;
+            {name} &#9662;
           </Typography>
         </Button>
         <Menu
@@ -77,13 +73,19 @@ class Selector extends React.Component {
           open={Boolean(anchor)}
           onClose={this.handleClose('anchor')}
           getContentAnchorEl={null}
-          anchorOrigin={{vertical: 'bottom', horizontal: 'left'}}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
         >
-          { searchTerm !== undefined && <SearchBar
-            onSearchChange={onSearchChange}
-            searchTerm={searchTerm}
-          />}
-          {filteredList.map(item => (<MenuItem onClick={this.handleClose('anchor')} key={item}>{item}</MenuItem>))}
+          {searchTerm !== undefined && (
+            <SearchBar
+              onSearchChange={onSearchChange}
+              searchTerm={searchTerm}
+            />
+          )}
+          {filteredList.map(item => (
+            <MenuItem onClick={this.handleClose('anchor')} key={item}>
+              {item}
+            </MenuItem>
+          ))}
         </Menu>
       </div>
     )
@@ -94,7 +96,7 @@ Selector.propTypes = {
   name: PropTypes.string.isRequired,
   list: PropTypes.array.isRequired,
   classes: PropTypes.object,
-  onChoose: PropTypes.func.isRequired
+  onChoose: PropTypes.func.isRequired,
 }
 
 export default Selector

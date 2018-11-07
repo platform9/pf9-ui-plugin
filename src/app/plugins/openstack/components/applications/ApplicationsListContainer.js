@@ -6,17 +6,16 @@ class ApplicationsListContainer extends React.Component {
   render () {
     return (
       <div>
-        {this.props.applications && <CardTable
-          data={this.props.applications}
-          searchTarget="name"
-        />}
+        {this.props.applications && (
+          <CardTable data={this.props.applications} searchTarget="name" />
+        )}
       </div>
     )
   }
 }
 
 ApplicationsListContainer.propTypes = {
-  applications: PropTypes.arrayOf(PropTypes.object)
+  applications: PropTypes.arrayOf(PropTypes.object),
 }
 
 export default ApplicationsListContainer

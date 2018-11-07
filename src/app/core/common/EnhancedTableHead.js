@@ -6,7 +6,7 @@ import {
   TableHead,
   TableRow,
   TableSortLabel,
-  Tooltip
+  Tooltip,
 } from '@material-ui/core'
 
 class EnhancedTableHead extends React.Component {
@@ -37,12 +37,14 @@ class EnhancedTableHead extends React.Component {
           indeterminate={!checked && numSelected > 0 && numSelected < rowCount}
           checked={checked}
           onChange={onSelectAllClick}
-          color='primary'
+          color="primary"
         />
       </TableCell>
     ) : null
 
-    const firstBlank = blankFirstColumn ? <TableCell padding="checkbox" key="_firstBlank" /> : null
+    const firstBlank = blankFirstColumn ? (
+      <TableCell padding="checkbox" key="_firstBlank" />
+    ) : null
 
     return (
       <TableHead>
@@ -73,7 +75,11 @@ class EnhancedTableHead extends React.Component {
               </TableCell>
             )
           }, this)}
-          {showRowActions && <TableCell padding="default" key="__actions__">Actions</TableCell>}
+          {showRowActions && (
+            <TableCell padding="default" key="__actions__">
+              Actions
+            </TableCell>
+          )}
         </TableRow>
       </TableHead>
     )

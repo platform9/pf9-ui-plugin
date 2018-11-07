@@ -47,7 +47,7 @@ class Volume extends ActiveModel {
       device: this.device,
       attachedMode: this.attachedMode,
       readonly: this.readonly,
-      created_at: this.created_at
+      created_at: this.created_at,
     }
   }
 }

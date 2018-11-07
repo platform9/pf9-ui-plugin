@@ -27,7 +27,7 @@ class HostsListContainer extends React.Component {
 }
 
 HostsListContainer.propTypes = {
-  hosts: PropTypes.arrayOf(PropTypes.object)
+  hosts: PropTypes.arrayOf(PropTypes.object),
 }
 
 export default HostsListContainer

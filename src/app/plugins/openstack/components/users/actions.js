@@ -1,5 +1,7 @@
 export const loadUsers = async ({ context, setContext, reload }) => {
-  if (!reload && context.users) { return context.users }
+  if (!reload && context.users) {
+    return context.users
+  }
   const users = await context.apiClient.keystone.getUsers()
   setContext({ users })
   return users
@@ -8,7 +10,7 @@ export const loadUsers = async ({ context, setContext, reload }) => {
 export const createUser = async ({ data, context, setContext }) => {
   const created = await context.apiClient.keystone.createUser(data)
   const existing = await context.apiClient.keystone.getUsers()
-  setContext({ users: [ ...existing, created ] })
+  setContext({ users: [...existing, created] })
   return created
 }
 

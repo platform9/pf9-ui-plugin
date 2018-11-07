@@ -7,7 +7,7 @@ import MoreVertIcon from '@material-ui/icons/MoreVert'
 
 class MoreMenu extends React.Component {
   state = {
-    anchorEl: null
+    anchorEl: null,
   }
 
   handleOpen = e => {
@@ -44,12 +44,12 @@ class MoreMenu extends React.Component {
           open={!!anchorEl}
           onClose={this.handleClose}
         >
-          {this.props.items.map(({ label, action, icon }) =>
+          {this.props.items.map(({ label, action, icon }) => (
             <MenuItem key={label} onClick={this.handleClick(action)}>
               {icon && icon}
               {label}
             </MenuItem>
-          )}
+          ))}
         </Menu>
       </div>
     )

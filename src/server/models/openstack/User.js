@@ -25,7 +25,8 @@ class User extends ActiveModel {
   static findById = findById(coll)
   static updateById = updateById(coll)
 
-  static findByUsername = username => User.getCollection().find(x => x.username === username)
+  static findByUsername = username =>
+    User.getCollection().find(x => x.username === username)
 
   static getAuthenticatedUser = (username, password) => {
     const user = User.findByUsername(username)
@@ -50,7 +51,7 @@ class User extends ActiveModel {
       username: this.username,
       tenantId: this.tenantId,
       roles: this.roles,
-      rolePair: this.rolePair
+      rolePair: this.rolePair,
     }
   }
 }

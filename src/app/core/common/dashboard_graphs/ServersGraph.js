@@ -3,16 +3,16 @@ import { withStyles } from '@material-ui/core/styles'
 import SvgArc from './SvgArc'
 
 const styles = theme => ({
-  'svg': {
+  svg: {
     'max-height': '100%',
-    position: 'absolute'
-  }
+    position: 'absolute',
+  },
 })
 
 @withStyles(styles)
 class ServersGraph extends React.Component {
   state = {
-    hover: false
+    hover: false,
   }
 
   mouseEnterUpdate = () => {

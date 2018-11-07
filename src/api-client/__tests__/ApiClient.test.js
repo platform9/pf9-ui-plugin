@@ -11,8 +11,12 @@ describe('ApiClient', () => {
   })
 
   it('requires an endpoint to be set', () => {
-    expect(() => { new ApiClient() }).toThrow()
-    expect(() => { new ApiClient({ keystoneEndpoint }) }).not.toThrow()
+    expect(() => {
+      new ApiClient()
+    }).toThrow()
+    expect(() => {
+      new ApiClient({ keystoneEndpoint })
+    }).not.toThrow()
   })
 
   it('includes the keystone API', () => {

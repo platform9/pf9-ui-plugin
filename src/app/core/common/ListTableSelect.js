@@ -8,14 +8,14 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableRow
+  TableRow,
 } from '@material-ui/core'
 import EnhancedTableHead from './EnhancedTableHead'
 
 const styles = theme => ({
   root: {
     width: '100%',
-    marginTop: theme.spacing.unit * 3
+    marginTop: theme.spacing.unit * 3,
   },
   table: {
     minWidth: 800,
@@ -40,13 +40,19 @@ class ListTableSelect extends React.Component {
     const { cellProps = {} } = columnDef
     let _contents = contents
 
-    if (typeof contents === 'boolean') { _contents = String(_contents) }
+    if (typeof contents === 'boolean') {
+      _contents = String(_contents)
+    }
 
     // Allow for customized rendering in the columnDef
-    if (columnDef.render) { _contents = columnDef.render(contents) }
+    if (columnDef.render) {
+      _contents = columnDef.render(contents)
+    }
 
     return (
-      <TableCell key={columnDef.id} {...cellProps}>{_contents}</TableCell>
+      <TableCell key={columnDef.id} {...cellProps}>
+        {_contents}
+      </TableCell>
     )
   }
 
@@ -60,8 +66,8 @@ class ListTableSelect extends React.Component {
           <Radio checked={isSelected} color="primary" />
         </TableCell>
         {columns.map((columnDef, colIdx) =>
-          this.renderCell(columnDef, row[columnDef.id]))
-        }
+          this.renderCell(columnDef, row[columnDef.id])
+        )}
       </TableRow>
     )
   }
@@ -79,13 +85,8 @@ class ListTableSelect extends React.Component {
           <Paper className={classes.root}>
             <div className={classes.tableWrapper}>
               <Table className={classes.table}>
-                <EnhancedTableHead
-                  columns={columns}
-                  blankFirstColumn
-                />
-                <TableBody>
-                  {data.map(this.renderRow)}
-                </TableBody>
+                <EnhancedTableHead columns={columns} blankFirstColumn />
+                <TableBody>{data.map(this.renderRow)}</TableBody>
               </Table>
             </div>
           </Paper>

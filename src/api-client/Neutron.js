@@ -14,7 +14,9 @@ class Neutron {
   networkUrl = async () => `${await this.endpoint()}/v2.0/networks`
 
   async setRegionUrls () {
-    const services = (await this.client.keystone.getServiceCatalog()).find(x => x.name === 'neutron').endpoints
+    const services = (await this.client.keystone.getServiceCatalog()).find(
+      x => x.name === 'neutron'
+    ).endpoints
     const baseUrlsByRegion = services.reduce((accum, service) => {
       accum[service.region] = service.url + '/v2.0'
       return accum
@@ -51,7 +53,11 @@ class Neutron {
   async createNetwork (params) {
     const url = await this.networkUrl()
     try {
-      const response = await axios.post(url, { network: params }, this.client.getAuthHeaders())
+      const response = await axios.post(
+        url,
+        { network: params },
+        this.client.getAuthHeaders()
+      )
       return response.data.network
     } catch (err) {
       console.log(err)
@@ -71,7 +77,11 @@ class Neutron {
   async updateNetwork (id, params) {
     const url = `${await this.networkUrl()}/${id}`
     try {
-      const response = await axios.put(url, { network: params }, this.client.getAuthHeaders())
+      const response = await axios.put(
+        url,
+        { network: params },
+        this.client.getAuthHeaders()
+      )
       return response.data.network
     } catch (err) {
       console.log(err)
@@ -91,7 +101,11 @@ class Neutron {
   async createSubnet (params) {
     const url = `${await this.endpoint()}/v2.0/subnets`
     try {
-      const response = await axios.post(url, { subnet: params }, this.client.getAuthHeaders())
+      const response = await axios.post(
+        url,
+        { subnet: params },
+        this.client.getAuthHeaders()
+      )
       return response.data.subnet
     } catch (err) {
       console.log(err)
@@ -110,7 +124,11 @@ class Neutron {
   async updateSubnet (id, params) {
     const url = `${await this.endpoint()}/v2.0/subnets/${id}`
     try {
-      const response = await axios.put(url, { subnet: params }, this.client.getAuthHeaders())
+      const response = await axios.put(
+        url,
+        { subnet: params },
+        this.client.getAuthHeaders()
+      )
       return response.data.subnet
     } catch (err) {
       console.log(err)
@@ -130,7 +148,11 @@ class Neutron {
   async createPort (params) {
     const url = `${await this.endpoint()}/v2.0/ports`
     try {
-      const response = await axios.post(url, { port: params }, this.client.getAuthHeaders())
+      const response = await axios.post(
+        url,
+        { port: params },
+        this.client.getAuthHeaders()
+      )
       return response.data.port
     } catch (err) {
       console.log(err)
@@ -149,7 +171,11 @@ class Neutron {
   async updatePort (id, params) {
     const url = `${await this.endpoint()}/v2.0/ports/${id}`
     try {
-      const response = await axios.put(url, { port: params }, this.client.getAuthHeaders())
+      const response = await axios.put(
+        url,
+        { port: params },
+        this.client.getAuthHeaders()
+      )
       return response.data.port
     } catch (err) {
       console.log(err)
@@ -169,7 +195,11 @@ class Neutron {
   async createFloatingIp (params) {
     const url = `${await this.endpoint()}/v2.0/floatingips`
     try {
-      const response = await axios.post(url, { floatingip: params }, this.client.getAuthHeaders())
+      const response = await axios.post(
+        url,
+        { floatingip: params },
+        this.client.getAuthHeaders()
+      )
       return response.data.floatingip
     } catch (err) {
       console.log(err)
@@ -179,7 +209,11 @@ class Neutron {
   async detachFloatingIp (id) {
     const url = `${await this.endpoint()}/v2.0/floatingips/${id}`
     try {
-      const response = await axios.put(url, { floatingip: { port_id: null } }, this.client.getAuthHeaders())
+      const response = await axios.put(
+        url,
+        { floatingip: { port_id: null } },
+        this.client.getAuthHeaders()
+      )
       return response.data.floatingip
     } catch (err) {
       console.log(err)
@@ -218,7 +252,11 @@ class Neutron {
   async createSecurityGroup (params) {
     const url = `${await this.endpoint()}/v2.0/security-groups`
     try {
-      const response = await axios.post(url, { security_group: params }, this.client.getAuthHeaders())
+      const response = await axios.post(
+        url,
+        { security_group: params },
+        this.client.getAuthHeaders()
+      )
       return response.data.security_group
     } catch (err) {
       console.log(err)
@@ -228,7 +266,11 @@ class Neutron {
   async updateSecurityGroup (id, params) {
     const url = `${await this.endpoint()}/v2.0/security-groups/${id}`
     try {
-      const response = await axios.put(url, { security_group: params }, this.client.getAuthHeaders())
+      const response = await axios.put(
+        url,
+        { security_group: params },
+        this.client.getAuthHeaders()
+      )
       return response.data.security_group
     } catch (err) {
       console.log(err)
@@ -257,7 +299,11 @@ class Neutron {
   async createSecurityGroupRule (params) {
     const url = `${await this.endpoint()}/v2.0/security-group-rules`
     try {
-      const response = await axios.post(url, { security_group_rule: params }, this.client.getAuthHeaders())
+      const response = await axios.post(
+        url,
+        { security_group_rule: params },
+        this.client.getAuthHeaders()
+      )
       return response.data.security_group_rule
     } catch (err) {
       console.log(err)
@@ -286,7 +332,11 @@ class Neutron {
   async createRouter (params) {
     const url = `${await this.endpoint()}/v2.0/routers`
     try {
-      const response = await axios.post(url, { router: params }, this.client.getAuthHeaders())
+      const response = await axios.post(
+        url,
+        { router: params },
+        this.client.getAuthHeaders()
+      )
       return response.data.router
     } catch (err) {
       console.log(err)
@@ -296,7 +346,11 @@ class Neutron {
   async updateRouter (id, params) {
     const url = `${await this.endpoint()}/v2.0/routers/${id}`
     try {
-      const response = await axios.put(url, { router: params }, this.client.getAuthHeaders())
+      const response = await axios.put(
+        url,
+        { router: params },
+        this.client.getAuthHeaders()
+      )
       return response.data.router
     } catch (err) {
       console.log(err)
@@ -315,7 +369,11 @@ class Neutron {
   async addInterface (id, params) {
     const url = `${await this.endpoint()}/v2.0/routers/${id}/add_router_interface`
     try {
-      const response = await axios.put(url, params, this.client.getAuthHeaders())
+      const response = await axios.put(
+        url,
+        params,
+        this.client.getAuthHeaders()
+      )
       return response.data
     } catch (err) {
       console.log(err)
@@ -325,7 +383,11 @@ class Neutron {
   async removeInterface (routerId, params) {
     const url = `${await this.endpoint()}/v2.0/routers/${routerId}/remove_router_interface`
     try {
-      const response = await axios.put(url, params, this.client.getAuthHeaders())
+      const response = await axios.put(
+        url,
+        params,
+        this.client.getAuthHeaders()
+      )
       return response.data
     } catch (err) {
       console.log(err)
@@ -378,7 +440,11 @@ class Neutron {
   async setQuotas (projectId, params) {
     const url = `${await this.endpoint()}/v2.0/quotas/${projectId}`
     try {
-      const response = await axios.put(url, { quota: params }, this.client.getAuthHeaders())
+      const response = await axios.put(
+        url,
+        { quota: params },
+        this.client.getAuthHeaders()
+      )
       return response.data.quota
     } catch (err) {
       console.log(err)
@@ -389,7 +455,11 @@ class Neutron {
     const urls = await this.setRegionUrls()
     const url = `${urls[region]}/quotas/${projectId}`
     try {
-      const response = await axios.put(url, { quota: params }, this.client.getAuthHeaders())
+      const response = await axios.put(
+        url,
+        { quota: params },
+        this.client.getAuthHeaders()
+      )
       return response.data.quota
     } catch (err) {
       console.log(err)

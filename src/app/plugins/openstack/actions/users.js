@@ -1,8 +1,4 @@
-import {
-  createUser,
-  deleteUser,
-  getUsers,
-} from '../api/keystone'
+import { createUser, deleteUser, getUsers } from '../api/keystone'
 
 export const ADD_USER = 'ADD_USER'
 export const REMOVE_USER = 'REMOVE_USER'
