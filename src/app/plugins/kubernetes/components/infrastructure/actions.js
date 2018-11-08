@@ -1,5 +1,5 @@
-import { asyncMap, asyncFlatMap, tap, existentialGet } from 'core/fp'
-import moment from 'moment'
+import { asyncMap, asyncFlatMap, tap } from 'core/fp'
+import { combineHost } from './combineHosts'
 
 export const loadClusters = async ({ context, setContext, reload }) => {
   if (!reload && context.clusters) { return context.clusters }
@@ -43,67 +43,6 @@ export const loadNodes = async ({ context, setContext, reload }) => {
   const nodes = []
   setContext({ nodes })
   return nodes
-}
-
-export const combineHost = host => {
-  const { resmgrHost } = host
-  let combined = {
-    ...host,
-    roles: resmgrHost.roles || [],
-    roleStatus: resmgrHost.role_status,
-    responding: resmgrHost.info.responding,
-    hostname: resmgrHost.info.hostname,
-    osInfo: resmgrHost.info.os_info,
-    networks: [],
-    vCenterIP:
-      existentialGet(['extensions', 'hypervisor_details', 'data', 'vcenter_ip'], resmgrHost),
-    supportRole: resmgrHost.roles.includes('pf9-support'),
-    networkInterfaces:
-      existentialGet(['extensions', 'interfaces', 'data', 'iface_ip'], resmgrHost),
-    warnings: resmgrHost.message && resmgrHost.message.warn,
-  }
-  const { roles, roleStatus, responding, warnings } = combined
-  if (roles.length === 0 || (roles.length === 1 && roles.includes('pf9-support'))) {
-    combined.uiState = 'unauthorized'
-  }
-
-  if (responding) {
-    if (['converging', 'retrying'].includes(roleStatus)) {
-      combined.uiState = 'pending'
-    }
-    if (roleStatus === 'ok' && roles.length > 0) {
-      combined.uiState = 'online'
-    }
-    if (warnings && warnings.length > 0) {
-      // What is this for?
-      combined.uiState = 'drifted'
-    }
-  }
-
-  if (!combined.uiState && !responding) {
-    combined.uiState = 'offline'
-    const lastResponseTime = resmgrHost.info.last_response_time
-    combined.lastResponse = moment.utc(lastResponseTime).fromNow(true)
-    combined.lastResponseData = lastResponseTime && lastResponseTime.split(' ').join('T').concat('Z')
-    // Even though the host is offline we may or may not have stats for it
-    // depending on if the roles were authorized successfully in the past.
-    combined.hasStats = roleStatus === 'ok'
-  }
-
-  const credentials = existentialGet(['extensions', 'hypervisor_details', 'data', 'credentials'], resmgrHost)
-  if (credentials === 'invalid') {
-    combined.uiState = 'invalid'
-  }
-
-  if (roleStatus === 'failed') {
-    combined.uiState = 'error'
-  }
-
-  combined.roleData = {}
-
-  // TODO: calculate aggregate totals across hosts and store it
-
-  return combined
 }
 
 /*
@@ -166,11 +105,11 @@ export const loadInfrastructure = async ({ context, setContext, reload }) => {
       hostsById[id] = hostsById[id] || {}
       hostsById[id][type] = value
     }
-    nodes.forEach(node => setHost('qbertHost', node.uuid, node))
+    nodes.forEach(node => setHost('qbert', node.uuid, node))
     await Promise.all([
       resmgr.getHosts().then(
         resmgrHosts => {
-          resmgrHosts.forEach(resmgrHost => setHost('resmgrHost', resmgrHost.id, resmgrHost))
+          resmgrHosts.forEach(resmgrHost => setHost('resmgr', resmgrHost.id, resmgrHost))
           setContext({ resmgrHosts })
         }
       ),
