@@ -1,13 +1,13 @@
 import React from 'react'
 import createUpdateComponents from 'core/createUpdateComponents'
 import SubmitButton from 'core/common/SubmitButton'
-import ValidatedForm from 'core/common/ValidatedForm'
-import Checkbox from 'core/common/Checkbox'
-import TextField from 'core/common/TextField'
-import { updateNetwork, loadNetworks } from './actions'
+import ValidatedForm from 'core/common/validated_form/ValidatedForm'
+import Checkbox from 'core/common/validated_form/Checkbox'
+import TextField from 'core/common/validated_form/TextField'
+import { loadNetworks, updateNetwork } from './actions'
 
 export const UpdateNetworkForm = ({ onComplete, initialValue }) => (
-  <ValidatedForm onSubmit={onComplete} initialValue={initialValue}>
+  <ValidatedForm onSubmit={onComplete} initialValues={initialValue}>
     <TextField id="name" label="Name" />
     <Checkbox id="admin_state_up" label="Admin State" />
     <Checkbox id="port_security_enabled" label="Port Security" />

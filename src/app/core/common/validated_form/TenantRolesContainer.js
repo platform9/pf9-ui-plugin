@@ -6,15 +6,13 @@ import {
   TableHead,
   TableRow
 } from '@material-ui/core'
-import { pickMultiple } from 'core/fp'
-import { withFormContext } from 'core/common/ValidatedForm'
 import TenantRoleSelector from 'core/common/TenantRoleSelector'
+import withFormContext, { ValidatedFormInputPropTypes } from 'core/common/validated_form/withFormContext'
 
-class TenantRolesContainer extends React.Component {
-  constructor (props) {
-    super(props)
-    const spec = pickMultiple('validations')(props)
-    props.defineField(props.id, spec)
+@withFormContext
+export default class TenantRolesContainer extends React.Component {
+  static propTypes = {
+    ...ValidatedFormInputPropTypes,
   }
 
   static defaultProps = {
@@ -22,8 +20,8 @@ class TenantRolesContainer extends React.Component {
   }
 
   handleChange = curTenant => async event => {
-    const { id, setField } = this.props
-    setField(id, await this.combineRoles(curTenant, event.target.value))
+    const { setFieldValue } = this.props
+    setFieldValue(await this.combineRoles(curTenant, event.target.value))
   }
 
   // Sample of rolepair:
@@ -78,5 +76,3 @@ class TenantRolesContainer extends React.Component {
     )
   }
 }
-
-export default withFormContext(TenantRolesContainer)

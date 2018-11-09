@@ -1,7 +1,7 @@
 import React from 'react'
 import SubmitButton from 'core/common/SubmitButton'
-import ValidatedForm from 'core/common/ValidatedForm'
-import TextField from 'core/common/TextField'
+import ValidatedForm from 'core/common/validated_form/ValidatedForm'
+import TextField from 'core/common/validated_form/TextField'
 
 const createFormComponent = ({ submitLabel, initialValue, displayName, fields }) => {
   const mapField = spec => {
@@ -14,7 +14,7 @@ const createFormComponent = ({ submitLabel, initialValue, displayName, fields })
   }
 
   const Form = ({ onComplete }) => (
-    <ValidatedForm onSubmit={onComplete} initialValue={initialValue}>
+    <ValidatedForm onSubmit={onComplete} initialValues={initialValue}>
       {fields.map(mapField)}
       <SubmitButton>{submitLabel}</SubmitButton>
     </ValidatedForm>

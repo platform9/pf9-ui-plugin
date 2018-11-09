@@ -1,7 +1,7 @@
 import React from 'react'
 import { Button } from '@material-ui/core'
-import ValidatedForm from 'core/common/ValidatedForm'
-import TextField from 'core/common/TextField'
+import ValidatedForm from 'core/common/validated_form/ValidatedForm'
+import TextField from 'core/common/validated_form/TextField'
 
 const AddSshKeyForm = ({ onComplete }) =>
   <ValidatedForm

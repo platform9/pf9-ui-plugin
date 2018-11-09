@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { compose, setStateLens } from 'core/fp'
+import { setStateLens } from 'core/fp'
 import { withRouter } from 'react-router-dom'
 import { pathEq, toPairs } from 'ramda'
 import { parseValidator } from 'core/FieldValidator'
@@ -9,21 +9,32 @@ import Icon from '@material-ui/core/Icon/Icon'
 
 const ValidatedFormContext = React.createContext({})
 
-export const Consumer = ValidatedFormContext.Consumer
-export const Provider = ValidatedFormContext.Provider
+export const ValidatedFormConsumer = ValidatedFormContext.Consumer
+export const ValidatedFormProvider = ValidatedFormContext.Provider
 
 const styles = theme => ({
-  formControl: {
-    margin: theme.spacing.unit,
-  },
-  info: {
-    minWidth: '30%',
+  root: {
     display: 'flex',
     flexFlow: 'row nowrap',
+    alignItems: 'center'
+  },
+  inputs: {
+    display: 'flex',
+    flexFlow: 'column nowrap',
+    width: '60%',
+    paddingRight: '2rem'
+  },
+  formControl: {
+    margin: theme.spacing.unit
+  },
+  info: {
+    width: '40%',
+    display: 'flex',
+    flexFlow: 'row nowrap'
   },
   infoIcon: {
     fontSize: 'x-large',
-    paddingRight: '0.5rem',
+    paddingRight: '0.5rem'
   }
 })
 
@@ -31,13 +42,28 @@ const styles = theme => ({
  * ValidatedForm is a HOC wrapper for forms.  The child components define the
  * data value schema and the validations.
  */
-class ValidatedForm extends React.Component {
+@withRouter
+@withStyles(styles)
+export default class ValidatedForm extends React.Component {
   constructor (props) {
     super(props)
     if (props.triggerSubmit) {
       props.triggerSubmit(this.handleSubmit)
     }
   }
+
+  static propTypes = {
+    // Initial values
+    initialValues: PropTypes.object,
+
+    // Set parent context
+    onSubmit: PropTypes.func,
+
+    triggerSubmit: PropTypes.func,
+
+    showErrorsOnBlur: PropTypes.bool
+  }
+
   /**
    * This stores the specification of the field, to be used for validation down the line.
    * This function will be called by the child components when they are initialized.
@@ -51,12 +77,10 @@ class ValidatedForm extends React.Component {
    * Note: many components use event.target.value but we only need value here.
    * Note: values can be passed up to parent component by supplying a setContext function prop
    */
-  setField = (field, value) => {
-    this.setState(setStateLens(value, ['value', field]), () => {
-      if (
-        this.state.showingErrors ||
-        (this.props.showErrorsOnBlur &&
-          pathEq(['errors', field, 'hasError'], true, this.state))
+  setFieldValue = (field, value) => {
+    this.setState(setStateLens(value, ['values', field]), () => {
+      if (this.state.showingErrors ||
+        (this.props.showErrorsOnBlur && pathEq(['errors', field, 'hasError'], true, this.state))
       ) {
         this.validateField(field)
       }
@@ -81,8 +105,8 @@ class ValidatedForm extends React.Component {
   }
 
   validateField = field => {
-    const { fields, value } = this.state
-    const fieldValue = value[field]
+    const { fields, values } = this.state
+    const fieldValue = values[field]
     const { validations } = fields[field]
 
     const validationsArray = Array.isArray(validations)
@@ -91,13 +115,13 @@ class ValidatedForm extends React.Component {
         parseValidator(validationKey, validationSpec)
       )
     const failedValidation = validationsArray.find(
-      validator => !validator.validate(fieldValue, value, field)
+      validator => !validator.validate(fieldValue, values, field)
     )
     if (failedValidation) {
       this.showFieldErrors(
         field,
         typeof failedValidation.errorMessage === 'function'
-          ? failedValidation.errorMessage(fieldValue, value, field)
+          ? failedValidation.errorMessage(fieldValue, values, field)
           : failedValidation.errorMessage
       )
     } else {
@@ -108,26 +132,27 @@ class ValidatedForm extends React.Component {
   setCurrentInfo = currentInfo =>
     this.setState(prevState => ({
       ...prevState,
-      currentInfo,
+      currentInfo
     }))
 
   state = {
-    value: this.props.initialValue || {},
-    showingErrors: false,
-    showErrorsOnBlur: this.props.showErrorsOnBlur,
+    initialValues: this.props.initialValues || {},
+    values: {},
     fields: {}, // child fields inject data here
     errors: {},
-    setField: this.setField,
+    setFieldValue: this.setFieldValue,
     defineField: this.defineField,
     validateField: this.validateField,
     currentInfo: '',
-    showInfo: this.setCurrentInfo,
+    showingErrors: false,
+    showErrorsOnBlur: this.props.showErrorsOnBlur,
+    showInfo: this.setCurrentInfo
   }
 
   validateForm = () => {
-    const { fields, value } = this.state
+    const { fields } = this.state
     const results = Object.keys(fields).map(field =>
-      this.validateField(field, value[field], fields[field])
+      this.validateField(field)
     )
     return results.includes(true)
   }
@@ -149,88 +174,30 @@ class ValidatedForm extends React.Component {
     }
   }
 
-  render () {
+  renderInfo () {
+    const { classes } = this.props
+    const { currentInfo } = this.state
     return (
-      <form onSubmit={this.handleSubmit}>
-        <Provider value={this.state}>{this.props.children}</Provider>
+      currentInfo && (
+        <div className={classes.info}>
+          <Icon className={classes.infoIcon} color="primary">
+            info
+          </Icon>
+          {currentInfo}
+        </div>
+      )
+    )
+  }
+
+  render () {
+    const { classes } = this.props
+    return (
+      <form onSubmit={this.handleSubmit} className={classes.root}>
+        <div className={classes.inputs}>
+          <ValidatedFormProvider value={this.state}>{this.props.children}</ValidatedFormProvider>
+        </div>
+        {this.renderInfo()}
       </form>
     )
   }
 }
-
-ValidatedForm.propTypes = {
-  // Initial values
-  initialValue: PropTypes.object,
-
-  // Set parent context
-  onSubmit: PropTypes.func,
-
-  triggerSubmit: PropTypes.func,
-
-  showErrorsOnBlur: PropTypes.bool,
-}
-
-export const PropKeys = Object.keys(ValidatedForm.propTypes)
-
-export default compose(withRouter)(ValidatedForm)
-
-/**
- * withFormContext provides access to the form context through props.
- *
- * This pattern is needed because React does not provide access to context within
- * lifecycle methods (componentDidMount).
- *
- * See: https://github.com/facebook/react/issues/12397#issuecomment-375501574
- *
- * @param {Inject the form context into this Component through props.} Component
- */
-export const withFormContext = Component => props => (
-  <Consumer>
-    {({
-      defineField,
-      setField,
-      value,
-      showErrorsOnBlur,
-      validateField,
-      errors,
-      showInfo,
-    }) => (
-      <Component
-        {...props}
-        defineField={defineField}
-        setField={setField}
-        value={value}
-        errors={errors}
-        showErrorsOnBlur={showErrorsOnBlur}
-        validateField={validateField}
-        showInfo={showInfo}
-      />
-    )}
-  </Consumer>
-)
-
-export const FormInfoPlaceholder = compose(
-  withStyles(styles)
-)(({ classes, ...rest }) => (
-  <Consumer>
-    {({ currentInfo }) => (
-      currentInfo && <div className={classes.info} {...rest}>
-        <Icon className={classes.infoIcon} color="primary">
-          info
-        </Icon>
-        {currentInfo}
-      </div>
-    )}
-  </Consumer>
-))
-
-withFormContext.propsToExclude = [
-  'defineField',
-  'setField',
-  'initialValue',
-  'showErrorsOnBlur',
-  'validations',
-  'errors',
-  'validateField',
-  'showInfo',
-]

@@ -2,13 +2,13 @@
 import React from 'react'
 import Wizard from 'core/common/Wizard'
 import WizardStep from 'core/common/WizardStep'
-import ValidatedForm from 'core/common/ValidatedForm'
-import TextField from 'core/common/TextField'
+import ValidatedForm from 'core/common/validated_form/ValidatedForm'
+import TextField from 'core/common/validated_form/TextField'
 import Picklist from 'core/common/Picklist'
-import PicklistField from 'core/common/PicklistField'
-import Checkbox from 'core/common/Checkbox'
+import PicklistField from 'core/common/validated_form/PicklistField'
+import Checkbox from 'core/common/validated_form/Checkbox'
 import DataLoader from 'core/DataLoader'
-import KeyValuesField from 'core/common/KeyValuesField'
+import KeyValuesField from 'core/common/validated_form/KeyValuesField'
 import ImageChooser from '../images/ImageChooser.js'
 import VolumeChooser from './VolumeChooser'
 import VolumeSnapshotChooser from './VolumeSnapshotChooser'
@@ -65,7 +65,7 @@ class AddVolumeForm extends React.Component {
               <WizardStep stepId="source" label="Source">
                 <Picklist name="sourceType" label="Volume Source" value={sourceType} onChange={this.setField('sourceType')} options={sourceTypes} />
                 {sourceType === 'Snapshot' &&
-                  <ValidatedForm initialValue={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
+                  <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                     <DataLoader dataKey="volumeSnapshots" loaderFn={loadVolumeSnapshots}>
                       {({ data }) =>
                         <VolumeSnapshotChooser data={data} onChange={value => setWizardContext({ snapshot_id: value })} initialValue={wizardContext.snapshot_id} />
@@ -74,7 +74,7 @@ class AddVolumeForm extends React.Component {
                   </ValidatedForm>
                 }
                 {sourceType === 'Another Volume' &&
-                  <ValidatedForm initialValue={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
+                  <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                     <DataLoader dataKey="volumes" loaderFn={loadVolumes}>
                       {({ data }) =>
                         <VolumeChooser data={data} onChange={value => setWizardContext({ volume_id: value })} initialValue={wizardContext.volume_id} />
@@ -83,7 +83,7 @@ class AddVolumeForm extends React.Component {
                   </ValidatedForm>
                 }
                 {sourceType === 'Image' &&
-                  <ValidatedForm initialValue={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
+                  <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                     <DataLoader dataKey="images" loaderFn={loadImages}>
                       {({ data }) =>
                         <ImageChooser data={data} onChange={value => setWizardContext({ imageRef: value })} initialValue={wizardContext.imageRef} />
@@ -96,7 +96,7 @@ class AddVolumeForm extends React.Component {
               <WizardStep stepId="basic" label="Basic">
                 <DataLoader dataKey="volumeTypes" loaderFn={loadVolumeTypes}>
                   {({ data }) =>
-                    <ValidatedForm initialValue={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
+                    <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                       <TextField id="name" label="Volume Name" onChange={this.setField('name')} />
                       <TextField id="description" label="Description" />
                       <PicklistField id="volumeType" label="Volume Type" options={(data || []).map(x => x.name)} showNone />
@@ -117,7 +117,7 @@ class AddVolumeForm extends React.Component {
               </WizardStep>
 
               <WizardStep stepId="metadata" label="Metadata">
-                <ValidatedForm initialValue={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
+                <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                   <KeyValuesField id="metadata" label="Metadata" />
                 </ValidatedForm>
               </WizardStep>

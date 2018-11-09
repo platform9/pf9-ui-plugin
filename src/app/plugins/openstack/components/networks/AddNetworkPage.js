@@ -1,9 +1,9 @@
 import React from 'react'
 import createAddComponents from 'core/createAddComponents'
 import SubmitButton from 'core/common/SubmitButton'
-import ValidatedForm from 'core/common/ValidatedForm'
-import Checkbox from 'core/common/Checkbox'
-import TextField from 'core/common/TextField'
+import ValidatedForm from 'core/common/validated_form/ValidatedForm'
+import Checkbox from 'core/common/validated_form/Checkbox'
+import TextField from 'core/common/validated_form/TextField'
 import { createNetwork, loadNetworks } from './actions'
 
 const initialValue = {
@@ -18,7 +18,7 @@ const initialValue = {
 }
 
 export const AddNetworkForm = ({ onComplete }) => (
-  <ValidatedForm onSubmit={onComplete} initialValue={initialValue}>
+  <ValidatedForm onSubmit={onComplete} initialValues={initialValue}>
     <TextField id="name" label="Name" />
     <TextField id="subnets" label="Subnets Associated" />
     <TextField id="tenant" label="Tenant" />

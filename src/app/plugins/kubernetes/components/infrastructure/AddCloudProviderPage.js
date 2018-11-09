@@ -1,11 +1,11 @@
 import React from 'react'
 import Alert from 'core/common/Alert'
-import ValidatedForm from 'core/common/ValidatedForm'
-import PicklistField from 'core/common/PicklistField'
+import ValidatedForm from 'core/common/validated_form/ValidatedForm'
+import PicklistField from 'core/common/validated_form/PicklistField'
 import SubmitButton from 'core/common/SubmitButton'
-import TextField from 'core/common/TextField'
+import TextField from 'core/common/validated_form/TextField'
 import createAddComponents from 'core/createAddComponents'
-import { loadCloudProviders, createCloudProvider } from './actions'
+import { createCloudProvider, loadCloudProviders } from './actions'
 
 const types = [
   { value: 'openstack', label: 'Openstack' },

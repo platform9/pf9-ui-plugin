@@ -1,12 +1,12 @@
 import React from 'react'
 import SubmitButton from 'core/common/SubmitButton'
-import ValidatedForm from 'core/common/ValidatedForm'
-import TextField from 'core/common/TextField'
-import KeyValuesField from 'core/common/KeyValuesField'
+import ValidatedForm from 'core/common/validated_form/ValidatedForm'
+import TextField from 'core/common/validated_form/TextField'
+import KeyValuesField from 'core/common/validated_form/KeyValuesField'
 
 const UpdateVolumeTypeForm = ({ volumeType, onSubmit }) =>
   <ValidatedForm
-    initialValue={volumeType}
+    initialValues={volumeType}
     backUrl="/ui/openstack/storage#volumeTypes"
     onSubmit={onSubmit}
   >

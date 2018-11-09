@@ -1,12 +1,12 @@
 import React from 'react'
 import { Button } from '@material-ui/core'
-import ValidatedForm from 'core/common/ValidatedForm'
-import TextField from 'core/common/TextField'
-import KeyValuesField from 'core/common/KeyValuesField'
+import ValidatedForm from 'core/common/validated_form/ValidatedForm'
+import TextField from 'core/common/validated_form/TextField'
+import KeyValuesField from 'core/common/validated_form/KeyValuesField'
 
 const UpdateVolumeSnapshotForm = ({ volumeSnapshot, onSubmit }) =>
   <ValidatedForm
-    initialValue={volumeSnapshot}
+    initialValues={volumeSnapshot}
     backUrl="/ui/openstack/storage#volumeSnapshots"
     onSubmit={onSubmit}
   >

@@ -1,9 +1,9 @@
 import React from 'react'
 import createUpdateComponents from 'core/createUpdateComponents'
 import SubmitButton from 'core/common/SubmitButton'
-import ValidatedForm from 'core/common/ValidatedForm'
-import TextField from 'core/common/TextField'
-import { updateCloudProvider, loadCloudProviders } from './actions'
+import ValidatedForm from 'core/common/validated_form/ValidatedForm'
+import TextField from 'core/common/validated_form/TextField'
+import { loadCloudProviders, updateCloudProvider } from './actions'
 
 const AWSFields = () => (
   <React.Fragment>
@@ -20,7 +20,7 @@ const OpenstackFields = () => (
 )
 
 export const UpdateCloudProviderForm = ({ onComplete, initialValue }) => (
-  <ValidatedForm onSubmit={onComplete} initialValue={initialValue}>
+  <ValidatedForm onSubmit={onComplete} initialValues={initialValue}>
     <TextField id="name" label="Name" />
     {initialValue.type === 'aws' && <AWSFields />}
     {initialValue.type === 'openstack' && <OpenstackFields />}

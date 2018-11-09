@@ -1,12 +1,12 @@
 import React from 'react'
 import { Button } from '@material-ui/core'
-import ValidatedForm from 'core/common/ValidatedForm'
-import TextField from 'core/common/TextField'
-import Checkbox from 'core/common/Checkbox'
+import ValidatedForm from 'core/common/validated_form/ValidatedForm'
+import TextField from 'core/common/validated_form/TextField'
+import Checkbox from 'core/common/validated_form/Checkbox'
 
 const UpdateImageForm = ({ image, onSubmit }) =>
   <ValidatedForm
-    initialValue={image}
+    initialValues={image}
     backUrl="/ui/openstack/images"
     onSubmit={onSubmit}
   >
