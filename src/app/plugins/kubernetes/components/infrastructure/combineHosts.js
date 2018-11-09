@@ -1,13 +1,11 @@
 import moment from 'moment'
-import { pathOr } from 'ramda'
-import { pipe } from 'core/fp'
-
-const pathOrNull = pathStr => pathOr(null, pathStr.split('.'))
+import { pipe, pathOrNull } from 'core/fp'
 
 export const annotateResmgrFields = host => {
   const { resmgr } = host
   return {
     ...host,
+    id: resmgr.id,
     roles: resmgr.roles || [],
     roleStatus: resmgr.role_status,
     roleData: {},
@@ -68,12 +66,51 @@ export const annotateUiState = host => {
   if (credentials === 'invalid') { host.uiState = 'invalid' }
   if (roleStatus === 'failed') { host.uiState = 'error' }
 
-  return host
+  return { ...host }
 }
 
 export const annotateNovaFields = host => {
   // TODO: add nova specific logic in here
-  return host
+  return { ...host }
+}
+
+export const calcResourceUtilization = host => {
+  const usage = pathOrNull('resmgr.extensions.resource_usage.data')(host)
+  if (!usage) return { ...host }
+  const { cpu, memory, disk } = usage
+
+  const K = 1000
+  const M = 1000 * K
+  const G = 1000 * M
+  const Ki = 1024
+  const Mi = 1024 * Ki
+  const Gi = 1024 * Mi
+
+  const stats = {
+    compute: {
+      current: cpu.used / G,
+      max: cpu.total / G,
+      units: 'GHz',
+      type: 'used',
+    },
+    memory: {
+      current: (memory.total - memory.available) / Gi,
+      max: memory.total / Gi,
+      units: 'GB',
+      type: 'used',
+    },
+    disk: {
+      current: disk.used / Gi,
+      max: disk.total / Gi,
+      units: 'GB',
+      type: 'used',
+    }
+  }
+
+  return {
+    ...host,
+    usage: stats,
+  }
 }
 
 export const combineHost =
@@ -81,4 +118,5 @@ export const combineHost =
     annotateResmgrFields,
     annotateUiState,
     annotateNovaFields,
+    calcResourceUtilization,
   )

@@ -1,3 +1,5 @@
+import { pathOr } from 'ramda'
+
 // functional programming helpers
 
 export const pluck = key => obj => obj[key]
@@ -103,3 +105,5 @@ export const emptyObj = Object.freeze({})
 
 // Utility array to prevent instantiation of new arrays on render methods
 export const emptyArr = Object.freeze([])
+
+export const pathOrNull = pathStr => pathOr(null, pathStr.split('.'))

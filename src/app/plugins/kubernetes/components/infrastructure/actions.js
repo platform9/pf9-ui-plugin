@@ -1,4 +1,4 @@
-import { asyncMap, asyncFlatMap, tap } from 'core/fp'
+import { asyncMap, asyncFlatMap, tap, pathOrNull } from 'core/fp'
 import { combineHost } from './combineHosts'
 
 export const loadClusters = async ({ context, setContext, reload }) => {
@@ -115,17 +115,25 @@ export const loadInfrastructure = async ({ context, setContext, reload }) => {
       ),
       // TODO: include nova hosts here as well
     ])
+
     // Convert it back to array form
-    const combinedHosts = Object.keys(hostsById).reduce(
-      (accum, hostId) => {
-        accum.push(hostsById[hostId])
+    const combinedHosts = Object.values(hostsById).map(combineHost)
+    const combinedHostsObj = combinedHosts.reduce(
+      (accum, host) => {
+        const id = pathOrNull('resmgr.id')(host) || pathOrNull('qbert.uuid')(host)
+        accum[id] = host
         return accum
       },
-      []
-    ).map(combineHost)
+      {}
+    )
+
     setContext({ combinedHosts })
 
-    return { nodes, clusters, namespaces: [] }
+    // associate nodes with the combinedHost entry
+    const nodesCombined = nodes.map(node => ({ ...node, combined: combinedHostsObj[node.uuid] }))
+    setContext({ nodes: nodesCombined })
+
+    return { nodes: nodesCombined, clusters, namespaces: [] }
   }
 
   return {
