@@ -8,6 +8,7 @@ import {
   FormHelperText
 } from '@material-ui/core'
 import withFormContext, { ValidatedFormInputPropTypes } from 'core/common/validated_form/withFormContext'
+import { compose } from 'core/fp'
 
 const styles = theme => ({
   formControl: {
@@ -15,17 +16,7 @@ const styles = theme => ({
   }
 })
 
-@withFormContext
-@withStyles(styles)
-export default class Checkbox extends React.Component {
-  static propTypes = {
-    id: PropTypes.string.isRequired,
-    info: PropTypes.string,
-    label: PropTypes.string,
-    onChange: PropTypes.func,
-    ...ValidatedFormInputPropTypes,
-  }
-
+class Checkbox extends React.Component {
   handleChange = e => {
     const { onChange } = this.props
     if (onChange) {
@@ -54,3 +45,16 @@ export default class Checkbox extends React.Component {
     )
   }
 }
+
+Checkbox.propTypes = {
+  id: PropTypes.string.isRequired,
+  info: PropTypes.string,
+  label: PropTypes.string,
+  onChange: PropTypes.func,
+  ...ValidatedFormInputPropTypes,
+}
+
+export default compose(
+  withFormContext,
+  withStyles(styles),
+)(Checkbox)

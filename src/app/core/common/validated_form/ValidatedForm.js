@@ -44,24 +44,12 @@ const styles = theme => ({
  */
 @withRouter
 @withStyles(styles)
-export default class ValidatedForm extends React.Component {
+class ValidatedForm extends React.Component {
   constructor (props) {
     super(props)
     if (props.triggerSubmit) {
       props.triggerSubmit(this.handleSubmit)
     }
-  }
-
-  static propTypes = {
-    // Initial values
-    initialValues: PropTypes.object,
-
-    // Set parent context
-    onSubmit: PropTypes.func,
-
-    triggerSubmit: PropTypes.func,
-
-    showErrorsOnBlur: PropTypes.bool
   }
 
   /**
@@ -201,3 +189,17 @@ export default class ValidatedForm extends React.Component {
     )
   }
 }
+
+ValidatedForm.propTypes = {
+  // Initial values
+  initialValues: PropTypes.object,
+
+  // Set parent context
+  onSubmit: PropTypes.func,
+
+  triggerSubmit: PropTypes.func,
+
+  showErrorsOnBlur: PropTypes.bool
+}
+
+export default ValidatedForm

@@ -16,8 +16,6 @@ export const ValidatedFormInputPropTypes = {
  * the ValidatedForm such as validations and text hints on hover
  */
 class ValidatedFormInput extends Component {
-  static propTypes = ValidatedFormInputPropTypes
-
   static defaultProps = {
     validations: [],
     required: false
@@ -78,6 +76,8 @@ class ValidatedFormInput extends Component {
     })
   }
 }
+
+ValidatedFormInput.propTypes = ValidatedFormInputPropTypes
 
 /**
  * withFormContext provides access to the form context through props.

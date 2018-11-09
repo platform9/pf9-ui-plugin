@@ -7,6 +7,7 @@ import {
   TextField as BaseTextField
 } from '@material-ui/core'
 import withFormContext, { ValidatedFormInputPropTypes } from 'core/common/validated_form/withFormContext'
+import { compose } from 'core/fp'
 
 const styles = theme => ({
   formControl: {
@@ -14,17 +15,7 @@ const styles = theme => ({
   }
 })
 
-@withStyles(styles)
-@withFormContext
-export default class TextField extends React.Component {
-  static propTypes = {
-    id: PropTypes.string.isRequired,
-    label: PropTypes.string,
-    initialValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    onChange: PropTypes.func,
-    ...ValidatedFormInputPropTypes
-  }
-
+class TextField extends React.Component {
   handleChange = e => {
     const { onChange, type } = this.props
     // HTML specs says that <input type="number"> return strings but it's more useful if we
@@ -55,3 +46,16 @@ export default class TextField extends React.Component {
     )
   }
 }
+
+TextField.propTypes = {
+  id: PropTypes.string.isRequired,
+  label: PropTypes.string,
+  initialValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  onChange: PropTypes.func,
+  ...ValidatedFormInputPropTypes
+}
+
+export default compose(
+  withFormContext,
+  withStyles(styles),
+)(TextField)

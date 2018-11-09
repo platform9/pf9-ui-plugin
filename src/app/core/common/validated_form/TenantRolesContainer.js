@@ -8,13 +8,9 @@ import {
 } from '@material-ui/core'
 import TenantRoleSelector from 'core/common/TenantRoleSelector'
 import withFormContext, { ValidatedFormInputPropTypes } from 'core/common/validated_form/withFormContext'
+import { compose } from 'core/fp'
 
-@withFormContext
-export default class TenantRolesContainer extends React.Component {
-  static propTypes = {
-    ...ValidatedFormInputPropTypes,
-  }
-
+class TenantRolesContainer extends React.Component {
   static defaultProps = {
     tenants: []
   }
@@ -76,3 +72,11 @@ export default class TenantRolesContainer extends React.Component {
     )
   }
 }
+
+TenantRolesContainer.propTypes = {
+  ...ValidatedFormInputPropTypes,
+}
+
+export default compose(
+  withFormContext
+)(TenantRolesContainer)
