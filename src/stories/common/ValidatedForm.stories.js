@@ -45,17 +45,17 @@ const renderForm = (props = {}) => () => (
     />
     <TextField
       id="description"
-      info="Lorem ipsum dolor sit amet consectetur adipiscing elit purus dignissim, nam ornare tellus class natoque nullam fames nec, in sed fermentum odio curae inceptos enim etiam. A cubilia lectus penatibus scelerisque et neque leo vestibulum, morbi hendrerit at ultricies erat fames est magna pellentesque, duis gravida donec dictumst sociis tortor tempor. Magna ac id vitae gravida dictumst non quis fusce, ornare sodales enim porttitor erat tellus convallis, proin fermentum mattis facilisi mauris fames dui."
+      info="Lorem ipsum dolor sit amet consectetur adipiscing elit purus dignissim, nam ornare tellus class natoque nullam fames nec, in sed fermentum odio curae inceptos enim etiam. "
       placeholder="Description"
       validations={[
         customValidator(
           value => /[0-9]+/.test(value),
           (value, formFields, fieldKey) =>
             `This is a custom validator that fails when text does not contain a number.` +
-          `The current value of field '${fieldKey}' is ${value}.` +
-          `From here we have access to other form fields as well, like 'name' with value ${
-            formFields['name']
-          }`
+            `The current value of field '${fieldKey}' is ${value}.` +
+            `From here we have access to other form fields as well, like 'name' with value ${
+              formFields['name']
+            }`
         )
       ]}
     />

@@ -8,6 +8,7 @@ import {
 } from '@material-ui/core'
 import withFormContext, { ValidatedFormInputPropTypes } from 'core/common/validated_form/withFormContext'
 import { compose } from 'core/fp'
+import { withInfoTooltip } from 'app/core/common/InfoTooltip'
 
 const styles = theme => ({
   formControl: {
@@ -50,6 +51,7 @@ class TextField extends React.Component {
 TextField.propTypes = {
   id: PropTypes.string.isRequired,
   label: PropTypes.string,
+  info: PropTypes.string,
   initialValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   onChange: PropTypes.func,
   ...ValidatedFormInputPropTypes
@@ -57,5 +59,6 @@ TextField.propTypes = {
 
 export default compose(
   withFormContext,
+  withInfoTooltip,
   withStyles(styles),
 )(TextField)

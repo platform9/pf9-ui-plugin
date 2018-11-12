@@ -9,6 +9,7 @@ import {
 } from '@material-ui/core'
 import withFormContext, { ValidatedFormInputPropTypes } from 'core/common/validated_form/withFormContext'
 import { compose } from 'core/fp'
+import { withInfoTooltip } from 'app/core/common/InfoTooltip'
 
 const styles = theme => ({
   formControl: {
@@ -57,4 +58,5 @@ Checkbox.propTypes = {
 export default compose(
   withFormContext,
   withStyles(styles),
+  withInfoTooltip,
 )(Checkbox)

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import KeyValues from 'core/common/KeyValues'
 import withFormContext, { ValidatedFormInputPropTypes } from 'core/common/validated_form/withFormContext'
 import { compose } from 'core/fp'
+import { withInfoTooltip } from 'app/core/common/InfoTooltip'
 
 class KeyValuesField extends React.Component {
   render () {
@@ -27,5 +28,6 @@ KeyValuesField.propTypes = {
 }
 
 export default compose(
-  withFormContext
+  withFormContext,
+  withInfoTooltip,
 )(KeyValuesField)

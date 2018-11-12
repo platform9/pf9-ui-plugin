@@ -9,6 +9,7 @@ import {
 import TenantRoleSelector from 'core/common/TenantRoleSelector'
 import withFormContext, { ValidatedFormInputPropTypes } from 'core/common/validated_form/withFormContext'
 import { compose } from 'core/fp'
+import { withInfoTooltip } from 'app/core/common/InfoTooltip'
 
 class TenantRolesContainer extends React.Component {
   static defaultProps = {
@@ -78,5 +79,6 @@ TenantRolesContainer.propTypes = {
 }
 
 export default compose(
-  withFormContext
+  withFormContext,
+  withInfoTooltip,
 )(TenantRolesContainer)

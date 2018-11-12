@@ -5,7 +5,6 @@ import { withRouter } from 'react-router-dom'
 import { pathEq, toPairs } from 'ramda'
 import { parseValidator } from 'core/FieldValidator'
 import { withStyles } from '@material-ui/core/styles'
-import Icon from '@material-ui/core/Icon/Icon'
 
 const ValidatedFormContext = React.createContext({})
 
@@ -27,15 +26,6 @@ const styles = theme => ({
   formControl: {
     margin: theme.spacing.unit
   },
-  info: {
-    width: '40%',
-    display: 'flex',
-    flexFlow: 'row nowrap'
-  },
-  infoIcon: {
-    fontSize: 'x-large',
-    paddingRight: '0.5rem'
-  }
 })
 
 /**
@@ -117,12 +107,6 @@ class ValidatedForm extends React.Component {
     }
   }
 
-  setCurrentInfo = currentInfo =>
-    this.setState(prevState => ({
-      ...prevState,
-      currentInfo
-    }))
-
   state = {
     initialValues: this.props.initialValues || {},
     values: {},
@@ -131,10 +115,8 @@ class ValidatedForm extends React.Component {
     setFieldValue: this.setFieldValue,
     defineField: this.defineField,
     validateField: this.validateField,
-    currentInfo: '',
     showingErrors: false,
     showErrorsOnBlur: this.props.showErrorsOnBlur,
-    showInfo: this.setCurrentInfo
   }
 
   validateForm = () => {
@@ -162,21 +144,6 @@ class ValidatedForm extends React.Component {
     }
   }
 
-  renderInfo () {
-    const { classes } = this.props
-    const { currentInfo } = this.state
-    return (
-      currentInfo && (
-        <div className={classes.info}>
-          <Icon className={classes.infoIcon} color="primary">
-            info
-          </Icon>
-          {currentInfo}
-        </div>
-      )
-    )
-  }
-
   render () {
     const { classes } = this.props
     return (
@@ -184,7 +151,6 @@ class ValidatedForm extends React.Component {
         <div className={classes.inputs}>
           <ValidatedFormProvider value={this.state}>{this.props.children}</ValidatedFormProvider>
         </div>
-        {this.renderInfo()}
       </form>
     )
   }
@@ -199,7 +165,7 @@ ValidatedForm.propTypes = {
 
   triggerSubmit: PropTypes.func,
 
-  showErrorsOnBlur: PropTypes.bool
+  showErrorsOnBlur: PropTypes.bool,
 }
 
 export default ValidatedForm

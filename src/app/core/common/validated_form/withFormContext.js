@@ -23,7 +23,7 @@ class ValidatedFormInput extends Component {
 
   constructor (props) {
     super(props)
-    const spec = pickMultiple('validations', 'info')(props)
+    const spec = pickMultiple('validations')(props)
 
     if (props.required) {
       spec.validations = Array.isArray(props.validations)
@@ -58,20 +58,9 @@ class ValidatedFormInput extends Component {
     }
   }
 
-  handleOnMouseEnter = e => {
-    if (this.props.info) {
-      this.props.showInfo(this.props.info)
-    }
-    // Leverage the event to the wrapped input
-    if (this.props.onMouseEnter) {
-      this.props.onMouseEnter(e)
-    }
-  }
-
   render () {
     return this.props.children({
       onChange: this.handleChange,
-      onMouseEnter: this.handleOnMouseEnter,
       onBlur: this.handleBlur
     })
   }
@@ -89,7 +78,7 @@ ValidatedFormInput.propTypes = ValidatedFormInputPropTypes
  *
  * @param {Inject the form context into this Component through props.} Input
  */
-const withFormContext = Input => ({ id, info, required, validations, ...rest }) => (
+const withFormContext = Input => ({ id, required, validations, ...rest }) => (
   <ValidatedFormConsumer>
     {({
       initialValues,
@@ -99,16 +88,13 @@ const withFormContext = Input => ({ id, info, required, validations, ...rest }) 
       showErrorsOnBlur,
       validateField,
       errors,
-      showInfo
     }) => (
       <ValidatedFormInput
         id={id}
-        info={info}
         defineField={partial(defineField, [id])}
         setFieldValue={partial(setFieldValue, [id])}
         validateField={partial(validateField, [id])}
         showErrorsOnBlur={showErrorsOnBlur}
-        showInfo={showInfo}
         initialValue={initialValues[id]}
         required={required}
         validations={validations}
