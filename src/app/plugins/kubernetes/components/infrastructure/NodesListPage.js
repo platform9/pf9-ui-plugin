@@ -31,7 +31,6 @@ export const options = {
   name: 'Nodes',
   title: 'Nodes',
   uniqueIdentifier: 'uuid',
-  debug: true,
 }
 
 const { ListPage, List } = createCRUDComponents(options)

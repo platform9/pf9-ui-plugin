@@ -1,9 +1,11 @@
 import openstack from './openstack'
 import kubernetes from './kubernetes'
+import developer from './developer'
 
 const plugins = [
   openstack,
-  kubernetes
+  kubernetes,
+  developer,
 ]
 
 export default plugins

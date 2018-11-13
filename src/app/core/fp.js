@@ -1,4 +1,4 @@
-import { pathOr } from 'ramda'
+import { curry, pathOr } from 'ramda'
 
 // functional programming helpers
 
@@ -107,3 +107,32 @@ export const emptyObj = Object.freeze({})
 export const emptyArr = Object.freeze([])
 
 export const pathOrNull = pathStr => pathOr(null, pathStr.split('.'))
+
+// I didn't see anything in Ramda that would allow me to create a "Maybe"
+// composition so creating a simple version here.
+// With long chains of functions it can get annoying to make sure each one
+// contains a valid value before continuing.  This HOF performs a pipe but
+// only when each function returns something truthy.
+export const pipeWhenTruthy = (...fns) => arg => {
+  if (!isTruthy(arg)) { return null }
+  const [head, ...tail] = fns
+  if (!head) { return arg }
+  const result = head(arg)
+  if (tail.length > 0) {
+    if (!isTruthy(result)) { return null }
+    return pipeWhenTruthy(...tail)(result)
+  }
+  return result
+}
+
+// Converts an array of items to a map/dictionary/assocArray form.
+// Useful when an array needs to be indexed by a key from each of the itmes.
+export const arrToObjByKey = curry((key, arr) =>
+  arr.reduce(
+    (accum, item) => {
+      accum[item[key]] = item
+      return accum
+    },
+    {}
+  )
+)

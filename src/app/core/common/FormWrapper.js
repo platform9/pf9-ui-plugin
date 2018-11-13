@@ -20,17 +20,13 @@ const styles = theme => ({
 
 @withStyles(styles)
 class FormWrapper extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      title: this.props.title,
-      backUrl: this.props.backUrl
-    }
-  }
-
   render () {
-    const { title, backUrl } = this.state
-    const { children, classes } = this.props
+    const {
+      backUrl,
+      children,
+      classes,
+      title,
+    } = this.props
     return (
       <Grid container justify="center">
         <Grid item xs={11}>
@@ -44,15 +40,17 @@ class FormWrapper extends React.Component {
                   {title}
                 </Typography>
               </Grid>
-              <Grid item>
-                <Button
-                  variant="outlined"
-                  component={Link}
-                  to={backUrl}
-                >
-                  &larr;&nbsp;Back to list
-                </Button>
-              </Grid>
+              {backUrl &&
+                <Grid item>
+                  <Button
+                    variant="outlined"
+                    component={Link}
+                    to={backUrl}
+                  >
+                    &larr;&nbsp;Back to list
+                  </Button>
+                </Grid>
+              }
             </Grid>
             <Divider className={classes.divider} />
             {children}

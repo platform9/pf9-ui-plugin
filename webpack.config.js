@@ -75,11 +75,11 @@ module.exports = {
     alias: {
       app: path.resolve(__dirname, 'src/app'),
       core: path.resolve(__dirname, 'src/app/core'),
-      util: path.resolve(__dirname, 'src/app/util'),
-      openstack: path.resolve(__dirname, 'src/app/plugins/openstack'),
+      developer: path.resolve(__dirname, 'src/app/plugins/developer'),
       k8s: path.resolve(__dirname, 'src/app/plugins/kubernetes'),
-      sim: path.resolve(__dirname, 'src/openstack-simulator'),
-      schema: path.resolve(__dirname, 'src/graphql'),
+      openstack: path.resolve(__dirname, 'src/app/plugins/openstack'),
+      server: path.resolve(__dirname, 'src/server'),
+      util: path.resolve(__dirname, 'src/app/util'),
       'api-client': path.resolve(__dirname, 'src/api-client'),
     },
   }

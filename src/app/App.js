@@ -15,7 +15,8 @@ import { setupFromConfig } from './util/registry'
 import config from '../../config'
 import AppContext from 'core/AppContext'
 import ApiClient from '../api-client'
-import SessionManager from './plugins/openstack/components/SessionManager'
+import SessionManager from 'openstack/components/SessionManager'
+import DeveloperToolsEmbed from 'developer/components/DeveloperToolsEmbed'
 
 setupFromConfig(config)
 window.process = process
@@ -55,6 +56,7 @@ class App extends React.Component {
                     <Route path="/ui/logout" exact component={LogoutPage} />
                     <Redirect to={pluginManager.getDefaultRoute()} />
                   </Switch>
+                  <DeveloperToolsEmbed />
                   {showFooter && renderFooter()}
                 </Navbar>
               </SessionManager>

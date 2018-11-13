@@ -6,6 +6,7 @@ import {
   pick,
   pickMultiple,
   pipe,
+  pipeWhenTruthy,
   pluck,
   pluckAsync,
 } from '../fp'
@@ -61,5 +62,15 @@ describe('functional programming utils', () => {
 
   it('filterFields', () => {
     expect(filterFields('b', 'a')(srcObj)).toEqual({ c: 3 })
+  })
+
+  it('pipeWhenTruthy', () => {
+    const first = () => 'first'
+    const second = () => 'second'
+    const third = () => null
+    const fourth = () => 'fourth'
+
+    expect(pipeWhenTruthy(first, second, third, fourth)('start')).toEqual(null)
+    expect(pipeWhenTruthy(first, second)(true)).toEqual('second')
   })
 })

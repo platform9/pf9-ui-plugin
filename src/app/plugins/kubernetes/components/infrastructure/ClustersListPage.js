@@ -9,6 +9,10 @@ export const options = {
     { id: 'deployment_type', label: 'Deployment Type' },
     { id: 'resource_utilization', label: 'Resource Utilization' },
     { id: 'version', label: 'Kubernetes version' },
+    /*
+    // TODO:
+    //  Something in this list is causing errors after loadInfrastructure loads.
+    //  Disabling these fields until we do more work on clusters.
     { id: 'network_backend', label: 'Network backend' },
     { id: 'containers_cidr', label: 'Containers CIDR' },
     { id: 'services_cidr', label: 'Services CIDR' },
@@ -17,6 +21,7 @@ export const options = {
     { id: 'nodes', label: 'Nodes' },
     { id: 'master_workloads', label: 'Master Workloads' },
     { id: 'privileged', label: 'Privileged' },
+    */
 
     // TODO: We probably want to write a metadata renderer for this kind of format
     // since we use it in a few places for tags / metadata.
@@ -33,7 +38,6 @@ export const options = {
     // TODO: attach nodes
     // TODO: detach nodes
   ],
-  debug: true,
 }
 
 const { ListPage, List } = createCRUDComponents(options)
