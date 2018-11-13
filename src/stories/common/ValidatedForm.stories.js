@@ -29,6 +29,7 @@ const renderForm = (props = {}) => () => (
       placeholder="Password"
       label="Password"
       info="Set the password"
+      type="password"
       validations={{
         required: true,
         minLength: [4]
@@ -38,6 +39,7 @@ const renderForm = (props = {}) => () => (
       id="password_repeat"
       placeholder="Repeat password"
       label="Repeat password"
+      type="password"
       validations={[
         requiredValidator,
         matchFieldValidator('password').withMessage('Passwords do not match')

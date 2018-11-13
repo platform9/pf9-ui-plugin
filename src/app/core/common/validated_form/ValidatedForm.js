@@ -19,12 +19,13 @@ const styles = theme => ({
   },
   inputs: {
     display: 'flex',
-    flexFlow: 'column nowrap',
-    width: '60%',
-    paddingRight: '2rem'
+    flexFlow: 'column wrap',
+    paddingRight: '2rem',
+    width: '100%',
+    maxWidth: '400px',
   },
   formControl: {
-    margin: theme.spacing.unit
+    margin: theme.spacing.unit,
   },
 })
 
@@ -82,6 +83,9 @@ class ValidatedForm extends React.Component {
     this.setState(setStateLens({ hasError: false }, ['errors', field]))
   }
 
+  /**
+   *  Validate the field and return false on error, true otherwise
+   */
   validateField = field => {
     const { fields, values } = this.state
     const fieldValue = values[field]
@@ -102,9 +106,10 @@ class ValidatedForm extends React.Component {
           ? failedValidation.errorMessage(fieldValue, values, field)
           : failedValidation.errorMessage
       )
-    } else {
-      this.clearFieldErrors(field)
+      return false
     }
+    this.clearFieldErrors(field)
+    return true
   }
 
   state = {
@@ -119,12 +124,15 @@ class ValidatedForm extends React.Component {
     showErrorsOnBlur: this.props.showErrorsOnBlur,
   }
 
+  /**
+   * Validate all fields and return false if any error is found, true otherwise
+   */
   validateForm = () => {
     const { fields } = this.state
     const results = Object.keys(fields).map(field =>
       this.validateField(field)
     )
-    return results.includes(true)
+    return !results.includes(false)
   }
 
   handleSubmit = event => {
@@ -134,8 +142,10 @@ class ValidatedForm extends React.Component {
       event.preventDefault()
     }
 
-    if (!this.validateForm() && !showingErrors) {
-      this.setState(prevState => ({ ...prevState, showingErrors: true }))
+    if (!this.validateForm()) {
+      if (!showingErrors) {
+        this.setState(prevState => ({ ...prevState, showingErrors: true }))
+      }
       return
     }
 

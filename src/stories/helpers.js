@@ -5,11 +5,10 @@ import { withInfo } from '@storybook/addon-info'
 import { withKnobs } from '@storybook/addon-knobs'
 import StoryRouter from 'storybook-react-router'
 import { compose } from 'core/fp'
-import { withAppContext } from 'core/AppContext'
+import AppContext, { withAppContext } from 'core/AppContext'
 import { withTheme } from 'app/theme'
 
 import 'app/app.css'
-import AppContext from 'app/core/AppContext'
 
 const objToJsonDetails = obj => JSON.stringify(obj, null, 4)
 const isArray = x => x instanceof Array
