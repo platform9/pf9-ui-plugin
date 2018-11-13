@@ -40,6 +40,8 @@ class ApiHelper extends React.Component {
   }
 
   componentDidMount () {
+    // TODO: Save the last developer API call in the AppContext to save
+    // repetition.
     /*
     this.performApiCall({
       method: 'GET',
@@ -219,11 +221,25 @@ class ApiHelper extends React.Component {
         .filter(field => !!formMappings[field].selected)
         .map(field => ({ id: field, label: field }))
     if (!columns || columns.length === 0) { return null }
+    const determineType = key => {
+      const datum = lensResult[key]
+      if (Number.isInteger(datum)) { return 'number' }
+      if (datum === true || datum === false) { return 'boolean' }
+      return 'string'
+    }
     const fields = columns.map(x => ({ key: x.id, type: 'string' }))
     if (!fields || fields.length === 0) { return null }
+    const initialValue = Object.keys(formMappings).reduce(
+      (accum, key) => {
+        accum[key] = lensResult[key]
+        return accum
+      },
+      {}
+    )
     const Form = createFormComponent({
       submitLabel: 'submit mock form field',
-      fields: columns.map(x => ({ id: x.id, key: x.id, label: x.id, type: 'string' }))
+      initialValue,
+      fields: columns.map(x => ({ id: x.id, key: x.id, label: x.id, type: determineType(x.id) }))
     })
     return (
       <div>

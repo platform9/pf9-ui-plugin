@@ -2,6 +2,7 @@ import React from 'react'
 import SubmitButton from 'core/common/SubmitButton'
 import ValidatedForm from 'core/common/validated_form/ValidatedForm'
 import TextField from 'core/common/validated_form/TextField'
+import Checkbox from 'core/common/validated_form/Checkbox'
 
 const createFormComponent = ({ submitLabel, initialValue, displayName, fields }) => {
   const mapField = spec => {
@@ -11,6 +12,7 @@ const createFormComponent = ({ submitLabel, initialValue, displayName, fields })
       type: spec.type || 'string',
     }
     if (props.type === 'string' || props.type === 'number') { return <TextField {...props} /> }
+    if (props.type === 'boolean') { return <Checkbox {...props} /> }
   }
 
   const Form = ({ onComplete }) => (
