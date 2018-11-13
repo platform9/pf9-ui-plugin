@@ -21,7 +21,7 @@ const styles = theme => ({
   }
 })
 
-class ApiViewer extends React.Component {
+class ApiHelper extends React.Component {
   state = {
     baseUrl: '',
     body: {},
@@ -60,7 +60,7 @@ class ApiViewer extends React.Component {
     if (!response) { return null }
     return (
       <div>
-        <Typography variant="subheading">Response</Typography>
+        <Typography variant="subtitle1">Response</Typography>
         <br />
         <JsonView src={response} collapsed={1} />
       </div>
@@ -84,7 +84,7 @@ class ApiViewer extends React.Component {
           <div className={classes.root}>
             <ValidatedForm
               onSubmit={this.performApiCall}
-              classes={classes.root}
+              className={classes.root}
               initialValue={initialValue}
             >
               <ServicePicker value={service} onChange={this.handleServiceChange} />
@@ -118,4 +118,4 @@ class ApiViewer extends React.Component {
 export default compose(
   withAppContext,
   withStyles(styles),
-)(ApiViewer)
+)(ApiHelper)

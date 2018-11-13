@@ -13,7 +13,7 @@ const SubmitButton = ({ classes, children }) => (
   <Button
     className={classes.root}
     type="submit"
-    variant="raised"
+    variant="contained"
   >
     {children}
   </Button>

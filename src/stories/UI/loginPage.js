@@ -125,7 +125,7 @@ class LoginPage extends React.Component {
             <Paper className={classes.paper}>
               <img src="https://hostadvice.com/wp-content/uploads/2017/07/Platform9-LogoStacked-777x352.png" className={classes.img} />
               <form className={classes.form}>
-                <Typography variant="subheading" align="center">
+                <Typography variant="subtitle1" align="center">
                   Please sign in
                 </Typography>
                 {this.renderInputfield()}

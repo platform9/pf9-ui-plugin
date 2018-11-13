@@ -49,7 +49,7 @@ class ProgressCard extends React.Component {
         <Card>
           <CardContent className={classes.title}>
             <Typography
-              variant="title"
+              variant="h6"
               align="center"
               className={classes.title}
             >
@@ -66,14 +66,14 @@ class ProgressCard extends React.Component {
               />
               <Typography
                 className={classes.percentage}
-                variant="headline"
+                variant="h5"
               >
                 {completed}%
               </Typography>
             </div>
             <div className={classes.description}>
               <Typography
-                variant="subheading"
+                variant="subtitle1"
                 align="center"
                 noWrap
               >

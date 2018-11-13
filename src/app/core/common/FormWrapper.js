@@ -34,7 +34,7 @@ class FormWrapper extends React.Component {
             <Grid container justify="space-between">
               <Grid item>
                 <Typography
-                  variant="display2"
+                  variant="h3"
                   className={classes.title}
                 >
                   {title}

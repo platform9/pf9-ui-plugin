@@ -110,7 +110,7 @@ class ApplicationCard extends React.Component {
       <Grid item sm={6} md={4} lg={4}>
         <Card className={classes.card}>
           <CardContent>
-            <Typography variant="headline" paragraph>{application.name}</Typography>
+            <Typography variant="h5" paragraph>{application.name}</Typography>
             <CardMedia
               className={classes.icon}
               image={rootPath+'images/image_catalog/icon-ubuntu.png'}
@@ -119,8 +119,8 @@ class ApplicationCard extends React.Component {
             <div className={classes.info}>
               {application.description}
             </div>
-            <Typography variant="body2" className={classes.text}>Tenant:</Typography>
-            <Typography variant="body1" className={classes.rightText}>{application.tenant}</Typography>
+            <Typography variant="body1" className={classes.text}>Tenant:</Typography>
+            <Typography variant="body2" className={classes.rightText}>{application.tenant}</Typography>
           </CardContent>
           <div className={classes.ActionContainer} align="center">
             <Button onClick={this.handleAddToEnv}>

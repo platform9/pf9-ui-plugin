@@ -66,7 +66,7 @@ class DeveloperToolsEmbed extends React.Component {
     return (
       <div className={classes.root}>
         {false && <Button onClick={this.collapse}>collapse devtools</Button>}
-        <Typography variant="subheading">Developer Tools</Typography>
+        <Typography variant="subtitle1">Developer Tools</Typography>
         <Panel title="Context Viewer">
           <ContextViewer />
         </Panel>

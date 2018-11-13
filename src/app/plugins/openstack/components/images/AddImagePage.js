@@ -62,7 +62,7 @@ class AddImagePage extends React.Component {
         <Typography>
           We support two ways to import images into your Image Catalog:
         </Typography>
-        <Typography variant="title"> Manual Import </Typography>
+        <Typography variant="h6"> Manual Import </Typography>
         <Typography>
           The easiest way to populate your Image Catalog is by copying images into the image library watch folder on the host assigned with the Image Library role.
           <br />
@@ -91,7 +91,7 @@ class AddImagePage extends React.Component {
     const { classes } = this.props
     return (
       <Fragment>
-        <Typography variant="title">Using OpenStack Glance Client</Typography>
+        <Typography variant="h6">Using OpenStack Glance Client</Typography>
         <Typography>
           Use the OpenStack Glance Client to import images into Platform9.
           <br />
@@ -118,7 +118,7 @@ class AddImagePage extends React.Component {
   renderCreateNewImage () {
     return (
       <Fragment>
-        <Typography variant="title">Creating a new image</Typography>
+        <Typography variant="h6">Creating a new image</Typography>
         <Typography>
           If you wish to create an image from scratch you may follow this guide:
           <br />

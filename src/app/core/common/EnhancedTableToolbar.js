@@ -49,11 +49,11 @@ const EnhancedTableToolbar = ({ classes, numSelected, title, onAdd, onDelete, on
   >
     <div className={classes.title}>
       {numSelected > 0 ? (
-        <Typography color="inherit" variant="subheading">
+        <Typography color="inherit" variant="subtitle1">
           {numSelected} selected
         </Typography>
       ) : (
-        <Typography variant="title">{title}</Typography>
+        <Typography variant="h6">{title}</Typography>
       )}
     </div>
     <div className={classes.spacer} />

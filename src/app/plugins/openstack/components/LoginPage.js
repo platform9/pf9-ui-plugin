@@ -170,7 +170,7 @@ export class LoginPage extends React.Component {
             <Paper className={classes.paper}>
               <img src={logoPath} className={classes.img} />
               <form className={classes.form} onSubmit={this.performLogin}>
-                <Typography variant="subheading" align="center">
+                <Typography variant="subtitle1" align="center">
                   Please sign in
                 </Typography>
                 {this.renderInputfield()}
