@@ -137,7 +137,7 @@ class ValidatedForm extends React.Component {
 
   handleSubmit = event => {
     const { onSubmit } = this.props
-    const { value, showingErrors } = this.state
+    const { values, showingErrors } = this.state
     if (event) {
       event.preventDefault()
     }
@@ -150,7 +150,7 @@ class ValidatedForm extends React.Component {
     }
 
     if (onSubmit) {
-      onSubmit(value)
+      onSubmit(values)
     }
   }
 
