@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button } from '@material-ui/core'
+import SubmitButton from 'core/common/SubmitButton'
 import ValidatedForm from 'core/common/validated_form/ValidatedForm'
 import TextField from 'core/common/validated_form/TextField'
 import Checkbox from 'core/common/validated_form/Checkbox'
@@ -12,7 +12,7 @@ const UpdateVolumeForm = ({ volume, onSubmit }) =>
     <TextField id="name" label="Volume Name" />
     <TextField id="description" label="Description" />
     <Checkbox id="bootable" label="Bootable" />
-    <Button type="submit" variant="raised">Update Volume</Button>
+    <SubmitButton>Update Volume</SubmitButton>
   </ValidatedForm>
 
 export default UpdateVolumeForm

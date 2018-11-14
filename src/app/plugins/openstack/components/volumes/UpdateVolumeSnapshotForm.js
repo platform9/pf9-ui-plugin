@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button } from '@material-ui/core'
+import SubmitButton from 'core/common/SubmitButton'
 import ValidatedForm from 'core/common/validated_form/ValidatedForm'
 import TextField from 'core/common/validated_form/TextField'
 import KeyValuesField from 'core/common/validated_form/KeyValuesField'
@@ -13,7 +13,7 @@ const UpdateVolumeSnapshotForm = ({ volumeSnapshot, onSubmit }) =>
     <TextField id="name" label="Volume Snapshot Name" />
     <TextField id="description" label="Description" />
     <KeyValuesField id="metadata" label="Metadata" />
-    <Button type="submit" variant="raised">Update Volume Snapshot</Button>
+    <SubmitButton>Update Volume Snapshot</SubmitButton>
   </ValidatedForm>
 
 export default UpdateVolumeSnapshotForm

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button } from '@material-ui/core'
+import SubmitButton from 'core/common/SubmitButton'
 import ValidatedForm from 'core/common/validated_form/ValidatedForm'
 import TextField from 'core/common/validated_form/TextField'
 
@@ -10,7 +10,7 @@ const AddSshKeyForm = ({ onComplete }) =>
   >
     <TextField id="name" label="Name" />
     <TextField id="public_key" label="Public Key" />
-    <Button type="submit" variant="raised">Add SSH Key</Button>
+    <SubmitButton>Add SSH Key</SubmitButton>
   </ValidatedForm>
 
 export default AddSshKeyForm
