@@ -129,6 +129,9 @@ class ApiHelper extends React.Component {
     )
   }
 
+  // TODO: It might be more convenient to have 1 row per API response field and have multiple columns
+  // for configuring the different concerns (table, form, simulator).  Also, separate this out into
+  // its own component.  This was rushed for the Hackathon.
   renderFieldSelection = () => {
     const { response, responseLens, fieldMappings } = this.state
     if (!response) { return null }
@@ -263,6 +266,8 @@ class ApiHelper extends React.Component {
 
     const { baseUrl, method, service } = this.state
 
+    // TODO: We might want to extend this to support custom headers and better
+    // editing of the body.
     return (
       <div className={classes.root}>
         <ValidatedForm
