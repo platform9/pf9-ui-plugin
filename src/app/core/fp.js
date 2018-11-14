@@ -2,6 +2,8 @@ import { curry, pathOr } from 'ramda'
 
 // functional programming helpers
 
+import { curry, remove } from 'ramda'
+
 export const pluck = key => obj => obj[key]
 export const identity = x => x
 export const isTruthy = x => !!x
@@ -65,6 +67,11 @@ export const range = (start, end) => {
   }
   return arr
 }
+
+// Returns a new array without the specified item
+export const except = curry((item, arr) => {
+  return remove(arr.indexOf(item), 1, arr)
+})
 
 // Converts from { foo: 'bar' } to [{ key: 'foo', value: 'bar' }]
 export const objToKeyValueArr = (obj = {}) =>

@@ -9,16 +9,26 @@ import Selector from './Selector'
 import MenuIcon from '@material-ui/icons/Menu'
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
 import TenantChooser from 'openstack/components/tenants/TenantChooser'
+import { fade } from '@material-ui/core/styles/colorManipulator'
+import { except } from 'app/core/fp'
 import {
   AppBar,
+  Collapse,
   Divider,
   Drawer,
   IconButton,
+  InputBase,
+  ListItemIcon,
   ListItemText,
   MenuItem,
   MenuList,
-  Toolbar
+  Toolbar,
 } from '@material-ui/core'
+import SearchIcon from '@material-ui/icons/Search'
+import ExpandLess from '@material-ui/icons/ExpandLess'
+import ExpandMore from '@material-ui/icons/ExpandMore'
+import moize from 'moize'
+import { flatten } from 'ramda'
 
 const drawerWidth = 240
 
@@ -110,7 +120,43 @@ const styles = theme => ({
     right: theme.spacing.unit * 2,
     display: 'flex',
     alignItems: 'center'
-  }
+  },
+  search: {
+    position: 'relative',
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: fade(theme.palette.background.paper, 0.15),
+    '&:hover': {
+      backgroundColor: fade(theme.palette.background.default, 0.25),
+    },
+    marginRight: theme.spacing.unit * 2,
+    marginLeft: 0,
+    width: '100%',
+    marginTop: theme.spacing.unit,
+  },
+  searchIcon: {
+    width: theme.spacing.unit * 8,
+    height: '100%',
+    position: 'absolute',
+    pointerEvents: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  inputRoot: {
+    color: 'inherit',
+    width: '100%',
+  },
+  inputInput: {
+    paddingTop: theme.spacing.unit,
+    paddingRight: theme.spacing.unit,
+    paddingBottom: theme.spacing.unit,
+    paddingLeft: theme.spacing.unit * 8,
+    transition: theme.transitions.create('width'),
+    width: '100%',
+    [theme.breakpoints.up('md')]: {
+      width: 200,
+    },
+  },
 })
 
 @withStyles(styles, { withTheme: true })
@@ -121,6 +167,8 @@ class Navbar extends React.Component {
     anchor: 'left',
     curRegion: '',
     regionSearch: '',
+    expandedItems: [],
+    filterText: '',
   }
 
   handleDrawerOpen = () => {
@@ -131,31 +179,109 @@ class Navbar extends React.Component {
     this.setState({ open: false })
   }
 
-  handleClick = key => event => {
+  handleClick = moize(key => event => {
     this.setState({
       [key]: event.target.innerText
     })
-  }
+  })
 
-  handleSearch = key => value => {
+  handleSearch = moize(key => value => {
     this.setState({
       [key]: value
     })
-  }
+  })
 
-  navTo = link => () => {
+  navTo = moize(link => () => {
     this.props.history.push(link)
-    // this.setState({ open: false })
+  })
+
+  toggleFolding = moize(name => () => {
+    this.setState(
+      ({ expandedItems, ...state }) => ({
+        ...state,
+        expandedItems: expandedItems.includes(name)
+          ? except(name, expandedItems)
+          : [name, ...expandedItems]
+      })
+    )
+  })
+
+  renderNavFolder = (name, links, icon) => {
+    const expanded = this.state.expandedItems.includes(name)
+    return [
+      <MenuItem onClick={this.toggleFolding(name)} key={name}>
+        {icon && (
+          <ListItemIcon>
+            {icon}
+          </ListItemIcon>
+        )}
+        <ListItemText primary={name} />
+        {expanded ? <ExpandLess /> : <ExpandMore />}
+      </MenuItem>,
+      <Collapse in={expanded} timeout="auto" unmountOnExit>
+        <MenuList component="div" disablePadding>
+          {links.map(this.renderNavLink)}
+        </MenuList>
+      </Collapse>
+    ]
   }
 
-  renderNavLink = ({ link, name }) => (
-    <MenuItem onClick={this.navTo(link.path)} key={link.path}><ListItemText primary={name} /></MenuItem>
+  renderNavLink = ({ nestedLinks, link, name, icon }) => {
+    return nestedLinks ? (
+      this.renderNavFolder(name, nestedLinks, icon)
+    ) : (
+      <MenuItem onClick={this.navTo(link.path)} key={link.path}>
+        {icon && (
+          <ListItemIcon>
+            {icon}
+          </ListItemIcon>
+        )}
+        <ListItemText primary={name} />
+      </MenuItem>
+    )
+  }
+
+  handleFilterChange = e => {
+    const { value } = e.target
+    this.setState(prevState => ({...prevState, filterText: value}))
+  }
+
+  renderNavFilterBar = () => {
+    const { classes } = this.props
+    const { filterText } = this.state
+    return <div className={classes.search}>
+      <div className={classes.searchIcon}>
+        <SearchIcon />
+      </div>
+      <InputBase
+        value={filterText}
+        placeholder="Search…"
+        onChange={this.handleFilterChange}
+        classes={{
+          root: classes.inputRoot,
+          input: classes.inputInput,
+        }}
+      />
+    </div>
+  }
+
+  flattenLinks = moize(links =>
+    flatten(
+      links.map(link => link.nestedLinks
+        ? this.flattenLinks(link.nestedLinks)
+        : [link]))
   )
 
+  getFilteredLinks = filterText => {
+    return this.flattenLinks(this.props.links).filter(({name}) =>
+      name.includes(filterText)
+    )
+  }
+
   render () {
-    const { classes, links } = this.props
-    const { open, curRegion, regionSearch } = this.state
-    const logoPath = rootPath+'images/logo.png'
+    const { classes, links, withSearchBar } = this.props
+    const { open, curRegion, regionSearch, filterText } = this.state
+    const logoPath = rootPath + 'images/logo.png'
 
     const drawer = (
       <Drawer
@@ -170,8 +296,14 @@ class Navbar extends React.Component {
           </IconButton>
         </div>
         <Divider />
-        <MenuList>
-          {links.map(this.renderNavLink)}
+        <MenuList
+          component="nav"
+          subheader={withSearchBar ? this.renderNavFilterBar() : null}
+        >
+          {(filterText
+            ? this.getFilteredLinks(filterText)
+            : links
+          ).map(this.renderNavLink)}
         </MenuList>
       </Drawer>
     )
@@ -224,8 +356,23 @@ class Navbar extends React.Component {
   }
 }
 
+const linkPropType = {
+  name: PropTypes.string,
+  link: PropTypes.shape({
+    path: PropTypes.string
+  }),
+  icon: PropTypes.element
+}
+
 Navbar.propTypes = {
+  withSearchBar: PropTypes.bool,
   classes: PropTypes.object,
+  links: PropTypes.arrayOf(
+    PropTypes.shape({
+      ...linkPropType,
+      nestedLinks: PropTypes.arrayOf(PropTypes.shape(linkPropType))
+    })
+  )
 }
 
 export default Navbar
