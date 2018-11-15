@@ -186,8 +186,10 @@ class ListTable extends React.Component {
 
     if (typeof contents === 'boolean') { _contents = String(_contents) }
 
-    // Allow for customized rendering in the columnDef
-    if (columnDef.render) { _contents = columnDef.render(contents, row) }
+    // Allow for customized rendering in the columnDef.  The render function might need
+    // to know more about the entire object (row) being rendered and in some cases the
+    // entire context.
+    if (columnDef.render) { _contents = columnDef.render(contents, row, this.props.context) }
 
     return (
       <TableCell key={columnDef.id} {...cellProps}>{_contents}</TableCell>
