@@ -143,3 +143,6 @@ export const arrToObjByKey = curry((key, arr) =>
     {}
   )
 )
+
+export const ensureArray = maybeArr =>
+  (maybeArr && maybeArr instanceof Array) ? maybeArr : []

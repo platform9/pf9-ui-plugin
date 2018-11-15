@@ -9,6 +9,7 @@ import AppContext, { withAppContext } from 'core/AppContext'
 import { withTheme } from 'app/theme'
 
 import 'app/app.css'
+import HotKeysContext from 'core/common/HotKeysProvider'
 
 const objToJsonDetails = obj => JSON.stringify(obj, null, 4)
 const isArray = x => x instanceof Array
@@ -27,9 +28,11 @@ export const withWrappings = Component =>
 const Pf9StoryWrapper = withWrappings(({ children }) => <div>{children}</div>)
 
 export const pf9Decorators = storyFn => (
-  <AppContext>
-    <Pf9StoryWrapper>{storyFn()}</Pf9StoryWrapper>
-  </AppContext>
+  <HotKeysContext>
+    <AppContext>
+      <Pf9StoryWrapper>{storyFn()}</Pf9StoryWrapper>
+    </AppContext>
+  </HotKeysContext>
 )
 
 export const addStory = (section, subsection, story) =>

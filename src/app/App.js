@@ -41,27 +41,29 @@ class App extends React.Component {
     return (
       <Router>
         <MuiThemeProvider theme={theme}>
-          <AppContext initialContext={{ apiClient, initialized: false }}>
-            <div id="_main-container">
-              <SessionManager>
-                <Navbar links={pluginManager.getNavItems()}>
-                  {pluginManager.getComponents().map((PluginComponent, idx) => <PluginComponent key={idx} />)}
-                  <Switch>
-                    {pluginManager.getRoutes().map(route => {
-                      const { component, link } = route
-                      const Component = component
-                      return <Route key={route.name} path={link.path} exact={link.exact || false} component={Component} />
-                    })}
-                    <Route path="/ui/openstack/login" component={null} />
-                    <Route path="/ui/logout" exact component={LogoutPage} />
-                    <Redirect to={pluginManager.getDefaultRoute()} />
-                  </Switch>
-                  <DeveloperToolsEmbed />
-                  {showFooter && renderFooter()}
-                </Navbar>
-              </SessionManager>
-            </div>
-          </AppContext>
+          <HotKeysProvider>
+            <AppContext initialContext={{ apiClient, initialized: false }}>
+              <div id="_main-container">
+                <SessionManager>
+                  <Navbar links={pluginManager.getNavItems()}>
+                    {pluginManager.getComponents().map((PluginComponent, idx) => <PluginComponent key={idx} />)}
+                    <Switch>
+                      {pluginManager.getRoutes().map(route => {
+                        const { component, link } = route
+                        const Component = component
+                        return <Route key={route.name} path={link.path} exact={link.exact || false} component={Component} />
+                      })}
+                      <Route path="/ui/openstack/login" component={null} />
+                      <Route path="/ui/logout" exact component={LogoutPage} />
+                      <Redirect to={pluginManager.getDefaultRoute()} />
+                    </Switch>
+                    <DeveloperToolsEmbed />
+                    {showFooter && renderFooter()}
+                  </Navbar>
+                </SessionManager>
+              </div>
+            </AppContext>
+          </HotKeysProvider>
         </MuiThemeProvider>
       </Router>
     )

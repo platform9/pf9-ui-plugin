@@ -29,6 +29,7 @@ import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'
 import moize from 'moize'
 import { flatten } from 'ramda'
+import { withHotKeys } from 'core/common/HotKeysProvider'
 
 const drawerWidth = 240
 
@@ -161,7 +162,22 @@ const styles = theme => ({
 
 @withStyles(styles, { withTheme: true })
 @withRouter
+@withHotKeys
 class Navbar extends React.Component {
+  constructor (props) {
+    super(props)
+    this.searchInputRef = React.createRef()
+    props.setHotKeyHandler('f', this.focusSearch, {
+      ctrlKey: false
+    })
+  }
+
+  focusSearch = () => {
+    if (this.searchInputRef.current) {
+      this.searchInputRef.current.focus()
+    }
+  }
+
   state = {
     open: true,
     anchor: 'left',
@@ -254,6 +270,7 @@ class Navbar extends React.Component {
         <SearchIcon />
       </div>
       <InputBase
+        inputRef={this.searchInputRef}
         value={filterText}
         placeholder="Search…"
         onChange={this.handleFilterChange}
