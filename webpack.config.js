@@ -73,13 +73,13 @@ module.exports = {
   plugins,
   resolve: {
     alias: {
-      app: path.resolve(__dirname, 'src/app'),
-      core: path.resolve(__dirname, 'src/app/core'),
       developer: path.resolve(__dirname, 'src/app/plugins/developer'),
       k8s: path.resolve(__dirname, 'src/app/plugins/kubernetes'),
       openstack: path.resolve(__dirname, 'src/app/plugins/openstack'),
-      server: path.resolve(__dirname, 'src/server'),
+      core: path.resolve(__dirname, 'src/app/core'),
       util: path.resolve(__dirname, 'src/app/util'),
+      app: path.resolve(__dirname, 'src/app'),
+      server: path.resolve(__dirname, 'src/server'),
       'api-client': path.resolve(__dirname, 'src/api-client'),
     },
   }

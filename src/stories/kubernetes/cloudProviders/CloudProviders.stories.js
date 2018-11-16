@@ -1,7 +1,7 @@
 import React from 'react'
-import { AddCloudProviderForm } from 'kubernetes/components/infrastructure/AddCloudProviderPage'
 import { action } from '@storybook/addon-actions'
 import { addStories } from '../../helpers'
+import { AddCloudProviderForm } from 'k8s/components/infrastructure/AddCloudProviderPage'
 
 const onComplete = action('complete')
 
