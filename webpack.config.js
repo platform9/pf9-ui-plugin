@@ -73,6 +73,8 @@ module.exports = {
   plugins,
   resolve: {
     alias: {
+      // IDE's seem to solve paths according to the order in which they are defined
+      // so we must put first the more specific aliases
       developer: path.resolve(__dirname, 'src/app/plugins/developer'),
       k8s: path.resolve(__dirname, 'src/app/plugins/kubernetes'),
       openstack: path.resolve(__dirname, 'src/app/plugins/openstack'),
