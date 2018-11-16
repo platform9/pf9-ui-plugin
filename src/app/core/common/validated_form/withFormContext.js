@@ -78,43 +78,46 @@ ValidatedFormInput.propTypes = ValidatedFormInputPropTypes
  *
  * @param {Inject the form context into this Component through props.} Input
  */
-const withFormContext = Input => ({ id, required, validations, ...rest }) => (
-  <ValidatedFormConsumer>
-    {({
-      initialValues,
-      values,
-      defineField,
-      setFieldValue,
-      showErrorsOnBlur,
-      validateField,
-      errors,
-    }) => (
-      <ValidatedFormInput
-        id={id}
-        defineField={partial(defineField, [id])}
-        setFieldValue={partial(setFieldValue, [id])}
-        validateField={partial(validateField, [id])}
-        showErrorsOnBlur={showErrorsOnBlur}
-        initialValue={initialValues[id]}
-        required={required}
-        validations={validations}
-        value={values[id]}
-      >
-        {({ onChange, onMouseEnter, onBlur }) => (
-          <Input
-            {...rest}
-            id={id}
-            value={values[id]}
-            hasError={pathOr(null, [id, 'hasError'], errors)}
-            errorMessage={pathOr(null, [id, 'errorMessage'], errors)}
-            onChange={onChange}
-            onMouseEnter={onMouseEnter}
-            onBlur={onBlur}
-          />
-        )}
-      </ValidatedFormInput>
-    )}
-  </ValidatedFormConsumer>
-)
+const withFormContext = Input =>
+  ({ id, required, validations, onBlur, onChange, ...rest }) => (
+    <ValidatedFormConsumer>
+      {({
+        initialValues,
+        values,
+        defineField,
+        setFieldValue,
+        showErrorsOnBlur,
+        validateField,
+        errors,
+      }) => (
+        <ValidatedFormInput
+          id={id}
+          defineField={partial(defineField, [id])}
+          setFieldValue={partial(setFieldValue, [id])}
+          validateField={partial(validateField, [id])}
+          showErrorsOnBlur={showErrorsOnBlur}
+          initialValue={initialValues[id]}
+          required={required}
+          validations={validations}
+          value={values[id]}
+          onBlur={onBlur}
+          onChange={onChange}
+        >
+          {({ onChange, onMouseEnter, onBlur }) => (
+            <Input
+              {...rest}
+              id={id}
+              value={values[id]}
+              hasError={pathOr(null, [id, 'hasError'], errors)}
+              errorMessage={pathOr(null, [id, 'errorMessage'], errors)}
+              onChange={onChange}
+              onMouseEnter={onMouseEnter}
+              onBlur={onBlur}
+            />
+          )}
+        </ValidatedFormInput>
+      )}
+    </ValidatedFormConsumer>
+  )
 
 export default withFormContext
