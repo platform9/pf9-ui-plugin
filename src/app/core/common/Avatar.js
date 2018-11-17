@@ -57,7 +57,7 @@ class Avatar extends React.Component {
           <BaseAvatar className={classes.avatarImg}>
             {userName.charAt(0)}
           </BaseAvatar>
-          <Typography color="inherit" variant="body1">
+          <Typography color="inherit" variant="body2">
             {userName}
           </Typography>
         </Button>

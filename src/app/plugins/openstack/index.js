@@ -36,8 +36,10 @@ import AddVolumeTypePage from './components/volumes/AddVolumeTypePage'
 import UpdateVolumeTypePage from './components/volumes/UpdateVolumeTypePage'
 
 import CreateSnapshotPage from './components/volumes/CreateSnapshotPage'
-import VolumeSnapshotsListPage from './components/volumes/VolumeSnapshotsListPage'
-import UpdateVolumeSnapshotPage from './components/volumes/UpdateVolumeSnapshotPage'
+import VolumeSnapshotsListPage
+  from './components/volumes/VolumeSnapshotsListPage'
+import UpdateVolumeSnapshotPage
+  from './components/volumes/UpdateVolumeSnapshotPage'
 
 import HostsListPage from './components/hosts/HostsListPage'
 
@@ -64,8 +66,11 @@ class OpenStack extends React.Component {
 OpenStack.__name__ = 'openstack'
 
 OpenStack.registerPlugin = pluginManager => {
-  pluginManager.registerRoutes(
-    '/ui/openstack',
+  const plugin = pluginManager.registerPlugin(
+    'openstack', 'OpenStack', '/ui/openstack'
+  )
+
+  plugin.registerRoutes(
     [
       {
         name: 'Dashboard',
@@ -250,8 +255,7 @@ OpenStack.registerPlugin = pluginManager => {
     ]
   )
 
-  pluginManager.registerNavItems(
-    '/ui/openstack',
+  plugin.registerNavItems(
     [
       /* Comment out the nav items since first UI release will be K8s only
       {

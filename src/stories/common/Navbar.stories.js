@@ -1,47 +1,50 @@
 import React from 'react'
+import faker from 'faker'
 import { addStories, randomInt, range } from '../helpers'
 
 import { BrowserRouter as Router } from 'react-router-dom'
 import fakeNavbarItem from './fakeNavbarItem'
-import Navbar from 'core/common/Navbar'
 import { omit } from 'ramda'
+import Navbar from 'core/common/Navbar'
 
-const someNavbarItems = range(5).map(fakeNavbarItem)
+const getSomeNavbarItems = (count = 5) => range(count).map(fakeNavbarItem)
 
 const categories = ['Infrastructure', 'Clusters', 'Nodes', 'Providers']
-const maxChildren = 5
-const categorizedItems = categories.map(category => ({
+const getCategorizedItems = () => categories.map(category => ({
   name: category,
-  nestedLinks: range(randomInt(1, maxChildren)).map(fakeNavbarItem),
+  nestedLinks: getSomeNavbarItems(randomInt(1, 5)),
+}))
+
+const sections = range(4).map(() => ({
+  id: faker.random.uuid(),
+  name: faker.random.word(),
+  links: getCategorizedItems(),
 }))
 
 addStories('Common Components/Navbar', {
   'Random links': () => (
-    <div>
-      <Router>
-        <Navbar links={someNavbarItems.map(omit(['icon']))} />
-      </Router>
-    </div>
+    <Router>
+      <Navbar sections={[{links: getSomeNavbarItems().map(omit(['icon']))}]} />
+    </Router>
   ),
   'With icons': () => (
-    <div>
-      <Router>
-        <Navbar links={someNavbarItems} />
-      </Router>
-    </div>
+    <Router>
+      <Navbar sections={[{links: getSomeNavbarItems()}]} />
+    </Router>
   ),
   'With categories': () => (
-    <div>
-      <Router>
-        <Navbar links={categorizedItems} />
-      </Router>
-    </div>
+    <Router>
+      <Navbar sections={[{links: getCategorizedItems()}]} />
+    </Router>
   ),
   'With search bar': () => (
-    <div>
-      <Router>
-        <Navbar withSearchBar links={categorizedItems} />
-      </Router>
-    </div>
+    <Router>
+      <Navbar withSearchBar sections={[{links: getCategorizedItems()}]} />
+    </Router>
+  ),
+  'Accordion with sections': () => (
+    <Router>
+      <Navbar withSearchBar sections={sections} />
+    </Router>
   )
 })

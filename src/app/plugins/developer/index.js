@@ -14,8 +14,9 @@ class Developer extends React.Component {
 Developer.__name__ = 'developer'
 
 Developer.registerPlugin = pluginManager => {
-  pluginManager.registerRoutes(
-    '/ui/developer',
+  const plugin = pluginManager.registerPlugin('developer', 'Developer', '/ui/developer')
+
+  plugin.registerRoutes(
     [
       {
         name: 'DeveloperHome',
@@ -30,8 +31,7 @@ Developer.registerPlugin = pluginManager => {
     ]
   )
 
-  pluginManager.registerNavItems(
-    '/ui/developer',
+  plugin.registerNavItems(
     [
       // Decided to embed these at the bottom of every page instead so don't
       // clutter the side navbar.

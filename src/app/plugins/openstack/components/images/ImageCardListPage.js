@@ -21,7 +21,7 @@ class ImageCardListPage extends React.Component {
     return (
       <div>
         <Paper className={classes.instruction}>
-          <Typography variant="body1" component="p" style={{'lineHeight': 2}}>
+          <Typography variant="body2" component="p" style={{'lineHeight': 2}}>
             These are pre-built Virtual Machine Images for commonly used Operating Systems. We have built these images with cloud-init pre-installed for ease of use. All you need to do is download the Image locally, then copy it over to the appropriate folder on the Host that’s assigned the ‘Image Library’ role, and they will be part of your Image catalog, ready for consumption! Click the New Image button under the <a style={{'textDecoration': 'underline', 'color': '#4aa3df', 'cursor': 'pointer'}} onClick={this.onClick}>Imported Images Tab</a> for more details.
           </Typography>
         </Paper>

@@ -1,15 +1,18 @@
 import React from 'react'
 
 import InfrastructurePage from './components/infrastructure/InfrastructurePage'
-import AddCloudProviderPage from './components/infrastructure/AddCloudProviderPage'
-import UpdateCloudProviderPage from './components/infrastructure/UpdateCloudProviderPage'
+import AddCloudProviderPage
+  from './components/infrastructure/AddCloudProviderPage'
+import UpdateCloudProviderPage
+  from './components/infrastructure/UpdateCloudProviderPage'
 import AppsIndexPage from './components/apps/AppsIndexPage'
 import PodsIndexPage from './components/pods/PodsIndexPage'
 import StorageClassesPage from './components/storage/StorageClassesPage'
 import AddNamespacePage from './components/namespaces/AddNamespacePage'
 import NamespacesListPage from './components/namespaces/NamespacesListPage'
 import ApiAccessPage from './components/apiAccess/ApiAccessPage'
-import UserManagementIndexPage from './components/userManagement/UserManagementIndexPage'
+import UserManagementIndexPage
+  from './components/userManagement/UserManagementIndexPage'
 
 class Kubernetes extends React.Component {
   render () {
@@ -22,8 +25,11 @@ class Kubernetes extends React.Component {
 Kubernetes.__name__ = 'kubernetes'
 
 Kubernetes.registerPlugin = pluginManager => {
-  pluginManager.registerRoutes(
-    '/ui/kubernetes',
+  const plugin = pluginManager.registerPlugin(
+    'kubernetes', 'Kubernetes', '/ui/kubernetes'
+  )
+
+  plugin.registerRoutes(
     [
       {
         name: 'Infrastructure',
@@ -78,8 +84,7 @@ Kubernetes.registerPlugin = pluginManager => {
     ]
   )
 
-  pluginManager.registerNavItems(
-    '/ui/kubernetes',
+  plugin.registerNavItems(
     [
       { name: 'Infrastructure', link: { path: '/infrastructure' } },
       { name: 'App Catalog', link: { path: '/apps' } },

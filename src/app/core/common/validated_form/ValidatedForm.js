@@ -15,7 +15,7 @@ const styles = theme => ({
   root: {
     display: 'flex',
     flexFlow: 'row nowrap',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   inputs: {
     display: 'flex',

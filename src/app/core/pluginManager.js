@@ -1,74 +1,112 @@
+import { partial, path } from 'ramda'
+
 const defaultOptions = {
   showFooter: false,
   showNavMenu: true,
   showSidebar: false,
 }
 
-let data = {
-  components: [],
-  pluginList: [],
-  routes: [],
-  navItems: [],
-  options: { ...defaultOptions },
-}
+const pluginList = {}
+const data = {}
 
 const pluginManager = {
-  clearAll () {
-    data.components = []
-    data.pluginList = []
-    data.routes = []
-    data.navItems = []
-    data.options = { ...defaultOptions }
+  clearAll (pluginId) {
+    data[pluginId] = {
+      components: [],
+      routes: [],
+      navItems: [],
+      options: { ...defaultOptions },
+    }
   },
 
-  registerComponent (component) {
-    data.components.push(component)
+  registerPlugin (pluginId, name, basePath) {
+    pluginList[pluginId] = Object.freeze({
+      name,
+      basePath,
+      registerComponent: partial(this.registerComponent, [pluginId]),
+      registerRoutes: partial(this.registerRoutes, [pluginId]),
+      registerNavItems: partial(this.registerNavItems, [pluginId]),
+      getComponents: partial(this.getComponents, [pluginId]),
+      getRoutes: partial(this.getRoutes, [pluginId]),
+      getNavItems: partial(this.getNavItems, [pluginId]),
+      getOptions: partial(this.getOptions, [pluginId]),
+      getOption: partial(this.getOption, [pluginId]),
+      setOption: partial(this.setOption, [pluginId]),
+      getDefaultRoute: partial(this.getDefaultRoute, [pluginId]),
+    })
+    data[pluginId] = {
+      basePath,
+      components: [],
+      routes: [],
+      navItems: [],
+      options: { ...defaultOptions },
+    }
+    return pluginList[pluginId]
   },
 
-  registerRoutes (prefix, components=[]) {
-    const prefixLink = link => ({ ...link, path: `${prefix}${link.path}` })
+  registerComponent (pluginId, component) {
+    data[pluginId].components.push(component)
+  },
+
+  registerRoutes (pluginId, components=[]) {
+    const prefixLink = link => ({
+      ...link,
+      path: `${data[pluginId].basePath}${link.path}`
+    })
 
     components
       .map(c => ({ ...c, link: prefixLink(c.link) }))
-      .forEach(component => data.routes.push(component))
+      .forEach(component => data[pluginId].routes.push(component))
   },
 
-  registerNavItems (prefix, items=[]) {
-    const prefixLink = link => ({ ...link, path: `${prefix}${link.path}` })
+  registerNavItems (pluginId, items=[]) {
+    const prefixLink = link => ({
+      ...link,
+      path: `${data[pluginId].basePath}${link.path}`
+    })
 
     items
       .map(x => ({ ...x, link: prefixLink(x.link) }))
       .forEach(item => {
-        data.navItems.push(item)
+        data[pluginId].navItems.push(item)
       })
   },
 
-  getComponents () {
-    return data.components
+  getPlugins () {
+    return pluginList
   },
 
-  getRoutes () {
-    return data.routes
+  getPlugin (pluginId) {
+    return pluginList[pluginId]
   },
 
-  getNavItems () {
-    return data.navItems
+  getComponents (pluginId) {
+    return data[pluginId].components
   },
 
-  getOptions () {
-    return data.options
+  getRoutes (pluginId) {
+    return data[pluginId].routes
   },
 
-  getOption (key) {
-    return data.options[key]
+  getNavItems (pluginId) {
+    return data[pluginId].navItems
   },
 
-  setOption (key, value) {
-    data.options[key] = value
+  getOptions (pluginId) {
+    return data[pluginId].options
   },
 
-  getDefaultRoute () {
-    return data.routes.find(r => r.link && r.link.default).link.path
+  getOption (pluginId, key) {
+    return data[pluginId].options[key]
+  },
+
+  setOption (pluginId, key, value) {
+    data[pluginId].options[key] = value
+  },
+
+  getDefaultRoute (pluginId) {
+    return path(['link', 'path'],
+      data[pluginId].routes.find(r => r.link && r.link.default))
   }
 }
 

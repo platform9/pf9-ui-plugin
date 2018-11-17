@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import {
   isEmpty,
   lensProp,
@@ -22,7 +22,7 @@ const HotKeysContext = React.createContext({
 
 const keyHandlersLens = lensProp('hotKeyHandlers')
 
-export default class HotKeysProvider extends PureComponent {
+export default class HotKeysProvider extends Component {
   state = {
     hotKeyHandlers: {},
 
@@ -89,7 +89,7 @@ export default class HotKeysProvider extends PureComponent {
   }
 }
 
-class HotKeysConsumerWrapper extends PureComponent {
+class HotKeysConsumerWrapper extends Component {
   static contextType = HotKeysContext;
 
   state = {

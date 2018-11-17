@@ -59,7 +59,7 @@ class Alert extends React.Component {
       <div className={classNames(classes.container, classes[variant])}>
         <span className={classes.message}>
           <Icon className={classNames(classes.icon, classes.iconVariant)} />
-          {message && <Typography variant="body1" color="inherit">{message}</Typography>}
+          {message && <Typography variant="body2" color="inherit">{message}</Typography>}
           {children}
         </span>
         <IconButton

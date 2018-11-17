@@ -1,12 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/core/styles'
-import {
-  Button,
-  Menu,
-  MenuItem,
-  Typography
-} from '@material-ui/core'
+import { Button, Menu, MenuItem, Typography } from '@material-ui/core'
 import SearchBar from './SearchBar'
 
 const styles = theme => ({
@@ -67,7 +62,7 @@ class Selector extends React.Component {
           color="inherit"
           disableRipple
         >
-          <Typography color="inherit" variant="body1">
+          <Typography color="inherit" variant="body2">
             {name}  &#9662;
           </Typography>
         </Button>

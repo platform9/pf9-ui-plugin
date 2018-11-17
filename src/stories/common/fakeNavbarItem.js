@@ -8,7 +8,7 @@ import CodeIcon from '@material-ui/icons/Code'
 import BuildIcon from '@material-ui/icons/Build'
 import TocIcon from '@material-ui/icons/Toc'
 import SendIcon from '@material-ui/icons/Send'
-import { randomInt } from '../helpers'
+import { randomItem } from '../helpers'
 
 const icons = [
   <StarBorder />,
@@ -26,7 +26,7 @@ const fakeNavbarItem = () => ({
   link: {
     path: faker.internet.url()
   },
-  icon: icons[randomInt(0, icons.length - 1)]
+  icon: randomItem(icons)
 })
 
 export default fakeNavbarItem

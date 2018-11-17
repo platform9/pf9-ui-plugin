@@ -1,8 +1,6 @@
-import { curry, pathOr } from 'ramda'
+import { curry, pathOr, remove } from 'ramda'
 
 // functional programming helpers
-
-import { curry, remove } from 'ramda'
 
 export const pluck = key => obj => obj[key]
 export const identity = x => x
@@ -106,12 +104,6 @@ export const asyncFlatMap = async (arr, callback) => {
   }
   return newArr
 }
-
-// Utility object to prevent instantiation of new objects on render methods
-export const emptyObj = Object.freeze({})
-
-// Utility array to prevent instantiation of new arrays on render methods
-export const emptyArr = Object.freeze([])
 
 export const pathOrNull = pathStr => pathOr(null, pathStr.split('.'))
 

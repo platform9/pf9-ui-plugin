@@ -10,9 +10,7 @@ plugins.forEach(plugin => plugin.registerPlugin(pluginManager))
 const render = Component => {
   ReactDOM.render(
     <AppContainer>
-      <div>
-        <Component pluginManager={pluginManager} />
-      </div>
+      <Component pluginManager={pluginManager} />
     </AppContainer>,
     document.getElementById('root')
   )
