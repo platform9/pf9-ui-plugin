@@ -15,6 +15,7 @@ import Application from '../models/openstack/Application'
 import SshKey from '../models/openstack/SshKey'
 import Hypervisor from '../models/openstack/Hypervisor'
 import ResMgrHost from '../models/resmgr/ResMgrHost'
+import CloudProvider from '../models/qbert/CloudProvider'
 // import Token from '../models/openstack/Token'
 import { range } from '../util'
 
@@ -107,6 +108,10 @@ function loadPreset () {
 
   // ResMgrHosts
   new ResMgrHost({ roles: ['pf9-ostackhost'], info: { hostname: 'fake resmgr host' } })
+
+  // Cloud Providers
+  CloudProvider.create({ name: 'fakeCp1', type: 'aws' }, context)
+  CloudProvider.create({ name: 'fakeCp2', type: 'openstack' }, context)
 }
 
 export default loadPreset

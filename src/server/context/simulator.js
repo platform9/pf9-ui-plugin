@@ -52,6 +52,7 @@ class Context {
     this.defaultQuota = { ...defaultQuota }
     this.resMgrHosts = []
     this.resMgrRoles = {}
+    this.cloudProviders = []
   }
 
   validateToken = id => Token.validateToken(id)

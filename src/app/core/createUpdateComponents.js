@@ -40,7 +40,8 @@ const createUpdateComponents = options => {
     }
 
     handleComplete = async data => {
-      const { setContext, context, history, uniqueIdentifier } = this.props
+      const { setContext, context, history, match } = this.props
+      const id = match.params[routeParamKey]
       try {
         const existing = await loaderFn({ setContext, context })
         if (initFn) {
@@ -48,9 +49,8 @@ const createUpdateComponents = options => {
           // This function allows for any amount of arbitrary initialization.
           await initFn(this.props)
         }
-        const updated = await updateFn({ data, context, setContext })
-        const uid = data[uniqueIdentifier]
-        const updatedList = existing.map(x => x[uniqueIdentifier] !== uid ? x : updated)
+        const updated = await updateFn({ id, data, context, setContext })
+        const updatedList = existing.map(x => x[uniqueIdentifier] !== id ? x : updated)
         setContext({ [dataKey]: updatedList })
         history.push(listUrl)
       } catch (err) {

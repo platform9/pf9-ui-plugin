@@ -117,6 +117,34 @@ const Catalog = {
         id: uuid.v4(),
         name: 'glance',
         type: 'image'
+      },
+      {
+        endpoints: [
+          {
+            id: uuid.v4(),
+            interface: 'admin',
+            region: config.region,
+            region_id: config.region,
+            url: `${config.apiHost}/qbert/v1`
+          },
+          {
+            id: uuid.v4(),
+            interface: 'internal',
+            region: config.region,
+            region_id: config.region,
+            url: `${config.apiHost}/qbert/v1`
+          },
+          {
+            id: uuid.v4(),
+            interface: 'public',
+            region: config.region,
+            region_id: config.region,
+            url: `${config.apiHost}/qbert/v1`
+          }
+        ],
+        id: uuid.v4(),
+        name: 'qbert',
+        type: 'qbert'
       }
     ]
   }

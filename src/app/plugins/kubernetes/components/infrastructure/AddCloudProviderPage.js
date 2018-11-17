@@ -129,6 +129,7 @@ export const options = {
   listUrl: '/ui/kubernetes/infrastructure#cloudProviders',
   name: 'AddCloudProvider',
   title: 'Add Cloud Provider',
+  dataKey: 'cloudProviders',
 }
 
 const { AddPage } = createAddComponents(options)

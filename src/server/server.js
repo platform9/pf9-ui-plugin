@@ -14,6 +14,7 @@ import nova from './api/nova'
 import neutron from './api/neutron'
 import cinder from './api/cinder'
 import glance from './api/glance'
+import qbert from './api/qbert'
 
 const defaultConfig = {
   port: 4444,
@@ -44,6 +45,7 @@ export function startServer (config = defaultConfig) {
   app.use('/neutron', neutron)
   app.use('/cinder', cinder)
   app.use('/glance', glance)
+  app.use('/qbert', qbert)
   app.use(cors())
 
   console.log(`Simulator server currently listening on port ${config.port}`)

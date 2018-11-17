@@ -40,7 +40,7 @@ const createAddComponents = options => {
           await initFn(this.props)
         }
         const created = await (createFn || crudActions.create)({ data, context, setContext })
-        setContext({ [dataKey]: [...existing, ...created] })
+        setContext({ [dataKey]: [...existing, created] })
         history.push(listUrl)
       } catch (err) {
         console.error(err)
