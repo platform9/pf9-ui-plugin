@@ -69,15 +69,13 @@ const styles = theme => ({
     width: '100%',
   },
   inputInput: {
+    fontSize: theme.typography.fontSize * 1.2,
     paddingTop: theme.spacing.unit,
     paddingRight: theme.spacing.unit,
     paddingBottom: theme.spacing.unit,
-    paddingLeft: theme.spacing.unit * 7,
+    paddingLeft: theme.spacing.unit * 6,
     transition: theme.transitions.create('width'),
-    width: '100%',
-    [theme.breakpoints.up('md')]: {
-      width: 200,
-    },
+    width: '100%'
   },
   nav: {
     margin: 0
@@ -150,7 +148,7 @@ class Navbar extends PureComponent {
 
   getFilteredLinks = (filterText, links) => {
     return this.flattenLinks(links).filter(({name}) =>
-      name.includes(filterText)
+      name.toLocaleLowerCase().includes(filterText.toLocaleLowerCase())
     )
   }
 
@@ -229,6 +227,9 @@ class Navbar extends PureComponent {
   render () {
     const {classes, withSearchBar, sections, open, handleDrawerClose} = this.props
     const {filterText, expandedSection} = this.state
+    const filteredSections = sections.filter(section =>
+      section.links && section.links.length > 0)
+
     return <Drawer
       variant="persistent"
       classes={{paper: classes.drawerPaper}}
@@ -242,8 +243,8 @@ class Navbar extends PureComponent {
         </IconButton>
       </div>
       <Divider />
-      {sections.map(section =>
-        section.links && section.links.length > 0 ? <ExpansionPanel
+      {filteredSections.map(section =>
+        filteredSections.length > 1 ? <ExpansionPanel
           key={section.id}
           className={classes.nav}
           expanded={expandedSection === section.id}
@@ -262,7 +263,15 @@ class Navbar extends PureComponent {
               ).map(this.renderNavLink)}
             </MenuList>
           </ExpansionPanelDetails>
-        </ExpansionPanel> : null)}
+        </ExpansionPanel> : <MenuList
+          component="nav"
+          key={section.id}
+          className={classes.navMenu}>
+          {(filterText
+            ? this.getFilteredLinks(filterText, section.links)
+            : section.links
+          ).map(this.renderNavLink)}
+        </MenuList>)}
     </Drawer>
   }
 }
@@ -276,7 +285,7 @@ const linkPropType = {
 }
 
 const sectionPropType = {
-  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   name: PropTypes.string,
   links: PropTypes.arrayOf(
     PropTypes.shape({

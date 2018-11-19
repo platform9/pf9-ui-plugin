@@ -1,20 +1,21 @@
 import React from 'react'
 import pluginManager from '../pluginManager'
 
+const plugin = pluginManager.registerPlugin('testPluginId', 'Test Plugin', '')
+
 describe('pluginManager', () => {
   beforeEach(() => {
-    pluginManager.clearAll()
+    plugin.clearAll()
   })
 
   test('registerRoutes', () => {
-    pluginManager.registerRoutes(
-      '',
+    plugin.registerRoutes(
       [
         { name: 'Dashboard', link: { path: '/', exact: true }, component: <h1>Dashboard</h1> },
         { name: 'Login', link: { path: '/login' }, component: <h1>Login</h1> },
       ]
     )
-    const routes = pluginManager.getRoutes()
+    const routes = plugin.getRoutes()
     expect(routes.length).toBe(2)
 
     expect(routes[0].name).toBe('Dashboard')
@@ -23,14 +24,13 @@ describe('pluginManager', () => {
   })
 
   test('registerNavItems', () => {
-    pluginManager.registerNavItems(
-      '',
+    plugin.registerNavItems(
       [
         { name: 'Dashboard', link: { path: '/' } },
         { name: 'Tenants', link: { path: '/tenants' } },
       ]
     )
-    const navItems = pluginManager.getNavItems()
+    const navItems = plugin.getNavItems()
     expect(navItems.length).toBe(2)
     expect(navItems[0].name).toBe('Dashboard')
     expect(navItems[1].name).toBe('Tenants')
@@ -38,36 +38,34 @@ describe('pluginManager', () => {
   })
 
   test('clearAll', () => {
-    pluginManager.registerRoutes(
-      '',
+    plugin.registerRoutes(
       [
         { name: 'Dashboard', link: { path: '/', exact: true }, component: <h1>Dashboard</h1> },
         { name: 'Login', link: { path: '/login' }, component: <h1>Login</h1> },
       ]
     )
-    pluginManager.registerNavItems(
-      '',
+    plugin.registerNavItems(
       [
         { name: 'Dashboard', link: { path: '/' } },
         { name: 'Tenants', link: { path: '/tenants' } },
       ]
     )
-    expect(pluginManager.getNavItems().length).toEqual(2)
-    expect(pluginManager.getRoutes().length).toEqual(2)
-    pluginManager.clearAll()
-    expect(pluginManager.getNavItems().length).toEqual(0)
-    expect(pluginManager.getRoutes().length).toEqual(0)
+    expect(plugin.getNavItems().length).toEqual(2)
+    expect(plugin.getRoutes().length).toEqual(2)
+    plugin.clearAll()
+    expect(plugin.getNavItems().length).toEqual(0)
+    expect(plugin.getRoutes().length).toEqual(0)
   })
 
   test('getOptions', () => {
-    pluginManager.clearAll()
-    pluginManager.setOption('customPluginValue', 'foo')
-    expect(pluginManager.getOptions()).toMatchObject({ customPluginValue: 'foo' })
+    plugin.clearAll()
+    plugin.setOption('customPluginValue', 'foo')
+    expect(plugin.getOptions()).toMatchObject({ customPluginValue: 'foo' })
   })
 
   test('getOption', () => {
-    pluginManager.clearAll()
-    pluginManager.setOption('customPluginValue', 'foo')
-    expect(pluginManager.getOption('customPluginValue')).toEqual('foo')
+    plugin.clearAll()
+    plugin.setOption('customPluginValue', 'foo')
+    expect(plugin.getOption('customPluginValue')).toEqual('foo')
   })
 })

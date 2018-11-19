@@ -1,4 +1,4 @@
-import http from '../../../util/http'
+import http from '../../../utils/http'
 
 const baseUrl = async () => {
   return '/neutron/v2.0'

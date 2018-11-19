@@ -11,7 +11,7 @@ import AppContainer from 'core/common/AppContainer'
 import LogoutPage from 'openstack/components/LogoutPage'
 import './app.css'
 import theme from './theme'
-import { setupFromConfig } from './util/registry'
+import { setupFromConfig } from './utils/registry'
 import config from '../../config'
 import AppContext from 'core/AppContext'
 import ApiClient from '../api-client'
@@ -69,7 +69,6 @@ class App extends React.Component {
   render () {
     const { pluginManager } = this.props
     const plugins = toPairs(pluginManager.getPlugins())
-    console.log(theme, 'estic carregant temes')
     return (
       <Router>
         <MuiThemeProvider theme={theme}>

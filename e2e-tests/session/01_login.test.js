@@ -1,8 +1,9 @@
 import { driver } from '../setup'
 import LoginPage from '../page-objects/LoginPage'
 import DashboardPage from '../page-objects/DashboardPage'
+
 const config = require('../../config')
-const registry = require('../../src/app/util/registry')
+const registry = require('../../src/app/utils/registry')
 
 describe('login', () => {
   let loginPage

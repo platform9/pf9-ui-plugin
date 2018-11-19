@@ -122,7 +122,7 @@ class ApiHelper extends React.Component {
     return (
       <div>
         <br />
-        <Typography variant="body1">Choose a lens ('.' separated) path to drill into the actual data.  E.g., "data.itemType.0"</Typography>
+        <Typography variant="body2">Choose a lens ('.' separated) path to drill into the actual data.  E.g., "data.itemType.0"</Typography>
         <BaseTextField
           id="responseLens"
           label="Response path lens"

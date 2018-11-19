@@ -18,11 +18,14 @@ module.exports = {
   },
   resolve: {
     alias: {
-      app: path.resolve(__dirname, '../app'),
-      core: path.resolve(__dirname, '../app/core'),
+      // IDE's seem to solve paths according to the order in which they are defined
+      // so we must put first the more specific aliases
+      developer: path.resolve(__dirname, '../app/plugins/developer'),
+      k8s: path.resolve(__dirname, '../app/plugins/kubernetes'),
       openstack: path.resolve(__dirname, '../app/plugins/openstack'),
-      kubernetes: path.resolve(__dirname, '../app/plugins/kubernetes'),
-      util: path.resolve(__dirname, '../app/util'),
+      core: path.resolve(__dirname, '../app/core'),
+      utils: path.resolve(__dirname, '../app/utils'),
+      app: path.resolve(__dirname, '../app'),
     },
     extensions: ['.webpack.js', '.web.js', '.js', '.json', '.css'],
   }

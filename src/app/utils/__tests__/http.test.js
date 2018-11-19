@@ -1,5 +1,6 @@
 import http from '../http'
 import * as registry from '../registry'
+
 const originalFetch = global.fetch
 
 describe('http', () => {

@@ -1,7 +1,4 @@
-import {
-  jestMockResponse,
-  lastCall,
-} from '../../util/testUtils'
+import { jestMockResponse, lastCall } from '../../util/testUtils'
 
 import {
   constructPasswordMethod,
@@ -12,7 +9,7 @@ import {
   getUnscopedToken,
 } from '../keystone'
 
-import * as registry from '../../../../util/registry'
+import * as registry from '../../../../utils/registry'
 
 let originalFetch = global.fetch
 

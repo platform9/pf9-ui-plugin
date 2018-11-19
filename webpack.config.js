@@ -79,7 +79,7 @@ module.exports = {
       k8s: path.resolve(__dirname, 'src/app/plugins/kubernetes'),
       openstack: path.resolve(__dirname, 'src/app/plugins/openstack'),
       core: path.resolve(__dirname, 'src/app/core'),
-      util: path.resolve(__dirname, 'src/app/util'),
+      utils: path.resolve(__dirname, 'src/app/utils'),
       app: path.resolve(__dirname, 'src/app'),
       server: path.resolve(__dirname, 'src/server'),
       'api-client': path.resolve(__dirname, 'src/api-client'),

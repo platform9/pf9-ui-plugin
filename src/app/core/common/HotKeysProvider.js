@@ -1,14 +1,5 @@
 import React, { Component } from 'react'
-import {
-  isEmpty,
-  lensProp,
-  over,
-  pluck,
-  propSatisfies,
-  reject,
-  toPairs,
-  view
-} from 'ramda'
+import { isEmpty, lensProp, over, pluck, toPairs, view } from 'ramda'
 import { ensureArray } from 'core/fp'
 
 const HotKeysContext = React.createContext({
@@ -39,10 +30,8 @@ export default class HotKeysProvider extends Component {
       this.setState(over(keyHandlersLens,
         handlers => ({
           ...handlers,
-          [key]: reject(
-            propSatisfies(
-              fn => handlerFunctions.includes(fn), 'fn'), handlers[key]
-          )
+          [key]: handlers[key].filter(handler =>
+            !handlerFunctions.includes(handler.fn))
         })
       ))
     }
@@ -56,7 +45,7 @@ export default class HotKeysProvider extends Component {
     document.removeEventListener('keydown', this.handleKeyDown)
   }
 
-  stopCallback = e => {
+  isEditable = e => {
     const target = e.target || e.srcElement
     // stop for input, select, and textarea
     return ['INPUT', 'SELECT', 'TEXTAREA'].includes(target.tagName) ||
@@ -68,7 +57,7 @@ export default class HotKeysProvider extends Component {
 
     if (hotkeyHandlers &&
       !isEmpty(hotkeyHandlers) &&
-      !this.stopCallback(e)) {
+      !this.isEditable(e)) {
       hotkeyHandlers.forEach(({fn, options}) => {
         if (options.ctrlKey === e.ctrlKey) {
           e.preventDefault()

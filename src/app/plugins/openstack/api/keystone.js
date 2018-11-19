@@ -1,5 +1,5 @@
-import http from '../../../util/http'
-import * as registry from '../../../util/registry'
+import http from '../../../utils/http'
+import * as registry from '../../../utils/registry'
 
 export const constructTokenBody = method => (unscopedToken, tenantId) => {
   const body = {

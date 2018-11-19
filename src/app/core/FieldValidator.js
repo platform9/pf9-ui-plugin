@@ -1,6 +1,6 @@
 import moize from 'moize'
 import { isNil } from 'ramda'
-import { isPlainObject } from 'util/misc'
+import { isPlainObject } from 'utils/misc'
 
 export default class FieldValidator {
   /**

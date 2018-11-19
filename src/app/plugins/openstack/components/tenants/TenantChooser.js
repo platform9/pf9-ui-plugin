@@ -3,6 +3,8 @@ import Selector from 'core/common/Selector'
 import { compose } from 'core/fp'
 import { loadTenants } from './actions'
 import { withAppContext } from 'core/AppContext'
+import { assoc } from 'ramda'
+import moize from 'moize'
 
 class TenantChooser extends React.Component {
   state = {
@@ -11,11 +13,11 @@ class TenantChooser extends React.Component {
     tenants: null
   }
 
-  handleChange = key => value => {
+  handleChange = moize(key => value => {
     this.setState({
       [key]: value
     })
-  }
+  })
 
   resetTenantScopedContext = (tenant) => {
     const { setContext } = this.props
@@ -35,15 +37,15 @@ class TenantChooser extends React.Component {
   updateCurrentTenant = async tenantName => {
     const { context, setContext } = this.props
     const { tenants } = this.state
+    this.setState(assoc('currentTenantName', tenantName), async () => {
+      const tenant = tenants.find(x => x.name === tenantName)
+      if (!tenant) { return }
+      setContext({ currentTenant: tenant })
 
-    this.setState({ currentTenantName: tenantName })
-    const tenant = tenants.find(x => x.name === tenantName)
-    if (!tenant) { return }
-    setContext({ currentTenant: tenant })
-
-    const { keystone } = context.apiClient
-    await keystone.changeProjectScope(tenant.id)
-    this.resetTenantScopedContext(tenant)
+      const { keystone } = context.apiClient
+      await keystone.changeProjectScope(tenant.id)
+      this.resetTenantScopedContext(tenant)
+    })
   }
 
   handleChoose = tenantName => {

@@ -1,4 +1,5 @@
-import { partial, path } from 'ramda'
+import { path } from 'ramda'
+import { pathJoin } from 'utils/misc'
 
 const defaultOptions = {
   showFooter: false,
@@ -20,20 +21,21 @@ const pluginManager = {
   },
 
   registerPlugin (pluginId, name, basePath) {
-    pluginList[pluginId] = Object.freeze({
+    pluginList[pluginId] = {
       name,
       basePath,
-      registerComponent: partial(this.registerComponent, [pluginId]),
-      registerRoutes: partial(this.registerRoutes, [pluginId]),
-      registerNavItems: partial(this.registerNavItems, [pluginId]),
-      getComponents: partial(this.getComponents, [pluginId]),
-      getRoutes: partial(this.getRoutes, [pluginId]),
-      getNavItems: partial(this.getNavItems, [pluginId]),
-      getOptions: partial(this.getOptions, [pluginId]),
-      getOption: partial(this.getOption, [pluginId]),
-      setOption: partial(this.setOption, [pluginId]),
-      getDefaultRoute: partial(this.getDefaultRoute, [pluginId]),
-    })
+      registerComponent: (...args) => this.registerComponent(pluginId, ...args),
+      registerRoutes: (...args) => this.registerRoutes(pluginId, ...args),
+      registerNavItems: (...args) => this.registerNavItems(pluginId, ...args),
+      getComponents: () => this.getComponents(pluginId),
+      getRoutes: () => this.getRoutes(pluginId),
+      getNavItems: () => this.getNavItems(pluginId),
+      getOptions: () => this.getOptions(pluginId),
+      getOption: (...args) => this.getOption(pluginId, ...args),
+      setOption: (...args) => this.setOption(pluginId, ...args),
+      getDefaultRoute: () => this.getDefaultRoute(pluginId),
+      clearAll: (...args) => this.clearAll(pluginId, ...args),
+    }
     data[pluginId] = {
       basePath,
       components: [],
@@ -51,7 +53,7 @@ const pluginManager = {
   registerRoutes (pluginId, components=[]) {
     const prefixLink = link => ({
       ...link,
-      path: `${data[pluginId].basePath}${link.path}`
+      path: pathJoin(data[pluginId].basePath, link.path)
     })
 
     components
@@ -62,7 +64,7 @@ const pluginManager = {
   registerNavItems (pluginId, items=[]) {
     const prefixLink = link => ({
       ...link,
-      path: `${data[pluginId].basePath}${link.path}`
+      path: pathJoin(data[pluginId].basePath, link.path)
     })
 
     items

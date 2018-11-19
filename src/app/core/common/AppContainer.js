@@ -45,6 +45,13 @@ const styles = theme => ({
   'contentShift-right': {
     marginRight: 0,
   },
+  drawerHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    padding: '0 8px',
+    ...theme.mixins.toolbar,
+  },
 })
 
 @withStyles(styles, { withTheme: true })
@@ -68,6 +75,9 @@ class AppContainer extends React.Component {
     return (
       <div className={classes.root}>
         <div className={classes.appFrame}>
+          <Toolbar
+            handleDrawerOpen={this.handleDrawerOpen}
+            open={open} />
           <Navbar
             withSearchBar
             drawerWidth={drawerWidth}
@@ -78,11 +88,7 @@ class AppContainer extends React.Component {
             [classes.contentShift]: open,
             [classes['contentShift-left']]: open,
           })}>
-            <div className={classes.drawerHeader}>
-              <Toolbar
-                handleDrawerOpen={this.handleDrawerOpen}
-                open={open} />
-            </div>
+            <div className={classes.drawerHeader} />
             <div>{this.props.children}</div>
           </main>
         </div>

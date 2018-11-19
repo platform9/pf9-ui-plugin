@@ -1,7 +1,7 @@
 require('isomorphic-fetch')
 
 const config = require('../../config')
-const registry = require('../../src/app/util/registry')
+const registry = require('../../src/app/utils/registry')
 
 const keystone = require('../../src/app/plugins/openstack/api/keystone')
 const {

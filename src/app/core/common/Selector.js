@@ -62,7 +62,7 @@ class Selector extends React.Component {
           color="inherit"
           disableRipple
         >
-          <Typography color="inherit" variant="body2">
+          <Typography color="inherit" variant="body1">
             {name}  &#9662;
           </Typography>
         </Button>

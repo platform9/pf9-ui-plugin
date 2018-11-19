@@ -27,7 +27,7 @@ const textTheme = createMuiTheme({
     title: {
       lineHeight: 2
     },
-    body2: {
+    body1: {
       lineHeight: 2.5
     }
   },

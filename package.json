@@ -107,6 +107,16 @@
   "jest": {
     "automock": false,
     "setupTestFrameworkScriptFile": "./setupJest.js",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "^developer(.*)$": "<rootDir>/src/app/plugins/developer$1",
+      "^k8s(.*)$": "<rootDir>/src/app/plugins/kubernetes$1",
+      "^openstack(.*)$": "<rootDir>/src/app/plugins/openstack$1",
+      "^core(.*)$": "<rootDir>/src/app/core$1",
+      "^utils(.*)$": "<rootDir>/src/app/utils$1",
+      "^app(.*)$": "<rootDir>/src/app$1",
+      "^server(.*)$": "<rootDir>/src/server$1",
+      "^api-client(.*)$": "<rootDir>/src/api-client$1"
+    }
   }
 }

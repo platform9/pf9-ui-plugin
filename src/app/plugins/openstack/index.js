@@ -36,10 +36,8 @@ import AddVolumeTypePage from './components/volumes/AddVolumeTypePage'
 import UpdateVolumeTypePage from './components/volumes/UpdateVolumeTypePage'
 
 import CreateSnapshotPage from './components/volumes/CreateSnapshotPage'
-import VolumeSnapshotsListPage
-  from './components/volumes/VolumeSnapshotsListPage'
-import UpdateVolumeSnapshotPage
-  from './components/volumes/UpdateVolumeSnapshotPage'
+import VolumeSnapshotsListPage from './components/volumes/VolumeSnapshotsListPage'
+import UpdateVolumeSnapshotPage from './components/volumes/UpdateVolumeSnapshotPage'
 
 import HostsListPage from './components/hosts/HostsListPage'
 
@@ -314,7 +312,7 @@ OpenStack.registerPlugin = pluginManager => {
         name: 'Hosts',
         link: { path: '/hosts' }
       }
-      */
+      /**/
     ]
   )
 }

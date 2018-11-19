@@ -62,15 +62,9 @@ class Toolbar extends React.Component {
     filterText: '',
   }
 
-  handleSearch = moize(key => value => {
+  handleChange = moize(key => value => {
     this.setState({
       [key]: value
-    })
-  })
-
-  handleClick = moize(key => event => {
-    this.setState({
-      [key]: event.target.innerText
     })
   })
 
@@ -97,8 +91,8 @@ class Toolbar extends React.Component {
           <Selector
             name={curRegion.length === 0 ? 'Current Region' : curRegion}
             list={[`AWS-US-West-1-Test`, `KVM-Neutron`]}
-            onChoose={this.handleClick('curRegion')}
-            onSearchChange={this.handleSearch('regionSearch')}
+            onChoose={this.handleChange('curRegion')}
+            onSearchChange={this.handleChange('regionSearch')}
             searchTerm={regionSearch}
           />
           <TenantChooser />
