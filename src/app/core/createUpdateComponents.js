@@ -67,7 +67,9 @@ const createUpdateComponents = options => {
 
       return (
         <FormWrapper title={title} backUrl={listUrl}>
-          <FormComponent {...this.props} onComplete={this.handleComplete} initialValue={initialValue} />
+          <FormComponent {...this.props}
+            onComplete={this.handleComplete}
+            initialValues={initialValue} />
         </FormWrapper>
       )
     }

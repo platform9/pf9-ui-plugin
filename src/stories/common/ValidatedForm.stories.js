@@ -104,5 +104,12 @@ addStories('Form Handling/ValidatedForm', {
     showErrorsOnBlur: true
   }),
 
-  'Fields validation just on submit': renderForm()
+  'Fields validation just on submit': renderForm(),
+
+  'With default values': renderForm({
+    initialValues: {
+      name: 'hello',
+      description: 'Lorem ipsum'
+    }
+  })
 })

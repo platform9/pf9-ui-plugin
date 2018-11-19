@@ -273,7 +273,7 @@ class ApiHelper extends React.Component {
         <ValidatedForm
           onSubmit={this.performApiCall}
           className={classes.root}
-          initialValue={initialValue}
+          initialValues={initialValue}
         >
           <ServicePicker value={service} onChange={this.handleServiceChange} />
           <PicklistField
