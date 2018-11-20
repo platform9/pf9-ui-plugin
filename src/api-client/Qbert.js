@@ -99,7 +99,8 @@ class Qbert {
   async detach (clusterId, nodeIds) { /* TODO */ }
 
   async getCliToken (clusterId, namespace) {
-    return this.client.basicPost(`${await this.baseUrl()}/webcli/${clusterId}`, { namespace })
+    const response = await this.client.basicPost(`${await this.baseUrl()}/webcli/${clusterId}`, { namespace })
+    return response.token
   }
 
   /* k8s API */

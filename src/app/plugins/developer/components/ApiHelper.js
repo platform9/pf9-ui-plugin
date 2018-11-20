@@ -57,8 +57,8 @@ class ApiHelper extends React.Component {
 
     const response = await {
       GET:    () => apiClient.basicGet(finalUrl),
-      POST:   () => apiClient.basicPost(finalUrl, body),
-      PUT:    () => apiClient.basicPut(finalUrl, body),
+      POST:   () => apiClient.basicPost(finalUrl, JSON.parse(body)),
+      PUT:    () => apiClient.basicPut(finalUrl, JSON.parse(body)),
       DELETE: () => apiClient.basicGet(finalUrl),
     }[method]()
 
@@ -67,8 +67,14 @@ class ApiHelper extends React.Component {
 
   setField = key => value => this.setState({ [key]: value })
 
-  handleServiceChange = ({ service, baseUrl }) => {
-    this.setState({ service, baseUrl })
+  handleServiceChange = async ({ service, baseUrl }) => {
+    const { apiClient } = this.props.context
+    this.setState({ service })
+
+    if (service === 'qbert') {
+      return this.setState({ baseUrl: await apiClient.qbert.baseUrl() })
+    }
+    this.setState({ baseUrl })
   }
 
   toggleFieldSelection = field => e => {

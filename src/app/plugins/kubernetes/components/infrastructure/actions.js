@@ -56,19 +56,30 @@ export const loadInfrastructure = async ({ context, setContext, reload }) => {
       qbert.getClusters().then(tap(clusters => setContext({ clusters }))),
       qbert.getNodes().then(tap(nodes => setContext({ nodes }))),
     ])
+    const qbertEndpoint = await qbert.baseUrl()
 
     // Then fill out the derived data
     const clusters = rawClusters.map(cluster => {
       const nodesInCluster = nodes.filter(node => node.clusterUuid === cluster.uuid)
       const masterNodes = nodesInCluster.filter(node => node.isMaster === 1)
       const healthyMasterNodes = masterNodes.filter(node => node.status === 'ok' && node.api_responding === 1)
+      const clusterOk = nodesInCluster.length > 0 && cluster.status === 'ok'
+      const dashboardLink =`${qbertEndpoint}/clusters/${cluster.uuid}/k8sapi/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:443/proxy/`
+      const host = qbertEndpoint.match(/(.*?)\/qbert/)[1]
       return {
         ...cluster,
-        nodes,
+        nodes: nodesInCluster,
         masterNodes,
         healthyMasterNodes,
         hasMasterNode: healthyMasterNodes.length > 0,
         highlyAvailable: healthyMasterNodes.length > 2,
+        links: {
+          dashboard: clusterOk ? dashboardLink : null,
+          // Rendering happens in <DownloadKubeConfigLink />
+          kubeconfig: clusterOk ? { cluster }: null,
+          // Rendering happens in <ClusterCLI />
+          cli: clusterOk ? { host, cluster }: null,
+        },
       }
     })
     setContext({ clusters })

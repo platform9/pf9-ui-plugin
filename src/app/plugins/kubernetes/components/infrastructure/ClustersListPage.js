@@ -1,11 +1,27 @@
 import React from 'react'
 import createCRUDComponents from 'core/createCRUDComponents'
+import DownloadKubeConfigLink from './DownloadKubeConfigLink'
+import KubeCLI from './KubeCLI'
 import { loadInfrastructure } from './actions'
 
-// TOOD: I can't do anything async in the render function.
-// I'll need to do this inside of `loadInfrastructure` unfortunately.
-const renderLinks = async (_, cluster, context) => {
-  return Promise.resolve(<div>test</div>)
+// Prevent the cluster row from being selected
+const stopPropagation = e => e.stopPropagation()
+
+const Link = ({ src, Icon, label }) => (
+  <div>
+    <a href={src} target="_blank" onClick={stopPropagation}>{label}</a>
+  </div>
+)
+
+const renderLinks = links => {
+  if (!links) { return null }
+  return (
+    <div>
+      {links.dashboard && <Link src={links.dashboard} label="Dashboard" />}
+      {links.kubeconfig && <DownloadKubeConfigLink cluster={links.kubeconfig.cluster} />}
+      {links.cli && <KubeCLI {...links.cli} />}
+    </div>
+  )
 }
 
 export const options = {
