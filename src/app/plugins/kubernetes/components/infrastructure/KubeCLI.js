@@ -5,6 +5,7 @@ import { withAppContext } from 'core/AppContext'
 import { AppBar, Dialog, IconButton, Slide, Toolbar, Typography } from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles'
 import CloseIcon from '@material-ui/icons/Close'
+import SimpleLink from 'core/common/SimpleLink'
 
 const styles = {
   appBar: {
@@ -24,9 +25,7 @@ const Transition = props => <Slide direction="up" {...props} />
 class KubeCLI extends React.Component {
   state = { url: null, open: false }
 
-  handleClick = async e => {
-    e.preventDefault()
-    e.stopPropagation()
+  handleClick = async () => {
     const { host, cluster, context } = this.props
     const token = await context.apiClient.qbert.getCliToken(cluster.uuid)
     const url = `${host}/container/index.html?token=${token}`
@@ -44,7 +43,7 @@ class KubeCLI extends React.Component {
     const { classes } = this.props
     return (
       <div>
-        <a href="#" onClick={this.handleClick}>CLI</a>
+        <SimpleLink onClick={this.handleClick}>CLI</SimpleLink>
         <Dialog
           fullScreen
           open={this.state.open}

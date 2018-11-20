@@ -1,13 +1,10 @@
 import React from 'react'
 import { compose } from 'ramda'
 import { withAppContext } from 'core/AppContext'
+import SimpleLink from 'core/common/SimpleLink'
 
 class DownloadKubeConfigLink extends React.Component {
   handleClick = e => {
-    // Prevent the table row from being selected
-    e.preventDefault()
-    e.stopPropagation()
-
     console.log('DownloadKubeConfigLink#handleClick')
     // TODO: The original solution involves requesting the user
     // for their username and password and then saving them
@@ -15,11 +12,18 @@ class DownloadKubeConfigLink extends React.Component {
     // security implications.  I'd like to punt on this for now
     // and see if we can get a dedicated endpoint that uses the
     // existing auth headers to authenticate.
+    //
+    // After further discussions with the Qbert team there will
+    // be some refactoring done to support self-service users.
+    // It is likely we can re-use that logic instead when it
+    // becomes available.
   }
 
   render () {
     return (
-      <a href="#" onClick={this.handleClick}>kubeconfig</a>
+      <div>
+        <SimpleLink onClick={this.handleClick}>kubeconfig</SimpleLink>
+      </div>
     )
   }
 }

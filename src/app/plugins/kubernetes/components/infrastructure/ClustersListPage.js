@@ -2,22 +2,14 @@ import React from 'react'
 import createCRUDComponents from 'core/createCRUDComponents'
 import DownloadKubeConfigLink from './DownloadKubeConfigLink'
 import KubeCLI from './KubeCLI'
+import SimpleLink from 'core/common/SimpleLink'
 import { loadInfrastructure } from './actions'
-
-// Prevent the cluster row from being selected
-const stopPropagation = e => e.stopPropagation()
-
-const Link = ({ src, Icon, label }) => (
-  <div>
-    <a href={src} target="_blank" onClick={stopPropagation}>{label}</a>
-  </div>
-)
 
 const renderLinks = links => {
   if (!links) { return null }
   return (
     <div>
-      {links.dashboard && <Link src={links.dashboard} label="Dashboard" />}
+      {links.dashboard && <SimpleLink src={links.dashboard} target="_blank">Dashboard</SimpleLink>}
       {links.kubeconfig && <DownloadKubeConfigLink cluster={links.kubeconfig.cluster} />}
       {links.cli && <KubeCLI {...links.cli} />}
     </div>
