@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { keyValueArrToObj } from 'core/fp'
 
-import ListTable from 'core/common/ListTable'
+import ListTable from 'core/common/list_table/ListTable'
 
 const columns = [
   { id: 'name', label: 'Name' },

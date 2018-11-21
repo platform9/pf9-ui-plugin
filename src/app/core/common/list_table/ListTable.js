@@ -3,21 +3,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/core/styles'
-import {
-  Checkbox,
-  Grid,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TablePagination,
-  TableRow
-} from '@material-ui/core'
-import EnhancedTableHead from './EnhancedTableHead'
-import EnhancedTableToolbar from './EnhancedTableToolbar'
+import { Checkbox, Grid, Paper, Table, TableBody, TableCell, TablePagination, TableRow } from '@material-ui/core'
+import EnhancedTableHead from '../EnhancedTableHead'
+import EnhancedTableToolbar from './ListTableToolbar'
 import MoreMenu from 'core/common/MoreMenu'
-import { compose } from 'core/fp'
+import { compose, except } from 'core/fp'
 import { withAppContext } from 'core/AppContext'
+import { prop } from 'ramda'
 
 const styles = theme => ({
   root: {
@@ -41,6 +33,9 @@ class ListTable extends React.Component {
     const prefs = (getUserPreferences && getUserPreferences()) || {}
 
     this.state = {
+      visibleColumns: columns
+        .filter(column => column.display !== false && column.display !== 'excluded')
+        .map(prop('id')),
       order: 'asc',
       orderBy: columns[0].id,
       page: 0,
@@ -166,6 +161,14 @@ class ListTable extends React.Component {
     })
   }
 
+  handleColumnsChange = columnId => {
+    this.setState(({visibleColumns}) => ({
+      visibleColumns: visibleColumns.includes(columnId)
+        ? except(columnId, visibleColumns)
+        : [...visibleColumns, columnId]
+    }))
+  }
+
   filterBySearch = (data, target) => {
     const { searchTerm } = this.state
     return data.filter(ele => ele[target].match(new RegExp(searchTerm, 'i')) !== null)
@@ -210,8 +213,14 @@ class ListTable extends React.Component {
     )
   }
 
+  getVisibleColums = () => {
+    const { columns } = this.props
+    const { visibleColumns } = this.state
+    return columns.filter(column => visibleColumns.includes(column.id))
+  }
+
   renderRow = row => {
-    const { columns, showCheckboxes, uniqueIdentifier } = this.props
+    const { showCheckboxes, uniqueIdentifier } = this.props
     const isSelected = this.isSelected(row)
 
     const checkboxProps = showCheckboxes ? {
@@ -230,9 +239,8 @@ class ListTable extends React.Component {
             <Checkbox checked={isSelected} color="primary" />
           </TableCell>
         }
-        {columns.map((columnDef, colIdx) =>
-          this.renderCell(columnDef, row[columnDef.id], row))
-        }
+        {this.getVisibleColums().map((columnDef) =>
+          this.renderCell(columnDef, row[columnDef.id], row))}
         {this.renderRowActions(row)}
       </TableRow>
     )
@@ -287,6 +295,7 @@ class ListTable extends React.Component {
       orderBy,
       searchTerm,
       selected,
+      visibleColumns,
     } = this.state
 
     if (!data) {
@@ -312,11 +321,14 @@ class ListTable extends React.Component {
               onEdit={onEdit && this.handleEdit}
               onSearchChange={searchTarget && this.handleSearch}
               searchTerm={searchTerm}
+              columns={columns}
+              visibleColumns={visibleColumns}
+              onColumnsChange={this.handleColumnsChange}
             />
             <div className={classes.tableWrapper}>
               <Table className={classes.table}>
                 <EnhancedTableHead
-                  columns={columns}
+                  columns={this.getVisibleColums()}
                   numSelected={selected.length}
                   order={order}
                   orderBy={orderBy}

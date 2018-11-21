@@ -4,13 +4,8 @@ import PicklistField from 'core/common/validated_form/PicklistField'
 import TextField from 'core/common/validated_form/TextField'
 import SubmitButton from 'core/common/SubmitButton'
 import ValidatedForm from 'core/common/validated_form/ValidatedForm'
-import ListTable from 'core/common/ListTable'
-import {
-  Checkbox,
-  FormControlLabel,
-  TextField as BaseTextField,
-  Typography
-} from '@material-ui/core'
+import ListTable from 'core/common/list_table/ListTable'
+import { Checkbox, FormControlLabel, TextField as BaseTextField, Typography } from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles'
 import { path, pick } from 'ramda'
 import { compose } from 'core/fp'

@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import ListTable from 'core/common/ListTable'
+import ListTable from 'core/common/list_table/ListTable'
 
 export const columns = [
   { id: 'id', label: 'OpenStack ID' },

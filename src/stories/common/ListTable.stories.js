@@ -1,8 +1,11 @@
 import React from 'react'
-import ListTable from 'core/common/ListTable'
+import ListTable from 'core/common/list_table/ListTable'
 import ReplayIcon from '@material-ui/icons/Replay'
 import { action } from '@storybook/addon-actions'
-import { addStories } from '../helpers'
+import { addStories, randomInt } from '../helpers'
+import { range } from 'ramda'
+import faker from 'faker'
+import moment from 'moment'
 
 const onAdd = action('add')
 const onDelete = action('delete')
@@ -10,31 +13,54 @@ const onEdit = action('edit')
 const onRestart = action('restart')
 
 const columns = [
-  { id: 'id', label: 'integer' },
-  { id: 'word', label: 'word' },
+  { id: 'id', label: 'ID', display: 'excluded' },
+  { id: 'uuid', label: 'UUID', display: false },
+  { id: 'name', label: 'Name' },
+  { id: 'phone', label: 'Phone' },
+  { id: 'email', label: 'Email' },
+  { id: 'date', label: 'Date' },
+  { id: 'address', label: 'Address', display: false },
+  { id: 'description', label: 'Description', display: false },
 ]
 
-const data = [
-  { id: 1, word: 'one' },
-  { id: 2, word: 'two' },
-  { id: 3, word: 'three' },
-]
+const data = range(1, randomInt(20, 30)).map(id => ({
+  id,
+  uuid: faker.random.uuid(),
+  name: faker.name.findName(),
+  phone: faker.phone.phoneNumber(),
+  email: faker.internet.email(),
+  date: moment(faker.date.past()).format('LL'),
+  address: faker.address.streetAddress(),
+  description: faker.lorem.sentence()
+}))
+
 const rowActions = [
   { icon: <ReplayIcon />, label: 'Restart', action: onRestart }
 ]
 
 const actions = { onAdd, onDelete, onEdit }
 
+const DefaultListTable = props =>
+  <ListTable title="Example table" columns={columns} data={data} {...props} />
+
 addStories('Common Components/ListTable', {
   'Minimal use case': () => (
-    <ListTable title="Numbers" columns={columns} data={data} {...actions} />
+    <DefaultListTable {...actions} />
   ),
 
   'w/o checkboxes': () => (
-    <ListTable title="Numbers" columns={columns} data={data} showCheckboxes={false} />
+    <DefaultListTable showCheckboxes={false} />
   ),
 
   'w/ row actions': () => (
-    <ListTable title="Numbers" columns={columns} data={data} rowActions={rowActions} />
+    <DefaultListTable rowActions={rowActions} />
+  ),
+
+  'w/ columns selection': () => (
+    <DefaultListTable editableColumns rowActions={rowActions} />
+  ),
+
+  'Sortable': () => (
+    <DefaultListTable sortable rowActions={rowActions} />
   )
 })

@@ -3,13 +3,9 @@ import { withRouter } from 'react-router-dom'
 import { compose } from 'core/fp'
 import FormWrapper from 'core/common/FormWrapper'
 import requiresAuthentication from '../../util/requiresAuthentication'
-import {
-  createMuiTheme,
-  MuiThemeProvider,
-  withStyles
-} from '@material-ui/core/styles'
+import { createMuiTheme, MuiThemeProvider, withStyles } from '@material-ui/core/styles'
 import { Divider, Typography } from '@material-ui/core'
-import ListTable from 'core/common/ListTable'
+import ListTable from 'core/common/list_table/ListTable'
 
 const styles = theme => ({
   code: {

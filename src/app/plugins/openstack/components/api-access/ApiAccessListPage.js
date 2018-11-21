@@ -3,7 +3,7 @@ import { compose } from 'core/fp'
 import requiresAuthentication from 'openstack/util/requiresAuthentication'
 import DataLoader from 'core/DataLoader'
 import { loadServiceCatalog } from './actions'
-import ListTable from 'core/common/ListTable'
+import ListTable from 'core/common/list_table/ListTable'
 
 const columns = [
   { id: 'id', label: 'ID' },
