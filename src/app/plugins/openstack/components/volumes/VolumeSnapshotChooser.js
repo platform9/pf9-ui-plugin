@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import ListTableSelect from 'core/common/ListTableSelect'
+import ListTableSelect from 'core/common/list_table/ListTableSelect'
 import { columns } from './VolumeSnapshotsList'
 
 const VolumeSnapshotChooser = ({ data, onChange, initialValue }) => {

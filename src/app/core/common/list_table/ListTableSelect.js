@@ -1,16 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/core/styles'
-import {
-  Grid,
-  Paper,
-  Radio,
-  Table,
-  TableBody,
-  TableCell,
-  TableRow
-} from '@material-ui/core'
-import EnhancedTableHead from './EnhancedTableHead'
+import { Grid, Paper, Radio, Table, TableBody, TableCell, TableRow } from '@material-ui/core'
+import ListTableHead from './ListTableHead'
 
 const styles = theme => ({
   root: {
@@ -79,7 +71,7 @@ class ListTableSelect extends React.Component {
           <Paper className={classes.root}>
             <div className={classes.tableWrapper}>
               <Table className={classes.table}>
-                <EnhancedTableHead
+                <ListTableHead
                   columns={columns}
                   blankFirstColumn
                 />

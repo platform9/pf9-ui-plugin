@@ -1,5 +1,5 @@
 import React from 'react'
-import ListTableSelect from 'core/common/ListTableSelect'
+import ListTableSelect from 'core/common/list_table/ListTableSelect'
 import { action } from '@storybook/addon-actions'
 import { addStories } from '../helpers'
 

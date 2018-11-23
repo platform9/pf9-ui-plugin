@@ -13,7 +13,7 @@ const onEdit = action('edit')
 const onRestart = action('restart')
 
 const columns = [
-  { id: 'id', label: 'ID', display: 'excluded' },
+  { id: 'id', label: 'ID', excluded: true },
   { id: 'uuid', label: 'UUID', display: false },
   { id: 'name', label: 'Name' },
   { id: 'phone', label: 'Phone' },
@@ -57,10 +57,10 @@ addStories('Common Components/ListTable', {
   ),
 
   'w/ columns selection': () => (
-    <DefaultListTable editableColumns rowActions={rowActions} />
+    <DefaultListTable canEditColumns rowActions={rowActions} />
   ),
 
-  'Sortable': () => (
-    <DefaultListTable sortable rowActions={rowActions} />
+  'w/ columns ordering': () => (
+    <DefaultListTable canEditColumns canDragColumns rowActions={rowActions} />
   )
 })

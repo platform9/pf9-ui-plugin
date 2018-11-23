@@ -5,7 +5,7 @@ import React from 'react'
 import grey from '@material-ui/core/colors/grey'
 import PropTypes from 'prop-types'
 import { compose } from 'ramda'
-import ListTableColumnsPopover from 'core/common/list_table/ListTableColumnsPopover'
+import ListTableColumnPopover from 'core/common/list_table/ListTableColumnPopover'
 
 const styles = theme => ({
   root: {
@@ -22,7 +22,7 @@ const styles = theme => ({
   }
 })
 
-class ListTableColumnsSelector extends React.PureComponent {
+class ListTableColumnSelector extends React.PureComponent {
   constructor (props) {
     super(props)
     this.inputRef = React.createRef()
@@ -76,7 +76,7 @@ class ListTableColumnsSelector extends React.PureComponent {
           vertical: 'top',
           horizontal: 'center',
         }}>
-        <ListTableColumnsPopover
+        <ListTableColumnPopover
           columns={columns}
           visibleColumns={visibleColumns}
           onColumnsChange={onColumnsChange} />
@@ -85,9 +85,15 @@ class ListTableColumnsSelector extends React.PureComponent {
   }
 }
 
-ListTableColumnsSelector.propTypes = {
-  columns: PropTypes.array.isRequired,
-  onColumnsChange: PropTypes.func.isRequired,
+ListTableColumnSelector.propTypes = {
+  columns: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string,
+    label: PropTypes.string,
+    display: PropTypes.bool,
+    excluded: PropTypes.bool,
+  })).isRequired,
+  visibleColumns: PropTypes.array,
+  onColumnsChange: PropTypes.func,
 }
 
-export default compose(withStyles(styles))(ListTableColumnsSelector)
+export default compose(withStyles(styles))(ListTableColumnSelector)

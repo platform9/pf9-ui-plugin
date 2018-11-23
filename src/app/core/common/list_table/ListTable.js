@@ -4,12 +4,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/core/styles'
 import { Checkbox, Grid, Paper, Table, TableBody, TableCell, TablePagination, TableRow } from '@material-ui/core'
-import EnhancedTableHead from '../EnhancedTableHead'
+import ListTableHead from './ListTableHead'
 import EnhancedTableToolbar from './ListTableToolbar'
 import MoreMenu from 'core/common/MoreMenu'
 import { compose, except } from 'core/fp'
 import { withAppContext } from 'core/AppContext'
-import { prop } from 'ramda'
+import { pipe, pluck, prop, update } from 'ramda'
 
 const styles = theme => ({
   root: {
@@ -34,8 +34,9 @@ class ListTable extends React.Component {
 
     this.state = {
       visibleColumns: columns
-        .filter(column => column.display !== false && column.display !== 'excluded')
+        .filter(column => column.display !== false && column.excluded !== true)
         .map(prop('id')),
+      columnsOrder: pluck('id', columns),
       order: 'asc',
       orderBy: columns[0].id,
       page: 0,
@@ -161,11 +162,23 @@ class ListTable extends React.Component {
     })
   }
 
-  handleColumnsChange = columnId => {
+  handleColumnSwitch = columnId => {
     this.setState(({visibleColumns}) => ({
       visibleColumns: visibleColumns.includes(columnId)
         ? except(columnId, visibleColumns)
         : [...visibleColumns, columnId]
+    }))
+  }
+
+  handleColumnsSwitch = (srcColumnId, destColumnId) => {
+    const {columnsOrder} = this.state
+    const srcColumnIdx = columnsOrder.indexOf(srcColumnId)
+    const tarColumnIdx = columnsOrder.indexOf(destColumnId)
+    this.setState(({columnsOrder}) => ({
+      columnsOrder: pipe(
+        update(srcColumnIdx, destColumnId),
+        update(tarColumnIdx, srcColumnId),
+      )(columnsOrder)
     }))
   }
 
@@ -199,10 +212,6 @@ class ListTable extends React.Component {
     )
   }
 
-  handleRowActionsClick = e => {
-    e.stopPropagation()
-  }
-
   renderRowActions = row => {
     const { rowActions } = this.props
     if (!rowActions) { return null }
@@ -213,10 +222,12 @@ class ListTable extends React.Component {
     )
   }
 
-  getVisibleColums = () => {
+  getSortedVisibleColums = () => {
     const { columns } = this.props
-    const { visibleColumns } = this.state
-    return columns.filter(column => visibleColumns.includes(column.id))
+    const { columnsOrder, visibleColumns } = this.state
+    return columnsOrder
+      .map(columnId => columns.find(column => column.id === columnId))
+      .filter(column => visibleColumns.includes(column.id))
   }
 
   renderRow = row => {
@@ -239,7 +250,7 @@ class ListTable extends React.Component {
             <Checkbox checked={isSelected} color="primary" />
           </TableCell>
         }
-        {this.getVisibleColums().map((columnDef) =>
+        {this.getSortedVisibleColums().map((columnDef) =>
           this.renderCell(columnDef, row[columnDef.id], row))}
         {this.renderRowActions(row)}
       </TableRow>
@@ -288,6 +299,8 @@ class ListTable extends React.Component {
       searchTarget,
       showCheckboxes,
       title,
+      canEditColumns,
+      canDragColumns,
     } = this.props
 
     const {
@@ -323,12 +336,14 @@ class ListTable extends React.Component {
               searchTerm={searchTerm}
               columns={columns}
               visibleColumns={visibleColumns}
-              onColumnsChange={this.handleColumnsChange}
+              onColumnsChange={canEditColumns && this.handleColumnSwitch}
             />
             <div className={classes.tableWrapper}>
               <Table className={classes.table}>
-                <EnhancedTableHead
-                  columns={this.getVisibleColums()}
+                <ListTableHead
+                  canDragColumns={canDragColumns}
+                  columns={this.getSortedVisibleColums()}
+                  onColumnsSwitch={this.handleColumnsSwitch}
                   numSelected={selected.length}
                   order={order}
                   orderBy={orderBy}
@@ -354,7 +369,14 @@ class ListTable extends React.Component {
 }
 
 ListTable.propTypes = {
-  columns: PropTypes.arrayOf(PropTypes.object).isRequired,
+  columns: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string,
+    label: PropTypes.string,
+    /* Not displayed columns will only appear in the columns selector */
+    display: PropTypes.bool,
+    /* Excluded columns will neither appear in the grid nor in the columns selector */
+    excluded: PropTypes.bool,
+  })).isRequired,
   data: PropTypes.arrayOf(PropTypes.object).isRequired,
   options: PropTypes.object,
   title: PropTypes.string.isRequired,
@@ -384,6 +406,9 @@ ListTable.propTypes = {
 
   showCheckboxes: PropTypes.bool,
   searchTarget: PropTypes.string,
+
+  canEditColumns: PropTypes.bool,
+  canDragColumns: PropTypes.bool,
 }
 
 ListTable.defaultProps = {
@@ -392,6 +417,8 @@ ListTable.defaultProps = {
   paginate: true,
   showCheckboxes: true,
   uniqueIdentifier: 'id',
+  canEditColumns: false,
+  canDragColumns: false,
 }
 
 export default compose(

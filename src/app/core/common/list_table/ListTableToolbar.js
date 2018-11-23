@@ -9,7 +9,7 @@ import DeleteIcon from '@material-ui/icons/Delete'
 import EditIcon from '@material-ui/icons/Edit'
 import FilterListIcon from '@material-ui/icons/FilterList'
 import SearchBar from 'core/common/SearchBar'
-import ListTableColumnsSelector from 'core/common/list_table/ListTableColumnsSelector'
+import ListTableColumnsSelector from 'core/common/list_table/ListTableColumnSelector'
 
 const toolbarStyles = theme => ({
   root: {
@@ -109,6 +109,14 @@ const ListTableToolbar = ({
 
 ListTableToolbar.propTypes = {
   classes: PropTypes.object.isRequired,
+  columns: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string,
+    label: PropTypes.string,
+    display: PropTypes.bool,
+    excluded: PropTypes.bool,
+  })).isRequired,
+  visibleColumns: PropTypes.array,
+  onColumnsChange: PropTypes.func,
   numSelected: PropTypes.number.isRequired,
   title: PropTypes.string.isRequired,
   onAdd: PropTypes.func,
