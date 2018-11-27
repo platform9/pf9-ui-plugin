@@ -57,10 +57,10 @@ export default class HotKeysProvider extends Component {
 
     if (hotkeyHandlers &&
       !isEmpty(hotkeyHandlers) &&
+      !e.metaKey && !e.altKey && !e.shiftKey &&
       !this.isEditable(e)) {
       hotkeyHandlers.forEach(({fn, options}) => {
-        if (!e.metaKey && !e.altKey && !e.shiftKey &&
-          options.ctrlKey === e.ctrlKey) {
+        if (options.ctrlKey === e.ctrlKey) {
           e.preventDefault()
           fn(e)
         }
