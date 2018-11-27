@@ -9,7 +9,7 @@ import ListTableToolbar from './ListTableToolbar'
 import MoreMenu from 'core/common/MoreMenu'
 import { compose, except } from 'core/fp'
 import { withAppContext } from 'core/AppContext'
-import { pipe, pluck, prop, update } from 'ramda'
+import { pipe, pluck, prop, propEq, propOr, update } from 'ramda'
 
 const styles = theme => ({
   root: {
@@ -57,14 +57,20 @@ class ListTable extends React.Component {
     this.setState({ order, orderBy })
   }
 
-  sortData = (data) => {
-    let _data = [...data]
-    const orderBy = this.state.orderBy || this.props.columns[0].id
-    const sorted =
-      this.state.order === 'desc'
-        ? _data.sort((a, b) => (b[orderBy] < a[orderBy] ? -1 : 1))
-        : _data.sort((a, b) => (a[orderBy] < b[orderBy] ? -1 : 1))
-    return sorted
+  sortData = data => {
+    const { columns } = this.props
+    const orderBy = this.state.orderBy || columns[0].id
+
+    const sortWith = propOr(
+      (prevValue, nextValue) => (nextValue < prevValue ? -1 : 1),
+      'sortWith',
+      columns.find(propEq('id', orderBy))
+    )
+
+    // .sort() does not mutate array
+    const sortedRows = data.sort((a, b) => sortWith(b[orderBy], a[orderBy]))
+
+    return this.state.order === 'desc' ? sortedRows : sortedRows.reverse()
   }
 
   areAllSelected = (data) => {
@@ -83,7 +89,8 @@ class ListTable extends React.Component {
     let newSelected
     if (checked) {
       // Add active paginated rows that are not already selected
-      newSelected = [...selected, ...paginatedData.filter(row => !selected.includes(row))]
+      newSelected = [...selected, ...paginatedData.filter(
+        row => !selected.includes(row))]
     } else {
       // Remove active paginated rows from selected
       newSelected = selected.filter(row => !paginatedData.includes(row))
@@ -163,7 +170,7 @@ class ListTable extends React.Component {
   }
 
   handleColumnSwitch = columnId => {
-    this.setState(({visibleColumns}) => ({
+    this.setState(({ visibleColumns }) => ({
       visibleColumns: visibleColumns.includes(columnId)
         ? except(columnId, visibleColumns)
         : [...visibleColumns, columnId]
@@ -171,10 +178,10 @@ class ListTable extends React.Component {
   }
 
   handleColumnsSwitch = (srcColumnId, destColumnId) => {
-    const {columnsOrder} = this.state
+    const { columnsOrder } = this.state
     const srcColumnIdx = columnsOrder.indexOf(srcColumnId)
     const tarColumnIdx = columnsOrder.indexOf(destColumnId)
-    this.setState(({columnsOrder}) => ({
+    this.setState(({ columnsOrder }) => ({
       columnsOrder: pipe(
         update(srcColumnIdx, destColumnId),
         update(tarColumnIdx, srcColumnId),
@@ -182,9 +189,14 @@ class ListTable extends React.Component {
     }))
   }
 
+  handleFiltersChange = filterValues => {
+
+  }
+
   filterBySearch = (data, target) => {
     const { searchTerm } = this.state
-    return data.filter(ele => ele[target].match(new RegExp(searchTerm, 'i')) !== null)
+    return data.filter(
+      ele => ele[target].match(new RegExp(searchTerm, 'i')) !== null)
   }
 
   isSelected = row => this.state.selected.includes(row)
@@ -246,9 +258,9 @@ class ListTable extends React.Component {
     return (
       <TableRow hover key={uid} {...checkboxProps}>
         {showCheckboxes &&
-          <TableCell padding="checkbox">
-            <Checkbox checked={isSelected} color="primary" />
-          </TableCell>
+        <TableCell padding="checkbox">
+          <Checkbox checked={isSelected} color="primary" />
+        </TableCell>
         }
         {this.getSortedVisibleColums().map((columnDef) =>
           this.renderCell(columnDef, row[columnDef.id], row))}
@@ -301,6 +313,7 @@ class ListTable extends React.Component {
       title,
       canEditColumns,
       canDragColumns,
+      filters,
     } = this.props
 
     const {
@@ -372,6 +385,8 @@ ListTable.propTypes = {
   columns: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.string,
     label: PropTypes.string,
+    render: PropTypes.func,
+    sortWith: PropTypes.func,
     /* Not displayed columns will only appear in the columns selector */
     display: PropTypes.bool,
     /* Excluded columns will neither appear in the grid nor in the columns selector */
@@ -386,11 +401,11 @@ ListTable.propTypes = {
   paginate: PropTypes.bool,
 
   /*
-    Some objects have a unique identifier other than 'id'
-    For example sshKeys have unique identifier of 'name' and the APIs
-    rely on using the name as part of the URI. Specify the unique identifier
-    in props if it is different from 'id'
-  */
+   Some objects have a unique identifier other than 'id'
+   For example sshKeys have unique identifier of 'name' and the APIs
+   rely on using the name as part of the URI. Specify the unique identifier
+   in props if it is different from 'id'
+   */
   uniqueIdentifier: PropTypes.string,
 
   /**
