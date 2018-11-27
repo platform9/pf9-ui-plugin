@@ -10,6 +10,15 @@ export const loadClusters = async ({ context, setContext, reload }) => {
   return clusters
 }
 
+export const deleteCluster = async ({ id, context, setContext }) => {
+  await context.apiClient.qbert.deleteCluster(id)
+  const clusters = context.clusters.filter(x => x.uuid !== id)
+  setContext({ clusters })
+  // Force refresh using 'loadInfrastructure' since combinedHosts will still
+  // have references to the deleted cluster.
+  loadInfrastructure({ context, setContext, reload: true })
+}
+
 export const loadCloudProviders = async ({ context, setContext, reload }) => {
   if (!reload && context.cloudProviders) { return context.cloudProviders }
   const cloudProviders = await context.apiClient.qbert.getCloudProviders()

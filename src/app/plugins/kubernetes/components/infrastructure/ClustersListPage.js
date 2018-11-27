@@ -4,7 +4,7 @@ import DownloadKubeConfigLink from './DownloadKubeConfigLink'
 import KubeCLI from './KubeCLI'
 import SimpleLink from 'core/common/SimpleLink'
 import { pathOr } from 'ramda'
-import { loadInfrastructure } from './actions'
+import { deleteCluster, loadInfrastructure } from './actions'
 
 const renderLinks = links => {
   if (!links) { return null }
@@ -95,6 +95,7 @@ export const options = {
   ],
   dataKey: 'clusters',
   loaderFn: loadInfrastructure,
+  deleteFn: deleteCluster,
   name: 'Clusters',
   title: 'Clusters',
   uniqueIdentifier: 'uuid',
