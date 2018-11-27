@@ -336,7 +336,7 @@ class ListTable extends React.Component {
               searchTerm={searchTerm}
               columns={columns}
               visibleColumns={visibleColumns}
-              onColumnsChange={canEditColumns && this.handleColumnSwitch}
+              onColumnsChange={(canEditColumns && this.handleColumnSwitch) || undefined}
             />
             <div className={classes.tableWrapper}>
               <Table className={classes.table}>

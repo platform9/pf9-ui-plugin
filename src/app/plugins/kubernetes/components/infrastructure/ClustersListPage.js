@@ -3,6 +3,7 @@ import createCRUDComponents from 'core/createCRUDComponents'
 import DownloadKubeConfigLink from './DownloadKubeConfigLink'
 import KubeCLI from './KubeCLI'
 import SimpleLink from 'core/common/SimpleLink'
+import { pathOr } from 'ramda'
 import { loadInfrastructure } from './actions'
 
 const renderLinks = links => {
@@ -16,14 +17,60 @@ const renderLinks = links => {
   )
 }
 
+const sumPath = (path, nodes) => (nodes || []).reduce(
+  (accum, node) => {
+    return accum + pathOr(0, path.split('.'), node)
+  },
+  0
+)
+
+// The cluster resource utilization is the aggregate of all nodes in the cluster.
+// This calculation happens every render.  It's not ideal but it isn't that expensive
+// so we can probably leave it here.
+const renderResourceUtilization = (_, cluster, context) => {
+  const nodeIds = cluster.nodes.map(x => x.uuid)
+  const combinedNodes = context.combinedHosts
+    .filter(x => nodeIds.includes(x.resmgr.id))
+  let clusterWithStats = {
+    ...cluster,
+    usage: {
+      compute: {
+        current: sumPath('usage.compute.current', combinedNodes),
+        max: sumPath('usage.compute.max', combinedNodes),
+        units: 'GHz',
+        type: 'used',
+      },
+      memory: {
+        current: sumPath('usage.memory.current', combinedNodes),
+        max: sumPath('usage.memory.max', combinedNodes),
+        units: 'GB',
+        type: 'used',
+      },
+      disk: {
+        current: sumPath('usage.disk.current', combinedNodes),
+        max: sumPath('usage.disk.max', combinedNodes),
+        units: 'GB',
+        type: 'used',
+      }
+    }
+  }
+
+  const { compute, memory, disk } = clusterWithStats.usage
+  clusterWithStats.usage.compute.percent = compute.current / compute.max
+  clusterWithStats.usage.memory.percent = memory.current / memory.max
+  clusterWithStats.usage.disk.percent = disk.current / disk.max
+
+  return <pre>{JSON.stringify(clusterWithStats.usage, null, 4)}</pre>
+}
+
 export const options = {
   baseUrl: '/ui/kubernetes/infrastructure/clusters',
   columns: [
     { id: 'name', label: 'Cluster name' },
     { id: 'status', label: 'Status' },
     { id: 'links', label: 'Links', render: renderLinks },
-    { id: 'deployment_type', label: 'Deployment Type' },
-    { id: 'resource_utilization', label: 'Resource Utilization' },
+    { id: 'cloudProviderType', label: 'Deployment Type' },
+    { id: 'resource_utilization', label: 'Resource Utilization', render: renderResourceUtilization },
     { id: 'version', label: 'Kubernetes version' },
     /*
     // TODO:

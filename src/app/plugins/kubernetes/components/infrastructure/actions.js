@@ -87,9 +87,10 @@ export const loadInfrastructure = async ({ context, setContext, reload }) => {
     const masterNodeClusters = clusters.filter(x => x.hasMasterNode)
     asyncMap(masterNodeClusters, async cluster => {
       try {
+        const version = await qbert.getKubernetesVersion(cluster.uuid)
         return {
           ...cluster,
-          k8sVersion: await qbert.getKubernetesVersion(cluster.uuid),
+          version: version && version.gitVersion && version.gitVersion.substr(1),
         }
       } catch (err) {
         console.log(err)
