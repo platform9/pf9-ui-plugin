@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/core/styles'
 import { Checkbox, Grid, Paper, Table, TableBody, TableCell, TablePagination, TableRow } from '@material-ui/core'
 import ListTableHead from './ListTableHead'
-import EnhancedTableToolbar from './ListTableToolbar'
+import ListTableToolbar from './ListTableToolbar'
 import MoreMenu from 'core/common/MoreMenu'
 import { compose, except } from 'core/fp'
 import { withAppContext } from 'core/AppContext'
@@ -326,13 +326,13 @@ class ListTable extends React.Component {
       <Grid container justify="center">
         <Grid item xs={12} zeroMinWidth>
           <Paper className={classes.root}>
-            <EnhancedTableToolbar
+            <ListTableToolbar
               numSelected={selected.length}
               title={title}
-              onAdd={onAdd && this.handleAdd}
-              onDelete={onDelete && this.handleDelete}
-              onEdit={onEdit && this.handleEdit}
-              onSearchChange={searchTarget && this.handleSearch}
+              onAdd={onAdd ? this.handleAdd : null}
+              onDelete={onDelete ? this.handleDelete : null}
+              onEdit={onEdit ? this.handleEdit : null}
+              onSearchChange={searchTarget ? this.handleSearch : null}
               searchTerm={searchTerm}
               columns={columns}
               visibleColumns={visibleColumns}
@@ -417,8 +417,8 @@ ListTable.defaultProps = {
   paginate: true,
   showCheckboxes: true,
   uniqueIdentifier: 'id',
-  canEditColumns: false,
-  canDragColumns: false,
+  canEditColumns: true,
+  canDragColumns: true,
 }
 
 export default compose(
