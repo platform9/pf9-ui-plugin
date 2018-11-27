@@ -23,3 +23,18 @@ export const pathJoin = (...pathParts) =>
   [].concat(...pathParts) // Flatten
     .join('/')
     .replace(duplicatedSlashesRegexp, '$1')
+
+export const castFuzzyBool = value => {
+  const mappings = {
+    // JS performs a narrowing cast of ints, bools, and strings to the same key.
+    false: false,
+    true: true,
+    0: false,
+    1: true,
+    'False': false,
+    'True': true,
+  }
+
+  if (mappings[value] !== undefined) { return mappings[value] }
+  return false
+}

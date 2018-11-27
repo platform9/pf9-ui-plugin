@@ -56,9 +56,9 @@ const renderResourceUtilization = (_, cluster, context) => {
   }
 
   const { compute, memory, disk } = clusterWithStats.usage
-  clusterWithStats.usage.compute.percent = compute.current / compute.max
-  clusterWithStats.usage.memory.percent = memory.current / memory.max
-  clusterWithStats.usage.disk.percent = disk.current / disk.max
+  clusterWithStats.usage.compute.percent = Math.round(100 * compute.current / compute.max)
+  clusterWithStats.usage.memory.percent = Math.round(100 * memory.current / memory.max)
+  clusterWithStats.usage.disk.percent = Math.round(100 * disk.current / disk.max)
 
   return <pre>{JSON.stringify(clusterWithStats.usage, null, 4)}</pre>
 }
@@ -72,23 +72,26 @@ export const options = {
     { id: 'cloudProviderType', label: 'Deployment Type' },
     { id: 'resource_utilization', label: 'Resource Utilization', render: renderResourceUtilization },
     { id: 'version', label: 'Kubernetes version' },
+    { id: 'networkPlugin', label: 'Network Backend' },
+    { id: 'containersCidr', label: 'Containers CIDR' },
+    { id: 'servicesCidr', label: 'Services CIDR' },
+    { id: 'endpoint', label: 'API endpoint' },
+    { id: 'cloudProviderName', label: 'Cloud provider' },
+    { id: 'allowWorkloadsOnMaster', label: 'Master Workloads' },
+    { id: 'privileged', label: 'Privileged' },
+    { id: 'hasVpn', label: 'VPN' },
+    { id: 'appCatalogEnabled', label: 'App Catalog', render: x => x ? 'Enabled' : 'Not Enabled' },
+    { id: 'hasLoadBalancer', label: 'Load Balancer' },
     /*
     // TODO:
     //  Something in this list is causing errors after loadInfrastructure loads.
     //  Disabling these fields until we do more work on clusters.
-    { id: 'network_backend', label: 'Network backend' },
-    { id: 'containers_cidr', label: 'Containers CIDR' },
-    { id: 'services_cidr', label: 'Services CIDR' },
-    { id: 'api_endpoint', label: 'API endpoint' },
-    { id: 'cloud_provider', label: 'Cloud provider' },
     { id: 'nodes', label: 'Nodes' },
-    { id: 'master_workloads', label: 'Master Workloads' },
-    { id: 'privileged', label: 'Privileged' },
     */
 
     // TODO: We probably want to write a metadata renderer for this kind of format
     // since we use it in a few places for tags / metadata.
-    { id: 'metadata', label: 'Metadata', render: data => JSON.stringify(data) }
+    { id: 'tags', label: 'Metadata', render: data => JSON.stringify(data) }
   ],
   dataKey: 'clusters',
   loaderFn: loadInfrastructure,
