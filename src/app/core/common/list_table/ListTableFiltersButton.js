@@ -1,11 +1,11 @@
 import { IconButton, Popover, Tooltip } from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles'
-import ViewColumnIcon from '@material-ui/icons/ViewColumn'
+import FilterListIcon from '@material-ui/icons/FilterList'
 import React from 'react'
 import grey from '@material-ui/core/colors/grey'
 import PropTypes from 'prop-types'
 import { compose } from 'ramda'
-import ListTableColumnPopover from 'core/common/list_table/ListTableColumnPopover'
+import ListTableFiltersPopover from 'core/common/list_table/ListTableFiltersPopover'
 
 const styles = theme => ({
   root: {
@@ -22,7 +22,7 @@ const styles = theme => ({
   }
 })
 
-class ListTableColumnSelector extends React.PureComponent {
+class ListTableFiltersButton extends React.PureComponent {
   inputRef = React.createRef()
 
   state = {
@@ -45,19 +45,19 @@ class ListTableColumnSelector extends React.PureComponent {
   }
 
   render () {
-    const {classes, columns, visibleColumns, onColumnsChange} = this.props
-    const {open, anchorEl} = this.state
+    const { classes, columns, filters, filterValues, onFilterUpdate, onFiltersReset } = this.props
+    const { open, anchorEl } = this.state
 
     return <React.Fragment>
-      <Tooltip title="Select Columns">
+      <Tooltip title="Filter list">
         <IconButton
           className={classes.root}
           aria-owns={open ? 'simple-popper' : undefined}
-          aria-label="Select Columns"
+          aria-label="Filter list"
           aria-haspopup="true"
           variant="contained"
           onClick={this.handleClick}>
-          <ViewColumnIcon />
+          <FilterListIcon />
         </IconButton>
       </Tooltip>
       <Popover
@@ -73,24 +73,31 @@ class ListTableColumnSelector extends React.PureComponent {
           vertical: 'top',
           horizontal: 'center',
         }}>
-        <ListTableColumnPopover
+        <ListTableFiltersPopover
           columns={columns}
-          visibleColumns={visibleColumns}
-          onColumnsChange={onColumnsChange} />
+          filters={filters}
+          filterValues={filterValues}
+          onFilterUpdate={onFilterUpdate}
+          onFiltersReset={onFiltersReset} />
       </Popover>
     </React.Fragment>
   }
 }
 
-ListTableColumnSelector.propTypes = {
-  columns: PropTypes.arrayOf(PropTypes.shape({
-    id: PropTypes.string,
-    label: PropTypes.string,
-    display: PropTypes.bool,
-    excluded: PropTypes.bool,
-  })).isRequired,
-  visibleColumns: PropTypes.array,
-  onColumnsChange: PropTypes.func,
+ListTableFiltersButton.propTypes = {
+  filters: PropTypes.arrayOf(PropTypes.shape({
+    columnId: PropTypes.string.isRequired,
+    label: PropTypes.string, // Will override column label
+    type: PropTypes.oneOf(['select', 'multiselect', 'checkbox', 'custom']).isRequired,
+    render: PropTypes.func, // Use for rendering a custom component, received props: {value, onChange}
+    filterWith: PropTypes.func, // Custom filtering function, received params: (filterValue, value, row)
+    items: PropTypes.array, // Array of possible values (only when using select/multiselect)
+  })),
+  filterValues: PropTypes.object,
+  onFilterUpdate: PropTypes.func,
+  onFiltersReset: PropTypes.func,
 }
 
-export default compose(withStyles(styles))(ListTableColumnSelector)
+export default compose(
+  withStyles(styles)
+)(ListTableFiltersButton)

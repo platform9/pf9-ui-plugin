@@ -67,7 +67,7 @@ class ListTableHead extends React.Component {
               key={column.id}
               numeric={column.numeric}
               padding={column.disablePadding ? 'none' : 'default'}
-              sortDirection={orderBy === column.id ? order : false}
+              sortDirection={column.sort !== false && orderBy === column.id ? order : false}
             >
               <Tooltip
                 title={column.label}

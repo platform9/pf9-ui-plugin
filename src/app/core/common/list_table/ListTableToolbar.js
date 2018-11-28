@@ -7,9 +7,9 @@ import { lighten } from '@material-ui/core/styles/colorManipulator'
 import AddIcon from '@material-ui/icons/Add'
 import DeleteIcon from '@material-ui/icons/Delete'
 import EditIcon from '@material-ui/icons/Edit'
-import FilterListIcon from '@material-ui/icons/FilterList'
 import SearchBar from 'core/common/SearchBar'
-import ListTableColumnsSelector from 'core/common/list_table/ListTableColumnSelector'
+import ListTableColumnButton from 'core/common/list_table/ListTableColumnSelector'
+import ListTableFiltersButton from 'core/common/list_table/ListTableFiltersButton'
 
 const toolbarStyles = theme => ({
   root: {
@@ -47,7 +47,11 @@ const ListTableToolbar = ({
   searchTerm,
   columns,
   visibleColumns,
-  onColumnsChange
+  onColumnsChange,
+  filters,
+  filterValues,
+  onFilterUpdate,
+  onFiltersReset,
 }) => (
   <Toolbar
     className={classNames(classes.root, {
@@ -84,17 +88,19 @@ const ListTableToolbar = ({
           </Tooltip>
         )}
         {columns && onColumnsChange && (
-          <ListTableColumnsSelector
+          <ListTableColumnButton
             columns={columns}
             visibleColumns={visibleColumns}
             onColumnsChange={onColumnsChange}
           />
         )}
-        <Tooltip title="Filter list">
-          <IconButton aria-label="Filter list">
-            <FilterListIcon />
-          </IconButton>
-        </Tooltip>
+        {filters && <ListTableFiltersButton
+          columns={columns}
+          filters={filters}
+          filterValues={filterValues}
+          onFilterUpdate={onFilterUpdate}
+          onFiltersReset={onFiltersReset}
+        />}
         {onAdd && (
           <Tooltip title="Add">
             <Button color="primary" onClick={onAdd}>
@@ -112,9 +118,22 @@ ListTableToolbar.propTypes = {
   columns: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.string,
     label: PropTypes.string,
+    render: PropTypes.func,
+    sortWith: PropTypes.func,
     display: PropTypes.bool,
     excluded: PropTypes.bool,
   })).isRequired,
+  filters: PropTypes.arrayOf(PropTypes.shape({
+    columnId: PropTypes.string.isRequired,
+    label: PropTypes.string, // Will override column label
+    type: PropTypes.oneOf(['select', 'multiselect', 'checkbox', 'custom']).isRequired,
+    render: PropTypes.func, // Use for rendering a custom component, received props: {value, onChange}
+    filterWith: PropTypes.func, // Custom filtering function, received params: (filterValue, value, row)
+    items: PropTypes.array, // Array of possible values (only when using select/multiselect)
+  })),
+  filterValues: PropTypes.object,
+  onFilterUpdate: PropTypes.func,
+  onFiltersReset: PropTypes.func,
   visibleColumns: PropTypes.array,
   onColumnsChange: PropTypes.func,
   numSelected: PropTypes.number.isRequired,

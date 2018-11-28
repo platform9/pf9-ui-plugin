@@ -7,9 +7,9 @@ import { Checkbox, Grid, Paper, Table, TableBody, TableCell, TablePagination, Ta
 import ListTableHead from './ListTableHead'
 import ListTableToolbar from './ListTableToolbar'
 import MoreMenu from 'core/common/MoreMenu'
-import { compose, except } from 'core/fp'
+import { compose, ensureFunction, except } from 'core/fp'
 import { withAppContext } from 'core/AppContext'
-import { pipe, pluck, prop, propEq, propOr, update } from 'ramda'
+import { any, assoc, assocPath, equals, pipe, pluck, prop, propEq, propOr, uniq, update } from 'ramda'
 
 const styles = theme => ({
   root: {
@@ -23,8 +23,6 @@ const styles = theme => ({
     overflowX: 'auto',
   },
 })
-
-// TODO: this component should take an optional sort function in the columns prop (eg. for IP addresses)
 
 class ListTable extends React.Component {
   constructor (props) {
@@ -43,6 +41,7 @@ class ListTable extends React.Component {
       rowsPerPage: prefs.perPage || 10,
       selected: [],
       searchTerm: '',
+      filterValues: {}
     }
   }
 
@@ -60,37 +59,32 @@ class ListTable extends React.Component {
   sortData = data => {
     const { columns } = this.props
     const orderBy = this.state.orderBy || columns[0].id
-
     const sortWith = propOr(
       (prevValue, nextValue) => (nextValue < prevValue ? -1 : 1),
       'sortWith',
       columns.find(propEq('id', orderBy))
     )
-
     // .sort() does not mutate array
     const sortedRows = data.sort((a, b) => sortWith(b[orderBy], a[orderBy]))
 
     return this.state.order === 'desc' ? sortedRows : sortedRows.reverse()
   }
 
-  areAllSelected = (data) => {
+  areAllSelected = data => {
     const { selected } = this.state
     return data.every(row => selected.includes(row))
   }
 
   handleSelectAllClick = (event, checked) => {
-    const { searchTarget, paginate, data } = this.props
-    const { selected, searchTerm } = this.state
-
-    let sortedData = this.sortData(data)
-    const searchData = searchTerm === '' ? sortedData : this.filterBySearch(sortedData, searchTarget)
-    const paginatedData = paginate ? this.paginate(searchData) : searchData
+    const { paginate } = this.props
+    const { selected } = this.state
+    const filteredData = this.getFilteredRows()
+    const paginatedData = paginate ? this.paginate(filteredData) : filteredData
 
     let newSelected
     if (checked) {
       // Add active paginated rows that are not already selected
-      newSelected = [...selected, ...paginatedData.filter(
-        row => !selected.includes(row))]
+      newSelected = uniq([...selected, ...paginatedData])
     } else {
       // Remove active paginated rows from selected
       newSelected = selected.filter(row => !paginatedData.includes(row))
@@ -133,48 +127,48 @@ class ListTable extends React.Component {
   }
 
   handleAdd = () => {
-    this.props.onAdd()
+    ensureFunction(this.props.onAdd)()
   }
 
-  handleDelete = () => {
+  handleDelete = async () => {
     const { onDelete, data } = this.props
-    const { selected, page, rowsPerPage } = this.state
-    let maxPage = Math.ceil(data.length / rowsPerPage) - 1
-    let newPage = page
-    if (page === maxPage && selected.length === data.length % rowsPerPage) {
-      newPage--
-    } else if (selected.length === rowsPerPage) {
-      newPage--
-    }
     if (!onDelete) {
       return
     }
+    const { selected, page, rowsPerPage } = this.state
+    const maxPage = Math.ceil(data.length / rowsPerPage) - 1
+    const pastPage =
+      (page === maxPage && selected.length === data.length % rowsPerPage) ||
+      selected.length === rowsPerPage
 
-    onDelete(selected).then(() => {
-      this.setState({
-        selected: [],
-        page: newPage
-      })
+    await onDelete(selected)
+
+    this.setState({
+      selected: [],
+      page: pastPage ? page - 1 : page
     })
   }
 
   handleEdit = () => {
-    const { selected } = this.state
-    this.props.onEdit(selected)
+    ensureFunction(this.props.onEdit)(this.state.selected)
   }
 
   handleSearch = value => {
-    this.setState({
-      searchTerm: value
-    })
+    if (this.props.searchTarget) {
+      this.setState({
+        searchTerm: value
+      })
+    }
   }
 
   handleColumnSwitch = columnId => {
-    this.setState(({ visibleColumns }) => ({
-      visibleColumns: visibleColumns.includes(columnId)
-        ? except(columnId, visibleColumns)
-        : [...visibleColumns, columnId]
-    }))
+    if (this.props.canEditColumns) {
+      this.setState(({ visibleColumns }) => ({
+        visibleColumns: visibleColumns.includes(columnId)
+          ? except(columnId, visibleColumns)
+          : [...visibleColumns, columnId]
+      }))
+    }
   }
 
   handleColumnsSwitch = (srcColumnId, destColumnId) => {
@@ -189,8 +183,45 @@ class ListTable extends React.Component {
     }))
   }
 
-  handleFiltersChange = filterValues => {
+  handleFilterUpdate = (columnId, selectedValue) => {
+    this.setState(assocPath(['filterValues', columnId], selectedValue))
+  }
 
+  handleFiltersReset = () => {
+    this.setState(assoc('filterValues', {}))
+  }
+
+  getFilterFunction = type => {
+    switch (type) {
+      case 'select':
+        return equals
+      case 'multiselect':
+        return (filterValues, value) => any(equals(value))(filterValues)
+      case 'checkbox':
+        return equals
+      default:
+        return equals
+    }
+  }
+
+  applyFilters = data => {
+    const { filters } = this.props
+    const { filterValues } = this.state
+    const filterParams = Object.entries(filterValues)
+      .map(([columnId, filterValue]) => ({
+        columnId,
+        filterValue,
+        filter: filters.find(propEq('columnId', columnId))
+      }))
+
+    return filterParams.reduce((filteredData,
+      { columnId, filterValue, filter }) => {
+      const filterWith = filter.filterWith || this.getFilterFunction(filter.type)
+
+      return filteredData.filter(row => {
+        return filterWith(filterValue, row[columnId])
+      })
+    }, data)
   }
 
   filterBySearch = (data, target) => {
@@ -206,6 +237,15 @@ class ListTable extends React.Component {
     const startIdx = page * rowsPerPage
     const endIdx = startIdx + rowsPerPage
     return data.slice(startIdx, endIdx)
+  }
+
+  getFilteredRows = () => {
+    const { searchTarget, data, filters } = this.props
+    const { searchTerm } = this.state
+
+    const sortedData = this.sortData(data)
+    const searchData = searchTerm === '' ? sortedData : this.filterBySearch(sortedData, searchTarget)
+    return filters ? this.applyFilters(searchData) : searchData
   }
 
   renderCell = (columnDef, contents, row) => {
@@ -257,27 +297,13 @@ class ListTable extends React.Component {
 
     return (
       <TableRow hover key={uid} {...checkboxProps}>
-        {showCheckboxes &&
-        <TableCell padding="checkbox">
+        {showCheckboxes && <TableCell padding="checkbox">
           <Checkbox checked={isSelected} color="primary" />
-        </TableCell>
-        }
+        </TableCell>}
         {this.getSortedVisibleColums().map((columnDef) =>
           this.renderCell(columnDef, row[columnDef.id], row))}
         {this.renderRowActions(row)}
       </TableRow>
-    )
-  }
-
-  renderColumnHeader = (column, idx) => {
-    const {
-      headerProps = {},
-      name,
-    } = column
-    return (
-      <TableCell key={idx} {...headerProps}>
-        {name}
-      </TableCell>
     )
   }
 
@@ -303,15 +329,10 @@ class ListTable extends React.Component {
       classes,
       columns,
       data,
-      onAdd,
-      onDelete,
-      onEdit,
       paginate,
       rowActions,
-      searchTarget,
       showCheckboxes,
       title,
-      canEditColumns,
       canDragColumns,
       filters,
     } = this.props
@@ -322,15 +343,15 @@ class ListTable extends React.Component {
       searchTerm,
       selected,
       visibleColumns,
+      filterValues,
     } = this.state
 
     if (!data) {
       return null
     }
 
-    const sortedData = this.sortData(data)
-    const searchData = searchTerm === '' ? sortedData : this.filterBySearch(sortedData, searchTarget)
-    const paginatedData = paginate ? this.paginate(searchData) : searchData
+    const filteredData = this.getFilteredRows()
+    const paginatedData = paginate ? this.paginate(filteredData) : filteredData
     const selectedAll = this.areAllSelected(paginatedData)
     // Always show pagination control bar to make sure the height doesn't change frequently.
     // const shouldShowPagination = paginate && sortedData.length > this.state.rowsPerPage
@@ -342,14 +363,18 @@ class ListTable extends React.Component {
             <ListTableToolbar
               numSelected={selected.length}
               title={title}
-              onAdd={onAdd ? this.handleAdd : null}
-              onDelete={onDelete ? this.handleDelete : null}
-              onEdit={onEdit ? this.handleEdit : null}
-              onSearchChange={searchTarget ? this.handleSearch : null}
+              onAdd={this.handleAdd}
+              onDelete={this.handleDelete}
+              onEdit={this.handleEdit}
+              onSearchChange={this.handleSearch}
               searchTerm={searchTerm}
               columns={columns}
               visibleColumns={visibleColumns}
-              onColumnsChange={canEditColumns ? this.handleColumnSwitch : null}
+              onColumnsChange={this.handleColumnSwitch}
+              filters={filters}
+              filterValues={filterValues}
+              onFilterUpdate={this.handleFilterUpdate}
+              onFiltersReset={this.handleFiltersReset}
             />
             <div className={classes.tableWrapper}>
               <Table className={classes.table}>
@@ -364,7 +389,7 @@ class ListTable extends React.Component {
                   onRequestSort={this.handleRequestSort}
                   checked={selectedAll}
                   title={title}
-                  rowCount={sortedData.length}
+                  rowCount={data.length}
                   showCheckboxes={showCheckboxes}
                   showRowActions={!!rowActions}
                 />
@@ -373,7 +398,7 @@ class ListTable extends React.Component {
                 </TableBody>
               </Table>
             </div>
-            {this.renderPaginationControls(searchData.length)}
+            {this.renderPaginationControls(filteredData.length)}
           </Paper>
         </Grid>
       </Grid>
@@ -399,6 +424,18 @@ ListTable.propTypes = {
   onDelete: PropTypes.func,
   onEdit: PropTypes.func,
   paginate: PropTypes.bool,
+
+  /**
+   * List of filters
+   */
+  filters: PropTypes.arrayOf(PropTypes.shape({
+    columnId: PropTypes.string.isRequired,
+    label: PropTypes.string, // Will override column label
+    type: PropTypes.oneOf(['select', 'multiselect', 'checkbox', 'custom']).isRequired,
+    render: PropTypes.func, // Use for rendering a custom component, received props: {value, onChange}
+    filterWith: PropTypes.func, // Custom filtering function, received params: (filterValue, value, row)
+    items: PropTypes.array, // Array of possible values (only when using select/multiselect)
+  })),
 
   /*
    Some objects have a unique identifier other than 'id'
@@ -427,8 +464,6 @@ ListTable.propTypes = {
 }
 
 ListTable.defaultProps = {
-  data: [],
-  columns: [],
   paginate: true,
   showCheckboxes: true,
   uniqueIdentifier: 'id',

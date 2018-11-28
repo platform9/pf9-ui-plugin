@@ -11,6 +11,9 @@ export const parseJSON = str => {
   }
 }
 
+export const isNumeric = n =>
+  !Number.isNaN(parseFloat(n)) && Number.isFinite(+n)
+
 export const isPlainObject = obj =>
   Object(obj) === obj && Object.getPrototypeOf(obj) === Object.prototype
 

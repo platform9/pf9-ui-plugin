@@ -1,4 +1,5 @@
 import { curry, pathOr, remove } from 'ramda'
+import moize from 'moize'
 
 // functional programming helpers
 
@@ -138,3 +139,10 @@ export const arrToObjByKey = curry((key, arr) =>
 
 export const ensureArray = maybeArr =>
   (maybeArr && maybeArr instanceof Array) ? maybeArr : []
+
+export const ensureFunction = moize(func => (...args) => {
+  if (typeof func === 'function') {
+    return func(...args)
+  }
+  return null
+})
