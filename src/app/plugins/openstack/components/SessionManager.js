@@ -5,7 +5,7 @@ import { withAppContext } from 'core/AppContext'
 import LoginPage from 'openstack/components/LoginPage'
 
 import { getStorage, setStorage } from 'core/common/pf9-storage'
-import { loadTenants } from 'openstack/components/tenants/actions'
+import { loadUserTenants } from 'openstack/components/tenants/actions'
 
 /**
  * Sets up the Openstack session.
@@ -58,8 +58,7 @@ class SessionManager extends React.Component {
     const lastTenant = prefs.lastTenant || 'service'
 
     // Set up the scopedToken
-    const tenants = await loadTenants({ context, setContext })
-    setContext({ tenants })
+    const tenants = await loadUserTenants({ context, setContext })
     const activeTenant = tenants.find(x => x.name === lastTenant)
     const { keystone } = context.apiClient
     await keystone.changeProjectScope(activeTenant.id)

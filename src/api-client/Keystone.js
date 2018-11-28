@@ -53,6 +53,7 @@ class Keystone {
   get v3 () { return `${this.endpoint}/v3` }
 
   get catalogUrl () { return `${this.v3}/auth/catalog` }
+  get projectsAuthUrl () { return `${this.v3}/auth/projects` }
   get endpointsUrl () { return `${this.v3}/endpoints` }
   get regionsUrl () { return `${this.v3}/regions` }
   get projectsUrl () { return `${this.v3}/projects` }
@@ -62,6 +63,11 @@ class Keystone {
   async getProject (id) {
     const response = await axios.get(`${this.projectsUrl}/${id}`, this.client.getAuthHeaders())
     return response.data.project
+  }
+
+  async getProjectsAuth () {
+    const response = await axios.get(this.projectsAuthUrl, this.client.getAuthHeaders(false))
+    return response.data.projects
   }
 
   async getProjects (scoped = false) {

@@ -1,5 +1,12 @@
 const dataKey = 'tenants'
 
+export const loadUserTenants = async ({ context, setContext, reload }) => {
+  if (!reload && context.userTenants) { return context.userTenants }
+  const userTenants = await context.apiClient.keystone.getProjectsAuth()
+  setContext({ userTenants })
+  return userTenants
+}
+
 export const loadTenants = async ({ context, setContext, reload }) => {
   if (!reload && context[dataKey]) { return context[dataKey] }
   const existing = await context.apiClient.keystone.getProjects()

@@ -1,7 +1,7 @@
 import React from 'react'
 import Selector from 'core/common/Selector'
 import { compose } from 'core/fp'
-import { loadTenants } from './actions'
+import { loadUserTenants } from './actions'
 import { withAppContext } from 'core/AppContext'
 import { assoc } from 'ramda'
 import moize from 'moize'
@@ -56,7 +56,7 @@ class TenantChooser extends React.Component {
 
   loadTenants = async (reload = false) => {
     const { context, setContext } = this.props
-    const tenants = await loadTenants({ context, setContext, reload })
+    const tenants = await loadUserTenants({ context, setContext, reload })
     this.setState({ tenants })
     return tenants
   }
