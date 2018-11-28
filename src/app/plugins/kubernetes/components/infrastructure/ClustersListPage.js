@@ -43,13 +43,13 @@ const renderResourceUtilization = (_, cluster, context) => {
       memory: {
         current: sumPath('usage.memory.current', combinedNodes),
         max: sumPath('usage.memory.max', combinedNodes),
-        units: 'GB',
+        units: 'GiB',
         type: 'used',
       },
       disk: {
         current: sumPath('usage.disk.current', combinedNodes),
         max: sumPath('usage.disk.max', combinedNodes),
-        units: 'GB',
+        units: 'GiB',
         type: 'used',
       }
     }
