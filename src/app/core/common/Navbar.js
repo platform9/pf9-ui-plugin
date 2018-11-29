@@ -3,7 +3,11 @@ import { withRouter } from 'react-router'
 import { assoc, flatten, prop } from 'ramda'
 import moize from 'moize'
 import PropTypes from 'prop-types'
-import { Collapse, Divider, Drawer, ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, IconButton, InputBase, ListItemIcon, ListItemText, MenuItem, MenuList, Typography } from '@material-ui/core'
+import {
+  Collapse, Divider, Drawer, ExpansionPanel, ExpansionPanelDetails,
+  ExpansionPanelSummary, IconButton, InputBase, ListItemIcon, ListItemText,
+  MenuItem, MenuList, Typography
+} from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles'
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
 import SearchIcon from '@material-ui/icons/Search'

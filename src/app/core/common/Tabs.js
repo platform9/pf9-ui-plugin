@@ -1,5 +1,5 @@
 import React from 'react'
-import { Grid, Paper, Tabs as MDTabs, Tab as MDTab } from '@material-ui/core'
+import { Grid, Paper, Tab as MDTab, Tabs as MDTabs } from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles'
 import { withRouter } from 'react-router-dom'
 import { compose } from 'core/fp'
@@ -19,13 +19,21 @@ const styles = theme => ({
 
 class Tabs extends React.Component {
   addTab = tab => {
-    this.setState(state => ({ tabs: [...state.tabs, tab] }), this.activateDefaultTab)
+    this.setState(
+      state => ({ tabs: [...state.tabs, tab] }), this.activateDefaultTab)
   }
 
   state = {
     tabs: [],
-    value: this.props.location.hash || false,
     addTab: this.addTab,
+  }
+
+  static getDerivedStateFromProps (props, state) {
+    if (props.location.hash !== state.value) {
+      return {
+        value: props.location.hash || false
+      }
+    }
   }
 
   activateDefaultTab = () => {
@@ -55,7 +63,8 @@ class Tabs extends React.Component {
                 textColor="primary"
               >
                 {tabs.map(tab =>
-                  <MDTab key={tab.value} value={tab.value} label={tab.label} href={tab.value} />
+                  <MDTab key={tab.value} value={tab.value} label={tab.label}
+                    href={tab.value} />
                 )}
               </MDTabs>
               {children}
