@@ -7,44 +7,55 @@ import fakeNavbarItem from './fakeNavbarItem'
 import { omit } from 'ramda'
 import Navbar from 'core/common/Navbar'
 
-const getSomeNavbarItems = (count = 5) => range(count).map(fakeNavbarItem)
+const getSomeNavbarItems = (withIcons, count = 5) =>
+  range(count).map(fakeNavbarItem(withIcons))
 
 const categories = ['Infrastructure', 'Clusters', 'Nodes', 'Providers']
-const getCategorizedItems = () => categories.map(category => ({
+const getCategorizedItems = withIcons => categories.map(category => ({
   name: category,
-  nestedLinks: getSomeNavbarItems(randomInt(1, 5)),
+  nestedLinks: getSomeNavbarItems(withIcons, randomInt(1, 5)),
 }))
 
-const sections = range(4).map(() => ({
+const getSections = withIcons => range(4).map(() => ({
   id: faker.random.uuid(),
   name: faker.random.word(),
-  links: getCategorizedItems(),
+  links: getCategorizedItems().map(omit(['icon'])),
 }))
 
 addStories('Common Components/Navbar', {
   'Random links': () => (
     <Router>
-      <Navbar sections={[{links: getSomeNavbarItems().map(omit(['icon']))}]} />
+      <Navbar sections={[{ links: getSomeNavbarItems() }]} />
     </Router>
   ),
-  'With icons': () => (
+  'w/ icons': () => (
     <Router>
-      <Navbar sections={[{links: getSomeNavbarItems()}]} />
+      <Navbar sections={[{ links: getSomeNavbarItems(true) }]} />
     </Router>
   ),
-  'With categories': () => (
+  'w/ categories': () => (
     <Router>
-      <Navbar sections={[{links: getCategorizedItems()}]} />
+      <Navbar sections={[{ links: getCategorizedItems() }]} />
     </Router>
   ),
-  'With search bar': () => (
+  'w/ categories + icons)': () => (
     <Router>
-      <Navbar withSearchBar sections={[{links: getCategorizedItems()}]} />
+      <Navbar sections={[{ links: getCategorizedItems(true) }]} />
     </Router>
   ),
-  'Accordion with sections': () => (
+  'w/ search bar': () => (
     <Router>
-      <Navbar withSearchBar sections={sections} />
+      <Navbar withSearchBar sections={[{ links: getCategorizedItems() }]} />
+    </Router>
+  ),
+  'Accordion w/ sections': () => (
+    <Router>
+      <Navbar withSearchBar sections={getSections()} />
+    </Router>
+  ),
+  'Accordion w/ sections + icons': () => (
+    <Router>
+      <Navbar withSearchBar sections={getSections(true)} />
     </Router>
   )
 })

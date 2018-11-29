@@ -21,12 +21,12 @@ const icons = [
   <SendIcon />,
 ]
 
-const fakeNavbarItem = () => ({
+const fakeNavbarItem = withIcons => () => ({
   name: faker.random.word(),
   link: {
     path: faker.internet.url()
   },
-  icon: randomItem(icons)
+  icon: withIcons ? randomItem(icons) : null
 })
 
 export default fakeNavbarItem

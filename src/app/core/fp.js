@@ -140,9 +140,9 @@ export const arrToObjByKey = curry((key, arr) =>
 export const ensureArray = maybeArr =>
   (maybeArr && maybeArr instanceof Array) ? maybeArr : []
 
-export const ensureFunction = moize(func => (...args) => {
-  if (typeof func === 'function') {
-    return func(...args)
+export const ensureFunction = moize(maybeFunc => (...args) => {
+  if (typeof maybeFunc === 'function') {
+    return maybeFunc(...args)
   }
   return null
 })
