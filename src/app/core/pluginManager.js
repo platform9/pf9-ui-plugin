@@ -16,6 +16,17 @@ const initData = () => ({
 
 const pluginList = {}
 
+const parseNavItem = basePath => navItem => ({
+  ...navItem,
+  link: {
+    ...navItem.link,
+    path: pathJoin(basePath, navItem.link.path)
+  },
+  nestedLinks: navItem.nestedLinks
+    ? navItem.nestedLinks.map(parseNavItem(basePath))
+    : null
+})
+
 const pluginManager = {
 
   getPlugins () {
@@ -28,6 +39,8 @@ const pluginManager = {
 
   registerPlugin: (pluginId, name, basePath) => {
     let data = initData()
+
+    const prependBasePath = parseNavItem(basePath)
 
     pluginList[pluginId] = {
       name,
@@ -42,28 +55,18 @@ const pluginManager = {
         data.components.push(component)
       },
 
-      registerRoutes: (components=[]) => {
-        const prefixLink = link => ({
-          ...link,
-          path: pathJoin(basePath, link.path)
-        })
-
-        components
-          .map(c => ({ ...c, link: prefixLink(c.link) }))
-          .forEach(component => data.routes.push(component))
+      registerRoutes: (components = []) => {
+        data.routes = [
+          ...data.routes,
+          ...components.map(prependBasePath)
+        ]
       },
 
-      registerNavItems: (items=[]) => {
-        const prefixLink = link => ({
-          ...link,
-          path: pathJoin(basePath, link.path)
-        })
-
-        items
-          .map(x => ({ ...x, link: prefixLink(x.link) }))
-          .forEach(item => {
-            data.navItems.push(item)
-          })
+      registerNavItems: (items = []) => {
+        data.navItems = [
+          ...data.navItems,
+          ...items.map(prependBasePath)
+        ]
       },
 
       getComponents: () => {
