@@ -1,5 +1,6 @@
 import React from 'react'
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles'
+import { deepOrange } from '@material-ui/core/colors'
 
 const theme = createMuiTheme({
   typography: {
@@ -11,7 +12,8 @@ const theme = createMuiTheme({
       main: '#4aa3df',
       dark: '#1e699c',
       contrastText: '#fff',
-    }
+    },
+    secondary: deepOrange
   }
 })
 
