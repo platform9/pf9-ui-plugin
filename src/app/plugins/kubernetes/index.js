@@ -86,7 +86,15 @@ Kubernetes.registerPlugin = pluginManager => {
 
   plugin.registerNavItems(
     [
-      { name: 'Infrastructure', link: { path: '/infrastructure' } },
+      {
+        name: 'Infrastructure',
+        link: { path: '/infrastructure' },
+        nestedLinks: [
+          { name: 'Clusters', link: { path: '/ui/kubernetes/infrastructure#clusters' } },
+          { name: 'Nodes', link: { path: '/ui/kubernetes/apps' } },
+          { name: 'Cloud Providers', link: { path: '/ui/kubernetes/infrastructure#cloudProviders' } },
+        ]
+      },
       { name: 'App Catalog', link: { path: '/apps' } },
       { name: 'Pods, Deployments, Services', link: { path: '/pods' } },
       { name: 'Storage Classes', link: { path: '/storage_classes' } },
