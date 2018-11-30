@@ -90,17 +90,42 @@ Kubernetes.registerPlugin = pluginManager => {
         name: 'Infrastructure',
         link: { path: '/infrastructure' },
         nestedLinks: [
-          { name: 'Clusters', link: { path: '/ui/kubernetes/infrastructure#clusters' } },
-          { name: 'Nodes', link: { path: '/ui/kubernetes/apps' } },
-          { name: 'Cloud Providers', link: { path: '/ui/kubernetes/infrastructure#cloudProviders' } },
+          { name: 'Clusters', link: { path: '/infrastructure#clusters' } },
+          { name: 'Nodes', link: { path: '/infrastructure#nodes' } },
+          { name: 'Cloud Providers', link: { path: '/infrastructure#cloudProviders' } },
         ]
       },
-      { name: 'App Catalog', link: { path: '/apps' } },
-      { name: 'Pods, Deployments, Services', link: { path: '/pods' } },
+      {
+        name: 'App Catalog',
+        link: { path: '/apps' },
+        nestedLinks: [
+          { name: 'App Catalog', link: { path: '/apps#appCatalog' } },
+          { name: 'Deployed Apps', link: { path: '/apps#deployedApps' } },
+          { name: 'Repositories', link: { path: '/apps#repositories' } },
+        ]
+      },
+      {
+        name: 'Pods, Deployments, Services',
+        link: { path: '/pods' },
+        nestedLinks: [
+          { name: 'Pods', link: { path: '/pods#pods' } },
+          { name: 'Deployments', link: { path: '/pods#deployments' } },
+          { name: 'Services', link: { path: '/pods#services' } },
+        ]
+      },
       { name: 'Storage Classes', link: { path: '/storage_classes' } },
       { name: 'Namespaces', link: { path: '/namespaces' } },
       { name: 'API Access', link: { path: '/api_access' } },
-      { name: 'Tenants & Users', link: { path: '/user_management' } },
+      {
+        name: 'Tenants & Users',
+        link: { path: '/user_management' },
+        nestedLinks: [
+          { name: 'Tenants', link: { path: '/user_management#tenants' } },
+          { name: 'Users', link: { path: '/user_management#users' } },
+          { name: 'Groups', link: { path: '/user_management#userGroups' } },
+          { name: 'Roles', link: { path: '/user_management#roles' } },
+        ]
+      },
     ]
   )
 }
