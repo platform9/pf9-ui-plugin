@@ -38,7 +38,7 @@ addStories('Common Components/Navbar', {
       <Navbar sections={[{ links: getCategorizedItems() }]} />
     </Router>
   ),
-  'w/ categories + icons)': () => (
+  'w/ categories + icons': () => (
     <Router>
       <Navbar sections={[{ links: getCategorizedItems(true) }]} />
     </Router>

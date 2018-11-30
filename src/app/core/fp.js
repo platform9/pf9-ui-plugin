@@ -144,5 +144,5 @@ export const ensureFunction = moize(maybeFunc => (...args) => {
   if (typeof maybeFunc === 'function') {
     return maybeFunc(...args)
   }
-  return null
+  return maybeFunc
 })

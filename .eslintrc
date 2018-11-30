@@ -27,14 +27,15 @@
     }],
     "jsx-quotes": 0,
     "react/prop-types": 0,
+    "react/no-unused-prop-types": "warn",
     "no-new": 0,
     "space-infix-ops": 0,
 
     // Allow for "table" alignment, ex:
     // { id: 'name',       type: 'string' }
     // { id: 'longerName', type: 'string' }
-    "no-multi-spaces": [2, { exceptions: { "ObjectExpression": true } } ],
-    "key-spacing": [2, { mode: "minimum" }]
+    "no-multi-spaces": [2, { "exceptions": { "ObjectExpression": true } } ],
+    "key-spacing": [2, { "mode": "minimum" }]
   },
 
   "settings": {
