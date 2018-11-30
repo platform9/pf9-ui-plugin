@@ -63,10 +63,12 @@ const renderResourceUtilization = (_, cluster, context) => {
   return <pre>{JSON.stringify(clusterWithStats.usage, null, 4)}</pre>
 }
 
+const renderClusterDetailLink = (name, cluster) => <SimpleLink src={`/ui/kubernetes/infrastructure/clusters/${cluster.uuid}`}>{name}</SimpleLink>
+
 export const options = {
   baseUrl: '/ui/kubernetes/infrastructure/clusters',
   columns: [
-    { id: 'name', label: 'Cluster name' },
+    { id: 'name', label: 'Cluster name', render: renderClusterDetailLink },
     { id: 'status', label: 'Status' },
     { id: 'links', label: 'Links', render: renderLinks },
     { id: 'cloudProviderType', label: 'Deployment Type' },

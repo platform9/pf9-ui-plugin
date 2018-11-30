@@ -19,11 +19,11 @@ const OpenstackFields = () => (
   </React.Fragment>
 )
 
-export const UpdateCloudProviderForm = ({ onComplete, initialValue }) => (
-  <ValidatedForm onSubmit={onComplete} initialValues={initialValue}>
+export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => (
+  <ValidatedForm onSubmit={onComplete} initialValues={initialValues}>
     <TextField id="name" label="Name" />
-    {initialValue.type === 'aws' && <AWSFields />}
-    {initialValue.type === 'openstack' && <OpenstackFields />}
+    {initialValues.type === 'aws' && <AWSFields />}
+    {initialValues.type === 'openstack' && <OpenstackFields />}
     <SubmitButton>Update Cloud Provider</SubmitButton>
   </ValidatedForm>
 )

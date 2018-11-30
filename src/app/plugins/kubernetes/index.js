@@ -1,18 +1,16 @@
 import React from 'react'
 
-import InfrastructurePage from './components/infrastructure/InfrastructurePage'
-import AddCloudProviderPage
-  from './components/infrastructure/AddCloudProviderPage'
-import UpdateCloudProviderPage
-  from './components/infrastructure/UpdateCloudProviderPage'
+import AddCloudProviderPage from './components/infrastructure/AddCloudProviderPage'
+import AddNamespacePage from './components/namespaces/AddNamespacePage'
+import ApiAccessPage from './components/apiAccess/ApiAccessPage'
 import AppsIndexPage from './components/apps/AppsIndexPage'
+import ClusterDetailsPage from './components/infrastructure/ClusterDetailsPage'
+import InfrastructurePage from './components/infrastructure/InfrastructurePage'
+import NamespacesListPage from './components/namespaces/NamespacesListPage'
 import PodsIndexPage from './components/pods/PodsIndexPage'
 import StorageClassesPage from './components/storage/StorageClassesPage'
-import AddNamespacePage from './components/namespaces/AddNamespacePage'
-import NamespacesListPage from './components/namespaces/NamespacesListPage'
-import ApiAccessPage from './components/apiAccess/ApiAccessPage'
-import UserManagementIndexPage
-  from './components/userManagement/UserManagementIndexPage'
+import UpdateCloudProviderPage from './components/infrastructure/UpdateCloudProviderPage'
+import UserManagementIndexPage from './components/userManagement/UserManagementIndexPage'
 
 class Kubernetes extends React.Component {
   render () {
@@ -35,6 +33,11 @@ Kubernetes.registerPlugin = pluginManager => {
         name: 'Infrastructure',
         link: { path: '/infrastructure', exact: true, default: true },
         component: InfrastructurePage
+      },
+      {
+        name: 'Cluster Details',
+        link: { path: '/infrastructure/clusters/:id', exact: true },
+        component: ClusterDetailsPage,
       },
       {
         name: 'Create Cloud Provider',
