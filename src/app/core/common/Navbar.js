@@ -158,7 +158,7 @@ class Navbar extends PureComponent {
           : [name, ...expandedItems]
       }), () => {
         if (path) {
-          this.navTo(path)
+          this.props.history.push(path)
         }
       }
     )
