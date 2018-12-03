@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
-import { withRouter } from 'react-router'
-import { assoc, flatten, prop } from 'ramda'
+import { matchPath, withRouter } from 'react-router'
+import { assoc, flatten, pluck, prop, propEq } from 'ramda'
 import moize from 'moize'
 import PropTypes from 'prop-types'
 import {
@@ -16,6 +16,7 @@ import ExpandLess from '@material-ui/icons/ExpandLess'
 import { withHotKeys } from 'core/common/HotKeysProvider'
 import { except } from 'core/fp'
 import { fade } from '@material-ui/core/styles/colorManipulator'
+import classnames from 'classnames'
 
 export const drawerWidth = 240
 
@@ -70,6 +71,13 @@ const styles = theme => ({
   nav: {
     margin: 0
   },
+  activeNavItem: {
+    backgroundColor: theme.palette.primary.dark,
+    color: '#fff'
+  },
+  currentNavLink: {
+    backgroundColor: theme.palette.primary.light,
+  },
   navHeading: {
     backgroundColor: theme.palette.grey[50],
     paddingTop: 0,
@@ -106,15 +114,17 @@ class Navbar extends PureComponent {
   constructor (props) {
     super(props)
     this.searchInputRef = React.createRef()
-    props.setHotKeyHandler('f', this.focusSearch, {
-      ctrlKey: false
-    })
+    props.setHotKeyHandler('f', this.focusSearch)
+    props.setHotKeyHandler('Enter', this.handleEnterKey)
+    props.setHotKeyHandler('ArrowUp', this.handleArrowKeys('ArrowUp'))
+    props.setHotKeyHandler('ArrowDown', this.handleArrowKeys('ArrowDown'))
   }
 
   state = {
     expandedSection: null,
     anchor: 'left',
     expandedItems: [],
+    activeNavItem: null,
     filterText: '',
   }
 
@@ -124,12 +134,48 @@ class Navbar extends PureComponent {
     }
   }
 
+  handleArrowKeys = direction => () => {
+    const { filterText, activeNavItem } = this.state
+    if (filterText && activeNavItem) {
+      // Highlight next nav item
+      const offset = direction === 'ArrowDown' ? 1 : -1
+      const sectionLinks = this.getSectionLinks()
+      const currentIdx = sectionLinks.findIndex(propEq('name', activeNavItem))
+      const nextIdx = currentIdx + offset >= sectionLinks.length ? 0
+        : (currentIdx === 0 && offset < 0 ? sectionLinks.length - 1 : currentIdx + offset)
+      const { name: nextLinkName } = sectionLinks[nextIdx]
+
+      this.setState(assoc('activeNavItem', nextLinkName))
+    }
+  }
+
+  handleEnterKey = () => {
+    const { filterText, activeNavItem } = this.state
+    if (filterText && activeNavItem) {
+      const sectionLinks = this.getSectionLinks()
+      const { link: activeNavLink } = sectionLinks.find(propEq('name', activeNavItem))
+      this.setState(prevState => ({
+        ...prevState,
+        activeNavItem: null,
+        filterText: '',
+      }), () => this.props.history.push(activeNavLink.path))
+    }
+  }
+
   handleExpand = moize(sectionName =>
     () => this.setState(assoc('expandedSection', sectionName)))
 
   handleFilterChange = e => {
     const { value } = e.target
-    this.setState(prevState => ({ ...prevState, filterText: value }))
+    this.setState(assoc('filterText', value), () => {
+      if (value) {
+        // Highlight first filtered nav link
+        const [{ name } = {}] = this.getSectionLinks()
+        this.setState(assoc('activeNavItem', name))
+      } else {
+        this.setState(assoc('activeNavItem', null))
+      }
+    })
   }
 
   flattenLinks = moize(links =>
@@ -139,13 +185,19 @@ class Navbar extends PureComponent {
         : [link]))
   )
 
-  getFilteredLinks = (filterText, links) => {
+  getFilteredLinks = links => {
+    const { filterText } = this.state
     return this.flattenLinks(links).filter(({ name }) =>
       name.toLocaleLowerCase().includes(filterText.toLocaleLowerCase())
     )
   }
 
-  navTo = moize(link => () => {
+  getSectionLinks = () => {
+    const sectionLinks = flatten(pluck('links', this.props.sections))
+    return this.getFilteredLinks(sectionLinks)
+  }
+
+  getNavToFn = moize(link => () => {
     this.props.history.push(link)
   })
 
@@ -166,9 +218,17 @@ class Navbar extends PureComponent {
 
   renderNavFolder = (name, link, subLinks, icon) => {
     const expanded = this.state.expandedItems.includes(name)
-    const { classes } = this.props
+    const { classes, location: { pathname } } = this.props
+    const isCurrentNavLink = link && matchPath(pathname, {
+      path: link.path,
+      exact: true,
+      strict: false
+    })
     return [
-      <MenuItem className={classes.navMenuItem}
+      <MenuItem
+        className={classnames(classes.navMenuItem, {
+          [classes.currentNavLink]: !!isCurrentNavLink,
+        })}
         onClick={this.toggleFoldingAndNavTo(name, prop('path', link))}
         key={name}>
         {icon && (
@@ -177,7 +237,7 @@ class Navbar extends PureComponent {
           </ListItemIcon>
         )}
         <ListItemText
-          primaryTypographyProps={{ color: 'primary', variant: 'overline' }}
+          primaryTypographyProps={{ color: 'textPrimary', variant: 'overline' }}
           primary={name} />
         {expanded ? <ExpandLess /> : <ExpandMore />}
       </MenuItem>,
@@ -190,19 +250,34 @@ class Navbar extends PureComponent {
     ]
   }
 
-  renderNavLink = ({ nestedLinks, link, name, icon }) => {
-    const { classes } = this.props
+  renderNavLink = ({ nestedLinks, link, name, icon }, idx) => {
+    const { classes, location: { pathname } } = this.props
+    const { activeNavItem } = this.state
+    const isActiveNavLink = activeNavItem === name
+    const isCurrentNavLink = link && matchPath(pathname, {
+      path: link.path,
+      exact: true,
+      strict: false
+    })
+
     return nestedLinks ? (
       this.renderNavFolder(name, link, nestedLinks, icon)
     ) : (
-      <MenuItem className={classes.navMenuItem} onClick={this.navTo(link.path)}
+      <MenuItem tabIndex={idx}
+        className={classnames(classes.navMenuItem, {
+          [classes.activeNavItem]: isActiveNavLink,
+          [classes.currentNavLink]: !!isCurrentNavLink,
+        })}
+        onClick={this.getNavToFn(link.path)}
         key={link.path}>
         {icon && (
           <ListItemIcon>
             {icon}
           </ListItemIcon>
         )}
-        <ListItemText primary={name} />
+        <ListItemText
+          primaryTypographyProps={{ color: isActiveNavLink ? 'inherit' : 'textPrimary' }}
+          primary={name} />
       </MenuItem>
     )
   }
@@ -246,35 +321,34 @@ class Navbar extends PureComponent {
         </IconButton>
       </div>
       <Divider />
-      {filteredSections.map(section =>
-        filteredSections.length > 1 ? <ExpansionPanel
-          key={section.id}
-          className={classes.nav}
-          expanded={expandedSection === section.id}
-          onChange={this.handleExpand(section.id)}>
-          <ExpansionPanelSummary
-            className={classes.navHeading}
-            expandIcon={<ExpandMore />}>
-            <Typography
-              className={classes.navHeadingText}>{section.name}</Typography>
-          </ExpansionPanelSummary>
-          <ExpansionPanelDetails className={classes.navBody}>
-            <MenuList component="nav" className={classes.navMenu}>
-              {(filterText
-                ? this.getFilteredLinks(filterText, section.links)
-                : section.links
-              ).map(this.renderNavLink)}
-            </MenuList>
-          </ExpansionPanelDetails>
-        </ExpansionPanel> : <MenuList
-          component="nav"
-          key={section.id}
-          className={classes.navMenu}>
+      {filteredSections.length > 1
+        ? filteredSections.map(section =>
+          <ExpansionPanel
+            key={section.id}
+            className={classes.nav}
+            expanded={expandedSection === section.id}
+            onChange={this.handleExpand(section.id)}>
+            <ExpansionPanelSummary
+              className={classes.navHeading}
+              expandIcon={<ExpandMore />}>
+              <Typography
+                className={classes.navHeadingText}>{section.name}</Typography>
+            </ExpansionPanelSummary>
+            <ExpansionPanelDetails className={classes.navBody}>
+              <MenuList component="nav" className={classes.navMenu}>
+                {(filterText
+                  ? this.getFilteredLinks(section.links)
+                  : section.links
+                ).map(this.renderNavLink)}
+              </MenuList>
+            </ExpansionPanelDetails>
+          </ExpansionPanel>)
+        : <MenuList component="nav" className={classes.navMenu}>
           {(filterText
-            ? this.getFilteredLinks(filterText, section.links)
-            : section.links
+            ? this.getFilteredLinks(filteredSections[0].links)
+            : filteredSections[0].links
           ).map(this.renderNavLink)}
-        </MenuList>)}
+        </MenuList>}
     </Drawer>
   }
 }

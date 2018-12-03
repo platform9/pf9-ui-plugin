@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { isEmpty, lensProp, over, pluck, toPairs, view } from 'ramda'
+import { isEmpty, lensProp, over, pluck, view } from 'ramda'
 import { ensureArray } from 'core/fp'
 
 const HotKeysContext = React.createContext({
@@ -10,8 +10,9 @@ const HotKeysContext = React.createContext({
     throw new Error('HotKeysProvider not found')
   },
 })
-
 const keyHandlersLens = lensProp('hotKeyHandlers')
+const editableInputs = ['INPUT', 'SELECT', 'TEXTAREA']
+const editEndKeys = ['Enter', 'Escape', 'Tab', 'ArrowUp', 'ArrowDown']
 
 export default class HotKeysProvider extends Component {
   state = {
@@ -48,19 +49,18 @@ export default class HotKeysProvider extends Component {
   isEditable = e => {
     const target = e.target || e.srcElement
     // stop for input, select, and textarea
-    return ['INPUT', 'SELECT', 'TEXTAREA'].includes(target.tagName) ||
+    return editableInputs.includes(target.tagName) ||
       target.isContentEditable
   }
 
   handleKeyDown = e => {
     const hotkeyHandlers = this.state.hotKeyHandlers[e.key]
-
     if (hotkeyHandlers &&
       !isEmpty(hotkeyHandlers) &&
       !e.metaKey && !e.altKey && !e.shiftKey &&
-      !this.isEditable(e)) {
+      (editEndKeys.includes(e.key) || !this.isEditable(e))) {
       hotkeyHandlers.forEach(({fn, options}) => {
-        if (options.ctrlKey === e.ctrlKey) {
+        if (!options.ctrlKey || options.ctrlKey === e.ctrlKey) {
           e.preventDefault()
           fn(e)
         }
@@ -93,12 +93,12 @@ class HotKeysConsumerWrapper extends Component {
   unsetHotKeysHandlers () {
     const handlers = view(keyHandlersLens, this.state) || {}
 
-    toPairs(handlers).forEach(([key, handlers]) => {
-      this.context.unsetHotKeyHandlers(key, pluck(['fn'], handlers))
+    Object.entries(handlers).forEach(([key, handlers]) => {
+      this.context.unsetHotKeyHandlers(key, pluck('fn', handlers))
     })
   }
 
-  setHotKeyHandler = (key, fn, options) => {
+  setHotKeyHandler = (key, fn, options = {}) => {
     // Keep a reference of the key handlers to be able to remove them
     // when the components unmounts
     this.setState(over(keyHandlersLens,
