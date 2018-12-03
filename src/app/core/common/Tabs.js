@@ -24,16 +24,18 @@ class Tabs extends React.Component {
   }
 
   state = {
+    value: false,
     tabs: [],
     addTab: this.addTab,
   }
 
   static getDerivedStateFromProps (props, state) {
-    if (props.location.hash !== state.value) {
+    if (props.location.hash && props.location.hash !== state.value) {
       return {
         value: props.location.hash || false
       }
     }
+    return null
   }
 
   activateDefaultTab = () => {
