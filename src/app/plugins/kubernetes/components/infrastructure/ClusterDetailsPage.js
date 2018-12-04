@@ -2,9 +2,8 @@ import React from 'react'
 import Tabs from 'core/common/Tabs'
 import Tab from 'core/common/Tab'
 
-// import ClusterInfo from './ClusterInfo'
+import ClusterInfo from './ClusterInfo'
 // import ClusterNodes from './ClusterNodes'
-const ClusterInfo = () => <h1>Info</h1>
 const ClusterNodes = () => <h1>Nodes</h1>
 
 const ClusterDetailsPage = () => (

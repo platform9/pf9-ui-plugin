@@ -4,7 +4,7 @@ import { withAppContext } from 'core/AppContext'
 import Loader from 'core/common/Loader'
 import DisplayError from 'core/common/DisplayError'
 
-class DataLoader extends React.Component {
+class DataLoaderBase extends React.Component {
   state = {
     loading: false,
     error: null,
@@ -49,13 +49,15 @@ class DataLoader extends React.Component {
   render () {
     const { loading, error } = this.state
     const { context, dataKey, children } = this.props
+    if (!context) { return <Loader /> }
     const data = context[dataKey]
-    if (loading) { return <Loader /> }
+    if (loading || !data) { return <Loader /> }
     if (error) { return <DisplayError error={error} /> }
     return children({ data, loading, error, context })
   }
 }
 
+const DataLoader = withAppContext(DataLoaderBase)
 DataLoader.propTypes = {
   /**
    * Used to determine if data already exists in context.
@@ -72,4 +74,9 @@ DataLoader.propTypes = {
   loaderFn: PropTypes.func.isRequired,
 }
 
-export default withAppContext(DataLoader)
+export const withDataLoader = ({ dataKey, loaderFn }) => Component => props =>
+  <DataLoader dataKey={dataKey} loaderFn={loaderFn}>
+    {({ data }) => <Component data={data} {...props} />}
+  </DataLoader>
+
+export default DataLoader
