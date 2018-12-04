@@ -12,17 +12,29 @@ const HotKeysContext = React.createContext({
 })
 const keyHandlersLens = lensProp('hotKeyHandlers')
 const editableInputs = ['INPUT', 'SELECT', 'TEXTAREA']
-const editEndKeys = ['Enter', 'Escape', 'Tab', 'ArrowUp', 'ArrowDown']
+const pressingSpecialKey = e => e.metaKey || e.altKey || e.shiftKey
+const isEditableInput = e => {
+  const target = e.target || e.srcElement
+  // input, select, and textarea are always considered editable inputs
+  return editableInputs.includes(target.tagName) ||
+    target.isContentEditable
+}
 
 export default class HotKeysProvider extends Component {
   state = {
     hotKeyHandlers: {},
 
+    /**
+     * Assign a key down handler for a specific key
+     * @param key key to bind
+     * @param fn function to trigger
+     * @param options { whileEditing, ctrlKey }
+     */
     setHotKeyHandler: (key, fn, options) => {
       this.setState(over(keyHandlersLens,
         handlers => ({
           ...handlers,
-          [key]: [...ensureArray(handlers[key]), {fn, options}]
+          [key]: [...ensureArray(handlers[key]), { fn, options }]
         })
       ))
     },
@@ -46,21 +58,13 @@ export default class HotKeysProvider extends Component {
     document.removeEventListener('keydown', this.handleKeyDown)
   }
 
-  isEditable = e => {
-    const target = e.target || e.srcElement
-    // stop for input, select, and textarea
-    return editableInputs.includes(target.tagName) ||
-      target.isContentEditable
-  }
-
   handleKeyDown = e => {
     const hotkeyHandlers = this.state.hotKeyHandlers[e.key]
-    if (hotkeyHandlers &&
-      !isEmpty(hotkeyHandlers) &&
-      !e.metaKey && !e.altKey && !e.shiftKey &&
-      (editEndKeys.includes(e.key) || !this.isEditable(e))) {
-      hotkeyHandlers.forEach(({fn, options}) => {
-        if (!options.ctrlKey || options.ctrlKey === e.ctrlKey) {
+
+    if (hotkeyHandlers && !isEmpty(hotkeyHandlers) && !pressingSpecialKey(e)) {
+      hotkeyHandlers.forEach(({ fn, options }) => {
+        if ((!options.ctrlKey || options.ctrlKey === e.ctrlKey) &&
+          (options.whileEditing || !isEditableInput(e))) {
           e.preventDefault()
           fn(e)
         }
@@ -72,7 +76,8 @@ export default class HotKeysProvider extends Component {
     const { children } = this.props
     const { setHotKeyHandler, unsetHotKeyHandlers } = this.state
     return (
-      <HotKeysContext.Provider value={{setHotKeyHandler, unsetHotKeyHandlers}}>
+      <HotKeysContext.Provider
+        value={{ setHotKeyHandler, unsetHotKeyHandlers }}>
         {children}
       </HotKeysContext.Provider>
     )
@@ -80,7 +85,7 @@ export default class HotKeysProvider extends Component {
 }
 
 class HotKeysConsumerWrapper extends Component {
-  static contextType = HotKeysContext;
+  static contextType = HotKeysContext
 
   state = {
     hotKeyHandlers: {},
@@ -104,7 +109,7 @@ class HotKeysConsumerWrapper extends Component {
     this.setState(over(keyHandlersLens,
       handlers => ({
         ...handlers,
-        [key]: [...ensureArray(handlers[key]), {fn, options}]
+        [key]: [...ensureArray(handlers[key]), { fn, options }]
       })
     ))
     this.context.setHotKeyHandler(key, fn, options)
