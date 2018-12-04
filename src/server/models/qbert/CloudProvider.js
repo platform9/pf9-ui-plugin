@@ -1,4 +1,4 @@
-import createModel from './createModel'
+import createModel from '../createModel'
 import uuid from 'uuid'
 
 const options = {

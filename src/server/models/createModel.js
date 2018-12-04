@@ -8,6 +8,7 @@ const createModel = (options={}) => {
     defaults,
     loaderFn, // function that maps data into a different form for API route
     mappingFn, // data coming form API, context needs it in a different format
+    onDeleteFn,
   } = options
 
   return {
@@ -29,6 +30,8 @@ const createModel = (options={}) => {
     },
 
     delete: (id, context) => {
+      const obj = context[dataKey].find(x => x[uniqueIdentifier] === id)
+      if (onDeleteFn) { onDeleteFn(id, context, obj) }
       context[dataKey] = context[dataKey].filter(x => x[uniqueIdentifier] !== id)
     },
   }

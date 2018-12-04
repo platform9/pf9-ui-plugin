@@ -105,20 +105,25 @@ export const loadInfrastructure = async ({ context, setContext, reload }) => {
     })
     setContext({ clusters })
 
-    const masterNodeClusters = clusters.filter(x => x.hasMasterNode)
-    asyncMap(masterNodeClusters, async cluster => {
-      try {
-        const version = await qbert.getKubernetesVersion(cluster.uuid)
-        return {
-          ...cluster,
-          version: version && version.gitVersion && version.gitVersion.substr(1),
+    let _clusters = clusters.slice()
+    asyncMap(_clusters, async cluster => {
+      if (cluster.hasMasterNode) {
+        try {
+          const version = await qbert.getKubernetesVersion(cluster.uuid)
+          return {
+            ...cluster,
+            version: version && version.gitVersion && version.gitVersion.substr(1),
+          }
+        } catch (err) {
+          console.log(err)
+          return cluster
         }
-      } catch (err) {
-        console.log(err)
+      } else {
         return cluster
       }
     }).then(clustersWithVersions => setContext({ clusters: clustersWithVersions }))
 
+    const masterNodeClusters = clusters.filter(x => x.hasMasterNode)
     asyncFlatMap(masterNodeClusters, cluster => qbert.getClusterNamespaces(cluster.uuid))
       .then(namespaces => setContext({ namespaces }))
 

@@ -53,6 +53,9 @@ class Context {
     this.resMgrHosts = []
     this.resMgrRoles = {}
     this.cloudProviders = []
+    this.nodes = []
+    this.clusters = []
+    this.namespaces = []
   }
 
   validateToken = id => Token.validateToken(id)

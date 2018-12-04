@@ -1,11 +1,11 @@
-import createModel from './createModel'
+import createModel from '../createModel'
 import uuid from 'uuid'
 
 const options = {
   dataKey: 'nodes',
   uniqueIdentifier: 'uuid',
   defaults: {
-    api_responding: '0',
+    api_responding: 0,
     type: 'local',
     clusterName: null,
     clusterUuid: null,

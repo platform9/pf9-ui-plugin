@@ -16,6 +16,10 @@ import SshKey from '../models/openstack/SshKey'
 import Hypervisor from '../models/openstack/Hypervisor'
 import ResMgrHost from '../models/resmgr/ResMgrHost'
 import CloudProvider from '../models/qbert/CloudProvider'
+import Node from '../models/qbert/Node'
+import Cluster from '../models/qbert/Cluster'
+import Namespace from '../models/qbert/Namespace'
+import { attachNodeToCluster } from '../models/qbert/Operations'
 // import Token from '../models/openstack/Token'
 import { range } from '../util'
 
@@ -107,11 +111,26 @@ function loadPreset () {
   new Hypervisor({ resMgrId: '1awf13fjsf90j', hypervisor_hostname: 'fake hypervisor', status: 'enabled', host_ip: '1.2.3.4', ipInfo: [{ip: '1.2.3.4', if_name: 'my-interface'}] })
 
   // ResMgrHosts
-  new ResMgrHost({ roles: ['pf9-ostackhost'], info: { hostname: 'fake resmgr host' } })
+  const resMgrHost = new ResMgrHost({ roles: ['pf9-ostackhost'], info: { hostname: 'fake resmgr host' } })
+  const resMgrHost2 = new ResMgrHost({ roles: ['pf9-ostackhost'], info: { hostname: 'fake resmgr host 2' } })
 
   // Cloud Providers
   CloudProvider.create({ name: 'fakeCp1', type: 'aws' }, context)
   CloudProvider.create({ name: 'fakeCp2', type: 'openstack' }, context)
+
+  // Clusters
+  const cluster = Cluster.create({ name: 'fakeCluster1', sshKey: 'someKey' }, context)
+  Cluster.create({ name: 'fakeCluster2' }, context)
+
+  // Nodes
+  // Nodes must be linked to a resMgrHost id or else the UI will break
+  const node = Node.create({ name: 'fakeNode1', api_responding: 1, isMaster: 1, uuid: resMgrHost.id }, context)
+  const node2 = Node.create({ name: 'fakeNode2', uuid: resMgrHost2.id }, context)
+
+  attachNodeToCluster(node, cluster)
+
+  // Namespaces
+  Namespace.create({ name: 'default' }, context)
 }
 
 export default loadPreset
