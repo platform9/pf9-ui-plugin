@@ -1,3 +1,5 @@
+import { path } from 'ramda'
+
 // A more resilient JSON parsing that should always return {}
 // in error conditions.
 export const parseJSON = str => {
@@ -41,3 +43,7 @@ export const castFuzzyBool = value => {
   if (mappings[value] !== undefined) { return mappings[value] }
   return false
 }
+
+export const columnPathLookup = _path => (_, row) => path(_path.split('.'), row)
+
+export const castBoolToStr = (t='yes', f='no') => value => value ? t : f

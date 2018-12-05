@@ -146,3 +146,5 @@ export const ensureFunction = moize(maybeFunc => (...args) => {
   }
   return maybeFunc
 })
+
+export const maybeFnOrNull = fn => value => value ? fn(value) : null
