@@ -1,5 +1,18 @@
 import axios from 'axios'
 
+const roleNames = {
+  'pf9-ceilometer': 'Telemetry',
+  'pf9-ceilometer-vmw': 'Telemetry',
+  'pf9-cindervolume-base': 'Block Storage',
+  'pf9-designate': 'Designate',
+  'pf9-glance-role': 'Image Library',
+  'pf9-glance-role-vmw': 'VMware Glance',
+  'pf9-kube': 'Containervisor',
+  'pf9-ostackhost-neutron-ironic': 'Ironic',
+}
+
+export const localizeRole = role => roleNames[role]
+
 class ResMgr {
   constructor (client) {
     this.client = client

@@ -4,9 +4,9 @@ import { loadInfrastructure } from './actions'
 import { pathOrNull } from 'core/fp'
 import HostStatus from 'core/common/HostStatus'
 
-const statusRenderer = (contents, node) => (<HostStatus host={node.combined} />)
+export const statusRenderer = (contents, node) => (<HostStatus host={node.combined} />)
 
-const utilizationRenderer = field => (contents, node) => {
+export const utilizationRenderer = field => (contents, node) => {
   const stats = pathOrNull(`combined.usage.${field}`)(node)
   if (!stats) { return null }
   // TODO: make this look nicer

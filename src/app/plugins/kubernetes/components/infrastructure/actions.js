@@ -59,9 +59,7 @@ export const loadNodes = async ({ context, setContext, reload }) => {
  * details.
  */
 export const loadInfrastructure = async ({ context, setContext, reload }) => {
-  console.log('loadInfrastructure')
   if (reload || !context.namespaces || !context.clusters || !context.nodes) {
-    console.log('loading infrastructure')
     const { qbert, resmgr } = context.apiClient
 
     // First `setContext` as the data arrive so we can at least render something.
