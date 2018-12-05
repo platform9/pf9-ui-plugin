@@ -3,8 +3,7 @@ import Tabs from 'core/common/Tabs'
 import Tab from 'core/common/Tab'
 
 import ClusterInfo from './ClusterInfo'
-// import ClusterNodes from './ClusterNodes'
-const ClusterNodes = () => <h1>Nodes</h1>
+import ClusterNodes from './ClusterNodes'
 
 const ClusterDetailsPage = () => (
   <Tabs>
