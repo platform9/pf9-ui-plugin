@@ -7,19 +7,17 @@ import HostStatus from 'core/common/HostStatus'
 import { localizeRole } from 'api-client/ResMgr'
 import { castFuzzyBool, columnPathLookup, castBoolToStr } from 'utils/misc'
 
-const renderCluster = (name, node) => name + (node.isMaster ? ' (master)' : '')
+const renderStatus = (_, node) => (<HostStatus host={node.combined} />)
+const renderRoles = (_, node) => node.combined.roles.map(localizeRole).join(', ')
+const isMaster = pipe(castFuzzyBool, castBoolToStr())
 
-const statusRenderer = (_, node) => (<HostStatus host={node.combined} />)
-
-const utilizationRenderer = field => pipe(
+const renderStats = field => pipe(
   columnPathLookup(`combined.usage.${field}`),
   // Offline nodes won't have usage stats
   maybeFnOrNull(stat =>
     <span>{stat.current.toFixed(2)} / {stat.max.toFixed(2)}{stat.units} used</span>
   )
 )
-
-const renderRoles = (_, node) => node.combined.roles.map(localizeRole).join(', ')
 
 const getSpotInstance = pipe(
   columnPathLookup('combined.resmgr.extensions.node_metadata.data.isSpotInstance'),
@@ -30,12 +28,13 @@ const getSpotInstance = pipe(
 export const columns = [
   { id: 'uuid', label: 'UUID', display: false },
   { id: 'name', label: 'Name' },
-  { id: 'status', label: 'Status', render: statusRenderer },
+  { id: 'status', label: 'Status', render: renderStatus },
   { id: 'primaryIp', label: 'Primary IP' },
-  { id: 'compute', label: 'Compute', render: utilizationRenderer('compute') },
-  { id: 'memory', label: 'Memory', render: utilizationRenderer('memory') },
-  { id: 'storage', label: 'Storage', render: utilizationRenderer('disk') },
-  { id: 'clusterName', label: 'Cluster', renderCluster },
+  { id: 'compute', label: 'Compute', render: renderStats('compute') },
+  { id: 'memory', label: 'Memory', render: renderStats('memory') },
+  { id: 'storage', label: 'Storage', render: renderStats('disk') },
+  { id: 'clusterName', label: 'Cluster' },
+  { id: 'isMaster', label: 'Is Master?', render: isMaster },
   { id: 'isSpotInstance', label: 'Spot Instance?', render: getSpotInstance },
   { id: 'assignedRoles', label: 'Assigned Roles', render: renderRoles },
 ]
