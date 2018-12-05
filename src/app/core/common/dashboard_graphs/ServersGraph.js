@@ -1,6 +1,6 @@
 import React from 'react'
 import { withStyles } from '@material-ui/core/styles'
-import SvgArc from './SvgArc'
+import SvgArc from './SemiCircle'
 
 const styles = theme => ({
   'svg': {
