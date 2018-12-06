@@ -1,7 +1,7 @@
-import { asyncMap, asyncFlatMap, tap, pathOrNull } from 'core/fp'
+import { asyncMap, asyncFlatMap, tap, pathOrNull, pipeWhenTruthy } from 'core/fp'
 import { combineHost } from './combineHosts'
 import { castFuzzyBool } from 'utils/misc'
-import { pathOr } from 'ramda'
+import { find, pathOr, prop, propEq } from 'ramda'
 
 export const loadClusters = async ({ context, setContext, reload }) => {
   if (!reload && context.clusters) { return context.clusters }
@@ -158,8 +158,17 @@ export const loadInfrastructure = async ({ context, setContext, reload }) => {
 
     setContext({ combinedHosts })
 
+    const qbertUrl = pipeWhenTruthy(
+      find(propEq('name', 'qbert')),
+      prop('url')
+    )(context.serviceCatalog) || ''
+
     // associate nodes with the combinedHost entry
-    const nodesCombined = nodes.map(node => ({ ...node, combined: combinedHostsObj[node.uuid] }))
+    const nodesCombined = nodes.map(node => ({
+      ...node,
+      combined: combinedHostsObj[node.uuid],
+      logs: `${qbertUrl}/logs/${node.uuid}`
+    }))
     setContext({ nodes: nodesCombined })
 
     return { nodes: nodesCombined, clusters, namespaces: [] }

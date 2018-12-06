@@ -2,14 +2,19 @@ import React from 'react'
 import createCRUDComponents from 'core/createCRUDComponents'
 import { loadInfrastructure } from './actions'
 import { maybeFnOrNull } from 'core/fp'
-import { pipe } from 'ramda'
+import { pathOr, pipe } from 'ramda'
 import HostStatus from 'core/common/HostStatus'
+import SimpleLink from 'core/common/SimpleLink'
 import { localizeRoles } from 'api-client/ResMgr'
 import { castFuzzyBool, columnPathLookup, castBoolToStr } from 'utils/misc'
 
 const renderStatus = (_, node) => (<HostStatus host={node.combined} />)
-const renderRoles = (_, node) => localizeRoles(node.combined.roles).join(', ')
 const isMaster = pipe(castFuzzyBool, castBoolToStr())
+
+const renderRoles = (_, node) => {
+  const roles = pathOr([], ['combined', 'roles'], node)
+  return localizeRoles(roles).join(', ')
+}
 
 const renderStats = field => pipe(
   columnPathLookup(`combined.usage.${field}`),
@@ -18,6 +23,8 @@ const renderStats = field => pipe(
     <span>{stat.current.toFixed(2)} / {stat.max.toFixed(2)}{stat.units} used</span>
   )
 )
+
+const renderLogs = url => <SimpleLink src={url} target="_blank">logs</SimpleLink>
 
 const getSpotInstance = pipe(
   columnPathLookup('combined.resmgr.extensions.node_metadata.data.isSpotInstance'),
@@ -29,6 +36,7 @@ export const columns = [
   { id: 'uuid', label: 'UUID', display: false },
   { id: 'name', label: 'Name' },
   { id: 'status', label: 'Status', render: renderStatus },
+  { id: 'logs', label: 'Logs', display: false, render: renderLogs },
   { id: 'primaryIp', label: 'Primary IP' },
   { id: 'compute', label: 'Compute', render: renderStats('compute') },
   { id: 'memory', label: 'Memory', render: renderStats('memory') },
