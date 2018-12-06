@@ -1,10 +1,11 @@
 import React from 'react'
 import { action } from '@storybook/addon-actions'
 import { number } from '@storybook/addon-knobs'
-import { addStories, range } from '../helpers'
+import { addStoriesFromModule, range } from '../helpers'
 import fakeImage from './fakeImage'
 import ImageList from 'openstack/components/images/ImageList'
 
+const addStories = addStoriesFromModule(module)
 const addAction = null
 const deleteAction = action('Delete image')
 

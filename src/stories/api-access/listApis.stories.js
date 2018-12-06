@@ -1,8 +1,9 @@
 import React from 'react'
-import { addStories, range } from '../helpers'
+import { addStoriesFromModule, range } from '../helpers'
 import fakeService from './fakeService'
 import { ServiceCatalogList } from 'openstack/components/api-access/ApiAccessListPage'
 
+const addStories = addStoriesFromModule(module)
 const someServices = range(15).map(fakeService)
 
 addStories('Service Catalog/Listing services', {

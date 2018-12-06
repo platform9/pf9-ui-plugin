@@ -1,8 +1,9 @@
 import React from 'react'
 import ListTableSelect from 'core/common/list_table/ListTableSelect'
 import { action } from '@storybook/addon-actions'
-import { addStories } from '../helpers'
+import { addStoriesFromModule } from '../helpers'
 
+const addStories = addStoriesFromModule(module)
 const onChange = action('change')
 
 const columns = [

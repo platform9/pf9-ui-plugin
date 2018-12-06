@@ -1,8 +1,10 @@
 import React from 'react'
 import { action } from '@storybook/addon-actions'
-import { addStories } from '../helpers'
+import { addStoriesFromModule } from '../helpers'
 
 import ConfirmationDialog from 'core/common/ConfirmationDialog'
+
+const addStories = addStoriesFromModule(module)
 
 const handleCancel = action('canceled')
 const handleConfirm = action('confirmed')

@@ -2,10 +2,11 @@ import React from 'react'
 import { linkTo } from '@storybook/addon-links'
 import { action } from '@storybook/addon-actions'
 import { number } from '@storybook/addon-knobs'
-import { addStories, range } from '../helpers'
+import { addStoriesFromModule, range } from '../helpers'
 import fakeSshKey from './fakeSshKey'
 import { SshKeysList } from 'openstack/components/sshkeys/SshKeysListPage'
 
+const addStories = addStoriesFromModule(module)
 const addAction = linkTo('SSH Key Management/Adding a key', 'Add an SSH Key')
 const someSshKeys = range(3).map(fakeSshKey)
 const deleteAction = action('Delete SSH Key')

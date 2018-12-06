@@ -1,8 +1,9 @@
 import React from 'react'
-import { addStories } from '../helpers'
+import { addStoriesFromModule } from '../helpers'
 
 import AutocompleteBase from 'core/common/AutocompleteBase'
 
+const addStories = addStoriesFromModule(module)
 const suggestions = 'one two three four five six seven eight nine ten'.split(' ')
 
 addStories('Common Components/AutocompleteBase', {

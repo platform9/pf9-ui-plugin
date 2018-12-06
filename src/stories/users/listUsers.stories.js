@@ -2,9 +2,11 @@ import React from 'react'
 import { linkTo } from '@storybook/addon-links'
 import { action } from '@storybook/addon-actions'
 import { number } from '@storybook/addon-knobs'
-import { addStories, range } from '../helpers'
+import { addStoriesFromModule, range } from '../helpers'
 import fakeUser from './fakeUser'
 import { UsersList } from 'openstack/components/users/UsersListPage'
+
+const addStories = addStoriesFromModule(module)
 
 const addAction = linkTo('Users management/Adding a user', 'Add a user')
 const deleteAction = action('Delete user')

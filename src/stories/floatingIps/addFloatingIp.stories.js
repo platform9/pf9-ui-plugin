@@ -1,7 +1,9 @@
 import React from 'react'
-import { jsonDetailLogger, addStories } from '../helpers'
+import { addStoriesFromModule, jsonDetailLogger } from '../helpers'
 
 import { AddFloatingIpForm } from 'openstack/components/floatingips/AddFloatingIpPage'
+
+const addStories = addStoriesFromModule(module)
 
 addStories('Floating IP Management/Adding a floating IP', {
   'Add a floating IP': () => (

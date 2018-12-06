@@ -5,15 +5,12 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
-process.traceDeprecation = true
 const contextPath = path.resolve(__dirname, './src/app')
 const outputPath = path.resolve(__dirname, './build')
 
 const env = process.env.NODE_ENV || 'development'
 const isDev = env === 'development'
 const isProd = env === 'production'
-
-console.log(env)
 
 const extractCSS = new MiniCssExtractPlugin({
   // Options similar to the same options in webpackOptions.output

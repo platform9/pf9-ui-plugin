@@ -1,10 +1,11 @@
 import React from 'react'
 import { action } from '@storybook/addon-actions'
 import { number } from '@storybook/addon-knobs'
-import { addStories, range } from '../helpers'
+import { addStoriesFromModule, range } from '../helpers'
 import fakeHost from './fakeHost'
 import HostsList from 'openstack/components/hosts/HostsList'
 
+const addStories = addStoriesFromModule(module)
 const addAction = () => {
   console.log('Todo')
 }

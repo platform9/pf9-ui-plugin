@@ -1,6 +1,8 @@
 import React from 'react'
-import { addStories } from '../helpers'
+import { addStoriesFromModule } from '../helpers'
 import InfoPanel from 'core/common/InfoPanel'
+
+const addStories = addStoriesFromModule(module)
 
 const items = {
   IP: '127.0.0.1',

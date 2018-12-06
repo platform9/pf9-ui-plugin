@@ -2,13 +2,15 @@ import React from 'react'
 import ListTable from 'core/common/list_table/ListTable'
 import ReplayIcon from '@material-ui/icons/Replay'
 import { action } from '@storybook/addon-actions'
-import { addStories, randomInt } from '../helpers'
+import { addStoriesFromModule, randomInt } from '../helpers'
 import { pluck, propOr, range } from 'ramda'
 import faker from 'faker'
 import moment from 'moment'
 import { formattedValue } from 'core/common/formatters'
 import { isNumeric } from 'utils/misc'
 import { TextField } from '@material-ui/core'
+
+const addStories = addStoriesFromModule(module)
 
 const onAdd = action('add')
 const onDelete = action('delete')

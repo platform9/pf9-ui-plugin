@@ -1,9 +1,6 @@
 import React from 'react'
 import { storiesOf } from '@storybook/react'
 import { decorateAction } from '@storybook/addon-actions'
-import { withInfo } from '@storybook/addon-info'
-import { withKnobs } from '@storybook/addon-knobs'
-import StoryRouter from 'storybook-react-router'
 import { compose } from 'core/fp'
 import AppContext, { withAppContext } from 'core/AppContext'
 import { withTheme } from 'app/theme'
@@ -35,17 +32,17 @@ export const pf9Decorators = storyFn => (
   </HotKeysContext>
 )
 
-export const addStory = (section, subsection, story) =>
-  storiesOf(section, module)
-    .addDecorator(withKnobs)
-    .addDecorator(StoryRouter())
-    .addDecorator(pf9Decorators)
-    .add(subsection, withInfo()(story))
+export const addStory = (section, subsection, story, mod) =>
+  storiesOf(section, mod)
+    .add(subsection, story)
 
-export const addStories = (section, stories) =>
+export const addStories = (section, stories, mod) =>
   Object.entries(stories).forEach(([subsection, story]) =>
-    addStory(section, subsection, story)
+    addStory(section, subsection, story, mod)
   )
+
+export const addStoriesFromModule = mod =>
+  (section, stories) => addStories(section, stories, mod)
 
 export const range = n => {
   let arr = []

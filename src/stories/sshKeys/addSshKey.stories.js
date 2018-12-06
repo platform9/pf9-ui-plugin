@@ -1,7 +1,10 @@
 import React from 'react'
-import { jsonDetailLogger, addStories } from '../helpers'
+import { addStoriesFromModule, jsonDetailLogger } from '../helpers'
 
-import AddSshKeyForm from '../../app/plugins/openstack/components/sshkeys/AddSshKeyForm'
+import AddSshKeyForm
+  from '../../app/plugins/openstack/components/sshkeys/AddSshKeyForm'
+
+const addStories = addStoriesFromModule(module)
 
 addStories('SSH Key Management/Adding a key', {
   'Add a key': () => (

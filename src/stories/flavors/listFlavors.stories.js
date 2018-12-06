@@ -2,10 +2,11 @@ import React from 'react'
 import { linkTo } from '@storybook/addon-links'
 import { action } from '@storybook/addon-actions'
 import { number } from '@storybook/addon-knobs'
-import { addStories, range } from '../helpers'
+import { addStoriesFromModule, range } from '../helpers'
 import fakeFlavor from './fakeFlavor'
 import { FlavorsList } from 'openstack/components/flavors/FlavorsListPage'
 
+const addStories = addStoriesFromModule(module)
 const addAction = linkTo('Flavor Management/Adding a flavor', 'Add a flavor')
 const someFlavors = range(3).map(fakeFlavor)
 const deleteAction = action('Delete flavor')

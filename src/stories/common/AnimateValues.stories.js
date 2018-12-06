@@ -1,7 +1,9 @@
 import React from 'react'
-import { addStories } from '../helpers'
+import { addStoriesFromModule } from '../helpers'
 
 import AnimateValues from 'core/common/AnimateValues'
+
+const addStories = addStoriesFromModule(module)
 
 const calcStyle = ({ width }) => ({
   width: `${width}px`,

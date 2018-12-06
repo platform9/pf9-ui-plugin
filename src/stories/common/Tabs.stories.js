@@ -1,7 +1,9 @@
 import React from 'react'
-import { addStories } from '../helpers'
+import { addStoriesFromModule } from '../helpers'
 import Tabs from 'core/common/Tabs'
 import Tab from 'core/common/Tab'
+
+const addStories = addStoriesFromModule(module)
 
 const First = () => <h1>First tab contents</h1>
 

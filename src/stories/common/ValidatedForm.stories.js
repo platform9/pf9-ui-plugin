@@ -1,13 +1,13 @@
 import React from 'react'
-import { addStories, jsonDetailLogger } from '../helpers'
+import { addStoriesFromModule, jsonDetailLogger } from '../helpers'
 import ValidatedForm from 'core/common/validated_form/ValidatedForm'
 import TextField from 'core/common/validated_form/TextField'
 import {
-  customValidator,
-  matchFieldValidator,
-  requiredValidator
+  customValidator, matchFieldValidator, requiredValidator
 } from 'core/FieldValidator'
 import Checkbox from 'core/common/validated_form/Checkbox'
+
+const addStories = addStoriesFromModule(module)
 
 const renderForm = (props = {}) => () => (
   <ValidatedForm onSubmit={jsonDetailLogger('ValidatedForm#submit')} {...props}>

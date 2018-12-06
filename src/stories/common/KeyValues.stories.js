@@ -1,7 +1,9 @@
 import React from 'react'
-import { addStories } from '../helpers'
+import { addStoriesFromModule } from '../helpers'
 
 import KeyValues from 'core/common/KeyValues'
+
+const addStories = addStoriesFromModule(module)
 
 addStories('Common Components/KeyValues', {
   'Default settings': () => (

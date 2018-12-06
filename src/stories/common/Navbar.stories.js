@@ -1,11 +1,13 @@
 import React from 'react'
 import faker from 'faker'
-import { addStories, randomInt, range } from '../helpers'
+import { addStoriesFromModule, randomInt, range } from '../helpers'
 
 import { BrowserRouter as Router } from 'react-router-dom'
 import fakeNavbarItem from './fakeNavbarItem'
 import { omit } from 'ramda'
 import Navbar from 'core/common/Navbar'
+
+const addStories = addStoriesFromModule(module)
 
 const getSomeNavbarItems = (withIcons, count = 5) =>
   range(count).map(fakeNavbarItem(withIcons))

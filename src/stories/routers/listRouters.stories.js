@@ -2,10 +2,11 @@ import React from 'react'
 import { linkTo } from '@storybook/addon-links'
 import { action } from '@storybook/addon-actions'
 import { number } from '@storybook/addon-knobs'
-import { addStories, range } from '../helpers'
+import { addStoriesFromModule, range } from '../helpers'
 import fakeRouter from './fakeRouter'
 import { RoutersList } from 'openstack/components/routers/RoutersListPage'
 
+const addStories = addStoriesFromModule(module)
 const addAction = linkTo('Router Management/Adding a router', 'Add a router')
 const someRouters = range(3).map(fakeRouter)
 const deleteAction = action('Delete router')

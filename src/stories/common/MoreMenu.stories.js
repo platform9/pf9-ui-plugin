@@ -3,8 +3,9 @@ import ReplayIcon from '@material-ui/icons/Replay'
 import PlayArrowIcon from '@material-ui/icons/PlayArrow'
 import MoreMenu from 'core/common/MoreMenu'
 import { action } from '@storybook/addon-actions'
-import { addStories } from '../helpers'
+import { addStoriesFromModule } from '../helpers'
 
+const addStories = addStoriesFromModule(module)
 const onAdd = action('add')
 const onDelete = action('delete')
 const onEdit = action('edit')

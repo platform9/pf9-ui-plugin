@@ -39,7 +39,10 @@
   },
 
   "settings": {
-    "import/parser": "babel-eslint"
+    "import/parser": "babel-eslint",
+    "react": {
+      "version": "16.6" // React version, default to the latest React stable release
+    }
   },
   "globals": {
   }

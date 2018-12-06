@@ -1,7 +1,9 @@
 import React from 'react'
-import { range, addStories } from '../helpers'
+import { addStoriesFromModule, range } from '../helpers'
 import fakeProgressTrackerItem from './fakeProgressTrackerItem'
 import ProgressTracker from 'core/common/ProgressTracker'
+
+const addStories = addStoriesFromModule(module)
 
 const someProgressTrackerItems = range(3).map(fakeProgressTrackerItem)
 const activeStep1 = 1

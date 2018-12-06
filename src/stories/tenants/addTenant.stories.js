@@ -1,7 +1,9 @@
 import React from 'react'
-import { jsonDetailLogger, addStories } from '../helpers'
+import { addStoriesFromModule, jsonDetailLogger } from '../helpers'
 
 import { AddTenantForm } from 'openstack/components/tenants/AddTenantPage'
+
+const addStories = addStoriesFromModule(module)
 
 addStories('Tenants/Adding a tenant', {
   'Add a tenant': () => (
