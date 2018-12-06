@@ -4,11 +4,11 @@ import { loadInfrastructure } from './actions'
 import { maybeFnOrNull } from 'core/fp'
 import { pipe } from 'ramda'
 import HostStatus from 'core/common/HostStatus'
-import { localizeRole } from 'api-client/ResMgr'
+import { localizeRoles } from 'api-client/ResMgr'
 import { castFuzzyBool, columnPathLookup, castBoolToStr } from 'utils/misc'
 
 const renderStatus = (_, node) => (<HostStatus host={node.combined} />)
-const renderRoles = (_, node) => node.combined.roles.map(localizeRole).join(', ')
+const renderRoles = (_, node) => localizeRoles(node.combined.roles).join(', ')
 const isMaster = pipe(castFuzzyBool, castBoolToStr())
 
 const renderStats = field => pipe(
