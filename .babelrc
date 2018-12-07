@@ -1,5 +1,5 @@
 {
-  "presets": [["@babel/env"], "@babel/react"],
+  "presets": [["@babel/env", {"modules": false}], "@babel/react"],
   "plugins": [
     "@babel/plugin-transform-runtime",
     "@babel/plugin-proposal-object-rest-spread",
@@ -14,5 +14,10 @@
         "camel2DashComponentName": false
       }
     ]
-  ]
+  ],
+  "env": {
+    "test": {
+      "presets": [["@babel/env"], "@babel/react"]
+    }
+  }
 }
