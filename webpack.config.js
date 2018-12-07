@@ -37,6 +37,7 @@ module.exports = {
   mode: isProd ? 'production' : 'development',
   devtool: isProd ? 'source-map' : 'cheap-module-eval-source-map',
   devServer: {
+    publicPath: '/',
     contentBase: outputPath,
     port: 3000,
     compress: true,
