@@ -17,3 +17,7 @@ export const deleteUser = async ({ id, context, setContext }) => {
   const newList = context.users.filter(x => x.id !== id)
   setContext({ users: newList })
 }
+
+export const updateUser = () => {
+  console.log('TODO')
+}
