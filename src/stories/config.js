@@ -10,10 +10,6 @@ function loadStories () {
   req.keys().forEach(filename => req(filename))
 }
 
-addDecorator(withKnobs)
-addDecorator(StoryRouter())
-addDecorator(pf9Decorators)
-addDecorator(withInfo)
 addDecorator(
   withInfo({
     header: false,
@@ -21,5 +17,8 @@ addDecorator(
     source: true,
   })
 )
+addDecorator(withKnobs)
+addDecorator(StoryRouter())
+addDecorator(pf9Decorators)
 
 configure(loadStories, module)
