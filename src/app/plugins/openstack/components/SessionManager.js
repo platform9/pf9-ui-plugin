@@ -6,6 +6,8 @@ import LoginPage from 'openstack/components/LoginPage'
 
 import { getStorage, setStorage } from 'core/common/pf9-storage'
 import { loadUserTenants } from 'openstack/components/tenants/actions'
+import { withPreferences } from 'core/helpers/PreferencesProvider'
+import { pathOr } from 'ramda'
 
 /**
  * Sets up the Openstack session.
@@ -37,38 +39,23 @@ class SessionManager extends React.Component {
 
   get keystone () { return this.props.context.apiClient.keystone }
 
-  setSession (newState = {}, cb) {
-    return this.props.setContext(state => ({
-      ...state,
-      session: {
-        ...state.session,
-        ...newState
-      }
-    }))
-  }
-
   // Handler that gets invoked on successful authentication
   initialSetup = async ({ username, unscopedToken }) => {
-    const { context, getUserPreferences, history, location, setContext } = this.props
+    const { context, history, location, initSession, initUserPreferences, setContext } = this.props
 
     setStorage('username', username)
     setStorage('unscopedToken', unscopedToken)
 
-    const prefs = getUserPreferences(username)
-    const lastTenant = prefs.lastTenant || 'service'
-
     // Set up the scopedToken
+    await initSession(unscopedToken, username)
+    // The order matters, we need the session to be able to init the user preferences
+    const userPreferences = await initUserPreferences(username)
+    const lastTenant = pathOr('service', ['Tenants', 'lastTenant'], userPreferences)
+
     const tenants = await loadUserTenants({ context, setContext })
     const activeTenant = tenants.find(x => x.name === lastTenant)
     const { keystone } = context.apiClient
     await keystone.changeProjectScope(activeTenant.id)
-
-    await this.setSession({
-      unscopedToken,
-      username,
-      loginSuccessful: true,
-      userPreferences: prefs,
-    })
 
     setContext({ initialized: true })
 
@@ -95,5 +82,6 @@ class SessionManager extends React.Component {
 
 export default compose(
   withAppContext,
+  withPreferences,
   withRouter,
 )(SessionManager)

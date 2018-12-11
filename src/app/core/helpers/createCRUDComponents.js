@@ -2,11 +2,13 @@ import React from 'react'
 import DataLoader from 'core/DataLoader'
 import CRUDListContainer from 'core/common/CRUDListContainer'
 import requiresAuthentication from 'openstack/util/requiresAuthentication'
-import ListTable from 'core/common/list_table/ListTable'
-import createCRUDActions from 'core/createCRUDActions'
+import ListTable, { pluckVisibleColumnIds } from 'core/common/list_table/ListTable'
+import createCRUDActions from 'core/helpers/createCRUDActions'
 import { compose } from 'core/fp'
 import { withAppContext } from 'core/AppContext'
 import { withRouter } from 'react-router-dom'
+import { withScopedPreferences } from 'core/helpers/PreferencesProvider'
+import { pluck } from 'ramda'
 
 /**
  * This helper removes a lot of boilerplate from standard CRUD operations.
@@ -51,11 +53,14 @@ const createCRUDComponents = options => {
   const crudActions = actions ? createCRUDActions(actions) : null
 
   // List
-  const List = ({ onAdd, onDelete, onEdit, rowActions, data }) => {
+  const List = withScopedPreferences(name)(({
+    onAdd, onDelete, onEdit, rowActions, data,
+    preferences: { visibleColumns, columnsOrder, rowsPerPage },
+    updatePreferences
+  }) => {
     if (!data || data.length === 0) {
       return <h1>No data found.</h1>
     }
-
     return (
       <ListTable
         title={title}
@@ -67,9 +72,17 @@ const createCRUDComponents = options => {
         rowActions={rowActions}
         searchTarget="name"
         uniqueIdentifier={uniqueIdentifier}
+        visibleColumns={visibleColumns}
+        columnsOrder={columnsOrder}
+        rowsPerPage={rowsPerPage}
+        onRowsPerPageChange={rowsPerPage => updatePreferences({ rowsPerPage })}
+        onColumnsChange={updatedColumns => updatePreferences({
+          visibleColumns: pluckVisibleColumnIds(updatedColumns),
+          columnsOrder: pluck('id', updatedColumns)
+        })}
       />
     )
-  }
+  })
   List.displayName = `${name}List`
 
   // ListContainer

@@ -3,13 +3,17 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/core/styles'
-import { Checkbox, Grid, Paper, Table, TableBody, TableCell, TablePagination, TableRow } from '@material-ui/core'
+import {
+  Checkbox, Grid, Paper, Table, TableBody, TableCell, TablePagination, TableRow
+} from '@material-ui/core'
 import ListTableHead from './ListTableHead'
 import ListTableToolbar from './ListTableToolbar'
 import MoreMenu from 'core/common/MoreMenu'
 import { compose, ensureFunction, except } from 'core/fp'
 import { withAppContext } from 'core/AppContext'
-import { any, assoc, assocPath, equals, pipe, pluck, prop, propEq, propOr, uniq, update } from 'ramda'
+import {
+  any, assoc, assocPath, equals, pipe, pluck, prop, propEq, propOr, uniq, update
+} from 'ramda'
 
 const styles = theme => ({
   root: {
@@ -24,21 +28,24 @@ const styles = theme => ({
   },
 })
 
+// Reject all columns that are not visible or excluded
+export const pluckVisibleColumnIds = columns =>
+  columns
+    .filter(column => column.display !== false && column.excluded !== true)
+    .map(prop('id'))
+
 class ListTable extends React.Component {
   constructor (props) {
     super(props)
-    const { columns, getUserPreferences } = props
-    const prefs = (getUserPreferences && getUserPreferences()) || {}
-
+    const { columns, visibleColumns, columnsOrder, rowsPerPage } = props
     this.state = {
-      visibleColumns: columns
-        .filter(column => column.display !== false && column.excluded !== true)
-        .map(prop('id')),
-      columnsOrder: pluck('id', columns),
-      order: 'asc',
+      columns: columns,
+      visibleColumns: visibleColumns || pluckVisibleColumnIds(columns),
+      columnsOrder: columnsOrder || pluck('id', columns),
+      rowsPerPage: rowsPerPage,
       orderBy: columns[0].id,
+      order: 'asc',
       page: 0,
-      rowsPerPage: prefs.perPage || 10,
       selected: [],
       searchTerm: '',
       filterValues: {}
@@ -122,8 +129,10 @@ class ListTable extends React.Component {
   handleChangePage = (event, page) => this.setState({ page })
 
   handleChangeRowsPerPage = event => {
-    this.props.setUserPreference('perPage', event.target.value)
-    this.setState({ rowsPerPage: event.target.value })
+    const { value: rowsPerPage } = event.target
+    this.setState({ rowsPerPage }, () =>
+      ensureFunction(this.props.onRowsPerPageChange)(rowsPerPage)
+    )
   }
 
   handleAdd = () => {
@@ -161,13 +170,15 @@ class ListTable extends React.Component {
     }
   }
 
-  handleColumnSwitch = columnId => {
+  handleColumnToggle = columnId => {
     if (this.props.canEditColumns) {
       this.setState(({ visibleColumns }) => ({
         visibleColumns: visibleColumns.includes(columnId)
           ? except(columnId, visibleColumns)
           : [...visibleColumns, columnId]
-      }))
+      }), () =>
+        ensureFunction(this.props.onColumnsChange)(this.state.columns)
+      )
     }
   }
 
@@ -180,7 +191,9 @@ class ListTable extends React.Component {
         update(srcColumnIdx, destColumnId),
         update(tarColumnIdx, srcColumnId),
       )(columnsOrder)
-    }))
+    }), () =>
+      ensureFunction(this.props.onColumnsChange)(this.state.columns)
+    )
   }
 
   handleFilterUpdate = (columnId, selectedValue) => {
@@ -370,7 +383,7 @@ class ListTable extends React.Component {
               searchTerm={searchTerm}
               columns={columns}
               visibleColumns={visibleColumns}
-              onColumnsChange={this.handleColumnSwitch}
+              onColumnToggle={this.handleColumnToggle}
               filters={filters}
               filterValues={filterValues}
               onFilterUpdate={this.handleFilterUpdate}
@@ -424,6 +437,10 @@ ListTable.propTypes = {
   onDelete: PropTypes.func,
   onEdit: PropTypes.func,
   paginate: PropTypes.bool,
+  orderBy: PropTypes.string,
+
+  visibleColumns: PropTypes.arrayOf(PropTypes.string),
+  rowsPerPage: PropTypes.number,
 
   /**
    * List of filters
@@ -456,6 +473,8 @@ ListTable.propTypes = {
       cond: PropTypes.func,
     })
   ),
+  onRowsPerPageChange: PropTypes.func,
+  onColumnsChange: PropTypes.func,
 
   showCheckboxes: PropTypes.bool,
   searchTarget: PropTypes.string,

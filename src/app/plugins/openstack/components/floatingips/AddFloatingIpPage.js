@@ -1,5 +1,5 @@
 import React from 'react'
-import createAddComponents from 'core/createAddComponents'
+import createAddComponents from 'core/helpers/createAddComponents'
 import SubmitButton from 'core/common/SubmitButton'
 import ValidatedForm from 'core/common/validated_form/ValidatedForm'
 import TextField from 'core/common/validated_form/TextField'

@@ -1,4 +1,4 @@
-import createAddComponents from 'core/createAddComponents'
+import createAddComponents from 'core/helpers/createAddComponents'
 
 const initialValue = {
   name: '',

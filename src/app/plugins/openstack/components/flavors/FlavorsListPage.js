@@ -1,4 +1,4 @@
-import createCRUDComponents from 'core/createCRUDComponents'
+import createCRUDComponents from 'core/helpers/createCRUDComponents'
 
 export const options = {
   baseUrl: '/ui/openstack/flavors',

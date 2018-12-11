@@ -1,10 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {
-  BrowserRouter as Router,
-  Redirect,
-  Route,
-  Switch,
+  BrowserRouter as Router, Redirect, Route, Switch,
 } from 'react-router-dom'
 import { MuiThemeProvider } from '@material-ui/core/styles'
 import AppContainer from 'core/common/AppContainer'
@@ -19,6 +16,7 @@ import HotKeysProvider from 'core/common/HotKeysProvider'
 import { apply, toPairs } from 'ramda'
 import SessionManager from 'openstack/components/SessionManager'
 import DeveloperToolsEmbed from 'developer/components/DeveloperToolsEmbed'
+import PreferencesProvider from 'core/helpers/PreferencesProvider'
 
 setupFromConfig(config)
 window.process = process
@@ -72,26 +70,26 @@ class App extends React.Component {
     return (
       <Router>
         <MuiThemeProvider theme={theme}>
-
           <HotKeysProvider>
             <AppContext initialContext={{ apiClient, initialized: false }}>
-              <div id="_main-container">
-                <SessionManager>
-                  <AppContainer
-                    sections={plugins.map(([id, plugin]) => ({
-                      id,
-                      name: plugin.name,
-                      links: plugin.getNavItems()
-                    }))}>
-                    {plugins.map(apply(this.renderPluginRoutes))}
-                    <DeveloperToolsEmbed />
-                  </AppContainer>
-                </SessionManager>
-              </div>
+              <PreferencesProvider>
+                <div id="_main-container">
+                  <SessionManager>
+                    <AppContainer
+                      sections={plugins.map(([id, plugin]) => ({
+                        id,
+                        name: plugin.name,
+                        links: plugin.getNavItems()
+                      }))}>
+                      {plugins.map(apply(this.renderPluginRoutes))}
+                      <DeveloperToolsEmbed />
+                    </AppContainer>
+                  </SessionManager>
+                </div>
+              </PreferencesProvider>
             </AppContext>
           </HotKeysProvider>
         </MuiThemeProvider>
-
       </Router>
     )
   }

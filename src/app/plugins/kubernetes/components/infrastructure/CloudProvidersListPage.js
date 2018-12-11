@@ -1,4 +1,4 @@
-import createCRUDComponents from 'core/createCRUDComponents'
+import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { deleteCloudProvider, loadCloudProviders } from './actions'
 
 export const options = {

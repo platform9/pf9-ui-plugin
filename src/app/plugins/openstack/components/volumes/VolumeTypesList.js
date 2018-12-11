@@ -2,7 +2,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { keyValueArrToObj } from 'core/fp'
 
-import ListTable from 'core/common/list_table/ListTable'
+import ListTable, { pluckVisibleColumnIds } from 'core/common/list_table/ListTable'
+import { compose, pluck } from 'ramda'
+import { withScopedPreferences } from 'core/helpers/PreferencesProvider'
 
 const columns = [
   { id: 'name', label: 'Name' },
@@ -12,25 +14,31 @@ const columns = [
   { id: 'extra_specs', label: 'Metadata', render: data => JSON.stringify(keyValueArrToObj(data)) },
 ]
 
-class VolumeTypesList extends React.Component {
-  render () {
-    const { onAdd, onDelete, onEdit, volumeTypes } = this.props
-    if (!volumeTypes || volumeTypes.length === 0) {
-      return <h1>No volume types found.</h1>
-    }
-    return (
-      <ListTable
-        title="Volume Types"
-        columns={columns}
-        data={volumeTypes}
-        onAdd={onAdd}
-        onDelete={onDelete}
-        onEdit={onEdit}
-        searchTarget="name"
-      />
-    )
-  }
-}
+const VolumeTypesList = ({
+  onAdd, onDelete, onEdit, volumeTypes,
+  preferences: { visibleColumns, columnsOrder, rowsPerPage },
+  updatePreferences
+}) => (
+  !volumeTypes || volumeTypes.length === 0
+    ? <h1>No volume types found.</h1>
+    : <ListTable
+      title="Volume Types"
+      columns={columns}
+      data={volumeTypes}
+      onAdd={onAdd}
+      onDelete={onDelete}
+      onEdit={onEdit}
+      searchTarget="name"
+      visibleColumns={visibleColumns}
+      columnsOrder={columnsOrder}
+      rowsPerPage={rowsPerPage}
+      onRowsPerPageChange={rowsPerPage => updatePreferences({ rowsPerPage })}
+      onColumnsChange={updatedColumns => updatePreferences({
+        visibleColumns: pluckVisibleColumnIds(updatedColumns),
+        columnsOrder: pluck('id', updatedColumns)
+      })}
+    />
+)
 
 VolumeTypesList.propTypes = {
   /** List of volumeTypes [{ id, name... }] */
@@ -49,4 +57,6 @@ VolumeTypesList.defaultProps = {
   volumeTypes: [],
 }
 
-export default VolumeTypesList
+export default compose(
+  withScopedPreferences('VolumeTypesList')
+)(VolumeTypesList)

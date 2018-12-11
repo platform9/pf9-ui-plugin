@@ -1,4 +1,4 @@
-import createCRUDComponents from 'core/createCRUDComponents'
+import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { deleteNetwork, loadNetworks } from './actions'
 
 export const options = {

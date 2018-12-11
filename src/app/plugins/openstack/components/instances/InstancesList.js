@@ -1,7 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import ListTable from 'core/common/list_table/ListTable'
+import ListTable, { pluckVisibleColumnIds } from 'core/common/list_table/ListTable'
+import { compose, pluck } from 'ramda'
+import { withScopedPreferences } from 'core/helpers/PreferencesProvider'
 
 const columns = [
   { id: 'name', label: 'Name' },
@@ -11,7 +13,9 @@ const columns = [
 
 class InstancesList extends React.Component {
   render () {
-    const { onAdd, onDelete, onEdit, instances } = this.props
+    const { onAdd, onDelete, onEdit, instances,
+      preferences: { visibleColumns, columnsOrder, rowsPerPage },
+      updatePreferences } = this.props
     if (!instances || instances.length === 0) {
       return <h1>No instances found.</h1>
     }
@@ -24,6 +28,14 @@ class InstancesList extends React.Component {
         onDelete={onDelete}
         onEdit={onEdit}
         searchTarget="name"
+        visibleColumns={visibleColumns}
+        columnsOrder={columnsOrder}
+        rowsPerPage={rowsPerPage}
+        onRowsPerPageChange={rowsPerPage => updatePreferences({ rowsPerPage })}
+        onColumnsChange={updatedColumns => updatePreferences({
+          visibleColumns: pluckVisibleColumnIds(updatedColumns),
+          columnsOrder: pluck('id', updatedColumns)
+        })}
       />
     )
   }
@@ -46,4 +58,6 @@ InstancesList.defaultProps = {
   instances: [],
 }
 
-export default InstancesList
+export default compose(
+  withScopedPreferences('InstancesList')
+)(InstancesList)

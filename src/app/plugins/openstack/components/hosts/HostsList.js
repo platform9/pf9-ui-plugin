@@ -1,7 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import ListTable from 'core/common/list_table/ListTable'
+import ListTable, { pluckVisibleColumnIds } from 'core/common/list_table/ListTable'
+import { compose, pluck } from 'ramda'
+import { withScopedPreferences } from 'core/helpers/PreferencesProvider'
 
 const columns = [
   { id: 'hypervisor_hostname', label: 'Hostname' },
@@ -11,7 +13,9 @@ const columns = [
 
 class HostsList extends React.Component {
   render () {
-    const { onAdd, onDelete, onEdit, hosts } = this.props
+    const { onAdd, onDelete, onEdit, hosts,
+      preferences: { visibleColumns, columnsOrder, rowsPerPage },
+      updatePreferences} = this.props
     if (!hosts || hosts.length === 0) {
       return <h1>No hosts found.</h1>
     }
@@ -24,6 +28,14 @@ class HostsList extends React.Component {
         onDelete={onDelete}
         onEdit={onEdit}
         searchTarget="hypervisor_hostname"
+        visibleColumns={visibleColumns}
+        columnsOrder={columnsOrder}
+        rowsPerPage={rowsPerPage}
+        onRowsPerPageChange={rowsPerPage => updatePreferences({ rowsPerPage })}
+        onColumnsChange={updatedColumns => updatePreferences({
+          visibleColumns: pluckVisibleColumnIds(updatedColumns),
+          columnsOrder: pluck('id', updatedColumns)
+        })}
       />
     )
   }
@@ -46,4 +58,6 @@ HostsList.defaultProps = {
   hosts: [],
 }
 
-export default HostsList
+export default compose(
+  withScopedPreferences('HostsList')
+)(HostsList)

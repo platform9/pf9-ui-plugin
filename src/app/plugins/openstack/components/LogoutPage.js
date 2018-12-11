@@ -10,10 +10,10 @@ import { clear } from 'core/common/pf9-storage'
 // more code.  This gives us a nice clean separation.
 export class LogoutPage extends React.Component {
   componentDidMount () {
-    const { history, setContext } = this.props
+    const { history, destroySession } = this.props
     clear('username')
     clear('unscopedToken')
-    setContext({ session: {} })
+    destroySession()
     history.push('/ui/openstack/login')
   }
 

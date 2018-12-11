@@ -3,7 +3,6 @@ import DownloadKubeConfigLink from './DownloadKubeConfigLink'
 import KubeCLI from './KubeCLI'
 import SimpleLink from 'core/common/SimpleLink'
 import clusterUsageStats from './clusterUsageStats'
-import createCRUDComponents from 'core/createCRUDComponents'
 import UsageBar from 'core/common/dashboard_graphs/UsageBar'
 import {
   AddToQueue as AttachIcon,
@@ -12,6 +11,7 @@ import {
   PresentToAll as UpgradeIcon,
 } from '@material-ui/icons'
 import { deleteCluster, loadInfrastructure } from './actions'
+import createCRUDComponents from 'core/helpers/createCRUDComponents'
 
 const renderLinks = links => {
   if (!links) { return null }

@@ -1,6 +1,6 @@
 import React from 'react'
 import Picklist from 'core/common/Picklist'
-import createCRUDComponents from 'core/createCRUDComponents'
+import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import Loader from 'core/common/Loader'
 import { withAppContext } from 'core/AppContext'
 import { loadInfrastructure } from '../infrastructure/actions'

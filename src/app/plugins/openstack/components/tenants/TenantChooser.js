@@ -2,9 +2,10 @@ import React from 'react'
 import Selector from 'core/common/Selector'
 import { compose } from 'core/fp'
 import { loadUserTenants } from './actions'
-import { withAppContext } from 'core/AppContext'
 import { assoc } from 'ramda'
 import moize from 'moize'
+import { withScopedPreferences } from 'core/helpers/PreferencesProvider'
+import { withAppContext } from 'core/AppContext'
 
 class TenantChooser extends React.Component {
   state = {
@@ -48,10 +49,10 @@ class TenantChooser extends React.Component {
     })
   }
 
-  handleChoose = tenantName => {
-    const { setUserPreference } = this.props
-    setUserPreference('lastTenant', tenantName)
-    this.updateCurrentTenant(tenantName)
+  handleChoose = lastTenant => {
+    const { updatePreferences } = this.props
+    updatePreferences({ lastTenant })
+    this.updateCurrentTenant(lastTenant)
   }
 
   loadTenants = async (reload = false) => {
@@ -67,7 +68,7 @@ class TenantChooser extends React.Component {
   }
 
   async componentDidMount () {
-    const lastTenant = this.props.getUserPreference('lastTenant') || 'service'
+    const lastTenant = this.props.preferences.lastTenant
     const tenants = await this.loadTenants()
     if (!tenants) { return }
     this.updateCurrentTenant(lastTenant)
@@ -91,5 +92,6 @@ class TenantChooser extends React.Component {
 }
 
 export default compose(
-  withAppContext,
+  withScopedPreferences('Tenants'),
+  withAppContext
 )(TenantChooser)

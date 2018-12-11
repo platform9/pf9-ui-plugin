@@ -1,12 +1,12 @@
 import React from 'react'
-import createCRUDComponents from 'core/createCRUDComponents'
+import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { loadInfrastructure } from './actions'
 import { maybeFnOrNull } from 'core/fp'
 import { pathOr, pipe } from 'ramda'
 import HostStatus from 'core/common/HostStatus'
 import SimpleLink from 'core/common/SimpleLink'
 import { localizeRoles } from 'api-client/ResMgr'
-import { castFuzzyBool, columnPathLookup, castBoolToStr } from 'utils/misc'
+import { castBoolToStr, castFuzzyBool, columnPathLookup } from 'utils/misc'
 import ProgressBar from 'core/common/ProgressBar'
 
 const renderStatus = (_, node) => (<HostStatus host={node.combined} />)

@@ -1,7 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import ListTable, { pluckVisibleColumnIds } from 'core/common/list_table/ListTable'
 
-import ListTable from 'core/common/list_table/ListTable'
+import { compose, pluck } from 'ramda'
+import { withScopedPreferences } from 'core/helpers/PreferencesProvider'
 
 const columns = [
   { id: 'name', label: 'Name' },
@@ -25,27 +27,32 @@ const columns = [
   { id: 'metadata', label: 'Metadata', render: data => JSON.stringify(data) }
 ]
 
-class VolumesList extends React.Component {
-  render () {
-    const { onAdd, onDelete, onEdit, rowActions, volumes } = this.props
-    if (!volumes || volumes.length === 0) {
-      return <h1>No volumes found.</h1>
-    }
-
-    return (
-      <ListTable
-        title="Volumes"
-        columns={columns}
-        data={volumes}
-        onAdd={onAdd}
-        onDelete={onDelete}
-        onEdit={onEdit}
-        rowActions={rowActions}
-        searchTarget="name"
-      />
-    )
-  }
-}
+const VolumesList = ({
+  onAdd, onDelete, onEdit, rowActions, volumes,
+  preferences: { visibleColumns, columnsOrder, rowsPerPage },
+  updatePreferences
+}) => (
+  !volumes || volumes.length === 0
+    ? <h1>No volumes found.</h1>
+    : <ListTable
+      title="Volumes"
+      columns={columns}
+      data={volumes}
+      onAdd={onAdd}
+      onDelete={onDelete}
+      onEdit={onEdit}
+      rowActions={rowActions}
+      searchTarget="name"
+      visibleColumns={visibleColumns}
+      columnsOrder={columnsOrder}
+      rowsPerPage={rowsPerPage}
+      onRowsPerPageChange={rowsPerPage => updatePreferences({ rowsPerPage })}
+      onColumnsChange={updatedColumns => updatePreferences({
+        visibleColumns: pluckVisibleColumnIds(updatedColumns),
+        columnsOrder: pluck('id', updatedColumns)
+      })}
+    />
+)
 
 VolumesList.propTypes = {
   /** List of volumes [{ id, name... }] */
@@ -72,4 +79,6 @@ VolumesList.defaultProps = {
   volumes: [],
 }
 
-export default VolumesList
+export default compose(
+  withScopedPreferences('VolumesList')
+)(VolumesList)

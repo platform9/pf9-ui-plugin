@@ -42,7 +42,7 @@ const toolbarStyles = theme => ({
 
 const ListTableToolbar = ({
   classes, columns, context, filterValues, filters,
-  onAdd, onColumnsChange, onDelete, onEdit, onFilterUpdate,
+  onAdd, onColumnToggle, onDelete, onEdit, onFilterUpdate,
   onFiltersReset, onSearchChange,
   rowActions, searchTerm, selected, title, visibleColumns,
 }) => {
@@ -83,11 +83,11 @@ const ListTableToolbar = ({
               </IconButton>
             </Tooltip>
           )}
-          {columns && onColumnsChange && (
+          {columns && onColumnToggle && (
             <ListTableColumnButton
               columns={columns}
               visibleColumns={visibleColumns}
-              onColumnsChange={onColumnsChange}
+              onColumnToggle={onColumnToggle}
             />
           )}
           {filters && <ListTableFiltersButton
@@ -130,14 +130,13 @@ ListTableToolbar.propTypes = {
   })),
   filterValues: PropTypes.object,
   onAdd: PropTypes.func,
-  onColumnsChange: PropTypes.func,
   onDelete: PropTypes.func,
   onEdit: PropTypes.func,
   onFilterUpdate: PropTypes.func,
   onFiltersReset: PropTypes.func,
   selected: PropTypes.array,
-  title: PropTypes.string.isRequired,
   visibleColumns: PropTypes.array,
+  onColumnToggle: PropTypes.func,
 }
 
 export default compose(

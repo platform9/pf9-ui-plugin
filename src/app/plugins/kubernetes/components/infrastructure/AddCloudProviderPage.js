@@ -4,7 +4,7 @@ import ValidatedForm from 'core/common/validated_form/ValidatedForm'
 import PicklistField from 'core/common/validated_form/PicklistField'
 import SubmitButton from 'core/common/SubmitButton'
 import TextField from 'core/common/validated_form/TextField'
-import createAddComponents from 'core/createAddComponents'
+import createAddComponents from 'core/helpers/createAddComponents'
 import { createCloudProvider, loadCloudProviders } from './actions'
 
 const types = [

@@ -1,5 +1,5 @@
 import React from 'react'
-import createUpdateComponents from 'core/createUpdateComponents'
+import createUpdateComponents from 'core/helpers/createUpdateComponents'
 import SubmitButton from 'core/common/SubmitButton'
 import ValidatedForm from 'core/common/validated_form/ValidatedForm'
 import Checkbox from 'core/common/validated_form/Checkbox'

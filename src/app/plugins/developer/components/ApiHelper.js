@@ -4,14 +4,17 @@ import PicklistField from 'core/common/validated_form/PicklistField'
 import TextField from 'core/common/validated_form/TextField'
 import SubmitButton from 'core/common/SubmitButton'
 import ValidatedForm from 'core/common/validated_form/ValidatedForm'
-import ListTable from 'core/common/list_table/ListTable'
-import { Checkbox, FormControlLabel, TextField as BaseTextField, Typography } from '@material-ui/core'
+import ListTable, { pluckVisibleColumnIds } from 'core/common/list_table/ListTable'
+import {
+  Checkbox, FormControlLabel, TextField as BaseTextField, Typography
+} from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles'
-import { path, pick } from 'ramda'
+import { path, pick, pluck } from 'ramda'
 import { compose } from 'core/fp'
 import { withAppContext } from 'core/AppContext'
-import createFormComponent from 'core/createFormComponent'
+import createFormComponent from 'core/helpers/createFormComponent'
 import ServicePicker from './ServicePicker'
+import { withScopedPreferences } from 'core/helpers/PreferencesProvider'
 
 const methodsWithBody = ['POST', 'PUT', 'PATCH']
 
@@ -163,6 +166,10 @@ class ApiHelper extends React.Component {
 
   renderTablePreview = () => {
     const { response, responseLens, fieldMappings } = this.state
+    const {
+      preferences: { visibleColumns, columnsOrder, rowsPerPage },
+      updatePreferences
+    } = this.props
     if (!response) { return null }
     const tableLens = responseLens.split('.').slice(0, -1)
     const lensResult = path(tableLens, response)
@@ -178,6 +185,14 @@ class ApiHelper extends React.Component {
           title="Table Preview"
           columns={columns}
           data={lensResult}
+          visibleColumns={visibleColumns}
+          columnsOrder={columnsOrder}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={rowsPerPage => updatePreferences({ rowsPerPage })}
+          onColumnsChange={updatedColumns => updatePreferences({
+            visibleColumns: pluckVisibleColumnIds(updatedColumns),
+            columnsOrder: pluck('id', updatedColumns)
+          })}
         />
         <br />
         <Typography variant="body1">Here's the table spec you can use in your code:</Typography>
@@ -309,5 +324,6 @@ class ApiHelper extends React.Component {
 
 export default compose(
   withAppContext,
+  withScopedPreferences('ApiHelper'),
   withStyles(styles),
 )(ApiHelper)
