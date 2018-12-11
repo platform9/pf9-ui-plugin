@@ -40,7 +40,7 @@ const ClusterInfo = ({ match, data, context }) => {
           <UsageWidget title="Memory" stats={usage.memory} />
         </Grid>
         <Grid item xs={4}>
-          <UsageWidget title="Storage" stats={usage.memory} />
+          <UsageWidget title="Storage" stats={usage.disk} />
         </Grid>
       </Grid>
       <Grid container spacing={40}>
