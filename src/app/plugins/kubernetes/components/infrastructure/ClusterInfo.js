@@ -1,19 +1,13 @@
 import React from 'react'
-import { withRouter } from 'react-router'
-import { withAppContext } from 'core/AppContext'
+import InfoPanel from 'core/common/InfoPanel'
+import UsageWidget from 'core/common/dashboard_graphs/UsageWidget'
+import clusterUsageStats from './clusterUsageStats'
+import { Grid } from '@material-ui/core'
 import { compose } from 'ramda'
 import { loadInfrastructure } from './actions'
+import { withAppContext } from 'core/AppContext'
 import { withDataLoader } from 'core/DataLoader'
-import InfoPanel from 'core/common/InfoPanel'
-import {
-  Grid,
-  Paper,
-  Typography,
-} from '@material-ui/core'
-
-const Title = ({ children }) => <Typography variant="h6">{children}</Typography>
-// Just a placeholder for now
-const UtilizationWidget = ({ title, stats }) => <Paper><Title>{title}</Title></Paper>
+import { withRouter } from 'react-router'
 
 const overviewStats = cluster => ({
   'Status':              cluster.status,
@@ -33,19 +27,20 @@ const openstackProps = cluster => ({
   'MetalLB CIDR': cluster.metallbCidr,
 })
 
-const ClusterInfo = ({ match, data }) => {
+const ClusterInfo = ({ match, data, context }) => {
   const cluster = data.find(x => x.uuid === match.params.id)
+  const { usage } = clusterUsageStats(cluster, context)
   return (
     <div className="root">
       <Grid container spacing={40}>
         <Grid item xs={4}>
-          <UtilizationWidget title="Compute" />
+          <UsageWidget title="Compute" stats={usage.compute} />
         </Grid>
         <Grid item xs={4}>
-          <UtilizationWidget title="Memory" />
+          <UsageWidget title="Memory" stats={usage.memory} />
         </Grid>
         <Grid item xs={4}>
-          <UtilizationWidget title="Storage" />
+          <UsageWidget title="Storage" stats={usage.memory} />
         </Grid>
       </Grid>
       <Grid container spacing={40}>

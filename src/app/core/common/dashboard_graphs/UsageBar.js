@@ -1,0 +1,34 @@
+import React from 'react'
+import PropTypes from 'prop-types'
+import ProgressBar from 'core/common/ProgressBar'
+
+const UsageBar = ({ precision, stats }) => {
+  const { current, max, percent, type, units } = stats
+
+  const curStr = current.toFixed(precision)
+  const maxStr = max.toFixed(precision)
+  return (
+    <ProgressBar
+      compact
+      percent={percent}
+      label={p => <span><strong>{p}%</strong> - {curStr} / {maxStr}{units} {type}</span>}
+    />
+  )
+}
+
+UsageBar.propTypes = {
+  precision: PropTypes.number,
+  stats: PropTypes.shape({
+    current: PropTypes.number,
+    max: PropTypes.number,
+    percent: PropTypes.number,
+    type: PropTypes.string,
+    units: PropTypes.string,
+  }),
+}
+
+UsageBar.defaultProps = {
+  precision: 2,
+}
+
+export default UsageBar

@@ -1,9 +1,10 @@
 import React from 'react'
-import createCRUDComponents from 'core/createCRUDComponents'
 import DownloadKubeConfigLink from './DownloadKubeConfigLink'
 import KubeCLI from './KubeCLI'
 import SimpleLink from 'core/common/SimpleLink'
-import { pathOr } from 'ramda'
+import clusterUsageStats from './clusterUsageStats'
+import createCRUDComponents from 'core/createCRUDComponents'
+import UsageBar from 'core/common/dashboard_graphs/UsageBar'
 import { deleteCluster, loadInfrastructure } from './actions'
 
 const renderLinks = links => {
@@ -17,50 +18,16 @@ const renderLinks = links => {
   )
 }
 
-const sumPath = (path, nodes) => (nodes || []).reduce(
-  (accum, node) => {
-    return accum + pathOr(0, path.split('.'), node)
-  },
-  0
-)
-
-// The cluster resource utilization is the aggregate of all nodes in the cluster.
-// This calculation happens every render.  It's not ideal but it isn't that expensive
-// so we can probably leave it here.
-const renderResourceUtilization = (_, cluster, context) => {
-  const nodeIds = cluster.nodes.map(x => x.uuid)
-  const combinedNodes = context.combinedHosts
-    .filter(x => nodeIds.includes(x.resmgr.id))
-  let clusterWithStats = {
-    ...cluster,
-    usage: {
-      compute: {
-        current: sumPath('usage.compute.current', combinedNodes),
-        max: sumPath('usage.compute.max', combinedNodes),
-        units: 'GHz',
-        type: 'used',
-      },
-      memory: {
-        current: sumPath('usage.memory.current', combinedNodes),
-        max: sumPath('usage.memory.max', combinedNodes),
-        units: 'GiB',
-        type: 'used',
-      },
-      disk: {
-        current: sumPath('usage.disk.current', combinedNodes),
-        max: sumPath('usage.disk.max', combinedNodes),
-        units: 'GiB',
-        type: 'used',
-      }
-    }
-  }
-
-  const { compute, memory, disk } = clusterWithStats.usage
-  clusterWithStats.usage.compute.percent = Math.round(100 * compute.current / compute.max)
-  clusterWithStats.usage.memory.percent = Math.round(100 * memory.current / memory.max)
-  clusterWithStats.usage.disk.percent = Math.round(100 * disk.current / disk.max)
-
-  return <pre>{JSON.stringify(clusterWithStats.usage, null, 4)}</pre>
+const renderStats = (_, cluster, context) => {
+  const { usage } = clusterUsageStats(cluster, context)
+  if (!usage) { return null }
+  return (
+    <div>
+      <div>Compute: <UsageBar stats={usage.compute} /></div>
+      <div>Memory: <UsageBar stats={usage.memory} /></div>
+      <div>Storage: <UsageBar stats={usage.disk} /></div>
+    </div>
+  )
 }
 
 const renderClusterDetailLink = (name, cluster) => <SimpleLink src={`/ui/kubernetes/infrastructure/clusters/${cluster.uuid}`}>{name}</SimpleLink>
@@ -72,7 +39,7 @@ export const options = {
     { id: 'status', label: 'Status' },
     { id: 'links', label: 'Links', render: renderLinks },
     { id: 'cloudProviderType', label: 'Deployment Type' },
-    { id: 'resource_utilization', label: 'Resource Utilization', render: renderResourceUtilization },
+    { id: 'resource_utilization', label: 'Resource Utilization', render: renderStats },
     { id: 'version', label: 'Kubernetes version' },
     { id: 'networkPlugin', label: 'Network Backend' },
     { id: 'containersCidr', label: 'Containers CIDR' },
