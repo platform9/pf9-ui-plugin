@@ -7,11 +7,12 @@ const UsageBar = ({ precision, stats }) => {
 
   const curStr = current.toFixed(precision)
   const maxStr = max.toFixed(precision)
+  const label = <span><strong>{percent}%</strong> - {curStr} / {maxStr}{units} {type}</span>
   return (
     <ProgressBar
       compact
       percent={percent}
-      label={p => <span><strong>{p}%</strong> - {curStr} / {maxStr}{units} {type}</span>}
+      label={label}
     />
   )
 }
