@@ -20,7 +20,8 @@ const renderLinks = links => {
 
 const renderStats = (_, cluster, context) => {
   const { usage } = clusterUsageStats(cluster, context)
-  if (!usage) { return null }
+  const hasValidStats = usage && usage.compute && usage.compute.current
+  if (!hasValidStats) { return null }
   return (
     <div>
       <div>Compute: <UsageBar stats={usage.compute} /></div>

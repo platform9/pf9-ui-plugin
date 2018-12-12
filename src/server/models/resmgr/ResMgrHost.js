@@ -5,11 +5,29 @@ import ResMgrRoles from './ResMgrRoles'
 
 const coll = () => context.resMgrHosts
 
+const G = 1000 * 1000 * 1000
+const defaultUsed = 1.2 * G
+const defaultTotal = 2.3 * G
+const generateMockStat = (stat, units='GB', type='used', used=defaultUsed, total=defaultTotal) => ({
+  [stat]: { used, total, units, type, available: total - used },
+})
+
+const generateMockUsageStats = () => ({
+  resource_usage: {
+    data: {
+      ...generateMockStat('cpu', 'GHz'),
+      ...generateMockStat('memory', 'GB'),
+      ...generateMockStat('disk', 'GB'),
+    }
+  }
+})
+
 class ResMgrHost extends ActiveModel {
   constructor (params = {}) {
     super(params)
     this.roles = params.roles || []
     this.info = params.info || ''
+    this.extensions = generateMockUsageStats()
     ResMgrRoles.newResMgrHost(this.id)
   }
 
@@ -32,7 +50,8 @@ class ResMgrHost extends ActiveModel {
     return {
       ...super.asJson(),
       roles: this.roles,
-      info: this.info
+      info: this.info,
+      extensions: this.extensions,
     }
   }
 }
