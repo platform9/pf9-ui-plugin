@@ -61,7 +61,7 @@ ProgressBar.defaultProps = {
 ProgressBar.propTypes = {
   compact: PropTypes.bool, // eslint-disable-line react/no-unused-prop-types
   width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  label: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+  label: PropTypes.oneOfType([PropTypes.string, PropTypes.func, PropTypes.node]),
   percent: PropTypes.number.isRequired,
 }
 
