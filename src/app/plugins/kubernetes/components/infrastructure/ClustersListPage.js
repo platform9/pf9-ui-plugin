@@ -5,6 +5,12 @@ import SimpleLink from 'core/common/SimpleLink'
 import clusterUsageStats from './clusterUsageStats'
 import createCRUDComponents from 'core/createCRUDComponents'
 import UsageBar from 'core/common/dashboard_graphs/UsageBar'
+import {
+  AddToQueue as AttachIcon,
+  RemoveFromQueue as DetachIcon,
+  TrendingUp as ScaleIcon,
+  PresentToAll as UpgradeIcon,
+} from '@material-ui/icons'
 import { deleteCluster, loadInfrastructure } from './actions'
 
 const renderLinks = links => {
@@ -33,6 +39,27 @@ const renderStats = (_, cluster, context) => {
 
 const renderClusterDetailLink = (name, cluster) => <SimpleLink src={`/ui/kubernetes/infrastructure/clusters/${cluster.uuid}`}>{name}</SimpleLink>
 
+const canAttachNode = (selected, context) => true
+const canDetachNode = (selected, context) => true
+const canScaleCluster = (selected, context) => true
+const canUpgradeCluster = (selected, context) => true
+
+const attachNode = (selected, context) => {
+  console.log('TODO: attachNode')
+}
+
+const detachNode = (selected, context) => {
+  console.log('TODO: detachNode')
+}
+
+const scaleCluster = (selected, context) => {
+  console.log('TODO: scaleCluster')
+}
+
+const upgradeCluster = (selected, context) => {
+  console.log('TODO: upgradeCluster')
+}
+
 export const options = {
   baseUrl: '/ui/kubernetes/infrastructure/clusters',
   columns: [
@@ -52,12 +79,6 @@ export const options = {
     { id: 'hasVpn', label: 'VPN' },
     { id: 'appCatalogEnabled', label: 'App Catalog', render: x => x ? 'Enabled' : 'Not Enabled' },
     { id: 'hasLoadBalancer', label: 'Load Balancer' },
-    /*
-    // TODO:
-    //  Something in this list is causing errors after loadInfrastructure loads.
-    //  Disabling these fields until we do more work on clusters.
-    { id: 'nodes', label: 'Nodes' },
-    */
 
     // TODO: We probably want to write a metadata renderer for this kind of format
     // since we use it in a few places for tags / metadata.
@@ -69,11 +90,11 @@ export const options = {
   name: 'Clusters',
   title: 'Clusters',
   uniqueIdentifier: 'uuid',
-  rowActions: () => [
-    // TODO: scale cluster
-    // TODO: upgrade
-    // TODO: attach nodes
-    // TODO: detach nodes
+  rowActions: [
+    { cond: canAttachNode, icon: <AttachIcon />, label: 'Attach node', action: attachNode },
+    { cond: canDetachNode, icon: <DetachIcon />, label: 'Detach node', action: detachNode },
+    { cond: canScaleCluster, icon: <ScaleIcon />, label: 'Scale cluster', action: scaleCluster },
+    { cond: canUpgradeCluster, icon: <UpgradeIcon />, label: 'Upgrade cluster', action: upgradeCluster },
   ],
 }
 

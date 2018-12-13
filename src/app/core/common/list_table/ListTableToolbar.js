@@ -1,15 +1,17 @@
 import React from 'react'
-import classNames from 'classnames'
-import PropTypes from 'prop-types'
-import { withStyles } from '@material-ui/core/styles'
-import { Button, IconButton, Toolbar, Tooltip, Typography } from '@material-ui/core'
-import { lighten } from '@material-ui/core/styles/colorManipulator'
 import AddIcon from '@material-ui/icons/Add'
 import DeleteIcon from '@material-ui/icons/Delete'
 import EditIcon from '@material-ui/icons/Edit'
-import SearchBar from 'core/common/SearchBar'
 import ListTableColumnButton from 'core/common/list_table/ListTableColumnSelector'
 import ListTableFiltersButton from 'core/common/list_table/ListTableFiltersButton'
+import ListTableRowActions from './ListTableRowActions'
+import PropTypes from 'prop-types'
+import SearchBar from 'core/common/SearchBar'
+import classNames from 'classnames'
+import { compose } from 'ramda'
+import { Button, IconButton, Toolbar, Tooltip, Typography } from '@material-ui/core'
+import { lighten } from '@material-ui/core/styles/colorManipulator'
+import { withStyles } from '@material-ui/core/styles'
 
 const toolbarStyles = theme => ({
   root: {
@@ -33,85 +35,80 @@ const toolbarStyles = theme => ({
   },
   title: {
     flex: '0 0 auto'
+  },
+  rowActions: {
   }
 })
 
 const ListTableToolbar = ({
-  classes,
-  numSelected,
-  title,
-  onAdd,
-  onDelete,
-  onEdit,
-  onSearchChange,
-  searchTerm,
-  columns,
-  visibleColumns,
-  onColumnsChange,
-  filters,
-  filterValues,
-  onFilterUpdate,
-  onFiltersReset,
-}) => (
-  <Toolbar
-    className={classNames(classes.root, {
-      [classes.highlight]: numSelected > 0
-    })}
-  >
-    <div className={classes.title}>
-      {numSelected > 0 ? (
-        <Typography color="inherit" variant="subtitle1">
-          {numSelected} selected
-        </Typography>
-      ) : (
-        <Typography variant="h6">{title}</Typography>
-      )}
-    </div>
-    <div className={classes.spacer} />
-    <div className={classes.actions}>
-      <Toolbar>
-        {onSearchChange && (
-          <SearchBar onSearchChange={onSearchChange} searchTerm={searchTerm} />
+  classes, columns, context, filterValues, filters,
+  onAdd, onColumnsChange, onDelete, onEdit, onFilterUpdate,
+  onFiltersReset, onSearchChange,
+  rowActions, searchTerm, selected, title, visibleColumns,
+}) => {
+  const numSelected = (selected || []).length
+  return (
+    <Toolbar
+      className={classNames(classes.root, {
+        [classes.highlight]: numSelected > 0
+      })}
+    >
+      <div className={classes.title}>
+        {numSelected > 0 ? (
+          <Typography color="inherit" variant="subtitle1">
+            {numSelected} selected
+          </Typography>
+        ) : (
+          <Typography variant="h6">{title}</Typography>
         )}
-        {numSelected === 1 && onEdit && (
-          <Tooltip title="Edit">
-            <IconButton aria-label="Edit" onClick={onEdit}>
-              <EditIcon />
-            </IconButton>
-          </Tooltip>
-        )}
-        {numSelected > 0 && onDelete && (
-          <Tooltip title="Delete">
-            <IconButton aria-label="Delete" onClick={onDelete}>
-              <DeleteIcon />
-            </IconButton>
-          </Tooltip>
-        )}
-        {columns && onColumnsChange && (
-          <ListTableColumnButton
+      </div>
+      <ListTableRowActions rowActions={rowActions} selected={selected} />
+      <div className={classes.spacer} />
+      <div className={classes.actions}>
+        <Toolbar>
+          {onSearchChange && (
+            <SearchBar onSearchChange={onSearchChange} searchTerm={searchTerm} />
+          )}
+          {numSelected === 1 && onEdit && (
+            <Tooltip title="Edit">
+              <IconButton aria-label="Edit" onClick={onEdit}>
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
+          )}
+          {numSelected > 0 && onDelete && (
+            <Tooltip title="Delete">
+              <IconButton aria-label="Delete" onClick={onDelete}>
+                <DeleteIcon />
+              </IconButton>
+            </Tooltip>
+          )}
+          {columns && onColumnsChange && (
+            <ListTableColumnButton
+              columns={columns}
+              visibleColumns={visibleColumns}
+              onColumnsChange={onColumnsChange}
+            />
+          )}
+          {filters && <ListTableFiltersButton
             columns={columns}
-            visibleColumns={visibleColumns}
-            onColumnsChange={onColumnsChange}
-          />
-        )}
-        {filters && <ListTableFiltersButton
-          columns={columns}
-          filters={filters}
-          filterValues={filterValues}
-          onFilterUpdate={onFilterUpdate}
-          onFiltersReset={onFiltersReset}
-        />}
-        {onAdd && (
-          <Tooltip title="Add">
-            <Button color="primary" onClick={onAdd}>
-              <AddIcon /> Add
-            </Button>
-          </Tooltip>
-        )}
-      </Toolbar>
-    </div>
-  </Toolbar>
-)
+            filters={filters}
+            filterValues={filterValues}
+            onFilterUpdate={onFilterUpdate}
+            onFiltersReset={onFiltersReset}
+          />}
+          {onAdd && (
+            <Tooltip title="Add">
+              <Button color="primary" onClick={onAdd}>
+                <AddIcon /> Add
+              </Button>
+            </Tooltip>
+          )}
+        </Toolbar>
+      </div>
+    </Toolbar>
+  )
+}
 
 ListTableToolbar.propTypes = {
   classes: PropTypes.object.isRequired,
@@ -132,15 +129,17 @@ ListTableToolbar.propTypes = {
     items: PropTypes.array, // Array of possible values (only when using select/multiselect)
   })),
   filterValues: PropTypes.object,
+  onAdd: PropTypes.func,
+  onColumnsChange: PropTypes.func,
+  onDelete: PropTypes.func,
+  onEdit: PropTypes.func,
   onFilterUpdate: PropTypes.func,
   onFiltersReset: PropTypes.func,
-  visibleColumns: PropTypes.array,
-  onColumnsChange: PropTypes.func,
-  numSelected: PropTypes.number.isRequired,
+  selected: PropTypes.array,
   title: PropTypes.string.isRequired,
-  onAdd: PropTypes.func,
-  onDelete: PropTypes.func,
-  onEdit: PropTypes.func
+  visibleColumns: PropTypes.array,
 }
 
-export default withStyles(toolbarStyles)(ListTableToolbar)
+export default compose(
+  withStyles(toolbarStyles),
+)(ListTableToolbar)

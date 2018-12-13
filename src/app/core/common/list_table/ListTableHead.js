@@ -36,7 +36,6 @@ class ListTableHead extends React.Component {
       orderBy,
       rowCount,
       showCheckboxes,
-      showRowActions,
     } = this.props
 
     const headerCheckbox = showCheckboxes ? (
@@ -83,8 +82,6 @@ class ListTableHead extends React.Component {
                 </TableSortLabel>
               </Tooltip>
             </TableCell>)}
-          {showRowActions &&
-            <TableCell padding="default" key="__actions__">Actions</TableCell>}
         </TableRow>
       </TableHead>
     )
@@ -107,7 +104,6 @@ ListTableHead.propTypes = {
   orderBy: PropTypes.string,
   rowCount: PropTypes.number,
   showCheckboxes: PropTypes.bool,
-  showRowActions: PropTypes.bool,
   blankFirstColumn: PropTypes.bool,
 }
 

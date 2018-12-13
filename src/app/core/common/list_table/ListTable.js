@@ -361,7 +361,7 @@ class ListTable extends React.Component {
         <Grid item xs={12} zeroMinWidth>
           <Paper className={classes.root}>
             <ListTableToolbar
-              numSelected={selected.length}
+              selected={selected}
               title={title}
               onAdd={this.handleAdd}
               onDelete={this.handleDelete}
@@ -375,6 +375,7 @@ class ListTable extends React.Component {
               filterValues={filterValues}
               onFilterUpdate={this.handleFilterUpdate}
               onFiltersReset={this.handleFiltersReset}
+              rowActions={rowActions}
             />
             <div className={classes.tableWrapper}>
               <Table className={classes.table}>
@@ -391,7 +392,6 @@ class ListTable extends React.Component {
                   title={title}
                   rowCount={data.length}
                   showCheckboxes={showCheckboxes}
-                  showRowActions={!!rowActions}
                 />
                 <TableBody>
                   {paginatedData.map(this.renderRow)}
@@ -451,8 +451,9 @@ ListTable.propTypes = {
   rowActions: PropTypes.arrayOf(
     PropTypes.shape({
       label: PropTypes.string.isRequired,
-      action: PropTypes.func,
+      action: PropTypes.func.isRequired,
       icon: PropTypes.node,
+      cond: PropTypes.func,
     })
   ),
 
