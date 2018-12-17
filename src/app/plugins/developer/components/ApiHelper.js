@@ -14,7 +14,7 @@ import { compose } from 'core/fp'
 import { withAppContext } from 'core/AppContext'
 import createFormComponent from 'core/helpers/createFormComponent'
 import ServicePicker from './ServicePicker'
-import { withScopedPreferences } from 'core/helpers/PreferencesProvider'
+import { withScopedPreferences } from 'core/PreferencesProvider'
 
 const methodsWithBody = ['POST', 'PUT', 'PATCH']
 

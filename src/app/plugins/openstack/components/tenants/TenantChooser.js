@@ -4,7 +4,7 @@ import { compose } from 'core/fp'
 import { loadUserTenants } from './actions'
 import { assoc } from 'ramda'
 import moize from 'moize'
-import { withScopedPreferences } from 'core/helpers/PreferencesProvider'
+import { withScopedPreferences } from 'core/PreferencesProvider'
 import { withAppContext } from 'core/AppContext'
 
 class TenantChooser extends React.Component {

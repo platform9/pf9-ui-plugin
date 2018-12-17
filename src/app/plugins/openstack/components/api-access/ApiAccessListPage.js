@@ -3,10 +3,7 @@ import { compose } from 'core/fp'
 import requiresAuthentication from 'openstack/util/requiresAuthentication'
 import DataLoader from 'core/DataLoader'
 import { loadServiceCatalog } from './actions'
-import ListTable from 'core/common/list_table/ListTable'
-import { pluck } from 'ramda'
-import { pluckVisibleColumnIds } from '../../../../core/common/list_table/ListTable'
-import { withScopedPreferences } from 'core/helpers/PreferencesProvider'
+import createListTableComponent from 'core/helpers/createListTableComponent'
 
 const columns = [
   { id: 'id', label: 'ID' },
@@ -16,32 +13,19 @@ const columns = [
   { id: 'iface', label: 'Interface' },
 ]
 
-const ServiceCatalogList = withScopedPreferences('ApiAccessList')(({
-  services,
-  preferences: { visibleColumns, columnsOrder, rowsPerPage },
-  updatePreferences
-}) => (
-  !services || services.length === 0
-    ? <h1>No services found.</h1>
-    : <ListTable
-      title="API Endpoints"
-      columns={columns}
-      data={services}
-      paginate={false}
-      showCheckboxes={false}
-      searchTarget="name"
-      onRowsPerPageChange={rowsPerPage => updatePreferences({ rowsPerPage })}
-      onColumnsChange={updatedColumns => updatePreferences({
-        visibleColumns: pluckVisibleColumnIds(updatedColumns),
-        columnsOrder: pluck('id', updatedColumns)
-      })}
-    />
-))
+const ListTable = createListTableComponent({
+  title: 'API Endpoints',
+  emptyText: 'No services found.',
+  name: 'ApiAccessList',
+  columns,
+  paginate: false,
+  showCheckboxes: false,
+})
 
 const ApiAccessPage = () => {
   return (
     <DataLoader dataKey="serviceCatalog" loaderFn={loadServiceCatalog}>
-      {({ data }) => <ServiceCatalogList services={data} />}
+      {({ data }) => <ListTable data={data} />}
     </DataLoader>
   )
 }

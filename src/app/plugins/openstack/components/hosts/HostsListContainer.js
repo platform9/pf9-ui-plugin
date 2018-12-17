@@ -2,7 +2,21 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import CRUDListContainer from 'core/common/CRUDListContainer'
-import HostsList from './HostsList'
+import createListTableComponent from 'core/helpers/createListTableComponent'
+
+const columns = [
+  { id: 'hypervisor_hostname', label: 'Hostname' },
+  { id: 'status', label: 'Status' },
+  { id: 'host_ip', label: 'Host IP' }
+]
+
+export const HostsList = createListTableComponent({
+  title: 'Hosts',
+  emptyText: 'No hosts found.',
+  name: 'HostsList',
+  columns,
+  searchTarget: 'hypervisor_hostname',
+})
 
 class HostsListContainer extends React.Component {
   render () {

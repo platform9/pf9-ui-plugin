@@ -2,7 +2,20 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import CRUDListContainer from 'core/common/CRUDListContainer'
-import InstancesList from './InstancesList'
+import createListTableComponent from 'core/helpers/createListTableComponent'
+
+const columns = [
+  { id: 'name', label: 'Name' },
+  { id: 'status', label: 'Status' },
+  { id: 'state', label: 'State' }
+]
+
+export const InstancesList = createListTableComponent({
+  title: 'Instances',
+  emptyText: 'No instances found',
+  name: 'InstancesList',
+  columns,
+})
 
 class InstancesListContainer extends React.Component {
   render () {
@@ -15,11 +28,10 @@ class InstancesListContainer extends React.Component {
       >
         {({ onDelete, onAdd, onEdit }) => (
           <InstancesList
-            instances={instances}
+            data={instances}
             onAdd={onAdd}
             onDelete={onDelete}
-            onEdit={onEdit}
-          />
+            onEdit={onEdit} />
         )}
       </CRUDListContainer>
     )

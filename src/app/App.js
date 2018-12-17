@@ -16,7 +16,7 @@ import HotKeysProvider from 'core/common/HotKeysProvider'
 import { apply, toPairs } from 'ramda'
 import SessionManager from 'openstack/components/SessionManager'
 import DeveloperToolsEmbed from 'developer/components/DeveloperToolsEmbed'
-import PreferencesProvider from 'core/helpers/PreferencesProvider'
+import PreferencesProvider from 'core/PreferencesProvider'
 
 setupFromConfig(config)
 window.process = process

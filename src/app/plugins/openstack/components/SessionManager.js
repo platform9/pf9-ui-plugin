@@ -6,7 +6,7 @@ import LoginPage from 'openstack/components/LoginPage'
 
 import { getStorage, setStorage } from 'core/common/pf9-storage'
 import { loadUserTenants } from 'openstack/components/tenants/actions'
-import { withPreferences } from 'core/helpers/PreferencesProvider'
+import { withPreferences } from 'core/PreferencesProvider'
 import { pathOr } from 'ramda'
 
 /**

@@ -1,11 +1,40 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import CRUDListContainer from 'core/common/CRUDListContainer'
-import VolumesList from './VolumesList'
 import PhotoCameraIcon from '@material-ui/icons/PhotoCamera'
 import { compose } from 'core/fp'
 import { withAppContext } from 'core/AppContext'
 import { withRouter } from 'react-router'
+import createListTableComponent from 'core/helpers/createListTableComponent'
+
+const columns = [
+  { id: 'name', label: 'Name' },
+  { id: 'volume_type', label: 'Volume Type' },
+  { id: 'description', label: 'Description' },
+  { id: 'status', label: 'Status' },
+  { id: 'tenant', label: 'Tenant' },
+  { id: 'source', label: 'Source' },
+  { id: 'host', label: 'Host' },
+  { id: 'instance', label: 'Instance' },
+  { id: 'device', label: 'Device' },
+  { id: 'size', label: 'Capacity' },
+  { id: 'bootable', label: 'Bootable' },
+  { id: 'created_at', label: 'Created' },
+  { id: 'id', label: 'OpenStack ID' },
+  { id: 'attachedMode', label: 'attached_mode' },
+  { id: 'readonly', label: 'readonly' },
+
+  // TODO: We probably want to write a metadata renderer for this kind of format
+  // since we use it in a few places for tags / metadata.
+  { id: 'metadata', label: 'Metadata', render: data => JSON.stringify(data) }
+]
+
+export const VolumesList = createListTableComponent({
+  title: 'Volume',
+  emptyText: 'No volumes found.',
+  name: 'VolumesList',
+  columns,
+})
 
 class VolumesListContainer extends React.Component {
   handleRemove = async id => {
@@ -31,7 +60,7 @@ class VolumesListContainer extends React.Component {
         editUrl="/ui/openstack/storage/volumes/edit"
         onRemove={this.handleRemove}
       >
-        {handlers => <VolumesList volumes={this.props.volumes} {...handlers} rowActions={rowActions} />}
+        {handlers => <VolumesList data={this.props.volumes} {...handlers} rowActions={rowActions} />}
       </CRUDListContainer>
     )
   }

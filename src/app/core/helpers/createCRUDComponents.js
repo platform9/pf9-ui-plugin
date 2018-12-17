@@ -7,7 +7,7 @@ import createCRUDActions from 'core/helpers/createCRUDActions'
 import { compose } from 'core/fp'
 import { withAppContext } from 'core/AppContext'
 import { withRouter } from 'react-router-dom'
-import { withScopedPreferences } from 'core/helpers/PreferencesProvider'
+import { withScopedPreferences } from 'core/PreferencesProvider'
 import { pluck } from 'ramda'
 
 /**

@@ -2,9 +2,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import CRUDListContainer from 'core/common/CRUDListContainer'
-import VolumeTypesList from './VolumeTypesList'
-import { compose } from 'core/fp'
+import { compose, keyValueArrToObj } from 'core/fp'
 import { withAppContext } from 'core/AppContext'
+import createListTableComponent from 'core/helpers/createListTableComponent'
 
 // Promote `volume_backend_name` from `extra_specs` into its own field
 // This is a rather tedious pattern.  If we are doing it elsewhere we
@@ -16,6 +16,20 @@ const convertVolumeType = x => {
   cloned.extra_specs = x.extra_specs.filter(x => x.key !== 'volume_backend_name')
   return cloned
 }
+const columns = [
+  { id: 'name', label: 'Name' },
+  { id: 'description', label: 'Description' },
+  { id: 'is_public', label: 'Public?' },
+  { id: 'volume_backend_name', label: 'Volume Backend' },
+  { id: 'extra_specs', label: 'Metadata', render: data => JSON.stringify(keyValueArrToObj(data)) },
+]
+
+export const VolumeTypesList = createListTableComponent({
+  title: 'Volume Types',
+  emptyText: 'No volume types found.',
+  name: 'VolumeTypesList',
+  columns,
+})
 
 class VolumeTypesListContainer extends React.Component {
   handleRemove = async id => {
@@ -35,7 +49,7 @@ class VolumeTypesListContainer extends React.Component {
         addUrl="/ui/openstack/storage/volumeTypes/add"
         editUrl="/ui/openstack/storage/volumeTypes/edit"
       >
-        {handlers => <VolumeTypesList volumeTypes={volumeTypes} {...handlers} />}
+        {handlers => <VolumeTypesList data={volumeTypes} {...handlers} />}
       </CRUDListContainer>
     )
   }
