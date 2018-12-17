@@ -339,11 +339,11 @@ class ListTable extends React.Component {
 
   render () {
     const {
+      batchActions,
       classes,
       columns,
       data,
       paginate,
-      rowActions,
       showCheckboxes,
       title,
       canDragColumns,
@@ -388,7 +388,7 @@ class ListTable extends React.Component {
               filterValues={filterValues}
               onFilterUpdate={this.handleFilterUpdate}
               onFiltersReset={this.handleFiltersReset}
-              rowActions={rowActions}
+              batchActions={batchActions}
             />
             <div className={classes.tableWrapper}>
               <Table className={classes.table}>
@@ -418,6 +418,13 @@ class ListTable extends React.Component {
     )
   }
 }
+
+const actionProps = PropTypes.shape({
+  label: PropTypes.string.isRequired,
+  action: PropTypes.func.isRequired,
+  icon: PropTypes.node,
+  cond: PropTypes.func,
+})
 
 ListTable.propTypes = {
   columns: PropTypes.arrayOf(PropTypes.shape({
@@ -463,16 +470,16 @@ ListTable.propTypes = {
   uniqueIdentifier: PropTypes.string,
 
   /**
-   * List of action items to make available to each row.
+   * List of batch actions that can be performed
+   * on the selected items.
    */
-  rowActions: PropTypes.arrayOf(
-    PropTypes.shape({
-      label: PropTypes.string.isRequired,
-      action: PropTypes.func.isRequired,
-      icon: PropTypes.node,
-      cond: PropTypes.func,
-    })
-  ),
+  batchActions: PropTypes.arrayOf(actionProps),
+
+  /**
+   * List of actions that can be performed on a single row.
+   */
+  rowActions: PropTypes.arrayOf(actionProps),
+
   onRowsPerPageChange: PropTypes.func,
   onColumnsChange: PropTypes.func,
 
@@ -489,6 +496,7 @@ ListTable.defaultProps = {
   uniqueIdentifier: 'id',
   canEditColumns: true,
   canDragColumns: true,
+  rowsPerPage: 10,
 }
 
 export default compose(
