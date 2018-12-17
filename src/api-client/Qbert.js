@@ -10,7 +10,14 @@ class Qbert {
     return endpoint.replace(/v1$/, `v2/${this.client.activeProjectId}`)
   }
 
+  async monocularBaseUrl () {
+    const services = await this.client.keystone.getServicesForActiveRegion()
+    return services.monocular.public.url
+  }
+
   baseUrl = async () => `${await this.endpoint()}`
+  clusterBaseUrl = async clusterId => `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1`
+  clusterMonocularBaseUrl = async clusterId => `${await this.clusterBaseUrl(clusterId)}/namespaces/kube-system/services/monocular-api-svc:80/proxy/v1`
 
   /* Cloud Providers */
   async getCloudProviders () {
@@ -191,6 +198,60 @@ class Qbert {
 
   async createServiceAccount (clusterId, namespace, params) {
     return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/serviceaccounts`)
+  }
+
+  /* Monocular endpoints being exposed through Qbert */
+  async getCharts (clusterId) {
+    return this.client.basicGet(`${await this.clusterMonocularBaseUrl(clusterId)}/charts`)
+  }
+
+  async getChart (clusterId, chart, release, version) {
+    const versionStr = version ? `/versions/${version}` : ''
+    return this.client.basicGet(`${await this.clusterMonocularBaseUrl(clusterId)}/charts/${chart}/${release}/${versionStr}`)
+  }
+
+  async getChartVersions (clusterId, chart, release) {
+    return this.client.basicGet(`${await this.clusterMonocularBaseUrl(clusterId)}/charts/${chart}/${release}/versions`)
+  }
+
+  async getReleases (clusterId) {
+    return this.client.basicGet(`${await this.clusterMonocularBaseUrl(clusterId)}/releases`)
+  }
+
+  async getRelease (clusterId, name) {
+    return this.client.basicGet(`${await this.clusterMonocularBaseUrl(clusterId)}/releases/${name}`)
+  }
+
+  async deleteRelease (clusterId, name) {
+    return this.client.basicDelete(`${await this.clusterMonocularBaseUrl(clusterId)}/releases/${name}`)
+  }
+
+  async deployApplication (clusterId, body) {
+    return this.client.basicPost(`${await this.clusterMonocularBaseUrl(clusterId)}/releases`, body)
+  }
+
+  async getRepositories () {
+    return this.client.basicGet(`${this.monocularBaseUrl()}/repos`)
+  }
+
+  async getRepositoriesForCluster (clusterId) {
+    return this.client.basicGet(`${await this.clusterMonocularBaseUrl(clusterId)}/repos`)
+  }
+
+  async createRepository (body) {
+    return this.client.basicPost(`${this.monocularBaseUrl()}/repos`, body)
+  }
+
+  async createRepositoryForCluster (clusterId, body) {
+    return this.client.basicGet(`${await this.clusterMonocularBaseUrl(clusterId)}/repos`, body)
+  }
+
+  async deleteRepository (repoId) {
+    return this.client.basicDelete(`${this.monocularBaseUrl()}/repos/${repoId}`)
+  }
+
+  async deleteRepositoriesForCluster (clusterId, repoId) {
+    return this.client.basicDelete(`${await this.clusterMonocularBaseUrl(clusterId)}/repos/${repoId}`)
   }
 }
 
