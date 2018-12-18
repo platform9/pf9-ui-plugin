@@ -19,6 +19,7 @@ import CloudProvider from '../models/qbert/CloudProvider'
 import Node from '../models/qbert/Node'
 import Cluster from '../models/qbert/Cluster'
 import Namespace from '../models/qbert/Namespace'
+import Chart from '../models/monocular/Chart'
 import { attachNodeToCluster } from '../models/qbert/Operations'
 // import Token from '../models/openstack/Token'
 import { range } from '../util'
@@ -131,6 +132,9 @@ function loadPreset () {
 
   // Namespaces
   Namespace.create({ name: 'default' }, context)
+
+  // Monocular Charts
+  range(3).forEach(i => Chart.create(undefined, context))
 }
 
 export default loadPreset

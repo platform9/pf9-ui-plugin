@@ -56,6 +56,7 @@ class Context {
     this.nodes = []
     this.clusters = []
     this.namespaces = []
+    this.charts = []
   }
 
   validateToken = id => Token.validateToken(id)

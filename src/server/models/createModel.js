@@ -5,7 +5,8 @@ const createModel = (options={}) => {
   const {
     dataKey,
     uniqueIdentifier = 'id',
-    defaults,
+    defaults = {},
+    createFn,
     loaderFn, // function that maps data into a different form for API route
     mappingFn, // data coming form API, context needs it in a different format
     onDeleteFn,
@@ -13,8 +14,13 @@ const createModel = (options={}) => {
 
   return {
     create: (data, context) => {
-      const mappedData = mappingFn ? mappingFn(data, context) : data
-      const newObject = { [uniqueIdentifier]: uuid.v4(), ...defaults, ...mappedData }
+      const createdData = createFn ? createFn(data, context) : data
+      const mappedData = mappingFn ? mappingFn(createdData, context) : createdData
+      const newObject = {
+        [uniqueIdentifier]: uuid.v4(),
+        ...defaults,
+        ...mappedData
+      }
       context[dataKey].push(newObject)
       return newObject
     },
