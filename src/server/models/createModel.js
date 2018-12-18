@@ -40,6 +40,14 @@ const createModel = (options={}) => {
       if (onDeleteFn) { onDeleteFn(id, context, obj) }
       context[dataKey] = context[dataKey].filter(x => x[uniqueIdentifier] !== id)
     },
+
+    findById: (id, context) => {
+      return context[dataKey].find(x => x[uniqueIdentifier] === id)
+    },
+
+    findByName: (name, context) => {
+      return context[dataKey].find(x => x.name === name)
+    }
   }
 }
 
