@@ -1,6 +1,6 @@
 import React from 'react'
-import ListTable, { pluckVisibleColumnIds } from 'core/common/list_table/ListTable'
-import { compose, pluck } from 'ramda'
+import ListTable from 'core/common/list_table/ListTable'
+import { compose } from 'ramda'
 import { withScopedPreferences } from 'core/PreferencesProvider'
 import { withRouter } from 'react-router-dom'
 import requiresAuthentication from 'openstack/util/requiresAuthentication'
@@ -41,10 +41,7 @@ const createListTableComponent = ({
       columnsOrder={columnsOrder}
       rowsPerPage={rowsPerPage}
       onRowsPerPageChange={rowsPerPage => updatePreferences({ rowsPerPage })}
-      onColumnsChange={updatedColumns => updatePreferences({
-        visibleColumns: pluckVisibleColumnIds(updatedColumns),
-        columnsOrder: pluck('id', updatedColumns)
-      })} />)
+      onColumnsChange={updatePreferences} />)
 
   CustomListTable.displayName = displayName
 

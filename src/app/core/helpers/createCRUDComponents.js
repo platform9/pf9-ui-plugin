@@ -2,13 +2,12 @@ import React from 'react'
 import DataLoader from 'core/DataLoader'
 import CRUDListContainer from 'core/common/CRUDListContainer'
 import requiresAuthentication from 'openstack/util/requiresAuthentication'
-import ListTable, { pluckVisibleColumnIds } from 'core/common/list_table/ListTable'
+import ListTable from 'core/common/list_table/ListTable'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { compose } from 'core/fp'
 import { withAppContext } from 'core/AppContext'
 import { withRouter } from 'react-router-dom'
 import { withScopedPreferences } from 'core/PreferencesProvider'
-import { pluck } from 'ramda'
 
 /**
  * This helper removes a lot of boilerplate from standard CRUD operations.
@@ -76,10 +75,7 @@ const createCRUDComponents = options => {
         columnsOrder={columnsOrder}
         rowsPerPage={rowsPerPage}
         onRowsPerPageChange={rowsPerPage => updatePreferences({ rowsPerPage })}
-        onColumnsChange={updatedColumns => updatePreferences({
-          visibleColumns: pluckVisibleColumnIds(updatedColumns),
-          columnsOrder: pluck('id', updatedColumns)
-        })}
+        onColumnsChange={updatePreferences}
       />
     )
   })

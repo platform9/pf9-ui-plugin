@@ -4,12 +4,12 @@ import PicklistField from 'core/common/validated_form/PicklistField'
 import TextField from 'core/common/validated_form/TextField'
 import SubmitButton from 'core/common/SubmitButton'
 import ValidatedForm from 'core/common/validated_form/ValidatedForm'
-import ListTable, { pluckVisibleColumnIds } from 'core/common/list_table/ListTable'
+import ListTable from 'core/common/list_table/ListTable'
 import {
   Checkbox, FormControlLabel, TextField as BaseTextField, Typography
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles'
-import { path, pick, pluck } from 'ramda'
+import { path, pick } from 'ramda'
 import { compose } from 'core/fp'
 import { withAppContext } from 'core/AppContext'
 import createFormComponent from 'core/helpers/createFormComponent'
@@ -189,10 +189,7 @@ class ApiHelper extends React.Component {
           columnsOrder={columnsOrder}
           rowsPerPage={rowsPerPage}
           onRowsPerPageChange={rowsPerPage => updatePreferences({ rowsPerPage })}
-          onColumnsChange={updatedColumns => updatePreferences({
-            visibleColumns: pluckVisibleColumnIds(updatedColumns),
-            columnsOrder: pluck('id', updatedColumns)
-          })}
+          onColumnsChange={updatePreferences}
         />
         <br />
         <Typography variant="body1">Here's the table spec you can use in your code:</Typography>

@@ -177,7 +177,10 @@ class ListTable extends React.Component {
           ? except(columnId, visibleColumns)
           : [...visibleColumns, columnId]
       }), () =>
-        ensureFunction(this.props.onColumnsChange)(this.state.columns)
+        ensureFunction(this.props.onColumnsChange)({
+          visibleColumns: this.state.visibleColumns,
+          columnsOrder: this.state.columnsOrder,
+        })
       )
     }
   }
@@ -192,7 +195,10 @@ class ListTable extends React.Component {
         update(tarColumnIdx, srcColumnId),
       )(columnsOrder)
     }), () =>
-      ensureFunction(this.props.onColumnsChange)(this.state.columns)
+      ensureFunction(this.props.onColumnsChange)({
+        visibleColumns: this.state.visibleColumns,
+        columnsOrder: this.state.columnsOrder,
+      })
     )
   }
 

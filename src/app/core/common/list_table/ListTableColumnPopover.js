@@ -1,9 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Checkbox, FormControl, FormControlLabel, FormGroup, Typography } from '@material-ui/core'
+import {
+  Checkbox, FormControl, FormControlLabel, FormGroup, Typography
+} from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles'
 import moize from 'moize'
 import { compose } from 'ramda'
+import { ensureFunction } from 'core/fp'
 
 const styles = {
   root: {
@@ -41,7 +44,7 @@ const styles = {
 
 class ListTableColumnPopover extends React.Component {
   handleColChange = moize(columnId => e => {
-    this.props.onColumnsChange(columnId)
+    ensureFunction(this.props.onColumnToggle)(columnId)
   })
 
   render () {
@@ -88,7 +91,7 @@ ListTableColumnPopover.propTypes = {
     excluded: PropTypes.bool,
   })).isRequired,
   visibleColumns: PropTypes.array,
-  onColumnsChange: PropTypes.func,
+  onColumnToggle: PropTypes.func,
   classes: PropTypes.object,
 }
 

@@ -38,7 +38,7 @@ class PreferencesProvider extends React.Component {
       const newValue = {...prevValue, ...values}
 
       // Update memoized values
-      getScopedUserPreferences.update(scopeKey, newValue)
+      getScopedUserPreferences.update([scopeKey], newValue)
 
       // Update app context
       await this.props.updateSession(['userPreferences', scopeKey], newValue)

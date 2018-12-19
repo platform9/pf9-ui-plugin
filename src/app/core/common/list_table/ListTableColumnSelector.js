@@ -5,7 +5,8 @@ import React from 'react'
 import grey from '@material-ui/core/colors/grey'
 import PropTypes from 'prop-types'
 import { compose } from 'ramda'
-import ListTableColumnPopover from 'core/common/list_table/ListTableColumnPopover'
+import ListTableColumnPopover
+  from 'core/common/list_table/ListTableColumnPopover'
 
 const styles = theme => ({
   root: {
@@ -45,7 +46,7 @@ class ListTableColumnSelector extends React.PureComponent {
   }
 
   render () {
-    const {classes, columns, visibleColumns, onColumnsChange} = this.props
+    const {classes, columns, visibleColumns, onColumnToggle} = this.props
     const {open, anchorEl} = this.state
 
     return <React.Fragment>
@@ -76,7 +77,7 @@ class ListTableColumnSelector extends React.PureComponent {
         <ListTableColumnPopover
           columns={columns}
           visibleColumns={visibleColumns}
-          onColumnsChange={onColumnsChange} />
+          onColumnToggle={onColumnToggle} />
       </Popover>
     </React.Fragment>
   }
@@ -90,7 +91,7 @@ ListTableColumnSelector.propTypes = {
     excluded: PropTypes.bool,
   })).isRequired,
   visibleColumns: PropTypes.array,
-  onColumnsChange: PropTypes.func,
+  onColumnToggle: PropTypes.func,
 }
 
 export default compose(withStyles(styles))(ListTableColumnSelector)
