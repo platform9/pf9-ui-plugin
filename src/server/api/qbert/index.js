@@ -16,6 +16,8 @@ import getClusterVersion from './clusters/getClusterVersion'
 // Namespaces
 import getNamespaces from './namespaces/getNamespaces'
 
+import { getPods, postPod, deletePod } from './pods/podActions'
+
 import { getCharts, getChart, getChartVersions } from './charts'
 /* TODO
 import { getReleases, getRelease, deleteRelease } from './releases'
@@ -45,6 +47,10 @@ router.delete('/v2/:tenantId/clusters/:clusterId', tokenValidator, deleteCluster
 router.get('/v2/:tenantId/clusters/:clusterId/k8sapi/version', tokenValidator, getClusterVersion)
 
 router.get('/v2/:tenantId/clusters/:clusterId/k8sapi/api/v1/namespaces', tokenValidator, getNamespaces)
+
+router.get('/v2/:tenantId/clusters/:clusterId/k8sapi/api/v1/namespaces/:namespace/pods', tokenValidator, getPods)
+router.post('/v2/:tenantId/clusters/:clusterId/k8sapi/api/v1/namespaces/:namespace/pods', tokenValidator, postPod)
+router.delete('/v2/:tenantId/clusters/:clusterId/k8sapi/api/v1/namespaces/:namespace/pods/:podName', tokenValidator, deletePod)
 
 // Monocular
 const k8sapi = '/v2/:tenantId/clusters/:clusterId/k8sapi/api/v1'

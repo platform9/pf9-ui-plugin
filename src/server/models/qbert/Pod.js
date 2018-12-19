@@ -18,7 +18,7 @@ const options = {
     },
     spec: {},
     status: {
-      phase: 'Running',
+      phase: 'Pending',
       hostIp: '',
     },
     name: '', // For easy access, will be returned in metadata for API response
@@ -26,14 +26,25 @@ const options = {
   // Phase should be 'Pending' when first created
   // After issuing delete it seems that phase stays as 'Running' up until termination (after 30 sec?)
   // in metadata there is a deletionGracePeriodSeconds and a deletionTimestamp
-  mappingFn: (input, context) => {
-    return { ...input, metadata: { ...input.metadata, name: input.name, creationTimestamp: getCurrentTime() } }
+  createFn: (input, context) => {
+    // Remove unneeded inputs
+    if (input.apiVersion) { delete input.apiVersion }
+    if (input.kind) { delete input.kind }
+    // Set status to Running after some time
+    setTimeout(() => {
+      const pod = context.pods.find(x => x.name === input.metadata.name)
+      pod.status.phase = 'Running'
+    }, 5000)
+
+    return { ...input, name: input.metadata.name, metadata: { ...input.metadata, name: input.metadata.name, namespace: input.namespace, creationTimestamp: getCurrentTime() } }
   },
   loaderFn: (pods) => {
     return pods.map((pod) => {
       const newPod = { ...pod, metadata: { ...pod.metadata, uid: pod.uuid } }
       delete newPod.name
       delete newPod.uuid
+      delete newPod.namespace
+      delete newPod.clusterId
       return newPod
     })
   }

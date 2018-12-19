@@ -25,14 +25,16 @@ const options = {
     status: {},
     name: '', // For easy access, will be returned in metadata for API response
   },
-  mappingFn: (input, context) => {
-    return { ...input, metadata: { ...input.metadata, name: input.name, creationTimestamp: getCurrentTime() } }
+  createFn: (input, context) => {
+    return { ...input, name: input.metadata.name, metadata: { ...input.metadata, name: input.metadata.name, namespace: input.namespace, creationTimestamp: getCurrentTime() } }
   },
   loaderFn: (services) => {
     return services.map((service) => {
       const newService = { ...service, metadata: { ...service.metadata, uid: service.uuid } }
       delete newService.name
       delete newService.uuid
+      delete newService.namespace
+      delete newService.clusterId
       return newService
     })
   }

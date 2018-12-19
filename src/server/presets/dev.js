@@ -19,6 +19,9 @@ import CloudProvider from '../models/qbert/CloudProvider'
 import Node from '../models/qbert/Node'
 import Cluster from '../models/qbert/Cluster'
 import Namespace from '../models/qbert/Namespace'
+import Pod from '../models/qbert/Pod'
+import Deployment from '../models/qbert/Deployment'
+import Service from '../models/qbert/Service'
 import Chart from '../models/monocular/Chart'
 import { attachNodeToCluster } from '../models/qbert/Operations'
 // import Token from '../models/openstack/Token'
@@ -116,25 +119,38 @@ function loadPreset () {
   const resMgrHost2 = new ResMgrHost({ roles: ['pf9-ostackhost'], info: { hostname: 'fake resmgr host 2' } })
 
   // Cloud Providers
-  CloudProvider.create({ name: 'fakeCp1', type: 'aws' }, context)
-  CloudProvider.create({ name: 'fakeCp2', type: 'openstack' }, context)
+  CloudProvider.create({ data: { name: 'fakeCp1', type: 'aws' }, context })
+  CloudProvider.create({ data: { name: 'fakeCp2', type: 'openstack' }, context })
 
   // Clusters
-  const cluster = Cluster.create({ name: 'fakeCluster1', sshKey: 'someKey' }, context)
-  Cluster.create({ name: 'fakeCluster2' }, context)
+  const cluster = Cluster.create({ data: { name: 'fakeCluster1', sshKey: 'someKey' }, context, raw: true })
+  Cluster.create({ data: { name: 'fakeCluster2' }, context })
 
   // Nodes
   // Nodes must be linked to a resMgrHost id or else the UI will break
-  const node = Node.create({ name: 'fakeNode1', api_responding: 1, isMaster: 1, uuid: resMgrHost.id }, context)
-  const node2 = Node.create({ name: 'fakeNode2', uuid: resMgrHost2.id }, context)
+  const node = Node.create({
+    data: { name: 'fakeNode1', api_responding: 1, isMaster: 1, uuid: resMgrHost.id },
+    context,
+    raw: true
+  })
+  Node.create({ data: { name: 'fakeNode2', uuid: resMgrHost2.id }, context })
 
   attachNodeToCluster(node, cluster)
 
   // Namespaces
-  Namespace.create({ name: 'default' }, context)
+  const defaultNamespace = Namespace.create({ data: { name: 'default' }, context, config: { clusterId: cluster.uuid }, raw: true })
+
+  // Pods
+  Pod.create({ data: { metadata: { name: 'fakePod' } }, context, config: { clusterId: cluster.uuid, namespace: defaultNamespace.name } })
+
+  // Deployments (and pods)
+  Deployment.create({ data: { metadata: { name: 'fakeDeployment' }, spec: { replicas: 2 } }, context, config: { clusterId: cluster.uuid, namespace: defaultNamespace.name } })
+
+  // Services
+  Service.create({ data: { metadata: { name: 'fakeService' } }, context, config: { clusterId: cluster.uuid, namespace: defaultNamespace.name } })
 
   // Monocular Charts
-  range(3).forEach(i => Chart.create(undefined, context))
+  range(3).forEach(i => Chart.create({ data: undefined, context }))
 }
 
 export default loadPreset

@@ -56,6 +56,9 @@ class Context {
     this.nodes = []
     this.clusters = []
     this.namespaces = []
+    this.pods = []
+    this.deployments = []
+    this.services = []
     this.charts = []
   }
 

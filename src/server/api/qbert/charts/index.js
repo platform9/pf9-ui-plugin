@@ -1,18 +1,23 @@
+/* eslint-disable no-unused-vars */
 import context from '../../../context'
 import Chart from '../../../models/monocular/Chart'
 
 export const getCharts = (req, res) => {
-  const charts = Chart.list(context)
+  const { namespace, clusterId, tenantId } = req.params
+  const charts = Chart.list({ context, config: { clusterId, namespace } })
   return res.send({ data: charts })
 }
 
 export const getChart = (req, res) => {
+  const { namespace, clusterId, tenantId } = req.params
   const { chartName } = req.params
-  const chart = Chart.get(chartName, context)
+  const chart = Chart.findByName({ name: chartName, context, config: { clusterId, namespace } })
   return res.send({ data: chart })
 }
 
+// This needs to be implemented in the model
 export const getChartVersions = (req, res) => {
+  const { namespace, clusterId, tenantId } = req.params
   const { chartName } = req.params
   const chart = Chart.getVersions(chartName, context)
   return res.send({ data: chart })

@@ -3,7 +3,8 @@ import context from '../../../context'
 import Pod from '../../../models/qbert/Pod'
 
 export const getPods = (req, res) => {
-  const pods = Pod.list(context)
+  const { namespace, clusterId, tenantId } = req.params
+  const pods = Pod.list({ context, config: { clusterId, namespace } })
   const response = {
     apiVersion: 'v1',
     items: pods,
@@ -17,6 +18,7 @@ export const getPods = (req, res) => {
 }
 
 export const postPod = (req, res) => {
+  const { namespace, clusterId, tenantId } = req.params
   const pod = { ...req.body }
 
   if (pod.kind !== 'Pod') {
@@ -26,17 +28,25 @@ export const postPod = (req, res) => {
     return res.status(409).send({code: 409, message: `pods #{pod.metadata.name} already exists`})
   }
 
-  if (pod.apiVersion) { delete pod.apiVersion }
-  if (pod.kind) { delete pod.kind }
-  const newPod = Pod.create(pod, context)
+  const newPod = Pod.create({ data: pod, context, config: {clusterId, namespace} })
   res.status(201).send(newPod)
 }
 
 export const deletePod = (req, res) => {
   // TODO: account for tenancy
-  const { podId, tenantId } = req.params
-  console.log('Attempting to delete podId: ', podId)
+  const { podName, clusterId, namespace, tenantId } = req.params
+  console.log('Attempting to delete podName: ', podName)
+  const pod = Pod.findByName({ name: podName, context, config: {clusterId, namespace} })
   // this should throw an error if it doesn't exist
-  Pod.delete(podId, context)
-  res.status(200).send({})
+  if (!pod) {
+    res.status(404).send({code: 404, message: 'pod not found'})
+  }
+
+  // Set status to Running after some time
+  setTimeout(() => {
+    console.log(`Deleting pod #{pod.metadata.uid}`)
+    Pod.delete(pod.metadata.uid, context)
+  }, 30000)
+
+  res.status(200).send(pod)
 }

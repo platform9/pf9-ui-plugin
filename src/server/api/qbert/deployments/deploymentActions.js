@@ -3,7 +3,8 @@ import context from '../../../context'
 import Deployment from '../../../models/qbert/deployment'
 
 export const getDeployments = (req, res) => {
-  const deployments = Deployment.list(context)
+  const { namespace, clusterId, tenantId } = req.params
+  const deployments = Deployment.list({ context, config: { clusterId, namespace } })
   const response = {
     apiVersion: 'v1',
     items: deployments,
@@ -17,6 +18,7 @@ export const getDeployments = (req, res) => {
 }
 
 export const postDeployment = (req, res) => {
+  const { namespace, clusterId, tenantId } = req.params
   const deployment = { ...req.body }
 
   if (deployment.kind !== 'Deployment') {
@@ -26,16 +28,19 @@ export const postDeployment = (req, res) => {
     return res.status(409).send({code: 409, message: `deployments #{deployment.metadata.name} already exists`})
   }
 
-  const newDeployment = Deployment.create(deployment, context)
+  const newDeployment = Deployment.create({ data: deployment, context, config: { clusterId, namespace } })
   res.status(201).send(newDeployment)
 }
 
-// Don't need to implement this yet, UI does not allow this action
-export const deleteDeployment = (req, res) => {
-  // TODO: account for tenancy
-  const { deploymentId, tenantId } = req.params
-  console.log('Attempting to delete deploymentId: ', deploymentId)
-  // this should throw an error if it doesn't exist
-  Deployment.delete(deploymentId, context)
-  res.status(200).send({})
-}
+// Don't need to implement deletion yet, UI does not allow this action
+// export const deleteDeployment = (req, res) => {
+//   const { deploymentName, clusterId, namespace, tenantId } = req.params
+//   console.log('Attempting to delete deploymentName: ', deploymentName)
+//   const deployment = Deployment.findByName({ name: deploymentName, context, config: { clusterId, namespace } })
+//   // this should throw an error if it doesn't exist
+//   if (!deployment) {
+//     res.status(404).send({code: 404, message: 'deployment not found'})
+//   }
+//   Deployment.delete(deployment.metadata.uid, context)
+//   res.status(200).send({})
+// }

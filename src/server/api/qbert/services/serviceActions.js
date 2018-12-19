@@ -3,7 +3,8 @@ import context from '../../../context'
 import Service from '../../../models/qbert/Service'
 
 export const getservices = (req, res) => {
-  const services = Service.list(context)
+  const { namespace, clusterId, tenantId } = req.params
+  const services = Service.list({ context, config: { clusterId, namespace } })
   const response = {
     apiVersion: 'v1',
     items: services,
@@ -17,25 +18,28 @@ export const getservices = (req, res) => {
 }
 
 export const postService = (req, res) => {
+  const { namespace, clusterId, tenantId } = req.params
   const service = { ...req.body }
 
-  if (service.kind !== 'Service') {
+  if (service.kind !== 'service') {
     return res.status(400).send({code: 400, message: 'Must be of kind "Service"'})
   }
   if (Service.findByName(service.metadata.name)) {
     return res.status(409).send({code: 409, message: `services #{service.metadata.name} already exists`})
   }
 
-  const newService = Service.create(service, context)
+  const newService = Service.create({ data: service, context, config: { clusterId, namespace } })
   res.status(201).send(newService)
 }
 
-// Returns the object in the response but immediately deletes it after
 export const deleteService = (req, res) => {
-  // TODO: account for tenancy
-  const { serviceId, tenantId } = req.params
-  console.log('Attempting to delete serviceId: ', serviceId)
+  const { serviceName, clusterId, namespace, tenantId } = req.params
+  console.log('Attempting to delete serviceName: ', serviceName)
+  const service = Service.findByName({ name: serviceName, context, config: { clusterId, namespace } })
   // this should throw an error if it doesn't exist
-  Service.delete(serviceId, context)
-  res.status(200).send({})
+  if (!service) {
+    res.status(404).send({code: 404, message: 'service not found'})
+  }
+  Service.delete(service.metadata.uid, context)
+  res.status(200).send(service)
 }
