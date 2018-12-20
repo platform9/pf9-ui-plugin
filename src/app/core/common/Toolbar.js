@@ -5,7 +5,6 @@ import { AppBar, IconButton } from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles'
 import MenuIcon from '@material-ui/icons/Menu'
 import classNames from 'classnames'
-import { rootPath } from 'core/globals'
 import Selector from 'core/common/Selector'
 import TenantChooser from 'openstack/components/tenants/TenantChooser'
 import Avatar from 'core/common/Avatar'
@@ -71,7 +70,7 @@ class Toolbar extends React.Component {
   render () {
     const { classes, open, handleDrawerOpen } = this.props
     const { curRegion, regionSearch } = this.state
-    const logoPath = rootPath + 'images/logo.png'
+    const logoPath = '/ui/images/logo.png'
 
     return <AppBar className={classNames(classes.appBar, {
       [classes.appBarShift]: open,
