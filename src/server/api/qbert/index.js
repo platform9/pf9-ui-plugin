@@ -48,21 +48,22 @@ router.put('/v2/:tenantId/clusters/:clusterId', tokenValidator, putCluster)
 router.delete('/v2/:tenantId/clusters/:clusterId', tokenValidator, deleteCluster)
 router.get('/v2/:tenantId/clusters/:clusterId/k8sapi/version', tokenValidator, getClusterVersion)
 
-router.get('/v2/:tenantId/clusters/:clusterId/k8sapi/api/v1/namespaces', tokenValidator, getNamespaces)
+const k8sapi = '/v2/:tenantId/clusters/:clusterId/k8sapi/api/v1'
 
-router.get('/v2/:tenantId/clusters/:clusterId/k8sapi/api/v1/namespaces/:namespace/pods', tokenValidator, getPods)
-router.post('/v2/:tenantId/clusters/:clusterId/k8sapi/api/v1/namespaces/:namespace/pods', tokenValidator, postPod)
-router.delete('/v2/:tenantId/clusters/:clusterId/k8sapi/api/v1/namespaces/:namespace/pods/:podName', tokenValidator, deletePod)
+router.get(`${k8sapi}/namespaces`, tokenValidator, getNamespaces)
 
-router.get('/v2/:tenantId/clusters/:clusterId/k8sapi/api/v1/namespaces/:namespace/deployments', tokenValidator, getDeployments)
-router.post('/v2/:tenantId/clusters/:clusterId/k8sapi/api/v1/namespaces/:namespace/deployments', tokenValidator, postDeployment)
+router.get(`${k8sapi}/namespaces/:namespace/pods`, tokenValidator, getPods)
+router.post(`${k8sapi}/namespaces/:namespace/pods`, tokenValidator, postPod)
+router.delete(`${k8sapi}/namespaces/:namespace/pods/:podName`, tokenValidator, deletePod)
 
-router.get('/v2/:tenantId/clusters/:clusterId/k8sapi/api/v1/namespaces/:namespace/services', tokenValidator, getServices)
-router.post('/v2/:tenantId/clusters/:clusterId/k8sapi/api/v1/namespaces/:namespace/services', tokenValidator, postService)
-router.delete('/v2/:tenantId/clusters/:clusterId/k8sapi/api/v1/namespaces/:namespace/services/:serviceName', tokenValidator, deleteService)
+router.get(`${k8sapi}/namespaces/:namespace/deployments`, tokenValidator, getDeployments)
+router.post(`${k8sapi}/namespaces/:namespace/deployments`, tokenValidator, postDeployment)
+
+router.get(`${k8sapi}/namespaces/:namespace/services`, tokenValidator, getServices)
+router.post(`${k8sapi}/namespaces/:namespace/services`, tokenValidator, postService)
+router.delete(`${k8sapi}/namespaces/:namespace/services/:serviceName`, tokenValidator, deleteService)
 
 // Monocular
-const k8sapi = '/v2/:tenantId/clusters/:clusterId/k8sapi/api/v1'
 const monocularClusterBase = `${k8sapi}/namespaces/kube-system/services/monocular-api-svc::80/proxy/v1`
 router.get(`${monocularClusterBase}/charts`, tokenValidator, getCharts)
 router.get(`${monocularClusterBase}/charts/:chartName`, tokenValidator, getChart)
