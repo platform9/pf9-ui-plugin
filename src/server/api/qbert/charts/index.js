@@ -16,7 +16,6 @@ export const getChart = (req, res) => {
 
 // This needs to be implemented in the model
 export const getChartVersions = (req, res) => {
-  const { namespace, clusterId } = req.params
   const { chartName } = req.params
   const chart = Chart.getVersions(chartName, context)
   return res.send({ data: chart })
