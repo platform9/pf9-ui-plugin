@@ -1,7 +1,7 @@
 import context from '../../../context'
 import Service from '../../../models/qbert/Service'
 
-export const getservices = (req, res) => {
+export const getServices = (req, res) => {
   const { namespace, clusterId } = req.params
   const services = Service.list({ context, config: { clusterId, namespace } })
   const response = {

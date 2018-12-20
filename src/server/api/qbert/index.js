@@ -17,6 +17,8 @@ import getClusterVersion from './clusters/getClusterVersion'
 import getNamespaces from './namespaces/getNamespaces'
 
 import { getPods, postPod, deletePod } from './pods/podActions'
+import { getDeployments, postDeployment } from './deployments/deploymentActions'
+import { getServices, postService, deleteService } from './services/serviceActions'
 
 import { getCharts, getChart, getChartVersions } from './charts'
 /* TODO
@@ -51,6 +53,13 @@ router.get('/v2/:tenantId/clusters/:clusterId/k8sapi/api/v1/namespaces', tokenVa
 router.get('/v2/:tenantId/clusters/:clusterId/k8sapi/api/v1/namespaces/:namespace/pods', tokenValidator, getPods)
 router.post('/v2/:tenantId/clusters/:clusterId/k8sapi/api/v1/namespaces/:namespace/pods', tokenValidator, postPod)
 router.delete('/v2/:tenantId/clusters/:clusterId/k8sapi/api/v1/namespaces/:namespace/pods/:podName', tokenValidator, deletePod)
+
+router.get('/v2/:tenantId/clusters/:clusterId/k8sapi/api/v1/namespaces/:namespace/deployments', tokenValidator, getDeployments)
+router.post('/v2/:tenantId/clusters/:clusterId/k8sapi/api/v1/namespaces/:namespace/deployments', tokenValidator, postDeployment)
+
+router.get('/v2/:tenantId/clusters/:clusterId/k8sapi/api/v1/namespaces/:namespace/services', tokenValidator, getServices)
+router.post('/v2/:tenantId/clusters/:clusterId/k8sapi/api/v1/namespaces/:namespace/services', tokenValidator, postService)
+router.delete('/v2/:tenantId/clusters/:clusterId/k8sapi/api/v1/namespaces/:namespace/services/:serviceName', tokenValidator, deleteService)
 
 // Monocular
 const k8sapi = '/v2/:tenantId/clusters/:clusterId/k8sapi/api/v1'
