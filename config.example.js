@@ -15,8 +15,8 @@ const {
 
 const config = {
   production: {
-    host: 'https://localhost',
-    apiHost: 'https://localhost',
+    host: '',
+    apiHost: '',
     region: OS_REGION,
   },
 

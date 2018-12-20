@@ -6,7 +6,8 @@ const CleanWebpackPlugin = require('clean-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
 const contextPath = path.resolve(__dirname, './src/app')
-const outputPath = path.resolve(__dirname, './build')
+const contentBase = path.resolve(__dirname, './build')
+const outputPath = path.resolve(contentBase, './ui')
 
 const env = process.env.NODE_ENV || 'development'
 const isDev = env === 'development'
@@ -37,17 +38,19 @@ module.exports = {
   mode: isProd ? 'production' : 'development',
   devtool: isProd ? 'source-map' : 'cheap-module-eval-source-map',
   devServer: {
-    publicPath: '/',
-    contentBase: outputPath,
+    publicPath: '/ui/',
+    contentBase: contentBase,
     port: 3000,
     compress: true,
     hot: true,
-    open: true,
-    historyApiFallback: true
+    open: false,
+    historyApiFallback: {
+      index: '/ui/index.html',
+    },
   },
   output: {
     filename: isDev ? '[name]-bundle.js' : '[name].[hash]-bundle.js',
-    publicPath: '/',
+    publicPath: '/ui/',
     path: outputPath,
   },
   module: {
@@ -60,12 +63,7 @@ module.exports = {
       {
         test: /\.css$/,
         exclude: /node_modules/,
-        use: ['style-loader', 'css-loader']
-      },
-      {
-        test: /\.graphql$/,
-        exclude: /node_modules/,
-        use: 'graphql-tag/loader'
+        use: ['style-loader', 'css-loader'],
       },
     ]
   },
@@ -100,7 +98,7 @@ module.exports = {
     extractCSS,
     new HtmlWebpackPlugin({
       inject: true,
-      template: './static/ui/index.html',
+      template: './static/index.html',
       favicon: './static/favicon.ico',
       title: 'Caching'
     }),

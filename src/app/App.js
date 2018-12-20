@@ -21,7 +21,7 @@ import PreferencesProvider from 'core/PreferencesProvider'
 setupFromConfig(config)
 window.process = process
 
-if (!config.apiHost) { throw new Error('config.js does not contain "apiHost"') }
+if (config.apiHost === undefined) { throw new Error('config.js does not contain "apiHost"') }
 
 const apiClient = new ApiClient({ keystoneEndpoint: `${config.apiHost}/keystone` })
 apiClient.setActiveRegion(config.region)

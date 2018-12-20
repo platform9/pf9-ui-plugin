@@ -7,7 +7,7 @@ class Qbert {
   async endpoint () {
     const services = await this.client.keystone.getServicesForActiveRegion()
     const endpoint = services.qbert.admin.url
-    return endpoint.replace(/v1$/, `v2/${this.client.activeProjectId}`)
+    return endpoint.replace(/v(1|2|3)$/, `v2/${this.client.activeProjectId}`)
   }
 
   async monocularBaseUrl () {

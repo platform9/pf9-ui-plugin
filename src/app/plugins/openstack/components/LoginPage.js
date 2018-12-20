@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import { compose } from 'core/fp'
 import { withRouter } from 'react-router'
 import { withStyles } from '@material-ui/core/styles'
-import { rootPath } from 'core/globals'
 import { withAppContext } from 'core/AppContext'
 import {
   Button,
@@ -162,13 +161,12 @@ export class LoginPage extends React.Component {
   render () {
     const { classes } = this.props
     const { loginFailed } = this.state
-    const logoPath = rootPath+'images/logo-color.png'
     return (
       <div className="login-page">
         <Grid container justify="center" className={classes.root}>
           <Grid item md={4} lg={3}>
             <Paper className={classes.paper}>
-              <img src={logoPath} className={classes.img} />
+              <img src="/ui/images/logo-color.png" className={classes.img} />
               <form className={classes.form} onSubmit={this.performLogin}>
                 <Typography variant="subtitle1" align="center">
                   Please sign in
