@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import context from '../../../context'
 import Cluster from '../../../models/qbert/Cluster'
 
@@ -14,14 +13,14 @@ export const postCluster = (req, res) => {
 }
 
 export const putCluster = (req, res) => {
-  const { clusterId, tenantId } = req.params
+  const { clusterId } = req.params
   const updatedCluster = Cluster.update({ id: clusterId, data: req.body, context })
   res.status(200).send(updatedCluster)
 }
 
 export const deleteCluster = (req, res) => {
   // TODO: account for tenancy
-  const { clusterId, tenantId } = req.params
+  const { clusterId } = req.params
   console.log('Attempting to delete clusterId: ', clusterId)
   // this should throw an error if it doesn't exist
   Cluster.delete({ id: clusterId, context })

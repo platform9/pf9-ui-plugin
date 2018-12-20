@@ -1,5 +1,6 @@
 import createModel from '../createModel'
 import { getCurrentTime } from '../../util'
+import { omit } from 'ramda'
 
 // There is a lot of stuff in the real API response, too much to put here...
 // Skimming down to what we use in the UI only
@@ -28,24 +29,20 @@ const options = {
   // in metadata there is a deletionGracePeriodSeconds and a deletionTimestamp
   createFn: (input, context) => {
     // Remove unneeded inputs
-    if (input.apiVersion) { delete input.apiVersion }
-    if (input.kind) { delete input.kind }
+    const _input = omit(['apiVersion', 'kind'], input)
+
     // Set status to Running after some time
     setTimeout(() => {
-      const pod = context.pods.find(x => x.name === input.metadata.name)
+      const pod = context.pods.find(x => x.name === _input.metadata.name)
       pod.status.phase = 'Running'
     }, 5000)
 
-    return { ...input, name: input.metadata.name, metadata: { ...input.metadata, name: input.metadata.name, namespace: input.namespace, creationTimestamp: getCurrentTime() } }
+    return { ..._input, name: _input.metadata.name, metadata: { ..._input.metadata, name: _input.metadata.name, namespace: _input.namespace, creationTimestamp: getCurrentTime() } }
   },
   loaderFn: (pods) => {
     return pods.map((pod) => {
       const newPod = { ...pod, metadata: { ...pod.metadata, uid: pod.uuid } }
-      delete newPod.name
-      delete newPod.uuid
-      delete newPod.namespace
-      delete newPod.clusterId
-      return newPod
+      return omit(['name', 'uuid', 'namespace', 'clusterId'], newPod)
     })
   }
 }

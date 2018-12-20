@@ -1,9 +1,8 @@
-/* eslint-disable no-unused-vars */
 import context from '../../../context'
 import Service from '../../../models/qbert/Service'
 
 export const getservices = (req, res) => {
-  const { namespace, clusterId, tenantId } = req.params
+  const { namespace, clusterId } = req.params
   const services = Service.list({ context, config: { clusterId, namespace } })
   const response = {
     apiVersion: 'v1',
@@ -18,7 +17,7 @@ export const getservices = (req, res) => {
 }
 
 export const postService = (req, res) => {
-  const { namespace, clusterId, tenantId } = req.params
+  const { namespace, clusterId } = req.params
   const service = { ...req.body }
 
   if (service.kind !== 'service') {
@@ -33,7 +32,7 @@ export const postService = (req, res) => {
 }
 
 export const deleteService = (req, res) => {
-  const { serviceName, clusterId, namespace, tenantId } = req.params
+  const { serviceName, clusterId, namespace } = req.params
   console.log('Attempting to delete serviceName: ', serviceName)
   const service = Service.findByName({ name: serviceName, context, config: { clusterId, namespace } })
   // this should throw an error if it doesn't exist

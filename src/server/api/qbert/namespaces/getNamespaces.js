@@ -1,9 +1,8 @@
-/* eslint-disable no-unused-vars */
 import context from '../../../context'
 import Namespace from '../../../models/qbert/Namespace'
 
 const getNamespaces = (req, res) => {
-  const { clusterId, tenantId } = req.params
+  const { clusterId } = req.params
   const namespaces = Namespace.list({ context, config: { clusterId } })
   const response = {
     apiVersion: 'v1',

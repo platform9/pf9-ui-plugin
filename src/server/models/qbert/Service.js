@@ -1,5 +1,6 @@
 import createModel from '../createModel'
 import { getCurrentTime } from '../../util'
+import { omit } from 'ramda'
 
 // There is a lot of stuff in the real API response, too much to put here...
 // Skimming down to what we use in the UI only
@@ -26,16 +27,13 @@ const options = {
     name: '', // For easy access, will be returned in metadata for API response
   },
   createFn: (input, context) => {
-    return { ...input, name: input.metadata.name, metadata: { ...input.metadata, name: input.metadata.name, namespace: input.namespace, creationTimestamp: getCurrentTime() } }
+    const _input = omit(['apiVersion', 'kind'], input)
+    return { ..._input, name: _input.metadata.name, metadata: { ..._input.metadata, name: _input.metadata.name, namespace: _input.namespace, creationTimestamp: getCurrentTime() } }
   },
   loaderFn: (services) => {
     return services.map((service) => {
       const newService = { ...service, metadata: { ...service.metadata, uid: service.uuid } }
-      delete newService.name
-      delete newService.uuid
-      delete newService.namespace
-      delete newService.clusterId
-      return newService
+      return omit(['name', 'uuid', 'namespace', 'clusterId'], newService)
     })
   }
 }

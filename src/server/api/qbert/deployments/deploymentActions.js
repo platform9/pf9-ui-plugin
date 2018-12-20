@@ -1,9 +1,8 @@
-/* eslint-disable no-unused-vars */
 import context from '../../../context'
 import Deployment from '../../../models/qbert/deployment'
 
 export const getDeployments = (req, res) => {
-  const { namespace, clusterId, tenantId } = req.params
+  const { namespace, clusterId } = req.params
   const deployments = Deployment.list({ context, config: { clusterId, namespace } })
   const response = {
     apiVersion: 'v1',
@@ -18,7 +17,7 @@ export const getDeployments = (req, res) => {
 }
 
 export const postDeployment = (req, res) => {
-  const { namespace, clusterId, tenantId } = req.params
+  const { namespace, clusterId } = req.params
   const deployment = { ...req.body }
 
   if (deployment.kind !== 'Deployment') {
@@ -34,7 +33,7 @@ export const postDeployment = (req, res) => {
 
 // Don't need to implement deletion yet, UI does not allow this action
 // export const deleteDeployment = (req, res) => {
-//   const { deploymentName, clusterId, namespace, tenantId } = req.params
+//   const { deploymentName, clusterId, namespace } = req.params
 //   console.log('Attempting to delete deploymentName: ', deploymentName)
 //   const deployment = Deployment.findByName({ name: deploymentName, context, config: { clusterId, namespace } })
 //   // this should throw an error if it doesn't exist

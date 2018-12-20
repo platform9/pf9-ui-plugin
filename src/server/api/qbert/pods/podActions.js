@@ -1,9 +1,8 @@
-/* eslint-disable no-unused-vars */
 import context from '../../../context'
 import Pod from '../../../models/qbert/Pod'
 
 export const getPods = (req, res) => {
-  const { namespace, clusterId, tenantId } = req.params
+  const { namespace, clusterId } = req.params
   const pods = Pod.list({ context, config: { clusterId, namespace } })
   const response = {
     apiVersion: 'v1',
@@ -18,7 +17,7 @@ export const getPods = (req, res) => {
 }
 
 export const postPod = (req, res) => {
-  const { namespace, clusterId, tenantId } = req.params
+  const { namespace, clusterId } = req.params
   const pod = { ...req.body }
 
   if (pod.kind !== 'Pod') {
@@ -34,7 +33,7 @@ export const postPod = (req, res) => {
 
 export const deletePod = (req, res) => {
   // TODO: account for tenancy
-  const { podName, clusterId, namespace, tenantId } = req.params
+  const { podName, clusterId, namespace } = req.params
   console.log('Attempting to delete podName: ', podName)
   const pod = Pod.findByName({ name: podName, context, config: {clusterId, namespace} })
   // this should throw an error if it doesn't exist
