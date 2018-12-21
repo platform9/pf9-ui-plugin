@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import AnimateValues from 'core/common/AnimateValues'
 import { withStyles } from '@material-ui/styles'
+import { withTheme } from '@material-ui/core/styles'
 import { describeArc } from 'core/svgHelpers'
 import { Typography } from '@material-ui/core'
 
@@ -44,6 +45,7 @@ const styles = theme => ({
   }
 })
 
+@withTheme()
 @withStyles(styles)
 class SemiCircle extends React.Component {
   render () {

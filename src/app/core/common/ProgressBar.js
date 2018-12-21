@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { ensureFunction } from 'core/fp'
 import { withStyles } from '@material-ui/styles'
+import { withTheme } from '@material-ui/core/styles'
 
 const styles = theme => ({
   root: {
@@ -32,6 +33,7 @@ const styles = theme => ({
   }
 })
 
+@withTheme()
 @withStyles(styles)
 class ProgressBar extends PureComponent {
   render () {

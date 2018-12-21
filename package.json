@@ -5,7 +5,7 @@
   "main": "src/app/index.js",
   "dependencies": {
     "@babel/polyfill": "^7.0.0",
-    "@material-ui/core": "^3.6.1",
+    "@material-ui/core": "^3.7.0",
     "@material-ui/icons": "^3.0.1",
     "@material-ui/styles": "^3.0.0-alpha.4",
     "axios": "^0.18.0",
