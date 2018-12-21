@@ -23,6 +23,7 @@ import Pod from '../models/qbert/Pod'
 import Deployment from '../models/qbert/Deployment'
 import Service from '../models/qbert/Service'
 import Chart from '../models/monocular/Chart'
+import StorageClass from '../models/qbert/StorageClass'
 import { attachNodeToCluster } from '../models/qbert/Operations'
 // import Token from '../models/openstack/Token'
 import { range } from '../util'
@@ -148,6 +149,9 @@ function loadPreset () {
 
   // Services
   Service.create({ data: { metadata: { name: 'fakeService' } }, context, config: { clusterId: cluster.uuid, namespace: defaultNamespace.name } })
+
+  // Storage Classes
+  StorageClass.create({ data: { metadata: { name: 'fakeStorageClass', annotations: { 'storageclass.kubernetes.io/is-default-class': 'true' } } }, context, config: { clusterId: cluster.uuid } })
 
   // Monocular Charts
   range(3).forEach(i => Chart.create({ data: undefined, context }))

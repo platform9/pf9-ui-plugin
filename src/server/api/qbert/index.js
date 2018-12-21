@@ -19,6 +19,7 @@ import getNamespaces from './namespaces/getNamespaces'
 import { getPods, postPod, deletePod } from './pods/podActions'
 import { getDeployments, postDeployment } from './deployments/deploymentActions'
 import { getServices, postService, deleteService } from './services/serviceActions'
+import { getStorageClasses, postStorageClass, deleteStorageClass } from './storageClasses/storageClassActions'
 
 import { getCharts, getChart, getChartVersions } from './charts'
 /* TODO
@@ -62,6 +63,12 @@ router.post(`${k8sapi}/namespaces/:namespace/deployments`, tokenValidator, postD
 router.get(`${k8sapi}/namespaces/:namespace/services`, tokenValidator, getServices)
 router.post(`${k8sapi}/namespaces/:namespace/services`, tokenValidator, postService)
 router.delete(`${k8sapi}/namespaces/:namespace/services/:serviceName`, tokenValidator, deleteService)
+
+const storageClassApi = '/v2/:tenantId/clusters/:clusterId/k8sapi/apis/storage.k8s.io/v1/storageclasses'
+
+router.get(`${storageClassApi}`, tokenValidator, getStorageClasses)
+router.post(`${storageClassApi}`, tokenValidator, postStorageClass)
+router.delete(`${storageClassApi}/:storageClassName`, tokenValidator, deleteStorageClass)
 
 // Monocular
 const monocularClusterBase = `${k8sapi}/namespaces/kube-system/services/monocular-api-svc::80/proxy/v1`

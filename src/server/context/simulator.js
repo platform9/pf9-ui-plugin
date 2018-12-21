@@ -59,6 +59,7 @@ class Context {
     this.pods = []
     this.deployments = []
     this.services = []
+    this.storageClasses = []
     this.charts = []
   }
 
