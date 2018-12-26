@@ -38,6 +38,7 @@ module.exports = {
   mode: isProd ? 'production' : 'development',
   devtool: isProd ? 'source-map' : 'cheap-module-eval-source-map',
   devServer: {
+    disableHostCheck: true, // Temporary workaround for https://github.com/webpack/webpack-dev-server/issues/1604
     publicPath: '/ui/',
     contentBase: contentBase,
     port: 3000,

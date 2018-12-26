@@ -39,6 +39,8 @@ const clusterUsageStats = (cluster, context) => {
   }
 
   const { compute, memory, disk } = clusterWithStats.usage
+  // Workaround for when max is 0, but this value should never be 0
+  // and if case of so (which would mean there is no max) we should probably just show the value
   clusterWithStats.usage.compute.percent = Math.round(100 * compute.current / (compute.max || 1))
   clusterWithStats.usage.memory.percent = Math.round(100 * memory.current / (memory.max || 1))
   clusterWithStats.usage.disk.percent = Math.round(100 * disk.current / (disk.max || 1))
