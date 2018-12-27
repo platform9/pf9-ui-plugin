@@ -1,10 +1,10 @@
 import express from 'express'
 
 // Cloud Providers
-import getCloudProviders from './getCloudProviders'
-import postCloudProvider from './postCloudProvider'
-import putCloudProvider from './putCloudProvider'
-import deleteCloudProvider from './deleteCloudProvider'
+import { getCloudProviders, postCloudProvider, putCloudProvider, deleteCloudProvider } from './cloudProviders/cloudProviderActions'
+
+import getCpTypes from './cloudProviders/getTypes'
+import { getCpDetails, getCpRegionDetails } from './cloudProviders/getCpDetails'
 
 // Nodes
 import getNodes from './nodes/getNodes'
@@ -12,6 +12,7 @@ import getNodes from './nodes/getNodes'
 // Clusters
 import { getClusters, postCluster, putCluster, deleteCluster } from './clusters/clusterActions'
 import getClusterVersion from './clusters/getClusterVersion'
+import { attachNodes, detachNodes } from './clusters/attachOperations'
 
 // Namespaces
 import getNamespaces from './namespaces/getNamespaces'
@@ -41,6 +42,10 @@ router.post('/v2/:tenantId/cloudProviders', tokenValidator, postCloudProvider)
 router.put('/v2/:tenantId/cloudProviders/:cloudProviderId', tokenValidator, putCloudProvider)
 router.delete('/v2/:tenantId/cloudProviders/:cloudProviderId', tokenValidator, deleteCloudProvider)
 
+router.get('/v2/:tenantId/cloudProviders/types', tokenValidator, getCpTypes)
+router.get('/v2/:tenantId/cloudProviders/:cloudProviderId', tokenValidator, getCpDetails)
+router.get('/v2/:tenantId/cloudProviders/:cloudProviderId/region/:regionId', tokenValidator, getCpRegionDetails)
+
 router.get('/v2/:tenantId/nodes', tokenValidator, getNodes)
 
 router.get('/v2/:tenantId/clusters', tokenValidator, getClusters)
@@ -48,6 +53,9 @@ router.post('/v2/:tenantId/clusters', tokenValidator, postCluster)
 router.put('/v2/:tenantId/clusters/:clusterId', tokenValidator, putCluster)
 router.delete('/v2/:tenantId/clusters/:clusterId', tokenValidator, deleteCluster)
 router.get('/v2/:tenantId/clusters/:clusterId/k8sapi/version', tokenValidator, getClusterVersion)
+
+router.post('/v3/:tenantId/clusters/:clusterId/attach', tokenValidator, attachNodes)
+router.post('/v3/:tenantId/clusters/:clusterId/detach', tokenValidator, detachNodes)
 
 const k8sapi = '/v2/:tenantId/clusters/:clusterId/k8sapi/api/v1'
 

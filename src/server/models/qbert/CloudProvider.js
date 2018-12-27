@@ -15,4 +15,8 @@ const options = {
 
 const CloudProvider = createModel(options)
 
+CloudProvider.getCpTypes = () => {
+  return [{type: 'aws'}, {type: 'gke'}, {type: 'local'}]
+}
+
 export default CloudProvider
