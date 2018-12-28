@@ -1,7 +1,3 @@
-import CloudProvider from '../../../models/qbert/CloudProvider'
-
-const getCpTypes = () => {
-  return CloudProvider.getCpTypes()
-}
+const getCpTypes = () => ([{type: 'aws'}, {type: 'gke'}, {type: 'local'}])
 
 export default getCpTypes

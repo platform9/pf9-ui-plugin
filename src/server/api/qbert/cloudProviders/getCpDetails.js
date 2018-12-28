@@ -16,71 +16,27 @@ const randomAwsRegions = (numRegions) => {
 }
 
 const randomOpenstackRegions = (numRegions) => {
-  const regions = times(() => {
-    return { 'RegionName': faker.random.locale() }
-  }, numRegions)
+  const regions = times(() => ({ 'RegionName': faker.random.locale() }), numRegions)
   return {'Regions': regions}
 }
 
 const randomAwsRegionDetails = (regionId) => {
   return {
-    azs: times(() => {
-      return {
-        'RegionName': regionId,
-        'State': 'available',
-        'ZoneName': faker.random.word()
-      }
-    }, 5),
-    domains: times(() => {
-      return {
-        'Name': faker.random.word(),
-        'Id': faker.random.word()
-      }
-    }, 8),
+    azs: times(() => ({ 'RegionName': regionId, 'State': 'available', 'ZoneName': faker.random.word() }), 5),
+    domains: times(() => ({ 'Name': faker.random.word(), 'Id': faker.random.word() }), 8),
     flavors: times(faker.random.word, 15),
-    keyPairs: times(() => {
-      return {
-        'KeyName': faker.random.word(),
-        'KeyFingerprint': faker.random.word()
-      }
-    }, 5),
+    keyPairs: times(() => ({ 'KeyName': faker.random.word(), 'KeyFingerprint': faker.random.word() }), 5),
     operatingSystems: ['centos', 'ubuntu'],
-    vpcs: times(() => {
-      return {
-        'CidrBlock': faker.internet.ip(),
-        'VpcName': faker.random.word()
-      }
-    }, 5)
+    vpcs: times(() => ({ 'CidrBlock': faker.internet.ip(), 'VpcName': faker.random.word() }), 5)
   }
 }
 
 const randomOpenstackRegionDetails = (regionId) => {
   return {
-    azs: times(() => {
-      return {
-        zoneName: faker.random.word()
-      }
-    }, 5),
-    flavors: times(() => {
-      return {
-        id: faker.random.uuid(),
-        name: faker.random.word()
-      }
-    }, 10),
-    images: times(() => {
-      return {
-        id: faker.random.uuid(),
-        name: faker.random.word(),
-        size: faker.random.number
-      }
-    }, 10),
-    keyPairs: times(() => {
-      return {
-        name: faker.random.word(),
-        fingerprint: faker.random.word(),
-        public_key: faker.random.word()
-      }
-    }, 5),
+    azs: times(() => ({ zoneName: faker.random.word() }), 5),
+    flavors: times(() => ({ id: faker.random.uuid(), name: faker.random.word() }), 10),
+    images: times(() => ({ id: faker.random.uuid(), name: faker.random.word(), size: faker.random.number }), 10),
+    keyPairs: times(() => ({ name: faker.random.word(), fingerprint: faker.random.word(), public_key: faker.random.word() }), 5),
     networks: times(() => {
       return {
         name: faker.random.word(),
@@ -94,12 +50,7 @@ const randomOpenstackRegionDetails = (regionId) => {
         }, 2)
       }
     }, 5),
-    securityGroups: times(() => {
-      return {
-        name: faker.random.word(),
-        id: faker.random.uuid()
-      }
-    }, 5)
+    securityGroups: times(() => ({ name: faker.random.word(), id: faker.random.uuid() }), 5)
   }
 }
 
