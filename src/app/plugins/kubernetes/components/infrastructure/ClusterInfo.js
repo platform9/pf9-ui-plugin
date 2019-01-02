@@ -13,7 +13,7 @@ const overviewStats = cluster => ({
   'Status':              cluster.status,
   'CloudProvider':       cluster.cloudProviderName,
   'Cloud Provider Type': cluster.cloudProviderType,
-  'Kubernetes Version':  cluster.version,
+  'Kubernetes Version':  cluster.version || 'unavailable',
   'Containers CIDR':     cluster.containersCidr,
   'Services CIDR':       cluster.servicesCidr,
   'Privileged':          cluster.privileged,
