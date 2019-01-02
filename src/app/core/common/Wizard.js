@@ -104,6 +104,7 @@ Wizard.propTypes = {
   onComplete: PropTypes.func,
   context: PropTypes.object,
   submitLabel: PropTypes.string,
+  children: PropTypes.func.isRequired,
 }
 
 Wizard.defaultProps = {

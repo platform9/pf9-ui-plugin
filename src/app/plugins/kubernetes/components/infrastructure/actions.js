@@ -47,6 +47,11 @@ export const loadNodes = async ({ context, setContext, reload }) => {
   return nodes
 }
 
+export const createCluster = async ({ data, context }) => {
+  console.log('createCluster TODO')
+  console.log(data)
+}
+
 /*
  * The data model needed in the UI requires interwoven dependencies between
  * nodes, clusters, and namespaces.  Ideally the API would be more aligned
