@@ -27,6 +27,7 @@ class Checkbox extends React.Component {
 
   render () {
     const { id, label, value, classes, hasError, onMouseEnter, errorMessage, ...restProps } = this.props
+
     return (
       <FormControl id={id} className={classes.formControl} error={hasError}>
         <FormControlLabel
@@ -36,7 +37,7 @@ class Checkbox extends React.Component {
             <BaseCheckbox
               {...restProps}
               error={errorMessage}
-              checked={value}
+              checked={value || false}
               onChange={this.handleChange}
             />
           }

@@ -8,7 +8,7 @@ import { partial, pathOr } from 'ramda'
 export const ValidatedFormInputPropTypes = {
   required: PropTypes.bool,
   validations: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
-  initialValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+  initialValue: PropTypes.any,
 }
 
 /**

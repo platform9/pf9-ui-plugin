@@ -1,4 +1,5 @@
 import React from 'react'
+import Checkbox from 'core/common/validated_form/Checkbox'
 import FormWrapper from 'core/common/FormWrapper'
 import PicklistField from 'core/common/validated_form/PicklistField'
 import ValidatedForm from 'core/common/validated_form/ValidatedForm'
@@ -8,6 +9,10 @@ import { compose } from 'ramda'
 import { loadCloudProviders } from './actions'
 import { withDataLoader } from 'core/DataLoader'
 
+const initialContext = {
+  manualDeploy: false,
+}
+
 class AddClusterPage extends React.Component {
   handleSubmit = () => console.log('TODO: AddClusterPage#handleSubmit')
 
@@ -16,13 +21,15 @@ class AddClusterPage extends React.Component {
     const cloudProviderOptions = data.map(cp => ({ value: cp.uuid, label: cp.name }))
     return (
       <FormWrapper title="Add Cluster">
-        <Wizard onComplete={this.handleSubmit}>
+        <Wizard onComplete={this.handleSubmit} context={initialContext}>
           {({ wizardContext, setWizardContext, onNext }) => {
             return (
               <React.Fragment>
+                <pre>{JSON.stringify(wizardContext, null, 4)}</pre>
                 <WizardStep stepId="type" label="Cluster Type">
                   <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                     <PicklistField id="cloudProvider" label="Cloud Provider" options={cloudProviderOptions} />
+                    <Checkbox id="manualDeploy" label="Deploy cluster via install agent" />
                   </ValidatedForm>
                 </WizardStep>
                 <WizardStep stepId="config" label="Configuration">
