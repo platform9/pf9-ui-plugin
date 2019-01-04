@@ -2,6 +2,7 @@ import React from 'react'
 import Checkbox from 'core/common/validated_form/Checkbox'
 import FormWrapper from 'core/common/FormWrapper'
 import PicklistField from 'core/common/validated_form/PicklistField'
+import TextField from 'core/common/validated_form/TextField'
 import ValidatedForm from 'core/common/validated_form/ValidatedForm'
 import Wizard from 'core/common/Wizard'
 import WizardStep from 'core/common/WizardStep'
@@ -19,6 +20,7 @@ class AddClusterPage extends React.Component {
   render () {
     const { data=[] } = this.props
     const cloudProviderOptions = data.map(cp => ({ value: cp.uuid, label: cp.name }))
+    const regions = []
     return (
       <FormWrapper title="Add Cluster">
         <Wizard onComplete={this.handleSubmit} context={initialContext}>
@@ -30,6 +32,8 @@ class AddClusterPage extends React.Component {
                   <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                     <PicklistField id="cloudProvider" label="Cloud Provider" options={cloudProviderOptions} />
                     <Checkbox id="manualDeploy" label="Deploy cluster via install agent" />
+                    <TextField id="name" label="name" />
+                    <PicklistField id="region" label="Region" options={regions} />
                   </ValidatedForm>
                 </WizardStep>
                 <WizardStep stepId="config" label="Configuration">

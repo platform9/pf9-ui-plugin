@@ -7,6 +7,7 @@ export const pluck = key => obj => obj[key]
 export const identity = x => x
 export const isTruthy = x => !!x
 export const exists = x => x !== undefined
+export const propExists = curry((key, obj) => obj[key] !== undefined)
 
 export const pluckAsync = key => promise => promise.then(obj => obj[key])
 
@@ -138,7 +139,7 @@ export const arrToObjByKey = curry((key, arr) =>
 )
 
 export const ensureArray = maybeArr =>
-  (maybeArr && maybeArr instanceof Array) ? maybeArr : []
+  (maybeArr && maybeArr instanceof Array) ? maybeArr : [maybeArr]
 
 export const ensureFunction = moize(maybeFunc => (...args) => {
   if (typeof maybeFunc === 'function') {
