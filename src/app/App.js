@@ -17,6 +17,7 @@ import { apply, toPairs } from 'ramda'
 import SessionManager from 'openstack/components/SessionManager'
 import DeveloperToolsEmbed from 'developer/components/DeveloperToolsEmbed'
 import PreferencesProvider from 'core/PreferencesProvider'
+import { ToastProvider } from 'core/common/ToastProvider'
 
 setupFromConfig(config)
 window.process = process
@@ -72,21 +73,23 @@ class App extends React.Component {
         <MuiThemeProvider theme={theme}>
           <HotKeysProvider>
             <AppContext initialContext={{ apiClient, initialized: false }}>
-              <PreferencesProvider>
-                <div id="_main-container">
-                  <SessionManager>
-                    <AppContainer
-                      sections={plugins.map(([id, plugin]) => ({
-                        id,
-                        name: plugin.name,
-                        links: plugin.getNavItems()
-                      }))}>
-                      {plugins.map(apply(this.renderPluginRoutes))}
-                      <DeveloperToolsEmbed />
-                    </AppContainer>
-                  </SessionManager>
-                </div>
-              </PreferencesProvider>
+              <ToastProvider>
+                <PreferencesProvider>
+                  <div id="_main-container">
+                    <SessionManager>
+                      <AppContainer
+                        sections={plugins.map(([id, plugin]) => ({
+                          id,
+                          name: plugin.name,
+                          links: plugin.getNavItems()
+                        }))}>
+                        {plugins.map(apply(this.renderPluginRoutes))}
+                        <DeveloperToolsEmbed />
+                      </AppContainer>
+                    </SessionManager>
+                  </div>
+                </PreferencesProvider>
+              </ToastProvider>
             </AppContext>
           </HotKeysProvider>
         </MuiThemeProvider>

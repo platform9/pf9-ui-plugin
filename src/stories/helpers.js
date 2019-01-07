@@ -7,6 +7,7 @@ import { withTheme } from 'app/theme'
 
 import 'app/app.css'
 import HotKeysContext from 'core/common/HotKeysProvider'
+import { ToastProvider } from 'core/common/ToastProvider'
 
 const objToJsonDetails = obj => JSON.stringify(obj, null, 4)
 const isArray = x => x instanceof Array
@@ -27,7 +28,9 @@ const Pf9StoryWrapper = withWrappings(({ children }) => <div>{children}</div>)
 export const pf9Decorators = storyFn => (
   <HotKeysContext>
     <AppContext>
-      <Pf9StoryWrapper>{storyFn()}</Pf9StoryWrapper>
+      <ToastProvider>
+        <Pf9StoryWrapper>{storyFn()}</Pf9StoryWrapper>
+      </ToastProvider>
     </AppContext>
   </HotKeysContext>
 )
