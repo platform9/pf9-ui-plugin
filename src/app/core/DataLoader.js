@@ -35,7 +35,7 @@ class DataLoaderBase extends React.Component {
       if (!isEmpty(loaderFns)) {
         try {
           const promises = loaderFns.map(fn => fn({ setContext, context }))
-          const [promiseFns, syncFns] = partition(propExists('then'), promises)
+          const [promiseFns, syncFns] = partition(propExists('then'), promises) // eslint-disable-line no-unused-vars
           if (isEmpty(promiseFns)) {
             // everything is sync so no need to wait
             this.setState({ loading: false })
