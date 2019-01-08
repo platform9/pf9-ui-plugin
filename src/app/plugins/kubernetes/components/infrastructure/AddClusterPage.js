@@ -21,6 +21,11 @@ class AddClusterPage extends React.Component {
     const { data=[] } = this.props
     const cloudProviderOptions = data.map(cp => ({ value: cp.uuid, label: cp.name }))
     const regions = []
+    const images = []
+    const flavors = []
+    const networks = []
+    const subnets = []
+    const sshKeys = []
     return (
       <FormWrapper title="Add Cluster">
         <Wizard onComplete={this.handleSubmit} context={initialContext}>
@@ -37,16 +42,40 @@ class AddClusterPage extends React.Component {
                   </ValidatedForm>
                 </WizardStep>
                 <WizardStep stepId="config" label="Configuration">
-                  <h1>Cluster Config</h1>
+                  <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
+                    <PicklistField id="image" label="Image" options={images} />
+                    <PicklistField id="masterFlavor" label="Master node instance flavor" options={flavors} />
+                    <PicklistField id="workerFlavor" label="Worker node instance flavor" options={flavors} />
+                    <TextField id="numMasters" label="Number of master nodes" type="number" />
+                    <TextField id="numWorkers" label="Number of worker nodes" type="number" />
+                    <Checkbox id="disableWorkloadsOnMaster" label="Disable workloads on master nodes" />
+                  </ValidatedForm>
                 </WizardStep>
                 <WizardStep stepId="network" label="Networking">
-                  <h1>Networking</h1>
+                  <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
+                    <PicklistField id="network" label="Network" options={networks} />
+                    <PicklistField id="subnet" label="Subnets" options={subnets} />
+                    <p>Placeholder: Security groups</p>
+                    <TextField id="apiFqdn" label="API FQDN" />
+                    <TextField id="containersCidr" label="Containers CIDR" />
+                    <TextField id="Services CIDR" label="Services CIDR" />
+                    <Checkbox id="useHttpProxy" label="Use HTTP proxy" />
+                  </ValidatedForm>
                 </WizardStep>
                 <WizardStep stepId="advancedConfig" label="Advanced Configuration">
-                  <h1>Advanced Configuration</h1>
+                  <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
+                    <PicklistField id="sshKey" label="SSH key" options={sshKeys} />
+                    <Checkbox id="privileged" label="Privileged" />
+                    <Checkbox id="advancedApi" label="Advanced API configuration" />
+                    <Checkbox id="enableAppCatalog" label="Enable application catalog" />
+                    <p>Placeholder: Tags</p>
+                  </ValidatedForm>
                 </WizardStep>
                 <WizardStep stepId="review" label="Review">
-                  <h1>Review</h1>
+                  <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
+                    <p>Placeholder: Review</p>
+                    <pre>{JSON.stringify(wizardContext, null, 4)}</pre>
+                  </ValidatedForm>
                 </WizardStep>
               </React.Fragment>
             )
