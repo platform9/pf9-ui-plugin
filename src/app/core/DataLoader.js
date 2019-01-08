@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import DisplayError from 'core/common/DisplayError'
 import Loader from 'core/common/Loader'
-import { all, isEmpty, partition, props } from 'ramda'
+import { all, isEmpty, partition, pick, props } from 'ramda'
 import { ensureArray, exists, propExists } from 'core/fp'
 import { withAppContext } from 'core/AppContext'
 
@@ -21,11 +21,15 @@ class DataLoaderBase extends React.Component {
     window.removeEventListener('scopeChanged', this.listener)
   }
 
-  loadData = () => {
-    const { dataKey, loaderFn, setContext, context } = this.props
+  doneLoading = () => {
+    const { dataKey, context } = this.props
     const dataKeys = ensureArray(dataKey)
-    const doneLoading = all(exists, props(dataKeys, context))
-    if (!doneLoading) {
+    return all(exists, props(dataKeys, context))
+  }
+
+  loadData = () => {
+    const { loaderFn, setContext, context } = this.props
+    if (!this.doneLoading()) {
       this.setState({ loading: true })
       const parseErr = err => {
         if (typeof err === 'string') { return err }
@@ -55,8 +59,9 @@ class DataLoaderBase extends React.Component {
   render () {
     const { loading, error } = this.state
     const { context, dataKey, children } = this.props
-    if (!context) { return <Loader /> }
-    const data = context[dataKey]
+    const dataKeys = ensureArray(dataKey)
+    if (!context || !this.doneLoading()) { return <Loader /> }
+    const data = dataKeys.length === 1 ? context[dataKey] : pick(dataKeys, context)
     if (loading || !data) { return <Loader /> }
     if (error) { return <DisplayError error={error} /> }
     return children({ data, loading, error, context })

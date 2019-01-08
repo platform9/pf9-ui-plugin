@@ -14,13 +14,19 @@ const initialContext = {
   manualDeploy: false,
 }
 
+const loadRegions = async ({ context, setContext }) => {
+  const regions = await context.apiClient.keystone.getRegions()
+  setContext({ regions })
+  return regions
+}
+
 class AddClusterPage extends React.Component {
   handleSubmit = () => console.log('TODO: AddClusterPage#handleSubmit')
 
   render () {
-    const { data=[] } = this.props
-    const cloudProviderOptions = data.map(cp => ({ value: cp.uuid, label: cp.name }))
-    const regions = []
+    const { data } = this.props
+    const cloudProviderOptions = data.cloudProviders.map(cp => ({ value: cp.uuid, label: cp.name }))
+    const regionOptions = data.regions.map(region => ({ value: region.id, label: region.name }))
     const images = []
     const flavors = []
     const networks = []
@@ -35,10 +41,10 @@ class AddClusterPage extends React.Component {
                 <pre>{JSON.stringify(wizardContext, null, 4)}</pre>
                 <WizardStep stepId="type" label="Cluster Type">
                   <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
-                    <PicklistField id="cloudProvider" label="Cloud Provider" options={cloudProviderOptions} />
-                    <Checkbox id="manualDeploy" label="Deploy cluster via install agent" />
                     <TextField id="name" label="name" />
-                    <PicklistField id="region" label="Region" options={regions} />
+                    <PicklistField id="cloudProvider" label="Cloud Provider" options={cloudProviderOptions} />
+                    <PicklistField id="region" label="Region" options={regionOptions} />
+                    <Checkbox id="manualDeploy" label="Deploy cluster via install agent" />
                   </ValidatedForm>
                 </WizardStep>
                 <WizardStep stepId="config" label="Configuration">
@@ -87,5 +93,5 @@ class AddClusterPage extends React.Component {
 }
 
 export default compose(
-  withDataLoader({ dataKey: 'cloudProviders', loaderFn: loadCloudProviders }),
+  withDataLoader({ dataKey: ['cloudProviders', 'regions'], loaderFn: [loadCloudProviders, loadRegions] }),
 )(AddClusterPage)
