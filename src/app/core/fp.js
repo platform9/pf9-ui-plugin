@@ -16,6 +16,22 @@ export const compose = (...fns) =>
 export const pipe = (...fns) => compose(...fns.reverse())
 export const pick = key => obj => obj[key]
 
+// Project the keys from the array of objects and rename them at the same time
+// Ex:
+// const values = [{ a: 123, b: 456 }, { c: 555 }]
+// const mappings = { first: 'a', second: 'b', third: 'c' }
+// projectAs(mappings, values) -> [{ first: 123, second: 456 }, { third: 555 }]
+export const projectAs = curry((mappings, arr) => arr.map(obj => Object.keys(mappings).reduce(
+  (accum, destKey) => {
+    const srcKey = mappings[destKey]
+    if (exists(obj[srcKey])) {
+      accum[destKey] = obj[srcKey]
+    }
+    return accum
+  },
+  {}
+)))
+
 // Transparently inject side-effects in a functional composition "chain".
 // Ex: const value = await somePromise.then(tap(x => console.log))
 // Ex: compose(fn1, fn2, fn3, tap(log), fn4)(value)

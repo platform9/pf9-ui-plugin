@@ -7,6 +7,8 @@ import ValidatedForm from 'core/common/validated_form/ValidatedForm'
 import Wizard from 'core/common/Wizard'
 import WizardStep from 'core/common/WizardStep'
 import { compose } from 'ramda'
+import { projectAs } from 'core/fp'
+import createCRUDActions from 'core/helpers/createCRUDActions'
 import { loadCloudProviders } from './actions'
 import { withDataLoader } from 'core/DataLoader'
 
@@ -14,21 +16,15 @@ const initialContext = {
   manualDeploy: false,
 }
 
-const loadRegions = async ({ context, setContext }) => {
-  const regions = await context.apiClient.keystone.getRegions()
-  setContext({ regions })
-  return regions
-}
-
 class AddClusterPage extends React.Component {
   handleSubmit = () => console.log('TODO: AddClusterPage#handleSubmit')
 
   render () {
     const { data } = this.props
-    const cloudProviderOptions = data.cloudProviders.map(cp => ({ value: cp.uuid, label: cp.name }))
-    const regionOptions = data.regions.map(region => ({ value: region.id, label: region.name }))
+    const cloudProviderOptions = projectAs({ value: 'uuid', label: 'name' }, data.cloudProviders)
+    const regionOptions = projectAs({ value: 'id', label: 'name' }, data.regions)
+    const flavorOptions = projectAs({ value: 'id', label: 'name' }, data.flavors)
     const images = []
-    const flavors = []
     const networks = []
     const subnets = []
     const sshKeys = []
@@ -50,8 +46,8 @@ class AddClusterPage extends React.Component {
                 <WizardStep stepId="config" label="Configuration">
                   <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                     <PicklistField id="image" label="Image" options={images} />
-                    <PicklistField id="masterFlavor" label="Master node instance flavor" options={flavors} />
-                    <PicklistField id="workerFlavor" label="Worker node instance flavor" options={flavors} />
+                    <PicklistField id="masterFlavor" label="Master node instance flavor" options={flavorOptions} />
+                    <PicklistField id="workerFlavor" label="Worker node instance flavor" options={flavorOptions} />
                     <TextField id="numMasters" label="Number of master nodes" type="number" />
                     <TextField id="numWorkers" label="Number of worker nodes" type="number" />
                     <Checkbox id="disableWorkloadsOnMaster" label="Disable workloads on master nodes" />
@@ -92,6 +88,18 @@ class AddClusterPage extends React.Component {
   }
 }
 
+const dataKeys = [
+  'cloudProviders',
+  'flavors',
+  'regions',
+]
+
+const loaders = [
+  loadCloudProviders,
+  createCRUDActions({ service: 'nova', entity: 'flavors' }).list,
+  createCRUDActions({ service: 'keystone', entity: 'regions' }).list,
+]
+
 export default compose(
-  withDataLoader({ dataKey: ['cloudProviders', 'regions'], loaderFn: [loadCloudProviders, loadRegions] }),
+  withDataLoader({ dataKey: dataKeys, loaderFn: loaders }),
 )(AddClusterPage)

@@ -7,6 +7,7 @@ import {
   pickMultiple,
   pipe,
   pipeWhenTruthy,
+  projectAs,
   pluck,
   pluckAsync,
 } from '../fp'
@@ -72,5 +73,13 @@ describe('functional programming utils', () => {
 
     expect(pipeWhenTruthy(first, second, third, fourth)('start')).toEqual(null)
     expect(pipeWhenTruthy(first, second)(true)).toEqual('second')
+  })
+
+  it('projectAs', () => {
+    const values = [{ a: 123, b: 456 }, { c: 555 }]
+    const mappings = { first: 'a', second: 'b', third: 'c' }
+    const result = projectAs(mappings, values)
+    expect(result[0]).toEqual({ first: 123, second: 456 })
+    expect(result[1]).toEqual({ third: 555 })
   })
 })
