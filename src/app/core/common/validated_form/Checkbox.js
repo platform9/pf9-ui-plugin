@@ -37,7 +37,7 @@ class Checkbox extends React.Component {
             <BaseCheckbox
               {...restProps}
               error={errorMessage}
-              checked={value || false}
+              checked={!!value}
               onChange={this.handleChange}
             />
           }
