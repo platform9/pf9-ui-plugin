@@ -46,9 +46,9 @@ class Nova {
 
   // Allow these methods to be accessed programatically as well.
   flavors = {
-    create: this.createFlavor,
-    list: this.getFlavors,
-    delete: this.deleteFlavor,
+    create: this.createFlavor.bind(this),
+    list: this.getFlavors.bind(this),
+    delete: this.deleteFlavor.bind(this),
   }
 
   async getInstances () {

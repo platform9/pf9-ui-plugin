@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import DisplayError from 'core/common/DisplayError'
 import Loader from 'core/common/Loader'
-import { all, isEmpty, partition, pick, props } from 'ramda'
+import { all, partition, pick, props } from 'ramda'
 import { ensureArray, exists, propExists } from 'core/fp'
 import { withAppContext } from 'core/AppContext'
 
@@ -36,22 +36,16 @@ class DataLoaderBase extends React.Component {
         if (err instanceof Error) { return err.message }
       }
       const loaderFns = ensureArray(loaderFn)
-      if (!isEmpty(loaderFns)) {
-        try {
-          const promises = loaderFns.map(fn => fn({ setContext, context }))
-          const [promiseFns, syncFns] = partition(propExists('then'), promises) // eslint-disable-line no-unused-vars
-          if (isEmpty(promiseFns)) {
-            // everything is sync so no need to wait
-            this.setState({ loading: false })
-          }
-          Promise.all(promises).then(
-            () => { this.setState({ loading: false }) },
-            err => { this.setState({ loading: false, error: parseErr(err) }) }
-          )
-        } catch (err) {
-          console.log(err)
-          this.setState({ loading: false, error: parseErr(err) })
-        }
+      try {
+        const promises = loaderFns.map(fn => fn({ setContext, context }))
+        const [promiseFns, syncFns] = partition(propExists('then'), promises) // eslint-disable-line no-unused-vars
+        Promise.all(promises).then(
+          () => { this.setState({ loading: false }) },
+          err => { this.setState({ loading: false, error: parseErr(err) }) }
+        )
+      } catch (err) {
+        console.log(err)
+        this.setState({ loading: false, error: parseErr(err) })
       }
     }
   }

@@ -147,7 +147,7 @@ class Keystone {
 
   // Allow programmatic access
   regions = {
-    list: this.getRegions,
+    list: this.getRegions.bind(this),
   }
 
   async getServiceCatalog () {
