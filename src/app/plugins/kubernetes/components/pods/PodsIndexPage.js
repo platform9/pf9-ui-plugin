@@ -1,9 +1,9 @@
 import React from 'react'
-import Tabs from 'core/components/Tabs'
-import Tab from 'core/components/Tab'
+import Tabs from 'core/common/Tabs'
+import Tab from 'core/common/Tab'
+import PodsListPage from './PodsListPage'
+import DeploymentsListPage from './DeploymentsListPage'
 
-const PodsListPage = () => <h1>TODO: Pods List Page</h1>
-const DeploymentsListPage = () => <h1>TODO: Deployments List Page</h1>
 const ServicesListPage = () => <h1>TODO: Services List Page</h1>
 
 const PodsIndexPage = () => (

@@ -68,7 +68,7 @@ const createModel = (options={}) => {
       const obj = list.find((x) => {
         return x.name === name
       })
-      return (!raw && loaderFn) ? loaderFn([obj])[0] : obj
+      return (!raw && loaderFn && obj) ? loaderFn([obj])[0] : obj
     }
   }
 }

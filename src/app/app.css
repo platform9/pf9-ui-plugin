@@ -32,3 +32,7 @@ body {
 #sidebar {
   grid-area: sd;
 }
+
+.CodeMirror {
+  border: 1px solid black;
+}

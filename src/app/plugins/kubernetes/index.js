@@ -3,6 +3,7 @@ import React from 'react'
 import AddCloudProviderPage from './components/infrastructure/AddCloudProviderPage'
 import AddClusterPage from './components/infrastructure/AddClusterPage'
 import AddNamespacePage from './components/namespaces/AddNamespacePage'
+import AddPodPage from './components/pods/AddPodPage'
 import ApiAccessPage from './components/apiAccess/ApiAccessPage'
 import AppsIndexPage from './components/apps/AppsIndexPage'
 import ClusterDetailsPage from './components/infrastructure/ClusterDetailsPage'
@@ -64,6 +65,11 @@ Kubernetes.registerPlugin = pluginManager => {
         name: 'Pods, Deployments, Services',
         link: { path: '/pods', exact: true },
         component: PodsIndexPage
+      },
+      {
+        name: 'Add Pod',
+        link: { path: '/pods/add', exact: true },
+        component: AddPodPage
       },
       {
         name: 'Storage Classes',

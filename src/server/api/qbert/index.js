@@ -61,6 +61,7 @@ const k8sapi = '/v2/:tenantId/clusters/:clusterId/k8sapi/api/v1'
 
 router.get(`${k8sapi}/namespaces`, tokenValidator, getNamespaces)
 
+router.get(`${k8sapi}/pods`, tokenValidator, getPods)
 router.get(`${k8sapi}/namespaces/:namespace/pods`, tokenValidator, getPods)
 router.post(`${k8sapi}/namespaces/:namespace/pods`, tokenValidator, postPod)
 router.delete(`${k8sapi}/namespaces/:namespace/pods/:podName`, tokenValidator, deletePod)

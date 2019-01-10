@@ -145,11 +145,23 @@ class Qbert {
   }
 
   async getClusterPods (clusterId) {
-    return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/pods`)
+    try {
+      const data = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/pods`)
+      return data.items.map(this.convertCluster(clusterId))
+    } catch (err) {
+      console.log(`Error getting cluster pods for clusterId: ${clusterId}`)
+      return []
+    }
   }
 
   async getClusterDeployments (clusterId) {
-    return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/extensions/v1beta1/deployments`)
+    try {
+      const data = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/extensions/v1beta1/deployments`)
+      return data.items.map(this.convertCluster(clusterId))
+    } catch (err) {
+      console.log(`Error getting cluster deployments for clusterId: ${clusterId}`)
+      return []
+    }
   }
 
   async deleteDeployment (clusterId, namespace, name) {
@@ -157,7 +169,13 @@ class Qbert {
   }
 
   async getClusterKubeServices (clusterId) {
-    return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/services`)
+    try {
+      const data = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/services`)
+      return data.items.map(this.convertCluster(clusterId))
+    } catch (err) {
+      console.log(`Error getting cluster services for clusterId: ${clusterId}`)
+      return []
+    }
   }
 
   async getClusterStorageClasses (clusterId) {
@@ -177,11 +195,11 @@ class Qbert {
   }
 
   async createPod (clusterId, namespace, params) {
-    return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/v1/namespaces/${namespace}/pods`, params)
+    return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/pods`, params)
   }
 
   async deletePod (clusterId, namespace, name) {
-    return this.client.basicDelete(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/v1/namespaces/${namespace}/pods/${name}`)
+    return this.client.basicDelete(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/pods/${name}`)
   }
 
   async createDeployment (clusterId, namespace, params) {
