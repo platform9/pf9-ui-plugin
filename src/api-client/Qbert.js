@@ -44,6 +44,15 @@ class Qbert {
     return this.client.basicDelete(`${await this.baseUrl()}/cloudProviders/${cpId}`)
   }
 
+  cloudProviders = {
+    create: this.createCloudProvider.bind(this),
+    list: this.getCloudProviders.bind(this),
+    details: this.getCloudProviderDetails.bind(this),
+    regionDetails: this.getCloudProviderDetails.bind(this),
+    update: this.updateCloudProvider.bind(this),
+    delete: this.deleteCloudProvider.bind(this),
+  }
+
   /* Cloud Providers Types */
   async getCloudProviderTypes () {
     return this.client.basicGet(`${await this.baseUrl()}/cloudProvider/types`)

@@ -1,11 +1,11 @@
 import context from '../../../context'
 import CloudProvider from '../../../models/qbert/CloudProvider'
-import { times } from 'ramda'
+import { times, uniq } from 'ramda'
 import faker from 'faker'
 
 const sshKeyMap = {}
 
-const randomAwsRegions = (numRegions) => {
+const randomAwsRegions = (numRegions = 5) => {
   const regions = times(() => {
     return {
       'RegionName': faker.random.locale(),
@@ -15,25 +15,25 @@ const randomAwsRegions = (numRegions) => {
   return {'Regions': regions}
 }
 
-const randomOpenstackRegions = (numRegions) => {
-  const regions = times(() => ({ 'RegionName': faker.random.locale() }), numRegions)
+const randomOpenstackRegions = (numRegions = 5) => {
+  const regions = uniq(times(() => ({ 'RegionName': faker.random.locale() }), numRegions))
   return {'Regions': regions}
 }
 
 const randomAwsRegionDetails = (regionId) => {
   return {
-    azs: times(() => ({ 'RegionName': regionId, 'State': 'available', 'ZoneName': faker.random.word() }), 5),
-    domains: times(() => ({ 'Name': faker.random.word(), 'Id': faker.random.word() }), 8),
-    flavors: times(faker.random.word, 15),
-    keyPairs: times(() => ({ 'KeyName': faker.random.word(), 'KeyFingerprint': faker.random.word() }), 5),
+    azs: uniq(times(() => ({ 'RegionName': regionId, 'State': 'available', 'ZoneName': faker.random.word() }), 5)),
+    domains: uniq(times(() => ({ 'Name': faker.random.word(), 'Id': faker.random.word() }), 8)),
+    flavors: uniq(times(faker.random.word, 15)),
+    keyPairs: uniq(times(() => ({ 'KeyName': faker.random.word(), 'KeyFingerprint': faker.random.word() }), 5)),
     operatingSystems: ['centos', 'ubuntu'],
-    vpcs: times(() => ({ 'CidrBlock': faker.internet.ip(), 'VpcName': faker.random.word() }), 5)
+    vpcs: uniq(times(() => ({ 'CidrBlock': faker.internet.ip(), 'VpcName': faker.random.word() }), 5))
   }
 }
 
 const randomOpenstackRegionDetails = (regionId) => {
   return {
-    azs: times(() => ({ zoneName: faker.random.word() }), 5),
+    azs: uniq(times(() => ({ zoneName: faker.random.word() }), 5)),
     flavors: times(() => ({ id: faker.random.uuid(), name: faker.random.word() }), 10),
     images: times(() => ({ id: faker.random.uuid(), name: faker.random.word(), size: faker.random.number }), 10),
     keyPairs: times(() => ({ name: faker.random.word(), fingerprint: faker.random.word(), public_key: faker.random.word() }), 5),

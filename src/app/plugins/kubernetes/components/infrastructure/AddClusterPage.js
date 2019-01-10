@@ -1,32 +1,71 @@
 import React from 'react'
-import { projectAs } from 'app/utils/fp'
-import FormWrapper from 'core/components/FormWrapper'
-import Checkbox from 'core/components/validatedForm/Checkbox'
-import PicklistField from 'core/components/validatedForm/PicklistField'
-import TextField from 'core/components/validatedForm/TextField'
-import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
-import Wizard from 'core/components/Wizard'
-import WizardStep from 'core/components/WizardStep'
-import { withDataLoader } from 'core/DataLoader'
+import Checkbox from 'core/common/validated_form/Checkbox'
+import FormWrapper from 'core/common/FormWrapper'
+import PicklistField from 'core/common/validated_form/PicklistField'
+import TextField from 'core/common/validated_form/TextField'
+import ValidatedForm from 'core/common/validated_form/ValidatedForm'
+import Wizard from 'core/common/Wizard'
+import WizardStep from 'core/common/WizardStep'
 import createCRUDActions from 'core/helpers/createCRUDActions'
-import { compose } from 'ramda'
+import { compose, prop, propEq } from 'ramda'
 import { loadCloudProviders } from './actions'
+import { projectAs } from 'core/fp'
+import { withAppContext } from 'core/AppContext'
+import { withDataLoader } from 'core/DataLoader'
 
 const initialContext = {
   manualDeploy: false,
 }
 
 class AddClusterPage extends React.Component {
+  state = {
+    azs: [],
+    domains: [],
+    flavors: [],
+    images: [],
+    keyPairs: [],
+    operatingSystems: [],
+    regions: [],
+    vpcs: [],
+    networks: [],
+    subnets: [],
+  }
+
+  // This method will be deleted at the end of this PR.  It auto-selects the cloudProvider and region
+  // so I don't need to waste time filling it out every time.
+  async componentDidMount () {
+    const cp = this.props.data.cloudProviders.find(x => x.name === 'mockOpenstackProvider')
+    await this.handleCpChange(cp.uuid)
+    const region = this.state.regions[0]
+    await this.handleRegionChange(region)
+  }
+
   handleSubmit = () => console.log('TODO: AddClusterPage#handleSubmit')
+
+  handleCpChange = async cpId => {
+    const cpDetails = await this.props.context.apiClient.qbert.getCloudProviderDetails(cpId)
+    const regions = cpDetails.Regions.map(prop('RegionName'))
+    this.setState({ cpId, regions })
+  }
+
+  handleRegionChange = async regionId => {
+    const regionDetails = await this.props.context.apiClient.qbert.getCloudProviderRegionDetails(this.state.cpId, regionId)
+    this.setState(regionDetails) // sets azs, domains, images, flavors, keyPairs, networks, operatingSystems, and vpcs
+  }
+
+  handleNetworkChange = networkId => {
+    const net = this.state.networks.find(propEq('id', networkId))
+    this.setState({ subnets: net.subnets })
+  }
 
   render () {
     const { data } = this.props
     const cloudProviderOptions = projectAs({ value: 'uuid', label: 'name' }, data.cloudProviders)
-    const regionOptions = projectAs({ value: 'id', label: 'name' }, data.regions)
-    const flavorOptions = projectAs({ value: 'id', label: 'name' }, data.flavors)
-    const images = []
-    const networks = []
-    const subnets = []
+    const regionOptions = this.state.regions
+    const imageOptions = projectAs({ value: 'id', label: 'name' }, this.state.images)
+    const flavorOptions = projectAs({ value: 'id', label: 'name' }, this.state.flavors)
+    const networkOptions = this.state.networks.map(x => ({ value: x.id, label: x.name || x.label }))
+    const subnetOptions = this.state.subnets.map(x => ({ value: x.id, label: `${x.name} ${x.cidr}` }))
     const sshKeys = []
     return (
       <FormWrapper title="Add Cluster">
@@ -34,18 +73,19 @@ class AddClusterPage extends React.Component {
           {({ wizardContext, setWizardContext, onNext }) => {
             return (
               <React.Fragment>
-                <pre>{JSON.stringify(wizardContext, null, 4)}</pre>
+                {false && <pre>{JSON.stringify(this.state, null, 4)}</pre>}
+                {false && <pre>{JSON.stringify(wizardContext, null, 4)}</pre>}
                 <WizardStep stepId="type" label="Cluster Type">
                   <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                     <TextField id="name" label="name" />
-                    <PicklistField id="cloudProvider" label="Cloud Provider" options={cloudProviderOptions} />
-                    <PicklistField id="region" label="Region" options={regionOptions} />
+                    <PicklistField id="cloudProvider" label="Cloud Provider" options={cloudProviderOptions} onChange={this.handleCpChange} />
+                    <PicklistField id="region" label="Region" options={regionOptions} onChange={this.handleRegionChange} />
                     <Checkbox id="manualDeploy" label="Deploy cluster via install agent" />
                   </ValidatedForm>
                 </WizardStep>
                 <WizardStep stepId="config" label="Configuration">
                   <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
-                    <PicklistField id="image" label="Image" options={images} />
+                    <PicklistField id="image" label="Image" options={imageOptions} />
                     <PicklistField id="masterFlavor" label="Master node instance flavor" options={flavorOptions} />
                     <PicklistField id="workerFlavor" label="Worker node instance flavor" options={flavorOptions} />
                     <TextField id="numMasters" label="Number of master nodes" type="number" />
@@ -55,8 +95,8 @@ class AddClusterPage extends React.Component {
                 </WizardStep>
                 <WizardStep stepId="network" label="Networking">
                   <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
-                    <PicklistField id="network" label="Network" options={networks} />
-                    <PicklistField id="subnet" label="Subnets" options={subnets} />
+                    <PicklistField id="network" label="Network" options={networkOptions} onChange={this.handleNetworkChange} />
+                    <PicklistField id="subnet" label="Subnets" options={subnetOptions} />
                     <p>Placeholder: Security groups</p>
                     <TextField id="apiFqdn" label="API FQDN" />
                     <TextField id="containersCidr" label="Containers CIDR" />
@@ -102,4 +142,5 @@ const loaders = [
 
 export default compose(
   withDataLoader({ dataKey: dataKeys, loaderFn: loaders }),
+  withAppContext,
 )(AddClusterPage)

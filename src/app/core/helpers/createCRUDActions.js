@@ -7,6 +7,7 @@ const createCRUDActions = (options={}) => {
   } = options
 
   return {
+    // Wrap standard CRUD operations to include updating the AppContext
     create: async ({ data, context, setContext }) => {
       const existing = await context.apiClient[service][entity].list()
       const created = await context.apiClient[service][entity].create(data)
