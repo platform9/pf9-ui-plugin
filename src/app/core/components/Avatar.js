@@ -1,10 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { withStyles } from '@material-ui/core/styles'
-import { withRouter } from 'react-router'
 import { Button, Menu, MenuItem, Typography } from '@material-ui/core'
 import { default as BaseAvatar } from '@material-ui/core/Avatar'
-import { getStorage } from 'core/util/pf9-storage'
+import { withStyles } from '@material-ui/core/styles'
+import { getStorage } from 'core/utils/pf9Storage'
+import { withRouter } from 'react-router'
 
 const styles = theme => ({
   avatar: {

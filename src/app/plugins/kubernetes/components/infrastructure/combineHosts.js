@@ -1,5 +1,5 @@
+import { pathOrNull, pipe } from 'app/utils/fp'
 import moment from 'moment'
-import { pipe, pathOrNull } from 'core/../../../../utils/fp'
 
 export const annotateResmgrFields = host => {
   const { resmgr } = host

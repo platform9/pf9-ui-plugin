@@ -1,5 +1,5 @@
 import context from '../../../context'
-import Deployment from '../../../models/qbert/deployment'
+import Deployment from '../../../models/qbert/Deployment'
 
 export const getDeployments = (req, res) => {
   const { namespace, clusterId } = req.params

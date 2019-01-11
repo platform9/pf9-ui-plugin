@@ -1,15 +1,19 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import AddIcon from '@material-ui/icons/Add'
 import DeleteIcon from '@material-ui/icons/Delete'
 import EditIcon from '@material-ui/icons/Edit'
-import ListTableColumnButton from 'core/components/listTable/ListTableColumnSelector'
-import ListTableFiltersButton from 'core/components/listTable/ListTableFiltersButton'
+import ListTableColumnButton
+  from 'core/components/listTable/ListTableColumnSelector'
+import ListTableFiltersButton
+  from 'core/components/listTable/ListTableFiltersButton'
 import ListTableRowActions from './ListTableRowActions'
-import PropTypes from 'prop-types'
 import SearchBar from 'core/components/SearchBar'
 import classNames from 'classnames'
 import { compose } from 'ramda'
-import { Button, IconButton, Toolbar, Tooltip, Typography } from '@material-ui/core'
+import {
+  Button, IconButton, Toolbar, Tooltip, Typography
+} from '@material-ui/core'
 import { lighten } from '@material-ui/core/styles/colorManipulator'
 import { withStyles } from '@material-ui/core/styles'
 

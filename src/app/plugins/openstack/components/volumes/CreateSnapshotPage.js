@@ -1,11 +1,11 @@
 import React from 'react'
-import CreateSnapshotForm from './CreateSnapshotForm'
+import { withRouter } from 'react-router'
+import { compose } from 'app/utils/fp'
+import { withAppContext } from 'core/AppContext'
 import FormWrapper from 'core/components/FormWrapper'
 import requiresAuthentication from '../../util/requiresAuthentication'
-import { compose } from 'core/../../../../utils/fp'
 import { loadVolumeSnapshots } from './actions'
-import { withAppContext } from 'core/AppContext'
-import { withRouter } from 'react-router'
+import CreateSnapshotForm from './CreateSnapshotForm'
 
 class CreateSnapshotPage extends React.Component {
   handleAdd = async snapshotData => {

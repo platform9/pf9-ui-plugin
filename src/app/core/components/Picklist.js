@@ -5,7 +5,7 @@ import InputLabel from '@material-ui/core/InputLabel'
 import MenuItem from '@material-ui/core/MenuItem'
 import Select from '@material-ui/core/Select'
 import { withStyles } from '@material-ui/core/styles'
-import { compose } from 'core/../../utils/fp'
+import { compose } from 'app/utils/fp'
 
 /**
  * Picklist is a bare-bones widget-only implmentation.

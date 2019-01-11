@@ -1,15 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { withStyles } from '@material-ui/core/styles'
 import {
-  Checkbox as BaseCheckbox,
-  FormControl,
-  FormControlLabel,
-  FormHelperText
+  Checkbox as BaseCheckbox, FormControl, FormControlLabel, FormHelperText
 } from '@material-ui/core'
-import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
-import { compose } from 'core/../../../utils/fp'
+import { withStyles } from '@material-ui/core/styles'
 import { withInfoTooltip } from 'app/core/components/InfoTooltip'
+import { compose } from 'app/utils/fp'
+import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
 
 const styles = theme => ({
   formControl: {

@@ -1,5 +1,5 @@
 import React from 'react'
-import { compose } from 'core/../../../utils/fp'
+import { compose } from 'app/utils/fp'
 import { withAppContext } from 'core/AppContext'
 
 // Wraps a component class to make it require authentication.

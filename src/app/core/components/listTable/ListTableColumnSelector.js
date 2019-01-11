@@ -1,9 +1,9 @@
+import React from 'react'
+import PropTypes from 'prop-types'
 import { IconButton, Popover, Tooltip } from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles'
 import ViewColumnIcon from '@material-ui/icons/ViewColumn'
-import React from 'react'
 import grey from '@material-ui/core/colors/grey'
-import PropTypes from 'prop-types'
 import { compose } from 'ramda'
 import ListTableColumnPopover
   from 'core/components/listTable/ListTableColumnPopover'

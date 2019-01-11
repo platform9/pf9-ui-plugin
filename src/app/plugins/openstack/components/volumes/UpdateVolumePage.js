@@ -1,10 +1,10 @@
 import React from 'react'
+import { compose } from 'app/utils/fp'
 import FormWrapper from 'core/components/FormWrapper'
-import requiresAuthentication from '../../util/requiresAuthentication'
 import DataUpdater from 'core/DataUpdater'
-import UpdateVolumeForm from './UpdateVolumeForm'
-import { compose } from 'core/../../../../utils/fp'
+import requiresAuthentication from '../../util/requiresAuthentication'
 import { loadVolumes, updateVolume } from './actions'
+import UpdateVolumeForm from './UpdateVolumeForm'
 
 const UpdateVolumePage = props => (
   <DataUpdater

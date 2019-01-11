@@ -4,9 +4,9 @@ import {
   Checkbox, FormControl, FormControlLabel, FormGroup, Typography
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles'
+import { ensureFunction } from 'app/utils/fp'
 import moize from 'moize'
 import { compose } from 'ramda'
-import { ensureFunction } from 'core/../../../utils/fp'
 
 const styles = {
   root: {

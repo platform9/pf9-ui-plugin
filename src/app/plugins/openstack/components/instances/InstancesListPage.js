@@ -1,9 +1,8 @@
-import React from 'react'
-
-import { compose } from 'core/../../../../utils/fp'
-import InstancesListContainer from './InstancesListContainer'
-import requiresAuthentication from '../../util/requiresAuthentication'
+import { compose } from 'app/utils/fp'
 import DataLoader from 'core/DataLoader'
+import React from 'react'
+import requiresAuthentication from '../../util/requiresAuthentication'
+import InstancesListContainer from './InstancesListContainer'
 
 const loadInstances = async ({ setContext, context }) => {
   const instances = await context.apiClient.nova.getInstances()

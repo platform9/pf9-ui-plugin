@@ -1,11 +1,11 @@
 import React from 'react'
-import { addStoriesFromModule, jsonDetailLogger } from '../helpers'
-import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
+import Checkbox from 'core/components/validatedForm/Checkbox'
 import TextField from 'core/components/validatedForm/TextField'
+import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import {
   customValidator, matchFieldValidator, requiredValidator
-} from 'core/util/FieldValidator'
-import Checkbox from 'core/components/validatedForm/Checkbox'
+} from 'core/utils/fieldValidators'
+import { addStoriesFromModule, jsonDetailLogger } from '../helpers'
 
 const addStories = addStoriesFromModule(module)
 

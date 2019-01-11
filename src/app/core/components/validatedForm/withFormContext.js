@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { pickMultiple } from 'core/../../../utils/fp'
-import { requiredValidator } from 'core/util/FieldValidator'
+import { pickMultiple } from 'app/utils/fp'
 import { ValidatedFormConsumer } from 'core/components/validatedForm/ValidatedForm'
+import { requiredValidator } from 'core/utils/fieldValidators'
 import { partial, pathOr } from 'ramda'
 
 export const ValidatedFormInputPropTypes = {

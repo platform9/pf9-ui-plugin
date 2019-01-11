@@ -1,10 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import AnimateValues from 'core/components/AnimateValues'
-import { withStyles } from '@material-ui/styles'
-import { withTheme } from '@material-ui/core/styles'
-import { describeArc } from 'core/util/svgHelpers'
 import { Typography } from '@material-ui/core'
+import { withTheme } from '@material-ui/core/styles'
+import { withStyles } from '@material-ui/styles'
+import AnimateValues from 'core/components/AnimateValues'
+import { describeArc } from 'core/utils/svgHelpers'
 
 const strokeWidth = 8
 

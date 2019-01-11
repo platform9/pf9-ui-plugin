@@ -1,8 +1,8 @@
 import React from 'react'
-import requiresAuthentication from '../util/requiresAuthentication'
-import ProgressCardList from 'core/components/ProgressCardList'
+import { compose } from 'app/utils/fp'
 import DashboardGraphs from 'core/components/dashboardGraphs/DashboardGraphs'
-import { compose } from 'core/../../../utils/fp'
+import ProgressCardList from 'core/components/ProgressCardList'
+import requiresAuthentication from '../util/requiresAuthentication'
 
 class Dashboard extends React.Component {
   render () {

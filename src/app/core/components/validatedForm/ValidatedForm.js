@@ -1,10 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { setStateLens } from 'core/../../../utils/fp'
-import { withRouter } from 'react-router-dom'
-import { pathEq, toPairs } from 'ramda'
-import { parseValidator } from 'core/util/FieldValidator'
 import { withStyles } from '@material-ui/core/styles'
+import { setStateLens } from 'app/utils/fp'
+import { parseValidator } from 'core/utils/fieldValidators'
+import { pathEq, toPairs } from 'ramda'
+import { withRouter } from 'react-router-dom'
 
 const ValidatedFormContext = React.createContext({})
 

@@ -1,12 +1,9 @@
 import React from 'react'
-import { withStyles } from '@material-ui/core/styles'
-import { addComma } from '../util/formatters'
 import {
-  Card,
-  CardContent,
-  CircularProgress,
-  Typography
+  Card, CardContent, CircularProgress, Typography
 } from '@material-ui/core'
+import { withStyles } from '@material-ui/core/styles'
+import { addComma } from '../utils/formatters'
 
 const styles = theme => ({
   card: {

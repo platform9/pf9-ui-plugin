@@ -1,7 +1,9 @@
-import { asyncMap, asyncFlatMap, tap, pathOrNull, pipeWhenTruthy } from 'core/../../../../utils/fp'
-import { combineHost } from './combineHosts'
-import { castFuzzyBool } from 'utils/misc'
+import {
+  asyncFlatMap, asyncMap, pathOrNull, pipeWhenTruthy, tap
+} from 'app/utils/fp'
 import { find, pathOr, prop, propEq } from 'ramda'
+import { castFuzzyBool } from 'utils/misc'
+import { combineHost } from './combineHosts'
 
 export const loadClusters = async ({ context, setContext, reload }) => {
   if (!reload && context.clusters) { return context.clusters }

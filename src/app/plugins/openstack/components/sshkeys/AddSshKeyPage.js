@@ -1,11 +1,11 @@
 import React from 'react'
-import FormWrapper from 'core/components/FormWrapper'
-import AddSshKeyForm from './AddSshKeyForm'
 import { withRouter } from 'react-router-dom'
-import { compose } from 'core/../../../../utils/fp'
-import requiresAuthentication from '../../util/requiresAuthentication'
+import { compose } from 'app/utils/fp'
 import { withAppContext } from 'core/AppContext'
+import FormWrapper from 'core/components/FormWrapper'
+import requiresAuthentication from '../../util/requiresAuthentication'
 import { loadSshKeys } from './actions'
+import AddSshKeyForm from './AddSshKeyForm'
 
 class AddSshKeyPage extends React.Component {
   handleAdd = async sshKey => {

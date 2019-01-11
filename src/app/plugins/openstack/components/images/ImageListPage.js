@@ -1,9 +1,9 @@
 import React from 'react'
-import { compose } from 'core/../../../../utils/fp'
-import ImageListContainer from './ImageListContainer'
-import requiresAuthentication from '../../util/requiresAuthentication'
+import { compose } from 'app/utils/fp'
 import DataLoader from 'core/DataLoader'
+import requiresAuthentication from '../../util/requiresAuthentication'
 import { loadImages } from './actions'
+import ImageListContainer from './ImageListContainer'
 
 const ImageListPage = () =>
   <DataLoader dataKey="images" loaderFn={loadImages}>

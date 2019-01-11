@@ -1,9 +1,9 @@
-import React from 'react'
-import VolumesListContainer from './VolumesListContainer'
-import requiresAuthentication from '../../util/requiresAuthentication'
+import { compose } from 'app/utils/fp'
 import DataLoader from 'core/DataLoader'
-import { compose } from 'core/../../../../utils/fp'
+import React from 'react'
+import requiresAuthentication from '../../util/requiresAuthentication'
 import { loadVolumes } from './actions'
+import VolumesListContainer from './VolumesListContainer'
 
 const VolumesListPage = () =>
   <DataLoader dataKey="volumes" loaderFn={loadVolumes}>

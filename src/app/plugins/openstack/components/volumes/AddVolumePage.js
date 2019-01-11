@@ -1,11 +1,11 @@
 import React from 'react'
-import FormWrapper from 'core/components/FormWrapper'
-import AddVolumeForm from './AddVolumeForm'
 import { withRouter } from 'react-router-dom'
-import { asyncMap, compose, keyValueArrToObj, range } from 'core/../../../../utils/fp'
-import requiresAuthentication from '../../util/requiresAuthentication'
+import { asyncMap, compose, keyValueArrToObj, range } from 'app/utils/fp'
 import { withAppContext } from 'core/AppContext'
+import FormWrapper from 'core/components/FormWrapper'
+import requiresAuthentication from '../../util/requiresAuthentication'
 import { loadVolumes } from './actions'
+import AddVolumeForm from './AddVolumeForm'
 
 const constructBatch = (numVolumes, prefix, data) =>
   range(1, numVolumes)

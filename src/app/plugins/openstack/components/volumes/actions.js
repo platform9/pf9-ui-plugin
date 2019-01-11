@@ -1,4 +1,4 @@
-import { objToKeyValueArr, keyValueArrToObj } from 'core/../../../../utils/fp'
+import { keyValueArrToObj, objToKeyValueArr } from 'app/utils/fp'
 
 export const loadVolumes = async ({ setContext, context, reload }) => {
   if (!reload && context.volumes) { return context.volumes }

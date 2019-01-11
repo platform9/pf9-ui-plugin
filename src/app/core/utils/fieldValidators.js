@@ -2,7 +2,7 @@ import moize from 'moize'
 import { isNil } from 'ramda'
 import { isPlainObject } from '../../utils/misc'
 
-export default class FieldValidator {
+class FieldValidator {
   /**
    * @param validationFn Function
    * @param errorMessage String
@@ -15,7 +15,7 @@ export default class FieldValidator {
   withMessage = moize(message => new FieldValidator(this.validate, message))
 }
 
-// Create a custom inline validator (alternative to 'new FieldValidator')
+// Create a custom inline validator
 export const customValidator = (validator, errorMessage) =>
   new FieldValidator(validator, errorMessage)
 

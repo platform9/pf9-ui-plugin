@@ -1,9 +1,9 @@
 import React from 'react'
-import ListTable from 'core/components/listTable/ListTable'
-import { compose } from 'ramda'
-import { withScopedPreferences } from 'core/PreferencesProvider'
 import { withRouter } from 'react-router-dom'
+import ListTable from 'core/components/listTable/ListTable'
+import { withScopedPreferences } from 'core/providers/PreferencesProvider'
 import requiresAuthentication from 'openstack/util/requiresAuthentication'
+import { compose } from 'ramda'
 
 const createListTableComponent = ({
   title,

@@ -1,8 +1,8 @@
-import React from 'react'
+import { asyncMap, compose } from 'app/utils/fp'
 import PropTypes from 'prop-types'
+import React from 'react'
 import { withRouter } from 'react-router-dom'
 import ConfirmationDialog from './ConfirmationDialog'
-import { asyncMap, compose } from 'core/../../utils/fp'
 
 class CRUDListContainer extends React.Component {
   componentDidMount () {

@@ -1,20 +1,20 @@
 import React from 'react'
-import JsonView from 'react-json-view'
-import PicklistField from 'core/components/validatedForm/PicklistField'
-import TextField from 'core/components/validatedForm/TextField'
-import SubmitButton from 'core/components/SubmitButton'
-import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
-import ListTable from 'core/components/listTable/ListTable'
 import {
   Checkbox, FormControlLabel, TextField as BaseTextField, Typography
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles'
-import { path, pick } from 'ramda'
-import { compose } from 'core/../../../utils/fp'
+import { compose } from 'app/utils/fp'
 import { withAppContext } from 'core/AppContext'
+import ListTable from 'core/components/listTable/ListTable'
+import SubmitButton from 'core/components/SubmitButton'
+import PicklistField from 'core/components/validatedForm/PicklistField'
+import TextField from 'core/components/validatedForm/TextField'
+import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import createFormComponent from 'core/helpers/createFormComponent'
+import { withScopedPreferences } from 'core/providers/PreferencesProvider'
+import { path, pick } from 'ramda'
+import JsonView from 'react-json-view'
 import ServicePicker from './ServicePicker'
-import { withScopedPreferences } from 'core/PreferencesProvider'
 
 const methodsWithBody = ['POST', 'PUT', 'PATCH']
 

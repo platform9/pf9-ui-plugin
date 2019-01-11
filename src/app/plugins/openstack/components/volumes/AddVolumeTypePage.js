@@ -1,11 +1,11 @@
 import React from 'react'
-import requiresAuthentication from '../../util/requiresAuthentication'
-import FormWrapper from 'core/components/FormWrapper'
-import AddVolumeTypeForm from './AddVolumeTypeForm'
-import { withRouter } from 'react-router-dom'
-import { compose, keyValueArrToObj } from 'core/../../../../utils/fp'
+import { compose, keyValueArrToObj } from 'app/utils/fp'
 import { withAppContext } from 'core/AppContext'
+import FormWrapper from 'core/components/FormWrapper'
+import { withRouter } from 'react-router-dom'
+import requiresAuthentication from '../../util/requiresAuthentication'
 import { loadVolumeTypes } from './actions'
+import AddVolumeTypeForm from './AddVolumeTypeForm'
 
 class AddVolumeTypePage extends React.Component {
   handleAdd = async data => {

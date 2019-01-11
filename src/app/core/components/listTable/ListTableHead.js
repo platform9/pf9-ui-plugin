@@ -1,8 +1,10 @@
 import React from 'react'
-import moize from 'moize'
 import PropTypes from 'prop-types'
+import moize from 'moize'
 import { assoc } from 'ramda'
-import { Checkbox, TableCell, TableHead, TableRow, TableSortLabel, Tooltip } from '@material-ui/core'
+import {
+  Checkbox, TableCell, TableHead, TableRow, TableSortLabel, Tooltip
+} from '@material-ui/core'
 
 class ListTableHead extends React.Component {
   createSortHandler = moize(id => event => {

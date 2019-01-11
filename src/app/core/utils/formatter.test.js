@@ -1,8 +1,5 @@
-import {
-  formattedValue,
-  formattedDate
-} from './formatters'
 import moment from 'moment'
+import { formattedDate, formattedValue } from './formatters'
 
 describe('Value Formatters Test', () => {
   it('Value without output unit', () => {

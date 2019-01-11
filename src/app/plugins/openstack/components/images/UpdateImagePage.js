@@ -1,10 +1,10 @@
 import React from 'react'
+import { compose } from 'app/utils/fp'
 import FormWrapper from 'core/components/FormWrapper'
-import requiresAuthentication from '../../util/requiresAuthentication'
 import DataUpdater from 'core/DataUpdater'
-import UpdateImageForm from './UpdateImageForm'
-import { compose } from 'core/../../../../utils/fp'
+import requiresAuthentication from '../../util/requiresAuthentication'
 import { loadImages, updateImage } from './actions'
+import UpdateImageForm from './UpdateImageForm'
 
 const UpdateImagePage = props => (
   <DataUpdater

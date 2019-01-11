@@ -1,18 +1,14 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {
-  Button,
-  ExpansionPanel,
-  ExpansionPanelSummary,
-  ExpansionPanelDetails,
+  Button, ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary,
   Typography,
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
-
-import { compose } from 'core/../../../utils/fp'
-import ContextViewer from 'developer/components/ContextViewer'
+import { compose } from 'app/utils/fp'
 import ApiHelper from 'developer/components/ApiHelper'
+import ContextViewer from 'developer/components/ContextViewer'
 
 const styles = theme => ({
   root: {

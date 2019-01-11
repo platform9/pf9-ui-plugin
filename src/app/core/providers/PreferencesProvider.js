@@ -1,8 +1,8 @@
 import React from 'react'
-import { withAppContext } from './AppContext'
-import { curry, pathOr, propOr } from 'ramda'
-import { getStorage, setStorage } from './util/pf9-storage'
 import moize from 'moize'
+import { curry, pathOr, propOr } from 'ramda'
+import { withAppContext } from '../AppContext'
+import { getStorage, setStorage } from '../utils/pf9Storage'
 
 const userPreferencesKey = username => `user-preferences-${username}`
 const setUserPrefs = (username, prefs) => setStorage(userPreferencesKey(username), prefs)

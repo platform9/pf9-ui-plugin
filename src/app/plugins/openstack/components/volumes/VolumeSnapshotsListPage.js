@@ -1,9 +1,9 @@
 import React from 'react'
-import VolumeSnapshotsListContainer from './VolumeSnapshotsListContainer'
-import requiresAuthentication from '../../util/requiresAuthentication'
+import { compose } from 'app/utils/fp'
 import DataLoader from 'core/DataLoader'
-import { compose } from 'core/../../../../utils/fp'
+import requiresAuthentication from '../../util/requiresAuthentication'
 import { loadVolumeSnapshots } from './actions'
+import VolumeSnapshotsListContainer from './VolumeSnapshotsListContainer'
 
 const VolumeSnapshotsListPage = () =>
   <DataLoader dataKey="volumeSnapshots" loaderFn={loadVolumeSnapshots}>

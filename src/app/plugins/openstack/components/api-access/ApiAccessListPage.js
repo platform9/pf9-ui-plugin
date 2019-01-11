@@ -1,9 +1,9 @@
-import React from 'react'
-import { compose } from 'core/../../../../utils/fp'
-import requiresAuthentication from 'openstack/util/requiresAuthentication'
+import { compose } from 'app/utils/fp'
 import DataLoader from 'core/DataLoader'
-import { loadServiceCatalog } from './actions'
 import createListTableComponent from 'core/helpers/createListTableComponent'
+import requiresAuthentication from 'openstack/util/requiresAuthentication'
+import React from 'react'
+import { loadServiceCatalog } from './actions'
 
 const columns = [
   { id: 'id', label: 'ID' },

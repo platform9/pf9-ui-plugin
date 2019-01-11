@@ -1,11 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import CRUDListContainer from 'core/components/CRUDListContainer'
 import PhotoCameraIcon from '@material-ui/icons/PhotoCamera'
-import { compose } from 'core/../../../../utils/fp'
+import { compose } from 'app/utils/fp'
 import { withAppContext } from 'core/AppContext'
-import { withRouter } from 'react-router'
+import CRUDListContainer from 'core/components/CRUDListContainer'
 import createListTableComponent from 'core/helpers/createListTableComponent'
+import { withRouter } from 'react-router'
 
 const columns = [
   { id: 'name', label: 'Name' },

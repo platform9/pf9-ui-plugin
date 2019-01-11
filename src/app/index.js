@@ -4,7 +4,7 @@ import { AppContainer } from 'react-hot-loader'
 import App from './App'
 import plugins from './plugins'
 
-let pluginManager = require('./core/util/pluginManager').default
+let pluginManager = require('./core/utils/pluginManager').default
 plugins.forEach(plugin => plugin.registerPlugin(pluginManager))
 
 const render = Component => {

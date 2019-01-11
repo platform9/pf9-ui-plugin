@@ -1,4 +1,4 @@
-import { identity } from '../../../utils/fp'
+import { identity } from 'app/utils/fp'
 
 export function mockResponse (params = {}) {
   const { headers = {}, ...rest } = params

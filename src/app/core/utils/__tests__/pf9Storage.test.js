@@ -1,10 +1,6 @@
 import {
-  clear,
-  clearAll,
-  getStorage,
-  setStorage,
-  LOCAL_STORAGE_NAMESPACE,
-} from '../pf9-storage'
+  clear, clearAll, getStorage, LOCAL_STORAGE_NAMESPACE, setStorage,
+} from '../pf9Storage'
 
 let originalLocalStorage = global.localStorage
 

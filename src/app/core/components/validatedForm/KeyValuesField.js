@@ -1,9 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { withInfoTooltip } from 'app/core/components/InfoTooltip'
+import { compose } from 'app/utils/fp'
 import KeyValues from 'core/components/KeyValues'
 import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
-import { compose } from 'core/../../../utils/fp'
-import { withInfoTooltip } from 'app/core/components/InfoTooltip'
 
 class KeyValuesField extends React.Component {
   render () {

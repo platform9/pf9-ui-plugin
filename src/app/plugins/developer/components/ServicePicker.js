@@ -1,10 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import Picklist from 'core/components/Picklist'
-import { prop } from 'ramda'
-import { arrToObjByKey, compose } from 'core/../../../utils/fp'
+import { arrToObjByKey, compose } from 'app/utils/fp'
 import { withAppContext } from 'core/AppContext'
+import Picklist from 'core/components/Picklist'
 import { loadServiceCatalog } from 'openstack/components/api-access/actions'
+import { prop } from 'ramda'
 
 class ServicePicker extends React.Component {
   state = {

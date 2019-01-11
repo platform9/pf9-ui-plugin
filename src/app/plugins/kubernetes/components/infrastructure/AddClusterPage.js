@@ -1,16 +1,16 @@
 import React from 'react'
-import Checkbox from 'core/components/validatedForm/Checkbox'
+import { projectAs } from 'app/utils/fp'
 import FormWrapper from 'core/components/FormWrapper'
+import Checkbox from 'core/components/validatedForm/Checkbox'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import TextField from 'core/components/validatedForm/TextField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import Wizard from 'core/components/Wizard'
 import WizardStep from 'core/components/WizardStep'
-import { compose } from 'ramda'
-import { projectAs } from 'core/../../../../utils/fp'
-import createCRUDActions from 'core/helpers/createCRUDActions'
-import { loadCloudProviders } from './actions'
 import { withDataLoader } from 'core/DataLoader'
+import createCRUDActions from 'core/helpers/createCRUDActions'
+import { compose } from 'ramda'
+import { loadCloudProviders } from './actions'
 
 const initialContext = {
   manualDeploy: false,

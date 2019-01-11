@@ -1,7 +1,4 @@
 import React, { PureComponent } from 'react'
-import { matchPath, withRouter } from 'react-router'
-import { assoc, flatten, pluck, prop, propEq, propOr } from 'ramda'
-import moize from 'moize'
 import PropTypes from 'prop-types'
 import {
   Collapse, Divider, Drawer, ExpansionPanel, ExpansionPanelDetails,
@@ -9,14 +6,17 @@ import {
   MenuItem, MenuList, Typography
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles'
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
-import SearchIcon from '@material-ui/icons/Search'
-import ExpandMore from '@material-ui/icons/ExpandMore'
-import ExpandLess from '@material-ui/icons/ExpandLess'
-import { withHotKeys } from 'core/components/HotKeysProvider'
-import { except } from 'core/../../utils/fp'
 import { fade } from '@material-ui/core/styles/colorManipulator'
+import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
+import ExpandLess from '@material-ui/icons/ExpandLess'
+import ExpandMore from '@material-ui/icons/ExpandMore'
+import SearchIcon from '@material-ui/icons/Search'
+import { except } from 'app/utils/fp'
 import classnames from 'classnames'
+import { withHotKeys } from 'core/providers/HotKeysProvider'
+import moize from 'moize'
+import { assoc, flatten, pluck, prop, propEq, propOr } from 'ramda'
+import { matchPath, withRouter } from 'react-router'
 
 export const drawerWidth = 240
 

@@ -1,9 +1,9 @@
-import React from 'react'
-import VolumeTypesListContainer from './VolumeTypesListContainer'
-import requiresAuthentication from '../../util/requiresAuthentication'
+import { compose } from 'app/utils/fp'
 import DataLoader from 'core/DataLoader'
-import { compose } from 'core/../../../../utils/fp'
+import React from 'react'
+import requiresAuthentication from '../../util/requiresAuthentication'
 import { loadVolumeTypes } from './actions'
+import VolumeTypesListContainer from './VolumeTypesListContainer'
 
 const VolumesListPage = () =>
   <DataLoader dataKey="volumeTypes" loaderFn={loadVolumeTypes}>

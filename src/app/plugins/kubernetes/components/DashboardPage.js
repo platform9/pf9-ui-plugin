@@ -1,5 +1,5 @@
 import React from 'react'
-import { compose } from 'core/../../../utils/fp'
+import { compose } from 'app/utils/fp'
 import requiresAuthentication from '../../openstack/util/requiresAuthentication'
 
 class Dashboard extends React.Component {

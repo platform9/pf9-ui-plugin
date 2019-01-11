@@ -1,9 +1,8 @@
 import React from 'react'
-
-import { compose } from 'core/../../../../utils/fp'
-import HostsListContainer from './HostsListContainer'
-import requiresAuthentication from '../../util/requiresAuthentication'
+import { compose } from 'app/utils/fp'
 import DataLoader from 'core/DataLoader'
+import requiresAuthentication from '../../util/requiresAuthentication'
+import HostsListContainer from './HostsListContainer'
 
 const loadHosts = async ({ setContext, context }) => {
   // const hosts = await context.apiClient.resmgr.getHosts()

@@ -1,13 +1,13 @@
 import React from 'react'
-import DataLoader from 'core/DataLoader'
-import CRUDListContainer from 'core/components/CRUDListContainer'
-import requiresAuthentication from 'openstack/util/requiresAuthentication'
-import ListTable from 'core/components/listTable/ListTable'
-import createCRUDActions from 'core/helpers/createCRUDActions'
-import { compose } from 'core/../../utils/fp'
+import { compose } from 'app/utils/fp'
 import { withAppContext } from 'core/AppContext'
+import CRUDListContainer from 'core/components/CRUDListContainer'
+import ListTable from 'core/components/listTable/ListTable'
+import DataLoader from 'core/DataLoader'
+import createCRUDActions from 'core/helpers/createCRUDActions'
+import { withScopedPreferences } from 'core/providers/PreferencesProvider'
+import requiresAuthentication from 'openstack/util/requiresAuthentication'
 import { withRouter } from 'react-router-dom'
-import { withScopedPreferences } from 'core/PreferencesProvider'
 
 /**
  * This helper removes a lot of boilerplate from standard CRUD operations.

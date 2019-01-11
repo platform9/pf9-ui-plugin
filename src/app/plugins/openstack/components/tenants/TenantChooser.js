@@ -1,11 +1,11 @@
 import React from 'react'
-import Selector from 'core/components/Selector'
-import { compose } from 'core/../../../../utils/fp'
-import { loadUserTenants } from './actions'
-import { assoc } from 'ramda'
-import moize from 'moize'
-import { withScopedPreferences } from 'core/PreferencesProvider'
+import { compose } from 'app/utils/fp'
 import { withAppContext } from 'core/AppContext'
+import Selector from 'core/components/Selector'
+import { withScopedPreferences } from 'core/providers/PreferencesProvider'
+import moize from 'moize'
+import { assoc } from 'ramda'
+import { loadUserTenants } from './actions'
 
 class TenantChooser extends React.Component {
   state = {

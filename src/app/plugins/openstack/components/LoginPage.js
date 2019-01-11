@@ -1,19 +1,13 @@
 import React, { Fragment } from 'react'
 import PropTypes from 'prop-types'
-import { compose } from 'core/../../../utils/fp'
-import { withRouter } from 'react-router'
-import { withStyles } from '@material-ui/core/styles'
-import { withAppContext } from 'core/AppContext'
 import {
-  Button,
-  Checkbox,
-  FormControlLabel,
-  Grid,
-  Paper,
-  TextField,
-  Typography,
+  Button, Checkbox, FormControlLabel, Grid, Paper, TextField, Typography,
 } from '@material-ui/core'
+import { withStyles } from '@material-ui/core/styles'
+import { compose } from 'app/utils/fp'
+import { withAppContext } from 'core/AppContext'
 import Alert from 'core/components/Alert'
+import { withRouter } from 'react-router'
 
 const styles = theme => ({
   root: {

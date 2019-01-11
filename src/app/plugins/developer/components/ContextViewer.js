@@ -1,9 +1,9 @@
 import React from 'react'
-import { compose } from 'core/../../../utils/fp'
+import { compose } from 'app/utils/fp'
 import { withAppContext } from 'core/AppContext'
+import SearchBar from 'core/components/SearchBar'
 import { omit } from 'ramda'
 import JsonView from 'react-json-view'
-import SearchBar from 'core/components/SearchBar'
 
 const keysToIgnore = [
   'apiClient',

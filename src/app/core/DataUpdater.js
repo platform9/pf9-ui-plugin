@@ -1,8 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import DataLoader from 'core/DataLoader'
-import { compose } from 'core/../utils/fp'
 import { withAppContext } from 'core/AppContext'
+import DataLoader from 'core/DataLoader'
+import { compose } from 'ramda'
 import { withRouter } from 'react-router'
 
 /* This is a convenience HOC to make updating the in-memory cache easier.

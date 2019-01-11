@@ -1,9 +1,9 @@
 /* eslint-disable camelcase */
 import React from 'react'
 import PropTypes from 'prop-types'
-import CRUDListContainer from 'core/components/CRUDListContainer'
-import { compose, keyValueArrToObj } from 'core/../../../../utils/fp'
+import { compose, keyValueArrToObj } from 'app/utils/fp'
 import { withAppContext } from 'core/AppContext'
+import CRUDListContainer from 'core/components/CRUDListContainer'
 import createListTableComponent from 'core/helpers/createListTableComponent'
 
 // Promote `volume_backend_name` from `extra_specs` into its own field

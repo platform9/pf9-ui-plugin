@@ -1,8 +1,8 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
-import { ensureFunction } from 'core/../../utils/fp'
-import { withStyles } from '@material-ui/styles'
 import { withTheme } from '@material-ui/core/styles'
+import { withStyles } from '@material-ui/styles'
+import { ensureFunction } from 'app/utils/fp'
 
 const styles = theme => ({
   root: {

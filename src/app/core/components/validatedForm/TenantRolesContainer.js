@@ -1,15 +1,11 @@
 import React from 'react'
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow
+  Table, TableBody, TableCell, TableHead, TableRow
 } from '@material-ui/core'
+import { withInfoTooltip } from 'app/core/components/InfoTooltip'
+import { compose } from 'app/utils/fp'
 import TenantRoleSelector from 'core/components/TenantRoleSelector'
 import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
-import { compose } from 'core/../../../utils/fp'
-import { withInfoTooltip } from 'app/core/components/InfoTooltip'
 
 class TenantRolesContainer extends React.Component {
   static defaultProps = {
