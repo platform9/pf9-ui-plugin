@@ -59,7 +59,6 @@ export default class HotKeysProvider extends Component {
 
   handleKeyDown = e => {
     const hotkeyHandlers = this.state.hotKeyHandlers[e.key]
-    console.log(this.state)
     if (hotkeyHandlers && !isEmpty(hotkeyHandlers) && !pressingSpecialKey(e)) {
       hotkeyHandlers.forEach(({ fn, options }) => {
         if ((!options.ctrlKey || options.ctrlKey === e.ctrlKey) &&
