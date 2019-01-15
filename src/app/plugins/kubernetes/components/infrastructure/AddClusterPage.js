@@ -1,6 +1,7 @@
 import React from 'react'
 import Checkbox from 'core/components/validatedForm/Checkbox'
 import FormWrapper from 'core/components/FormWrapper'
+import KeyValuesField from 'core/components/validatedForm/KeyValuesField'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import TextField from 'core/components/validatedForm/TextField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
@@ -16,8 +17,10 @@ import { withDataLoader } from 'core/DataLoader'
 const initialContext = {
   manualDeploy: false,
   disableWorkloadsOnMaster: true,
-  numMasters: 1,
+  masterNodes: 1,
   useHttpProxy: false,
+  clusterTags: [],
+  securityGroups: [],
 }
 
 class AddClusterPage extends React.Component {
@@ -68,6 +71,45 @@ class AddClusterPage extends React.Component {
     this.setState({ subnets: net.subnets })
   }
 
+  renderReviewTable = wizard => {
+    const { cloudProviders } = this.props.data
+
+    // React will always call this render method even before the user has populated any fields.
+    // If we ensure all the data exist before proceeding we can remove lots of ugly conditionals
+    // later on.
+    if (!cloudProviders || !wizard.cloudProvider) { return null }
+
+    const cp = cloudProviders.find(propEq('uuid', wizard.cloudProvider))
+    const { cpType } = this.state
+
+    // TODO: need to find a way to clean up the conditionals from the old code base
+    //
+    // conditionals:
+    //
+    // not manualDeploy
+    // openstack
+    // regionType
+    // useHttpProxy
+    // useAdvancedApiConfig
+    // is manualDeploy || aws
+    // create new VPC
+    // enableSpotWorkers
+    // enableMetalLB
+    // configureNetworkBackend
+    let review = {
+      'Cluster Deployment Type': wizard.manualDeploy ? 'manual' : 'auto',
+    }
+    if (!wizard.manualDeploy) {
+      review['Cloud Provider'] = cp.name
+      if (cpType === 'openstack') {
+      }
+      if (cpType === 'aws') {
+      }
+    }
+
+    return <pre>{JSON.stringify(review, null, 4)}</pre>
+  }
+
   render () {
     const { data } = this.props
     console.log(data.cloudProviders)
@@ -103,7 +145,7 @@ class AddClusterPage extends React.Component {
                     <PicklistField id="image" label="Image" options={imageOptions} />
                     <PicklistField id="masterFlavor" label="Master node instance flavor" options={flavorOptions} />
                     <PicklistField id="workerFlavor" label="Worker node instance flavor" options={flavorOptions} />
-                    <TextField id="numMasters" label="Number of master nodes" type="number" />
+                    <TextField id="masterNodes" label="Number of master nodes" type="number" />
                     <TextField id="numWorkers" label="Number of worker nodes" type="number" />
                     <Checkbox id="disableWorkloadsOnMaster" label="Disable workloads on master nodes" />
                   </ValidatedForm>
@@ -115,23 +157,22 @@ class AddClusterPage extends React.Component {
                     <p>Placeholder: Security groups</p>
                     <TextField id="apiFqdn" label="API FQDN" />
                     <TextField id="containersCidr" label="Containers CIDR" />
-                    <TextField id="Services CIDR" label="Services CIDR" />
+                    <TextField id="servicesCidr" label="Services CIDR" />
                     <Checkbox id="useHttpProxy" label="Use HTTP proxy" />
                   </ValidatedForm>
                 </WizardStep>
                 <WizardStep stepId="advancedConfig" label="Advanced Configuration">
                   <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
-                    <PicklistField id="sshKey" label="SSH key" options={sshKeys} />
+                    <PicklistField id="keyPair" label="SSH key" options={sshKeys} />
                     <Checkbox id="privileged" label="Privileged" />
-                    <Checkbox id="advancedApi" label="Advanced API configuration" />
-                    <Checkbox id="enableAppCatalog" label="Enable application catalog" />
-                    <p>Placeholder: Tags</p>
+                    <Checkbox id="useAdvancedApiConfig" label="Advanced API configuration" />
+                    <Checkbox id="appCatalogEnabled" label="Enable application catalog" />
+                    <KeyValuesField id="clusterTags" label="Tags" />
                   </ValidatedForm>
                 </WizardStep>
                 <WizardStep stepId="review" label="Review">
                   <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
-                    <p>Placeholder: Review</p>
-                    <pre>{JSON.stringify(wizardContext, null, 4)}</pre>
+                    {this.renderReviewTable(wizardContext)}
                   </ValidatedForm>
                 </WizardStep>
               </React.Fragment>
