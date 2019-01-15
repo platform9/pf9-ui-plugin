@@ -49,7 +49,6 @@ class ListPage extends React.Component {
   render () {
     const { activeCluster, clusterOptions } = this.state
     const { deployments } = this.props.context
-    if (!deployments) { return <Loader /> }
     const filteredDeployments = (activeCluster === '__all__' && deployments) ||
       deployments.filter(deployment => deployment.clusterId === activeCluster)
     const withClusterNames = filteredDeployments.map(ns => ({

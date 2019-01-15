@@ -11,6 +11,7 @@ import { compose } from 'core/fp'
 import { withInfoTooltip } from 'app/core/common/InfoTooltip'
 import {Controlled as BaseCodeMirror} from 'react-codemirror2'
 import 'codemirror/lib/codemirror.css'
+import './codemirror-custom.css'
 
 require('codemirror/mode/yaml/yaml')
 
@@ -19,6 +20,18 @@ const styles = theme => ({
     margin: theme.spacing.unit
   }
 })
+
+const defaultOptions = {
+  lineNumbers: true,
+  mode: 'yaml',
+  theme: 'default',
+  extraKeys: {
+    Tab: (cm) => {
+      const spaces = Array(cm.getOption('indentUnit') + 1).join(' ')
+      cm.replaceSelection(spaces)
+    }
+  }
+}
 
 class CodeMirror extends React.Component {
   handleChange = (editor, data, value) => {
@@ -30,7 +43,8 @@ class CodeMirror extends React.Component {
   }
 
   render () {
-    const { id, label, value, classes, hasError, onMouseEnter, errorMessage, onChange, ...restProps } = this.props
+    const { id, label, value, classes, hasError, onMouseEnter, errorMessage, onChange, options, ...restProps } = this.props
+    const combinedOptions = { ...defaultOptions, ...options }
     return (
       <FormControl id={id} className={classes.formControl} error={hasError}>
         <FormLabel>{label}</FormLabel>
@@ -38,6 +52,7 @@ class CodeMirror extends React.Component {
           {...restProps}
           onBeforeChange={this.handleChange}
           value={value}
+          options={combinedOptions}
         />
         <FormHelperText>{errorMessage}</FormHelperText>
       </FormControl>

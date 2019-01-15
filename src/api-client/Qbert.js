@@ -149,8 +149,8 @@ class Qbert {
       const data = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/pods`)
       return data.items.map(this.convertCluster(clusterId))
     } catch (err) {
-      console.log(`Error getting cluster pods for clusterId: ${clusterId}`)
-      return []
+      console.error(`Error getting cluster pods for clusterId: ${clusterId}`)
+      return err
     }
   }
 
@@ -159,8 +159,8 @@ class Qbert {
       const data = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/extensions/v1beta1/deployments`)
       return data.items.map(this.convertCluster(clusterId))
     } catch (err) {
-      console.log(`Error getting cluster deployments for clusterId: ${clusterId}`)
-      return []
+      console.error(`Error getting cluster deployments for clusterId: ${clusterId}`)
+      return err
     }
   }
 
@@ -173,8 +173,8 @@ class Qbert {
       const data = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/services`)
       return data.items.map(this.convertCluster(clusterId))
     } catch (err) {
-      console.log(`Error getting cluster services for clusterId: ${clusterId}`)
-      return []
+      console.error(`Error getting cluster services for clusterId: ${clusterId}`)
+      return err
     }
   }
 
