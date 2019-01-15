@@ -64,6 +64,7 @@ CodeMirror.propTypes = {
   info: PropTypes.string,
   label: PropTypes.string,
   onChange: PropTypes.func,
+  options: PropTypes.object,
   ...ValidatedFormInputPropTypes,
 }
 

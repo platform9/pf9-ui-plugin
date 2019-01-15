@@ -7,7 +7,7 @@ import { projectAs } from 'utils/fp'
 import { loadInfrastructure } from '../infrastructure/actions'
 import { loadDeployments, createDeployment } from './actions'
 import DataLoader from 'core/DataLoader'
-import CodeMirror from 'core/common/validated_form/CodeMirror'
+import CodeMirror from 'core/components/validatedForm/CodeMirror'
 
 export class AddDeploymentForm extends React.Component {
   state = {
