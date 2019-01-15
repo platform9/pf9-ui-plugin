@@ -15,6 +15,9 @@ import { withDataLoader } from 'core/DataLoader'
 
 const initialContext = {
   manualDeploy: false,
+  disableWorkloadsOnMaster: true,
+  numMasters: 1,
+  useHttpProxy: false,
 }
 
 class AddClusterPage extends React.Component {
@@ -38,19 +41,26 @@ class AddClusterPage extends React.Component {
     await this.handleCpChange(cp.uuid)
     const region = this.state.regions[0]
     await this.handleRegionChange(region)
+    initialContext.cloudProvider = cp.uuid
+    initialContext.region = region
+    initialContext.name = 'New Cluster 123'
+    initialContext.numWorkers = 3
+    this.setState({ done: true })
   }
 
   handleSubmit = () => console.log('TODO: AddClusterPage#handleSubmit')
 
   handleCpChange = async cpId => {
     const cpDetails = await this.props.context.apiClient.qbert.getCloudProviderDetails(cpId)
+    const cp = this.props.data.cloudProviders.find(x => x.uuid === cpId)
     const regions = cpDetails.Regions.map(prop('RegionName'))
-    this.setState({ cpId, regions })
+    this.setState({ cpId, regions, cpType: cp.type })
   }
 
   handleRegionChange = async regionId => {
     const regionDetails = await this.props.context.apiClient.qbert.getCloudProviderRegionDetails(this.state.cpId, regionId)
     this.setState(regionDetails) // sets azs, domains, images, flavors, keyPairs, networks, operatingSystems, and vpcs
+    console.log(regionDetails)
   }
 
   handleNetworkChange = networkId => {
@@ -60,13 +70,18 @@ class AddClusterPage extends React.Component {
 
   render () {
     const { data } = this.props
+    console.log(data.cloudProviders)
+    console.log(this.state.cpType)
     const cloudProviderOptions = projectAs({ value: 'uuid', label: 'name' }, data.cloudProviders)
     const regionOptions = this.state.regions
     const imageOptions = projectAs({ value: 'id', label: 'name' }, this.state.images)
     const flavorOptions = projectAs({ value: 'id', label: 'name' }, this.state.flavors)
     const networkOptions = this.state.networks.map(x => ({ value: x.id, label: x.name || x.label }))
     const subnetOptions = this.state.subnets.map(x => ({ value: x.id, label: `${x.name} ${x.cidr}` }))
-    const sshKeys = []
+
+    // AWS and OpenStack cloud providers call this field differently
+    const sshKeys = this.state.keyPairs.map(x => x.name || x.KeyName)
+    if (!this.state.done) { return 'debug loading...' } // TODO: remove me before PR is done
     return (
       <FormWrapper title="Add Cluster">
         <Wizard onComplete={this.handleSubmit} context={initialContext}>
@@ -74,7 +89,7 @@ class AddClusterPage extends React.Component {
             return (
               <React.Fragment>
                 {false && <pre>{JSON.stringify(this.state, null, 4)}</pre>}
-                {false && <pre>{JSON.stringify(wizardContext, null, 4)}</pre>}
+                {true && <pre>{JSON.stringify(wizardContext, null, 4)}</pre>}
                 <WizardStep stepId="type" label="Cluster Type">
                   <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                     <TextField id="name" label="name" />
