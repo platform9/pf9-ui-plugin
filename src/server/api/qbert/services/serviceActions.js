@@ -20,7 +20,7 @@ export const postService = (req, res) => {
   const { namespace, clusterId } = req.params
   const service = { ...req.body }
 
-  if (service.kind !== 'service') {
+  if (service.kind !== 'Service') {
     return res.status(400).send({code: 400, message: 'Must be of kind "Service"'})
   }
   if (Service.findByName({ name: service.metadata.name, context, config: { clusterId, namespace } })) {

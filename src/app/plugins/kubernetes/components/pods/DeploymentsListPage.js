@@ -1,7 +1,7 @@
 import React from 'react'
-import Picklist from 'core/common/Picklist'
+import Picklist from 'core/components/Picklist'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import Loader from 'core/common/Loader'
+import Loader from 'core/components/Loader'
 import { withAppContext } from 'core/AppContext'
 import { loadInfrastructure } from '../infrastructure/actions'
 import { loadDeployments } from './actions'
@@ -49,6 +49,7 @@ class ListPage extends React.Component {
   render () {
     const { activeCluster, clusterOptions } = this.state
     const { deployments } = this.props.context
+    if (!deployments) { return <Loader /> }
     const filteredDeployments = (activeCluster === '__all__' && deployments) ||
       deployments.filter(deployment => deployment.clusterId === activeCluster)
     const withClusterNames = filteredDeployments.map(ns => ({
@@ -74,6 +75,7 @@ class ListPage extends React.Component {
 const DeploymentsListPage = withAppContext(ListPage)
 
 export const options = {
+  baseCrudUrl: '/ui/kubernetes/deployments',
   baseUrl: '/ui/kubernetes/pods#deployments',
   columns: [
     { id: 'name', label: 'Name' },

@@ -5,11 +5,11 @@ import SubmitButton from 'core/components/SubmitButton'
 import createAddComponents from 'core/helpers/createAddComponents'
 import { projectAs } from 'utils/fp'
 import { loadInfrastructure } from '../infrastructure/actions'
-import { loadPods, createPod } from './actions'
+import { loadDeployments, createDeployment } from './actions'
 import DataLoader from 'core/DataLoader'
 import CodeMirror from 'core/common/validated_form/CodeMirror'
 
-export class AddPodForm extends React.Component {
+export class AddDeploymentForm extends React.Component {
   state = {
     clusterOptions: [],
     namespaceOptions: [],
@@ -45,11 +45,11 @@ export class AddPodForm extends React.Component {
               options={namespaceOptions}
             />
             <CodeMirror
-              id="podYaml"
-              label="Pod YAML"
+              id="deploymentYaml"
+              label="Deployment YAML"
               options={codeMirrorOptions}
             />
-            <SubmitButton>Create Pod</SubmitButton>
+            <SubmitButton>Create Deployment</SubmitButton>
           </ValidatedForm>
         }
       </DataLoader>
@@ -58,12 +58,12 @@ export class AddPodForm extends React.Component {
 }
 
 export const options = {
-  FormComponent: AddPodForm,
-  createFn: createPod,
-  loaderFn: loadPods,
-  listUrl: '/ui/kubernetes/pods',
-  name: 'AddPod',
-  title: 'Create Pod',
+  FormComponent: AddDeploymentForm,
+  createFn: createDeployment,
+  loaderFn: loadDeployments,
+  listUrl: '/ui/kubernetes/pods#deployments',
+  name: 'AddDeployment',
+  title: 'Create Deployment'
 }
 
 const { AddPage } = createAddComponents(options)

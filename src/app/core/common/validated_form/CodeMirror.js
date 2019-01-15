@@ -6,12 +6,11 @@ import {
   FormHelperText,
   FormLabel,
 } from '@material-ui/core'
-import withFormContext, { ValidatedFormInputPropTypes } from 'core/common/validated_form/withFormContext'
-import { compose } from 'core/fp'
-import { withInfoTooltip } from 'app/core/common/InfoTooltip'
+import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
+import { compose } from 'app/utils/fp'
+import { withInfoTooltip } from 'app/core/components/InfoTooltip'
 import {Controlled as BaseCodeMirror} from 'react-codemirror2'
-import 'codemirror/lib/codemirror.css'
-import './codemirror-custom.css'
+import './codemirror.css'
 
 require('codemirror/mode/yaml/yaml')
 

@@ -37,6 +37,7 @@ const createCRUDComponents = options => {
 
   const {
     actions,
+    baseCrudUrl,
     baseUrl,
     columns,
     dataKey,
@@ -94,11 +95,14 @@ const createCRUDComponents = options => {
         moreProps.rowActions = rowActions
       }
 
+      const addUrl = baseCrudUrl ? `${baseCrudUrl}/add` : `${baseUrl}/add`
+      const editUrl = baseCrudUrl ? `${baseCrudUrl}/edit` : `${baseUrl}/edit`
+
       return (
         <CRUDListContainer
           items={this.props.data}
-          addUrl={`${baseUrl}/add`}
-          editUrl={`${baseUrl}/edit`}
+          addUrl={addUrl}
+          editUrl={editUrl}
           onRemove={this.handleRemove}
           uniqueIdentifier={uniqueIdentifier}
         >

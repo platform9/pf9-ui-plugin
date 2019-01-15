@@ -1,11 +1,13 @@
 import yaml from 'js-yaml'
+import createCRUDActions from 'core/helpers/createCRUDActions'
 
-export const loadPods = async ({ clusterId, context, setContext, reload }) => {
-  if (!reload && context.pods) { return context.pods }
-  const existing = await context.apiClient.qbert.getClusterPods(clusterId)
-  setContext({ pods: existing })
-  return existing
-}
+const podCRUDActions = createCRUDActions({ service: 'qbert', entity: 'pods' })
+const deploymentCRUDActions = createCRUDActions({ service: 'qbert', entity: 'deployments' })
+const serviceCRUDActions = createCRUDActions({ service: 'qbert', entity: 'services', dataKey: 'kubeServices' })
+
+export const loadPods = podCRUDActions.list
+export const loadDeployments = deploymentCRUDActions.list
+export const loadServices = serviceCRUDActions.list
 
 export const createPod = async ({ data, context, setContext }) => {
   const { clusterId, namespace, podYaml } = data
@@ -33,39 +35,43 @@ export const deletePod = async ({ id, context, setContext }) => {
   setContext({ pods: newList })
 }
 
-export const loadDeployments = async ({ clusterId, context, setContext, reload }) => {
-  if (!reload && context.deployments) { return context.deployments }
-  const existing = await context.apiClient.qbert.getClusterDeployments(clusterId)
-  setContext({ deployments: existing })
-  return existing
-}
-
 export const createDeployment = async ({ data, context, setContext }) => {
-  const { clusterId, name } = data
-  const body = { metadata: { name } }
-  const created = await context.apiClient.qbert.createDeployment(clusterId, body)
-  setContext({ deployments: [ ...context.deployments, created ] })
+  const { clusterId, namespace, deploymentYaml } = data
+  const body = yaml.safeLoad(deploymentYaml)
+  const existing = await loadDeployments({ clusterId, context, setContext })
+  const created = await context.apiClient.qbert.createDeployment(clusterId, namespace, body)
+  const converted = {
+    ...created,
+    clusterId,
+    name: created.metadata.name,
+    created: created.metadata.creationTimestamp,
+    id: created.metadata.uid
+  }
+  // Also need to refresh list of pods
+  const pods = await loadPods({ clusterId, context, setContext, reload: true })
+  setContext({ deployments: [ ...existing, converted ], pods })
   return created
 }
 
-export const loadServices = async ({ clusterId, context, setContext, reload }) => {
-  if (!reload && context.services) { return context.services }
-  const existing = await context.apiClient.qbert.getClusterKubeServices(clusterId)
-  setContext({ services: existing })
-  return existing
-}
-
 export const createService = async ({ data, context, setContext }) => {
-  const { clusterId, name } = data
-  const body = { metadata: { name } }
-  const created = await context.apiClient.qbert.createService(clusterId, body)
-  setContext({ services: [ ...context.services, created ] })
+  const { clusterId, namespace, serviceYaml } = data
+  const body = yaml.safeLoad(serviceYaml)
+  const existing = await loadServices({ clusterId, context, setContext })
+  const created = await context.apiClient.qbert.createService(clusterId, namespace, body)
+  const converted = {
+    ...created,
+    clusterId,
+    name: created.metadata.name,
+    created: created.metadata.creationTimestamp,
+    id: created.metadata.uid
+  }
+  setContext({ kubeServices: [ ...existing, converted ] })
   return created
 }
 
 export const deleteService = async ({ id, context, setContext }) => {
-  const { clusterId, namespace, name } = await context.services.find(x => x.id === id)
+  const { clusterId, namespace, name } = await context.kubeServices.find(x => x.id === id)
   await context.apiClient.qbert.deleteService(clusterId, namespace, name)
-  const newList = context.services.filter(x => x.id !== id)
-  setContext({ services: newList })
+  const newList = context.kubeServices.filter(x => x.id !== id)
+  setContext({ kubeServices: newList })
 }

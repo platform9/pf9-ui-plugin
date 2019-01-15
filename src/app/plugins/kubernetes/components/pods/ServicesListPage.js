@@ -1,7 +1,7 @@
 import React from 'react'
-import Picklist from 'core/common/Picklist'
+import Picklist from 'core/components/Picklist'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import Loader from 'core/common/Loader'
+import Loader from 'core/components/Loader'
 import { withAppContext } from 'core/AppContext'
 import { loadInfrastructure } from '../infrastructure/actions'
 import { loadServices, deleteService } from './actions'
@@ -11,7 +11,7 @@ let ListContainer = null
 class ListPage extends React.Component {
   state = {
     activeCluster: '__all__',
-    services: null,
+    kubeServices: null,
     clusterOptions: [
       { label: 'all', value: '__all__' },
     ],
@@ -48,10 +48,10 @@ class ListPage extends React.Component {
 
   render () {
     const { activeCluster, clusterOptions } = this.state
-    const { services } = this.props.context
-    if (!services) { return <Loader /> }
-    const filteredServices = (activeCluster === '__all__' && services) ||
-      services.filter(service => service.clusterId === activeCluster)
+    const { kubeServices } = this.props.context
+    if (!kubeServices) { return <Loader /> }
+    const filteredServices = (activeCluster === '__all__' && kubeServices) ||
+      kubeServices.filter(service => service.clusterId === activeCluster)
     const withClusterNames = filteredServices.map(ns => ({
       ...ns,
       clusterName: this.findClusterName(ns.clusterId)
@@ -75,13 +75,14 @@ class ListPage extends React.Component {
 const ServicesListPage = withAppContext(ListPage)
 
 export const options = {
+  baseCrudUrl: '/ui/kubernetes/services',
   baseUrl: '/ui/kubernetes/pods#services',
   columns: [
     { id: 'name', label: 'Name' },
     { id: 'clusterName', label: 'Cluster' },
     { id: 'created', label: 'Created' },
   ],
-  dataKey: 'services',
+  dataKey: 'kubeServices',
   deleteFn: deleteService,
   name: 'Services',
   title: 'Services',
