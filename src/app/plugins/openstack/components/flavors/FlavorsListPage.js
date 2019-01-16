@@ -1,7 +1,7 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 
 export const options = {
-  baseUrl: '/ui/openstack/flavors',
+  addUrl: '/ui/openstack/flavors/add',
   columns: [
     { id: 'name', label: 'Name' },
     { id: 'vcpus', label: 'VCPUs' },
@@ -10,6 +10,7 @@ export const options = {
     { id: 'tags', label: 'tags' }
   ],
   dataKey: 'flavors',
+  editUrl: '/ui/openstack/flavors/edit',
   actions: { service: 'nova', entity: 'flavors' },
   name: 'Flavors',
   title: 'Flavors',

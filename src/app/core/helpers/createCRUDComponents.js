@@ -14,7 +14,7 @@ import { withRouter } from 'react-router-dom'
  *
  * We separate them out into the following components:
  *   - ListPage:
- *       Responsible for fetching the data.
+ *       Responsible for fetching the data.  A render prop that receives ({ ListContainer })
  *   - ListContainer:
  *       Responsible for handling CRUD operations (add, delete, update).
  *   - List:
@@ -37,10 +37,10 @@ const createCRUDComponents = options => {
 
   const {
     actions,
-    baseCrudUrl,
-    baseUrl,
+    addUrl,
     columns,
     dataKey,
+    editUrl,
     debug,
     deleteFn,
     loaderFn,
@@ -95,9 +95,6 @@ const createCRUDComponents = options => {
         moreProps.rowActions = rowActions
       }
 
-      const addUrl = baseCrudUrl ? `${baseCrudUrl}/add` : `${baseUrl}/add`
-      const editUrl = baseCrudUrl ? `${baseCrudUrl}/edit` : `${baseUrl}/edit`
-
       return (
         <CRUDListContainer
           items={this.props.data}
@@ -130,7 +127,7 @@ const createCRUDComponents = options => {
       }
     </DataLoader>
   )
-  const ListPage = requiresAuthentication(options.ListPage || StandardListPage)
+  const ListPage = requiresAuthentication(options.ListPage ? options.ListPage({ ListContainer }) : StandardListPage)
   ListPage.displayName = `${name}ListPage`
 
   return {

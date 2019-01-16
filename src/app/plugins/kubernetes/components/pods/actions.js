@@ -48,7 +48,7 @@ export const createDeployment = async ({ data, context, setContext }) => {
     id: created.metadata.uid
   }
   // Also need to refresh list of pods
-  const pods = await loadPods({ clusterId, context, setContext, reload: true })
+  const pods = await loadPods({ params: { clusterId }, context, setContext, reload: true })
   setContext({ deployments: [ ...existing, converted ], pods })
   return created
 }

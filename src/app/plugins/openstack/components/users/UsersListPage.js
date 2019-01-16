@@ -2,7 +2,7 @@ import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { deleteUser, loadUsers } from './actions'
 
 export const options = {
-  baseUrl: '/ui/openstack/users',
+  addUrl: '/ui/openstack/users/add',
   columns: [
     { id: 'name', label: 'Username' },
     { id: 'displayname', label: 'Display name' },
@@ -11,6 +11,7 @@ export const options = {
   ],
   dataKey: 'users',
   deleteFn: deleteUser,
+  editUrl: '/ui/openstack/users/edit',
   loaderFn: loadUsers,
   name: 'Users',
   title: 'Users',

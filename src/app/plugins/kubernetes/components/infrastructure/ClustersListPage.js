@@ -61,7 +61,7 @@ const upgradeCluster = (selected, context) => {
 }
 
 export const options = {
-  baseUrl: '/ui/kubernetes/infrastructure/clusters',
+  addUrl: '/ui/kubernetes/infrastructure/clusters/add',
   columns: [
     { id: 'name', label: 'Cluster name', render: renderClusterDetailLink },
     { id: 'status', label: 'Status' },
@@ -85,6 +85,7 @@ export const options = {
     { id: 'tags', label: 'Metadata', render: data => JSON.stringify(data) }
   ],
   dataKey: 'clusters',
+  editUrl: '/ui/kubernetes/infrastructure/clusters/edit',
   loaderFn: loadInfrastructure,
   deleteFn: deleteCluster,
   name: 'Clusters',
