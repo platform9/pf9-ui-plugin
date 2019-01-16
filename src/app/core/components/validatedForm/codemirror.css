@@ -1,3 +1,9 @@
+/*
+Taken from node_modules/codemirror/lib/codemirror.css -- we want to exclude
+the node_modules directory in webpack, so we took it out and put it in
+the same directory as our CodeMirror component
+*/
+
 /* BASICS */
 
 .CodeMirror {
@@ -6,6 +12,7 @@
   height: 300px;
   color: black;
   direction: ltr;
+  /* Custom-added black border around text area */
   border: 1px solid black;
 }
 

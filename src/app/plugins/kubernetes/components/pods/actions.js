@@ -12,7 +12,7 @@ export const loadServices = serviceCRUDActions.list
 export const createPod = async ({ data, context, setContext }) => {
   const { clusterId, namespace, podYaml } = data
   const body = yaml.safeLoad(podYaml)
-  const existing = await loadPods({ clusterId, context, setContext })
+  const existing = await loadPods({ params: { clusterId }, context, setContext })
   const created = await context.apiClient.qbert.createPod(clusterId, namespace, body)
   // This conversion happens normally at the api client level
   // Need to think of better way to handle this conversion globally for
@@ -38,7 +38,7 @@ export const deletePod = async ({ id, context, setContext }) => {
 export const createDeployment = async ({ data, context, setContext }) => {
   const { clusterId, namespace, deploymentYaml } = data
   const body = yaml.safeLoad(deploymentYaml)
-  const existing = await loadDeployments({ clusterId, context, setContext })
+  const existing = await loadDeployments({ params: { clusterId }, context, setContext })
   const created = await context.apiClient.qbert.createDeployment(clusterId, namespace, body)
   const converted = {
     ...created,
@@ -56,7 +56,7 @@ export const createDeployment = async ({ data, context, setContext }) => {
 export const createService = async ({ data, context, setContext }) => {
   const { clusterId, namespace, serviceYaml } = data
   const body = yaml.safeLoad(serviceYaml)
-  const existing = await loadServices({ clusterId, context, setContext })
+  const existing = await loadServices({ params: { clusterId }, context, setContext })
   const created = await context.apiClient.qbert.createService(clusterId, namespace, body)
   const converted = {
     ...created,

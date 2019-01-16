@@ -6,8 +6,9 @@ import createAddComponents from 'core/helpers/createAddComponents'
 import { projectAs } from 'utils/fp'
 import { loadInfrastructure } from '../infrastructure/actions'
 import { loadPods, createPod } from './actions'
-import DataLoader from 'core/DataLoader'
+import { withDataLoader } from 'core/DataLoader'
 import CodeMirror from 'core/components/validatedForm/CodeMirror'
+import { compose } from 'ramda'
 
 export class AddPodForm extends React.Component {
   state = {
@@ -32,27 +33,23 @@ export class AddPodForm extends React.Component {
     const clusterOptions = context.clusters ? projectAs({ value: 'uuid', label: 'name' }, context.clusters) : []
 
     return (
-      <DataLoader dataKey="clusters" loaderFn={loadInfrastructure}>
-        {({ data }) =>
-          <ValidatedForm onSubmit={onComplete}>
-            <PicklistField id="clusterId"
-              label="Cluster"
-              onChange={this.handleClusterChange}
-              options={clusterOptions}
-            />
-            <PicklistField id="namespace"
-              label="Namespace"
-              options={namespaceOptions}
-            />
-            <CodeMirror
-              id="podYaml"
-              label="Pod YAML"
-              options={codeMirrorOptions}
-            />
-            <SubmitButton>Create Pod</SubmitButton>
-          </ValidatedForm>
-        }
-      </DataLoader>
+      <ValidatedForm onSubmit={onComplete}>
+        <PicklistField id="clusterId"
+          label="Cluster"
+          onChange={this.handleClusterChange}
+          options={clusterOptions}
+        />
+        <PicklistField id="namespace"
+          label="Namespace"
+          options={namespaceOptions}
+        />
+        <CodeMirror
+          id="podYaml"
+          label="Pod YAML"
+          options={codeMirrorOptions}
+        />
+        <SubmitButton>Create Pod</SubmitButton>
+      </ValidatedForm>
     )
   }
 }
@@ -68,4 +65,6 @@ export const options = {
 
 const { AddPage } = createAddComponents(options)
 
-export default AddPage
+export default compose(
+  withDataLoader({ dataKey: 'clusters', loaderFn: loadInfrastructure }),
+)(AddPage)

@@ -24,7 +24,7 @@ class ListPage extends React.Component {
     // Make sure to use a new reference to props.context since it has now changed
     const clusters = this.props.context.clusters.filter(x => x.hasMasterNode)
     // Need to query for all clusters
-    await loadPods({ clusterId: clusters[0].uuid, context, setContext })
+    await loadPods({ params: { clusterId: clusters[0].uuid }, context, setContext })
     const clusterOptions = clusters.map(cluster => ({
       label: cluster.name,
       value: cluster.uuid

@@ -144,7 +144,8 @@ class Qbert {
     return this.client.basicDelete(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespaceName}`)
   }
 
-  async getClusterPods (clusterId) {
+  async getClusterPods (params) {
+    const { clusterId } = params
     try {
       const data = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/pods`)
       return data.items.map(this.convertCluster(clusterId))
@@ -154,7 +155,8 @@ class Qbert {
     }
   }
 
-  async getClusterDeployments (clusterId) {
+  async getClusterDeployments (params) {
+    const { clusterId } = params
     try {
       const data = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/extensions/v1beta1/deployments`)
       return data.items.map(this.convertCluster(clusterId))
@@ -168,7 +170,8 @@ class Qbert {
     return this.client.basicDelete(`${await this.baseUrl()}}/k8sapi/apis/extensions/v1beta1/namespaces/${namespace}/deployments/${name}`)
   }
 
-  async getClusterKubeServices (clusterId) {
+  async getClusterKubeServices (params) {
+    const { clusterId } = params
     try {
       const data = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/services`)
       return data.items.map(this.convertCluster(clusterId))
