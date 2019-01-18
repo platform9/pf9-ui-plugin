@@ -4,12 +4,10 @@ import KubeCLI from './KubeCLI'
 import SimpleLink from 'core/components/SimpleLink'
 import clusterUsageStats from './clusterUsageStats'
 import UsageBar from 'core/components/dashboardGraphs/UsageBar'
-import {
-  AddToQueue as AttachIcon,
-  RemoveFromQueue as DetachIcon,
-  TrendingUp as ScaleIcon,
-  PresentToAll as UpgradeIcon,
-} from '@material-ui/icons'
+import AttachIcon from '@material-ui/icons/AddToQueue'
+import DetachIcon from '@material-ui/icons/RemoveFromQueue'
+import ScaleIcon from '@material-ui/icons/TrendingUp'
+import UpgradeIcon from '@material-ui/icons/PresentToAll'
 import { deleteCluster, loadInfrastructure } from './actions'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 
