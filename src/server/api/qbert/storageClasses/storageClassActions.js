@@ -24,7 +24,7 @@ export const postStorageClass = (req, res) => {
     return res.status(400).send({code: 400, message: 'Must be of kind "StorageClass"'})
   }
   if (storageClass.findByName({ name: storageClass.metadata.name, context, config: { clusterId } })) {
-    return res.status(409).send({code: 409, message: `storageClass #{storageClass.metadata.name} already exists`})
+    return res.status(409).send({code: 409, message: `storageClass ${storageClass.metadata.name} already exists`})
   }
 
   const newStorageClass = StorageClass.create({ data: storageClass, context, config: { clusterId } })

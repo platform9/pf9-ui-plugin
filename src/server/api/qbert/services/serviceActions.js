@@ -24,7 +24,7 @@ export const postService = (req, res) => {
     return res.status(400).send({code: 400, message: 'Must be of kind "Service"'})
   }
   if (Service.findByName({ name: service.metadata.name, context, config: { clusterId, namespace } })) {
-    return res.status(409).send({code: 409, message: `services #{service.metadata.name} already exists`})
+    return res.status(409).send({code: 409, message: `services ${service.metadata.name} already exists`})
   }
 
   const newService = Service.create({ data: service, context, config: { clusterId, namespace } })

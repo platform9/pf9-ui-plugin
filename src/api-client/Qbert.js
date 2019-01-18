@@ -121,6 +121,7 @@ class Qbert {
     name: cluster.metadata.name,
     created: cluster.metadata.creationTimestamp,
     id: cluster.metadata.uid,
+    namespace: cluster.metadata.namespace,
   })
 
   async getClusterNamespaces (clusterId) {

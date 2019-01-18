@@ -22,7 +22,8 @@ export const createPod = async ({ data, context, setContext }) => {
     clusterId,
     name: created.metadata.name,
     created: created.metadata.creationTimestamp,
-    id: created.metadata.uid
+    id: created.metadata.uid,
+    namespace: created.metadata.namespace,
   }
   setContext({ pods: [ ...existing, converted ] })
   return created
@@ -45,7 +46,8 @@ export const createDeployment = async ({ data, context, setContext }) => {
     clusterId,
     name: created.metadata.name,
     created: created.metadata.creationTimestamp,
-    id: created.metadata.uid
+    id: created.metadata.uid,
+    namespace: created.metadata.namespace,
   }
   // Also need to refresh list of pods
   const pods = await loadPods({ params: { clusterId }, context, setContext, reload: true })
@@ -63,7 +65,8 @@ export const createService = async ({ data, context, setContext }) => {
     clusterId,
     name: created.metadata.name,
     created: created.metadata.creationTimestamp,
-    id: created.metadata.uid
+    id: created.metadata.uid,
+    namespace: created.metadata.namespace,
   }
   setContext({ kubeServices: [ ...existing, converted ] })
   return created
