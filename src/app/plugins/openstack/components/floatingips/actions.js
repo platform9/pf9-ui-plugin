@@ -6,8 +6,8 @@ export const loadFloatingIps = async ({ context, setContext, reload }) => {
 }
 
 export const createFloatingIp = async ({ data, context, setContext }) => {
-  const created = await context.apiClient.neutron.createFloatingIp(data)
   const existing = await context.apiClient.neutron.getFloatingIps()
+  const created = await context.apiClient.neutron.createFloatingIp(data)
   setContext({ floatingIps: [ ...existing, created ] })
   return created
 }

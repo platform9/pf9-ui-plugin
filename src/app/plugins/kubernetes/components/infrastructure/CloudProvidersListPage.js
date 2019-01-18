@@ -2,7 +2,7 @@ import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { deleteCloudProvider, loadCloudProviders } from './actions'
 
 export const options = {
-  baseUrl: '/ui/kubernetes/infrastructure/cloudProviders',
+  addUrl: '/ui/kubernetes/infrastructure/cloudProviders/add',
   columns: [
     { id: 'name', label: 'Name' },
     { id: 'type', label: 'Type' },
@@ -13,6 +13,7 @@ export const options = {
   ],
   dataKey: 'cloudProviders',
   deleteFn: deleteCloudProvider,
+  editUrl: '/ui/kubernetes/infrastructure/cloudProviders/edit',
   loaderFn: loadCloudProviders,
   name: 'CloudProviders',
   rowActions: () => [],

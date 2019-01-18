@@ -12,8 +12,8 @@ export const loadSshKeys = async ({ context, setContext, reload }) => {
 }
 
 export const createSshKey = async ({ data, context, setContext }) => {
-  const created = await context.apiClient.nova.createSshKey(data)
   const existing = await loadSshKeys({ context, setContext })
+  const created = await context.apiClient.nova.createSshKey(data)
   setContext({ [dataKey]: [ ...existing, created ] })
   return created
 }

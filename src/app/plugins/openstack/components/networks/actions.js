@@ -6,8 +6,8 @@ export const loadNetworks = async ({ context, setContext, reload }) => {
 }
 
 export const createNetwork = async ({ data, context, setContext }) => {
-  const created = await context.apiClient.neutron.createNetwork(data)
   const existing = await context.apiClient.neutron.getNetworks()
+  const created = await context.apiClient.neutron.createNetwork(data)
   setContext({ networks: [ ...existing, created ] })
   return created
 }

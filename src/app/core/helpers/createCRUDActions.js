@@ -14,9 +14,9 @@ const createCRUDActions = (options={}) => {
       return created
     },
 
-    list: async ({ context, setContext, reload }) => {
+    list: async ({ params, context, setContext, reload }) => {
       if (!reload && context[dataKey]) { return context[dataKey] }
-      const entities = await context.apiClient[service][entity].list()
+      const entities = await context.apiClient[service][entity].list(params)
       await setContext({ [dataKey]: entities })
       return entities
     },

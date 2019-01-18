@@ -2,7 +2,7 @@ import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { deleteTenant, loadTenants } from './actions'
 
 export const options = {
-  baseUrl: '/ui/openstack/tenants',
+  addUrl: '/ui/openstack/tenants/add',
   columns: [
     { id: 'name', label: 'Name' },
     { id: 'description', label: 'Description' },
@@ -12,6 +12,7 @@ export const options = {
   ],
   dataKey: 'tenants',
   deleteFn: deleteTenant,
+  editUrl: '/ui/openstack/tenants/edit',
   loaderFn: loadTenants,
   name: 'Tenants',
   title: 'Tenants',

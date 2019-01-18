@@ -60,9 +60,10 @@ export const columns = [
 ]
 
 export const options = {
-  baseUrl: '/ui/kubernetes/infrastructure/nodes',
+  addUrl: '/ui/kubernetes/infrastructure/nodes/add',
   columns,
   dataKey: 'nodes',
+  editUrl: '/ui/kubernetes/infrastructure/nodes/edit',
   loaderFn: loadInfrastructure,
   name: 'Nodes',
   title: 'Nodes',

@@ -2,7 +2,7 @@ import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { deleteSshKey, loadSshKeys } from './actions'
 
 export const options = {
-  baseUrl: '/ui/openstack/sshkeys',
+  addUrl: '/ui/openstack/sshkeys/add',
   columns: [
     { id: 'name', label: 'Name' },
     { id: 'fingerprint', label: 'Fingerprint' },
@@ -10,6 +10,7 @@ export const options = {
   ],
   dataKey: 'sshKeys',
   deleteFn: deleteSshKey,
+  editUrl: '/ui/openstack/sshkeys/edit',
   loaderFn: loadSshKeys,
   name: 'SSHKeys',
   title: 'SSH Keys',

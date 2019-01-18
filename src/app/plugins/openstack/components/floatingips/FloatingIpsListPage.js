@@ -2,7 +2,7 @@ import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { deleteFloatingIp, loadFloatingIps } from './actions'
 
 export const options = {
-  baseUrl: '/ui/openstack/floatingips',
+  addUrl: '/ui/openstack/floatingips/add',
   columns: [
     { id: 'floating_ip_address', label: 'Floating IP' },
     { id: 'subnet_id', label: 'Subnet ID' },
@@ -15,6 +15,7 @@ export const options = {
   ],
   dataKey: 'floatingIps',
   deleteFn: deleteFloatingIp,
+  editUrl: '/ui/openstack/floatingips/edit',
   loaderFn: loadFloatingIps,
   name: 'FloatingIps',
   title: 'Floating IPs',

@@ -4,13 +4,13 @@ import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import Loader from 'core/components/Loader'
 import { withAppContext } from 'core/AppContext'
 import { loadInfrastructure } from '../infrastructure/actions'
-import { deleteNamespace } from './actions'
+import { loadServices, deleteService } from './actions'
 
 const ListPage = ({ ListContainer }) => {
   class ListPage extends React.Component {
     state = {
       activeCluster: '__all__',
-      namespaces: null,
+      kubeServices: null,
       clusterOptions: [
         { label: 'all', value: '__all__' },
       ],
@@ -22,6 +22,8 @@ const ListPage = ({ ListContainer }) => {
 
       // Make sure to use a new reference to props.context since it has now changed
       const clusters = this.props.context.clusters.filter(x => x.hasMasterNode)
+      // Need to query for all clusters
+      await loadServices({ params: { clusterId: clusters[0].uuid }, context, setContext })
       const clusterOptions = clusters.map(cluster => ({
         label: cluster.name,
         value: cluster.uuid
@@ -45,11 +47,11 @@ const ListPage = ({ ListContainer }) => {
 
     render () {
       const { activeCluster, clusterOptions } = this.state
-      const { namespaces } = this.props.context
-      if (!namespaces) { return <Loader /> }
-      const filteredNamespaces = (activeCluster === '__all__' && namespaces) ||
-        namespaces.filter(namespace => namespace.clusterId === activeCluster)
-      const withClusterNames = filteredNamespaces.map(ns => ({
+      const { kubeServices } = this.props.context
+      if (!kubeServices) { return <Loader /> }
+      const filteredServices = (activeCluster === '__all__' && kubeServices) ||
+        kubeServices.filter(service => service.clusterId === activeCluster)
+      const withClusterNames = filteredServices.map(ns => ({
         ...ns,
         clusterName: this.findClusterName(ns.clusterId)
       }))
@@ -73,21 +75,19 @@ const ListPage = ({ ListContainer }) => {
 }
 
 export const options = {
-  addUrl: '/ui/kubernetes/namespaces/add',
+  addUrl: '/ui/kubernetes/services/add',
   columns: [
     { id: 'name', label: 'Name' },
     { id: 'clusterName', label: 'Cluster' },
     { id: 'created', label: 'Created' },
   ],
-  dataKey: 'namespaces',
-  deleteFn: deleteNamespace,
-  editUrl: '/ui/kubernetes/namespaces/edit',
-  name: 'Namespaces',
-  title: 'Namespaces',
+  dataKey: 'kubeServices',
+  deleteFn: deleteService,
+  name: 'Services',
+  title: 'Services',
   ListPage,
 }
-
 const components = createCRUDComponents(options)
-export const NodesList = components.List
+export const ServicesList = components.List
 
 export default components.ListPage

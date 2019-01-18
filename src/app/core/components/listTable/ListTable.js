@@ -384,7 +384,7 @@ class ListTable extends React.Component {
               title={title}
               onAdd={this.handleAdd}
               onDelete={this.handleDelete}
-              onEdit={this.handleEdit}
+              onEdit={this.props.onEdit && this.handleEdit}
               onSearchChange={this.handleSearch}
               searchTerm={searchTerm}
               columns={columns}

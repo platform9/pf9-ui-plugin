@@ -6,8 +6,8 @@ export const loadRouters = async ({ context, setContext, reload }) => {
 }
 
 export const createRouter = async ({ data, context, setContext }) => {
-  const created = await context.apiClient.neutron.createRouter(data)
   const existing = await context.apiClient.neutron.getRouters()
+  const created = await context.apiClient.neutron.createRouter(data)
   setContext({ routers: [ ...existing, created ] })
   return created
 }

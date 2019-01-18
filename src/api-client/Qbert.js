@@ -144,20 +144,41 @@ class Qbert {
     return this.client.basicDelete(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespaceName}`)
   }
 
-  async getClusterPods (clusterId) {
-    return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/pods`)
+  async getClusterPods (params) {
+    const { clusterId } = params
+    try {
+      const data = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/pods`)
+      return data.items.map(this.convertCluster(clusterId))
+    } catch (err) {
+      console.error(`Error getting cluster pods for clusterId: ${clusterId}`)
+      return err
+    }
   }
 
-  async getClusterDeployments (clusterId) {
-    return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/extensions/v1beta1/deployments`)
+  async getClusterDeployments (params) {
+    const { clusterId } = params
+    try {
+      const data = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/extensions/v1beta1/deployments`)
+      return data.items.map(this.convertCluster(clusterId))
+    } catch (err) {
+      console.error(`Error getting cluster deployments for clusterId: ${clusterId}`)
+      return err
+    }
   }
 
   async deleteDeployment (clusterId, namespace, name) {
     return this.client.basicDelete(`${await this.baseUrl()}}/k8sapi/apis/extensions/v1beta1/namespaces/${namespace}/deployments/${name}`)
   }
 
-  async getClusterKubeServices (clusterId) {
-    return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/services`)
+  async getClusterKubeServices (params) {
+    const { clusterId } = params
+    try {
+      const data = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/services`)
+      return data.items.map(this.convertCluster(clusterId))
+    } catch (err) {
+      console.error(`Error getting cluster services for clusterId: ${clusterId}`)
+      return err
+    }
   }
 
   async getClusterStorageClasses (clusterId) {
@@ -172,28 +193,46 @@ class Qbert {
     return this.client.basicDelete(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/storage.k8s.io/v1/storageclasses/${name}`)
   }
 
-  async getRepliaceSets (clusterId) {
+  async getReplicaSets (clusterId) {
     return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/extensions/v1beta1/replicasets`)
   }
 
   async createPod (clusterId, namespace, params) {
-    return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/v1/namespaces/${namespace}/pods`, params)
+    return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/pods`, params)
   }
 
   async deletePod (clusterId, namespace, name) {
-    return this.client.basicDelete(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/v1/namespaces/${namespace}/pods/${name}`)
+    return this.client.basicDelete(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/pods/${name}`)
+  }
+
+  pods = {
+    create: this.createPod.bind(this),
+    list: this.getClusterPods.bind(this),
+    delete: this.deletePod.bind(this),
   }
 
   async createDeployment (clusterId, namespace, params) {
-    return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/extensions/v1beta1/namespaces/${namespace}/deployments`)
+    return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/extensions/v1beta1/namespaces/${namespace}/deployments`, params)
+  }
+
+  deployments = {
+    create: this.createDeployment.bind(this),
+    list: this.getClusterDeployments.bind(this),
+    delete: this.deleteDeployment.bind(this),
   }
 
   async createService (clusterId, namespace, params) {
-    return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/services`)
+    return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/services`, params)
   }
 
   async deleteService (clusterId, namespace, name) {
     return this.client.basicDelete(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/services/${name}`)
+  }
+
+  services = {
+    create: this.createService.bind(this),
+    list: this.getClusterKubeServices.bind(this),
+    delete: this.deleteService.bind(this),
   }
 
   async createServiceAccount (clusterId, namespace, params) {

@@ -4,12 +4,10 @@ import KubeCLI from './KubeCLI'
 import SimpleLink from 'core/components/SimpleLink'
 import clusterUsageStats from './clusterUsageStats'
 import UsageBar from 'core/components/dashboardGraphs/UsageBar'
-import {
-  AddToQueue as AttachIcon,
-  RemoveFromQueue as DetachIcon,
-  TrendingUp as ScaleIcon,
-  PresentToAll as UpgradeIcon,
-} from '@material-ui/icons'
+import AttachIcon from '@material-ui/icons/AddToQueue'
+import DetachIcon from '@material-ui/icons/RemoveFromQueue'
+import ScaleIcon from '@material-ui/icons/TrendingUp'
+import UpgradeIcon from '@material-ui/icons/PresentToAll'
 import { deleteCluster, loadInfrastructure } from './actions'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 
@@ -61,7 +59,7 @@ const upgradeCluster = (selected, context) => {
 }
 
 export const options = {
-  baseUrl: '/ui/kubernetes/infrastructure/clusters',
+  addUrl: '/ui/kubernetes/infrastructure/clusters/add',
   columns: [
     { id: 'name', label: 'Cluster name', render: renderClusterDetailLink },
     { id: 'status', label: 'Status' },
@@ -85,6 +83,7 @@ export const options = {
     { id: 'tags', label: 'Metadata', render: data => JSON.stringify(data) }
   ],
   dataKey: 'clusters',
+  editUrl: '/ui/kubernetes/infrastructure/clusters/edit',
   loaderFn: loadInfrastructure,
   deleteFn: deleteCluster,
   name: 'Clusters',

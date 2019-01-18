@@ -80,8 +80,8 @@ class CRUDListContainer extends React.Component {
         />
         {this.props.children({
           onDelete: this.handleDelete,
-          onAdd: this.redirectToAdd,
-          onEdit: this.redirectToEdit
+          onAdd: this.props.addUrl && this.redirectToAdd,
+          onEdit: this.props.editUrl && this.redirectToEdit
         })}
       </div>
     )

@@ -58,16 +58,20 @@ router.post('/v3/:tenantId/clusters/:clusterId/attach', tokenValidator, attachNo
 router.post('/v3/:tenantId/clusters/:clusterId/detach', tokenValidator, detachNodes)
 
 const k8sapi = '/v2/:tenantId/clusters/:clusterId/k8sapi/api/v1'
+const k8sBetaApi = '/v2/:tenantId/clusters/:clusterId/k8sapi/apis/extensions/v1beta1'
 
 router.get(`${k8sapi}/namespaces`, tokenValidator, getNamespaces)
 
+router.get(`${k8sapi}/pods`, tokenValidator, getPods)
 router.get(`${k8sapi}/namespaces/:namespace/pods`, tokenValidator, getPods)
 router.post(`${k8sapi}/namespaces/:namespace/pods`, tokenValidator, postPod)
 router.delete(`${k8sapi}/namespaces/:namespace/pods/:podName`, tokenValidator, deletePod)
 
-router.get(`${k8sapi}/namespaces/:namespace/deployments`, tokenValidator, getDeployments)
-router.post(`${k8sapi}/namespaces/:namespace/deployments`, tokenValidator, postDeployment)
+router.get(`${k8sBetaApi}/deployments`, tokenValidator, getDeployments)
+router.get(`${k8sBetaApi}/namespaces/:namespace/deployments`, tokenValidator, getDeployments)
+router.post(`${k8sBetaApi}/namespaces/:namespace/deployments`, tokenValidator, postDeployment)
 
+router.get(`${k8sapi}/services`, tokenValidator, getServices)
 router.get(`${k8sapi}/namespaces/:namespace/services`, tokenValidator, getServices)
 router.post(`${k8sapi}/namespaces/:namespace/services`, tokenValidator, postService)
 router.delete(`${k8sapi}/namespaces/:namespace/services/:serviceName`, tokenValidator, deleteService)
