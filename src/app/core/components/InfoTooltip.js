@@ -48,7 +48,9 @@ InfoTooltip.propTypes = {
 }
 
 const withInfoTooltip = Component => ({ info, ...props }) => {
-  return <InfoTooltip info={info}><Component {...props} /></InfoTooltip>
+  return <InfoTooltip info={info}>
+    <div><Component {...props} /></div>
+  </InfoTooltip>
 }
 
 export { withInfoTooltip }
