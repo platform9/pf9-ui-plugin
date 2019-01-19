@@ -42,20 +42,6 @@ class AddClusterPage extends React.Component {
     enableMetalLb: false,
   }
 
-  // This method will be deleted at the end of this PR.  It auto-selects the cloudProvider and region
-  // so I don't need to waste time filling it out every time.
-  async componentDidMount () {
-    const cp = this.props.data.cloudProviders.find(x => x.name === 'mockOpenstackProvider')
-    await this.handleCpChange(cp.uuid)
-    const region = this.state.regions[0]
-    await this.handleRegionChange(region)
-    initialContext.cloudProvider = cp.uuid
-    initialContext.region = region
-    initialContext.name = 'New Cluster 123'
-    initialContext.numWorkers = 3
-    this.setState({ done: true })
-  }
-
   handleSubmit = () => console.log('TODO: AddClusterPage#handleSubmit')
 
   handleCpChange = async cpId => {
@@ -157,7 +143,7 @@ class AddClusterPage extends React.Component {
 
   render () {
     const { data } = this.props
-    const { done, images, flavors, keyPairs, manualDeploy, networks, regions, subnets } = this.state
+    const { images, flavors, keyPairs, manualDeploy, networks, regions, subnets } = this.state
     const cloudProviderOptions = projectAs({ value: 'uuid', label: 'name' }, data.cloudProviders)
     const regionOptions = regions
     const imageOptions = projectAs({ value: 'id', label: 'name' }, images)
@@ -167,15 +153,12 @@ class AddClusterPage extends React.Component {
 
     // AWS and OpenStack cloud providers call this field differently
     const sshKeys = keyPairs.map(x => x.name || x.KeyName)
-    if (!done) { return 'debug loading...' } // TODO: remove me before PR is done
     return (
       <FormWrapper title="Add Cluster">
         <Wizard onComplete={this.handleSubmit} context={initialContext}>
           {({ wizardContext, setWizardContext, onNext }) => {
             return (
               <React.Fragment>
-                {false && <pre>{JSON.stringify(this.state, null, 4)}</pre>}
-                {true && <pre>{JSON.stringify(wizardContext, null, 4)}</pre>}
                 <WizardStep stepId="type" label="Cluster Type">
                   <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                     <Checkbox
