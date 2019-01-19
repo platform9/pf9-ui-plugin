@@ -33,7 +33,8 @@ class InfoTooltip extends React.Component {
         title={<React.Fragment>
           <Icon className={classes.infoIcon} color="primary">
             <span>info</span>
-          </Icon><span>{info}</span>
+          </Icon>
+          <span>{info}</span>
         </React.Fragment>}
       >{children}</Tooltip> : children
     )
@@ -43,8 +44,10 @@ class InfoTooltip extends React.Component {
 InfoTooltip.defaultProps = {
   placement: 'right'
 }
+
 InfoTooltip.propTypes = {
-  classes: PropTypes.object
+  classes: PropTypes.object,
+  info: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
 }
 
 const withInfoTooltip = Component => ({ info, ...props }) => {

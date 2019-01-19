@@ -1,5 +1,7 @@
+import { T } from 'ramda'
 import {
   compose,
+  condLiteral,
   filterFields,
   identity,
   mergeKey,
@@ -81,5 +83,29 @@ describe('functional programming utils', () => {
     const result = projectAs(mappings, values)
     expect(result[0]).toEqual({ first: 123, second: 456 })
     expect(result[1]).toEqual({ third: 555 })
+  })
+
+  it('condLiteral', () => {
+    const arr = [1, 3, 5, 7, 14, 15]
+    const divisibleBy = n1 => n2 => n2 % n1 === 0
+
+    // without catch all
+    const fn = condLiteral(
+      [divisibleBy(3), 'three'],
+      [divisibleBy(5), 'five'],
+      [divisibleBy(7), 'seven'],
+    )
+    const result = arr.map(fn)
+    expect(result).toEqual([undefined, 'three', 'five', 'seven', 'seven', 'three'])
+
+    // with catch all
+    const fn2 = condLiteral(
+      [divisibleBy(3), 'three'],
+      [divisibleBy(5), 'five'],
+      [divisibleBy(7), 'seven'],
+      [T, 'unknown']
+    )
+    const result2 = arr.map(fn2)
+    expect(result2).toEqual(['unknown', 'three', 'five', 'seven', 'seven', 'three'])
   })
 })

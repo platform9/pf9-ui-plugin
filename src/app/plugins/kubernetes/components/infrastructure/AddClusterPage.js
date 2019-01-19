@@ -2,6 +2,7 @@ import React from 'react'
 import Checkbox from 'core/components/validatedForm/Checkbox'
 import FormWrapper from 'core/components/FormWrapper'
 import KeyValuesField from 'core/components/validatedForm/KeyValuesField'
+import NodesChooser from './NodesChooser'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import TextField from 'core/components/validatedForm/TextField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
@@ -35,6 +36,10 @@ class AddClusterPage extends React.Component {
     vpcs: [],
     networks: [],
     subnets: [],
+    manualDeploy: false,
+    masterNodes: [],
+    workerNodes: [],
+    enableMetalLb: false,
   }
 
   // This method will be deleted at the end of this PR.  It auto-selects the cloudProvider and region
@@ -63,13 +68,17 @@ class AddClusterPage extends React.Component {
   handleRegionChange = async regionId => {
     const regionDetails = await this.props.context.apiClient.qbert.getCloudProviderRegionDetails(this.state.cpId, regionId)
     this.setState(regionDetails) // sets azs, domains, images, flavors, keyPairs, networks, operatingSystems, and vpcs
-    console.log(regionDetails)
   }
 
   handleNetworkChange = networkId => {
     const net = this.state.networks.find(propEq('id', networkId))
     this.setState({ subnets: net.subnets })
   }
+
+  setField = key => value => this.setState({ [key]: value })
+
+  setMasterNodes = masterNodes => this.setState({ masterNodes })
+  setWorkerNodes = workerNodes => this.setState({ workerNodes })
 
   renderReviewTable = wizard => {
     const { cloudProviders } = this.props.data
@@ -110,20 +119,55 @@ class AddClusterPage extends React.Component {
     return <pre>{JSON.stringify(review, null, 4)}</pre>
   }
 
+  renderManualDeployNetworking = () => (
+    <React.Fragment>
+      <TextField
+        id="virtualIP"
+        label="Virtual IP"
+        info="Virtual IP address for cluster"
+      />
+      <PicklistField
+        id="virtualIpInterface"
+        label="Virtual IP address for cluster"
+        options={[]}
+        info={
+          <span>
+            Specify the virtual IP address that will be used to provide access to the API server endpoint for this cluster. Refer to
+            <a href="https://docs.platform9.com/support/ha-for-baremetal-multimaster-kubernetes-cluster-service-type-load-balancer/" target="_blank" rel="noopener">this article</a>
+            for more information re how the VIP service operates, VIP configuration, etc.
+          </span>
+        }
+      />
+      <Checkbox
+        id="enableMetalLb"
+        label="Enable MetalLB"
+        info="Select if MetalLB should load-balancer should be enabled for this cluster. Platform9 uses MetalLB - a load-balancer implementation for bare metal Kubernetes clusters that uses standard routing protocols - for service level load balancing. Enabling MetalLB on this cluster will provide the ability to create services of type load-balancer."
+        onChange={value => this.setState({ enableMetalLb: value })}
+      />
+      {this.state.enableMetalLb && this.renderMetalLbFields()}
+    </React.Fragment>
+  )
+
+  renderMetalLbFields = () => (
+    <React.Fragment>
+      <TextField id="metalAddressPoolStart" label="Metal Address Pool Start" />
+      <TextField id="metalAddressPoolEnd" label="Metal Address Pool End" />
+    </React.Fragment>
+  )
+
   render () {
     const { data } = this.props
-    console.log(data.cloudProviders)
-    console.log(this.state.cpType)
+    const { done, images, flavors, keyPairs, manualDeploy, networks, regions, subnets } = this.state
     const cloudProviderOptions = projectAs({ value: 'uuid', label: 'name' }, data.cloudProviders)
-    const regionOptions = this.state.regions
-    const imageOptions = projectAs({ value: 'id', label: 'name' }, this.state.images)
-    const flavorOptions = projectAs({ value: 'id', label: 'name' }, this.state.flavors)
-    const networkOptions = this.state.networks.map(x => ({ value: x.id, label: x.name || x.label }))
-    const subnetOptions = this.state.subnets.map(x => ({ value: x.id, label: `${x.name} ${x.cidr}` }))
+    const regionOptions = regions
+    const imageOptions = projectAs({ value: 'id', label: 'name' }, images)
+    const flavorOptions = projectAs({ value: 'id', label: 'name' }, flavors)
+    const networkOptions = networks.map(x => ({ value: x.id, label: x.name || x.label }))
+    const subnetOptions = subnets.map(x => ({ value: x.id, label: `${x.name} ${x.cidr}` }))
 
     // AWS and OpenStack cloud providers call this field differently
-    const sshKeys = this.state.keyPairs.map(x => x.name || x.KeyName)
-    if (!this.state.done) { return 'debug loading...' } // TODO: remove me before PR is done
+    const sshKeys = keyPairs.map(x => x.name || x.KeyName)
+    if (!done) { return 'debug loading...' } // TODO: remove me before PR is done
     return (
       <FormWrapper title="Add Cluster">
         <Wizard onComplete={this.handleSubmit} context={initialContext}>
@@ -134,24 +178,59 @@ class AddClusterPage extends React.Component {
                 {true && <pre>{JSON.stringify(wizardContext, null, 4)}</pre>}
                 <WizardStep stepId="type" label="Cluster Type">
                   <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
-                    <TextField id="name" label="name" />
-                    <PicklistField id="cloudProvider" label="Cloud Provider" options={cloudProviderOptions} onChange={this.handleCpChange} />
-                    <PicklistField id="region" label="Region" options={regionOptions} onChange={this.handleRegionChange} />
-                    <Checkbox id="manualDeploy" label="Deploy cluster via install agent" />
+                    <Checkbox
+                      id="manualDeploy"
+                      label="Deploy cluster via install agent"
+                      onChange={this.setField('manualDeploy')}
+                      info="Use this option to download and deploy Platform9 host agent on individual nodes to create a cluster using them."
+                    />
+                    <TextField
+                      id="name"
+                      label="name"
+                      info="Name of the cluster"
+                    />
+                    {!manualDeploy && <React.Fragment>
+                      <PicklistField
+                        id="cloudProvider"
+                        label="Cloud Provider"
+                        options={cloudProviderOptions}
+                        onChange={this.handleCpChange}
+                        info="Nodes will be provisioned using this cloud provider."
+                      />
+                      <PicklistField
+                        id="region"
+                        label="Region"
+                        options={regionOptions}
+                        onChange={this.handleRegionChange}
+                      />
+                    </React.Fragment>}
+                    {manualDeploy && <NodesChooser
+                      name="masterNodes"
+                      label="Master Nodes (choose 1, 3, or 5 nodes)"
+                      onChange={this.setMasterNodes}
+                    />}
                   </ValidatedForm>
                 </WizardStep>
                 <WizardStep stepId="config" label="Configuration">
                   <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
-                    <PicklistField id="image" label="Image" options={imageOptions} />
-                    <PicklistField id="masterFlavor" label="Master node instance flavor" options={flavorOptions} />
-                    <PicklistField id="workerFlavor" label="Worker node instance flavor" options={flavorOptions} />
-                    <TextField id="masterNodes" label="Number of master nodes" type="number" />
-                    <TextField id="numWorkers" label="Number of worker nodes" type="number" />
                     <Checkbox id="disableWorkloadsOnMaster" label="Disable workloads on master nodes" />
+                    {!manualDeploy && <React.Fragment>
+                      <PicklistField id="image" label="Image" options={imageOptions} />
+                      <PicklistField id="masterFlavor" label="Master node instance flavor" options={flavorOptions} />
+                      <PicklistField id="workerFlavor" label="Worker node instance flavor" options={flavorOptions} />
+                      <TextField id="masterNodes" label="Number of master nodes" type="number" />
+                      <TextField id="numWorkers" label="Number of worker nodes" type="number" />
+                    </React.Fragment>}
+                    {manualDeploy && <NodesChooser
+                      name="workerNodes"
+                      label="Worker Nodes"
+                      onChange={this.setWorkerNodes}
+                    />}
                   </ValidatedForm>
                 </WizardStep>
                 <WizardStep stepId="network" label="Networking">
                   <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
+                    {manualDeploy && this.renderManualDeployNetworking(wizardContext)}
                     <PicklistField id="network" label="Network" options={networkOptions} onChange={this.handleNetworkChange} />
                     <PicklistField id="subnet" label="Subnets" options={subnetOptions} />
                     <p>Placeholder: Security groups</p>

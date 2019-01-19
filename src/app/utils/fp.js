@@ -165,3 +165,14 @@ export const ensureFunction = moize(maybeFunc => (...args) => {
 })
 
 export const maybeFnOrNull = fn => value => value ? fn(value) : null
+
+// Create a function that compares a value against multiple predicate functions,
+// returning the first 'literal' from the matching predicate pair.
+// If none match, then undefined is returned.
+// (...[predicateFn, literal]) -> value -> literal
+export const condLiteral = (...conds) => value => {
+  for (let i=0; i<conds.length; i++) {
+    const [pred, literal] = conds[i]
+    if (pred(value)) { return literal }
+  }
+}

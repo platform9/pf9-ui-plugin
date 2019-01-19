@@ -117,7 +117,7 @@ function loadPreset () {
 
   // ResMgrHosts
   const resMgrHost = new ResMgrHost({ roles: ['pf9-ostackhost'], info: { hostname: 'fake resmgr host' } })
-  const resMgrHost2 = new ResMgrHost({ roles: ['pf9-ostackhost'], info: { hostname: 'fake resmgr host 2' } })
+  const resMgrHost2 = new ResMgrHost({ roles: ['pf9-ostackhost', 'pf9-kube'], info: { hostname: 'fake resmgr host 2' } })
 
   // Cloud Providers
   CloudProvider.create({ data: { name: 'mockAwsProvider', type: 'aws' }, context })
