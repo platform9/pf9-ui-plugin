@@ -38,15 +38,18 @@ export class AddPodForm extends React.Component {
           label="Cluster"
           onChange={this.handleClusterChange}
           options={clusterOptions}
+          validations={{required: true}}
         />
         <PicklistField id="namespace"
           label="Namespace"
           options={namespaceOptions}
+          validations={{required: true}}
         />
         <CodeMirror
           id="podYaml"
           label="Pod YAML"
           options={codeMirrorOptions}
+          validations={{required: true}}
         />
         <SubmitButton>Create Pod</SubmitButton>
       </ValidatedForm>
