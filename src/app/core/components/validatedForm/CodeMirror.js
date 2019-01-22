@@ -45,7 +45,7 @@ class CodeMirror extends React.Component {
     const { id, label, value, classes, hasError, onMouseEnter, errorMessage, onChange, options, ...restProps } = this.props
     const combinedOptions = { ...defaultOptions, ...options }
     return (
-      <FormControl id={id} className={classes.formControl} error={hasError}>
+      <FormControl id={id} className={classes.formControl} error={hasError} fullWidth>
         <FormLabel>{label}</FormLabel>
         <BaseCodeMirror
           {...restProps}

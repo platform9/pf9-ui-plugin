@@ -2,19 +2,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Picklist from 'core/components/Picklist'
 import {
-  FormControl,
   FormHelperText,
 } from '@material-ui/core'
-import { withStyles } from '@material-ui/core/styles'
 import { withInfoTooltip } from 'app/core/components/InfoTooltip'
 import { compose } from 'app/utils/fp'
 import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
-
-const styles = theme => ({
-  formControl: {
-    margin: theme.spacing.unit
-  }
-})
 
 /**
  * PicklistField builds upon Picklist and adds integration with ValidatedForm
@@ -32,7 +24,7 @@ class PicklistField extends React.Component {
     const { id, label, value, showNone, classes, hasError, errorMessage, ...restProps } = this.props
     const options = showNone ? [{ value: '', label: 'None' }, ...this.props.options] : this.props.options
     return (
-      <FormControl id={id} className={classes.formControl} error={hasError}>
+      <div id={id}>
         <Picklist
           {...restProps}
           name={id}
@@ -41,8 +33,8 @@ class PicklistField extends React.Component {
           value={value !== undefined ? value: ''}
           onChange={this.handleChange}
         />
-        <FormHelperText>{errorMessage}</FormHelperText>
-      </FormControl>
+        <FormHelperText error={hasError}>{errorMessage}</FormHelperText>
+      </div>
     )
   }
 }
@@ -73,5 +65,4 @@ PicklistField.propTypes = {
 export default compose(
   withFormContext,
   withInfoTooltip,
-  withStyles(styles),
 )(PicklistField)
