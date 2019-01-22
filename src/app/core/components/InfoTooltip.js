@@ -52,7 +52,7 @@ InfoTooltip.propTypes = {
 
 const withInfoTooltip = Component => ({ info, ...props }) => {
   return <InfoTooltip info={info}>
-    <div><Component {...props} /></div>
+    <Component {...props} />
   </InfoTooltip>
 }
 
