@@ -26,21 +26,22 @@ class Checkbox extends React.Component {
     const { id, label, value, classes, hasError, onMouseEnter, errorMessage, ...restProps } = this.props
 
     return (
-      <FormControl id={id} className={classes.formControl} error={hasError}>
-        <FormControlLabel
-          label={label}
-          onMouseEnter={onMouseEnter}
-          control={
-            <BaseCheckbox
-              {...restProps}
-              error={errorMessage}
-              checked={!!value}
-              onChange={this.handleChange}
-            />
-          }
-        />
-        <FormHelperText>{errorMessage}</FormHelperText>
-      </FormControl>
+      <div {...restProps}>
+        <FormControl id={id} onMouseEnter={onMouseEnter} className={classes.formControl} error={hasError}>
+          <FormControlLabel
+            label={label}
+            control={<div>
+              <BaseCheckbox
+                {...restProps}
+                error={errorMessage}
+                checked={!!value}
+                onChange={this.handleChange}
+              /></div>
+            }
+          />
+          <FormHelperText>{errorMessage}</FormHelperText>
+        </FormControl>
+      </div>
     )
   }
 }
@@ -55,6 +56,6 @@ Checkbox.propTypes = {
 
 export default compose(
   withFormContext,
-  withStyles(styles),
   withInfoTooltip,
+  withStyles(styles),
 )(Checkbox)
