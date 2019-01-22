@@ -111,6 +111,8 @@ const withFormContext = Input =>
               onChange={onChange}
               onMouseEnter={onMouseEnter}
               onBlur={onBlur}
+              /*  supposedly validations should not be required to pass here,
+                  but PicklistField does not work without this prop passed here  */
               validations={validations}
             />
           )}
