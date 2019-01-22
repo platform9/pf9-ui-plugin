@@ -13,6 +13,7 @@ import { apply, toPairs } from 'ramda'
 import {
   BrowserRouter as Router, Redirect, Route, Switch,
 } from 'react-router-dom'
+import { pathJoin } from 'utils/misc'
 import config from '../../config'
 import ApiClient from '../api-client'
 import './app.css'
@@ -57,8 +58,8 @@ class App extends React.Component {
           })}
 
           {/* TODO implement generic login page? */}
-          <Route path="/ui/openstack/login" component={null} />
-          <Route path="/ui/logout" exact component={LogoutPage} />
+          <Route path={pathJoin(plugin.basePath, 'login')} component={null} />
+          <Route path={pathJoin(plugin.basePath, 'logout')} exact component={LogoutPage} />
           <Redirect to={defaultRoute} />
           {showFooter && this.renderFooter()}
         </Switch>

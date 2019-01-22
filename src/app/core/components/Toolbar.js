@@ -7,7 +7,7 @@ import MenuIcon from '@material-ui/icons/Menu'
 import classNames from 'classnames'
 import Selector from 'core/components/Selector'
 import TenantChooser from 'openstack/components/tenants/TenantChooser'
-import Avatar from 'core/components/Avatar'
+import UserMenu from 'core/components/UserMenu'
 import MaterialToolbar from '@material-ui/core/Toolbar/Toolbar'
 import { drawerWidth } from 'core/components/Navbar'
 
@@ -95,7 +95,7 @@ class Toolbar extends React.Component {
             searchTerm={regionSearch}
           />
           <TenantChooser />
-          <Avatar />
+          <UserMenu />
         </div>
       </MaterialToolbar>
     </AppBar>

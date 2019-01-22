@@ -22,7 +22,7 @@ const styles = theme => ({
 
 @withStyles(styles)
 @withRouter
-class Avatar extends React.Component {
+class UserMenu extends React.Component {
   state = {
     anchorEl: null,
   }
@@ -71,15 +71,16 @@ class Avatar extends React.Component {
         >
           <MenuItem onClick={this.handleClose('anchorEl')}>Change Password</MenuItem>
           <MenuItem onClick={this.handleClose('anchorEl')}>SSH Keys</MenuItem>
-          <MenuItem onClick={this.navTo('/ui/logout')}>Sign Out</MenuItem>
+          {/* TODO: Implement a generic logout page or use a plugin relative route */}
+          <MenuItem onClick={this.navTo('/ui/openstack/logout')}>Sign Out</MenuItem>
         </Menu>
       </div>
     )
   }
 }
 
-Avatar.propTypes = {
+UserMenu.propTypes = {
   classes: PropTypes.object,
 }
 
-export default Avatar
+export default UserMenu
