@@ -23,7 +23,7 @@ class Checkbox extends React.Component {
   }
 
   render () {
-    const { id, label, value, classes, hasError, onMouseEnter, errorMessage, ...restProps } = this.props
+    const { id, label, value, classes, hasError, onClick, onChange, onMouseEnter, errorMessage, ...restProps } = this.props
 
     return (
       <div {...restProps}>
@@ -33,6 +33,7 @@ class Checkbox extends React.Component {
             control={<div>
               <BaseCheckbox
                 {...restProps}
+                onClick={onClick}
                 error={errorMessage}
                 checked={!!value}
                 onChange={this.handleChange}
