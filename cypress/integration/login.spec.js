@@ -16,7 +16,6 @@ describe('login', () => {
       .click()
 
     cy.contains('Login failed')
-      .should('exist')
   })
 
   it('logs in successfully', () => {
@@ -32,7 +31,6 @@ describe('login', () => {
       .click()
 
     cy.contains('Current Region')
-      .should('exist')
   })
 
   it('remembers the login state on refresh', () => {

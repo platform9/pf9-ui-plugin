@@ -13,3 +13,5 @@ npm-debug.log
 .*.swo
 coverage/*
 .vscode
+cypress/screenshots/*
+cypress/videos/*
