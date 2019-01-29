@@ -34,10 +34,8 @@ describe('login', () => {
   })
 
   it('remembers the login state on refresh', () => {
-    // TODO: Need to find a way to mock a login.
-    // It seems like calls to visit discard all browser state.
-    // cy.visit('/')
-    // cy.contains('SIGN IN')
-    // .should('not.exist')
+    cy.setSimSession()
+    cy.visit('/')
+    cy.contains('Current Region')
   })
 })

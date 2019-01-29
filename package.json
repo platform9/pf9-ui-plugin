@@ -104,7 +104,8 @@
     "test:client": "cross-env NODE_ENV=test jest src/api-client",
     "test:client:watch": "cross-env NODE_ENV=test jest --watch src/api-client",
     "test:e2e": "cross-env NODE_ENV=test jest -i e2e-tests/",
-    "test:integration": "cross-env NODE_ENV=test cypress open",
+    "test:integration": "cross-env NODE_ENV=test cypress run",
+    "test:integration:watch": "cross-env NODE_ENV=test cypress open",
     "test:unit": "cross-env NODE_ENV=test jest --coverage src/app src/server",
     "test:unit:watch": "cross-env NODE_ENV=test jest --watch --coverage src/app src/server"
   },

@@ -4,6 +4,7 @@ const context = require('./context').default
 const server = require('./server')
 const config = require('../../config')
 const User = require('./models/openstack/User').default
+const Token = require('./models/openstack/Token').default
 
 server.startServer()
 context.resetContext()
@@ -18,6 +19,9 @@ if (simulator) {
 
   const { username, password } = simulator
   if (username && password) {
-    new User({ name: username, password })
+    const user = new User({ name: username, password })
+
+    // construct a token with a hard-coded id to make testing easier
+    new Token({ user, id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' })
   }
 }

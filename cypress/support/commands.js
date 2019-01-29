@@ -1,3 +1,5 @@
+const config = require('../../config')
+
 // ***********************************************
 // This example commands.js shows you how to
 // create various custom commands and overwrite
@@ -23,3 +25,14 @@
 //
 // -- This is will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+
+// Allow the session to be stubbed out.
+// The hard-coded token id is explicitly whitelisted in the simulator.
+// TODO: For true e2e tests we can have this command make actual API calls to login,
+// then memoize the result, and set them here.
+Cypress.Commands.add('setSimSession', () => {
+  const tokenId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
+  const username = config.simulator.username
+  const session = { username, unscopedToken: tokenId }
+  window.localStorage.setItem('pf9', JSON.stringify(session))
+})
