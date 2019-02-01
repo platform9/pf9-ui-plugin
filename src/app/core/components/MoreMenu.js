@@ -7,7 +7,8 @@ import MoreVertIcon from '@material-ui/icons/MoreVert'
 
 class MoreMenu extends React.Component {
   state = {
-    anchorEl: null
+    anchorEl: null,
+    openedAction: null,
   }
 
   handleOpen = e => {
@@ -20,10 +21,15 @@ class MoreMenu extends React.Component {
     this.setState({ anchorEl: null })
   }
 
-  handleClick = action => e => {
+  handleClick = (action, label) => e => {
     e.stopPropagation()
     this.handleClose(e)
     action(this.props.data)
+    this.setState({ openedAction: label })
+  }
+
+  handleModalClose = () => {
+    this.setState({ openedAction: null })
   }
 
   render () {
@@ -31,6 +37,10 @@ class MoreMenu extends React.Component {
 
     return (
       <div>
+        {this.props.items.map(({ action, icon, dialog, label }) => {
+          const Modal = dialog
+          return this.state.openedAction === label && <Modal key={label} onClose={this.handleModalClose} />
+        })}
         <IconButton
           aria-label="More Actions"
           aria-owns={anchorEl ? 'more-menu' : null}
@@ -45,7 +55,7 @@ class MoreMenu extends React.Component {
           onClose={this.handleClose}
         >
           {this.props.items.map(({ label, action, icon }) =>
-            <MenuItem key={label} onClick={this.handleClick(action)}>
+            <MenuItem key={label} onClick={this.handleClick(action, label)}>
               {icon && icon}
               {label}
             </MenuItem>
@@ -62,8 +72,10 @@ MoreMenu.propTypes = {
    */
   items: PropTypes.arrayOf(
     PropTypes.shape({
-      label: PropTypes.string.isRequired,
       action: PropTypes.func,
+      dialog: PropTypes.func, // React class or functional component
+      icon: PropTypes.node,
+      label: PropTypes.string.isRequired,
     })
   ),
 

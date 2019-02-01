@@ -10,6 +10,7 @@ import ScaleIcon from '@material-ui/icons/TrendingUp'
 import UpgradeIcon from '@material-ui/icons/PresentToAll'
 import { deleteCluster, loadInfrastructure } from './actions'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
+import ClusterAttachNodeDialog from './ClusterAttachNodeDialog'
 
 const renderLinks = links => {
   if (!links) { return null }
@@ -90,7 +91,7 @@ export const options = {
   title: 'Clusters',
   uniqueIdentifier: 'uuid',
   rowActions: [
-    { cond: canAttachNode, icon: <AttachIcon />, label: 'Attach node', action: attachNode },
+    { cond: canAttachNode, icon: <AttachIcon />, label: 'Attach node', dialog: ClusterAttachNodeDialog, action: attachNode },
     { cond: canDetachNode, icon: <DetachIcon />, label: 'Detach node', action: detachNode },
     { cond: canScaleCluster, icon: <ScaleIcon />, label: 'Scale cluster', action: scaleCluster },
     { cond: canUpgradeCluster, icon: <UpgradeIcon />, label: 'Upgrade cluster', action: upgradeCluster },

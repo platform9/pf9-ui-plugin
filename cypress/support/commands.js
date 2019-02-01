@@ -36,3 +36,19 @@ Cypress.Commands.add('setSimSession', () => {
   const session = { username, unscopedToken: tokenId }
   window.localStorage.setItem('pf9', JSON.stringify(session))
 })
+
+// For use with <ListTable>.  This will select the row containing the given text.
+Cypress.Commands.add('tableRowContaining', text => {
+  cy.contains(text)
+    .parentsUntil('tr').parent()
+})
+
+// Once a ListTable row is selected (prevSubject), click the specified row action.
+Cypress.Commands.add(
+  'rowAction',
+  { prevSubject: true },
+  (subject, action) => {
+    subject.find('button[aria-label="More Actions"]').click()
+    cy.get('#more-menu').contains(action).click()
+  }
+)
