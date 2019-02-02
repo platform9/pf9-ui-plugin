@@ -34,18 +34,18 @@ describe('clusters', () => {
     context.only('attach node', () => {
       it('shows the modal for adding nodes to the cluster', () => {
         cy.visit('/ui/kubernetes/clusters')
-        cy.tableRowContaining('fakeCluster1')
+        cy.row('fakeCluster1')
           .rowAction('Attach node')
         cy.contains('Attach Node to Cluster')
       })
 
-      it('closes the modal on cancel', () => {
+      it.skip('closes the modal on cancel', () => {
         cy.contains('Cancel').click()
         cy.contains('Attach Node to Cluster').should('not.exist')
       })
 
-      it('closes the modal on attach', () => {
-        cy.tableRowContaining('fakeCluster1')
+      it.skip('closes the modal on attach', () => {
+        cy.row('fakeCluster1')
           .rowAction('Attach node')
         cy.contains('Attach Node to Cluster')
         cy.contains('button', 'Attach').click()

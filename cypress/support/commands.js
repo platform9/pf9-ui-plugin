@@ -38,9 +38,8 @@ Cypress.Commands.add('setSimSession', () => {
 })
 
 // For use with <ListTable>.  This will select the row containing the given text.
-Cypress.Commands.add('tableRowContaining', text => {
-  cy.contains(text)
-    .parentsUntil('tr').parent()
+Cypress.Commands.add('row', text => {
+  cy.contains('tr', text)
 })
 
 // Once a ListTable row is selected (prevSubject), click the specified row action.

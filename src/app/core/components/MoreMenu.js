@@ -39,7 +39,7 @@ class MoreMenu extends React.Component {
       <div>
         {this.props.items.map(({ action, icon, dialog, label }) => {
           const Modal = dialog
-          return this.state.openedAction === label && <Modal key={label} onClose={this.handleModalClose} />
+          return this.state.openedAction === label && <Modal key={label} onClose={this.handleModalClose} row={this.props.data} />
         })}
         <IconButton
           aria-label="More Actions"

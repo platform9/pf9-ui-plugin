@@ -7,7 +7,7 @@ class Qbert {
   async endpoint () {
     const services = await this.client.keystone.getServicesForActiveRegion()
     const endpoint = services.qbert.admin.url
-    return endpoint.replace(/v(1|2|3)$/, `v2/${this.client.activeProjectId}`)
+    return endpoint.replace(/v(1|2|3)$/, `v3/${this.client.activeProjectId}`)
   }
 
   async monocularBaseUrl () {
@@ -16,6 +16,7 @@ class Qbert {
   }
 
   baseUrl = async () => `${await this.endpoint()}`
+
   clusterBaseUrl = async clusterId => `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1`
   clusterMonocularBaseUrl = async clusterId => `${await this.clusterBaseUrl(clusterId)}/namespaces/kube-system/services/monocular-api-svc:80/proxy/v1`
 
@@ -110,7 +111,13 @@ class Qbert {
     list: this.getClusters,
   }
 
-  async attach (clusterId, nodeIds) { /* TODO */ }
+  // @param clusterId = cluster.uuid
+  // @param nodes = [{ uuid: node.uuid, isMaster: (true|false) }]
+  async attach (clusterId, nodes) {
+    console.log(clusterId, nodes)
+    return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/attach`, nodes)
+  }
+
   async _detach (clusterId, nodeIds) { /* TODO */ }
   async detach (clusterId, nodeIds) { /* TODO */ }
 

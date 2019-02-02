@@ -37,28 +37,29 @@ import { tokenValidator } from '../../middleware'
 
 const router = express.Router()
 
-router.get('/v2/:tenantId/cloudProviders', tokenValidator, getCloudProviders)
-router.post('/v2/:tenantId/cloudProviders', tokenValidator, postCloudProvider)
-router.put('/v2/:tenantId/cloudProviders/:cloudProviderId', tokenValidator, putCloudProvider)
-router.delete('/v2/:tenantId/cloudProviders/:cloudProviderId', tokenValidator, deleteCloudProvider)
+const version = 'v3'
+router.get(`/${version}/:tenantId/cloudProviders`, tokenValidator, getCloudProviders)
+router.post(`/${version}/:tenantId/cloudProviders`, tokenValidator, postCloudProvider)
+router.put(`/${version}/:tenantId/cloudProviders/:cloudProviderId`, tokenValidator, putCloudProvider)
+router.delete(`/${version}/:tenantId/cloudProviders/:cloudProviderId`, tokenValidator, deleteCloudProvider)
 
-router.get('/v2/:tenantId/cloudProviders/types', tokenValidator, getCpTypes)
-router.get('/v2/:tenantId/cloudProviders/:cloudProviderId', tokenValidator, getCpDetails)
-router.get('/v2/:tenantId/cloudProviders/:cloudProviderId/region/:regionId', tokenValidator, getCpRegionDetails)
+router.get(`/${version}/:tenantId/cloudProviders/types`, tokenValidator, getCpTypes)
+router.get(`/${version}/:tenantId/cloudProviders/:cloudProviderId`, tokenValidator, getCpDetails)
+router.get(`/${version}/:tenantId/cloudProviders/:cloudProviderId/region/:regionId`, tokenValidator, getCpRegionDetails)
 
-router.get('/v2/:tenantId/nodes', tokenValidator, getNodes)
+router.get(`/${version}/:tenantId/nodes`, tokenValidator, getNodes)
 
-router.get('/v2/:tenantId/clusters', tokenValidator, getClusters)
-router.post('/v2/:tenantId/clusters', tokenValidator, postCluster)
-router.put('/v2/:tenantId/clusters/:clusterId', tokenValidator, putCluster)
-router.delete('/v2/:tenantId/clusters/:clusterId', tokenValidator, deleteCluster)
-router.get('/v2/:tenantId/clusters/:clusterId/k8sapi/version', tokenValidator, getClusterVersion)
+router.get(`/${version}/:tenantId/clusters`, tokenValidator, getClusters)
+router.post(`/${version}/:tenantId/clusters`, tokenValidator, postCluster)
+router.put(`/${version}/:tenantId/clusters/:clusterId`, tokenValidator, putCluster)
+router.delete(`/${version}/:tenantId/clusters/:clusterId`, tokenValidator, deleteCluster)
+router.get(`/${version}/:tenantId/clusters/:clusterId/k8sapi/version`, tokenValidator, getClusterVersion)
 
-router.post('/v3/:tenantId/clusters/:clusterId/attach', tokenValidator, attachNodes)
-router.post('/v3/:tenantId/clusters/:clusterId/detach', tokenValidator, detachNodes)
+router.post(`/${version}/:tenantId/clusters/:clusterId/attach`, tokenValidator, attachNodes)
+router.post(`/${version}/:tenantId/clusters/:clusterId/detach`, tokenValidator, detachNodes)
 
-const k8sapi = '/v2/:tenantId/clusters/:clusterId/k8sapi/api/v1'
-const k8sBetaApi = '/v2/:tenantId/clusters/:clusterId/k8sapi/apis/extensions/v1beta1'
+const k8sapi = `/${version}/:tenantId/clusters/:clusterId/k8sapi/api/v1`
+const k8sBetaApi = `/${version}/:tenantId/clusters/:clusterId/k8sapi/apis/extensions/v1beta1`
 
 router.get(`${k8sapi}/namespaces`, tokenValidator, getNamespaces)
 
@@ -76,7 +77,7 @@ router.get(`${k8sapi}/namespaces/:namespace/services`, tokenValidator, getServic
 router.post(`${k8sapi}/namespaces/:namespace/services`, tokenValidator, postService)
 router.delete(`${k8sapi}/namespaces/:namespace/services/:serviceName`, tokenValidator, deleteService)
 
-const storageClassApi = '/v2/:tenantId/clusters/:clusterId/k8sapi/apis/storage.k8s.io/v1/storageclasses'
+const storageClassApi = `/${version}/:tenantId/clusters/:clusterId/k8sapi/apis/storage.k8s.io/v1/storageclasses`
 
 router.get(`${storageClassApi}`, tokenValidator, getStorageClasses)
 router.post(`${storageClassApi}`, tokenValidator, postStorageClass)
