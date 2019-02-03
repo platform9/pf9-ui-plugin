@@ -120,6 +120,7 @@ module.exports = {
       app: path.resolve(__dirname, 'src/app'),
       server: path.resolve(__dirname, 'src/server'),
       'api-client': path.resolve(__dirname, 'src/api-client'),
+      hackathon10: path.resolve(__dirname, 'src/app/plugins/hackathon10'),
     },
   }
 }
