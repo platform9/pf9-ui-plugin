@@ -5,8 +5,15 @@ import { compose } from 'ramda'
 import { withCanvasContext } from './SVGCanvas'
 
 class Draggable extends React.Component {
+  state = {
+    dragging: false,
+  }
+
   handleMouseDown = e => {
     const { buttons } = parseMouseEvent(e)
+
+    if (this.props.selectedTool !== 'move') { return }
+
     if (buttons.left) {
       e.stopPropagation()
       e.preventDefault()
@@ -14,7 +21,6 @@ class Draggable extends React.Component {
 
     this.startX = e.clientX
     this.startY = e.clientY
-    this.props.setCanvasContext({ cursor: 'move' })
     document.addEventListener('mousemove', this.handleMouseMove)
   }
 
@@ -30,18 +36,23 @@ class Draggable extends React.Component {
     const newX = x + dx / scale
     const newY = y + dy / scale
     onDrag({ x: newX, y: newY })
+    this.setState({ dragging: true })
   }
 
   handleMouseUp = e => {
     document.removeEventListener('mousemove', this.handleMouseMove)
   }
 
-  handleMouseEnter = e => {
-    this.props.setCanvasContext({ cursor: 'move' })
-  }
+  // Might want to change some context (like a status bar) when the component is hovered
+  handleMouseEnter = e => {}
+  handleMouseLeave = e => {}
 
-  handleMouseLeave = e => {
-    this.props.setCanvasContext({ cursor: 'default' })
+  handleClick = e => {
+    if (this.state.dragging) {
+      this.setState({ dragging: false })
+      return
+    }
+    this.props.onClick && this.props.onClick(e)
   }
 
   render () {
@@ -49,6 +60,7 @@ class Draggable extends React.Component {
     return (
       <g
         transform={`translate(${x}, ${y})`}
+        onClick={this.handleClick}
         onMouseDown={this.handleMouseDown}
         onMouseUp={this.handleMouseUp}
         onMouseEnter={this.handleMouseEnter}
@@ -63,7 +75,9 @@ class Draggable extends React.Component {
 Draggable.propTypes = {
   x: PropTypes.number.isRequired,
   y: PropTypes.number.isRequired,
+  onClick: PropTypes.func,
   onDrag: PropTypes.func.isRequired,
+  selectedTool: PropTypes.string.isRequired,
 }
 
 export default compose(

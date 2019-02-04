@@ -13,12 +13,10 @@ class SVGCanvas extends React.Component {
   canvasRef = React.createRef()
   state = {
     dragging: false,
-    previousCursor: null,
     canvasOffsetX: 0,
     canvasOffsetY: 0,
     scale: 1.0,
     zoom: 1.25,
-    selectedTool: 'move',
     setCanvasContext: (...args) => {
       // If the `setState` async callback is not passed in default to
       // return a Promise.
@@ -88,8 +86,7 @@ class SVGCanvas extends React.Component {
   }
 
   handleMouseDown = e => {
-    const { cursor, selectedTool } = this.state
-    this.setState({ previousCursor: cursor })
+    const { selectedTool } = this.props
     const { buttons } = parseMouseEvent(e)
     if (buttons.middle) {
       this.startPan(e)
@@ -104,7 +101,7 @@ class SVGCanvas extends React.Component {
   handleMouseUp = e => {
     const { buttons } = parseMouseEvent(e)
     if (!buttons.middle) {
-      this.setState({ dragging: false, cursor: this.state.previousCursor })
+      this.setState({ dragging: false })
     }
   }
 
@@ -119,12 +116,11 @@ class SVGCanvas extends React.Component {
     this.startX = canvasX
     this.startY = canvasY
     this.setState({ dragging: true })
-    this.setState({ cursor: 'grabbing' })
   }
 
   render () {
-    const { children, width, height } = this.props
-    const { canvasOffsetX, canvasOffsetY, scale, cursor } = this.state
+    const { children, cursor, width, height } = this.props
+    const { canvasOffsetX, canvasOffsetY, scale } = this.state
     const vbWidth = width / scale
     const vbHeight = height / scale
 

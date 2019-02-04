@@ -1,27 +1,16 @@
 import React from 'react'
-import { compose } from 'ramda'
-import { withAppContext } from 'core/AppContext'
+import PropTypes from 'prop-types'
 
 const keyMap = {
   ' ': 'move',
-  'a': 'add',
+  'c': 'create',
   'd': 'delete',
   'e': 'edit',
-  's': 'select',
+  'a': 'select',
   't': 'text',
   'v': 'move',
   'w': 'wire',
   'Delete': 'delete',
-}
-
-const cursorMap = {
-  add: 'crosshair',
-  delete: 'no-drop',
-  edit: 'pointer',
-  select: 'default',
-  text: 'text',
-  move: 'grab',
-  wire: 'default',
 }
 
 class HotKeys extends React.Component {
@@ -30,7 +19,7 @@ class HotKeys extends React.Component {
   }
 
   handleKeyDown = e => {
-    const { context, setContext } = this.props
+    const { onToolChange, selectedTool } = this.props
 
     // Stop the page from scrolling when space is pressed
     if (e.key === ' ') {
@@ -43,29 +32,20 @@ class HotKeys extends React.Component {
 
     // Spacebar is a temporary tool.  It reverts back to previous tool.
     if (e.key === ' ') {
-      this.setState({ previousTool: context.selectedTool })
-      setContext({ cursor: 'grab' })
+      this.setState({ previousTool: selectedTool })
     }
 
     const tool = keyMap[e.key]
     if (!tool) { return }
 
-    setContext({ selectedTool: tool })
-    this.setCursor(tool)
+    onToolChange(tool)
   }
 
   handleKeyUp = e => {
     // Revert back to previous tool when spacebar is released.
     if (e.key === ' ' && this.state.previousTool) {
-      this.props.setContext({ selectedTool: this.state.previousTool })
-      this.setCursor(this.state.previousTool)
+      this.props.onToolChange(this.state.previousTool)
     }
-  }
-
-  setCursor = tool => {
-    const cursor = cursorMap[tool]
-    if (!cursor) { return }
-    this.props.setContext({ cursor })
   }
 
   componentDidMount () {
@@ -81,6 +61,9 @@ class HotKeys extends React.Component {
   render = () => this.props.children
 }
 
-export default compose(
-  withAppContext,
-)(HotKeys)
+HotKeys.propTypes = {
+  selectedTool: PropTypes.string.isRequired,
+  onToolChange: PropTypes.func.isRequired,
+}
+
+export default HotKeys
