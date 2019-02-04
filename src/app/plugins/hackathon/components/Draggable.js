@@ -1,14 +1,10 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import parseMouseEvent from '../parseMouseEvent'
 import { compose } from 'ramda'
 import { withCanvasContext } from './SVGCanvas'
 
 class Draggable extends React.Component {
-  state = {
-    x: 0,
-    y: 0,
-  }
-
   handleMouseDown = e => {
     const { buttons } = parseMouseEvent(e)
     if (buttons.left) {
@@ -23,6 +19,7 @@ class Draggable extends React.Component {
   }
 
   handleMouseMove = e => {
+    const { onDrag, x, y } = this.props
     const { buttons } = parseMouseEvent(e)
     if (!buttons.left) { return }
     const dx = e.clientX - this.startX
@@ -30,10 +27,9 @@ class Draggable extends React.Component {
     this.startX = e.clientX
     this.startY = e.clientY
     const { scale } = this.props.canvasContext
-    const x = this.state.x + dx / scale
-    const y = this.state.y + dy / scale
-    this.setState({ x, y })
-    if (this.props.onChange) { this.props.onChange({ x, y }) }
+    const newX = x + dx / scale
+    const newY = y + dy / scale
+    onDrag({ x: newX, y: newY })
   }
 
   handleMouseUp = e => {
@@ -49,8 +45,7 @@ class Draggable extends React.Component {
   }
 
   render () {
-    const { children } = this.props
-    const { x, y } = this.state
+    const { children, x, y } = this.props
     return (
       <g
         transform={`translate(${x}, ${y})`}
@@ -63,6 +58,12 @@ class Draggable extends React.Component {
       </g>
     )
   }
+}
+
+Draggable.propTypes = {
+  x: PropTypes.number.isRequired,
+  y: PropTypes.number.isRequired,
+  onDrag: PropTypes.func.isRequired,
 }
 
 export default compose(

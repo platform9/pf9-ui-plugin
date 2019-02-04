@@ -31,7 +31,7 @@ class SVGCanvas extends React.Component {
         setImmediate(() => { window.context = this.state })
         this.setState(...args, resolve)
       })
-    }
+    },
   }
 
   getNumbers = e => {
