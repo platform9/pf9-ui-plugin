@@ -112,7 +112,6 @@ class SVGCanvas extends React.Component {
       contextCenter: { x: canvasX, y: canvasY },
       showContext: true,
     })
-    console.log('handleContextMenu', canvasX, canvasY)
     e.preventDefault()
     e.stopPropagation()
   }
