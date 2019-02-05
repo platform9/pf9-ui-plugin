@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Draggable from '../Draggable'
 
-export const width = 150
+export const width = 180
 export const height = 50
 
 export const wireStart = node => [node.x + width / 2, node.y + height / 2]

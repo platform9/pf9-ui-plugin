@@ -1,5 +1,6 @@
 import React from 'react'
 import { Grid, Typography } from '@material-ui/core'
+import PanelRow from './PanelRow'
 
 class CommonPanel extends React.Component {
   render () {
@@ -10,21 +11,21 @@ class CommonPanel extends React.Component {
       <div>
         <Typography variant="h6">Common</Typography>
         <Grid container alignItems="center">
-          <Grid item xs={4}>id</Grid>
-          <Grid item xs={8}>{node.id}</Grid>
+          <PanelRow title="id">{node.id}</PanelRow>
 
-          <Grid item xs={4}>position</Grid>
-          <Grid item xs={8}>
+          <PanelRow title="position">
             x: {node.x.toFixed(0)}
             <br />
             y: {node.y.toFixed(0)}
-          </Grid>
+          </PanelRow>
 
-          <Grid item xs={4}>Input</Grid>
-          <Grid item xs={8}><pre>{JSON.stringify(result.input, null, 4)}</pre></Grid>
+          <PanelRow title="input">
+            <pre>{JSON.stringify(result.input, null, 4)}</pre>
+          </PanelRow>
 
-          <Grid item xs={4}>Output</Grid>
-          <Grid item xs={8}><pre>{JSON.stringify(result.output, null, 4)}</pre></Grid>
+          <PanelRow title="output">
+            <pre>{JSON.stringify(result.output, null, 4)}</pre>
+          </PanelRow>
         </Grid>
       </div>
     )

@@ -23,7 +23,7 @@ const NodeWalker = workflow => {
       const { action } = node
       if (action === 'API') {
         // TODO: Make actual API call
-        const response = { status: 200, body: { nodes: [ { id: 1, name: 'foo' } ] } }
+        const response = { status: 200, body: { nodes: [ { id: 1, name: 'foo', clusterUuid: 'abc' } ] } }
         // TODO: memoize result in editor
         return { input, context, output: response, nextNodes }
       }

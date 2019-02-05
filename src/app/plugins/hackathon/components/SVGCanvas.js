@@ -72,6 +72,7 @@ class SVGCanvas extends React.Component {
     const canvasOffsetX = canvasX - newRangeX * normOffsetX
     const canvasOffsetY = canvasY - newRangeY * normOffsetY
     this.setState({ scale: newScale, canvasOffsetX, canvasOffsetY })
+    e.preventDefault()
   }
 
   handleMouseMove = e => {

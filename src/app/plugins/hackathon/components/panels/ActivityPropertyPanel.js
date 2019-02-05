@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { compose } from 'ramda'
 import Picklist from 'core/components/Picklist'
 import CommonPanel from './CommonPanel'
+import PanelRow from './PanelRow'
 import { Divider, Grid, List, ListItem, ListItemText, Typography, TextField } from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles'
 
@@ -23,6 +24,7 @@ class ActivityPropertyPanel extends React.Component {
 
   render () {
     const { node, nodeWalker } = this.props
+
     return (
       <div>
         <Typography variant="h5">Activity</Typography>
@@ -30,13 +32,11 @@ class ActivityPropertyPanel extends React.Component {
 
         <Typography variant="h6">Action</Typography>
         <Grid container alignItems="center">
-          <Grid item xs={4}>label</Grid>
-          <Grid item xs={8}>
+          <PanelRow title="label">
             <TextField name="label" label="label" value={node.label || ''} onChange={this.handleChangeEventValue('label')} />
-          </Grid>
+          </PanelRow>
 
-          <Grid item xs={4}>action type</Grid>
-          <Grid item xs={8}>
+          <PanelRow title="action type">
             <Picklist
               name="action"
               options={actionTypes}
@@ -44,7 +44,7 @@ class ActivityPropertyPanel extends React.Component {
               value={node.action || ''}
               onChange={this.handleChange('action')}
             />
-          </Grid>
+          </PanelRow>
         </Grid>
         <Divider />
 
@@ -55,12 +55,10 @@ class ActivityPropertyPanel extends React.Component {
           <React.Fragment>
             <Typography variant="h6">API call</Typography>
             <Grid container alignItems="center">
-              <Grid item xs={4}>URL</Grid>
-              <Grid item xs={8}>
+              <PanelRow title="url">
                 <TextField name="url" label="url" value={node.url || ''} onChange={this.handleChangeEventValue('url')} />
-              </Grid>
-              <Grid item xs={4}>HTTP method</Grid>
-              <Grid item xs={8}>
+              </PanelRow>
+              <PanelRow title="HTTP method">
                 <Picklist
                   name="httpMethod"
                   options={httpMethods}
@@ -68,7 +66,7 @@ class ActivityPropertyPanel extends React.Component {
                   value={node.httpMethod || ''}
                   onChange={this.handleChange('httpMethod')}
                 />
-              </Grid>
+              </PanelRow>
             </Grid>
           </React.Fragment>
         }
@@ -78,8 +76,7 @@ class ActivityPropertyPanel extends React.Component {
             <Typography variant="h6">path</Typography>
             <p>Specify the path (lens) selection as a string separated with '.'</p>
             <Grid container alignItems="center">
-              <Grid item xs={4}>path</Grid>
-              <Grid item xs={8}>
+              <PanelRow title="path">
                 <TextField name="path" label="path" value={node.path || ''} onChange={this.handleChangeEventValue('path')} />
                 <br />
                 <p>Or... just click the keys you want to use</p>
@@ -93,7 +90,7 @@ class ActivityPropertyPanel extends React.Component {
                         const newParts = parts.slice(0, -1)
                         return this.handleChange('path')(newParts.join('.'))
                       }
-                      const prefix = node.path.length > 0 ? `${node.path}.` : ''
+                      const prefix = (node.path || '').length > 0 ? `${node.path}.` : ''
                       this.handleChange('path')(prefix + key)
                     }
                     return (
@@ -107,11 +104,10 @@ class ActivityPropertyPanel extends React.Component {
                     )
                   } catch (err) {}
                 })()}
-              </Grid>
-              <Grid item xs={4}>default value</Grid>
-              <Grid item xs={8}>
+              </PanelRow>
+              <PanelRow title="default value">
                 <TextField name="pathDefault" label="pathDefault" value={node.pathDefault || ''} onChange={this.handleChangeEventValue('pathDefault')} />
-              </Grid>
+              </PanelRow>
             </Grid>
           </React.Fragment>
         }
@@ -122,10 +118,9 @@ class ActivityPropertyPanel extends React.Component {
             <p>Specify new object structure as `{'{'} "destKey": "sourceKey", ... }`</p>
             <p>Note: This must be valid JSON (double quotes required).</p>
             <Grid container alignItems="center">
-              <Grid item xs={4}>mappings</Grid>
-              <Grid item xs={8}>
+              <PanelRow title="mappings">
                 <TextField name="mappings" label="mappings" value={node.mappings || ''} onChange={this.handleChangeEventValue('mappings')} />
-              </Grid>
+              </PanelRow>
             </Grid>
           </React.Fragment>
         }
