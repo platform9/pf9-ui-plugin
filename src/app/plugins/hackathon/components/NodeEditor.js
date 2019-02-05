@@ -83,7 +83,7 @@ class NodeEditor extends React.Component {
     }
 
     this.setState(state => ({
-      nodes: [...state.nodes, {...node, ...defaultProps}]
+      nodes: [...state.nodes, {...node, ...defaultProps, ...props}]
     }))
   }
 
