@@ -1,6 +1,7 @@
 import React from 'react'
 import uuid from 'uuid'
 import HotKeys from './HotKeys'
+import NodeWalker from '../NodeWalker'
 import ActivitySymbol, { addActivityNode } from './symbols/ActivitySymbol'
 import StartSymbol from './symbols/StartSymbol'
 import PropertyInspector from './PropertyInspector'
@@ -43,7 +44,10 @@ class NodeEditor extends React.Component {
     // This is just temp stuff while developing this component
     this.handleAddNode({ type: 'start', x: 200, y: 200 })
     this.handleAddNode({ type: 'activity', x: 300, y: 300, label: 'Delete Node API', action: 'API', httpMethod: 'DELETE', url: '/nodes/{id}' })
-    setTimeout(() => { this.addWire(this.state.nodes[0].id, this.state.nodes[1].id) }, 500)
+    setTimeout(() => {
+      this.addWire(this.state.nodes[0].id, this.state.nodes[1].id)
+      this.setState({ selectedNode: this.state.nodes[1].id, selectedTool: 'select' })
+    }, 500)
   }
 
   deleteNode = selected => {
@@ -180,6 +184,7 @@ class NodeEditor extends React.Component {
     const { nodes, selectedTool, sourceNode, wires } = this.state
     const { classes } = this.props
     const debugJson = omit(['nodes', 'wires'], this.state)
+    const nodeWalker = NodeWalker({ nodes, wires })
     return (
       <div>
         <h1>Node Editor</h1>
@@ -196,7 +201,11 @@ class NodeEditor extends React.Component {
             </Grid>
             <Grid item xs={3}>
               {selectedTool === 'select' &&
-                <PropertyInspector node={this.selectedNode()} onChange={this.handlePropertyChanges} />
+                <PropertyInspector
+                  node={this.selectedNode()}
+                  onChange={this.handlePropertyChanges}
+                  nodeWalker={nodeWalker}
+                />
               }
               {selectedTool === 'wire' &&
                 <div>

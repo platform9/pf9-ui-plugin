@@ -22,13 +22,13 @@ class ActivityPropertyPanel extends React.Component {
   }
 
   render () {
-    const { node } = this.props
+    const { node, nodeWalker } = this.props
     return (
       <div>
         <Typography variant="h5">Activity</Typography>
         <Divider />
 
-        <CommonPanel node={node} />
+        <CommonPanel node={node} nodeWalker={nodeWalker} />
         <Divider />
 
         <Typography variant="h6">Action</Typography>
@@ -80,6 +80,7 @@ class ActivityPropertyPanel extends React.Component {
 
 ActivityPropertyPanel.propTypes = {
   onChange: PropTypes.func.isRequired,
+  nodeWalker: PropTypes.object.isRequired,
 }
 
 export default compose(
