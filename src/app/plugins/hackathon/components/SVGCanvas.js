@@ -4,6 +4,7 @@ import Grid from './Grid'
 import { compose } from 'ramda'
 import { withAppContext } from 'core/AppContext'
 import parseMouseEvent from '../parseMouseEvent'
+import PieMenu, { Slice } from 'react-pie-menu'
 
 export const CanvasContext = React.createContext({})
 const Provider = CanvasContext.Provider
@@ -13,12 +14,10 @@ class SVGCanvas extends React.Component {
   canvasRef = React.createRef()
   state = {
     dragging: false,
-    previousCursor: null,
     canvasOffsetX: 0,
     canvasOffsetY: 0,
     scale: 1.0,
     zoom: 1.25,
-    selectedTool: 'move',
     setCanvasContext: (...args) => {
       // If the `setState` async callback is not passed in default to
       // return a Promise.
@@ -31,7 +30,7 @@ class SVGCanvas extends React.Component {
         setImmediate(() => { window.context = this.state })
         this.setState(...args, resolve)
       })
-    }
+    },
   }
 
   getNumbers = e => {
@@ -88,8 +87,7 @@ class SVGCanvas extends React.Component {
   }
 
   handleMouseDown = e => {
-    const { cursor, selectedTool } = this.state
-    this.setState({ previousCursor: cursor })
+    const { selectedTool } = this.props
     const { buttons } = parseMouseEvent(e)
     if (buttons.middle) {
       this.startPan(e)
@@ -104,13 +102,46 @@ class SVGCanvas extends React.Component {
   handleMouseUp = e => {
     const { buttons } = parseMouseEvent(e)
     if (!buttons.middle) {
-      this.setState({ dragging: false, cursor: this.state.previousCursor })
+      this.setState({ dragging: false })
     }
   }
 
   handleContextMenu = e => {
+    const { canvasX, canvasY } = this.getNumbers(e)
+    this.setState({
+      contextCenter: { x: canvasX, y: canvasY },
+      showContext: true,
+    })
+    console.log('handleContextMenu', canvasX, canvasY)
     e.preventDefault()
     e.stopPropagation()
+  }
+
+  maybeRenderContextMenu = () => {
+    const { contextCenter, showContext, scale } = this.state
+    if (!showContext) { return null }
+
+    const { x, y } = contextCenter
+
+    const close = () => this.setState({ showContext: false })
+
+    const addNode = props => {
+      this.props.onAddNode(props)
+      close()
+    }
+
+    const radius = 140
+
+    return (
+      <foreignObject x={x*scale-radius} y={y*scale - radius} transform={`scale(${1/scale})`}>
+        <PieMenu radius={`${radius}px`} centerRadius="30px" centerX={0} centerY={0}>
+          <Slice onSelect={() => addNode({ type: 'activity', x, y })}>Activity</Slice>
+          <Slice onSelect={close}>End node</Slice>
+          <Slice onSelect={close}>Descision node</Slice>
+          <Slice onSelect={close}>Cancel</Slice>
+        </PieMenu>
+      </foreignObject>
+    )
   }
 
   startPan = (e) => {
@@ -119,12 +150,11 @@ class SVGCanvas extends React.Component {
     this.startX = canvasX
     this.startY = canvasY
     this.setState({ dragging: true })
-    this.setState({ cursor: 'grabbing' })
   }
 
   render () {
-    const { children, width, height } = this.props
-    const { canvasOffsetX, canvasOffsetY, scale, cursor } = this.state
+    const { children, cursor, width, height } = this.props
+    const { canvasOffsetX, canvasOffsetY, scale } = this.state
     const vbWidth = width / scale
     const vbHeight = height / scale
 
@@ -146,6 +176,7 @@ class SVGCanvas extends React.Component {
           <Provider value={this.state}>
             {children}
           </Provider>
+          {this.maybeRenderContextMenu()}
         </svg>
       </React.Fragment>
     )
@@ -168,6 +199,7 @@ SVGCanvas.propTypes = {
   children: PropTypes.node.isRequired,
   width: PropTypes.number,
   height: PropTypes.number,
+  onAddNode: PropTypes.func.isRequired,
 }
 
 SVGCanvas.defaultProps = {

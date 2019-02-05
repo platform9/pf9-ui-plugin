@@ -4,15 +4,21 @@ import PropTypes from 'prop-types'
 const Grid = ({ opacity, minorTick, majorTick, width, height, majorOpacity, minorOpacity }) => {
   let gridLines = []
 
+  const endX = width * 10
+  const startX = -endX
+  const endY = height * 10
+  const startY = -endY
+
   const drawLine = (type, position) => {
     let strokeOpacity = position % majorTick === 0 ? majorOpacity : minorOpacity
+
     if (type === 'horizontal') {
       return (
         <line
           key={`h${position}`}
-          x1="0"
+          x1={startX}
           y1={position}
-          x2={width}
+          x2={endX}
           y2={position}
           stroke="black"
           strokeOpacity={strokeOpacity}
@@ -24,9 +30,9 @@ const Grid = ({ opacity, minorTick, majorTick, width, height, majorOpacity, mino
         <line
           key={`v${position}`}
           x1={position}
-          y1="0"
+          y1={startY}
           x2={position}
-          y2={height}
+          y2={endY}
           stroke="black"
           strokeOpacity={strokeOpacity}
         />
@@ -34,10 +40,10 @@ const Grid = ({ opacity, minorTick, majorTick, width, height, majorOpacity, mino
     }
   }
 
-  for (let offset=0; offset <= width; offset += minorTick) {
+  for (let offset=startX; offset <= endX; offset += minorTick) {
     gridLines.push(drawLine('vertical', offset))
   }
-  for (let offset=0; offset <= height; offset += minorTick) {
+  for (let offset=startY; offset <= endY; offset += minorTick) {
     gridLines.push(drawLine('horizontal', offset))
   }
 
@@ -60,8 +66,8 @@ Grid.propTypes = {
 
 Grid.defaultProps = {
   tickSpacing: 10,
-  minorOpacity: 0.1,
-  majorOpacity: 0.5,
+  minorOpacity: 0.05,
+  majorOpacity: 0.2,
 }
 
 export default Grid

@@ -57,7 +57,7 @@ const styles = theme => ({
 @withStyles(styles, { withTheme: true })
 class AppContainer extends React.Component {
   state = {
-    open: true,
+    open: false,
   }
 
   handleDrawerOpen = () => {

@@ -1,14 +1,17 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import Button from '@material-ui/core/Button'
 import Tooltip from '@material-ui/core/Tooltip'
-import { compose } from 'ramda'
-import { withAppContext } from 'core/AppContext'
 
-const ToolButton = ({ context, setContext, Icon, tool, text='', hotkey='' }) => {
-  const handleClick = e => {
-    setContext({ selectedTool: tool })
-  }
-  const selected = context.selectedTool === tool
+const ToolButton = ({
+  Icon,
+  tool,
+  text='',
+  hotkey='',
+  onClick,
+  selected,
+}) => {
+  const handleClick = e => onClick(tool)
 
   return (
     <Tooltip title={`${text} (${hotkey})`} placement="right-start">
@@ -23,6 +26,8 @@ const ToolButton = ({ context, setContext, Icon, tool, text='', hotkey='' }) => 
   )
 }
 
-export default compose(
-  withAppContext,
-)(ToolButton)
+ToolButton.propTypes = {
+  onClick: PropTypes.func.isRequired,
+}
+
+export default ToolButton
