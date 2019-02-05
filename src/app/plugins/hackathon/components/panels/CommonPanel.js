@@ -4,7 +4,7 @@ import { Grid, Typography } from '@material-ui/core'
 class CommonPanel extends React.Component {
   render () {
     const { node, nodeWalker } = this.props
-    const result = nodeWalker.executeNode(node, null)
+    const result = nodeWalker.executeAll(nodeWalker.startNode, node)
 
     return (
       <div>

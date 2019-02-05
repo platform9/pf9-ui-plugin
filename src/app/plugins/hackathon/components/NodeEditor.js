@@ -43,10 +43,14 @@ class NodeEditor extends React.Component {
   componentDidMount () {
     // This is just temp stuff while developing this component
     this.handleAddNode({ type: 'start', x: 200, y: 200 })
-    this.handleAddNode({ type: 'activity', x: 300, y: 300, label: 'Delete Node API', action: 'API', httpMethod: 'DELETE', url: '/nodes/{id}' })
+    this.handleAddNode({ type: 'activity', x: 300, y: 300, label: 'GET /nodes', action: 'API', httpMethod: 'GET', url: '{qbert}/nodes' })
+    this.handleAddNode({ type: 'activity', x: 400, y: 400, label: 'extract nodes', action: 'path', path: 'body.nodes' })
+    this.handleAddNode({ type: 'activity', x: 300, y: 550, label: 'rename name to label', action: 'projectAs', mappings: '{"id": "id", "label": "name"}' })
     setTimeout(() => {
       this.addWire(this.state.nodes[0].id, this.state.nodes[1].id)
-      this.setState({ selectedNode: this.state.nodes[1].id, selectedTool: 'select' })
+      this.addWire(this.state.nodes[1].id, this.state.nodes[2].id)
+      this.addWire(this.state.nodes[2].id, this.state.nodes[3].id)
+      this.setState({ selectedNode: this.state.nodes[2].id, selectedTool: 'select' })
     }, 500)
   }
 
