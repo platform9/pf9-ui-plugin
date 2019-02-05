@@ -1,5 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import StartPropertyPanel from './panels/StartPropertyPanel'
+import ActivityPropertyPanel from './panels/ActivityPropertyPanel'
 
 class PropertyInspector extends React.Component {
   render () {
@@ -11,7 +13,8 @@ class PropertyInspector extends React.Component {
 
     return (
       <div>
-        <h1>Property Inspector</h1>
+        {node.type === 'start' && <StartPropertyPanel {...this.props} />}
+        {node.type === 'activity' && <ActivityPropertyPanel {...this.props} />}
       </div>
     )
   }
@@ -19,6 +22,7 @@ class PropertyInspector extends React.Component {
 
 PropertyInspector.propTypes = {
   node: PropTypes.object,
+  onChange: PropTypes.func.isRequired,
 }
 
 export default PropertyInspector

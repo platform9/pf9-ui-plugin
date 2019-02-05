@@ -19,6 +19,8 @@ class HotKeys extends React.Component {
   }
 
   handleKeyDown = e => {
+    if (e.target.tagName.toUpperCase() === 'INPUT') { return }
+
     const { onToolChange, selectedTool } = this.props
 
     // Stop the page from scrolling when space is pressed

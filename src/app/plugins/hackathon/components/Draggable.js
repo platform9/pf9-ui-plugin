@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import parseMouseEvent from '../parseMouseEvent'
 import { compose } from 'ramda'
+import { hoverableTools } from './NodeEditor'
 import { withCanvasContext } from './SVGCanvas'
 
 class Draggable extends React.Component {
@@ -44,8 +45,19 @@ class Draggable extends React.Component {
   }
 
   // Might want to change some context (like a status bar) when the component is hovered
-  handleMouseEnter = e => {}
-  handleMouseLeave = e => {}
+  handleMouseEnter = e => {
+    const { selectedTool } = this.props
+    if (hoverableTools.includes(selectedTool)) {
+      this.props.onHoverChange(true)
+    }
+  }
+
+  handleMouseLeave = e => {
+    const { selectedTool } = this.props
+    if (hoverableTools.includes(selectedTool)) {
+      this.props.onHoverChange(false)
+    }
+  }
 
   handleClick = e => {
     if (this.state.dragging) {

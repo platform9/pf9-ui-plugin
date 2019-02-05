@@ -2,8 +2,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Draggable from '../Draggable'
 
-const width = 100
-const height = 50
+export const width = 100
+export const height = 50
+
+export const wireStart = node => [node.x + width / 2, node.y + height / 2]
+export const wireEnd = node => [node.x + width / 2, node.y + height / 2]
 
 class ActivitySymbol extends React.Component {
   render () {
@@ -26,6 +29,7 @@ class ActivitySymbol extends React.Component {
           y={height / 2}
           dominantBaseline="middle"
           textAnchor="middle"
+          style={{ userSelect: 'none' }}
         >
           {label}
         </text>
