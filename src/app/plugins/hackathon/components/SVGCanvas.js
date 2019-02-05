@@ -4,6 +4,7 @@ import Grid from './Grid'
 import { compose } from 'ramda'
 import { withAppContext } from 'core/AppContext'
 import parseMouseEvent from '../parseMouseEvent'
+import PieMenu, { Slice } from 'react-pie-menu'
 
 export const CanvasContext = React.createContext({})
 const Provider = CanvasContext.Provider
@@ -106,8 +107,41 @@ class SVGCanvas extends React.Component {
   }
 
   handleContextMenu = e => {
+    const { canvasX, canvasY } = this.getNumbers(e)
+    this.setState({
+      contextCenter: { x: canvasX, y: canvasY },
+      showContext: true,
+    })
+    console.log('handleContextMenu', canvasX, canvasY)
     e.preventDefault()
     e.stopPropagation()
+  }
+
+  maybeRenderContextMenu = () => {
+    const { contextCenter, scale, showContext } = this.state
+    if (!showContext) { return null }
+
+    const { x, y } = contextCenter
+
+    const close = () => this.setState({ showContext: false })
+
+    const addNode = props => {
+      this.props.onAddNode(props)
+      close()
+    }
+
+    const radius = 140
+
+    return (
+      <foreignObject x={x - radius} y={y - radius} transform={`scale(${1 / scale})`}>
+        <PieMenu radius={`${radius}px`} centerRadius="30px" centerX={0} centerY={0}>
+          <Slice onSelect={() => addNode({ type: 'activity', x, y })}>Activity</Slice>
+          <Slice onSelect={close}>End node</Slice>
+          <Slice onSelect={close}>Descision node</Slice>
+          <Slice onSelect={close}>Cancel</Slice>
+        </PieMenu>
+      </foreignObject>
+    )
   }
 
   startPan = (e) => {
@@ -142,6 +176,7 @@ class SVGCanvas extends React.Component {
           <Provider value={this.state}>
             {children}
           </Provider>
+          {this.maybeRenderContextMenu()}
         </svg>
       </React.Fragment>
     )
@@ -164,6 +199,7 @@ SVGCanvas.propTypes = {
   children: PropTypes.node.isRequired,
   width: PropTypes.number,
   height: PropTypes.number,
+  onAddNode: PropTypes.func.isRequired,
 }
 
 SVGCanvas.defaultProps = {

@@ -1,7 +1,7 @@
 import React from 'react'
 import uuid from 'uuid'
 import HotKeys from './HotKeys'
-import ActivitySymbol from './symbols/ActivitySymbol'
+import ActivitySymbol, { addActivityNode } from './symbols/ActivitySymbol'
 import StartSymbol from './symbols/StartSymbol'
 import PropertyInspector from './PropertyInspector'
 import SVGCanvas from './SVGCanvas'
@@ -40,8 +40,9 @@ class NodeEditor extends React.Component {
   }
 
   componentDidMount () {
+    // This is just temp stuff while developing this component
     this.handleAddNode({ type: 'start', x: 200, y: 200 })
-    this.handleAddNode({ type: 'activity', x: 300, y: 300, label: 'API call 2', action: 'API', httpMethod: 'DELETE', url: '/nodes/{id}' })
+    this.handleAddNode({ type: 'activity', x: 300, y: 300, label: 'Delete Node API', action: 'API', httpMethod: 'DELETE', url: '/nodes/{id}' })
     setTimeout(() => { this.addWire(this.state.nodes[0].id, this.state.nodes[1].id) }, 500)
   }
 
@@ -75,8 +76,14 @@ class NodeEditor extends React.Component {
   handleAddNode = props => {
     const id = uuid.v4()
     const node = { id, ...props }
+
+    let defaultProps = {}
+    if (props.type === 'activity') {
+      defaultProps = addActivityNode(props)
+    }
+
     this.setState(state => ({
-      nodes: [...state.nodes, node]
+      nodes: [...state.nodes, {...node, ...defaultProps}]
     }))
   }
 
@@ -182,7 +189,7 @@ class NodeEditor extends React.Component {
               <ToolPalette onToolChange={this.handleToolChange} selectedTool={selectedTool} />
             </Grid>
             <Grid item xs={8} className={classes.canvasWrapper}>
-              <SVGCanvas width={1300} height={600} cursor={this.determineCursor()}>
+              <SVGCanvas width={1300} height={600} cursor={this.determineCursor()} onAddNode={this.handleAddNode}>
                 {wires.map(this.renderWire)}
                 {nodes.map(this.renderNode)}
               </SVGCanvas>

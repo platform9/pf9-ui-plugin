@@ -9,7 +9,11 @@ const CommonPanel = ({ node, ...rest }) => (
       <Grid item xs={8}>{node.id}</Grid>
 
       <Grid item xs={4}>position</Grid>
-      <Grid item xs={8}>x: {node.x}, y: {node.y}</Grid>
+      <Grid item xs={8}>
+        x: {node.x.toFixed(0)}
+        <br />
+        y: {node.y.toFixed(0)}
+      </Grid>
     </Grid>
   </div>
 )

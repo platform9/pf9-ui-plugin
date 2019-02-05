@@ -2,15 +2,29 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Draggable from '../Draggable'
 
-export const width = 100
+export const width = 150
 export const height = 50
 
 export const wireStart = node => [node.x + width / 2, node.y + height / 2]
 export const wireEnd = node => [node.x + width / 2, node.y + height / 2]
 
+export const addActivityNode = props => {
+  const x = props.x - width / 2
+  const y = props.y - height / 2
+
+  return ({ x, y, label: 'label' })
+}
+
 class ActivitySymbol extends React.Component {
+  componentDidMount () {
+    this.setWidthByLabel()
+  }
+
+  setWidthByLabel = () => {
+
+  }
   render () {
-    const { label, x, y, ...rest } = this.props
+    const { label, x, y, width, height, ...rest } = this.props
     return (
       <Draggable x={x} y={y} {...rest}>
         <rect
@@ -46,6 +60,8 @@ ActivitySymbol.propTypes = {
 
 ActivitySymbol.defaultProps = {
   label: 'change me',
+  width,
+  height,
 }
 
 export default ActivitySymbol
