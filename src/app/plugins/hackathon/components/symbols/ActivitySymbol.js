@@ -12,7 +12,7 @@ export const addActivityNode = props => {
   const x = props.x - width / 2
   const y = props.y - height / 2
 
-  return ({ x, y, label: 'label' })
+  return ({ x, y })
 }
 
 class ActivitySymbol extends React.Component {
@@ -59,7 +59,7 @@ ActivitySymbol.propTypes = {
 }
 
 ActivitySymbol.defaultProps = {
-  label: 'change me',
+  label: 'label',
   width,
   height,
 }

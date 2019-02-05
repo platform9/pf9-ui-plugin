@@ -118,7 +118,7 @@ class SVGCanvas extends React.Component {
   }
 
   maybeRenderContextMenu = () => {
-    const { contextCenter, scale, showContext } = this.state
+    const { contextCenter, showContext, scale } = this.state
     if (!showContext) { return null }
 
     const { x, y } = contextCenter
@@ -133,7 +133,7 @@ class SVGCanvas extends React.Component {
     const radius = 140
 
     return (
-      <foreignObject x={x - radius} y={y - radius} transform={`scale(${1 / scale})`}>
+      <foreignObject x={x*scale-radius} y={y*scale - radius} transform={`scale(${1/scale})`}>
         <PieMenu radius={`${radius}px`} centerRadius="30px" centerX={0} centerY={0}>
           <Slice onSelect={() => addNode({ type: 'activity', x, y })}>Activity</Slice>
           <Slice onSelect={close}>End node</Slice>

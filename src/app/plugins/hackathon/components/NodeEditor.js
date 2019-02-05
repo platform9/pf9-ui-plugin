@@ -77,13 +77,13 @@ class NodeEditor extends React.Component {
     const id = uuid.v4()
     const node = { id, ...props }
 
-    let defaultProps = {}
+    let additionalProps = {}
     if (props.type === 'activity') {
-      defaultProps = addActivityNode(props)
+      additionalProps = addActivityNode(props)
     }
 
     this.setState(state => ({
-      nodes: [...state.nodes, {...node, ...defaultProps, ...props}]
+      nodes: [...state.nodes, { ...node, ...props, ...additionalProps }]
     }))
   }
 
