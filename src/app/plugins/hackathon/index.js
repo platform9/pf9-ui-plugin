@@ -1,9 +1,9 @@
 import React from 'react'
+import Demo from './components/Demo'
+import FormBuilder from './components/formBuilder/FormBuilder'
 
 import Hackathon10Home from './components/Hackathon10Home'
-import FormBuilder from './components/FormBuilder'
 import NodeEditor from './components/NodeEditor'
-import Demo from './components/Demo'
 
 class Hackathon extends React.Component {
   render () {

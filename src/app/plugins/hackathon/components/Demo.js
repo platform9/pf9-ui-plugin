@@ -1,5 +1,5 @@
 import React from 'react'
-import FormBuilder from './FormBuilder'
+import FormBuilder from './formBuilder/FormBuilder'
 import NodeEditor from './NodeEditor'
 
 class Demo extends React.Component {

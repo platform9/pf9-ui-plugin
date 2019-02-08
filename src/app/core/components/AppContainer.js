@@ -1,9 +1,11 @@
-import React from 'react'
-import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/core/styles'
 import classNames from 'classnames'
 import Navbar, { drawerWidth } from 'core/components/Navbar'
 import Toolbar from 'core/components/Toolbar'
+import PropTypes from 'prop-types'
+import React from 'react'
+import { DragDropContext } from 'react-dnd'
+import HTML5Backend from 'react-dnd-html5-backend'
 
 const styles = theme => ({
   root: {
@@ -102,4 +104,4 @@ AppContainer.propTypes = {
   sections: Navbar.propTypes.sections
 }
 
-export default AppContainer
+export default DragDropContext(HTML5Backend)(AppContainer)
