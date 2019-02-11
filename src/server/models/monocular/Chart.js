@@ -1,6 +1,6 @@
+import faker from 'faker'
 import { pick, times } from 'ramda'
 import createModel from '../createModel'
-import faker from 'faker'
 
 // TODO:
 //   We need to associate charts with a cluster as well.
@@ -36,7 +36,7 @@ const createFn = (_params={}, context) => {
           app_version: times(faker.random.number, 3).join('.'),
           created: '2018-12-17T22:55:38.21494671Z',
           digest: '92353f0bb7ec4ef735fad9acf593e7fb391d1fae619b762e1789d9517628533b',
-          icons: [ { name: '160x160-fit', path: '/assets/stable/logo.png' } ],
+          icons: [ { name: '160x160-fit', path: faker.image.imageUrl() } ],
           readme: '/assets/stable/project/0.1.2/README.md',
           urls: [ 'https://project-0.1.2.tar.gz' ],
           version: '0.1.2',

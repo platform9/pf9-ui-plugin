@@ -1,32 +1,34 @@
 /* eslint-disable no-unused-vars, no-undef */
+import faker from 'faker'
+import { range } from 'ramda'
 import context from '../context'
-import Region from '../models/openstack/Region'
-import Role from '../models/openstack/Role'
-import Tenant from '../models/openstack/Tenant'
-import User from '../models/openstack/User'
+import Chart from '../models/monocular/Chart'
+import Application from '../models/openstack/Application'
 import Flavor from '../models/openstack/Flavor'
+import FloatingIp from '../models/openstack/FloatingIp'
+import Hypervisor from '../models/openstack/Hypervisor'
+import Image from '../models/openstack/Image'
 import Instance from '../models/openstack/Instance'
 import Network from '../models/openstack/Network'
+import Region from '../models/openstack/Region'
+import Role from '../models/openstack/Role'
 import Router from '../models/openstack/Router'
-import FloatingIp from '../models/openstack/FloatingIp'
-import Volume from '../models/openstack/Volume'
-import Image from '../models/openstack/Image'
-import Application from '../models/openstack/Application'
 import SshKey from '../models/openstack/SshKey'
-import Hypervisor from '../models/openstack/Hypervisor'
-import ResMgrHost from '../models/resmgr/ResMgrHost'
+import Tenant from '../models/openstack/Tenant'
+import User from '../models/openstack/User'
+import Volume from '../models/openstack/Volume'
 import CloudProvider from '../models/qbert/CloudProvider'
-import Node from '../models/qbert/Node'
 import Cluster from '../models/qbert/Cluster'
-import Namespace from '../models/qbert/Namespace'
-import Pod from '../models/qbert/Pod'
 import Deployment from '../models/qbert/Deployment'
-import Service from '../models/qbert/Service'
-import Chart from '../models/monocular/Chart'
-import StorageClass from '../models/qbert/StorageClass'
+import Namespace from '../models/qbert/Namespace'
+import Node from '../models/qbert/Node'
 import { attachNodeToCluster } from '../models/qbert/Operations'
+import Pod from '../models/qbert/Pod'
+import Service from '../models/qbert/Service'
+import StorageClass from '../models/qbert/StorageClass'
+import ResMgrHost from '../models/resmgr/ResMgrHost'
+
 // import Token from '../models/openstack/Token'
-import { range } from '../util'
 
 function loadPreset () {
   console.log(`Loading 'dev' preset.`)
@@ -36,7 +38,7 @@ function loadPreset () {
   const testTenant = new Tenant({ name: 'test' })
 
   // Create a bunch of tenants
-  range(2).forEach(i => {
+  range(1, 2).forEach(i => {
     new Tenant({ name: `Tenant #${i}`, description: `${i}` })
   })
 
@@ -55,7 +57,7 @@ function loadPreset () {
   adminUser.rolePair = context.getTenantRoles(adminUser.id)
 
   // Create a bunch of misc users
-  range(2).forEach(i => {
+  range(1, 2).forEach(i => {
     let email = `user${i}@platform9.com`
     let user = new User({
       email,
@@ -130,34 +132,38 @@ function loadPreset () {
   Cluster.create({ data: { name: 'mockAwsCluster', cloudProviderType: 'aws' }, context })
   Cluster.create({ data: { name: 'mockOpenStackCluster', cloudProviderType: 'openstack' }, context })
 
-  // Nodes
-  // Nodes must be linked to a resMgrHost id or else the UI will break
-  const node = Node.create({
-    data: { name: 'fakeNode1', api_responding: 1, isMaster: 1, uuid: resMgrHost.id },
-    context,
-    raw: true
+    // Nodes
+    // Nodes must be linked to a resMgrHost id or else the UI will break
+    const node = Node.create({
+      data: { name: 'fakeNode1', api_responding: 1, isMaster: 1, uuid: resMgrHost.id },
+      context,
+      raw: true
+    })
+    Node.create({ data: { name: 'fakeNode2', uuid: resMgrHost2.id }, context })
+
+    attachNodeToCluster(node, cluster)
+
+    // Namespaces
+    const defaultNamespace = Namespace.create({ data: { name: 'default' }, context, config: { clusterId: cluster.uuid }, raw: true })
+
+    // Pods
+    Pod.create({ data: { metadata: { name: 'fakePod' } }, context, config: { clusterId: cluster.uuid, namespace: defaultNamespace.name } })
+
+    // Deployments (and pods)
+    Deployment.create({ data: { metadata: { name: 'fakeDeployment' }, spec: { replicas: 2 } }, context, config: { clusterId: cluster.uuid, namespace: defaultNamespace.name } })
+
+    // Services
+    Service.create({ data: { metadata: { name: 'fakeService' } }, context, config: { clusterId: cluster.uuid, namespace: defaultNamespace.name } })
+
+    // Storage Classes
+    StorageClass.create({ data: { metadata: { name: 'fakeStorageClass', annotations: { 'storageclass.kubernetes.io/is-default-class': 'true' } } }, context, config: { clusterId: cluster.uuid } })
+
+    // Monocular Charts
+    range(1, faker.random.number({
+      'min': 2,
+      'max': 10
+    })).forEach(i => Chart.create({ data: {}, context, config: { clusterId: cluster.uuid, namespace: defaultNamespace.name } }))
   })
-  Node.create({ data: { name: 'fakeNode2', uuid: resMgrHost2.id }, context })
-
-  attachNodeToCluster(node, cluster)
-
-  // Namespaces
-  const defaultNamespace = Namespace.create({ data: { name: 'default' }, context, config: { clusterId: cluster.uuid }, raw: true })
-
-  // Pods
-  Pod.create({ data: { metadata: { name: 'fakePod' } }, context, config: { clusterId: cluster.uuid, namespace: defaultNamespace.name } })
-
-  // Deployments (and pods)
-  Deployment.create({ data: { metadata: { name: 'fakeDeployment' }, spec: { replicas: 2 } }, context, config: { clusterId: cluster.uuid, namespace: defaultNamespace.name } })
-
-  // Services
-  Service.create({ data: { metadata: { name: 'fakeService' } }, context, config: { clusterId: cluster.uuid, namespace: defaultNamespace.name } })
-
-  // Storage Classes
-  StorageClass.create({ data: { metadata: { name: 'fakeStorageClass', annotations: { 'storageclass.kubernetes.io/is-default-class': 'true' } } }, context, config: { clusterId: cluster.uuid } })
-
-  // Monocular Charts
-  range(3).forEach(i => Chart.create({ data: undefined, context }))
 }
 
 export default loadPreset

@@ -1,13 +1,9 @@
-import React from 'react'
-import PropTypes from 'prop-types'
+import { Grid, Paper, TablePagination } from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles'
-import {
-  Grid,
-  Paper,
-  TablePagination,
-} from '@material-ui/core'
+import PropTypes from 'prop-types'
+import React from 'react'
+import ApplicationCard from '../appCatalog/ApplicationCard'
 import CardTableToolbar from './CardTableToolbar'
-import ApplicationCard from './ApplicationCard'
 
 const styles = theme => ({
   root: {
@@ -46,7 +42,8 @@ class CardTable extends React.Component {
 
   filterBySearch = (data, target) => {
     const { searchTerm } = this.state
-    return data.filter(ele => ele[target].match(new RegExp(searchTerm, 'i')) !== null)
+    return data.filter(
+      ele => ele[target].match(new RegExp(searchTerm, 'i')) !== null)
   }
 
   renderPaginationControls = (count) => {
@@ -70,7 +67,9 @@ class CardTable extends React.Component {
     const { classes, data, searchTarget } = this.props
     const { searchTerm } = this.state
 
-    const searchData = searchTerm === '' ? data : this.filterBySearch(data, searchTarget)
+    const searchData = searchTerm === ''
+      ? data
+      : this.filterBySearch(data, searchTarget)
 
     return (
       <Grid container justify="center">
@@ -81,7 +80,8 @@ class CardTable extends React.Component {
               searchTerm={searchTerm}
             />
             <Grid container spacing={24} justify="flex-start">
-              {searchData.map(app => <ApplicationCard application={app} key={app.name} />)}
+              {searchData.map(app =>
+                <ApplicationCard application={app} key={app.id} />)}
             </Grid>
             {this.renderPaginationControls(15)}
           </Paper>

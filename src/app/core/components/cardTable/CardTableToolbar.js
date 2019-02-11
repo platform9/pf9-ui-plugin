@@ -1,7 +1,7 @@
-import React from 'react'
-import { withStyles } from '@material-ui/core/styles'
 import { Toolbar } from '@material-ui/core'
+import { withStyles } from '@material-ui/core/styles'
 import SearchBar from 'core/components/SearchBar'
+import React from 'react'
 
 const styles = theme => ({
   root: {
@@ -19,9 +19,7 @@ const styles = theme => ({
 })
 
 const CardTableToolbar = ({ classes, onSearchChange, searchTerm }) => (
-  <Toolbar
-    className={classes.root}
-  >
+  <Toolbar className={classes.root}>
     <div className={classes.spacer} />
     <div className={classes.actions}>
       <Toolbar>
@@ -29,8 +27,7 @@ const CardTableToolbar = ({ classes, onSearchChange, searchTerm }) => (
           <SearchBar
             onSearchChange={onSearchChange}
             searchTerm={searchTerm}
-          />
-        }
+          />}
       </Toolbar>
     </div>
   </Toolbar>

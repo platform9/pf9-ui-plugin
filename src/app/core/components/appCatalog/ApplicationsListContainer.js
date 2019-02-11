@@ -1,6 +1,6 @@
-import React from 'react'
 import PropTypes from 'prop-types'
-import CardTable from './CardTable'
+import React from 'react'
+import CardTable from '../cardTable/CardTable'
 
 class ApplicationsListContainer extends React.Component {
   render () {
