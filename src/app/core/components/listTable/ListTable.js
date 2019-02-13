@@ -427,9 +427,10 @@ class ListTable extends React.Component {
 
 const actionProps = PropTypes.shape({
   label: PropTypes.string.isRequired,
-  action: PropTypes.func.isRequired,
+  action: PropTypes.func,
   icon: PropTypes.node,
   cond: PropTypes.func,
+  dialog: PropTypes.func,  // a React class or function
 })
 
 ListTable.propTypes = {

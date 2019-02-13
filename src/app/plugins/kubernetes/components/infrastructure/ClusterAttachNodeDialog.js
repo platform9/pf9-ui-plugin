@@ -14,11 +14,14 @@ import {
   TableBody,
   TableRow,
   TableCell,
+  Typography,
 } from '@material-ui/core'
 
 // The modal is technically inside the row, so clicking anything inside
 // the modal window will cause the table row to be toggled.
 const stopPropagation = e => {
+  // Except for <a href=""> style links
+  if (e.target.tagName.toUpperCase() === 'A') { return }
   e.preventDefault()
   e.stopPropagation()
 }
@@ -36,6 +39,7 @@ class ClusterAttachNodeDialog extends React.Component {
       .map(uuid => ({ uuid, isMaster: this.state[uuid] === 'master' }))
     const clusterUuid = this.props.row.uuid
     if (nodes.length > 0) {
+      console.log('handleSubmit', this.state)
       this.props.context.apiClient.qbert.attach(clusterUuid, nodes)
     }
     this.handleClose()
@@ -71,6 +75,19 @@ class ClusterAttachNodeDialog extends React.Component {
       <Dialog open onClose={this.handleClose} onClick={stopPropagation}>
         <DialogTitle>Attach Node to Cluster</DialogTitle>
         <DialogContent>
+          <p>
+            <b>IMPORTANT</b>:
+            Before adding nodes to a cluster, please ensure that you have followed the requirements
+            in <a href="https://platform9.com/support/managed-container-cloud-requirements-checklist/" target="_blank">this article</a> for
+            each node.
+          </p>
+
+          <p>
+            Choose the nodes you would like to add to this cluster as well as their corresponding role.
+          </p>
+          {freeNodes.length === 0 &&
+            <Typography variant="h5">No nodes available to attach</Typography>
+          }
           <Table>
             <TableBody>
               {freeNodes.map(this.renderNodeRow)}

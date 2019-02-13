@@ -38,14 +38,11 @@ const renderStats = (_, cluster, context) => {
 
 const renderClusterDetailLink = (name, cluster) => <SimpleLink src={`/ui/kubernetes/infrastructure/clusters/${cluster.uuid}`}>{name}</SimpleLink>
 
-const canAttachNode = (selected, context) => true
+const canAttachNode = row => row.cloudProviderType === 'local'
+
 const canDetachNode = (selected, context) => true
 const canScaleCluster = (selected, context) => true
 const canUpgradeCluster = (selected, context) => true
-
-const attachNode = (selected, context) => {
-  console.log('TODO: attachNode')
-}
 
 const detachNode = (selected, context) => {
   console.log('TODO: detachNode')
@@ -80,6 +77,7 @@ export const options = {
     { id: 'hasLoadBalancer', label: 'Load Balancer' },
 
     // TODO: We probably want to write a metadata renderer for this kind of format
+    //
     // since we use it in a few places for tags / metadata.
     { id: 'tags', label: 'Metadata', render: data => JSON.stringify(data) }
   ],
@@ -91,7 +89,7 @@ export const options = {
   title: 'Clusters',
   uniqueIdentifier: 'uuid',
   rowActions: [
-    { cond: canAttachNode, icon: <AttachIcon />, label: 'Attach node', dialog: ClusterAttachNodeDialog, action: attachNode },
+    { cond: canAttachNode, icon: <AttachIcon />, label: 'Attach node', dialog: ClusterAttachNodeDialog },
     { cond: canDetachNode, icon: <DetachIcon />, label: 'Detach node', action: detachNode },
     { cond: canScaleCluster, icon: <ScaleIcon />, label: 'Scale cluster', action: scaleCluster },
     { cond: canUpgradeCluster, icon: <UpgradeIcon />, label: 'Upgrade cluster', action: upgradeCluster },

@@ -122,10 +122,13 @@ function loadPreset () {
   // Cloud Providers
   CloudProvider.create({ data: { name: 'mockAwsProvider', type: 'aws' }, context })
   CloudProvider.create({ data: { name: 'mockOpenstackProvider', type: 'openstack' }, context })
+  CloudProvider.create({ data: { name: 'mockLocalProvider', type: 'local' }, context })
 
   // Clusters
   const cluster = Cluster.create({ data: { name: 'fakeCluster1', sshKey: 'someKey' }, context, raw: true })
   Cluster.create({ data: { name: 'fakeCluster2' }, context })
+  Cluster.create({ data: { name: 'mockAwsCluster', cloudProviderType: 'aws' }, context })
+  Cluster.create({ data: { name: 'mockOpenStackCluster', cloudProviderType: 'openstack' }, context })
 
   // Nodes
   // Nodes must be linked to a resMgrHost id or else the UI will break

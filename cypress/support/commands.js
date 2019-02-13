@@ -38,9 +38,7 @@ Cypress.Commands.add('setSimSession', () => {
 })
 
 // For use with <ListTable>.  This will select the row containing the given text.
-Cypress.Commands.add('row', text => {
-  cy.contains('tr', text)
-})
+Cypress.Commands.add('row', text => cy.contains('tr', text))
 
 // Once a ListTable row is selected (prevSubject), click the specified row action.
 Cypress.Commands.add(
@@ -48,6 +46,43 @@ Cypress.Commands.add(
   { prevSubject: true },
   (subject, action) => {
     subject.find('button[aria-label="More Actions"]').click()
-    cy.get('#more-menu').contains(action).click()
+
+    const menu = cy.get('ul[role="menu"]')
+
+    // Allow just the menu to be opened if no action is supplied.
+    action && menu.contains(action).click()
+    return menu
+  }
+)
+
+Cypress.Commands.add(
+  'isDisabled',
+  { prevSubject: 'element' },
+  subject => {
+    cy.wrap(subject).should($subject => {
+      const classNames = $subject.attr('class')
+      console.log(classNames)
+      expect(classNames).to.contain('disabled')
+    })
+  }
+)
+
+Cypress.Commands.add(
+  'isEnabled',
+  { prevSubject: 'element' },
+  subject => {
+    cy.wrap(subject).should($subject => {
+      const classNames = $subject.attr('class')
+      expect(classNames).not.to.contain('disabled')
+    })
+  }
+)
+
+Cypress.Commands.add(
+  'closeModal',
+  () => {
+    const selector = 'div[role="presentation"] > [aria-hidden="true"]'
+    cy.get(selector).click()
+    cy.get(selector).should('not.exist') // Wait for the modal to close before proceeding.
   }
 )
