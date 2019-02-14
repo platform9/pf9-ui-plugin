@@ -43,13 +43,18 @@ class AnimateValues extends React.Component {
     const offsetMs = this.elapsed()
     if (offsetMs < duration) {
       this.setState({ elapsed: offsetMs })
-      return requestAnimationFrame(this.tick)
+      this.subscription = requestAnimationFrame(this.tick)
+      return this.subscription
     }
     this.setState({ elapsed: duration })
   }
 
   componentDidMount () {
-    requestAnimationFrame(this.tick)
+    this.subscription = requestAnimationFrame(this.tick)
+  }
+
+  componentWillUnmount = () => {
+    cancelAnimationFrame(this.subscription)
   }
 
   render () {

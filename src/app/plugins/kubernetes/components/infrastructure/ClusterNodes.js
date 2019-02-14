@@ -13,8 +13,8 @@ const ListTable = createListTableComponent({
   title: 'Cluster Nodes',
   emptyText: 'No instances found.',
   name: 'ClusterNodes',
-  uniqueIdentifier: 'uuid',
   columns,
+  uniqueIdentifier: 'uuid',
 })
 
 const ClusterNodes = ({ context, data, match }) => {

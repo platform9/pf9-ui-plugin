@@ -2,7 +2,7 @@ import React from 'react'
 import { compose } from 'ramda'
 import { withAppContext } from 'core/AppContext'
 import { withDataLoader } from 'core/DataLoader'
-import { loadInfrastructure } from './actions'
+import { attachNodesToCluster, loadInfrastructure } from './actions'
 import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab'
 import {
   Button,
@@ -33,15 +33,15 @@ class ClusterAttachNodeDialog extends React.Component {
     this.props.onClose && this.props.onClose()
   }
 
-  handleSubmit = () => {
+  handleSubmit = async () => {
+    const { row, context, setContext } = this.props
+
     const nodes = Object.keys(this.state)
       .filter(uuid => this.state[uuid] !== 'unassigned')
       .map(uuid => ({ uuid, isMaster: this.state[uuid] === 'master' }))
-    const clusterUuid = this.props.row.uuid
-    if (nodes.length > 0) {
-      console.log('handleSubmit', this.state)
-      this.props.context.apiClient.qbert.attach(clusterUuid, nodes)
-    }
+
+    const clusterUuid = row.uuid
+    await attachNodesToCluster({ data: { clusterUuid, nodes }, context, setContext })
     this.handleClose()
   }
 

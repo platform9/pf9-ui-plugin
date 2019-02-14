@@ -54,6 +54,11 @@ export const createCluster = async ({ data, context }) => {
   console.log(data)
 }
 
+export const attachNodesToCluster = ({ data, context, setContext }) => {
+  const { clusterUuid, nodes } = data
+  return context.apiClient.qbert.attach(clusterUuid, nodes)
+}
+
 /*
  * The data model needed in the UI requires interwoven dependencies between
  * nodes, clusters, and namespaces.  Ideally the API would be more aligned

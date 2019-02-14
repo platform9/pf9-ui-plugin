@@ -41,7 +41,9 @@ const createListTableComponent = ({
       columnsOrder={columnsOrder}
       rowsPerPage={rowsPerPage}
       onRowsPerPageChange={rowsPerPage => updatePreferences({ rowsPerPage })}
-      onColumnsChange={updatePreferences} />)
+      onColumnsChange={updatePreferences}
+      uniqueIdentifier={uniqueIdentifier}
+    />)
 
   CustomListTable.displayName = displayName
 
