@@ -15,6 +15,8 @@ import Token from '../models/openstack/Token'
 import Application from '../models/openstack/Application'
 import SshKey from '../models/openstack/SshKey'
 
+const config = require('../../../config')
+
 const defaultQuota = {
   cores: 10,
   ram: 10000,
@@ -61,6 +63,17 @@ class Context {
     this.services = []
     this.storageClasses = []
     this.charts = []
+  }
+
+  createSimUser = () => {
+    if (config.simulator) {
+      const { username, password } = config.simulator
+      if (username && password) {
+        const user = new User({ name: username, password })
+        // construct a token with a hard-coded id to make testing easier
+        new Token({ user, id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' })
+      }
+    }
   }
 
   validateToken = id => Token.validateToken(id)

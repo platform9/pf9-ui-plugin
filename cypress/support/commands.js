@@ -87,3 +87,14 @@ Cypress.Commands.add(
     cy.get(selector).should('not.exist') // Wait for the modal to close before proceeding.
   }
 )
+
+Cypress.Commands.add(
+  'resetServerContext',
+  preset => {
+    if (preset) {
+      cy.request(`${config.apiHost}/admin/preset/${preset}`)
+    }
+    // Give time for simulator context to be initialized before using the APIs
+    cy.wait(200)
+  }
+)

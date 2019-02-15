@@ -1,7 +1,3 @@
-// TODO: Currently these tests are not idempotent.  When running the tests in watch mode
-// within the same simulator instance, nodes will not be available because they have already
-// been attached.  We need to have the tests start the simulator and control its state in the
-// "before".
 describe('clusters', () => {
   beforeEach(() => {
     cy.setSimSession()
@@ -35,7 +31,11 @@ describe('clusters', () => {
   })
 
   context('cluster actions', () => {
-    context.only('attach node', () => {
+    before(() => {
+      cy.resetServerContext('dev')
+    })
+
+    context('attach node', () => {
       it('shows the modal for adding nodes to the cluster', () => {
         cy.visit('/ui/kubernetes/clusters')
         cy.row('fakeCluster1')
