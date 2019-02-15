@@ -93,7 +93,6 @@ class ClusterAttachNodeDialog extends React.Component {
               {freeNodes.map(this.renderNodeRow)}
             </TableBody>
           </Table>
-          <pre>{JSON.stringify(this.state, null, 4)}</pre>
         </DialogContent>
         <DialogActions>
           <Button onClick={this.handleClose} color="primary">

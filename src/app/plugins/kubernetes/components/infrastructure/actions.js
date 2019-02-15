@@ -1,7 +1,5 @@
-import {
-  asyncFlatMap, asyncMap, pathOrNull, pipeWhenTruthy, tap
-} from 'app/utils/fp'
-import { find, pathOr, prop, propEq } from 'ramda'
+import { asyncFlatMap, asyncMap, pathOrNull, pipeWhenTruthy, tap } from 'app/utils/fp'
+import { find, pathOr, pluck, prop, propEq } from 'ramda'
 import { castFuzzyBool } from 'utils/misc'
 import { combineHost } from './combineHosts'
 
@@ -54,9 +52,15 @@ export const createCluster = async ({ data, context }) => {
   console.log(data)
 }
 
-export const attachNodesToCluster = ({ data, context, setContext }) => {
+export const attachNodesToCluster = async ({ data, context, setContext }) => {
   const { clusterUuid, nodes } = data
-  return context.apiClient.qbert.attach(clusterUuid, nodes)
+  const nodeUuids = pluck('uuid', nodes)
+  await context.apiClient.qbert.attach(clusterUuid, nodes)
+  // Assign nodes to their clusters in the context as well so the user
+  // can't add the same node to another cluster.
+  const newNodes = context.nodes.map(node =>
+    nodeUuids.includes(node.uuid) ? ({ ...node, clusterUuid }) : node)
+  setContext({ nodes: newNodes })
 }
 
 /*

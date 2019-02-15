@@ -26,7 +26,7 @@ describe('clusters', () => {
     })
   })
 
-  context.skip('create cluster', () => {
+  context('create cluster', () => {
     it('shows the cluster create form', () => {
       cy.visit('/ui/kubernetes/clusters')
       cy.contains('Add').click()
@@ -35,7 +35,7 @@ describe('clusters', () => {
   })
 
   context('cluster actions', () => {
-    context('attach node', () => {
+    context.only('attach node', () => {
       it('shows the modal for adding nodes to the cluster', () => {
         cy.visit('/ui/kubernetes/clusters')
         cy.row('fakeCluster1')
@@ -51,35 +51,23 @@ describe('clusters', () => {
         cy.contains('button', 'Attach').click()
         cy.contains('Attach Node to Cluster').should('not.exist')
       })
-      return
 
       it('should not allow the node to be added to another cluster', () => {
-        // Reload to the page to get the latest nodes data
-        cy.visit('/ui/kubernetes/clusters')
-        // TODO: need to update the AppContext with the new cluster <-> association
-
         cy.row('fakeCluster1')
           .rowAction('Attach node')
         cy.get('div[role=dialog]').contains('fakeNode2').should('not.exist')
       })
 
       it('should show "No nodes available to attach"', () => {
-        cy.visit('/ui/kubernetes/clusters')
-        cy.row('fakeCluster1')
-          .rowAction('Attach node')
         cy.contains('No nodes available to attach')
       })
 
       it('closes the modal on cancel', () => {
-        cy.row('fakeCluster1')
-          .rowAction('Attach node')
-        cy.contains('Attach Node to Cluster')
         cy.contains('Cancel').click()
         cy.contains('Attach Node to Cluster').should('not.exist')
       })
 
       it('only allows attaching for "local" cloudProviders', () => {
-        cy.visit('/ui/kubernetes/clusters')
         cy.row('mockOpenStackCluster').rowAction().contains('Attach node').isDisabled()
         cy.closeModal()
         cy.row('mockAwsCluster').rowAction().contains('Attach node').isDisabled()

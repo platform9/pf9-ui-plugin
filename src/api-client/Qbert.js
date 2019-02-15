@@ -114,7 +114,6 @@ class Qbert {
   // @param clusterId = cluster.uuid
   // @param nodes = [{ uuid: node.uuid, isMaster: (true|false) }]
   async attach (clusterId, nodes) {
-    console.log(clusterId, nodes)
     return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/attach`, nodes)
   }
 
