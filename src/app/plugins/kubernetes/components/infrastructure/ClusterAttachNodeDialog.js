@@ -1,4 +1,5 @@
 import React from 'react'
+import ExternalLink from 'core/components/ExternalLink'
 import { compose } from 'ramda'
 import { withAppContext } from 'core/AppContext'
 import { withDataLoader } from 'core/DataLoader'
@@ -78,7 +79,7 @@ class ClusterAttachNodeDialog extends React.Component {
           <p>
             <b>IMPORTANT</b>:
             Before adding nodes to a cluster, please ensure that you have followed the requirements
-            in <a href="https://platform9.com/support/managed-container-cloud-requirements-checklist/" target="_blank">this article</a> for
+            in <ExternalLink url="https://docs.platform9.com/getting-started/managed-container-cloud-requirements-checklist/">this article</ExternalLink> for
             each node.
           </p>
 

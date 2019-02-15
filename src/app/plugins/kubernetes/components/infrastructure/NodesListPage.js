@@ -1,9 +1,9 @@
 import React from 'react'
 import { localizeRoles } from 'api-client/ResMgr'
 import { maybeFnOrNull } from 'app/utils/fp'
+import ExternalLink from 'core/components/ExternalLink'
 import HostStatus from 'core/components/HostStatus'
 import ProgressBar from 'core/components/ProgressBar'
-import SimpleLink from 'core/components/SimpleLink'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { pathOr, pipe } from 'ramda'
 import { castBoolToStr, castFuzzyBool, columnPathLookup } from 'utils/misc'
@@ -36,7 +36,7 @@ const renderStats = field => pipe(
   maybeFnOrNull(stat => <UsageBar stat={stat} />)
 )
 
-const renderLogs = url => <SimpleLink src={url} target="_blank">logs</SimpleLink>
+const renderLogs = url => <ExternalLink url={url}>logs</ExternalLink>
 
 const getSpotInstance = pipe(
   columnPathLookup('combined.resmgr.extensions.node_metadata.data.isSpotInstance'),

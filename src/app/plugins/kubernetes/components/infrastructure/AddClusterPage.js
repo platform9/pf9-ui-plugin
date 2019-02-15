@@ -1,5 +1,6 @@
 import React from 'react'
 import Checkbox from 'core/components/validatedForm/Checkbox'
+import ExternalLink from 'core/components/ExternalLink'
 import FormWrapper from 'core/components/FormWrapper'
 import KeyValuesField from 'core/components/validatedForm/KeyValuesField'
 import NodesChooser from './NodesChooser'
@@ -119,7 +120,7 @@ class AddClusterPage extends React.Component {
         info={
           <span>
             Specify the virtual IP address that will be used to provide access to the API server endpoint for this cluster. Refer to
-            <a href="https://docs.platform9.com/support/ha-for-baremetal-multimaster-kubernetes-cluster-service-type-load-balancer/" target="_blank" rel="noopener">this article</a>
+            <ExternalLink url="https://docs.platform9.com/support/ha-for-baremetal-multimaster-kubernetes-cluster-service-type-load-balancer/">this article</ExternalLink>
             for more information re how the VIP service operates, VIP configuration, etc.
           </span>
         }

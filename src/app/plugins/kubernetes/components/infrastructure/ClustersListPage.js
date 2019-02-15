@@ -1,6 +1,7 @@
 import React from 'react'
 import DownloadKubeConfigLink from './DownloadKubeConfigLink'
 import KubeCLI from './KubeCLI'
+import ExternalLink from 'core/components/ExternalLink'
 import SimpleLink from 'core/components/SimpleLink'
 import clusterUsageStats from './clusterUsageStats'
 import UsageBar from 'core/components/dashboardGraphs/UsageBar'
@@ -16,7 +17,7 @@ const renderLinks = links => {
   if (!links) { return null }
   return (
     <div>
-      {links.dashboard && <SimpleLink src={links.dashboard} target="_blank">Dashboard</SimpleLink>}
+      {links.dashboard && <ExternalLink url={links.dashboard}>Dashboard</ExternalLink>}
       {links.kubeconfig && <DownloadKubeConfigLink cluster={links.kubeconfig.cluster} />}
       {links.cli && <KubeCLI {...links.cli} />}
     </div>
