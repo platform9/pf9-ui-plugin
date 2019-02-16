@@ -63,6 +63,14 @@ export const attachNodesToCluster = async ({ data, context, setContext }) => {
   setContext({ nodes: newNodes })
 }
 
+export const detachNodesFromCluster = async ({ data, context, setContext }) => {
+  const { clusterUuid, nodeUuids } = data
+  await context.apiClient.qbert.detach(clusterUuid, nodeUuids)
+  const newNodes = context.nodes.map(node =>
+    nodeUuids.includes(node.uuid) ? ({ ...node, clusterUuid: null }) : node)
+  setContext({ nodes: newNodes })
+}
+
 /*
  * The data model needed in the UI requires interwoven dependencies between
  * nodes, clusters, and namespaces.  Ideally the API would be more aligned

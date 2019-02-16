@@ -117,8 +117,12 @@ class Qbert {
     return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/attach`, nodes)
   }
 
-  async _detach (clusterId, nodeIds) { /* TODO */ }
-  async detach (clusterId, nodeIds) { /* TODO */ }
+  // @param clusterId = cluster.uuid
+  // @param nodes = [node1Uuid, node2Uuid, ...]
+  async detach (clusterId, nodeUuids) {
+    const body = nodeUuids.map(uuid => ({ uuid }))
+    return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/detach`, body)
+  }
 
   async getCliToken (clusterId, namespace) {
     const response = await this.client.basicPost(`${await this.baseUrl()}/webcli/${clusterId}`, { namespace })

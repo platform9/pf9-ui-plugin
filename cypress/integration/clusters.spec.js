@@ -76,5 +76,51 @@ describe('clusters', () => {
         cy.closeModal()
       })
     })
+
+    context('detach node', () => {
+      it('only allows detaching for "local" cloudProviders', () => {
+        cy.visit('/ui/kubernetes/clusters')
+        cy.row('mockOpenStackCluster').rowAction().contains('Detach node').isDisabled()
+        cy.closeModal()
+        cy.row('mockAwsCluster').rowAction().contains('Detach node').isDisabled()
+        cy.closeModal()
+        cy.row('fakeCluster1').rowAction().contains('Detach node').isEnabled()
+        cy.closeModal()
+      })
+
+      it('show the modal for detaching nodes from the cluster', () => {
+        cy.visit('/ui/kubernetes/clusters')
+        cy.row('fakeCluster1')
+          .rowAction('Detach node')
+        cy.contains('Detach node from cluster')
+      })
+
+      it('detaches a node', () => {
+        cy.get('div[role=dialog]').contains('tr', 'fakeNode1').contains('Detach').click()
+      })
+
+      it('closes the modal on detach', () => {
+        cy.contains('button', 'Detach nodes').click()
+        cy.contains('Detach node from cluster').should('not.exist')
+      })
+
+      it('should show "No nodes available to detach" (context updated)', () => {
+        cy.row('fakeCluster1')
+          .rowAction('Detach node')
+        cy.contains('No nodes available to detach')
+      })
+
+      it('still shows the node as detached after a page reload (backend data updated)', () => {
+        cy.visit('/ui/kubernetes/clusters')
+        cy.row('fakeCluster1')
+          .rowAction('Detach node')
+        cy.contains('No nodes available to detach')
+      })
+
+      it('closes the modal on cancel', () => {
+        cy.contains('Cancel').click()
+        cy.contains('Detach node from cluster').should('not.exist')
+      })
+    })
   })
 })

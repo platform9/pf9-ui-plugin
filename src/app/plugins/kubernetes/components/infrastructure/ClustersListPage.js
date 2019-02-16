@@ -12,6 +12,7 @@ import UpgradeIcon from '@material-ui/icons/PresentToAll'
 import { deleteCluster, loadInfrastructure } from './actions'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import ClusterAttachNodeDialog from './ClusterAttachNodeDialog'
+import ClusterDetachNodeDialog from './ClusterDetachNodeDialog'
 
 const renderLinks = links => {
   if (!links) { return null }
@@ -40,14 +41,9 @@ const renderStats = (_, cluster, context) => {
 const renderClusterDetailLink = (name, cluster) => <SimpleLink src={`/ui/kubernetes/infrastructure/clusters/${cluster.uuid}`}>{name}</SimpleLink>
 
 const canAttachNode = row => row.cloudProviderType === 'local'
-
-const canDetachNode = (selected, context) => true
+const canDetachNode = row => row.cloudProviderType === 'local'
 const canScaleCluster = (selected, context) => true
 const canUpgradeCluster = (selected, context) => true
-
-const detachNode = (selected, context) => {
-  console.log('TODO: detachNode')
-}
 
 const scaleCluster = (selected, context) => {
   console.log('TODO: scaleCluster')
@@ -91,7 +87,7 @@ export const options = {
   uniqueIdentifier: 'uuid',
   rowActions: [
     { cond: canAttachNode, icon: <AttachIcon />, label: 'Attach node', dialog: ClusterAttachNodeDialog },
-    { cond: canDetachNode, icon: <DetachIcon />, label: 'Detach node', action: detachNode },
+    { cond: canDetachNode, icon: <DetachIcon />, label: 'Detach node', dialog: ClusterDetachNodeDialog },
     { cond: canScaleCluster, icon: <ScaleIcon />, label: 'Scale cluster', action: scaleCluster },
     { cond: canUpgradeCluster, icon: <UpgradeIcon />, label: 'Upgrade cluster', action: upgradeCluster },
   ],
