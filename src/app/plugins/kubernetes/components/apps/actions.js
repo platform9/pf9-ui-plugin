@@ -1,14 +1,5 @@
 import { flatten, prop } from 'ramda'
 
-export const loadClusters = async ({ data, context, setContext, reload }) => {
-  if (!reload && context.clusters) {
-    return context.clusters
-  }
-  const clusters = await context.apiClient.qbert.getClusters()
-  setContext({ clusters })
-  return clusters
-}
-
 const loadClusterApps = context => async cluster => {
   return context.apiClient.qbert.getCharts(cluster.uuid).then(prop('data'))
 }

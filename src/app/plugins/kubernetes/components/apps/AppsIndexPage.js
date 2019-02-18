@@ -1,7 +1,7 @@
-import Tab from 'core/components/Tab'
-import Tabs from 'core/components/Tabs'
-import AppCatalogPage from 'k8s/components/apps/AppCatalogPage'
 import React from 'react'
+import Tabs from 'core/components/Tabs'
+import Tab from 'core/components/Tab'
+import AppCatalogPage from 'k8s/components/apps/AppCatalogPage'
 
 const DeployedAppsListPage = () => <h1>TODO: Deployed Apps List Page</h1>
 const RepositoriesListPage = () => <h1>TODO: Repositories List Page</h1>

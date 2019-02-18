@@ -1,9 +1,20 @@
 import React from 'react'
 import { withRouter } from 'react-router'
+import { Typography, Link } from '@material-ui/core'
 
 // We need to destructure staticContext even though we are not using it in order to
 // work around this issue: https://github.com/ReactTraining/react-router/issues/4683
-const SimpleLink = ({ onClick, src, children, history, staticContext, ...rest }) => {
+const SimpleLink = ({
+  className,
+  onClick,
+  src,
+  children,
+  history,
+  staticContext,
+  match,
+  location,
+  ...rest
+}) => {
   const handleClick = e => {
     // Prevent links inside of a table row from triggering row selection.
     e.stopPropagation()
@@ -21,7 +32,15 @@ const SimpleLink = ({ onClick, src, children, history, staticContext, ...rest })
   }
 
   return (
-    <a href={src || '#'} onClick={handleClick} {...rest}>{children}</a>
+    <Typography>
+      <Link
+        href={src || 'javascript:;'}
+        onClick={handleClick}
+        {...rest}
+      >
+        {children}
+      </Link>
+    </Typography>
   )
 }
 

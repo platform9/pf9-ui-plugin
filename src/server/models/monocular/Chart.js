@@ -1,6 +1,6 @@
-import faker from 'faker'
 import { pick, times } from 'ramda'
 import createModel from '../createModel'
+import faker from 'faker'
 
 // TODO:
 //   We need to associate charts with a cluster as well.

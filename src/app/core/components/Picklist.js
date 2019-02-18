@@ -6,6 +6,7 @@ import MenuItem from '@material-ui/core/MenuItem'
 import Select from '@material-ui/core/Select'
 import { withStyles } from '@material-ui/core/styles'
 import { compose } from 'app/utils/fp'
+import classnames from 'classnames'
 
 /**
  * Picklist is a bare-bones widget-only implmentation.
@@ -35,7 +36,7 @@ class Picklist extends React.Component {
   }
 
   render () {
-    const { classes, label, name } = this.props
+    const { className, classes, label, name } = this.props
 
     const options = this.props.options.map(x =>
       typeof x === 'string' ? ({ value: x, label: x }) : x
@@ -49,7 +50,7 @@ class Picklist extends React.Component {
     const value = this.props.value === '' ? '__none__' : this.props.value
 
     return (
-      <FormControl className={classes.formControl}>
+      <FormControl className={classnames(classes.formControl, className)}>
         <InputLabel htmlFor={name}>{label}</InputLabel>
         <Select
           value={value}

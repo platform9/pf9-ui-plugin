@@ -71,8 +71,7 @@ class ListTable extends React.Component {
       'sortWith',
       columns.find(propEq('id', orderBy))
     )
-    // .sort() does not mutate array
-    const sortedRows = data.sort((a, b) => sortWith(b[orderBy], a[orderBy]))
+    const sortedRows = [...data].sort((a, b) => sortWith(b[orderBy], a[orderBy]))
 
     return this.state.order === 'desc' ? sortedRows : sortedRows.reverse()
   }
@@ -235,6 +234,10 @@ class ListTable extends React.Component {
 
     return filterParams.reduce((filteredData,
       { columnId, filterValue, filter }) => {
+      if (filter.onChange) {
+        // If a custom handler is provided, don't filter the data locally
+        return filteredData
+      }
       const filterWith = filter.filterWith || this.getFilterFunction(filter.type)
 
       return filteredData.filter(row => {

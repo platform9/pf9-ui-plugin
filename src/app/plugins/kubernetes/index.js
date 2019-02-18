@@ -15,6 +15,7 @@ import PodsIndexPage from './components/pods/PodsIndexPage'
 import StorageClassesPage from './components/storage/StorageClassesPage'
 import UpdateCloudProviderPage from './components/infrastructure/UpdateCloudProviderPage'
 import UserManagementIndexPage from './components/userManagement/UserManagementIndexPage'
+import AppDetailsPage from 'core/components/appCatalog/AppDetailsPage'
 
 class Kubernetes extends React.Component {
   render () {
@@ -62,6 +63,11 @@ Kubernetes.registerPlugin = pluginManager => {
         name: 'App Catalog',
         link: { path: '/apps', exact: true },
         component: AppsIndexPage
+      },
+      {
+        name: 'App Details',
+        link: { path: '/apps/:id', exact: true },
+        component: AppDetailsPage,
       },
       {
         name: 'Pods, Deployments, Services',

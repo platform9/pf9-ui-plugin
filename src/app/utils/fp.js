@@ -1,5 +1,5 @@
-import moize from 'moize'
 import { curry, pathOr, remove } from 'ramda'
+import moize from 'moize'
 
 // functional programming helpers
 
@@ -19,7 +19,7 @@ export const pick = key => obj => obj[key]
 // Project the keys from the array of objects and rename them at the same time
 // Ex:
 // const values = [{ a: 123, b: 456 }, { c: 555 }]
-// const mappings = { first: 'a', second: 'b', third: 'c' }cc
+// const mappings = { first: 'a', second: 'b', third: 'c' }
 // projectAs(mappings, values) -> [{ first: 123, second: 456 }, { third: 555 }]
 export const projectAs = curry((mappings, arr) => arr.map(obj => Object.keys(mappings).reduce(
   (accum, destKey) => {

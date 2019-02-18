@@ -1,57 +1,57 @@
 import React from 'react'
 
-import ApplicationsPage from '../kubernetes/components/apps/AppCatalogPage'
-
-import ApiAccessPage from './components/api-access/ApiAccessListPage'
-
 import DashboardPage from './components/DashboardPage'
-import AddFlavorPage from './components/flavors/AddFlavorPage'
-
-import FlavorsListPage from './components/flavors/FlavorsListPage'
-import AddFloatingIpPage from './components/floatingips/AddFloatingIpPage'
-
-import FloatingIpsPage from './components/floatingips/FloatingIpsListPage'
-import UpdateFloatingIpPage from './components/floatingips/UpdateFloatingIpPage'
-
-import HostsListPage from './components/hosts/HostsListPage'
-import AddImagePage from './components/images/AddImagePage'
-
-import ImageIndex from './components/images/ImageIndex'
-import ImageListPage from './components/images/ImageListPage'
-import UpdateImagePage from './components/images/UpdateImagePage'
-
-import InstancesPage from './components/instances/InstancesListPage'
-import AddNetworkPage from './components/networks/AddNetworkPage'
-
-import NetworksPage from './components/networks/NetworksListPage'
-import UpdateNetworkPage from './components/networks/UpdateNetworkPage'
-import AddRouterPage from './components/routers/AddRouterPage'
-
-import RoutersPage from './components/routers/RoutersListPage'
-import UpdateRouterPage from './components/routers/UpdateRouterPage'
-import AddSshKeyPage from './components/sshkeys/AddSshKeyPage'
-
-import SshKeysPage from './components/sshkeys/SshKeysListPage'
 
 import AddTenantPage from './components/tenants/AddTenantPage'
 import TenantsListPage from './components/tenants/TenantsListPage'
+
+import UsersListPage from './components/users/UsersListPage'
 import AddUserPage from './components/users/AddUserPage'
 import UpdateUserPage from './components/users/UpdateUserPage'
 
-import UsersListPage from './components/users/UsersListPage'
-import AddVolumePage from './components/volumes/AddVolumePage'
+import FlavorsListPage from './components/flavors/FlavorsListPage'
+import AddFlavorPage from './components/flavors/AddFlavorPage'
 
-import AddVolumeTypePage from './components/volumes/AddVolumeTypePage'
+import InstancesPage from './components/instances/InstancesListPage'
 
-import CreateSnapshotPage from './components/volumes/CreateSnapshotPage'
+import NetworksPage from './components/networks/NetworksListPage'
+import AddNetworkPage from './components/networks/AddNetworkPage'
+import UpdateNetworkPage from './components/networks/UpdateNetworkPage'
+
+import RoutersPage from './components/routers/RoutersListPage'
+import AddRouterPage from './components/routers/AddRouterPage'
+import UpdateRouterPage from './components/routers/UpdateRouterPage'
+
+import FloatingIpsPage from './components/floatingips/FloatingIpsListPage'
+import AddFloatingIpPage from './components/floatingips/AddFloatingIpPage'
+import UpdateFloatingIpPage from './components/floatingips/UpdateFloatingIpPage'
 
 import StorageIndex from './components/volumes/StorageIndex'
-import UpdateVolumePage from './components/volumes/UpdateVolumePage'
-import UpdateVolumeSnapshotPage from './components/volumes/UpdateVolumeSnapshotPage'
-import UpdateVolumeTypePage from './components/volumes/UpdateVolumeTypePage'
 
 import VolumesListPage from './components/volumes/VolumesListPage'
+import AddVolumePage from './components/volumes/AddVolumePage'
+import UpdateVolumePage from './components/volumes/UpdateVolumePage'
+
+import AddVolumeTypePage from './components/volumes/AddVolumeTypePage'
+import UpdateVolumeTypePage from './components/volumes/UpdateVolumeTypePage'
+
+import CreateSnapshotPage from './components/volumes/CreateSnapshotPage'
 import VolumeSnapshotsListPage from './components/volumes/VolumeSnapshotsListPage'
+import UpdateVolumeSnapshotPage from './components/volumes/UpdateVolumeSnapshotPage'
+
+import HostsListPage from './components/hosts/HostsListPage'
+
+import ImageIndex from './components/images/ImageIndex'
+import ImageListPage from './components/images/ImageListPage'
+import AddImagePage from './components/images/AddImagePage'
+import UpdateImagePage from './components/images/UpdateImagePage'
+
+import ApiAccessPage from './components/api-access/ApiAccessListPage'
+
+import AppCatalogPage from 'k8s/components/apps/AppCatalogPage'
+
+import SshKeysPage from './components/sshkeys/SshKeysListPage'
+import AddSshKeyPage from './components/sshkeys/AddSshKeyPage'
 
 class OpenStack extends React.Component {
   render () {
@@ -233,7 +233,7 @@ OpenStack.registerPlugin = pluginManager => {
       {
         name: 'Applications',
         link: { path: '/applications', exact: true },
-        component: ApplicationsPage
+        component: AppCatalogPage
       },
       {
         name: 'SshKeys',

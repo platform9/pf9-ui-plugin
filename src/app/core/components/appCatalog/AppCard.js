@@ -1,9 +1,11 @@
 import { Button, Card, CardContent, CardMedia, Grid, Tooltip, Typography } from '@material-ui/core'
+import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/core/styles'
 import GetAppIcon from '@material-ui/icons/GetApp'
 import UnfoldMoreIcon from '@material-ui/icons/UnfoldMore'
-import { path } from 'ramda'
+import { path, compose } from 'ramda'
 import React from 'react'
+import { withRouter } from 'react-router'
 
 const styles = theme => ({
   card: {
@@ -81,35 +83,24 @@ const styles = theme => ({
   }
 })
 
-class ApplicationCard extends React.Component {
-  handleAddToEnv = () => {
-    this.props.handleAddToEnv()
-  }
-
+class AppCard extends React.Component {
   handleDeploy = () => {
-    this.props.handleDeploy()
-  }
-
-  handleEdit = () => {
-    this.props.handleEdit()
-  }
-
-  handleDetail = () => {
-    this.props.handleDetail()
+    if (this.props.handleDeploy) {
+      this.props.handleDeploy()
+    }
   }
 
   handleDownload = () => {
-    this.props.handleDownload()
-  }
-
-  handleDelete = () => {
-    this.props.handleDelete()
+    if (this.props.handleDownload) {
+      this.props.handleDownload()
+    }
   }
 
   render () {
     const {
       classes,
       application: {
+        id,
         attributes: { name, description },
         relationships
       }
@@ -143,7 +134,7 @@ class ApplicationCard extends React.Component {
               </Typography>
             </CardContent>
             <div className={classes.actions}>
-              <Button onClick={this.handleDetail}>
+              <Button href={`/ui/kubernetes/apps/${id}`}>
                 <Tooltip title="More details about this application">
                   <UnfoldMoreIcon />
                 </Tooltip>
@@ -161,4 +152,13 @@ class ApplicationCard extends React.Component {
   }
 }
 
-export default withStyles(styles)(ApplicationCard)
+AppCard.propTypes = {
+  handleDeploy: PropTypes.func,
+  handleDownload: PropTypes.func,
+  application: PropTypes.object
+}
+
+export default compose(
+  withRouter,
+  withStyles(styles)
+)(AppCard)
