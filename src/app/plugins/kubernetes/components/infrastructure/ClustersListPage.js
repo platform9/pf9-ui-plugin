@@ -13,6 +13,7 @@ import { deleteCluster, loadInfrastructure } from './actions'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import ClusterAttachNodeDialog from './ClusterAttachNodeDialog'
 import ClusterDetachNodeDialog from './ClusterDetachNodeDialog'
+import ClusterScaleDialog from './ClusterScaleDialog'
 
 const renderLinks = links => {
   if (!links) { return null }
@@ -42,12 +43,8 @@ const renderClusterDetailLink = (name, cluster) => <SimpleLink src={`/ui/kuberne
 
 const canAttachNode = row => row.cloudProviderType === 'local'
 const canDetachNode = row => row.cloudProviderType === 'local'
-const canScaleCluster = (selected, context) => true
+const canScaleCluster = row => row.cloudProviderType === 'aws'
 const canUpgradeCluster = (selected, context) => true
-
-const scaleCluster = (selected, context) => {
-  console.log('TODO: scaleCluster')
-}
 
 const upgradeCluster = (selected, context) => {
   console.log('TODO: upgradeCluster')
@@ -88,7 +85,7 @@ export const options = {
   rowActions: [
     { cond: canAttachNode, icon: <AttachIcon />, label: 'Attach node', dialog: ClusterAttachNodeDialog },
     { cond: canDetachNode, icon: <DetachIcon />, label: 'Detach node', dialog: ClusterDetachNodeDialog },
-    { cond: canScaleCluster, icon: <ScaleIcon />, label: 'Scale cluster', action: scaleCluster },
+    { cond: canScaleCluster, icon: <ScaleIcon />, label: 'Scale cluster', dialog: ClusterScaleDialog },
     { cond: canUpgradeCluster, icon: <UpgradeIcon />, label: 'Upgrade cluster', action: upgradeCluster },
   ],
 }

@@ -63,11 +63,11 @@ class ValidatedForm extends React.Component {
       ) {
         this.validateField(field)
       }
+      // Pass field up to parent if there is a parent
+      if (this.props.setContext) {
+        this.props.setContext(this.state.values)
+      }
     })
-    // Pass field up to parent if there is a parent
-    if (this.props.setContext) {
-      this.props.setContext(this.state.value)
-    }
   }
 
   /**
@@ -155,9 +155,9 @@ class ValidatedForm extends React.Component {
   }
 
   render () {
-    const { classes } = this.props
+    const { classes, id } = this.props
     return (
-      <form onSubmit={this.handleSubmit} className={classes.root}>
+      <form onSubmit={this.handleSubmit} className={classes.root} id={id}>
         <div className={classes.inputs}>
           <ValidatedFormProvider value={this.state}>{this.props.children}</ValidatedFormProvider>
         </div>

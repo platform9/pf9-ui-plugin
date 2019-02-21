@@ -81,6 +81,7 @@ Cypress.Commands.add(
 Cypress.Commands.add(
   'closeModal',
   () => {
+    // Click outside the modal to close it
     const selector = 'div[role="presentation"] > [aria-hidden="true"]'
     cy.get(selector).click()
     cy.wait(100) // During development the modal closes before we can see it is even open

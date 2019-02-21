@@ -33,7 +33,11 @@ const options = {
 
     // Set status to Running after some time
     setTimeout(() => {
+      // If the context is reset on the server this callback will crash the server.
+      // Unforunately we do not have any kind of destructor when resetting the context.
+      // Instead we can workaround this by not accessing the pod if it doesn't exist.
       const pod = context.pods.find(x => x.name === _input.metadata.name)
+      if (!pod) { return }
       pod.status.phase = 'Running'
     }, 5000)
 

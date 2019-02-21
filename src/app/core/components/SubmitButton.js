@@ -9,11 +9,12 @@ const styles = theme => ({
   }
 })
 
-const SubmitButton = ({ classes, children }) => (
+const SubmitButton = ({ classes, children, form }) => (
   <Button
     className={classes.root}
     type="submit"
     variant="contained"
+    form={form}
   >
     {children}
   </Button>
