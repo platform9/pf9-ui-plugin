@@ -44,7 +44,6 @@ class ClusterScaleDialog extends React.Component {
     const { enableSpotWorkers, sliderValue } = this.state
     const { row } = this.props
     const initialValues = pick(['numMasters', 'numWorkers'], row)
-    console.log(row)
     return (
       <Dialog open onClose={this.handleClose} onClick={stopPropagation} fullWidth>
         <DialogTitle>Scale Cluster</DialogTitle>
