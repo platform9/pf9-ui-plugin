@@ -151,6 +151,7 @@ class Keystone {
       return scopedToken
     } catch (err) {
       // authentication failed
+      console.error(err)
       return null
     }
   }
