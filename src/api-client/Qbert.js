@@ -129,6 +129,10 @@ class Qbert {
     return response.token
   }
 
+  async getKubeConfig (clusterId) {
+    return this.client.basicGet(`${await this.baseUrl()}/kubeconfig/${clusterId}`)
+  }
+
   /* k8s API */
   async getKubernetesVersion (clusterId) {
     return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/version`)

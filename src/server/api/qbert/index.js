@@ -12,6 +12,8 @@ import getNodes from './nodes/getNodes'
 import { getClusters, postCluster, putCluster, deleteCluster } from './clusters/clusterActions'
 import getClusterVersion from './clusters/getClusterVersion'
 import { attachNodes, detachNodes } from './clusters/attachOperations'
+import getKubeConfig from './kubeConfig/getKubeConfig'
+
 // Namespaces
 import getNamespaces from './namespaces/getNamespaces'
 
@@ -56,6 +58,8 @@ router.get(`/${version}/:tenantId/clusters/:clusterId/k8sapi/version`, tokenVali
 
 router.post(`/${version}/:tenantId/clusters/:clusterId/attach`, tokenValidator, attachNodes)
 router.post(`/${version}/:tenantId/clusters/:clusterId/detach`, tokenValidator, detachNodes)
+
+router.get(`/${version}/:tenantId/kubeconfig/:clusterId`, tokenValidator, getKubeConfig)
 
 const k8sapi = `/${version}/:tenantId/clusters/:clusterId/k8sapi/api/v1`
 const k8sBetaApi = `/${version}/:tenantId/clusters/:clusterId/k8sapi/apis/extensions/v1beta1`

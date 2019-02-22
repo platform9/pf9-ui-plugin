@@ -4,20 +4,22 @@ import { withAppContext } from 'core/AppContext'
 import SimpleLink from 'core/components/SimpleLink'
 
 class DownloadKubeConfigLink extends React.Component {
-  handleClick = e => {
-    console.log('DownloadKubeConfigLink#handleClick')
-    // TODO: The original solution involves requesting the user
-    // for their username and password and then saving them
-    // in the "context" for future use.  I'm not crazy about the
-    // security implications.  I'd like to punt on this for now
-    // and see if we can get a dedicated endpoint that uses the
-    // existing auth headers to authenticate.
-    //
-    // After further discussions with the Qbert team there will
-    // be some refactoring done to support self-service users.
-    // It is likely we can re-use that logic instead when it
-    // becomes available.
+  handleClick = async () => {
+    const { cluster, context } = this.props
+    const _kubeConfig = await context.apiClient.qbert.getKubeConfig(cluster.uuid)
+    const newToken = await context.apiClient.keystone.renewScopedToken()
+    const kubeConfig = _kubeConfig.replace('__INSERT_BEARER_TOKEN_HERE__', newToken)
+
+    const blob = new Blob([kubeConfig], {type: 'application/octet-stream'})
+    let elem = window.document.createElement('a')
+    elem.href = window.URL.createObjectURL(blob)
+    elem.download = `${cluster.name}.yml`
+    document.body.appendChild(elem)
+    elem.click()
+    document.body.removeChild(elem)
   }
+
+  // How to explain to user that the kubeconfig will only be valid for 24h?
 
   render () {
     return (

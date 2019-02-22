@@ -140,6 +140,21 @@ class Keystone {
     }
   }
 
+  async renewScopedToken () {
+    const body = constructAuthBody('token', this.client.unscopedToken)
+    const projectId = this.client.activeProjectId
+    body.auth.scope = { project: { id: projectId } }
+    try {
+      const response = await axios.post(this.tokensUrl, body)
+      const scopedToken = response.headers['x-subject-token']
+      this.client.scopedToken = scopedToken
+      return scopedToken
+    } catch (err) {
+      // authentication failed
+      return null
+    }
+  }
+
   async getRegions () {
     const response = await axios.get(this.regionsUrl, this.client.getAuthHeaders())
     return response.data.regions

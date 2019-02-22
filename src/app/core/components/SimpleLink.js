@@ -23,7 +23,7 @@ const SimpleLink = ({
       onClick(e)
     }
     // If there is no provided onClick, just use the `src` as a normal link.
-    if (!src.startsWith('http')) {
+    if (src && !src.startsWith('http')) {
       // local paths should use the History's push state
       e.preventDefault()
       return history.push(src)
