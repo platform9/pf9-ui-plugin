@@ -24,6 +24,41 @@ export const loadApps = async ({
   return apps
 }
 
+const loadClusterReleases = context => async cluster => {
+  return context.apiClient.qbert.getReleases(cluster.uuid).then(prop('data'))
+}
+
+export const loadReleases = async ({
+  data,
+  context,
+  setContext,
+  params,
+  reload
+}) => {
+  const { clusterId = '__all__' } = params
+  if (!reload && context[clusterId]) {
+    return context[clusterId]
+  }
+  const loadClusterReleasesFromContext = loadClusterReleases(context)
+
+  const releases = clusterId === '__all__'
+    ? await Promise.all(context.clusters.map(loadClusterReleasesFromContext)).then(flatten)
+    : await loadClusterReleasesFromContext(context.clusters.find(cluster => cluster.uuid === clusterId))
+
+  setContext({ releases })
+  return releases
+}
+
+export const deleteRelease = async ({
+  data,
+  context,
+  setContext,
+  params,
+  reload
+}) => {
+  // TODO
+}
+
 export const editApp = async ({ id, context, setContext }) => {}
 
 export const downloadApp = async () => {}

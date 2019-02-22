@@ -63,6 +63,7 @@ class Context {
     this.services = []
     this.storageClasses = []
     this.charts = []
+    this.releases = []
   }
 
   createSimUser = () => {

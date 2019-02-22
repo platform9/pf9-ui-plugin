@@ -23,6 +23,7 @@ import Pod from '../models/qbert/Pod'
 import Deployment from '../models/qbert/Deployment'
 import Service from '../models/qbert/Service'
 import Chart from '../models/monocular/Chart'
+import Release from '../models/monocular/Release'
 import StorageClass from '../models/qbert/StorageClass'
 import { attachNodeToCluster } from '../models/qbert/Operations'
 // import Token from '../models/openstack/Token'
@@ -158,6 +159,9 @@ function loadPreset () {
 
   // Monocular Charts
   range(3).forEach(i => Chart.create({ data: {}, context, config: { clusterId: cluster.uuid, namespace: defaultNamespace.name } }))
+
+  // Monocular releases
+  range(3).forEach(i => Release.create({ data: {}, context, config: { clusterId: cluster.uuid, namespace: defaultNamespace.name } }))
 }
 
 export default loadPreset

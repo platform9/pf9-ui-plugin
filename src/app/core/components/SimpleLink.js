@@ -1,6 +1,6 @@
 import React from 'react'
 import { withRouter } from 'react-router'
-import { Typography, Link } from '@material-ui/core'
+import { Link } from '@material-ui/core'
 
 // We need to destructure staticContext even though we are not using it in order to
 // work around this issue: https://github.com/ReactTraining/react-router/issues/4683
@@ -32,15 +32,13 @@ const SimpleLink = ({
   }
 
   return (
-    <Typography>
-      <Link
-        href={src || 'javascript:;'}
-        onClick={handleClick}
-        {...rest}
-      >
-        {children}
-      </Link>
-    </Typography>
+    <Link
+      href={src || 'javascript:;'}
+      onClick={handleClick}
+      {...rest}
+    >
+      {children}
+    </Link>
   )
 }
 

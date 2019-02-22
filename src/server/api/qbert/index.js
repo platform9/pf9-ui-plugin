@@ -1,39 +1,38 @@
 import express from 'express'
-
 // Cloud Providers
-import { getCloudProviders, postCloudProvider, putCloudProvider, deleteCloudProvider } from './cloudProviders/cloudProviderActions'
+import {
+  getCloudProviders, postCloudProvider, putCloudProvider, deleteCloudProvider,
+} from './cloudProviders/cloudProviderActions'
 
 import getCpTypes from './cloudProviders/getTypes'
 import { getCpDetails, getCpRegionDetails } from './cloudProviders/getCpDetails'
-
 // Nodes
 import getNodes from './nodes/getNodes'
-
 // Clusters
 import { getClusters, postCluster, putCluster, deleteCluster } from './clusters/clusterActions'
 import getClusterVersion from './clusters/getClusterVersion'
 import { attachNodes, detachNodes } from './clusters/attachOperations'
-
 // Namespaces
 import getNamespaces from './namespaces/getNamespaces'
 
 import { getPods, postPod, deletePod } from './pods/podActions'
 import { getDeployments, postDeployment } from './deployments/deploymentActions'
 import { getServices, postService, deleteService } from './services/serviceActions'
-import { getStorageClasses, postStorageClass, deleteStorageClass } from './storageClasses/storageClassActions'
+import {
+  getStorageClasses, postStorageClass, deleteStorageClass,
+} from './storageClasses/storageClassActions'
 
 import { getCharts, getChart, getChartVersions } from './charts'
-/* TODO
 import { getReleases, getRelease, deleteRelease } from './releases'
-import { deployApplication } from './applications'
-import {
-  getRepositories, getRepositoriesForCluster,
-  createReponsitory, createRepositoryForCluster,
-  deleteReponsitory, deleteRepositoryForCluster,
-} from './repositories'
-*/
-
 import { tokenValidator } from '../../middleware'
+
+// TODO
+// import { deployApplication } from './applications'
+// import {
+//   getRepositories, getRepositoriesForCluster,
+//   createReponsitory, createRepositoryForCluster,
+//   deleteReponsitory, deleteRepositoryForCluster,
+// } from './repositories'
 
 const router = express.Router()
 
@@ -88,5 +87,9 @@ const monocularClusterBase = `${k8sapi}/namespaces/kube-system/services/monocula
 router.get(`${monocularClusterBase}/charts`, tokenValidator, getCharts)
 router.get(`${monocularClusterBase}/charts/:chartName`, tokenValidator, getChart)
 router.get(`${monocularClusterBase}/charts/:chartName/versions`, tokenValidator, getChartVersions)
+
+router.get(`${monocularClusterBase}/releases`, tokenValidator, getReleases)
+router.get(`${monocularClusterBase}/releases/:releaseName`, tokenValidator, getRelease)
+router.delete(`${monocularClusterBase}/releases/:releaseName`, tokenValidator, deleteRelease)
 
 export default router

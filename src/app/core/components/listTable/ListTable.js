@@ -3,14 +3,14 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {
-  Checkbox, Grid, Paper, Table, TableBody, TableCell, TablePagination, TableRow
+  Checkbox, Grid, Paper, Table, TableBody, TableCell, TablePagination, TableRow,
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles'
 import { compose, ensureFunction, except } from 'app/utils/fp'
 import { withAppContext } from 'core/AppContext'
 import MoreMenu from 'core/components/MoreMenu'
 import {
-  any, assoc, assocPath, equals, pipe, pluck, prop, propEq, propOr, uniq, update
+  any, assoc, assocPath, equals, pipe, pluck, path, prop, propEq, propOr, uniq, update,
 } from 'ramda'
 import ListTableHead from './ListTableHead'
 import ListTableToolbar from './ListTableToolbar'
@@ -39,7 +39,7 @@ class ListTable extends React.Component {
     super(props)
     const { columns, visibleColumns, columnsOrder, rowsPerPage } = props
     this.state = {
-      columns: columns,
+      columns,
       visibleColumns: visibleColumns || pluckVisibleColumnIds(columns),
       columnsOrder: columnsOrder || pluck('id', columns),
       rowsPerPage: rowsPerPage,
@@ -135,7 +135,7 @@ class ListTable extends React.Component {
   }
 
   handleAdd = () => {
-    ensureFunction(this.props.onAdd)()
+    this.props.onAdd()
   }
 
   handleDelete = async () => {
@@ -319,17 +319,18 @@ class ListTable extends React.Component {
 
     return (
       <TableRow hover key={uid} {...checkboxProps}>
-        {showCheckboxes && <TableCell padding="checkbox">
+        {showCheckboxes && (<TableCell padding="checkbox">
           <Checkbox checked={isSelected} color="primary" />
-        </TableCell>}
-        {this.getSortedVisibleColums().map((columnDef) =>
-          this.renderCell(columnDef, row[columnDef.id], row))}
+        </TableCell>)}
+        {this.getSortedVisibleColums().map(columnDef =>
+          this.renderCell(columnDef, path((columnDef.id || '').split('.'), row), row)
+        )}
         {this.renderRowActions(row)}
       </TableRow>
     )
   }
 
-  renderPaginationControls = (count) => {
+  renderPaginationControls = count => {
     const { page, rowsPerPage } = this.state
     return (
       <TablePagination
@@ -385,8 +386,8 @@ class ListTable extends React.Component {
             <ListTableToolbar
               selected={selected}
               title={title}
-              onAdd={this.handleAdd}
-              onDelete={this.handleDelete}
+              onAdd={this.props.onAdd && this.handleAdd}
+              onDelete={this.props.onDelete && this.handleDelete}
               onEdit={this.props.onEdit && this.handleEdit}
               onSearchChange={this.handleSearch}
               searchTerm={searchTerm}
