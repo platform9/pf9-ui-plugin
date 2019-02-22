@@ -65,7 +65,7 @@ const options = {
       [...Array(input.numMasters)].map(() => {
         const name = `${input.name}-node-${faker.random.number()}`
         const resMgrHost = new ResMgrHost({ roles: ['pf9-containervisor'], info: { hostname: name } })
-        const node = Node.create({ name: name, api_responding: 1, isMaster: 1, uuid: resMgrHost.id }, context)
+        const node = Node.create({ data: { name: name, api_responding: 1, isMaster: 1, uuid: resMgrHost.id }, context })
         attachNodeToCluster(node, input)
       })
     }
@@ -74,7 +74,7 @@ const options = {
       [...Array(input.numWorkers)].map(() => {
         const name = `${input.name}-node-${faker.random.number()}`
         const resMgrHost = new ResMgrHost({ roles: ['pf9-containervisor'], info: { hostname: name } })
-        const node = Node.create({ name: name, api_responding: 0, isMaster: 0, uuid: resMgrHost.id }, context)
+        const node = Node.create({ data: { name: name, api_responding: 0, isMaster: 0, uuid: resMgrHost.id }, context })
         attachNodeToCluster(node, input)
       })
     }

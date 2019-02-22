@@ -71,6 +71,17 @@ export const detachNodesFromCluster = async ({ data, context, setContext }) => {
   setContext({ nodes: newNodes })
 }
 
+export const scaleCluster = async ({ data, context, setContext }) => {
+  const { cluster, numSpotWorkers, numWorkers, spotPrice } = data
+  const body = {
+    numWorkers,
+    numSpotWorkers: numSpotWorkers || 0,
+    spotPrice: spotPrice || 0.001,
+    spotWorkerFlavor: cluster.cloudProperties.workerFlavor,
+  }
+  await context.apiClient.qbert.updateCluster(cluster.uuid, body)
+}
+
 /*
  * The data model needed in the UI requires interwoven dependencies between
  * nodes, clusters, and namespaces.  Ideally the API would be more aligned

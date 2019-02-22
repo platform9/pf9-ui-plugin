@@ -123,8 +123,8 @@ describe('clusters', () => {
       })
     })
 
-    context.only('scale cluster', () => {
-      it.skip('only allows scaling for "AWS" cloudProviders', () => {
+    context('scale cluster', () => {
+      it('only allows scaling for "AWS" cloudProviders', () => {
         cy.visit('/ui/kubernetes/clusters')
         cy.row('mockOpenStackCluster').rowAction().contains('Scale cluster').isDisabled()
         cy.closeModal()
@@ -135,7 +135,6 @@ describe('clusters', () => {
       })
 
       it('show the modal for scaling the cluster', () => {
-        cy.visit('/ui/kubernetes/clusters')
         cy.row('mockAwsCluster')
           .rowAction('Scale cluster')
         cy.contains('Scale Cluster') // Note we capitalize 'Cluster' to differentiate and have text on the modal
@@ -143,24 +142,24 @@ describe('clusters', () => {
 
       it('scales a cluster', () => {
         cy.get('#numWorkers input').clear().type('3')
-        cy.get('#enableSpotWorkers input').click()
+        // cy.get('#enableSpotWorkers input').click()
       })
 
-      it.skip('closes the modal on scale', () => {
+      it('closes the modal on scale', () => {
         cy.contains('button', 'Scale Cluster').click()
         cy.contains('Scale Cluster').should('not.exist')
       })
 
-      it.skip('should show the cluster as converging', () => {
+      it('should show the cluster with the new number of worker nodes', () => {
         cy.visit('/ui/kubernetes/clusters')
-        cy.row('mockAwsCluster').contains('converging')
+        cy.row('mockAwsCluster')
+          .rowAction('Scale cluster')
+        cy.get('#numWorkers input').should('have.value', '3')
       })
 
-      it.skip('should eventually show the cluster as converged and show the new node number', () => {
-        cy.wait(2000)
-        cy.visit('/ui/kubernetes/clusters')
-        cy.row('mockAwsCluster').contains('Healthy')
-        // TODO: how do we test the number of nodes
+      it('should close the modal when cancelled', () => {
+        cy.contains('button', 'Cancel').click()
+        cy.contains('Scale Cluster').should('not.exist')
       })
     })
   })

@@ -6,7 +6,7 @@ import { Slider } from '@material-ui/lab'
 import { compose, pick } from 'ramda'
 import { withAppContext } from 'core/AppContext'
 import { withDataLoader } from 'core/DataLoader'
-import { loadInfrastructure } from './actions'
+import { scaleCluster, loadInfrastructure } from './actions'
 import {
   Button,
   Dialog,
@@ -27,13 +27,20 @@ class ClusterScaleDialog extends React.Component {
   handleChange = value => this.setState(state => ({ ...state, ...value }))
 
   handleSubmit = async (e) => {
-    console.log('handleSubmit', this.state)
+    const { row, context, setContext } = this.props
+    const { numWorkers } = this.state
+    const data = { cluster: row, numWorkers }
+    await scaleCluster({ data, context, setContext })
     this.handleClose()
   }
 
   handleSlideChange = (e, sliderValue) => this.setState({ sliderValue })
 
   render () {
+    // Disabling spot worker feature for now.  It sounds like it is going to change
+    // in the near future.
+    const spotFeatureEnabled = false
+
     const { enableSpotWorkers, sliderValue } = this.state
     const { row } = this.props
     const initialValues = pick(['numMasters', 'numWorkers'], row)
@@ -45,7 +52,7 @@ class ClusterScaleDialog extends React.Component {
           <ValidatedForm setContext={this.handleChange} initialValues={initialValues}>
             <TextField id="numMasters" type="number" label="Num master nodes" fullWidth disabled />
             <TextField id="numWorkers" type="number" label="Num worker nodes" fullWidth />
-            <Checkbox id="enableSpotWorkers" label="Enable spot workers" />
+            {spotFeatureEnabled && <Checkbox id="enableSpotWorkers" label="Enable spot workers" />}
             {enableSpotWorkers &&
               <React.Fragment>
                 <Slider min={0.0} max={1.0} value={sliderValue} onChange={this.handleSlideChange} />
