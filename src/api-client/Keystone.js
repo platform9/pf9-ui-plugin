@@ -179,9 +179,6 @@ class Keystone {
   }
 
   async getServicesForActiveRegion () {
-    if (!this.client.activeRegion) {
-      throw new Error('Must first select a region before getting services for that region')
-    }
     if (!this.client.serviceCatalog) {
       await this.getServiceCatalog()
     }
