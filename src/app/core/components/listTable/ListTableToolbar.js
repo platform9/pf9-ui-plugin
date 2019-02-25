@@ -28,10 +28,14 @@ const toolbarStyles = theme => ({
         backgroundColor: theme.palette.secondary.dark
       },
   spacer: {
-    flex: '1 1 100%'
+    flex: '0 0 auto'
   },
   actions: {
-    color: theme.palette.text.secondary
+    color: theme.palette.text.secondary,
+    flex: '1 1 100%'
+  },
+  toolbar: {
+    justifyContent: 'flex-end'
   },
   title: {
     flex: '0 0 auto'
@@ -65,7 +69,7 @@ const ListTableToolbar = ({
       <ListTableRowActions rowActions={rowActions} selected={selected} />
       <div className={classes.spacer} />
       <div className={classes.actions}>
-        <Toolbar>
+        <Toolbar className={classes.toolbar}>
           {onSearchChange && (
             <SearchBar onSearchChange={onSearchChange} searchTerm={searchTerm} />
           )}
