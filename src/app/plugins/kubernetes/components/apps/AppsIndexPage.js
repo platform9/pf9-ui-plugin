@@ -3,8 +3,7 @@ import Tabs from 'core/components/Tabs'
 import Tab from 'core/components/Tab'
 import AppCatalogPage from 'k8s/components/apps/AppCatalogPage'
 import DeployedAppsListPage from 'k8s/components/apps/DeployedAppsListPage'
-
-const RepositoriesListPage = () => <h1>TODO: Repositories List Page</h1>
+import RepositoriesListPage from 'k8s/components/apps/RepositoriesListPage'
 
 const InfrastructurePage = () => (
   <Tabs>

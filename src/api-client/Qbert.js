@@ -294,7 +294,7 @@ class Qbert {
   }
 
   async getRepositories () {
-    return this.client.basicGet(`${this.monocularBaseUrl()}/repos`)
+    return this.client.basicGet(`${await this.monocularBaseUrl()}/repos`)
   }
 
   async getRepositoriesForCluster (clusterId) {

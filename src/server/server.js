@@ -3,11 +3,7 @@ import express from 'express'
 import http from 'http'
 import cors from 'cors'
 
-import {
-  requestLogger,
-  enableAllCors,
-  injectClientInfo,
-} from './middleware'
+import { requestLogger, enableAllCors, injectClientInfo } from './middleware'
 
 import keystone from './api/keystone'
 import nova from './api/nova'
@@ -15,6 +11,7 @@ import neutron from './api/neutron'
 import cinder from './api/cinder'
 import glance from './api/glance'
 import qbert from './api/qbert'
+import monocular from './api/monocular'
 import resmgr from './api/resmgr'
 import admin from './api/admin'
 
@@ -48,6 +45,8 @@ export function startServer (config = defaultConfig) {
   app.use('/cinder', cinder)
   app.use('/glance', glance)
   app.use('/qbert', qbert)
+  app.use('/monocular', monocular)
+  app.use('/resmgr', resmgr)
   app.use('/resmgr', resmgr)
   app.use('/admin', admin)
   app.use(cors())

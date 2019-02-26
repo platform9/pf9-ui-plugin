@@ -59,6 +59,28 @@ export const deleteRelease = async ({
   // TODO
 }
 
+export const loadRepositories = async ({
+  data,
+  context,
+  setContext,
+  params,
+  reload
+}) => {
+  const repositories = await context.apiClient.qbert.getRepositories().then(prop('data'))
+  setContext({ repositories })
+  return repositories
+}
+
+export const deleteRepository = async ({
+  data,
+  context,
+  setContext,
+  params,
+  reload
+}) => {
+  // TODO
+}
+
 export const editApp = async ({ id, context, setContext }) => {}
 
 export const downloadApp = async () => {}
