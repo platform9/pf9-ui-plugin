@@ -1,6 +1,7 @@
 import React from 'react'
 import { withRouter } from 'react-router'
 import { compose } from 'app/utils/fp'
+import { dashboardUrl, loginUrl } from 'app/constants'
 
 import { withAppContext } from 'core/AppContext'
 import { withPreferences } from 'core/providers/PreferencesProvider'
@@ -23,7 +24,7 @@ class SessionManager extends React.Component {
 
     if (!username || !unscopedToken) {
       setContext({ initialized: true })
-      return history.push('/ui/openstack/login')
+      return history.push(loginUrl)
     }
 
     // We need to make sure the token has not expired.
@@ -31,7 +32,7 @@ class SessionManager extends React.Component {
 
     if (!unscopedToken) {
       setContext({ initialized: true })
-      return this.props.history.push('/ui/openstack/login')
+      return this.props.history.push(loginUrl)
     }
 
     this.initialSetup({ username, unscopedToken })
@@ -59,8 +60,8 @@ class SessionManager extends React.Component {
 
     setContext({ initialized: true })
 
-    if (location.pathname === '/ui/openstack/login') {
-      history.push('/ui/openstack/dashboard')
+    if (location.pathname === loginUrl) {
+      history.push(dashboardUrl)
     }
   }
 

@@ -1,15 +1,15 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import moize from 'moize'
-import { AppBar, IconButton } from '@material-ui/core'
-import { withStyles } from '@material-ui/core/styles'
-import MenuIcon from '@material-ui/icons/Menu'
 import classNames from 'classnames'
-import Selector from 'core/components/Selector'
+import MenuIcon from '@material-ui/icons/Menu'
 import TenantChooser from 'openstack/components/tenants/TenantChooser'
+import RegionChooser from 'openstack/components/regions/RegionChooser'
 import UserMenu from 'core/components/UserMenu'
 import MaterialToolbar from '@material-ui/core/Toolbar/Toolbar'
+import { AppBar, IconButton } from '@material-ui/core'
+import { logoPath } from 'app/constants'
 import { drawerWidth } from 'core/components/Navbar'
+import { withStyles } from '@material-ui/core/styles'
 
 const styles = theme => ({
   appBar: {
@@ -50,61 +50,34 @@ const styles = theme => ({
   }
 })
 
-@withStyles(styles, { withTheme: true })
-class Toolbar extends React.Component {
-  state = {
-    open: true,
-    anchor: 'left',
-    curRegion: '',
-    regionSearch: '',
-    expandedItems: [],
-    filterText: '',
-  }
+const Toolbar = ({ classes, open, handleDrawerOpen }) => (
+  <AppBar className={classNames(classes.appBar, {
+    [classes.appBarShift]: open,
+    [classes['appBarShift-left']]: open,
+  })}>
+    <MaterialToolbar disableGutters={!open}>
+      <IconButton
+        color="inherit"
+        aria-label="open drawer"
+        onClick={handleDrawerOpen}
+        className={classNames(classes.menuButton, open && classes.hide)}
+      >
+        <MenuIcon />
+      </IconButton>
+      <img src={logoPath} className={classes.logo} align="middle" />
+      <div className={classes.rightTools}>
+        <RegionChooser />
+        <TenantChooser />
+        <UserMenu />
+      </div>
+    </MaterialToolbar>
+  </AppBar>
 
-  handleChange = moize(key => value => {
-    this.setState({
-      [key]: value
-    })
-  })
-
-  render () {
-    const { classes, open, handleDrawerOpen } = this.props
-    const { curRegion, regionSearch } = this.state
-    const logoPath = '/ui/images/logo.png'
-
-    return <AppBar className={classNames(classes.appBar, {
-      [classes.appBarShift]: open,
-      [classes['appBarShift-left']]: open,
-    })}>
-      <MaterialToolbar disableGutters={!open}>
-        <IconButton
-          color="inherit"
-          aria-label="open drawer"
-          onClick={handleDrawerOpen}
-          className={classNames(classes.menuButton, open && classes.hide)}
-        >
-          <MenuIcon />
-        </IconButton>
-        <img src={logoPath} className={classes.logo} align="middle" />
-        <div className={classes.rightTools}>
-          <Selector
-            name={curRegion.length === 0 ? 'Current Region' : curRegion}
-            list={[`AWS-US-West-1-Test`, `KVM-Neutron`]}
-            onChoose={this.handleChange('curRegion')}
-            onSearchChange={this.handleChange('regionSearch')}
-            searchTerm={regionSearch}
-          />
-          <TenantChooser />
-          <UserMenu />
-        </div>
-      </MaterialToolbar>
-    </AppBar>
-  }
-}
+)
 
 Toolbar.propTypes = {
   open: PropTypes.bool,
   handleDrawerOpen: PropTypes.func,
 }
 
-export default Toolbar
+export default withStyles(styles, { withTheme: true })(Toolbar)
