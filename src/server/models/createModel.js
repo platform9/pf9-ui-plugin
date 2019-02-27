@@ -1,6 +1,6 @@
 // Base template for handling k8s object models
 import uuid from 'uuid'
-import { both, propEq, T } from 'ramda'
+import { both, propEq, T, clone } from 'ramda'
 
 // Filter list by cluster and namespace if necessary
 const filterListByConfig = (list, { clusterId, namespace }) =>
@@ -32,9 +32,12 @@ const createModel = (options={}) => {
 
       const createdData = createFn ? createFn(data, context) : data
       const mappedData = mappingFn ? mappingFn(createdData, context) : createdData
+      // Clone is necessary to avoid references to same arrays/objects in instance properties
+      // that are shared through the defaults object
+      const _defaults = clone(defaults)
       const newObject = {
         [uniqueIdentifier]: uuid.v4(),
-        ...defaults,
+        ..._defaults,
         ...mappedData
       }
       context[dataKey].push(newObject)
