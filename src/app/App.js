@@ -38,7 +38,7 @@ class App extends React.Component {
   renderPluginRoutes = (id, plugin) => {
     const options = plugin.getOptions()
     // TODO: Implement 404 page
-    const defaultRoute = plugin.getDefaultRoute() || '/ui/404'
+    const defaultRoute = plugin.getDefaultRoute()
     const { showFooter } = options
     return <Route key={id} path={plugin.basePath}
       exact={false}
@@ -60,7 +60,7 @@ class App extends React.Component {
           {/* TODO implement generic login page? */}
           <Route path={pathJoin(plugin.basePath, 'login')} component={null} />
           <Route path={pathJoin(plugin.basePath, 'logout')} exact component={LogoutPage} />
-          <Redirect to={defaultRoute} />
+          {defaultRoute && <Redirect to={defaultRoute || '/ui/404'} />}
           {showFooter && this.renderFooter()}
         </Switch>
       }} />
@@ -73,7 +73,7 @@ class App extends React.Component {
       <Router>
         <MuiThemeProvider theme={theme}>
           <HotKeysProvider>
-            <AppContext initialContext={{ apiClient, initialized: false }}>
+            <AppContext initialContext={{ apiClient, initialized: false, sessionLoaded: false }}>
               <ToastProvider>
                 <PreferencesProvider>
                   <div id="_main-container">

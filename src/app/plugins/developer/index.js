@@ -20,7 +20,7 @@ Developer.registerPlugin = pluginManager => {
     [
       {
         name: 'DeveloperHome',
-        link: { path: '/', exact: true, default: true },
+        link: { path: '/', exact: true, default: false },
         component: DeveloperIndexPage
       },
       {

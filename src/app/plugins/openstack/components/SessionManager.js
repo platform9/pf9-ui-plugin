@@ -19,8 +19,10 @@ class SessionManager extends React.Component {
   async componentDidMount () {
     const { history, setContext } = this.props
     // Attempt to restore the session
-    const username = getStorage('username')
-    let unscopedToken = getStorage('unscopedToken')
+    const tokens = getStorage('tokens')
+    const user = getStorage('user')
+    const username = user && user.username
+    let unscopedToken = tokens && tokens.unscopedToken
 
     if (!username || !unscopedToken) {
       setContext({ initialized: true })
@@ -44,8 +46,8 @@ class SessionManager extends React.Component {
   initialSetup = async ({ username, unscopedToken }) => {
     const { context, history, location, initSession, initUserPreferences, setContext } = this.props
 
-    setStorage('username', username)
-    setStorage('unscopedToken', unscopedToken)
+    setStorage('user', { username })
+    setStorage('tokens', { unscopedToken })
 
     // Set up the scopedToken
     await initSession(unscopedToken, username)
@@ -58,7 +60,7 @@ class SessionManager extends React.Component {
     const { keystone } = context.apiClient
     await keystone.changeProjectScope(activeTenant.id)
 
-    setContext({ initialized: true })
+    setContext({ initialized: true, sessionLoaded: true })
 
     if (location.pathname === loginUrl) {
       history.push(dashboardUrl)
@@ -67,7 +69,7 @@ class SessionManager extends React.Component {
 
   render () {
     const { context, children } = this.props
-    const { session, initialized } = context
+    const { initialized, session, sessionLoaded } = context
 
     if (!initialized) {
       return <div>Loading app...</div>
@@ -77,7 +79,8 @@ class SessionManager extends React.Component {
       return <LoginPage onAuthSuccess={this.initialSetup} />
     }
 
-    return children
+    // Do not let the rest of the UI load until we have a working session.
+    return sessionLoaded ? children : <div>Initializing session...</div>
   }
 }
 
