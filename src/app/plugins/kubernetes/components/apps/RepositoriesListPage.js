@@ -2,7 +2,7 @@ import React from 'react'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { loadRepositories, deleteRepository } from 'k8s/components/apps/actions'
 import { loadInfrastructure } from 'k8s/components/infrastructure/actions'
-import { withDataLoader } from 'core/DataLoader'
+import { withMultiLoader } from 'core/DataLoader'
 
 const ListPage = ({ ListContainer }) =>
   ({ data: { repositories } }) => <ListContainer data={repositories} />
@@ -25,7 +25,10 @@ export const options = {
 
 const { ListPage: RepositoriesListPage } = createCRUDComponents(options)
 
-export default withDataLoader({
-  dataKey: ['clusters', 'repositories'],
-  loaderFn: [loadInfrastructure, loadRepositories],
+export default withMultiLoader({
+  clusters: loadInfrastructure,
+  repositories: {
+    requires: 'clusters',
+    loaderFn: loadRepositories
+  }
 })(RepositoriesListPage)

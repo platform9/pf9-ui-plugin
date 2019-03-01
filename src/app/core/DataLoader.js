@@ -1,68 +1,120 @@
-import React from 'react'
+import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
-import { all, partition, pick, props } from 'ramda'
-import { ensureArray, exists, propExists } from 'app/utils/fp'
-import { withAppContext } from './AppContext'
+import { pick, intersection, flatten, head } from 'ramda'
+import { ensureArray } from 'app/utils/fp'
 import DisplayError from './components/DisplayError'
 import Loader from './components/Loader'
+import { withAppContext } from 'core/AppContext'
 
-class DataLoaderBase extends React.Component {
+class MultiLoaderBase extends PureComponent {
   state = {
     loading: false,
     error: null,
   }
 
   componentDidMount () {
-    this.listener = window.addEventListener('scopeChanged', () => this.loadData())
-    this.loadData()
+    this.listener = window.addEventListener('scopeChanged', this.loadAll())
+    this.loadAll()
   }
 
   componentWillUnmount () {
     window.removeEventListener('scopeChanged', this.listener)
   }
 
-  doneLoading = () => {
-    const { dataKey, context } = this.props
-    const dataKeys = ensureArray(dataKey)
-    return all(exists, props(dataKeys, context))
+  /**
+   * Returns a map of [loaderKeys, promise] arrays that rely one on another and will wait for the
+   * dependant loaders regardless of the order on which they are called
+   * @param loaders
+   */
+  getLinkedLoaders = loaders => {
+    const loaderPairs = Array.isArray(loaders)
+      ? loaders
+      : Object.entries(loaders)
+
+    const linkedLoaders = loaderPairs.map(([loaderKeys, loaderSpec]) => {
+      const { loaderFn, requires } =
+        typeof loaderSpec === 'function'
+          ? { loaderFn: loaderSpec }
+          : loaderSpec
+
+      // If the loader has dependencies, create a promise that will wait for the dependencies to be resolved
+      return [
+        loaderKeys,
+        async params => {
+          const { setContext, context } = this.props
+          return requires
+            ? Promise.all(
+              linkedLoaders
+                .filter(([lnkLoaderKeys]) =>
+                  intersection(lnkLoaderKeys, ensureArray(requires)).length > 0,
+                )
+                .map(([, loaderFn]) => loaderFn()),
+            ).then(prevResults =>
+              loaderFn({ setContext, context, params, prevResults }),
+            )
+            : loaderFn({ setContext, context, params })
+        },
+      ]
+    })
+    return linkedLoaders
   }
 
-  loadData = () => {
-    const { loaderFn, setContext, context } = this.props
-    if (!this.doneLoading()) {
-      this.setState({ loading: true })
-      const parseErr = err => {
-        if (typeof err === 'string') { return err }
-        if (err instanceof Error) { return err.message }
-      }
-      const loaderFns = ensureArray(loaderFn)
+  loadAll = async () =>
+    this.setState({ loading: true }, async () => {
+      const { loaders } = this.props
       try {
-        const promises = loaderFns.map(fn => fn({ setContext, context }))
-        const [promiseFns, syncFns] = partition(propExists('then'), promises) // eslint-disable-line no-unused-vars
-        Promise.all(promises).then(
-          () => { this.setState({ loading: false }) },
-          err => { this.setState({ loading: false, error: parseErr(err) }) }
+        await Promise.all(this.getLinkedLoaders(loaders)
+          .map(([, callback]) => callback())
         )
+        this.setState({ loading: false })
       } catch (err) {
         console.log(err)
-        this.setState({ loading: false, error: parseErr(err) })
+        this.setState({ loading: false, error: err.toString() })
       }
-    }
+    })
+
+  loadOne = (key, params) => {
+    const { loaders } = this.props
+    const [, loaderFn] = this.getLinkedLoaders(loaders).find(([keys]) =>
+      Array.isArray(keys) ? keys.includes(key) : keys === key,
+    )
+
+    this.setState({ loading: true }, async () => {
+      try {
+        await loaderFn(params)
+        this.setState({ loading: false })
+      } catch (err) {
+        console.log(err)
+        this.setState({ loading: false, error: err.toString() })
+      }
+    })
   }
 
   render () {
     const { loading, error } = this.state
-    const { context, dataKey, children } = this.props
-    const dataKeys = ensureArray(dataKey)
-    if (!context || !this.doneLoading()) { return <Loader /> }
-    const data = dataKeys.length === 1 ? context[dataKey] : pick(dataKeys, context)
-    if (loading || !data) { return <Loader /> }
-    if (error) { return <DisplayError error={error} /> }
-    return children({ data, loading, error, context })
+    if (error) {
+      return <DisplayError error={error} />
+    }
+    const { context, loaders, children } = this.props
+    const loaderPairs = Array.isArray(loaders)
+      ? loaders
+      : Object.entries(loaders)
+    const dataKeys = flatten(loaderPairs.map(head))
+    const data = dataKeys.length === 1 ? context[dataKeys[0]] : pick(dataKeys, context)
+    if (loading || !data) {
+      return <Loader />
+    }
+    return children({ data, loading, error, context, reload: this.loadOne })
   }
 }
 
-const DataLoader = withAppContext(DataLoaderBase)
+const MultiLoader = withAppContext(MultiLoaderBase)
+
+const DataLoader = ({ dataKey, loaderFn, children }) => (
+  <MultiLoader loaders={[[ensureArray(dataKey), loaderFn]]}>
+    {children}
+  </MultiLoader>
+)
 DataLoader.propTypes = {
   /**
    * Used to determine if data already exists in context.
@@ -80,16 +132,33 @@ DataLoader.propTypes = {
    * This function is invoked when the data does not yet exist.
    * It is passed `setContext` to use for updating.
    * Can also take an array of multiple loaders.
-  */
+   */
   loaderFn: PropTypes.oneOfType([
     PropTypes.func,
     PropTypes.arrayOf(PropTypes.func),
   ]).isRequired,
 }
 
-export const withDataLoader = ({ dataKey, loaderFn }) => Component => props =>
+MultiLoader.propTypes = {
+  /**
+   * Object with key value pairs where key is the dataKey and
+   * value is a loaderFn or a spec of { requires, loaderFn }
+   */
+  loaders: PropTypes.oneOfType([PropTypes.object, PropTypes.array]).isRequired,
+}
+
+export const withDataLoader = ({ dataKey, loaderFn }) => Component => props => (
   <DataLoader dataKey={dataKey} loaderFn={loaderFn}>
-    {({ data }) => <Component data={data} {...props} />}
+    {loaderProps => <Component {...loaderProps} {...props} />}
   </DataLoader>
+)
+
+export const withMultiLoader = loaders => Component => props => (
+  <MultiLoader loaders={loaders}>
+    {loaderProps => <Component {...loaderProps} {...props} />}
+  </MultiLoader>
+)
+
+export { MultiLoader }
 
 export default DataLoader
