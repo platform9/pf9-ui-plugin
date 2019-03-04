@@ -105,11 +105,9 @@ const options = {
   onDeleteFn: (id, context, obj) => {
     // Need to clean up all resources on this cluster
     // Clean up attached nodes
-    if (obj.nodes && obj.nodes.length > 0) {
-      for (const node of obj.nodes) {
-        Node.delete({id: node.uuid, context})
-      }
-    }
+    (obj.nodes || []).forEach((node) => {
+      Node.delete({ id: node.uuid, context })
+    })
 
     Deployment.deleteAllInCluster({ clusterId: id, context })
     Namespace.deleteAllInCluster({ clusterId: id, context })
