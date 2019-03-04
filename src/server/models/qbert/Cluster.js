@@ -3,6 +3,11 @@ import faker from 'faker'
 import { getCurrentTime } from '../../util'
 import ResMgrHost from '../resmgr/ResMgrHost'
 import Node from './Node'
+import Deployment from './Deployment'
+import Namespace from './Namespace'
+import Pod from './Pod'
+import Service from './Service'
+import StorageClass from './StorageClass'
 import { attachNodeToCluster } from './Operations'
 import uuid from 'uuid'
 
@@ -98,12 +103,19 @@ const options = {
     })
   },
   onDeleteFn: (id, context, obj) => {
+    // Need to clean up all resources on this cluster
     // Clean up attached nodes
-    if (obj.nodes.length > 0) {
+    if (obj.nodes && obj.nodes.length > 0) {
       for (const node of obj.nodes) {
-        Node.delete(node.uuid, context)
+        Node.delete({id: node.uuid, context})
       }
     }
+
+    Deployment.deleteAllInCluster({ clusterId: id, context })
+    Namespace.deleteAllInCluster({ clusterId: id, context })
+    Pod.deleteAllInCluster({ clusterId: id, context })
+    Service.deleteAllInCluster({ clusterId: id, context })
+    StorageClass.deleteAllInCluster({ clusterId: id, context })
   }
 }
 

@@ -61,6 +61,10 @@ const createModel = (options={}) => {
       context[dataKey] = context[dataKey].filter(x => x[uniqueIdentifier] !== id)
     },
 
+    deleteAllInCluster: ({ clusterId, context }) => {
+      context[dataKey] = context[dataKey].filter(x => x.clusterId !== clusterId)
+    },
+
     findById: ({ id, context, raw=false }) => {
       const obj = context[dataKey].find(x => x[uniqueIdentifier] === id)
       return (!raw && loaderFn) ? loaderFn([obj])[0] : obj

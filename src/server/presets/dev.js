@@ -120,6 +120,7 @@ function loadPreset () {
   // ResMgrHosts
   const resMgrHost = new ResMgrHost({ roles: ['pf9-ostackhost'], info: { hostname: 'fake resmgr host' } })
   const resMgrHost2 = new ResMgrHost({ roles: ['pf9-ostackhost', 'pf9-kube'], info: { hostname: 'fake resmgr host 2' } })
+  const resMgrHost3 = new ResMgrHost({ roles: ['pf9-ostackhost', 'pf9-kube'], info: { hostname: 'fake resmgr host 3' } })
 
   // Cloud Providers
   CloudProvider.create({ data: { name: 'mockAwsProvider', type: 'aws' }, context })
@@ -128,7 +129,8 @@ function loadPreset () {
 
   // Clusters
   const cluster = Cluster.create({ data: { name: 'fakeCluster1', sshKey: 'someKey' }, context, raw: true })
-  Cluster.create({ data: { name: 'fakeCluster2' }, context })
+  const cluster2 = Cluster.create({ data: { name: 'fakeCluster2', sshKey: 'someKey' }, context, raw: true })
+  Cluster.create({ data: { name: 'fakeCluster3' }, context })
   Cluster.create({ data: { name: 'mockAwsCluster', cloudProviderType: 'aws' }, context })
   Cluster.create({ data: { name: 'mockOpenStackCluster', cloudProviderType: 'openstack' }, context })
 
@@ -139,15 +141,23 @@ function loadPreset () {
     context,
     raw: true
   })
-  Node.create({ data: { name: 'fakeNode2', uuid: resMgrHost2.id }, context })
+  const node2 = Node.create({
+    data: { name: 'fakeNode2', api_responding: 1, isMaster: 1, uuid: resMgrHost2.id },
+    context,
+    raw: true
+  })
+  Node.create({ data: { name: 'fakeNode3', uuid: resMgrHost3.id }, context })
 
   attachNodeToCluster(node, cluster)
+  attachNodeToCluster(node2, cluster2)
 
   // Namespaces
   const defaultNamespace = Namespace.create({ data: { name: 'default' }, context, config: { clusterId: cluster.uuid }, raw: true })
+  const defaultNamespace2 = Namespace.create({ data: { name: 'default' }, context, config: { clusterId: cluster2.uuid }, raw: true })
 
   // Pods
   Pod.create({ data: { metadata: { name: 'fakePod' } }, context, config: { clusterId: cluster.uuid, namespace: defaultNamespace.name } })
+  Pod.create({ data: { metadata: { name: 'fakePod2' } }, context, config: { clusterId: cluster2.uuid, namespace: defaultNamespace2.name } })
 
   // Deployments (and pods)
   Deployment.create({ data: { metadata: { name: 'fakeDeployment' }, spec: { replicas: 2 } }, context, config: { clusterId: cluster.uuid, namespace: defaultNamespace.name } })
