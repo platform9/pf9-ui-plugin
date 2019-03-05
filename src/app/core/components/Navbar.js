@@ -24,10 +24,7 @@ const styles = theme => ({
   search: {
     position: 'relative',
     borderRadius: theme.shape.borderRadius,
-    backgroundColor: fade(theme.palette.background.paper, 0.15),
-    '&:hover': {
-      backgroundColor: fade(theme.palette.background.default, 0.25),
-    },
+    backgroundColor: '#fff',
     marginRight: theme.spacing.unit * 2,
     marginLeft: 0,
     width: '100%',
@@ -47,6 +44,7 @@ const styles = theme => ({
     width: drawerWidth,
     height: '100%',
     minHeight: '100vh',
+    backgroundColor: '#243748',
   },
   drawerHeader: {
     display: 'flex',
@@ -72,11 +70,12 @@ const styles = theme => ({
     margin: 0
   },
   activeNavItem: {
-    backgroundColor: theme.palette.primary.dark,
-    color: '#fff'
+    backgroundColor: '#fff',
+    color: 'rgba(0, 0, 0, .87)'
   },
   currentNavLink: {
-    backgroundColor: theme.palette.grey[300],
+    backgroundColor: '#fff !important',
+    color: 'rgba(0, 0, 0, .87) !important'
   },
   navHeading: {
     backgroundColor: theme.palette.grey[50],
@@ -101,9 +100,26 @@ const styles = theme => ({
     paddingRight: theme.spacing.unit * 2,
     paddingBottom: theme.spacing.unit,
     paddingLeft: theme.spacing.unit * 2,
+    backgroundColor: '#243748',
+    color: '#aee0ff',
+    borderBottom: '1px solid #07283e',
+    '&:hover': {
+      backgroundColor: '#243748'
+    },
+  },
+  navMenuText: {
+    color: '#aee0ff',
+    fontSize: '12px',
+    fontWeight: 600,
+  },
+  currentNavMenuText: {
+    color: 'rgba(0, 0, 0, 0.87)',
+    fontSize: '12px',
+    fontWeight: 600,
   },
   navMenuList: {
-    paddingLeft: theme.spacing.unit
+    // paddingLeft: theme.spacing.unit,
+    borderLeft: `${theme.spacing.unit}px solid #6dc6fe`
   }
 })
 
@@ -244,7 +260,7 @@ class Navbar extends PureComponent {
         })}>
         {icon && (<ListItemIcon>{icon}</ListItemIcon>)}
         <ListItemText
-          primaryTypographyProps={{ color: 'textPrimary', variant: 'overline' }}
+          classes={{ primary: isCurrentNavLink ? classes.currentNavMenuText : classes.navMenuText }}
           primary={name} />
         {expanded ? <ExpandLess /> : <ExpandMore />}
       </MenuItem>,
@@ -283,7 +299,7 @@ class Navbar extends PureComponent {
           </ListItemIcon>
         )}
         <ListItemText
-          primaryTypographyProps={{ color: isActiveNavLink ? 'inherit' : 'textPrimary' }}
+          classes={{ primary: isCurrentNavLink ? classes.currentNavMenuText : classes.navMenuText }}
           primary={name} />
       </MenuItem>
     )
@@ -354,7 +370,7 @@ class Navbar extends PureComponent {
     >
       <div className={classes.drawerHeader}>
         {withSearchBar ? this.renderNavFilterBar() : null}
-        <IconButton onClick={handleDrawerClose}>
+        <IconButton className={classes.navMenuText} onClick={handleDrawerClose}>
           <ChevronLeftIcon />
         </IconButton>
       </div>

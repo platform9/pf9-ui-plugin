@@ -5,6 +5,7 @@ body {
   background-color: #eee;
   overflow-x: hidden;
   max-width: 100%;
+  -webkit-font-smoothing: antialiased;
 }
 
 #main-container {
