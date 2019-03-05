@@ -6,7 +6,6 @@ import {
   MenuItem, MenuList, Typography
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles'
-import { fade } from '@material-ui/core/styles/colorManipulator'
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
 import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'
@@ -118,7 +117,6 @@ const styles = theme => ({
     fontWeight: 600,
   },
   navMenuList: {
-    // paddingLeft: theme.spacing.unit,
     borderLeft: `${theme.spacing.unit}px solid #6dc6fe`
   }
 })
