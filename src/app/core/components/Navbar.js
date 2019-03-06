@@ -10,11 +10,11 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
 import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'
 import SearchIcon from '@material-ui/icons/Search'
-import { except } from 'app/utils/fp'
+import { except, notEmpty } from 'app/utils/fp'
 import classnames from 'classnames'
 import { withHotKeys } from 'core/providers/HotKeysProvider'
 import moize from 'moize'
-import { assoc, flatten, pluck, prop, propEq, propOr } from 'ramda'
+import { assoc, flatten, pluck, prop, propEq, propOr, where } from 'ramda'
 import { matchPath, withRouter } from 'react-router'
 
 export const drawerWidth = 240
@@ -246,13 +246,15 @@ class Navbar extends PureComponent {
       exact: true,
       strict: false
     })
+    const redirect = () => { window.location = link.path }
+    const handleClick = link.external ? redirect : this.toggleFoldingAndNavTo(name, prop('path', link))
     const isCurrentNavLink = matchesCurrentPath(link)
     const expanded = subLinks.some(({ link }) => matchesCurrentPath(link)) ||
       this.state.expandedItems.includes(name)
     return [
       <MenuItem
         key={name}
-        onClick={this.toggleFoldingAndNavTo(name, prop('path', link))}
+        onClick={handleClick}
         className={classnames(classes.navMenuItem, {
           [classes.currentNavLink]: !!isCurrentNavLink,
         })}>
@@ -281,6 +283,9 @@ class Navbar extends PureComponent {
       strict: false
     })
 
+    const redirect = () => { window.location = link.path }
+    const handleClick = link.external ? redirect : this.getNavToFn(link.path)
+
     return nestedLinks ? (
       this.renderNavFolder(name, link, nestedLinks, icon)
     ) : (
@@ -289,7 +294,7 @@ class Navbar extends PureComponent {
           [classes.activeNavItem]: isActiveNavLink,
           [classes.currentNavLink]: !!isCurrentNavLink && !isActiveNavLink,
         })}
-        onClick={this.getNavToFn(link.path)}
+        onClick={handleClick}
         key={link.path}>
         {icon && (
           <ListItemIcon>
@@ -347,18 +352,15 @@ class Navbar extends PureComponent {
   renderSectionLinks = sectionLinks => {
     const { classes } = this.props
     const { filterText } = this.state
+    const filteredLinks = filterText ? this.getFilteredLinks(sectionLinks) : sectionLinks
     return <MenuList component="nav" className={classes.navMenu}>
-      {(filterText
-        ? this.getFilteredLinks(sectionLinks)
-        : sectionLinks
-      ).map(this.renderNavLink)}
+      {filteredLinks.map(this.renderNavLink)}
     </MenuList>
   }
 
   render () {
     const { classes, withSearchBar, sections, open, handleDrawerClose } = this.props
-    const filteredSections = sections.filter(section =>
-      section.links && section.links.length > 0)
+    const filteredSections = sections.filter(where({ links: notEmpty }))
 
     return <Drawer
       variant="persistent"

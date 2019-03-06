@@ -117,50 +117,103 @@ Kubernetes.registerPlugin = pluginManager => {
     ]
   )
 
-  plugin.registerNavItems(
-    [
-      {
-        name: 'Infrastructure',
-        link: { path: '/infrastructure' },
-        nestedLinks: [
-          { name: 'Clusters', link: { path: '/infrastructure#clusters' } },
-          { name: 'Nodes', link: { path: '/infrastructure#nodes' } },
-          { name: 'Cloud Providers', link: { path: '/infrastructure#cloudProviders' } },
-        ]
-      },
-      {
-        name: 'App Catalog',
-        link: { path: '/apps' },
-        nestedLinks: [
-          { name: 'App Catalog', link: { path: '/apps#appCatalog' } },
-          { name: 'Deployed Apps', link: { path: '/apps#deployedApps' } },
-          { name: 'Repositories', link: { path: '/apps#repositories' } },
-        ]
-      },
-      {
-        name: 'Pods, Deployments, Services',
-        link: { path: '/pods' },
-        nestedLinks: [
-          { name: 'Pods', link: { path: '/pods#pods' } },
-          { name: 'Deployments', link: { path: '/pods#deployments' } },
-          { name: 'Services', link: { path: '/pods#services' } },
-        ]
-      },
-      { name: 'Storage Classes', link: { path: '/storage_classes' } },
-      { name: 'Namespaces', link: { path: '/namespaces' } },
-      { name: 'API Access', link: { path: '/api_access' } },
-      {
-        name: 'Tenants & Users',
-        link: { path: '/user_management' },
-        nestedLinks: [
-          { name: 'Tenants', link: { path: '/user_management#tenants' } },
-          { name: 'Users', link: { path: '/user_management#users' } },
-          { name: 'Groups', link: { path: '/user_management#userGroups' } },
-          { name: 'Roles', link: { path: '/user_management#roles' } },
-        ]
-      },
-    ]
-  )
+  const hostPrefix = '' // set to another host during development
+  const clarityBase = path => `${hostPrefix}/clarity/index.html#${path}`
+  const clarityLink = path => ({ link: { path: clarityBase(path), external: true } })
+
+  // For development we can set this manually
+  const useClarityLinks = Boolean(!window.localStorage.disableClarityLinks)
+
+  // These nav items will redirect to the old "clarity" UI while the new UI is under development.
+  const clarityNavItems = [
+    {
+      name: 'Infrastructure',
+      ...clarityLink('/infrastructureK8s'),
+      nestedLinks: [
+        { name: 'Clusters', ...clarityLink('/infrastructureK8s#clusters') },
+        { name: 'Nodes', ...clarityLink('/infrastructureK8s#nodes') },
+        { name: 'Cloud Providers', ...clarityLink('/infrastructureK8s#cps') },
+      ]
+    },
+    {
+      name: 'App Catalog',
+      ...clarityLink('/kubernetes/apps'),
+      nestedLinks: [
+        { name: 'App Catalog', ...clarityLink('/kubernetes/apps#catalog') },
+        { name: 'Deployed Apps', ...clarityLink('/kubernetes/apps#deployed_apps') },
+        { name: 'Repositories', ...clarityLink('/kubernetes/apps#repositories') },
+      ]
+    },
+    {
+      name: 'Pods, Deployments, Services',
+      ...clarityLink('/podsK8s'),
+      nestedLinks: [
+        { name: 'Pods', ...clarityLink('/podsK8s#pods') },
+        { name: 'Deployments', ...clarityLink('/podsK8s#deployments') },
+        { name: 'Services', ...clarityLink('/podsK8s#services') },
+      ]
+    },
+    { name: 'Storage Classes', ...clarityLink('/kubernetes/storage_classes') },
+    { name: 'Namespaces', ...clarityLink('/kubernetes/namespaces') },
+    { name: 'API Access', ...clarityLink('/kubernetes/api_access') },
+    {
+      name: 'Tenants & Users',
+      ...clarityLink('/kubernetes/users'),
+      nestedLinks: [
+        { name: 'Tenants', ...clarityLink('/kubernetes/users#tenants') },
+        { name: 'Users', ...clarityLink('/kubernetes/users#users') },
+        { name: 'Groups', ...clarityLink('/kubernetes/users#groups') },
+        { name: 'Roles', ...clarityLink('/kubernetes/users#roles') },
+      ]
+    },
+  ]
+
+  // These nav items are in active development but not shown in production.
+  const devNavItems = [
+    {
+      name: 'Infrastructure',
+      link: { path: '/infrastructure' },
+      nestedLinks: [
+        { name: 'Clusters', link: { path: '/infrastructure#clusters' } },
+        { name: 'Nodes', link: { path: '/infrastructure#nodes' } },
+        { name: 'Cloud Providers', link: { path: '/infrastructure#cloudProviders' } },
+      ]
+    },
+    {
+      name: 'App Catalog',
+      link: { path: '/apps' },
+      nestedLinks: [
+        { name: 'App Catalog', link: { path: '/apps#appCatalog' } },
+        { name: 'Deployed Apps', link: { path: '/apps#deployedApps' } },
+        { name: 'Repositories', link: { path: '/apps#repositories' } },
+      ]
+    },
+    {
+      name: 'Pods, Deployments, Services',
+      link: { path: '/pods' },
+      nestedLinks: [
+        { name: 'Pods', link: { path: '/pods#pods' } },
+        { name: 'Deployments', link: { path: '/pods#deployments' } },
+        { name: 'Services', link: { path: '/pods#services' } },
+      ]
+    },
+    { name: 'Storage Classes', link: { path: '/storage_classes' } },
+    { name: 'Namespaces', link: { path: '/namespaces' } },
+    { name: 'API Access', link: { path: '/api_access' } },
+    {
+      name: 'Tenants & Users',
+      link: { path: '/user_management' },
+      nestedLinks: [
+        { name: 'Tenants', link: { path: '/user_management#tenants' } },
+        { name: 'Users', link: { path: '/user_management#users' } },
+        { name: 'Groups', link: { path: '/user_management#userGroups' } },
+        { name: 'Roles', link: { path: '/user_management#roles' } },
+      ]
+    },
+  ]
+
+  const links = useClarityLinks ? clarityNavItems : devNavItems
+  plugin.registerNavItems(links)
 }
 
 export default Kubernetes

@@ -9,6 +9,9 @@ export const isTruthy = x => !!x
 export const exists = x => x !== undefined
 export const propExists = curry((key, obj) => obj[key] !== undefined)
 
+// Works for arrays and strings.  All other types return false.
+export const notEmpty = arr => !!(arr && arr.length)
+
 export const pluckAsync = key => promise => promise.then(obj => obj[key])
 
 export const compose = (...fns) =>
