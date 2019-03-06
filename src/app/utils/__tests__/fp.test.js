@@ -5,6 +5,7 @@ import {
   filterFields,
   identity,
   mergeKey,
+  notEmpty,
   pick,
   pickMultiple,
   pipe,
@@ -107,5 +108,22 @@ describe('functional programming utils', () => {
     )
     const result2 = arr.map(fn2)
     expect(result2).toEqual(['unknown', 'three', 'five', 'seven', 'seven', 'three'])
+  })
+
+  it('notEmpty', () => {
+    expect(notEmpty(null)).toEqual(false)
+    expect(notEmpty(undefined)).toEqual(false)
+    expect(notEmpty(0)).toEqual(false)
+    expect(notEmpty(false)).toEqual(false)
+    expect(notEmpty(123)).toEqual(false)
+    expect(notEmpty(true)).toEqual(false)
+    expect(notEmpty(() => {})).toEqual(false)
+    expect(notEmpty([])).toEqual(false)
+    expect(notEmpty('')).toEqual(false)
+
+    expect(notEmpty('blah')).toEqual(true)
+    expect(notEmpty([123])).toEqual(true)
+    expect(notEmpty([null])).toEqual(true)
+    expect(notEmpty([undefined])).toEqual(true)
   })
 })

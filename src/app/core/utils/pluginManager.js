@@ -20,7 +20,7 @@ const parseNavItem = basePath => navItem => ({
   ...navItem,
   link: {
     ...navItem.link,
-    path: pathJoin(basePath, navItem.link.path)
+    path: navItem.link.external ? navItem.link.path : pathJoin(basePath, navItem.link.path)
   },
   nestedLinks: navItem.nestedLinks
     ? navItem.nestedLinks.map(parseNavItem(basePath))
