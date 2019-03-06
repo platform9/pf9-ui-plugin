@@ -169,6 +169,16 @@ Mocha and Selenium for these tests.
 A server must be provisioned before each one of these tests. These tests are
 very expensive to run (several hours) and designed to be run occasionally.
 
+## Special Flags
+
+To enable the develeper plugin use:
+
+`window.localStorage.setItem('enableDevPlugin', true)`
+
+To enable the left sidebar nav links to point to the development version use:
+
+`window.localStorage.disableClarityLinks = true`
+
 ## Docker
 
 As of right now, the Docker image is a UI development demo.  It runs with the

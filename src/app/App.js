@@ -69,6 +69,7 @@ class App extends React.Component {
   render () {
     const { pluginManager } = this.props
     const plugins = toPairs(pluginManager.getPlugins())
+    const devEnabled = window.localStorage.enableDevPlugin === 'true'
     return (
       <Router>
         <MuiThemeProvider theme={theme}>
@@ -85,7 +86,7 @@ class App extends React.Component {
                           links: plugin.getNavItems()
                         }))}>
                         {plugins.map(apply(this.renderPluginRoutes))}
-                        <DeveloperToolsEmbed />
+                        {devEnabled && <DeveloperToolsEmbed />}
                       </AppContainer>
                     </SessionManager>
                   </div>
