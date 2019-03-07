@@ -7,7 +7,7 @@ import SearchBar from './SearchBar'
 const styles = theme => ({
   selector: {
     position: 'relative',
-    float: 'right'
+    float: 'right',
   }
 })
 
@@ -38,7 +38,7 @@ class Selector extends React.Component {
   }
 
   render () {
-    const { classes, name, list, searchTerm, onSearchChange, type } = this.props
+    const { className, classes, name, list, searchTerm, onSearchChange, type } = this.props
     const { anchor } = this.state
     const selectorName = `${name}-selector`
 
@@ -46,7 +46,7 @@ class Selector extends React.Component {
     const filteredList = searchTerm === '' ? sortedList : this.filterBySearch(sortedList)
 
     return (
-      <div className={classes.selector}>
+      <div className={`${className} ${classes.selector}`}>
         <Typography color="inherit" variant="subtitle2" onClick={this.handleClick}>{type && `${type}: `}{name} &#9662;</Typography>
         <Menu
           id={selectorName}

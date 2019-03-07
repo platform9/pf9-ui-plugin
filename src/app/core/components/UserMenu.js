@@ -29,12 +29,12 @@ class UserMenu extends React.Component {
   logout = () => this.props.history.push(logoutUrl)
 
   render () {
-    const { classes, context } = this.props
+    const { classes, className, context } = this.props
     const { anchorEl } = this.state
     const username = context.session.username || '?'
 
     return (
-      <div className={classes.avatar}>
+      <div className={`${classes.avatar} ${className}`}>
         <Typography color="inherit" variant="subtitle2" onClick={this.handleClick}>{username} &#9662;</Typography>
         <Menu
           id="user-menu"
@@ -46,7 +46,6 @@ class UserMenu extends React.Component {
         >
           <MenuItem onClick={this.handleClose}>Change Password</MenuItem>
           <MenuItem onClick={this.handleClose}>SSH Keys</MenuItem>
-          {/* TODO: Implement a generic logout page or use a plugin relative route */}
           <MenuItem onClick={this.logout}>Sign Out</MenuItem>
         </Menu>
       </div>

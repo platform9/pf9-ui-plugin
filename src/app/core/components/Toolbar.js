@@ -49,7 +49,10 @@ const styles = theme => ({
     alignItems: 'center',
     justifyContent: 'flex-end',
     width: '700px',
-  }
+  },
+  leftMargin: {
+    marginLeft: theme.spacing.unit * 2,
+  },
 })
 
 const Toolbar = ({ classes, open, handleDrawerOpen }) => (
@@ -69,10 +72,8 @@ const Toolbar = ({ classes, open, handleDrawerOpen }) => (
       <img src={logoPath} className={classes.logo} align="middle" />
       <div className={classes.rightTools}>
         <RegionChooser />
-        &nbsp; &nbsp; &nbsp;
-        <TenantChooser />
-        &nbsp; &nbsp; &nbsp;
-        <UserMenu />
+        <TenantChooser className={classes.leftMargin} />
+        <UserMenu className={classes.leftMargin} />
       </div>
     </MaterialToolbar>
   </AppBar>

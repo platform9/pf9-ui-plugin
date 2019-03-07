@@ -41,6 +41,7 @@ class RegionChooser extends React.Component {
 
     return (
       <Selector
+        className={this.props.className}
         name={curRegion.length === 0 ? 'Current Region' : curRegion}
         type="Region"
         list={regionNames}
