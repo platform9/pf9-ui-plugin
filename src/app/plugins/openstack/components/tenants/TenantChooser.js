@@ -82,6 +82,7 @@ class TenantChooser extends React.Component {
     return (
       <Selector
         name={currentTenantName || 'service'}
+        type="Tenant"
         list={this.tenantNames(tenants)}
         onChoose={this.handleChoose}
         onSearchChange={this.handleChange('tenantSearch')}

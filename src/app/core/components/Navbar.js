@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import {
   Collapse, Divider, Drawer, ExpansionPanel, ExpansionPanelDetails,
-  ExpansionPanelSummary, IconButton, InputBase, ListItemIcon, ListItemText,
+  ExpansionPanelSummary, IconButton, InputBase, ListItemText,
   MenuItem, MenuList, Typography
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles'
@@ -109,17 +109,19 @@ const styles = theme => ({
   navMenuText: {
     color: '#aee0ff',
     fontSize: '12px',
-    fontWeight: 600,
+    fontWeight: 500,
   },
   currentNavMenuText: {
     color: 'rgba(0, 0, 0, 0.87)',
     fontSize: '12px',
-    fontWeight: 600,
+    fontWeight: 500,
   },
   navMenuList: {
     borderLeft: `${theme.spacing.unit}px solid #6dc6fe`
   }
 })
+
+const FontAwesomeIcon = ({ children }) => <i className={`fal fa-fw fa-lg fa-${children}`} />
 
 @withStyles(styles, { withTheme: true })
 @withHotKeys
@@ -258,7 +260,7 @@ class Navbar extends PureComponent {
         className={classnames(classes.navMenuItem, {
           [classes.currentNavLink]: !!isCurrentNavLink,
         })}>
-        {icon && (<ListItemIcon>{icon}</ListItemIcon>)}
+        {icon && <FontAwesomeIcon>{icon}</FontAwesomeIcon>}
         <ListItemText
           classes={{ primary: isCurrentNavLink ? classes.currentNavMenuText : classes.navMenuText }}
           primary={name} />
@@ -296,11 +298,7 @@ class Navbar extends PureComponent {
         })}
         onClick={handleClick}
         key={link.path}>
-        {icon && (
-          <ListItemIcon>
-            {icon}
-          </ListItemIcon>
-        )}
+        {icon && <FontAwesomeIcon>{icon}</FontAwesomeIcon>}
         <ListItemText
           classes={{ primary: isCurrentNavLink ? classes.currentNavMenuText : classes.navMenuText }}
           primary={name} />
@@ -387,7 +385,7 @@ const linkPropType = {
   link: PropTypes.shape({
     path: PropTypes.string
   }),
-  icon: PropTypes.element
+  icon: PropTypes.string,
 }
 
 const sectionPropType = {

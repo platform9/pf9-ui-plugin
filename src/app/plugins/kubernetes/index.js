@@ -122,13 +122,14 @@ Kubernetes.registerPlugin = pluginManager => {
   const clarityLink = path => ({ link: { path: clarityBase(path), external: true } })
 
   // For development we can set this manually
-  const useClarityLinks = Boolean(!window.localStorage.disableClarityLinks)
+  const useClarityLinks = window.localStorage.disableClarityLinks !== 'true'
 
   // These nav items will redirect to the old "clarity" UI while the new UI is under development.
   const clarityNavItems = [
     {
       name: 'Infrastructure',
       ...clarityLink('/infrastructureK8s'),
+      icon: 'building',
       nestedLinks: [
         { name: 'Clusters', ...clarityLink('/infrastructureK8s#clusters') },
         { name: 'Nodes', ...clarityLink('/infrastructureK8s#nodes') },
@@ -138,6 +139,7 @@ Kubernetes.registerPlugin = pluginManager => {
     {
       name: 'App Catalog',
       ...clarityLink('/kubernetes/apps'),
+      icon: 'th',
       nestedLinks: [
         { name: 'App Catalog', ...clarityLink('/kubernetes/apps#catalog') },
         { name: 'Deployed Apps', ...clarityLink('/kubernetes/apps#deployed_apps') },
@@ -147,17 +149,19 @@ Kubernetes.registerPlugin = pluginManager => {
     {
       name: 'Pods, Deployments, Services',
       ...clarityLink('/podsK8s'),
+      icon: 'cubes',
       nestedLinks: [
         { name: 'Pods', ...clarityLink('/podsK8s#pods') },
         { name: 'Deployments', ...clarityLink('/podsK8s#deployments') },
         { name: 'Services', ...clarityLink('/podsK8s#services') },
       ]
     },
-    { name: 'Storage Classes', ...clarityLink('/kubernetes/storage_classes') },
-    { name: 'Namespaces', ...clarityLink('/kubernetes/namespaces') },
-    { name: 'API Access', ...clarityLink('/kubernetes/api_access') },
+    { name: 'Storage Classes', icon: 'hdd', ...clarityLink('/kubernetes/storage_classes') },
+    { name: 'Namespaces', icon: 'object-group', ...clarityLink('/kubernetes/namespaces') },
+    { name: 'API Access', icon: 'key', ...clarityLink('/kubernetes/api_access') },
     {
       name: 'Tenants & Users',
+      icon: 'user',
       ...clarityLink('/kubernetes/users'),
       nestedLinks: [
         { name: 'Tenants', ...clarityLink('/kubernetes/users#tenants') },
