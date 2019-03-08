@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/core/styles'
 import classNames from 'classnames'
+import Intercom from 'core/components/integrations/Intercom'
 import Navbar, { drawerWidth } from 'core/components/Navbar'
 import Toolbar from 'core/components/Toolbar'
 
@@ -92,6 +93,7 @@ class AppContainer extends React.Component {
             <div>{this.props.children}</div>
           </main>
         </div>
+        <Intercom />
       </div>
     )
   }
