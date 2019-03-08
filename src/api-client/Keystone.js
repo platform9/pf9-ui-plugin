@@ -1,4 +1,6 @@
 import axios from 'axios'
+import { pluck } from 'ramda'
+import { getHighestRole } from './helpers'
 
 const authConstructors = {
   password: (username, password) => ({
@@ -106,19 +108,8 @@ class Keystone {
       const _user = response.data.token.user
       const roles = response.data.token.roles
 
-      const matchRole = (roles, roleName) => {
-        return roles.some((role) => role && role.name === roleName)
-      }
-
-      const role = roles.reduce((acc, current) => {
-        if (matchRole([acc, current], 'admin')) {
-          return 'admin'
-        } else if (matchRole([acc, current], '_member')) {
-          return '_member_'
-        } else {
-          return current.name
-        }
-      }, null)
+      const roleNames = pluck('name', roles)
+      const role = getHighestRole(roleNames)
 
       const user = {
         username: _user.name,

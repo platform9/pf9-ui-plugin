@@ -52,3 +52,13 @@ export const waitUntil = async ({ condition, delay, maxRetries }) =>
 
 export const sleep = (delay) =>
   new Promise(resolve => setTimeout(resolve, delay))
+
+export const getHighestRole = (roleNames) => {
+  if (roleNames.includes('admin')) {
+    return 'admin'
+  } else if (roleNames.includes('_member_')) {
+    return '_member_'
+  } else {
+    return roleNames[0]
+  }
+}
