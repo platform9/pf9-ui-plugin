@@ -37,7 +37,7 @@ class RegionChooser extends React.Component {
   render () {
     const { curRegion, regionSearch } = this.state
 
-    const regionNames = pluck('name', this.props.data)
+    const regionNames = pluck('id', this.props.data)
 
     return (
       <Selector

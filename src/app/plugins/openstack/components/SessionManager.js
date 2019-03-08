@@ -46,9 +46,6 @@ class SessionManager extends React.Component {
   initialSetup = async ({ username, unscopedToken }) => {
     const { context, history, location, initSession, initUserPreferences, setContext } = this.props
 
-    setStorage('user', { username })
-    setStorage('tokens', { unscopedToken })
-
     // Set up the scopedToken
     await initSession(unscopedToken, username)
     // The order matters, we need the session to be able to init the user preferences
@@ -58,7 +55,10 @@ class SessionManager extends React.Component {
     const tenants = await loadUserTenants({ context, setContext })
     const activeTenant = tenants.find(x => x.name === lastTenant)
     const { keystone } = context.apiClient
-    await keystone.changeProjectScope(activeTenant.id)
+    const { scopedToken, user } = await keystone.changeProjectScope(activeTenant.id)
+
+    setStorage('user', user)
+    setStorage('tokens', { unscopedToken, currentToken: scopedToken })
 
     setContext({ initialized: true, sessionLoaded: true })
 

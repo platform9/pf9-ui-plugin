@@ -43,7 +43,7 @@ function loadPreset () {
   })
 
   // Regions
-  const region = new Region({ name: 'Default Region' })
+  const region = new Region({ id: 'Default Region' })
 
   // Roles
   const adminRole = new Role({ name: 'admin' })

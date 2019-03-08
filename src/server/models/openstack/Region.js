@@ -8,7 +8,7 @@ const coll = () => context.regions
 class Region extends ActiveModel {
   constructor (params = {}) {
     super(params)
-    this.name = params.name || ''
+    this.id = params.id
     this.description = params.description || ''
     return this
   }
@@ -20,7 +20,7 @@ class Region extends ActiveModel {
   asJson = () => {
     const json = {
       ...super.asJson(),
-      name: this.name,
+      description: this.description,
     }
     return json
   }
