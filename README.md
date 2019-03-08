@@ -4,62 +4,44 @@ This is the new home for all things Platform9 UI related.
 
 
 # Getting started
+
 **Initializing the App**
 
 `npm install`
 
-**Starting the Server (previous OpenStack Simulator)**
+**Create a custom config**
+
+`cp config.example.js config.js`
+
+Edit `config.js` and make the necessary tweaks.
+
+**Starting the Simulator Server
 
 `npm run server`
 
-**Starting the App**
+The simulator will create an admin user as specified in your `config.js`
 
-`npm run start`
+**Hosting the App**
 
-For local dev version, use `localhost:3000?dev=true` as the browser URL.
+`npm run dev`
+
+Load the UI in your browser at `localhost:3000?dev=true` as the browser URL.
 
 
 # Key Elements
 
-## Server
+## Simulator Server
 
-The Server (previous OpenStack Simulator) serves as the API endpoint for the entire UI. Its roles are as follows:
+The Simulator Server implements all API endpoints used in the app.
+It serves multiple functions.
 
-- GraphQL API endpoint
+- Provides a mock environment used during testing
 
-- Proxies requests from GraphQL to the OpenStack REST API
+- Provides a mock environment used during development
 
-- Contains business logic
+- Allows rapid "provisioning" of different backend configurations using `presets`.
 
-- Testing simulator mock environment
-
-- Development mock environment
-
-There are some presets that can be used to configure the initial server status.
-
-
-## Loader
-
-The loader bootstraps the app loading process. It is the very first code to run
-and determines which version of the UI to load.
-
-Currently, the UI is loaded from an S3 bucket. Multiple versions of the UI are
-stored in different folders and the loader selects which one to use.
-
-It does this using a combination of query parameters, `localStorage`, and
-defaults (in that order).
-
-By default it will select the released version (branch mode).
-
-To switch to a specific branch you can use `?branch=[BRANCH]`.
-
-To switch to a specific version you can used `?version=vX.Y`.
-
-To use the latest *edge* version use `?branch=master`. This option will have the
-latest passing commit from `master` and is the absolute latest version.
-
-To use the local dev version you will need to append `?dev=true` to the browser
-URL. This will switch the bundle-loading source to local dev server.
+- Provides a quick way to change backend state that would be too costly otherwise.
 
 
 # Storybook
@@ -75,17 +57,14 @@ To see the Storybook just run:
 
 # Running tests
 
-We have several levels of testing: unit tests, integration tests, and end to end
-tests (e2e).
+We have several levels of testing: unit tests and integration tests.
+e2e tests are planned for later.
 
-Unit tests and integration tests are run through jest.
+Unit tests are run through jest.
 
-End to end tests are run through the Selenium web driver.
+Integration tests are run through Cypress.
 
-If on Mac OS X, make sure to install the Selenium web driver for chrome. This can
-be done with:
-
-`brew install chromedriver`
+End to end tests are not yet implemented.
 
 
 ## Linting tests
@@ -114,9 +93,6 @@ first) paradigm and running these in watch mode.
 Unit tests should be run after each commit. Ideally, locally before they are
 pushed as well.
 
-100% test coverage with unit tests is validated during tests and PRs will be
-blocked unless they have 100% coverage.
-
 CI will run unit tests after every commit in a PR.
 
 
@@ -133,41 +109,14 @@ The general line between integration tests and e2e tests are that external APIs
 are mocked out so there is no need for an actual server.  The API events are
 either mocked out or simulated.
 
-These tests will run in Jest and Enzyme.
+These tests are run through Cypress.
 
 
 ## End-To-End tests
 
-Currently we have an issue with tests not running in the correct order. We may
-need to switch to Mocha instead of Jest if we can't find a way to force Jest to
-run tests in a specific order.
+Not yet implemented.  These tests will target a real backend and must be run in
+a more sequential manner.
 
-To run them:
-
-1. Set up a test bed server.
-
-2. Configure `config.json` to point to the correct server.
-See `config.example.json` for an example.
-
-3. `npm run test:e2e`
-
-End-to-end tests are run against an actual server in an actual browser. We use
-Mocha and Selenium for these tests.
-
-A server must be provisioned before each one of these tests.  These tests are
-very expensive to run (several hours) and designed to be run occasionally.
-1. Set up a test bed server.
-
-2. Configure `config.json` to point to the correct server.
-See `config.example.json` for an example.
-
-3. `npm run test:e2e`
-
-End-to-end tests are run against an actual server in an actual browser. We use
-Mocha and Selenium for these tests.
-
-A server must be provisioned before each one of these tests. These tests are
-very expensive to run (several hours) and designed to be run occasionally.
 
 ## Special Flags
 
@@ -178,32 +127,3 @@ To enable the develeper plugin use:
 To enable the left sidebar nav links to point to the development version use:
 
 `window.localStorage.disableClarityLinks = true`
-
-## Docker
-
-As of right now, the Docker image is a UI development demo.  It runs with the
-simulator built into the image so no DU is required.
-
-To build, tag, and publish the image:
-
-```
-npm run docker:build
-npm run docker:tag
-npm run docker:push
-```
-
-To run the image:
-
-`npm run docker:run`
-
-Alternatively, you can run the UI demo without checking out the Github repo at all:
-
-`docker run -p 3000:3000 -p 4444:4444 platform9/ui-dev`
-
-This will launch the simulator, graphql server, and a simple express HTTP server.
-
-Be sure to specify the dev version in the loader by visiting this url:
-
-`http://localhost:3000/?dev=true`
-
-Use the username: `admin@platform9.com` with the password: `secret` for the login.
