@@ -4,7 +4,7 @@ import { withAppContext } from 'core/AppContext'
 import Selector from 'core/components/Selector'
 import { withScopedPreferences } from 'core/providers/PreferencesProvider'
 import moize from 'moize'
-import { assoc } from 'ramda'
+import { assoc, propEq } from 'ramda'
 import { loadUserTenants } from './actions'
 
 class TenantChooser extends React.Component {
@@ -52,7 +52,7 @@ class TenantChooser extends React.Component {
   handleChoose = lastTenant => {
     const { updatePreferences } = this.props
 
-    const fullTenantObj = this.state.tenants.find((tenant) => tenant.name === lastTenant)
+    const fullTenantObj = this.state.tenants.find(propEq('name', lastTenant))
     updatePreferences({ lastTenant: fullTenantObj })
     this.updateCurrentTenant(lastTenant)
   }

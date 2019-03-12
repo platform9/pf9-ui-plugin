@@ -8,7 +8,7 @@ import { withPreferences } from 'core/providers/PreferencesProvider'
 import { getStorage, setStorage } from 'core/utils/pf9Storage'
 import LoginPage from 'openstack/components/LoginPage'
 import { loadUserTenants } from 'openstack/components/tenants/actions'
-import { pathOr } from 'ramda'
+import { pathOr, propEq } from 'ramda'
 
 /**
  * Sets up the Openstack session.
@@ -53,7 +53,7 @@ class SessionManager extends React.Component {
     const lastTenant = pathOr('service', ['Tenants', 'lastTenant'], userPreferences)
 
     const tenants = await loadUserTenants({ context, setContext })
-    const activeTenant = tenants.find(x => x.name === lastTenant.name)
+    const activeTenant = tenants.find(propEq('name', lastTenant.name))
     const { keystone } = context.apiClient
     const { scopedToken, user } = await keystone.changeProjectScope(activeTenant.id)
 
