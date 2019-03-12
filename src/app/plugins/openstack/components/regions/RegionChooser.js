@@ -20,14 +20,17 @@ class RegionChooser extends React.Component {
 
   componentDidMount () {
     const { lastRegion } = this.props.preferences
-    if (lastRegion) { this.setState({ curRegion: lastRegion }) }
+    if (lastRegion) { this.setState({ curRegion: lastRegion.id }) }
   }
 
   handleSearchChange = regionSearch => this.setState({ regionSearch })
 
   handleRegionSelect = region => {
     this.setState({ curRegion: region })
-    this.props.updatePreferences({ lastRegion: region })
+    // Future Todo: Update the Selector component or create a variant of the component
+    // that can take a list of objects
+    const fullRegionObj = this.props.data.find((reg) => reg.id === region)
+    this.props.updatePreferences({ lastRegion: fullRegionObj })
 
     // Initial loading of the app is tightly coupled to knowing the region to use.
     // Reloading the app when the region changes is the simplest and most robust solution.

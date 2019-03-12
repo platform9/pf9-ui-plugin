@@ -53,7 +53,7 @@ class SessionManager extends React.Component {
     const lastTenant = pathOr('service', ['Tenants', 'lastTenant'], userPreferences)
 
     const tenants = await loadUserTenants({ context, setContext })
-    const activeTenant = tenants.find(x => x.name === lastTenant)
+    const activeTenant = tenants.find(x => x.name === lastTenant.name)
     const { keystone } = context.apiClient
     const { scopedToken, user } = await keystone.changeProjectScope(activeTenant.id)
 

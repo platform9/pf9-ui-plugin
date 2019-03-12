@@ -51,7 +51,9 @@ class TenantChooser extends React.Component {
 
   handleChoose = lastTenant => {
     const { updatePreferences } = this.props
-    updatePreferences({ lastTenant })
+
+    const fullTenantObj = this.state.tenants.find((tenant) => tenant.name === lastTenant)
+    updatePreferences({ lastTenant: fullTenantObj })
     this.updateCurrentTenant(lastTenant)
   }
 
@@ -71,7 +73,7 @@ class TenantChooser extends React.Component {
     const lastTenant = this.props.preferences.lastTenant
     const tenants = await this.loadTenants()
     if (!tenants) { return }
-    this.updateCurrentTenant(lastTenant)
+    this.updateCurrentTenant(lastTenant.name)
   }
 
   render () {
