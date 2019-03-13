@@ -72,7 +72,7 @@ class TenantChooser extends React.Component {
   async componentDidMount () {
     const lastTenant = this.props.preferences.lastTenant
     const tenants = await this.loadTenants()
-    if (!tenants) { return }
+    if (!tenants || !lastTenant) { return }
     this.updateCurrentTenant(lastTenant.name)
   }
 
