@@ -16,6 +16,7 @@ import StorageClassesPage from './components/storage/StorageClassesPage'
 import UpdateCloudProviderPage from './components/infrastructure/UpdateCloudProviderPage'
 import UserManagementIndexPage from './components/userManagement/UserManagementIndexPage'
 import AppDetailsPage from 'core/components/appCatalog/AppDetailsPage'
+import PrometheusMonitoringPage from './components/prometheus/PrometheusMonitoringPage'
 
 class Kubernetes extends React.Component {
   render () {
@@ -113,6 +114,11 @@ Kubernetes.registerPlugin = pluginManager => {
         name: 'Tenants & Users',
         link: { path: '/user_management', exact: true },
         component: UserManagementIndexPage
+      },
+      {
+        name: 'Monitoring',
+        link: { path: '/monitoring', exact: true },
+        component: PrometheusMonitoringPage,
       },
     ]
   )
@@ -216,8 +222,17 @@ Kubernetes.registerPlugin = pluginManager => {
     },
   ]
 
-  const links = useClarityLinks ? clarityNavItems : devNavItems
-  plugin.registerNavItems(links)
+  const navItems = useClarityLinks ? clarityNavItems : devNavItems
+  const commonNavItems = [
+    {
+      name: 'Monitoring',
+      icon: 'chart-area',
+      link: { path: '/monitoring' },
+
+    }
+  ]
+  const allNavItems = [...commonNavItems, ...navItems]
+  plugin.registerNavItems(allNavItems)
 }
 
 export default Kubernetes
