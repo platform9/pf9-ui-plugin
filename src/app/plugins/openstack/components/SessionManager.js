@@ -50,10 +50,10 @@ class SessionManager extends React.Component {
     await initSession(unscopedToken, username)
     // The order matters, we need the session to be able to init the user preferences
     const userPreferences = await initUserPreferences(username)
-    const lastTenant = pathOr('service', ['Tenants', 'lastTenant'], userPreferences)
+    const lastTenant = pathOr('service', ['Tenants', 'lastTenant', 'name'], userPreferences)
 
     const tenants = await loadUserTenants({ context, setContext })
-    const activeTenant = tenants.find(propEq('name', lastTenant.name))
+    const activeTenant = tenants.find(propEq('name', lastTenant))
     const { keystone } = context.apiClient
     const { scopedToken, user } = await keystone.changeProjectScope(activeTenant.id)
 
