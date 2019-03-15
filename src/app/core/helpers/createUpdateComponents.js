@@ -3,7 +3,7 @@ import { withRouter } from 'react-router-dom'
 import { compose } from 'app/utils/fp'
 import { withAppContext } from 'core/AppContext'
 import FormWrapper from 'core/components/FormWrapper'
-import Loader from 'core/components/Loader'
+import Progress from 'core/components/Progress'
 import requiresAuthentication from 'openstack/util/requiresAuthentication'
 
 const createUpdateComponents = options => {
@@ -61,16 +61,14 @@ const createUpdateComponents = options => {
     render () {
       const { initialValue } = this.state
 
-      if (!initialValue) {
-        return <Loader message="Fetching data..." />
-      }
-
       return (
-        <FormWrapper title={title} backUrl={listUrl}>
-          <FormComponent {...this.props}
-            onComplete={this.handleComplete}
-            initialValues={initialValue} />
-        </FormWrapper>
+        <Progress message="Fetching data..." loading={!initialValue}>
+          <FormWrapper title={title} backUrl={listUrl}>
+            <FormComponent {...this.props}
+              onComplete={this.handleComplete}
+              initialValues={initialValue} />
+          </FormWrapper>
+        </Progress>
       )
     }
   }

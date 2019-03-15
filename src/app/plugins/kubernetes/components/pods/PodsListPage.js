@@ -1,7 +1,6 @@
 import React from 'react'
 import Picklist from 'core/components/Picklist'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import Loader from 'core/components/Loader'
 import { withAppContext } from 'core/AppContext'
 import { loadInfrastructure } from '../infrastructure/actions'
 import { loadPods, deletePod } from './actions'
@@ -26,13 +25,13 @@ const ListPage = ({ ListContainer }) => {
       await loadPods({ params: { clusterId: clusters[0].uuid }, context, setContext })
       const clusterOptions = clusters.map(cluster => ({
         label: cluster.name,
-        value: cluster.uuid
+        value: cluster.uuid,
       }))
       this.setState({
         clusterOptions: [
           { label: 'all', value: '__all__' },
-          ...clusterOptions
-        ]
+          ...clusterOptions,
+        ],
       })
     }
 
@@ -47,13 +46,13 @@ const ListPage = ({ ListContainer }) => {
 
     render () {
       const { activeCluster, clusterOptions } = this.state
-      const { pods } = this.props.context
-      if (!pods) { return <Loader /> }
-      const filteredPods = (activeCluster === '__all__' && pods) ||
-        pods.filter(pod => pod.clusterId === activeCluster)
+      const { pods = [] } = this.props.context
+      const filteredPods = activeCluster === '__all__'
+        ? pods
+        : pods.filter(pod => pod.clusterId === activeCluster)
       const withClusterNames = filteredPods.map(ns => ({
         ...ns,
-        clusterName: this.findClusterName(ns.clusterId)
+        clusterName: this.findClusterName(ns.clusterId),
       }))
 
       return (
@@ -71,6 +70,7 @@ const ListPage = ({ ListContainer }) => {
       )
     }
   }
+
   return withAppContext(ListPage)
 }
 

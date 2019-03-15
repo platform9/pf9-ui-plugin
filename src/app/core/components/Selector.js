@@ -8,6 +8,7 @@ const styles = theme => ({
   selector: {
     position: 'relative',
     float: 'right',
+    cursor: 'pointer',
   }
 })
 

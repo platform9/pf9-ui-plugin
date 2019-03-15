@@ -7,7 +7,7 @@ import RegionChooser from 'openstack/components/regions/RegionChooser'
 import UserMenu from 'core/components/UserMenu'
 import MaterialToolbar from '@material-ui/core/Toolbar/Toolbar'
 import { AppBar, IconButton } from '@material-ui/core'
-import { logoPath } from 'app/constants'
+import { imageUrls } from 'app/constants'
 import { drawerWidth } from 'core/components/Navbar'
 import { withStyles } from '@material-ui/core/styles'
 
@@ -69,7 +69,7 @@ const Toolbar = ({ classes, open, handleDrawerOpen }) => (
       >
         <MenuIcon />
       </IconButton>
-      <img src={logoPath} className={classes.logo} align="middle" />
+      <img src={imageUrls.logo} className={classes.logo} align="middle" />
       <div className={classes.rightTools}>
         <RegionChooser />
         <TenantChooser className={classes.leftMargin} />

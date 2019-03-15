@@ -39,13 +39,14 @@ class RegionChooser extends React.Component {
 
   render () {
     const { curRegion, regionSearch } = this.state
+    const { data = [], className } = this.props
 
-    const regionNames = pluck('id', this.props.data)
+    const regionNames = pluck('id', data)
 
     return (
       <Selector
-        className={this.props.className}
-        name={curRegion.length === 0 ? 'Current Region' : curRegion}
+        className={className}
+        name={!curRegion || curRegion.length === 0 ? 'Current Region' : curRegion}
         type="Region"
         list={regionNames}
         onChoose={this.handleRegionSelect}
@@ -57,6 +58,6 @@ class RegionChooser extends React.Component {
 }
 
 export default compose(
-  withDataLoader({ dataKey: 'regions', loaderFn: loadRegions }),
+  withDataLoader({ dataKey: 'regions', loaderFn: loadRegions }, { inlineProgress: true }),
   withScopedPreferences('RegionChooser'),
 )(RegionChooser)

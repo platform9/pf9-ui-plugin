@@ -1,7 +1,6 @@
 import React from 'react'
 import Picklist from 'core/components/Picklist'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import Loader from 'core/components/Loader'
 import { withAppContext } from 'core/AppContext'
 import { loadInfrastructure } from '../infrastructure/actions'
 import { deleteNamespace } from './actions'
@@ -24,13 +23,13 @@ const ListPage = ({ ListContainer }) => {
       const clusters = this.props.context.clusters.filter(x => x.hasMasterNode)
       const clusterOptions = clusters.map(cluster => ({
         label: cluster.name,
-        value: cluster.uuid
+        value: cluster.uuid,
       }))
       this.setState({
         clusterOptions: [
           { label: 'all', value: '__all__' },
-          ...clusterOptions
-        ]
+          ...clusterOptions,
+        ],
       })
     }
 
@@ -45,13 +44,13 @@ const ListPage = ({ ListContainer }) => {
 
     render () {
       const { activeCluster, clusterOptions } = this.state
-      const { namespaces } = this.props.context
-      if (!namespaces) { return <Loader /> }
-      const filteredNamespaces = (activeCluster === '__all__' && namespaces) ||
-        namespaces.filter(namespace => namespace.clusterId === activeCluster)
+      const { namespaces = [] } = this.props.context
+      const filteredNamespaces = activeCluster === '__all__'
+        ? namespaces
+        : namespaces.filter(namespace => namespace.clusterId === activeCluster)
       const withClusterNames = filteredNamespaces.map(ns => ({
         ...ns,
-        clusterName: this.findClusterName(ns.clusterId)
+        clusterName: this.findClusterName(ns.clusterId),
       }))
 
       return (
@@ -69,6 +68,7 @@ const ListPage = ({ ListContainer }) => {
       )
     }
   }
+
   return withAppContext(ListPage)
 }
 

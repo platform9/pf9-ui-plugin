@@ -1,7 +1,7 @@
 import React from 'react'
 import Picklist from 'core/components/Picklist'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import Loader from 'core/components/Loader'
+import Loader from 'core/components/Progress'
 import { withAppContext } from 'core/AppContext'
 import { loadInfrastructure } from '../infrastructure/actions'
 import { loadServices, deleteService } from './actions'

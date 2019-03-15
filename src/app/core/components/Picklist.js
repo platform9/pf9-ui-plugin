@@ -36,29 +36,29 @@ class Picklist extends React.Component {
   }
 
   render () {
-    const { className, classes, label, name } = this.props
+    const { className, classes, label, name, value, options } = this.props
 
-    const options = this.props.options.map(x =>
-      typeof x === 'string' ? ({ value: x, label: x }) : x
+    const items = options.map(x =>
+      typeof x === 'string' ? ({ value: x, label: x }) : x,
     ).map(x => ({
       label: x.label,
       // Hack to work around Material UI's Select ignoring empty string as a value
-      value: x.value === '' ? '__none__' : x.value
+      value: x.value === '' ? '__none__' : x.value,
     }))
 
     // Hack to work around Material UI's Select ignoring empty string as a value
-    const value = this.props.value === '' ? '__none__' : this.props.value
-
+    const nonEmptyValue = value === '' ? '__none__' : value
+    console.log(value, items)
     return (
       <FormControl className={classnames(classes.formControl, className)}>
         <InputLabel htmlFor={name}>{label}</InputLabel>
         <Select
-          value={value}
+          value={nonEmptyValue}
           onChange={this.handleChange}
           inputProps={{ name: label, id: name }}
           displayEmpty
         >
-          {options.map(x => <MenuItem value={x.value} key={x.value}>{x.label}</MenuItem>)}
+          {items.map(item => <MenuItem value={item.value} key={item.value}>{item.label}</MenuItem>)}
         </Select>
       </FormControl>
     )
@@ -70,7 +70,7 @@ const optionPropType = PropTypes.oneOfType([
   PropTypes.shape({
     value: PropTypes.string,
     label: PropTypes.string,
-  })
+  }),
 ])
 
 Picklist.propTypes = {

@@ -14,7 +14,7 @@ import { compose, prop, propEq } from 'ramda'
 import { loadCloudProviders } from './actions'
 import { projectAs } from 'utils/fp'
 import { withAppContext } from 'core/AppContext'
-import { withDataLoader } from 'core/DataLoader'
+import { withMultiLoader } from 'core/DataLoader'
 
 const initialContext = {
   manualDeploy: false,
@@ -247,19 +247,11 @@ class AddClusterPage extends React.Component {
   }
 }
 
-const dataKeys = [
-  'cloudProviders',
-  'flavors',
-  'regions',
-]
-
-const loaders = [
-  loadCloudProviders,
-  createCRUDActions({ service: 'nova', entity: 'flavors' }).list,
-  createCRUDActions({ service: 'keystone', entity: 'regions' }).list,
-]
-
 export default compose(
-  withDataLoader({ dataKey: dataKeys, loaderFn: loaders }),
+  withMultiLoader({
+    cloudProviders: loadCloudProviders,
+    flavors: createCRUDActions({ service: 'nova', entity: 'flavors' }).list,
+    regions: createCRUDActions({ service: 'keystone', entity: 'regions' }).list,
+  }),
   withAppContext,
 )(AddClusterPage)

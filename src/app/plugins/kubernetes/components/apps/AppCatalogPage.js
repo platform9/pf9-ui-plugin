@@ -1,4 +1,3 @@
-import Loader from 'core/components/Loader'
 import { withMultiLoader } from 'core/DataLoader'
 import { loadApps } from 'k8s/components/apps/actions'
 import { loadInfrastructure } from 'k8s/components/infrastructure/actions'
@@ -14,14 +13,14 @@ class AppCatalogPage extends React.Component {
   sortingConfig = [
     {
       field: 'attributes.name',
-      label: 'Name'
+      label: 'Name',
     },
     {
       field: 'relationships.latestChartVersion.data.created',
       label: 'Created',
       sortWith: (prevDate, nextDate) =>
-        moment(prevDate).isBefore(nextDate) ? 1 : -1
-    }
+        moment(prevDate).isBefore(nextDate) ? 1 : -1,
+    },
   ]
 
   filtersConfig = () => [
@@ -34,23 +33,19 @@ class AppCatalogPage extends React.Component {
       },
       items: projectAs(
         { label: 'name', value: 'uuid' },
-        this.props.context.clusters.filter(x => x.hasMasterNode)
-      )
-    }
+        (this.props.context.clusters || []).filter(cluster => cluster.hasMasterNode),
+      ),
+    },
   ]
 
   render () {
     const {
-      context: { clusters, apps }
+      context: { apps },
     } = this.props
-
-    if (!clusters || !apps) {
-      return <Loader />
-    }
     return (
       <div className="applications">
         <CardTable
-          data={apps}
+          data={apps || []}
           sorting={this.sortingConfig}
           filters={this.filtersConfig()}
           searchTarget="attributes.name"
@@ -69,7 +64,7 @@ export default compose(
       clusters: loadInfrastructure,
       apps: {
         requires: 'clusters',
-        loaderFn: loadApps
-      }
+        loaderFn: loadApps,
+      },
     }),
 )(AppCatalogPage)

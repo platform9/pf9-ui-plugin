@@ -12,7 +12,7 @@ const sumPath = (path, nodes) => (nodes || []).reduce(
 // so we can probably leave it here.
 const clusterUsageStats = (cluster, context) => {
   const nodeIds = cluster.nodes.map(x => x.uuid)
-  const combinedNodes = context.combinedHosts
+  const combinedNodes = (context.combinedHosts || [])
     .filter(x => nodeIds.includes(x.resmgr.id))
   let clusterWithStats = {
     ...cluster,

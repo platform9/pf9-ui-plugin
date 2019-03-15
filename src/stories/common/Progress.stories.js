@@ -1,16 +1,16 @@
 import React from 'react'
 import { addStoriesFromModule } from '../helpers'
 
-import Loader from 'core/components/Loader'
+import Progress from 'core/components/Progress'
 
 const addStories = addStoriesFromModule(module)
 
-addStories('Common Components/Loader', {
+addStories('Common Components/Progress', {
   'Default settings': () => (
-    <Loader />
+    <Progress />
   ),
 
   'Custom message': () => (
-    <Loader message="Fetching data..." />
+    <Progress message="Fetching data..." />
   ),
 })

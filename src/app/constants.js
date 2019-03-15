@@ -1,5 +1,10 @@
 export const appUrlRoot = '/ui'
+export const imageUrlRoot = `${appUrlRoot}/images`
 export const loginUrl = `${appUrlRoot}/openstack/login`
 export const logoutUrl = `${appUrlRoot}/openstack/logout`
 export const dashboardUrl = `${appUrlRoot}/kubernetes/infrastructure`
-export const logoPath = `${appUrlRoot}/images/logo.png`
+
+export const imageUrls = Object.freeze({
+  logo: `${imageUrlRoot}/logo.png`,
+  loading: `${imageUrlRoot}/loading.gif`,
+})

@@ -5,7 +5,6 @@ import { loadReleases, deleteRelease } from 'k8s/components/apps/actions'
 import { loadInfrastructure } from 'k8s/components/infrastructure/actions'
 import { withAppContext } from 'core/AppContext'
 import Picklist from 'core/components/Picklist'
-import Loader from 'core/components/Loader'
 import { compose, pathOr } from 'ramda'
 import requiresAuthentication from 'openstack/util/requiresAuthentication'
 import { withDataLoader } from 'core/DataLoader'
@@ -20,7 +19,7 @@ const styles = theme => ({
     minHeight: 100,
     backgroundSize: 'contain',
     backgroundPosition: `50% ${theme.spacing.unit}px`,
-  }
+  },
 })
 
 const IconCell = withStyles(styles)(({ classes, ...rest }) =>
@@ -56,11 +55,11 @@ const ListPage = ({ ListContainer }) => {
     handleClusterChange = async clusterId => {
       const { context, setContext } = this.props
       this.setState({
-        activeCluster: clusterId
+        activeCluster: clusterId,
       }, async () => loadReleases({
         params: { clusterId },
         context,
-        setContext
+        setContext,
       }))
     }
 
@@ -71,13 +70,13 @@ const ListPage = ({ ListContainer }) => {
 
     render () {
       const { activeCluster } = this.state
-      const { releases, clusters } = this.props.context
-      if (!releases) { return <Loader /> }
-      const filteredReleases = (activeCluster === '__all__' && releases) ||
-        releases.filter(pod => pod.clusterId === activeCluster)
+      const { releases = [], clusters = [] } = this.props.context
+      const filteredReleases = activeCluster === '__all__'
+        ? releases
+        : releases.filter(pod => pod.clusterId === activeCluster)
       const withClusterNames = filteredReleases.map(ns => ({
         ...ns,
-        clusterName: this.findClusterName(ns.clusterId)
+        clusterName: this.findClusterName(ns.clusterId),
       }))
       return (
         <div>
@@ -86,7 +85,7 @@ const ListPage = ({ ListContainer }) => {
             label="Current Cluster"
             options={projectAs(
               { label: 'name', value: 'uuid' },
-              clusters.filter(x => x.hasMasterNode)
+              clusters.filter(x => x.hasMasterNode),
             )}
             value={activeCluster}
             onChange={this.handleClusterChange}
@@ -117,12 +116,12 @@ export const options = {
   name: 'DeployedApps',
   title: 'Deployed Apps',
   uniqueIdentifier: 'id',
-  ListPage
+  ListPage,
 }
 
 const { ListPage: DeployedAppsListPage } = createCRUDComponents(options)
 
 export default compose(
   requiresAuthentication,
-  withDataLoader({ dataKey: 'clusters', loaderFn: loadInfrastructure })
+  withDataLoader({ dataKey: 'clusters', loaderFn: loadInfrastructure }),
 )(DeployedAppsListPage)

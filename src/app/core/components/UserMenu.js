@@ -10,6 +10,7 @@ const styles = theme => ({
   avatar: {
     position: 'relative',
     float: 'right',
+    cursor: 'pointer',
   },
   avatarImg: {
     backgroundColor: theme.palette.primary.dark,

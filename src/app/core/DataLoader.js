@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { pick, intersection, flatten, head } from 'ramda'
 import { ensureArray } from 'app/utils/fp'
 import DisplayError from './components/DisplayError'
-import Loader from './components/Loader'
+import Progress from './components/Progress'
 import { withAppContext } from 'core/AppContext'
 
 class MultiLoaderBase extends PureComponent {
@@ -21,15 +21,17 @@ class MultiLoaderBase extends PureComponent {
     window.removeEventListener('scopeChanged', this.listener)
   }
 
+  getLoaderPairs = loaders => Array.isArray(loaders)
+    ? loaders
+    : Object.entries(loaders)
+
   /**
    * Returns a map of [loaderKeys, promise] arrays that rely one on another and will wait for the
    * dependant loaders regardless of the order on which they are called
    * @param loaders
    */
   getLinkedLoaders = loaders => {
-    const loaderPairs = Array.isArray(loaders)
-      ? loaders
-      : Object.entries(loaders)
+    const loaderPairs = this.getLoaderPairs(loaders)
 
     const linkedLoaders = loaderPairs.map(([loaderKeys, loaderSpec]) => {
       const { loaderFn, requires } =
@@ -41,18 +43,17 @@ class MultiLoaderBase extends PureComponent {
       return [
         loaderKeys,
         async params => {
-          const { setContext, context } = this.props
-          return requires
-            ? Promise.all(
+          const prevResults = requires
+            ? await Promise.all(
               linkedLoaders
                 .filter(([lnkLoaderKeys]) =>
                   intersection(lnkLoaderKeys, ensureArray(requires)).length > 0,
                 )
-                .map(([, loaderFn]) => loaderFn()),
-            ).then(prevResults =>
-              loaderFn({ setContext, context, params, prevResults }),
-            )
-            : loaderFn({ setContext, context, params })
+                .map(([, loaderFn]) => loaderFn({ setContext, context, params })),
+            ) : undefined
+          const { setContext, context } = this.props
+
+          return loaderFn({ setContext, context, params, prevResults })
         },
       ]
     })
@@ -64,7 +65,7 @@ class MultiLoaderBase extends PureComponent {
       const { loaders } = this.props
       try {
         await Promise.all(this.getLinkedLoaders(loaders)
-          .map(([, callback]) => callback())
+          .map(([, callback]) => callback()),
         )
         this.setState({ loading: false })
       } catch (err) {
@@ -95,23 +96,20 @@ class MultiLoaderBase extends PureComponent {
     if (error) {
       return <DisplayError error={error} />
     }
-    const { context, loaders, children } = this.props
-    const loaderPairs = Array.isArray(loaders)
-      ? loaders
-      : Object.entries(loaders)
+    const { context, loaders, children, options } = this.props
+    const loaderPairs = this.getLoaderPairs(loaders)
     const dataKeys = flatten(loaderPairs.map(head))
     const data = dataKeys.length === 1 ? context[dataKeys[0]] : pick(dataKeys, context)
-    if (loading || !data) {
-      return <Loader />
-    }
-    return children({ data, loading, error, context, reload: this.loadOne })
+    return <Progress inline={options.inlineProgress} overlay loading={loading || !data}>
+      {children({ data, loading, error, context, reload: this.loadOne })}
+    </Progress>
   }
 }
 
 const MultiLoader = withAppContext(MultiLoaderBase)
 
-const DataLoader = ({ dataKey, loaderFn, children }) => (
-  <MultiLoader loaders={[[ensureArray(dataKey), loaderFn]]}>
+const DataLoader = ({ dataKey, loaderFn, children, options }) => (
+  <MultiLoader loaders={[[ensureArray(dataKey), loaderFn]]} options={options}>
     {children}
   </MultiLoader>
 )
@@ -145,16 +143,24 @@ MultiLoader.propTypes = {
    * value is a loaderFn or a spec of { requires, loaderFn }
    */
   loaders: PropTypes.oneOfType([PropTypes.object, PropTypes.array]).isRequired,
+
+  options: PropTypes.shape({
+    inlineProgress: PropTypes.bool,
+  }),
 }
 
-export const withDataLoader = ({ dataKey, loaderFn }) => Component => props => (
-  <DataLoader dataKey={dataKey} loaderFn={loaderFn}>
+MultiLoader.defaultProps = {
+  options: {},
+}
+
+export const withDataLoader = ({ dataKey, loaderFn }, options) => Component => props => (
+  <DataLoader dataKey={dataKey} loaderFn={loaderFn} options={options}>
     {loaderProps => <Component {...loaderProps} {...props} />}
   </DataLoader>
 )
 
-export const withMultiLoader = loaders => Component => props => (
-  <MultiLoader loaders={loaders}>
+export const withMultiLoader = (loaders, options) => Component => props => (
+  <MultiLoader loaders={loaders} options={options}>
     {loaderProps => <Component {...loaderProps} {...props} />}
   </MultiLoader>
 )

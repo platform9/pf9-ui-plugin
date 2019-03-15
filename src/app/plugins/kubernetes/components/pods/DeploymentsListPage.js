@@ -1,7 +1,6 @@
 import React from 'react'
 import Picklist from 'core/components/Picklist'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import Loader from 'core/components/Loader'
 import { withAppContext } from 'core/AppContext'
 import { loadInfrastructure } from '../infrastructure/actions'
 import { loadDeployments } from './actions'
@@ -26,13 +25,13 @@ const ListPage = ({ ListContainer }) => {
       await loadDeployments({ params: { clusterId: clusters[0].uuid }, context, setContext })
       const clusterOptions = clusters.map(cluster => ({
         label: cluster.name,
-        value: cluster.uuid
+        value: cluster.uuid,
       }))
       this.setState({
         clusterOptions: [
           { label: 'all', value: '__all__' },
-          ...clusterOptions
-        ]
+          ...clusterOptions,
+        ],
       })
     }
 
@@ -47,13 +46,13 @@ const ListPage = ({ ListContainer }) => {
 
     render () {
       const { activeCluster, clusterOptions } = this.state
-      const { deployments } = this.props.context
-      if (!deployments) { return <Loader /> }
-      const filteredDeployments = (activeCluster === '__all__' && deployments) ||
-        deployments.filter(deployment => deployment.clusterId === activeCluster)
+      const { deployments = [] } = this.props.context
+      const filteredDeployments = activeCluster === '__all__'
+        ? deployments
+        : deployments.filter(deployment => deployment.clusterId === activeCluster)
       const withClusterNames = filteredDeployments.map(ns => ({
         ...ns,
-        clusterName: this.findClusterName(ns.clusterId)
+        clusterName: this.findClusterName(ns.clusterId),
       }))
 
       return (
@@ -71,6 +70,7 @@ const ListPage = ({ ListContainer }) => {
       )
     }
   }
+
   return withAppContext(ListPage)
 }
 
