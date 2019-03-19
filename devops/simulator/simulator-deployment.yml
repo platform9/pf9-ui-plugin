@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: simulator-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      component: simulator
+  template:
+    metadata:
+      labels:
+        component: simulator
+    spec:
+      containers:
+        - name: ui-simulator
+          image: volgenic/ui-simulator
+          ports:
+            - containerPort: 4444

@@ -1,0 +1,16 @@
+version: '3'
+services:
+  simulator:
+    build:
+      dockerfile: ./devops/simulator/Dockerfile.dev
+      context: ../
+    environment:
+      - OS_API_HOST=http://localhost:4444
+      - OS_USERNAME=admin@platform9.net
+      - OS_PASSWORD=secret
+    ports:
+      - 4444:4444
+  # app:
+    # build:
+      # dockerfile: Dockerfile.dev
+      # context: ./app

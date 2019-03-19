@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: simulator-node-port
+spec:
+  type: NodePort
+  ports:
+    - port: 4444
+      targetPort: 4444
+      nodePort: 31515
+  selector:
+    component: simulator 

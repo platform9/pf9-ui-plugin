@@ -1,0 +1,9 @@
+FROM node:8-alpine
+WORKDIR /app
+COPY devops/simulator/package.json .
+RUN npm install
+COPY src ./src
+COPY devops/simulator/.babelrc .
+COPY devops/simulator/config.js .
+CMD ["npm", "run", "server"]
+EXPOSE 4444

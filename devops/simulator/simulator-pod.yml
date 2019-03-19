@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: simulator-pod
+  labels:
+    component: simulator
+spec:
+  containers:
+    - name: ui-simulator
+      image: volgenic/ui-simulator
+      ports:
+        - containerPort: 3000

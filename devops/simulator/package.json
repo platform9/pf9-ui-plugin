@@ -1,0 +1,57 @@
+{
+  "name": "pf9-ui-plugin",
+  "version": "1.0.0",
+  "description": "Platform9 UI",
+  "main": "src/app/index.js",
+  "dependencies": {
+    "@babel/polyfill": "^7.0.0",
+    "cors": "^2.8.4",
+    "js-yaml": "^3.12.1",
+    "moment": "^2.22.2",
+    "ramda": "^0.26.1",
+    "uuid": "^3.2.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.2.0",
+    "@babel/node": "^7.2.0",
+    "@babel/plugin-proposal-class-properties": "^7.2.1",
+    "@babel/plugin-proposal-decorators": "^7.2.0",
+    "@babel/plugin-proposal-object-rest-spread": "^7.2.0",
+    "@babel/plugin-transform-runtime": "^7.2.0",
+    "@babel/preset-env": "^7.2.0",
+    "@babel/preset-react": "^7.0.0",
+    "@babel/runtime": "^7.2.0",
+    "babel-core": "^7.0.0-bridge.0",
+    "babel-loader": "^8.0.4",
+    "babel-plugin-import": "^1.11.0",
+    "express": "^4.16.2",
+    "faker": "^4.1.0",
+    "regenerator-runtime": "^0.13.1"
+  },
+  "scripts": {
+    "server": "./node_modules/.bin/babel-node --inspect --presets @babel/preset-env src/server/main.js"
+  },
+  "keywords": [
+    "Platform9",
+    "ui",
+    "react",
+    "plugin"
+  ],
+  "author": "Platform9, Inc.",
+  "license": "ISC",
+  "jest": {
+    "automock": false,
+    "setupTestFrameworkScriptFile": "./setupJest.js",
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "^developer(.*)$": "<rootDir>/src/app/plugins/developer$1",
+      "^k8s(.*)$": "<rootDir>/src/app/plugins/kubernetes$1",
+      "^openstack(.*)$": "<rootDir>/src/app/plugins/openstack$1",
+      "^core(.*)$": "<rootDir>/src/app/core$1",
+      "^utils(.*)$": "<rootDir>/src/app/utils$1",
+      "^app(.*)$": "<rootDir>/src/app$1",
+      "^server(.*)$": "<rootDir>/src/server$1",
+      "^api-client(.*)$": "<rootDir>/src/api-client$1"
+    }
+  }
+}
