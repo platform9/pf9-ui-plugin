@@ -29,7 +29,8 @@ if (isDev) {
 
 // main entry point
 appEntry.push('@babel/polyfill')
-appEntry.push('./index.js')
+// Don't include react-hot-loader in prod
+appEntry.push(isDev ? './index.js' : './index.prod.js')
 
 module.exports = {
   entry: {

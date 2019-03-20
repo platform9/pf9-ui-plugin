@@ -1,0 +1,17 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ui-web-ingress
+  namespace: ui-staging
+spec:
+  rules:
+  - host: ui-staging.platform9.horse
+    http:
+      paths:
+      - backend:
+          serviceName: ui-web-cluster-ip-service
+          servicePort: 80
+  tls:
+  - hosts:
+    - ui-staging.platform9.horse
+    secretName: dothorse

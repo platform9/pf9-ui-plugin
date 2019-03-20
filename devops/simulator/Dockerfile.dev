@@ -4,6 +4,6 @@ COPY devops/simulator/package.json .
 RUN npm install
 COPY src ./src
 COPY devops/simulator/.babelrc .
-COPY devops/simulator/config.js .
+COPY devops/simulator/config-simulator.js ./config.js
 CMD ["npm", "run", "server"]
-EXPOSE 4444
+EXPOSE 80

@@ -1,0 +1,17 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ui-simulator-ingress
+  namespace: ui-staging
+spec:
+  rules:
+  - host: ui-staging-api.platform9.horse
+    http:
+      paths:
+      - backend:
+          serviceName: simulator-cluster-ip-service
+          servicePort: 80
+  tls:
+  - hosts:
+    - ui-staging-api.platform9.horse
+    secretName: dothorse

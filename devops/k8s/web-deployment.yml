@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ui-web
+  namespace: ui-staging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: ui-web
+  template:
+    metadata:
+      labels:
+        component: ui-web
+    spec:
+      containers:
+        - name: ui-web
+          image: platform9/ui-web:latest
+          ports:
+            - containerPort: 80

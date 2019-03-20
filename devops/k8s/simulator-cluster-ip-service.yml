@@ -2,10 +2,11 @@ apiVersion: v1
 kind: Service
 metadata:
   name: simulator-cluster-ip-service
+  namespace: ui-staging
 spec:
   type: ClusterIP
   selector:
     component: simulator
   ports:
-    - port: 4444
+    - port: 80
       targetPort: 4444
