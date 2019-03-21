@@ -16,5 +16,6 @@ spec:
       containers:
         - name: ui-simulator
           image: platform9/ui-simulator:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 4444

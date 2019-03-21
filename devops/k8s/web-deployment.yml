@@ -16,5 +16,6 @@ spec:
       containers:
         - name: ui-web
           image: platform9/ui-web:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
