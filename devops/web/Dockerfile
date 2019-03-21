@@ -12,5 +12,5 @@ FROM nginx
 COPY --from=builder /app/build/* /usr/share/nginx/html/ui/
 # redirect the root domain to /ui
 COPY devops/web/index.html /usr/share/nginx/html/
-COPY devops/web/ui.conf /etc/nginx/conf.d/
+COPY devops/web/default.conf /etc/nginx/conf.d/
 EXPOSE 80
