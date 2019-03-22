@@ -2,10 +2,9 @@ import React from 'react'
 import Checkbox from 'core/components/validatedForm/Checkbox'
 import TextField from 'core/components/validatedForm/TextField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
-import {
-  customValidator, matchFieldValidator, requiredValidator
-} from 'core/utils/fieldValidators'
+import { customValidator, matchFieldValidator, requiredValidator } from 'core/utils/fieldValidators'
 import { addStoriesFromModule, jsonDetailLogger } from '../helpers'
+import PicklistField from 'core/components/validatedForm/PicklistField'
 
 const addStories = addStoriesFromModule(module)
 
@@ -44,6 +43,21 @@ const renderForm = (props = {}) => () => (
         requiredValidator,
         matchFieldValidator('password').withMessage('Passwords do not match')
       ]}
+    />
+    <PicklistField
+      id="items"
+      label="List of items"
+      options={[{
+        label: 'Item 1',
+        value: 'item_1',
+      }, {
+        label: 'Item 2',
+        value: 'item_2',
+      }, {
+        label: 'Item 3',
+        value: 'item_3',
+      }]}
+      info="List of items"
     />
     <TextField
       id="description"

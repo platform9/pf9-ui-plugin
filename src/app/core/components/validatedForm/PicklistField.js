@@ -1,12 +1,17 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Picklist from 'core/components/Picklist'
-import {
-  FormHelperText,
-} from '@material-ui/core'
+import { FormHelperText, FormControl } from '@material-ui/core'
+import { withStyles } from '@material-ui/core/styles'
 import { withInfoTooltip } from 'app/core/components/InfoTooltip'
 import { compose } from 'app/utils/fp'
 import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
+
+const styles = theme => ({
+  formControl: {
+    margin: theme.spacing.unit
+  }
+})
 
 /**
  * PicklistField builds upon Picklist and adds integration with ValidatedForm
@@ -21,20 +26,20 @@ class PicklistField extends React.Component {
   }
 
   render () {
-    const { id, label, value, showNone, classes, hasError, errorMessage, ...restProps } = this.props
-    const options = showNone ? [{ value: '', label: 'None' }, ...this.props.options] : this.props.options
+    const { id, label, value, showNone, classes, hasError, errorMessage, title, options, className, ...restProps } = this.props
     return (
-      <div id={id}>
+      <FormControl id={id} className={classes.formControl} error={hasError} {...restProps}>
         <Picklist
-          {...restProps}
+          title={title}
+          className={className}
           name={id}
           label={label}
-          options={options}
-          value={value !== undefined ? value: ''}
+          options={showNone ? [{ value: '', label: 'None' }, ...options] : options}
+          value={value !== undefined ? value : ''}
           onChange={this.handleChange}
         />
         <FormHelperText error={hasError}>{errorMessage}</FormHelperText>
-      </div>
+      </FormControl>
     )
   }
 }
@@ -48,7 +53,7 @@ const optionPropType = PropTypes.oneOfType([
   PropTypes.shape({
     value: PropTypes.string,
     label: PropTypes.string,
-  })
+  }),
 ])
 
 PicklistField.propTypes = {
@@ -65,4 +70,5 @@ PicklistField.propTypes = {
 export default compose(
   withFormContext,
   withInfoTooltip,
+  withStyles(styles),
 )(PicklistField)
