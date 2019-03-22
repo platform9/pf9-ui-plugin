@@ -5,6 +5,7 @@ import { ensureArray } from 'app/utils/fp'
 import DisplayError from './components/DisplayError'
 import Progress from './components/Progress'
 import { withAppContext } from 'core/AppContext'
+import moize from 'moize'
 
 class MultiLoaderBase extends PureComponent {
   state = {
@@ -12,9 +13,9 @@ class MultiLoaderBase extends PureComponent {
     error: null,
   }
 
-  componentDidMount () {
-    this.listener = window.addEventListener('scopeChanged', this.loadAll())
-    this.loadAll()
+  async componentDidMount () {
+    this.listener = window.addEventListener('scopeChanged', this.loadAll)
+    await this.loadAll()
   }
 
   componentWillUnmount () {
@@ -30,9 +31,8 @@ class MultiLoaderBase extends PureComponent {
    * dependant loaders regardless of the order on which they are called
    * @param loaders
    */
-  getLinkedLoaders = loaders => {
+  getLinkedLoaders = moize(loaders => {
     const loaderPairs = this.getLoaderPairs(loaders)
-
     const linkedLoaders = loaderPairs.map(([loaderKeys, loaderSpec]) => {
       const { loaderFn, requires } =
         typeof loaderSpec === 'function'
@@ -42,23 +42,24 @@ class MultiLoaderBase extends PureComponent {
       // If the loader has dependencies, create a promise that will wait for the dependencies to be resolved
       return [
         loaderKeys,
-        async params => {
+        async (params, reloadAll) => {
           const prevResults = requires
             ? await Promise.all(
               linkedLoaders
                 .filter(([lnkLoaderKeys]) =>
                   intersection(lnkLoaderKeys, ensureArray(requires)).length > 0,
                 )
-                .map(([, loaderFn]) => loaderFn({ setContext, context, params })),
+                .map(([, loaderFn]) => loaderFn({ setContext, context, params, reload: reloadAll })),
             ) : undefined
+
           const { setContext, context } = this.props
 
-          return loaderFn({ setContext, context, params, prevResults })
+          return loaderFn({ setContext, context, prevResults, params, reload: true })
         },
       ]
     })
     return linkedLoaders
-  }
+  })
 
   loadAll = async () =>
     this.setState({ loading: true }, async () => {
@@ -74,7 +75,7 @@ class MultiLoaderBase extends PureComponent {
       }
     })
 
-  loadOne = (key, params) => {
+  loadOne = (key, params, reloadAll = false) => {
     const { loaders } = this.props
     const [, loaderFn] = this.getLinkedLoaders(loaders).find(([keys]) =>
       Array.isArray(keys) ? keys.includes(key) : keys === key,
@@ -82,7 +83,7 @@ class MultiLoaderBase extends PureComponent {
 
     this.setState({ loading: true }, async () => {
       try {
-        await loaderFn(params)
+        await loaderFn(params, reloadAll)
         this.setState({ loading: false })
       } catch (err) {
         console.log(err)

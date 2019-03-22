@@ -6,7 +6,7 @@
     "mocha": true,
     "jest": true,
     "jquery": true,
-    "cypress/globals": true,
+    "cypress/globals": true
   },
   "parser": "babel-eslint",
   "parserOptions": {
@@ -15,7 +15,7 @@
   "plugins": [
     "import",
     "react",
-    "cypress",
+    "cypress"
   ],
   "extends": ["standard", "standard-react"],
 
@@ -38,7 +38,8 @@
     // { id: 'name',       type: 'string' }
     // { id: 'longerName', type: 'string' }
     "no-multi-spaces": [2, { "exceptions": { "ObjectExpression": true } } ],
-    "key-spacing": [2, { "mode": "minimum" }]
+    "key-spacing": [2, { "mode": "minimum" }],
+    "standard/no-callback-literal": 0
   },
 
   "settings": {

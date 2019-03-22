@@ -1,13 +1,14 @@
 import yaml from 'js-yaml'
 import createCRUDActions from 'core/helpers/createCRUDActions'
+import { withCluster } from 'core/helpers/withCluster'
 
 const podCRUDActions = createCRUDActions({ service: 'qbert', entity: 'pods' })
 const deploymentCRUDActions = createCRUDActions({ service: 'qbert', entity: 'deployments' })
 const serviceCRUDActions = createCRUDActions({ service: 'qbert', entity: 'services', dataKey: 'kubeServices' })
 
-export const loadPods = podCRUDActions.list
-export const loadDeployments = deploymentCRUDActions.list
-export const loadServices = serviceCRUDActions.list
+export const loadPods = withCluster(podCRUDActions.list)
+export const loadDeployments = withCluster(deploymentCRUDActions.list)
+export const loadServices = withCluster(serviceCRUDActions.list)
 
 export const createPod = async ({ data, context, setContext }) => {
   const { clusterId, namespace, podYaml } = data

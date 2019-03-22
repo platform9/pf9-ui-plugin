@@ -33,19 +33,22 @@ class AppCatalogPage extends React.Component {
       },
       items: projectAs(
         { label: 'name', value: 'uuid' },
-        (this.props.context.clusters || []).filter(cluster => cluster.hasMasterNode),
+        [
+          { name: 'all', uuid: '__all__' },
+          ...(this.props.context.clusters || []).filter(cluster => cluster.hasMasterNode),
+        ],
       ),
     },
   ]
 
   render () {
     const {
-      context: { apps },
+      context: { apps = [] },
     } = this.props
     return (
       <div className="applications">
         <CardTable
-          data={apps || []}
+          data={apps}
           sorting={this.sortingConfig}
           filters={this.filtersConfig()}
           searchTarget="attributes.name"

@@ -1,42 +1,23 @@
 import React from 'react'
 import Picklist from 'core/components/Picklist'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { withAppContext } from 'core/AppContext'
 import { loadInfrastructure } from '../infrastructure/actions'
 import { loadDeployments } from './actions'
+import { withMultiLoader } from 'core/DataLoader'
+import { projectAs } from 'utils/fp'
+import { prop, head } from 'ramda'
 
 const ListPage = ({ ListContainer }) => {
   class ListPage extends React.Component {
     state = {
-      activeCluster: '__all__',
-      deployments: null,
-      clusterOptions: [
-        { label: 'all', value: '__all__' },
-      ],
-    }
-
-    async componentDidMount () {
-      const { context, setContext } = this.props
-      await loadInfrastructure({ context, setContext })
-
-      // Make sure to use a new reference to props.context since it has now changed
-      const clusters = this.props.context.clusters.filter(x => x.hasMasterNode)
-      // Need to query for all clusters
-      await loadDeployments({ params: { clusterId: clusters[0].uuid }, context, setContext })
-      const clusterOptions = clusters.map(cluster => ({
-        label: cluster.name,
-        value: cluster.uuid,
-      }))
-      this.setState({
-        clusterOptions: [
-          { label: 'all', value: '__all__' },
-          ...clusterOptions,
-        ],
-      })
+      activeCluster: null,
     }
 
     handleChangeCluster = clusterId => {
-      this.setState({ activeCluster: clusterId })
+      this.setState({ activeCluster: clusterId },
+        () => {
+          this.props.reload('deployments', { clusterId })
+        })
     }
 
     findClusterName = clusterId => {
@@ -45,12 +26,9 @@ const ListPage = ({ ListContainer }) => {
     }
 
     render () {
-      const { activeCluster, clusterOptions } = this.state
-      const { deployments = [] } = this.props.context
-      const filteredDeployments = activeCluster === '__all__'
-        ? deployments
-        : deployments.filter(deployment => deployment.clusterId === activeCluster)
-      const withClusterNames = filteredDeployments.map(ns => ({
+      const { activeCluster } = this.state
+      const { deployments = [], clusters = [] } = this.props.context
+      const withClusterNames = deployments.map(ns => ({
         ...ns,
         clusterName: this.findClusterName(ns.clusterId),
       }))
@@ -60,8 +38,15 @@ const ListPage = ({ ListContainer }) => {
           <Picklist
             name="currentCluster"
             label="Current Cluster"
-            options={clusterOptions}
-            value={activeCluster}
+            options={projectAs(
+              { label: 'name', value: 'uuid' },
+              [
+                // TODO: Figure out a way to query for all clusters
+                // { name: 'all', uuid: '__all__' },
+                ...clusters.filter(
+                  cluster => cluster.hasMasterNode)],
+            )}
+            value={activeCluster || prop('uuid', head(clusters))}
             onChange={this.handleChangeCluster}
           />
 
@@ -71,7 +56,14 @@ const ListPage = ({ ListContainer }) => {
     }
   }
 
-  return withAppContext(ListPage)
+  return withMultiLoader(
+    {
+      clusters: loadInfrastructure,
+      deployments: {
+        requires: 'clusters',
+        loaderFn: loadDeployments,
+      },
+    })(ListPage)
 }
 
 export const options = {

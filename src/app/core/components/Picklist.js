@@ -39,16 +39,15 @@ class Picklist extends React.Component {
     const { className, classes, label, name, value, options } = this.props
 
     const items = options.map(x =>
-      typeof x === 'string' ? ({ value: x, label: x }) : x,
+      typeof x === 'string' ? ({ value: x, label: x }) : x
     ).map(x => ({
       label: x.label,
       // Hack to work around Material UI's Select ignoring empty string as a value
-      value: x.value === '' ? '__none__' : x.value,
+      value: x.value === '' ? '__none__' : x.value
     }))
 
     // Hack to work around Material UI's Select ignoring empty string as a value
     const nonEmptyValue = value === '' ? '__none__' : value
-    console.log(value, items)
     return (
       <FormControl className={classnames(classes.formControl, className)}>
         <InputLabel htmlFor={name}>{label}</InputLabel>
