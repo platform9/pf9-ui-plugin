@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import uuid from 'uuid'
 import { IconButton, Snackbar } from '@material-ui/core'
-import { withStyles } from '@material-ui/core/styles'
+import { withStyles } from '@material-ui/styles'
 import { adjust, init, propEq } from 'ramda'
 import classnames from 'classnames'
 import CheckCircleIcon from '@material-ui/icons/CheckCircle'

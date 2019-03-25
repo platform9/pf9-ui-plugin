@@ -1,5 +1,5 @@
 import { Toolbar, Typography } from '@material-ui/core'
-import { withStyles } from '@material-ui/core/styles'
+import { withStyles } from '@material-ui/styles'
 import SearchBar from 'core/components/SearchBar'
 import React from 'react'
 import Picklist from 'core/components/Picklist'

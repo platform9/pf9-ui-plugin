@@ -9,7 +9,7 @@ import green from '@material-ui/core/colors/green'
 import amber from '@material-ui/core/colors/amber'
 import IconButton from '@material-ui/core/IconButton'
 import WarningIcon from '@material-ui/icons/Warning'
-import { withStyles } from '@material-ui/core/styles'
+import { withStyles } from '@material-ui/styles'
 import Typography from '@material-ui/core/Typography'
 
 const variantIcon = {

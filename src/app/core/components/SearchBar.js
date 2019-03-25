@@ -1,10 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { withStyles } from '@material-ui/core/styles'
-import {
-  InputAdornment,
-  TextField
-} from '@material-ui/core'
+import { withStyles } from '@material-ui/styles'
+import { InputAdornment, TextField } from '@material-ui/core'
 import SearchIcon from '@material-ui/icons/Search'
 import ClearIcon from '@material-ui/icons/Clear'
 import grey from '@material-ui/core/colors/grey'

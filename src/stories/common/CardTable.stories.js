@@ -1,8 +1,8 @@
 import React from 'react'
 import {
-  TextField, Card, Grid, CardMedia, Button, CardContent, Typography, Tooltip
+  TextField, Card, Grid, CardMedia, Button, CardContent, Typography, Tooltip,
 } from '@material-ui/core'
-import { withStyles } from '@material-ui/core/styles'
+import { withStyles } from '@material-ui/styles'
 import { action } from '@storybook/addon-actions'
 import GetAppIcon from '@material-ui/icons/GetApp'
 import faker from 'faker'

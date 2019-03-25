@@ -1,9 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {
-  Checkbox, FormControl, FormControlLabel, FormGroup, Typography
-} from '@material-ui/core'
-import { withStyles } from '@material-ui/core/styles'
+import { Checkbox, FormControl, FormControlLabel, FormGroup, Typography } from '@material-ui/core'
+import { withStyles } from '@material-ui/styles'
 import { ensureFunction } from 'app/utils/fp'
 import moize from 'moize'
 import { compose } from 'ramda'

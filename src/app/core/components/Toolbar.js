@@ -9,7 +9,7 @@ import MaterialToolbar from '@material-ui/core/Toolbar/Toolbar'
 import { AppBar, IconButton } from '@material-ui/core'
 import { imageUrls } from 'app/constants'
 import { drawerWidth } from 'core/components/Navbar'
-import { withStyles } from '@material-ui/core/styles'
+import { withStyles } from '@material-ui/styles'
 
 const styles = theme => ({
   appBar: {

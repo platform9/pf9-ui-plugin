@@ -1,11 +1,10 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import {
-  Collapse, Divider, Drawer, ExpansionPanel, ExpansionPanelDetails,
-  ExpansionPanelSummary, IconButton, InputBase, ListItemText,
-  MenuItem, MenuList, Typography
+  Collapse, Divider, Drawer, ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary,
+  IconButton, InputBase, ListItemText, MenuItem, MenuList, Typography,
 } from '@material-ui/core'
-import { withStyles } from '@material-ui/core/styles'
+import { withStyles } from '@material-ui/styles'
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
 import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'

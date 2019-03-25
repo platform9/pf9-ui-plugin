@@ -1,15 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { withStyles } from '@material-ui/core/styles'
-import {
-  FormControl,
-  FormHelperText,
-  FormLabel,
-} from '@material-ui/core'
+import { withStyles } from '@material-ui/styles'
+import { FormControl, FormHelperText, FormLabel } from '@material-ui/core'
 import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
 import { compose } from 'app/utils/fp'
 import { withInfoTooltip } from 'app/core/components/InfoTooltip'
-import {Controlled as BaseCodeMirror} from 'react-codemirror2'
+import { Controlled as BaseCodeMirror } from 'react-codemirror2'
 import './codemirror.css'
 
 require('codemirror/mode/yaml/yaml')

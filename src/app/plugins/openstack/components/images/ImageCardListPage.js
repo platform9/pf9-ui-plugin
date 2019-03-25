@@ -1,7 +1,7 @@
 import React from 'react'
 import ImageCard from './ImageCard'
 import imageCatalog from './image_catalog.json'
-import { withStyles } from '@material-ui/core/styles'
+import { withStyles } from '@material-ui/styles'
 import { Paper, Typography } from '@material-ui/core'
 
 const styles = theme => ({

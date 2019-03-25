@@ -9,7 +9,7 @@ import { compose, pathOr } from 'ramda'
 import requiresAuthentication from 'openstack/util/requiresAuthentication'
 import { withDataLoader } from 'core/DataLoader'
 import { CardMedia } from '@material-ui/core'
-import { withStyles } from '@material-ui/core/styles'
+import { withStyles } from '@material-ui/styles'
 import { projectAs } from 'utils/fp'
 
 const styles = theme => ({

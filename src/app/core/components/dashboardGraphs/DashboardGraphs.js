@@ -1,5 +1,5 @@
 import React from 'react'
-import { withStyles } from '@material-ui/core/styles'
+import { withStyles } from '@material-ui/styles'
 import DashboardCard from './DashboardCard'
 import NetworksGraph from './NetworksGraph'
 import RegionsGraph from './RegionsGraph'

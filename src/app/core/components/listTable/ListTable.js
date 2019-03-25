@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 import {
   Checkbox, Grid, Paper, Table, TableBody, TableCell, TablePagination, TableRow,
 } from '@material-ui/core'
-import { withStyles } from '@material-ui/core/styles'
+import { withStyles } from '@material-ui/styles'
 import { compose, ensureFunction, except } from 'app/utils/fp'
 import { withAppContext } from 'core/AppContext'
 import MoreMenu from 'core/components/MoreMenu'

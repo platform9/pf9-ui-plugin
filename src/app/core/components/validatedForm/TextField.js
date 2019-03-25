@@ -1,9 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {
-  FormControl, FormHelperText, TextField as BaseTextField
-} from '@material-ui/core'
-import { withStyles } from '@material-ui/core/styles'
+import { FormControl, FormHelperText, TextField as BaseTextField } from '@material-ui/core'
+import { withStyles } from '@material-ui/styles'
 import { withInfoTooltip } from 'app/core/components/InfoTooltip'
 import { compose } from 'app/utils/fp'
 import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'

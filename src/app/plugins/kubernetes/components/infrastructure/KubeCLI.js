@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { compose } from 'ramda'
 import { withAppContext } from 'core/AppContext'
 import { AppBar, Dialog, IconButton, Slide, Toolbar, Typography } from '@material-ui/core'
-import { withStyles } from '@material-ui/core/styles'
+import { withStyles } from '@material-ui/styles'
 import CloseIcon from '@material-ui/icons/Close'
 import SimpleLink from 'core/components/SimpleLink'
 

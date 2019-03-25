@@ -1,13 +1,6 @@
 import React from 'react'
-import { withStyles } from '@material-ui/core/styles'
-import {
-  Button,
-  Card,
-  CardContent,
-  CardMedia,
-  Grid,
-  Typography
-} from '@material-ui/core'
+import { withStyles } from '@material-ui/styles'
+import { Button, Card, CardContent, CardMedia, Grid, Typography } from '@material-ui/core'
 import CloudDownloadIcon from '@material-ui/icons/CloudDownload'
 import { rootPath } from 'core/globals'
 

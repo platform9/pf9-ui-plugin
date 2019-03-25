@@ -1,10 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {
-  Button, ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary,
-  Typography,
+  Button, ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, Typography,
 } from '@material-ui/core'
-import { withStyles } from '@material-ui/core/styles'
+import { withStyles } from '@material-ui/styles'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import { compose } from 'app/utils/fp'
 import ApiHelper from 'developer/components/ApiHelper'

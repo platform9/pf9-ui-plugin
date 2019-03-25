@@ -1,8 +1,8 @@
 import React from 'react'
 import {
-  Checkbox, FormControlLabel, TextField as BaseTextField, Typography
+  Checkbox, FormControlLabel, TextField as BaseTextField, Typography,
 } from '@material-ui/core'
-import { withStyles } from '@material-ui/core/styles'
+import { withStyles } from '@material-ui/styles'
 import { compose } from 'app/utils/fp'
 import { withAppContext } from 'core/AppContext'
 import ListTable from 'core/components/listTable/ListTable'

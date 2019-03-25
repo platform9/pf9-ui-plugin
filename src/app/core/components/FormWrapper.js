@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { withStyles } from '@material-ui/core/styles'
+import { withStyles } from '@material-ui/styles'
 import { Button, Divider, Grid, Paper, Typography } from '@material-ui/core'
 
 const styles = theme => ({

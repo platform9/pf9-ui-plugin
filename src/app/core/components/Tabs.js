@@ -1,7 +1,7 @@
 import React from 'react'
 import { withRouter } from 'react-router-dom'
 import { Grid, Paper, Tab as MDTab, Tabs as MDTabs } from '@material-ui/core'
-import { withStyles } from '@material-ui/core/styles'
+import { withStyles } from '@material-ui/styles'
 import { compose } from 'app/utils/fp'
 
 const TabContext = React.createContext({})

@@ -1,6 +1,6 @@
 import { Button, Card, CardContent, CardMedia, Grid, Tooltip, Typography } from '@material-ui/core'
 import PropTypes from 'prop-types'
-import { withStyles } from '@material-ui/core/styles'
+import { withStyles } from '@material-ui/styles'
 import GetAppIcon from '@material-ui/icons/GetApp'
 import UnfoldMoreIcon from '@material-ui/icons/UnfoldMore'
 import { path, compose } from 'ramda'

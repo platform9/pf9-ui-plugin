@@ -11,7 +11,7 @@ import classNames from 'classnames'
 import { compose } from 'ramda'
 import { Button, IconButton, Toolbar, Tooltip, Typography } from '@material-ui/core'
 import { lighten } from '@material-ui/core/styles/colorManipulator'
-import { withStyles } from '@material-ui/core/styles'
+import { withStyles } from '@material-ui/styles'
 
 const toolbarStyles = theme => ({
   root: {

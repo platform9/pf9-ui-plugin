@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import {
   Button, Checkbox, FormControlLabel, Grid, Paper, TextField, Typography,
 } from '@material-ui/core'
-import { withStyles } from '@material-ui/core/styles'
+import { withStyles } from '@material-ui/styles'
 import { compose } from 'app/utils/fp'
 import { withAppContext } from 'core/AppContext'
 import Alert from 'core/components/Alert'

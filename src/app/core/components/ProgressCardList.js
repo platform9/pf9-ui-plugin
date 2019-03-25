@@ -1,5 +1,5 @@
 import React from 'react'
-import { withStyles } from '@material-ui/core/styles'
+import { withStyles } from '@material-ui/styles'
 import Hidden from '@material-ui/core/Hidden'
 import { Grid } from '@material-ui/core'
 import ProgressCard from './ProgressCard'
