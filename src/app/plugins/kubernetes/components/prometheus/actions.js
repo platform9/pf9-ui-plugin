@@ -1,27 +1,43 @@
-export const loadPrometheusInstances = async ({ context, setContext, reload }) => {
+import { pathOrNull } from 'utils/fp'
+import { pathOr, prop } from 'ramda'
+
+const mapServiceMonitor = x => x
+const mapRule = x => x
+const mapAlertMonitor = prop('name')
+
+const mapPrometheusInstance = ({ metadata, spec }) => ({
+  name: metadata.name,
+  namespace: metadata.namespace,
+  id: metadata.uid,
+  serviceMonitorSelector: pathOrNull('serviceMonitorSelector.matchLabels', spec),
+  alertManagersSelector:
+    pathOr([], ['alerting', 'alertmanagers'], spec)
+      .map(mapAlertMonitor)
+      .join(', '),
+  ruleSelector: pathOrNull('ruleSelector.matchLabels', spec),
+  cpu: pathOrNull('resources.requests.cpu', spec),
+  storage: pathOrNull('resources.requests.storage', spec),
+  memory: pathOrNull('resources.requests.memory', spec),
+  version: metadata.resourceVersion,
+  retention: spec.retention,
+  replicas: spec.replicas,
+  metadata,
+  spec,
+})
+
+export const loadPrometheusResources = async ({ context, setContext, reload }) => {
   if (!reload && context.prometheusInstances) { return context.prometheusInstances }
 
-  // TODO: fetch the data from actual API
-  // const prometheusInstances = await context.apiClient.qbert.getPrometheusInstances()
+  const instancesResponse = await context.apiClient.qbert.getPrometheusInstances('e8f1d175-2e7d-40fa-a475-ed20b8d8c66d')
+  const prometheusInstances = instancesResponse.items.map(mapPrometheusInstance)
+  console.log(prometheusInstances)
 
-  // Mocking out data for now:
-  const mockData = [
-    {
-      name: 'dev-stageprom1',
-      namespace: 'development',
-      serviceMonitor: { prometheus: 'staging', project: 'dev' },
-      alertManager: 'database-pager',
-      disk: 8,
-      retention: 15,
-      version: 'v2.6',
-      status: 'healthy',
-      age: '21 hrs',
-      numInstances: 4,
-    },
-  ]
+  const serviceMonitorsResponse = await context.apiClient.qbert.getPrometheusServiceMonitors('e8f1d175-2e7d-40fa-a475-ed20b8d8c66d')
+  const prometheusServiceMonitors = serviceMonitorsResponse.items.map(mapServiceMonitor)
 
-  const prometheusInstances = mockData
+  const rulesResponse = await context.apiClient.qbert.getPrometheusRules('e8f1d175-2e7d-40fa-a475-ed20b8d8c66d')
+  const prometheusRules = rulesResponse.items.map(mapRule)
 
-  setContext({ prometheusInstances })
+  setContext({ prometheusInstances, prometheusServiceMonitors, prometheusRules })
   return prometheusInstances
 }

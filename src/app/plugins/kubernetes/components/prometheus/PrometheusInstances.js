@@ -1,20 +1,22 @@
-// import React from 'react'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { loadPrometheusInstances } from './actions'
+import { loadPrometheusResources } from './actions'
 
-const renderAsJson = data => JSON.stringify(data)
+// const renderAsJson = data => JSON.stringify(data)
+const renderKeyValues = obj => Object.entries(obj)
+  .map(([key, value]) => `${key}: ${value}`)
+  .join(', <br/>')
 
 export const columns = [
   { id: 'name', label: 'Name' },
   { id: 'namespace', label: 'Namespace' },
-  { id: 'serviceMonitor', label: 'Service Monitor', render: renderAsJson },
-  { id: 'alertManager', label: 'Alert Manager' },
-  { id: 'disk', label: 'Disk' },
+  { id: 'serviceMonitorSelector', label: 'Service Monitor', render: renderKeyValues },
+  { id: 'alertManagersSelector', label: 'Alert Managers' },
+  { id: 'cpu', label: 'CPU' },
+  { id: 'storage', label: 'Storage' },
+  { id: 'memory', label: 'Memory' },
   { id: 'retention', label: 'Retention' },
   { id: 'version', label: 'version' },
-  { id: 'status', label: 'Status' },
-  { id: 'age', label: 'Age' },
-  { id: 'numInstances', label: '# Instances' },
+  { id: 'replicas', label: '# of instances' },
 ]
 
 export const options = {
@@ -22,9 +24,10 @@ export const options = {
   columns,
   dataKey: 'prometheusInstances',
   editUrl: '/ui/kubernetes/prometheus/instances/edit',
-  loaderFn: loadPrometheusInstances,
+  loaderFn: loadPrometheusResources,
   name: 'PrometheusInstances',
   title: 'Prometheus Instances',
+  debug: true,
 }
 
 const { ListPage, List } = createCRUDComponents(options)

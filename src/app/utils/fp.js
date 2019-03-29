@@ -126,7 +126,7 @@ export const asyncFlatMap = async (arr, callback) => {
   return newArr
 }
 
-export const pathOrNull = pathStr => pathOr(null, pathStr.split('.'))
+export const pathOrNull = curry((pathStr, obj) => pathOr(null, pathStr.split('.'), obj))
 
 // I didn't see anything in Ramda that would allow me to create a "Maybe"
 // composition so creating a simple version here.

@@ -316,6 +316,19 @@ class Qbert {
   async deleteRepositoriesForCluster (clusterId, repoId) {
     return this.client.basicDelete(`${await this.clusterMonocularBaseUrl(clusterId)}/repos/${repoId}`)
   }
+
+  /* Managed Apps */
+  async getPrometheusInstances (clusterId) {
+    return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/prometheuses`)
+  }
+
+  async getPrometheusServiceMonitors (clusterId) {
+    return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/servicemonitors`)
+  }
+
+  async getPrometheusRules (clusterId) {
+    return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/prometheusrules`)
+  }
 }
 
 export default Qbert
