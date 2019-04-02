@@ -2,7 +2,7 @@ import React from 'react'
 import createUpdateComponents from 'core/helpers/createUpdateComponents'
 import SubmitButton from 'core/components/SubmitButton'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
-import Checkbox from 'core/components/validatedForm/Checkbox'
+import Checkbox from 'core/components/validatedForm/CheckboxField'
 import TextField from 'core/components/validatedForm/TextField'
 import { loadNetworks, updateNetwork } from './actions'
 

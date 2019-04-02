@@ -2,15 +2,13 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Picklist from 'core/components/Picklist'
 import { FormHelperText, FormControl } from '@material-ui/core'
-import { withStyles } from '@material-ui/core/styles'
+import { withStyles } from '@material-ui/styles'
 import { withInfoTooltip } from 'app/core/components/InfoTooltip'
 import { compose } from 'app/utils/fp'
 import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
 
 const styles = theme => ({
-  formControl: {
-    margin: theme.spacing.unit
-  }
+  margin: 0,
 })
 
 /**
@@ -33,12 +31,13 @@ class PicklistField extends React.Component {
           title={title}
           className={className}
           name={id}
+          filled
           label={label}
           options={showNone ? [{ value: '', label: 'None' }, ...options] : options}
           value={value !== undefined ? value : ''}
           onChange={this.handleChange}
         />
-        <FormHelperText error={hasError}>{errorMessage}</FormHelperText>
+        {errorMessage && <FormHelperText error={hasError}>{errorMessage}</FormHelperText>}
       </FormControl>
     )
   }

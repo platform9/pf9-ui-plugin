@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { MuiThemeProvider } from '@material-ui/core/styles'
+import { ThemeProvider } from '@material-ui/styles'
 import AppContext from 'core/AppContext'
 import AppContainer from 'core/components/AppContainer'
 import HotKeysProvider from 'core/providers/HotKeysProvider'
@@ -10,9 +10,7 @@ import DeveloperToolsEmbed from 'developer/components/DeveloperToolsEmbed'
 import LogoutPage from 'openstack/components/LogoutPage'
 import SessionManager from 'openstack/components/SessionManager'
 import { apply, toPairs } from 'ramda'
-import {
-  BrowserRouter as Router, Redirect, Route, Switch,
-} from 'react-router-dom'
+import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom'
 import { pathJoin } from 'utils/misc'
 import config from '../../config'
 import ApiClient from '../api-client'
@@ -72,7 +70,7 @@ class App extends React.Component {
     const devEnabled = window.localStorage.enableDevPlugin === 'true'
     return (
       <Router>
-        <MuiThemeProvider theme={theme}>
+        <ThemeProvider theme={theme}>
           <HotKeysProvider>
             <AppContext initialContext={{ apiClient, initialized: false, sessionLoaded: false }}>
               <ToastProvider>
@@ -94,7 +92,7 @@ class App extends React.Component {
               </ToastProvider>
             </AppContext>
           </HotKeysProvider>
-        </MuiThemeProvider>
+        </ThemeProvider>
       </Router>
     )
   }

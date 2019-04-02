@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import { range } from 'app/utils/fp'
 import Picklist from 'core/components/Picklist'
-import Checkbox from 'core/components/validatedForm/Checkbox'
+import Checkbox from 'core/components/validatedForm/CheckboxField'
 import KeyValuesField from 'core/components/validatedForm/KeyValuesField'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import TextField from 'core/components/validatedForm/TextField'

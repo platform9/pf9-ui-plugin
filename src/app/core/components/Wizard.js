@@ -3,14 +3,21 @@ import PropTypes from 'prop-types'
 import { Button } from '@material-ui/core'
 import FormButtons from 'core/components/FormButtons'
 import ProgressTracker from 'core/components/ProgressTracker'
+import { withStyles } from '@material-ui/styles'
 
 const WizardContext = React.createContext({})
 
 export const Consumer = WizardContext.Consumer
 export const Provider = WizardContext.Provider
 
-const NextButton = ({ children, handleNext }) => <Button variant="outlined" onClick={handleNext}>{children}</Button>
-const BackButton = ({ handleBack }) => <Button variant="outlined" onClick={handleBack}>Back</Button>
+const NextButton = ({ children, handleNext, ...rest }) =>
+  <Button variant="outlined" onClick={handleNext} {...rest}>{children}</Button>
+const BackButton = ({ handleBack, ...rest }) =>
+  <Button variant="outlined" onClick={handleBack} {...rest}>Back</Button>
+
+const styles = theme => ({
+  button: { marginRight: theme.spacing.unit },
+})
 
 class Wizard extends React.Component {
   isLastStep = () => this.state.step === this.state.steps.length - 1
@@ -82,7 +89,7 @@ class Wizard extends React.Component {
 
   render () {
     const { wizardContext, setWizardContext, steps, step } = this.state
-    const { children, submitLabel } = this.props
+    const { children, submitLabel, classes } = this.props
 
     return (
       <div>
@@ -90,9 +97,12 @@ class Wizard extends React.Component {
           <ProgressTracker steps={steps} activeStep={step} />
           {children({ wizardContext, setWizardContext, onNext: this.onNext })}
           <FormButtons>
-            { this.hasBack() && <BackButton handleBack={this.handleBack} /> }
-            { this.hasNext() && <NextButton handleNext={this.handleNext}>Next</NextButton> }
-            { this.isLastStep() && <NextButton handleNext={this.handleNext}>{submitLabel}</NextButton> }
+            {this.hasBack() &&
+              <BackButton className={classes.button} handleBack={this.handleBack} />}
+            {this.hasNext() &&
+              <NextButton className={classes.button} handleNext={this.handleNext}>Next</NextButton>}
+            {this.isLastStep() &&
+              <NextButton className={classes.button} handleNext={this.handleNext}>{submitLabel}</NextButton>}
           </FormButtons>
         </Provider>
       </div>
@@ -115,7 +125,7 @@ Wizard.defaultProps = {
   }
 }
 
-export default Wizard
+export default withStyles(styles)(Wizard)
 
 /**
  * withWizardContext provides access to the wizard context through props.

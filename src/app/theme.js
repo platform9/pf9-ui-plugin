@@ -1,6 +1,7 @@
-import React from 'react'
-import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles'
 import { deepOrange } from '@material-ui/core/colors'
+import { createMuiTheme } from '@material-ui/core/styles'
+import { ThemeProvider } from '@material-ui/styles'
+import React from 'react'
 
 const theme = createMuiTheme({
   typography: {
@@ -13,13 +14,13 @@ const theme = createMuiTheme({
       dark: '#1e699c',
       contrastText: '#fff',
     },
-    secondary: deepOrange
-  }
+    secondary: deepOrange,
+  },
 })
 
-export const withTheme = Component => props =>
-  <MuiThemeProvider theme={theme}>
+export const withAppTheme = Component => props =>
+  <ThemeProvider theme={theme}>
     <Component {...props} />
-  </MuiThemeProvider>
+  </ThemeProvider>
 
 export default theme

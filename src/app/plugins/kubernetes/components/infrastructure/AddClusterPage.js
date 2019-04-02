@@ -1,5 +1,5 @@
 import React from 'react'
-import Checkbox from 'core/components/validatedForm/Checkbox'
+import Checkbox from 'core/components/validatedForm/CheckboxField'
 import ExternalLink from 'core/components/ExternalLink'
 import FormWrapper from 'core/components/FormWrapper'
 import KeyValuesField from 'core/components/validatedForm/KeyValuesField'

@@ -8,6 +8,7 @@ import { loadInfrastructure } from './actions'
 import { withAppContext } from 'core/AppContext'
 import { withDataLoader } from 'core/DataLoader'
 import { withRouter } from 'react-router'
+import { withStyles } from '@material-ui/styles'
 
 const overviewStats = cluster => ({
   'Status':              cluster.status,
@@ -27,12 +28,19 @@ const openstackProps = cluster => ({
   'MetalLB CIDR': cluster.metallbCidr,
 })
 
-const ClusterInfo = ({ match, data, context }) => {
+const styles = theme => ({
+  root: {
+    flexGrow: 1,
+    marginTop: theme.spacing.unit
+  },
+})
+
+const ClusterInfo = ({ match, data, context, classes }) => {
   const cluster = data.find(x => x.uuid === match.params.id)
   const { usage } = clusterUsageStats(cluster, context)
   return (
-    <div className="root">
-      <Grid container spacing={40}>
+    <React.Fragment>
+      <Grid container spacing={40} className={classes.root}>
         <Grid item xs={4}>
           <UsageWidget title="Compute" stats={usage.compute} />
         </Grid>
@@ -43,7 +51,7 @@ const ClusterInfo = ({ match, data, context }) => {
           <UsageWidget title="Storage" stats={usage.disk} />
         </Grid>
       </Grid>
-      <Grid container spacing={40}>
+      <Grid container spacing={40} className={classes.root}>
         <Grid item xs={6}>
           <InfoPanel title="Overview" items={overviewStats(cluster)} />
         </Grid>
@@ -51,11 +59,12 @@ const ClusterInfo = ({ match, data, context }) => {
           <InfoPanel title="OpenStack Properties" items={openstackProps(cluster)} />
         </Grid>
       </Grid>
-    </div>
+    </React.Fragment>
   )
 }
 
 export default compose(
+  withStyles(styles),
   withRouter,
   withAppContext,
   withDataLoader({ dataKey: 'clusters', loaderFn: loadInfrastructure }),

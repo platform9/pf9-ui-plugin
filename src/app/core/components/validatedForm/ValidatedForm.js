@@ -34,7 +34,7 @@ const styles = theme => ({
  * data value schema and the validations.
  */
 @withRouter
-@withStyles(styles)
+@withStyles(styles, { withTheme: true })
 class ValidatedForm extends React.Component {
   constructor (props) {
     super(props)

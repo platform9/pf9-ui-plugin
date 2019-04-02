@@ -2,7 +2,7 @@ import React from 'react'
 import SubmitButton from 'core/components/SubmitButton'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import TextField from 'core/components/validatedForm/TextField'
-import Checkbox from 'core/components/validatedForm/Checkbox'
+import Checkbox from 'core/components/validatedForm/CheckboxField'
 
 const createFormComponent = ({ submitLabel, initialValue, displayName, fields }) => {
   const mapField = spec => {

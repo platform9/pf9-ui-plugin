@@ -1,19 +1,13 @@
 import React from 'react'
 import TextField from 'core/components/validatedForm/TextField'
-import Checkbox from 'core/components/validatedForm/Checkbox'
+import Checkbox from 'core/components/validatedForm/CheckboxField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import { Slider } from '@material-ui/lab'
 import { compose, pick } from 'ramda'
 import { withAppContext } from 'core/AppContext'
 import { withDataLoader } from 'core/DataLoader'
 import { scaleCluster, loadInfrastructure } from './actions'
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-} from '@material-ui/core'
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@material-ui/core'
 
 // The modal is technically inside the row, so clicking anything inside
 // the modal window will cause the table row to be toggled.

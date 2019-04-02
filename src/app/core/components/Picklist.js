@@ -1,12 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import FormControl from '@material-ui/core/FormControl'
-import InputLabel from '@material-ui/core/InputLabel'
 import MenuItem from '@material-ui/core/MenuItem'
-import Select from '@material-ui/core/Select'
 import { withStyles } from '@material-ui/styles'
 import { compose } from 'app/utils/fp'
 import classnames from 'classnames'
+import TextField from '@material-ui/core/TextField'
 
 /**
  * Picklist is a bare-bones widget-only implmentation.
@@ -36,7 +35,7 @@ class Picklist extends React.Component {
   }
 
   render () {
-    const { className, classes, label, name, value, options } = this.props
+    const { className, classes, label, name, value, options, filled } = this.props
 
     const items = options.map(x =>
       typeof x === 'string' ? ({ value: x, label: x }) : x
@@ -50,15 +49,17 @@ class Picklist extends React.Component {
     const nonEmptyValue = value === '' ? '__none__' : value
     return (
       <FormControl className={classnames(classes.formControl, className)}>
-        <InputLabel htmlFor={name}>{label}</InputLabel>
-        <Select
+        <TextField
+          select
+          variant={filled ? 'filled' : 'standard'}
+          label={label}
           value={nonEmptyValue}
+          displayEmpty
           onChange={this.handleChange}
           inputProps={{ name: label, id: name }}
-          displayEmpty
         >
           {items.map(item => <MenuItem value={item.value} key={item.value}>{item.label}</MenuItem>)}
-        </Select>
+        </TextField>
       </FormControl>
     )
   }
@@ -78,6 +79,7 @@ Picklist.propTypes = {
   options: PropTypes.arrayOf(optionPropType).isRequired,
   value: PropTypes.string,
   onChange: PropTypes.func,
+  filled: PropTypes.bool,
 }
 
 export default compose(

@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
-import { withTheme } from '@material-ui/core/styles'
 import { withStyles } from '@material-ui/styles'
 import { ensureFunction } from 'app/utils/fp'
 
@@ -33,8 +32,7 @@ const styles = theme => ({
   }
 })
 
-@withTheme()
-@withStyles(styles)
+@withStyles(styles, { withTheme: true })
 class ProgressBar extends PureComponent {
   render () {
     const { label, percent, classes, width } = this.props

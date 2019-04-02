@@ -14,6 +14,8 @@ const styles = theme => ({
     fontSize: 14,
     display: 'flex',
     flexFlow: 'row nowrap',
+    paddingTop: 0,
+    marginTop: 0
   },
   infoIcon: {
     fontSize: theme.spacing.unit * 2.4,
@@ -42,7 +44,7 @@ class InfoTooltip extends React.Component {
 }
 
 InfoTooltip.defaultProps = {
-  placement: 'right'
+  placement: 'right-start'
 }
 
 InfoTooltip.propTypes = {

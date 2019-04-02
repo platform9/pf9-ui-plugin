@@ -1,9 +1,8 @@
 import React from 'react'
-
 import { decorateAction } from '@storybook/addon-actions'
 import { storiesOf } from '@storybook/react'
 import 'app/app.css'
-import { withTheme } from 'app/theme'
+import { withAppTheme } from 'app/theme'
 import { compose } from 'ramda'
 import AppContext, { withAppContext } from 'core/AppContext'
 import HotKeysContext from 'core/providers/HotKeysProvider'
@@ -19,7 +18,7 @@ export const jsonDetailLogger = decorateAction([
 
 export const withWrappings = Component =>
   compose(
-    withTheme,
+    withAppTheme,
     withAppContext,
   )(Component)
 
@@ -41,7 +40,7 @@ export const addStory = (section, subsection, story, mod) =>
 
 export const addStories = (section, stories, mod) =>
   Object.entries(stories).forEach(([subsection, story]) =>
-    addStory(section, subsection, story, mod)
+    addStory(section, subsection, story, mod),
   )
 
 export const addStoriesFromModule = mod =>

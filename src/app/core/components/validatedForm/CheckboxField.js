@@ -10,11 +10,11 @@ import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/va
 
 const styles = theme => ({
   formControl: {
-    margin: theme.spacing.unit
+    marginTop: theme.spacing.unit,
   }
 })
 
-class Checkbox extends React.Component {
+class CheckboxField extends React.Component {
   handleChange = e => {
     const { onChange } = this.props
     if (onChange) {
@@ -40,14 +40,14 @@ class Checkbox extends React.Component {
               /></div>
             }
           />
-          <FormHelperText>{errorMessage}</FormHelperText>
+          {errorMessage && <FormHelperText>{errorMessage}</FormHelperText>}
         </FormControl>
       </div>
     )
   }
 }
 
-Checkbox.propTypes = {
+CheckboxField.propTypes = {
   id: PropTypes.string.isRequired,
   info: PropTypes.string,
   label: PropTypes.string,
@@ -59,4 +59,4 @@ export default compose(
   withFormContext,
   withInfoTooltip,
   withStyles(styles),
-)(Checkbox)
+)(CheckboxField)

@@ -8,7 +8,7 @@ import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/va
 
 const styles = theme => ({
   formControl: {
-    margin: theme.spacing.unit
+    marginTop: theme.spacing.unit,
   }
 })
 
@@ -34,11 +34,12 @@ class TextField extends React.Component {
       <FormControl id={id} className={classes.formControl} error={hasError}>
         <BaseTextField
           {...restProps}
+          variant="filled"
           error={hasError}
           value={value !== undefined ? value : ''}
           onChange={this.handleChange}
         />
-        <FormHelperText>{errorMessage}</FormHelperText>
+        {errorMessage && <FormHelperText>{errorMessage}</FormHelperText>}
       </FormControl>
     )
   }

@@ -1,13 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import FormControl from '@material-ui/core/FormControl'
-import Input from '@material-ui/core/Input'
-import InputLabel from '@material-ui/core/InputLabel'
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown'
 import { withStyles } from '@material-ui/styles'
 import MenuList from '@material-ui/core/MenuList'
 import MenuItem from '@material-ui/core/MenuItem'
 import Paper from '@material-ui/core/Paper'
+import { TextField as BaseTextField } from '@material-ui/core'
 
 // This is being called 'Base' because it is standalone and does not
 // integrate with ValidatedForm.
@@ -97,9 +96,10 @@ class AutocompleteBase extends React.Component {
     return (
       <div className={classes.relative}>
         <FormControl className={classes.container} onMouseDown={this.toggleOpen}>
-          {label && <InputLabel htmlFor={id}>{label}</InputLabel>}
-          <Input
+          <BaseTextField
             id={id}
+            label={label}
+            variant="filled"
             value={value}
             onChange={this.handleChange}
             onBlur={this.handleClose}

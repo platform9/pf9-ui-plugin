@@ -1,9 +1,8 @@
 import React, { Fragment } from 'react'
 import { withRouter } from 'react-router-dom'
+import { createMuiTheme } from '@material-ui/core/styles'
 import { Divider, Typography } from '@material-ui/core'
-import {
-  createMuiTheme, MuiThemeProvider, withStyles
-} from '@material-ui/core/styles'
+import { ThemeProvider, withStyles } from '@material-ui/styles'
 import { compose } from 'app/utils/fp'
 import FormWrapper from 'core/components/FormWrapper'
 import ListTable from 'core/components/listTable/ListTable'
@@ -133,14 +132,14 @@ class AddImagePage extends React.Component {
 
   render () {
     return (
-      <MuiThemeProvider theme={textTheme}>
+      <ThemeProvider theme={textTheme}>
         <FormWrapper title="Import a New Image" backUrl="/ui/openstack/images">
           {this.renderManualImport()}
           {this.renderGlanceClient()}
           <Divider />
           {this.renderCreateNewImage()}
         </FormWrapper>
-      </MuiThemeProvider>
+      </ThemeProvider>
     )
   }
 }

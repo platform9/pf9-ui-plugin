@@ -1,5 +1,5 @@
 import React from 'react'
-import Checkbox from 'core/components/validatedForm/Checkbox'
+import Checkbox from 'core/components/validatedForm/CheckboxField'
 import TextField from 'core/components/validatedForm/TextField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import { customValidator, matchFieldValidator, requiredValidator } from 'core/utils/fieldValidators'
