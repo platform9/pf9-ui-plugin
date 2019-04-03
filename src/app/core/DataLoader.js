@@ -42,7 +42,7 @@ class MultiLoaderBase extends PureComponent {
       // If the loader has dependencies, create a promise that will wait for the dependencies to be resolved
       return [
         loaderKeys,
-        async (params, reloadAll) => {
+        async (params, reloadAll = true) => {
           const prevResults = requires
             ? await Promise.all(
               linkedLoaders
@@ -54,7 +54,7 @@ class MultiLoaderBase extends PureComponent {
 
           const { setContext, context } = this.props
 
-          return loaderFn({ setContext, context, prevResults, params, reload: true })
+          return loaderFn({ setContext, context, prevResults, params, reload: reloadAll })
         },
       ]
     })
