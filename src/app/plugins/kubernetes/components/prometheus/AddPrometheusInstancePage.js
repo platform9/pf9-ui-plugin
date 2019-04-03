@@ -8,6 +8,7 @@ import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import Wizard from 'core/components/Wizard'
 import WizardStep from 'core/components/WizardStep'
 import { compose } from 'ramda'
+import { createPrometheusInstance } from './actions'
 import { loadInfrastructure } from '../infrastructure/actions'
 import { projectAs } from 'utils/fp'
 import { withAppContext } from 'core/AppContext'
@@ -22,7 +23,10 @@ const initialContext = {
 }
 
 class AddPrometheusInstancePage extends React.Component {
-  handleSubmit = () => console.log('TODO: AddPrometheusInstancePage#handleSubmit')
+  handleSubmit = data => {
+    const { context, setContext } = this.props
+    createPrometheusInstance({ data, context, setContext })
+  }
 
   render () {
     const clusters = this.props.data
@@ -37,10 +41,10 @@ class AddPrometheusInstancePage extends React.Component {
                   <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                     <TextField id="name" label="Name" info="Name of the Prometheus instance" />
                     <TextField id="numInstances" label="# of instances" info="Number of Prometheus instances" type="number" />
+                    <TextField id="cpu" label="CPU" info="Expressed in 'm' (1m = 1/1000th of a core)" type="number" />
                     <TextField id="memory" label="Memory" info="GiB of memory to allocate" type="number" />
-                    <TextField id="cpu" label="CPU" info="# of CPUs to allocate" type="number" />
-                    <PicklistField id="cluster" options={clusterOptions} label="Cluster" info="Clusters available with RoleBing from admin delegation" />
                     <TextField id="storage" label="Storage" info="The storage allocation.  Default is 8 GiB" type="number" />
+                    <PicklistField id="cluster" options={clusterOptions} label="Cluster" info="Clusters available with RoleBing from admin delegation" />
                     <Checkbox id="enablePersistentStorage" label="Enable persistent storage" />
                     <TextField id="retention" label="Storage Retention (days)" info="Defaults to 15 days if nothing is set" type="number" />
                     <KeyValuesField id="serviceMonitor" label="Service Monitor" info="Key/value pairs for service monitor that Prometheus will use" />

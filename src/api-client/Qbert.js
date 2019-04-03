@@ -1,3 +1,5 @@
+import { hasKeys, keyValueArrToObj } from 'utils/fp'
+
 /* eslint-disable camelcase */
 class Qbert {
   constructor (client) {
@@ -320,6 +322,43 @@ class Qbert {
   /* Managed Apps */
   async getPrometheusInstances (clusterId) {
     return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/prometheuses`)
+  }
+
+  async createPrometheusInstance (clusterId, data) {
+    const requests = {}
+    if (data.cpu) { requests.cpu = `${data.cpu}m` }
+    if (data.memory) { requests.cpu = `${data.memory}Gi` }
+    if (data.storage) { requests.cpu = `${data.storage}Gi` }
+
+    let metadata = {
+      name: data.name,
+
+      // TODO: Do we want to scope this to a namespace?  We don't have a field for that in the mockup.
+      // Another alternative is that we use the value from a namespace chooser.  But that probably means making
+      // the namespace picker be persistent across screens and stored in the session.
+    }
+
+    let spec = {
+      replicas: data.numInstances,
+      retention: data.retention,
+      resources: { requests },
+    }
+
+    const serviceMonitor = keyValueArrToObj(data.serviceMonitor)
+    if (hasKeys(serviceMonitor)) {
+      spec.serviceMonitorSelector = {
+        matchLabels: serviceMonitor,
+      }
+    }
+
+    let body = { metadata, spec }
+
+    // TODO: How do we specifiy "Enable persistent storage" in the API call?  What does this field mean in the
+    // context of a Prometheus Instance?  Where will it be stored?  Do we need to specify PVC and StorageClasses?
+
+    console.log('apiClient.qbert#createPrometheusInstance')
+    console.log('body', body)
+    // return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/prometheuses`, body)
   }
 
   async getPrometheusServiceMonitors (clusterId) {
