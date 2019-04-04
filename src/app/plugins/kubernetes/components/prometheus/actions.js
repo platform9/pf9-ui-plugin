@@ -30,7 +30,6 @@ export const loadPrometheusResources = async ({ context, setContext, reload }) =
 
   const instancesResponse = await context.apiClient.qbert.getPrometheusInstances('e8f1d175-2e7d-40fa-a475-ed20b8d8c66d')
   const prometheusInstances = instancesResponse.items.map(mapPrometheusInstance)
-  console.log(prometheusInstances)
 
   const serviceMonitorsResponse = await context.apiClient.qbert.getPrometheusServiceMonitors('e8f1d175-2e7d-40fa-a475-ed20b8d8c66d')
   const prometheusServiceMonitors = serviceMonitorsResponse.items.map(mapServiceMonitor)

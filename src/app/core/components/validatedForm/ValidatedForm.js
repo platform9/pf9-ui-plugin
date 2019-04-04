@@ -136,7 +136,7 @@ class ValidatedForm extends React.Component {
   }
 
   handleSubmit = event => {
-    const { onSubmit } = this.props
+    const { clearOnSubmit, onSubmit } = this.props
     const { values, showingErrors } = this.state
     if (event) {
       event.preventDefault()
@@ -151,6 +151,10 @@ class ValidatedForm extends React.Component {
 
     if (onSubmit) {
       onSubmit(values)
+    }
+
+    if (clearOnSubmit) {
+      this.setState({ values: {} })
     }
   }
 
@@ -167,6 +171,12 @@ class ValidatedForm extends React.Component {
 }
 
 ValidatedForm.propTypes = {
+  // When the form is successfully submitted, clear the form.
+  // A common use case for this will be when we want to have the form stay on
+  // the screen but each time the user makes a submit we add an item to an array
+  // and allow them to add another.
+  clearOnSubmit: PropTypes.bool,
+
   // Initial values
   initialValues: PropTypes.object,
 
@@ -176,6 +186,10 @@ ValidatedForm.propTypes = {
   triggerSubmit: PropTypes.func,
 
   showErrorsOnBlur: PropTypes.bool,
+}
+
+ValidatedForm.defaultProps = {
+  clearOnSubmit: false,
 }
 
 export default ValidatedForm

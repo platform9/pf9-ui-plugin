@@ -327,11 +327,12 @@ class Qbert {
   async createPrometheusInstance (clusterId, data) {
     const requests = {}
     if (data.cpu) { requests.cpu = `${data.cpu}m` }
-    if (data.memory) { requests.cpu = `${data.memory}Gi` }
-    if (data.storage) { requests.cpu = `${data.storage}Gi` }
+    if (data.memory) { requests.memory = `${data.memory}Mi` }
+    if (data.storage) { requests.storage = `${data.storage}Gi` }
 
     let metadata = {
       name: data.name,
+      namespace: data.namespace,
 
       // TODO: Do we want to scope this to a namespace?  We don't have a field for that in the mockup.
       // Another alternative is that we use the value from a namespace chooser.  But that probably means making
@@ -340,7 +341,7 @@ class Qbert {
 
     let spec = {
       replicas: data.numInstances,
-      retention: data.retention,
+      retention: `${data.retention}d`,
       resources: { requests },
     }
 
@@ -358,7 +359,31 @@ class Qbert {
 
     console.log('apiClient.qbert#createPrometheusInstance')
     console.log('body', body)
+
+    // TODO: We need to get the prometheus port name/number in the UI
+
+    let serviceMonitorBody = {
+      metadata: {
+        name: `${data.name}-service-monitor`,
+        namespace: data.namespace,
+        labels: serviceMonitor,
+      },
+      spec: {
+        endpoints: [
+          { port: data.port }, // TODO: we don't have this data from the UI yet
+        ],
+        selector: { matchLabels: serviceMonitor },
+      },
+    }
+
+    let alertManagerBody = {
+    }
+
+    console.log('prometheusInstanceBody', body)
+    console.log('serviceMonitorBody', serviceMonitorBody)
+    console.log('alertMonitorBody', alertManagerBody)
     // return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/prometheuses`, body)
+    // return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/servicemonitors`, serviceMonitorBody)
   }
 
   async getPrometheusServiceMonitors (clusterId) {
