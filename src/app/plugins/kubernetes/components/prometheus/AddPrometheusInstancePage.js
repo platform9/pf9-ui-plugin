@@ -1,5 +1,5 @@
 import React from 'react'
-import Checkbox from 'core/components/validatedForm/Checkbox'
+import CheckboxField from 'core/components/validatedForm/CheckboxField'
 import FormWrapper from 'core/components/FormWrapper'
 import KeyValuesField from 'core/components/validatedForm/KeyValuesField'
 import PicklistField from 'core/components/validatedForm/PicklistField'
@@ -71,7 +71,7 @@ class AddPrometheusInstancePage extends React.Component {
                     <TextField id="storage" label="Storage" info="The storage allocation.  Default is 8 GiB" type="number" />
                     <PicklistField id="cluster" options={clusterOptions} onChange={this.handleClusterChange} label="Cluster" info="Clusters available with RoleBing from admin delegation" />
                     {namespaceOptions.length > 0 && <PicklistField id="namespace" options={namespaceOptions} label="Namespace" info="Which namespace to use" />}
-                    {enableStorage && <Checkbox id="enablePersistentStorage" label="Enable persistent storage" />}
+                    {enableStorage && <CheckboxField id="enablePersistentStorage" label="Enable persistent storage" />}
                     <TextField id="retention" label="Storage Retention (days)" info="Defaults to 15 days if nothing is set" type="number" />
                     <KeyValuesField id="serviceMonitor" label="Service Monitor" info="Key/value pairs for service monitor that Prometheus will use" />
                   </ValidatedForm>
