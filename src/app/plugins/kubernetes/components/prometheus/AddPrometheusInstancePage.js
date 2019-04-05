@@ -10,7 +10,7 @@ import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import Wizard from 'core/components/Wizard'
 import WizardStep from 'core/components/WizardStep'
 import uuid from 'uuid'
-import { compose } from 'ramda'
+import { compose, propEq } from 'ramda'
 import { createPrometheusInstance } from './actions'
 import { loadInfrastructure } from '../infrastructure/actions'
 import { projectAs } from 'utils/fp'
@@ -27,6 +27,7 @@ const initialContext = {
 
 class AddPrometheusInstancePage extends React.Component {
   state = {
+    clusterUuid: null,
     rules: [],
   }
 
@@ -41,14 +42,19 @@ class AddPrometheusInstancePage extends React.Component {
     this.setState({ rules: [...this.state.rules, withId] })
   }
 
+  handleClusterChange = clusterUuid => this.setState({ clusterUuid })
+
   handleDeleteRule = id => () => {
     this.setState(state => ({ rules: state.rules.filter(rule => rule.id !== id) }))
   }
 
   render () {
-    const { rules } = this.state
-    const clusters = this.props.data
+    const { clusterUuid, rules } = this.state
+    const { clusters, namespaces } = this.props.context
     const clusterOptions = projectAs({ value: 'uuid', label: 'name' }, clusters)
+    const namespaceOptions = clusterUuid
+      ? namespaces.filter(propEq('clusterId', clusterUuid)).map(x => x.metadata.name)
+      : []
     const enableStorage = false // We are just using ephemeral storage for the first version
     return (
       <FormWrapper title="Add Prometheus Instance">
@@ -57,22 +63,22 @@ class AddPrometheusInstancePage extends React.Component {
             return (
               <React.Fragment>
                 <WizardStep stepId="instance" label="Prometheus Instsance">
-                  {rules.length > 0 && <PrometheusRulesTable rules={this.state.rules} onDelete={this.handleDeleteRule} />}
-                  <PrometheusRuleForm onSubmit={this.handleAddRule} onDelete={this.handleDeleteRule} />
                   <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                     <TextField id="name" label="Name" info="Name of the Prometheus instance" />
                     <TextField id="numInstances" label="# of instances" info="Number of Prometheus instances" type="number" />
                     <TextField id="cpu" label="CPU" info="Expressed in millicores (1m = 1/1000th of a core)" type="number" />
                     <TextField id="memory" label="Memory" info="MiB of memory to allocate" type="number" />
                     <TextField id="storage" label="Storage" info="The storage allocation.  Default is 8 GiB" type="number" />
-                    <PicklistField id="cluster" options={clusterOptions} label="Cluster" info="Clusters available with RoleBing from admin delegation" />
+                    <PicklistField id="cluster" options={clusterOptions} onChange={this.handleClusterChange} label="Cluster" info="Clusters available with RoleBing from admin delegation" />
+                    {namespaceOptions.length > 0 && <PicklistField id="namespace" options={namespaceOptions} label="Namespace" info="Which namespace to use" />}
                     {enableStorage && <Checkbox id="enablePersistentStorage" label="Enable persistent storage" />}
                     <TextField id="retention" label="Storage Retention (days)" info="Defaults to 15 days if nothing is set" type="number" />
                     <KeyValuesField id="serviceMonitor" label="Service Monitor" info="Key/value pairs for service monitor that Prometheus will use" />
                   </ValidatedForm>
                 </WizardStep>
                 <WizardStep stepId="config" label="Configure Alerting">
-                  <PrometheusRuleForm onSubmit={this.handleAddRule} onDelete={this.handleDeleteRule} />
+                  {rules.length > 0 && <PrometheusRulesTable rules={this.state.rules} onDelete={this.handleDeleteRule} />}
+                  <PrometheusRuleForm onSubmit={this.handleAddRule} />
                 </WizardStep>
               </React.Fragment>
             )

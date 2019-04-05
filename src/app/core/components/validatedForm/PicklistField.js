@@ -60,6 +60,7 @@ PicklistField.propTypes = {
   label: PropTypes.string,
   options: PropTypes.arrayOf(optionPropType).isRequired,
   initialValue: PropTypes.string,
+  onChange: PropTypes.func,
 
   /** Create an option of 'None' as the first default choice */
   showNone: PropTypes.bool,

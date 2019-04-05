@@ -377,13 +377,32 @@ class Qbert {
     }
 
     let alertManagerBody = {
+      // TODO: what goes in here
+    }
+
+    let prometheusRulesBody = {
+      metadata: {
+        labels: { /* what goes here */ },
+        name: `${data.name}-prometheus-rules`,
+        namespace: data.namespace,
+      },
+      spec: {
+        groups: [
+          {
+            name: '', // TODO: name of group?
+            rules: data.rules,
+          }
+        ]
+      }
     }
 
     console.log('prometheusInstanceBody', body)
     console.log('serviceMonitorBody', serviceMonitorBody)
     console.log('alertMonitorBody', alertManagerBody)
+    console.log('prometheusRulesBody', prometheusRulesBody)
     // return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/prometheuses`, body)
     // return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/servicemonitors`, serviceMonitorBody)
+    // return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/prometheusrules`, prometheusRulesBody)
   }
 
   async getPrometheusServiceMonitors (clusterId) {
