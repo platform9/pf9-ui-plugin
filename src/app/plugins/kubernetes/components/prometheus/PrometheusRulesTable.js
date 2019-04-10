@@ -9,7 +9,7 @@ const PrometheusRulesTable = ({ rules, onDelete }) => {
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>Name</TableCell>
+            <TableCell>Alert Name</TableCell>
             <TableCell>Rule</TableCell>
             <TableCell>Severity</TableCell>
             <TableCell>Period</TableCell>
@@ -20,8 +20,8 @@ const PrometheusRulesTable = ({ rules, onDelete }) => {
         <TableBody>
           {rules.map(rule => (
             <TableRow key={rule.id}>
-              <TableCell>{rule.name}</TableCell>
-              <TableCell>{rule.rule}</TableCell>
+              <TableCell>{rule.alert}</TableCell>
+              <TableCell>{rule.expr}</TableCell>
               <TableCell>{rule.severity}</TableCell>
               <TableCell>{rule.period}</TableCell>
               <TableCell>{rule.description}</TableCell>

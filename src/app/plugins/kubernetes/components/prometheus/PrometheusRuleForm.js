@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import PicklistField from 'core/components/ValidatedForm/PicklistField'
+import PicklistField from 'core/components/validatedForm/PicklistField'
 import SubmitButton from 'core/components/SubmitButton'
 import TextField from 'core/components/validatedForm/TextField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
@@ -24,11 +24,11 @@ const PrometheusRuleForm = ({ onDelete, onSubmit, classes }) => {
     <Card className={classes.root}>
       <CardContent>
         <Typography variant="h6">Prometheus Rule</Typography>
-        <ValidatedForm initialValues={initialValues} onSubmit={onSubmit}>
-          <TextField id="name" label="Name" info="Name of the rule " />
-          <TextField id="rule" label="Rule" info="Prometheus Rule Expression" />
+        <ValidatedForm initialValues={initialValues} onSubmit={onSubmit} clearOnSubmit>
+          <TextField id="alert" label="Alert Name" info="Name of the alert " />
+          <TextField id="expr" label="Rule" info="Prometheus Rule Expression" />
           <PicklistField id="severity" options={severityOptions} label="Severity" info="Severity of the alert" />
-          <TextField id="period" label="Period" info="How long rule needs to be true before triggering an alert" />
+          <TextField id="period" label="Period" info="How long rule needs to be true before triggering an alert (Ex: 5m)" />
           <TextField id="description" label="Description" info="Optional description for this rule" />
           <SubmitButton>Create</SubmitButton>
         </ValidatedForm>

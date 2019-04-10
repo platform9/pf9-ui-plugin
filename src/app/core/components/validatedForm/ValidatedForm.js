@@ -137,7 +137,7 @@ class ValidatedForm extends React.Component {
 
   handleSubmit = event => {
     const { clearOnSubmit, onSubmit } = this.props
-    const { values, showingErrors } = this.state
+    const { initialValues, values, showingErrors } = this.state
     if (event) {
       event.preventDefault()
     }
@@ -154,7 +154,7 @@ class ValidatedForm extends React.Component {
     }
 
     if (clearOnSubmit) {
-      this.setState({ values: {} })
+      this.setState({ values: initialValues })
     }
   }
 

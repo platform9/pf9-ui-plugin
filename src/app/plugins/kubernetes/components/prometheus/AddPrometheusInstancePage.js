@@ -23,6 +23,7 @@ const initialContext = {
   cpu: 500,
   storage: 8,
   retention: 15,
+  port: 'prometheus',
 }
 
 class AddPrometheusInstancePage extends React.Component {
@@ -33,11 +34,11 @@ class AddPrometheusInstancePage extends React.Component {
 
   handleSubmit = data => {
     const { context, setContext } = this.props
+    data.rules = this.state.rules
     createPrometheusInstance({ data, context, setContext })
   }
 
   handleAddRule = rule => {
-    console.log('handleAddRule', rule)
     const withId = { id: uuid.v4(), ...rule }
     this.setState({ rules: [...this.state.rules, withId] })
   }
@@ -73,6 +74,7 @@ class AddPrometheusInstancePage extends React.Component {
                     {namespaceOptions.length > 0 && <PicklistField id="namespace" options={namespaceOptions} label="Namespace" info="Which namespace to use" />}
                     {enableStorage && <CheckboxField id="enablePersistentStorage" label="Enable persistent storage" />}
                     <TextField id="retention" label="Storage Retention (days)" info="Defaults to 15 days if nothing is set" type="number" />
+                    <TextField id="port" label="Service Monitor Port" info="Port for the service monitor" />
                     <KeyValuesField id="serviceMonitor" label="Service Monitor" info="Key/value pairs for service monitor that Prometheus will use" />
                   </ValidatedForm>
                 </WizardStep>

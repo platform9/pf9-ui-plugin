@@ -1,4 +1,4 @@
-import { hasKeys, keyValueArrToObj } from 'utils/fp'
+import { keyValueArrToObj } from 'utils/fp'
 
 /* eslint-disable camelcase */
 class Qbert {
@@ -330,39 +330,37 @@ class Qbert {
     if (data.memory) { requests.memory = `${data.memory}Mi` }
     if (data.storage) { requests.storage = `${data.storage}Gi` }
 
+    const apiVersion = 'monitoring.coreos.com/v1'
+
     let metadata = {
       name: data.name,
       namespace: data.namespace,
+    }
 
-      // TODO: Do we want to scope this to a namespace?  We don't have a field for that in the mockup.
-      // Another alternative is that we use the value from a namespace chooser.  But that probably means making
-      // the namespace picker be persistent across screens and stored in the session.
+    const serviceMonitor = keyValueArrToObj(data.serviceMonitor)
+    const ruleSelector = {
+      prometheus: data.name,
+      role: 'alert-rules',
     }
 
     let spec = {
       replicas: data.numInstances,
       retention: `${data.retention}d`,
       resources: { requests },
+      serviceMonitorSelector: { matchLabels: serviceMonitor },
+      ruleSelector: { matchLabels: ruleSelector },
     }
 
-    const serviceMonitor = keyValueArrToObj(data.serviceMonitor)
-    if (hasKeys(serviceMonitor)) {
-      spec.serviceMonitorSelector = {
-        matchLabels: serviceMonitor,
-      }
-    }
-
-    let body = { metadata, spec }
+    let prometheusBody = { apiVersion, kind: 'Prometheus', metadata, spec }
 
     // TODO: How do we specifiy "Enable persistent storage" in the API call?  What does this field mean in the
     // context of a Prometheus Instance?  Where will it be stored?  Do we need to specify PVC and StorageClasses?
 
-    console.log('apiClient.qbert#createPrometheusInstance')
-    console.log('body', body)
-
     // TODO: We need to get the prometheus port name/number in the UI
 
     let serviceMonitorBody = {
+      apiVersion,
+      kind: 'ServiceMonitor',
       metadata: {
         name: `${data.name}-service-monitor`,
         namespace: data.namespace,
@@ -376,33 +374,38 @@ class Qbert {
       },
     }
 
+    /*
     let alertManagerBody = {
       // TODO: what goes in here
     }
+    */
 
     let prometheusRulesBody = {
+      apiVersion,
+      kind: 'PrometheusRule',
       metadata: {
-        labels: { /* what goes here */ },
+        labels: ruleSelector,
         name: `${data.name}-prometheus-rules`,
         namespace: data.namespace,
       },
       spec: {
         groups: [
           {
-            name: '', // TODO: name of group?
+            name: `${data.name}-rule-group`,
             rules: data.rules,
           }
         ]
       }
     }
 
-    console.log('prometheusInstanceBody', body)
-    console.log('serviceMonitorBody', serviceMonitorBody)
-    console.log('alertMonitorBody', alertManagerBody)
-    console.log('prometheusRulesBody', prometheusRulesBody)
-    // return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/prometheuses`, body)
-    // return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/servicemonitors`, serviceMonitorBody)
-    // return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/prometheusrules`, prometheusRulesBody)
+    console.log('prometheusInstanceBody', JSON.stringify(prometheusBody, null, 4))
+    console.log('serviceMonitorBody', JSON.stringify(serviceMonitorBody, null, 4))
+    console.log('prometheusRulesBody', JSON.stringify(prometheusRulesBody, null, 4))
+    // console.log('alertMonitorBody', alertManagerBody)
+    this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${data.namespace}/prometheuses`, prometheusBody)
+    this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${data.namespace}/servicemonitors`, serviceMonitorBody)
+    this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${data.namespace}/prometheusrules`, prometheusRulesBody)
+    // return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/alertmanagers`, alertManagerBody)
   }
 
   async getPrometheusServiceMonitors (clusterId) {

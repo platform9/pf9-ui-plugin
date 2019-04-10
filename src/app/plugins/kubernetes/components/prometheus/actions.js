@@ -42,7 +42,6 @@ export const loadPrometheusResources = async ({ context, setContext, reload }) =
 }
 
 export const createPrometheusInstance = async ({ data, context, setContext }) => {
-  console.log('createPrometheusInstance')
   const createdInstance = await context.apiClient.qbert.createPrometheusInstance(data.cluster, data)
-  console.log('createdInstance', createdInstance)
+  console.log('createdPrometheusInstance', createdInstance)
 }

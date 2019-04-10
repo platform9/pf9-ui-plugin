@@ -189,6 +189,7 @@ Kubernetes.registerPlugin = pluginManager => {
     {
       name: 'Infrastructure',
       link: { path: '/infrastructure' },
+      icon: 'building',
       nestedLinks: [
         { name: 'Clusters', link: { path: '/infrastructure#clusters' } },
         { name: 'Nodes', link: { path: '/infrastructure#nodes' } },
@@ -198,6 +199,7 @@ Kubernetes.registerPlugin = pluginManager => {
     {
       name: 'App Catalog',
       link: { path: '/apps' },
+      icon: 'th',
       nestedLinks: [
         { name: 'App Catalog', link: { path: '/apps#appCatalog' } },
         { name: 'Deployed Apps', link: { path: '/apps#deployedApps' } },
@@ -207,18 +209,20 @@ Kubernetes.registerPlugin = pluginManager => {
     {
       name: 'Pods, Deployments, Services',
       link: { path: '/pods' },
+      icon: 'cubes',
       nestedLinks: [
         { name: 'Pods', link: { path: '/pods#pods' } },
         { name: 'Deployments', link: { path: '/pods#deployments' } },
         { name: 'Services', link: { path: '/pods#services' } },
       ]
     },
-    { name: 'Storage Classes', link: { path: '/storage_classes' } },
-    { name: 'Namespaces', link: { path: '/namespaces' } },
-    { name: 'API Access', link: { path: '/api_access' } },
+    { name: 'Storage Classes', icon: 'hdd', link: { path: '/storage_classes' } },
+    { name: 'Namespaces', icon: 'object-group', link: { path: '/namespaces' } },
+    { name: 'API Access', icon: 'key', link: { path: '/api_access' } },
     {
       name: 'Tenants & Users',
       link: { path: '/user_management' },
+      icon: 'user',
       nestedLinks: [
         { name: 'Tenants', link: { path: '/user_management#tenants' } },
         { name: 'Users', link: { path: '/user_management#users' } },
