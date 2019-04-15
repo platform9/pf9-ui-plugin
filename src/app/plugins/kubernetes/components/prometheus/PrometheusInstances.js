@@ -27,7 +27,6 @@ export const options = {
   loaderFn: loadPrometheusResources,
   name: 'PrometheusInstances',
   title: 'Prometheus Instances',
-  debug: true,
 }
 
 const { ListPage, List } = createCRUDComponents(options)

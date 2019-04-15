@@ -11,7 +11,7 @@ import Wizard from 'core/components/Wizard'
 import WizardStep from 'core/components/WizardStep'
 import uuid from 'uuid'
 import { compose, propEq } from 'ramda'
-import { createPrometheusInstance } from './actions'
+import { loadServiceAccounts, createPrometheusInstance } from './actions'
 import { loadInfrastructure } from '../infrastructure/actions'
 import { projectAs } from 'utils/fp'
 import { withAppContext } from 'core/AppContext'
@@ -29,7 +29,9 @@ const initialContext = {
 class AddPrometheusInstancePage extends React.Component {
   state = {
     clusterUuid: null,
+    namespace: null,
     rules: [],
+    serviceAccounts: [],
   }
 
   handleSubmit = data => {
@@ -43,7 +45,12 @@ class AddPrometheusInstancePage extends React.Component {
     this.setState({ rules: [...this.state.rules, withId] })
   }
 
-  handleClusterChange = clusterUuid => this.setState({ clusterUuid })
+  handleClusterChange = async clusterUuid => this.setState({ clusterUuid })
+
+  handleNamespaceChange = async namespace => {
+    const serviceAccounts = await loadServiceAccounts(this.state.clusterUuid, namespace)
+    this.setState({ serviceAccounts, namespace })
+  }
 
   handleDeleteRule = id => () => {
     this.setState(state => ({ rules: state.rules.filter(rule => rule.id !== id) }))
@@ -56,6 +63,7 @@ class AddPrometheusInstancePage extends React.Component {
     const namespaceOptions = clusterUuid
       ? namespaces.filter(propEq('clusterId', clusterUuid)).map(x => x.metadata.name)
       : []
+    const serviceAccountOptions = [] // TODO: TBD
     const enableStorage = false // We are just using ephemeral storage for the first version
     return (
       <FormWrapper title="Add Prometheus Instance">
@@ -69,13 +77,37 @@ class AddPrometheusInstancePage extends React.Component {
                     <TextField id="numInstances" label="# of instances" info="Number of Prometheus instances" type="number" />
                     <TextField id="cpu" label="CPU" info="Expressed in millicores (1m = 1/1000th of a core)" type="number" />
                     <TextField id="memory" label="Memory" info="MiB of memory to allocate" type="number" />
-                    <TextField id="storage" label="Storage" info="The storage allocation.  Default is 8 GiB" type="number" />
-                    <PicklistField id="cluster" options={clusterOptions} onChange={this.handleClusterChange} label="Cluster" info="Clusters available with RoleBing from admin delegation" />
-                    {namespaceOptions.length > 0 && <PicklistField id="namespace" options={namespaceOptions} label="Namespace" info="Which namespace to use" />}
+                    {enableStorage && <TextField id="storage" label="Storage" info="The storage allocation.  Default is 8 GiB" type="number" />}
+
+                    <PicklistField
+                      id="cluster"
+                      options={clusterOptions}
+                      onChange={this.handleClusterChange}
+                      label="Cluster"
+                      info="Clusters available with RoleBing from admin delegation"
+                    />
+
+                    {namespaceOptions.length > 0 &&
+                      <PicklistField
+                        id="namespace"
+                        onChange={this.handleNamespaceChange}
+                        options={namespaceOptions}
+                        label="Namespace"
+                        info="Which namespace to use"
+                      />}
+
+                    {serviceAccountOptions.length > 0 &&
+                      <PicklistField
+                        id="serviceAccount"
+                        options={serviceAccountOptions}
+                        label="Service Account"
+                        info="Which service account to use"
+                      />}
+
                     {enableStorage && <CheckboxField id="enablePersistentStorage" label="Enable persistent storage" />}
                     <TextField id="retention" label="Storage Retention (days)" info="Defaults to 15 days if nothing is set" type="number" />
                     <TextField id="port" label="Service Monitor Port" info="Port for the service monitor" />
-                    <KeyValuesField id="serviceMonitor" label="Service Monitor" info="Key/value pairs for service monitor that Prometheus will use" />
+                    <KeyValuesField id="appLabels" label="App Labels" info="Key/value pairs for app that Prometheus will monitor" />
                   </ValidatedForm>
                 </WizardStep>
                 <WizardStep stepId="config" label="Configure Alerting">

@@ -1,15 +1,17 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { withInfoTooltip } from 'app/core/components/InfoTooltip'
+import { Typography } from '@material-ui/core'
 import { compose } from 'app/utils/fp'
 import KeyValues from 'core/components/KeyValues'
 import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
 
 class KeyValuesField extends React.Component {
   render () {
-    const { id, value, ...restProps } = this.props
+    const { id, value, label, ...restProps } = this.props
     return (
       <div id={id}>
+        <Typography variant="subtitle1">{label}</Typography>
         <KeyValues
           {...restProps}
           entries={value !== undefined ? value : []}

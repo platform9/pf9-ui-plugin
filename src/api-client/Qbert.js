@@ -319,8 +319,12 @@ class Qbert {
     return this.client.basicDelete(`${await this.clusterMonocularBaseUrl(clusterId)}/repos/${repoId}`)
   }
 
+  async getServiceAccounts (clusterId, namespace) {
+    return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/v1/namespaces/${namespace}/serviceaccounts`)
+  }
+
   /* Managed Apps */
-  async getPrometheusInstances (clusterId) {
+  async getPrometheusInstances (clusterId, namespace) {
     return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/prometheuses`)
   }
 
@@ -328,35 +332,39 @@ class Qbert {
     const requests = {}
     if (data.cpu) { requests.cpu = `${data.cpu}m` }
     if (data.memory) { requests.memory = `${data.memory}Mi` }
-    if (data.storage) { requests.storage = `${data.storage}Gi` }
+    // if (data.storage) { requests.storage = `${data.storage}Gi` }
 
     const apiVersion = 'monitoring.coreos.com/v1'
 
-    let metadata = {
-      name: data.name,
-      namespace: data.namespace,
+    const serviceMonitor = {
+      prometheus: data.name,
+      role: 'service-monitor'
     }
 
-    const serviceMonitor = keyValueArrToObj(data.serviceMonitor)
+    const appLabels = keyValueArrToObj(data.appLabels)
     const ruleSelector = {
       prometheus: data.name,
       role: 'alert-rules',
     }
 
-    let spec = {
-      replicas: data.numInstances,
-      retention: `${data.retention}d`,
-      resources: { requests },
-      serviceMonitorSelector: { matchLabels: serviceMonitor },
-      ruleSelector: { matchLabels: ruleSelector },
+    let prometheusBody = {
+      apiVersion,
+      kind: 'Prometheus',
+      metadata: {
+        name: data.name,
+        namespace: data.namespace,
+      },
+      spec: {
+        replicas: data.numInstances,
+        retention: `${data.retention}d`,
+        resources: { requests },
+        serviceMonitorSelector: { matchLabels: serviceMonitor },
+        ruleSelector: { matchLabels: ruleSelector },
+      }
     }
-
-    let prometheusBody = { apiVersion, kind: 'Prometheus', metadata, spec }
 
     // TODO: How do we specifiy "Enable persistent storage" in the API call?  What does this field mean in the
     // context of a Prometheus Instance?  Where will it be stored?  Do we need to specify PVC and StorageClasses?
-
-    // TODO: We need to get the prometheus port name/number in the UI
 
     let serviceMonitorBody = {
       apiVersion,
@@ -370,7 +378,7 @@ class Qbert {
         endpoints: [
           { port: data.port }, // TODO: we don't have this data from the UI yet
         ],
-        selector: { matchLabels: serviceMonitor },
+        selector: { matchLabels: appLabels },
       },
     }
 
@@ -398,14 +406,10 @@ class Qbert {
       }
     }
 
-    console.log('prometheusInstanceBody', JSON.stringify(prometheusBody, null, 4))
-    console.log('serviceMonitorBody', JSON.stringify(serviceMonitorBody, null, 4))
-    console.log('prometheusRulesBody', JSON.stringify(prometheusRulesBody, null, 4))
-    // console.log('alertMonitorBody', alertManagerBody)
     this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${data.namespace}/prometheuses`, prometheusBody)
     this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${data.namespace}/servicemonitors`, serviceMonitorBody)
     this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${data.namespace}/prometheusrules`, prometheusRulesBody)
-    // return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/alertmanagers`, alertManagerBody)
+    // this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/alertmanagers`, alertManagerBody)
   }
 
   async getPrometheusServiceMonitors (clusterId) {
