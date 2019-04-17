@@ -84,7 +84,7 @@ class AddPrometheusInstancePage extends React.Component {
                       options={clusterOptions}
                       onChange={this.handleClusterChange}
                       label="Cluster"
-                      info="Clusters available with RoleBing from admin delegation"
+                      info="Clusters available with RoleBinding from admin delegation"
                     />
 
                     {namespaceOptions.length > 0 &&

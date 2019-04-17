@@ -324,7 +324,7 @@ class Qbert {
   }
 
   /* Managed Apps */
-  async getPrometheusInstances (clusterId, namespace) {
+  async getPrometheusInstances (clusterId) {
     return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/prometheuses`)
   }
 
@@ -376,7 +376,7 @@ class Qbert {
       },
       spec: {
         endpoints: [
-          { port: data.port }, // TODO: we don't have this data from the UI yet
+          { port: data.port },
         ],
         selector: { matchLabels: appLabels },
       },
