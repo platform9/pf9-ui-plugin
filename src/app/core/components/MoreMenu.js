@@ -58,7 +58,7 @@ class MoreMenu extends React.Component {
           onClick={e => e.stopPropagation()}
         >
           {this.props.items.map(({ action, cond, icon, label }) =>
-            <MenuItem key={label} onClick={this.handleClick(action, label)} disabled={!cond(data, context)}>
+            <MenuItem key={label} onClick={this.handleClick(action, label)} disabled={cond && !cond(data, context)}>
               {icon && icon}
               {label}
             </MenuItem>
