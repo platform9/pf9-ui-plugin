@@ -9,6 +9,7 @@ import { ToastProvider } from 'core/providers/ToastProvider'
 import DeveloperToolsEmbed from 'developer/components/DeveloperToolsEmbed'
 import LogoutPage from 'openstack/components/LogoutPage'
 import SessionManager from 'openstack/components/SessionManager'
+import ThemeManager from './ThemeManager'
 import { apply, toPairs } from 'ramda'
 import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom'
 import { pathJoin } from 'utils/misc'
@@ -75,19 +76,21 @@ class App extends React.Component {
             <AppContext initialContext={{ apiClient, initialized: false, sessionLoaded: false }}>
               <ToastProvider>
                 <PreferencesProvider>
-                  <div id="_main-container">
-                    <SessionManager>
-                      <AppContainer
-                        sections={plugins.map(([id, plugin]) => ({
-                          id,
-                          name: plugin.name,
-                          links: plugin.getNavItems()
-                        }))}>
-                        {plugins.map(apply(this.renderPluginRoutes))}
-                        {devEnabled && <DeveloperToolsEmbed />}
-                      </AppContainer>
-                    </SessionManager>
-                  </div>
+                  <ThemeManager>
+                    <div id="_main-container">
+                      <SessionManager>
+                        <AppContainer
+                          sections={plugins.map(([id, plugin]) => ({
+                            id,
+                            name: plugin.name,
+                            links: plugin.getNavItems()
+                          }))}>
+                          {plugins.map(apply(this.renderPluginRoutes))}
+                          {devEnabled && <DeveloperToolsEmbed />}
+                        </AppContainer>
+                      </SessionManager>
+                    </div>
+                  </ThemeManager>
                 </PreferencesProvider>
               </ToastProvider>
             </AppContext>

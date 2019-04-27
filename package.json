@@ -24,6 +24,7 @@
     "ramda": "^0.26.1",
     "react": "^16.6.3",
     "react-codemirror2": "^5.1.0",
+    "react-color": "^2.17.1",
     "react-dom": "^16.6.3",
     "react-intercom": "^1.0.15",
     "react-json-view": "^1.19.1",
