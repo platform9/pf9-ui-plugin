@@ -2,7 +2,7 @@ import React from 'react'
 import { withRouter } from 'react-router'
 import { withAppContext } from 'core/AppContext'
 import { compose } from 'ramda'
-import { loadInfrastructure } from './actions'
+import { loadClusters } from './actions'
 import { withDataLoader } from 'core/DataLoader'
 // This table essentially has the same functionality as the <NodesList>
 // except that it is only the nodes from the a single cluster.
@@ -26,5 +26,5 @@ const ClusterNodes = ({ context, data, match }) => {
 export default compose(
   withRouter,
   withAppContext,
-  withDataLoader({ dataKey: 'clusters', loaderFn: loadInfrastructure }),
+  withDataLoader(loadClusters),
 )(ClusterNodes)

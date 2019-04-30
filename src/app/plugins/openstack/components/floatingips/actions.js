@@ -1,24 +1,22 @@
-export const loadFloatingIps = async ({ context, setContext, reload }) => {
-  if (!reload && context.floatingIps) { return context.floatingIps }
-  const floatingIps = await context.apiClient.neutron.getFloatingIps()
-  setContext({ floatingIps })
-  return floatingIps
-}
+import contextLoader from 'core/helpers/contextLoader'
+import contextUpdater from 'core/helpers/contextUpdater'
 
-export const createFloatingIp = async ({ data, context, setContext }) => {
+export const loadFloatingIps = contextLoader('floatingIps', async ({ context }) => {
+  return context.apiClient.neutron.getFloatingIps()
+})
+
+export const createFloatingIp = contextUpdater('floatingIps', async ({ data, context }) => {
   const existing = await context.apiClient.neutron.getFloatingIps()
   const created = await context.apiClient.neutron.createFloatingIp(data)
-  setContext({ floatingIps: [ ...existing, created ] })
-  return created
-}
+  return [...existing, created]
+}, true)
 
-export const deleteFloatingIp = async ({ id, context, setContext }) => {
+export const deleteFloatingIp = contextUpdater('floatingIps', async ({ id, context }) => {
   await context.apiClient.neutron.deleteFloatingIp(id)
-  const newList = context.floatingIps.filter(x => x.id !== id)
-  setContext({ floatingIps: newList })
-}
+  return context.floatingIps.filter(x => x.id !== id)
+})
 
-export const updateFloatingIp = async ({ data, context, setContext }) => {
+export const updateFloatingIp = contextUpdater('floatingIps', async ({ data, context, setContext }) => {
   console.error('TODO: Update Floating IP not yet implemented')
   /*
   const { id } = data
@@ -27,4 +25,4 @@ export const updateFloatingIp = async ({ data, context, setContext }) => {
   const newList = existing.map(x => x.id === id ? x : updated)
   setContext({ floatingIps: newList })
   */
-}
+})

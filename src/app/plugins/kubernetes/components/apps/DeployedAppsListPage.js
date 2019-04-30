@@ -2,7 +2,7 @@ import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import React from 'react'
 import SimpleLink from 'core/components/SimpleLink'
 import { loadReleases, deleteRelease } from 'k8s/components/apps/actions'
-import { loadInfrastructure } from 'k8s/components/infrastructure/actions'
+import { loadClusters } from 'k8s/components/infrastructure/actions'
 import { withAppContext } from 'core/AppContext'
 import Picklist from 'core/components/Picklist'
 import { compose, pathOr } from 'ramda'
@@ -123,5 +123,5 @@ const { ListPage: DeployedAppsListPage } = createCRUDComponents(options)
 
 export default compose(
   requiresAuthentication,
-  withDataLoader({ dataKey: 'clusters', loaderFn: loadInfrastructure }),
+  withDataLoader(loadClusters),
 )(DeployedAppsListPage)

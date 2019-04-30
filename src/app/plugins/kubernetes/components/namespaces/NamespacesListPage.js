@@ -1,11 +1,11 @@
 import React from 'react'
-import Picklist from 'core/components/Picklist'
-import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { loadInfrastructure } from '../infrastructure/actions'
-import { deleteNamespace } from './actions'
-import { withDataLoader } from 'core/DataLoader'
 import { projectAs } from 'utils/fp'
 import { prop, head } from 'ramda'
+import { loadClusters, loadNamespaces } from 'k8s/components/infrastructure/actions'
+import Picklist from 'core/components/Picklist'
+import { withDataLoader } from 'core/DataLoader'
+import { deleteNamespace } from 'k8s/components/namespaces/actions'
+import createCRUDComponents from 'core/helpers/createCRUDComponents'
 
 const ListPage = ({ ListContainer }) => {
   class ListPage extends React.Component {
@@ -53,11 +53,10 @@ const ListPage = ({ ListContainer }) => {
     }
   }
 
-  return withDataLoader(
-    {
-      dataKey: 'clusters',
-      loaderFn: loadInfrastructure,
-    })(ListPage)
+  return withDataLoader({
+    clusters: loadClusters,
+    namespaces: loadNamespaces,
+  })(ListPage)
 }
 
 export const options = {

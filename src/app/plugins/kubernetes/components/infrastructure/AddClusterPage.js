@@ -14,7 +14,7 @@ import { compose, prop, propEq } from 'ramda'
 import { loadCloudProviders } from './actions'
 import { projectAs } from 'utils/fp'
 import { withAppContext } from 'core/AppContext'
-import { withMultiLoader } from 'core/DataLoader'
+import { withDataLoader } from 'core/DataLoader'
 
 const initialContext = {
   manualDeploy: false,
@@ -248,7 +248,7 @@ class AddClusterPage extends React.Component {
 }
 
 export default compose(
-  withMultiLoader({
+  withDataLoader({
     cloudProviders: loadCloudProviders,
     flavors: createCRUDActions({ service: 'nova', entity: 'flavors' }).list,
     regions: createCRUDActions({ service: 'keystone', entity: 'regions' }).list,

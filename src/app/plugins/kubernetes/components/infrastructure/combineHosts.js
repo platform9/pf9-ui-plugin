@@ -1,5 +1,5 @@
 import { condLiteral, pathOrNull, pipe } from 'app/utils/fp'
-import { __, both, contains, T } from 'ramda'
+import { __, both, includes, T } from 'ramda'
 import { localizeRoles } from 'api-client/ResMgr'
 import moment from 'moment'
 
@@ -20,8 +20,8 @@ const k8sRoles = ['Containervisor']
 
 export const annotateCloudStack = host => {
   const localizedRoles = localizeRoles(host.roles)
-  const isOpenStack = () => localizedRoles.some(contains(__, openstackRoles))
-  const isK8s = () => localizedRoles.some(contains(__, k8sRoles))
+  const isOpenStack = () => localizedRoles.some(includes(__, openstackRoles))
+  const isK8s = () => localizedRoles.some(includes(__, k8sRoles))
   const cloudStack =
     condLiteral(
       [both(isOpenStack, isK8s), 'both'],

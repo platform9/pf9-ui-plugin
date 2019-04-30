@@ -1,19 +1,9 @@
 import { T } from 'ramda'
 import {
-  compose,
-  condLiteral,
-  filterFields,
-  identity,
-  mergeKey,
-  notEmpty,
-  pick,
-  pickMultiple,
-  pipe,
-  pipeWhenTruthy,
-  projectAs,
-  pluck,
-  pluckAsync,
+  compose, condLiteral, filterFields, identity, mergeKey, notEmpty, pick, pickMultiple, pipe,
+  pipeWhenTruthy, projectAs, pluck, pluckAsync,
 } from '../fp'
+import { asyncProps } from 'utils/fp'
 
 describe('functional programming utils', () => {
   it('identity', () => {
@@ -30,6 +20,20 @@ describe('functional programming utils', () => {
     const promise = Promise.resolve({ foo: 'value' })
     const value = await pluckAsync('foo')(promise)
     expect(value).toEqual('value')
+  })
+
+  it('asyncProps', async () => {
+    const promises = {
+      a: Promise.resolve('A value'),
+      b: Promise.resolve('B value'),
+      c: Promise.resolve('C value'),
+    }
+    const result = await asyncProps(promises)
+    expect(result).toEqual({
+      a: 'A value',
+      b: 'B value',
+      c: 'C value',
+    })
   })
 
   it('compose', () => {

@@ -6,7 +6,7 @@ import { loadVolumeTypes } from './actions'
 import VolumeTypesListContainer from './VolumeTypesListContainer'
 
 const VolumesListPage = () =>
-  <DataLoader dataKey="volumeTypes" loaderFn={loadVolumeTypes}>
+  <DataLoader dataKey="volumeTypes" loaders={loadVolumeTypes}>
     {({ data }) => <VolumeTypesListContainer volumeTypes={data} />}
   </DataLoader>
 

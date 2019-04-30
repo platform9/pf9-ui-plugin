@@ -6,7 +6,7 @@ import { loadVolumes } from './actions'
 import VolumesListContainer from './VolumesListContainer'
 
 const VolumesListPage = () =>
-  <DataLoader dataKey="volumes" loaderFn={loadVolumes}>
+  <DataLoader dataKey="volumes" loaders={loadVolumes}>
     {({ data }) => <VolumesListContainer volumes={data} />}
   </DataLoader>
 

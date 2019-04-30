@@ -8,7 +8,6 @@ import UpdateVolumeForm from './UpdateVolumeForm'
 
 const UpdateVolumePage = props => (
   <DataUpdater
-    dataKey="volumes"
     loaderFn={loadVolumes}
     updateFn={updateVolume}
     objId={props.match.params.volumeId}

@@ -8,7 +8,6 @@ import UpdateImageForm from './UpdateImageForm'
 
 const UpdateImagePage = props => (
   <DataUpdater
-    dataKey="images"
     loaderFn={loadImages}
     updateFn={updateImage}
     objId={props.match.params.imageId}

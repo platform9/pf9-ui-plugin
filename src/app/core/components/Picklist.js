@@ -54,6 +54,9 @@ class Picklist extends React.Component {
           variant={filled ? 'filled' : 'standard'}
           label={label}
           value={nonEmptyValue}
+          SelectProps={{
+            displayEmpty: true
+          }}
           onChange={this.handleChange}
           inputProps={{ name: label, id: name }}
         >

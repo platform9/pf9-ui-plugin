@@ -1,9 +1,8 @@
-export const loadImages = async ({ setContext, context, reload }) => {
-  if (!reload && context.images) { return context.images }
-  const images = await context.apiClient.glance.getImages()
-  setContext({ images })
-  return images
-}
+import contextLoader from 'core/helpers/contextLoader'
+
+export const loadImages = contextLoader('images', async ({ context }) => {
+  return context.apiClient.glance.getImages()
+})
 
 export const updateImage = async (data, helpers) => {
   const { context, dataKey, objId } = helpers

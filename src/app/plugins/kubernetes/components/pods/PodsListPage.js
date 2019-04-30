@@ -1,22 +1,22 @@
 import React from 'react'
-import Picklist from 'core/components/Picklist'
-import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { loadInfrastructure } from '../infrastructure/actions'
-import { loadPods, deletePod } from './actions'
-import { withMultiLoader } from 'core/DataLoader'
 import { projectAs } from 'utils/fp'
 import { head, prop } from 'ramda'
+import { loadClusters } from 'k8s/components/infrastructure/actions'
+import createCRUDComponents from 'core/helpers/createCRUDComponents'
+import { deletePod, loadPods } from 'k8s/components/pods/actions'
+import { withDataLoader } from 'core/DataLoader'
+import Picklist from 'core/components/Picklist'
 
 const ListPage = ({ ListContainer }) => {
   class ListPage extends React.Component {
     state = {
-      activeCluster: null
+      activeCluster: null,
     }
 
     handleChangeCluster = clusterId => {
       this.setState({ activeCluster: clusterId },
         () => {
-          this.props.reload('pods', { clusterId })
+          this.props.reloadData(loadPods, { clusterId })
         })
     }
 
@@ -43,8 +43,8 @@ const ListPage = ({ ListContainer }) => {
               [
                 // TODO: Figure out a way to query for all clusters
                 // { name: 'all', uuid: '__all__' },
-                ...clusters.filter(
-                  cluster => cluster.hasMasterNode)],
+                ...clusters.filter(cluster => cluster.hasMasterNode),
+              ],
             )}
             value={activeCluster || prop('uuid', head(clusters))}
             onChange={this.handleChangeCluster}
@@ -56,14 +56,7 @@ const ListPage = ({ ListContainer }) => {
     }
   }
 
-  return withMultiLoader(
-    {
-      clusters: loadInfrastructure,
-      pods: {
-        requires: 'clusters',
-        loaderFn: loadPods,
-      },
-    })(ListPage)
+  return withDataLoader([loadClusters, loadPods])(ListPage)
 }
 
 export const options = {

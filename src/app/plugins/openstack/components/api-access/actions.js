@@ -1,30 +1,31 @@
 /* eslint-disable key-spacing */
 // which endpoint to use for each service (internal, public, admin)
+import contextLoader from 'core/helpers/contextLoader'
+
 const serviceMappings = {
-  aodh:       'internal',
-  azmanager:  'admin',
+  aodh: 'internal',
+  azmanager: 'admin',
   ceilometer: 'internal',
-  cinder:     'internal',
-  credsmgr:   'admin',
-  glance:     'admin',
-  gnocchi:    'internal',
-  ironic:     'public',
-  mors:       'internal',
-  murano:     'internal',
-  neutron:    'internal',
-  nova:       'internal',
-  panko:      'internal',
-  qbert:      'internal',
-  resmgr:     'internal',
-  tasker:     'admin',
+  cinder: 'internal',
+  credsmgr: 'admin',
+  glance: 'admin',
+  gnocchi: 'internal',
+  ironic: 'public',
+  mors: 'internal',
+  murano: 'internal',
+  neutron: 'internal',
+  nova: 'internal',
+  panko: 'internal',
+  qbert: 'internal',
+  resmgr: 'internal',
+  tasker: 'admin',
 }
 
 const whichInterface = serviceName => serviceMappings[serviceName] || 'internal'
 
-export const loadServiceCatalog = async ({ context, setContext, reload }) => {
-  if (!reload && context.serviceCatalog) { return context.serviceCatalog }
+export const loadServiceCatalog = contextLoader('serviceCatalog', async ({ context }) => {
   const services = await context.apiClient.keystone.getServicesForActiveRegion()
-  const serviceCatalog = Object.keys(services).map(x => {
+  return Object.keys(services).map(x => {
     const service = services[x]
     const iface = whichInterface(service)
     const endpoint = (service && service[iface]) || service[Object.keys(service)[0]]
@@ -36,6 +37,4 @@ export const loadServiceCatalog = async ({ context, setContext, reload }) => {
       iface: endpoint.iface,
     }
   })
-  setContext({ serviceCatalog })
-  return serviceCatalog
-}
+})

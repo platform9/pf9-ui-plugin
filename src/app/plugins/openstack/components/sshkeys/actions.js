@@ -1,25 +1,22 @@
 import uuid from 'uuid'
+import contextLoader from 'core/helpers/contextLoader'
+import contextUpdater from 'core/helpers/contextUpdater'
 
 const dataKey = 'sshKeys'
 
 const injectIds = x => ({ ...x, id: x.id || uuid.v4() })
 
-export const loadSshKeys = async ({ context, setContext, reload }) => {
-  if (!reload && context[dataKey]) { return context[dataKey] }
-  const existing = (await context.apiClient.nova.getSshKeys()).map(injectIds)
-  setContext({ [dataKey]: existing })
-  return existing
-}
+export const loadSshKeys = contextLoader(dataKey, async ({ context }) => {
+  return (await context.apiClient.nova.getSshKeys()).map(injectIds)
+})
 
-export const createSshKey = async ({ data, context, setContext }) => {
+export const createSshKey = contextUpdater(dataKey, async ({ data, context, setContext }) => {
   const existing = await loadSshKeys({ context, setContext })
   const created = await context.apiClient.nova.createSshKey(data)
-  setContext({ [dataKey]: [ ...existing, created ] })
-  return created
-}
+  return [ ...existing, created ]
+}, true)
 
-export const deleteSshKey = async ({ id, context, setContext }) => {
+export const deleteSshKey = contextUpdater(dataKey, async ({ id, context }) => {
   await context.apiClient.nova.deleteSshKey(id)
-  const newList = context[dataKey].filter(x => x.id !== id)
-  setContext({ [dataKey]: newList })
-}
+  return context[dataKey].filter(x => x.id !== id)
+})

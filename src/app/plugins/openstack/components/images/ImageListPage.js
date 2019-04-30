@@ -6,7 +6,7 @@ import { loadImages } from './actions'
 import ImageListContainer from './ImageListContainer'
 
 const ImageListPage = () =>
-  <DataLoader dataKey="images" loaderFn={loadImages}>
+  <DataLoader dataKey="images" loaders={loadImages}>
     {({ data }) => <ImageListContainer images={data} />}
   </DataLoader>
 

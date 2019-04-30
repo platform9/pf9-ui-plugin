@@ -2,9 +2,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import MultiSelect from 'core/components/MultiSelect'
 import { allPass, compose } from 'ramda'
-import { loadInfrastructure } from './actions'
 import { withDataLoader } from 'core/DataLoader'
 import { withInfoTooltip } from 'core/components/InfoTooltip'
+import { loadCombinedHosts } from 'k8s/components/infrastructure/actions'
 
 class NodesChooser extends React.Component {
   state = {
@@ -52,6 +52,6 @@ NodesChooser.propTypes = {
 }
 
 export default compose(
-  withDataLoader({ dataKey: 'combinedHosts', loaderFn: loadInfrastructure }),
+  withDataLoader(loadCombinedHosts),
   withInfoTooltip,
 )(NodesChooser)

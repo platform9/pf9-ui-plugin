@@ -118,7 +118,7 @@ const createCRUDComponents = options => {
 
   // ListPage
   const StandardListPage = () => (
-    <DataLoader dataKey={dataKey} loaderFn={loaderFn || crudActions.list}>
+    <DataLoader dataKey={dataKey} loaders={loaderFn || crudActions.list}>
       {({ data }) =>
         <React.Fragment>
           <ListContainer data={data} />

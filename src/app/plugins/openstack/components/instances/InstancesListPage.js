@@ -10,7 +10,7 @@ const loadInstances = async ({ setContext, context }) => {
 }
 
 const InstancesListPage = () =>
-  <DataLoader dataKey="instances" loaderFn={loadInstances}>
+  <DataLoader loaders={loadInstances}>
     {({ data }) => <InstancesListContainer instances={data} />}
   </DataLoader>
 

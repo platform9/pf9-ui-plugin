@@ -24,7 +24,7 @@ const ListTable = createListTableComponent({
 
 const ApiAccessPage = () => {
   return (
-    <DataLoader dataKey="serviceCatalog" loaderFn={loadServiceCatalog}>
+    <DataLoader loaders={loadServiceCatalog}>
       {({ data }) => <ListTable data={data} />}
     </DataLoader>
   )

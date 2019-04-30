@@ -4,7 +4,7 @@ import UsageWidget from 'core/components/dashboardGraphs/UsageWidget'
 import clusterUsageStats from './clusterUsageStats'
 import { Grid } from '@material-ui/core'
 import { compose } from 'ramda'
-import { loadInfrastructure } from './actions'
+import { loadClusters } from './actions'
 import { withAppContext } from 'core/AppContext'
 import { withDataLoader } from 'core/DataLoader'
 import { withRouter } from 'react-router'
@@ -67,5 +67,5 @@ export default compose(
   withStyles(styles),
   withRouter,
   withAppContext,
-  withDataLoader({ dataKey: 'clusters', loaderFn: loadInfrastructure }),
+  withDataLoader(loadClusters),
 )(ClusterInfo)

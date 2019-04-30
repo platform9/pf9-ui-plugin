@@ -1,45 +1,36 @@
 import { flatten, prop, propEq } from 'ramda'
 import { withCluster } from 'core/helpers/withCluster'
+import contextLoader from 'core/helpers/contextLoader'
 
-const loadClusterApps = context => async cluster => {
+const getClusterApps = context => async cluster => {
   return context.apiClient.qbert.getCharts(cluster.uuid).then(prop('data'))
 }
 
-export const loadApps = withCluster(async ({ data, context, setContext, params: { clusterId } }) => {
-  const clusters = (context.clusters || []).filter(x => x.hasMasterNode)
-  const loadClusterAppsFromContext = loadClusterApps(context)
-  const apps = clusterId === '__all__'
-    ? await Promise.all(clusters.map(loadClusterAppsFromContext)).then(flatten)
-    : await loadClusterAppsFromContext(clusters.find(propEq('uuid', clusterId)))
+export const loadApps = contextLoader('apps', withCluster(async ({ context, clusters, params: { clusterId } }) => {
+  const loadClusterAppsFromContext = getClusterApps(context)
+  return clusterId === '__all__'
+    ? Promise.all(clusters.map(loadClusterAppsFromContext)).then(flatten)
+    : loadClusterAppsFromContext(clusters.find(propEq('uuid', clusterId)))
+}))
 
-  setContext({ apps })
-  return apps
-})
-
-const loadClusterReleases = context => async cluster => {
+const getClusterReleases = context => async cluster => {
   return context.apiClient.qbert.getReleases(cluster.uuid).then(prop('data'))
 }
 
-export const loadReleases = withCluster(async ({ data, context, setContext, params: { clusterId } }) => {
-  const clusters = (context.clusters || []).filter(x => x.hasMasterNode)
-  const loadClusterReleasesFromContext = loadClusterReleases(context)
-  const releases = clusterId === '__all__'
-    ? await Promise.all(clusters.map(loadClusterReleasesFromContext)).then(flatten)
-    : await loadClusterReleasesFromContext(clusters.find(propEq('uuid', clusterId)))
+export const loadReleases = contextLoader('releases', withCluster(async ({ context, clusters, params: { clusterId } }) => {
+  const loadClusterReleasesFromContext = getClusterReleases(context)
+  return clusterId === '__all__'
+    ? Promise.all(clusters.map(loadClusterReleasesFromContext)).then(flatten)
+    : loadClusterReleasesFromContext(clusters.find(propEq('uuid', clusterId)))
+}))
 
-  setContext({ releases })
-  return releases
-})
-
-export const deleteRelease = async ({ data, context, setContext, params, reload }) => {
+export const deleteRelease = async ({ data, context, setContext, reload }) => {
   // TODO
 }
 
-export const loadRepositories = async ({ data, context, setContext, params }) => {
-  const repositories = await context.apiClient.qbert.getRepositories().then(prop('data'))
-  setContext({ repositories })
-  return repositories
-}
+export const loadRepositories = contextLoader('repositories', async ({ context }) => {
+  return context.apiClient.qbert.getRepositories().then(prop('data'))
+})
 
 export const deleteRepository = async ({ data, context, setContext, params, reload }) => {
   // TODO

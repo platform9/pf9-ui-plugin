@@ -3,10 +3,10 @@ import Picklist from 'core/components/Picklist'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { deleteService } from './actions'
 import { projectAs } from 'utils/fp'
-import { withMultiLoader } from 'core/DataLoader'
-import { loadInfrastructure } from 'k8s/components/infrastructure/actions'
 import { loadServices } from 'k8s/components/pods/actions'
 import { prop, head } from 'ramda'
+import { loadClusters } from 'k8s/components/infrastructure/actions'
+import { withDataLoader } from 'core/DataLoader'
 
 const ListPage = ({ ListContainer }) => {
   class ListPage extends React.Component {
@@ -17,7 +17,7 @@ const ListPage = ({ ListContainer }) => {
     handleChangeCluster = clusterId => {
       this.setState({ activeCluster: clusterId },
         () => {
-          this.props.reload('services', { clusterId })
+          this.props.reloadData(loadServices, { clusterId })
         })
     }
 
@@ -58,14 +58,9 @@ const ListPage = ({ ListContainer }) => {
     }
   }
 
-  return withMultiLoader(
-    {
-      clusters: loadInfrastructure,
-      services: {
-        requires: 'clusters',
-        loaderFn: loadServices,
-      },
-    })(ListPage)
+  return withDataLoader(
+    [loadClusters, loadServices],
+  )(ListPage)
 }
 
 export const options = {

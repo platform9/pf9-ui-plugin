@@ -1,14 +1,14 @@
-export const createNamespace = async ({ data, context, setContext }) => {
+import contextUpdater from 'core/helpers/contextUpdater'
+
+export const createNamespace = contextUpdater('namespaces', async ({ data, context }) => {
   const { clusterId, name } = data
   const body = { metadata: { name } }
   const created = await context.apiClient.qbert.createNamespace(clusterId, body)
-  setContext({ namespaces: [ ...context.namespaces, created ] })
-  return created
-}
+  return [...context.namespaces, created]
+}, true)
 
-export const deleteNamespace = async ({ id, context, setContext }) => {
+export const deleteNamespace = contextUpdater('namespaces', async ({ id, context }) => {
   const { clusterId, name } = await context.namespaces.find(x => x.id === id)
   await context.apiClient.qbert.deleteNamespace(clusterId, name)
-  const newList = context.namespaces.filter(x => x.id !== id)
-  setContext({ namespaces: newList })
-}
+  return context.namespaces.filter(x => x.id !== id)
+})

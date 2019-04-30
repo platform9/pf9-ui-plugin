@@ -8,7 +8,6 @@ import UpdateVolumeSnapshotForm from './UpdateVolumeSnapshotForm'
 
 const UpdateVolumeSnapshotPage = props => (
   <DataUpdater
-    dataKey="volumeSnapshots"
     loaderFn={loadVolumeSnapshots}
     updateFn={updateVolumeSnapshot}
     objId={props.match.params.volumeSnapshotId}

@@ -1,4 +1,4 @@
-import { curry, pathOr, remove } from 'ramda'
+import { curry, fromPairs, mapObjIndexed, pathOr, remove } from 'ramda'
 import moize from 'moize'
 
 // functional programming helpers
@@ -37,7 +37,7 @@ export const projectAs = curry((mappings, arr) => arr.map(obj => Object.keys(map
     }
     return accum
   },
-  {}
+  {},
 )))
 
 // Transparently inject side-effects in a functional composition "chain".
@@ -62,7 +62,7 @@ export const pickMultiple = (...keys) => obj =>
 export const filterFields = (...keys) => obj =>
   Object.keys(obj).reduce(
     (accum, key) => (keys.includes(key) ? accum : mergeKey(obj, accum, key)),
-    {}
+    {},
   )
 
 // Lens-style setter useful for setState operations
@@ -108,8 +108,10 @@ export const keyValueArrToObj = (arr = []) =>
     return accum
   }, {})
 
-// Wait for each iteration to complete before continuing to the next (serial)
-export const asyncMap = async (arr, callback) => {
+export const asyncMap = async (arr, callback, parallel = false) => {
+  if (parallel) {
+    return Promise.all(arr.map((val, i) => callback(val, i, arr)))
+  }
   let newArr = []
   for (let i = 0; i < arr.length; i++) {
     newArr.push(await callback(arr[i], i, arr))
@@ -129,6 +131,23 @@ export const asyncFlatMap = async (arr, callback) => {
     }
   }
   return newArr
+}
+
+// Like Promise.all but for object properties instead of iterated values
+// Example:
+// asyncProps({
+//   foo: getFoo(),
+//   boo: getBoo(),
+// }).then(results => {
+//   console.log(results.foo, results.boo);
+// });
+export const asyncProps = async objPromises => {
+  const promises = Object.values(mapObjIndexed(async (promise, key) => {
+    return [key, await promise]
+  }, objPromises))
+  const results = await Promise.all(promises)
+
+  return fromPairs(results)
 }
 
 export const pathOrNull = curry((pathStr, obj) => pathOr(null, pathStr.split('.'), obj))
@@ -158,8 +177,8 @@ export const arrToObjByKey = curry((key, arr) =>
       accum[item[key]] = item
       return accum
     },
-    {}
-  )
+    {},
+  ),
 )
 
 export const ensureArray = maybeArr =>
@@ -179,7 +198,7 @@ export const maybeFnOrNull = fn => value => value ? fn(value) : null
 // If none match, then undefined is returned.
 // (...[predicateFn, literal]) -> value -> literal
 export const condLiteral = (...conds) => value => {
-  for (let i=0; i<conds.length; i++) {
+  for (let i = 0; i < conds.length; i++) {
     const [pred, literal] = conds[i]
     if (pred(value)) { return literal }
   }

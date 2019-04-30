@@ -1,23 +1,21 @@
-export const loadUsers = async ({ context, setContext, reload }) => {
-  if (!reload && context.users) { return context.users }
-  const users = await context.apiClient.keystone.getUsers()
-  setContext({ users })
-  return users
-}
+import contextLoader from 'core/helpers/contextLoader'
+import contextUpdater from 'core/helpers/contextUpdater'
 
-export const createUser = async ({ data, context, setContext }) => {
+export const loadUsers = contextLoader('users', async ({ context }) => {
+  return context.apiClient.keystone.getUsers()
+})
+
+export const createUser = contextUpdater('users', async ({ data, context }) => {
   const created = await context.apiClient.keystone.createUser(data)
   const existing = await context.apiClient.keystone.getUsers()
-  setContext({ users: [ ...existing, created ] })
-  return created
-}
+  return [ ...existing, created ]
+}, true)
 
-export const deleteUser = async ({ id, context, setContext }) => {
+export const deleteUser = contextUpdater('users', async ({ id, context }) => {
   await context.apiClient.keystone.deleteUser(id)
-  const newList = context.users.filter(x => x.id !== id)
-  setContext({ users: newList })
-}
+  return context.users.filter(x => x.id !== id)
+})
 
 export const updateUser = () => {
-  console.log('TODO')
+  // TODO
 }

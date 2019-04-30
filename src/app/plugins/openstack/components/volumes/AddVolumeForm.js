@@ -66,7 +66,7 @@ class AddVolumeForm extends React.Component {
                 <Picklist name="sourceType" label="Volume Source" value={sourceType} onChange={this.setField('sourceType')} options={sourceTypes} />
                 {sourceType === 'Snapshot' &&
                   <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
-                    <DataLoader dataKey="volumeSnapshots" loaderFn={loadVolumeSnapshots}>
+                    <DataLoader dataKey="volumeSnapshots" loaders={loadVolumeSnapshots}>
                       {({ data }) =>
                         <VolumeSnapshotChooser data={data} onChange={value => setWizardContext({ snapshot_id: value })} initialValue={wizardContext.snapshot_id} />
                       }
@@ -75,7 +75,7 @@ class AddVolumeForm extends React.Component {
                 }
                 {sourceType === 'Another Volume' &&
                   <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
-                    <DataLoader dataKey="volumes" loaderFn={loadVolumes}>
+                    <DataLoader dataKey="volumes" loaders={loadVolumes}>
                       {({ data }) =>
                         <VolumeChooser data={data} onChange={value => setWizardContext({ volume_id: value })} initialValue={wizardContext.volume_id} />
                       }
@@ -84,7 +84,7 @@ class AddVolumeForm extends React.Component {
                 }
                 {sourceType === 'Image' &&
                   <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
-                    <DataLoader dataKey="images" loaderFn={loadImages}>
+                    <DataLoader dataKey="images" loaders={loadImages}>
                       {({ data }) =>
                         <ImageChooser data={data} onChange={value => setWizardContext({ imageRef: value })} initialValue={wizardContext.imageRef} />
                       }
@@ -94,7 +94,7 @@ class AddVolumeForm extends React.Component {
               </WizardStep>
 
               <WizardStep stepId="basic" label="Basic">
-                <DataLoader dataKey="volumeTypes" loaderFn={loadVolumeTypes}>
+                <DataLoader dataKey="volumeTypes" loaders={loadVolumeTypes}>
                   {({ data }) =>
                     <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                       <TextField id="name" label="Volume Name" onChange={this.setField('name')} />

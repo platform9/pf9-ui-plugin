@@ -11,7 +11,7 @@ const loadHosts = async ({ setContext, context }) => {
 }
 
 const HostsListPage = () =>
-  <DataLoader dataKey="hosts" loaderFn={loadHosts}>
+  <DataLoader dataKey="hosts" loaders={loadHosts}>
     {({ data }) => <HostsListContainer hosts={data} />}
   </DataLoader>
 

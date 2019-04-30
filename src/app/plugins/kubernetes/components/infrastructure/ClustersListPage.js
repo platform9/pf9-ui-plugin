@@ -9,7 +9,7 @@ import AttachIcon from '@material-ui/icons/AddToQueue'
 import DetachIcon from '@material-ui/icons/RemoveFromQueue'
 import ScaleIcon from '@material-ui/icons/TrendingUp'
 import UpgradeIcon from '@material-ui/icons/PresentToAll'
-import { deleteCluster, loadInfrastructure } from './actions'
+import { deleteCluster, loadClusters } from './actions'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import ClusterAttachNodeDialog from './ClusterAttachNodeDialog'
 import ClusterDetachNodeDialog from './ClusterDetachNodeDialog'
@@ -77,7 +77,7 @@ export const options = {
   ],
   dataKey: 'clusters',
   editUrl: '/ui/kubernetes/infrastructure/clusters/edit',
-  loaderFn: loadInfrastructure,
+  loaderFn: loadClusters,
   deleteFn: deleteCluster,
   name: 'Clusters',
   title: 'Clusters',

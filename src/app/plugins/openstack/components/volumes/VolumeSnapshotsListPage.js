@@ -6,7 +6,7 @@ import { loadVolumeSnapshots } from './actions'
 import VolumeSnapshotsListContainer from './VolumeSnapshotsListContainer'
 
 const VolumeSnapshotsListPage = () =>
-  <DataLoader dataKey="volumeSnapshots" loaderFn={loadVolumeSnapshots}>
+  <DataLoader dataKey="volumeSnapshots" loaders={loadVolumeSnapshots}>
     {({ data }) => <VolumeSnapshotsListContainer volumeSnapshots={data} />}
   </DataLoader>
 

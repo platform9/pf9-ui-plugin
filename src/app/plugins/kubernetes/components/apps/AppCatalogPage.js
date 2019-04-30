@@ -1,6 +1,5 @@
-import { withMultiLoader } from 'core/DataLoader'
 import { loadApps } from 'k8s/components/apps/actions'
-import { loadInfrastructure } from 'k8s/components/infrastructure/actions'
+import { loadClusters } from 'k8s/components/infrastructure/actions'
 import requiresAuthentication from 'openstack/util/requiresAuthentication'
 import { compose } from 'ramda'
 import React from 'react'
@@ -8,6 +7,7 @@ import { projectAs } from 'utils/fp'
 import CardTable from 'core/components/cardTable/CardTable'
 import ApplicationCard from 'core/components/appCatalog/AppCard'
 import moment from 'moment'
+import { withDataLoader } from 'core/DataLoader'
 
 class AppCatalogPage extends React.Component {
   sortingConfig = [
@@ -29,13 +29,13 @@ class AppCatalogPage extends React.Component {
       type: 'select',
       label: 'Cluster',
       onChange: async clusterId => {
-        this.props.reload('apps', { clusterId })
+        this.props.reloadData(loadApps, { clusterId })
       },
       items: projectAs(
         { label: 'name', value: 'uuid' },
         [
           { name: 'all', uuid: '__all__' },
-          ...(this.props.context.clusters || []).filter(cluster => cluster.hasMasterNode),
+          ...this.props.context.clusters.filter(cluster => cluster.hasMasterNode),
         ],
       ),
     },
@@ -62,12 +62,8 @@ class AppCatalogPage extends React.Component {
 
 export default compose(
   requiresAuthentication,
-  withMultiLoader(
-    {
-      clusters: loadInfrastructure,
-      apps: {
-        requires: 'clusters',
-        loaderFn: loadApps,
-      },
-    }),
+  withDataLoader([
+    loadClusters,
+    loadApps,
+  ]),
 )(AppCatalogPage)

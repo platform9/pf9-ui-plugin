@@ -4,7 +4,7 @@ import PicklistField from 'core/components/validatedForm/PicklistField'
 import SubmitButton from 'core/components/SubmitButton'
 import createAddComponents from 'core/helpers/createAddComponents'
 import { projectAs } from 'utils/fp'
-import { loadInfrastructure } from '../infrastructure/actions'
+import { loadClusters } from '../infrastructure/actions'
 import { loadDeployments, createDeployment } from './actions'
 import { withDataLoader } from 'core/DataLoader'
 import CodeMirror from 'core/components/validatedForm/CodeMirror'
@@ -66,5 +66,5 @@ export const options = {
 const { AddPage } = createAddComponents(options)
 
 export default compose(
-  withDataLoader({ dataKey: 'clusters', loaderFn: loadInfrastructure }),
+  withDataLoader(loadClusters),
 )(AddPage)
