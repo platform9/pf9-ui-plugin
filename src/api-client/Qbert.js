@@ -325,6 +325,7 @@ class Qbert {
 
   /* Managed Apps */
   async getPrometheusInstances (clusterId) {
+    console.log('Getting prometheus instances for ', clusterId)
     return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/prometheuses`)
   }
 
@@ -418,6 +419,10 @@ class Qbert {
 
   async getPrometheusRules (clusterId) {
     return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/prometheusrules`)
+  }
+
+  async getPrometheusAlertManagers (clusterId) {
+    return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/alertmanagers`)
   }
 }
 
