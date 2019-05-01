@@ -12,10 +12,10 @@ import WizardStep from 'core/components/WizardStep'
 import uuid from 'uuid'
 import { compose, propEq } from 'ramda'
 import { loadServiceAccounts, createPrometheusInstance } from './actions'
-import { loadInfrastructure } from '../infrastructure/actions'
 import { projectAs } from 'utils/fp'
 import { withAppContext } from 'core/AppContext'
 import { withDataLoader } from 'core/DataLoader'
+import { loadClusters } from 'k8s/components/infrastructure/actions'
 
 const initialContext = {
   numInstances: 1,
@@ -124,6 +124,6 @@ class AddPrometheusInstancePage extends React.Component {
 }
 
 export default compose(
-  withDataLoader({ dataKey: 'clusters', loaderFn: loadInfrastructure }),
+  withDataLoader(loadClusters),
   withAppContext,
 )(AddPrometheusInstancePage)

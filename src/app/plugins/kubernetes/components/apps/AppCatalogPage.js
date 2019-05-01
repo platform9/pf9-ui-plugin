@@ -10,6 +10,8 @@ import moment from 'moment'
 import { withDataLoader } from 'core/DataLoader'
 
 class AppCatalogPage extends React.Component {
+  state = { clusterId: '__all__' }
+
   sortingConfig = [
     {
       field: 'attributes.name',
@@ -29,6 +31,7 @@ class AppCatalogPage extends React.Component {
       type: 'select',
       label: 'Cluster',
       onChange: async clusterId => {
+        this.setState({ clusterId })
         this.props.reloadData(loadApps, { clusterId })
       },
       items: projectAs(
@@ -43,12 +46,13 @@ class AppCatalogPage extends React.Component {
 
   render () {
     const {
-      context: { apps = [] },
+      context: { apps = {} },
     } = this.props
+    const { clusterId } = this.state
     return (
       <div className="applications">
         <CardTable
-          data={apps}
+          data={apps[clusterId]}
           sorting={this.sortingConfig}
           filters={this.filtersConfig()}
           searchTarget="attributes.name"

@@ -6,7 +6,9 @@ const getClusterApps = context => async cluster => {
   return context.apiClient.qbert.getCharts(cluster.uuid).then(prop('data'))
 }
 
-export const loadApps = contextLoader('apps', withCluster(async ({ context, clusters, params: { clusterId } }) => {
+export const loadApps = contextLoader(({ clusterId }) => {
+  return ['apps', clusterId || '__all__']
+}, withCluster(async ({ context, clusters, params: { clusterId } }) => {
   const loadClusterAppsFromContext = getClusterApps(context)
   return clusterId === '__all__'
     ? Promise.all(clusters.map(loadClusterAppsFromContext)).then(flatten)
