@@ -62,7 +62,7 @@ class ClusterDetachNodeDialog extends React.Component {
   render () {
     const { data, row } = this.props
     const { name } = row
-    const attachedNodes = data.filter(node => node.clusterUuid === row.uuid)
+    const attachedNodes = data.nodes.filter(node => node.clusterUuid === row.uuid)
     return (
       <Dialog open onClose={this.handleClose} onClick={stopPropagation}>
         <DialogTitle>Detach node from cluster ({name})</DialogTitle>
@@ -107,6 +107,6 @@ class ClusterDetachNodeDialog extends React.Component {
 }
 
 export default compose(
-  withDataLoader(loadNodes),
+  withDataLoader({ nodes: loadNodes }),
   withAppContext,
 )(ClusterDetachNodeDialog)

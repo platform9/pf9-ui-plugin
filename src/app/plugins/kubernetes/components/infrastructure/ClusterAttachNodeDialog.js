@@ -63,8 +63,8 @@ class ClusterAttachNodeDialog extends React.Component {
   }
 
   render () {
-    const { data } = this.props
-    const freeNodes = data.filter(x => !x.clusterUuid)
+    const { data: { nodes } } = this.props
+    const freeNodes = nodes.filter(x => !x.clusterUuid)
     return (
       <Dialog open onClose={this.handleClose} onClick={stopPropagation}>
         <DialogTitle>Attach Node to Cluster</DialogTitle>
@@ -72,15 +72,17 @@ class ClusterAttachNodeDialog extends React.Component {
           <p>
             <b>IMPORTANT</b>:
             Before adding nodes to a cluster, please ensure that you have followed the requirements
-            in <ExternalLink url="https://docs.platform9.com/getting-started/managed-container-cloud-requirements-checklist/">this article</ExternalLink> for
+            in <ExternalLink url="https://docs.platform9.com/getting-started/managed-container-cloud-requirements-checklist/">this
+            article</ExternalLink> for
             each node.
           </p>
 
           <p>
-            Choose the nodes you would like to add to this cluster as well as their corresponding role.
+            Choose the nodes you would like to add to this cluster as well as their corresponding
+            role.
           </p>
           {freeNodes.length === 0 &&
-            <Typography variant="h5">No nodes available to attach</Typography>
+          <Typography variant="h5">No nodes available to attach</Typography>
           }
           <Table>
             <TableBody>
@@ -102,6 +104,6 @@ class ClusterAttachNodeDialog extends React.Component {
 }
 
 export default compose(
-  withDataLoader(loadNodes),
+  withDataLoader({ nodes: loadNodes }),
   withAppContext,
 )(ClusterAttachNodeDialog)

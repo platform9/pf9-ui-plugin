@@ -1,22 +1,30 @@
 import yaml from 'js-yaml'
 import createCRUDActions from 'core/helpers/createCRUDActions'
-import { withCluster } from 'core/helpers/withCluster'
-import contextUpdater from 'core/helpers/contextUpdater'
+import clusterContextLoader from 'core/helpers/clusterContextLoader'
+import clusterContextUpdater from 'core/helpers/clusterContextUpdater'
 
-const podCRUDActions = createCRUDActions({ service: 'qbert', entity: 'pods' })
-const deploymentCRUDActions = createCRUDActions({ service: 'qbert', entity: 'deployments' })
-const serviceCRUDActions = createCRUDActions({
+const createClusterizedCRUDActions = options => createCRUDActions({
+  ...options,
+  customContextLoader: clusterContextLoader,
+  customContextUpdater: clusterContextUpdater,
+})
+const podCRUDActions = createClusterizedCRUDActions({ service: 'qbert', entity: 'pods' })
+const deploymentCRUDActions = createClusterizedCRUDActions({
+  service: 'qbert',
+  entity: 'deployments',
+})
+const serviceCRUDActions = createClusterizedCRUDActions({
   service: 'qbert',
   entity: 'services',
   dataKey: 'kubeServices',
 })
 
-export const loadPods = withCluster(podCRUDActions.list)
-export const loadDeployments = withCluster(deploymentCRUDActions.list)
-export const loadServices = withCluster(serviceCRUDActions.list)
+export const loadPods = podCRUDActions.list
+export const loadDeployments = deploymentCRUDActions.list
+export const loadServices = serviceCRUDActions.list
 
-export const createPod = contextUpdater('pods', async ({ data, context, setContext }) => {
-  const { clusterId, namespace, podYaml } = data
+export const createPod = clusterContextUpdater('pods', async ({ params, context, setContext }) => {
+  const { clusterId, namespace, podYaml } = params
   const body = yaml.safeLoad(podYaml)
   const existing = await loadPods({ params: { clusterId }, context, setContext })
   const created = await context.apiClient.qbert.createPod(clusterId, namespace, body)
@@ -34,14 +42,14 @@ export const createPod = contextUpdater('pods', async ({ data, context, setConte
   return [...existing, converted]
 }, true)
 
-export const deletePod = contextUpdater('pods', async ({ id, context }) => {
+export const deletePod = clusterContextUpdater('pods', async ({ id, context }) => {
   const { clusterId, namespace, name } = await context.pods.find(x => x.id === id)
   await context.apiClient.qbert.deletePod(clusterId, namespace, name)
   return context.pods.filter(x => x.id !== id)
 })
 
-export const createDeployment = contextUpdater('deployments', async ({ data, context, setContext }) => {
-  const { clusterId, namespace, deploymentYaml } = data
+export const createDeployment = clusterContextUpdater('deployments', async ({ params, context, setContext }) => {
+  const { clusterId, namespace, deploymentYaml } = params
   const body = yaml.safeLoad(deploymentYaml)
   const existing = await loadDeployments({ params: { clusterId }, context, setContext })
   const created = await context.apiClient.qbert.createDeployment(clusterId, namespace, body)
@@ -58,8 +66,8 @@ export const createDeployment = contextUpdater('deployments', async ({ data, con
   return [...existing, converted]
 }, true)
 
-export const createService = contextUpdater('kubeServices', async ({ data, context, setContext }) => {
-  const { clusterId, namespace, serviceYaml } = data
+export const createService = clusterContextUpdater('kubeServices', async ({ params, context, setContext }) => {
+  const { clusterId, namespace, serviceYaml } = params
   const body = yaml.safeLoad(serviceYaml)
   const existing = await loadServices({ params: { clusterId }, context, setContext })
   const created = await context.apiClient.qbert.createService(clusterId, namespace, body)
@@ -74,7 +82,7 @@ export const createService = contextUpdater('kubeServices', async ({ data, conte
   return [...existing, converted]
 }, true)
 
-export const deleteService = contextUpdater('kubeServices', async ({ id, context }) => {
+export const deleteService = clusterContextUpdater('kubeServices', async ({ params: { id }, context }) => {
   const { clusterId, namespace, name } = await context.kubeServices.find(x => x.id === id)
   await context.apiClient.qbert.deleteService(clusterId, namespace, name)
   return context.kubeServices.filter(x => x.id !== id)

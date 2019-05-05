@@ -16,18 +16,18 @@ const ListPage = ({ ListContainer }) => {
     handleChangeCluster = clusterId => {
       this.setState({ activeCluster: clusterId },
         () => {
-          this.props.reloadData(loadDeployments, { clusterId })
+          this.props.reloadData('deployments', { clusterId })
         })
     }
 
     findClusterName = clusterId => {
-      const cluster = this.props.context.clusters.find(x => x.uuid === clusterId)
+      const cluster = this.props.data.clusters.find(x => x.uuid === clusterId)
       return (cluster && cluster.name) || ''
     }
 
     render () {
       const { activeCluster } = this.state
-      const { deployments = [], clusters = [] } = this.props.context
+      const { deployments = [], clusters = [] } = this.props.data
       const withClusterNames = deployments.map(ns => ({
         ...ns,
         clusterName: this.findClusterName(ns.clusterId),
@@ -57,10 +57,10 @@ const ListPage = ({ ListContainer }) => {
   }
 
   return withDataLoader(
-    [
-      loadClusters,
-      loadDeployments,
-    ])(ListPage)
+    {
+      clusters: loadClusters,
+      deployments: loadDeployments,
+    })(ListPage)
 }
 
 export const options = {

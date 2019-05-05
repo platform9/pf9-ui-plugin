@@ -8,7 +8,7 @@ import { loadServices, createService } from './actions'
 import { withDataLoader } from 'core/DataLoader'
 import CodeMirror from 'core/components/validatedForm/CodeMirror'
 import { compose } from 'ramda'
-import { loadClusters } from 'k8s/components/infrastructure/actions'
+import { loadClusters, loadNamespaces } from 'k8s/components/infrastructure/actions'
 
 export class AddServiceForm extends React.Component {
   state = {
@@ -17,20 +17,20 @@ export class AddServiceForm extends React.Component {
   }
 
   handleClusterChange = value => {
-    const { context } = this.props
-    const namespaceOptions = context.namespaces.filter(n => n.clusterId === value).map(n => ({ value: n.name, label: n.name }))
+    const { data } = this.props
+    const namespaceOptions = data.namespaces.filter(n => n.clusterId === value).map(n => ({ value: n.name, label: n.name }))
     this.setState({ namespaceOptions })
   }
 
   render () {
     const { namespaceOptions } = this.state
-    const { context, onComplete } = this.props
+    const { data, onComplete } = this.props
 
     const codeMirrorOptions = {
       mode: 'yaml',
     }
 
-    const clusterOptions = context.clusters ? projectAs({ value: 'uuid', label: 'name' }, context.clusters) : []
+    const clusterOptions = data.clusters ? projectAs({ value: 'uuid', label: 'name' }, data.clusters) : []
 
     return (
       <ValidatedForm onSubmit={onComplete}>
@@ -66,5 +66,5 @@ export const options = {
 const { AddPage } = createAddComponents(options)
 
 export default compose(
-  withDataLoader(loadClusters),
+  withDataLoader({ clusters: loadClusters, namespaces: loadNamespaces }),
 )(AddPage)

@@ -44,9 +44,9 @@ const ListPage = ({ ListContainer }) => {
     }
 
     async componentDidMount () {
-      const { context } = this.props
-      // Make sure to use a new reference to props.context since it has now changed
-      const clusters = context.clusters.filter(x => x.hasMasterNode)
+      const { data } = this.props
+      // Make sure to use a new reference to props.data since it has now changed
+      const clusters = data.clusters.filter(x => x.hasMasterNode)
       const clusterId = pathOr('__all__', [0, 'uuid'], clusters)
 
       await this.handleClusterChange(clusterId)
@@ -64,13 +64,13 @@ const ListPage = ({ ListContainer }) => {
     }
 
     findClusterName = clusterId => {
-      const cluster = this.props.context.clusters.find(x => x.uuid === clusterId)
+      const cluster = this.props.data.clusters.find(x => x.uuid === clusterId)
       return (cluster && cluster.name) || ''
     }
 
     render () {
       const { activeCluster } = this.state
-      const { releases = [], clusters = [] } = this.props.context
+      const { releases = [], clusters = [] } = this.props.data
       const filteredReleases = activeCluster === '__all__'
         ? releases
         : releases.filter(pod => pod.clusterId === activeCluster)
@@ -123,5 +123,5 @@ const { ListPage: DeployedAppsListPage } = createCRUDComponents(options)
 
 export default compose(
   requiresAuthentication,
-  withDataLoader(loadClusters),
+  withDataLoader({ clusters: loadClusters, releases: loadReleases }),
 )(DeployedAppsListPage)

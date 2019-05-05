@@ -11,6 +11,7 @@ import moize from 'moize'
  */
 const contextUpdater = (pathResolver, updaterFn, returnLast = false) => {
   const moizedPathResolver = moize(ensureFunction(pathResolver))
+
   return async ({ context, setContext, params = {}, ...rest }) => {
     const resolvedPath = ensureArray(moizedPathResolver(params))
     const output = await updaterFn({

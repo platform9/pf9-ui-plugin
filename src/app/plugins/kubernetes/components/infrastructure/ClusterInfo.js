@@ -36,7 +36,7 @@ const styles = theme => ({
 })
 
 const ClusterInfo = ({ match, data, context, classes }) => {
-  const cluster = data.find(x => x.uuid === match.params.id)
+  const cluster = data.clusters.find(x => x.uuid === match.params.id)
   const { usage } = clusterUsageStats(cluster, context)
   return (
     <React.Fragment>
@@ -67,5 +67,5 @@ export default compose(
   withStyles(styles),
   withRouter,
   withAppContext,
-  withDataLoader(loadClusters),
+  withDataLoader({ clusters: loadClusters }),
 )(ClusterInfo)

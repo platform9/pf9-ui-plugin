@@ -77,7 +77,8 @@ class AddPrometheusInstancePage extends React.Component {
                     <TextField id="numInstances" label="# of instances" info="Number of Prometheus instances" type="number" />
                     <TextField id="cpu" label="CPU" info="Expressed in millicores (1m = 1/1000th of a core)" type="number" />
                     <TextField id="memory" label="Memory" info="MiB of memory to allocate" type="number" />
-                    {enableStorage && <TextField id="storage" label="Storage" info="The storage allocation.  Default is 8 GiB" type="number" />}
+                    {enableStorage &&
+                    <TextField id="storage" label="Storage" info="The storage allocation.  Default is 8 GiB" type="number" />}
 
                     <PicklistField
                       id="cluster"
@@ -88,30 +89,32 @@ class AddPrometheusInstancePage extends React.Component {
                     />
 
                     {namespaceOptions.length > 0 &&
-                      <PicklistField
-                        id="namespace"
-                        onChange={this.handleNamespaceChange}
-                        options={namespaceOptions}
-                        label="Namespace"
-                        info="Which namespace to use"
-                      />}
+                    <PicklistField
+                      id="namespace"
+                      onChange={this.handleNamespaceChange}
+                      options={namespaceOptions}
+                      label="Namespace"
+                      info="Which namespace to use"
+                    />}
 
                     {serviceAccountOptions.length > 0 &&
-                      <PicklistField
-                        id="serviceAccount"
-                        options={serviceAccountOptions}
-                        label="Service Account"
-                        info="Which service account to use"
-                      />}
+                    <PicklistField
+                      id="serviceAccount"
+                      options={serviceAccountOptions}
+                      label="Service Account"
+                      info="Which service account to use"
+                    />}
 
-                    {enableStorage && <CheckboxField id="enablePersistentStorage" label="Enable persistent storage" />}
+                    {enableStorage &&
+                    <CheckboxField id="enablePersistentStorage" label="Enable persistent storage" />}
                     <TextField id="retention" label="Storage Retention (days)" info="Defaults to 15 days if nothing is set" type="number" />
                     <TextField id="port" label="Service Monitor Port" info="Port for the service monitor" />
                     <KeyValuesField id="appLabels" label="App Labels" info="Key/value pairs for app that Prometheus will monitor" />
                   </ValidatedForm>
                 </WizardStep>
                 <WizardStep stepId="config" label="Configure Alerting">
-                  {rules.length > 0 && <PrometheusRulesTable rules={this.state.rules} onDelete={this.handleDeleteRule} />}
+                  {rules.length > 0 &&
+                  <PrometheusRulesTable rules={this.state.rules} onDelete={this.handleDeleteRule} />}
                   <PrometheusRuleForm onSubmit={this.handleAddRule} />
                 </WizardStep>
               </React.Fragment>
@@ -124,6 +127,6 @@ class AddPrometheusInstancePage extends React.Component {
 }
 
 export default compose(
-  withDataLoader(loadClusters),
+  withDataLoader({ clusters: loadClusters }),
   withAppContext,
 )(AddPrometheusInstancePage)

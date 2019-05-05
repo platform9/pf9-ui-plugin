@@ -27,7 +27,7 @@ class RegionChooser extends React.Component {
     this.setState({ curRegion: region })
     // Future Todo: Update the Selector component or create a variant of the component
     // that can take a list of objects
-    const fullRegionObj = this.props.data.find(propEq('id', region))
+    const fullRegionObj = this.props.data.regions.find(propEq('id', region))
     this.props.updatePreferences({ lastRegion: fullRegionObj })
 
     // Initial loading of the app is tightly coupled to knowing the region to use.
@@ -37,9 +37,9 @@ class RegionChooser extends React.Component {
 
   render () {
     const { curRegion, regionSearch } = this.state
-    const { data = [], className } = this.props
+    const { data: { regions = [] }, className } = this.props
 
-    const regionNames = pluck('id', data)
+    const regionNames = pluck('id', regions)
 
     return (
       <Selector
@@ -56,6 +56,6 @@ class RegionChooser extends React.Component {
 }
 
 export default compose(
-  withDataLoader(loadRegions, { inlineProgress: true }),
+  withDataLoader({ regions: loadRegions }, { inlineProgress: true }),
   withScopedPreferences('RegionChooser'),
 )(RegionChooser)

@@ -24,13 +24,13 @@ export class AddDeploymentForm extends React.Component {
 
   render () {
     const { namespaceOptions } = this.state
-    const { context, onComplete } = this.props
+    const { data, onComplete } = this.props
 
     const codeMirrorOptions = {
       mode: 'yaml',
     }
 
-    const clusterOptions = context.clusters ? projectAs({ value: 'uuid', label: 'name' }, context.clusters) : []
+    const clusterOptions = data.clusters ? projectAs({ value: 'uuid', label: 'name' }, data.clusters) : []
 
     return (
       <ValidatedForm onSubmit={onComplete}>
@@ -66,5 +66,5 @@ export const options = {
 const { AddPage } = createAddComponents(options)
 
 export default compose(
-  withDataLoader(loadClusters),
+  withDataLoader({ clusters: loadClusters }),
 )(AddPage)

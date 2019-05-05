@@ -10,8 +10,6 @@ import moment from 'moment'
 import { withDataLoader } from 'core/DataLoader'
 
 class AppCatalogPage extends React.Component {
-  state = { clusterId: '__all__' }
-
   sortingConfig = [
     {
       field: 'attributes.name',
@@ -31,14 +29,13 @@ class AppCatalogPage extends React.Component {
       type: 'select',
       label: 'Cluster',
       onChange: async clusterId => {
-        this.setState({ clusterId })
-        this.props.reloadData(loadApps, { clusterId })
+        this.props.reloadData('apps', { clusterId })
       },
       items: projectAs(
         { label: 'name', value: 'uuid' },
         [
           { name: 'all', uuid: '__all__' },
-          ...this.props.context.clusters.filter(cluster => cluster.hasMasterNode),
+          ...this.props.data.clusters.filter(cluster => cluster.hasMasterNode),
         ],
       ),
     },
@@ -46,18 +43,17 @@ class AppCatalogPage extends React.Component {
 
   render () {
     const {
-      context: { apps = {} },
+      data: { apps },
     } = this.props
-    const { clusterId } = this.state
     return (
       <div className="applications">
         <CardTable
-          data={apps[clusterId]}
+          data={apps}
           sorting={this.sortingConfig}
           filters={this.filtersConfig()}
           searchTarget="attributes.name"
         >
-          {item => <ApplicationCard application={item} key={item.id} />}
+          {item => <ApplicationCard application={item} keyf={item.id} />}
         </CardTable>
       </div>
     )
@@ -66,8 +62,8 @@ class AppCatalogPage extends React.Component {
 
 export default compose(
   requiresAuthentication,
-  withDataLoader([
-    loadClusters,
-    loadApps,
-  ]),
+  withDataLoader({
+    clusters: loadClusters,
+    apps: loadApps,
+  }),
 )(AppCatalogPage)

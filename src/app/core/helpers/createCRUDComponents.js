@@ -56,7 +56,7 @@ const createCRUDComponents = options => {
   const List = withScopedPreferences(name)(({
     onAdd, onDelete, onEdit, rowActions, data,
     preferences: { visibleColumns, columnsOrder, rowsPerPage },
-    updatePreferences
+    updatePreferences,
   }) => {
     if (!data || data.length === 0) {
       return <h1>No data found.</h1>
@@ -118,16 +118,18 @@ const createCRUDComponents = options => {
 
   // ListPage
   const StandardListPage = () => (
-    <DataLoader dataKey={dataKey} loaders={loaderFn || crudActions.list}>
+    <DataLoader loaders={{ [dataKey]: loaderFn || crudActions.list }}>
       {({ data }) =>
         <React.Fragment>
-          <ListContainer data={data} />
-          {debug && <pre>{JSON.stringify(data, null, 4)}</pre>}
+          <ListContainer data={data[dataKey]} />
+          {debug && <pre>{JSON.stringify(data[dataKey], null, 4)}</pre>}
         </React.Fragment>
       }
     </DataLoader>
   )
-  const ListPage = requiresAuthentication(options.ListPage ? options.ListPage({ ListContainer }) : StandardListPage)
+  const ListPage = requiresAuthentication(options.ListPage
+    ? options.ListPage({ ListContainer })
+    : StandardListPage)
   ListPage.displayName = `${name}ListPage`
 
   return {

@@ -23,11 +23,11 @@ class DataUpdater extends React.Component {
   render () {
     const { loaderFn, objId, children } = this.props
     return (
-      <DataLoader loaders={loaderFn}>
+      <DataLoader loaders={{ updaterData: loaderFn }}>
         {({ data }) => {
-          if (!data) { return null }
+          if (!data.updaterData) { return null }
           return children({
-            data: this.findById(data, objId),
+            data: this.findById(data.updaterData, objId),
             onSubmit: this.handleSubmit,
           })
         }}

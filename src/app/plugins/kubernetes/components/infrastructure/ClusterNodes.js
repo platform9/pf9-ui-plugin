@@ -1,6 +1,5 @@
 import React from 'react'
 import { withRouter } from 'react-router'
-import { withAppContext } from 'core/AppContext'
 import { compose } from 'ramda'
 import { loadClusters } from './actions'
 import { withDataLoader } from 'core/DataLoader'
@@ -8,6 +7,7 @@ import { withDataLoader } from 'core/DataLoader'
 // except that it is only the nodes from the a single cluster.
 import { columns } from './NodesListPage'
 import createListTableComponent from 'core/helpers/createListTableComponent'
+import { loadNodes } from 'k8s/components/infrastructure/actions'
 
 const ListTable = createListTableComponent({
   title: 'Cluster Nodes',
@@ -17,14 +17,13 @@ const ListTable = createListTableComponent({
   uniqueIdentifier: 'uuid',
 })
 
-const ClusterNodes = ({ context, data, match }) => {
-  const cluster = data.find(x => x.uuid === match.params.id)
-  const nodes = cluster.nodes.map(node => context.nodes.find(x => x.uuid === node.uuid))
+const ClusterNodes = ({ data, match }) => {
+  const cluster = data.clusters.find(x => x.uuid === match.params.id)
+  const nodes = cluster.nodes.map(node => data.nodes.find(x => x.uuid === node.uuid))
   return <ListTable data={nodes} />
 }
 
 export default compose(
   withRouter,
-  withAppContext,
-  withDataLoader(loadClusters),
+  withDataLoader({ clusters: loadClusters, nodes: loadNodes }),
 )(ClusterNodes)

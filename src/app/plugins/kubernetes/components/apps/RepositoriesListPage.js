@@ -26,5 +26,5 @@ export const options = {
 const { ListPage: RepositoriesListPage } = createCRUDComponents(options)
 
 export default withDataLoader(
-  [loadClusters, loadRepositories],
+  { clusters: loadClusters, repositories: loadRepositories },
 )(RepositoriesListPage)

@@ -64,6 +64,6 @@ class ClusterScaleDialog extends React.Component {
 }
 
 export default compose(
-  withDataLoader(loadClusters),
+  withDataLoader({ clusters: loadClusters }),
   withAppContext,
 )(ClusterScaleDialog)

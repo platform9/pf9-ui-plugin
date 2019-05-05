@@ -52,6 +52,6 @@ NodesChooser.propTypes = {
 }
 
 export default compose(
-  withDataLoader(loadCombinedHosts),
+  withDataLoader({ combinedHosts: loadCombinedHosts }),
   withInfoTooltip,
 )(NodesChooser)

@@ -17,18 +17,18 @@ const ListPage = ({ ListContainer }) => {
     handleChangeCluster = clusterId => {
       this.setState({ activeCluster: clusterId },
         () => {
-          this.props.reloadData(loadServices, { clusterId })
+          this.props.reloadData('services', { clusterId })
         })
     }
 
     findClusterName = clusterId => {
-      const cluster = this.props.context.clusters.find(x => x.uuid === clusterId)
+      const cluster = this.props.data.clusters.find(x => x.uuid === clusterId)
       return (cluster && cluster.name) || ''
     }
 
     render () {
       const { activeCluster } = this.state
-      const { kubeServices = [], clusters = [] } = this.props.context
+      const { kubeServices = [], clusters = [] } = this.props.data
 
       const withClusterNames = kubeServices.map(ns => ({
         ...ns,
@@ -59,7 +59,7 @@ const ListPage = ({ ListContainer }) => {
   }
 
   return withDataLoader(
-    [loadClusters, loadServices],
+    { clusters: loadClusters, services: loadServices },
   )(ListPage)
 }
 

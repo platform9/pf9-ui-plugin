@@ -3,16 +3,16 @@ import { compose } from 'app/utils/fp'
 import DataLoader from 'core/DataLoader'
 import requiresAuthentication from '../../util/requiresAuthentication'
 import HostsListContainer from './HostsListContainer'
+import contextLoader from 'core/helpers/contextLoader'
 
-const loadHosts = async ({ setContext, context }) => {
+const loadHosts = contextLoader('hosts', async ({ context }) => {
   // const hosts = await context.apiClient.resmgr.getHosts()
-  const hosts = await context.apiClient.nova.getHypervisors()
-  setContext({ hosts })
-}
+  return context.apiClient.nova.getHypervisors()
+})
 
 const HostsListPage = () =>
-  <DataLoader dataKey="hosts" loaders={loadHosts}>
-    {({ data }) => <HostsListContainer hosts={data} />}
+  <DataLoader loaders={{ hosts: loadHosts }}>
+    {({ data }) => <HostsListContainer hosts={data.hosts} />}
   </DataLoader>
 
 export default compose(

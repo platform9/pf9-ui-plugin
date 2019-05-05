@@ -1,12 +1,14 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
-import { ensureArray } from 'app/utils/fp'
 import DisplayError from './components/DisplayError'
 import Progress from './components/Progress'
+import { asyncProps } from 'utils/fp'
+import { mapObjIndexed, compose } from 'ramda'
 import { withAppContext } from 'core/AppContext'
 
 class DataLoaderBase extends PureComponent {
   state = {
+    data: mapObjIndexed(() => [], this.props.loaders),
     loading: false,
     error: null,
   }
@@ -22,21 +24,28 @@ class DataLoaderBase extends PureComponent {
 
   loadAll = async () =>
     this.setState({ loading: true }, async () => {
-      const { loaders } = this.props
+      const { loaders, options, context, setContext } = this.props
       try {
-        await Promise.all(ensureArray(loaders).map(loader => loader(this.props)))
-        this.setState({ loading: false })
+        const data = await asyncProps(mapObjIndexed(loader =>
+          loader({ context, setContext, reload: options.reloadOnMount }), loaders,
+        ))
+        this.setState({ loading: false, data, error: null })
       } catch (err) {
         console.log(err)
         this.setState({ loading: false, error: err.toString() })
       }
     })
 
-  reloadData = (loaderFn, params, reload, cascade = false) => {
+  loadOne = (loaderKey, params, reload, cascade = false) => {
     this.setState({ loading: true }, async () => {
+      const { loaders, context, setContext } = this.props
       try {
-        await loaderFn({ ...this.props, params, reload, cascade })
-        this.setState({ loading: false })
+        const data = await loaders[loaderKey]({ context, setContext, params, reload, cascade })
+        this.setState(prevState => ({
+          loading: false,
+          error: null,
+          data: { ...prevState.data, [loaderKey]: data },
+        }))
       } catch (err) {
         console.log(err)
         this.setState({ loading: false, error: err.toString() })
@@ -45,35 +54,39 @@ class DataLoaderBase extends PureComponent {
   }
 
   render () {
-    const { loading, error } = this.state
+    const { data, loading, error } = this.state
     if (error) {
       return <DisplayError error={error} />
     }
     const { children, options } = this.props
     return <Progress inline={options.inlineProgress} overlay loading={loading}>
-      {children({ loading, error, reloadData: this.reloadData })}
+      {children({ data, loading, error, reloadData: this.loadOne })}
     </Progress>
   }
 }
 
-// FIXME: for now we assign app context here but ideally this component
-// should not be aware of anything about the app
-const DataLoader = withAppContext(DataLoaderBase)
+const DataLoader = compose(
+  withAppContext,
+)(DataLoaderBase)
 
 DataLoader.propTypes = {
   /**
    * Object with key value pairs where key is the dataKey and
    * value is a loaderFn or a spec of { requires, loaderFn }
    */
-  loaders: PropTypes.oneOfType([PropTypes.array, PropTypes.func]).isRequired,
+  loaders: PropTypes.object.isRequired,
 
   options: PropTypes.shape({
     inlineProgress: PropTypes.bool,
+    reloadOnMount: PropTypes.bool,
   }),
 }
 
 DataLoader.defaultProps = {
-  options: {},
+  options: {
+    inlineProgress: false,
+    reloadOnMount: false,
+  },
 }
 
 export const withDataLoader = (loaders, options) => Component => props => (

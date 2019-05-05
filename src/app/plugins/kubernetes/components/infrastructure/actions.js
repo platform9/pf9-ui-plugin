@@ -134,7 +134,7 @@ export const loadResMgrHosts = contextLoader('resmgrHosts', async ({ context }) 
 })
 
 export const loadCombinedHosts = contextLoader('combinedHosts', async params => {
-  const [rawNodes, resmgrHosts] = Promise.all([
+  const [rawNodes, resmgrHosts] = await Promise.all([
     loadRawNodes(params),
     loadResMgrHosts(params),
   ])

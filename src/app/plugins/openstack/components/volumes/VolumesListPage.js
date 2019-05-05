@@ -6,8 +6,8 @@ import { loadVolumes } from './actions'
 import VolumesListContainer from './VolumesListContainer'
 
 const VolumesListPage = () =>
-  <DataLoader dataKey="volumes" loaders={loadVolumes}>
-    {({ data }) => <VolumesListContainer volumes={data} />}
+  <DataLoader loaders={{ volumes: loadVolumes }}>
+    {({ data }) => <VolumesListContainer volumes={data.volumes} />}
   </DataLoader>
 
 export default compose(

@@ -34,7 +34,6 @@ const contextLoader = (pathResolver, loaderFn, defaultValue = []) => {
         cascade,
         ...rest,
       })
-      console.log(resolvedPath)
       pendingPromises = assocPath(resolvedPath, promise, pendingPromises)
       output = await promise
       await setContext(assocPath(resolvedPath, output))
