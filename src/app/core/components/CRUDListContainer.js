@@ -103,8 +103,15 @@ CRUDListContainer.propTypes = {
     For example sshKeys have unique identifier of 'name' and the APIs
     rely on using the name as part of the URI. Specify the unique identifier
     in props if it is different from 'id'
+
+    For more complicated scenarios, you can pass a funciton that receives the row data and returns the uid.
+    It has the following type signature:
+      uniqueIdentifier :: RowData -> String
   */
-  uniqueIdentifier: PropTypes.string,
+  uniqueIdentifier: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.func
+  ]),
 }
 
 CRUDListContainer.defaultProps = {

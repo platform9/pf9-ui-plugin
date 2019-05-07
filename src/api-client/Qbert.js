@@ -322,12 +322,12 @@ class Qbert {
   }
 
   async getServiceAccounts (clusterId, namespace) {
-    return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/v1/namespaces/${namespace}/serviceaccounts`)
+    const response = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/serviceaccounts`)
+    return response.items
   }
 
   /* Managed Apps */
   async getPrometheusInstances (clusterUuid) {
-    console.log('Getting prometheus instances for ', clusterUuid)
     const response = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/prometheuses`)
     return normalizePrometheusResponse(clusterUuid, response)
   }
@@ -363,6 +363,7 @@ class Qbert {
         retention: `${data.retention}d`,
         resources: { requests },
         serviceMonitorSelector: { matchLabels: serviceMonitor },
+        serviceAccountName: data.serviceAccountName,
         ruleSelector: { matchLabels: ruleSelector },
       }
     }

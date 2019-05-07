@@ -103,7 +103,7 @@ class AutocompleteBase extends React.Component {
             value={value}
             onChange={this.handleChange}
             onBlur={this.handleClose}
-            endAdornment={suggestions && DropdownIcon}
+            endadornment={suggestions && DropdownIcon}
             {...other}
           />
         </FormControl>

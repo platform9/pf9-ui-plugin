@@ -10,10 +10,14 @@ const renderClusterName = (field, row, context) => {
   return cluster.name
 }
 
+// Placeholder for now until the dashboard links are working
+const renderBlank = () => ''
+
 export const columns = [
   { id: 'name', label: 'Name' },
   { id: 'clusterName', label: 'cluster', render: renderClusterName },
   { id: 'namespace', label: 'Namespace' },
+  { id: 'dashboard', label: 'Dashboard', render: renderBlank },
   { id: 'serviceMonitorSelector', label: 'Service Monitor', render: renderKeyValues },
   { id: 'alertManagersSelector', label: 'Alert Managers' },
   { id: 'cpu', label: 'CPU' },

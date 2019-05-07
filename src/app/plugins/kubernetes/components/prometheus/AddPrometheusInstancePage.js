@@ -15,7 +15,7 @@ import { loadServiceAccounts, createPrometheusInstance } from './actions'
 import { projectAs } from 'utils/fp'
 import { withAppContext } from 'core/AppContext'
 import { withDataLoader } from 'core/DataLoader'
-import { loadClusters } from 'k8s/components/infrastructure/actions'
+import { loadClusters, loadNamespaces } from 'k8s/components/infrastructure/actions'
 
 const initialContext = {
   numInstances: 1,
@@ -48,7 +48,9 @@ class AddPrometheusInstancePage extends React.Component {
   handleClusterChange = async clusterUuid => this.setState({ clusterUuid })
 
   handleNamespaceChange = async namespace => {
-    const serviceAccounts = await loadServiceAccounts(this.state.clusterUuid, namespace)
+    const { context, setContext } = this.props
+    const data = { clusterUuid: this.state.clusterUuid, namespace }
+    const serviceAccounts = await loadServiceAccounts({ data, context, setContext })
     this.setState({ serviceAccounts, namespace })
   }
 
@@ -57,13 +59,15 @@ class AddPrometheusInstancePage extends React.Component {
   }
 
   render () {
-    const { clusterUuid, rules } = this.state
+    const { clusterUuid, namespace, rules, serviceAccounts } = this.state
     const { clusters, namespaces } = this.props.context
     const clusterOptions = projectAs({ value: 'uuid', label: 'name' }, clusters)
     const namespaceOptions = clusterUuid
       ? namespaces.filter(propEq('clusterId', clusterUuid)).map(x => x.metadata.name)
       : []
-    const serviceAccountOptions = [] // TODO: TBD
+    const serviceAccountOptions = namespace
+      ? serviceAccounts.map(x => x.metadata.name)
+      : []
     const enableStorage = false // We are just using ephemeral storage for the first version
     return (
       <FormWrapper title="Add Prometheus Instance">
@@ -99,10 +103,10 @@ class AddPrometheusInstancePage extends React.Component {
 
                     {serviceAccountOptions.length > 0 &&
                     <PicklistField
-                      id="serviceAccount"
+                      id="serviceAccountName"
                       options={serviceAccountOptions}
-                      label="Service Account"
-                      info="Which service account to use"
+                      label="Service Account Name"
+                      info="Prometheus will use this to query metrics endpoints"
                     />}
 
                     {enableStorage &&
@@ -127,6 +131,9 @@ class AddPrometheusInstancePage extends React.Component {
 }
 
 export default compose(
-  withDataLoader({ clusters: loadClusters }),
+  withDataLoader({
+    clusters: loadClusters,
+    namespaces: loadNamespaces,
+  }),
   withAppContext,
 )(AddPrometheusInstancePage)

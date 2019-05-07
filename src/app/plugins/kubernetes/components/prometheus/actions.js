@@ -58,12 +58,22 @@ const mapAsyncItems = async (values, loaderFn, mapFn) => {
   return items
 }
 
+export const loadClusterTags = async ({ context, setContext, reload }) => {
+  const clusterTags = await context.apiClient.appbert.getClusterTags()
+  setContext({ clusterTags })
+  return clusterTags
+}
+
 export const loadPrometheusResources = async ({ context, setContext, reload }) => {
   if (!reload && context.prometheusInstances) { return context.prometheusInstances }
 
-  await loadClusters({ context, setContext, reload })
-  // const clusterUuids = clusters.map(prop('uuid'))
-  const clusterUuids = ['e8f1d175-2e7d-40fa-a475-ed20b8d8c66d'] // hardcode for now during development
+  const [_, clusterTags] = await Promise.all([ // eslint-disable-line no-unused-vars
+    loadClusters({ context, setContext, reload }),
+    loadClusterTags({ context, setContext, reload })
+  ])
+
+  const hasMonitoring = cluster => cluster.tags.includes('pf9-system:monitoring')
+  const clusterUuids = clusterTags.filter(hasMonitoring).map(prop('uuid'))
 
   const prometheusInstances = await mapAsyncItems(clusterUuids, getPrometheusInstances, mapPrometheusInstance)
   setContext({ prometheusInstances })
@@ -100,6 +110,6 @@ export const createPrometheusInstance = async ({ data, context, setContext }) =>
 }
 
 export const loadServiceAccounts = async ({ data, context, setContext }) => {
-  const serviceAccounts = await context.apiClient.qbert.getServiceAccounts(data.cluster)
+  const serviceAccounts = await context.apiClient.qbert.getServiceAccounts(data.clusterUuid, data.namespace)
   return serviceAccounts
 }

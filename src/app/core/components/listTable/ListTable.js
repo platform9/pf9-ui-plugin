@@ -296,12 +296,12 @@ class ListTable extends React.Component {
     )
   }
 
-  getSortedVisibleColums = () => {
+  getSortedVisibleColumns = () => {
     const { columns } = this.props
     const { columnsOrder, visibleColumns } = this.state
     return columnsOrder
       .map(columnId => columns.find(column => column.id === columnId))
-      .filter(column => visibleColumns.includes(column.id))
+      .filter(column => column && column.id && visibleColumns.includes(column.id))
   }
 
   renderRow = row => {
@@ -315,14 +315,16 @@ class ListTable extends React.Component {
       selected: isSelected
     } : {}
 
-    const uid = row[uniqueIdentifier]
+    const uid = uniqueIdentifier instanceof Function
+      ? uniqueIdentifier(row)
+      : row[uniqueIdentifier]
 
     return (
       <TableRow hover key={uid} {...checkboxProps}>
         {showCheckboxes && (<TableCell padding="checkbox">
           <Checkbox checked={isSelected} color="primary" />
         </TableCell>)}
-        {this.getSortedVisibleColums().map(columnDef =>
+        {this.getSortedVisibleColumns().map(columnDef =>
           this.renderCell(columnDef, path((columnDef.id || '').split('.'), row), row)
         )}
         {this.renderRowActions(row)}
@@ -404,7 +406,7 @@ class ListTable extends React.Component {
               <Table className={classes.table}>
                 <ListTableHead
                   canDragColumns={canDragColumns}
-                  columns={this.getSortedVisibleColums()}
+                  columns={this.getSortedVisibleColumns()}
                   onColumnsSwitch={this.handleColumnsSwitch}
                   numSelected={selected.length}
                   order={order}
@@ -477,8 +479,15 @@ ListTable.propTypes = {
    For example sshKeys have unique identifier of 'name' and the APIs
    rely on using the name as part of the URI. Specify the unique identifier
    in props if it is different from 'id'
+
+   For more complicated scenarios, you can pass a funciton that receives the row data and returns the uid.
+   It has the following type signature:
+     uniqueIdentifier :: RowData -> String
    */
-  uniqueIdentifier: PropTypes.string,
+  uniqueIdentifier: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.func
+  ]),
 
   /**
    * List of batch actions that can be performed

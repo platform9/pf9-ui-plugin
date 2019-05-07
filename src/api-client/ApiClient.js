@@ -1,5 +1,6 @@
 import axios from 'axios'
 
+import Appbert from './Appbert'
 import Cinder from './Cinder'
 import Glance from './Glance'
 import Keystone from './Keystone'
@@ -15,6 +16,7 @@ class ApiClient {
     if (!options.keystoneEndpoint) {
       throw new Error('keystoneEndpoint required')
     }
+    this.appbert = new Appbert(this)
     this.cinder = new Cinder(this)
     this.glance = new Glance(this)
     this.keystone = new Keystone(this)
