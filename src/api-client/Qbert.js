@@ -1,5 +1,7 @@
 import { keyValueArrToObj } from 'utils/fp'
 
+const normalizePrometheusResponse = (clusterUuid, response) => response.items.map(x => ({ ...x, clusterUuid }))
+
 /* eslint-disable camelcase */
 class Qbert {
   constructor (client) {
@@ -324,9 +326,10 @@ class Qbert {
   }
 
   /* Managed Apps */
-  async getPrometheusInstances (clusterId) {
-    console.log('Getting prometheus instances for ', clusterId)
-    return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/prometheuses`)
+  async getPrometheusInstances (clusterUuid) {
+    console.log('Getting prometheus instances for ', clusterUuid)
+    const response = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/prometheuses`)
+    return normalizePrometheusResponse(clusterUuid, response)
   }
 
   async createPrometheusInstance (clusterId, data) {
@@ -413,16 +416,19 @@ class Qbert {
     // this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/alertmanagers`, alertManagerBody)
   }
 
-  async getPrometheusServiceMonitors (clusterId) {
-    return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/servicemonitors`)
+  async getPrometheusServiceMonitors (clusterUuid) {
+    const response = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/servicemonitors`)
+    return normalizePrometheusResponse(clusterUuid, response)
   }
 
-  async getPrometheusRules (clusterId) {
-    return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/prometheusrules`)
+  async getPrometheusRules (clusterUuid) {
+    const response = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/prometheusrules`)
+    return normalizePrometheusResponse(clusterUuid, response)
   }
 
-  async getPrometheusAlertManagers (clusterId) {
-    return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/alertmanagers`)
+  async getPrometheusAlertManagers (clusterUuid) {
+    const response = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/alertmanagers`)
+    return normalizePrometheusResponse(clusterUuid, response)
   }
 }
 

@@ -1,5 +1,5 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { loadPrometheusRules } from './actions'
+import { loadPrometheusServiceMonitors } from './actions'
 
 const renderKeyValues = obj => Object.entries(obj)
   .map(([key, value]) => `${key}: ${value}`)
@@ -14,20 +14,22 @@ export const columns = [
   { id: 'name', label: 'Name' },
   { id: 'clusterName', label: 'cluster', render: renderClusterName },
   { id: 'namespace', label: 'Namespace' },
-  { id: 'labels',  label: 'labels', render: renderKeyValues }
+  { id: 'labels',  label: 'Labels', render: renderKeyValues },
+  { id: 'port',  label: 'Port' },
+  { id: 'selector',  label: 'Selector', render: renderKeyValues },
 ]
 
 export const options = {
   columns,
-  dataKey: 'prometheusRules',
-  editUrl: '/ui/kubernetes/prometheus/rules/edit',
-  loaderFn: loadPrometheusRules,
-  name: 'PrometheusRules',
-  title: 'Prometheus Rules',
+  dataKey: 'prometheusServiceMonitors',
+  editUrl: '/ui/kubernetes/prometheus/serviceMonitors/edit',
+  loaderFn: loadPrometheusServiceMonitors,
+  name: 'PrometheuServiceMonitors',
+  title: 'Prometheus Service Monitors',
   uniqueIdentifier: 'name',
 }
 
 const { ListPage, List } = createCRUDComponents(options)
-export const PrometheusRulesList = List
+export const PrometheusServiceMonitorsList = List
 
 export default ListPage
