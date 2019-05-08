@@ -4,7 +4,7 @@ class Appbert {
     this.client = client
   }
 
-  async endpoint () {
+  endpoint = async () => {
     const services = await this.client.keystone.getServicesForActiveRegion()
     const endpoint = services.appbert.admin.url
     return endpoint
@@ -12,7 +12,7 @@ class Appbert {
 
   baseUrl = async () => `${await this.endpoint()}`
 
-  async getClusterTags () {
+  getClusterTags = async () => {
     return this.client.basicGet(`${await this.baseUrl()}/clusters`)
   }
 }

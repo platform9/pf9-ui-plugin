@@ -8,13 +8,13 @@ class Qbert {
     this.client = client
   }
 
-  async endpoint () {
+  endpoint = async () => {
     const services = await this.client.keystone.getServicesForActiveRegion()
     const endpoint = services.qbert.admin.url
     return endpoint.replace(/v(1|2|3)$/, `v3/${this.client.activeProjectId}`)
   }
 
-  async monocularBaseUrl () {
+  monocularBaseUrl = async () => {
     const services = await this.client.keystone.getServicesForActiveRegion()
     return services.monocular.public.url
   }
@@ -25,27 +25,27 @@ class Qbert {
   clusterMonocularBaseUrl = async clusterId => `${await this.clusterBaseUrl(clusterId)}/namespaces/kube-system/services/monocular-api-svc:80/proxy/v1`
 
   /* Cloud Providers */
-  async getCloudProviders () {
+  getCloudProviders = async () => {
     return this.client.basicGet(`${await this.baseUrl()}/cloudProviders`)
   }
 
-  async createCloudProvider (params) {
+  createCloudProvider = async (params) => {
     return this.client.basicPost(`${await this.baseUrl()}/cloudProviders`, params)
   }
 
-  async getCloudProviderDetails (cpId) {
+  getCloudProviderDetails = async (cpId) => {
     return this.client.basicGet(`${await this.baseUrl()}/cloudProviders/${cpId}`)
   }
 
-  async getCloudProviderRegionDetails (cpId, regionId) {
+  getCloudProviderRegionDetails = async (cpId, regionId) => {
     return this.client.basicGet(`${await this.baseUrl()}/cloudProviders/${cpId}/region/${regionId}`)
   }
 
-  async updateCloudProvider (cpId, params) {
+  updateCloudProvider = async (cpId, params) => {
     return this.client.basicPut(`${await this.baseUrl()}/cloudProviders/${cpId}`, params)
   }
 
-  async deleteCloudProvider (cpId) {
+  deleteCloudProvider = async (cpId) => {
     return this.client.basicDelete(`${await this.baseUrl()}/cloudProviders/${cpId}`)
   }
 
@@ -59,7 +59,7 @@ class Qbert {
   }
 
   /* Cloud Providers Types */
-  async getCloudProviderTypes () {
+  getCloudProviderTypes = async () => {
     return this.client.basicGet(`${await this.baseUrl()}/cloudProvider/types`)
   }
 
@@ -74,7 +74,7 @@ class Qbert {
   }
 
   /* SSH Keys */
-  async importSshKey (cpId, regionId, body) {
+  importSshKey = async (cpId, regionId, body) => {
     return this.client.basicPost(`${await this.baseUrl()}/cloudProviders/${cpId}/region/${regionId}`)
   }
 
@@ -91,23 +91,23 @@ class Qbert {
     }))
   }
 
-  async getClusterDetails (clusterId) {
+  getClusterDetails = async (clusterId) => {
     return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}`)
   }
 
-  async createCluster (params) {
+  createCluster = async (params) => {
     return this.client.basicPost(`${await this.baseUrl()}/clusters`, params)
   }
 
-  async updateCluster (clusterId, params) {
+  updateCluster = async (clusterId, params) => {
     return this.client.basicPut(`${await this.baseUrl()}/clusters/${clusterId}`, params)
   }
 
-  async upgradeCluster (clusterId) {
+  upgradeCluster = async (clusterId) => {
     return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/upgrade`)
   }
 
-  async deleteCluster (clusterId) {
+  deleteCluster = async (clusterId) => {
     return this.client.basicDelete(`${await this.baseUrl()}/clusters/${clusterId}`)
   }
 
@@ -117,28 +117,28 @@ class Qbert {
 
   // @param clusterId = cluster.uuid
   // @param nodes = [{ uuid: node.uuid, isMaster: (true|false) }]
-  async attach (clusterId, nodes) {
+  attach = async (clusterId, nodes) => {
     return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/attach`, nodes)
   }
 
   // @param clusterId = cluster.uuid
   // @param nodes = [node1Uuid, node2Uuid, ...]
-  async detach (clusterId, nodeUuids) {
+  detach = async (clusterId, nodeUuids) => {
     const body = nodeUuids.map(uuid => ({ uuid }))
     return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/detach`, body)
   }
 
-  async getCliToken (clusterId, namespace) {
+  getCliToken = async (clusterId, namespace) => {
     const response = await this.client.basicPost(`${await this.baseUrl()}/webcli/${clusterId}`, { namespace })
     return response.token
   }
 
-  async getKubeConfig (clusterId) {
+  getKubeConfig = async (clusterId) => {
     return this.client.basicGet(`${await this.baseUrl()}/kubeconfig/${clusterId}`)
   }
 
   /* k8s API */
-  async getKubernetesVersion (clusterId) {
+  getKubernetesVersion = async (clusterId) => {
     return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/version`)
   }
 
@@ -151,7 +151,7 @@ class Qbert {
     namespace: cluster.metadata.namespace,
   })
 
-  async getClusterNamespaces (clusterId) {
+  getClusterNamespaces = async (clusterId) => {
     try {
       const data = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces`)
 
@@ -162,17 +162,17 @@ class Qbert {
     }
   }
 
-  async createNamespace (clusterId, body) {
+  createNamespace = async (clusterId, body) => {
     const raw = await this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces`, body)
     const converted = this.convertCluster(clusterId)(raw)
     return converted
   }
 
-  async deleteNamespace (clusterId, namespaceName) {
+  deleteNamespace = async (clusterId, namespaceName) => {
     return this.client.basicDelete(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespaceName}`)
   }
 
-  async getClusterPods (params) {
+  getClusterPods = async (params) => {
     const { clusterId } = params
     try {
       const data = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/pods`)
@@ -183,7 +183,7 @@ class Qbert {
     }
   }
 
-  async getClusterDeployments (params) {
+  getClusterDeployments = async (params) => {
     const { clusterId } = params
     try {
       const data = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/extensions/v1beta1/deployments`)
@@ -194,11 +194,11 @@ class Qbert {
     }
   }
 
-  async deleteDeployment (clusterId, namespace, name) {
+  deleteDeployment = async (clusterId, namespace, name) => {
     return this.client.basicDelete(`${await this.baseUrl()}}/k8sapi/apis/extensions/v1beta1/namespaces/${namespace}/deployments/${name}`)
   }
 
-  async getClusterKubeServices (params) {
+  getClusterKubeServices = async (params) => {
     const { clusterId } = params
     try {
       const data = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/services`)
@@ -209,27 +209,27 @@ class Qbert {
     }
   }
 
-  async getClusterStorageClasses (clusterId) {
+  getClusterStorageClasses = async (clusterId) => {
     return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/storage.k8s.io/v1/storageclasses`)
   }
 
-  async createStorageClass (clusterId, params) {
+  createStorageClass = async (clusterId, params) => {
     return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/storage.k8s.io/v1/storageclasses`)
   }
 
-  async deleteStorageClass (clusterId, name) {
+  deleteStorageClass = async (clusterId, name) => {
     return this.client.basicDelete(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/storage.k8s.io/v1/storageclasses/${name}`)
   }
 
-  async getReplicaSets (clusterId) {
+  getReplicaSets = async (clusterId) => {
     return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/extensions/v1beta1/replicasets`)
   }
 
-  async createPod (clusterId, namespace, params) {
+  createPod = async (clusterId, namespace, params) => {
     return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/pods`, params)
   }
 
-  async deletePod (clusterId, namespace, name) {
+  deletePod = async (clusterId, namespace, name) => {
     return this.client.basicDelete(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/pods/${name}`)
   }
 
@@ -239,7 +239,7 @@ class Qbert {
     delete: this.deletePod.bind(this),
   }
 
-  async createDeployment (clusterId, namespace, params) {
+  createDeployment = async (clusterId, namespace, params) => {
     return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/extensions/v1beta1/namespaces/${namespace}/deployments`, params)
   }
 
@@ -249,11 +249,11 @@ class Qbert {
     delete: this.deleteDeployment.bind(this),
   }
 
-  async createService (clusterId, namespace, params) {
+  createService = async (clusterId, namespace, params) => {
     return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/services`, params)
   }
 
-  async deleteService (clusterId, namespace, name) {
+  deleteService = async (clusterId, namespace, name) => {
     return this.client.basicDelete(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/services/${name}`)
   }
 
@@ -263,71 +263,71 @@ class Qbert {
     delete: this.deleteService.bind(this),
   }
 
-  async createServiceAccount (clusterId, namespace, params) {
+  createServiceAccount = async (clusterId, namespace, params) => {
     return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/serviceaccounts`)
   }
 
   /* Monocular endpoints being exposed through Qbert */
-  async getCharts (clusterId) {
+  getCharts = async (clusterId) => {
     return this.client.basicGet(`${await this.clusterMonocularBaseUrl(clusterId)}/charts`)
   }
 
-  async getChart (clusterId, chart, release, version) {
+  getChart = async (clusterId, chart, release, version) => {
     const versionStr = version ? `/versions/${version}` : ''
     return this.client.basicGet(`${await this.clusterMonocularBaseUrl(clusterId)}/charts/${chart}/${release}/${versionStr}`)
   }
 
-  async getChartVersions (clusterId, chart, release) {
+  getChartVersions = async (clusterId, chart, release) => {
     return this.client.basicGet(`${await this.clusterMonocularBaseUrl(clusterId)}/charts/${chart}/${release}/versions`)
   }
 
-  async getReleases (clusterId) {
+  getReleases = async (clusterId) => {
     return this.client.basicGet(`${await this.clusterMonocularBaseUrl(clusterId)}/releases`)
   }
 
-  async getRelease (clusterId, name) {
+  getRelease = async (clusterId, name) => {
     return this.client.basicGet(`${await this.clusterMonocularBaseUrl(clusterId)}/releases/${name}`)
   }
 
-  async deleteRelease (clusterId, name) {
+  deleteRelease = async (clusterId, name) => {
     return this.client.basicDelete(`${await this.clusterMonocularBaseUrl(clusterId)}/releases/${name}`)
   }
 
-  async deployApplication (clusterId, body) {
+  deployApplication = async (clusterId, body) => {
     return this.client.basicPost(`${await this.clusterMonocularBaseUrl(clusterId)}/releases`, body)
   }
 
-  async getRepositories () {
+  getRepositories = async () => {
     return this.client.basicGet(`${await this.monocularBaseUrl()}/repos`)
   }
 
-  async getRepositoriesForCluster (clusterId) {
+  getRepositoriesForCluster = async (clusterId) => {
     return this.client.basicGet(`${await this.clusterMonocularBaseUrl(clusterId)}/repos`)
   }
 
-  async createRepository (body) {
+  createRepository = async (body) => {
     return this.client.basicPost(`${this.monocularBaseUrl()}/repos`, body)
   }
 
-  async createRepositoryForCluster (clusterId, body) {
+  createRepositoryForCluster = async (clusterId, body) => {
     return this.client.basicGet(`${await this.clusterMonocularBaseUrl(clusterId)}/repos`, body)
   }
 
-  async deleteRepository (repoId) {
+  deleteRepository = async (repoId) => {
     return this.client.basicDelete(`${this.monocularBaseUrl()}/repos/${repoId}`)
   }
 
-  async deleteRepositoriesForCluster (clusterId, repoId) {
+  deleteRepositoriesForCluster = async (clusterId, repoId) => {
     return this.client.basicDelete(`${await this.clusterMonocularBaseUrl(clusterId)}/repos/${repoId}`)
   }
 
-  async getServiceAccounts (clusterId, namespace) {
+  getServiceAccounts = async (clusterId, namespace) => {
     const response = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/serviceaccounts`)
     return response.items
   }
 
   /* Managed Apps */
-  async getPrometheusInstances (clusterUuid) {
+  getPrometheusInstances = async (clusterUuid) => {
     const response = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/prometheuses`)
     return normalizePrometheusResponse(clusterUuid, response)
   }
@@ -335,7 +335,7 @@ class Qbert {
   // TODO: What is the API call to delete prometheus instances?  How do we uniquely identify them
   // async deletePrometheusInstances (clusterUuid, ???)
 
-  async createPrometheusInstance (clusterId, data) {
+  createPrometheusInstance = async (clusterId, data) => {
     const requests = {}
     if (data.cpu) { requests.cpu = `${data.cpu}m` }
     if (data.memory) { requests.memory = `${data.memory}Mi` }
@@ -421,17 +421,17 @@ class Qbert {
     return response
   }
 
-  async getPrometheusServiceMonitors (clusterUuid) {
+  getPrometheusServiceMonitors = async (clusterUuid) => {
     const response = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/servicemonitors`)
     return normalizePrometheusResponse(clusterUuid, response)
   }
 
-  async getPrometheusRules (clusterUuid) {
+  getPrometheusRules = async (clusterUuid) => {
     const response = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/prometheusrules`)
     return normalizePrometheusResponse(clusterUuid, response)
   }
 
-  async getPrometheusAlertManagers (clusterUuid) {
+  getPrometheusAlertManagers = async (clusterUuid) => {
     const response = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/alertmanagers`)
     return normalizePrometheusResponse(clusterUuid, response)
   }
