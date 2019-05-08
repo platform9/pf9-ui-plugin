@@ -1,5 +1,5 @@
 import { pathOrNull } from 'utils/fp'
-import { pathOr, prop } from 'ramda'
+import { pathOr, prop, propEq } from 'ramda'
 import { loadClusters } from '../infrastructure/actions'
 
 const mapServiceMonitor = ({ clusterUuid, metadata, spec }) => ({
@@ -26,7 +26,7 @@ const mapAlertManager = ({ clusterUuid, metadata, spec }) => ({
   labels: metadata.labels,
 })
 
-const mapPrometheusInstance = ({ clusterUuid, metadata, spec }) => ({
+export const mapPrometheusInstance = ({ clusterUuid, metadata, spec }) => ({
   clusterUuid,
   name: metadata.name,
   namespace: metadata.namespace,
@@ -112,4 +112,13 @@ export const createPrometheusInstance = async ({ data, context, setContext }) =>
 export const loadServiceAccounts = async ({ data, context, setContext }) => {
   const serviceAccounts = await context.apiClient.qbert.getServiceAccounts(data.clusterUuid, data.namespace)
   return serviceAccounts
+}
+
+export const deletePrometheusInstance = async ({ id, context, setContext }) => {
+  const instance = context.prometheusInstances.find(propEq('id', id))
+  if (!instance) {
+    console.error(`Unable to find prometheus instance with id: ${id} in deletePrometheusInstance`)
+    return // eslint-disable-line no-useless-return
+  }
+  // TODO: waiting on documentation from backend team on how to do DELETE calls
 }

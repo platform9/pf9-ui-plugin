@@ -1,9 +1,12 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { loadPrometheusResources } from './actions'
+import {
+  deletePrometheusInstance,
+  loadPrometheusResources,
+} from './actions'
 
 const renderKeyValues = obj => Object.entries(obj)
   .map(([key, value]) => `${key}: ${value}`)
-  .join(', <br/>')
+  .join(', ')
 
 const renderClusterName = (field, row, context) => {
   const cluster = context.clusters.find(x => x.uuid === row.clusterUuid)
@@ -32,6 +35,7 @@ export const options = {
   addUrl: '/ui/kubernetes/prometheus/instances/add',
   columns,
   dataKey: 'prometheusInstances',
+  deleteFn: deletePrometheusInstance,
   editUrl: '/ui/kubernetes/prometheus/instances/edit',
   loaderFn: loadPrometheusResources,
   name: 'PrometheusInstances',

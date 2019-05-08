@@ -332,6 +332,9 @@ class Qbert {
     return normalizePrometheusResponse(clusterUuid, response)
   }
 
+  // TODO: What is the API call to delete prometheus instances?  How do we uniquely identify them
+  // async deletePrometheusInstances (clusterUuid, ???)
+
   async createPrometheusInstance (clusterId, data) {
     const requests = {}
     if (data.cpu) { requests.cpu = `${data.cpu}m` }
@@ -411,10 +414,11 @@ class Qbert {
       }
     }
 
-    this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${data.namespace}/prometheuses`, prometheusBody)
+    const response = await this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${data.namespace}/prometheuses`, prometheusBody)
     this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${data.namespace}/servicemonitors`, serviceMonitorBody)
     this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${data.namespace}/prometheusrules`, prometheusRulesBody)
     // this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/alertmanagers`, alertManagerBody)
+    return response
   }
 
   async getPrometheusServiceMonitors (clusterUuid) {
