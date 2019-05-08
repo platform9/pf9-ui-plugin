@@ -16,10 +16,10 @@ export const columns = [
 export const options = {
   columns,
   dataKey: 'prometheusAlertManagers',
-  editUrl: '/ui/kubernetes/prometheus/serviceMonitors/edit',
+  editUrl: '/ui/kubernetes/prometheus/alertManagers/edit',
   loaderFn: loadPrometheusAlertManagers,
-  name: 'PrometheuServiceMonitors',
-  title: 'Prometheus Service Monitors',
+  name: 'PrometheusAlertManagers',
+  title: 'Prometheus Alert Managers',
   uniqueIdentifier: 'name',
 }
 

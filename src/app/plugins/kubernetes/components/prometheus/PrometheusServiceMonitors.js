@@ -24,7 +24,7 @@ export const options = {
   dataKey: 'prometheusServiceMonitors',
   editUrl: '/ui/kubernetes/prometheus/serviceMonitors/edit',
   loaderFn: loadPrometheusServiceMonitors,
-  name: 'PrometheuServiceMonitors',
+  name: 'PrometheusServiceMonitors',
   title: 'Prometheus Service Monitors',
   uniqueIdentifier: sm => `${sm.clusterUuid}-${sm.namespace}-${sm.name}`,
 }
