@@ -4,6 +4,7 @@ import { compose } from 'app/utils/fp'
 import { withAppContext } from 'core/AppContext'
 import CRUDListContainer from 'core/components/CRUDListContainer'
 import createListTableComponent from 'core/helpers/createListTableComponent'
+import { loadVolumeSnapshots } from 'openstack/components/volumes/actions'
 
 export const columns = [
   { id: 'id', label: 'OpenStack ID' },
@@ -25,9 +26,10 @@ export const VolumeSnapshotsList = createListTableComponent({
 
 class VolumeSnapshotsListContainer extends React.Component {
   handleRemove = async id => {
-    const { context, setContext } = this.props
-    await context.apiClient.cinder.deleteSnapshot(id)
-    const newVolumeSnapshots = context.volumeSnapshots.filter(x => x.id !== id)
+    const { getContext, setContext } = this.props
+    await getContext('apiClient').cinder.deleteSnapshot(id)
+    const newVolumeSnapshots = (await loadVolumeSnapshots({ getContext, setContext }))
+      .filter(x => x.id !== id)
     setContext({ volumeSnapshots: newVolumeSnapshots })
   }
 
@@ -46,7 +48,7 @@ class VolumeSnapshotsListContainer extends React.Component {
 }
 
 VolumeSnapshotsListContainer.propTypes = {
-  volumeSnapshots: PropTypes.arrayOf(PropTypes.object)
+  volumeSnapshots: PropTypes.arrayOf(PropTypes.object),
 }
 
 export default compose(

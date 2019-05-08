@@ -2,23 +2,23 @@ import { keyValueArrToObj, objToKeyValueArr } from 'app/utils/fp'
 import contextLoader from 'core/helpers/contextLoader'
 import contextUpdater from 'core/helpers/contextUpdater'
 
-export const loadVolumes = contextLoader('volumes', async ({ context }) => {
-  return context.apiClient.cinder.getVolumes()
+export const loadVolumes = contextLoader('volumes', async ({ apiClient }) => {
+  return apiClient.cinder.getVolumes()
 })
 
 export const updateVolume = async ({ setContext }) => {
   // TODO
 }
 
-export const loadVolumeTypes = contextLoader('volumeTypes', async ({ context }) => {
-  const volumeTypes = await context.apiClient.cinder.getVolumeTypes()
+export const loadVolumeTypes = contextLoader('volumeTypes', async ({ apiClient }) => {
+  const volumeTypes = await apiClient.cinder.getVolumeTypes()
 
   // Change metadata into array form
   return (volumeTypes || []).map(x => ({ ...x, extra_specs: objToKeyValueArr(x.extra_specs) }))
 })
 
-export const loadVolumeSnapshots = contextLoader('volumeSnapshots', async ({ context }) => {
-  const volumeSnapshots = await context.apiClient.cinder.getSnapshots()
+export const loadVolumeSnapshots = contextLoader('volumeSnapshots', async ({ apiClient }) => {
+  const volumeSnapshots = await apiClient.cinder.getSnapshots()
 
   // Change metadata into array form
   return (volumeSnapshots || []).map(x => ({
@@ -27,32 +27,32 @@ export const loadVolumeSnapshots = contextLoader('volumeSnapshots', async ({ con
   }))
 })
 
-export const updateVolumeSnapshot = contextUpdater('volumeSnapshots', async ({ data, context }) => {
+export const updateVolumeSnapshot = contextUpdater('volumeSnapshots', async ({ apiClient, currentItems, data }) => {
   const { id } = data
-  const { cinder } = context.apiClient
+  const { cinder } = apiClient
   const updated = await cinder.updateSnapshot(id, data)
   cinder.updateSnapshotMetadata(id, keyValueArrToObj(data.metadata))
   updated.metadata = data.metadata
-  return context.volumeSnapshots.map(x => x.id === id ? updated : x)
+  return currentItems.map(x => x.id === id ? updated : x)
 })
 
-export const updateVolumeType = contextUpdater('volumeTypes', async ({ data, context }) => {
+export const updateVolumeType = contextUpdater('volumeTypes', async ({ apiClient, currentItems, data }) => {
   const { id } = data
-  const { cinder } = context.apiClient
+  const { cinder } = apiClient
   const converted = {
     name: data.name,
     extra_specs: keyValueArrToObj(data.extra_specs),
   }
-  const oldKeys = context.volumeTypes.find(x => x.id === id).extra_specs.map(x => x.key)
+  const oldKeys = currentItems.find(x => x.id === id).extra_specs.map(x => x.key)
   const newKeys = data.extra_specs.map(x => x.key)
   const keysToDelete = oldKeys.filter(x => !newKeys.includes(x))
   const updated = await cinder.updateVolumeType(id, converted, keysToDelete)
-  return context.volumeTypes.map(x => x.id === id ? updated : x)
+  return currentItems.map(x => x.id === id ? updated : x)
 })
 
 // TODO: update context?
-export const createVolume = async ({ data, context, setContext }) => {
-  const { cinder } = context.apiClient
+export const createVolume = async ({ data, apiClient }) => {
+  const { cinder } = apiClient
   const created = await cinder.createVolume(data)
   if (data.bootable) {
     await cinder.setBootable(created.id, true)

@@ -58,8 +58,8 @@ class TenantChooser extends React.Component {
   }
 
   loadTenants = async (reload = false) => {
-    const { context, setContext } = this.props
-    const tenants = await loadUserTenants({ context, setContext, reload })
+    const { getContext, setContext } = this.props
+    const tenants = await loadUserTenants({ getContext, setContext, reload })
     this.setState({ tenants })
     return tenants
   }

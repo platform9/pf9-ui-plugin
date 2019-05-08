@@ -53,7 +53,7 @@ class AppCatalogPage extends React.Component {
           filters={this.filtersConfig()}
           searchTarget="attributes.name"
         >
-          {item => <ApplicationCard application={item} keyf={item.id} />}
+          {item => <ApplicationCard application={item} key={item.id} />}
         </CardTable>
       </div>
     )

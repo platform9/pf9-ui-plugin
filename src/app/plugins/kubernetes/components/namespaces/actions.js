@@ -1,14 +1,24 @@
-import contextUpdater from 'core/helpers/contextUpdater'
+import clusterContextLoader from 'core/helpers/clusterContextLoader'
+import { asyncFlatMap } from 'utils/fp'
+import { pluck } from 'ramda'
+import clusterContextUpdater from 'core/helpers/clusterContextUpdater'
 
-export const createNamespace = contextUpdater('namespaces', async ({ data, context }) => {
+export const loadNamespaces = clusterContextLoader('namespaces', async ({ apiClient, clusters, params: { clusterId } }) => {
+  const { qbert } = apiClient
+  return clusterId === '__all__'
+    ? asyncFlatMap(pluck('uuid', clusters), qbert.getClusterNamespaces)
+    : qbert.getClusterNamespaces(clusterId)
+})
+
+export const createNamespace = clusterContextUpdater('namespaces', async ({ apiClient, currentItems, data }) => {
   const { clusterId, name } = data
   const body = { metadata: { name } }
-  const created = await context.apiClient.qbert.createNamespace(clusterId, body)
-  return [...context.namespaces, created]
+  const created = await apiClient.qbert.createNamespace(clusterId, body)
+  return [...currentItems, created]
 }, true)
 
-export const deleteNamespace = contextUpdater('namespaces', async ({ id, context }) => {
-  const { clusterId, name } = await context.namespaces.find(x => x.id === id)
-  await context.apiClient.qbert.deleteNamespace(clusterId, name)
-  return context.namespaces.filter(x => x.id !== id)
+export const deleteNamespace = clusterContextUpdater('namespaces', async ({ apiClient, currentItems, params: { id } }) => {
+  const { clusterId, name } = currentItems.find(ns => ns.id === id)
+  await apiClient.qbert.deleteNamespace(clusterId, name)
+  return currentItems.filter(x => x.id !== id)
 })

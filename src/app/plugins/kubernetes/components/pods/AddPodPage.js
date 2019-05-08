@@ -4,11 +4,12 @@ import PicklistField from 'core/components/validatedForm/PicklistField'
 import SubmitButton from 'core/components/SubmitButton'
 import createAddComponents from 'core/helpers/createAddComponents'
 import { projectAs } from 'utils/fp'
-import { loadClusters, loadNamespaces } from '../infrastructure/actions'
+import { loadClusters } from '../infrastructure/actions'
 import { loadPods, createPod } from './actions'
 import { withDataLoader } from 'core/DataLoader'
 import CodeMirror from 'core/components/validatedForm/CodeMirror'
 import { compose } from 'ramda'
+import { loadNamespaces } from 'k8s/components/namespaces/actions'
 
 export class AddPodForm extends React.Component {
   state = {

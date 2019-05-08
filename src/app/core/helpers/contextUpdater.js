@@ -1,23 +1,27 @@
 import { last, assocPath } from 'ramda'
-import { ensureFunction, ensureArray } from 'utils/fp'
-import moize from 'moize'
+import { ensureArray } from 'utils/fp'
+import { getLoader } from 'core/helpers/contextLoader'
 
 /**
  * Returns a function that will be used to add values to existing context arrays
- * @param pathResolver Context pathResolver
+ * @param contextPath Context contextPath
  * @param updaterFn Function whose return value will be used to update the context
  * @param returnLast Whether or not to return the last value of the updated list
  * @returns {Function}
  */
-const contextUpdater = (pathResolver, updaterFn, returnLast = false) => {
-  const moizedPathResolver = moize(ensureFunction(pathResolver))
+const contextUpdater = (contextPath, updaterFn, returnLast = false) => {
+  const resolvedPath = ensureArray(contextPath)
 
-  return async ({ context, setContext, params = {}, ...rest }) => {
-    const resolvedPath = ensureArray(moizedPathResolver(params))
+  return async args => {
+    const { getContext, setContext } = args
+    const loaderFn = getLoader(resolvedPath)
+    const currentItems = (await loaderFn(args)) || []
     const output = await updaterFn({
-      context,
-      setContext,
-      ...rest,
+      ...args,
+      apiClient: getContext('apiClient'),
+      currentItems,
+      loadFromContext: (contextPath, customArgs) =>
+        getLoader(contextPath)({ ...args, ...customArgs }),
     })
     await setContext(assocPath(resolvedPath, output))
     return returnLast && Array.isArray(output) ? last(output) : output

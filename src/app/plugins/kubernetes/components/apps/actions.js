@@ -1,42 +1,35 @@
-import { flatten, prop, propEq } from 'ramda'
+import { prop, pluck } from 'ramda'
 import clusterContextLoader from 'core/helpers/clusterContextLoader'
 import contextLoader from 'core/helpers/contextLoader'
-
-const getClusterApps = context => async cluster => {
-  return context.apiClient.qbert.getCharts(cluster.uuid).then(prop('data'))
-}
+import { asyncFlatMap } from 'utils/fp'
 
 export const loadApps = clusterContextLoader(
   'apps',
-  async ({ context, clusters, params: { clusterId } }) => {
-    const loadClusterAppsFromContext = getClusterApps(context)
+  async ({ apiClient, clusters, params: { clusterId } }) => {
+    const { qbert } = apiClient
     return clusterId === '__all__'
-      ? Promise.all(clusters.map(loadClusterAppsFromContext)).then(flatten)
-      : loadClusterAppsFromContext(clusters.find(propEq('uuid', clusterId)))
+      ? asyncFlatMap(pluck('uuid', clusters), qbert.getCharts)
+      : qbert.getCharts(clusterId)
   })
-
-const getClusterReleases = context => async cluster => {
-  return context.apiClient.qbert.getReleases(cluster.uuid).then(prop('data'))
-}
 
 export const loadReleases = clusterContextLoader(
   'releases',
-  async ({ context, clusters, params: { clusterId } }) => {
-    const loadClusterReleasesFromContext = getClusterReleases(context)
+  async ({ apiClient, clusters, params: { clusterId } }) => {
+    const { qbert } = apiClient
     return clusterId === '__all__'
-      ? Promise.all(clusters.map(loadClusterReleasesFromContext)).then(flatten)
-      : loadClusterReleasesFromContext(clusters.find(propEq('uuid', clusterId)))
+      ? asyncFlatMap(pluck('uuid', clusters), qbert.getReleases)
+      : qbert.getReleases(clusterId)
   })
 
-export const deleteRelease = async ({ data, context, setContext, reload }) => {
+export const deleteRelease = async ({ data, setContext, reload }) => {
   // TODO
 }
 
-export const loadRepositories = contextLoader('repositories', async ({ context }) => {
-  return context.apiClient.qbert.getRepositories().then(prop('data'))
+export const loadRepositories = contextLoader('repositories', async ({ apiClient }) => {
+  return apiClient.qbert.getRepositories().then(prop('data'))
 })
 
-export const deleteRepository = async ({ data, context, setContext, params, reload }) => {
+export const deleteRepository = async ({ data, setContext, params, reload }) => {
   // TODO
 }
 

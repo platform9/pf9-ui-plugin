@@ -1,7 +1,7 @@
 import contextLoader from 'core/helpers/contextLoader'
 
-export const loadImages = contextLoader('images', async ({ context }) => {
-  return context.apiClient.glance.getImages()
+export const loadImages = contextLoader('images', async ({ apiClient }) => {
+  return apiClient.glance.getImages()
 })
 
 export const updateImage = async (data, helpers) => {

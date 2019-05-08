@@ -1,8 +1,8 @@
 import contextLoader from 'core/helpers/contextLoader'
 import contextUpdater from 'core/helpers/contextUpdater'
 
-export const loadUsers = contextLoader('users', async ({ context }) => {
-  return context.apiClient.keystone.getUsers()
+export const loadUsers = contextLoader('users', async ({ apiClient }) => {
+  return apiClient.keystone.getUsers()
 })
 
 export const createUser = contextUpdater('users', async ({ data, context }) => {

@@ -6,8 +6,8 @@ import { withDataLoader } from 'core/DataLoader'
 import { withScopedPreferences } from 'core/providers/PreferencesProvider'
 import contextLoader from 'core/helpers/contextLoader'
 
-const loadRegions = contextLoader('regions', async ({ context }) => {
-  return context.apiClient.keystone.getRegions()
+const loadRegions = contextLoader('regions', async ({ apiClient }) => {
+  return apiClient.keystone.getRegions()
 })
 
 class RegionChooser extends React.Component {

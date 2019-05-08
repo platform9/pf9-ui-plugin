@@ -53,12 +53,12 @@ const ListPage = ({ ListContainer }) => {
     }
 
     handleClusterChange = async clusterId => {
-      const { context, setContext } = this.props
+      const { getContext, setContext } = this.props
       this.setState({
         activeCluster: clusterId,
       }, async () => loadReleases({
         params: { clusterId },
-        context,
+        getContext,
         setContext,
       }))
     }

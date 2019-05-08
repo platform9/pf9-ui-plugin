@@ -8,7 +8,8 @@ import { loadServices, createService } from './actions'
 import { withDataLoader } from 'core/DataLoader'
 import CodeMirror from 'core/components/validatedForm/CodeMirror'
 import { compose } from 'ramda'
-import { loadClusters, loadNamespaces } from 'k8s/components/infrastructure/actions'
+import { loadClusters } from 'k8s/components/infrastructure/actions'
+import { loadNamespaces } from 'k8s/components/namespaces/actions'
 
 export class AddServiceForm extends React.Component {
   state = {

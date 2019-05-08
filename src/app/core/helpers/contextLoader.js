@@ -1,46 +1,55 @@
 import { path, assocPath, dissocPath } from 'ramda'
-import moize from 'moize'
-import { ensureFunction, ensureArray } from 'utils/fp'
+import { ensureArray } from 'utils/fp'
 
 let pendingPromises = {}
+let resolvers = {}
 
 /**
  * Returns a function that will use context to load and cache values
- * @param pathResolver Context path on which the resolved value will be cached, it can be a function
+ * @param contextPath Context path (a string or array for deep paths) on which the resolved value will be cached
  * @param loaderFn Function returning the data to be assigned to the context
  * @param defaultValue Default value assigned to the context
  * @returns {Function}
  */
-const contextLoader = (pathResolver, loaderFn, defaultValue = []) => {
-  const moizedPathResolver = moize(ensureFunction(pathResolver))
+const contextLoader = (contextPath, loaderFn, defaultValue = []) => {
+  const arrContextPath = ensureArray(contextPath)
 
-  return async ({ context, setContext, params = {}, reload = false, cascade = false, ...rest }) => {
-    const resolvedPath = ensureArray(moizedPathResolver(params))
-    let promise = path(resolvedPath, pendingPromises)
+  const resolver = async ({ getContext, setContext, params = {}, reload = false, cascade = false, ...rest }) => {
+    let promise = path(arrContextPath, pendingPromises)
     if (promise) {
       return promise
     }
-    let output = path(resolvedPath, context)
+    let output = getContext(arrContextPath)
 
     if (reload || !output) {
       if (!output && defaultValue) {
-        await setContext(assocPath(resolvedPath, defaultValue))
+        await setContext(assocPath(arrContextPath, defaultValue))
       }
-      promise = loaderFn({
-        context,
+      const args = {
+        getContext,
         setContext,
+        apiClient: getContext('apiClient'),
         params,
         reload: reload && cascade,
         cascade,
+        loadFromContext: (contextPath, customArgs) =>
+          path(ensureArray(contextPath), resolvers)({ ...args, ...customArgs }),
         ...rest,
-      })
-      pendingPromises = assocPath(resolvedPath, promise, pendingPromises)
+      }
+      promise = loaderFn(args)
+      pendingPromises = assocPath(arrContextPath, promise, pendingPromises)
       output = await promise
-      await setContext(assocPath(resolvedPath, output))
-      dissocPath(resolvedPath, pendingPromises)
+      await setContext(context => assocPath(arrContextPath, output, context))
+      pendingPromises = dissocPath(arrContextPath, pendingPromises)
     }
     return output
   }
+
+  // Store the resolver in an key indexed object that we will use in the exported "getLoader" function
+  // "contextUpdater" will make use of resolvers defined using "contextLoader"
+  resolvers = assocPath(arrContextPath, resolver, resolvers)
+  return resolver
 }
 
+export const getLoader = loaderPath => path(loaderPath, resolvers)
 export default contextLoader

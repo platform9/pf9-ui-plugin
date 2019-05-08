@@ -1,4 +1,4 @@
-import { curry, fromPairs, mapObjIndexed, pathOr, remove } from 'ramda'
+import { curry, fromPairs, mapObjIndexed, pathOr, remove, flatten } from 'ramda'
 import moize from 'moize'
 
 // functional programming helpers
@@ -108,7 +108,7 @@ export const keyValueArrToObj = (arr = []) =>
     return accum
   }, {})
 
-export const asyncMap = async (arr, callback, parallel = false) => {
+export const asyncMap = async (arr, callback, parallel = true) => {
   if (parallel) {
     return Promise.all(arr.map((val, i) => callback(val, i, arr)))
   }
@@ -119,7 +119,12 @@ export const asyncMap = async (arr, callback, parallel = false) => {
   return newArr
 }
 
-export const asyncFlatMap = async (arr, callback) => {
+export const asyncFlatMap = async (arr, callback, parallel = true) => {
+  if (parallel) {
+    return flatten(await Promise.all(
+      arr.map(async (val, i) => ensureArray(await callback(val, i, arr))),
+    ))
+  }
   let newArr = []
   for (let i = 0; i < arr.length; i++) {
     // Array#flat is not widely supported so best to just implement ourselves.

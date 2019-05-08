@@ -19,8 +19,8 @@ class ServicePicker extends React.Component {
       // loadServiceCatalog completes.  Need this hack to work around it.
       { isMounted: true },
       async () => {
-        const { context, setContext } = this.props
-        const catalog = await loadServiceCatalog({ context, setContext })
+        const { getContext, setContext } = this.props
+        const catalog = await loadServiceCatalog({ getContext, setContext })
         const catalogMap = arrToObjByKey('name', catalog)
         if (this.state.isMounted) {
           this.setState({

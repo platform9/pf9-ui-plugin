@@ -4,19 +4,19 @@ import Chart from '../../../models/monocular/Chart'
 export const getCharts = (req, res) => {
   const { namespace, clusterId } = req.params
   const charts = Chart.list({ context, config: { clusterId, namespace } })
-  return res.send({ data: charts })
+  return res.send(charts)
 }
 
 export const getChart = (req, res) => {
   const { namespace, clusterId } = req.params
   const { chartName } = req.params
   const chart = Chart.findByName({ name: chartName, context, config: { clusterId, namespace } })
-  return res.send({ data: chart })
+  return res.send(chart)
 }
 
 // This needs to be implemented in the model
 export const getChartVersions = (req, res) => {
   const { chartName } = req.params
   const chart = Chart.getVersions(chartName, context)
-  return res.send({ data: chart })
+  return res.send(chart)
 }

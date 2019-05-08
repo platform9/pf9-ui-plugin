@@ -9,7 +9,7 @@ import CreateSnapshotForm from './CreateSnapshotForm'
 
 class CreateSnapshotPage extends React.Component {
   handleAdd = async snapshotData => {
-    const { setContext, context, history, match } = this.props
+    const { setContext, getContext, history, match } = this.props
     const { volumeId } = match.params
     if (!volumeId) { return console.error('Invalid volumeId') }
     try {
@@ -18,8 +18,8 @@ class CreateSnapshotPage extends React.Component {
         name: snapshotData.name,
         description: snapshotData.description,
       }
-      const existingSnapshots = await loadVolumeSnapshots({ setContext, context })
-      const createdSnapshot = await context.apiClient.cinder.snapshotVolume(params)
+      const existingSnapshots = await loadVolumeSnapshots({ setContext, getContext })
+      const createdSnapshot = await getContext('apiClient').cinder.snapshotVolume(params)
       setContext({ volumeSnapshots: [ ...existingSnapshots, createdSnapshot ] })
       history.push('/ui/openstack/storage#volumeSnapshots')
     } catch (err) {

@@ -23,8 +23,8 @@ const serviceMappings = {
 
 const whichInterface = serviceName => serviceMappings[serviceName] || 'internal'
 
-export const loadServiceCatalog = contextLoader('serviceCatalog', async ({ context }) => {
-  const services = await context.apiClient.keystone.getServicesForActiveRegion()
+export const loadServiceCatalog = contextLoader('serviceCatalog', async ({ apiClient }) => {
+  const services = await apiClient.keystone.getServicesForActiveRegion()
   return Object.keys(services).map(x => {
     const service = services[x]
     const iface = whichInterface(service)

@@ -1,24 +1,22 @@
 import contextLoader from 'core/helpers/contextLoader'
 import contextUpdater from 'core/helpers/contextUpdater'
 
-export const loadNetworks = contextLoader('networks', async ({ context }) => {
-  return context.apiClient.neutron.getNetworks()
+export const loadNetworks = contextLoader('networks', async ({ apiClient }) => {
+  return apiClient.neutron.getNetworks()
 })
 
-export const createNetwork = contextUpdater('networks', async ({ data, context }) => {
-  const existing = await context.apiClient.neutron.getNetworks()
-  const created = await context.apiClient.neutron.createNetwork(data)
-  return [...existing, created]
+export const createNetwork = contextUpdater('networks', async ({ apiClient, currentItems, data }) => {
+  const created = await apiClient.neutron.createNetwork(data)
+  return [...currentItems, created]
 }, true)
 
-export const deleteNetwork = contextUpdater('networks', async ({ id, context }) => {
-  await context.apiClient.neutron.deleteNetwork(id)
-  return context.networks.filter(x => x.id !== id)
+export const deleteNetwork = contextUpdater('networks', async ({ apiClient, id, currentItems }) => {
+  await apiClient.neutron.deleteNetwork(id)
+  return currentItems.filter(x => x.id !== id)
 })
 
-export const updateNetwork = contextUpdater('networks', async ({ data, context }) => {
+export const updateNetwork = contextUpdater('networks', async ({ apiClient, currentItems, data }) => {
   const { id } = data
-  const existing = await context.apiClient.neutron.getNetworks()
-  const updated = await context.apiClient.neutron.updateNetwork(id, data)
-  return existing.map(x => x.id === id ? x : updated)
+  const updated = await apiClient.neutron.updateNetwork(id, data)
+  return currentItems.map(x => x.id === id ? x : updated)
 })

@@ -24,10 +24,10 @@ class DataLoaderBase extends PureComponent {
 
   loadAll = async () =>
     this.setState({ loading: true }, async () => {
-      const { loaders, options, context, setContext } = this.props
+      const { loaders, options, getContext, setContext } = this.props
       try {
         const data = await asyncProps(mapObjIndexed(loader =>
-          loader({ context, setContext, reload: options.reloadOnMount }), loaders,
+          loader({ getContext, setContext, reload: options.reloadOnMount }), loaders,
         ))
         this.setState({ loading: false, data, error: null })
       } catch (err) {
@@ -38,9 +38,9 @@ class DataLoaderBase extends PureComponent {
 
   loadOne = (loaderKey, params, reload, cascade = false) => {
     this.setState({ loading: true }, async () => {
-      const { loaders, context, setContext } = this.props
+      const { loaders, getContext, setContext } = this.props
       try {
-        const data = await loaders[loaderKey]({ context, setContext, params, reload, cascade })
+        const data = await loaders[loaderKey]({ getContext, setContext, params, reload, cascade })
         this.setState(prevState => ({
           loading: false,
           error: null,
@@ -58,9 +58,9 @@ class DataLoaderBase extends PureComponent {
     if (error) {
       return <DisplayError error={error} />
     }
-    const { children, options } = this.props
+    const { children, options, ...rest } = this.props
     return <Progress inline={options.inlineProgress} overlay loading={loading}>
-      {children({ data, loading, error, reloadData: this.loadOne })}
+      {children({ ...rest, data, loading, error, reloadData: this.loadOne })}
     </Progress>
   }
 }

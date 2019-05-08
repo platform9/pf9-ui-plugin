@@ -345,7 +345,7 @@ class Qbert {
 
     const serviceMonitor = {
       prometheus: data.name,
-      role: 'service-monitor'
+      role: 'service-monitor',
     }
 
     const appLabels = keyValueArrToObj(data.appLabels)
@@ -368,7 +368,7 @@ class Qbert {
         serviceMonitorSelector: { matchLabels: serviceMonitor },
         serviceAccountName: data.serviceAccountName,
         ruleSelector: { matchLabels: ruleSelector },
-      }
+      },
     }
 
     // TODO: How do we specifiy "Enable persistent storage" in the API call?  What does this field mean in the
@@ -409,9 +409,9 @@ class Qbert {
           {
             name: `${data.name}-rule-group`,
             rules: data.rules,
-          }
-        ]
-      }
+          },
+        ],
+      },
     }
 
     const response = await this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${data.namespace}/prometheuses`, prometheusBody)

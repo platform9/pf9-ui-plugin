@@ -5,8 +5,8 @@ import requiresAuthentication from '../../util/requiresAuthentication'
 import InstancesListContainer from './InstancesListContainer'
 import contextLoader from 'core/helpers/contextLoader'
 
-const loadInstances = contextLoader('instances', async ({ context }) => {
-  return context.apiClient.nova.getInstances()
+const loadInstances = contextLoader('instances', async ({ apiClient }) => {
+  return apiClient.nova.getInstances()
 })
 
 const InstancesListPage = () =>

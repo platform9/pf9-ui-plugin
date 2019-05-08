@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { assocPath, flatten } from 'ramda'
+import { path, assocPath, flatten, omit } from 'ramda'
+import { ensureArray } from 'utils/fp'
 
 const Context = React.createContext({})
 export const Consumer = Context.Consumer
@@ -17,21 +18,35 @@ class AppContext extends React.Component {
         session: {
           unscopedToken,
           username,
-          loginSuccessful: true
-        }
+          loginSuccessful: true,
+        },
       })
     },
 
     updateSession: async (path, value) => {
       return this.state.setContext(
-        assocPath(flatten(['session', path]), value)
+        assocPath(flatten(['session', path]), value),
       )
     },
 
     destroySession: async () => {
       return this.state.setContext({
-        session: {}
+        session: {},
       })
+    },
+
+    // Get an updated version of the current context values (not methods)
+    getContext: contextPath => {
+      const contextValues = omit([
+        'initSession',
+        'updateSession',
+        'destroySession',
+        'getContext',
+        'setContext',
+      ], this.state)
+
+      // Return all values if no path is specified
+      return contextPath ? path(ensureArray(contextPath), contextValues) : contextValues
     },
 
     setContext: (...args) => {
@@ -65,23 +80,25 @@ class AppContext extends React.Component {
 }
 
 AppContext.propTypes = {
-  initialContext: PropTypes.object
+  initialContext: PropTypes.object,
 }
 
 AppContext.defaultProps = {
-  initialContext: {}
+  initialContext: {},
 }
 
 export const withAppContext = Component => props =>
   <Consumer>
     {
-      ({ setContext, initSession, updateSession, destroySession, ...rest }) =>
+      ({ getContext, setContext, loadFromContext, initSession, updateSession, destroySession, ...rest }) =>
         <Component
           {...props}
           initSession={initSession}
           updateSession={updateSession}
           destroySession={destroySession}
+          getContext={getContext}
           setContext={setContext}
+          loadFromContext={loadFromContext}
           context={rest}
         />
     }

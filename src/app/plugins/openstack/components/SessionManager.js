@@ -44,7 +44,7 @@ class SessionManager extends React.Component {
 
   // Handler that gets invoked on successful authentication
   initialSetup = async ({ username, unscopedToken }) => {
-    const { context, history, location, initSession, initUserPreferences, setContext } = this.props
+    const { context, history, location, initSession, initUserPreferences, getContext, setContext } = this.props
 
     // Set up the scopedToken
     await initSession(unscopedToken, username)
@@ -52,7 +52,7 @@ class SessionManager extends React.Component {
     const userPreferences = await initUserPreferences(username)
     const lastTenant = pathOr('service', ['Tenants', 'lastTenant', 'name'], userPreferences)
 
-    const tenants = await loadUserTenants({ context, setContext })
+    const tenants = await loadUserTenants({ getContext, setContext })
     const activeTenant = tenants.find(propEq('name', lastTenant))
     const { keystone } = context.apiClient
     const { scopedToken, user } = await keystone.changeProjectScope(activeTenant.id)

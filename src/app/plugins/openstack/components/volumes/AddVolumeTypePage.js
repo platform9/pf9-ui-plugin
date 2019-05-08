@@ -9,14 +9,14 @@ import AddVolumeTypeForm from './AddVolumeTypeForm'
 
 class AddVolumeTypePage extends React.Component {
   handleAdd = async data => {
-    const { setContext, context, history } = this.props
+    const { setContext, getContext, history } = this.props
     try {
       const volumeType = {
         name: data.name,
         extra_specs: keyValueArrToObj(data.metadata),
       }
-      const createdVolumeType = await context.apiClient.cinder.createVolumeType(volumeType)
-      const existingVolumeTypes = await loadVolumeTypes({ setContext, context })
+      const createdVolumeType = await getContext('apiClient').cinder.createVolumeType(volumeType)
+      const existingVolumeTypes = await loadVolumeTypes({ setContext, getContext })
       setContext({ volumeTypes: [ ...existingVolumeTypes, createdVolumeType ] })
       history.push('/ui/openstack/storage#volumeTypes')
     } catch (err) {

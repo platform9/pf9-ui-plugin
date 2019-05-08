@@ -1,10 +1,10 @@
 import React from 'react'
 import { projectAs } from 'utils/fp'
 import { prop, head } from 'ramda'
-import { loadClusters, loadNamespaces } from 'k8s/components/infrastructure/actions'
+import { loadClusters } from 'k8s/components/infrastructure/actions'
 import Picklist from 'core/components/Picklist'
 import { withDataLoader } from 'core/DataLoader'
-import { deleteNamespace } from 'k8s/components/namespaces/actions'
+import { deleteNamespace, loadNamespaces } from 'k8s/components/namespaces/actions'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 
 const ListPage = ({ ListContainer }) => {
@@ -15,6 +15,7 @@ const ListPage = ({ ListContainer }) => {
 
     handleChangeCluster = clusterId => {
       this.setState({ activeCluster: clusterId })
+      this.props.reloadData('namespaces', { clusterId })
     }
 
     findClusterName = clusterId => {
@@ -24,7 +25,7 @@ const ListPage = ({ ListContainer }) => {
 
     render () {
       const { activeCluster } = this.state
-      const { namespaces = [], clusters = [] } = this.props.context
+      const { data: { namespaces, clusters } } = this.props
       const withClusterNames = namespaces.map(ns => ({
         ...ns,
         clusterName: this.findClusterName(ns.clusterId),
@@ -38,10 +39,9 @@ const ListPage = ({ ListContainer }) => {
             options={projectAs(
               { label: 'name', value: 'uuid' },
               [
-                // TODO: Figure out a way to query for all clusters
-                // { name: 'all', uuid: '__all__' },
-                ...clusters.filter(
-                  cluster => cluster.hasMasterNode)],
+                { name: 'all', uuid: '__all__' },
+                ...clusters.filter(cluster => cluster.hasMasterNode),
+              ],
             )}
             value={activeCluster || prop('uuid', head(clusters))}
             onChange={this.handleChangeCluster}

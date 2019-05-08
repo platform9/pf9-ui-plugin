@@ -6,6 +6,7 @@ import { withAppContext } from 'core/AppContext'
 import CRUDListContainer from 'core/components/CRUDListContainer'
 import createListTableComponent from 'core/helpers/createListTableComponent'
 import { withRouter } from 'react-router'
+import getVolumes from 'server/api/cinder/getVolumes'
 
 const columns = [
   { id: 'name', label: 'Name' },
@@ -26,7 +27,7 @@ const columns = [
 
   // TODO: We probably want to write a metadata renderer for this kind of format
   // since we use it in a few places for tags / metadata.
-  { id: 'metadata', label: 'Metadata', render: data => JSON.stringify(data) }
+  { id: 'metadata', label: 'Metadata', render: data => JSON.stringify(data) },
 ]
 
 export const VolumesList = createListTableComponent({
@@ -38,9 +39,10 @@ export const VolumesList = createListTableComponent({
 
 class VolumesListContainer extends React.Component {
   handleRemove = async id => {
-    const { context, setContext } = this.props
-    await context.apiClient.cinder.deleteVolume(id)
-    const newVolumes = context.volumes.filter(x => x.id !== id)
+    const { getContext, setContext } = this.props
+    await getContext('apiClient').cinder.deleteVolume(id)
+    const newVolumes = (await getVolumes({ getContext, setContext }))
+      .filter(x => x.id !== id)
     setContext({ volumes: newVolumes })
   }
 
@@ -50,7 +52,7 @@ class VolumesListContainer extends React.Component {
 
   render () {
     const rowActions = [
-      { icon: <PhotoCameraIcon />, label: 'Snapshot', action: this.handleSnapshot }
+      { icon: <PhotoCameraIcon />, label: 'Snapshot', action: this.handleSnapshot },
     ]
 
     return (
@@ -60,14 +62,15 @@ class VolumesListContainer extends React.Component {
         editUrl="/ui/openstack/storage/volumes/edit"
         onRemove={this.handleRemove}
       >
-        {handlers => <VolumesList data={this.props.volumes} {...handlers} rowActions={rowActions} />}
+        {handlers =>
+          <VolumesList data={this.props.volumes} {...handlers} rowActions={rowActions} />}
       </CRUDListContainer>
     )
   }
 }
 
 VolumesListContainer.propTypes = {
-  volumes: PropTypes.arrayOf(PropTypes.object)
+  volumes: PropTypes.arrayOf(PropTypes.object),
 }
 
 export default compose(

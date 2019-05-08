@@ -3,28 +3,26 @@ import contextUpdater from 'core/helpers/contextUpdater'
 
 const dataKey = 'tenants'
 
-export const loadUserTenants = contextLoader('userTenants', async ({ context }) => {
-  return context.apiClient.keystone.getProjectsAuth()
+export const loadUserTenants = contextLoader('userTenants', async ({ apiClient }) => {
+  return apiClient.keystone.getProjectsAuth()
 })
 
-export const loadTenants = contextLoader(dataKey, async ({ context }) => {
-  return context.apiClient.keystone.getProjects()
+export const loadTenants = contextLoader(dataKey, async ({ apiClient }) => {
+  return apiClient.keystone.getProjects()
 })
 
-export const createTenant = contextUpdater(dataKey, async ({ data, context, setContext }) => {
-  const created = await context.apiClient.keystone.createTenant(data)
-  const existing = await loadTenants({ context, setContext })
-  return [...existing, created]
+export const createTenant = contextUpdater(dataKey, async ({ data, apiClient, currentItems }) => {
+  const created = await apiClient.keystone.createTenant(data)
+  return [...currentItems, created]
 }, true)
 
-export const deleteTenant = contextUpdater(dataKey, async ({ id, context }) => {
-  await context.apiClient.keystone.deleteTenant(id)
-  return context[dataKey].filter(x => x.id !== id)
+export const deleteTenant = contextUpdater(dataKey, async ({ id, apiClient, currentItems }) => {
+  await apiClient.keystone.deleteTenant(id)
+  return currentItems.filter(x => x.id !== id)
 })
 
-export const updateTenant = contextUpdater(dataKey, async ({ data, context, setContext }) => {
+export const updateTenant = contextUpdater(dataKey, async ({ data, apiClient, currentItems }) => {
   const { id } = data
-  const existing = await loadTenants({ context, setContext })
-  const updated = await context.apiClient.keystone.updateTenant(id, data)
-  return existing.map(x => x.id === id ? x : updated)
+  const updated = await apiClient.keystone.updateTenant(id, data)
+  return currentItems.map(x => x.id === id ? x : updated)
 })

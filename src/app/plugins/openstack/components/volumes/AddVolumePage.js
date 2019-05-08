@@ -18,13 +18,13 @@ const constructBatch = (numVolumes, prefix, data) =>
 
 class AddVolumePage extends React.Component {
   handleAdd = async volume => {
-    const { setContext, context, history } = this.props
+    const { setContext, getContext, history } = this.props
     try {
-      const { createMultiple, numVolumes, volumeNamePrefix, ...rest } = volume
+      const { numVolumes, volumeNamePrefix, ...rest } = volume
       const volumesToCreate = constructBatch(numVolumes, volumeNamePrefix, rest)
-      const existing = await loadVolumes({ setContext, context })
+      const existing = await loadVolumes({ setContext, getContext })
       const createdVolumes = await asyncMap(volumesToCreate, data =>
-        context.apiClient.cinder.createVolume(data, { setContext, context })
+        getContext('apiClient').cinder.createVolume(data)
       )
       setContext({ volumes: [ ...existing, ...createdVolumes ] })
       history.push('/ui/openstack/storage#volumes')
