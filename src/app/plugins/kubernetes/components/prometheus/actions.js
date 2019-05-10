@@ -118,7 +118,10 @@ export const deletePrometheusInstance = async ({ id, context, setContext }) => {
   const instance = context.prometheusInstances.find(propEq('id', id))
   if (!instance) {
     console.error(`Unable to find prometheus instance with id: ${id} in deletePrometheusInstance`)
-    return // eslint-disable-line no-useless-return
+    return
   }
-  // TODO: waiting on documentation from backend team on how to do DELETE calls
+  const response = await context.apiClient.qbert.deletePrometheusInstance(instance.clusterUuid, instance.namespace, instance.name)
+  const prometheusInstances = context.prometheusInstances.filter(x => x.id !== id)
+  setContext({ prometheusInstances })
+  return response
 }

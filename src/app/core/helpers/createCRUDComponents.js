@@ -58,9 +58,13 @@ const createCRUDComponents = options => {
     preferences: { visibleColumns, columnsOrder, rowsPerPage },
     updatePreferences,
   }) => {
-    if (!data || data.length === 0) {
-      return <h1>No data found.</h1>
-    }
+    // Disabling the "No data found" message for now because there create action is
+    // tied to the ListTable and if there are no entities there won't be any way
+    // for the user to create new ones.
+    // TODO: We need to decouple the Add functionality from the ListTable completely.
+    // if (!data || data.length === 0) {
+    //   return <h1>No data found.</h1>
+    // }
     return (
       <ListTable
         title={title}

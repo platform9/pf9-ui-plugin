@@ -332,8 +332,10 @@ class Qbert {
     return normalizePrometheusResponse(clusterUuid, response)
   }
 
-  // TODO: What is the API call to delete prometheus instances?  How do we uniquely identify them
-  // async deletePrometheusInstances (clusterUuid, ???)
+  deletePrometheusInstance = async (clusterUuid, namespace, name) => {
+    const response = await this.client.basicDelete(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${namespace}/prometheuses/${name}`)
+    return response
+  }
 
   createPrometheusInstance = async (clusterId, data) => {
     const requests = {}
