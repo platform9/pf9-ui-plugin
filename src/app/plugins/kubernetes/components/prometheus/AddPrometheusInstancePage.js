@@ -14,7 +14,8 @@ import { compose, propEq } from 'ramda'
 import { projectAs } from 'utils/fp'
 import { withAppContext } from 'core/AppContext'
 import { withDataLoader } from 'core/DataLoader'
-import { loadClusters, loadNamespaces } from 'k8s/components/infrastructure/actions'
+import { loadClusters } from 'k8s/components/infrastructure/actions'
+import { loadNamespaces } from 'k8s/components/namespaces/actions'
 import {
   createPrometheusInstance,
   loadPrometheusResources,

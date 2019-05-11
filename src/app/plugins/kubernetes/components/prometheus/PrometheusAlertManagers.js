@@ -20,7 +20,7 @@ export const options = {
   loaderFn: loadPrometheusAlertManagers,
   name: 'PrometheusAlertManagers',
   title: 'Prometheus Alert Managers',
-  uniqueIdentifier: 'name',
+  uniqueIdentifier: ({ clusterUuid, namespace, name }) => `${clusterUuid}-${namespace}-${name}`,
 }
 
 const { ListPage, List } = createCRUDComponents(options)

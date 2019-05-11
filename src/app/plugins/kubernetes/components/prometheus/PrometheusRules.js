@@ -1,5 +1,8 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { loadPrometheusRules } from './actions'
+import {
+  deletePrometheusRule,
+  loadPrometheusRules,
+} from './actions'
 
 const renderKeyValues = obj => Object.entries(obj)
   .map(([key, value]) => `${key}: ${value}`)
@@ -20,11 +23,12 @@ export const columns = [
 export const options = {
   columns,
   dataKey: 'prometheusRules',
+  deleteFn: deletePrometheusRule,
   editUrl: '/ui/kubernetes/prometheus/rules/edit',
   loaderFn: loadPrometheusRules,
   name: 'PrometheusRules',
   title: 'Prometheus Rules',
-  uniqueIdentifier: 'name',
+  uniqueIdentifier: ({ clusterUuid, namespace, name }) => `${clusterUuid}-${namespace}-${name}`,
 }
 
 const { ListPage, List } = createCRUDComponents(options)

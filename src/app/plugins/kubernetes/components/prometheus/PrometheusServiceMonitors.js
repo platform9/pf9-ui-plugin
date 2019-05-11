@@ -26,7 +26,7 @@ export const options = {
   loaderFn: loadPrometheusServiceMonitors,
   name: 'PrometheusServiceMonitors',
   title: 'Prometheus Service Monitors',
-  uniqueIdentifier: sm => `${sm.clusterUuid}-${sm.namespace}-${sm.name}`,
+  uniqueIdentifier: ({ clusterUuid, namespace, name }) => `${clusterUuid}-${namespace}-${name}`,
 }
 
 const { ListPage, List } = createCRUDComponents(options)

@@ -24,10 +24,10 @@ class DataLoaderBase extends PureComponent {
 
   loadAll = async () =>
     this.setState({ loading: true }, async () => {
-      const { loaders, options, getContext, setContext } = this.props
+      const { loaders, options, context, getContext, setContext } = this.props
       try {
         const data = await asyncProps(mapObjIndexed(loader =>
-          loader({ getContext, setContext, reload: options.reloadOnMount }), loaders,
+          loader({ context, getContext, setContext, reload: options.reloadOnMount }), loaders,
         ))
         this.setState({ loading: false, data, error: null })
       } catch (err) {
@@ -38,9 +38,9 @@ class DataLoaderBase extends PureComponent {
 
   loadOne = (loaderKey, params, reload, cascade = false) => {
     this.setState({ loading: true }, async () => {
-      const { loaders, getContext, setContext } = this.props
+      const { loaders, context, getContext, setContext } = this.props
       try {
-        const data = await loaders[loaderKey]({ getContext, setContext, params, reload, cascade })
+        const data = await loaders[loaderKey]({ context, getContext, setContext, params, reload, cascade })
         this.setState(prevState => ({
           loading: false,
           error: null,

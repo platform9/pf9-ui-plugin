@@ -40,7 +40,12 @@ class CRUDListContainer extends React.Component {
     const { uniqueIdentifier } = this.props
     this.setState({ showConfirmation: false })
     const items = this.state.selectedItems || []
-    await asyncMap(items, item => this.handleRemove(item[uniqueIdentifier]))
+    await asyncMap(items, item => {
+      const uid = uniqueIdentifier instanceof Function
+        ? uniqueIdentifier(item)
+        : item[uniqueIdentifier]
+      this.handleRemove(uid)
+    })
 
     this.setState({ selectedItems: [] })
     // The user resolves the promise by clicking "confirm".
