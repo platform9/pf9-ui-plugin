@@ -1,5 +1,8 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { loadPrometheusServiceMonitors } from './actions'
+import {
+  deletePrometheusServiceMonitor,
+  loadPrometheusServiceMonitors,
+} from './actions'
 
 const renderKeyValues = obj => Object.entries(obj)
   .map(([key, value]) => `${key}: ${value}`)
@@ -22,6 +25,7 @@ export const columns = [
 export const options = {
   columns,
   dataKey: 'prometheusServiceMonitors',
+  deleteFn: deletePrometheusServiceMonitor,
   editUrl: '/ui/kubernetes/prometheus/serviceMonitors/edit',
   loaderFn: loadPrometheusServiceMonitors,
   name: 'PrometheusServiceMonitors',
