@@ -31,16 +31,16 @@ const createAddComponents = options => {
 
   class AddPageBase extends React.Component {
     handleAdd = async data => {
-      const { setContext, context, history } = this.props
+      const { setContext, getContext, context, history } = this.props
       try {
-        const existing = await (loaderFn || crudActions.list)({ setContext, context })
+        const existing = await (loaderFn || crudActions.list)({ setContext, getContext, context })
         if (initFn) {
           // Sometimes a component needs more than just a single GET API call.
           // This function allows for any amount of arbitrary initialization.
           await initFn(this.props)
         }
-        const created = await (createFn || crudActions.create)({ data, context, setContext })
-        setContext({ [dataKey]: [...existing, created] })
+        const created = await (createFn || crudActions.create)({ data, getContext, context, setContext })
+        await setContext({ [dataKey]: [...existing, created] })
         history.push(listUrl)
       } catch (err) {
         console.error(err)

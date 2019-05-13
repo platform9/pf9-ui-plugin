@@ -26,6 +26,7 @@ const contextLoader = (contextPath, loaderFn, defaultValue = []) => {
         await setContext(assocPath(arrContextPath, defaultValue))
       }
       const args = {
+        context: getContext(),
         getContext,
         setContext,
         apiClient: getContext('apiClient'),

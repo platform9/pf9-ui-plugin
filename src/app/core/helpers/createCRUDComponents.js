@@ -89,8 +89,8 @@ const createCRUDComponents = options => {
   // ListContainer
   class ContainerBase extends React.Component {
     handleRemove = id => {
-      const { context, setContext } = this.props
-      return (deleteFn || crudActions.delete)({ id, context, setContext })
+      const { context, getContext, setContext } = this.props
+      return (deleteFn || crudActions.delete)({ id, context, getContext, setContext })
     }
 
     render () {

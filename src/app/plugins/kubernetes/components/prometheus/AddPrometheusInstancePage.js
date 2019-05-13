@@ -16,11 +16,7 @@ import { withAppContext } from 'core/AppContext'
 import { withDataLoader } from 'core/DataLoader'
 import { loadClusters } from 'k8s/components/infrastructure/actions'
 import { loadNamespaces } from 'k8s/components/namespaces/actions'
-import {
-  createPrometheusInstance,
-  loadPrometheusResources,
-  loadServiceAccounts,
-} from './actions'
+import { createPrometheusInstance, loadPrometheusInstances, loadServiceAccounts } from './actions'
 
 const initialContext = {
   numInstances: 1,
@@ -54,9 +50,10 @@ class AddPrometheusInstanceFormBase extends React.Component {
   handleClusterChange = async clusterUuid => this.setState({ clusterUuid })
 
   handleNamespaceChange = async namespace => {
-    const { context, setContext } = this.props
+    const { getContext, setContext } = this.props
     const data = { clusterUuid: this.state.clusterUuid, namespace }
-    const serviceAccounts = await loadServiceAccounts({ data, context, setContext })
+    const serviceAccounts = await loadServiceAccounts({ data, getContext, setContext })
+
     this.setState({ serviceAccounts, namespace })
   }
 
@@ -66,7 +63,7 @@ class AddPrometheusInstanceFormBase extends React.Component {
 
   render () {
     const { clusterUuid, namespace, rules, serviceAccounts } = this.state
-    const { clusters, namespaces } = this.props.context
+    const { clusters, namespaces } = this.props.data
     const clusterOptions = projectAs({ value: 'uuid', label: 'name' }, clusters)
     const namespaceOptions = clusterUuid
       ? namespaces.filter(propEq('clusterId', clusterUuid)).map(x => x.metadata.name)
@@ -145,7 +142,7 @@ const AddPrometheusInstanceForm = compose(
 export const options = {
   FormComponent: AddPrometheusInstanceForm,
   createFn: createPrometheusInstance,
-  loaderFn: loadPrometheusResources,
+  loaderFn: loadPrometheusInstances,
   listUrl: '/ui/kubernetes/prometheus#instances',
   name: 'AddPrometheusInstance',
   title: 'Add Prometheus Instance',

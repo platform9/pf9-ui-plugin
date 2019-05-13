@@ -9,7 +9,7 @@ import PrometheusServiceMonitors from './PrometheusServiceMonitors'
 import PrometheusAlertManagers from './PrometheusAlertManagers'
 
 import { compose } from 'ramda'
-import { loadPrometheusResources } from './actions'
+import { loadPrometheusInstances } from './actions'
 import { withAppContext } from 'core/AppContext'
 import { withDataLoader } from 'core/DataLoader'
 
@@ -29,6 +29,6 @@ class PrometheusMonitoringPage extends React.Component {
 }
 
 export default compose(
-  withDataLoader({ prometheusInstances: loadPrometheusResources }),
+  withDataLoader({ prometheusInstances: loadPrometheusInstances }),
   withAppContext,
 )(PrometheusMonitoringPage)
