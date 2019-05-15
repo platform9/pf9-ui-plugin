@@ -28,7 +28,7 @@ export const options = {
   loaderFn: loadPrometheusRules,
   name: 'PrometheusRules',
   title: 'Prometheus Rules',
-  uniqueIdentifier: ({ clusterUuid, namespace, name }) => `${clusterUuid}-${namespace}-${name}`,
+  uniqueIdentifier: 'uid',
 }
 
 const { ListPage, List } = createCRUDComponents(options)

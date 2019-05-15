@@ -6,12 +6,20 @@ const normalizePrometheusResponse = (clusterUuid, response) => response.items.ma
 class Qbert {
   constructor (client) {
     this.client = client
+    this.cachedEndpoint = ''
   }
 
   endpoint = async () => {
     const services = await this.client.keystone.getServicesForActiveRegion()
     const endpoint = services.qbert.admin.url
-    return endpoint.replace(/v(1|2|3)$/, `v3/${this.client.activeProjectId}`)
+    const mappedEndpoint = endpoint.replace(/v(1|2|3)$/, `v3/${this.client.activeProjectId}`)
+
+    // Certain operations like column renderers from ListTable need to prepend the Qbert URL to links
+    // sent from the backend.  But getting the endpoint is an async operation so we need to make an
+    // async version.  In theory this should always be set since keystone must get the service
+    // catalog before any Qbert API calls are made.
+    this.cachedEndpoint = mappedEndpoint
+    return mappedEndpoint
   }
 
   monocularBaseUrl = async () => {
@@ -452,6 +460,8 @@ class Qbert {
     const response = await this.client.basicDelete(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${namespace}/alertmanagers/${name}`)
     return response
   }
+
+  getPrometheusDashboardLink = instance => `${this.cachedEndpoint}/clusters/${instance.clusterUuid}/k8sapi${instance.dashboard}`
 }
 
 export default Qbert

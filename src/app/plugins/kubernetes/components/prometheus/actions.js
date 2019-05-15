@@ -23,7 +23,7 @@ export const mapPrometheusInstance = ({ clusterUuid, metadata, spec }) => ({
   clusterUuid,
   name: metadata.name,
   namespace: metadata.namespace,
-  id: metadata.uid,
+  uid: metadata.uid,
   serviceMonitorSelector: pathOrNull('serviceMonitorSelector.matchLabels', spec),
   alertManagersSelector:
     pathOr([], ['alerting', 'alertmanagers'], spec)
@@ -35,6 +35,7 @@ export const mapPrometheusInstance = ({ clusterUuid, metadata, spec }) => ({
   version: metadata.resourceVersion,
   retention: spec.retention,
   replicas: spec.replicas,
+  dashboard: metadata.annotations.service_path,
   metadata,
   spec,
 })
@@ -60,6 +61,15 @@ export const deletePrometheusInstance = contextUpdater('prometheusInstances', as
   return currentItems.filter(x => x.id !== id)
 })
 
+export const updatePrometheusInstance = contextUpdater('prometheusInstances', async (params) => {
+  console.log(params)
+  // extract unique id
+  // make API call
+  // get return value
+  // re-map it
+  // replace it in the array of currentItems
+})
+
 /* Service Accounts */
 
 export const loadServiceAccounts = contextLoader('serviceAccounts', async ({ apiClient, data }) => {
@@ -69,6 +79,7 @@ export const loadServiceAccounts = contextLoader('serviceAccounts', async ({ api
 /* Prometheus Rules */
 
 const mapRule = ({ clusterUuid, metadata, spec }) => ({
+  uid: metadata.uid,
   clusterUuid,
   name: metadata.name,
   namespace: metadata.namespace,
@@ -79,6 +90,15 @@ export const loadPrometheusRules = contextLoader('prometheusRules', async ({ api
   const clusterTags = await loadFromContext('clusterTags')
   const clusterUuids = clusterTags.filter(hasMonitoring).map(prop('uuid'))
   return mapAsyncItems(clusterUuids, apiClient.qbert.getPrometheusRules, mapRule)
+})
+
+export const updatePrometheusRule = contextUpdater('prometheusrules', async (params) => {
+  console.log(params)
+  // extract unique id
+  // make API call
+  // get return value
+  // re-map it
+  // replace it in the array of currentItems
 })
 
 export const deletePrometheusRule = contextUpdater('prometheusRules', async ({ id, currentItems, apiClient }) => {
@@ -95,6 +115,7 @@ export const deletePrometheusRule = contextUpdater('prometheusRules', async ({ i
 /* Service Monitors */
 
 const mapServiceMonitor = ({ clusterUuid, metadata, spec }) => ({
+  uid: metadata.uid,
   clusterUuid,
   name: metadata.name,
   namespace: metadata.namespace,
@@ -123,6 +144,7 @@ export const deletePrometheusServiceMonitor = contextUpdater('prometheusServiceM
 /* Alert Managers */
 
 const mapAlertManager = ({ clusterUuid, metadata, spec }) => ({
+  uid: metadata.uid,
   clusterUuid,
   name: metadata.name,
   namespace: metadata.namespace,

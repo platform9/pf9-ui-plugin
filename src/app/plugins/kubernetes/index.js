@@ -18,6 +18,7 @@ import UserManagementIndexPage from './components/userManagement/UserManagementI
 import AppDetailsPage from 'core/components/appCatalog/AppDetailsPage'
 import AddPrometheusInstancePage from './components/prometheus/AddPrometheusInstancePage'
 import PrometheusMonitoringPage from './components/prometheus/PrometheusMonitoringPage'
+import UpdatePrometheusRulePage from './components/prometheus/UpdatePrometheusRulePage'
 
 class Kubernetes extends React.Component {
   render () {
@@ -126,6 +127,11 @@ Kubernetes.registerPlugin = pluginManager => {
         link: { path: '/prometheus/instances/add', exact: true },
         component: AddPrometheusInstancePage,
       },
+      {
+        name: 'Edit Prometheus Rule',
+        link: { path: '/prometheus/rules/edit/:id', exact: true },
+        component: UpdatePrometheusRulePage,
+      }
     ]
   )
 
