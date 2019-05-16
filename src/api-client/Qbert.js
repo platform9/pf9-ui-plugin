@@ -1,6 +1,7 @@
 import { keyValueArrToObj } from 'utils/fp'
 
 const normalizePrometheusResponse = (clusterUuid, response) => response.items.map(x => ({ ...x, clusterUuid }))
+const normalizePrometheusUpdate = (clusterUuid, response) => ({ ...response, clusterUuid })
 
 /* eslint-disable camelcase */
 class Qbert {
@@ -446,6 +447,16 @@ class Qbert {
     return normalizePrometheusResponse(clusterUuid, response)
   }
 
+  updatePrometheusRules = async rulesObject => {
+    const { clusterUuid, namespace, name } = rulesObject
+    const body = [{
+      op: 'replace',
+      path: '/spec/groups/0/rules',
+      value: rulesObject.rules,
+    }]
+    const response = await this.client.basicPatch(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${namespace}/prometheusrules/${name}`, body)
+    return normalizePrometheusUpdate(clusterUuid, response)
+  }
   deletePrometheusRule = async (clusterUuid, namespace, name) => {
     const response = await this.client.basicDelete(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${namespace}/prometheusrules/${name}`)
     return response

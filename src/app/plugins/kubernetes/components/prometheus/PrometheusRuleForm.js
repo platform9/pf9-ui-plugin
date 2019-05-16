@@ -30,7 +30,7 @@ const PrometheusRuleForm = ({ onDelete, onSubmit, classes }) => {
           <PicklistField id="severity" options={severityOptions} label="Severity" info="Severity of the alert" />
           <TextField id="period" label="Period" info="How long rule needs to be true before triggering an alert (Ex: 5m)" />
           <TextField id="description" label="Description" info="Optional description for this rule" />
-          <SubmitButton>Create</SubmitButton>
+          <SubmitButton>Add Rule</SubmitButton>
         </ValidatedForm>
       </CardContent>
     </Card>

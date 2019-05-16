@@ -84,6 +84,7 @@ const mapRule = ({ clusterUuid, metadata, spec }) => ({
   name: metadata.name,
   namespace: metadata.namespace,
   labels: metadata.labels,
+  rules: pathOr([], ['groups', 0, 'rules'], spec),
 })
 
 export const loadPrometheusRules = contextLoader('prometheusRules', async ({ apiClient, loadFromContext }) => {
@@ -92,24 +93,22 @@ export const loadPrometheusRules = contextLoader('prometheusRules', async ({ api
   return mapAsyncItems(clusterUuids, apiClient.qbert.getPrometheusRules, mapRule)
 })
 
-export const updatePrometheusRule = contextUpdater('prometheusrules', async (params) => {
-  console.log(params)
-  // extract unique id
-  // make API call
-  // get return value
-  // re-map it
-  // replace it in the array of currentItems
+export const updatePrometheusRules = contextUpdater('prometheusRules', async ({ apiClient, data, currentItems }) => {
+  const response = await apiClient.qbert.updatePrometheusRules(data)
+  const mapped = mapRule(response)
+  const items = currentItems.map(x => x.uid === data.uid ? mapped : x)
+  return items
 })
 
 export const deletePrometheusRule = contextUpdater('prometheusRules', async ({ id, currentItems, apiClient }) => {
-  const calcId = x => `${x.clusterUuid}-${x.namespace}-${x.name}`
-  const rule = currentItems.find(rule => id === calcId(rule))
+  const rule = currentItems.find(propEq('uid', id))
   if (!rule) {
-    console.error(`Unable to find prometheus rule with id: ${id} in deletePrometheusrule`)
+    console.error(`Unable to find prometheus rule with id: ${id} in deletePrometheusRule`)
     return
   }
   await apiClient.qbert.deletePrometheusRule(rule.clusterUuid, rule.namespace, rule.name)
-  return currentItems.filter(x => calcId(x) !== calcId(rule))
+  const items = currentItems.filter(x => id !== x.uid)
+  return items
 })
 
 /* Service Monitors */

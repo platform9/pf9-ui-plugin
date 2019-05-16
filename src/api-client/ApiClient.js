@@ -83,6 +83,17 @@ class ApiClient {
     }
   }
 
+  async basicPatch (url, body) {
+    try {
+      const config = this.getAuthHeaders()
+      config.headers['Content-Type'] = 'application/json-patch+json'
+      const response = await axios.patch(url, body, config)
+      return response.data
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
   async basicPut (url, body) {
     try {
       const response = await axios.put(url, body, this.getAuthHeaders())
