@@ -90,7 +90,7 @@ AppContext.defaultProps = {
 export const withAppContext = Component => props =>
   <Consumer>
     {
-      ({ getContext, setContext, loadFromContext, initSession, updateSession, destroySession, ...rest }) =>
+      ({ getContext, setContext, initSession, updateSession, destroySession, ...rest }) =>
         <Component
           {...props}
           initSession={initSession}
@@ -98,7 +98,6 @@ export const withAppContext = Component => props =>
           destroySession={destroySession}
           getContext={getContext}
           setContext={setContext}
-          loadFromContext={loadFromContext}
           context={rest}
         />
     }

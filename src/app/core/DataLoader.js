@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import DisplayError from './components/DisplayError'
 import Progress from './components/Progress'
 import { asyncProps } from 'utils/fp'
-import { mapObjIndexed, compose } from 'ramda'
+import { mapObjIndexed, compose, equals } from 'ramda'
 import { withAppContext } from 'core/AppContext'
 
 class DataLoaderBase extends PureComponent {
@@ -16,6 +16,13 @@ class DataLoaderBase extends PureComponent {
   async componentDidMount () {
     this.listener = window.addEventListener('scopeChanged', this.loadAll)
     await this.loadAll()
+  }
+
+  async componentDidUpdate (prevProps) {
+    // Refresh data if context has changed
+    if (!equals(this.props.context, prevProps.context)) {
+      await this.loadAll()
+    }
   }
 
   componentWillUnmount () {

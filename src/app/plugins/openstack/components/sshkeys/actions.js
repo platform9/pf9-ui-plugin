@@ -16,7 +16,7 @@ export const createSshKey = contextUpdater(dataKey, async ({ apiClient, data, co
   return [ ...existing, created ]
 }, true)
 
-export const deleteSshKey = contextUpdater(dataKey, async ({ apiClient, id, loadFromContext }) => {
+export const deleteSshKey = contextUpdater(dataKey, async ({ apiClient, id, currentItems }) => {
   await apiClient.nova.deleteSshKey(id)
-  return (await loadFromContext(dataKey)).filter(x => x.id !== id)
+  return currentItems.filter(x => x.id !== id)
 })

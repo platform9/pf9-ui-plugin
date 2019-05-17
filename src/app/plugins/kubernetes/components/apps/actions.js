@@ -5,7 +5,7 @@ import { asyncFlatMap } from 'utils/fp'
 
 export const loadApps = clusterContextLoader(
   'apps',
-  async ({ apiClient, clusters, params: { clusterId } }) => {
+  async ({ apiClient, preloaded: { clusters }, params: { clusterId } }) => {
     const { qbert } = apiClient
     return clusterId === '__all__'
       ? asyncFlatMap(pluck('uuid', clusters), qbert.getCharts)
@@ -14,7 +14,7 @@ export const loadApps = clusterContextLoader(
 
 export const loadReleases = clusterContextLoader(
   'releases',
-  async ({ apiClient, clusters, params: { clusterId } }) => {
+  async ({ apiClient, preloaded: { clusters }, params: { clusterId } }) => {
     const { qbert } = apiClient
     return clusterId === '__all__'
       ? asyncFlatMap(pluck('uuid', clusters), qbert.getReleases)

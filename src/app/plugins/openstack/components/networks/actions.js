@@ -8,7 +8,7 @@ export const loadNetworks = contextLoader('networks', async ({ apiClient }) => {
 export const createNetwork = contextUpdater('networks', async ({ apiClient, currentItems, data }) => {
   const created = await apiClient.neutron.createNetwork(data)
   return [...currentItems, created]
-}, true)
+}, { returnLast: true })
 
 export const deleteNetwork = contextUpdater('networks', async ({ apiClient, id, currentItems }) => {
   await apiClient.neutron.deleteNetwork(id)

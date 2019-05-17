@@ -14,7 +14,7 @@ export const loadTenants = contextLoader(dataKey, async ({ apiClient }) => {
 export const createTenant = contextUpdater(dataKey, async ({ data, apiClient, currentItems }) => {
   const created = await apiClient.keystone.createTenant(data)
   return [...currentItems, created]
-}, true)
+}, { returnLast: true })
 
 export const deleteTenant = contextUpdater(dataKey, async ({ id, apiClient, currentItems }) => {
   await apiClient.keystone.deleteTenant(id)

@@ -17,7 +17,7 @@ const createCRUDActions = (options = {}) => {
       const existing = await apiClient[service][entity].list()
       const created = await apiClient[service][entity].create(data)
       return [...existing, created]
-    }, true),
+    }, { returnLast: true }),
 
     list: customContextLoader(dataKey, async ({ params, apiClient }) => {
       return apiClient[service][entity].list(params)

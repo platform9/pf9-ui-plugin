@@ -47,7 +47,10 @@ class AddPrometheusInstanceFormBase extends React.Component {
     this.setState({ rules: [...this.state.rules, withId] })
   }
 
-  handleClusterChange = async clusterUuid => this.setState({ clusterUuid })
+  handleClusterChange = async clusterUuid => {
+    this.setState({ clusterUuid })
+    this.props.reloadData('namespaces', { clusterUuid })
+  }
 
   handleNamespaceChange = async namespace => {
     const { getContext, setContext } = this.props

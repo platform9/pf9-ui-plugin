@@ -1,4 +1,4 @@
-import { last, assocPath } from 'ramda'
+import { last, assocPath, omit } from 'ramda'
 import { ensureArray } from 'utils/fp'
 import { getLoader } from 'core/helpers/contextLoader'
 
@@ -6,24 +6,25 @@ import { getLoader } from 'core/helpers/contextLoader'
  * Returns a function that will be used to add values to existing context arrays
  * @param contextPath Context contextPath
  * @param updaterFn Function whose return value will be used to update the context
- * @param returnLast Whether or not to return the last value of the updated list
+ * @param options Additional options ({contextRetriever, returnLast})
  * @returns {Function}
  */
-const contextUpdater = (contextPath, updaterFn, returnLast = false) => {
-  const resolvedPath = ensureArray(contextPath)
+const contextUpdater = (contextPath, updaterFn, options = {}) => {
+  const contextPathArr = ensureArray(contextPath)
+  const {
+    returnLast = false,
+  } = options
 
   return async args => {
     const { getContext, setContext } = args
-    const loaderFn = getLoader(resolvedPath)
-    const currentItems = (await loaderFn(args)) || []
+    const loaderFn = getLoader(contextPathArr)
+    const currentItems = (await loaderFn(omit(['params', 'reload', 'cascade'], args))) || []
     const output = await updaterFn({
       ...args,
       apiClient: getContext('apiClient'),
       currentItems,
-      loadFromContext: (contextPath, customArgs) =>
-        getLoader(contextPath)({ ...args, ...customArgs }),
     })
-    await setContext(assocPath(resolvedPath, output))
+    await setContext(assocPath(contextPathArr, output))
     return returnLast && Array.isArray(output) ? last(output) : output
   }
 }

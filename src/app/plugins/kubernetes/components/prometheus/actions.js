@@ -2,6 +2,7 @@ import { pathOrNull } from 'utils/fp'
 import { pathOr, prop, propEq } from 'ramda'
 import contextLoader from 'core/helpers/contextLoader'
 import contextUpdater from 'core/helpers/contextUpdater'
+import { loadClusters } from 'k8s/components/infrastructure/actions'
 
 const mapServiceMonitor = ({ clusterUuid, metadata, spec }) => ({
   clusterUuid,
@@ -54,40 +55,55 @@ const mapAsyncItems = async (values, loaderFn, mapFn) => {
   return items
 }
 
-export const loadClusterTags = contextLoader('clusterTags', async ({ apiClient, loadFromContext }) => {
-  await loadFromContext('clusters')
+export const loadClusterTags = contextLoader('clusterTags', async ({ apiClient }) => {
   return apiClient.appbert.getClusterTags()
+}, {
+  preload: {
+    clusters: loadClusters,
+  },
 })
 
 const hasMonitoring = cluster => cluster.tags.includes('pf9-system:monitoring')
 
-export const loadPrometheusInstances = contextLoader('prometheusInstances', async ({ apiClient, loadFromContext }) => {
-  const clusterTags = await loadFromContext('clusterTags')
+export const loadPrometheusInstances = contextLoader('prometheusInstances', async ({ apiClient, preloaded: { clusterTags } }) => {
   const clusterUuids = clusterTags.filter(hasMonitoring).map(prop('uuid'))
   return mapAsyncItems(clusterUuids, apiClient.qbert.getPrometheusInstances, mapPrometheusInstance)
+}, {
+  preload: {
+    clusterTags: loadClusterTags,
+  },
 })
 
-export const loadPrometheusRules = contextLoader('prometheusRules', async ({ apiClient, loadFromContext }) => {
-  const clusterTags = await loadFromContext('clusterTags')
+export const loadPrometheusRules = contextLoader('prometheusRules', async ({ apiClient, preloaded: { clusterTags } }) => {
   const clusterUuids = clusterTags.filter(hasMonitoring).map(prop('uuid'))
   return mapAsyncItems(clusterUuids, apiClient.qbert.getPrometheusRules, mapRule)
+}, {
+  preload: {
+    clusterTags: loadClusterTags,
+  },
 })
 
-export const loadPrometheusServiceMonitors = contextLoader('prometheusServiceMonitors', async ({ apiClient, loadFromContext }) => {
-  const clusterTags = await loadFromContext('clusterTags')
+export const loadPrometheusServiceMonitors = contextLoader('prometheusServiceMonitors', async ({ apiClient, preloaded: { clusterTags } }) => {
   const clusterUuids = clusterTags.filter(hasMonitoring).map(prop('uuid'))
   return mapAsyncItems(clusterUuids, apiClient.qbert.getPrometheusServiceMonitors, mapServiceMonitor)
+}, {
+  preload: {
+    clusterTags: loadClusterTags,
+  },
 })
 
-export const loadPrometheusAlertManagers = contextLoader('prometheusAlertManagers', async ({ apiClient, loadFromContext }) => {
-  const clusterTags = await loadFromContext('clusterTags')
+export const loadPrometheusAlertManagers = contextLoader('prometheusAlertManagers', async ({ apiClient, preloaded: { clusterTags } }) => {
   const clusterUuids = clusterTags.filter(hasMonitoring).map(prop('uuid'))
   return mapAsyncItems(clusterUuids, apiClient.qbert.getPrometheusAlertManagers, mapAlertManager)
+}, {
+  preload: {
+    clusterTags: loadClusterTags,
+  },
 })
 
 export const createPrometheusInstance = contextUpdater('prometheusInstances', async ({ data, apiClient, currentItems }) => {
   const createdInstance = await apiClient.qbert.createPrometheusInstance(data.cluster, data)
-  return [...currentItems, mapPrometheusInstance({clusterUuid: data.cluster, ...createdInstance})]
+  return [...currentItems, mapPrometheusInstance({ clusterUuid: data.cluster, ...createdInstance })]
 })
 
 export const loadServiceAccounts = contextLoader('serviceAccounts', async ({ apiClient, data }) => {
