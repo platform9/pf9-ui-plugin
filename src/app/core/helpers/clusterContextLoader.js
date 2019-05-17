@@ -26,10 +26,15 @@ const clusterContextLoader = (key, loaderFn, filterMasterNodes = true, defaultVa
     const clusters = (await loadClusters({ getContext, setContext, ...rest, reload: false }))
       .filter(cluster => !filterMasterNodes || cluster.hasMasterNode)
     const { clusterId = pathOr('__all__', [0, 'uuid'], clusters) } = params
-    const loadedData = await contextLoader([...keyPath, clusterId], loaderFn, defaultValue)(
-      { getContext, setContext, params: { ...params, clusterId }, clusters, ...rest },
-    )
+    const resolver = contextLoader([...keyPath, clusterId], loaderFn, defaultValue)
 
+    const loadedData = await resolver({
+      getContext,
+      setContext,
+      params: { ...params, clusterId },
+      clusters,
+      ...rest,
+    })
     if (clusterId === '__all__') {
       // update all cluster indexed positions in bulk
       await setContext(context => {

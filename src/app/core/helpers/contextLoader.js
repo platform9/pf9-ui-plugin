@@ -43,7 +43,7 @@ const contextLoader = (contextPath, loaderFn, defaultValue = []) => {
       await setContext(context => assocPath(arrContextPath, output, context))
       pendingPromises = dissocPath(arrContextPath, pendingPromises)
     }
-    return output
+    return output || defaultValue
   }
 
   // Store the resolver in an key indexed object that we will use in the exported "getLoader" function
