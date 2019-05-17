@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import DisplayError from './components/DisplayError'
 import Progress from './components/Progress'
 import { asyncProps } from 'utils/fp'
-import { mapObjIndexed, compose } from 'ramda'
+import { equals, mapObjIndexed, compose } from 'ramda'
 import { withAppContext } from 'core/AppContext'
 
 class DataLoaderBase extends PureComponent {
@@ -18,16 +18,22 @@ class DataLoaderBase extends PureComponent {
     await this.loadAll()
   }
 
+  async componentDidUpdate (prevProps) {
+    if (!equals(this.props.context, prevProps.context)) {
+      await this.loadAll(true)
+    }
+  }
+
   componentWillUnmount () {
     window.removeEventListener('scopeChanged', this.listener)
   }
 
-  loadAll = async () =>
+  loadAll = async nofetch =>
     this.setState({ loading: true }, async () => {
       const { loaders, options, context, getContext, setContext } = this.props
       try {
         const data = await asyncProps(mapObjIndexed(loader =>
-          loader({ context, getContext, setContext, reload: options.reloadOnMount }), loaders,
+          loader({ context, getContext, setContext, reload: options.reloadOnMount, nofetch }), loaders,
         ))
         this.setState({ loading: false, data, error: null })
       } catch (err) {
