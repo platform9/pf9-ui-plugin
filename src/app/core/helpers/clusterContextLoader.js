@@ -1,4 +1,4 @@
-import { pathOr, pipe, filter } from 'ramda'
+import { pathOr } from 'ramda'
 import { loadClusters } from 'k8s/components/infrastructure/actions'
 import contextLoader from 'core/helpers/contextLoader'
 
@@ -13,10 +13,10 @@ const clusterContextLoader = (contextPath, loaderFn, options = {}) => {
     ...otherOptions,
     indexBy: clusterIdKey,
     preload: {
-      clusters: pipe(
-        loadClusters,
-        filter(cluster => filterMasterNodes ? cluster.hasMasterNode : true),
-      ),
+      clusters: async args => {
+        const clusters = await loadClusters(args)
+        return filterMasterNodes ? clusters.filter(cluster => cluster.hasMasterNode) : clusters
+      },
     },
     parseParams: ({ preloaded: { clusters }, params }) => {
       // Use first cluster by default if no cluster has been selected
