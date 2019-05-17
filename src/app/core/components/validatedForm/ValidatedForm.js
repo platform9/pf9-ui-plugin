@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import ValidatedFormDebug from './ValidatedFormDebug'
 import { withStyles } from '@material-ui/styles'
 import { setStateLens } from 'app/utils/fp'
 import { parseValidator } from 'core/utils/fieldValidators'
@@ -159,11 +160,14 @@ class ValidatedForm extends React.Component {
   }
 
   render () {
-    const { classes, id } = this.props
+    const { children, classes, debug, id } = this.props
     return (
       <form onSubmit={this.handleSubmit} className={classes.root} id={id}>
         <div className={classes.inputs}>
-          <ValidatedFormProvider value={this.state}>{this.props.children}</ValidatedFormProvider>
+          <ValidatedFormProvider value={this.state}>
+            {debug && <ValidatedFormDebug />}
+            {children}
+          </ValidatedFormProvider>
         </div>
       </form>
     )
@@ -176,6 +180,8 @@ ValidatedForm.propTypes = {
   // the screen but each time the user makes a submit we add an item to an array
   // and allow them to add another.
   clearOnSubmit: PropTypes.bool,
+
+  debug: PropTypes.bool,
 
   // Initial values
   initialValues: PropTypes.object,
@@ -190,6 +196,7 @@ ValidatedForm.propTypes = {
 
 ValidatedForm.defaultProps = {
   clearOnSubmit: false,
+  debug: false,
 }
 
 export default ValidatedForm

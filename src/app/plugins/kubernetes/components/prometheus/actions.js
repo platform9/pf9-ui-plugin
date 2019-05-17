@@ -35,7 +35,7 @@ export const mapPrometheusInstance = ({ clusterUuid, metadata, spec }) => ({
   version: metadata.resourceVersion,
   retention: spec.retention,
   replicas: spec.replicas,
-  dashboard: metadata.annotations.service_path,
+  dashboard: pathOr('', ['annotations', 'service_path'], metadata),
   metadata,
   spec,
 })
@@ -127,6 +127,13 @@ export const loadPrometheusServiceMonitors = contextLoader('prometheusServiceMon
   const clusterTags = await loadFromContext('clusterTags')
   const clusterUuids = clusterTags.filter(hasMonitoring).map(prop('uuid'))
   return mapAsyncItems(clusterUuids, apiClient.qbert.getPrometheusServiceMonitors, mapServiceMonitor)
+})
+
+export const updatePrometheusServiceMonitor = contextUpdater('prometheusServiceMonitors', async ({ apiClient, data, currentItems }) => {
+  const response = await apiClient.qbert.updatePrometheusServiceMonitor(data)
+  const mapped = mapRule(response)
+  const items = currentItems.map(x => x.uid === data.uid ? mapped : x)
+  return items
 })
 
 export const deletePrometheusServiceMonitor = contextUpdater('prometheusServiceMonitors', async ({ id, currentItems, apiClient }) => {

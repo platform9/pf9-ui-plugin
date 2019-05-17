@@ -437,6 +437,17 @@ class Qbert {
     return normalizePrometheusResponse(clusterUuid, response)
   }
 
+  updatePrometheusServiceMonitor = async data => {
+    const { clusterUuid, namespace, name } = data
+    const body = [{
+      op: 'replace',
+      path: '/spec/groups/0/rules',
+      value: data.labels,
+    }]
+    const response = await this.client.basicPatch(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${namespace}/servicemonitors/${name}`, body)
+    return normalizePrometheusUpdate(clusterUuid, response)
+  }
+
   deletePrometheusServiceMonitor = async (clusterUuid, namespace, name) => {
     const response = await this.client.basicDelete(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${namespace}/servicemonitors/${name}`)
     return response
@@ -457,6 +468,7 @@ class Qbert {
     const response = await this.client.basicPatch(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${namespace}/prometheusrules/${name}`, body)
     return normalizePrometheusUpdate(clusterUuid, response)
   }
+
   deletePrometheusRule = async (clusterUuid, namespace, name) => {
     const response = await this.client.basicDelete(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${namespace}/prometheusrules/${name}`)
     return response

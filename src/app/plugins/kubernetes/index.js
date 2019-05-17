@@ -19,6 +19,7 @@ import AppDetailsPage from 'core/components/appCatalog/AppDetailsPage'
 import AddPrometheusInstancePage from './components/prometheus/AddPrometheusInstancePage'
 import PrometheusMonitoringPage from './components/prometheus/PrometheusMonitoringPage'
 import UpdatePrometheusRulePage from './components/prometheus/UpdatePrometheusRulePage'
+import UpdatePrometheusServiceMonitorPage from './components/prometheus/UpdateServiceMonitorPage'
 
 class Kubernetes extends React.Component {
   render () {
@@ -131,7 +132,12 @@ Kubernetes.registerPlugin = pluginManager => {
         name: 'Edit Prometheus Rule',
         link: { path: '/prometheus/rules/edit/:id', exact: true },
         component: UpdatePrometheusRulePage,
-      }
+      },
+      {
+        name: 'Edit Prometheus Service Monitor',
+        link: { path: '/prometheus/serviceMonitors/edit/:id', exact: true },
+        component: UpdatePrometheusServiceMonitorPage,
+      },
     ]
   )
 
