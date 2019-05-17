@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { withInfoTooltip } from 'app/core/components/InfoTooltip'
 import { Typography } from '@material-ui/core'
 import { compose } from 'app/utils/fp'
-import KeyValues from 'core/components/KeyValues'
+import KeyValues, { EntryShape } from 'core/components/KeyValues'
 import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
 
 class KeyValuesField extends React.Component {
@@ -24,9 +24,9 @@ class KeyValuesField extends React.Component {
 KeyValuesField.propTypes = {
   id: PropTypes.string.isRequired,
   label: PropTypes.string,
-  initialValue: PropTypes.string,
   onChange: PropTypes.func,
   ...ValidatedFormInputPropTypes,
+  initialValue: PropTypes.arrayOf(EntryShape),
 }
 
 export default compose(

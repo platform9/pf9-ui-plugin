@@ -122,7 +122,7 @@ class KeyValues extends React.Component {
   }
 }
 
-const EntryShape = PropTypes.shape({
+export const EntryShape = PropTypes.shape({
   key: PropTypes.string.isRequired,
   value: PropTypes.string.isRequired,
 })

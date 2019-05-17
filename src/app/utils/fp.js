@@ -121,7 +121,6 @@ export const asyncMap = async (arr, callback, parallel = true) => {
 
 export const asyncFlatMap = async (arr, callback, parallel = true) => {
   if (parallel) {
-    console.log('aqui arribo', arr, callback)
     return flatten(await Promise.all(
       arr.map(async (val, i) => ensureArray(await callback(val, i, arr))),
     ))

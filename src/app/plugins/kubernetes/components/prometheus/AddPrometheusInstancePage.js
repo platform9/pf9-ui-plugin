@@ -25,6 +25,7 @@ const initialContext = {
   storage: 8,
   retention: 15,
   port: 'prometheus',
+  appLabels: []
 }
 
 class AddPrometheusInstanceFormBase extends React.Component {

@@ -115,7 +115,7 @@ class ValidatedForm extends React.Component {
 
   state = {
     initialValues: this.props.initialValues || {},
-    values: {},
+    values: this.props.initialValues || {},
     fields: {}, // child fields inject data here
     errors: {},
     setFieldValue: this.setFieldValue,
