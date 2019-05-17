@@ -441,7 +441,7 @@ class Qbert {
     const { clusterUuid, namespace, name } = data
     const body = [{
       op: 'replace',
-      path: '/spec/groups/0/rules',
+      path: '/metadata/labels',
       value: data.labels,
     }]
     const response = await this.client.basicPatch(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${namespace}/servicemonitors/${name}`, body)

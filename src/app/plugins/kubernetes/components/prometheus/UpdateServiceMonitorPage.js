@@ -4,24 +4,21 @@ import SubmitButton from 'core/components/SubmitButton'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import createUpdateComponents from 'core/helpers/createUpdateComponents'
 import { loadPrometheusServiceMonitors, updatePrometheusServiceMonitor } from './actions'
-import { objToKeyValueArr } from 'utils/fp'
-import { withStyles } from '@material-ui/styles'
+import { keyValueArrToObj, objToKeyValueArr } from 'utils/fp'
 
-@withStyles(theme => ({
-  submit: { marginTop: theme.spacing.unit * 3 },
-}))
 class UpdateServiceMonitorForm extends React.Component {
   state = this.props.initialValues
 
-  handleUpdate = newState => {
-    this.props.onComplete(newState)
+  handleUpdate = data => {
+    const newData = { ...data, labels: keyValueArrToObj(data.labels) }
+    this.props.onComplete(newData)
   }
 
   render () {
     const initialValues = {...this.props.initialValues}
     initialValues.labels = objToKeyValueArr(initialValues.labels)
     return (
-      <ValidatedForm initialValues={initialValues} onSubmit={this.handleUpdate} debug>
+      <ValidatedForm initialValues={initialValues} onSubmit={this.handleUpdate}>
         <KeyValuesField id="labels" label="App Labels" info="Key/value pairs for app that Prometheus will monitor" />
         <SubmitButton>Update service monitor</SubmitButton>
       </ValidatedForm>

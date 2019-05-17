@@ -131,20 +131,19 @@ export const loadPrometheusServiceMonitors = contextLoader('prometheusServiceMon
 
 export const updatePrometheusServiceMonitor = contextUpdater('prometheusServiceMonitors', async ({ apiClient, data, currentItems }) => {
   const response = await apiClient.qbert.updatePrometheusServiceMonitor(data)
-  const mapped = mapRule(response)
+  const mapped = mapServiceMonitor(response)
   const items = currentItems.map(x => x.uid === data.uid ? mapped : x)
   return items
 })
 
 export const deletePrometheusServiceMonitor = contextUpdater('prometheusServiceMonitors', async ({ id, currentItems, apiClient }) => {
-  const calcId = x => `${x.clusterUuid}-${x.namespace}-${x.name}`
-  const sm = currentItems.find(rule => id === calcId(rule))
+  const sm = currentItems.find(x => id === x.uid)
   if (!sm) {
     console.error(`Unable to find prometheus service monitor with id: ${id} in deletePrometheusServiceMonitor`)
     return
   }
   await apiClient.qbert.deletePrometheusServiceMonitor(sm.clusterUuid, sm.namespace, sm.name)
-  return currentItems.filter(x => calcId(x) !== calcId(sm))
+  return currentItems.filter(x => x.uid !== sm.uid)
 })
 
 /* Alert Managers */
