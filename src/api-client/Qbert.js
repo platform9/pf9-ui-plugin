@@ -17,7 +17,7 @@ class Qbert {
 
     // Certain operations like column renderers from ListTable need to prepend the Qbert URL to links
     // sent from the backend.  But getting the endpoint is an async operation so we need to make an
-    // async version.  In theory this should always be set since keystone must get the service
+    // sync version.  In theory this should always be set since keystone must get the service
     // catalog before any Qbert API calls are made.
     this.cachedEndpoint = mappedEndpoint
     return mappedEndpoint
@@ -339,6 +339,18 @@ class Qbert {
   getPrometheusInstances = async (clusterUuid) => {
     const response = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/prometheuses`)
     return normalizePrometheusResponse(clusterUuid, response)
+  }
+
+  updatePrometheusInstance = async data => {
+    const { clusterUuid, namespace, name } = data
+    const body = [
+      { op: 'replace', path: '/spec/replicas', value: data.replicas },
+      { op: 'replace', path: '/spec/retention', value: data.retention },
+      { op: 'replace', path: '/spec/resources/requests/cpu', value: data.cpu },
+      { op: 'replace', path: '/spec/resources/requests/memory', value: data.memory },
+    ]
+    const response = await this.client.basicPatch(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${namespace}/prometheuses/${name}`, body)
+    return normalizePrometheusUpdate(clusterUuid, response)
   }
 
   deletePrometheusInstance = async (clusterUuid, namespace, name) => {

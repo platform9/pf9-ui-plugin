@@ -15,7 +15,7 @@ class UpdateServiceMonitorForm extends React.Component {
   }
 
   render () {
-    const initialValues = {...this.props.initialValues}
+    const initialValues = { ...this.props.initialValues }
     initialValues.labels = objToKeyValueArr(initialValues.labels)
     return (
       <ValidatedForm initialValues={initialValues} onSubmit={this.handleUpdate}>

@@ -61,13 +61,11 @@ export const deletePrometheusInstance = contextUpdater('prometheusInstances', as
   return currentItems.filter(x => x.id !== id)
 })
 
-export const updatePrometheusInstance = contextUpdater('prometheusInstances', async (params) => {
-  console.log(params)
-  // extract unique id
-  // make API call
-  // get return value
-  // re-map it
-  // replace it in the array of currentItems
+export const updatePrometheusInstance = contextUpdater('prometheusInstances', async ({ apiClient, data, currentItems }) => {
+  const response = await apiClient.qbert.updatePrometheusInstance(data)
+  const mapped = mapPrometheusInstance(response)
+  const items = currentItems.map(x => x.uid === data.uid ? mapped : x)
+  return items
 })
 
 /* Service Accounts */

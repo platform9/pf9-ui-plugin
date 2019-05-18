@@ -18,6 +18,7 @@ import UserManagementIndexPage from './components/userManagement/UserManagementI
 import AppDetailsPage from 'core/components/appCatalog/AppDetailsPage'
 import AddPrometheusInstancePage from './components/prometheus/AddPrometheusInstancePage'
 import PrometheusMonitoringPage from './components/prometheus/PrometheusMonitoringPage'
+import UpdatePrometheusInstancePage from './components/prometheus/UpdatePrometheusInstancePage'
 import UpdatePrometheusRulePage from './components/prometheus/UpdatePrometheusRulePage'
 import UpdatePrometheusServiceMonitorPage from './components/prometheus/UpdateServiceMonitorPage'
 
@@ -127,6 +128,11 @@ Kubernetes.registerPlugin = pluginManager => {
         name: 'Create Prometheus Instance',
         link: { path: '/prometheus/instances/add', exact: true },
         component: AddPrometheusInstancePage,
+      },
+      {
+        name: 'Edit Prometheus Instance',
+        link: { path: '/prometheus/instances/edit/:id', exact: true },
+        component: UpdatePrometheusInstancePage,
       },
       {
         name: 'Edit Prometheus Rule',
