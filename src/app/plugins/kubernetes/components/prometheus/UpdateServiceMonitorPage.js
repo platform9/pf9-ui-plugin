@@ -7,8 +7,6 @@ import { loadPrometheusServiceMonitors, updatePrometheusServiceMonitor } from '.
 import { keyValueArrToObj, objToKeyValueArr } from 'utils/fp'
 
 class UpdateServiceMonitorForm extends React.Component {
-  state = this.props.initialValues
-
   handleUpdate = data => {
     const newData = { ...data, labels: keyValueArrToObj(data.labels) }
     this.props.onComplete(newData)

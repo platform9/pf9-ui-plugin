@@ -6,16 +6,13 @@ import createUpdateComponents from 'core/helpers/createUpdateComponents'
 import { loadPrometheusInstances, updatePrometheusInstance } from './actions'
 
 class UpdatePrometheusInstanceForm extends React.Component {
-  state = this.props.initialValues
-
   handleUpdate = data => {
     this.props.onComplete(data)
   }
 
   render () {
-    const initialValues = { ...this.props.initialValues }
     return (
-      <ValidatedForm initialValues={initialValues} onSubmit={this.handleUpdate}>
+      <ValidatedForm initialValues={this.props.initialValues} onSubmit={this.handleUpdate}>
         <TextField id="replicas" label="# of instances" info="Number of Prometheus instances" type="number" />
         <TextField id="cpu" label="CPU" info="Expressed in millicores (1m = 1/1000th of a core)" />
         <TextField id="memory" label="Memory" info="MiB of memory to allocate" />
