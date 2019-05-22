@@ -34,9 +34,62 @@ const styles = theme => ({
   },
 })
 
+let debounceFn = null
+function debounce (fn, ms) {
+  debounceFn = fn
+  setTimeout(() => {
+    if (fn === debounceFn) { fn() }
+  }, ms)
+}
+
+const zeroPad = (str, minLen) => str.length < minLen ? zeroPad(`0${str}`, minLen) : str
+
 class ColorPicker extends React.Component {
   state = {
     open: false,
+  }
+
+  async componentDidMount () {
+    this.input = [...(await navigator.requestMIDIAccess()).inputs.values()][1]
+    this.input.onmidimessage = this.handleMIDIMessage
+  }
+
+  componentWillUnmount () {
+    this.input.onmidimessage = null
+  }
+
+  handleMIDIMessage = ({ data }) => {
+    const [type, controller, midiValue] = data
+    if (!this.props.control) { return }
+    const [cr, cg, cb] = this.props.control
+    let color = this.getColor()
+    if (!color) { return }
+    if (color.length === 4) {
+      const [r, g, b] = color.substr(1)
+      color = `#${r}${r}${g}${g}${b}${b}`
+    }
+    if (!color || color.length !== 7) { return }
+    if (type !== 176) { return }
+    const hex = color.substr(1)
+    const value = parseInt(hex, 16)
+    const r = (value & 0xFF0000) >> 16
+    const g = (value & 0x00FF00) >> 8
+    const b = (value & 0x0000FF) >> 0
+    let newValue
+    const calcValue = (r, g, b) => (r << 16) + (g << 8) + b
+    if (controller === cr) { newValue = calcValue(midiValue * 2, g, b) }
+    if (controller === cg) { newValue = calcValue(r, midiValue * 2, b) }
+    if (controller === cb) { newValue = calcValue(r, g, midiValue * 2) }
+    if (newValue === undefined) { return }
+    const newR = zeroPad(((newValue & 0xFF0000) >> 16).toString(16), 2)
+    const newG = zeroPad(((newValue & 0x00FF00) >> 8).toString(16), 2)
+    const newB = zeroPad(((newValue & 0x0000FF) >> 0).toString(16), 2)
+    const newHex = `#${newR}${newG}${newB}`
+    debounce(() => {
+      this.props.setContext({
+        theme: set(this.lens(), newHex, this.props.context.theme)
+      })
+    }, 10)
   }
 
   handleClick = () => this.setState({ open: !this.state.open })

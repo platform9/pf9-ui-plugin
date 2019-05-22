@@ -45,7 +45,7 @@ const KitchenSink = ({ context: { theme } }) => (
     </Panel>
 
     <Panel title="Raw theme JSON" defaultExpanded>
-      <pre>{JSON.stringify(theme, null, 4)}</pre>
+      <pre>{JSON.stringify(theme.typography, null, 4)}</pre>
     </Panel>
   </div>
 )
