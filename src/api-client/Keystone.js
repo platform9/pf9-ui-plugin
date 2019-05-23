@@ -197,6 +197,7 @@ class Keystone {
     if (!this.client.serviceCatalog) {
       await this.getServiceCatalog()
     }
+
     const servicesByRegion = groupByRegion(this.client.serviceCatalog)
     if (!this.client.activeRegion) {
       // Just assume the first region we come across if there isn't one set.

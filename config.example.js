@@ -48,4 +48,8 @@ const config = {
 
 const env = process.env.NODE_ENV || 'development'
 
+if (env === 'development' && !config.development.simulator) {
+  throw new Error('config.development.simulator not found')
+}
+
 module.exports = config[env]

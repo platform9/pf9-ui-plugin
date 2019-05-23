@@ -25,7 +25,6 @@ window.process = process
 if (config.apiHost === undefined) { throw new Error('config.js does not contain "apiHost"') }
 
 const apiClient = new ApiClient({ keystoneEndpoint: `${config.apiHost}/keystone` })
-apiClient.setActiveRegion(config.region)
 
 class App extends React.Component {
   renderFooter = () => (

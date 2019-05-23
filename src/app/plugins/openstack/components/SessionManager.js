@@ -8,7 +8,7 @@ import { withPreferences } from 'core/providers/PreferencesProvider'
 import { getStorage, setStorage } from 'core/utils/pf9Storage'
 import LoginPage from 'openstack/components/LoginPage'
 import { loadUserTenants } from 'openstack/components/tenants/actions'
-import { pathOr, propEq } from 'ramda'
+import { path, pathOr, propEq } from 'ramda'
 
 /**
  * Sets up the Openstack session.
@@ -50,11 +50,15 @@ class SessionManager extends React.Component {
     await initSession(unscopedToken, username)
     // The order matters, we need the session to be able to init the user preferences
     const userPreferences = await initUserPreferences(username)
+
     const lastTenant = pathOr('service', ['Tenants', 'lastTenant', 'name'], userPreferences)
+    const lastRegion = path(['RegionChooser', 'lastRegion', 'id'], userPreferences)
 
     const tenants = await loadUserTenants({ getContext, setContext })
     const activeTenant = tenants.find(propEq('name', lastTenant))
     const { keystone } = context.apiClient
+
+    if (lastRegion) { context.apiClient.setActiveRegion(lastRegion) }
     const { scopedToken, user } = await keystone.changeProjectScope(activeTenant.id)
 
     setStorage('user', user)
