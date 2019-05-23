@@ -17,8 +17,8 @@ class ConfigureThemePage extends React.Component {
           </Grid>
           <Grid item xs={4}>
             <ColorsPanel />
-            <TypographyPanel />
             <MiscPanel />
+            <TypographyPanel />
           </Grid>
         </Grid>
       </div>

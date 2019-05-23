@@ -42,7 +42,7 @@ const styles = theme => ({
     width: drawerWidth,
     height: '100%',
     minHeight: '100vh',
-    backgroundColor: '#243748',
+    backgroundColor: theme.palette.sidebar.background,
   },
   drawerHeader: {
     display: 'flex',
@@ -98,15 +98,15 @@ const styles = theme => ({
     paddingRight: theme.spacing.unit * 2,
     paddingBottom: theme.spacing.unit,
     paddingLeft: theme.spacing.unit * 2,
-    backgroundColor: '#243748',
-    color: '#aee0ff',
+    backgroundColor: theme.palette.sidebar.background,
+    color: theme.palette.sidebar.text,
     borderBottom: '1px solid #07283e',
     '&:hover': {
-      backgroundColor: '#243748'
+      backgroundColor: theme.palette.sidebar.background,
     },
   },
   navMenuText: {
-    color: '#aee0ff',
+    color: theme.palette.sidebar.text,
     fontSize: '12px',
     fontWeight: 500,
   },

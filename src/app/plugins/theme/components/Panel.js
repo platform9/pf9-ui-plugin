@@ -26,7 +26,7 @@ const Panel = withStyles(styles)(({ classes, title, children, ...rest }) => (
         <Typography variant="subtitle1">{title}</Typography>
       </ExpansionPanelSummary>
       <ExpansionPanelDetails>
-        <div>
+        <div style={{ width: '100%' }}>
           {children}
         </div>
       </ExpansionPanelDetails>

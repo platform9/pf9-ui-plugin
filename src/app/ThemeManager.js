@@ -16,6 +16,10 @@ const defaultThemeJson = {
       contrastText: '#fff',
     },
     secondary: deepOrange,
+    sidebar: {
+      background: '#243748',
+      text: '#aee0ff',
+    }
   }
 }
 

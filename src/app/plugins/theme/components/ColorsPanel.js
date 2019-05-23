@@ -8,20 +8,24 @@ const ColorsPanel = () => (
     <ColorPicker path="palette.common.black" />
     <br />
 
-    <ColorPicker path="palette.background.paper" control={[77, 78, 79]} />
-    <ColorPicker path="palette.background.default" control={[81, 82, 83]} />
+    <ColorPicker path="palette.background.paper" />
+    <ColorPicker path="palette.background.default" />
     <br />
 
     <ColorPicker path="palette.primary.light" />
-    <ColorPicker path="palette.primary.main" control={[13, 14, 15, 16]} />
+    <ColorPicker path="palette.primary.main" />
     <ColorPicker path="palette.primary.dark" />
     <ColorPicker path="palette.primary.contrastText" />
     <br />
 
     <ColorPicker path="palette.secondary.light" />
-    <ColorPicker path="palette.secondary.main" control={[29, 30, 31, 32]} />
+    <ColorPicker path="palette.secondary.main" />
     <ColorPicker path="palette.secondary.dark" />
     <ColorPicker path="palette.secondary.contrastText" />
+    <br />
+
+    <ColorPicker path="palette.sidebar.background" />
+    <ColorPicker path="palette.sidebar.text" />
     <br />
 
     <ColorPicker path="palette.error.light" />
