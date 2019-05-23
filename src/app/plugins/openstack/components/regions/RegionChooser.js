@@ -2,6 +2,7 @@ import React from 'react'
 import Selector from 'core/components/Selector'
 import { appUrlRoot } from 'app/constants'
 import { compose, pluck, propEq } from 'ramda'
+import { withAppContext } from 'core/AppContext'
 import { withDataLoader } from 'core/DataLoader'
 import { withScopedPreferences } from 'core/providers/PreferencesProvider'
 import contextLoader from 'core/helpers/contextLoader'
@@ -17,8 +18,8 @@ class RegionChooser extends React.Component {
   }
 
   componentDidMount () {
-    const { lastRegion } = this.props.preferences
-    if (lastRegion) { this.setState({ curRegion: lastRegion.id }) }
+    const { context } = this.props
+    this.setState({ curRegion: context.apiClient.activeRegion })
   }
 
   handleSearchChange = regionSearch => this.setState({ regionSearch })
@@ -56,6 +57,7 @@ class RegionChooser extends React.Component {
 }
 
 export default compose(
+  withAppContext,
   withDataLoader({ regions: loadRegions }, { inlineProgress: true }),
   withScopedPreferences('RegionChooser'),
 )(RegionChooser)
