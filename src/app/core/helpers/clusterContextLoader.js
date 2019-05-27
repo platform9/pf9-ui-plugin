@@ -20,11 +20,10 @@ import { ensureArray } from 'utils/fp'
 //     { "id": "stable/card", }
 //   ],
 // }
-const clusterContextLoader = (key, loaderFn, filterMasterNodes = true, defaultValue = []) =>
+const clusterContextLoader = (key, loaderFn, defaultValue = []) =>
   async ({ getContext, setContext, params = {}, ...rest }) => {
     const keyPath = ensureArray(key)
     const clusters = (await loadClusters({ getContext, setContext, ...rest, reload: false }))
-      .filter(cluster => !filterMasterNodes || cluster.hasMasterNode)
     const { clusterId = pathOr('__all__', [0, 'uuid'], clusters) } = params
     const resolver = contextLoader([...keyPath, clusterId], loaderFn, defaultValue)
 
