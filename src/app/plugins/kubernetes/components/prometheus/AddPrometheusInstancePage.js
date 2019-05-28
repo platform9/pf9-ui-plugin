@@ -10,7 +10,7 @@ import Wizard from 'core/components/Wizard'
 import WizardStep from 'core/components/WizardStep'
 import createAddComponents from 'core/helpers/createAddComponents'
 import uuid from 'uuid'
-import { compose, propEq } from 'ramda'
+import { compose, pathOr, prop } from 'ramda'
 import { projectAs } from 'utils/fp'
 import { withAppContext } from 'core/AppContext'
 import { withDataLoader } from 'core/DataLoader'
@@ -48,7 +48,10 @@ class AddPrometheusInstanceFormBase extends React.Component {
     this.setState({ rules: [...this.state.rules, withId] })
   }
 
-  handleClusterChange = async clusterUuid => this.setState({ clusterUuid })
+  handleClusterChange = async clusterUuid => {
+    this.setState({ clusterUuid })
+    this.props.reloadData('namespaces', { clusterId: clusterUuid })
+  }
 
   handleNamespaceChange = async namespace => {
     const { getContext, setContext } = this.props
@@ -62,13 +65,23 @@ class AddPrometheusInstanceFormBase extends React.Component {
     this.setState(state => ({ rules: state.rules.filter(rule => rule.id !== id) }))
   }
 
+  // this.props.reloadDate('namespaces', { clusterUuid }) loads the new namespaces
+  // for the selected cluster correctly, but it does not scope to the correct namespace
+  // in this.props.data.namespaces.
+  //
+  // As a consequence this is a temp workaround for the current 3.11 release.  Longer
+  // term we need to fix the data loading, caching, and scoping system.
+  getNamespaces = () => {
+    const { clusterUuid } = this.state
+    const namespaces = pathOr([], ['context', 'namespaces', clusterUuid], this.props)
+    return namespaces
+  }
+
   render () {
-    const { clusterUuid, namespace, rules, serviceAccounts } = this.state
-    const { clusters, namespaces } = this.props.data
+    const { namespace, rules, serviceAccounts } = this.state
+    const { clusters } = this.props.data
     const clusterOptions = projectAs({ value: 'uuid', label: 'name' }, clusters)
-    const namespaceOptions = clusterUuid
-      ? namespaces.filter(propEq('clusterId', clusterUuid)).map(x => x.metadata.name)
-      : []
+    const namespaceOptions = this.getNamespaces().map(prop('name'))
     const serviceAccountOptions = namespace
       ? serviceAccounts.map(x => x.metadata.name)
       : []
