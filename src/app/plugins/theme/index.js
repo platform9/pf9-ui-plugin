@@ -27,6 +27,9 @@ Theme.registerPlugin = pluginManager => {
     ]
   )
 
+  // Hide the theme plugin from the sidenav until we have a way to
+  // turn plugins on/off from a features.json.
+  /*
   plugin.registerNavItems([
     {
       name: 'Configure Theme',
@@ -34,6 +37,7 @@ Theme.registerPlugin = pluginManager => {
       icon: 'palette',
     }
   ])
+  */
 }
 
 export default Theme

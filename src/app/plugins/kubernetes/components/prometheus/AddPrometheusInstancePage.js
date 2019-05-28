@@ -65,7 +65,7 @@ class AddPrometheusInstanceFormBase extends React.Component {
     this.setState(state => ({ rules: state.rules.filter(rule => rule.id !== id) }))
   }
 
-  // this.props.reloadDate('namespaces', { clusterUuid }) loads the new namespaces
+  // this.props.reloadData('namespaces', { clusterUuid }) loads the new namespaces
   // for the selected cluster correctly, but it does not scope to the correct namespace
   // in this.props.data.namespaces.
   //
