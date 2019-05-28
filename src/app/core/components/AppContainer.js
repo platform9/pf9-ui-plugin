@@ -1,3 +1,5 @@
+import axios from 'axios'
+
 import React from 'react'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/styles'
@@ -57,6 +59,26 @@ const styles = theme => ({
 
 @withStyles(styles, { withTheme: true })
 class AppContainer extends React.Component {
+  async componentDidMount () {
+    // Note: urlOrigin may or may not be changed to use a specific path instead of
+    // window.location.origin, this depends on whether the new UI is intended to be
+    // accessed from the master DU or from each region.
+    const urlOrigin = window.location.origin
+    // Timestamp tag used for preventing browser caching of features.json
+    const timestamp = new Date().getTime()
+    try {
+      const response = await axios.get(`${urlOrigin}/clarity/features.json?tag=${timestamp}`)
+      this.setState({ withStackSlider: !!response.data.experimental.openstackEnabled })
+    } catch (err) {
+      console.error('No features.json')
+      // Just set slider to true for now as a default.
+      // This is fine from the old UI perspective because if routed to the
+      // dashboard (which is what happens today), the old UI can handle
+      // the stack switching appropriately.
+      this.setState({ withStackSlider: true })
+    }
+  }
+
   state = {
     open: true,
   }
@@ -71,7 +93,7 @@ class AppContainer extends React.Component {
 
   render () {
     const { classes, sections } = this.props
-    const { open } = this.state
+    const { open, withStackSlider } = this.state
 
     return (
       <div className={classes.root}>
@@ -81,6 +103,7 @@ class AppContainer extends React.Component {
             open={open} />
           <Navbar
             withSearchBar
+            withStackSlider={withStackSlider}
             drawerWidth={drawerWidth}
             sections={sections}
             open={open}

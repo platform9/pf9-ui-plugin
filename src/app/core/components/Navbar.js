@@ -6,6 +6,7 @@ import {
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
+import ChevronRightIcon from '@material-ui/icons/ChevronRight'
 import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'
 import SearchIcon from '@material-ui/icons/Search'
@@ -117,7 +118,28 @@ const styles = theme => ({
   },
   navMenuList: {
     borderLeft: `${theme.spacing.unit}px solid #6dc6fe`
-  }
+  },
+  sliderContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    marginBottom: '10px',
+  },
+  sliderLogo: {
+    flexGrow: 1,
+    textAlign: 'center',
+    background: 'white',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '45px'
+  },
+  sliderLogoImage: {
+    maxHeight: '32px',
+    maxWidth: '180px'
+  },
+  sliderArrow: {
+    color: theme.palette.sidebar.text,
+  },
 })
 
 const FontAwesomeIcon = ({ children }) => <i className={`fal fa-fw fa-lg fa-${children}`} />
@@ -355,8 +377,23 @@ class Navbar extends PureComponent {
     </MenuList>
   }
 
+  renderStackSlider = () => {
+    const { classes } = this.props
+    return <div className={classes.sliderContainer}>
+      <a href="/clarity/index.html#/dashboard">
+        <ChevronLeftIcon className={classes.sliderArrow} />
+      </a>
+      <div className={classes.sliderLogo}>
+        <img src="/ui/images/logo-kubernetes-h.png" className={classes.sliderLogoImage} />
+      </div>
+      <a href="/clarity/index.html#/dashboard">
+        <ChevronRightIcon className={classes.sliderArrow} />
+      </a>
+    </div>
+  }
+
   render () {
-    const { classes, withSearchBar, sections, open, handleDrawerClose } = this.props
+    const { classes, withSearchBar, withStackSlider, sections, open, handleDrawerClose } = this.props
     const filteredSections = sections.filter(where({ links: notEmpty }))
 
     return <Drawer
@@ -372,6 +409,7 @@ class Navbar extends PureComponent {
         </IconButton>
       </div>
       <Divider />
+      {withStackSlider ? this.renderStackSlider() : null}
       {filteredSections.length > 1
         ? this.renderSections(filteredSections)
         : this.renderSectionLinks(propOr([], 'links', filteredSections[0]))}
@@ -400,6 +438,7 @@ const sectionPropType = {
 
 Navbar.propTypes = {
   withSearchBar: PropTypes.bool,
+  withStackSlider: PropTypes.bool,
   open: PropTypes.bool,
   handleDrawerClose: PropTypes.func,
   sections: PropTypes.arrayOf(
