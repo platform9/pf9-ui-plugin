@@ -29,7 +29,7 @@ class AppCatalogPage extends React.Component {
       type: 'select',
       label: 'Cluster',
       onChange: async clusterId => {
-        this.props.reloadData('apps', { clusterId })
+        return this.props.reloadData('apps', { clusterId })
       },
       items: projectAs(
         { label: 'name', value: 'uuid' },

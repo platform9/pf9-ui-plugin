@@ -10,7 +10,7 @@ import Wizard from 'core/components/Wizard'
 import WizardStep from 'core/components/WizardStep'
 import createAddComponents from 'core/helpers/createAddComponents'
 import uuid from 'uuid'
-import { compose, pathOr, prop } from 'ramda'
+import { compose, pluck } from 'ramda'
 import { projectAs } from 'utils/fp'
 import { withAppContext } from 'core/AppContext'
 import { withDataLoader } from 'core/DataLoader'
@@ -65,23 +65,11 @@ class AddPrometheusInstanceFormBase extends React.Component {
     this.setState(state => ({ rules: state.rules.filter(rule => rule.id !== id) }))
   }
 
-  // this.props.reloadData('namespaces', { clusterUuid }) loads the new namespaces
-  // for the selected cluster correctly, but it does not scope to the correct namespace
-  // in this.props.data.namespaces.
-  //
-  // As a consequence this is a temp workaround for the current 3.11 release.  Longer
-  // term we need to fix the data loading, caching, and scoping system.
-  getNamespaces = () => {
-    const { clusterUuid } = this.state
-    const namespaces = pathOr([], ['context', 'namespaces', clusterUuid], this.props)
-    return namespaces
-  }
-
   render () {
     const { namespace, rules, serviceAccounts } = this.state
-    const { clusters } = this.props.data
+    const { clusters, namespaces } = this.props.data
     const clusterOptions = projectAs({ value: 'uuid', label: 'name' }, clusters)
-    const namespaceOptions = this.getNamespaces().map(prop('name'))
+    const namespaceOptions = pluck('name', namespaces)
     const serviceAccountOptions = namespace
       ? serviceAccounts.map(x => x.metadata.name)
       : []

@@ -53,14 +53,9 @@ const ListPage = ({ ListContainer }) => {
     }
 
     handleClusterChange = async clusterId => {
-      const { getContext, setContext } = this.props
-      this.setState({
-        activeCluster: clusterId,
-      }, async () => loadReleases({
-        params: { clusterId },
-        getContext,
-        setContext,
-      }))
+      this.setState({ activeCluster: clusterId },
+        async () => this.props.reloadData('releases', { clusterId }),
+      )
     }
 
     findClusterName = clusterId => {
@@ -71,13 +66,11 @@ const ListPage = ({ ListContainer }) => {
     render () {
       const { activeCluster } = this.state
       const { releases = [], clusters = [] } = this.props.data
-      const filteredReleases = activeCluster === '__all__'
-        ? releases
-        : releases.filter(pod => pod.clusterId === activeCluster)
-      const withClusterNames = filteredReleases.map(ns => ({
+      const withClusterNames = releases.map(ns => ({
         ...ns,
         clusterName: this.findClusterName(ns.clusterId),
       }))
+
       return (
         <div>
           <Picklist

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import DisplayError from './components/DisplayError'
 import Progress from './components/Progress'
 import { asyncProps } from 'utils/fp'
-import { equals, mapObjIndexed, compose } from 'ramda'
+import { mapObjIndexed, compose } from 'ramda'
 import { withAppContext } from 'core/AppContext'
 
 class DataLoaderBase extends PureComponent {
@@ -14,26 +14,20 @@ class DataLoaderBase extends PureComponent {
   }
 
   async componentDidMount () {
-    this.listener = window.addEventListener('scopeChanged', this.loadAll)
     await this.loadAll()
   }
 
-  async componentDidUpdate (prevProps) {
-    if (!equals(this.props.context, prevProps.context)) {
-      await this.loadAll(true)
-    }
-  }
-
-  componentWillUnmount () {
-    window.removeEventListener('scopeChanged', this.listener)
-  }
-
-  loadAll = async nofetch =>
+  loadAll = async () => {
     this.setState({ loading: true }, async () => {
       const { loaders, options, context, getContext, setContext } = this.props
       try {
         const data = await asyncProps(mapObjIndexed(loader =>
-          loader({ context, getContext, setContext, reload: options.reloadOnMount, nofetch }), loaders,
+          loader({
+            context,
+            getContext,
+            setContext,
+            reload: options.reloadOnMount,
+          }), loaders,
         ))
         this.setState({ loading: false, data, error: null })
       } catch (err) {
@@ -41,12 +35,20 @@ class DataLoaderBase extends PureComponent {
         this.setState({ loading: false, error: err.toString() })
       }
     })
+  }
 
   loadOne = (loaderKey, params, reload, cascade = false) => {
     this.setState({ loading: true }, async () => {
       const { loaders, context, getContext, setContext } = this.props
       try {
-        const data = await loaders[loaderKey]({ context, getContext, setContext, params, reload, cascade })
+        const data = await loaders[loaderKey]({
+          context,
+          getContext,
+          setContext,
+          params,
+          reload,
+          cascade,
+        })
         this.setState(prevState => ({
           loading: false,
           error: null,

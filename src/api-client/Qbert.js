@@ -278,7 +278,9 @@ class Qbert {
 
   /* Monocular endpoints being exposed through Qbert */
   getCharts = async (clusterId) => {
-    return this.client.basicGet(`${await this.clusterMonocularBaseUrl(clusterId)}/charts`)
+    const output = this.client.basicGet(`${await this.clusterMonocularBaseUrl(clusterId)}/charts`)
+    // FIXME: remove this when api is fixed (right now it is returning data.data)
+    return output.hasOwnProperty('data') ? output.data : output
   }
 
   getChart = async (clusterId, chart, release, version) => {
@@ -291,11 +293,15 @@ class Qbert {
   }
 
   getReleases = async (clusterId) => {
-    return this.client.basicGet(`${await this.clusterMonocularBaseUrl(clusterId)}/releases`)
+    const output = await this.client.basicGet(`${await this.clusterMonocularBaseUrl(clusterId)}/releases`)
+    // FIXME: remove this when api is fixed (right now it is returning data.data)
+    return output.hasOwnProperty('data') ? output.data : output
   }
 
   getRelease = async (clusterId, name) => {
-    return this.client.basicGet(`${await this.clusterMonocularBaseUrl(clusterId)}/releases/${name}`)
+    const output = await this.client.basicGet(`${await this.clusterMonocularBaseUrl(clusterId)}/releases/${name}`)
+    // FIXME: remove this when api is fixed (right now it is returning data.data)
+    return output.hasOwnProperty('data') ? output.data : output
   }
 
   deleteRelease = async (clusterId, name) => {
