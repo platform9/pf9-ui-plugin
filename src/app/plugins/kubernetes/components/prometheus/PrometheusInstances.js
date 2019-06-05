@@ -1,5 +1,5 @@
-import React from 'react'
-import ExternalLink from 'core/components/ExternalLink'
+// import React from 'react'
+// import ExternalLink from 'core/components/ExternalLink'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { deletePrometheusInstance, loadPrometheusInstances } from './actions'
 
@@ -12,16 +12,19 @@ const renderClusterName = (field, row, data) => {
   return cluster.name
 }
 
+// Disabling for now until the backend has the links for this working
+/*
 const renderDashboardLink = (field, row, context) => {
   const link = context.apiClient.qbert.getPrometheusDashboardLink(row)
   return <ExternalLink url={link}>dashboard</ExternalLink>
 }
+*/
 
 export const columns = [
   { id: 'name', label: 'Name' },
   { id: 'clusterName', label: 'cluster', render: renderClusterName },
   { id: 'namespace', label: 'Namespace' },
-  { id: 'dashboard', label: 'Dashboard', render: renderDashboardLink },
+  // { id: 'dashboard', label: 'Dashboard', render: renderDashboardLink },
   { id: 'serviceMonitorSelector', label: 'Service Monitor', render: renderKeyValues },
   { id: 'alertManagersSelector', label: 'Alert Managers' },
   { id: 'cpu', label: 'CPU' },
