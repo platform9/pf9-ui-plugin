@@ -52,13 +52,13 @@ export const createPrometheusInstance = contextUpdater('prometheusInstances', as
 })
 
 export const deletePrometheusInstance = contextUpdater('prometheusInstances', async ({ id, apiClient, currentItems }) => {
-  const instance = currentItems.find(propEq('id', id))
+  const instance = currentItems.find(propEq('uid', id))
   if (!instance) {
     console.error(`Unable to find prometheus instance with id: ${id} in deletePrometheusInstance`)
     return
   }
   await apiClient.qbert.deletePrometheusInstance(instance.clusterUuid, instance.namespace, instance.name)
-  return currentItems.filter(x => x.id !== id)
+  return currentItems.filter(x => x.uid !== id)
 })
 
 export const updatePrometheusInstance = contextUpdater('prometheusInstances', async ({ apiClient, data, currentItems }) => {

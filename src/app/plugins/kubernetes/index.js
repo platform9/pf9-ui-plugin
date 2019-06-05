@@ -105,6 +105,11 @@ Kubernetes.registerPlugin = pluginManager => {
         component: NamespacesListPage
       },
       {
+        name: 'Prometheus Monitoring (BETA)',
+        link: { path: '/prometheus', exact: true },
+        component: PrometheusMonitoringPage,
+      },
+      {
         name: 'Add Namespace',
         link: { path: '/namespaces/add', exact: true },
         component: AddNamespacePage
@@ -118,11 +123,6 @@ Kubernetes.registerPlugin = pluginManager => {
         name: 'Tenants & Users',
         link: { path: '/user_management', exact: true },
         component: UserManagementIndexPage
-      },
-      {
-        name: 'Monitoring',
-        link: { path: '/prometheus', exact: true },
-        component: PrometheusMonitoringPage,
       },
       {
         name: 'Create Prometheus Instance',
@@ -188,6 +188,7 @@ Kubernetes.registerPlugin = pluginManager => {
     },
     { name: 'Storage Classes', icon: 'hdd', ...clarityLink('/kubernetes/storage_classes') },
     { name: 'Namespaces', icon: 'object-group', ...clarityLink('/kubernetes/namespaces') },
+    { name: 'Prometheus Monitoring (BETA)', icon: 'chart-area', link: { path: '/prometheus' } },
     { name: 'API Access', icon: 'key', ...clarityLink('/kubernetes/api_access') },
     {
       name: 'Tenants & Users',
@@ -236,6 +237,7 @@ Kubernetes.registerPlugin = pluginManager => {
     },
     { name: 'Storage Classes', icon: 'hdd', link: { path: '/storage_classes' } },
     { name: 'Namespaces', icon: 'object-group', link: { path: '/namespaces' } },
+    { name: 'Prometheus Monitoring (BETA)', icon: 'chart-area', link: { path: '/prometheus' } },
     { name: 'API Access', icon: 'key', link: { path: '/api_access' } },
     {
       name: 'Tenants & Users',
@@ -251,14 +253,7 @@ Kubernetes.registerPlugin = pluginManager => {
   ]
 
   const navItems = useClarityLinks ? clarityNavItems : devNavItems
-  const commonNavItems = [
-    {
-      name: 'Monitoring',
-      icon: 'chart-area',
-      link: { path: '/prometheus' },
-
-    }
-  ]
+  const commonNavItems = []
   const allNavItems = [...navItems, ...commonNavItems]
   plugin.registerNavItems(allNavItems)
 }

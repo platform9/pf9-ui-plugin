@@ -3,12 +3,11 @@ import PropTypes from 'prop-types'
 import DisplayError from './components/DisplayError'
 import Progress from './components/Progress'
 import { asyncProps } from 'utils/fp'
-import { mapObjIndexed, compose } from 'ramda'
+import { assoc, compose, mapObjIndexed, merge, pick } from 'ramda'
 import { withAppContext } from 'core/AppContext'
 
 class DataLoaderBase extends PureComponent {
   state = {
-    data: mapObjIndexed(() => [], this.props.loaders),
     loading: false,
     error: null,
   }
@@ -29,7 +28,8 @@ class DataLoaderBase extends PureComponent {
             reload: options.reloadOnMount,
           }), loaders,
         ))
-        this.setState({ loading: false, data, error: null })
+        setContext(merge(data))
+        this.setState({ loading: false, error: null })
       } catch (err) {
         console.log(err)
         this.setState({ loading: false, error: err.toString() })
@@ -49,11 +49,8 @@ class DataLoaderBase extends PureComponent {
           reload,
           cascade,
         })
-        this.setState(prevState => ({
-          loading: false,
-          error: null,
-          data: { ...prevState.data, [loaderKey]: data },
-        }))
+        setContext(assoc(loaderKey, data))
+        this.setState({ loading: false, error: null })
       } catch (err) {
         console.log(err)
         this.setState({ loading: false, error: err.toString() })
@@ -61,11 +58,17 @@ class DataLoaderBase extends PureComponent {
     })
   }
 
+  mapDataFromContext = () => {
+    const { context, loaders } = this.props
+    return pick(Object.keys(loaders), context)
+  }
+
   render () {
-    const { data, loading, error } = this.state
+    const { loading, error } = this.state
     if (error) {
       return <DisplayError error={error} />
     }
+    const data = this.mapDataFromContext()
     const { children, options, ...rest } = this.props
     return <Progress inline={options.inlineProgress} overlay loading={loading}>
       {children({ ...rest, data, loading, error, reloadData: this.loadOne })}
