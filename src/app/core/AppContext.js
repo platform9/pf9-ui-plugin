@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { path, assocPath, flatten, omit } from 'ramda'
 import { ensureArray } from 'utils/fp'
+import { withToast } from 'core/providers/ToastProvider'
 
 const Context = React.createContext({})
 export const Consumer = Context.Consumer
@@ -10,6 +11,7 @@ export const Provider = Context.Provider
 class AppContext extends React.Component {
   state = {
     ...this.props.initialContext,
+    showToast: this.props.showToast,
 
     session: {},
 
@@ -104,4 +106,4 @@ export const withAppContext = Component => props =>
     }
   </Consumer>
 
-export default AppContext
+export default withToast(AppContext)

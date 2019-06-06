@@ -16,9 +16,11 @@ const contextUpdater = (contextPath, updaterFn, returnLast = false) => {
     const { getContext, setContext } = args
     const loaderFn = getLoader(resolvedPath)
     const currentItems = (await loaderFn(args)) || []
+    const context = getContext()
     const output = await updaterFn({
       ...args,
-      apiClient: getContext('apiClient'),
+      showToast: context.showToast,
+      apiClient: context.apiClient,
       currentItems,
       loadFromContext: (contextPath, customArgs) =>
         getLoader(contextPath)({ ...args, ...customArgs }),

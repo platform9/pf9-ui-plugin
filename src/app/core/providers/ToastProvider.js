@@ -13,6 +13,7 @@ import amber from '@material-ui/core/colors/amber'
 import WarningIcon from '@material-ui/icons/Warning'
 import SnackbarContent from '@material-ui/core/SnackbarContent/SnackbarContent'
 
+// Possible values for 'type' are ['success', 'warning', 'error', 'info']
 const variantIcon = {
   success: CheckCircleIcon,
   warning: WarningIcon,

@@ -46,26 +46,47 @@ export const loadPrometheusInstances = contextLoader('prometheusInstances', asyn
   return mapAsyncItems(clusterUuids, apiClient.qbert.getPrometheusInstances, mapPrometheusInstance)
 })
 
-export const createPrometheusInstance = contextUpdater('prometheusInstances', async ({ data, apiClient, currentItems }) => {
-  const createdInstance = await apiClient.qbert.createPrometheusInstance(data.cluster, data)
-  return [...currentItems, mapPrometheusInstance({clusterUuid: data.cluster, ...createdInstance})]
+export const createPrometheusInstance = contextUpdater('prometheusInstances', async ({ data, apiClient, currentItems, showToast }) => {
+  try {
+    const createdInstance = await apiClient.qbert.createPrometheusInstance(data.cluster, data)
+    const mappedInstance = mapPrometheusInstance({clusterUuid: data.cluster, ...createdInstance})
+    showToast(`Successfully created Prometheus instance ${mappedInstance.name}`, 'success')
+    return [...currentItems, mappedInstance]
+  } catch (err) {
+    showToast(err, 'error')
+    console.log(err)
+  }
 })
 
-export const deletePrometheusInstance = contextUpdater('prometheusInstances', async ({ id, apiClient, currentItems }) => {
+export const deletePrometheusInstance = contextUpdater('prometheusInstances', async ({ id, apiClient, currentItems, showToast }) => {
   const instance = currentItems.find(propEq('uid', id))
   if (!instance) {
-    console.error(`Unable to find prometheus instance with id: ${id} in deletePrometheusInstance`)
+    const message = `Unable to find prometheus instance with id: ${id} in deletePrometheusInstance`
+    showToast(message, 'error')
+    console.error(message)
     return
   }
-  await apiClient.qbert.deletePrometheusInstance(instance.clusterUuid, instance.namespace, instance.name)
-  return currentItems.filter(x => x.uid !== id)
+  try {
+    await apiClient.qbert.deletePrometheusInstance(instance.clusterUuid, instance.namespace, instance.name)
+    showToast(`Successfully deleted Prometheus instance ${instance.name}`, 'success')
+    return currentItems.filter(x => x.uid !== id)
+  } catch (err) {
+    showToast(err, 'error')
+    console.log(err)
+  }
 })
 
-export const updatePrometheusInstance = contextUpdater('prometheusInstances', async ({ apiClient, data, currentItems }) => {
-  const response = await apiClient.qbert.updatePrometheusInstance(data)
-  const mapped = mapPrometheusInstance(response)
-  const items = currentItems.map(x => x.uid === data.uid ? mapped : x)
-  return items
+export const updatePrometheusInstance = contextUpdater('prometheusInstances', async ({ apiClient, data, currentItems, showToast }) => {
+  try {
+    const response = await apiClient.qbert.updatePrometheusInstance(data)
+    const mapped = mapPrometheusInstance(response)
+    showToast(`Successfully updated Prometheus instance ${mapped.name}`, 'success')
+    const items = currentItems.map(x => x.uid === data.uid ? mapped : x)
+    return items
+  } catch (err) {
+    showToast(err, 'error')
+    console.log(err)
+  }
 })
 
 /* Service Accounts */

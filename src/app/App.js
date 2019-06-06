@@ -72,8 +72,8 @@ class App extends React.Component {
       <Router>
         <ThemeProvider theme={theme}>
           <HotKeysProvider>
-            <AppContext initialContext={{ apiClient, initialized: false, sessionLoaded: false }}>
-              <ToastProvider>
+            <ToastProvider>
+              <AppContext initialContext={{ apiClient, initialized: false, sessionLoaded: false }}>
                 <PreferencesProvider>
                   <ThemeManager>
                     <div id="_main-container">
@@ -91,8 +91,8 @@ class App extends React.Component {
                     </div>
                   </ThemeManager>
                 </PreferencesProvider>
-              </ToastProvider>
-            </AppContext>
+              </AppContext>
+            </ToastProvider>
           </HotKeysProvider>
         </ThemeProvider>
       </Router>
