@@ -77,6 +77,12 @@ const ToastContent = withStyles(styles)(({onClose, type, message, classes, class
   />
 })
 
+const snackbarStyle = {
+  marginBottom: '80px',
+  // Intercom uses a ridiculously high zIndex so we have to be even more ridiculous
+  zIndex: '9999999999',
+}
+
 export class ToastProvider extends Component {
   state = {
     toasts: []
@@ -123,10 +129,11 @@ export class ToastProvider extends Component {
       <ToastContext.Provider value={this.showToast}>
         {toasts.map(({id, isOpen, text, onClose, type}) =>
           <Snackbar
+            style={snackbarStyle}
             key={id}
             anchorOrigin={{
               vertical: 'bottom',
-              horizontal: 'left',
+              horizontal: 'right',
             }}
             open={isOpen}
             autoHideDuration={toastsTimeout}
