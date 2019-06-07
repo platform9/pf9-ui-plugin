@@ -29,7 +29,7 @@ export const styles = {
     alignSelf: 'left',
   },
   resetLink: {
-    color: '#027cb5',
+    color: '#027CB5',
     backgroundColor: '#FFF',
     display: 'inline-block',
     marginLeft: '24px',
@@ -49,10 +49,11 @@ export const styles = {
     display: 'flex',
     marginTop: '16px',
     flexDirection: 'row',
-    flexWrap: 'wrap',
     width: '100%',
     height: '80%',
     justifyContent: 'space-between',
+    flexWrap: ({ inline }) =>
+      inline ? 'nowrap' : 'wrap',
   },
   formGroup: {
     flex: '1 1 calc(50% - 24px)',
@@ -61,7 +62,7 @@ export const styles = {
   },
 }
 
-class ListTableFiltersPopover extends React.Component {
+class ListTableFilters extends React.Component {
   renderWrappedFilter = filter => <FormGroup
     key={filter.columnId}
     className={this.props.classes.formGroup}>
@@ -79,10 +80,11 @@ class ListTableFiltersPopover extends React.Component {
         return <FormControl className={classes.formControl}>
           <InputLabel htmlFor={`filter-${columnId}`}>{label}</InputLabel>
           <Select
+            variant="outlined"
             value={value || ''}
             onChange={e => onChange(e.target.value)}
             inputProps={{
-              id: `filter-${columnId}`
+              id: `filter-${columnId}`,
             }}
           >
             {filter.items.map(item => <MenuItem key={item} value={item}>
@@ -95,12 +97,13 @@ class ListTableFiltersPopover extends React.Component {
         return <FormControl className={classes.formControl}>
           <InputLabel htmlFor={`filter-${columnId}`}>{label}</InputLabel>
           <Select
+            variant="outlined"
             multiple
             value={value || []}
             onChange={e => onChange(e.target.value)}
             renderValue={selected => selected.join(', ')}
             inputProps={{
-              id: `filter-${columnId}`
+              id: `filter-${columnId}`,
             }}
           >
             {filter.items.map(item => <MenuItem key={item} value={item}>
@@ -133,7 +136,13 @@ class ListTableFiltersPopover extends React.Component {
   }
 
   render () {
-    const { classes, filters, onFiltersReset } = this.props
+    const { classes, inline, filters, onFiltersReset } = this.props
+    const filtersDiv = <div className={classes.filters}>
+      {filters.map(this.renderWrappedFilter)}
+    </div>
+    if (inline) {
+      return filtersDiv
+    }
     return (
       <div className={classes.root}>
         <div className={classes.header}>
@@ -150,19 +159,18 @@ class ListTableFiltersPopover extends React.Component {
           </div>
           <div className={classes.filtersSelected} />
         </div>
-        <div className={classes.filters}>
-          {filters.map(this.renderWrappedFilter)}
-        </div>
+        {filtersDiv}
       </div>
     )
   }
 }
 
-ListTableFiltersPopover.defaultProps = {
-  filterValues: {}
+ListTableFilters.defaultProps = {
+  filterValues: {},
 }
 
-ListTableFiltersPopover.propTypes = {
+ListTableFilters.propTypes = {
+  inline: PropTypes.bool,
   filters: PropTypes.arrayOf(PropTypes.shape({
     columnId: PropTypes.string.isRequired,
     label: PropTypes.string, // Will override column label
@@ -177,5 +185,5 @@ ListTableFiltersPopover.propTypes = {
 }
 
 export default compose(
-  withStyles(styles)
-)(ListTableFiltersPopover)
+  withStyles(styles),
+)(ListTableFilters)

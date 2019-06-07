@@ -9,12 +9,38 @@ const theme = createMuiTheme({
   },
   palette: {
     primary: {
-      light: '#aee0ff',
-      main: '#4aa3df',
-      dark: '#1e699c',
-      contrastText: '#fff',
+      light: '#AEE0FF',
+      main: '#4AA3DF',
+      dark: '#1E699C',
+      contrastText: '#FFF',
     },
     secondary: deepOrange,
+  },
+  overrides: {
+    MuiTableCell: {
+      root: {
+        padding: '4px 24px',
+      },
+    },
+    MuiInputBase: {
+      root: {
+        color: 'inherit',
+      },
+    },
+    MuiOutlinedInput: {
+      root: {
+        padding: '3px 0',
+      },
+      input: {
+        padding: '5px 3px',
+      },
+      adornedStart: {
+        paddingLeft: 8,
+      },
+      adornedEnd: {
+        paddingRight: 8,
+      },
+    },
   },
 })
 

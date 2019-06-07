@@ -3,8 +3,37 @@ import PropTypes from 'prop-types'
 import moize from 'moize'
 import { assoc } from 'ramda'
 import {
-  Checkbox, TableCell, TableHead, TableRow, TableSortLabel, Tooltip
+  Checkbox, TableCell, TableHead, TableRow, TableSortLabel, Tooltip,
 } from '@material-ui/core'
+import { compose } from 'utils/fp'
+import { withStyles } from '@material-ui/styles'
+import * as classnames from 'classnames'
+
+const styles = theme => ({
+  root: {
+    // backgroundColor: theme.palette.grey[50],
+    fontWeight: 'bold',
+    color: theme.palette.text.primary,
+  },
+  checkboxCell: {
+    display: ['flex', '!important'],
+    flexFlow: 'row nowrap',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+  },
+  checkbox: {
+    paddingRight: 4,
+  },
+  cellLabel: {
+    color: [theme.palette.text.primary, '!important'],
+  },
+  checkAllCell: {
+    paddingRight: 0,
+  },
+  emptyCheckAllCell: {
+    paddingRight: 20,
+  },
+})
 
 class ListTableHead extends React.Component {
   createSortHandler = moize(id => event => {
@@ -28,6 +57,7 @@ class ListTableHead extends React.Component {
 
   render () {
     const {
+      classes,
       canDragColumns,
       blankFirstColumn,
       checked,
@@ -40,27 +70,37 @@ class ListTableHead extends React.Component {
       showCheckboxes,
     } = this.props
 
-    const headerCheckbox = showCheckboxes ? (
-      <TableCell padding="checkbox">
-        <Checkbox
-          indeterminate={!checked && numSelected > 0 && numSelected < rowCount}
-          checked={checked}
-          onChange={onSelectAllClick}
-          color='primary'
-        />
+    const headerCheckbox = showCheckboxes && !blankFirstColumn
+      ? <TableCell padding="checkbox" key="_checkAll" className={classnames(classes.cellLabel,
+        classes.checkAllCell, {
+          [classes.emptyCheckAllCell]: !numSelected,
+        })}>
+        <label className={classes.checkboxCell}>
+          <Checkbox
+            className={classes.checkbox}
+            indeterminate={!checked && numSelected > 0 && numSelected < rowCount}
+            checked={checked}
+            onChange={onSelectAllClick}
+            color='primary'
+          />
+          {numSelected > 0 ? <span>({numSelected})</span> : null}
+        </label>
       </TableCell>
-    ) : null
+      : null
 
-    const firstBlank = blankFirstColumn
-      ? <TableCell padding="checkbox" key="_firstBlank" /> : null
+    const firstBlank = blankFirstColumn ? <TableCell
+      padding="checkbox"
+      key="_checkAll"
+      className={classes.cellLabel} /> : null
 
     return (
-      <TableHead>
+      <TableHead className={classes.root}>
         <TableRow>
           {headerCheckbox}
           {firstBlank}
           {columns.map(column =>
             <TableCell
+              className={classes.cellLabel}
               draggable={canDragColumns}
               onDragStart={canDragColumns ? this.createDragHandler(column.id) : null}
               onDragOver={canDragColumns ? this.handleDragOver : null}
@@ -113,4 +153,6 @@ ListTableHead.defaultProps = {
   numSelected: 0,
 }
 
-export default ListTableHead
+export default compose(
+  withStyles(styles),
+)(ListTableHead)

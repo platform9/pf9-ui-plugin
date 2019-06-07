@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { IconButton, Tooltip } from '@material-ui/core'
 import { withAppContext } from 'core/AppContext'
 
-const ListTableRowActions = ({ context, rowActions, selected }) => {
+const ListTableRowActions = ({ actionClassName, context, rowActions, selected }) => {
   const _selected = selected || []
   const filtered = (rowActions || []).filter(action =>
     action.cond === undefined || action.cond(_selected, context)
@@ -11,7 +11,7 @@ const ListTableRowActions = ({ context, rowActions, selected }) => {
   if (_selected.length === 0 || filtered.length === 0) { return null }
   return filtered.map(action => (
     <Tooltip key={action.label} title={action.label}>
-      <IconButton onClick={() => action.action(_selected, context)}>{action.icon}</IconButton>
+      <IconButton className={actionClassName} onClick={() => action.action(_selected, context)}>{action.icon}</IconButton>
     </Tooltip>
   ))
 }

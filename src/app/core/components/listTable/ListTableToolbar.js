@@ -1,51 +1,54 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import AddIcon from '@material-ui/icons/Add'
-import DeleteIcon from '@material-ui/icons/Delete'
-import EditIcon from '@material-ui/icons/Edit'
 import ListTableColumnButton from 'core/components/listTable/ListTableColumnSelector'
-import ListTableFiltersButton from 'core/components/listTable/ListTableFiltersButton'
+import ListTableFilters from 'core/components/listTable/ListTableFilters'
 import ListTableRowActions from './ListTableRowActions'
 import SearchBar from 'core/components/SearchBar'
 import classNames from 'classnames'
 import { compose } from 'ramda'
-import { Button, IconButton, Toolbar, Tooltip, Typography } from '@material-ui/core'
-import { lighten } from '@material-ui/core/styles/colorManipulator'
+import { Button, Toolbar, Tooltip, Typography } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
+import ListTableFiltersButton from 'core/components/listTable/ListTableFiltersButton'
 
 const toolbarStyles = theme => ({
   root: {
-    paddingRight: theme.spacing.unit
+    paddingRight: theme.spacing.unit,
+    color: theme.palette.grey[600],
+
   },
-  highlight:
-    theme.palette.type === 'light'
-      ? {
-        color: theme.palette.primary.main,
-        backgroundColor: lighten(theme.palette.primary.light, 0.85)
-      }
-      : {
-        color: theme.palette.text.primary,
-        backgroundColor: theme.palette.secondary.dark
-      },
+  highlight: {},
   spacer: {
-    flex: '0 0 auto'
+    flex: '0 0 auto',
   },
   actions: {
-    color: theme.palette.text.secondary,
-    flex: '1 1 100%'
+    flex: '1 1 100%',
   },
   toolbar: {
-    justifyContent: 'flex-end'
+    justifyContent: 'flex-end',
   },
   title: {
-    flex: '0 0 auto'
+    flex: '0 0 auto',
+    marginRight: theme.spacing.unit * 2,
+    color: theme.palette.primary.contrastText,
   },
   rowActions: {
-  }
+    color: 'inherit',
+  },
+  action: {
+    marginLeft: theme.spacing.unit,
+    marginRight: theme.spacing.unit,
+    cursor: 'pointer',
+    display: 'flex',
+    flexFlow: 'column nowrap',
+    alignItems: 'center',
+    lineHeight: 2,
+    fontSize: theme.typography.fontSize * 0.8,
+  },
 })
 
 const ListTableToolbar = ({
-  classes, columns, context, filterValues, filters,
+  classes, columns, context, filterValues, filters, inlineFilters,
   onAdd, onColumnToggle, onDelete, onEdit, onFilterUpdate,
   onFiltersReset, onSearchChange,
   rowActions, searchTerm, selected, title, visibleColumns,
@@ -54,39 +57,53 @@ const ListTableToolbar = ({
   return (
     <Toolbar
       className={classNames(classes.root, {
-        [classes.highlight]: numSelected > 0
+        [classes.highlight]: numSelected > 0,
       })}
     >
       <div className={classes.title}>
-        {numSelected > 0 ? (
-          <Typography color="inherit" variant="subtitle1">
-            {numSelected} selected
-          </Typography>
-        ) : (
-          <Typography variant="h6">{title}</Typography>
-        )}
+        <Typography variant="h6">{title}</Typography>
       </div>
-      <ListTableRowActions rowActions={rowActions} selected={selected} />
+      <ListTableRowActions actionClassName={classes.action} rowActions={rowActions} selected={selected} />
+      {numSelected === 1 && onEdit && (
+        <Tooltip title="Edit">
+          <div className={classes.action}>
+            <i className='fal fa-fw fa-lg fa-pencil-alt'
+              aria-owns={open ? 'simple-popper' : undefined}
+              aria-label="Edit"
+              aria-haspopup="true"
+              onClick={onEdit}
+            />
+            Edit
+          </div>
+        </Tooltip>
+      )}
+      {numSelected > 0 && onDelete && (
+        <Tooltip title="Delete">
+          <div className={classes.action}>
+            <i className='fal fa-fw fa-lg fa-trash-alt'
+              aria-owns={open ? 'simple-popper' : undefined}
+              aria-label="Delete"
+              aria-haspopup="true"
+              onClick={onDelete}
+            />
+            Delete
+          </div>
+        </Tooltip>
+      )}
       <div className={classes.spacer} />
       <div className={classes.actions}>
         <Toolbar className={classes.toolbar}>
           {onSearchChange && (
             <SearchBar onSearchChange={onSearchChange} searchTerm={searchTerm} />
           )}
-          {numSelected === 1 && onEdit && (
-            <Tooltip title="Edit">
-              <IconButton aria-label="Edit" onClick={onEdit}>
-                <EditIcon />
-              </IconButton>
-            </Tooltip>
-          )}
-          {numSelected > 0 && onDelete && (
-            <Tooltip title="Delete">
-              <IconButton aria-label="Delete" onClick={onDelete}>
-                <DeleteIcon />
-              </IconButton>
-            </Tooltip>
-          )}
+          {filters && inlineFilters && <ListTableFilters
+            inline
+            columns={columns}
+            filters={filters}
+            filterValues={filterValues}
+            onFilterUpdate={onFilterUpdate}
+            onFiltersReset={onFiltersReset}
+          />}
           {columns && onColumnToggle && (
             <ListTableColumnButton
               columns={columns}
@@ -94,7 +111,7 @@ const ListTableToolbar = ({
               onColumnToggle={onColumnToggle}
             />
           )}
-          {filters && <ListTableFiltersButton
+          {filters && !inlineFilters && <ListTableFiltersButton
             columns={columns}
             filters={filters}
             filterValues={filterValues}
@@ -133,6 +150,7 @@ ListTableToolbar.propTypes = {
     filterWith: PropTypes.func, // Custom filtering function, received params: (filterValue, value, row)
     items: PropTypes.array, // Array of possible values (only when using select/multiselect)
   })),
+  inlineFilters: PropTypes.bool,
   filterValues: PropTypes.object,
   onAdd: PropTypes.func,
   onDelete: PropTypes.func,

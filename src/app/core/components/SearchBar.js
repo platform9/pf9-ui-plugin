@@ -5,23 +5,22 @@ import { InputAdornment, TextField } from '@material-ui/core'
 import SearchIcon from '@material-ui/icons/Search'
 import ClearIcon from '@material-ui/icons/Clear'
 import grey from '@material-ui/core/colors/grey'
+import { compose } from 'ramda'
 
 const styles = theme => ({
   SearchBar: {
     outline: 'none',
-    padding: theme.spacing.unit * 2
+    marginRight: theme.spacing.unit * 2,
   },
   clearIcon: {
     '&:hover': {
       color: grey[800],
     },
     '&:active': {
-      color: grey[200]
-    }
-  }
+      color: grey[200],
+    },
+  },
 })
-
-@withStyles(styles)
 
 // The selector containing searchBar needs to keep state of searchBar in parent component.
 // To keep it aligned, please keep searchTerm in parent component of searchBar
@@ -38,6 +37,7 @@ class SearchBar extends React.Component {
     const { classes, searchTerm } = this.props
     return (
       searchTerm !== undefined && <TextField
+        variant="outlined"
         placeholder='Search'
         className={classes.SearchBar}
         onChange={this.handleSearch}
@@ -59,7 +59,7 @@ class SearchBar extends React.Component {
                 onClick={this.handleClear}
               />
             </InputAdornment>
-          )
+          ),
         }}
       />
     )
@@ -67,7 +67,9 @@ class SearchBar extends React.Component {
 }
 
 SearchBar.propTypes = {
-  onSearchChange: PropTypes.func.isRequired
+  onSearchChange: PropTypes.func.isRequired,
 }
 
-export default SearchBar
+export default compose(
+  withStyles(styles, { withTheme: true }),
+)(SearchBar)

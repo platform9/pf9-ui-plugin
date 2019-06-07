@@ -18,7 +18,7 @@ import ListTableToolbar from './ListTableToolbar'
 const styles = theme => ({
   root: {
     width: '100%',
-    marginTop: theme.spacing.unit * 3
+    marginTop: theme.spacing.unit * 3,
   },
   table: {
     minWidth: 800,
@@ -48,7 +48,7 @@ class ListTable extends React.Component {
       page: 0,
       selected: [],
       searchTerm: '',
-      filterValues: {}
+      filterValues: {},
     }
   }
 
@@ -69,7 +69,7 @@ class ListTable extends React.Component {
     const sortWith = propOr(
       (prevValue, nextValue) => (nextValue < prevValue ? -1 : 1),
       'sortWith',
-      columns.find(propEq('id', orderBy))
+      columns.find(propEq('id', orderBy)),
     )
     const sortedRows = [...data].sort((a, b) => sortWith(b[orderBy], a[orderBy]))
 
@@ -96,7 +96,7 @@ class ListTable extends React.Component {
       newSelected = selected.filter(row => !paginatedData.includes(row))
     }
     this.setState({
-      selected: newSelected
+      selected: newSelected,
     })
   }
 
@@ -130,7 +130,7 @@ class ListTable extends React.Component {
   handleChangeRowsPerPage = event => {
     const { value: rowsPerPage } = event.target
     this.setState({ rowsPerPage }, () =>
-      ensureFunction(this.props.onRowsPerPageChange)(rowsPerPage)
+      ensureFunction(this.props.onRowsPerPageChange)(rowsPerPage),
     )
   }
 
@@ -153,7 +153,7 @@ class ListTable extends React.Component {
 
     this.setState({
       selected: [],
-      page: pastPage ? page - 1 : page
+      page: pastPage ? page - 1 : page,
     })
   }
 
@@ -164,7 +164,7 @@ class ListTable extends React.Component {
   handleSearch = value => {
     if (this.props.searchTarget) {
       this.setState({
-        searchTerm: value
+        searchTerm: value,
       })
     }
   }
@@ -174,7 +174,7 @@ class ListTable extends React.Component {
       this.setState(({ visibleColumns }) => ({
         visibleColumns: visibleColumns.includes(columnId)
           ? except(columnId, visibleColumns)
-          : [...visibleColumns, columnId]
+          : [...visibleColumns, columnId],
       }), () =>
         ensureFunction(this.props.onColumnsChange)({
           visibleColumns: this.state.visibleColumns,
@@ -192,7 +192,7 @@ class ListTable extends React.Component {
       columnsOrder: pipe(
         update(srcColumnIdx, destColumnId),
         update(tarColumnIdx, srcColumnId),
-      )(columnsOrder)
+      )(columnsOrder),
     }), () =>
       ensureFunction(this.props.onColumnsChange)({
         visibleColumns: this.state.visibleColumns,
@@ -229,7 +229,7 @@ class ListTable extends React.Component {
       .map(([columnId, filterValue]) => ({
         columnId,
         filterValue,
-        filter: filters.find(propEq('columnId', columnId))
+        filter: filters.find(propEq('columnId', columnId)),
       }))
 
     return filterParams.reduce((filteredData,
@@ -266,7 +266,9 @@ class ListTable extends React.Component {
     const { searchTerm } = this.state
 
     const sortedData = this.sortData(data)
-    const searchData = searchTerm === '' ? sortedData : this.filterBySearch(sortedData, searchTarget)
+    const searchData = searchTerm === ''
+      ? sortedData
+      : this.filterBySearch(sortedData, searchTarget)
     return filters ? this.applyFilters(searchData) : searchData
   }
 
@@ -312,7 +314,7 @@ class ListTable extends React.Component {
       onClick: this.handleClick(row),
       role: 'checkbox',
       tabIndex: -1,
-      selected: isSelected
+      selected: isSelected,
     } : {}
 
     const uid = uniqueIdentifier instanceof Function
@@ -325,7 +327,7 @@ class ListTable extends React.Component {
           <Checkbox checked={isSelected} color="primary" />
         </TableCell>)}
         {this.getSortedVisibleColumns().map(columnDef =>
-          this.renderCell(columnDef, path((columnDef.id || '').split('.'), row), row)
+          this.renderCell(columnDef, path((columnDef.id || '').split('.'), row), row),
         )}
         {this.renderRowActions(row)}
       </TableRow>
@@ -360,6 +362,7 @@ class ListTable extends React.Component {
       title,
       canDragColumns,
       filters,
+      inlineFilters,
     } = this.props
 
     const {
@@ -397,6 +400,7 @@ class ListTable extends React.Component {
               visibleColumns={visibleColumns}
               onColumnToggle={this.handleColumnToggle}
               filters={filters}
+              inlineFilters={inlineFilters}
               filterValues={filterValues}
               onFilterUpdate={this.handleFilterUpdate}
               onFiltersReset={this.handleFiltersReset}
@@ -474,6 +478,12 @@ ListTable.propTypes = {
     items: PropTypes.array, // Array of possible values (only when using select/multiselect)
   })),
 
+  /**
+   * False by default, if this prop is true, then the filters will be rendered "in-line" before the search bar
+   * otherwise we will display a button to show a popover with the filters
+   */
+  inlineFilters: PropTypes.bool,
+
   /*
    Some objects have a unique identifier other than 'id'
    For example sshKeys have unique identifier of 'name' and the APIs
@@ -486,7 +496,7 @@ ListTable.propTypes = {
    */
   uniqueIdentifier: PropTypes.oneOfType([
     PropTypes.string,
-    PropTypes.func
+    PropTypes.func,
   ]),
 
   /**

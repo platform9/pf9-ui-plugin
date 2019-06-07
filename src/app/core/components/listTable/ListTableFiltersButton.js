@@ -5,7 +5,7 @@ import { withStyles } from '@material-ui/styles'
 import FilterListIcon from '@material-ui/icons/FilterList'
 import grey from '@material-ui/core/colors/grey'
 import { compose } from 'ramda'
-import ListTableFiltersPopover from 'core/components/listTable/ListTableFiltersPopover'
+import ListTableFiltersPopover from 'core/components/listTable/ListTableFilters'
 
 const styles = theme => ({
   root: {
