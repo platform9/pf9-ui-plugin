@@ -82,7 +82,7 @@ class AddPrometheusInstanceFormBase extends React.Component {
               <WizardStep stepId="instance" label="Prometheus Instsance">
                 <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                   <TextField id="name" label="Name" info="Name of the Prometheus instance" />
-                  <TextField id="numInstances" label="# of instances" info="Number of Prometheus instances" type="number" />
+                  <TextField id="numInstances" label="Replicas" info="Number of Prometheus replicas" type="number" />
                   <TextField id="cpu" label="CPU" info="Expressed in millicores (1m = 1/1000th of a core)" type="number" />
                   <TextField id="memory" label="Memory" info="MiB of memory to allocate" type="number" />
                   {enableStorage &&
