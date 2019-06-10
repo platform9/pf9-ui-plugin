@@ -61,9 +61,7 @@ export const createPrometheusInstance = contextUpdater('prometheusInstances', as
 export const deletePrometheusInstance = contextUpdater('prometheusInstances', async ({ id, apiClient, currentItems, showToast }) => {
   const instance = currentItems.find(propEq('uid', id))
   if (!instance) {
-    const message = `Unable to find prometheus instance with id: ${id} in deletePrometheusInstance`
-    showToast(message, 'error')
-    console.error(message)
+    console.error(`Unable to find prometheus instance with id: ${id} in deletePrometheusInstance`)
     return
   }
   try {
@@ -112,22 +110,35 @@ export const loadPrometheusRules = contextLoader('prometheusRules', async ({ api
   return mapAsyncItems(clusterUuids, apiClient.qbert.getPrometheusRules, mapRule)
 })
 
-export const updatePrometheusRules = contextUpdater('prometheusRules', async ({ apiClient, data, currentItems }) => {
-  const response = await apiClient.qbert.updatePrometheusRules(data)
-  const mapped = mapRule(response)
-  const items = currentItems.map(x => x.uid === data.uid ? mapped : x)
-  return items
+export const updatePrometheusRules = contextUpdater('prometheusRules', async ({ apiClient, data, currentItems, showToast }) => {
+  try {
+    const response = await apiClient.qbert.updatePrometheusRules(data)
+    const mapped = mapRule(response)
+    showToast(`Successfully updated Prometheus rule ${mapped.name}`, 'success')
+    const items = currentItems.map(x => x.uid === data.uid ? mapped : x)
+    return items
+  } catch (err) {
+    showToast(err, 'error')
+    console.log(err)
+  }
 })
 
-export const deletePrometheusRule = contextUpdater('prometheusRules', async ({ id, currentItems, apiClient }) => {
+export const deletePrometheusRule = contextUpdater('prometheusRules', async ({ id, apiClient, currentItems, showToast }) => {
   const rule = currentItems.find(propEq('uid', id))
   if (!rule) {
     console.error(`Unable to find prometheus rule with id: ${id} in deletePrometheusRule`)
     return
   }
-  await apiClient.qbert.deletePrometheusRule(rule.clusterUuid, rule.namespace, rule.name)
-  const items = currentItems.filter(x => id !== x.uid)
-  return items
+
+  try {
+    await apiClient.qbert.deletePrometheusRule(rule.clusterUuid, rule.namespace, rule.name)
+    showToast(`Successfully deleted Prometheus rule ${rule.name}`, 'success')
+    const items = currentItems.filter(x => id !== x.uid)
+    return items
+  } catch (err) {
+    showToast(err, 'error')
+    console.log(err)
+  }
 })
 
 /* Service Monitors */
@@ -148,21 +159,33 @@ export const loadPrometheusServiceMonitors = contextLoader('prometheusServiceMon
   return mapAsyncItems(clusterUuids, apiClient.qbert.getPrometheusServiceMonitors, mapServiceMonitor)
 })
 
-export const updatePrometheusServiceMonitor = contextUpdater('prometheusServiceMonitors', async ({ apiClient, data, currentItems }) => {
-  const response = await apiClient.qbert.updatePrometheusServiceMonitor(data)
-  const mapped = mapServiceMonitor(response)
-  const items = currentItems.map(x => x.uid === data.uid ? mapped : x)
-  return items
+export const updatePrometheusServiceMonitor = contextUpdater('prometheusServiceMonitors', async ({ apiClient, data, currentItems, showToast }) => {
+  try {
+    const response = await apiClient.qbert.updatePrometheusServiceMonitor(data)
+    const mapped = mapServiceMonitor(response)
+    showToast(`Successfully updated Prometheus ServiceMonitor ${mapped.name}`, 'success')
+    const items = currentItems.map(x => x.uid === data.uid ? mapped : x)
+    return items
+  } catch (err) {
+    showToast(err, 'error')
+    console.log(err)
+  }
 })
 
-export const deletePrometheusServiceMonitor = contextUpdater('prometheusServiceMonitors', async ({ id, currentItems, apiClient }) => {
+export const deletePrometheusServiceMonitor = contextUpdater('prometheusServiceMonitors', async ({ id, currentItems, apiClient, showToast }) => {
   const sm = currentItems.find(x => id === x.uid)
   if (!sm) {
     console.error(`Unable to find prometheus service monitor with id: ${id} in deletePrometheusServiceMonitor`)
     return
   }
-  await apiClient.qbert.deletePrometheusServiceMonitor(sm.clusterUuid, sm.namespace, sm.name)
-  return currentItems.filter(x => x.uid !== sm.uid)
+  try {
+    await apiClient.qbert.deletePrometheusServiceMonitor(sm.clusterUuid, sm.namespace, sm.name)
+    showToast(`Successfully deleted Prometheus Service Monitor ${sm.name}`, 'success')
+    return currentItems.filter(x => x.uid !== sm.uid)
+  } catch (err) {
+    showToast(err, 'error')
+    console.log(err)
+  }
 })
 
 /* Alert Managers */
@@ -182,13 +205,19 @@ export const loadPrometheusAlertManagers = contextLoader('prometheusAlertManager
   return mapAsyncItems(clusterUuids, apiClient.qbert.getPrometheusAlertManagers, mapAlertManager)
 })
 
-export const deletePrometheusAlertManager = contextUpdater('prometheusAlertManagers', async ({ id, currentItems, apiClient }) => {
+export const deletePrometheusAlertManager = contextUpdater('prometheusAlertManagers', async ({ id, currentItems, apiClient, showToast }) => {
   const calcId = x => `${x.clusterUuid}-${x.namespace}-${x.name}`
   const am = currentItems.find(rule => id === calcId(rule))
   if (!am) {
     console.error(`Unable to find prometheus alert manager with id: ${id} in deletePrometheusAlertManager`)
     return
   }
-  await apiClient.qbert.deletePrometheusAlertManager(am.clusterUuid, am.namespace, am.name)
-  return currentItems.filter(x => calcId(x) !== calcId(am))
+  try {
+    await apiClient.qbert.deletePrometheusAlertManager(am.clusterUuid, am.namespace, am.name)
+    showToast(`Successfully deleted Prometheus Alert Manager ${am.name}`, 'success')
+    return currentItems.filter(x => calcId(x) !== calcId(am))
+  } catch (err) {
+    showToast(err, 'error')
+    console.log(err)
+  }
 })
