@@ -5,7 +5,7 @@ import { InputAdornment, TextField } from '@material-ui/core'
 import SearchIcon from '@material-ui/icons/Search'
 import ClearIcon from '@material-ui/icons/Clear'
 import grey from '@material-ui/core/colors/grey'
-import { compose } from 'ramda'
+import { compose, pick } from 'ramda'
 
 const styles = theme => ({
   SearchBar: {
@@ -19,6 +19,20 @@ const styles = theme => ({
     '&:active': {
       color: grey[200],
     },
+  },
+
+  // classes for the InputProps
+  root: {
+    padding: '3px 0',
+  },
+  input: {
+    padding: '5px 3px',
+  },
+  adornedStart: {
+    paddingLeft: 8,
+  },
+  adornedEnd: {
+    paddingRight: 8,
   },
 })
 
@@ -42,7 +56,9 @@ class SearchBar extends React.Component {
         className={classes.SearchBar}
         onChange={this.handleSearch}
         value={searchTerm}
+        type="search"
         InputProps={{
+          classes: pick(['root', 'input', 'adornedStart', 'adornedEnd'], classes),
           startAdornment: (
             <InputAdornment position="start">
               <SearchIcon />

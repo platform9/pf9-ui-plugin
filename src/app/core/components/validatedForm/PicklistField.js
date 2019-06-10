@@ -31,7 +31,6 @@ class PicklistField extends React.Component {
           title={title}
           className={className}
           name={id}
-          filled
           label={label}
           options={showNone ? [{ value: '', label: 'None' }, ...options] : options}
           value={value !== undefined ? value : ''}

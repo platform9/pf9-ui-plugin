@@ -22,28 +22,9 @@ const defaultThemeJson = {
     }
   },
   overrides: {
-    MuiTableCell: {
-      root: {
-        padding: '4px 24px',
-      },
-    },
-    MuiInputBase: {
-      root: {
-        color: 'inherit'
-      }
-    },
     MuiOutlinedInput: {
       root: {
-        padding: '3px 0',
-      },
-      input: {
-        padding: '5px 3px',
-      },
-      adornedStart: {
-        paddingLeft: 8,
-      },
-      adornedEnd: {
-        paddingRight: 8,
+        marginBottom: '16px',
       },
     },
   },

@@ -99,7 +99,7 @@ class AutocompleteBase extends React.Component {
           <BaseTextField
             id={id}
             label={label}
-            variant="filled"
+            variant="outlined"
             value={value}
             onChange={this.handleChange}
             onBlur={this.handleClose}

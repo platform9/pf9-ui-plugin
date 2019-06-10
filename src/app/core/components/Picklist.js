@@ -35,7 +35,7 @@ class Picklist extends React.Component {
   }
 
   render () {
-    const { className, classes, label, name, value, options, filled } = this.props
+    const { className, classes, label, name, value, options } = this.props
 
     const items = options.map(x =>
       typeof x === 'string' ? ({ value: x, label: x }) : x
@@ -51,7 +51,7 @@ class Picklist extends React.Component {
       <FormControl className={classnames(classes.formControl, className)}>
         <TextField
           select
-          variant={filled ? 'filled' : 'standard'}
+          variant="outlined"
           label={label}
           value={nonEmptyValue}
           SelectProps={{
@@ -81,7 +81,6 @@ Picklist.propTypes = {
   options: PropTypes.arrayOf(optionPropType).isRequired,
   value: PropTypes.string,
   onChange: PropTypes.func,
-  filled: PropTypes.bool,
 }
 
 export default compose(

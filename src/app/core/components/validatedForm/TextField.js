@@ -34,7 +34,7 @@ class TextField extends React.Component {
       <FormControl id={id} className={classes.formControl} error={hasError}>
         <BaseTextField
           {...restProps}
-          variant="filled"
+          variant="outlined"
           error={hasError}
           value={value !== undefined ? value : ''}
           onChange={this.handleChange}
