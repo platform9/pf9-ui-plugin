@@ -497,6 +497,15 @@ class Qbert {
     return normalizePrometheusResponse(clusterUuid, response)
   }
 
+  updatePrometheusAlertManager = async data => {
+    const { clusterUuid, namespace, name } = data
+    const body = [
+      { op: 'replace', path: '/spec/replicas', value: data.replicas },
+    ]
+    const response = await this.client.basicPatch(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${namespace}/alertmanagers/${name}`, body)
+    return normalizePrometheusUpdate(clusterUuid, response)
+  }
+
   deletePrometheusAlertManager = async (clusterUuid, namespace, name) => {
     const response = await this.client.basicDelete(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${namespace}/alertmanagers/${name}`)
     return response

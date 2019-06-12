@@ -205,9 +205,21 @@ export const loadPrometheusAlertManagers = contextLoader('prometheusAlertManager
   return mapAsyncItems(clusterUuids, apiClient.qbert.getPrometheusAlertManagers, mapAlertManager)
 })
 
+export const updatePrometheusAlertManager = contextUpdater('prometheusAlertManagers', async ({ apiClient, data, currentItems, showToast }) => {
+  try {
+    const response = await apiClient.qbert.updatePrometheusAlertManager(data)
+    const mapped = mapAlertManager(response)
+    showToast(`Successfully updated Prometheus Alert Manager ${mapped.name}`, 'success')
+    const items = currentItems.map(x => x.uid === data.uid ? mapped : x)
+    return items
+  } catch (err) {
+    showToast(err, 'error')
+    console.log(err)
+  }
+})
+
 export const deletePrometheusAlertManager = contextUpdater('prometheusAlertManagers', async ({ id, currentItems, apiClient, showToast }) => {
-  const calcId = x => `${x.clusterUuid}-${x.namespace}-${x.name}`
-  const am = currentItems.find(rule => id === calcId(rule))
+  const am = currentItems.find(x => id === x.uid)
   if (!am) {
     console.error(`Unable to find prometheus alert manager with id: ${id} in deletePrometheusAlertManager`)
     return
@@ -215,7 +227,7 @@ export const deletePrometheusAlertManager = contextUpdater('prometheusAlertManag
   try {
     await apiClient.qbert.deletePrometheusAlertManager(am.clusterUuid, am.namespace, am.name)
     showToast(`Successfully deleted Prometheus Alert Manager ${am.name}`, 'success')
-    return currentItems.filter(x => calcId(x) !== calcId(am))
+    return currentItems.filter(x => x.uid !== am.uid)
   } catch (err) {
     showToast(err, 'error')
     console.log(err)
