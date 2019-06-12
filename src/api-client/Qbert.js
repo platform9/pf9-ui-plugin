@@ -366,9 +366,9 @@ class Qbert {
 
   createPrometheusInstance = async (clusterId, data) => {
     const requests = {}
-    if (data.cpu) { requests.cpu = `${data.cpu}m` }
-    if (data.memory) { requests.memory = `${data.memory}Mi` }
-    // if (data.storage) { requests.storage = `${data.storage}Gi` }
+    if (data.cpu) { requests.cpu = data.cpu }
+    if (data.memory) { requests.memory = data.memory }
+    // if (data.storage) { requests.storage = data.storage }
 
     const apiVersion = 'monitoring.coreos.com/v1'
 
@@ -391,8 +391,8 @@ class Qbert {
         namespace: data.namespace,
       },
       spec: {
-        replicas: data.numInstances,
-        retention: `${data.retention}d`,
+        replicas: data.replicas,
+        retention: data.retention,
         resources: { requests },
         serviceMonitorSelector: { matchLabels: serviceMonitor },
         serviceAccountName: data.serviceAccountName,

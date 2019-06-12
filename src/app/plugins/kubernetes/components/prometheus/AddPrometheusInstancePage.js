@@ -19,11 +19,11 @@ import { loadNamespaces } from 'k8s/components/namespaces/actions'
 import { createPrometheusInstance, loadPrometheusInstances, loadServiceAccounts } from './actions'
 
 const initialContext = {
-  numInstances: 1,
-  memory: 512,
-  cpu: 500,
-  storage: 8,
-  retention: 15,
+  replicas: 1,
+  memory: '512Mi',
+  cpu: '500m',
+  storage: '8Gi',
+  retention: '15d',
   port: 'prometheus',
   appLabels: []
 }
@@ -82,11 +82,11 @@ class AddPrometheusInstanceFormBase extends React.Component {
               <WizardStep stepId="instance" label="Prometheus Instsance">
                 <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                   <TextField id="name" label="Name" info="Name of the Prometheus instance" />
-                  <TextField id="numInstances" label="Replicas" info="Number of Prometheus replicas" type="number" />
-                  <TextField id="cpu" label="CPU" info="Expressed in millicores (1m = 1/1000th of a core)" type="number" />
-                  <TextField id="memory" label="Memory" info="MiB of memory to allocate" type="number" />
+                  <TextField id="replicas" label="Replicas" info="Number of Prometheus replicas" type="number" />
+                  <TextField id="cpu" label="CPU" info="Expressed in millicores (1m = 1/1000th of a core)" />
+                  <TextField id="memory" label="Memory" info="MiB of memory to allocate" />
                   {enableStorage &&
-                  <TextField id="storage" label="Storage" info="The storage allocation.  Default is 8 GiB" type="number" />}
+                  <TextField id="storage" label="Storage" info="The storage allocation.  Default is 8 GiB" />}
 
                   <PicklistField
                     id="cluster"
@@ -115,7 +115,7 @@ class AddPrometheusInstanceFormBase extends React.Component {
 
                   {enableStorage &&
                   <CheckboxField id="enablePersistentStorage" label="Enable persistent storage" />}
-                  <TextField id="retention" label="Storage Retention (days)" info="Defaults to 15 days if nothing is set" type="number" />
+                  <TextField id="retention" label="Storage Retention (days)" info="Defaults to 15 days if nothing is set" />
                   <TextField id="port" label="Service Monitor Port" info="Port for the service monitor" />
                   <KeyValuesField id="appLabels" label="App Labels" info="Key/value pairs for app that Prometheus will monitor" />
                 </ValidatedForm>
