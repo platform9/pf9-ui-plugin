@@ -5,11 +5,12 @@ import ListTableColumnButton from 'core/components/listTable/ListTableColumnSele
 import ListTableFilters from 'core/components/listTable/ListTableFilters'
 import ListTableRowActions from './ListTableRowActions'
 import SearchBar from 'core/components/SearchBar'
-import classNames from 'classnames'
+import classnames from 'classnames'
 import { compose } from 'ramda'
 import { Button, Toolbar, Tooltip, Typography } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import ListTableFiltersButton from 'core/components/listTable/ListTableFiltersButton'
+import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 
 const toolbarStyles = theme => ({
   root: {
@@ -36,6 +37,7 @@ const toolbarStyles = theme => ({
     color: 'inherit',
   },
   action: {
+    marginTop: theme.spacing.unit * 2,
     marginLeft: theme.spacing.unit,
     marginRight: theme.spacing.unit,
     cursor: 'pointer',
@@ -44,6 +46,9 @@ const toolbarStyles = theme => ({
     alignItems: 'center',
     lineHeight: 2,
     fontSize: theme.typography.fontSize * 0.8,
+  },
+  actionIcon: {
+    fontSize: '1.7em',
   },
 })
 
@@ -56,7 +61,7 @@ const ListTableToolbar = ({
   const numSelected = (selected || []).length
   return (
     <Toolbar
-      className={classNames(classes.root, {
+      className={classnames(classes.root, {
         [classes.highlight]: numSelected > 0,
       })}
     >
@@ -66,26 +71,16 @@ const ListTableToolbar = ({
       <ListTableRowActions actionClassName={classes.action} rowActions={rowActions} selected={selected} />
       {numSelected === 1 && onEdit && (
         <Tooltip title="Edit">
-          <div className={classes.action}>
-            <i className='fal fa-fw fa-lg fa-pencil-alt'
-              aria-owns={open ? 'simple-popper' : undefined}
-              aria-label="Edit"
-              aria-haspopup="true"
-              onClick={onEdit}
-            />
+          <div className={classes.action} onClick={onEdit}>
+            <FontAwesomeIcon className={classes.actionIcon}>{'pencil-alt'}</FontAwesomeIcon>
             Edit
           </div>
         </Tooltip>
       )}
       {numSelected > 0 && onDelete && (
         <Tooltip title="Delete">
-          <div className={classes.action}>
-            <i className='fal fa-fw fa-lg fa-trash-alt'
-              aria-owns={open ? 'simple-popper' : undefined}
-              aria-label="Delete"
-              aria-haspopup="true"
-              onClick={onDelete}
-            />
+          <div className={classes.action} onClick={onDelete}>
+            <FontAwesomeIcon className={classes.actionIcon}>{'trash-alt'}</FontAwesomeIcon>
             Delete
           </div>
         </Tooltip>

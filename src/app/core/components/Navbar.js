@@ -16,6 +16,7 @@ import { withHotKeys } from 'core/providers/HotKeysProvider'
 import moize from 'moize'
 import { assoc, flatten, pluck, prop, propEq, propOr, where } from 'ramda'
 import { matchPath, withRouter } from 'react-router'
+import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 
 export const drawerWidth = 240
 
@@ -141,8 +142,6 @@ const styles = theme => ({
     color: theme.palette.sidebar.text,
   },
 })
-
-const FontAwesomeIcon = ({ children }) => <i className={`fal fa-fw fa-lg fa-${children}`} />
 
 @withStyles(styles, { withTheme: true })
 @withHotKeys
