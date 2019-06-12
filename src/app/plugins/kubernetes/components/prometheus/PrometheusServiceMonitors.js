@@ -15,7 +15,7 @@ const renderClusterName = (field, row, context) => {
 
 export const columns = [
   { id: 'name', label: 'Name' },
-  { id: 'clusterName', label: 'cluster', render: renderClusterName },
+  { id: 'clusterName', label: 'Cluster', render: renderClusterName },
   { id: 'namespace', label: 'Namespace' },
   { id: 'labels',  label: 'Labels', render: renderKeyValues },
   { id: 'port',  label: 'Port' },

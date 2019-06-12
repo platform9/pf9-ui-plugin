@@ -22,17 +22,17 @@ const renderDashboardLink = (field, row, context) => {
 
 export const columns = [
   { id: 'name', label: 'Name' },
-  { id: 'clusterName', label: 'cluster', render: renderClusterName },
+  { id: 'clusterName', label: 'Cluster', render: renderClusterName },
   { id: 'namespace', label: 'Namespace' },
   // { id: 'dashboard', label: 'Dashboard', render: renderDashboardLink },
   { id: 'serviceMonitorSelector', label: 'Service Monitor', render: renderKeyValues },
   { id: 'alertManagersSelector', label: 'Alert Managers' },
   { id: 'cpu', label: 'CPU' },
-  { id: 'storage', label: 'Storage' },
+  { id: 'storage', label: 'Storage', display: false },
   { id: 'memory', label: 'Memory' },
   { id: 'retention', label: 'Retention' },
-  { id: 'version', label: 'version' },
-  { id: 'replicas', label: '# of instances' },
+  { id: 'version', label: 'Version' },
+  { id: 'replicas', label: 'Replicas' },
 ]
 
 export const options = {
