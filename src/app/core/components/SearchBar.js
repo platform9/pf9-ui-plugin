@@ -24,6 +24,7 @@ const styles = theme => ({
   // classes for the InputProps
   root: {
     padding: '3px 0',
+    margin: 0,
   },
   input: {
     padding: '5px 3px',

@@ -24,6 +24,9 @@ const styles = theme => ({
   checkbox: {
     paddingRight: 4,
   },
+  headLabel: {
+    whiteSpace: 'nowrap'
+  },
   cellLabel: {
     color: [theme.palette.text.primary, '!important'],
   },
@@ -98,7 +101,7 @@ class ListTableHead extends React.Component {
         <TableRow>
           {headerCheckbox}
           {firstBlank}
-          {columns.map(column =>
+          {columns.map((column, idx) =>
             <TableCell
               className={classes.cellLabel}
               draggable={canDragColumns}
@@ -116,11 +119,12 @@ class ListTableHead extends React.Component {
                 enterDelay={300}
               >
                 <TableSortLabel
+                  className={classes.headLabel}
                   active={orderBy === column.id}
                   direction={order}
                   onClick={this.createSortHandler(column.id)}
                 >
-                  {column.label}
+                  {column.label} {idx === 0 ? `(${rowCount})` : ''}
                 </TableSortLabel>
               </Tooltip>
             </TableCell>)}
