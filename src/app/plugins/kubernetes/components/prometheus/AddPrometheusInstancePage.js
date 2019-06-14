@@ -10,13 +10,14 @@ import Wizard from 'core/components/Wizard'
 import WizardStep from 'core/components/WizardStep'
 import createAddComponents from 'core/helpers/createAddComponents'
 import uuid from 'uuid'
-import { compose, pluck } from 'ramda'
+import { compose, path, pluck } from 'ramda'
 import { projectAs } from 'utils/fp'
 import { withAppContext } from 'core/AppContext'
 import { withDataLoader } from 'core/DataLoader'
 import { loadClusters } from 'k8s/components/infrastructure/actions'
 import { loadNamespaces } from 'k8s/components/namespaces/actions'
 import { createPrometheusInstance, loadPrometheusInstances, loadServiceAccounts } from './actions'
+import { castFuzzyBool } from 'utils/misc'
 
 const initialContext = {
   replicas: 1,
@@ -27,6 +28,8 @@ const initialContext = {
   port: 'prometheus',
   appLabels: []
 }
+
+const hasPrometheusEnabled = compose(castFuzzyBool, path(['tags', 'pf9-system:monitoring']))
 
 class AddPrometheusInstanceFormBase extends React.Component {
   state = {
@@ -68,7 +71,8 @@ class AddPrometheusInstanceFormBase extends React.Component {
   render () {
     const { namespace, rules, serviceAccounts } = this.state
     const { clusters, namespaces } = this.props.data
-    const clusterOptions = projectAs({ value: 'uuid', label: 'name' }, clusters)
+    const clustersWithPrometheus = clusters.filter(hasPrometheusEnabled)
+    const clusterOptions = projectAs({ value: 'uuid', label: 'name' }, clustersWithPrometheus)
     const namespaceOptions = pluck('name', namespaces)
     const serviceAccountOptions = namespace
       ? serviceAccounts.map(x => x.metadata.name)
