@@ -3,6 +3,7 @@ import { deleteNetwork, loadNetworks } from './actions'
 
 export const options = {
   addUrl: '/ui/openstack/networks/add',
+  addText: 'Add Network',
   columns: [
     { id: 'name', label: 'Name' },
     { id: 'subnets', label: 'Subnets Associated' },

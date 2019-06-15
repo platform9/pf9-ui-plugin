@@ -3,6 +3,7 @@ import { deleteRouter, loadRouters } from './actions'
 
 export const options = {
   addUrl: '/ui/openstack/routers/add',
+  addText: 'Add Router',
   columns: [
     { id: 'name', label: 'Name' },
     { id: 'tenant_id', label: 'Tenant' },

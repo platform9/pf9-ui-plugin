@@ -3,6 +3,7 @@ import { deleteSshKey, loadSshKeys } from './actions'
 
 export const options = {
   addUrl: '/ui/openstack/sshkeys/add',
+  addText: 'Add Key',
   columns: [
     { id: 'name', label: 'Name' },
     { id: 'fingerprint', label: 'Fingerprint' },

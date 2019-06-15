@@ -37,6 +37,7 @@ export const columns = [
 
 export const options = {
   addUrl: '/ui/kubernetes/prometheus/instances/add',
+  addText: 'New Instance',
   columns,
   dataKey: 'prometheusInstances',
   deleteFn: deletePrometheusInstance,

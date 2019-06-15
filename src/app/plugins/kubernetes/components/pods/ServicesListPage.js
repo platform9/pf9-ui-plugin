@@ -65,6 +65,7 @@ const ListPage = ({ ListContainer }) => {
 
 export const options = {
   addUrl: '/ui/kubernetes/services/add',
+  addText: 'Add Service',
   columns: [
     { id: 'name', label: 'Name' },
     { id: 'clusterName', label: 'Cluster' },

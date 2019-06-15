@@ -61,6 +61,7 @@ const ListPage = ({ ListContainer }) => {
 
 export const options = {
   addUrl: '/ui/kubernetes/pods/add',
+  addText: 'Add Pod',
   columns: [
     { id: 'name', label: 'Name' },
     { id: 'clusterName', label: 'Cluster' },

@@ -65,6 +65,7 @@ const ListPage = ({ ListContainer }) => {
 
 export const options = {
   addUrl: '/ui/kubernetes/deployments/add',
+  addText: 'Add Deployment',
   columns: [
     { id: 'name', label: 'Name' },
     { id: 'clusterName', label: 'Cluster' },

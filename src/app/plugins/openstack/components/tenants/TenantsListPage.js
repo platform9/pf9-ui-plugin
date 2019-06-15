@@ -3,6 +3,7 @@ import { deleteTenant, loadTenants } from './actions'
 
 export const options = {
   addUrl: '/ui/openstack/tenants/add',
+  addText: 'Add Tenant',
   columns: [
     { id: 'name', label: 'Name' },
     { id: 'description', label: 'Description' },

@@ -3,6 +3,7 @@ import { deleteFloatingIp, loadFloatingIps } from './actions'
 
 export const options = {
   addUrl: '/ui/openstack/floatingips/add',
+  addText: 'Add Floating IP',
   columns: [
     { id: 'floating_ip_address', label: 'Floating IP' },
     { id: 'subnet_id', label: 'Subnet ID' },

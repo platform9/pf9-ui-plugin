@@ -35,11 +35,13 @@ const createCRUDComponents = options => {
     columns: [],
     rowActions: () => [],
     uniqueIdentifier: 'id',
+    addText: 'Add',
   }
 
   const {
     actions,
     addUrl,
+    addText,
     columns,
     dataKey,
     editUrl,
@@ -100,7 +102,7 @@ const createCRUDComponents = options => {
     }
 
     renderAddButton = () => {
-      return <Button size="small" color="primary" onClick={this.redirectToAdd}>Add</Button>
+      return <Button variant="contained" size="small" color="primary" onClick={this.redirectToAdd}>+ {addText}</Button>
     }
 
     render () {

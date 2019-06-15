@@ -2,6 +2,7 @@ import createCRUDComponents from 'core/helpers/createCRUDComponents'
 
 export const options = {
   addUrl: '/ui/openstack/flavors/add',
+  addText: 'Add Flavor',
   columns: [
     { id: 'name', label: 'Name' },
     { id: 'vcpus', label: 'VCPUs' },
