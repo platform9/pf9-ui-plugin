@@ -24,7 +24,7 @@ const styles = theme => ({
   search: {
     position: 'relative',
     borderRadius: theme.shape.borderRadius,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFF',
     marginRight: theme.spacing.unit * 2,
     marginLeft: 0,
     width: '100%',
@@ -64,18 +64,18 @@ const styles = theme => ({
     paddingBottom: theme.spacing.unit,
     paddingLeft: theme.spacing.unit * 6,
     transition: theme.transitions.create('width'),
-    width: '100%'
+    width: '100%',
   },
   nav: {
-    margin: 0
+    margin: 0,
   },
   activeNavItem: {
-    backgroundColor: '#fff',
-    color: 'rgba(0, 0, 0, .87)'
+    backgroundColor: '#FFF',
+    color: 'rgba(0, 0, 0, .87)',
   },
   currentNavLink: {
     backgroundColor: '#fff !important',
-    color: 'rgba(0, 0, 0, .87) !important'
+    color: 'rgba(0, 0, 0, .87) !important',
   },
   navHeading: {
     backgroundColor: theme.palette.grey[50],
@@ -118,7 +118,7 @@ const styles = theme => ({
     fontWeight: 500,
   },
   navMenuList: {
-    borderLeft: `${theme.spacing.unit}px solid #6dc6fe`
+    borderLeft: `${theme.spacing.unit}px solid #6dc6fe`,
   },
   sliderContainer: {
     display: 'flex',
@@ -132,11 +132,11 @@ const styles = theme => ({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    height: '45px'
+    height: '45px',
   },
   sliderLogoImage: {
     maxHeight: '32px',
-    maxWidth: '180px'
+    maxWidth: '180px',
   },
   sliderArrow: {
     color: theme.palette.sidebar.text,
@@ -227,13 +227,13 @@ class Navbar extends PureComponent {
     flatten(
       links.map(link => link.nestedLinks
         ? this.flattenLinks(link.nestedLinks)
-        : [link]))
+        : [link])),
   )
 
   getFilteredLinks = links => {
     const { filterText } = this.state
     return this.flattenLinks(links).filter(({ name }) =>
-      name.toLocaleLowerCase().includes(filterText.toLocaleLowerCase())
+      name.toLocaleLowerCase().includes(filterText.toLocaleLowerCase()),
     )
   }
 
@@ -252,12 +252,12 @@ class Navbar extends PureComponent {
         ...state,
         expandedItems: expandedItems.includes(name)
           ? except(name, expandedItems)
-          : [name, ...expandedItems]
+          : [name, ...expandedItems],
       }), () => {
         if (path) {
           this.props.history.push(path)
         }
-      }
+      },
     )
   })
 
@@ -266,10 +266,12 @@ class Navbar extends PureComponent {
     const matchesCurrentPath = link => link && matchPath(`${pathname}${hash}`, {
       path: link.path,
       exact: true,
-      strict: false
+      strict: false,
     })
     const redirect = () => { window.location = link.path }
-    const handleClick = link.external ? redirect : this.toggleFoldingAndNavTo(name, prop('path', link))
+    const handleClick = link.external
+      ? redirect
+      : this.toggleFoldingAndNavTo(name, prop('path', link))
     const isCurrentNavLink = matchesCurrentPath(link)
     const expanded = subLinks.some(({ link }) => matchesCurrentPath(link)) ||
       this.state.expandedItems.includes(name)
@@ -291,7 +293,7 @@ class Navbar extends PureComponent {
           disablePadding>
           {subLinks.map(this.renderNavLink)}
         </MenuList>
-      </Collapse>
+      </Collapse>,
     ]
   }
 
@@ -302,7 +304,7 @@ class Navbar extends PureComponent {
     const isCurrentNavLink = link && matchPath(`${pathname}${hash}`, {
       path: link.path,
       exact: true,
-      strict: false
+      strict: false,
     })
 
     const redirect = () => { window.location = link.path }
@@ -419,7 +421,7 @@ class Navbar extends PureComponent {
 const linkPropType = {
   name: PropTypes.string,
   link: PropTypes.shape({
-    path: PropTypes.string
+    path: PropTypes.string,
   }),
   icon: PropTypes.string,
 }
@@ -430,9 +432,9 @@ const sectionPropType = {
   links: PropTypes.arrayOf(
     PropTypes.shape({
       ...linkPropType,
-      nestedLinks: PropTypes.arrayOf(PropTypes.shape(linkPropType))
-    })
-  )
+      nestedLinks: PropTypes.arrayOf(PropTypes.shape(linkPropType)),
+    }),
+  ),
 }
 
 Navbar.propTypes = {
@@ -441,12 +443,12 @@ Navbar.propTypes = {
   open: PropTypes.bool,
   handleDrawerClose: PropTypes.func,
   sections: PropTypes.arrayOf(
-    PropTypes.shape(sectionPropType)
-  ).isRequired
+    PropTypes.shape(sectionPropType),
+  ).isRequired,
 }
 
 Navbar.defaultProps = {
-  open: true
+  open: true,
 }
 
 export default Navbar

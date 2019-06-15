@@ -8,6 +8,8 @@ import createCRUDActions from 'core/helpers/createCRUDActions'
 import { withScopedPreferences } from 'core/providers/PreferencesProvider'
 import requiresAuthentication from 'openstack/util/requiresAuthentication'
 import { withRouter } from 'react-router-dom'
+import { Button } from '@material-ui/core'
+import TopExtraContent from 'core/components/TopExtraContent'
 
 /**
  * This helper removes a lot of boilerplate from standard CRUD operations.
@@ -93,6 +95,14 @@ const createCRUDComponents = options => {
       return (deleteFn || crudActions.delete)({ id, context, getContext, setContext })
     }
 
+    redirectToAdd = () => {
+      this.props.history.push(addUrl)
+    }
+
+    renderAddButton = () => {
+      return <Button size="small" color="primary" onClick={this.redirectToAdd}>Add</Button>
+    }
+
     render () {
       let moreProps = {}
       if (rowActions && rowActions.length > 0) {
@@ -102,12 +112,14 @@ const createCRUDComponents = options => {
       return (
         <CRUDListContainer
           items={this.props.data}
-          addUrl={addUrl}
           editUrl={editUrl}
           onRemove={this.handleRemove}
           uniqueIdentifier={uniqueIdentifier}
         >
-          {handlers => <List data={this.props.data} {...handlers} {...moreProps} />}
+          {handlers => <React.Fragment>
+            {addUrl && <TopExtraContent>{this.renderAddButton()}</TopExtraContent>}
+            <List data={this.props.data} {...handlers} {...moreProps} />
+          </React.Fragment>}
         </CRUDListContainer>
       )
     }

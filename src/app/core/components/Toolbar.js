@@ -11,6 +11,8 @@ import { imageUrls } from 'app/constants'
 import { drawerWidth } from 'core/components/Navbar'
 import { withStyles } from '@material-ui/styles'
 
+export const extraContentId = 'top-extra-content'
+
 const styles = theme => ({
   appBar: {
     position: 'absolute',
@@ -53,7 +55,17 @@ const styles = theme => ({
   leftMargin: {
     marginLeft: theme.spacing.unit * 2,
   },
+  extraContent: {
+    position: 'absolute',
+    color: theme.palette.text.primary,
+    right: theme.spacing.unit * 3,
+    bottom: -(theme.spacing.unit * 8),
+  },
 })
+
+const renderExtraContent = classes => {
+  return <div className={classes.extraContent} id={extraContentId} />
+}
 
 const Toolbar = ({ classes, open, handleDrawerOpen }) => (
   <AppBar className={classNames(classes.appBar, {
@@ -76,6 +88,7 @@ const Toolbar = ({ classes, open, handleDrawerOpen }) => (
         <UserMenu className={classes.leftMargin} />
       </div>
     </MaterialToolbar>
+    {renderExtraContent(classes)}
   </AppBar>
 
 )
