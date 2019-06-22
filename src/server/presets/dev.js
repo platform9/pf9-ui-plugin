@@ -26,6 +26,7 @@ import Chart from '../models/monocular/Chart'
 import Release from '../models/monocular/Release'
 import Repository from '../models/monocular/Repository'
 import StorageClass from '../models/qbert/StorageClass'
+import PrometheusInstance from '../models/prometheus/PrometheusInstance'
 import { attachNodeToCluster } from '../models/qbert/Operations'
 // import Token from '../models/openstack/Token'
 import { range } from '../util'
@@ -128,7 +129,7 @@ function loadPreset () {
   CloudProvider.create({ data: { name: 'mockLocalProvider', type: 'local' }, context })
 
   // Clusters
-  const cluster = Cluster.create({ data: { name: 'fakeCluster1', sshKey: 'someKey' }, context, raw: true })
+  const cluster = Cluster.create({ data: { name: 'fakeCluster1', sshKey: 'someKey', tags: { 'pf9-system:monitoring': 'true' } }, context, raw: true })
   const cluster2 = Cluster.create({ data: { name: 'fakeCluster2', sshKey: 'someKey' }, context, raw: true })
   Cluster.create({ data: { name: 'fakeCluster3' }, context })
   Cluster.create({ data: { name: 'mockAwsCluster', cloudProviderType: 'aws' }, context })
@@ -150,6 +151,9 @@ function loadPreset () {
 
   attachNodeToCluster(node, cluster)
   attachNodeToCluster(node2, cluster2)
+
+  // Add Prometheus Instances to 'cluster'
+  PrometheusInstance.create({ clusterId: cluster.uuid })
 
   // Namespaces
   const defaultNamespace = Namespace.create({ data: { name: 'default' }, context, config: { clusterId: cluster.uuid }, raw: true })

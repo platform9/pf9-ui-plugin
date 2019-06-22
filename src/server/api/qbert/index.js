@@ -28,6 +28,8 @@ import { getCharts, getChart, getChartVersions } from './charts'
 import { getReleases, getRelease, deleteRelease } from './releases'
 import { tokenValidator } from '../../middleware'
 
+import { getPrometheusInstances } from './prometheus'
+
 // TODO
 // import { deployApplication } from './applications'
 // import {
@@ -61,8 +63,9 @@ router.post(`/${version}/:tenantId/clusters/:clusterId/detach`, tokenValidator, 
 
 router.get(`/${version}/:tenantId/kubeconfig/:clusterId`, tokenValidator, getKubeConfig)
 
-const k8sapi = `/${version}/:tenantId/clusters/:clusterId/k8sapi/api/v1`
-const k8sBetaApi = `/${version}/:tenantId/clusters/:clusterId/k8sapi/apis/extensions/v1beta1`
+const clusterK8sApiBase = `/${version}/:tenantId/clusters/:clusterId/k8sapi`
+const k8sapi = `${clusterK8sApiBase}/api/v1`
+const k8sBetaApi = `${clusterK8sApiBase}/apis/extensions/v1beta1`
 
 router.get(`${k8sapi}/namespaces`, tokenValidator, getNamespaces)
 
@@ -95,5 +98,9 @@ router.get(`${monocularClusterBase}/charts/:chartName/versions`, tokenValidator,
 router.get(`${monocularClusterBase}/releases`, tokenValidator, getReleases)
 router.get(`${monocularClusterBase}/releases/:releaseName`, tokenValidator, getRelease)
 router.delete(`${monocularClusterBase}/releases/:releaseName`, tokenValidator, deleteRelease)
+
+// Managed Prometheus
+const monitoringBase = `${clusterK8sApiBase}/apis/monitoring.coreos.com/v1`
+router.get(`${monitoringBase}/prometheuses`, tokenValidator, getPrometheusInstances)
 
 export default router
