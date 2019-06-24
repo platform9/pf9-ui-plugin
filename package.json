@@ -94,7 +94,7 @@
     "fsevents": "^1.2.7"
   },
   "scripts": {
-    "build": "cross-env NODE_ENV=production ./node_modules/.bin/webpack",
+    "build": "rm -rf ./build && cross-env NODE_ENV=production ./node_modules/.bin/webpack",
     "build-storybook": "build-storybook",
     "dev": "cross-env NODE_ENV=development npm start",
     "lint": "./node_modules/.bin/eslint src",

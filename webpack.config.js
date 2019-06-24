@@ -2,7 +2,6 @@ const path = require('path')
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
-const CleanWebpackPlugin = require('clean-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
 const contextPath = path.resolve(__dirname, './src/app')
@@ -96,7 +95,7 @@ module.exports = {
   },
   plugins: [
     ...(isProd
-      ? [new CleanWebpackPlugin(['build'])]
+      ? []
       : [new webpack.NamedModulesPlugin()]),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(env)
