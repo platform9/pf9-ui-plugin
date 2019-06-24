@@ -73,7 +73,7 @@
   "license": "ISC",
   "jest": {
     "automock": false,
-    "setupTestFrameworkScriptFile": "./setupJest.js",
+    "setupFilesAfterEnv": ["./setupJest.js"],
     "testEnvironment": "node",
     "moduleNameMapper": {
       "^developer(.*)$": "<rootDir>/src/app/plugins/developer$1",
