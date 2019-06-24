@@ -154,6 +154,7 @@ function loadPreset () {
 
   // Add Prometheus Instances to 'cluster'
   PrometheusInstance.create({ clusterId: cluster.uuid })
+  PrometheusInstance.create({ clusterId: cluster.uuid })
 
   // Namespaces
   const defaultNamespace = Namespace.create({ data: { name: 'default' }, context, config: { clusterId: cluster.uuid }, raw: true })

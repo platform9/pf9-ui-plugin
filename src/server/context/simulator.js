@@ -65,6 +65,10 @@ class Context {
     this.charts = []
     this.releases = []
     this.repositories = []
+    this.prometheusInstances = []
+    this.prometheusRules = []
+    this.prometheusServiceMonitors = []
+    this.prometheusAlertManagers = []
   }
 
   createSimUser = () => {

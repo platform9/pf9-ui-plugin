@@ -5,15 +5,16 @@ import cors from 'cors'
 
 import { requestLogger, enableAllCors, injectClientInfo } from './middleware'
 
-import keystone from './api/keystone'
-import nova from './api/nova'
-import neutron from './api/neutron'
+import admin from './api/admin'
+import appbert from './api/appbert'
 import cinder from './api/cinder'
 import glance from './api/glance'
-import qbert from './api/qbert'
+import keystone from './api/keystone'
 import monocular from './api/monocular'
+import neutron from './api/neutron'
+import nova from './api/nova'
+import qbert from './api/qbert'
 import resmgr from './api/resmgr'
-import admin from './api/admin'
 
 const defaultConfig = {
   port: 4444,
@@ -39,16 +40,16 @@ export function startServer (config = defaultConfig) {
   }
   app.use(injectClientInfo)
 
-  app.use('/keystone', keystone)
-  app.use('/nova', nova)
-  app.use('/neutron', neutron)
+  app.use('/admin', admin)
+  app.use('/appbert', appbert)
   app.use('/cinder', cinder)
   app.use('/glance', glance)
-  app.use('/qbert', qbert)
+  app.use('/keystone', keystone)
   app.use('/monocular', monocular)
+  app.use('/neutron', neutron)
+  app.use('/nova', nova)
+  app.use('/qbert', qbert)
   app.use('/resmgr', resmgr)
-  app.use('/resmgr', resmgr)
-  app.use('/admin', admin)
   app.use(cors())
 
   console.log(`Simulator server currently listening on port ${config.port}`)

@@ -1,9 +1,22 @@
-import { T } from 'ramda'
+import { propEq, T } from 'ramda'
 import {
-  compose, condLiteral, filterFields, identity, mergeKey, notEmpty, pick, pickMultiple, pipe,
-  pipeWhenTruthy, projectAs, pluck, pluckAsync,
-} from '../fp'
-import { asyncProps } from 'utils/fp'
+  applyJsonPatch,
+  asyncProps,
+  compose,
+  condLiteral,
+  filterFields,
+  identity,
+  mergeKey,
+  notEmpty,
+  pick,
+  pickMultiple,
+  pipe,
+  pipeWhenTruthy,
+  projectAs,
+  pluck,
+  pluckAsync,
+  updateInArray,
+} from 'utils/fp'
 
 describe('functional programming utils', () => {
   it('identity', () => {
@@ -129,5 +142,44 @@ describe('functional programming utils', () => {
     expect(notEmpty([123])).toEqual(true)
     expect(notEmpty([null])).toEqual(true)
     expect(notEmpty([undefined])).toEqual(true)
+  })
+
+  it('updateInArray', () => {
+    const items = [
+      { id: 1, name: 'foo' },
+      { id: 2, name: 'bar' },
+    ]
+    const findById = id => propEq('id', id)
+    const updateFn = obj => ({ ...obj, name: 'changed' })
+
+    const updatedItems = updateInArray(findById(2), updateFn, items)
+    expect(updatedItems).toEqual([
+      { id: 1, name: 'foo' },
+      { id: 2, name: 'changed' },
+    ])
+  })
+
+  it('applyJsonPatch', () => {
+    const original = {
+      spec: {
+        groups: [
+          { rules: [{ name: 'changeMe' }] }
+        ]
+      }
+    }
+    const expected = {
+      spec: {
+        groups: [
+          { rules: [{ name: 'I have been changed' }] }
+        ]
+      }
+    }
+    const patch = {
+      op: 'replace',
+      path: '/spec/groups/0/rules',
+      value: [{ name: 'I have been changed' }],
+    }
+    const updated = applyJsonPatch(patch, original)
+    expect(updated).toEqual(expected)
   })
 })

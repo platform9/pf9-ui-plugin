@@ -1,6 +1,8 @@
+import context from '../../context'
 import faker from 'faker'
 import uuid from 'uuid'
 import { propEq } from 'ramda'
+import { applyJsonPatch, updateInArray } from '../../../app/utils/fp'
 
 const create = (params) => {
   if (!params.clusterId) {
@@ -8,7 +10,7 @@ const create = (params) => {
   }
   const defaults = {
     cpu: '500m',
-    name: faker.address.streetName(),
+    name: faker.address.streetName().replace(/ /g, ''),
     namespace: 'default',
     memory: '512Mi',
     retention: '15d',
@@ -26,7 +28,7 @@ const create = (params) => {
 
   const service = `${name}-service-xyz`
 
-  return {
+  const instance = {
     clusterId, // This should be stripped from actual responses
     apiVersion: 'monitoring.coreos.com/v1',
     kind: 'Prometheus',
@@ -70,13 +72,33 @@ const create = (params) => {
       }
     }
   }
+
+  context.prometheusInstances.push(instance)
 }
 
 const PrometheusInstance = {
-  list: ({ context, clusterId }) => {
+  list: ({ clusterId }) => {
     return context.prometheusInstances.filter(propEq('clusterId', clusterId))
   },
+
   create,
+
+  // `data` contains an array of JSON patches (https://tools.ietf.org/html/rfc6902)
+  update: ({ clusterId, name, data }) => {
+    const findInstance = obj => obj.clusterId === clusterId && obj.metadata.name === name
+    const updateFn = original => data.reduce(
+      (accum, patch) => applyJsonPatch(patch, accum),
+      original
+    )
+    context.prometheusInstances = updateInArray(findInstance, updateFn, context.prometheusInstances)
+    return context.prometheusInstances.find(findInstance)
+  },
+
+  delete: ({ clusterId, name }) => {
+    const findInstance = obj => obj.clusterId === clusterId && obj.metadata.name === name
+    const instances = context.prometheusInstances.filter(cluster => !findInstance(cluster))
+    context.prometheusInstances = instances
+  }
 }
 
 export default PrometheusInstance

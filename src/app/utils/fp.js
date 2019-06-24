@@ -1,4 +1,4 @@
-import { curry, fromPairs, mapObjIndexed, pathOr, remove, flatten } from 'ramda'
+import { assocPath, curry, fromPairs, mapObjIndexed, pathOr, remove, flatten } from 'ramda'
 import moize from 'moize'
 
 // functional programming helpers
@@ -208,3 +208,29 @@ export const condLiteral = (...conds) => value => {
     if (pred(value)) { return literal }
   }
 }
+
+// Update an object in an array using a predicateFn and an updateFn.
+//
+// updateInArray :: (obj -> Boolean) -> (obj -> obj) -> arr -> arr
+//
+// Ex: updateInArray(
+//   obj => obj.id === id,
+//   obj => ({ ...obj, name: 'changed' }),
+//   arr
+// )
+export const updateInArray = curry((predicateFn, updateFn, arr) =>
+  arr.map(item => predicateFn(item) ? updateFn(item) : item)
+)
+
+// applyJsonPatch :: oldObject -> patch -> newObject
+export const applyJsonPatch = curry((patch, obj) => {
+  const { op, path, value } = patch
+
+  // assocPath requires array indexes to be integer not string
+  const convertIntsToInts = n => !isNaN(n) ? parseInt(n, 10) : n
+
+  const pathParts = path.split('/').slice(1).map(convertIntsToInts)
+  if (op === 'replace') {
+    return assocPath(pathParts, value, obj)
+  }
+})
