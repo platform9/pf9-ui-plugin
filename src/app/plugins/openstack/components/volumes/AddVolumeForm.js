@@ -21,7 +21,7 @@ const initialValue = {
   numVolumes: 1,
 }
 const sourceTypes = [
-  {value: 'None', label: 'None (empty volume)'},
+  { value: 'None', label: 'None (empty volume)' },
   'Snapshot',
   'Another Volume',
   'Image'

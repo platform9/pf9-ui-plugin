@@ -55,7 +55,7 @@ class Selector extends React.Component {
           open={Boolean(anchor)}
           onClose={this.handleClose('anchor')}
           getContentAnchorEl={null}
-          anchorOrigin={{vertical: 'bottom', horizontal: 'left'}}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
         >
           { searchTerm !== undefined && <SearchBar
             onSearchChange={onSearchChange}

@@ -329,7 +329,7 @@ class Cinder {
     const urls = await this.setRegionUrls()
     const url = `${urls[region]}/os-quota-sets/${projectId}`
     try {
-      const quotas = await axios.put(url, {quota_set: params}, this.client.getAuthHeaders())
+      const quotas = await axios.put(url, { quota_set: params }, this.client.getAuthHeaders())
       return quotas.data.quota_set
     } catch (err) {
       console.log(err)

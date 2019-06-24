@@ -39,7 +39,7 @@ class Context {
   getUsers = async () => {
     const users = (await this.client.keystone.getUsers() || [])
     // Sometimes the API returns users without a username.
-    const sanitized = users.map(user => ({...user, username: user.username || ''}))
+    const sanitized = users.map(user => ({ ...user, username: user.username || '' }))
     return sanitized
   }
 

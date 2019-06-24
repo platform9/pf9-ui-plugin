@@ -162,9 +162,9 @@ describe('Keystone', () => {
 
   describe('helpers', () => {
     it('Get highest role function', () => {
-      const adminHighest = [{name: 'admin'}, {name: '_member_'}, {name: 'basic'}]
-      const memberHighest = [{name: 'basic'}, {name: 'other'}, {name: '_member_'}]
-      const basicHighest = [{name: 'basic'}, {name: 'other'}]
+      const adminHighest = [{ name: 'admin' }, { name: '_member_' }, { name: 'basic' }]
+      const memberHighest = [{ name: 'basic' }, { name: 'other' }, { name: '_member_' }]
+      const basicHighest = [{ name: 'basic' }, { name: 'other' }]
       expect(getHighestRole(adminHighest)).toEqual('admin')
       expect(getHighestRole(memberHighest)).toEqual('_member_')
       expect(getHighestRole(basicHighest)).toEqual('basic')

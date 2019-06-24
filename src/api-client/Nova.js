@@ -3,7 +3,7 @@ import axios from 'axios'
 // Returns a transducer function instead being passed the obj directly
 // so it can be used in Array#map/filter/etc as well.
 const renameKey = (srcKey, destKey) => obj => Object.keys(obj).reduce(
-  (accum, key) => ({...accum, [key === srcKey ? destKey : key]: obj[key]}),
+  (accum, key) => ({ ...accum, [key === srcKey ? destKey : key]: obj[key] }),
   {}
 )
 

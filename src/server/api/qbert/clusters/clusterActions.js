@@ -2,7 +2,7 @@ import context from '../../../context'
 import Cluster from '../../../models/qbert/Cluster'
 
 export const getClusters = (req, res) => {
-  const clusters = Cluster.list({context})
+  const clusters = Cluster.list({ context })
   return res.send(clusters)
 }
 

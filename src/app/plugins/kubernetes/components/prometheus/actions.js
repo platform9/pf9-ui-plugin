@@ -49,7 +49,7 @@ export const loadPrometheusInstances = contextLoader('prometheusInstances', asyn
 export const createPrometheusInstance = contextUpdater('prometheusInstances', async ({ data, apiClient, currentItems, showToast }) => {
   try {
     const createdInstance = await apiClient.qbert.createPrometheusInstance(data.cluster, data)
-    const mappedInstance = mapPrometheusInstance({clusterUuid: data.cluster, ...createdInstance})
+    const mappedInstance = mapPrometheusInstance({ clusterUuid: data.cluster, ...createdInstance })
     showToast(`Successfully created Prometheus instance ${mappedInstance.name}`, 'success')
     return [...currentItems, mappedInstance]
   } catch (err) {

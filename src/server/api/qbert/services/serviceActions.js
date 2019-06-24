@@ -21,10 +21,10 @@ export const postService = (req, res) => {
   const service = { ...req.body }
 
   if (service.kind !== 'Service') {
-    return res.status(400).send({code: 400, message: 'Must be of kind "Service"'})
+    return res.status(400).send({ code: 400, message: 'Must be of kind "Service"' })
   }
   if (Service.findByName({ name: service.metadata.name, context, config: { clusterId, namespace } })) {
-    return res.status(409).send({code: 409, message: `services ${service.metadata.name} already exists`})
+    return res.status(409).send({ code: 409, message: `services ${service.metadata.name} already exists` })
   }
 
   const newService = Service.create({ data: service, context, config: { clusterId, namespace } })
@@ -37,7 +37,7 @@ export const deleteService = (req, res) => {
   const service = Service.findByName({ name: serviceName, context, config: { clusterId, namespace } })
   // this should throw an error if it doesn't exist
   if (!service) {
-    res.status(404).send({code: 404, message: 'service not found'})
+    res.status(404).send({ code: 404, message: 'service not found' })
   }
   Service.delete({ id: service.metadata.uid, context })
   res.status(200).send(service)

@@ -47,7 +47,7 @@ const getKubeConfig = (req, res) => {
   const cluster = Cluster.findById({ id: clusterId, context })
 
   if (!cluster) {
-    return res.status(404).send({code: 404, message: 'cluster not found'})
+    return res.status(404).send({ code: 404, message: 'cluster not found' })
   }
 
   const yamlString = randomKubeConfig(cluster)

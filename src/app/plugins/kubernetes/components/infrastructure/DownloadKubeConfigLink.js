@@ -10,7 +10,7 @@ class DownloadKubeConfigLink extends React.Component {
     const newToken = await context.apiClient.keystone.renewScopedToken()
     const kubeConfig = _kubeConfig.replace('__INSERT_BEARER_TOKEN_HERE__', newToken)
 
-    const blob = new Blob([kubeConfig], {type: 'application/octet-stream'})
+    const blob = new Blob([kubeConfig], { type: 'application/octet-stream' })
     let elem = window.document.createElement('a')
     elem.href = window.URL.createObjectURL(blob)
     elem.download = `${cluster.name}.yml`

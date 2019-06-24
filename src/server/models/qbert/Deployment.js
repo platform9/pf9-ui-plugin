@@ -35,7 +35,7 @@ const options = {
           metadata: {
             name: `${_input.metadata.name}-${uuid.v4()}`,
             namespace: _input.namespace,
-            ownerReferences: [{name: _input.metadata.name, uid: deploymentUuid}]
+            ownerReferences: [{ name: _input.metadata.name, uid: deploymentUuid }]
           }
         },
         context,

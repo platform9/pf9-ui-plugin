@@ -4,7 +4,7 @@ let context
 
 describe('Storage Class', () => {
   beforeEach(() => {
-    context = {storageClasses: []}
+    context = { storageClasses: [] }
   })
 
   describe('Basic functionality', () => {

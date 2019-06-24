@@ -4,7 +4,7 @@ let context
 
 describe('Deployment', () => {
   beforeEach(() => {
-    context = {deployments: [], pods: []}
+    context = { deployments: [], pods: [] }
   })
 
   describe('Basic functionality', () => {
@@ -15,7 +15,7 @@ describe('Deployment', () => {
       expect(deployment).toMatchObject({ metadata: { name: 'fakeDeployment', namespace: 'default' } })
       expect(context.pods.length).toBe(2)
       for (const pod of context.pods) {
-        expect(pod).toMatchObject({ metadata: { ownerReferences: [{name: 'fakeDeployment', uid: deployment.metadata.uid}] } })
+        expect(pod).toMatchObject({ metadata: { ownerReferences: [{ name: 'fakeDeployment', uid: deployment.metadata.uid }] } })
       }
     })
   })

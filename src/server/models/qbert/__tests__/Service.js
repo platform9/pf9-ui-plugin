@@ -4,7 +4,7 @@ let context
 
 describe('Service', () => {
   beforeEach(() => {
-    context = {services: []}
+    context = { services: [] }
   })
 
   describe('Basic functionality', () => {

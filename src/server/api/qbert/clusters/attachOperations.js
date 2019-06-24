@@ -5,10 +5,10 @@ import { attachNodeToCluster, detachNodeFromCluster } from '../../../models/qber
 
 export const attachNodes = (req, res) => {
   const { clusterId } = req.params
-  const cluster = Cluster.findById({id: clusterId, context, raw: true})
+  const cluster = Cluster.findById({ id: clusterId, context, raw: true })
   const nodes = req.body
   for (const node of nodes) {
-    const _node = Node.findById({id: node.uuid, context, raw: true})
+    const _node = Node.findById({ id: node.uuid, context, raw: true })
     attachNodeToCluster(_node, cluster)
   }
   res.status(200).send('ok')
@@ -16,10 +16,10 @@ export const attachNodes = (req, res) => {
 
 export const detachNodes = (req, res) => {
   const { clusterId } = req.params
-  const cluster = Cluster.findById({id: clusterId, context, raw: true})
+  const cluster = Cluster.findById({ id: clusterId, context, raw: true })
   const nodes = req.body
   for (const node of nodes) {
-    const _node = Node.findById({id: node.uuid, context, raw: true})
+    const _node = Node.findById({ id: node.uuid, context, raw: true })
     detachNodeFromCluster(_node, cluster)
   }
   res.status(200).send('ok')

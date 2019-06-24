@@ -21,13 +21,13 @@ export const postPod = (req, res) => {
   const pod = { ...req.body }
 
   if (pod.kind !== 'Pod') {
-    return res.status(400).send({code: 400, message: 'Must be of kind "Pod"'})
+    return res.status(400).send({ code: 400, message: 'Must be of kind "Pod"' })
   }
   if (Pod.findByName({ name: pod.metadata.name, context, config: { clusterId, namespace } })) {
-    return res.status(409).send({code: 409, message: `pods ${pod.metadata.name} already exists`})
+    return res.status(409).send({ code: 409, message: `pods ${pod.metadata.name} already exists` })
   }
 
-  const newPod = Pod.create({ data: pod, context, config: {clusterId, namespace} })
+  const newPod = Pod.create({ data: pod, context, config: { clusterId, namespace } })
   res.status(201).send(newPod)
 }
 
@@ -35,10 +35,10 @@ export const deletePod = (req, res) => {
   // TODO: account for tenancy
   const { podName, clusterId, namespace } = req.params
   console.log('Attempting to delete podName: ', podName)
-  const pod = Pod.findByName({ name: podName, context, config: {clusterId, namespace} })
+  const pod = Pod.findByName({ name: podName, context, config: { clusterId, namespace } })
   // this should throw an error if it doesn't exist
   if (!pod) {
-    return res.status(404).send({code: 404, message: 'pod not found'})
+    return res.status(404).send({ code: 404, message: 'pod not found' })
   }
 
   // Set status to Running after some time

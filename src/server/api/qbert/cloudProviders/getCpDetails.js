@@ -12,12 +12,12 @@ const randomAwsRegions = (numRegions = 5) => {
       'Endpoint': faker.internet.url()
     }
   }, numRegions)
-  return {'Regions': regions}
+  return { Regions: regions }
 }
 
 const randomOpenstackRegions = (numRegions = 5) => {
   const regions = uniq(times(() => ({ 'RegionName': faker.random.locale() }), numRegions))
-  return {'Regions': regions}
+  return { Regions: regions }
 }
 
 const randomAwsRegionDetails = (regionId) => {
@@ -60,7 +60,7 @@ export const getCpDetails = (req, res) => {
 
   // Send some defaults found from dogfood
   if (cp.type === 'local') {
-    res.status(500).send({code: 500, message: 'Cannot get details for local cloud provider'})
+    res.status(500).send({ code: 500, message: 'Cannot get details for local cloud provider' })
   } else if (cp.type === 'aws') {
     res.status(200).send(randomAwsRegions())
   } else if (cp.type === 'openstack') {
@@ -73,7 +73,7 @@ export const getCpRegionDetails = (req, res) => {
   const cp = CloudProvider.findById({ id: cloudProviderId, context })
 
   if (cp.type === 'local') {
-    res.status(500).send({code: 500, message: 'Cannot get details for local cloud provider'})
+    res.status(500).send({ code: 500, message: 'Cannot get details for local cloud provider' })
   } else if (cp.type === 'aws') {
     const awsRegionDetails = randomAwsRegionDetails()
     if (sshKeyMap[cloudProviderId] && sshKeyMap[cloudProviderId][regionId]) {
@@ -87,7 +87,7 @@ export const getCpRegionDetails = (req, res) => {
 
 export const importAwsSshKey = (req, res) => {
   const { cloudProviderId, regionId } = req.params
-  const sshKey = {'KeyName': req.body.name, 'KeyFingerprint': faker.random.word()}
+  const sshKey = { KeyName: req.body.name, KeyFingerprint: faker.random.word() }
   if (sshKeyMap[cloudProviderId]) {
     if (sshKeyMap[cloudProviderId][regionId]) {
       sshKeyMap[cloudProviderId][regionId] = sshKeyMap[cloudProviderId][regionId].push(sshKey)

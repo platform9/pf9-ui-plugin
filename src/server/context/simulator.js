@@ -91,7 +91,7 @@ class Context {
   getFlavors = () => Flavor.getCollection().map(x => x.asJson())
 
   createFlavor = ({ input }) => {
-    const flavor = new Flavor({...input})
+    const flavor = new Flavor({ ...input })
     return flavor.asJson()
   }
 
@@ -115,7 +115,7 @@ class Context {
   getInstances = () => Instance.getCollection().map(x => x.asJson())
 
   createInstance = ({ input }) => {
-    const instance = new Instance({...input})
+    const instance = new Instance({ ...input })
     return instance.asJson()
   }
 
@@ -140,7 +140,7 @@ class Context {
     Tenant.getCollection().map(x => x.asJson())
 
   createTenant = ({ input }) => {
-    const tenant = new Tenant({...input})
+    const tenant = new Tenant({ ...input })
     return tenant.asJson()
   }
 

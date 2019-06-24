@@ -51,7 +51,7 @@ const ToastContext = React.createContext()
 
 const toastsTimeout = 5000
 
-const ToastContent = withStyles(styles)(({onClose, type, message, classes, className, ...rest}) => {
+const ToastContent = withStyles(styles)(({ onClose, type, message, classes, className, ...rest }) => {
   const Icon = variantIcon[type]
   return <SnackbarContent
     className={classnames(classes[type], className)}
@@ -103,7 +103,7 @@ export class ToastProvider extends Component {
   })
 
   dismissToast = id => () => {
-    this.setState(({toasts, ...prevState}) => ({
+    this.setState(({ toasts, ...prevState }) => ({
       ...prevState,
       toasts: adjust(
         toasts.findIndex(propEq('id', id)),
@@ -127,7 +127,7 @@ export class ToastProvider extends Component {
     const { toasts } = this.state
     return (
       <ToastContext.Provider value={this.showToast}>
-        {toasts.map(({id, isOpen, text, onClose, type}) =>
+        {toasts.map(({ id, isOpen, text, onClose, type }) =>
           <Snackbar
             style={snackbarStyle}
             key={id}

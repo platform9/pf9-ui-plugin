@@ -51,7 +51,7 @@ const createModel = (options={}) => {
 
     update: ({ id, data, context }) => {
       const mappedData = mappingFn ? mappingFn(data, context) : data
-      context[dataKey] = context[dataKey].map(x => x[uniqueIdentifier] === id ? {...x, ...mappedData} : x)
+      context[dataKey] = context[dataKey].map(x => x[uniqueIdentifier] === id ? { ...x, ...mappedData } : x)
       return context[dataKey].find(propEq(uniqueIdentifier, id))
     },
 

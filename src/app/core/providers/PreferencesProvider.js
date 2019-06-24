@@ -9,8 +9,8 @@ const setUserPrefs = (username, prefs) => setStorage(userPreferencesKey(username
 const getStorageUserPrefs = username => getStorage(userPreferencesKey(username)) || {}
 
 const Context = React.createContext({})
-export const {Consumer} = Context
-export const {Provider} = Context
+export const { Consumer } = Context
+export const { Provider } = Context
 
 class PreferencesProvider extends React.Component {
   state = {
@@ -22,7 +22,7 @@ class PreferencesProvider extends React.Component {
     },
 
     getUserPreferences: () => {
-      const {session} = this.props.context
+      const { session } = this.props.context
       // Try to get preferences from session, otherwise get it from localStorage
       return propOr(
         getStorageUserPrefs(session.username),
@@ -35,7 +35,7 @@ class PreferencesProvider extends React.Component {
     updateScopedUserPreferences: curry(async (scopeKey, values) => {
       const { getScopedUserPreferences } = this.state
       const prevValue = getScopedUserPreferences(scopeKey)
-      const newValue = {...prevValue, ...values}
+      const newValue = { ...prevValue, ...values }
 
       // Update memoized values
       getScopedUserPreferences.update([scopeKey], newValue)
@@ -51,7 +51,7 @@ class PreferencesProvider extends React.Component {
     }),
 
     getScopedUserPreferences: moize(key => {
-      const {session} = this.props.context
+      const { session } = this.props.context
       // Try to get preferences from session, otherwise get it from localStorage
       return pathOr(
         getStorageUserPrefs(session.username)[key],

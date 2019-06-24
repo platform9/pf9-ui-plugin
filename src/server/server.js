@@ -32,7 +32,7 @@ export function startServer (config = defaultConfig) {
 
   app.use(bodyParser.urlencoded({ extended: true }))
   app.use(bodyParser.json())
-  app.use(bodyParser.json({type: 'application/openstack-images-v2.1-json-patch'}))
+  app.use(bodyParser.json({ type: 'application/openstack-images-v2.1-json-patch' }))
 
   if (config.verbose) {
     app.use(requestLogger)

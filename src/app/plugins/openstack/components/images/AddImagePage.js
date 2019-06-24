@@ -102,7 +102,7 @@ class AddImagePage extends React.Component {
         <Typography className={classes.code}>
           &nbsp;&nbsp;glance image-create&nbsp;&nbsp;--disk-format qcow2
         </Typography>
-        <Typography className={classes.code} style={{paddingLeft: '18ch'}}>
+        <Typography className={classes.code} style={{ paddingLeft: '18ch' }}>
           --container-format bare \<br />
           --file ~/images/my-qcow2-img.img \<br />
           --visibility public \<br />
