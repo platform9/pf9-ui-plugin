@@ -4,63 +4,38 @@ import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { deleteService } from './actions'
 import { projectAs } from 'utils/fp'
 import { loadServices } from 'k8s/components/pods/actions'
-import { prop, head } from 'ramda'
-import { loadClusters } from 'k8s/components/infrastructure/actions'
-import { withDataLoader } from 'core/DataLoader'
+import moize from 'moize'
+import clusterizedDataLoader from 'k8s/helpers/clusterizedDataLoader'
 
 const ListPage = ({ ListContainer }) => {
-  class ListPage extends React.Component {
-    state = {
-      activeCluster: null,
-    }
+  const handleClusterChange = moize(setParams => async clusterId => {
+    setParams({ clusterId })
+  })
 
-    handleChangeCluster = clusterId => {
-      this.setState({ activeCluster: clusterId },
-        () => {
-          this.props.reloadData('services', { clusterId })
-        })
-    }
-
-    findClusterName = clusterId => {
-      const cluster = this.props.data.clusters.find(x => x.uuid === clusterId)
-      return (cluster && cluster.name) || ''
-    }
-
-    render () {
-      const { activeCluster } = this.state
-      const { kubeServices = [], clusters = [] } = this.props.data
-
-      const withClusterNames = kubeServices.map(ns => ({
-        ...ns,
-        clusterName: this.findClusterName(ns.clusterId),
-      }))
-
-      return (
-        <div>
-          <Picklist
-            name="currentCluster"
-            label="Current Cluster"
-            options={projectAs(
-              { label: 'name', value: 'uuid' },
-              [
-                // TODO: Figure out a way to query for all clusters
-                // { name: 'all', uuid: '__all__' },
-                ...clusters.filter(
-                  cluster => cluster.hasMasterNode)],
-            )}
-            value={activeCluster || prop('uuid', head(clusters))}
-            onChange={this.handleChangeCluster}
-          />
-
-          <ListContainer data={withClusterNames} />
-        </div>
-      )
-    }
+  const findClusterName = (clusters, clusterId) => {
+    const cluster = clusters.find(x => x.uuid === clusterId)
+    return (cluster && cluster.name) || ''
   }
 
-  return withDataLoader(
-    { clusters: loadClusters, services: loadServices },
-  )(ListPage)
+  return clusterizedDataLoader('kubeServices', loadServices)(
+    ({ setParams, params: { clusterId }, data: { clusters, kubeServices } }) =>
+      <div>
+        <Picklist
+          name="currentCluster"
+          label="Current Cluster"
+          options={projectAs(
+            { label: 'name', value: 'uuid' },
+            clusters.filter(x => x.hasMasterNode),
+          )}
+          value={clusterId}
+          onChange={handleClusterChange(setParams)}
+        />
+        <ListContainer data={kubeServices.map(ns => ({
+          ...ns,
+          clusterName: findClusterName(clusters, ns.clusterId),
+        }))} />
+      </div>,
+  )
 }
 
 export const options = {

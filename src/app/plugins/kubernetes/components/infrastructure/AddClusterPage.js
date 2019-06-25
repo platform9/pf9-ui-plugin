@@ -10,11 +10,12 @@ import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import Wizard from 'core/components/Wizard'
 import WizardStep from 'core/components/WizardStep'
 import createCRUDActions from 'core/helpers/createCRUDActions'
-import { compose, prop, propEq } from 'ramda'
+import { compose, prop, propEq, pathOr } from 'ramda'
 import { loadCloudProviders } from './actions'
 import { projectAs } from 'utils/fp'
 import { withAppContext } from 'core/AppContext'
-import { withDataLoader } from 'core/DataLoader'
+import withDataLoader from 'core/hocs/withDataLoader'
+import withDataMapper from 'core/hocs/withDataMapper'
 
 const initialContext = {
   manualDeploy: false,
@@ -248,10 +249,15 @@ class AddClusterPage extends React.Component {
 }
 
 export default compose(
+  withAppContext,
   withDataLoader({
     cloudProviders: loadCloudProviders,
     flavors: createCRUDActions({ service: 'nova', entity: 'flavors' }).list,
     regions: createCRUDActions({ service: 'keystone', entity: 'regions' }).list,
   }),
-  withAppContext,
+  withDataMapper({
+    cloudProviders: pathOr([], ['context', 'cloudProviders']),
+    flavors: pathOr([], ['context', 'flavors']),
+    regions: pathOr([], ['context', 'regions']),
+  }),
 )(AddClusterPage)

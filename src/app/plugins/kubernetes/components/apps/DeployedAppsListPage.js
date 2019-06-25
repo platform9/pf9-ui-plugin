@@ -2,15 +2,14 @@ import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import React from 'react'
 import SimpleLink from 'core/components/SimpleLink'
 import { loadReleases, deleteRelease } from 'k8s/components/apps/actions'
-import { loadClusters } from 'k8s/components/infrastructure/actions'
-import { withAppContext } from 'core/AppContext'
 import Picklist from 'core/components/Picklist'
-import { compose, pathOr } from 'ramda'
+import { compose } from 'ramda'
 import requiresAuthentication from 'openstack/util/requiresAuthentication'
-import { withDataLoader } from 'core/DataLoader'
 import { CardMedia } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import { projectAs } from 'utils/fp'
+import clusterizedDataLoader from 'k8s/helpers/clusterizedDataLoader'
+import moize from 'moize'
 
 const styles = theme => ({
   icon: {
@@ -34,63 +33,34 @@ const renderDeployedAppLink = (name, deployedApp) =>
   <SimpleLink src={`/ui/kubernetes/deployed/${deployedApp.id}`}>{name}</SimpleLink>
 
 const ListPage = ({ ListContainer }) => {
-  class ListPage extends React.Component {
-    state = {
-      activeCluster: '__all__',
-      pods: null,
-      clusterOptions: [
-        { label: 'all', value: '__all__' },
-      ],
-    }
+  const handleClusterChange = moize(setParams => async clusterId => {
+    setParams({ clusterId })
+  })
 
-    async componentDidMount () {
-      const { data } = this.props
-      // Make sure to use a new reference to props.data since it has now changed
-      const clusters = data.clusters.filter(x => x.hasMasterNode)
-      const clusterId = pathOr('__all__', [0, 'uuid'], clusters)
-
-      await this.handleClusterChange(clusterId)
-    }
-
-    handleClusterChange = async clusterId => {
-      this.setState({ activeCluster: clusterId },
-        async () => this.props.reloadData('releases', { clusterId }),
-      )
-    }
-
-    findClusterName = clusterId => {
-      const cluster = this.props.data.clusters.find(x => x.uuid === clusterId)
-      return (cluster && cluster.name) || ''
-    }
-
-    render () {
-      const { activeCluster } = this.state
-      const { releases = [], clusters = [] } = this.props.data
-      const withClusterNames = releases.map(ns => ({
-        ...ns,
-        clusterName: this.findClusterName(ns.clusterId),
-      }))
-
-      return (
-        <div>
-          <Picklist
-            name="currentCluster"
-            label="Current Cluster"
-            options={projectAs(
-              { label: 'name', value: 'uuid' },
-              clusters.filter(x => x.hasMasterNode),
-            )}
-            value={activeCluster}
-            onChange={this.handleClusterChange}
-          />
-
-          <ListContainer data={withClusterNames} />
-        </div>
-      )
-    }
+  const findClusterName = (clusters, clusterId) => {
+    const cluster = clusters.find(x => x.uuid === clusterId)
+    return (cluster && cluster.name) || ''
   }
 
-  return withAppContext(ListPage)
+  return clusterizedDataLoader('releases', loadReleases)(
+    ({ setParams, params: { clusterId }, data: { clusters, releases } }) =>
+      <div>
+        <Picklist
+          name="currentCluster"
+          label="Current Cluster"
+          options={projectAs(
+            { label: 'name', value: 'uuid' },
+            clusters.filter(x => x.hasMasterNode),
+          )}
+          value={clusterId}
+          onChange={handleClusterChange(setParams)}
+        />
+        <ListContainer data={releases.map(ns => ({
+          ...ns,
+          clusterName: findClusterName(clusters, ns.clusterId),
+        }))} />
+      </div>,
+  )
 }
 
 export const options = {
@@ -116,5 +86,4 @@ const { ListPage: DeployedAppsListPage } = createCRUDComponents(options)
 
 export default compose(
   requiresAuthentication,
-  withDataLoader({ clusters: loadClusters, releases: loadReleases }),
 )(DeployedAppsListPage)

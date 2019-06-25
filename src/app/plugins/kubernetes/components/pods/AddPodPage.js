@@ -4,12 +4,10 @@ import PicklistField from 'core/components/validatedForm/PicklistField'
 import SubmitButton from 'core/components/SubmitButton'
 import createAddComponents from 'core/helpers/createAddComponents'
 import { projectAs } from 'utils/fp'
-import { loadClusters } from '../infrastructure/actions'
 import { loadPods, createPod } from './actions'
-import { withDataLoader } from 'core/DataLoader'
 import CodeMirror from 'core/components/validatedForm/CodeMirror'
-import { compose } from 'ramda'
 import { loadNamespaces } from 'k8s/components/namespaces/actions'
+import clusterizedDataLoader from 'k8s/helpers/clusterizedDataLoader'
 
 export class AddPodForm extends React.Component {
   state = {
@@ -19,7 +17,8 @@ export class AddPodForm extends React.Component {
 
   handleClusterChange = value => {
     const { data } = this.props
-    const namespaceOptions = data.namespaces.filter(n => n.clusterId === value).map(n => ({ value: n.name, label: n.name }))
+    const namespaceOptions = data.namespaces.filter(n => n.clusterId === value).map(
+      n => ({ value: n.name, label: n.name }))
     this.setState({ namespaceOptions })
   }
 
@@ -31,7 +30,10 @@ export class AddPodForm extends React.Component {
       mode: 'yaml',
     }
 
-    const clusterOptions = data.clusters ? projectAs({ value: 'uuid', label: 'name' }, data.clusters) : []
+    const clusterOptions = data.clusters ? projectAs({
+      value: 'uuid',
+      label: 'name',
+    }, data.clusters) : []
 
     return (
       <ValidatedForm onSubmit={onComplete}>
@@ -69,6 +71,4 @@ export const options = {
 
 const { AddPage } = createAddComponents(options)
 
-export default compose(
-  withDataLoader({ clusters: loadClusters, namespaces: loadNamespaces }),
-)(AddPage)
+export default clusterizedDataLoader('namespaces', loadNamespaces)(AddPage)

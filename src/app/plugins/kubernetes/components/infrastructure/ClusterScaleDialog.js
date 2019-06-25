@@ -3,11 +3,12 @@ import TextField from 'core/components/validatedForm/TextField'
 import Checkbox from 'core/components/validatedForm/CheckboxField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import { Slider } from '@material-ui/lab'
-import { compose, pick } from 'ramda'
+import { compose, pick, pathOr } from 'ramda'
 import { withAppContext } from 'core/AppContext'
 import { scaleCluster, loadClusters } from './actions'
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@material-ui/core'
-import { withDataLoader } from 'core/DataLoader'
+import withDataLoader from 'core/hocs/withDataLoader'
+import withDataMapper from 'core/hocs/withDataMapper'
 
 // The modal is technically inside the row, so clicking anything inside
 // the modal window will cause the table row to be toggled.
@@ -64,6 +65,7 @@ class ClusterScaleDialog extends React.Component {
 }
 
 export default compose(
-  withDataLoader({ clusters: loadClusters }),
   withAppContext,
+  withDataLoader({ clusters: loadClusters }),
+  withDataMapper({ clusters: pathOr([], ['context', 'clusters']) }),
 )(ClusterScaleDialog)

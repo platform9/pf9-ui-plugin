@@ -9,10 +9,10 @@ const setUserPrefs = (username, prefs) => setStorage(userPreferencesKey(username
 const getStorageUserPrefs = username => getStorage(userPreferencesKey(username)) || {}
 
 const Context = React.createContext({})
-export const { Consumer } = Context
-export const { Provider } = Context
+export const { Consumer: PreferencesConsumer } = Context
+export const { Provider: PreferencesProvider } = Context
 
-class PreferencesProvider extends React.Component {
+class PreferencesComponent extends React.Component {
   state = {
     initUserPreferences: async username => {
       const userPrefs = getStorageUserPrefs(username)
@@ -62,15 +62,15 @@ class PreferencesProvider extends React.Component {
 
   render () {
     return (
-      <Provider value={this.state}>
+      <PreferencesProvider value={this.state}>
         {this.props.children}
-      </Provider>
+      </PreferencesProvider>
     )
   }
 }
 
 export const withPreferences = Component => props =>
-  <Consumer>
+  <PreferencesConsumer>
     {
       ({ initUserPreferences, getUserPreferences }) =>
         <Component
@@ -79,11 +79,11 @@ export const withPreferences = Component => props =>
           initUserPreferences={initUserPreferences}
         />
     }
-  </Consumer>
+  </PreferencesConsumer>
 
 export const withScopedPreferences = storeKey => Component => {
   return props =>
-    <Consumer>
+    <PreferencesConsumer>
       {
         ({ updateScopedUserPreferences, getScopedUserPreferences }) =>
           <Component
@@ -92,7 +92,7 @@ export const withScopedPreferences = storeKey => Component => {
             updatePreferences={updateScopedUserPreferences(storeKey)}
           />
       }
-    </Consumer>
+    </PreferencesConsumer>
 }
 
-export default withAppContext(PreferencesProvider)
+export default withAppContext(PreferencesComponent)

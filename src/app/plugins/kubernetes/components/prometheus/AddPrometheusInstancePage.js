@@ -12,12 +12,10 @@ import createAddComponents from 'core/helpers/createAddComponents'
 import uuid from 'uuid'
 import { compose, path, pluck } from 'ramda'
 import { projectAs } from 'utils/fp'
-import { withAppContext } from 'core/AppContext'
-import { withDataLoader } from 'core/DataLoader'
-import { loadClusters } from 'k8s/components/infrastructure/actions'
 import { loadNamespaces } from 'k8s/components/namespaces/actions'
 import { createPrometheusInstance, loadPrometheusInstances, loadServiceAccounts } from './actions'
 import { castFuzzyBool } from 'utils/misc'
+import clusterizedDataLoader from 'k8s/helpers/clusterizedDataLoader'
 
 const initialContext = {
   replicas: 1,
@@ -26,7 +24,7 @@ const initialContext = {
   storage: '8Gi',
   retention: '15d',
   port: 'prometheus',
-  appLabels: []
+  appLabels: [],
 }
 
 const hasPrometheusEnabled = compose(castFuzzyBool, path(['tags', 'pf9-system:monitoring']))
@@ -53,7 +51,7 @@ class AddPrometheusInstanceFormBase extends React.Component {
 
   handleClusterChange = async clusterUuid => {
     this.setState({ clusterUuid })
-    this.props.reloadData('namespaces', { clusterId: clusterUuid })
+    this.props.setParams({ clusterId: clusterUuid })
   }
 
   handleNamespaceChange = async namespace => {
@@ -137,13 +135,7 @@ class AddPrometheusInstanceFormBase extends React.Component {
   }
 }
 
-const AddPrometheusInstanceForm = compose(
-  withDataLoader({
-    clusters: loadClusters,
-    namespaces: loadNamespaces,
-  }),
-  withAppContext,
-)(AddPrometheusInstanceFormBase)
+const AddPrometheusInstanceForm = clusterizedDataLoader('namespaces', loadNamespaces)(AddPrometheusInstanceFormBase)
 
 export const options = {
   FormComponent: AddPrometheusInstanceForm,

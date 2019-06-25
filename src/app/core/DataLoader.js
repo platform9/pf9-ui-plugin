@@ -3,64 +3,38 @@ import PropTypes from 'prop-types'
 import DisplayError from './components/DisplayError'
 import Progress from './components/Progress'
 import { asyncProps } from 'utils/fp'
-import { assoc, compose, mapObjIndexed, merge, pick } from 'ramda'
-import { withAppContext } from 'core/AppContext'
+import { mapObjIndexed, equals } from 'ramda'
 
-class DataLoaderBase extends PureComponent {
+class DataLoader extends PureComponent {
   state = {
     loading: false,
     error: null,
   }
 
   async componentDidMount () {
-    await this.loadAll()
+    await this.loadAll(this.props.options.reloadOnMount)
   }
 
-  loadAll = async () => {
+  async componentDidUpdate (prevProps) {
+    // Data will be reloaded only if the "params" prop has changed
+    if (!equals(prevProps.params, this.props.params)) {
+      await this.loadAll()
+    }
+  }
+
+  loadAll = async reload => {
     this.setState({ loading: true }, async () => {
-      const { loaders, options, context, getContext, setContext } = this.props
+      const { loaders, ...props } = this.props
       try {
-        const data = await asyncProps(mapObjIndexed(loader =>
-          loader({
-            context,
-            getContext,
-            setContext,
-            reload: options.reloadOnMount,
-          }), loaders,
+        await asyncProps(mapObjIndexed(loader =>
+          loader({ ...props, reload }), loaders,
         ))
-        setContext(merge(data))
         this.setState({ loading: false, error: null })
       } catch (err) {
         console.log(err)
         this.setState({ loading: false, error: err.toString() })
       }
     })
-  }
-
-  loadOne = (loaderKey, params, reload, cascade = false) => {
-    this.setState({ loading: true }, async () => {
-      const { loaders, context, getContext, setContext } = this.props
-      try {
-        const data = await loaders[loaderKey]({
-          context,
-          getContext,
-          setContext,
-          params,
-          reload,
-          cascade,
-        })
-        setContext(assoc(loaderKey, data))
-        this.setState({ loading: false, error: null })
-      } catch (err) {
-        console.log(err)
-        this.setState({ loading: false, error: err.toString() })
-      }
-    })
-  }
-
-  mapDataFromContext = () => {
-    const { context, loaders } = this.props
-    return pick(Object.keys(loaders), context)
   }
 
   render () {
@@ -68,17 +42,12 @@ class DataLoaderBase extends PureComponent {
     if (error) {
       return <DisplayError error={error} />
     }
-    const data = this.mapDataFromContext()
-    const { children, options, ...rest } = this.props
+    const { children, options, loaders, ...props } = this.props
     return <Progress inline={options.inlineProgress} overlay loading={loading}>
-      {children({ ...rest, data, loading, error, reloadData: this.loadOne })}
+      {children({ ...props, loading, error })}
     </Progress>
   }
 }
-
-const DataLoader = compose(
-  withAppContext,
-)(DataLoaderBase)
 
 DataLoader.propTypes = {
   /**
@@ -91,6 +60,8 @@ DataLoader.propTypes = {
     inlineProgress: PropTypes.bool,
     reloadOnMount: PropTypes.bool,
   }),
+
+  params: PropTypes.object,
 }
 
 DataLoader.defaultProps = {
@@ -99,11 +70,5 @@ DataLoader.defaultProps = {
     reloadOnMount: false,
   },
 }
-
-export const withDataLoader = (loaders, options) => Component => props => (
-  <DataLoader loaders={loaders} options={options}>
-    {loaderProps => <Component {...loaderProps} {...props} />}
-  </DataLoader>
-)
 
 export default DataLoader

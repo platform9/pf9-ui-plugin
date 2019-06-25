@@ -1,8 +1,7 @@
 import React from 'react'
 import ExternalLink from 'core/components/ExternalLink'
-import { compose } from 'ramda'
+import { compose, pathOr } from 'ramda'
 import { withAppContext } from 'core/AppContext'
-import { withDataLoader } from 'core/DataLoader'
 import { attachNodesToCluster } from './actions'
 import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab'
 import {
@@ -10,6 +9,8 @@ import {
   Typography,
 } from '@material-ui/core'
 import { loadNodes } from 'k8s/components/infrastructure/actions'
+import withDataLoader from 'core/hocs/withDataLoader'
+import withDataMapper from 'core/hocs/withDataMapper'
 
 // The modal is technically inside the row, so clicking anything inside
 // the modal window will cause the table row to be toggled.
@@ -104,6 +105,7 @@ class ClusterAttachNodeDialog extends React.Component {
 }
 
 export default compose(
-  withDataLoader({ nodes: loadNodes }),
   withAppContext,
+  withDataLoader({ nodes: loadNodes }),
+  withDataMapper({ nodes: pathOr([], ['context', 'nodes']) }),
 )(ClusterAttachNodeDialog)

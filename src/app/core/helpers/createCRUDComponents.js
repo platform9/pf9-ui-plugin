@@ -3,13 +3,15 @@ import { compose } from 'app/utils/fp'
 import { withAppContext } from 'core/AppContext'
 import CRUDListContainer from 'core/components/CRUDListContainer'
 import ListTable from 'core/components/listTable/ListTable'
-import DataLoader from 'core/DataLoader'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { withScopedPreferences } from 'core/providers/PreferencesProvider'
 import requiresAuthentication from 'openstack/util/requiresAuthentication'
 import { withRouter } from 'react-router-dom'
 import { Button } from '@material-ui/core'
 import TopExtraContent from 'core/components/TopExtraContent'
+import withDataLoader from 'core/hocs/withDataLoader'
+import withDataMapper from 'core/hocs/withDataMapper'
+import { pathOr, prop } from 'ramda'
 
 /**
  * This helper removes a lot of boilerplate from standard CRUD operations.
@@ -31,30 +33,24 @@ import TopExtraContent from 'core/components/TopExtraContent'
  */
 
 const createCRUDComponents = options => {
-  const defaults = {
-    columns: [],
-    rowActions: () => [],
-    uniqueIdentifier: 'id',
-    addText: 'Add',
-  }
-
   const {
     actions,
-    addUrl,
-    addText,
-    columns,
+    crudActions = actions ? createCRUDActions(actions) : null,
     dataKey,
-    editUrl,
-    debug,
     deleteFn,
     loaderFn,
+    mappers = { [dataKey]: pathOr([], ['context', dataKey]) },
+    loaders = loaderFn || crudActions ? { [dataKey]: loaderFn || prop('list', crudActions) } : null,
+    columns = [],
+    rowActions = () => [],
+    uniqueIdentifier = 'id',
+    addText = 'Add',
+    addUrl,
+    editUrl,
+    debug,
     name,
-    rowActions,
     title,
-    uniqueIdentifier,
-  } = { ...defaults, ...options }
-
-  const crudActions = actions ? createCRUDActions(actions) : null
+  } = options
 
   // List
   const List = withScopedPreferences(name)(({
@@ -134,20 +130,28 @@ const createCRUDComponents = options => {
 
   ListContainer.displayName = `${name}ListContainer`
 
-  // ListPage
-  const StandardListPage = () => (
-    <DataLoader loaders={{ [dataKey]: loaderFn || crudActions.list }}>
-      {({ data }) =>
-        <React.Fragment>
-          <ListContainer data={data[dataKey]} />
-          {debug && <pre>{JSON.stringify(data[dataKey], null, 4)}</pre>}
-        </React.Fragment>
+  const createStandardListPage = () => {
+    // ListPage
+    let StandardListPage = ({ data }) => (
+      <React.Fragment>
+        <ListContainer data={data[dataKey]} />
+        {debug && <pre>{JSON.stringify(data[dataKey], null, 4)}</pre>}
+      </React.Fragment>
+    )
+
+    if (loaders) {
+      if (mappers) {
+        StandardListPage = withDataMapper(mappers)(StandardListPage)
       }
-    </DataLoader>
-  )
+      StandardListPage = withDataLoader(loaders)(StandardListPage)
+    }
+    return StandardListPage
+  }
+
   const ListPage = requiresAuthentication(options.ListPage
     ? options.ListPage({ ListContainer })
-    : StandardListPage)
+    : createStandardListPage())
+
   ListPage.displayName = `${name}ListPage`
 
   return {

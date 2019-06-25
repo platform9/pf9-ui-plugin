@@ -120,14 +120,14 @@ const CardTableToolbar = ({
     )}
     <div className={classes.actions}>
       <div className={classes.filters}>
-        {filters.map(({ field, ...filterProps }) => (
+        {filters.map(({ field, value, ...filterProps }) => (
           <FilterDropdown
             key={field}
             {...filterProps}
             className={classes.filter}
             onChange={onFilterUpdate(field)}
             field={field}
-            value={filterValues[field]}
+            value={value !== undefined ? value : filterValues[field]}
           />
         ))}
       </div>

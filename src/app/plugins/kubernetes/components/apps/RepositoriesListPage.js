@@ -1,13 +1,8 @@
-import React from 'react'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { loadRepositories, deleteRepository } from 'k8s/components/apps/actions'
-import { withDataLoader } from 'core/DataLoader'
-import { loadClusters } from 'k8s/components/infrastructure/actions'
-
-const ListPage = ({ ListContainer }) =>
-  ({ context: { repositories } }) => <ListContainer data={repositories} />
 
 export const options = {
+  loaderFn: loadRepositories,
   columns: [
     { id: 'attributes.name', label: 'Name' },
     { id: 'attributes.URL', label: 'URL' },
@@ -20,11 +15,8 @@ export const options = {
   name: 'Repositories',
   title: 'Repositories',
   uniqueIdentifier: 'id',
-  ListPage,
 }
 
 const { ListPage: RepositoriesListPage } = createCRUDComponents(options)
 
-export default withDataLoader(
-  { clusters: loadClusters, repositories: loadRepositories },
-)(RepositoriesListPage)
+export default RepositoriesListPage

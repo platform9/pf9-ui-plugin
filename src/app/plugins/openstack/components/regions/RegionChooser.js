@@ -1,11 +1,12 @@
 import React from 'react'
 import Selector from 'core/components/Selector'
 import { appUrlRoot } from 'app/constants'
-import { compose, pluck, propEq } from 'ramda'
+import { compose, pluck, propEq, pathOr } from 'ramda'
 import { withAppContext } from 'core/AppContext'
-import { withDataLoader } from 'core/DataLoader'
 import { withScopedPreferences } from 'core/providers/PreferencesProvider'
 import contextLoader from 'core/helpers/contextLoader'
+import withDataLoader from 'core/hocs/withDataLoader'
+import withDataMapper from 'core/hocs/withDataMapper'
 
 const loadRegions = contextLoader('regions', async ({ apiClient }) => {
   return apiClient.keystone.getRegions()
@@ -59,5 +60,8 @@ class RegionChooser extends React.Component {
 export default compose(
   withAppContext,
   withDataLoader({ regions: loadRegions }, { inlineProgress: true }),
+  withDataMapper({
+    regions: pathOr([], ['context', 'regions']),
+  }),
   withScopedPreferences('RegionChooser'),
 )(RegionChooser)

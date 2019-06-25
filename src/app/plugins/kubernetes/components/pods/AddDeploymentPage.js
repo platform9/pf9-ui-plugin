@@ -4,11 +4,10 @@ import PicklistField from 'core/components/validatedForm/PicklistField'
 import SubmitButton from 'core/components/SubmitButton'
 import createAddComponents from 'core/helpers/createAddComponents'
 import { projectAs } from 'utils/fp'
-import { loadClusters } from '../infrastructure/actions'
 import { loadDeployments, createDeployment } from './actions'
-import { withDataLoader } from 'core/DataLoader'
 import CodeMirror from 'core/components/validatedForm/CodeMirror'
-import { compose } from 'ramda'
+import clusterizedDataLoader from 'k8s/helpers/clusterizedDataLoader'
+import { loadNamespaces } from 'k8s/components/namespaces/actions'
 
 export class AddDeploymentForm extends React.Component {
   state = {
@@ -18,7 +17,8 @@ export class AddDeploymentForm extends React.Component {
 
   handleClusterChange = value => {
     const { context } = this.props
-    const namespaceOptions = context.namespaces.filter(n => n.clusterId === value).map(n => ({ value: n.name, label: n.name }))
+    const namespaceOptions = context.namespaces.filter(n => n.clusterId === value).map(
+      n => ({ value: n.name, label: n.name }))
     this.setState({ namespaceOptions })
   }
 
@@ -30,7 +30,10 @@ export class AddDeploymentForm extends React.Component {
       mode: 'yaml',
     }
 
-    const clusterOptions = data.clusters ? projectAs({ value: 'uuid', label: 'name' }, data.clusters) : []
+    const clusterOptions = data.clusters ? projectAs({
+      value: 'uuid',
+      label: 'name',
+    }, data.clusters) : []
 
     return (
       <ValidatedForm onSubmit={onComplete}>
@@ -60,11 +63,9 @@ export const options = {
   loaderFn: loadDeployments,
   listUrl: '/ui/kubernetes/pods#deployments',
   name: 'AddDeployment',
-  title: 'Create Deployment'
+  title: 'Create Deployment',
 }
 
 const { AddPage } = createAddComponents(options)
 
-export default compose(
-  withDataLoader({ clusters: loadClusters }),
-)(AddPage)
+export default clusterizedDataLoader('namespaces', loadNamespaces)(AddPage)

@@ -14,7 +14,7 @@ let resolvers = {}
 const contextLoader = (contextPath, loaderFn, defaultValue = []) => {
   const arrContextPath = ensureArray(contextPath)
 
-  const resolver = async ({ getContext, setContext, params = {}, reload = false, cascade = false, nofetch = false, ...rest }) => {
+  const resolver = async ({ getContext, setContext, reload = false, cascade = false, nofetch = false, ...props }) => {
     let promise = path(arrContextPath, pendingPromises)
     if (promise) {
       return promise
@@ -26,16 +26,15 @@ const contextLoader = (contextPath, loaderFn, defaultValue = []) => {
         await setContext(assocPath(arrContextPath, defaultValue))
       }
       const args = {
+        ...props,
         context: getContext(),
         getContext,
         setContext,
         apiClient: getContext('apiClient'),
-        params,
         reload: reload && cascade,
         cascade,
         loadFromContext: (contextPath, customArgs) =>
           path(ensureArray(contextPath), resolvers)({ ...args, ...customArgs }),
-        ...rest,
       }
       promise = loaderFn(args)
       pendingPromises = assocPath(arrContextPath, promise, pendingPromises)
