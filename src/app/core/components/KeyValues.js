@@ -1,55 +1,41 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import AutocompleteBase from 'core/components/AutocompleteBase'
 import Button from '@material-ui/core/Button'
 import IconButton from '@material-ui/core/IconButton'
 import DeleteIcon from '@material-ui/icons/Delete'
 import uuid from 'uuid'
+import { assoc } from 'ramda'
 
-class KeyValue extends React.Component {
-  constructor (props) {
-    super(props)
-    const entry = props.entry || {}
-    this.state = {
-      id: entry.id || uuid.v4(),
-      key: entry.key || '',
-      value: entry.value || '',
-    }
-  }
+const KeyValue = ({ entry = {}, onChange, onDelete, keySuggestions, valueSuggestions }) => {
+  const [state, setState] = useState({
+    id: entry.id || uuid.v4(),
+    key: entry.key || '',
+    value: entry.value || '',
+  })
 
-  // Unfortunate overloading of naming going on here.
-  // field is one of ['key', 'value'], and value is the value of the field.
-  handleChange = field => value => {
-    const { onChange } = this.props
-    this.setState(
-      () => ({ [field]: value }),
-      () => onChange && onChange(this.state)
-    )
-  }
+  useEffect(() => onChange(state), [state])
 
-  render () {
-    const { onDelete, keySuggestions, valueSuggestions } = this.props
-    const { key, value } = this.state
+  const handleChange = field => value => setState(assoc(field, value, state))
 
-    return (
-      <div style={{ display: 'flex' }}>
-        <AutocompleteBase
-          label="Key"
-          value={key}
-          onChange={this.handleChange('key')}
-          suggestions={keySuggestions}
-        />
-        &nbsp;
-        <AutocompleteBase
-          label="Value"
-          value={value}
-          onChange={this.handleChange('value')}
-          suggestions={valueSuggestions}
-        />
-        <IconButton onClick={onDelete}><DeleteIcon /></IconButton>
-      </div>
-    )
-  }
+  return (
+    <div style={{ display: 'flex' }}>
+      <AutocompleteBase
+        label="Key"
+        value={state.key}
+        onChange={handleChange('key')}
+        suggestions={keySuggestions}
+      />
+      &nbsp;
+      <AutocompleteBase
+        label="Value"
+        value={state.value}
+        onChange={handleChange('value')}
+        suggestions={valueSuggestions}
+      />
+      <IconButton onClick={onDelete}><DeleteIcon /></IconButton>
+    </div>
+  )
 }
 
 const newEntry = () => ({ id: uuid.v4(), key: '', value: '' })
@@ -61,65 +47,40 @@ const newEntry = () => ({ id: uuid.v4(), key: '', value: '' })
 // filter it out before submitting. :(
 const addId = entry => ({ ...entry, id: uuid.v4() })
 
-class KeyValues extends React.Component {
-  constructor (props) {
-    super(props)
-    const entries = (this.props.entries || []).map(addId)
-    this.state = { entries: [...entries, newEntry()] }
-  }
+const KeyValues = ({ entries: _entries, onChange, keySuggestions, valueSuggestions }) => {
+  const entriesWithId = [...(_entries || []).map(addId), newEntry()]
+  const [entries, setEntries] = useState(entriesWithId)
 
-  addBlankEntry = () => {
-    this.setState(state => ({
-      entries: [...state.entries, newEntry()]
-    }))
-  }
+  const addBlankEntry = () => setEntries([...entries, newEntry()])
+  const deleteEntry = id => () => setEntries(entries.filter(x => x.id !== id))
+  const handleChange = entry => setEntries(entries.map(x => (x.id === entry.id) ? entry : x))
 
-  propogateChange = () => {
+  useEffect(() => {
     // Remove empty entries and strip out id
     const noEmptyKeys = x => x.key.length > 0
     const removeId = ({ key, value }) => ({ key, value })
-    const entries = (this.state.entries || []).filter(noEmptyKeys).map(removeId)
-    if (this.props.onChange) {
-      this.props.onChange(entries)
-    }
-  }
+    const sanitized = (entries || []).filter(noEmptyKeys).map(removeId)
+    onChange && onChange(sanitized)
+  }, [entries])
 
-  deleteEntry = id => () => {
-    this.setState(
-      state => ({ entries: state.entries.filter(x => x.id !== id) }),
-      this.propogateChange
-    )
-  }
-
-  handleChange = entry => {
-    this.setState(
-      state => ({ ...state, entries: state.entries.map(x => (x.id === entry.id) ? entry : x) }),
-      this.propogateChange
-    )
-  }
-
-  render () {
-    const { keySuggestions, valueSuggestions } = this.props
-
-    return (
+  return (
+    <div>
+      {entries.map(entry => (
+        <KeyValue
+          key={entry.id}
+          keySuggestions={keySuggestions}
+          valueSuggestions={valueSuggestions}
+          entry={entry}
+          onChange={handleChange}
+          onDelete={deleteEntry(entry.id)}
+        />
+      ))}
       <div>
-        {this.state.entries.map(entry => (
-          <KeyValue
-            key={entry.id}
-            keySuggestions={keySuggestions}
-            valueSuggestions={valueSuggestions}
-            entry={entry}
-            onChange={this.handleChange}
-            onDelete={this.deleteEntry(entry.id)}
-          />
-        ))}
-        <div>
-          <br />
-          <Button variant="contained" color="primary" onClick={this.addBlankEntry}>Add key / value pair</Button>
-        </div>
+        <br />
+        <Button variant="contained" color="primary" onClick={addBlankEntry}>Add key / value pair</Button>
       </div>
-    )
-  }
+    </div>
+  )
 }
 
 export const EntryShape = PropTypes.shape({
