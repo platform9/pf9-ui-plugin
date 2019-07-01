@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { ThemeProvider } from '@material-ui/styles'
 import AppContext from 'core/AppContext'
 import AppContainer from 'core/components/AppContainer'
 import HotKeysProvider from 'core/providers/HotKeysProvider'
@@ -16,7 +15,6 @@ import { pathJoin } from 'utils/misc'
 import config from '../../config'
 import ApiClient from '../api-client'
 import './app.css'
-import theme from './theme'
 import { setupFromConfig } from './utils/registry'
 
 setupFromConfig(config)
@@ -70,31 +68,29 @@ class App extends React.Component {
     const devEnabled = window.localStorage.enableDevPlugin === 'true'
     return (
       <Router>
-        <ThemeProvider theme={theme}>
-          <HotKeysProvider>
-            <ToastProvider>
-              <AppContext initialContext={{ apiClient, initialized: false, sessionLoaded: false }}>
-                <PreferencesProvider>
-                  <ThemeManager>
-                    <div id="_main-container">
-                      <SessionManager>
-                        <AppContainer
-                          sections={plugins.map(([id, plugin]) => ({
-                            id,
-                            name: plugin.name,
-                            links: plugin.getNavItems()
-                          }))}>
-                          {plugins.map(apply(this.renderPluginRoutes))}
-                          {devEnabled && <DeveloperToolsEmbed />}
-                        </AppContainer>
-                      </SessionManager>
-                    </div>
-                  </ThemeManager>
-                </PreferencesProvider>
-              </AppContext>
-            </ToastProvider>
-          </HotKeysProvider>
-        </ThemeProvider>
+        <HotKeysProvider>
+          <ToastProvider>
+            <AppContext initialContext={{ apiClient, initialized: false, sessionLoaded: false }}>
+              <PreferencesProvider>
+                <ThemeManager>
+                  <div id="_main-container">
+                    <SessionManager>
+                      <AppContainer
+                        sections={plugins.map(([id, plugin]) => ({
+                          id,
+                          name: plugin.name,
+                          links: plugin.getNavItems()
+                        }))}>
+                        {plugins.map(apply(this.renderPluginRoutes))}
+                        {devEnabled && <DeveloperToolsEmbed />}
+                      </AppContainer>
+                    </SessionManager>
+                  </div>
+                </ThemeManager>
+              </PreferencesProvider>
+            </AppContext>
+          </ToastProvider>
+        </HotKeysProvider>
       </Router>
     )
   }

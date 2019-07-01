@@ -44,7 +44,9 @@ class ThemeManager extends React.Component {
     const theme = context.theme
     return theme
       ? <ThemeProvider theme={theme}>{children}</ThemeProvider>
-      : children
+      // Rendering the app before the theme is loaded will have issues because `withStyles`
+      // requires the `theme` object to exist.
+      : <div>Loading theme...</div>
   }
 }
 

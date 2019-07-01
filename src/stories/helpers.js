@@ -1,12 +1,10 @@
 import React from 'react'
+import 'app/app.css'
+import AppContext from 'core/AppContext'
+import ThemeManager from 'app/ThemeManager'
+import { ToastProvider } from 'core/providers/ToastProvider'
 import { decorateAction } from '@storybook/addon-actions'
 import { storiesOf } from '@storybook/react'
-import 'app/app.css'
-import { withAppTheme } from 'app/theme'
-import { compose } from 'ramda'
-import AppContext, { withAppContext } from 'core/AppContext'
-import HotKeysContext from 'core/providers/HotKeysProvider'
-import { ToastProvider } from 'core/providers/ToastProvider'
 
 const objToJsonDetails = obj => JSON.stringify(obj, null, 4)
 const isArray = x => x instanceof Array
@@ -16,22 +14,16 @@ export const jsonDetailLogger = decorateAction([
   args => args.map(x => (isObject(x) ? objToJsonDetails(x) : x)),
 ])
 
-export const withWrappings = Component =>
-  compose(
-    withAppTheme,
-    withAppContext,
-  )(Component)
-
-const Pf9StoryWrapper = withWrappings(({ children }) => <div>{children}</div>)
-
 export const pf9Decorators = storyFn => (
-  <HotKeysContext>
+  <div style={{ margin: '16px' }}>
     <AppContext>
-      <ToastProvider>
-        <Pf9StoryWrapper>{storyFn()}</Pf9StoryWrapper>
-      </ToastProvider>
+      <ThemeManager>
+        <ToastProvider>
+          {storyFn()}
+        </ToastProvider>
+      </ThemeManager>
     </AppContext>
-  </HotKeysContext>
+  </div>
 )
 
 export const addStory = (section, subsection, story, mod) =>
