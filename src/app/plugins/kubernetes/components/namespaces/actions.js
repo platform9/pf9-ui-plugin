@@ -3,10 +3,10 @@ import { asyncFlatMap } from 'utils/fp'
 import { pluck } from 'ramda'
 import clusterContextUpdater from 'core/helpers/clusterContextUpdater'
 
-export const loadNamespaces = clusterContextLoader('namespaces', async ({ apiClient, clusters, params: { clusterId } }) => {
+export const loadNamespaces = clusterContextLoader('namespaces', async ({ apiClient, loadFromContext, params: { clusterId } }) => {
   const { qbert } = apiClient
-  return clusterId === '__all__'
-    ? asyncFlatMap(pluck('uuid', clusters), qbert.getClusterNamespaces)
+  return !clusterId || clusterId === '__all__'
+    ? asyncFlatMap(pluck('uuid', await loadFromContext('clusters')), qbert.getClusterNamespaces)
     : qbert.getClusterNamespaces(clusterId)
 })
 

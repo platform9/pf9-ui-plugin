@@ -5,19 +5,19 @@ import { asyncFlatMap } from 'utils/fp'
 
 export const loadApps = clusterContextLoader(
   'apps',
-  async ({ apiClient, clusters, params: { clusterId } }) => {
+  async ({ apiClient, params: { clusterId }, loadFromContext }) => {
     const { qbert } = apiClient
-    return clusterId === '__all__'
-      ? asyncFlatMap(pluck('uuid', clusters), qbert.getCharts)
+    return !clusterId || clusterId === '__all__'
+      ? asyncFlatMap(pluck('uuid', await loadFromContext('clusters')), qbert.getCharts)
       : qbert.getCharts(clusterId)
   })
 
 export const loadReleases = clusterContextLoader(
   'releases',
-  async ({ apiClient, clusters, params: { clusterId } }) => {
+  async ({ apiClient, params: { clusterId }, loadFromContext }) => {
     const { qbert } = apiClient
-    return clusterId === '__all__'
-      ? asyncFlatMap(pluck('uuid', clusters), qbert.getReleases)
+    return !clusterId || clusterId === '__all__'
+      ? asyncFlatMap(pluck('uuid', await loadFromContext('clusters')), qbert.getReleases)
       : qbert.getReleases(clusterId)
   })
 
@@ -25,9 +25,10 @@ export const deleteRelease = async ({ data, setContext, reload }) => {
   // TODO
 }
 
-export const loadRepositories = contextLoader('repositories', async ({ apiClient }) => {
-  return apiClient.qbert.getRepositories().then(prop('data'))
-})
+export const loadRepositories = contextLoader('repositories',
+  async ({ apiClient }) => {
+    return apiClient.qbert.getRepositories().then(prop('data'))
+  })
 
 export const deleteRepository = async ({ data, setContext, params, reload }) => {
   // TODO

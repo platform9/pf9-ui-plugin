@@ -1,5 +1,4 @@
-import { pathOr, prop, groupBy, assocPath } from 'ramda'
-import { loadClusters } from 'k8s/components/infrastructure/actions'
+import { prop, groupBy, assocPath, path } from 'ramda'
 import contextLoader from 'core/helpers/contextLoader'
 import { ensureArray } from 'utils/fp'
 
@@ -20,30 +19,25 @@ import { ensureArray } from 'utils/fp'
 //     { "id": "stable/card", }
 //   ],
 // }
-const clusterContextLoader = (key, loaderFn, defaultValue = []) =>
-  async ({ getContext, setContext, params = {}, ...rest }) => {
-    const keyPath = ensureArray(key)
-    const clusters = (await loadClusters({ getContext, setContext, ...rest, reload: false }))
-    const { clusterId = pathOr('__all__', [0, 'uuid'], clusters) } = params
-    const resolver = contextLoader([...keyPath, clusterId], loaderFn, defaultValue)
-
-    const loadedData = await resolver({
-      getContext,
-      setContext,
-      params: { ...params, clusterId },
-      clusters,
-      ...rest,
-    })
-    if (clusterId === '__all__') {
-      // update all cluster indexed positions in bulk
-      await setContext(context => {
-        assocPath(keyPath, {
-          ...groupBy(prop('clusterId'), loadedData),
-          '__all__': loadedData,
-        }, context)
-      })
+const clusterContextLoader = (key, loaderFn) => {
+  const arrContextPath = ensureArray(key)
+  const contextGetter = (context, { params: { clusterId } = {} }) =>
+    path([...arrContextPath, clusterId || '__all__'], context)
+  const contextSetter = (context, data, { params: { clusterId } = {} }) => {
+    // update all cluster indexed positions in bulk
+    if (!clusterId || clusterId === '__all__') {
+      return assocPath(arrContextPath, {
+        ...groupBy(prop('clusterId'), data),
+        '__all__': data,
+      }, context)
     }
-    return loadedData
+    return assocPath([...arrContextPath, clusterId], data, context)
   }
+
+  return contextLoader(key, loaderFn, {
+    contextGetter,
+    contextSetter,
+  })
+}
 
 export default clusterContextLoader

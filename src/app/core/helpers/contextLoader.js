@@ -8,24 +8,30 @@ let resolvers = {}
  * Returns a function that will use context to load and cache values
  * @param contextPath Context path (a string or array for deep paths) on which the resolved value will be cached
  * @param loaderFn Function returning the data to be assigned to the context
- * @param defaultValue Default value assigned to the context
+ * @param options {contextGetter, contextSetter, defaultValue}
  * @returns {Function}
  */
-const contextLoader = (contextPath, loaderFn, defaultValue = []) => {
+const contextLoader = (contextPath, loaderFn, options) => {
   const arrContextPath = ensureArray(contextPath)
+  const {
+    contextGetter = context => path(arrContextPath, context),
+    contextSetter = (context, output) => assocPath(arrContextPath, output, context),
+    defaultValue = [],
+  } = options || {}
 
   const resolver = async ({ getContext, setContext, reload = false, cascade = false, nofetch = false, ...props }) => {
     let promise = path(arrContextPath, pendingPromises)
     if (promise) {
       return promise
     }
-    let output = getContext(arrContextPath)
+    let output = getContext(ctx => contextGetter(ctx, props))
 
     if ((reload || !output) && !nofetch) {
       if (!output && defaultValue) {
-        await setContext(assocPath(arrContextPath, defaultValue))
+        await setContext(ctx => contextSetter(ctx, defaultValue, props))
       }
       const args = {
+        params: {},
         ...props,
         context: getContext(),
         getContext,
@@ -39,7 +45,7 @@ const contextLoader = (contextPath, loaderFn, defaultValue = []) => {
       promise = loaderFn(args)
       pendingPromises = assocPath(arrContextPath, promise, pendingPromises)
       output = await promise
-      await setContext(context => assocPath(arrContextPath, output, context))
+      await setContext(ctx => contextSetter(ctx, output, props))
       pendingPromises = dissocPath(arrContextPath, pendingPromises)
     }
     return output || defaultValue
