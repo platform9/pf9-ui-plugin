@@ -5,8 +5,9 @@ import clusterContextUpdater from 'core/helpers/clusterContextUpdater'
 
 export const loadNamespaces = clusterContextLoader('namespaces', async ({ apiClient, loadFromContext, params: { clusterId } }) => {
   const { qbert } = apiClient
+  const clusters = await loadFromContext('clusters')
   return !clusterId || clusterId === '__all__'
-    ? asyncFlatMap(pluck('uuid', await loadFromContext('clusters')), qbert.getClusterNamespaces)
+    ? asyncFlatMap(pluck('uuid', clusters), qbert.getClusterNamespaces)
     : qbert.getClusterNamespaces(clusterId)
 })
 

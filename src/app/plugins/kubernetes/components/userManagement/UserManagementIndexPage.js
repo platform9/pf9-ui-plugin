@@ -1,9 +1,9 @@
 import React from 'react'
 import Tabs from 'core/components/Tabs'
 import Tab from 'core/components/Tab'
+import TenantsListPage from 'k8s/components/userManagement/TenantsListPage'
+import UsersListPage from 'k8s/components/userManagement/UsersListPage'
 
-const TenantsListPage = () => <h1>TODO: Tenants List Page</h1>
-const UsersListPage = () => <h1>TODO: Users List Page</h1>
 const UserGroupsListPage = () => <h1>TODO: User Groups List Page</h1>
 const RolesListPage = () => <h1>TODO: Roles List Page</h1>
 

@@ -7,8 +7,9 @@ export const loadApps = clusterContextLoader(
   'apps',
   async ({ apiClient, params: { clusterId }, loadFromContext }) => {
     const { qbert } = apiClient
+    const clusters = await loadFromContext('clusters')
     return !clusterId || clusterId === '__all__'
-      ? asyncFlatMap(pluck('uuid', await loadFromContext('clusters')), qbert.getCharts)
+      ? asyncFlatMap(pluck('uuid', clusters), qbert.getCharts)
       : qbert.getCharts(clusterId)
   })
 
@@ -16,8 +17,9 @@ export const loadReleases = clusterContextLoader(
   'releases',
   async ({ apiClient, params: { clusterId }, loadFromContext }) => {
     const { qbert } = apiClient
+    const clusters = await loadFromContext('clusters')
     return !clusterId || clusterId === '__all__'
-      ? asyncFlatMap(pluck('uuid', await loadFromContext('clusters')), qbert.getReleases)
+      ? asyncFlatMap(pluck('uuid', clusters), qbert.getReleases)
       : qbert.getReleases(clusterId)
   })
 
