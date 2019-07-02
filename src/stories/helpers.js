@@ -1,6 +1,7 @@
 import React from 'react'
 import 'app/app.css'
 import AppContext from 'core/AppContext'
+import HotKeysProvider from 'core/providers/HotKeysProvider'
 import ThemeManager from 'app/ThemeManager'
 import { ToastProvider } from 'core/providers/ToastProvider'
 import { decorateAction } from '@storybook/addon-actions'
@@ -14,14 +15,18 @@ export const jsonDetailLogger = decorateAction([
   args => args.map(x => (isObject(x) ? objToJsonDetails(x) : x)),
 ])
 
-export const pf9Decorators = storyFn => (
+// HotKeysProvider has a dependency on AppContext.  It is needed for rendering the sidenav.
+// ToastProvider has a dependency on ThemeManager
+export const appDecorators = storyFn => (
   <div style={{ margin: '16px' }}>
     <AppContext>
-      <ThemeManager>
-        <ToastProvider>
-          {storyFn()}
-        </ToastProvider>
-      </ThemeManager>
+      <HotKeysProvider>
+        <ThemeManager>
+          <ToastProvider>
+            {storyFn()}
+          </ToastProvider>
+        </ThemeManager>
+      </HotKeysProvider>
     </AppContext>
   </div>
 )

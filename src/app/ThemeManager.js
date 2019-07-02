@@ -1,7 +1,7 @@
 import React from 'react'
 import { withAppContext } from 'core/AppContext'
 import { deepOrange } from '@material-ui/core/colors'
-import { createMuiTheme } from '@material-ui/core/styles'
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
 import { ThemeProvider } from '@material-ui/styles'
 
 const defaultThemeJson = {
@@ -42,11 +42,20 @@ class ThemeManager extends React.Component {
   render () {
     const { children, context } = this.props
     const theme = context.theme
-    return theme
-      ? <ThemeProvider theme={theme}>{children}</ThemeProvider>
-      // Rendering the app before the theme is loaded will have issues because `withStyles`
-      // requires the `theme` object to exist.
-      : <div>Loading theme...</div>
+
+    // Rendering the app before the theme is loaded will have issues because `withStyles`
+    // requires the `theme` object to exist.
+    if (!theme) { return <div>Loading theme...</div> }
+
+    // Storybook will not work unless you include BOTH (yes BOTH) the new way and the
+    // deprecated way.  But for some reason it works fine in the normal app with just
+    // ThemeProvider.
+    // https://github.com/mui-org/material-ui/issues/14078
+    return (
+      <MuiThemeProvider theme={theme}>
+        <ThemeProvider theme={theme}>{children}</ThemeProvider>
+      </MuiThemeProvider>
+    )
   }
 }
 

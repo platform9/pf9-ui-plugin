@@ -1,6 +1,6 @@
 import StoryRouter from 'storybook-react-router'
 import { addDecorator, addParameters, configure } from '@storybook/react'
-import { pf9Decorators } from './helpers'
+import { appDecorators } from './helpers'
 import { create } from '@storybook/theming'
 import { withKnobs } from '@storybook/addon-knobs'
 
@@ -13,7 +13,7 @@ import { withKnobs } from '@storybook/addon-knobs'
 
 addDecorator(withKnobs)
 addDecorator(StoryRouter())
-addDecorator(pf9Decorators)
+addDecorator(appDecorators)
 
 const storybookTheme = create({
   base: 'light',

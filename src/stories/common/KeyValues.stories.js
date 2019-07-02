@@ -6,9 +6,7 @@ import KeyValues from 'core/components/KeyValues'
 const addStories = addStoriesFromModule(module)
 
 addStories('Common Components/KeyValues', {
-  'Default settings': () => (
-    <KeyValues />
-  ),
+  'Default settings': () => <KeyValues />,
 
   'Pre-populated': () => {
     const entries = [
@@ -17,14 +15,9 @@ addStories('Common Components/KeyValues', {
       { key: 'bbb', value: '222' },
       { key: 'ccc', value: '333' },
     ]
-    return (
-      <KeyValues entries={entries} />
-    )
+    return <KeyValues entries={entries} />
   },
 
-  'Populated w/ suggestions': () => {
-    return (
-      <KeyValues entries={[]} keySuggestions={['one', 'two', 'three']} />
-    )
-  }
+  'Populated w/ suggestions': () =>
+    <KeyValues entries={[]} keySuggestions={['one', 'two', 'three']} />
 })
