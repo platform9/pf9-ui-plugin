@@ -67,7 +67,9 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        exclude: /node_modules/,
+        // @storybook/addon-info does not compile their own css with webpack.
+        // I filed an issue: https://github.com/storybookjs/storybook/issues/7246
+        exclude: /node_modules(?!\/@storybook\/addon-info)/,
         use: ['style-loader', 'css-loader'],
       },
     ]

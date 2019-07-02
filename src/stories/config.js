@@ -2,15 +2,10 @@ import StoryRouter from 'storybook-react-router'
 import { addDecorator, addParameters, configure } from '@storybook/react'
 import { appDecorators } from './helpers'
 import { create } from '@storybook/theming'
+import { withInfo } from '@storybook/addon-info'
 import { withKnobs } from '@storybook/addon-knobs'
 
-// TODO: figure out how to fix and re-enable this decorator
-// This is causing a build error for storybook.  Disabling for now.
-// import { withInfo } from '@storybook/addon-info'
-
-// withInfo seems to cause build failures with the latest version
-// addDecorator( withInfo({ header: false, inline: true, source: true }))
-
+addDecorator(withInfo({ header: false, inline: true, source: true }))
 addDecorator(withKnobs)
 addDecorator(StoryRouter())
 addDecorator(appDecorators)
