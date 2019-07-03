@@ -4,7 +4,7 @@ import { path, assocPath, flatten, omit } from 'ramda'
 import { ensureArray } from 'utils/fp'
 import { withToast } from 'core/providers/ToastProvider'
 
-const Context = React.createContext({})
+export const Context = React.createContext({})
 export const Consumer = Context.Consumer
 export const Provider = Context.Provider
 

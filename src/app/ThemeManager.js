@@ -1,8 +1,9 @@
-import React from 'react'
-import { withAppContext } from 'core/AppContext'
+import React, { useContext, useEffect } from 'react'
+import axios from 'axios'
 import { deepOrange } from '@material-ui/core/colors'
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
 import { ThemeProvider } from '@material-ui/styles'
+import { Context } from 'core/AppContext'
 
 const defaultThemeJson = {
   typography: {
@@ -30,33 +31,46 @@ const defaultThemeJson = {
   },
 }
 
-class ThemeManager extends React.Component {
-  getThemeJson = () => this.props.context.themeJson || defaultThemeJson
+const ThemeManager = ({ children }) => {
+  const context = useContext(Context)
+  const themeJson = context.themeJson || defaultThemeJson
 
-  componentDidMount () {
-    const themeJson = this.getThemeJson()
+  useEffect(() => {
     const theme = createMuiTheme(themeJson)
-    this.props.setContext({ theme, themeJson })
-  }
+    context.setContext({ theme, themeJson })
 
-  render () {
-    const { children, context } = this.props
-    const theme = context.theme
+    const loadTheme = async () => {
+      try {
+        const response = await axios.get('/ui/theme.json')
+        const loadedTheme = response.data
+        if (!loadedTheme) { console.error('Unable to load theme.json') }
+        if (loadedTheme) { console.info('Loaded theme.json') }
+        context.setContext({
+          theme: createMuiTheme(loadedTheme),
+          themeJson: loadedTheme,
+        })
+      } catch (err) {
+        console.log(err)
+      }
+    }
+    loadTheme()
+  }, [])
 
-    // Rendering the app before the theme is loaded will have issues because `withStyles`
-    // requires the `theme` object to exist.
-    if (!theme) { return <div>Loading theme...</div> }
+  const theme = context.theme
 
-    // Storybook will not work unless you include BOTH (yes BOTH) the new way and the
-    // deprecated way.  But for some reason it works fine in the normal app with just
-    // ThemeProvider.
-    // https://github.com/mui-org/material-ui/issues/14078
-    return (
-      <MuiThemeProvider theme={theme}>
-        <ThemeProvider theme={theme}>{children}</ThemeProvider>
-      </MuiThemeProvider>
-    )
-  }
+  // Rendering the app before the theme is loaded will have issues because `withStyles`
+  // requires the `theme` object to exist.
+  if (!theme) { return <div>Loading theme...</div> }
+
+  // Storybook will not work unless you include BOTH (yes BOTH) the new way and the
+  // deprecated way.  But for some reason it works fine in the normal app with just
+  // ThemeProvider.
+  // https://github.com/mui-org/material-ui/issues/14078
+  return (
+    <MuiThemeProvider theme={theme}>
+      <ThemeProvider theme={theme}>{children}</ThemeProvider>
+    </MuiThemeProvider>
+  )
 }
 
-export default withAppContext(ThemeManager)
+export default ThemeManager
