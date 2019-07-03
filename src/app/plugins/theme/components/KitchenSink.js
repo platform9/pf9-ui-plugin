@@ -10,8 +10,8 @@ import { withAppContext } from 'core/AppContext'
 
 const KitchenSink = ({ context: { theme } }) => (
   <div>
-    <FormExample expanded />
-    <WizardExample expanded />
+    <FormExample />
+    <WizardExample />
     <ButtonsExample expanded />
     <TabsExample expanded />
     <TablesExample expanded />

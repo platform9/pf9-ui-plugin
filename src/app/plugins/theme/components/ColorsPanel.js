@@ -38,6 +38,7 @@ const ColorsPanel = () => (
     <ColorPicker path="palette.text.secondary" />
     <ColorPicker path="palette.text.disabled" />
     <ColorPicker path="palette.text.hint" />
+
     <br />
   </Panel>
 )
