@@ -69,27 +69,27 @@ class App extends React.Component {
     return (
       <Router>
         <HotKeysProvider>
-          <ToastProvider>
-            <AppContext initialContext={{ apiClient, initialized: false, sessionLoaded: false }}>
-              <PreferencesProvider>
-                <ThemeManager>
+          <AppContext initialContext={{ apiClient, initialized: false, sessionLoaded: false }}>
+            <PreferencesProvider>
+              <ThemeManager>
+                <ToastProvider>
                   <div id="_main-container">
                     <SessionManager>
                       <AppContainer
                         sections={plugins.map(([id, plugin]) => ({
                           id,
                           name: plugin.name,
-                          links: plugin.getNavItems()
+                          links: plugin.getNavItems(),
                         }))}>
                         {plugins.map(apply(this.renderPluginRoutes))}
                         {devEnabled && <DeveloperToolsEmbed />}
                       </AppContainer>
                     </SessionManager>
                   </div>
-                </ThemeManager>
-              </PreferencesProvider>
-            </AppContext>
-          </ToastProvider>
+                </ToastProvider>
+              </ThemeManager>
+            </PreferencesProvider>
+          </AppContext>
         </HotKeysProvider>
       </Router>
     )
@@ -97,7 +97,7 @@ class App extends React.Component {
 }
 
 App.propTypes = {
-  pluginManager: PropTypes.object
+  pluginManager: PropTypes.object,
 }
 
 export default App

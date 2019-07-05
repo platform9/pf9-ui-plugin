@@ -19,7 +19,6 @@ const contextUpdater = (contextPath, updaterFn, returnLast = false) => {
     const context = getContext()
     const output = await updaterFn({
       ...args,
-      showToast: context.showToast,
       apiClient: context.apiClient,
       currentItems,
       loadFromContext: (contextPath, customArgs) =>
