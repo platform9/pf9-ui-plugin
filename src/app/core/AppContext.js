@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { path, assocPath, flatten, omit } from 'ramda'
-import { ensureArray } from 'utils/fp'
+import { assocPath, flatten, omit } from 'ramda'
 
 export const Context = React.createContext({})
 export const Consumer = Context.Consumer
@@ -36,7 +35,7 @@ class AppContext extends React.Component {
     },
 
     // Get an updated version of the current context values (not methods)
-    getContext: contextPath => {
+    getContext: getterFn => {
       const contextValues = omit([
         'initSession',
         'updateSession',
@@ -46,7 +45,7 @@ class AppContext extends React.Component {
       ], this.state)
 
       // Return all values if no path is specified
-      return contextPath ? path(ensureArray(contextPath), contextValues) : contextValues
+      return getterFn ? getterFn(contextValues) : contextValues
     },
 
     setContext: (...args) => {

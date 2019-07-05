@@ -24,7 +24,7 @@ class AddVolumePage extends React.Component {
       const volumesToCreate = constructBatch(numVolumes, volumeNamePrefix, rest)
       const existing = await loadVolumes({ setContext, getContext })
       const createdVolumes = await asyncMap(volumesToCreate, data =>
-        getContext('apiClient').cinder.createVolume(data)
+        getContext().apiClient.cinder.createVolume(data)
       )
       setContext({ volumes: [ ...existing, ...createdVolumes ] })
       history.push('/ui/openstack/storage#volumes')

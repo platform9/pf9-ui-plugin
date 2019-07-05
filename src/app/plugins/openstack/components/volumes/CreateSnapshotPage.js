@@ -19,7 +19,7 @@ class CreateSnapshotPage extends React.Component {
         description: snapshotData.description,
       }
       const existingSnapshots = await loadVolumeSnapshots({ setContext, getContext })
-      const createdSnapshot = await getContext('apiClient').cinder.snapshotVolume(params)
+      const createdSnapshot = await getContext().apiClient.cinder.snapshotVolume(params)
       setContext({ volumeSnapshots: [ ...existingSnapshots, createdSnapshot ] })
       history.push('/ui/openstack/storage#volumeSnapshots')
     } catch (err) {

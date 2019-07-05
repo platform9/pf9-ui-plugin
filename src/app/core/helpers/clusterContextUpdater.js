@@ -21,7 +21,7 @@ const clusterContextUpdater = (key, updaterFn, returnLast = false) =>
           '__all__': updatedData,
         }, ctx)
       })
-    } else if (getContext([...keyPath, '__all__'])) {
+    } else if (getContext(path([...keyPath, '__all__']))) {
       // update "__all__" key (if __all__ exists)
       await setContext(ctx =>
         assocPath(

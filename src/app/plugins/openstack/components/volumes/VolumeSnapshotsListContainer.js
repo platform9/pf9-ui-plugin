@@ -27,7 +27,7 @@ export const VolumeSnapshotsList = createListTableComponent({
 class VolumeSnapshotsListContainer extends React.Component {
   handleRemove = async id => {
     const { getContext, setContext } = this.props
-    await getContext('apiClient').cinder.deleteSnapshot(id)
+    await getContext().apiClient.cinder.deleteSnapshot(id)
     const newVolumeSnapshots = (await loadVolumeSnapshots({ getContext, setContext }))
       .filter(x => x.id !== id)
     setContext({ volumeSnapshots: newVolumeSnapshots })

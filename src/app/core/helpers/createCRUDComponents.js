@@ -12,6 +12,7 @@ import TopExtraContent from 'core/components/TopExtraContent'
 import withDataLoader from 'core/hocs/withDataLoader'
 import withDataMapper from 'core/hocs/withDataMapper'
 import { pathOr, prop } from 'ramda'
+import { withToast } from 'core/providers/ToastProvider'
 
 /**
  * This helper removes a lot of boilerplate from standard CRUD operations.
@@ -88,9 +89,8 @@ const createCRUDComponents = options => {
 
   // ListContainer
   class ContainerBase extends React.Component {
-    handleRemove = id => {
-      const { context, getContext, setContext } = this.props
-      return (deleteFn || crudActions.delete)({ id, context, getContext, setContext })
+    handleRemove = async id => {
+      return (deleteFn || crudActions.delete)({ id, ...this.props })
     }
 
     redirectToAdd = () => {
@@ -124,6 +124,7 @@ const createCRUDComponents = options => {
   }
 
   const ListContainer = compose(
+    withToast,
     withAppContext,
     withRouter,
   )(ContainerBase)

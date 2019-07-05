@@ -30,13 +30,14 @@ const contextLoader = (contextPath, loaderFn, options) => {
       if (!output && defaultValue) {
         await setContext(ctx => contextSetter(ctx, defaultValue, props))
       }
+      const context = getContext()
       const args = {
         params: {},
         ...props,
-        context: getContext(),
+        context,
         getContext,
         setContext,
-        apiClient: getContext('apiClient'),
+        apiClient: context.apiClient,
         reload: reload && cascade,
         cascade,
         loadFromContext: (contextPath, customArgs) =>

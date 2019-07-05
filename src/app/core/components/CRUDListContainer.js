@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import { withRouter } from 'react-router-dom'
 import ConfirmationDialog from './ConfirmationDialog'
+import Progress from 'core/components/Progress'
 
 class CRUDListContainer extends React.Component {
   componentDidMount () {
@@ -14,6 +15,7 @@ class CRUDListContainer extends React.Component {
   state = {
     showConfirmation: false,
     selectedItems: null,
+    deleting: false,
   }
 
   deleteConfirmText = () => {
@@ -38,16 +40,20 @@ class CRUDListContainer extends React.Component {
 
   handleDeleteConfirm = async () => {
     const { uniqueIdentifier } = this.props
-    this.setState({ showConfirmation: false })
+    this.setState({ showConfirmation: false, deleting: true })
     const items = this.state.selectedItems || []
-    await asyncMap(items, item => {
+
+    await asyncMap(items, async item => {
       const uid = uniqueIdentifier instanceof Function
         ? uniqueIdentifier(item)
         : item[uniqueIdentifier]
-      this.handleRemove(uid)
-    })
+      return this.handleRemove(uid)
+    },
+    // Items will be deleted sequentially, otherwise we would run in a race condition
+    // causing the context to be incorrectly updated with just one item removed
+    false)
 
-    this.setState({ selectedItems: [] })
+    this.setState({ selectedItems: [], deleting: false })
     // The user resolves the promise by clicking "confirm".
     this.resolveDelete()
   }
@@ -56,8 +62,9 @@ class CRUDListContainer extends React.Component {
     const { onRemove } = this.props
 
     if (onRemove) {
-      await onRemove(id)
+      return onRemove(id)
     }
+    return null
   }
 
   redirectToAdd = () => {
@@ -76,7 +83,7 @@ class CRUDListContainer extends React.Component {
 
   render () {
     return (
-      <div>
+      <Progress renderContentOnMount overlay loading={this.state.deleting}>
         <ConfirmationDialog
           open={this.state.showConfirmation}
           text={this.deleteConfirmText()}
@@ -86,9 +93,9 @@ class CRUDListContainer extends React.Component {
         {this.props.children({
           onDelete: this.handleDelete,
           onAdd: this.props.addUrl && this.redirectToAdd,
-          onEdit: this.props.editUrl && this.redirectToEdit
+          onEdit: this.props.editUrl && this.redirectToEdit,
         })}
-      </div>
+      </Progress>
     )
   }
 }
@@ -115,12 +122,12 @@ CRUDListContainer.propTypes = {
   */
   uniqueIdentifier: PropTypes.oneOfType([
     PropTypes.string,
-    PropTypes.func
+    PropTypes.func,
   ]),
 }
 
 CRUDListContainer.defaultProps = {
-  uniqueIdentifier: 'id'
+  uniqueIdentifier: 'id',
 }
 
 export default compose(

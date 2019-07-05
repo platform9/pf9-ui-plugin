@@ -40,7 +40,7 @@ export const VolumesList = createListTableComponent({
 class VolumesListContainer extends React.Component {
   handleRemove = async id => {
     const { getContext, setContext } = this.props
-    await getContext('apiClient').cinder.deleteVolume(id)
+    await getContext().apiClient.cinder.deleteVolume(id)
     const newVolumes = (await getVolumes({ getContext, setContext }))
       .filter(x => x.id !== id)
     setContext({ volumes: newVolumes })
