@@ -1,3 +1,4 @@
+import { assoc } from 'ramda'
 import { keyValueArrToObj } from 'utils/fp'
 
 const normalizePrometheusResponse = (clusterUuid, response) => response.items.map(x => ({ ...x, clusterUuid }))
@@ -151,7 +152,7 @@ class Qbert {
     return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/version`)
   }
 
-  convertCluster = clusterId => cluster => ({
+  convertResource = clusterId => cluster => ({
     ...cluster,
     clusterId,
     name: cluster.metadata.name,
@@ -164,7 +165,7 @@ class Qbert {
     try {
       const data = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces`)
 
-      return data.items.map(this.convertCluster(clusterId))
+      return data.items.map(this.convertResource(clusterId))
     } catch (err) {
       console.log(`Error getting cluster namespaces for clusterId: ${clusterId}`)
       return []
@@ -173,7 +174,7 @@ class Qbert {
 
   createNamespace = async (clusterId, body) => {
     const raw = await this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces`, body)
-    const converted = this.convertCluster(clusterId)(raw)
+    const converted = this.convertResource(clusterId)(raw)
     return converted
   }
 
@@ -185,7 +186,7 @@ class Qbert {
     const { clusterId } = params
     try {
       const data = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/pods`)
-      return data.items.map(this.convertCluster(clusterId))
+      return data.items.map(this.convertResource(clusterId))
     } catch (err) {
       console.error(`Error getting cluster pods for clusterId: ${clusterId}`)
       return err
@@ -196,7 +197,7 @@ class Qbert {
     const { clusterId } = params
     try {
       const data = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/extensions/v1beta1/deployments`)
-      return data.items.map(this.convertCluster(clusterId))
+      return data.items.map(this.convertResource(clusterId))
     } catch (err) {
       console.error(`Error getting cluster deployments for clusterId: ${clusterId}`)
       return err
@@ -211,7 +212,7 @@ class Qbert {
     const { clusterId } = params
     try {
       const data = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/services`)
-      return data.items.map(this.convertCluster(clusterId))
+      return data.items.map(this.convertResource(clusterId))
     } catch (err) {
       console.error(`Error getting cluster services for clusterId: ${clusterId}`)
       return err
@@ -219,7 +220,14 @@ class Qbert {
   }
 
   getClusterStorageClasses = async (clusterId) => {
-    return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/storage.k8s.io/v1/storageclasses`)
+    try {
+      const data = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/storage.k8s.io/v1/storageclasses`)
+      const mapStorageClass = sc => assoc('type', sc.parameters.type, sc)
+      return data.items.map(this.convertResource(clusterId)).map(mapStorageClass)
+    } catch (err) {
+      console.error(`Error getting cluster storage classes for clusterId: ${clusterId}`, err)
+      return []
+    }
   }
 
   createStorageClass = async (clusterId, params) => {

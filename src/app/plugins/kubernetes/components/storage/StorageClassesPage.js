@@ -1,5 +1,25 @@
-import React from 'react'
+import { deleteStorageClass, loadStorageClasses } from './actions'
+import createCRUDComponents from 'core/helpers/createCRUDComponents'
 
-const StorageClassesPage = () => <h1>TODO: Storage ClassesPage Page</h1>
+export const options = {
+  addUrl: '/ui/kubernetes/storage_classes/add',
+  addText: 'Add Storage Class',
+  columns: [
+    { id: 'name', label: 'Name' },
+    { id: 'clusterName', label: 'Cluster' },
+    { id: 'type', label: 'Type' },
+    { id: 'provisioner', label: 'Provisioner' },
+    { id: 'created', label: 'Created' },
+  ],
+  dataKey: 'storageClasses',
+  deleteFn: deleteStorageClass,
+  editUrl: '/ui/kubernetes/storage_classes/edit',
+  loaderFn: loadStorageClasses,
+  name: 'StorageClasses',
+  title: 'Storage Classes',
+}
 
-export default StorageClassesPage
+const components = createCRUDComponents(options)
+export const NodesList = components.List
+
+export default components.ListPage
