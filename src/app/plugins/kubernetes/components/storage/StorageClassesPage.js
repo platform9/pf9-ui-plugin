@@ -13,7 +13,6 @@ export const options = {
   ],
   dataKey: 'storageClasses',
   deleteFn: deleteStorageClass,
-  editUrl: '/ui/kubernetes/storage_classes/edit',
   loaderFn: loadStorageClasses,
   name: 'StorageClasses',
   title: 'Storage Classes',
