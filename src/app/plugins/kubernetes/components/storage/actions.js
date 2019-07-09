@@ -1,14 +1,12 @@
 import contextLoader from 'core/helpers/contextLoader'
-import { loadClusters } from '../infrastructure/actions'
 import { asyncFlatMap } from 'utils/fp'
-import { assoc, path, propEq } from 'ramda'
+import { assoc, propEq } from 'ramda'
 
-export const loadStorageClasses = contextLoader('storageClasses', async (params) => {
-  const clusters = await loadClusters(params)
-  const qbert = path(['context', 'apiClient', 'qbert'], params)
+export const loadStorageClasses = contextLoader('storageClasses', async ({ apiClient, loadFromContext }) => {
+  const clusters = await loadFromContext('clusters')
   const isHealthy = cluster => cluster.healthyMasterNodes.length > 0
   const usableClusters = clusters.filter(isHealthy)
-  const getStorageClasses = cluster => qbert.getClusterStorageClasses(cluster.uuid)
+  const getStorageClasses = cluster => apiClient.qbert.getClusterStorageClasses(cluster.uuid)
   const storageClasses = await asyncFlatMap(usableClusters, getStorageClasses, true)
 
   // Add the clusterName
