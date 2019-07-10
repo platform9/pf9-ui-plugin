@@ -22,6 +22,7 @@ import UpdatePrometheusInstancePage from './components/prometheus/UpdatePromethe
 import UpdatePrometheusRulePage from './components/prometheus/UpdatePrometheusRulePage'
 import UpdatePrometheusServiceMonitorPage from './components/prometheus/UpdateServiceMonitorPage'
 import UpdatePrometheusAlertManagerPage from './components/prometheus/UpdatePrometheusAlertManagerPage'
+import config from '../../../../config'
 
 class Kubernetes extends React.Component {
   render () {
@@ -158,7 +159,7 @@ Kubernetes.registerPlugin = pluginManager => {
   const clarityLink = path => ({ link: { path: clarityBase(path), external: true } })
 
   // For development we can set this manually
-  const useClarityLinks = window.localStorage.disableClarityLinks !== 'true'
+  const useClarityLinks = !(window.localStorage.disableClarityLinks === 'true' || config.developer)
 
   // These nav items will redirect to the old "clarity" UI while the new UI is under development.
   const clarityNavItems = [

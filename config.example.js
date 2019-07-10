@@ -29,6 +29,8 @@ const config = {
       password: OS_PASSWORD || 'secret',
     },
     region: OS_REGION,
+    // Show development version of the UI
+    developer: true,
   },
 
   test: {
