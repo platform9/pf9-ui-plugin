@@ -1,4 +1,6 @@
+import React from 'react'
 import { deleteStorageClass, loadStorageClasses } from './actions'
+import useSingleTabPage from 'core/hooks/useSingleTabPage'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 
 export const options = {
@@ -19,6 +21,8 @@ export const options = {
 }
 
 const components = createCRUDComponents(options)
-export const NodesList = components.List
+export const StorageClassesList = components.ListPage
 
-export default components.ListPage
+export const StorageClassesListPage = useSingleTabPage('storage_classes', 'Storage Classes', <StorageClassesList />)
+
+export default StorageClassesListPage

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import { assocPath, flatten, omit } from 'ramda'
 
@@ -102,5 +102,11 @@ export const withAppContext = Component => props =>
         />
     }
   </Consumer>
+
+export const useAppContext = () => {
+  const ctx = useContext(Context)
+  const context = ctx.getContext()
+  return { ...ctx, context }
+}
 
 export default AppContext

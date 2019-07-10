@@ -58,5 +58,6 @@ const contextLoader = (contextPath, loaderFn, options) => {
   return resolver
 }
 
-export const getLoader = loaderPath => path(loaderPath, resolvers)
+export const getLoader = loaderPath => path(ensureArray(loaderPath), resolvers)
+
 export default contextLoader

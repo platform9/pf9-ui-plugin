@@ -147,7 +147,7 @@ class ValidatedForm extends PureComponent {
       if (!showingErrors) {
         this.setState(prevState => ({ ...prevState, showingErrors: true }))
       }
-      return
+      return false
     }
 
     if (onSubmit) {
@@ -157,6 +157,9 @@ class ValidatedForm extends PureComponent {
     if (clearOnSubmit) {
       this.setState({ values: initialValues })
     }
+
+    // We need to return true for the Wizard's nextCb to know if it can proceed.
+    return true
   }
 
   render () {

@@ -48,7 +48,9 @@ class Wizard extends React.Component {
     const { onComplete } = this.props
 
     if (this.nextCb) {
-      this.nextCb()
+      // This corresponds to ValidatedForm#handleSubmit.  Basically, if validation succeeded.
+      const canProceedNext = this.nextCb()
+      if (!canProceedNext) { return }
     }
 
     this.setState(
@@ -75,7 +77,7 @@ class Wizard extends React.Component {
     activeStep: 0,
     steps: [],
     activeStepId: null,
-    wizardContext: this.props.context || {},
+    wizardContext: this.props.context,
     setWizardContext: this.setWizardContext,
   }
 
@@ -109,6 +111,7 @@ Wizard.propTypes = {
 }
 
 Wizard.defaultProps = {
+  context: {},
   submitLabel: 'Complete',
   onComplete: value => {
     console.info('Wizard#onComplete handler not implemented.  Falling back to console.log')
