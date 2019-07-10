@@ -1,7 +1,9 @@
 import contextLoader from 'core/helpers/contextLoader'
 import {
-  path, pluck, pipe, uniq, reduce, map, head, values, groupBy, prop, innerJoin,
+  any, path, pluck, pipe, uniq, reduce, map, head, values, groupBy, prop, innerJoin, pathEq,
+  flatten, find,
 } from 'ramda'
+import moize from 'moize'
 
 export const loadTenants = contextLoader('tenants', async ({ apiClient, loadFromContext }) => {
   const namespaces = await loadFromContext('namespaces')
@@ -51,5 +53,64 @@ export const loadUsers = contextLoader('users', async ({ apiClient, loadFromCont
 })
 
 export const deleteUser = () => {
+  console.log('TODO')
+}
+
+const tryJsonParse = moize(val => typeof val === 'string' ? JSON.parse(val) : val)
+export const loadGroups = contextLoader('groups', async ({ apiClient, loadFromContext }) => {
+  const [groups, mappings] = await Promise.all([
+    apiClient.keystone.getGroups(),
+    apiClient.keystone.getGroupMappings(),
+  ])
+
+  return groups.map(group => {
+    // Find the mapping that contains a rule belonging to the current group
+    const groupMapping = mappings.find(mapping => {
+      const mappingRules = tryJsonParse(mapping.rules)
+      return pipe(
+        pluck('local'),
+        flatten,
+        find(pathEq(['group', 'id'], group.id)),
+      )(mappingRules)
+    })
+    // Filter out the rules not belonging to current group
+    const mappingRules = tryJsonParse(groupMapping.rules)
+    const groupRules = mappingRules.reduce((groupRules, rule) => {
+      if (any(pathEq(['group', 'id'], group.id), rule.local)) {
+        // Remove FirsName & LastName mapping from remote attribute array.
+        return groupRules.concat(rule.remote.slice(2))
+      }
+      return groupRules
+    }, [])
+    // Stringify the results
+    const samlAttributesString = groupRules.reduce((samlAttributes, rule) => {
+      if (rule.hasOwnProperty('any_one_of')) {
+        return samlAttributes.concat(`${rule.type} = ${rule.any_one_of.join(', ')}`)
+      } else if (rule.hasOwnProperty('not_any_of')) {
+        return samlAttributes.concat(`${rule.type} != ${rule.not_any_of.join(', ')}`)
+      }
+      return samlAttributes
+    }, []).join(' AND ')
+
+    return {
+      ...group,
+      samlAttributesString,
+    }
+  })
+})
+
+export const deleteGroup = () => {
+  console.log('TODO')
+}
+
+export const loadRoles = contextLoader('roles', async ({ apiClient, loadFromContext }) => {
+  const roles = await apiClient.keystone.getRoles()
+  return roles.map(role => ({
+    ...role,
+    name: role.name || role.displayName,
+  }))
+})
+
+export const deleteRole = () => {
   console.log('TODO')
 }

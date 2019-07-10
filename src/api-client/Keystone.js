@@ -64,6 +64,9 @@ class Keystone {
   get tenantsUrl () { return `${this.adminV3}/PF9-KSADM/all_tenants_all_users` }
   get tokensUrl () { return `${this.v3}/auth/tokens?nocatalog` }
   get usersUrl () { return `${this.v3}/users` }
+  get groupsUrl () { return `${this.v3}/groups` }
+  get groupMappingsUrl () { return `${this.v3}/OS-FEDERATION/mappings` }
+  get rolesUrl () { return `${this.v3}/roles` }
 
   getProject = async (id) => {
     const response = await axios.get(`${this.projectsUrl}/${id}`, this.client.getAuthHeaders())
@@ -83,6 +86,21 @@ class Keystone {
   getAllTenantsAllUsers = async () => {
     const response = await axios.get(this.tenantsUrl, this.client.getAuthHeaders())
     return response.data.tenants
+  }
+
+  getGroups = async () => {
+    const response = await axios.get(this.groupsUrl, this.client.getAuthHeaders())
+    return response.data.groups
+  }
+
+  getGroupMappings = async () => {
+    const response = await axios.get(this.groupMappingsUrl, this.client.getAuthHeaders())
+    return response.data.mappings
+  }
+
+  getRoles = async () => {
+    const response = await axios.get(this.rolesUrl, this.client.getAuthHeaders())
+    return response.data.roles
   }
 
   createProject = async (params) => {

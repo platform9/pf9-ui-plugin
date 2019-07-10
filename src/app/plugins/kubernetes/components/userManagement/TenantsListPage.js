@@ -1,11 +1,8 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { compose, pathOr } from 'ramda'
-import requiresAuthentication from 'openstack/util/requiresAuthentication'
 import { loadTenants, deleteTenant } from 'k8s/components/userManagement/actions'
 
 export const options = {
-  loaders: { tenants: loadTenants },
-  mappers: { tenants: pathOr([], ['context', 'tenants']) },
+  loaderFn: loadTenants,
   columns: [
     { id: 'name', label: 'Name' },
     { id: 'description', label: 'Description' },
@@ -21,6 +18,4 @@ export const options = {
 
 const { ListPage: TenantsListPage } = createCRUDComponents(options)
 
-export default compose(
-  requiresAuthentication,
-)(TenantsListPage)
+export default TenantsListPage
