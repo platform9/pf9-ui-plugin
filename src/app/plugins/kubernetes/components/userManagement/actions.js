@@ -105,10 +105,13 @@ export const deleteGroup = () => {
 
 export const loadRoles = contextLoader('roles', async ({ apiClient, loadFromContext }) => {
   const roles = await apiClient.keystone.getRoles()
-  return roles.map(role => ({
-    ...role,
-    name: role.name || role.displayName,
-  }))
+
+  return roles
+    .filter(role => ['admin', '_member_'].includes(role.name))
+    .map(role => ({
+      ...role,
+      name: role.name || role.displayName,
+    }))
 })
 
 export const deleteRole = () => {
