@@ -28,11 +28,6 @@ const toolbarStyles = theme => ({
   toolbar: {
     justifyContent: 'flex-end',
   },
-  title: {
-    flex: '0 0 auto',
-    marginRight: theme.spacing.unit * 2,
-    color: theme.palette.primary.contrastText,
-  },
   rowActions: {
     color: 'inherit',
   },
@@ -56,7 +51,7 @@ const ListTableToolbar = ({
   classes, columns, context, filterValues, filters, inlineFilters,
   onAdd, onColumnToggle, onDelete, onEdit, onFilterUpdate,
   onFiltersReset, onSearchChange,
-  rowActions, searchTerm, selected, title, visibleColumns,
+  rowActions, searchTerm, selected, visibleColumns,
 }) => {
   const numSelected = (selected || []).length
   return (
@@ -65,9 +60,6 @@ const ListTableToolbar = ({
         [classes.highlight]: numSelected > 0,
       })}
     >
-      <div className={classes.title}>
-        <Typography variant="h6">{title}</Typography>
-      </div>
       <ListTableRowActions actionClassName={classes.action} rowActions={rowActions} selected={selected} />
       {numSelected === 1 && onEdit && (
         <Tooltip title="Edit">
@@ -127,7 +119,6 @@ const ListTableToolbar = ({
 }
 
 ListTableToolbar.propTypes = {
-  title: PropTypes.string,
   classes: PropTypes.object.isRequired,
   columns: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.string,

@@ -1,13 +1,14 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import ApiHelper from 'developer/components/ApiHelper'
+import ContextViewer from 'developer/components/ContextViewer'
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
+import SimpleLink from 'core/components/SimpleLink'
+import { compose } from 'app/utils/fp'
+import { withStyles } from '@material-ui/styles'
 import {
   Button, ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, Typography,
 } from '@material-ui/core'
-import { withStyles } from '@material-ui/styles'
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
-import { compose } from 'app/utils/fp'
-import ApiHelper from 'developer/components/ApiHelper'
-import ContextViewer from 'developer/components/ContextViewer'
 
 const styles = theme => ({
   root: {
@@ -60,6 +61,7 @@ class DeveloperToolsEmbed extends React.Component {
     // This is currently UI developers only so leaving always expanded
     return (
       <div className={classes.root}>
+
         {false && <Button onClick={this.collapse}>collapse devtools</Button>}
         <Typography variant="subtitle1">Developer Tools</Typography>
         <Panel title="Context Viewer">
@@ -68,6 +70,7 @@ class DeveloperToolsEmbed extends React.Component {
         <Panel title="API helper">
           <ApiHelper />
         </Panel>
+        <SimpleLink src="/ui/themes/configure">Theme Manager</SimpleLink>
       </div>
     )
   }

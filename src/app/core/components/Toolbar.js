@@ -59,7 +59,7 @@ const styles = theme => ({
     position: 'absolute',
     color: theme.palette.text.primary,
     right: theme.spacing.unit * 3,
-    bottom: -(theme.spacing.unit * 8),
+    bottom: -(theme.spacing.unit * 9.5),
   },
 })
 

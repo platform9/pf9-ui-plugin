@@ -44,7 +44,6 @@ export const options = {
   editUrl: '/ui/kubernetes/prometheus/instances/edit',
   loaderFn: loadPrometheusInstances,
   name: 'PrometheusInstances',
-  title: 'Prometheus Instances',
   uniqueIdentifier: 'uid',
 }
 

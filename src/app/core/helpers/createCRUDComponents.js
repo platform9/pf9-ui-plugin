@@ -1,17 +1,17 @@
 import React from 'react'
-import { compose } from 'app/utils/fp'
-import { withAppContext } from 'core/AppContext'
+import CreateButton from 'core/components/buttons/CreateButton'
 import CRUDListContainer from 'core/components/CRUDListContainer'
 import ListTable from 'core/components/listTable/ListTable'
-import createCRUDActions from 'core/helpers/createCRUDActions'
-import { withScopedPreferences } from 'core/providers/PreferencesProvider'
-import requiresAuthentication from 'openstack/util/requiresAuthentication'
-import { withRouter } from 'react-router-dom'
-import { Button } from '@material-ui/core'
 import TopExtraContent from 'core/components/TopExtraContent'
+import createCRUDActions from 'core/helpers/createCRUDActions'
+import requiresAuthentication from 'openstack/util/requiresAuthentication'
 import withDataLoader from 'core/hocs/withDataLoader'
 import withDataMapper from 'core/hocs/withDataMapper'
+import { compose } from 'app/utils/fp'
 import { pathOr, prop } from 'ramda'
+import { withAppContext } from 'core/AppContext'
+import { withRouter } from 'react-router-dom'
+import { withScopedPreferences } from 'core/providers/PreferencesProvider'
 import { withToast } from 'core/providers/ToastProvider'
 
 /**
@@ -50,7 +50,6 @@ const createCRUDComponents = options => {
     editUrl,
     debug,
     name,
-    title,
   } = options
 
   // List
@@ -68,7 +67,6 @@ const createCRUDComponents = options => {
     // }
     return (
       <ListTable
-        title={title}
         columns={columns}
         data={data}
         onAdd={onAdd}
@@ -97,9 +95,7 @@ const createCRUDComponents = options => {
       this.props.history.push(addUrl)
     }
 
-    renderAddButton = () => {
-      return <Button variant="contained" size="small" color="primary" onClick={this.redirectToAdd}>+ {addText}</Button>
-    }
+    renderAddButton = () => <CreateButton onClick={this.redirectToAdd}>{addText}</CreateButton>
 
     render () {
       let moreProps = {}
