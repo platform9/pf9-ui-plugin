@@ -39,12 +39,36 @@ const styles = theme => ({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  drawerPaper: {
+  drawer: {
     position: 'relative',
     width: drawerWidth,
+    flexShrink: 0,
+    whiteSpace: 'nowrap',
     height: '100%',
     minHeight: '100vh',
     backgroundColor: theme.palette.sidebar.background,
+  },
+  drawerOpen: {
+    width: drawerWidth,
+    transition: theme.transitions.create('width', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  },
+  drawerClose: {
+    marginTop: theme.spacing.unit * 8,
+    transition: theme.transitions.create('width', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+    overflowX: 'hidden',
+    width: (theme.spacing.unit * 6) + 1,
+    [theme.breakpoints.up('sm')]: {
+      width: (theme.spacing.unit * 6) + 1,
+    },
+  },
+  paper: {
+    backgroundColor: 'inherit',
   },
   drawerHeader: {
     display: 'flex',
@@ -52,6 +76,9 @@ const styles = theme => ({
     justifyContent: 'flex-end',
     padding: '0 8px',
     ...theme.mixins.toolbar,
+  },
+  drawerHeaderClosed: {
+    display: 'none',
   },
   inputRoot: {
     color: 'inherit',
@@ -130,9 +157,14 @@ const styles = theme => ({
     textAlign: 'center',
     background: 'white',
     display: 'flex',
-    justifyContent: 'center',
+    justifyContent: 'left',
     alignItems: 'center',
     height: '45px',
+    maxWidth: '90%',
+    margin: '3px',
+    padding: '0 5px',
+    borderRadius: theme.shape.borderRadius,
+    boxSizing: 'border-box',
   },
   sliderLogoImage: {
     maxHeight: '32px',
@@ -262,7 +294,7 @@ class Navbar extends PureComponent {
   })
 
   renderNavFolder = (name, link, subLinks, icon) => {
-    const { classes, location: { pathname, hash } } = this.props
+    const { classes, location: { pathname, hash }, open } = this.props
     const matchesCurrentPath = link => link && matchPath(`${pathname}${hash}`, {
       path: link.path,
       exact: true,
@@ -273,8 +305,8 @@ class Navbar extends PureComponent {
       ? redirect
       : this.toggleFoldingAndNavTo(name, prop('path', link))
     const isCurrentNavLink = matchesCurrentPath(link)
-    const expanded = subLinks.some(({ link }) => matchesCurrentPath(link)) ||
-      this.state.expandedItems.includes(name)
+    const expanded = open && (subLinks.some(({ link }) => matchesCurrentPath(link)) ||
+      this.state.expandedItems.includes(name))
     return [
       <MenuItem
         key={name}
@@ -379,17 +411,17 @@ class Navbar extends PureComponent {
   }
 
   renderStackSlider = () => {
-    const { classes } = this.props
+    const { classes, open } = this.props
     return <div className={classes.sliderContainer}>
-      <a href="/clarity/index.html#/dashboard">
+      {open && <a href="/clarity/index.html#/dashboard">
         <ChevronLeftIcon className={classes.sliderArrow} />
-      </a>
+      </a>}
       <div className={classes.sliderLogo}>
         <img src="/ui/images/logo-kubernetes-h.png" className={classes.sliderLogoImage} />
       </div>
-      <a href="/clarity/index.html#/dashboard">
+      {open && <a href="/clarity/index.html#/dashboard">
         <ChevronRightIcon className={classes.sliderArrow} />
-      </a>
+      </a>}
     </div>
   }
 
@@ -398,12 +430,23 @@ class Navbar extends PureComponent {
     const filteredSections = sections.filter(where({ links: notEmpty }))
 
     return <Drawer
-      variant="persistent"
-      classes={{ paper: classes.drawerPaper }}
+      variant="permanent"
+      className={classnames(classes.drawer, {
+        [classes.drawerOpen]: open,
+        [classes.drawerClose]: !open,
+      })}
+      classes={{
+        paper: classnames(classes.paper, {
+          [classes.drawerOpen]: open,
+          [classes.drawerClose]: !open,
+        }),
+      }}
       anchor="left"
       open={open}
     >
-      <div className={classes.drawerHeader}>
+      <div className={classnames(classes.drawerHeader, {
+        [classes.drawerHeaderClosed]: !open,
+      })}>
         {withSearchBar ? this.renderNavFilterBar() : null}
         <IconButton className={classes.navMenuText} onClick={handleDrawerClose}>
           <ChevronLeftIcon />

@@ -20,7 +20,6 @@ const styles = theme => ({
     width: '100%',
   },
   content: {
-    maxWidth: 'calc(100% - 48px)',
     overflowX: 'auto',
     flexGrow: 1,
     backgroundColor: theme.palette.background.default,
@@ -29,12 +28,6 @@ const styles = theme => ({
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-  },
-  'content-left': {
-    marginLeft: -drawerWidth,
-  },
-  'content-right': {
-    marginRight: -drawerWidth,
   },
   contentShift: {
     transition: theme.transitions.create('margin', {
