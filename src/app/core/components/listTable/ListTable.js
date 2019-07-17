@@ -371,6 +371,7 @@ class ListTable extends React.Component {
       selected,
       visibleColumns,
       filterValues,
+      rowsPerPage,
     } = this.state
 
     if (!data) {
@@ -403,6 +404,9 @@ class ListTable extends React.Component {
               onFilterUpdate={this.handleFilterUpdate}
               onFiltersReset={this.handleFiltersReset}
               batchActions={batchActions}
+              rowsPerPage={rowsPerPage}
+              onChangeRowsPerPage={this.handleChangeRowsPerPage}
+              rowsPerPageOptions={[5, 10, 25, 50, 100]}
             />
             <div className={classes.tableWrapper}>
               <Table className={classes.table}>

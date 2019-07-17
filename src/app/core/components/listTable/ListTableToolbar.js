@@ -4,10 +4,11 @@ import AddIcon from '@material-ui/icons/Add'
 import ListTableColumnButton from 'core/components/listTable/ListTableColumnSelector'
 import ListTableFilters from 'core/components/listTable/ListTableFilters'
 import ListTableRowActions from './ListTableRowActions'
+import PerPageControl from './PerPageControl'
 import SearchBar from 'core/components/SearchBar'
 import classnames from 'classnames'
 import { compose } from 'ramda'
-import { Button, Toolbar, Tooltip, Typography } from '@material-ui/core'
+import { Button, Toolbar, Tooltip } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import ListTableFiltersButton from 'core/components/listTable/ListTableFiltersButton'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
@@ -52,6 +53,7 @@ const ListTableToolbar = ({
   onAdd, onColumnToggle, onDelete, onEdit, onFilterUpdate,
   onFiltersReset, onSearchChange,
   rowActions, searchTerm, selected, visibleColumns,
+  rowsPerPage, onChangeRowsPerPage, rowsPerPageOptions,
 }) => {
   const numSelected = (selected || []).length
   return (
@@ -112,6 +114,11 @@ const ListTableToolbar = ({
               </Button>
             </Tooltip>
           )}
+          <PerPageControl
+            value={rowsPerPage}
+            onChangeRowsPerPage={onChangeRowsPerPage}
+            rowsPerPageOptions={rowsPerPageOptions}
+          />
         </Toolbar>
       </div>
     </Toolbar>
@@ -146,6 +153,9 @@ ListTableToolbar.propTypes = {
   selected: PropTypes.array,
   visibleColumns: PropTypes.array,
   onColumnToggle: PropTypes.func,
+  rowsPerPage: PropTypes.number.isRequired,
+  onChangeRowsPerPage: PropTypes.func.isRequired,
+  rowsPerPageOptions: PropTypes.arrayOf(PropTypes.number),
 }
 
 export default compose(
