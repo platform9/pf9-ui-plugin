@@ -3,6 +3,7 @@ import { withStyles } from '@material-ui/styles'
 import {
   Button, Checkbox, FormControlLabel, Grid, Paper, TextField, Typography,
 } from '@material-ui/core'
+import SimpleLink from 'core/components/SimpleLink'
 
 const styles = theme => ({
   root: {
@@ -78,7 +79,7 @@ class LoginPage extends React.Component {
         label={
           <div>
             <span>I have a Multi-Factor Authentication (MFA) token. (</span>
-            <a href="http://www.platform9.com">more info</a>
+            <SimpleLink src="http://www.platform9.com">more info</SimpleLink>
             <span>)</span>
           </div>
         }
@@ -102,7 +103,7 @@ class LoginPage extends React.Component {
     const { classes } = this.props
     return <Fragment>
       <Typography className={classes.paragraph} variant="caption" color="textSecondary">
-        By signing in, you agree to our <a href="http://www.platform9.com">Terms of Service</a>.
+        By signing in, you agree to our <SimpleLink src="http://www.platform9.com">Terms of Service</SimpleLink>.
       </Typography>
       <Typography className={classes.paragraph} variant="caption" color="textSecondary">
         © 2014-2018 Platform9 Systems, Inc.
@@ -129,7 +130,7 @@ class LoginPage extends React.Component {
                   SIGN IN
                 </Button>
                 <Typography className={classes.forgotPwd} gutterBottom>
-                  <a href="http://www.platform9.com">Forgot password?</a>
+                  <SimpleLink src="http://www.platform9.com">Forgot password?</SimpleLink>
                 </Typography>
               </form>
               {this.renderFooter()}
