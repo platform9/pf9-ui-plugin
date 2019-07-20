@@ -8,47 +8,48 @@ import { compose } from 'app/utils/fp'
 import { withAppContext } from 'core/AppContext'
 import Alert from 'core/components/Alert'
 import { withRouter } from 'react-router'
+import SimpleLink from 'core/components/SimpleLink'
 
 const styles = theme => ({
   root: {
     padding: theme.spacing.unit * 8,
-    overflow: 'auto'
+    overflow: 'auto',
   },
   paper: {
-    padding: theme.spacing.unit * 4
+    padding: theme.spacing.unit * 4,
   },
   img: {
     maxHeight: '70%',
     maxWidth: '70%',
     display: 'block',
     marginLeft: 'auto',
-    marginRight: 'auto'
+    marginRight: 'auto',
   },
   form: {
     paddingTop: theme.spacing.unit * 3,
   },
   textField: {
     minWidth: '100%',
-    marginTop: theme.spacing.unit
+    marginTop: theme.spacing.unit,
   },
   checkbox: {
-    marginTop: theme.spacing.unit * 3
+    marginTop: theme.spacing.unit * 3,
   },
   signinButton: {
     minWidth: '80%',
     marginTop: theme.spacing.unit * 3,
     display: 'block',
     marginLeft: 'auto',
-    marginRight: 'auto'
+    marginRight: 'auto',
   },
   forgotPwd: {
     marginTop: theme.spacing.unit * 2,
     marginBottom: theme.spacing.unit * 3,
-    textAlign: 'center'
+    textAlign: 'center',
   },
   paragraph: {
-    textAlign: 'center'
-  }
+    textAlign: 'center',
+  },
 })
 
 export class LoginPage extends React.Component {
@@ -120,7 +121,7 @@ export class LoginPage extends React.Component {
         label={
           <div>
             <span>I have a Multi-Factor Authentication (MFA) token. (</span>
-            <a href="http://www.platform9.com">more info</a>
+            <SimpleLink src="http://www.platform9.com">more info</SimpleLink>
             <span>)</span>
           </div>
         }
@@ -144,7 +145,8 @@ export class LoginPage extends React.Component {
     const { classes } = this.props
     return <Fragment>
       <Typography className={classes.paragraph} variant="caption" color="textSecondary">
-        By signing in, you agree to our <a href="http://www.platform9.com">Terms of Service</a>.
+        By signing in, you agree to our <SimpleLink src="http://www.platform9.com">Terms of
+        Service</SimpleLink>.
       </Typography>
       <Typography className={classes.paragraph} variant="caption" color="textSecondary">
         © 2014-2018 Platform9 Systems, Inc.
@@ -168,12 +170,12 @@ export class LoginPage extends React.Component {
                 {this.renderInputfield()}
                 {this.renderMFACheckbox()}
                 {this.state.MFAcheckbox && this.renderMFAInput()}
-                {loginFailed && <Alert variant="error" message="Login failed" /> }
+                {loginFailed && <Alert variant="error" message="Login failed" />}
                 <Button type="submit" className={classes.signinButton} variant="contained" color="primary">
                   SIGN IN
                 </Button>
                 <Typography className={classes.forgotPwd} gutterBottom>
-                  <a href="http://www.platform9.com">Forgot password?</a>
+                  <SimpleLink src="http://www.platform9.com">Forgot password?</SimpleLink>
                 </Typography>
               </form>
               {this.renderFooter()}
@@ -188,12 +190,12 @@ export class LoginPage extends React.Component {
 LoginPage.propTypes = {
   /**
    * Handler that is invoked upon successful authentication.
-  */
+   */
   onAuthSuccess: PropTypes.func,
 }
 
 export default compose(
   withAppContext,
   withRouter,
-  withStyles(styles)
+  withStyles(styles),
 )(LoginPage)

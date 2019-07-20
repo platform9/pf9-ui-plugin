@@ -6,6 +6,7 @@ import ThemeManager from 'app/ThemeManager'
 import { ToastProvider } from 'core/providers/ToastProvider'
 import { decorateAction } from '@storybook/addon-actions'
 import { storiesOf } from '@storybook/react'
+import PreferencesProvider from 'core/providers/PreferencesProvider'
 
 const objToJsonDetails = obj => JSON.stringify(obj, null, 4)
 const isArray = x => x instanceof Array
@@ -21,11 +22,13 @@ export const appDecorators = storyFn => (
   <div style={{ margin: '16px' }}>
     <HotKeysProvider>
       <AppContext>
-        <ThemeManager>
-          <ToastProvider>
-            {storyFn()}
-          </ToastProvider>
-        </ThemeManager>
+        <PreferencesProvider>
+          <ThemeManager>
+            <ToastProvider>
+              {storyFn()}
+            </ToastProvider>
+          </ThemeManager>
+        </PreferencesProvider>
       </AppContext>
     </HotKeysProvider>
   </div>
