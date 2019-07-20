@@ -19,15 +19,15 @@ export const jsonDetailLogger = decorateAction([
 // ToastProvider has a dependency on ThemeManager
 export const appDecorators = storyFn => (
   <div style={{ margin: '16px' }}>
-    <AppContext>
-      <HotKeysProvider>
+    <HotKeysProvider>
+      <AppContext>
         <ThemeManager>
           <ToastProvider>
             {storyFn()}
           </ToastProvider>
         </ThemeManager>
-      </HotKeysProvider>
-    </AppContext>
+      </AppContext>
+    </HotKeysProvider>
   </div>
 )
 

@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import classNames from 'classnames'
+import clsx from 'clsx'
 import MenuIcon from '@material-ui/icons/Menu'
 import TenantChooser from 'openstack/components/tenants/TenantChooser'
 import RegionChooser from 'openstack/components/regions/RegionChooser'
@@ -68,7 +68,7 @@ const renderExtraContent = classes => {
 }
 
 const Toolbar = ({ classes, open, handleDrawerOpen }) => (
-  <AppBar className={classNames(classes.appBar, {
+  <AppBar className={clsx(classes.appBar, {
     [classes.appBarShift]: open,
     [classes['appBarShift-left']]: open,
   })}>
@@ -77,7 +77,7 @@ const Toolbar = ({ classes, open, handleDrawerOpen }) => (
         color="inherit"
         aria-label="open drawer"
         onClick={handleDrawerOpen}
-        className={classNames(classes.menuButton, open && classes.hide)}
+        className={clsx(classes.menuButton, open && classes.hide)}
       >
         <MenuIcon />
       </IconButton>

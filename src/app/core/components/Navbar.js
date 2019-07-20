@@ -11,7 +11,7 @@ import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'
 import SearchIcon from '@material-ui/icons/Search'
 import { except, notEmpty } from 'app/utils/fp'
-import classnames from 'classnames'
+import clsx from 'clsx'
 import { withHotKeys } from 'core/providers/HotKeysProvider'
 import moize from 'moize'
 import { assoc, flatten, pluck, prop, propEq, propOr, where } from 'ramda'
@@ -311,7 +311,7 @@ class Navbar extends PureComponent {
       <MenuItem
         key={name}
         onClick={handleClick}
-        className={classnames(classes.navMenuItem, {
+        className={clsx(classes.navMenuItem, {
           [classes.currentNavLink]: !!isCurrentNavLink,
         })}>
         {icon && <FontAwesomeIcon>{icon}</FontAwesomeIcon>}
@@ -346,7 +346,7 @@ class Navbar extends PureComponent {
       this.renderNavFolder(name, link, nestedLinks, icon)
     ) : (
       <MenuItem tabIndex={idx}
-        className={classnames(classes.navMenuItem, {
+        className={clsx(classes.navMenuItem, {
           [classes.activeNavItem]: isActiveNavLink,
           [classes.currentNavLink]: !!isCurrentNavLink && !isActiveNavLink,
         })}
@@ -431,12 +431,12 @@ class Navbar extends PureComponent {
 
     return <Drawer
       variant="permanent"
-      className={classnames(classes.drawer, {
+      className={clsx(classes.drawer, {
         [classes.drawerOpen]: open,
         [classes.drawerClose]: !open,
       })}
       classes={{
-        paper: classnames(classes.paper, {
+        paper: clsx(classes.paper, {
           [classes.drawerOpen]: open,
           [classes.drawerClose]: !open,
         }),
@@ -444,7 +444,7 @@ class Navbar extends PureComponent {
       anchor="left"
       open={open}
     >
-      <div className={classnames(classes.drawerHeader, {
+      <div className={clsx(classes.drawerHeader, {
         [classes.drawerHeaderClosed]: !open,
       })}>
         {withSearchBar ? this.renderNavFilterBar() : null}

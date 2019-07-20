@@ -16,6 +16,7 @@ import config from '../../config'
 import ApiClient from '../api-client'
 import './app.css'
 import { setupFromConfig } from './utils/registry'
+import moize from 'moize'
 
 setupFromConfig(config)
 window.process = process
@@ -62,9 +63,20 @@ class App extends React.Component {
       }} />
   }
 
+  getSections = moize(plugins =>
+    toPairs(plugins).map(([id, plugin]) => ({
+      id,
+      name: plugin.name,
+      links: plugin.getNavItems(),
+    })))
+
+  renderPlugins = moize(plugins =>
+    toPairs(plugins).map(apply(this.renderPluginRoutes)),
+  )
+
   render () {
     const { pluginManager } = this.props
-    const plugins = toPairs(pluginManager.getPlugins())
+    const plugins = pluginManager.getPlugins()
     const devEnabled = window.localStorage.enableDevPlugin === 'true'
     return (
       <Router>
@@ -76,12 +88,8 @@ class App extends React.Component {
                   <div id="_main-container">
                     <SessionManager>
                       <AppContainer
-                        sections={plugins.map(([id, plugin]) => ({
-                          id,
-                          name: plugin.name,
-                          links: plugin.getNavItems(),
-                        }))}>
-                        {plugins.map(apply(this.renderPluginRoutes))}
+                        sections={this.getSections(plugins)}>
+                        {this.renderPlugins(plugins)}
                         {devEnabled && <DeveloperToolsEmbed />}
                       </AppContainer>
                     </SessionManager>

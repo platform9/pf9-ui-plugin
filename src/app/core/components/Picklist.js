@@ -4,7 +4,7 @@ import FormControl from '@material-ui/core/FormControl'
 import MenuItem from '@material-ui/core/MenuItem'
 import { withStyles } from '@material-ui/styles'
 import { compose } from 'app/utils/fp'
-import classnames from 'classnames'
+import clsx from 'clsx'
 import TextField from '@material-ui/core/TextField'
 
 /**
@@ -48,7 +48,7 @@ class Picklist extends React.Component {
     // Hack to work around Material UI's Select ignoring empty string as a value
     const nonEmptyValue = value === '' ? '__none__' : value
     return (
-      <FormControl className={classnames(classes.formControl, className)}>
+      <FormControl className={clsx(classes.formControl, className)}>
         <TextField
           select
           variant="outlined"

@@ -3,7 +3,7 @@ import uuid from 'uuid'
 import { IconButton, Snackbar } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import { adjust, init, propEq } from 'ramda'
-import classnames from 'classnames'
+import clsx from 'clsx'
 import CheckCircleIcon from '@material-ui/icons/CheckCircle'
 import ErrorIcon from '@material-ui/icons/Error'
 import InfoIcon from '@material-ui/icons/Info'
@@ -54,11 +54,11 @@ const toastsTimeout = 5000
 const ToastContent = withStyles(styles)(({ onClose, type, message, classes, className, ...rest }) => {
   const Icon = variantIcon[type]
   return <SnackbarContent
-    className={classnames(classes[type], className)}
+    className={clsx(classes[type], className)}
     aria-describedby="client-snackbar"
     message={
       <span id="client-snackbar" className={classes.message}>
-        <Icon className={classnames(classes.icon, classes.iconVariant)} />
+        <Icon className={clsx(classes.icon, classes.iconVariant)} />
         {message}
       </span>
     }

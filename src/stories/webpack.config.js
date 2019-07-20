@@ -3,19 +3,11 @@
 // Aliases have been added so we don't have to figure out the relative paths.
 
 const R = require('ramda')
-const webpack = require('webpack')
-const merge = require('webpack-merge')
 const baseConfig = require('../../webpack.config.js')
 
-const config = merge(
-  R.pick(['module', 'resolve'], baseConfig),
-  {
-    devtool: 'cheap-module-eval-source-map',
-    plugins: [
-      new webpack.DefinePlugin({
-        'process.env.NODE_ENV': 'development'
-      })
-    ]
-  })
+module.exports = async ({ config, mode }) => {
+  config.resolve = R.mergeDeepRight(config.resolve || {}, baseConfig.resolve)
 
-module.exports = config
+  // Return the altered config
+  return config
+}

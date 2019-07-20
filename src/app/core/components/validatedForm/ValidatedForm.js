@@ -76,7 +76,7 @@ class ValidatedForm extends React.Component {
    */
   showFieldErrors = (field, errorMessage) => {
     this.setState(
-      setStateLens({ errorMessage, hasError: true }, ['errors', field])
+      setStateLens({ errorMessage, hasError: true }, ['errors', field]),
     )
   }
 
@@ -95,17 +95,17 @@ class ValidatedForm extends React.Component {
     const validationsArray = Array.isArray(validations)
       ? validations
       : toPairs(validations).map(([validationKey, validationSpec]) =>
-        parseValidator(validationKey, validationSpec)
+        parseValidator(validationKey, validationSpec),
       )
     const failedValidation = validationsArray.find(
-      validator => !validator.validate(fieldValue, values, field)
+      validator => !validator.validate(fieldValue, values, field),
     )
     if (failedValidation) {
       this.showFieldErrors(
         field,
         typeof failedValidation.errorMessage === 'function'
           ? failedValidation.errorMessage(fieldValue, values, field)
-          : failedValidation.errorMessage
+          : failedValidation.errorMessage,
       )
       return false
     }
@@ -131,7 +131,7 @@ class ValidatedForm extends React.Component {
   validateForm = () => {
     const { fields } = this.state
     const results = Object.keys(fields).map(field =>
-      this.validateField(field)
+      this.validateField(field),
     )
     return !results.includes(false)
   }
@@ -163,7 +163,9 @@ class ValidatedForm extends React.Component {
     const { children, classes, debug, id } = this.props
     return (
       <form onSubmit={this.handleSubmit} className={classes.root} id={id}>
-        <div className={classes.inputs}>
+        <div className={classes.inputs} classes={{
+          input: classes.formControl,
+        }}>
           <ValidatedFormProvider value={this.state}>
             {debug && <ValidatedFormDebug />}
             {children}

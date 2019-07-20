@@ -7,7 +7,7 @@ import {
 } from '@material-ui/core'
 import { compose } from 'utils/fp'
 import { withStyles } from '@material-ui/styles'
-import * as classnames from 'classnames'
+import clsx from 'clsx'
 
 const styles = theme => ({
   root: {
@@ -74,7 +74,7 @@ class ListTableHead extends React.Component {
     } = this.props
 
     const headerCheckbox = showCheckboxes && !blankFirstColumn
-      ? <TableCell padding="checkbox" key="_checkAll" className={classnames(classes.cellLabel,
+      ? <TableCell padding="checkbox" key="_checkAll" className={clsx(classes.cellLabel,
         classes.checkAllCell, {
           [classes.emptyCheckAllCell]: !numSelected,
         })}>

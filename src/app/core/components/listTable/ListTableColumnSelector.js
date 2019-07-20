@@ -5,7 +5,7 @@ import { withStyles } from '@material-ui/styles'
 import grey from '@material-ui/core/colors/grey'
 import { compose } from 'ramda'
 import ListTableColumnPopover from 'core/components/listTable/ListTableColumnPopover'
-import classnames from 'classnames'
+import clsx from 'clsx'
 
 const styles = theme => ({
   root: {
@@ -55,7 +55,7 @@ class ListTableColumnSelector extends React.PureComponent {
 
     return <React.Fragment>
       <Tooltip title="Select Columns">
-        <i className={classnames(classes.button, 'fas fa-fw fa-lg fa-cog')}
+        <i className={clsx(classes.button, 'fas fa-fw fa-lg fa-cog')}
           aria-owns={open ? 'simple-popper' : undefined}
           aria-label="Select Columns"
           aria-haspopup="true"

@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/core/styles'
-import classnames from 'classnames'
+import clsx from 'clsx'
 import { imageUrls } from 'app/constants'
 import Typography from '@material-ui/core/Typography'
 
@@ -97,15 +97,15 @@ class Progress extends PureComponent {
     if (!loading) {
       return null
     }
-    return <div className={classnames(classes.status, {
+    return <div className={clsx(classes.status, {
       [classes.statusInline]: inline,
       [classes.statusOverlayed]: overlay && loading && (renderContentOnMount || loadedOnce),
     })}>
       {renderLoadingImage &&
-      <img alt="" src={imageUrls.loading} className={classnames(classes.img, {
+      <img alt="" src={imageUrls.loading} className={clsx(classes.img, {
         [classes.imgInline]: inline,
       })} />}
-      {message && <Typography className={classnames(classes.message, {
+      {message && <Typography className={clsx(classes.message, {
         [classes.messageInline]: inline,
       })} variant="caption" color="textSecondary">
         {message}
@@ -126,7 +126,7 @@ class Progress extends PureComponent {
     if (!children || (!renderContentOnMount && !loadedOnce)) {
       return null
     }
-    return <div className={classnames(classes.content, {
+    return <div className={clsx(classes.content, {
       [classes.hiddenContent]: loading && !overlay,
       [classes.contentLoading]: loading,
     })}>{children}</div>
@@ -140,7 +140,7 @@ class Progress extends PureComponent {
     } = this.props
 
     return <div
-      className={classnames(classes.root, {
+      className={clsx(classes.root, {
         [classes.fixed]: fixed,
         [classes.rootInline]: inline,
       })}>

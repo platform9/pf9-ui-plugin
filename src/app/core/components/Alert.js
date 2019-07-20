@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import classNames from 'classnames'
+import clsx from 'clsx'
 import CheckCircleIcon from '@material-ui/icons/CheckCircle'
 import ErrorIcon from '@material-ui/icons/Error'
 import InfoIcon from '@material-ui/icons/Info'
@@ -56,9 +56,9 @@ class Alert extends React.Component {
     const Icon = variantIcon[variant]
 
     return (
-      <div className={classNames(classes.container, classes[variant])}>
+      <div className={clsx(classes.container, classes[variant])}>
         <span className={classes.message}>
-          <Icon className={classNames(classes.icon, classes.iconVariant)} />
+          <Icon className={clsx(classes.icon, classes.iconVariant)} />
           {message && <Typography variant="body1" color="inherit">{message}</Typography>}
           {children}
         </span>

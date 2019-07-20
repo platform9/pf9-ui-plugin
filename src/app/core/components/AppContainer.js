@@ -3,7 +3,7 @@ import axios from 'axios'
 import React from 'react'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/styles'
-import classNames from 'classnames'
+import clsx from 'clsx'
 import Intercom from 'core/components/integrations/Intercom'
 import Navbar, { drawerWidth } from 'core/components/Navbar'
 import Toolbar from 'core/components/Toolbar'
@@ -101,7 +101,7 @@ class AppContainer extends React.Component {
             sections={sections}
             open={open}
             handleDrawerClose={this.handleDrawerClose} />
-          <main className={classNames(classes.content, classes['content-left'], {
+          <main className={clsx(classes.content, classes['content-left'], {
             [classes.contentShift]: open,
             [classes['contentShift-left']]: open,
           })}>

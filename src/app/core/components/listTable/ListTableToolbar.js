@@ -6,7 +6,7 @@ import ListTableFilters from 'core/components/listTable/ListTableFilters'
 import ListTableRowActions from './ListTableRowActions'
 import PerPageControl from './PerPageControl'
 import SearchBar from 'core/components/SearchBar'
-import classnames from 'classnames'
+import clsx from 'clsx'
 import { compose } from 'ramda'
 import { Button, Toolbar, Tooltip } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
@@ -58,7 +58,7 @@ const ListTableToolbar = ({
   const numSelected = (selected || []).length
   return (
     <Toolbar
-      className={classnames(classes.root, {
+      className={clsx(classes.root, {
         [classes.highlight]: numSelected > 0,
       })}
     >
