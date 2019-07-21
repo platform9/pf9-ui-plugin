@@ -1,4 +1,3 @@
-import 'app/bootstrap'
 import StoryRouter from 'storybook-react-router'
 import { addDecorator, addParameters, configure } from '@storybook/react'
 import { appDecorators } from './helpers'

@@ -7,8 +7,8 @@ import { rootPath } from 'core/globals'
 const styles = theme => ({
   card: {
     display: 'flex',
-    marginTop: theme.spacing.unit * 2.5,
-    padding: theme.spacing.unit * 3
+    marginTop: theme.spacing(2.5),
+    padding: theme.spacing(3)
   },
   details: {
     display: 'flex',
@@ -26,11 +26,11 @@ const styles = theme => ({
     flexGrow: 1,
   },
   icon: {
-    marginRight: theme.spacing.unit * 0.5
+    marginRight: theme.spacing(0.5)
   },
   text: {
     display: 'inline-block',
-    marginRight: theme.spacing.unit * 0.5
+    marginRight: theme.spacing(0.5)
   }
 })
 

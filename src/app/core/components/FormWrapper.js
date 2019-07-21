@@ -5,16 +5,16 @@ import { Button, Divider, Grid, Paper, Typography } from '@material-ui/core'
 
 const styles = theme => ({
   root: {
-    marginTop: theme.spacing.unit * 5,
-    marginBottom: theme.spacing.unit * 5,
-    padding: theme.spacing.unit * 5,
+    marginTop: theme.spacing(5),
+    marginBottom: theme.spacing(5),
+    padding: theme.spacing(5),
   },
   title: {
     color: theme.palette.grey[700],
-    marginBottom: theme.spacing.unit * 2
+    marginBottom: theme.spacing(2)
   },
   divider: {
-    marginBottom: theme.spacing.unit * 2
+    marginBottom: theme.spacing(2)
   }
 })
 

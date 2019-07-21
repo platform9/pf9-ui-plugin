@@ -2,11 +2,12 @@ import React from 'react'
 import TextField from 'core/components/validatedForm/TextField'
 import Checkbox from 'core/components/validatedForm/CheckboxField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
-import { Slider } from '@material-ui/lab'
 import { compose, pick, pathOr } from 'ramda'
 import { withAppContext } from 'core/AppContext'
 import { scaleCluster, loadClusters } from './actions'
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@material-ui/core'
+import {
+  Slider, Button, Dialog, DialogActions, DialogContent, DialogTitle,
+} from '@material-ui/core'
 import withDataLoader from 'core/hocs/withDataLoader'
 import withDataMapper from 'core/hocs/withDataMapper'
 

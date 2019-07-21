@@ -27,7 +27,7 @@ const styles = theme => ({
   icon: { fontSize: 20 },
   iconVariant: {
     opacity: 0.9,
-    marginRight: theme.spacing.unit
+    marginRight: theme.spacing(1)
   },
   message: {
     color: theme.palette.primary.contrastText,
@@ -38,8 +38,8 @@ const styles = theme => ({
     color: theme.palette.primary.contrastText,
     display: 'flex',
     justifyContent: 'space-between',
-    margin: `${theme.spacing.unit}px 0`,
-    padding: theme.spacing.unit,
+    margin: `${theme.spacing(1)}px 0`,
+    padding: theme.spacing(1),
     width: '100%',
   }
 })

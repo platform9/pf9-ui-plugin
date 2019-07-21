@@ -17,7 +17,7 @@ const styles = theme => ({
     width: ({ compact }) =>
       compact ? '100%' : 100,
     paddingLeft: ({ compact }) =>
-      compact ? null : theme.spacing.unit,
+      compact ? null : theme.spacing(1),
     ...theme.typography.captionNext
   },
   progressContainer: {

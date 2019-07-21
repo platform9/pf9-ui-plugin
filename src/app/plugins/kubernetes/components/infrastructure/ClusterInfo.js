@@ -32,7 +32,7 @@ const openstackProps = cluster => ({
 const styles = theme => ({
   root: {
     flexGrow: 1,
-    marginTop: theme.spacing.unit
+    marginTop: theme.spacing(1)
   },
 })
 
@@ -41,7 +41,7 @@ const ClusterInfo = ({ match, data, context, classes }) => {
   const { usage } = clusterUsageStats(cluster, context)
   return (
     <React.Fragment>
-      <Grid container spacing={40} className={classes.root}>
+      <Grid container spacing={4} className={classes.root}>
         <Grid item xs={4}>
           <UsageWidget title="Compute" stats={usage.compute} />
         </Grid>
@@ -52,7 +52,7 @@ const ClusterInfo = ({ match, data, context, classes }) => {
           <UsageWidget title="Storage" stats={usage.disk} />
         </Grid>
       </Grid>
-      <Grid container spacing={40} className={classes.root}>
+      <Grid container spacing={4} className={classes.root}>
         <Grid item xs={6}>
           <InfoPanel title="Overview" items={overviewStats(cluster)} />
         </Grid>

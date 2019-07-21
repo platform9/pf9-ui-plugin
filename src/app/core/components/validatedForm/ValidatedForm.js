@@ -26,7 +26,7 @@ const styles = theme => ({
     maxWidth: '400px',
   },
   formControl: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
   },
 })
 

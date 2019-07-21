@@ -1,17 +1,14 @@
 import React from 'react'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import {
-  ExpansionPanel,
-  ExpansionPanelDetails,
-  ExpansionPanelSummary,
-  Typography,
+  ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, Typography,
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 
 const styles = theme => ({
   root: {
     width: '100%',
-    marginBottom: theme.spacing.unit * 2,
+    marginBottom: theme.spacing(2),
   },
   heading: {
     fontSize: theme.typography.pxToRem(15),

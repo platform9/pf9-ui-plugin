@@ -10,7 +10,7 @@ import { compose, pick } from 'ramda'
 const styles = theme => ({
   SearchBar: {
     outline: 'none',
-    marginRight: theme.spacing.unit * 2,
+    marginRight: theme.spacing(2),
   },
   clearIcon: {
     '&:hover': {

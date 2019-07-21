@@ -12,7 +12,7 @@ import {
 
 const styles = theme => ({
   root: {
-    marginTop: theme.spacing.unit * 4,
+    marginTop: theme.spacing(4),
     width: '100%',
   },
   panel: {

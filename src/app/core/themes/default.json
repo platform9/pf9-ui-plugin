@@ -340,15 +340,12 @@
             "lineHeight": 2.66,
             "letterSpacing": "0.08333em",
             "textTransform": "uppercase"
-        },
-        "useNextVariants": true
+        }
     },
     "shape": {
         "borderRadius": 4
     },
-    "spacing": {
-        "unit": 8
-    },
+    "spacing": 8,
     "transitions": {
         "easing": {
             "easeInOut": "cubic-bezier(0.4, 0, 0.2, 1)",

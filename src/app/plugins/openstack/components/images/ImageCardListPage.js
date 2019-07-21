@@ -6,8 +6,8 @@ import { Paper, Typography } from '@material-ui/core'
 
 const styles = theme => ({
   instruction: {
-    marginTop: theme.spacing.unit * 2.5,
-    padding: theme.spacing.unit * 4
+    marginTop: theme.spacing(2.5),
+    padding: theme.spacing(4)
   }
 })
 

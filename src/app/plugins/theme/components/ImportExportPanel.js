@@ -9,7 +9,7 @@ import { withStyles } from '@material-ui/styles'
 
 const styles = theme => ({
   marginRight: {
-    marginRight: theme.spacing.unit * 2,
+    marginRight: theme.spacing(2),
   }
 })
 

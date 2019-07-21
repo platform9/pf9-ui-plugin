@@ -23,13 +23,13 @@ const actions = { onMainActionClick, onDetailClick, onDownloadClick }
 const styles = theme => ({
   card: {
     display: 'flex'
-    // margin: theme.spacing.unit,
+    // margin: theme.spacing(1),
     // padding: 0
   },
   text: {
     display: 'inline-block',
-    marginTop: theme.spacing.unit,
-    marginRight: theme.spacing.unit * 0.5
+    marginTop: theme.spacing(1),
+    marginRight: theme.spacing(0.5)
   },
   rightText: {
     display: 'inline-block'
@@ -37,7 +37,7 @@ const styles = theme => ({
   header: {
     textAlign: 'center',
     width: 120,
-    padding: theme.spacing.unit * 2,
+    padding: theme.spacing(2),
     borderRight: '1px solid #d2d2d2'
   },
   details: {
@@ -49,15 +49,15 @@ const styles = theme => ({
     width: '100%',
     minHeight: 120,
     backgroundSize: 'contain',
-    backgroundPosition: `50% ${theme.spacing.unit}px`,
-    marginBottom: theme.spacing.unit
+    backgroundPosition: `50% ${theme.spacing(1)}px`,
+    marginBottom: theme.spacing(1)
   },
   buttonIcon: {
-    marginRight: theme.spacing.unit
+    marginRight: theme.spacing(1)
   },
   divider: {
-    marginTop: theme.spacing.unit,
-    marginBottom: theme.spacing.unit
+    marginTop: theme.spacing(1),
+    marginBottom: theme.spacing(1)
   },
   info: {
     overflow: 'hidden',
@@ -72,7 +72,7 @@ const styles = theme => ({
     '&:before': {
       content: '\'...\'',
       position: 'absolute',
-      right: theme.spacing.unit,
+      right: theme.spacing(1),
       bottom: 0
     },
     '&:after': {
@@ -92,7 +92,7 @@ const styles = theme => ({
     display: 'flex',
     justifyContent: 'flex-end',
     alignItems: 'center',
-    padding: theme.spacing.unit
+    padding: theme.spacing(1)
   }
 })
 

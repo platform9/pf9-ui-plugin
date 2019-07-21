@@ -8,7 +8,7 @@ import { withStyles } from '@material-ui/styles'
 const BootstrapInput = withStyles(theme => ({
   root: {
     'label + &': {
-      marginTop: theme.spacing.unit * 3,
+      marginTop: theme.spacing(3),
     },
   },
   input: {
@@ -42,7 +42,7 @@ const BootstrapInput = withStyles(theme => ({
 
 const styles = theme => ({
   margin: {
-    margin: theme.spacing.unit * 1,
+    margin: theme.spacing(1),
   },
 })
 

@@ -16,7 +16,7 @@ const BackButton = ({ handleBack, ...rest }) =>
   <Button variant="outlined" onClick={handleBack} {...rest}>Back</Button>
 
 const styles = theme => ({
-  button: { marginRight: theme.spacing.unit },
+  button: { marginRight: theme.spacing(1) },
 })
 
 class Wizard extends React.Component {

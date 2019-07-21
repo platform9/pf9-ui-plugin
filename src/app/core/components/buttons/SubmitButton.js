@@ -4,7 +4,7 @@ import { withStyles } from '@material-ui/styles'
 
 const styles = theme => ({
   baseButton: {
-    margin: theme.spacing.unit * 1,
+    margin: theme.spacing(1),
     borderRadius: 2,
   }
 })

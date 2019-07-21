@@ -14,10 +14,10 @@ const styles = theme => ({
   },
   avatarImg: {
     backgroundColor: theme.palette.primary.dark,
-    marginRight: theme.spacing.unit,
-    fontSize: theme.spacing.unit * 2,
-    height: theme.spacing.unit * 3,
-    width: theme.spacing.unit * 3,
+    marginRight: theme.spacing(1),
+    fontSize: theme.spacing(2),
+    height: theme.spacing(3),
+    width: theme.spacing(3),
   },
 })
 

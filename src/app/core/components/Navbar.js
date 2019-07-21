@@ -25,13 +25,13 @@ const styles = theme => ({
     position: 'relative',
     borderRadius: theme.shape.borderRadius,
     backgroundColor: '#FFF',
-    marginRight: theme.spacing.unit * 2,
+    marginRight: theme.spacing(2),
     marginLeft: 0,
     width: '100%',
-    marginTop: theme.spacing.unit,
+    marginTop: theme.spacing(1),
   },
   searchIcon: {
-    width: theme.spacing.unit * 6,
+    width: theme.spacing(6),
     height: '100%',
     position: 'absolute',
     pointerEvents: 'none',
@@ -56,15 +56,15 @@ const styles = theme => ({
     }),
   },
   drawerClose: {
-    marginTop: theme.spacing.unit * 8,
+    marginTop: theme.spacing(8),
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
     overflowX: 'hidden',
-    width: (theme.spacing.unit * 6) + 1,
+    width: (theme.spacing(6)) + 1,
     [theme.breakpoints.up('sm')]: {
-      width: (theme.spacing.unit * 6) + 1,
+      width: (theme.spacing(6)) + 1,
     },
   },
   paper: {
@@ -86,10 +86,10 @@ const styles = theme => ({
   },
   inputInput: {
     fontSize: theme.typography.fontSize * 1.2,
-    paddingTop: theme.spacing.unit,
-    paddingRight: theme.spacing.unit,
-    paddingBottom: theme.spacing.unit,
-    paddingLeft: theme.spacing.unit * 6,
+    paddingTop: theme.spacing(1),
+    paddingRight: theme.spacing(1),
+    paddingBottom: theme.spacing(1),
+    paddingLeft: theme.spacing(6),
     transition: theme.transitions.create('width'),
     width: '100%',
   },
@@ -107,9 +107,9 @@ const styles = theme => ({
   navHeading: {
     backgroundColor: theme.palette.grey[50],
     paddingTop: 0,
-    paddingRight: theme.spacing.unit * 1,
+    paddingRight: theme.spacing(1),
     paddingBottom: 0,
-    paddingLeft: theme.spacing.unit * 1,
+    paddingLeft: theme.spacing(1),
   },
   navHeadingText: {
     ...theme.typography.subtitle2,
@@ -123,10 +123,10 @@ const styles = theme => ({
     width: '100%',
   },
   navMenuItem: {
-    paddingTop: theme.spacing.unit,
-    paddingRight: theme.spacing.unit * 2,
-    paddingBottom: theme.spacing.unit,
-    paddingLeft: theme.spacing.unit * 2,
+    paddingTop: theme.spacing(1),
+    paddingRight: theme.spacing(2),
+    paddingBottom: theme.spacing(1),
+    paddingLeft: theme.spacing(2),
     backgroundColor: theme.palette.sidebar.background,
     color: theme.palette.sidebar.text,
     borderBottom: '1px solid #07283e',
@@ -145,7 +145,7 @@ const styles = theme => ({
     fontWeight: 500,
   },
   navMenuList: {
-    borderLeft: `${theme.spacing.unit}px solid #6dc6fe`,
+    borderLeft: `${theme.spacing(1)}px solid #6dc6fe`,
   },
   sliderContainer: {
     display: 'flex',
@@ -309,7 +309,7 @@ class Navbar extends PureComponent {
       this.state.expandedItems.includes(name))
     return [
       <MenuItem
-        key={name}
+        key={`menuItem-${name}`}
         onClick={handleClick}
         className={clsx(classes.navMenuItem, {
           [classes.currentNavLink]: !!isCurrentNavLink,
@@ -320,7 +320,7 @@ class Navbar extends PureComponent {
           primary={name} />
         {expanded ? <ExpandLess /> : <ExpandMore />}
       </MenuItem>,
-      <Collapse in={expanded} timeout="auto" unmountOnExit>
+      <Collapse key={`collapse-${name}`} in={expanded} timeout="auto" unmountOnExit>
         <MenuList component="div" className={classes.navMenuList}
           disablePadding>
           {subLinks.map(this.renderNavLink)}

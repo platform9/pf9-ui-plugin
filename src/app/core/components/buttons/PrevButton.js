@@ -5,11 +5,11 @@ import { withStyles } from '@material-ui/styles'
 
 const styles = theme => ({
   baseButton: {
-    margin: theme.spacing.unit * 1,
+    margin: theme.spacing(1),
     borderRadius: 2,
   },
   leftIcon: {
-    marginRight: theme.spacing.unit * 1
+    marginRight: theme.spacing(1)
   },
 })
 

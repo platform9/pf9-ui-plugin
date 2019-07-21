@@ -5,7 +5,7 @@ import withParams from 'core/hocs/withParams'
 import withDataMapper from 'core/hocs/withDataMapper'
 import { withAppContext } from 'core/AppContext'
 
-export const mapByClusterId = contextKey => ({ context = {}, params: { clusterId } }) => {
+export const mapByClusterId = contextKey => ({ context = {}, params: { clusterId } = {} }) => {
   return pathOr([], [contextKey, clusterId], context)
 }
 

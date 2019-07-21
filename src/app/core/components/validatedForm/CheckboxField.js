@@ -10,7 +10,7 @@ import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/va
 
 const styles = theme => ({
   formControl: {
-    marginTop: theme.spacing.unit,
+    marginTop: theme.spacing(1),
   }
 })
 

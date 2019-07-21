@@ -12,11 +12,11 @@ import SimpleLink from 'core/components/SimpleLink'
 
 const styles = theme => ({
   root: {
-    padding: theme.spacing.unit * 8,
+    padding: theme.spacing(8),
     overflow: 'auto',
   },
   paper: {
-    padding: theme.spacing.unit * 4,
+    padding: theme.spacing(4),
   },
   img: {
     maxHeight: '70%',
@@ -26,25 +26,25 @@ const styles = theme => ({
     marginRight: 'auto',
   },
   form: {
-    paddingTop: theme.spacing.unit * 3,
+    paddingTop: theme.spacing(3),
   },
   textField: {
     minWidth: '100%',
-    marginTop: theme.spacing.unit,
+    marginTop: theme.spacing(1),
   },
   checkbox: {
-    marginTop: theme.spacing.unit * 3,
+    marginTop: theme.spacing(3),
   },
   signinButton: {
     minWidth: '80%',
-    marginTop: theme.spacing.unit * 3,
+    marginTop: theme.spacing(3),
     display: 'block',
     marginLeft: 'auto',
     marginRight: 'auto',
   },
   forgotPwd: {
-    marginTop: theme.spacing.unit * 2,
-    marginBottom: theme.spacing.unit * 3,
+    marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(3),
     textAlign: 'center',
   },
   paragraph: {

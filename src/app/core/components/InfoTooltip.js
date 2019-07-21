@@ -18,7 +18,7 @@ const styles = theme => ({
     marginTop: 0
   },
   infoIcon: {
-    fontSize: theme.spacing.unit * 2.4,
+    fontSize: theme.spacing(2.4),
     paddingTop: '0.1rem',
     paddingRight: '0.5rem',
   }

@@ -17,7 +17,7 @@ const styles = theme => ({
     minWidth: 100,
     minHeight: 100,
     backgroundSize: 'contain',
-    backgroundPosition: `50% ${theme.spacing.unit}px`,
+    backgroundPosition: `50% ${theme.spacing(1)}px`,
   },
 })
 

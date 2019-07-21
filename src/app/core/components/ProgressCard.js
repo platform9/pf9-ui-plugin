@@ -7,7 +7,7 @@ const styles = theme => ({
   card: {
     minWidth: 200,
     maxHeight: 300,
-    marginTop: theme.spacing.unit * 3
+    marginTop: theme.spacing(3)
   },
   title: {
     backgroundColor: theme.palette.grey[50]
@@ -30,7 +30,7 @@ const styles = theme => ({
     left: '45%'
   },
   description: {
-    marginTop: theme.spacing.unit * 5,
+    marginTop: theme.spacing(5),
   }
 })
 

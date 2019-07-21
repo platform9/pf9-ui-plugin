@@ -20,7 +20,6 @@ const styles = theme => ({
 
 const textTheme = createMuiTheme({
   typography: {
-    useNextVariants: true,
     title: {
       lineHeight: 2
     },

@@ -1,16 +1,12 @@
 import React from 'react'
 import { withRouter } from 'react-router'
-import { compose, pathOr } from 'ramda'
-import { loadClusters } from './actions'
+import { compose, pluck } from 'ramda'
 // This table essentially has the same functionality as the <NodesList>
 // except that it is only the nodes from the a single cluster.
 import { columns } from './NodesListPage'
 import createListTableComponent from 'core/helpers/createListTableComponent'
 import { loadNodes } from 'k8s/components/infrastructure/actions'
-import withDataLoader from 'core/hocs/withDataLoader'
-import withDataMapper from 'core/hocs/withDataMapper'
-import { mapByClusterId } from 'k8s/helpers/clusterizedDataLoader'
-import { withAppContext } from 'core/AppContext'
+import clusterizedDataLoader from 'k8s/helpers/clusterizedDataLoader'
 
 const ListTable = createListTableComponent({
   title: 'Cluster Nodes',
@@ -20,18 +16,15 @@ const ListTable = createListTableComponent({
   uniqueIdentifier: 'uuid',
 })
 
-const ClusterNodes = ({ data, match }) => {
-  const cluster = data.clusters.find(x => x.uuid === match.params.id)
-  const nodes = cluster.nodes.map(node => data.nodes.find(x => x.uuid === node.uuid))
-  return <ListTable data={nodes} />
+const ClusterNodes = ({ data: { clusters, nodes }, match }) => {
+  const cluster = clusters.find(x => x.uuid === match.params.id)
+  const clusterNodesUids = pluck('uuid', cluster.nodes)
+  const clusterNodes = nodes.filter(node => clusterNodesUids.includes(node.uuid))
+
+  return <ListTable data={clusterNodes} />
 }
 
 export default compose(
+  clusterizedDataLoader('nodes', loadNodes),
   withRouter,
-  withAppContext,
-  withDataLoader({ clusters: loadClusters, nodes: loadNodes }),
-  withDataMapper({
-    clusters: pathOr([], ['context', 'clusters']),
-    nodes: mapByClusterId('nodes'),
-  }),
 )(ClusterNodes)

@@ -8,7 +8,7 @@ import { loadPrometheusRules, updatePrometheusRules } from './actions'
 import { withStyles } from '@material-ui/styles'
 
 @withStyles(theme => ({
-  submit: { marginTop: theme.spacing.unit * 3 },
+  submit: { marginTop: theme.spacing(3) },
 }))
 class UpdatePrometheusRuleForm extends React.Component {
   state = this.props.initialValues

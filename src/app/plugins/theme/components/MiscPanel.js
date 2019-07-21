@@ -19,7 +19,7 @@ const MiscPanel = ({ context, setContext }) => {
     <Panel title="Misc">
       <div>
         spacing.unit &nbsp;
-        <TextField type="number" value={context.theme.spacing.unit} onChange={handleChange('spacing.unit')} />
+        <TextField type="number" value={context.theme.spacing(1)} onChange={handleChange('spacing.unit')} />
       </div>
     </Panel>
   )

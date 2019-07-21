@@ -35,31 +35,31 @@ const styles = theme => ({
     marginRight: drawerWidth,
   },
   menuButton: {
-    marginLeft: theme.spacing.unit * 1.5,
-    marginRight: theme.spacing.unit,
+    marginLeft: theme.spacing(1.5),
+    marginRight: theme.spacing(1),
   },
   hide: {
     display: 'none',
   },
   logo: {
-    maxHeight: theme.spacing.unit * 6.5,
+    maxHeight: theme.spacing(6.5),
   },
   rightTools: {
     position: 'absolute',
-    right: theme.spacing.unit * 2,
+    right: theme.spacing(2),
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'flex-end',
     width: '700px',
   },
   leftMargin: {
-    marginLeft: theme.spacing.unit * 2,
+    marginLeft: theme.spacing(2),
   },
   extraContent: {
     position: 'absolute',
     color: theme.palette.text.primary,
-    right: theme.spacing.unit * 3,
-    bottom: -(theme.spacing.unit * 9.5),
+    right: theme.spacing(3),
+    bottom: -(theme.spacing(9.5)),
   },
 })
 

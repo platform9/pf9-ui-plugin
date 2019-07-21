@@ -10,7 +10,7 @@ import ListTableFiltersPopover from 'core/components/listTable/ListTableFilters'
 const styles = theme => ({
   root: {
     outline: 'none',
-    padding: theme.spacing.unit * 2
+    padding: theme.spacing(2)
   },
   clearIcon: {
     '&:hover': {

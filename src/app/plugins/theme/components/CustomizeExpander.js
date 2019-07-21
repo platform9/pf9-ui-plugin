@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/styles'
 
 const styles = theme => ({
   root: {
-    marginTop: theme.spacing.unit * 4,
+    marginTop: theme.spacing(4),
   }
 })
 

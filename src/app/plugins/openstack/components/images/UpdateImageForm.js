@@ -16,7 +16,7 @@ const UpdateImageForm = ({ image, onSubmit }) =>
     <TextField id="visibility" label="Visibility" />
     <Checkbox id="protected" label="Protected" />
     <TextField id="tags" label="Tags" />
-    <Button type="submit" variant="raised">Update Image</Button>
+    <Button type="submit" variant="contained">Update Image</Button>
   </ValidatedForm>
 
 export default UpdateImageForm

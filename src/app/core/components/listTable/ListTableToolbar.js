@@ -15,7 +15,7 @@ import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 
 const toolbarStyles = theme => ({
   root: {
-    paddingRight: theme.spacing.unit,
+    paddingRight: theme.spacing(1),
     color: theme.palette.grey[600],
 
   },
@@ -33,9 +33,9 @@ const toolbarStyles = theme => ({
     color: 'inherit',
   },
   action: {
-    marginTop: theme.spacing.unit * 2,
-    marginLeft: theme.spacing.unit,
-    marginRight: theme.spacing.unit,
+    marginTop: theme.spacing(2),
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
     cursor: 'pointer',
     display: 'flex',
     flexFlow: 'column nowrap',

@@ -29,9 +29,6 @@ if (isDev) {
 // main entry point
 appEntry.push('@babel/polyfill')
 
-// Install css-in-js https://material-ui.com/css-in-js/basics/#migration-for-material-ui-core-users
-appEntry.push('./bootstrap.js')
-
 // Don't include react-hot-loader in prod
 appEntry.push(isDev ? './index.js' : './index.prod.js')
 

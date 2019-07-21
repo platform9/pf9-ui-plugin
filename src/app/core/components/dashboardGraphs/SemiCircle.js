@@ -9,7 +9,7 @@ const strokeWidth = 8
 
 const styles = theme => ({
   root: {
-    padding: theme.spacing.unit,
+    padding: theme.spacing(1),
     width: ({ width }) => width,
     position: 'relative',
   },
