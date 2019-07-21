@@ -138,11 +138,13 @@ const styles = theme => ({
     color: theme.palette.sidebar.text,
     fontSize: '12px',
     fontWeight: 500,
+    marginLeft: theme.spacing(2),
   },
   currentNavMenuText: {
     color: 'rgba(0, 0, 0, 0.87)',
     fontSize: '12px',
     fontWeight: 500,
+    marginLeft: theme.spacing(2),
   },
   navMenuList: {
     borderLeft: `${theme.spacing(1)}px solid #6dc6fe`,
@@ -318,7 +320,7 @@ class Navbar extends PureComponent {
         <ListItemText
           classes={{ primary: isCurrentNavLink ? classes.currentNavMenuText : classes.navMenuText }}
           primary={name} />
-        {expanded ? <ExpandLess /> : <ExpandMore />}
+        {open ? (expanded ? <ExpandLess /> : <ExpandMore />) : null}
       </MenuItem>,
       <Collapse key={`collapse-${name}`} in={expanded} timeout="auto" unmountOnExit>
         <MenuList component="div" className={classes.navMenuList}
