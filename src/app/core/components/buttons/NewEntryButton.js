@@ -6,6 +6,7 @@ const styles = theme => ({
   baseButton: {
     margin: theme.spacing(1),
     borderRadius: 2,
+    textTransform: 'none',
   },
 })
 

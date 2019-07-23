@@ -15,6 +15,9 @@ const styles = theme => ({
   },
   divider: {
     marginBottom: theme.spacing(2)
+  },
+  buttonBase: {
+    textTransform: 'none',
   }
 })
 
@@ -43,6 +46,7 @@ class FormWrapper extends React.Component {
               {backUrl &&
                 <Grid item>
                   <Button
+                    className={classes.buttonBase}
                     variant="outlined"
                     component={Link}
                     to={backUrl}

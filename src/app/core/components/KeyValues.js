@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import AutocompleteBase from 'core/components/AutocompleteBase'
-import Button from '@material-ui/core/Button'
 import IconButton from '@material-ui/core/IconButton'
 import DeleteIcon from '@material-ui/icons/Delete'
+import SubmitButton from 'core/components/buttons/SubmitButton'
 import uuid from 'uuid'
 import { assoc } from 'ramda'
 
@@ -77,7 +77,7 @@ const KeyValues = ({ entries: _entries, onChange, keySuggestions, valueSuggestio
       ))}
       <div>
         <br />
-        <Button variant="contained" color="primary" onClick={addBlankEntry}>Add key / value pair</Button>
+        <SubmitButton onClick={addBlankEntry}>Add key / value pair</SubmitButton>
       </div>
     </div>
   )

@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import PicklistField from 'core/components/validatedForm/PicklistField'
-import SubmitButton from 'core/components/SubmitButton'
+import SubmitButton from 'core/components/buttons/SubmitButton'
 import TextField from 'core/components/validatedForm/TextField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import { Card, CardContent, Typography } from '@material-ui/core'

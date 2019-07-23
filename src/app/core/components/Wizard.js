@@ -1,8 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Button } from '@material-ui/core'
 import FormButtons from 'core/components/FormButtons'
 import ProgressTracker from 'core/components/ProgressTracker'
+import NextButton from 'core/components/buttons/NextButton'
+import PrevButton from 'core/components/buttons/PrevButton'
 import { withStyles } from '@material-ui/styles'
 
 const WizardContext = React.createContext({})
@@ -10,13 +11,7 @@ const WizardContext = React.createContext({})
 export const Consumer = WizardContext.Consumer
 export const Provider = WizardContext.Provider
 
-const NextButton = ({ children, handleNext, ...rest }) =>
-  <Button variant="outlined" onClick={handleNext} {...rest}>{children}</Button>
-const BackButton = ({ handleBack, ...rest }) =>
-  <Button variant="outlined" onClick={handleBack} {...rest}>Back</Button>
-
 const styles = theme => ({
-  button: { marginRight: theme.spacing(1) },
 })
 
 class Wizard extends React.Component {
@@ -89,7 +84,7 @@ class Wizard extends React.Component {
 
   render () {
     const { wizardContext, setWizardContext, steps, step } = this.state
-    const { children, submitLabel, classes } = this.props
+    const { children, submitLabel } = this.props
 
     return (
       <div>
@@ -98,11 +93,11 @@ class Wizard extends React.Component {
           {children({ wizardContext, setWizardContext, onNext: this.onNext })}
           <FormButtons>
             {this.hasBack() &&
-              <BackButton className={classes.button} handleBack={this.handleBack} />}
+              <PrevButton onClick={this.handleBack} />}
             {this.hasNext() &&
-              <NextButton className={classes.button} handleNext={this.handleNext}>Next</NextButton>}
+              <NextButton onClick={this.handleNext}>Next</NextButton>}
             {this.isLastStep() &&
-              <NextButton className={classes.button} handleNext={this.handleNext}>{submitLabel}</NextButton>}
+              <NextButton onClick={this.handleNext}>{submitLabel}</NextButton>}
           </FormButtons>
         </Provider>
       </div>
