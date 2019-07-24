@@ -26,6 +26,9 @@ const styles = theme => ({
   tableWrapper: {
     overflowX: 'auto',
   },
+  cell: {
+    fontSize: '13px',
+  }
 })
 
 // Reject all columns that are not visible or excluded
@@ -273,6 +276,7 @@ class ListTable extends React.Component {
   }
 
   renderCell = (columnDef, contents, row) => {
+    const { classes } = this.props
     const { cellProps = {} } = columnDef
     let _contents = contents
 
@@ -284,7 +288,7 @@ class ListTable extends React.Component {
     if (columnDef.render) { _contents = columnDef.render(contents, row, this.props.context) }
 
     return (
-      <TableCell key={columnDef.id} {...cellProps}>{_contents}</TableCell>
+      <TableCell className={classes.cell} key={columnDef.id} {...cellProps}>{_contents}</TableCell>
     )
   }
 
