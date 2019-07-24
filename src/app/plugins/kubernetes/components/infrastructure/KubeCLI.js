@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { forwardRef } from 'react'
 import PropTypes from 'prop-types'
 import { compose } from 'ramda'
 import { withAppContext } from 'core/AppContext'
@@ -20,7 +20,7 @@ const styles = {
   }
 }
 
-const Transition = props => <Slide direction="up" {...props} />
+const Transition = forwardRef((props, ref) => <Slide direction="up" {...props} ref={ref} />)
 
 class KubeCLI extends React.Component {
   state = { url: null, open: false }

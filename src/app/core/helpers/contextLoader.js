@@ -52,7 +52,7 @@ const contextLoader = (contextPath, loaderFn, options) => {
     return output || defaultValue
   }
 
-  // Store the resolver in an key indexed object that we will use in the exported "getLoader" function
+  // Store the resolver in a key indexed object that we will use in the exported "getLoader" function
   // "contextUpdater" will make use of resolvers defined using "contextLoader"
   resolvers = assocPath(arrContextPath, resolver, resolvers)
   return resolver

@@ -57,6 +57,6 @@ CheckboxField.propTypes = {
 
 export default compose(
   withFormContext,
-  withInfoTooltip,
   withStyles(styles),
+  withInfoTooltip,
 )(CheckboxField)

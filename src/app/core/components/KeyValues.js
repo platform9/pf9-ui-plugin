@@ -14,7 +14,9 @@ const KeyValue = ({ entry = {}, onChange, onDelete, keySuggestions, valueSuggest
     value: entry.value || '',
   })
 
-  useEffect(() => onChange(state), [state])
+  useEffect(() => {
+    onChange(state)
+  }, [state])
 
   const handleChange = field => value => setState(assoc(field, value, state))
 

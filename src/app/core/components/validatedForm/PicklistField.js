@@ -8,13 +8,14 @@ import { compose } from 'app/utils/fp'
 import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
 
 const styles = theme => ({
-  margin: 0,
+  root: {
+    margin: 0,
+  },
 })
 
 /**
  * PicklistField builds upon Picklist and adds integration with ValidatedForm
  */
-@withFormContext
 class PicklistField extends React.Component {
   handleChange = value => {
     const { onChange } = this.props
@@ -26,7 +27,7 @@ class PicklistField extends React.Component {
   render () {
     const { id, label, value, showNone, classes, hasError, errorMessage, title, options, className, ...restProps } = this.props
     return (
-      <FormControl id={id} className={classes.formControl} error={hasError} {...restProps}>
+      <FormControl id={id} className={classes.root} error={hasError} {...restProps}>
         <Picklist
           title={title}
           className={className}
@@ -68,6 +69,6 @@ PicklistField.propTypes = {
 
 export default compose(
   withFormContext,
-  withInfoTooltip,
   withStyles(styles),
+  withInfoTooltip,
 )(PicklistField)

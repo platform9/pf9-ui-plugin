@@ -14,11 +14,11 @@ const ThemeManager = ({ children, themeName = 'default' }) => {
       theme: createMuiTheme(themeJson),
       themeJson,
     })
-    const loadTheme = async themeName => {
+    const loadTheme = async name => {
       try {
-        const jsonTheme = await import(`core/themes/${themeName}.json`)
-        if (!jsonTheme) { console.error(`Unable to load ${themeName}.json`) }
-        if (jsonTheme) { console.info(`Loaded ${themeName}.json`) }
+        const jsonTheme = await import(`core/themes/${name}.json`)
+        if (!jsonTheme) { console.error(`Unable to load ${name}.json`) }
+        if (jsonTheme) { console.info(`Loaded ${name}.json`) }
         context.setContext({
           theme: createMuiTheme(jsonTheme),
           themeJson: jsonTheme,
@@ -28,7 +28,7 @@ const ThemeManager = ({ children, themeName = 'default' }) => {
       }
     }
     if (themeName !== 'default') {
-      return loadTheme()
+      loadTheme(themeName)
     }
   }, [themeName])
 

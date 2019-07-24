@@ -56,6 +56,6 @@ TextField.propTypes = {
 
 export default compose(
   withFormContext,
-  withInfoTooltip,
   withStyles(styles),
+  withInfoTooltip,
 )(TextField)
