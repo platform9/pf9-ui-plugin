@@ -99,7 +99,7 @@
         "divider": "rgba(0, 0, 0, 0.12)",
         "background": {
             "paper": "#fff",
-            "default": "#fafafa"
+            "default": "#fff"
         },
         "action": {
             "active": "rgba(0, 0, 0, 0.54)",

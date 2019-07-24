@@ -3,7 +3,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {
-  Checkbox, Grid, Paper, Table, TableBody, TableCell, TablePagination, TableRow,
+  Checkbox, Grid, Table, TableBody, TableCell, TablePagination, TableRow,
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import { compose, ensureFunction, except } from 'app/utils/fp'
@@ -387,7 +387,7 @@ class ListTable extends React.Component {
     return (
       <Grid container justify="center">
         <Grid item xs={12} zeroMinWidth>
-          <Paper className={classes.root}>
+          <div className={classes.root}>
             <ListTableToolbar
               selected={selected}
               onAdd={this.props.onAdd && this.handleAdd}
@@ -429,7 +429,7 @@ class ListTable extends React.Component {
               </Table>
             </div>
             {this.renderPaginationControls(filteredData.length)}
-          </Paper>
+          </div>
         </Grid>
       </Grid>
     )
