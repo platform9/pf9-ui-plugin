@@ -14,6 +14,13 @@ const styles = theme => ({
     width: '100%',
     boxShadow: '0 0 0 0',
     backgroundColor: theme.palette.background.default
+  },
+  tab: {
+    textTransform: 'none',
+    fontSize: '21px',
+  },
+  tabColor: {
+    color: theme.palette.text.primary,
   }
 })
 
@@ -51,25 +58,27 @@ class Tabs extends React.Component {
 
   render () {
     const { tabs, value } = this.state
-    const { children } = this.props
+    const { children, classes } = this.props
 
     return (
       <Provider value={this.state}>
         <Grid container justify="center">
           <Grid item xs={12} zeroMinWidth>
             <Paper className={this.props.classes.root}>
-              <MDTabs
-                value={value}
-                onChange={this.handleChange}
-                indicatorColor="primary"
-                textColor="primary"
-              >
-                {tabs.map(tab =>
-                  <MDTab key={tab.value} value={tab.value} label={tab.label}
-                    href={tab.value} />
-                )}
-              </MDTabs>
-              {children}
+              <div className={classes.tabColor}>
+                <MDTabs
+                  value={value}
+                  onChange={this.handleChange}
+                  indicatorColor="primary"
+                  textColor="inherit"
+                  TabIndicatorProps={{ style: { display: 'none' } }}
+                >
+                  {tabs.map(tab =>
+                    <MDTab className={classes.tab} key={tab.value} value={tab.value} label={tab.label} href={tab.value} />
+                  )}
+                </MDTabs>
+                {children}
+              </div>
             </Paper>
           </Grid>
         </Grid>
