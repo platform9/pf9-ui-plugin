@@ -1,14 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import clsx from 'clsx'
-import MenuIcon from '@material-ui/icons/Menu'
 import TenantChooser from 'openstack/components/tenants/TenantChooser'
 import RegionChooser from 'openstack/components/regions/RegionChooser'
 import UserMenu from 'core/components/UserMenu'
 import MaterialToolbar from '@material-ui/core/Toolbar/Toolbar'
-import { AppBar, IconButton } from '@material-ui/core'
+import { AppBar } from '@material-ui/core'
 import { imageUrls } from 'app/constants'
-import { drawerWidth } from 'core/components/Navbar'
 import { withStyles } from '@material-ui/styles'
 
 export const extraContentId = 'top-extra-content'
@@ -16,23 +13,6 @@ export const extraContentId = 'top-extra-content'
 const styles = theme => ({
   appBar: {
     position: 'absolute',
-    transition: theme.transitions.create(['margin', 'width'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  appBarShift: {
-    width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(['margin', 'width'], {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  'appBarShift-left': {
-    marginLeft: drawerWidth,
-  },
-  'appBarShift-right': {
-    marginRight: drawerWidth,
   },
   menuButton: {
     marginLeft: theme.spacing(1.5),
@@ -67,20 +47,9 @@ const renderExtraContent = classes => {
   return <div className={classes.extraContent} id={extraContentId} />
 }
 
-const Toolbar = ({ classes, open, handleDrawerOpen }) => (
-  <AppBar className={clsx(classes.appBar, {
-    [classes.appBarShift]: open,
-    [classes['appBarShift-left']]: open,
-  })}>
+const Toolbar = ({ classes, open }) => (
+  <AppBar className={classes.appBar}>
     <MaterialToolbar disableGutters={!open}>
-      <IconButton
-        color="inherit"
-        aria-label="open drawer"
-        onClick={handleDrawerOpen}
-        className={clsx(classes.menuButton, open && classes.hide)}
-      >
-        <MenuIcon />
-      </IconButton>
       <img src={imageUrls.logo} className={classes.logo} align="middle" />
       <div className={classes.rightTools}>
         <RegionChooser />
@@ -95,7 +64,6 @@ const Toolbar = ({ classes, open, handleDrawerOpen }) => (
 
 Toolbar.propTypes = {
   open: PropTypes.bool,
-  handleDrawerOpen: PropTypes.func,
 }
 
 export default withStyles(styles, { withTheme: true })(Toolbar)

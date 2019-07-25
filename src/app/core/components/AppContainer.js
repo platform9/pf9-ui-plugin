@@ -76,12 +76,8 @@ class AppContainer extends React.Component {
     open: true,
   }
 
-  handleDrawerOpen = () => {
-    this.setState({ open: true })
-  }
-
-  handleDrawerClose = () => {
-    this.setState({ open: false })
+  handleDrawerToggle = () => {
+    this.setState({ open: !this.state.open })
   }
 
   render () {
@@ -91,15 +87,13 @@ class AppContainer extends React.Component {
     return (
       <div className={classes.root}>
         <div className={classes.appFrame}>
-          <Toolbar
-            handleDrawerOpen={this.handleDrawerOpen}
-            open={open} />
+          <Toolbar />
           <Navbar
             withStackSlider={withStackSlider}
             drawerWidth={drawerWidth}
             sections={sections}
             open={open}
-            handleDrawerClose={this.handleDrawerClose} />
+            handleDrawerToggle={this.handleDrawerToggle} />
           <main className={clsx(classes.content, classes['content-left'], {
             [classes.contentShift]: open,
             [classes['contentShift-left']]: open,

@@ -49,6 +49,7 @@ const styles = theme => ({
     },
   },
   paper: {
+    marginTop: 64,
     backgroundColor: 'inherit',
     overflow: 'hidden',
     borderRight: 0,
@@ -58,10 +59,7 @@ const styles = theme => ({
     alignItems: 'center',
     justifyContent: 'flex-end',
     padding: '0 8px',
-    ...theme.mixins.toolbar,
-  },
-  drawerHeaderClosed: {
-    display: 'none',
+    minHeight: 50,
   },
   inputRoot: {
     color: 'inherit',
@@ -131,6 +129,13 @@ const styles = theme => ({
     fontSize: 12,
     fontWeight: 500,
     color: theme.palette.sidebar.text,
+  },
+  toggleButton: {
+    fontSize: 12,
+    fontWeight: 500,
+    color: theme.palette.sidebar.text,
+    textAlign: 'center',
+    padding: 4,
   },
   currentNavMenuText: {
     fontSize: 12,
@@ -333,27 +338,26 @@ class Navbar extends PureComponent {
     const redirect = () => { window.location = link.path }
     const handleClick = link.external ? redirect : this.getNavToFn(link.path)
 
-    return nestedLinks ? (
-      this.renderNavFolder(name, link, nestedLinks, icon)
-    ) : (
-      <MenuItem tabIndex={idx}
-        className={clsx(classes.navMenuItem, {
-          [classes.activeNavItem]: isActiveNavLink,
-          [classes.currentNavLink]: !!isCurrentNavLink && !isActiveNavLink,
-        })}
-        onClick={handleClick}
-        key={link.path}>
-        {icon && <div className={classes.navIcon}>
-          <FontAwesomeIcon>{icon}</FontAwesomeIcon>
-        </div>}
-        {open && <ListItemText
-          classes={{
-            root: classes.navMenuTextRoot,
-            primary: isCurrentNavLink ? classes.currentNavMenuText : classes.navMenuText,
-          }}
-          primary={name} />}
-      </MenuItem>
-    )
+    // if (nestedLinks) {
+    //   this.renderNavFolder(name, link, nestedLinks, icon)
+    // }
+    return <MenuItem tabIndex={idx}
+      className={clsx(classes.navMenuItem, {
+        [classes.activeNavItem]: isActiveNavLink,
+        [classes.currentNavLink]: !!isCurrentNavLink && !isActiveNavLink,
+      })}
+      onClick={handleClick}
+      key={link.path}>
+      {icon && <div className={classes.navIcon}>
+        <FontAwesomeIcon>{icon}</FontAwesomeIcon>
+      </div>}
+      {open && <ListItemText
+        classes={{
+          root: classes.navMenuTextRoot,
+          primary: isCurrentNavLink ? classes.currentNavMenuText : classes.navMenuText,
+        }}
+        primary={name} />}
+    </MenuItem>
   }
 
   renderSections = sections => {
@@ -402,7 +406,7 @@ class Navbar extends PureComponent {
   }
 
   render () {
-    const { classes, withStackSlider, sections, open, handleDrawerClose } = this.props
+    const { classes, withStackSlider, sections, open, handleDrawerToggle } = this.props
     const filteredSections = sections.filter(where({ links: notEmpty }))
 
     return <Drawer
@@ -420,11 +424,9 @@ class Navbar extends PureComponent {
       anchor="left"
       open={open}
     >
-      <div className={clsx(classes.drawerHeader, {
-        [classes.drawerHeaderClosed]: !open,
-      })}>
-        <IconButton className={classes.navMenuText} onClick={handleDrawerClose}>
-          <ChevronLeftIcon />
+      <div className={classes.drawerHeader}>
+        <IconButton className={classes.toggleButton} onClick={handleDrawerToggle}>
+          <FontAwesomeIcon>{open ? 'angle-double-left' : 'angle-double-right'}</FontAwesomeIcon>
         </IconButton>
       </div>
       <Divider />
@@ -458,7 +460,7 @@ const sectionPropType = {
 Navbar.propTypes = {
   withStackSlider: PropTypes.bool,
   open: PropTypes.bool,
-  handleDrawerClose: PropTypes.func,
+  handleDrawerToggle: PropTypes.func,
   sections: PropTypes.arrayOf(
     PropTypes.shape(sectionPropType),
   ).isRequired,
