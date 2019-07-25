@@ -14,6 +14,7 @@ const getSomeNavbarItems = (withIcons, count = 5) =>
 
 const categories = ['Infrastructure', 'Clusters', 'Nodes', 'Providers']
 const getCategorizedItems = withIcons => categories.map(category => ({
+  ...fakeNavbarItem(withIcons)(),
   name: category,
   nestedLinks: getSomeNavbarItems(withIcons, randomInt(1, 5)),
 }))
@@ -45,19 +46,14 @@ addStories('Common Components/Navbar', {
       <Navbar sections={[{ links: getCategorizedItems(true) }]} />
     </Router>
   ),
-  'w/ search bar': () => (
-    <Router>
-      <Navbar withSearchBar sections={[{ links: getCategorizedItems() }]} />
-    </Router>
-  ),
   'Accordion w/ sections': () => (
     <Router>
-      <Navbar withSearchBar sections={getSections()} />
+      <Navbar sections={getSections()} />
     </Router>
   ),
   'Accordion w/ sections + icons': () => (
     <Router>
-      <Navbar withSearchBar sections={getSections(true)} />
+      <Navbar sections={getSections(true)} />
     </Router>
   )
 })

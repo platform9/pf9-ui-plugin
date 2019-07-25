@@ -2,14 +2,13 @@ import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import {
   Collapse, Divider, Drawer, ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary,
-  IconButton, InputBase, ListItemText, MenuItem, MenuList, Typography,
+  IconButton, ListItemText, MenuItem, MenuList, Typography,
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
 import ChevronRightIcon from '@material-ui/icons/ChevronRight'
 import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'
-import SearchIcon from '@material-ui/icons/Search'
 import { except, notEmpty } from 'app/utils/fp'
 import clsx from 'clsx'
 import { withHotKeys } from 'core/providers/HotKeysProvider'
@@ -18,27 +17,9 @@ import { assoc, flatten, pluck, prop, propEq, propOr, where } from 'ramda'
 import { matchPath, withRouter } from 'react-router'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 
-export const drawerWidth = 240
+export const drawerWidth = 180
 
 const styles = theme => ({
-  search: {
-    position: 'relative',
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: '#FFF',
-    marginRight: theme.spacing(2),
-    marginLeft: 0,
-    width: '100%',
-    marginTop: theme.spacing(1),
-  },
-  searchIcon: {
-    width: theme.spacing(6),
-    height: '100%',
-    position: 'absolute',
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   drawer: {
     position: 'relative',
     width: drawerWidth,
@@ -64,11 +45,13 @@ const styles = theme => ({
     overflowX: 'hidden',
     width: (theme.spacing(6)) + 1,
     [theme.breakpoints.up('sm')]: {
-      width: (theme.spacing(6)) + 1,
+      width: theme.spacing(5.5),
     },
   },
   paper: {
     backgroundColor: 'inherit',
+    overflow: 'hidden',
+    borderRight: 0,
   },
   drawerHeader: {
     display: 'flex',
@@ -97,11 +80,11 @@ const styles = theme => ({
     margin: 0,
   },
   activeNavItem: {
-    backgroundColor: '#FFF',
+    backgroundColor: theme.palette.background.default,
     color: 'rgba(0, 0, 0, .87)',
   },
   currentNavLink: {
-    backgroundColor: '#fff !important',
+    backgroundColor: [theme.palette.background.default, '!important'],
     color: 'rgba(0, 0, 0, .87) !important',
   },
   navHeading: {
@@ -118,33 +101,41 @@ const styles = theme => ({
   navBody: {
     padding: 0,
   },
+  navIcon: {
+    minWidth: 26,
+  },
   navMenu: {
     padding: 0,
     width: '100%',
   },
   navMenuItem: {
-    paddingTop: theme.spacing(1),
-    paddingRight: theme.spacing(2),
-    paddingBottom: theme.spacing(1),
-    paddingLeft: theme.spacing(2),
+    padding: theme.spacing(1, 0.5, 1, 1),
     backgroundColor: theme.palette.sidebar.background,
     color: theme.palette.sidebar.text,
     borderBottom: '1px solid #07283e',
     '&:hover': {
       backgroundColor: theme.palette.sidebar.background,
     },
+    display: 'flex',
+    flexFlow: 'row nowrap',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  navMenuTextRoot: {
+    flexGrow: 1,
+    padding: theme.spacing(0, 0, 0, 1),
+    whiteSpace: 'normal',
+    margin: 0,
   },
   navMenuText: {
-    color: theme.palette.sidebar.text,
-    fontSize: '12px',
+    fontSize: 12,
     fontWeight: 500,
-    marginLeft: theme.spacing(2),
+    color: theme.palette.sidebar.text,
   },
   currentNavMenuText: {
-    color: 'rgba(0, 0, 0, 0.87)',
-    fontSize: '12px',
+    fontSize: 12,
     fontWeight: 500,
-    marginLeft: theme.spacing(2),
+    color: 'rgba(0, 0, 0, 0.87)',
   },
   navMenuList: {
     borderLeft: `${theme.spacing(1)}px solid #6dc6fe`,
@@ -163,16 +154,17 @@ const styles = theme => ({
     alignItems: 'center',
     height: '45px',
     maxWidth: '90%',
-    margin: '3px',
-    padding: '0 5px',
+    margin: '2px',
+    padding: '0 7px',
     borderRadius: theme.shape.borderRadius,
     boxSizing: 'border-box',
   },
   sliderLogoImage: {
-    maxHeight: '32px',
-    maxWidth: '180px',
+    maxHeight: 26,
+    maxWidth: 130,
   },
   sliderArrow: {
+    width: '0.8em',
     color: theme.palette.sidebar.text,
   },
 })
@@ -183,8 +175,6 @@ const styles = theme => ({
 class Navbar extends PureComponent {
   constructor (props) {
     super(props)
-    this.searchInputRef = React.createRef()
-    props.setHotKeyHandler('f', this.focusSearch)
     // The following events will be triggered even when focusing an editable input
     props.setHotKeyHandler('Enter', this.handleEnterKey, { whileEditing: true })
     props.setHotKeyHandler('ArrowUp', this.handleArrowKeys('ArrowUp'), { whileEditing: true })
@@ -198,12 +188,6 @@ class Navbar extends PureComponent {
     expandedItems: [],
     activeNavItem: null,
     filterText: '',
-  }
-
-  focusSearch = () => {
-    if (this.searchInputRef.current) {
-      this.searchInputRef.current.focus()
-    }
   }
 
   handleEscKey = () => {
@@ -316,10 +300,15 @@ class Navbar extends PureComponent {
         className={clsx(classes.navMenuItem, {
           [classes.currentNavLink]: !!isCurrentNavLink,
         })}>
-        {icon && <FontAwesomeIcon>{icon}</FontAwesomeIcon>}
-        <ListItemText
-          classes={{ primary: isCurrentNavLink ? classes.currentNavMenuText : classes.navMenuText }}
-          primary={name} />
+        {icon && <div className={classes.navIcon}>
+          <FontAwesomeIcon>{icon}</FontAwesomeIcon>
+        </div>}
+        {open && <ListItemText
+          classes={{
+            root: classes.navMenuTextRoot,
+            primary: isCurrentNavLink ? classes.currentNavMenuText : classes.navMenuText,
+          }}
+          primary={name} />}
         {open ? (expanded ? <ExpandLess /> : <ExpandMore />) : null}
       </MenuItem>,
       <Collapse key={`collapse-${name}`} in={expanded} timeout="auto" unmountOnExit>
@@ -332,7 +321,7 @@ class Navbar extends PureComponent {
   }
 
   renderNavLink = ({ nestedLinks, link, name, icon }, idx) => {
-    const { classes, location: { pathname, hash } } = this.props
+    const { open, classes, location: { pathname, hash } } = this.props
     const { activeNavItem } = this.state
     const isActiveNavLink = activeNavItem === name
     const isCurrentNavLink = link && matchPath(`${pathname}${hash}`, {
@@ -354,32 +343,17 @@ class Navbar extends PureComponent {
         })}
         onClick={handleClick}
         key={link.path}>
-        {icon && <FontAwesomeIcon>{icon}</FontAwesomeIcon>}
-        <ListItemText
-          classes={{ primary: isCurrentNavLink ? classes.currentNavMenuText : classes.navMenuText }}
-          primary={name} />
+        {icon && <div className={classes.navIcon}>
+          <FontAwesomeIcon>{icon}</FontAwesomeIcon>
+        </div>}
+        {open && <ListItemText
+          classes={{
+            root: classes.navMenuTextRoot,
+            primary: isCurrentNavLink ? classes.currentNavMenuText : classes.navMenuText,
+          }}
+          primary={name} />}
       </MenuItem>
     )
-  }
-
-  renderNavFilterBar = () => {
-    const { classes } = this.props
-    const { filterText } = this.state
-    return <div className={classes.search}>
-      <div className={classes.searchIcon}>
-        <SearchIcon />
-      </div>
-      <InputBase
-        inputRef={this.searchInputRef}
-        value={filterText}
-        placeholder="Search…"
-        onChange={this.handleFilterChange}
-        classes={{
-          root: classes.inputRoot,
-          input: classes.inputInput,
-        }}
-      />
-    </div>
   }
 
   renderSections = sections => {
@@ -428,7 +402,7 @@ class Navbar extends PureComponent {
   }
 
   render () {
-    const { classes, withSearchBar, withStackSlider, sections, open, handleDrawerClose } = this.props
+    const { classes, withStackSlider, sections, open, handleDrawerClose } = this.props
     const filteredSections = sections.filter(where({ links: notEmpty }))
 
     return <Drawer
@@ -449,7 +423,6 @@ class Navbar extends PureComponent {
       <div className={clsx(classes.drawerHeader, {
         [classes.drawerHeaderClosed]: !open,
       })}>
-        {withSearchBar ? this.renderNavFilterBar() : null}
         <IconButton className={classes.navMenuText} onClick={handleDrawerClose}>
           <ChevronLeftIcon />
         </IconButton>
@@ -483,7 +456,6 @@ const sectionPropType = {
 }
 
 Navbar.propTypes = {
-  withSearchBar: PropTypes.bool,
   withStackSlider: PropTypes.bool,
   open: PropTypes.bool,
   handleDrawerClose: PropTypes.func,

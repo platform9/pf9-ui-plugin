@@ -95,7 +95,6 @@ class AppContainer extends React.Component {
             handleDrawerOpen={this.handleDrawerOpen}
             open={open} />
           <Navbar
-            withSearchBar
             withStackSlider={withStackSlider}
             drawerWidth={drawerWidth}
             sections={sections}

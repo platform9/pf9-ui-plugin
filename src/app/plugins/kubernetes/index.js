@@ -21,8 +21,10 @@ import PrometheusMonitoringPage from './components/prometheus/PrometheusMonitori
 import UpdatePrometheusInstancePage from './components/prometheus/UpdatePrometheusInstancePage'
 import UpdatePrometheusRulePage from './components/prometheus/UpdatePrometheusRulePage'
 import UpdatePrometheusServiceMonitorPage from './components/prometheus/UpdateServiceMonitorPage'
-import UpdatePrometheusAlertManagerPage from './components/prometheus/UpdatePrometheusAlertManagerPage'
+import UpdatePrometheusAlertManagerPage
+  from './components/prometheus/UpdatePrometheusAlertManagerPage'
 import config from '../../../../config'
+import DashboardPage from 'k8s/components/DashboardPage'
 
 class Kubernetes extends React.Component {
   render () {
@@ -36,15 +38,20 @@ Kubernetes.__name__ = 'kubernetes'
 
 Kubernetes.registerPlugin = pluginManager => {
   const plugin = pluginManager.registerPlugin(
-    'kubernetes', 'Kubernetes', '/ui/kubernetes'
+    'kubernetes', 'Kubernetes', '/ui/kubernetes',
   )
 
   plugin.registerRoutes(
     [
       {
+        name: 'Dashboard',
+        link: { path: '/', exact: true, default: true },
+        component: DashboardPage,
+      },
+      {
         name: 'Infrastructure',
-        link: { path: '/infrastructure', exact: true, default: true },
-        component: InfrastructurePage
+        link: { path: '/infrastructure', exact: true },
+        component: InfrastructurePage,
       },
       {
         name: 'Create Cluster',
@@ -59,17 +66,17 @@ Kubernetes.registerPlugin = pluginManager => {
       {
         name: 'Create Cloud Provider',
         link: { path: '/infrastructure/cloudProviders/add', exact: true },
-        component: AddCloudProviderPage
+        component: AddCloudProviderPage,
       },
       {
         name: 'Update Cloud Provider',
         link: { path: '/infrastructure/cloudProviders/edit/:id', exact: true },
-        component: UpdateCloudProviderPage
+        component: UpdateCloudProviderPage,
       },
       {
         name: 'App Catalog',
         link: { path: '/apps', exact: true },
-        component: AppsIndexPage
+        component: AppsIndexPage,
       },
       {
         name: 'App Details',
@@ -79,32 +86,32 @@ Kubernetes.registerPlugin = pluginManager => {
       {
         name: 'Pods, Deployments, Services',
         link: { path: '/pods', exact: true },
-        component: PodsIndexPage
+        component: PodsIndexPage,
       },
       {
         name: 'Add Pod',
         link: { path: '/pods/add', exact: true },
-        component: AddPodPage
+        component: AddPodPage,
       },
       {
         name: 'Add Deployment',
         link: { path: '/deployments/add', exact: true },
-        component: AddDeploymentPage
+        component: AddDeploymentPage,
       },
       {
         name: 'Add Service',
         link: { path: '/services/add', exact: true },
-        component: AddServicePage
+        component: AddServicePage,
       },
       {
         name: 'Storage Classes',
         link: { path: '/storage_classes', exact: true },
-        component: StorageClassesPage
+        component: StorageClassesPage,
       },
       {
         name: 'Namespaces',
         link: { path: '/namespaces', exact: true },
-        component: NamespacesListPage
+        component: NamespacesListPage,
       },
       {
         name: 'Prometheus Monitoring (BETA)',
@@ -114,17 +121,17 @@ Kubernetes.registerPlugin = pluginManager => {
       {
         name: 'Add Namespace',
         link: { path: '/namespaces/add', exact: true },
-        component: AddNamespacePage
+        component: AddNamespacePage,
       },
       {
         name: 'API Access',
         link: { path: '/api_access', exact: true },
-        component: ApiAccessPage
+        component: ApiAccessPage,
       },
       {
         name: 'Tenants & Users',
         link: { path: '/user_management', exact: true },
-        component: UserManagementIndexPage
+        component: UserManagementIndexPage,
       },
       {
         name: 'Create Prometheus Instance',
@@ -151,7 +158,7 @@ Kubernetes.registerPlugin = pluginManager => {
         link: { path: '/prometheus/alertManagers/edit/:id', exact: true },
         component: UpdatePrometheusAlertManagerPage,
       },
-    ]
+    ],
   )
 
   const hostPrefix = '' // set to another host during development
@@ -164,6 +171,11 @@ Kubernetes.registerPlugin = pluginManager => {
   // These nav items will redirect to the old "clarity" UI while the new UI is under development.
   const clarityNavItems = [
     {
+      name: 'Dashboard',
+      ...clarityLink('/dashboard'),
+      icon: 'tachometer',
+    },
+    {
       name: 'Infrastructure',
       ...clarityLink('/infrastructureK8s'),
       icon: 'building',
@@ -171,7 +183,7 @@ Kubernetes.registerPlugin = pluginManager => {
         { name: 'Clusters', ...clarityLink('/infrastructureK8s#clusters') },
         { name: 'Nodes', ...clarityLink('/infrastructureK8s#nodes') },
         { name: 'Cloud Providers', ...clarityLink('/infrastructureK8s#cps') },
-      ]
+      ],
     },
     {
       name: 'App Catalog',
@@ -181,7 +193,7 @@ Kubernetes.registerPlugin = pluginManager => {
         { name: 'App Catalog', ...clarityLink('/kubernetes/apps#catalog') },
         { name: 'Deployed Apps', ...clarityLink('/kubernetes/apps#deployed_apps') },
         { name: 'Repositories', ...clarityLink('/kubernetes/apps#repositories') },
-      ]
+      ],
     },
     {
       name: 'Pods, Deployments, Services',
@@ -191,7 +203,7 @@ Kubernetes.registerPlugin = pluginManager => {
         { name: 'Pods', ...clarityLink('/podsK8s#pods') },
         { name: 'Deployments', ...clarityLink('/podsK8s#deployments') },
         { name: 'Services', ...clarityLink('/podsK8s#services') },
-      ]
+      ],
     },
     { name: 'Storage Classes', icon: 'hdd', ...clarityLink('/kubernetes/storage_classes') },
     { name: 'Namespaces', icon: 'object-group', ...clarityLink('/kubernetes/namespaces') },
@@ -206,12 +218,17 @@ Kubernetes.registerPlugin = pluginManager => {
         { name: 'Users', ...clarityLink('/kubernetes/users#users') },
         { name: 'Groups', ...clarityLink('/kubernetes/users#groups') },
         { name: 'Roles', ...clarityLink('/kubernetes/users#roles') },
-      ]
+      ],
     },
   ]
 
   // These nav items are in active development but not shown in production.
   const devNavItems = [
+    {
+      name: 'Dashboard',
+      link: { path: '/' },
+      icon: 'tachometer',
+    },
     {
       name: 'Infrastructure',
       link: { path: '/infrastructure' },
@@ -220,7 +237,7 @@ Kubernetes.registerPlugin = pluginManager => {
         { name: 'Clusters', link: { path: '/infrastructure#clusters' } },
         { name: 'Nodes', link: { path: '/infrastructure#nodes' } },
         { name: 'Cloud Providers', link: { path: '/infrastructure#cloudProviders' } },
-      ]
+      ],
     },
     {
       name: 'App Catalog',
@@ -230,7 +247,7 @@ Kubernetes.registerPlugin = pluginManager => {
         { name: 'App Catalog', link: { path: '/apps#appCatalog' } },
         { name: 'Deployed Apps', link: { path: '/apps#deployedApps' } },
         { name: 'Repositories', link: { path: '/apps#repositories' } },
-      ]
+      ],
     },
     {
       name: 'Pods, Deployments, Services',
@@ -240,7 +257,7 @@ Kubernetes.registerPlugin = pluginManager => {
         { name: 'Pods', link: { path: '/pods#pods' } },
         { name: 'Deployments', link: { path: '/pods#deployments' } },
         { name: 'Services', link: { path: '/pods#services' } },
-      ]
+      ],
     },
     { name: 'Storage Classes', icon: 'hdd', link: { path: '/storage_classes' } },
     { name: 'Namespaces', icon: 'object-group', link: { path: '/namespaces' } },
@@ -255,7 +272,7 @@ Kubernetes.registerPlugin = pluginManager => {
         { name: 'Users', link: { path: '/user_management#users' } },
         { name: 'Groups', link: { path: '/user_management#userGroups' } },
         { name: 'Roles', link: { path: '/user_management#roles' } },
-      ]
+      ],
     },
   ]
 
