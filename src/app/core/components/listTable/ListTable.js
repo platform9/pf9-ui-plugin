@@ -130,8 +130,7 @@ class ListTable extends React.Component {
 
   handleChangePage = (event, page) => this.setState({ page })
 
-  handleChangeRowsPerPage = event => {
-    const { value: rowsPerPage } = event.target
+  handleChangeRowsPerPage = rowsPerPage => {
     this.setState({ rowsPerPage }, () =>
       ensureFunction(this.props.onRowsPerPageChange)(rowsPerPage),
     )

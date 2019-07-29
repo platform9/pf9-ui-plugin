@@ -47,11 +47,13 @@ PicklistField.defaultProps = {
   validations: [],
 }
 
+const numOrString = PropTypes.oneOfType([PropTypes.number, PropTypes.string])
 const optionPropType = PropTypes.oneOfType([
   PropTypes.string,
+  PropTypes.number,
   PropTypes.shape({
-    value: PropTypes.string,
-    label: PropTypes.string,
+    value: numOrString,
+    label: numOrString,
   }),
 ])
 
@@ -59,7 +61,7 @@ PicklistField.propTypes = {
   id: PropTypes.string.isRequired,
   label: PropTypes.string,
   options: PropTypes.arrayOf(optionPropType).isRequired,
-  initialValue: PropTypes.string,
+  initialValue: numOrString,
   onChange: PropTypes.func,
 
   /** Create an option of 'None' as the first default choice */

@@ -67,11 +67,13 @@ class Picklist extends React.Component {
   }
 }
 
+const numOrString = PropTypes.oneOfType([PropTypes.number, PropTypes.string])
 const optionPropType = PropTypes.oneOfType([
   PropTypes.string,
+  PropTypes.number,
   PropTypes.shape({
-    value: PropTypes.string,
-    label: PropTypes.string,
+    value: numOrString,
+    label: numOrString,
   }),
 ])
 
@@ -79,7 +81,7 @@ Picklist.propTypes = {
   name: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
   options: PropTypes.arrayOf(optionPropType).isRequired,
-  value: PropTypes.string,
+  value: numOrString,
   onChange: PropTypes.func,
 }
 

@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { withStyles } from '@material-ui/styles'
-import { Button, Divider, Grid, Paper, Typography } from '@material-ui/core'
+import { Button, Divider, Grid, Typography } from '@material-ui/core'
 
 const styles = theme => ({
   root: {
@@ -10,7 +10,6 @@ const styles = theme => ({
     padding: theme.spacing(5),
   },
   title: {
-    color: theme.palette.grey[700],
     marginBottom: theme.spacing(2)
   },
   divider: {
@@ -31,34 +30,32 @@ class FormWrapper extends React.Component {
       title,
     } = this.props
     return (
-      <Grid container justify="center">
+      <Grid container>
         <Grid item xs={11}>
-          <Paper className={classes.root}>
-            <Grid container justify="space-between">
-              <Grid item>
-                <Typography
-                  variant="h3"
-                  className={classes.title}
-                >
-                  {title}
-                </Typography>
-              </Grid>
-              {backUrl &&
-                <Grid item>
-                  <Button
-                    className={classes.buttonBase}
-                    variant="outlined"
-                    component={Link}
-                    to={backUrl}
-                  >
-                    &larr;&nbsp;Back to list
-                  </Button>
-                </Grid>
-              }
+          <Grid container justify="space-between">
+            <Grid item>
+              <Typography
+                variant="h3"
+                className={classes.title}
+              >
+                {title}
+              </Typography>
             </Grid>
-            <Divider className={classes.divider} />
-            {children}
-          </Paper>
+            {backUrl &&
+              <Grid item>
+                <Button
+                  className={classes.buttonBase}
+                  variant="outlined"
+                  component={Link}
+                  to={backUrl}
+                >
+                  &larr;&nbsp;Back to list
+                </Button>
+              </Grid>
+            }
+          </Grid>
+          <Divider className={classes.divider} />
+          {children}
         </Grid>
       </Grid>
     )

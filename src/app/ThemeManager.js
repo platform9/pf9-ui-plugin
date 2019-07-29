@@ -2,7 +2,7 @@ import React, { useContext, useEffect } from 'react'
 import { createMuiTheme } from '@material-ui/core/styles'
 import { ThemeProvider } from '@material-ui/styles'
 import { Context } from 'core/AppContext'
-import defaultThemeJson from 'core/themes/default.json'
+import defaultThemeJson from 'core/themes/defaultTheme'
 
 // TODO: use PreferencesProvider to pick the user specific theme
 const ThemeManager = ({ children, themeName = 'default' }) => {
