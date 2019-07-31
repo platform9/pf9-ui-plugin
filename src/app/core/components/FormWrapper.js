@@ -1,7 +1,7 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import CloseButton from 'core/components/buttons/CloseButton'
 import { withStyles } from '@material-ui/styles'
-import { Button, Divider, Grid, Typography } from '@material-ui/core'
+import { Divider, Grid, Typography } from '@material-ui/core'
 
 const styles = theme => ({
   root: {
@@ -43,14 +43,7 @@ class FormWrapper extends React.Component {
             </Grid>
             {backUrl &&
               <Grid item>
-                <Button
-                  className={classes.buttonBase}
-                  variant="outlined"
-                  component={Link}
-                  to={backUrl}
-                >
-                  &larr;&nbsp;Back to list
-                </Button>
+                <CloseButton to={backUrl} />
               </Grid>
             }
           </Grid>

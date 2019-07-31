@@ -25,8 +25,8 @@ const NextButton = ({ children, classes, disabled, ...rest }) => {
 
   return (
     <Button {...params}>
-      <Icon className={classes.rightIcon}>arrow_forward</Icon>
       {children || 'Next'}
+      <Icon className={classes.rightIcon}>arrow_forward</Icon>
     </Button>
   )
 }

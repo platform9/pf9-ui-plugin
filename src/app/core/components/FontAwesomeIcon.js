@@ -1,7 +1,17 @@
 import React from 'react'
 import clsx from 'clsx'
 
-const FontAwesomeIcon = ({ children, className, ...rest }) =>
-  <i className={clsx(`fal fa-fw fa-lg fa-${children}`, className)} {...rest} />
+const FontAwesomeIcon = ({ children, className, size, solid, ...rest }) => {
+  const defaultClasses = [
+    'fal',
+    'fa-fw',
+    (size ? `fa-${size}` : 'fa-lg'),
+    `fa-${children}`,
+    (solid ? 'fas' : ''),
+  ]
+  return (
+    <i className={clsx(defaultClasses.join(' '), className)} {...rest} />
+  )
+}
 
 export default FontAwesomeIcon
