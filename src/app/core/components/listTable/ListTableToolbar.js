@@ -28,6 +28,7 @@ const toolbarStyles = theme => ({
   },
   toolbar: {
     justifyContent: 'flex-end',
+    paddingRight: 0,
   },
   rowActions: {
     color: 'inherit',

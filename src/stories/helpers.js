@@ -19,7 +19,7 @@ export const jsonDetailLogger = decorateAction([
 // HotKeysProvider has a dependency on AppContext.  It is needed for rendering the sidenav.
 // ToastProvider has a dependency on ThemeManager
 export const appDecorators = storyFn => (
-  <div style={{ margin: '16px' }}>
+  <div style={{ padding: '16px', backgroundColor: '#fff' }}>
     <HotKeysProvider>
       <AppContext>
         <PreferencesProvider>

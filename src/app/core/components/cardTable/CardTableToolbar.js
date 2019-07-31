@@ -11,58 +11,62 @@ import Button from '@material-ui/core/Button'
 
 const styles = theme => ({
   root: {
-    paddingRight: theme.spacing(1)
+    paddingRight: theme.spacing(1),
+    marginBottom: theme.spacing(1),
   },
   spacer: {
-    flex: '1 1 100%'
+    flex: '1 1 100%',
   },
   actions: {
     display: 'flex',
     flexFlow: 'row nowrap',
     justifyContent: 'space-between',
     color: theme.palette.text.secondary,
-    width: '100%'
+    width: '100%',
   },
   filters: {
     flexGrow: '1',
     display: 'flex',
     flexFlow: 'row nowrap',
     alignItems: 'center',
-    justifyContent: 'left'
+    justifyContent: 'left',
   },
   controls: {
     display: 'flex',
     flexFlow: 'row nowrap',
     alignItems: 'center',
-    justifyContent: 'right'
-  },
-  filter: {
-    marginTop: 0
+    justifyContent: 'right',
   },
   title: {
-    flex: '0 0 auto'
-  }
+    flex: '0 0 auto',
+  },
 })
 
+const CustomPicklist = withStyles(theme => ({
+  root: {
+    '& .MuiOutlinedInput-root': {
+      marginBottom: theme.spacing(1),
+    },
+  },
+}))(Picklist)
+
 const FilterDropdown = ({
-  className,
   field,
   type,
   label,
   onChange,
   value,
-  items
+  items,
 }) => {
   switch (type) {
     case 'select':
       return (
-        <Picklist
+        <CustomPicklist
           name={field}
           label={label}
           options={items}
           value={value || ''}
           onChange={onChange}
-          className={className}
         />
       )
     default:
@@ -70,15 +74,14 @@ const FilterDropdown = ({
   }
 }
 
-const SortDropdown = ({ className, items, value, onChange }) => {
+const SortDropdown = ({ items, value, onChange }) => {
   return (
-    <Picklist
+    <CustomPicklist
       name={'sort'}
       label={'Sort By'}
       options={items}
       value={value || ''}
       onChange={onChange}
-      className={className}
     />
   )
 }
@@ -107,7 +110,7 @@ const CardTableToolbar = ({
   onDirectionChange,
   onFilterUpdate,
   onSearchChange,
-  searchTerm
+  searchTerm,
 }) => (
   <Toolbar className={classes.root}>
     {title && (
@@ -124,7 +127,7 @@ const CardTableToolbar = ({
           <FilterDropdown
             key={field}
             {...filterProps}
-            className={classes.filter}
+            classes={classes}
             onChange={onFilterUpdate(field)}
             field={field}
             value={value !== undefined ? value : filterValues[field]}
@@ -135,7 +138,7 @@ const CardTableToolbar = ({
         {sorting.length && (
           <React.Fragment>
             <SortDropdown
-              className={classes.filter}
+              classes={classes}
               items={projectAs({ label: 'label', value: 'field' }, sorting)}
               value={orderBy}
               onChange={onSortChange}
@@ -172,8 +175,8 @@ CardTableToolbar.propTypes = {
         .isRequired,
       render: PropTypes.func, // Use for rendering a custom component, received props: {value, onChange}
       filterWith: PropTypes.func, // Custom filtering function, received params: (filterValue, value, row)
-      items: PropTypes.array // Array of possible values (only when using select/multiselect)
-    })
+      items: PropTypes.array, // Array of possible values (only when using select/multiselect)
+    }),
   ),
   filterValues: PropTypes.object,
   onFilterUpdate: PropTypes.func,

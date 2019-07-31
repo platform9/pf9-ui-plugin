@@ -81,7 +81,7 @@ class AddPrometheusInstanceFormBase extends React.Component {
         {({ wizardContext, setWizardContext, onNext }) => {
           return (
             <React.Fragment>
-              <WizardStep stepId="instance" label="Prometheus Instsance">
+              <WizardStep stepId="instance" label="Prometheus Instance">
                 <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                   <TextField id="name" label="Name" info="Name of the Prometheus instance" />
                   <TextField id="replicas" label="Replicas" info="Number of Prometheus replicas" type="number" />
