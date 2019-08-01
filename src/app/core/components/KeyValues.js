@@ -3,11 +3,23 @@ import PropTypes from 'prop-types'
 import AutocompleteBase from 'core/components/AutocompleteBase'
 import IconButton from '@material-ui/core/IconButton'
 import DeleteIcon from '@material-ui/icons/Delete'
-import SubmitButton from 'core/components/buttons/SubmitButton'
 import uuid from 'uuid'
 import { assoc } from 'ramda'
+import { makeStyles } from '@material-ui/styles'
+import { Button } from '@material-ui/core'
+
+const styles = theme => ({
+  root: {
+    display: 'flex',
+  },
+  deleteButton: {
+    marginBottom: theme.spacing(2),
+    padding: theme.spacing(0, 1),
+  },
+})
 
 const KeyValue = ({ entry = {}, onChange, onDelete, keySuggestions, valueSuggestions }) => {
+  const classes = makeStyles(styles)()
   const [state, setState] = useState({
     id: entry.id || uuid.v4(),
     key: entry.key || '',
@@ -21,7 +33,7 @@ const KeyValue = ({ entry = {}, onChange, onDelete, keySuggestions, valueSuggest
   const handleChange = field => value => setState(assoc(field, value, state))
 
   return (
-    <div style={{ display: 'flex' }}>
+    <div className={classes.root}>
       <AutocompleteBase
         label="Key"
         value={state.key}
@@ -35,7 +47,7 @@ const KeyValue = ({ entry = {}, onChange, onDelete, keySuggestions, valueSuggest
         onChange={handleChange('value')}
         suggestions={valueSuggestions}
       />
-      <IconButton onClick={onDelete}><DeleteIcon /></IconButton>
+      <IconButton className={classes.deleteButton} onClick={onDelete}><DeleteIcon /></IconButton>
     </div>
   )
 }
@@ -77,10 +89,7 @@ const KeyValues = ({ entries: _entries, onChange, keySuggestions, valueSuggestio
           onDelete={deleteEntry(entry.id)}
         />
       ))}
-      <div>
-        <br />
-        <SubmitButton onClick={addBlankEntry}>Add key / value pair</SubmitButton>
-      </div>
+      <Button variant="text" onClick={addBlankEntry}>Add key / value pair</Button>
     </div>
   )
 }

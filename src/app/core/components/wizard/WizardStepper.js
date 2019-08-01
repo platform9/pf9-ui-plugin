@@ -5,7 +5,7 @@ import { Stepper, StepConnector, Step, StepLabel } from '@material-ui/core'
 import clsx from 'clsx'
 import { Check } from '@material-ui/icons'
 
-const stepIconsSize = 32
+const stepIconsSize = 36
 
 const QontoConnector = withStyles(theme => ({
   alternativeLabel: {
@@ -47,14 +47,15 @@ const useQontoStepIconStyles = makeStyles(theme => ({
   circle: {
     width: stepIconsSize,
     height: stepIconsSize,
-    lineHeight: 2,
-    borderRadius: 8,
+    lineHeight: `${stepIconsSize}px`,
+    borderRadius: stepIconsSize / 2,
     textAlign: 'center',
     color: theme.palette.primary.contrastText,
     backgroundColor: theme.palette.primary.dark,
   },
   completed: {
-    height: stepIconsSize,
+    height: stepIconsSize / 2,
+    marginTop: stepIconsSize / 4,
     color: theme.palette.primary.contrastText,
     backgroundColor: theme.palette.primary.dark,
     zIndex: 1,

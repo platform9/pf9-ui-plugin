@@ -5,13 +5,24 @@ import { Typography } from '@material-ui/core'
 import { compose } from 'app/utils/fp'
 import KeyValues, { EntryShape } from 'core/components/KeyValues'
 import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
+import { withStyles } from '@material-ui/styles'
+
+const styles = theme => ({
+  root: {
+    marginTop: theme.spacing(1),
+    marginBottom: theme.spacing(1),
+  },
+  title: {
+    marginBottom: theme.spacing(1)
+  },
+})
 
 class KeyValuesField extends React.Component {
   render () {
-    const { id, value, label, ...restProps } = this.props
+    const { id, value, label, classes, ...restProps } = this.props
     return (
-      <div id={id}>
-        <Typography variant="subtitle1">{label}</Typography>
+      <div id={id} className={classes.root}>
+        <Typography variant="subtitle1" className={classes.title}>{label}</Typography>
         <KeyValues
           {...restProps}
           entries={value !== undefined ? value : []}
@@ -32,4 +43,5 @@ KeyValuesField.propTypes = {
 export default compose(
   withFormContext,
   withInfoTooltip,
+  withStyles(styles),
 )(KeyValuesField)

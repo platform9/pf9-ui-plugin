@@ -1,34 +1,26 @@
 import React from 'react'
+import { FormControl, MenuItem, Select } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
-import Picklist from 'core/components/Picklist'
-
-const CustomPicklist = withStyles(theme => ({
-  root: {
-    '& .MuiOutlinedInput-root': {
-      marginBottom: 0,
-    },
-  },
-}))(Picklist)
 
 const styles = theme => ({
-  root: {
+  margin: {
     margin: theme.spacing(1),
-    minWidth: 90,
   },
 })
 
 const PerPageControl = ({ classes, value, onChangeRowsPerPage, rowsPerPageOptions }) => {
   const options = rowsPerPageOptions.map(x => ({ label: x, value: x }))
   return (
-    <CustomPicklist
-      name="perPage"
-      label="Per Page"
-      options={options}
-      value={value}
-      onChange={onChangeRowsPerPage}
-      classes={classes}
-      disableUnderline
-    />
+    <FormControl className={classes.margin}>
+      <Select
+        value={value}
+        options={options}
+        onChange={onChangeRowsPerPage}
+        disableUnderline
+      >
+        {rowsPerPageOptions.map(pp => <MenuItem value={pp} key={pp}>{pp}</MenuItem>)}
+      </Select>
+    </FormControl>
   )
 }
 

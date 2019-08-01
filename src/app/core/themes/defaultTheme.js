@@ -265,7 +265,7 @@ const theme = {
       fontSize: '0.875rem',
       lineHeight: 1.75,
       letterSpacing: '0.02857em',
-      textTransform: 'uppercase'
+      textTransform: 'none'
     },
     h1: {
       color: 'rgba(0, 0, 0, 0.87)',
