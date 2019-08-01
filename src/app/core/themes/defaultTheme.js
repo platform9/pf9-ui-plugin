@@ -28,13 +28,14 @@ const theme = {
     }
   },
   overrides: {
-    MuiOutlinedInput: {
+    MuiSvgIcon: {
       root: {
-        fontSize: '13px',
-        marginBottom: '16px',
+        fontSize: '22px',
       },
-      input: {
-        padding: '6.5px 14px',
+    },
+    MuiInput: {
+      root: {
+        fontSize: '14px',
       }
     },
     MuiInputLabel: {
@@ -54,7 +55,16 @@ const theme = {
         fontSize: '13px',
         minHeight: '19px',
       }
-    }
+    },
+    MuiOutlinedInput: {
+      root: {
+        fontSize: '13px',
+        marginBottom: '16px',
+      },
+      input: {
+        padding: '6.5px 14px',
+      }
+    },
   },
   palette: {
     common: {

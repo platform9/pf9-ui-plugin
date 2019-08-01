@@ -2,9 +2,8 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {
-  Checkbox, Grid, Table, TableBody, TableCell, TablePagination, TableRow,
-} from '@material-ui/core'
+import Checkbox from 'core/components/Checkbox'
+import { Grid, Table, TableBody, TableCell, TablePagination, TableRow } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import { compose, ensureFunction, except } from 'app/utils/fp'
 import { withAppContext } from 'core/AppContext'
@@ -130,7 +129,8 @@ class ListTable extends React.Component {
 
   handleChangePage = (event, page) => this.setState({ page })
 
-  handleChangeRowsPerPage = rowsPerPage => {
+  handleChangeRowsPerPage = e => {
+    const { value: rowsPerPage } = e.target
     this.setState({ rowsPerPage }, () =>
       ensureFunction(this.props.onRowsPerPageChange)(rowsPerPage),
     )

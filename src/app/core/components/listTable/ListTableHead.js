@@ -1,10 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import Checkbox from 'core/components/Checkbox'
 import moize from 'moize'
 import { assoc } from 'ramda'
-import {
-  Checkbox, TableCell, TableHead, TableRow, TableSortLabel, Tooltip,
-} from '@material-ui/core'
+import { TableCell, TableHead, TableRow, TableSortLabel, Tooltip } from '@material-ui/core'
 import { compose } from 'utils/fp'
 import { withStyles } from '@material-ui/styles'
 import clsx from 'clsx'

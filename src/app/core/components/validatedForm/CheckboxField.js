@@ -1,8 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {
-  Checkbox as BaseCheckbox, FormControl, FormControlLabel, FormHelperText,
-} from '@material-ui/core'
+import Checkbox from 'core/components/Checkbox'
+import { FormControl, FormControlLabel, FormHelperText } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import { withInfoTooltip } from 'app/core/components/InfoTooltip'
 import { compose } from 'app/utils/fp'
@@ -11,7 +10,7 @@ import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/va
 const styles = theme => ({
   formControl: {
     marginTop: theme.spacing(1),
-  }
+  },
 })
 
 class CheckboxField extends React.Component {
@@ -30,14 +29,14 @@ class CheckboxField extends React.Component {
         <FormControl id={id} onMouseEnter={onMouseEnter} className={classes.formControl} error={hasError}>
           <FormControlLabel
             label={label}
-            control={<div>
-              <BaseCheckbox
+            control={
+              <Checkbox
                 {...restProps}
                 onClick={onClick}
                 error={errorMessage}
                 checked={!!value}
                 onChange={this.handleChange}
-              /></div>
+              />
             }
           />
           {errorMessage && <FormHelperText>{errorMessage}</FormHelperText>}

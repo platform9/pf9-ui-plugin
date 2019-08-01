@@ -1,6 +1,5 @@
 import React from 'react'
-import Picklist from 'core/components/Picklist'
-import { FormControl } from '@material-ui/core'
+import { FormControl, MenuItem, Select } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 
 const styles = theme => ({
@@ -13,13 +12,14 @@ const PerPageControl = ({ classes, value, onChangeRowsPerPage, rowsPerPageOption
   const options = rowsPerPageOptions.map(x => ({ label: x, value: x }))
   return (
     <FormControl className={classes.margin}>
-      <Picklist
-        name="perPage"
-        label="Per Page"
-        options={options}
+      <Select
         value={value}
+        options={options}
         onChange={onChangeRowsPerPage}
-      />
+        disableUnderline
+      >
+        {rowsPerPageOptions.map(pp => <MenuItem value={pp} key={pp}>{pp}</MenuItem>)}
+      </Select>
     </FormControl>
   )
 }
