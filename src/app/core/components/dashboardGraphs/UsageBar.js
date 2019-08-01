@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import ProgressBar from 'core/components/ProgressBar'
+import ProgressBar from 'core/components/progress/ProgressBar'
 
 const UsageBar = ({ precision, stats }) => {
   const { current, max, percent, type, units } = stats

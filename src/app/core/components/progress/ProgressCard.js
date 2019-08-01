@@ -1,7 +1,7 @@
 import React from 'react'
 import { Card, CardContent, CircularProgress, Typography } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
-import { addComma } from '../utils/formatters'
+import { addComma } from '../../utils/formatters'
 
 const styles = theme => ({
   card: {

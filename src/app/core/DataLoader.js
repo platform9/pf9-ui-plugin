@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import DisplayError from './components/DisplayError'
-import Progress from './components/Progress'
+import Progress from './components/progress/Progress'
 import { asyncProps } from 'utils/fp'
 import { mapObjIndexed, equals } from 'ramda'
 

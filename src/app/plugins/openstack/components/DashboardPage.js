@@ -1,7 +1,7 @@
 import React from 'react'
 import { compose } from 'app/utils/fp'
 import DashboardGraphs from 'core/components/dashboardGraphs/DashboardGraphs'
-import ProgressCardList from 'core/components/ProgressCardList'
+import ProgressCardList from 'core/components/progress/ProgressCardList'
 import requiresAuthentication from '../util/requiresAuthentication'
 
 class Dashboard extends React.Component {

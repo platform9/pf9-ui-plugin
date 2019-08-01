@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { withWizardContext } from 'core/components/Wizard'
+import { withWizardContext } from 'core/components/wizard/Wizard'
 
 class WizardStep extends React.Component {
   componentDidMount () {

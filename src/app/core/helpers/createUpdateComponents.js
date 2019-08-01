@@ -3,7 +3,7 @@ import { withRouter } from 'react-router-dom'
 import { compose } from 'app/utils/fp'
 import { withAppContext } from 'core/AppContext'
 import FormWrapper from 'core/components/FormWrapper'
-import Progress from 'core/components/Progress'
+import Progress from 'core/components/progress/Progress'
 import requiresAuthentication from 'openstack/util/requiresAuthentication'
 
 const createUpdateComponents = options => {

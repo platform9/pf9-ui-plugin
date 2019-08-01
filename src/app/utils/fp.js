@@ -8,6 +8,7 @@ export const identity = x => x
 export const isTruthy = x => !!x
 export const exists = x => x !== undefined
 export const propExists = curry((key, obj) => obj[key] !== undefined)
+export const noop = () => {}
 
 // Works for arrays and strings.  All other types return false.
 export const notEmpty = arr => !!(arr && arr.length)

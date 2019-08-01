@@ -1,12 +1,14 @@
 import React from 'react'
-import { noop } from 'utils/fp'
-import Panel from '../Panel'
-import Wizard from 'core/components/wizard/Wizard'
+import { addStoriesFromModule } from '../helpers'
 import WizardStep from 'core/components/wizard/WizardStep'
+import Wizard from 'core/components/wizard/Wizard'
+import { action } from '@storybook/addon-actions'
 
-const WizardExample = ({ expanded = false }) => (
-  <Panel title="Wizard" defaultExpanded={expanded}>
-    <Wizard onComplete={noop}>
+const addStories = addStoriesFromModule(module)
+
+addStories('Wizard', {
+  'Default': () => (
+    <Wizard onComplete={action('Submit action')}>
       {[
         <WizardStep key="first" stepId="first" label="First" info="This is the first">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
@@ -28,7 +30,5 @@ const WizardExample = ({ expanded = false }) => (
         </WizardStep>,
       ]}
     </Wizard>
-  </Panel>
-)
-
-export default WizardExample
+  ),
+})

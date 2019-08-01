@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import { withRouter } from 'react-router-dom'
 import ConfirmationDialog from './ConfirmationDialog'
-import Progress from 'core/components/Progress'
+import Progress from 'core/components/progress/Progress'
 
 class CRUDListContainer extends React.Component {
   componentDidMount () {

@@ -1,7 +1,7 @@
 import React from 'react'
 import { addStoriesFromModule } from '../helpers'
 
-import Progress from 'core/components/Progress'
+import Progress from 'core/components/progress/Progress'
 
 const addStories = addStoriesFromModule(module)
 

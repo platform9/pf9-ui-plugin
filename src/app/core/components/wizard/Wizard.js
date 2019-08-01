@@ -1,45 +1,42 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import FormButtons from 'core/components/FormButtons'
-import ProgressTracker from 'core/components/ProgressTracker'
 import NextButton from 'core/components/buttons/NextButton'
 import PrevButton from 'core/components/buttons/PrevButton'
-import { withStyles } from '@material-ui/styles'
+import { ensureFunction } from 'utils/fp'
+import WizzardStepper from 'core/components/wizard/WizardStepper'
 
 const WizardContext = React.createContext({})
 
 export const Consumer = WizardContext.Consumer
 export const Provider = WizardContext.Provider
 
-const styles = theme => ({
-})
-
 class Wizard extends React.Component {
-  isLastStep = () => this.state.step === this.state.steps.length - 1
-  isComplete = () => this.state.step > this.state.steps.length - 1
+  isLastStep = () => this.state.activeStep === this.state.steps.length - 1
+  isComplete = () => this.state.activeStep > this.state.steps.length - 1
   lastStep = () => this.state.steps.length - 1
-  hasNext = () => this.state.step < this.lastStep()
-  hasBack = () => this.state.step > 0
+  hasNext = () => this.state.activeStep < this.lastStep()
+  hasBack = () => this.state.activeStep > 0
 
   activateStep = () => {
     // Activate the step if we don't have one already
-    const { steps, step } = this.state
-    if (steps[step]) {
-      this.setState({ activeStepId: steps[step].stepId })
+    const { steps, activeStep } = this.state
+    if (steps[activeStep]) {
+      this.setState({ activeStepId: steps[activeStep].stepId })
     }
   }
 
   addStep = newStep => {
     this.setState(
       state => ({ steps: [...state.steps, newStep] }),
-      this.activateStep
+      this.activateStep,
     )
   }
 
   handleBack = () => {
     this.setState(
-      state => ({ step: state.step - 1 }),
-      this.activateStep
+      state => ({ activeStep: state.activeStep - 1 }),
+      this.activateStep,
     )
   }
 
@@ -55,19 +52,19 @@ class Wizard extends React.Component {
     }
 
     this.setState(
-      state => ({ step: state.step + 1 }),
+      state => ({ activeStep: state.activeStep + 1 }),
       () => {
         this.activateStep()
         if (this.isComplete()) {
           onComplete(this.state.wizardContext)
         }
-      }
+      },
     )
   }
 
   setWizardContext = newValues => {
     this.setState(
-      state => ({ wizardContext: { ...state.wizardContext, ...newValues } })
+      state => ({ wizardContext: { ...state.wizardContext, ...newValues } }),
     )
   }
 
@@ -75,7 +72,7 @@ class Wizard extends React.Component {
     handleBack: this.handleBack,
     handleNext: this.handleNext,
     addStep: this.addStep,
-    step: 0,
+    activeStep: 0,
     steps: [],
     activeStepId: null,
     wizardContext: this.props.context || {},
@@ -83,24 +80,23 @@ class Wizard extends React.Component {
   }
 
   render () {
-    const { wizardContext, setWizardContext, steps, step } = this.state
+    const { wizardContext, setWizardContext, steps, activeStep } = this.state
     const { children, submitLabel } = this.props
+    const renderStepsContent = ensureFunction(children)
 
     return (
-      <div>
-        <Provider value={this.state}>
-          <ProgressTracker steps={steps} activeStep={step} />
-          {children({ wizardContext, setWizardContext, onNext: this.onNext })}
-          <FormButtons>
-            {this.hasBack() &&
-              <PrevButton onClick={this.handleBack} />}
-            {this.hasNext() &&
-              <NextButton onClick={this.handleNext}>Next</NextButton>}
-            {this.isLastStep() &&
-              <NextButton onClick={this.handleNext}>{submitLabel}</NextButton>}
-          </FormButtons>
-        </Provider>
-      </div>
+      <Provider value={this.state}>
+        <WizzardStepper steps={steps} activeStep={activeStep} />
+        {renderStepsContent({ wizardContext, setWizardContext, onNext: this.onNext })}
+        <FormButtons>
+          {this.hasBack() &&
+          <PrevButton onClick={this.handleBack} />}
+          {this.hasNext() &&
+          <NextButton onClick={this.handleNext}>Next</NextButton>}
+          {this.isLastStep() &&
+          <NextButton onClick={this.handleNext}>{submitLabel}</NextButton>}
+        </FormButtons>
+      </Provider>
     )
   }
 }
@@ -109,7 +105,7 @@ Wizard.propTypes = {
   onComplete: PropTypes.func,
   context: PropTypes.object,
   submitLabel: PropTypes.string,
-  children: PropTypes.func.isRequired,
+  children: PropTypes.oneOfType([PropTypes.array, PropTypes.func]).isRequired,
 }
 
 Wizard.defaultProps = {
@@ -117,10 +113,10 @@ Wizard.defaultProps = {
   onComplete: value => {
     console.info('Wizard#onComplete handler not implemented.  Falling back to console.log')
     console.log(value)
-  }
+  },
 }
 
-export default withStyles(styles)(Wizard)
+export default Wizard
 
 /**
  * withWizardContext provides access to the wizard context through props.
@@ -136,11 +132,11 @@ export const withWizardContext = Component => props => {
   return (
     <Consumer>
       {
-        ({ step, steps, handleBack, handleNext, addStep, activeStepId }) =>
+        ({ activeStep, steps, handleBack, handleNext, addStep, activeStepId }) =>
           <Component
             {...props}
             activeStepId={activeStepId}
-            step={step}
+            activeStep={activeStep}
             steps={steps}
             handleBack={handleBack}
             handleNext={handleNext}

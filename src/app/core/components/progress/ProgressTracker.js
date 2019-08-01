@@ -16,21 +16,19 @@ import { Stepper, Step, StepLabel } from '@material-ui/core'
   go back to step 1 when step 1 is clicked
 */
 const ProgressCard = ({ steps, activeStep }) =>
-  <div>
-    <Stepper activeStep={activeStep}>
-      {steps.map((step, index) => {
-        return (
-          <Step key={step.stepId}>
-            <StepLabel>{step.label}</StepLabel>
-          </Step>
-        )
-      })}
-    </Stepper>
-  </div>
+  <Stepper activeStep={activeStep}>
+    {steps.map((step, index) => {
+      return (
+        <Step key={step.stepId}>
+          <StepLabel>{step.label}</StepLabel>
+        </Step>
+      )
+    })}
+  </Stepper>
 
 ProgressCard.propTypes = {
   activeStep: PropTypes.number,
-  steps: PropTypes.array
+  steps: PropTypes.array,
 }
 
 export default ProgressCard
