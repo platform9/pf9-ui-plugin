@@ -1,10 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import FormControl from '@material-ui/core/FormControl'
 import MenuItem from '@material-ui/core/MenuItem'
 import { withStyles } from '@material-ui/styles'
-import { compose } from 'app/utils/fp'
-import clsx from 'clsx'
 import TextField from '@material-ui/core/TextField'
 
 /**
@@ -13,18 +10,18 @@ import TextField from '@material-ui/core/TextField'
  */
 const styles = theme => ({
   root: {
-    display: 'flex',
+    display: ({ formField }) =>
+      formField ? 'flex' : 'block',
     flexWrap: 'wrap',
-  },
-  formControl: {
+    minWidth: 120,
     marginTop: theme.spacing(1),
-    minWidth: 200,
   },
   selectEmpty: {
     marginTop: theme.spacing(2),
   },
 })
 
+@withStyles(styles)
 class Picklist extends React.Component {
   handleChange = e => {
     const { onChange } = this.props
@@ -47,23 +44,22 @@ class Picklist extends React.Component {
 
     // Hack to work around Material UI's Select ignoring empty string as a value
     const nonEmptyValue = value === '' ? '__none__' : value
-    return (
-      <FormControl classes={classes} className={clsx(classes.formControl, className)}>
-        <TextField
-          select
-          variant="outlined"
-          label={label}
-          value={nonEmptyValue}
-          SelectProps={{
-            displayEmpty: true,
-          }}
-          onChange={this.handleChange}
-          inputProps={{ name: label, id: name }}
-        >
-          {items.map(item => <MenuItem value={item.value} key={item.value}>{item.label}</MenuItem>)}
-        </TextField>
-      </FormControl>
-    )
+
+    return <TextField
+      select
+      className={className}
+      classes={classes}
+      variant="outlined"
+      label={label}
+      value={nonEmptyValue}
+      SelectProps={{
+        displayEmpty: true,
+      }}
+      onChange={this.handleChange}
+      inputProps={{ name: label, id: name }}
+    >
+      {items.map(item => <MenuItem value={item.value} key={item.value}>{item.label}</MenuItem>)}
+    </TextField>
   }
 }
 
@@ -83,8 +79,11 @@ Picklist.propTypes = {
   options: PropTypes.arrayOf(optionPropType).isRequired,
   value: numOrString,
   onChange: PropTypes.func,
+  formField: PropTypes.bool,
 }
 
-export default compose(
-  withStyles(styles),
-)(Picklist)
+Picklist.defaultProps = {
+  formField: true,
+}
+
+export default Picklist

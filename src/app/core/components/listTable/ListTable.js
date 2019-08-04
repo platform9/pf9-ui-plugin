@@ -397,6 +397,27 @@ class ListTable extends React.Component {
     // Always show pagination control bar to make sure the height doesn't change frequently.
     // const shouldShowPagination = paginate && sortedData.length > this.state.rowsPerPage
 
+    const tableContent = paginatedData && paginatedData.length
+      ? <Table className={classes.table}>
+        <ListTableHead
+          canDragColumns={canDragColumns}
+          columns={this.getSortedVisibleColumns()}
+          onColumnsSwitch={this.handleColumnsSwitch}
+          numSelected={selected.length}
+          order={order}
+          orderBy={orderBy}
+          onSelectAllClick={this.handleSelectAllClick}
+          onRequestSort={this.handleRequestSort}
+          checked={selectedAll}
+          rowCount={data.length}
+          showCheckboxes={showCheckboxes}
+        />
+        <TableBody>
+          {paginatedData.map(this.renderRow)}
+        </TableBody>
+      </Table>
+      : this.renderEmptyList()
+
     return (
       <Grid container justify="center">
         <Grid item xs={12} zeroMinWidth>
@@ -423,24 +444,7 @@ class ListTable extends React.Component {
               rowsPerPageOptions={[5, 10, 25, 50, 100]}
             />
             <div className={classes.tableWrapper}>
-              {paginatedData && paginatedData.length ? <Table className={classes.table}>
-                <ListTableHead
-                  canDragColumns={canDragColumns}
-                  columns={this.getSortedVisibleColumns()}
-                  onColumnsSwitch={this.handleColumnsSwitch}
-                  numSelected={selected.length}
-                  order={order}
-                  orderBy={orderBy}
-                  onSelectAllClick={this.handleSelectAllClick}
-                  onRequestSort={this.handleRequestSort}
-                  checked={selectedAll}
-                  rowCount={data.length}
-                  showCheckboxes={showCheckboxes}
-                />
-                <TableBody>
-                  {paginatedData.map(this.renderRow)}
-                </TableBody>
-              </Table> : this.renderEmptyList()}
+              {tableContent}
             </div>
             {this.renderPaginationControls(filteredData.length)}
           </div>

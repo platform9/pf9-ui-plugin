@@ -20,6 +20,7 @@ const ListPage = ({ ListContainer }) => {
     ({ setParams, params: { clusterId }, data: { clusters, pods } }) =>
       <div>
         <Picklist
+          formField={false}
           name="currentCluster"
           label="Current Cluster"
           options={projectAs(
