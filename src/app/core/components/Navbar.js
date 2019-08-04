@@ -332,7 +332,7 @@ class Navbar extends PureComponent {
     const isActiveNavLink = activeNavItem === name
     const isCurrentNavLink = link && matchPath(`${pathname}${hash}`, {
       path: link.path,
-      exact: true,
+      exact: false,
       strict: false,
     })
 

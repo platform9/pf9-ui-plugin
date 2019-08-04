@@ -45,7 +45,7 @@ Kubernetes.registerPlugin = pluginManager => {
     [
       {
         name: 'Dashboard',
-        link: { path: '/', exact: true, default: true },
+        link: { path: '/dashboard', exact: true, default: true },
         component: DashboardPage,
       },
       {
@@ -226,7 +226,7 @@ Kubernetes.registerPlugin = pluginManager => {
   const devNavItems = [
     {
       name: 'Dashboard',
-      link: { path: '/' },
+      link: { path: '/dashboard' },
       icon: 'tachometer',
     },
     {
