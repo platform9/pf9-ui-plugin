@@ -22,7 +22,8 @@ const styles = theme => ({
     display: 'none',
   },
   logo: {
-    maxHeight: theme.spacing(6.5),
+    marginLeft: 45,
+    height: '100%',
   },
   rightTools: {
     position: 'absolute',
@@ -49,8 +50,8 @@ const renderExtraContent = classes => {
 
 const Toolbar = ({ classes, open }) => (
   <AppBar className={classes.appBar}>
-    <MaterialToolbar disableGutters={!open}>
-      <img src={imageUrls.logo} className={classes.logo} align="middle" />
+    <MaterialToolbar variant="dense" disableGutters={!open}>
+      <img src={imageUrls.logo} className={classes.logo} />
       <div className={classes.rightTools}>
         <RegionChooser />
         <TenantChooser className={classes.leftMargin} />

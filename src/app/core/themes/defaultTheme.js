@@ -65,6 +65,17 @@ const theme = {
         padding: '6.5px 14px',
       }
     },
+    MuiTooltip: {
+      tooltip: {
+        fontSize: 12,
+        padding: '7px 11px'
+      }
+    },
+    MuiToolbar: {
+      dense: {
+        height: 55
+      }
+    }
   },
   palette: {
     common: {
