@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import FormButtons from 'core/components/FormButtons'
+import WizardButtons from 'core/components/wizard/WizardButtons'
 import NextButton from 'core/components/buttons/NextButton'
 import PrevButton from 'core/components/buttons/PrevButton'
 import { ensureFunction } from 'utils/fp'
@@ -88,14 +88,14 @@ class Wizard extends React.Component {
       <Provider value={this.state}>
         <WizzardStepper steps={steps} activeStep={activeStep} />
         {renderStepsContent({ wizardContext, setWizardContext, onNext: this.onNext })}
-        <FormButtons>
+        <WizardButtons>
           {this.hasBack() &&
           <PrevButton onClick={this.handleBack} />}
           {this.hasNext() &&
           <NextButton onClick={this.handleNext}>Next</NextButton>}
           {this.isLastStep() &&
           <NextButton onClick={this.handleNext}>{submitLabel}</NextButton>}
-        </FormButtons>
+        </WizardButtons>
       </Provider>
     )
   }

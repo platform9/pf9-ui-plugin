@@ -7,10 +7,10 @@ const styles = theme => ({
   }
 })
 
-const FormButtons = ({ classes, children }) => (
+const WizardButtons = ({ classes, children }) => (
   <div className={classes.root}>
     {children}
   </div>
 )
 
-export default withStyles(styles)(FormButtons)
+export default withStyles(styles)(WizardButtons)
