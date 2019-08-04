@@ -198,7 +198,7 @@ class CardTable extends React.Component {
               onDirectionChange={this.handleDirectionChange}
               searchTerm={searchTerm}
             />
-            <Grid container spacing={24} justify="flex-start">
+            <Grid container spacing={3} justify="flex-start">
               {paginatedData.map(children)}
             </Grid>
             {this.renderPaginationControls(filteredData.length)}

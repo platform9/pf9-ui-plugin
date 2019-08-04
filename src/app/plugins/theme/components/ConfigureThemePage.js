@@ -12,7 +12,7 @@ class ConfigureThemePage extends React.Component {
       <div>
         <h1>Configure Theme</h1>
 
-        <Grid container spacing={10}>
+        <Grid container spacing={1}>
           <Grid item xs={8}>
             <KitchenSink />
           </Grid>

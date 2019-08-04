@@ -58,7 +58,7 @@ class ImageCard extends React.Component {
               {image.description}
             </Typography>
             <br />
-            <Grid container className={classes.root} spacing={8}>
+            <Grid container className={classes.root} spacing={2}>
               <Grid item sm={3}>
                 <Typography variant="body1" className={classes.text}>Disk Format: </Typography>
                 <Typography variant="body2" className={classes.text} paragraph>{image.disk_format}</Typography>

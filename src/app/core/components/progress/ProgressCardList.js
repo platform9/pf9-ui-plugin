@@ -21,7 +21,7 @@ class ProgressCardList extends React.Component {
           container
           justify="space-between"
           className={classes.root}
-          spacing={32}
+          spacing={4}
         >
           {cards.map(card => {
             return (
