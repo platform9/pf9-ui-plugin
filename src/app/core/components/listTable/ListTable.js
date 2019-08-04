@@ -3,7 +3,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Checkbox from 'core/components/Checkbox'
-import { Grid, Table, TableBody, TableCell, TablePagination, TableRow } from '@material-ui/core'
+import {
+  Typography, Grid, Table, TableBody, TableCell, TablePagination, TableRow,
+} from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import { compose, ensureFunction, except } from 'app/utils/fp'
 import { withAppContext } from 'core/AppContext'
@@ -27,7 +29,10 @@ const styles = theme => ({
   },
   cell: {
     fontSize: '13px',
-  }
+  },
+  emptyList: {
+    textAlign: 'left',
+  },
 })
 
 // Reject all columns that are not visible or excluded
@@ -181,7 +186,7 @@ class ListTable extends React.Component {
         ensureFunction(this.props.onColumnsChange)({
           visibleColumns: this.state.visibleColumns,
           columnsOrder: this.state.columnsOrder,
-        })
+        }),
       )
     }
   }
@@ -199,7 +204,7 @@ class ListTable extends React.Component {
       ensureFunction(this.props.onColumnsChange)({
         visibleColumns: this.state.visibleColumns,
         columnsOrder: this.state.columnsOrder,
-      })
+      }),
     )
   }
 
@@ -354,6 +359,10 @@ class ListTable extends React.Component {
     )
   }
 
+  renderEmptyList = () => {
+    return <Typography className={this.props.classes.emptyList} variant="h6">{this.props.emptyText}</Typography>
+  }
+
   render () {
     const {
       batchActions,
@@ -365,6 +374,7 @@ class ListTable extends React.Component {
       canDragColumns,
       filters,
       inlineFilters,
+      onRefresh,
     } = this.props
 
     const {
@@ -406,13 +416,14 @@ class ListTable extends React.Component {
               filterValues={filterValues}
               onFilterUpdate={this.handleFilterUpdate}
               onFiltersReset={this.handleFiltersReset}
+              onRefresh={onRefresh}
               batchActions={batchActions}
               rowsPerPage={rowsPerPage}
               onChangeRowsPerPage={this.handleChangeRowsPerPage}
               rowsPerPageOptions={[5, 10, 25, 50, 100]}
             />
             <div className={classes.tableWrapper}>
-              <Table className={classes.table}>
+              {paginatedData && paginatedData.length ? <Table className={classes.table}>
                 <ListTableHead
                   canDragColumns={canDragColumns}
                   columns={this.getSortedVisibleColumns()}
@@ -429,7 +440,7 @@ class ListTable extends React.Component {
                 <TableBody>
                   {paginatedData.map(this.renderRow)}
                 </TableBody>
-              </Table>
+              </Table> : this.renderEmptyList()}
             </div>
             {this.renderPaginationControls(filteredData.length)}
           </div>
@@ -463,11 +474,13 @@ ListTable.propTypes = {
   onAdd: PropTypes.func,
   onDelete: PropTypes.func,
   onEdit: PropTypes.func,
+  onRefresh: PropTypes.func,
   paginate: PropTypes.bool,
   orderBy: PropTypes.string,
 
   visibleColumns: PropTypes.arrayOf(PropTypes.string),
   rowsPerPage: PropTypes.number,
+  emptyText: PropTypes.string,
 
   /**
    * List of filters
@@ -530,6 +543,7 @@ ListTable.defaultProps = {
   canEditColumns: true,
   canDragColumns: true,
   rowsPerPage: 10,
+  emptyText: 'No data found',
 }
 
 export default compose(

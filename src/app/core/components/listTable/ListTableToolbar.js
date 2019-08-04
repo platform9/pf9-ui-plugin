@@ -12,6 +12,7 @@ import { Button, Toolbar, Tooltip } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import ListTableFiltersButton from 'core/components/listTable/ListTableFiltersButton'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
+import moize from 'moize'
 
 const toolbarStyles = theme => ({
   root: {
@@ -26,9 +27,17 @@ const toolbarStyles = theme => ({
   actions: {
     flex: '1 1 100%',
   },
+  button: {
+    cursor: 'pointer',
+    fontWeight: 300,
+    margin: theme.spacing(0, 1),
+  },
   toolbar: {
     justifyContent: 'flex-end',
     paddingRight: 0,
+  },
+  search: {
+    margin: theme.spacing(0, 2),
   },
   rowActions: {
     color: 'inherit',
@@ -49,10 +58,18 @@ const toolbarStyles = theme => ({
   },
 })
 
+const renderRefreshButton = moize((classes, onRefresh) =>
+  onRefresh && <Tooltip title="Refresh list">
+    <i className={clsx(classes.button, 'fas fa-fw fa-lg fa-sync')}
+      aria-label="Refresh list"
+      onClick={onRefresh}
+    />
+  </Tooltip>)
+
 const ListTableToolbar = ({
   classes, columns, context, filterValues, filters, inlineFilters,
   onAdd, onColumnToggle, onDelete, onEdit, onFilterUpdate,
-  onFiltersReset, onSearchChange,
+  onFiltersReset, onSearchChange, onRefresh,
   rowActions, searchTerm, selected, visibleColumns,
   rowsPerPage, onChangeRowsPerPage, rowsPerPageOptions,
 }) => {
@@ -84,7 +101,7 @@ const ListTableToolbar = ({
       <div className={classes.actions}>
         <Toolbar className={classes.toolbar}>
           {onSearchChange && (
-            <SearchBar onSearchChange={onSearchChange} searchTerm={searchTerm} />
+            <SearchBar className={classes.search} onSearchChange={onSearchChange} searchTerm={searchTerm} />
           )}
           {filters && inlineFilters && <ListTableFilters
             inline
@@ -101,6 +118,7 @@ const ListTableToolbar = ({
               onColumnToggle={onColumnToggle}
             />
           )}
+          {renderRefreshButton(classes, onRefresh)}
           {filters && !inlineFilters && <ListTableFiltersButton
             columns={columns}
             filters={filters}
@@ -151,6 +169,7 @@ ListTableToolbar.propTypes = {
   onEdit: PropTypes.func,
   onFilterUpdate: PropTypes.func,
   onFiltersReset: PropTypes.func,
+  onRefresh: PropTypes.func,
   selected: PropTypes.array,
   visibleColumns: PropTypes.array,
   onColumnToggle: PropTypes.func,
