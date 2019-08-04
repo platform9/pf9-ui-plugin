@@ -27,8 +27,10 @@ const tabStyles = theme => ({
     fontSize: '21px',
     minWidth: 100,
     padding: 0,
+    marginRight: 15,
     margin: '0 0 -1px',
-    '&:hover:not(.Mui-selected) .MuiTab-wrapper': {
+    cursor: 'default',
+    '&:hover:not(.Mui-selected)': {
       cursor: 'pointer',
       boxShadow: `inset 0 -2px 0 ${theme.palette.primary.main}`,
       color: theme.palette.primary.main,
@@ -37,9 +39,7 @@ const tabStyles = theme => ({
   wrapper: {
     padding: '5px 15px 15px',
     transition: 'all .2s',
-    marginRight: 15,
     lineHeight: 1,
-    cursor: 'default',
   },
 })
 
