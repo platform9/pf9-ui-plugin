@@ -327,10 +327,10 @@ class Navbar extends PureComponent {
   }
 
   renderNavLink = ({ nestedLinks, link, name, icon }, idx) => {
-    const { open, classes, location: { pathname, hash } } = this.props
+    const { open, classes, location: { pathname } } = this.props
     const { activeNavItem } = this.state
     const isActiveNavLink = activeNavItem === name
-    const isCurrentNavLink = link && matchPath(`${pathname}${hash}`, {
+    const isCurrentNavLink = link && matchPath(pathname, {
       path: link.path,
       exact: false,
       strict: false,

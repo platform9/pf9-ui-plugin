@@ -16,9 +16,6 @@ const styles = theme => ({
     minWidth: 120,
     marginTop: theme.spacing(1),
   },
-  selectEmpty: {
-    marginTop: theme.spacing(2),
-  },
 })
 
 @withStyles(styles)
