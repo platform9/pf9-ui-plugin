@@ -16,6 +16,7 @@ import moize from 'moize'
 import { assoc, flatten, pluck, prop, propEq, propOr, where } from 'ramda'
 import { matchPath, withRouter } from 'react-router'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
+import { imageUrls, clarityDashboardUrl } from 'app/constants'
 
 export const drawerWidth = 180
 
@@ -393,13 +394,13 @@ class Navbar extends PureComponent {
   renderStackSlider = () => {
     const { classes, open } = this.props
     return <div className={classes.sliderContainer}>
-      {open && <a href="/clarity/index.html#/dashboard">
+      {open && <a href={clarityDashboardUrl}>
         <ChevronLeftIcon className={classes.sliderArrow} />
       </a>}
       <div className={classes.sliderLogo}>
-        <img src="/ui/images/logo-kubernetes-h.png" className={classes.sliderLogoImage} />
+        <img src={imageUrls.kubernetes} className={classes.sliderLogoImage} />
       </div>
-      {open && <a href="/clarity/index.html#/dashboard">
+      {open && <a href={clarityDashboardUrl}>
         <ChevronRightIcon className={classes.sliderArrow} />
       </a>}
     </div>

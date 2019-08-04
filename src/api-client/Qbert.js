@@ -1,7 +1,7 @@
-import { assoc } from 'ramda'
+import { assoc, propOr } from 'ramda'
 import { keyValueArrToObj } from 'utils/fp'
 
-const normalizePrometheusResponse = (clusterUuid, response) => response.items.map(x => ({ ...x, clusterUuid }))
+const normalizePrometheusResponse = (clusterUuid, response) => propOr([], 'items', response).map(x => ({ ...x, clusterUuid }))
 const normalizePrometheusUpdate = (clusterUuid, response) => ({ ...response, clusterUuid })
 
 /* eslint-disable camelcase */

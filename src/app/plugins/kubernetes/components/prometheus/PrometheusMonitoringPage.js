@@ -16,7 +16,7 @@ class PrometheusMonitoringPage extends React.Component {
     return (
       <div>
         <Tabs>
-          <Tab value="instances" label="Prometheus Instances"><PrometheusInstances /></Tab>
+          <Tab value="instances" label="Instances"><PrometheusInstances /></Tab>
           <Tab value="rules" label="Rules"><PrometheusRules /></Tab>
           <Tab value="serviceMonitors" label="Service Monitors"><PrometheusServiceMonitors /></Tab>
           <Tab value="alerts" label="Alert Managers"><PrometheusAlertManagers /></Tab>

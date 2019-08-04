@@ -6,11 +6,11 @@ import ClearIcon from '@material-ui/icons/Clear'
 import grey from '@material-ui/core/colors/grey'
 import { compose, pick } from 'ramda'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
+import clsx from 'clsx'
 
 const styles = theme => ({
   SearchBar: {
     outline: 'none',
-    marginRight: theme.spacing(2),
   },
   searchIcon: {
     fontSize: 15,
@@ -50,12 +50,12 @@ class SearchBar extends React.Component {
   }
 
   render () {
-    const { classes, searchTerm } = this.props
+    const { classes, searchTerm, className } = this.props
     return (
       searchTerm !== undefined && <TextField
         variant="outlined"
         placeholder='Search'
-        className={classes.SearchBar}
+        className={clsx(classes.SearchBar, className)}
         onChange={this.handleSearch}
         value={searchTerm}
         type="search"
