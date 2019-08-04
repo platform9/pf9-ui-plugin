@@ -1,7 +1,7 @@
 import React from 'react'
 
-import Tabs from 'core/components/Tabs'
-import Tab from 'core/components/Tab'
+import Tabs from 'core/components/tabs/Tabs'
+import Tab from 'core/components/tabs/Tab'
 
 import PrometheusInstances from './PrometheusInstances'
 import PrometheusRules from './PrometheusRules'

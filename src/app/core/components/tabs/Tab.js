@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Typography from '@material-ui/core/Typography'
-import { withTabContext } from 'core/components/Tabs'
+import { withTabContext } from 'core/components/tabs/Tabs'
 
 class Tab extends React.Component {
   componentDidMount () {

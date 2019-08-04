@@ -50,7 +50,7 @@ const styles = theme => ({
     },
   },
   paper: {
-    marginTop: 64,
+    marginTop: 55,
     backgroundColor: 'inherit',
     overflow: 'hidden',
     borderRight: 0,

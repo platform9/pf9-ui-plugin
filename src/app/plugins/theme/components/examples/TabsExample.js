@@ -1,7 +1,7 @@
 import React from 'react'
 import Panel from '../Panel'
-import Tab from 'core/components/Tab'
-import Tabs from 'core/components/Tabs'
+import Tab from 'core/components/tabs/Tab'
+import Tabs from 'core/components/tabs/Tabs'
 import { Typography } from '@material-ui/core'
 
 const TabsExample = ({ expanded = false }) => (

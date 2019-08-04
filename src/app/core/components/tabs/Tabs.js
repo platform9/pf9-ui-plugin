@@ -2,7 +2,7 @@ import React from 'react'
 import { withRouter } from 'react-router-dom'
 import { Grid, Paper, Tab as MDTab, Tabs as MDTabs } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
-import { compose } from 'app/utils/fp'
+import { compose } from 'utils/fp'
 
 const TabContext = React.createContext({})
 export const Consumer = TabContext.Consumer
@@ -13,16 +13,37 @@ const styles = theme => ({
     flexGrow: 1,
     width: '100%',
     boxShadow: '0 0 0 0',
-    backgroundColor: theme.palette.background.default
+    backgroundColor: theme.palette.background.default,
   },
-  tab: {
-    textTransform: 'none',
-    fontSize: '21px',
-  },
+
   tabColor: {
     color: theme.palette.text.primary,
-  }
+  },
 })
+
+const tabStyles = theme => ({
+  root: {
+    textTransform: 'none',
+    fontSize: '21px',
+    minWidth: 100,
+    padding: 0,
+    margin: '0 0 -1px',
+    '&:hover:not(.Mui-selected) .MuiTab-wrapper': {
+      cursor: 'pointer',
+      boxShadow: `inset 0 -2px 0 ${theme.palette.primary.main}`,
+      color: theme.palette.primary.main,
+    },
+  },
+  wrapper: {
+    padding: '5px 15px 15px',
+    transition: 'all .2s',
+    marginRight: 15,
+    lineHeight: 1,
+    cursor: 'default',
+  },
+})
+
+const CustomTab = withStyles(tabStyles)(MDTab)
 
 class Tabs extends React.Component {
   addTab = tab => {
@@ -39,7 +60,7 @@ class Tabs extends React.Component {
   static getDerivedStateFromProps (props, state) {
     if (props.location.hash && props.location.hash !== state.value) {
       return {
-        value: props.location.hash || false
+        value: props.location.hash || false,
       }
     }
     return null
@@ -59,7 +80,6 @@ class Tabs extends React.Component {
   render () {
     const { tabs, value } = this.state
     const { children, classes } = this.props
-
     return (
       <Provider value={this.state}>
         <Grid container justify="center">
@@ -74,7 +94,7 @@ class Tabs extends React.Component {
                   TabIndicatorProps={{ style: { display: 'none' } }}
                 >
                   {tabs.map(tab =>
-                    <MDTab className={classes.tab} key={tab.value} value={tab.value} label={tab.label} href={tab.value} />
+                    <CustomTab key={tab.value} value={tab.value} label={tab.label} href={tab.value} />,
                   )}
                 </MDTabs>
                 {children}
@@ -104,5 +124,5 @@ export const withTabContext = Component => props => {
 
 export default compose(
   withStyles(styles),
-  withRouter
+  withRouter,
 )(Tabs)
