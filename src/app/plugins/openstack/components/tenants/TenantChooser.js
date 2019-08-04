@@ -85,7 +85,7 @@ class TenantChooser extends React.Component {
     return (
       <Tooltip
         title="Tenant"
-        placement="bottom-start"
+        placement="bottom"
         enterDelay={300}
       >
         <Selector

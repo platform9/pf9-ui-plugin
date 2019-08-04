@@ -47,7 +47,7 @@ class RegionChooser extends React.Component {
     return (
       <Tooltip
         title="Region"
-        placement="bottom-start"
+        placement="bottom"
         enterDelay={300}
       >
         <Selector
