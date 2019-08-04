@@ -8,18 +8,18 @@ import { assoc } from 'ramda'
 import { makeStyles } from '@material-ui/styles'
 import { Button } from '@material-ui/core'
 
-const styles = theme => ({
+const keyValueStyles = theme => ({
   root: {
     display: 'flex',
   },
   deleteButton: {
-    marginBottom: theme.spacing(2),
-    padding: theme.spacing(0, 1),
+    margin: theme.spacing(0, 0, 2, 1),
+    padding: 0,
   },
 })
 
 const KeyValue = ({ entry = {}, onChange, onDelete, keySuggestions, valueSuggestions }) => {
-  const classes = makeStyles(styles)()
+  const classes = makeStyles(keyValueStyles)()
   const [state, setState] = useState({
     id: entry.id || uuid.v4(),
     key: entry.key || '',
@@ -52,6 +52,12 @@ const KeyValue = ({ entry = {}, onChange, onDelete, keySuggestions, valueSuggest
   )
 }
 
+const keyValuesStyles = theme => ({
+  addButton: {
+    marginTop: theme.spacing(-1),
+  },
+})
+
 const newEntry = () => ({ id: uuid.v4(), key: '', value: '' })
 
 // Unfortunately React forces us to use `key` for each item in an
@@ -62,6 +68,7 @@ const newEntry = () => ({ id: uuid.v4(), key: '', value: '' })
 const addId = entry => ({ ...entry, id: uuid.v4() })
 
 const KeyValues = ({ entries: _entries, onChange, keySuggestions, valueSuggestions }) => {
+  const classes = makeStyles(keyValuesStyles)()
   const entriesWithId = [...(_entries || []).map(addId), newEntry()]
   const [entries, setEntries] = useState(entriesWithId)
 
@@ -89,7 +96,9 @@ const KeyValues = ({ entries: _entries, onChange, keySuggestions, valueSuggestio
           onDelete={deleteEntry(entry.id)}
         />
       ))}
-      <Button variant="text" onClick={addBlankEntry}>Add key / value pair</Button>
+      <Button className={classes.addButton} variant="text" onClick={addBlankEntry}>
+        Add key / value pair
+      </Button>
     </div>
   )
 }

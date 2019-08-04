@@ -9,10 +9,10 @@ import { withStyles } from '@material-ui/styles'
 
 const styles = theme => ({
   root: {
-    marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1),
   },
   title: {
+    display: 'block',
     marginBottom: theme.spacing(1)
   },
 })
@@ -22,7 +22,7 @@ class KeyValuesField extends React.Component {
     const { id, value, label, classes, ...restProps } = this.props
     return (
       <div id={id} className={classes.root}>
-        <Typography variant="subtitle1" className={classes.title}>{label}</Typography>
+        <Typography variant="caption" className={classes.title}>{label}</Typography>
         <KeyValues
           {...restProps}
           entries={value !== undefined ? value : []}
