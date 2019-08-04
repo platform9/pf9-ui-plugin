@@ -7,6 +7,7 @@ import { withScopedPreferences } from 'core/providers/PreferencesProvider'
 import contextLoader from 'core/helpers/contextLoader'
 import withDataLoader from 'core/hocs/withDataLoader'
 import withDataMapper from 'core/hocs/withDataMapper'
+import { Tooltip } from '@material-ui/core'
 
 const loadRegions = contextLoader('regions', async ({ apiClient }) => {
   return apiClient.keystone.getRegions()
@@ -44,15 +45,20 @@ class RegionChooser extends React.Component {
     const regionNames = pluck('id', regions)
 
     return (
-      <Selector
-        className={className}
-        name={!curRegion || curRegion.length === 0 ? 'Current Region' : curRegion}
-        type="Region"
-        list={regionNames}
-        onChoose={this.handleRegionSelect}
-        onSearchChange={this.handleSearchChange}
-        searchTerm={regionSearch}
-      />
+      <Tooltip
+        title="Region"
+        placement="bottom-start"
+        enterDelay={300}
+      >
+        <Selector
+          className={className}
+          name={!curRegion || curRegion.length === 0 ? 'Current Region' : curRegion}
+          list={regionNames}
+          onChoose={this.handleRegionSelect}
+          onSearchChange={this.handleSearchChange}
+          searchTerm={regionSearch}
+        />
+      </Tooltip>
     )
   }
 }

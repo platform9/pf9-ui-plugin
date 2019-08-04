@@ -3,8 +3,12 @@ import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/styles'
 import { Menu, MenuItem, Typography } from '@material-ui/core'
 import SearchBar from './SearchBar'
+import clsx from 'clsx'
 
 const styles = theme => ({
+  search: {
+    margin: theme.spacing(1, 2),
+  },
   selector: {
     position: 'relative',
     float: 'right',
@@ -39,15 +43,14 @@ class Selector extends React.Component {
   }
 
   render () {
-    const { className, classes, name, list, searchTerm, onSearchChange, type } = this.props
+    const { className, classes, name, list, searchTerm, onSearchChange, type, onMouseLeave, onMouseOver } = this.props
     const { anchor } = this.state
     const selectorName = `${name}-selector`
 
     const sortedList = this.sortList(list)
     const filteredList = searchTerm === '' ? sortedList : this.filterBySearch(sortedList)
-
     return (
-      <div className={`${className} ${classes.selector}`}>
+      <div onMouseLeave={onMouseLeave} onMouseOver={onMouseOver} className={clsx(className, classes.selector)}>
         <Typography color="inherit" variant="subtitle2" onClick={this.handleClick}>{type && `${type}: `}{name} &#9662;</Typography>
         <Menu
           id={selectorName}
@@ -58,6 +61,7 @@ class Selector extends React.Component {
           anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
         >
           { searchTerm !== undefined && <SearchBar
+            className={classes.search}
             onSearchChange={onSearchChange}
             searchTerm={searchTerm}
           />}

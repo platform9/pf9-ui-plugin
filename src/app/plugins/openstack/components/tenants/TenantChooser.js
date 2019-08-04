@@ -6,17 +6,18 @@ import { withScopedPreferences } from 'core/providers/PreferencesProvider'
 import moize from 'moize'
 import { assoc, propEq } from 'ramda'
 import { loadUserTenants } from './actions'
+import { Tooltip } from '@material-ui/core'
 
 class TenantChooser extends React.Component {
   state = {
     tenantSearch: '',
     currentTenantName: '',
-    tenants: null
+    tenants: null,
   }
 
   handleChange = moize(key => value => {
     this.setState({
-      [key]: value
+      [key]: value,
     })
   })
 
@@ -70,7 +71,7 @@ class TenantChooser extends React.Component {
   }
 
   async componentDidMount () {
-    const lastTenant = this.props.preferences.lastTenant
+    const { lastTenant } = this.props.preferences
     const tenants = await this.loadTenants()
     if (!tenants || !lastTenant) { return }
     this.updateCurrentTenant(lastTenant.name)
@@ -82,20 +83,25 @@ class TenantChooser extends React.Component {
     if (!tenants) { return null }
 
     return (
-      <Selector
-        className={this.props.className}
-        name={currentTenantName || 'service'}
-        type="Tenant"
-        list={this.tenantNames(tenants)}
-        onChoose={this.handleChoose}
-        onSearchChange={this.handleChange('tenantSearch')}
-        searchTerm={tenantSearch}
-      />
+      <Tooltip
+        title="Tenant"
+        placement="bottom-start"
+        enterDelay={300}
+      >
+        <Selector
+          className={this.props.className}
+          name={currentTenantName || 'service'}
+          list={this.tenantNames(tenants)}
+          onChoose={this.handleChoose}
+          onSearchChange={this.handleChange('tenantSearch')}
+          searchTerm={tenantSearch}
+        />
+      </Tooltip>
     )
   }
 }
 
 export default compose(
   withScopedPreferences('Tenants'),
-  withAppContext
+  withAppContext,
 )(TenantChooser)
