@@ -1,11 +1,11 @@
-import React from 'react'
+import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { TextField as BaseTextField } from '@material-ui/core'
 import { withInfoTooltip } from 'app/core/components/InfoTooltip'
 import { compose } from 'app/utils/fp'
 import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
 
-class TextField extends React.Component {
+class TextField extends PureComponent {
   handleChange = e => {
     const { onChange, type } = this.props
     // HTML specs says that <input type="number"> return strings but it's more useful if we

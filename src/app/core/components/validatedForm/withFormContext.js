@@ -1,9 +1,9 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { pickMultiple } from 'app/utils/fp'
 import { ValidatedFormConsumer } from 'core/components/validatedForm/ValidatedForm'
 import { requiredValidator } from 'core/utils/fieldValidators'
-import { partial, pathOr } from 'ramda'
+import { pathOr } from 'ramda'
 
 export const ValidatedFormInputPropTypes = {
   required: PropTypes.bool,
@@ -15,10 +15,10 @@ export const ValidatedFormInputPropTypes = {
  * Wrapper for all the inputs that will require some sort of interaction with
  * the ValidatedForm such as validations and text hints on hover
  */
-class ValidatedFormInput extends Component {
+class ValidatedFormInput extends PureComponent {
   static defaultProps = {
     validations: [],
-    required: false
+    required: false,
   }
 
   constructor (props) {
@@ -59,7 +59,7 @@ class ValidatedFormInput extends Component {
   render () {
     return this.props.children({
       onChange: this.handleChange,
-      onBlur: this.handleBlur
+      onBlur: this.handleBlur,
     })
   }
 }
@@ -90,9 +90,9 @@ const withFormContext = Input =>
       }) => (
         <ValidatedFormInput
           id={id}
-          defineField={partial(defineField, [id])}
-          setFieldValue={partial(setFieldValue, [id])}
-          validateField={partial(validateField, [id])}
+          defineField={defineField(id)}
+          setFieldValue={setFieldValue(id)}
+          validateField={validateField(id)}
           showErrorsOnBlur={showErrorsOnBlur}
           initialValue={initialValues[id]}
           required={required}

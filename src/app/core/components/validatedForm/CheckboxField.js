@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import Checkbox from 'core/components/Checkbox'
 import { FormControl, FormControlLabel, FormHelperText } from '@material-ui/core'
@@ -13,7 +13,7 @@ const styles = theme => ({
   },
 })
 
-class CheckboxField extends React.Component {
+class CheckboxField extends PureComponent {
   handleChange = e => {
     const { onChange } = this.props
     if (onChange) {
