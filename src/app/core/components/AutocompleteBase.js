@@ -7,6 +7,7 @@ import MenuList from '@material-ui/core/MenuList'
 import MenuItem from '@material-ui/core/MenuItem'
 import Paper from '@material-ui/core/Paper'
 import { TextField as BaseTextField } from '@material-ui/core'
+import clsx from 'clsx'
 
 // This is being called 'Base' because it is standalone and does not
 // integrate with ValidatedForm.
@@ -90,11 +91,11 @@ class AutocompleteBase extends React.Component {
   render () {
     const matched = this.matchedSuggestions()
     const { value } = this.state
-    const { classes, suggestions, onChange, initialValue, label, id, ...other } = this.props
+    const { className, classes, suggestions, onChange, initialValue, label, id, ...other } = this.props
     const DropdownIcon = <ArrowDropDownIcon className={classes.dropdownButton} />
 
     return (
-      <div className={classes.relative}>
+      <div className={clsx(classes.relative, className)}>
         <FormControl className={classes.container} onMouseDown={this.toggleOpen}>
           <BaseTextField
             id={id}

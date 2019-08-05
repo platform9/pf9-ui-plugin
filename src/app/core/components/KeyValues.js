@@ -11,9 +11,21 @@ import { Button } from '@material-ui/core'
 const keyValueStyles = theme => ({
   root: {
     display: 'flex',
+    flexFlow: 'row nowrap',
+    width: '100%',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  autocomplete: {
+    flexGrow: 1,
+    marginRight: theme.spacing(0.5),
+    '& .MuiFormControl-root': {
+      marginTop: theme.spacing(0.5),
+      marginBottom: 0
+    },
   },
   deleteButton: {
-    margin: theme.spacing(0, 0, 2, 1),
+    flexGrow: 0,
     padding: 0,
   },
 })
@@ -39,6 +51,7 @@ const KeyValue = ({ entry = {}, onChange, onDelete, keySuggestions, valueSuggest
         value={state.key}
         onChange={handleChange('key')}
         suggestions={keySuggestions}
+        className={classes.autocomplete}
       />
       &nbsp;
       <AutocompleteBase
@@ -46,15 +59,22 @@ const KeyValue = ({ entry = {}, onChange, onDelete, keySuggestions, valueSuggest
         value={state.value}
         onChange={handleChange('value')}
         suggestions={valueSuggestions}
+        className={classes.autocomplete}
       />
       <IconButton className={classes.deleteButton} onClick={onDelete}><DeleteIcon /></IconButton>
     </div>
   )
 }
 
-const keyValuesStyles = theme => ({
+const styles = theme => ({
+  root: {
+    display: 'flex',
+    flexFlow: 'column',
+    alignItems: 'flex-start',
+    maxWidth: '100%',
+  },
   addButton: {
-    marginTop: theme.spacing(-1),
+    marginTop: theme.spacing(0.5),
   },
 })
 
@@ -68,7 +88,7 @@ const newEntry = () => ({ id: uuid.v4(), key: '', value: '' })
 const addId = entry => ({ ...entry, id: uuid.v4() })
 
 const KeyValues = ({ entries: _entries, onChange, keySuggestions, valueSuggestions }) => {
-  const classes = makeStyles(keyValuesStyles)()
+  const classes = makeStyles(styles)()
   const entriesWithId = [...(_entries || []).map(addId), newEntry()]
   const [entries, setEntries] = useState(entriesWithId)
 
@@ -85,7 +105,7 @@ const KeyValues = ({ entries: _entries, onChange, keySuggestions, valueSuggestio
   }, [entries])
 
   return (
-    <div>
+    <div className={classes.root}>
       {entries.map(entry => (
         <KeyValue
           key={entry.id}

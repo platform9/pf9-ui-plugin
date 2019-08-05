@@ -10,7 +10,7 @@ const FontAwesomeIcon = ({ children, className, size, solid, ...rest }) => {
     (solid ? 'fas' : ''),
   ]
   return (
-    <i className={clsx(defaultClasses.join(' '), className)} {...rest} />
+    <i className={clsx(...defaultClasses, className)} {...rest} />
   )
 }
 

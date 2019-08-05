@@ -23,10 +23,12 @@ const styles = theme => ({
     flexFlow: 'column wrap',
     paddingRight: '2rem',
     width: '100%',
-    maxWidth: '400px',
-  },
-  formControl: {
-    margin: theme.spacing(1),
+    maxWidth: 400,
+    '& .MuiFormControl-root': {
+      width: '100%',
+      marginTop: theme.spacing(1),
+      marginBottom: theme.spacing(1),
+    },
   },
 })
 
@@ -163,9 +165,7 @@ class ValidatedForm extends React.Component {
     const { children, classes, debug, id } = this.props
     return (
       <form onSubmit={this.handleSubmit} className={classes.root} id={id}>
-        <div className={classes.inputs} classes={{
-          input: classes.formControl,
-        }}>
+        <div className={classes.inputs}>
           <ValidatedFormProvider value={this.state}>
             {debug && <ValidatedFormDebug />}
             {children}

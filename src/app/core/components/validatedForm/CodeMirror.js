@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { withStyles } from '@material-ui/styles'
 import { FormControl, FormHelperText, FormLabel } from '@material-ui/core'
 import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
 import { compose } from 'app/utils/fp'
@@ -9,12 +8,6 @@ import { Controlled as BaseCodeMirror } from 'react-codemirror2'
 import './codemirror.css'
 
 require('codemirror/mode/yaml/yaml')
-
-const styles = theme => ({
-  formControl: {
-    margin: theme.spacing(1)
-  }
-})
 
 const defaultOptions = {
   lineNumbers: true,
@@ -41,7 +34,7 @@ class CodeMirror extends React.Component {
     const { id, label, value, classes, hasError, onMouseEnter, errorMessage, onChange, options, ...restProps } = this.props
     const combinedOptions = { ...defaultOptions, ...options }
     return (
-      <FormControl id={id} className={classes.formControl} error={hasError} fullWidth>
+      <FormControl id={id} error={hasError} fullWidth>
         <FormLabel>{label}</FormLabel>
         <BaseCodeMirror
           {...restProps}
@@ -66,6 +59,5 @@ CodeMirror.propTypes = {
 
 export default compose(
   withFormContext,
-  withStyles(styles),
   withInfoTooltip,
 )(CodeMirror)

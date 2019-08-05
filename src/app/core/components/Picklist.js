@@ -29,7 +29,7 @@ class Picklist extends React.Component {
   }
 
   render () {
-    const { className, classes, label, name, value, options } = this.props
+    const { className, classes, label, name, value, options, formField, ...restProps } = this.props
 
     const items = options.map(x =>
       typeof x === 'string' ? ({ value: x, label: x }) : x,
@@ -43,6 +43,7 @@ class Picklist extends React.Component {
     const nonEmptyValue = value === '' ? '__none__' : value
 
     return <TextField
+      {...restProps}
       select
       className={className}
       classes={classes}

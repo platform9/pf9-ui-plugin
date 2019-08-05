@@ -7,6 +7,7 @@ import { addStoriesFromModule, jsonDetailLogger } from '../helpers'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import FormWrapper from 'core/components/FormWrapper'
 import { Button } from '@material-ui/core'
+import KeyValuesField from 'core/components/validatedForm/KeyValuesField'
 
 const addStories = addStoriesFromModule(module)
 
@@ -77,6 +78,7 @@ const renderForm = (props = {}) => () => (
           ),
         ]}
       />
+      <KeyValuesField required id="keyValues" label="Key Values" info="Key/value pairs" />
       <Checkbox
         id="accept_terms"
         label="Accept terms"

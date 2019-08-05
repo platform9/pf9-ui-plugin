@@ -59,7 +59,6 @@ const theme = {
     MuiOutlinedInput: {
       root: {
         fontSize: '13px',
-        marginBottom: '16px',
       },
       input: {
         padding: '6.5px 14px',

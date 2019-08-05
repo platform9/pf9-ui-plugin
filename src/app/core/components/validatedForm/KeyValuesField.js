@@ -1,36 +1,22 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { withInfoTooltip } from 'app/core/components/InfoTooltip'
-import { Typography } from '@material-ui/core'
+import { Typography, FormControl, FormHelperText } from '@material-ui/core'
 import { compose } from 'app/utils/fp'
 import KeyValues, { EntryShape } from 'core/components/KeyValues'
 import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
-import { withStyles } from '@material-ui/styles'
 
-const styles = theme => ({
-  root: {
-    marginBottom: theme.spacing(1),
-  },
-  title: {
-    display: 'block',
-    marginBottom: theme.spacing(1)
-  },
-})
-
-class KeyValuesField extends React.Component {
-  render () {
-    const { id, value, label, classes, ...restProps } = this.props
-    return (
-      <div id={id} className={classes.root}>
-        <Typography variant="caption" className={classes.title}>{label}</Typography>
-        <KeyValues
-          {...restProps}
-          entries={value !== undefined ? value : []}
-        />
-      </div>
-    )
-  }
-}
+const KeyValuesField = React.forwardRef(({ id, value, label, hasError, errorMessage, onChange, keySuggestions, valueSuggestions, ...restProps }, ref) =>
+  <FormControl id={id} error={hasError} {...restProps} ref={ref}>
+    <Typography variant="caption">{label}</Typography>
+    <KeyValues
+      entries={value !== undefined ? value : []}
+      onChange={onChange}
+      keySuggestions={keySuggestions}
+      valueSuggestions={valueSuggestions}
+    />
+    {errorMessage && <FormHelperText>{errorMessage}</FormHelperText>}
+  </FormControl>)
 
 KeyValuesField.propTypes = {
   id: PropTypes.string.isRequired,
@@ -43,5 +29,4 @@ KeyValuesField.propTypes = {
 export default compose(
   withFormContext,
   withInfoTooltip,
-  withStyles(styles),
 )(KeyValuesField)

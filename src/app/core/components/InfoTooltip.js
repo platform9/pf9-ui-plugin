@@ -52,11 +52,11 @@ InfoTooltip.propTypes = {
   info: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
 }
 
-const withInfoTooltip = Component => ({ info, ...props }) => {
+const withInfoTooltip = Component => React.forwardRef(({ info, ...props }, ref) => {
   return <InfoTooltip info={info}>
-    <Component {...props} />
+    <Component {...props} ref={ref} />
   </InfoTooltip>
-}
+})
 
 export { withInfoTooltip }
 
