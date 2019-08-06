@@ -1,9 +1,9 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { TextField as BaseTextField } from '@material-ui/core'
-import { withInfoTooltip } from 'app/core/components/InfoTooltip'
 import { compose } from 'app/utils/fp'
 import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
+import { withInfoTooltip } from 'core/components/InfoTooltip'
 
 class TextField extends PureComponent {
   handleChange = e => {
@@ -46,6 +46,6 @@ TextField.propTypes = {
 }
 
 export default compose(
+  withInfoTooltip, // This HoC causes unnecessary re-renders if declared after withFormContext
   withFormContext,
-  withInfoTooltip,
 )(TextField)

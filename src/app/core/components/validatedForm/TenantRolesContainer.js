@@ -1,7 +1,5 @@
 import React from 'react'
-import {
-  Table, TableBody, TableCell, TableHead, TableRow
-} from '@material-ui/core'
+import { Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core'
 import { withInfoTooltip } from 'app/core/components/InfoTooltip'
 import { compose } from 'app/utils/fp'
 import TenantRoleSelector from 'core/components/TenantRoleSelector'
@@ -75,6 +73,6 @@ TenantRolesContainer.propTypes = {
 }
 
 export default compose(
+  withInfoTooltip, // This HoC causes unnecessary re-renders if declared after withFormContext
   withFormContext,
-  withInfoTooltip,
 )(TenantRolesContainer)

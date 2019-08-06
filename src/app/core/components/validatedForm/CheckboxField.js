@@ -55,7 +55,7 @@ CheckboxField.propTypes = {
 }
 
 export default compose(
-  withFormContext,
+  withInfoTooltip, // This HoC causes unnecessary re-renders if declared after withFormContext
   withStyles(styles),
-  withInfoTooltip,
+  withFormContext,
 )(CheckboxField)

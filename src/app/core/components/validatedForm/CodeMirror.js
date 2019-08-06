@@ -58,6 +58,6 @@ CodeMirror.propTypes = {
 }
 
 export default compose(
+  withInfoTooltip, // This HoC causes unnecessary re-renders if declared after withFormContext
   withFormContext,
-  withInfoTooltip,
 )(CodeMirror)

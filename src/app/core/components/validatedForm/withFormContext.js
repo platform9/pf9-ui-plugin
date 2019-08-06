@@ -1,9 +1,9 @@
-import React, { PureComponent } from 'react'
+import React, { useContext, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { pickMultiple } from 'app/utils/fp'
-import { ValidatedFormConsumer } from 'core/components/validatedForm/ValidatedForm'
+import { ValidatedFormContext } from 'core/components/validatedForm/ValidatedForm'
 import { requiredValidator } from 'core/utils/fieldValidators'
 import { pathOr } from 'ramda'
+import moize from 'moize'
 
 export const ValidatedFormInputPropTypes = {
   required: PropTypes.bool,
@@ -11,57 +11,72 @@ export const ValidatedFormInputPropTypes = {
   initialValue: PropTypes.any,
 }
 
+// Prevent extra re-renders by memoizing handler functions
+const handleBlur = moize((showErrorsOnBlur, validateCurrentField, onBlur) => e => {
+  if (showErrorsOnBlur) {
+    validateCurrentField()
+  }
+  // Leverage the event to the wrapped input
+  if (onBlur) {
+    onBlur(e)
+  }
+})
+
+const handleChange = moize((setCurrentFieldValue, onChange) => value => {
+  setCurrentFieldValue(value)
+  // Leverage the event to the wrapped input
+  if (onChange) {
+    onChange(value)
+  }
+})
+
 /**
  * Wrapper for all the inputs that will require some sort of interaction with
  * the ValidatedForm such as validations and text hints on hover
  */
-class ValidatedFormInput extends PureComponent {
-  static defaultProps = {
-    validations: [],
-    required: false,
-  }
+const ValidatedFormInput = ({
+  id, initialValue, required, validations, onBlur, onChange, children, ...rest
+}) => {
+  const {
+    initialValues,
+    values,
+    errors,
+    setFieldValue,
+    defineField,
+    validateField,
+    showErrorsOnBlur,
+  } = useContext(ValidatedFormContext)
 
-  constructor (props) {
-    super(props)
-    const spec = pickMultiple('validations')(props)
-    if (props.required) {
-      spec.validations = Array.isArray(props.validations)
-        ? [requiredValidator, ...props.validations]
-        : { required: true, ...props.validations }
-    }
-    props.defineField(spec)
-    const { initialValue, setFieldValue } = this.props
+  const defineCurrentField = defineField(id)
+  const setCurrentFieldValue = setFieldValue(id)
+  const validateCurrentField = validateField(id)
+  const currentInitialValue = initialValue !== undefined
+    ? initialValue : initialValues[id]
+  const value = values[id]
+  const hasError = pathOr(null, [id, 'hasError'], errors)
+  const errorMessage = pathOr(null, [id, 'errorMessage'], errors)
 
-    if (initialValue !== undefined) {
-      setFieldValue(initialValue)
-    }
-  }
-
-  handleBlur = e => {
-    const { showErrorsOnBlur, validateField } = this.props
-    if (showErrorsOnBlur) {
-      validateField()
-    }
-    // Leverage the event to the wrapped input
-    if (this.props.onBlur) {
-      this.props.onBlur(e)
-    }
-  }
-
-  handleChange = value => {
-    this.props.setFieldValue(value)
-    // Leverage the event to the wrapped input
-    if (this.props.onChange) {
-      this.props.onChange(value)
-    }
-  }
-
-  render () {
-    return this.props.children({
-      onChange: this.handleChange,
-      onBlur: this.handleBlur,
+  useEffect(() => {
+    defineCurrentField({
+      validations: required ? Array.isArray(validations)
+        ? [requiredValidator, ...validations]
+        : { required: true, ...validations }
+        : validations,
     })
-  }
+    if (currentInitialValue !== undefined) {
+      setCurrentFieldValue(currentInitialValue)
+    }
+  }, [])
+
+  return children({
+    ...rest,
+    id,
+    onChange: handleChange(setCurrentFieldValue, onChange),
+    onBlur: handleBlur(showErrorsOnBlur, validateCurrentField, onBlur),
+    value,
+    hasError,
+    errorMessage,
+  })
 }
 
 ValidatedFormInput.propTypes = ValidatedFormInputPropTypes
@@ -77,48 +92,10 @@ ValidatedFormInput.propTypes = ValidatedFormInputPropTypes
  * @param {Inject the form context into this Component through props.} Input
  */
 const withFormContext = Input =>
-  ({ id, required, validations, onBlur, onChange, ...rest }) => (
-    <ValidatedFormConsumer>
-      {({
-        initialValues,
-        values,
-        defineField,
-        setFieldValue,
-        showErrorsOnBlur,
-        validateField,
-        errors,
-      }) => (
-        <ValidatedFormInput
-          id={id}
-          defineField={defineField(id)}
-          setFieldValue={setFieldValue(id)}
-          validateField={validateField(id)}
-          showErrorsOnBlur={showErrorsOnBlur}
-          initialValue={initialValues[id]}
-          required={required}
-          validations={validations}
-          value={values[id]}
-          onBlur={onBlur}
-          onChange={onChange}
-        >
-          {({ onChange, onMouseEnter, onBlur }) => (
-            <Input
-              {...rest}
-              id={id}
-              value={values[id]}
-              hasError={pathOr(null, [id, 'hasError'], errors)}
-              errorMessage={pathOr(null, [id, 'errorMessage'], errors)}
-              onChange={onChange}
-              onMouseEnter={onMouseEnter}
-              onBlur={onBlur}
-              /*  supposedly validations should not be required to pass here,
-                  but PicklistField does not work without this prop passed here  */
-              validations={validations}
-            />
-          )}
-        </ValidatedFormInput>
-      )}
-    </ValidatedFormConsumer>
-  )
+  React.forwardRef((props, ref) => (
+    <ValidatedFormInput {...props}>
+      {(inputProps => <Input {...inputProps} ref={ref} />)}
+    </ValidatedFormInput>
+  ))
 
 export default withFormContext

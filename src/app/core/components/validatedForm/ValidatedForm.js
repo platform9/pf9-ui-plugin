@@ -8,7 +8,7 @@ import { pathEq, toPairs } from 'ramda'
 import { withRouter } from 'react-router-dom'
 import moize from 'moize'
 
-const ValidatedFormContext = React.createContext({})
+export const ValidatedFormContext = React.createContext({})
 
 export const ValidatedFormConsumer = ValidatedFormContext.Consumer
 export const ValidatedFormProvider = ValidatedFormContext.Provider
