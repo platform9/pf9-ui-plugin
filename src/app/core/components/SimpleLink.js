@@ -5,7 +5,6 @@ import { Link } from '@material-ui/core'
 // We need to destructure staticContext even though we are not using it in order to
 // work around this issue: https://github.com/ReactTraining/react-router/issues/4683
 const SimpleLink = ({
-  className,
   onClick,
   src,
   children,

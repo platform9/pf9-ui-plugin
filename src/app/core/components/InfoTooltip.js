@@ -35,10 +35,11 @@ class InfoTooltip extends PureComponent {
   </React.Fragment>)
 
   render () {
-    const { info, classes = {}, placement, children } = this.props
+    const { info, classes = {}, placement, open, children } = this.props
 
     return (
       info ? <Tooltip
+        open={open}
         placement={placement}
         classes={{ tooltip: classes.infoTooltip }}
         title={this.renderTitle(info)}
@@ -52,7 +53,9 @@ InfoTooltip.defaultProps = {
 }
 
 InfoTooltip.propTypes = {
+  open: PropTypes.bool,
   classes: PropTypes.object,
+  placement: PropTypes.string,
   info: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
 }
 

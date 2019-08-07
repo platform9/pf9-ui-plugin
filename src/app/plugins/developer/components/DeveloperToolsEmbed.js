@@ -15,6 +15,10 @@ const styles = theme => ({
     marginTop: theme.spacing(4),
     width: '100%',
   },
+  button: {
+    display: 'block',
+    marginTop: theme.spacing(2),
+  },
   panel: {
     width: '100%',
   },
@@ -61,7 +65,6 @@ class DeveloperToolsEmbed extends React.Component {
     // This is currently UI developers only so leaving always expanded
     return (
       <div className={classes.root}>
-
         {false && <Button onClick={this.collapse}>collapse devtools</Button>}
         <Typography variant="subtitle1">Developer Tools</Typography>
         <Panel title="Context Viewer">
@@ -70,7 +73,9 @@ class DeveloperToolsEmbed extends React.Component {
         <Panel title="API helper">
           <ApiHelper />
         </Panel>
-        <SimpleLink src="/ui/themes/configure">Theme Manager</SimpleLink>
+        <SimpleLink className={classes.button} src="/ui/themes/configure">
+          Theme Manager
+        </SimpleLink>
       </div>
     )
   }
