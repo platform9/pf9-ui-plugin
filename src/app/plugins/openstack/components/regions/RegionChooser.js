@@ -17,6 +17,7 @@ class RegionChooser extends React.Component {
   state = {
     curRegion: '',
     regionSearch: '',
+    tooltipOpen: false,
   }
 
   componentDidMount () {
@@ -38,19 +39,25 @@ class RegionChooser extends React.Component {
     window.location = appUrlRoot
   }
 
+  handleTooltipClose = () => this.setState({ tooltipOpen: false })
+  handleTooltipOpen = () => this.setState({ tooltipOpen: true })
+
   render () {
-    const { curRegion, regionSearch } = this.state
+    const { curRegion, regionSearch, tooltipOpen } = this.state
     const { data: { regions = [] }, className } = this.props
 
     const regionNames = pluck('id', regions)
 
     return (
       <Tooltip
+        open={tooltipOpen}
         title="Region"
         placement="bottom"
-        enterDelay={300}
       >
         <Selector
+          onMouseEnter={this.handleTooltipOpen}
+          onMouseLeave={this.handleTooltipClose}
+          onClick={this.handleTooltipClose}
           className={className}
           name={!curRegion || curRegion.length === 0 ? 'Current Region' : curRegion}
           list={regionNames}

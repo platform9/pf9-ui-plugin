@@ -4,6 +4,7 @@ import { withStyles } from '@material-ui/styles'
 import { Menu, MenuItem, Typography } from '@material-ui/core'
 import SearchBar from './SearchBar'
 import clsx from 'clsx'
+import { pick } from 'ramda'
 
 const styles = theme => ({
   search: {
@@ -13,7 +14,7 @@ const styles = theme => ({
     position: 'relative',
     float: 'right',
     cursor: 'pointer',
-  }
+  },
 })
 
 @withStyles(styles)
@@ -43,14 +44,14 @@ class Selector extends React.Component {
   }
 
   render () {
-    const { className, classes, name, list, searchTerm, onSearchChange, type, onMouseLeave, onMouseOver } = this.props
+    const { className, classes, name, list, searchTerm, onSearchChange, type } = this.props
     const { anchor } = this.state
+    const mouseEventHandlers = pick(['onMouseLeave', 'onMouseOver', 'onClick', 'onMouseEnter'], this.props)
     const selectorName = `${name}-selector`
-
     const sortedList = this.sortList(list)
     const filteredList = searchTerm === '' ? sortedList : this.filterBySearch(sortedList)
     return (
-      <div onMouseLeave={onMouseLeave} onMouseOver={onMouseOver} className={clsx(className, classes.selector)}>
+      <div {...mouseEventHandlers} className={clsx(className, classes.selector)}>
         <Typography color="inherit" variant="subtitle2" onClick={this.handleClick}>{type && `${type}: `}{name} &#9662;</Typography>
         <Menu
           id={selectorName}
@@ -60,12 +61,13 @@ class Selector extends React.Component {
           getContentAnchorEl={null}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
         >
-          { searchTerm !== undefined && <SearchBar
+          {searchTerm !== undefined && <SearchBar
             className={classes.search}
             onSearchChange={onSearchChange}
             searchTerm={searchTerm}
           />}
-          {filteredList.map(item => (<MenuItem onClick={this.handleClose('anchor')} key={item}>{item}</MenuItem>))}
+          {filteredList.map(item => (
+            <MenuItem onClick={this.handleClose('anchor')} key={item}>{item}</MenuItem>))}
         </Menu>
       </div>
     )
@@ -77,7 +79,7 @@ Selector.propTypes = {
   type: PropTypes.string,
   list: PropTypes.array.isRequired,
   classes: PropTypes.object,
-  onChoose: PropTypes.func.isRequired
+  onChoose: PropTypes.func.isRequired,
 }
 
 export default Selector

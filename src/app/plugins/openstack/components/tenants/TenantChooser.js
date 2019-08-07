@@ -13,6 +13,7 @@ class TenantChooser extends React.Component {
     tenantSearch: '',
     currentTenantName: '',
     tenants: null,
+    tooltipOpen: false,
   }
 
   handleChange = moize(key => value => {
@@ -77,18 +78,24 @@ class TenantChooser extends React.Component {
     this.updateCurrentTenant(lastTenant.name)
   }
 
+  handleTooltipClose = () => this.setState({ tooltipOpen: false })
+  handleTooltipOpen = () => this.setState({ tooltipOpen: true })
+
   render () {
-    const { currentTenantName, tenantSearch, tenants } = this.state
+    const { currentTenantName, tenantSearch, tenants, tooltipOpen } = this.state
 
     if (!tenants) { return null }
 
     return (
       <Tooltip
+        open={tooltipOpen}
         title="Tenant"
         placement="bottom"
-        enterDelay={300}
       >
         <Selector
+          onMouseEnter={this.handleTooltipOpen}
+          onMouseLeave={this.handleTooltipClose}
+          onClick={this.handleTooltipClose}
           className={this.props.className}
           name={currentTenantName || 'service'}
           list={this.tenantNames(tenants)}

@@ -80,6 +80,9 @@ const ValidatedFormInput = ({
 }
 
 ValidatedFormInput.propTypes = ValidatedFormInputPropTypes
+ValidatedFormInput.defaultProps = {
+  validations: []
+}
 
 /**
  * withFormContext provides access to the form context through props.
