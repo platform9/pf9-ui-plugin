@@ -32,8 +32,10 @@ class Context {
   resetContext () {
     this.novaTimeout = 6 * 1000
     this.users = []
+    this.tenantUsers = []
     this.hosts = []
     this.roles = []
+    this.groups = []
     this.tokens = []
     this.tenants = []
     this.flavors = []

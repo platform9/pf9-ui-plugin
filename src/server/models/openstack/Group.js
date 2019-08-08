@@ -3,13 +3,15 @@ import context from '../../context'
 import ActiveModel from '../ActiveModel'
 import { findById } from '../../helpers'
 
-const coll = () => context.tenants
+const coll = () => context.groups
 
-class Tenant extends ActiveModel {
+class Group extends ActiveModel {
   constructor (params = {}) {
     super(params)
     this.name = params.name || ''
     this.description = params.description || ''
+    this.domain_id = params.domain_id || 'default'
+    this.links = params.links || {}
     return this
   }
 
@@ -21,7 +23,8 @@ class Tenant extends ActiveModel {
     ...super.asJson(),
     name: this.name,
     description: this.description,
+    displayName: this.displayName,
   })
 }
 
-export default Tenant
+export default Group

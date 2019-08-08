@@ -2,7 +2,9 @@
 import context from '../context'
 import Region from '../models/openstack/Region'
 import Role from '../models/openstack/Role'
+import Group from '../models/openstack/Group'
 import Tenant from '../models/openstack/Tenant'
+import TenantUser from '../models/openstack/TenantUser'
 import User from '../models/openstack/User'
 import Flavor from '../models/openstack/Flavor'
 import Instance from '../models/openstack/Instance'
@@ -70,6 +72,48 @@ function loadPreset () {
     user.addRole(serviceTenant, memberRole)
     user.addRole(testTenant, memberRole)
     user.rolePair = context.getTenantRoles(user.id)
+  })
+
+  // Tenants & users
+  range(4).forEach(i => {
+    let tenant = new TenantUser({
+      description: `Test tenant ${i} description`,
+      domain_id: '77c53dae6ab6421caaddc34cd56becb4',
+      enabled: true,
+      id: i,
+      name: `tenant-${i}`,
+    })
+    // Add a bunch of users for the current Tenant
+    range(2).forEach(j => {
+      let email = `tenant${i}User${j}@platform9.com`
+      let user = new User({
+        id: j,
+        email,
+        username: email,
+        name: email,
+        password: 'secret',
+        tenantId: serviceTenant.id,
+        displayname: `Test user ${j}`,
+        enabled: true,
+        mfa: {
+          enabled: false
+        },
+      })
+      user.addRole(serviceTenant, memberRole)
+      user.addRole(testTenant, memberRole)
+      user.rolePair = context.getTenantRoles(user.id)
+      tenant.addUser(user)
+    })
+  })
+
+  // Groups
+  new Group({
+    name: 'test_group',
+    description: 'test description'
+  })
+  new Group({
+    name: 'test_group_2',
+    description: 'test 2 description'
   })
 
   // Flavors

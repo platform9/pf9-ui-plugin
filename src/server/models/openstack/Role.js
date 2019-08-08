@@ -18,15 +18,12 @@ class Role extends ActiveModel {
   static clearCollection = () => coll().splice(0, coll().length)
   static findById = findById(coll)
 
-  asJson = () => {
-    const json = {
-      ...super.asJson(),
-      name: this.name,
-      description: this.description,
-      displayName: this.displayName,
-    }
-    return json
-  }
+  asJson = () => ({
+    ...super.asJson(),
+    name: this.name,
+    description: this.description,
+    displayName: this.displayName,
+  })
 }
 
 export default Role
