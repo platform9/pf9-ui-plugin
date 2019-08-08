@@ -35,14 +35,16 @@ const styles = theme => ({
     opacity: 0.7,
   },
   status: {
+    display: 'flex',
+    flexFlow: 'column nowrap',
+    justifyContent: 'center',
+    alignItems: 'center',
     padding: '4rem',
-    textAlign: 'center',
   },
   statusInline: {
     padding: '0 1rem',
     display: 'flex',
     flexFlow: 'row nowrap',
-    alignItems: 'center',
   },
   statusOverlayed: {
     position: 'absolute',
@@ -62,7 +64,7 @@ const styles = theme => ({
 
 class Progress extends PureComponent {
   state = {
-    loading: this.props.loading,
+    loading: false,
     loadedOnce: false,
   }
 
