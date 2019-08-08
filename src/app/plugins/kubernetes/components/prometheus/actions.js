@@ -6,8 +6,7 @@ import contextUpdater from 'core/helpers/contextUpdater'
 const mapAsyncItems = async (values, loaderFn, mapFn) => {
   const promises = values.map(loaderFn)
   const responses = await Promise.all(promises)
-  const items = responses.flat().map(mapFn)
-  return items
+  return responses.flat().map(mapFn)
 }
 
 export const loadClusterTags = contextLoader('clusterTags', async ({ apiClient, loadFromContext }) => {

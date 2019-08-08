@@ -9,7 +9,7 @@ export const createRouter = contextUpdater('routers', async ({ data, context }) 
   const existing = await context.apiClient.neutron.getRouters()
   const created = await context.apiClient.neutron.createRouter(data)
   return [...existing, created]
-}, true)
+}, { returnLast: true })
 
 export const deleteRouter = contextUpdater('routers', async ({ id, context }) => {
   await context.apiClient.neutron.deleteRouter(id)

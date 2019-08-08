@@ -16,7 +16,7 @@ export const createNamespace = clusterContextUpdater('namespaces', async ({ apiC
   const body = { metadata: { name } }
   const created = await apiClient.qbert.createNamespace(clusterId, body)
   return [...currentItems, created]
-}, true)
+}, { returnLast: true })
 
 export const deleteNamespace = clusterContextUpdater('namespaces', async ({ apiClient, currentItems, params: { id } }) => {
   const { clusterId, name } = currentItems.find(ns => ns.id === id)

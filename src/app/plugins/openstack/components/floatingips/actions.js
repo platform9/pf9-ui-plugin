@@ -9,7 +9,7 @@ export const createFloatingIp = contextUpdater('floatingIps', async ({ apiClient
   const existing = await apiClient.neutron.getFloatingIps()
   const created = await apiClient.neutron.createFloatingIp(data)
   return [...existing, created]
-}, true)
+}, { returnLast: true })
 
 export const deleteFloatingIp = contextUpdater('floatingIps', async ({ apiClient, id, currentItems }) => {
   await apiClient.neutron.deleteFloatingIp(id)

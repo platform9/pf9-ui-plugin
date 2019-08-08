@@ -39,7 +39,7 @@ export const createPod = clusterContextUpdater('pods', async ({ params, currentI
     namespace: created.metadata.namespace,
   }
   return [...currentItems, converted]
-}, true)
+}, { returnLast: true })
 
 export const deletePod = clusterContextUpdater('pods', async ({ id, apiClient, currentItems }) => {
   const { clusterId, namespace, name } = await context.pods.find(x => x.id === id)
@@ -62,7 +62,7 @@ export const createDeployment = clusterContextUpdater('deployments', async ({ ap
   // Also need to refresh list of pods
   await loadFromContext('pods', { params: { clusterId }, reload: true })
   return [...currentItems, converted]
-}, true)
+}, { returnLast: true })
 
 export const createService = clusterContextUpdater('kubeServices', async ({ params, currentItems, apiClient }) => {
   const { clusterId, namespace, serviceYaml } = params
@@ -77,7 +77,7 @@ export const createService = clusterContextUpdater('kubeServices', async ({ para
     namespace: created.metadata.namespace,
   }
   return [...currentItems, converted]
-}, true)
+}, { returnLast: true })
 
 export const deleteService = clusterContextUpdater('kubeServices', async ({ params: { id }, currentItems, apiClient }) => {
   const { clusterId, namespace, name } = await currentItems.find(x => x.id === id)

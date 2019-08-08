@@ -9,7 +9,7 @@ export const createUser = contextUpdater('users', async ({ data, context }) => {
   const created = await context.apiClient.keystone.createUser(data)
   const existing = await context.apiClient.keystone.getUsers()
   return [ ...existing, created ]
-}, true)
+}, { returnLast: true })
 
 export const deleteUser = contextUpdater('users', async ({ id, context }) => {
   await context.apiClient.keystone.deleteUser(id)
