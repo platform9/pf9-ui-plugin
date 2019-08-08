@@ -11,13 +11,17 @@ import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/va
 const PicklistField = React.forwardRef(({ id, info, placement, onChange, label, value, showNone, classes, hasError, errorMessage, title, options, className, ...restProps },
   ref) => {
   const [open, setOpen] = React.useState(false)
+  const openTooltip = () => setOpen(true)
+  const closeTooltip = () => setOpen(false)
 
   return <InfoTooltip open={open} info={info} placement={placement}>
     <Picklist
       {...restProps}
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
-      onClick={() => setOpen(false)}
+      onMouseEnter={openTooltip}
+      onMouseLeave={closeTooltip}
+      onFocus={openTooltip}
+      onBlur={closeTooltip}
+      onClick={closeTooltip}
       ref={ref}
       title={title}
       className={className}
