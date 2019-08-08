@@ -74,6 +74,11 @@ const theme = {
       dense: {
         height: 55
       }
+    },
+    MuiButton: {
+      contained: {
+        boxShadow: 'none'
+      }
     }
   },
   palette: {

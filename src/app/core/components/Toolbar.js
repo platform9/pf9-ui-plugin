@@ -12,7 +12,8 @@ export const extraContentId = 'top-extra-content'
 
 const styles = theme => ({
   appBar: {
-    position: 'absolute',
+    position: 'fixed',
+    boxShadow: 'none',
   },
   menuButton: {
     marginLeft: theme.spacing(1.5),
