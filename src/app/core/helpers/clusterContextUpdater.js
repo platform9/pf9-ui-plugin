@@ -6,7 +6,6 @@ import { ensureArray } from 'utils/fp'
 const clusterContextUpdater = (key, updaterFn, options) => {
   const keyPath = ensureArray(key)
   const contextSetter = (context, output, { params: { clusterId } }) => {
-    const arrContextPath = [...keyPath, clusterId || '__all__']
     if (!clusterId || clusterId === '__all__') {
       // update all cluster indexed positions in bulk
       return assocPath(keyPath, {
@@ -15,14 +14,14 @@ const clusterContextUpdater = (key, updaterFn, options) => {
       }, context)
     }
     return pipe(
-      assocPath(arrContextPath, output),
+      assocPath([...keyPath, clusterId], output),
       context => {
         // update "__all__" key if it exists
-        if (hasPath([...keyPath, '__all__'])) {
-          return assocPath(
-            [...keyPath, '__all__'],
-            flatten(Object.values(omit(['__all__'], path(keyPath, context)))),
-          )
+        if (hasPath([...keyPath, '__all__'], context)) {
+          const valuesByClusterId = omit(['__all__'], path(keyPath, context))
+          const allValues = flatten(Object.values(valuesByClusterId))
+
+          return assocPath([...keyPath, '__all__'], allValues, context)
         }
         return context
       },

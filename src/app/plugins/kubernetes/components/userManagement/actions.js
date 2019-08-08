@@ -72,7 +72,7 @@ export const loadGroups = contextLoader('groups', async ({ apiClient, loadFromCo
         flatten,
         find(pathEq(['group', 'id'], group.id)),
       )(mappingRules)
-    })
+    }) || { rules: [] }
     // Filter out the rules not belonging to current group
     const mappingRules = tryJsonParse(groupMapping.rules)
     const groupRules = mappingRules.reduce((groupRules, rule) => {

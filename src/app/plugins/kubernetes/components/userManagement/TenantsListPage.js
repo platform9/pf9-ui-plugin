@@ -4,6 +4,7 @@ import { loadTenants, deleteTenant } from 'k8s/components/userManagement/actions
 export const options = {
   loaderFn: loadTenants,
   columns: [
+    { id: 'id', label: 'OpenStack ID', display: false },
     { id: 'name', label: 'Name' },
     { id: 'description', label: 'Description' },
     { id: 'clusters', label: 'Mapped Clusters' },

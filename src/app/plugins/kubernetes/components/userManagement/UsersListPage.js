@@ -4,6 +4,7 @@ import { loadUsers, deleteUser } from 'k8s/components/userManagement/actions'
 export const options = {
   loaderFn: loadUsers,
   columns: [
+    { id: 'id', label: 'OpenStack ID', display: false },
     { id: 'username', label: 'Username' },
     { id: 'displayname', label: 'Display Name' },
     { id: 'two_factor', label: 'Two-Factor Authentication' },

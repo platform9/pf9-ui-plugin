@@ -4,8 +4,8 @@ import { loadGroups, deleteGroup } from 'k8s/components/userManagement/actions'
 export const options = {
   loaderFn: loadGroups,
   columns: [
-    { id: 'name', label: 'Group Name' },
     { id: 'id', label: 'OpenStack ID', display: false },
+    { id: 'name', label: 'Group Name' },
     { id: 'description', label: 'Description' },
     { id: 'samlAttributesString', label: 'SAML Attributes Mapped' },
   ],

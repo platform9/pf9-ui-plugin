@@ -23,7 +23,8 @@ class Group extends ActiveModel {
     ...super.asJson(),
     name: this.name,
     description: this.description,
-    displayName: this.displayName,
+    domain_id: this.domain_id,
+    links: this.links,
   })
 }
 

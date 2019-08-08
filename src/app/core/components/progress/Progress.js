@@ -64,7 +64,7 @@ const styles = theme => ({
 
 class Progress extends PureComponent {
   state = {
-    loading: false,
+    loading: this.props.loading,
     loadedOnce: false,
   }
 
