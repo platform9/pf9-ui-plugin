@@ -16,17 +16,16 @@ const ListPage = ({ ListContainer }) => {
     return (cluster && cluster.name) || ''
   }
 
-  return clusterizedDataLoader('pods', loadPods)(
-    ({ setParams, params: { clusterId }, data: { clusters, pods } }) =>
-      <div>
+  return clusterizedDataLoader('pods', loadPods, {
+    onlyMasterNodeClusters: true
+  })(
+    ({ setParams, params: { clusterId }, data: { clusters, pods } }) => {
+      return <div>
         <Picklist
           formField={false}
           name="currentCluster"
           label="Current Cluster"
-          options={projectAs(
-            { label: 'name', value: 'uuid' },
-            clusters.filter(x => x.hasMasterNode),
-          )}
+          options={projectAs({ label: 'name', value: 'uuid' }, clusters)}
           value={clusterId}
           onChange={handleClusterChange(setParams)}
         />
@@ -34,8 +33,8 @@ const ListPage = ({ ListContainer }) => {
           ...ns,
           clusterName: findClusterName(clusters, ns.clusterId),
         }))} />
-      </div>,
-  )
+      </div>
+    })
 }
 
 export const options = {

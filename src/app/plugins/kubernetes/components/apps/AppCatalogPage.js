@@ -32,7 +32,7 @@ const filtersConfig = (clusters, clusterId, setParams) => [
       { label: 'name', value: 'uuid' },
       [
         { name: 'all', uuid: '__all__' },
-        ...clusters.filter(cluster => cluster.hasMasterNode),
+        ...clusters,
       ],
     ),
   },
@@ -50,4 +50,6 @@ const AppCatalogPage = ({ data: { apps, clusters }, params, setParams }) =>
     </CardTable>
   </div>
 
-export default clusterizedDataLoader('apps', loadApps)(AppCatalogPage)
+export default clusterizedDataLoader('apps', loadApps, {
+  onlyMasterNodeClusters: true,
+})(AppCatalogPage)

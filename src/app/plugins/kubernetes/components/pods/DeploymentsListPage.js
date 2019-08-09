@@ -16,17 +16,16 @@ const ListPage = ({ ListContainer }) => {
     return (cluster && cluster.name) || ''
   }
 
-  return clusterizedDataLoader('deployments', loadDeployments)(
+  return clusterizedDataLoader('deployments', loadDeployments, {
+    onlyMasterNodeClusters: true,
+  })(
     ({ setParams, params: { clusterId }, data: { deployments, clusters } }) =>
       <div>
         <Picklist
           formField={false}
           name="currentCluster"
           label="Current Cluster"
-          options={projectAs(
-            { label: 'name', value: 'uuid' },
-            clusters.filter(x => x.hasMasterNode),
-          )}
+          options={projectAs({ label: 'name', value: 'uuid' }, clusters)}
           value={clusterId}
           onChange={handleClusterChange(setParams)}
         />
