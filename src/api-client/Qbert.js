@@ -189,7 +189,7 @@ class Qbert {
       return data.items.map(this.convertResource(clusterId))
     } catch (err) {
       console.error(`Error getting cluster pods for clusterId: ${clusterId}`)
-      return err
+      return []
     }
   }
 
@@ -200,7 +200,7 @@ class Qbert {
       return data.items.map(this.convertResource(clusterId))
     } catch (err) {
       console.error(`Error getting cluster deployments for clusterId: ${clusterId}`)
-      return err
+      return []
     }
   }
 
@@ -215,7 +215,7 @@ class Qbert {
       return data.items.map(this.convertResource(clusterId))
     } catch (err) {
       console.error(`Error getting cluster services for clusterId: ${clusterId}`)
-      return err
+      return []
     }
   }
 
