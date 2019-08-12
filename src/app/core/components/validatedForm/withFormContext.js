@@ -1,34 +1,14 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useCallback } from 'react'
 import PropTypes from 'prop-types'
 import { ValidatedFormContext } from 'core/components/validatedForm/ValidatedForm'
 import { requiredValidator } from 'core/utils/fieldValidators'
 import { pathOr } from 'ramda'
-import moize from 'moize'
 
 export const ValidatedFormInputPropTypes = {
   required: PropTypes.bool,
   validations: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
   initialValue: PropTypes.any,
 }
-
-// Prevent extra re-renders by memoizing handler functions
-const handleBlur = moize((showErrorsOnBlur, validateCurrentField, onBlur) => e => {
-  if (showErrorsOnBlur) {
-    validateCurrentField()
-  }
-  // Leverage the event to the wrapped input
-  if (onBlur) {
-    onBlur(e)
-  }
-})
-
-const handleChange = moize((setCurrentFieldValue, onChange) => value => {
-  setCurrentFieldValue(value)
-  // Leverage the event to the wrapped input
-  if (onChange) {
-    onChange(value)
-  }
-})
 
 /**
  * Wrapper for all the inputs that will require some sort of interaction with
@@ -68,11 +48,35 @@ const ValidatedFormInput = ({
     }
   }, [])
 
+  const handleBlur = useCallback(
+    e => {
+      if (showErrorsOnBlur) {
+        validateCurrentField()
+      }
+      // Leverage the event to the wrapped input
+      if (onBlur) {
+        onBlur(e)
+      }
+    },
+    [showErrorsOnBlur, validateCurrentField, onBlur],
+  )
+
+  const handleChange = useCallback(
+    value => {
+      setCurrentFieldValue(value)
+      // Leverage the event to the wrapped input
+      if (onChange) {
+        onChange(value)
+      }
+    },
+    [setCurrentFieldValue, onChange],
+  )
+
   return children({
     ...rest,
     id,
-    onChange: handleChange(setCurrentFieldValue, onChange),
-    onBlur: handleBlur(showErrorsOnBlur, validateCurrentField, onBlur),
+    onChange: handleChange,
+    onBlur: handleBlur,
     value,
     hasError,
     errorMessage,
