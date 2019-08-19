@@ -9,7 +9,7 @@ import PrometheusServiceMonitors from './PrometheusServiceMonitors'
 import PrometheusAlertManagers from './PrometheusAlertManagers'
 
 import { compose } from 'ramda'
-import { withAppContext } from 'core/AppContext'
+import { withAppContext } from 'core/AppProvider'
 
 class PrometheusMonitoringPage extends React.Component {
   render () {

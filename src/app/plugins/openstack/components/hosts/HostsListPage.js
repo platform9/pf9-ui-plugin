@@ -3,9 +3,9 @@ import { compose } from 'app/utils/fp'
 import DataLoader from 'core/DataLoader'
 import requiresAuthentication from '../../util/requiresAuthentication'
 import HostsListContainer from './HostsListContainer'
-import contextLoader from 'core/helpers/contextLoader'
+import createContextLoader from 'core/helpers/createContextLoader'
 
-const loadHosts = contextLoader('hosts', async ({ context }) => {
+const loadHosts = createContextLoader('hosts', async ({ context }) => {
   // const hosts = await context.apiClient.resmgr.getHosts()
   return context.apiClient.nova.getHypervisors()
 })

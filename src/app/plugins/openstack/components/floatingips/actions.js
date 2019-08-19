@@ -1,27 +1,28 @@
-import contextLoader from 'core/helpers/contextLoader'
-import contextUpdater from 'core/helpers/contextUpdater'
+import ApiClient from 'api-client/ApiClient'
+import createContextLoader from 'core/helpers/createContextLoader'
+import createContextUpdater from 'core/helpers/createContextUpdater'
 
-export const loadFloatingIps = contextLoader('floatingIps', async ({ apiClient }) => {
-  return apiClient.neutron.getFloatingIps()
+export const loadFloatingIps = createContextLoader('floatingIps', async () => {
+  const { neutron } = ApiClient.getInstance()
+  return neutron.getFloatingIps()
 })
 
-export const createFloatingIp = contextUpdater('floatingIps', async ({ apiClient, data }) => {
-  const existing = await apiClient.neutron.getFloatingIps()
-  const created = await apiClient.neutron.createFloatingIp(data)
-  return [...existing, created]
-}, { returnLast: true })
+export const createFloatingIp = createContextUpdater('floatingIps', async data => {
+  const { neutron } = ApiClient.getInstance()
+  return neutron.createFloatingIp(data)
+}, { operation: 'create' })
 
-export const deleteFloatingIp = contextUpdater('floatingIps', async ({ apiClient, id, currentItems }) => {
-  await apiClient.neutron.deleteFloatingIp(id)
-  return currentItems.filter(x => x.id !== id)
-})
+export const deleteFloatingIp = createContextUpdater('floatingIps', async ({ id }) => {
+  const { neutron } = ApiClient.getInstance()
+  await neutron.deleteFloatingIp(id)
+}, { operation: 'delete' })
 
-export const updateFloatingIp = contextUpdater('floatingIps', async ({ apiClient, loadFromContext, data }) => {
+export const updateFloatingIp = createContextUpdater('floatingIps', async data => {
   console.error('TODO: Update Floating IP not yet implemented')
   /*
   const { id } = data
   const existing = await loadFloatingIps({ context, setContext })
-  const updated = await apiClient.neutron.updateFloatingIp(id, data)
+  const updated = await neutron.updateFloatingIp(id, data)
   const newList = existing.map(x => x.id === id ? x : updated)
   setContext({ floatingIps: newList })
   */

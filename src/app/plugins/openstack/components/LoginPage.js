@@ -5,7 +5,7 @@ import {
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import { compose } from 'app/utils/fp'
-import { withAppContext } from 'core/AppContext'
+import { withAppContext } from 'core/AppProvider'
 import Alert from 'core/components/Alert'
 import { withRouter } from 'react-router'
 import SimpleLink from 'core/components/SimpleLink'

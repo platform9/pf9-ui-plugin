@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { compose } from 'app/utils/fp'
-import { withAppContext } from 'core/AppContext'
+import { withAppContext } from 'core/AppProvider'
 import CRUDListContainer from 'core/components/CRUDListContainer'
 import createListTableComponent from 'core/helpers/createListTableComponent'
 

@@ -1,10 +1,11 @@
-import React from 'react'
-import { loadApps } from 'k8s/components/apps/actions'
-import { projectAs } from 'utils/fp'
+import React, { useState, useMemo } from 'react'
 import CardTable from 'core/components/cardTable/CardTable'
-import ApplicationCard from 'core/components/appCatalog/AppCard'
+import AppCard from 'k8s/components/apps/AppCard'
 import moment from 'moment'
-import clusterizedDataLoader from 'k8s/helpers/clusterizedDataLoader'
+import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
+import useDataLoader from 'core/hooks/useDataLoader'
+import { loadApps } from 'k8s/components/apps/actions'
+import { emptyObj } from 'utils/fp'
 
 const sortingConfig = [
   {
@@ -19,37 +20,25 @@ const sortingConfig = [
   },
 ]
 
-const filtersConfig = (clusters, clusterId, setParams) => [
-  {
-    field: 'clusterId',
-    type: 'select',
-    label: 'Cluster',
-    value: clusterId,
-    onChange: async clusterId => {
-      setParams({ clusterId })
-    },
-    items: projectAs(
-      { label: 'name', value: 'uuid' },
-      [
-        { name: 'all', uuid: '__all__' },
-        ...clusters,
-      ],
-    ),
-  },
-]
+const AppCatalogPage = () => {
+  const [params, setParams] = useState(emptyObj)
+  const [apps, loading, reload] = useDataLoader(loadApps, params)
+  const renderFilters = useMemo(() => <>
+    <ClusterPicklist
+      onChange={clusterId => setParams({ clusterId })}
+      clusterId={params.clusterId} />
+  </>, [params.clusterId])
 
-const AppCatalogPage = ({ data: { apps, clusters }, params, setParams }) =>
-  <div className="applications">
-    <CardTable
-      data={apps}
-      sorting={sortingConfig}
-      filters={filtersConfig(clusters, params.clusterId, setParams)}
-      searchTarget="attributes.name"
-    >
-      {item => <ApplicationCard application={item} key={item.id} />}
-    </CardTable>
-  </div>
+  return <CardTable
+    loading={loading}
+    onReload={reload}
+    data={apps}
+    sorting={sortingConfig}
+    searchTarget="attributes.name"
+    filters={renderFilters}
+  >
+    {item => <AppCard application={item} key={item.key} />}
+  </CardTable>
+}
 
-export default clusterizedDataLoader('apps', loadApps, {
-  onlyMasterNodeClusters: true,
-})(AppCatalogPage)
+export default AppCatalogPage

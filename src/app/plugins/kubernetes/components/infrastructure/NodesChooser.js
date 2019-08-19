@@ -6,7 +6,8 @@ import { withInfoTooltip } from 'core/components/InfoTooltip'
 import { loadCombinedHosts } from 'k8s/components/infrastructure/actions'
 import withDataLoader from 'core/hocs/withDataLoader'
 import withDataMapper from 'core/hocs/withDataMapper'
-import { withAppContext } from 'core/AppContext'
+import { withAppContext } from 'core/AppProvider'
+import { dataKey } from 'core/helpers/createContextLoader'
 
 class NodesChooser extends React.Component {
   state = {
@@ -56,6 +57,6 @@ NodesChooser.propTypes = {
 export default compose(
   withAppContext,
   withDataLoader({ combinedHosts: loadCombinedHosts }),
-  withDataMapper({ combinedHosts: pathOr([], ['context', 'combinedHosts']) }),
+  withDataMapper({ combinedHosts: pathOr([], [dataKey, 'combinedHosts']) }),
   withInfoTooltip,
 )(NodesChooser)

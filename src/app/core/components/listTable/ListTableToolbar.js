@@ -18,7 +18,9 @@ const toolbarStyles = theme => ({
   root: {
     paddingRight: theme.spacing(1),
     color: theme.palette.grey[600],
-
+    '& .MuiOutlinedInput-root': {
+      marginBottom: theme.spacing(1),
+    },
   },
   highlight: {},
   spacer: {

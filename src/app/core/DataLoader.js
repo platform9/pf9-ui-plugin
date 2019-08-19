@@ -24,10 +24,10 @@ class DataLoader extends PureComponent {
 
   loadAll = async reload => {
     this.setState({ loading: true }, async () => {
-      const { loaders, ...props } = this.props
+      const { loaders, getContext, setContext } = this.props
       try {
-        await asyncProps(mapObjIndexed(loader =>
-          loader({ ...props, reload }), loaders,
+        await asyncProps(mapObjIndexed(loaderFn =>
+          loaderFn({ getContext, setContext, reload }), loaders,
         ))
         this.setState({ loading: false, error: null })
       } catch (err) {

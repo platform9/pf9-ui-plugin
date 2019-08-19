@@ -1,19 +1,24 @@
-import contextLoader from 'core/helpers/contextLoader'
-import contextUpdater from 'core/helpers/contextUpdater'
+import ApiClient from 'api-client/ApiClient'
+import createContextLoader from 'core/helpers/createContextLoader'
+import createContextUpdater from 'core/helpers/createContextUpdater'
 
-export const loadUsers = contextLoader('users', async ({ apiClient }) => {
-  return apiClient.keystone.getUsers()
+export const loadUsers = createContextLoader('users', async ({ apiClient }) => {
+  const { keystone } = ApiClient.getInstance()
+  return keystone.getUsers()
 })
 
-export const createUser = contextUpdater('users', async ({ data, context }) => {
-  const created = await context.apiClient.keystone.createUser(data)
-  const existing = await context.apiClient.keystone.getUsers()
-  return [ ...existing, created ]
-}, { returnLast: true })
+export const createUser = createContextUpdater('users', async ({ data, context }) => {
+  const { keystone } = ApiClient.getInstance()
+  return keystone.createUser(data)
+}, {
+  operation: 'create'
+})
 
-export const deleteUser = contextUpdater('users', async ({ id, context }) => {
-  await context.apiClient.keystone.deleteUser(id)
-  return context.users.filter(x => x.id !== id)
+export const deleteUser = createContextUpdater('users', async ({ id, context }) => {
+  const { keystone } = ApiClient.getInstance()
+  await keystone.deleteUser(id)
+}, {
+  operation: 'delete'
 })
 
 export const updateUser = () => {

@@ -11,6 +11,19 @@ import Qbert from './Qbert'
 import ResMgr from './ResMgr'
 
 class ApiClient {
+  static init (options = {}) {
+    this.instance = new this(options)
+    return this.instance
+  }
+
+  static getInstance () {
+    const { instance } = this
+    if (!instance) {
+      throw new Error('ApiClient instance has not been initialized, please call ApiClient.init to instantiate it')
+    }
+    return instance
+  }
+
   constructor (options = {}) {
     this.options = options
     if (!options.keystoneEndpoint) {

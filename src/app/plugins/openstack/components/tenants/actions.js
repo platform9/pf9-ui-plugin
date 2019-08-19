@@ -1,28 +1,31 @@
-import contextLoader from 'core/helpers/contextLoader'
-import contextUpdater from 'core/helpers/contextUpdater'
+import createContextLoader from 'core/helpers/createContextLoader'
+import createContextUpdater from 'core/helpers/createContextUpdater'
+import ApiClient from 'api-client/ApiClient'
 
-const dataKey = 'tenants'
+const tenantsContextKey = 'tenants'
 
-export const loadUserTenants = contextLoader('userTenants', async ({ apiClient }) => {
-  return apiClient.keystone.getProjectsAuth()
+export const loadUserTenants = createContextLoader('userTenants', async () => {
+  const { keystone } = ApiClient.getInstance()
+  return keystone.getProjectsAuth()
 })
 
-export const loadTenants = contextLoader(dataKey, async ({ apiClient }) => {
-  return apiClient.keystone.getProjects()
+export const loadTenants = createContextLoader(tenantsContextKey, async () => {
+  const { keystone } = ApiClient.getInstance()
+  return keystone.getProjects()
 })
 
-export const createTenant = contextUpdater(dataKey, async ({ data, apiClient, currentItems }) => {
-  const created = await apiClient.keystone.createTenant(data)
-  return [...currentItems, created]
-}, { returnLast: true })
+export const createTenant = createContextUpdater(tenantsContextKey, async data => {
+  const { keystone } = ApiClient.getInstance()
+  return keystone.createTenant(data)
+}, { operation: 'create' })
 
-export const deleteTenant = contextUpdater(dataKey, async ({ id, apiClient, currentItems }) => {
-  await apiClient.keystone.deleteTenant(id)
-  return currentItems.filter(x => x.id !== id)
-})
+export const deleteTenant = createContextUpdater(tenantsContextKey, async ({ id }) => {
+  const { keystone } = ApiClient.getInstance()
+  await keystone.deleteTenant(id)
+}, { operation: 'delete' })
 
-export const updateTenant = contextUpdater(dataKey, async ({ data, apiClient, currentItems }) => {
+export const updateTenant = createContextUpdater(tenantsContextKey, async data => {
+  const { keystone } = ApiClient.getInstance()
   const { id } = data
-  const updated = await apiClient.keystone.updateTenant(id, data)
-  return currentItems.map(x => x.id === id ? x : updated)
-})
+  return keystone.updateTenant(id, data)
+}, { operation: 'update' })

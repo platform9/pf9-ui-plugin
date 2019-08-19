@@ -1,40 +1,24 @@
-import React from 'react'
-import { projectAs } from 'utils/fp'
-import Picklist from 'core/components/Picklist'
-import { deleteNamespace, loadNamespaces } from 'k8s/components/namespaces/actions'
+import React, { useState, useCallback } from 'react'
+import { emptyObj } from 'utils/fp'
+import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
+import { deleteNamespace } from 'k8s/components/namespaces/actions'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import clusterizedDataLoader from 'k8s/helpers/clusterizedDataLoader'
-import moize from 'moize'
+import useDataLoader from 'core/hooks/useDataLoader'
 
 const ListPage = ({ ListContainer }) => {
-  const handleClusterChange = moize(setParams => async clusterId => {
-    setParams({ clusterId })
-  })
-
-  const findClusterName = (clusters, clusterId) => {
-    const cluster = clusters.find(x => x.uuid === clusterId)
-    return (cluster && cluster.name) || ''
+  return () => {
+    const [ params, setParams ] = useState(emptyObj)
+    const handleClusterChange = useCallback(clusterId => setParams({ clusterId }), [setParams])
+    const [ namespaces, loading, reload ] = useDataLoader('namespaces', params)
+    return <div>
+      <ClusterPicklist
+        formField={false}
+        onChange={handleClusterChange}
+        value={params.clusterId}
+      />
+      <ListContainer loading={loading} data={namespaces} reload={reload} />
+    </div>
   }
-
-  return clusterizedDataLoader('namespaces', loadNamespaces, {
-    onlyMasterNodeClusters: true,
-  })(
-    ({ setParams, params: { clusterId }, data: { clusters, namespaces } }) =>
-      <div>
-        <Picklist
-          formField={false}
-          name="currentCluster"
-          label="Current Cluster"
-          options={projectAs({ label: 'name', value: 'uuid' }, clusters)}
-          value={clusterId}
-          onChange={handleClusterChange(setParams)}
-        />
-        <ListContainer data={namespaces.map(ns => ({
-          ...ns,
-          clusterName: findClusterName(clusters, ns.clusterId),
-        }))} />
-      </div>,
-  )
 }
 
 export const options = {

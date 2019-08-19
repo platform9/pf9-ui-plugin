@@ -1,14 +1,16 @@
-import React from 'react'
+import React, { useMemo, useCallback } from 'react'
 import PropTypes from 'prop-types'
 import MenuItem from '@material-ui/core/MenuItem'
-import { withStyles } from '@material-ui/styles'
+import { makeStyles } from '@material-ui/styles'
 import TextField from '@material-ui/core/TextField'
+import { pipe, map } from 'ramda'
+import Progress from 'core/components/progress/Progress'
 
 /**
  * Picklist is a bare-bones widget-only implmentation.
  * See PicklistField if you need ValidatedForm integration.
  */
-const styles = theme => ({
+const useStyles = makeStyles(theme => ({
   root: {
     display: ({ formField }) =>
       formField ? 'flex' : 'block',
@@ -16,33 +18,32 @@ const styles = theme => ({
     minWidth: 120,
     marginTop: theme.spacing(1),
   },
-})
+}))
 
-@withStyles(styles)
-class Picklist extends React.Component {
-  handleChange = e => {
-    const { onChange } = this.props
+const Picklist = ({ className, label, name, value, options, onChange, formField, loading, ...restProps }) => {
+  const classes = useStyles()
+  const handleChange = useCallback(e => {
     // Hack to work around the fact that Material UI's "Select" will ignore
     // an options with value of '' (empty string).
     const value = e.target.value === '__none__' ? '' : e.target.value
     onChange && onChange(value)
-  }
+  }, [onChange])
 
-  render () {
-    const { className, classes, label, name, value, options, formField, ...restProps } = this.props
-
-    const items = options.map(x =>
-      typeof x === 'string' ? ({ value: x, label: x }) : x,
-    ).map(x => ({
-      label: x.label,
+  const items = useMemo(() => map(pipe(
+    option => typeof option === 'string' ? ({ value: option, label: option }) : option,
+    option => ({
+      label: option.label,
       // Hack to work around Material UI's Select ignoring empty string as a value
-      value: x.value === '' ? '__none__' : x.value,
-    }))
+      value: option.value === '' ? '__none__' : option.value,
+    }),
+    option => <MenuItem value={option.value} key={option.value}>{option.label}</MenuItem>,
+  ), options), [options])
 
-    // Hack to work around Material UI's Select ignoring empty string as a value
-    const nonEmptyValue = value === '' ? '__none__' : value
+  // Hack to work around Material UI's Select ignoring empty string as a value
+  const nonEmptyValue = value === '' ? '__none__' : value
 
-    return <TextField
+  return <Progress inline overlay loading={loading}>
+    <TextField
       {...restProps}
       select
       className={className}
@@ -50,15 +51,13 @@ class Picklist extends React.Component {
       variant="outlined"
       label={label}
       value={nonEmptyValue}
-      SelectProps={{
-        displayEmpty: true,
-      }}
-      onChange={this.handleChange}
+      SelectProps={{ displayEmpty: true }}
+      onChange={handleChange}
       inputProps={{ name: label, id: name }}
     >
-      {items.map(item => <MenuItem value={item.value} key={item.value}>{item.label}</MenuItem>)}
+      {items}
     </TextField>
-  }
+  </Progress>
 }
 
 const numOrString = PropTypes.oneOfType([PropTypes.number, PropTypes.string])
@@ -78,10 +77,12 @@ Picklist.propTypes = {
   value: numOrString,
   onChange: PropTypes.func,
   formField: PropTypes.bool,
+  loading: PropTypes.bool,
 }
 
 Picklist.defaultProps = {
   formField: true,
+  loading: false,
 }
 
 export default Picklist

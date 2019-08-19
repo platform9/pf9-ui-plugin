@@ -1,44 +1,38 @@
+import ApiClient from 'api-client/ApiClient'
 import { keyValueArrToObj, objToKeyValueArr } from 'app/utils/fp'
-import contextLoader from 'core/helpers/contextLoader'
-import contextUpdater from 'core/helpers/contextUpdater'
+import createContextLoader from 'core/helpers/createContextLoader'
+import createContextUpdater from 'core/helpers/createContextUpdater'
 
-export const loadVolumes = contextLoader('volumes', async ({ apiClient }) => {
-  return apiClient.cinder.getVolumes()
+export const loadVolumes = createContextLoader('volumes', async () => {
+  const { cinder } = ApiClient.getInstance()
+  return cinder.getVolumes()
 })
 
-export const updateVolume = async ({ setContext }) => {
-  // TODO
-}
+export const createVolume = createContextUpdater('volumes', async data => {
+  const { cinder } = ApiClient.getInstance()
+  const created = await cinder.createVolume(data)
+  if (data.bootable) {
+    await cinder.setBootable(created.id, true)
+    created.bootable = true
+  }
+  return created
+}, { operation: 'create' })
 
-export const loadVolumeTypes = contextLoader('volumeTypes', async ({ apiClient }) => {
-  const volumeTypes = await apiClient.cinder.getVolumeTypes()
+export const updateVolume = createContextUpdater('volumes', async () => {
+  // TODO
+}, { operation: 'update' })
+
+export const loadVolumeTypes = createContextLoader('volumeTypes', async () => {
+  const { cinder } = ApiClient.getInstance()
+  const volumeTypes = await cinder.getVolumeTypes()
 
   // Change metadata into array form
   return (volumeTypes || []).map(x => ({ ...x, extra_specs: objToKeyValueArr(x.extra_specs) }))
 })
 
-export const loadVolumeSnapshots = contextLoader('volumeSnapshots', async ({ apiClient }) => {
-  const volumeSnapshots = await apiClient.cinder.getSnapshots()
-
-  // Change metadata into array form
-  return (volumeSnapshots || []).map(x => ({
-    ...x,
-    metadata: objToKeyValueArr(x.metadata),
-  }))
-})
-
-export const updateVolumeSnapshot = contextUpdater('volumeSnapshots', async ({ apiClient, currentItems, data }) => {
+export const updateVolumeType = createContextUpdater('volumeTypes', async (data, currentItems) => {
+  const { cinder } = ApiClient.getInstance()
   const { id } = data
-  const { cinder } = apiClient
-  const updated = await cinder.updateSnapshot(id, data)
-  cinder.updateSnapshotMetadata(id, keyValueArrToObj(data.metadata))
-  updated.metadata = data.metadata
-  return currentItems.map(x => x.id === id ? updated : x)
-})
-
-export const updateVolumeType = contextUpdater('volumeTypes', async ({ apiClient, currentItems, data }) => {
-  const { id } = data
-  const { cinder } = apiClient
   const converted = {
     name: data.name,
     extra_specs: keyValueArrToObj(data.extra_specs),
@@ -46,17 +40,27 @@ export const updateVolumeType = contextUpdater('volumeTypes', async ({ apiClient
   const oldKeys = currentItems.find(x => x.id === id).extra_specs.map(x => x.key)
   const newKeys = data.extra_specs.map(x => x.key)
   const keysToDelete = oldKeys.filter(x => !newKeys.includes(x))
-  const updated = await cinder.updateVolumeType(id, converted, keysToDelete)
-  return currentItems.map(x => x.id === id ? updated : x)
+  return cinder.updateVolumeType(id, converted, keysToDelete)
+}, { operation: 'update' })
+
+export const loadVolumeSnapshots = createContextLoader('volumeSnapshots', async () => {
+  const { cinder } = ApiClient.getInstance()
+  const volumeSnapshots = await cinder.getSnapshots()
+
+  // Change metadata into array form
+  return (volumeSnapshots || []).map(volumeSnapshot => ({
+    ...volumeSnapshot,
+    metadata: objToKeyValueArr(volumeSnapshot.metadata),
+  }))
 })
 
-// TODO: update context?
-export const createVolume = async ({ data, apiClient }) => {
-  const { cinder } = apiClient
-  const created = await cinder.createVolume(data)
-  if (data.bootable) {
-    await cinder.setBootable(created.id, true)
-    created.bootable = true
+export const updateVolumeSnapshot = createContextUpdater('volumeSnapshots', async data => {
+  const { cinder } = ApiClient.getInstance()
+  const { id } = data
+  const updated = await cinder.updateSnapshot(id, data)
+  await cinder.updateSnapshotMetadata(id, keyValueArrToObj(data.metadata))
+  return {
+    ...updated,
+    metadata: data.metadata,
   }
-  return created
-}
+}, { operation: 'update' })

@@ -3,11 +3,8 @@ import withDataLoader from 'core/hocs/withDataLoader'
 import { loadClusters } from 'k8s/components/infrastructure/actions'
 import withParams from 'core/hocs/withParams'
 import withDataMapper from 'core/hocs/withDataMapper'
-import { withAppContext } from 'core/AppContext'
-
-export const mapByClusterId = contextKey => ({ context = {}, params: { clusterId } = {} }) => {
-  return pathOr([], [contextKey, clusterId], context)
-}
+import { withAppContext } from 'core/AppProvider'
+import { dataKey } from 'core/helpers/createContextLoader'
 
 export default (key, loaderFn, options = {}) => {
   const {
@@ -21,7 +18,7 @@ export default (key, loaderFn, options = {}) => {
     // Provide a "setParams" function and a "params" object in the props
     withParams({
       clusterId: pipe(
-        pathOr([], ['context', 'clusters']),
+        pathOr([], [dataKey, 'clusters']),
         onlyMasterNodeClusters ? filter(x => x.hasMasterNode) : identity,
         pathOr('__all__', [0, 'uuid']),
       ),
@@ -32,10 +29,10 @@ export default (key, loaderFn, options = {}) => {
     withDataMapper({
       clusters:
         pipe(
-          pathOr([], ['context', 'clusters']),
+          pathOr([], [dataKey, 'clusters']),
           onlyMasterNodeClusters ? filter(x => x.hasMasterNode) : identity,
         ),
-      [key]: mapByClusterId(key),
+      [key]: pathOr([], [dataKey, key]),
     }),
   )
 }

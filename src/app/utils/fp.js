@@ -1,7 +1,12 @@
-import { assocPath, curry, fromPairs, mapObjIndexed, pathOr, remove, flatten } from 'ramda'
+import { T, cond, toPairs, equals, always, adjust, update, findIndex, assocPath, curry, fromPairs, mapObjIndexed, pathOr, remove, flatten } from 'ramda'
 import moize from 'moize'
 
-// functional programming helpers
+// State hook initializers
+
+export const emptyArr = Object.freeze([])
+export const emptyObj = Object.freeze({})
+
+// Functional programming helpers
 
 export const pluck = key => obj => obj[key]
 export const identity = x => x
@@ -19,6 +24,9 @@ export const hasKeys = obj => {
 }
 
 export const pluckAsync = key => promise => promise.then(obj => obj[key])
+
+export const pipeAsync = (...fns) =>
+  async params => fns.reduce(async (prevResult, nextCb) => nextCb(prevResult), params)
 
 export const compose = (...fns) =>
   fns.reduce((f, g) => (...args) => f(g(...args)))
@@ -223,6 +231,22 @@ export const updateInArray = curry((predicateFn, updateFn, arr) =>
   arr.map(item => predicateFn(item) ? updateFn(item) : item)
 )
 
+// Like `updateInArray` but stops after finding the element to update
+// Also like ramda `adjust` but using a predicateFn
+export const adjustWith = curry((predicateFn, updateFn, arr) =>
+  adjust(findIndex(predicateFn, arr), updateFn, arr)
+)
+
+// Like ramda `update` but using a predicateFn
+export const updateWith = curry((predicateFn, newValue, arr) =>
+  update(findIndex(predicateFn, arr), newValue, arr)
+)
+
+// Remove an item from an array using a predicateFn
+export const removeWith = curry((predicateFn, arr) =>
+  remove(findIndex(predicateFn, arr), 1, arr)
+)
+
 // applyJsonPatch :: oldObject -> patch -> newObject
 export const applyJsonPatch = curry((patch, obj) => {
   const { op, path, value } = patch
@@ -235,3 +259,27 @@ export const applyJsonPatch = curry((patch, obj) => {
     return assocPath(pathParts, value, obj)
   }
 })
+
+/**
+ * A functional switch statement
+ * @param {object} casesObj Object whose keys are the conditions to be tested against the key
+ * @param {any} defaultValue Value to be returned in case no cases matches the key
+ * @param {any} key Input key to test against the case statements
+ * @returns {any}
+ *
+ * @example
+ *
+ * const numbersSwitch = switchCase({
+ *    1: "one",
+ *    2: "two"
+ * }, "defaultValue")
+ *
+ * numbersSwitch(2) // "two"
+ * numbersSwitch(5) // "defaultValue"
+ */
+export const switchCase = curry((casesObj, defaultValue, key) =>
+  cond(
+    ...toPairs(casesObj).map(([caseCond, caseVal]) => [equals(caseCond), always(caseVal)]),
+    [T, always(defaultValue)]
+  )(key)
+)

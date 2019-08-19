@@ -13,9 +13,10 @@ import createCRUDActions from 'core/helpers/createCRUDActions'
 import { compose, prop, propEq, pathOr } from 'ramda'
 import { loadCloudProviders } from './actions'
 import { projectAs } from 'utils/fp'
-import { withAppContext } from 'core/AppContext'
+import { withAppContext } from 'core/AppProvider'
 import withDataLoader from 'core/hocs/withDataLoader'
 import withDataMapper from 'core/hocs/withDataMapper'
+import { dataKey } from 'core/helpers/createContextLoader'
 
 const initialContext = {
   manualDeploy: false,
@@ -256,8 +257,8 @@ export default compose(
     regions: createCRUDActions({ service: 'keystone', entity: 'regions' }).list,
   }),
   withDataMapper({
-    cloudProviders: pathOr([], ['context', 'cloudProviders']),
-    flavors: pathOr([], ['context', 'flavors']),
-    regions: pathOr([], ['context', 'regions']),
+    cloudProviders: pathOr([], [dataKey, 'cloudProviders']),
+    flavors: pathOr([], [dataKey, 'flavors']),
+    regions: pathOr([], [dataKey, 'regions']),
   }),
 )(AddClusterPage)

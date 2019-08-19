@@ -2,8 +2,7 @@ import React from 'react'
 import { withRouter } from 'react-router'
 import { compose } from 'app/utils/fp'
 import { dashboardUrl, loginUrl } from 'app/constants'
-
-import { withAppContext } from 'core/AppContext'
+import { withAppContext } from 'core/AppProvider'
 import { withPreferences } from 'core/providers/PreferencesProvider'
 import { getStorage, setStorage } from 'core/utils/pf9Storage'
 import LoginPage from 'openstack/components/LoginPage'
@@ -44,7 +43,7 @@ class SessionManager extends React.Component {
 
   // Handler that gets invoked on successful authentication
   initialSetup = async ({ username, unscopedToken }) => {
-    const { context, history, location, initSession, initUserPreferences, getContext, setContext } = this.props
+    const { context, history, location, initSession, initUserPreferences, setContext } = this.props
 
     // Set up the scopedToken
     await initSession(unscopedToken, username)
@@ -54,7 +53,7 @@ class SessionManager extends React.Component {
     const lastTenant = pathOr('service', ['Tenants', 'lastTenant', 'name'], userPreferences)
     const lastRegion = path(['RegionChooser', 'lastRegion', 'id'], userPreferences)
 
-    const tenants = await loadUserTenants({ getContext, setContext })
+    const tenants = await loadUserTenants()
     const activeTenant = tenants.find(propEq('name', lastTenant))
     const { keystone } = context.apiClient
 

@@ -1,10 +1,14 @@
-import contextLoader from 'core/helpers/contextLoader'
+import ApiClient from 'api-client/ApiClient'
+import createContextLoader from 'core/helpers/createContextLoader'
 
-export const loadImages = contextLoader('images', async ({ apiClient }) => {
-  return apiClient.glance.getImages()
+export const loadImages = createContextLoader('images', async ({ apiClient }) => {
+  const { glance } = ApiClient.getInstance()
+  return glance.getImages()
 })
 
+// TODO: Use contextUpdater
 export const updateImage = async (data, helpers) => {
+  const { glance } = ApiClient.getInstance()
   const { context, dataKey, objId } = helpers
   const initialValue = context[dataKey].find(obj => obj.id === objId)
 
@@ -19,7 +23,7 @@ export const updateImage = async (data, helpers) => {
 
   // TODO: tags
 
-  const updatedImage = await context.apiClient.glance.updateImage(body, initialValue.id)
+  const updatedImage = await glance.updateImage(body, initialValue.id)
 
   // This should return the response of the client
   return updatedImage

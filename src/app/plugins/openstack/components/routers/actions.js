@@ -1,24 +1,24 @@
-import contextLoader from 'core/helpers/contextLoader'
-import contextUpdater from 'core/helpers/contextUpdater'
+import ApiClient from 'api-client/ApiClient'
+import createContextLoader from 'core/helpers/createContextLoader'
+import createContextUpdater from 'core/helpers/createContextUpdater'
 
-export const loadRouters = contextLoader('routers', async ({ context }) => {
-  return context.apiClient.neutron.getRouters()
+export const loadRouters = createContextLoader('routers', async () => {
+  const { neutron } = ApiClient.getInstance()
+  return neutron.getRouters()
 })
 
-export const createRouter = contextUpdater('routers', async ({ data, context }) => {
-  const existing = await context.apiClient.neutron.getRouters()
-  const created = await context.apiClient.neutron.createRouter(data)
-  return [...existing, created]
-}, { returnLast: true })
+export const createRouter = createContextUpdater('routers', async data => {
+  const { neutron } = ApiClient.getInstance()
+  return neutron.createRouter(data)
+}, { operation: 'create' })
 
-export const deleteRouter = contextUpdater('routers', async ({ id, context }) => {
-  await context.apiClient.neutron.deleteRouter(id)
-  return context.routers.filter(x => x.id !== id)
-})
+export const deleteRouter = createContextUpdater('routers', async ({ id }) => {
+  const { neutron } = ApiClient.getInstance()
+  await neutron.deleteRouter(id)
+}, { operation: 'delete' })
 
-export const updateRouter = contextUpdater('routers', async ({ data, context }) => {
+export const updateRouter = createContextUpdater('routers', async data => {
+  const { neutron } = ApiClient.getInstance()
   const { id } = data
-  const existing = await context.apiClient.neutron.getRouters()
-  const updated = await context.apiClient.neutron.updateRouter(id, data)
-  return existing.map(x => x.id === id ? x : updated)
-})
+  return neutron.updateRouter(id, data)
+}, { operation: 'update' })

@@ -1,14 +1,18 @@
-import contextLoader from 'core/helpers/contextLoader'
+import ApiClient from 'api-client/ApiClient'
 import {
-  any, path, pluck, pipe, uniq, reduce, map, head, values, groupBy, prop, innerJoin, pathEq,
+  path, any, pluck, pipe, uniq, reduce, map, head, values, groupBy, prop, innerJoin, pathEq,
   flatten, find,
 } from 'ramda'
 import moize from 'moize'
+import createContextLoader from 'core/helpers/createContextLoader'
+import { loadNamespaces } from 'k8s/components/namespaces/actions'
 
-export const loadTenants = contextLoader('tenants', async ({ apiClient, loadFromContext }) => {
-  const namespaces = await loadFromContext('namespaces')
-  const allTenantsAllUsers = await apiClient.keystone.getAllTenantsAllUsers()
-
+export const loadTenants = createContextLoader('tenants', async () => {
+  const { keystone } = ApiClient.getInstance()
+  const [namespaces, allTenantsAllUsers] = await Promise.all([
+    loadNamespaces(),
+    keystone.getAllTenantsAllUsers()
+  ])
   return allTenantsAllUsers.map(tenant => ({
     ...tenant,
     clusters: pluck('clusterName', namespaces
@@ -20,8 +24,8 @@ export const deleteTenant = () => {
   console.log('TODO')
 }
 
-export const loadUsers = contextLoader('users', async ({ apiClient, loadFromContext }) => {
-  const tenants = await loadFromContext('tenants')
+export const loadUsers = createContextLoader('users', async () => {
+  const tenants = await loadTenants()
 
   // Get all tenant users and assign the corresponding tenant ID
   const selectAllTenantUsers = reduce((acc, tenant) => {
@@ -57,10 +61,11 @@ export const deleteUser = () => {
 }
 
 const tryJsonParse = moize(val => typeof val === 'string' ? JSON.parse(val) : val)
-export const loadGroups = contextLoader('groups', async ({ apiClient, loadFromContext }) => {
+export const loadGroups = createContextLoader('groups', async () => {
+  const { keystone } = ApiClient.getInstance()
   const [groups, mappings] = await Promise.all([
-    apiClient.keystone.getGroups(),
-    apiClient.keystone.getGroupMappings(),
+    keystone.getGroups(),
+    keystone.getGroupMappings(),
   ])
 
   return groups.map(group => {
@@ -103,8 +108,9 @@ export const deleteGroup = () => {
   console.log('TODO')
 }
 
-export const loadRoles = contextLoader('roles', async ({ apiClient, loadFromContext }) => {
-  const roles = await apiClient.keystone.getRoles()
+export const loadRoles = createContextLoader('roles', async () => {
+  const { keystone } = ApiClient.getInstance()
+  const roles = await keystone.getRoles()
 
   return roles
     .filter(role => ['admin', '_member_'].includes(role.name))

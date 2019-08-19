@@ -1,6 +1,6 @@
 import React from 'react'
 import { compose } from 'app/utils/fp'
-import { withAppContext } from 'core/AppContext'
+import { withAppContext } from 'core/AppProvider'
 import SearchBar from 'core/components/SearchBar'
 import { omit } from 'ramda'
 import JsonView from 'react-json-view'

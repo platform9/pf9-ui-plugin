@@ -1,29 +1,29 @@
-import React from 'react'
+import React, { useEffect, useState, useContext } from 'react'
+import { AppContext } from 'core/AppProvider'
 import { compose } from 'app/utils/fp'
-import { withAppContext } from 'core/AppContext'
 import Selector from 'core/components/Selector'
 import { withScopedPreferences } from 'core/providers/PreferencesProvider'
-import moize from 'moize'
-import { assoc, propEq } from 'ramda'
+import { propEq } from 'ramda'
 import { loadUserTenants } from './actions'
 import { Tooltip } from '@material-ui/core'
 
-class TenantChooser extends React.Component {
-  state = {
-    tenantSearch: '',
-    currentTenantName: '',
-    tenants: null,
-    tooltipOpen: false,
-  }
+const TenantChooser = props => {
+  const { setContext, apiClient: { keystone } } = useContext(AppContext)
 
-  handleChange = moize(key => value => {
-    this.setState({
-      [key]: value,
-    })
-  })
+  const [tenantSearch, setTenantSearch] = useState('')
+  const [currentTenantName, setCurrentTenantName] = useState('')
+  const [tenants, setTenants] = useState(null)
+  const [tooltipOpen, setTooltipOpen] = useState(false)
 
-  resetTenantScopedContext = (tenant) => {
-    const { setContext } = this.props
+  useEffect(async () => {
+    const { lastTenant } = props.preferences
+    const tenants = await loadTenants()
+    setTenants(tenants)
+    if (!tenants || !lastTenant) { return }
+    updateCurrentTenant(lastTenant.name)
+  }, [])
+
+  const resetTenantScopedContext = tenant => {
     // Clear any data that should change when the user changes tenant.
     // The data will then be reloaded when it is needed.
     setContext({
@@ -37,78 +37,62 @@ class TenantChooser extends React.Component {
     })
   }
 
-  updateCurrentTenant = async tenantName => {
-    const { context, setContext } = this.props
-    const { tenants } = this.state
-    this.setState(assoc('currentTenantName', tenantName), async () => {
-      const tenant = tenants.find(x => x.name === tenantName)
-      if (!tenant) { return }
-      setContext({ currentTenant: tenant })
+  const updateCurrentTenant = async tenantName => {
+    await setCurrentTenantName(tenantName)
 
-      const { keystone } = context.apiClient
-      await keystone.changeProjectScope(tenant.id)
-      this.resetTenantScopedContext(tenant)
-    })
+    const tenant = tenants.find(x => x.name === tenantName)
+    if (!tenant) { return }
+    setContext({ currentTenant: tenant })
+
+    await keystone.changeProjectScope(tenant.id)
+    resetTenantScopedContext(tenant)
   }
 
-  handleChoose = lastTenant => {
-    const { updatePreferences } = this.props
+  const handleChoose = lastTenant => {
+    const { updatePreferences } = props
 
-    const fullTenantObj = this.state.tenants.find(propEq('name', lastTenant))
+    const fullTenantObj = tenants.find(propEq('name', lastTenant))
     updatePreferences({ lastTenant: fullTenantObj })
-    this.updateCurrentTenant(lastTenant)
+    updateCurrentTenant(lastTenant)
   }
 
-  loadTenants = async (reload = false) => {
-    const { getContext, setContext } = this.props
-    const tenants = await loadUserTenants({ getContext, setContext, reload })
-    this.setState({ tenants })
+  const loadTenants = async (reload = false) => {
+    const tenants = await loadUserTenants(null, reload)
+    setTenants(tenants)
     return tenants
   }
 
-  tenantNames = tenants => {
+  const tenantNames = tenants => {
     const isUserTenant = x => x.description !== 'Heat stack user project'
     return (tenants || []).filter(isUserTenant).map(x => x.name)
   }
 
-  async componentDidMount () {
-    const { lastTenant } = this.props.preferences
-    const tenants = await this.loadTenants()
-    if (!tenants || !lastTenant) { return }
-    this.updateCurrentTenant(lastTenant.name)
-  }
+  const handleTooltipClose = () => setTooltipOpen(false)
+  const handleTooltipOpen = () => setTooltipOpen(true)
 
-  handleTooltipClose = () => this.setState({ tooltipOpen: false })
-  handleTooltipOpen = () => this.setState({ tooltipOpen: true })
+  if (!tenants) { return null }
 
-  render () {
-    const { currentTenantName, tenantSearch, tenants, tooltipOpen } = this.state
-
-    if (!tenants) { return null }
-
-    return (
-      <Tooltip
-        open={tooltipOpen}
-        title="Tenant"
-        placement="bottom"
-      >
-        <Selector
-          onMouseEnter={this.handleTooltipOpen}
-          onMouseLeave={this.handleTooltipClose}
-          onClick={this.handleTooltipClose}
-          className={this.props.className}
-          name={currentTenantName || 'service'}
-          list={this.tenantNames(tenants)}
-          onChoose={this.handleChoose}
-          onSearchChange={this.handleChange('tenantSearch')}
-          searchTerm={tenantSearch}
-        />
-      </Tooltip>
-    )
-  }
+  return (
+    <Tooltip
+      open={tooltipOpen}
+      title="Tenant"
+      placement="bottom"
+    >
+      <Selector
+        onMouseEnter={handleTooltipOpen}
+        onMouseLeave={handleTooltipClose}
+        onClick={handleTooltipClose}
+        className={props.className}
+        name={currentTenantName || 'service'}
+        list={tenantNames(tenants)}
+        onChoose={handleChoose}
+        onSearchChange={setTenantSearch}
+        searchTerm={tenantSearch}
+      />
+    </Tooltip>
+  )
 }
 
 export default compose(
   withScopedPreferences('Tenants'),
-  withAppContext,
 )(TenantChooser)

@@ -1,6 +1,7 @@
 /* eslint-disable key-spacing */
 // which endpoint to use for each service (internal, public, admin)
-import contextLoader from 'core/helpers/contextLoader'
+import ApiClient from 'api-client/ApiClient'
+import createContextLoader from 'core/helpers/createContextLoader'
 
 const serviceMappings = {
   aodh: 'internal',
@@ -23,15 +24,17 @@ const serviceMappings = {
 
 const whichInterface = serviceName => serviceMappings[serviceName] || 'internal'
 
-export const loadServiceCatalog = contextLoader('serviceCatalog', async ({ apiClient }) => {
-  const services = await apiClient.keystone.getServicesForActiveRegion()
-  return Object.keys(services).map(x => {
-    const service = services[x]
+export const serviceCatalogContextKey = 'serviceCatalog'
+
+export const loadServiceCatalog = createContextLoader(serviceCatalogContextKey, async () => {
+  const { keystone } = ApiClient.getInstance()
+  const services = await keystone.getServicesForActiveRegion()
+  return Object.entries(services).map(([name, service]) => {
     const iface = whichInterface(service)
     const endpoint = (service && service[iface]) || service[Object.keys(service)[0]]
     return {
       id: endpoint.id,
-      name: x,
+      name,
       type: endpoint.type,
       url: endpoint.url,
       iface: endpoint.iface,

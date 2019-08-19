@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { withAppContext } from 'core/AppContext'
+import { withAppContext } from 'core/AppProvider'
 import DataLoader from 'core/DataLoader'
 import { compose } from 'ramda'
 import { withRouter } from 'react-router'

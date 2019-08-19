@@ -1,6 +1,6 @@
 import React from 'react'
 import { compose, keyValueArrToObj } from 'app/utils/fp'
-import { withAppContext } from 'core/AppContext'
+import { withAppContext } from 'core/AppProvider'
 import FormWrapper from 'core/components/FormWrapper'
 import { withRouter } from 'react-router-dom'
 import requiresAuthentication from '../../util/requiresAuthentication'

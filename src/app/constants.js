@@ -4,6 +4,10 @@ export const imageUrlRoot = `${appUrlRoot}/images`
 export const loginUrl = `${appUrlRoot}/openstack/login`
 export const logoutUrl = `${appUrlRoot}/openstack/logout`
 export const dashboardUrl = `${appUrlRoot}/kubernetes/`
+export const allKey = '__all__'
+
+// Errors
+export const notFoundErr = 'ERR_NOT_FOUND'
 
 // Clarity
 export const clarityUrlRoot = '/clarity/index.html#'

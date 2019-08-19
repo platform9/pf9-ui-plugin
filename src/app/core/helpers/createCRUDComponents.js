@@ -9,7 +9,7 @@ import withDataLoader from 'core/hocs/withDataLoader'
 import withDataMapper from 'core/hocs/withDataMapper'
 import { compose } from 'app/utils/fp'
 import { pathOr, prop } from 'ramda'
-import { withAppContext } from 'core/AppContext'
+import { withAppContext } from 'core/AppProvider'
 import { withRouter } from 'react-router-dom'
 import { withScopedPreferences } from 'core/providers/PreferencesProvider'
 import { withToast } from 'core/providers/ToastProvider'
@@ -40,7 +40,7 @@ const createCRUDComponents = options => {
     dataKey,
     deleteFn,
     loaderFn,
-    mappers = { [dataKey]: pathOr([], ['context', dataKey]) },
+    mappers = { [dataKey]: pathOr([], [dataKey, dataKey]) },
     loaders = loaderFn || crudActions ? { [dataKey]: loaderFn || prop('list', crudActions) } : null,
     columns = [],
     rowActions = () => [],
@@ -105,6 +105,7 @@ const createCRUDComponents = options => {
 
       return (
         <CRUDListContainer
+          loading={this.props.loading}
           items={this.props.data}
           editUrl={editUrl}
           onRemove={this.handleRemove}
@@ -129,9 +130,9 @@ const createCRUDComponents = options => {
 
   const createStandardListPage = () => {
     // ListPage
-    let StandardListPage = ({ data }) => (
+    let StandardListPage = ({ data, loading, reload }) => (
       <React.Fragment>
-        <ListContainer data={data[dataKey]} />
+        <ListContainer data={data[dataKey]} loading={loading} reload={reload} />
         {debug && <pre>{JSON.stringify(data[dataKey], null, 4)}</pre>}
       </React.Fragment>
     )

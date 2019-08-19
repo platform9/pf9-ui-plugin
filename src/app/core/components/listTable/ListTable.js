@@ -8,7 +8,7 @@ import {
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import { compose, ensureFunction, except } from 'app/utils/fp'
-import { withAppContext } from 'core/AppContext'
+import { withAppContext } from 'core/AppProvider'
 import MoreMenu from 'core/components/MoreMenu'
 import {
   any, assoc, assocPath, equals, pipe, pluck, path, prop, propEq, propOr, uniq, update,

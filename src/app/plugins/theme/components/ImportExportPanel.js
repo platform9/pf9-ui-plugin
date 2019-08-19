@@ -4,7 +4,7 @@ import ImportDataButton from 'core/components/ImportDataButton'
 import ExportDataButton from 'core/components/ExportDataButton'
 import { compose } from 'ramda'
 import { createMuiTheme } from '@material-ui/core/styles'
-import { withAppContext } from 'core/AppContext'
+import { withAppContext } from 'core/AppProvider'
 import { withStyles } from '@material-ui/styles'
 
 const styles = theme => ({

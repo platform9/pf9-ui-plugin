@@ -1,7 +1,17 @@
-import { pathOrNull } from 'utils/fp'
-import { pathOr, prop, propEq } from 'ramda'
-import contextLoader from 'core/helpers/contextLoader'
-import contextUpdater from 'core/helpers/contextUpdater'
+import { switchCase, pathOrNull } from 'utils/fp'
+import { pipe, last, pathOr, prop, propEq } from 'ramda'
+import ApiClient from 'api-client/ApiClient'
+import createContextLoader from 'core/helpers/createContextLoader'
+import createContextUpdater from 'core/helpers/createContextUpdater'
+import { clustersContextKey } from '../infrastructure/actions'
+import { notFoundErr } from 'app/constants'
+
+export const clusterTagsContextKey = 'clusterTags'
+export const prometheusInstancesContextKey = 'prometheusInstances'
+export const serviceAccountsContextKey = 'serviceAccounts'
+export const prometheusRulesContextKey = 'prometheusRules'
+export const prometheusServiceMonitorsContextKey = 'prometheusServiceMonitors'
+export const prometheusAlertManagersContextKey = 'prometheusAlertManagers'
 
 const mapAsyncItems = async (values, loaderFn, mapFn) => {
   const promises = values.map(loaderFn)
@@ -9,9 +19,10 @@ const mapAsyncItems = async (values, loaderFn, mapFn) => {
   return responses.flat().map(mapFn)
 }
 
-export const loadClusterTags = contextLoader('clusterTags', async ({ apiClient, loadFromContext }) => {
-  await loadFromContext('clusters')
-  return apiClient.appbert.getClusterTags()
+export const loadClusterTags = createContextLoader(clusterTagsContextKey, async (params, loadFromContext) => {
+  const { appbert } = ApiClient.getInstance()
+  await loadFromContext(clustersContextKey)
+  return appbert.getClusterTags()
 })
 
 const hasMonitoring = cluster => cluster.tags.includes('pf9-system:monitoring')
@@ -39,57 +50,58 @@ export const mapPrometheusInstance = ({ clusterUuid, metadata, spec }) => ({
   spec,
 })
 
-export const loadPrometheusInstances = contextLoader('prometheusInstances', async ({ apiClient, loadFromContext }) => {
-  const clusterTags = await loadFromContext('clusterTags')
+export const loadPrometheusInstances = createContextLoader(prometheusInstancesContextKey, async (params, loadFromContext) => {
+  const { qbert } = ApiClient.getInstance()
+  const clusterTags = await loadFromContext(clusterTagsContextKey)
   const clusterUuids = clusterTags.filter(hasMonitoring).map(prop('uuid'))
-  return mapAsyncItems(clusterUuids, apiClient.qbert.getPrometheusInstances, mapPrometheusInstance)
+  return mapAsyncItems(clusterUuids, qbert.getPrometheusInstances, mapPrometheusInstance)
 })
 
-export const createPrometheusInstance = contextUpdater('prometheusInstances', async ({ data, apiClient, currentItems, showToast }) => {
-  try {
-    const createdInstance = await apiClient.qbert.createPrometheusInstance(data.cluster, data)
-    const mappedInstance = mapPrometheusInstance({ clusterUuid: data.cluster, ...createdInstance })
-    showToast(`Successfully created Prometheus instance ${mappedInstance.name}`, 'success')
-    return [...currentItems, mappedInstance]
-  } catch (err) {
-    showToast(err, 'error')
-    console.log(err)
-  }
+export const createPrometheusInstance = createContextUpdater(prometheusInstancesContextKey, async ({ data, apiClient, currentItems, showToast }) => {
+  const { qbert } = ApiClient.getInstance()
+  const createdInstance = await qbert.createPrometheusInstance(data.cluster, data)
+  return mapPrometheusInstance({ clusterUuid: data.cluster, ...createdInstance })
+}, {
+  operation: 'create',
+  successMessage: updatedItems => `Successfully created Prometheus instance ${last(updatedItems).name}`
 })
 
-export const deletePrometheusInstance = contextUpdater('prometheusInstances', async ({ id, apiClient, currentItems, showToast }) => {
+export const deletePrometheusInstance = createContextUpdater(prometheusInstancesContextKey, async ({ id, apiClient, currentItems }) => {
+  const { qbert } = ApiClient.getInstance()
   const instance = currentItems.find(propEq('uid', id))
   if (!instance) {
-    console.error(`Unable to find prometheus instance with id: ${id} in deletePrometheusInstance`)
-    return
+    throw new Error(notFoundErr)
   }
-  try {
-    await apiClient.qbert.deletePrometheusInstance(instance.clusterUuid, instance.namespace, instance.name)
-    showToast(`Successfully deleted Prometheus instance ${instance.name}`, 'success')
-    return currentItems.filter(x => x.uid !== id)
-  } catch (err) {
-    showToast(err, 'error')
-    console.log(err)
-  }
+  await qbert.deletePrometheusInstance(instance.clusterUuid, instance.namespace, instance.name)
+}, {
+  operation: 'delete',
+  successMessage: (updatedItems, prevItems, { id }) => `Successfully deleted Prometheus instance ${pipe(
+    find(propEq('uid', id)),
+    prop('name')
+  )(prevItems)}`,
+  errorMessage: (catchedErr, { id }) => switchCase({
+    [notFoundErr]: `Unable to find prometheus instance with id: ${id} in deletePrometheusInstance`,
+  }, `Error when trying to delete Prometheus instance with id: ${id}`
+  )(catchedErr.message),
 })
 
-export const updatePrometheusInstance = contextUpdater('prometheusInstances', async ({ apiClient, data, currentItems, showToast }) => {
-  try {
-    const response = await apiClient.qbert.updatePrometheusInstance(data)
-    const mapped = mapPrometheusInstance(response)
-    showToast(`Successfully updated Prometheus instance ${mapped.name}`, 'success')
-    const items = currentItems.map(x => x.uid === data.uid ? mapped : x)
-    return items
-  } catch (err) {
-    showToast(err, 'error')
-    console.log(err)
-  }
+export const updatePrometheusInstance = createContextUpdater(prometheusInstancesContextKey, async data => {
+  const { qbert } = ApiClient.getInstance()
+  const response = await qbert.updatePrometheusInstance(data)
+  return mapPrometheusInstance(response)
+}, {
+  operation: 'update',
+  successMessage: (updatedItems, prevItems, { id }) => `Successfully updated Prometheus instance ${pipe(
+    find(propEq('uid', id)),
+    prop('name')
+  )(updatedItems)}`,
 })
 
 /* Service Accounts */
 
-export const loadServiceAccounts = contextLoader('serviceAccounts', async ({ apiClient, data }) => {
-  return apiClient.qbert.getServiceAccounts(data.clusterUuid, data.namespace)
+export const loadServiceAccounts = createContextLoader(serviceAccountsContextKey, async data => {
+  const { qbert } = ApiClient.getInstance()
+  return qbert.getServiceAccounts(data.clusterUuid, data.namespace)
 })
 
 /* Prometheus Rules */
@@ -103,41 +115,42 @@ const mapRule = ({ clusterUuid, metadata, spec }) => ({
   rules: pathOr([], ['groups', 0, 'rules'], spec),
 })
 
-export const loadPrometheusRules = contextLoader('prometheusRules', async ({ apiClient, loadFromContext }) => {
-  const clusterTags = await loadFromContext('clusterTags')
+export const loadPrometheusRules = createContextLoader(prometheusRulesContextKey, async (params, loadFromContext) => {
+  const { qbert } = ApiClient.getInstance()
+  const clusterTags = await loadFromContext(clusterTagsContextKey)
   const clusterUuids = clusterTags.filter(hasMonitoring).map(prop('uuid'))
-  return mapAsyncItems(clusterUuids, apiClient.qbert.getPrometheusRules, mapRule)
+  return mapAsyncItems(clusterUuids, qbert.getPrometheusRules, mapRule)
 })
 
-export const updatePrometheusRules = contextUpdater('prometheusRules', async ({ apiClient, data, currentItems, showToast }) => {
-  try {
-    const response = await apiClient.qbert.updatePrometheusRules(data)
-    const mapped = mapRule(response)
-    showToast(`Successfully updated Prometheus rule ${mapped.name}`, 'success')
-    const items = currentItems.map(x => x.uid === data.uid ? mapped : x)
-    return items
-  } catch (err) {
-    showToast(err, 'error')
-    console.log(err)
-  }
+export const updatePrometheusRules = createContextUpdater(prometheusRulesContextKey, async data => {
+  const { qbert } = ApiClient.getInstance()
+  const response = await qbert.updatePrometheusRules(data)
+  return mapRule(response)
+}, {
+  operation: 'update',
+  successMessage: (updatedItems, prevItems, { id }) => `Successfully updated Prometheus rule ${pipe(
+    find(propEq('uid', id)),
+    prop('name')
+  )(updatedItems)}`,
 })
 
-export const deletePrometheusRule = contextUpdater('prometheusRules', async ({ id, apiClient, currentItems, showToast }) => {
+export const deletePrometheusRule = createContextUpdater(prometheusRulesContextKey, async ({ id, apiClient, currentItems, showToast }) => {
+  const { qbert } = ApiClient.getInstance()
   const rule = currentItems.find(propEq('uid', id))
   if (!rule) {
-    console.error(`Unable to find prometheus rule with id: ${id} in deletePrometheusRule`)
-    return
+    throw new Error(notFoundErr)
   }
-
-  try {
-    await apiClient.qbert.deletePrometheusRule(rule.clusterUuid, rule.namespace, rule.name)
-    showToast(`Successfully deleted Prometheus rule ${rule.name}`, 'success')
-    const items = currentItems.filter(x => id !== x.uid)
-    return items
-  } catch (err) {
-    showToast(err, 'error')
-    console.log(err)
-  }
+  await qbert.deletePrometheusRule(rule.clusterUuid, rule.namespace, rule.name)
+}, {
+  operation: 'delete',
+  successMessage: (updatedItems, prevItems, { id }) => `Successfully deleted Prometheus rule ${pipe(
+    find(propEq('uid', id)),
+    prop('name')
+  )(prevItems)}`,
+  errorMessage: (catchedErr, { id }) => switchCase({
+    [notFoundErr]: `Unable to find prometheus rule with id: ${id} in deletePrometheusRule`,
+  }, `Error when trying to delete Prometheus rule with id: ${id}`
+  )(catchedErr.message),
 })
 
 /* Service Monitors */
@@ -152,39 +165,42 @@ const mapServiceMonitor = ({ clusterUuid, metadata, spec }) => ({
   selector: spec.selector.matchLabels,
 })
 
-export const loadPrometheusServiceMonitors = contextLoader('prometheusServiceMonitors', async ({ apiClient, loadFromContext }) => {
-  const clusterTags = await loadFromContext('clusterTags')
+export const loadPrometheusServiceMonitors = createContextLoader(prometheusServiceMonitorsContextKey, async () => {
+  const { qbert } = ApiClient.getInstance()
+  const clusterTags = await loadClusterTags()
   const clusterUuids = clusterTags.filter(hasMonitoring).map(prop('uuid'))
-  return mapAsyncItems(clusterUuids, apiClient.qbert.getPrometheusServiceMonitors, mapServiceMonitor)
+  return mapAsyncItems(clusterUuids, qbert.getPrometheusServiceMonitors, mapServiceMonitor)
 })
 
-export const updatePrometheusServiceMonitor = contextUpdater('prometheusServiceMonitors', async ({ apiClient, data, currentItems, showToast }) => {
-  try {
-    const response = await apiClient.qbert.updatePrometheusServiceMonitor(data)
-    const mapped = mapServiceMonitor(response)
-    showToast(`Successfully updated Prometheus ServiceMonitor ${mapped.name}`, 'success')
-    const items = currentItems.map(x => x.uid === data.uid ? mapped : x)
-    return items
-  } catch (err) {
-    showToast(err, 'error')
-    console.log(err)
-  }
+export const updatePrometheusServiceMonitor = createContextUpdater(prometheusServiceMonitorsContextKey, async data => {
+  const { qbert } = ApiClient.getInstance()
+  const response = await qbert.updatePrometheusServiceMonitor(data)
+  return mapServiceMonitor(response)
+}, {
+  operation: 'update',
+  successMessage: (updatedItems, prevItems, { id }) => `Successfully updated Prometheus ServiceMonitor ${pipe(
+    find(propEq('uid', id)),
+    prop('name')
+  )(updatedItems)}`,
 })
 
-export const deletePrometheusServiceMonitor = contextUpdater('prometheusServiceMonitors', async ({ id, currentItems, apiClient, showToast }) => {
-  const sm = currentItems.find(x => id === x.uid)
+export const deletePrometheusServiceMonitor = createContextUpdater(prometheusServiceMonitorsContextKey, async ({ id, currentItems, apiClient, showToast }) => {
+  const { qbert } = ApiClient.getInstance()
+  const sm = currentItems.find(propEq('uid', id))
   if (!sm) {
-    console.error(`Unable to find prometheus service monitor with id: ${id} in deletePrometheusServiceMonitor`)
-    return
+    throw new Error(notFoundErr)
   }
-  try {
-    await apiClient.qbert.deletePrometheusServiceMonitor(sm.clusterUuid, sm.namespace, sm.name)
-    showToast(`Successfully deleted Prometheus Service Monitor ${sm.name}`, 'success')
-    return currentItems.filter(x => x.uid !== sm.uid)
-  } catch (err) {
-    showToast(err, 'error')
-    console.log(err)
-  }
+  await qbert.deletePrometheusServiceMonitor(sm.clusterUuid, sm.namespace, sm.name)
+}, {
+  operation: 'delete',
+  successMessage: (updatedItems, prevItems, { id }) => `Successfully deleted Prometheus service monitor ${pipe(
+    find(propEq('uid', id)),
+    prop('name')
+  )(prevItems)}`,
+  errorMessage: (catchedErr, { id }) => switchCase({
+    [notFoundErr]: `Unable to find prometheus service monitor with id: ${id} in deletePrometheusServiceMonitor`,
+  }, `Error when trying to delete Prometheus service monitor with id: ${id}`
+  )(catchedErr.message),
 })
 
 /* Alert Managers */
@@ -198,37 +214,40 @@ const mapAlertManager = ({ clusterUuid, metadata, spec }) => ({
   labels: metadata.labels,
 })
 
-export const loadPrometheusAlertManagers = contextLoader('prometheusAlertManagers', async ({ apiClient, loadFromContext }) => {
-  const clusterTags = await loadFromContext('clusterTags')
+export const loadPrometheusAlertManagers = createContextLoader(prometheusAlertManagersContextKey, async () => {
+  const { qbert } = ApiClient.getInstance()
+  const clusterTags = await loadClusterTags()
   const clusterUuids = clusterTags.filter(hasMonitoring).map(prop('uuid'))
-  return mapAsyncItems(clusterUuids, apiClient.qbert.getPrometheusAlertManagers, mapAlertManager)
+  return mapAsyncItems(clusterUuids, qbert.getPrometheusAlertManagers, mapAlertManager)
 })
 
-export const updatePrometheusAlertManager = contextUpdater('prometheusAlertManagers', async ({ apiClient, data, currentItems, showToast }) => {
-  try {
-    const response = await apiClient.qbert.updatePrometheusAlertManager(data)
-    const mapped = mapAlertManager(response)
-    showToast(`Successfully updated Prometheus Alert Manager ${mapped.name}`, 'success')
-    const items = currentItems.map(x => x.uid === data.uid ? mapped : x)
-    return items
-  } catch (err) {
-    showToast(err, 'error')
-    console.log(err)
-  }
+export const updatePrometheusAlertManager = createContextUpdater(prometheusAlertManagersContextKey, async data => {
+  const { qbert } = ApiClient.getInstance()
+  const response = await qbert.updatePrometheusAlertManager(data)
+  return mapAlertManager(response)
+}, {
+  operation: 'update',
+  successMessage: (updatedItems, prevItems, { id }) => `Successfully updated Prometheus Alert Manager ${pipe(
+    find(propEq('uid', id)),
+    prop('name')
+  )(updatedItems)}`,
 })
 
-export const deletePrometheusAlertManager = contextUpdater('prometheusAlertManagers', async ({ id, currentItems, apiClient, showToast }) => {
-  const am = currentItems.find(x => id === x.uid)
+export const deletePrometheusAlertManager = createContextUpdater(prometheusAlertManagersContextKey, async ({ id, currentItems, apiClient, showToast }) => {
+  const { qbert } = ApiClient.getInstance()
+  const am = currentItems.find(propEq('uid', id))
   if (!am) {
-    console.error(`Unable to find prometheus alert manager with id: ${id} in deletePrometheusAlertManager`)
-    return
+    throw new Error(notFoundErr)
   }
-  try {
-    await apiClient.qbert.deletePrometheusAlertManager(am.clusterUuid, am.namespace, am.name)
-    showToast(`Successfully deleted Prometheus Alert Manager ${am.name}`, 'success')
-    return currentItems.filter(x => x.uid !== am.uid)
-  } catch (err) {
-    showToast(err, 'error')
-    console.log(err)
-  }
+  await qbert.deletePrometheusAlertManager(am.clusterUuid, am.namespace, am.name)
+}, {
+  operation: 'delete',
+  successMessage: (updatedItems, prevItems, { id }) => `Successfully deleted Prometheus Alert Manager ${pipe(
+    find(propEq('uid', id)),
+    prop('name')
+  )(prevItems)}`,
+  errorMessage: (catchedErr, { id }) => switchCase({
+    [notFoundErr]: `Unable to find prometheus Alert Manager with id: ${id} in deletePrometheusAlertManager`,
+  }, `Error when trying to delete Prometheus Alert Manager with id: ${id}`
+  )(catchedErr.message),
 })

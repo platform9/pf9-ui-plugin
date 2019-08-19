@@ -1,6 +1,6 @@
 import React from 'react'
 import { compose } from 'ramda'
-import { withAppContext } from 'core/AppContext'
+import { withAppContext } from 'core/AppProvider'
 import SimpleLink from 'core/components/SimpleLink'
 
 class DownloadKubeConfigLink extends React.Component {

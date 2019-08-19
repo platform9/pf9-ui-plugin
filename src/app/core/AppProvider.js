@@ -1,12 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { assocPath, flatten, omit } from 'ramda'
+import { assocPath, flatten, pipe } from 'ramda'
 
-export const Context = React.createContext({})
-export const Consumer = Context.Consumer
-export const Provider = Context.Provider
+export const AppContext = React.createContext({})
 
-class AppContext extends React.Component {
+class AppProvider extends React.Component {
   state = {
     ...this.props.initialContext,
 
@@ -34,31 +32,21 @@ class AppContext extends React.Component {
       })
     },
 
-    // Get an updated version of the current context values (not methods)
+    // Get an updated version of the current context
     getContext: getterFn => {
-      const contextValues = omit([
-        'initSession',
-        'updateSession',
-        'destroySession',
-        'getContext',
-        'setContext',
-      ], this.state)
-
-      // Return all values if no path is specified
-      return getterFn ? getterFn(contextValues) : contextValues
+      // Return all values if no getterFn is specified
+      return getterFn ? getterFn(this.state) : this.state
     },
 
-    setContext: (...args) => {
+    setContext: (setterFn, cb) => {
       // If the `setState` async callback is not passed in default to
       // return a Promise.
       return new Promise((resolve, reject) => {
-        if (args.length > 1) {
-          // The Promise will never resolve when a callback is passed
-          // but that's ok, because we are using the callback not an await.
-          return this.setState(...args)
+        if (cb) {
+          return this.setState(setterFn, pipe(cb, resolve))
         }
         setImmediate(() => { window.context = this.state })
-        this.setState(...args, resolve)
+        this.setState(setterFn, resolve)
       })
     },
   }
@@ -71,23 +59,23 @@ class AppContext extends React.Component {
 
   render () {
     return (
-      <Provider value={this.state}>
+      <AppContext.Provider value={this.state}>
         {this.props.children}
-      </Provider>
+      </AppContext.Provider>
     )
   }
 }
 
-AppContext.propTypes = {
+AppProvider.propTypes = {
   initialContext: PropTypes.object,
 }
 
-AppContext.defaultProps = {
+AppProvider.defaultProps = {
   initialContext: {},
 }
 
 export const withAppContext = Component => props =>
-  <Consumer>
+  <AppContext.Consumer>
     {
       ({ getContext, setContext, loadFromContext, initSession, updateSession, destroySession, ...rest }) =>
         <Component
@@ -101,6 +89,6 @@ export const withAppContext = Component => props =>
           context={rest}
         />
     }
-  </Consumer>
+  </AppContext.Consumer>
 
-export default AppContext
+export default AppProvider

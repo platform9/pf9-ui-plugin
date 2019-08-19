@@ -8,7 +8,7 @@ import { assoc } from 'ramda'
 import { makeStyles } from '@material-ui/styles'
 import { Button } from '@material-ui/core'
 
-const keyValueStyles = theme => ({
+const useKeyValueStyles = makeStyles(theme => ({
   root: {
     display: 'flex',
     flexFlow: 'row nowrap',
@@ -28,10 +28,10 @@ const keyValueStyles = theme => ({
     flexGrow: 0,
     padding: 0,
   },
-})
+}))
 
 const KeyValue = ({ entry = {}, onChange, onDelete, keySuggestions, valueSuggestions }) => {
-  const classes = makeStyles(keyValueStyles)()
+  const classes = useKeyValueStyles()
   const [state, setState] = useState({
     id: entry.id || uuid.v4(),
     key: entry.key || '',
@@ -66,7 +66,7 @@ const KeyValue = ({ entry = {}, onChange, onDelete, keySuggestions, valueSuggest
   )
 }
 
-const styles = theme => ({
+const useStyles = makeStyles(theme => ({
   root: {
     display: 'flex',
     flexFlow: 'column',
@@ -76,7 +76,7 @@ const styles = theme => ({
   addButton: {
     marginTop: theme.spacing(0.5),
   },
-})
+}))
 
 const newEntry = () => ({ id: uuid.v4(), key: '', value: '' })
 
@@ -88,7 +88,7 @@ const newEntry = () => ({ id: uuid.v4(), key: '', value: '' })
 const addId = entry => ({ ...entry, id: uuid.v4() })
 
 const KeyValues = ({ entries: _entries, onChange, keySuggestions, valueSuggestions }) => {
-  const classes = makeStyles(styles)()
+  const classes = useStyles()
   const entriesWithId = [...(_entries || []).map(addId), newEntry()]
   const [entries, setEntries] = useState(entriesWithId)
 

@@ -2,14 +2,14 @@ import React from 'react'
 import Selector from 'core/components/Selector'
 import { appUrlRoot } from 'app/constants'
 import { compose, pluck, propEq, pathOr } from 'ramda'
-import { withAppContext } from 'core/AppContext'
+import { withAppContext } from 'core/AppProvider'
 import { withScopedPreferences } from 'core/providers/PreferencesProvider'
-import contextLoader from 'core/helpers/contextLoader'
+import createContextLoader, { dataKey } from 'core/helpers/createContextLoader'
 import withDataLoader from 'core/hocs/withDataLoader'
 import withDataMapper from 'core/hocs/withDataMapper'
 import { Tooltip } from '@material-ui/core'
 
-const loadRegions = contextLoader('regions', async ({ apiClient }) => {
+const loadRegions = createContextLoader('regions', async ({ apiClient }) => {
   return apiClient.keystone.getRegions()
 })
 
@@ -74,7 +74,7 @@ export default compose(
   withAppContext,
   withDataLoader({ regions: loadRegions }, { inlineProgress: true }),
   withDataMapper({
-    regions: pathOr([], ['context', 'regions']),
+    regions: pathOr([], [dataKey, 'regions']),
   }),
   withScopedPreferences('RegionChooser'),
 )(RegionChooser)

@@ -2,7 +2,7 @@ import React from 'react'
 import Panel from './Panel'
 import TypographyVariant from './TypographyVariant'
 import { path } from 'ramda'
-import { withAppContext } from 'core/AppContext'
+import { withAppContext } from 'core/AppProvider'
 
 const TypographyPanel = ({ context: { theme } }) => {
   const isVariant = x => !!path([x, 'fontSize'], theme.typography)

@@ -163,10 +163,16 @@ Progress.propTypes = {
 
 Progress.defaultProps = {
   loading: false,
-  overlay: false,
+  overlay: true,
+  inline: false,
   renderContentOnMount: false,
   renderLoadingImage: true,
   message: 'Loading...',
 }
+
+export const withProgress = Component => ({ overlay, inline, loading, ...props }) =>
+  <Progress overlay={overlay} inline={inline} loading={loading}>
+    <Component {...props} />
+  </Progress>
 
 export default withStyles(styles)(Progress)

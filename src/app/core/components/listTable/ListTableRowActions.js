@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { IconButton, Tooltip } from '@material-ui/core'
-import { withAppContext } from 'core/AppContext'
+import { withAppContext } from 'core/AppProvider'
 
 const ListTableRowActions = ({ actionClassName, context, rowActions, selected }) => {
   const _selected = selected || []

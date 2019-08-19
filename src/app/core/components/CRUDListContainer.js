@@ -83,7 +83,7 @@ class CRUDListContainer extends React.Component {
 
   render () {
     return (
-      <Progress renderContentOnMount overlay loading={this.state.deleting}>
+      <Progress renderContentOnMount overlay loading={this.state.deleting || this.props.loading}>
         <ConfirmationDialog
           open={this.state.showConfirmation}
           text={this.deleteConfirmText()}
@@ -101,6 +101,7 @@ class CRUDListContainer extends React.Component {
 }
 
 CRUDListContainer.propTypes = {
+  loading: PropTypes.bool,
   addUrl: PropTypes.string,
   editUrl: PropTypes.string,
 

@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
-import AppContext from 'core/AppContext'
+import AppProvider from 'core/AppProvider'
 import AppContainer from 'core/components/AppContainer'
 import HotKeysProvider from 'core/providers/HotKeysProvider'
 import PreferencesProvider from 'core/providers/PreferencesProvider'
@@ -23,9 +23,10 @@ window.process = process
 
 if (config.apiHost === undefined) { throw new Error('config.js does not contain "apiHost"') }
 
-const apiClient = new ApiClient({ keystoneEndpoint: `${config.apiHost}/keystone` })
+// Initialize ApiClient singleton
+ApiClient.init({ keystoneEndpoint: `${config.apiHost}/keystone` })
 
-class App extends React.Component {
+class App extends PureComponent {
   renderFooter = () => (
     <div id="_main-footer">
       TODO: Footer
@@ -81,7 +82,7 @@ class App extends React.Component {
     return (
       <Router>
         <HotKeysProvider>
-          <AppContext initialContext={{ apiClient, initialized: false, sessionLoaded: false }}>
+          <AppProvider initialContext={{ initialized: false, sessionLoaded: false }}>
             <PreferencesProvider>
               <ThemeManager>
                 <ToastProvider>
@@ -97,7 +98,7 @@ class App extends React.Component {
                 </ToastProvider>
               </ThemeManager>
             </PreferencesProvider>
-          </AppContext>
+          </AppProvider>
         </HotKeysProvider>
       </Router>
     )

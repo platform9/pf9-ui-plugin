@@ -1,6 +1,6 @@
 import React from 'react'
 import { compose, pathOr } from 'ramda'
-import { withAppContext } from 'core/AppContext'
+import { withAppContext } from 'core/AppProvider'
 import { detachNodesFromCluster } from './actions'
 import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab'
 import {
@@ -10,6 +10,7 @@ import {
 import { loadNodes } from 'k8s/components/infrastructure/actions'
 import withDataLoader from 'core/hocs/withDataLoader'
 import withDataMapper from 'core/hocs/withDataMapper'
+import { dataKey } from 'core/helpers/createContextLoader'
 
 // The modal is technically inside the row, so clicking anything inside
 // the modal window will cause the table row to be toggled.
@@ -28,13 +29,13 @@ class ClusterDetachNodeDialog extends React.Component {
   }
 
   handleSubmit = async () => {
-    const { row, context, setContext } = this.props
+    const { row, getContext, setContext } = this.props
 
     const nodeUuids = Object.keys(this.state)
       .filter(uuid => this.state[uuid] === 'detach')
 
     const clusterUuid = row.uuid
-    await detachNodesFromCluster({ data: { clusterUuid, nodeUuids }, context, setContext })
+    await detachNodesFromCluster({ getContext, setContext, params: { clusterUuid, nodeUuids } })
     this.handleClose()
   }
 
@@ -110,5 +111,5 @@ class ClusterDetachNodeDialog extends React.Component {
 export default compose(
   withAppContext,
   withDataLoader({ nodes: loadNodes }),
-  withDataMapper({ nodes: pathOr([], ['context', 'nodes']) }),
+  withDataMapper({ nodes: pathOr([], [dataKey, dataKey, 'nodes']) }),
 )(ClusterDetachNodeDialog)

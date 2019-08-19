@@ -47,7 +47,7 @@ const styles = theme => ({
   },
 })
 
-const ToastContext = React.createContext()
+export const ToastContext = React.createContext()
 
 const toastsTimeout = 5000
 

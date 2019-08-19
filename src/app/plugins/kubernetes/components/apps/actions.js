@@ -1,40 +1,46 @@
-import { prop, pluck } from 'ramda'
-import clusterContextLoader from 'core/helpers/clusterContextLoader'
-import contextLoader from 'core/helpers/contextLoader'
-import { asyncFlatMap } from 'utils/fp'
+import { pluck } from 'ramda'
+import ApiClient from 'api-client/ApiClient'
+import createContextLoader from 'core/helpers/createContextLoader'
+import createContextUpdater from 'core/helpers/createContextUpdater'
+import { pipeAsync, asyncFlatMap } from 'utils/fp'
+import { allKey } from 'app/constants'
+import { parseClusterParams } from 'k8s/components/infrastructure/actions'
 
-export const loadApps = clusterContextLoader(
-  'apps',
-  async ({ apiClient, params: { clusterId }, loadFromContext }) => {
-    const { qbert } = apiClient
-    const clusters = await loadFromContext('clusters')
-    return !clusterId || clusterId === '__all__'
-      ? asyncFlatMap(pluck('uuid', clusters), qbert.getCharts)
-      : qbert.getCharts(clusterId)
-  })
+export const loadApps = createContextLoader('apps', pipeAsync(
+  parseClusterParams,
+  async ({ clusterId, clusters }) => {
+    const { qbert } = ApiClient.getInstance()
+    if (clusterId === allKey) {
+      return asyncFlatMap(pluck('uuid', clusters), qbert.getCharts)
+    }
+    return qbert.getCharts(clusterId)
+  }),
+{ indexBy: 'clusterId' })
 
-export const loadReleases = clusterContextLoader(
-  'releases',
-  async ({ apiClient, params: { clusterId }, loadFromContext }) => {
-    const { qbert } = apiClient
-    const clusters = await loadFromContext('clusters')
-    return !clusterId || clusterId === '__all__'
-      ? asyncFlatMap(pluck('uuid', clusters), qbert.getReleases)
-      : qbert.getReleases(clusterId)
-  })
+export const loadReleases = createContextLoader('releases', pipeAsync(
+  parseClusterParams,
+  async ({ clusterId, clusters }) => {
+    const { qbert } = ApiClient.getInstance()
+    if (clusterId === allKey) {
+      return asyncFlatMap(pluck('uuid', clusters), qbert.getReleases)
+    }
+    return qbert.getReleases(clusterId)
+  }),
+{ indexBy: 'clusterId' })
 
 export const deleteRelease = async ({ data, setContext, reload }) => {
   // TODO
 }
 
-export const loadRepositories = contextLoader('repositories',
-  async ({ apiClient }) => {
-    return apiClient.qbert.getRepositories().then(prop('data'))
-  })
+export const loadRepositories = createContextLoader('repositories', async () => {
+  const { qbert } = ApiClient.getInstance()
+  const { data } = qbert.getRepositories()
+  return data
+})
 
-export const deleteRepository = async ({ data, setContext, params, reload }) => {
+export const deleteRepository = createContextUpdater('repositories', async (params, currentItems) => {
   // TODO
-}
+})
 
 export const editApp = async ({ id, context, setContext }) => {}
 

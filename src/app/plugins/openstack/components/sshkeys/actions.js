@@ -1,23 +1,22 @@
+import ApiClient from 'api-client/ApiClient'
 import uuid from 'uuid'
-import contextLoader from 'core/helpers/contextLoader'
-import contextUpdater from 'core/helpers/contextUpdater'
+import createContextLoader from 'core/helpers/createContextLoader'
+import createContextUpdater from 'core/helpers/createContextUpdater'
 
-const dataKey = 'sshKeys'
-
+const sshContextKey = 'sshKeys'
 const injectIds = x => ({ ...x, id: x.id || uuid.v4() })
 
-export const loadSshKeys = contextLoader(dataKey, async ({ apiClient }) => {
-  return (await apiClient.nova.getSshKeys()).map(injectIds)
+export const loadSshKeys = createContextLoader(sshContextKey, async () => {
+  const { nova } = ApiClient.getInstance()
+  return (await nova.getSshKeys()).map(injectIds)
 })
 
-export const createSshKey = contextUpdater(dataKey, async ({ apiClient, data, context, setContext }) => {
-  const existing = await loadSshKeys({ context, setContext })
-  const created = await apiClient.nova.createSshKey(data)
-  return [ ...existing, created ]
-}, { returnLast: true })
+export const createSshKey = createContextUpdater(sshContextKey, async data => {
+  const { nova } = ApiClient.getInstance()
+  return nova.createSshKey(data)
+}, { operation: 'create' })
 
-export const deleteSshKey = contextUpdater(dataKey, async ({ apiClient, id, loadFromContext }) => {
-  await apiClient.nova.deleteSshKey(id)
-  const keys = await loadFromContext(dataKey)
-  return keys.filter(x => x.id !== id)
-})
+export const deleteSshKey = createContextUpdater(sshContextKey, async ({ id }) => {
+  const { nova } = ApiClient.getInstance()
+  await nova.deleteSshKey(id)
+}, { operation: 'delete' })

@@ -1,7 +1,7 @@
 import React from 'react'
 import { withRouter } from 'react-router-dom'
 import { compose } from 'app/utils/fp'
-import { withAppContext } from 'core/AppContext'
+import { withAppContext } from 'core/AppProvider'
 import FormWrapper from 'core/components/FormWrapper'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import createFormComponent from 'core/helpers/createFormComponent'

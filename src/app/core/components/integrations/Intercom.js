@@ -1,5 +1,5 @@
 import React from 'react'
-import { withAppContext } from 'core/AppContext'
+import { withAppContext } from 'core/AppProvider'
 import BaseIntercom from 'react-intercom'
 
 const Intercom = ({ context: { session } }) => {

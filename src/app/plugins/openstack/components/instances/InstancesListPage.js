@@ -3,9 +3,9 @@ import DataLoader from 'core/DataLoader'
 import React from 'react'
 import requiresAuthentication from '../../util/requiresAuthentication'
 import InstancesListContainer from './InstancesListContainer'
-import contextLoader from 'core/helpers/contextLoader'
+import createContextLoader from 'core/helpers/createContextLoader'
 
-const loadInstances = contextLoader('instances', async ({ apiClient }) => {
+const loadInstances = createContextLoader('instances', async ({ apiClient }) => {
   return apiClient.nova.getInstances()
 })
 

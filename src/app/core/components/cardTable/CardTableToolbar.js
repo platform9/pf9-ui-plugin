@@ -13,6 +13,9 @@ const styles = theme => ({
   root: {
     paddingRight: theme.spacing(1),
     marginBottom: theme.spacing(1),
+    '& .MuiOutlinedInput-root': {
+      marginBottom: theme.spacing(1),
+    },
   },
   spacer: {
     flex: '1 1 100%',
@@ -123,16 +126,18 @@ const CardTableToolbar = ({
     )}
     <div className={classes.actions}>
       <div className={classes.filters}>
-        {filters.map(({ field, value, ...filterProps }) => (
-          <FilterDropdown
-            key={field}
-            {...filterProps}
-            classes={classes}
-            onChange={onFilterUpdate(field)}
-            field={field}
-            value={value !== undefined ? value : filterValues[field]}
-          />
-        ))}
+        {Array.isArray(filters)
+          ? filters.map(({ field, value, ...filterProps }) => (
+            <FilterDropdown
+              key={field}
+              {...filterProps}
+              classes={classes}
+              onChange={onFilterUpdate(field)}
+              field={field}
+              value={value !== undefined ? value : filterValues[field]}
+            />
+          ))
+          : filters}
       </div>
       <div className={classes.controls}>
         {sorting.length && (
@@ -158,6 +163,15 @@ const CardTableToolbar = ({
   </Toolbar>
 )
 
+export const filterSpecPropType = PropTypes.shape({
+  field: PropTypes.string.isRequired,
+  label: PropTypes.string, // Will override column label
+  type: PropTypes.oneOf(['select', 'multiselect', 'checkbox', 'custom']).isRequired,
+  render: PropTypes.func, // Use for rendering a custom component, received props: {value, onChange}
+  filterWith: PropTypes.func, // Custom filtering function, received params: (filterValue, value, row)
+  items: PropTypes.array, // Array of possible values (only when using select/multiselect)
+})
+
 CardTableToolbar.propTypes = {
   direction: PropTypes.oneOf(['asc', 'desc']),
   orderBy: PropTypes.string,
@@ -167,17 +181,7 @@ CardTableToolbar.propTypes = {
   searchTerm: PropTypes.string,
   title: PropTypes.string,
   classes: PropTypes.object.isRequired,
-  filters: PropTypes.arrayOf(
-    PropTypes.shape({
-      field: PropTypes.string.isRequired,
-      label: PropTypes.string, // Will override column label
-      type: PropTypes.oneOf(['select', 'multiselect', 'checkbox', 'custom'])
-        .isRequired,
-      render: PropTypes.func, // Use for rendering a custom component, received props: {value, onChange}
-      filterWith: PropTypes.func, // Custom filtering function, received params: (filterValue, value, row)
-      items: PropTypes.array, // Array of possible values (only when using select/multiselect)
-    }),
-  ),
+  filters: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(filterSpecPropType)]),
   filterValues: PropTypes.object,
   onFilterUpdate: PropTypes.func,
 }

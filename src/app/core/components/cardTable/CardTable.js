@@ -1,27 +1,30 @@
 import { Grid, Paper, TablePagination } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, { PureComponent } from 'react'
 import CardTableToolbar from './CardTableToolbar'
 import { assocPath, assoc, propOr, propEq, pathOr } from 'ramda'
 import { ensureFunction, compose } from 'utils/fp'
 import moize from 'moize'
-import { withAppContext } from 'core/AppContext'
+import { withAppContext } from 'core/AppProvider'
+import Progress, { withProgress } from 'core/components/progress/Progress'
+import { filterSpecPropType } from 'core/components/cardTable/CardTableToolbar'
 
 const styles = theme => ({
   root: {
     width: '100%',
-    marginTop: theme.spacing(3)
+    marginTop: theme.spacing(3),
   },
   table: {
-    minWidth: 800
+    minWidth: 800,
   },
   tableWrapper: {
-    overflowX: 'auto'
-  }
+    overflowX: 'auto',
+  },
 })
 
-class CardTable extends React.Component {
+@withProgress
+class CardTable extends PureComponent {
   state = {
     rowsPerPage: this.props.rowsPerPage,
     orderBy: null,
@@ -29,13 +32,13 @@ class CardTable extends React.Component {
     page: 0,
     selected: [],
     searchTerm: '',
-    filterValues: {}
+    filterValues: {},
   }
 
   handleSearch = value => {
     if (this.props.searchTarget) {
       this.setState({
-        searchTerm: value
+        searchTerm: value,
       })
     }
   }
@@ -46,10 +49,10 @@ class CardTable extends React.Component {
     const sortWith = propOr(
       (prevValue, nextValue) => (nextValue < prevValue ? -1 : 1),
       'sortWith',
-      sorting.find(propEq('id', orderBy))
+      sorting.find(propEq('id', orderBy)),
     )
     const sortedRows = [...data].sort((a, b) =>
-      sortWith(b[orderBy], a[orderBy])
+      sortWith(b[orderBy], a[orderBy]),
     )
     return this.state.direction === 'desc' ? sortedRows : sortedRows.reverse()
   }
@@ -68,7 +71,7 @@ class CardTable extends React.Component {
         assocPath(['filterValues', columnId], selectedValue),
         () => {
           filter.onChange && filter.onChange(selectedValue)
-        }
+        },
       )
     }
   })
@@ -82,7 +85,7 @@ class CardTable extends React.Component {
   handleChangeRowsPerPage = event => {
     const { value: rowsPerPage } = event.target
     this.setState({ rowsPerPage }, () =>
-      ensureFunction(this.props.onRowsPerPageChange)(rowsPerPage)
+      ensureFunction(this.props.onRowsPerPageChange)(rowsPerPage),
     )
   }
 
@@ -91,8 +94,8 @@ class CardTable extends React.Component {
     return data.filter(
       ele =>
         pathOr('', target.split('.'), ele).match(
-          new RegExp(searchTerm, 'i')
-        ) !== null
+          new RegExp(searchTerm, 'i'),
+        ) !== null,
     )
   }
 
@@ -130,8 +133,8 @@ class CardTable extends React.Component {
       ([columnId, filterValue]) => ({
         columnId,
         filterValue,
-        filter: filters.find(propEq('field', columnId))
-      })
+        filter: filters.find(propEq('field', columnId)),
+      }),
     )
 
     return filterParams.reduce(
@@ -147,7 +150,7 @@ class CardTable extends React.Component {
           return filterWith(filterValue, row[columnId])
         })
       },
-      data
+      data,
     )
   }
 
@@ -168,11 +171,11 @@ class CardTable extends React.Component {
       direction,
       orderBy,
       filterValues,
-      searchTerm
+      searchTerm,
     } = this.state
     const {
       classes, paginate,
-      data, sorting, filters, children
+      data, sorting, filters, children,
     } = this.props
 
     if (!data) {
@@ -211,25 +214,16 @@ class CardTable extends React.Component {
 
 CardTable.propTypes = {
   data: PropTypes.arrayOf(PropTypes.object).isRequired,
-  filters: PropTypes.arrayOf(
-    PropTypes.shape({
-      field: PropTypes.string.isRequired,
-      label: PropTypes.string, // Will override column label
-      type: PropTypes.oneOf(['select', 'multiselect', 'checkbox', 'custom'])
-        .isRequired,
-      render: PropTypes.func, // Use for rendering a custom component, received props: {value, onChange}
-      filterWith: PropTypes.func, // Custom filtering function, received params: (filterValue, value, row)
-      items: PropTypes.array // Array of possible values (only when using select/multiselect)
-    })
-  ),
+  filters: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(filterSpecPropType)]),
   searchTarget: PropTypes.string,
   sorting: PropTypes.arrayOf(
     PropTypes.shape({
       field: PropTypes.string.isRequired,
       label: PropTypes.string, // Will override column label
       sortWith: PropTypes.func,
-    })
-  )
+    }),
+  ),
+  ...Progress.propTypes,
 }
 
 CardTable.defaultProps = {
@@ -237,10 +231,11 @@ CardTable.defaultProps = {
   data: [],
   filters: [],
   sorting: [],
-  rowsPerPage: 24
+  rowsPerPage: 24,
+  loading: false,
 }
 
 export default compose(
   withStyles(styles),
-  withAppContext
+  withAppContext,
 )(CardTable)
