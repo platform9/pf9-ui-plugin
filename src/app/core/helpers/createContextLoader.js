@@ -1,8 +1,8 @@
-import { concat, identity, assoc, find, whereEq, when, isNil, reject, filter, always, append, uniqWith, eqProps, pipe, over, lensPath, pickAll, set, view } from 'ramda'
+import { pick, isEmpty, concat, identity, assoc, find, whereEq, when, isNil, reject, filter, always, append, uniqWith, eqProps, pipe, over, lensPath, pickAll, set, view } from 'ramda'
 import { ensureFunction, ensureArray, emptyObj, emptyArr } from 'utils/fp'
 import moize from 'moize'
 
-export const defaultUniqueIdentifier = 'id'
+export const defaultUniqueIdentifier = 'uuid'
 export const paramsContextKey = 'cachedParams'
 export const dataContextKey = 'cachedData'
 
@@ -22,6 +22,7 @@ export const getContextLoader = key => {
  * @param {string} [options.uniqueIdentifier="id"] Unique primary key of the entity
  * @param {string} [options.entityName=options.uniqueIdentifier] Name of the entity
  * @param {string|array} [options.indexBy] Keys to use to index the values
+ * @param {bool} [options.skipEmptyParamCalls=!!indexBy] Skip calls that doesn't contain any of the required indexed keys in the params
  * @param {function} [options.dataMapper] Function used to apply additional transformations to loaded data
  * @param {function|string} [options.successMessage] Custom message to display after the items have been successfully fetched
  * @param {function|string} [options.errorMessage] Custom message to display after an error has been thrown
@@ -30,8 +31,9 @@ export const getContextLoader = key => {
 const createContextLoader = (key, dataFetchFn, options = emptyObj) => {
   const {
     uniqueIdentifier = defaultUniqueIdentifier,
-    entityName = key.charAt(0).toUpperCase() + key.slice(1).toLowerCase(),
+    entityName = key.charAt(0).toUpperCase() + key.slice(1),
     indexBy,
+    skipEmptyParamCalls = !!indexBy,
     dataMapper = identity,
     successMessage = (params) => `Successfully retrieved ${entityName} items`,
     errorMessage = (catchedErr, params) => `Error when trying to retrieve ${entityName} items`,
@@ -40,20 +42,23 @@ const createContextLoader = (key, dataFetchFn, options = emptyObj) => {
   const dataLens = lensPath([dataContextKey, key])
   const arrayIfNil = when(isNil, always(emptyArr))
   const contextLoaderFn = moize(async ({ getContext, setContext, params = emptyObj, refetch = false, additionalOptions = emptyObj }) => {
+    const indexByAll = indexBy ? ensureArray(indexBy) : emptyArr
+    if (skipEmptyParamCalls && isEmpty(pick(indexByAll, params))) {
+      return emptyArr
+    }
     const {
       onSuccess = (successMessage, params) => console.info(successMessage),
       onError = (errorMessage, catchedErr, params) => console.error(errorMessage, catchedErr),
     } = additionalOptions
-    const indexByAll = indexBy ? ensureArray(indexBy) : emptyArr
+    const indexedParams = pickAll(indexByAll, params)
     const loadFromContext = (key, params, refetch) => {
       const loaderFn = getContextLoader(key)
       return loaderFn({ getContext, setContext, params, refetch, additionalOptions })
     }
-    const indexedParams = pickAll(indexByAll, params)
+
     if (!refetch) {
       const allCachedParams = getContext(view(paramsLens)) ||
         (setContext(set(paramsLens, emptyArr)) && emptyArr)
-
       if (find(whereEq(indexedParams), allCachedParams)) {
         // Return the cached data
         return getContext(pipe(
@@ -63,7 +68,7 @@ const createContextLoader = (key, dataFetchFn, options = emptyObj) => {
         ))
       }
     }
-    // if refetch = true or no cached params are found, fetch the items
+    // if refetch = true or no cached params have been found, fetch the items
     try {
       const fetchedItems = await dataFetchFn(params, loadFromContext)
       await setContext(pipe(

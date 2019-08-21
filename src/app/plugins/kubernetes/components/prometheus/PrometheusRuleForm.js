@@ -11,15 +11,13 @@ const styles = theme => ({
   root: {
   }
 })
+const initialValues = {
+  severity: 'warning',
+}
+const severityOptions = 'critical warning info'.split(' ').map(x => ({ value: x, label: x }))
 
 // TODO: Need some UI mechanism to delete a rule.
 const PrometheusRuleForm = ({ onDelete, onSubmit, classes }) => {
-  const severityOptions = 'critical warning info'.split(' ').map(x => ({ value: x, label: x }))
-
-  const initialValues = {
-    severity: 'warning',
-  }
-
   return (
     <Card className={classes.root}>
       <CardContent>

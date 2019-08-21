@@ -11,7 +11,6 @@ const ListPage = ({ ListContainer }) => {
     const [data, loading, reload] = useDataLoader('kubeServices', params)
     return <div>
       <ClusterPicklist
-        formField={false}
         onChange={handleClusterChange}
         value={params.clusterId}
       />

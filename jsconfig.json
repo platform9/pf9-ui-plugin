@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+      "baseUrl": "./",
+      "paths": {
+        "core/*": ["src/app/core/*"],
+        "openstack/*": ["src/app/plugins/openstack/*"],
+        "k8s/*": ["src/app/plugins/kubernetes/*"],
+        "sim/*": ["src/openstack-simulator/*"],
+        "utils/*": ["src/app/utils/*"],
+        "app/*": ["src/app/*"],
+        "server/*": ["src/server/*"],
+        "api-client/*": ["src/api-client/*"]
+      },
+      "experimentalDecorators": true
+    },
+    "exclude": [
+        "node_modules"
+    ]
+  }

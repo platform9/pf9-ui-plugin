@@ -1,50 +1,35 @@
-import React from 'react'
+import React, { useState, useCallback } from 'react'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import SubmitButton from 'core/components/SubmitButton'
-import TextField from 'core/components/validatedForm/TextField'
 import createAddComponents from 'core/helpers/createAddComponents'
-import { loadClusters } from '../infrastructure/actions'
-import { createNamespace } from './actions'
+import { emptyObj } from 'utils/fp'
+import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
+import TextField from 'core/components/validatedForm/TextField'
+import { namespacesDataKey } from './actions'
 
-export class AddNamespaceForm extends React.Component {
-  state = {
-    clusterId: null,
-    clustersOptions: null
-  }
-
-  async componentDidMount () {
-    // Make sure to use the new reference to context.  It changes after loadInfrastucture.
-    const clusterOptions = this.props.context.clusters.map(c => ({ value: c.uuid, label: c.name }))
-    this.setState({ clusterOptions })
-  }
-
-  setField = key => value => {
-    this.setState({ [key]: value })
-  }
-
-  render () {
-    const { clusterOptions } = this.state
-    if (!clusterOptions) { return null }
-    const { onComplete } = this.props
-    return (
-      <ValidatedForm onSubmit={onComplete}>
-        <TextField id="name" label="Name" />
-        <PicklistField id="clusterId"
-          label="cluster"
-          onChange={this.setField('clusterId')}
-          options={clusterOptions}
-        />
-        <SubmitButton>Add Namespace</SubmitButton>
-      </ValidatedForm>
-    )
-  }
+export const AddNamespaceForm = ({ onComplete }) => {
+  const [params, setParams] = useState(emptyObj)
+  const handleClusterChange = useCallback(clusterId => setParams({ clusterId }), [])
+  return (
+    <ValidatedForm onSubmit={onComplete}>
+      <TextField id="name" label="Name" required />
+      <PicklistField
+        DropdownComponent={ClusterPicklist}
+        id="clusterId"
+        label="Cluster"
+        onChange={handleClusterChange}
+        value={params.clusterId}
+        required
+      />
+      <SubmitButton>Add Namespace</SubmitButton>
+    </ValidatedForm>
+  )
 }
 
 export const options = {
+  dataKey: namespacesDataKey,
   FormComponent: AddNamespaceForm,
-  createFn: createNamespace,
-  loaderFn: loadClusters,
   listUrl: '/ui/kubernetes/namespaces',
   name: 'AddNamespace',
   title: 'Add Namespace',

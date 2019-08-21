@@ -3,7 +3,11 @@ import createCRUDActions from 'core/helpers/createCRUDActions'
 import createContextUpdater from 'core/helpers/createContextUpdater'
 import ApiClient from 'api-client/ApiClient'
 
-const podCRUDActions = createCRUDActions({ service: 'qbert', entity: 'pods' })
+export const podsDataKey = 'pods'
+export const kubeServicesDataKey = 'kubeServices'
+export const deploymentsDataKey = 'deployments'
+
+const podCRUDActions = createCRUDActions({ service: 'qbert', entity: podsDataKey })
 const deploymentCRUDActions = createCRUDActions({
   service: 'qbert',
   entity: 'deployments',
@@ -11,14 +15,14 @@ const deploymentCRUDActions = createCRUDActions({
 const serviceCRUDActions = createCRUDActions({
   service: 'qbert',
   entity: 'services',
-  dataKey: 'kubeServices',
+  dataKey: kubeServicesDataKey,
 })
 
 export const loadPods = podCRUDActions.list
 export const loadDeployments = deploymentCRUDActions.list
 export const loadServices = serviceCRUDActions.list
 
-export const createPod = createContextUpdater('pods', async ({ clusterId, namespace, podYaml }) => {
+export const createPod = createContextUpdater(podsDataKey, async ({ clusterId, namespace, podYaml }) => {
   const { qbert } = ApiClient.getInstance()
   const body = yaml.safeLoad(podYaml)
   const created = await qbert.createPod(clusterId, namespace, body)
@@ -35,13 +39,13 @@ export const createPod = createContextUpdater('pods', async ({ clusterId, namesp
   }
 }, { operation: 'create' })
 
-export const deletePod = createContextUpdater('pods', async ({ id }, currentItems) => {
+export const deletePod = createContextUpdater(podsDataKey, async ({ id }, currentItems) => {
   const { qbert } = ApiClient.getInstance()
   const { clusterId, namespace, name } = await currentItems.find(x => x.id === id)
   await qbert.deletePod(clusterId, namespace, name)
 }, { operation: 'delete' })
 
-export const createDeployment = createContextUpdater('deployments', async ({ clusterId, namespace, deploymentYaml }) => {
+export const createDeployment = createContextUpdater(deploymentsDataKey, async ({ clusterId, namespace, deploymentYaml }) => {
   const { qbert } = ApiClient.getInstance()
   const body = yaml.safeLoad(deploymentYaml)
   const created = await qbert.createDeployment(clusterId, namespace, body)
@@ -59,7 +63,7 @@ export const createDeployment = createContextUpdater('deployments', async ({ clu
   onSuccess: ({ clusterId }) => loadPods({ clusterId }, true)
 })
 
-export const createService = createContextUpdater('kubeServices', async ({ clusterId, namespace, serviceYaml }) => {
+export const createService = createContextUpdater(kubeServicesDataKey, async ({ clusterId, namespace, serviceYaml }) => {
   const { qbert } = ApiClient.getInstance()
   const body = yaml.safeLoad(serviceYaml)
   const created = await qbert.createService(clusterId, namespace, body)
@@ -73,7 +77,7 @@ export const createService = createContextUpdater('kubeServices', async ({ clust
   }
 }, { operation: 'create' })
 
-export const deleteService = createContextUpdater('kubeServices', async ({ id }, currentItems) => {
+export const deleteService = createContextUpdater(kubeServicesDataKey, async ({ id }, currentItems) => {
   const { qbert } = ApiClient.getInstance()
   const { clusterId, namespace, name } = await currentItems.find(x => x.id === id)
   await qbert.deleteService(clusterId, namespace, name)

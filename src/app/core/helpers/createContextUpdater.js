@@ -26,7 +26,7 @@ export const getContextUpdater = (key, operation) => {
 const createContextUpdater = (key, dataUpdateFn, options = emptyObj) => {
   const {
     uniqueIdentifier = defaultUniqueIdentifier,
-    entityName = key.charAt(0).toUpperCase() + key.slice(1).toLowerCase(),
+    entityName = key.charAt(0).toUpperCase() + key.slice(1),
     operation = 'any',
     successMessage = (updatedItems, prevItems, params) => `${entityName} item ${switchCase({
       create: 'created',

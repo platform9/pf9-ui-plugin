@@ -17,6 +17,7 @@ const PicklistField = React.forwardRef(({ DropdownComponent, id, info, placement
   return <InfoTooltip open={open} info={info} placement={placement}>
     <DropdownComponent
       {...restProps}
+      formField
       onMouseEnter={openTooltip}
       onMouseLeave={closeTooltip}
       onFocus={openTooltip}
@@ -38,6 +39,9 @@ const PicklistField = React.forwardRef(({ DropdownComponent, id, info, placement
 PicklistField.defaultProps = {
   validations: [],
   DropdownComponent: Picklist,
+  showNone: true,
+  showAll: false,
+  formField: true,
 }
 
 const numOrString = PropTypes.oneOfType([PropTypes.number, PropTypes.string])
@@ -59,6 +63,9 @@ PicklistField.propTypes = {
   onChange: PropTypes.func,
   info: PropTypes.string,
   placement: PropTypes.string,
+  showNone: PropTypes.bool,
+  showAll: PropTypes.bool,
+  formField: PropTypes.bool,
   ...ValidatedFormInputPropTypes,
 }
 

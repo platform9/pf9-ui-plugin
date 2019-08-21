@@ -23,15 +23,15 @@ export const AddServiceForm = ({ onComplete }) => {
         showAll={false}
         required
       />
-      {params.clusterId && <PicklistField
+      <PicklistField
         DropdownComponent={NamespacePicklist}
-        loading={!params.clusterId}
+        disabled={!params.clusterId}
         id="namespace"
         label="Namespace"
         clusterId={params.clusterId}
         value={params.namespaceId}
         required
-      />}
+      />
       <CodeMirror
         id="serviceYaml"
         label="Service YAML"

@@ -35,7 +35,7 @@ const AddPrometheusInstanceForm = ({ onComplete }) => {
   [])
   const handleAddRule = useCallback(rule => {
     const withId = { id: uuid.v4(), ...rule }
-    setRules([...rules, withId])
+    setRules([ ...rules, withId ])
   }, [rules])
   const handleDeleteRule = useCallback(id =>
     setRules(removeWith(rule => rule.id === id, rules)),
@@ -57,7 +57,6 @@ const AddPrometheusInstanceForm = ({ onComplete }) => {
                 <TextField id="memory" label="Memory" info="MiB of memory to allocate" />
                 {enableStorage &&
                 <TextField id="storage" label="Storage" info="The storage allocation.  Default is 8 GiB" />}
-
                 <PicklistField
                   DropdownComponent={ClusterPicklist}
                   id="cluster"
@@ -87,7 +86,6 @@ const AddPrometheusInstanceForm = ({ onComplete }) => {
                   clusterId={params.clusterId}
                   info="Prometheus will use this to query metrics endpoints"
                 />}
-
                 {enableStorage &&
                 <CheckboxField id="enablePersistentStorage" label="Enable persistent storage" />}
                 <TextField id="retention" label="Storage Retention (days)" info="Defaults to 15 days if nothing is set" />

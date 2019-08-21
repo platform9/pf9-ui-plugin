@@ -1,17 +1,17 @@
 import React, { useState, useCallback } from 'react'
 import { emptyObj } from 'utils/fp'
-import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
+import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
 import useDataLoader from 'core/hooks/useDataLoader'
+import { namespacesDataKey } from './actions'
 
 const ListPage = ({ ListContainer }) => {
   return () => {
-    const [ params, setParams ] = useState(emptyObj)
+    const [params, setParams] = useState(emptyObj)
     const handleClusterChange = useCallback(clusterId => setParams({ clusterId }), [])
-    const [ namespaces, loading, reload ] = useDataLoader('namespaces', params)
+    const [namespaces, loading, reload] = useDataLoader(namespacesDataKey, params)
     return <div>
       <ClusterPicklist
-        formField={false}
         onChange={handleClusterChange}
         value={params.clusterId}
       />
@@ -28,7 +28,7 @@ export const options = {
     { id: 'clusterName', label: 'Cluster' },
     { id: 'created', label: 'Created' },
   ],
-  dataKey: 'namespaces',
+  dataKey: namespacesDataKey,
   editUrl: '/ui/kubernetes/namespaces/edit',
   name: 'Namespaces',
   title: 'Namespaces',

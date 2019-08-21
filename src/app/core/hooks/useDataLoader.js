@@ -5,11 +5,11 @@ import { ToastContext } from 'core/providers/ToastProvider'
 import { AppContext } from 'core/AppProvider'
 import { getContextLoader, dataContextKey } from 'core/helpers/createContextLoader'
 
-const useDataLoader = (key, params, refetchOnMount = false) => {
+const useDataLoader = (key, params, refetchOnMount = true) => {
   const [ loading, setLoading ] = useState(false)
   const [ data, setData ] = useState(emptyArr)
+  const [ refetching, setRefetching ] = useState(refetchOnMount)
   const { getContext, setContext } = useContext(AppContext)
-  const [ refetch, setRefetch ] = useState(refetchOnMount)
   const showToast = useContext(ToastContext)
   const additionalOptions = useMemo(() => ({
     onError: (errorMessage, catchedErr, params) => {
@@ -26,9 +26,11 @@ const useDataLoader = (key, params, refetchOnMount = false) => {
   }
   const reload = useCallback(loadData, [key, params])
   useEffect(() => {
-    loadData(refetch)
-    setRefetch(false)
-  }, [key, getContext(path([dataContextKey, key]))])
+    loadData(refetching)
+    if (refetching) {
+      setRefetching(false)
+    }
+  }, [refetchOnMount, key, params, getContext(path([dataContextKey, key]))])
 
   return [data, loading, reload]
 }

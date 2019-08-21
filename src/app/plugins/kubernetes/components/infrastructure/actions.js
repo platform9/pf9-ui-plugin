@@ -8,29 +8,29 @@ import createContextLoader from 'core/helpers/createContextLoader'
 import createContextUpdater from 'core/helpers/createContextUpdater'
 import ApiClient from 'api-client/ApiClient'
 
-export const clustersContextKey = 'clusters'
-export const cloudProvidersContextKey = 'cloudProviders'
-export const nodesContextKey = 'nodes'
-export const rawNodesContextKey = 'rawNodes'
-export const resMgrHostsContextKey = 'resMgrHosts'
-export const combinedHostsContextKey = 'combinedHosts'
+export const clustersDataKey = 'clusters'
+export const cloudProvidersDataKey = 'cloudProviders'
+export const nodesDataKey = 'nodes'
+export const rawNodesDataKey = 'rawNodes'
+export const resMgrHostsDataKey = 'resMgrHosts'
+export const combinedHostsDataKey = 'combinedHosts'
 
 // If params.clusterId is not assigned it fetches all clusters and extracts the clusterId from the first cluster
 // It also adds a "clusters" param that contains all the clusters, just for convenience
 export const parseClusterParams = async (params, loadFromContext) => {
-  const clusters = await loadFromContext(clustersContextKey)
+  const clusters = await loadFromContext(clustersDataKey)
   const { clusterId = pathOr(allKey, [0, 'uuid'], clusters) || allKey } = params
-  return [ clusterId, clusters ]
+  return [clusterId, clusters]
 }
 
-export const deleteCluster = createContextUpdater(clustersContextKey, async ({ id }) => {
+export const deleteCluster = createContextUpdater(clustersDataKey, async ({ id }) => {
   const { qbert } = ApiClient.getInstance()
   await qbert.deleteCluster(id)
   // Refresh clusters since combinedHosts will still
   // have references to the deleted cluster.
 }, { operation: 'delete' })
 
-export const loadCloudProviders = createContextLoader(cloudProvidersContextKey, async () => {
+export const loadCloudProviders = createContextLoader(cloudProvidersDataKey, async () => {
   const { qbert } = ApiClient.getInstance()
   return qbert.getCloudProviders()
 })
@@ -40,12 +40,12 @@ export const createCloudProvider = ({ data }) => {
   return qbert.createCloudProvider(data)
 }
 
-export const updateCloudProvider = createContextUpdater(cloudProvidersContextKey, ({ id, data }) => {
+export const updateCloudProvider = createContextUpdater(cloudProvidersDataKey, ({ id, data }) => {
   const { qbert } = ApiClient.getInstance()
   return qbert.updateCloudProvider(id, data)
 }, { operation: 'update' })
 
-export const deleteCloudProvider = createContextUpdater(cloudProvidersContextKey, async ({ id }) => {
+export const deleteCloudProvider = createContextUpdater(cloudProvidersDataKey, async ({ id }) => {
   const { qbert } = ApiClient.getInstance()
   await qbert.deleteCloudProvider(id)
 }, { operation: 'delete' })
@@ -55,20 +55,27 @@ export const createCluster = async ({ data, context }) => {
   console.log(data)
 }
 
-export const attachNodesToCluster = createContextUpdater(nodesContextKey, async ({ clusterUuid, nodes }, currentItems) => {
+export const attachNodesToCluster = createContextUpdater(nodesDataKey, async ({ clusterUuid, nodes }, currentItems) => {
   const { qbert } = ApiClient.getInstance()
   const nodeUuids = pluck('uuid', nodes)
   await qbert.attach(clusterUuid, nodes)
   // Assign nodes to their clusters in the context as well so the user
   // can't add the same node to another cluster.
-  return currentItems.map(node => nodeUuids.includes(node.uuid) ? ({ ...node, clusterUuid }) : node)
+  return currentItems.map(node =>
+    nodeUuids.includes(node.uuid) ? ({ ...node, clusterUuid }) : node)
+}, {
+  // TODO allow custom operations
+  operation: 'attachNodes',
 })
 
-export const detachNodesFromCluster = createContextUpdater(nodesContextKey, async ({ clusterUuid, nodeUuids }, currentItems) => {
+export const detachNodesFromCluster = createContextUpdater(nodesDataKey, async ({ clusterUuid, nodeUuids }, currentItems) => {
   const { qbert } = ApiClient.getInstance()
   await qbert.detach(clusterUuid, nodeUuids)
   return currentItems.map(node =>
     nodeUuids.includes(node.uuid) ? ({ ...node, clusterUuid: null }) : node)
+}, {
+  // TODO allow custom operations
+  operation: 'detachNodes',
 })
 
 export const scaleCluster = async ({ data }) => {
@@ -85,15 +92,15 @@ export const scaleCluster = async ({ data }) => {
 }
 
 // eslint-disable-next-line
-const loadRawNodes = createContextLoader(rawNodesContextKey, async () => {
+const loadRawNodes = createContextLoader(rawNodesDataKey, async () => {
   const { qbert } = ApiClient.getInstance()
   return qbert.getNodes()
 })
 
-export const loadClusters = createContextLoader(clustersContextKey, async (params, loadFromContext) => {
+export const loadClusters = createContextLoader(clustersDataKey, async (params, loadFromContext) => {
   const { qbert } = ApiClient.getInstance()
   const [rawNodes, rawClusters, qbertEndpoint] = await Promise.all([
-    loadFromContext(rawNodesContextKey),
+    loadFromContext(rawNodesDataKey),
     qbert.getClusters(),
     qbert.baseUrl(),
   ])
@@ -151,15 +158,15 @@ export const loadClusters = createContextLoader(clustersContextKey, async (param
   }, true)
 })
 
-export const loadResMgrHosts = createContextLoader(resMgrHostsContextKey, async () => {
+export const loadResMgrHosts = createContextLoader(resMgrHostsDataKey, async () => {
   const { resmgr } = ApiClient.getInstance()
   return resmgr.getHosts()
 })
 
-export const loadCombinedHosts = createContextLoader(combinedHostsContextKey, async (params, loadFromContext) => {
+export const loadCombinedHosts = createContextLoader(combinedHostsDataKey, async (params, loadFromContext) => {
   const [rawNodes, resMgrHosts] = await Promise.all([
-    loadFromContext(rawNodesContextKey),
-    loadFromContext(resMgrHostsContextKey),
+    loadFromContext(rawNodesDataKey),
+    loadFromContext(resMgrHostsDataKey),
   ])
 
   let hostsById = {}
@@ -176,10 +183,10 @@ export const loadCombinedHosts = createContextLoader(combinedHostsContextKey, as
   return Object.values(hostsById).map(combineHost)
 })
 
-export const loadNodes = createContextLoader(nodesContextKey, async (params, loadFromContext) => {
+export const loadNodes = createContextLoader(nodesDataKey, async (params, loadFromContext) => {
   const [rawNodes, combinedHosts, serviceCatalog] = await Promise.all([
-    loadFromContext(rawNodesContextKey),
-    loadFromContext(combinedHostsContextKey),
+    loadFromContext(rawNodesDataKey),
+    loadFromContext(combinedHostsDataKey),
     loadFromContext(serviceCatalogContextKey),
   ])
 

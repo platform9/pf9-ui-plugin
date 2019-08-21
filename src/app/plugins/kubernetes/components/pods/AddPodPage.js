@@ -8,6 +8,7 @@ import CodeMirror from 'core/components/validatedForm/CodeMirror'
 import { codeMirrorOptions } from 'app/constants'
 import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
 import NamespacePicklist from 'k8s/components/common/NamespacePicklist'
+import { podsDataKey } from './actions'
 
 export const AddPodForm = ({ onComplete }) => {
   const [params, setParams] = useState(emptyObj)
@@ -20,18 +21,17 @@ export const AddPodForm = ({ onComplete }) => {
         label="Cluster"
         onChange={handleClusterChange}
         value={params.clusterId}
-        showAll={false}
         required
       />
-      {params.clusterId && <PicklistField
+      <PicklistField
         DropdownComponent={NamespacePicklist}
-        loading={!params.clusterId}
+        disabled={!params.clusterId}
         id="namespace"
         label="Namespace"
         clusterId={params.clusterId}
         value={params.namespaceId}
         required
-      />}
+      />
       <CodeMirror
         id="podYaml"
         label="Pod YAML"
@@ -44,7 +44,7 @@ export const AddPodForm = ({ onComplete }) => {
 }
 
 export const options = {
-  dataKey: 'pods',
+  dataKey: podsDataKey,
   FormComponent: AddPodForm,
   listUrl: '/ui/kubernetes/pods',
   name: 'AddPod',

@@ -12,7 +12,6 @@ const ListPage = ({ ListContainer }) => {
     const [data, loading, reload] = useDataLoader('deployments', params)
     return <div>
       <ClusterPicklist
-        formField={false}
         onChange={handleClusterChange}
         value={params.clusterId}
       />

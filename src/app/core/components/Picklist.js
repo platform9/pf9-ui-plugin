@@ -34,7 +34,7 @@ const Picklist = ({ showAll, showNone, label, name, value, options, onChange, fo
     showAll ? prepend({ label: 'All', value: allKey }) : identity,
     showNone ? prepend({ label: 'None', value: noneKey }) : identity,
     map(option => <MenuItem value={option.value} key={option.value}>{option.label}</MenuItem>),
-  ), [options])
+  )(options), [options])
 
   const handleChange = useCallback(e => {
     // Hack to work around the fact that Material UI's "Select" will ignore
@@ -86,7 +86,9 @@ Picklist.propTypes = {
 }
 
 Picklist.defaultProps = {
-  formField: true,
+  showAll: true,
+  showNone: false,
+  formField: false,
   loading: false,
   variant: 'outlined',
 }

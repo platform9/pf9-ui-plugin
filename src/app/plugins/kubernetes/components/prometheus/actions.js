@@ -3,7 +3,7 @@ import { pipe, last, pathOr, prop, propEq } from 'ramda'
 import ApiClient from 'api-client/ApiClient'
 import createContextLoader from 'core/helpers/createContextLoader'
 import createContextUpdater from 'core/helpers/createContextUpdater'
-import { clustersContextKey } from '../infrastructure/actions'
+import { clustersDataKey } from '../infrastructure/actions'
 import { notFoundErr } from 'app/constants'
 
 export const clusterTagsContextKey = 'clusterTags'
@@ -21,7 +21,7 @@ const mapAsyncItems = async (values, loaderFn, mapFn) => {
 
 export const loadClusterTags = createContextLoader(clusterTagsContextKey, async (params, loadFromContext) => {
   const { appbert } = ApiClient.getInstance()
-  await loadFromContext(clustersContextKey)
+  await loadFromContext(clustersDataKey)
   return appbert.getClusterTags()
 })
 
