@@ -1,5 +1,5 @@
 import createContextLoader from 'core/helpers/createContextLoader'
-import { pipeAsync, asyncFlatMap } from 'utils/fp'
+import { asyncFlatMap } from 'utils/fp'
 import { pluck } from 'ramda'
 import { allKey } from 'app/constants'
 import createContextUpdater from 'core/helpers/createContextUpdater'
@@ -18,14 +18,13 @@ const namespacesMapper = async (items, params, loadFromContext) => {
   }))
 }
 
-export const loadNamespaces = createContextLoader('namespaces', pipeAsync(
-  parseClusterParams,
-  async ({ clusterId, clusters }) => {
-    const { qbert } = ApiClient.getInstance()
-    return clusterId === allKey
-      ? asyncFlatMap(pluck('uuid', clusters), qbert.getClusterNamespaces)
-      : qbert.getClusterNamespaces(clusterId)
-  }),
+export const loadNamespaces = createContextLoader('namespaces', async (params, loadFromContext) => {
+  const [clusterId, clusters] = await parseClusterParams(params, loadFromContext)
+  const { qbert } = ApiClient.getInstance()
+  return clusterId === allKey
+    ? asyncFlatMap(pluck('uuid', clusters), qbert.getClusterNamespaces)
+    : qbert.getClusterNamespaces(clusterId)
+},
 {
   indexBy: 'clusterId',
   dataMapper: namespacesMapper

@@ -1,4 +1,5 @@
 import React from 'react'
+import ApiClient from 'api-client/ApiClient'
 import { withRouter } from 'react-router-dom'
 import { asyncMap, compose, keyValueArrToObj, range } from 'app/utils/fp'
 import { withAppContext } from 'core/AppProvider'
@@ -6,6 +7,8 @@ import FormWrapper from 'core/components/FormWrapper'
 import requiresAuthentication from '../../util/requiresAuthentication'
 import { loadVolumes } from './actions'
 import AddVolumeForm from './AddVolumeForm'
+import { dataContextKey } from 'core/helpers/createContextLoader'
+import { assocPath } from 'ramda'
 
 const constructBatch = (numVolumes, prefix, data) =>
   range(1, numVolumes)
@@ -23,10 +26,11 @@ class AddVolumePage extends React.Component {
       const { numVolumes, volumeNamePrefix, ...rest } = volume
       const volumesToCreate = constructBatch(numVolumes, volumeNamePrefix, rest)
       const existing = await loadVolumes({ setContext, getContext })
+      // TODO: use createContextUpdater
       const createdVolumes = await asyncMap(volumesToCreate, data =>
-        getContext().apiClient.cinder.createVolume(data)
+        ApiClient.getInstance().cinder.createVolume(data)
       )
-      setContext({ volumes: [ ...existing, ...createdVolumes ] })
+      setContext(assocPath([dataContextKey, 'volumes'], [...existing, ...createdVolumes]))
       history.push('/ui/openstack/storage#volumes')
     } catch (err) {
       console.error(err)

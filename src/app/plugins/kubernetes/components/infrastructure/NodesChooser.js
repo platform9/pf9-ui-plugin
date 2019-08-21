@@ -1,13 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import MultiSelect from 'core/components/MultiSelect'
-import { allPass, compose, pathOr } from 'ramda'
+import { allPass, compose, propOr } from 'ramda'
 import { withInfoTooltip } from 'core/components/InfoTooltip'
 import { loadCombinedHosts } from 'k8s/components/infrastructure/actions'
 import withDataLoader from 'core/hocs/withDataLoader'
 import withDataMapper from 'core/hocs/withDataMapper'
 import { withAppContext } from 'core/AppProvider'
-import { dataKey } from 'core/helpers/createContextLoader'
 
 class NodesChooser extends React.Component {
   state = {
@@ -57,6 +56,6 @@ NodesChooser.propTypes = {
 export default compose(
   withAppContext,
   withDataLoader({ combinedHosts: loadCombinedHosts }),
-  withDataMapper({ combinedHosts: pathOr([], [dataKey, 'combinedHosts']) }),
+  withDataMapper({ combinedHosts: propOr([], 'combinedHosts') }),
   withInfoTooltip,
 )(NodesChooser)

@@ -1,7 +1,7 @@
 import ApiClient from 'api-client/ApiClient'
 import createContextLoader from 'core/helpers/createContextLoader'
 
-export const loadImages = createContextLoader('images', async ({ apiClient }) => {
+export const loadImages = createContextLoader('images', async () => {
   const { glance } = ApiClient.getInstance()
   return glance.getImages()
 })

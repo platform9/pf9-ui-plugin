@@ -1,4 +1,5 @@
 import React from 'react'
+import ApiClient from 'api-client/ApiClient'
 import {
   Checkbox, FormControlLabel, TextField as BaseTextField, Typography,
 } from '@material-ui/core'
@@ -50,7 +51,7 @@ class ApiHelper extends React.Component {
 
   performApiCall = async ({ method, url, body }) => {
     const { baseUrl } = this.state
-    const { apiClient } = this.props.context
+    const apiClient = ApiClient.getInstance()
     const finalUrl = baseUrl + url
 
     const response = await {
@@ -66,7 +67,7 @@ class ApiHelper extends React.Component {
   setField = key => value => this.setState({ [key]: value })
 
   handleServiceChange = async ({ service, baseUrl }) => {
-    const { apiClient } = this.props.context
+    const apiClient = ApiClient.getInstance()
     this.setState({ service })
 
     if (service === 'qbert') {

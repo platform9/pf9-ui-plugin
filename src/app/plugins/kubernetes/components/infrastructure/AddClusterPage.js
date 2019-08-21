@@ -1,4 +1,5 @@
 import React from 'react'
+import ApiClient from 'api-client/ApiClient'
 import Checkbox from 'core/components/validatedForm/CheckboxField'
 import ExternalLink from 'core/components/ExternalLink'
 import FormWrapper from 'core/components/FormWrapper'
@@ -10,13 +11,12 @@ import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import Wizard from 'core/components/wizard/Wizard'
 import WizardStep from 'core/components/wizard/WizardStep'
 import createCRUDActions from 'core/helpers/createCRUDActions'
-import { compose, prop, propEq, pathOr } from 'ramda'
+import { compose, prop, propEq, propOr } from 'ramda'
 import { loadCloudProviders } from './actions'
 import { projectAs } from 'utils/fp'
 import { withAppContext } from 'core/AppProvider'
 import withDataLoader from 'core/hocs/withDataLoader'
 import withDataMapper from 'core/hocs/withDataMapper'
-import { dataKey } from 'core/helpers/createContextLoader'
 
 const initialContext = {
   manualDeploy: false,
@@ -48,14 +48,14 @@ class AddClusterPage extends React.Component {
   handleSubmit = () => console.log('TODO: AddClusterPage#handleSubmit')
 
   handleCpChange = async cpId => {
-    const cpDetails = await this.props.context.apiClient.qbert.getCloudProviderDetails(cpId)
+    const cpDetails = await ApiClient.getInstance().qbert.getCloudProviderDetails(cpId)
     const cp = this.props.data.cloudProviders.find(x => x.uuid === cpId)
     const regions = cpDetails.Regions.map(prop('RegionName'))
     this.setState({ cpId, regions, cpType: cp.type })
   }
 
   handleRegionChange = async regionId => {
-    const regionDetails = await this.props.context.apiClient.qbert.getCloudProviderRegionDetails(this.state.cpId, regionId)
+    const regionDetails = await ApiClient.getInstance().qbert.getCloudProviderRegionDetails(this.state.cpId, regionId)
     this.setState(regionDetails) // sets azs, domains, images, flavors, keyPairs, networks, operatingSystems, and vpcs
   }
 
@@ -257,8 +257,8 @@ export default compose(
     regions: createCRUDActions({ service: 'keystone', entity: 'regions' }).list,
   }),
   withDataMapper({
-    cloudProviders: pathOr([], [dataKey, 'cloudProviders']),
-    flavors: pathOr([], [dataKey, 'flavors']),
-    regions: pathOr([], [dataKey, 'regions']),
+    cloudProviders: propOr([], 'cloudProviders'),
+    flavors: propOr([], 'flavors'),
+    regions: propOr([], 'regions'),
   }),
 )(AddClusterPage)

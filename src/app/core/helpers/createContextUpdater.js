@@ -1,9 +1,15 @@
 import { hasPath, path, assocPath, propEq, always, over, append, view, lensPath } from 'ramda'
 import { emptyObj, ensureFunction, removeWith, updateWith, switchCase } from 'utils/fp'
-import { dataKey, defaultUniqueIdentifier, getContextLoader } from 'core/helpers/createContextLoader'
+import { dataContextKey, defaultUniqueIdentifier, getContextLoader } from 'core/helpers/createContextLoader'
 import moize from 'moize'
 
 let updaters = {}
+export const getContextUpdater = (key, operation) => {
+  if (!hasPath([key, operation || 'any'], updaters)) {
+    throw new Error(`Context Updater with key "${key}" and operation "${operation}" not found`)
+  }
+  return path([key, operation || 'any'], updaters)
+}
 
 /**
  * Returns a function that will be used to remove or add values from/to existing cached data
@@ -39,9 +45,9 @@ const createContextUpdater = (key, dataUpdateFn, options = emptyObj) => {
       onError = (errorMessage, catchedErr, params) => console.error(errorMessage, catchedErr),
     } = additionalOptions
     const { [uniqueIdentifier]: id } = params
-    const loaderFn = getContextLoader(key, getContext, setContext, additionalOptions)
-    const prevItems = await loaderFn(params)
-    const dataLens = lensPath([dataKey, key])
+    const loaderFn = getContextLoader(key)
+    const prevItems = await loaderFn({ getContext, setContext, params, additionalOptions })
+    const dataLens = lensPath([dataContextKey, key])
 
     try {
       const output = await dataUpdateFn(params, prevItems)
@@ -72,13 +78,6 @@ const createContextUpdater = (key, dataUpdateFn, options = emptyObj) => {
   })
   updaters = assocPath([key, operation], contextUpdaterFn, updaters)
   return contextUpdaterFn
-}
-
-export const getContextUpdater = (key, operation) => {
-  if (!hasPath([key, operation || 'any'], updaters)) {
-    throw new Error(`Context Updater with key "${key}" and operation "${operation}" not found`)
-  }
-  return path([key, operation || 'any'], updaters)
 }
 
 export default createContextUpdater

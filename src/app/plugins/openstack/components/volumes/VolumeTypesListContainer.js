@@ -1,10 +1,13 @@
 /* eslint-disable camelcase */
 import React from 'react'
 import PropTypes from 'prop-types'
+import ApiClient from 'api-client/ApiClient'
 import { compose, keyValueArrToObj } from 'app/utils/fp'
 import { withAppContext } from 'core/AppProvider'
 import CRUDListContainer from 'core/components/CRUDListContainer'
 import createListTableComponent from 'core/helpers/createListTableComponent'
+import { dataContextKey } from 'core/helpers/createContextLoader'
+import { assocPath } from 'ramda'
 
 // Promote `volume_backend_name` from `extra_specs` into its own field
 // This is a rather tedious pattern.  If we are doing it elsewhere we
@@ -33,11 +36,12 @@ export const VolumeTypesList = createListTableComponent({
 
 class VolumeTypesListContainer extends React.Component {
   handleRemove = async id => {
-    const { volumeTypes, setContext, context } = this.props
-    const { cinder } = context.apiClient
+    const { volumeTypes, setContext } = this.props
+    const { cinder } = ApiClient.getInstance()
+    // TODO: use createContextUpdater
     await cinder.deleteVolumeType(id)
     const newVolumeTypes = volumeTypes.filter(x => x.id !== id)
-    setContext({ volumeTypes: newVolumeTypes })
+    setContext(assocPath([dataContextKey, 'volumeTypes'], newVolumeTypes))
   }
 
   render () {

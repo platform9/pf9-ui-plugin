@@ -4,20 +4,14 @@ import { compose } from 'app/utils/fp'
 import { withAppContext } from 'core/AppProvider'
 import FormWrapper from 'core/components/FormWrapper'
 import requiresAuthentication from '../../util/requiresAuthentication'
-import { loadSshKeys } from './actions'
+import { createSshKey } from './actions'
 import AddSshKeyForm from './AddSshKeyForm'
 
 class AddSshKeyPage extends React.Component {
   handleAdd = async sshKey => {
-    const { setContext, context, history } = this.props
-    try {
-      const existing = await loadSshKeys({ context, setContext })
-      const createdSshKey = await context.apiClient.nova.createSshKey(sshKey)
-      setContext({ sshKeys: [ ...existing, createdSshKey ] })
-      history.push('/ui/openstack/sshkeys')
-    } catch (err) {
-      console.error(err)
-    }
+    const { setContext, getContext, history } = this.props
+    await createSshKey({ getContext, setContext, params: sshKey })
+    history.push('/ui/openstack/sshkeys')
   }
 
   render () {

@@ -1,69 +1,51 @@
-import React from 'react'
+import React, { useState, useCallback } from 'react'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import SubmitButton from 'core/components/SubmitButton'
 import createAddComponents from 'core/helpers/createAddComponents'
-import { projectAs } from 'utils/fp'
-import { loadPods, createPod } from './actions'
+import { emptyObj } from 'utils/fp'
 import CodeMirror from 'core/components/validatedForm/CodeMirror'
-import { loadNamespaces } from 'k8s/components/namespaces/actions'
-import clusterizedDataLoader from 'k8s/helpers/clusterizedDataLoader'
+import { codeMirrorOptions } from 'app/constants'
+import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
+import NamespacePicklist from 'k8s/components/common/NamespacePicklist'
 
-export class AddPodForm extends React.Component {
-  state = {
-    clusterOptions: [],
-    namespaceOptions: [],
-  }
-
-  handleClusterChange = value => {
-    const { data } = this.props
-    const namespaceOptions = data.namespaces.filter(n => n.clusterId === value).map(
-      n => ({ value: n.name, label: n.name }))
-    this.setState({ namespaceOptions })
-  }
-
-  render () {
-    const { namespaceOptions } = this.state
-    const { data, onComplete } = this.props
-
-    const codeMirrorOptions = {
-      mode: 'yaml',
-    }
-
-    const clusterOptions = data.clusters ? projectAs({
-      value: 'uuid',
-      label: 'name',
-    }, data.clusters) : []
-
-    return (
-      <ValidatedForm onSubmit={onComplete}>
-        <PicklistField id="clusterId"
-          label="Cluster"
-          onChange={this.handleClusterChange}
-          options={clusterOptions}
-          validations={{ required: true }}
-        />
-        <PicklistField id="namespace"
-          label="Namespace"
-          options={namespaceOptions}
-          validations={{ required: true }}
-        />
-        <CodeMirror
-          id="podYaml"
-          label="Pod YAML"
-          options={codeMirrorOptions}
-          validations={{ required: true }}
-        />
-        <SubmitButton>Create Pod</SubmitButton>
-      </ValidatedForm>
-    )
-  }
+export const AddPodForm = ({ onComplete }) => {
+  const [params, setParams] = useState(emptyObj)
+  const handleClusterChange = useCallback(clusterId => setParams({ clusterId }), [])
+  return (
+    <ValidatedForm onSubmit={onComplete}>
+      <PicklistField
+        DropdownComponent={ClusterPicklist}
+        id="clusterId"
+        label="Cluster"
+        onChange={handleClusterChange}
+        value={params.clusterId}
+        showAll={false}
+        required
+      />
+      {params.clusterId && <PicklistField
+        DropdownComponent={NamespacePicklist}
+        loading={!params.clusterId}
+        id="namespace"
+        label="Namespace"
+        clusterId={params.clusterId}
+        value={params.namespaceId}
+        required
+      />}
+      <CodeMirror
+        id="podYaml"
+        label="Pod YAML"
+        options={codeMirrorOptions}
+        required
+      />
+      <SubmitButton>Create Pod</SubmitButton>
+    </ValidatedForm>
+  )
 }
 
 export const options = {
+  dataKey: 'pods',
   FormComponent: AddPodForm,
-  createFn: createPod,
-  loaderFn: loadPods,
   listUrl: '/ui/kubernetes/pods',
   name: 'AddPod',
   title: 'Create Pod',
@@ -71,4 +53,4 @@ export const options = {
 
 const { AddPage } = createAddComponents(options)
 
-export default clusterizedDataLoader('namespaces', loadNamespaces)(AddPage)
+export default AddPage

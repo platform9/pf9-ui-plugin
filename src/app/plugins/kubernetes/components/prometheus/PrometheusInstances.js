@@ -15,7 +15,7 @@ const renderClusterName = (field, row, data) => {
 // Disabling for now until the backend has the links for this working
 /*
 const renderDashboardLink = (field, row, context) => {
-  const link = context.apiClient.qbert.getPrometheusDashboardLink(row)
+  const link = ApiCLient.getInstance().qbert.getPrometheusDashboardLink(row)
   return <ExternalLink url={link}>dashboard</ExternalLink>
 }
 */

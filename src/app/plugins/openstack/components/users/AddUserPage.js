@@ -8,11 +8,12 @@ import TenantRolesContainer
   from 'core/components/validatedForm/TenantRolesContainer'
 import { createUser, loadUsers } from './actions'
 import { loadTenants } from '../tenants/actions'
+import { prop } from 'ramda'
 
 // As of Chrome 66, Google has disabled the NoAutofillHack and still does
 // not respect the HTML spec for autocomplete="off".  After some experimentation
 // it looks like autocomplete="new-password" works.
-export const AddUserForm = ({ onComplete, context }) => (
+export const AddUserForm = ({ onComplete, getContext }) => (
   <ValidatedForm onSubmit={onComplete}>
     <NoAutofillHack />
     <TextField id="name" label="Name" />
@@ -23,7 +24,7 @@ export const AddUserForm = ({ onComplete, context }) => (
     <TenantRolesContainer
       id="rolePair"
       label="TenantRoleSelectors"
-      tenants={context.tenants}
+      tenants={getContext(prop('tenants'))}
       roles={['None', 'Role1', 'Role2', 'Role3']}
     />
     <SubmitButton>Add User</SubmitButton>

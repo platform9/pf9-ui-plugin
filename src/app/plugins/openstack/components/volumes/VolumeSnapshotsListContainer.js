@@ -1,10 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import ApiClient from 'api-client/ApiClient'
 import { compose } from 'app/utils/fp'
 import { withAppContext } from 'core/AppProvider'
 import CRUDListContainer from 'core/components/CRUDListContainer'
 import createListTableComponent from 'core/helpers/createListTableComponent'
 import { loadVolumeSnapshots } from 'openstack/components/volumes/actions'
+import { dataContextKey } from 'core/helpers/createContextLoader'
+import { assocPath } from 'ramda'
 
 export const columns = [
   { id: 'id', label: 'OpenStack ID' },
@@ -27,10 +30,11 @@ export const VolumeSnapshotsList = createListTableComponent({
 class VolumeSnapshotsListContainer extends React.Component {
   handleRemove = async id => {
     const { getContext, setContext } = this.props
-    await getContext().apiClient.cinder.deleteSnapshot(id)
+    // TODO: use createContextUpdater
+    await ApiClient.getInstance().cinder.deleteSnapshot(id)
     const newVolumeSnapshots = (await loadVolumeSnapshots({ getContext, setContext }))
       .filter(x => x.id !== id)
-    setContext({ volumeSnapshots: newVolumeSnapshots })
+    setContext(assocPath([dataContextKey, 'volumeSnapshots'], newVolumeSnapshots))
   }
 
   render () {

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 import Picklist from 'core/components/Picklist'
 import InfoTooltip from 'app/core/components/InfoTooltip'
@@ -8,14 +8,14 @@ import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/va
 /**
  * PicklistField builds upon Picklist and adds integration with ValidatedForm
  */
-const PicklistField = React.forwardRef(({ id, info, placement, onChange, label, value, showNone, classes, hasError, errorMessage, title, options, className, ...restProps },
+const PicklistField = React.forwardRef(({ DropdownComponent, id, info, placement, label, value, showNone, classes, hasError, errorMessage, options, ...restProps },
   ref) => {
   const [open, setOpen] = React.useState(false)
-  const openTooltip = () => setOpen(true)
-  const closeTooltip = () => setOpen(false)
+  const openTooltip = useCallback(() => setOpen(true), [])
+  const closeTooltip = useCallback(() => setOpen(false), [])
 
   return <InfoTooltip open={open} info={info} placement={placement}>
-    <Picklist
+    <DropdownComponent
       {...restProps}
       onMouseEnter={openTooltip}
       onMouseLeave={closeTooltip}
@@ -23,14 +23,12 @@ const PicklistField = React.forwardRef(({ id, info, placement, onChange, label, 
       onBlur={closeTooltip}
       onClick={closeTooltip}
       ref={ref}
-      title={title}
-      className={className}
       id={id}
+      disabled={!options || !options.length}
       name={id}
       label={label}
-      options={showNone ? [{ value: '', label: 'None' }, ...options] : options}
+      options={options}
       value={value !== undefined ? value : ''}
-      onChange={onChange}
       error={hasError}
       helperText={errorMessage}
     />
@@ -39,6 +37,7 @@ const PicklistField = React.forwardRef(({ id, info, placement, onChange, label, 
 
 PicklistField.defaultProps = {
   validations: [],
+  DropdownComponent: Picklist,
 }
 
 const numOrString = PropTypes.oneOfType([PropTypes.number, PropTypes.string])
@@ -52,6 +51,7 @@ const optionPropType = PropTypes.oneOfType([
 ])
 
 PicklistField.propTypes = {
+  DropdownComponent: PropTypes.elementType,
   id: PropTypes.string.isRequired,
   label: PropTypes.string,
   options: PropTypes.arrayOf(optionPropType).isRequired,
@@ -59,9 +59,6 @@ PicklistField.propTypes = {
   onChange: PropTypes.func,
   info: PropTypes.string,
   placement: PropTypes.string,
-
-  /** Create an option of 'None' as the first default choice */
-  showNone: PropTypes.bool,
   ...ValidatedFormInputPropTypes,
 }
 

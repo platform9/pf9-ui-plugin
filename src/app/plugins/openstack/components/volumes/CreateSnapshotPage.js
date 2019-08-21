@@ -1,4 +1,5 @@
 import React from 'react'
+import ApiClient from 'api-client/ApiClient'
 import { withRouter } from 'react-router'
 import { compose } from 'app/utils/fp'
 import { withAppContext } from 'core/AppProvider'
@@ -6,6 +7,8 @@ import FormWrapper from 'core/components/FormWrapper'
 import requiresAuthentication from '../../util/requiresAuthentication'
 import { loadVolumeSnapshots } from './actions'
 import CreateSnapshotForm from './CreateSnapshotForm'
+import { dataContextKey } from 'core/helpers/createContextLoader'
+import { assocPath } from 'ramda'
 
 class CreateSnapshotPage extends React.Component {
   handleAdd = async snapshotData => {
@@ -19,8 +22,8 @@ class CreateSnapshotPage extends React.Component {
         description: snapshotData.description,
       }
       const existingSnapshots = await loadVolumeSnapshots({ setContext, getContext })
-      const createdSnapshot = await getContext().apiClient.cinder.snapshotVolume(params)
-      setContext({ volumeSnapshots: [ ...existingSnapshots, createdSnapshot ] })
+      const createdSnapshot = await ApiClient.getInstance().cinder.snapshotVolume(params)
+      setContext(assocPath([dataContextKey, 'volumeSnapshots'], [...existingSnapshots, createdSnapshot]))
       history.push('/ui/openstack/storage#volumeSnapshots')
     } catch (err) {
       console.error(err)

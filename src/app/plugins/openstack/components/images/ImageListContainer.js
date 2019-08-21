@@ -1,4 +1,5 @@
 import React from 'react'
+import ApiClient from 'api-client/ApiClient'
 import PropTypes from 'prop-types'
 import { compose } from 'app/utils/fp'
 import { withAppContext } from 'core/AppProvider'
@@ -28,8 +29,8 @@ export const ImageList = createListTableComponent({
 
 class ImageListContainer extends React.Component {
   handleRemove = async id => {
-    const { images, setContext, context } = this.props
-    const { glance } = context.apiClient
+    const { images, setContext } = this.props
+    const { glance } = ApiClient.getInstance()
     await glance.deleteImage(id)
     const newImages = images.filter(x => x.id !== id)
     setContext({ images: newImages })

@@ -1,12 +1,18 @@
-import { identity, assoc, find, whereEq, when, isNil, reject, filter, always, append, uniqWith, propEq, pipe, over, lensPath, pickAll, set, view } from 'ramda'
+import { concat, identity, assoc, find, whereEq, when, isNil, reject, filter, always, append, uniqWith, eqProps, pipe, over, lensPath, pickAll, set, view } from 'ramda'
 import { ensureFunction, ensureArray, emptyObj, emptyArr } from 'utils/fp'
 import moize from 'moize'
 
-let loaders = {}
 export const defaultUniqueIdentifier = 'id'
-export const loadersKey = 'loaders'
-export const paramsKey = 'cachedParams'
-export const dataKey = 'cachedData'
+export const paramsContextKey = 'cachedParams'
+export const dataContextKey = 'cachedData'
+
+let loaders = {}
+export const getContextLoader = key => {
+  if (!loaders.hasOwnProperty(key)) {
+    throw new Error(`Context Loader with key ${key} not found`)
+  }
+  return loaders[key]
+}
 
 /**
  * Create a function that will use context to load and cache values
@@ -30,22 +36,21 @@ const createContextLoader = (key, dataFetchFn, options = emptyObj) => {
     successMessage = (params) => `Successfully retrieved ${entityName} items`,
     errorMessage = (catchedErr, params) => `Error when trying to retrieve ${entityName} items`,
   } = options
-  const paramsLens = lensPath([paramsKey, key])
-  const dataLens = lensPath([dataKey, key])
+  const paramsLens = lensPath([paramsContextKey, key])
+  const dataLens = lensPath([dataContextKey, key])
   const arrayIfNil = when(isNil, always(emptyArr))
-  const contextLoaderFn = moize(async ({ getContext, setContext, params = emptyObj, reload = false, additionalOptions = emptyObj }) => {
+  const contextLoaderFn = moize(async ({ getContext, setContext, params = emptyObj, refetch = false, additionalOptions = emptyObj }) => {
     const {
       onSuccess = (successMessage, params) => console.info(successMessage),
       onError = (errorMessage, catchedErr, params) => console.error(errorMessage, catchedErr),
     } = additionalOptions
     const indexByAll = indexBy ? ensureArray(indexBy) : emptyArr
-    const loadFromContext = (key, params, reload) => {
-      const getLoader = loaders[key]
-      const loaderFn = getLoader({ getContext, setContext, params, reload, additionalOptions })
-      return loaderFn(params, reload)
+    const loadFromContext = (key, params, refetch) => {
+      const loaderFn = getContextLoader(key)
+      return loaderFn({ getContext, setContext, params, refetch, additionalOptions })
     }
     const indexedParams = pickAll(indexByAll, params)
-    if (!reload) {
+    if (!refetch) {
       const allCachedParams = getContext(view(paramsLens)) ||
         (setContext(set(paramsLens, emptyArr)) && emptyArr)
 
@@ -58,15 +63,14 @@ const createContextLoader = (key, dataFetchFn, options = emptyObj) => {
         ))
       }
     }
-    // if reload = true or no cached params are found, fetch the items
+    // if refetch = true or no cached params are found, fetch the items
     try {
-      const fetchedItems = dataFetchFn(params, loadFromContext)
-
+      const fetchedItems = await dataFetchFn(params, loadFromContext)
       await setContext(pipe(
         // If we are reloading, we'll clean up the previous queried items first
-        reload ? over(dataLens, pipe(arrayIfNil, reject(whereEq(indexedParams)))) : identity,
+        refetch ? over(dataLens, pipe(arrayIfNil, reject(whereEq(indexedParams)))) : identity,
         // Insert new items replacing possible duplicates (by uniqueIdentifier)
-        over(dataLens, pipe(arrayIfNil, uniqWith(propEq(uniqueIdentifier), fetchedItems))),
+        over(dataLens, pipe(arrayIfNil, concat(fetchedItems), uniqWith(eqProps(uniqueIdentifier)))),
         // Update cachedParams so that we know this query has already been resolved
         over(paramsLens, append(indexedParams))
       ))
@@ -86,15 +90,8 @@ const createContextLoader = (key, dataFetchFn, options = emptyObj) => {
     isPromise: true,
     isDeepEqual: true,
   })
-  assoc(key, contextLoaderFn, loaders)
+  loaders = assoc(key, contextLoaderFn, loaders)
   return contextLoaderFn
-}
-
-export const getContextLoader = key => {
-  if (!loaders.hasOwnProperty(key)) {
-    throw new Error(`Context Loader with key ${key} not found`)
-  }
-  return loaders[key]
 }
 
 export default createContextLoader

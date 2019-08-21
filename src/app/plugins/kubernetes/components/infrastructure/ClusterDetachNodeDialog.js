@@ -1,5 +1,5 @@
 import React from 'react'
-import { compose, pathOr } from 'ramda'
+import { compose, propOr } from 'ramda'
 import { withAppContext } from 'core/AppProvider'
 import { detachNodesFromCluster } from './actions'
 import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab'
@@ -10,7 +10,6 @@ import {
 import { loadNodes } from 'k8s/components/infrastructure/actions'
 import withDataLoader from 'core/hocs/withDataLoader'
 import withDataMapper from 'core/hocs/withDataMapper'
-import { dataKey } from 'core/helpers/createContextLoader'
 
 // The modal is technically inside the row, so clicking anything inside
 // the modal window will cause the table row to be toggled.
@@ -111,5 +110,5 @@ class ClusterDetachNodeDialog extends React.Component {
 export default compose(
   withAppContext,
   withDataLoader({ nodes: loadNodes }),
-  withDataMapper({ nodes: pathOr([], [dataKey, dataKey, 'nodes']) }),
+  withDataMapper({ nodes: propOr([], 'nodes') }),
 )(ClusterDetachNodeDialog)

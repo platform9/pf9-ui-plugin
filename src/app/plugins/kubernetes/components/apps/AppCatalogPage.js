@@ -1,10 +1,9 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import CardTable from 'core/components/cardTable/CardTable'
 import AppCard from 'k8s/components/apps/AppCard'
 import moment from 'moment'
 import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
 import useDataLoader from 'core/hooks/useDataLoader'
-import { loadApps } from 'k8s/components/apps/actions'
 import { emptyObj } from 'utils/fp'
 
 const sortingConfig = [
@@ -22,7 +21,9 @@ const sortingConfig = [
 
 const AppCatalogPage = () => {
   const [params, setParams] = useState(emptyObj)
-  const [apps, loading, reload] = useDataLoader(loadApps, params)
+  const [apps, loading, reload] = useDataLoader('apps', params)
+  // reload(true) refetches the data from server
+  const handleRefresh = useCallback(() => reload(true), [reload])
   const renderFilters = useMemo(() => <>
     <ClusterPicklist
       onChange={clusterId => setParams({ clusterId })}
@@ -31,7 +32,7 @@ const AppCatalogPage = () => {
 
   return <CardTable
     loading={loading}
-    onReload={reload}
+    onRefresh={handleRefresh}
     data={apps}
     sorting={sortingConfig}
     searchTarget="attributes.name"

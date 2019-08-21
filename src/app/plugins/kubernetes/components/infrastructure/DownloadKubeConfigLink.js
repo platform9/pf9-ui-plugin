@@ -1,13 +1,15 @@
 import React from 'react'
 import { compose } from 'ramda'
+import ApiClient from 'api-client/ApiClient'
 import { withAppContext } from 'core/AppProvider'
 import SimpleLink from 'core/components/SimpleLink'
 
 class DownloadKubeConfigLink extends React.Component {
   handleClick = async () => {
-    const { cluster, context } = this.props
-    const _kubeConfig = await context.apiClient.qbert.getKubeConfig(cluster.uuid)
-    const newToken = await context.apiClient.keystone.renewScopedToken()
+    const { cluster } = this.props
+    const { qbert, keystone } = ApiClient.getInstance()
+    const _kubeConfig = await qbert.getKubeConfig(cluster.uuid)
+    const newToken = await keystone.renewScopedToken()
     const kubeConfig = _kubeConfig.replace('__INSERT_BEARER_TOKEN_HERE__', newToken)
 
     const blob = new Blob([kubeConfig], { type: 'application/octet-stream' })

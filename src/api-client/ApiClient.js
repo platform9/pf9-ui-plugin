@@ -79,50 +79,30 @@ class ApiClient {
   }
 
   async basicGet (url) {
-    try {
-      const response = await axios.get(url, this.getAuthHeaders())
-      return response.data
-    } catch (err) {
-      console.log(err)
-    }
+    const response = await axios.get(url, this.getAuthHeaders())
+    return response.data
   }
 
   async basicPost (url, body) {
-    try {
-      const response = await axios.post(url, body, this.getAuthHeaders())
-      return response.data
-    } catch (err) {
-      console.log(err)
-    }
+    const response = await axios.post(url, body, this.getAuthHeaders())
+    return response.data
   }
 
   async basicPatch (url, body) {
-    try {
-      const config = this.getAuthHeaders()
-      config.headers['Content-Type'] = 'application/json-patch+json'
-      const response = await axios.patch(url, body, config)
-      return response.data
-    } catch (err) {
-      console.log(err)
-    }
+    const config = this.getAuthHeaders()
+    config.headers['Content-Type'] = 'application/json-patch+json'
+    const response = await axios.patch(url, body, config)
+    return response.data
   }
 
   async basicPut (url, body) {
-    try {
-      const response = await axios.put(url, body, this.getAuthHeaders())
-      return response.data
-    } catch (err) {
-      console.log(err)
-    }
+    const response = await axios.put(url, body, this.getAuthHeaders())
+    return response.data
   }
 
   async basicDelete (url) {
-    try {
-      const response = await axios.delete(url, this.getAuthHeaders())
-      return response.data
-    } catch (err) {
-      console.log(err)
-    }
+    const response = await axios.delete(url, this.getAuthHeaders())
+    return response.data
   }
 }
 

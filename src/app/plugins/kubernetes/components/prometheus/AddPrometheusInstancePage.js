@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback, useState } from 'react'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
 import KeyValuesField from 'core/components/validatedForm/KeyValuesField'
 import PicklistField from 'core/components/validatedForm/PicklistField'
@@ -10,12 +10,11 @@ import Wizard from 'core/components/wizard/Wizard'
 import WizardStep from 'core/components/wizard/WizardStep'
 import createAddComponents from 'core/helpers/createAddComponents'
 import uuid from 'uuid'
-import { compose, path, pluck } from 'ramda'
-import { projectAs } from 'utils/fp'
-import { loadNamespaces } from 'k8s/components/namespaces/actions'
-import { createPrometheusInstance, loadPrometheusInstances, loadServiceAccounts } from './actions'
-import { castFuzzyBool } from 'utils/misc'
-import clusterizedDataLoader from 'k8s/helpers/clusterizedDataLoader'
+import { removeWith, emptyArr, emptyObj } from 'utils/fp'
+import { prometheusInstancesContextKey } from './actions'
+import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
+import NamespacePicklist from 'k8s/components/common/NamespacePicklist'
+import ServicePicklist from 'k8s/components/common/ServicePicklist'
 
 const initialContext = {
   replicas: 1,
@@ -27,120 +26,90 @@ const initialContext = {
   appLabels: [],
 }
 
-const hasPrometheusEnabled = compose(castFuzzyBool, path(['tags', 'pf9-system:monitoring']))
-
-class AddPrometheusInstanceFormBase extends React.Component {
-  state = {
-    clusterUuid: null,
-    namespace: null,
-    rules: [],
-    serviceAccounts: [],
-  }
-
-  handleSubmit = async data => {
-    const { onComplete } = this.props
-    const { rules } = this.state
-    data.rules = rules
-    onComplete(data)
-  }
-
-  handleAddRule = rule => {
+const AddPrometheusInstanceForm = ({ onComplete }) => {
+  const enableStorage = false // We are just using ephemeral storage for the first version
+  const [rules, setRules] = useState(emptyArr)
+  const [params, setParams] = useState(emptyObj)
+  const handleClusterChange = useCallback(clusterId =>
+    setParams({ clusterId }),
+  [])
+  const handleAddRule = useCallback(rule => {
     const withId = { id: uuid.v4(), ...rule }
-    this.setState({ rules: [...this.state.rules, withId] })
-  }
+    setRules([...rules, withId])
+  }, [rules])
+  const handleDeleteRule = useCallback(id =>
+    setRules(removeWith(rule => rule.id === id, rules)),
+  [rules])
+  const handleSubmit = useCallback(data =>
+    onComplete({ ...data, rules }),
+  [rules])
 
-  handleClusterChange = async clusterUuid => {
-    this.setState({ clusterUuid })
-    this.props.setParams({ clusterId: clusterUuid })
-  }
+  return (
+    <Wizard onComplete={handleSubmit} context={initialContext}>
+      {({ wizardContext, setWizardContext, onNext }) => {
+        return (
+          <React.Fragment>
+            <WizardStep stepId="instance" label="Prometheus Instance">
+              <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
+                <TextField id="name" label="Name" info="Name of the Prometheus instance" />
+                <TextField id="replicas" label="Replicas" info="Number of Prometheus replicas" type="number" />
+                <TextField id="cpu" label="CPU" info="Expressed in millicores (1m = 1/1000th of a core)" />
+                <TextField id="memory" label="Memory" info="MiB of memory to allocate" />
+                {enableStorage &&
+                <TextField id="storage" label="Storage" info="The storage allocation.  Default is 8 GiB" />}
 
-  handleNamespaceChange = async namespace => {
-    const { getContext, setContext } = this.props
-    const data = { clusterUuid: this.state.clusterUuid, namespace }
-    const serviceAccounts = await loadServiceAccounts({ data, getContext, setContext })
+                <PicklistField
+                  DropdownComponent={ClusterPicklist}
+                  id="cluster"
+                  label="Cluster"
+                  onChange={handleClusterChange}
+                  value={params.clusterId}
+                  showAll={false}
+                  onlyPrometheusEnabled
+                  required
+                  info="Clusters available with RoleBinding from admin delegation"
+                />
+                <PicklistField
+                  DropdownComponent={NamespacePicklist}
+                  id="namespace"
+                  label="Namespace"
+                  disabled={!params.clusterId}
+                  clusterId={params.clusterId}
+                  value={params.namespaceId}
+                  required
+                  info="Which namespace to use"
+                />
+                <PicklistField
+                  DropdownComponent={ServicePicklist}
+                  id="serviceAccountName"
+                  label="Service Account Name"
+                  disabled={!params.clusterId}
+                  clusterId={params.clusterId}
+                  info="Prometheus will use this to query metrics endpoints"
+                />}
 
-    this.setState({ serviceAccounts, namespace })
-  }
-
-  handleDeleteRule = id => () => {
-    this.setState(state => ({ rules: state.rules.filter(rule => rule.id !== id) }))
-  }
-
-  render () {
-    const { namespace, rules, serviceAccounts } = this.state
-    const { clusters, namespaces } = this.props.data
-    const clustersWithPrometheus = clusters.filter(hasPrometheusEnabled)
-    const clusterOptions = projectAs({ value: 'uuid', label: 'name' }, clustersWithPrometheus)
-    const namespaceOptions = pluck('name', namespaces)
-    const serviceAccountOptions = namespace
-      ? serviceAccounts.map(x => x.metadata.name)
-      : []
-    const enableStorage = false // We are just using ephemeral storage for the first version
-    return (
-      <Wizard onComplete={this.handleSubmit} context={initialContext}>
-        {({ wizardContext, setWizardContext, onNext }) => {
-          return (
-            <React.Fragment>
-              <WizardStep stepId="instance" label="Prometheus Instance">
-                <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
-                  <TextField id="name" label="Name" info="Name of the Prometheus instance" />
-                  <TextField id="replicas" label="Replicas" info="Number of Prometheus replicas" type="number" />
-                  <TextField id="cpu" label="CPU" info="Expressed in millicores (1m = 1/1000th of a core)" />
-                  <TextField id="memory" label="Memory" info="MiB of memory to allocate" />
-                  {enableStorage &&
-                  <TextField id="storage" label="Storage" info="The storage allocation.  Default is 8 GiB" />}
-
-                  <PicklistField
-                    id="cluster"
-                    options={clusterOptions}
-                    onChange={this.handleClusterChange}
-                    label="Cluster"
-                    info="Clusters available with RoleBinding from admin delegation"
-                  />
-
-                  {namespaceOptions.length > 0 &&
-                  <PicklistField
-                    id="namespace"
-                    onChange={this.handleNamespaceChange}
-                    options={namespaceOptions}
-                    label="Namespace"
-                    info="Which namespace to use"
-                  />}
-
-                  {serviceAccountOptions.length > 0 &&
-                  <PicklistField
-                    id="serviceAccountName"
-                    options={serviceAccountOptions}
-                    label="Service Account Name"
-                    info="Prometheus will use this to query metrics endpoints"
-                  />}
-
-                  {enableStorage &&
-                  <CheckboxField id="enablePersistentStorage" label="Enable persistent storage" />}
-                  <TextField id="retention" label="Storage Retention (days)" info="Defaults to 15 days if nothing is set" />
-                  <TextField id="port" label="Service Monitor Port" info="Port for the service monitor" />
-                  <KeyValuesField id="appLabels" label="App Labels" info="Key/value pairs for app that Prometheus will monitor" />
-                </ValidatedForm>
-              </WizardStep>
-              <WizardStep stepId="config" label="Configure Alerting">
-                {rules.length > 0 &&
-                <PrometheusRulesTable rules={this.state.rules} onDelete={this.handleDeleteRule} />}
-                <PrometheusRuleForm onSubmit={this.handleAddRule} />
-              </WizardStep>
-            </React.Fragment>
-          )
-        }}
-      </Wizard>
-    )
-  }
+                {enableStorage &&
+                <CheckboxField id="enablePersistentStorage" label="Enable persistent storage" />}
+                <TextField id="retention" label="Storage Retention (days)" info="Defaults to 15 days if nothing is set" />
+                <TextField id="port" label="Service Monitor Port" info="Port for the service monitor" />
+                <KeyValuesField id="appLabels" label="App Labels" info="Key/value pairs for app that Prometheus will monitor" />
+              </ValidatedForm>
+            </WizardStep>
+            <WizardStep stepId="config" label="Configure Alerting">
+              {rules.length > 0 &&
+              <PrometheusRulesTable rules={rules} onDelete={handleDeleteRule} />}
+              <PrometheusRuleForm onSubmit={handleAddRule} />
+            </WizardStep>
+          </React.Fragment>
+        )
+      }}
+    </Wizard>
+  )
 }
 
-const AddPrometheusInstanceForm = clusterizedDataLoader('namespaces', loadNamespaces)(AddPrometheusInstanceFormBase)
-
 export const options = {
+  dataKey: prometheusInstancesContextKey,
   FormComponent: AddPrometheusInstanceForm,
-  createFn: createPrometheusInstance,
-  loaderFn: loadPrometheusInstances,
   listUrl: '/ui/kubernetes/prometheus#instances',
   name: 'AddPrometheusInstance',
   title: 'Add Prometheus Instance',

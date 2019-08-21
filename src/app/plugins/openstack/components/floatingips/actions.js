@@ -19,11 +19,4 @@ export const deleteFloatingIp = createContextUpdater('floatingIps', async ({ id 
 
 export const updateFloatingIp = createContextUpdater('floatingIps', async data => {
   console.error('TODO: Update Floating IP not yet implemented')
-  /*
-  const { id } = data
-  const existing = await loadFloatingIps({ context, setContext })
-  const updated = await neutron.updateFloatingIp(id, data)
-  const newList = existing.map(x => x.id === id ? x : updated)
-  setContext({ floatingIps: newList })
-  */
 })

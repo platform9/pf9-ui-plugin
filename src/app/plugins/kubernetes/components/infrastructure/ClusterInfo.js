@@ -3,14 +3,13 @@ import InfoPanel from 'core/components/InfoPanel'
 import UsageWidget from 'core/components/dashboardGraphs/UsageWidget'
 import clusterUsageStats from './clusterUsageStats'
 import { Grid } from '@material-ui/core'
-import { compose, pathOr } from 'ramda'
+import { compose, propOr } from 'ramda'
 import { loadClusters } from './actions'
 import { withAppContext } from 'core/AppProvider'
 import { withRouter } from 'react-router'
 import { withStyles } from '@material-ui/styles'
 import withDataLoader from 'core/hocs/withDataLoader'
 import withDataMapper from 'core/hocs/withDataMapper'
-import { dataKey } from 'core/helpers/createContextLoader'
 
 const overviewStats = cluster => ({
   'Status':              cluster.status,
@@ -70,5 +69,5 @@ export default compose(
   withRouter,
   withAppContext,
   withDataLoader({ clusters: loadClusters }),
-  withDataMapper({ clusters: pathOr([], [dataKey, 'clusters']) }),
+  withDataMapper({ clusters: propOr([], 'clusters') }),
 )(ClusterInfo)

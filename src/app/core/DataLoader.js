@@ -4,6 +4,7 @@ import DisplayError from './components/DisplayError'
 import Progress from './components/progress/Progress'
 import { asyncProps } from 'utils/fp'
 import { mapObjIndexed, equals } from 'ramda'
+import { withAppContext } from 'core/AppProvider'
 
 class DataLoader extends PureComponent {
   state = {
@@ -12,7 +13,7 @@ class DataLoader extends PureComponent {
   }
 
   async componentDidMount () {
-    await this.loadAll(this.props.options.reloadOnMount)
+    await this.loadAll(this.props.options.refetchOnMount)
   }
 
   async componentDidUpdate (prevProps) {
@@ -22,12 +23,12 @@ class DataLoader extends PureComponent {
     }
   }
 
-  loadAll = async reload => {
+  loadAll = async refetch => {
     this.setState({ loading: true }, async () => {
       const { loaders, getContext, setContext } = this.props
       try {
         await asyncProps(mapObjIndexed(loaderFn =>
-          loaderFn({ getContext, setContext, reload }), loaders,
+          loaderFn({ getContext, setContext, refetch }), loaders,
         ))
         this.setState({ loading: false, error: null })
       } catch (err) {
@@ -43,8 +44,9 @@ class DataLoader extends PureComponent {
       return <DisplayError error={error} />
     }
     const { children, options, loaders, ...props } = this.props
+    const reload = this.loadAll
     return <Progress inline={options.inlineProgress} overlay loading={loading}>
-      {children({ ...props, loading, error })}
+      {children({ ...props, loading, error, reload })}
     </Progress>
   }
 }
@@ -58,7 +60,7 @@ DataLoader.propTypes = {
 
   options: PropTypes.shape({
     inlineProgress: PropTypes.bool,
-    reloadOnMount: PropTypes.bool,
+    refetchOnMount: PropTypes.bool,
   }),
 
   params: PropTypes.object,
@@ -67,8 +69,8 @@ DataLoader.propTypes = {
 DataLoader.defaultProps = {
   options: {
     inlineProgress: false,
-    reloadOnMount: false,
+    refetchOnMount: false,
   },
 }
 
-export default DataLoader
+export default withAppContext(DataLoader)

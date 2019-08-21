@@ -1,15 +1,13 @@
+import React, { useCallback, useState } from 'react'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import React from 'react'
 import SimpleLink from 'core/components/SimpleLink'
-import { loadReleases, deleteRelease } from 'k8s/components/apps/actions'
-import Picklist from 'core/components/Picklist'
 import { compose } from 'ramda'
 import requiresAuthentication from 'openstack/util/requiresAuthentication'
 import { CardMedia } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
-import { projectAs } from 'utils/fp'
-import clusterizedDataLoader from 'k8s/helpers/clusterizedDataLoader'
-import moize from 'moize'
+import { emptyObj } from 'utils/fp'
+import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
+import useDataLoader from 'core/hooks/useDataLoader'
 
 const styles = theme => ({
   icon: {
@@ -33,34 +31,19 @@ const renderDeployedAppLink = (name, deployedApp) =>
   <SimpleLink src={`/ui/kubernetes/deployed/${deployedApp.id}`}>{name}</SimpleLink>
 
 const ListPage = ({ ListContainer }) => {
-  const handleClusterChange = moize(setParams => async clusterId => {
-    setParams({ clusterId })
-  })
-
-  const findClusterName = (clusters, clusterId) => {
-    const cluster = clusters.find(x => x.uuid === clusterId)
-    return (cluster && cluster.name) || ''
+  return () => {
+    const [params, setParams] = useState(emptyObj)
+    const handleClusterChange = useCallback(clusterId => setParams({ clusterId }), [])
+    const [data, loading, reload] = useDataLoader('releases', params)
+    return <div>
+      <ClusterPicklist
+        formField={false}
+        onChange={handleClusterChange}
+        value={params.clusterId}
+      />
+      <ListContainer loading={loading} reload={reload} data={data} />
+    </div>
   }
-
-  return clusterizedDataLoader('releases', loadReleases, {
-    onlyMasterNodeClusters: true,
-  })(
-    ({ setParams, params: { clusterId }, data: { clusters, releases } }) =>
-      <div>
-        <Picklist
-          formField={false}
-          name="currentCluster"
-          label="Current Cluster"
-          options={projectAs({ label: 'name', value: 'uuid' }, clusters)}
-          value={clusterId}
-          onChange={handleClusterChange(setParams)}
-        />
-        <ListContainer data={releases.map(ns => ({
-          ...ns,
-          clusterName: findClusterName(clusters, ns.clusterId),
-        }))} />
-      </div>,
-  )
 }
 
 export const options = {
@@ -75,7 +58,6 @@ export const options = {
   ],
   dataKey: 'releases',
   // editUrl: '/ui/kubernetes/infrastructure/releases/edit',
-  deleteFn: deleteRelease,
   name: 'DeployedApps',
   title: 'Deployed Apps',
   uniqueIdentifier: 'id',

@@ -1,40 +1,24 @@
-import React from 'react'
-import { projectAs } from 'utils/fp'
-import Picklist from 'core/components/Picklist'
+import React, { useCallback, useState } from 'react'
 import { loadDeployments } from 'k8s/components/pods/actions'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import clusterizedDataLoader from 'k8s/helpers/clusterizedDataLoader'
-import moize from 'moize'
+import { emptyObj } from 'utils/fp'
+import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
+import useDataLoader from 'core/hooks/useDataLoader'
 
 const ListPage = ({ ListContainer }) => {
-  const handleClusterChange = moize(setParams => async clusterId => {
-    setParams({ clusterId })
-  })
-
-  const findClusterName = (clusters, clusterId) => {
-    const cluster = clusters.find(x => x.uuid === clusterId)
-    return (cluster && cluster.name) || ''
+  return () => {
+    const [params, setParams] = useState(emptyObj)
+    const handleClusterChange = useCallback(clusterId => setParams({ clusterId }), [])
+    const [data, loading, reload] = useDataLoader('deployments', params)
+    return <div>
+      <ClusterPicklist
+        formField={false}
+        onChange={handleClusterChange}
+        value={params.clusterId}
+      />
+      <ListContainer loading={loading} reload={reload} data={data} />
+    </div>
   }
-
-  return clusterizedDataLoader('deployments', loadDeployments, {
-    onlyMasterNodeClusters: true,
-  })(
-    ({ setParams, params: { clusterId }, data: { deployments, clusters } }) =>
-      <div>
-        <Picklist
-          formField={false}
-          name="currentCluster"
-          label="Current Cluster"
-          options={projectAs({ label: 'name', value: 'uuid' }, clusters)}
-          value={clusterId}
-          onChange={handleClusterChange(setParams)}
-        />
-        <ListContainer data={deployments.map(ns => ({
-          ...ns,
-          clusterName: findClusterName(clusters, ns.clusterId),
-        }))} />
-      </div>,
-  )
 }
 
 export const options = {

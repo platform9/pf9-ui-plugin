@@ -62,6 +62,7 @@ const styles = theme => ({
   },
 })
 
+@withStyles(styles)
 class Progress extends PureComponent {
   state = {
     loading: this.props.loading,
@@ -175,4 +176,4 @@ export const withProgress = Component => ({ overlay, inline, loading, ...props }
     <Component {...props} />
   </Progress>
 
-export default withStyles(styles)(Progress)
+export default Progress

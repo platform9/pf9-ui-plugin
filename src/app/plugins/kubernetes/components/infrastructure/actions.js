@@ -20,7 +20,7 @@ export const combinedHostsContextKey = 'combinedHosts'
 export const parseClusterParams = async (params, loadFromContext) => {
   const clusters = await loadFromContext(clustersContextKey)
   const { clusterId = pathOr(allKey, [0, 'uuid'], clusters) || allKey } = params
-  return { ...params, clusterId, clusters }
+  return [ clusterId, clusters ]
 }
 
 export const deleteCluster = createContextUpdater(clustersContextKey, async ({ id }) => {

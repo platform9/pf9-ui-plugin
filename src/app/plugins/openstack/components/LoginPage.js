@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react'
 import PropTypes from 'prop-types'
+import ApiClient from 'api-client/ApiClient'
 import {
   Button, Checkbox, FormControlLabel, Grid, Paper, TextField, Typography,
 } from '@material-ui/core'
@@ -67,9 +68,9 @@ export class LoginPage extends React.Component {
 
   performLogin = async (event) => {
     event.preventDefault()
-    const { onAuthSuccess, context } = this.props
+    const { onAuthSuccess } = this.props
     const { username, password } = this.state
-    const { keystone } = context.apiClient
+    const { keystone } = ApiClient.getInstance()
 
     this.setState({ loginFailed: false, loading: true })
     const unscopedToken = await keystone.authenticate(username, password)

@@ -1,4 +1,5 @@
 import React from 'react'
+import ApiClient from 'api-client/ApiClient'
 import { withRouter } from 'react-router'
 import { compose } from 'app/utils/fp'
 import { dashboardUrl, loginUrl } from 'app/constants'
@@ -39,11 +40,11 @@ class SessionManager extends React.Component {
     this.initialSetup({ username, unscopedToken })
   }
 
-  get keystone () { return this.props.context.apiClient.keystone }
+  get keystone () { return ApiClient.getInstance().keystone }
 
   // Handler that gets invoked on successful authentication
   initialSetup = async ({ username, unscopedToken }) => {
-    const { context, history, location, initSession, initUserPreferences, setContext } = this.props
+    const { history, location, initSession, initUserPreferences, getContext, setContext } = this.props
 
     // Set up the scopedToken
     await initSession(unscopedToken, username)
@@ -53,11 +54,12 @@ class SessionManager extends React.Component {
     const lastTenant = pathOr('service', ['Tenants', 'lastTenant', 'name'], userPreferences)
     const lastRegion = path(['RegionChooser', 'lastRegion', 'id'], userPreferences)
 
-    const tenants = await loadUserTenants()
+    const tenants = await loadUserTenants({ getContext, setContext })
     const activeTenant = tenants.find(propEq('name', lastTenant))
-    const { keystone } = context.apiClient
+    const apiClient = ApiClient.getInstance()
+    const { keystone } = apiClient
 
-    if (lastRegion) { context.apiClient.setActiveRegion(lastRegion) }
+    if (lastRegion) { apiClient.setActiveRegion(lastRegion) }
     const { scopedToken, user } = await keystone.changeProjectScope(activeTenant.id)
 
     setStorage('user', user)

@@ -1,18 +1,15 @@
-import React from 'react'
+import React, { useMemo, useCallback } from 'react'
 import CreateButton from 'core/components/buttons/CreateButton'
 import CRUDListContainer from 'core/components/CRUDListContainer'
 import ListTable from 'core/components/listTable/ListTable'
 import TopExtraContent from 'core/components/TopExtraContent'
-import createCRUDActions from 'core/helpers/createCRUDActions'
 import requiresAuthentication from 'openstack/util/requiresAuthentication'
-import withDataLoader from 'core/hocs/withDataLoader'
-import withDataMapper from 'core/hocs/withDataMapper'
+import useDataLoader from 'core/hooks/useDataLoader'
+import useDataUpdater from 'core/hooks/useDataUpdater'
 import { compose } from 'app/utils/fp'
-import { pathOr, prop } from 'ramda'
 import { withAppContext } from 'core/AppProvider'
 import { withRouter } from 'react-router-dom'
 import { withScopedPreferences } from 'core/providers/PreferencesProvider'
-import { withToast } from 'core/providers/ToastProvider'
 
 /**
  * This helper removes a lot of boilerplate from standard CRUD operations.
@@ -35,13 +32,7 @@ import { withToast } from 'core/providers/ToastProvider'
 
 const createCRUDComponents = options => {
   const {
-    actions,
-    crudActions = actions ? createCRUDActions(actions) : null,
     dataKey,
-    deleteFn,
-    loaderFn,
-    mappers = { [dataKey]: pathOr([], [dataKey, dataKey]) },
-    loaders = loaderFn || crudActions ? { [dataKey]: loaderFn || prop('list', crudActions) } : null,
     columns = [],
     rowActions = () => [],
     uniqueIdentifier = 'id',
@@ -54,7 +45,7 @@ const createCRUDComponents = options => {
 
   // List
   const List = withScopedPreferences(name)(({
-    onAdd, onDelete, onEdit, rowActions, data,
+    onAdd, onDelete, onEdit, rowActions, data, reload,
     preferences: { visibleColumns, columnsOrder, rowsPerPage },
     updatePreferences,
   }) => {
@@ -67,6 +58,7 @@ const createCRUDComponents = options => {
     // }
     return (
       <ListTable
+        reload={reload}
         columns={columns}
         data={data}
         onAdd={onAdd}
@@ -86,42 +78,37 @@ const createCRUDComponents = options => {
   List.displayName = `${name}List`
 
   // ListContainer
-  class ContainerBase extends React.Component {
-    handleRemove = async id => {
-      return (deleteFn || crudActions.delete)({ id, ...this.props })
+  const ContainerBase = ({ params, setParams, history, data, loading, reload }) => {
+    const [removeFn, deleting] = useDataUpdater(dataKey, 'delete')
+    const handleRemove = useCallback(async id => removeFn({ [uniqueIdentifier]: id }), [removeFn])
+    const addButton = useMemo(() =>
+      <CreateButton onClick={() => history.push(addUrl)}>{addText}</CreateButton>,
+    [history])
+
+    let moreProps = {}
+    if (rowActions && rowActions.length > 0) {
+      moreProps.rowActions = rowActions
     }
 
-    redirectToAdd = () => {
-      this.props.history.push(addUrl)
-    }
-
-    renderAddButton = () => <CreateButton onClick={this.redirectToAdd}>{addText}</CreateButton>
-
-    render () {
-      let moreProps = {}
-      if (rowActions && rowActions.length > 0) {
-        moreProps.rowActions = rowActions
-      }
-
-      return (
-        <CRUDListContainer
-          loading={this.props.loading}
-          items={this.props.data}
-          editUrl={editUrl}
-          onRemove={this.handleRemove}
-          uniqueIdentifier={uniqueIdentifier}
-        >
-          {handlers => <React.Fragment>
-            {addUrl && <TopExtraContent>{this.renderAddButton()}</TopExtraContent>}
-            <List data={this.props.data} {...handlers} {...moreProps} />
-          </React.Fragment>}
-        </CRUDListContainer>
-      )
-    }
+    return (
+      <CRUDListContainer
+        loading={loading || deleting}
+        items={data}
+        params={params}
+        setParams={setParams}
+        editUrl={editUrl}
+        onRemove={handleRemove}
+        uniqueIdentifier={uniqueIdentifier}
+      >
+        {handlers => <>
+          {addUrl && <TopExtraContent>{addButton}</TopExtraContent>}
+          <List data={data} reload={reload} {...handlers} {...moreProps} />
+        </>}
+      </CRUDListContainer>
+    )
   }
 
   const ListContainer = compose(
-    withToast,
     withAppContext,
     withRouter,
   )(ContainerBase)
@@ -130,20 +117,13 @@ const createCRUDComponents = options => {
 
   const createStandardListPage = () => {
     // ListPage
-    let StandardListPage = ({ data, loading, reload }) => (
-      <React.Fragment>
-        <ListContainer data={data[dataKey]} loading={loading} reload={reload} />
-        {debug && <pre>{JSON.stringify(data[dataKey], null, 4)}</pre>}
-      </React.Fragment>
-    )
-
-    if (loaders) {
-      if (mappers) {
-        StandardListPage = withDataMapper(mappers)(StandardListPage)
-      }
-      StandardListPage = withDataLoader(loaders)(StandardListPage)
+    return () => {
+      const [data, loading, reload] = useDataLoader(dataKey)
+      return <>
+        <ListContainer data={data} loading={loading} reload={reload} />
+        {debug && <pre>{JSON.stringify(data, null, 4)}</pre>}
+      </>
     }
-    return StandardListPage
   }
 
   const ListPage = requiresAuthentication(options.ListPage

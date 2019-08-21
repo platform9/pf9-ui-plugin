@@ -1,5 +1,6 @@
 import React, { forwardRef } from 'react'
 import PropTypes from 'prop-types'
+import ApiClient from 'api-client/ApiClient'
 import { compose } from 'ramda'
 import { withAppContext } from 'core/AppProvider'
 import { AppBar, Dialog, IconButton, Slide, Toolbar, Typography } from '@material-ui/core'
@@ -26,8 +27,8 @@ class KubeCLI extends React.Component {
   state = { url: null, open: false }
 
   handleClick = async () => {
-    const { host, cluster, context } = this.props
-    const token = await context.apiClient.qbert.getCliToken(cluster.uuid)
+    const { host, cluster } = this.props
+    const token = await ApiClient.getInstance().qbert.getCliToken(cluster.uuid)
     const url = `${host}/container/index.html?token=${token}`
     this.setState({ url, open: true })
   }

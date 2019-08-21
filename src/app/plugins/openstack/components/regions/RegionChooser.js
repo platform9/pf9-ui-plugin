@@ -1,16 +1,18 @@
 import React from 'react'
+import ApiClient from 'api-client/ApiClient'
 import Selector from 'core/components/Selector'
 import { appUrlRoot } from 'app/constants'
-import { compose, pluck, propEq, pathOr } from 'ramda'
+import { compose, pluck, propEq, propOr } from 'ramda'
 import { withAppContext } from 'core/AppProvider'
 import { withScopedPreferences } from 'core/providers/PreferencesProvider'
-import createContextLoader, { dataKey } from 'core/helpers/createContextLoader'
+import createContextLoader from 'core/helpers/createContextLoader'
 import withDataLoader from 'core/hocs/withDataLoader'
 import withDataMapper from 'core/hocs/withDataMapper'
 import { Tooltip } from '@material-ui/core'
 
-const loadRegions = createContextLoader('regions', async ({ apiClient }) => {
-  return apiClient.keystone.getRegions()
+const loadRegions = createContextLoader('regions', async () => {
+  const { keystone } = ApiClient.getInstance()
+  return keystone.getRegions()
 })
 
 class RegionChooser extends React.Component {
@@ -21,8 +23,7 @@ class RegionChooser extends React.Component {
   }
 
   componentDidMount () {
-    const { context } = this.props
-    this.setState({ curRegion: context.apiClient.activeRegion })
+    this.setState({ curRegion: ApiClient.getInstance().activeRegion })
   }
 
   handleSearchChange = regionSearch => this.setState({ regionSearch })
@@ -45,7 +46,6 @@ class RegionChooser extends React.Component {
   render () {
     const { curRegion, regionSearch, tooltipOpen } = this.state
     const { data: { regions = [] }, className } = this.props
-
     const regionNames = pluck('id', regions)
 
     return (
@@ -73,8 +73,6 @@ class RegionChooser extends React.Component {
 export default compose(
   withAppContext,
   withDataLoader({ regions: loadRegions }, { inlineProgress: true }),
-  withDataMapper({
-    regions: pathOr([], [dataKey, 'regions']),
-  }),
+  withDataMapper({ regions: propOr([], 'regions') }),
   withScopedPreferences('RegionChooser'),
 )(RegionChooser)

@@ -176,6 +176,7 @@ class CardTable extends PureComponent {
     const {
       classes, paginate,
       data, sorting, filters, children,
+      onRefresh,
     } = this.props
 
     if (!data) {
@@ -198,6 +199,7 @@ class CardTable extends PureComponent {
               onFilterUpdate={this.handleFilterUpdate}
               onSearchChange={this.handleSearch}
               onSortChange={this.handleRequestSort}
+              onRefresh={onRefresh}
               onDirectionChange={this.handleDirectionChange}
               searchTerm={searchTerm}
             />
@@ -223,6 +225,7 @@ CardTable.propTypes = {
       sortWith: PropTypes.func,
     }),
   ),
+  onRefresh: PropTypes.func,
   ...Progress.propTypes,
 }
 

@@ -1,4 +1,4 @@
-import { Toolbar, Typography } from '@material-ui/core'
+import { Button, Toolbar, Typography, Tooltip } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import SearchBar from 'core/components/SearchBar'
 import React from 'react'
@@ -7,7 +7,8 @@ import PropTypes from 'prop-types'
 import { projectAs } from 'utils/fp'
 import ArrowDownward from '@material-ui/icons/ArrowDownward'
 import ArrowUpward from '@material-ui/icons/ArrowUpward'
-import Button from '@material-ui/core/Button'
+import moize from 'moize'
+import clsx from 'clsx'
 
 const styles = theme => ({
   root: {
@@ -44,6 +45,14 @@ const styles = theme => ({
     flex: '0 0 auto',
   },
 })
+
+const renderRefreshButton = moize((classes, onRefresh) =>
+  onRefresh && <Tooltip title="Refresh list">
+    <i className={clsx(classes.button, 'fas fa-fw fa-lg fa-sync')}
+      aria-label="Refresh list"
+      onClick={onRefresh}
+    />
+  </Tooltip>)
 
 const CustomPicklist = withStyles(theme => ({
   root: {
@@ -112,6 +121,7 @@ const CardTableToolbar = ({
   onSortChange,
   onDirectionChange,
   onFilterUpdate,
+  onRefresh,
   onSearchChange,
   searchTerm,
 }) => (
@@ -140,6 +150,7 @@ const CardTableToolbar = ({
           : filters}
       </div>
       <div className={classes.controls}>
+        {renderRefreshButton(classes, onRefresh)}
         {sorting.length && (
           <React.Fragment>
             <SortDropdown
@@ -178,6 +189,7 @@ CardTableToolbar.propTypes = {
   onSortChange: PropTypes.func,
   onDirectionChange: PropTypes.func,
   onSearchChange: PropTypes.func,
+  onRefresh: PropTypes.func,
   searchTerm: PropTypes.string,
   title: PropTypes.string,
   classes: PropTypes.object.isRequired,

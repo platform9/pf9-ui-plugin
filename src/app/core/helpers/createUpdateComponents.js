@@ -15,7 +15,6 @@ const createUpdateComponents = options => {
   const {
     FormComponent,
     updateFn,
-    dataKey,
     initFn,
     listUrl,
     loaderFn,
@@ -32,26 +31,23 @@ const createUpdateComponents = options => {
     state = { initialValue: null }
 
     async componentDidMount () {
-      const { context, getContext, setContext, match } = this.props
+      const { getContext, setContext, match } = this.props
       const id = match.params[routeParamKey]
-      const existing = await loaderFn({ setContext, getContext, context })
+      const existing = await loaderFn({ setContext, getContext })
       const initialValue = existing.find(x => x[uniqueIdentifier] === id)
       this.setState({ initialValue })
     }
 
     handleComplete = async data => {
-      const { setContext, getContext, context, history, match } = this.props
+      const { setContext, getContext, history, match } = this.props
       const id = match.params[routeParamKey]
       try {
-        const existing = await loaderFn({ setContext, getContext, context })
         if (initFn) {
           // Sometimes a component needs more than just a single GET API call.
           // This function allows for any amount of arbitrary initialization.
           await initFn(this.props)
         }
-        const updated = await updateFn({ id, data, context, getContext, setContext })
-        const updatedList = existing.map(x => x[uniqueIdentifier] !== id ? x : updated)
-        setContext({ [dataKey]: updatedList })
+        await updateFn({ params: { [uniqueIdentifier]: id, ...data }, getContext, setContext })
         history.push(listUrl)
       } catch (err) {
         console.error(err)

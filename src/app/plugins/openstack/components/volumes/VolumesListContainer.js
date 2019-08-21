@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import ApiClient from 'api-client/ApiClient'
 import PhotoCameraIcon from '@material-ui/icons/PhotoCamera'
 import { compose } from 'app/utils/fp'
 import { withAppContext } from 'core/AppProvider'
@@ -7,6 +8,8 @@ import CRUDListContainer from 'core/components/CRUDListContainer'
 import createListTableComponent from 'core/helpers/createListTableComponent'
 import { withRouter } from 'react-router'
 import getVolumes from 'server/api/cinder/getVolumes'
+import { dataContextKey } from 'core/helpers/createContextLoader'
+import { assocPath } from 'ramda'
 
 const columns = [
   { id: 'name', label: 'Name' },
@@ -40,10 +43,11 @@ export const VolumesList = createListTableComponent({
 class VolumesListContainer extends React.Component {
   handleRemove = async id => {
     const { getContext, setContext } = this.props
-    await getContext().apiClient.cinder.deleteVolume(id)
+    // TODO: use createContextUpdater
+    await ApiClient.getInstance().cinder.deleteVolume(id)
     const newVolumes = (await getVolumes({ getContext, setContext }))
       .filter(x => x.id !== id)
-    setContext({ volumes: newVolumes })
+    setContext(assocPath([dataContextKey, 'volumes'], newVolumes))
   }
 
   handleSnapshot = async volume => {

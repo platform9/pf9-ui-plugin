@@ -57,7 +57,7 @@ export const loadPrometheusInstances = createContextLoader(prometheusInstancesCo
   return mapAsyncItems(clusterUuids, qbert.getPrometheusInstances, mapPrometheusInstance)
 })
 
-export const createPrometheusInstance = createContextUpdater(prometheusInstancesContextKey, async ({ data, apiClient, currentItems, showToast }) => {
+export const createPrometheusInstance = createContextUpdater(prometheusInstancesContextKey, async ({ data, currentItems, showToast }) => {
   const { qbert } = ApiClient.getInstance()
   const createdInstance = await qbert.createPrometheusInstance(data.cluster, data)
   return mapPrometheusInstance({ clusterUuid: data.cluster, ...createdInstance })
@@ -66,7 +66,7 @@ export const createPrometheusInstance = createContextUpdater(prometheusInstances
   successMessage: updatedItems => `Successfully created Prometheus instance ${last(updatedItems).name}`
 })
 
-export const deletePrometheusInstance = createContextUpdater(prometheusInstancesContextKey, async ({ id, apiClient, currentItems }) => {
+export const deletePrometheusInstance = createContextUpdater(prometheusInstancesContextKey, async ({ id, currentItems }) => {
   const { qbert } = ApiClient.getInstance()
   const instance = currentItems.find(propEq('uid', id))
   if (!instance) {
@@ -134,7 +134,7 @@ export const updatePrometheusRules = createContextUpdater(prometheusRulesContext
   )(updatedItems)}`,
 })
 
-export const deletePrometheusRule = createContextUpdater(prometheusRulesContextKey, async ({ id, apiClient, currentItems, showToast }) => {
+export const deletePrometheusRule = createContextUpdater(prometheusRulesContextKey, async ({ id, currentItems, showToast }) => {
   const { qbert } = ApiClient.getInstance()
   const rule = currentItems.find(propEq('uid', id))
   if (!rule) {
@@ -184,7 +184,7 @@ export const updatePrometheusServiceMonitor = createContextUpdater(prometheusSer
   )(updatedItems)}`,
 })
 
-export const deletePrometheusServiceMonitor = createContextUpdater(prometheusServiceMonitorsContextKey, async ({ id, currentItems, apiClient, showToast }) => {
+export const deletePrometheusServiceMonitor = createContextUpdater(prometheusServiceMonitorsContextKey, async ({ id, currentItems, showToast }) => {
   const { qbert } = ApiClient.getInstance()
   const sm = currentItems.find(propEq('uid', id))
   if (!sm) {
@@ -233,7 +233,7 @@ export const updatePrometheusAlertManager = createContextUpdater(prometheusAlert
   )(updatedItems)}`,
 })
 
-export const deletePrometheusAlertManager = createContextUpdater(prometheusAlertManagersContextKey, async ({ id, currentItems, apiClient, showToast }) => {
+export const deletePrometheusAlertManager = createContextUpdater(prometheusAlertManagersContextKey, async ({ id, currentItems, showToast }) => {
   const { qbert } = ApiClient.getInstance()
   const am = currentItems.find(propEq('uid', id))
   if (!am) {
