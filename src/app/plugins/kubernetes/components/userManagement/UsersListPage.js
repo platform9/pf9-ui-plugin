@@ -1,5 +1,5 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { loadUsers, deleteUser } from 'k8s/components/userManagement/actions'
+import { loadUsers, deleteUser, mngmUsersDataKey } from 'k8s/components/userManagement/actions'
 
 export const options = {
   loaderFn: loadUsers,
@@ -10,7 +10,7 @@ export const options = {
     { id: 'two_factor', label: 'Two-Factor Authentication' },
     { id: 'tenants', label: 'Tenants' },
   ],
-  dataKey: 'users',
+  dataKey: mngmUsersDataKey,
   // editUrl: '/ui/kubernetes/infrastructure/users/edit',
   deleteFn: deleteUser,
   name: 'Users',

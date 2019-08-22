@@ -1,8 +1,11 @@
-import { path, pick, isEmpty, concat, identity, assoc, find, whereEq, when, isNil, reject, filter, always, append, uniqBy, pipe, over, lensPath, pickAll, view } from 'ramda'
+import {
+  path, pick, isEmpty, concat, identity, assoc, find, whereEq, when, isNil, reject, filter, always,
+  append, uniqBy, pipe, over, lensPath, pickAll, view, has,
+} from 'ramda'
 import { ensureFunction, ensureArray, emptyObj, emptyArr } from 'utils/fp'
-import { singlePromise } from 'utils/misc'
+import { singlePromise, uncamelizeString } from 'utils/misc'
+import { defaultUniqueIdentifier } from 'app/constants'
 
-export const defaultUniqueIdentifier = 'uuid'
 export const paramsContextKey = 'cachedParams'
 export const dataContextKey = 'cachedData'
 
@@ -16,7 +19,7 @@ export const getContextLoader = key => {
 const arrayIfNil = when(isNil, always(emptyArr))
 
 /**
- * Create a function that will use context to load and cache values
+ * Returns a function that will use context to load and cache values
  * @param {string} key Key on which the resolved value will be cached
  * @param {function} dataFetchFn Function returning the data to be assigned to the context
  * @param {object} [options] Optional additional options
@@ -24,15 +27,15 @@ const arrayIfNil = when(isNil, always(emptyArr))
  * @param {string} [options.entityName=options.uniqueIdentifier] Name of the entity
  * @param {string|array} [options.indexBy] Keys to use to index the values
  * @param {bool} [options.skipEmptyParamCalls=!!indexBy] Skip calls that doesn't contain any of the required indexed keys in the params
- * @param {function} [options.dataMapper] Function used to apply additional transformations to loaded data
+ * @param {function} [options.dataMapper] Function used to apply additional transformations to loaded data after retrieved from cache
  * @param {function|string} [options.successMessage] Custom message to display after the items have been successfully fetched
  * @param {function|string} [options.errorMessage] Custom message to display after an error has been thrown
- * @returns {function}
+ * @returns {contextLoaderFn} Function that once called will retrieve data from cache or fetch from server
  */
-const createContextLoader = (key, dataFetchFn, options = emptyObj) => {
+const createContextLoader = (key, dataFetchFn, options = {}) => {
   const {
     uniqueIdentifier = defaultUniqueIdentifier,
-    entityName = key.charAt(0).toUpperCase() + key.slice(1),
+    entityName = uncamelizeString(key).replace(/s$/, ''), // Remove trailing "s"
     indexBy,
     skipEmptyParamCalls = !!indexBy,
     dataMapper = identity,
@@ -40,11 +43,27 @@ const createContextLoader = (key, dataFetchFn, options = emptyObj) => {
     errorMessage = (catchedErr, params) => `Error when trying to retrieve ${entityName} items`,
   } = options
   const uniqueIdentifierPath = uniqueIdentifier.split('.')
-  const paramsLens = lensPath([paramsContextKey, key])
   const dataLens = lensPath([dataContextKey, key])
+  const paramsLens = lensPath([paramsContextKey, key])
   const indexByAll = indexBy ? ensureArray(indexBy) : emptyArr
-  // Memoize the promise so that we avoid concurrent calls from fetching the api or possible race conditions
-  const contextLoaderFn = singlePromise(async ({ getContext, setContext, params = emptyObj, refetch = false, additionalOptions = emptyObj }) => {
+
+  /**
+   * Context loader function, uses a custom loader function to load data from the server
+   * This function promise is memoized so that concurrent calls fetching the api or possible race conditions are avoided
+   * @typedef {function} contextLoaderFn
+   * @function contextLoaderFn
+   * @async
+   * @param {Object} args Object containing the required arguments
+   * @param {function} args.getContext
+   * @param {function} args.setContext
+   * @param {object} [args.params] Object containing parameters that will be passed to the updaterFn
+   * @param {object} [args.refetch] Invalidates the cache and calls the dataFetchFn() to fetch the data from server
+   * @param {object} [args.additionalOptions] Additional custom options
+   * @param {function} [args.additionalOptions.onSuccess] Custom logic to perfom after success
+   * @param {function} [args.additionalOptions.onError] Custom logic to perfom after error
+   * @returns {Promise<array>} Fetched or cached items
+   */
+  const contextLoaderFn = singlePromise(async ({ getContext, setContext, params = {}, refetch = false, additionalOptions = emptyObj }) => {
     if (skipEmptyParamCalls && isEmpty(pick(indexByAll, params))) {
       return emptyArr
     }
@@ -57,7 +76,7 @@ const createContextLoader = (key, dataFetchFn, options = emptyObj) => {
       const loaderFn = getContextLoader(key)
       return loaderFn({ getContext, setContext, params, refetch, additionalOptions })
     }
-    if (!refetch) {
+    if (!refetch && !contextLoaderFn._invalidatedCache) {
       const allCachedParams = getContext(view(paramsLens)) || emptyArr
       if (find(whereEq(indexedParams), allCachedParams)) {
         // Return the cached data
@@ -70,13 +89,17 @@ const createContextLoader = (key, dataFetchFn, options = emptyObj) => {
       const fetchedItems = await dataFetchFn(params, loadFromContext)
 
       await setContext(pipe(
-        // If we are reloading, we'll clean up the previous queried items first
-        refetch ? over(dataLens, pipe(arrayIfNil, reject(whereEq(indexedParams)))) : identity,
+        contextLoaderFn._invalidatedCache
+          // If cache has been invalidated, empty the cached data array
+          ? over(dataLens, always(emptyArr))
+          // If we are refetching, we'll clean up the previous queried items
+          : (refetch ? over(dataLens, pipe(arrayIfNil, reject(whereEq(indexedParams)))) : identity),
         // Insert new items replacing possible duplicates (by uniqueIdentifier)
         over(dataLens, pipe(arrayIfNil, concat(fetchedItems), uniqBy(path(uniqueIdentifierPath)))),
         // Update cachedParams so that we know this query has already been resolved
-        over(paramsLens, pipe(arrayIfNil, append(indexedParams)))
+        over(paramsLens, pipe(arrayIfNil, contextLoaderFn._invalidatedCache ? always(indexedParams) : append(indexedParams))),
       ))
+      contextLoaderFn._invalidatedCache = false
       if (onSuccess) {
         const parsedSuccessMesssage = ensureFunction(successMessage)(params)
         await onSuccess(parsedSuccessMesssage, params)
@@ -92,6 +115,14 @@ const createContextLoader = (key, dataFetchFn, options = emptyObj) => {
   }, {
     isDeepEqual: true,
   })
+  contextLoaderFn._invalidatedCache = true
+  contextLoaderFn.invalidateCache = () => {
+    contextLoaderFn._invalidatedCache = true
+  }
+
+  if (has(key, loaders)) {
+    throw new Error(`Context Loader function with key ${key} already exists`)
+  }
   loaders = assoc(key, contextLoaderFn, loaders)
   return contextLoaderFn
 }

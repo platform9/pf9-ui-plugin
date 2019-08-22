@@ -1,5 +1,7 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { loadTenants, deleteTenant } from 'k8s/components/userManagement/actions'
+import {
+  loadTenants, deleteTenant, mngmTenantsDataKey,
+} from 'k8s/components/userManagement/actions'
 
 export const options = {
   loaderFn: loadTenants,
@@ -9,7 +11,7 @@ export const options = {
     { id: 'description', label: 'Description' },
     { id: 'clusters', label: 'Mapped Clusters' },
   ],
-  dataKey: 'tenants',
+  dataKey: mngmTenantsDataKey,
   // editUrl: '/ui/kubernetes/infrastructure/tenants/edit',
   deleteFn: deleteTenant,
   name: 'Tenants',

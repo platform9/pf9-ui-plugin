@@ -1,5 +1,5 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { loadRoles, deleteRole } from 'k8s/components/userManagement/actions'
+import { loadRoles, deleteRole, mngmRolesDataKey } from 'k8s/components/userManagement/actions'
 
 export const options = {
   loaderFn: loadRoles,
@@ -7,7 +7,7 @@ export const options = {
     { id: 'name', label: 'Role' },
     { id: 'description', label: 'Description' },
   ],
-  dataKey: 'roles',
+  dataKey: mngmRolesDataKey,
   // editUrl: '/ui/kubernetes/infrastructure/roles/edit',
   deleteFn: deleteRole,
   name: 'Roles',

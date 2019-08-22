@@ -10,7 +10,7 @@ import withDataLoader from 'core/hocs/withDataLoader'
 import withDataMapper from 'core/hocs/withDataMapper'
 import { Tooltip } from '@material-ui/core'
 
-const loadRegions = createContextLoader('regions', async () => {
+const loadRegions = createContextLoader('regionChooser', async () => {
   const { keystone } = ApiClient.getInstance()
   return keystone.getRegions()
 })
@@ -73,6 +73,6 @@ class RegionChooser extends React.Component {
 export default compose(
   withAppContext,
   withDataLoader({ regions: loadRegions }, { inlineProgress: true }),
-  withDataMapper({ regions: propOr([], 'regions') }),
+  withDataMapper({ regions: propOr([], 'regionChooser') }),
   withScopedPreferences('RegionChooser'),
 )(RegionChooser)

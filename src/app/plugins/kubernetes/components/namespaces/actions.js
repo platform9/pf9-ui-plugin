@@ -22,7 +22,6 @@ const namespacesMapper = async (items, params, loadFromContext) => {
 
 export const loadNamespaces = createContextLoader(namespacesDataKey, async (params, loadFromContext) => {
   const [clusterId, clusters] = await parseClusterParams(params, loadFromContext)
-  console.log(clusterId)
   const { qbert } = ApiClient.getInstance()
   return clusterId === allKey
     ? asyncFlatMap(pluck('uuid', clusters), qbert.getClusterNamespaces)

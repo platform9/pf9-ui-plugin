@@ -3,14 +3,19 @@ import {
   path, any, pluck, pipe, uniq, reduce, map, head, values, groupBy, prop, innerJoin, pathEq,
   flatten, find,
 } from 'ramda'
-import moize from 'moize'
+import { tryJsonParse } from 'utils/misc'
 import createContextLoader from 'core/helpers/createContextLoader'
-import { loadNamespaces } from 'k8s/components/namespaces/actions'
+import { namespacesDataKey } from 'k8s/components/namespaces/actions'
 
-export const loadTenants = createContextLoader('tenants', async () => {
+export const mngmTenantsDataKey = 'mngmTenants'
+export const mngmUsersDataKey = 'mngmUsers'
+export const mngmGroupsDataKey = 'mngmGroups'
+export const mngmRolesDataKey = 'mngmRoles'
+
+export const loadTenants = createContextLoader(mngmTenantsDataKey, async (params, loadFromContext) => {
   const { keystone } = ApiClient.getInstance()
   const [namespaces, allTenantsAllUsers] = await Promise.all([
-    loadNamespaces(),
+    loadFromContext(namespacesDataKey),
     keystone.getAllTenantsAllUsers()
   ])
   return allTenantsAllUsers.map(tenant => ({
@@ -24,8 +29,8 @@ export const deleteTenant = () => {
   console.log('TODO')
 }
 
-export const loadUsers = createContextLoader('users', async () => {
-  const tenants = await loadTenants()
+export const loadUsers = createContextLoader(mngmUsersDataKey, async (params, loadFromContext) => {
+  const tenants = await loadFromContext(mngmTenantsDataKey)
 
   // Get all tenant users and assign the corresponding tenant ID
   const selectAllTenantUsers = reduce((acc, tenant) => {
@@ -60,8 +65,7 @@ export const deleteUser = () => {
   console.log('TODO')
 }
 
-const tryJsonParse = moize(val => typeof val === 'string' ? JSON.parse(val) : val)
-export const loadGroups = createContextLoader('groups', async () => {
+export const loadGroups = createContextLoader(mngmGroupsDataKey, async () => {
   const { keystone } = ApiClient.getInstance()
   const [groups, mappings] = await Promise.all([
     keystone.getGroups(),
@@ -108,7 +112,7 @@ export const deleteGroup = () => {
   console.log('TODO')
 }
 
-export const loadRoles = createContextLoader('roles', async () => {
+export const loadRoles = createContextLoader(mngmRolesDataKey, async () => {
   const { keystone } = ApiClient.getInstance()
   const roles = await keystone.getRoles()
 

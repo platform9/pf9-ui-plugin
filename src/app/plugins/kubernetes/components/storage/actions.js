@@ -3,11 +3,11 @@ import createContextLoader from 'core/helpers/createContextLoader'
 import createContextUpdater from 'core/helpers/createContextUpdater'
 import { asyncFlatMap } from 'utils/fp'
 import { assoc, propEq } from 'ramda'
-import { loadClusters } from 'k8s/components/infrastructure/actions'
+import { clustersDataKey } from 'k8s/components/infrastructure/actions'
 
-export const loadStorageClasses = createContextLoader('storageClasses', async () => {
+export const loadStorageClasses = createContextLoader('storageClasses', async (params, loadFromContext) => {
   const { qbert } = ApiClient.getInstance()
-  const clusters = await loadClusters()
+  const clusters = await loadFromContext(clustersDataKey)
   const isHealthy = cluster => cluster.healthyMasterNodes.length > 0
   const usableClusters = clusters.filter(isHealthy)
   const getStorageClasses = cluster => qbert.getClusterStorageClasses(cluster.uuid)

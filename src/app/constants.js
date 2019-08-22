@@ -1,4 +1,5 @@
 // App
+export const defaultUniqueIdentifier = 'id'
 export const appUrlRoot = '/ui'
 export const imageUrlRoot = `${appUrlRoot}/images`
 export const loginUrl = `${appUrlRoot}/openstack/login`

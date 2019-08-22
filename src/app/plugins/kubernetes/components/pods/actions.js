@@ -7,15 +7,21 @@ export const podsDataKey = 'pods'
 export const kubeServicesDataKey = 'kubeServices'
 export const deploymentsDataKey = 'deployments'
 
-const podCRUDActions = createCRUDActions({ service: 'qbert', entity: podsDataKey })
+const podCRUDActions = createCRUDActions({
+  service: 'qbert',
+  entity: podsDataKey,
+  operations: ['list'],
+})
 const deploymentCRUDActions = createCRUDActions({
   service: 'qbert',
-  entity: 'deployments',
+  entity: deploymentsDataKey,
+  operations: ['list'],
 })
 const serviceCRUDActions = createCRUDActions({
   service: 'qbert',
   entity: 'services',
   dataKey: kubeServicesDataKey,
+  operations: ['list'],
 })
 
 export const loadPods = podCRUDActions.list
@@ -49,6 +55,8 @@ export const createDeployment = createContextUpdater(deploymentsDataKey, async (
   const { qbert } = ApiClient.getInstance()
   const body = yaml.safeLoad(deploymentYaml)
   const created = await qbert.createDeployment(clusterId, namespace, body)
+  // Also need to refresh the list of pods
+  loadPods.invalidateCache()
   return {
     ...created,
     clusterId,
@@ -59,8 +67,6 @@ export const createDeployment = createContextUpdater(deploymentsDataKey, async (
   }
 }, {
   operation: 'create',
-  // Also need to refresh the list of pods
-  onSuccess: ({ clusterId }) => loadPods({ clusterId }, true)
 })
 
 export const createService = createContextUpdater(kubeServicesDataKey, async ({ clusterId, namespace, serviceYaml }) => {
@@ -77,7 +83,8 @@ export const createService = createContextUpdater(kubeServicesDataKey, async ({ 
   }
 }, { operation: 'create' })
 
-export const deleteService = createContextUpdater(kubeServicesDataKey, async ({ id }, currentItems) => {
+export const deleteService = createContextUpdater(kubeServicesDataKey, async ({ id },
+  currentItems) => {
   const { qbert } = ApiClient.getInstance()
   const { clusterId, namespace, name } = await currentItems.find(x => x.id === id)
   await qbert.deleteService(clusterId, namespace, name)

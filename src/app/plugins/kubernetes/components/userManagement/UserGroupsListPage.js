@@ -1,5 +1,5 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { loadGroups, deleteGroup } from 'k8s/components/userManagement/actions'
+import { loadGroups, deleteGroup, mngmGroupsDataKey } from 'k8s/components/userManagement/actions'
 
 export const options = {
   loaderFn: loadGroups,
@@ -9,7 +9,7 @@ export const options = {
     { id: 'description', label: 'Description' },
     { id: 'samlAttributesString', label: 'SAML Attributes Mapped' },
   ],
-  dataKey: 'groups',
+  dataKey: mngmGroupsDataKey,
   // editUrl: '/ui/kubernetes/infrastructure/groups/edit',
   deleteFn: deleteGroup,
   name: 'Groups',

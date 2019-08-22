@@ -49,6 +49,8 @@ export const columnPathLookup = _path => (_, row) => path(_path.split('.'), row)
 
 export const castBoolToStr = (t='yes', f='no') => value => value ? t : f
 
+export const tryJsonParse = moize(val => typeof val === 'string' ? JSON.parse(val) : val)
+
 /**
  * Memoizes an async function so that concurrent calls to the same function (with the same params) will return the same promise
  * @param {function} asyncFn Function that will be memoized until it gets resolved
@@ -72,3 +74,15 @@ export const singlePromise = (asyncFn, moizeOptions = {}) => {
     }
   }
 }
+
+/**
+ * Converts a camelCased string to a string with capitalized words separated by spaces
+ * @example "camelCasedExampleString" -> "Camel Cased Example String"
+ * @param inputStr
+ * @returns {string}
+ */
+export const uncamelizeString = inputStr => inputStr
+// insert a space before all caps
+  .replace(/([A-Z])/g, ' $1')
+  // uppercase the first character
+  .replace(/^./, str => str.toUpperCase())
