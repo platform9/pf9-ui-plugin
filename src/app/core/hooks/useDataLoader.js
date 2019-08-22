@@ -1,11 +1,10 @@
 import { useMemo, useEffect, useState, useCallback, useContext } from 'react'
 import { emptyArr } from 'utils/fp'
-import { path } from 'ramda'
 import { ToastContext } from 'core/providers/ToastProvider'
 import { AppContext } from 'core/AppProvider'
-import { getContextLoader, dataContextKey } from 'core/helpers/createContextLoader'
+import { getContextLoader } from 'core/helpers/createContextLoader'
 
-const useDataLoader = (key, params, refetchOnMount = true) => {
+const useDataLoader = (key, params, refetchOnMount = false) => {
   const [ loading, setLoading ] = useState(false)
   const [ data, setData ] = useState(emptyArr)
   const [ refetching, setRefetching ] = useState(refetchOnMount)
@@ -17,7 +16,7 @@ const useDataLoader = (key, params, refetchOnMount = true) => {
       showToast(errorMessage, 'error')
     }
   }), [key, showToast])
-  const loadData = async (refetch = false) => {
+  const loadData = async refetch => {
     setLoading(true)
     const loaderFn = getContextLoader(key)
     const result = await loaderFn({ getContext, setContext, additionalOptions, params, refetch })
@@ -30,7 +29,7 @@ const useDataLoader = (key, params, refetchOnMount = true) => {
     if (refetching) {
       setRefetching(false)
     }
-  }, [refetchOnMount, key, params, getContext(path([dataContextKey, key]))])
+  }, [key, params])
 
   return [data, loading, reload]
 }

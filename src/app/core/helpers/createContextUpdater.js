@@ -1,7 +1,7 @@
-import { hasPath, path, assocPath, propEq, always, over, append, view, lensPath } from 'ramda'
+import { hasPath, path, assocPath, pathEq, always, over, append, view, lensPath } from 'ramda'
 import { emptyObj, ensureFunction, removeWith, updateWith, switchCase } from 'utils/fp'
 import { dataContextKey, defaultUniqueIdentifier, getContextLoader } from 'core/helpers/createContextLoader'
-import moize from 'moize'
+import { singlePromise } from 'utils/misc'
 
 let updaters = {}
 export const getContextUpdater = (key, operation) => {
@@ -18,7 +18,7 @@ export const getContextUpdater = (key, operation) => {
  * @param {object} [options] Optional additional options
  * @param {string} [options.uniqueIdentifier="id"] Unique primary key of the entity
  * @param {string} [options.entityName=options.primaryKey] Name of the entity
- * @param {("any"|"create"|"update"|"delete")} [options.operation="any"] CRUD operation
+ * @param {("any"|"create"|"update"|"delete")|string} [options.operation="any"] CRUD operation, it can be "create", "update", "delete" for specific cache adjustments or any custom string to replace the whole cache
  * @param {function|string} [options.successMessage] Custom message to display after context has been updated
  * @param {function|string} [options.errorMessage] Custom message to display after an error has been thrown
  * @returns {function}
@@ -28,38 +28,43 @@ const createContextUpdater = (key, dataUpdateFn, options = emptyObj) => {
     uniqueIdentifier = defaultUniqueIdentifier,
     entityName = key.charAt(0).toUpperCase() + key.slice(1),
     operation = 'any',
-    successMessage = (updatedItems, prevItems, params) => `${entityName} item ${switchCase({
-      create: 'created',
-      update: 'updated',
-      delete: 'deleted',
-    }, 'updated')(operation)} successfully`,
-    errorMessage = (catchedErr, params) => `Error when trying to perform "${switchCase({
-      create: 'create',
-      update: 'update',
-      delete: 'delete',
-    }, `" operation on ${entityName}`)(operation)}`,
+    successMessage = (updatedItems, prevItems, params) => `${entityName} item ${switchCase(
+      'updated',
+      ['create', 'created'],
+      ['update', 'updated'],
+      ['delete', 'deleted'],
+    )(operation)} successfully`,
+    errorMessage = (catchedErr, params) => `Error when trying to perform "${switchCase(
+      'update',
+      ['create', 'create'],
+      ['update', 'update'],
+      ['delete', 'delete'],
+    )(operation)}" operation on ${entityName}`,
   } = options
-  const contextUpdaterFn = moize(async ({ getContext, setContext, params = emptyObj, additionalOptions = emptyObj }) => {
+  const uniqueIdentifierPath = uniqueIdentifier.split('.')
+  // Memoize the promise so that we avoid concurrent calls from fetching the api or possible race conditions
+  const contextUpdaterFn = singlePromise(async ({ getContext, setContext, params = emptyObj, additionalOptions = emptyObj }) => {
     const {
       onSuccess = (successMessage, params) => console.info(successMessage),
       onError = (errorMessage, catchedErr, params) => console.error(errorMessage, catchedErr),
     } = additionalOptions
-    const { [uniqueIdentifier]: id } = params
+    const id = path(uniqueIdentifierPath, params)
     const loaderFn = getContextLoader(key)
     const prevItems = await loaderFn({ getContext, setContext, params, additionalOptions })
     const dataLens = lensPath([dataContextKey, key])
 
     try {
       const output = await dataUpdateFn(params, prevItems)
-      const getContextSetterFn = switchCase({
-        create: append(output),
-        update: updateWith(propEq(uniqueIdentifier, id), output),
-        delete: removeWith(propEq(uniqueIdentifier, id)),
-        // If no operation is chosen (ie "any"), just replace the whole array with the new output
-      }, always(output))
-
-      await setContext(over(dataLens, getContextSetterFn(operation)))
+      const operationSwitchCase = switchCase(
+        // If no operation is chosen (ie "any" or a custom operation), just replace the whole array with the new output
+        always(output),
+        ['create', append(output)],
+        ['update', updateWith(pathEq(uniqueIdentifierPath, id), output)],
+        ['delete', removeWith(pathEq(uniqueIdentifierPath, id))],
+      )
+      await setContext(over(dataLens, operationSwitchCase(operation)))
       const updatedItems = getContext(view(dataLens))
+
       if (onSuccess) {
         const parsedSuccessMesssage = ensureFunction(successMessage)(updatedItems, prevItems, params)
         await onSuccess(parsedSuccessMesssage, params)
@@ -73,7 +78,6 @@ const createContextUpdater = (key, dataUpdateFn, options = emptyObj) => {
       return prevItems
     }
   }, {
-    isPromise: true,
     isDeepEqual: true,
   })
   updaters = assocPath([key, operation], contextUpdaterFn, updaters)

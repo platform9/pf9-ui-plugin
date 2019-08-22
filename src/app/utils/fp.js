@@ -1,4 +1,4 @@
-import { T, cond, toPairs, equals, always, adjust, update, findIndex, assocPath, curry, fromPairs, mapObjIndexed, pathOr, remove, flatten } from 'ramda'
+import { T, cond, equals, always, adjust, update, findIndex, assocPath, curry, fromPairs, mapObjIndexed, pathOr, remove, flatten } from 'ramda'
 import moize from 'moize'
 
 // State hook initializers
@@ -261,25 +261,24 @@ export const applyJsonPatch = curry((patch, obj) => {
 })
 
 /**
- * A functional switch statement
- * @param {object} casesObj Object whose keys are the conditions to be tested against the key
+ * Returns a functional switch statement
  * @param {any} defaultValue Value to be returned in case no cases matches the key
- * @param {any} key Input key to test against the case statements
- * @returns {any}
+ * @param {...array} case Conditions whose first item is the value to be tested against the key
+ * @returns {function}
  *
  * @example
  *
- * const numbersSwitch = switchCase({
- *    1: "one",
- *    2: "two"
- * }, "defaultValue")
+ * const numbersSwitch = switchCase(
+ *    "defaultValue",
+ *    [1, "one"],
+ *    [2, "two"]
+ * )
  *
  * numbersSwitch(2) // "two"
  * numbersSwitch(5) // "defaultValue"
  */
-export const switchCase = curry((casesObj, defaultValue, key) =>
-  cond(
-    ...toPairs(casesObj).map(([caseCond, caseVal]) => [equals(caseCond), always(caseVal)]),
+export const switchCase = (defaultValue, ...cases) => key =>
+  cond([
+    ...cases.map(([caseCond, caseVal]) => [equals(caseCond), always(caseVal)]),
     [T, always(defaultValue)]
-  )(key)
-)
+  ])(key)

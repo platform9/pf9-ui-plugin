@@ -64,7 +64,6 @@ export const attachNodesToCluster = createContextUpdater(nodesDataKey, async ({ 
   return currentItems.map(node =>
     nodeUuids.includes(node.uuid) ? ({ ...node, clusterUuid }) : node)
 }, {
-  // TODO allow custom operations
   operation: 'attachNodes',
 })
 
@@ -74,7 +73,6 @@ export const detachNodesFromCluster = createContextUpdater(nodesDataKey, async (
   return currentItems.map(node =>
     nodeUuids.includes(node.uuid) ? ({ ...node, clusterUuid: null }) : node)
 }, {
-  // TODO allow custom operations
   operation: 'detachNodes',
 })
 

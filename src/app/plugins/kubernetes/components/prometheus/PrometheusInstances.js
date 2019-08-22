@@ -1,16 +1,11 @@
 // import React from 'react'
 // import ExternalLink from 'core/components/ExternalLink'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { deletePrometheusInstance, loadPrometheusInstances } from './actions'
+import { prometheusInstancesDataKey } from './actions'
 
 const renderKeyValues = obj => Object.entries(obj)
   .map(([key, value]) => `${key}: ${value}`)
   .join(', ')
-
-const renderClusterName = (field, row, data) => {
-  const cluster = data.clusters.find(x => x.uuid === row.clusterUuid)
-  return cluster.name
-}
 
 // Disabling for now until the backend has the links for this working
 /*
@@ -22,7 +17,7 @@ const renderDashboardLink = (field, row, context) => {
 
 export const columns = [
   { id: 'name', label: 'Name' },
-  { id: 'clusterName', label: 'Cluster', render: renderClusterName },
+  { id: 'clusterName', label: 'Cluster' },
   { id: 'namespace', label: 'Namespace' },
   // { id: 'dashboard', label: 'Dashboard', render: renderDashboardLink },
   { id: 'serviceMonitorSelector', label: 'Service Monitor', render: renderKeyValues },
@@ -36,13 +31,11 @@ export const columns = [
 ]
 
 export const options = {
+  dataKey: prometheusInstancesDataKey,
   addUrl: '/ui/kubernetes/prometheus/instances/add',
   addText: 'New Instance',
   columns,
-  dataKey: 'prometheusInstances',
-  deleteFn: deletePrometheusInstance,
   editUrl: '/ui/kubernetes/prometheus/instances/edit',
-  loaderFn: loadPrometheusInstances,
   name: 'PrometheusInstances',
   uniqueIdentifier: 'uid',
 }

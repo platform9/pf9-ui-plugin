@@ -39,19 +39,12 @@ class CRUDListContainer extends React.Component {
   }
 
   handleDeleteConfirm = async () => {
-    const { uniqueIdentifier } = this.props
     this.setState({ showConfirmation: false, deleting: true })
     const items = this.state.selectedItems || []
 
-    await asyncMap(items, async item => {
-      const uid = uniqueIdentifier instanceof Function
-        ? uniqueIdentifier(item)
-        : item[uniqueIdentifier]
-      return this.handleRemove(uid)
-    },
     // Items will be deleted sequentially, otherwise we would run in a race condition
     // causing the context to be incorrectly updated with just one item removed
-    false)
+    await asyncMap(items, this.handleRemove, false)
 
     this.setState({ selectedItems: [], deleting: false })
     // The user resolves the promise by clicking "confirm".

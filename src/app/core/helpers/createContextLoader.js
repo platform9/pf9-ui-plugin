@@ -1,6 +1,6 @@
-import { pick, isEmpty, concat, identity, assoc, find, whereEq, when, isNil, reject, filter, always, append, uniqWith, eqProps, pipe, over, lensPath, pickAll, set, view } from 'ramda'
+import { path, pick, isEmpty, concat, identity, assoc, find, whereEq, when, isNil, reject, filter, always, append, uniqBy, pipe, over, lensPath, pickAll, view } from 'ramda'
 import { ensureFunction, ensureArray, emptyObj, emptyArr } from 'utils/fp'
-import moize from 'moize'
+import { singlePromise } from 'utils/misc'
 
 export const defaultUniqueIdentifier = 'uuid'
 export const paramsContextKey = 'cachedParams'
@@ -13,6 +13,7 @@ export const getContextLoader = key => {
   }
   return loaders[key]
 }
+const arrayIfNil = when(isNil, always(emptyArr))
 
 /**
  * Create a function that will use context to load and cache values
@@ -38,11 +39,12 @@ const createContextLoader = (key, dataFetchFn, options = emptyObj) => {
     successMessage = (params) => `Successfully retrieved ${entityName} items`,
     errorMessage = (catchedErr, params) => `Error when trying to retrieve ${entityName} items`,
   } = options
+  const uniqueIdentifierPath = uniqueIdentifier.split('.')
   const paramsLens = lensPath([paramsContextKey, key])
   const dataLens = lensPath([dataContextKey, key])
-  const arrayIfNil = when(isNil, always(emptyArr))
-  const contextLoaderFn = moize(async ({ getContext, setContext, params = emptyObj, refetch = false, additionalOptions = emptyObj }) => {
-    const indexByAll = indexBy ? ensureArray(indexBy) : emptyArr
+  const indexByAll = indexBy ? ensureArray(indexBy) : emptyArr
+  // Memoize the promise so that we avoid concurrent calls from fetching the api or possible race conditions
+  const contextLoaderFn = singlePromise(async ({ getContext, setContext, params = emptyObj, refetch = false, additionalOptions = emptyObj }) => {
     if (skipEmptyParamCalls && isEmpty(pick(indexByAll, params))) {
       return emptyArr
     }
@@ -55,29 +57,25 @@ const createContextLoader = (key, dataFetchFn, options = emptyObj) => {
       const loaderFn = getContextLoader(key)
       return loaderFn({ getContext, setContext, params, refetch, additionalOptions })
     }
-
     if (!refetch) {
-      const allCachedParams = getContext(view(paramsLens)) ||
-        (setContext(set(paramsLens, emptyArr)) && emptyArr)
+      const allCachedParams = getContext(view(paramsLens)) || emptyArr
       if (find(whereEq(indexedParams), allCachedParams)) {
         // Return the cached data
-        return getContext(pipe(
-          view(dataLens),
-          filter(whereEq(indexedParams)),
-          items => dataMapper(items, params, loadFromContext),
-        ))
+        const cachedItems = getContext(pipe(view(dataLens), arrayIfNil, filter(whereEq(indexedParams))))
+        return dataMapper(cachedItems, params, loadFromContext)
       }
     }
     // if refetch = true or no cached params have been found, fetch the items
     try {
       const fetchedItems = await dataFetchFn(params, loadFromContext)
+
       await setContext(pipe(
         // If we are reloading, we'll clean up the previous queried items first
         refetch ? over(dataLens, pipe(arrayIfNil, reject(whereEq(indexedParams)))) : identity,
         // Insert new items replacing possible duplicates (by uniqueIdentifier)
-        over(dataLens, pipe(arrayIfNil, concat(fetchedItems), uniqWith(eqProps(uniqueIdentifier)))),
+        over(dataLens, pipe(arrayIfNil, concat(fetchedItems), uniqBy(path(uniqueIdentifierPath)))),
         // Update cachedParams so that we know this query has already been resolved
-        over(paramsLens, append(indexedParams))
+        over(paramsLens, pipe(arrayIfNil, append(indexedParams)))
       ))
       if (onSuccess) {
         const parsedSuccessMesssage = ensureFunction(successMessage)(params)
@@ -92,7 +90,6 @@ const createContextLoader = (key, dataFetchFn, options = emptyObj) => {
       return emptyArr
     }
   }, {
-    isPromise: true,
     isDeepEqual: true,
   })
   loaders = assoc(key, contextLoaderFn, loaders)

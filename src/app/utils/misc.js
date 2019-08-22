@@ -1,4 +1,5 @@
 import { path } from 'ramda'
+import moize from 'moize'
 
 // A more resilient JSON parsing that should always return {}
 // in error conditions.
@@ -47,3 +48,27 @@ export const castFuzzyBool = value => {
 export const columnPathLookup = _path => (_, row) => path(_path.split('.'), row)
 
 export const castBoolToStr = (t='yes', f='no') => value => value ? t : f
+
+/**
+ * Memoizes an async function so that concurrent calls to the same function (with the same params) will return the same promise
+ * @param {function} asyncFn Function that will be memoized until it gets resolved
+ * @param {object} moizeOptions Additional moize options
+ * @returns {function}
+ */
+export const singlePromise = (asyncFn, moizeOptions = {}) => {
+  const memoizedCb = moize(asyncFn, {
+    ...moizeOptions,
+    isPromise: true,
+  })
+  return async (...params) => {
+    try {
+      const result = await memoizedCb(...params)
+      // Clear the memoized cache when the promise is resolved (or rejected), so that all the subsequent calls will return a new promise
+      memoizedCb.remove(params)
+      return result
+    } catch (err) {
+      memoizedCb.remove(params)
+      throw err
+    }
+  }
+}

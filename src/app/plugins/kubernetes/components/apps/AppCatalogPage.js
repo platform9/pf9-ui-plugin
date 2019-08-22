@@ -27,7 +27,7 @@ const AppCatalogPage = () => {
   const renderFilters = useMemo(() => <>
     <ClusterPicklist
       onChange={clusterId => setParams({ clusterId })}
-      clusterId={params.clusterId} />
+      value={params.clusterId} />
   </>, [params.clusterId])
 
   return <CardTable

@@ -6,8 +6,6 @@ import TopExtraContent from 'core/components/TopExtraContent'
 import requiresAuthentication from 'openstack/util/requiresAuthentication'
 import useDataLoader from 'core/hooks/useDataLoader'
 import useDataUpdater from 'core/hooks/useDataUpdater'
-import { compose } from 'app/utils/fp'
-import { withAppContext } from 'core/AppProvider'
 import { withRouter } from 'react-router-dom'
 import { withScopedPreferences } from 'core/providers/PreferencesProvider'
 
@@ -45,7 +43,7 @@ const createCRUDComponents = options => {
 
   // List
   const List = withScopedPreferences(name)(({
-    onAdd, onDelete, onEdit, rowActions, data, reload,
+    onAdd, onDelete, onEdit, rowActions, data, onRefresh,
     preferences: { visibleColumns, columnsOrder, rowsPerPage },
     updatePreferences,
   }) => {
@@ -58,7 +56,7 @@ const createCRUDComponents = options => {
     // }
     return (
       <ListTable
-        reload={reload}
+        onRefresh={onRefresh}
         columns={columns}
         data={data}
         onAdd={onAdd}
@@ -79,11 +77,11 @@ const createCRUDComponents = options => {
 
   // ListContainer
   const ContainerBase = ({ params, setParams, history, data, loading, reload }) => {
-    const [removeFn, deleting] = useDataUpdater(dataKey, 'delete')
-    const handleRemove = useCallback(async id => removeFn({ [uniqueIdentifier]: id }), [removeFn])
+    const [handleRemove, deleting] = useDataUpdater(dataKey, 'delete', reload)
     const addButton = useMemo(() =>
       <CreateButton onClick={() => history.push(addUrl)}>{addText}</CreateButton>,
     [history])
+    const refetch = useCallback(() => reload(true))
 
     let moreProps = {}
     if (rowActions && rowActions.length > 0) {
@@ -102,16 +100,13 @@ const createCRUDComponents = options => {
       >
         {handlers => <>
           {addUrl && <TopExtraContent>{addButton}</TopExtraContent>}
-          <List data={data} reload={reload} {...handlers} {...moreProps} />
+          <List data={data} onRefresh={refetch} {...handlers} {...moreProps} />
         </>}
       </CRUDListContainer>
     )
   }
 
-  const ListContainer = compose(
-    withAppContext,
-    withRouter,
-  )(ContainerBase)
+  const ListContainer = withRouter(ContainerBase)
 
   ListContainer.displayName = `${name}ListContainer`
 

@@ -11,7 +11,7 @@ import WizardStep from 'core/components/wizard/WizardStep'
 import createAddComponents from 'core/helpers/createAddComponents'
 import uuid from 'uuid'
 import { removeWith, emptyArr, emptyObj } from 'utils/fp'
-import { prometheusInstancesContextKey } from './actions'
+import { prometheusInstancesDataKey } from './actions'
 import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
 import NamespacePicklist from 'k8s/components/common/NamespacePicklist'
 import ServicePicklist from 'k8s/components/common/ServicePicklist'
@@ -106,7 +106,7 @@ const AddPrometheusInstanceForm = ({ onComplete }) => {
 }
 
 export const options = {
-  dataKey: prometheusInstancesContextKey,
+  dataKey: prometheusInstancesDataKey,
   FormComponent: AddPrometheusInstanceForm,
   listUrl: '/ui/kubernetes/prometheus#instances',
   name: 'AddPrometheusInstance',

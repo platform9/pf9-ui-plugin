@@ -28,6 +28,11 @@ const styles = theme => ({
     color: theme.palette.text.secondary,
     width: '100%',
   },
+  button: {
+    cursor: 'pointer',
+    fontWeight: 300,
+    margin: theme.spacing(0, 1),
+  },
   filters: {
     flexGrow: '1',
     display: 'flex',

@@ -7,7 +7,7 @@ import ProgressBar from 'core/components/progress/ProgressBar'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { pathOr, pipe } from 'ramda'
 import { castBoolToStr, castFuzzyBool, columnPathLookup } from 'utils/misc'
-import { loadNodes } from 'k8s/components/infrastructure/actions'
+import { nodesDataKey } from 'k8s/components/infrastructure/actions'
 
 const renderStatus = (_, node) => (<HostStatus host={node.combined} />)
 const isMaster = pipe(castFuzzyBool, castBoolToStr())
@@ -62,9 +62,8 @@ export const columns = [
 export const options = {
   addUrl: '/ui/kubernetes/infrastructure/nodes/add',
   columns,
-  dataKey: 'nodes',
+  dataKey: nodesDataKey,
   editUrl: '/ui/kubernetes/infrastructure/nodes/edit',
-  loaderFn: loadNodes,
   name: 'Nodes',
   title: 'Nodes',
   uniqueIdentifier: 'uuid',
