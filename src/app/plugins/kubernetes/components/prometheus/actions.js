@@ -102,8 +102,19 @@ createContextUpdater(prometheusInstancesDataKey, async data => {
 
 /* Service Accounts */
 
+const mapService = ({ clusterUuid, metadata, spec }) => ({
+  uid: metadata.uid,
+  name: metadata.name,
+  namespace: metadata.namespace,
+  labels: metadata.labels,
+})
+
 createContextLoader(serviceAccountsDataKey, async data => {
-  return qbert.getServiceAccounts(data.clusterUuid, data.namespace)
+  return qbert.getServiceAccounts(data.clusterId, data.namespace)
+}, {
+  uniqueIdentifier,
+  indexBy: ['clusterId', 'namespace'],
+  dataMapper: map(mapService),
 })
 
 /* Prometheus Rules */

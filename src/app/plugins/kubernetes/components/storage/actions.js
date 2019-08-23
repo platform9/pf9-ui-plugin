@@ -7,7 +7,7 @@ import { clustersDataKey } from 'k8s/components/infrastructure/actions'
 
 export const storageClassesDataKey = 'storageClasses'
 
-export const loadStorageClasses = createContextLoader(storageClassesDataKey, async (params, loadFromContext) => {
+createContextLoader(storageClassesDataKey, async (params, loadFromContext) => {
   const { qbert } = ApiClient.getInstance()
   const clusters = await loadFromContext(clustersDataKey)
   const isHealthy = cluster => cluster.healthyMasterNodes.length > 0
@@ -19,9 +19,11 @@ export const loadStorageClasses = createContextLoader(storageClassesDataKey, asy
   const getClusterName = uuid => clusters.find(propEq('uuid', uuid)).name
   const addClusterName = sc => assoc('clusterName', getClusterName(sc.clusterId), sc)
   return storageClasses.map(addClusterName)
+}, {
+  entityName: 'Storage Class',
 })
 
-export const deleteStorageClass = createContextUpdater(storageClassesDataKey, async ({ id }, currentItems) => {
+createContextUpdater(storageClassesDataKey, async ({ id }, currentItems) => {
   const { qbert } = ApiClient.getInstance()
   const item = currentItems.find(propEq('id', id))
   if (!item) {
@@ -30,5 +32,6 @@ export const deleteStorageClass = createContextUpdater(storageClassesDataKey, as
   const { clusterId, name } = item
   await qbert.deleteStorageClass(clusterId, name)
 }, {
+  entityName: 'Storage Class',
   operation: 'delete',
 })

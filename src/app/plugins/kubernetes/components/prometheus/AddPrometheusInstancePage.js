@@ -30,12 +30,16 @@ const AddPrometheusInstanceForm = ({ onComplete }) => {
   const enableStorage = false // We are just using ephemeral storage for the first version
   const [rules, setRules] = useState(emptyArr)
   const [params, setParams] = useState(emptyObj)
+
   const handleClusterChange = useCallback(clusterId =>
-    setParams({ clusterId }),
-  [])
+    setParams({ ...params, clusterId }), [params])
+  const handleNamespaceChange = useCallback(namespace =>
+    setParams({ ...params, namespace }), [params])
+  const handleServiceChange = useCallback(serviceId =>
+    setParams({ ...params, serviceId }), [params])
   const handleAddRule = useCallback(rule => {
     const withId = { id: uuid.v4(), ...rule }
-    setRules([ ...rules, withId ])
+    setRules([...rules, withId])
   }, [rules])
   const handleDeleteRule = useCallback(id =>
     setRules(removeWith(rule => rule.id === id, rules)),
@@ -74,7 +78,8 @@ const AddPrometheusInstanceForm = ({ onComplete }) => {
                   label="Namespace"
                   disabled={!params.clusterId}
                   clusterId={params.clusterId}
-                  value={params.namespaceId}
+                  onChange={handleNamespaceChange}
+                  value={params.namespace}
                   required
                   info="Which namespace to use"
                 />
@@ -82,10 +87,13 @@ const AddPrometheusInstanceForm = ({ onComplete }) => {
                   DropdownComponent={ServicePicklist}
                   id="serviceAccountName"
                   label="Service Account Name"
-                  disabled={!params.clusterId}
+                  disabled={!params.clusterId || !params.namespace}
                   clusterId={params.clusterId}
+                  namespace={params.namespace}
+                  onChange={handleServiceChange}
+                  value={params.serviceId}
                   info="Prometheus will use this to query metrics endpoints"
-                />}
+                />
                 {enableStorage &&
                 <CheckboxField id="enablePersistentStorage" label="Enable persistent storage" />}
                 <TextField id="retention" label="Storage Retention (days)" info="Defaults to 15 days if nothing is set" />

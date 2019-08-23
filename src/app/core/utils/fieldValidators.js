@@ -1,5 +1,5 @@
 import moize from 'moize'
-import { isNil } from 'ramda'
+import { isEmpty, isNil } from 'ramda'
 import { isPlainObject } from '../../utils/misc'
 
 class FieldValidator {
@@ -19,11 +19,11 @@ class FieldValidator {
 export const customValidator = (validator, errorMessage) =>
   new FieldValidator(validator, errorMessage)
 
-const fieldIsEmpty = value => isNil(value) || value === '' || value === false
+const fieldIsUnset = value => isNil(value) || isEmpty(value) || value === false
 
 export const emailValidator = new FieldValidator(
   email =>
-    fieldIsEmpty(email) ||
+    fieldIsUnset(email) ||
     /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/i.test(
       email
     ),
@@ -31,7 +31,7 @@ export const emailValidator = new FieldValidator(
 )
 
 export const requiredValidator = new FieldValidator(
-  value => !fieldIsEmpty(value),
+  value => !fieldIsUnset(value),
   'Field is required'
 )
 
@@ -46,7 +46,7 @@ export const matchFieldValidator = moize(
 export const lengthValidator = (minLength, maxLength) =>
   new FieldValidator(
     value =>
-      fieldIsEmpty(value) ||
+      fieldIsUnset(value) ||
       (value.toString().length >= minLength &&
         value.toString().length <= maxLength),
     `Length must be between ${minLength} and ${maxLength}`
@@ -55,7 +55,7 @@ export const lengthValidator = (minLength, maxLength) =>
 export const minLengthValidator = moize(
   minLength =>
     new FieldValidator(
-      value => fieldIsEmpty(value) || value.toString().length >= minLength,
+      value => fieldIsUnset(value) || value.toString().length >= minLength,
       `Length must be greater than ${minLength}`
     )
 )
@@ -63,7 +63,7 @@ export const minLengthValidator = moize(
 export const maxLengthValidator = moize(
   maxLength =>
     new FieldValidator(
-      value => fieldIsEmpty(value) || value.toString().length <= maxLength,
+      value => fieldIsUnset(value) || value.toString().length <= maxLength,
       `Length must be less than ${maxLength}`
     )
 )

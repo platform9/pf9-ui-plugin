@@ -6,6 +6,8 @@ import createContextUpdater from 'core/helpers/createContextUpdater'
 import ApiClient from 'api-client/ApiClient'
 import { parseClusterParams, clustersDataKey } from 'k8s/components/infrastructure/actions'
 
+const { qbert } = ApiClient.getInstance()
+
 export const namespacesDataKey = 'namespaces'
 
 const findClusterName = (clusters, clusterId) => {
@@ -20,9 +22,8 @@ const namespacesMapper = async (items, params, loadFromContext) => {
   }))
 }
 
-export const loadNamespaces = createContextLoader(namespacesDataKey, async (params, loadFromContext) => {
+createContextLoader(namespacesDataKey, async (params, loadFromContext) => {
   const [clusterId, clusters] = await parseClusterParams(params, loadFromContext)
-  const { qbert } = ApiClient.getInstance()
   return clusterId === allKey
     ? asyncFlatMap(pluck('uuid', clusters), qbert.getClusterNamespaces)
     : qbert.getClusterNamespaces(clusterId)
@@ -32,14 +33,12 @@ export const loadNamespaces = createContextLoader(namespacesDataKey, async (para
   dataMapper: namespacesMapper
 })
 
-export const createNamespace = createContextUpdater(namespacesDataKey, async ({ clusterId, name }) => {
-  const { qbert } = ApiClient.getInstance()
+createContextUpdater(namespacesDataKey, async ({ clusterId, name }) => {
   const body = { metadata: { name } }
   return qbert.createNamespace(clusterId, body)
 }, { operation: 'create' })
 
-export const deleteNamespace = createContextUpdater(namespacesDataKey, async ({ id }, currentItems) => {
-  const { qbert } = ApiClient.getInstance()
+createContextUpdater(namespacesDataKey, async ({ id }, currentItems) => {
   const { clusterId, name } = currentItems.find(ns => ns.id === id)
   await qbert.deleteNamespace(clusterId, name)
 }, { operation: 'delete' })

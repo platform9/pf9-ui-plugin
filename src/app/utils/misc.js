@@ -47,7 +47,7 @@ export const castFuzzyBool = value => {
 
 export const columnPathLookup = _path => (_, row) => path(_path.split('.'), row)
 
-export const castBoolToStr = (t='yes', f='no') => value => value ? t : f
+export const castBoolToStr = (t = 'yes', f = 'no') => value => value ? t : f
 
 export const tryJsonParse = moize(val => typeof val === 'string' ? JSON.parse(val) : val)
 
@@ -73,6 +73,17 @@ export const singlePromise = asyncFn => {
     }
   }
 }
+
+/**
+ * Utility to prevent React hooks from triggering when passing objects or arrays that
+ * really don't change but as they are being generated on every render they trigger an update
+ * To archieve so we use ramda "equals" that compares array items and object props instead of just references
+ * https://ramdajs.com/docs/#equals
+ * @type {function(*): any}
+ */
+export const memoizedDep = moize(dep => dep, {
+  equals,
+})
 
 /**
  * Converts a camelCased string to a string with capitalized words separated by spaces

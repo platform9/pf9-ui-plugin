@@ -1,8 +1,8 @@
-import React from 'react'
+import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { withWizardContext } from 'core/components/wizard/Wizard'
 
-class WizardStep extends React.Component {
+class WizardStep extends PureComponent {
   componentDidMount () {
     const { addStep, stepId, label } = this.props
     addStep({ stepId, label })

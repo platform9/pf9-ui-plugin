@@ -31,7 +31,7 @@ const styles = theme => ({
     maxHeight: '80%',
   },
   imgInline: {
-    maxHeight: 30,
+    maxHeight: 25,
     opacity: 0.7,
   },
   status: {
@@ -57,6 +57,9 @@ const styles = theme => ({
     left: '0',
     bottom: '0',
     top: '0',
+  },
+  content: {
+    width: '100%',
   },
   contentLoading: {
     opacity: 0.3,

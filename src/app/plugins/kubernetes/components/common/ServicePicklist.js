@@ -3,9 +3,14 @@ import Picklist from 'core/components/Picklist'
 import { projectAs } from 'utils/fp'
 import useDataLoader from 'core/hooks/useDataLoader'
 import PropTypes from 'prop-types'
+import { serviceAccountsDataKey } from 'k8s/components/prometheus/actions'
+import { omit } from 'ramda'
 
-const ServicePicklist = ({ loading, clusterId, ...rest }) => {
-  const [services, servicesLoading] = useDataLoader('services', { clusterId })
+const ServicePicklist = ({ loading, clusterId, namespace, ...rest }) => {
+  const [services, servicesLoading] = useDataLoader(serviceAccountsDataKey, {
+    clusterId,
+    namespace,
+  })
   const options = useMemo(() =>
     projectAs({ label: 'name', value: 'name' }, services),
   [services])
@@ -18,7 +23,7 @@ const ServicePicklist = ({ loading, clusterId, ...rest }) => {
 }
 
 ServicePicklist.propTypes = {
-  ...Picklist.propTypes,
+  ...omit(['options'], Picklist.propTypes),
   name: PropTypes.string,
   label: PropTypes.string,
   clusterId: PropTypes.number,

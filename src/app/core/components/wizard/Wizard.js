@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import WizardButtons from 'core/components/wizard/WizardButtons'
 import NextButton from 'core/components/buttons/NextButton'
@@ -11,7 +11,7 @@ const WizardContext = React.createContext({})
 export const Consumer = WizardContext.Consumer
 export const Provider = WizardContext.Provider
 
-class Wizard extends React.Component {
+class Wizard extends PureComponent {
   isLastStep = () => this.state.activeStep === this.state.steps.length - 1
   isComplete = () => this.state.activeStep > this.state.steps.length - 1
   lastStep = () => this.state.steps.length - 1

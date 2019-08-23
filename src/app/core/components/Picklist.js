@@ -21,8 +21,11 @@ const useStyles = makeStyles(theme => ({
 }))
 const selectProps = { displayEmpty: true }
 
-const Picklist = ({ showAll, showNone, label, name, value, options, onChange, formField, loading, ...restProps }) => {
-  const classes = useStyles()
+const Picklist = React.forwardRef((props, ref) => {
+  const {
+    showAll, showNone, label, name, value, options, onChange, loading, formField, ...restProps
+  } = props
+  const classes = useStyles(props)
   const inputProps = useMemo(() => ({ name: label, id: name }), [label, name])
   const items = useMemo(() => pipe(
     map(option => typeof option === 'string' ? ({ value: option, label: option }) : option),
@@ -49,6 +52,7 @@ const Picklist = ({ showAll, showNone, label, name, value, options, onChange, fo
   return <Progress inline overlay loading={loading}>
     <TextField
       {...restProps}
+      ref={ref}
       select
       classes={classes}
       label={label}
@@ -60,7 +64,7 @@ const Picklist = ({ showAll, showNone, label, name, value, options, onChange, fo
       {items}
     </TextField>
   </Progress>
-}
+})
 
 const numOrString = PropTypes.oneOfType([PropTypes.number, PropTypes.string])
 const optionPropType = PropTypes.oneOfType([

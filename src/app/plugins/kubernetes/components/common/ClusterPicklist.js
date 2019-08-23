@@ -13,12 +13,15 @@ import { allKey } from 'app/constants'
 const hasMasterNode = propSatisfies(isTruthy, 'hasMasterNode')
 const hasPrometheusEnabled = compose(castFuzzyBool, path(['tags', 'pf9-system:monitoring']))
 
-const ClusterPicklist = ({ loading, onChange, value, onlyPrometheusEnabled, onlyMasterNodeClusters, showAll, ...rest }) => {
+const ClusterPicklist = React.forwardRef(({
+  loading, onChange, value, onlyPrometheusEnabled, onlyMasterNodeClusters,
+  showNone, ...rest,
+}, ref) => {
   const [clusters, clustersLoading] = useDataLoader(clustersDataKey)
   const options = useMemo(() => pipe(
     onlyMasterNodeClusters ? filter(hasMasterNode) : identity,
     onlyPrometheusEnabled ? filter(hasPrometheusEnabled) : identity,
-    projectAs({ label: 'name', value: 'uuid' })
+    projectAs({ label: 'name', value: 'uuid' }),
   )(clusters),
   [clusters, onlyMasterNodeClusters, onlyPrometheusEnabled])
 
@@ -31,13 +34,15 @@ const ClusterPicklist = ({ loading, onChange, value, onlyPrometheusEnabled, only
 
   return <Picklist
     {...rest}
+    ref={ref}
+    showNone={showNone}
     onChange={onChange}
-    disabled={isEmpty(options)}
+    disabled={isEmpty(options) && !showNone}
     value={value || propOr(allKey, 'value', head(options))}
     loading={loading || clustersLoading}
     options={options}
   />
-}
+})
 
 ClusterPicklist.propTypes = {
   ...omit(['options'], Picklist.propTypes),
@@ -54,7 +59,7 @@ ClusterPicklist.defaultProps = {
   label: 'Current Cluster',
   formField: false,
   onlyMasterNodeClusters: true,
-  onlyPrometheusEnabled: false
+  onlyPrometheusEnabled: false,
 }
 
 export default ClusterPicklist

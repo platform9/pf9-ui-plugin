@@ -2,14 +2,15 @@ import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 import Picklist from 'core/components/Picklist'
 import InfoTooltip from 'app/core/components/InfoTooltip'
-import { compose } from 'app/utils/fp'
-import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
+import { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
 
 /**
  * PicklistField builds upon Picklist and adds integration with ValidatedForm
  */
-const PicklistField = React.forwardRef(({ DropdownComponent, id, info, placement, label, value, showNone, classes, hasError, errorMessage, options, ...restProps },
-  ref) => {
+const PicklistField = React.forwardRef(({
+  DropdownComponent, id, info, placement, label, value, showNone,
+  hasError, errorMessage, options, ...restProps
+}, ref) => {
   const [open, setOpen] = React.useState(false)
   const openTooltip = useCallback(() => setOpen(true), [])
   const closeTooltip = useCallback(() => setOpen(false), [])
@@ -25,7 +26,6 @@ const PicklistField = React.forwardRef(({ DropdownComponent, id, info, placement
       onClick={closeTooltip}
       ref={ref}
       id={id}
-      disabled={!options || !options.length}
       name={id}
       label={label}
       options={options}
@@ -41,7 +41,6 @@ PicklistField.defaultProps = {
   DropdownComponent: Picklist,
   showNone: true,
   showAll: false,
-  formField: true,
 }
 
 const numOrString = PropTypes.oneOfType([PropTypes.number, PropTypes.string])
@@ -58,17 +57,14 @@ PicklistField.propTypes = {
   DropdownComponent: PropTypes.elementType,
   id: PropTypes.string.isRequired,
   label: PropTypes.string,
-  options: PropTypes.arrayOf(optionPropType).isRequired,
+  options: PropTypes.arrayOf(optionPropType),
   initialValue: numOrString,
   onChange: PropTypes.func,
   info: PropTypes.string,
   placement: PropTypes.string,
   showNone: PropTypes.bool,
   showAll: PropTypes.bool,
-  formField: PropTypes.bool,
   ...ValidatedFormInputPropTypes,
 }
 
-export default compose(
-  withFormContext,
-)(PicklistField)
+export default PicklistField

@@ -1,6 +1,6 @@
 import {
   path, pick, isEmpty, concat, identity, assoc, find, whereEq, when, isNil, reject, filter, always,
-  append, uniqBy, of, pipe, over, lensPath, pickAll, view, has, equals,
+  append, uniqBy, of, pipe, over, lensPath, pickAll, view, has, equals, mergeLeft, map,
 } from 'ramda'
 import moize from 'moize'
 import { ensureFunction, ensureArray, emptyObj, emptyArr } from 'utils/fp'
@@ -49,11 +49,11 @@ const createContextLoader = (key, dataFetchFn, options = {}) => {
   const paramsLens = lensPath([paramsContextKey, key])
   const indexByAll = indexBy ? ensureArray(indexBy) : emptyArr
   // Memoize the data mapper so we will prevent remapping the same items over and over
-  const memoizedDataMapper = dataMapper !== identity ? moize(dataMapper, {
+  const memoizedDataMapper = moize(dataMapper, {
     equals, // Use ramda "equals" to prevent SameValueZero comparison which would clean the cache every time
     maxSize: 1, // Only memoize the last resultset of items
     maxArgs: 2, // We don't care about the third argument (loadFromContext) as it shouldn't make any difference
-  }) : dataMapper
+  })
 
   /**
    * Context loader function, uses a custom loader function to load data from the server
@@ -84,8 +84,8 @@ const createContextLoader = (key, dataFetchFn, options = {}) => {
       const loaderFn = getContextLoader(key)
       return loaderFn({ getContext, setContext, params, refetch, additionalOptions })
     }
-    if (!refetch && !contextLoaderFn._invalidatedCache) {
 
+    if (!refetch && !contextLoaderFn._invalidatedCache) {
       const allCachedParams = getContext(view(paramsLens)) || emptyArr
       if (find(whereEq(indexedParams), allCachedParams)) {
         // Return the cached data
@@ -101,6 +101,9 @@ const createContextLoader = (key, dataFetchFn, options = {}) => {
     // if refetch = true or no cached params have been found, fetch the items
     try {
       const fetchedItems = await dataFetchFn(params, loadFromContext)
+      // Sometimes the server doesn't return the params used for the query
+      // so we must add them to the items in order to be able to find them afterwards
+      const itemsWithParams = map(mergeLeft(indexedParams), fetchedItems)
 
       await setContext(pipe(
         contextLoaderFn._invalidatedCache
@@ -109,7 +112,7 @@ const createContextLoader = (key, dataFetchFn, options = {}) => {
           // If we are refetching, we'll clean up the previous queried items
           : (refetch ? over(dataLens, pipe(arrayIfNil, reject(whereEq(indexedParams)))) : identity),
         // Insert new items replacing possible duplicates (by uniqueIdentifier)
-        over(dataLens, pipe(arrayIfNil, concat(fetchedItems), uniqBy(path(uniqueIdentifierPath)))),
+        over(dataLens, pipe(arrayIfNil, concat(itemsWithParams), uniqBy(path(uniqueIdentifierPath)))),
         // Update cachedParams so that we know this query has already been resolved
         over(paramsLens, pipe(arrayIfNil, contextLoaderFn._invalidatedCache
           ? always(of(indexedParams))
@@ -121,7 +124,7 @@ const createContextLoader = (key, dataFetchFn, options = {}) => {
         await onSuccess(parsedSuccessMesssage, params)
       }
       return arrayIfEmpty(
-        memoizedDataMapper(fetchedItems, params, loadFromContext)
+        memoizedDataMapper(itemsWithParams, params, loadFromContext)
       )
     } catch (err) {
       if (onError) {
