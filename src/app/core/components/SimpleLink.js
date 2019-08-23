@@ -32,7 +32,7 @@ const SimpleLink = ({
 
   return (
     <Link
-      href={src || 'javascript:;'}
+      href={src || null}
       onClick={handleClick}
       {...rest}
     >

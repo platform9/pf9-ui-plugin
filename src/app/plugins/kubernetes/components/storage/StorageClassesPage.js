@@ -1,5 +1,5 @@
-import { deleteStorageClass, loadStorageClasses } from './actions'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
+import { storageClassesDataKey } from 'k8s/components/storage/actions'
 
 export const options = {
   addUrl: '/ui/kubernetes/storage_classes/add',
@@ -11,9 +11,7 @@ export const options = {
     { id: 'provisioner', label: 'Provisioner' },
     { id: 'created', label: 'Created' },
   ],
-  dataKey: 'storageClasses',
-  deleteFn: deleteStorageClass,
-  loaderFn: loadStorageClasses,
+  dataKey: storageClassesDataKey,
   name: 'StorageClasses',
   title: 'Storage Classes',
 }

@@ -1,4 +1,4 @@
-import { Grid, Paper, TablePagination } from '@material-ui/core'
+import { Grid, Paper, TablePagination, Typography } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import PropTypes from 'prop-types'
 import React, { PureComponent } from 'react'
@@ -6,14 +6,14 @@ import CardTableToolbar from './CardTableToolbar'
 import { assocPath, assoc, propOr, propEq, pathOr } from 'ramda'
 import { ensureFunction, compose } from 'utils/fp'
 import moize from 'moize'
-import { withAppContext } from 'core/AppProvider'
-import Progress, { withProgress } from 'core/components/progress/Progress'
+import Progress from 'core/components/progress/Progress'
 import { filterSpecPropType } from 'core/components/cardTable/CardTableToolbar'
 
 const styles = theme => ({
   root: {
     width: '100%',
     marginTop: theme.spacing(3),
+    minHeight: 300,
   },
   table: {
     minWidth: 800,
@@ -21,9 +21,12 @@ const styles = theme => ({
   tableWrapper: {
     overflowX: 'auto',
   },
+  emptyList: {
+    textAlign: 'left',
+    margin: theme.spacing(1, 4),
+  },
 })
 
-@withProgress
 class CardTable extends PureComponent {
   state = {
     rowsPerPage: this.props.rowsPerPage,
@@ -165,6 +168,13 @@ class CardTable extends PureComponent {
     return filters ? this.applyFilters(searchData) : searchData
   }
 
+  renderEmptyList = () => {
+    if (this.props.loading) {
+      return null
+    }
+    return <Typography className={this.props.classes.emptyList} variant="h6">{this.props.emptyText}</Typography>
+  }
+
   render () {
     const {
       title,
@@ -176,7 +186,7 @@ class CardTable extends PureComponent {
     const {
       classes, paginate,
       data, sorting, filters, children,
-      onRefresh,
+      onRefresh, loading,
     } = this.props
 
     if (!data) {
@@ -185,31 +195,37 @@ class CardTable extends PureComponent {
 
     const filteredData = this.getFilteredItems()
     const paginatedData = paginate ? this.paginate(filteredData) : filteredData
+    const gridContent = paginatedData && paginatedData.length
+      ? paginatedData.map(children)
+      : this.renderEmptyList()
+
     return (
-      <Grid container justify="center">
-        <Grid item xs={12} zeroMinWidth>
-          <Paper className={classes.root}>
-            <CardTableToolbar
-              title={title}
-              sorting={sorting}
-              direction={direction}
-              orderBy={orderBy}
-              filters={filters}
-              filterValues={filterValues}
-              onFilterUpdate={this.handleFilterUpdate}
-              onSearchChange={this.handleSearch}
-              onSortChange={this.handleRequestSort}
-              onRefresh={onRefresh}
-              onDirectionChange={this.handleDirectionChange}
-              searchTerm={searchTerm}
-            />
-            <Grid container spacing={3} justify="flex-start">
-              {paginatedData.map(children)}
-            </Grid>
-            {this.renderPaginationControls(filteredData.length)}
-          </Paper>
+      <Progress loading={loading} overlay renderContentOnMount>
+        <Grid container justify="center">
+          <Grid item xs={12} zeroMinWidth>
+            <Paper className={classes.root}>
+              <CardTableToolbar
+                title={title}
+                sorting={sorting}
+                direction={direction}
+                orderBy={orderBy}
+                filters={filters}
+                filterValues={filterValues}
+                onFilterUpdate={this.handleFilterUpdate}
+                onSearchChange={this.handleSearch}
+                onSortChange={this.handleRequestSort}
+                onRefresh={onRefresh}
+                onDirectionChange={this.handleDirectionChange}
+                searchTerm={searchTerm}
+              />
+              <Grid container spacing={3} justify="flex-start">
+                {gridContent}
+              </Grid>
+              {this.renderPaginationControls(filteredData.length)}
+            </Paper>
+          </Grid>
         </Grid>
-      </Grid>
+      </Progress>
     )
   }
 }
@@ -226,7 +242,7 @@ CardTable.propTypes = {
     }),
   ),
   onRefresh: PropTypes.func,
-  ...Progress.propTypes,
+  loading: PropTypes.bool,
 }
 
 CardTable.defaultProps = {
@@ -235,10 +251,10 @@ CardTable.defaultProps = {
   filters: [],
   sorting: [],
   rowsPerPage: 24,
+  emptyText: 'No data found',
   loading: false,
 }
 
 export default compose(
   withStyles(styles),
-  withAppContext,
 )(CardTable)

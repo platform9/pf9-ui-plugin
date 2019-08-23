@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import Typography from '@material-ui/core/Typography'
 import { withTabContext } from 'core/components/tabs/Tabs'
 
-class Tab extends React.Component {
+class Tab extends PureComponent {
   componentDidMount () {
     const { addTab, value, label } = this.props
 

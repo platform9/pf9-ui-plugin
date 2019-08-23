@@ -26,8 +26,7 @@ export const loadNamespaces = createContextLoader(namespacesDataKey, async (para
   return clusterId === allKey
     ? asyncFlatMap(pluck('uuid', clusters), qbert.getClusterNamespaces)
     : qbert.getClusterNamespaces(clusterId)
-},
-{
+}, {
   uniqueIdentifier: 'id',
   indexBy: 'clusterId',
   dataMapper: namespacesMapper

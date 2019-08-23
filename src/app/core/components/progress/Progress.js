@@ -40,11 +40,15 @@ const styles = theme => ({
     justifyContent: 'center',
     alignItems: 'center',
     padding: '4rem',
+    minHeight: 200,
+  },
+  statusHidden: {
+    display: 'none'
   },
   statusInline: {
     padding: '0 1rem',
-    display: 'flex',
     flexFlow: 'row nowrap',
+    minHeight: 'unset'
   },
   statusOverlayed: {
     position: 'absolute',
@@ -97,15 +101,12 @@ class Progress extends PureComponent {
     } = this.props
     const { loadedOnce } = this.state
 
-    if (!loading) {
-      return null
-    }
     return <div className={clsx(classes.status, {
+      [classes.statusHidden]: !loading,
       [classes.statusInline]: inline,
       [classes.statusOverlayed]: overlay && loading && (renderContentOnMount || loadedOnce),
     })}>
-      {renderLoadingImage &&
-      <img alt="" src={imageUrls.loading} className={clsx(classes.img, {
+      {renderLoadingImage && <img alt="Loading..." src={imageUrls.loading} className={clsx(classes.img, {
         [classes.imgInline]: inline,
       })} />}
       {message && <Typography className={clsx(classes.message, {

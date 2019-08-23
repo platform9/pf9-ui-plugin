@@ -15,6 +15,8 @@ export const rawNodesDataKey = 'rawNodes'
 export const resMgrHostsDataKey = 'resMgrHosts'
 export const combinedHostsDataKey = 'combinedHosts'
 
+const { qbert, resmgr } = ApiClient.getInstance()
+
 // If params.clusterId is not assigned it fetches all clusters and extracts the clusterId from the first cluster
 // It also adds a "clusters" param that contains all the clusters, just for convenience
 export const parseClusterParams = async (params, loadFromContext) => {
@@ -24,32 +26,27 @@ export const parseClusterParams = async (params, loadFromContext) => {
 }
 
 export const deleteCluster = createContextUpdater(clustersDataKey, async ({ id }) => {
-  const { qbert } = ApiClient.getInstance()
   await qbert.deleteCluster(id)
   // Refresh clusters since combinedHosts will still
   // have references to the deleted cluster.
 }, {
   uniqueIdentifier: 'uuid',
-  operation: 'delete'
+  operation: 'delete',
 })
 
 export const loadCloudProviders = createContextLoader(cloudProvidersDataKey, async () => {
-  const { qbert } = ApiClient.getInstance()
   return qbert.getCloudProviders()
 }, { uniqueIdentifier: 'uuid' })
 
 export const createCloudProvider = createContextUpdater(cloudProvidersDataKey, ({ data }) => {
-  const { qbert } = ApiClient.getInstance()
   return qbert.createCloudProvider(data)
 }, { uniqueIdentifier: 'uuid', operation: 'create' })
 
 export const updateCloudProvider = createContextUpdater(cloudProvidersDataKey, ({ id, data }) => {
-  const { qbert } = ApiClient.getInstance()
   return qbert.updateCloudProvider(id, data)
 }, { uniqueIdentifier: 'uuid', operation: 'update' })
 
 export const deleteCloudProvider = createContextUpdater(cloudProvidersDataKey, async ({ id }) => {
-  const { qbert } = ApiClient.getInstance()
   await qbert.deleteCloudProvider(id)
 }, { uniqueIdentifier: 'uuid', operation: 'delete' })
 
@@ -58,31 +55,30 @@ export const createCluster = async ({ data, context }) => {
   console.log(data)
 }
 
-export const attachNodesToCluster = createContextUpdater(nodesDataKey, async ({ clusterUuid, nodes }, currentItems) => {
-  const { qbert } = ApiClient.getInstance()
-  const nodeUuids = pluck('uuid', nodes)
-  await qbert.attach(clusterUuid, nodes)
-  // Assign nodes to their clusters in the context as well so the user
-  // can't add the same node to another cluster.
-  return currentItems.map(node =>
-    nodeUuids.includes(node.uuid) ? ({ ...node, clusterUuid }) : node)
-}, {
-  uniqueIdentifier: 'uuid',
-  operation: 'attachNodes',
-})
+export const attachNodesToCluster = createContextUpdater(nodesDataKey,
+  async ({ clusterUuid, nodes }, currentItems) => {
+    const nodeUuids = pluck('uuid', nodes)
+    await qbert.attach(clusterUuid, nodes)
+    // Assign nodes to their clusters in the context as well so the user
+    // can't add the same node to another cluster.
+    return currentItems.map(node =>
+      nodeUuids.includes(node.uuid) ? ({ ...node, clusterUuid }) : node)
+  }, {
+    uniqueIdentifier: 'uuid',
+    operation: 'attachNodes',
+  })
 
-export const detachNodesFromCluster = createContextUpdater(nodesDataKey, async ({ clusterUuid, nodeUuids }, currentItems) => {
-  const { qbert } = ApiClient.getInstance()
-  await qbert.detach(clusterUuid, nodeUuids)
-  return currentItems.map(node =>
-    nodeUuids.includes(node.uuid) ? ({ ...node, clusterUuid: null }) : node)
-}, {
-  uniqueIdentifier: 'uuid',
-  operation: 'detachNodes',
-})
+export const detachNodesFromCluster = createContextUpdater(nodesDataKey,
+  async ({ clusterUuid, nodeUuids }, currentItems) => {
+    await qbert.detach(clusterUuid, nodeUuids)
+    return currentItems.map(node =>
+      nodeUuids.includes(node.uuid) ? ({ ...node, clusterUuid: null }) : node)
+  }, {
+    uniqueIdentifier: 'uuid',
+    operation: 'detachNodes',
+  })
 
 export const scaleCluster = async ({ data }) => {
-  const { qbert } = ApiClient.getInstance()
   const { cluster, numSpotWorkers, numWorkers, spotPrice } = data
   const body = {
     numWorkers,
@@ -96,12 +92,10 @@ export const scaleCluster = async ({ data }) => {
 
 // eslint-disable-next-line
 const loadRawNodes = createContextLoader(rawNodesDataKey, async () => {
-  const { qbert } = ApiClient.getInstance()
   return qbert.getNodes()
 }, { uniqueIdentifier: 'uuid' })
 
 export const loadClusters = createContextLoader(clustersDataKey, async (params, loadFromContext) => {
-  const { qbert } = ApiClient.getInstance()
   const [rawNodes, rawClusters, qbertEndpoint] = await Promise.all([
     loadFromContext(rawNodesDataKey),
     qbert.getClusters(),
@@ -159,15 +153,14 @@ export const loadClusters = createContextLoader(clustersDataKey, async (params, 
       return cluster
     }
   }, true)
-},  {
-  uniqueIdentifier: 'uuid'
+}, {
+  uniqueIdentifier: 'uuid',
 })
 
 export const loadResMgrHosts = createContextLoader(resMgrHostsDataKey, async () => {
-  const { resmgr } = ApiClient.getInstance()
   return resmgr.getHosts()
 }, {
-  uniqueIdentifier: 'uuid'
+  uniqueIdentifier: 'uuid',
 })
 
 export const loadCombinedHosts = createContextLoader(combinedHostsDataKey, async (params, loadFromContext) => {
@@ -189,7 +182,7 @@ export const loadCombinedHosts = createContextLoader(combinedHostsDataKey, async
   // Convert it back to array form
   return Object.values(hostsById).map(combineHost)
 }, {
-  uniqueIdentifier: 'uuid'
+  uniqueIdentifier: 'uuid',
 })
 
 export const loadNodes = createContextLoader(nodesDataKey, async (params, loadFromContext) => {
@@ -220,5 +213,5 @@ export const loadNodes = createContextLoader(nodesDataKey, async (params, loadFr
     logs: `${qbertUrl}/logs/${node.uuid}`,
   }))
 }, {
-  uniqueIdentifier: 'uuid'
+  uniqueIdentifier: 'uuid',
 })

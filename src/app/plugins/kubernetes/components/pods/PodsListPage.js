@@ -7,7 +7,9 @@ import useDataLoader from 'core/hooks/useDataLoader'
 const ListPage = ({ ListContainer }) => {
   return () => {
     const [params, setParams] = useState(emptyObj)
-    const handleClusterChange = useCallback(clusterId => setParams({ clusterId }), [])
+    const handleClusterChange = useCallback(clusterId => {
+      setParams({ clusterId })
+    }, [setParams])
     const [data, loading, reload] = useDataLoader('pods', params)
     return <div>
       <ClusterPicklist

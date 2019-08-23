@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import { withRouter } from 'react-router-dom'
 import ConfirmationDialog from './ConfirmationDialog'
-import Progress from 'core/components/progress/Progress'
 
 class CRUDListContainer extends React.Component {
   componentDidMount () {
@@ -15,7 +14,6 @@ class CRUDListContainer extends React.Component {
   state = {
     showConfirmation: false,
     selectedItems: null,
-    deleting: false,
   }
 
   deleteConfirmText = () => {
@@ -39,14 +37,14 @@ class CRUDListContainer extends React.Component {
   }
 
   handleDeleteConfirm = async () => {
-    this.setState({ showConfirmation: false, deleting: true })
+    this.setState({ showConfirmation: false })
     const items = this.state.selectedItems || []
 
     // Items will be deleted sequentially, otherwise we would run in a race condition
     // causing the context to be incorrectly updated with just one item removed
     await asyncMap(items, this.handleRemove, false)
 
-    this.setState({ selectedItems: [], deleting: false })
+    this.setState({ selectedItems: [] })
     // The user resolves the promise by clicking "confirm".
     this.resolveDelete()
   }
@@ -76,7 +74,7 @@ class CRUDListContainer extends React.Component {
 
   render () {
     return (
-      <Progress renderContentOnMount overlay loading={this.state.deleting || this.props.loading}>
+      <div>
         <ConfirmationDialog
           open={this.state.showConfirmation}
           text={this.deleteConfirmText()}
@@ -88,13 +86,12 @@ class CRUDListContainer extends React.Component {
           onAdd: this.props.addUrl && this.redirectToAdd,
           onEdit: this.props.editUrl && this.redirectToEdit,
         })}
-      </Progress>
+      </div>
     )
   }
 }
 
 CRUDListContainer.propTypes = {
-  loading: PropTypes.bool,
   addUrl: PropTypes.string,
   editUrl: PropTypes.string,
 

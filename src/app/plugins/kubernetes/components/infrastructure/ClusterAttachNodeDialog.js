@@ -29,14 +29,14 @@ class ClusterAttachNodeDialog extends React.Component {
   }
 
   handleSubmit = async () => {
-    const { row, context, setContext } = this.props
+    const { row, getContext, setContext } = this.props
 
     const nodes = Object.keys(this.state)
       .filter(uuid => this.state[uuid] !== 'unassigned')
       .map(uuid => ({ uuid, isMaster: this.state[uuid] === 'master' }))
 
     const clusterUuid = row.uuid
-    await attachNodesToCluster({ data: { clusterUuid, nodes }, context, setContext })
+    await attachNodesToCluster({ getContext, setContext, params: { clusterUuid, nodes } })
     this.handleClose()
   }
 

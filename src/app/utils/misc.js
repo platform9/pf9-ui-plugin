@@ -1,4 +1,4 @@
-import { path } from 'ramda'
+import { path, equals } from 'ramda'
 import moize from 'moize'
 
 // A more resilient JSON parsing that should always return {}
@@ -54,12 +54,11 @@ export const tryJsonParse = moize(val => typeof val === 'string' ? JSON.parse(va
 /**
  * Memoizes an async function so that concurrent calls to the same function (with the same params) will return the same promise
  * @param {function} asyncFn Function that will be memoized until it gets resolved
- * @param {object} moizeOptions Additional moize options
  * @returns {function}
  */
-export const singlePromise = (asyncFn, moizeOptions = {}) => {
+export const singlePromise = asyncFn => {
   const memoizedCb = moize(asyncFn, {
-    ...moizeOptions,
+    equals, // Use ramda "equals" instead of moize SameValueZero comparisons
     isPromise: true,
   })
   return async (...params) => {

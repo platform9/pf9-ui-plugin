@@ -22,13 +22,14 @@ const sortingConfig = [
 const AppCatalogPage = () => {
   const [params, setParams] = useState(emptyObj)
   const [apps, loading, reload] = useDataLoader('apps', params)
-  // reload(true) refetches the data from server
   const handleRefresh = useCallback(() => reload(true), [reload])
   const renderFilters = useMemo(() => <>
     <ClusterPicklist
       onChange={clusterId => setParams({ clusterId })}
       value={params.clusterId} />
   </>, [params.clusterId])
+  const renderCardItems = useCallback(item =>
+    <AppCard application={item} key={item.id} />, [])
 
   return <CardTable
     loading={loading}
@@ -38,7 +39,7 @@ const AppCatalogPage = () => {
     searchTarget="attributes.name"
     filters={renderFilters}
   >
-    {item => <AppCard application={item} key={item.key} />}
+    {renderCardItems}
   </CardTable>
 }
 

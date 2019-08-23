@@ -1,10 +1,10 @@
 import {
-  hasPath, path, assocPath, pathEq, always, over, append, lensPath, pipe, when,
+  hasPath, path, assocPath, pathEq, always, over, append, lensPath, pipe, ifElse,
 } from 'ramda'
 import { emptyObj, ensureFunction, removeWith, updateWith, switchCase } from 'utils/fp'
 import { dataContextKey, getContextLoader } from 'core/helpers/createContextLoader'
 import { singlePromise, uncamelizeString } from 'utils/misc'
-import { defaultUniqueIdentifier } from 'app/constants'
+import { defaultUniqueIdentifier, notFoundErr } from 'app/constants'
 
 let updaters = {}
 export const getContextUpdater = (key, operation) => {
@@ -37,15 +37,25 @@ function createContextUpdater (key, dataUpdaterFn, options = {}) {
       ['update', 'updated'],
       ['delete', 'deleted'],
     )(operation)} ${entityName}`,
-    errorMessage = (catchedErr, params) => `Error when trying to "${switchCase(
-      'update',
-      ['create', 'create'],
-      ['update', 'update'],
-      ['delete', 'delete'],
-    )(operation)}" ${entityName} ${when(
-      hasPath(uniqueIdentifierPath),
-      pipe(path(uniqueIdentifierPath), id => `with ${uniqueIdentifier}: ${id}`)
-    )(params)}`,
+    errorMessage = (catchedErr, params) => {
+      const action = switchCase(
+        'update',
+        ['create', 'create'],
+        ['update', 'update'],
+        ['delete', 'delete'],
+      )(operation)
+      // Display entity ID if available
+      const withId = ifElse(
+        hasPath(uniqueIdentifierPath),
+        pipe(path(uniqueIdentifierPath), id => ` with ${uniqueIdentifier}: ${id}`),
+        always(''),
+      )(params)
+      // Specific error handling
+      return switchCase(
+        `Error when trying to ${action} ${entityName}${withId}`,
+        [notFoundErr, `Unable to find ${entityName}${withId} when trying to ${action}`],
+      )(catchedErr.message)
+    },
   } = options
   const uniqueIdentifierPath = uniqueIdentifier.split('.')
   const dataLens = lensPath([dataContextKey, key])
@@ -96,8 +106,6 @@ function createContextUpdater (key, dataUpdaterFn, options = {}) {
         await onError(parsedErrorMesssage, err, params)
       }
     }
-  }, {
-    isDeepEqual: true,
   })
 
   if (hasPath([key, operation], updaters)) {

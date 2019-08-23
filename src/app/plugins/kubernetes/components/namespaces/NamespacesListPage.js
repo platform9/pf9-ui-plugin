@@ -8,7 +8,7 @@ import { namespacesDataKey } from './actions'
 const ListPage = ({ ListContainer }) => {
   return () => {
     const [params, setParams] = useState(emptyObj)
-    const handleClusterChange = useCallback(clusterId => setParams({ clusterId }), [])
+    const handleClusterChange = useCallback(clusterId => setParams({ clusterId }), [setParams])
     const [namespaces, loading, reload] = useDataLoader(namespacesDataKey, params)
     return <div>
       <ClusterPicklist

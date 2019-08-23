@@ -1,6 +1,8 @@
 import React, { useMemo, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { isEmpty, propOr, head, compose, filter, identity, omit, path, pipe, propSatisfies } from 'ramda'
+import {
+  isEmpty, propOr, head, compose, filter, identity, omit, path, pipe, propSatisfies,
+} from 'ramda'
 import Picklist from 'core/components/Picklist'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { isTruthy, projectAs } from 'utils/fp'
@@ -22,16 +24,16 @@ const ClusterPicklist = ({ loading, onChange, value, onlyPrometheusEnabled, only
 
   // Select the first cluster as soon as clusters are loaded
   useEffect(() => {
-    if (!isEmpty(clusters)) {
-      onChange(propOr(allKey, 'uuid', head(clusters)))
+    if (!isEmpty(options)) {
+      onChange(propOr(allKey, 'value', head(options)))
     }
-  }, [clusters])
+  }, [options])
 
   return <Picklist
     {...rest}
     onChange={onChange}
-    disabled={isEmpty(clusters)}
-    value={value || propOr(allKey, 'uuid', head(clusters))}
+    disabled={isEmpty(options)}
+    value={value || propOr(allKey, 'value', head(options))}
     loading={loading || clustersLoading}
     options={options}
   />

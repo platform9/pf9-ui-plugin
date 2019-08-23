@@ -1,39 +1,47 @@
 import ApiClient from 'api-client/ApiClient'
 import createContextLoader from 'core/helpers/createContextLoader'
 import createContextUpdater from 'core/helpers/createContextUpdater'
-import { equals, find } from 'ramda'
 import { defaultUniqueIdentifier } from 'app/constants'
 
-const createCRUDActions = (options = {}) => {
+const createCRUDActions = options => {
   const {
     service,
     entity,
     dataKey = entity,
     uniqueIdentifier = defaultUniqueIdentifier,
-    operations = ['create', 'list', 'update', 'delete']
+    operations = ['create', 'list', 'update', 'delete'],
+    indexBy,
   } = options
+  const apiClient = ApiClient.getInstance()
+  const throwErr = operation => () => {
+    throw new Error(`Operation ${operation} for entity ${entity} not created`)
+  }
 
   return {
     // Wrap standard CRUD operations to include updating the AppContext
-    create: find(equals('create'), operations) && createContextUpdater(dataKey, async data => {
-      const apiClient = ApiClient.getInstance()
-      return apiClient[service][entity].create(data)
-    }, { uniqueIdentifier, operation: 'create' }),
+    create: operations.includes('create')
+      ? createContextUpdater(dataKey,
+        async data => apiClient[service][entity].create(data),
+        { uniqueIdentifier, operation: 'create' })
+      : throwErr('create'),
 
-    list: find(equals('list'), operations) && createContextLoader(dataKey, async params => {
-      const apiClient = ApiClient.getInstance()
-      return apiClient[service][entity].list(params)
-    }, { uniqueIdentifier }),
+    list: operations.includes('list')
+      ? createContextLoader(dataKey,
+        async params => apiClient[service][entity].list(params),
+        { uniqueIdentifier, indexBy })
+      : throwErr('list'),
 
-    update: find(equals('update'), operations) && createContextUpdater(dataKey, async ({ [uniqueIdentifier]: id, ...data }) => {
-      const apiClient = ApiClient.getInstance()
-      return apiClient[service][entity].update(id, data)
-    }, { uniqueIdentifier, operation: 'update' }),
+    update: operations.includes('update')
+      ? createContextUpdater(dataKey,
+        async ({ [uniqueIdentifier]: id, ...data }) => apiClient[service][entity].update(id, data),
+        { uniqueIdentifier, operation: 'update' })
+      : throwErr('update'),
 
-    delete: find(equals('delete'), operations) && createContextUpdater(dataKey, async ({ [uniqueIdentifier]: id }) => {
-      const apiClient = ApiClient.getInstance()
-      await apiClient[service][entity].delete(id)
-    }, { uniqueIdentifier, operation: 'delete' }),
+    delete: operations.includes('delete')
+      ? createContextUpdater(dataKey,
+        async ({ [uniqueIdentifier]: id }) => apiClient[service][entity].delete(id),
+        { uniqueIdentifier, operation: 'delete' })
+      : throwErr('delete'),
   }
 }
 

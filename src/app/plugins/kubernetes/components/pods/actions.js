@@ -11,17 +11,20 @@ const podCRUDActions = createCRUDActions({
   service: 'qbert',
   entity: podsDataKey,
   operations: ['list'],
+  indexBy: 'clusterId',
 })
 const deploymentCRUDActions = createCRUDActions({
   service: 'qbert',
   entity: deploymentsDataKey,
   operations: ['list'],
+  indexBy: 'clusterId',
 })
 const serviceCRUDActions = createCRUDActions({
   service: 'qbert',
   entity: 'services',
   dataKey: kubeServicesDataKey,
   operations: ['list'],
+  indexBy: 'clusterId',
 })
 
 export const loadPods = podCRUDActions.list

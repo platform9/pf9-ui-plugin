@@ -6,6 +6,9 @@ import { asyncProps } from 'utils/fp'
 import { mapObjIndexed, equals } from 'ramda'
 import { withAppContext } from 'core/AppProvider'
 
+/**
+ * @deprecated Use useDataLoader hook instead
+ */
 class DataLoader extends PureComponent {
   state = {
     loading: false,

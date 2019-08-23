@@ -43,7 +43,7 @@ const createCRUDComponents = options => {
 
   // List
   const List = withScopedPreferences(name)(({
-    onAdd, onDelete, onEdit, rowActions, data, onRefresh,
+    onAdd, onDelete, onEdit, rowActions, data, onRefresh, loading,
     preferences: { visibleColumns, columnsOrder, rowsPerPage },
     updatePreferences,
   }) => {
@@ -56,6 +56,7 @@ const createCRUDComponents = options => {
     // }
     return (
       <ListTable
+        loading={loading}
         onRefresh={onRefresh}
         columns={columns}
         data={data}
@@ -90,7 +91,6 @@ const createCRUDComponents = options => {
 
     return (
       <CRUDListContainer
-        loading={loading || deleting}
         items={data}
         params={params}
         setParams={setParams}
@@ -100,7 +100,7 @@ const createCRUDComponents = options => {
       >
         {handlers => <>
           {addUrl && <TopExtraContent>{addButton}</TopExtraContent>}
-          <List data={data} onRefresh={refetch} {...handlers} {...moreProps} />
+          <List loading={loading || deleting} data={data} onRefresh={refetch} {...handlers} {...moreProps} />
         </>}
       </CRUDListContainer>
     )

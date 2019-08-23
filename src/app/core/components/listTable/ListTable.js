@@ -1,6 +1,6 @@
 /* eslint-disable react/no-did-update-set-state */
 
-import React from 'react'
+import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import Checkbox from 'core/components/Checkbox'
 import {
@@ -15,11 +15,13 @@ import {
 } from 'ramda'
 import ListTableHead from './ListTableHead'
 import ListTableToolbar from './ListTableToolbar'
+import Progress from 'core/components/progress/Progress'
 
 const styles = theme => ({
   root: {
     width: '100%',
     marginTop: theme.spacing(3),
+    minHeight: 300,
   },
   table: {
     minWidth: 800,
@@ -32,6 +34,7 @@ const styles = theme => ({
   },
   emptyList: {
     textAlign: 'left',
+    margin: theme.spacing(1, 3),
   },
 })
 
@@ -41,7 +44,7 @@ export const pluckVisibleColumnIds = columns =>
     .filter(column => column.display !== false && column.excluded !== true)
     .map(prop('id'))
 
-class ListTable extends React.Component {
+class ListTable extends PureComponent {
   constructor (props) {
     super(props)
     const { columns, visibleColumns, columnsOrder, rowsPerPage } = props
@@ -360,6 +363,9 @@ class ListTable extends React.Component {
   }
 
   renderEmptyList = () => {
+    if (this.props.loading) {
+      return null
+    }
     return <Typography className={this.props.classes.emptyList} variant="h6">{this.props.emptyText}</Typography>
   }
 
@@ -375,6 +381,7 @@ class ListTable extends React.Component {
       filters,
       inlineFilters,
       onRefresh,
+      loading,
     } = this.props
 
     const {
@@ -419,37 +426,39 @@ class ListTable extends React.Component {
       : this.renderEmptyList()
 
     return (
-      <Grid container justify="center">
-        <Grid item xs={12} zeroMinWidth>
-          <div className={classes.root}>
-            <ListTableToolbar
-              selected={selected}
-              onAdd={this.props.onAdd && this.handleAdd}
-              onDelete={this.props.onDelete && this.handleDelete}
-              onEdit={this.props.onEdit && this.handleEdit}
-              onSearchChange={this.handleSearch}
-              searchTerm={searchTerm}
-              columns={columns}
-              visibleColumns={visibleColumns}
-              onColumnToggle={this.handleColumnToggle}
-              filters={filters}
-              inlineFilters={inlineFilters}
-              filterValues={filterValues}
-              onFilterUpdate={this.handleFilterUpdate}
-              onFiltersReset={this.handleFiltersReset}
-              onRefresh={onRefresh}
-              batchActions={batchActions}
-              rowsPerPage={rowsPerPage}
-              onChangeRowsPerPage={this.handleChangeRowsPerPage}
-              rowsPerPageOptions={[5, 10, 25, 50, 100]}
-            />
-            <div className={classes.tableWrapper}>
-              {tableContent}
+      <Progress loading={loading} overlay renderContentOnMount>
+        <Grid container justify="center">
+          <Grid item xs={12} zeroMinWidth>
+            <div className={classes.root}>
+              <ListTableToolbar
+                selected={selected}
+                onAdd={this.props.onAdd && this.handleAdd}
+                onDelete={this.props.onDelete && this.handleDelete}
+                onEdit={this.props.onEdit && this.handleEdit}
+                onSearchChange={this.handleSearch}
+                searchTerm={searchTerm}
+                columns={columns}
+                visibleColumns={visibleColumns}
+                onColumnToggle={this.handleColumnToggle}
+                filters={filters}
+                inlineFilters={inlineFilters}
+                filterValues={filterValues}
+                onFilterUpdate={this.handleFilterUpdate}
+                onFiltersReset={this.handleFiltersReset}
+                onRefresh={onRefresh}
+                batchActions={batchActions}
+                rowsPerPage={rowsPerPage}
+                onChangeRowsPerPage={this.handleChangeRowsPerPage}
+                rowsPerPageOptions={[5, 10, 25, 50, 100]}
+              />
+              <div className={classes.tableWrapper}>
+                {tableContent}
+              </div>
+              {this.renderPaginationControls(filteredData.length)}
             </div>
-            {this.renderPaginationControls(filteredData.length)}
-          </div>
+          </Grid>
         </Grid>
-      </Grid>
+      </Progress>
     )
   }
 }
@@ -538,6 +547,8 @@ ListTable.propTypes = {
 
   canEditColumns: PropTypes.bool,
   canDragColumns: PropTypes.bool,
+
+  loading: PropTypes.bool,
 }
 
 ListTable.defaultProps = {
@@ -548,6 +559,7 @@ ListTable.defaultProps = {
   canDragColumns: true,
   rowsPerPage: 10,
   emptyText: 'No data found',
+  loading: false,
 }
 
 export default compose(

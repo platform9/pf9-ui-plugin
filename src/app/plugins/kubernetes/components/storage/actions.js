@@ -5,7 +5,9 @@ import { asyncFlatMap } from 'utils/fp'
 import { assoc, propEq } from 'ramda'
 import { clustersDataKey } from 'k8s/components/infrastructure/actions'
 
-export const loadStorageClasses = createContextLoader('storageClasses', async (params, loadFromContext) => {
+export const storageClassesDataKey = 'storageClasses'
+
+export const loadStorageClasses = createContextLoader(storageClassesDataKey, async (params, loadFromContext) => {
   const { qbert } = ApiClient.getInstance()
   const clusters = await loadFromContext(clustersDataKey)
   const isHealthy = cluster => cluster.healthyMasterNodes.length > 0
@@ -19,7 +21,7 @@ export const loadStorageClasses = createContextLoader('storageClasses', async (p
   return storageClasses.map(addClusterName)
 })
 
-export const deleteStorageClass = createContextUpdater('storageClasses', async ({ id }, currentItems) => {
+export const deleteStorageClass = createContextUpdater(storageClassesDataKey, async ({ id }, currentItems) => {
   const { qbert } = ApiClient.getInstance()
   const item = currentItems.find(propEq('id', id))
   if (!item) {

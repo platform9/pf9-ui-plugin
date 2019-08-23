@@ -1,20 +1,21 @@
-import React from 'react'
+import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { withAppContext } from 'core/AppProvider'
 import DataLoader from 'core/DataLoader'
 import { compose } from 'ramda'
 import { withRouter } from 'react-router'
 
-/* This is a convenience HOC to make updating the in-memory cache easier.
- *
+/**
+ * This is a convenience HOC to make updating the in-memory cache easier.
  * Additionally, it handles loading as well through `DataLoader`.
+ * @deprecated Use useDataUpdater hook instead
  */
-class DataUpdater extends React.Component {
+class DataUpdater extends PureComponent {
   findById = (arr = [], id) => arr.find(x => x.id === id)
 
-  handleSubmit = async data => {
-    const { updateFn, objId, backUrl, context, setContext, history } = this.props
-    await updateFn({ data, context, setContext, objId })
+  handleSubmit = async params => {
+    const { updateFn, objId, backUrl, getContext, setContext, history } = this.props
+    await updateFn({ params: { id: objId, ...params }, getContext, setContext, objId })
     if (backUrl) {
       history.push(backUrl)
     }

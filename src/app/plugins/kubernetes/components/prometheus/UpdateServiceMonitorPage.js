@@ -3,7 +3,7 @@ import KeyValuesField from 'core/components/validatedForm/KeyValuesField'
 import SubmitButton from 'core/components/SubmitButton'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import createUpdateComponents from 'core/helpers/createUpdateComponents'
-import { loadPrometheusServiceMonitors, updatePrometheusServiceMonitor } from './actions'
+import { prometheusServiceMonitorsDataKey } from './actions'
 import { keyValueArrToObj, objToKeyValueArr } from 'utils/fp'
 
 class UpdateServiceMonitorForm extends React.Component {
@@ -26,10 +26,9 @@ class UpdateServiceMonitorForm extends React.Component {
 
 export const options = {
   FormComponent: UpdateServiceMonitorForm,
+  dataKey: prometheusServiceMonitorsDataKey,
   routeParamKey: 'id',
   uniqueIdentifier: 'uid',
-  updateFn: updatePrometheusServiceMonitor,
-  loaderFn: loadPrometheusServiceMonitors,
   listUrl: '/ui/kubernetes/prometheus#serviceMonitors',
   name: 'UpdatePrometheusServiceMonitor',
   title: 'Update Prometheus Service Monitor',

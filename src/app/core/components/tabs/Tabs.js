@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { PureComponent } from 'react'
 import { withRouter } from 'react-router-dom'
 import { Grid, Paper, Tab as MDTab, Tabs as MDTabs } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
@@ -45,7 +45,7 @@ const tabStyles = theme => ({
 
 const CustomTab = withStyles(tabStyles)(MDTab)
 
-class Tabs extends React.Component {
+class Tabs extends PureComponent {
   addTab = tab => {
     this.setState(
       state => ({ tabs: [...state.tabs, tab] }), this.activateDefaultTab)
