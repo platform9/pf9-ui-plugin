@@ -3,7 +3,7 @@ import createAddComponents from 'core/helpers/createAddComponents'
 import SubmitButton from 'core/components/SubmitButton'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import TextField from 'core/components/validatedForm/TextField'
-import { createTenant, loadTenants } from './actions'
+import { tenantsDataKey } from './actions'
 
 export const AddTenantForm = ({ onComplete }) => (
   <ValidatedForm onSubmit={onComplete}>
@@ -15,8 +15,7 @@ export const AddTenantForm = ({ onComplete }) => (
 
 export const options = {
   FormComponent: AddTenantForm,
-  createFn: createTenant,
-  loaderFn: loadTenants,
+  dataKey: tenantsDataKey,
   listUrl: '/ui/openstack/tenants',
   name: 'AddTenant',
   title: 'Add Tenant',

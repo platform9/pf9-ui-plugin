@@ -1,24 +1,24 @@
 import ApiClient from 'api-client/ApiClient'
-import createContextLoader from 'core/helpers/createContextLoader'
-import createContextUpdater from 'core/helpers/createContextUpdater'
+import createCRUDActions from 'core/helpers/createCRUDActions'
 
-export const loadRouters = createContextLoader('routers', async () => {
-  const { neutron } = ApiClient.getInstance()
-  return neutron.getRouters()
+export const routersDataKey = 'routers'
+
+const { neutron } = ApiClient.getInstance()
+
+const routerActions = createCRUDActions(routersDataKey, {
+  listFn: async () => {
+    return neutron.getRouters()
+  },
+  createFn: async data => {
+    return neutron.createRouter(data)
+  },
+  updateFn: async data => {
+    const { id } = data
+    return neutron.updateRouter(id, data)
+  },
+  deleteFn: async ({ id }) => {
+    await neutron.deleteRouter(id)
+  }
 })
 
-export const createRouter = createContextUpdater('routers', async data => {
-  const { neutron } = ApiClient.getInstance()
-  return neutron.createRouter(data)
-}, { operation: 'create' })
-
-export const deleteRouter = createContextUpdater('routers', async ({ id }) => {
-  const { neutron } = ApiClient.getInstance()
-  await neutron.deleteRouter(id)
-}, { operation: 'delete' })
-
-export const updateRouter = createContextUpdater('routers', async data => {
-  const { neutron } = ApiClient.getInstance()
-  const { id } = data
-  return neutron.updateRouter(id, data)
-}, { operation: 'update' })
+export default routerActions

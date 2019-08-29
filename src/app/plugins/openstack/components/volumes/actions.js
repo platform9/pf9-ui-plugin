@@ -5,11 +5,15 @@ import createContextUpdater from 'core/helpers/createContextUpdater'
 
 const { cinder } = ApiClient.getInstance()
 
-export const loadVolumes = createContextLoader('volumes', async () => {
+export const volumesDataKey = 'volumes'
+export const volumeTypesDataKey = 'volumeTypes'
+export const volumeSnapshotsDataKey = 'volumeSnapshots'
+
+export const loadVolumes = createContextLoader(volumesDataKey, async () => {
   return cinder.getVolumes()
 })
 
-export const createVolume = createContextUpdater('volumes', async data => {
+export const createVolume = createContextUpdater(volumesDataKey, async data => {
   const created = await cinder.createVolume(data)
   if (data.bootable) {
     await cinder.setBootable(created.id, true)
@@ -18,18 +22,18 @@ export const createVolume = createContextUpdater('volumes', async data => {
   return created
 }, { operation: 'create' })
 
-export const updateVolume = createContextUpdater('volumes', async () => {
+export const updateVolume = createContextUpdater(volumesDataKey, async () => {
   // TODO
 }, { operation: 'update' })
 
-export const loadVolumeTypes = createContextLoader('volumeTypes', async () => {
+export const loadVolumeTypes = createContextLoader(volumeTypesDataKey, async () => {
   const volumeTypes = await cinder.getVolumeTypes()
 
   // Change metadata into array form
   return (volumeTypes || []).map(x => ({ ...x, extra_specs: objToKeyValueArr(x.extra_specs) }))
 })
 
-export const updateVolumeType = createContextUpdater('volumeTypes', async (data, currentItems) => {
+export const updateVolumeType = createContextUpdater(volumeTypesDataKey, async (data, currentItems) => {
   const { id } = data
   const converted = {
     name: data.name,
@@ -41,7 +45,7 @@ export const updateVolumeType = createContextUpdater('volumeTypes', async (data,
   return cinder.updateVolumeType(id, converted, keysToDelete)
 }, { operation: 'update' })
 
-export const loadVolumeSnapshots = createContextLoader('volumeSnapshots', async () => {
+export const loadVolumeSnapshots = createContextLoader(volumeSnapshotsDataKey, async () => {
   const volumeSnapshots = await cinder.getSnapshots()
 
   // Change metadata into array form
@@ -51,7 +55,7 @@ export const loadVolumeSnapshots = createContextLoader('volumeSnapshots', async 
   }))
 })
 
-export const updateVolumeSnapshot = createContextUpdater('volumeSnapshots', async data => {
+export const updateVolumeSnapshot = createContextUpdater(volumeSnapshotsDataKey, async data => {
   const { id } = data
   const updated = await cinder.updateSnapshot(id, data)
   await cinder.updateSnapshotMetadata(id, keyValueArrToObj(data.metadata))

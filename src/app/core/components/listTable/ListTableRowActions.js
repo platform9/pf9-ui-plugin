@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { IconButton, Tooltip } from '@material-ui/core'
 import { withAppContext } from 'core/AppProvider'
 
+// FIXME this should not be accessing the context
 const ListTableRowActions = ({ actionClassName, context, rowActions, selected }) => {
   const _selected = selected || []
   const filtered = (rowActions || []).filter(action =>

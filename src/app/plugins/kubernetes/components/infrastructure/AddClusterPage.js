@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { PureComponent } from 'react'
 import ApiClient from 'api-client/ApiClient'
 import Checkbox from 'core/components/validatedForm/CheckboxField'
 import ExternalLink from 'core/components/ExternalLink'
@@ -10,13 +10,14 @@ import TextField from 'core/components/validatedForm/TextField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import Wizard from 'core/components/wizard/Wizard'
 import WizardStep from 'core/components/wizard/WizardStep'
-import createCRUDActions from 'core/helpers/createCRUDActions'
 import { compose, prop, propEq, propOr } from 'ramda'
-import { loadCloudProviders } from './actions'
 import { projectAs } from 'utils/fp'
 import { withAppContext } from 'core/AppProvider'
 import withDataLoader from 'core/hocs/withDataLoader'
 import withDataMapper from 'core/hocs/withDataMapper'
+import {
+  cloudProviderActions, flavorActions, regionActions,
+} from 'k8s/components/infrastructure/actions'
 
 const initialContext = {
   manualDeploy: false,
@@ -27,7 +28,8 @@ const initialContext = {
   securityGroups: [],
 }
 
-class AddClusterPage extends React.Component {
+// TODO Refactor this to be a function component and use hooks
+class AddClusterPage extends PureComponent {
   state = {
     azs: [],
     domains: [],
@@ -252,9 +254,9 @@ class AddClusterPage extends React.Component {
 export default compose(
   withAppContext,
   withDataLoader({
-    cloudProviders: loadCloudProviders,
-    flavors: createCRUDActions({ service: 'nova', entity: 'flavors' }).list,
-    regions: createCRUDActions({ service: 'keystone', entity: 'regions' }).list,
+    cloudProviders: cloudProviderActions.list,
+    flavors: flavorActions.list,
+    regions: regionActions.list,
   }),
   withDataMapper({
     cloudProviders: propOr([], 'cloudProviders'),

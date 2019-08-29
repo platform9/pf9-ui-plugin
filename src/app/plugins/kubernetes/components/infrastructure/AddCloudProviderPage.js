@@ -5,7 +5,7 @@ import PicklistField from 'core/components/validatedForm/PicklistField'
 import SubmitButton from 'core/components/SubmitButton'
 import TextField from 'core/components/validatedForm/TextField'
 import createAddComponents from 'core/helpers/createAddComponents'
-import { createCloudProvider, loadCloudProviders } from './actions'
+import { cloudProviderActions } from 'k8s/components/infrastructure/actions'
 
 const types = [
   { value: 'openstack', label: 'Openstack' },
@@ -123,13 +123,11 @@ export class AddCloudProviderForm extends React.Component {
 }
 
 export const options = {
+  createFn: cloudProviderActions.create,
   FormComponent: AddCloudProviderForm,
-  createFn: createCloudProvider,
-  loaderFn: loadCloudProviders,
   listUrl: '/ui/kubernetes/infrastructure#cloudProviders',
   name: 'AddCloudProvider',
   title: 'Add Cloud Provider',
-  dataKey: 'cloudProviders',
 }
 
 const { AddPage } = createAddComponents(options)

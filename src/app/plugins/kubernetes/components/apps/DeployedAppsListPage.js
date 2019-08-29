@@ -1,13 +1,12 @@
 import React, { useCallback, useState } from 'react'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import SimpleLink from 'core/components/SimpleLink'
-import { compose } from 'ramda'
-import requiresAuthentication from 'openstack/util/requiresAuthentication'
 import { CardMedia } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import { emptyObj } from 'utils/fp'
 import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
 import useDataLoader from 'core/hooks/useDataLoader'
+import { releaseActions } from 'k8s/components/apps/actions'
 
 const styles = theme => ({
   icon: {
@@ -34,7 +33,7 @@ const ListPage = ({ ListContainer }) => {
   return () => {
     const [params, setParams] = useState(emptyObj)
     const handleClusterChange = useCallback(clusterId => setParams({ clusterId }), [])
-    const [data, loading, reload] = useDataLoader('releases', params)
+    const [data, loading, reload] = useDataLoader(releaseActions.list, params)
     return <div>
       <ClusterPicklist
         onChange={handleClusterChange}
@@ -55,7 +54,6 @@ export const options = {
     { id: 'attributes.status', label: 'Status' },
     { id: 'attributes.updated', label: 'Last updated' },
   ],
-  dataKey: 'releases',
   // editUrl: '/ui/kubernetes/infrastructure/releases/edit',
   name: 'DeployedApps',
   title: 'Deployed Apps',
@@ -65,6 +63,4 @@ export const options = {
 
 const { ListPage: DeployedAppsListPage } = createCRUDComponents(options)
 
-export default compose(
-  requiresAuthentication,
-)(DeployedAppsListPage)
+export default DeployedAppsListPage

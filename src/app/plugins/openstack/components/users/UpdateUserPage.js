@@ -5,13 +5,14 @@ import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import TextField from 'core/components/validatedForm/TextField'
 import NoAutofillHack from 'core/components/NoAutofillHack'
 import TenantRolesContainer from 'core/components/validatedForm/TenantRolesContainer'
-import { loadUsers, updateUser } from './actions'
-import { loadTenants } from '../tenants/actions'
+import { usersDataKey } from './actions'
+
+const roles = ['None', 'Role1', 'Role2', 'Role3']
 
 // As of Chrome 66, Google has disabled the NoAutofillHack and still does
 // not respect the HTML spec for autocomplete="off".  After some experimentation
 // it looks like autocomplete="new-password" works.
-export const UpdateUserForm = ({ onComplete, initialValue, data }) => (
+export const UpdateUserForm = ({ onComplete, initialValue }) => (
   <ValidatedForm onSubmit={onComplete} initialValues={initialValue}>
     <NoAutofillHack />
     <TextField id="name" label="Name" />
@@ -22,8 +23,7 @@ export const UpdateUserForm = ({ onComplete, initialValue, data }) => (
     <TenantRolesContainer
       id="rolePair"
       label="TenantRoleSelectors"
-      tenants={data.tenants}
-      roles={['None', 'Role1', 'Role2', 'Role3']}
+      roles={roles}
     />
     <SubmitButton>Update User</SubmitButton>
   </ValidatedForm>
@@ -32,9 +32,7 @@ export const UpdateUserForm = ({ onComplete, initialValue, data }) => (
 export const options = {
   FormComponent: UpdateUserForm,
   routeParamKey: 'userId',
-  updateFn: updateUser,
-  initFn: loadTenants,
-  loaderFn: loadUsers,
+  dataKey: usersDataKey,
   listUrl: '/ui/openstack/routers',
   name: 'UpdateUser',
   title: 'Update User',

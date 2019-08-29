@@ -8,7 +8,7 @@ import useDataUpdater from 'core/hooks/useDataUpdater'
 
 const createAddComponents = options => {
   const {
-    dataKey,
+    createFn,
     formSpec,
     listUrl,
     name,
@@ -23,7 +23,7 @@ const createAddComponents = options => {
 
   const AddPageBase = props => {
     const onComplete = useCallback(() => props.history.push(listUrl), [props.history])
-    const [handleAdd, loading] = useDataUpdater(dataKey, 'create', onComplete)
+    const [handleAdd, loading] = useDataUpdater(createFn, onComplete)
 
     return (
       <FormWrapper title={title} backUrl={listUrl}>

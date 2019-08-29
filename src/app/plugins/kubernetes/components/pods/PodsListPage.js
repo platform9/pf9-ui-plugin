@@ -3,7 +3,7 @@ import { emptyObj } from 'utils/fp'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
 import useDataLoader from 'core/hooks/useDataLoader'
-import { podsDataKey } from 'k8s/components/pods/actions'
+import { podActions } from 'k8s/components/pods/actions'
 
 const ListPage = ({ ListContainer }) => {
   return () => {
@@ -11,14 +11,14 @@ const ListPage = ({ ListContainer }) => {
     const handleClusterChange = useCallback(clusterId => {
       setParams({ clusterId })
     }, [setParams])
-    const [data, loading, reload] = useDataLoader(podsDataKey, params)
+    const [data, loading, reload] = useDataLoader(podActions.list, params)
 
     return <div>
       <ClusterPicklist
         onChange={handleClusterChange}
         value={params.clusterId}
       />
-      <ListContainer loading={loading || !params.clusterId} reload={reload} data={data} />
+      <ListContainer loading={loading} reload={reload} data={data} />
     </div>
   }
 }
@@ -31,7 +31,6 @@ export const options = {
     { id: 'clusterName', label: 'Cluster' },
     { id: 'created', label: 'Created' },
   ],
-  dataKey: 'pods',
   name: 'Pods',
   title: 'Pods',
   ListPage,

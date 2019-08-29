@@ -1,5 +1,5 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { deleteNetwork, loadNetworks } from './actions'
+import { networksDataKey } from './actions'
 
 export const options = {
   addUrl: '/ui/openstack/networks/add',
@@ -14,10 +14,8 @@ export const options = {
     { id: 'admin_state_up', label: 'Admin State' },
     { id: 'status', label: 'Status' },
   ],
-  dataKey: 'networks',
-  deleteFn: deleteNetwork,
+  dataKey: networksDataKey,
   editUrl: '/ui/openstack/networks/edit',
-  loaderFn: loadNetworks,
   name: 'Networks',
   title: 'Networks',
 }

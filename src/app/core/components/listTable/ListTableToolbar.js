@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import PropTypes from 'prop-types'
 import AddIcon from '@material-ui/icons/Add'
 import ListTableColumnButton from 'core/components/listTable/ListTableColumnSelector'
@@ -12,7 +12,6 @@ import { Button, Toolbar, Tooltip } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import ListTableFiltersButton from 'core/components/listTable/ListTableFiltersButton'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
-import moize from 'moize'
 
 const toolbarStyles = theme => ({
   root: {
@@ -60,22 +59,26 @@ const toolbarStyles = theme => ({
   },
 })
 
-const renderRefreshButton = moize((classes, onRefresh) =>
-  onRefresh && <Tooltip title="Refresh list">
-    <i className={clsx(classes.button, 'fas fa-fw fa-lg fa-sync')}
-      aria-label="Refresh list"
-      onClick={onRefresh}
-    />
-  </Tooltip>)
-
 const ListTableToolbar = ({
-  classes, columns, context, filterValues, filters, inlineFilters,
+  classes, columns, filterValues, filters, inlineFilters,
   onAdd, onColumnToggle, onDelete, onEdit, onFilterUpdate,
   onFiltersReset, onSearchChange, onRefresh,
   rowActions, searchTerm, selected, visibleColumns,
   rowsPerPage, onChangeRowsPerPage, rowsPerPageOptions,
 }) => {
   const numSelected = (selected || []).length
+  const refreshButton = useMemo(() =>
+    onRefresh && <Tooltip title="Refresh list">
+      <FontAwesomeIcon
+        className={classes.button}
+        solid
+        size="lg"
+        aria-label="Refresh list"
+        onClick={onRefresh}>
+        sync
+      </FontAwesomeIcon>
+    </Tooltip>, [onRefresh])
+
   return (
     <Toolbar
       className={clsx(classes.root, {
@@ -120,7 +123,7 @@ const ListTableToolbar = ({
               onColumnToggle={onColumnToggle}
             />
           )}
-          {renderRefreshButton(classes, onRefresh)}
+          {refreshButton}
           {filters && !inlineFilters && <ListTableFiltersButton
             columns={columns}
             filters={filters}

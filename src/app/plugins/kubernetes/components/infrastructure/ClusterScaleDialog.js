@@ -1,10 +1,10 @@
-import React from 'react'
+import React, { PureComponent } from 'react'
 import TextField from 'core/components/validatedForm/TextField'
 import Checkbox from 'core/components/validatedForm/CheckboxField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import { compose, pick, propOr } from 'ramda'
 import { withAppContext } from 'core/AppProvider'
-import { scaleCluster, loadClusters } from './actions'
+import { scaleCluster, clusterActions } from './actions'
 import {
   Slider, Button, Dialog, DialogActions, DialogContent, DialogTitle,
 } from '@material-ui/core'
@@ -15,9 +15,9 @@ import withDataMapper from 'core/hocs/withDataMapper'
 // the modal window will cause the table row to be toggled.
 const stopPropagation = e => e.stopPropagation()
 
-class ClusterScaleDialog extends React.Component {
+class ClusterScaleDialog extends PureComponent {
   state = {
-    sliderValue: 0.0
+    sliderValue: 0.0,
   }
   handleClose = () => this.props.onClose && this.props.onClose()
   handleChange = value => this.setState(state => ({ ...state, ...value }))
@@ -49,10 +49,10 @@ class ClusterScaleDialog extends React.Component {
             <TextField id="numWorkers" type="number" label="Num worker nodes" fullWidth />
             {spotFeatureEnabled && <Checkbox id="enableSpotWorkers" label="Enable spot workers" />}
             {enableSpotWorkers &&
-              <React.Fragment>
-                <Slider min={0.0} max={1.0} value={sliderValue} onChange={this.handleSlideChange} />
-                <TextField id="spotPrice" label="Spot price" fullWidth />
-              </React.Fragment>
+            <React.Fragment>
+              <Slider min={0.0} max={1.0} value={sliderValue} onChange={this.handleSlideChange} />
+              <TextField id="spotPrice" label="Spot price" fullWidth />
+            </React.Fragment>
             }
           </ValidatedForm>
         </DialogContent>
@@ -67,6 +67,6 @@ class ClusterScaleDialog extends React.Component {
 
 export default compose(
   withAppContext,
-  withDataLoader({ clusters: loadClusters }),
+  withDataLoader({ clusters: clusterActions.list }),
   withDataMapper({ clusters: propOr([], 'clusters') }),
 )(ClusterScaleDialog)

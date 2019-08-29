@@ -16,6 +16,7 @@ class DataLoader extends PureComponent {
   }
 
   async componentDidMount () {
+    console.warn('DataLoader component is deprecated, please use `useDataLoader` hook or `withDataLoader` HoC instead')
     await this.loadAll(this.props.options.refetchOnMount)
   }
 

@@ -1,5 +1,5 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { deleteCloudProvider, loadCloudProviders } from './actions'
+import { cloudProvidersDataKey } from './actions'
 
 export const options = {
   addUrl: '/ui/kubernetes/infrastructure/cloudProviders/add',
@@ -11,10 +11,8 @@ export const options = {
     // TODO: clusters
     // TODO: nodes
   ],
-  dataKey: 'cloudProviders',
-  deleteFn: deleteCloudProvider,
+  dataKey: cloudProvidersDataKey,
   editUrl: '/ui/kubernetes/infrastructure/cloudProviders/edit',
-  loaderFn: loadCloudProviders,
   name: 'CloudProviders',
   rowActions: () => [],
   title: 'Cloud Providers',

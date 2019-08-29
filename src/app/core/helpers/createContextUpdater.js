@@ -1,6 +1,4 @@
-import {
-  hasPath, path, assocPath, pathEq, always, over, append, lensPath, pipe, ifElse,
-} from 'ramda'
+import { hasPath, path, assocPath, pathEq, always, over, append, lensPath } from 'ramda'
 import { emptyObj, ensureFunction, removeWith, updateWith, switchCase } from 'utils/fp'
 import { dataContextKey, getContextLoader } from 'core/helpers/createContextLoader'
 import { singlePromise, uncamelizeString } from 'utils/misc'
@@ -8,22 +6,27 @@ import { defaultUniqueIdentifier, notFoundErr } from 'app/constants'
 
 let updaters = {}
 export const getContextUpdater = (key, operation) => {
-  if (!hasPath([key, operation || 'any'], updaters)) {
-    throw new Error(`Context Updater with key "${key}" and operation "${operation}" not found`)
-  }
   return path([key, operation || 'any'], updaters)
 }
 
 /**
+ * Context Updater options
+ * @typedef {object} createContextUpdater~Options
+ * @property {string} [uniqueIdentifier="id"] Unique primary key of the entity
+ * @property {string} [entityName=primaryKey] Name of the entity
+ * @property {("create"|"update"|"delete")|string} [operation="any"] CRUD operation, it can be "create", "update", "delete" for specific cache adjustments or any custom string to replace the whole cache
+ * @property {contextLoaderFn} [contextLoader] ContextLoader used to retrieve data from cache
+ * @property {function|string} [successMessage] Custom message to display after context has been updated
+ * @property {function|string} [errorMessage] Custom message to display after an error has been thrown
+ */
+
+/**
  * Returns a function that will be used to remove or add values from/to existing cached data
+ * @typedef {function} createContextUpdater
+ * @function createContextUpdater
  * @param {string} key Key on which the resolved value will be cached
  * @param {function} dataUpdaterFn Function whose return value will be used to update the context
- * @param {object} [options] Optional custom options
- * @param {string} [options.uniqueIdentifier="id"] Unique primary key of the entity
- * @param {string} [options.entityName=options.primaryKey] Name of the entity
- * @param {("create"|"update"|"delete")|string} [options.operation="any"] CRUD operation, it can be "create", "update", "delete" for specific cache adjustments or any custom string to replace the whole cache
- * @param {function|string} [options.successMessage] Custom message to display after context has been updated
- * @param {function|string} [options.errorMessage] Custom message to display after an error has been thrown
+ * @param {...createContextUpdater~Options} [options] Optional custom options
  * @returns {contextUpdaterFn} Function that once called will update data from the server and the cache
  */
 function createContextUpdater (key, dataUpdaterFn, options = {}) {
@@ -31,13 +34,14 @@ function createContextUpdater (key, dataUpdaterFn, options = {}) {
     uniqueIdentifier = defaultUniqueIdentifier,
     entityName = uncamelizeString(key).replace(/s$/, ''), // Remove trailing "s"
     operation = 'any',
-    successMessage = (updatedItems, prevItems, params) => `Successfully ${switchCase(
+    contextLoader,
+    successMessage = (updatedItems, prevItems, params, operation) => `Successfully ${switchCase(
       'updated',
       ['create', 'created'],
       ['update', 'updated'],
       ['delete', 'deleted'],
     )(operation)} ${entityName}`,
-    errorMessage = (catchedErr, params) => {
+    errorMessage = (catchedErr, params, operation) => {
       const action = switchCase(
         'update',
         ['create', 'create'],
@@ -45,11 +49,9 @@ function createContextUpdater (key, dataUpdaterFn, options = {}) {
         ['delete', 'delete'],
       )(operation)
       // Display entity ID if available
-      const withId = ifElse(
-        hasPath(uniqueIdentifierPath),
-        pipe(path(uniqueIdentifierPath), id => ` with ${uniqueIdentifier}: ${id}`),
-        always(''),
-      )(params)
+      const withId = hasPath(uniqueIdentifierPath, params)
+        ? ` with ${uniqueIdentifier}: ${path(uniqueIdentifierPath)}`
+        : ''
       // Specific error handling
       return switchCase(
         `Error when trying to ${action} ${entityName}${withId}`,
@@ -81,8 +83,11 @@ function createContextUpdater (key, dataUpdaterFn, options = {}) {
       onError = (errorMessage, catchedErr, params) => console.error(errorMessage, catchedErr),
     } = additionalOptions
     const id = path(uniqueIdentifierPath, params)
-    const loaderFn = getContextLoader(key)
-    const prevItems = await loaderFn(args)
+    const loader = contextLoader || getContextLoader(key)
+    if (!loader) {
+      throw new Error(`Context Loader with key ${key} not found`)
+    }
+    const prevItems = await loader(args)
 
     try {
       const output = await dataUpdaterFn(params, prevItems)
@@ -96,17 +101,18 @@ function createContextUpdater (key, dataUpdaterFn, options = {}) {
       await setContext(over(dataLens, operationSwitchCase(operation)))
 
       if (onSuccess) {
-        const updatedItems = await loaderFn(args)
-        const parsedSuccessMesssage = ensureFunction(successMessage)(updatedItems, prevItems, params)
+        const updatedItems = await loader(args)
+        const parsedSuccessMesssage = ensureFunction(successMessage)(updatedItems, prevItems, params, operation)
         await onSuccess(parsedSuccessMesssage, params)
       }
     } catch (err) {
       if (onError) {
-        const parsedErrorMesssage = ensureFunction(errorMessage)(err, params)
+        const parsedErrorMesssage = ensureFunction(errorMessage)(err, params, operation)
         await onError(parsedErrorMesssage, err, params)
       }
     }
   })
+  contextUpdaterFn.getKey = () => key
 
   if (hasPath([key, operation], updaters)) {
     throw new Error(`Context Updater function with key ${key} and operation ${operation} already exists`)

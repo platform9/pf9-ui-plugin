@@ -1,5 +1,5 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { deleteTenant, loadTenants } from './actions'
+import { tenantsDataKey } from 'openstack/components/tenants/actions'
 
 export const options = {
   addUrl: '/ui/openstack/tenants/add',
@@ -11,10 +11,8 @@ export const options = {
     { id: 'blockStorageUsage', label: 'Block storage usage' },
     { id: 'networkUsage', label: 'Network usage' },
   ],
-  dataKey: 'tenants',
-  deleteFn: deleteTenant,
+  dataKey: tenantsDataKey,
   editUrl: '/ui/openstack/tenants/edit',
-  loaderFn: loadTenants,
   name: 'Tenants',
   title: 'Tenants',
 }

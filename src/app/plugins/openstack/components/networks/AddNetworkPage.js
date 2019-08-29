@@ -4,7 +4,7 @@ import SubmitButton from 'core/components/SubmitButton'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import Checkbox from 'core/components/validatedForm/CheckboxField'
 import TextField from 'core/components/validatedForm/TextField'
-import { createNetwork, loadNetworks } from './actions'
+import { networksDataKey } from './actions'
 
 const initialValue = {
   name: '',
@@ -32,8 +32,7 @@ export const AddNetworkForm = ({ onComplete }) => (
 
 export const options = {
   FormComponent: AddNetworkForm,
-  createFn: createNetwork,
-  loaderFn: loadNetworks,
+  dataKey: networksDataKey,
   listUrl: '/ui/openstack/networks',
   name: 'AddNetwork',
   title: 'Add Network',

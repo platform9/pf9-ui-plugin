@@ -182,26 +182,15 @@ class Qbert {
     return this.client.basicDelete(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespaceName}`)
   }
 
-  getClusterPods = async (params) => {
-    const { clusterId } = params
-    try {
-      const data = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/pods`)
-      return data.items.map(this.convertResource(clusterId))
-    } catch (err) {
-      console.error(`Error getting cluster pods for clusterId: ${clusterId}`)
-      return []
-    }
+  getClusterPods = async (clusterId) => {
+    const data = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/pods`)
+    return data.items.map(this.convertResource(clusterId))
   }
 
   getClusterDeployments = async (params) => {
     const { clusterId } = params
-    try {
-      const data = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/extensions/v1beta1/deployments`)
-      return data.items.map(this.convertResource(clusterId))
-    } catch (err) {
-      console.error(`Error getting cluster deployments for clusterId: ${clusterId}`)
-      return []
-    }
+    const data = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/extensions/v1beta1/deployments`)
+    return data.items.map(this.convertResource(clusterId))
   }
 
   deleteDeployment = async (clusterId, namespace, name) => {
@@ -210,24 +199,14 @@ class Qbert {
 
   getClusterKubeServices = async (params) => {
     const { clusterId } = params
-    try {
-      const data = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/services`)
-      return data.items.map(this.convertResource(clusterId))
-    } catch (err) {
-      console.error(`Error getting cluster services for clusterId: ${clusterId}`)
-      return []
-    }
+    const data = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/services`)
+    return data.items.map(this.convertResource(clusterId))
   }
 
   getClusterStorageClasses = async (clusterId) => {
-    try {
-      const data = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/storage.k8s.io/v1/storageclasses`)
-      const mapStorageClass = sc => assoc('type', sc.parameters.type, sc)
-      return data.items.map(this.convertResource(clusterId)).map(mapStorageClass)
-    } catch (err) {
-      console.error(`Error getting cluster storage classes for clusterId: ${clusterId}`, err)
-      return []
-    }
+    const data = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/storage.k8s.io/v1/storageclasses`)
+    const mapStorageClass = sc => assoc('type', sc.parameters.type, sc)
+    return data.items.map(this.convertResource(clusterId)).map(mapStorageClass)
   }
 
   createStorageClass = async (clusterId, params) => {

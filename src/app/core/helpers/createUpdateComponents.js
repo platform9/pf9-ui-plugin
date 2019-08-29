@@ -1,33 +1,33 @@
-import React from 'react'
+import React, { PureComponent } from 'react'
 import { withRouter } from 'react-router-dom'
 import { compose } from 'app/utils/fp'
 import { withAppContext } from 'core/AppProvider'
 import FormWrapper from 'core/components/FormWrapper'
 import Progress from 'core/components/progress/Progress'
 import requiresAuthentication from 'openstack/util/requiresAuthentication'
+import { getContextLoader } from 'core/helpers/createContextLoader'
+import { getContextUpdater } from 'core/helpers/createContextUpdater'
 
 const createUpdateComponents = options => {
-  const defaults = {
-    uniqueIdentifier: 'id',
-    routeParamKey: 'id',
-  }
-
   const {
+    dataKey,
+    loaderFn = dataKey ? getContextLoader(dataKey) : null,
+    updateFn = dataKey ? getContextUpdater(dataKey, 'update') : null,
+
     FormComponent,
-    updateFn,
     initFn,
     listUrl,
-    loaderFn,
     name,
 
     // This should match the id in the route.  Ex:
     // '/prefix/entity/:entityId' would be 'entityId'
-    routeParamKey,
+    routeParamKey = 'id',
     title,
-    uniqueIdentifier,
-  } = { ...defaults, ...options }
+    uniqueIdentifier = 'id',
+  } = options
 
-  class UpdatePageBase extends React.Component {
+  // TODO: Refactor this to use hooks
+  class UpdatePageBase extends PureComponent {
     state = { initialValue: null }
 
     async componentDidMount () {

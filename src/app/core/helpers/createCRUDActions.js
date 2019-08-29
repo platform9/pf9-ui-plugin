@@ -2,46 +2,95 @@ import ApiClient from 'api-client/ApiClient'
 import createContextLoader from 'core/helpers/createContextLoader'
 import createContextUpdater from 'core/helpers/createContextUpdater'
 import { defaultUniqueIdentifier } from 'app/constants'
+import { mapObjIndexed } from 'ramda'
 
-const createCRUDActions = options => {
+/**
+ * @typedef {object} createCRUDActions~BaseOptions
+ * @property {string} [service] API service used to perform the CRUD operations (only required if using automaticaly generated functions)
+ * @property {string} [entity] Entity used when auto generating CRUD operations
+ * @property {function} [listFn] Function used to fetch data from server, returned data will be stored in the context
+ * @property {function} [createFn] Function used to create a new item in the server, return data will be appended to the context
+ * @property {function} [updateFn] Function used to update a new item in the server, returned data will be used to update the context
+ * @property {function} [deleteFn] Function used to delete an item
+ * @property {object} [customOperations] Custom additional operations, the returned value will replace the entire context data array
+ */
+
+/**
+ * @typedef {createContextLoader~Options & createContextUpdater~Options & createCRUDActions~BaseOptions} createCRUDActions~Options
+ */
+
+/**
+ * Create CRUD actions
+ * @param {string} dataKey Key on which the resolved value will be cached
+ * @param {...createCRUDActions~Options} [options] CRUD options
+ * @returns {{(*=): (function), create: function, update: function, list: function, delete: function, invalidateCache: function}}
+ */
+const createCRUDActions = (dataKey, options) => {
+  const apiClient = ApiClient.getInstance()
+
   const {
     service,
-    entity,
-    dataKey = entity,
+    entity = dataKey,
+    createFn = async data => service
+      ? apiClient[service][entity].create(data)
+      : throwErr('create'),
+    listFn = async params => service
+      ? apiClient[service][entity].list(params)
+      : throwErr('list'),
+    updateFn = async ({ [uniqueIdentifier]: id, ...data }) => service
+      ? apiClient[service][entity].update(id, data)
+      : throwErr('update'),
+    deleteFn = async ({ [uniqueIdentifier]: id }) => service
+      ? apiClient[service][entity].delete(id)
+      : throwErr('delete'),
+    customOperations = {},
     uniqueIdentifier = defaultUniqueIdentifier,
-    operations = ['create', 'list', 'update', 'delete'],
-    indexBy,
+    ...rest
   } = options
-  const apiClient = ApiClient.getInstance()
+
+  const contextLoader = createContextLoader(dataKey, listFn, {
+    uniqueIdentifier,
+    ...rest,
+  })
+
   const throwErr = operation => () => {
-    throw new Error(`Operation ${operation} for entity ${entity} not created`)
+    throw new Error(`"service" option for operation "${operation}" and entity "${entity}" not defined`)
   }
 
   return {
-    // Wrap standard CRUD operations to include updating the AppContext
-    create: operations.includes('create')
-      ? createContextUpdater(dataKey,
-        async data => apiClient[service][entity].create(data),
-        { uniqueIdentifier, operation: 'create' })
-      : throwErr('create'),
+    // Custom operations
+    ...mapObjIndexed((customOperationFn, operation) =>
+      createContextUpdater(dataKey, customOperationFn, {
+        uniqueIdentifier,
+        operation,
+        ...rest,
+      }),
+    customOperations),
 
-    list: operations.includes('list')
-      ? createContextLoader(dataKey,
-        async params => apiClient[service][entity].list(params),
-        { uniqueIdentifier, indexBy })
-      : throwErr('list'),
+    list: contextLoader,
 
-    update: operations.includes('update')
-      ? createContextUpdater(dataKey,
-        async ({ [uniqueIdentifier]: id, ...data }) => apiClient[service][entity].update(id, data),
-        { uniqueIdentifier, operation: 'update' })
-      : throwErr('update'),
+    create: createContextUpdater(dataKey, createFn, {
+      uniqueIdentifier,
+      operation: 'create',
+      contextLoader,
+      ...rest,
+    }),
 
-    delete: operations.includes('delete')
-      ? createContextUpdater(dataKey,
-        async ({ [uniqueIdentifier]: id }) => apiClient[service][entity].delete(id),
-        { uniqueIdentifier, operation: 'delete' })
-      : throwErr('delete'),
+    update: createContextUpdater(dataKey, updateFn, {
+      uniqueIdentifier,
+      operation: 'update',
+      contextLoader,
+      ...rest,
+    }),
+
+    delete: createContextUpdater(dataKey, deleteFn, {
+      uniqueIdentifier,
+      operation: 'delete',
+      contextLoader,
+      ...rest,
+    }),
+
+    invalidateCache: contextLoader.invalidateCache,
   }
 }
 

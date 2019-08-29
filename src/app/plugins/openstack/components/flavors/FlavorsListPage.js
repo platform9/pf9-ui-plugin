@@ -1,4 +1,5 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
+import { flavorActions } from 'k8s/components/infrastructure/actions'
 
 export const options = {
   addUrl: '/ui/openstack/flavors/add',
@@ -10,7 +11,8 @@ export const options = {
     { id: 'disk', label: 'Disk' },
     { id: 'tags', label: 'tags' }
   ],
-  dataKey: 'flavors',
+  loaderFn: flavorActions.list,
+  updateFn: flavorActions.update,
   editUrl: '/ui/openstack/flavors/edit',
   actions: { service: 'nova', entity: 'flavors' },
   name: 'Flavors',

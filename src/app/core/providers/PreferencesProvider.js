@@ -1,18 +1,18 @@
-import React from 'react'
+import React, { useContext, useCallback, PureComponent, useMemo } from 'react'
 import moize from 'moize'
 import { curry, pathOr, propOr } from 'ramda'
-import { withAppContext } from 'core/AppProvider'
+import { withAppContext, AppContext } from 'core/AppProvider'
 import { getStorage, setStorage } from '../utils/pf9Storage'
 
 const userPreferencesKey = username => `user-preferences-${username}`
 const setUserPrefs = (username, prefs) => setStorage(userPreferencesKey(username), prefs)
 const getStorageUserPrefs = username => getStorage(userPreferencesKey(username)) || {}
 
-const Context = React.createContext({})
-export const { Consumer: PreferencesConsumer } = Context
-export const { Provider: PreferencesProvider } = Context
+export const PreferencesContext = React.createContext({})
+export const { Consumer: PreferencesConsumer } = PreferencesContext
+export const { Provider: PreferencesProvider } = PreferencesContext
 
-class PreferencesComponent extends React.Component {
+class PreferencesComponent extends PureComponent {
   state = {
     initUserPreferences: async username => {
       const userPrefs = getStorageUserPrefs(username)
@@ -67,6 +67,27 @@ class PreferencesComponent extends React.Component {
       </PreferencesProvider>
     )
   }
+}
+
+export const usePreferences = () => {
+  const { session } = useContext(AppContext)
+  const { getUserPreferences, initUserPreferences } = useContext(PreferencesContext)
+  const userPreferences = useMemo(getUserPreferences, [session.userPreferences])
+  return [
+    userPreferences,
+    initUserPreferences,
+  ]
+}
+export const useScopedPreferences = storeKey => {
+  const { updateScopedUserPreferences, getScopedUserPreferences } = useContext(PreferencesContext)
+  const updatePreferences = useCallback(async values => {
+    return updateScopedUserPreferences(storeKey, values)
+  }, [storeKey])
+
+  return [
+    getScopedUserPreferences(storeKey),
+    updatePreferences,
+  ]
 }
 
 export const withPreferences = Component => props =>

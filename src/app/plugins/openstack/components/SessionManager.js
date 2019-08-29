@@ -1,10 +1,10 @@
-import React from 'react'
+import React, { useEffect, useContext } from 'react'
 import ApiClient from 'api-client/ApiClient'
 import { withRouter } from 'react-router'
 import { compose } from 'app/utils/fp'
 import { dashboardUrl, loginUrl } from 'app/constants'
-import { withAppContext } from 'core/AppProvider'
-import { withPreferences } from 'core/providers/PreferencesProvider'
+import { AppContext } from 'core/AppProvider'
+import { withPreferences, usePreferences } from 'core/providers/PreferencesProvider'
 import { getStorage, setStorage } from 'core/utils/pf9Storage'
 import LoginPage from 'openstack/components/LoginPage'
 import { loadUserTenants } from 'openstack/components/tenants/actions'
@@ -15,36 +15,44 @@ import { path, pathOr, propEq } from 'ramda'
  * Renders children when logged in.
  * Otherwise shows the <LoginPage>
  */
-class SessionManager extends React.Component {
-  async componentDidMount () {
-    const { history, setContext } = this.props
+const SessionManager = props => {
+  const { keystone, setActiveRegion } = ApiClient.getInstance()
+  const [ , initUserPreferences ] = usePreferences()
+  const { getContext, setContext, currentRegion } = useContext(AppContext)
+  const { initialized, session, sessionLoaded } = getContext()
+
+  useEffect(() => {
+    init()
+  }, [currentRegion])
+
+  const init = async () => {
     // Attempt to restore the session
     const tokens = getStorage('tokens')
     const user = getStorage('user')
+    const { history } = props
     const username = user && user.username
     let unscopedToken = tokens && tokens.unscopedToken
 
     if (!username || !unscopedToken) {
       setContext({ initialized: true })
-      return history.push(loginUrl)
+      history.push(loginUrl)
+    } else {
+      // We need to make sure the token has not expired.
+      unscopedToken = await keystone.renewToken(unscopedToken)
+
+      if (!unscopedToken) {
+        setContext({ initialized: true })
+        history.push(loginUrl)
+      } else {
+        await initialSetup({ username, unscopedToken })
+      }
     }
-
-    // We need to make sure the token has not expired.
-    unscopedToken = await this.keystone.renewToken(unscopedToken)
-
-    if (!unscopedToken) {
-      setContext({ initialized: true })
-      return this.props.history.push(loginUrl)
-    }
-
-    this.initialSetup({ username, unscopedToken })
   }
 
-  get keystone () { return ApiClient.getInstance().keystone }
-
   // Handler that gets invoked on successful authentication
-  initialSetup = async ({ username, unscopedToken }) => {
-    const { history, location, initSession, initUserPreferences, getContext, setContext } = this.props
+  const initialSetup = async ({ username, unscopedToken }) => {
+    const { initSession } = getContext()
+    const { history, location } = props
 
     // Set up the scopedToken
     await initSession(unscopedToken, username)
@@ -56,41 +64,37 @@ class SessionManager extends React.Component {
 
     const tenants = await loadUserTenants({ getContext, setContext })
     const activeTenant = tenants.find(propEq('name', lastTenant))
-    const apiClient = ApiClient.getInstance()
-    const { keystone } = apiClient
 
-    if (lastRegion) { apiClient.setActiveRegion(lastRegion) }
+    if (lastRegion) { setActiveRegion(lastRegion) }
     const { scopedToken, user } = await keystone.changeProjectScope(activeTenant.id)
 
     setStorage('user', user)
     setStorage('tokens', { unscopedToken, currentToken: scopedToken })
 
-    setContext({ initialized: true, sessionLoaded: true })
+    setContext({
+      initialized: true,
+      sessionLoaded: true,
+      currentTenant: activeTenant,
+    })
 
     if (location.pathname === loginUrl) {
       history.push(dashboardUrl)
     }
   }
 
-  render () {
-    const { context, children } = this.props
-    const { initialized, session, sessionLoaded } = context
-
-    if (!initialized) {
-      return <div>Loading app...</div>
-    }
-
-    if (!session || !session.loginSuccessful) {
-      return <LoginPage onAuthSuccess={this.initialSetup} />
-    }
-
-    // Do not let the rest of the UI load until we have a working session.
-    return sessionLoaded ? children : <div>Initializing session...</div>
+  if (!initialized) {
+    return <div>Loading app...</div>
   }
+
+  if (!session || !session.loginSuccessful) {
+    return <LoginPage onAuthSuccess={initialSetup} />
+  }
+
+  // Do not let the rest of the UI load until we have a working session.
+  return sessionLoaded ? props.children : <div>Initializing session...</div>
 }
 
 export default compose(
-  withAppContext,
   withPreferences,
   withRouter,
 )(SessionManager)

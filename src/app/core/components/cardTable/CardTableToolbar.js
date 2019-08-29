@@ -1,14 +1,13 @@
 import { Button, Toolbar, Typography, Tooltip } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import SearchBar from 'core/components/SearchBar'
-import React from 'react'
+import React, { useMemo } from 'react'
 import Picklist from 'core/components/Picklist'
 import PropTypes from 'prop-types'
 import { projectAs } from 'utils/fp'
 import ArrowDownward from '@material-ui/icons/ArrowDownward'
 import ArrowUpward from '@material-ui/icons/ArrowUpward'
-import moize from 'moize'
-import clsx from 'clsx'
+import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 
 const styles = theme => ({
   root: {
@@ -50,14 +49,6 @@ const styles = theme => ({
     flex: '0 0 auto',
   },
 })
-
-const renderRefreshButton = moize((classes, onRefresh) =>
-  onRefresh && <Tooltip title="Refresh list">
-    <i className={clsx(classes.button, 'fas fa-fw fa-lg fa-sync')}
-      aria-label="Refresh list"
-      onClick={onRefresh}
-    />
-  </Tooltip>)
 
 const CustomPicklist = withStyles(theme => ({
   root: {
@@ -129,8 +120,20 @@ const CardTableToolbar = ({
   onRefresh,
   onSearchChange,
   searchTerm,
-}) => (
-  <Toolbar className={classes.root}>
+}) => {
+  const refreshButton = useMemo(() =>
+    onRefresh && <Tooltip title="Refresh list">
+      <FontAwesomeIcon
+        className={classes.button}
+        solid
+        size="lg"
+        aria-label="Refresh list"
+        onClick={onRefresh}>
+        sync
+      </FontAwesomeIcon>
+    </Tooltip>, [onRefresh])
+
+  return <Toolbar className={classes.root}>
     {title && (
       <div>
         <div className={classes.title}>
@@ -155,7 +158,7 @@ const CardTableToolbar = ({
           : filters}
       </div>
       <div className={classes.controls}>
-        {renderRefreshButton(classes, onRefresh)}
+        {refreshButton}
         {sorting.length && (
           <React.Fragment>
             <SortDropdown
@@ -177,7 +180,7 @@ const CardTableToolbar = ({
       </div>
     </div>
   </Toolbar>
-)
+}
 
 export const filterSpecPropType = PropTypes.shape({
   field: PropTypes.string.isRequired,

@@ -14,7 +14,7 @@ import { removeWith, emptyArr, emptyObj } from 'utils/fp'
 import { prometheusInstancesDataKey } from './actions'
 import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
 import NamespacePicklist from 'k8s/components/common/NamespacePicklist'
-import ServicePicklist from 'k8s/components/common/ServicePicklist'
+import ServiceAccountPicklist from 'k8s/components/prometheus/ServiceAccountPicklist'
 
 const initialContext = {
   replicas: 1,
@@ -84,7 +84,7 @@ const AddPrometheusInstanceForm = ({ onComplete }) => {
                   info="Which namespace to use"
                 />
                 <PicklistField
-                  DropdownComponent={ServicePicklist}
+                  DropdownComponent={ServiceAccountPicklist}
                   id="serviceAccountName"
                   label="Service Account Name"
                   disabled={!params.clusterId || !params.namespace}

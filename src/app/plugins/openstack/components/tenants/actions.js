@@ -1,31 +1,28 @@
 import createContextLoader from 'core/helpers/createContextLoader'
-import createContextUpdater from 'core/helpers/createContextUpdater'
 import ApiClient from 'api-client/ApiClient'
+import createCRUDActions from 'core/helpers/createCRUDActions'
 
-const tenantsContextKey = 'tenants'
+export const tenantsDataKey = 'tenants'
+export const userTenantsDataKey = 'userTenants'
 
-export const loadUserTenants = createContextLoader('userTenants', async () => {
-  const { keystone } = ApiClient.getInstance()
+const { keystone } = ApiClient.getInstance()
+
+export const loadUserTenants = createContextLoader(userTenantsDataKey, async () => {
   return keystone.getProjectsAuth()
 })
 
-export const loadTenants = createContextLoader(tenantsContextKey, async () => {
-  const { keystone } = ApiClient.getInstance()
-  return keystone.getProjects()
+const tenantActions = createCRUDActions(tenantsDataKey, {
+  listFn: async () => keystone.getProjects(),
+  createFn: async data => {
+    return keystone.createTenant(data)
+  },
+  updateFn: async data => {
+    const { id } = data
+    return keystone.updateTenant(id, data)
+  },
+  deleteFn: async ({ id }) => {
+    await keystone.deleteTenant(id)
+  }
 })
 
-export const createTenant = createContextUpdater(tenantsContextKey, async data => {
-  const { keystone } = ApiClient.getInstance()
-  return keystone.createTenant(data)
-}, { operation: 'create' })
-
-export const deleteTenant = createContextUpdater(tenantsContextKey, async ({ id }) => {
-  const { keystone } = ApiClient.getInstance()
-  await keystone.deleteTenant(id)
-}, { operation: 'delete' })
-
-export const updateTenant = createContextUpdater(tenantsContextKey, async data => {
-  const { keystone } = ApiClient.getInstance()
-  const { id } = data
-  return keystone.updateTenant(id, data)
-}, { operation: 'update' })
+export default tenantActions

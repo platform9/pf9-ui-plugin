@@ -1,10 +1,9 @@
-import createContextLoader from 'core/helpers/createContextLoader'
 import { asyncFlatMap } from 'utils/fp'
 import { pluck } from 'ramda'
 import { allKey } from 'app/constants'
-import createContextUpdater from 'core/helpers/createContextUpdater'
 import ApiClient from 'api-client/ApiClient'
 import { parseClusterParams, clustersDataKey } from 'k8s/components/infrastructure/actions'
+import createCRUDActions from 'core/helpers/createCRUDActions'
 
 const { qbert } = ApiClient.getInstance()
 
@@ -22,23 +21,25 @@ const namespacesMapper = async (items, params, loadFromContext) => {
   }))
 }
 
-createContextLoader(namespacesDataKey, async (params, loadFromContext) => {
-  const [clusterId, clusters] = await parseClusterParams(params, loadFromContext)
-  return clusterId === allKey
-    ? asyncFlatMap(pluck('uuid', clusters), qbert.getClusterNamespaces)
-    : qbert.getClusterNamespaces(clusterId)
-}, {
+const namespaceActions = createCRUDActions(namespacesDataKey, {
+  listFn: async (params, loadFromContext) => {
+    const [ clusterId, clusters ] = await parseClusterParams(params, loadFromContext)
+    if (clusterId === allKey) {
+      return asyncFlatMap(pluck('uuid', clusters), qbert.getClusterNamespaces)
+    }
+    return qbert.getClusterNamespaces(clusterId)
+  },
+  createFn: async ({ clusterId, name }) => {
+    const body = { metadata: { name } }
+    return qbert.createNamespace(clusterId, body)
+  },
+  deleteFn: async ({ id }, currentItems) => {
+    const { clusterId, name } = currentItems.find(ns => ns.id === id)
+    await qbert.deleteNamespace(clusterId, name)
+  },
   uniqueIdentifier: 'id',
   indexBy: 'clusterId',
   dataMapper: namespacesMapper
 })
 
-createContextUpdater(namespacesDataKey, async ({ clusterId, name }) => {
-  const body = { metadata: { name } }
-  return qbert.createNamespace(clusterId, body)
-}, { operation: 'create' })
-
-createContextUpdater(namespacesDataKey, async ({ id }, currentItems) => {
-  const { clusterId, name } = currentItems.find(ns => ns.id === id)
-  await qbert.deleteNamespace(clusterId, name)
-}, { operation: 'delete' })
+export default namespaceActions

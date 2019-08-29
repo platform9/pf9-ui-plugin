@@ -1,17 +1,9 @@
-import { asyncFlatMap, pathOrNull } from 'utils/fp'
+import { asyncFlatMap, pathOrNull, switchCase } from 'utils/fp'
 import { map, pathEq, find, pluck, curry, pipe, last, pathOr, prop, propEq } from 'ramda'
 import ApiClient from 'api-client/ApiClient'
-import createContextLoader from 'core/helpers/createContextLoader'
-import createContextUpdater from 'core/helpers/createContextUpdater'
 import { clustersDataKey } from '../infrastructure/actions'
 import { notFoundErr } from 'app/constants'
-
-export const clusterTagsDataKey = 'clusterTags'
-export const prometheusInstancesDataKey = 'prometheusInstances'
-export const serviceAccountsDataKey = 'serviceAccounts'
-export const prometheusRulesDataKey = 'prometheusRules'
-export const prometheusServiceMonitorsDataKey = 'prometheusServiceMonitors'
-export const prometheusAlertManagersDataKey = 'prometheusAlertManagers'
+import createCRUDActions from 'core/helpers/createCRUDActions'
 
 const { appbert, qbert } = ApiClient.getInstance()
 const uniqueIdentifier = 'metadata.uid'
@@ -21,10 +13,12 @@ const getName = (id, items) => pipe(
 )(items)
 const hasMonitoring = cluster => cluster.tags.includes('pf9-system:monitoring')
 
-createContextLoader(clusterTagsDataKey, async (params, loadFromContext) => {
-  await loadFromContext(clustersDataKey)
-  return appbert.getClusterTags()
-}, {
+export const clusterTagsDataKey = 'clusterTags'
+export const clusterTagActions = createCRUDActions(clusterTagsDataKey, {
+  listFn: async (params, loadFromContext) => {
+    await loadFromContext(clustersDataKey)
+    return appbert.getClusterTags()
+  },
   uniqueIdentifier,
 })
 
@@ -49,199 +43,154 @@ export const mapPrometheusInstance = curry((clusters, { clusterUuid, metadata, s
   metadata,
   spec,
 }))
+export const prometheusInstancesDataKey = 'prometheusInstances'
+export const prometheusInstanceActions = createCRUDActions(prometheusInstancesDataKey, {
+  listFn: async (params, loadFromContext) => {
+    const clusterTags = await loadFromContext(clusterTagsDataKey)
+    const clusterUuids = pluck('uuid', clusterTags.filter(hasMonitoring))
 
-createContextLoader(prometheusInstancesDataKey, async (params, loadFromContext) => {
-  const clusterTags = await loadFromContext(clusterTagsDataKey)
-  const clusterUuids = pluck('uuid', clusterTags.filter(hasMonitoring))
-
-  return asyncFlatMap(clusterUuids, qbert.getPrometheusInstances)
-}, {
-  uniqueIdentifier,
+    return asyncFlatMap(clusterUuids, qbert.getPrometheusInstances)
+  },
+  createFn: async data => {
+    return qbert.createPrometheusInstance(data.cluster, data)
+  },
+  deleteFn: async ({ uid }, currentItems) => {
+    const instance = currentItems.find(pathEq(['metadata', 'uid'], uid))
+    if (!instance) {
+      throw new Error(notFoundErr)
+    }
+    await qbert.deletePrometheusInstance(instance.clusterUuid, instance.namespace, instance.name)
+  },
   dataMapper: async (items, params, loadFromContext) => {
     const clusters = await loadFromContext(clustersDataKey)
     return items.map(mapPrometheusInstance(clusters))
   },
-})
-
-createContextUpdater(prometheusInstancesDataKey, async data => {
-  return qbert.createPrometheusInstance(data.cluster, data)
-}, {
+  successMessage: (updatedItems, prevItems, { uid }, operation) => switchCase(
+    null,
+    ['create', `Successfully created Prometheus instance ${prop('name', last(updatedItems))}`],
+    ['delete', `Successfully deleted Prometheus instance ${getName(uid, prevItems)}`],
+  )(operation),
   uniqueIdentifier,
-  operation: 'create',
-  successMessage: updatedItems =>
-    `Successfully created Prometheus instance ${last(updatedItems).name}`,
-})
-
-createContextUpdater(prometheusInstancesDataKey, async ({ uid }, currentItems) => {
-  const instance = currentItems.find(pathEq(['metadata', 'uid'], uid))
-  if (!instance) {
-    throw new Error(notFoundErr)
-  }
-  await qbert.deletePrometheusInstance(instance.clusterUuid, instance.namespace, instance.name)
-}, {
-  uniqueIdentifier,
-  operation: 'delete',
-  successMessage: (updatedItems, prevItems, { uid }) =>
-    `Successfully deleted Prometheus instance ${pipe(
-      find(pathEq(['metadata', 'uid'], uid)),
-      prop('name'),
-    )(prevItems)}`,
-})
-
-createContextUpdater(prometheusInstancesDataKey, async data => {
-  return qbert.updatePrometheusInstance(data)
-}, {
-  uniqueIdentifier,
-  operation: 'update',
-  successMessage: (updatedItems, prevItems, { id }) =>
-    `Successfully updated Prometheus instance ${pipe(
-      find(pathEq(['metadata', 'uid'], id)),
-      prop('name'),
-    )(updatedItems)}`,
 })
 
 /* Service Accounts */
 
-const mapService = ({ clusterUuid, metadata, spec }) => ({
-  uid: metadata.uid,
-  name: metadata.name,
-  namespace: metadata.namespace,
-  labels: metadata.labels,
-})
-
-createContextLoader(serviceAccountsDataKey, async data => {
-  return qbert.getServiceAccounts(data.clusterId, data.namespace)
-}, {
+export const serviceAccountsDataKey = 'serviceAccounts'
+export const serviceAccountActions = createCRUDActions(serviceAccountsDataKey, {
+  listFn: async data => {
+    return qbert.getServiceAccounts(data.clusterId, data.namespace)
+  },
+  dataMapper: map(({ clusterUuid, metadata, spec }) => ({
+    uid: metadata.uid,
+    name: metadata.name,
+    namespace: metadata.namespace,
+    labels: metadata.labels,
+  })),
   uniqueIdentifier,
-  indexBy: ['clusterId', 'namespace'],
-  dataMapper: map(mapService),
 })
 
-/* Prometheus Rules */
+/* Rules */
 
-const mapRule = ({ clusterUuid, metadata, spec }) => ({
-  uid: metadata.uid,
-  clusterUuid,
-  name: metadata.name,
-  namespace: metadata.namespace,
-  labels: metadata.labels,
-  rules: pathOr([], ['groups', 0, 'rules'], spec),
-})
-
-createContextLoader(prometheusRulesDataKey, async (params, loadFromContext) => {
-  const clusterTags = await loadFromContext(clusterTagsDataKey)
-  const clusterUuids = pluck('uuid', clusterTags.filter(hasMonitoring))
-  return asyncFlatMap(clusterUuids, qbert.getPrometheusRules)
-}, {
+export const prometheusRulesDataKey = 'prometheusRules'
+export const prometheusRuleActions = createCRUDActions(prometheusRulesDataKey, {
+  listFn: async (params, loadFromContext) => {
+    const clusterTags = await loadFromContext(clusterTagsDataKey)
+    const clusterUuids = pluck('uuid', clusterTags.filter(hasMonitoring))
+    return asyncFlatMap(clusterUuids, qbert.getPrometheusRules)
+  },
+  updateFn: async data => {
+    return qbert.updatePrometheusRules(data)
+  },
+  deleteFn: async ({ id }, currentItems) => {
+    const rule = currentItems.find(propEq('uid', id))
+    if (!rule) {
+      throw new Error(notFoundErr)
+    }
+    await qbert.deletePrometheusRule(rule.clusterUuid, rule.namespace, rule.name)
+  },
+  successMessage: (updatedItems, prevItems, { uid }, operation) => switchCase(
+    null,
+    ['create', `Successfully created Prometheus rule ${prop('name', last(updatedItems))}`],
+    ['delete', `Successfully deleted Prometheus rule ${getName(uid, prevItems)}`],
+  )(operation),
+  dataMapper: map(({ clusterUuid, metadata, spec }) => ({
+    uid: metadata.uid,
+    clusterUuid,
+    name: metadata.name,
+    namespace: metadata.namespace,
+    labels: metadata.labels,
+    rules: pathOr([], ['groups', 0, 'rules'], spec),
+  })),
   uniqueIdentifier,
-  dataMapper: map(mapRule),
-})
-
-createContextUpdater(prometheusRulesDataKey, async data => {
-  return qbert.updatePrometheusRules(data)
-}, {
-  uniqueIdentifier,
-  operation: 'update',
-  successMessage: (updatedItems, prevItems, { id }) =>
-    `Successfully updated Prometheus rule ${getName(id, updatedItems)}`,
-})
-
-createContextUpdater(prometheusRulesDataKey, async ({ id }, currentItems) => {
-  const rule = currentItems.find(propEq('uid', id))
-  if (!rule) {
-    throw new Error(notFoundErr)
-  }
-  await qbert.deletePrometheusRule(rule.clusterUuid, rule.namespace, rule.name)
-}, {
-  uniqueIdentifier,
-  operation: 'delete',
 })
 
 /* Service Monitors */
 
-const mapServiceMonitor = ({ clusterUuid, metadata, spec }) => ({
-  uid: metadata.uid,
-  clusterUuid,
-  name: metadata.name,
-  namespace: metadata.namespace,
-  labels: metadata.labels,
-  port: spec.endpoints.map(prop('port')).join(', '),
-  selector: spec.selector.matchLabels,
-})
-
-createContextLoader(prometheusServiceMonitorsDataKey, async (params, loadFromContext) => {
-  const clusterTags = await loadFromContext(clusterTagsDataKey)
-  const clusterUuids = pluck('uuid', clusterTags.filter(hasMonitoring))
-  return asyncFlatMap(clusterUuids, qbert.getPrometheusServiceMonitors)
-}, {
+export const prometheusServiceMonitorsDataKey = 'prometheusServiceMonitors'
+export const prometheusServiceMonitorActions = createCRUDActions(prometheusServiceMonitorsDataKey, {
+  listFn: async (params, loadFromContext) => {
+    const clusterTags = await loadFromContext(clusterTagsDataKey)
+    const clusterUuids = pluck('uuid', clusterTags.filter(hasMonitoring))
+    return asyncFlatMap(clusterUuids, qbert.getPrometheusServiceMonitors)
+  },
+  updateFn: async data => {
+    return qbert.updatePrometheusServiceMonitor(data)
+  },
+  deleteFn: async ({ id }, currentItems) => {
+    const sm = currentItems.find(propEq('uid', id))
+    if (!sm) {
+      throw new Error(notFoundErr)
+    }
+    await qbert.deletePrometheusServiceMonitor(sm.clusterUuid, sm.namespace, sm.name)
+  },
+  successMessage: (updatedItems, prevItems, { uid }, operation) => switchCase(
+    null,
+    ['create', `Successfully created Prometheus Service Monitor ${prop('name', last(updatedItems))}`],
+    ['delete', `Successfully deleted Prometheus Service Monitor ${getName(uid, prevItems)}`],
+  )(operation),
+  dataMapper: map(({ clusterUuid, metadata, spec }) => ({
+    uid: metadata.uid,
+    clusterUuid,
+    name: metadata.name,
+    namespace: metadata.namespace,
+    labels: metadata.labels,
+    port: spec.endpoints.map(prop('port')).join(', '),
+    selector: spec.selector.matchLabels,
+  })),
   uniqueIdentifier,
-  dataMapper: map(mapServiceMonitor),
-})
-
-createContextUpdater(prometheusServiceMonitorsDataKey, async data => {
-  return qbert.updatePrometheusServiceMonitor(data)
-}, {
-  uniqueIdentifier,
-  operation: 'update',
-  successMessage: (updatedItems, prevItems, { id }) =>
-    `Successfully updated Prometheus ServiceMonitor ${getName(id, updatedItems)}`,
-})
-
-createContextUpdater(prometheusServiceMonitorsDataKey, async ({ id }, currentItems) => {
-  const sm = currentItems.find(propEq('uid', id))
-  if (!sm) {
-    throw new Error(notFoundErr)
-  }
-  await qbert.deletePrometheusServiceMonitor(sm.clusterUuid, sm.namespace, sm.name)
-}, {
-  uniqueIdentifier,
-  operation: 'delete',
-  successMessage: (updatedItems, prevItems, { id }) =>
-    `Successfully deleted Prometheus service monitor ${getName(id, prevItems)}`,
 })
 
 /* Alert Managers */
 
-const mapAlertManager = ({ clusterUuid, metadata, spec }) => ({
-  uid: metadata.uid,
-  clusterUuid,
-  name: metadata.name,
-  namespace: metadata.namespace,
-  replicas: spec.replicas,
-  labels: metadata.labels,
-})
-
-createContextLoader(prometheusAlertManagersDataKey, async (params, loadFromContext) => {
-  const clusterTags = await loadFromContext(clusterTagsDataKey)
-  const clusterUuids = pluck('uuid', clusterTags.filter(hasMonitoring))
-  return asyncFlatMap(clusterUuids, qbert.getPrometheusAlertManagers)
-}, {
+export const prometheusAlertManagersDataKey = 'prometheusAlertManagers'
+export const prometheusAlertManagerActions = createCRUDActions(prometheusAlertManagersDataKey, {
+  listFn: async (params, loadFromContext) => {
+    const clusterTags = await loadFromContext(clusterTagsDataKey)
+    const clusterUuids = pluck('uuid', clusterTags.filter(hasMonitoring))
+    return asyncFlatMap(clusterUuids, qbert.getPrometheusAlertManagers)
+  },
+  updateFn: async data => {
+    return qbert.updatePrometheusAlertManager(data)
+  },
+  deleteFn: async ({ id }, currentItems) => {
+    const am = currentItems.find(propEq('uid', id))
+    if (!am) {
+      throw new Error(notFoundErr)
+    }
+    await qbert.deletePrometheusAlertManager(am.clusterUuid, am.namespace, am.name)
+  },
+  successMessage: (updatedItems, prevItems, { uid }, operation) => switchCase(
+    null,
+    ['create', `Successfully created Prometheus Alert Manager ${prop('name', last(updatedItems))}`],
+    ['delete', `Successfully deleted Prometheus Alert Manager ${getName(uid, prevItems)}`],
+  )(operation),
+  dataMapper: map(({ clusterUuid, metadata, spec }) => ({
+    uid: metadata.uid,
+    clusterUuid,
+    name: metadata.name,
+    namespace: metadata.namespace,
+    replicas: spec.replicas,
+    labels: metadata.labels,
+  })),
   uniqueIdentifier,
-  dataMapper: map(mapAlertManager),
-})
-
-/**
- * @type contextUpdaterFn
- */
-createContextUpdater(prometheusAlertManagersDataKey, async data => {
-  return qbert.updatePrometheusAlertManager(data)
-}, {
-  uniqueIdentifier,
-  operation: 'update',
-  successMessage: (updatedItems, prevItems, { id }) =>
-    `Successfully updated Prometheus Alert Manager ${getName(id, updatedItems)}`,
-})
-
-createContextUpdater(prometheusAlertManagersDataKey, async ({ id }, currentItems) => {
-  const am = currentItems.find(propEq('uid', id))
-  if (!am) {
-    throw new Error(notFoundErr)
-  }
-  await qbert.deletePrometheusAlertManager(am.clusterUuid, am.namespace, am.name)
-}, {
-  entityName: 'Prometheus Alert Manager',
-  uniqueIdentifier,
-  operation: 'delete',
-  successMessage: (updatedItems, prevItems, { id }) =>
-    `Successfully deleted Prometheus Alert Manager ${getName(id, prevItems)}`,
 })

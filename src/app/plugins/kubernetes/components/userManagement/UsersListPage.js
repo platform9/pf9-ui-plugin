@@ -1,8 +1,7 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { loadUsers, deleteUser, mngmUsersDataKey } from 'k8s/components/userManagement/actions'
+import { mngmUsersDataKey } from 'k8s/components/userManagement/actions'
 
 export const options = {
-  loaderFn: loadUsers,
   columns: [
     { id: 'id', label: 'OpenStack ID', display: false },
     { id: 'username', label: 'Username' },
@@ -12,7 +11,6 @@ export const options = {
   ],
   dataKey: mngmUsersDataKey,
   // editUrl: '/ui/kubernetes/infrastructure/users/edit',
-  deleteFn: deleteUser,
   name: 'Users',
   title: 'Users',
   uniqueIdentifier: 'id',

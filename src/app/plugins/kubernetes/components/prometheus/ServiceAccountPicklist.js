@@ -1,13 +1,13 @@
-import React, { useMemo } from 'react'
+import React, { forwardRef, useMemo } from 'react'
 import Picklist from 'core/components/Picklist'
 import { projectAs } from 'utils/fp'
 import useDataLoader from 'core/hooks/useDataLoader'
 import PropTypes from 'prop-types'
-import { serviceAccountsDataKey } from 'k8s/components/prometheus/actions'
+import { serviceAccountActions } from 'k8s/components/prometheus/actions'
 import { omit } from 'ramda'
 
-const ServicePicklist = ({ loading, clusterId, namespace, ...rest }) => {
-  const [services, servicesLoading] = useDataLoader(serviceAccountsDataKey, {
+const ServiceAccountPicklist = forwardRef(({ loading, clusterId, namespace, ...rest }, ref) => {
+  const [services, servicesLoading] = useDataLoader(serviceAccountActions.list, {
     clusterId,
     namespace,
   })
@@ -17,22 +17,23 @@ const ServicePicklist = ({ loading, clusterId, namespace, ...rest }) => {
 
   return <Picklist
     {...rest}
+    ref={ref}
     loading={loading || servicesLoading}
     options={options}
   />
-}
+})
 
-ServicePicklist.propTypes = {
+ServiceAccountPicklist.propTypes = {
   ...omit(['options'], Picklist.propTypes),
   name: PropTypes.string,
   label: PropTypes.string,
   clusterId: PropTypes.number,
 }
 
-ServicePicklist.defaultProps = {
+ServiceAccountPicklist.defaultProps = {
   ...Picklist.defaultProps,
   name: 'serviceId',
   label: 'Current Service',
 }
 
-export default ServicePicklist
+export default ServiceAccountPicklist

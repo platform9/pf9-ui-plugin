@@ -1,22 +1,21 @@
 import ApiClient from 'api-client/ApiClient'
-import createContextLoader from 'core/helpers/createContextLoader'
-import createContextUpdater from 'core/helpers/createContextUpdater'
+import createCRUDActions from 'core/helpers/createCRUDActions'
 
-export const loadFloatingIps = createContextLoader('floatingIps', async () => {
-  const { neutron } = ApiClient.getInstance()
-  return neutron.getFloatingIps()
+const { neutron } = ApiClient.getInstance()
+
+const floatingIpActions = createCRUDActions('floatingIps', {
+  listFn: async () => {
+    return neutron.getFloatingIps()
+  },
+  createFn: async data => {
+    return neutron.createFloatingIp(data)
+  },
+  deleteFn: async ({ id }) => {
+    await neutron.deleteFloatingIp(id)
+  },
+  updateFn: async data => {
+    throw new Error('Update Floating IP not yet implemented')
+  }
 })
 
-export const createFloatingIp = createContextUpdater('floatingIps', async data => {
-  const { neutron } = ApiClient.getInstance()
-  return neutron.createFloatingIp(data)
-}, { operation: 'create' })
-
-export const deleteFloatingIp = createContextUpdater('floatingIps', async ({ id }) => {
-  const { neutron } = ApiClient.getInstance()
-  await neutron.deleteFloatingIp(id)
-}, { operation: 'delete' })
-
-export const updateFloatingIp = createContextUpdater('floatingIps', async data => {
-  console.error('TODO: Update Floating IP not yet implemented')
-})
+export default floatingIpActions

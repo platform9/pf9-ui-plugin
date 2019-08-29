@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react'
-import { loadDeployments } from 'k8s/components/pods/actions'
+import { deploymentActions } from 'k8s/components/pods/actions'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { emptyObj } from 'utils/fp'
 import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
@@ -9,7 +9,7 @@ const ListPage = ({ ListContainer }) => {
   return () => {
     const [params, setParams] = useState(emptyObj)
     const handleClusterChange = useCallback(clusterId => setParams({ clusterId }), [])
-    const [data, loading, reload] = useDataLoader('deployments', params)
+    const [data, loading, reload] = useDataLoader(deploymentActions.list, params)
     return <div>
       <ClusterPicklist
         onChange={handleClusterChange}
@@ -21,7 +21,8 @@ const ListPage = ({ ListContainer }) => {
 }
 
 export const options = {
-  loaderFn: loadDeployments,
+  loaderFn: deploymentActions.list,
+  deleteFn: deploymentActions.delete,
   addUrl: '/ui/kubernetes/deployments/add',
   addText: 'Add Deployment',
   columns: [
@@ -29,7 +30,6 @@ export const options = {
     { id: 'clusterName', label: 'Cluster' },
     { id: 'created', label: 'Created' },
   ],
-  dataKey: 'deployments',
   name: 'Deployments',
   title: 'Deployments',
   ListPage,

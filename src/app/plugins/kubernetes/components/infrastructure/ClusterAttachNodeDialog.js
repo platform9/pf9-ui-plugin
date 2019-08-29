@@ -1,8 +1,7 @@
-import React from 'react'
+import React, { PureComponent } from 'react'
 import ExternalLink from 'core/components/ExternalLink'
 import { compose, propOr } from 'ramda'
 import { withAppContext } from 'core/AppProvider'
-import { attachNodesToCluster } from './actions'
 import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab'
 import {
   Button, Dialog, DialogActions, DialogContent, DialogTitle, Table, TableBody, TableRow, TableCell,
@@ -21,7 +20,7 @@ const stopPropagation = e => {
   e.stopPropagation()
 }
 
-class ClusterAttachNodeDialog extends React.Component {
+class ClusterAttachNodeDialog extends PureComponent {
   state = {}
 
   handleClose = () => {
@@ -36,7 +35,11 @@ class ClusterAttachNodeDialog extends React.Component {
       .map(uuid => ({ uuid, isMaster: this.state[uuid] === 'master' }))
 
     const clusterUuid = row.uuid
-    await attachNodesToCluster({ getContext, setContext, params: { clusterUuid, nodes } })
+    await cloudProviderActions.attachNodesToCluster({
+      getContext,
+      setContext,
+      params: { clusterUuid, nodes },
+    })
     this.handleClose()
   }
 

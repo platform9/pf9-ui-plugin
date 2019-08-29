@@ -1,26 +1,20 @@
 import ApiClient from 'api-client/ApiClient'
-import createContextLoader from 'core/helpers/createContextLoader'
-import createContextUpdater from 'core/helpers/createContextUpdater'
+import createCRUDActions from 'core/helpers/createCRUDActions'
 
-export const loadUsers = createContextLoader('users', async () => {
-  const { keystone } = ApiClient.getInstance()
-  return keystone.getUsers()
+export const usersDataKey = 'users'
+
+const { keystone } = ApiClient.getInstance()
+
+const userActions = createCRUDActions(usersDataKey, {
+  listFn: async () => {
+    return keystone.getUsers()
+  },
+  createFn: async ({ data }) => {
+    return keystone.createUser(data)
+  },
+  deleteFn: async ({ id }) => {
+    await keystone.deleteUser(id)
+  },
 })
 
-export const createUser = createContextUpdater('users', async ({ data }) => {
-  const { keystone } = ApiClient.getInstance()
-  return keystone.createUser(data)
-}, {
-  operation: 'create'
-})
-
-export const deleteUser = createContextUpdater('users', async ({ id }) => {
-  const { keystone } = ApiClient.getInstance()
-  await keystone.deleteUser(id)
-}, {
-  operation: 'delete'
-})
-
-export const updateUser = () => {
-  // TODO
-}
+export default userActions

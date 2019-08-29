@@ -3,7 +3,7 @@ import createAddComponents from 'core/helpers/createAddComponents'
 import SubmitButton from 'core/components/SubmitButton'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import TextField from 'core/components/validatedForm/TextField'
-import { createFloatingIp, loadFloatingIps } from './actions'
+import floatingIpActions from './actions'
 
 export const AddFloatingIpForm = ({ onComplete }) => (
   <ValidatedForm onSubmit={onComplete}>
@@ -14,8 +14,8 @@ export const AddFloatingIpForm = ({ onComplete }) => (
 
 export const options = {
   FormComponent: AddFloatingIpForm,
-  createFn: createFloatingIp,
-  loaderFn: loadFloatingIps,
+  createFn: floatingIpActions.create,
+  loaderFn: floatingIpActions.list,
   listUrl: '/ui/openstack/floatingips',
   name: 'AddFloatingIp',
   title: 'Add Floating IP',

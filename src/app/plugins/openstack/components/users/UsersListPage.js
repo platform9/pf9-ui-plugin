@@ -1,5 +1,5 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { deleteUser, loadUsers } from './actions'
+import { usersDataKey } from './actions'
 
 export const options = {
   addUrl: '/ui/openstack/users/add',
@@ -9,10 +9,8 @@ export const options = {
     { id: 'mfa', label: 'Two-factor authentication' },
     { id: 'rolePair', label: 'Tenants & Roles' },
   ],
-  dataKey: 'users',
-  deleteFn: deleteUser,
+  dataKey: usersDataKey,
   editUrl: '/ui/openstack/users/edit',
-  loaderFn: loadUsers,
   name: 'Users',
   title: 'Users',
 }

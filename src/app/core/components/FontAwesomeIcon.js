@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { forwardRef } from 'react'
 import clsx from 'clsx'
 
-const FontAwesomeIcon = ({ children, className, size, solid, ...rest }) => {
+const FontAwesomeIcon = forwardRef(({ children, className, size, solid, ...rest }, ref) => {
   const defaultClasses = [
     'fal',
     'fa-fw',
@@ -10,8 +10,8 @@ const FontAwesomeIcon = ({ children, className, size, solid, ...rest }) => {
     (solid ? 'fas' : ''),
   ]
   return (
-    <i className={clsx(...defaultClasses, className)} {...rest} />
+    <i ref={ref} className={clsx(...defaultClasses, className)} {...rest} />
   )
-}
+})
 
 export default FontAwesomeIcon

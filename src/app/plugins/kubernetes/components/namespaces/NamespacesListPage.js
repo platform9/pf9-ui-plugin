@@ -3,13 +3,13 @@ import { emptyObj } from 'utils/fp'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
 import useDataLoader from 'core/hooks/useDataLoader'
-import { namespacesDataKey } from './actions'
+import namespaceActions from './actions'
 
 const ListPage = ({ ListContainer }) => {
   return () => {
     const [params, setParams] = useState(emptyObj)
     const handleClusterChange = useCallback(clusterId => setParams({ clusterId }), [setParams])
-    const [namespaces, loading, reload] = useDataLoader(namespacesDataKey, params)
+    const [namespaces, loading, reload] = useDataLoader(namespaceActions.list, params)
     return <div>
       <ClusterPicklist
         onChange={handleClusterChange}
@@ -28,7 +28,8 @@ export const options = {
     { id: 'clusterName', label: 'Cluster' },
     { id: 'created', label: 'Created' },
   ],
-  dataKey: namespacesDataKey,
+  loaderFn: namespaceActions.list,
+  deleteFn: namespaceActions.delete,
   editUrl: '/ui/kubernetes/namespaces/edit',
   name: 'Namespaces',
   title: 'Namespaces',

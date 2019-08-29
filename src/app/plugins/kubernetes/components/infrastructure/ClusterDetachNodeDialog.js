@@ -1,13 +1,12 @@
 import React from 'react'
 import { compose, propOr } from 'ramda'
 import { withAppContext } from 'core/AppProvider'
-import { detachNodesFromCluster } from './actions'
 import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab'
 import {
   Button, Dialog, DialogActions, DialogContent, DialogTitle, Table, TableBody, TableRow, TableCell,
   Typography,
 } from '@material-ui/core'
-import { loadNodes } from 'k8s/components/infrastructure/actions'
+import { loadNodes, clusterActions } from 'k8s/components/infrastructure/actions'
 import withDataLoader from 'core/hocs/withDataLoader'
 import withDataMapper from 'core/hocs/withDataMapper'
 
@@ -34,7 +33,7 @@ class ClusterDetachNodeDialog extends React.Component {
       .filter(uuid => this.state[uuid] === 'detach')
 
     const clusterUuid = row.uuid
-    await detachNodesFromCluster({ getContext, setContext, params: { clusterUuid, nodeUuids } })
+    await clusterActions.detachNodesFromCluster({ getContext, setContext, params: { clusterUuid, nodeUuids } })
     this.handleClose()
   }
 

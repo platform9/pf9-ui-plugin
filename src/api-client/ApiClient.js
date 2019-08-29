@@ -24,6 +24,15 @@ class ApiClient {
     return instance
   }
 
+  static hydrate (state) {
+    const options = {
+      keystoneEndpoint: state.keystoneEndpoint,
+    }
+    const client = new ApiClient(options)
+    client.catalog = state.catalog
+    return client
+  }
+
   constructor (options = {}) {
     this.options = options
     if (!options.keystoneEndpoint) {
@@ -43,7 +52,7 @@ class ApiClient {
     this.activeRegion = null
   }
 
-  serialize () {
+  serialize = () => {
     return {
       keystoneEndpoint: this.options.keystoneEndpoint,
       unscopedToken: this.unscopedToken,
@@ -53,20 +62,11 @@ class ApiClient {
     }
   }
 
-  setActiveRegion (regionId) {
+  setActiveRegion = regionId => {
     this.activeRegion = regionId
   }
 
-  static hydrate (state) {
-    const options = {
-      keystoneEndpoint: state.keystoneEndpoint
-    }
-    const client = new ApiClient(options)
-    client.catalog = state.catalog
-    return client
-  }
-
-  getAuthHeaders (scoped = true) {
+  getAuthHeaders = (scoped = true) => {
     const token = scoped ? this.scopedToken : this.unscopedToken
     // It's not necessary to send both headers but it's easier since we don't
     // need to pass around the url and have conditional logic.
@@ -78,29 +78,29 @@ class ApiClient {
     return { headers }
   }
 
-  async basicGet (url) {
+  basicGet = async url => {
     const response = await axios.get(url, this.getAuthHeaders())
     return response.data
   }
 
-  async basicPost (url, body) {
+  basicPost = async (url, body) => {
     const response = await axios.post(url, body, this.getAuthHeaders())
     return response.data
   }
 
-  async basicPatch (url, body) {
+  basicPatch = async (url, body) => {
     const config = this.getAuthHeaders()
     config.headers['Content-Type'] = 'application/json-patch+json'
     const response = await axios.patch(url, body, config)
     return response.data
   }
 
-  async basicPut (url, body) {
+  basicPut = async (url, body) => {
     const response = await axios.put(url, body, this.getAuthHeaders())
     return response.data
   }
 
-  async basicDelete (url) {
+  basicDelete = async url => {
     const response = await axios.delete(url, this.getAuthHeaders())
     return response.data
   }

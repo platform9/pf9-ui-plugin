@@ -3,7 +3,7 @@ import createUpdateComponents from 'core/helpers/createUpdateComponents'
 import SubmitButton from 'core/components/SubmitButton'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import TextField from 'core/components/validatedForm/TextField'
-import { loadFloatingIps, updateFloatingIp } from './actions'
+import floatingIpActions from './actions'
 
 export const UpdateFloatingIpForm = ({ onComplete, initialValue }) => (
   <ValidatedForm onSubmit={onComplete} initialValues={initialValue}>
@@ -16,8 +16,8 @@ export const UpdateFloatingIpForm = ({ onComplete, initialValue }) => (
 export const options = {
   FormComponent: UpdateFloatingIpForm,
   routeParamKey: 'floatingIpId',
-  updateFn: updateFloatingIp,
-  loaderFn: loadFloatingIps,
+  updateFn: floatingIpActions.update,
+  loaderFn: floatingIpActions.list,
   listUrl: '/ui/openstack/floatingips',
   name: 'UpdateFloatingIp',
   title: 'Update Floating IP',

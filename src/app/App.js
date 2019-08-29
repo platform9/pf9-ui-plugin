@@ -12,20 +12,7 @@ import ThemeManager from './ThemeManager'
 import { apply, toPairs } from 'ramda'
 import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom'
 import { pathJoin } from 'utils/misc'
-import config from '../../config'
-import ApiClient from '../api-client'
-import './app.css'
-import { setupFromConfig } from './utils/registry'
 import moize from 'moize'
-
-setupFromConfig(config)
-window.process = process
-
-if (config.apiHost === undefined) { throw new Error('config.js does not contain "apiHost"') }
-
-// Initialize ApiClient singleton
-// We must import App.js before the plugins, so that it will be available to use in the plugin actions
-ApiClient.init({ keystoneEndpoint: `${config.apiHost}/keystone` })
 
 class App extends PureComponent {
   renderFooter = () => (

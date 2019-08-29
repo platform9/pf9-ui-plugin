@@ -4,7 +4,7 @@ import SubmitButton from 'core/components/SubmitButton'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import Checkbox from 'core/components/validatedForm/CheckboxField'
 import TextField from 'core/components/validatedForm/TextField'
-import { loadNetworks, updateNetwork } from './actions'
+import { networksDataKey } from './actions'
 
 export const UpdateNetworkForm = ({ onComplete, initialValue }) => (
   <ValidatedForm onSubmit={onComplete} initialValues={initialValue}>
@@ -20,8 +20,7 @@ export const UpdateNetworkForm = ({ onComplete, initialValue }) => (
 export const options = {
   FormComponent: UpdateNetworkForm,
   routeParamKey: 'networkId',
-  updateFn: updateNetwork,
-  loaderFn: loadNetworks,
+  dataKey: networksDataKey,
   listUrl: '/ui/openstack/networks',
   name: 'UpdateNetwork',
   title: 'Update Network',

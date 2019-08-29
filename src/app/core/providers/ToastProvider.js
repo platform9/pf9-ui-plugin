@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import uuid from 'uuid'
 import { IconButton, Snackbar } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
@@ -83,7 +83,7 @@ const snackbarStyle = {
   zIndex: '9999999999',
 }
 
-export class ToastProvider extends Component {
+export class ToastProvider extends PureComponent {
   state = {
     toasts: []
   }

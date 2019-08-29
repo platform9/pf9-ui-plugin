@@ -1,15 +1,15 @@
-import React, { useMemo, useEffect } from 'react'
+import React, { forwardRef, useMemo, useEffect } from 'react'
 import Picklist from 'core/components/Picklist'
 import { projectAs } from 'utils/fp'
 import useDataLoader from 'core/hooks/useDataLoader'
 import PropTypes from 'prop-types'
 import { isEmpty, propOr, head, omit } from 'ramda'
 import { allKey } from 'app/constants'
-import { namespacesDataKey } from 'k8s/components/namespaces/actions'
+import namespaceActions from 'k8s/components/namespaces/actions'
 
-const NamespacePicklist = React.forwardRef(
+const NamespacePicklist = forwardRef(
   ({ clusterId, loading, onChange, value, showNone, ...rest }, ref) => {
-    const [namespaces, namespacesLoading] = useDataLoader(namespacesDataKey, { clusterId })
+    const [namespaces, namespacesLoading] = useDataLoader(namespaceActions.list, { clusterId })
     const options = useMemo(() => projectAs(
       { label: 'name', value: 'name' }, namespaces,
     ), [namespaces])

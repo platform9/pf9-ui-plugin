@@ -1,22 +1,23 @@
 import ApiClient from 'api-client/ApiClient'
 import uuid from 'uuid'
-import createContextLoader from 'core/helpers/createContextLoader'
-import createContextUpdater from 'core/helpers/createContextUpdater'
+import createCRUDActions from 'core/helpers/createCRUDActions'
 
-const sshContextKey = 'sshKeys'
+export const sshDataKey = 'sshKeys'
+
+const { nova } = ApiClient.getInstance()
+
 const injectIds = x => ({ ...x, id: x.id || uuid.v4() })
 
-export const loadSshKeys = createContextLoader(sshContextKey, async () => {
-  const { nova } = ApiClient.getInstance()
-  return (await nova.getSshKeys()).map(injectIds)
+const sshKeyActions = createCRUDActions(sshDataKey, {
+  listFn: async () => {
+    return (await nova.getSshKeys()).map(injectIds)
+  },
+  createFn: async data => {
+    return nova.createSshKey(data)
+  },
+  deleteFn: async ({ id }) => {
+    await nova.deleteSshKey(id)
+  }
 })
 
-export const createSshKey = createContextUpdater(sshContextKey, async data => {
-  const { nova } = ApiClient.getInstance()
-  return nova.createSshKey(data)
-}, { operation: 'create' })
-
-export const deleteSshKey = createContextUpdater(sshContextKey, async ({ id }) => {
-  const { nova } = ApiClient.getInstance()
-  await nova.deleteSshKey(id)
-}, { operation: 'delete' })
+export default sshKeyActions

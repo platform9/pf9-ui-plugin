@@ -1,78 +1,77 @@
-import React from 'react'
+import React, { useState, useContext, useCallback, useMemo } from 'react'
 import ApiClient from 'api-client/ApiClient'
 import Selector from 'core/components/Selector'
-import { appUrlRoot } from 'app/constants'
-import { compose, pluck, propEq, propOr } from 'ramda'
-import { withAppContext } from 'core/AppProvider'
-import { withScopedPreferences } from 'core/providers/PreferencesProvider'
-import createContextLoader from 'core/helpers/createContextLoader'
-import withDataLoader from 'core/hocs/withDataLoader'
-import withDataMapper from 'core/hocs/withDataMapper'
+import { pluck, propEq, prop } from 'ramda'
+import { useScopedPreferences } from 'core/providers/PreferencesProvider'
 import { Tooltip } from '@material-ui/core'
+import useDataLoader from 'core/hooks/useDataLoader'
+import { AppContext } from 'core/AppProvider'
+import { regionActions } from 'k8s/components/infrastructure/actions'
+import { appUrlRoot } from 'app/constants'
 
-const loadRegions = createContextLoader('regionChooser', async () => {
-  const { keystone } = ApiClient.getInstance()
-  return keystone.getRegions()
-})
+const apiClient = ApiClient.getInstance()
 
-class RegionChooser extends React.Component {
-  state = {
-    curRegion: '',
-    regionSearch: '',
-    tooltipOpen: false,
-  }
+const RegionChooser = props => {
+  const [tooltipOpen, setTooltipOpen] = useState(false)
+  const [preferences, updatePreferences] = useScopedPreferences('RegionChooser')
+  const { lastRegion } = preferences
+  const [loading, setLoading] = useState(false)
+  const [curRegion, setRegion] = useState(apiClient.activeRegion || prop('id', lastRegion))
+  const [regionSearch, setSearchText] = useState('')
+  const { setContext } = useContext(AppContext)
 
-  componentDidMount () {
-    this.setState({ curRegion: ApiClient.getInstance().activeRegion })
-  }
+  const [regions, loadingRegions] = useDataLoader(regionActions.list)
 
-  handleSearchChange = regionSearch => this.setState({ regionSearch })
-
-  handleRegionSelect = region => {
-    this.setState({ curRegion: region })
+  const handleRegionSelect = useCallback(async region => {
+    setLoading(true)
+    setRegion(region)
     // Future Todo: Update the Selector component or create a variant of the component
     // that can take a list of objects
-    const fullRegionObj = this.props.data.regions.find(propEq('id', region))
-    this.props.updatePreferences({ lastRegion: fullRegionObj })
+    const fullRegionObj = regions.find(propEq('id', region))
+    await updatePreferences({ lastRegion: fullRegionObj })
 
     // Initial loading of the app is tightly coupled to knowing the region to use.
     // Reloading the app when the region changes is the simplest and most robust solution.
+    // FIXME this can probably be avoided using the commented code below
     window.location = appUrlRoot
-  }
+    // await setContext(pipe(
+    //   // Reset all the data cache
+    //   assoc(dataContextKey, emptyArr),
+    //   assoc(paramsContextKey, emptyArr),
+    //   // Changing the currentTenant will cause all the current active `useDataLoader`
+    //   // hooks to reload its data
+    //   assoc('currentRegion', region),
+    // ))
+    // setLoading(false)
+  }, [regions])
 
-  handleTooltipClose = () => this.setState({ tooltipOpen: false })
-  handleTooltipOpen = () => this.setState({ tooltipOpen: true })
+  const handleTooltipClose = useCallback(() => setTooltipOpen(false))
+  const handleTooltipOpen = useCallback(() => setTooltipOpen(true))
 
-  render () {
-    const { curRegion, regionSearch, tooltipOpen } = this.state
-    const { data: { regions = [] }, className } = this.props
-    const regionNames = pluck('id', regions)
+  const regionNames = useMemo(() => pluck('id', regions), [regions])
 
-    return (
-      <Tooltip
-        open={tooltipOpen}
-        title="Region"
-        placement="bottom"
-      >
-        <Selector
-          onMouseEnter={this.handleTooltipOpen}
-          onMouseLeave={this.handleTooltipClose}
-          onClick={this.handleTooltipClose}
-          className={className}
-          name={!curRegion || curRegion.length === 0 ? 'Current Region' : curRegion}
-          list={regionNames}
-          onChoose={this.handleRegionSelect}
-          onSearchChange={this.handleSearchChange}
-          searchTerm={regionSearch}
-        />
-      </Tooltip>
-    )
-  }
+  return (
+    <Tooltip
+      open={tooltipOpen}
+      title="Region"
+      placement="bottom"
+    >
+      <Selector
+        inline
+        overlay={false}
+        loading={loading || loadingRegions}
+        onMouseEnter={handleTooltipOpen}
+        onMouseLeave={handleTooltipClose}
+        onClick={handleTooltipClose}
+        className={props.className}
+        name={!curRegion || curRegion.length === 0 ? 'Current Region' : curRegion}
+        list={regionNames}
+        onChoose={handleRegionSelect}
+        onSearchChange={setSearchText}
+        searchTerm={regionSearch}
+      />
+    </Tooltip>
+  )
 }
 
-export default compose(
-  withAppContext,
-  withDataLoader({ regions: loadRegions }, { inlineProgress: true }),
-  withDataMapper({ regions: propOr([], 'regionChooser') }),
-  withScopedPreferences('RegionChooser'),
-)(RegionChooser)
+export default RegionChooser

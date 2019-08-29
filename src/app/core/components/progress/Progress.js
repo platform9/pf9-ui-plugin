@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, forwardRef } from 'react'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/core/styles'
 import clsx from 'clsx'
@@ -43,12 +43,12 @@ const styles = theme => ({
     minHeight: 200,
   },
   statusHidden: {
-    display: 'none'
+    display: 'none',
   },
   statusInline: {
     padding: '0 1rem',
     flexFlow: 'row nowrap',
-    minHeight: 'unset'
+    minHeight: 'unset',
   },
   statusOverlayed: {
     position: 'absolute',
@@ -109,7 +109,8 @@ class Progress extends PureComponent {
       [classes.statusInline]: inline,
       [classes.statusOverlayed]: overlay && loading && (renderContentOnMount || loadedOnce),
     })}>
-      {renderLoadingImage && <img alt="Loading..." src={imageUrls.loading} className={clsx(classes.img, {
+      {renderLoadingImage &&
+      <img alt="Loading..." src={imageUrls.loading} className={clsx(classes.img, {
         [classes.imgInline]: inline,
       })} />}
       {message && <Typography className={clsx(classes.message, {
@@ -175,9 +176,10 @@ Progress.defaultProps = {
   message: 'Loading...',
 }
 
-export const withProgress = Component => ({ overlay, inline, loading, ...props }) =>
-  <Progress overlay={overlay} inline={inline} loading={loading}>
-    <Component {...props} />
-  </Progress>
+export const withProgress = Component =>
+  forwardRef(({ overlay, inline, loading, ...props }, ref) =>
+    <Progress overlay={overlay} inline={inline} loading={loading}>
+      <Component {...props} ref={ref} />
+    </Progress>)
 
 export default Progress

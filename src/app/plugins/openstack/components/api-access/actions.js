@@ -22,12 +22,13 @@ const serviceMappings = {
   tasker: 'admin',
 }
 
+const { keystone } = ApiClient.getInstance()
+
 const whichInterface = serviceName => serviceMappings[serviceName] || 'internal'
 
 export const serviceCatalogContextKey = 'serviceCatalog'
 
 export const loadServiceCatalog = createContextLoader(serviceCatalogContextKey, async () => {
-  const { keystone } = ApiClient.getInstance()
   const services = await keystone.getServicesForActiveRegion()
   return Object.entries(services).map(([name, service]) => {
     const iface = whichInterface(service)

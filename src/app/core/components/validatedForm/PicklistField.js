@@ -2,7 +2,8 @@ import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 import Picklist from 'core/components/Picklist'
 import InfoTooltip from 'app/core/components/InfoTooltip'
-import { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
+import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
+import { compose } from 'utils/fp'
 
 /**
  * PicklistField builds upon Picklist and adds integration with ValidatedForm
@@ -67,4 +68,6 @@ PicklistField.propTypes = {
   ...ValidatedFormInputPropTypes,
 }
 
-export default PicklistField
+export default compose(
+  withFormContext,
+)(PicklistField)

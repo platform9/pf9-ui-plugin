@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/styles'
 import { Menu, MenuItem, Typography } from '@material-ui/core'
 import SearchBar from './SearchBar'
 import clsx from 'clsx'
 import { pick } from 'ramda'
+import { withProgress } from 'core/components/progress/Progress'
 
 const styles = theme => ({
   search: {
@@ -18,7 +19,7 @@ const styles = theme => ({
 })
 
 @withStyles(styles)
-class Selector extends React.Component {
+class Selector extends PureComponent {
   state = { anchor: null }
   handleClick = event => this.setState({ anchor: event.currentTarget })
 
@@ -82,4 +83,4 @@ Selector.propTypes = {
   onChoose: PropTypes.func.isRequired,
 }
 
-export default Selector
+export default withProgress(Selector)

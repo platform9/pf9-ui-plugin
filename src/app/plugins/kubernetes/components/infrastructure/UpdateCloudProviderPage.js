@@ -3,7 +3,7 @@ import createUpdateComponents from 'core/helpers/createUpdateComponents'
 import SubmitButton from 'core/components/SubmitButton'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import TextField from 'core/components/validatedForm/TextField'
-import { loadCloudProviders, updateCloudProvider } from './actions'
+import { cloudProviderActions } from './actions'
 
 const AWSFields = () => (
   <React.Fragment>
@@ -30,8 +30,8 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => (
 
 export const options = {
   FormComponent: UpdateCloudProviderForm,
-  updateFn: updateCloudProvider,
-  loaderFn: loadCloudProviders,
+  updateFn: cloudProviderActions.update,
+  loaderFn: cloudProviderActions.list,
   listUrl: '/ui/kubernetes/infrastructure#cloudProviders',
   name: 'UpdateCloudProvider',
   title: 'Update Cloud Provider',

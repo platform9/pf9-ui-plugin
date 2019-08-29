@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from 'react'
+import React, { useMemo, useEffect, forwardRef } from 'react'
 import PropTypes from 'prop-types'
 import {
   isEmpty, propOr, head, compose, filter, identity, omit, path, pipe, propSatisfies,
@@ -7,17 +7,17 @@ import Picklist from 'core/components/Picklist'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { isTruthy, projectAs } from 'utils/fp'
 import { castFuzzyBool } from 'utils/misc'
-import { clustersDataKey } from '../infrastructure/actions'
+import { clusterActions } from '../infrastructure/actions'
 import { allKey } from 'app/constants'
 
 const hasMasterNode = propSatisfies(isTruthy, 'hasMasterNode')
 const hasPrometheusEnabled = compose(castFuzzyBool, path(['tags', 'pf9-system:monitoring']))
 
-const ClusterPicklist = React.forwardRef(({
+const ClusterPicklist = forwardRef(({
   loading, onChange, value, onlyPrometheusEnabled, onlyMasterNodeClusters,
   showNone, ...rest,
 }, ref) => {
-  const [clusters, clustersLoading] = useDataLoader(clustersDataKey)
+  const [clusters, clustersLoading] = useDataLoader(clusterActions.list)
   const options = useMemo(() => pipe(
     onlyMasterNodeClusters ? filter(hasMasterNode) : identity,
     onlyPrometheusEnabled ? filter(hasPrometheusEnabled) : identity,

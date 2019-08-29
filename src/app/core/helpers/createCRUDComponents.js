@@ -8,6 +8,9 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import { withRouter } from 'react-router-dom'
 import { withScopedPreferences } from 'core/providers/PreferencesProvider'
+import { emptyArr } from 'utils/fp'
+import { getContextLoader } from 'core/helpers/createContextLoader'
+import { getContextUpdater } from 'core/helpers/createContextUpdater'
 
 /**
  * This helper removes a lot of boilerplate from standard CRUD operations.
@@ -31,6 +34,8 @@ import { withScopedPreferences } from 'core/providers/PreferencesProvider'
 const createCRUDComponents = options => {
   const {
     dataKey,
+    loaderFn = dataKey ? getContextLoader(dataKey) : null,
+    deleteFn = dataKey ? getContextUpdater(dataKey, 'delete') : null,
     columns = [],
     rowActions = () => [],
     uniqueIdentifier = 'id',
@@ -78,11 +83,11 @@ const createCRUDComponents = options => {
 
   // ListContainer
   const ContainerBase = ({ params, setParams, history, data, loading, reload }) => {
-    const [handleRemove, deleting] = useDataUpdater(dataKey, 'delete', reload)
+    const [handleRemove, deleting] = deleteFn ? useDataUpdater(deleteFn, reload) : emptyArr
     const addButton = useMemo(() =>
       <CreateButton onClick={() => history.push(addUrl)}>{addText}</CreateButton>,
     [history])
-    const refetch = useCallback(() => reload(true))
+  const refetch = useCallback(() => reload(true))
 
     let moreProps = {}
     if (rowActions && rowActions.length > 0) {
@@ -113,7 +118,7 @@ const createCRUDComponents = options => {
   const createStandardListPage = () => {
     // ListPage
     return () => {
-      const [data, loading, reload] = useDataLoader(dataKey)
+      const [data, loading, reload] = useDataLoader(loaderFn)
       return <>
         <ListContainer data={data} loading={loading} reload={reload} />
         {debug && <pre>{JSON.stringify(data, null, 4)}</pre>}

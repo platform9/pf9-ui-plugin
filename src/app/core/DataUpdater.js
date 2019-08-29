@@ -11,6 +11,10 @@ import { withRouter } from 'react-router'
  * @deprecated Use useDataUpdater hook instead
  */
 class DataUpdater extends PureComponent {
+  componentDidMount () {
+    console.warn('DataUpdater component is deprecated, please use `useDataUpdater` hook instead')
+  }
+
   findById = (arr = [], id) => arr.find(x => x.id === id)
 
   handleSubmit = async params => {
