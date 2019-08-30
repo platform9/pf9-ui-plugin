@@ -1,5 +1,7 @@
-import { asyncMap, pathOrNull, pipeWhenTruthy } from 'app/utils/fp'
-import { find, pathOr, pluck, prop, propEq } from 'ramda'
+import { asyncMap, pathOrNull, pipeWhenTruthy, isTruthy } from 'app/utils/fp'
+import {
+  identity, filter, find, pathOr, pluck, prop, propEq, propSatisfies, compose, path, pipe,
+} from 'ramda'
 import { allKey } from 'app/constants'
 import { castFuzzyBool } from 'utils/misc'
 import { combineHost } from './combineHosts'
@@ -28,10 +30,13 @@ export const loadResMgrHosts = createContextLoader(resMgrHostsDataKey, async () 
   uniqueIdentifier: 'uuid',
 })
 
+export const hasMasterNode = propSatisfies(isTruthy, 'hasMasterNode')
+export const hasPrometheusEnabled = compose(castFuzzyBool, path(['tags', 'pf9-system:monitoring']))
+
 // If params.clusterId is not assigned it fetches all clusters and extracts the clusterId from the first cluster
 // It also adds a "clusters" param that contains all the clusters, just for convenience
 export const parseClusterParams = async (params, loadFromContext) => {
-  const clusters = await loadFromContext(clustersDataKey)
+  const clusters = await loadFromContext(clustersDataKey, params)
   const { clusterId = pathOr(allKey, [0, 'uuid'], clusters) || allKey } = params
   return [clusterId, clusters]
 }
@@ -43,7 +48,6 @@ export const clusterActions = createCRUDActions(clustersDataKey, {
       qbert.getClusters(),
       qbert.baseUrl(),
     ])
-
     const clusters = rawClusters.map(cluster => {
       const nodesInCluster = rawNodes.filter(node => node.clusterUuid === cluster.uuid)
       const masterNodes = nodesInCluster.filter(node => node.isMaster === 1)
@@ -102,6 +106,10 @@ export const clusterActions = createCRUDActions(clustersDataKey, {
     // have references to the deleted cluster.
     loadCombinedHosts.invalidateCache()
   },
+  dataMapper: (items, { masterNodeClusters, prometheusClusters }) => pipe(
+    masterNodeClusters ? filter(hasMasterNode) : identity,
+    prometheusClusters ? filter(hasPrometheusEnabled) : identity
+  )(items),
   uniqueIdentifier: 'uuid',
 })
 

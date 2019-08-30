@@ -20,7 +20,7 @@ const storageClassActions = createCRUDActions(storageClassesDataKey, {
     const addClusterName = sc => assoc('clusterName', getClusterName(sc.clusterId), sc)
     return storageClasses.map(addClusterName)
   },
-  delete: async ({ id }, currentItems) => {
+  deleteFn: async ({ id }, currentItems) => {
     const { qbert } = ApiClient.getInstance()
     const item = currentItems.find(propEq('id', id))
     if (!item) {

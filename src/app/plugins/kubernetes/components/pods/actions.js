@@ -13,7 +13,7 @@ export const kubeServicesDataKey = 'kubeServices'
 export const podsDataKey = 'pods'
 
 export const deploymentActions = createCRUDActions(deploymentsDataKey, {
-  create: async ({ clusterId, namespace, deploymentYaml }) => {
+  createFn: async ({ clusterId, namespace, deploymentYaml }) => {
     const body = yaml.safeLoad(deploymentYaml)
     const created = await qbert.createDeployment(clusterId, namespace, body)
     // Also need to refresh the list of pods
@@ -33,7 +33,7 @@ export const deploymentActions = createCRUDActions(deploymentsDataKey, {
 })
 
 export const serviceActions = createCRUDActions(kubeServicesDataKey, {
-  create: async ({ clusterId, namespace, serviceYaml }) => {
+  createFn: async ({ clusterId, namespace, serviceYaml }) => {
     const body = yaml.safeLoad(serviceYaml)
     const created = await qbert.createService(clusterId, namespace, body)
     return {
@@ -45,7 +45,7 @@ export const serviceActions = createCRUDActions(kubeServicesDataKey, {
       namespace: created.metadata.namespace,
     }
   },
-  delete: async ({ id }, currentItems) => {
+  deleteFn: async ({ id }, currentItems) => {
     const { clusterId, namespace, name } = await currentItems.find(x => x.id === id)
     await qbert.deleteService(clusterId, namespace, name)
   },

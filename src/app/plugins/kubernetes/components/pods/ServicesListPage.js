@@ -1,14 +1,18 @@
 import React, { useState, useCallback } from 'react'
-import { emptyObj } from 'utils/fp'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { serviceActions } from 'k8s/components/pods/actions'
 
+const defaultParams = {
+  masterNodeClusters: true,
+}
 const ListPage = ({ ListContainer }) => {
   return () => {
-    const [params, setParams] = useState(emptyObj)
-    const handleClusterChange = useCallback(clusterId => setParams({ clusterId }), [])
+    const [params, setParams] = useState(defaultParams)
+    const handleClusterChange = useCallback(clusterId => {
+      setParams({ ...params, clusterId })
+    }, [])
     const [data, loading, reload] = useDataLoader(serviceActions.list, params)
     return <div>
       <ClusterPicklist

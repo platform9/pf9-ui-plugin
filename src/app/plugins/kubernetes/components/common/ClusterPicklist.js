@@ -1,28 +1,23 @@
 import React, { useMemo, useEffect, forwardRef } from 'react'
 import PropTypes from 'prop-types'
-import {
-  isEmpty, propOr, head, compose, filter, identity, omit, path, pipe, propSatisfies,
-} from 'ramda'
+import { isEmpty, propOr, head, omit } from 'ramda'
 import Picklist from 'core/components/Picklist'
 import useDataLoader from 'core/hooks/useDataLoader'
-import { isTruthy, projectAs } from 'utils/fp'
-import { castFuzzyBool } from 'utils/misc'
+import { projectAs } from 'utils/fp'
 import { clusterActions } from '../infrastructure/actions'
 import { allKey } from 'app/constants'
-
-const hasMasterNode = propSatisfies(isTruthy, 'hasMasterNode')
-const hasPrometheusEnabled = compose(castFuzzyBool, path(['tags', 'pf9-system:monitoring']))
 
 const ClusterPicklist = forwardRef(({
   loading, onChange, value, onlyPrometheusEnabled, onlyMasterNodeClusters,
   showNone, ...rest,
 }, ref) => {
-  const [clusters, clustersLoading] = useDataLoader(clusterActions.list)
-  const options = useMemo(() => pipe(
-    onlyMasterNodeClusters ? filter(hasMasterNode) : identity,
-    onlyPrometheusEnabled ? filter(hasPrometheusEnabled) : identity,
-    projectAs({ label: 'name', value: 'uuid' }),
-  )(clusters),
+  const defaultParams = {
+    masterNodeClusters: onlyMasterNodeClusters,
+    prometheusNodeClusters: onlyPrometheusEnabled,
+  }
+  const [clusters, clustersLoading] = useDataLoader(clusterActions.list, defaultParams)
+  const options = useMemo(() =>
+    projectAs({ label: 'name', value: 'uuid' })(clusters),
   [clusters, onlyMasterNodeClusters, onlyPrometheusEnabled])
 
   // Select the first cluster as soon as clusters are loaded

@@ -5,7 +5,7 @@ import {
 import moize from 'moize'
 import { ensureFunction, ensureArray, emptyObj, emptyArr } from 'utils/fp'
 import { singlePromise, uncamelizeString } from 'utils/misc'
-import { defaultUniqueIdentifier } from 'app/constants'
+import { defaultUniqueIdentifier, allKey } from 'app/constants'
 
 export const paramsContextKey = 'cachedParams'
 export const dataContextKey = 'cachedData'
@@ -83,7 +83,7 @@ const createContextLoader = (key, dataFetchFn, options = {}) => {
       // Get the required values from the provided params
       const providedRequiredParams = pipe(
         pick(allRequiredParams),
-        reject(isNil)
+        reject(isNil),
       )(params)
       // If not all the required params are provided, skip this request and just return an empty array
       if (requiredParams && values(providedRequiredParams).length < allRequiredParams.length) {
@@ -93,7 +93,10 @@ const createContextLoader = (key, dataFetchFn, options = {}) => {
         onSuccess = (successMessage, params) => console.info(successMessage),
         onError = (errorMessage, catchedErr, params) => console.error(errorMessage, catchedErr),
       } = additionalOptions
-      const providedIndexedParams = pickAll(allIndexKeys, providedRequiredParams)
+      const providedIndexedParams = pipe(
+        pickAll(allIndexKeys),
+        reject(equals(allKey)),
+      )(providedRequiredParams)
       const loadFromContext = (key, params, refetch) => {
         const loaderFn = getContextLoader(key)
         return loaderFn({ getContext, setContext, params, refetch, additionalOptions })
