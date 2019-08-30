@@ -11,7 +11,7 @@ import PrometheusAlertManagers from './PrometheusAlertManagers'
 import { compose } from 'ramda'
 import { withAppContext } from 'core/AppProvider'
 
-class PrometheusMonitoringPage extends React.Component {
+class PrometheusMonitoringPage extends React.PureComponent {
   render () {
     return (
       <div>

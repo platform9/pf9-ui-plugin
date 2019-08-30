@@ -4,7 +4,7 @@ import { Typography } from '@material-ui/core'
 import { compose, lensPath, set } from 'ramda'
 import { withAppContext } from 'core/AppProvider'
 
-class TypographyVariant extends React.Component {
+class TypographyVariant extends React.PureComponent {
   lens = () => lensPath(this.props.path.split('.'))
 
   handleChange = color => this.props.setContext({

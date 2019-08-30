@@ -21,7 +21,7 @@ const styles = theme => ({
 })
 
 @withStyles(styles)
-class FormWrapper extends React.Component {
+class FormWrapper extends React.PureComponent {
   render () {
     const {
       backUrl,

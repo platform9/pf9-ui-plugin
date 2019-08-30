@@ -28,9 +28,10 @@ if (isDev) {
 
 // main entry point
 appEntry.push('@babel/polyfill')
+appEntry.push('./index.js')
 
-// Don't include react-hot-loader in prod
-appEntry.push(isDev ? './index.js' : './index.prod.js')
+const port = 3000
+const publicPath = isProd ? '/ui/' : `http://localhost:${port}/ui`
 
 module.exports = {
   entry: {
@@ -40,9 +41,9 @@ module.exports = {
   devtool: isProd ? 'source-map' : 'cheap-module-eval-source-map',
   devServer: {
     disableHostCheck: true, // Temporary workaround for https://github.com/webpack/webpack-dev-server/issues/1604
-    publicPath: '/ui/',
-    contentBase: contentBase,
-    port: 3000,
+    publicPath,
+    contentBase,
+    port,
     compress: true,
     hot: true,
     open: false,
@@ -52,7 +53,7 @@ module.exports = {
   },
   output: {
     filename: isDev ? '[name]-bundle.js' : '[name].[hash]-bundle.js',
-    publicPath: '/ui/',
+    publicPath,
     path: outputPath,
   },
   module: {

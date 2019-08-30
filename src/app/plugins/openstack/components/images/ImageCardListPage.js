@@ -11,7 +11,7 @@ const styles = theme => ({
   }
 })
 
-class ImageCardListPage extends React.Component {
+class ImageCardListPage extends React.PureComponent {
   onClick = () => {
     this.props.onChange(null, '/ui/openstack/images#images')
   }

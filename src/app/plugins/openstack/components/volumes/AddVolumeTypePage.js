@@ -10,7 +10,7 @@ import AddVolumeTypeForm from './AddVolumeTypeForm'
 import { dataContextKey } from 'core/helpers/createContextLoader'
 import { assocPath } from 'ramda'
 
-class AddVolumeTypePage extends React.Component {
+class AddVolumeTypePage extends React.PureComponent {
   handleAdd = async data => {
     const { setContext, getContext, history } = this.props
     try {

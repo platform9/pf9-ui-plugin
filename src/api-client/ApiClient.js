@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { defaultAxiosConfig } from 'app/constants'
 
 import Appbert from './Appbert'
 import Cinder from './Cinder'
@@ -50,6 +51,8 @@ class ApiClient {
 
     this.catalog = {}
     this.activeRegion = null
+
+    this.axiosInstance = axios.create({ ...defaultAxiosConfig, ...(options.axios || {}) })
   }
 
   serialize = () => {
@@ -79,29 +82,29 @@ class ApiClient {
   }
 
   basicGet = async url => {
-    const response = await axios.get(url, this.getAuthHeaders())
+    const response = await this.axiosInstance.get(url, this.getAuthHeaders())
     return response.data
   }
 
   basicPost = async (url, body) => {
-    const response = await axios.post(url, body, this.getAuthHeaders())
+    const response = await this.axiosInstance.post(url, body, this.getAuthHeaders())
     return response.data
   }
 
   basicPatch = async (url, body) => {
     const config = this.getAuthHeaders()
     config.headers['Content-Type'] = 'application/json-patch+json'
-    const response = await axios.patch(url, body, config)
+    const response = await this.axiosInstance.patch(url, body, config)
     return response.data
   }
 
   basicPut = async (url, body) => {
-    const response = await axios.put(url, body, this.getAuthHeaders())
+    const response = await this.axiosInstance.put(url, body, this.getAuthHeaders())
     return response.data
   }
 
   basicDelete = async url => {
-    const response = await axios.delete(url, this.getAuthHeaders())
+    const response = await this.axiosInstance.delete(url, this.getAuthHeaders())
     return response.data
   }
 }

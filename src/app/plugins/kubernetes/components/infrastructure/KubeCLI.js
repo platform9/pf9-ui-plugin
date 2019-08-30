@@ -23,7 +23,7 @@ const styles = {
 
 const Transition = forwardRef((props, ref) => <Slide direction="up" {...props} ref={ref} />)
 
-class KubeCLI extends React.Component {
+class KubeCLI extends React.PureComponent {
   state = { url: null, open: false }
 
   handleClick = async () => {

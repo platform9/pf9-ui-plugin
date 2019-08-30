@@ -25,3 +25,11 @@ export const imageUrls = Object.freeze({
 export const codeMirrorOptions = Object.freeze({
   mode: 'yaml',
 })
+
+/**
+ * Default axios config
+ * @type {object}
+ */
+export const defaultAxiosConfig = Object.freeze({
+  timeout: 30000
+})

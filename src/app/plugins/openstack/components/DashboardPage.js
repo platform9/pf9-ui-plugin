@@ -4,7 +4,7 @@ import DashboardGraphs from 'core/components/dashboardGraphs/DashboardGraphs'
 import ProgressCardList from 'core/components/progress/ProgressCardList'
 import requiresAuthentication from '../util/requiresAuthentication'
 
-class Dashboard extends React.Component {
+class Dashboard extends React.PureComponent {
   render () {
     const testCards = [
       {

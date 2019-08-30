@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { extraContentId } from 'core/components/Toolbar'
 
-class TopExtraContent extends React.Component {
+class TopExtraContent extends React.PureComponent {
   render () {
     const { children } = this.props
     const container = document.getElementById(`${extraContentId}`)

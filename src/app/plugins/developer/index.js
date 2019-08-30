@@ -3,7 +3,7 @@ import React from 'react'
 import DeveloperIndexPage from './components/DeveloperIndexPage'
 import ContextViewer from './components/ContextViewer'
 
-class Developer extends React.Component {
+class Developer extends React.PureComponent {
   render () {
     return (
       <h1>Developer Plugin</h1>

@@ -17,7 +17,7 @@ const styles = theme => ({
   },
 })
 
-class ListTableSelect extends React.Component {
+class ListTableSelect extends React.PureComponent {
   state = { selected: this.props.initialValue }
 
   handleClick = row => event => {

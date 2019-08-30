@@ -6,7 +6,7 @@ import MiscPanel from './MiscPanel'
 import TypographyPanel from './TypographyPanel'
 import { Grid } from '@material-ui/core'
 
-class ConfigureThemePage extends React.Component {
+class ConfigureThemePage extends React.PureComponent {
   render () {
     return (
       <div>

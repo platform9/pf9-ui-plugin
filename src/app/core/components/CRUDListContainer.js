@@ -4,7 +4,7 @@ import React from 'react'
 import { withRouter } from 'react-router-dom'
 import ConfirmationDialog from './ConfirmationDialog'
 
-class CRUDListContainer extends React.Component {
+class CRUDListContainer extends React.PureComponent {
   componentDidMount () {
     if (this.props.getQuery) {
       console.error(`TODO: remove getQuery usage from CRUDListContainer`)

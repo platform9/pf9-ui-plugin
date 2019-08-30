@@ -97,7 +97,7 @@ const styles = theme => ({
 })
 
 @withStyles(styles)
-class CardTableContainer extends React.Component {
+class CardTableContainer extends React.PureComponent {
   state = {
     data: range(1, randomInt(20, 30)).map(id => ({
       id,

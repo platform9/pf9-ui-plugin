@@ -55,7 +55,7 @@ const data = [
   createData('dev.company.sys', '11.11.11.11', '/var/opt/company/imagelibrary/data')
 ]
 
-class AddImagePage extends React.Component {
+class AddImagePage extends React.PureComponent {
   renderManualImport () {
     const { classes } = this.props
     return (

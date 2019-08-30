@@ -21,7 +21,7 @@ const styles = theme => ({
   },
 })
 
-class MultiSelect extends React.Component {
+class MultiSelect extends React.PureComponent {
   handleChange = e => {
     const { onChange } = this.props
     onChange && onChange(e.target.value)

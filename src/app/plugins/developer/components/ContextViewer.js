@@ -20,7 +20,7 @@ const findFirstMatching = (key, obj) => {
   return obj
 }
 
-class ContextViewer extends React.Component {
+class ContextViewer extends React.PureComponent {
   state = { searchTerm: '' }
   handleSearchChange = searchTerm => this.setState({ searchTerm })
 

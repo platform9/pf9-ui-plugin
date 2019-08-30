@@ -53,7 +53,7 @@ const styles = theme => ({
   },
 })
 
-export class LoginPage extends React.Component {
+export class LoginPage extends React.PureComponent {
   state = {
     username: '',
     password: '',

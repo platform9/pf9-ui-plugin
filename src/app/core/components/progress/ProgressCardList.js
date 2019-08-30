@@ -11,7 +11,7 @@ const styles = theme => ({
 })
 
 @withStyles(styles)
-class ProgressCardList extends React.Component {
+class ProgressCardList extends React.PureComponent {
   render () {
     const { classes, cards } = this.props
     const cardNum = Math.round(12 / cards.length)

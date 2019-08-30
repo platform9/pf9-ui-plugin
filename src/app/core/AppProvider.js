@@ -4,7 +4,7 @@ import { assocPath, flatten, pipe } from 'ramda'
 
 export const AppContext = React.createContext({})
 
-class AppProvider extends React.Component {
+class AppProvider extends React.PureComponent {
   state = {
     ...this.props.initialContext,
 

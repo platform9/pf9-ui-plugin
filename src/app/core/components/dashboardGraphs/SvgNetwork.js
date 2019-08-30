@@ -10,7 +10,7 @@ const styles = theme => ({
 })
 
 @withStyles(styles)
-class SvgNetwork extends React.Component {
+class SvgNetwork extends React.PureComponent {
   render () {
     const { classes } = this.props
     const side = 43

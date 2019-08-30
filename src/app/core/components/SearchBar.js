@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/styles'
 import { InputAdornment, TextField } from '@material-ui/core'
@@ -15,7 +15,7 @@ const styles = theme => ({
   searchIcon: {
     fontSize: 15,
     fontWeight: 'bold',
-    color: '#b7b7b7',
+    color: '#B7B7B7',
   },
   clearIcon: {
     '&:hover': {
@@ -40,7 +40,7 @@ const styles = theme => ({
 
 // The selector containing searchBar needs to keep state of searchBar in parent component.
 // To keep it aligned, please keep searchTerm in parent component of searchBar
-class SearchBar extends React.Component {
+class SearchBar extends PureComponent {
   handleSearch = event => {
     this.props.onSearchChange(event.target.value)
   }

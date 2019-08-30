@@ -5,7 +5,7 @@ import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import createUpdateComponents from 'core/helpers/createUpdateComponents'
 import { prometheusInstancesDataKey } from 'k8s/components/prometheus/actions'
 
-class UpdatePrometheusInstanceForm extends React.Component {
+class UpdatePrometheusInstanceForm extends React.PureComponent {
   handleUpdate = data => {
     this.props.onComplete(data)
   }

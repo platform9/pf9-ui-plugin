@@ -10,7 +10,7 @@ import CreateSnapshotForm from './CreateSnapshotForm'
 import { dataContextKey } from 'core/helpers/createContextLoader'
 import { assocPath } from 'ramda'
 
-class CreateSnapshotPage extends React.Component {
+class CreateSnapshotPage extends React.PureComponent {
   handleAdd = async snapshotData => {
     const { setContext, getContext, history, match } = this.props
     const { volumeId } = match.params

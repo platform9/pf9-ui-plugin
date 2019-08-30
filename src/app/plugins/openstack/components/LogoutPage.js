@@ -8,7 +8,7 @@ import { loginUrl } from 'app/constants'
 // We are abusing the React component system a little bit here.  This is really
 // nothing but an action but I didn't want to clutter the Navbar component with
 // more code.  This gives us a nice clean separation.
-export class LogoutPage extends React.Component {
+export class LogoutPage extends React.PureComponent {
   componentDidMount () {
     const { history, destroySession } = this.props
     clear('user')

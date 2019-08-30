@@ -25,7 +25,7 @@ const styles = theme => ({
   }
 })
 
-class ApiHelper extends React.Component {
+class ApiHelper extends React.PureComponent {
   state = {
     baseUrl: '',
     body: {},

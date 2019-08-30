@@ -23,7 +23,7 @@ const data = {
 }
 
 @withStyles(styles)
-class DashboardGraphs extends React.Component {
+class DashboardGraphs extends React.PureComponent {
   render () {
     const { classes } = this.props
 

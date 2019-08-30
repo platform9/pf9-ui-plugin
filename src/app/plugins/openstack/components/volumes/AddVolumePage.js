@@ -19,7 +19,7 @@ const constructBatch = (numVolumes, prefix, data) =>
       metadata: keyValueArrToObj(volume.metadata)
     }))
 
-class AddVolumePage extends React.Component {
+class AddVolumePage extends React.PureComponent {
   handleAdd = async volume => {
     const { setContext, getContext, history } = this.props
     try {

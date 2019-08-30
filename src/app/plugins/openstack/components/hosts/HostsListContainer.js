@@ -18,7 +18,7 @@ export const HostsList = createListTableComponent({
   searchTarget: 'hypervisor_hostname',
 })
 
-class HostsListContainer extends React.Component {
+class HostsListContainer extends React.PureComponent {
   render () {
     const hosts = this.props.hosts || []
     return (

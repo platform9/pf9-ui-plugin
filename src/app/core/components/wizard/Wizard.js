@@ -6,10 +6,7 @@ import PrevButton from 'core/components/buttons/PrevButton'
 import { ensureFunction } from 'utils/fp'
 import WizzardStepper from 'core/components/wizard/WizardStepper'
 
-const WizardContext = React.createContext({})
-
-export const Consumer = WizardContext.Consumer
-export const Provider = WizardContext.Provider
+export const WizardContext = React.createContext({})
 
 class Wizard extends PureComponent {
   isLastStep = () => this.state.activeStep === this.state.steps.length - 1
@@ -85,7 +82,7 @@ class Wizard extends PureComponent {
     const renderStepsContent = ensureFunction(children)
 
     return (
-      <Provider value={this.state}>
+      <WizardContext.Provider value={this.state}>
         <WizzardStepper steps={steps} activeStep={activeStep} />
         {renderStepsContent({ wizardContext, setWizardContext, onNext: this.onNext })}
         <WizardButtons>
@@ -96,7 +93,7 @@ class Wizard extends PureComponent {
           {this.isLastStep() &&
           <NextButton onClick={this.handleNext}>{submitLabel}</NextButton>}
         </WizardButtons>
-      </Provider>
+      </WizardContext.Provider>
     )
   }
 }
@@ -117,32 +114,3 @@ Wizard.defaultProps = {
 }
 
 export default Wizard
-
-/**
- * withWizardContext provides access to the wizard context through props.
- *
- * This pattern is needed because React does not provide access to context within
- * lifecycle methods (componentDidMount).
- *
- * See: https://github.com/facebook/react/issues/12397#issuecomment-375501574
- *
- * @param {Inject the form context into this Component through props.} Component
- */
-export const withWizardContext = Component => props => {
-  return (
-    <Consumer>
-      {
-        ({ activeStep, steps, handleBack, handleNext, addStep, activeStepId }) =>
-          <Component
-            {...props}
-            activeStepId={activeStepId}
-            activeStep={activeStep}
-            steps={steps}
-            handleBack={handleBack}
-            handleNext={handleNext}
-            addStep={addStep}
-          />
-      }
-    </Consumer>
-  )
-}

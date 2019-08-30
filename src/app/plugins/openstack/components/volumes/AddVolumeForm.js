@@ -30,7 +30,7 @@ const sourceTypes = [
 const schemaSamples = (prefix, num) => range(1, num).map(i => `${prefix}${i}`)
 
 // See if the data supplied to WizardStep can be raised up to AddVolumeForm state
-class AddVolumeForm extends React.Component {
+class AddVolumeForm extends React.PureComponent {
   state = {
     createMultiple: false,
     name: '',

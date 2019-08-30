@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { PureComponent } from 'react'
 import { withRouter } from 'react-router-dom'
 import { compose } from 'app/utils/fp'
 import { withAppContext } from 'core/AppProvider'
@@ -7,7 +7,7 @@ import requiresAuthentication from '../../util/requiresAuthentication'
 import sshKeyActions from './actions'
 import AddSshKeyForm from './AddSshKeyForm'
 
-class AddSshKeyPage extends React.Component {
+class AddSshKeyPage extends PureComponent {
   handleAdd = async sshKey => {
     const { setContext, getContext, history } = this.props
     await sshKeyActions.create({ getContext, setContext, params: sshKey })

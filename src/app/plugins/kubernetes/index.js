@@ -26,7 +26,7 @@ import UpdatePrometheusAlertManagerPage
 import config from '../../../../config'
 import DashboardPage from 'k8s/components/DashboardPage'
 
-class Kubernetes extends React.Component {
+class Kubernetes extends React.PureComponent {
   render () {
     return (
       <h1>Kubernetes Plugin</h1>

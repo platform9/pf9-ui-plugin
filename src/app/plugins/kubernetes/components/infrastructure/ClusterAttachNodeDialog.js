@@ -7,7 +7,7 @@ import {
   Button, Dialog, DialogActions, DialogContent, DialogTitle, Table, TableBody, TableRow, TableCell,
   Typography,
 } from '@material-ui/core'
-import { loadNodes } from 'k8s/components/infrastructure/actions'
+import { loadNodes, cloudProviderActions } from 'k8s/components/infrastructure/actions'
 import withDataLoader from 'core/hocs/withDataLoader'
 import withDataMapper from 'core/hocs/withDataMapper'
 

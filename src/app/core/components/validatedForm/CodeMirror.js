@@ -21,7 +21,7 @@ const defaultOptions = {
   }
 }
 
-class CodeMirror extends React.Component {
+class CodeMirror extends React.PureComponent {
   handleChange = (editor, data, value) => {
     const { onChange } = this.props
 

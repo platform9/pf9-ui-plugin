@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import React from 'react'
+import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/styles'
 import clsx from 'clsx'
@@ -51,7 +51,7 @@ const styles = theme => ({
 })
 
 @withStyles(styles, { withTheme: true })
-class AppContainer extends React.Component {
+class AppContainer extends PureComponent {
   async componentDidMount () {
     // Note: urlOrigin may or may not be changed to use a specific path instead of
     // window.location.origin, this depends on whether the new UI is intended to be

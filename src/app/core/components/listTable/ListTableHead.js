@@ -38,7 +38,7 @@ const styles = theme => ({
   },
 })
 
-class ListTableHead extends React.Component {
+class ListTableHead extends React.PureComponent {
   createSortHandler = moize(id => event => {
     const { onRequestSort } = this.props
     if (onRequestSort) {

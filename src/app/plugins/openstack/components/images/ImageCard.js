@@ -34,7 +34,7 @@ const styles = theme => ({
   }
 })
 
-class ImageCard extends React.Component {
+class ImageCard extends React.PureComponent {
   render () {
     const { classes, image } = this.props
     return (

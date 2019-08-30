@@ -4,7 +4,7 @@ import { ensureFunction } from 'utils/fp'
 import PropTypes from 'prop-types'
 import { withAppContext } from 'core/AppProvider'
 
-class ParamsWrapper extends React.Component {
+class ParamsWrapper extends React.PureComponent {
   state = this.props.defaultParams
 
   setParams = params => this.setState(params)

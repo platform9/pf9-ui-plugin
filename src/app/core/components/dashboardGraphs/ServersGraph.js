@@ -10,7 +10,7 @@ const styles = theme => ({
 })
 
 @withStyles(styles)
-class ServersGraph extends React.Component {
+class ServersGraph extends React.PureComponent {
   state = {
     hover: false
   }

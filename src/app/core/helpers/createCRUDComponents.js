@@ -33,6 +33,7 @@ import { getContextUpdater } from 'core/helpers/createContextUpdater'
 
 const createCRUDComponents = options => {
   const {
+    // We can either provide the dataKey to autoresolve the loader, or the loaderFn/deleteFn functions directly
     dataKey,
     loaderFn = dataKey ? getContextLoader(dataKey) : null,
     deleteFn = dataKey ? getContextUpdater(dataKey, 'delete') : null,
@@ -87,7 +88,7 @@ const createCRUDComponents = options => {
     const addButton = useMemo(() =>
       <CreateButton onClick={() => history.push(addUrl)}>{addText}</CreateButton>,
     [history])
-  const refetch = useCallback(() => reload(true))
+    const refetch = useCallback(() => reload(true))
 
     let moreProps = {}
     if (rowActions && rowActions.length > 0) {

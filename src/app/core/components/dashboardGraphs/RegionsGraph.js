@@ -10,7 +10,7 @@ const styles = theme => ({
 })
 
 @withStyles(styles)
-class RegionsGraph extends React.Component {
+class RegionsGraph extends React.PureComponent {
   render () {
     const { classes } = this.props
 

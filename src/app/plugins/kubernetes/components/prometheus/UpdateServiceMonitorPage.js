@@ -6,7 +6,7 @@ import createUpdateComponents from 'core/helpers/createUpdateComponents'
 import { prometheusServiceMonitorsDataKey } from './actions'
 import { keyValueArrToObj, objToKeyValueArr } from 'utils/fp'
 
-class UpdateServiceMonitorForm extends React.Component {
+class UpdateServiceMonitorForm extends React.PureComponent {
   handleUpdate = data => {
     const newData = { ...data, labels: keyValueArrToObj(data.labels) }
     this.props.onComplete(newData)

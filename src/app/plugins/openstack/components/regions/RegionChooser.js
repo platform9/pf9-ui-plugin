@@ -1,11 +1,10 @@
-import React, { useState, useContext, useCallback, useMemo } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
 import ApiClient from 'api-client/ApiClient'
 import Selector from 'core/components/Selector'
 import { pluck, propEq, prop } from 'ramda'
 import { useScopedPreferences } from 'core/providers/PreferencesProvider'
 import { Tooltip } from '@material-ui/core'
 import useDataLoader from 'core/hooks/useDataLoader'
-import { AppContext } from 'core/AppProvider'
 import { regionActions } from 'k8s/components/infrastructure/actions'
 import { appUrlRoot } from 'app/constants'
 
@@ -18,7 +17,7 @@ const RegionChooser = props => {
   const [loading, setLoading] = useState(false)
   const [curRegion, setRegion] = useState(apiClient.activeRegion || prop('id', lastRegion))
   const [regionSearch, setSearchText] = useState('')
-  const { setContext } = useContext(AppContext)
+  // const { setContext } = useContext(AppContext)
 
   const [regions, loadingRegions] = useDataLoader(regionActions.list)
 

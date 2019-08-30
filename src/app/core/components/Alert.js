@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import clsx from 'clsx'
 import CheckCircleIcon from '@material-ui/icons/CheckCircle'
@@ -45,7 +45,7 @@ const styles = theme => ({
 })
 
 @withStyles(styles)
-class Alert extends React.Component {
+class Alert extends PureComponent {
   state = { open: true }
 
   onClose = () => { this.setState({ open: false }) }

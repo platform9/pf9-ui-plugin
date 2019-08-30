@@ -31,7 +31,7 @@ const styles = theme => ({
   },
 })
 
-class DeveloperToolsEmbed extends React.Component {
+class DeveloperToolsEmbed extends React.PureComponent {
   state = { expanded: true }
 
   expand = () => this.setState({ expanded: true })

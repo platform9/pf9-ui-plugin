@@ -6,7 +6,7 @@ import Picklist from 'core/components/Picklist'
 import { loadServiceCatalog } from 'openstack/components/api-access/actions'
 import { prop } from 'ramda'
 
-class ServicePicker extends React.Component {
+class ServicePicker extends React.PureComponent {
   state = {
     services: [],
     catalog: {},

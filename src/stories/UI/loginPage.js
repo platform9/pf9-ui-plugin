@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react'
+import React, { Fragment, PureComponent } from 'react'
 import { withStyles } from '@material-ui/styles'
 import {
   Button, Checkbox, FormControlLabel, Grid, Paper, TextField, Typography,
@@ -47,7 +47,7 @@ const styles = theme => ({
   }
 })
 
-class LoginPage extends React.Component {
+class LoginPage extends PureComponent {
   state = {
     MFAcheckbox: false
   }

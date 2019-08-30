@@ -10,7 +10,7 @@ import { withStyles } from '@material-ui/styles'
 @withStyles(theme => ({
   submit: { marginTop: theme.spacing(3) },
 }))
-class UpdatePrometheusRuleForm extends React.Component {
+class UpdatePrometheusRuleForm extends React.PureComponent {
   state = this.props.initialValues
 
   handleAddRule = rule => {

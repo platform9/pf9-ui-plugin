@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { PureComponent } from 'react'
 import { Card, CardContent, CircularProgress, Typography } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import { addComma } from '../../utils/formatters'
@@ -7,10 +7,10 @@ const styles = theme => ({
   card: {
     minWidth: 200,
     maxHeight: 300,
-    marginTop: theme.spacing(3)
+    marginTop: theme.spacing(3),
   },
   title: {
-    backgroundColor: theme.palette.grey[50]
+    backgroundColor: theme.palette.grey[50],
   },
   icon: {
     float: 'right',
@@ -22,23 +22,23 @@ const styles = theme => ({
     width: 120,
   },
   progress: {
-    position: 'absolute'
+    position: 'absolute',
   },
   percentage: {
     position: 'absolute',
     top: '50%',
-    left: '45%'
+    left: '45%',
   },
   description: {
     marginTop: theme.spacing(5),
-  }
+  },
 })
 
 @withStyles(styles)
-class ProgressCard extends React.Component {
+class ProgressCard extends PureComponent {
   render () {
     const { classes, card: { title, used, total, unit } } = this.props
-    const completed = Math.round(used/total * 100)
+    const completed = Math.round(used / total * 100)
     return (
       <div className={classes.card}>
         <Card>

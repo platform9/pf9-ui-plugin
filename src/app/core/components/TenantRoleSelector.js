@@ -1,13 +1,7 @@
 import React from 'react'
-import {
-  FormControl,
-  MenuItem,
-  Select,
-  TableCell,
-  TableRow,
-} from '@material-ui/core'
+import { FormControl, MenuItem, Select, TableCell, TableRow } from '@material-ui/core'
 
-class TenantRoleSelector extends React.Component {
+class TenantRoleSelector extends React.PureComponent {
   render () {
     const { tenant, roles, status, handleChange } = this.props
     return (

@@ -53,7 +53,7 @@ import AppCatalogPage from 'k8s/components/apps/AppCatalogPage'
 import SshKeysPage from './components/sshkeys/SshKeysListPage'
 import AddSshKeyPage from './components/sshkeys/AddSshKeyPage'
 
-class OpenStack extends React.Component {
+class OpenStack extends React.PureComponent {
   render () {
     return (
       <h1>OpenStack Plugin</h1>

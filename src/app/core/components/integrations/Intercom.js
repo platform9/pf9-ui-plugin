@@ -1,19 +1,20 @@
-import React from 'react'
-import { withAppContext } from 'core/AppProvider'
+import React, { useContext, useMemo } from 'react'
+import { AppContext } from 'core/AppProvider'
 import BaseIntercom from 'react-intercom'
 
-const Intercom = ({ context: { session } }) => {
-  const options = {
+const Intercom = () => {
+  const { session: { username } } = useContext(AppContext)
+  const options = useMemo(() => ({
     appID: 'vk6p8zue',
-    email: session.username,
+    email: username,
     created_at: 1312182000, // Keystone does not provide user create time so just put whatever
-    name: session.username,
+    name: username,
     domain: document.domain,
-    user_id: session.username,
+    user_id: username,
     pf9_role: 'TODO', // We don't have this information yet in the session.
     widget: { activator: '#IntercomDefaultWidget' },
-  }
+  }), [username])
   return <BaseIntercom {...options} />
 }
 
-export default withAppContext(Intercom)
+export default Intercom

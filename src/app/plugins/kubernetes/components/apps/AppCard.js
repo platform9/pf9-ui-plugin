@@ -4,7 +4,7 @@ import { withStyles } from '@material-ui/styles'
 import GetAppIcon from '@material-ui/icons/GetApp'
 import UnfoldMoreIcon from '@material-ui/icons/UnfoldMore'
 import { path, compose } from 'ramda'
-import React from 'react'
+import React, { PureComponent } from 'react'
 import { withRouter } from 'react-router'
 
 const styles = theme => ({
@@ -83,7 +83,7 @@ const styles = theme => ({
   }
 })
 
-class AppCard extends React.Component {
+class AppCard extends PureComponent {
   handleDeploy = () => {
     if (this.props.handleDeploy) {
       this.props.handleDeploy()

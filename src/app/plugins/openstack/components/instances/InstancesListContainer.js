@@ -17,7 +17,7 @@ export const InstancesList = createListTableComponent({
   columns,
 })
 
-class InstancesListContainer extends React.Component {
+class InstancesListContainer extends React.PureComponent {
   render () {
     const instances = this.props.instances || []
     return (

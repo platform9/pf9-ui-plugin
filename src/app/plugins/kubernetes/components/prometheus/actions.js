@@ -77,8 +77,8 @@ export const prometheusInstanceActions = createCRUDActions(prometheusInstancesDa
 
 export const serviceAccountsDataKey = 'serviceAccounts'
 export const serviceAccountActions = createCRUDActions(serviceAccountsDataKey, {
-  listFn: async data => {
-    return qbert.getServiceAccounts(data.clusterId, data.namespace)
+  listFn: async params => {
+    return qbert.getServiceAccounts(params.clusterId, params.namespace)
   },
   dataMapper: map(({ clusterUuid, metadata, spec }) => ({
     uid: metadata.uid,
@@ -86,7 +86,8 @@ export const serviceAccountActions = createCRUDActions(serviceAccountsDataKey, {
     namespace: metadata.namespace,
     labels: metadata.labels,
   })),
-  uniqueIdentifier,
+  indexBy: ['clusterId', 'namespace'],
+  uniqueIdentifier
 })
 
 /* Rules */

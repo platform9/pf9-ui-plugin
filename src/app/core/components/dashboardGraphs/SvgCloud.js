@@ -13,7 +13,7 @@ const styles = theme => ({
 })
 
 @withStyles(styles)
-class SvgCloud extends React.Component {
+class SvgCloud extends React.PureComponent {
   render () {
     const { classes } = this.props
 

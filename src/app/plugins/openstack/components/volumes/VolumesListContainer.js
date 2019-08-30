@@ -40,7 +40,7 @@ export const VolumesList = createListTableComponent({
   columns,
 })
 
-class VolumesListContainer extends React.Component {
+class VolumesListContainer extends React.PureComponent {
   handleRemove = async id => {
     const { getContext, setContext } = this.props
     // TODO: use createContextUpdater

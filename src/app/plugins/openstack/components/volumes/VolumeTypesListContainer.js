@@ -34,7 +34,7 @@ export const VolumeTypesList = createListTableComponent({
   columns,
 })
 
-class VolumeTypesListContainer extends React.Component {
+class VolumeTypesListContainer extends React.PureComponent {
   handleRemove = async id => {
     const { volumeTypes, setContext } = this.props
     const { cinder } = ApiClient.getInstance()

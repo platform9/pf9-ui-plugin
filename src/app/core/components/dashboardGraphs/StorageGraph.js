@@ -10,7 +10,7 @@ const styles = theme => ({
 })
 
 @withStyles(styles)
-class StorageGraph extends React.Component {
+class StorageGraph extends React.PureComponent {
   state = {
     hover: false
   }

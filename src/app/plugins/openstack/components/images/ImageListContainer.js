@@ -27,7 +27,7 @@ export const ImageList = createListTableComponent({
   columns,
 })
 
-class ImageListContainer extends React.Component {
+class ImageListContainer extends React.PureComponent {
   handleRemove = async id => {
     const { images, setContext } = this.props
     const { glance } = ApiClient.getInstance()

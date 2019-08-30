@@ -62,7 +62,7 @@ export const styles = {
   },
 }
 
-class ListTableFilters extends React.Component {
+class ListTableFilters extends React.PureComponent {
   renderWrappedFilter = filter => <FormGroup
     key={filter.columnId}
     className={this.props.classes.formGroup}>

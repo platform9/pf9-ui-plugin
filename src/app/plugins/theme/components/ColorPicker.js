@@ -34,7 +34,7 @@ const styles = theme => ({
   },
 })
 
-class ColorPicker extends React.Component {
+class ColorPicker extends React.PureComponent {
   state = { open: false }
   handleClick = () => this.setState({ open: !this.state.open })
   handleClose = () => this.setState({ open: false })

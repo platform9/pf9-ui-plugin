@@ -40,7 +40,7 @@ const styles = {
   },
 }
 
-class ListTableColumnPopover extends React.Component {
+class ListTableColumnPopover extends React.PureComponent {
   handleColChange = moize(columnId => e => {
     ensureFunction(this.props.onColumnToggle)(columnId)
   })

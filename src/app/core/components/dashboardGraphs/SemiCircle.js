@@ -45,7 +45,7 @@ const styles = theme => ({
 })
 
 @withStyles(styles, { withTheme: true })
-class SemiCircle extends React.Component {
+class SemiCircle extends React.PureComponent {
   render () {
     const { label, width, percentage, duration, classes } = this.props
     const arcSize = width / 2 - strokeWidth

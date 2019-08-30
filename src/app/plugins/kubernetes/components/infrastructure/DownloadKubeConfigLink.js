@@ -4,7 +4,7 @@ import ApiClient from 'api-client/ApiClient'
 import { withAppContext } from 'core/AppProvider'
 import SimpleLink from 'core/components/SimpleLink'
 
-class DownloadKubeConfigLink extends React.Component {
+class DownloadKubeConfigLink extends React.PureComponent {
   handleClick = async () => {
     const { cluster } = this.props
     const { qbert, keystone } = ApiClient.getInstance()

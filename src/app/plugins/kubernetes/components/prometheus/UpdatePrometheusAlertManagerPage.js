@@ -5,7 +5,7 @@ import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import createUpdateComponents from 'core/helpers/createUpdateComponents'
 import { prometheusAlertManagersDataKey } from './actions'
 
-class UpdatePrometheusAlertManagerForm extends React.Component {
+class UpdatePrometheusAlertManagerForm extends React.PureComponent {
   handleUpdate = data => {
     this.props.onComplete(data)
   }

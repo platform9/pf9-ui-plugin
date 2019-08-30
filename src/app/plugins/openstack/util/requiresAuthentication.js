@@ -8,7 +8,7 @@ const requiresAuthentication = WrappedComponent => {
     compose(
       withAppContext,
     )(
-      class AuthenticatedComponent extends React.Component {
+      class AuthenticatedComponent extends React.PureComponent {
         isAuthenticated = () => {
           const { session } = this.props.context
           return session && session.user

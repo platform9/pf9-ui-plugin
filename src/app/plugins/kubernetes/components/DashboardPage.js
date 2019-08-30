@@ -2,7 +2,7 @@ import React from 'react'
 import { compose } from 'app/utils/fp'
 import requiresAuthentication from '../../openstack/util/requiresAuthentication'
 
-class Dashboard extends React.Component {
+class Dashboard extends React.PureComponent {
   render () {
     return (
       <div className="dashboard-page">

@@ -23,7 +23,7 @@ const styles = theme => ({
 
 @withStyles(styles)
 @withRouter
-class UserMenu extends React.Component {
+class UserMenu extends React.PureComponent {
   state = { anchorEl: null }
   handleClick = event => this.setState({ anchorEl: event.currentTarget })
   handleClose = () => this.setState({ anchorEl: null })

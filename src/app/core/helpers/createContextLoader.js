@@ -80,15 +80,20 @@ const createContextLoader = (key, dataFetchFn, options = {}) => {
    */
   const contextLoaderFn = singlePromise(
     async ({ getContext, setContext, params = {}, refetch = false, additionalOptions = emptyObj }) => {
+      // Get the required values from the provided params
+      const providedRequiredParams = pipe(
+        pick(allRequiredParams),
+        reject(isNil)
+      )(params)
       // If not all the required params are provided, skip this request and just return an empty array
-      if (requiredParams && values(pick(allRequiredParams, params)).length < allRequiredParams.length) {
+      if (requiredParams && values(providedRequiredParams).length < allRequiredParams.length) {
         return emptyArr
       }
       const {
         onSuccess = (successMessage, params) => console.info(successMessage),
         onError = (errorMessage, catchedErr, params) => console.error(errorMessage, catchedErr),
       } = additionalOptions
-      const indexedParams = pickAll(allIndexKeys, params)
+      const providedIndexedParams = pickAll(allIndexKeys, providedRequiredParams)
       const loadFromContext = (key, params, refetch) => {
         const loaderFn = getContextLoader(key)
         return loaderFn({ getContext, setContext, params, refetch, additionalOptions })
@@ -97,13 +102,13 @@ const createContextLoader = (key, dataFetchFn, options = {}) => {
         if (!refetch && !contextLoaderFn._invalidatedCache) {
           const allCachedParams = getContext(view(paramsLens)) || emptyArr
           // If the provided params are already cached
-          if (find(whereEq(indexedParams), allCachedParams)) {
+          if (find(whereEq(providedIndexedParams), allCachedParams)) {
             // Return the cached data filtering by the provided params
             const cachedItems = getContext(pipe(
               view(dataLens),
               arrayIfNil,
               // Filter the data by the provided params
-              filter(whereEq(indexedParams)),
+              filter(whereEq(providedIndexedParams)),
               // Return the constant emptyArr to avoid unnecessary re-renderings
               arrayIfEmpty,
             ))
@@ -116,20 +121,20 @@ const createContextLoader = (key, dataFetchFn, options = {}) => {
         // Sometimes the server doesn't return the params used for the query
         // so we must add them to the items in order to be able to find them afterwards
         const itemsWithParams = arrayIfEmpty(
-          map(mergeLeft(indexedParams), fetchedItems),
+          map(mergeLeft(providedIndexedParams), fetchedItems),
         )
         // If cache has been invalidated, empty the cached data array
         const cleanExistingItems = contextLoaderFn._invalidatedCache ? always(emptyArr)
           // Otherwise, if we are refetching, we'll clean up the previous cached items that match the current params
-          : (refetch ? pipe(arrayIfNil, reject(whereEq(indexedParams))) : identity)
+          : (refetch ? pipe(arrayIfNil, reject(whereEq(providedIndexedParams))) : identity)
 
         // Insert new items replacing possible duplicates (by uniqueIdentifier)
         const addNewItems = pipe(arrayIfNil, concat(itemsWithParams), uniqBy(path(uniqueIdentifierPath)))
 
         // Update cachedParams so that we know this query has already been resolved
         const updateParams = pipe(arrayIfNil, contextLoaderFn._invalidatedCache
-          ? always(of(indexedParams)) // Reset the params array if cache has been invalidated
-          : append(indexedParams))
+          ? always(of(providedIndexedParams)) // Reset the params array if cache has been invalidated
+          : append(providedIndexedParams))
 
         // Perfom the context update operations
         await setContext(pipe(

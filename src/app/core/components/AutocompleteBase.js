@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import FormControl from '@material-ui/core/FormControl'
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown'
@@ -25,7 +25,7 @@ import clsx from 'clsx'
   absolute: { position: 'absolute', zIndex: '9999' },
   relative: { position: 'relative' },
 }))
-class AutocompleteBase extends React.Component {
+class AutocompleteBase extends PureComponent {
   state = {
     value: this.props.initialValue || '',
     open: this.props.initialValue && this.props.initialValue.length > 0,

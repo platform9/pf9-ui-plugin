@@ -29,7 +29,7 @@ const styles = theme => ({
 })
 
 @withStyles(styles)
-class DashboardCard extends React.Component {
+class DashboardCard extends React.PureComponent {
   render () {
     const { classes, children, title } = this.props
 

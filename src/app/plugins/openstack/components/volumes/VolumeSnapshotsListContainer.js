@@ -27,7 +27,7 @@ export const VolumeSnapshotsList = createListTableComponent({
   columns,
 })
 
-class VolumeSnapshotsListContainer extends React.Component {
+class VolumeSnapshotsListContainer extends React.PureComponent {
   handleRemove = async id => {
     const { getContext, setContext } = this.props
     // TODO: use createContextUpdater

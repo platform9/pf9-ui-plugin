@@ -6,7 +6,7 @@ import IconButton from '@material-ui/core/IconButton'
 import MoreVertIcon from '@material-ui/icons/MoreVert'
 import { withAppContext } from 'core/AppProvider'
 
-class MoreMenu extends React.Component {
+class MoreMenu extends React.PureComponent {
   state = {
     anchorEl: null,
     openedAction: null,

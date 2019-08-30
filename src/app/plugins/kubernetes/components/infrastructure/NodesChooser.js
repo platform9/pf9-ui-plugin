@@ -8,7 +8,7 @@ import withDataLoader from 'core/hocs/withDataLoader'
 import withDataMapper from 'core/hocs/withDataMapper'
 import { withAppContext } from 'core/AppProvider'
 
-class NodesChooser extends React.Component {
+class NodesChooser extends React.PureComponent {
   state = {
     selected: [],
   }

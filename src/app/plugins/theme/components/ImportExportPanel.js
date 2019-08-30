@@ -13,7 +13,7 @@ const styles = theme => ({
   }
 })
 
-class ImportExportPanel extends React.Component {
+class ImportExportPanel extends React.PureComponent {
   handleImport = themeStr => {
     const themeJson = JSON.parse(themeStr)
     const theme = createMuiTheme(themeJson)

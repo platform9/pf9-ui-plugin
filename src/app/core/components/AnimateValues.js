@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-class AnimateValues extends React.Component {
+class AnimateValues extends React.PureComponent {
   elapsed = () => {
     const { duration } = this.props
     const delta = Date.now() - this.state.startTime

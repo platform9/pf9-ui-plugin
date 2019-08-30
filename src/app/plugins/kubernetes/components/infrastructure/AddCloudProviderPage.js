@@ -71,7 +71,7 @@ const OpenstackHelpText = () => (
   </div>
 )
 
-export class AddCloudProviderForm extends React.Component {
+export class AddCloudProviderForm extends React.PureComponent {
   state = {
     type: types[0].value,
   }

@@ -19,7 +19,7 @@ const stopPropagation = e => {
   e.stopPropagation()
 }
 
-class ClusterDetachNodeDialog extends React.Component {
+class ClusterDetachNodeDialog extends React.PureComponent {
   state = {}
 
   handleClose = () => {

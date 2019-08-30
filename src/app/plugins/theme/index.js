@@ -2,7 +2,7 @@ import React from 'react'
 
 import ConfigureThemePage from './components/ConfigureThemePage'
 
-class Theme extends React.Component {
+class Theme extends React.PureComponent {
   render () {
     return (
       <h1>Themes Plugin</h1>
