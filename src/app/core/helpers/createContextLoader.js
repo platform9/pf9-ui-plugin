@@ -1,7 +1,7 @@
 import {
   path, pick, isEmpty, identity, assoc, find, whereEq, when, isNil, reject, filter, always, append,
-  of, pipe, over, lensPath, pickAll, view, has, equals, values, either, sortBy, prop, reverse,
-  mergeLeft, map,
+  of, pipe, over, lensPath, pickAll, view, has, equals, values, either, sortBy, reverse, mergeLeft,
+  map,
 } from 'ramda'
 import moize from 'moize'
 import { ensureFunction, ensureArray, emptyObj, emptyArr, upsertAllBy } from 'utils/fp'
@@ -27,7 +27,7 @@ const arrayIfEmpty = when(isEmpty, always(emptyArr))
  * @property {bool} [requiredParams=indexBy] Skip calls that doesn't contain all of the required params
  * @property {function} [preloader] Function that will be called at the beginning so that its result can be used in the dataMapper second argument
  * @property {function} [dataMapper] Function used to apply additional transformations to the data AFTER being retrieved from cache
- * @property {function} [sortWith] Function used to sort the data after being parsed with the dataMapper
+ * @property {function} [sortWith] Function used to sort the data after being parsed by the dataMapper
  * @property {function|string} [fetchSuccessMessage] Custom message to display after the items have been successfully fetched
  * @property {function|string} [fetchErrorMessage] Custom message to display after an error has been thrown
  */
@@ -48,9 +48,9 @@ const createContextLoader = (key, dataFetchFn, options = {}) => {
     indexBy,
     requiredParams = indexBy,
     dataMapper = identity,
-    sortWith = (items, { orderBy = uniqueIdentifier, orderDirection = 'asc' }) =>
+    sortWith = (items, { orderBy = uniqueIdentifierPath, orderDirection = 'asc' }) =>
       pipe(
-        sortBy(prop(orderBy)),
+        sortBy(path(orderBy)),
         orderDirection === 'asc' ? identity : reverse,
       )(items),
     fetchSuccessMessage = (params) => `Successfully fetched ${entityName} items`,
@@ -167,7 +167,6 @@ const createContextLoader = (key, dataFetchFn, options = {}) => {
         }
         const mappedData = await memoizedDataMapper(itemsWithParams, params, loadFromContext)
         return sortWith(mappedData, params)
-
       } catch (err) {
         if (onError) {
           const parsedErrorMesssage = ensureFunction(fetchErrorMessage)(err, params)

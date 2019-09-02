@@ -1,10 +1,13 @@
-import React, { useState, useCallback } from 'react'
+import React, { useCallback } from 'react'
 import CardTable from 'core/components/cardTable/CardTable'
 import AppCard from 'k8s/components/apps/AppCard'
 import moment from 'moment'
 import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { appActions } from 'k8s/components/apps/actions'
+import RepositoryPicklist from 'k8s/components/apps/RepositoryPicklist'
+import { createUsePrefParamsHook } from 'core/hooks/useParams'
+import { listTablePrefs } from 'app/constants'
 
 const sortingConfig = [
   {
@@ -19,13 +22,12 @@ const sortingConfig = [
   },
 ]
 const defaultParams = {
-  masterNodeClusters: true,
+  appCatalogClusters: true,
 }
+const usePrefParams = createUsePrefParamsHook('AppCatalog', listTablePrefs)
+
 const AppCatalogPage = () => {
-  const [params, setParams] = useState(defaultParams)
-  const handleClusterChange = useCallback(clusterId => {
-    setParams({ ...params, clusterId })
-  }, [])
+  const { params, getParamsUpdater } = usePrefParams(defaultParams)
   const [apps, loading, reload] = useDataLoader(appActions.list, params)
   const handleRefresh = useCallback(() => reload(true), [reload])
   const renderCardItems = useCallback(item =>
@@ -39,8 +41,17 @@ const AppCatalogPage = () => {
     searchTarget="attributes.name"
     filters={<>
       <ClusterPicklist
-        onChange={handleClusterChange}
+        showAll={false}
+        label="Cluster"
+        onlyAppCatalogEnabled
+        onChange={getParamsUpdater('clusterId')}
         value={params.clusterId} />
+      {params.clusterId && <RepositoryPicklist
+        label="Repository"
+        onChange={getParamsUpdater('repositoryId')}
+        clusterId={params.clusterId}
+        value={params.repositoryId}
+      />}
     </>}
   >
     {renderCardItems}

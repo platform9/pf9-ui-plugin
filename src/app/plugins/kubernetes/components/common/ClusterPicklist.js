@@ -8,17 +8,19 @@ import { clusterActions } from '../infrastructure/actions'
 import { allKey } from 'app/constants'
 
 const ClusterPicklist = forwardRef(({
-  loading, onChange, value, onlyPrometheusEnabled, onlyMasterNodeClusters,
+  loading, onChange, value,
+  onlyPrometheusEnabled, onlyMasterNodeClusters, onlyAppCatalogEnabled,
   showNone, ...rest,
 }, ref) => {
   const defaultParams = {
     masterNodeClusters: onlyMasterNodeClusters,
-    prometheusNodeClusters: onlyPrometheusEnabled,
+    appCatalogClusters: onlyAppCatalogEnabled,
+    prometheusClusters: onlyPrometheusEnabled,
   }
   const [clusters, clustersLoading] = useDataLoader(clusterActions.list, defaultParams)
   const options = useMemo(() =>
     projectAs({ label: 'name', value: 'uuid' })(clusters),
-  [clusters, onlyMasterNodeClusters, onlyPrometheusEnabled])
+  [clusters])
 
   // Select the first cluster as soon as clusters are loaded
   useEffect(() => {
@@ -45,6 +47,7 @@ ClusterPicklist.propTypes = {
   label: PropTypes.string,
   formField: PropTypes.bool,
   onlyMasterNodeClusters: PropTypes.bool,
+  onlyAppCatalogEnabled: PropTypes.bool,
   onlyPrometheusEnabled: PropTypes.bool,
 }
 
@@ -53,7 +56,8 @@ ClusterPicklist.defaultProps = {
   name: 'clusterId',
   label: 'Current Cluster',
   formField: false,
-  onlyMasterNodeClusters: true,
+  onlyMasterNodeClusters: false,
+  onlyAppCatalogEnabled: false,
   onlyPrometheusEnabled: false,
 }
 

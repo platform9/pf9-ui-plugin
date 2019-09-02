@@ -1,15 +1,21 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { repositoryActions } from 'k8s/components/apps/actions'
+import { allKey } from 'app/constants'
 
 export const options = {
   loaderFn: repositoryActions.list,
   deleteFn: repositoryActions.delete,
+  defaultParams: {
+    sortBy: 'name',
+    sortDirection: 'asc',
+    clusterId: allKey,
+  },
   editUrl: '/ui/kubernetes/infrastructure/repositories/edit',
   columns: [
-    { id: 'attributes.name', label: 'Name' },
-    { id: 'attributes.URL', label: 'URL' },
-    { id: 'attributes.source', label: 'Source' },
-    { id: 'clusters', label: 'Clusters' },
+    { id: 'name', label: 'Name' },
+    { id: 'url', label: 'URL' },
+    { id: 'source', label: 'Source' },
+    { id: 'clusters', label: 'Clusters' }, // TODO figure out what to do with this column
   ],
   name: 'Repositories',
   title: 'Repositories',

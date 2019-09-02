@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/styles'
 import GetAppIcon from '@material-ui/icons/GetApp'
 import UnfoldMoreIcon from '@material-ui/icons/UnfoldMore'
-import { path, compose } from 'ramda'
+import { compose } from 'ramda'
 import React, { PureComponent } from 'react'
 import { withRouter } from 'react-router'
 
@@ -101,21 +101,15 @@ class AppCard extends PureComponent {
       classes,
       application: {
         id,
+        appLogoUrl,
         attributes: { name, description },
-        relationships
       }
     } = this.props
-
-    const icon = path(
-      ['latestChartVersion', 'data', 'icons', 0, 'path'],
-      relationships
-    )
-
     return (
       <Grid item sm={6} md={4} lg={4}>
         <Card className={classes.card}>
           <div className={classes.header}>
-            <CardMedia className={classes.icon} image={icon} title="icon" />
+            <CardMedia className={classes.icon} image={appLogoUrl} title="icon" />
             <Button
               variant="contained"
               color="primary"

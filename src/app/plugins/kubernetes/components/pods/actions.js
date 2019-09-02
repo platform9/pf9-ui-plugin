@@ -73,12 +73,4 @@ export const podActions = createCRUDActions(podsDataKey, {
   },
   uniqueIdentifier: 'metadata.uid',
   indexBy: 'clusterId',
-  dataMapper: (clusters, { clusterId }) => clusters.map(cluster => ({
-    ...cluster,
-    clusterId,
-    name: cluster.metadata.name,
-    created: cluster.metadata.creationTimestamp,
-    id: cluster.metadata.uid,
-    namespace: cluster.metadata.namespace,
-  })),
 })

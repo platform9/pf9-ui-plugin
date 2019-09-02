@@ -1,6 +1,7 @@
 import { asyncMap, pathOrNull, pipeWhenTruthy, isTruthy } from 'app/utils/fp'
 import {
-  identity, filter, find, pathOr, pluck, prop, propEq, propSatisfies, compose, path, pipe,
+  identity, filter, find, pathOr, pluck, prop, propEq, propSatisfies, compose, path, pipe, sortBy,
+  reverse,
 } from 'ramda'
 import { allKey } from 'app/constants'
 import { castFuzzyBool } from 'utils/misc'
@@ -32,12 +33,13 @@ export const loadResMgrHosts = createContextLoader(resMgrHostsDataKey, async () 
 
 export const hasMasterNode = propSatisfies(isTruthy, 'hasMasterNode')
 export const hasPrometheusEnabled = compose(castFuzzyBool, path(['tags', 'pf9-system:monitoring']))
+export const hasAppCatalogEnabled = propSatisfies(isTruthy, 'appCatalogEnabled')
 
 // If params.clusterId is not assigned it fetches all clusters and extracts the clusterId from the first cluster
 // It also adds a "clusters" param that contains all the clusters, just for convenience
 export const parseClusterParams = async (params, loadFromContext) => {
   const clusters = await loadFromContext(clustersDataKey, params)
-  const { clusterId = pathOr(allKey, [0, 'uuid'], clusters) || allKey } = params
+  const { clusterId = pathOr(allKey, [0, 'uuid'], clusters) } = params
   return [clusterId, clusters]
 }
 
@@ -106,11 +108,18 @@ export const clusterActions = createCRUDActions(clustersDataKey, {
     // have references to the deleted cluster.
     loadCombinedHosts.invalidateCache()
   },
-  dataMapper: (items, { masterNodeClusters, prometheusClusters }) => pipe(
-    masterNodeClusters ? filter(hasMasterNode) : identity,
-    prometheusClusters ? filter(hasPrometheusEnabled) : identity
-  )(items),
   uniqueIdentifier: 'uuid',
+  dataMapper: (items,
+    { masterNodeClusters, appCatalogClusters, prometheusClusters }) => pipe(
+    masterNodeClusters ? filter(hasMasterNode) : identity,
+    prometheusClusters ? filter(hasPrometheusEnabled) : identity,
+    appCatalogClusters ? filter(hasAppCatalogEnabled) : identity,
+  )(items),
+  sortWith: (items, { orderBy = 'name', orderDirection = 'asc' }) =>
+    pipe(
+      sortBy(prop(orderBy)),
+      orderDirection === 'asc' ? identity : reverse,
+    )(items),
 })
 
 export const createCluster = async ({ data, context }) => {

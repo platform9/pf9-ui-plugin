@@ -1,8 +1,9 @@
 import { assoc, propOr } from 'ramda'
 import { keyValueArrToObj } from 'utils/fp'
+import { pathJoin } from 'utils/misc'
 
-const normalizePrometheusResponse = (clusterUuid, response) => propOr([], 'items', response).map(x => ({ ...x, clusterUuid }))
-const normalizePrometheusUpdate = (clusterUuid, response) => ({ ...response, clusterUuid })
+const normalizeClusterizedResponse = (clusterId, response) => propOr([], 'items', response).map(x => ({ ...x, clusterId }))
+const normalizeClusterizedUpdate = (clusterId, response) => ({ ...response, clusterId })
 
 /* eslint-disable camelcase */
 class Qbert {
@@ -32,7 +33,16 @@ class Qbert {
   baseUrl = async () => `${await this.endpoint()}`
 
   clusterBaseUrl = async clusterId => `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1`
-  clusterMonocularBaseUrl = async clusterId => `${await this.clusterBaseUrl(clusterId)}/namespaces/kube-system/services/monocular-api-svc:80/proxy/v1`
+  clusterMonocularBaseUrl = async (clusterId, version = 'v1') =>
+    pathJoin(
+      await this.clusterBaseUrl(clusterId),
+      'namespaces',
+      'kube-system',
+      'services',
+      'monocular-api-svc:80',
+      'proxy',
+      version || '/'
+    )
 
   /* Cloud Providers */
   getCloudProviders = async () => {
@@ -152,13 +162,13 @@ class Qbert {
     return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/version`)
   }
 
-  convertResource = clusterId => cluster => ({
-    ...cluster,
+  convertResource = clusterId => item => ({
+    ...item,
     clusterId,
-    name: cluster.metadata.name,
-    created: cluster.metadata.creationTimestamp,
-    id: cluster.metadata.uid,
-    namespace: cluster.metadata.namespace,
+    name: item.metadata.name,
+    created: item.metadata.creationTimestamp,
+    id: item.metadata.uid,
+    namespace: item.metadata.namespace,
   })
 
   getClusterNamespaces = async (clusterId) => {
@@ -325,7 +335,7 @@ class Qbert {
   /* Managed Apps */
   getPrometheusInstances = async (clusterUuid) => {
     const response = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/prometheuses`)
-    return normalizePrometheusResponse(clusterUuid, response)
+    return normalizeClusterizedResponse(clusterUuid, response)
   }
 
   updatePrometheusInstance = async data => {
@@ -337,7 +347,7 @@ class Qbert {
       { op: 'replace', path: '/spec/resources/requests/memory', value: data.memory },
     ]
     const response = await this.client.basicPatch(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${namespace}/prometheuses/${name}`, body)
-    return normalizePrometheusUpdate(clusterUuid, response)
+    return normalizeClusterizedUpdate(clusterUuid, response)
   }
 
   deletePrometheusInstance = async (clusterUuid, namespace, name) => {
@@ -433,7 +443,7 @@ class Qbert {
 
   getPrometheusServiceMonitors = async (clusterUuid) => {
     const response = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/servicemonitors`)
-    return normalizePrometheusResponse(clusterUuid, response)
+    return normalizeClusterizedResponse(clusterUuid, response)
   }
 
   updatePrometheusServiceMonitor = async data => {
@@ -444,7 +454,7 @@ class Qbert {
       value: data.labels,
     }]
     const response = await this.client.basicPatch(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${namespace}/servicemonitors/${name}`, body)
-    return normalizePrometheusUpdate(clusterUuid, response)
+    return normalizeClusterizedUpdate(clusterUuid, response)
   }
 
   deletePrometheusServiceMonitor = async (clusterUuid, namespace, name) => {
@@ -454,7 +464,7 @@ class Qbert {
 
   getPrometheusRules = async (clusterUuid) => {
     const response = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/prometheusrules`)
-    return normalizePrometheusResponse(clusterUuid, response)
+    return normalizeClusterizedResponse(clusterUuid, response)
   }
 
   updatePrometheusRules = async rulesObject => {
@@ -465,7 +475,7 @@ class Qbert {
       value: rulesObject.rules,
     }]
     const response = await this.client.basicPatch(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${namespace}/prometheusrules/${name}`, body)
-    return normalizePrometheusUpdate(clusterUuid, response)
+    return normalizeClusterizedUpdate(clusterUuid, response)
   }
 
   deletePrometheusRule = async (clusterUuid, namespace, name) => {
@@ -475,7 +485,7 @@ class Qbert {
 
   getPrometheusAlertManagers = async (clusterUuid) => {
     const response = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/alertmanagers`)
-    return normalizePrometheusResponse(clusterUuid, response)
+    return normalizeClusterizedResponse(clusterUuid, response)
   }
 
   updatePrometheusAlertManager = async data => {
@@ -484,7 +494,7 @@ class Qbert {
       { op: 'replace', path: '/spec/replicas', value: data.replicas },
     ]
     const response = await this.client.basicPatch(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${namespace}/alertmanagers/${name}`, body)
-    return normalizePrometheusUpdate(clusterUuid, response)
+    return normalizeClusterizedUpdate(clusterUuid, response)
   }
 
   deletePrometheusAlertManager = async (clusterUuid, namespace, name) => {

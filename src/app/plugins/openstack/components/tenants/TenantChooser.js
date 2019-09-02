@@ -1,10 +1,10 @@
-import React, { useEffect, useState, useContext, useCallback, useMemo } from 'react'
+import React, { useState, useContext, useCallback, useMemo } from 'react'
 import ApiClient from 'api-client/ApiClient'
 import { AppContext } from 'core/AppProvider'
 import { emptyArr } from 'app/utils/fp'
 import Selector from 'core/components/Selector'
 import { useScopedPreferences } from 'core/providers/PreferencesProvider'
-import { propEq, pipe, assoc } from 'ramda'
+import { propEq, pipe, assoc, propOr } from 'ramda'
 import { Tooltip } from '@material-ui/core'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { dataContextKey, paramsContextKey } from 'core/helpers/createContextLoader'
@@ -12,22 +12,13 @@ import { loadUserTenants } from 'openstack/components/tenants/actions'
 
 const TenantChooser = props => {
   const { keystone } = ApiClient.getInstance()
-  const [preferences, updatePreferences] = useScopedPreferences('Tenants')
+  const { updatePrefs } = useScopedPreferences('Tenants')
   const [tenantSearch, setTenantSearch] = useState('')
   const [loading, setLoading] = useState(false)
-  const [currentTenantName, setCurrentTenantName] = useState('')
+  const { setContext, currentTenant } = useContext(AppContext)
+  const [currentTenantName, setCurrentTenantName] = useState(propOr('', 'name', currentTenant))
   const [tooltipOpen, setTooltipOpen] = useState(false)
   const [tenants, loadingTenants] = useDataLoader(loadUserTenants)
-
-  useEffect(() => {
-    // TODO this should probably be done in SessionManager
-    const { lastTenant } = preferences
-    if (tenants && lastTenant) {
-      updateCurrentTenant(lastTenant.name)
-    }
-  }, [tenants])
-
-  const { setContext } = useContext(AppContext)
 
   const updateCurrentTenant = async tenantName => {
     setLoading(true)
@@ -37,7 +28,6 @@ const TenantChooser = props => {
     if (!tenant) { return }
 
     await keystone.changeProjectScope(tenant.id)
-
     // Clear any data that should change when the user changes tenant.
     // The data will then be reloaded when it is needed.
     await setContext(pipe(
@@ -53,7 +43,7 @@ const TenantChooser = props => {
 
   const handleChoose = useCallback(async lastTenant => {
     const fullTenantObj = tenants.find(propEq('name', lastTenant))
-    updatePreferences({ lastTenant: fullTenantObj })
+    updatePrefs({ lastTenant: fullTenantObj })
     await updateCurrentTenant(lastTenant)
   }, [tenants])
 
@@ -79,7 +69,7 @@ const TenantChooser = props => {
         onMouseLeave={handleTooltipClose}
         onClick={handleTooltipClose}
         className={props.className}
-        name={currentTenantName || 'service'}
+        name={currentTenantName}
         list={tenantNames}
         onChoose={handleChoose}
         onSearchChange={setTenantSearch}

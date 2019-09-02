@@ -12,8 +12,8 @@ const apiClient = ApiClient.getInstance()
 
 const RegionChooser = props => {
   const [tooltipOpen, setTooltipOpen] = useState(false)
-  const [preferences, updatePreferences] = useScopedPreferences('RegionChooser')
-  const { lastRegion } = preferences
+  const { prefs, updatePrefs } = useScopedPreferences('RegionChooser')
+  const { lastRegion } = prefs
   const [loading, setLoading] = useState(false)
   const [curRegion, setRegion] = useState(apiClient.activeRegion || prop('id', lastRegion))
   const [regionSearch, setSearchText] = useState('')
@@ -27,7 +27,7 @@ const RegionChooser = props => {
     // Future Todo: Update the Selector component or create a variant of the component
     // that can take a list of objects
     const fullRegionObj = regions.find(propEq('id', region))
-    await updatePreferences({ lastRegion: fullRegionObj })
+    await updatePrefs({ lastRegion: fullRegionObj })
 
     // Initial loading of the app is tightly coupled to knowing the region to use.
     // Reloading the app when the region changes is the simplest and most robust solution.

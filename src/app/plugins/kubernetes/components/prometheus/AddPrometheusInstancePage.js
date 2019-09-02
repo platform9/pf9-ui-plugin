@@ -10,11 +10,12 @@ import Wizard from 'core/components/wizard/Wizard'
 import WizardStep from 'core/components/wizard/WizardStep'
 import createAddComponents from 'core/helpers/createAddComponents'
 import uuid from 'uuid'
-import { removeWith, emptyArr, emptyObj } from 'utils/fp'
+import { removeWith, emptyArr } from 'utils/fp'
 import { prometheusInstancesDataKey } from './actions'
 import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
 import NamespacePicklist from 'k8s/components/common/NamespacePicklist'
 import ServiceAccountPicklist from 'k8s/components/prometheus/ServiceAccountPicklist'
+import useParams from 'core/hooks/useParams'
 
 const initialContext = {
   replicas: 1,
@@ -25,28 +26,25 @@ const initialContext = {
   port: 'prometheus',
   appLabels: [],
 }
+const defaultParams = {
+  prometheusClusters: true,
+}
 
 const AddPrometheusInstanceForm = ({ onComplete }) => {
   const enableStorage = false // We are just using ephemeral storage for the first version
+  const { params, getParamsUpdater } = useParams(defaultParams)
   const [rules, setRules] = useState(emptyArr)
-  const [params, setParams] = useState(emptyObj)
-
-  const handleClusterChange = useCallback(clusterId =>
-    setParams({ ...params, clusterId }), [params])
-  const handleNamespaceChange = useCallback(namespace =>
-    setParams({ ...params, namespace }), [params])
-  const handleServiceChange = useCallback(serviceId =>
-    setParams({ ...params, serviceId }), [params])
-  const handleAddRule = useCallback(rule => {
-    const withId = { id: uuid.v4(), ...rule }
-    setRules([...rules, withId])
-  }, [rules])
-  const handleDeleteRule = useCallback(id =>
-    setRules(removeWith(rule => rule.id === id, rules)),
-  [rules])
-  const handleSubmit = useCallback(data =>
-    onComplete({ ...data, rules }),
-  [rules])
+  const handleAddRule = useCallback(
+    rule => {
+      const withId = { id: uuid.v4(), ...rule }
+      setRules([...rules, withId])
+    }, [rules])
+  const handleDeleteRule = useCallback(
+    id => setRules(removeWith(rule => rule.id === id, rules)),
+    [rules])
+  const handleSubmit = useCallback(
+    data => onComplete({ ...data, rules }),
+    [rules])
 
   return (
     <Wizard onComplete={handleSubmit} context={initialContext}>
@@ -65,7 +63,7 @@ const AddPrometheusInstanceForm = ({ onComplete }) => {
                   DropdownComponent={ClusterPicklist}
                   id="cluster"
                   label="Cluster"
-                  onChange={handleClusterChange}
+                  onChange={getParamsUpdater('clusterId')}
                   value={params.clusterId}
                   showAll={false}
                   onlyPrometheusEnabled
@@ -78,7 +76,7 @@ const AddPrometheusInstanceForm = ({ onComplete }) => {
                   label="Namespace"
                   disabled={!params.clusterId}
                   clusterId={params.clusterId}
-                  onChange={handleNamespaceChange}
+                  onChange={getParamsUpdater('namespace')}
                   value={params.namespace}
                   required
                   info="Which namespace to use"
@@ -90,7 +88,7 @@ const AddPrometheusInstanceForm = ({ onComplete }) => {
                   disabled={!params.clusterId || !params.namespace}
                   clusterId={params.clusterId}
                   namespace={params.namespace}
-                  onChange={handleServiceChange}
+                  onChange={getParamsUpdater('serviceId')}
                   value={params.serviceId}
                   info="Prometheus will use this to query metrics endpoints"
                 />

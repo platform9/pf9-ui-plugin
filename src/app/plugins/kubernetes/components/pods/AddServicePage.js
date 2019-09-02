@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React from 'react'
 import { codeMirrorOptions } from 'app/constants'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import PicklistField from 'core/components/validatedForm/PicklistField'
@@ -7,22 +7,20 @@ import createAddComponents from 'core/helpers/createAddComponents'
 import CodeMirror from 'core/components/validatedForm/CodeMirror'
 import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
 import NamespacePicklist from 'k8s/components/common/NamespacePicklist'
+import useParams from 'core/hooks/useParams'
 
 const defaultParams = {
   masterNodeClusters: true,
 }
 export const AddServiceForm = ({ onComplete }) => {
-  const [params, setParams] = useState(defaultParams)
-  const handleClusterChange = useCallback(clusterId => {
-    setParams({ ...params, clusterId })
-  }, [])
+  const { params, getParamsUpdater } = useParams(defaultParams)
   return (
     <ValidatedForm onSubmit={onComplete}>
       <PicklistField
         DropdownComponent={ClusterPicklist}
         id="clusterId"
         label="Cluster"
-        onChange={handleClusterChange}
+        onChange={getParamsUpdater('clusterId')}
         value={params.clusterId}
         showAll={false}
         required
@@ -30,10 +28,11 @@ export const AddServiceForm = ({ onComplete }) => {
       <PicklistField
         DropdownComponent={NamespacePicklist}
         disabled={!params.clusterId}
+        onChange={getParamsUpdater('namespace')}
         id="namespace"
         label="Namespace"
         clusterId={params.clusterId}
-        value={params.namespaceId}
+        value={params.namespace}
         required
       />
       <CodeMirror

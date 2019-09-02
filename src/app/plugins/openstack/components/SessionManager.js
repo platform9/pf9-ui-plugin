@@ -1,21 +1,20 @@
 import React, { useEffect, useContext } from 'react'
 import ApiClient from 'api-client/ApiClient'
 import { withRouter } from 'react-router'
-import { compose } from 'app/utils/fp'
 import { dashboardUrl, loginUrl } from 'app/constants'
 import { AppContext } from 'core/AppProvider'
-import { withPreferences, usePreferences } from 'core/providers/PreferencesProvider'
+import { usePreferences } from 'core/providers/PreferencesProvider'
 import { getStorage, setStorage } from 'core/utils/pf9Storage'
 import LoginPage from 'openstack/components/LoginPage'
 import { loadUserTenants } from 'openstack/components/tenants/actions'
-import { path, pathOr, propEq } from 'ramda'
+import { head, path, pathOr, propEq } from 'ramda'
 
 /**
  * Sets up the Openstack session.
  * Renders children when logged in.
  * Otherwise shows the <LoginPage>
  */
-const SessionManager = props => {
+const SessionManager = withRouter(props => {
   const { keystone, setActiveRegion } = ApiClient.getInstance()
   const [ , initUserPreferences ] = usePreferences()
   const { getContext, setContext, currentRegion } = useContext(AppContext)
@@ -34,14 +33,14 @@ const SessionManager = props => {
     let unscopedToken = tokens && tokens.unscopedToken
 
     if (!username || !unscopedToken) {
-      setContext({ initialized: true })
+      await setContext({ initialized: true })
       history.push(loginUrl)
     } else {
       // We need to make sure the token has not expired.
       unscopedToken = await keystone.renewToken(unscopedToken)
 
       if (!unscopedToken) {
-        setContext({ initialized: true })
+        await setContext({ initialized: true })
         history.push(loginUrl)
       } else {
         await initialSetup({ username, unscopedToken })
@@ -63,7 +62,7 @@ const SessionManager = props => {
     const lastRegion = path(['RegionChooser', 'lastRegion', 'id'], userPreferences)
 
     const tenants = await loadUserTenants({ getContext, setContext })
-    const activeTenant = tenants.find(propEq('name', lastTenant))
+    const activeTenant = tenants.find(propEq('name', lastTenant)) || head(tenants)
 
     if (lastRegion) { setActiveRegion(lastRegion) }
     const { scopedToken, user } = await keystone.changeProjectScope(activeTenant.id)
@@ -71,7 +70,7 @@ const SessionManager = props => {
     setStorage('user', user)
     setStorage('tokens', { unscopedToken, currentToken: scopedToken })
 
-    setContext({
+    await setContext({
       initialized: true,
       sessionLoaded: true,
       currentTenant: activeTenant,
@@ -92,9 +91,6 @@ const SessionManager = props => {
 
   // Do not let the rest of the UI load until we have a working session.
   return sessionLoaded ? props.children : <div>Initializing session...</div>
-}
+})
 
-export default compose(
-  withPreferences,
-  withRouter,
-)(SessionManager)
+export default SessionManager
