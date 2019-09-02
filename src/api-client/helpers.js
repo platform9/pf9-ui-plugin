@@ -1,5 +1,6 @@
 import config from '../../config'
 import ApiClient from './ApiClient'
+import { emptyArr } from 'utils/fp'
 
 const defaultTestTenant = 'Development Team Tenant'
 
@@ -36,7 +37,7 @@ export const makeRegionedClient = async (tenantName = defaultTestTenant) => {
   const client = await makeScopedClient(tenantName)
   const regions = await client.keystone.getRegions()
   // currently set KVM-Neutron as default test environment
-  client.setActiveRegion(regions.find(x => x.id ==='KVM-Neutron').id || regions[0].id)
+  client.setActiveRegion(regions.find(x => x.id === 'KVM-Neutron').id || regions[0].id)
   await client.keystone.getServicesForActiveRegion()
   return client
 }
@@ -63,4 +64,10 @@ export const getHighestRole = (roleNames) => {
   } else {
     return roleNames[0]
   }
+}
+
+export const normalizeResponse = response => {
+  const data = (response && response.hasOwnProperty('data') ? response.data : response)
+  // Fix nested data.data issue
+  return (data && data.hasOwnProperty('data') ? data.data : data) || emptyArr
 }

@@ -47,14 +47,14 @@ export const pluckVisibleColumnIds = columns =>
 class ListTable extends PureComponent {
   constructor (props) {
     super(props)
-    const { columns, visibleColumns, columnsOrder, rowsPerPage } = props
+    const { columns, visibleColumns, columnsOrder, rowsPerPage, orderBy, orderDirection } = props
     this.state = {
       columns,
       visibleColumns: visibleColumns || pluckVisibleColumnIds(columns),
       columnsOrder: columnsOrder || pluck('id', columns),
       rowsPerPage: rowsPerPage,
-      orderBy: columns[0].id,
-      order: 'asc',
+      orderBy: orderBy || columns[0].id,
+      order: orderDirection || 'asc',
       page: 0,
       selected: [],
       searchTerm: '',
@@ -63,14 +63,16 @@ class ListTable extends PureComponent {
   }
 
   handleRequestSort = (event, property) => {
+    const { onSortChange } = this.props
     const orderBy = property
     let order = 'desc'
 
     if (this.state.orderBy === property && this.state.order === 'desc') {
       order = 'asc'
     }
-
-    this.setState({ order, orderBy })
+    this.setState({ order, orderBy }, () => {
+      ensureFunction(onSortChange)(orderBy, order)
+    })
   }
 
   sortData = data => {
@@ -181,15 +183,16 @@ class ListTable extends PureComponent {
 
   handleColumnToggle = columnId => {
     if (this.props.canEditColumns) {
-      this.setState(({ visibleColumns }) => ({
-        visibleColumns: visibleColumns.includes(columnId)
-          ? except(columnId, visibleColumns)
-          : [...visibleColumns, columnId],
-      }), () =>
-        ensureFunction(this.props.onColumnsChange)({
-          visibleColumns: this.state.visibleColumns,
-          columnsOrder: this.state.columnsOrder,
+      this.setState(
+        ({ visibleColumns }) => ({
+          visibleColumns: visibleColumns.includes(columnId)
+            ? except(columnId, visibleColumns)
+            : [...visibleColumns, columnId],
         }),
+        () => ensureFunction(this.props.onColumnsChange)(
+          this.state.visibleColumns,
+          this.state.columnsOrder,
+        ),
       )
     }
   }
@@ -198,16 +201,17 @@ class ListTable extends PureComponent {
     const { columnsOrder } = this.state
     const srcColumnIdx = columnsOrder.indexOf(srcColumnId)
     const tarColumnIdx = columnsOrder.indexOf(destColumnId)
-    this.setState(({ columnsOrder }) => ({
-      columnsOrder: pipe(
-        update(srcColumnIdx, destColumnId),
-        update(tarColumnIdx, srcColumnId),
-      )(columnsOrder),
-    }), () =>
-      ensureFunction(this.props.onColumnsChange)({
-        visibleColumns: this.state.visibleColumns,
-        columnsOrder: this.state.columnsOrder,
+    this.setState(
+      ({ columnsOrder }) => ({
+        columnsOrder: pipe(
+          update(srcColumnIdx, destColumnId),
+          update(tarColumnIdx, srcColumnId),
+        )(columnsOrder),
       }),
+      () => ensureFunction(this.props.onColumnsChange)(
+        this.state.visibleColumns,
+        this.state.columnsOrder,
+      ),
     )
   }
 
@@ -272,10 +276,10 @@ class ListTable extends PureComponent {
   }
 
   getFilteredRows = () => {
-    const { searchTarget, data, filters } = this.props
+    const { searchTarget, data, filters, onSortChange } = this.props
     const { searchTerm } = this.state
 
-    const sortedData = this.sortData(data)
+    const sortedData = onSortChange ? data : this.sortData(data)
     const searchData = searchTerm === ''
       ? sortedData
       : this.filterBySearch(sortedData, searchTarget)
@@ -490,6 +494,7 @@ ListTable.propTypes = {
   onRefresh: PropTypes.func,
   paginate: PropTypes.bool,
   orderBy: PropTypes.string,
+  orderDirection: PropTypes.oneOf(['asc', 'desc']),
 
   visibleColumns: PropTypes.arrayOf(PropTypes.string),
   rowsPerPage: PropTypes.number,

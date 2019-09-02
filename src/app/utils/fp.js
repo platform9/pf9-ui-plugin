@@ -1,6 +1,6 @@
 import {
   T, cond, equals, always, adjust, update, findIndex, assocPath, curry, fromPairs, mapObjIndexed,
-  pathOr, remove, flatten,
+  pathOr, remove, flatten, values, groupBy,
 } from 'ramda'
 import moize from 'moize'
 
@@ -20,6 +20,18 @@ export const noop = () => {}
 
 // Works for arrays and strings.  All other types return false.
 export const notEmpty = arr => !!(arr && arr.length)
+
+export const mapKeys = curry((cb, obj) => {
+  Object.keys(obj).reduce(
+    (accum, destKey) => {
+      const srcValue = obj[destKey]
+      const resultKey = cb(destKey)
+      accum[resultKey] = srcValue
+      return accum
+    },
+    {},
+  )
+})
 
 export const hasKeys = obj => {
   if (!(obj instanceof Object)) { return false }
@@ -231,24 +243,33 @@ export const condLiteral = (...conds) => value => {
 //   arr
 // )
 export const updateInArray = curry((predicateFn, updateFn, arr) =>
-  arr.map(item => predicateFn(item) ? updateFn(item) : item)
+  arr.map(item => predicateFn(item) ? updateFn(item) : item),
 )
 
 // Like `updateInArray` but stops after finding the element to update
 // Also like ramda `adjust` but using a predicateFn
 export const adjustWith = curry((predicateFn, updateFn, arr) =>
-  adjust(findIndex(predicateFn, arr), updateFn, arr)
+  adjust(findIndex(predicateFn, arr), updateFn, arr),
 )
 
 // Like ramda `update` but using a predicateFn
 export const updateWith = curry((predicateFn, newValue, arr) =>
-  update(findIndex(predicateFn, arr), newValue, arr)
+  update(findIndex(predicateFn, arr), newValue, arr),
 )
 
 // Remove an item from an array using a predicateFn
 export const removeWith = curry((predicateFn, arr) =>
-  remove(findIndex(predicateFn, arr), 1, arr)
+  remove(findIndex(predicateFn, arr), 1, arr),
 )
+
+// Insert or update items in bulk
+export const upsertAllBy = curry((predicateFn, newItems, targetArr) => {
+  const groupedValues = values(groupBy(predicateFn, [...targetArr, ...newItems]))
+  return groupedValues.map(
+    ([oldVal, newVal]) => newVal
+      ? { ...oldVal, ...newVal }
+      : oldVal)
+})
 
 // applyJsonPatch :: oldObject -> patch -> newObject
 export const applyJsonPatch = curry((patch, obj) => {
@@ -283,5 +304,5 @@ export const applyJsonPatch = curry((patch, obj) => {
 export const switchCase = (defaultValue, ...cases) => input =>
   cond([
     ...cases.map(([caseCond, caseVal]) => [equals(caseCond), always(caseVal)]),
-    [T, always(defaultValue)]
+    [T, always(defaultValue)],
   ])(input)

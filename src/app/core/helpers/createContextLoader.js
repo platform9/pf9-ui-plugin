@@ -1,9 +1,10 @@
 import {
-  path, pick, isEmpty, concat, identity, assoc, find, whereEq, when, isNil, reject, filter, always,
-  append, uniqBy, of, pipe, over, lensPath, pickAll, view, has, equals, mergeLeft, map, values,
+  path, pick, isEmpty, identity, assoc, find, whereEq, when, isNil, reject, filter, always, append,
+  of, pipe, over, lensPath, pickAll, view, has, equals, values, either, sortBy, prop, reverse,
+  mergeLeft, map,
 } from 'ramda'
 import moize from 'moize'
-import { ensureFunction, ensureArray, emptyObj, emptyArr } from 'utils/fp'
+import { ensureFunction, ensureArray, emptyObj, emptyArr, upsertAllBy } from 'utils/fp'
 import { singlePromise, uncamelizeString } from 'utils/misc'
 import { defaultUniqueIdentifier, allKey } from 'app/constants'
 
@@ -26,6 +27,7 @@ const arrayIfEmpty = when(isEmpty, always(emptyArr))
  * @property {bool} [requiredParams=indexBy] Skip calls that doesn't contain all of the required params
  * @property {function} [preloader] Function that will be called at the beginning so that its result can be used in the dataMapper second argument
  * @property {function} [dataMapper] Function used to apply additional transformations to the data AFTER being retrieved from cache
+ * @property {function} [sortWith] Function used to sort the data after being parsed with the dataMapper
  * @property {function|string} [fetchSuccessMessage] Custom message to display after the items have been successfully fetched
  * @property {function|string} [fetchErrorMessage] Custom message to display after an error has been thrown
  */
@@ -46,6 +48,11 @@ const createContextLoader = (key, dataFetchFn, options = {}) => {
     indexBy,
     requiredParams = indexBy,
     dataMapper = identity,
+    sortWith = (items, { orderBy = uniqueIdentifier, orderDirection = 'asc' }) =>
+      pipe(
+        sortBy(prop(orderBy)),
+        orderDirection === 'asc' ? identity : reverse,
+      )(items),
     fetchSuccessMessage = (params) => `Successfully fetched ${entityName} items`,
     fetchErrorMessage = (catchedErr, params) => `Error when trying to fetch ${entityName} items`,
   } = options
@@ -79,7 +86,7 @@ const createContextLoader = (key, dataFetchFn, options = {}) => {
    * @returns {Promise<array>} Fetched or cached items
    */
   const contextLoaderFn = singlePromise(
-    async ({ getContext, setContext, params = {}, refetch = false, additionalOptions = emptyObj }) => {
+    async ({ getContext, setContext, params = emptyObj, refetch = false, additionalOptions = emptyObj }) => {
       // Get the required values from the provided params
       const providedRequiredParams = pipe(
         pick(allRequiredParams),
@@ -95,8 +102,8 @@ const createContextLoader = (key, dataFetchFn, options = {}) => {
       } = additionalOptions
       const providedIndexedParams = pipe(
         pickAll(allIndexKeys),
-        reject(equals(allKey)),
-      )(providedRequiredParams)
+        reject(either(isNil, equals(allKey))),
+      )(params)
       const loadFromContext = (key, params, refetch) => {
         const loaderFn = getContextLoader(key)
         return loaderFn({ getContext, setContext, params, refetch, additionalOptions })
@@ -105,7 +112,7 @@ const createContextLoader = (key, dataFetchFn, options = {}) => {
         if (!refetch && !contextLoaderFn._invalidatedCache) {
           const allCachedParams = getContext(view(paramsLens)) || emptyArr
           // If the provided params are already cached
-          if (find(whereEq(providedIndexedParams), allCachedParams)) {
+          if (find(equals(providedIndexedParams), allCachedParams)) {
             // Return the cached data filtering by the provided params
             const cachedItems = getContext(pipe(
               view(dataLens),
@@ -115,41 +122,52 @@ const createContextLoader = (key, dataFetchFn, options = {}) => {
               // Return the constant emptyArr to avoid unnecessary re-renderings
               arrayIfEmpty,
             ))
-            return memoizedDataMapper(cachedItems, params, loadFromContext)
+            const mappedData = await memoizedDataMapper(cachedItems, params, loadFromContext)
+            return sortWith(mappedData, params)
           }
         }
         // if refetch = true or no cached params have been found, fetch the items
         const fetchedItems = await dataFetchFn(params, loadFromContext)
 
-        // Sometimes the server doesn't return the params used for the query
-        // so we must add them to the items in order to be able to find them afterwards
+        // We can't rely on the server to index the data, as sometimes it simply doesn't return the
+        // params used for the query, so we will add them to the items in order to be able to find them afterwards
         const itemsWithParams = arrayIfEmpty(
           map(mergeLeft(providedIndexedParams), fetchedItems),
         )
-        // If cache has been invalidated, empty the cached data array
-        const cleanExistingItems = contextLoaderFn._invalidatedCache ? always(emptyArr)
-          // Otherwise, if we are refetching, we'll clean up the previous cached items that match the current params
-          : (refetch ? pipe(arrayIfNil, reject(whereEq(providedIndexedParams))) : identity)
 
-        // Insert new items replacing possible duplicates (by uniqueIdentifier)
-        const addNewItems = pipe(arrayIfNil, concat(itemsWithParams), uniqBy(path(uniqueIdentifierPath)))
+        // Insert or update the existing items (using `uniqueIdentifier` to prevent duplicates)
+        const upsertNewItems = pipe(arrayIfNil, upsertAllBy(item => {
+          const id = path(uniqueIdentifierPath, item)
+          if (!id) {
+            console.error(`ID path ${uniqueIdentifier} has not been found for entity ${key}, please make sure it is correctly defined`)
+          }
+          return id
+        }, itemsWithParams))
+
+        // If cache has been invalidated or we are refetching, empty the cached data array
+        const cleanPrevItems = contextLoaderFn._invalidatedCache || refetch
+          ? always(emptyArr)
+          : identity
 
         // Update cachedParams so that we know this query has already been resolved
-        const updateParams = pipe(arrayIfNil, contextLoaderFn._invalidatedCache
+        const updateParams = pipe(arrayIfNil, contextLoaderFn._invalidatedCache || refetch
           ? always(of(providedIndexedParams)) // Reset the params array if cache has been invalidated
           : append(providedIndexedParams))
 
         // Perfom the context update operations
         await setContext(pipe(
-          over(dataLens, pipe(cleanExistingItems, addNewItems)),
+          over(dataLens, pipe(cleanPrevItems, upsertNewItems)),
           over(paramsLens, updateParams),
         ))
         contextLoaderFn._invalidatedCache = false
+
         if (onSuccess) {
           const parsedSuccessMesssage = ensureFunction(fetchSuccessMessage)(params)
           await onSuccess(parsedSuccessMesssage, params)
         }
-        return memoizedDataMapper(itemsWithParams, params, loadFromContext)
+        const mappedData = await memoizedDataMapper(itemsWithParams, params, loadFromContext)
+        return sortWith(mappedData, params)
+
       } catch (err) {
         if (onError) {
           const parsedErrorMesssage = ensureFunction(fetchErrorMessage)(err, params)

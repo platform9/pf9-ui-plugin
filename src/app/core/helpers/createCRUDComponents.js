@@ -7,10 +7,12 @@ import requiresAuthentication from 'openstack/util/requiresAuthentication'
 import useDataLoader from 'core/hooks/useDataLoader'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import { withRouter } from 'react-router-dom'
-import { withScopedPreferences } from 'core/providers/PreferencesProvider'
 import { emptyArr } from 'utils/fp'
 import { getContextLoader } from 'core/helpers/createContextLoader'
 import { getContextUpdater } from 'core/helpers/createContextUpdater'
+import { createUsePrefParamsHook } from 'core/hooks/useParams'
+import { pick } from 'ramda'
+import { listTablePrefs } from 'app/constants'
 
 /**
  * This helper removes a lot of boilerplate from standard CRUD operations.
@@ -37,6 +39,7 @@ const createCRUDComponents = options => {
     dataKey,
     loaderFn = dataKey ? getContextLoader(dataKey) : null,
     deleteFn = dataKey ? getContextUpdater(dataKey, 'delete') : null,
+    defaultParams = {},
     columns = [],
     rowActions = () => [],
     uniqueIdentifier = 'id',
@@ -48,10 +51,10 @@ const createCRUDComponents = options => {
   } = options
 
   // List
-  const List = withScopedPreferences(name)(({
+  const List = ({
     onAdd, onDelete, onEdit, rowActions, data, onRefresh, loading,
-    preferences: { visibleColumns, columnsOrder, rowsPerPage },
-    updatePreferences,
+    visibleColumns, columnsOrder, rowsPerPage, orderBy, orderDirection,
+    getParamsUpdater,
   }) => {
     // Disabling the "No data found" message for now because there create action is
     // tied to the ListTable and if there are no entities there won't be any way
@@ -75,19 +78,22 @@ const createCRUDComponents = options => {
         visibleColumns={visibleColumns}
         columnsOrder={columnsOrder}
         rowsPerPage={rowsPerPage}
-        onRowsPerPageChange={rowsPerPage => updatePreferences({ rowsPerPage })}
-        onColumnsChange={updatePreferences}
+        orderBy={orderBy}
+        orderDirection={orderDirection}
+        onSortChange={getParamsUpdater('orderBy', 'orderDirection')}
+        onRowsPerPageChange={getParamsUpdater('rowsPerPage')}
+        onColumnsChange={getParamsUpdater('visibleColumns', 'columnsOrder')}
       />
     )
-  })
+  }
   List.displayName = `${name}List`
 
   // ListContainer
-  const ContainerBase = ({ params, setParams, history, data, loading, reload }) => {
+  const ListContainer = withRouter(({ history, data, loading, reload, ...restProps }) => {
     const [handleRemove, deleting] = deleteFn ? useDataUpdater(deleteFn, reload) : emptyArr
-    const addButton = useMemo(() =>
-      <CreateButton onClick={() => history.push(addUrl)}>{addText}</CreateButton>,
-    [history])
+    const addButton = useMemo(
+      () => <CreateButton onClick={() => history.push(addUrl)}>{addText}</CreateButton>,
+      [history])
     const refetch = useCallback(() => reload(true))
 
     let moreProps = {}
@@ -98,30 +104,40 @@ const createCRUDComponents = options => {
     return (
       <CRUDListContainer
         items={data}
-        params={params}
-        setParams={setParams}
         editUrl={editUrl}
         onRemove={handleRemove}
         uniqueIdentifier={uniqueIdentifier}
       >
         {handlers => <>
           {addUrl && <TopExtraContent>{addButton}</TopExtraContent>}
-          <List loading={loading || deleting} data={data} onRefresh={refetch} {...handlers} {...moreProps} />
+          <List
+            loading={loading || deleting}
+            data={data}
+            onRefresh={refetch}
+            {...handlers}
+            {...restProps}
+            {...moreProps} />
         </>}
       </CRUDListContainer>
     )
-  }
-
-  const ListContainer = withRouter(ContainerBase)
+  })
 
   ListContainer.displayName = `${name}ListContainer`
 
   const createStandardListPage = () => {
+    const usePrefParams = createUsePrefParamsHook(name, listTablePrefs)
     // ListPage
     return () => {
-      const [data, loading, reload] = useDataLoader(loaderFn)
+      const { params, getParamsUpdater } = usePrefParams(defaultParams)
+      const [data, loading, reload] = useDataLoader(loaderFn, params)
       return <>
-        <ListContainer data={data} loading={loading} reload={reload} />
+        <ListContainer
+          getParamsUpdater={getParamsUpdater}
+          data={data}
+          loading={loading}
+          reload={reload}
+          {...pick(listTablePrefs, params)}
+        />
         {debug && <pre>{JSON.stringify(data, null, 4)}</pre>}
       </>
     }

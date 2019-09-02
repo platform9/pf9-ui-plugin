@@ -162,14 +162,8 @@ class Qbert {
   })
 
   getClusterNamespaces = async (clusterId) => {
-    try {
-      const data = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces`)
-
-      return data.items.map(this.convertResource(clusterId))
-    } catch (err) {
-      console.log(`Error getting cluster namespaces for clusterId: ${clusterId}`)
-      return []
-    }
+    const data = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces`)
+    return data.items.map(this.convertResource(clusterId))
   }
 
   createNamespace = async (clusterId, body) => {
@@ -282,13 +276,13 @@ class Qbert {
   getReleases = async (clusterId) => {
     const output = await this.client.basicGet(`${await this.clusterMonocularBaseUrl(clusterId)}/releases`)
     // FIXME: remove this when api is fixed (right now it is returning data.data)
-    return output && output.hasOwnProperty('data') ? output.data : output || []
+    return (output && output.hasOwnProperty('data') ? output.data : output) || []
   }
 
   getRelease = async (clusterId, name) => {
     const output = await this.client.basicGet(`${await this.clusterMonocularBaseUrl(clusterId)}/releases/${name}`)
     // FIXME: remove this when api is fixed (right now it is returning data.data)
-    return output && output.hasOwnProperty('data') ? output.data : output || []
+    return (output && output.hasOwnProperty('data') ? output.data : output) || []
   }
 
   deleteRelease = async (clusterId, name) => {

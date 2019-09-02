@@ -1,9 +1,16 @@
 import { useMemo, useEffect, useState, useCallback, useContext, useRef } from 'react'
+import moize from 'moize'
 import { emptyArr } from 'utils/fp'
 import { isEmpty } from 'ramda'
 import { ToastContext } from 'core/providers/ToastProvider'
 import { AppContext } from 'core/AppProvider'
 import { memoizedDep } from 'utils/misc'
+
+const onErrorHandler = moize((loaderFn, showToast) => (errorMessage, catchedErr, params) => {
+  const key = loaderFn.getKey()
+  console.error(`Error when fetching items for entity "${key}"`, catchedErr)
+  showToast(errorMessage, 'error')
+})
 
 /**
  * Hook to load data using the specified loader function
@@ -33,12 +40,11 @@ const useDataLoader = (loaderFn, params, invalidateCache = false) => {
   // Set a custom error handler for all loading functions using this hook
   // We do this here because we have access to the ToastContext, unlike in the dataLoader functions
   const additionalOptions = useMemo(() => ({
-    onError: (errorMessage, catchedErr, params) => {
-      const key = loaderFn.getKey()
-      console.error(`Error when fetching items for entity "${key}"`, catchedErr)
-      showToast(errorMessage, 'error')
-    },
-  }), [showToast])
+    // Even if using useMemo, every instance of useDataLoader will create a new function, thus
+    // forcing the recalling of the loading function as the memoization of the promise will not work,
+    //  so we are forced to create a memoized error handler outside of the hook
+    onError: onErrorHandler(loaderFn, showToast),
+  }), [])
 
   // The following function will handle the calls to the data loading and
   // set the loading state variable to true in the meantime, while also taking care

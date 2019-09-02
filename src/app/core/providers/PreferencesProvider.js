@@ -1,8 +1,9 @@
 import React, { useContext, useCallback, PureComponent, useMemo } from 'react'
 import moize from 'moize'
-import { curry, pathOr, propOr } from 'ramda'
+import { equals, curry, pathOr, propOr, zipObj } from 'ramda'
 import { withAppContext, AppContext } from 'core/AppProvider'
 import { getStorage, setStorage } from '../utils/pf9Storage'
+import { emptyObj } from 'utils/fp'
 
 const userPreferencesKey = username => `user-preferences-${username}`
 const setUserPrefs = (username, prefs) => setStorage(userPreferencesKey(username), prefs)
@@ -56,8 +57,8 @@ class PreferencesComponent extends PureComponent {
       return pathOr(
         getStorageUserPrefs(session.username)[key],
         ['userPreferences', key],
-        session) || {}
-    }),
+        session) || emptyObj
+    }, { equals }),
   }
 
   render () {
@@ -78,16 +79,30 @@ export const usePreferences = () => {
     initUserPreferences,
   ]
 }
-export const useScopedPreferences = storeKey => {
+
+/**
+ *
+ * @param storeKey
+ * @param defaultPrefs
+ * @returns {{getPrefsUpdater: *, updatePrefs: *, prefs: *}}
+ */
+export const useScopedPreferences = (storeKey, defaultPrefs = emptyObj) => {
   const { updateScopedUserPreferences, getScopedUserPreferences } = useContext(PreferencesContext)
   const updatePreferences = useCallback(async values => {
     return updateScopedUserPreferences(storeKey, values)
   }, [storeKey])
+  const getPrefsUpdater = useMemo(() => {
+    return moize((...keys) =>
+      (...values) =>
+        updatePreferences(zipObj(keys, values)),
+    )
+  }, [updatePreferences])
 
-  return [
-    getScopedUserPreferences(storeKey),
-    updatePreferences,
-  ]
+  return {
+    prefs: { ...defaultPrefs, ...getScopedUserPreferences(storeKey) },
+    updatePrefs: updatePreferences,
+    getPrefsUpdater,
+  }
 }
 
 export const withPreferences = Component => props =>

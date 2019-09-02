@@ -7,6 +7,7 @@ export const logoutUrl = `${appUrlRoot}/openstack/logout`
 export const dashboardUrl = `${appUrlRoot}/kubernetes/`
 export const allKey = '__all__'
 export const noneKey = '__none__'
+export const listTablePrefs = ['visibleColumns', 'columnsOrder', 'rowsPerPage', 'orderBy', 'orderDirection']
 
 // Errors
 export const notFoundErr = 'ERR_NOT_FOUND'
@@ -31,5 +32,5 @@ export const codeMirrorOptions = Object.freeze({
  * @type {object}
  */
 export const defaultAxiosConfig = Object.freeze({
-  timeout: 30000
+  timeout: 120000
 })

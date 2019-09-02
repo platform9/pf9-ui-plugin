@@ -15,6 +15,7 @@ const styles = theme => ({
     marginBottom: theme.spacing(1),
     '& .MuiOutlinedInput-root': {
       marginBottom: theme.spacing(1),
+      marginRight: theme.spacing(2),
     },
   },
   spacer: {

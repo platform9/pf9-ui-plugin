@@ -10,6 +10,7 @@ import Neutron from './Neutron'
 import Nova from './Nova'
 import Qbert from './Qbert'
 import ResMgr from './ResMgr'
+import { normalizeResponse } from 'api-client/helpers'
 
 class ApiClient {
   static init (options = {}) {
@@ -83,29 +84,29 @@ class ApiClient {
 
   basicGet = async url => {
     const response = await this.axiosInstance.get(url, this.getAuthHeaders())
-    return response.data
+    return normalizeResponse(response)
   }
 
   basicPost = async (url, body) => {
     const response = await this.axiosInstance.post(url, body, this.getAuthHeaders())
-    return response.data
+    return normalizeResponse(response)
   }
 
   basicPatch = async (url, body) => {
     const config = this.getAuthHeaders()
     config.headers['Content-Type'] = 'application/json-patch+json'
     const response = await this.axiosInstance.patch(url, body, config)
-    return response.data
+    return normalizeResponse(response)
   }
 
   basicPut = async (url, body) => {
     const response = await this.axiosInstance.put(url, body, this.getAuthHeaders())
-    return response.data
+    return normalizeResponse(response)
   }
 
   basicDelete = async url => {
     const response = await this.axiosInstance.delete(url, this.getAuthHeaders())
-    return response.data
+    return normalizeResponse(response)
   }
 }
 
