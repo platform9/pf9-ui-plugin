@@ -1,7 +1,6 @@
 import { asyncMap, pathOrNull, pipeWhenTruthy, isTruthy } from 'app/utils/fp'
 import {
-  identity, filter, find, pathOr, pluck, prop, propEq, propSatisfies, compose, path, pipe, sortBy,
-  reverse,
+  identity, find, pathOr, pluck, prop, propEq, propSatisfies, compose, path, pipe, sortBy, reverse,
 } from 'ramda'
 import { allKey } from 'app/constants'
 import { castFuzzyBool } from 'utils/misc'
@@ -10,6 +9,7 @@ import { serviceCatalogContextKey } from 'openstack/components/api-access/action
 import createContextLoader from 'core/helpers/createContextLoader'
 import ApiClient from 'api-client/ApiClient'
 import createCRUDActions from 'core/helpers/createCRUDActions'
+import { filterIf } from 'utils/fp'
 
 export const clustersDataKey = 'clusters'
 export const cloudProvidersDataKey = 'cloudProviders'
@@ -111,9 +111,9 @@ export const clusterActions = createCRUDActions(clustersDataKey, {
   uniqueIdentifier: 'uuid',
   dataMapper: (items,
     { masterNodeClusters, appCatalogClusters, prometheusClusters }) => pipe(
-    masterNodeClusters ? filter(hasMasterNode) : identity,
-    prometheusClusters ? filter(hasPrometheusEnabled) : identity,
-    appCatalogClusters ? filter(hasAppCatalogEnabled) : identity,
+    filterIf(masterNodeClusters, hasMasterNode),
+    filterIf(prometheusClusters, hasPrometheusEnabled),
+    filterIf(appCatalogClusters, hasAppCatalogEnabled),
   )(items),
   sortWith: (items, { orderBy = 'name', orderDirection = 'asc' }) =>
     pipe(

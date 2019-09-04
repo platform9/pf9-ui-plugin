@@ -5,35 +5,19 @@ import { isEmpty, pick, zipObj } from 'ramda'
 import { useScopedPreferences } from 'core/providers/PreferencesProvider'
 
 /**
- * Function that will update the params object with a new set of provided key/values,
- * keeping the previous existing values (equivalent to Object.assign)
- * @typedef {function} updateParamsFn
- * @type {function}
- * @param {object} New params
- */
-
-/**
- * Returns a function that can be used to update one or more param keys,
- * keeping the previous existing values (see example)
- * @typedef {function} getParamsUpdaterFn
- * @type {function}
- * @param {...string} Keys that will have to be providen to the updater function
- * @example
- *
- * getParamsUpdater('orderBy', 'orderDirection')
- *
- * // This will get us a function equivalent to:
- * function (orderBy, orderDirection) {
- *   updateParams({ orderBy, orderDirection })
- * }
- */
-
-/**
  * Utility hook to handle a params object
  * Meant to be used along with useDataLoader/useDataUpdater hooks
  * @typedef {object} useParams
  * @param defaultParams
  * @returns {{ params: object, updateParams: updateParamsFn, getParamsUpdater: getParamsUpdaterFn}}
+ * @example
+ *
+ *   const { params, updateParams, getParamsUpdater } = useParams(defaultParams)
+ *   const [data, loading, reload] = useDataLoader(dataKey, params)
+ *
+ *   return <Picklist onChange={getParamsUpdater('clusterId')}
+ *   Equivalent to:
+ *   return <Picklist onChange={clusterId => updateParams({ clusterId })}
  */
 const useParams = (defaultParams = emptyObj) => {
   const [params, setParams] = useState(defaultParams)
@@ -80,3 +64,27 @@ export const createUsePrefParamsHook = (storeKey, userPrefKeys) => {
 }
 
 export default useParams
+
+/**
+ * Function that will update the params object with a new set of provided key/values,
+ * keeping the previous existing values (equivalent to Object.assign)
+ * @typedef {function} updateParamsFn
+ * @type {function}
+ * @param {object} New params
+ */
+
+/**
+ * Returns a function that can be used to update one or more param keys,
+ * keeping the previous existing values (see example)
+ * @typedef {function} getParamsUpdaterFn
+ * @type {function}
+ * @param {...string} Keys that will have to be providen to the updater function
+ * @example
+ *
+ * getParamsUpdater('orderBy', 'orderDirection')
+ *
+ * // This will get us a function equivalent to:
+ * function (orderBy, orderDirection) {
+ *   updateParams({ orderBy, orderDirection })
+ * }
+ */

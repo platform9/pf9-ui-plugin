@@ -6,6 +6,8 @@ import { compose, pluck } from 'ramda'
 import { columns } from './NodesListPage'
 import useDataLoader from 'core/hooks/useDataLoader'
 import createListTableComponent from 'core/helpers/createListTableComponent'
+import { clusterActions, loadNodes } from 'k8s/components/infrastructure/actions'
+import { emptyArr } from 'utils/fp'
 
 const ListTable = createListTableComponent({
   title: 'Cluster Nodes',
@@ -16,12 +18,15 @@ const ListTable = createListTableComponent({
 })
 
 const ClusterNodes = ({ match }) => {
-  const [clusters, loadingClusters] = useDataLoader('clusters')
-  const [nodes, loadingNodes] = useDataLoader('nodes')
+  const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
+  const [nodes, loadingNodes] = useDataLoader(loadNodes)
   const clusterNodes = useMemo(() => {
     const cluster = clusters.find(cluster => cluster.uuid === match.params.id)
-    const clusterNodesUids = pluck('uuid', cluster.nodes)
-    return nodes.filter(node => clusterNodesUids.includes(node.uuid))
+    if (cluster) {
+      const clusterNodesUids = pluck('uuid', cluster.nodes)
+      return nodes.filter(node => clusterNodesUids.includes(node.uuid))
+    }
+    return emptyArr
   }, [clusters, nodes, match])
 
   return <ListTable data={clusterNodes} loading={loadingClusters || loadingNodes} />

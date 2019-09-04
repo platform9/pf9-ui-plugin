@@ -23,7 +23,7 @@ const selectProps = { displayEmpty: true }
 
 const Picklist = React.forwardRef((props, ref) => {
   const {
-    showAll, showNone, label, name, value, options, onChange, loading, formField, ...restProps
+    notAsync, showAll, showNone, label, name, value, options, onChange, loading, formField, ...restProps
   } = props
   const classes = useStyles(props)
   const inputProps = useMemo(() => ({ name: label, id: name }), [label, name])
@@ -49,7 +49,7 @@ const Picklist = React.forwardRef((props, ref) => {
   // Hack to work around Material UI's Select ignoring empty string as a value
   const nonEmptyValue = value === '' ? noneKey : value
 
-  return <Progress inline overlay loading={loading}>
+  return <Progress inline overlay loading={loading} renderContentOnMount={notAsync}>
     <TextField
       {...restProps}
       ref={ref}
@@ -77,6 +77,7 @@ const optionPropType = PropTypes.oneOfType([
 ])
 
 Picklist.propTypes = {
+  notAsync: PropTypes.bool,
   name: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
   options: PropTypes.arrayOf(optionPropType).isRequired,
@@ -90,10 +91,10 @@ Picklist.propTypes = {
 }
 
 Picklist.defaultProps = {
+  notAsync: false,
   showAll: true,
   showNone: false,
   formField: false,
-  loading: false,
   variant: 'outlined',
 }
 

@@ -1,28 +1,10 @@
 import { propEq, T } from 'ramda'
 import {
-  applyJsonPatch,
-  asyncProps,
-  compose,
-  condLiteral,
-  filterFields,
-  identity,
-  mergeKey,
-  notEmpty,
-  pick,
-  pickMultiple,
-  pipe,
-  pipeWhenTruthy,
-  projectAs,
-  pluck,
-  pluckAsync,
-  updateInArray,
+  applyJsonPatch, asyncProps, compose, condLiteral, filterFields, mergeKey, notEmpty, pick,
+  pickMultiple, pipe, pipeWhenTruthy, projectAs, pluck, pluckAsync, updateInArray,
 } from 'utils/fp'
 
 describe('functional programming utils', () => {
-  it('identity', () => {
-    expect(identity(123)).toEqual(123)
-  })
-
   it('pluck', () => {
     const obj = { foo: 'bar', another: 123 }
     const fn = pluck('foo')

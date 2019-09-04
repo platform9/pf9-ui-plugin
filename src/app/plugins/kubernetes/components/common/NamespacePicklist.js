@@ -8,14 +8,14 @@ import { allKey } from 'app/constants'
 import namespaceActions from 'k8s/components/namespaces/actions'
 
 const NamespacePicklist = forwardRef(
-  ({ clusterId, loading, onChange, value, showNone, ...rest }, ref) => {
+  ({ clusterId, loading, onChange, selectFirst, value, showAll, showNone, ...rest }, ref) => {
     const [namespaces, namespacesLoading] = useDataLoader(namespaceActions.list, { clusterId })
     const options = useMemo(() => projectAs(
       { label: 'name', value: 'name' }, namespaces,
     ), [namespaces])
-    // Select the first namespace as soon as namespaces are loaded
+    // Select the first item as soon as data is loaded
     useEffect(() => {
-      if (!isEmpty(options)) {
+      if (!isEmpty(options) && selectFirst) {
         onChange(propOr(allKey, 'value', head(options)))
       }
     }, [options])
@@ -26,7 +26,7 @@ const NamespacePicklist = forwardRef(
       showNone={showNone}
       onChange={onChange}
       disabled={isEmpty(options) && !showNone}
-      value={value || propOr(allKey, 'value', head(options))}
+      value={value || (showAll ? allKey : '')}
       loading={loading || namespacesLoading}
       options={options}
     />
@@ -36,13 +36,17 @@ NamespacePicklist.propTypes = {
   ...omit(['options'], Picklist.propTypes),
   name: PropTypes.string,
   label: PropTypes.string,
-  clusterId: PropTypes.number,
+  clusterId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  selectFirst: PropTypes.bool,
 }
 
 NamespacePicklist.defaultProps = {
   ...Picklist.defaultProps,
   name: 'namespaceId',
-  label: 'Current Namespace',
+  label: 'Namespace',
+  formField: false,
+  selectFirst: false,
+  showAll: true,
 }
 
 export default NamespacePicklist

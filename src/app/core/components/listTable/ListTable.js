@@ -16,6 +16,7 @@ import {
 import ListTableHead from './ListTableHead'
 import ListTableToolbar from './ListTableToolbar'
 import Progress from 'core/components/progress/Progress'
+import { filterSpecPropType } from 'core/components/cardTable/CardTableToolbar'
 
 const styles = theme => ({
   root: {
@@ -54,7 +55,7 @@ class ListTable extends PureComponent {
       columnsOrder: columnsOrder || pluck('id', columns),
       rowsPerPage: rowsPerPage,
       orderBy: orderBy || columns[0].id,
-      order: orderDirection || 'asc',
+      orderDirection: orderDirection || 'asc',
       page: 0,
       selected: [],
       searchTerm: '',
@@ -65,13 +66,13 @@ class ListTable extends PureComponent {
   handleRequestSort = (event, property) => {
     const { onSortChange } = this.props
     const orderBy = property
-    let order = 'desc'
+    let orderDirection = 'desc'
 
-    if (this.state.orderBy === property && this.state.order === 'desc') {
-      order = 'asc'
+    if (this.state.orderBy === property && this.state.orderDirection === 'desc') {
+      orderDirection = 'asc'
     }
-    this.setState({ order, orderBy }, () => {
-      ensureFunction(onSortChange)(orderBy, order)
+    this.setState({ orderDirection, orderBy }, () => {
+      ensureFunction(onSortChange)(orderBy, orderDirection)
     })
   }
 
@@ -85,7 +86,7 @@ class ListTable extends PureComponent {
     )
     const sortedRows = [...data].sort((a, b) => sortWith(b[orderBy], a[orderBy]))
 
-    return this.state.order === 'desc' ? sortedRows : sortedRows.reverse()
+    return this.state.orderDirection === 'desc' ? sortedRows : sortedRows.reverse()
   }
 
   areAllSelected = data => {
@@ -383,13 +384,12 @@ class ListTable extends PureComponent {
       showCheckboxes,
       canDragColumns,
       filters,
-      inlineFilters,
       onRefresh,
       loading,
     } = this.props
 
     const {
-      order,
+      orderDirection,
       orderBy,
       searchTerm,
       selected,
@@ -415,7 +415,7 @@ class ListTable extends PureComponent {
           columns={this.getSortedVisibleColumns()}
           onColumnsSwitch={this.handleColumnsSwitch}
           numSelected={selected.length}
-          order={order}
+          order={orderDirection}
           orderBy={orderBy}
           onSelectAllClick={this.handleSelectAllClick}
           onRequestSort={this.handleRequestSort}
@@ -445,7 +445,6 @@ class ListTable extends PureComponent {
                 visibleColumns={visibleColumns}
                 onColumnToggle={this.handleColumnToggle}
                 filters={filters}
-                inlineFilters={inlineFilters}
                 filterValues={filterValues}
                 onFilterUpdate={this.handleFilterUpdate}
                 onFiltersReset={this.handleFiltersReset}
@@ -495,6 +494,7 @@ ListTable.propTypes = {
   paginate: PropTypes.bool,
   orderBy: PropTypes.string,
   orderDirection: PropTypes.oneOf(['asc', 'desc']),
+  onSortChange: PropTypes.func,
 
   visibleColumns: PropTypes.arrayOf(PropTypes.string),
   rowsPerPage: PropTypes.number,
@@ -503,20 +503,7 @@ ListTable.propTypes = {
   /**
    * List of filters
    */
-  filters: PropTypes.arrayOf(PropTypes.shape({
-    columnId: PropTypes.string.isRequired,
-    label: PropTypes.string, // Will override column label
-    type: PropTypes.oneOf(['select', 'multiselect', 'checkbox', 'custom']).isRequired,
-    render: PropTypes.func, // Use for rendering a custom component, received props: {value, onChange}
-    filterWith: PropTypes.func, // Custom filtering function, received params: (filterValue, value, row)
-    items: PropTypes.array, // Array of possible values (only when using select/multiselect)
-  })),
-
-  /**
-   * False by default, if this prop is true, then the filters will be rendered "in-line" before the search bar
-   * otherwise we will display a button to show a popover with the filters
-   */
-  inlineFilters: PropTypes.bool,
+  filters: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(filterSpecPropType)]),
 
   /*
    Some objects have a unique identifier other than 'id'

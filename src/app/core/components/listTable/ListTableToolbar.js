@@ -2,23 +2,22 @@ import React, { useMemo } from 'react'
 import PropTypes from 'prop-types'
 import AddIcon from '@material-ui/icons/Add'
 import ListTableColumnButton from 'core/components/listTable/ListTableColumnSelector'
-import ListTableFilters from 'core/components/listTable/ListTableFilters'
 import ListTableRowActions from './ListTableRowActions'
 import PerPageControl from './PerPageControl'
 import SearchBar from 'core/components/SearchBar'
 import clsx from 'clsx'
-import { compose } from 'ramda'
 import { Button, Toolbar, Tooltip } from '@material-ui/core'
-import { withStyles } from '@material-ui/styles'
-import ListTableFiltersButton from 'core/components/listTable/ListTableFiltersButton'
+import { makeStyles } from '@material-ui/styles'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
+import Picklist from 'core/components/Picklist'
 
-const toolbarStyles = theme => ({
+const useStyles = makeStyles(theme => ({
   root: {
     paddingRight: theme.spacing(1),
     color: theme.palette.grey[600],
     '& .MuiOutlinedInput-root': {
       marginBottom: theme.spacing(1),
+      marginRight: theme.spacing(2),
     },
   },
   highlight: {},
@@ -57,15 +56,40 @@ const toolbarStyles = theme => ({
   actionIcon: {
     fontSize: '1.7em',
   },
-})
+}))
+
+const FilterDropdown = ({
+  field,
+  type,
+  label,
+  onChange,
+  value,
+  items,
+}) => {
+  switch (type) {
+    case 'select':
+      return (
+        <Picklist
+          name={field}
+          label={label}
+          options={items}
+          value={value || ''}
+          onChange={onChange}
+        />
+      )
+    default:
+      return <div />
+  }
+}
 
 const ListTableToolbar = ({
-  classes, columns, filterValues, filters, inlineFilters,
+  columns, filterValues, filters,
   onAdd, onColumnToggle, onDelete, onEdit, onFilterUpdate,
   onFiltersReset, onSearchChange, onRefresh,
   rowActions, searchTerm, selected, visibleColumns,
   rowsPerPage, onChangeRowsPerPage, rowsPerPageOptions,
 }) => {
+  const classes = useStyles()
   const numSelected = (selected || []).length
   const refreshButton = useMemo(() =>
     onRefresh && <Tooltip title="Refresh list">
@@ -105,17 +129,22 @@ const ListTableToolbar = ({
       <div className={classes.spacer} />
       <div className={classes.actions}>
         <Toolbar className={classes.toolbar}>
+          {Array.isArray(filters)
+            ? filters.map(({ field, value, ...filterProps }) => (
+              <FilterDropdown
+                key={field}
+                {...filterProps}
+                classes={classes}
+                onChange={onFilterUpdate(field)}
+                field={field}
+                value={value !== undefined ? value : filterValues[field]}
+              />
+            ))
+            : filters}
+
           {onSearchChange && (
             <SearchBar className={classes.search} onSearchChange={onSearchChange} searchTerm={searchTerm} />
           )}
-          {filters && inlineFilters && <ListTableFilters
-            inline
-            columns={columns}
-            filters={filters}
-            filterValues={filterValues}
-            onFilterUpdate={onFilterUpdate}
-            onFiltersReset={onFiltersReset}
-          />}
           {columns && onColumnToggle && (
             <ListTableColumnButton
               columns={columns}
@@ -123,14 +152,6 @@ const ListTableToolbar = ({
               onColumnToggle={onColumnToggle}
             />
           )}
-          {refreshButton}
-          {filters && !inlineFilters && <ListTableFiltersButton
-            columns={columns}
-            filters={filters}
-            filterValues={filterValues}
-            onFilterUpdate={onFilterUpdate}
-            onFiltersReset={onFiltersReset}
-          />}
           {onAdd && (
             <Tooltip title="Add">
               <Button color="primary" onClick={onAdd}>
@@ -138,6 +159,7 @@ const ListTableToolbar = ({
               </Button>
             </Tooltip>
           )}
+          {refreshButton}
           <PerPageControl
             value={rowsPerPage}
             onChangeRowsPerPage={onChangeRowsPerPage}
@@ -149,8 +171,16 @@ const ListTableToolbar = ({
   )
 }
 
+export const filterSpecPropType = PropTypes.shape({
+  field: PropTypes.string.isRequired,
+  label: PropTypes.string, // Will override column label
+  type: PropTypes.oneOf(['select', 'multiselect', 'checkbox', 'custom']).isRequired,
+  render: PropTypes.func, // Use for rendering a custom component, received props: {value, onChange}
+  filterWith: PropTypes.func, // Custom filtering function, received params: (filterValue, value, row)
+  items: PropTypes.array, // Array of possible values (only when using select/multiselect)
+})
+
 ListTableToolbar.propTypes = {
-  classes: PropTypes.object.isRequired,
   columns: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.string,
     label: PropTypes.string,
@@ -159,15 +189,7 @@ ListTableToolbar.propTypes = {
     display: PropTypes.bool,
     excluded: PropTypes.bool,
   })).isRequired,
-  filters: PropTypes.arrayOf(PropTypes.shape({
-    columnId: PropTypes.string.isRequired,
-    label: PropTypes.string, // Will override column label
-    type: PropTypes.oneOf(['select', 'multiselect', 'checkbox', 'custom']).isRequired,
-    render: PropTypes.func, // Use for rendering a custom component, received props: {value, onChange}
-    filterWith: PropTypes.func, // Custom filtering function, received params: (filterValue, value, row)
-    items: PropTypes.array, // Array of possible values (only when using select/multiselect)
-  })),
-  inlineFilters: PropTypes.bool,
+  filters: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(filterSpecPropType)]),
   filterValues: PropTypes.object,
   onAdd: PropTypes.func,
   onDelete: PropTypes.func,
@@ -183,6 +205,4 @@ ListTableToolbar.propTypes = {
   rowsPerPageOptions: PropTypes.arrayOf(PropTypes.number),
 }
 
-export default compose(
-  withStyles(toolbarStyles),
-)(ListTableToolbar)
+export default ListTableToolbar

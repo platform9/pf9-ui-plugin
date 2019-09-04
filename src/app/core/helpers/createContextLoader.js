@@ -136,13 +136,7 @@ const createContextLoader = (key, dataFetchFn, options = {}) => {
         )
 
         // Insert or update the existing items (using `uniqueIdentifier` to prevent duplicates)
-        const upsertNewItems = pipe(arrayIfNil, upsertAllBy(item => {
-          const id = path(uniqueIdentifierPath, item)
-          if (!id) {
-            console.error(`ID path ${uniqueIdentifier} has not been found for entity ${key}, please make sure it is correctly defined`)
-          }
-          return id
-        }, itemsWithParams))
+        const upsertNewItems = pipe(arrayIfNil, upsertAllBy(path(uniqueIdentifierPath), itemsWithParams))
 
         // If cache has been invalidated or we are refetching, empty the cached data array
         const cleanPrevItems = contextLoaderFn._invalidatedCache || refetch
@@ -192,7 +186,7 @@ const createContextLoader = (key, dataFetchFn, options = {}) => {
   contextLoaderFn.getKey = () => key
 
   if (has(key, loaders)) {
-    throw new Error(`Context Loader function with key ${key} already exists`)
+    console.warn(`Context Loader function with key ${key} already exists`)
   }
   loaders = assoc(key, contextLoaderFn, loaders)
   return contextLoaderFn

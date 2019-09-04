@@ -54,7 +54,7 @@ ClusterPicklist.propTypes = {
 ClusterPicklist.defaultProps = {
   ...Picklist.defaultProps,
   name: 'clusterId',
-  label: 'Current Cluster',
+  label: 'Cluster',
   formField: false,
   onlyMasterNodeClusters: false,
   onlyAppCatalogEnabled: false,

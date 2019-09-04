@@ -54,7 +54,7 @@ const createCRUDComponents = options => {
   const List = ({
     onAdd, onDelete, onEdit, rowActions, data, onRefresh, loading,
     visibleColumns, columnsOrder, rowsPerPage, orderBy, orderDirection,
-    getParamsUpdater,
+    getParamsUpdater, filters,
   }) => {
     // Disabling the "No data found" message for now because there create action is
     // tied to the ListTable and if there are no entities there won't be any way
@@ -68,6 +68,7 @@ const createCRUDComponents = options => {
         loading={loading}
         onRefresh={onRefresh}
         columns={columns}
+        filters={filters}
         data={data}
         onAdd={onAdd}
         onDelete={onDelete}

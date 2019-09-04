@@ -101,6 +101,7 @@ const styles = theme => ({
     padding: 0,
   },
   navIcon: {
+    textAlign: 'center',
     minWidth: 26,
   },
   navMenu: {

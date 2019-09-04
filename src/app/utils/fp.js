@@ -1,6 +1,6 @@
 import {
   T, cond, equals, always, adjust, update, findIndex, assocPath, curry, fromPairs, mapObjIndexed,
-  pathOr, remove, flatten, values, groupBy,
+  pathOr, remove, flatten, values, groupBy, filter,
 } from 'ramda'
 import moize from 'moize'
 
@@ -12,7 +12,6 @@ export const emptyObj = Object.freeze({})
 // Functional programming helpers
 
 export const pluck = key => obj => obj[key]
-export const identity = x => x
 export const isTruthy = x => !!x
 export const exists = x => x !== undefined
 export const propExists = curry((key, obj) => obj[key] !== undefined)
@@ -20,18 +19,6 @@ export const noop = () => {}
 
 // Works for arrays and strings.  All other types return false.
 export const notEmpty = arr => !!(arr && arr.length)
-
-export const mapKeys = curry((cb, obj) => {
-  Object.keys(obj).reduce(
-    (accum, destKey) => {
-      const srcValue = obj[destKey]
-      const resultKey = cb(destKey)
-      accum[resultKey] = srcValue
-      return accum
-    },
-    {},
-  )
-})
 
 export const hasKeys = obj => {
   if (!(obj instanceof Object)) { return false }
@@ -262,7 +249,16 @@ export const removeWith = curry((predicateFn, arr) =>
   remove(findIndex(predicateFn, arr), 1, arr),
 )
 
-// Insert or update items in bulk
+/**
+ * Insert a set of items in an array updating those that match the predicateFn, and adding the ones who doesn't
+ * @param {function} predicateFn Predicate used to know which values to compare when inserting the new items,
+ * @param {array} newItems Items that will be added or used to update the target array
+ * @param {array} targetArr Array that will receive the new items
+ * @example
+ * const targetArr = [{id: 1, val: "one"},{id: 2, val: "two"},{id: 3, val: "three"}]
+ * const newItems = [{id: 2, val: "new two"}, {id: 4, val: "new four"}]
+ * upsertAllBy(R.prop('id'), newItems, targetArr) -> [{id: 1, val: "one"},{id: 2, val: "new two"},{id: 3, val: "three"},{id: 4, val: "new four}]
+ */
 export const upsertAllBy = curry((predicateFn, newItems, targetArr) => {
   const groupedValues = values(groupBy(predicateFn, [...targetArr, ...newItems]))
   return groupedValues.map(
@@ -283,6 +279,11 @@ export const applyJsonPatch = curry((patch, obj) => {
     return assocPath(pathParts, value, obj)
   }
 })
+
+// Perform a filter on the provided array if the passed boolean is truthy
+export const filterIf = curry(
+  (cond, fn, items) => cond ? filter(fn, items) : items,
+)
 
 /**
  * Returns a functional switch statement

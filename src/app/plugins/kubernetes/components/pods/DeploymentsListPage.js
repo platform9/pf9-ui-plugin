@@ -16,20 +16,18 @@ const ListPage = ({ ListContainer }) => {
   return () => {
     const { params, getParamsUpdater } = usePrefParams(defaultParams)
     const [data, loading, reload] = useDataLoader(deploymentActions.list, params)
-    return <div>
-      <ClusterPicklist
+    return <ListContainer
+      loading={loading}
+      reload={reload}
+      data={data}
+      getParamsUpdater={getParamsUpdater}
+      filters={<ClusterPicklist
         onChange={getParamsUpdater('clusterId')}
         value={params.clusterId}
         onlyMasterNodeClusters
-      />
-      <ListContainer
-        loading={loading}
-        reload={reload}
-        data={data}
-        getParamsUpdater={getParamsUpdater}
-        {...pick(listTablePrefs, params)}
-      />
-    </div>
+      />}
+      {...pick(listTablePrefs, params)}
+    />
   }
 }
 

@@ -9,6 +9,7 @@ import { releaseActions } from 'k8s/components/apps/actions'
 import { createUsePrefParamsHook } from 'core/hooks/useParams'
 import { listTablePrefs } from 'app/constants'
 import { pick } from 'ramda'
+import NamespacePicklist from 'k8s/components/common/NamespacePicklist'
 
 const styles = theme => ({
   icon: {
@@ -40,20 +41,27 @@ const ListPage = ({ ListContainer }) => {
   return () => {
     const { params, getParamsUpdater } = usePrefParams(defaultParams)
     const [data, loading, reload] = useDataLoader(releaseActions.list, params)
-    return <div>
-      <ClusterPicklist
-        onChange={getParamsUpdater('clusterId')}
-        value={params.clusterId}
-        onlyAppCatalogEnabled
-      />
-      <ListContainer
-        loading={loading}
-        reload={reload}
-        data={data}
-        getParamsUpdater={getParamsUpdater}
-        {...pick(listTablePrefs, params)}
-      />
-    </div>
+    return <ListContainer
+      loading={loading}
+      reload={reload}
+      data={data}
+      getParamsUpdater={getParamsUpdater}
+      filters={<>
+        <ClusterPicklist
+          showAll={false}
+          onChange={getParamsUpdater('clusterId')}
+          value={params.clusterId}
+          onlyAppCatalogEnabled
+        />
+        <NamespacePicklist
+          onChange={getParamsUpdater('namespace')}
+          value={params.namespace}
+          clusterId={params.clusterId}
+          disabled={!params.clusterId}
+        />
+      </>}
+      {...pick(listTablePrefs, params)}
+    />
   }
 }
 

@@ -115,7 +115,7 @@ function createContextUpdater (key, dataUpdaterFn, options = {}) {
   contextUpdaterFn.getKey = () => key
 
   if (hasPath([key, operation], updaters)) {
-    throw new Error(`Context Updater function with key ${key} and operation ${operation} already exists`)
+    console.warn(`Context Updater function with key ${key} and operation ${operation} already exists`)
   }
   updaters = assocPath([key, operation], contextUpdaterFn, updaters)
   return contextUpdaterFn

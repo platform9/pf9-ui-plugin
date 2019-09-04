@@ -30,8 +30,8 @@ const styles = theme => ({
 class CardTable extends PureComponent {
   state = {
     rowsPerPage: this.props.rowsPerPage,
-    orderBy: null,
-    direction: 'asc',
+    orderBy: this.props.orderBy || null,
+    orderDirection: this.props.orderDirection || 'asc',
     page: 0,
     selected: [],
     searchTerm: '',
@@ -57,7 +57,7 @@ class CardTable extends PureComponent {
     const sortedRows = [...data].sort((a, b) =>
       sortWith(b[orderBy], a[orderBy]),
     )
-    return this.state.direction === 'desc' ? sortedRows : sortedRows.reverse()
+    return this.state.orderDirection === 'desc' ? sortedRows : sortedRows.reverse()
   }
 
   paginate = data => {
@@ -121,13 +121,22 @@ class CardTable extends PureComponent {
   }
 
   handleRequestSort = orderBy => {
-    this.setState({ orderBy })
+    const { onSortChange } = this.props
+    this.setState({ orderBy }, () => {
+      ensureFunction(onSortChange)(orderBy, 'asc')
+    })
   }
 
-  handleDirectionChange = moize(direction => e => {
+  handleDirectionSwitch = e => {
+    const { onSortChange } = this.props
+    const { orderBy, orderDirection: prevDirection } = this.state
+    const orderDirection = prevDirection === 'asc' ? 'desc' : 'asc'
+    console.log(prevDirection, orderDirection)
     e.preventDefault()
-    this.setState({ direction })
-  })
+    this.setState({ orderDirection }, () => {
+      ensureFunction(onSortChange)(orderBy, orderDirection)
+    })
+  }
 
   applyFilters = data => {
     const { filters } = this.props
@@ -158,9 +167,9 @@ class CardTable extends PureComponent {
   }
 
   getFilteredItems = () => {
-    const { searchTarget, data, filters } = this.props
+    const { searchTarget, data, filters, onSortChange } = this.props
     const { searchTerm } = this.state
-    const sortedData = this.sortData(data)
+    const sortedData = onSortChange ? data : this.sortData(data)
     const searchData =
       searchTerm === ''
         ? sortedData
@@ -178,7 +187,7 @@ class CardTable extends PureComponent {
   render () {
     const {
       title,
-      direction,
+      orderDirection,
       orderBy,
       filterValues,
       searchTerm,
@@ -207,15 +216,15 @@ class CardTable extends PureComponent {
               <CardTableToolbar
                 title={title}
                 sorting={sorting}
-                direction={direction}
+                orderDirection={orderDirection}
                 orderBy={orderBy}
                 filters={filters}
                 filterValues={filterValues}
                 onFilterUpdate={this.handleFilterUpdate}
                 onSearchChange={this.handleSearch}
                 onSortChange={this.handleRequestSort}
+                onDirectionSwitch={this.handleDirectionSwitch}
                 onRefresh={onRefresh}
-                onDirectionChange={this.handleDirectionChange}
                 searchTerm={searchTerm}
               />
               <Grid container spacing={3} justify="flex-start">
@@ -241,6 +250,9 @@ CardTable.propTypes = {
       sortWith: PropTypes.func,
     }),
   ),
+  orderBy: PropTypes.string,
+  orderDirection: PropTypes.oneOf(['asc', 'desc']),
+  onSortChange: PropTypes.func,
   onRefresh: PropTypes.func,
   loading: PropTypes.bool,
 }

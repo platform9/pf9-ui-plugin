@@ -5,6 +5,7 @@ import { allKey, imageUrlRoot } from 'app/constants'
 import { parseClusterParams } from 'k8s/components/infrastructure/actions'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { pathJoin } from 'utils/misc'
+import moment from 'moment'
 
 const { qbert } = ApiClient.getInstance()
 
@@ -19,23 +20,34 @@ export const appActions = createCRUDActions('apps', {
     }
     return qbert.getCharts(clusterId)
   },
-  dataMapper: async (items, { clusterId, repositoryId }) => {
-    const monocularUrl = await qbert.clusterMonocularBaseUrl(clusterId, null)
-    return pipe(
-      repositoryId && repositoryId !== allKey
-        ? filter(pathEq(['attributes', 'repo', 'name'], repositoryId))
-        : identity,
-      map(item => {
-        const icon = path(['relationships', 'latestChartVersion', 'data', 'icons', 0, 'path'], item)
-        return {
-          ...item,
-          appLogoUrl: icon ? pathJoin(monocularUrl, icon) : `${imageUrlRoot}/default-app-logo.png`,
-        }
-      }),
-    )(items)
-  },
+  entityName: 'App Catalog',
   uniqueIdentifier,
   indexBy,
+  dataMapper: async (items, { clusterId, repositoryId }) => {
+    const monocularUrl = await qbert.clusterMonocularBaseUrl(clusterId, null)
+    const filterByRepo = repositoryId && repositoryId !== allKey
+      ? filter(pathEq(['attributes', 'repo', 'name'], repositoryId))
+      : identity
+    const normalize = map(item => {
+      const icon = path(['relationships', 'latestChartVersion', 'data', 'icons', 0, 'path'], item)
+      return {
+        ...item,
+        name: path(['attributes', 'name'], item),
+        created: path(['relationships', 'latestChartVersion', 'data', 'created'], item),
+        appLogoUrl: icon ? pathJoin(monocularUrl, icon) : `${imageUrlRoot}/default-app-logo.png`,
+      }
+    })
+
+    return pipe(
+      filterByRepo,
+      normalize,
+    )(items)
+  },
+  sortWith: (items, { orderBy = 'name', orderDirection = 'asc' }) =>
+    pipe(
+      sortBy(orderBy === 'created' ? pipe(prop(orderBy), moment) : prop(orderBy)),
+      orderDirection === 'asc' ? identity : reverse,
+    )(items),
 })
 
 export const releaseActions = createCRUDActions('releases', {

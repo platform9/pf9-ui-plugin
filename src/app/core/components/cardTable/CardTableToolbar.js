@@ -1,15 +1,13 @@
-import { Button, Toolbar, Typography, Tooltip } from '@material-ui/core'
-import { withStyles } from '@material-ui/styles'
+import { Toolbar, Typography, Tooltip } from '@material-ui/core'
+import { makeStyles } from '@material-ui/styles'
 import SearchBar from 'core/components/SearchBar'
 import React, { useMemo } from 'react'
 import Picklist from 'core/components/Picklist'
 import PropTypes from 'prop-types'
 import { projectAs } from 'utils/fp'
-import ArrowDownward from '@material-ui/icons/ArrowDownward'
-import ArrowUpward from '@material-ui/icons/ArrowUpward'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 
-const styles = theme => ({
+const useStyles = makeStyles(theme => ({
   root: {
     paddingRight: theme.spacing(1),
     marginBottom: theme.spacing(1),
@@ -21,6 +19,13 @@ const styles = theme => ({
   spacer: {
     flex: '1 1 100%',
   },
+  search: {
+    marginTop: theme.spacing(1),
+    marginLeft: theme.spacing(2),
+  },
+  sortBy: {
+    marginRight: 0,
+  },
   actions: {
     display: 'flex',
     flexFlow: 'row nowrap',
@@ -31,7 +36,9 @@ const styles = theme => ({
   button: {
     cursor: 'pointer',
     fontWeight: 300,
-    margin: theme.spacing(0, 1),
+    margin: theme.spacing(1, 1, 0, 0),
+    height: theme.spacing(3),
+    outline: 'none',
   },
   filters: {
     flexGrow: '1',
@@ -49,15 +56,7 @@ const styles = theme => ({
   title: {
     flex: '0 0 auto',
   },
-})
-
-const CustomPicklist = withStyles(theme => ({
-  root: {
-    '& .MuiOutlinedInput-root': {
-      marginBottom: theme.spacing(1),
-    },
-  },
-}))(Picklist)
+}))
 
 const FilterDropdown = ({
   field,
@@ -70,7 +69,7 @@ const FilterDropdown = ({
   switch (type) {
     case 'select':
       return (
-        <CustomPicklist
+        <Picklist
           name={field}
           label={label}
           options={items}
@@ -83,45 +82,32 @@ const FilterDropdown = ({
   }
 }
 
-const SortDropdown = ({ items, value, onChange }) => {
-  return (
-    <CustomPicklist
-      name={'sort'}
-      label={'Sort By'}
-      options={items}
-      value={value || ''}
-      onChange={onChange}
-    />
-  )
-}
-
-const SortDirection = ({ disabled, value, onChange }) => {
-  return (
-    <Button
-      disabled={disabled}
-      title={value === 'asc' ? 'Asc' : 'Desc'}
-      onClick={disabled ? null : onChange(value === 'asc' ? 'desc' : 'asc')}
-    >
-      {value === 'asc' ? <ArrowDownward /> : <ArrowUpward />}
-    </Button>
-  )
-}
-
 const CardTableToolbar = ({
   title,
-  classes,
   sorting = [],
-  direction,
+  orderDirection,
   orderBy,
   filters = [],
   filterValues,
   onSortChange,
-  onDirectionChange,
+  onDirectionSwitch,
   onFilterUpdate,
   onRefresh,
   onSearchChange,
   searchTerm,
 }) => {
+  const classes = useStyles()
+  const sortDirection = useMemo(() =>
+    onDirectionSwitch && <Tooltip title={orderDirection === 'asc' ? 'Asc' : 'Desc'}>
+      <FontAwesomeIcon
+        className={classes.button}
+        solid
+        size="lg"
+        aria-label="Change direction"
+        onClick={onDirectionSwitch}>
+        {orderDirection === 'asc' ? 'arrow-down' : 'arrow-up'}
+      </FontAwesomeIcon>
+    </Tooltip>, [orderDirection, onDirectionSwitch])
   const refreshButton = useMemo(() =>
     onRefresh && <Tooltip title="Refresh list">
       <FontAwesomeIcon
@@ -130,7 +116,7 @@ const CardTableToolbar = ({
         size="lg"
         aria-label="Refresh list"
         onClick={onRefresh}>
-        sync
+        {'sync'}
       </FontAwesomeIcon>
     </Tooltip>, [onRefresh])
 
@@ -149,7 +135,6 @@ const CardTableToolbar = ({
           ? filters.map(({ field, value, ...filterProps }) => (
             <FilterDropdown
               key={field}
-              {...filterProps}
               classes={classes}
               onChange={onFilterUpdate(field)}
               field={field}
@@ -159,25 +144,29 @@ const CardTableToolbar = ({
           : filters}
       </div>
       <div className={classes.controls}>
-        {refreshButton}
         {sorting.length && (
-          <React.Fragment>
-            <SortDropdown
-              classes={classes}
-              items={projectAs({ label: 'label', value: 'field' }, sorting)}
-              value={orderBy}
+          <>
+            <Picklist
+              className={classes.sortBy}
+              notAsync
+              disabled={false}
+              showAll={false}
+              name={'sort'}
+              label={'Sort By'}
+              options={projectAs({ label: 'label', value: 'field' }, sorting)}
+              value={orderBy || ''}
               onChange={onSortChange}
             />
-            <SortDirection
-              disabled={!orderBy}
-              value={direction}
-              onChange={onDirectionChange}
-            />
-          </React.Fragment>
+            {sortDirection}
+          </>
         )}
         {onSearchChange && (
-          <SearchBar onSearchChange={onSearchChange} searchTerm={searchTerm} />
+          <SearchBar
+            className={classes.search}
+            onSearchChange={onSearchChange}
+            searchTerm={searchTerm} />
         )}
+        {refreshButton}
       </div>
     </div>
   </Toolbar>
@@ -193,18 +182,17 @@ export const filterSpecPropType = PropTypes.shape({
 })
 
 CardTableToolbar.propTypes = {
-  direction: PropTypes.oneOf(['asc', 'desc']),
+  orderDirection: PropTypes.oneOf(['asc', 'desc']),
   orderBy: PropTypes.string,
   onSortChange: PropTypes.func,
-  onDirectionChange: PropTypes.func,
+  onDirectionSwitch: PropTypes.func,
   onSearchChange: PropTypes.func,
   onRefresh: PropTypes.func,
   searchTerm: PropTypes.string,
   title: PropTypes.string,
-  classes: PropTypes.object.isRequired,
   filters: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(filterSpecPropType)]),
   filterValues: PropTypes.object,
   onFilterUpdate: PropTypes.func,
 }
 
-export default withStyles(styles)(CardTableToolbar)
+export default CardTableToolbar
