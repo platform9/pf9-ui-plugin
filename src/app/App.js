@@ -1,5 +1,5 @@
-import React, { PureComponent } from 'react'
-import PropTypes from 'prop-types'
+import { hot } from 'react-hot-loader'
+import React from 'react'
 import AppProvider from 'core/AppProvider'
 import AppContainer from 'core/components/AppContainer'
 import HotKeysProvider from 'core/providers/HotKeysProvider'
@@ -13,88 +13,85 @@ import { apply, toPairs } from 'ramda'
 import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom'
 import { pathJoin } from 'utils/misc'
 import moize from 'moize'
+import plugins from 'app/plugins'
+import pluginManager from 'core/utils/pluginManager'
 
-class App extends PureComponent {
-  renderFooter = () => (
-    <div id="_main-footer">
-      TODO: Footer
-    </div>
-  )
+plugins.forEach(plugin => plugin.registerPlugin(pluginManager))
 
-  renderPluginRoutes = (id, plugin) => {
-    const options = plugin.getOptions()
-    // TODO: Implement 404 page
-    const defaultRoute = plugin.getDefaultRoute()
-    const { showFooter } = options
-    return <Route key={id} path={plugin.basePath}
-      exact={false}
-      render={() => {
-        return <Switch>
-          {/* Plugin components */}
-          {plugin.getComponents().map((PluginComponent, idx) =>
-            <PluginComponent key={idx} />)}
+const renderFooter = () => (
+  <div id="_main-footer">
+    TODO: Footer
+  </div>
+)
 
-          {/* Plugin specific routes */}
-          {plugin.getRoutes().map(route => {
-            const { component: Component, link } = route
-            return <Route key={route.name}
-              path={link.path}
-              exact={link.exact || false}
-              component={Component} />
-          })}
+const renderPluginRoutes = (id, plugin) => {
+  const options = plugin.getOptions()
+  // TODO: Implement 404 page
+  const defaultRoute = plugin.getDefaultRoute()
+  const { showFooter } = options
+  return <Route key={id} path={plugin.basePath}
+    exact={false}
+    render={() => {
+      return <Switch>
+        {/* Plugin components */}
+        {plugin.getComponents().map((PluginComponent, idx) =>
+          <PluginComponent key={idx} />)}
 
-          {/* TODO implement generic login page? */}
-          <Route path={pathJoin(plugin.basePath, 'login')} component={null} />
-          <Route path={pathJoin(plugin.basePath, 'logout')} exact component={LogoutPage} />
-          {defaultRoute && <Redirect to={defaultRoute || '/ui/404'} />}
-          {showFooter && this.renderFooter()}
-        </Switch>
-      }} />
-  }
+        {/* Plugin specific routes */}
+        {plugin.getRoutes().map(route => {
+          const { component: Component, link } = route
+          return <Route key={route.name}
+            path={link.path}
+            exact={link.exact || false}
+            component={Component} />
+        })}
 
-  getSections = moize(plugins =>
-    toPairs(plugins).map(([id, plugin]) => ({
-      id,
-      name: plugin.name,
-      links: plugin.getNavItems(),
-    })))
-
-  renderPlugins = moize(plugins =>
-    toPairs(plugins).map(apply(this.renderPluginRoutes)),
-  )
-
-  render () {
-    const { pluginManager } = this.props
-    const plugins = pluginManager.getPlugins()
-    const devEnabled = window.localStorage.enableDevPlugin === 'true'
-    return (
-      <Router>
-        <HotKeysProvider>
-          <AppProvider initialContext={{ initialized: false, sessionLoaded: false }}>
-            <PreferencesProvider>
-              <ThemeManager>
-                <ToastProvider>
-                  <div id="_main-container">
-                    <SessionManager>
-                      <AppContainer
-                        sections={this.getSections(plugins)}>
-                        {this.renderPlugins(plugins)}
-                        {devEnabled && <DeveloperToolsEmbed />}
-                      </AppContainer>
-                    </SessionManager>
-                  </div>
-                </ToastProvider>
-              </ThemeManager>
-            </PreferencesProvider>
-          </AppProvider>
-        </HotKeysProvider>
-      </Router>
-    )
-  }
+        {/* TODO implement generic login page? */}
+        <Route path={pathJoin(plugin.basePath, 'login')} component={null} />
+        <Route path={pathJoin(plugin.basePath, 'logout')} exact component={LogoutPage} />
+        {defaultRoute && <Redirect to={defaultRoute || '/ui/404'} />}
+        {showFooter && renderFooter()}
+      </Switch>
+    }} />
 }
 
-App.propTypes = {
-  pluginManager: PropTypes.object,
+const getSections = moize(plugins =>
+  toPairs(plugins).map(([id, plugin]) => ({
+    id,
+    name: plugin.name,
+    links: plugin.getNavItems(),
+  })))
+
+const renderPlugins = moize(plugins =>
+  toPairs(plugins).map(apply(renderPluginRoutes)),
+)
+
+const App = () => {
+  const plugins = pluginManager.getPlugins()
+  const devEnabled = window.localStorage.enableDevPlugin === 'true'
+  return (
+    <Router>
+      <HotKeysProvider>
+        <AppProvider initialContext={{ initialized: false, sessionLoaded: false }}>
+          <PreferencesProvider>
+            <ThemeManager>
+              <ToastProvider>
+                <div id="_main-container">
+                  <SessionManager>
+                    <AppContainer
+                      sections={getSections(plugins)}>
+                      {renderPlugins(plugins)}
+                      {devEnabled && <DeveloperToolsEmbed />}
+                    </AppContainer>
+                  </SessionManager>
+                </div>
+              </ToastProvider>
+            </ThemeManager>
+          </PreferencesProvider>
+        </AppProvider>
+      </HotKeysProvider>
+    </Router>
+  )
 }
 
-export default App
+export default hot(module)(App)

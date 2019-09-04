@@ -21,11 +21,6 @@ const extractCSS = new MiniCssExtractPlugin({
 
 const appEntry = []
 
-// dev only stuff
-if (isDev) {
-  appEntry.push('react-hot-loader/patch')
-}
-
 // main entry point
 appEntry.push('@babel/polyfill')
 appEntry.push('./index.js')
