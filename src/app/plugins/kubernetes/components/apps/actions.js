@@ -1,11 +1,15 @@
-import { path, filter, reverse, identity, sortBy, prop, pluck, map, pipe, pathEq } from 'ramda'
+import {
+  mergeLeft, path, filter, reverse, identity, sortBy, prop, pluck, map, pipe, pathEq, head, props,
+  values, groupBy, propEq, join, find, unless, isNil,
+} from 'ramda'
 import ApiClient from 'api-client/ApiClient'
 import { asyncFlatMap } from 'utils/fp'
 import { allKey, imageUrlRoot } from 'app/constants'
-import { parseClusterParams } from 'k8s/components/infrastructure/actions'
+import { parseClusterParams, clustersDataKey } from 'k8s/components/infrastructure/actions'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { pathJoin } from 'utils/misc'
 import moment from 'moment'
+import createContextLoader from 'core/helpers/createContextLoader'
 
 const { qbert } = ApiClient.getInstance()
 
@@ -62,24 +66,51 @@ export const releaseActions = createCRUDActions('releases', {
   indexBy,
 })
 
+createContextLoader('repositoriesByCluster', async (params, loadFromContext) => {
+  const monocularClusters = await loadFromContext(clustersDataKey, {
+    appCatalogClusters: true,
+    hasControlPlane: true,
+  })
+  return asyncFlatMap(map(props(['uuid', 'name']), monocularClusters), async ([clusterId, clusterName]) => {
+    const clusterRepos = await qbert.getRepositoriesForCluster(clusterId)
+    return clusterRepos.map(mergeLeft({ clusterId, clusterName }))
+  })
+}, {
+  dataMapper: pipe(
+    groupBy(prop('id')),
+    values,
+    map(sameIdRepos => ({
+      ...head(sameIdRepos),
+      clusters: pluck('clusterName', sameIdRepos),
+    })),
+  ),
+})
+
 export const repositoryActions = createCRUDActions('repositories', {
-  listFn: async (params) => {
-    const { clusterId = allKey } = params
-    if (clusterId === allKey) {
-      return qbert.getRepositories()
-    }
-    return qbert.getRepositoriesForCluster(clusterId)
+  listFn: async (params, loadFromContext) => {
+    return qbert.getRepositories()
   },
   entityName: 'Repository',
   indexBy,
   uniqueIdentifier,
-  dataMapper: map(({ id, type, attributes }) => ({
-    id,
-    type,
-    name: attributes.name,
-    url: attributes.URL,
-    source: attributes.source,
-  })),
+  refetchCascade: true,
+  dataMapper: async (items, params, loadFromContext) => {
+    const reposByCluster = await loadFromContext('repositoriesByCluster')
+
+    return map(({ id, type, attributes }) => ({
+      id,
+      type,
+      name: attributes.name,
+      url: attributes.URL,
+      source: attributes.source,
+      clusters: pipe(
+        find(propEq('id', id)),
+        prop('clusters'),
+        unless(isNil, join(', ')),
+      )(reposByCluster),
+      // clusters,
+    }), items)
+  },
   sortWith: (items, { orderBy = 'name', orderDirection = 'asc' }) =>
     pipe(
       sortBy(prop(orderBy)),

@@ -15,7 +15,7 @@ export const options = {
     { id: 'name', label: 'Name' },
     { id: 'url', label: 'URL' },
     { id: 'source', label: 'Source' },
-    { id: 'clusters', label: 'Clusters' }, // TODO figure out what to do with this column
+    { id: 'clusters', label: 'Clusters' },
   ],
   name: 'Repositories',
   title: 'Repositories',

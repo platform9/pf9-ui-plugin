@@ -9,42 +9,42 @@ import { withRouter } from 'react-router'
 
 const styles = theme => ({
   card: {
-    display: 'flex'
+    display: 'flex',
     // margin: theme.spacing(1),
     // padding: 0
   },
   text: {
     display: 'inline-block',
     marginTop: theme.spacing(1),
-    marginRight: theme.spacing(0.5)
+    marginRight: theme.spacing(0.5),
   },
   rightText: {
-    display: 'inline-block'
+    display: 'inline-block',
   },
   header: {
     textAlign: 'center',
     width: 120,
     padding: theme.spacing(2),
-    borderRight: '1px solid #d2d2d2'
+    borderRight: '1px solid #d2d2d2',
   },
   details: {
     display: 'flex',
     flexDirection: 'column',
-    flexGrow: 1
+    flexGrow: 1,
   },
   icon: {
     width: '100%',
     minHeight: 120,
     backgroundSize: 'contain',
     backgroundPosition: `50% ${theme.spacing(1)}px`,
-    marginBottom: theme.spacing(1)
+    marginBottom: theme.spacing(1),
   },
   buttonIcon: {
-    marginRight: theme.spacing(1)
+    marginRight: theme.spacing(1),
   },
   divider: {
     marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(1)
+    marginBottom: theme.spacing(1),
   },
   info: {
     overflow: 'hidden',
@@ -60,7 +60,7 @@ const styles = theme => ({
       content: '\'...\'',
       position: 'absolute',
       right: theme.spacing(1),
-      bottom: 0
+      bottom: 0,
     },
     '&:after': {
       content: '\'\'',
@@ -69,18 +69,18 @@ const styles = theme => ({
       width: '2em',
       height: '1em',
       marginTop: '0.2em',
-      background: 'white'
-    }
+      background: 'white',
+    },
   },
   content: {
-    flex: '1 0 auto'
+    flex: '1 0 auto',
   },
   actions: {
     display: 'flex',
     justifyContent: 'flex-end',
     alignItems: 'center',
-    padding: theme.spacing(1)
-  }
+    padding: theme.spacing(1),
+  },
 })
 
 class AppCard extends PureComponent {
@@ -103,7 +103,7 @@ class AppCard extends PureComponent {
         id,
         appLogoUrl,
         attributes: { name, description },
-      }
+      },
     } = this.props
     return (
       <Grid item sm={6} md={4} lg={4}>
@@ -111,7 +111,7 @@ class AppCard extends PureComponent {
           <div className={classes.header}>
             <CardMedia className={classes.icon} image={appLogoUrl} title="icon" />
             <Button
-              variant="contained"
+              variant="outlined"
               color="primary"
               onClick={this.handleDeploy}
             >
@@ -149,10 +149,10 @@ class AppCard extends PureComponent {
 AppCard.propTypes = {
   handleDeploy: PropTypes.func,
   handleDownload: PropTypes.func,
-  application: PropTypes.object
+  application: PropTypes.object,
 }
 
 export default compose(
   withRouter,
-  withStyles(styles)
+  withStyles(styles),
 )(AppCard)

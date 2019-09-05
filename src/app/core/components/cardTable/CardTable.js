@@ -131,7 +131,6 @@ class CardTable extends PureComponent {
     const { onSortChange } = this.props
     const { orderBy, orderDirection: prevDirection } = this.state
     const orderDirection = prevDirection === 'asc' ? 'desc' : 'asc'
-    console.log(prevDirection, orderDirection)
     e.preventDefault()
     this.setState({ orderDirection }, () => {
       ensureFunction(onSortChange)(orderBy, orderDirection)

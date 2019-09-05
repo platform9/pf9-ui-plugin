@@ -1,6 +1,7 @@
 import { asyncMap, pathOrNull, pipeWhenTruthy, isTruthy } from 'app/utils/fp'
 import {
   identity, find, pathOr, pluck, prop, propEq, propSatisfies, compose, path, pipe, sortBy, reverse,
+  either,
 } from 'ramda'
 import { allKey } from 'app/constants'
 import { castFuzzyBool } from 'utils/misc'
@@ -32,6 +33,7 @@ export const loadResMgrHosts = createContextLoader(resMgrHostsDataKey, async () 
 })
 
 export const hasMasterNode = propSatisfies(isTruthy, 'hasMasterNode')
+export const masterlessCluster = propSatisfies(isTruthy, 'masterless')
 export const hasPrometheusEnabled = compose(castFuzzyBool, path(['tags', 'pf9-system:monitoring']))
 export const hasAppCatalogEnabled = propSatisfies(isTruthy, 'appCatalogEnabled')
 
@@ -110,10 +112,12 @@ export const clusterActions = createCRUDActions(clustersDataKey, {
   },
   uniqueIdentifier: 'uuid',
   dataMapper: (items,
-    { masterNodeClusters, appCatalogClusters, prometheusClusters }) => pipe(
+    { masterNodeClusters, masterlessClusters, hasControlPlane, appCatalogClusters, prometheusClusters }) => pipe(
     filterIf(masterNodeClusters, hasMasterNode),
+    filterIf(masterlessClusters, masterlessCluster),
     filterIf(prometheusClusters, hasPrometheusEnabled),
     filterIf(appCatalogClusters, hasAppCatalogEnabled),
+    filterIf(hasControlPlane, either(hasMasterNode, masterlessCluster))
   )(items),
   sortWith: (items, { orderBy = 'name', orderDirection = 'asc' }) =>
     pipe(
