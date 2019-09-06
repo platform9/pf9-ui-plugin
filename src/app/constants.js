@@ -8,6 +8,7 @@ export const dashboardUrl = `${appUrlRoot}/kubernetes/`
 export const allKey = '__all__'
 export const noneKey = '__none__'
 export const listTablePrefs = ['visibleColumns', 'columnsOrder', 'rowsPerPage', 'orderBy', 'orderDirection']
+export const k8sLink = path => `${appUrlRoot}/kubernetes${path}`
 
 // Errors
 export const addError = 'ERR_ADD'

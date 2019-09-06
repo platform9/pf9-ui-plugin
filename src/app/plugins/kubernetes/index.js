@@ -1,6 +1,7 @@
 import React from 'react'
 
 import AddCloudProviderPage from './components/infrastructure/AddCloudProviderPage'
+import AddAwsClusterPage from './components/infrastructure/AddAwsClusterPage'
 import AddClusterPage from './components/infrastructure/AddClusterPage'
 import AddDeploymentPage from './components/pods/AddDeploymentPage'
 import AddNamespacePage from './components/namespaces/AddNamespacePage'
@@ -57,6 +58,11 @@ Kubernetes.registerPlugin = pluginManager => {
         name: 'Create Cluster',
         link: { path: '/infrastructure/clusters/add', exact: true },
         component: AddClusterPage,
+      },
+      {
+        name: 'Create AWS Cluster',
+        link: { path: '/infrastructure/clusters/addAws', exact: true },
+        component: AddAwsClusterPage,
       },
       {
         name: 'Cluster Details',
