@@ -4,35 +4,23 @@ import React from 'react'
 import FormWrapper from 'core/components/FormWrapper'
 // import KeyValuesField from 'core/components/validatedForm/KeyValuesField'
 // import NodesChooser from './NodesChooser'
+import CloudProviderPicklist from 'k8s/components/common/CloudProviderPicklist'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import TextField from 'core/components/validatedForm/TextField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
-import Wizard from 'core/components/wizard/Wizard'
-import WizardStep from 'core/components/wizard/WizardStep'
+// import Wizard from 'core/components/wizard/Wizard'
+// import WizardStep from 'core/components/wizard/WizardStep'
 import useDataLoader from 'core/hooks/useDataLoader'
+import useParams from 'core/hooks/useParams'
 import { projectAs } from 'utils/fp'
 import { cloudProviderActions } from './actions'
 import { propEq } from 'ramda'
-// import { compose, prop, propEq, propOr } from 'ramda'
-
-const initialContext = {}
 
 const AddAwsClusterPage = () => {
   const [cloudProviders, cpLoading] = useDataLoader(cloudProviderActions.list)
   const cloudProviderOptions = projectAs({ value: 'uuid', label: 'name' }, cloudProviders.filter(propEq('type', 'aws')))
-  console.log(cloudProviderOptions)
+  const { params, getParamsUpdater } = useParams()
 
-  const handleSubmit = data => {
-    console.log('Here are the data', data)
-  }
-
-  const handleChangeCp = data => {
-    console.log('Change cloud provider', data)
-  }
-
-  if (cpLoading) {
-    return (<div>Loading cloud providers</div>)
-  }
   return (
     <FormWrapper title="Add Cluster">
       <ValidatedForm>
@@ -42,13 +30,18 @@ const AddAwsClusterPage = () => {
           info="Name of the cluster"
         />
         <PicklistField
+          DropdownComponent={CloudProviderPicklist}
           id="cloudProvider"
           label="Cloud Provider"
           options={cloudProviderOptions}
-          onChange={handleChangeCp}
+          onChange={getParamsUpdater('cloudProviderId')}
           info="Nodes will be provisioned using this cloud provider."
+          value={params.cloudProviderId}
+          renderContentOnMount
+          type="aws"
         />
         <pre>{JSON.stringify(cloudProviderOptions, null, 4)}</pre>
+        <pre>{JSON.stringify(cpLoading, null, 4)}</pre>
       </ValidatedForm>
     </FormWrapper>
   )
