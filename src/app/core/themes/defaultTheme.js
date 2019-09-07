@@ -80,6 +80,11 @@ const theme = {
       contained: {
         boxShadow: 'none'
       }
+    },
+    MuiTableCell: {
+      root: {
+        padding: '8px',
+      }
     }
   },
   palette: {
@@ -254,8 +259,8 @@ const theme = {
       color: 'rgba(0, 0, 0, 0.87)',
       fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
       fontWeight: 400,
-      fontSize: '0.875rem',
-      lineHeight: 1.5,
+      fontSize: '0.775rem',
+      lineHeight: 1.4,
       letterSpacing: '0.01071em'
     },
     body1: {
@@ -336,7 +341,7 @@ const theme = {
       fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
       fontWeight: 400,
       fontSize: '1rem',
-      lineHeight: 1.75,
+      lineHeight: 1.45,
       letterSpacing: '0.00938em'
     },
     subtitle2: {
@@ -344,7 +349,7 @@ const theme = {
       fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
       fontWeight: 500,
       fontSize: '0.875rem',
-      lineHeight: 1.57,
+      lineHeight: 1.4,
       letterSpacing: '0.00714em'
     },
     body1Next: {
