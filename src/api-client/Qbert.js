@@ -316,7 +316,7 @@ class Qbert {
   }
 
   createRepositoryForCluster = async (clusterId, body) => {
-    return this.client.basicGet(`${await this.clusterMonocularBaseUrl(clusterId)}/repos`, body)
+    return this.client.basicPost(`${await this.clusterMonocularBaseUrl(clusterId)}/repos`, body)
   }
 
   deleteRepository = async (repoId) => {

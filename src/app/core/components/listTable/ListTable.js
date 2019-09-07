@@ -17,6 +17,7 @@ import ListTableHead from './ListTableHead'
 import ListTableToolbar from './ListTableToolbar'
 import Progress from 'core/components/progress/Progress'
 import { filterSpecPropType } from 'core/components/cardTable/CardTableToolbar'
+import { isNilOrEmpty } from 'utils/fp'
 
 const styles = theme => ({
   root: {
@@ -305,11 +306,11 @@ class ListTable extends PureComponent {
   }
 
   renderRowActions = row => {
-    const { rowActions } = this.props
-    if (!rowActions) { return null }
+    const { rowActions, onRefresh, onActionComplete = onRefresh } = this.props
+    if (isNilOrEmpty(rowActions)) { return null }
     return (
       <TableCell>
-        <MoreMenu items={rowActions} data={row} />
+        <MoreMenu items={rowActions} onComplete={onActionComplete} data={row} />
       </TableCell>
     )
   }
@@ -491,6 +492,7 @@ ListTable.propTypes = {
   onDelete: PropTypes.func,
   onEdit: PropTypes.func,
   onRefresh: PropTypes.func,
+  onActionComplete: PropTypes.func,
   paginate: PropTypes.bool,
   orderBy: PropTypes.string,
   orderDirection: PropTypes.oneOf(['asc', 'desc']),

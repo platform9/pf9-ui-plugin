@@ -1,4 +1,6 @@
-import { hasPath, path, assocPath, pathEq, always, over, append, lensPath } from 'ramda'
+import {
+  hasPath, path, assocPath, pathEq, always, over, append, lensPath, identity, isNil,
+} from 'ramda'
 import { emptyObj, ensureFunction, removeWith, updateWith, switchCase } from 'utils/fp'
 import { dataContextKey, getContextLoader } from 'core/helpers/createContextLoader'
 import { singlePromise, uncamelizeString } from 'utils/misc'
@@ -41,7 +43,7 @@ function createContextUpdater (key, dataUpdaterFn, options = {}) {
       ['update', 'updated'],
       ['delete', 'deleted'],
     )(operation)} ${entityName}`,
-    errorMessage = (catchedErr, params, operation) => {
+    errorMessage = (prevItems, params, operation, catchedErr) => {
       const action = switchCase(
         'update',
         ['create', 'create'],
@@ -50,7 +52,7 @@ function createContextUpdater (key, dataUpdaterFn, options = {}) {
       )(operation)
       // Display entity ID if available
       const withId = hasPath(uniqueIdentifierPath, params)
-        ? ` with ${uniqueIdentifier}: ${path(uniqueIdentifierPath)}`
+        ? ` with ${uniqueIdentifier}: ${path(uniqueIdentifierPath, params)}`
         : ''
       // Specific error handling
       return switchCase(
@@ -76,8 +78,14 @@ function createContextUpdater (key, dataUpdaterFn, options = {}) {
    * @param {function} [args.additionalOptions.onSuccess] Custom logic to perfom after success
    * @param {function} [args.additionalOptions.onError] Custom logic to perfom after error
    */
-  const contextUpdaterFn = singlePromise(async args => {
-    const { setContext, params = {}, additionalOptions = emptyObj } = args
+  const contextUpdaterFn = singlePromise(async ({
+    getContext,
+    setContext,
+    params = {},
+    loaderParams,
+    additionalOptions = emptyObj,
+    noDataMapping = false
+  }) => {
     const {
       onSuccess = (successMessage, params) => console.info(successMessage),
       onError = (errorMessage, catchedErr, params) => console.error(errorMessage, catchedErr),
@@ -87,13 +95,18 @@ function createContextUpdater (key, dataUpdaterFn, options = {}) {
     if (!loader) {
       throw new Error(`Context Loader with key ${key} not found`)
     }
-    const prevItems = await loader(args)
-
+    const prevItems = await loader({
+      getContext,
+      setContext,
+      params: loaderParams,
+      additionalOptions,
+      noDataMapping // Return the raw server data without any post processing
+    })
     try {
       const output = await dataUpdaterFn(params, prevItems)
       const operationSwitchCase = switchCase(
         // If no operation is chosen (ie "any" or a custom operation), just replace the whole array with the new output
-        always(output),
+        isNil(output) ? identity : always(output),
         ['create', append(output)],
         ['update', updateWith(pathEq(uniqueIdentifierPath, id), output)],
         ['delete', removeWith(pathEq(uniqueIdentifierPath, id))],
@@ -101,13 +114,18 @@ function createContextUpdater (key, dataUpdaterFn, options = {}) {
       await setContext(over(dataLens, operationSwitchCase(operation)))
 
       if (onSuccess) {
-        const updatedItems = await loader(args)
+        const updatedItems = await loader({
+          getContext,
+          setContext,
+          params: loaderParams,
+          additionalOptions,
+        })
         const parsedSuccessMesssage = ensureFunction(successMessage)(updatedItems, prevItems, params, operation)
         await onSuccess(parsedSuccessMesssage, params)
       }
     } catch (err) {
       if (onError) {
-        const parsedErrorMesssage = ensureFunction(errorMessage)(err, params, operation)
+        const parsedErrorMesssage = ensureFunction(errorMessage)(prevItems, params, operation, err)
         await onError(parsedErrorMesssage, err, params)
       }
     }

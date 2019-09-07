@@ -82,13 +82,14 @@ const createContextLoader = (key, dataFetchFn, options = {}) => {
    * @param {function} args.setContext
    * @param {object} [args.params] Object containing parameters that will be passed to the updaterFn
    * @param {object} [args.refetch] Invalidates the cache and calls the dataFetchFn() to fetch the data from server
+   * @param {boolean} [args.rawData] Return raw server data without any additional postprocessing (via dataMapper) or sorting
    * @param {object} [args.additionalOptions] Additional custom options
    * @param {function} [args.additionalOptions.onSuccess] Custom logic to perfom after success
    * @param {function} [args.additionalOptions.onError] Custom logic to perfom after error
    * @returns {Promise<array>} Fetched or cached items
    */
   const contextLoaderFn = singlePromise(
-    async ({ getContext, setContext, params = emptyObj, refetch = false, additionalOptions = emptyObj }) => {
+    async ({ getContext, setContext, params = emptyObj, refetch = false, rawData = false, additionalOptions = emptyObj }) => {
       // Get the required values from the provided params
       const providedRequiredParams = pipe(
         pick(allRequiredParams),
@@ -125,6 +126,9 @@ const createContextLoader = (key, dataFetchFn, options = {}) => {
               // Return the constant emptyArr to avoid unnecessary re-renderings
               arrayIfEmpty,
             ))
+            if (rawData) {
+              return cachedItems
+            }
             const mappedData = await memoizedDataMapper(cachedItems, params, loadFromContext)
             return sortWith(mappedData, params)
           }
@@ -161,6 +165,9 @@ const createContextLoader = (key, dataFetchFn, options = {}) => {
         if (onSuccess) {
           const parsedSuccessMesssage = ensureFunction(fetchSuccessMessage)(params)
           await onSuccess(parsedSuccessMesssage, params)
+        }
+        if (rawData) {
+          return itemsWithParams
         }
         const mappedData = await memoizedDataMapper(itemsWithParams, params, loadFromContext)
         return sortWith(mappedData, params)

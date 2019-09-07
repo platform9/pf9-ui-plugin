@@ -1,6 +1,6 @@
 import {
   T, cond, equals, always, adjust, update, findIndex, assocPath, curry, fromPairs, mapObjIndexed,
-  pathOr, remove, flatten, values, groupBy, filter,
+  pathOr, remove, flatten, values, groupBy, filter, either, isNil, isEmpty,
 } from 'ramda'
 import moize from 'moize'
 
@@ -14,8 +14,8 @@ export const emptyObj = Object.freeze({})
 export const pluck = key => obj => obj[key]
 export const isTruthy = x => !!x
 export const exists = x => x !== undefined
-export const propExists = curry((key, obj) => obj[key] !== undefined)
 export const noop = () => {}
+export const isNilOrEmpty = either(isNil, isEmpty)
 
 // Works for arrays and strings.  All other types return false.
 export const notEmpty = arr => !!(arr && arr.length)

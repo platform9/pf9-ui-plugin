@@ -41,7 +41,7 @@ const createCRUDComponents = options => {
     deleteFn = dataKey ? getContextUpdater(dataKey, 'delete') : null,
     defaultParams = {},
     columns = [],
-    rowActions = () => [],
+    rowActions = [],
     uniqueIdentifier = 'id',
     addText = 'Add',
     addUrl,
@@ -52,7 +52,7 @@ const createCRUDComponents = options => {
 
   // List
   const List = ({
-    onAdd, onDelete, onEdit, rowActions, data, onRefresh, loading,
+    onAdd, onDelete, onEdit, rowActions, data, onRefresh, onActionComplete, loading,
     visibleColumns, columnsOrder, rowsPerPage, orderBy, orderDirection,
     getParamsUpdater, filters,
   }) => {
@@ -66,6 +66,7 @@ const createCRUDComponents = options => {
     return (
       <ListTable
         loading={loading}
+        onActionComplete={onActionComplete}
         onRefresh={onRefresh}
         columns={columns}
         filters={filters}
@@ -97,11 +98,6 @@ const createCRUDComponents = options => {
       [history])
     const refetch = useCallback(() => reload(true))
 
-    let moreProps = {}
-    if (rowActions && rowActions.length > 0) {
-      moreProps.rowActions = rowActions
-    }
-
     return (
       <CRUDListContainer
         items={data}
@@ -114,10 +110,12 @@ const createCRUDComponents = options => {
           <List
             loading={loading || deleting}
             data={data}
+            rowActions={rowActions}
             onRefresh={refetch}
+            onActionComplete={reload}
             {...handlers}
             {...restProps}
-            {...moreProps} />
+          />
         </>}
       </CRUDListContainer>
     )

@@ -1,9 +1,9 @@
 import {
   mergeLeft, path, filter, reverse, identity, sortBy, prop, pluck, map, pipe, pathEq, head, props,
-  values, groupBy, propEq, join, find, unless, isNil,
+  values, groupBy, propEq, find, propOr, pick,
 } from 'ramda'
 import ApiClient from 'api-client/ApiClient'
-import { asyncFlatMap } from 'utils/fp'
+import { asyncFlatMap, emptyArr, switchCase } from 'utils/fp'
 import { allKey, imageUrlRoot } from 'app/constants'
 import { parseClusterParams, clustersDataKey } from 'k8s/components/infrastructure/actions'
 import createCRUDActions from 'core/helpers/createCRUDActions'
@@ -66,37 +66,83 @@ export const releaseActions = createCRUDActions('releases', {
   indexBy,
 })
 
-createContextLoader('repositoriesByCluster', async (params, loadFromContext) => {
+const repositoriesByCluster = createContextLoader('repositoriesByCluster', async (params,
+  loadFromContext) => {
   const monocularClusters = await loadFromContext(clustersDataKey, {
     appCatalogClusters: true,
     hasControlPlane: true,
   })
-  return asyncFlatMap(map(props(['uuid', 'name']), monocularClusters), async ([clusterId, clusterName]) => {
+  const data = await asyncFlatMap(map(props(['uuid', 'name']), monocularClusters), async ([clusterId, clusterName]) => {
     const clusterRepos = await qbert.getRepositoriesForCluster(clusterId)
     return clusterRepos.map(mergeLeft({ clusterId, clusterName }))
   })
-}, {
-  dataMapper: pipe(
+  return pipe(
     groupBy(prop('id')),
     values,
     map(sameIdRepos => ({
       ...head(sameIdRepos),
-      clusters: pluck('clusterName', sameIdRepos),
+      clusters: map(pick(['clusterId', 'clusterName']), sameIdRepos),
     })),
-  ),
+  )(data)
+}, {
+  uniqueIdentifier,
 })
 
+const getRepoName = (id, repos) => prop('name', find(propEq('id', id), repos))
 export const repositoryActions = createCRUDActions('repositories', {
   listFn: async (params, loadFromContext) => {
     return qbert.getRepositories()
   },
+  deleteFn: async ({ id }) => {
+    await qbert.deleteRepository(id)
+  },
+  customOperations: {
+    updateRepoClusters: async ({ id, clusters }, prevItems) => {
+      const repository = find(propEq('id', id), prevItems)
+      const prevSelectedClusters = pluck('clusterId', repository.clusters)
+      const body = {
+        name: repository.name,
+        URL: repository.url,
+        source: repository.source,
+      }
+      const itemsToRemove = filter(clusterId => {
+        return !clusters.includes(clusterId)
+      }, prevSelectedClusters)
+      const itemsToAdd = filter(clusterId => {
+        return !prevSelectedClusters.includes(clusterId)
+      }, clusters)
+
+      // Invalidate the Repositories by Clusters cache so that we force a refetch of the data
+      repositoriesByCluster.invalidateCache()
+
+      // Perfom the update operations sequentially, for safety
+      await asyncFlatMap(
+        itemsToRemove,
+        clusterId => qbert.deleteRepositoriesForCluster(clusterId, id),
+        false,
+      )
+      await asyncFlatMap(
+        itemsToAdd,
+        clusterId => qbert.createRepositoryForCluster(clusterId, body),
+        false,
+      )
+    },
+  },
   entityName: 'Repository',
-  indexBy,
   uniqueIdentifier,
   refetchCascade: true,
+  successMessage: (updatedItems, prevItems, { id }, operation) => switchCase(
+    null,
+    ['updateRepoClusters', `Successfully edited cluster access for repository ${getRepoName(id, prevItems)}`],
+    ['delete', `Successfully deleted Repository ${getRepoName(id, prevItems)}`],
+  )(operation),
+  errorMessage: (prevItems, { id }, operation) => switchCase(
+    null,
+    ['updateRepoClusters', `Error when updating cluster access for repository ${getRepoName(id, prevItems)}`],
+    ['delete', `Error when trying to delete Repository ${getRepoName(id, prevItems)}`],
+  )(operation),
   dataMapper: async (items, params, loadFromContext) => {
     const reposByCluster = await loadFromContext('repositoriesByCluster')
-
     return map(({ id, type, attributes }) => ({
       id,
       type,
@@ -105,15 +151,14 @@ export const repositoryActions = createCRUDActions('repositories', {
       source: attributes.source,
       clusters: pipe(
         find(propEq('id', id)),
-        prop('clusters'),
-        unless(isNil, join(', ')),
+        propOr(emptyArr, 'clusters'),
       )(reposByCluster),
-      // clusters,
-    }), items)
+    }))(items)
   },
-  sortWith: (items, { orderBy = 'name', orderDirection = 'asc' }) =>
-    pipe(
-      sortBy(prop(orderBy)),
-      orderDirection === 'asc' ? identity : reverse,
-    )(items),
+  sortWith:
+    (items, { orderBy = 'name', orderDirection = 'asc' }) =>
+      pipe(
+        sortBy(prop(orderBy)),
+        orderDirection === 'asc' ? identity : reverse,
+      )(items),
 })

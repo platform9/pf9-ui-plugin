@@ -17,20 +17,34 @@ const styles = theme => ({
     display: 'inline-block',
     marginTop: theme.spacing(1),
     marginRight: theme.spacing(0.5),
+    maxWidth: 100,
+    textOverflow: 'clip',
+    whiteSpace: 'pre-wrap',
+    overflow: 'hidden',
+    flexWrap: 'wrap',
+    overflowWrap: 'break-word',
+    wordWrap: 'break-word',
   },
   rightText: {
     display: 'inline-block',
   },
   header: {
-    textAlign: 'center',
-    width: 120,
+    flexBasis: 90,
+    minWidth: 90,
     padding: theme.spacing(2),
     borderRight: '1px solid #d2d2d2',
+    display: 'flex',
+    flexFlow: 'column',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   details: {
     display: 'flex',
     flexDirection: 'column',
+    flexBasis: 'auto',
+    flexShrink: 1,
     flexGrow: 1,
+    overflow: 'hidden',
   },
   icon: {
     width: '100%',
@@ -74,6 +88,9 @@ const styles = theme => ({
   },
   content: {
     flex: '1 0 auto',
+    height: 140,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
   },
   actions: {
     display: 'flex',
@@ -109,7 +126,7 @@ class AppCard extends PureComponent {
       <Grid item sm={6} md={4} lg={4}>
         <Card className={classes.card}>
           <div className={classes.header}>
-            <CardMedia className={classes.icon} image={appLogoUrl} title="icon" />
+            <CardMedia className={classes.icon} image={appLogoUrl} title={name} />
             <Button
               variant="outlined"
               color="primary"
@@ -120,10 +137,10 @@ class AppCard extends PureComponent {
           </div>
           <div className={classes.details}>
             <CardContent className={classes.content}>
-              <Typography component="h6" variant="h6">
+              <Typography variant="subtitle1">
                 {name}
               </Typography>
-              <Typography variant="body1" className={classes.text}>
+              <Typography variant="body2" className={classes.text}>
                 {description}
               </Typography>
             </CardContent>

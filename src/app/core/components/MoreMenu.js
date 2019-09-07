@@ -5,6 +5,7 @@ import MenuItem from '@material-ui/core/MenuItem'
 import IconButton from '@material-ui/core/IconButton'
 import MoreVertIcon from '@material-ui/icons/MoreVert'
 import { withAppContext } from 'core/AppProvider'
+import { ensureFunction } from 'utils/fp'
 
 class MoreMenu extends React.PureComponent {
   state = {
@@ -25,12 +26,12 @@ class MoreMenu extends React.PureComponent {
   handleClick = (action, label) => e => {
     e.stopPropagation()
     this.handleClose(e)
-    action && action(this.props.data, this.props.context)
+    ensureFunction(action)(this.props.data, this.props.context)
     this.setState({ openedAction: label })
   }
 
   handleModalClose = () => {
-    this.setState({ openedAction: null })
+    this.setState({ openedAction: null }, this.props.onComplete)
   }
 
   render () {
@@ -39,7 +40,7 @@ class MoreMenu extends React.PureComponent {
 
     return (
       <div>
-        {this.props.items.map(({ action, cond, dialog, icon, label }) => {
+        {this.props.items.map(({ dialog, label }) => {
           const Modal = dialog
           return openedAction === label && <Modal key={label} onClose={this.handleModalClose} row={this.props.data} />
         })}
@@ -89,6 +90,11 @@ MoreMenu.propTypes = {
    * Arbitrary data to pass to the `action` handler.
    */
   data: PropTypes.any,
+
+  /**
+   * Action to perform after closing a dialog
+   */
+  onComplete: PropTypes.func,
 }
 
 export default withAppContext(MoreMenu)

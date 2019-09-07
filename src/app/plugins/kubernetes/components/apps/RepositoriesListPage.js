@@ -1,21 +1,26 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { repositoryActions } from 'k8s/components/apps/actions'
-import { allKey } from 'app/constants'
+import EditIcon from '@material-ui/icons/Edit'
+import React from 'react'
+import EditRepoClustersDialog from 'k8s/components/apps/EditRepoClustersDialog'
+import { unless, isNil, join, pipe, pluck } from 'ramda'
+
+const concatClusterNames = pipe(
+  pluck('clusterName'),
+  unless(isNil, join(', ')),
+)
 
 export const options = {
   loaderFn: repositoryActions.list,
   deleteFn: repositoryActions.delete,
-  defaultParams: {
-    sortBy: 'name',
-    sortDirection: 'asc',
-    clusterId: allKey,
-  },
-  editUrl: '/ui/kubernetes/infrastructure/repositories/edit',
+  rowActions: [
+    { icon: <EditIcon />, label: 'Edit repo clusters', dialog: EditRepoClustersDialog },
+  ],
   columns: [
     { id: 'name', label: 'Name' },
     { id: 'url', label: 'URL' },
     { id: 'source', label: 'Source' },
-    { id: 'clusters', label: 'Clusters' },
+    { id: 'clusters', label: 'Clusters', render: concatClusterNames },
   ],
   name: 'Repositories',
   title: 'Repositories',
