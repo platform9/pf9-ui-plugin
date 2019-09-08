@@ -3,7 +3,7 @@ import {
   values, groupBy, propEq, find, propOr, pick,
 } from 'ramda'
 import ApiClient from 'api-client/ApiClient'
-import { asyncFlatMap, emptyArr, switchCase } from 'utils/fp'
+import { asyncFlatMap, emptyArr, objSwitchCase } from 'utils/fp'
 import { allKey, imageUrlRoot } from 'app/constants'
 import { parseClusterParams, clustersDataKey } from 'k8s/components/infrastructure/actions'
 import createCRUDActions from 'core/helpers/createCRUDActions'
@@ -16,7 +16,12 @@ const { qbert } = ApiClient.getInstance()
 const uniqueIdentifier = 'id'
 const indexBy = 'clusterId'
 
-export const appActions = createCRUDActions('apps', {
+const appsDataKey = 'apps'
+const releasesDataKey = 'releases'
+const repositoriesWithClustersDataKey = 'repositoriesWithClusters'
+const repositoriesDataKey = 'repositories'
+
+export const appActions = createCRUDActions(appsDataKey, {
   listFn: async (params, loadFromContext) => {
     const [clusterId, clusters] = await parseClusterParams(params, loadFromContext)
     if (clusterId === allKey) {
@@ -54,7 +59,7 @@ export const appActions = createCRUDActions('apps', {
     )(items),
 })
 
-export const releaseActions = createCRUDActions('releases', {
+export const releaseActions = createCRUDActions(releasesDataKey, {
   listFn: async (params, loadFromContext) => {
     const [clusterId, clusters] = await parseClusterParams(params, loadFromContext)
     if (clusterId === allKey) {
@@ -66,7 +71,7 @@ export const releaseActions = createCRUDActions('releases', {
   indexBy,
 })
 
-const repositoriesByCluster = createContextLoader('repositoriesByCluster', async (params,
+const repositoriesWithClusters = createContextLoader(repositoriesWithClustersDataKey, async (params,
   loadFromContext) => {
   const monocularClusters = await loadFromContext(clustersDataKey, {
     appCatalogClusters: true,
@@ -89,7 +94,7 @@ const repositoriesByCluster = createContextLoader('repositoriesByCluster', async
 })
 
 const getRepoName = (id, repos) => prop('name', find(propEq('id', id), repos))
-export const repositoryActions = createCRUDActions('repositories', {
+export const repositoryActions = createCRUDActions(repositoriesDataKey, {
   listFn: async (params, loadFromContext) => {
     return qbert.getRepositories()
   },
@@ -113,7 +118,7 @@ export const repositoryActions = createCRUDActions('repositories', {
       }, clusters)
 
       // Invalidate the Repositories by Clusters cache so that we force a refetch of the data
-      repositoriesByCluster.invalidateCache()
+      repositoriesWithClusters.invalidateCache()
 
       // Perfom the update operations sequentially, for safety
       await asyncFlatMap(
@@ -131,18 +136,16 @@ export const repositoryActions = createCRUDActions('repositories', {
   entityName: 'Repository',
   uniqueIdentifier,
   refetchCascade: true,
-  successMessage: (updatedItems, prevItems, { id }, operation) => switchCase(
-    null,
-    ['updateRepoClusters', `Successfully edited cluster access for repository ${getRepoName(id, prevItems)}`],
-    ['delete', `Successfully deleted Repository ${getRepoName(id, prevItems)}`],
-  )(operation),
-  errorMessage: (prevItems, { id }, operation) => switchCase(
-    null,
-    ['updateRepoClusters', `Error when updating cluster access for repository ${getRepoName(id, prevItems)}`],
-    ['delete', `Error when trying to delete Repository ${getRepoName(id, prevItems)}`],
-  )(operation),
+  successMessage: (updatedItems, prevItems, { id }, operation) => objSwitchCase({
+    delete: `Successfully deleted Repository ${getRepoName(id, prevItems)}`,
+    updateRepoClusters: `Successfully edited cluster access for repository ${getRepoName(id, prevItems)}`,
+  })(operation),
+  errorMessage: (prevItems, { id }, operation) => objSwitchCase({
+    delete: `Error when trying to delete Repository ${getRepoName(id, prevItems)}`,
+    updateRepoClusters: `Error when updating cluster access for repository ${getRepoName(id, prevItems)}`,
+  })(operation),
   dataMapper: async (items, params, loadFromContext) => {
-    const reposByCluster = await loadFromContext('repositoriesByCluster')
+    const reposWithClusters = await loadFromContext(repositoriesWithClustersDataKey)
     return map(({ id, type, attributes }) => ({
       id,
       type,
@@ -152,7 +155,7 @@ export const repositoryActions = createCRUDActions('repositories', {
       clusters: pipe(
         find(propEq('id', id)),
         propOr(emptyArr, 'clusters'),
-      )(reposByCluster),
+      )(reposWithClusters),
     }))(items)
   },
   sortWith:

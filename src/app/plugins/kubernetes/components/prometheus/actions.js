@@ -1,4 +1,4 @@
-import { asyncFlatMap, pathOrNull, switchCase } from 'utils/fp'
+import { asyncFlatMap, pathOrNull, objSwitchCase } from 'utils/fp'
 import { map, pathEq, find, pluck, curry, pipe, last, pathOr, prop, propEq } from 'ramda'
 import ApiClient from 'api-client/ApiClient'
 import { clustersDataKey } from '../infrastructure/actions'
@@ -65,11 +65,10 @@ export const prometheusInstanceActions = createCRUDActions(prometheusInstancesDa
     const clusters = await loadFromContext(clustersDataKey)
     return items.map(mapPrometheusInstance(clusters))
   },
-  successMessage: (updatedItems, prevItems, { uid }, operation) => switchCase(
-    null,
-    ['create', `Successfully created Prometheus instance ${prop('name', last(updatedItems))}`],
-    ['delete', `Successfully deleted Prometheus instance ${getName(uid, prevItems)}`],
-  )(operation),
+  successMessage: (updatedItems, prevItems, { uid }, operation) => objSwitchCase({
+    create: `Successfully created Prometheus instance ${prop('name', last(updatedItems))}`,
+    delete: `Successfully deleted Prometheus instance ${getName(uid, prevItems)}`,
+  })(operation),
   uniqueIdentifier,
 })
 
@@ -87,7 +86,7 @@ export const serviceAccountActions = createCRUDActions(serviceAccountsDataKey, {
     labels: metadata.labels,
   })),
   indexBy: ['clusterId', 'namespace'],
-  uniqueIdentifier
+  uniqueIdentifier,
 })
 
 /* Rules */
@@ -109,11 +108,10 @@ export const prometheusRuleActions = createCRUDActions(prometheusRulesDataKey, {
     }
     await qbert.deletePrometheusRule(rule.clusterUuid, rule.namespace, rule.name)
   },
-  successMessage: (updatedItems, prevItems, { uid }, operation) => switchCase(
-    null,
-    ['create', `Successfully created Prometheus rule ${prop('name', last(updatedItems))}`],
-    ['delete', `Successfully deleted Prometheus rule ${getName(uid, prevItems)}`],
-  )(operation),
+  successMessage: (updatedItems, prevItems, { uid }, operation) => objSwitchCase({
+    create: `Successfully created Prometheus rule ${prop('name', last(updatedItems))}`,
+    delete: `Successfully deleted Prometheus rule ${getName(uid, prevItems)}`,
+  })(operation),
   dataMapper: map(({ clusterUuid, metadata, spec }) => ({
     uid: metadata.uid,
     clusterUuid,
@@ -144,11 +142,10 @@ export const prometheusServiceMonitorActions = createCRUDActions(prometheusServi
     }
     await qbert.deletePrometheusServiceMonitor(sm.clusterUuid, sm.namespace, sm.name)
   },
-  successMessage: (updatedItems, prevItems, { uid }, operation) => switchCase(
-    null,
-    ['create', `Successfully created Prometheus Service Monitor ${prop('name', last(updatedItems))}`],
-    ['delete', `Successfully deleted Prometheus Service Monitor ${getName(uid, prevItems)}`],
-  )(operation),
+  successMessage: (updatedItems, prevItems, { uid }, operation) => objSwitchCase({
+    create: `Successfully created Prometheus Service Monitor ${prop('name', last(updatedItems))}`,
+    delete: `Successfully deleted Prometheus Service Monitor ${getName(uid, prevItems)}`,
+  })(operation),
   dataMapper: map(({ clusterUuid, metadata, spec }) => ({
     uid: metadata.uid,
     clusterUuid,
@@ -180,11 +177,10 @@ export const prometheusAlertManagerActions = createCRUDActions(prometheusAlertMa
     }
     await qbert.deletePrometheusAlertManager(am.clusterUuid, am.namespace, am.name)
   },
-  successMessage: (updatedItems, prevItems, { uid }, operation) => switchCase(
-    null,
-    ['create', `Successfully created Prometheus Alert Manager ${prop('name', last(updatedItems))}`],
-    ['delete', `Successfully deleted Prometheus Alert Manager ${getName(uid, prevItems)}`],
-  )(operation),
+  successMessage: (updatedItems, prevItems, { uid }, operation) => objSwitchCase({
+    create: `Successfully created Prometheus Alert Manager ${prop('name', last(updatedItems))}`,
+    delete: `Successfully deleted Prometheus Alert Manager ${getName(uid, prevItems)}`,
+  })(operation),
   dataMapper: map(({ clusterUuid, metadata, spec }) => ({
     uid: metadata.uid,
     clusterUuid,

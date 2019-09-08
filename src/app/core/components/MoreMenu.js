@@ -5,7 +5,6 @@ import MenuItem from '@material-ui/core/MenuItem'
 import IconButton from '@material-ui/core/IconButton'
 import MoreVertIcon from '@material-ui/icons/MoreVert'
 import { withAppContext } from 'core/AppProvider'
-import { ensureFunction } from 'utils/fp'
 
 class MoreMenu extends React.PureComponent {
   state = {
@@ -26,7 +25,7 @@ class MoreMenu extends React.PureComponent {
   handleClick = (action, label) => e => {
     e.stopPropagation()
     this.handleClose(e)
-    ensureFunction(action)(this.props.data, this.props.context)
+    action && action(this.props.data, this.props.context)
     this.setState({ openedAction: label })
   }
 
