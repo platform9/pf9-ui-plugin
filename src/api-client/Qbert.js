@@ -312,7 +312,7 @@ class Qbert {
   }
 
   createRepository = async (body) => {
-    return this.client.basicPost(`${this.monocularBaseUrl()}/repos`, body)
+    return this.client.basicPost(`${await this.monocularBaseUrl()}/repos`, body)
   }
 
   createRepositoryForCluster = async (clusterId, body) => {
@@ -320,7 +320,7 @@ class Qbert {
   }
 
   deleteRepository = async (repoId) => {
-    return this.client.basicDelete(`${this.monocularBaseUrl()}/repos/${repoId}`)
+    return this.client.basicDelete(`${await this.monocularBaseUrl()}/repos/${repoId}`)
   }
 
   deleteRepositoriesForCluster = async (clusterId, repoId) => {

@@ -80,6 +80,7 @@ const ValidatedFormInput = ({
     value,
     hasError,
     errorMessage,
+    required,
   })
 }
 

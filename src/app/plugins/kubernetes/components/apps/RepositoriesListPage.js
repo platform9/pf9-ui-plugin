@@ -4,6 +4,7 @@ import EditIcon from '@material-ui/icons/Edit'
 import React from 'react'
 import EditRepoClustersDialog from 'k8s/components/apps/EditRepoClustersDialog'
 import { unless, isNil, join, pipe, pluck } from 'ramda'
+import AddRepoDialog from 'k8s/components/apps/AddRepoDialog'
 
 const concatClusterNames = pipe(
   pluck('clusterName'),
@@ -16,6 +17,8 @@ export const options = {
   rowActions: [
     { icon: <EditIcon />, label: 'Edit repo clusters', dialog: EditRepoClustersDialog },
   ],
+  addText: 'Add New Repository',
+  renderAddDialog: onClose => <AddRepoDialog onClose={onClose} />,
   columns: [
     { id: 'name', label: 'Name' },
     { id: 'url', label: 'URL' },

@@ -1,10 +1,10 @@
 import {
   mergeLeft, path, filter, reverse, identity, sortBy, prop, pluck, map, pipe, pathEq, head, props,
-  values, groupBy, propEq, find, propOr, pick,
+  values, groupBy, propEq, find, propOr, pick, F,
 } from 'ramda'
 import ApiClient from 'api-client/ApiClient'
-import { asyncFlatMap, emptyArr, objSwitchCase } from 'utils/fp'
-import { allKey, imageUrlRoot } from 'app/constants'
+import { asyncFlatMap, emptyArr, objSwitchCase, asyncTryCatch } from 'utils/fp'
+import { allKey, imageUrlRoot, addError, deleteError, updateError } from 'app/constants'
 import { parseClusterParams, clustersDataKey } from 'k8s/components/infrastructure/actions'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { pathJoin } from 'utils/misc'
@@ -93,10 +93,27 @@ const repositoriesWithClusters = createContextLoader(repositoriesWithClustersDat
   uniqueIdentifier,
 })
 
-const getRepoName = (id, repos) => prop('name', find(propEq('id', id), repos))
+const getRepoName = (id, repos) => id ? pipe(
+  find(propEq('id', id)),
+  propOr(id, 'name'),
+)(repos) : ''
+
 export const repositoryActions = createCRUDActions(repositoriesDataKey, {
-  listFn: async (params, loadFromContext) => {
+  listFn: async () => {
     return qbert.getRepositories()
+  },
+  createFn: async ({ clusters, ...data }) => {
+    const result = await qbert.createRepository(data)
+
+    const addResults = await asyncTryCatch(() => asyncFlatMap(clusters,
+      clusterId => qbert.createRepositoryForCluster(clusterId, data),
+    ), F)(null)
+
+    if (!addResults) {
+      // TODO: figure out a way to show toast notifications with non-blocking errors
+      console.warn('Error when trying to add repo to cluster')
+    }
+    return result
   },
   deleteFn: async ({ id }) => {
     await qbert.deleteRepository(id)
@@ -117,32 +134,46 @@ export const repositoryActions = createCRUDActions(repositoriesDataKey, {
         return !prevSelectedClusters.includes(clusterId)
       }, clusters)
 
-      // Invalidate the Repositories by Clusters cache so that we force a refetch of the data
+      // Invalidate the Repositories with Clusters cache so that we force a refetch of the data
       repositoriesWithClusters.invalidateCache()
 
-      // Perfom the update operations sequentially, for safety
-      await asyncFlatMap(
-        itemsToRemove,
+      // Perfom the update operations, return FALSE if there has been any error
+      const deleteResults = await asyncTryCatch(() => asyncFlatMap(itemsToRemove,
         clusterId => qbert.deleteRepositoriesForCluster(clusterId, id),
-        false,
-      )
-      await asyncFlatMap(
-        itemsToAdd,
+      ), F)(null)
+      const addResults = await asyncTryCatch(() => asyncFlatMap(itemsToAdd,
         clusterId => qbert.createRepositoryForCluster(clusterId, body),
-        false,
-      )
+      ), F)(null)
+
+      // Check if there has been any errors
+      if (!deleteResults && !addResults) {
+        throw new Error(updateError)
+      }
+      if (!deleteResults) {
+        throw new Error(deleteError)
+      }
+      if (!addResults) {
+        throw new Error(addError)
+      }
     },
   },
   entityName: 'Repository',
   uniqueIdentifier,
   refetchCascade: true,
-  successMessage: (updatedItems, prevItems, { id }, operation) => objSwitchCase({
+  successMessage: (updatedItems, prevItems, { id, name }, operation) => objSwitchCase({
+    create: `Successfully created Repository ${name}`,
     delete: `Successfully deleted Repository ${getRepoName(id, prevItems)}`,
     updateRepoClusters: `Successfully edited cluster access for repository ${getRepoName(id, prevItems)}`,
   })(operation),
-  errorMessage: (prevItems, { id }, operation) => objSwitchCase({
+  errorMessage: (prevItems, { id, name }, catchedErr, operation) => objSwitchCase({
+    create: objSwitchCase({
+      [addError]: `Repository ${name} could not be added to cluster `,
+    }, `Error when trying to create a ${name} repository`)(catchedErr.message),
     delete: `Error when trying to delete Repository ${getRepoName(id, prevItems)}`,
-    updateRepoClusters: `Error when updating cluster access for repository ${getRepoName(id, prevItems)}`,
+    updateRepoClusters: objSwitchCase({
+      [deleteError]: `Repository ${getRepoName(id, prevItems)} could not be removed from cluster `,
+      [addError]: `Repository ${getRepoName(id, prevItems)} could not be added to cluster `,
+    }, `Error when updating cluster access for repository ${getRepoName(id, prevItems)}`)(catchedErr.message),
   })(operation),
   dataMapper: async (items, params, loadFromContext) => {
     const reposWithClusters = await loadFromContext(repositoriesWithClustersDataKey)
@@ -158,10 +189,5 @@ export const repositoryActions = createCRUDActions(repositoriesDataKey, {
       )(reposWithClusters),
     }))(items)
   },
-  sortWith:
-    (items, { orderBy = 'name', orderDirection = 'asc' }) =>
-      pipe(
-        sortBy(prop(orderBy)),
-        orderDirection === 'asc' ? identity : reverse,
-      )(items),
+  defaultOrderBy: 'name',
 })

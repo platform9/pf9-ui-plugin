@@ -43,7 +43,7 @@ function createContextUpdater (key, dataUpdaterFn, options = {}) {
       ['update', 'updated'],
       ['delete', 'deleted'],
     )(operation)} ${entityName}`,
-    errorMessage = (prevItems, params, operation, catchedErr) => {
+    errorMessage = (prevItems, params, catchedErr, operation) => {
       const action = switchCase(
         'update',
         ['create', 'create'],
@@ -81,8 +81,8 @@ function createContextUpdater (key, dataUpdaterFn, options = {}) {
   const contextUpdaterFn = singlePromise(async ({
     getContext,
     setContext,
-    params = {},
-    loaderParams,
+    params = emptyObj,
+    loaderParams = emptyObj,
     additionalOptions = emptyObj,
     noDataMapping = false
   }) => {
@@ -125,7 +125,7 @@ function createContextUpdater (key, dataUpdaterFn, options = {}) {
       }
     } catch (err) {
       if (onError) {
-        const parsedErrorMesssage = ensureFunction(errorMessage)(prevItems, params, operation, err)
+        const parsedErrorMesssage = ensureFunction(errorMessage)(prevItems, params, err, operation)
         await onError(parsedErrorMesssage, err, params)
       }
     }

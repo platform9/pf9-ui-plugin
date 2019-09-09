@@ -149,6 +149,15 @@ export const asyncFlatMap = async (arr, callback, parallel = true) => {
   return newArr
 }
 
+// Functional async try catch
+export const asyncTryCatch = curry(async (tryer, catcher, input) => {
+  try {
+    return await tryer(input)
+  } catch (e) {
+    return catcher(e)
+  }
+})
+
 // Like Promise.all but for object properties instead of iterated values
 // Example:
 // asyncProps({
@@ -288,7 +297,7 @@ export const filterIf = curry(
 /**
  * Returns a functional switch statement
  * @param {*} defaultValue Value to be returned when no cases matches the key
- * @param {...[*,*]} cases Condition pairs of [case, result] where "case" will be tested against the provided value
+ * @param {...[*,*]} cases Case pairs of [condition, result] where "condition" will be tested against the provided value
  * @returns {function(*=): *}
  *
  * @example

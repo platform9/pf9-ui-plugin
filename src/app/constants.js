@@ -10,6 +10,9 @@ export const noneKey = '__none__'
 export const listTablePrefs = ['visibleColumns', 'columnsOrder', 'rowsPerPage', 'orderBy', 'orderDirection']
 
 // Errors
+export const addError = 'ERR_ADD'
+export const updateError = 'ERR_UPDATE'
+export const deleteError = 'ERR_DELETE'
 export const notFoundErr = 'ERR_NOT_FOUND'
 
 // Clarity

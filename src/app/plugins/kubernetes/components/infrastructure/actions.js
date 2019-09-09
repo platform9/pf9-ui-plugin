@@ -1,7 +1,6 @@
 import { asyncMap, pathOrNull, pipeWhenTruthy, isTruthy } from 'app/utils/fp'
 import {
-  identity, find, pathOr, pluck, prop, propEq, propSatisfies, compose, path, pipe, sortBy, reverse,
-  either,
+  find, pathOr, pluck, prop, propEq, propSatisfies, compose, path, pipe, either,
 } from 'ramda'
 import { allKey } from 'app/constants'
 import { castFuzzyBool } from 'utils/misc'
@@ -119,11 +118,7 @@ export const clusterActions = createCRUDActions(clustersDataKey, {
     filterIf(appCatalogClusters, hasAppCatalogEnabled),
     filterIf(hasControlPlane, either(hasMasterNode, masterlessCluster))
   )(items),
-  sortWith: (items, { orderBy = 'name', orderDirection = 'asc' }) =>
-    pipe(
-      sortBy(prop(orderBy)),
-      orderDirection === 'asc' ? identity : reverse,
-    )(items),
+  defaultOrderBy: 'name',
 })
 
 export const createCluster = async ({ data, context }) => {

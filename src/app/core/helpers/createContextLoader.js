@@ -28,6 +28,7 @@ const arrayIfEmpty = when(isEmpty, always(emptyArr))
  * @property {function} [preloader] Function that will be called at the beginning so that its result can be used in the dataMapper second argument
  * @property {function} [dataMapper] Function used to apply additional transformations to the data AFTER being retrieved from cache
  * @property {bool} [refetchCascade=false] Indicate wether or not to refetch all the resources loaded using `loadFromContext` in the loader or mapper functions
+ * @property {string} defaultOrderBy ID of the field that will be used to sort the returned items
  * @property {function} [sortWith] Function used to sort the data after being parsed by the dataMapper
  * @property {function|string} [fetchSuccessMessage] Custom message to display after the items have been successfully fetched
  * @property {function|string} [fetchErrorMessage] Custom message to display after an error has been thrown
@@ -50,9 +51,10 @@ const createContextLoader = (key, dataFetchFn, options = {}) => {
     requiredParams = indexBy,
     dataMapper = identity,
     refetchCascade = false,
-    sortWith = (items, { orderBy = uniqueIdentifierPath, orderDirection = 'asc' }) =>
+    defaultOrderBy = uniqueIdentifier,
+    sortWith = (items, { orderBy = defaultOrderBy, orderDirection = 'asc' }) =>
       pipe(
-        sortBy(path(orderBy)),
+        sortBy(path(orderBy.split('.'))),
         orderDirection === 'asc' ? identity : reverse,
       )(items),
     fetchSuccessMessage = (params) => `Successfully fetched ${entityName} items`,
@@ -107,7 +109,7 @@ const createContextLoader = (key, dataFetchFn, options = {}) => {
         pickAll(allIndexKeys),
         reject(either(isNil, equals(allKey))),
       )(params)
-      const loadFromContext = (key, params, refetchDeep = refetchCascade && refetch) => {
+      const loadFromContext = (key, params = emptyObj, refetchDeep = refetchCascade && refetch) => {
         const loaderFn = getContextLoader(key)
         return loaderFn({ getContext, setContext, params, refetch: refetchDeep, additionalOptions })
       }

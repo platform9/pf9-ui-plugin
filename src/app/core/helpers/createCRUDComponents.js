@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react'
+import React, { useMemo, useCallback, useState } from 'react'
 import CreateButton from 'core/components/buttons/CreateButton'
 import CRUDListContainer from 'core/components/CRUDListContainer'
 import ListTable from 'core/components/listTable/ListTable'
@@ -45,6 +45,7 @@ const createCRUDComponents = options => {
     uniqueIdentifier = 'id',
     addText = 'Add',
     addUrl,
+    renderAddDialog,
     editUrl,
     debug,
     name,
@@ -93,11 +94,17 @@ const createCRUDComponents = options => {
   // ListContainer
   const ListContainer = withRouter(({ history, data, loading, reload, ...restProps }) => {
     const [handleRemove, deleting] = deleteFn ? useDataUpdater(deleteFn, reload) : emptyArr
+    const [addDialogOpen, setAddDialogOpen] = useState(false)
+    const handleAddDialogClose = useCallback(() => {
+      setAddDialogOpen(false)
+      reload()
+    }, [reload])
     const addButton = useMemo(
-      () => <CreateButton onClick={() => history.push(addUrl)}>{addText}</CreateButton>,
+      () => <CreateButton onClick={
+        () => renderAddDialog ? setAddDialogOpen(true) : history.push(addUrl)
+      }>{addText}</CreateButton>,
       [history])
     const refetch = useCallback(() => reload(true))
-
     return (
       <CRUDListContainer
         items={data}
@@ -106,7 +113,8 @@ const createCRUDComponents = options => {
         uniqueIdentifier={uniqueIdentifier}
       >
         {handlers => <>
-          {addUrl && <TopExtraContent>{addButton}</TopExtraContent>}
+          {(addUrl || renderAddDialog) && <TopExtraContent>{addButton}</TopExtraContent>}
+          {renderAddDialog && addDialogOpen && renderAddDialog(handleAddDialogClose)}
           <List
             loading={loading || deleting}
             data={data}
