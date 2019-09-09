@@ -1,19 +1,16 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { extraContentId } from 'core/components/Toolbar'
+import { AppContext } from 'core/AppProvider'
 
-class TopExtraContent extends React.PureComponent {
-  render () {
-    const { children } = this.props
-    const container = document.getElementById(`${extraContentId}`)
-    if (!container) {
-      return null
-    }
-    return ReactDOM.createPortal(
-      children,
-      container,
-    )
+const TopExtraContent = ({ children }) => {
+  const { extraContentRef } = React.useContext(AppContext)
+  if (!extraContentRef || !extraContentRef.current) {
+    return null
   }
+  return ReactDOM.createPortal(
+    children,
+    extraContentRef.current,
+  )
 }
 
 export default TopExtraContent

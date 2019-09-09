@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import TenantChooser from 'openstack/components/tenants/TenantChooser'
 import RegionChooser from 'openstack/components/regions/RegionChooser'
@@ -7,8 +7,8 @@ import MaterialToolbar from '@material-ui/core/Toolbar/Toolbar'
 import { AppBar } from '@material-ui/core'
 import { imageUrls } from 'app/constants'
 import { withStyles } from '@material-ui/styles'
-
-export const extraContentId = 'top-extra-content'
+import { AppContext } from 'core/AppProvider'
+import { assoc, dissoc } from 'ramda'
 
 const styles = theme => ({
   appBar: {
@@ -45,8 +45,17 @@ const styles = theme => ({
   },
 })
 
+const extraContentRef = React.createRef()
+
 const renderExtraContent = classes => {
-  return <div className={classes.extraContent} id={extraContentId} />
+  const { setContext } = React.useContext(AppContext)
+  useEffect(() => {
+    setContext(assoc('extraContentRef', extraContentRef))
+    return () => {
+      setContext(dissoc('extraContentRef'))
+    }
+  }, [])
+  return <div className={classes.extraContent} ref={extraContentRef} />
 }
 
 const Toolbar = ({ classes, open }) => (
