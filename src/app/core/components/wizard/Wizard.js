@@ -5,6 +5,7 @@ import NextButton from 'core/components/buttons/NextButton'
 import PrevButton from 'core/components/buttons/PrevButton'
 import { ensureFunction } from 'utils/fp'
 import WizzardStepper from 'core/components/wizard/WizardStepper'
+import CancelButton from 'core/components/buttons/CancelButton'
 
 export const WizardContext = React.createContext({})
 
@@ -44,8 +45,8 @@ class Wizard extends PureComponent {
   handleNext = () => {
     const { onComplete } = this.props
 
-    if (this.nextCb) {
-      this.nextCb()
+    if (this.nextCb && this.nextCb() === false) {
+      return
     }
 
     this.setState(
@@ -78,14 +79,15 @@ class Wizard extends PureComponent {
 
   render () {
     const { wizardContext, setWizardContext, steps, activeStep } = this.state
-    const { children, submitLabel } = this.props
+    const { showSteps, children, submitLabel, onCancel } = this.props
     const renderStepsContent = ensureFunction(children)
 
     return (
       <WizardContext.Provider value={this.state}>
-        <WizzardStepper steps={steps} activeStep={activeStep} />
+        {showSteps && <WizzardStepper steps={steps} activeStep={activeStep} />}
         {renderStepsContent({ wizardContext, setWizardContext, onNext: this.onNext })}
         <WizardButtons>
+          {onCancel && <CancelButton onClick={onCancel} />}
           {this.hasBack() &&
           <PrevButton onClick={this.handleBack} />}
           {this.hasNext() &&
@@ -99,13 +101,16 @@ class Wizard extends PureComponent {
 }
 
 Wizard.propTypes = {
+  showSteps: PropTypes.bool,
   onComplete: PropTypes.func,
+  onCancel: PropTypes.func,
   context: PropTypes.object,
   submitLabel: PropTypes.string,
   children: PropTypes.oneOfType([PropTypes.array, PropTypes.func]).isRequired,
 }
 
 Wizard.defaultProps = {
+  showSteps: true,
   submitLabel: 'Complete',
   onComplete: value => {
     console.info('Wizard#onComplete handler not implemented.  Falling back to console.log')

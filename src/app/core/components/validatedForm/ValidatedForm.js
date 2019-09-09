@@ -61,7 +61,7 @@ class ValidatedForm extends PureComponent {
         if (this.state.showingErrors ||
           (this.props.showErrorsOnBlur && pathEq(['errors', field, 'hasError'], true, this.state))
         ) {
-          this.validateField(field)
+          this.validateField(field)(null)
         }
         // Pass field up to parent if there is a parent
         if (this.props.setContext) {
@@ -131,7 +131,7 @@ class ValidatedForm extends PureComponent {
   validateForm = () => {
     const { fields } = this.state
     const results = Object.keys(fields).map(field =>
-      this.validateField(field),
+      this.validateField(field)(null),
     )
     return !results.includes(false)
   }
@@ -147,7 +147,7 @@ class ValidatedForm extends PureComponent {
       if (!showingErrors) {
         this.setState(prevState => ({ ...prevState, showingErrors: true }))
       }
-      return
+      return false
     }
 
     if (onSubmit) {
@@ -157,6 +157,7 @@ class ValidatedForm extends PureComponent {
     if (clearOnSubmit) {
       this.setState({ values: initialValues })
     }
+    return true
   }
 
   render () {
