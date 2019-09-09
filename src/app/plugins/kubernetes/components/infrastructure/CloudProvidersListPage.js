@@ -14,7 +14,7 @@ export const options = {
   dataKey: cloudProvidersDataKey,
   editUrl: '/ui/kubernetes/infrastructure/cloudProviders/edit',
   name: 'CloudProviders',
-  rowActions: () => [],
+  rowActions: [],
   title: 'Cloud Providers',
   uniqueIdentifier: 'uuid',
 }
