@@ -40,9 +40,7 @@ class CRUDListContainer extends React.PureComponent {
     this.setState({ showConfirmation: false })
     const items = this.state.selectedItems || []
 
-    // Items will be deleted sequentially, otherwise we would run in a race condition
-    // causing the context to be incorrectly updated with just one item removed
-    await asyncMap(items, this.handleRemove, false)
+    await asyncMap(items, this.handleRemove)
 
     this.setState({ selectedItems: [] })
     // The user resolves the promise by clicking "confirm".

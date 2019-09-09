@@ -1,6 +1,8 @@
 import { useState, useCallback, useMemo, useContext, useEffect, useRef } from 'react'
 import { ToastContext } from 'core/providers/ToastProvider'
 import { AppContext } from 'core/AppProvider'
+import { emptyObj } from 'utils/fp'
+import { isEmpty } from 'ramda'
 
 /**
  * Hook to update data using the specified updater function
@@ -11,6 +13,11 @@ import { AppContext } from 'core/AppProvider'
 const useDataUpdater = (updaterFn, onComplete) => {
   // We use this ref to flag when the component has been unmounted so we prevent further state updates
   const unmounted = useRef(false)
+
+  // FIFO buffer of sequentialized data updating promises
+  // The aim of this is to prevent issues in the case two or more subsequent data updating requests
+  // are performed with different params, and the previous one didn't have time to finish
+  const updaterPromisesBuffer = useRef([])
   const [loading, setLoading] = useState(false)
   const { getContext, setContext } = useContext(AppContext)
   const showToast = useContext(ToastContext)
@@ -24,13 +31,30 @@ const useDataUpdater = (updaterFn, onComplete) => {
       const key = updaterFn.getKey()
       console.error(`Error when updating entity "${key}"`, catchedErr)
       showToast(errorMessage, 'error')
-    }
+    },
   }), [showToast])
-  const update = useCallback(async (params) => {
-    setLoading(true)
-    await updaterFn({ getContext, setContext, params, additionalOptions })
-    // Make sure the component is not unmounted before updating the state
-    if (!unmounted.current) {
+
+  // The following function will handle the calls to the data updating and
+  // set the loading state variable to true in the meantime, while also taking care
+  // of the sequantialization of multiple concurrent calls
+  const update = useCallback(async (params = emptyObj) => {
+    // No need to update loading state if a request is already in progress
+    if (isEmpty(updaterPromisesBuffer.current)) {
+      setLoading(true)
+    }
+
+    // Create a new promise that will wait for the previous promises in the buffer before running the new request
+    const currentPromise = (async () => {
+      await Promise.all(updaterPromisesBuffer.current) // Wait for previous promises to resolve
+      await updaterFn({ getContext, setContext, params, additionalOptions })
+      updaterPromisesBuffer.current.shift() // Delete the oldest promise in the sequence (FIFO)
+    })()
+    updaterPromisesBuffer.current.push(currentPromise)
+    await currentPromise
+
+    // With this condition, we ensure that all promises except the last one will be ignored
+    if (isEmpty(updaterPromisesBuffer.current) &&
+      !unmounted.current) {
       setLoading(false)
       if (onComplete) {
         await onComplete()

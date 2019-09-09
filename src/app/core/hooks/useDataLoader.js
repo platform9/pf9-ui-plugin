@@ -1,6 +1,6 @@
 import { useMemo, useEffect, useState, useCallback, useContext, useRef } from 'react'
 import moize from 'moize'
-import { emptyArr } from 'utils/fp'
+import { emptyArr, emptyObj } from 'utils/fp'
 import { isEmpty } from 'ramda'
 import { ToastContext } from 'core/providers/ToastProvider'
 import { AppContext } from 'core/AppProvider'
@@ -19,7 +19,7 @@ const onErrorHandler = moize((loaderFn, showToast) => (errorMessage, catchedErr,
  * @param {boolean} [invalidateCache=false] Reset cache before performing the loading when component mounts
  * @returns {[array, boolean, function]} Returns an array with the loaded data, a loading boolean and a function to reload the data
  */
-const useDataLoader = (loaderFn, params, invalidateCache = false) => {
+const useDataLoader = (loaderFn, params = emptyObj, invalidateCache = false) => {
   // Use this ref to invalidate the cache on component mount so we will force data refetch
   // Invalidating the cache clears all the cache for this entity, unlike using the "refetch"
   // param, which only refreshes data for the current set of params
