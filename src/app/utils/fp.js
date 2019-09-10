@@ -1,6 +1,6 @@
 import {
   T, cond, equals, always, adjust, update, findIndex, assocPath, curry, fromPairs, mapObjIndexed,
-  pathOr, remove, flatten, values, groupBy, filter, either, isNil, isEmpty, toPairs,
+  pathOr, remove, flatten, values, groupBy, filter, either, isNil, isEmpty,
 } from 'ramda'
 import moize from 'moize'
 
@@ -296,7 +296,7 @@ export const filterIf = curry(
 
 /**
  * Returns a functional switch statement
- * @param {*} defaultValue Value to be returned when no cases matches the key
+ * @param {*} defaultValue Value to be returned when no case matches the key
  * @param {...[*,*]} cases Case pairs of [condition, result] where "condition" will be tested against the provided value
  * @returns {function(*=): *}
  *
@@ -320,8 +320,8 @@ export const switchCase = (defaultValue, ...cases) => input =>
 /**
  * A functional switch case that accepts an object as an input of cases
  * A cleaner way (over switchCase) of dealing with sets of cases when the conditions are strings
- * @param {object} casesObj Object whose keys will be the conditions to test again the provided value
- * @param {*} [defaultValue] Value to be returned when no cases matches the key
+ * @param {object} casesObj Object whose keys will be the conditions to test against the provided value
+ * @param {*} [defaultValue] Value to be returned when no case matches the key
  * @returns {function(*=): *}
  *
  * @example
@@ -334,5 +334,5 @@ export const switchCase = (defaultValue, ...cases) => input =>
  * stringsSwitch("foo")  // "value foo"
  * stringsSwitch("test") // "defaultValue"
  */
-export const objSwitchCase = (casesObj, defaultValue) =>
-  switchCase(defaultValue, ...toPairs(casesObj))
+export const objSwitchCase = (casesObj, defaultValue) => input =>
+  casesObj.hasOwnProperty(input) ? casesObj[input] : defaultValue
