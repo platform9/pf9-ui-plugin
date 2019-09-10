@@ -1,12 +1,13 @@
-import React, { PureComponent } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { withRouter } from 'react-router-dom'
-import { compose } from 'app/utils/fp'
-import { withAppContext } from 'core/AppProvider'
 import FormWrapper from 'core/components/FormWrapper'
 import Progress from 'core/components/progress/Progress'
-import requiresAuthentication from 'openstack/util/requiresAuthentication'
 import { getContextLoader } from 'core/helpers/createContextLoader'
 import { getContextUpdater } from 'core/helpers/createContextUpdater'
+import useDataLoader from 'core/hooks/useDataLoader'
+import useDataUpdater from 'core/hooks/useDataUpdater'
+import { pathEq, assocPath, isEmpty } from 'ramda'
+import { emptyObj } from 'utils/fp'
 
 const createUpdateComponents = options => {
   const {
@@ -25,55 +26,50 @@ const createUpdateComponents = options => {
     title,
     uniqueIdentifier = 'id',
   } = options
+  const uniqueIdentifierPath = uniqueIdentifier.split('.')
 
-  // TODO: Refactor this to use hooks
-  class UpdatePageBase extends PureComponent {
-    state = { initialValue: null }
-
-    async componentDidMount () {
-      const { getContext, setContext, match } = this.props
-      const id = match.params[routeParamKey]
-      const existing = await loaderFn({ setContext, getContext })
-      const initialValue = existing.find(x => x[uniqueIdentifier] === id)
-      this.setState({ initialValue })
-    }
-
-    handleComplete = async data => {
-      const { setContext, getContext, history, match } = this.props
-      const id = match.params[routeParamKey]
-      try {
-        if (initFn) {
-          // Sometimes a component needs more than just a single GET API call.
-          // This function allows for any amount of arbitrary initialization.
-          await initFn(this.props)
-        }
-        await updateFn({ params: { [uniqueIdentifier]: id, ...data }, getContext, setContext })
+  const UpdatePage = withRouter(({ match, history, ...restProps }) => {
+    const [initialValues, setInitialValues] = useState(emptyObj)
+    const [data, loading] = useDataLoader(loaderFn)
+    const [update, updating] = useDataUpdater(updateFn, successfulUpdate => {
+      if (successfulUpdate) {
         history.push(listUrl)
-      } catch (err) {
-        console.error(err)
       }
-    }
+    })
+    const id = match.params[routeParamKey]
 
-    render () {
-      const { initialValue } = this.state
+    useEffect(() => {
+      if (data.length) {
+        const currentItem = data.find(pathEq(uniqueIdentifierPath, id))
+        if (currentItem) {
+          setInitialValues(currentItem)
+        } else {
+          console.error(`Item with id ${id} not found`)
+        }
+      }
+    }, [data])
 
-      return (
-        <Progress message="Fetching data..." loading={!initialValue}>
-          <FormWrapper title={title} backUrl={listUrl}>
-            <FormComponent {...this.props}
-              onComplete={this.handleComplete}
-              initialValues={initialValue} />
-          </FormWrapper>
-        </Progress>
-      )
-    }
-  }
+    const handleComplete = useCallback(async data => {
+      if (initFn) {
+        // Sometimes a component needs more than just a single GET API call.
+        // This function allows for any amount of arbitrary initialization.
+        await initFn(restProps)
+      }
+      update(assocPath(uniqueIdentifierPath, id, data))
+    }, [id])
 
-  const UpdatePage = compose(
-    withAppContext,
-    withRouter,
-    requiresAuthentication,
-  )(UpdatePageBase)
+    return <Progress message={`${updating
+      ? 'Updating data...'
+      : 'Loading data...'}`} loading={isEmpty(initialValues) || loading || updating}>
+      <FormWrapper title={title} backUrl={listUrl}>
+        <FormComponent
+          {...restProps}
+          onComplete={handleComplete}
+          initialValues={initialValues} />
+      </FormWrapper>
+    </Progress>
+  })
+
   UpdatePage.displayName = `Update${name}Page`
 
   return {
