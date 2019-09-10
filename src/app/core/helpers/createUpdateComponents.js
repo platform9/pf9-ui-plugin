@@ -58,16 +58,16 @@ const createUpdateComponents = options => {
       update(assocPath(uniqueIdentifierPath, id, data))
     }, [id])
 
-    return <Progress message={`${updating
-      ? 'Updating data...'
-      : 'Loading data...'}`} loading={isEmpty(initialValues) || loading || updating}>
-      <FormWrapper title={title} backUrl={listUrl}>
+    return <FormWrapper title={title} backUrl={listUrl}>
+      <Progress message={`${updating
+        ? 'Updating data...'
+        : 'Loading data...'}`} loading={isEmpty(initialValues) || loading || updating}>
         <FormComponent
           {...restProps}
           onComplete={handleComplete}
           initialValues={initialValues} />
-      </FormWrapper>
-    </Progress>
+      </Progress>
+    </FormWrapper>
   })
 
   UpdatePage.displayName = `Update${name}Page`
