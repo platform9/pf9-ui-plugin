@@ -16,7 +16,6 @@ const sortingConfig = [
   {
     field: 'created',
     label: 'Created',
-
   },
 ]
 const defaultParams = {
@@ -43,16 +42,13 @@ const AppCatalogPage = () => {
     filters={<>
       <ClusterPicklist
         showAll={false}
-        label="Cluster"
         onlyAppCatalogEnabled
         onChange={getParamsUpdater('clusterId')}
         value={params.clusterId} />
-      {params.clusterId && <RepositoryPicklist
-        label="Repository"
+      <RepositoryPicklist
         onChange={getParamsUpdater('repositoryId')}
-        clusterId={params.clusterId}
         value={params.repositoryId}
-      />}
+      />
     </>}
   >
     {renderCardItems}

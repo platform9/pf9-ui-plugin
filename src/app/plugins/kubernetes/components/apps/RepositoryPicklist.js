@@ -8,25 +8,23 @@ import { repositoryActions } from './actions'
 import { allKey } from 'app/constants'
 
 const RepositoryPicklist = forwardRef(
-  ({ clusterId, loading, onChange, value, showAll, showNone, selectFirst, ...rest }, ref) => {
-    const [repos, reposLoading] = useDataLoader(repositoryActions.list, { clusterId })
+  ({ loading, onChange, selectFirst, ...rest }, ref) => {
+    const [repos, reposLoading] = useDataLoader(repositoryActions.list)
     const options = useMemo(() => projectAs(
       { label: 'name', value: 'id' }, repos,
     ), [repos])
+
     // Select the first item as soon as data is loaded
     useEffect(() => {
       if (!isEmpty(options) && selectFirst) {
         onChange(propOr(allKey, 'value', head(options)))
       }
     }, [options])
+
     return <Picklist
       {...rest}
       ref={ref}
-      showAll={showAll}
-      showNone={showNone}
       onChange={onChange}
-      disabled={isEmpty(options) && !showNone}
-      value={value || (showAll ? allKey : '')}
       loading={loading || reposLoading}
       options={options}
     />
@@ -42,7 +40,7 @@ RepositoryPicklist.propTypes = {
 
 RepositoryPicklist.defaultProps = {
   ...Picklist.defaultProps,
-  name: 'clusterId',
+  name: 'repositoryId',
   label: 'Repository',
   formField: false,
   showAll: true,
