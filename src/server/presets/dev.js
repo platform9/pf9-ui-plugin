@@ -28,6 +28,7 @@ import Chart from '../models/monocular/Chart'
 import Release from '../models/monocular/Release'
 import Repository from '../models/monocular/Repository'
 import StorageClass from '../models/qbert/StorageClass'
+import ClusterRepository from '../models/qbert/Repository'
 import PrometheusInstance from '../models/prometheus/PrometheusInstance'
 import { attachNodeToCluster } from '../models/qbert/Operations'
 // import Token from '../models/openstack/Token'
@@ -225,6 +226,9 @@ function loadPreset () {
 
   // Monocular repositories
   range(3).forEach(i => Repository.create({ data: {}, context, config: { clusterId: cluster.uuid, namespace: defaultNamespace.name } }))
+
+  // Qbert repositories
+  range(3).forEach(i => ClusterRepository.create({ data: {}, context, config: { clusterId: cluster.uuid, namespace: defaultNamespace.name } }))
 }
 
 export default loadPreset

@@ -13,7 +13,6 @@ import { getClusters, postCluster, putCluster, deleteCluster } from './clusters/
 import getClusterVersion from './clusters/getClusterVersion'
 import { attachNodes, detachNodes } from './clusters/attachOperations'
 import getKubeConfig from './kubeConfig/getKubeConfig'
-
 // Namespaces
 import getNamespaces from './namespaces/getNamespaces'
 
@@ -28,15 +27,12 @@ import { getCharts, getChart, getChartVersions } from './charts'
 import { getReleases, getRelease, deleteRelease } from './releases'
 import { tokenValidator } from '../../middleware'
 
-import { getPrometheusInstances, patchPrometheusInstance, deletePrometheusInstance } from './prometheus'
-
+import {
+  getPrometheusInstances, patchPrometheusInstance, deletePrometheusInstance,
+} from './prometheus'
 // TODO
 // import { deployApplication } from './applications'
-// import {
-//   getRepositories, getRepositoriesForCluster,
-//   createReponsitory, createRepositoryForCluster,
-//   deleteReponsitory, deleteRepositoryForCluster,
-// } from './repositories'
+import { getRepositoriesForCluster } from './repositories/actions'
 
 const router = express.Router()
 
@@ -98,6 +94,8 @@ router.get(`${monocularClusterBase}/charts/:chartName/versions`, tokenValidator,
 router.get(`${monocularClusterBase}/releases`, tokenValidator, getReleases)
 router.get(`${monocularClusterBase}/releases/:releaseName`, tokenValidator, getRelease)
 router.delete(`${monocularClusterBase}/releases/:releaseName`, tokenValidator, deleteRelease)
+
+router.get(`${monocularClusterBase}/repos`, tokenValidator, getRepositoriesForCluster)
 
 // Managed Prometheus
 const monitoringBase = `${clusterK8sApiBase}/apis/monitoring.coreos.com/v1`
