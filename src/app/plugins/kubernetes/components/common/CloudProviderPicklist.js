@@ -1,7 +1,7 @@
 import React, { useMemo, forwardRef } from 'react'
 import PropTypes from 'prop-types'
 import Picklist from 'core/components/Picklist'
-import useDataLoader from 'core/hooks/useDataloader'
+import useDataLoader from 'core/hooks/useDataLoader'
 import { cloudProviderActions } from '../infrastructure/actions'
 import { projectAs } from 'utils/fp'
 import { identity, propEq } from 'ramda'

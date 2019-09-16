@@ -10,15 +10,13 @@ import TextField from 'core/components/validatedForm/TextField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 // import Wizard from 'core/components/wizard/Wizard'
 // import WizardStep from 'core/components/wizard/WizardStep'
-import useDataLoader from 'core/hooks/useDataLoader'
+// import useDataLoader from 'core/hooks/useDataLoader'
 import useParams from 'core/hooks/useParams'
-import { projectAs } from 'utils/fp'
-import { cloudProviderActions } from './actions'
-import { propEq } from 'ramda'
+// import { projectAs } from 'utils/fp'
+// import { cloudProviderActions } from './actions'
+// import { propEq } from 'ramda'
 
 const AddAwsClusterPage = () => {
-  const [cloudProviders, cpLoading] = useDataLoader(cloudProviderActions.list)
-  const cloudProviderOptions = projectAs({ value: 'uuid', label: 'name' }, cloudProviders.filter(propEq('type', 'aws')))
   const { params, getParamsUpdater } = useParams()
 
   return (
@@ -33,15 +31,12 @@ const AddAwsClusterPage = () => {
           DropdownComponent={CloudProviderPicklist}
           id="cloudProvider"
           label="Cloud Provider"
-          options={cloudProviderOptions}
           onChange={getParamsUpdater('cloudProviderId')}
           info="Nodes will be provisioned using this cloud provider."
           value={params.cloudProviderId}
           renderContentOnMount
           type="aws"
         />
-        <pre>{JSON.stringify(cloudProviderOptions, null, 4)}</pre>
-        <pre>{JSON.stringify(cpLoading, null, 4)}</pre>
       </ValidatedForm>
     </FormWrapper>
   )
