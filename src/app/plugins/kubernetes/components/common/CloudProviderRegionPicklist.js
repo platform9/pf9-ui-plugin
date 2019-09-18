@@ -7,12 +7,12 @@ import { cloudProviderActions } from '../infrastructure/actions'
 const CloudProviderRegionPicklist = forwardRef(({ cloudProviderId, ...rest }, ref) => {
   console.log('Getting cloud provider details for ' + cloudProviderId)
   const [details, loading] = useDataLoader(cloudProviderActions.details, { cloudProviderId })
+  console.log(details)
 
   const options = [
     { value: 'test', label: 'test' },
   ]
 
-  console.log(details)
 
   return <Picklist
     {...rest}
@@ -27,7 +27,7 @@ CloudProviderRegionPicklist.propTypes = {
   cloudProviderId: PropTypes.string,
 }
 
-Picklist.defaultProps = {
+CloudProviderRegionPicklist.defaultProps = {
   showAll: true,
   showNone: false,
   formField: true,

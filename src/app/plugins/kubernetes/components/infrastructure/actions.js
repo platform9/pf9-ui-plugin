@@ -126,29 +126,44 @@ export const createCluster = async ({ data, context }) => {
   console.log(data)
 }
 
-export const cloudProviderActions = createCRUDActions(cloudProvidersCacheKey, {
-  listFn: () => qbert.getCloudProviders(),
-  createFn: (params) => qbert.createCloudProvider(params),
-  updateFn: ({ uuid: id, ...data }) => qbert.updateCloudProvider(id, data),
-  deleteFn: ({ uuid: id }) => qbert.deleteCloudProvider(id),
-  customOperations: {
-    details: ({ cloudProviderId }) => qbert.getCloudProviderDetails(cloudProviderId),
-    attachNodesToCluster: async ({ clusterUuid, nodes }, currentItems) => {
-      const nodeUuids = pluck('uuid', nodes)
-      await qbert.attach(clusterUuid, nodes)
-      // Assign nodes to their clusters in the context as well so the user
-      // can't add the same node to another cluster.
-      return currentItems.map(node =>
-        nodeUuids.includes(node.uuid) ? ({ ...node, clusterUuid }) : node)
+export const cloudProviderActions = {
+  ...createCRUDActions(cloudProvidersCacheKey, {
+    listFn: () => qbert.getCloudProviders(),
+    createFn: (params) => qbert.createCloudProvider(params),
+    updateFn: ({ id, ...data }) => qbert.updateCloudProvider(id, data),
+    deleteFn: ({ id }) => qbert.deleteCloudProvider(id),
+    customOperations: {
+      attachNodesToCluster: async ({ clusterUuid, nodes }, currentItems) => {
+        const nodeUuids = pluck('uuid', nodes)
+        await qbert.attach(clusterUuid, nodes)
+        // Assign nodes to their clusters in the context as well so the user
+        // can't add the same node to another cluster.
+        return currentItems.map(node =>
+          nodeUuids.includes(node.uuid) ? ({ ...node, clusterUuid }) : node)
+      },
+      detachNodesFromCluster: async ({ clusterUuid, nodeUuids }, currentItems) => {
+        await qbert.detach(clusterUuid, nodeUuids)
+        return currentItems.map(node =>
+          nodeUuids.includes(node.uuid) ? ({ ...node, clusterUuid: null }) : node)
+      },
     },
-    detachNodesFromCluster: async ({ clusterUuid, nodeUuids }, currentItems) => {
-      await qbert.detach(clusterUuid, nodeUuids)
-      return currentItems.map(node =>
-        nodeUuids.includes(node.uuid) ? ({ ...node, clusterUuid: null }) : node)
+    uniqueIdentifier: 'uuid',
+  }),
+  details: cloudProviderId => createContextLoader(
+    'cloudProviderDetails',
+    async ({ cloudProviderId }) => {
+      console.log('Why is this function not even running?  Something else seems to be running.')
+      const response = await qbert.getCloudProviderDetails(cloudProviderId)
+      console.log('response')
+      console.log(response)
+      return response.Regions
     },
-  },
-  uniqueIdentifier: 'uuid',
-})
+    {
+      uniqueIdentifier: 'RegionName',
+      indexBy: 'cloudProviderId',
+    },
+  )
+}
 
 export const flavorActions = createCRUDActions('flavors', { service: 'nova' })
 
