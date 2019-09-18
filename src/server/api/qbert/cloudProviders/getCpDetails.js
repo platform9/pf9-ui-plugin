@@ -6,9 +6,10 @@ import faker from 'faker'
 const sshKeyMap = {}
 
 const randomAwsRegions = (numRegions = 5) => {
-  const regions = times(() => {
+  const regions = times(i => {
     return {
-      'RegionName': faker.random.locale(),
+      // make sure these are unique since they are used as keys
+      'RegionName': `region-${i}`,
       'Endpoint': faker.internet.url()
     }
   }, numRegions)
@@ -16,7 +17,7 @@ const randomAwsRegions = (numRegions = 5) => {
 }
 
 const randomOpenstackRegions = (numRegions = 5) => {
-  const regions = uniq(times(() => ({ 'RegionName': faker.random.locale() }), numRegions))
+  const regions = uniq(times(i => ({ 'RegionName': `region-${i}` }), numRegions))
   return { Regions: regions }
 }
 
