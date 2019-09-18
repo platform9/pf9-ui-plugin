@@ -6,6 +6,7 @@ import UnfoldMoreIcon from '@material-ui/icons/UnfoldMore'
 import { compose } from 'ramda'
 import React, { PureComponent } from 'react'
 import { withRouter } from 'react-router'
+import SimpleLink from 'core/components/SimpleLink'
 
 const styles = theme => ({
   card: {
@@ -116,12 +117,14 @@ class AppCard extends PureComponent {
   render () {
     const {
       classes,
+      clusterId,
       application: {
         id,
         appLogoUrl,
         attributes: { name, description },
       },
     } = this.props
+    const detailUrl = `/ui/kubernetes/apps/${clusterId}/${id}`
     return (
       <Grid item sm={6} md={4} lg={4}>
         <Card className={classes.card}>
@@ -137,15 +140,17 @@ class AppCard extends PureComponent {
           </div>
           <div className={classes.details}>
             <CardContent className={classes.content}>
-              <Typography variant="subtitle1">
-                {name}
-              </Typography>
+              <SimpleLink src={detailUrl}>
+                <Typography variant="subtitle1">
+                  {name}
+                </Typography>
+              </SimpleLink>
               <Typography variant="body2" className={classes.text}>
                 {description}
               </Typography>
             </CardContent>
             <div className={classes.actions}>
-              <Button href={`/ui/kubernetes/apps/${id}`}>
+              <Button href={detailUrl}>
                 <Tooltip title="More details about this application">
                   <UnfoldMoreIcon />
                 </Tooltip>

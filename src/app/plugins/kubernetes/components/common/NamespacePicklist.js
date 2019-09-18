@@ -34,8 +34,8 @@ NamespacePicklist.propTypes = {
   ...omit(['options'], Picklist.propTypes),
   name: PropTypes.string,
   label: PropTypes.string,
-  clusterId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   selectFirst: PropTypes.bool,
+  clusterId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
 }
 
 NamespacePicklist.defaultProps = {

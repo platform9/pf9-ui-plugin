@@ -27,8 +27,10 @@ const AppCatalogPage = () => {
   const { params, getParamsUpdater } = usePrefParams(defaultParams)
   const [apps, loading, reload] = useDataLoader(appActions.list, params)
   const handleRefresh = useCallback(() => reload(true), [reload])
-  const renderCardItems = useCallback(item =>
-    <AppCard application={item} key={item.id} />, [])
+  const renderCardItems = useCallback(
+    item =>
+      <AppCard application={item} clusterId={params.clusterId} key={item.id} />,
+    [params])
 
   return <CardTable
     loading={loading}
