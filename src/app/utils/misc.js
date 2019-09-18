@@ -52,11 +52,12 @@ export const castBoolToStr = (t = 'yes', f = 'no') => value => value ? t : f
 export const tryJsonParse = moize(val => typeof val === 'string' ? JSON.parse(val) : val)
 
 /**
- * Memoizes an async function so that concurrent calls to the same function (with the same params) will return the same promise
+ * Memoizes an async function to prevent so that concurrent calls to the same function
+ * (with the same params) will return the same promise.
  * @param {function} asyncFn Function that will be memoized until it gets resolved
  * @returns {function}
  */
-export const singlePromise = asyncFn => {
+export const memoizePromise = asyncFn => {
   const memoizedCb = moize(asyncFn, {
     equals, // Use ramda "equals" instead of moize SameValueZero comparisons
     isPromise: true,

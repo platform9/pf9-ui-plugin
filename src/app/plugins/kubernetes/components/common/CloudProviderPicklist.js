@@ -7,7 +7,7 @@ import { projectAs } from 'utils/fp'
 import { identity, propEq } from 'ramda'
 
 const CloudProviderPicklist = forwardRef(({ type, ...rest }, ref) => {
-  const [cloudProviders, cpLoading] = useDataLoader(cloudProviderActions.list)
+  const [cloudProviders, loading] = useDataLoader(cloudProviderActions.list)
   const options = useMemo(
     () => projectAs(
       { value: 'uuid', label: 'name' },
@@ -19,8 +19,8 @@ const CloudProviderPicklist = forwardRef(({ type, ...rest }, ref) => {
   return <Picklist
     {...rest}
     ref={ref}
-    loading={cpLoading}
-    options={options}
+    loading={loading}
+    options={options || []}
   />
 })
 

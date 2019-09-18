@@ -5,7 +5,7 @@ import {
 } from 'ramda'
 import moize from 'moize'
 import { ensureFunction, ensureArray, emptyObj, emptyArr, upsertAllBy } from 'utils/fp'
-import { singlePromise, uncamelizeString } from 'utils/misc'
+import { memoizePromise, uncamelizeString } from 'utils/misc'
 import { defaultUniqueIdentifier, allKey } from 'app/constants'
 
 export const paramsContextKey = 'cachedParams'
@@ -130,7 +130,7 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
    *
    * @returns {Promise<array>} Fetched or cached items
    */
-  const contextLoaderFn = singlePromise(
+  const contextLoaderFn = memoizePromise(
     async ({ getContext, setContext, params = emptyObj, refetch = false, rawData = false, additionalOptions = emptyObj }) => {
       // Get the required values from the provided params
       const providedRequiredParams = pipe(

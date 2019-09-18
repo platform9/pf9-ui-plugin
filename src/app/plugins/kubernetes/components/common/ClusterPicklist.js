@@ -1,6 +1,6 @@
 import React, { useMemo, useEffect, forwardRef } from 'react'
 import PropTypes from 'prop-types'
-import { isEmpty, propOr, head, omit } from 'ramda'
+import { isEmpty, propOr, head } from 'ramda'
 import Picklist from 'core/components/Picklist'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { projectAs } from 'utils/fp'
@@ -39,7 +39,7 @@ const ClusterPicklist = forwardRef(({
 })
 
 ClusterPicklist.propTypes = {
-  ...omit(['options'], Picklist.propTypes),
+  ...Picklist.propTypes,
   name: PropTypes.string,
   label: PropTypes.string,
   formField: PropTypes.bool,

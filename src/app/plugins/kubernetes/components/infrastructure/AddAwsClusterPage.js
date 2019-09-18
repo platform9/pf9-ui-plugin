@@ -5,6 +5,7 @@ import FormWrapper from 'core/components/FormWrapper'
 // import KeyValuesField from 'core/components/validatedForm/KeyValuesField'
 // import NodesChooser from './NodesChooser'
 import CloudProviderPicklist from 'k8s/components/common/CloudProviderPicklist'
+import CloudProviderRegionPicklist from 'k8s/components/common/CloudProviderRegionPicklist'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import TextField from 'core/components/validatedForm/TextField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
@@ -34,7 +35,18 @@ const AddAwsClusterPage = () => {
           onChange={getParamsUpdater('cloudProviderId')}
           info="Nodes will be provisioned using this cloud provider."
           value={params.cloudProviderId}
-          renderContentOnMount
+          type="aws"
+          required
+        />
+        <PicklistField
+          DropdownComponent={CloudProviderRegionPicklist}
+          disabled={!params.cloudProviderId}
+          id="cloudProviderRegion"
+          label="Region"
+          cloudProviderId={params.cloudProviderId}
+          onChange={getParamsUpdater('cloudProviderRegionId')}
+          info="Region "
+          value={params.cloudProviderRegionId}
           type="aws"
         />
       </ValidatedForm>

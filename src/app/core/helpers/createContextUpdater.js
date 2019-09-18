@@ -3,7 +3,7 @@ import {
 } from 'ramda'
 import { emptyObj, ensureFunction, removeWith, updateWith, switchCase } from 'utils/fp'
 import { dataContextKey, getContextLoader } from 'core/helpers/createContextLoader'
-import { singlePromise, uncamelizeString } from 'utils/misc'
+import { memoizePromise, uncamelizeString } from 'utils/misc'
 import { defaultUniqueIdentifier, notFoundErr } from 'app/constants'
 
 let updaters = {}
@@ -106,7 +106,7 @@ function createContextUpdater (cacheKey, dataUpdaterFn, options = {}) {
    *
    * @param {function} [args.additionalOptions.onError] Custom logic to perfom after error
    */
-  const contextUpdaterFn = singlePromise(async ({
+  const contextUpdaterFn = memoizePromise(async ({
     getContext,
     setContext,
     params = emptyObj,

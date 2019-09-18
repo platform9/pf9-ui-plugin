@@ -132,6 +132,7 @@ export const cloudProviderActions = createCRUDActions(cloudProvidersCacheKey, {
   updateFn: ({ uuid: id, ...data }) => qbert.updateCloudProvider(id, data),
   deleteFn: ({ uuid: id }) => qbert.deleteCloudProvider(id),
   customOperations: {
+    details: ({ cloudProviderId }) => qbert.getCloudProviderDetails(cloudProviderId),
     attachNodesToCluster: async ({ clusterUuid, nodes }, currentItems) => {
       const nodeUuids = pluck('uuid', nodes)
       await qbert.attach(clusterUuid, nodes)
