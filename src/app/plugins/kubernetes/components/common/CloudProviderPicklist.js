@@ -20,7 +20,7 @@ const CloudProviderPicklist = forwardRef(({ type, ...rest }, ref) => {
     {...rest}
     ref={ref}
     loading={loading}
-    options={options || []}
+    options={options}
   />
 })
 

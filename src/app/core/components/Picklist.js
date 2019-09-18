@@ -85,7 +85,7 @@ Picklist.propTypes = {
   notAsync: PropTypes.bool,
   name: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
-  options: PropTypes.arrayOf(optionPropType).isRequired,
+  options: PropTypes.arrayOf(optionPropType),
   value: numOrString,
   onChange: PropTypes.func,
   formField: PropTypes.bool,
@@ -102,6 +102,7 @@ Picklist.defaultProps = {
   formField: false,
   variant: 'outlined',
   value: '',
+  options: [],
 }
 
 export default Picklist
