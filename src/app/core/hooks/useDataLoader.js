@@ -56,7 +56,7 @@ const useDataLoader = (loaderFn, params = emptyObj, invalidateCache = false) => 
       setLoading(true)
     }
     if (invalidatingCache.current) {
-      loaderFn.invalidateCache()
+      loaderFn.invalidateCache && loaderFn.invalidateCache()
       invalidatingCache.current = false
     }
     // Create a new promise that will wait for the previous promises in the buffer before running the new request

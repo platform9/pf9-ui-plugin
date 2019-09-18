@@ -47,7 +47,11 @@ const Picklist = React.forwardRef((props, ref) => {
   }, [onChange])
 
   // Hack to work around Material UI's Select ignoring empty string as a value
-  const nonEmptyValue = value === '' ? (showNone ? noneKey : (showAll ? allKey : value)) : value
+  const nonEmptyValue = value === ''
+    ? (showNone
+      ? noneKey
+      : (showAll ? allKey : value))
+    : value
 
   return <Progress inline overlay loading={loading} renderContentOnMount={notAsync}>
     <TextField
@@ -97,7 +101,7 @@ Picklist.defaultProps = {
   showNone: false,
   formField: false,
   variant: 'outlined',
-  value: ''
+  value: '',
 }
 
 export default Picklist

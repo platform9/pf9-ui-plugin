@@ -14,7 +14,7 @@ export const createRepositoryForCluster = (req, res) => {
   // TODO
 }
 
-export const deleteReponsitory = (req, res) => {
+export const deleteRepository = (req, res) => {
   // TODO
 }
 
