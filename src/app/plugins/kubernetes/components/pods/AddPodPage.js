@@ -7,7 +7,7 @@ import CodeMirror from 'core/components/validatedForm/CodeMirror'
 import { codeMirrorOptions } from 'app/constants'
 import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
 import NamespacePicklist from 'k8s/components/common/NamespacePicklist'
-import { podsDataKey } from './actions'
+import { podsCacheKey } from './actions'
 import useParams from 'core/hooks/useParams'
 
 const defaultParams = {
@@ -47,7 +47,7 @@ export const AddPodForm = ({ onComplete }) => {
 }
 
 export const options = {
-  dataKey: podsDataKey,
+  cacheKey: podsCacheKey,
   FormComponent: AddPodForm,
   listUrl: '/ui/kubernetes/pods',
   name: 'AddPod',

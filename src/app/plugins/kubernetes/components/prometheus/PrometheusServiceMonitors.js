@@ -1,5 +1,5 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { prometheusServiceMonitorsDataKey } from './actions'
+import { prometheusServiceMonitorsCacheKey } from './actions'
 
 const renderKeyValues = obj => Object.entries(obj)
   .map(([key, value]) => `${key}: ${value}`)
@@ -21,7 +21,7 @@ export const columns = [
 
 export const options = {
   columns,
-  dataKey: prometheusServiceMonitorsDataKey,
+  cacheKey: prometheusServiceMonitorsCacheKey,
   editUrl: '/ui/kubernetes/prometheus/serviceMonitors/edit',
   name: 'PrometheusServiceMonitors',
   title: 'Prometheus Service Monitors',

@@ -1,5 +1,5 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { routersDataKey } from './actions'
+import { routersCacheKey } from './actions'
 
 export const options = {
   addUrl: '/ui/openstack/routers/add',
@@ -10,7 +10,7 @@ export const options = {
     { id: 'admin_state_up', label: 'Admin State' },
     { id: 'status', label: 'Status' },
   ],
-  dataKey: routersDataKey,
+  cacheKey: routersCacheKey,
   editUrl: '/ui/openstack/routers/edit',
   name: 'Routers',
   title: 'Routers',

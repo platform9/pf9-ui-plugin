@@ -5,7 +5,7 @@ import {
 import ApiClient from 'api-client/ApiClient'
 import { asyncFlatMap, emptyArr, objSwitchCase, asyncTryCatch } from 'utils/fp'
 import { allKey, imageUrlRoot, addError, deleteError, updateError } from 'app/constants'
-import { parseClusterParams, clustersDataKey } from 'k8s/components/infrastructure/actions'
+import { parseClusterParams, clustersCacheKey } from 'k8s/components/infrastructure/actions'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { pathJoin } from 'utils/misc'
 import moment from 'moment'
@@ -15,14 +15,14 @@ const { qbert } = ApiClient.getInstance()
 
 const uniqueIdentifier = 'id'
 
-export const singleAppDataKey = 'singleApp'
-export const appsDataKey = 'apps'
-export const appVersionsDataKey = 'appVersions'
-export const releasesDataKey = 'releases'
-export const repositoriesWithClustersDataKey = 'repositoriesWithClusters'
-export const repositoriesDataKey = 'repositories'
+export const singleAppCacheKey = 'singleApp'
+export const appsCacheKey = 'apps'
+export const appVersionsCacheKey = 'appVersions'
+export const releasesCacheKey = 'releases'
+export const repositoriesWithClustersCacheKey = 'repositoriesWithClusters'
+export const repositoriesCacheKey = 'repositories'
 
-export const singleAppLoader = createContextLoader(singleAppDataKey, async ({ clusterId, appId, release, version }) => {
+export const singleAppLoader = createContextLoader(singleAppCacheKey, async ({ clusterId, appId, release, version }) => {
   const chart = await qbert.getChart(clusterId, appId, release, version)
   return {
     ...chart,
@@ -32,13 +32,13 @@ export const singleAppLoader = createContextLoader(singleAppDataKey, async ({ cl
   indexBy: ['clusterId', 'appId', 'release', 'version'],
 })
 
-export const appVersionLoader = createContextLoader(appVersionsDataKey, async ({ clusterId, appId, release }) => {
+export const appVersionLoader = createContextLoader(appVersionsCacheKey, async ({ clusterId, appId, release }) => {
   return qbert.getChartVersions(clusterId, appId, release)
 }, {
   indexBy: ['clusterId', 'appId', 'release'],
 })
 
-export const appActions = createCRUDActions(appsDataKey, {
+export const appActions = createCRUDActions(appsCacheKey, {
   listFn: async (params, loadFromContext) => {
     const [clusterId, clusters] = await parseClusterParams(params, loadFromContext)
     if (clusterId === allKey) {
@@ -76,7 +76,7 @@ export const appActions = createCRUDActions(appsDataKey, {
     )(items),
 })
 
-export const releaseActions = createCRUDActions(releasesDataKey, {
+export const releaseActions = createCRUDActions(releasesCacheKey, {
   listFn: async (params, loadFromContext) => {
     const [clusterId, clusters] = await parseClusterParams(params, loadFromContext)
     if (clusterId === allKey) {
@@ -88,9 +88,9 @@ export const releaseActions = createCRUDActions(releasesDataKey, {
   indexBy: 'clusterId',
 })
 
-const reposWithClustersLoader = createContextLoader(repositoriesWithClustersDataKey, async (params,
+const reposWithClustersLoader = createContextLoader(repositoriesWithClustersCacheKey, async (params,
   loadFromContext) => {
-  const monocularClusters = await loadFromContext(clustersDataKey, {
+  const monocularClusters = await loadFromContext(clustersCacheKey, {
     appCatalogClusters: true,
     hasControlPlane: true,
   })
@@ -116,7 +116,7 @@ const getRepoName = (id, repos) => id ? pipe(
   propOr(id, 'name'),
 )(repos) : ''
 
-export const repositoryActions = createCRUDActions(repositoriesDataKey, {
+export const repositoryActions = createCRUDActions(repositoriesCacheKey, {
   listFn: async () => {
     return qbert.getRepositories()
   },
@@ -194,7 +194,7 @@ export const repositoryActions = createCRUDActions(repositoriesDataKey, {
     }, `Error when updating cluster access for repository ${getRepoName(id, prevItems)}`)(catchedErr.message),
   })(operation),
   dataMapper: async (items, params, loadFromContext) => {
-    const reposWithClusters = await loadFromContext(repositoriesWithClustersDataKey)
+    const reposWithClusters = await loadFromContext(repositoriesWithClustersCacheKey)
     return map(({ id, type, attributes }) => ({
       id,
       type,

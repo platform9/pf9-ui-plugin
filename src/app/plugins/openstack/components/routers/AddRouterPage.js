@@ -4,7 +4,7 @@ import SubmitButton from 'core/components/SubmitButton'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import Checkbox from 'core/components/validatedForm/CheckboxField'
 import TextField from 'core/components/validatedForm/TextField'
-import { routersDataKey } from './actions'
+import { routersCacheKey } from './actions'
 
 export const AddRouterForm = ({ onComplete }) => (
   <ValidatedForm onSubmit={onComplete}>
@@ -18,7 +18,7 @@ export const AddRouterForm = ({ onComplete }) => (
 
 export const options = {
   FormComponent: AddRouterForm,
-  dataKey: routersDataKey,
+  cacheKey: routersCacheKey,
   listUrl: '/ui/openstack/routers',
   name: 'AddRouter',
   title: 'Add Router',

@@ -11,9 +11,9 @@ import { emptyObj } from 'utils/fp'
 
 const createUpdateComponents = options => {
   const {
-    dataKey,
-    loaderFn = dataKey ? getContextLoader(dataKey) : null,
-    updateFn = dataKey ? getContextUpdater(dataKey, 'update') : null,
+    cacheKey,
+    loaderFn = cacheKey ? getContextLoader(cacheKey) : null,
+    updateFn = cacheKey ? getContextUpdater(cacheKey, 'update') : null,
 
     FormComponent,
     initFn,

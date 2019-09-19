@@ -1,5 +1,5 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { cloudProvidersDataKey } from './actions'
+import { cloudProvidersCacheKey } from './actions'
 
 export const options = {
   addUrl: '/ui/kubernetes/infrastructure/cloudProviders/add',
@@ -11,7 +11,7 @@ export const options = {
     // TODO: clusters
     // TODO: nodes
   ],
-  dataKey: cloudProvidersDataKey,
+  cacheKey: cloudProvidersCacheKey,
   editUrl: '/ui/kubernetes/infrastructure/cloudProviders/edit',
   name: 'CloudProviders',
   rowActions: [],

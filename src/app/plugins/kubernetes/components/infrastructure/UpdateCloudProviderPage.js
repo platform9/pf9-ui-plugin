@@ -36,7 +36,7 @@ export const options = {
   name: 'UpdateCloudProvider',
   title: 'Update Cloud Provider',
   uniqueIdentifier: 'uuid',
-  dataKey: 'cloudProviders',
+  cacheKey: 'cloudProviders',
 }
 
 const { UpdatePage } = createUpdateComponents(options)

@@ -35,10 +35,10 @@ import { listTablePrefs } from 'app/constants'
 
 const createCRUDComponents = options => {
   const {
-    // We can either provide the dataKey to autoresolve the loader, or the loaderFn/deleteFn functions directly
-    dataKey,
-    loaderFn = dataKey ? getContextLoader(dataKey) : null,
-    deleteFn = dataKey ? getContextUpdater(dataKey, 'delete') : null,
+    // We can either provide the cacheKey to autoresolve the loader, or the loaderFn/deleteFn functions directly
+    cacheKey,
+    loaderFn = cacheKey ? getContextLoader(cacheKey) : null,
+    deleteFn = cacheKey ? getContextUpdater(cacheKey, 'delete') : null,
     defaultParams = {},
     columns = [],
     rowActions = [],

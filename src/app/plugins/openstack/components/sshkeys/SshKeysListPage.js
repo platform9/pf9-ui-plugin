@@ -1,5 +1,5 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { sshDataKey } from './actions'
+import { sshCacheKey } from './actions'
 
 export const options = {
   addUrl: '/ui/openstack/sshkeys/add',
@@ -9,7 +9,7 @@ export const options = {
     { id: 'fingerprint', label: 'Fingerprint' },
     { id: 'public_key', label: 'Public Key' },
   ],
-  dataKey: sshDataKey,
+  cacheKey: sshCacheKey,
   editUrl: '/ui/openstack/sshkeys/edit',
   name: 'SSHKeys',
   title: 'SSH Keys',

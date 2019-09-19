@@ -1,5 +1,5 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { mngmGroupsDataKey } from 'k8s/components/userManagement/actions'
+import { mngmGroupsCacheKey } from 'k8s/components/userManagement/actions'
 
 export const options = {
   columns: [
@@ -8,7 +8,7 @@ export const options = {
     { id: 'description', label: 'Description' },
     { id: 'samlAttributesString', label: 'SAML Attributes Mapped' },
   ],
-  dataKey: mngmGroupsDataKey,
+  cacheKey: mngmGroupsCacheKey,
   // editUrl: '/ui/kubernetes/infrastructure/groups/edit',
   name: 'Groups',
   title: 'Groups',

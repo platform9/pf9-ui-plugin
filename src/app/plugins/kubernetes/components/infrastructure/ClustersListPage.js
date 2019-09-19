@@ -9,7 +9,7 @@ import AttachIcon from '@material-ui/icons/AddToQueue'
 import DetachIcon from '@material-ui/icons/RemoveFromQueue'
 import ScaleIcon from '@material-ui/icons/TrendingUp'
 import UpgradeIcon from '@material-ui/icons/PresentToAll'
-import { clustersDataKey } from './actions'
+import { clustersCacheKey } from './actions'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import ClusterAttachNodeDialog from './ClusterAttachNodeDialog'
 import ClusterDetachNodeDialog from './ClusterDetachNodeDialog'
@@ -75,7 +75,7 @@ export const options = {
     // since we use it in a few places for tags / metadata.
     { id: 'tags', label: 'Metadata', render: data => JSON.stringify(data) }
   ],
-  dataKey: clustersDataKey,
+  cacheKey: clustersCacheKey,
   editUrl: '/ui/kubernetes/infrastructure/clusters/edit',
   name: 'Clusters',
   title: 'Clusters',

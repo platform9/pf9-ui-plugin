@@ -18,7 +18,8 @@ export const getContextUpdater = (key, operation) => {
  *
  * @property {string} [uniqueIdentifier="id"] Unique primary key of the entity
  *
- * @property {string} [entityName=primaryKey] Name of the entity
+ * @property {string} [entityName] Name of the entity, it defaults to the the provided entity "cacheKey"
+ * formatted with added spaces and removing the last "s"
  *
  * @property {("create"|"update"|"delete")|string} [operation="any"] CRUD operation, it can be
  * "create", "update", "delete" for specific cache adjustments or any custom string to
@@ -39,7 +40,7 @@ export const getContextUpdater = (key, operation) => {
  * @typedef {function} createContextUpdater
  * @function createContextUpdater
  *
- * @param {string} key Key on which the resolved value will be cached
+ * @param {string} cacheKey Context key on which the resolved value will be cached
  *
  * @param {function} dataUpdaterFn Function whose return value will be used to update the context
  *
@@ -48,10 +49,10 @@ export const getContextUpdater = (key, operation) => {
  * @returns {contextUpdaterFn} Function that once called will update data from the server and
  * the cache
  */
-function createContextUpdater (key, dataUpdaterFn, options = {}) {
+function createContextUpdater (cacheKey, dataUpdaterFn, options = {}) {
   const {
     uniqueIdentifier = defaultUniqueIdentifier,
-    entityName = uncamelizeString(key).replace(/s$/, ''), // Remove trailing "s"
+    entityName = uncamelizeString(cacheKey).replace(/s$/, ''), // Remove trailing "s"
     operation = 'any',
     contextLoader,
     successMessage = (updatedItems, prevItems, params, operation) => `Successfully ${switchCase(
@@ -79,7 +80,7 @@ function createContextUpdater (key, dataUpdaterFn, options = {}) {
     },
   } = options
   const uniqueIdentifierPath = uniqueIdentifier.split('.')
-  const dataLens = lensPath([dataContextKey, key])
+  const dataLens = lensPath([dataContextKey, cacheKey])
 
   /**
    * Context updater function, uses a custom updater function to update the data from the cache,
@@ -118,9 +119,9 @@ function createContextUpdater (key, dataUpdaterFn, options = {}) {
       onError = (errorMessage, catchedErr, params) => console.error(errorMessage, catchedErr),
     } = additionalOptions
     const id = path(uniqueIdentifierPath, params)
-    const loader = contextLoader || getContextLoader(key)
+    const loader = contextLoader || getContextLoader(cacheKey)
     if (!loader) {
-      throw new Error(`Context Loader with key ${key} not found`)
+      throw new Error(`Context Loader with key ${cacheKey} not found`)
     }
     const prevItems = await loader({
       getContext,
@@ -159,12 +160,12 @@ function createContextUpdater (key, dataUpdaterFn, options = {}) {
       return false
     }
   })
-  contextUpdaterFn.getKey = () => key
+  contextUpdaterFn.getKey = () => cacheKey
 
-  if (hasPath([key, operation], updaters)) {
-    console.warn(`Context Updater function with key ${key} and operation ${operation} already exists`)
+  if (hasPath([cacheKey, operation], updaters)) {
+    console.warn(`Context Updater function with key ${cacheKey} and operation ${operation} already exists`)
   }
-  updaters = assocPath([key, operation], contextUpdaterFn, updaters)
+  updaters = assocPath([cacheKey, operation], contextUpdaterFn, updaters)
   return contextUpdaterFn
 }
 

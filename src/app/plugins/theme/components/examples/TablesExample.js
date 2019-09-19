@@ -48,7 +48,7 @@ const columns = [
 
 export const options = {
   columns,
-  dataKey: 'example',
+  cacheKey: 'example',
   deleteFn: nop,
   editUrl: '/ui/theme/examples/edit',
   loaderFn: loadMockData,

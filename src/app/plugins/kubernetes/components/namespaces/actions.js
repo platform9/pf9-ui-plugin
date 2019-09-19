@@ -2,26 +2,26 @@ import { asyncFlatMap } from 'utils/fp'
 import { pluck } from 'ramda'
 import { allKey } from 'app/constants'
 import ApiClient from 'api-client/ApiClient'
-import { parseClusterParams, clustersDataKey } from 'k8s/components/infrastructure/actions'
+import { parseClusterParams, clustersCacheKey } from 'k8s/components/infrastructure/actions'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 
 const { qbert } = ApiClient.getInstance()
 
-export const namespacesDataKey = 'namespaces'
+export const namespacesCacheKey = 'namespaces'
 
 const findClusterName = (clusters, clusterId) => {
   const cluster = clusters.find(x => x.uuid === clusterId)
   return (cluster && cluster.name) || ''
 }
 const namespacesMapper = async (items, params, loadFromContext) => {
-  const clusters = await loadFromContext(clustersDataKey)
+  const clusters = await loadFromContext(clustersCacheKey)
   return items.map(ns => ({
     ...ns,
     clusterName: findClusterName(clusters, ns.clusterId),
   }))
 }
 
-const namespaceActions = createCRUDActions(namespacesDataKey, {
+const namespaceActions = createCRUDActions(namespacesCacheKey, {
   listFn: async (params, loadFromContext) => {
     const [ clusterId, clusters ] = await parseClusterParams(params, loadFromContext)
     if (clusterId === allKey) {

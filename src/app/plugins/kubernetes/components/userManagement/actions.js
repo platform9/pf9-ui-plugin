@@ -4,16 +4,16 @@ import {
   flatten, find,
 } from 'ramda'
 import { tryJsonParse } from 'utils/misc'
-import { namespacesDataKey } from 'k8s/components/namespaces/actions'
+import { namespacesCacheKey } from 'k8s/components/namespaces/actions'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 
 const { keystone } = ApiClient.getInstance()
 
-export const mngmTenantsDataKey = 'managementTenants'
-export const mngmTenantActions = createCRUDActions(mngmTenantsDataKey, {
+export const mngmTenantsCacheKey = 'managementTenants'
+export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
   listFn: async () => keystone.getAllTenantsAllUsers(),
   dataMapper: async (allTenantsAllUsers, params, loadFromContext) => {
-    const namespaces = await loadFromContext(namespacesDataKey)
+    const namespaces = await loadFromContext(namespacesCacheKey)
     return allTenantsAllUsers.map(tenant => ({
       ...tenant,
       clusters: pluck('clusterName', namespaces
@@ -22,10 +22,10 @@ export const mngmTenantActions = createCRUDActions(mngmTenantsDataKey, {
   },
 })
 
-export const mngmUsersDataKey = 'managementUsers'
-export const mngmUserActions = createCRUDActions(mngmUsersDataKey, {
+export const mngmUsersCacheKey = 'managementUsers'
+export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
   listFn: async (params, loadFromContext) => {
-    return loadFromContext(mngmTenantsDataKey)
+    return loadFromContext(mngmTenantsCacheKey)
   },
   dataMapper: tenants => {
     // Get all tenant users and assign the corresponding tenant ID
@@ -58,12 +58,12 @@ export const mngmUserActions = createCRUDActions(mngmUsersDataKey, {
   },
 })
 
-export const mngmGroupsDataKey = 'managementGroups'
-export const mngmGroupActions = createCRUDActions(mngmGroupsDataKey, {
+export const mngmGroupsCacheKey = 'managementGroups'
+export const mngmGroupActions = createCRUDActions(mngmGroupsCacheKey, {
   listFn: async () => keystone.getGroups(),
   dataMapper: async (groups, params, loadFromContext) => {
     // Retrieve the group mappings from the cache
-    const mappings = await loadFromContext(mngmGroupMappingsDataKey)
+    const mappings = await loadFromContext(mngmGroupMappingsCacheKey)
     return groups.map(group => {
       // Find the mapping that contains a rule belonging to the current group
       const groupMapping = mappings.find(mapping => {
@@ -101,13 +101,13 @@ export const mngmGroupActions = createCRUDActions(mngmGroupsDataKey, {
   },
 })
 
-export const mngmGroupMappingsDataKey = 'managementGroupMappings'
-export const mngmGroupMappingActions = createCRUDActions(mngmGroupMappingsDataKey, {
+export const mngmGroupMappingsCacheKey = 'managementGroupMappings'
+export const mngmGroupMappingActions = createCRUDActions(mngmGroupMappingsCacheKey, {
   listFn: async () => keystone.getGroupMappings(),
 })
 
-export const mngmRolesDataKey = 'managementRoles'
-export const mngmRoleActions = createCRUDActions(mngmRolesDataKey, {
+export const mngmRolesCacheKey = 'managementRoles'
+export const mngmRoleActions = createCRUDActions(mngmRolesCacheKey, {
   listFn: async () => {
     const roles = await keystone.getRoles()
     return roles.filter(role => ['admin', '_member_'].includes(role.name))

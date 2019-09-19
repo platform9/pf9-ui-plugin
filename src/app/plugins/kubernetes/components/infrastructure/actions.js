@@ -11,21 +11,21 @@ import ApiClient from 'api-client/ApiClient'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { filterIf } from 'utils/fp'
 
-export const clustersDataKey = 'clusters'
-export const cloudProvidersDataKey = 'cloudProviders'
-export const nodesDataKey = 'nodes'
-export const rawNodesDataKey = 'rawNodes'
-export const resMgrHostsDataKey = 'resMgrHosts'
-export const combinedHostsDataKey = 'combinedHosts'
+export const clustersCacheKey = 'clusters'
+export const cloudProvidersCacheKey = 'cloudProviders'
+export const nodesCacheKey = 'nodes'
+export const rawNodesCacheKey = 'rawNodes'
+export const resMgrHostsCacheKey = 'resMgrHosts'
+export const combinedHostsCacheKey = 'combinedHosts'
 
 const { qbert, resmgr } = ApiClient.getInstance()
 
 // eslint-disable-next-line
-const loadRawNodes = createContextLoader(rawNodesDataKey, async () => {
+const loadRawNodes = createContextLoader(rawNodesCacheKey, async () => {
   return qbert.getNodes()
 }, { uniqueIdentifier: 'uuid' })
 
-export const loadResMgrHosts = createContextLoader(resMgrHostsDataKey, async () => {
+export const loadResMgrHosts = createContextLoader(resMgrHostsCacheKey, async () => {
   return resmgr.getHosts()
 }, {
   uniqueIdentifier: 'uuid',
@@ -39,15 +39,15 @@ export const hasAppCatalogEnabled = propSatisfies(isTruthy, 'appCatalogEnabled')
 // If params.clusterId is not assigned it fetches all clusters and extracts the clusterId from the first cluster
 // It also adds a "clusters" param that contains all the clusters, just for convenience
 export const parseClusterParams = async (params, loadFromContext) => {
-  const clusters = await loadFromContext(clustersDataKey, params)
+  const clusters = await loadFromContext(clustersCacheKey, params)
   const { clusterId = pathOr(allKey, [0, 'uuid'], clusters) } = params
   return [clusterId, clusters]
 }
 
-export const clusterActions = createCRUDActions(clustersDataKey, {
+export const clusterActions = createCRUDActions(clustersCacheKey, {
   listFn: async (params, loadFromContext) => {
     const [rawNodes, rawClusters, qbertEndpoint] = await Promise.all([
-      loadFromContext(rawNodesDataKey),
+      loadFromContext(rawNodesCacheKey),
       qbert.getClusters(),
       qbert.baseUrl(),
     ])
@@ -126,7 +126,7 @@ export const createCluster = async ({ data, context }) => {
   console.log(data)
 }
 
-export const cloudProviderActions = createCRUDActions(cloudProvidersDataKey, {
+export const cloudProviderActions = createCRUDActions(cloudProvidersCacheKey, {
   listFn: () => qbert.getCloudProviders(),
   createFn: (params) => qbert.createCloudProvider(params),
   updateFn: ({ uuid: id, ...data }) => qbert.updateCloudProvider(id, data),
@@ -165,11 +165,11 @@ export const scaleCluster = async ({ data }) => {
   await qbert.updateCluster(cluster.uuid, body)
 }
 
-export const loadCombinedHosts = createContextLoader(combinedHostsDataKey, async (params,
+export const loadCombinedHosts = createContextLoader(combinedHostsCacheKey, async (params,
   loadFromContext) => {
   const [rawNodes, resMgrHosts] = await Promise.all([
-    loadFromContext(rawNodesDataKey),
-    loadFromContext(resMgrHostsDataKey),
+    loadFromContext(rawNodesCacheKey),
+    loadFromContext(resMgrHostsCacheKey),
   ])
 
   let hostsById = {}
@@ -188,10 +188,10 @@ export const loadCombinedHosts = createContextLoader(combinedHostsDataKey, async
   uniqueIdentifier: 'uuid',
 })
 
-export const loadNodes = createContextLoader(nodesDataKey, async (params, loadFromContext) => {
+export const loadNodes = createContextLoader(nodesCacheKey, async (params, loadFromContext) => {
   const [rawNodes, combinedHosts, serviceCatalog] = await Promise.all([
-    loadFromContext(rawNodesDataKey),
-    loadFromContext(combinedHostsDataKey),
+    loadFromContext(rawNodesCacheKey),
+    loadFromContext(combinedHostsCacheKey),
     loadFromContext(serviceCatalogContextKey),
   ])
 
