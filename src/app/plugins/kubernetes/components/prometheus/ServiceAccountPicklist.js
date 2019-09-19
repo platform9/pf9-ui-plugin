@@ -27,7 +27,8 @@ ServiceAccountPicklist.propTypes = {
   ...omit(['options'], Picklist.propTypes),
   name: PropTypes.string,
   label: PropTypes.string,
-  clusterId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  clusterId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  namespace: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
 }
 
 ServiceAccountPicklist.defaultProps = {

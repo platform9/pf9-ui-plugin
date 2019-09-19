@@ -46,18 +46,19 @@ const useDataUpdater = (updaterFn, onComplete) => {
     // Create a new promise that will wait for the previous promises in the buffer before running the new request
     const currentPromise = (async () => {
       await Promise.all(updaterPromisesBuffer.current) // Wait for previous promises to resolve
-      await updaterFn({ getContext, setContext, params, additionalOptions })
+      const result = await updaterFn({ getContext, setContext, params, additionalOptions })
       updaterPromisesBuffer.current.shift() // Delete the oldest promise in the sequence (FIFO)
+      return result
     })()
     updaterPromisesBuffer.current.push(currentPromise)
-    await currentPromise
+    const successful = await currentPromise
 
     // With this condition, we ensure that all promises except the last one will be ignored
     if (isEmpty(updaterPromisesBuffer.current) &&
       !unmounted.current) {
       setLoading(false)
       if (onComplete) {
-        await onComplete()
+        await onComplete(successful)
       }
     }
   }, [updaterFn, getContext, setContext])

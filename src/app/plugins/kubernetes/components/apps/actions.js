@@ -14,12 +14,29 @@ import createContextLoader from 'core/helpers/createContextLoader'
 const { qbert } = ApiClient.getInstance()
 
 const uniqueIdentifier = 'id'
-const indexBy = 'clusterId'
 
-const appsDataKey = 'apps'
-const releasesDataKey = 'releases'
-const repositoriesWithClustersDataKey = 'repositoriesWithClusters'
-const repositoriesDataKey = 'repositories'
+export const singleAppDataKey = 'singleApp'
+export const appsDataKey = 'apps'
+export const appVersionsDataKey = 'appVersions'
+export const releasesDataKey = 'releases'
+export const repositoriesWithClustersDataKey = 'repositoriesWithClusters'
+export const repositoriesDataKey = 'repositories'
+
+export const singleAppLoader = createContextLoader(singleAppDataKey, async ({ clusterId, appId, release, version }) => {
+  const chart = await qbert.getChart(clusterId, appId, release, version)
+  return {
+    ...chart,
+    readmeMarkdown: await qbert.getChartReadmeContents(chart.attributes.readme)
+  }
+}, {
+  indexBy: ['clusterId', 'appId', 'release', 'version'],
+})
+
+export const appVersionLoader = createContextLoader(appVersionsDataKey, async ({ clusterId, appId, release }) => {
+  return qbert.getChartVersions(clusterId, appId, release)
+}, {
+  indexBy: ['clusterId', 'appId', 'release'],
+})
 
 export const appActions = createCRUDActions(appsDataKey, {
   listFn: async (params, loadFromContext) => {
@@ -31,7 +48,7 @@ export const appActions = createCRUDActions(appsDataKey, {
   },
   entityName: 'App Catalog',
   uniqueIdentifier,
-  indexBy,
+  indexBy: 'clusterId',
   dataMapper: async (items, { clusterId, repositoryId }) => {
     const monocularUrl = await qbert.clusterMonocularBaseUrl(clusterId, null)
     const filterByRepo = repositoryId && repositoryId !== allKey
@@ -68,10 +85,10 @@ export const releaseActions = createCRUDActions(releasesDataKey, {
     return qbert.getReleases(clusterId)
   },
   uniqueIdentifier,
-  indexBy,
+  indexBy: 'clusterId',
 })
 
-const repositoriesWithClusters = createContextLoader(repositoriesWithClustersDataKey, async (params,
+const reposWithClustersLoader = createContextLoader(repositoriesWithClustersDataKey, async (params,
   loadFromContext) => {
   const monocularClusters = await loadFromContext(clustersDataKey, {
     appCatalogClusters: true,
@@ -82,7 +99,7 @@ const repositoriesWithClusters = createContextLoader(repositoriesWithClustersDat
     return clusterRepos.map(mergeLeft({ clusterId, clusterName }))
   })
   return pipe(
-    groupBy(prop('id')),
+    groupBy(prop(uniqueIdentifier)),
     values,
     map(sameIdRepos => ({
       ...head(sameIdRepos),
@@ -91,10 +108,11 @@ const repositoriesWithClusters = createContextLoader(repositoriesWithClustersDat
   )(data)
 }, {
   uniqueIdentifier,
+  entityName: 'Repository with Clusters',
 })
 
 const getRepoName = (id, repos) => id ? pipe(
-  find(propEq('id', id)),
+  find(propEq(uniqueIdentifier, id)),
   propOr(id, 'name'),
 )(repos) : ''
 
@@ -120,7 +138,7 @@ export const repositoryActions = createCRUDActions(repositoriesDataKey, {
   },
   customOperations: {
     updateRepoClusters: async ({ id, clusters }, prevItems) => {
-      const repository = find(propEq('id', id), prevItems)
+      const repository = find(propEq(uniqueIdentifier, id), prevItems)
       const prevSelectedClusters = pluck('clusterId', repository.clusters)
       const body = {
         name: repository.name,
@@ -135,7 +153,7 @@ export const repositoryActions = createCRUDActions(repositoriesDataKey, {
       }, clusters)
 
       // Invalidate the Repositories with Clusters cache so that we force a refetch of the data
-      repositoriesWithClusters.invalidateCache()
+      reposWithClustersLoader.invalidateCache()
 
       // Perfom the update operations, return FALSE if there has been any error
       const deleteResults = await asyncTryCatch(() => asyncFlatMap(itemsToRemove,
@@ -184,7 +202,7 @@ export const repositoryActions = createCRUDActions(repositoriesDataKey, {
       url: attributes.URL,
       source: attributes.source,
       clusters: pipe(
-        find(propEq('id', id)),
+        find(propEq(uniqueIdentifier, id)),
         propOr(emptyArr, 'clusters'),
       )(reposWithClusters),
     }))(items)

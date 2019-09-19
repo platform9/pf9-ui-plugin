@@ -16,7 +16,6 @@ const sortingConfig = [
   {
     field: 'created',
     label: 'Created',
-
   },
 ]
 const defaultParams = {
@@ -28,8 +27,10 @@ const AppCatalogPage = () => {
   const { params, getParamsUpdater } = usePrefParams(defaultParams)
   const [apps, loading, reload] = useDataLoader(appActions.list, params)
   const handleRefresh = useCallback(() => reload(true), [reload])
-  const renderCardItems = useCallback(item =>
-    <AppCard application={item} key={item.id} />, [])
+  const renderCardItems = useCallback(
+    item =>
+      <AppCard application={item} clusterId={params.clusterId} key={item.id} />,
+    [params])
 
   return <CardTable
     loading={loading}
@@ -43,16 +44,13 @@ const AppCatalogPage = () => {
     filters={<>
       <ClusterPicklist
         showAll={false}
-        label="Cluster"
         onlyAppCatalogEnabled
         onChange={getParamsUpdater('clusterId')}
         value={params.clusterId} />
-      {params.clusterId && <RepositoryPicklist
-        label="Repository"
+      <RepositoryPicklist
         onChange={getParamsUpdater('repositoryId')}
-        clusterId={params.clusterId}
         value={params.repositoryId}
-      />}
+      />
     </>}
   >
     {renderCardItems}

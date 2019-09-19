@@ -80,7 +80,7 @@ Kubernetes.registerPlugin = pluginManager => {
       },
       {
         name: 'App Details',
-        link: { path: '/apps/:id', exact: true },
+        link: { path: '/apps/:clusterId/:release/:id', exact: true },
         component: AppDetailsPage,
       },
       {

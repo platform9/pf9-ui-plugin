@@ -4,15 +4,17 @@ import { head, isEmpty, omit, propOr } from 'ramda'
 import Picklist from 'core/components/Picklist'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { projectAs } from 'utils/fp'
-import { repositoryActions } from './actions'
 import { allKey } from 'app/constants'
+import { appVersionLoader } from 'k8s/components/apps/actions'
 
-const RepositoryPicklist = forwardRef(
-  ({ loading, onChange, selectFirst, ...rest }, ref) => {
-    const [repos, reposLoading] = useDataLoader(repositoryActions.list)
+const AppVersionPicklist = forwardRef(
+  ({ clusterId, appId, loading, onChange, selectFirst, ...rest }, ref) => {
+    const [versions, versionsLoading] = useDataLoader(appVersionLoader, {
+      clusterId, appId,
+    })
     const options = useMemo(() => projectAs(
-      { label: 'name', value: 'id' }, repos,
-    ), [repos])
+      { label: 'name', value: 'id' }, versions,
+    ), [versions])
 
     // Select the first item as soon as data is loaded
     useEffect(() => {
@@ -25,26 +27,28 @@ const RepositoryPicklist = forwardRef(
       {...rest}
       ref={ref}
       onChange={onChange}
-      loading={loading || reposLoading}
+      loading={loading || versionsLoading}
       options={options}
     />
   })
 
-RepositoryPicklist.propTypes = {
+AppVersionPicklist.propTypes = {
   ...omit(['options'], Picklist.propTypes),
   name: PropTypes.string,
   label: PropTypes.string,
   formField: PropTypes.bool,
   selectFirst: PropTypes.bool,
+  clusterId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  appId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
 }
 
-RepositoryPicklist.defaultProps = {
+AppVersionPicklist.defaultProps = {
   ...Picklist.defaultProps,
   name: 'repositoryId',
-  label: 'Repository',
+  label: 'AppVersion',
   formField: false,
   showAll: true,
   selectFirst: false,
 }
 
-export default RepositoryPicklist
+export default AppVersionPicklist

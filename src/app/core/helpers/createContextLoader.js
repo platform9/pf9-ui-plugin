@@ -20,28 +20,54 @@ const arrayIfEmpty = when(isEmpty, always(emptyArr))
 
 /**
  * Context Loader options
+ *
  * @typedef {object} createContextLoader~Options
+ *
  * @property {string} [uniqueIdentifier="id"] Unique primary key of the entity
- * @property {string} [entityName=uniqueIdentifier] Name of the entity
+ *
+ * @property {string} [entityName] Name of the entity, it defaults to the the provided entity "key"
+ * formatted with added spaces and removing the last "s"
+ *
  * @property {string|array} [indexBy] Keys to use to index the values
- * @property {bool} [requiredParams=indexBy] Skip calls that doesn't contain all of the required params
- * @property {function} [preloader] Function that will be called at the beginning so that its result can be used in the dataMapper second argument
- * @property {function} [dataMapper] Function used to apply additional transformations to the data AFTER being retrieved from cache
- * @property {bool} [refetchCascade=false] Indicate wether or not to refetch all the resources loaded using `loadFromContext` in the loader or mapper functions
+ *
+ * @property {string|array} [requiredParams=indexBy] Skip calls that doesn't contain all of the
+ * required params, in which case an empty array will be returned
+ *
+ * @property {function} [preloader] Function that will be called at the beginning so that its
+ * result can be used in the dataMapper second argument
+ *
+ * @property {function} [dataMapper] Function used to apply additional transformations to the data
+ * AFTER being retrieved from cache
+ *
+ * @property {bool} [refetchCascade=false] Indicate wether or not to refetch all the resources
+ * loaded using `loadFromContext` in the loader or mapper functions
+ *
  * @property {string} defaultOrderBy ID of the field that will be used to sort the returned items
- * @property {function} [sortWith] Function used to sort the data after being parsed by the dataMapper
- * @property {function|string} [fetchSuccessMessage] Custom message to display after the items have been successfully fetched
- * @property {function|string} [fetchErrorMessage] Custom message to display after an error has been thrown
+ *
+ * @property {function} [sortWith] Function used to sort the data after being parsed by the
+ * dataMapper
+ *
+ * @property {function|string} [fetchSuccessMessage] Custom message to display after the items have
+ * been successfully fetched
+ *
+ * @property {function|string} [fetchErrorMessage] Custom message to display after an error has
+ * been thrown
  */
 
 /**
  * Returns a function that will use context to load and cache values
+ *
  * @typedef {function} createContextLoader
  * @function createContextLoader
+ *
  * @param {string} key Key on which the resolved value will be cached
+ *
  * @param {function} dataFetchFn Function returning the data to be assigned to the context
+ *
  * @param {...createContextLoader~Options} [options] Optional additional options
- * @returns {contextLoaderFn} Function that once called will retrieve data from cache or fetch from server
+ *
+ * @returns {contextLoaderFn} Function that once called will retrieve data from cache or
+ * fetch from server
  */
 const createContextLoader = (key, dataFetchFn, options = {}) => {
   const {
@@ -75,19 +101,33 @@ const createContextLoader = (key, dataFetchFn, options = {}) => {
 
   /**
    * Context loader function, uses a custom loader function to load data from the server
-   * This function promise is memoized so that concurrent calls fetching the api or possible race conditions are avoided
+   * This function promise is memoized so that concurrent calls fetching the api or possible race
+   * conditions are avoided
+   *
    * @typedef {function} contextLoaderFn
    * @function contextLoaderFn
    * @async
+   *
    * @param {Object} args Object containing the required arguments
+   *
    * @param {function} args.getContext
+   *
    * @param {function} args.setContext
+   *
    * @param {object} [args.params] Object containing parameters that will be passed to the updaterFn
-   * @param {object} [args.refetch] Invalidates the cache and calls the dataFetchFn() to fetch the data from server
-   * @param {boolean} [args.rawData] Return raw server data without any additional postprocessing (via dataMapper) or sorting
+   *
+   * @param {object} [args.refetch] Invalidates the cache and calls the dataFetchFn() to fetch the
+   * data from server
+   *
+   * @param {boolean} [args.rawData] Return raw server data without any additional postprocessing
+   * (via dataMapper) or sorting
+   *
    * @param {object} [args.additionalOptions] Additional custom options
+   *
    * @param {function} [args.additionalOptions.onSuccess] Custom logic to perfom after success
+   *
    * @param {function} [args.additionalOptions.onError] Custom logic to perfom after error
+   *
    * @returns {Promise<array>} Fetched or cached items
    */
   const contextLoaderFn = singlePromise(
@@ -141,7 +181,7 @@ const createContextLoader = (key, dataFetchFn, options = {}) => {
         // We can't rely on the server to index the data, as sometimes it simply doesn't return the
         // params used for the query, so we will add them to the items in order to be able to find them afterwards
         const itemsWithParams = arrayIfEmpty(
-          map(mergeLeft(providedIndexedParams), fetchedItems),
+          map(mergeLeft(providedIndexedParams), ensureArray(fetchedItems)),
         )
 
         // Insert or update the existing items (using `uniqueIdentifier` to prevent duplicates)

@@ -37,7 +37,7 @@ const useStyles = makeStyles(theme => ({
     paddingRight: 0,
   },
   search: {
-    margin: theme.spacing(0, 2),
+    margin: theme.spacing(1, 2, 0, 2),
   },
   rowActions: {
     color: 'inherit',

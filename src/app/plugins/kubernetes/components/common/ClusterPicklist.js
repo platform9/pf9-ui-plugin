@@ -8,9 +8,9 @@ import { clusterActions } from '../infrastructure/actions'
 import { allKey } from 'app/constants'
 
 const ClusterPicklist = forwardRef(({
-  loading, onChange, value,
+  loading, onChange,
   onlyPrometheusEnabled, onlyMasterNodeClusters, onlyAppCatalogEnabled,
-  showNone, ...rest,
+  ...rest,
 }, ref) => {
   const defaultParams = {
     masterNodeClusters: onlyMasterNodeClusters,
@@ -18,9 +18,9 @@ const ClusterPicklist = forwardRef(({
     prometheusClusters: onlyPrometheusEnabled,
   }
   const [clusters, clustersLoading] = useDataLoader(clusterActions.list, defaultParams)
-  const options = useMemo(() =>
-    projectAs({ label: 'name', value: 'uuid' })(clusters),
-  [clusters])
+  const options = useMemo(() => projectAs(
+    { label: 'name', value: 'uuid' }, clusters,
+  ), [clusters])
 
   // Select the first cluster as soon as clusters are loaded
   useEffect(() => {
@@ -32,10 +32,7 @@ const ClusterPicklist = forwardRef(({
   return <Picklist
     {...rest}
     ref={ref}
-    showNone={showNone}
     onChange={onChange}
-    disabled={isEmpty(options) && !showNone}
-    value={value || propOr(allKey, 'value', head(options))}
     loading={loading || clustersLoading}
     options={options}
   />

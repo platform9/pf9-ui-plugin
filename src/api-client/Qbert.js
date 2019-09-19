@@ -1,8 +1,10 @@
 import { assoc, propOr } from 'ramda'
 import { keyValueArrToObj } from 'utils/fp'
 import { pathJoin } from 'utils/misc'
+import { normalizeResponse } from 'api-client/helpers'
 
-const normalizeClusterizedResponse = (clusterId, response) => propOr([], 'items', response).map(x => ({ ...x, clusterId }))
+const normalizeClusterizedResponse = (clusterId, response) => propOr([], 'items', response).map(
+  x => ({ ...x, clusterId }))
 const normalizeClusterizedUpdate = (clusterId, response) => ({ ...response, clusterId })
 
 /* eslint-disable camelcase */
@@ -41,7 +43,7 @@ class Qbert {
       'services',
       'monocular-api-svc:80',
       'proxy',
-      version || '/'
+      version || '/',
     )
 
   /* Cloud Providers */
@@ -269,9 +271,8 @@ class Qbert {
 
   /* Monocular endpoints being exposed through Qbert */
   getCharts = async (clusterId) => {
-    const output = await this.client.basicGet(`${await this.clusterMonocularBaseUrl(clusterId)}/charts`)
-    // FIXME: remove this when api is fixed (right now it is returning data.data)
-    return output && output.hasOwnProperty('data') ? output.data : output || []
+    const response = await this.client.basicGet(`${await this.clusterMonocularBaseUrl(clusterId)}/charts`)
+    return normalizeResponse(response)
   }
 
   getChart = async (clusterId, chart, release, version) => {
@@ -279,20 +280,22 @@ class Qbert {
     return this.client.basicGet(`${await this.clusterMonocularBaseUrl(clusterId)}/charts/${chart}/${release}/${versionStr}`)
   }
 
+  getChartReadmeContents = async readmeUrl => {
+    return this.client.basicGet(readmeUrl)
+  }
+
   getChartVersions = async (clusterId, chart, release) => {
     return this.client.basicGet(`${await this.clusterMonocularBaseUrl(clusterId)}/charts/${chart}/${release}/versions`)
   }
 
   getReleases = async (clusterId) => {
-    const output = await this.client.basicGet(`${await this.clusterMonocularBaseUrl(clusterId)}/releases`)
-    // FIXME: remove this when api is fixed (right now it is returning data.data)
-    return (output && output.hasOwnProperty('data') ? output.data : output) || []
+    const response = await this.client.basicGet(`${await this.clusterMonocularBaseUrl(clusterId)}/releases`)
+    return normalizeResponse(response)
   }
 
   getRelease = async (clusterId, name) => {
-    const output = await this.client.basicGet(`${await this.clusterMonocularBaseUrl(clusterId)}/releases/${name}`)
-    // FIXME: remove this when api is fixed (right now it is returning data.data)
-    return (output && output.hasOwnProperty('data') ? output.data : output) || []
+    const response = await this.client.basicGet(`${await this.clusterMonocularBaseUrl(clusterId)}/releases/${name}`)
+    return normalizeResponse(response)
   }
 
   deleteRelease = async (clusterId, name) => {
@@ -502,7 +505,8 @@ class Qbert {
     return response
   }
 
-  getPrometheusDashboardLink = instance => `${this.cachedEndpoint}/clusters/${instance.clusterUuid}/k8sapi${instance.dashboard}`
+  getPrometheusDashboardLink =
+    instance => `${this.cachedEndpoint}/clusters/${instance.clusterUuid}/k8sapi${instance.dashboard}`
 }
 
 export default Qbert
