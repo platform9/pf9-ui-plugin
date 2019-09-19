@@ -52,9 +52,15 @@ const MultiSelect = ({ label, options, values, onChange, maxOptions }) => {
     }
   }
 
+  const onHitEnter = () => {
+    if (visibleOptions.length === 1) {
+      toggleOption(visibleOptions[0].value)
+    }
+  }
+
   return (
     <Box className={classes.container}>
-      <SearchField onSearchChange={onSearchChange} />
+      <SearchField onSearchChange={onSearchChange} onHitEnter={onHitEnter} />
       {visibleOptions.map((option) => (
         <Option
           classes={classes}
@@ -69,16 +75,25 @@ const MultiSelect = ({ label, options, values, onChange, maxOptions }) => {
   )
 }
 
-const SearchField = ({ onSearchChange }) => {
+const SearchField = ({ onSearchChange, onHitEnter }) => {
   const [term, setTerm] = useState('')
 
   useEffect(() => onSearchChange(term), [term])
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      onHitEnter()
+    } else if (event.key === 'Escape') {
+      setTerm('')
+    }
+  }
 
   return (
     <FormControl>
       <OutlinedInput
         value={term}
         onChange={(e) => setTerm(e.target.value)}
+        onKeyDown={handleKeyDown}
         startAdornment={<InputAdornment position="start"><SearchIcon /></InputAdornment>}
       />
     </FormControl>

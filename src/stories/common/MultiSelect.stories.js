@@ -6,7 +6,7 @@ const addStories = addStoriesFromModule(module)
 
 addStories('Common Components/MultiSelect', {
   'countries': () => {
-    const [values, setValues] = useState(['A'])
+    const [values, setValues] = useState([])
     const options = [
       { value: 'Argentina', label: 'Argentina' },
       { value: 'Brazil', label: 'Brazil' },
