@@ -26,11 +26,18 @@ const useStyles = makeStyles(theme => createStyles({
   },
 }))
 
-const MultiSelect = ({ label, options, values, onChange, maxOptions }) => {
+const MultiSelect = ({ label, options, values, onChange, maxOptions, sortSelectedFirst }) => {
   const classes = useStyles()
-  const limitOptions = (options) => maxOptions ? options.slice(0, maxOptions) : options
 
-  const [visibleOptions, setVisibleOptions] = useState(limitOptions(options))
+  const adjustOptions = (options) => {
+    const sortBySelected = (a, b) => values.includes(b.value) - values.includes(a.value)
+    const sortedOptions = sortSelectedFirst ? options.sort(sortBySelected) : options
+    const limitedOptions = maxOptions ? sortedOptions.slice(0, maxOptions) : sortedOptions
+
+    return limitedOptions
+  }
+
+  const [visibleOptions, setVisibleOptions] = useState(adjustOptions(options))
   const [fuse, setFuse] = useState(null)
 
   useEffect(() => setFuse(new Fuse(options, FUSE_OPTIONS)), [options])
@@ -45,10 +52,10 @@ const MultiSelect = ({ label, options, values, onChange, maxOptions }) => {
 
   const onSearchChange = (term) => {
     if (!term) {
-      setVisibleOptions(limitOptions(options))
+      setVisibleOptions(adjustOptions(options))
     } else if (fuse) {
       const searchResults = fuse.search(term)
-      setVisibleOptions(limitOptions(searchResults))
+      setVisibleOptions(adjustOptions(searchResults))
     }
   }
 
@@ -118,6 +125,7 @@ MultiSelect.propTypes = {
   values: PropTypes.arrayOf(PropTypes.string),
   onChange: PropTypes.func,
   maxOptions: PropTypes.bool,
+  sortSelectedFirst: PropTypes.bool,
 }
 
 export default MultiSelect
