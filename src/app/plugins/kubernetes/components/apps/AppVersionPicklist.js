@@ -38,8 +38,8 @@ AppVersionPicklist.propTypes = {
   label: PropTypes.string,
   formField: PropTypes.bool,
   selectFirst: PropTypes.bool,
-  clusterId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
-  appId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  clusterId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  appId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 }
 
 AppVersionPicklist.defaultProps = {
