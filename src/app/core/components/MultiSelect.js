@@ -124,7 +124,7 @@ MultiSelect.propTypes = {
   options: PropTypes.arrayOf(optionPropType).isRequired,
   values: PropTypes.arrayOf(PropTypes.string),
   onChange: PropTypes.func,
-  maxOptions: PropTypes.bool,
+  maxOptions: PropTypes.number,
   sortSelectedFirst: PropTypes.bool,
 }
 
