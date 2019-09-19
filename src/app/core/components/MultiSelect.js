@@ -9,6 +9,8 @@ import FormControlLabel from '@material-ui/core/FormControlLabel'
 import Checkbox from '@material-ui/core/Checkbox'
 import SearchIcon from '@material-ui/icons/Search'
 
+const MAX_OPTIONS = 9
+
 const useStyles = makeStyles(theme => createStyles({
   container: {
     display: 'inline-flex',
@@ -23,6 +25,7 @@ const useStyles = makeStyles(theme => createStyles({
 
 const MultiSelect = ({ label, options, values, onChange }) => {
   const classes = useStyles()
+  const [visibleOptions, setVisibleOptions] = useState(limitOptions(options));
 
   const toggleOption = (value) => {
     const updatedValues = values.includes(value)
@@ -35,7 +38,7 @@ const MultiSelect = ({ label, options, values, onChange }) => {
   return (
     <Box className={classes.container}>
       <SearchField />
-      {options.map((option) => (
+      {visibleOptions.map((option) => (
         <Option
           classes={classes}
           key={option.value}
@@ -69,6 +72,8 @@ const Option = ({ classes, label, ...checkboxProps }) =>
     label={label}
     control={<Checkbox {...checkboxProps} />}
   />
+
+const limitOptions = (options) => options.slice(0, MAX_OPTIONS);
 
 const optionPropType = PropTypes.shape({
   value: PropTypes.string,
