@@ -47,7 +47,7 @@ export const AddServiceForm = ({ onComplete }) => {
 }
 
 export const options = {
-  dataKey: 'kubeServices',
+  cacheKey: 'kubeServices',
   FormComponent: AddServiceForm,
   listUrl: '/ui/kubernetes/pods#services',
   name: 'AddService',

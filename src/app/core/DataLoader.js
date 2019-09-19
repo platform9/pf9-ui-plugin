@@ -57,7 +57,7 @@ class DataLoader extends PureComponent {
 
 DataLoader.propTypes = {
   /**
-   * Object with key value pairs where key is the dataKey and
+   * Object with key value pairs where key is the cacheKey and
    * value is a loaderFn or a spec of { requires, loaderFn }
    */
   loaders: PropTypes.object.isRequired,

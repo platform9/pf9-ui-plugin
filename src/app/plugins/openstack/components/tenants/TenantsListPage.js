@@ -1,5 +1,5 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { tenantsDataKey } from 'openstack/components/tenants/actions'
+import { tenantsCacheKey } from 'openstack/components/tenants/actions'
 
 export const options = {
   addUrl: '/ui/openstack/tenants/add',
@@ -11,7 +11,7 @@ export const options = {
     { id: 'blockStorageUsage', label: 'Block storage usage' },
     { id: 'networkUsage', label: 'Network usage' },
   ],
-  dataKey: tenantsDataKey,
+  cacheKey: tenantsCacheKey,
   editUrl: '/ui/openstack/tenants/edit',
   name: 'Tenants',
   title: 'Tenants',

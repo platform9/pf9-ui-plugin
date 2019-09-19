@@ -1,7 +1,7 @@
 // import React from 'react'
 // import ExternalLink from 'core/components/ExternalLink'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { prometheusInstancesDataKey } from './actions'
+import { prometheusInstancesCacheKey } from './actions'
 
 const renderKeyValues = obj => Object.entries(obj)
   .map(([key, value]) => `${key}: ${value}`)
@@ -31,7 +31,7 @@ export const columns = [
 ]
 
 export const options = {
-  dataKey: prometheusInstancesDataKey,
+  cacheKey: prometheusInstancesCacheKey,
   addUrl: '/ui/kubernetes/prometheus/instances/add',
   addText: 'New Instance',
   columns,

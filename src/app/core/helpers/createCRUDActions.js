@@ -21,16 +21,16 @@ import { mapObjIndexed } from 'ramda'
 
 /**
  * Create CRUD actions
- * @param {string} dataKey Key on which the resolved value will be cached
+ * @param {string} cacheKey Key on which the resolved value will be cached
  * @param {...createCRUDActions~Options} [options] CRUD options
  * @returns {{(*=): (function), create: function, update: function, list: function, delete: function, invalidateCache: function}}
  */
-const createCRUDActions = (dataKey, options) => {
+const createCRUDActions = (cacheKey, options) => {
   const apiClient = ApiClient.getInstance()
 
   const {
     service,
-    entity = dataKey,
+    entity = cacheKey,
     createFn = async data => service
       ? apiClient[service][entity].create(data)
       : throwErr('create'),
@@ -48,7 +48,7 @@ const createCRUDActions = (dataKey, options) => {
     ...rest
   } = options
 
-  const contextLoader = createContextLoader(dataKey, listFn, {
+  const contextLoader = createContextLoader(cacheKey, listFn, {
     uniqueIdentifier,
     ...rest,
   })
@@ -60,7 +60,7 @@ const createCRUDActions = (dataKey, options) => {
   return {
     // Custom operations
     ...mapObjIndexed((customOperationFn, operation) =>
-      createContextUpdater(dataKey, customOperationFn, {
+      createContextUpdater(cacheKey, customOperationFn, {
         uniqueIdentifier,
         operation,
         ...rest,
@@ -69,21 +69,21 @@ const createCRUDActions = (dataKey, options) => {
 
     list: contextLoader,
 
-    create: createContextUpdater(dataKey, createFn, {
+    create: createContextUpdater(cacheKey, createFn, {
       uniqueIdentifier,
       operation: 'create',
       contextLoader,
       ...rest,
     }),
 
-    update: createContextUpdater(dataKey, updateFn, {
+    update: createContextUpdater(cacheKey, updateFn, {
       uniqueIdentifier,
       operation: 'update',
       contextLoader,
       ...rest,
     }),
 
-    delete: createContextUpdater(dataKey, deleteFn, {
+    delete: createContextUpdater(cacheKey, deleteFn, {
       uniqueIdentifier,
       operation: 'delete',
       contextLoader,

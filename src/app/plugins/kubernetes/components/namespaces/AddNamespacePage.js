@@ -5,7 +5,7 @@ import SubmitButton from 'core/components/SubmitButton'
 import createAddComponents from 'core/helpers/createAddComponents'
 import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
 import TextField from 'core/components/validatedForm/TextField'
-import { namespacesDataKey } from './actions'
+import { namespacesCacheKey } from './actions'
 import useParams from 'core/hooks/useParams'
 
 const defaultParams = {
@@ -30,7 +30,7 @@ export const AddNamespaceForm = ({ onComplete }) => {
 }
 
 export const options = {
-  dataKey: namespacesDataKey,
+  cacheKey: namespacesCacheKey,
   FormComponent: AddNamespaceForm,
   listUrl: '/ui/kubernetes/namespaces',
   name: 'AddNamespace',

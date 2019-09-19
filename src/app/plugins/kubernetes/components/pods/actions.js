@@ -8,11 +8,11 @@ import { pluck } from 'ramda'
 
 const { qbert } = ApiClient.getInstance()
 
-export const deploymentsDataKey = 'deployments'
-export const kubeServicesDataKey = 'kubeServices'
-export const podsDataKey = 'pods'
+export const deploymentsCacheKey = 'deployments'
+export const kubeServicesCacheKey = 'kubeServices'
+export const podsCacheKey = 'pods'
 
-export const deploymentActions = createCRUDActions(deploymentsDataKey, {
+export const deploymentActions = createCRUDActions(deploymentsCacheKey, {
   createFn: async ({ clusterId, namespace, deploymentYaml }) => {
     const body = yaml.safeLoad(deploymentYaml)
     const created = await qbert.createDeployment(clusterId, namespace, body)
@@ -28,11 +28,11 @@ export const deploymentActions = createCRUDActions(deploymentsDataKey, {
     }
   },
   service: 'qbert',
-  entity: deploymentsDataKey,
+  entity: deploymentsCacheKey,
   indexBy: 'clusterId',
 })
 
-export const serviceActions = createCRUDActions(kubeServicesDataKey, {
+export const serviceActions = createCRUDActions(kubeServicesCacheKey, {
   createFn: async ({ clusterId, namespace, serviceYaml }) => {
     const body = yaml.safeLoad(serviceYaml)
     const created = await qbert.createService(clusterId, namespace, body)
@@ -51,11 +51,11 @@ export const serviceActions = createCRUDActions(kubeServicesDataKey, {
   },
   service: 'qbert',
   entity: 'services',
-  dataKey: kubeServicesDataKey,
+  cacheKey: kubeServicesCacheKey,
   indexBy: 'clusterId',
 })
 
-export const podActions = createCRUDActions(podsDataKey, {
+export const podActions = createCRUDActions(podsCacheKey, {
   listFn: async (params, loadFromContext) => {
     const [clusterId, clusters] = await parseClusterParams(params, loadFromContext)
     if (clusterId === allKey) {

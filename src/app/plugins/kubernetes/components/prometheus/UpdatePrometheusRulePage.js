@@ -4,7 +4,7 @@ import PrometheusRuleForm from './PrometheusRuleForm'
 import PrometheusRulesTable from './PrometheusRulesTable'
 import createUpdateComponents from 'core/helpers/createUpdateComponents'
 import uuid from 'uuid'
-import { prometheusRulesDataKey } from './actions'
+import { prometheusRulesCacheKey } from './actions'
 import { withStyles } from '@material-ui/styles'
 
 @withStyles(theme => ({
@@ -41,7 +41,7 @@ class UpdatePrometheusRuleForm extends React.PureComponent {
 
 export const options = {
   FormComponent: UpdatePrometheusRuleForm,
-  dataKey: prometheusRulesDataKey,
+  cacheKey: prometheusRulesCacheKey,
   routeParamKey: 'id',
   uniqueIdentifier: 'uid',
   listUrl: '/ui/kubernetes/prometheus#rules',

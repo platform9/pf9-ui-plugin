@@ -1,11 +1,11 @@
 import ApiClient from 'api-client/ApiClient'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 
-export const usersDataKey = 'users'
+export const usersCacheKey = 'users'
 
 const { keystone } = ApiClient.getInstance()
 
-const userActions = createCRUDActions(usersDataKey, {
+const userActions = createCRUDActions(usersCacheKey, {
   listFn: async () => {
     return keystone.getUsers()
   },

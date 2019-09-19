@@ -47,7 +47,7 @@ export const AddDeploymentForm = ({ onComplete }) => {
 }
 
 export const options = {
-  dataKey: 'deployments',
+  cacheKey: 'deployments',
   FormComponent: AddDeploymentForm,
   listUrl: '/ui/kubernetes/pods#deployments',
   name: 'AddDeployment',

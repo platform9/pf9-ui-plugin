@@ -1,5 +1,5 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { mngmUsersDataKey } from 'k8s/components/userManagement/actions'
+import { mngmUsersCacheKey } from 'k8s/components/userManagement/actions'
 
 export const options = {
   columns: [
@@ -9,7 +9,7 @@ export const options = {
     { id: 'two_factor', label: 'Two-Factor Authentication' },
     { id: 'tenants', label: 'Tenants' },
   ],
-  dataKey: mngmUsersDataKey,
+  cacheKey: mngmUsersCacheKey,
   // editUrl: '/ui/kubernetes/infrastructure/users/edit',
   name: 'Users',
   title: 'Users',

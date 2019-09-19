@@ -1,5 +1,5 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { prometheusAlertManagersDataKey } from './actions'
+import { prometheusAlertManagersCacheKey } from './actions'
 
 const renderClusterName = (field, row, context) => {
   const cluster = context.clusters.find(x => x.uuid === row.clusterUuid)
@@ -15,7 +15,7 @@ export const columns = [
 
 export const options = {
   columns,
-  dataKey: prometheusAlertManagersDataKey,
+  cacheKey: prometheusAlertManagersCacheKey,
   editUrl: '/ui/kubernetes/prometheus/alertManagers/edit',
   name: 'PrometheusAlertManagers',
   title: 'Prometheus Alert Managers',

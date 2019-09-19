@@ -1,11 +1,11 @@
 import ApiClient from 'api-client/ApiClient'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 
-export const routersDataKey = 'routers'
+export const routersCacheKey = 'routers'
 
 const { neutron } = ApiClient.getInstance()
 
-const routerActions = createCRUDActions(routersDataKey, {
+const routerActions = createCRUDActions(routersCacheKey, {
   listFn: async () => {
     return neutron.getRouters()
   },

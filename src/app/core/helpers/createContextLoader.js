@@ -25,7 +25,7 @@ const arrayIfEmpty = when(isEmpty, always(emptyArr))
  *
  * @property {string} [uniqueIdentifier="id"] Unique primary key of the entity
  *
- * @property {string} [entityName] Name of the entity, it defaults to the the provided entity "key"
+ * @property {string} [entityName] Name of the entity, it defaults to the the provided entity "cacheKey"
  * formatted with added spaces and removing the last "s"
  *
  * @property {string|array} [indexBy] Keys to use to index the values
@@ -60,7 +60,7 @@ const arrayIfEmpty = when(isEmpty, always(emptyArr))
  * @typedef {function} createContextLoader
  * @function createContextLoader
  *
- * @param {string} key Key on which the resolved value will be cached
+ * @param {string} cacheKey Context key on which the resolved value will be cached
  *
  * @param {function} dataFetchFn Function returning the data to be assigned to the context
  *
@@ -69,10 +69,10 @@ const arrayIfEmpty = when(isEmpty, always(emptyArr))
  * @returns {contextLoaderFn} Function that once called will retrieve data from cache or
  * fetch from server
  */
-const createContextLoader = (key, dataFetchFn, options = {}) => {
+const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
   const {
     uniqueIdentifier = defaultUniqueIdentifier,
-    entityName = uncamelizeString(key).replace(/s$/, ''), // Remove trailing "s"
+    entityName = uncamelizeString(cacheKey).replace(/s$/, ''), // Remove trailing "s"
     indexBy,
     requiredParams = indexBy,
     dataMapper = identity,
@@ -87,8 +87,8 @@ const createContextLoader = (key, dataFetchFn, options = {}) => {
     fetchErrorMessage = (catchedErr, params) => `Error when trying to fetch ${entityName} items`,
   } = options
   const uniqueIdentifierPath = uniqueIdentifier.split('.')
-  const dataLens = lensPath([dataContextKey, key])
-  const paramsLens = lensPath([paramsContextKey, key])
+  const dataLens = lensPath([dataContextKey, cacheKey])
+  const paramsLens = lensPath([paramsContextKey, cacheKey])
   const allIndexKeys = indexBy ? ensureArray(indexBy) : emptyArr
   const allRequiredParams = requiredParams ? ensureArray(requiredParams) : emptyArr
   // Memoize the data mapper so we will prevent remapping the same items over and over
@@ -231,16 +231,16 @@ const createContextLoader = (key, dataFetchFn, options = {}) => {
     contextLoaderFn._invalidatedCache = true
   }
   /**
-   * Function to retrieve the current dataKey
+   * Function to retrieve the current cacheKey
    * @function
    * @returns {string}
    */
-  contextLoaderFn.getKey = () => key
+  contextLoaderFn.getKey = () => cacheKey
 
-  if (has(key, loaders)) {
-    console.warn(`Context Loader function with key ${key} already exists`)
+  if (has(cacheKey, loaders)) {
+    console.warn(`Context Loader function with key ${cacheKey} already exists`)
   }
-  loaders = assoc(key, contextLoaderFn, loaders)
+  loaders = assoc(cacheKey, contextLoaderFn, loaders)
   return contextLoaderFn
 }
 

@@ -13,7 +13,7 @@ import { useScopedPreferences } from 'core/providers/PreferencesProvider'
  * @example
  *
  *   const { params, updateParams, getParamsUpdater } = useParams(defaultParams)
- *   const [data, loading, reload] = useDataLoader(dataKey, params)
+ *   const [data, loading, reload] = useDataLoader(cacheKey, params)
  *
  *   return <Picklist onChange={getParamsUpdater('clusterId')}
  *   Equivalent to:

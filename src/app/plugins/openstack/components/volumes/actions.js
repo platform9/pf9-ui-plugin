@@ -5,15 +5,15 @@ import createContextUpdater from 'core/helpers/createContextUpdater'
 
 const { cinder } = ApiClient.getInstance()
 
-export const volumesDataKey = 'volumes'
-export const volumeTypesDataKey = 'volumeTypes'
-export const volumeSnapshotsDataKey = 'volumeSnapshots'
+export const volumesCacheKey = 'volumes'
+export const volumeTypesCacheKey = 'volumeTypes'
+export const volumeSnapshotsCacheKey = 'volumeSnapshots'
 
-export const loadVolumes = createContextLoader(volumesDataKey, async () => {
+export const loadVolumes = createContextLoader(volumesCacheKey, async () => {
   return cinder.getVolumes()
 })
 
-export const createVolume = createContextUpdater(volumesDataKey, async data => {
+export const createVolume = createContextUpdater(volumesCacheKey, async data => {
   const created = await cinder.createVolume(data)
   if (data.bootable) {
     await cinder.setBootable(created.id, true)
@@ -22,18 +22,18 @@ export const createVolume = createContextUpdater(volumesDataKey, async data => {
   return created
 }, { operation: 'create' })
 
-export const updateVolume = createContextUpdater(volumesDataKey, async () => {
+export const updateVolume = createContextUpdater(volumesCacheKey, async () => {
   // TODO
 }, { operation: 'update' })
 
-export const loadVolumeTypes = createContextLoader(volumeTypesDataKey, async () => {
+export const loadVolumeTypes = createContextLoader(volumeTypesCacheKey, async () => {
   const volumeTypes = await cinder.getVolumeTypes()
 
   // Change metadata into array form
   return (volumeTypes || []).map(x => ({ ...x, extra_specs: objToKeyValueArr(x.extra_specs) }))
 })
 
-export const updateVolumeType = createContextUpdater(volumeTypesDataKey, async (data, currentItems) => {
+export const updateVolumeType = createContextUpdater(volumeTypesCacheKey, async (data, currentItems) => {
   const { id } = data
   const converted = {
     name: data.name,
@@ -45,7 +45,7 @@ export const updateVolumeType = createContextUpdater(volumeTypesDataKey, async (
   return cinder.updateVolumeType(id, converted, keysToDelete)
 }, { operation: 'update' })
 
-export const loadVolumeSnapshots = createContextLoader(volumeSnapshotsDataKey, async () => {
+export const loadVolumeSnapshots = createContextLoader(volumeSnapshotsCacheKey, async () => {
   const volumeSnapshots = await cinder.getSnapshots()
 
   // Change metadata into array form
@@ -55,7 +55,7 @@ export const loadVolumeSnapshots = createContextLoader(volumeSnapshotsDataKey, a
   }))
 })
 
-export const updateVolumeSnapshot = createContextUpdater(volumeSnapshotsDataKey, async data => {
+export const updateVolumeSnapshot = createContextUpdater(volumeSnapshotsCacheKey, async data => {
   const { id } = data
   const updated = await cinder.updateSnapshot(id, data)
   await cinder.updateSnapshotMetadata(id, keyValueArrToObj(data.metadata))
