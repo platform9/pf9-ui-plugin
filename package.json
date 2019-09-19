@@ -101,6 +101,7 @@
     "build-storybook": "build-storybook",
     "dev": "cross-env NODE_ENV=development npm start",
     "lint": "./node_modules/.bin/eslint src",
+    "fix-lint": "./node_modules/.bin/eslint --fix src",
     "start": "webpack-dev-server --progress --colors --hot --inline --env.development --host 0.0.0.0",
     "server": "./node_modules/.bin/babel-node --inspect --presets @babel/preset-env src/server/main.js",
     "all": "concurrently --kill-others \"npm run server\" \"npm start\"",
