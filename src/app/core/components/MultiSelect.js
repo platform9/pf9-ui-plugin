@@ -10,7 +10,6 @@ import Checkbox from '@material-ui/core/Checkbox'
 import SearchIcon from '@material-ui/icons/Search'
 import * as Fuse from 'fuse.js'
 
-const MAX_OPTIONS = 9
 const FUSE_OPTIONS = {
   keys: ['value', 'label'],
 }
@@ -27,8 +26,9 @@ const useStyles = makeStyles(theme => createStyles({
   },
 }))
 
-const MultiSelect = ({ label, options, values, onChange }) => {
+const MultiSelect = ({ label, options, values, onChange, maxOptions }) => {
   const classes = useStyles()
+  const limitOptions = (options) => maxOptions ? options.slice(0, maxOptions) : options
 
   const [visibleOptions, setVisibleOptions] = useState(limitOptions(options))
   const [fuse, setFuse] = useState(null)
@@ -92,8 +92,6 @@ const Option = ({ classes, label, ...checkboxProps }) =>
     control={<Checkbox {...checkboxProps} />}
   />
 
-const limitOptions = (options) => options.slice(0, MAX_OPTIONS)
-
 const optionPropType = PropTypes.shape({
   value: PropTypes.string,
   label: PropTypes.string,
@@ -104,6 +102,7 @@ MultiSelect.propTypes = {
   options: PropTypes.arrayOf(optionPropType).isRequired,
   values: PropTypes.arrayOf(PropTypes.string),
   onChange: PropTypes.func,
+  maxOptions: PropTypes.bool,
 }
 
 export default MultiSelect

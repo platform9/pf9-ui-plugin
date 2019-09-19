@@ -29,6 +29,7 @@ addStories('Common Components/MultiSelect', {
         options={options}
         values={values}
         onChange={setValues}
+        maxOptions={9}
       />
     )
   },
