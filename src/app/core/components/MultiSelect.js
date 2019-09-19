@@ -27,10 +27,6 @@ const useStyles = makeStyles(theme => createStyles({
 
 const MultiSelect = ({label, options, values, onChange}) => {
     const classes = useStyles();
-    const optionsWithStatus = options.map(option => ({
-        ...option,
-        checked: values.includes(option.value),
-    }));
 
     const toggleOption = (value) => {
         const updatedValues = values.includes(value)
@@ -43,13 +39,13 @@ const MultiSelect = ({label, options, values, onChange}) => {
     return (
         <Box className={classes.container}>
             <SearchField />
-            {optionsWithStatus.map((option) => (
+            {options.map((option) => (
                 <Option
                     classes={classes}
                     key={option.value}
                     label={option.label}
                     value={option.value}
-                    checked={option.checked}
+                    checked={values.includes(option.value)}
                     onChange={() => toggleOption(option.value)}
                 />
             ))}
