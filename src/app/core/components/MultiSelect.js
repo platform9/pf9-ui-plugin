@@ -1,55 +1,82 @@
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
+import { makeStyles, createStyles } from '@material-ui/styles';
+import Box from '@material-ui/core/Box'
 import FormControl from '@material-ui/core/FormControl'
-import InputLabel from '@material-ui/core/InputLabel'
+import InputLabel from '@material-ui/core/InputLabel';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import OutlinedInput from '@material-ui/core/OutlinedInput';
 import MenuItem from '@material-ui/core/MenuItem'
 import Select from '@material-ui/core/Select'
-import { withStyles } from '@material-ui/styles'
-import { compose } from 'app/utils/fp'
+import FormGroup from '@material-ui/core/FormGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
+import SearchIcon from '@material-ui/icons/Search';
 
-const styles = theme => ({
-  root: {
-    display: 'flex',
-    flexWrap: 'wrap',
-  },
-  formControl: {
-    marginTop: theme.spacing(1),
-    minWidth: 200,
-  },
-  selectEmpty: {
-    marginTop: theme.spacing(2),
-  },
-})
+const useStyles = makeStyles(theme => createStyles({
+    container: {
+        display: "inline-flex",
+        flexDirection: "column",
+        padding: 10,
+        border: "1px solid #000",
+    },
+    option: {
 
-class MultiSelect extends React.PureComponent {
-  handleChange = e => {
-    const { onChange } = this.props
-    onChange && onChange(e.target.value)
-  }
+    },
+}));
 
-  render () {
-    const { classes, label, name, value } = this.props
+const MultiSelect = ({label, options, values, onChange}) => {
+    const classes = useStyles();
+    const optionsWithStatus = options.map(option => ({
+        ...option,
+        checked: values.includes(option.value),
+    }));
 
-    const options = this.props.options.map(x =>
-      typeof x === 'string' ? ({ value: x, label: x }) : x
-    )
+    const toggleOption = (value) => {
+        const updatedValues = values.includes(value)
+            ? values.filter(currentValue => currentValue !== value)
+            : [...values, value];
+
+        onChange(updatedValues);
+    };
 
     return (
-      <FormControl className={classes.formControl}>
-        <InputLabel htmlFor={name}>{label}</InputLabel>
-        <Select
-          value={value}
-          onChange={this.handleChange}
-          inputProps={{ name: label, id: name }}
-          displayEmpty
-          multiple
-        >
-          {options.map(x => <MenuItem value={x.value} key={x.value}>{x.label}</MenuItem>)}
-        </Select>
-      </FormControl>
-    )
-  }
-}
+        <Box className={classes.container}>
+            <SearchField />
+            {optionsWithStatus.map((option) => (
+                <Option
+                    classes={classes}
+                    key={option.value}
+                    label={option.label}
+                    value={option.value}
+                    checked={option.checked}
+                    onChange={() => toggleOption(option.value)}
+                />
+            ))}
+        </Box>
+    );
+};
+
+const SearchField = () => {
+    const [term, setTerm] = useState("");
+
+    return (
+        <FormControl>
+            <OutlinedInput
+                value={term}
+                onChange={(e) => setTerm(e.target.value)}
+                startAdornment={<InputAdornment position="start"><SearchIcon /></InputAdornment>}
+            />
+        </FormControl>
+    );
+};
+
+const Option = ({classes, label, ...checkboxProps}) =>
+    <FormControlLabel
+        className={classes.options}
+        label={label}
+        control={<Checkbox {...checkboxProps} />}
+    />;
 
 const optionPropType = PropTypes.shape({
   value: PropTypes.string,
@@ -60,10 +87,8 @@ MultiSelect.propTypes = {
   name: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
   options: PropTypes.arrayOf(optionPropType).isRequired,
-  value: PropTypes.arrayOf(PropTypes.string),
+  values: PropTypes.arrayOf(PropTypes.string),
   onChange: PropTypes.func,
 }
 
-export default compose(
-  withStyles(styles),
-)(MultiSelect)
+export default MultiSelect;

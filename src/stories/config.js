@@ -4,6 +4,7 @@ import { appDecorators } from './helpers'
 import { create } from '@storybook/theming'
 import { withInfo } from '@storybook/addon-info'
 import { withKnobs } from '@storybook/addon-knobs'
+import '../app/bootstrap'
 
 addDecorator(withInfo({ header: false, inline: true, source: true }))
 addDecorator(withKnobs)

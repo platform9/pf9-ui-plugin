@@ -40,7 +40,7 @@ class NodesChooser extends React.PureComponent {
           label={label}
           options={hostOptions}
           onChange={this.handleMultiSelect}
-          value={this.state.selected}
+          values={this.state.selected}
         />
       </React.Fragment>
     )
