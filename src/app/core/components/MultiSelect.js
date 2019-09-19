@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { makeStyles, createStyles } from '@material-ui/styles'
 import Box from '@material-ui/core/Box'
@@ -8,8 +8,12 @@ import OutlinedInput from '@material-ui/core/OutlinedInput'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 import Checkbox from '@material-ui/core/Checkbox'
 import SearchIcon from '@material-ui/icons/Search'
+import * as Fuse from 'fuse.js'
 
 const MAX_OPTIONS = 9
+const FUSE_OPTIONS = {
+  keys: ['value', 'label'],
+}
 
 const useStyles = makeStyles(theme => createStyles({
   container: {
@@ -25,7 +29,11 @@ const useStyles = makeStyles(theme => createStyles({
 
 const MultiSelect = ({ label, options, values, onChange }) => {
   const classes = useStyles()
-  const [visibleOptions, setVisibleOptions] = useState(limitOptions(options));
+
+  const [visibleOptions, setVisibleOptions] = useState(limitOptions(options))
+  const [fuse, setFuse] = useState(null)
+
+  useEffect(() => setFuse(new Fuse(options, FUSE_OPTIONS)), [options])
 
   const toggleOption = (value) => {
     const updatedValues = values.includes(value)
@@ -35,9 +43,18 @@ const MultiSelect = ({ label, options, values, onChange }) => {
     onChange(updatedValues)
   }
 
+  const onSearchChange = (term) => {
+    if (!term) {
+      setVisibleOptions(limitOptions(options))
+    } else if (fuse) {
+      const searchResults = fuse.search(term)
+      setVisibleOptions(limitOptions(searchResults))
+    }
+  }
+
   return (
     <Box className={classes.container}>
-      <SearchField />
+      <SearchField onSearchChange={onSearchChange} />
       {visibleOptions.map((option) => (
         <Option
           classes={classes}
@@ -52,8 +69,10 @@ const MultiSelect = ({ label, options, values, onChange }) => {
   )
 }
 
-const SearchField = () => {
+const SearchField = ({ onSearchChange }) => {
   const [term, setTerm] = useState('')
+
+  useEffect(() => onSearchChange(term), [term])
 
   return (
     <FormControl>
@@ -73,7 +92,7 @@ const Option = ({ classes, label, ...checkboxProps }) =>
     control={<Checkbox {...checkboxProps} />}
   />
 
-const limitOptions = (options) => options.slice(0, MAX_OPTIONS);
+const limitOptions = (options) => options.slice(0, MAX_OPTIONS)
 
 const optionPropType = PropTypes.shape({
   value: PropTypes.string,
