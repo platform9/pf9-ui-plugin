@@ -37,10 +37,10 @@ const styles = theme => ({
   status: {
     display: 'flex',
     flexFlow: 'column nowrap',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'center',
-    padding: '4rem',
-    minHeight: 200,
+    padding: '8rem 4rem',
+    minHeight: 400,
   },
   statusHidden: {
     display: 'none',

@@ -8,12 +8,12 @@ import { allKey } from 'app/constants'
 import { appVersionLoader } from 'k8s/components/apps/actions'
 
 const AppVersionPicklist = forwardRef(
-  ({ clusterId, appId, loading, onChange, selectFirst, ...rest }, ref) => {
+  ({ clusterId, appId, release, loading, onChange, selectFirst, ...rest }, ref) => {
     const [versions, versionsLoading] = useDataLoader(appVersionLoader, {
-      clusterId, appId,
+      clusterId, appId, release,
     })
     const options = useMemo(() => projectAs(
-      { label: 'name', value: 'id' }, versions,
+      { label: 'version', value: 'version' }, versions,
     ), [versions])
 
     // Select the first item as soon as data is loaded
@@ -40,6 +40,7 @@ AppVersionPicklist.propTypes = {
   selectFirst: PropTypes.bool,
   clusterId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   appId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  release: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 }
 
 AppVersionPicklist.defaultProps = {
@@ -47,8 +48,8 @@ AppVersionPicklist.defaultProps = {
   name: 'repositoryId',
   label: 'AppVersion',
   formField: false,
-  showAll: true,
-  selectFirst: false,
+  showAll: false,
+  selectFirst: true,
 }
 
 export default AppVersionPicklist

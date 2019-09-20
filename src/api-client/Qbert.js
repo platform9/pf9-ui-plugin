@@ -276,16 +276,16 @@ class Qbert {
   }
 
   getChart = async (clusterId, chart, release, version) => {
-    const versionStr = version ? `/versions/${version}` : ''
-    return this.client.basicGet(`${await this.clusterMonocularBaseUrl(clusterId)}/charts/${chart}/${release}/${versionStr}`)
+    const versionStr = version ? `versions/${version}` : ''
+    return this.client.basicGet(`${await this.clusterMonocularBaseUrl(clusterId)}/charts/${release}/${chart}/${versionStr}`)
   }
 
-  getChartReadmeContents = async readmeUrl => {
-    return this.client.basicGet(readmeUrl)
+  getChartReadmeContents = async (clusterId, readmeUrl) => {
+    return this.client.basicGet(pathJoin(await this.clusterMonocularBaseUrl(clusterId, null), readmeUrl))
   }
 
   getChartVersions = async (clusterId, chart, release) => {
-    return this.client.basicGet(`${await this.clusterMonocularBaseUrl(clusterId)}/charts/${chart}/${release}/versions`)
+    return this.client.basicGet(`${await this.clusterMonocularBaseUrl(clusterId)}/charts/${release}/${chart}/versions`)
   }
 
   getReleases = async (clusterId) => {

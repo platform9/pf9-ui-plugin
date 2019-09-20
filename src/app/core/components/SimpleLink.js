@@ -36,7 +36,7 @@ const SimpleLink = ({
       onClick={handleClick}
       {...rest}
     >
-      {children}
+      {children || src}
     </Link>
   )
 }

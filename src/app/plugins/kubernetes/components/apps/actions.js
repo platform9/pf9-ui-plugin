@@ -26,16 +26,35 @@ export const singleAppLoader = createContextLoader(singleAppCacheKey, async ({ c
   const chart = await qbert.getChart(clusterId, appId, release, version)
   return {
     ...chart,
-    readmeMarkdown: await qbert.getChartReadmeContents(chart.attributes.readme)
+    readmeMarkdown: await qbert.getChartReadmeContents(clusterId, chart.attributes.readme),
   }
 }, {
   indexBy: ['clusterId', 'appId', 'release', 'version'],
+  dataMapper: async (items, { clusterId }) => {
+    const monocularUrl = await qbert.clusterMonocularBaseUrl(clusterId, null)
+    return map(item => {
+      const icon = path(['attributes', 'icons', 0, 'path'], item)
+      return {
+        ...item,
+        logoUrl: icon ? pathJoin(monocularUrl, icon) : `${imageUrlRoot}/default-app-logo.png`,
+        home: item.relationships.chart.data.home,
+        sources: item.relationships.chart.data.sources,
+        maintainers: item.relationships.chart.data.maintainers,
+      }
+    })(items)
+  },
 })
 
 export const appVersionLoader = createContextLoader(appVersionsCacheKey, async ({ clusterId, appId, release }) => {
   return qbert.getChartVersions(clusterId, appId, release)
 }, {
   indexBy: ['clusterId', 'appId', 'release'],
+  dataMapper: map(item => ({
+    ...item,
+    version: item.attributes.version,
+  })),
+  defaultOrderBy: 'version',
+  defaultOrderDirection: 'desc',
 })
 
 export const appActions = createCRUDActions(appsCacheKey, {
@@ -60,7 +79,7 @@ export const appActions = createCRUDActions(appsCacheKey, {
         ...item,
         name: path(['attributes', 'name'], item),
         created: path(['relationships', 'latestChartVersion', 'data', 'created'], item),
-        appLogoUrl: icon ? pathJoin(monocularUrl, icon) : `${imageUrlRoot}/default-app-logo.png`,
+        logoUrl: icon ? pathJoin(monocularUrl, icon) : `${imageUrlRoot}/default-app-logo.png`,
       }
     })
 
