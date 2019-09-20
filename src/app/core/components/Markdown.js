@@ -27,7 +27,7 @@ const options = {
       props: { gutterBottom: true, variant: 'caption', paragraph: true },
     },
     p: { component: Typography, props: { paragraph: true } },
-    a: { component: Link },
+    a: { component: Link, props: { target: '_blank' } },
     li: {
       component: withStyles(styles)(({ classes, ...props }) => (
         <li className={classes.listItem}>

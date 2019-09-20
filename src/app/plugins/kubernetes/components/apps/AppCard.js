@@ -120,7 +120,7 @@ class AppCard extends PureComponent {
       clusterId,
       application: {
         id,
-        appLogoUrl,
+        logoUrl,
         attributes: { name, description },
       },
     } = this.props
@@ -129,7 +129,7 @@ class AppCard extends PureComponent {
       <Grid item sm={6} md={4} lg={4}>
         <Card className={classes.card}>
           <div className={classes.header}>
-            <CardMedia className={classes.icon} image={appLogoUrl} title={name} />
+            <CardMedia className={classes.icon} image={logoUrl} title={name} />
             <Button
               variant="outlined"
               color="primary"

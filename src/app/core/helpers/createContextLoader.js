@@ -42,7 +42,9 @@ const arrayIfEmpty = when(isEmpty, always(emptyArr))
  * @property {bool} [refetchCascade=false] Indicate wether or not to refetch all the resources
  * loaded using `loadFromContext` in the loader or mapper functions
  *
- * @property {string} defaultOrderBy ID of the field that will be used to sort the returned items
+ * @property {string} [defaultOrderBy=uniqueIdentifier] ID of the field that will be used to sort the returned items
+ *
+ * @property {string} [defaultOrderDirection='asc'] Sorting direction (asc/desc)
  *
  * @property {function} [sortWith] Function used to sort the data after being parsed by the
  * dataMapper
@@ -78,7 +80,8 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
     dataMapper = identity,
     refetchCascade = false,
     defaultOrderBy = uniqueIdentifier,
-    sortWith = (items, { orderBy = defaultOrderBy, orderDirection = 'asc' }) =>
+    defaultOrderDirection = 'asc',
+    sortWith = (items, { orderBy = defaultOrderBy, orderDirection = defaultOrderDirection }) =>
       pipe(
         sortBy(path(orderBy.split('.'))),
         orderDirection === 'asc' ? identity : reverse,
