@@ -21,7 +21,7 @@ const useStyles = makeStyles(theme => createStyles({
     display: 'inline-flex',
     flexDirection: 'column',
     padding: 8,
-    border: '1px solid #000',
+    border: `1px solid ${theme.palette.common.black}`,
   },
   searchInputWrapper: {
     marginBottom: 4,
