@@ -7,6 +7,7 @@ import { projectAs } from 'utils/fp'
 import { clusterActions } from '../infrastructure/actions'
 import { allKey } from 'app/constants'
 
+// We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
 const ClusterPicklist = forwardRef(({
   loading, onChange,
   onlyPrometheusEnabled, onlyMasterNodeClusters, onlyAppCatalogEnabled,

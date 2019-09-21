@@ -150,7 +150,7 @@ class AppCard extends PureComponent {
               </Typography>
             </CardContent>
             <div className={classes.actions}>
-              <Button href={detailUrl}>
+              <Button component={SimpleLink} src={detailUrl}>
                 <Tooltip title="More details about this application">
                   <UnfoldMoreIcon />
                 </Tooltip>

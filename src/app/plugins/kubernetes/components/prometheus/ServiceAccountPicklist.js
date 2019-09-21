@@ -4,8 +4,8 @@ import { projectAs } from 'utils/fp'
 import useDataLoader from 'core/hooks/useDataLoader'
 import PropTypes from 'prop-types'
 import { serviceAccountActions } from 'k8s/components/prometheus/actions'
-import { omit } from 'ramda'
 
+// We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
 const ServiceAccountPicklist = forwardRef(({ loading, clusterId, namespace, ...rest }, ref) => {
   const [services, servicesLoading] = useDataLoader(serviceAccountActions.list, {
     clusterId,
@@ -24,7 +24,7 @@ const ServiceAccountPicklist = forwardRef(({ loading, clusterId, namespace, ...r
 })
 
 ServiceAccountPicklist.propTypes = {
-  ...omit(['options'], Picklist.propTypes),
+  ...Picklist.propTypes,
   name: PropTypes.string,
   label: PropTypes.string,
   clusterId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),

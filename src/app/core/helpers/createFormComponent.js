@@ -15,6 +15,7 @@ const createFormComponent = ({ submitLabel, initialValue, displayName, fields })
     if (props.type === 'boolean') { return <Checkbox {...props} /> }
   }
 
+  // We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
   const Form = forwardRef(({ onComplete }, ref) => (
     <ValidatedForm ref={ref} onSubmit={onComplete} initialValues={initialValue}>
       {fields.map(mapField)}

@@ -16,9 +16,15 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexFlow: 'column nowrap',
     paddingBottom: theme.spacing(3),
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    overflowWrap: 'break-word',
   },
   paper: {
     paddingBottom: theme.spacing(3),
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    overflowWrap: 'break-word',
   },
   icon: {
     width: '100%',
@@ -42,6 +48,7 @@ const AppDetailsPage = () => {
   })
   // We are just interested in the first (and only) item
   const [[app = emptyObj], loadingApp] = useDataLoader(singleAppLoader, params)
+
   return <Progress loading={loadingApp} overlay>
     <Grid container justify="center" spacing={3}>
       <Grid item xs={4}>
@@ -60,7 +67,7 @@ const AppDetailsPage = () => {
             variant="subtitle2">
             Application Version
           </Typography>
-          <Typography variant="body2" component="p">
+          <Typography variant="body2" component="div">
             {params.version}
           </Typography>
           <br />
@@ -68,17 +75,19 @@ const AppDetailsPage = () => {
             variant="subtitle2">
             Home
           </Typography>
-          <Typography variant="body2" component="p">
-            {app.home && <SimpleLink src={app.home} />}
+          <Typography variant="body2" component="div">
+            {app.home && <SimpleLink target="_blank" src={app.home} />}
           </Typography>
           <br />
           <Typography
             variant="subtitle2">
             Source Repository
           </Typography>
-          <Typography variant="body2" component="p">
+          <Typography variant="body2" component="div">
             {(app.sources || emptyArr).map(source =>
-              <SimpleLink key={source} src={source} />)}
+              <div key={source}>
+                <SimpleLink target="_blank" src={source} />
+              </div>)}
           </Typography>
           <br />
           <Typography
@@ -88,7 +97,7 @@ const AppDetailsPage = () => {
           <Typography variant="body2" component="div">
             {(app.maintainers || emptyArr).map(maintainer =>
               <div key={maintainer.email}>
-                <SimpleLink src={maintainer.email}>{maintainer.name}</SimpleLink>
+                <SimpleLink target="_blank" src={`mailto: ${maintainer.email}`}>{maintainer.name}</SimpleLink>
               </div>)}
           </Typography>
         </Paper>

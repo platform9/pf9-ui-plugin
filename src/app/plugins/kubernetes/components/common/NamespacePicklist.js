@@ -3,10 +3,11 @@ import Picklist from 'core/components/Picklist'
 import { projectAs } from 'utils/fp'
 import useDataLoader from 'core/hooks/useDataLoader'
 import PropTypes from 'prop-types'
-import { isEmpty, propOr, head, omit } from 'ramda'
+import { isEmpty, propOr, head } from 'ramda'
 import { allKey } from 'app/constants'
 import namespaceActions from 'k8s/components/namespaces/actions'
 
+// We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
 const NamespacePicklist = forwardRef(
   ({ clusterId, loading, onChange, selectFirst, ...rest }, ref) => {
     const [namespaces, namespacesLoading] = useDataLoader(namespaceActions.list, { clusterId })
@@ -31,7 +32,7 @@ const NamespacePicklist = forwardRef(
   })
 
 NamespacePicklist.propTypes = {
-  ...omit(['options'], Picklist.propTypes),
+  ...Picklist.propTypes,
   name: PropTypes.string,
   label: PropTypes.string,
   selectFirst: PropTypes.bool,
