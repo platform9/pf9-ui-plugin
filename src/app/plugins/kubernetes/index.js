@@ -24,6 +24,7 @@ import UpdatePrometheusRulePage from './components/prometheus/UpdatePrometheusRu
 import UpdatePrometheusServiceMonitorPage from './components/prometheus/UpdateServiceMonitorPage'
 import UpdatePrometheusAlertManagerPage
   from './components/prometheus/UpdatePrometheusAlertManagerPage'
+import LoggingPage from './components/logging/loggingPage'
 import config from '../../../../config'
 import DashboardPage from 'k8s/components/DashboardPage'
 
@@ -123,6 +124,11 @@ Kubernetes.registerPlugin = pluginManager => {
         name: 'Prometheus Monitoring (BETA)',
         link: { path: '/prometheus', exact: true },
         component: PrometheusMonitoringPage,
+      },
+      {
+        name: 'Logging (beta)',
+        link: { path: '/logging', exact: true },
+        component: LoggingPage,
       },
       {
         name: 'Add Namespace',
@@ -268,6 +274,7 @@ Kubernetes.registerPlugin = pluginManager => {
     { name: 'Storage Classes', icon: 'hdd', link: { path: '/storage_classes' } },
     { name: 'Namespaces', icon: 'object-group', link: { path: '/namespaces' } },
     { name: 'Prometheus Monitoring (BETA)', icon: 'chart-area', link: { path: '/prometheus' } },
+    { name: 'Logging (beta)', icon: 'clipboard-list', link: { path: '/logging' } },
     { name: 'API Access', icon: 'key', link: { path: '/api_access' } },
     {
       name: 'Tenants & Users',
