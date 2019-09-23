@@ -46,7 +46,7 @@ AppVersionPicklist.propTypes = {
 
 AppVersionPicklist.defaultProps = {
   ...Picklist.defaultProps,
-  name: 'repositoryId',
+  name: 'version',
   label: 'AppVersion',
   formField: false,
   showAll: false,

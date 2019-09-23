@@ -1,45 +1,50 @@
 import {
-  mergeLeft, path, filter, reverse, identity, sortBy, prop, pluck, map, pipe, pathEq, head, props,
-  values, groupBy, propEq, find, propOr, pick, F,
+  mergeLeft, filter, identity, prop, pluck, map, pipe, pathEq, head, props, values, groupBy, propEq,
+  find, propOr, pick, F,
 } from 'ramda'
 import ApiClient from 'api-client/ApiClient'
-import { asyncFlatMap, emptyArr, objSwitchCase, asyncTryCatch } from 'utils/fp'
+import { emptyArr, objSwitchCase, pathStr } from 'utils/fp'
 import { allKey, imageUrlRoot, addError, deleteError, updateError } from 'app/constants'
 import { parseClusterParams, clustersCacheKey } from 'k8s/components/infrastructure/actions'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { pathJoin } from 'utils/misc'
 import moment from 'moment'
 import createContextLoader from 'core/helpers/createContextLoader'
+import { tryCatchAsync, flatMapAsync } from 'utils/async'
 
 const { qbert } = ApiClient.getInstance()
 
 const uniqueIdentifier = 'id'
 
-export const singleAppCacheKey = 'singleApp'
+export const singleAppCacheKey = 'appDetails'
 export const appsCacheKey = 'apps'
 export const appVersionsCacheKey = 'appVersions'
 export const releasesCacheKey = 'releases'
 export const repositoriesWithClustersCacheKey = 'repositoriesWithClusters'
 export const repositoriesCacheKey = 'repositories'
 
-export const singleAppLoader = createContextLoader(singleAppCacheKey, async ({ clusterId, appId, release, version }) => {
+export const appDetailLoader = createContextLoader(singleAppCacheKey, async ({ clusterId, appId, release, version }) => {
   const chart = await qbert.getChart(clusterId, appId, release, version)
   return {
     ...chart,
     readmeMarkdown: await qbert.getChartReadmeContents(clusterId, chart.attributes.readme),
   }
 }, {
+  uniqueIdentifier,
   indexBy: ['clusterId', 'appId', 'release', 'version'],
   dataMapper: async (items, { clusterId }) => {
     const monocularUrl = await qbert.clusterMonocularBaseUrl(clusterId, null)
-    return map(item => {
-      const icon = path(['attributes', 'icons', 0, 'path'], item)
+    return map(({ id, ...item }) => {
+      const icon = pathStr('attributes.icons.0.path', item)
+      const chartId = id.substring(0, id.indexOf(':')) // Remove the version from the ID
       return {
         ...item,
+        id: chartId,
+        name: chartId.substring(chartId.indexOf('/') + 1),
         logoUrl: icon ? pathJoin(monocularUrl, icon) : `${imageUrlRoot}/default-app-logo.png`,
-        home: item.relationships.chart.data.home,
-        sources: item.relationships.chart.data.sources,
-        maintainers: item.relationships.chart.data.maintainers,
+        home: pathStr('relationships.chart.data.home', item),
+        sources: pathStr('relationships.chart.data.sources', item),
+        maintainers: pathStr('relationships.chart.data.maintainers', item),
       }
     })(items)
   },
@@ -51,7 +56,9 @@ export const appVersionLoader = createContextLoader(appVersionsCacheKey, async (
   indexBy: ['clusterId', 'appId', 'release'],
   dataMapper: map(item => ({
     ...item,
-    version: item.attributes.version,
+    version: pathStr('attributes.version', item),
+    appVersion: pathStr('attributes.app_version', item),
+    downloadLink: pathStr('attributes.urls.0', item),
   })),
   defaultOrderBy: 'version',
   defaultOrderDirection: 'desc',
@@ -61,10 +68,23 @@ export const appActions = createCRUDActions(appsCacheKey, {
   listFn: async (params, loadFromContext) => {
     const [clusterId, clusters] = await parseClusterParams(params, loadFromContext)
     if (clusterId === allKey) {
-      return asyncFlatMap(pluck('uuid', clusters), qbert.getCharts)
+      return flatMapAsync(qbert.getCharts, pluck('uuid', clusters))
     }
     return qbert.getCharts(clusterId)
   },
+  customOperations: {
+    deploy: async ({ clusterId, ...body }) => {
+      await qbert.deployApplication(clusterId, body)
+      // Force a refetch of the deployed apps list
+      releaseActions.invalidateCache()
+    },
+  },
+  errorMessage: (prevItems, { releaseName }, catchedError, operation) => objSwitchCase({
+    deploy: `Error when deploying App ${releaseName}`,
+  })(operation),
+  successMessage: (updatedItems, prevItems, { name }, operation) => objSwitchCase({
+    deploy: `Successfully deployed App ${name}`,
+  })(operation),
   entityName: 'App Catalog',
   uniqueIdentifier,
   indexBy: 'clusterId',
@@ -74,32 +94,28 @@ export const appActions = createCRUDActions(appsCacheKey, {
       ? filter(pathEq(['attributes', 'repo', 'name'], repositoryId))
       : identity
     const normalize = map(item => {
-      const icon = path(['relationships', 'latestChartVersion', 'data', 'icons', 0, 'path'], item)
+      const icon = pathStr('relationships.latestChartVersion.data.icons.0.path', item)
       return {
         ...item,
-        name: path(['attributes', 'name'], item),
-        created: path(['relationships', 'latestChartVersion', 'data', 'created'], item),
+        name: pathStr('attributes.name', item),
+        description: pathStr('attributes.description', item),
+        created: moment(pathStr('relationships.latestChartVersion.data.created', item)),
         logoUrl: icon ? pathJoin(monocularUrl, icon) : `${imageUrlRoot}/default-app-logo.png`,
       }
     })
-
     return pipe(
       filterByRepo,
       normalize,
     )(items)
   },
-  sortWith: (items, { orderBy = 'name', orderDirection = 'asc' }) =>
-    pipe(
-      sortBy(orderBy === 'created' ? pipe(prop(orderBy), moment) : prop(orderBy)),
-      orderDirection === 'asc' ? identity : reverse,
-    )(items),
+  defaultOrderBy: 'name',
 })
 
 export const releaseActions = createCRUDActions(releasesCacheKey, {
   listFn: async (params, loadFromContext) => {
     const [clusterId, clusters] = await parseClusterParams(params, loadFromContext)
     if (clusterId === allKey) {
-      return asyncFlatMap(pluck('uuid', clusters), qbert.getReleases)
+      return flatMapAsync(qbert.getReleases, pluck('uuid', clusters))
     }
     return qbert.getReleases(clusterId)
   },
@@ -113,10 +129,10 @@ const reposWithClustersLoader = createContextLoader(repositoriesWithClustersCach
     appCatalogClusters: true,
     hasControlPlane: true,
   })
-  const data = await asyncFlatMap(map(props(['uuid', 'name']), monocularClusters), async ([clusterId, clusterName]) => {
+  const data = await flatMapAsync(async ([clusterId, clusterName]) => {
     const clusterRepos = await qbert.getRepositoriesForCluster(clusterId)
     return clusterRepos.map(mergeLeft({ clusterId, clusterName }))
-  })
+  }, map(props(['uuid', 'name']), monocularClusters))
   return pipe(
     groupBy(prop(uniqueIdentifier)),
     values,
@@ -142,8 +158,9 @@ export const repositoryActions = createCRUDActions(repositoriesCacheKey, {
   createFn: async ({ clusters, ...data }) => {
     const result = await qbert.createRepository(data)
 
-    const addResults = await asyncTryCatch(() => asyncFlatMap(clusters,
+    const addResults = await tryCatchAsync(() => flatMapAsync(
       clusterId => qbert.createRepositoryForCluster(clusterId, data),
+      clusters,
     ), F)(null)
 
     if (!addResults) {
@@ -175,11 +192,13 @@ export const repositoryActions = createCRUDActions(repositoriesCacheKey, {
       reposWithClustersLoader.invalidateCache()
 
       // Perfom the update operations, return FALSE if there has been any error
-      const deleteResults = await asyncTryCatch(() => asyncFlatMap(itemsToRemove,
+      const deleteResults = await tryCatchAsync(() => flatMapAsync(
         clusterId => qbert.deleteRepositoriesForCluster(clusterId, id),
+        itemsToRemove,
       ), F)(null)
-      const addResults = await asyncTryCatch(() => asyncFlatMap(itemsToAdd,
+      const addResults = await tryCatchAsync(() => flatMapAsync(
         clusterId => qbert.createRepositoryForCluster(clusterId, body),
+        itemsToAdd,
       ), F)(null)
 
       // Check if there has been any errors

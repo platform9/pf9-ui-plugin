@@ -40,9 +40,11 @@ export const tryCatchAsync = curry(async (tryer, catcher, input) => {
  * })
  */
 export const propsAsync = async objPromises => {
-  const promises = Object.values(mapObjIndexed(async (promise, key) => {
-    return [key, await promise]
-  }, objPromises))
+  const promises = Object.values(
+    mapObjIndexed(
+      async (promise, key) => [key, await promise],
+      objPromises,
+    ))
   const results = await Promise.all(promises)
 
   return fromPairs(results)

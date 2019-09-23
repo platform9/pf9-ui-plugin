@@ -1,6 +1,6 @@
 import {
   T, cond, equals, always, adjust, update, findIndex, assocPath, curry, pathOr, remove, values,
-  groupBy, filter, either, isNil, isEmpty,
+  groupBy, filter, either, isNil, isEmpty, path,
 } from 'ramda'
 import moize from 'moize'
 
@@ -114,7 +114,9 @@ export const keyValueArrToObj = (arr = []) =>
     return accum
   }, {})
 
-export const pathOrNull = curry((pathStr, obj) => pathOr(null, pathStr.split('.'), obj))
+export const pathStr = curry((str, obj) => path(str.split('.'), obj))
+export const pathStrOr = curry((defaultValue, str, obj) => pathOr(defaultValue, str.split('.'), obj))
+export const pathStrOrNull = curry((str, obj) => pathOr(null, str.split('.'), obj))
 
 // I didn't see anything in Ramda that would allow me to create a "Maybe"
 // composition so creating a simple version here.

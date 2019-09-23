@@ -1,4 +1,4 @@
-import { pathOrNull, pipeWhenTruthy, isTruthy } from 'app/utils/fp'
+import { pathStrOrNull, pipeWhenTruthy, isTruthy } from 'app/utils/fp'
 import {
   find, pathOr, pluck, prop, propEq, propSatisfies, compose, path, pipe, either,
 } from 'ramda'
@@ -210,7 +210,7 @@ export const loadNodes = createContextLoader(nodesCacheKey, async (params, loadF
 
   const combinedHostsObj = combinedHosts.reduce(
     (accum, host) => {
-      const id = pathOrNull('resmgr.id')(host) || pathOrNull('qbert.uuid')(host)
+      const id = pathStrOrNull('resmgr.id')(host) || pathStrOrNull('qbert.uuid')(host)
       accum[id] = host
       return accum
     },

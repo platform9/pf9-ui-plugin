@@ -1,18 +1,14 @@
 import { Button, Card, CardContent, CardMedia, Grid, Tooltip, Typography } from '@material-ui/core'
 import PropTypes from 'prop-types'
-import { withStyles } from '@material-ui/styles'
+import { makeStyles } from '@material-ui/styles'
 import GetAppIcon from '@material-ui/icons/GetApp'
-import UnfoldMoreIcon from '@material-ui/icons/UnfoldMore'
-import { compose } from 'ramda'
-import React, { PureComponent } from 'react'
-import { withRouter } from 'react-router'
+import ZoomInIcon from '@material-ui/icons/ZoomIn'
+import React from 'react'
 import SimpleLink from 'core/components/SimpleLink'
 
-const styles = theme => ({
+const useStyles = makeStyles(theme => ({
   card: {
     display: 'flex',
-    // margin: theme.spacing(1),
-    // padding: 0
   },
   text: {
     display: 'inline-block',
@@ -99,82 +95,67 @@ const styles = theme => ({
     alignItems: 'center',
     padding: theme.spacing(1),
   },
-})
+}))
 
-class AppCard extends PureComponent {
-  handleDeploy = () => {
-    if (this.props.handleDeploy) {
-      this.props.handleDeploy()
-    }
-  }
-
-  handleDownload = () => {
-    if (this.props.handleDownload) {
-      this.props.handleDownload()
-    }
-  }
-
-  render () {
-    const {
-      classes,
-      clusterId,
-      application: {
-        id,
-        logoUrl,
-        attributes: { name, description },
-      },
-    } = this.props
-    const detailUrl = `/ui/kubernetes/apps/${clusterId}/${id}`
-    return (
-      <Grid item sm={6} md={4} lg={4}>
-        <Card className={classes.card}>
-          <div className={classes.header}>
-            <CardMedia className={classes.icon} image={logoUrl} title={name} />
-            <Button
-              variant="outlined"
-              color="primary"
-              onClick={this.handleDeploy}
-            >
-              Deploy
+const AppCard = ({
+  clusterId,
+  onDeploy,
+  onDownload,
+  application: {
+    id,
+    logoUrl,
+    name,
+    description,
+  },
+}) => {
+  const classes = useStyles()
+  const detailUrl = `/ui/kubernetes/apps/${clusterId}/${id}`
+  return (
+    <Grid item sm={6} md={4} lg={4}>
+      <Card className={classes.card}>
+        <div className={classes.header}>
+          <CardMedia className={classes.icon} image={logoUrl} title={name} />
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={onDeploy}
+          >
+            Deploy
+          </Button>
+        </div>
+        <div className={classes.details}>
+          <CardContent className={classes.content}>
+            <SimpleLink src={detailUrl}>
+              <Typography variant="subtitle1">
+                {name}
+              </Typography>
+            </SimpleLink>
+            <Typography variant="body2" className={classes.text}>
+              {description}
+            </Typography>
+          </CardContent>
+          <div className={classes.actions}>
+            <Button component={SimpleLink} src={detailUrl}>
+              <Tooltip title="More details about this application">
+                <ZoomInIcon />
+              </Tooltip>
+            </Button>
+            <Button onClick={onDownload}>
+              <Tooltip title="Download the .tgz file for this application">
+                <GetAppIcon />
+              </Tooltip>
             </Button>
           </div>
-          <div className={classes.details}>
-            <CardContent className={classes.content}>
-              <SimpleLink src={detailUrl}>
-                <Typography variant="subtitle1">
-                  {name}
-                </Typography>
-              </SimpleLink>
-              <Typography variant="body2" className={classes.text}>
-                {description}
-              </Typography>
-            </CardContent>
-            <div className={classes.actions}>
-              <Button component={SimpleLink} src={detailUrl}>
-                <Tooltip title="More details about this application">
-                  <UnfoldMoreIcon />
-                </Tooltip>
-              </Button>
-              <Button onClick={this.handleDownload}>
-                <Tooltip title="Download the .tgz file for this application">
-                  <GetAppIcon />
-                </Tooltip>
-              </Button>
-            </div>
-          </div>
-        </Card>
-      </Grid>
-    )
-  }
+        </div>
+      </Card>
+    </Grid>
+  )
 }
 
 AppCard.propTypes = {
-  handleDeploy: PropTypes.func,
-  handleDownload: PropTypes.func,
+  onDeploy: PropTypes.func,
+  onDownload: PropTypes.func,
   application: PropTypes.object,
 }
 
-export default compose(
-  withRouter,
-  withStyles(styles),
-)(AppCard)
+export default AppCard

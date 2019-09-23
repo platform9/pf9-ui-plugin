@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Markdown from 'core/components/Markdown'
 import useReactRouter from 'use-react-router'
 import Progress from 'core/components/progress/Progress'
@@ -7,10 +7,10 @@ import { makeStyles } from '@material-ui/styles'
 import useDataLoader from 'core/hooks/useDataLoader'
 import AppVersionPicklist from 'k8s/components/apps/AppVersionPicklist'
 import useParams from 'core/hooks/useParams'
-import { singleAppLoader } from 'k8s/components/apps/actions'
+import { appDetailLoader } from 'k8s/components/apps/actions'
 import { emptyObj, emptyArr } from 'utils/fp'
 import SimpleLink from 'core/components/SimpleLink'
-import Icon from '@material-ui/core/Icon'
+import AppDeployDialog from 'k8s/components/apps/AppDeployDialog'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -20,9 +20,6 @@ const useStyles = makeStyles(theme => ({
   backLink: {
     marginBottom: theme.spacing(2),
     alignSelf: 'flex-end',
-  },
-  leftIcon: {
-    marginRight: theme.spacing(1),
   },
   card: {
     display: 'flex',
@@ -42,13 +39,10 @@ const useStyles = makeStyles(theme => ({
     width: '100%',
     minHeight: 120,
     backgroundSize: 'contain',
-    backgroundPosition: `50% ${theme.spacing(1)}px`,
+    backgroundPosition: '50%',
     marginBottom: theme.spacing(1),
   },
 }))
-const handleDeploy = () => {
-  console.warn('TODO')
-}
 
 const AppDetailsPage = () => {
   const classes = useStyles()
@@ -58,23 +52,27 @@ const AppDetailsPage = () => {
     appId: routeParams.id,
     release: routeParams.release,
   })
+  const [showingDeployDialog, setShowingDeployDialog] = useState(false)
   // We are just interested in the first (and only) item
-  const [[app = emptyObj], loadingApp] = useDataLoader(singleAppLoader, params)
+  const [[app = emptyObj], loadingApp] = useDataLoader(appDetailLoader, params)
 
   return <div className={classes.root}>
+    {showingDeployDialog &&
+    <AppDeployDialog
+      app={app}
+      onClose={() => setShowingDeployDialog(false)} />}
     <SimpleLink src={`/ui/kubernetes/apps`} className={classes.backLink}>
-      <Icon className={classes.leftIcon} fontSize="small">arrow_back</Icon>
-      Back to Application Catalog
+      « Back to Application Catalog
     </SimpleLink>
-    <Progress loading={loadingApp} overlay>
+    <Progress loading={loadingApp} overlay renderContentOnMount>
       <Grid container justify="center" spacing={3}>
         <Grid item xs={4}>
           {app.logoUrl && <Card className={classes.card}>
-            <CardMedia className={classes.icon} image={app.logoUrl} title={name} />
+            <CardMedia className={classes.icon} image={app.logoUrl} title={app.name} />
             <Button
               variant="outlined"
               color="primary"
-              onClick={handleDeploy}
+              onClick={() => setShowingDeployDialog(true)}
             >
               Deploy
             </Button>

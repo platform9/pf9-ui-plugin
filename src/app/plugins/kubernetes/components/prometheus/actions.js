@@ -1,4 +1,4 @@
-import { pathOrNull, objSwitchCase } from 'utils/fp'
+import { pathStrOrNull, objSwitchCase } from 'utils/fp'
 import { map, pathEq, find, pluck, curry, pipe, last, pathOr, prop, propEq } from 'ramda'
 import ApiClient from 'api-client/ApiClient'
 import { clustersCacheKey } from '../infrastructure/actions'
@@ -31,12 +31,12 @@ export const mapPrometheusInstance = curry((clusters, { clusterUuid, metadata, s
   name: metadata.name,
   namespace: metadata.namespace,
   uid: metadata.uid,
-  serviceMonitorSelector: pathOrNull('serviceMonitorSelector.matchLabels', spec),
+  serviceMonitorSelector: pathStrOrNull('serviceMonitorSelector.matchLabels', spec),
   alertManagersSelector: pathOr([], ['alerting', 'alertmanagers'], spec).join(', '),
-  ruleSelector: pathOrNull('ruleSelector.matchLabels', spec),
-  cpu: pathOrNull('resources.requests.cpu', spec),
-  storage: pathOrNull('resources.requests.storage', spec),
-  memory: pathOrNull('resources.requests.memory', spec),
+  ruleSelector: pathStrOrNull('ruleSelector.matchLabels', spec),
+  cpu: pathStrOrNull('resources.requests.cpu', spec),
+  storage: pathStrOrNull('resources.requests.storage', spec),
+  memory: pathStrOrNull('resources.requests.memory', spec),
   version: metadata.resourceVersion,
   retention: spec.retention,
   replicas: spec.replicas,
