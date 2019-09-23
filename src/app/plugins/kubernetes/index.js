@@ -24,7 +24,7 @@ import UpdatePrometheusRulePage from './components/prometheus/UpdatePrometheusRu
 import UpdatePrometheusServiceMonitorPage from './components/prometheus/UpdateServiceMonitorPage'
 import UpdatePrometheusAlertManagerPage
   from './components/prometheus/UpdatePrometheusAlertManagerPage'
-import LoggingPage from './components/logging/loggingPage'
+import LoggingPage from './components/logging/LoggingPage'
 import config from '../../../../config'
 import DashboardPage from 'k8s/components/DashboardPage'
 
