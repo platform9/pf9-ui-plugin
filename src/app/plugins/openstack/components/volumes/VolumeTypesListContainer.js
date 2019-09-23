@@ -6,7 +6,7 @@ import { compose, keyValueArrToObj } from 'app/utils/fp'
 import { withAppContext } from 'core/AppProvider'
 import CRUDListContainer from 'core/components/CRUDListContainer'
 import createListTableComponent from 'core/helpers/createListTableComponent'
-import { dataContextKey } from 'core/helpers/createContextLoader'
+import { dataCacheKey } from 'core/helpers/createContextLoader'
 import { assocPath } from 'ramda'
 
 // Promote `volume_backend_name` from `extra_specs` into its own field
@@ -41,7 +41,7 @@ class VolumeTypesListContainer extends React.PureComponent {
     // TODO: use createContextUpdater
     await cinder.deleteVolumeType(id)
     const newVolumeTypes = volumeTypes.filter(x => x.id !== id)
-    setContext(assocPath([dataContextKey, 'volumeTypes'], newVolumeTypes))
+    setContext(assocPath([dataCacheKey, 'volumeTypes'], newVolumeTypes))
   }
 
   render () {

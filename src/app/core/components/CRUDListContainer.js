@@ -1,8 +1,9 @@
-import { asyncMap, compose } from 'app/utils/fp'
+import { compose } from 'app/utils/fp'
 import PropTypes from 'prop-types'
 import React from 'react'
 import { withRouter } from 'react-router-dom'
 import ConfirmationDialog from './ConfirmationDialog'
+import { mapAsync } from 'utils/async'
 
 class CRUDListContainer extends React.PureComponent {
   componentDidMount () {
@@ -40,7 +41,7 @@ class CRUDListContainer extends React.PureComponent {
     this.setState({ showConfirmation: false })
     const items = this.state.selectedItems || []
 
-    await asyncMap(items, this.handleRemove)
+    await mapAsync(this.handleRemove, items)
 
     this.setState({ selectedItems: [] })
     // The user resolves the promise by clicking "confirm".

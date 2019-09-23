@@ -8,7 +8,7 @@ import CRUDListContainer from 'core/components/CRUDListContainer'
 import createListTableComponent from 'core/helpers/createListTableComponent'
 import { withRouter } from 'react-router'
 import getVolumes from 'server/api/cinder/getVolumes'
-import { dataContextKey } from 'core/helpers/createContextLoader'
+import { dataCacheKey } from 'core/helpers/createContextLoader'
 import { assocPath } from 'ramda'
 
 const columns = [
@@ -47,7 +47,7 @@ class VolumesListContainer extends React.PureComponent {
     await ApiClient.getInstance().cinder.deleteVolume(id)
     const newVolumes = (await getVolumes({ getContext, setContext }))
       .filter(x => x.id !== id)
-    setContext(assocPath([dataContextKey, 'volumes'], newVolumes))
+    setContext(assocPath([dataCacheKey, 'volumes'], newVolumes))
   }
 
   handleSnapshot = async volume => {

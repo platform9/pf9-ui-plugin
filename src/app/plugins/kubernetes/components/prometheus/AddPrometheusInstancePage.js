@@ -79,6 +79,7 @@ const AddPrometheusInstanceForm = ({ onComplete }) => {
                   onChange={getParamsUpdater('namespace')}
                   value={params.namespace}
                   required
+                  selectFirst={false}
                   info="Which namespace to use"
                 />
                 <PicklistField

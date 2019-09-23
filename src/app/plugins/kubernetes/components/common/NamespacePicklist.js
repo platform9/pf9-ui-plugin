@@ -44,7 +44,7 @@ NamespacePicklist.defaultProps = {
   name: 'namespaceId',
   label: 'Namespace',
   formField: false,
-  selectFirst: false,
+  selectFirst: true,
   showAll: true,
 }
 

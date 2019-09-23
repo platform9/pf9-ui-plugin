@@ -17,9 +17,9 @@ const styles = theme => ({
   root: {
     display: 'flex',
     flexFlow: 'column wrap',
-    paddingRight: '2rem',
     width: '100%',
     maxWidth: 400,
+    minWidth: 300,
     '& .MuiFormControl-root': {
       width: '100%',
       marginTop: theme.spacing(1),

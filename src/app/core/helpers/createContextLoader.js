@@ -8,8 +8,8 @@ import { ensureFunction, ensureArray, emptyObj, emptyArr, upsertAllBy } from 'ut
 import { memoizePromise, uncamelizeString } from 'utils/misc'
 import { defaultUniqueIdentifier, allKey } from 'app/constants'
 
-export const paramsContextKey = 'cachedParams'
-export const dataContextKey = 'cachedData'
+export const paramsCacheKey = 'cachedParams'
+export const dataCacheKey = 'cachedData'
 
 let loaders = {}
 export const getContextLoader = key => {
@@ -90,8 +90,8 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
     fetchErrorMessage = (catchedErr, params) => `Error when trying to fetch ${entityName} items`,
   } = options
   const uniqueIdentifierPath = uniqueIdentifier.split('.')
-  const dataLens = lensPath([dataContextKey, cacheKey])
-  const paramsLens = lensPath([paramsContextKey, cacheKey])
+  const dataLens = lensPath([dataCacheKey, cacheKey])
+  const paramsLens = lensPath([paramsCacheKey, cacheKey])
   const allIndexKeys = indexBy ? ensureArray(indexBy) : emptyArr
   const allRequiredParams = requiredParams ? ensureArray(requiredParams) : emptyArr
   // Memoize the data mapper so we will prevent remapping the same items over and over

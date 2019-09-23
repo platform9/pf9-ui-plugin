@@ -6,7 +6,7 @@ import { withAppContext } from 'core/AppProvider'
 import CRUDListContainer from 'core/components/CRUDListContainer'
 import createListTableComponent from 'core/helpers/createListTableComponent'
 import { loadVolumeSnapshots } from 'openstack/components/volumes/actions'
-import { dataContextKey } from 'core/helpers/createContextLoader'
+import { dataCacheKey } from 'core/helpers/createContextLoader'
 import { assocPath } from 'ramda'
 
 export const columns = [
@@ -34,7 +34,7 @@ class VolumeSnapshotsListContainer extends React.PureComponent {
     await ApiClient.getInstance().cinder.deleteSnapshot(id)
     const newVolumeSnapshots = (await loadVolumeSnapshots({ getContext, setContext }))
       .filter(x => x.id !== id)
-    setContext(assocPath([dataContextKey, 'volumeSnapshots'], newVolumeSnapshots))
+    setContext(assocPath([dataCacheKey, 'volumeSnapshots'], newVolumeSnapshots))
   }
 
   render () {

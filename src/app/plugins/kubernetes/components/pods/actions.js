@@ -3,8 +3,8 @@ import createCRUDActions from 'core/helpers/createCRUDActions'
 import ApiClient from 'api-client/ApiClient'
 import { parseClusterParams } from 'k8s/components/infrastructure/actions'
 import { allKey } from 'app/constants'
-import { asyncFlatMap } from 'utils/fp'
 import { pluck } from 'ramda'
+import { flatMapAsync } from 'utils/async'
 
 const { qbert } = ApiClient.getInstance()
 
@@ -59,7 +59,7 @@ export const podActions = createCRUDActions(podsCacheKey, {
   listFn: async (params, loadFromContext) => {
     const [clusterId, clusters] = await parseClusterParams(params, loadFromContext)
     if (clusterId === allKey) {
-      return asyncFlatMap(pluck('uuid', clusters), qbert.getClusterPods)
+      return flatMapAsync(qbert.getClusterPods, pluck('uuid', clusters))
     }
     return qbert.getClusterPods(clusterId)
   },
