@@ -58,6 +58,10 @@ export const appVersionLoader = createContextLoader(appVersionsCacheKey, async (
     ...item,
     version: pathStr('attributes.version', item),
     appVersion: pathStr('attributes.app_version', item),
+    versionLabel: [
+      pathStr('attributes.version', item),
+      moment(pathStr('attributes.created', item)).format('MMM DD, YYYY'),
+    ].join(' - '),
     downloadLink: pathStr('attributes.urls.0', item),
   })),
   defaultOrderBy: 'version',

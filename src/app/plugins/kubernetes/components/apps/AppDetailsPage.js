@@ -119,6 +119,7 @@ const AppDetailsPage = () => {
         </Grid>
         <Grid item xs={8} zeroMinWidth>
           <AppVersionPicklist
+            label="Application Version"
             appId={params.appId}
             clusterId={params.clusterId}
             release={params.release}

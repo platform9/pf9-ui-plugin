@@ -14,7 +14,7 @@ const AppVersionPicklist = forwardRef(
       clusterId, appId, release,
     })
     const options = useMemo(() => projectAs(
-      { label: 'version', value: 'version' }, versions,
+      { label: 'versionLabel', value: 'version' }, versions,
     ), [versions])
 
     // Select the first item as soon as data is loaded
@@ -47,7 +47,7 @@ AppVersionPicklist.propTypes = {
 AppVersionPicklist.defaultProps = {
   ...Picklist.defaultProps,
   name: 'version',
-  label: 'AppVersion',
+  label: 'App Version',
   formField: false,
   showAll: false,
   selectFirst: true,
