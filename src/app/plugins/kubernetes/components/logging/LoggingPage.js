@@ -9,6 +9,9 @@ const useStyles = makeStyles(theme => createStyles({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
+    justifyContent: 'center',
+    width: 40,
+    height: 40,
   },
   actionIcon: {
     fontSize: 18,
@@ -160,6 +163,14 @@ const data = [
   },
 ]
 
+const LoggingPage = () => {
+  const classes = useStyles()
+  const columns = getColumns(classes)
+  const actions = getActions(classes)
+
+  return <ListTable columns={columns} data={data} batchActions={actions} />
+}
+
 const renderStatus = (classes, value) => {
   let icon
   switch (value) {
@@ -224,16 +235,19 @@ const getActions = (classes) => [
     icon: <ActionIcon classes={classes} icon='check' label='Enable' />,
     label: 'Enable',
     action: () => {},
+    cond: (clusters) => clusters.every(cluster => cluster.status === status.DISABLED)
   },
   {
     icon: <ActionIcon classes={classes} icon='times' label='Disable' />,
     label: 'Disable',
     action: () => {},
+    cond: (clusters) => clusters.every(cluster => cluster.status === status.ENABLED)
   },
   {
     icon: <ActionIcon classes={classes} icon='edit' label='Edit' />,
     label: 'Edit',
     action: () => {},
+    cond: (clusters) => clusters.length === 1
   },
   {
     icon: <ActionIcon classes={classes} icon='trash-alt' label='Delete' />,
@@ -241,13 +255,5 @@ const getActions = (classes) => [
     action: () => {},
   },
 ]
-
-const LoggingPage = () => {
-  const classes = useStyles()
-  const columns = getColumns(classes)
-  const actions = getActions(classes)
-
-  return <ListTable title="Example table" columns={columns} data={data} batchActions={actions} />
-}
 
 export default LoggingPage
