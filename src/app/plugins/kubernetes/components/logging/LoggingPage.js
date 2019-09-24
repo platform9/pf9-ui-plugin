@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import { makeStyles, createStyles } from '@material-ui/styles'
 import Box from '@material-ui/core/Box'
 import ListTable from 'core/components/listTable/ListTable'
@@ -168,7 +168,12 @@ const LoggingPage = () => {
   const columns = getColumns(classes)
   const actions = getActions(classes)
 
-  return <ListTable columns={columns} data={data} batchActions={actions} />
+  return (
+    <Fragment>
+      <h2>Logging</h2>
+      <ListTable columns={columns} data={data} batchActions={actions} />
+    </Fragment>
+  )
 }
 
 const renderStatus = (classes, value) => {
