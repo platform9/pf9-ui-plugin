@@ -4,9 +4,9 @@ import { IconButton, Tooltip } from '@material-ui/core'
 import { withAppContext } from 'core/AppProvider'
 
 // FIXME this should not be accessing the context
-const ListTableRowActions = ({ actionClassName, context, rowActions, selected }) => {
+const ListTableBatchActions = ({ actionClassName, context, batchActions, selected }) => {
   const _selected = selected || []
-  const filtered = (rowActions || []).filter(action =>
+  const filtered = (batchActions || []).filter(action =>
     action.cond === undefined || action.cond(_selected, context)
   )
   if (_selected.length === 0 || filtered.length === 0) { return null }
@@ -17,12 +17,12 @@ const ListTableRowActions = ({ actionClassName, context, rowActions, selected })
   ))
 }
 
-ListTableRowActions.propTypes = {
+ListTableBatchActions.propTypes = {
   // The selected rows
   selected: PropTypes.arrayOf(PropTypes.object),
 
   // The actions to perform on the selected rows
-  rowActions: PropTypes.arrayOf(
+  batchActions: PropTypes.arrayOf(
     PropTypes.shape({
       label: PropTypes.string.isRequired,
       action: PropTypes.func,
@@ -32,4 +32,4 @@ ListTableRowActions.propTypes = {
   ),
 }
 
-export default withAppContext(ListTableRowActions)
+export default withAppContext(ListTableBatchActions)

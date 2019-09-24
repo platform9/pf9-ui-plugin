@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import PropTypes from 'prop-types'
 import AddIcon from '@material-ui/icons/Add'
 import ListTableColumnButton from 'core/components/listTable/ListTableColumnSelector'
-import ListTableRowActions from './ListTableRowActions'
+import ListTableBatchActions from './ListTableBatchActions'
 import PerPageControl from './PerPageControl'
 import SearchBar from 'core/components/SearchBar'
 import clsx from 'clsx'
@@ -86,7 +86,7 @@ const ListTableToolbar = ({
   columns, filterValues, filters,
   onAdd, onColumnToggle, onDelete, onEdit, onFilterUpdate,
   onFiltersReset, onSearchChange, onRefresh,
-  rowActions, searchTerm, selected, visibleColumns,
+  batchActions, searchTerm, selected, visibleColumns,
   rowsPerPage, onChangeRowsPerPage, rowsPerPageOptions,
 }) => {
   const classes = useStyles()
@@ -109,7 +109,7 @@ const ListTableToolbar = ({
         [classes.highlight]: numSelected > 0,
       })}
     >
-      <ListTableRowActions actionClassName={classes.action} rowActions={rowActions} selected={selected} />
+      <ListTableBatchActions actionClassName={classes.action} batchActions={batchActions} selected={selected} />
       {numSelected === 1 && onEdit && (
         <Tooltip title="Edit">
           <div className={classes.action} onClick={onEdit}>
@@ -197,6 +197,14 @@ ListTableToolbar.propTypes = {
   onFilterUpdate: PropTypes.func,
   onFiltersReset: PropTypes.func,
   onRefresh: PropTypes.func,
+  batchActions: PropTypes.arrayOf(
+    PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      action: PropTypes.func,
+      icon: PropTypes.node,
+      cond: PropTypes.func,
+    })
+  ),
   selected: PropTypes.array,
   visibleColumns: PropTypes.array,
   onColumnToggle: PropTypes.func,
