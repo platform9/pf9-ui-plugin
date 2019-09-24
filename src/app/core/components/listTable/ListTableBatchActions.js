@@ -4,15 +4,14 @@ import { IconButton, Tooltip } from '@material-ui/core'
 import { withAppContext } from 'core/AppProvider'
 
 // FIXME this should not be accessing the context
-const ListTableBatchActions = ({ actionClassName, context, batchActions, selected }) => {
-  const _selected = selected || []
+const ListTableBatchActions = ({ actionClassName, context, batchActions, selected = [] }) => {
   const filtered = (batchActions || []).filter(action =>
-    action.cond === undefined || action.cond(_selected, context)
+    action.cond === undefined || action.cond(selected, context)
   )
-  if (_selected.length === 0 || filtered.length === 0) { return null }
+  if (selected.length === 0 || filtered.length === 0) { return null }
   return filtered.map(action => (
     <Tooltip key={action.label} title={action.label}>
-      <IconButton className={actionClassName} onClick={() => action.action(_selected, context)}>{action.icon}</IconButton>
+      <IconButton className={actionClassName} onClick={() => action.action(selected, context)}>{action.icon}</IconButton>
     </Tooltip>
   ))
 }
