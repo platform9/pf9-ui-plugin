@@ -6,6 +6,7 @@ import { cloudProviderActions } from '../infrastructure/actions'
 import { projectAs } from 'utils/fp'
 import { identity, propEq } from 'ramda'
 
+// We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
 const CloudProviderPicklist = forwardRef(({ type, ...rest }, ref) => {
   const [cloudProviders, loading] = useDataLoader(cloudProviderActions.list)
   const options = useMemo(

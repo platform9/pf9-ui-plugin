@@ -1,6 +1,6 @@
 import {
-  T, cond, equals, always, adjust, update, findIndex, assocPath, curry, fromPairs, mapObjIndexed,
-  pathOr, remove, flatten, values, groupBy, filter, either, isNil, isEmpty,
+  T, cond, equals, always, adjust, update, findIndex, assocPath, curry, pathOr, remove, values,
+  groupBy, filter, either, isNil, isEmpty, path,
 } from 'ramda'
 import moize from 'moize'
 
@@ -24,11 +24,6 @@ export const hasKeys = obj => {
   if (!(obj instanceof Object)) { return false }
   return Object.keys(obj).length > 0
 }
-
-export const pluckAsync = key => promise => promise.then(obj => obj[key])
-
-export const pipeAsync = (...fns) =>
-  async params => fns.reduce(async (prevResult, nextCb) => nextCb(prevResult), params)
 
 export const compose = (...fns) =>
   fns.reduce((f, g) => (...args) => f(g(...args)))
@@ -119,63 +114,9 @@ export const keyValueArrToObj = (arr = []) =>
     return accum
   }, {})
 
-export const asyncMap = async (arr, callback, parallel = true) => {
-  if (parallel) {
-    return Promise.all(arr.map((val, i) => callback(val, i, arr)))
-  }
-  let newArr = []
-  for (let i = 0; i < arr.length; i++) {
-    newArr.push(await callback(arr[i], i, arr))
-  }
-  return newArr
-}
-
-export const asyncFlatMap = async (arr, callback, parallel = true) => {
-  if (parallel) {
-    return flatten(await Promise.all(
-      arr.map(async (val, i) => ensureArray(await callback(val, i, arr))),
-    ))
-  }
-  let newArr = []
-  for (let i = 0; i < arr.length; i++) {
-    // Array#flat is not widely supported so best to just implement ourselves.
-    const values = await callback(arr[i], i, arr)
-    if (values instanceof Array) {
-      values.forEach(item => newArr.push(item))
-    } else {
-      newArr.push(values)
-    }
-  }
-  return newArr
-}
-
-// Functional async try catch
-export const asyncTryCatch = curry(async (tryer, catcher, input) => {
-  try {
-    return await tryer(input)
-  } catch (e) {
-    return catcher(e)
-  }
-})
-
-// Like Promise.all but for object properties instead of iterated values
-// Example:
-// asyncProps({
-//   foo: getFoo(),
-//   boo: getBoo(),
-// }).then(results => {
-//   console.log(results.foo, results.boo);
-// });
-export const asyncProps = async objPromises => {
-  const promises = Object.values(mapObjIndexed(async (promise, key) => {
-    return [key, await promise]
-  }, objPromises))
-  const results = await Promise.all(promises)
-
-  return fromPairs(results)
-}
-
-export const pathOrNull = curry((pathStr, obj) => pathOr(null, pathStr.split('.'), obj))
+export const pathStr = curry((str, obj) => path(str.split('.'), obj))
+export const pathStrOr = curry((defaultValue, str, obj) => pathOr(defaultValue, str.split('.'), obj))
+export const pathStrOrNull = curry((str, obj) => pathOr(null, str.split('.'), obj))
 
 // I didn't see anything in Ramda that would allow me to create a "Maybe"
 // composition so creating a simple version here.

@@ -7,7 +7,7 @@ import FormWrapper from 'core/components/FormWrapper'
 import requiresAuthentication from '../../util/requiresAuthentication'
 import { loadVolumeSnapshots } from './actions'
 import CreateSnapshotForm from './CreateSnapshotForm'
-import { dataContextKey } from 'core/helpers/createContextLoader'
+import { dataCacheKey } from 'core/helpers/createContextLoader'
 import { assocPath } from 'ramda'
 
 class CreateSnapshotPage extends React.PureComponent {
@@ -23,7 +23,7 @@ class CreateSnapshotPage extends React.PureComponent {
       }
       const existingSnapshots = await loadVolumeSnapshots({ setContext, getContext })
       const createdSnapshot = await ApiClient.getInstance().cinder.snapshotVolume(params)
-      setContext(assocPath([dataContextKey, 'volumeSnapshots'], [...existingSnapshots, createdSnapshot]))
+      setContext(assocPath([dataCacheKey, 'volumeSnapshots'], [...existingSnapshots, createdSnapshot]))
       history.push('/ui/openstack/storage#volumeSnapshots')
     } catch (err) {
       console.error(err)

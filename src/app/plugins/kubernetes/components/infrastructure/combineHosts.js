@@ -1,4 +1,4 @@
-import { condLiteral, pathOrNull, pipe } from 'app/utils/fp'
+import { condLiteral, pathStrOrNull, pipe } from 'app/utils/fp'
 import { __, both, includes, T } from 'ramda'
 import { localizeRoles } from 'api-client/ResMgr'
 import moment from 'moment'
@@ -44,9 +44,9 @@ export const annotateResmgrFields = host => {
     hostname: resmgr.info.hostname,
     osInfo: resmgr.info.os_info,
     networks: [],
-    vCenterIP: pathOrNull('extensions.hypervisor_details.data.vcenter_ip', resmgr),
+    vCenterIP: pathStrOrNull('extensions.hypervisor_details.data.vcenter_ip', resmgr),
     supportRole: resmgr.roles.includes('pf9-support'),
-    networkInterfaces: pathOrNull('extensions.interfaces.data.iface_ip', resmgr),
+    networkInterfaces: pathStrOrNull('extensions.interfaces.data.iface_ip', resmgr),
     warnings: resmgr.message && resmgr.message.warn,
   }
 }
@@ -93,7 +93,7 @@ export const annotateUiState = host => {
     host.hasStats = roleStatus === 'ok'
   }
 
-  const credentials = pathOrNull('extensions.hypervisor_details.data.credentials', resmgr)
+  const credentials = pathStrOrNull('extensions.hypervisor_details.data.credentials', resmgr)
   if (credentials === 'invalid') { host.uiState = 'invalid' }
   if (roleStatus === 'failed') { host.uiState = 'error' }
 
@@ -106,7 +106,7 @@ export const annotateNovaFields = host => {
 }
 
 export const calcResourceUtilization = host => {
-  const usage = pathOrNull('resmgr.extensions.resource_usage.data')(host)
+  const usage = pathStrOrNull('resmgr.extensions.resource_usage.data')(host)
   if (!usage) return { ...host }
   const { cpu, memory, disk } = usage
 

@@ -2,7 +2,7 @@ import {
   hasPath, path, assocPath, pathEq, always, over, append, lensPath, identity, isNil,
 } from 'ramda'
 import { emptyObj, ensureFunction, removeWith, updateWith, switchCase } from 'utils/fp'
-import { dataContextKey, getContextLoader } from 'core/helpers/createContextLoader'
+import { dataCacheKey, getContextLoader } from 'core/helpers/createContextLoader'
 import { memoizePromise, uncamelizeString } from 'utils/misc'
 import { defaultUniqueIdentifier, notFoundErr } from 'app/constants'
 
@@ -80,7 +80,7 @@ function createContextUpdater (cacheKey, dataUpdaterFn, options = {}) {
     },
   } = options
   const uniqueIdentifierPath = uniqueIdentifier.split('.')
-  const dataLens = lensPath([dataContextKey, cacheKey])
+  const dataLens = lensPath([dataCacheKey, cacheKey])
 
   /**
    * Context updater function, uses a custom updater function to update the data from the cache,

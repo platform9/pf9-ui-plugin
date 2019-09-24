@@ -35,8 +35,8 @@ const RegionChooser = props => {
     window.location = appUrlRoot
     // await setContext(pipe(
     //   // Reset all the data cache
-    //   assoc(dataContextKey, emptyArr),
-    //   assoc(paramsContextKey, emptyArr),
+    //   assoc(dataCacheKey, emptyArr),
+    //   assoc(paramsCacheKey, emptyArr),
     //   // Changing the currentTenant will cause all the current active `useDataLoader`
     //   // hooks to reload its data
     //   assoc('currentRegion', region),

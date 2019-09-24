@@ -1,4 +1,4 @@
-import { asyncMap, pathOrNull, pipeWhenTruthy, isTruthy } from 'app/utils/fp'
+import { pathStrOrNull, pipeWhenTruthy, isTruthy } from 'app/utils/fp'
 import {
   find, pathOr, pluck, prop, propEq, propSatisfies, compose, path, pipe, either,
 } from 'ramda'
@@ -10,6 +10,7 @@ import createContextLoader from 'core/helpers/createContextLoader'
 import ApiClient from 'api-client/ApiClient'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { filterIf } from 'utils/fp'
+import { mapAsync } from 'utils/async'
 
 export const clustersCacheKey = 'clusters'
 export const cloudProvidersCacheKey = 'cloudProviders'
@@ -86,7 +87,7 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
       }
     })
     // Get the cluster versions in parallel
-    return asyncMap(clusters, async cluster => {
+    return mapAsync(async cluster => {
       if (cluster.hasMasterNode) {
         try {
           const version = await qbert.getKubernetesVersion(cluster.uuid)
@@ -101,7 +102,7 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
       } else {
         return cluster
       }
-    }, true)
+    }, clusters)
   },
   deleteFn: async ({ id }) => {
     await qbert.deleteCluster(id)
@@ -209,7 +210,7 @@ export const loadNodes = createContextLoader(nodesCacheKey, async (params, loadF
 
   const combinedHostsObj = combinedHosts.reduce(
     (accum, host) => {
-      const id = pathOrNull('resmgr.id')(host) || pathOrNull('qbert.uuid')(host)
+      const id = pathStrOrNull('resmgr.id')(host) || pathStrOrNull('qbert.uuid')(host)
       accum[id] = host
       return accum
     },

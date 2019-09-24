@@ -8,6 +8,7 @@ import { compose } from 'utils/fp'
 /**
  * PicklistField builds upon Picklist and adds integration with ValidatedForm
  */
+// We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
 const PicklistField = React.forwardRef(({
   DropdownComponent, id, info, placement, label, value, showNone,
   hasError, errorMessage, options, ...restProps

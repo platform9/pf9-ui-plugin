@@ -1,12 +1,13 @@
 import React, { useMemo, forwardRef, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { head, isEmpty, omit, propOr } from 'ramda'
+import { head, isEmpty, propOr } from 'ramda'
 import Picklist from 'core/components/Picklist'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { projectAs } from 'utils/fp'
 import { repositoryActions } from './actions'
 import { allKey } from 'app/constants'
 
+// We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
 const RepositoryPicklist = forwardRef(
   ({ loading, onChange, selectFirst, ...rest }, ref) => {
     const [repos, reposLoading] = useDataLoader(repositoryActions.list)
@@ -31,7 +32,7 @@ const RepositoryPicklist = forwardRef(
   })
 
 RepositoryPicklist.propTypes = {
-  ...omit(['options'], Picklist.propTypes),
+  ...Picklist.propTypes,
   name: PropTypes.string,
   label: PropTypes.string,
   formField: PropTypes.bool,

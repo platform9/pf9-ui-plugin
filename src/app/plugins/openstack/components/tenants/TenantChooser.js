@@ -7,7 +7,7 @@ import { useScopedPreferences } from 'core/providers/PreferencesProvider'
 import { propEq, pipe, assoc, propOr } from 'ramda'
 import { Tooltip } from '@material-ui/core'
 import useDataLoader from 'core/hooks/useDataLoader'
-import { dataContextKey, paramsContextKey } from 'core/helpers/createContextLoader'
+import { dataCacheKey, paramsCacheKey } from 'core/helpers/createContextLoader'
 import { loadUserTenants } from 'openstack/components/tenants/actions'
 
 const TenantChooser = props => {
@@ -32,8 +32,8 @@ const TenantChooser = props => {
     // The data will then be reloaded when it is needed.
     await setContext(pipe(
       // Reset all the data cache
-      assoc(dataContextKey, emptyArr),
-      assoc(paramsContextKey, emptyArr),
+      assoc(dataCacheKey, emptyArr),
+      assoc(paramsCacheKey, emptyArr),
       // Changing the currentTenant will cause all the current active `useDataLoader`
       // hooks to reload its data
       assoc('currentTenant', tenant),

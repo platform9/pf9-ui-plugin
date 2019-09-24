@@ -2,9 +2,9 @@ import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import DisplayError from './components/DisplayError'
 import Progress from './components/progress/Progress'
-import { asyncProps } from 'utils/fp'
 import { mapObjIndexed, equals } from 'ramda'
 import { withAppContext } from 'core/AppProvider'
+import { propsAsync } from 'utils/async'
 
 /**
  * @deprecated Use useDataLoader hook instead
@@ -31,7 +31,7 @@ class DataLoader extends PureComponent {
     this.setState({ loading: true }, async () => {
       const { loaders, getContext, setContext } = this.props
       try {
-        await asyncProps(mapObjIndexed(loaderFn =>
+        await propsAsync(mapObjIndexed(loaderFn =>
           loaderFn({ getContext, setContext, refetch }), loaders,
         ))
         this.setState({ loading: false, error: null })

@@ -1,8 +1,9 @@
 import { propEq, T } from 'ramda'
 import {
-  applyJsonPatch, asyncProps, compose, condLiteral, filterFields, mergeKey, notEmpty, pick,
-  pickMultiple, pipe, pipeWhenTruthy, projectAs, pluck, pluckAsync, updateInArray,
+  applyJsonPatch, compose, condLiteral, filterFields, mergeKey, notEmpty, pick, pickMultiple, pipe,
+  pipeWhenTruthy, projectAs, pluck, updateInArray,
 } from 'utils/fp'
+import { pluckAsync, propsAsync } from 'utils/async'
 
 describe('functional programming utils', () => {
   it('pluck', () => {
@@ -23,7 +24,7 @@ describe('functional programming utils', () => {
       b: Promise.resolve('B value'),
       c: Promise.resolve('C value'),
     }
-    const result = await asyncProps(promises)
+    const result = await propsAsync(promises)
     expect(result).toEqual({
       a: 'A value',
       b: 'B value',

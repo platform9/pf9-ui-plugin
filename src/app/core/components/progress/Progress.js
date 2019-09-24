@@ -176,6 +176,7 @@ Progress.defaultProps = {
   message: 'Loading...',
 }
 
+// We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
 export const withProgress = Component =>
   forwardRef(({ overlay, inline, loading, ...props }, ref) =>
     <Progress overlay={overlay} inline={inline} loading={loading}>

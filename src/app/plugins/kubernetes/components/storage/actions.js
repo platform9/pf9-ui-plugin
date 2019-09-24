@@ -1,8 +1,8 @@
 import ApiClient from 'api-client/ApiClient'
-import { asyncFlatMap } from 'utils/fp'
 import { assoc, propEq } from 'ramda'
 import { clustersCacheKey } from 'k8s/components/infrastructure/actions'
 import createCRUDActions from 'core/helpers/createCRUDActions'
+import { flatMapAsync } from 'utils/async'
 
 export const storageClassesCacheKey = 'storageClasses'
 
@@ -13,7 +13,7 @@ const storageClassActions = createCRUDActions(storageClassesCacheKey, {
     const isHealthy = cluster => cluster.healthyMasterNodes.length > 0
     const usableClusters = clusters.filter(isHealthy)
     const getStorageClasses = cluster => qbert.getClusterStorageClasses(cluster.uuid)
-    const storageClasses = await asyncFlatMap(usableClusters, getStorageClasses, true)
+    const storageClasses = await flatMapAsync(getStorageClasses, usableClusters)
 
     // Add the clusterName
     const getClusterName = uuid => clusters.find(propEq('uuid', uuid)).name

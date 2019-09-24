@@ -7,7 +7,7 @@ import { withRouter } from 'react-router-dom'
 import requiresAuthentication from '../../util/requiresAuthentication'
 import { loadVolumeTypes } from './actions'
 import AddVolumeTypeForm from './AddVolumeTypeForm'
-import { dataContextKey } from 'core/helpers/createContextLoader'
+import { dataCacheKey } from 'core/helpers/createContextLoader'
 import { assocPath } from 'ramda'
 
 class AddVolumeTypePage extends React.PureComponent {
@@ -21,7 +21,7 @@ class AddVolumeTypePage extends React.PureComponent {
       const existingVolumeTypes = await loadVolumeTypes({ setContext, getContext })
       // TODO: use createContextUpdater
       const createdVolumeType = await ApiClient.getInstance().cinder.createVolumeType(volumeType)
-      setContext(assocPath([dataContextKey, 'volumeTypes'], [...existingVolumeTypes, createdVolumeType]))
+      setContext(assocPath([dataCacheKey, 'volumeTypes'], [...existingVolumeTypes, createdVolumeType]))
       history.push('/ui/openstack/storage#volumeTypes')
     } catch (err) {
       console.error(err)
