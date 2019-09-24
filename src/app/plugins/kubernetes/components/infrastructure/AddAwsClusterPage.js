@@ -33,11 +33,12 @@ const AddAwsClusterPage = () => {
           <>
             <WizardStep stepId="basic" label="Basic Info">
               <FormWrapper title="Add Cluster">
-                <ValidatedForm>
+                <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext}>
                   <TextField
                     id="name"
                     label="name"
                     info="Name of the cluster"
+                    required
                   />
                   <PicklistField
                     DropdownComponent={CloudProviderPicklist}
