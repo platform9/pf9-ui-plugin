@@ -4,6 +4,7 @@ import React from 'react'
 import FormWrapper from 'core/components/FormWrapper'
 // import KeyValuesField from 'core/components/validatedForm/KeyValuesField'
 // import NodesChooser from './NodesChooser'
+import AwsAvailabilityZoneChooser from './AwsAvailabilityZoneChooser'
 import CloudProviderPicklist from 'k8s/components/common/CloudProviderPicklist'
 import CloudProviderRegionPicklist from 'k8s/components/common/CloudProviderRegionPicklist'
 import PicklistField from 'core/components/validatedForm/PicklistField'
@@ -61,7 +62,10 @@ const AddAwsClusterPage = () => {
                     value={params.cloudProviderRegionId}
                     type="aws"
                   />
-                  {/* Availability Zones */}
+                  <AwsAvailabilityZoneChooser
+                    id="azs"
+                    info="Select from the Availability Zones for the specified region"
+                  />
                   {/* Operating System */}
                 </ValidatedForm>
               </FormWrapper>

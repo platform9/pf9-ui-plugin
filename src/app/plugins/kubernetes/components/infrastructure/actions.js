@@ -162,6 +162,18 @@ export const loadCloudProviderDetails = createContextLoader(
   },
 )
 
+export const loadCloudProviderRegionDetails = createContextLoader(
+  'cloudProviderRegionDetails',
+  async ({ cloudProviderId, cloudProviderRegionId }) => {
+    console.log(`loadCloudProviderRegionDetails(${cloudProviderId}, ${cloudProviderRegionId})`)
+    const response = await qbert.getCloudProviderRegionDetails(cloudProviderId, cloudProviderRegionId)
+    return response
+  },
+  {
+    indexBy: 'cloudProviderRegionId',
+  }
+)
+
 export const flavorActions = createCRUDActions('flavors', { service: 'nova' })
 
 export const regionActions = createCRUDActions('regions', { service: 'keystone' })
