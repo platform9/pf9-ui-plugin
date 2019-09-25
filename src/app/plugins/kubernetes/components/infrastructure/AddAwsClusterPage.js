@@ -65,6 +65,8 @@ const AddAwsClusterPage = () => {
                   <AwsAvailabilityZoneChooser
                     id="azs"
                     info="Select from the Availability Zones for the specified region"
+                    cloudProviderId={params.cloudProviderId}
+                    cloudProviderRegionId={params.cloudProviderRegionId}
                   />
                   {/* Operating System */}
                 </ValidatedForm>

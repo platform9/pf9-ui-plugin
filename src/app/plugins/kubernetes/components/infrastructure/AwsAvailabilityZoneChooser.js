@@ -31,6 +31,8 @@ const AwsAvailabilityZoneChooser = React.forwardRef(({ cloudProviderId, cloudPro
 */
 AwsAvailabilityZoneChooser.propTypes = {
   id: PropTypes.string.isRequired,
+  cloudProviderId: PropTypes.string,
+  cloudProviderRegionId: PropTypes.string,
   initialValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   onChange: PropTypes.func,
   ...ValidatedFormInputPropTypes,
