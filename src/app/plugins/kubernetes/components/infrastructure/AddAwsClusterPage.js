@@ -9,48 +9,86 @@ import CloudProviderRegionPicklist from 'k8s/components/common/CloudProviderRegi
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import TextField from 'core/components/validatedForm/TextField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
-// import Wizard from 'core/components/wizard/Wizard'
-// import WizardStep from 'core/components/wizard/WizardStep'
+import Wizard from 'core/components/wizard/Wizard'
+import WizardStep from 'core/components/wizard/WizardStep'
 // import useDataLoader from 'core/hooks/useDataLoader'
 import useParams from 'core/hooks/useParams'
 // import { projectAs } from 'utils/fp'
 // import { cloudProviderActions } from './actions'
 // import { propEq } from 'ramda'
 
+const initialContext = {}
+
 const AddAwsClusterPage = () => {
   const { params, getParamsUpdater } = useParams()
 
+  const handleSubmit = () => {
+    // TODO
+  }
+
   return (
-    <FormWrapper title="Add Cluster">
-      <ValidatedForm>
-        <TextField
-          id="name"
-          label="name"
-          info="Name of the cluster"
-        />
-        <PicklistField
-          DropdownComponent={CloudProviderPicklist}
-          id="cloudProvider"
-          label="Cloud Provider"
-          onChange={getParamsUpdater('cloudProviderId')}
-          info="Nodes will be provisioned using this cloud provider."
-          value={params.cloudProviderId}
-          type="aws"
-          required
-        />
-        <PicklistField
-          DropdownComponent={CloudProviderRegionPicklist}
-          disabled={!params.cloudProviderId}
-          id="cloudProviderRegion"
-          label="Region"
-          cloudProviderId={params.cloudProviderId}
-          onChange={getParamsUpdater('cloudProviderRegionId')}
-          info="Region "
-          value={params.cloudProviderRegionId}
-          type="aws"
-        />
-      </ValidatedForm>
-    </FormWrapper>
+    <Wizard onComplete={handleSubmit} context={initialContext}>
+      {({ wizardContext, setWizardContext, onNext }) => {
+        return (
+          <>
+            <WizardStep stepId="basic" label="Basic Info">
+              <FormWrapper title="Add Cluster">
+                <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext}>
+                  <TextField
+                    id="name"
+                    label="name"
+                    info="Name of the cluster"
+                    required
+                  />
+                  <PicklistField
+                    DropdownComponent={CloudProviderPicklist}
+                    id="cloudProvider"
+                    label="Cloud Provider"
+                    onChange={getParamsUpdater('cloudProviderId')}
+                    info="Nodes will be provisioned using this cloud provider."
+                    value={params.cloudProviderId}
+                    type="aws"
+                    required
+                  />
+                  <PicklistField
+                    DropdownComponent={CloudProviderRegionPicklist}
+                    disabled={!params.cloudProviderId}
+                    id="cloudProviderRegion"
+                    label="Region"
+                    cloudProviderId={params.cloudProviderId}
+                    onChange={getParamsUpdater('cloudProviderRegionId')}
+                    info="Region "
+                    value={params.cloudProviderRegionId}
+                    type="aws"
+                  />
+                  {/* Availability Zones */}
+                  {/* Operating System */}
+                </ValidatedForm>
+              </FormWrapper>
+            </WizardStep>
+
+            <WizardStep stepId="config" label="Cluster Configuration">
+              <FormWrapper title="Cluster Configuration">
+                <ValidatedForm>
+                  {/* Master node instance type */}
+                  {/* Num master nodes */}
+
+                  {/* Worker node instance type */}
+                  {/* Num worker nodes */}
+                  {/* Checkbox 'Enable Auto Scaling' */}
+                  {/* Max worker nodes */}
+
+                  {/* Disable workloads on master nodes */}
+                  {/* Enable spot workers */}
+                  {/* Percent of worker nodes as spot instances */}
+                  {/* Spot price */}
+                </ValidatedForm>
+              </FormWrapper>
+            </WizardStep>
+          </>
+        )
+      }}
+    </Wizard>
   )
 }
 
