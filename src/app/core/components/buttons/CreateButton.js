@@ -8,7 +8,6 @@ const styles = theme => ({
     borderRadius: 2,
     textTransform: 'none',
     height: 40,
-    boxShadow: '0 3px 1px -2px rgba(0, 0, 0, 0.11), 0 2px 2px 0 rgba(0, 0, 0, 0.11), 0 1px 5px 0 rgba(0, 0, 0, 0.2)',
   }
 })
 
