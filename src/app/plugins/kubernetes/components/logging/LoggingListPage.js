@@ -46,8 +46,8 @@ const useStyles = makeStyles(theme => createStyles({
   },
 }))
 
-const EDIT_URL = '/ui/kubernetes/logging/edit'
-const ADD_URL = '/ui/kubernetes/logging/add'
+const addUrl = '/ui/kubernetes/logging/add'
+const editUrl = '/ui/kubernetes/logging/edit'
 
 const status = {
   ENABLED: 'enabled',
@@ -181,7 +181,7 @@ const LoggingListPage = withRouter(({ history }) => {
     <Fragment>
       <Box className={classes.titleAndCreateButton}>
         <h2>Logging</h2>
-        <CreateButton onClick={() => history.push(ADD_URL)}>New Logging</CreateButton>
+        <CreateButton onClick={() => history.push(addUrl)}>New Logging</CreateButton>
       </Box>
       <ListTable columns={columns} data={data} batchActions={actions} />
     </Fragment>
@@ -263,7 +263,7 @@ const getActions = (classes, history) => [
   {
     icon: <ActionIcon classes={classes} icon='edit' label='Edit' />,
     label: 'Edit',
-    action: (clusters) => history.push(`${EDIT_URL}/${clusters[0].cluster}`),
+    action: (clusters) => history.push(`${editUrl}/${clusters[0].cluster}`),
     cond: (clusters) => clusters.length === 1
   },
   {
