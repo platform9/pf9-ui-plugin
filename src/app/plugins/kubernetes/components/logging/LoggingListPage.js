@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react'
-import { withRouter } from 'react-router-dom'
+import useReactRouter from 'use-react-router'
 import { makeStyles, createStyles } from '@material-ui/styles'
 import Box from '@material-ui/core/Box'
 import ListTable from 'core/components/listTable/ListTable'
@@ -172,8 +172,9 @@ const data = [
   },
 ]
 
-const LoggingListPage = withRouter(({ history }) => {
+const LoggingListPage = () => {
   const classes = useStyles()
+  const { history } = useReactRouter()
   const columns = getColumns(classes)
   const actions = getActions(classes, history)
 
@@ -186,7 +187,7 @@ const LoggingListPage = withRouter(({ history }) => {
       <ListTable columns={columns} data={data} batchActions={actions} />
     </Fragment>
   )
-})
+}
 
 const renderStatus = (classes, value) => {
   let icon
