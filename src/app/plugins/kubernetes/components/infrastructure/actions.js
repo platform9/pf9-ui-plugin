@@ -112,12 +112,12 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
   },
   uniqueIdentifier: 'uuid',
   dataMapper: (items,
-    { masterNodeClusters, masterlessClusters, hasControlPlane, appCatalogClusters, prometheusClusters }) => pipe(
+    { masterNodeClusters, masterlessClusters, hasControlPanel, appCatalogClusters, prometheusClusters }) => pipe(
     filterIf(masterNodeClusters, hasMasterNode),
     filterIf(masterlessClusters, masterlessCluster),
     filterIf(prometheusClusters, hasPrometheusEnabled),
     filterIf(appCatalogClusters, hasAppCatalogEnabled),
-    filterIf(hasControlPlane, either(hasMasterNode, masterlessCluster))
+    filterIf(hasControlPanel, either(hasMasterNode, masterlessCluster))
   )(items),
   defaultOrderBy: 'name',
 })

@@ -131,7 +131,7 @@ const reposWithClustersLoader = createContextLoader(repositoriesWithClustersCach
   loadFromContext) => {
   const monocularClusters = await loadFromContext(clustersCacheKey, {
     appCatalogClusters: true,
-    hasControlPlane: true,
+    hasControlPanel: true,
   })
   const data = await flatMapAsync(async ([clusterId, clusterName]) => {
     const clusterRepos = await qbert.getRepositoriesForCluster(clusterId)
