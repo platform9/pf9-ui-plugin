@@ -1,33 +1,35 @@
-import React from 'react'
+import React, { forwardRef } from 'react'
 import PropTypes from 'prop-types'
-import { compose } from 'app/utils/fp'
+import { compose, pathStrOr, projectAs } from 'app/utils/fp'
 import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
 import useDataLoader from 'core/hooks/useDataLoader'
-// import MultiSelect from 'core/components/MultiSelect'
+import MultiSelect from 'core/components/MultiSelect'
 import { withInfoTooltip } from 'core/components/InfoTooltip'
 import { loadCloudProviderRegionDetails } from './actions'
 
-const AwsAvailabilityZoneChooser = React.forwardRef(({ cloudProviderId, cloudProviderRegionId, ...rest }, ref) => {
+const AwsAvailabilityZoneChooser = forwardRef(({ cloudProviderId, cloudProviderRegionId, ...rest }, ref) => {
   const [details, loading] = useDataLoader(loadCloudProviderRegionDetails, { cloudProviderId, cloudProviderRegionId })
+  const [values, setValues] = React.useState([])
 
+  const azs = pathStrOr([], '0.azs', details)
+  const regions = projectAs({ label: 'ZoneName', value: 'ZoneName' }, azs)
   // TOOD: extract the region names
 
   return (
     <>
-      <pre>{JSON.stringify(loading, null, 4)}</pre>
-      <pre>{JSON.stringify(details, null, 4)}</pre>
+      <MultiSelect
+        label="Availability Zones"
+        options={regions}
+        values={values}
+        onChange={setValues}
+        {...rest}
+      />
+      <pre>{JSON.stringify(regions, null, 4)}</pre>
     </>
   )
 })
 
 /*
- <MultiSelect
-   ref={ref}
-   options={options}
-   values={values}
-   onChange={setValues}
-   {...props}
- />
 */
 AwsAvailabilityZoneChooser.propTypes = {
   id: PropTypes.string.isRequired,

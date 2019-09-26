@@ -165,7 +165,6 @@ export const loadCloudProviderDetails = createContextLoader(
 export const loadCloudProviderRegionDetails = createContextLoader(
   'cloudProviderRegionDetails',
   async ({ cloudProviderId, cloudProviderRegionId }) => {
-    console.log(`loadCloudProviderRegionDetails(${cloudProviderId}, ${cloudProviderRegionId})`)
     const response = await qbert.getCloudProviderRegionDetails(cloudProviderId, cloudProviderRegionId)
     return response
   },
