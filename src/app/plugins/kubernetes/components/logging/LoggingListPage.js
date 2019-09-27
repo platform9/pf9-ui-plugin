@@ -1,28 +1,16 @@
-import React, { Fragment } from 'react'
+import React from 'react'
 import useReactRouter from 'use-react-router'
 import { makeStyles, createStyles } from '@material-ui/styles'
-import Box from '@material-ui/core/Box'
-import ListTable from 'core/components/listTable/ListTable'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
-import CreateButton from 'core/components/buttons/CreateButton'
+import ApiClient from 'api-client/ApiClient'
+import createCRUDComponents from 'core/helpers/createCRUDComponents'
+
+const { qbert } = ApiClient.getInstance()
 
 const useStyles = makeStyles(theme => createStyles({
   titleAndCreateButton: {
     display: 'flex',
     justifyContent: 'space-between',
-  },
-  actionIconWrapper: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 40,
-    height: 40,
-  },
-  actionIcon: {
-    fontSize: 18,
-    fontWeight: 300,
-    color: '#606060',
   },
   enabledIcon: {
     fontSize: 13,
@@ -56,137 +44,27 @@ const status = {
   FAILED: 'failed',
 }
 
-const storageType = {
-  S3: 'AWS-S3',
-  ELASTIC_SEARCH: 'ElasticSearch',
-}
-
-const data = [
-  {
-    cluster: 'cluster-id-01',
-    status: status.ENABLED,
-    logStorage: [
-      storageType.S3,
-      storageType.ELASTIC_SEARCH
-    ],
-    logDestination: [
-      'bucket123/regionnameABC',
-      'http://mybucket.s3.johnsmith',
-    ],
-  },
-  {
-    cluster: 'cluster-id-02',
-    status: status.DISABLED,
-    logStorage: [
-      storageType.S3,
-    ],
-    logDestination: [
-      'bucket123/regionnameABC',
-    ],
-  },
-  {
-    cluster: 'cluster-id-03',
-    status: status.ENABLED,
-    logStorage: [
-      storageType.ELASTIC_SEARCH
-    ],
-    logDestination: [
-      'http://mybucket.s3.johnsmith',
-    ],
-  },
-  {
-    cluster: 'cluster-id-04',
-    status: status.ENABLED,
-    logStorage: [
-      storageType.S3,
-      storageType.ELASTIC_SEARCH
-    ],
-    logDestination: [
-      'bucket123/regionnameABC',
-      'http://mybucket.s3.johnsmith',
-    ],
-  },
-  {
-    cluster: 'cluster-id-05',
-    status: status.CONFIGURING,
-    logStorage: [
-      storageType.ELASTIC_SEARCH
-    ],
-    logDestination: [
-      'http://mybucket.s3.johnsmith',
-    ],
-  },
-  {
-    cluster: 'cluster-id-06',
-    status: status.FAILED,
-    logStorage: [
-      storageType.S3,
-      storageType.ELASTIC_SEARCH
-    ],
-    logDestination: [
-      'bucket123/regionnameABC',
-      'http://mybucket.s3.johnsmith',
-    ],
-  },
-  {
-    cluster: 'cluster-id-07',
-    status: status.DISABLED,
-    logStorage: [
-      storageType.S3,
-    ],
-    logDestination: [
-      'bucket123/regionnameABC',
-    ],
-  },
-  {
-    cluster: 'cluster-id-08',
-    status: status.ENABLED,
-    logStorage: [
-      storageType.ELASTIC_SEARCH
-    ],
-    logDestination: [
-      'http://mybucket.s3.johnsmith',
-    ],
-  },
-  {
-    cluster: 'cluster-id-09',
-    status: status.ENABLED,
-    logStorage: [
-      storageType.S3,
-      storageType.ELASTIC_SEARCH
-    ],
-    logDestination: [
-      'bucket123/regionnameABC',
-      'http://mybucket.s3.johnsmith',
-    ],
-  },
-  {
-    cluster: 'cluster-id-10',
-    status: status.ENABLED,
-    logStorage: [
-      storageType.ELASTIC_SEARCH
-    ],
-    logDestination: [
-      'http://mybucket.s3.johnsmith',
-    ],
-  },
-]
-
 const LoggingListPage = () => {
   const classes = useStyles()
   const { history } = useReactRouter()
   const columns = getColumns(classes)
-  const actions = getActions(classes, history)
+  const batchActions = getActions(classes, history)
 
-  return (
-    <Fragment>
-      <Box className={classes.titleAndCreateButton}>
-        <h2>Logging</h2>
-        <CreateButton onClick={() => history.push(addUrl)}>New Logging</CreateButton>
-      </Box>
-      <ListTable columns={columns} data={data} batchActions={actions} />
-    </Fragment>
-  )
+  const options = {
+    innerTitle: 'Logging',
+    addText: 'New Logging',
+    uniqueIdentifier: 'cluster',
+    loaderFn: qbert.getLoggings,
+    onEdit: () => {},
+    onDelete: () => {},
+    addUrl,
+    editUrl,
+    columns,
+    batchActions,
+  }
+  const { ListPage } = createCRUDComponents(options)
+
+  return <ListPage />
 }
 
 const renderStatus = (classes, value) => {
@@ -242,35 +120,18 @@ const getColumns = (classes) => [
   { id: 'logDestination', label: 'Log Destination', render: renderList },
 ]
 
-const ActionIcon = ({ classes, icon, label }) =>
-  <Box className={classes.actionIconWrapper}>
-    <FontAwesomeIcon className={classes.actionIcon}>{icon}</FontAwesomeIcon>
-    {label}
-  </Box>
-
 const getActions = (classes, history) => [
   {
-    icon: <ActionIcon classes={classes} icon='check' label='Enable' />,
+    icon: 'check',
     label: 'Enable',
     action: () => {},
     cond: (clusters) => clusters.every(cluster => cluster.status === status.DISABLED)
   },
   {
-    icon: <ActionIcon classes={classes} icon='times' label='Disable' />,
+    icon: 'times',
     label: 'Disable',
     action: () => {},
     cond: (clusters) => clusters.every(cluster => cluster.status === status.ENABLED)
-  },
-  {
-    icon: <ActionIcon classes={classes} icon='edit' label='Edit' />,
-    label: 'Edit',
-    action: (clusters) => history.push(`${editUrl}/${clusters[0].cluster}`),
-    cond: (clusters) => clusters.length === 1
-  },
-  {
-    icon: <ActionIcon classes={classes} icon='trash-alt' label='Delete' />,
-    label: 'Delete',
-    action: () => {},
   },
 ]
 

@@ -109,11 +109,11 @@ const ListTableToolbar = ({
         [classes.highlight]: numSelected > 0,
       })}
     >
-      <ListTableBatchActions actionClassName={classes.action} batchActions={batchActions} selected={selected} />
+      <ListTableBatchActions actionClassName={classes.action} actionIconClassName={classes.actionIcon} batchActions={batchActions} selected={selected} />
       {numSelected === 1 && onEdit && (
         <Tooltip title="Edit">
           <div className={classes.action} onClick={onEdit}>
-            <FontAwesomeIcon className={classes.actionIcon}>{'pencil-alt'}</FontAwesomeIcon>
+            <FontAwesomeIcon className={classes.actionIcon}>edit</FontAwesomeIcon>
             Edit
           </div>
         </Tooltip>
@@ -121,7 +121,7 @@ const ListTableToolbar = ({
       {numSelected > 0 && onDelete && (
         <Tooltip title="Delete">
           <div className={classes.action} onClick={onDelete}>
-            <FontAwesomeIcon className={classes.actionIcon}>{'trash-alt'}</FontAwesomeIcon>
+            <FontAwesomeIcon className={classes.actionIcon}>trash-alt</FontAwesomeIcon>
             Delete
           </div>
         </Tooltip>

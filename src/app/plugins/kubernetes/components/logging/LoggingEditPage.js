@@ -1,5 +1,19 @@
-import React from 'react'
+import createUpdateComponents from 'core/helpers/createUpdateComponents'
+import LoggingForm from './LoggingForm'
+import ApiClient from 'api-client/ApiClient'
 
-const LoggingEditPage = () => <h1>Edit Logging Configuration</h1>
+const { qbert } = ApiClient.getInstance()
+
+const options = {
+  FormComponent: LoggingForm,
+  updateFn: () => {},
+  loaderFn: qbert.getLoggings,
+  listUrl: '/ui/kubernetes/logging',
+  name: 'EditLogging',
+  title: 'Edit Logging Configuration',
+  uniqueIdentifier: 'cluster',
+}
+
+const { UpdatePage: LoggingEditPage } = createUpdateComponents(options)
 
 export default LoggingEditPage

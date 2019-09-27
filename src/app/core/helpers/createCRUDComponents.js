@@ -1,8 +1,7 @@
-import React, { useMemo, useCallback, useState } from 'react'
-import CreateButton from 'core/components/buttons/CreateButton'
+import React, { useCallback } from 'react'
 import CRUDListContainer from 'core/components/CRUDListContainer'
 import ListTable from 'core/components/listTable/ListTable'
-import TopExtraContent from 'core/components/TopExtraContent'
+import TitleAndAddButton from 'core/components/listTable/TitleAndAddButton'
 import requiresAuthentication from 'openstack/util/requiresAuthentication'
 import useDataLoader from 'core/hooks/useDataLoader'
 import useDataUpdater from 'core/hooks/useDataUpdater'
@@ -41,7 +40,9 @@ const createCRUDComponents = options => {
     deleteFn = cacheKey ? getContextUpdater(cacheKey, 'delete') : null,
     defaultParams = {},
     columns = [],
+    batchActions = [],
     rowActions = [],
+    innerTitle,
     uniqueIdentifier = 'id',
     addText = 'Add',
     addUrl,
@@ -53,7 +54,7 @@ const createCRUDComponents = options => {
 
   // List
   const List = ({
-    onAdd, onDelete, onEdit, rowActions, data, onRefresh, onActionComplete, loading,
+    onAdd, onDelete, onEdit, batchActions, rowActions, data, onRefresh, onActionComplete, loading,
     visibleColumns, columnsOrder, rowsPerPage, orderBy, orderDirection,
     getParamsUpdater, filters,
   }) => {
@@ -75,6 +76,7 @@ const createCRUDComponents = options => {
         onAdd={onAdd}
         onDelete={onDelete}
         onEdit={onEdit}
+        batchActions={batchActions}
         rowActions={rowActions}
         searchTarget="name"
         uniqueIdentifier={uniqueIdentifier}
@@ -94,16 +96,6 @@ const createCRUDComponents = options => {
   // ListContainer
   const ListContainer = withRouter(({ history, data, loading, reload, ...restProps }) => {
     const [handleRemove, deleting] = deleteFn ? useDataUpdater(deleteFn, reload) : emptyArr
-    const [addDialogOpen, setAddDialogOpen] = useState(false)
-    const handleAddDialogClose = useCallback(() => {
-      setAddDialogOpen(false)
-      reload()
-    }, [reload])
-    const addButton = useMemo(
-      () => <CreateButton onClick={
-        () => renderAddDialog ? setAddDialogOpen(true) : history.push(addUrl)
-      }>{addText}</CreateButton>,
-      [history])
     const refetch = useCallback(() => reload(true))
     return (
       <CRUDListContainer
@@ -113,11 +105,17 @@ const createCRUDComponents = options => {
         uniqueIdentifier={uniqueIdentifier}
       >
         {handlers => <>
-          {(addUrl || renderAddDialog) && <TopExtraContent>{addButton}</TopExtraContent>}
-          {renderAddDialog && addDialogOpen && renderAddDialog(handleAddDialogClose)}
+          <TitleAndAddButton
+            title={innerTitle}
+            addUrl={addUrl}
+            addText={addText}
+            renderAddDialog={renderAddDialog}
+            reload={reload}
+          />
           <List
             loading={loading || deleting}
             data={data}
+            batchActions={batchActions}
             rowActions={rowActions}
             onRefresh={refetch}
             onActionComplete={reload}

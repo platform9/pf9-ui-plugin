@@ -2,6 +2,7 @@ import { assoc, propOr } from 'ramda'
 import { keyValueArrToObj } from 'utils/fp'
 import { pathJoin } from 'utils/misc'
 import { normalizeResponse } from 'api-client/helpers'
+import LoggingStub from 'k8s/components/logging/LoggingStub'
 
 const normalizeClusterizedResponse = (clusterId, response) => propOr([], 'items', response).map(
   x => ({ ...x, clusterId }))
@@ -507,6 +508,9 @@ class Qbert {
 
   getPrometheusDashboardLink =
     instance => `${this.cachedEndpoint}/clusters/${instance.clusterUuid}/k8sapi${instance.dashboard}`
+
+  /* Logging */
+  getLoggings = () => LoggingStub.getLoggings()
 }
 
 export default Qbert
