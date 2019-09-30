@@ -7,30 +7,29 @@ import MultiSelect from 'core/components/MultiSelect'
 import { withInfoTooltip } from 'core/components/InfoTooltip'
 import { loadCloudProviderRegionDetails } from './actions'
 
-const AwsAvailabilityZoneChooser = forwardRef(({ cloudProviderId, cloudProviderRegionId, ...rest }, ref) => {
-  const [details, loading] = useDataLoader(loadCloudProviderRegionDetails, { cloudProviderId, cloudProviderRegionId })
+const AwsAvailabilityZoneChooser = forwardRef(({ cloudProviderId, cloudProviderRegionId, onChange, ...rest }, ref) => {
+  const [details] = useDataLoader(loadCloudProviderRegionDetails, { cloudProviderId, cloudProviderRegionId })
   const [values, setValues] = React.useState([])
+
+  const handleValuesChange = values => {
+    setValues(values)
+    onChange && onChange(values)
+  }
 
   const azs = pathStrOr([], '0.azs', details)
   const regions = projectAs({ label: 'ZoneName', value: 'ZoneName' }, azs)
-  // TOOD: extract the region names
 
   return (
-    <>
-      <MultiSelect
-        label="Availability Zones"
-        options={regions}
-        values={values}
-        onChange={setValues}
-        {...rest}
-      />
-      <pre>{JSON.stringify(regions, null, 4)}</pre>
-    </>
+    <MultiSelect
+      label="Availability Zones"
+      options={regions}
+      values={values}
+      onChange={handleValuesChange}
+      {...rest}
+    />
   )
 })
 
-/*
-*/
 AwsAvailabilityZoneChooser.propTypes = {
   id: PropTypes.string.isRequired,
   cloudProviderId: PropTypes.string,

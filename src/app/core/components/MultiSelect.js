@@ -70,14 +70,18 @@ const MultiSelect = ({ label, options, values, onChange, maxOptions, sortSelecte
   const sortOptions = (options) => {
     const sortBySelected = (a, b) => values.includes(b.value) - values.includes(a.value)
     const sortedOptions = sortSelectedFirst ? options.sort(sortBySelected) : options
-
     return sortedOptions
   }
 
   const [visibleOptions, setVisibleOptions] = useState(sortOptions(options))
   const [fuse, setFuse] = useState(null)
 
-  useEffect(() => setFuse(new Fuse(options, FUSE_OPTIONS)), [options])
+  useEffect(() => {
+    setFuse(new Fuse(options, FUSE_OPTIONS))
+    // Change visibleOptions when we receive async changes to options.
+    // `options` is originally `[]` during most async data loading.
+    setVisibleOptions(sortOptions(options))
+  }, [options])
 
   const toggleOption = (value) => {
     const updatedValues = values.includes(value)
