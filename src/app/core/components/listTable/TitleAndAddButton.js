@@ -27,7 +27,7 @@ const TitleAndAddButton = ({ title, addUrl, addText, renderAddDialog, reload }) 
     <CreateButton onClick={() => renderAddDialog ? setAddDialogOpen(true) : history.push(addUrl)}>
       {addText}
     </CreateButton>
-  ), [history])
+  ), [history, addUrl, addText])
 
   const isTitleOrButtonVisible = addUrl || title || !!renderAddDialog
   const isAddDialogOpen = !!renderAddDialog && addDialogOpen
