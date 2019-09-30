@@ -30,6 +30,9 @@ import { tokenValidator } from '../../middleware'
 import {
   getPrometheusInstances, patchPrometheusInstance, deletePrometheusInstance,
 } from './prometheus'
+
+import { getLoggings, postLogging, putLogging, deleteLogging } from './logging/loggingActions'
+
 // TODO
 // import { deployApplication } from './applications'
 import { getRepositoriesForCluster } from './repositories/actions'
@@ -102,5 +105,12 @@ const monitoringBase = `${clusterK8sApiBase}/apis/monitoring.coreos.com/v1`
 router.get(`${monitoringBase}/prometheuses`, tokenValidator, getPrometheusInstances)
 router.patch(`${monitoringBase}/namespaces/:namespace/prometheuses/:name`, tokenValidator, patchPrometheusInstance)
 router.delete(`${monitoringBase}/namespaces/:namespace/prometheuses/:name`, tokenValidator, deletePrometheusInstance)
+
+// TODO: check Logging urls
+const loggingBase = `/apis/logging.pf9.io/v1alpha1`
+router.get(`/${loggingBase}/loggings`, tokenValidator, getLoggings)
+router.post(`/${loggingBase}/loggings`, tokenValidator, postLogging)
+router.put(`/${loggingBase}/loggings/:clusterId`, tokenValidator, putLogging)
+router.delete(`/${loggingBase}/loggings/:clusterId`, tokenValidator, deleteLogging)
 
 export default router

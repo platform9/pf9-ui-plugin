@@ -2,7 +2,6 @@ import { assoc, propOr } from 'ramda'
 import { keyValueArrToObj } from 'utils/fp'
 import { pathJoin } from 'utils/misc'
 import { normalizeResponse } from 'api-client/helpers'
-import LoggingStub from 'k8s/components/logging/LoggingStub'
 
 const normalizeClusterizedResponse = (clusterId, response) => propOr([], 'items', response).map(
   x => ({ ...x, clusterId }))
@@ -509,8 +508,26 @@ class Qbert {
   getPrometheusDashboardLink =
     instance => `${this.cachedEndpoint}/clusters/${instance.clusterUuid}/k8sapi${instance.dashboard}`
 
-  /* Logging */
-  getLoggings = () => LoggingStub.getLoggings()
+  // TODO: Loggings
+  getLoggings = async () => {
+    const response = await this.client.basicGet(`${await this.baseUrl()}/apis/logging.pf9.io/v1alpha1/loggings`)
+    return response
+  }
+
+  createLogging = async (logging) => {
+    const response = await this.client.basicPost(`${await this.baseUrl()}/apis/logging.pf9.io/v1alpha1/loggings`, logging)
+    return response
+  }
+
+  updateLogging = async (clusterId, logging) => {
+    const response = await this.client.basicPut(`${await this.baseUrl()}/apis/logging.pf9.io/v1alpha1/loggings/${clusterId}`, logging)
+    return response
+  }
+
+  deleteLogging = async (clusterId) => {
+    const response = await this.client.basicDelete(`${await this.baseUrl()}/apis/logging.pf9.io/v1alpha1/loggings/${clusterId}`)
+    return response
+  }
 }
 
 export default Qbert
