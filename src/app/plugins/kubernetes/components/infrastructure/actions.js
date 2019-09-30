@@ -166,10 +166,12 @@ export const loadCloudProviderRegionDetails = createContextLoader(
   'cloudProviderRegionDetails',
   async ({ cloudProviderId, cloudProviderRegionId }) => {
     const response = await qbert.getCloudProviderRegionDetails(cloudProviderId, cloudProviderRegionId)
-    return response
+    // We create an artificial `id` parameter in the response so that createContextLoader has a
+    // uniqueIdentifier to key off of.  Failure to do this results in inproperly cached values.
+    return { id: `${cloudProviderId}-${cloudProviderRegionId}`, ...response }
   },
   {
-    indexBy: 'cloudProviderRegionId',
+    indexBy: ['cloudProviderId', 'cloudProviderRegionId']
   }
 )
 
