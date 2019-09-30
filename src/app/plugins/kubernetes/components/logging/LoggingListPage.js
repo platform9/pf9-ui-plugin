@@ -50,6 +50,7 @@ const LoggingListPage = () => {
   const columns = getColumns(classes)
   const batchActions = getActions(classes, history)
 
+  // TODO: onEdit and onDelete
   const options = {
     innerTitle: 'Logging',
     addText: 'New Logging',
