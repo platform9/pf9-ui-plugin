@@ -25,7 +25,7 @@ const selectProps = { displayEmpty: true }
 // We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
 const Picklist = React.forwardRef((props, ref) => {
   const {
-    disabled, notAsync, showAll, showNone, label, name, value, options, onChange, loading, formField, ...restProps
+    disabled, showAll, showNone, label, name, value, options, onChange, loading, formField, ...restProps
   } = props
   const classes = useStyles(props)
   const inputProps = useMemo(() => ({ name: label, id: name }), [label, name])
@@ -55,7 +55,9 @@ const Picklist = React.forwardRef((props, ref) => {
       : (showAll ? allKey : value))
     : value
 
-  return <Progress inline overlay loading={loading} renderContentOnMount={notAsync}>
+  // If loading is undefined, it means we are not performing any async
+  // operation to load the options, hence we can render the contents on mount
+  return <Progress inline overlay loading={loading} renderContentOnMount={loading === undefined}>
     <TextField
       {...restProps}
       ref={ref}
@@ -88,7 +90,6 @@ Picklist.propTypes = {
   label: PropTypes.string.isRequired,
   loading: PropTypes.bool,
   name: PropTypes.string.isRequired,
-  notAsync: PropTypes.bool,
   onChange: PropTypes.func,
   options: PropTypes.arrayOf(optionPropType),
   showAll: PropTypes.bool,
@@ -99,8 +100,6 @@ Picklist.propTypes = {
 
 Picklist.defaultProps = {
   formField: false,
-  loading: false,
-  notAsync: false,
   options: [],
   showAll: true,
   showNone: false,

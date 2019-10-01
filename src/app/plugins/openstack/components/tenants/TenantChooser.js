@@ -62,8 +62,6 @@ const TenantChooser = props => {
       placement="bottom"
     >
       <Selector
-        inline
-        overlay={false}
         loading={loading || loadingTenants}
         onMouseEnter={handleTooltipOpen}
         onMouseLeave={handleTooltipClose}
