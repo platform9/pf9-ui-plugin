@@ -1,6 +1,6 @@
 import { pathStrOrNull, pipeWhenTruthy, isTruthy } from 'app/utils/fp'
 import {
-  find, pathOr, pluck, prop, propEq, propSatisfies, compose, path, pipe, either,
+  find, pathOr, pluck, prop, propEq, propSatisfies, compose, path, pipe, either, evolve, add,
 } from 'ramda'
 import { allKey } from 'app/constants'
 import { castFuzzyBool } from 'utils/misc'
@@ -9,7 +9,7 @@ import { serviceCatalogContextKey } from 'openstack/components/api-access/action
 import createContextLoader from 'core/helpers/createContextLoader'
 import ApiClient from 'api-client/ApiClient'
 import createCRUDActions from 'core/helpers/createCRUDActions'
-import { filterIf } from 'utils/fp'
+import { filterIf, pathStrOr, pathStr } from 'utils/fp'
 import { mapAsync } from 'utils/async'
 
 export const clustersCacheKey = 'clusters'
@@ -45,15 +45,68 @@ export const parseClusterParams = async (params, loadFromContext) => {
   return [clusterId, clusters]
 }
 
+const clusterUsageSpec = {
+  compute: {
+    current: 0,
+    max: 0,
+    percent: 0,
+    units: 'GHz',
+    type: 'used',
+  },
+  memory: {
+    current: 0,
+    max: 0,
+    percent: 0,
+    units: 'GiB',
+    type: 'used',
+  },
+  disk: {
+    current: 0,
+    max: 0,
+    percent: 0,
+    units: 'GiB',
+    type: 'used',
+  },
+}
+
 export const clusterActions = createCRUDActions(clustersCacheKey, {
   listFn: async (params, loadFromContext) => {
-    const [rawNodes, rawClusters, qbertEndpoint] = await Promise.all([
+    const [rawNodes, combinedHosts, rawClusters, qbertEndpoint] = await Promise.all([
       loadFromContext(rawNodesCacheKey),
+      loadFromContext(combinedHostsCacheKey),
       qbert.getClusters(),
       qbert.baseUrl(),
     ])
+
+    // FIXME: Workaround for when max is 0, but this value should never be 0
+    // and if case of so (which would mean there is no max) we should probably just show the value
+    const calcUsagePercent = (strPath, node, numNodes) =>
+      100 * pathStrOr(0, `${strPath}.current`, node) / (pathStr(`${strPath}.max`, node) || 1) / numNodes
+
     const clusters = rawClusters.map(cluster => {
       const nodesInCluster = rawNodes.filter(node => node.clusterUuid === cluster.uuid)
+      const nodeIds = pluck('uuid', nodesInCluster)
+      const combinedNodes = combinedHosts.filter(x => nodeIds.includes(x.resmgr.id))
+
+      const specReducer = (acc, node) => evolve({
+        compute: {
+          current: add(pathStrOr(0, 'usage.compute.current', node)),
+          max: add(pathStrOr(0, 'usage.compute.max', node)),
+          percent: add(calcUsagePercent('usage.compute', node, combinedNodes.length)),
+        },
+        memory: {
+          current: add(pathStrOr(0, 'usage.memory.current', node)),
+          max: add(pathStrOr(0, 'usage.memory.max', node)),
+          percent: add(calcUsagePercent('usage.memory', node, combinedNodes.length)),
+        },
+        disk: {
+          current: add(pathStrOr(0, 'usage.disk.current', node)),
+          max: add(pathStrOr(0, 'usage.disk.max', node)),
+          percent: add(calcUsagePercent('usage.disk', node, combinedNodes.length)),
+        },
+      }, acc)
+      const usage = combinedNodes.reduce(specReducer, clusterUsageSpec)
+
       const masterNodes = nodesInCluster.filter(node => node.isMaster === 1)
       const healthyMasterNodes = masterNodes.filter(
         node => node.status === 'ok' && node.api_responding === 1)
@@ -69,6 +122,7 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
       )
       return {
         ...cluster,
+        usage,
         nodes: nodesInCluster,
         masterNodes,
         healthyMasterNodes,
@@ -97,11 +151,9 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
           }
         } catch (err) {
           console.log(err)
-          return cluster
         }
-      } else {
-        return cluster
       }
+      return cluster
     }, clusters)
   },
   deleteFn: async ({ id }) => {
@@ -117,7 +169,7 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
     filterIf(masterlessClusters, masterlessCluster),
     filterIf(prometheusClusters, hasPrometheusEnabled),
     filterIf(appCatalogClusters, hasAppCatalogEnabled),
-    filterIf(hasControlPanel, either(hasMasterNode, masterlessCluster))
+    filterIf(hasControlPanel, either(hasMasterNode, masterlessCluster)),
   )(items),
   defaultOrderBy: 'name',
 })
@@ -171,8 +223,8 @@ export const loadCloudProviderRegionDetails = createContextLoader(
     return { id: `${cloudProviderId}-${cloudProviderRegionId}`, ...response }
   },
   {
-    indexBy: ['cloudProviderId', 'cloudProviderRegionId']
-  }
+    indexBy: ['cloudProviderId', 'cloudProviderRegionId'],
+  },
 )
 
 export const flavorActions = createCRUDActions('flavors', { service: 'nova' })
@@ -211,7 +263,7 @@ export const loadCombinedHosts = createContextLoader(combinedHostsCacheKey, asyn
   // Convert it back to array form
   return Object.values(hostsById).map(combineHost)
 }, {
-  uniqueIdentifier: 'uuid',
+  uniqueIdentifier: 'id',
 })
 
 export const loadNodes = createContextLoader(nodesCacheKey, async (params, loadFromContext) => {

@@ -162,6 +162,7 @@ Progress.propTypes = {
   message: PropTypes.string,
   overlay: PropTypes.bool,
   inline: PropTypes.bool,
+  // eslint-disable-next-line react/no-unused-prop-types
   minHeight: PropTypes.number,
 }
 

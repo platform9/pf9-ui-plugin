@@ -136,7 +136,6 @@ const AddAwsClusterPage = () => {
                         options={templateOptions}
                         onChange={handleTemplateChoice({ setWizardContext, setFieldValue })}
                         info="Set common options from one of the available templates"
-                        notAsync
                       />
 
                       {/* AWS Availability Zone */}
@@ -153,7 +152,6 @@ const AddAwsClusterPage = () => {
                         label="Operating System"
                         options={operatingSystemOptions}
                         info="Operating System / AMI"
-                        notAsync
                       />
 
                       {/* CLUSTER CONFIGURATION STEP */}
