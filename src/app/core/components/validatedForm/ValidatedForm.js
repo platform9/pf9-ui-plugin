@@ -166,7 +166,7 @@ class ValidatedForm extends PureComponent {
       <form onSubmit={this.handleSubmit} className={classes.root} id={id}>
         <ValidatedFormProvider value={this.state}>
           {debug && <ValidatedFormDebug />}
-          {children}
+          {children instanceof Function ? children(this.state) : children}
         </ValidatedFormProvider>
       </form>
     )

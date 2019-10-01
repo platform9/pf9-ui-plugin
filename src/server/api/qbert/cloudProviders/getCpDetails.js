@@ -21,11 +21,18 @@ const randomOpenstackRegions = (numRegions = 5) => {
   return { Regions: regions }
 }
 
+const awsAzs = [
+  { RegionName: 'us-west-1', State: 'available', ZoneName: 'us-west-1' },
+  { RegionName: 'us-west-2', State: 'available', ZoneName: 'us-west-2' },
+  { RegionName: 'us-east-1', State: 'available', ZoneName: 'us-east-1' },
+  { RegionName: 'us-east-2', State: 'available', ZoneName: 'us-east-2' },
+]
+
 const randomAwsRegionDetails = (regionId) => {
   return {
-    azs: uniq(times(() => ({ 'RegionName': regionId, 'State': 'available', 'ZoneName': faker.random.word() }), 5)),
+    azs: awsAzs,
     domains: uniq(times(() => ({ 'Name': faker.random.word(), 'Id': faker.random.word() }), 8)),
-    flavors: uniq(times(faker.random.word, 15)),
+    flavors: 't2.small t2.medium t2.large'.split(' '),
     keyPairs: uniq(times(() => ({ 'KeyName': faker.random.word(), 'KeyFingerprint': faker.random.word() }), 5)),
     operatingSystems: ['centos', 'ubuntu'],
     vpcs: uniq(times(() => ({ 'CidrBlock': faker.internet.ip(), 'VpcName': faker.random.word() }), 5))

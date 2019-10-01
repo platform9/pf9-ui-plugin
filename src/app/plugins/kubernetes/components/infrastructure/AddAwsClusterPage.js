@@ -5,6 +5,7 @@ import FormWrapper from 'core/components/FormWrapper'
 // import KeyValuesField from 'core/components/validatedForm/KeyValuesField'
 // import NodesChooser from './NodesChooser'
 import AwsAvailabilityZoneChooser from './AwsAvailabilityZoneChooser'
+import AwsRegionFlavorPicklist from './AwsRegionFlavorPicklist'
 import CloudProviderPicklist from 'k8s/components/common/CloudProviderPicklist'
 import CloudProviderRegionPicklist from 'k8s/components/common/CloudProviderRegionPicklist'
 import PicklistField from 'core/components/validatedForm/PicklistField'
@@ -18,13 +19,70 @@ import useParams from 'core/hooks/useParams'
 // import { cloudProviderActions } from './actions'
 // import { propEq } from 'ramda'
 
-const initialContext = {}
+const initialContext = {
+  ami: 'ubuntu',
+  masterFlavor: 't2.small',
+  workerFlavor: 't2.small',
+  numMasters: 1,
+  numWorkers: 1,
+}
 
 const AddAwsClusterPage = () => {
   const { params, getParamsUpdater } = useParams()
 
   const handleSubmit = () => {
     // TODO
+  }
+
+  const templateOptions = [
+    { label: 'small (single dev) - 1 node master + worker (t2.small)', value: 'small' },
+    { label: 'medium (internal team) - 1 master + 3 workers (t2.medium)', value: 'medium' },
+    { label: 'large (production) - 3 masters + 5 workers (t2.large)', value: 'large' },
+  ]
+
+  const operatingSystemOptions = [
+    { label: 'Ubuntu', value: 'ubuntu' },
+    { label: 'CentOS', value: 'centos' },
+  ]
+
+  // The template picker allows the user to fill out some useful defaults for the fields.
+  // This greatly simplifies the number of fields that need to be filled out.
+  // Presets are as follows:
+  // small (single dev) - 1 node master + worker - select instance type (default t2.small)
+  // medium (internal team) - 1 master + 3 workers - select instance (default t2.medium)
+  // large (production) - 3 master + 5 workers - no workload on masters (default t2.large)
+  const handleTemplateChoice = ({ setWizardContext, setFieldValue }) => option => {
+    const options = {
+      small: {
+        numMasters: 1,
+        numWorkers: 0,
+        runWorkloadsOnMaster: true,
+        masterFlavor: 't2.small',
+        workerFlavor: 't2.small',
+      },
+      medium: {
+        numMasters: 1,
+        numWorkers: 3,
+        runWorkloadsOnMaster: false,
+        masterFlavor: 't2.medium',
+        workerFlavor: 't2.medium',
+      },
+      large: {
+        numMasters: 3,
+        numWorkers: 5,
+        runWorkloadsOnMaster: false,
+        masterFlavor: 't2.large',
+        workerFlavor: 't2.large',
+      }
+    }
+    if (!options[option]) return
+    setWizardContext(options[option])
+    Object.entries(options[option]).forEach(([key, value]) => {
+      setFieldValue(key)(value)
+    })
+
+    // set common default settings
+    // TODO: Choose the first AZ by default
   }
 
   return (
@@ -35,40 +93,113 @@ const AddAwsClusterPage = () => {
             <WizardStep stepId="basic" label="Basic Info">
               <FormWrapper title="Add Cluster">
                 <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext}>
-                  <TextField
-                    id="name"
-                    label="name"
-                    info="Name of the cluster"
-                    required
-                  />
-                  <PicklistField
-                    DropdownComponent={CloudProviderPicklist}
-                    id="cloudProvider"
-                    label="Cloud Provider"
-                    onChange={getParamsUpdater('cloudProviderId')}
-                    info="Nodes will be provisioned using this cloud provider."
-                    value={params.cloudProviderId}
-                    type="aws"
-                    required
-                  />
-                  <PicklistField
-                    DropdownComponent={CloudProviderRegionPicklist}
-                    disabled={!params.cloudProviderId}
-                    id="cloudProviderRegion"
-                    label="Region"
-                    cloudProviderId={params.cloudProviderId}
-                    onChange={getParamsUpdater('cloudProviderRegionId')}
-                    info="Region "
-                    value={params.cloudProviderRegionId}
-                    type="aws"
-                  />
-                  <AwsAvailabilityZoneChooser
-                    id="azs"
-                    info="Select from the Availability Zones for the specified region"
-                    cloudProviderId={params.cloudProviderId}
-                    cloudProviderRegionId={params.cloudProviderRegionId}
-                  />
-                  {/* Operating System */}
+                  {({ setFieldValue }) => (
+                    <>
+                      {/* Cluster Name */}
+                      <TextField
+                        id="name"
+                        label="name"
+                        info="Name of the cluster"
+                        required
+                      />
+
+                      {/* Cloud Provider */}
+                      <PicklistField
+                        DropdownComponent={CloudProviderPicklist}
+                        id="nodePoolUuid"
+                        label="Cloud Provider"
+                        onChange={getParamsUpdater('cloudProviderId')}
+                        info="Nodes will be provisioned using this cloud provider."
+                        value={params.cloudProviderId}
+                        type="aws"
+                        required
+                      />
+
+                      {/* AWS Region */}
+                      <PicklistField
+                        DropdownComponent={CloudProviderRegionPicklist}
+                        disabled={!params.cloudProviderId}
+                        id="region"
+                        label="Region"
+                        cloudProviderId={params.cloudProviderId}
+                        onChange={getParamsUpdater('cloudProviderRegionId')}
+                        info="Region "
+                        value={params.cloudProviderRegionId}
+                        type="aws"
+                      />
+
+                      {/* Template Chooser */}
+                      <PicklistField
+                        id="template"
+                        label="Cluster Template"
+                        options={templateOptions}
+                        onChange={handleTemplateChoice({ setWizardContext, setFieldValue })}
+                        info="Set common options from one of the available templates"
+                        notAsync
+                      />
+
+                      {/* AWS Availability Zone */}
+                      <AwsAvailabilityZoneChooser
+                        id="azs"
+                        info="Select from the Availability Zones for the specified region"
+                        cloudProviderId={params.cloudProviderId}
+                        cloudProviderRegionId={params.cloudProviderRegionId}
+                      />
+
+                      {/* Operating System */}
+                      <PicklistField
+                        id="ami"
+                        label="Operating System"
+                        options={operatingSystemOptions}
+                        info="Operating System / AMI"
+                        notAsync
+                      />
+
+                      {/* CLUSTER CONFIGURATION STEP */}
+                      {/* TODO: Leaving in first step for easier development.  Move this into its own step once we are done */}
+
+                      {/* Master node instance type */}
+                      <PicklistField
+                        DropdownComponent={AwsRegionFlavorPicklist}
+                        disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
+                        id="masterFlavor"
+                        label="Master Node Instance Type"
+                        cloudProviderId={params.cloudProviderId}
+                        cloudProviderRegionId={params.cloudProviderRegionId}
+                        info="Choose an instance type used by master nodes."
+                      />
+
+                      {/* Num master nodes */}
+                      <TextField
+                        id="numMasters"
+                        type="number"
+                        label="Number of master nodes"
+                        info="Number of master nodes to deploy.  3 nodes are required for an High Availability (HA) cluster."
+                        required
+                      />
+
+                      {/* Worker node instance type */}
+                      <PicklistField
+                        DropdownComponent={AwsRegionFlavorPicklist}
+                        disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
+                        id="workerFlavor"
+                        label="Worker Node Instance Type"
+                        cloudProviderId={params.cloudProviderId}
+                        cloudProviderRegionId={params.cloudProviderRegionId}
+                        info="Choose an instance type used by worker nodes."
+                      />
+
+                      {/* Num worker nodes */}
+                      <TextField
+                        id="numWorkers"
+                        type="number"
+                        label="Number of worker nodes"
+                        info="Number of worker nodes to deploy."
+                        required
+                      />
+                    </>
+                  )}
+
                 </ValidatedForm>
               </FormWrapper>
             </WizardStep>

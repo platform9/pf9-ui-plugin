@@ -84,27 +84,28 @@ const optionPropType = PropTypes.oneOfType([
 ])
 
 Picklist.propTypes = {
-  notAsync: PropTypes.bool,
-  name: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
-  options: PropTypes.arrayOf(optionPropType),
-  value: numOrString,
-  onChange: PropTypes.func,
   formField: PropTypes.bool,
+  label: PropTypes.string.isRequired,
   loading: PropTypes.bool,
+  name: PropTypes.string.isRequired,
+  notAsync: PropTypes.bool,
+  onChange: PropTypes.func,
+  options: PropTypes.arrayOf(optionPropType),
   showAll: PropTypes.bool,
   showNone: PropTypes.bool,
+  value: numOrString,
   variant: PropTypes.string,
 }
 
 Picklist.defaultProps = {
+  formField: false,
+  loading: false,
   notAsync: false,
+  options: [],
   showAll: true,
   showNone: false,
-  formField: false,
-  variant: 'outlined',
   value: '',
-  options: [],
+  variant: 'outlined',
 }
 
 export default Picklist

@@ -17,25 +17,27 @@ const PicklistField = React.forwardRef(({
   const openTooltip = useCallback(() => setOpen(true), [])
   const closeTooltip = useCallback(() => setOpen(false), [])
 
-  return <InfoTooltip open={open} info={info} placement={placement}>
-    <DropdownComponent
-      {...restProps}
-      formField
-      onMouseEnter={openTooltip}
-      onMouseLeave={closeTooltip}
-      onFocus={openTooltip}
-      onBlur={closeTooltip}
-      onClick={closeTooltip}
-      ref={ref}
-      id={id}
-      name={id}
-      label={label}
-      options={options}
-      value={value !== undefined ? value : ''}
-      error={hasError}
-      helperText={errorMessage}
-    />
-  </InfoTooltip>
+  return (
+    <InfoTooltip open={open} info={info} placement={placement}>
+      <DropdownComponent
+        {...restProps}
+        formField
+        onMouseEnter={openTooltip}
+        onMouseLeave={closeTooltip}
+        onFocus={openTooltip}
+        onBlur={closeTooltip}
+        onClick={closeTooltip}
+        ref={ref}
+        id={id}
+        name={id}
+        label={label}
+        options={options}
+        value={value !== undefined ? value : ''}
+        error={hasError}
+        helperText={errorMessage}
+      />
+    </InfoTooltip>
+  )
 })
 
 PicklistField.defaultProps = {
