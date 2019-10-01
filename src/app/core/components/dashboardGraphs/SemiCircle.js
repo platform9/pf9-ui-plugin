@@ -12,6 +12,7 @@ const styles = theme => ({
     padding: theme.spacing(1),
     width: ({ width }) => width,
     position: 'relative',
+    textAlign: 'center',
   },
   barProgress: {
     fill: 'none',

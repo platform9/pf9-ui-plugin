@@ -3,10 +3,10 @@ import { withStyles } from '@material-ui/styles'
 
 const styles = theme => ({
   network: {
-    fill: '#6ca2d1',
-    stroke: '#fff',
-    'stroke-width': '2'
-  }
+    fill: '#6CA2D1',
+    stroke: '#FFF',
+    'stroke-width': '2',
+  },
 })
 
 @withStyles(styles)
@@ -20,6 +20,6 @@ class SvgNetwork extends React.PureComponent {
       <rect className={classes.network} width={side} height={side} transform={transform} />
     )
   }
-};
+}
 
 export default SvgNetwork
