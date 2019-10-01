@@ -27,62 +27,63 @@ const initialContext = {
   numWorkers: 1,
 }
 
+const templateOptions = [
+  { label: 'small (single dev) - 1 node master + worker (t2.small)', value: 'small' },
+  { label: 'medium (internal team) - 1 master + 3 workers (t2.medium)', value: 'medium' },
+  { label: 'large (production) - 3 masters + 5 workers (t2.large)', value: 'large' },
+]
+
+const operatingSystemOptions = [
+  { label: 'Ubuntu', value: 'ubuntu' },
+  { label: 'CentOS', value: 'centos' },
+]
+
+// The template picker allows the user to fill out some useful defaults for the fields.
+// This greatly simplifies the number of fields that need to be filled out.
+// Presets are as follows:
+// small (single dev) - 1 node master + worker - select instance type (default t2.small)
+// medium (internal team) - 1 master + 3 workers - select instance (default t2.medium)
+// large (production) - 3 master + 5 workers - no workload on masters (default t2.large)
+const handleTemplateChoice = ({ setWizardContext, setFieldValue }) => option => {
+  const options = {
+    small: {
+      numMasters: 1,
+      numWorkers: 0,
+      runWorkloadsOnMaster: true,
+      masterFlavor: 't2.small',
+      workerFlavor: 't2.small',
+    },
+    medium: {
+      numMasters: 1,
+      numWorkers: 3,
+      runWorkloadsOnMaster: false,
+      masterFlavor: 't2.medium',
+      workerFlavor: 't2.medium',
+    },
+    large: {
+      numMasters: 3,
+      numWorkers: 5,
+      runWorkloadsOnMaster: false,
+      masterFlavor: 't2.large',
+      workerFlavor: 't2.large',
+    }
+  }
+
+  if (!options[option]) return
+  setWizardContext(options[option])
+  Object.entries(options[option]).forEach(([key, value]) => {
+    setFieldValue(key)(value)
+  })
+
+  // set common default settings
+  // TODO: Choose the first AZ by default
+}
+
 const AddAwsClusterPage = () => {
   const { params, getParamsUpdater } = useParams()
 
   const handleSubmit = () => {
     // TODO
-  }
-
-  const templateOptions = [
-    { label: 'small (single dev) - 1 node master + worker (t2.small)', value: 'small' },
-    { label: 'medium (internal team) - 1 master + 3 workers (t2.medium)', value: 'medium' },
-    { label: 'large (production) - 3 masters + 5 workers (t2.large)', value: 'large' },
-  ]
-
-  const operatingSystemOptions = [
-    { label: 'Ubuntu', value: 'ubuntu' },
-    { label: 'CentOS', value: 'centos' },
-  ]
-
-  // The template picker allows the user to fill out some useful defaults for the fields.
-  // This greatly simplifies the number of fields that need to be filled out.
-  // Presets are as follows:
-  // small (single dev) - 1 node master + worker - select instance type (default t2.small)
-  // medium (internal team) - 1 master + 3 workers - select instance (default t2.medium)
-  // large (production) - 3 master + 5 workers - no workload on masters (default t2.large)
-  const handleTemplateChoice = ({ setWizardContext, setFieldValue }) => option => {
-    const options = {
-      small: {
-        numMasters: 1,
-        numWorkers: 0,
-        runWorkloadsOnMaster: true,
-        masterFlavor: 't2.small',
-        workerFlavor: 't2.small',
-      },
-      medium: {
-        numMasters: 1,
-        numWorkers: 3,
-        runWorkloadsOnMaster: false,
-        masterFlavor: 't2.medium',
-        workerFlavor: 't2.medium',
-      },
-      large: {
-        numMasters: 3,
-        numWorkers: 5,
-        runWorkloadsOnMaster: false,
-        masterFlavor: 't2.large',
-        workerFlavor: 't2.large',
-      }
-    }
-    if (!options[option]) return
-    setWizardContext(options[option])
-    Object.entries(options[option]).forEach(([key, value]) => {
-      setFieldValue(key)(value)
-    })
-
-    // set common default settings
-    // TODO: Choose the first AZ by default
   }
 
   return (

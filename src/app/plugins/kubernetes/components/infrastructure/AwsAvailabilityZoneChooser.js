@@ -1,7 +1,7 @@
 import React, { forwardRef } from 'react'
 import PropTypes from 'prop-types'
 import { compose, pathStrOr, projectAs } from 'app/utils/fp'
-import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
+import { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
 import useDataLoader from 'core/hooks/useDataLoader'
 import MultiSelect from 'core/components/MultiSelect'
 import { withInfoTooltip } from 'core/components/InfoTooltip'
@@ -41,5 +41,4 @@ AwsAvailabilityZoneChooser.propTypes = {
 
 export default compose(
   withInfoTooltip,
-  withFormContext,
 )(AwsAvailabilityZoneChooser)
