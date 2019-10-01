@@ -3,6 +3,7 @@ import { cloudProvidersCacheKey } from './actions'
 
 export const options = {
   addUrl: '/ui/kubernetes/infrastructure/cloudProviders/add',
+  addText: 'Add Cloud Provider',
   columns: [
     { id: 'name', label: 'Name' },
     { id: 'type', label: 'Type' },

@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react'
-import { withRouter } from 'react-router'
-import { compose, pluck } from 'ramda'
+import { pluck } from 'ramda'
 // This table essentially has the same functionality as the <NodesList>
 // except that it is only the nodes from the a single cluster.
 import { columns } from './NodesListPage'
@@ -8,6 +7,7 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import createListTableComponent from 'core/helpers/createListTableComponent'
 import { clusterActions, loadNodes } from 'k8s/components/infrastructure/actions'
 import { emptyArr } from 'utils/fp'
+import useReactRouter from 'use-react-router'
 
 const ListTable = createListTableComponent({
   title: 'Cluster Nodes',
@@ -17,7 +17,8 @@ const ListTable = createListTableComponent({
   uniqueIdentifier: 'uuid',
 })
 
-const ClusterNodes = ({ match }) => {
+const ClusterNodes = () => {
+  const { match } = useReactRouter()
   const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
   const [nodes, loadingNodes] = useDataLoader(loadNodes)
   const clusterNodes = useMemo(() => {
@@ -32,6 +33,4 @@ const ClusterNodes = ({ match }) => {
   return <ListTable data={clusterNodes} loading={loadingClusters || loadingNodes} />
 }
 
-export default compose(
-  withRouter,
-)(ClusterNodes)
+export default ClusterNodes

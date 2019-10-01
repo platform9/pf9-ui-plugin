@@ -1,15 +1,13 @@
 import React from 'react'
 import InfoPanel from 'core/components/InfoPanel'
 import UsageWidget from 'core/components/dashboardGraphs/UsageWidget'
-import clusterUsageStats from './clusterUsageStats'
+import useReactRouter from 'use-react-router'
 import { Grid } from '@material-ui/core'
-import { compose, propOr } from 'ramda'
 import { clusterActions } from './actions'
-import { withAppContext } from 'core/AppProvider'
-import { withRouter } from 'react-router'
-import { withStyles } from '@material-ui/styles'
-import withDataLoader from 'core/hocs/withDataLoader'
-import withDataMapper from 'core/hocs/withDataMapper'
+import { makeStyles } from '@material-ui/styles'
+import useDataLoader from 'core/hooks/useDataLoader'
+import Progress from 'core/components/progress/Progress'
+import { emptyObj } from 'utils/fp'
 
 const overviewStats = cluster => ({
   'Status':              cluster.status,
@@ -29,18 +27,21 @@ const openstackProps = cluster => ({
   'MetalLB CIDR': cluster.metallbCidr,
 })
 
-const styles = theme => ({
+const useStyles = makeStyles(theme => ({
   root: {
     flexGrow: 1,
     marginTop: theme.spacing(1)
   },
-})
+}))
 
-const ClusterInfo = ({ match, data, context, classes }) => {
-  const cluster = data.clusters.find(x => x.uuid === match.params.id)
-  const { usage } = clusterUsageStats(cluster, context)
+const ClusterInfo = () => {
+  const { match } = useReactRouter()
+  const classes = useStyles()
+  const [clusters, loading] = useDataLoader(clusterActions.list)
+  const cluster = clusters.find(x => x.uuid === match.params.id) || {}
+  const { usage = emptyObj } = cluster
   return (
-    <React.Fragment>
+    <Progress loading={loading}>
       <Grid container spacing={4} className={classes.root}>
         <Grid item xs={4}>
           <UsageWidget title="Compute" stats={usage.compute} />
@@ -60,14 +61,8 @@ const ClusterInfo = ({ match, data, context, classes }) => {
           <InfoPanel title="OpenStack Properties" items={openstackProps(cluster)} />
         </Grid>
       </Grid>
-    </React.Fragment>
+    </Progress>
   )
 }
 
-export default compose(
-  withStyles(styles),
-  withRouter,
-  withAppContext,
-  withDataLoader({ clusters: clusterActions.list }),
-  withDataMapper({ clusters: propOr([], 'clusters') }),
-)(ClusterInfo)
+export default ClusterInfo
