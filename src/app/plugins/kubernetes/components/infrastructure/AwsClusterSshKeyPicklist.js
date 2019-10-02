@@ -1,10 +1,9 @@
 import React, { forwardRef } from 'react'
 import PropTypes from 'prop-types'
-import { compose, pathStrOr } from 'app/utils/fp'
+import { pathStrOr } from 'app/utils/fp'
 import { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
 import useDataLoader from 'core/hooks/useDataLoader'
 import Picklist from 'core/components/Picklist'
-import { withInfoTooltip } from 'core/components/InfoTooltip'
 import { loadCloudProviderRegionDetails } from './actions'
 
 const AwsClusterSshKeyPicklist = forwardRef(({
@@ -36,6 +35,4 @@ AwsClusterSshKeyPicklist.propTypes = {
   ...ValidatedFormInputPropTypes,
 }
 
-export default compose(
-  withInfoTooltip,
-)(AwsClusterSshKeyPicklist)
+export default AwsClusterSshKeyPicklist
