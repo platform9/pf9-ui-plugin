@@ -8,6 +8,10 @@ import AwsAvailabilityZoneChooser from './AwsAvailabilityZoneChooser'
 import AwsRegionFlavorPicklist from './AwsRegionFlavorPicklist'
 import CloudProviderPicklist from 'k8s/components/common/CloudProviderPicklist'
 import CloudProviderRegionPicklist from 'k8s/components/common/CloudProviderRegionPicklist'
+import AwsClusterSshKeyPicklist from './AwsClusterSshKeyPicklist'
+import ClusterDomainPicklist from './ClusterDomainPicklist'
+import CheckboxField from 'core/components/validatedForm/CheckboxField'
+import KeyValuesField from 'core/components/validatedForm/KeyValuesField'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import TextField from 'core/components/validatedForm/TextField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
@@ -25,6 +29,10 @@ const initialContext = {
   workerFlavor: 't2.small',
   numMasters: 1,
   numWorkers: 1,
+  usePf9Domain: true,
+  vpcOption: 'newVpc',
+  containersCidr: '10.20.0.0/16',
+  servicesCidr: '10.21.0.0/16',
 }
 
 const templateOptions = [
@@ -36,6 +44,12 @@ const templateOptions = [
 const operatingSystemOptions = [
   { label: 'Ubuntu', value: 'ubuntu' },
   { label: 'CentOS', value: 'centos' },
+]
+
+const networkPluginOptions = [
+  { label: 'Flannel', value: 'flannel' },
+  { label: 'Calico', value: 'calico' },
+  { label: 'Canal (experimental)', value: 'canal' },
 ]
 
 // The template picker allows the user to fill out some useful defaults for the fields.
@@ -79,12 +93,64 @@ const handleTemplateChoice = ({ setWizardContext, setFieldValue }) => option => 
   // TODO: Choose the first AZ by default
 }
 
+const vpcOptions = [
+  { label: '+ Create new VPC', value: 'newVpc' },
+  { label: 'Use existing VPC', value: 'existing' },
+  { label: 'Use existing VPC with VPN', value: 'existingNewVpn' },
+]
+
+const renderVpcFields = (vpcOption) => {
+  switch (vpcOption) {
+    case 'newVpc':
+      return (
+        <div>TODO</div>
+      )
+    case 'existing':
+      return (
+        <div>TODO</div>
+      )
+    case 'existingNewVpn':
+      return (
+        <div>TODO</div>
+      )
+  }
+}
+
+// These fields are only rendered when the user opts to not use a `platform9.net` domain.
+const renderCustomNetworkingFields = ({ params, values }) => {
+  const updateFqdns = () => {
+    // TODO: When the domain changes, update the API and services FQDN
+  }
+
+  return (
+    <>
+      <PicklistField
+        DropdownComponent={ClusterDomainPicklist}
+        id="domainId"
+        label="Domain"
+        cloudProviderId={params.cloudProviderId}
+        onChange={updateFqdns}
+        cloudProviderRegionId={params.cloudProviderRegionId}
+        info="Select the base domain name to be used for the API and service FQDNs"
+      />
+
+      <PicklistField
+        id="vpcOption"
+        label="Operating System"
+        options={vpcOptions}
+        info="Select a network configuration. Read this article for detailed information about each network configuration type."
+      />
+      {renderVpcFields(values.vpcOption, {})}
+    </>
+  )
+}
+
+const handleSubmit = () => {
+  // TODO
+}
+
 const AddAwsClusterPage = () => {
   const { params, getParamsUpdater } = useParams()
-
-  const handleSubmit = () => {
-    // TODO
-  }
 
   return (
     <Wizard onComplete={handleSubmit} context={initialContext}>
@@ -94,7 +160,7 @@ const AddAwsClusterPage = () => {
             <WizardStep stepId="basic" label="Basic Info">
               <FormWrapper title="Add Cluster">
                 <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext}>
-                  {({ setFieldValue }) => (
+                  {({ setFieldValue, values }) => (
                     <>
                       {/* Cluster Name */}
                       <TextField
@@ -168,7 +234,7 @@ const AddAwsClusterPage = () => {
                         info="Choose an instance type used by master nodes."
                       />
 
-                      {/* Num master nodes */}
+                      {/* Num master nodes (TODO: this should be a picklist of 1, 3, or 5 as the only options) */}
                       <TextField
                         id="numMasters"
                         type="number"
@@ -196,6 +262,103 @@ const AddAwsClusterPage = () => {
                         info="Number of worker nodes to deploy."
                         required
                       />
+
+                      {/* NETWORK INFO STEP */}
+                      {/* TODO: Leaving in first step for easier development.  Move this into its own step once we are done */}
+
+                      {/* Use PF9 domain */}
+                      <CheckboxField
+                        id="usePf9Domain"
+                        label="Use the platform9.net domain"
+                        info="Select this option if you want Platform9 to automatically generate the endpoints or if you do not have access to Route 53."
+                      />
+
+                      {values.usePf9Domain || renderCustomNetworkingFields({ params, values, setFieldValue, setWizardContext })}
+
+                      {/* Containers CIDR */}
+                      <TextField
+                        id="containersCidr"
+                        label="Containers CIDR"
+                        info="Defines the network CIDR from which the flannel networking layer allocates IP addresses to Docker containers. This CIDR should not overlap with the VPC CIDR. Each node gets a /24 subnet. Choose a CIDR bigger than /23 depending on the number of nodes in your cluster. A /16 CIDR gives you 256 nodes."
+                        required
+                      />
+
+                      {/* Services CIDR */}
+                      <TextField
+                        id="servicesCidr"
+                        label="Services CIDR"
+                        info="Defines the network CIDR from which Kubernetes allocates virtual IP addresses to Services.  This CIDR should not overlap with the VPC CIDR."
+                        required
+                      />
+
+                      {/* HTTP proxy */}
+                      <TextField
+                        id="httpProxy"
+                        label="HTTP Proxy"
+                        info="Specify the HTTP proxy for this cluster.  Leave blank for none.  Uses format of <scheme>://<username>:<password>@<host>:<port> where <username>:<password>@ is optional."
+                      />
+
+                      {/* Network plugin */}
+                      <PicklistField
+                        id="networkPlugin"
+                        label="Network backend"
+                        options={networkPluginOptions}
+                        info=""
+                      />
+
+                      {/* HTTP proxy */}
+                      {values.networkPlugin === 'calico' &&
+                        <TextField
+                          id="mtuSize"
+                          label="MTU Size"
+                          info="Maximum Transmission Unit (MTU) for the interface (in bytes)"
+                        />
+                      }
+
+                      {/* ADVANCED CONFIGURATION STEP */}
+                      {/* TODO: Leaving in first step for easier development.  Move this into its own step once we are done */}
+
+                      {/* SSH Key */}
+                      <PicklistField
+                        DropdownComponent={AwsClusterSshKeyPicklist}
+                        disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
+                        id="sshKey"
+                        label="Worker Node Instance Type"
+                        cloudProviderId={params.cloudProviderId}
+                        cloudProviderRegionId={params.cloudProviderRegionId}
+                        info="Select an AWS SSH key to be associated with the nodes. This key can be used to access the nodes for debugging or other purposes."
+                        required
+                      />
+
+                      {/* Privileged (TODO: disabled and set to true if networkPlugin is calico, canal, or weave) */}
+                      <CheckboxField
+                        id="privileged"
+                        label="Privileged"
+                        info="Allows this cluster to run privileged containers. Read this article for more information."
+                      />
+
+                      {/* Advanced API Configuration (TODO) */}
+
+                      {/* Enable Application Catalog */}
+                      <CheckboxField
+                        id="appCatalogEnabled"
+                        label="Enable Application Catalog"
+                        info="Allows this cluster to run privileged containers. Read this article for more information."
+                      />
+
+                      {/* Custom AMI */}
+                      <TextField
+                        id="customAmi"
+                        label="Custom AMI ID"
+                        info="Use a custom AMI (leave blank for none) to create cluster nodes with, in case our AMI defaults are not available for you."
+                      />
+
+                      {/* Tags */}
+                      <KeyValuesField
+                        id="tags"
+                        label="tags"
+                        info="Add tag metadata to this cluster"
+                      />
                     </>
                   )}
 
@@ -206,18 +369,31 @@ const AddAwsClusterPage = () => {
             <WizardStep stepId="config" label="Cluster Configuration">
               <FormWrapper title="Cluster Configuration">
                 <ValidatedForm>
-                  {/* Master node instance type */}
-                  {/* Num master nodes */}
+                  {/* TODO */}
+                </ValidatedForm>
+              </FormWrapper>
+            </WizardStep>
 
-                  {/* Worker node instance type */}
-                  {/* Num worker nodes */}
-                  {/* Checkbox 'Enable Auto Scaling' */}
-                  {/* Max worker nodes */}
+            <WizardStep stepId="network" label="Network Info">
+              <FormWrapper title="Network Info">
+                <ValidatedForm>
+                  {/* TODO */}
+                </ValidatedForm>
+              </FormWrapper>
+            </WizardStep>
 
-                  {/* Disable workloads on master nodes */}
-                  {/* Enable spot workers */}
-                  {/* Percent of worker nodes as spot instances */}
-                  {/* Spot price */}
+            <WizardStep stepId="advanced" label="Advanced Configuration">
+              <FormWrapper title="Advanced Configuration">
+                <ValidatedForm>
+                  {/* TODO */}
+                </ValidatedForm>
+              </FormWrapper>
+            </WizardStep>
+
+            <WizardStep stepId="review" label="Review">
+              <FormWrapper title="Review">
+                <ValidatedForm>
+                  {/* TODO */}
                 </ValidatedForm>
               </FormWrapper>
             </WizardStep>
@@ -229,257 +405,3 @@ const AddAwsClusterPage = () => {
 }
 
 export default AddAwsClusterPage
-/*
-import ApiClient from 'api-client/ApiClient'
-import { withAppContext } from 'core/AppProvider'
-import withDataLoader from 'core/hocs/withDataLoader'
-import withDataMapper from 'core/hocs/withDataMapper'
-import {
-  cloudProviderActions, flavorActions, regionActions,
-} from 'k8s/components/infrastructure/actions'
-
-const initialContext = {
-  manualDeploy: false,
-  disableWorkloadsOnMaster: true,
-  masterNodes: 1,
-  useHttpProxy: false,
-  clusterTags: [],
-  securityGroups: [],
-}
-
-// TODO Refactor this to be a function component and use hooks
-class AddClusterPage extends PureComponent {
-  state = {
-    azs: [],
-    domains: [],
-    flavors: [],
-    images: [],
-    keyPairs: [],
-    operatingSystems: [],
-    regions: [],
-    vpcs: [],
-    networks: [],
-    subnets: [],
-    manualDeploy: false,
-    masterNodes: [],
-    workerNodes: [],
-    enableMetalLb: false,
-  }
-
-  handleSubmit = () => console.log('TODO: AddClusterPage#handleSubmit')
-
-  handleCpChange = async cpId => {
-    const cpDetails = await ApiClient.getInstance().qbert.getCloudProviderDetails(cpId)
-    const cp = this.props.data.cloudProviders.find(x => x.uuid === cpId)
-    const regions = cpDetails.Regions.map(prop('RegionName'))
-    this.setState({ cpId, regions, cpType: cp.type })
-  }
-
-  handleRegionChange = async regionId => {
-    const regionDetails = await ApiClient.getInstance().qbert.getCloudProviderRegionDetails(this.state.cpId, regionId)
-    this.setState(regionDetails) // sets azs, domains, images, flavors, keyPairs, networks, operatingSystems, and vpcs
-  }
-
-  handleNetworkChange = networkId => {
-    const net = this.state.networks.find(propEq('id', networkId))
-    this.setState({ subnets: net.subnets })
-  }
-
-  setField = key => value => this.setState({ [key]: value })
-
-  setMasterNodes = masterNodes => this.setState({ masterNodes })
-  setWorkerNodes = workerNodes => this.setState({ workerNodes })
-
-  renderReviewTable = wizard => {
-    const { cloudProviders } = this.props.data
-
-    // React will always call this render method even before the user has populated any fields.
-    // If we ensure all the data exist before proceeding we can remove lots of ugly conditionals
-    // later on.
-    if (!cloudProviders || !wizard.cloudProvider) { return null }
-
-    const cp = cloudProviders.find(propEq('uuid', wizard.cloudProvider))
-    const { cpType } = this.state
-
-    // TODO: need to find a way to clean up the conditionals from the old code base
-    //
-    // conditionals:
-    //
-    // not manualDeploy
-    // openstack
-    // regionType
-    // useHttpProxy
-    // useAdvancedApiConfig
-    // is manualDeploy || aws
-    // create new VPC
-    // enableSpotWorkers
-    // enableMetalLB
-    // configureNetworkBackend
-    let review = {
-      'Cluster Deployment Type': wizard.manualDeploy ? 'manual' : 'auto',
-    }
-    if (!wizard.manualDeploy) {
-      review['Cloud Provider'] = cp.name
-      if (cpType === 'openstack') {
-      }
-      if (cpType === 'aws') {
-      }
-    }
-
-    return <pre>{JSON.stringify(review, null, 4)}</pre>
-  }
-
-  renderManualDeployNetworking = () => (
-    <React.Fragment>
-      <TextField
-        id="virtualIP"
-        label="Virtual IP"
-        info="Virtual IP address for cluster"
-      />
-      <PicklistField
-        id="virtualIpInterface"
-        label="Virtual IP address for cluster"
-        options={[]}
-        info={
-          <span>
-            Specify the virtual IP address that will be used to provide access to the API server endpoint for this cluster. Refer to
-            <ExternalLink url="https://docs.platform9.com/support/ha-for-baremetal-multimaster-kubernetes-cluster-service-type-load-balancer/">this article</ExternalLink>
-            for more information re how the VIP service operates, VIP configuration, etc.
-          </span>
-        }
-      />
-      <Checkbox
-        id="enableMetalLb"
-        label="Enable MetalLB"
-        info="Select if MetalLB should load-balancer should be enabled for this cluster. Platform9 uses MetalLB - a load-balancer implementation for bare metal Kubernetes clusters that uses standard routing protocols - for service level load balancing. Enabling MetalLB on this cluster will provide the ability to create services of type load-balancer."
-        onChange={value => this.setState({ enableMetalLb: value })}
-      />
-      {this.state.enableMetalLb && this.renderMetalLbFields()}
-    </React.Fragment>
-  )
-
-  renderMetalLbFields = () => (
-    <React.Fragment>
-      <TextField id="metalAddressPoolStart" label="Metal Address Pool Start" />
-      <TextField id="metalAddressPoolEnd" label="Metal Address Pool End" />
-    </React.Fragment>
-  )
-
-  render () {
-    const { data } = this.props
-    const { images, flavors, keyPairs, manualDeploy, networks, regions, subnets } = this.state
-    const regionOptions = regions
-    const imageOptions = projectAs({ value: 'id', label: 'name' }, images)
-    const flavorOptions = projectAs({ value: 'id', label: 'name' }, flavors)
-    const networkOptions = networks.map(x => ({ value: x.id, label: x.name || x.label }))
-    const subnetOptions = subnets.map(x => ({ value: x.id, label: `${x.name} ${x.cidr}` }))
-
-    // AWS and OpenStack cloud providers call this field differently
-    const sshKeys = keyPairs.map(x => x.name || x.KeyName)
-    return (
-      <FormWrapper title="Add Cluster">
-        <Wizard onComplete={this.handleSubmit} context={initialContext}>
-          {({ wizardContext, setWizardContext, onNext }) => {
-            return (
-              <React.Fragment>
-                <WizardStep stepId="type" label="Cluster Type">
-                  <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
-                    <Checkbox
-                      id="manualDeploy"
-                      label="Deploy cluster via install agent"
-                      onChange={this.setField('manualDeploy')}
-                      info="Use this option to download and deploy Platform9 host agent on individual nodes to create a cluster using them."
-                    />
-                    <TextField
-                      id="name"
-                      label="name"
-                      info="Name of the cluster"
-                    />
-                    {!manualDeploy && <React.Fragment>
-                      <PicklistField
-                        id="cloudProvider"
-                        label="Cloud Provider"
-                        options={cloudProviderOptions}
-                        onChange={this.handleCpChange}
-                        info="Nodes will be provisioned using this cloud provider."
-                      />
-                      <PicklistField
-                        id="region"
-                        label="Region"
-                        options={regionOptions}
-                        onChange={this.handleRegionChange}
-                      />
-                    </React.Fragment>}
-                    {manualDeploy && <NodesChooser
-                      name="masterNodes"
-                      label="Master Nodes (choose 1, 3, or 5 nodes)"
-                      onChange={this.setMasterNodes}
-                    />}
-                  </ValidatedForm>
-                </WizardStep>
-                <WizardStep stepId="config" label="Configuration">
-                  <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
-                    <Checkbox id="disableWorkloadsOnMaster" label="Disable workloads on master nodes" />
-                    {!manualDeploy && <React.Fragment>
-                      <PicklistField id="image" label="Image" options={imageOptions} />
-                      <PicklistField id="masterFlavor" label="Master node instance flavor" options={flavorOptions} />
-                      <PicklistField id="workerFlavor" label="Worker node instance flavor" options={flavorOptions} />
-                      <TextField id="masterNodes" label="Number of master nodes" type="number" />
-                      <TextField id="numWorkers" label="Number of worker nodes" type="number" />
-                    </React.Fragment>}
-                    {manualDeploy && <NodesChooser
-                      name="workerNodes"
-                      label="Worker Nodes"
-                      onChange={this.setWorkerNodes}
-                    />}
-                  </ValidatedForm>
-                </WizardStep>
-                <WizardStep stepId="network" label="Networking">
-                  <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
-                    {manualDeploy && this.renderManualDeployNetworking(wizardContext)}
-                    <PicklistField id="network" label="Network" options={networkOptions} onChange={this.handleNetworkChange} />
-                    <PicklistField id="subnet" label="Subnets" options={subnetOptions} />
-                    <p>Placeholder: Security groups</p>
-                    <TextField id="apiFqdn" label="API FQDN" />
-                    <TextField id="containersCidr" label="Containers CIDR" />
-                    <TextField id="servicesCidr" label="Services CIDR" />
-                    <Checkbox id="useHttpProxy" label="Use HTTP proxy" />
-                  </ValidatedForm>
-                </WizardStep>
-                <WizardStep stepId="advancedConfig" label="Advanced Configuration">
-                  <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
-                    <PicklistField id="keyPair" label="SSH key" options={sshKeys} />
-                    <Checkbox id="privileged" label="Privileged" />
-                    <Checkbox id="useAdvancedApiConfig" label="Advanced API configuration" />
-                    <Checkbox id="appCatalogEnabled" label="Enable application catalog" />
-                    <KeyValuesField id="clusterTags" label="Tags" />
-                  </ValidatedForm>
-                </WizardStep>
-                <WizardStep stepId="review" label="Review">
-                  <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
-                    {this.renderReviewTable(wizardContext)}
-                  </ValidatedForm>
-                </WizardStep>
-              </React.Fragment>
-            )
-          }}
-        </Wizard>
-      </FormWrapper>
-    )
-  }
-}
-
-export default compose(
-  withAppContext,
-  withDataLoader({
-    cloudProviders: cloudProviderActions.list,
-    flavors: flavorActions.list,
-    regions: regionActions.list,
-  }),
-  withDataMapper({
-    cloudProviders: propOr([], 'cloudProviders'),
-    flavors: propOr([], 'flavors'),
-    regions: propOr([], 'regions'),
-  }),
-)(AddClusterPage)
-*/
