@@ -24,7 +24,7 @@ import UpdatePrometheusRulePage from './components/prometheus/UpdatePrometheusRu
 import UpdatePrometheusServiceMonitorPage from './components/prometheus/UpdateServiceMonitorPage'
 import UpdatePrometheusAlertManagerPage
   from './components/prometheus/UpdatePrometheusAlertManagerPage'
-import LoggingListPage from './components/logging/LoggingListPage'
+import LoggingIndexPage from './components/logging/LoggingIndexPage'
 import LoggingAddPage from './components/logging/LoggingAddPage'
 import LoggingEditPage from './components/logging/LoggingEditPage'
 import config from '../../../../config'
@@ -130,7 +130,7 @@ Kubernetes.registerPlugin = pluginManager => {
       {
         name: 'Logging (beta)',
         link: { path: '/logging', exact: true },
-        component: LoggingListPage,
+        component: LoggingIndexPage,
       },
       {
         name: 'Add Logging',

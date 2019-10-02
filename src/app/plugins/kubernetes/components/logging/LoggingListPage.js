@@ -51,7 +51,6 @@ const LoggingListPage = () => {
   const batchActions = getActions(classes, history)
 
   const options = {
-    innerTitle: 'Logging',
     addText: 'New Logging',
     uniqueIdentifier: 'cluster',
     loaderFn: qbert.getLoggings,
