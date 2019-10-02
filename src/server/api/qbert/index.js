@@ -108,9 +108,9 @@ router.delete(`${monitoringBase}/namespaces/:namespace/prometheuses/:name`, toke
 
 // TODO: check Logging urls
 const loggingBase = `/apis/logging.pf9.io/v1alpha1`
-router.get(`/${loggingBase}/loggings`, tokenValidator, getLoggings)
-router.post(`/${loggingBase}/loggings`, tokenValidator, postLogging)
-router.put(`/${loggingBase}/loggings/:clusterId`, tokenValidator, putLogging)
-router.delete(`/${loggingBase}/loggings/:clusterId`, tokenValidator, deleteLogging)
+router.get(`${loggingBase}/loggings`, tokenValidator, getLoggings)
+router.post(`${loggingBase}/loggings`, tokenValidator, postLogging)
+router.put(`${loggingBase}/loggings/:clusterId`, tokenValidator, putLogging)
+router.delete(`${loggingBase}/loggings/:clusterId`, tokenValidator, deleteLogging)
 
 export default router
