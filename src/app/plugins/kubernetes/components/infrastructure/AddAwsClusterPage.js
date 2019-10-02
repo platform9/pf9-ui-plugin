@@ -24,11 +24,13 @@ import useParams from 'core/hooks/useParams'
 // import { propEq } from 'ramda'
 
 const initialContext = {
+  template: 'small',
   ami: 'ubuntu',
   masterFlavor: 't2.small',
   workerFlavor: 't2.small',
   numMasters: 1,
   numWorkers: 1,
+  enableCAS: false,
   usePf9Domain: true,
   vpcOption: 'newVpc',
   containersCidr: '10.20.0.0/16',
@@ -46,10 +48,10 @@ const operatingSystemOptions = [
   { label: 'CentOS', value: 'centos' },
 ]
 
-const networkPluginOptions = [
-  { label: 'Flannel', value: 'flannel' },
-  { label: 'Calico', value: 'calico' },
-  { label: 'Canal (experimental)', value: 'canal' },
+const numMasterOptions = [
+  { label: '1', value: 1 },
+  { label: '3', value: 3 },
+  { label: '5', value: 5 },
 ]
 
 // The template picker allows the user to fill out some useful defaults for the fields.
@@ -63,21 +65,21 @@ const handleTemplateChoice = ({ setWizardContext, setFieldValue }) => option => 
     small: {
       numMasters: 1,
       numWorkers: 0,
-      runWorkloadsOnMaster: true,
+      allowWorkloadsOnMaster: true,
       masterFlavor: 't2.small',
       workerFlavor: 't2.small',
     },
     medium: {
       numMasters: 1,
       numWorkers: 3,
-      runWorkloadsOnMaster: false,
+      allowWorkloadsOnMaster: false,
       masterFlavor: 't2.medium',
       workerFlavor: 't2.medium',
     },
     large: {
       numMasters: 3,
       numWorkers: 5,
-      runWorkloadsOnMaster: false,
+      allowWorkloadsOnMaster: false,
       masterFlavor: 't2.large',
       workerFlavor: 't2.large',
     }
@@ -103,16 +105,41 @@ const renderVpcFields = (vpcOption) => {
   switch (vpcOption) {
     case 'newVpc':
       return (
-        <div>TODO</div>
+        <CheckboxField
+          id="isPrivate"
+          label="Deploy nodes using private subnet"
+          info=""
+        />
       )
     case 'existing':
       return (
-        <div>TODO</div>
+        <div>
+          {/* TODO: public subnets for each AZ */}
+          <CheckboxField
+            id="isPrivate"
+            label="Deploy nodes using private subnet"
+            info=""
+          />
+          {/* TODO: private subnets for each AZ if isPrivate */}
+        </div>
       )
     case 'existingNewVpn':
       return (
         <div>TODO</div>
       )
+  }
+}
+
+const networkPluginOptions = [
+  { label: 'Flannel', value: 'flannel' },
+  { label: 'Calico', value: 'calico' },
+  { label: 'Canal (experimental)', value: 'canal' },
+]
+
+const handleNetworkPluginChange = ({ setWizardContext, setFieldValue }) => option => {
+  if (['calico', 'canal', 'weave'].includes(option)) {
+    setWizardContext({ privileged: true })
+    setFieldValue('privileged')(true)
   }
 }
 
@@ -132,13 +159,15 @@ const renderCustomNetworkingFields = ({ params, values }) => {
         onChange={updateFqdns}
         cloudProviderRegionId={params.cloudProviderRegionId}
         info="Select the base domain name to be used for the API and service FQDNs"
+        required
       />
 
       <PicklistField
         id="vpcOption"
-        label="Operating System"
+        label="VPC Network"
         options={vpcOptions}
         info="Select a network configuration. Read this article for detailed information about each network configuration type."
+        notAsync
       />
       {renderVpcFields(values.vpcOption, {})}
     </>
@@ -193,6 +222,7 @@ const AddAwsClusterPage = () => {
                         info="Region "
                         value={params.cloudProviderRegionId}
                         type="aws"
+                        required
                       />
 
                       {/* Template Chooser */}
@@ -210,6 +240,7 @@ const AddAwsClusterPage = () => {
                         info="Select from the Availability Zones for the specified region"
                         cloudProviderId={params.cloudProviderId}
                         cloudProviderRegionId={params.cloudProviderRegionId}
+                        required
                       />
 
                       {/* Operating System */}
@@ -218,10 +249,19 @@ const AddAwsClusterPage = () => {
                         label="Operating System"
                         options={operatingSystemOptions}
                         info="Operating System / AMI"
+                        required
+                        notAsync
                       />
 
                       {/* CLUSTER CONFIGURATION STEP */}
                       {/* TODO: Leaving in first step for easier development.  Move this into its own step once we are done */}
+
+                      {/* Workloads on masters */}
+                      <CheckboxField
+                        id="allowWorkloadsOnMaster"
+                        label="Allow workloads on master nodes"
+                        info="Check this box to enable workloads on master nodes. It is highly recommended to not enable workloads on master nodes for production or critical workload clusters."
+                      />
 
                       {/* Master node instance type */}
                       <PicklistField
@@ -232,15 +272,17 @@ const AddAwsClusterPage = () => {
                         cloudProviderId={params.cloudProviderId}
                         cloudProviderRegionId={params.cloudProviderRegionId}
                         info="Choose an instance type used by master nodes."
+                        required
                       />
 
-                      {/* Num master nodes (TODO: this should be a picklist of 1, 3, or 5 as the only options) */}
-                      <TextField
+                      {/* Num master nodes */}
+                      <PicklistField
                         id="numMasters"
-                        type="number"
+                        options={numMasterOptions}
                         label="Number of master nodes"
                         info="Number of master nodes to deploy.  3 nodes are required for an High Availability (HA) cluster."
                         required
+                        notAsync
                       />
 
                       {/* Worker node instance type */}
@@ -252,6 +294,7 @@ const AddAwsClusterPage = () => {
                         cloudProviderId={params.cloudProviderId}
                         cloudProviderRegionId={params.cloudProviderRegionId}
                         info="Choose an instance type used by worker nodes."
+                        required
                       />
 
                       {/* Num worker nodes */}
@@ -262,6 +305,25 @@ const AddAwsClusterPage = () => {
                         info="Number of worker nodes to deploy."
                         required
                       />
+
+                      {/* Enable Auto Scaling */}
+                      <CheckboxField
+                        id="enableCAS"
+                        label="Enable Auto Scaling"
+                        info="The cluster may scale up to the max worker nodes specified. Auto scaling may not be used with spot instances."
+                      />
+
+                      {values.enableCAS &&
+                        <TextField
+                          id="numMaxWorkers"
+                          type="number"
+                          label="Maximum number of worker nodes"
+                          info="Maximum number of worker nodes this cluster may be scaled up to."
+                          required={values.enableCAS}
+                        />
+                      }
+
+                      {/* TODO: enable auto scaling, max number of worker nodes */}
 
                       {/* NETWORK INFO STEP */}
                       {/* TODO: Leaving in first step for easier development.  Move this into its own step once we are done */}
@@ -304,6 +366,9 @@ const AddAwsClusterPage = () => {
                         label="Network backend"
                         options={networkPluginOptions}
                         info=""
+                        onChange={handleNetworkPluginChange({ setWizardContext, setFieldValue })}
+                        required
+                        notAsync
                       />
 
                       {/* HTTP proxy */}
@@ -312,6 +377,7 @@ const AddAwsClusterPage = () => {
                           id="mtuSize"
                           label="MTU Size"
                           info="Maximum Transmission Unit (MTU) for the interface (in bytes)"
+                          required={values.networkPlugin === 'calico'}
                         />
                       }
 
@@ -323,7 +389,7 @@ const AddAwsClusterPage = () => {
                         DropdownComponent={AwsClusterSshKeyPicklist}
                         disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
                         id="sshKey"
-                        label="Worker Node Instance Type"
+                        label="SSH Key"
                         cloudProviderId={params.cloudProviderId}
                         cloudProviderRegionId={params.cloudProviderRegionId}
                         info="Select an AWS SSH key to be associated with the nodes. This key can be used to access the nodes for debugging or other purposes."
@@ -334,6 +400,7 @@ const AddAwsClusterPage = () => {
                       <CheckboxField
                         id="privileged"
                         label="Privileged"
+                        disabled={['calico', 'canal', 'weave'].includes(values.networkPlugin)}
                         info="Allows this cluster to run privileged containers. Read this article for more information."
                       />
 
@@ -343,7 +410,7 @@ const AddAwsClusterPage = () => {
                       <CheckboxField
                         id="appCatalogEnabled"
                         label="Enable Application Catalog"
-                        info="Allows this cluster to run privileged containers. Read this article for more information."
+                        info="Enable the Helm Application Catalog on this cluster"
                       />
 
                       {/* Custom AMI */}
@@ -356,7 +423,7 @@ const AddAwsClusterPage = () => {
                       {/* Tags */}
                       <KeyValuesField
                         id="tags"
-                        label="tags"
+                        label="Tags"
                         info="Add tag metadata to this cluster"
                       />
                     </>

@@ -2,6 +2,7 @@ import context from '../../../context'
 import CloudProvider from '../../../models/qbert/CloudProvider'
 import { times, uniq } from 'ramda'
 import faker from 'faker'
+import uuid from 'uuid'
 
 const sshKeyMap = {}
 
@@ -33,7 +34,7 @@ const randomAwsRegionDetails = (regionId) => {
     azs: awsAzs,
     domains: uniq(times(() => ({ 'Name': faker.random.word(), 'Id': faker.random.word() }), 8)),
     flavors: 't2.small t2.medium t2.large'.split(' '),
-    keyPairs: uniq(times(() => ({ 'KeyName': faker.random.word(), 'KeyFingerprint': faker.random.word() }), 5)),
+    keyPairs: uniq(times(() => ({ 'KeyName': faker.fake('{{name.firstName}}'), 'KeyFingerprint': uuid.v4() }), 5)),
     operatingSystems: ['centos', 'ubuntu'],
     vpcs: uniq(times(() => ({ 'CidrBlock': faker.internet.ip(), 'VpcName': faker.random.word() }), 5))
   }
