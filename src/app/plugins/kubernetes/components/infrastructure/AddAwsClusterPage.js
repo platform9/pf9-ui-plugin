@@ -1,11 +1,8 @@
 import React from 'react'
-// import Checkbox from 'core/components/validatedForm/CheckboxField'
-// import ExternalLink from 'core/components/ExternalLink'
 import FormWrapper from 'core/components/FormWrapper'
-// import KeyValuesField from 'core/components/validatedForm/KeyValuesField'
-// import NodesChooser from './NodesChooser'
 import AwsAvailabilityZoneChooser from './AwsAvailabilityZoneChooser'
 import AwsRegionFlavorPicklist from './AwsRegionFlavorPicklist'
+import AwsClusterVpcPicklist from './AwsClusterVpcPicklist'
 import CloudProviderPicklist from 'k8s/components/common/CloudProviderPicklist'
 import CloudProviderRegionPicklist from 'k8s/components/common/CloudProviderRegionPicklist'
 import AwsClusterSshKeyPicklist from './AwsClusterSshKeyPicklist'
@@ -17,11 +14,7 @@ import TextField from 'core/components/validatedForm/TextField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import Wizard from 'core/components/wizard/Wizard'
 import WizardStep from 'core/components/wizard/WizardStep'
-// import useDataLoader from 'core/hooks/useDataLoader'
 import useParams from 'core/hooks/useParams'
-// import { projectAs } from 'utils/fp'
-// import { cloudProviderActions } from './actions'
-// import { propEq } from 'ramda'
 
 const initialContext = {
   template: 'small',
@@ -32,7 +25,7 @@ const initialContext = {
   numWorkers: 1,
   enableCAS: false,
   usePf9Domain: true,
-  vpcOption: 'newVpc',
+  network: 'newVpc',
   containersCidr: '10.20.0.0/16',
   servicesCidr: '10.21.0.0/16',
 }
@@ -95,40 +88,11 @@ const handleTemplateChoice = ({ setWizardContext, setFieldValue }) => option => 
   // TODO: Choose the first AZ by default
 }
 
-const vpcOptions = [
+const networkOptions = [
   { label: '+ Create new VPC', value: 'newVpc' },
   { label: 'Use existing VPC', value: 'existing' },
   { label: 'Use existing VPC with VPN', value: 'existingNewVpn' },
 ]
-
-const renderVpcFields = (vpcOption) => {
-  switch (vpcOption) {
-    case 'newVpc':
-      return (
-        <CheckboxField
-          id="isPrivate"
-          label="Deploy nodes using private subnet"
-          info=""
-        />
-      )
-    case 'existing':
-      return (
-        <div>
-          {/* TODO: public subnets for each AZ */}
-          <CheckboxField
-            id="isPrivate"
-            label="Deploy nodes using private subnet"
-            info=""
-          />
-          {/* TODO: private subnets for each AZ if isPrivate */}
-        </div>
-      )
-    case 'existingNewVpn':
-      return (
-        <div>TODO</div>
-      )
-  }
-}
 
 const networkPluginOptions = [
   { label: 'Flannel', value: 'flannel' },
@@ -144,9 +108,60 @@ const handleNetworkPluginChange = ({ setWizardContext, setFieldValue }) => optio
 }
 
 // These fields are only rendered when the user opts to not use a `platform9.net` domain.
-const renderCustomNetworkingFields = ({ params, values }) => {
+const renderCustomNetworkingFields = ({ params, getParamsUpdater, values }) => {
   const updateFqdns = () => {
     // TODO: When the domain changes, update the API and services FQDN
+  }
+
+  const renderNetworkFields = networkOption => {
+    const VpcSubnets = () => {
+      // TODO
+      return null
+    }
+    switch (networkOption) {
+      case 'newVpc':
+        return (
+          <CheckboxField
+            id="isPrivate"
+            label="Deploy nodes using private subnet"
+            info=""
+          />
+        )
+      case 'existing':
+        return (
+          <div>
+            {/* TODO: public subnets for each AZ */}
+            <CheckboxField
+              id="isPrivate"
+              label="Deploy nodes using private subnet"
+              info=""
+            />
+            {/* TODO: private subnets for each AZ if isPrivate */}
+          </div>
+        )
+      case 'existingNewVpn':
+        return (
+          <React.Fragment>
+            <PicklistField
+              DropdownComponent={AwsClusterVpcPicklist}
+              id="vpc"
+              label="Domain"
+              onChange={getParamsUpdater('vpc')}
+              cloudProviderId={params.cloudProviderId}
+              cloudProviderRegionId={params.cloudProviderRegionId}
+              info=""
+              required
+            />
+
+            <VpcSubnets
+              type="private"
+              cloudProviderId={params.cloudProviderId}
+              cloudProviderRegionId={params.cloudProviderRegionId}
+              vpcId={params.vpc}
+            />
+          </React.Fragment>
+        )
+    }
   }
 
   return (
@@ -155,21 +170,20 @@ const renderCustomNetworkingFields = ({ params, values }) => {
         DropdownComponent={ClusterDomainPicklist}
         id="domainId"
         label="Domain"
-        cloudProviderId={params.cloudProviderId}
         onChange={updateFqdns}
+        cloudProviderId={params.cloudProviderId}
         cloudProviderRegionId={params.cloudProviderRegionId}
         info="Select the base domain name to be used for the API and service FQDNs"
         required
       />
 
       <PicklistField
-        id="vpcOption"
-        label="VPC Network"
-        options={vpcOptions}
+        id="network"
+        label="Network"
+        options={networkOptions}
         info="Select a network configuration. Read this article for detailed information about each network configuration type."
-        notAsync
       />
-      {renderVpcFields(values.vpcOption, {})}
+      {renderNetworkFields(values.network)}
     </>
   )
 }
@@ -194,7 +208,7 @@ const AddAwsClusterPage = () => {
                       {/* Cluster Name */}
                       <TextField
                         id="name"
-                        label="name"
+                        label="Name"
                         info="Name of the cluster"
                         required
                       />
@@ -250,7 +264,6 @@ const AddAwsClusterPage = () => {
                         options={operatingSystemOptions}
                         info="Operating System / AMI"
                         required
-                        notAsync
                       />
 
                       {/* CLUSTER CONFIGURATION STEP */}
@@ -260,7 +273,7 @@ const AddAwsClusterPage = () => {
                       <CheckboxField
                         id="allowWorkloadsOnMaster"
                         label="Allow workloads on master nodes"
-                        info="Check this box to enable workloads on master nodes. It is highly recommended to not enable workloads on master nodes for production or critical workload clusters."
+                        info="It is highly recommended to not enable workloads on master nodes for production or critical workload clusters."
                       />
 
                       {/* Master node instance type */}
@@ -282,7 +295,6 @@ const AddAwsClusterPage = () => {
                         label="Number of master nodes"
                         info="Number of master nodes to deploy.  3 nodes are required for an High Availability (HA) cluster."
                         required
-                        notAsync
                       />
 
                       {/* Worker node instance type */}
@@ -335,7 +347,7 @@ const AddAwsClusterPage = () => {
                         info="Select this option if you want Platform9 to automatically generate the endpoints or if you do not have access to Route 53."
                       />
 
-                      {values.usePf9Domain || renderCustomNetworkingFields({ params, values, setFieldValue, setWizardContext })}
+                      {values.usePf9Domain || renderCustomNetworkingFields({ params, getParamsUpdater, values, setFieldValue, setWizardContext })}
 
                       {/* Containers CIDR */}
                       <TextField
@@ -368,7 +380,6 @@ const AddAwsClusterPage = () => {
                         info=""
                         onChange={handleNetworkPluginChange({ setWizardContext, setFieldValue })}
                         required
-                        notAsync
                       />
 
                       {/* HTTP proxy */}
