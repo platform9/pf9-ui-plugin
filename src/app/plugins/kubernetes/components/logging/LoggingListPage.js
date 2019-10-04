@@ -52,7 +52,6 @@ const LoggingListPage = () => {
 
   // TODO: onEdit and onDelete
   const options = {
-    innerTitle: 'Logging',
     addText: 'New Logging',
     uniqueIdentifier: 'cluster',
     loaderFn: qbert.getLoggings,

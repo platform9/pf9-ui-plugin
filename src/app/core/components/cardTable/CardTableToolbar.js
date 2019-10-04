@@ -148,7 +148,6 @@ const CardTableToolbar = ({
           <>
             <Picklist
               className={classes.sortBy}
-              notAsync
               disabled={false}
               showAll={false}
               name={'sort'}

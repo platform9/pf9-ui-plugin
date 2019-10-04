@@ -72,8 +72,8 @@ const useDataLoader = (loaderFn, params = emptyObj, invalidateCache = false) => 
     // With this condition, we ensure that all promises except the last one will be ignored
     if (isEmpty(loaderPromisesBuffer.current) &&
       !unmounted.current) {
-      setLoading(false)
       setData(result)
+      setLoading(false)
     }
   }
 

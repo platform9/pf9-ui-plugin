@@ -83,4 +83,7 @@ Selector.propTypes = {
   onChoose: PropTypes.func.isRequired,
 }
 
-export default withProgress(Selector)
+export default withProgress(Selector, {
+  inline: true,
+  overlay: false
+})

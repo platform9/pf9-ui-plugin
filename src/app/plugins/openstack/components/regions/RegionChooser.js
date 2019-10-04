@@ -56,8 +56,6 @@ const RegionChooser = props => {
       placement="bottom"
     >
       <Selector
-        inline
-        overlay={false}
         loading={loading || loadingRegions}
         onMouseEnter={handleTooltipOpen}
         onMouseLeave={handleTooltipClose}

@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 import CRUDListContainer from 'core/components/CRUDListContainer'
 import ListTable from 'core/components/listTable/ListTable'
-import TitleAndAddButton from 'core/components/listTable/TitleAndAddButton'
+import TopAddButtonAndDialog from 'core/components/TopAddButtonAndDialog'
 import requiresAuthentication from 'openstack/util/requiresAuthentication'
 import useDataLoader from 'core/hooks/useDataLoader'
 import useDataUpdater from 'core/hooks/useDataUpdater'
@@ -42,7 +42,6 @@ const createCRUDComponents = options => {
     columns = [],
     batchActions = [],
     rowActions = [],
-    innerTitle,
     uniqueIdentifier = 'id',
     addText = 'Add',
     addUrl,
@@ -105,8 +104,7 @@ const createCRUDComponents = options => {
         uniqueIdentifier={uniqueIdentifier}
       >
         {handlers => <>
-          <TitleAndAddButton
-            title={innerTitle}
+          <TopAddButtonAndDialog
             addUrl={addUrl}
             addText={addText}
             renderAddDialog={renderAddDialog}

@@ -60,6 +60,7 @@ export const columns = [
 ]
 
 export const options = {
+  addText: 'Add Node',
   addUrl: '/ui/kubernetes/infrastructure/nodes/add',
   columns,
   cacheKey: nodesCacheKey,

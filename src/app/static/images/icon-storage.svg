@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="80px" height="80px" viewBox="0 0 80 80" version="1.1"
+     xmlns="http://www.w3.org/2000/svg">
+    <!-- Generator: sketchtool 3.8.2 (29753) - http://www.bohemiancoding.com/sketch -->
+    <title>F6F9FFC5-CB04-4645-8F98-106F80AE040E</title>
+    <desc>Created with sketchtool.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="01-reformat-hosts" transform="translate(-1930.000000, -310.000000)" stroke="#B7B7B7">
+            <g id="box" transform="translate(1480.000000, 292.000000)">
+                <g id="icon-storage" transform="translate(450.000000, 18.000000)">
+                    <g id="Layer_1" transform="translate(4.000000, 13.000000)">
+                        <g id="Group">
+                            <g>
+                                <path d="M64.3,0.8 L7.7,0.8 C3.5,0.8 0.1,4.2 0.1,8.4 L0.1,15.8 C0.1,20 3.5,23.4 7.7,23.4 L64.3,23.4 C68.5,23.4 71.9,20 71.9,15.8 L71.9,8.4 C71.9,4.2 68.5,0.8 64.3,0.8 L64.3,0.8 Z" id="Shape" stroke-width="2"></path>
+                                <circle id="Oval" cx="7.8" cy="9" r="3.3"></circle>
+                            </g>
+                            <path d="M62.1,8 L42.5,8" id="Shape"></path>
+                            <path d="M62.1,11 L42.5,11" id="Shape"></path>
+                            <path d="M62.1,14 L42.5,14" id="Shape"></path>
+                        </g>
+                        <g id="Group" transform="translate(0.000000, 29.000000)">
+                            <g>
+                                <path d="M64.3,0.6 L7.7,0.6 C3.5,0.6 0.1,4 0.1,8.2 L0.1,15.6 C0.1,19.8 3.5,23.2 7.7,23.2 L64.3,23.2 C68.5,23.2 71.9,19.8 71.9,15.6 L71.9,8.2 C71.9,4 68.5,0.6 64.3,0.6 L64.3,0.6 Z" id="Shape" stroke-width="2"></path>
+                                <circle id="Oval" cx="7.8" cy="8.8" r="3.3"></circle>
+                            </g>
+                            <path d="M62.1,8 L42.5,8" id="Shape"></path>
+                            <path d="M62.1,11 L42.5,11" id="Shape"></path>
+                            <path d="M62.1,14 L42.5,14" id="Shape"></path>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

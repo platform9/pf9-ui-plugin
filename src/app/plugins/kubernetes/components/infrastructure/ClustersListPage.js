@@ -3,7 +3,6 @@ import DownloadKubeConfigLink from './DownloadKubeConfigLink'
 import KubeCLI from './KubeCLI'
 import ExternalLink from 'core/components/ExternalLink'
 import SimpleLink from 'core/components/SimpleLink'
-import clusterUsageStats from './clusterUsageStats'
 import UsageBar from 'core/components/dashboardGraphs/UsageBar'
 import AttachIcon from '@material-ui/icons/AddToQueue'
 import DetachIcon from '@material-ui/icons/RemoveFromQueue'
@@ -26,8 +25,8 @@ const renderLinks = links => {
   )
 }
 
-const renderStats = (_, cluster, context) => {
-  const { usage } = clusterUsageStats(cluster, context)
+const renderStats = (_, cluster) => {
+  const { usage } = cluster
   const hasValidStats = usage && usage.compute && usage.compute.current
   if (!hasValidStats) { return null }
   return (
@@ -44,14 +43,15 @@ const renderClusterDetailLink = (name, cluster) => <SimpleLink src={`/ui/kuberne
 const canAttachNode = row => row.cloudProviderType === 'local'
 const canDetachNode = row => row.cloudProviderType === 'local'
 const canScaleCluster = row => row.cloudProviderType === 'aws'
-const canUpgradeCluster = (selected, context) => true
+const canUpgradeCluster = (selected) => true
 
-const upgradeCluster = (selected, context) => {
+const upgradeCluster = (selected) => {
   console.log('TODO: upgradeCluster')
 }
 
 export const options = {
   addUrl: '/ui/kubernetes/infrastructure/clusters/add',
+  addText: 'Add Cluster',
   columns: [
     { id: 'name', label: 'Cluster name', render: renderClusterDetailLink },
     { id: 'status', label: 'Status' },

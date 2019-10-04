@@ -5,13 +5,25 @@ import Tab from 'core/components/tabs/Tab'
 import ClustersListPage from './ClustersListPage'
 import NodesListPage from './NodesListPage'
 import CloudProvidersListPage from './CloudProvidersListPage'
+import InfrastructureStats from './InfrastructureStats'
+import { makeStyles } from '@material-ui/styles'
 
-const InfrastructurePage = () => (
-  <Tabs>
-    <Tab value="clusters" label="Clusters"><ClustersListPage /></Tab>
-    <Tab value="nodes" label="Nodes"><NodesListPage /></Tab>
-    <Tab value="cloudProviders" label="Cloud Providers"><CloudProvidersListPage /></Tab>
-  </Tabs>
-)
+const useStyles = makeStyles(theme => ({
+  root: {
+    marginTop: theme.spacing(4),
+  },
+}))
+
+const InfrastructurePage = () => {
+  const classes = useStyles()
+  return <div className={classes.root}>
+    <InfrastructureStats />
+    <Tabs>
+      <Tab value="clusters" label="Clusters"><ClustersListPage /></Tab>
+      <Tab value="nodes" label="Nodes"><NodesListPage /></Tab>
+      <Tab value="cloudProviders" label="Cloud Providers"><CloudProvidersListPage /></Tab>
+    </Tabs>
+  </div>
+}
 
 export default InfrastructurePage
