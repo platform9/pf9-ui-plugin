@@ -7,6 +7,7 @@ import CloudProviderPicklist from 'k8s/components/common/CloudProviderPicklist'
 import CloudProviderRegionPicklist from 'k8s/components/common/CloudProviderRegionPicklist'
 import AwsClusterSshKeyPicklist from './AwsClusterSshKeyPicklist'
 import ClusterDomainPicklist from './ClusterDomainPicklist'
+import AwsZoneVpcMappings from './AwsZoneVpcMappings'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
 import KeyValuesField from 'core/components/validatedForm/KeyValuesField'
 import PicklistField from 'core/components/validatedForm/PicklistField'
@@ -24,10 +25,11 @@ const initialContext = {
   numMasters: 1,
   numWorkers: 1,
   enableCAS: false,
-  usePf9Domain: true,
+  usePf9Domain: false, // TODO: default to true when not in dev
   network: 'newVpc',
   containersCidr: '10.20.0.0/16',
   servicesCidr: '10.21.0.0/16',
+  networkPlugin: 'flannel',
 }
 
 const templateOptions = [
@@ -114,10 +116,6 @@ const renderCustomNetworkingFields = ({ params, getParamsUpdater, values }) => {
   }
 
   const renderNetworkFields = networkOption => {
-    const VpcSubnets = () => {
-      // TODO
-      return null
-    }
     switch (networkOption) {
       case 'newVpc':
         return (
@@ -129,37 +127,69 @@ const renderCustomNetworkingFields = ({ params, getParamsUpdater, values }) => {
         )
       case 'existing':
         return (
-          <div>
-            {/* TODO: public subnets for each AZ */}
-            <CheckboxField
-              id="isPrivate"
-              label="Deploy nodes using private subnet"
-              info=""
-            />
-            {/* TODO: private subnets for each AZ if isPrivate */}
-          </div>
-        )
-      case 'existingNewVpn':
-        return (
-          <React.Fragment>
+          <>
             <PicklistField
               DropdownComponent={AwsClusterVpcPicklist}
               id="vpc"
-              label="Domain"
-              onChange={getParamsUpdater('vpc')}
+              label="VPC"
+              onChange={getParamsUpdater('vpcId')}
               cloudProviderId={params.cloudProviderId}
               cloudProviderRegionId={params.cloudProviderRegionId}
               info=""
               required
             />
 
-            <VpcSubnets
+            <AwsZoneVpcMappings
+              type="public"
+              cloudProviderId={params.cloudProviderId}
+              cloudProviderRegionId={params.cloudProviderRegionId}
+              onChange={getParamsUpdater('subnets')}
+              vpcId={params.vpcId}
+              azs={params.azs}
+            />
+
+            <CheckboxField
+              id="isPrivate"
+              label="Deploy nodes using private subnet"
+              onChange={getParamsUpdater('isPrivate')}
+              info=""
+            />
+
+            {params.isPrivate &&
+              <AwsZoneVpcMappings
+                type="private"
+                cloudProviderId={params.cloudProviderId}
+                cloudProviderRegionId={params.cloudProviderRegionId}
+                onChange={getParamsUpdater('privateSubnets')}
+                vpcId={params.vpcId}
+                azs={params.azs}
+              />
+            }
+          </>
+        )
+      case 'existingNewVpn':
+        return (
+          <>
+            <PicklistField
+              DropdownComponent={AwsClusterVpcPicklist}
+              id="vpc"
+              label="VPC"
+              onChange={getParamsUpdater('vpcId')}
+              cloudProviderId={params.cloudProviderId}
+              cloudProviderRegionId={params.cloudProviderRegionId}
+              info=""
+              required
+            />
+
+            <AwsZoneVpcMappings
               type="private"
               cloudProviderId={params.cloudProviderId}
               cloudProviderRegionId={params.cloudProviderRegionId}
-              vpcId={params.vpc}
+              onChange={getParamsUpdater('privateSubnets')}
+              vpcId={params.vpcId}
+              azs={params.azs}
             />
-          </React.Fragment>
+          </>
         )
     }
   }
@@ -254,8 +284,24 @@ const AddAwsClusterPage = () => {
                         info="Select from the Availability Zones for the specified region"
                         cloudProviderId={params.cloudProviderId}
                         cloudProviderRegionId={params.cloudProviderRegionId}
+                        onChange={getParamsUpdater('azs')}
                         required
                       />
+
+                      {/* SSH Key */}
+                      <PicklistField
+                        DropdownComponent={AwsClusterSshKeyPicklist}
+                        disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
+                        id="sshKey"
+                        label="SSH Key"
+                        cloudProviderId={params.cloudProviderId}
+                        cloudProviderRegionId={params.cloudProviderRegionId}
+                        info="Select an AWS SSH key to be associated with the nodes. This key can be used to access the nodes for debugging or other purposes."
+                        required
+                      />
+
+                      {/* CLUSTER CONFIGURATION STEP */}
+                      {/* TODO: Leaving in first step for easier development.  Move this into its own step once we are done */}
 
                       {/* Operating System */}
                       <PicklistField
@@ -264,16 +310,6 @@ const AddAwsClusterPage = () => {
                         options={operatingSystemOptions}
                         info="Operating System / AMI"
                         required
-                      />
-
-                      {/* CLUSTER CONFIGURATION STEP */}
-                      {/* TODO: Leaving in first step for easier development.  Move this into its own step once we are done */}
-
-                      {/* Workloads on masters */}
-                      <CheckboxField
-                        id="allowWorkloadsOnMaster"
-                        label="Allow workloads on master nodes"
-                        info="It is highly recommended to not enable workloads on master nodes for production or critical workload clusters."
                       />
 
                       {/* Master node instance type */}
@@ -318,6 +354,13 @@ const AddAwsClusterPage = () => {
                         required
                       />
 
+                      {/* Workloads on masters */}
+                      <CheckboxField
+                        id="allowWorkloadsOnMaster"
+                        label="Allow workloads on master nodes"
+                        info="It is highly recommended to not enable workloads on master nodes for production or critical workload clusters."
+                      />
+
                       {/* Enable Auto Scaling */}
                       <CheckboxField
                         id="enableCAS"
@@ -325,6 +368,7 @@ const AddAwsClusterPage = () => {
                         info="The cluster may scale up to the max worker nodes specified. Auto scaling may not be used with spot instances."
                       />
 
+                      {/* Max num worker nodes (autoscaling) */}
                       {values.enableCAS &&
                         <TextField
                           id="numMaxWorkers"
@@ -394,18 +438,6 @@ const AddAwsClusterPage = () => {
 
                       {/* ADVANCED CONFIGURATION STEP */}
                       {/* TODO: Leaving in first step for easier development.  Move this into its own step once we are done */}
-
-                      {/* SSH Key */}
-                      <PicklistField
-                        DropdownComponent={AwsClusterSshKeyPicklist}
-                        disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
-                        id="sshKey"
-                        label="SSH Key"
-                        cloudProviderId={params.cloudProviderId}
-                        cloudProviderRegionId={params.cloudProviderRegionId}
-                        info="Select an AWS SSH key to be associated with the nodes. This key can be used to access the nodes for debugging or other purposes."
-                        required
-                      />
 
                       {/* Privileged (TODO: disabled and set to true if networkPlugin is calico, canal, or weave) */}
                       <CheckboxField
