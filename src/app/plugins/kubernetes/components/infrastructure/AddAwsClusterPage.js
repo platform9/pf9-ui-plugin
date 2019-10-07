@@ -16,6 +16,7 @@ import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import Wizard from 'core/components/wizard/Wizard'
 import WizardStep from 'core/components/wizard/WizardStep'
 import useParams from 'core/hooks/useParams'
+import { pick } from 'ramda'
 
 const initialContext = {
   template: 'small',
@@ -218,15 +219,25 @@ const renderCustomNetworkingFields = ({ params, getParamsUpdater, values }) => {
   )
 }
 
-const handleSubmit = () => {
-  // TODO
+const handleSubmit = params => data => {
+  // TODO: construct the body that will be passed to the API
+  const body = {
+    ...pick('nodePoolUuid name region azs ami masterFlavor workerFlavor numMasters enableCAS numWorks allowWorkloadsOnMaster'.split(' '), data),
+    ...pick('domainId vpc isPrivate privateSubnets subnets externalDnsName serviceFqdn containersCidr servicesCidr'.split(' '), data),
+  }
+  if (data.httpProxy) { body.httpProxy = data.httpProxy }
+  if (data.networkPlugin === 'calico') { body.mtuSize = data.mtuSize }
+
+  console.log('TODO: submit API call with body')
+  console.log(body)
+  return body
 }
 
 const AddAwsClusterPage = () => {
   const { params, getParamsUpdater } = useParams()
 
   return (
-    <Wizard onComplete={handleSubmit} context={initialContext}>
+    <Wizard onComplete={handleSubmit(params)} context={initialContext}>
       {({ wizardContext, setWizardContext, onNext }) => {
         return (
           <>
@@ -379,8 +390,6 @@ const AddAwsClusterPage = () => {
                         />
                       }
 
-                      {/* TODO: enable auto scaling, max number of worker nodes */}
-
                       {/* NETWORK INFO STEP */}
                       {/* TODO: Leaving in first step for easier development.  Move this into its own step once we are done */}
 
@@ -392,6 +401,9 @@ const AddAwsClusterPage = () => {
                       />
 
                       {values.usePf9Domain || renderCustomNetworkingFields({ params, getParamsUpdater, values, setFieldValue, setWizardContext })}
+
+                      {/* API FQDN (TODO) */}
+                      {/* Services FQDN (TODO) */}
 
                       {/* Containers CIDR */}
                       <TextField
@@ -439,7 +451,7 @@ const AddAwsClusterPage = () => {
                       {/* ADVANCED CONFIGURATION STEP */}
                       {/* TODO: Leaving in first step for easier development.  Move this into its own step once we are done */}
 
-                      {/* Privileged (TODO: disabled and set to true if networkPlugin is calico, canal, or weave) */}
+                      {/* Privileged */}
                       <CheckboxField
                         id="privileged"
                         label="Privileged"
