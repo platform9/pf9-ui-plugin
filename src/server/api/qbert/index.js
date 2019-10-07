@@ -1,4 +1,5 @@
 import express from 'express'
+import { readFile } from 'fs'
 // Cloud Providers
 import {
   getCloudProviders, postCloudProvider, putCloudProvider, deleteCloudProvider,
@@ -23,7 +24,7 @@ import {
   getStorageClasses, postStorageClass, deleteStorageClass,
 } from './storageClasses/storageClassActions'
 
-import { getCharts, getChart, getChartVersions } from './charts'
+import { getCharts, getChart, getChartVersions, getChartVersion } from './charts'
 import { getReleases, getRelease, deleteRelease } from './releases'
 import { tokenValidator } from '../../middleware'
 
@@ -86,16 +87,24 @@ router.post(`${storageClassApi}`, tokenValidator, postStorageClass)
 router.delete(`${storageClassApi}/:storageClassName`, tokenValidator, deleteStorageClass)
 
 // Monocular
-const monocularClusterBase = `${k8sapi}/namespaces/kube-system/services/monocular-api-svc::80/proxy/v1`
-router.get(`${monocularClusterBase}/charts`, tokenValidator, getCharts)
-router.get(`${monocularClusterBase}/charts/:chartName`, tokenValidator, getChart)
-router.get(`${monocularClusterBase}/charts/:chartName/versions`, tokenValidator, getChartVersions)
+const monocularClusterBase = `${k8sapi}/namespaces/kube-system/services/monocular-api-svc::80/proxy`
+const monocularClusterBaseV1 = `${monocularClusterBase}/v1`
+router.get(`${monocularClusterBaseV1}/charts/:releaseName/:chartName/versions/:version`, tokenValidator, getChartVersion)
+router.get(`${monocularClusterBaseV1}/charts/:releaseName/:chartName/versions`, tokenValidator, getChartVersions)
+router.get(`${monocularClusterBaseV1}/charts/:releaseName/:chartName/:version`, tokenValidator, getChart)
+router.get(`${monocularClusterBaseV1}/charts`, tokenValidator, getCharts)
+router.get(`${monocularClusterBase}/assets/:releaseName/:chartName/:version/README.md`, tokenValidator, (req, res) => {
+  const path = __dirname + '/../../assets/dummyMarkdown.md'
+  readFile(path, 'utf8', (err, data) => {
+    res.send(data)
+  })
+})
 
-router.get(`${monocularClusterBase}/releases`, tokenValidator, getReleases)
-router.get(`${monocularClusterBase}/releases/:releaseName`, tokenValidator, getRelease)
-router.delete(`${monocularClusterBase}/releases/:releaseName`, tokenValidator, deleteRelease)
+router.get(`${monocularClusterBaseV1}/releases`, tokenValidator, getReleases)
+router.get(`${monocularClusterBaseV1}/releases/:releaseName`, tokenValidator, getRelease)
+router.delete(`${monocularClusterBaseV1}/releases/:releaseName`, tokenValidator, deleteRelease)
 
-router.get(`${monocularClusterBase}/repos`, tokenValidator, getRepositoriesForCluster)
+router.get(`${monocularClusterBaseV1}/repos`, tokenValidator, getRepositoriesForCluster)
 
 // Managed Prometheus
 const monitoringBase = `${clusterK8sApiBase}/apis/monitoring.coreos.com/v1`

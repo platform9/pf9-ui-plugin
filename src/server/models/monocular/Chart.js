@@ -1,6 +1,11 @@
 import { pick, times } from 'ramda'
 import createModel from '../createModel'
+import ChartVersion from './ChartVersion'
 import faker from 'faker'
+
+const getVersions = (chartName, context) => {
+  return ChartVersion.list({ context })
+}
 
 // TODO:
 //   We need to associate charts with a cluster as well.
@@ -31,6 +36,25 @@ const createFn = (_params={}, context) => {
       },
     },
     relationships: {
+      chart: {
+        data: {
+          home: faker.internet.url(),
+          sources: [
+            faker.internet.url(),
+            faker.internet.url(),
+            faker.internet.url()
+          ],
+          maintainers: [
+            {
+              email: faker.internet.email(),
+              name: faker.name.firstName
+            },{
+              email: faker.internet.email(),
+              name: faker.name.firstName
+            }
+          ]
+        }
+      },
       latestChartVersion: {
         data: {
           app_version: times(faker.random.number, 3).join('.'),
@@ -51,6 +75,9 @@ const options = {
   dataKey: 'charts',
   uniqueIdentifier: 'id',
   defaults: chartDefaults,
+  customOperations: {
+    getVersions
+  },
 }
 
 const Chart = createModel(options)

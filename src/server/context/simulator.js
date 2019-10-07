@@ -65,6 +65,7 @@ class Context {
     this.services = []
     this.storageClasses = []
     this.charts = []
+    this.chartVersions = []
     this.releases = []
     this.repositories = []
     this.prometheusInstances = []

@@ -25,6 +25,7 @@ import Pod from '../models/qbert/Pod'
 import Deployment from '../models/qbert/Deployment'
 import Service from '../models/qbert/Service'
 import Chart from '../models/monocular/Chart'
+import ChartVersion from '../models/monocular/ChartVersion'
 import Release from '../models/monocular/Release'
 import Repository from '../models/monocular/Repository'
 import StorageClass from '../models/qbert/StorageClass'
@@ -219,7 +220,15 @@ function loadPreset () {
   StorageClass.create({ data: { metadata: { name: 'fakeStorageClass', annotations: { 'storageclass.kubernetes.io/is-default-class': 'true' } } }, context, config: { clusterId: cluster.uuid } })
 
   // Monocular Charts
-  range(3).forEach(i => Chart.create({ data: {}, context, config: { clusterId: cluster.uuid, namespace: defaultNamespace.name } }))
+  range(3).forEach(i => {
+    const chart = Chart.create({ data: {}, context, config: { clusterId: cluster.uuid, namespace: defaultNamespace.name } })
+    range(3).forEach(i => ChartVersion.create({
+      data: {
+        id: chart.id
+      },
+      context
+    }))
+  })
 
   // Monocular releases
   range(3).forEach(i => Release.create({ data: {}, context, config: { clusterId: cluster.uuid, namespace: defaultNamespace.name } }))

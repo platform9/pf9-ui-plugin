@@ -13,15 +13,6 @@ import WizardStep from 'core/components/wizard/WizardStep'
 import TextField from 'core/components/validatedForm/TextField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 
-// The modal is technically inside the row, so clicking anything inside
-// the modal window will cause the table row to be toggled.
-const stopPropagation = e => {
-  // Except for <a href=""> style links
-  if (e.target.tagName.toUpperCase() === 'A') { return }
-  e.preventDefault()
-  e.stopPropagation()
-}
-
 export default ({ onClose }) => {
   const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
   const [create, creating] = useDataUpdater(repositoryActions.create, onClose)
@@ -50,7 +41,7 @@ export default ({ onClose }) => {
   }
 
   return (
-    <Dialog fullWidth open onClose={onClose} onClick={stopPropagation}>
+    <Dialog fullWidth open onClose={onClose}>
       <DialogTitle>Add New Repository</DialogTitle>
       <DialogContent>
         <Progress loading={loadingClusters || creating} inline renderContentOnMount>

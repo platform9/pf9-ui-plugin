@@ -9,7 +9,7 @@ const filterListByConfig = (list, { clusterId, namespace }) =>
     namespace ? propEq('namespace', namespace) : T,
   ))
 
-const createModel = (options={}) => {
+const createModel = (options = {}) => {
   const {
     dataKey,
     uniqueIdentifier = 'id',
@@ -18,10 +18,13 @@ const createModel = (options={}) => {
     loaderFn, // function that maps data into a different form for API route
     mappingFn, // data coming form API, context needs it in a different format
     onDeleteFn,
+    customOperations = {},
   } = options
 
   return {
-    create: ({ data, context, raw=false, config={} }) => {
+    ...customOperations,
+
+    create: ({ data, context, raw = false, config = {} }) => {
       // In kubernetes, need to track clusterId and namespace
       if (config.clusterId) {
         data.clusterId = config.clusterId
@@ -38,20 +41,22 @@ const createModel = (options={}) => {
       const newObject = {
         [uniqueIdentifier]: uuid.v4(),
         ..._defaults,
-        ...mappedData
+        ...mappedData,
       }
       context[dataKey].push(newObject)
       return (!raw && loaderFn) ? loaderFn([newObject])[0] : newObject
     },
 
-    list: ({ context, raw=false, config={} }) => {
+    list: ({ context, raw = false, config = {} }) => {
       const list = filterListByConfig(context[dataKey], config)
       return (!raw && loaderFn) ? loaderFn(list) : list
     },
 
     update: ({ id, data, context }) => {
       const mappedData = mappingFn ? mappingFn(data, context) : data
-      context[dataKey] = context[dataKey].map(x => x[uniqueIdentifier] === id ? { ...x, ...mappedData } : x)
+      context[dataKey] = context[dataKey].map(x => x[uniqueIdentifier] === id
+        ? { ...x, ...mappedData }
+        : x)
       return context[dataKey].find(propEq(uniqueIdentifier, id))
     },
 
@@ -65,18 +70,18 @@ const createModel = (options={}) => {
       context[dataKey] = context[dataKey].filter(x => x.clusterId !== clusterId)
     },
 
-    findById: ({ id, context, raw=false }) => {
+    findById: ({ id, context, raw = false }) => {
       const obj = context[dataKey].find(x => x[uniqueIdentifier] === id)
       return (!raw && loaderFn) ? loaderFn([obj])[0] : obj
     },
 
-    findByName: ({ name, context, raw=false, config={} }) => {
+    findByName: ({ name, context, raw = false, config = {} }) => {
       const list = filterListByConfig(context[dataKey], config)
       const obj = list.find((x) => {
         return x.name === name
       })
       return (!raw && loaderFn && obj) ? loaderFn([obj])[0] : obj
-    }
+    },
   }
 }
 
