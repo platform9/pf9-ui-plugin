@@ -31,6 +31,7 @@ const initialContext = {
   containersCidr: '10.20.0.0/16',
   servicesCidr: '10.21.0.0/16',
   networkPlugin: 'flannel',
+  mtuSize: 1440,
 }
 
 const templateOptions = [
@@ -111,9 +112,17 @@ const handleNetworkPluginChange = ({ setWizardContext, setFieldValue }) => optio
 }
 
 // These fields are only rendered when the user opts to not use a `platform9.net` domain.
-const renderCustomNetworkingFields = ({ params, getParamsUpdater, values }) => {
-  const updateFqdns = () => {
-    // TODO: When the domain changes, update the API and services FQDN
+const renderCustomNetworkingFields = ({ params, getParamsUpdater, values, setFieldValue, setWizardContext, wizardContext }) => {
+  const updateFqdns = (value, label) => {
+    const name = values.name || wizardContext.name
+
+    const api = `${name}-api.${label}`
+    setFieldValue('externalDnsName')(api)
+    setWizardContext({ externalDnsName: api })
+
+    const service = `${name}-service.${label}`
+    setFieldValue('serviceFqdn')(service)
+    setWizardContext({ serviceFdqn: service })
   }
 
   const renderNetworkFields = networkOption => {
@@ -400,10 +409,26 @@ const AddAwsClusterPage = () => {
                         info="Select this option if you want Platform9 to automatically generate the endpoints or if you do not have access to Route 53."
                       />
 
-                      {values.usePf9Domain || renderCustomNetworkingFields({ params, getParamsUpdater, values, setFieldValue, setWizardContext })}
+                      {values.usePf9Domain || renderCustomNetworkingFields({ params, getParamsUpdater, values, setFieldValue, setWizardContext, wizardContext })}
 
-                      {/* API FQDN (TODO) */}
-                      {/* Services FQDN (TODO) */}
+                      {/* API FQDN */}
+                      {values.usePf9Domain ||
+                        <TextField
+                          id="externalDnsName"
+                          label="API FQDN"
+                          info="FQDN used to reference cluster API. To ensure the API can be accessed securely at the FQDN, the FQDN will be included in the API server certificate's Subject Alt Names. If deploying onto AWS, we will automatically create the DNS records for this FQDN into AWS Route 53."
+                          required
+                        />
+                      }
+                      {/* Services FQDN */}
+                      {values.usePf9Domain ||
+                        <TextField
+                          id="serviceFqdn"
+                          label="Services FQDN"
+                          info="FQDN used to reference cluster services. If deploying onto AWS, we will automatically create the DNS records for this FQDN into AWS Route 53."
+                          required
+                        />
+                      }
 
                       {/* Containers CIDR */}
                       <TextField
@@ -459,7 +484,15 @@ const AddAwsClusterPage = () => {
                         info="Allows this cluster to run privileged containers. Read this article for more information."
                       />
 
-                      {/* Advanced API Configuration (TODO) */}
+                      {/* Advanced API Configuration(TODO) */}
+                      <PicklistField
+                        id="networkPlugin"
+                        label="Network backend"
+                        options={networkPluginOptions}
+                        info=""
+                        onChange={handleNetworkPluginChange({ setWizardContext, setFieldValue })}
+                        required
+                      />
 
                       {/* Enable Application Catalog */}
                       <CheckboxField

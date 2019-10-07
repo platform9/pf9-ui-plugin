@@ -62,11 +62,11 @@ const ValidatedFormInput = ({
   )
 
   const handleChange = useCallback(
-    value => {
+    (value, label) => {
       setCurrentFieldValue(value)
       // Leverage the event to the wrapped input
       if (onChange) {
-        onChange(value)
+        onChange(value, label)
       }
     },
     [setCurrentFieldValue, onChange],

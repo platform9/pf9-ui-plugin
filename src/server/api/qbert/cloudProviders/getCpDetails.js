@@ -54,10 +54,12 @@ const fakeAwsVpcSubnet = ({ VpcId, isPublic }) => az => {
   }
 }
 
+const fakeAwsDomain = () => ({ Name: faker.internet.domainName(), Id: uuid.v4() })
+
 const randomAwsRegionDetails = (regionId) => {
   return {
     azs: awsAzs,
-    domains: uniq(times(() => ({ 'Name': faker.random.word(), 'Id': faker.random.word() }), 8)),
+    domains: uniq(times(fakeAwsDomain, 8)),
     flavors: 't2.small t2.medium t2.large'.split(' '),
     keyPairs: uniq(times(() => ({ 'KeyName': faker.fake('{{name.firstName}}'), 'KeyFingerprint': uuid.v4() }), 5)),
     operatingSystems: ['centos', 'ubuntu'],

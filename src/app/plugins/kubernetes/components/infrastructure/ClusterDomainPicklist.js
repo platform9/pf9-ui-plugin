@@ -7,16 +7,22 @@ import Picklist from 'core/components/Picklist'
 import { loadCloudProviderRegionDetails } from './actions'
 
 const ClusterDomainPicklist = forwardRef(({
-  cloudProviderId, cloudProviderRegionId, hasError, errorMessage, ...rest
+  cloudProviderId, cloudProviderRegionId, hasError, errorMessage, onChange, ...rest
 }, ref) => {
   const [details, loading] = useDataLoader(loadCloudProviderRegionDetails, { cloudProviderId, cloudProviderRegionId })
 
   const domains = pathStrOr([], '0.domains', details)
   const options = domains.map(x => ({ label: x.Name, value: x.Id }))
 
+  const handleChange = value => {
+    const option = options.find(x => x.value === value)
+    onChange && onChange(value, option && option.label)
+  }
+
   return (
     <Picklist
       {...rest}
+      onChange={handleChange}
       ref={ref}
       loading={loading}
       options={options}
