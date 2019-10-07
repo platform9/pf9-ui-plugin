@@ -524,8 +524,9 @@ class Qbert {
     return response
   }
 
-  deleteLogging = async (clusterId) => {
-    const response = await this.client.basicDelete(`${await this.baseUrl()}/apis/logging.pf9.io/v1alpha1/loggings/${clusterId}`)
+  deleteLogging = async (logging) => {
+    const { cluster } = logging
+    const response = await this.client.basicDelete(`${await this.baseUrl()}/apis/logging.pf9.io/v1alpha1/loggings/${cluster}`)
     return response
   }
 }

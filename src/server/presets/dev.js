@@ -234,7 +234,7 @@ function loadPreset () {
 
   // Logging
   const loggings = LoggingStub.getLoggings()
-  Logging.create({ data: loggings[0], context, config: { clusterId: cluster.uuid }, raw: true })
+  loggings.forEach(logging => Logging.create({ data: logging, context, config: { clusterId: logging.cluster }, raw: true }))
 }
 
 export default loadPreset
