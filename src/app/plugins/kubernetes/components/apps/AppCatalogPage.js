@@ -49,7 +49,7 @@ const AppCatalogPage = () => {
         onDeploy={handleDeploy(item)}
         onDownload={handleDownload(item)}
         clusterId={params.clusterId} />,
-    [params])
+    [params.clusterId])
 
   return <>
     {showingDeployDialog &&
