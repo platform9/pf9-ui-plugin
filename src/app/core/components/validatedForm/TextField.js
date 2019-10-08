@@ -4,6 +4,17 @@ import { TextField as BaseTextField } from '@material-ui/core'
 import { compose } from 'app/utils/fp'
 import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
 import { withInfoTooltip } from 'core/components/InfoTooltip'
+import { withStyles } from '@material-ui/styles'
+
+const styles = () => ({
+  // Workaround for label value in outlined TextField overlapping the border
+  // https://github.com/mui-org/material-ui/issues/14530
+  label: {
+    backgroundColor: 'white',
+    padding: '0 5px',
+    margin: '0 -5px',
+  },
+})
 
 class TextField extends PureComponent {
   handleChange = e => {
@@ -26,6 +37,11 @@ class TextField extends PureComponent {
     return (
       <BaseTextField
         {...restProps}
+        InputLabelProps={{
+          classes: {
+            root: classes.label,
+          },
+        }}
         variant="outlined"
         error={hasError}
         value={value !== undefined ? value : ''}
@@ -48,4 +64,5 @@ TextField.propTypes = {
 export default compose(
   withInfoTooltip, // This HoC causes unnecessary re-renders if declared after withFormContext
   withFormContext,
+  withStyles(styles),
 )(TextField)

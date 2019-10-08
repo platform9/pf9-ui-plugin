@@ -34,6 +34,7 @@ import {
 // TODO
 // import { deployApplication } from './applications'
 import { getRepositoriesForCluster } from './repositories/actions'
+import path from 'path'
 
 const router = express.Router()
 
@@ -93,10 +94,14 @@ router.get(`${monocularClusterBaseV1}/charts/:releaseName/:chartName/versions/:v
 router.get(`${monocularClusterBaseV1}/charts/:releaseName/:chartName/versions`, tokenValidator, getChartVersions)
 router.get(`${monocularClusterBaseV1}/charts/:releaseName/:chartName/:version`, tokenValidator, getChart)
 router.get(`${monocularClusterBaseV1}/charts`, tokenValidator, getCharts)
-router.get(`${monocularClusterBase}/assets/:releaseName/:chartName/:version/README.md`, tokenValidator, (req, res) => {
-  const path = __dirname + '/../../assets/dummyMarkdown.md'
-  readFile(path, 'utf8', (err, data) => {
+router.get(`${monocularClusterBase}/assets/:releaseName/:chartName/:version/README.md`, tokenValidator, (req,
+  res) => {
+  const mdPath = path.join(__dirname, '/../../assets/dummyMarkdown.md')
+  readFile(mdPath, 'utf8', (err, data) => {
     res.send(data)
+    if (err) {
+      return null
+    }
   })
 })
 
