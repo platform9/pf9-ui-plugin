@@ -12,6 +12,7 @@ import AppsIndexPage from './components/apps/AppsIndexPage'
 import ClusterDetailsPage from './components/infrastructure/ClusterDetailsPage'
 import InfrastructurePage from './components/infrastructure/InfrastructurePage'
 import NamespacesListPage from './components/namespaces/NamespacesListPage'
+import OnboardingPage from './components/onboarding/OnboardingPage'
 import PodsIndexPage from './components/pods/PodsIndexPage'
 import StorageClassesPage from './components/storage/StorageClassesPage'
 import UpdateCloudProviderPage from './components/infrastructure/UpdateCloudProviderPage'
@@ -181,6 +182,11 @@ Kubernetes.registerPlugin = pluginManager => {
         name: 'Edit Prometheus Alert Manager',
         link: { path: '/prometheus/alertManagers/edit/:id', exact: true },
         component: UpdatePrometheusAlertManagerPage,
+      },
+      {
+        name: 'Guided Onboarding',
+        link: { path: '/onboarding', exact: true },
+        component: OnboardingPage,
       },
     ],
   )
