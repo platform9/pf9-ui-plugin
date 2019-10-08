@@ -273,7 +273,7 @@ const AddAwsClusterPage = () => {
           <>
             <WizardStep stepId="basic" label="Basic Info">
               <FormWrapper title="Add Cluster">
-                <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext}>
+                <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                   {({ setFieldValue, values }) => (
                     <>
                       {/* Cluster Name */}
@@ -348,7 +348,7 @@ const AddAwsClusterPage = () => {
 
             <WizardStep stepId="config" label="Cluster Configuration">
               <FormWrapper title="Cluster Configuration">
-                <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext}>
+                <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                   {({ setFieldValue, values }) => (
                     <>
                       {/* Operating System */}
@@ -434,7 +434,7 @@ const AddAwsClusterPage = () => {
 
             <WizardStep stepId="network" label="Network Info">
               <FormWrapper title="Network Info">
-                <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext}>
+                <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                   {({ setFieldValue, values }) => (
                     <>
                       {/* Use PF9 domain */}
@@ -515,7 +515,7 @@ const AddAwsClusterPage = () => {
 
             <WizardStep stepId="advanced" label="Advanced Configuration">
               <FormWrapper title="Advanced Configuration">
-                <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext}>
+                <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                   {({ setFieldValue, values }) => (
                     <>
                       {/* Privileged */}
@@ -571,7 +571,7 @@ const AddAwsClusterPage = () => {
 
             <WizardStep stepId="review" label="Review">
               <FormWrapper title="Review">
-                <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext}>
+                <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                   {/* TODO */}
                   <pre>{JSON.stringify(wizardContext, null, 4)}</pre>
                 </ValidatedForm>
