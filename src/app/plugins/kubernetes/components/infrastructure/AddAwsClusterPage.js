@@ -121,6 +121,10 @@ const handleNetworkPluginChange = ({ setWizardContext, setFieldValue }) => optio
 // These fields are only rendered when the user opts to not use a `platform9.net` domain.
 const renderCustomNetworkingFields = ({ params, getParamsUpdater, values, setFieldValue, setWizardContext, wizardContext }) => {
   const updateFqdns = (value, label) => {
+    console.log('wizardContext')
+    console.log(wizardContext)
+    console.log('values')
+    console.log(values)
     const name = values.name || wizardContext.name
 
     const api = `${name}-api.${label}`
@@ -336,10 +340,17 @@ const AddAwsClusterPage = () => {
                         info="Select an AWS SSH key to be associated with the nodes. This key can be used to access the nodes for debugging or other purposes."
                         required
                       />
+                    </>
+                  )}
+                </ValidatedForm>
+              </FormWrapper>
+            </WizardStep>
 
-                      {/* CLUSTER CONFIGURATION STEP */}
-                      {/* TODO: Leaving in first step for easier development.  Move this into its own step once we are done */}
-
+            <WizardStep stepId="config" label="Cluster Configuration">
+              <FormWrapper title="Cluster Configuration">
+                <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext}>
+                  {({ setFieldValue, values }) => (
+                    <>
                       {/* Operating System */}
                       <PicklistField
                         id="ami"
@@ -415,10 +426,17 @@ const AddAwsClusterPage = () => {
                           required={values.enableCAS}
                         />
                       }
+                    </>
+                  )}
+                </ValidatedForm>
+              </FormWrapper>
+            </WizardStep>
 
-                      {/* NETWORK INFO STEP */}
-                      {/* TODO: Leaving in first step for easier development.  Move this into its own step once we are done */}
-
+            <WizardStep stepId="network" label="Network Info">
+              <FormWrapper title="Network Info">
+                <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext}>
+                  {({ setFieldValue, values }) => (
+                    <>
                       {/* Use PF9 domain */}
                       <CheckboxField
                         id="usePf9Domain"
@@ -489,10 +507,17 @@ const AddAwsClusterPage = () => {
                           required={values.networkPlugin === 'calico'}
                         />
                       }
+                    </>
+                  )}
+                </ValidatedForm>
+              </FormWrapper>
+            </WizardStep>
 
-                      {/* ADVANCED CONFIGURATION STEP */}
-                      {/* TODO: Leaving in first step for easier development.  Move this into its own step once we are done */}
-
+            <WizardStep stepId="advanced" label="Advanced Configuration">
+              <FormWrapper title="Advanced Configuration">
+                <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext}>
+                  {({ setFieldValue, values }) => (
+                    <>
                       {/* Privileged */}
                       <CheckboxField
                         id="privileged"
@@ -540,39 +565,15 @@ const AddAwsClusterPage = () => {
                       />
                     </>
                   )}
-
-                </ValidatedForm>
-              </FormWrapper>
-            </WizardStep>
-
-            <WizardStep stepId="config" label="Cluster Configuration">
-              <FormWrapper title="Cluster Configuration">
-                <ValidatedForm>
-                  {/* TODO */}
-                </ValidatedForm>
-              </FormWrapper>
-            </WizardStep>
-
-            <WizardStep stepId="network" label="Network Info">
-              <FormWrapper title="Network Info">
-                <ValidatedForm>
-                  {/* TODO */}
-                </ValidatedForm>
-              </FormWrapper>
-            </WizardStep>
-
-            <WizardStep stepId="advanced" label="Advanced Configuration">
-              <FormWrapper title="Advanced Configuration">
-                <ValidatedForm>
-                  {/* TODO */}
                 </ValidatedForm>
               </FormWrapper>
             </WizardStep>
 
             <WizardStep stepId="review" label="Review">
               <FormWrapper title="Review">
-                <ValidatedForm>
+                <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext}>
                   {/* TODO */}
+                  <pre>{JSON.stringify(wizardContext, null, 4)}</pre>
                 </ValidatedForm>
               </FormWrapper>
             </WizardStep>
