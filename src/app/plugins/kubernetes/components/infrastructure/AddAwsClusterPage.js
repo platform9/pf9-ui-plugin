@@ -26,12 +26,13 @@ const initialContext = {
   numMasters: 1,
   numWorkers: 1,
   enableCAS: false,
-  usePf9Domain: false, // TODO: default to true when not in dev
+  usePf9Domain: true,
   network: 'newVpc',
   containersCidr: '10.20.0.0/16',
   servicesCidr: '10.21.0.0/16',
   networkPlugin: 'flannel',
   mtuSize: 1440,
+  runtimeConfigOption: 'default',
 }
 
 const templateOptions = [
@@ -49,6 +50,12 @@ const numMasterOptions = [
   { label: '1', value: 1 },
   { label: '3', value: 3 },
   { label: '5', value: 5 },
+]
+
+const runtimeConfigOptions = [
+  { label: 'Default API groups and versions', value: 'default' },
+  { label: 'All API groups and versions', value: 'all' },
+  { label: 'Custom', value: 'custom' },
 ]
 
 // The template picker allows the user to fill out some useful defaults for the fields.
@@ -229,7 +236,6 @@ const renderCustomNetworkingFields = ({ params, getParamsUpdater, values, setFie
 }
 
 const handleSubmit = params => data => {
-  // TODO: construct the body that will be passed to the API
   const body = {
     ...pick('nodePoolUuid name region azs ami masterFlavor workerFlavor numMasters enableCAS numWorks allowWorkloadsOnMaster'.split(' '), data),
     ...pick('domainId vpc isPrivate privateSubnets subnets externalDnsName serviceFqdn containersCidr servicesCidr'.split(' '), data),
@@ -237,7 +243,18 @@ const handleSubmit = params => data => {
   if (data.httpProxy) { body.httpProxy = data.httpProxy }
   if (data.networkPlugin === 'calico') { body.mtuSize = data.mtuSize }
 
+  data.runtimeConfig = {
+    default: '',
+    all: 'api/all=true',
+    custom: data.customRuntimeConfig,
+  }[data.runtimeConfigOption]
+
   console.log('TODO: submit API call with body')
+  console.log('params')
+  console.log(params)
+  console.log('data')
+  console.log(data)
+  console.log('-------------------------')
   console.log(body)
   return body
 }
@@ -484,15 +501,22 @@ const AddAwsClusterPage = () => {
                         info="Allows this cluster to run privileged containers. Read this article for more information."
                       />
 
-                      {/* Advanced API Configuration(TODO) */}
+                      {/* Advanced API Configuration */}
                       <PicklistField
-                        id="networkPlugin"
-                        label="Network backend"
-                        options={networkPluginOptions}
-                        info=""
-                        onChange={handleNetworkPluginChange({ setWizardContext, setFieldValue })}
+                        id="runtimeConfigOption"
+                        label="Advanced API Configuration"
+                        options={runtimeConfigOptions}
+                        info="Make sure you are familiar with the Kubernetes API configuration documentation before enabling this option."
                         required
                       />
+
+                      {values.runtimeConfigOption === 'custom' &&
+                        <TextField
+                          id="customRuntimeConfig"
+                          label="Custom API Configuration"
+                          info=""
+                        />
+                      }
 
                       {/* Enable Application Catalog */}
                       <CheckboxField
