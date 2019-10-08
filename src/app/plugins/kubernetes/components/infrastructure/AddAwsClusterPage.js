@@ -121,10 +121,6 @@ const handleNetworkPluginChange = ({ setWizardContext, setFieldValue }) => optio
 // These fields are only rendered when the user opts to not use a `platform9.net` domain.
 const renderCustomNetworkingFields = ({ params, getParamsUpdater, values, setFieldValue, setWizardContext, wizardContext }) => {
   const updateFqdns = (value, label) => {
-    console.log('wizardContext')
-    console.log(wizardContext)
-    console.log('values')
-    console.log(values)
     const name = values.name || wizardContext.name
 
     const api = `${name}-api.${label}`
