@@ -56,7 +56,7 @@ const AddClusterPage = () => {
 
       <div className={classes.root}>
         <CloudProviderLink label="Bare OS" image={icons.other} src={`${k8sPrefix}/infrastructure/clusters/addBareOs`} />
-        <CloudProviderLink label="AWS" image={icons.aws} src={`${k8sPrefix}/infrastructure/clusters/adAws`} />
+        <CloudProviderLink label="AWS" image={icons.aws} src={`${k8sPrefix}/infrastructure/clusters/addAws`} />
         <CloudProviderLink label="Azure" image={icons.azure} src={`${k8sPrefix}/infrastructure/clusters/addAzure`} />
       </div>
     </div>

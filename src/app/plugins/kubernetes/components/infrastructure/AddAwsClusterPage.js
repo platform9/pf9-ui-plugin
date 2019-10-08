@@ -237,8 +237,17 @@ const renderCustomNetworkingFields = ({ params, getParamsUpdater, values, setFie
 
 const handleSubmit = params => data => {
   const body = {
-    ...pick('nodePoolUuid name region azs ami masterFlavor workerFlavor numMasters enableCAS numWorks allowWorkloadsOnMaster'.split(' '), data),
-    ...pick('domainId vpc isPrivate privateSubnets subnets externalDnsName serviceFqdn containersCidr servicesCidr'.split(' '), data),
+    // basic info
+    ...pick('nodePoolUuid name region azs ami sshKey'.split(' '), data),
+
+    // cluster configuration
+    ...pick('masterFlavor workerFlavor numMasters enableCAS numWorkers numMaxWorkers allowWorkloadsOnMaster numSpotWorkers spotPrice'.split(' '), data),
+
+    // network info
+    ...pick('domainId vpc isPrivate privateSubnets subnets externalDnsName serviceFqdn containersCidr servicesCidr networkPlugin'.split(' '), data),
+
+    // advanced configuration
+    ...pick('privileged appCatalogEnabled customAmi tags'.split(' '), data),
   }
   if (data.httpProxy) { body.httpProxy = data.httpProxy }
   if (data.networkPlugin === 'calico') { body.mtuSize = data.mtuSize }
@@ -256,6 +265,10 @@ const handleSubmit = params => data => {
   console.log(data)
   console.log('-------------------------')
   console.log(body)
+
+  // TODO: azs
+  // TODO: vpc
+  //
   return body
 }
 
