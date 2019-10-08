@@ -1,43 +1,63 @@
 import React from 'react'
 import SimpleLink from 'core/components/SimpleLink'
+import Typography from '@material-ui/core/Typography'
 import { k8sPrefix } from 'app/constants'
 import { makeStyles } from '@material-ui/styles'
 
 const useStyles = makeStyles(theme => ({
   root: {
+    marginTop: theme.spacing(2),
     display: 'flex',
     justifyContent: 'space-between',
     maxWidth: '800px',
+  },
+  provider: {
+    width: '130px',
+    height: '80px',
+    borderRadius: '4px',
+    border: 'solid 1px #888',
+    textAlign: 'center',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  centered: {
+    textAlign: 'center',
   }
 }))
 
-const iconSizes = {
-  small: '',
-  medium: '@2x',
-  large: '@3x',
-}
+const iconSizes = { small: '', medium: '@2x', large: '@3x' }
 const iconSize = iconSizes.small
+const rootPath = '/ui/images/icon-cloudproviders'
 
 const icons = {
-  aws: `/ui/images/icon-cloudproviders/icon-cloudproviders-aws${iconSize}.png`,
-  azure: `/ui/images/icon-cloudproviders/icon-cloudproviders-azure${iconSize}.png`,
-  openstack: `/ui/images/icon-cloudproviders/icon-cloudproviders-openstack${iconSize}.png`,
-  other: `/ui/images/icon-cloudproviders/icon-cloudproviders-other${iconSize}.png`,
-  vmware: `/ui/images/icon-cloudproviders/icon-cloudproviders-vmware${iconSize}.png`,
+  aws: `${rootPath}/icon-cloudproviders-aws${iconSize}.png`,
+  azure: `${rootPath}/icon-cloudproviders-azure${iconSize}.png`,
+  openstack: `${rootPath}/icon-cloudproviders-openstack${iconSize}.png`,
+  other: `${rootPath}/icon-cloudproviders-other${iconSize}.png`,
+  vmware: `${rootPath}/icon-cloudproviders-vmware${iconSize}.png`,
 }
 
-// TOOD: implement new UX for choosing the cluster type to create first.
-// This is a placeholder for now.
 const AddClusterPage = () => {
   const classes = useStyles()
+
+  const CloudProviderLink = ({ label, image, src }) => (
+    <div className={classes.centered}>
+      <SimpleLink src={src}>
+        <div className={classes.provider}><img src={image} /></div>
+        <Typography variant="subtitle1">{label}</Typography>
+      </SimpleLink>
+    </div>
+  )
+
   return (
     <div>
-      <h1>Choose a cluster type to create</h1>
+      <Typography variant="h5">Select one of the support Cloud Provider Types:</Typography>
 
       <div className={classes.root}>
-        <SimpleLink src={`${k8sPrefix}/infrastructure/clusters/addAws`}><img src={icons.aws} /></SimpleLink>
-        <SimpleLink src={`${k8sPrefix}/infrastructure/clusters/addBareOs`}><img src={icons.openstack} /></SimpleLink>
-        <SimpleLink src={`${k8sPrefix}/infrastructure/clusters/addAzure`}><img src={icons.azure} /></SimpleLink>
+        <CloudProviderLink label="Bare OS" image={icons.other} src={`${k8sPrefix}/infrastructure/clusters/addBareOs`} />
+        <CloudProviderLink label="AWS" image={icons.aws} src={`${k8sPrefix}/infrastructure/clusters/adAws`} />
+        <CloudProviderLink label="Azure" image={icons.azure} src={`${k8sPrefix}/infrastructure/clusters/addAzure`} />
       </div>
     </div>
 
