@@ -70,6 +70,7 @@ const clusterUsageSpec = {
 }
 
 export const clusterActions = createCRUDActions(clustersCacheKey, {
+  createFn: (params) => qbert.createCluster(params),
   listFn: async (params, loadFromContext) => {
     const [rawNodes, combinedHosts, rawClusters, qbertEndpoint] = await Promise.all([
       loadFromContext(rawNodesCacheKey),

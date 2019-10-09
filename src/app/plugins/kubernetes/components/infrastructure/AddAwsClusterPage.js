@@ -1,6 +1,7 @@
 import React from 'react'
 import FormWrapper from 'core/components/FormWrapper'
 import AwsAvailabilityZoneChooser from './AwsAvailabilityZoneChooser'
+import AwsClusterReviewTable from './AwsClusterReviewTable'
 import AwsRegionFlavorPicklist from './AwsRegionFlavorPicklist'
 import AwsClusterVpcPicklist from './AwsClusterVpcPicklist'
 import CloudProviderPicklist from 'k8s/components/common/CloudProviderPicklist'
@@ -15,7 +16,10 @@ import TextField from 'core/components/validatedForm/TextField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import Wizard from 'core/components/wizard/Wizard'
 import WizardStep from 'core/components/wizard/WizardStep'
+import useDataUpdater from 'core/hooks/useDataUpdater'
 import useParams from 'core/hooks/useParams'
+import useReactRouter from 'use-react-router'
+import { clusterActions } from './actions'
 import { pick } from 'ramda'
 
 const initialContext = {
@@ -235,45 +239,43 @@ const renderCustomNetworkingFields = ({ params, getParamsUpdater, values, setFie
   )
 }
 
-const handleSubmit = params => data => {
-  const body = {
-    // basic info
-    ...pick('nodePoolUuid name region azs ami sshKey'.split(' '), data),
-
-    // cluster configuration
-    ...pick('masterFlavor workerFlavor numMasters enableCAS numWorkers numMaxWorkers allowWorkloadsOnMaster numSpotWorkers spotPrice'.split(' '), data),
-
-    // network info
-    ...pick('domainId vpc isPrivate privateSubnets subnets externalDnsName serviceFqdn containersCidr servicesCidr networkPlugin'.split(' '), data),
-
-    // advanced configuration
-    ...pick('privileged appCatalogEnabled customAmi tags'.split(' '), data),
-  }
-  if (data.httpProxy) { body.httpProxy = data.httpProxy }
-  if (data.networkPlugin === 'calico') { body.mtuSize = data.mtuSize }
-
-  data.runtimeConfig = {
-    default: '',
-    all: 'api/all=true',
-    custom: data.customRuntimeConfig,
-  }[data.runtimeConfigOption]
-
-  console.log('TODO: submit API call with body')
-  console.log('params')
-  console.log(params)
-  console.log('data')
-  console.log(data)
-  console.log('-------------------------')
-  console.log(body)
-
-  // TODO: azs
-  // TODO: vpc
-  //
-  return body
-}
-
 const AddAwsClusterPage = () => {
   const { params, getParamsUpdater } = useParams()
+  const { history } = useReactRouter()
+  const onComplete = () => {
+    history.push('/ui/kubernetes/infrastructure#clusters')
+  }
+  const [create] = useDataUpdater(clusterActions.create, onComplete)
+
+  const handleSubmit = params => async data => {
+    const body = {
+      // basic info
+      ...pick('nodePoolUuid name region azs ami sshKey'.split(' '), data),
+
+      // cluster configuration
+      ...pick('masterFlavor workerFlavor numMasters enableCAS numWorkers numMaxWorkers allowWorkloadsOnMaster numSpotWorkers spotPrice'.split(' '), data),
+
+      // network info
+      ...pick('domainId vpc isPrivate privateSubnets subnets externalDnsName serviceFqdn containersCidr servicesCidr networkPlugin'.split(' '), data),
+
+      // advanced configuration
+      ...pick('privileged appCatalogEnabled customAmi tags'.split(' '), data),
+    }
+    if (data.httpProxy) { body.httpProxy = data.httpProxy }
+    if (data.networkPlugin === 'calico') { body.mtuSize = data.mtuSize }
+
+    data.runtimeConfig = {
+      default: '',
+      all: 'api/all=true',
+      custom: data.customRuntimeConfig,
+    }[data.runtimeConfigOption]
+
+    // TODO: azs
+    // TODO: vpc
+
+    await create(body)
+    return body
+  }
 
   return (
     <Wizard onComplete={handleSubmit(params)} context={initialContext}>
@@ -581,8 +583,7 @@ const AddAwsClusterPage = () => {
             <WizardStep stepId="review" label="Review">
               <FormWrapper title="Review">
                 <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
-                  {/* TODO */}
-                  <pre>{JSON.stringify(wizardContext, null, 4)}</pre>
+                  <AwsClusterReviewTable data={wizardContext} />
                 </ValidatedForm>
               </FormWrapper>
             </WizardStep>
