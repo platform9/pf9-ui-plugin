@@ -31,6 +31,11 @@ const useStyles = makeStyles(theme => ({
   },
 }))
 
+/**
+ * Component to be used as a container for the sections contents which allows to use
+ * PageContainerHeader to render extra header contents dynamically within any children and also
+ * exposes a "header" prop to render any arbitrary fixed header content
+ */
 const PageContainer = ({ children, header, ...rest }) => {
   const classes = useStyles(rest)
   const [extraHeaderContainer, setExtraHeaderContainer] = useState(null)
