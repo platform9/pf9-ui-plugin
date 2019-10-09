@@ -6,6 +6,7 @@ import namespaceActions from './actions'
 import { createUsePrefParamsHook } from 'core/hooks/useParams'
 import { listTablePrefs } from 'app/constants'
 import { pick } from 'ramda'
+import PageContainer from 'core/components/pageContainer/PageContainer'
 
 const defaultParams = {
   masterNodeClusters: true,
@@ -16,20 +17,22 @@ const ListPage = ({ ListContainer }) => {
   return () => {
     const { params, getParamsUpdater } = usePrefParams(defaultParams)
     const [namespaces, loading, reload] = useDataLoader(namespaceActions.list, params)
-    return <ListContainer
-      loading={loading}
-      reload={reload}
-      data={namespaces}
-      getParamsUpdater={getParamsUpdater}
-      filters={
-        <ClusterPicklist
-          onChange={getParamsUpdater('clusterId')}
-          value={params.clusterId}
-          onlyMasterNodeClusters
-        />
-      }
-      {...pick(listTablePrefs, params)}
-    />
+    return <PageContainer floatingHeader={false}>
+      <ListContainer
+        loading={loading}
+        reload={reload}
+        data={namespaces}
+        getParamsUpdater={getParamsUpdater}
+        filters={
+          <ClusterPicklist
+            onChange={getParamsUpdater('clusterId')}
+            value={params.clusterId}
+            onlyMasterNodeClusters
+          />
+        }
+        {...pick(listTablePrefs, params)}
+      />
+    </PageContainer>
   }
 }
 

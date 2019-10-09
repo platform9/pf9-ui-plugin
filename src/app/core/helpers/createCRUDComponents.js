@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 import CRUDListContainer from 'core/components/CRUDListContainer'
 import ListTable from 'core/components/listTable/ListTable'
-import TopAddButtonAndDialog from 'core/components/TopAddButtonAndDialog'
+import TopAddButtonAndDialog from 'core/components/pageContainer/TopAddButtonAndDialog'
 import requiresAuthentication from 'openstack/util/requiresAuthentication'
 import useDataLoader from 'core/hooks/useDataLoader'
 import useDataUpdater from 'core/hooks/useDataUpdater'

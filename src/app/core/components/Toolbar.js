@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import TenantChooser from 'openstack/components/tenants/TenantChooser'
 import RegionChooser from 'openstack/components/regions/RegionChooser'
@@ -6,11 +6,9 @@ import UserMenu from 'core/components/UserMenu'
 import MaterialToolbar from '@material-ui/core/Toolbar/Toolbar'
 import { AppBar } from '@material-ui/core'
 import { imageUrls } from 'app/constants'
-import { withStyles } from '@material-ui/styles'
-import { AppContext } from 'core/AppProvider'
-import { assoc, dissoc } from 'ramda'
+import { makeStyles } from '@material-ui/styles'
 
-const styles = theme => ({
+const useStyles = makeStyles(theme => ({
   appBar: {
     position: 'fixed',
     boxShadow: 'none',
@@ -37,29 +35,11 @@ const styles = theme => ({
   leftMargin: {
     marginLeft: theme.spacing(2),
   },
-  extraContent: {
-    position: 'absolute',
-    color: theme.palette.text.primary,
-    right: theme.spacing(3),
-    bottom: -(theme.spacing(9.5)),
-  },
-})
+}))
 
-const extraContentRef = React.createRef()
-
-const renderExtraContent = classes => {
-  const { setContext } = React.useContext(AppContext)
-  useEffect(() => {
-    setContext(assoc('extraContentRef', extraContentRef))
-    return () => {
-      setContext(dissoc('extraContentRef'))
-    }
-  }, [])
-  return <div className={classes.extraContent} ref={extraContentRef} />
-}
-
-const Toolbar = ({ classes, open }) => (
-  <AppBar className={classes.appBar}>
+const Toolbar = ({ open }) => {
+  const classes = useStyles()
+  return <AppBar className={classes.appBar}>
     <MaterialToolbar variant="dense" disableGutters={!open}>
       <img src={imageUrls.logo} className={classes.logo} />
       <div className={classes.rightTools}>
@@ -68,13 +48,11 @@ const Toolbar = ({ classes, open }) => (
         <UserMenu className={classes.leftMargin} />
       </div>
     </MaterialToolbar>
-    {renderExtraContent(classes)}
   </AppBar>
-
-)
+}
 
 Toolbar.propTypes = {
   open: PropTypes.bool,
 }
 
-export default withStyles(styles, { withTheme: true })(Toolbar)
+export default Toolbar
