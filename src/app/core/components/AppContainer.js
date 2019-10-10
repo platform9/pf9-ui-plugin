@@ -3,6 +3,7 @@ import axios from 'axios'
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/styles'
+import { withRouter } from 'react-router-dom'
 import clsx from 'clsx'
 import Intercom from 'core/components/integrations/Intercom'
 import Navbar, { drawerWidth } from 'core/components/Navbar'
@@ -50,6 +51,7 @@ const styles = theme => ({
   },
 })
 
+@withRouter
 @withStyles(styles, { withTheme: true })
 class AppContainer extends PureComponent {
   async componentDidMount () {
@@ -70,6 +72,23 @@ class AppContainer extends PureComponent {
       // the stack switching appropriately.
       this.setState({ withStackSlider: true })
     }
+  }
+
+  componentWillMount() {
+    const { history } = this.props
+
+    this.unlisten = this.props.history.listen((location, action) => {
+      if (!analytics) { return }
+      analytics.page(`${location.pathname}${location.hash}`)
+    });
+
+    // This is to send page event for the first page the user lands on
+    if (!analytics) { return }
+    analytics.page(`${history.location.pathname}${history.location.hash}`)
+  }
+
+  componentWillUnmount() {
+      this.unlisten();
   }
 
   state = {
