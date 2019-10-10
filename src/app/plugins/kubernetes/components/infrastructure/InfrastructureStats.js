@@ -34,6 +34,7 @@ const totalsSpec = {
 
 const useStyles = makeStyles(theme => ({
   root: {
+    alignSelf: 'normal',
     margin: theme.spacing(1, 0),
   },
 }))
@@ -65,22 +66,24 @@ const InfrastructureStats = () => {
     return clusters.reduce(specReducer, totalsSpec)
   }, [clusters])
 
-  return <Progress loading={loadingClusters} minHeight={200}>
-    <Grid container spacing={4} className={classes.root}>
-      <Grid item xs={4}>
-        <UsageWidget title="Compute" stats={totals.compute} headerImg={'/ui/images/icon-compute.svg'} />
+  return <div className={classes.root}>
+    <Progress loading={loadingClusters} minHeight={200}>
+      <Grid container spacing={4}>
+        <Grid item xs={4}>
+          <UsageWidget title="Compute" stats={totals.compute} headerImg={'/ui/images/icon-compute.svg'} />
+        </Grid>
+        <Grid item xs={4}>
+          <UsageWidget title="Memory" stats={totals.memory} headerImg={'/ui/images/icon-memory.svg'} />
+        </Grid>
+        <Grid item xs={4}>
+          <UsageWidget title="Storage" stats={totals.disk} headerImg={'/ui/images/icon-storage.svg'} />
+        </Grid>
+        <Grid item xs={3}>
+          {/* TODO Networks */}
+        </Grid>
       </Grid>
-      <Grid item xs={4}>
-        <UsageWidget title="Memory" stats={totals.memory} headerImg={'/ui/images/icon-memory.svg'} />
-      </Grid>
-      <Grid item xs={4}>
-        <UsageWidget title="Storage" stats={totals.disk} headerImg={'/ui/images/icon-storage.svg'} />
-      </Grid>
-      <Grid item xs={3}>
-        {/* TODO Networks */}
-      </Grid>
-    </Grid>
-  </Progress>
+    </Progress>
+  </div>
 }
 
 export default InfrastructureStats

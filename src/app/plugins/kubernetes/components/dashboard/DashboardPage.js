@@ -3,7 +3,6 @@ import { compose } from 'app/utils/fp'
 import { makeStyles, createStyles } from '@material-ui/styles'
 import { Typography } from '@material-ui/core'
 import requiresAuthentication from 'openstack/util/requiresAuthentication'
-import ClusterSetupWizard from './ClusterSetupWizard'
 
 const useStyles = makeStyles(theme => createStyles({
   welcome: {
@@ -18,7 +17,6 @@ const Dashboard = () => {
   return (
     <div>
       <Typography className={classes.welcome}>Welcome (username)</Typography>
-      <ClusterSetupWizard />
     </div>
   )
 }

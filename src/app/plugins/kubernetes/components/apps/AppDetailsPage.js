@@ -11,12 +11,9 @@ import { appDetailLoader } from 'k8s/components/apps/actions'
 import { emptyObj, emptyArr } from 'utils/fp'
 import SimpleLink from 'core/components/SimpleLink'
 import AppDeployDialog from 'k8s/components/apps/AppDeployDialog'
+import PageContainer from 'core/components/pageContainer/PageContainer'
 
 const useStyles = makeStyles(theme => ({
-  root: {
-    display: 'flex',
-    flexFlow: 'column nowrap',
-  },
   backLink: {
     marginBottom: theme.spacing(2),
     alignSelf: 'flex-end',
@@ -56,7 +53,7 @@ const AppDetailsPage = () => {
   // We are just interested in the first (and only) item
   const [[app = emptyObj], loadingApp] = useDataLoader(appDetailLoader, params)
 
-  return <div className={classes.root}>
+  return <PageContainer>
     {showingDeployDialog &&
     <AppDeployDialog
       app={app}
@@ -130,7 +127,7 @@ const AppDetailsPage = () => {
         </Grid>
       </Grid>
     </Progress>
-  </div>
+  </PageContainer>
 }
 
 export default AppDetailsPage

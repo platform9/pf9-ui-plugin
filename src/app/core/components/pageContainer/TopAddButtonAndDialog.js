@@ -2,7 +2,7 @@ import React, { Fragment, useState, useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import useReactRouter from 'use-react-router'
 import CreateButton from 'core/components/buttons/CreateButton'
-import TopExtraContent from 'core/components/TopExtraContent'
+import PageContainerHeader from 'core/components/pageContainer/PageContainerHeader'
 
 const TopAddButtonAndDialog = ({ addUrl, addText, renderAddDialog, reload }) => {
   const { history } = useReactRouter()
@@ -14,11 +14,11 @@ const TopAddButtonAndDialog = ({ addUrl, addText, renderAddDialog, reload }) => 
   }, [reload])
 
   const addButton = useMemo(() => (
-    <TopExtraContent>
+    <PageContainerHeader>
       <CreateButton onClick={() => renderAddDialog ? setAddDialogOpen(true) : history.push(addUrl)}>
         {addText}
       </CreateButton>
-    </TopExtraContent>
+    </PageContainerHeader>
   ), [history, addUrl, addText])
 
   const isButtonVisible = addUrl || !!renderAddDialog

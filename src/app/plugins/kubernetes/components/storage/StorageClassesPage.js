@@ -1,5 +1,7 @@
+import React from 'react'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { storageClassesCacheKey } from 'k8s/components/storage/actions'
+import PageContainer from 'core/components/pageContainer/PageContainer'
 
 export const options = {
   addUrl: '/ui/kubernetes/storage_classes/add',
@@ -16,7 +18,8 @@ export const options = {
   title: 'Storage Classes',
 }
 
-const components = createCRUDComponents(options)
-export const NodesList = components.List
+const { ListPage } = createCRUDComponents(options)
 
-export default components.ListPage
+export default () => <PageContainer floatingHeader={false}>
+  <ListPage />
+</PageContainer>
