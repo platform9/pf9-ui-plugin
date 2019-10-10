@@ -1,14 +1,21 @@
 import React, { useMemo } from 'react'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { clusterActions } from './actions'
-import { evolve, add } from 'ramda'
+import { filter, evolve, add } from 'ramda'
 import { pathStrOr, pathStr } from 'utils/fp'
 import UsageWidget from 'core/components/dashboardGraphs/UsageWidget'
 import Progress from 'core/components/progress/Progress'
 import { Grid } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 
-const totalsSpec = {
+const useStyles = makeStyles(theme => ({
+  root: {
+    alignSelf: 'normal',
+    margin: theme.spacing(1, 0),
+  },
+}))
+
+const clusterTotalsSpec = {
   compute: {
     current: 0,
     max: 0,
@@ -31,40 +38,38 @@ const totalsSpec = {
     type: 'used',
   },
 }
+const isClusterActive = cluster => pathStr(`usage.disk.max`, cluster)
+const calcTotals = clusters => {
+  const activeClustersCount = filter(isClusterActive, clusters).length
+  const calcUsagePercent = (strPath, cluster) =>
+    pathStr(`${strPath}.max`, cluster) && activeClustersCount
+      ? 100 * pathStrOr(0, `${strPath}.current`, cluster) / pathStr(`${strPath}.max`, cluster) / activeClustersCount
+      : 0
+  const clusterTotalsReducer = (accumulatedTotals, cluster) => evolve({
+    compute: {
+      current: add(pathStrOr(0, 'usage.compute.current', cluster)),
+      max: add(pathStrOr(0, 'usage.compute.max', cluster)),
+      percent: add(calcUsagePercent('usage.compute', cluster)),
+    },
+    memory: {
+      current: add(pathStrOr(0, 'usage.memory.current', cluster)),
+      max: add(pathStrOr(0, 'usage.memory.max', cluster)),
+      percent: add(calcUsagePercent('usage.memory', cluster)),
+    },
+    disk: {
+      current: add(pathStrOr(0, 'usage.disk.current', cluster)),
+      max: add(pathStrOr(0, 'usage.disk.max', cluster)),
+      percent: add(calcUsagePercent('usage.disk', cluster)),
+    },
+  }, accumulatedTotals)
 
-const useStyles = makeStyles(theme => ({
-  root: {
-    alignSelf: 'normal',
-    margin: theme.spacing(1, 0),
-  },
-}))
-
-const calcUsagePercent = (strPath, node, numClusters) =>
-  100 * pathStrOr(0, `${strPath}.current`, node) / (pathStr(`${strPath}.max`, node) || 1) / numClusters
+  return clusters.reduce(clusterTotalsReducer, clusterTotalsSpec)
+}
 
 const InfrastructureStats = () => {
   const classes = useStyles()
   const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
-  const totals = useMemo(() => {
-    const specReducer = (acc, cluster) => evolve({
-      compute: {
-        current: add(pathStrOr(0, 'usage.compute.current', cluster)),
-        max: add(pathStrOr(0, 'usage.compute.max', cluster)),
-        percent: add(calcUsagePercent('usage.compute', cluster, clusters.length)),
-      },
-      memory: {
-        current: add(pathStrOr(0, 'usage.memory.current', cluster)),
-        max: add(pathStrOr(0, 'usage.memory.max', cluster)),
-        percent: add(calcUsagePercent('usage.memory', cluster, clusters.length)),
-      },
-      disk: {
-        current: add(pathStrOr(0, 'usage.disk.current', cluster)),
-        max: add(pathStrOr(0, 'usage.disk.max', cluster)),
-        percent: add(calcUsagePercent('usage.disk', cluster, clusters.length)),
-      },
-    }, acc)
-    return clusters.reduce(specReducer, totalsSpec)
-  }, [clusters])
+  const totals = useMemo(() => calcTotals(clusters), [clusters])
 
   return <div className={classes.root}>
     <Progress loading={loadingClusters} minHeight={200}>
