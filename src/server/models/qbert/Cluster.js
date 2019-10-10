@@ -8,6 +8,7 @@ import Namespace from './Namespace'
 import Pod from './Pod'
 import Service from './Service'
 import StorageClass from './StorageClass'
+import Logging from './Logging'
 import { attachNodeToCluster } from './Operations'
 import uuid from 'uuid'
 
@@ -114,6 +115,7 @@ const options = {
     Pod.deleteAllInCluster({ clusterId: id, context })
     Service.deleteAllInCluster({ clusterId: id, context })
     StorageClass.deleteAllInCluster({ clusterId: id, context })
+    Logging.deleteAllInCluster({ clusterId: id, context })
   }
 }
 

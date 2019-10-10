@@ -509,24 +509,29 @@ class Qbert {
     instance => `${this.cachedEndpoint}/clusters/${instance.clusterUuid}/k8sapi${instance.dashboard}`
 
   // TODO: Loggings
-  getLoggings = async () => {
-    const response = await this.client.basicGet(`${await this.baseUrl()}/apis/logging.pf9.io/v1alpha1/loggings`)
+  getLoggingsBaseUrl = async (clusterUuid) => `${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/logging.pf9.io/v1alpha1/outputs`
+
+  getLoggings = async (clusterUuid) => {
+    const url = await this.getLoggingsBaseUrl(clusterUuid)
+    const response = await this.client.basicGet(url)
     return response
   }
 
-  createLogging = async (logging) => {
-    const response = await this.client.basicPost(`${await this.baseUrl()}/apis/logging.pf9.io/v1alpha1/loggings`, logging)
+  createLogging = async (clusterUuid, logging) => {
+    const url = await this.getLoggingsBaseUrl(clusterUuid)
+    const response = await this.client.basicPost(url, logging)
     return response
   }
 
-  updateLogging = async (clusterId, logging) => {
-    const response = await this.client.basicPut(`${await this.baseUrl()}/apis/logging.pf9.io/v1alpha1/loggings/${clusterId}`, logging)
+  updateLogging = async (clusterUuid, logging) => {
+    const url = `${await this.getLoggingsBaseUrl(clusterUuid)}/${logging.uuid}`
+    const response = await this.client.basicPut(url, logging)
     return response
   }
 
-  deleteLogging = async (logging) => {
-    const { cluster } = logging
-    const response = await this.client.basicDelete(`${await this.baseUrl()}/apis/logging.pf9.io/v1alpha1/loggings/${cluster}`)
+  deleteLogging = async (clusterUuid, loggingUuid) => {
+    const url = `${await this.getLoggingsBaseUrl(clusterUuid)}/${loggingUuid}`
+    const response = await this.client.basicDelete(url)
     return response
   }
 }

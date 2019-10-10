@@ -50,6 +50,7 @@ const LoggingListPage = () => {
 
   // TODO: onEdit and onDelete
   const options = {
+    cacheKey: 'loggings',
     addText: 'New Logging',
     uniqueIdentifier: 'cluster',
     loaderFn: loggingActions.list,
