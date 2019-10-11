@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { withRouter } from 'react-router-dom'
+import useReactRouter from 'use-react-router'
 import FormWrapper from 'core/components/FormWrapper'
 import Progress from 'core/components/progress/Progress'
 import { getContextLoader } from 'core/helpers/createContextLoader'
@@ -28,7 +28,8 @@ const createUpdateComponents = options => {
   } = options
   const uniqueIdentifierPath = uniqueIdentifier.split('.')
 
-  const UpdatePage = withRouter(({ match, history, ...restProps }) => {
+  const UpdatePage = props => {
+    const { match, history } = useReactRouter()
     const [initialValues, setInitialValues] = useState(emptyObj)
     const [data, loading] = useDataLoader(loaderFn)
     const [update, updating] = useDataUpdater(updateFn, successfulUpdate => {
@@ -53,7 +54,7 @@ const createUpdateComponents = options => {
       if (initFn) {
         // Sometimes a component needs more than just a single GET API call.
         // This function allows for any amount of arbitrary initialization.
-        await initFn(restProps)
+        await initFn(props)
       }
       update(assocPath(uniqueIdentifierPath, id, data))
     }, [id])
@@ -63,12 +64,12 @@ const createUpdateComponents = options => {
         ? 'Updating data...'
         : 'Loading data...'}`} loading={isEmpty(initialValues) || loading || updating}>
         <FormComponent
-          {...restProps}
+          {...props}
           onComplete={handleComplete}
           initialValues={initialValues} />
       </Progress>
     </FormWrapper>
-  })
+  }
 
   UpdatePage.displayName = `Update${name}Page`
 
