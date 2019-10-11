@@ -36,6 +36,7 @@ import LoggingStub from '../../app/plugins/kubernetes/components/logging/Logging
 import { attachNodeToCluster } from '../models/qbert/Operations'
 // import Token from '../models/openstack/Token'
 import { range } from '../util'
+import { strict as assert } from 'assert'
 
 function loadPreset () {
   console.log(`Loading 'dev' preset.`)
@@ -242,18 +243,16 @@ function loadPreset () {
   range(3).forEach(i => ClusterRepository.create({ data: {}, context, config: { clusterId: cluster.uuid, namespace: defaultNamespace.name } }))
 
   // Logging
-  const loggingsJSON = LoggingStub.loggingsJSON
+  const loggingsForAllClusters = LoggingStub.loggingsForAllClusters
 
-  Logging.create({ data: loggingsJSON, context, config: { clusterId: cluster.uuid } })
-  Logging.create({ data: loggingsJSON, context, config: { clusterId: cluster.uuid } })
-  Logging.create({ data: loggingsJSON, context, config: { clusterId: cluster2.uuid } })
-  Logging.create({ data: loggingsJSON, context, config: { clusterId: cluster2.uuid } })
-  Logging.create({ data: loggingsJSON, context, config: { clusterId: cluster3.uuid } })
-  Logging.create({ data: loggingsJSON, context, config: { clusterId: cluster3.uuid } })
-  Logging.create({ data: loggingsJSON, context, config: { clusterId: cluster4.uuid } })
-  Logging.create({ data: loggingsJSON, context, config: { clusterId: cluster4.uuid } })
-  Logging.create({ data: loggingsJSON, context, config: { clusterId: cluster5.uuid } })
-  Logging.create({ data: loggingsJSON, context, config: { clusterId: cluster5.uuid } })
+  // Assert our stub has enough data for all clusters
+  assert(loggingsForAllClusters.length >= 5, 'Not enough data in loggingsForAllClusters!')
+
+  Logging.create({ data: loggingsForAllClusters[0], context, config: { clusterId: cluster.uuid } })
+  Logging.create({ data: loggingsForAllClusters[1], context, config: { clusterId: cluster2.uuid } })
+  Logging.create({ data: loggingsForAllClusters[2], context, config: { clusterId: cluster3.uuid } })
+  Logging.create({ data: loggingsForAllClusters[3], context, config: { clusterId: cluster4.uuid } })
+  Logging.create({ data: loggingsForAllClusters[4], context, config: { clusterId: cluster5.uuid } })
 }
 
 export default loadPreset
