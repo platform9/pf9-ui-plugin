@@ -3,7 +3,7 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import { clusterActions } from './actions'
 import { filter, evolve, add } from 'ramda'
 import { pathStrOr, pathStr } from 'utils/fp'
-import UsageWidget from 'core/components/dashboardGraphs/UsageWidget'
+import UsageWidget from 'core/components/widgets/UsageWidget'
 import Progress from 'core/components/progress/Progress'
 import { Grid } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
@@ -73,7 +73,7 @@ const InfrastructureStats = () => {
 
   return <div className={classes.root}>
     <Progress loading={loadingClusters} minHeight={200}>
-      <Grid container spacing={4}>
+      <Grid container spacing={2}>
         <Grid item xs={4}>
           <UsageWidget title="Compute" stats={totals.compute} headerImg={'/ui/images/icon-compute.svg'} />
         </Grid>
@@ -83,9 +83,9 @@ const InfrastructureStats = () => {
         <Grid item xs={4}>
           <UsageWidget title="Storage" stats={totals.disk} headerImg={'/ui/images/icon-storage.svg'} />
         </Grid>
-        <Grid item xs={3}>
-          {/* TODO Networks */}
-        </Grid>
+        {/* <Grid item xs={3}> */}
+        {/*  TODO */}
+        {/* </Grid> */}
       </Grid>
     </Progress>
   </div>
