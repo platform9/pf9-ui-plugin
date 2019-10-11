@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import SemiCircle from 'core/components/dashboardGraphs/SemiCircle'
+import SemiCircle from 'core/components/widgets/SemiCircle'
 import { Card, CardHeader, CardContent } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 

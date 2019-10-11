@@ -2,10 +2,8 @@ import React, { useCallback } from 'react'
 import CRUDListContainer from 'core/components/CRUDListContainer'
 import ListTable from 'core/components/listTable/ListTable'
 import TopAddButtonAndDialog from 'core/components/pageContainer/TopAddButtonAndDialog'
-import requiresAuthentication from 'openstack/util/requiresAuthentication'
 import useDataLoader from 'core/hooks/useDataLoader'
 import useDataUpdater from 'core/hooks/useDataUpdater'
-import { withRouter } from 'react-router-dom'
 import { emptyArr } from 'utils/fp'
 import { getContextLoader } from 'core/helpers/createContextLoader'
 import { getContextUpdater } from 'core/helpers/createContextUpdater'
@@ -93,7 +91,7 @@ const createCRUDComponents = options => {
   List.displayName = `${name}List`
 
   // ListContainer
-  const ListContainer = withRouter(({ history, data, loading, reload, ...restProps }) => {
+  const ListContainer = ({ data, loading, reload, ...restProps }) => {
     const [handleRemove, deleting] = deleteFn ? useDataUpdater(deleteFn, reload) : emptyArr
     const refetch = useCallback(() => reload(true))
     return (
@@ -123,7 +121,7 @@ const createCRUDComponents = options => {
         </>}
       </CRUDListContainer>
     )
-  })
+  }
 
   ListContainer.displayName = `${name}ListContainer`
 
@@ -146,9 +144,9 @@ const createCRUDComponents = options => {
     }
   }
 
-  const ListPage = requiresAuthentication(options.ListPage
+  const ListPage = options.ListPage
     ? options.ListPage({ ListContainer })
-    : createStandardListPage())
+    : createStandardListPage()
 
   ListPage.displayName = `${name}ListPage`
 

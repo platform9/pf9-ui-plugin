@@ -1,6 +1,6 @@
 import React from 'react'
 import { compose } from 'app/utils/fp'
-import DashboardGraphs from 'core/components/dashboardGraphs/DashboardGraphs'
+import DashboardGraphs from 'core/components/widgets/DashboardGraphs'
 import ProgressCardList from 'core/components/progress/ProgressCardList'
 import requiresAuthentication from '../util/requiresAuthentication'
 

@@ -1,6 +1,6 @@
 import React from 'react'
 import InfoPanel from 'core/components/InfoPanel'
-import UsageWidget from 'core/components/dashboardGraphs/UsageWidget'
+import UsageWidget from 'core/components/widgets/UsageWidget'
 import useReactRouter from 'use-react-router'
 import { Grid } from '@material-ui/core'
 import { clusterActions } from './actions'

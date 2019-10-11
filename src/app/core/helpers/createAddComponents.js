@@ -1,14 +1,14 @@
 import React, { useCallback } from 'react'
-import { withRouter } from 'react-router-dom'
-import { compose } from 'app/utils/fp'
 import FormWrapper from 'core/components/FormWrapper'
 import createFormComponent from 'core/helpers/createFormComponent'
-import requiresAuthentication from 'openstack/util/requiresAuthentication'
 import useDataUpdater from 'core/hooks/useDataUpdater'
+import useReactRouter from 'use-react-router'
+import { getContextUpdater } from 'core/helpers/createContextUpdater'
 
 const createAddComponents = options => {
   const {
-    createFn,
+    cacheKey,
+    createFn = cacheKey ? getContextUpdater(cacheKey, 'create') : null,
     formSpec,
     listUrl,
     name,
@@ -21,8 +21,9 @@ const createAddComponents = options => {
     throw new Error('Unable to display form, No FormComponent or formSpec specified')
   }
 
-  const AddPageBase = props => {
-    const onComplete = useCallback(() => props.history.push(listUrl), [props.history])
+  const AddPage = props => {
+    const { history } = useReactRouter()
+    const onComplete = useCallback(() => history.push(listUrl), [history])
     const [handleAdd, loading] = useDataUpdater(createFn, onComplete)
 
     return (
@@ -32,10 +33,6 @@ const createAddComponents = options => {
     )
   }
 
-  const AddPage = compose(
-    withRouter,
-    requiresAuthentication,
-  )(AddPageBase)
   AddPage.displayName = `Add${name}Page`
 
   return {

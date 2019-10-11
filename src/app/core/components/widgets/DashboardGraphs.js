@@ -7,9 +7,9 @@ import StorageGraph from './StorageGraph'
 import ServersGraph from './ServersGraph'
 
 const styles = theme => ({
-  'dashboard-graphs': {
+  dashboardGraphs: {
     display: 'flex',
-    'margin-top': '10px'
+    marginTop: theme.spacing(1)
   }
 })
 
@@ -28,7 +28,7 @@ class DashboardGraphs extends React.PureComponent {
     const { classes } = this.props
 
     return (
-      <div className={classes['dashboard-graphs']}>
+      <div className={classes.dashboardGraphs}>
         <DashboardCard title="Servers">
           <ServersGraph data={data.servers} />
         </DashboardCard>

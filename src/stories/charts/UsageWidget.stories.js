@@ -1,5 +1,5 @@
 import React from 'react'
-import UsageWidget from 'core/components/dashboardGraphs/UsageWidget'
+import UsageWidget from 'core/components/widgets/UsageWidget'
 import { addStoriesFromModule } from '../helpers'
 
 const addStories = addStoriesFromModule(module)
