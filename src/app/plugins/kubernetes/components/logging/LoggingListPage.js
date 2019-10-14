@@ -1,5 +1,6 @@
 import React from 'react'
 import useReactRouter from 'use-react-router'
+import { map } from 'ramda'
 import { makeStyles, createStyles } from '@material-ui/styles'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
@@ -110,7 +111,7 @@ const renderStatus = (classes, value) => {
   )
 }
 
-const renderList = (values) => values.map(value => (<div key={value}>{value}</div>))
+const renderList = (values) => map(value => (<div key={value}>{value}</div>), values)
 
 const getColumns = (classes) => [
   { id: 'cluster', label: 'Cluster' },

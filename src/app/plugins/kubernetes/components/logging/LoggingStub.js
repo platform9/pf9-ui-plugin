@@ -1,4 +1,6 @@
 /* Stub data while not fetching from real API */
+import faker from 'faker'
+import uuid from 'uuid'
 
 const storageType = {
   S3: 's3',
@@ -58,7 +60,7 @@ const outputListData = {
   metadata: {
     continue: '',
     selfLink: '/apis/logging.pf9.io/v1alpha1/outputs',
-    resourceVersion: '3132'
+    resourceVersion: `${faker.random.number()}`
   }
 }
 
@@ -73,15 +75,15 @@ const elasticSearchItem = (url) => ({
       },
       {
         name: 'user',
-        value: 'test-elastic'
+        value: faker.internet.userName(),
       },
       {
         name: 'password',
-        value: 'test-password'
+        value: faker.internet.password(),
       },
       {
         name: 'index_name',
-        value: 'test-index'
+        value: `${faker.random.number()}`,
       }
     ]
   },
@@ -89,10 +91,10 @@ const elasticSearchItem = (url) => ({
   metadata: {
     name: 'es-object',
     generation: 1,
-    resourceVersion: '3054',
-    creationTimestamp: '2019-10-08T20:07:28Z',
+    resourceVersion: `${faker.random.number()}`,
+    creationTimestamp: faker.date.past(),
     selfLink: '/apis/logging.pf9.io/v1alpha1/outputs/es-object',
-    uid: '2836f085-39cf-4b15-ae56-a653a46c8d44'
+    uid: uuid.v4(),
   }
 })
 
@@ -105,7 +107,7 @@ const s3Item = (bucket) => ({
         valueFrom: {
           namespace: 'default',
           name: 's3',
-          key: 'access_key'
+          key: faker.internet.password(),
         },
         name: 'aws_key_id'
       },
@@ -113,13 +115,13 @@ const s3Item = (bucket) => ({
         valueFrom: {
           namespace: 'default',
           name: 's3',
-          key: 'secret_key'
+          key: faker.internet.password(),
         },
         name: 'aws_sec_key'
       },
       {
         name: 's3_region',
-        value: '<s3 region name>'
+        value: faker.address.country(),
       },
       {
         name: 's3_bucket',
@@ -131,24 +133,25 @@ const s3Item = (bucket) => ({
   metadata: {
     name: 'objstore',
     generation: 1,
-    resourceVersion: '3127',
-    creationTimestamp: '2019-10-08T20:08:25Z',
+    resourceVersion: `${faker.random.number()}`,
+    creationTimestamp: faker.date.past(),
     selfLink: '/apis/logging.pf9.io/v1alpha1/outputs/objstore',
-    uid: 'ce89663d-faba-4f44-86cd-85600d07da0d'
+    uid: uuid.v4(),
   }
 })
+
+const mapStorage = {
+  [storageType.S3]: s3Item,
+  [storageType.ELASTIC_SEARCH]: elasticSearchItem,
+}
 
 const createLoggingsJSON = (loggingsOfOneCluster) => {
   const items = []
 
   loggingsOfOneCluster.logStorage.forEach((storage, index) => {
     const destination = loggingsOfOneCluster.logDestination[index]
-
-    if (storage === storageType.S3) {
-      items.push(s3Item(destination))
-    } else if (storage === storageType.ELASTIC_SEARCH) {
-      items.push(elasticSearchItem(destination))
-    }
+    const item = mapStorage[storage](destination)
+    items.push(item)
   })
 
   return {
