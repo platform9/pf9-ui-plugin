@@ -4,7 +4,7 @@ import SvgNetwork from './SvgNetwork'
 
 const styles = theme => ({
   'svg': {
-    'max-height': '100%',
+    maxHeight: '100%',
     position: 'absolute'
   }
 })

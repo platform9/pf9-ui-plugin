@@ -7,6 +7,7 @@ import UsageWidget from 'core/components/widgets/UsageWidget'
 import Progress from 'core/components/progress/Progress'
 import { Grid } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
+import NetworksWidget from 'core/components/widgets/NetworksWidget'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -70,22 +71,24 @@ const InfrastructureStats = () => {
   const classes = useStyles()
   const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
   const totals = useMemo(() => calcTotals(clusters), [clusters])
+  // TODO: fix the number of networks
+  const numNetworks = 1
 
   return <div className={classes.root}>
     <Progress loading={loadingClusters} minHeight={200}>
-      <Grid container spacing={2}>
-        <Grid item xs={4}>
+      <Grid container spacing={1}>
+        <Grid item xs={3}>
           <UsageWidget title="Compute" stats={totals.compute} headerImg={'/ui/images/icon-compute.svg'} />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={3}>
           <UsageWidget title="Memory" stats={totals.memory} headerImg={'/ui/images/icon-memory.svg'} />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={3}>
           <UsageWidget title="Storage" stats={totals.disk} headerImg={'/ui/images/icon-storage.svg'} />
         </Grid>
-        {/* <Grid item xs={3}> */}
-        {/*  TODO */}
-        {/* </Grid> */}
+        <Grid item xs={3}>
+          <NetworksWidget numNetworks={numNetworks} />
+        </Grid>
       </Grid>
     </Progress>
   </div>

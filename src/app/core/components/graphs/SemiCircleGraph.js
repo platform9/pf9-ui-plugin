@@ -46,7 +46,7 @@ const styles = theme => ({
 })
 
 @withStyles(styles, { withTheme: true })
-class SemiCircle extends React.PureComponent {
+class SemiCircleGraph extends React.PureComponent {
   render () {
     const { label, width, percentage, duration, classes } = this.props
     const arcSize = width / 2 - strokeWidth
@@ -80,16 +80,16 @@ class SemiCircle extends React.PureComponent {
   }
 }
 
-SemiCircle.defaultProps = {
+SemiCircleGraph.defaultProps = {
   width: 150,
   duration: 1000,
 }
 
-SemiCircle.propTypes = {
+SemiCircleGraph.propTypes = {
   width: PropTypes.number,
   label: PropTypes.string,
   duration: PropTypes.number,
   percentage: PropTypes.number.isRequired,
 }
 
-export default SemiCircle
+export default SemiCircleGraph

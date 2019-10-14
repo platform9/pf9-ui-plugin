@@ -1,10 +1,10 @@
 import React from 'react'
 import { withStyles } from '@material-ui/styles'
 import DashboardCard from './DashboardCard'
-import NetworksGraph from './NetworksGraph'
-import RegionsGraph from './RegionsGraph'
-import StorageGraph from './StorageGraph'
-import ServersGraph from './ServersGraph'
+import NetworksGraph from 'core/components/graphs/NetworksGraph'
+import RegionsGraph from 'core/components/graphs/RegionsGraph'
+import StorageGraph from 'core/components/graphs/StorageGraph'
+import ServersGraph from 'core/components/graphs/ServersGraph'
 
 const styles = theme => ({
   dashboardGraphs: {

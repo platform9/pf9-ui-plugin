@@ -2,30 +2,30 @@ import React from 'react'
 import { withStyles } from '@material-ui/styles'
 
 const styles = theme => ({
-  'dashboard-card': {
-    'flex-grow': '1',
+  dashboardCard: {
+    flexGrow: '1',
     width: '100%',
-    'margin-right': '5px',
+    marginRight: 5,
     '&:last-child': {
-      'margin-right': '0px'
-    }
+      marginRight: '0px',
+    },
   },
-  'dashboard-card-title': {
-    background: '#dbedf9',
+  dashboardCardTitle: {
+    background: '#DBEDF9',
     padding: '10px 15px',
-    'margin-bottom': '2px'
+    marginBottom: '2px',
   },
-  'dashboard-card-title-text': {
+  dashboardCardTitleText: {
     margin: '0px',
-    'font-weight': '400'
+    fontWeight: '400',
   },
-  'dashboard-card-contents': {
+  dashboardCardContents: {
     border: '10px solid #edf6fc',
     height: '300px',
     position: 'relative',
     display: 'flex',
-    'align-items': 'center'
-  }
+    alignItems: 'center',
+  },
 })
 
 @withStyles(styles)
@@ -34,16 +34,16 @@ class DashboardCard extends React.PureComponent {
     const { classes, children, title } = this.props
 
     return (
-      <div className={classes['dashboard-card']}>
-        <div className={classes['dashboard-card-title']}>
-          <h2 className={classes['dashboard-card-title-text']}>{title}</h2>
+      <div className={classes.dashboardCard}>
+        <div className={classes.dashboardCardTitle}>
+          <h2 className={classes.dashboardCardTitleText}>{title}</h2>
         </div>
-        <div className={classes['dashboard-card-contents']}>
+        <div className={classes.dashboardCardContents}>
           {children}
         </div>
       </div>
     )
   }
-};
+}
 
 export default DashboardCard
