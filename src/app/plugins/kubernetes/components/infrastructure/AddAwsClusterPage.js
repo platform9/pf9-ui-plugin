@@ -331,14 +331,16 @@ const AddAwsClusterPage = () => {
                       />
 
                       {/* AWS Availability Zone */}
-                      <AwsAvailabilityZoneChooser
-                        id="azs"
-                        info="Select from the Availability Zones for the specified region"
-                        cloudProviderId={params.cloudProviderId}
-                        cloudProviderRegionId={params.cloudProviderRegionId}
-                        onChange={getParamsUpdater('azs')}
-                        required
-                      />
+                      {values.region &&
+                        <AwsAvailabilityZoneChooser
+                          id="azs"
+                          info="Select from the Availability Zones for the specified region"
+                          cloudProviderId={params.cloudProviderId}
+                          cloudProviderRegionId={params.cloudProviderRegionId}
+                          onChange={getParamsUpdater('azs')}
+                          required
+                        />
+                      }
 
                       {/* SSH Key */}
                       <PicklistField
