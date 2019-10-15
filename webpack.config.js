@@ -97,8 +97,8 @@ module.exports = {
     new HtmlWebpackPlugin({
       inject: true,
       template: isProd
-        ? './static/index-with-tracking.html',
-        : './static/index.html'
+        ? './static/index-with-tracking.html'
+        : './static/index.html',
       favicon: './static/favicon.ico',
       title: 'Caching'
     }),

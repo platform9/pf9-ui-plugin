@@ -75,19 +75,19 @@ class AppContainer extends PureComponent {
     }
   }
 
-  componentWillMount() {
+  componentWillMount () {
     const { history } = this.props
 
     this.unlisten = this.props.history.listen((location, action) => {
-      track('pageLoad', {route: `${location.pathname}${location.hash}`})
-    });
+      track('pageLoad', { route: `${location.pathname}${location.hash}` })
+    })
 
     // This is to send page event for the first page the user lands on
-    track('pageLoad', {route: `${history.location.pathname}${history.location.hash}`})
+    track('pageLoad', { route: `${history.location.pathname}${history.location.hash}` })
   }
 
-  componentWillUnmount() {
-      this.unlisten();
+  componentWillUnmount () {
+    this.unlisten()
   }
 
   state = {
