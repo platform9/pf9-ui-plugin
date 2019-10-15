@@ -96,7 +96,9 @@ module.exports = {
     extractCSS,
     new HtmlWebpackPlugin({
       inject: true,
-      template: './static/index.html',
+      template: isProd
+        ? './static/index-with-tracking.html',
+        : './static/index.html'
       favicon: './static/favicon.ico',
       title: 'Caching'
     }),

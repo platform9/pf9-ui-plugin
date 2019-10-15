@@ -8,6 +8,7 @@ import clsx from 'clsx'
 import Intercom from 'core/components/integrations/Intercom'
 import Navbar, { drawerWidth } from 'core/components/Navbar'
 import Toolbar from 'core/components/Toolbar'
+import track from 'utils/tracking'
 
 const styles = theme => ({
   root: {
@@ -78,13 +79,11 @@ class AppContainer extends PureComponent {
     const { history } = this.props
 
     this.unlisten = this.props.history.listen((location, action) => {
-      if (!analytics) { return }
-      analytics.page(`${location.pathname}${location.hash}`)
+      track('pageLoad', {route: `${location.pathname}${location.hash}`})
     });
 
     // This is to send page event for the first page the user lands on
-    if (!analytics) { return }
-    analytics.page(`${history.location.pathname}${history.location.hash}`)
+    track('pageLoad', {route: `${history.location.pathname}${history.location.hash}`})
   }
 
   componentWillUnmount() {
