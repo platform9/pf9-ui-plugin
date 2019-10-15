@@ -90,6 +90,126 @@ const randomOpenstackRegionDetails = (regionId) => {
   }
 }
 
+const randomAzureRegions = () => ({
+  Regions: [
+    { RegionName: 'test', DisplayName: 'East Asia' },
+    { RegionName: 'centralus', DisplayName: 'Central US' },
+    { RegionName: 'eastus', DisplayName: 'East US' },
+    { RegionName: 'eastus2', DisplayName: 'East US 2' },
+    { RegionName: 'westus', DisplayName: 'West US' },
+    { RegionName: 'northcentralus', DisplayName: 'North Central US' },
+    { RegionName: 'southcentralus', DisplayName: 'South Central US' },
+  ]
+})
+
+// TODO: clean this up and only include some of the most popular ones that we will use in the template.
+const azureRegionDetails= {
+  skus: [
+    {
+      'name': 'Standard_B1ls',
+      'capabilities': {
+        'MaxResourceVolumeMB': '1024',
+        'OSVhdSizeMB': '1047552',
+        'vCPUs': '1',
+        'HyperVGenerations': 'V1,V2',
+        'MemoryGB': '0.5',
+        'MaxDataDiskCount': '2',
+        'LowPriorityCapable': 'False',
+        'PremiumIO': 'True',
+        'EphemeralOSDiskSupported': 'False'
+      },
+      'family': 'standardBSFamily',
+      'locationInfo': [
+        {
+          'location': 'westus',
+          'zones': []
+        }
+      ]
+    },
+    {
+      'name': 'Standard_B1ms',
+      'capabilities': {
+        'MaxResourceVolumeMB': '4096',
+        'OSVhdSizeMB': '1047552',
+        'vCPUs': '1',
+        'HyperVGenerations': 'V1,V2',
+        'MemoryGB': '2',
+        'MaxDataDiskCount': '2',
+        'LowPriorityCapable': 'False',
+        'PremiumIO': 'True',
+        'vCPUsAvailable': '1',
+        'vCPUsPerCore': '1',
+        'CombinedTempDiskAndCachedIOPS': '800',
+        'CombinedTempDiskAndCachedReadBytesPerSecond': '10485760',
+        'CombinedTempDiskAndCachedWriteBytesPerSecond': '10485760',
+        'UncachedDiskIOPS': '640',
+        'UncachedDiskBytesPerSecond': '10485760',
+        'EphemeralOSDiskSupported': 'False'
+      },
+      'family': 'standardBSFamily',
+      'locationInfo': [
+        {
+          'location': 'westus',
+          'zones': []
+        }
+      ]
+    },
+    {
+      'name': 'Standard_B1s',
+      'capabilities': {
+        'MaxResourceVolumeMB': '2048',
+        'OSVhdSizeMB': '1047552',
+        'vCPUs': '1',
+        'HyperVGenerations': 'V1',
+        'MemoryGB': '1',
+        'MaxDataDiskCount': '2',
+        'LowPriorityCapable': 'False',
+        'PremiumIO': 'True',
+        'vCPUsAvailable': '1',
+        'vCPUsPerCore': '1',
+        'CombinedTempDiskAndCachedIOPS': '400',
+        'CombinedTempDiskAndCachedReadBytesPerSecond': '10485760',
+        'CombinedTempDiskAndCachedWriteBytesPerSecond': '10485760',
+        'UncachedDiskIOPS': '3200',
+        'UncachedDiskBytesPerSecond': '10485760',
+        'EphemeralOSDiskSupported': 'False'
+      },
+      'family': 'standardBSFamily',
+      'locationInfo': [
+        {
+          'location': 'westus',
+          'zones': []
+        }
+      ]
+    },
+    {
+      'name': 'Standard_NV48s_v3',
+      'capabilities': {
+        'MaxResourceVolumeMB': '1376256',
+        'OSVhdSizeMB': '1047552',
+        'vCPUs': '48',
+        'HyperVGenerations': 'V1,V2',
+        'MemoryGB': '448',
+        'MaxDataDiskCount': '32',
+        'LowPriorityCapable': 'True',
+        'PremiumIO': 'True',
+        'vCPUsAvailable': '48',
+        'GPUs': '4',
+        'vCPUsPerCore': '2',
+        'EphemeralOSDiskSupported': 'False'
+      },
+      'family': 'standardNVSv3Family',
+      'locationInfo': [
+        {
+          'location': 'westus',
+          'zones': []
+        }
+      ]
+    }
+  ],
+  'virtualNetworks': []
+}
+
 export const getCpDetails = (req, res) => {
   const { cloudProviderId } = req.params
   const cp = CloudProvider.findById({ id: cloudProviderId, context })
@@ -101,6 +221,8 @@ export const getCpDetails = (req, res) => {
     res.status(200).send(randomAwsRegions())
   } else if (cp.type === 'openstack') {
     res.status(200).send(randomOpenstackRegions())
+  } else if (cp.type === 'azure') {
+    res.status(200).send(randomAzureRegions())
   }
 }
 
@@ -118,6 +240,8 @@ export const getCpRegionDetails = (req, res) => {
     res.status(200).send(awsRegionDetails)
   } else if (cp.type === 'openstack') {
     res.status(200).send(randomOpenstackRegionDetails())
+  } else if (cp.type === 'azure') {
+    res.status(200).send(azureRegionDetails)
   }
 }
 
