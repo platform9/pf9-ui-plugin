@@ -15,7 +15,7 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexFlow: 'column nowrap',
     alignItems: 'flex-end',
-    minHeight: 50
+    minHeight: 50,
   },
 }))
 
@@ -36,7 +36,7 @@ const InfrastructurePage = () => {
 
   return <PageContainer header={<div className={classes.header}>
     <StatsToggle statsVisible={statsVisible} toggleStats={toggleStats} />
-    {statsVisible && <InfrastructureStats />}
+    <InfrastructureStats visible={statsVisible} />
   </div>}>
     <Tabs>
       <Tab value="clusters" label="Clusters"><ClustersListPage /></Tab>

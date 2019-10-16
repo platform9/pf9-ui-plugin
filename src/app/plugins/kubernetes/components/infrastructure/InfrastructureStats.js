@@ -5,7 +5,7 @@ import { filter, evolve, add } from 'ramda'
 import { pathStrOr, pathStr } from 'utils/fp'
 import UsageWidget from 'core/components/widgets/UsageWidget'
 import Progress from 'core/components/progress/Progress'
-import { Grid } from '@material-ui/core'
+import { Grid, Collapse } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import NetworksWidget from 'core/components/widgets/NetworksWidget'
 
@@ -67,15 +67,15 @@ const calcTotals = clusters => {
   return clusters.reduce(clusterTotalsReducer, clusterTotalsSpec)
 }
 
-const InfrastructureStats = () => {
+const InfrastructureStats = ({ visible }) => {
   const classes = useStyles()
   const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
   const totals = useMemo(() => calcTotals(clusters), [clusters])
   // TODO: fix the number of networks
   const numNetworks = 1
 
-  return <div className={classes.root}>
-    <Progress loading={loadingClusters} minHeight={200}>
+  return <Collapse className={classes.root} in={visible}>
+    <Progress loading={loadingClusters} renderContentOnMount minHeight={200}>
       <Grid container spacing={1}>
         <Grid item xs={3}>
           <UsageWidget title="Compute" stats={totals.compute} headerImg={'/ui/images/icon-compute.svg'} />
@@ -91,7 +91,7 @@ const InfrastructureStats = () => {
         </Grid>
       </Grid>
     </Progress>
-  </div>
+  </Collapse>
 }
 
 export default InfrastructureStats
