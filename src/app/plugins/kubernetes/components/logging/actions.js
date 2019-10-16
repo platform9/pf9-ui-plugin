@@ -33,13 +33,18 @@ const mapLoggings = (cluster, loggings) => {
 const loggingActions = createCRUDActions(loggingsCacheKey, {
   listFn: async (params, loadFromContext) => {
     const clusters = await loadFromContext(clustersCacheKey)
+    const loggings = []
 
-    const loggingsPromises = clusters.map(async cluster => {
-      const response = await qbert.getLoggings(cluster.uuid)
-      return mapLoggings(cluster, response[0])
-    })
-
-    const loggings = await Promise.all(loggingsPromises)
+    for (const cluster of clusters) {
+      try {
+        const response = await qbert.getLoggings(cluster.uuid)
+        const loggingsForCluster = mapLoggings(cluster, response)
+        loggings.push(loggingsForCluster)
+      } catch (e) {
+        console.log(`Could not fetch loggings for cluster ${cluster.uuid}`)
+        console.log(e)
+      }
+    }
 
     return loggings
   },
