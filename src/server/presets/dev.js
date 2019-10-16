@@ -174,6 +174,7 @@ function loadPreset () {
 
   // Cloud Providers
   CloudProvider.create({ data: { name: 'mockAwsProvider', type: 'aws' }, context })
+  CloudProvider.create({ data: { name: 'mockAzureProvier', type: 'azure' }, context })
   CloudProvider.create({ data: { name: 'mockOpenstackProvider', type: 'openstack' }, context })
   CloudProvider.create({ data: { name: 'mockLocalProvider', type: 'local' }, context })
 

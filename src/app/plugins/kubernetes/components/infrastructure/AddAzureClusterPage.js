@@ -5,7 +5,6 @@ import AwsClusterReviewTable from './AwsClusterReviewTable'
 import AzureSkuPicklist from './AwsRegionFlavorPicklist'
 import CloudProviderPicklist from 'k8s/components/common/CloudProviderPicklist'
 import CloudProviderRegionPicklist from 'k8s/components/common/CloudProviderRegionPicklist'
-import AwsClusterSshKeyPicklist from './AwsClusterSshKeyPicklist'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
 import KeyValuesField from 'core/components/validatedForm/KeyValuesField'
 import PicklistField from 'core/components/validatedForm/PicklistField'
@@ -192,14 +191,10 @@ const AddAzureClusterPage = () => {
                       />
 
                       {/* SSH Key */}
-                      <PicklistField
-                        DropdownComponent={AwsClusterSshKeyPicklist}
-                        disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
+                      <TextField
                         id="sshKey"
-                        label="SSH Key"
-                        cloudProviderId={params.cloudProviderId}
-                        cloudProviderRegionId={params.cloudProviderRegionId}
-                        info="Select an AWS SSH key to be associated with the nodes. This key can be used to access the nodes for debugging or other purposes."
+                        label="Public SSH key"
+                        info="Copy/paste your public SSH key"
                         required
                       />
                     </>
@@ -237,6 +232,8 @@ const AddAzureClusterPage = () => {
                         label="Master Node SKU"
                         cloudProviderId={params.cloudProviderId}
                         cloudProviderRegionId={params.cloudProviderRegionId}
+                        filterByZones={!values.useAllAvailabilityZones}
+                        selectedZones={values.zones}
                         info="Choose an instance type used by master nodes."
                         required
                       />
@@ -258,6 +255,7 @@ const AddAzureClusterPage = () => {
                         label="Worker Node SKU"
                         cloudProviderId={params.cloudProviderId}
                         cloudProviderRegionId={params.cloudProviderRegionId}
+                        selectedZones={values.zones}
                         info="Choose an instance type used by worker nodes."
                         required
                       />
