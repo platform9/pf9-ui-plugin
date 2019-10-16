@@ -2,7 +2,7 @@ import React from 'react'
 import FormWrapper from 'core/components/FormWrapper'
 import AzureAvailabilityZoneChooser from './AzureAvailabilityZoneChooser'
 import AwsClusterReviewTable from './AwsClusterReviewTable'
-import AzureSkuPicklist from './AwsRegionFlavorPicklist'
+import AzureSkuPicklist from './AzureSkuPicklist'
 import CloudProviderPicklist from 'k8s/components/common/CloudProviderPicklist'
 import CloudProviderRegionPicklist from 'k8s/components/common/CloudProviderRegionPicklist'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
@@ -32,6 +32,10 @@ const initialContext = {
   runtimeConfigOption: 'default',
   useAllAvailabilityZones: true,
   assignPublicIps: false,
+
+  // TODO: temp for dev purposes
+  name: 'asdf',
+  sshKey: 'asdf',
 }
 
 const templateOptions = [
@@ -195,6 +199,8 @@ const AddAzureClusterPage = () => {
                         id="sshKey"
                         label="Public SSH key"
                         info="Copy/paste your public SSH key"
+                        multiline
+                        rows={3}
                         required
                       />
                     </>
@@ -211,6 +217,7 @@ const AddAzureClusterPage = () => {
                       <CheckboxField
                         id="useAllAvailabilityZones"
                         label="Use all availability zones"
+                        onChange={checked => checked || getParamsUpdater('zones')([])}
                         info=""
                       />
 
@@ -224,7 +231,7 @@ const AddAzureClusterPage = () => {
                         />
                       }
 
-                      {/* Master node instance type */}
+                      {/* Master node SKU */}
                       <PicklistField
                         DropdownComponent={AzureSkuPicklist}
                         disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
@@ -233,7 +240,7 @@ const AddAzureClusterPage = () => {
                         cloudProviderId={params.cloudProviderId}
                         cloudProviderRegionId={params.cloudProviderRegionId}
                         filterByZones={!values.useAllAvailabilityZones}
-                        selectedZones={values.zones}
+                        selectedZones={params.zones}
                         info="Choose an instance type used by master nodes."
                         required
                       />
@@ -247,7 +254,7 @@ const AddAzureClusterPage = () => {
                         required
                       />
 
-                      {/* Worker node instance type */}
+                      {/* Worker node SKU */}
                       <PicklistField
                         DropdownComponent={AzureSkuPicklist}
                         disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
@@ -255,7 +262,8 @@ const AddAzureClusterPage = () => {
                         label="Worker Node SKU"
                         cloudProviderId={params.cloudProviderId}
                         cloudProviderRegionId={params.cloudProviderRegionId}
-                        selectedZones={values.zones}
+                        filterByZones={!values.useAllAvailabilityZones}
+                        selectedZones={params.zones}
                         info="Choose an instance type used by worker nodes."
                         required
                       />

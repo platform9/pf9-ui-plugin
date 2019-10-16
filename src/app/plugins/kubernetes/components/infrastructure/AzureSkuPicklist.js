@@ -13,10 +13,10 @@ const AzureSkuPicklist = forwardRef(({
   const [details, loading] = useDataLoader(loadCloudProviderRegionDetails, { cloudProviderId, cloudProviderRegionId })
 
   const skus = pathStrOr([], '0.skus', details)
-  const zonesFilter = sku => intersection(sku.locationInfo.zones, selectedZones).length > 0
+  const zonesFilter = sku => intersection(pathStrOr([], 'locationInfo.0.zones', sku), selectedZones).length > 0
   const options = skus
-    .map(x => ({ label: x, value: x }))
     .filter(filterByZones ? zonesFilter : identity)
+    .map(x => ({ label: x.name, value: x.name }))
 
   return (
     <Picklist
