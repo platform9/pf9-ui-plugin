@@ -1,8 +1,11 @@
 import React from 'react'
 import FormWrapper from 'core/components/FormWrapper'
 import AzureAvailabilityZoneChooser from './AzureAvailabilityZoneChooser'
-import AwsClusterReviewTable from './AwsClusterReviewTable'
+import AzureClusterReviewTable from './AzureClusterReviewTable'
 import AzureSkuPicklist from './AzureSkuPicklist'
+import AzureSubnetPicklist from './AzureSubnetPicklist'
+import AzureVnetPicklist from './AzureVnetPicklist'
+import AzureResourceGroupPicklist from './AzureResourceGroupPicklist'
 import CloudProviderPicklist from 'k8s/components/common/CloudProviderPicklist'
 import CloudProviderRegionPicklist from 'k8s/components/common/CloudProviderRegionPicklist'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
@@ -25,7 +28,7 @@ const initialContext = {
   numMasters: 1,
   numWorkers: 1,
   usePf9Domain: true,
-  network: 'newVpc',
+  network: 'newNetwork',
   containersCidr: '10.20.0.0/16',
   servicesCidr: '10.21.0.0/16',
   networkPlugin: 'flannel',
@@ -34,8 +37,8 @@ const initialContext = {
   assignPublicIps: false,
 
   // TODO: temp for dev purposes
-  name: 'asdf',
-  sshKey: 'asdf',
+  name: 'gvmadsfjrtw',
+  sshKey: 'gvmadsfjrtw',
 }
 
 const templateOptions = [
@@ -92,9 +95,6 @@ const handleTemplateChoice = ({ setWizardContext, setFieldValue }) => option => 
   Object.entries(options[option]).forEach(([key, value]) => {
     setFieldValue(key)(value)
   })
-
-  // set common default settings
-  // TODO: Choose the first AZ by default
 }
 
 const networkOptions = [
@@ -133,9 +133,6 @@ const AddAzureClusterPage = () => {
       all: 'api/all=true',
       custom: data.customRuntimeConfig,
     }[data.runtimeConfigOption]
-
-    // TODO: azs
-    // TODO: vpc
 
     await create(body)
     return body
@@ -277,30 +274,12 @@ const AddAzureClusterPage = () => {
                         required
                       />
 
-                      {/* Workloads on masters */}
+                      {/* Allow workloads on masters */}
                       <CheckboxField
                         id="allowWorkloadsOnMaster"
                         label="Allow workloads on master nodes"
                         info="It is highly recommended to not enable workloads on master nodes for production or critical workload clusters."
                       />
-
-                      {/* Enable Auto Scaling */}
-                      <CheckboxField
-                        id="enableCAS"
-                        label="Enable Auto Scaling"
-                        info="The cluster may scale up to the max worker nodes specified. Auto scaling may not be used with spot instances."
-                      />
-
-                      {/* Max num worker nodes (autoscaling) */}
-                      {values.enableCAS &&
-                        <TextField
-                          id="numMaxWorkers"
-                          type="number"
-                          label="Maximum number of worker nodes"
-                          info="Maximum number of worker nodes this cluster may be scaled up to."
-                          required={values.enableCAS}
-                        />
-                      }
                     </>
                   )}
                 </ValidatedForm>
@@ -330,10 +309,57 @@ const AddAzureClusterPage = () => {
 
                       {values.network === 'existing' &&
                         <>
-                          {/* TODO: Resource group */}
-                          {/* TODO: Existing network */}
-                          {/* TODO: Master node subnet */}
-                          {/* TODO: Worker node subnet */}
+                          {/* Resource group */}
+                          <PicklistField
+                            DropdownComponent={AzureResourceGroupPicklist}
+                            disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
+                            id="vnetResourceGroup"
+                            label="Resource group"
+                            cloudProviderId={params.cloudProviderId}
+                            cloudProviderRegionId={params.cloudProviderRegionId}
+                            onChange={getParamsUpdater('resourceGroup')}
+                            info="Select the resource group that your networking resources belong to."
+                            required
+                          />
+
+                          {/* Existing network.  I don't get the point of this field. */}
+                          <PicklistField
+                            DropdownComponent={AzureVnetPicklist}
+                            disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
+                            id="vnetName"
+                            label="Select existing network"
+                            cloudProviderId={params.cloudProviderId}
+                            cloudProviderRegionId={params.cloudProviderRegionId}
+                            resourceGroup={params.resourceGroup}
+                            info="Select the network for your cluster."
+                            required
+                          />
+
+                          {/* Master node subnet */}
+                          <PicklistField
+                            DropdownComponent={AzureSubnetPicklist}
+                            disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
+                            id="masterSubnetName"
+                            label="Master node subnet"
+                            cloudProviderId={params.cloudProviderId}
+                            cloudProviderRegionId={params.cloudProviderRegionId}
+                            resourceGroup={params.resourceGroup}
+                            info="Select the subnet for your master nodes. Can be the same as worker node subnet."
+                            required
+                          />
+
+                          {/* Worker node subnet */}
+                          <PicklistField
+                            DropdownComponent={AzureSubnetPicklist}
+                            disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
+                            id="workerSubnetName"
+                            label="Worker node subnet"
+                            cloudProviderId={params.cloudProviderId}
+                            cloudProviderRegionId={params.cloudProviderRegionId}
+                            resourceGroup={params.resourceGroup}
+                            info="Select the subnet for your worker nodes. Can be the same as master node subnet."
+                            required
+                          />
                         </>
                       }
 
@@ -425,7 +451,7 @@ const AddAzureClusterPage = () => {
             <WizardStep stepId="review" label="Review">
               <FormWrapper title="Review">
                 <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
-                  <AwsClusterReviewTable data={wizardContext} />
+                  <AzureClusterReviewTable data={wizardContext} />
                 </ValidatedForm>
               </FormWrapper>
             </WizardStep>

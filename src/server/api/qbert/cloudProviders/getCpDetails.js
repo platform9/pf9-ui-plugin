@@ -102,6 +102,18 @@ const randomAzureRegions = () => ({
   ]
 })
 
+// Abbreviated list of just the fields the UI uses.
+const fakeAzureVirtualNetwork = () => ({
+  name: `virtual-network-${uuid.v4()}`,
+  properties: {
+    subnets: [
+      { name: `master-subnet-${uuid.v4()}`, properties: { addressPrefix: '10.0.1.0/24' } },
+      { name: `worker-subnet-${uuid.v4()}`, properties: { addressPrefix: '10.0.2.0/24' } },
+    ]
+  },
+  resourceGroup: `azure-resource-group-${uuid.v4()}`,
+})
+
 // Only including the values that we use in the cluster template picklist.
 const azureRegionDetails= {
   skus: [
@@ -124,7 +136,7 @@ const azureRegionDetails= {
       locationInfo: [ { location: 'westus', zones: ['1', '2', '3'] } ]
     },
     // This one has zones removed so it is useful for testing that filtering by zones is working correctly.
-    // It should only show up in the SKU options when "Use all availability zones" is selected.
+    // It should only show up in the SKU options when 'Use all availability zones' is selected.
     {
       name: 'Standard_B1ls',
       capabilities: { MaxResourceVolumeMB: '1024', OSVhdSizeMB: '1047552', vCPUs: '1', HyperVGenerations: 'V1,V2', MemoryGB: '0.5', MaxDataDiskCount: '2', LowPriorityCapable: 'False', PremiumIO: 'True', EphemeralOSDiskSupported: 'False' },
@@ -132,7 +144,7 @@ const azureRegionDetails= {
       locationInfo: [ { location: 'westus', zones: [] } ]
     }
   ],
-  virtualNetworks: [],
+  virtualNetworks: times(fakeAzureVirtualNetwork, 3),
 }
 
 export const getCpDetails = (req, res) => {
