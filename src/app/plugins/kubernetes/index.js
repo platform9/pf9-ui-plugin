@@ -3,6 +3,8 @@ import AddCloudProviderPage from './components/infrastructure/cloudProviders/Add
 import AddAwsClusterPage from './components/infrastructure/clusters/AddAwsClusterPage'
 import AddAzureClusterPage from './components/infrastructure/clusters/AddAzureClusterPage'
 import AddClusterPage from './components/infrastructure/clusters/AddClusterPage'
+import AddBareOsClusterPage from './components/infrastructure/clusters/bareos/AddBareOsClusterPage'
+import AddDeploymentPage from './components/pods/AddDeploymentPage'
 import AddNamespacePage from './components/namespaces/AddNamespacePage'
 import ApiAccessPage from './components/apiAccess/ApiAccessPage'
 import AppsIndexPage from './components/apps/AppsIndexPage'
@@ -12,8 +14,7 @@ import NamespacesListPage from './components/namespaces/NamespacesListPage'
 import OnboardingPage from './components/onboarding/OnboardingPage'
 import PodsIndexPage from './components/pods/PodsIndexPage'
 import StorageClassesPage from './components/storage/StorageClassesPage'
-import UpdateCloudProviderPage
-  from './components/infrastructure/cloudProviders/UpdateCloudProviderPage'
+import UpdateCloudProviderPage from './components/infrastructure/cloudProviders/UpdateCloudProviderPage'
 import StorageClassesAddPage from './components/storage/StorageClassesAddPage'
 import UserManagementIndexPage from './components/userManagement/UserManagementIndexPage'
 import AppDetailsPage from 'k8s/components/apps/AppDetailsPage'
@@ -22,8 +23,7 @@ import PrometheusMonitoringPage from './components/prometheus/PrometheusMonitori
 import UpdatePrometheusInstancePage from './components/prometheus/UpdatePrometheusInstancePage'
 import UpdatePrometheusRulePage from './components/prometheus/UpdatePrometheusRulePage'
 import UpdatePrometheusServiceMonitorPage from './components/prometheus/UpdateServiceMonitorPage'
-import UpdatePrometheusAlertManagerPage
-  from './components/prometheus/UpdatePrometheusAlertManagerPage'
+import UpdatePrometheusAlertManagerPage from './components/prometheus/UpdatePrometheusAlertManagerPage'
 import LoggingIndexPage from './components/logging/LoggingIndexPage'
 import LoggingAddPage from './components/logging/LoggingAddPage'
 import LoggingEditPage from './components/logging/LoggingEditPage'
@@ -72,6 +72,11 @@ Kubernetes.registerPlugin = pluginManager => {
         name: 'Create Azure Cluster',
         link: { path: '/infrastructure/clusters/addAzure', exact: true },
         component: AddAzureClusterPage,
+      },
+      {
+        name: 'Create Bare OS Cluster',
+        link: { path: '/infrastructure/clusters/addBareOs', exact: true },
+        component: AddBareOsClusterPage,
       },
       {
         name: 'Cluster Details',
