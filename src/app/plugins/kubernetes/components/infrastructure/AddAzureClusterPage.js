@@ -35,10 +35,6 @@ const initialContext = {
   runtimeConfigOption: 'default',
   useAllAvailabilityZones: true,
   assignPublicIps: false,
-
-  // TODO: temp for dev purposes
-  name: 'gvmadsfjrtw',
-  sshKey: 'gvmadsfjrtw',
 }
 
 const templateOptions = [
