@@ -4,7 +4,7 @@ import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import Checkbox from 'core/components/Checkbox'
 import {
-  Typography, Grid, Table, TableBody, TableCell, TablePagination, TableRow,
+  Radio, Typography, Grid, Table, TableBody, TableCell, TablePagination, TableRow,
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import { compose, ensureFunction, except } from 'app/utils/fp'
@@ -116,6 +116,11 @@ class ListTable extends PureComponent {
 
   handleClick = row => event => {
     const { selected } = this.state
+    const { multiSelection } = this.props
+    if (!multiSelection) {
+      this.setState({ selected: [row] })
+      return
+    }
     const selectedIndex = selected.indexOf(row)
     let newSelected = []
 
@@ -297,7 +302,7 @@ class ListTable extends PureComponent {
 
     // Allow for customized rendering in the columnDef.  The render function might need
     // to know more about the entire object (row) being rendered and in some cases the
-    // entire context.
+    // entire context (FIXME: This component should not even be aware of `context`)
     if (columnDef.render) { _contents = columnDef.render(contents, row, this.props.context) }
 
     return (
@@ -324,7 +329,7 @@ class ListTable extends PureComponent {
   }
 
   renderRow = row => {
-    const { showCheckboxes, uniqueIdentifier } = this.props
+    const { multiSelection, showCheckboxes, uniqueIdentifier } = this.props
     const isSelected = this.isSelected(row)
 
     const checkboxProps = showCheckboxes ? {
@@ -341,7 +346,9 @@ class ListTable extends PureComponent {
     return (
       <TableRow hover key={uid} {...checkboxProps}>
         {showCheckboxes && (<TableCell padding="checkbox">
-          <Checkbox checked={isSelected} color="primary" />
+          {multiSelection
+            ? <Checkbox checked={isSelected} color="primary" />
+            : <Radio checked={isSelected} color="primary" />}
         </TableCell>)}
         {this.getSortedVisibleColumns().map(columnDef =>
           this.renderCell(columnDef, path((columnDef.id || '').split('.'), row), row),
@@ -387,6 +394,7 @@ class ListTable extends PureComponent {
       filters,
       onRefresh,
       loading,
+      multiSelection,
     } = this.props
 
     const {
@@ -422,7 +430,7 @@ class ListTable extends PureComponent {
           onRequestSort={this.handleRequestSort}
           checked={selectedAll}
           rowCount={data.length}
-          showCheckboxes={showCheckboxes}
+          showCheckboxes={multiSelection && showCheckboxes}
         />
         <TableBody>
           {paginatedData.map(this.renderRow)}
@@ -543,11 +551,17 @@ ListTable.propTypes = {
   canDragColumns: PropTypes.bool,
 
   loading: PropTypes.bool,
+
+  /**
+   * Wether or not to allow selecting multiple rows (checkboxes) or just one at a time (radio boxes)
+   */
+  multiSelection: PropTypes.bool
 }
 
 ListTable.defaultProps = {
   paginate: true,
   showCheckboxes: true,
+  multiSelection: true,
   uniqueIdentifier: 'id',
   canEditColumns: true,
   canDragColumns: true,

@@ -47,6 +47,7 @@ const createCRUDComponents = options => {
     editUrl,
     debug,
     name,
+    multiSelection = true,
   } = options
 
   // List
@@ -64,6 +65,7 @@ const createCRUDComponents = options => {
     // }
     return (
       <ListTable
+        multiSelection={multiSelection}
         loading={loading}
         onActionComplete={onActionComplete}
         onRefresh={onRefresh}

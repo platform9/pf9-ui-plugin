@@ -73,12 +73,12 @@ class ListTableHead extends React.PureComponent {
       showCheckboxes,
     } = this.props
 
-    const headerCheckbox = showCheckboxes && !blankFirstColumn
+    const headerCheckbox = !blankFirstColumn
       ? <TableCell padding="checkbox" key="_checkAll" className={clsx(classes.cellLabel,
         classes.checkAllCell, {
           [classes.emptyCheckAllCell]: !numSelected,
         })}>
-        <label className={classes.checkboxCell}>
+        {showCheckboxes && <label className={classes.checkboxCell}>
           <Checkbox
             className={classes.checkbox}
             indeterminate={!checked && numSelected > 0 && numSelected < rowCount}
@@ -87,7 +87,7 @@ class ListTableHead extends React.PureComponent {
             color='primary'
           />
           {numSelected > 0 ? <span>({numSelected})</span> : null}
-        </label>
+        </label>}
       </TableCell>
       : null
 
