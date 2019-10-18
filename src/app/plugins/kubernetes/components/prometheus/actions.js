@@ -32,7 +32,7 @@ export const mapPrometheusInstance = curry((clusters, { clusterUuid, metadata, s
   namespace: metadata.namespace,
   uid: metadata.uid,
   serviceMonitorSelector: pathStrOrNull('serviceMonitorSelector.matchLabels', spec),
-  alertManagersSelector: pathOr([], ['alerting', 'alertmanagers'], spec).join(', '),
+  alertManagersSelector: pathOr([], ['alerting', 'alertmanagers'], spec).map(x => x.name).join(', '),
   ruleSelector: pathStrOrNull('ruleSelector.matchLabels', spec),
   cpu: pathStrOrNull('resources.requests.cpu', spec),
   storage: pathStrOrNull('resources.requests.storage', spec),
