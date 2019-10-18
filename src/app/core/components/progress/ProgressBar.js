@@ -5,9 +5,9 @@ import { makeStyles } from '@material-ui/styles'
 
 const useStyles = makeStyles(theme => ({
   root: {
-    height: 20,
+    height: ({ height }) => height,
     display: 'flex',
-    width: ({ width }) => width,
+    width: ({ width}) => width,
     flexFlow: ({ compact }) =>
       compact ? 'column-reverse nowrap' : 'row nowrap',
     alignItems: ({ compact }) =>
@@ -17,11 +17,12 @@ const useStyles = makeStyles(theme => ({
     whiteSpace: 'nowrap',
     height: '100%',
     width: ({ compact }) =>
-      compact ? '100%' : 100,
+      compact ? '100%' : 40,
     paddingLeft: ({ compact }) =>
       compact ? null : theme.spacing(1),
-    ...theme.typography.captionNext,
-    letterSpacing: 0.1
+    color: 'rgba(0, 0, 0, 0.87)',
+    fontSize: '0.7rem',
+    letterSpacing: 0.1,
   },
   progressContainer: {
     flexGrow: 1,
@@ -42,13 +43,16 @@ const useStyles = makeStyles(theme => ({
   progress: {
     display: 'flex',
     flexFlow: 'row nowrap',
+    fontSize: '0.75rem',
     alignItems: 'center',
     justifyContent: 'center',
     width: ({ percent }) => `${percent}%`,
     textAlign: 'center',
     textOverflow: 'visible',
     height: '100%',
-    backgroundImage:  ({ animated }) => animated ? 'linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent)' : null,
+    backgroundImage: ({ animated }) => animated
+      ? 'linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent)'
+      : null,
     backgroundSize: '40px 40px',
     backgroundColor: ({ animated }) => animated ? '#4AA3DF' : '#4ADF74',
     animation: '$stripes 2s linear infinite',
@@ -80,6 +84,7 @@ ProgressBar.defaultProps = {
   containedPercent: false,
   compact: false,
   width: 125,
+  height: 15,
   label: progress => `${progress}%`,
 }
 
