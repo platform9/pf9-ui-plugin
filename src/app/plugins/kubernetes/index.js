@@ -16,6 +16,7 @@ import NamespacesListPage from './components/namespaces/NamespacesListPage'
 import OnboardingPage from './components/onboarding/OnboardingPage'
 import PodsIndexPage from './components/pods/PodsIndexPage'
 import StorageClassesPage from './components/storage/StorageClassesPage'
+import StorageClassesAddPage from './components/storage/StorageClassesAddPage'
 import UpdateCloudProviderPage from './components/infrastructure/UpdateCloudProviderPage'
 import UserManagementIndexPage from './components/userManagement/UserManagementIndexPage'
 import AppDetailsPage from 'k8s/components/apps/AppDetailsPage'
@@ -123,6 +124,11 @@ Kubernetes.registerPlugin = pluginManager => {
         name: 'Storage Classes',
         link: { path: '/storage_classes', exact: true },
         component: StorageClassesPage,
+      },
+      {
+        name: 'Add Storage Class',
+        link: { path: '/storage_classes/add', exact: true },
+        component: StorageClassesAddPage,
       },
       {
         name: 'Namespaces',
