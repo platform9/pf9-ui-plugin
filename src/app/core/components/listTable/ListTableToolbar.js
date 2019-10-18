@@ -42,20 +42,6 @@ const useStyles = makeStyles(theme => ({
   rowActions: {
     color: 'inherit',
   },
-  action: {
-    marginTop: theme.spacing(2),
-    marginLeft: theme.spacing(1),
-    marginRight: theme.spacing(1),
-    cursor: 'pointer',
-    display: 'flex',
-    flexFlow: 'column nowrap',
-    alignItems: 'center',
-    lineHeight: 2,
-    fontSize: theme.typography.fontSize * 0.8,
-  },
-  actionIcon: {
-    fontSize: '1.7em',
-  },
 }))
 
 const FilterDropdown = ({
@@ -103,29 +89,26 @@ const ListTableToolbar = ({
       </FontAwesomeIcon>
     </Tooltip>, [onRefresh])
 
+  const allActions = useMemo(() => [...batchActions,
+    ...(numSelected === 1 && onEdit ? [{
+      label: 'Edit',
+      action: onEdit,
+      icon: 'edit',
+    }] : []),
+    ...(numSelected > 0 && onDelete ? [{
+      label: 'Delete',
+      action: onDelete,
+      icon: 'trash-alt',
+    }] : []),
+  ], [numSelected, batchActions, onEdit, onDelete])
+
   return (
     <Toolbar
       className={clsx(classes.root, {
         [classes.highlight]: numSelected > 0,
       })}
     >
-      <ListTableBatchActions actionClassName={classes.action} actionIconClassName={classes.actionIcon} batchActions={batchActions} selected={selected} />
-      {numSelected === 1 && onEdit && (
-        <Tooltip title="Edit">
-          <div className={classes.action} onClick={onEdit}>
-            <FontAwesomeIcon className={classes.actionIcon}>edit</FontAwesomeIcon>
-            Edit
-          </div>
-        </Tooltip>
-      )}
-      {numSelected > 0 && onDelete && (
-        <Tooltip title="Delete">
-          <div className={classes.action} onClick={onDelete}>
-            <FontAwesomeIcon className={classes.actionIcon}>trash-alt</FontAwesomeIcon>
-            Delete
-          </div>
-        </Tooltip>
-      )}
+      <ListTableBatchActions batchActions={allActions} selected={selected} />
       <div className={classes.spacer} />
       <div className={classes.actions}>
         <Toolbar className={classes.toolbar}>
@@ -203,7 +186,7 @@ ListTableToolbar.propTypes = {
       action: PropTypes.func,
       icon: PropTypes.node,
       cond: PropTypes.func,
-    })
+    }),
   ),
   selected: PropTypes.array,
   visibleColumns: PropTypes.array,
