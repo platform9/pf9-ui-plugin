@@ -10,7 +10,7 @@ import createContextLoader from 'core/helpers/createContextLoader'
 import ApiClient from 'api-client/ApiClient'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { filterIf, pathStrOr, pathStr } from 'utils/fp'
-import { mapAsync } from 'utils/async'
+import { mapAsync, tryCatchAsync } from 'utils/async'
 
 export const clustersCacheKey = 'clusters'
 export const cloudProvidersCacheKey = 'cloudProviders'
@@ -69,6 +69,30 @@ const clusterUsageSpec = {
   },
 }
 
+const getProgressPercent = async clusterId => {
+  return tryCatchAsync(
+    async () => {
+      const { progressPercent } = await qbert.getClusterDetails(clusterId)
+      return progressPercent
+    },
+    e => {
+      console.warn(e)
+      return null
+    })(null)
+}
+
+const getKubernetesVersion = async clusterId => {
+  return tryCatchAsync(
+    async () => {
+      const version = await qbert.getKubernetesVersion(clusterId)
+      return version && version.gitVersion && version.gitVersion.substr(1)
+    },
+    e => {
+      console.warn(e)
+      return null
+    })(null)
+}
+
 export const clusterActions = createCRUDActions(clustersCacheKey, {
   createFn: (params) => qbert.createCluster(params),
   listFn: async (params, loadFromContext) => {
@@ -84,7 +108,7 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
     const calcUsagePercent = (strPath, node, numNodes) =>
       100 * pathStrOr(0, `${strPath}.current`, node) / (pathStr(`${strPath}.max`, node) || 1) / numNodes
 
-    const clusters = rawClusters.map(cluster => {
+    return mapAsync(async cluster => {
       const nodesInCluster = rawNodes.filter(node => node.clusterUuid === cluster.uuid)
       const nodeIds = pluck('uuid', nodesInCluster)
       const combinedNodes = combinedHosts.filter(x => nodeIds.includes(x.resmgr.id))
@@ -111,6 +135,7 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
       const masterNodes = nodesInCluster.filter(node => node.isMaster === 1)
       const healthyMasterNodes = masterNodes.filter(
         node => node.status === 'ok' && node.api_responding === 1)
+      const hasMasterNode = healthyMasterNodes.length > 0
       const clusterOk = nodesInCluster.length > 0 && cluster.status === 'ok'
       const dashboardLink = `${qbertEndpoint}/clusters/${cluster.uuid}/k8sapi/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:443/proxy/`
       const host = qbertEndpoint.match(/(.*?)\/qbert/)[1]
@@ -121,13 +146,22 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
         },
         {},
       )
+      const progressPercent = cluster.taskStatus === 'converging'
+        ? await getProgressPercent(cluster.uuid)
+        : null
+      const version = hasMasterNode
+        ? await getKubernetesVersion(cluster.uuid)
+        : null
+
       return {
         ...cluster,
         usage,
+        version: version || 'N/A',
         nodes: nodesInCluster,
         masterNodes,
+        progressPercent,
         healthyMasterNodes,
-        hasMasterNode: healthyMasterNodes.length > 0,
+        hasMasterNode,
         highlyAvailable: healthyMasterNodes.length > 2,
         links: {
           dashboard: clusterOk ? dashboardLink : null,
@@ -140,22 +174,7 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
         hasVpn: castFuzzyBool(pathOr(false, ['cloudProperties', 'internalElb'], cluster)),
         hasLoadBalancer: castFuzzyBool(cluster.enableMetallb || pathOr(false, ['cloudProperties', 'enableLbaas'], cluster)),
       }
-    })
-    // Get the cluster versions in parallel
-    return mapAsync(async cluster => {
-      if (cluster.hasMasterNode) {
-        try {
-          const version = await qbert.getKubernetesVersion(cluster.uuid)
-          return {
-            ...cluster,
-            version: version && version.gitVersion && version.gitVersion.substr(1),
-          }
-        } catch (err) {
-          console.log(err)
-        }
-      }
-      return cluster
-    }, clusters)
+    }, rawClusters)
   },
   deleteFn: async ({ id }) => {
     await qbert.deleteCluster(id)

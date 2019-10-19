@@ -97,3 +97,12 @@ export const uncamelizeString = inputStr => inputStr
   .replace(/([A-Z])/g, ' $1')
   // uppercase the first character
   .replace(/^./, str => str.toUpperCase())
+
+/**
+ * Capitalize the first letter of the given string
+ * @param inputStr
+ * @returns {*}
+ */
+export const capitalizeString = inputStr => inputStr
+// uppercase the first character
+  .replace(/^./, str => str.toUpperCase())

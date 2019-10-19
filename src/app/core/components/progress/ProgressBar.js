@@ -7,7 +7,7 @@ const useStyles = makeStyles(theme => ({
   root: {
     height: ({ height }) => height,
     display: 'flex',
-    width: ({ width}) => width,
+    width: ({ width }) => width,
     flexFlow: ({ compact }) =>
       compact ? 'column-reverse nowrap' : 'row nowrap',
     alignItems: ({ compact }) =>

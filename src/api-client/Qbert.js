@@ -180,8 +180,7 @@ class Qbert {
 
   createNamespace = async (clusterId, body) => {
     const raw = await this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces`, body)
-    const converted = this.convertResource(clusterId)(raw)
-    return converted
+    return this.convertResource(clusterId)(raw)
   }
 
   deleteNamespace = async (clusterId, namespaceName) => {
