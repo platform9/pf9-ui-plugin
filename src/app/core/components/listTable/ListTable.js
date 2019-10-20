@@ -18,6 +18,7 @@ import ListTableToolbar from './ListTableToolbar'
 import Progress from 'core/components/progress/Progress'
 import { filterSpecPropType } from 'core/components/cardTable/CardTableToolbar'
 import { isNilOrEmpty } from 'utils/fp'
+import { listTableActionPropType } from 'core/components/listTable/ListTableBatchActions'
 
 const styles = theme => ({
   root: {
@@ -395,6 +396,13 @@ class ListTable extends PureComponent {
       onRefresh,
       loading,
       multiSelection,
+      onAdd,
+      onDelete,
+      deleteCond,
+      deleteDisabledInfo,
+      onEdit,
+      editCond,
+      editDisabledInfo,
     } = this.props
 
     const {
@@ -445,9 +453,13 @@ class ListTable extends PureComponent {
             <div className={classes.root}>
               <ListTableToolbar
                 selected={selected}
-                onAdd={this.props.onAdd && this.handleAdd}
-                onDelete={this.props.onDelete && this.handleDelete}
-                onEdit={this.props.onEdit && this.handleEdit}
+                onAdd={onAdd && this.handleAdd}
+                onDelete={onDelete && this.handleDelete}
+                deleteCond={deleteCond}
+                deleteDisabledInfo={deleteDisabledInfo}
+                onEdit={onEdit && this.handleEdit}
+                editCond={editCond}
+                editDisabledInfo={editDisabledInfo}
                 onSearchChange={this.handleSearch}
                 searchTerm={searchTerm}
                 columns={columns}
@@ -475,14 +487,6 @@ class ListTable extends PureComponent {
   }
 }
 
-const actionProps = PropTypes.shape({
-  label: PropTypes.string.isRequired,
-  action: PropTypes.func,
-  icon: PropTypes.node,
-  cond: PropTypes.func,
-  dialog: PropTypes.func,  // a React class or function
-})
-
 ListTable.propTypes = {
   columns: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.string,
@@ -498,7 +502,11 @@ ListTable.propTypes = {
   options: PropTypes.object,
   onAdd: PropTypes.func,
   onDelete: PropTypes.func,
+  deleteCond: PropTypes.func,
+  deleteDisabledInfo: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
   onEdit: PropTypes.func,
+  editCond: PropTypes.func,
+  editDisabledInfo: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
   onRefresh: PropTypes.func,
   onActionComplete: PropTypes.func,
   paginate: PropTypes.bool,
@@ -534,12 +542,12 @@ ListTable.propTypes = {
    * List of batch actions that can be performed
    * on the selected items.
    */
-  batchActions: PropTypes.arrayOf(actionProps),
+  batchActions: PropTypes.arrayOf(listTableActionPropType),
 
   /**
    * List of actions that can be performed on a single row.
    */
-  rowActions: PropTypes.arrayOf(actionProps),
+  rowActions: PropTypes.arrayOf(listTableActionPropType),
 
   onRowsPerPageChange: PropTypes.func,
   onColumnsChange: PropTypes.func,

@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import PropTypes from 'prop-types'
 import AddIcon from '@material-ui/icons/Add'
 import ListTableColumnButton from 'core/components/listTable/ListTableColumnSelector'
-import ListTableBatchActions from './ListTableBatchActions'
+import ListTableBatchActions, { listTableActionPropType } from './ListTableBatchActions'
 import PerPageControl from './PerPageControl'
 import SearchBar from 'core/components/SearchBar'
 import clsx from 'clsx'
@@ -11,6 +11,7 @@ import { makeStyles } from '@material-ui/styles'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import Picklist from 'core/components/Picklist'
 import { emptyArr } from 'utils/fp'
+import { both, T } from 'ramda'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -75,6 +76,7 @@ const ListTableToolbar = ({
   onFiltersReset, onSearchChange, onRefresh,
   batchActions = emptyArr, searchTerm, selected, visibleColumns,
   rowsPerPage, onChangeRowsPerPage, rowsPerPageOptions,
+  editCond, editDisabledInfo, deleteCond, deleteDisabledInfo,
 }) => {
   const classes = useStyles()
   const numSelected = (selected || []).length
@@ -91,15 +93,19 @@ const ListTableToolbar = ({
     </Tooltip>, [onRefresh])
 
   const allActions = useMemo(() => [...batchActions,
-    ...(numSelected === 1 && onEdit ? [{
+    ...(onEdit ? [{
       label: 'Edit',
       action: onEdit,
       icon: 'edit',
+      cond: both(() => numSelected === 1, editCond || T),
+      disabledInfo: editDisabledInfo,
     }] : emptyArr),
-    ...(numSelected > 0 && onDelete ? [{
+    ...(onDelete ? [{
       label: 'Delete',
       action: onDelete,
       icon: 'trash-alt',
+      cond: deleteCond,
+      disabledInfo: deleteDisabledInfo,
     }] : emptyArr),
   ], [numSelected, batchActions, onEdit, onDelete])
 
@@ -177,18 +183,15 @@ ListTableToolbar.propTypes = {
   filterValues: PropTypes.object,
   onAdd: PropTypes.func,
   onDelete: PropTypes.func,
+  deleteCond: PropTypes.func,
+  deleteDisabledInfo: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+  editCond: PropTypes.func,
+  editDisabledInfo: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
   onEdit: PropTypes.func,
   onFilterUpdate: PropTypes.func,
   onFiltersReset: PropTypes.func,
   onRefresh: PropTypes.func,
-  batchActions: PropTypes.arrayOf(
-    PropTypes.shape({
-      label: PropTypes.string.isRequired,
-      action: PropTypes.func,
-      icon: PropTypes.node,
-      cond: PropTypes.func,
-    }),
-  ),
+  batchActions: PropTypes.arrayOf(listTableActionPropType),
   selected: PropTypes.array,
   visibleColumns: PropTypes.array,
   onColumnToggle: PropTypes.func,
