@@ -29,10 +29,11 @@ UsageWidget.propTypes = {
     current: PropTypes.number,
     max: PropTypes.number,
     percent: PropTypes.number,
-  }).isRequired,
+  }),
 }
 
 UsageWidget.defaultProps = {
+  stats: { current: 0, max: 0, percent: 0 },
   usedText: 'used',
   units: '',
   precision: 1,

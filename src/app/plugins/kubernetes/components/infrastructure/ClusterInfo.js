@@ -40,17 +40,18 @@ const ClusterInfo = () => {
   const [clusters, loading] = useDataLoader(clusterActions.list)
   const cluster = clusters.find(x => x.uuid === match.params.id) || {}
   const { usage = emptyObj } = cluster
+
   return (
     <Progress loading={loading}>
       <Grid container spacing={4} className={classes.root}>
         <Grid item xs={4}>
-          <UsageWidget title="Compute" stats={usage.compute} />
+          <UsageWidget units="GHz" title="Compute" stats={usage.compute} />
         </Grid>
         <Grid item xs={4}>
-          <UsageWidget title="Memory" stats={usage.memory} />
+          <UsageWidget units="GiB" title="Memory" stats={usage.memory} />
         </Grid>
         <Grid item xs={4}>
-          <UsageWidget title="Storage" stats={usage.disk} />
+          <UsageWidget units="GiB" title="Storage" stats={usage.disk} />
         </Grid>
       </Grid>
       <Grid container spacing={4} className={classes.root}>
