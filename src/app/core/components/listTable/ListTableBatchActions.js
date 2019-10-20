@@ -9,6 +9,7 @@ import { ensureFunction } from 'utils/fp'
 
 const useStyles = makeStyles(theme => ({
   root: {
+    minWidth: 50,
     display: 'flex',
     flexFlow: 'column nowrap',
     alignItems: 'center',

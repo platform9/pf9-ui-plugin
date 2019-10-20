@@ -15,6 +15,8 @@ import { both, T } from 'ramda'
 
 const useStyles = makeStyles(theme => ({
   root: {
+    display: 'flex',
+    flexFlow: 'row nowrap',
     paddingRight: theme.spacing(1),
     color: theme.palette.grey[600],
     '& .MuiOutlinedInput-root': {
@@ -23,11 +25,9 @@ const useStyles = makeStyles(theme => ({
     },
   },
   highlight: {},
-  spacer: {
-    flex: '0 0 auto',
-  },
   actions: {
-    flex: '1 1 100%',
+    flexGrow: 1,
+    justifySelf: 'flex-end',
   },
   button: {
     cursor: 'pointer',
@@ -116,7 +116,6 @@ const ListTableToolbar = ({
       })}
     >
       <ListTableBatchActions batchActions={allActions} selected={selected} />
-      <div className={classes.spacer} />
       <div className={classes.actions}>
         <Toolbar className={classes.toolbar}>
           {Array.isArray(filters)

@@ -16,7 +16,7 @@ import { capitalizeString } from 'utils/misc'
 import { objSwitchCase } from 'utils/fp'
 import ProgressBar from 'core/components/progress/ProgressBar'
 import ClusterStatusSpan from 'k8s/components/infrastructure/ClusterStatusSpan'
-import ClusterResourceSpan from 'k8s/components/infrastructure/ClusterResourceSpan'
+import ResourceUsageTable from 'k8s/components/infrastructure/ResourceUsageTable'
 
 const getClusterPopoverContent = (healthyMasterNodes, masterNodes) =>
   `${healthyMasterNodes.length} of ${masterNodes.length} master nodes healthy (3 required)`
@@ -88,15 +88,15 @@ const renderLinks = links => {
   )
 }
 
-const renderStats = (_, cluster) => {
-  const { usage } = cluster
+const renderStats = (_, { usage }) => {
   const hasValidStats = usage && usage.compute && usage.compute.current
   if (!hasValidStats) { return null }
+
   return (
     <div>
-      <ClusterResourceSpan label="CPU" stats={usage.compute} />
-      <ClusterResourceSpan label="Memory" stats={usage.memory} />
-      <ClusterResourceSpan label="Storage" stats={usage.disk} />
+      <ResourceUsageTable valueConverter={value => value * 1024} units="MHz" label="CPU" stats={usage.compute} />
+      <ResourceUsageTable units="GiB" label="Memory" stats={usage.memory} />
+      <ResourceUsageTable units="GiB" label="Storage" stats={usage.disk} />
     </div>
   )
 }

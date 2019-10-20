@@ -32,7 +32,7 @@ const SimpleLink = forwardRef(({
   return (
     <Link
       ref={ref}
-      href={src || null}
+      href={src || 'javascript:;'}
       onClick={handleClick}
       {...rest}
     >
