@@ -10,6 +10,7 @@ import { Button, Toolbar, Tooltip } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import Picklist from 'core/components/Picklist'
+import { emptyArr } from 'utils/fp'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -72,7 +73,7 @@ const ListTableToolbar = ({
   columns, filterValues, filters,
   onAdd, onColumnToggle, onDelete, onEdit, onFilterUpdate,
   onFiltersReset, onSearchChange, onRefresh,
-  batchActions, searchTerm, selected, visibleColumns,
+  batchActions = emptyArr, searchTerm, selected, visibleColumns,
   rowsPerPage, onChangeRowsPerPage, rowsPerPageOptions,
 }) => {
   const classes = useStyles()
@@ -94,12 +95,12 @@ const ListTableToolbar = ({
       label: 'Edit',
       action: onEdit,
       icon: 'edit',
-    }] : []),
+    }] : emptyArr),
     ...(numSelected > 0 && onDelete ? [{
       label: 'Delete',
       action: onDelete,
       icon: 'trash-alt',
-    }] : []),
+    }] : emptyArr),
   ], [numSelected, batchActions, onEdit, onDelete])
 
   return (

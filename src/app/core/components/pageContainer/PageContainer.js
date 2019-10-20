@@ -14,9 +14,20 @@ const useStyles = makeStyles(theme => ({
     flexFlow: 'column nowrap',
   },
   header: {
+    display: 'flex',
+    flexFlow: 'column nowrap',
+    flexGrow: 1,
     zIndex: 1,
     position: 'relative',
     color: theme.palette.text.primary,
+  },
+  headerContents: {
+    display: 'flex',
+    flexFlow: 'row nowrap',
+    justifyContent: 'space-between',
+    paddingBottom: theme.spacing(1),
+    marginBottom: theme.spacing(2),
+    borderBottom: '1px solid #ccc',
   },
   extraHeader: {
     position: ({ floatingHeader }) => floatingHeader ? 'absolute' : 'static',
@@ -48,7 +59,9 @@ const PageContainer = ({ children, header, ...rest }) => {
 
   return <div className={classes.root}>
     <div className={classes.header}>
-      {header}
+      {header && <div className={classes.headerContents}>
+        {header}
+      </div>}
       <div className={classes.extraHeader} ref={extraHeaderRef} />
     </div>
     <div className={classes.content}>

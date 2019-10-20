@@ -53,14 +53,14 @@ const AppDetailsPage = () => {
   // We are just interested in the first (and only) item
   const [[app = emptyObj], loadingApp] = useDataLoader(appDetailLoader, params)
 
-  return <PageContainer>
+  return <PageContainer header={
+    <SimpleLink src={`/ui/kubernetes/apps`} className={classes.backLink}>
+      « Back to Application Catalog
+    </SimpleLink>}>
     {showingDeployDialog &&
     <AppDeployDialog
       app={app}
       onClose={() => setShowingDeployDialog(false)} />}
-    <SimpleLink src={`/ui/kubernetes/apps`} className={classes.backLink}>
-      « Back to Application Catalog
-    </SimpleLink>
     <Progress loading={loadingApp} overlay renderContentOnMount>
       <Grid container justify="center" spacing={3}>
         <Grid item xs={4}>

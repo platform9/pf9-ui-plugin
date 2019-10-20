@@ -8,6 +8,7 @@ import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { pathOr, pipe } from 'ramda'
 import { castBoolToStr, castFuzzyBool, columnPathLookup } from 'utils/misc'
 import { nodesCacheKey } from 'k8s/components/infrastructure/actions'
+import SimpleLink from 'core/components/SimpleLink'
 
 const renderStatus = (_, node) => (<HostStatus host={node.combined} />)
 const isMaster = pipe(castFuzzyBool, castBoolToStr())
@@ -33,7 +34,7 @@ const UsageBar = ({ stat }) => {
 const renderStats = field => pipe(
   columnPathLookup(`combined.usage.${field}`),
   // Offline nodes won't have usage stats
-  maybeFnOrNull(stat => <UsageBar stat={stat} />)
+  maybeFnOrNull(stat => <UsageBar stat={stat} />),
 )
 
 const renderLogs = url => <ExternalLink url={url}>logs</ExternalLink>
@@ -44,6 +45,9 @@ const getSpotInstance = pipe(
   castBoolToStr(),
 )
 
+const renderClusterLink = (clusterName, { clusterUuid }) => clusterUuid &&
+  <SimpleLink src={`/ui/kubernetes/infrastructure/clusters/${clusterUuid}`}>{clusterName}</SimpleLink>
+
 export const columns = [
   { id: 'uuid', label: 'UUID', display: false },
   { id: 'name', label: 'Name' },
@@ -53,7 +57,7 @@ export const columns = [
   { id: 'compute', label: 'Compute', render: renderStats('compute') },
   { id: 'memory', label: 'Memory', render: renderStats('memory') },
   { id: 'storage', label: 'Storage', render: renderStats('disk') },
-  { id: 'clusterName', label: 'Cluster' },
+  { id: 'clusterName', label: 'Cluster', render: renderClusterLink },
   { id: 'isMaster', label: 'Is Master?', render: isMaster },
   { id: 'isSpotInstance', label: 'Spot Instance?', render: getSpotInstance },
   { id: 'assignedRoles', label: 'Assigned Roles', render: renderRoles },

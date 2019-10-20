@@ -6,7 +6,7 @@ import clsx from 'clsx'
 import { makeStyles } from '@material-ui/styles'
 import { objSwitchCase } from 'utils/fp'
 import { capitalizeString } from 'utils/misc'
-import SimpleLink from 'core/components/SimpleLink'
+import ExternalLink from 'core/components/ExternalLink'
 import { propOr } from 'ramda'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { Tooltip } from '@material-ui/core'
@@ -50,9 +50,9 @@ const HostStatus = ({ host = {} }) => {
     'offline': <><WarningIcon style={yellowStyle} />Offline since {host.lastResponse}</>,
 
     'drifted': warnings ? warnings.map(warning =>
-      <SimpleLink src={getTimeDriftSupportLink(host)} rel="noopener" target="_blank">
+      <ExternalLink url={getTimeDriftSupportLink(host)}>
         <WarningIcon style={yellowStyle} />{warning}
-      </SimpleLink>) : capitalizeString(uiState),
+      </ExternalLink>) : capitalizeString(uiState),
 
     'pending': <>
       <i className={clsx(classes.loading, 'fal fa-lg fa-spin fa-sync')} />Discovering</>,
