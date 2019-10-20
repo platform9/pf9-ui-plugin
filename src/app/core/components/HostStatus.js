@@ -1,33 +1,85 @@
 import React from 'react'
 import CheckIcon from '@material-ui/icons/Check'
 import WarningIcon from '@material-ui/icons/Warning'
-import { green, yellow } from '@material-ui/core/colors'
+import { green, yellow, deepOrange } from '@material-ui/core/colors'
+import clsx from 'clsx'
+import { makeStyles } from '@material-ui/styles'
+import { objSwitchCase } from 'utils/fp'
+import { capitalizeString } from 'utils/misc'
+import SimpleLink from 'core/components/SimpleLink'
+import { propOr } from 'ramda'
+import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
+import { Tooltip } from '@material-ui/core'
+
+const useStyles = makeStyles(theme => ({
+  root: {
+    display: 'flex',
+    flexFlow: 'column nowrap',
+    alignItems: 'baseline',
+  },
+  loading: {
+    marginRight: 3,
+    marginBottom: 3,
+    fontSize: 15,
+  },
+  supportRole: {
+    fontSize: '0.7rem',
+    color: 'rgba(0, 0, 0, 0.87)',
+    marginTop: 5,
+    '& i': {
+      fontSize: 'inherit',
+    },
+  },
+}))
 
 const greenStyle = { color: green[500] }
-const yellowStyle = { color: yellow[500] }
+const yellowStyle = { color: yellow[600] }
+const orangeStyle = { color: deepOrange[500] }
 
-const HostStatus = ({ host }) => {
-  const uiState = host && host.uiState
-  switch (uiState) {
-    case 'online':
-      return <span><CheckIcon style={greenStyle} /> connected</span>
+const isDebian = host => ['ubuntu', 'debian'].includes(propOr('', 'osInfo', host).toLowerCase())
+const getTimeDriftSupportLink = host => isDebian(host)
+  ? 'https://platform9.com/support/prepare-a-ubuntu-server-for-platform9-openstack/'
+  : 'https://platform9.com/support/prepare-a-centos-physical-server/'
 
-    case 'offline':
-      return <span><WarningIcon style={yellowStyle} /> offline since {host.lastResponse}</span>
+const HostStatus = ({ host = {} }) => {
+  const classes = useStyles()
+  const { uiState, warnings, supportRole } = host
+  const getStatusContents = objSwitchCase({
+    'online': <><CheckIcon style={greenStyle} />Connected</>,
 
-    case 'drifted':
-    case 'pending':
-    case 'error':
-    case 'invalid-credentials':
-    case 'insufficient-permissions':
-      // TODO:
-      return `${uiState}`
+    'offline': <><WarningIcon style={yellowStyle} />Offline since {host.lastResponse}</>,
 
-    default:
-      return uiState || 'unknown'
-  }
+    'drifted': warnings ? warnings.map(warning =>
+      <SimpleLink src={getTimeDriftSupportLink(host)} rel="noopener" target="_blank">
+        <WarningIcon style={yellowStyle} />{warning}
+      </SimpleLink>) : capitalizeString(uiState),
 
-  // TODO: append support role
+    'pending': <>
+      <i className={clsx(classes.loading, 'fal fa-lg fa-spin fa-sync')} />Discovering</>,
+
+    'error': <><WarningIcon style={orangeStyle} />Error authorizing host. Please contact
+      support.</>,
+
+    'invalid-credentials': <><WarningIcon style={orangeStyle} />
+      Error connecting to vCenter. Please <a href="#/infrastructure/vmware">update your
+        credentials</a>.</>,
+
+    'insufficient-permissions': <>
+      <WarningIcon style={yellowStyle} />
+      Cannot verify vCenter permissions. Please <a href="#/infrastructure/vmware">ensure you have
+      sufficient permissions</a>.
+    </>,
+  }, uiState ? capitalizeString(uiState) : 'Unknown')
+
+  return <div className={classes.root}>
+    {getStatusContents(uiState)}
+    {supportRole && <div className={classes.supportRole}>
+      (Advanced Remote Support Enabled)&nbsp;
+      <Tooltip title={'Advanced Remote Support is currently enabled on this node. To disable it, select the \'Configure Host\' action from the actions bar.'}>
+        <FontAwesomeIcon>question-circle</FontAwesomeIcon>
+      </Tooltip>
+    </div>}
+  </div>
 }
 
 export default HostStatus
