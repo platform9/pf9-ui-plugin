@@ -1,6 +1,14 @@
 import React, { forwardRef, useCallback } from 'react'
 import { Link } from '@material-ui/core'
 import useReactRouter from 'use-react-router'
+import { makeStyles } from '@material-ui/styles'
+import clsx from 'clsx'
+
+const useStyles = makeStyles(theme => ({
+  root: {
+    cursor: 'pointer'
+  },
+}))
 
 // We need to destructure staticContext even though we are not using it in order to
 // work around this issue: https://github.com/ReactTraining/react-router/issues/4683
@@ -10,8 +18,10 @@ const SimpleLink = forwardRef(({
   src,
   children,
   staticContext,
+  className,
   ...rest
 }, ref) => {
+  const classes = useStyles()
   const { history } = useReactRouter()
   const handleClick = useCallback(e => {
     // Prevent links inside of a table row from triggering row selection.
@@ -31,8 +41,9 @@ const SimpleLink = forwardRef(({
 
   return (
     <Link
+      className={clsx(className, classes.root)}
       ref={ref}
-      href={src || 'javascript:;'}
+      href={src || null}
       onClick={handleClick}
       {...rest}
     >
