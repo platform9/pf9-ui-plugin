@@ -1,9 +1,25 @@
 import React from 'react'
 import createAddComponents from 'core/helpers/createAddComponents'
+import Wizard from 'core/components/wizard/Wizard'
+import WizardStep from 'core/components/wizard/WizardStep'
 import { storageClassesCacheKey } from './actions'
 
-// TODO: Add Form
-export const AddStorageClassForm = () => <h1>Add Form</h1>
+export const AddStorageClassForm = () => {
+  return (
+    <Wizard>
+      {() =>
+        <>
+          <BasicStep />
+          <CustomizeStep />
+        </>
+      }
+    </Wizard>
+  )
+}
+
+// TODO: implement Steps
+const BasicStep = () => <WizardStep stepId="basic" label="Basic">Basic Step</WizardStep>
+const CustomizeStep = () => <WizardStep stepId="customize" label="Customize">Customize Step</WizardStep>
 
 export const options = {
   cacheKey: storageClassesCacheKey,
