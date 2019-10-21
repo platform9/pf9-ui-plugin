@@ -22,13 +22,13 @@ class CheckboxField extends PureComponent {
   }
 
   render () {
-    const { id, label, value, classes, hasError, onClick, onChange, onMouseEnter, errorMessage, ...restProps } = this.props
+    const { id, label, required, value, classes, hasError, onClick, onChange, onMouseEnter, errorMessage, ...restProps } = this.props
 
     return (
       <div {...restProps}>
         <FormControl id={id} onMouseEnter={onMouseEnter} className={classes.formControl} error={hasError}>
           <FormControlLabel
-            label={label}
+            label={required ? `${label} *` : label}
             control={
               <Checkbox
                 {...restProps}

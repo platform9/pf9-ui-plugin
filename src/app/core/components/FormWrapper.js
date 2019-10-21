@@ -35,7 +35,7 @@ class FormWrapper extends React.PureComponent {
           <Grid container justify="space-between">
             <Grid item>
               <Typography
-                variant="h3"
+                variant="h5"
                 className={classes.title}
               >
                 {title}
