@@ -312,7 +312,7 @@ class ListTable extends PureComponent {
   }
 
   renderRowActions = row => {
-    const { rowActions, onRefresh, onActionComplete = onRefresh } = this.props
+    const { rowActions, onReload, onActionComplete = onReload } = this.props
     if (isNilOrEmpty(rowActions)) { return null }
     return (
       <TableCell>
@@ -393,6 +393,7 @@ class ListTable extends PureComponent {
       showCheckboxes,
       canDragColumns,
       filters,
+      onReload,
       onRefresh,
       loading,
       multiSelection,
@@ -469,6 +470,7 @@ class ListTable extends PureComponent {
                 filterValues={filterValues}
                 onFilterUpdate={this.handleFilterUpdate}
                 onFiltersReset={this.handleFiltersReset}
+                onReload={onReload}
                 onRefresh={onRefresh}
                 batchActions={batchActions}
                 rowsPerPage={rowsPerPage}
@@ -507,6 +509,7 @@ ListTable.propTypes = {
   onEdit: PropTypes.func,
   editCond: PropTypes.func,
   editDisabledInfo: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+  onReload: PropTypes.func,
   onRefresh: PropTypes.func,
   onActionComplete: PropTypes.func,
   paginate: PropTypes.bool,

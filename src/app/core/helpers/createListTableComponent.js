@@ -15,6 +15,8 @@ const createListTableComponent = ({
   searchTarget = 'name',
   paginate,
   showCheckboxes,
+  onReload,
+  onRefresh,
 }) => {
   const CustomListTable = ({
     data,
@@ -40,6 +42,8 @@ const createListTableComponent = ({
       visibleColumns={visibleColumns}
       columnsOrder={columnsOrder}
       rowsPerPage={rowsPerPage}
+      onReload={onReload}
+      onRefresh={onRefresh}
       onRowsPerPageChange={rowsPerPage => updatePreferences({ rowsPerPage })}
       onColumnsChange={updatePreferences}
       uniqueIdentifier={uniqueIdentifier}

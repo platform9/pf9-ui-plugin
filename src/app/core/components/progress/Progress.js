@@ -29,11 +29,8 @@ const styles = theme => ({
     color: 'inherit',
   },
   img: {
-    maxHeight: '80%',
-  },
-  imgInline: {
-    maxHeight: 25,
-    opacity: 0.7,
+    maxHeight: ({ inline }) => inline ? 25 : '80%',
+    opacity: ({ inline }) => inline ? 0.7 : 1,
   },
   status: {
     display: 'flex',
@@ -41,7 +38,10 @@ const styles = theme => ({
     flexWrap: 'nowrap',
     alignItems: 'center',
     flexFlow: ({ inline }) => inline ? 'row' : 'column',
-    padding: ({ inline, minHeight }) => inline ? '0 1rem' : `${minHeight / 4}px 0`,
+    padding: ({ inline, minHeight, maxHeight }) => inline
+      ? '0 1rem'
+      : `${(maxHeight < minHeight ? maxHeight : minHeight) / 4}px 0`,
+    maxHeight: ({ maxHeight }) => maxHeight,
     minHeight: ({ inline, minHeight }) => inline ? 'unset' : minHeight / 2,
   },
   statusOverlayed: {
@@ -51,7 +51,7 @@ const styles = theme => ({
     left: '0',
     bottom: '0',
     top: '0',
-    minWidth: ({ inline }) => inline ? 150 : 'unset'
+    minWidth: ({ inline }) => inline ? 150 : 'unset',
   },
   content: {
     width: '100%',
@@ -107,9 +107,7 @@ class Progress extends PureComponent {
       [classes.statusOverlayed]: overlay && loading && (renderContentOnMount || loadedOnce),
     })}>
       {renderLoadingImage &&
-      <img alt="Loading..." src={imageUrls.loading} className={clsx(classes.img, {
-        [classes.imgInline]: inline,
-      })} />}
+      <img alt="Loading..." src={imageUrls.loading} className={classes.img} />}
       {message && <Typography className={clsx(classes.message, {
         [classes.messageInline]: inline,
       })} variant="caption" color="textSecondary">
@@ -164,6 +162,8 @@ Progress.propTypes = {
   inline: PropTypes.bool,
   // eslint-disable-next-line react/no-unused-prop-types
   minHeight: PropTypes.number,
+  // eslint-disable-next-line react/no-unused-prop-types
+  maxHeight: PropTypes.number,
 }
 
 Progress.defaultProps = {

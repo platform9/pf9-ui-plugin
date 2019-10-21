@@ -1,79 +1,81 @@
-import React, { PureComponent } from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import clsx from 'clsx'
+import { Paper, IconButton, Typography } from '@material-ui/core'
 import CheckCircleIcon from '@material-ui/icons/CheckCircle'
 import ErrorIcon from '@material-ui/icons/Error'
 import InfoIcon from '@material-ui/icons/Info'
 import CloseIcon from '@material-ui/icons/Close'
 import green from '@material-ui/core/colors/green'
 import amber from '@material-ui/core/colors/amber'
-import IconButton from '@material-ui/core/IconButton'
 import WarningIcon from '@material-ui/icons/Warning'
-import { withStyles } from '@material-ui/styles'
-import Typography from '@material-ui/core/Typography'
+import { makeStyles } from '@material-ui/styles'
 
 const variantIcon = {
   success: CheckCircleIcon,
   warning: WarningIcon,
   error: ErrorIcon,
-  info: InfoIcon
+  info: InfoIcon,
 }
 
-const styles = theme => ({
-  success: { backgroundColor: green[600] },
-  error: { backgroundColor: theme.palette.error.dark },
-  info: { backgroundColor: theme.palette.primary.dark },
-  warning: { backgroundColor: amber[700] },
-  icon: { fontSize: 20 },
+const useStyles = makeStyles(theme => ({
+  root: {
+    maxWidth: 800,
+    position: 'relative',
+    padding: theme.spacing(1, 8),
+    margin: theme.spacing(2, 0),
+    width: '100%',
+    border: 0,
+  },
+  success: { color: green[600] },
+  error: { color: theme.palette.error.dark },
+  info: { color: theme.palette.primary.dark },
+  warning: { color: amber[700] },
+  icon: {
+    position: 'absolute',
+    left: theme.spacing(2),
+    top: theme.spacing(3),
+    fontSize: 28,
+  },
+  close: {
+    position: 'absolute',
+    right: theme.spacing(2),
+    top: theme.spacing(3),
+    padding: theme.spacing(1),
+    margin: theme.spacing(-1),
+  },
   iconVariant: {
     opacity: 0.9,
-    marginRight: theme.spacing(1)
+    marginRight: theme.spacing(1),
   },
   message: {
-    color: theme.palette.primary.contrastText,
     display: 'flex',
     alignItems: 'center',
   },
-  container: {
-    color: theme.palette.primary.contrastText,
-    display: 'flex',
-    justifyContent: 'space-between',
-    margin: `${theme.spacing(1)}px 0`,
-    padding: theme.spacing(1),
-    width: '100%',
-  }
-})
+}))
 
-@withStyles(styles)
-class Alert extends PureComponent {
-  state = { open: true }
+const Alert = ({ children, message, variant }) => {
+  const classes = useStyles()
+  const [open, setOpen] = useState(true)
+  if (!open) { return null }
+  const Icon = variantIcon[variant]
 
-  onClose = () => { this.setState({ open: false }) }
-  render () {
-    if (!this.state.open) { return null }
-
-    const { classes, children, message, variant } = this.props
-    const Icon = variantIcon[variant]
-
-    return (
-      <div className={clsx(classes.container, classes[variant])}>
-        <span className={classes.message}>
-          <Icon className={clsx(classes.icon, classes.iconVariant)} />
-          {message && <Typography variant="body1" color="inherit">{message}</Typography>}
-          {children}
-        </span>
-        <IconButton
-          key='close'
-          aria-label='Close'
-          color='inherit'
-          className={classes.close}
-          onClick={this.onClose}
-        >
-          <CloseIcon className={classes.icon} />
-        </IconButton>
-      </div>
-    )
-  }
+  return (
+    <Paper className={classes.root}>
+      <Icon className={clsx(classes.icon, classes.iconVariant, classes[variant])} />
+      {message && <Typography variant="body1" color="inherit">{message}</Typography>}
+      {children}
+      <IconButton
+        key='close'
+        aria-label='Close'
+        color='inherit'
+        className={classes.close}
+        onClick={() => setOpen(false)}
+      >
+        <CloseIcon />
+      </IconButton>
+    </Paper>
+  )
 }
 
 Alert.propTypes = {

@@ -2,7 +2,6 @@ import React, { useCallback, useState } from 'react'
 import {
   Dialog, DialogTitle, DialogContent, Table, TableBody, TableRow, TableCell, Checkbox,
 } from '@material-ui/core'
-import { clusterActions } from 'k8s/components/infrastructure/actions'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { except, emptyArr } from 'utils/fp'
 import Progress from 'core/components/progress/Progress'
@@ -12,6 +11,7 @@ import Wizard from 'core/components/wizard/Wizard'
 import WizardStep from 'core/components/wizard/WizardStep'
 import TextField from 'core/components/validatedForm/TextField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
+import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 
 export default ({ onClose }) => {
   const [clusters, loadingClusters] = useDataLoader(clusterActions.list)

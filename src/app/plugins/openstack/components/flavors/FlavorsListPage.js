@@ -1,5 +1,5 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { flavorActions } from 'k8s/components/infrastructure/actions'
+import { flavorActions } from 'k8s/components/infrastructure/common/actions'
 
 export const options = {
   addUrl: '/ui/openstack/flavors/add',

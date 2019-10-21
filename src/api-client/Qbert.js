@@ -336,8 +336,12 @@ class Qbert {
 
   /* Managed Apps */
   getPrometheusInstances = async (clusterUuid) => {
-    const response = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/prometheuses`)
-    return normalizeClusterizedResponse(clusterUuid, response)
+    try {
+      const response = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/prometheuses`)
+      return normalizeClusterizedResponse(clusterUuid, response)
+    } catch (e) {
+      return []
+    }
   }
 
   updatePrometheusInstance = async data => {

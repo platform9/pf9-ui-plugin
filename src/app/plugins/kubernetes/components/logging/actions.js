@@ -1,6 +1,6 @@
 import ApiClient from 'api-client/ApiClient'
 import createCRUDActions from 'core/helpers/createCRUDActions'
-import { clustersCacheKey } from 'k8s/components/infrastructure/actions'
+import { clustersCacheKey } from 'k8s/components/infrastructure/common/actions'
 import { mapAsync } from 'utils/async'
 
 const { qbert } = ApiClient.getInstance()
