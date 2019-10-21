@@ -56,7 +56,7 @@ const createCRUDComponents = options => {
 
   // List
   const List = ({
-    onAdd, onDelete, onEdit, batchActions, rowActions, data, onRefresh, onActionComplete, loading,
+    onAdd, onDelete, onEdit, batchActions, rowActions, data, onRefresh, onReload, onActionComplete, loading,
     visibleColumns, columnsOrder, rowsPerPage, orderBy, orderDirection,
     getParamsUpdater, filters,
   }) => {
@@ -76,6 +76,7 @@ const createCRUDComponents = options => {
         multiSelection={multiSelection}
         loading={loading}
         onActionComplete={onActionComplete}
+        onReload={onReload}
         onRefresh={onRefresh}
         columns={columns}
         filters={filters}
@@ -123,7 +124,8 @@ const createCRUDComponents = options => {
             data={data}
             batchActions={batchActions}
             rowActions={rowActions}
-            onRefresh={refetch}
+            onRefresh={reload}
+            onReload={refetch}
             onActionComplete={reload}
             {...handlers}
             {...restProps}

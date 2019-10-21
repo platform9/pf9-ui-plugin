@@ -2,12 +2,13 @@ import React, { useMemo } from 'react'
 import { pluck } from 'ramda'
 // This table essentially has the same functionality as the <NodesList>
 // except that it is only the nodes from the a single cluster.
-import { columns } from './NodesListPage'
+import { columns } from '../nodes/NodesListPage'
 import useDataLoader from 'core/hooks/useDataLoader'
 import createListTableComponent from 'core/helpers/createListTableComponent'
-import { clusterActions, loadNodes } from 'k8s/components/infrastructure/actions'
 import { emptyArr } from 'utils/fp'
 import useReactRouter from 'use-react-router'
+import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
+import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
 
 const ListTable = createListTableComponent({
   title: 'Cluster Nodes',

@@ -1,19 +1,20 @@
 import React, { forwardRef } from 'react'
 import PropTypes from 'prop-types'
-import { compose, pathStrOr } from 'app/utils/fp'
+import { propEq } from 'ramda'
+import { pathStrOr } from 'utils/fp'
 import { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
 import useDataLoader from 'core/hooks/useDataLoader'
 import Picklist from 'core/components/Picklist'
-import { withInfoTooltip } from 'core/components/InfoTooltip'
-import { loadCloudProviderRegionDetails } from './actions'
+import { loadCloudProviderRegionDetails } from 'k8s/components/infrastructure/cloudProviders/actions'
 
-const AwsRegionFlavorPicklist = forwardRef(({
-  cloudProviderId, cloudProviderRegionId, hasError, errorMessage, ...rest
+const AzureVnetPicklist = forwardRef(({
+  cloudProviderId, cloudProviderRegionId, resourceGroup, hasError, errorMessage, ...rest
 }, ref) => {
   const [details, loading] = useDataLoader(loadCloudProviderRegionDetails, { cloudProviderId, cloudProviderRegionId })
 
-  const flavors = pathStrOr([], '0.flavors', details)
-  const options = flavors.map(x => ({ label: x, value: x }))
+  const networks = pathStrOr([], '0.virtualNetworks', details)
+  const netsMatchingResourceGroup = networks.filter(propEq('resourceGroup', resourceGroup))
+  const options = netsMatchingResourceGroup.map(x => ({ label: x.name, value: x.name }))
 
   return (
     <Picklist
@@ -27,15 +28,14 @@ const AwsRegionFlavorPicklist = forwardRef(({
   )
 })
 
-AwsRegionFlavorPicklist.propTypes = {
+AzureVnetPicklist.propTypes = {
   id: PropTypes.string.isRequired,
   cloudProviderId: PropTypes.string,
   cloudProviderRegionId: PropTypes.string,
+  resourceGroup: PropTypes.string,
   initialValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   onChange: PropTypes.func,
   ...ValidatedFormInputPropTypes,
 }
 
-export default compose(
-  withInfoTooltip,
-)(AwsRegionFlavorPicklist)
+export default AzureVnetPicklist

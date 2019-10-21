@@ -1,8 +1,7 @@
-import React from 'react'
+import React, { useState, Fragment } from 'react'
 import PropTypes from 'prop-types'
 import { Tooltip } from '@material-ui/core'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
-import { withAppContext } from 'core/AppProvider'
 import { makeStyles } from '@material-ui/styles'
 import clsx from 'clsx'
 import { ensureFunction } from 'utils/fp'
@@ -39,29 +38,45 @@ const useStyles = makeStyles(theme => ({
   },
 }))
 
-// FIXME this should not be accessing the global context
-const ListTableBatchActions = ({ context, batchActions = [], selected = [] }) => {
+const ListTableAction = ({ cond, action, label, disabledInfo, dialog, icon, selected, onRefresh }) => {
   const { root, actionLabel, actionIcon, disabledAction } = useStyles()
-  if (selected.length === 0 || batchActions.length === 0) { return null }
-
-  const renderAction = action => {
-    const isActionEnabled = !action.cond || action.cond(selected, context)
-    const info = isActionEnabled || !action.disabledInfo
-      ? action.label
-      : ensureFunction(action.disabledInfo)(selected)
-    return <Tooltip key={action.label} title={info}>
+  const [dialogOpened, setDialogOpened] = useState(false)
+  const isActionEnabled = !cond || cond(selected)
+  const info = isActionEnabled || !disabledInfo
+    ? label
+    : ensureFunction(disabledInfo)(selected)
+  const DialogComponent = dialog
+  return <Fragment>
+    {dialog && dialogOpened
+      ? <DialogComponent rows={selected} open={dialogOpened} onClose={success => {
+        if (success && onRefresh) {
+          onRefresh()
+        }
+        setDialogOpened(false)
+      }} />
+      : null}
+    <Tooltip key={label} title={info}>
       <div className={clsx(root, {
         [disabledAction]: !isActionEnabled,
-      })} onClick={isActionEnabled ? () => action.action(selected, context) : null}>
-        {typeof action.icon === 'string'
-          ? <FontAwesomeIcon className={actionIcon}>{action.icon}</FontAwesomeIcon>
-          : action.icon}
-        <div className={actionLabel}>{action.label}</div>
+      })} onClick={isActionEnabled ? () => {
+        if (dialog) {
+          setDialogOpened(true)
+        } else {
+          action(selected)
+        }
+      } : null}>
+        {typeof icon === 'string'
+          ? <FontAwesomeIcon className={actionIcon}>{icon}</FontAwesomeIcon>
+          : icon}
+        <div className={actionLabel}>{label}</div>
       </div>
-    </Tooltip>
-  }
+    </Tooltip></Fragment>
+}
 
-  return batchActions.map(renderAction)
+const ListTableBatchActions = ({ batchActions = [], selected = [], onRefresh }) => {
+  if (selected.length === 0 || batchActions.length === 0) { return null }
+  return batchActions.map(action =>
+    <ListTableAction key={action.label} {...action} onRefresh={onRefresh} selected={selected} />)
 }
 
 export const listTableActionPropType = PropTypes.shape({
@@ -79,6 +94,8 @@ ListTableBatchActions.propTypes = {
 
   // The actions to perform on the selected rows
   batchActions: PropTypes.arrayOf(listTableActionPropType),
+
+  onRefresh: PropTypes.func,
 }
 
-export default withAppContext(ListTableBatchActions)
+export default ListTableBatchActions

@@ -1,12 +1,12 @@
 import React, { useMemo } from 'react'
 import useDataLoader from 'core/hooks/useDataLoader'
-import { clusterActions } from './actions'
 import UsageWidget from 'core/components/widgets/UsageWidget'
 import Progress from 'core/components/progress/Progress'
 import { Grid, Collapse } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import NetworksWidget from 'core/components/widgets/NetworksWidget'
 import calcUsageTotals from 'k8s/util/calcUsageTotals'
+import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 
 const useStyles = makeStyles(theme => ({
   root: {

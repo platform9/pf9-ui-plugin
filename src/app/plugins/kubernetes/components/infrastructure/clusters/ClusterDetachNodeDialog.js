@@ -1,5 +1,4 @@
-import React, { PureComponent } from 'react'
-import ExternalLink from 'core/components/ExternalLink'
+import React from 'react'
 import { compose, propOr } from 'ramda'
 import { withAppContext } from 'core/AppProvider'
 import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab'
@@ -7,9 +6,10 @@ import {
   Button, Dialog, DialogActions, DialogContent, DialogTitle, Table, TableBody, TableRow, TableCell,
   Typography,
 } from '@material-ui/core'
-import { loadNodes, cloudProviderActions } from 'k8s/components/infrastructure/actions'
 import withDataLoader from 'core/hocs/withDataLoader'
 import withDataMapper from 'core/hocs/withDataMapper'
+import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
+import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
 
 // The modal is technically inside the row, so clicking anything inside
 // the modal window will cause the table row to be toggled.
@@ -20,7 +20,7 @@ const stopPropagation = e => {
   e.stopPropagation()
 }
 
-class ClusterAttachNodeDialog extends PureComponent {
+class ClusterDetachNodeDialog extends React.PureComponent {
   state = {}
 
   handleClose = () => {
@@ -30,36 +30,30 @@ class ClusterAttachNodeDialog extends PureComponent {
   handleSubmit = async () => {
     const { row, getContext, setContext } = this.props
 
-    const nodes = Object.keys(this.state)
-      .filter(uuid => this.state[uuid] !== 'unassigned')
-      .map(uuid => ({ uuid, isMaster: this.state[uuid] === 'master' }))
+    const nodeUuids = Object.keys(this.state)
+      .filter(uuid => this.state[uuid] === 'detach')
 
     const clusterUuid = row.uuid
-    await cloudProviderActions.attachNodesToCluster({
-      getContext,
-      setContext,
-      params: { clusterUuid, nodes },
-    })
+    await clusterActions.detachNodesFromCluster({ getContext, setContext, params: { clusterUuid, nodeUuids } })
     this.handleClose()
   }
 
   setNodeRole = uuid => (e, value) => {
     e.preventDefault()
     e.stopPropagation()
-    this.setState({ [uuid]: value || 'unassigned' })
+    this.setState({ [uuid]: value || 'attached' })
   }
 
   renderNodeRow = node => {
     const uuid = node.uuid
-    const value = this.state[uuid] || 'unassigned'
+    const value = this.state[uuid] || 'attached'
     return (
       <TableRow key={uuid}>
         <TableCell>{node.name}</TableCell>
         <TableCell>
           <ToggleButtonGroup exclusive value={value} onChange={this.setNodeRole(uuid)}>
-            <ToggleButton value="unassigned">Unassigned</ToggleButton>
-            <ToggleButton value="master">Master</ToggleButton>
-            <ToggleButton value="worker">Worker</ToggleButton>
+            <ToggleButton value="detach">Detach</ToggleButton>
+            <ToggleButton value="attached">Attached</ToggleButton>
           </ToggleButtonGroup>
         </TableCell>
       </TableRow>
@@ -67,30 +61,36 @@ class ClusterAttachNodeDialog extends PureComponent {
   }
 
   render () {
-    const { data: { nodes } } = this.props
-    const freeNodes = nodes.filter(x => !x.clusterUuid)
+    const { data, row } = this.props
+    const { name } = row
+    const attachedNodes = data.nodes.filter(node => node.clusterUuid === row.uuid)
     return (
       <Dialog open onClose={this.handleClose} onClick={stopPropagation}>
-        <DialogTitle>Attach Node to Cluster</DialogTitle>
+        <DialogTitle>Detach node from cluster ({name})</DialogTitle>
         <DialogContent>
-          <p>
-            <b>IMPORTANT</b>:
-            Before adding nodes to a cluster, please ensure that you have followed the requirements
-            in <ExternalLink url="https://docs.platform9.com/getting-started/managed-container-cloud-requirements-checklist/">this
-            article</ExternalLink> for
-            each node.
-          </p>
+          <p>Detaching a node from a Kubernetes cluster has the following impact:</p>
+          <ul>
+            <li>
+              All containers running on the node will be destroyed.
+            </li>
+            <li>
+              Deployment will be automatically restarted by Kubernetes on another node
+              in the cluster provided sufficient resources are available.
+            </li>
+            <li>
+              This does not uninstall any Kubernetes packages from the node.
+              Hence the node is available for reattaching to the same or different cluster.
+            </li>
+          </ul>
 
-          <p>
-            Choose the nodes you would like to add to this cluster as well as their corresponding
-            role.
-          </p>
-          {freeNodes.length === 0 &&
-          <Typography variant="h5">No nodes available to attach</Typography>
+          <p>Choose nodes to detach from the cluster</p>
+
+          {attachedNodes.length === 0 &&
+            <Typography variant="h5">No nodes available to detach</Typography>
           }
           <Table>
             <TableBody>
-              {freeNodes.map(this.renderNodeRow)}
+              {attachedNodes.map(this.renderNodeRow)}
             </TableBody>
           </Table>
         </DialogContent>
@@ -99,7 +99,7 @@ class ClusterAttachNodeDialog extends PureComponent {
             Cancel
           </Button>
           <Button onClick={this.handleSubmit} color="primary" autoFocus>
-            Attach
+            Detach nodes
           </Button>
         </DialogActions>
       </Dialog>
@@ -111,4 +111,4 @@ export default compose(
   withAppContext,
   withDataLoader({ nodes: loadNodes }),
   withDataMapper({ nodes: propOr([], 'nodes') }),
-)(ClusterAttachNodeDialog)
+)(ClusterDetachNodeDialog)

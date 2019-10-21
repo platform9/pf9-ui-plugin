@@ -1,7 +1,7 @@
 import { pathStrOrNull, objSwitchCase } from 'utils/fp'
 import { map, pathEq, find, pluck, curry, pipe, last, pathOr, prop, propEq } from 'ramda'
 import ApiClient from 'api-client/ApiClient'
-import { clustersCacheKey } from '../infrastructure/actions'
+import { clustersCacheKey } from '../infrastructure/common/actions'
 import { notFoundErr } from 'app/constants'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { flatMapAsync } from 'utils/async'

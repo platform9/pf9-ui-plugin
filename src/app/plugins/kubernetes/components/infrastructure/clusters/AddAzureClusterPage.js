@@ -1,14 +1,13 @@
 import React from 'react'
 import FormWrapper from 'core/components/FormWrapper'
-import AwsAvailabilityZoneChooser from './AwsAvailabilityZoneChooser'
-import AwsClusterReviewTable from './AwsClusterReviewTable'
-import AwsRegionFlavorPicklist from './AwsRegionFlavorPicklist'
-import AwsClusterVpcPicklist from './AwsClusterVpcPicklist'
+import AzureAvailabilityZoneChooser from '../common/AzureAvailabilityZoneChooser'
+import AzureClusterReviewTable from '../common/AzureClusterReviewTable'
+import AzureSkuPicklist from '../common/AzureSkuPicklist'
+import AzureSubnetPicklist from '../common/AzureSubnetPicklist'
+import AzureVnetPicklist from '../common/AzureVnetPicklist'
+import AzureResourceGroupPicklist from '../common/AzureResourceGroupPicklist'
 import CloudProviderPicklist from 'k8s/components/common/CloudProviderPicklist'
 import CloudProviderRegionPicklist from 'k8s/components/common/CloudProviderRegionPicklist'
-import AwsClusterSshKeyPicklist from './AwsClusterSshKeyPicklist'
-import ClusterDomainPicklist from './ClusterDomainPicklist'
-import AwsZoneVpcMappings from './AwsZoneVpcMappings'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
 import KeyValuesField from 'core/components/validatedForm/KeyValuesField'
 import PicklistField from 'core/components/validatedForm/PicklistField'
@@ -19,35 +18,29 @@ import WizardStep from 'core/components/wizard/WizardStep'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import useParams from 'core/hooks/useParams'
 import useReactRouter from 'use-react-router'
-import { clusterActions } from './actions'
 import { pick } from 'ramda'
+import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 
 const initialContext = {
   template: 'small',
-  ami: 'ubuntu',
-  masterFlavor: 't2.small',
-  workerFlavor: 't2.small',
+  masterSku: 'Standard_A1_v2',
+  workerSku: 'Standard_A1_v2',
   numMasters: 1,
   numWorkers: 1,
-  enableCAS: false,
   usePf9Domain: true,
-  network: 'newVpc',
+  network: 'newNetwork',
   containersCidr: '10.20.0.0/16',
   servicesCidr: '10.21.0.0/16',
   networkPlugin: 'flannel',
-  mtuSize: 1440,
   runtimeConfigOption: 'default',
+  useAllAvailabilityZones: true,
+  assignPublicIps: false,
 }
 
 const templateOptions = [
-  { label: 'small (single dev) - 1 node master + worker (t2.small)', value: 'small' },
-  { label: 'medium (internal team) - 1 master + 3 workers (t2.medium)', value: 'medium' },
-  { label: 'large (production) - 3 masters + 5 workers (t2.large)', value: 'large' },
-]
-
-const operatingSystemOptions = [
-  { label: 'Ubuntu', value: 'ubuntu' },
-  { label: 'CentOS', value: 'centos' },
+  { label: 'small (single dev) - 1 node master + worker (Standard_A1_v2)', value: 'small' },
+  { label: 'medium (internal team) - 1 master + 3 workers (Standard_A2_v2)', value: 'medium' },
+  { label: 'large (production) - 3 masters + 5 workers (Standard_A4_v2)', value: 'large' },
 ]
 
 const numMasterOptions = [
@@ -74,22 +67,22 @@ const handleTemplateChoice = ({ setWizardContext, setFieldValue }) => option => 
       numMasters: 1,
       numWorkers: 0,
       allowWorkloadsOnMaster: true,
-      masterFlavor: 't2.small',
-      workerFlavor: 't2.small',
+      masterFlavor: 'Standard_A1_v2',
+      workerFlavor: 'Standard_A1_v2',
     },
     medium: {
       numMasters: 1,
       numWorkers: 3,
       allowWorkloadsOnMaster: false,
-      masterFlavor: 't2.medium',
-      workerFlavor: 't2.medium',
+      masterFlavor: 'Standard_A2_v2',
+      workerFlavor: 'Standard_A2_v2',
     },
     large: {
       numMasters: 3,
       numWorkers: 5,
       allowWorkloadsOnMaster: false,
-      masterFlavor: 't2.large',
-      workerFlavor: 't2.large',
+      masterFlavor: 'Standard_A4_v2',
+      workerFlavor: 'Standard_A4_v2',
     }
   }
 
@@ -98,148 +91,14 @@ const handleTemplateChoice = ({ setWizardContext, setFieldValue }) => option => 
   Object.entries(options[option]).forEach(([key, value]) => {
     setFieldValue(key)(value)
   })
-
-  // set common default settings
-  // TODO: Choose the first AZ by default
 }
 
 const networkOptions = [
-  { label: '+ Create new VPC', value: 'newVpc' },
-  { label: 'Use existing VPC', value: 'existing' },
-  { label: 'Use existing VPC with VPN', value: 'existingNewVpn' },
+  { label: 'Select existing', value: 'existing' },
+  { label: 'Create new network', value: 'newNetwork' },
 ]
 
-const networkPluginOptions = [
-  { label: 'Flannel', value: 'flannel' },
-  { label: 'Calico', value: 'calico' },
-  { label: 'Canal (experimental)', value: 'canal' },
-]
-
-const handleNetworkPluginChange = ({ setWizardContext, setFieldValue }) => option => {
-  if (['calico', 'canal', 'weave'].includes(option)) {
-    setWizardContext({ privileged: true })
-    setFieldValue('privileged')(true)
-  }
-}
-
-// These fields are only rendered when the user opts to not use a `platform9.net` domain.
-const renderCustomNetworkingFields = ({ params, getParamsUpdater, values, setFieldValue, setWizardContext, wizardContext }) => {
-  const updateFqdns = (value, label) => {
-    const name = values.name || wizardContext.name
-
-    const api = `${name}-api.${label}`
-    setFieldValue('externalDnsName')(api)
-    setWizardContext({ externalDnsName: api })
-
-    const service = `${name}-service.${label}`
-    setFieldValue('serviceFqdn')(service)
-    setWizardContext({ serviceFdqn: service })
-  }
-
-  const renderNetworkFields = networkOption => {
-    switch (networkOption) {
-      case 'newVpc':
-        return (
-          <CheckboxField
-            id="isPrivate"
-            label="Deploy nodes using private subnet"
-            info=""
-          />
-        )
-      case 'existing':
-        return (
-          <>
-            <PicklistField
-              DropdownComponent={AwsClusterVpcPicklist}
-              id="vpc"
-              label="VPC"
-              onChange={getParamsUpdater('vpcId')}
-              cloudProviderId={params.cloudProviderId}
-              cloudProviderRegionId={params.cloudProviderRegionId}
-              info=""
-              required
-            />
-
-            <AwsZoneVpcMappings
-              type="public"
-              cloudProviderId={params.cloudProviderId}
-              cloudProviderRegionId={params.cloudProviderRegionId}
-              onChange={getParamsUpdater('subnets')}
-              vpcId={params.vpcId}
-              azs={params.azs}
-            />
-
-            <CheckboxField
-              id="isPrivate"
-              label="Deploy nodes using private subnet"
-              onChange={getParamsUpdater('isPrivate')}
-              info=""
-            />
-
-            {params.isPrivate &&
-              <AwsZoneVpcMappings
-                type="private"
-                cloudProviderId={params.cloudProviderId}
-                cloudProviderRegionId={params.cloudProviderRegionId}
-                onChange={getParamsUpdater('privateSubnets')}
-                vpcId={params.vpcId}
-                azs={params.azs}
-              />
-            }
-          </>
-        )
-      case 'existingNewVpn':
-        return (
-          <>
-            <PicklistField
-              DropdownComponent={AwsClusterVpcPicklist}
-              id="vpc"
-              label="VPC"
-              onChange={getParamsUpdater('vpcId')}
-              cloudProviderId={params.cloudProviderId}
-              cloudProviderRegionId={params.cloudProviderRegionId}
-              info=""
-              required
-            />
-
-            <AwsZoneVpcMappings
-              type="private"
-              cloudProviderId={params.cloudProviderId}
-              cloudProviderRegionId={params.cloudProviderRegionId}
-              onChange={getParamsUpdater('privateSubnets')}
-              vpcId={params.vpcId}
-              azs={params.azs}
-            />
-          </>
-        )
-    }
-  }
-
-  return (
-    <>
-      <PicklistField
-        DropdownComponent={ClusterDomainPicklist}
-        id="domainId"
-        label="Domain"
-        onChange={updateFqdns}
-        cloudProviderId={params.cloudProviderId}
-        cloudProviderRegionId={params.cloudProviderRegionId}
-        info="Select the base domain name to be used for the API and service FQDNs"
-        required
-      />
-
-      <PicklistField
-        id="network"
-        label="Network"
-        options={networkOptions}
-        info="Select a network configuration. Read this article for detailed information about each network configuration type."
-      />
-      {renderNetworkFields(values.network)}
-    </>
-  )
-}
-
-const AddAwsClusterPage = () => {
+const AddAzureClusterPage = () => {
   const { params, getParamsUpdater } = useParams()
   const { history } = useReactRouter()
   const onComplete = () => {
@@ -250,17 +109,18 @@ const AddAwsClusterPage = () => {
   const handleSubmit = params => async data => {
     const body = {
       // basic info
-      ...pick('nodePoolUuid name region azs ami sshKey'.split(' '), data),
+      ...pick('nodePoolUuid name location zones sshKey'.split(' '), data),
 
       // cluster configuration
-      ...pick('masterFlavor workerFlavor numMasters enableCAS numWorkers numMaxWorkers allowWorkloadsOnMaster numSpotWorkers spotPrice'.split(' '), data),
+      ...pick('masterSku workerSku numMasters numWorkers allowWorkloadsOnMaster'.split(' '), data),
 
       // network info
-      ...pick('domainId vpc isPrivate privateSubnets subnets externalDnsName serviceFqdn containersCidr servicesCidr networkPlugin'.split(' '), data),
+      ...pick('assignPublicIps vnetResourceGroup vnetName masterSubnetName workerSubnetName externalDnsName serviceFqdn containersCidr servicesCidr networkPlugin'.split(' '), data),
 
       // advanced configuration
       ...pick('privileged appCatalogEnabled customAmi tags'.split(' '), data),
     }
+    if (data.useAllAvailabilityZones) { body.zones = [] }
     if (data.httpProxy) { body.httpProxy = data.httpProxy }
     if (data.networkPlugin === 'calico') { body.mtuSize = data.mtuSize }
 
@@ -269,9 +129,6 @@ const AddAwsClusterPage = () => {
       all: 'api/all=true',
       custom: data.customRuntimeConfig,
     }[data.runtimeConfigOption]
-
-    // TODO: azs
-    // TODO: vpc
 
     await create(body)
     return body
@@ -303,7 +160,7 @@ const AddAwsClusterPage = () => {
                         onChange={getParamsUpdater('cloudProviderId')}
                         info="Nodes will be provisioned using this cloud provider."
                         value={params.cloudProviderId}
-                        type="aws"
+                        type="azure"
                         required
                       />
 
@@ -311,7 +168,7 @@ const AddAwsClusterPage = () => {
                       <PicklistField
                         DropdownComponent={CloudProviderRegionPicklist}
                         disabled={!params.cloudProviderId}
-                        id="region"
+                        id="location"
                         label="Region"
                         cloudProviderId={params.cloudProviderId}
                         onChange={getParamsUpdater('cloudProviderRegionId')}
@@ -330,27 +187,13 @@ const AddAwsClusterPage = () => {
                         info="Set common options from one of the available templates"
                       />
 
-                      {/* AWS Availability Zone */}
-                      {values.region &&
-                        <AwsAvailabilityZoneChooser
-                          id="azs"
-                          info="Select from the Availability Zones for the specified region"
-                          cloudProviderId={params.cloudProviderId}
-                          cloudProviderRegionId={params.cloudProviderRegionId}
-                          onChange={getParamsUpdater('azs')}
-                          required
-                        />
-                      }
-
                       {/* SSH Key */}
-                      <PicklistField
-                        DropdownComponent={AwsClusterSshKeyPicklist}
-                        disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
+                      <TextField
                         id="sshKey"
-                        label="SSH Key"
-                        cloudProviderId={params.cloudProviderId}
-                        cloudProviderRegionId={params.cloudProviderRegionId}
-                        info="Select an AWS SSH key to be associated with the nodes. This key can be used to access the nodes for debugging or other purposes."
+                        label="Public SSH key"
+                        info="Copy/paste your public SSH key"
+                        multiline
+                        rows={3}
                         required
                       />
                     </>
@@ -364,23 +207,33 @@ const AddAwsClusterPage = () => {
                 <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                   {({ setFieldValue, values }) => (
                     <>
-                      {/* Operating System */}
-                      <PicklistField
-                        id="ami"
-                        label="Operating System"
-                        options={operatingSystemOptions}
-                        info="Operating System / AMI"
-                        required
+                      <CheckboxField
+                        id="useAllAvailabilityZones"
+                        label="Use all availability zones"
+                        onChange={checked => checked || getParamsUpdater('zones')([])}
+                        info=""
                       />
 
-                      {/* Master node instance type */}
+                      {/* Azure Availability Zone */}
+                      {values.useAllAvailabilityZones ||
+                        <AzureAvailabilityZoneChooser
+                          id="zones"
+                          info="Select from the Availability Zones for the specified region"
+                          onChange={getParamsUpdater('zones')}
+                          required
+                        />
+                      }
+
+                      {/* Master node SKU */}
                       <PicklistField
-                        DropdownComponent={AwsRegionFlavorPicklist}
+                        DropdownComponent={AzureSkuPicklist}
                         disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
-                        id="masterFlavor"
-                        label="Master Node Instance Type"
+                        id="masterSku"
+                        label="Master Node SKU"
                         cloudProviderId={params.cloudProviderId}
                         cloudProviderRegionId={params.cloudProviderRegionId}
+                        filterByZones={!values.useAllAvailabilityZones}
+                        selectedZones={params.zones}
                         info="Choose an instance type used by master nodes."
                         required
                       />
@@ -394,14 +247,16 @@ const AddAwsClusterPage = () => {
                         required
                       />
 
-                      {/* Worker node instance type */}
+                      {/* Worker node SKU */}
                       <PicklistField
-                        DropdownComponent={AwsRegionFlavorPicklist}
+                        DropdownComponent={AzureSkuPicklist}
                         disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
-                        id="workerFlavor"
-                        label="Worker Node Instance Type"
+                        id="workerSku"
+                        label="Worker Node SKU"
                         cloudProviderId={params.cloudProviderId}
                         cloudProviderRegionId={params.cloudProviderRegionId}
+                        filterByZones={!values.useAllAvailabilityZones}
+                        selectedZones={params.zones}
                         info="Choose an instance type used by worker nodes."
                         required
                       />
@@ -415,30 +270,12 @@ const AddAwsClusterPage = () => {
                         required
                       />
 
-                      {/* Workloads on masters */}
+                      {/* Allow workloads on masters */}
                       <CheckboxField
                         id="allowWorkloadsOnMaster"
                         label="Allow workloads on master nodes"
                         info="It is highly recommended to not enable workloads on master nodes for production or critical workload clusters."
                       />
-
-                      {/* Enable Auto Scaling */}
-                      <CheckboxField
-                        id="enableCAS"
-                        label="Enable Auto Scaling"
-                        info="The cluster may scale up to the max worker nodes specified. Auto scaling may not be used with spot instances."
-                      />
-
-                      {/* Max num worker nodes (autoscaling) */}
-                      {values.enableCAS &&
-                        <TextField
-                          id="numMaxWorkers"
-                          type="number"
-                          label="Maximum number of worker nodes"
-                          info="Maximum number of worker nodes this cluster may be scaled up to."
-                          required={values.enableCAS}
-                        />
-                      }
                     </>
                   )}
                 </ValidatedForm>
@@ -450,33 +287,85 @@ const AddAwsClusterPage = () => {
                 <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                   {({ setFieldValue, values }) => (
                     <>
-                      {/* Use PF9 domain */}
+                      {/* Assign public IP's */}
                       <CheckboxField
-                        id="usePf9Domain"
-                        label="Use the platform9.net domain"
-                        info="Select this option if you want Platform9 to automatically generate the endpoints or if you do not have access to Route 53."
+                        id="assignPublicIps"
+                        label="Assign public IP's"
+                        info="Assign a public IP for every node created on this cluster."
                       />
 
-                      {values.usePf9Domain || renderCustomNetworkingFields({ params, getParamsUpdater, values, setFieldValue, setWizardContext, wizardContext })}
+                      {/* Network */}
+                      <PicklistField
+                        id="network"
+                        options={networkOptions}
+                        label="Network"
+                        info="Select existing networking resources or automatically create and assign new networking resources."
+                        required
+                      />
+
+                      {values.network === 'existing' &&
+                        <>
+                          {/* Resource group */}
+                          <PicklistField
+                            DropdownComponent={AzureResourceGroupPicklist}
+                            disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
+                            id="vnetResourceGroup"
+                            label="Resource group"
+                            cloudProviderId={params.cloudProviderId}
+                            cloudProviderRegionId={params.cloudProviderRegionId}
+                            onChange={getParamsUpdater('resourceGroup')}
+                            info="Select the resource group that your networking resources belong to."
+                            required
+                          />
+
+                          {/* Existing network.  I don't get the point of this field. */}
+                          <PicklistField
+                            DropdownComponent={AzureVnetPicklist}
+                            disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
+                            id="vnetName"
+                            label="Select existing network"
+                            cloudProviderId={params.cloudProviderId}
+                            cloudProviderRegionId={params.cloudProviderRegionId}
+                            resourceGroup={params.resourceGroup}
+                            info="Select the network for your cluster."
+                            required
+                          />
+
+                          {/* Master node subnet */}
+                          <PicklistField
+                            DropdownComponent={AzureSubnetPicklist}
+                            disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
+                            id="masterSubnetName"
+                            label="Master node subnet"
+                            cloudProviderId={params.cloudProviderId}
+                            cloudProviderRegionId={params.cloudProviderRegionId}
+                            resourceGroup={params.resourceGroup}
+                            info="Select the subnet for your master nodes. Can be the same as worker node subnet."
+                            required
+                          />
+
+                          {/* Worker node subnet */}
+                          <PicklistField
+                            DropdownComponent={AzureSubnetPicklist}
+                            disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
+                            id="workerSubnetName"
+                            label="Worker node subnet"
+                            cloudProviderId={params.cloudProviderId}
+                            cloudProviderRegionId={params.cloudProviderRegionId}
+                            resourceGroup={params.resourceGroup}
+                            info="Select the subnet for your worker nodes. Can be the same as master node subnet."
+                            required
+                          />
+                        </>
+                      }
 
                       {/* API FQDN */}
-                      {values.usePf9Domain ||
-                        <TextField
-                          id="externalDnsName"
-                          label="API FQDN"
-                          info="FQDN used to reference cluster API. To ensure the API can be accessed securely at the FQDN, the FQDN will be included in the API server certificate's Subject Alt Names. If deploying onto AWS, we will automatically create the DNS records for this FQDN into AWS Route 53."
-                          required
-                        />
-                      }
-                      {/* Services FQDN */}
-                      {values.usePf9Domain ||
-                        <TextField
-                          id="serviceFqdn"
-                          label="Services FQDN"
-                          info="FQDN used to reference cluster services. If deploying onto AWS, we will automatically create the DNS records for this FQDN into AWS Route 53."
-                          required
-                        />
-                      }
+                      <TextField
+                        id="externalDnsName"
+                        label="API FQDN"
+                        info="FQDN used to reference cluster API. To ensure the API can be accessed securely at the FQDN, the FQDN will be included in the API server certificate's Subject Alt Names. If deploying onto AWS, we will automatically create the DNS records for this FQDN into AWS Route 53."
+                        required
+                      />
 
                       {/* Containers CIDR */}
                       <TextField
@@ -500,26 +389,6 @@ const AddAwsClusterPage = () => {
                         label="HTTP Proxy"
                         info="Specify the HTTP proxy for this cluster.  Leave blank for none.  Uses format of <scheme>://<username>:<password>@<host>:<port> where <username>:<password>@ is optional."
                       />
-
-                      {/* Network plugin */}
-                      <PicklistField
-                        id="networkPlugin"
-                        label="Network backend"
-                        options={networkPluginOptions}
-                        info=""
-                        onChange={handleNetworkPluginChange({ setWizardContext, setFieldValue })}
-                        required
-                      />
-
-                      {/* HTTP proxy */}
-                      {values.networkPlugin === 'calico' &&
-                        <TextField
-                          id="mtuSize"
-                          label="MTU Size"
-                          info="Maximum Transmission Unit (MTU) for the interface (in bytes)"
-                          required={values.networkPlugin === 'calico'}
-                        />
-                      }
                     </>
                   )}
                 </ValidatedForm>
@@ -563,13 +432,6 @@ const AddAwsClusterPage = () => {
                         info="Enable the Helm Application Catalog on this cluster"
                       />
 
-                      {/* Custom AMI */}
-                      <TextField
-                        id="customAmi"
-                        label="Custom AMI ID"
-                        info="Use a custom AMI (leave blank for none) to create cluster nodes with, in case our AMI defaults are not available for you."
-                      />
-
                       {/* Tags */}
                       <KeyValuesField
                         id="tags"
@@ -585,7 +447,7 @@ const AddAwsClusterPage = () => {
             <WizardStep stepId="review" label="Review">
               <FormWrapper title="Review">
                 <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
-                  <AwsClusterReviewTable data={wizardContext} />
+                  <AzureClusterReviewTable data={wizardContext} />
                 </ValidatedForm>
               </FormWrapper>
             </WizardStep>
@@ -596,4 +458,4 @@ const AddAwsClusterPage = () => {
   )
 }
 
-export default AddAwsClusterPage
+export default AddAzureClusterPage

@@ -1,22 +1,28 @@
 import React, { forwardRef } from 'react'
 import PropTypes from 'prop-types'
-import { pathStrOr } from 'app/utils/fp'
+import { pathStrOr } from 'utils/fp'
 import { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
 import useDataLoader from 'core/hooks/useDataLoader'
 import Picklist from 'core/components/Picklist'
-import { loadCloudProviderRegionDetails } from './actions'
+import { loadCloudProviderRegionDetails } from 'k8s/components/infrastructure/cloudProviders/actions'
 
-const AwsClusterSshKeyPicklist = forwardRef(({
-  cloudProviderId, cloudProviderRegionId, hasError, errorMessage, ...rest
+const ClusterDomainPicklist = forwardRef(({
+  cloudProviderId, cloudProviderRegionId, hasError, errorMessage, onChange, ...rest
 }, ref) => {
   const [details, loading] = useDataLoader(loadCloudProviderRegionDetails, { cloudProviderId, cloudProviderRegionId })
 
-  const keypairs = pathStrOr([], '0.keyPairs', details)
-  const options = keypairs.map(x => ({ label: x.KeyName, value: x.KeyName }))
+  const domains = pathStrOr([], '0.domains', details)
+  const options = domains.map(x => ({ label: x.Name, value: x.Id }))
+
+  const handleChange = value => {
+    const option = options.find(x => x.value === value)
+    onChange && onChange(value, option && option.label)
+  }
 
   return (
     <Picklist
       {...rest}
+      onChange={handleChange}
       ref={ref}
       loading={loading}
       options={options}
@@ -26,7 +32,7 @@ const AwsClusterSshKeyPicklist = forwardRef(({
   )
 })
 
-AwsClusterSshKeyPicklist.propTypes = {
+ClusterDomainPicklist.propTypes = {
   id: PropTypes.string.isRequired,
   cloudProviderId: PropTypes.string,
   cloudProviderRegionId: PropTypes.string,
@@ -35,4 +41,4 @@ AwsClusterSshKeyPicklist.propTypes = {
   ...ValidatedFormInputPropTypes,
 }
 
-export default AwsClusterSshKeyPicklist
+export default ClusterDomainPicklist

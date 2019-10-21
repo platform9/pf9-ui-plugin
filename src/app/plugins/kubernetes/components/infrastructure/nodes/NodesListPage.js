@@ -1,14 +1,14 @@
 import React from 'react'
 import { localizeRoles } from 'api-client/ResMgr'
-import { maybeFnOrNull } from 'app/utils/fp'
+import { maybeFnOrNull } from 'utils/fp'
 import ExternalLink from 'core/components/ExternalLink'
 import HostStatus from 'core/components/HostStatus'
 import ProgressBar from 'core/components/progress/ProgressBar'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { pathOr, pipe } from 'ramda'
 import { castBoolToStr, castFuzzyBool, columnPathLookup } from 'utils/misc'
-import { nodesCacheKey } from 'k8s/components/infrastructure/actions'
 import SimpleLink from 'core/components/SimpleLink'
+import { nodesCacheKey } from 'k8s/components/infrastructure/nodes/actions'
 
 const renderStatus = (_, node) => (<HostStatus host={node.combined} />)
 const isMaster = pipe(castFuzzyBool, castBoolToStr())

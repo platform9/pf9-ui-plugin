@@ -1,9 +1,10 @@
 import { pluck } from 'ramda'
 import { allKey } from 'app/constants'
 import ApiClient from 'api-client/ApiClient'
-import { parseClusterParams, clustersCacheKey } from 'k8s/components/infrastructure/actions'
+import { clustersCacheKey } from 'k8s/components/infrastructure/common/actions'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { flatMapAsync } from 'utils/async'
+import { parseClusterParams } from 'k8s/components/infrastructure/clusters/actions'
 
 const { qbert } = ApiClient.getInstance()
 

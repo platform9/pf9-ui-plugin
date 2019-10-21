@@ -1,13 +1,13 @@
 import React from 'react'
-import DownloadKubeConfigLink from './DownloadKubeConfigLink'
-import KubeCLI from './KubeCLI'
+import DownloadKubeConfigLink from '../common/DownloadKubeConfigLink'
+import KubeCLI from '../common/KubeCLI'
 import ExternalLink from 'core/components/ExternalLink'
 import SimpleLink from 'core/components/SimpleLink'
 import AttachIcon from '@material-ui/icons/AddToQueue'
 import DetachIcon from '@material-ui/icons/RemoveFromQueue'
 import ScaleIcon from '@material-ui/icons/TrendingUp'
 import UpgradeIcon from '@material-ui/icons/PresentToAll'
-import { clustersCacheKey } from './actions'
+import { clustersCacheKey } from '../common/actions'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import ClusterAttachNodeDialog from './ClusterAttachNodeDialog'
 import ClusterDetachNodeDialog from './ClusterDetachNodeDialog'
@@ -15,8 +15,8 @@ import ClusterScaleDialog from './ClusterScaleDialog'
 import { capitalizeString } from 'utils/misc'
 import { objSwitchCase } from 'utils/fp'
 import ProgressBar from 'core/components/progress/ProgressBar'
-import ClusterStatusSpan from 'k8s/components/infrastructure/ClusterStatusSpan'
-import ResourceUsageTable from 'k8s/components/infrastructure/ResourceUsageTable'
+import ClusterStatusSpan from 'k8s/components/infrastructure/clusters/ClusterStatusSpan'
+import ResourceUsageTable from 'k8s/components/infrastructure/common/ResourceUsageTable'
 
 const getClusterPopoverContent = (healthyMasterNodes, masterNodes) =>
   `${healthyMasterNodes.length} of ${masterNodes.length} master nodes healthy (3 required)`
@@ -104,10 +104,10 @@ const renderStats = (_, { usage }) => {
 const renderClusterDetailLink = (name, cluster) =>
   <SimpleLink src={`/ui/kubernetes/infrastructure/clusters/${cluster.uuid}`}>{name}</SimpleLink>
 
-const canAttachNode = row => row.cloudProviderType === 'local'
-const canDetachNode = row => row.cloudProviderType === 'local'
-const canScaleCluster = row => row.cloudProviderType === 'aws'
-const canUpgradeCluster = (selected) => true
+const canAttachNode = ([row]) => row.cloudProviderType === 'local'
+const canDetachNode = ([row]) => row.cloudProviderType === 'local'
+const canScaleCluster = ([row]) => row.cloudProviderType === 'aws'
+const canUpgradeCluster = (selected) => false
 
 const upgradeCluster = (selected) => {
   console.log('TODO: upgradeCluster')
@@ -169,6 +169,7 @@ export const options = {
       icon: <UpgradeIcon />,
       label: 'Upgrade cluster',
       action: upgradeCluster,
+      disabledInfo: 'Feature not yet implemented'
     },
   ],
 }

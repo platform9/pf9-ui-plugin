@@ -5,7 +5,7 @@ import PicklistField from 'core/components/validatedForm/PicklistField'
 import SubmitButton from 'core/components/SubmitButton'
 import TextField from 'core/components/validatedForm/TextField'
 import createAddComponents from 'core/helpers/createAddComponents'
-import { cloudProviderActions } from 'k8s/components/infrastructure/actions'
+import { cloudProviderActions } from 'k8s/components/infrastructure/cloudProviders/actions'
 
 const types = [
   { value: 'openstack', label: 'Openstack' },

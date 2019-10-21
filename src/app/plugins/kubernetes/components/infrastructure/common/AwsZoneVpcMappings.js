@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
-import { pathStrOr, projectAs } from 'app/utils/fp'
+import { pathStrOr, projectAs } from 'utils/fp'
 import { groupBy, prop, propEq } from 'ramda'
 import { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
 import useDataLoader from 'core/hooks/useDataLoader'
 import PicklistField from 'core/components/validatedForm/PicklistField'
-import { loadCloudProviderRegionDetails } from './actions'
+import { loadCloudProviderRegionDetails } from 'k8s/components/infrastructure/cloudProviders/actions'
 
 /* Displays multiple picklists to allow the user to specify a subnet for each AZ in the VPC */
 const AwsZoneVpcMappings = ({ azs=[], type, cloudProviderId, cloudProviderRegionId, vpcId, onChange }) => {

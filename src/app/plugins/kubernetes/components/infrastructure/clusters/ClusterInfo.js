@@ -3,11 +3,11 @@ import InfoPanel from 'core/components/InfoPanel'
 import UsageWidget from 'core/components/widgets/UsageWidget'
 import useReactRouter from 'use-react-router'
 import { Grid } from '@material-ui/core'
-import { clusterActions } from './actions'
 import { makeStyles } from '@material-ui/styles'
 import useDataLoader from 'core/hooks/useDataLoader'
 import Progress from 'core/components/progress/Progress'
 import { emptyObj } from 'utils/fp'
+import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 
 const overviewStats = cluster => ({
   'Status':              cluster.status,

@@ -1,10 +1,10 @@
 import yaml from 'js-yaml'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import ApiClient from 'api-client/ApiClient'
-import { parseClusterParams } from 'k8s/components/infrastructure/actions'
 import { allKey } from 'app/constants'
 import { pluck } from 'ramda'
 import { flatMapAsync } from 'utils/async'
+import { parseClusterParams } from 'k8s/components/infrastructure/clusters/actions'
 
 const { qbert } = ApiClient.getInstance()
 

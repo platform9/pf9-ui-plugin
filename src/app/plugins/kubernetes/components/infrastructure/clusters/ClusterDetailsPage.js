@@ -9,8 +9,8 @@ import SimpleLink from 'core/components/SimpleLink'
 import { makeStyles } from '@material-ui/styles'
 import { Typography } from '@material-ui/core'
 import useDataLoader from 'core/hooks/useDataLoader'
-import { clusterActions } from 'k8s/components/infrastructure/actions'
 import useReactRouter from 'use-react-router'
+import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 
 const useStyles = makeStyles(theme => ({
   backLink: {

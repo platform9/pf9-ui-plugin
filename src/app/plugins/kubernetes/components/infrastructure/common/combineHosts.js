@@ -1,4 +1,4 @@
-import { condLiteral, pathStrOrNull, pipe } from 'app/utils/fp'
+import { condLiteral, pathStrOrNull, pipe } from 'utils/fp'
 import { __, both, includes, T } from 'ramda'
 import { localizeRoles } from 'api-client/ResMgr'
 import moment from 'moment'

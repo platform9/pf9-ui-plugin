@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { cloudProvidersCacheKey } from './actions'
-import ResourceUsageTable from 'k8s/components/infrastructure/ResourceUsageTable'
+import ResourceUsageTable from 'k8s/components/infrastructure/common/ResourceUsageTable'
 import SimpleLink from 'core/components/SimpleLink'
+import { cloudProvidersCacheKey } from 'k8s/components/infrastructure/cloudProviders/actions'
 
 const toMHz = bytes => bytes / Math.pow(1024, 2)
 const toGB = bytes => bytes / Math.pow(1024, 3)

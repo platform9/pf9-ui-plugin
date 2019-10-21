@@ -73,24 +73,24 @@ const FilterDropdown = ({
 const ListTableToolbar = ({
   columns, filterValues, filters,
   onAdd, onColumnToggle, onDelete, onEdit, onFilterUpdate,
-  onFiltersReset, onSearchChange, onRefresh,
+  onFiltersReset, onSearchChange, onReload, onRefresh,
   batchActions = emptyArr, searchTerm, selected, visibleColumns,
   rowsPerPage, onChangeRowsPerPage, rowsPerPageOptions,
   editCond, editDisabledInfo, deleteCond, deleteDisabledInfo,
 }) => {
   const classes = useStyles()
   const numSelected = (selected || []).length
-  const refreshButton = useMemo(() =>
-    onRefresh && <Tooltip title="Refresh list">
+  const reloadButton = useMemo(() =>
+    onReload && <Tooltip title="Refresh list">
       <FontAwesomeIcon
         className={classes.button}
         solid
         size="lg"
         aria-label="Refresh list"
-        onClick={onRefresh}>
+        onClick={onReload}>
         sync
       </FontAwesomeIcon>
-    </Tooltip>, [onRefresh])
+    </Tooltip>, [onReload])
 
   const allActions = useMemo(() => [...batchActions,
     ...(onEdit ? [{
@@ -115,7 +115,7 @@ const ListTableToolbar = ({
         [classes.highlight]: numSelected > 0,
       })}
     >
-      <ListTableBatchActions batchActions={allActions} selected={selected} />
+      <ListTableBatchActions batchActions={allActions} selected={selected} onRefresh={onRefresh} />
       <div className={classes.actions}>
         <Toolbar className={classes.toolbar}>
           {Array.isArray(filters)
@@ -148,7 +148,7 @@ const ListTableToolbar = ({
               </Button>
             </Tooltip>
           )}
-          {refreshButton}
+          {reloadButton}
           <PerPageControl
             value={rowsPerPage}
             onChangeRowsPerPage={onChangeRowsPerPage}
@@ -190,6 +190,7 @@ ListTableToolbar.propTypes = {
   onFilterUpdate: PropTypes.func,
   onFiltersReset: PropTypes.func,
   onRefresh: PropTypes.func,
+  onReload: PropTypes.func,
   batchActions: PropTypes.arrayOf(listTableActionPropType),
   selected: PropTypes.array,
   visibleColumns: PropTypes.array,

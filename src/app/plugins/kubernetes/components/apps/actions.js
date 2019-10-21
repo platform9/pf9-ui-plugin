@@ -5,12 +5,13 @@ import {
 import ApiClient from 'api-client/ApiClient'
 import { emptyArr, objSwitchCase, pathStr } from 'utils/fp'
 import { allKey, imageUrlRoot, addError, deleteError, updateError } from 'app/constants'
-import { parseClusterParams, clustersCacheKey } from 'k8s/components/infrastructure/actions'
+import { clustersCacheKey } from 'k8s/components/infrastructure/common/actions'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { pathJoin } from 'utils/misc'
 import moment from 'moment'
 import createContextLoader from 'core/helpers/createContextLoader'
 import { tryCatchAsync, flatMapAsync } from 'utils/async'
+import { parseClusterParams } from 'k8s/components/infrastructure/clusters/actions'
 
 const { qbert } = ApiClient.getInstance()
 

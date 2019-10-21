@@ -3,7 +3,7 @@ import createUpdateComponents from 'core/helpers/createUpdateComponents'
 import SubmitButton from 'core/components/SubmitButton'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import TextField from 'core/components/validatedForm/TextField'
-import { cloudProviderActions } from './actions'
+import { cloudProviderActions } from 'k8s/components/infrastructure/cloudProviders/actions'
 
 const AWSFields = () => (
   <React.Fragment>
