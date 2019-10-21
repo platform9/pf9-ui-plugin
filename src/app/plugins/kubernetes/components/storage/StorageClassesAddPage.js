@@ -7,24 +7,26 @@ import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import TextField from 'core/components/validatedForm/TextField'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
+import CodeMirror from 'core/components/validatedForm/CodeMirror'
+import { codeMirrorOptions } from 'app/constants'
 import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
 import { storageClassesCacheKey } from './actions'
 import useParams from 'core/hooks/useParams'
 
 const initialContext = {}
 
-export const AddStorageClassForm = () => {
-  return (
-    <Wizard context={initialContext}>
-      {({ setWizardContext, onNext }) =>
-        <>
-          <BasicStep onSubmit={setWizardContext} triggerSubmit={onNext} />
-          <CustomizeStep />
-        </>
-      }
-    </Wizard>
-  )
-}
+// TODO: handleSubmit
+const handleSubmit = (data) => console.log({ data })
+
+export const AddStorageClassForm = () =>
+  <Wizard onComplete={handleSubmit} context={initialContext}>
+    {({ setWizardContext, onNext }) =>
+      <>
+        <BasicStep onSubmit={setWizardContext} triggerSubmit={onNext} />
+        <CustomizeStep onSubmit={setWizardContext} triggerSubmit={onNext} />
+      </>
+    }
+  </Wizard>
 
 const BasicStep = ({ onSubmit, triggerSubmit }) => {
   const { params, getParamsUpdater } = useParams()
@@ -34,6 +36,7 @@ const BasicStep = ({ onSubmit, triggerSubmit }) => {
       <p>
         Create a new storage class on a specific cluster by specifying the storage type that maps to the cloud provider for that cluster.
       </p>
+      <br />
       <FormWrapper title="Add Storage Class">
         <ValidatedForm onSubmit={onSubmit} triggerSubmit={triggerSubmit}>
           <TextField
@@ -63,8 +66,26 @@ const BasicStep = ({ onSubmit, triggerSubmit }) => {
   )
 }
 
-// TODO: implement CustomizeStep
-const CustomizeStep = () => <WizardStep stepId="customize" label="Customize">Customize Step</WizardStep>
+const CustomizeStep = ({ onSubmit, triggerSubmit }) =>
+  <WizardStep stepId="customize" label="Customize">
+    <p>
+      Optionally edit the storage class YAML for advanced configuration. See this <a href='https://kubernetes.io/docs/concepts/storage/persistent-volumes/#storageclasses'>article</a> for more information.
+    </p>
+    <p>
+      <b>NOTE:</b> In case of a conflict with options selected on the previous page, changes you make here will override them.
+    </p>
+    <br />
+    <FormWrapper title="Customize">
+      <ValidatedForm onSubmit={onSubmit} triggerSubmit={triggerSubmit}>
+        <CodeMirror
+          id="storageClassYaml"
+          label="Storage Class YAML"
+          options={codeMirrorOptions}
+          required
+        />
+      </ValidatedForm>
+    </FormWrapper>
+  </WizardStep>
 
 export const options = {
   cacheKey: storageClassesCacheKey,
