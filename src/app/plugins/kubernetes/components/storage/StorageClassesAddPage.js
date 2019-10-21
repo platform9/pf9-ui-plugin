@@ -49,15 +49,12 @@ const BasicStep = ({ onSubmit, triggerSubmit }) => {
             DropdownComponent={ClusterPicklist}
             id="clusterId"
             label="Cluster"
-            onChange={getParamsUpdater('clusterId')}
             info="The cluster to deploy this storage class on."
-            value={params.clusterId}
             required
           />
           <CheckboxField
             id="isDefault"
             label="Use as Default Storage Class"
-            onChange={getParamsUpdater('isDefault')}
             info=""
           />
         </ValidatedForm>
