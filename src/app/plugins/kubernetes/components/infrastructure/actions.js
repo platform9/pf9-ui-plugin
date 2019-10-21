@@ -1,16 +1,17 @@
 import { pathStrOrNull, pipeWhenTruthy, isTruthy } from 'app/utils/fp'
 import {
-  find, pathOr, pluck, prop, propEq, propSatisfies, compose, path, pipe, either, evolve, add,
+  find, pathOr, pluck, prop, propEq, propSatisfies, compose, path, pipe, either,
 } from 'ramda'
 import { allKey } from 'app/constants'
-import { castFuzzyBool } from 'utils/misc'
+import { castFuzzyBool, capitalizeString } from 'utils/misc'
 import { combineHost } from './combineHosts'
 import { serviceCatalogContextKey } from 'openstack/components/api-access/actions'
 import createContextLoader from 'core/helpers/createContextLoader'
 import ApiClient from 'api-client/ApiClient'
 import createCRUDActions from 'core/helpers/createCRUDActions'
-import { filterIf, pathStrOr, pathStr } from 'utils/fp'
-import { mapAsync } from 'utils/async'
+import { filterIf, pathStrOr } from 'utils/fp'
+import { mapAsync, tryCatchAsync } from 'utils/async'
+import calcUsageTotals from 'k8s/util/calcUsageTotals'
 
 export const clustersCacheKey = 'clusters'
 export const cloudProvidersCacheKey = 'cloudProviders'
@@ -45,28 +46,28 @@ export const parseClusterParams = async (params, loadFromContext) => {
   return [clusterId, clusters]
 }
 
-const clusterUsageSpec = {
-  compute: {
-    current: 0,
-    max: 0,
-    percent: 0,
-    units: 'GHz',
-    type: 'used',
-  },
-  memory: {
-    current: 0,
-    max: 0,
-    percent: 0,
-    units: 'GiB',
-    type: 'used',
-  },
-  disk: {
-    current: 0,
-    max: 0,
-    percent: 0,
-    units: 'GiB',
-    type: 'used',
-  },
+const getProgressPercent = async clusterId => {
+  return tryCatchAsync(
+    async () => {
+      const { progressPercent } = await qbert.getClusterDetails(clusterId)
+      return progressPercent
+    },
+    e => {
+      console.warn(e)
+      return null
+    })(null)
+}
+
+const getKubernetesVersion = async clusterId => {
+  return tryCatchAsync(
+    async () => {
+      const version = await qbert.getKubernetesVersion(clusterId)
+      return version && version.gitVersion && version.gitVersion.substr(1)
+    },
+    e => {
+      console.warn(e)
+      return null
+    })(null)
 }
 
 export const clusterActions = createCRUDActions(clustersCacheKey, {
@@ -78,39 +79,20 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
       qbert.getClusters(),
       qbert.baseUrl(),
     ])
-
-    // FIXME: Workaround for when max is 0, but this value should never be 0
-    // and if case of so (which would mean there is no max) we should probably just show the value
-    const calcUsagePercent = (strPath, node, numNodes) =>
-      100 * pathStrOr(0, `${strPath}.current`, node) / (pathStr(`${strPath}.max`, node) || 1) / numNodes
-
-    const clusters = rawClusters.map(cluster => {
+    return mapAsync(async cluster => {
       const nodesInCluster = rawNodes.filter(node => node.clusterUuid === cluster.uuid)
       const nodeIds = pluck('uuid', nodesInCluster)
       const combinedNodes = combinedHosts.filter(x => nodeIds.includes(x.resmgr.id))
-
-      const specReducer = (acc, node) => evolve({
-        compute: {
-          current: add(pathStrOr(0, 'usage.compute.current', node)),
-          max: add(pathStrOr(0, 'usage.compute.max', node)),
-          percent: add(calcUsagePercent('usage.compute', node, combinedNodes.length)),
-        },
-        memory: {
-          current: add(pathStrOr(0, 'usage.memory.current', node)),
-          max: add(pathStrOr(0, 'usage.memory.max', node)),
-          percent: add(calcUsagePercent('usage.memory', node, combinedNodes.length)),
-        },
-        disk: {
-          current: add(pathStrOr(0, 'usage.disk.current', node)),
-          max: add(pathStrOr(0, 'usage.disk.max', node)),
-          percent: add(calcUsagePercent('usage.disk', node, combinedNodes.length)),
-        },
-      }, acc)
-      const usage = combinedNodes.reduce(specReducer, clusterUsageSpec)
-
+      const calcNodesTotals = calcUsageTotals(combinedNodes)
+      const usage = {
+        compute: calcNodesTotals('usage.compute.current', 'usage.compute.max'),
+        memory: calcNodesTotals('usage.memory.current', 'usage.memory.max'),
+        disk: calcNodesTotals('usage.disk.current', 'usage.disk.max'),
+      }
       const masterNodes = nodesInCluster.filter(node => node.isMaster === 1)
       const healthyMasterNodes = masterNodes.filter(
         node => node.status === 'ok' && node.api_responding === 1)
+      const hasMasterNode = healthyMasterNodes.length > 0
       const clusterOk = nodesInCluster.length > 0 && cluster.status === 'ok'
       const dashboardLink = `${qbertEndpoint}/clusters/${cluster.uuid}/k8sapi/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:443/proxy/`
       const host = qbertEndpoint.match(/(.*?)\/qbert/)[1]
@@ -121,13 +103,22 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
         },
         {},
       )
+      const progressPercent = cluster.taskStatus === 'converging'
+        ? await getProgressPercent(cluster.uuid)
+        : null
+      const version = hasMasterNode
+        ? await getKubernetesVersion(cluster.uuid)
+        : null
+
       return {
         ...cluster,
         usage,
+        version: version || 'N/A',
         nodes: nodesInCluster,
         masterNodes,
+        progressPercent,
         healthyMasterNodes,
-        hasMasterNode: healthyMasterNodes.length > 0,
+        hasMasterNode,
         highlyAvailable: healthyMasterNodes.length > 2,
         links: {
           dashboard: clusterOk ? dashboardLink : null,
@@ -140,22 +131,7 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
         hasVpn: castFuzzyBool(pathOr(false, ['cloudProperties', 'internalElb'], cluster)),
         hasLoadBalancer: castFuzzyBool(cluster.enableMetallb || pathOr(false, ['cloudProperties', 'enableLbaas'], cluster)),
       }
-    })
-    // Get the cluster versions in parallel
-    return mapAsync(async cluster => {
-      if (cluster.hasMasterNode) {
-        try {
-          const version = await qbert.getKubernetesVersion(cluster.uuid)
-          return {
-            ...cluster,
-            version: version && version.gitVersion && version.gitVersion.substr(1),
-          }
-        } catch (err) {
-          console.log(err)
-        }
-      }
-      return cluster
-    }, clusters)
+    }, rawClusters)
   },
   deleteFn: async ({ id }) => {
     await qbert.deleteCluster(id)
@@ -179,7 +155,11 @@ export const createCluster = async ({ data, context }) => {
   console.log('createCluster TODO')
   console.log(data)
 }
-
+const cloudProviderTypes = {
+  aws: 'Amazon AWS Provider',
+  azure: 'Microsoft Azure Provider',
+  openstack: 'OpenStack',
+}
 export const cloudProviderActions = createCRUDActions(cloudProvidersCacheKey, {
   listFn: () => qbert.getCloudProviders(),
   createFn: (params) => qbert.createCloudProvider(params),
@@ -199,6 +179,40 @@ export const cloudProviderActions = createCRUDActions(cloudProvidersCacheKey, {
       return currentItems.map(node =>
         nodeUuids.includes(node.uuid) ? ({ ...node, clusterUuid: null }) : node)
     },
+  },
+  refetchCascade: true,
+  dataMapper: async (items, params, loadFromContext) => {
+    const [clusters, combinedHosts] = await Promise.all([
+      loadFromContext(clustersCacheKey),
+      loadFromContext(combinedHostsCacheKey),
+    ])
+    const getNodesHosts = nodeIds =>
+      combinedHosts.filter(propSatisfies(id => nodeIds.includes(id), 'id'))
+    const usagePathStr = 'resmgr.extensions.resource_usage.data'
+
+    return items.map(cloudProvider => {
+      const descriptiveType = cloudProviderTypes[cloudProvider.type] || capitalizeString(cloudProvider.type)
+      const filterCpClusters = propEq('nodePoolUuid', cloudProvider.nodePoolUuid)
+      const cpClusters = clusters.filter(filterCpClusters)
+      const cpNodes = pluck('nodes', cpClusters).flat()
+      const cpHosts = getNodesHosts(pluck('uuid', cpNodes))
+      const calcDeployedCapacity = calcUsageTotals(cpHosts)
+      const deployedCapacity = {
+        compute: calcDeployedCapacity(`${usagePathStr}.cpu.used`, `${usagePathStr}.cpu.total`),
+        memory: calcDeployedCapacity(
+          item => pathStrOr(0, `${usagePathStr}.memory.total`, item) - pathStrOr(0, `${usagePathStr}.memory.available`, item),
+          `${usagePathStr}.memory.total`, true),
+        disk: calcDeployedCapacity(`${usagePathStr}.disk.used`, `${usagePathStr}.disk.total`),
+      }
+
+      return {
+        ...cloudProvider,
+        descriptiveType,
+        deployedCapacity,
+        clusters: cpClusters,
+        nodes: cpNodes,
+      }
+    })
   },
   uniqueIdentifier: 'uuid',
 })

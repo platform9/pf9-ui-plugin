@@ -11,11 +11,12 @@ import { FormControlLabel, Switch } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 
 const useStyles = makeStyles(theme => ({
-  header: {
+  infrastructureHeader: {
     display: 'flex',
+    flexGrow: 1,
     flexFlow: 'column nowrap',
     alignItems: 'flex-end',
-    minHeight: 50
+    minHeight: 50,
   },
 }))
 
@@ -34,9 +35,9 @@ const InfrastructurePage = () => {
   const [statsVisible, setStatsVisble] = useState(true)
   const toggleStats = useCallback(() => setStatsVisble(!statsVisible), [statsVisible])
 
-  return <PageContainer header={<div className={classes.header}>
+  return <PageContainer header={<div className={classes.infrastructureHeader}>
     <StatsToggle statsVisible={statsVisible} toggleStats={toggleStats} />
-    {statsVisible && <InfrastructureStats />}
+    <InfrastructureStats visible={statsVisible} />
   </div>}>
     <Tabs>
       <Tab value="clusters" label="Clusters"><ClustersListPage /></Tab>

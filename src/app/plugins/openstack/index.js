@@ -1,6 +1,6 @@
 import React from 'react'
 
-import DashboardPage from './components/DashboardPage'
+import DashboardPage from './components/dashboard/DashboardPage'
 
 import AddTenantPage from './components/tenants/AddTenantPage'
 import TenantsListPage from './components/tenants/TenantsListPage'

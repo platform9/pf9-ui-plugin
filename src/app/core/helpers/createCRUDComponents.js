@@ -36,6 +36,8 @@ const createCRUDComponents = options => {
     cacheKey,
     loaderFn = cacheKey ? getContextLoader(cacheKey) : null,
     deleteFn = cacheKey ? getContextUpdater(cacheKey, 'delete') : null,
+    deleteCond,
+    deleteDisabledInfo,
     defaultParams = {},
     columns = [],
     batchActions = [],
@@ -45,8 +47,11 @@ const createCRUDComponents = options => {
     addUrl,
     renderAddDialog,
     editUrl,
+    editCond,
+    editDisabledInfo,
     debug,
     name,
+    multiSelection = true,
   } = options
 
   // List
@@ -64,6 +69,11 @@ const createCRUDComponents = options => {
     // }
     return (
       <ListTable
+        deleteCond={deleteCond}
+        deleteDisabledInfo={deleteDisabledInfo}
+        editCond={editCond}
+        editDisabledInfo={editDisabledInfo}
+        multiSelection={multiSelection}
         loading={loading}
         onActionComplete={onActionComplete}
         onRefresh={onRefresh}
