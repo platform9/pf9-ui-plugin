@@ -13,7 +13,7 @@ const { resmgr } = ApiClient.getInstance()
 createContextLoader(resMgrHostsCacheKey, async () => {
   return resmgr.getHosts()
 }, {
-  uniqueIdentifier: 'uuid',
+  uniqueIdentifier: 'id',
 })
 
 export const flavorActions = createCRUDActions('flavors', { service: 'nova' })

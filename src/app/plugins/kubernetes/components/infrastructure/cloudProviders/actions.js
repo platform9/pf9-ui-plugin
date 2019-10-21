@@ -1,6 +1,6 @@
 import createContextLoader from 'core/helpers/createContextLoader'
 import createCRUDActions from 'core/helpers/createCRUDActions'
-import { pluck, propSatisfies, propEq } from 'ramda'
+import { pluck, propSatisfies, propEq, pick } from 'ramda'
 import { capitalizeString } from 'utils/misc'
 import calcUsageTotals from 'k8s/util/calcUsageTotals'
 import { pathStrOr } from 'utils/fp'
@@ -21,9 +21,16 @@ export const cloudProvidersCacheKey = 'cloudProviders'
 
 export const cloudProviderActions = createCRUDActions(cloudProvidersCacheKey, {
   listFn: () => qbert.getCloudProviders(),
-  createFn: (params) => qbert.createCloudProvider(params),
-  updateFn: ({ id, ...data }) => qbert.updateCloudProvider(id, data),
-  deleteFn: ({ id }) => qbert.deleteCloudProvider(id),
+  createFn: async params => {
+    const result = await qbert.createCloudProvider(params)
+    return {
+      // TODO we need "nodePoolUuid"
+      ...pick(['name', 'type'], params),
+      ...result
+    }
+  },
+  updateFn: ({ uuid, ...data }) => qbert.updateCloudProvider(uuid, data),
+  deleteFn: ({ uuid }) => qbert.deleteCloudProvider(uuid),
   customOperations: {
     attachNodesToCluster: async ({ clusterUuid, nodes }, currentItems) => {
       const nodeUuids = pluck('uuid', nodes)

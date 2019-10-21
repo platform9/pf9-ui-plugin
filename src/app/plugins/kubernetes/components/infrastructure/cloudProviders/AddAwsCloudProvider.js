@@ -37,10 +37,14 @@ const helpText = <Typography variant="body1" component="div">
 
 const awsAccessHelpUrl = 'http://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys'
 
+const initialValues = {
+  type: 'aws',
+}
+
 const AddAwsCloudProvider = ({ onComplete }) => {
   return <>
     {helpText}
-    <ValidatedForm onSubmit={onComplete}>
+    <ValidatedForm onSubmit={onComplete} initialValues={initialValues}>
       <p>Specify AWS Credentials:</p>
       <TextField required id="name" label="Name" info="Name of the cloud provider" />
       <TextField required id="key" label="AWS Access Key ID" info={<span>

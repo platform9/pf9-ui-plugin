@@ -43,10 +43,14 @@ const keyStoneUrlInfo = <div>
   this
 </div>
 
+const initialValues = {
+  type: 'vmware',
+}
+
 const AddVmwareCloudProvider = ({ onComplete }) => {
   return <>
     {helpText}
-    <ValidatedForm onSubmit={onComplete}>
+    <ValidatedForm onSubmit={onComplete} initialValues={initialValues}>
       <p>Specify OpenStack Credentials:</p>
       <TextField required id="name" label="Name" info="Name of the cloud provider" />
       <TextField required id="authUrl" label="Keystone URL" info={keyStoneUrlInfo} />

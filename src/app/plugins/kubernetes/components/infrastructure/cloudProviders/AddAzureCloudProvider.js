@@ -43,10 +43,14 @@ const helpText = <Typography variant="body1" component="div">
   </Alert>
 </Typography>
 
+const initialValues = {
+  type: 'azure',
+}
+
 const AddAzureCloudProvider = ({ onComplete }) => {
   return <>
     {helpText}
-    <ValidatedForm onSubmit={onComplete}>
+    <ValidatedForm onSubmit={onComplete} initialValues={initialValues}>
       <p>Specify Azure Credentials:</p>
       <TextField required id="name" label="Name" info="Name of the cloud provider" />
       <TextField required id="tenantId" label="Tenant ID" info="The tenant ID of the service principal" />
