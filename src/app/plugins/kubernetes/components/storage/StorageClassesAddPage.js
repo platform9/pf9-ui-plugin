@@ -11,7 +11,6 @@ import CodeMirror from 'core/components/validatedForm/CodeMirror'
 import { codeMirrorOptions } from 'app/constants'
 import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
 import { storageClassesCacheKey } from './actions'
-import useParams from 'core/hooks/useParams'
 
 const initialContext = {}
 
@@ -28,40 +27,35 @@ export const AddStorageClassForm = () =>
     }
   </Wizard>
 
-const BasicStep = ({ onSubmit, triggerSubmit }) => {
-  const { params, getParamsUpdater } = useParams()
-
-  return (
-    <WizardStep stepId="basic" label="Basic">
-      <p>
-        Create a new storage class on a specific cluster by specifying the storage type that maps to the cloud provider for that cluster.
-      </p>
-      <br />
-      <FormWrapper title="Add Storage Class">
-        <ValidatedForm onSubmit={onSubmit} triggerSubmit={triggerSubmit}>
-          <TextField
-            id="name"
-            label="Name"
-            info="Name for this storage class."
-            required
-          />
-          <PicklistField
-            DropdownComponent={ClusterPicklist}
-            id="clusterId"
-            label="Cluster"
-            info="The cluster to deploy this storage class on."
-            required
-          />
-          <CheckboxField
-            id="isDefault"
-            label="Use as Default Storage Class"
-            info=""
-          />
-        </ValidatedForm>
-      </FormWrapper>
-    </WizardStep>
-  )
-}
+const BasicStep = ({ onSubmit, triggerSubmit }) =>
+  <WizardStep stepId="basic" label="Basic">
+    <p>
+      Create a new storage class on a specific cluster by specifying the storage type that maps to the cloud provider for that cluster.
+    </p>
+    <br />
+    <FormWrapper title="Add Storage Class">
+      <ValidatedForm onSubmit={onSubmit} triggerSubmit={triggerSubmit}>
+        <TextField
+          id="name"
+          label="Name"
+          info="Name for this storage class."
+          required
+        />
+        <PicklistField
+          DropdownComponent={ClusterPicklist}
+          id="clusterId"
+          label="Cluster"
+          info="The cluster to deploy this storage class on."
+          required
+        />
+        <CheckboxField
+          id="isDefault"
+          label="Use as Default Storage Class"
+          info=""
+        />
+      </ValidatedForm>
+    </FormWrapper>
+  </WizardStep>
 
 const CustomizeStep = ({ onSubmit, triggerSubmit }) =>
   <WizardStep stepId="customize" label="Customize">
