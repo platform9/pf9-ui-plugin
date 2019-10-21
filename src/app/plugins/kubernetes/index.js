@@ -1,22 +1,24 @@
 import React from 'react'
 
-import AddCloudProviderPage from './components/infrastructure/AddCloudProviderPage'
-import AddAwsClusterPage from './components/infrastructure/AddAwsClusterPage'
-import AddAzureClusterPage from './components/infrastructure/AddAzureClusterPage'
-import AddClusterPage from './components/infrastructure/AddClusterPage'
+import AddCloudProviderPage from './components/infrastructure/cloudProviders/AddCloudProviderPage'
+import AddAwsClusterPage from './components/infrastructure/clusters/AddAwsClusterPage'
+import AddAzureClusterPage from './components/infrastructure/clusters/AddAzureClusterPage'
+import AddClusterPage from './components/infrastructure/clusters/AddClusterPage'
 import AddDeploymentPage from './components/pods/AddDeploymentPage'
 import AddNamespacePage from './components/namespaces/AddNamespacePage'
 import AddPodPage from './components/pods/AddPodPage'
 import AddServicePage from './components/pods/AddServicePage'
 import ApiAccessPage from './components/apiAccess/ApiAccessPage'
 import AppsIndexPage from './components/apps/AppsIndexPage'
-import ClusterDetailsPage from './components/infrastructure/ClusterDetailsPage'
+import ClusterDetailsPage from './components/infrastructure/clusters/ClusterDetailsPage'
 import InfrastructurePage from './components/infrastructure/InfrastructurePage'
 import NamespacesListPage from './components/namespaces/NamespacesListPage'
 import OnboardingPage from './components/onboarding/OnboardingPage'
 import PodsIndexPage from './components/pods/PodsIndexPage'
 import StorageClassesPage from './components/storage/StorageClassesPage'
-import UpdateCloudProviderPage from './components/infrastructure/UpdateCloudProviderPage'
+import UpdateCloudProviderPage
+  from './components/infrastructure/cloudProviders/UpdateCloudProviderPage'
+import StorageClassesAddPage from './components/storage/StorageClassesAddPage'
 import UserManagementIndexPage from './components/userManagement/UserManagementIndexPage'
 import AppDetailsPage from 'k8s/components/apps/AppDetailsPage'
 import AddPrometheusInstancePage from './components/prometheus/AddPrometheusInstancePage'
@@ -123,6 +125,11 @@ Kubernetes.registerPlugin = pluginManager => {
         name: 'Storage Classes',
         link: { path: '/storage_classes', exact: true },
         component: StorageClassesPage,
+      },
+      {
+        name: 'Add Storage Class',
+        link: { path: '/storage_classes/add', exact: true },
+        component: StorageClassesAddPage,
       },
       {
         name: 'Namespaces',

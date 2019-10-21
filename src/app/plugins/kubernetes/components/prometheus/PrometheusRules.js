@@ -5,14 +5,9 @@ const renderKeyValues = obj => Object.entries(obj)
   .map(([key, value]) => `${key}: ${value}`)
   .join(', ')
 
-const renderClusterName = (field, row, context) => {
-  const cluster = context.clusters.find(x => x.uuid === row.clusterUuid)
-  return cluster.name
-}
-
 export const columns = [
   { id: 'name', label: 'Name' },
-  { id: 'clusterName', label: 'Cluster', render: renderClusterName },
+  { id: 'clusterName', label: 'Cluster' },
   { id: 'namespace', label: 'Namespace' },
   { id: 'labels',  label: 'Labels', render: renderKeyValues }
 ]

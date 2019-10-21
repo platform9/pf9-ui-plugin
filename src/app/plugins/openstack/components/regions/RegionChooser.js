@@ -5,7 +5,7 @@ import { pluck, propEq, prop } from 'ramda'
 import { useScopedPreferences } from 'core/providers/PreferencesProvider'
 import { Tooltip } from '@material-ui/core'
 import useDataLoader from 'core/hooks/useDataLoader'
-import { regionActions } from 'k8s/components/infrastructure/actions'
+import { regionActions } from 'k8s/components/infrastructure/common/actions'
 import { appUrlRoot } from 'app/constants'
 
 const apiClient = ApiClient.getInstance()

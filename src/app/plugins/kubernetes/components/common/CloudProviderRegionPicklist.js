@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import Picklist from 'core/components/Picklist'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { pluck } from 'ramda'
-import { loadCloudProviderDetails } from '../infrastructure/actions'
+import { loadCloudProviderDetails } from 'k8s/components/infrastructure/cloudProviders/actions'
 
 // We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
 const CloudProviderRegionPicklist = forwardRef(({ cloudProviderId, ...rest }, ref) => {

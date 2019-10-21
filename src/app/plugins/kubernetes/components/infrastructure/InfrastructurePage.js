@@ -2,20 +2,21 @@ import React, { useState, useCallback } from 'react'
 import Tabs from 'core/components/tabs/Tabs'
 import Tab from 'core/components/tabs/Tab'
 
-import ClustersListPage from './ClustersListPage'
-import NodesListPage from './NodesListPage'
-import CloudProvidersListPage from './CloudProvidersListPage'
+import ClustersListPage from './clusters/ClustersListPage'
+import NodesListPage from './nodes/NodesListPage'
+import CloudProvidersListPage from './cloudProviders/CloudProvidersListPage'
 import InfrastructureStats from './InfrastructureStats'
 import PageContainer from 'core/components/pageContainer/PageContainer'
 import { FormControlLabel, Switch } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 
 const useStyles = makeStyles(theme => ({
-  header: {
+  infrastructureHeader: {
     display: 'flex',
+    flexGrow: 1,
     flexFlow: 'column nowrap',
     alignItems: 'flex-end',
-    minHeight: 50
+    minHeight: 50,
   },
 }))
 
@@ -34,9 +35,9 @@ const InfrastructurePage = () => {
   const [statsVisible, setStatsVisble] = useState(true)
   const toggleStats = useCallback(() => setStatsVisble(!statsVisible), [statsVisible])
 
-  return <PageContainer header={<div className={classes.header}>
+  return <PageContainer header={<div className={classes.infrastructureHeader}>
     <StatsToggle statsVisible={statsVisible} toggleStats={toggleStats} />
-    {statsVisible && <InfrastructureStats />}
+    <InfrastructureStats visible={statsVisible} />
   </div>}>
     <Tabs>
       <Tab value="clusters" label="Clusters"><ClustersListPage /></Tab>

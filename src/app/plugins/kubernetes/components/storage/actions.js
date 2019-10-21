@@ -1,6 +1,6 @@
 import ApiClient from 'api-client/ApiClient'
 import { assoc, propEq } from 'ramda'
-import { clustersCacheKey } from 'k8s/components/infrastructure/actions'
+import { clustersCacheKey } from 'k8s/components/infrastructure/common/actions'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { flatMapAsync } from 'utils/async'
 

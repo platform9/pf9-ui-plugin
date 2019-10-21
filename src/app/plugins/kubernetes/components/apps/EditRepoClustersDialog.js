@@ -3,13 +3,13 @@ import {
   Dialog, DialogTitle, DialogContent, Typography, Table, TableBody, DialogActions, Button, TableRow,
   TableCell, Checkbox,
 } from '@material-ui/core'
-import { clusterActions } from 'k8s/components/infrastructure/actions'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { except } from 'utils/fp'
 import Progress from 'core/components/progress/Progress'
 import { repositoryActions } from 'k8s/components/apps/actions'
 import { pluck } from 'ramda'
 import useDataUpdater from 'core/hooks/useDataUpdater'
+import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 
 // The modal is technically inside the row, so clicking anything inside
 // the modal window will cause the table row to be toggled.

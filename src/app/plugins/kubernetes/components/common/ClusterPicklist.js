@@ -4,8 +4,8 @@ import { isEmpty, propOr, head } from 'ramda'
 import Picklist from 'core/components/Picklist'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { projectAs } from 'utils/fp'
-import { clusterActions } from '../infrastructure/actions'
 import { allKey } from 'app/constants'
+import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 
 // We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
 const ClusterPicklist = forwardRef(({
