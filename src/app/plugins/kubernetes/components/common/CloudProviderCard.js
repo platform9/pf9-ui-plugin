@@ -6,6 +6,8 @@ import { makeStyles } from '@material-ui/styles'
 
 const useStyles = makeStyles(theme => ({
   root: {
+    filter: ({ disabled }) => disabled ? 'grayscale(100%)' : null,
+    opacity: ({ disabled }) => disabled ? 0.7 : 1,
     margin: theme.spacing(1, 3),
     userSelect: 'none',
     textAlign: 'center',
@@ -13,7 +15,7 @@ const useStyles = makeStyles(theme => ({
     flexFlow: 'column nowrap',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    cursor: 'pointer',
+    cursor: ({ disabled }) => disabled ? 'default' : 'pointer',
   },
   logoContainer: {
     display: 'flex',
@@ -30,8 +32,8 @@ const useStyles = makeStyles(theme => ({
       maxHeight: 60,
     },
     '&:hover': {
-      margin: 0,
-      border: '2px solid #4aa3df',
+      margin: ({ disabled }) => !disabled ? 0 : 1,
+      border: ({ disabled }) => !disabled ? '2px solid #4aa3df' : '1px solid #999',
     },
   },
   label: {
@@ -58,10 +60,14 @@ const labels = {
   other: 'Bare OS',
 }
 
-const CloudProviderCard = ({ type, image = icons[type], label = labels[type], src, onClick, ...rest }) => {
-  const classes = useStyles(rest)
+const CloudProviderCard = props => {
+  const { type, disabled, image = icons[type], label = labels[type], src, onClick } = props
+  const classes = useStyles(props)
   const { history } = useReactRouter()
   const handleClick = () => {
+    if (disabled) {
+      return
+    }
     if (onClick) {
       onClick()
     } else {
@@ -69,7 +75,7 @@ const CloudProviderCard = ({ type, image = icons[type], label = labels[type], sr
     }
   }
   return <div className={classes.root} onClick={handleClick}>
-    <div className={classes.logoContainer}><img src={image} /></div>
+    <div className={classes.logoContainer}><img alt={type} src={image} /></div>
     <Typography className={classes.label} variant="subtitle2">{label}</Typography>
   </div>
 }
@@ -78,9 +84,11 @@ CloudProviderCard.propTypes = {
   type: PropTypes.oneOf(['aws', 'azure', 'openstack', 'vmware', 'other']).isRequired,
   src: PropTypes.string,
   onClick: PropTypes.func,
+  // eslint-disable-next-line react/no-unused-prop-types
   active: PropTypes.bool,
   image: PropTypes.string,
   label: PropTypes.string,
+  disabled: PropTypes.bool,
 }
 
 export default CloudProviderCard
