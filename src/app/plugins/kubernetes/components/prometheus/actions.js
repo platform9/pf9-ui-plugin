@@ -20,14 +20,14 @@ export const clusterTagActions = createCRUDActions(clusterTagsCacheKey, {
     await loadFromContext(clustersCacheKey)
     return appbert.getClusterTags()
   },
-  uniqueIdentifier,
+  uniqueIdentifier: 'uuid',
 })
 
 /* Prometheus Instances */
 
-export const mapPrometheusInstance = curry((clusters, { clusterUuid, metadata, spec }) => ({
-  clusterUuid,
-  clusterName: pipe(find(propEq('uuid', clusterUuid)), prop('name'))(clusters),
+export const mapPrometheusInstance = curry((clusters, { clusterId, metadata, spec }) => ({
+  clusterUuid: clusterId,
+  clusterName: pipe(find(propEq('uuid', clusterId)), prop('name'))(clusters),
   name: metadata.name,
   namespace: metadata.namespace,
   uid: metadata.uid,
@@ -49,7 +49,6 @@ export const prometheusInstanceActions = createCRUDActions(prometheusInstancesCa
   listFn: async (params, loadFromContext) => {
     const clusterTags = await loadFromContext(clusterTagsCacheKey)
     const clusterUuids = pluck('uuid', clusterTags.filter(hasMonitoring))
-
     return flatMapAsync(qbert.getPrometheusInstances, clusterUuids)
   },
   createFn: async data => {
@@ -80,12 +79,17 @@ export const serviceAccountActions = createCRUDActions(serviceAccountsCacheKey, 
   listFn: async params => {
     return qbert.getServiceAccounts(params.clusterId, params.namespace)
   },
-  dataMapper: map(({ clusterUuid, metadata, spec }) => ({
-    uid: metadata.uid,
-    name: metadata.name,
-    namespace: metadata.namespace,
-    labels: metadata.labels,
-  })),
+  dataMapper: async (items, params, loadFromContext) => {
+    const clusters = await loadFromContext(clustersCacheKey)
+    return map(({ clusterId, metadata, spec }) => ({
+      uid: metadata.uid,
+      clusterUuid: clusterId,
+      clusterName: pipe(find(propEq('uuid', clusterId)), prop('name'))(clusters),
+      name: metadata.name,
+      namespace: metadata.namespace,
+      labels: metadata.labels,
+    }))(items)
+  },
   indexBy: ['clusterId', 'namespace'],
   uniqueIdentifier,
 })
@@ -113,14 +117,18 @@ export const prometheusRuleActions = createCRUDActions(prometheusRulesCacheKey, 
     create: `Successfully created Prometheus rule ${prop('name', last(updatedItems))}`,
     delete: `Successfully deleted Prometheus rule ${getName(uid, prevItems)}`,
   })(operation),
-  dataMapper: map(({ clusterUuid, metadata, spec }) => ({
-    uid: metadata.uid,
-    clusterUuid,
-    name: metadata.name,
-    namespace: metadata.namespace,
-    labels: metadata.labels,
-    rules: pathOr([], ['groups', 0, 'rules'], spec),
-  })),
+  dataMapper: async (items, params, loadFromContext) => {
+    const clusters = await loadFromContext(clustersCacheKey)
+    return map(({ clusterId, metadata, spec }) => ({
+      uid: metadata.uid,
+      clusterUuid: clusterId,
+      clusterName: pipe(find(propEq('uuid', clusterId)), prop('name'))(clusters),
+      name: metadata.name,
+      namespace: metadata.namespace,
+      labels: metadata.labels,
+      rules: pathOr([], ['groups', 0, 'rules'], spec),
+    }))(items)
+  },
   uniqueIdentifier,
 })
 
@@ -147,15 +155,19 @@ export const prometheusServiceMonitorActions = createCRUDActions(prometheusServi
     create: `Successfully created Prometheus Service Monitor ${prop('name', last(updatedItems))}`,
     delete: `Successfully deleted Prometheus Service Monitor ${getName(uid, prevItems)}`,
   })(operation),
-  dataMapper: map(({ clusterUuid, metadata, spec }) => ({
-    uid: metadata.uid,
-    clusterUuid,
-    name: metadata.name,
-    namespace: metadata.namespace,
-    labels: metadata.labels,
-    port: spec.endpoints.map(prop('port')).join(', '),
-    selector: spec.selector.matchLabels,
-  })),
+  dataMapper: async (items, params, loadFromContext) => {
+    const clusters = await loadFromContext(clustersCacheKey)
+    return map(({ clusterId, metadata, spec }) => ({
+      uid: metadata.uid,
+      clusterUuid: clusterId,
+      clusterName: pipe(find(propEq('uuid', clusterId)), prop('name'))(clusters),
+      name: metadata.name,
+      namespace: metadata.namespace,
+      labels: metadata.labels,
+      port: spec.endpoints.map(prop('port')).join(', '),
+      selector: spec.selector.matchLabels,
+    }))(items)
+  },
   uniqueIdentifier,
 })
 
@@ -182,13 +194,17 @@ export const prometheusAlertManagerActions = createCRUDActions(prometheusAlertMa
     create: `Successfully created Prometheus Alert Manager ${prop('name', last(updatedItems))}`,
     delete: `Successfully deleted Prometheus Alert Manager ${getName(uid, prevItems)}`,
   })(operation),
-  dataMapper: map(({ clusterUuid, metadata, spec }) => ({
-    uid: metadata.uid,
-    clusterUuid,
-    name: metadata.name,
-    namespace: metadata.namespace,
-    replicas: spec.replicas,
-    labels: metadata.labels,
-  })),
+  dataMapper: async (items, params, loadFromContext) => {
+    const clusters = await loadFromContext(clustersCacheKey)
+    return map(({ clusterId, metadata, spec }) => ({
+      uid: metadata.uid,
+      clusterUuid: clusterId,
+      clusterName: pipe(find(propEq('uuid', clusterId)), prop('name'))(clusters),
+      name: metadata.name,
+      namespace: metadata.namespace,
+      replicas: spec.replicas,
+      labels: metadata.labels,
+    }))(items)
+  },
   uniqueIdentifier,
 })
