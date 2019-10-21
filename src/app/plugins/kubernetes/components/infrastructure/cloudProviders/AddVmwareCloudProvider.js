@@ -13,7 +13,8 @@ const helpText = <Typography variant="body1" component="div">
     Platform9 Managed OpenStack for VMware needs to be setup.
   </p>
   <p>
-    To complete these steps, you can follow the steps in <ExternalLink url={supportUrl}>support article</ExternalLink>.
+    To complete these steps, you can follow the steps in <ExternalLink url={supportUrl}>support
+    article</ExternalLink>.
   </p>
   <Alert variant="info">
     <div>
@@ -46,6 +47,7 @@ const AddVmwareCloudProvider = ({ onComplete }) => {
   return <>
     {helpText}
     <ValidatedForm onSubmit={onComplete}>
+      <p>Specify OpenStack Credentials:</p>
       <TextField required id="name" label="Name" info="Name of the cloud provider" />
       <TextField required id="authUrl" label="Keystone URL" info={keyStoneUrlInfo} />
       <TextField required id="username" label="Username" info="Your OpenStack username" />

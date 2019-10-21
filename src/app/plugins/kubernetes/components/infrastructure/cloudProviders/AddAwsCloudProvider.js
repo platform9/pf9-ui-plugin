@@ -41,6 +41,7 @@ const AddAwsCloudProvider = ({ onComplete }) => {
   return <>
     {helpText}
     <ValidatedForm onSubmit={onComplete}>
+      <p>Specify AWS Credentials:</p>
       <TextField required id="name" label="Name" info="Name of the cloud provider" />
       <TextField required id="key" label="AWS Access Key ID" info={<span>
         This is the part of the AWS two part accesskey required for API access.&nbsp;

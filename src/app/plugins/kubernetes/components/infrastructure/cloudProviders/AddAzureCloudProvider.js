@@ -47,6 +47,7 @@ const AddAzureCloudProvider = ({ onComplete }) => {
   return <>
     {helpText}
     <ValidatedForm onSubmit={onComplete}>
+      <p>Specify Azure Credentials:</p>
       <TextField required id="name" label="Name" info="Name of the cloud provider" />
       <TextField required id="tenantId" label="Tenant ID" info="The tenant ID of the service principal" />
       <TextField required id="clientId" label="Client ID" info="The client ID of the service principal" />

@@ -44,6 +44,7 @@ const AddOpenstackCloudProvider = ({ onComplete }) => {
   return <>
     {helpText}
     <ValidatedForm onSubmit={onComplete}>
+      <p>Specify OpenStack Credentials:</p>
       <TextField required id="name" label="Name" info="Name of the cloud provider" />
       <TextField required id="authUrl" label="Keystone URL" info={keyStoneUrlInfo} />
       <TextField required id="username" label="Username" info="Your OpenStack username" />

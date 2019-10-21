@@ -1,13 +1,13 @@
 import React from 'react'
 import { action } from '@storybook/addon-actions'
 import { addStoriesFromModule } from '../../helpers'
-import { AddCloudProviderForm } from 'k8s/components/infrastructure/cloudProviders/AddCloudProviderPage'
+import AddCloudProviderPage from 'k8s/components/infrastructure/cloudProviders/AddCloudProviderPage'
 
 const addStories = addStoriesFromModule(module)
 const onComplete = action('complete')
 
 addStories('Kubernetes/Infrastructure/Cloud Providers', {
   'Adding a cloud provider': () => (
-    <AddCloudProviderForm onComplete={onComplete} />
+    <AddCloudProviderPage onComplete={onComplete} />
   ),
 })
