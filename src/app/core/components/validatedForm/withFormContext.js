@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useCallback } from 'react'
 import PropTypes from 'prop-types'
 import { ValidatedFormContext } from 'core/components/validatedForm/ValidatedForm'
 import { requiredValidator } from 'core/utils/fieldValidators'
-import { pathOr } from 'ramda'
+import { pathOr, isNil } from 'ramda'
 
 export const ValidatedFormInputPropTypes = {
   required: PropTypes.bool,
@@ -15,7 +15,7 @@ export const ValidatedFormInputPropTypes = {
  * the ValidatedForm such as validations and text hints on hover
  */
 const ValidatedFormInput = ({
-  id, initialValue, required, validations, onBlur, onChange, children, ...rest
+  id, initialValue, value, required, validations, onBlur, onChange, children, ...rest
 }) => {
   const {
     initialValues,
@@ -32,7 +32,7 @@ const ValidatedFormInput = ({
   const validateCurrentField = validateField(id)
   const currentInitialValue = initialValue !== undefined
     ? initialValue : initialValues[id]
-  const value = values[id]
+  const currentValue = isNil(value) ? values[id] : value
   const hasError = pathOr(null, [id, 'hasError'], errors)
   const errorMessage = pathOr(null, [id, 'errorMessage'], errors)
 
@@ -47,6 +47,13 @@ const ValidatedFormInput = ({
       setCurrentFieldValue(currentInitialValue)
     }
   }, [])
+
+  // Notify value changes to the form when the field is controlled
+  useEffect(() => {
+    if (!isNil(value)) {
+      setCurrentFieldValue(value)
+    }
+  }, [value])
 
   const handleBlur = useCallback(
     e => {
@@ -77,7 +84,7 @@ const ValidatedFormInput = ({
     id,
     onChange: handleChange,
     onBlur: handleBlur,
-    value,
+    value: currentValue,
     hasError,
     errorMessage,
     required,
@@ -86,7 +93,7 @@ const ValidatedFormInput = ({
 
 ValidatedFormInput.propTypes = ValidatedFormInputPropTypes
 ValidatedFormInput.defaultProps = {
-  validations: []
+  validations: [],
 }
 
 /**
