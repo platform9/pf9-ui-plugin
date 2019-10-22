@@ -6,6 +6,8 @@ import { podActions } from 'k8s/components/pods/actions'
 import { createUsePrefParamsHook } from 'core/hooks/useParams'
 import { listTablePrefs } from 'app/constants'
 import { pick } from 'ramda'
+import ExternalLink from 'core/components/ExternalLink'
+import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 
 const defaultParams = {
   masterNodeClusters: true,
@@ -30,12 +32,19 @@ const ListPage = ({ ListContainer }) => {
     />
   }
 }
+const renderPodName = (name, { dashboardUrl }) => {
+  return <span>
+    {name}<br />
+    <ExternalLink url={dashboardUrl}>dashboard
+      <FontAwesomeIcon size="sm">file-alt</FontAwesomeIcon></ExternalLink>
+  </span>
+}
 
 export const options = {
   addUrl: '/ui/kubernetes/pods/add',
-  addText: 'Add Pod',
+  addText: 'Create New Pod',
   columns: [
-    { id: 'name', label: 'Name' },
+    { id: 'name', label: 'Name', render: renderPodName },
     { id: 'clusterName', label: 'Cluster' },
     { id: 'created', label: 'Created' },
   ],

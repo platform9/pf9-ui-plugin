@@ -1,13 +1,9 @@
 import React from 'react'
-
 import AddCloudProviderPage from './components/infrastructure/cloudProviders/AddCloudProviderPage'
 import AddAwsClusterPage from './components/infrastructure/clusters/AddAwsClusterPage'
 import AddAzureClusterPage from './components/infrastructure/clusters/AddAzureClusterPage'
 import AddClusterPage from './components/infrastructure/clusters/AddClusterPage'
-import AddDeploymentPage from './components/pods/AddDeploymentPage'
 import AddNamespacePage from './components/namespaces/AddNamespacePage'
-import AddPodPage from './components/pods/AddPodPage'
-import AddServicePage from './components/pods/AddServicePage'
 import ApiAccessPage from './components/apiAccess/ApiAccessPage'
 import AppsIndexPage from './components/apps/AppsIndexPage'
 import ClusterDetailsPage from './components/infrastructure/clusters/ClusterDetailsPage'
@@ -33,6 +29,7 @@ import LoggingAddPage from './components/logging/LoggingAddPage'
 import LoggingEditPage from './components/logging/LoggingEditPage'
 import config from '../../../../config'
 import DashboardPage from './components/dashboard/DashboardPage'
+import AddResourcePage from 'k8s/components/common/AddResourcePage'
 
 class Kubernetes extends React.PureComponent {
   render () {
@@ -109,17 +106,17 @@ Kubernetes.registerPlugin = pluginManager => {
       {
         name: 'Add Pod',
         link: { path: '/pods/add', exact: true },
-        component: AddPodPage,
+        component: () => <AddResourcePage resourceType="pod" />,
       },
       {
         name: 'Add Deployment',
         link: { path: '/deployments/add', exact: true },
-        component: AddDeploymentPage,
+        component: () => <AddResourcePage resourceType="deployment" />,
       },
       {
         name: 'Add Service',
         link: { path: '/services/add', exact: true },
-        component: AddServicePage,
+        component: () => <AddResourcePage resourceType="service" />,
       },
       {
         name: 'Storage Classes',
