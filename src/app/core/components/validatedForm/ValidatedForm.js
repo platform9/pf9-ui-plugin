@@ -55,13 +55,17 @@ class ValidatedForm extends PureComponent {
    * Note: many components use event.target.value but we only need value here.
    * Note: values can be passed up to parent component by supplying a setContext function prop
    */
-  setFieldValue = moize(field => value => {
+  setFieldValue = moize(field => (value, validateAll) => {
     this.setState(setStateLens(value, ['values', field]),
       () => {
         if (this.state.showingErrors ||
           (this.props.showErrorsOnBlur && pathEq(['errors', field, 'hasError'], true, this.state))
         ) {
-          this.validateField(field)(null)
+          if (validateAll) {
+            this.validateForm()
+          } else {
+            this.validateField(field)(null)
+          }
         }
         // Pass field up to parent if there is a parent
         if (this.props.setContext) {
@@ -142,7 +146,6 @@ class ValidatedForm extends PureComponent {
     if (event) {
       event.preventDefault()
     }
-
     if (!this.validateForm()) {
       if (!showingErrors) {
         this.setState(prevState => ({ ...prevState, showingErrors: true }))

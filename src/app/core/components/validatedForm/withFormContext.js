@@ -6,6 +6,7 @@ import { pathOr, isNil } from 'ramda'
 
 export const ValidatedFormInputPropTypes = {
   required: PropTypes.bool,
+  validateFormOnChange: PropTypes.bool,
   validations: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
   initialValue: PropTypes.any,
 }
@@ -15,7 +16,7 @@ export const ValidatedFormInputPropTypes = {
  * the ValidatedForm such as validations and text hints on hover
  */
 const ValidatedFormInput = ({
-  id, initialValue, value, required, validations, onBlur, onChange, children, ...rest
+  id, initialValue, validateFormOnChange, value, required, validations, onBlur, onChange, children, ...rest
 }) => {
   const {
     initialValues,
@@ -46,7 +47,7 @@ const ValidatedFormInput = ({
     if (currentInitialValue !== undefined) {
       setCurrentFieldValue(currentInitialValue)
     }
-  }, [])
+  }, [validations, required])
 
   // Notify value changes to the form when the field is controlled
   useEffect(() => {
@@ -70,7 +71,7 @@ const ValidatedFormInput = ({
 
   const handleChange = useCallback(
     (value, label) => {
-      setCurrentFieldValue(value)
+      setCurrentFieldValue(value, validateFormOnChange)
       // Leverage the event to the wrapped input
       if (onChange) {
         onChange(value, label)

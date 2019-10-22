@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react'
+import jsYaml from 'js-yaml'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import SubmitButton from 'core/components/SubmitButton'
@@ -13,9 +14,11 @@ import useReactRouter from 'use-react-router'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import FormWrapper from 'core/components/FormWrapper'
 import { objSwitchCase } from 'utils/fp'
+import moize from 'moize'
 import { deploymentActions, serviceActions, podActions } from 'k8s/components/pods/actions'
 import Progress from 'core/components/progress/Progress'
 import Button from '@material-ui/core/Button'
+import { requiredValidator, customValidator } from 'core/utils/fieldValidators'
 
 const createPodUrl =
   'https://kubernetes.io/docs/tasks/configure-pod-container/communicate-containers-same-pod/#creating-a-pod-that-runs-two-containers'
@@ -98,6 +101,32 @@ spec:
 `,
 }
 
+const moizedYamlLoad = moize(jsYaml.safeLoad, {
+  maxSize: 10,
+})
+
+const codeMirrorValidations = [
+  requiredValidator,
+  customValidator(yaml => {
+    try {
+      moizedYamlLoad(yaml)
+      return true
+    } catch (err) {
+      return false
+    }
+  },
+  'Provided YAML code is invalid'),
+  customValidator((yaml, formFields) => {
+    try {
+      const body = moizedYamlLoad(yaml)
+      return body.kind.toLowerCase() === formFields.resourceType.toLowerCase()
+    } catch (err) {
+      return true
+    }
+  },
+  'Resource type does not match with selected resource type above'),
+]
+
 export const AddResourceForm = ({ resourceType = 'pod' }) => {
   const { history } = useReactRouter()
   const { params, getParamsUpdater, updateParams } = useParams({ resourceType })
@@ -115,14 +144,15 @@ export const AddResourceForm = ({ resourceType = 'pod' }) => {
 
   return (
     <FormWrapper title='New Resource' backUrl={listRoutes[resourceType]}>
-      {helpText}
+      {helpText}<br />
       <Progress overlay loading={adding} renderContentOnMount>
         <ValidatedForm onSubmit={handleAdd}>
           <PicklistField
+            validateFormOnChange
             id="resourceType"
             label="Resource Type"
             info="Can be a pod, deployment, or service. This must match with the resource YAML specified below"
-            onChange={getParamsUpdater('type')}
+            onChange={getParamsUpdater('resourceType')}
             initialValue={params.resourceType}
             options={resourceTypes}
             required
@@ -133,7 +163,6 @@ export const AddResourceForm = ({ resourceType = 'pod' }) => {
             label="Cluster"
             info="The cluster to deploy this resource on"
             onChange={getParamsUpdater('clusterId')}
-            // value={params.clusterId}
             required
           />
           <PicklistField
@@ -148,11 +177,11 @@ export const AddResourceForm = ({ resourceType = 'pod' }) => {
           <CodeMirror
             id="yaml"
             label="Resource YAML"
+            validations={codeMirrorValidations}
             onChange={getParamsUpdater('yaml')}
             value={params.yaml}
             info="Manually input the resource YAML. For more information, see the articles linked at the top of this form"
             options={codeMirrorOptions}
-            required
           />
           <Button onClick={insertYamlTemplate}>
             Use example {params.resourceType} template
