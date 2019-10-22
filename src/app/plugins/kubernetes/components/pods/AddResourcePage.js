@@ -15,6 +15,7 @@ import FormWrapper from 'core/components/FormWrapper'
 import { objSwitchCase } from 'utils/fp'
 import { deploymentActions, serviceActions, podActions } from 'k8s/components/pods/actions'
 import Progress from 'core/components/progress/Progress'
+import Button from '@material-ui/core/Button'
 
 const createPodUrl =
   'https://kubernetes.io/docs/tasks/configure-pod-container/communicate-containers-same-pod/#creating-a-pod-that-runs-two-containers'
@@ -49,9 +50,57 @@ const listRoutes = {
   service: `${k8sPrefix}/services`,
 }
 
+const yamlTemplates = {
+  pod: `apiVersion: v1
+kind: pod
+metadata:
+  name: redis-django
+  labels:
+    app: web
+spec:
+  containers:
+    - name: key-value-store
+      image: redis
+      ports:
+        - containerPort: 6379
+    - name: frontend
+      image: django
+      ports:
+        - containerPort: 8000
+`,
+  deployment: `apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.7.9
+        ports:
+        - containerPort: 80
+`,
+  service: `apiVersion: v1
+kind: Service
+metadata:
+  name: myapp
+spec:
+  ports:
+    - port: 8765
+      targetPort: 9376
+  selector:
+    app: example
+`,
+}
+
 export const AddResourceForm = ({ resourceType = 'pod' }) => {
   const { history } = useReactRouter()
-  const { params, getParamsUpdater } = useParams({ resourceType })
+  const { params, getParamsUpdater, updateParams } = useParams({ resourceType })
   const onComplete = useCallback(() =>
     history.push(listRoutes[params.resourceType]), [history])
   const createFn = objSwitchCase({
@@ -59,16 +108,20 @@ export const AddResourceForm = ({ resourceType = 'pod' }) => {
     deployment: deploymentActions.create,
     service: serviceActions.create,
   })(params.resourceType)
-  const [handleAdd, loading] = useDataUpdater(createFn, onComplete)
+  const [handleAdd, adding] = useDataUpdater(createFn, onComplete)
+  const insertYamlTemplate = useCallback(() => updateParams({
+    yaml: yamlTemplates[params.resourceType],
+  }), [params])
 
   return (
     <FormWrapper title='New Resource' backUrl={listRoutes[resourceType]}>
       {helpText}
-      <Progress overlay loading={loading} renderContentOnMount>
+      <Progress overlay loading={adding} renderContentOnMount>
         <ValidatedForm onSubmit={handleAdd}>
           <PicklistField
             id="resourceType"
             label="Resource Type"
+            info="Can be a pod, deployment, or service. This must match with the resource YAML specified below"
             onChange={getParamsUpdater('type')}
             initialValue={params.resourceType}
             options={resourceTypes}
@@ -78,8 +131,9 @@ export const AddResourceForm = ({ resourceType = 'pod' }) => {
             DropdownComponent={ClusterPicklist}
             id="clusterId"
             label="Cluster"
+            info="The cluster to deploy this resource on"
             onChange={getParamsUpdater('clusterId')}
-            value={params.clusterId}
+            // value={params.clusterId}
             required
           />
           <PicklistField
@@ -87,15 +141,22 @@ export const AddResourceForm = ({ resourceType = 'pod' }) => {
             disabled={!params.clusterId}
             id="namespace"
             label="Namespace"
+            info="The namespace to deploy this resource on"
             clusterId={params.clusterId}
             required
           />
           <CodeMirror
             id="yaml"
             label="Resource YAML"
+            onChange={getParamsUpdater('yaml')}
+            value={params.yaml}
+            info="Manually input the resource YAML. For more information, see the articles linked at the top of this form"
             options={codeMirrorOptions}
             required
           />
+          <Button onClick={insertYamlTemplate}>
+            Use example {params.resourceType} template
+          </Button>
           <SubmitButton>Create Resource</SubmitButton>
         </ValidatedForm>
       </Progress>
