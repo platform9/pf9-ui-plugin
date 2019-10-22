@@ -5,15 +5,15 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import { podActions } from 'k8s/components/pods/actions'
 import { createUsePrefParamsHook } from 'core/hooks/useParams'
 import { listTablePrefs, allKey } from 'app/constants'
-import { toPairs, pick } from 'ramda'
+import { pick } from 'ramda'
 import ExternalLink from 'core/components/ExternalLink'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import NamespacePicklist from 'k8s/components/common/NamespacePicklist'
-import { Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import { objSwitchCase } from 'utils/fp'
 import moment from 'moment'
 import { secondsToString } from 'utils/misc'
+import renderLabels from 'k8s/components/pods/renderLabels'
 
 const useStyles = makeStyles(theme => ({
   status: {
@@ -84,14 +84,6 @@ const renderPodName = (name, { dashboardUrl }) => {
   </span>
 }
 
-const greenStyle = { color: '#00C036', fontWeight: 400 }
-const renderLabels = labels => {
-  return <Typography style={greenStyle} variant="body2" component="div">
-    {toPairs(labels).map(([name, value]) =>
-      <p key={name}>{name}: {value}</p>)}
-  </Typography>
-}
-
 const PodsStatusSpan = props => {
   const { children } = props
   const { status } = useStyles(props)
@@ -131,7 +123,7 @@ export const options = {
     { id: 'name', label: 'Name', render: renderPodName },
     { id: 'clusterName', label: 'Cluster' },
     { id: 'namespace', label: 'Namespace' },
-    { id: 'labels', label: 'Labels', render: renderLabels },
+    { id: 'labels', label: 'Labels', render: renderLabels('label') },
     { id: 'status.phase', label: 'Status', render: renderStatus },
     { id: 'status.hostIP', label: 'Node IP' },
     { id: 'created', label: 'Age', render: renderAge },

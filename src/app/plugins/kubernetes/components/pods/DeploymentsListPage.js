@@ -7,6 +7,9 @@ import { listTablePrefs, allKey } from 'app/constants'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { pick } from 'ramda'
 import NamespacePicklist from 'k8s/components/common/NamespacePicklist'
+import { secondsToString } from 'utils/misc'
+import moment from 'moment'
+import renderLabels from 'k8s/components/pods/renderLabels'
 
 const defaultParams = {
   masterNodeClusters: true,
@@ -47,6 +50,10 @@ const ListPage = ({ ListContainer }) => {
   }
 }
 
+const renderAge = created => {
+  return secondsToString(moment().diff(created, 's'))
+}
+
 export const options = {
   loaderFn: deploymentActions.list,
   deleteFn: deploymentActions.delete,
@@ -55,7 +62,11 @@ export const options = {
   columns: [
     { id: 'name', label: 'Name' },
     { id: 'clusterName', label: 'Cluster' },
-    { id: 'created', label: 'Created' },
+    { id: 'namespace', label: 'Namespace' },
+    { id: 'labels', label: 'Labels', render: renderLabels('label') },
+    { id: 'selectors', label: 'Selectors', render: renderLabels('selector') },
+    { id: 'pods', label: 'Pods' },
+    { id: 'created', label: 'Age', render: renderAge },
   ],
   name: 'Deployments',
   title: 'Deployments',
