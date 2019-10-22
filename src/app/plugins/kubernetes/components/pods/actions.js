@@ -14,6 +14,13 @@ export const kubeServicesCacheKey = 'kubeServices'
 export const podsCacheKey = 'pods'
 
 export const deploymentActions = createCRUDActions(deploymentsCacheKey, {
+  listFn: async (params, loadFromContext) => {
+    const [clusterId, clusters] = await parseClusterParams(params, loadFromContext)
+    if (clusterId === allKey) {
+      return flatMapAsync(qbert.getClusterDeployments, pluck('uuid', clusters))
+    }
+    return qbert.getClusterDeployments(clusterId)
+  },
   createFn: async ({ clusterId, namespace, yaml }) => {
     const body = jsYaml.safeLoad(yaml)
     const created = await qbert.createDeployment(clusterId, namespace, body)
@@ -34,6 +41,13 @@ export const deploymentActions = createCRUDActions(deploymentsCacheKey, {
 })
 
 export const serviceActions = createCRUDActions(kubeServicesCacheKey, {
+  listFn: async (params, loadFromContext) => {
+    const [clusterId, clusters] = await parseClusterParams(params, loadFromContext)
+    if (clusterId === allKey) {
+      return flatMapAsync(qbert.getClusterKubeServices, pluck('uuid', clusters))
+    }
+    return qbert.getClusterKubeServices(clusterId)
+  },
   createFn: async ({ clusterId, namespace, yaml }) => {
     const body = jsYaml.safeLoad(yaml)
     const created = await qbert.createService(clusterId, namespace, body)
