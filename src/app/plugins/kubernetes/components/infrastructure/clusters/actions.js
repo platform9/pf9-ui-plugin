@@ -1,14 +1,12 @@
+import ApiClient from 'api-client/ApiClient'
+import calcUsageTotals from 'k8s/util/calcUsageTotals'
 import createCRUDActions from 'core/helpers/createCRUDActions'
+import { allKey } from 'app/constants'
+import { castFuzzyBool } from 'utils/misc'
+import { clustersCacheKey, combinedHostsCacheKey, loadCombinedHosts } from 'k8s/components/infrastructure/common/actions'
+import { filterIf, isTruthy, updateWith } from 'utils/fp'
 import { mapAsync } from 'utils/async'
 import { pluck, pathOr, pipe, either, propSatisfies, compose, path, propEq } from 'ramda'
-import calcUsageTotals from 'k8s/util/calcUsageTotals'
-import { castFuzzyBool } from 'utils/misc'
-import { filterIf, isTruthy, updateWith } from 'utils/fp'
-import {
-  clustersCacheKey, combinedHostsCacheKey, loadCombinedHosts,
-} from 'k8s/components/infrastructure/common/actions'
-import ApiClient from 'api-client/ApiClient'
-import { allKey } from 'app/constants'
 import { rawNodesCacheKey } from 'k8s/components/infrastructure/nodes/actions'
 
 const { qbert } = ApiClient.getInstance()

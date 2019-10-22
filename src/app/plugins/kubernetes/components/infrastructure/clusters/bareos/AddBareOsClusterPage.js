@@ -11,7 +11,7 @@ import WizardStep from 'core/components/wizard/WizardStep'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import useParams from 'core/hooks/useParams'
 import useReactRouter from 'use-react-router'
-import { clusterActions } from './actions'
+import { clusterActions } from '../actions'
 import { pick } from 'ramda'
 
 const initialContext = {
@@ -49,7 +49,6 @@ const AddBareOsClusterPage = () => {
       // advanced configuration
       ...pick('privileged appCatalogEnabled customAmi tags'.split(' '), data),
     }
-    if (data.useAllAvailabilityZones) { body.zones = [] }
     if (data.httpProxy) { body.httpProxy = data.httpProxy }
     if (data.networkPlugin === 'calico') { body.mtuSize = data.mtuSize }
 

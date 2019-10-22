@@ -19,7 +19,7 @@ const AddClusterPage = () => {
     <div>
       <Typography variant="h5">Select one of the support Cloud Provider Types:</Typography>
       <div className={classes.root}>
-        <CloudProviderCard disabled type="other" src={`${k8sPrefix}/infrastructure/clusters/addBareOs`} />
+        <CloudProviderCard type="other" src={`${k8sPrefix}/infrastructure/clusters/addBareOs`} />
         <CloudProviderCard type="aws" src={`${k8sPrefix}/infrastructure/clusters/addAws`} />
         <CloudProviderCard type="azure" src={`${k8sPrefix}/infrastructure/clusters/addAzure`} />
       </div>
