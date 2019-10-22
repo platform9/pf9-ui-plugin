@@ -57,6 +57,8 @@ const renderAge = created => {
 export const options = {
   loaderFn: deploymentActions.list,
   deleteFn: deploymentActions.delete,
+  deleteCond: () => false,
+  deleteDisabledInfo: 'Feature not yet implemented',
   addUrl: '/ui/kubernetes/deployments/add',
   addText: 'Add Deployment',
   columns: [
