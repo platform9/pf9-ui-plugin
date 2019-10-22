@@ -3,7 +3,7 @@ import {
   find, propOr, pick, F,
 } from 'ramda'
 import ApiClient from 'api-client/ApiClient'
-import { emptyArr, objSwitchCase, pathStr } from 'utils/fp'
+import { emptyArr, objSwitchCase, pathStr, filterIf } from 'utils/fp'
 import { allKey, imageUrlRoot, addError, deleteError, updateError } from 'app/constants'
 import { clustersCacheKey } from 'k8s/components/infrastructure/common/actions'
 import createCRUDActions from 'core/helpers/createCRUDActions'
@@ -124,6 +124,10 @@ export const releaseActions = createCRUDActions(releasesCacheKey, {
     }
     return qbert.getReleases(clusterId)
   },
+  dataMapper: (items,
+    { namespace }) => pipe(
+    filterIf(namespace && namespace !== allKey, pathEq(['attributes', 'namespace'], namespace)),
+  )(items),
   uniqueIdentifier,
   indexBy: 'clusterId',
 })

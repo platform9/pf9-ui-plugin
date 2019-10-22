@@ -14,6 +14,36 @@ export const parseJSON = str => {
   }
 }
 
+/**
+ * Given a number of seconds returns the number of
+ * years, months, days, hours and minutes in a human readable format
+ * @param seconds
+ * @returns {string}
+ */
+export const secondsToString = seconds => {
+  let remainingSeconds = seconds
+  const units = {
+    'year': 24 * 60 * 365,
+    'month': 24 * 60 * 60 * 30,
+    'day': 24 * 60 * 60,
+    'hour': 60 * 60,
+    'min': 60,
+    // 'second': 1,
+  }
+  const results = []
+  for (const unitName in units) {
+    const amount = Math.floor(remainingSeconds / units[unitName])
+    if (amount === 1) {
+      results.push(' ' + amount + ' ' + unitName)
+    }
+    if (amount >= 2) {
+      results.push(' ' + amount + ' ' + unitName + 's')
+    }
+    remainingSeconds %= units[unitName]
+  }
+  return results.join(', ')
+}
+
 export const isNumeric = n =>
   !Number.isNaN(parseFloat(n)) && Number.isFinite(+n)
 

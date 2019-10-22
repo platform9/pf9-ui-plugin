@@ -16,7 +16,7 @@ const useStyles = makeStyles(theme => ({
   },
   circle: {
     display: 'inline-flex',
-    alignItems: 'baseline',
+    alignItems: 'end',
     '&:before': {
       content: '\' \'',
       height: 14,
