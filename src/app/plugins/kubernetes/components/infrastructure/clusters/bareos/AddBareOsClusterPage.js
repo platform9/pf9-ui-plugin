@@ -2,6 +2,7 @@ import React from 'react'
 import FormWrapper from 'core/components/FormWrapper'
 import BareOsClusterReviewTable from './BareOsClusterReviewTable'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
+import ClusterHostChooser from './ClusterHostChooser'
 import KeyValuesField from 'core/components/validatedForm/KeyValuesField'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import TextField from 'core/components/validatedForm/TextField'
@@ -91,6 +92,7 @@ const AddBareOsClusterPage = () => {
                       />
 
                       {/* TODO: select master nodes */}
+                      <ClusterHostChooser />
                     </>
                   )}
                 </ValidatedForm>
