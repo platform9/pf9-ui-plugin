@@ -32,9 +32,7 @@ const styles = theme => ({
   },
   checkAllCell: {
     paddingRight: 0,
-  },
-  emptyCheckAllCell: {
-    paddingRight: 20,
+    minWidth: 60
   },
 })
 
@@ -75,9 +73,7 @@ class ListTableHead extends React.PureComponent {
 
     const headerCheckbox = !blankFirstColumn
       ? <TableCell padding="checkbox" key="_checkAll" className={clsx(classes.cellLabel,
-        classes.checkAllCell, {
-          [classes.emptyCheckAllCell]: !numSelected,
-        })}>
+        classes.checkAllCell)}>
         {showCheckboxes && <label className={classes.checkboxCell}>
           <Checkbox
             className={classes.checkbox}

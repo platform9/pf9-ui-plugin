@@ -76,7 +76,7 @@ const ListPage = ({ ListContainer }) => {
     />
   }
 }
-const renderPodName = (name, { dashboardUrl }) => {
+const renderName = (name, { dashboardUrl }) => {
   return <span>
     {name}<br />
     <ExternalLink url={dashboardUrl}>dashboard
@@ -120,7 +120,7 @@ export const options = {
   addUrl: '/ui/kubernetes/pods/add',
   addText: 'Create New Pod',
   columns: [
-    { id: 'name', label: 'Name', render: renderPodName },
+    { id: 'name', label: 'Name', render: renderName },
     { id: 'clusterName', label: 'Cluster' },
     { id: 'namespace', label: 'Namespace' },
     { id: 'labels', label: 'Labels', render: renderLabels('label') },

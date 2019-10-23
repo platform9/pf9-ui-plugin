@@ -10,6 +10,8 @@ import NamespacePicklist from 'k8s/components/common/NamespacePicklist'
 import { secondsToString } from 'utils/misc'
 import moment from 'moment'
 import renderLabels from 'k8s/components/pods/renderLabels'
+import ExternalLink from 'core/components/ExternalLink'
+import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 
 const defaultParams = {
   masterNodeClusters: true,
@@ -50,6 +52,14 @@ const ListPage = ({ ListContainer }) => {
   }
 }
 
+const renderName = (name, { dashboardUrl }) => {
+  return <span>
+    {name}<br />
+    <ExternalLink url={dashboardUrl}>dashboard
+      <FontAwesomeIcon size="sm">file-alt</FontAwesomeIcon></ExternalLink>
+  </span>
+}
+
 const renderAge = created => {
   return secondsToString(moment().diff(created, 's'))
 }
@@ -62,7 +72,7 @@ export const options = {
   addUrl: '/ui/kubernetes/deployments/add',
   addText: 'Add Deployment',
   columns: [
-    { id: 'name', label: 'Name' },
+    { id: 'name', label: 'Name', render: renderName },
     { id: 'clusterName', label: 'Cluster' },
     { id: 'namespace', label: 'Namespace' },
     { id: 'labels', label: 'Labels', render: renderLabels('label') },

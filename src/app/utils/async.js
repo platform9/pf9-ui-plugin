@@ -4,7 +4,8 @@ import { ensureArray } from 'utils/fp'
 export const pluckAsync = curry((key, promise) => promise.then(obj => obj[key]))
 
 export const pipeAsync = (...fns) =>
-  async params => fns.reduce(async (prevResult, nextCb) => nextCb(prevResult), params)
+  async params => fns.reduce(async (prevPromise, nextCb) =>
+    nextCb(await prevPromise), params)
 
 export const mapAsync = curry(async (callback, arr) => {
   return Promise.all(arr.map((val, i) => callback(val, i, arr)))
