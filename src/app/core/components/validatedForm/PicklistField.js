@@ -28,6 +28,7 @@ const PicklistField = React.forwardRef(({
   const [open, setOpen] = React.useState(false)
   const openTooltip = useCallback(() => setOpen(true), [])
   const closeTooltip = useCallback(() => setOpen(false), [])
+  // TODO Implement "interactive" behavior so that tooltip won't be closed when hovering it
 
   return (
     <InfoTooltip open={open} info={info} placement={placement}>

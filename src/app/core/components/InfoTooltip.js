@@ -39,6 +39,7 @@ class InfoTooltip extends PureComponent {
 
     return (
       info ? <Tooltip
+        interactive
         open={open}
         placement={placement}
         classes={{ tooltip: classes.infoTooltip }}

@@ -16,6 +16,9 @@ class Wizard extends PureComponent {
   hasNext = () => this.state.activeStep < this.lastStep()
   hasBack = () => this.state.activeStep > 0
 
+  // Callbacks indexed by step ID to be called before navigating to the next step
+  nextCb = {}
+
   activateStep = () => {
     // Activate the step if we don't have one already
     const { steps, activeStep } = this.state
@@ -39,13 +42,14 @@ class Wizard extends PureComponent {
   }
 
   onNext = (cb) => {
-    this.nextCb = cb
+    this.nextCb[this.state.activeStep] = cb
   }
 
   handleNext = () => {
     const { onComplete } = this.props
+    const { activeStep } = this.state
 
-    if (this.nextCb && this.nextCb() === false) {
+    if (this.nextCb[activeStep] && this.nextCb[activeStep]() === false) {
       return
     }
 

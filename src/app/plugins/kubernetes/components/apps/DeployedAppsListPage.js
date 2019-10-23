@@ -48,12 +48,12 @@ const ListPage = ({ ListContainer }) => {
       getParamsUpdater={getParamsUpdater}
       filters={<>
         <ClusterPicklist
-          showAll={false}
           onChange={getParamsUpdater('clusterId')}
           value={params.clusterId}
-          onlyAppCatalogEnabled
+          onlyMasterNodeClusters
         />
         <NamespacePicklist
+          selectFirst={false}
           onChange={getParamsUpdater('namespace')}
           value={params.namespace}
           clusterId={params.clusterId}
@@ -71,7 +71,7 @@ export const options = {
     { id: 'attributes.chartName', label: 'Name', render: renderDeployedAppLink },
     { id: 'type', label: 'App Type' },
     { id: 'attributes.chartVersion', label: 'Version' },
-    { id: 'namespace', label: 'Namespace' },
+    { id: 'attributes.namespace', label: 'Namespace' },
     { id: 'attributes.status', label: 'Status' },
     { id: 'attributes.updated', label: 'Last updated' },
   ],
