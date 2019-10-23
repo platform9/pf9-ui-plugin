@@ -21,26 +21,21 @@ export const parseJSON = str => {
  * @returns {string}
  */
 export const secondsToString = seconds => {
+  const min = 60
+  const hour = min * 60
+  const day = hour * 24
+  const month = day * 30
+  const year = day * 365
+  const units = { year, month, day, hour, min }
   let remainingSeconds = seconds
-  const units = {
-    'year': 24 * 60 * 365,
-    'month': 24 * 60 * 60 * 30,
-    'day': 24 * 60 * 60,
-    'hour': 60 * 60,
-    'min': 60,
-    // 'second': 1,
-  }
-  const results = []
-  for (const unitName in units) {
-    const amount = Math.floor(remainingSeconds / units[unitName])
-    if (amount === 1) {
-      results.push(' ' + amount + ' ' + unitName)
-    }
-    if (amount >= 2) {
-      results.push(' ' + amount + ' ' + unitName + 's')
-    }
+  const results = Object.entries(units).reduce((acc, [unitName, unitSeconds]) => {
+    const amount = Math.floor(remainingSeconds / unitSeconds)
     remainingSeconds %= units[unitName]
-  }
+    if (amount >= 1) {
+      return [...acc, `${amount} ${unitName}${amount >= 2 ? 's' : ''}`]
+    }
+    return acc
+  }, [])
   return results.join(', ')
 }
 
