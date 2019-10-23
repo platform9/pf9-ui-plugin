@@ -62,9 +62,9 @@ const BasicStep = ({ onSubmit, triggerSubmit }) =>
     </FormWrapper>
   </WizardStep>
 
-const CustomizeStep = ({ ...rest }) =>
+const CustomizeStep = props =>
   <WizardStep stepId="customize" label="Customize">
-    <CustomizeStepContent {...rest} />
+    <CustomizeStepContent {...props} />
   </WizardStep>
 
 const CustomizeStepContent = ({ isActive, wizardContext, onSubmit, triggerSubmit }) => {
