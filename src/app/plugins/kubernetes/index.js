@@ -4,7 +4,6 @@ import AddAwsClusterPage from './components/infrastructure/clusters/AddAwsCluste
 import AddAzureClusterPage from './components/infrastructure/clusters/AddAzureClusterPage'
 import AddClusterPage from './components/infrastructure/clusters/AddClusterPage'
 import AddBareOsClusterPage from './components/infrastructure/clusters/bareos/AddBareOsClusterPage'
-import AddDeploymentPage from './components/pods/AddDeploymentPage'
 import AddNamespacePage from './components/namespaces/AddNamespacePage'
 import ApiAccessPage from './components/apiAccess/ApiAccessPage'
 import AppsIndexPage from './components/apps/AppsIndexPage'
