@@ -26,7 +26,7 @@ import UpdatePrometheusAlertManagerPage from './components/prometheus/UpdateProm
 import LoggingIndexPage from './components/logging/LoggingIndexPage'
 import LoggingAddPage from './components/logging/LoggingAddPage'
 import LoggingEditPage from './components/logging/LoggingEditPage'
-import config from '../../../../config'
+// import config from '../../../../config'
 import DashboardPage from './components/dashboard/DashboardPage'
 import AddResourcePage from 'k8s/components/pods/AddResourcePage'
 
@@ -209,8 +209,10 @@ Kubernetes.registerPlugin = pluginManager => {
   const clarityBase = path => `${hostPrefix}/clarity/index.html#${path}`
   const clarityLink = path => ({ link: { path: clarityBase(path), external: true } })
 
-  // For development we can set this manually
-  const useClarityLinks = !(window.localStorage.disableClarityLinks === 'true' || config.developer)
+  // const useClarityLinks = !(window.localStorage.disableClarityLinks === 'true' || config.developer)
+
+  // New builds should default to just the new UI
+  const useClarityLinks = false
 
   // These nav items will redirect to the old "clarity" UI while the new UI is under development.
   const clarityNavItems = [
