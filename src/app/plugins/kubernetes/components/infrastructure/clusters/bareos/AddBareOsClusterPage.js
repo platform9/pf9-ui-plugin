@@ -1,4 +1,5 @@
 import React from 'react'
+import ApiClient from 'api-client/ApiClient'
 import FormWrapper from 'core/components/FormWrapper'
 import BareOsClusterReviewTable from './BareOsClusterReviewTable'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
@@ -14,12 +15,16 @@ import useParams from 'core/hooks/useParams'
 import useReactRouter from 'use-react-router'
 import { clusterActions } from '../actions'
 import { pick } from 'ramda'
+const { qbert } = ApiClient.getInstance()
 
 const initialContext = {
   containersCidr: '10.20.0.0/16',
   servicesCidr: '10.21.0.0/16',
   networkPlugin: 'flannel',
   runtimeConfigOption: 'default',
+
+  // TODO: remove after development done
+  name: 'someCluster',
 }
 
 const runtimeConfigOptions = [
@@ -34,12 +39,12 @@ const AddBareOsClusterPage = () => {
   const onComplete = () => {
     history.push('/ui/kubernetes/infrastructure#clusters')
   }
-  const [create] = useDataUpdater(clusterActions.create, onComplete)
+  const [create] = useDataUpdater(clusterActions.create, onComplete) // eslint-disable-line
 
   const handleSubmit = params => async data => {
     const body = {
       // basic info
-      ...pick('nodePoolUuid name location zones sshKey'.split(' '), data),
+      ...pick('name'.split(' '), data),
 
       // cluster configuration
       ...pick('allowWorkloadsOnMaster'.split(' '), data),
@@ -59,7 +64,18 @@ const AddBareOsClusterPage = () => {
       custom: data.customRuntimeConfig,
     }[data.runtimeConfigOption]
 
-    await create(body)
+    // 1. Get the nodePoolUuid from the nodePools API and look for the pool with name 'defaultPool'
+    const nodePools = await qbert.getNodePools()
+    data.nodePoolUuid = nodePools.find(x => x.name === 'defaultPool').uuid
+
+    // 2. Create the cluster
+    // await create(body)
+    console.log('TODO: submit cluster create API call with body:')
+    console.log(body)
+
+    // 3. Attach the master nodes
+    // 4. Attach the worker nodes
+
     return body
   }
 
@@ -73,6 +89,7 @@ const AddBareOsClusterPage = () => {
                 <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                   {({ setFieldValue, values }) => (
                     <>
+                      <pre>{JSON.stringify(wizardContext, null, 4)}</pre>
                       {/* Cluster Name */}
                       <TextField
                         id="name"
@@ -81,18 +98,13 @@ const AddBareOsClusterPage = () => {
                         required
                       />
 
-                      {/* SSH Key */}
-                      <TextField
-                        id="sshKey"
-                        label="Public SSH key"
-                        info="Copy/paste your public SSH key"
-                        multiline
-                        rows={3}
-                        required
+                      {/* TODO: BUG, wizardContext keeps getting cleared with the original values even if the onChange changes the values */}
+                      <ClusterHostChooser
+                        isMaster
+                        onChange={x => setWizardContext({ masterNodes: x })}
+                        excludeList={[]}
+                        value={wizardContext.masterNodes}
                       />
-
-                      {/* TODO: select master nodes */}
-                      <ClusterHostChooser />
                     </>
                   )}
                 </ValidatedForm>
@@ -104,7 +116,13 @@ const AddBareOsClusterPage = () => {
                 <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                   {({ setFieldValue, values }) => (
                     <>
-                      {/* TODO: select worker nodes */}
+                      <pre>{JSON.stringify(wizardContext, null, 4)}</pre>
+                      {/* TODO: BUG, wizardContext keeps getting cleared with the original values even if the onChange changes the values */}
+                      <ClusterHostChooser
+                        onChange={x => setWizardContext({ workerNodes: x })}
+                        value={wizardContext.workerNodes}
+                        excludeList={wizardContext.masterNodes}
+                      />
                     </>
                   )}
                 </ValidatedForm>

@@ -85,6 +85,12 @@ class Qbert {
     return this.client.basicGet(`${await this.baseUrl()}/cloudProvider/types`)
   }
 
+  /* Node Pools */
+  getNodePools = async () => {
+    const nodePools = await this.client.basicGet(`${await this.baseUrl()}/nodePools`)
+    return nodePools
+  }
+
   /* Nodes */
   getNodes = async () => {
     const nodes = await this.client.basicGet(`${await this.baseUrl()}/nodes`)

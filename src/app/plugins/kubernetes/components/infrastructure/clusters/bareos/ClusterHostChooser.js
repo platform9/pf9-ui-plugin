@@ -1,37 +1,36 @@
 import React, { forwardRef, useState, useEffect } from 'react'
 import withFormContext from 'core/components/validatedForm/withFormContext'
 import { Checkbox, Table, TableHead, TableCell, TableRow, TableBody } from '@material-ui/core'
-import { loadCombinedHosts } from 'k8s/components/infrastructure/common/actions'
+import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
 import useDataLoader from 'core/hooks/useDataLoader'
 import PropTypes from 'prop-types'
 
 // TODO: is forwardRef actually needed here?
 const ClusterHostChooser = forwardRef(({
-  isMaster, onChange, initialValue,
+  isMaster, onChange, value, excludeList,
 }, ref) => {
-  // TODO: useDataLoader with to get a list of unauthorized hosts
-  const [selected, setSelected] = useState(initialValue)
+  const [selected, setSelected] = useState(value)
 
-  const [combinedHosts] = useDataLoader(loadCombinedHosts)
-  console.log(combinedHosts)
+  // TODO: need to figure out a way to do validtion with our system to select 1, 3, or 5 nodes only for masters
+  // const isValid = () => !isMaster || [1, 3, 5].includes(selected.length)
 
-  // TODO: change mock data fields to match actual fields
-  const hosts = [
-    { id: '1', hostname: 'abc', ipAddress: '123.123.123.123', os: 'Ubuntu 16.04' },
-    { id: '2', hostname: 'def', ipAddress: '123.123.123.124', os: 'Ubuntu 16.04' },
-    { id: '3', hostname: 'ghi', ipAddress: '123.123.123.125', os: 'Ubuntu 16.04' },
-  ]
-
-  const isValid = () => !isMaster || [1, 3, 5].includes(selected.length)
   const allSelected = () => selected.length === hosts.length
-  const toggleAll = () => setSelected(allSelected() ? [] : hosts.map(x => x.id))
-  const isSelected = id => selected.includes(id)
+  const toggleAll = () => setSelected(allSelected() ? [] : hosts.map(x => x.uuid))
+  const isSelected = uuid => selected.includes(uuid)
 
-  const toggleHost = id => () => setSelected(
-    isSelected(id)
-      ? selected.filter(x => x !== id)
-      : [ ...selected, id ]
-  )
+  const [nodes] = useDataLoader(loadNodes)
+
+  const notAssignedToCluster = node => !node.clusterUuid
+
+  // exclude list does not filter anything if isMaster
+  const notInExcludeList = node => isMaster || !excludeList.includes(node.uuid)
+
+  const hosts = nodes.filter(notAssignedToCluster).filter(notInExcludeList)
+
+  const toggleHost = uuid => () => {
+    const newHosts = isSelected(uuid) ? selected.filter(x => x !== uuid) : [ ...selected, uuid ]
+    setSelected(newHosts)
+  }
 
   useEffect(() => {
     onChange && onChange(selected)
@@ -39,7 +38,7 @@ const ClusterHostChooser = forwardRef(({
 
   return (
     <React.Fragment>
-      <div>isValid: {isValid() ? 'yes' : 'no'}</div>
+      <pre>{JSON.stringify(selected, null, 4)}</pre>
       <Table ref={ref}>
         <TableHead>
           <TableRow>
@@ -51,11 +50,11 @@ const ClusterHostChooser = forwardRef(({
         </TableHead>
         <TableBody>
           {hosts.map(host => (
-            <TableRow key={host.id}>
-              <TableCell><Checkbox checked={isSelected(host.id)} onChange={toggleHost(host.id)} /></TableCell>
-              <TableCell>{host.hostname}</TableCell>
-              <TableCell>{host.ipAddress}</TableCell>
-              <TableCell>{host.os}</TableCell>
+            <TableRow key={host.uuid}>
+              <TableCell><Checkbox checked={isSelected(host.uuid)} onChange={toggleHost(host.uuid)} /></TableCell>
+              <TableCell>{host.name}</TableCell>
+              <TableCell>{host.primaryIp}</TableCell>
+              <TableCell>{host.combined.osInfo}</TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -67,12 +66,16 @@ const ClusterHostChooser = forwardRef(({
 ClusterHostChooser.propTypes = {
   isMaster: PropTypes.bool,
   onChange: PropTypes.func,
-  initialValue: PropTypes.arrayOf(PropTypes.string),
+  value: PropTypes.arrayOf(PropTypes.string),
+
+  // This list will not show up in the choices.  Useful for excluding the already chosen master nodes.
+  excludeList: PropTypes.arrayOf(PropTypes.string),
 }
 
 ClusterHostChooser.defaultProps = {
   isMaster: false,
-  initialValue: [],
+  value: [],
+  excludeList: [],
 }
 
 export default withFormContext(ClusterHostChooser)
