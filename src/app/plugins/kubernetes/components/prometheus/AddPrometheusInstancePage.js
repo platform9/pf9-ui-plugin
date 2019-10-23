@@ -96,7 +96,7 @@ const AddPrometheusInstanceForm = ({ onComplete }) => {
                 {enableStorage &&
                 <CheckboxField id="enablePersistentStorage" label="Enable persistent storage" />}
                 <TextField id="retention" label="Storage Retention (days)" info="Defaults to 15 days if nothing is set" />
-                <TextField id="port" label="Service Monitor Port" info="Port for the service monitor" />
+                <TextField id="port" label="Metrics Exporter Port" info="Name of Prometheus Exporter Port for fetching application merices" />
                 <KeyValuesField id="appLabels" label="App Labels" info="Key/value pairs for app that Prometheus will monitor" />
               </ValidatedForm>
             </WizardStep>
