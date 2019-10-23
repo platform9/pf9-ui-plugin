@@ -22,9 +22,6 @@ const initialContext = {
   servicesCidr: '10.21.0.0/16',
   networkPlugin: 'flannel',
   runtimeConfigOption: 'default',
-
-  // TODO: remove after development done
-  name: 'someCluster',
 }
 
 const runtimeConfigOptions = [
@@ -36,7 +33,8 @@ const runtimeConfigOptions = [
 const AddBareOsClusterPage = () => {
   const { params } = useParams()
   const { history } = useReactRouter()
-  const onComplete = () => {
+  const onComplete = success => {
+    if (!success) { return console.error('Unable to create cluster') }
     history.push('/ui/kubernetes/infrastructure#clusters')
   }
   const [create] = useDataUpdater(clusterActions.create, onComplete) // eslint-disable-line
@@ -57,6 +55,9 @@ const AddBareOsClusterPage = () => {
     }
     if (data.httpProxy) { body.httpProxy = data.httpProxy }
     if (data.networkPlugin === 'calico') { body.mtuSize = data.mtuSize }
+    if (data.enableMetallb) {
+      data.metallbCidr = `${data.metalAddressPoolStart}-${data.metalAddressPoolEnd}`
+    }
 
     data.runtimeConfig = {
       default: '',
@@ -143,14 +144,20 @@ const AddBareOsClusterPage = () => {
                       <TextField
                         id="masterVipIpv4"
                         label="Virtual IP address for cluster"
-                        info=""
+                        info={
+                          <div>
+                            Specify the virtual IP address that will be used to provide access to the API server endpoint for this cluster.
+                            Refer to <a href="https://docs.platform9.com/support/ha-for-baremetal-multimaster-kubernetes-cluster-service-type-load-balancer/">this article</a>
+                            for more information re how the VIP service operates, VIP configuration, etc.
+                          </div>
+                        }
                         required
                       />
 
                       <TextField
                         id="masterVipIface"
                         label="Physical interface for virtual IP association"
-                        info=""
+                        info="Provide the name of the network interface that the virtual IP should be bound to. The virtual IP should be reachable from the network this interface connects to. Note: All master nodes should use the same interface (eg: ens3) that the virtual IP will be bound to."
                         required
                       />
 
@@ -158,16 +165,24 @@ const AddBareOsClusterPage = () => {
                       <CheckboxField
                         id="enableMetallb"
                         label="Enable MetalLB"
-                        info=""
+                        info="Select if MetalLB should load-balancer should be enabled for this cluster. Platform9 uses MetalLB - a load-balancer implementation for bare metal Kubernetes clusters that uses standard routing protocols - for service level load balancing. Enabling MetalLB on this cluster will provide the ability to create services of type load-balancer."
                       />
 
                       {values.enableMetallb &&
-                        <TextField
-                          id="metalLbCidr"
-                          label="Address pool for MetalLB Load Balancer"
-                          info=""
-                          required
-                        />
+                        <>
+                          <TextField
+                            id="metalAddressPoolStart"
+                            label="Start of address pool for MetalLB"
+                            info="Provide the IP address pool that MetalLB load-balancer is allowed to allocate from. You need to specify an explicit start-end range of IPs for the pool."
+                            required
+                          />
+                          <TextField
+                            id="metalAddressPoolEnd"
+                            label="End of address pool for MetalLB"
+                            info="Provide the IP address pool that MetalLB load-balancer is allowed to allocate from. You need to specify an explicit start-end range of IPs for the pool."
+                            required
+                          />
+                        </>
                       }
 
                       {/* API FQDN */}
