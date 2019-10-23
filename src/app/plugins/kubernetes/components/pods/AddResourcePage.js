@@ -49,8 +49,8 @@ const resourceTypes = [
 ]
 const listRoutes = {
   pod: `${k8sPrefix}/pods`,
-  deployment: `${k8sPrefix}/deployments`,
-  service: `${k8sPrefix}/services`,
+  deployment: `${k8sPrefix}/pods#deployments`,
+  service: `${k8sPrefix}/pods#services`,
 }
 
 const yamlTemplates = {
