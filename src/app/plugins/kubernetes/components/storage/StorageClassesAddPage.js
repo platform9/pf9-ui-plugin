@@ -108,10 +108,10 @@ const getInitialStorageClassYaml = (wizardContext) => {
     metadata: {
       name: wizardContext.name,
       annotations: {
-        'storageclass.kubernetes.io/is-default-class': wizardContext.isDefault,
+        'storageclass.kubernetes.io/is-default-class': wizardContext.isDefault.toString(),
       },
       labels: {
-        'kubernetes.io/cluster-service': true,
+        'kubernetes.io/cluster-service': true.toString(),
       },
     },
     provisioner: 'kubernetes.io/aws-ebs',
