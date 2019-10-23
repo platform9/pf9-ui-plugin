@@ -34,11 +34,10 @@ const ClusterHostChooser = forwardRef(({
 
   useEffect(() => {
     onChange && onChange(selected)
-  }, [selected, onChange])
+  }, [selected])
 
   return (
     <React.Fragment>
-      <pre>{JSON.stringify(selected, null, 4)}</pre>
       <Table ref={ref}>
         <TableHead>
           <TableRow>

@@ -69,12 +69,14 @@ const AddBareOsClusterPage = () => {
     data.nodePoolUuid = nodePools.find(x => x.name === 'defaultPool').uuid
 
     // 2. Create the cluster
-    // await create(body)
-    console.log('TODO: submit cluster create API call with body:')
-    console.log(body)
+    await create(body)
 
-    // 3. Attach the master nodes
-    // 4. Attach the worker nodes
+    // 3. Attach the nodes
+    const nodes = [
+      ...data.masterNodes.map(uuid => ({ isMaster: true, uuid })),
+      ...data.workerNodes.map(uuid => ({ isMaster: false, uuid })),
+    ]
+    qbert.attachNodes(body.clusterUuid, nodes)
 
     return body
   }
@@ -89,7 +91,6 @@ const AddBareOsClusterPage = () => {
                 <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                   {({ setFieldValue, values }) => (
                     <>
-                      <pre>{JSON.stringify(wizardContext, null, 4)}</pre>
                       {/* Cluster Name */}
                       <TextField
                         id="name"
@@ -98,12 +99,19 @@ const AddBareOsClusterPage = () => {
                         required
                       />
 
-                      {/* TODO: BUG, wizardContext keeps getting cleared with the original values even if the onChange changes the values */}
+                      <div>TODO: Download CLI tool. (pending backend work)</div>
+
+                      {/* Master nodes */}
                       <ClusterHostChooser
+                        id="masterNodes"
                         isMaster
-                        onChange={x => setWizardContext({ masterNodes: x })}
-                        excludeList={[]}
-                        value={wizardContext.masterNodes}
+                      />
+
+                      {/* Workloads on masters */}
+                      <CheckboxField
+                        id="allowWorkloadsOnMaster"
+                        label="Allow workloads on master nodes"
+                        info="It is highly recommended to not enable workloads on master nodes for production or critical workload clusters."
                       />
                     </>
                   )}
@@ -116,11 +124,9 @@ const AddBareOsClusterPage = () => {
                 <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                   {({ setFieldValue, values }) => (
                     <>
-                      <pre>{JSON.stringify(wizardContext, null, 4)}</pre>
-                      {/* TODO: BUG, wizardContext keeps getting cleared with the original values even if the onChange changes the values */}
+                      {/* Worker nodes */}
                       <ClusterHostChooser
-                        onChange={x => setWizardContext({ workerNodes: x })}
-                        value={wizardContext.workerNodes}
+                        id="workerNodes"
                         excludeList={wizardContext.masterNodes}
                       />
                     </>
