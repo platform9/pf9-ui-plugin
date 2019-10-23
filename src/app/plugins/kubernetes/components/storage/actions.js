@@ -33,8 +33,7 @@ const storageClassActions = createCRUDActions(storageClassesCacheKey, {
   createFn: async ({ clusterId, storageClassYaml }) => {
     const { qbert } = ApiClient.getInstance()
     const body = yaml.safeLoad(storageClassYaml)
-
-    await qbert.createStorageClass(clusterId, body)
+    return qbert.createStorageClass(clusterId, body)
   },
   entityName: 'Storage Class',
 })
