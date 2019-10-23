@@ -9,6 +9,7 @@ import { pick } from 'ramda'
 import NamespacePicklist from 'k8s/components/common/NamespacePicklist'
 import ExternalLink from 'core/components/ExternalLink'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
+import renderLabels from 'k8s/components/pods/renderLabels'
 
 const defaultParams = {
   masterNodeClusters: true,
@@ -67,7 +68,7 @@ const renderStatus = status => {
 
 const renderEndpoints = endpoints => {
   return <>
-    {endpoints.map(endpoint => <div key={endpoint}>{endpoint}</div>)}
+    {endpoints.map((endpoint, i) => <div key={i}>{endpoint}</div>)}
   </>
 }
 
@@ -81,8 +82,8 @@ export const options = {
     { id: 'status', label: 'Status', render: renderStatus },
     { id: 'clusterName', label: 'Cluster' },
     { id: 'namespace', label: 'Namespace' },
-    // { id: 'labels', label: 'Labels', render: renderLabels('label') },
-    // { id: 'selectors', label: 'Selectors', render: renderLabels('selector') },
+    { id: 'labels', label: 'Labels', render: renderLabels('label') },
+    { id: 'selectors', label: 'Selectors', render: renderLabels('selector') },
     { id: 'clusterIp', label: 'Cluster IP' },
     { id: 'internalEndpoints', label: 'Internal Endpoints', render: renderEndpoints },
     { id: 'externalEndpoints', label: 'External Endpoints', render: renderEndpoints },

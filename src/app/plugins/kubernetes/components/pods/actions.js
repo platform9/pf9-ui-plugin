@@ -185,7 +185,9 @@ export const serviceActions = createCRUDActions(kubeServicesCacheKey, {
         return {
           ...service,
           dashboardUrl,
-          type: pathStr('spec.type', service),
+          labels: pathStr('metadata.labels', service),
+          selectors: pathStrOr(emptyObj, 'spec.selector', service),
+          type,
           status,
           clusterIp,
           internalEndpoints,
