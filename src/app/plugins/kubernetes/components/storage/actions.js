@@ -1,5 +1,6 @@
 import ApiClient from 'api-client/ApiClient'
 import { assoc, propEq } from 'ramda'
+import yaml from 'js-yaml'
 import { clustersCacheKey } from 'k8s/components/infrastructure/common/actions'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { flatMapAsync } from 'utils/async'
@@ -28,6 +29,12 @@ const storageClassActions = createCRUDActions(storageClassesCacheKey, {
     }
     const { clusterId, name } = item
     await qbert.deleteStorageClass(clusterId, name)
+  },
+  createFn: async ({ clusterId, storageClassYaml }) => {
+    const { qbert } = ApiClient.getInstance()
+    const body = yaml.safeLoad(storageClassYaml)
+
+    await qbert.createStorageClass(clusterId, body)
   },
   entityName: 'Storage Class',
 })

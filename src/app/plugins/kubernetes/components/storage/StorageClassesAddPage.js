@@ -1,4 +1,5 @@
 import React from 'react'
+import yaml from 'js-yaml'
 import createAddComponents from 'core/helpers/createAddComponents'
 import Wizard from 'core/components/wizard/Wizard'
 import WizardStep from 'core/components/wizard/WizardStep'
@@ -11,18 +12,22 @@ import CodeMirror from 'core/components/validatedForm/CodeMirror'
 import { codeMirrorOptions } from 'app/constants'
 import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
 import { storageClassesCacheKey } from './actions'
+import useParams from 'core/hooks/useParams'
 
-const initialContext = {}
+const initialContext = {
+  isDefault: false,
+}
 
-// TODO: handleSubmit
-const handleSubmit = (data) => console.log({ data })
-
-export const AddStorageClassForm = () =>
-  <Wizard onComplete={handleSubmit} context={initialContext}>
-    {({ setWizardContext, onNext }) =>
+export const AddStorageClassForm = ({ onComplete }) =>
+  <Wizard onComplete={onComplete} context={initialContext}>
+    {({ wizardContext, setWizardContext, onNext }) =>
       <>
         <BasicStep onSubmit={setWizardContext} triggerSubmit={onNext} />
-        <CustomizeStep onSubmit={setWizardContext} triggerSubmit={onNext} />
+        <CustomizeStep
+          wizardContext={wizardContext}
+          onSubmit={setWizardContext}
+          triggerSubmit={onNext}
+        />
       </>
     }
   </Wizard>
@@ -57,26 +62,66 @@ const BasicStep = ({ onSubmit, triggerSubmit }) =>
     </FormWrapper>
   </WizardStep>
 
-const CustomizeStep = ({ onSubmit, triggerSubmit }) =>
+const CustomizeStep = ({ ...rest }) =>
   <WizardStep stepId="customize" label="Customize">
-    <p>
-      Optionally edit the storage class YAML for advanced configuration. See this <a href='https://kubernetes.io/docs/concepts/storage/persistent-volumes/#storageclasses'>article</a> for more information.
-    </p>
-    <p>
-      <b>NOTE:</b> In case of a conflict with options selected on the previous page, changes you make here will override them.
-    </p>
-    <br />
-    <FormWrapper title="Customize">
-      <ValidatedForm onSubmit={onSubmit} triggerSubmit={triggerSubmit}>
-        <CodeMirror
-          id="storageClassYaml"
-          label="Storage Class YAML"
-          options={codeMirrorOptions}
-          required
-        />
-      </ValidatedForm>
-    </FormWrapper>
+    <CustomizeStepContent {...rest} />
   </WizardStep>
+
+const CustomizeStepContent = ({ isActive, wizardContext, onSubmit, triggerSubmit }) => {
+  const isInvalidContext = wizardContext.name == null || wizardContext.isDefault == null
+  if (isInvalidContext) {
+    return null
+  }
+
+  const storageClassYaml = getInitialStorageClassYaml(wizardContext)
+  const { params, getParamsUpdater } = useParams({ storageClassYaml })
+
+  return (
+    <>
+      <p>
+        Optionally edit the storage class YAML for advanced configuration. See this <a href='https://kubernetes.io/docs/concepts/storage/persistent-volumes/#storageclasses'>article</a> for more information.
+      </p>
+      <p>
+        <b>NOTE:</b> In case of a conflict with options selected on the previous page, changes you make here will override them.
+      </p>
+      <br />
+      <FormWrapper title="Customize">
+        <ValidatedForm onSubmit={onSubmit} triggerSubmit={triggerSubmit}>
+          <CodeMirror
+            id="storageClassYaml"
+            label="Storage Class YAML"
+            options={codeMirrorOptions}
+            onChange={getParamsUpdater('storageClassYaml')}
+            initialValue={params.storageClassYaml}
+            required
+          />
+        </ValidatedForm>
+      </FormWrapper>
+    </>
+  )
+}
+
+const getInitialStorageClassYaml = (wizardContext) => {
+  const storageClass = {
+    apiVersion: 'storage.k8s.io/v1',
+    kind: 'StorageClass',
+    metadata: {
+      name: wizardContext.name,
+      annotations: {
+        'storageclass.kubernetes.io/is-default-class': wizardContext.isDefault,
+      },
+      labels: {
+        'kubernetes.io/cluster-service': true,
+      },
+    },
+    provisioner: 'kubernetes.io/aws-ebs',
+    parameters: {
+      type: 'gp2', // TODO: Add picklist for type
+    },
+  }
+
+  return yaml.safeDump(storageClass)
+}
 
 export const options = {
   cacheKey: storageClassesCacheKey,

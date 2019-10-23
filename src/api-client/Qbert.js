@@ -214,8 +214,8 @@ class Qbert {
     return data.items.map(this.convertResource(clusterId)).map(mapStorageClass)
   }
 
-  createStorageClass = async (clusterId, params) => {
-    return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/storage.k8s.io/v1/storageclasses`)
+  createStorageClass = async (clusterId, body) => {
+    return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/storage.k8s.io/v1/storageclasses`, body)
   }
 
   deleteStorageClass = async (clusterId, name) => {
