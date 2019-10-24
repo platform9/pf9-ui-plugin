@@ -10,11 +10,11 @@ const renderKeyValues = obj => Object.entries(obj)
 const PrometheusRulesTable = ({ rules, onDelete }) => {
   var groups = rules
   var allRules = groups.map((group) => {
-    return [...group.rules.map(rule => ({
+    return group.rules.map(rule => ({
       ...rule,
       group: name,
       labels: isNilOrEmpty(rule.labels) ? {} : rule.labels,
-    }))]
+    }))
   }).flat()
 
   return (
