@@ -34,8 +34,7 @@ const runtimeConfigOptions = [
 const AddBareOsClusterPage = () => {
   const { params, getParamsUpdater } = useParams()
   const { history } = useReactRouter()
-  const onComplete = success => {
-    if (!success) { return console.error('Unable to create cluster') }
+  const onComplete = () => {
     history.push('/ui/kubernetes/infrastructure#clusters')
   }
   const [create] = useDataUpdater(clusterActions.create, onComplete) // eslint-disable-line
