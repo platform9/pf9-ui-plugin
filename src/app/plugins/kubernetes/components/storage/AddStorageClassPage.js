@@ -51,6 +51,7 @@ const BasicStep = ({ onSubmit, triggerSubmit }) =>
           id="clusterId"
           label="Cluster"
           info="The cluster to deploy this storage class on."
+          onlyHealthyClusters
           required
         />
         <CheckboxField
