@@ -17,7 +17,7 @@ export const options = {
   cacheKey: prometheusRulesCacheKey,
   editUrl: '/ui/kubernetes/prometheus/rules/edit',
   name: 'PrometheusRules',
-  title: 'Prometheus Rules',
+  title: 'Prometheus Rule Set',
   uniqueIdentifier: 'uid',
 }
 

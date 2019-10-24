@@ -452,8 +452,12 @@ class Qbert {
   }
 
   getPrometheusServiceMonitors = async (clusterUuid) => {
-    const response = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/servicemonitors`)
-    return normalizeClusterizedResponse(clusterUuid, response)
+    try {
+      const response = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/servicemonitors`)
+      return normalizeClusterizedResponse(clusterUuid, response)
+    } catch (e) {
+      return []
+    }
   }
 
   updatePrometheusServiceMonitor = async data => {
@@ -473,8 +477,12 @@ class Qbert {
   }
 
   getPrometheusRules = async (clusterUuid) => {
-    const response = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/prometheusrules`)
-    return normalizeClusterizedResponse(clusterUuid, response)
+    try {
+      const response = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/prometheusrules`)
+      return normalizeClusterizedResponse(clusterUuid, response)
+    } catch (e) {
+      return []
+    }
   }
 
   updatePrometheusRules = async rulesObject => {
@@ -494,8 +502,12 @@ class Qbert {
   }
 
   getPrometheusAlertManagers = async (clusterUuid) => {
-    const response = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/alertmanagers`)
-    return normalizeClusterizedResponse(clusterUuid, response)
+    try {
+      const response = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/alertmanagers`)
+      return normalizeClusterizedResponse(clusterUuid, response)
+    } catch (e) {
+      return []
+    }
   }
 
   updatePrometheusAlertManager = async data => {

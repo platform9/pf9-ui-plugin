@@ -126,7 +126,7 @@ export const prometheusRuleActions = createCRUDActions(prometheusRulesCacheKey, 
       name: metadata.name,
       namespace: metadata.namespace,
       labels: metadata.labels,
-      rules: pathOr([], ['groups', 0, 'rules'], spec),
+      rules: pathOr([], ['groups'], spec),
     }))(items)
   },
   uniqueIdentifier,
