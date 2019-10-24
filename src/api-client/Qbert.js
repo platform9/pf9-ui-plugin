@@ -1,4 +1,4 @@
-import { assoc, propOr } from 'ramda'
+import { propOr } from 'ramda'
 import { keyValueArrToObj } from 'utils/fp'
 import { pathJoin } from 'utils/misc'
 import { normalizeResponse } from 'api-client/helpers'
@@ -214,8 +214,7 @@ class Qbert {
 
   getClusterStorageClasses = async (clusterId) => {
     const data = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/storage.k8s.io/v1/storageclasses`)
-    const mapStorageClass = sc => assoc('type', sc.parameters.type, sc)
-    return data.items.map(this.convertResource(clusterId)).map(mapStorageClass)
+    return data.items.map(this.convertResource(clusterId))
   }
 
   createStorageClass = async (clusterId, body) => {

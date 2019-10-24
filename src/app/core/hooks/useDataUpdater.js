@@ -61,7 +61,7 @@ const useDataUpdater = (updaterFn, onComplete) => {
         await onComplete(successful)
       }
     }
-  }, [updaterFn, getContext, setContext])
+  }, [updaterFn, onComplete, getContext, setContext])
 
   useEffect(() => {
     return () => {

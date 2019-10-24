@@ -104,7 +104,7 @@ const createCRUDComponents = options => {
   // ListContainer
   const ListContainer = ({ data, loading, reload, ...restProps }) => {
     const [handleRemove, deleting] = deleteFn ? useDataUpdater(deleteFn, reload) : emptyArr
-    const refetch = useCallback(() => reload(true))
+    const refetch = useCallback(() => reload(true), [reload])
     return (
       <CRUDListContainer
         items={data}
