@@ -7,6 +7,7 @@ const renderKeyValues = obj => Object.entries(obj)
   .map(([key, value]) => `${key}: ${value}`)
   .join(', ')
 
+
 // Disabling for now until the backend has the links for this working
 /*
 const renderDashboardLink = (field, row, context) => {
