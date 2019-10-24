@@ -21,16 +21,17 @@ const useStyles = makeStyles(theme => ({
   card: {
     display: 'flex',
     flexFlow: 'column nowrap',
-    paddingBottom: theme.spacing(3),
+    padding: theme.spacing(1, 1, 3, 1),
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     overflowWrap: 'break-word',
   },
   paper: {
-    paddingBottom: theme.spacing(3),
+    padding: theme.spacing(1, 1, 3, 1),
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     overflowWrap: 'break-word',
+    backgroundColor: '#e2f4ff'
   },
   icon: {
     width: '100%',
@@ -63,7 +64,7 @@ const AppDetailsPage = () => {
       onClose={() => setShowingDeployDialog(false)} />}
     <Progress loading={loadingApp} overlay renderContentOnMount>
       <Grid container justify="center" spacing={3}>
-        <Grid item xs={4}>
+        <Grid item xs={3}>
           {app.logoUrl && <Card className={classes.card}>
             <CardMedia className={classes.icon} image={app.logoUrl} title={app.name} />
             <Button
@@ -114,7 +115,7 @@ const AppDetailsPage = () => {
             </Typography>
           </Paper>
         </Grid>
-        <Grid item xs={8} zeroMinWidth>
+        <Grid item xs={9} zeroMinWidth>
           <AppVersionPicklist
             label="Application Version"
             appId={params.appId}

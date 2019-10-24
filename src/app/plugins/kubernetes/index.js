@@ -31,6 +31,7 @@ import LoggingEditPage from './components/logging/LoggingEditPage'
 // import config from '../../../../config'
 import DashboardPage from './components/dashboard/DashboardPage'
 import AddResourcePage from 'k8s/components/pods/AddResourcePage'
+import DeployedAppDetailsPage from 'k8s/components/apps/DeployedAppDetailsPage'
 
 class Kubernetes extends React.PureComponent {
   render () {
@@ -98,6 +99,11 @@ Kubernetes.registerPlugin = pluginManager => {
         name: 'App Catalog',
         link: { path: '/apps', exact: true },
         component: AppsIndexPage,
+      },
+      {
+        name: 'Deployed App Details',
+        link: { path: '/apps/deployed/:clusterId/:release', exact: true },
+        component: DeployedAppDetailsPage,
       },
       {
         name: 'App Details',

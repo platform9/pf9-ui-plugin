@@ -3,7 +3,7 @@ import {
   find, propOr, pick, F,
 } from 'ramda'
 import ApiClient from 'api-client/ApiClient'
-import { emptyArr, objSwitchCase, pathStr, filterIf } from 'utils/fp'
+import { emptyArr, objSwitchCase, pathStr, filterIf, pathStrOr } from 'utils/fp'
 import { allKey, imageUrlRoot, addError, deleteError, updateError } from 'app/constants'
 import { clustersCacheKey } from 'k8s/components/infrastructure/common/actions'
 import createCRUDActions from 'core/helpers/createCRUDActions'
@@ -21,6 +21,7 @@ export const singleAppCacheKey = 'appDetails'
 export const appsCacheKey = 'apps'
 export const appVersionsCacheKey = 'appVersions'
 export const releasesCacheKey = 'releases'
+export const releaseDetailCacheKey = 'deployment'
 export const repositoriesWithClustersCacheKey = 'repositoriesWithClusters'
 export const repositoriesCacheKey = 'repositories'
 
@@ -49,6 +50,27 @@ export const appDetailLoader = createContextLoader(singleAppCacheKey, async ({ c
       }
     })(items)
   },
+})
+
+export const deploymentDetailLoader = createContextLoader(releaseDetailCacheKey, async ({ clusterId, release }) => {
+  return qbert.getRelease(clusterId, release)
+}, {
+  dataMapper: async items => {
+    return map(item => ({
+      ...item,
+      name: pathStr('attributes.name', item),
+      chartName: pathStr('attributes.chartName', item),
+      version: pathStr('attributes.chartVersion', item),
+      namespace: pathStr('attributes.namespace', item),
+      status: pathStr('attributes.status', item),
+      lastUpdated: moment(pathStr('attirbutes.updated', item)).format('LL'),
+      logoUrl: pathStrOr(`${imageUrlRoot}/default-app-logo.png`, 'attributes.chartIcon', item),
+      resourcesText: pathStr('attributes.resources', item),
+      notesText: pathStr('attributes.notes', item),
+    }))(items)
+  },
+  uniqueIdentifier,
+  indexBy: ['clusterId', 'release'],
 })
 
 export const appVersionLoader = createContextLoader(appVersionsCacheKey, async ({ clusterId, appId, release }) => {
@@ -123,6 +145,9 @@ export const releaseActions = createCRUDActions(releasesCacheKey, {
       return flatMapAsync(qbert.getReleases, pluck('uuid', clusters))
     }
     return qbert.getReleases(clusterId)
+  },
+  deleteFn: async (params) => {
+    return qbert.deleteRelease(params.clusterId, params.id)
   },
   dataMapper: (items,
     { namespace }) => pipe(

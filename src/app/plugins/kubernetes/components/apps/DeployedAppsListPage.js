@@ -17,20 +17,20 @@ const styles = theme => ({
     minWidth: 100,
     minHeight: 100,
     backgroundSize: 'contain',
-    backgroundPosition: `50% ${theme.spacing(1)}px`,
+    backgroundPosition: 'center',
   },
 })
 
 const IconCell = withStyles(styles)(({ classes, ...rest }) =>
   <CardMedia className={classes.icon} {...rest} />)
 
-const renderDeployedAppIcon = (chartIcon, deployedApp) =>
-  <SimpleLink src={`/ui/kubernetes/deployed/${deployedApp.id}`}>
+const renderDeployedAppIcon = (chartIcon, { clusterId, id }) =>
+  <SimpleLink src={`/ui/kubernetes/apps/deployed/${clusterId}/${id}`}>
     <IconCell image={chartIcon} title="icon" />
   </SimpleLink>
 
-const renderDeployedAppLink = (name, deployedApp) =>
-  <SimpleLink src={`/ui/kubernetes/deployed/${deployedApp.id}`}>{name}</SimpleLink>
+const renderDeployedAppLink = (name, { clusterId, id }) =>
+  <SimpleLink src={`/ui/kubernetes/apps/deployed/${clusterId}/${id}`}>{name}</SimpleLink>
 
 const defaultParams = {
   masterNodeClusters: true,
@@ -50,7 +50,7 @@ const ListPage = ({ ListContainer }) => {
         <ClusterPicklist
           onChange={getParamsUpdater('clusterId')}
           value={params.clusterId}
-          onlyMasterNodeClusters
+          onlyAppCatalogEnabled
         />
         <NamespacePicklist
           selectFirst={false}
@@ -68,13 +68,14 @@ const ListPage = ({ ListContainer }) => {
 export const options = {
   columns: [
     { id: 'attributes.chartIcon', label: '', render: renderDeployedAppIcon },
-    { id: 'attributes.chartName', label: 'Name', render: renderDeployedAppLink },
-    { id: 'type', label: 'App Type' },
+    { id: 'attributes.name', label: 'Name', render: renderDeployedAppLink },
+    { id: 'attributes.chartName', label: 'App Type' },
     { id: 'attributes.chartVersion', label: 'Version' },
     { id: 'attributes.namespace', label: 'Namespace' },
     { id: 'attributes.status', label: 'Status' },
     { id: 'attributes.updated', label: 'Last updated' },
   ],
+  deleteFn: releaseActions.delete,
   // editUrl: '/ui/kubernetes/infrastructure/releases/edit',
   name: 'DeployedApps',
   title: 'Deployed Apps',
