@@ -13,7 +13,7 @@ const PrometheusRulesTable = ({ rules, onDelete }) => {
     return [...group.rules.map(rule => ({
       ...rule,
       group: name,
-      labels: isNilOrEmpty(rule.labels)  ? {} : rule.labels,
+      labels: isNilOrEmpty(rule.labels) ? {} : rule.labels,
     }))]
   }).flat()
 
