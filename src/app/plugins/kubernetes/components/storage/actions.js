@@ -39,7 +39,8 @@ const storageClassActions = createCRUDActions(storageClassesCacheKey, {
       id: pathStr('metadata.uid', storageClass),
       name: pathStr('metadata.name', storageClass),
       clusterName: pipe(find(propEq('uuid', storageClass.clusterId)), prop('name'))(clusters),
-      type: pathStr('parameters.type', storageClass)
+      type: pathStr('parameters.type', storageClass),
+      created: pathStr('metadata.creationTimestamp', storageClass),
     }), items)
   },
   uniqueIdentifier: 'metadata.uid',
