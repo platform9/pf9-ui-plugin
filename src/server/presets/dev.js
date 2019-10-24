@@ -31,6 +31,7 @@ import Repository from '../models/monocular/Repository'
 import StorageClass from '../models/qbert/StorageClass'
 import ClusterRepository from '../models/qbert/Repository'
 import PrometheusInstance from '../models/prometheus/PrometheusInstance'
+import ApiAccess from '../models/qbert/ApiAccess'
 import Logging from '../models/qbert/Logging'
 import LoggingStub from '../../app/plugins/kubernetes/components/logging/LoggingStub'
 import { attachNodeToCluster } from '../models/qbert/Operations'
@@ -254,6 +255,10 @@ function loadPreset () {
   Logging.create({ data: loggingsForAllClusters[2], context, config: { clusterId: cluster3.uuid } })
   Logging.create({ data: loggingsForAllClusters[3], context, config: { clusterId: cluster4.uuid } })
   Logging.create({ data: loggingsForAllClusters[4], context, config: { clusterId: cluster5.uuid } })
+
+  // API Access
+  ApiAccess.create({ data: { metadata: { name: 'fakeService', annotations: { 'storageclass.kubernetes.io/is-default-class': 'true' } } }, context, config: { clusterId: cluster.uuid } })
+
 }
 
 export default loadPreset

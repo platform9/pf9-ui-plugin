@@ -127,4 +127,10 @@ router.post(loggingBase, tokenValidator, postLogging)
 router.put(`${loggingBase}/:loggingId`, tokenValidator, putLogging)
 router.delete(`${loggingBase}/:loggingId`, tokenValidator, deleteLogging)
 
+// API Access 
+import { getApiAccess } from './apiAccess/apiAccessActions';
+
+const apiAccessBase = `${clusterK8sApiBase}/apis/logging.pf9.io/v1alpha1/outputs1`
+router.get(apiAccessBase, tokenValidator, getApiAccess)
+
 export default router

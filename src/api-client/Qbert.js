@@ -528,6 +528,18 @@ class Qbert {
     }
   }
 
+  getApiAccessBaseUrl = async (clusterUuid) => `${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/logging.pf9.io/v1alpha1/outputs1`
+
+  getApiAccess = async (clusterUuid) => {
+    try {
+      const url = await this.getApiAccessBaseUrl(clusterUuid)
+      const response = await this.client.basicGet(url)
+      return response
+    } catch (e) {
+      console.log(`Could not fetch api access info for cluster ${clusterUuid}`)
+    }
+  }
+
   createLogging = async (clusterUuid, logging) => {
     const url = await this.getLoggingsBaseUrl(clusterUuid)
     const response = await this.client.basicPost(url, logging)
