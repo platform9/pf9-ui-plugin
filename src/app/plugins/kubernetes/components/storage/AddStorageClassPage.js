@@ -39,8 +39,7 @@ const BasicStep = ({ onSubmit, triggerSubmit }) => {
     healthyClusters: true,
   }
   const [storageClasses] = useDataLoader(storageClassesActions.list, listStorageClassesParams)
-  const { params, updateParams } = useParams()
-  const updateClusterId = useCallback(clusterId => updateParams({ clusterId }), [params.clusterId])
+  const { params, getParamsUpdater } = useParams()
   const defaultExists = !!storageClasses.find(storageClass =>
     storageClass.clusterId === params.clusterId &&
     storageClass.metadata.annotations['storageclass.kubernetes.io/is-default-class'] === 'true'
@@ -65,7 +64,7 @@ const BasicStep = ({ onSubmit, triggerSubmit }) => {
             id="clusterId"
             label="Cluster"
             info="The cluster to deploy this storage class on."
-            onChange={updateClusterId}
+            onChange={getParamsUpdater('clusterId')}
             value={params.clusterId}
             onlyHealthyClusters
             required
