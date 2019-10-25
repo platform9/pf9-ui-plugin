@@ -2,8 +2,8 @@ import jsYaml from 'js-yaml'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import ApiClient from 'api-client/ApiClient'
 import { allKey } from 'app/constants'
-import { pluck, pipe, propEq, find, prop, pathEq, any, toPairs, head } from 'ramda'
-import { flatMapAsync, mapAsync, pipeAsync } from 'utils/async'
+import { pluck, pipe, propEq, find, prop, pathEq, any, toPairs, head, flatten } from 'ramda'
+import { mapAsync, pipeAsync, someAsync } from 'utils/async'
 import { parseClusterParams } from 'k8s/components/infrastructure/clusters/actions'
 import { pathJoin } from 'utils/misc'
 import { clustersCacheKey } from 'k8s/components/infrastructure/common/actions'
@@ -20,7 +20,7 @@ export const podActions = createCRUDActions(podsCacheKey, {
   listFn: async (params, loadFromContext) => {
     const [clusterId, clusters] = await parseClusterParams(params, loadFromContext)
     if (clusterId === allKey) {
-      return flatMapAsync(qbert.getClusterPods, pluck('uuid', clusters))
+      return someAsync(pluck('uuid', clusters).map(qbert.getClusterPods)).then(flatten)
     }
     return qbert.getClusterPods(clusterId)
   },
@@ -38,6 +38,7 @@ export const podActions = createCRUDActions(podsCacheKey, {
       // Filter by namespace
       filterIf(namespace && namespace !== allKey, pathEq(['metadata', 'namespace'], namespace)),
       mapAsync(async pod => {
+        const clusterId = prop('clusterId', pod)
         const dashboardUrl = pathJoin(await qbert.clusterBaseUrl(pod.clusterId),
           k8sDocUrl,
           'pod',
@@ -49,7 +50,6 @@ export const podActions = createCRUDActions(podsCacheKey, {
           dashboardUrl,
           namespace: pathStr('metadata.namespace', pod),
           labels: pathStr('metadata.labels', pod),
-          clusterId,
           clusterName: pipe(find(propEq('uuid', clusterId)), prop('name'))(clusters),
         }
       }),
@@ -63,23 +63,15 @@ export const deploymentActions = createCRUDActions(deploymentsCacheKey, {
   listFn: async (params, loadFromContext) => {
     const [clusterId, clusters] = await parseClusterParams(params, loadFromContext)
     if (clusterId === allKey) {
-      return flatMapAsync(qbert.getClusterDeployments, pluck('uuid', clusters))
+      return someAsync(pluck('uuid', clusters).map(qbert.getClusterDeployments)).then(flatten)
     }
     return qbert.getClusterDeployments(clusterId)
   },
   createFn: async ({ clusterId, namespace, yaml }) => {
     const body = jsYaml.safeLoad(yaml)
-    const created = await qbert.createDeployment(clusterId, namespace, body)
     // Also need to refresh the list of pods
     podActions.invalidateCache()
-    return {
-      ...created,
-      clusterId,
-      name: pathStr('metadata.name', created),
-      created: pathStr('metadata.creationTimestamp', created),
-      id: pathStr('metadata.uid', created),
-      namespace: pathStr('metadata.namespace', created),
-    }
+    return qbert.createDeployment(clusterId, namespace, body)
   },
   dataMapper: async (items, { clusterId, namespace }, loadFromContext) => {
     const [clusters, pods] = await Promise.all([
@@ -97,13 +89,14 @@ export const deploymentActions = createCRUDActions(deploymentsCacheKey, {
           pathStr('metadata.name', deployment),
         )
         const selectors = pathStrOr(emptyObj, 'spec.selector.matchLabels', deployment)
+        const clusterId = prop('clusterId', deployment)
         const namespace = pathStr('metadata.namespace', deployment)
         const [labelKey, labelValue] = head(toPairs(selectors)) || emptyArr
 
         // Check if any pod label matches the first deployment match label key
         // Note: this logic should probably be revised (copied from Clarity UI)
         const deploymentPods = pods.filter(pod => {
-          if (pod.namespace !== namespace) {
+          if (pod.namespace !== namespace || pod.clusterId !== clusterId) {
             return false
           }
           const podLabels = pathStr('metadata.labels', pod)
@@ -114,11 +107,14 @@ export const deploymentActions = createCRUDActions(deploymentsCacheKey, {
         return {
           ...deployment,
           dashboardUrl,
+          id: pathStr('metadata.uid', deployment),
+          name: pathStr('metadata.name', deployment),
+          created: pathStr('metadata.creationTimestamp', deployment),
           labels: pathStr('metadata.labels', deployment),
           selectors,
           pods: deploymentPods.length,
-          clusterId,
-          clusterName: pipe(find(propEq('uuid', clusterId)), prop('name'))(clusters),
+          namespace,
+          clusterName: pipe(find(propEq('uuid', deployment.clusterId)), prop('name'))(clusters),
         }
       }),
     )(items)
@@ -132,7 +128,7 @@ export const serviceActions = createCRUDActions(kubeServicesCacheKey, {
   listFn: async (params, loadFromContext) => {
     const [clusterId, clusters] = await parseClusterParams(params, loadFromContext)
     if (clusterId === allKey) {
-      return flatMapAsync(qbert.getClusterKubeServices, pluck('uuid', clusters))
+      return someAsync(pluck('uuid', clusters).map(qbert.getClusterKubeServices)).then(flatten)
     }
     return qbert.getClusterKubeServices(clusterId)
   },
@@ -164,6 +160,7 @@ export const serviceActions = createCRUDActions(kubeServicesCacheKey, {
           pathStr('metadata.namespace', service),
           pathStr('metadata.name', service),
         )
+        const clusterId = prop('clusterId', service)
         const type = pathStr('spec.type', service)
         const externalName = pathStr('spec.externalName', service)
         const name = pathStr('metadata.name', service)
@@ -193,7 +190,6 @@ export const serviceActions = createCRUDActions(kubeServicesCacheKey, {
           internalEndpoints,
           externalEndpoints,
           namespace: pathStr('metadata.namespace', service),
-          clusterId,
           clusterName: pipe(find(propEq('uuid', clusterId)), prop('name'))(clusters),
         }
       }),

@@ -3,7 +3,7 @@ import Picklist from 'core/components/Picklist'
 import { projectAs } from 'utils/fp'
 import useDataLoader from 'core/hooks/useDataLoader'
 import PropTypes from 'prop-types'
-import { isEmpty, propOr, head } from 'ramda'
+import { isEmpty, propOr, head, uniqBy, prop } from 'ramda'
 import { allKey } from 'app/constants'
 import namespaceActions from 'k8s/components/namespaces/actions'
 
@@ -12,9 +12,8 @@ const NamespacePicklist = forwardRef(
   ({ clusterId, loading, onChange, selectFirst, ...rest }, ref) => {
     const [namespaces, namespacesLoading] = useDataLoader(namespaceActions.list, { clusterId })
     const options = useMemo(() => projectAs(
-      { label: 'name', value: 'name' }, namespaces,
+      { label: 'name', value: 'name' }, uniqBy(prop('name'), namespaces),
     ), [namespaces])
-
     // Select the first item as soon as data is loaded
     useEffect(() => {
       if (!isEmpty(options) && selectFirst) {

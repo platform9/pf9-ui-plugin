@@ -1,10 +1,10 @@
 import { pathStrOrNull, objSwitchCase } from 'utils/fp'
-import { map, pathEq, find, pluck, curry, pipe, last, pathOr, prop, propEq } from 'ramda'
+import { map, pathEq, find, pluck, curry, pipe, last, pathOr, prop, propEq, flatten } from 'ramda'
 import ApiClient from 'api-client/ApiClient'
 import { clustersCacheKey } from '../infrastructure/common/actions'
 import { notFoundErr } from 'app/constants'
 import createCRUDActions from 'core/helpers/createCRUDActions'
-import { flatMapAsync } from 'utils/async'
+import { someAsync } from 'utils/async'
 
 const { appbert, qbert } = ApiClient.getInstance()
 const uniqueIdentifier = 'metadata.uid'
@@ -49,7 +49,7 @@ export const prometheusInstanceActions = createCRUDActions(prometheusInstancesCa
   listFn: async (params, loadFromContext) => {
     const clusterTags = await loadFromContext(clusterTagsCacheKey)
     const clusterUuids = pluck('uuid', clusterTags.filter(hasMonitoring))
-    return flatMapAsync(qbert.getPrometheusInstances, clusterUuids)
+    return someAsync(clusterUuids.map(qbert.getPrometheusInstances)).then(flatten)
   },
   createFn: async data => {
     return qbert.createPrometheusInstance(data.cluster, data)
@@ -101,7 +101,7 @@ export const prometheusRuleActions = createCRUDActions(prometheusRulesCacheKey, 
   listFn: async (params, loadFromContext) => {
     const clusterTags = await loadFromContext(clusterTagsCacheKey)
     const clusterUuids = pluck('uuid', clusterTags.filter(hasMonitoring))
-    return flatMapAsync(qbert.getPrometheusRules, clusterUuids)
+    return someAsync(clusterUuids.map(qbert.getPrometheusRules)).then(flatten)
   },
   updateFn: async data => {
     return qbert.updatePrometheusRules(data)
@@ -139,7 +139,7 @@ export const prometheusServiceMonitorActions = createCRUDActions(prometheusServi
   listFn: async (params, loadFromContext) => {
     const clusterTags = await loadFromContext(clusterTagsCacheKey)
     const clusterUuids = pluck('uuid', clusterTags.filter(hasMonitoring))
-    return flatMapAsync(qbert.getPrometheusServiceMonitors, clusterUuids)
+    return someAsync(clusterUuids.map(qbert.getPrometheusServiceMonitors)).then(flatten)
   },
   updateFn: async data => {
     return qbert.updatePrometheusServiceMonitor(data)
@@ -178,7 +178,7 @@ export const prometheusAlertManagerActions = createCRUDActions(prometheusAlertMa
   listFn: async (params, loadFromContext) => {
     const clusterTags = await loadFromContext(clusterTagsCacheKey)
     const clusterUuids = pluck('uuid', clusterTags.filter(hasMonitoring))
-    return flatMapAsync(qbert.getPrometheusAlertManagers, clusterUuids)
+    return someAsync(clusterUuids.map(qbert.getPrometheusAlertManagers)).then(flatten)
   },
   updateFn: async data => {
     return qbert.updatePrometheusAlertManager(data)

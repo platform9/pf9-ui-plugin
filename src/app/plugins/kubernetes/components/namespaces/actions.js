@@ -1,10 +1,10 @@
-import { pluck } from 'ramda'
+import { pluck, flatten } from 'ramda'
 import { allKey } from 'app/constants'
 import ApiClient from 'api-client/ApiClient'
 import { clustersCacheKey } from 'k8s/components/infrastructure/common/actions'
 import createCRUDActions from 'core/helpers/createCRUDActions'
-import { flatMapAsync } from 'utils/async'
 import { parseClusterParams } from 'k8s/components/infrastructure/clusters/actions'
+import { someAsync } from 'utils/async'
 
 const { qbert } = ApiClient.getInstance()
 
@@ -26,7 +26,7 @@ const namespaceActions = createCRUDActions(namespacesCacheKey, {
   listFn: async (params, loadFromContext) => {
     const [ clusterId, clusters ] = await parseClusterParams(params, loadFromContext)
     if (clusterId === allKey) {
-      return flatMapAsync(qbert.getClusterNamespaces, pluck('uuid', clusters))
+      return someAsync(pluck('uuid', clusters).map(qbert.getClusterNamespaces)).then(flatten)
     }
     return qbert.getClusterNamespaces(clusterId)
   },
