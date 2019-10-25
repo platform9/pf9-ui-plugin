@@ -1,11 +1,14 @@
 import ApiClient from 'api-client/ApiClient'
 import {
-  path, any, pluck, pipe, uniq, reduce, map, head, values, groupBy, prop, innerJoin, pathEq,
-  flatten, find,
+  any, pluck, pipe, uniq, map, head, values, groupBy, prop, innerJoin, pathEq, flatten, find,
+  propEq, filter, when, isNil, always,
 } from 'ramda'
 import { tryJsonParse } from 'utils/misc'
 import { namespacesCacheKey } from 'k8s/components/namespaces/actions'
 import createCRUDActions from 'core/helpers/createCRUDActions'
+import { upsertAllBy, emptyObj } from 'utils/fp'
+import { uuidRegex } from 'app/constants'
+import createContextLoader from 'core/helpers/createContextLoader'
 
 const { keystone } = ApiClient.getInstance()
 
@@ -14,33 +17,55 @@ export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
   listFn: async () => keystone.getAllTenantsAllUsers(),
   dataMapper: async (allTenantsAllUsers, params, loadFromContext) => {
     const namespaces = await loadFromContext(namespacesCacheKey)
-    return allTenantsAllUsers.map(tenant => ({
-      ...tenant,
-      clusters: pluck('clusterName', namespaces
-        .filter(namespace => namespace.metadata.name === tenant.name)),
-    }))
+    const heatTenantId = pipe(
+      find(propEq('name', 'heat')),
+      prop('id'),
+    )(allTenantsAllUsers)
+    return pipe(
+      filter(tenant =>
+        params.blacklisted
+          ? ['admin', 'services', 'Default', 'heat'].includes(tenant.name)
+          : (tenant.domain_id !== heatTenantId &&
+          !['admin', 'services', 'Default', 'heat'].includes(tenant.name)),
+      ),
+      map(tenant => ({
+        ...tenant,
+        users: tenant.users.filter(user => user.username !== 'admin@platform9.net'),
+        clusters: pluck('clusterName', namespaces
+          .filter(namespace => namespace.metadata.name === tenant.name)),
+      })),
+    )(allTenantsAllUsers)
   },
 })
 
+const isSystemUser = ({ username }) => {
+  return uuidRegex.test(username)
+}
+createContextLoader('credentials', () => keystone.getCredentials())
+const adminUserNames = ['heatadmin', 'admin@platform9.net']
 export const mngmUsersCacheKey = 'managementUsers'
 export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
-  listFn: async (params, loadFromContext) => {
-    return loadFromContext(mngmTenantsCacheKey)
+  listFn: async () => {
+    return keystone.getUsers()
   },
-  dataMapper: tenants => {
-    // Get all tenant users and assign the corresponding tenant ID
-    const selectAllTenantUsers = reduce((acc, tenant) => {
-      const tenantUsers = tenant.users.map(user => ({
+  dataMapper: async (users, { systemUsers }, loadFromContext) => {
+    const [credentials, tenants, blacklistedTenantIds] = await Promise.all([
+      loadFromContext('credentials'),
+      loadFromContext(mngmTenantsCacheKey),
+      loadFromContext(mngmTenantsCacheKey, { blacklisted: true }).then(pluck('id')),
+    ])
+
+    // Get all tenant users and assign their corresponding tenant ID
+    const pluckUsers = map(tenant =>
+      tenant.users.map(user => ({
         ...user,
         tenantId: tenant.id,
-      }))
-      return acc.concat(tenantUsers)
-    }, [])
+      })),
+    )
 
     // Unify all users with the same ID
-    const unifyUsers = map(groupedUsers => ({
+    const unifyTenantUsers = map(groupedUsers => ({
       ...head(groupedUsers),
-      two_factor: path(['mfa', 'enabled'], head(groupedUsers)) ? 'enabled' : 'disabled',
       // Get user tenant names and concat them with commas
       tenants: innerJoin(
         (tenant, id) => tenant.id === id,
@@ -49,11 +74,35 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
       ).map(prop('name')).join(', '),
     }))
 
+    const allUsers = users.map(user => ({
+      id: user.id,
+      username: user.name,
+      displayname: user.displayname,
+      email: user.email,
+      defaultProject: user.default_project_id,
+      twoFactor: pipe(
+        find(propEq('user_id', user.id)),
+        when(isNil, always(emptyObj)),
+        propEq('type', 'totp'),
+        mfaEnabled => mfaEnabled ? 'enabled' : 'disabled',
+      )(credentials),
+    }))
+
+    const filterUsers = filter(user => {
+      return (systemUsers || !isSystemUser(user)) &&
+        user.username &&
+        !adminUserNames.includes(user.username) &&
+        !blacklistedTenantIds.includes(user.defaultProject)
+    })
+
     return pipe(
-      selectAllTenantUsers,
+      pluckUsers,
+      flatten,
       groupBy(prop('id')),
       values,
-      unifyUsers,
+      unifyTenantUsers,
+      upsertAllBy(prop('id'), allUsers),
+      filterUsers,
     )(tenants)
   },
 })
@@ -114,6 +163,6 @@ export const mngmRoleActions = createCRUDActions(mngmRolesCacheKey, {
   },
   dataMapper: roles => roles.map(role => ({
     ...role,
-    name: role.name || role.displayName,
+    name: role.displayName || role.name,
   })),
 })

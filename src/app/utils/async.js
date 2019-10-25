@@ -1,4 +1,4 @@
-import { curry, flatten, mapObjIndexed, fromPairs } from 'ramda'
+import { curry, flatten, mapObjIndexed, fromPairs, head } from 'ramda'
 import { ensureArray } from 'utils/fp'
 
 export const pluckAsync = curry((key, promise) => promise.then(obj => obj[key]))
@@ -49,4 +49,25 @@ export const propsAsync = async objPromises => {
   const results = await Promise.all(promises)
 
   return fromPairs(results)
+}
+
+/**
+ * Like Promise.all but it won't reject if any (or all) of the promises are rejected
+ * and it will always fullfill by returning an array with the successful results
+ * An error handler function can be provided to deal with promise rejections individually
+ * @param promises
+ * @param [errorHandler] Function that can be used to handle the rejected promises
+ * @returns {Promise<[*,...]>}
+ */
+export const someAsync = async (promises, errorHandler = err => console.warn(err)) => {
+  const results = await Promise.all(promises.map(async promise => {
+    try {
+      return [await promise]
+    } catch (err) {
+      errorHandler(err)
+      return null
+    }
+  }))
+  // Just return the successful results
+  return results.filter(Array.isArray).map(head)
 }

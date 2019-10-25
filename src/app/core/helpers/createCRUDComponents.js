@@ -51,6 +51,7 @@ const createCRUDComponents = options => {
     editDisabledInfo,
     debug,
     name,
+    searchTarget = 'name',
     multiSelection = true,
   } = options
 
@@ -86,7 +87,7 @@ const createCRUDComponents = options => {
         onEdit={onEdit}
         batchActions={batchActions}
         rowActions={rowActions}
-        searchTarget="name"
+        searchTarget={searchTarget}
         uniqueIdentifier={uniqueIdentifier}
         visibleColumns={visibleColumns}
         columnsOrder={columnsOrder}

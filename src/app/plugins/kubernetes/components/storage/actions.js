@@ -1,9 +1,9 @@
 import ApiClient from 'api-client/ApiClient'
-import { propEq, pluck, pipe, find, prop, map } from 'ramda'
+import { propEq, pluck, pipe, find, prop, map, flatten } from 'ramda'
 import yaml from 'js-yaml'
 import { clustersCacheKey } from 'k8s/components/infrastructure/common/actions'
 import createCRUDActions from 'core/helpers/createCRUDActions'
-import { flatMapAsync } from 'utils/async'
+import { someAsync } from 'utils/async'
 import { parseClusterParams } from 'k8s/components/infrastructure/clusters/actions'
 import { allKey, notFoundErr } from 'app/constants'
 import { pathStr } from 'utils/fp'
@@ -16,7 +16,7 @@ const storageClassActions = createCRUDActions(storageClassesCacheKey, {
   listFn: async (params, loadFromContext) => {
     const [clusterId, clusters] = await parseClusterParams(params, loadFromContext)
     if (clusterId === allKey) {
-      return flatMapAsync(qbert.getClusterStorageClasses, pluck('uuid', clusters))
+      return someAsync(pluck('uuid', clusters).map(qbert.getClusterStorageClasses)).then(flatten)
     }
     return qbert.getClusterStorageClasses(clusterId)
   },
