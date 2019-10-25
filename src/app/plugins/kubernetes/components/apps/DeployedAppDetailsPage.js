@@ -42,7 +42,7 @@ const useStyles = makeStyles(theme => ({
     fontFamily: 'monospace, serif',
     border: '1px solid #ccc',
     padding: 11,
-    whiteSpace: 'pre-wrap',
+    overflowX: 'scroll',
     color: '#212121',
   },
 }))
@@ -80,7 +80,7 @@ const DeployedAppDetailsPage = () => {
     />
     <Progress loading={loading || removing} overlay renderContentOnMount>
       <Grid container justify="center" spacing={3}>
-        <Grid item xs={3}>
+        <Grid item xs={3} lg={2}>
           {release.logoUrl && <Card className={classes.card}>
             <CardMedia className={classes.icon} image={release.logoUrl} title={release.name} />
             <Button
@@ -125,7 +125,7 @@ const DeployedAppDetailsPage = () => {
             </Typography>
           </Paper>
         </Grid>
-        <Grid item xs={9} zeroMinWidth>
+        <Grid item xs={9} lg={10} zeroMinWidth>
           <Typography variant="h4" component="h4">
             {release.name}
           </Typography>
