@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react'
+import React, { useEffect } from 'react'
 import yaml from 'js-yaml'
 import createAddComponents from 'core/helpers/createAddComponents'
 import Wizard from 'core/components/wizard/Wizard'
@@ -40,10 +40,10 @@ const BasicStep = ({ onSubmit, triggerSubmit }) => {
   }
   const [storageClasses] = useDataLoader(storageClassesActions.list, listStorageClassesParams)
   const { params, getParamsUpdater } = useParams()
-  const defaultExists = !!storageClasses.find(storageClass =>
+  const defaultStorageClassForCurrentCluster = storageClass =>
     storageClass.clusterId === params.clusterId &&
     storageClass.metadata.annotations['storageclass.kubernetes.io/is-default-class'] === 'true'
-  )
+  const defaultExists = !!storageClasses.find(defaultStorageClassForCurrentCluster)
 
   return (
     <WizardStep stepId="basic" label="Basic">
