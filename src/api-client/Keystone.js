@@ -64,6 +64,7 @@ class Keystone {
   get tenantsUrl () { return `${this.adminV3}/PF9-KSADM/all_tenants_all_users` }
   get tokensUrl () { return `${this.v3}/auth/tokens?nocatalog` }
   get usersUrl () { return `${this.v3}/users` }
+  get credentialsUrl () { return `${this.v3}/credentials` }
   get groupsUrl () { return `${this.v3}/groups` }
   get groupMappingsUrl () { return `${this.v3}/OS-FEDERATION/mappings` }
   get rolesUrl () { return `${this.v3}/roles` }
@@ -230,6 +231,11 @@ class Keystone {
       this.client.activeRegion = this.client.serviceCatalog[0].endpoints[0].region
     }
     return servicesByRegion[this.client.activeRegion]
+  }
+
+  getCredentials = async () => {
+    const response = await axios.get(this.credentialsUrl, this.client.getAuthHeaders())
+    return response.data.credentials
   }
 
   getUser = async (id) => {

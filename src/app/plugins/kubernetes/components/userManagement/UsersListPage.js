@@ -6,7 +6,7 @@ export const options = {
     { id: 'id', label: 'OpenStack ID', display: false },
     { id: 'username', label: 'Username' },
     { id: 'displayname', label: 'Display Name' },
-    { id: 'two_factor', label: 'Two-Factor Authentication' },
+    { id: 'twoFactor', label: 'Two-Factor Authentication' },
     { id: 'tenants', label: 'Tenants' },
   ],
   cacheKey: mngmUsersCacheKey,
@@ -14,6 +14,7 @@ export const options = {
   name: 'Users',
   title: 'Users',
   uniqueIdentifier: 'id',
+  searchTarget: 'username',
 }
 
 const { ListPage: UsersListPage } = createCRUDComponents(options)

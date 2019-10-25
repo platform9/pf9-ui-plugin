@@ -8,6 +8,7 @@ export const dashboardUrl = `${appUrlRoot}/kubernetes/`
 export const allKey = '__all__'
 export const noneKey = '__none__'
 export const listTablePrefs = ['visibleColumns', 'columnsOrder', 'rowsPerPage', 'orderBy', 'orderDirection']
+export const uuidRegex = new RegExp(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/, 'i')
 
 export const k8sPrefix = `${appUrlRoot}/kubernetes`
 
@@ -24,7 +25,7 @@ export const clarityDashboardUrl = `${clarityUrlRoot}/dashboard`
 export const imageUrls = Object.freeze({
   logo: `${imageUrlRoot}/logo.png`,
   loading: `${imageUrlRoot}/loading.gif`,
-  kubernetes: `${imageUrlRoot}/logo-kubernetes-h.png`
+  kubernetes: `${imageUrlRoot}/logo-kubernetes-h.png`,
 })
 
 // k8s
@@ -37,5 +38,5 @@ export const codeMirrorOptions = Object.freeze({
  * @type {object}
  */
 export const defaultAxiosConfig = Object.freeze({
-  timeout: 120000
+  timeout: 120000,
 })
