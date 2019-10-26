@@ -67,13 +67,13 @@ const ListPage = ({ ListContainer }) => {
 
 export const options = {
   columns: [
-    { id: 'attributes.chartIcon', label: '', render: renderDeployedAppIcon },
+    { id: 'logoUrl', label: '', render: renderDeployedAppIcon },
     { id: 'attributes.name', label: 'Name', render: renderDeployedAppLink },
     { id: 'attributes.chartName', label: 'App Type' },
     { id: 'attributes.chartVersion', label: 'Version' },
     { id: 'attributes.namespace', label: 'Namespace' },
     { id: 'attributes.status', label: 'Status' },
-    { id: 'attributes.updated', label: 'Last updated' },
+    { id: 'lastUpdated', label: 'Last updated' },
   ],
   deleteFn: releaseActions.delete,
   // editUrl: '/ui/kubernetes/infrastructure/releases/edit',

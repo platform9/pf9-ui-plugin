@@ -6,13 +6,14 @@ import {
 import { tryJsonParse } from 'utils/misc'
 import { namespacesCacheKey } from 'k8s/components/namespaces/actions'
 import createCRUDActions from 'core/helpers/createCRUDActions'
-import { upsertAllBy, emptyObj } from 'utils/fp'
+import { upsertAllBy, emptyObj, emptyArr } from 'utils/fp'
 import { uuidRegex } from 'app/constants'
 import createContextLoader from 'core/helpers/createContextLoader'
 
 const { keystone } = ApiClient.getInstance()
 
 export const mngmTenantsCacheKey = 'managementTenants'
+const reservedTenantNames = ['admin', 'services', 'Default', 'heat']
 export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
   listFn: async () => keystone.getAllTenantsAllUsers(),
   dataMapper: async (allTenantsAllUsers, params, loadFromContext) => {
@@ -22,11 +23,9 @@ export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
       prop('id'),
     )(allTenantsAllUsers)
     return pipe(
-      filter(tenant =>
-        params.blacklisted
-          ? ['admin', 'services', 'Default', 'heat'].includes(tenant.name)
-          : (tenant.domain_id !== heatTenantId &&
-          !['admin', 'services', 'Default', 'heat'].includes(tenant.name)),
+      filter(tenant => params.blacklisted
+        ? reservedTenantNames.includes(tenant.name)
+        : (tenant.domain_id !== heatTenantId && !reservedTenantNames.includes(tenant.name)),
       ),
       map(tenant => ({
         ...tenant,
@@ -122,7 +121,7 @@ export const mngmGroupActions = createCRUDActions(mngmGroupsCacheKey, {
           flatten,
           find(pathEq(['group', 'id'], group.id)),
         )(mappingRules)
-      }) || { rules: [] }
+      }) || { rules: emptyArr }
       // Filter out the rules not belonging to current group
       const mappingRules = tryJsonParse(groupMapping.rules)
       const groupRules = mappingRules.reduce((groupRules, rule) => {
@@ -131,7 +130,7 @@ export const mngmGroupActions = createCRUDActions(mngmGroupsCacheKey, {
           return groupRules.concat(rule.remote.slice(2))
         }
         return groupRules
-      }, [])
+      }, emptyArr)
       // Stringify the results
       const samlAttributesString = groupRules.reduce((samlAttributes, rule) => {
         if (rule.hasOwnProperty('any_one_of')) {
@@ -140,7 +139,7 @@ export const mngmGroupActions = createCRUDActions(mngmGroupsCacheKey, {
           return samlAttributes.concat(`${rule.type} != ${rule.not_any_of.join(', ')}`)
         }
         return samlAttributes
-      }, []).join(' AND ')
+      }, emptyArr).join(' AND ')
 
       return {
         ...group,

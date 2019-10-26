@@ -12,7 +12,7 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexFlow: 'column nowrap',
     alignItems: 'center',
-    marginTop: theme.spacing(2),
+    marginTop: theme.spacing(1),
     marginLeft: theme.spacing(1),
     marginRight: theme.spacing(1),
     cursor: 'pointer',

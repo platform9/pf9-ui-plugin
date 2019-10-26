@@ -16,6 +16,7 @@ import { parseClusterParams } from 'k8s/components/infrastructure/clusters/actio
 const { qbert } = ApiClient.getInstance()
 
 const uniqueIdentifier = 'id'
+const apiDateFormat = 'ddd MMM D HH:mm:ss YYYY'
 
 export const singleAppCacheKey = 'appDetails'
 export const appsCacheKey = 'apps'
@@ -63,7 +64,7 @@ export const deploymentDetailLoader = createContextLoader(releaseDetailCacheKey,
       version: pathStr('attributes.chartVersion', item),
       namespace: pathStr('attributes.namespace', item),
       status: pathStr('attributes.status', item),
-      lastUpdated: moment(pathStr('attributes.updated', item)).format('llll'),
+      lastUpdated: moment(pathStr('attributes.updated', item), apiDateFormat).format('llll'),
       logoUrl: pathStrOr(`${imageUrlRoot}/default-app-logo.png`, 'attributes.chartIcon', item),
       resourcesText: pathStr('attributes.resources', item),
       notesText: pathStr('attributes.notes', item),
@@ -152,6 +153,11 @@ export const releaseActions = createCRUDActions(releasesCacheKey, {
   dataMapper: (items,
     { namespace }) => pipe(
     filterIf(namespace && namespace !== allKey, pathEq(['attributes', 'namespace'], namespace)),
+    map(item => ({
+      ...item,
+      logoUrl: pathStrOr(`${imageUrlRoot}/default-app-logo.png`, 'attributes.chartIcon', item),
+      lastUpdated: moment(pathStr('attributes.updated', item), apiDateFormat).format('llll'),
+    }))
   )(items),
   uniqueIdentifier,
   indexBy: 'clusterId',
@@ -164,7 +170,7 @@ const reposWithClustersLoader = createContextLoader(repositoriesWithClustersCach
     hasControlPanel: true,
   })
   return pipeAsync(
-    map(async ({ clusterId, clusterName }) => {
+    map(async ({ uuid: clusterId, name: clusterName }) => {
       const clusterRepos = await qbert.getRepositoriesForCluster(clusterId)
       return clusterRepos.map(mergeLeft({ clusterId, clusterName }))
     }),
