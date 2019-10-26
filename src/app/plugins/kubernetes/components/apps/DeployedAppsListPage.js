@@ -68,7 +68,7 @@ const ListPage = ({ ListContainer }) => {
 export const options = {
   columns: [
     { id: 'logoUrl', label: '', render: renderDeployedAppIcon },
-    { id: 'attributes.name', label: 'Name', render: renderDeployedAppLink },
+    { id: 'name', label: 'Name', render: renderDeployedAppLink },
     { id: 'attributes.chartName', label: 'App Type' },
     { id: 'attributes.chartVersion', label: 'Version' },
     { id: 'attributes.namespace', label: 'Namespace' },

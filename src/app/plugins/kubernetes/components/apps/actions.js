@@ -155,6 +155,7 @@ export const releaseActions = createCRUDActions(releasesCacheKey, {
     filterIf(namespace && namespace !== allKey, pathEq(['attributes', 'namespace'], namespace)),
     map(item => ({
       ...item,
+      name: pathStr('attributes.name', item),
       logoUrl: pathStrOr(`${imageUrlRoot}/default-app-logo.png`, 'attributes.chartIcon', item),
       lastUpdated: moment(pathStr('attributes.updated', item), apiDateFormat).format('llll'),
     }))
