@@ -75,8 +75,6 @@ const BasicStep = ({ onSubmit, triggerSubmit }) => {
             id="storageType"
             label="Storage Type"
             info="Select the storage type for this storage class. The list of available storage types is specific to the cloud provider that the cluster belongs to."
-            onChange={getParamsUpdater('storageType')}
-            value={params.storageType}
             required
           />
           <CheckboxField
