@@ -31,6 +31,7 @@ const getKubernetesVersion = async clusterId => {
 }
 
 export const hasMasterNode = propSatisfies(isTruthy, 'hasMasterNode')
+export const hasHealthyMasterNodes = propSatisfies(healthyMasterNodes => healthyMasterNodes.length > 0, 'healthyMasterNodes')
 export const masterlessCluster = propSatisfies(isTruthy, 'masterless')
 export const hasPrometheusEnabled = compose(castFuzzyBool, path(['tags', 'pf9-system:monitoring']))
 export const hasAppCatalogEnabled = propSatisfies(isTruthy, 'appCatalogEnabled')
@@ -125,12 +126,13 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
   },
   uniqueIdentifier: 'uuid',
   dataMapper: (items,
-    { masterNodeClusters, masterlessClusters, hasControlPanel, appCatalogClusters, prometheusClusters }) => pipe(
+    { masterNodeClusters, masterlessClusters, hasControlPanel, healthyClusters, appCatalogClusters, prometheusClusters }) => pipe(
     filterIf(masterNodeClusters, hasMasterNode),
     filterIf(masterlessClusters, masterlessCluster),
     filterIf(prometheusClusters, hasPrometheusEnabled),
     filterIf(appCatalogClusters, hasAppCatalogEnabled),
     filterIf(hasControlPanel, either(hasMasterNode, masterlessCluster)),
+    filterIf(healthyClusters, hasHealthyMasterNodes),
   )(items),
   defaultOrderBy: 'name',
 })
