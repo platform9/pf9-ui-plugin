@@ -42,7 +42,7 @@ const AddBareOsClusterPage = () => {
   const onComplete = () => {
     history.push('/ui/kubernetes/infrastructure#clusters')
   }
-  const [create] = useDataUpdater(clusterActions.create, onComplete) // eslint-disable-line
+  const [create, loading] = useDataUpdater(clusterActions.create, onComplete) // eslint-disable-line
 
   const handleSubmit = params => async data => {
     const body = {
@@ -88,7 +88,7 @@ const AddBareOsClusterPage = () => {
   }
 
   return (
-    <FormWrapper title="Add Bare OS Cluster" backUrl={listUrl}>
+    <FormWrapper title="Add Bare OS Cluster" backUrl={listUrl} loading={loading}>
       <Wizard onComplete={handleSubmit(params)} context={initialContext}>
         {({ wizardContext, setWizardContext, onNext }) => {
           return (

@@ -108,7 +108,7 @@ const AddAzureClusterPage = () => {
   const onComplete = () => {
     history.push('/ui/kubernetes/infrastructure#clusters')
   }
-  const [create] = useDataUpdater(clusterActions.create, onComplete)
+  const [create, loading] = useDataUpdater(clusterActions.create, onComplete)
 
   const handleSubmit = params => async data => {
     const body = {
@@ -139,7 +139,7 @@ const AddAzureClusterPage = () => {
   }
 
   return (
-    <FormWrapper title="Add Azure Cluster" backUrl={listUrl}>
+    <FormWrapper title="Add Azure Cluster" backUrl={listUrl} loading={loading}>
       <Wizard onComplete={handleSubmit(params)} context={initialContext}>
         {({ wizardContext, setWizardContext, onNext }) => {
           return (
