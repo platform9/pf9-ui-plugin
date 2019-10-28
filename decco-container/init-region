@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -ex
+mkdir -p /var/log/nginx
+

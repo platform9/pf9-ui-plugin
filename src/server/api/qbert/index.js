@@ -24,6 +24,14 @@ import {
   getStorageClasses, postStorageClass, deleteStorageClass,
 } from './storageClasses/storageClassActions'
 
+// RBAC
+import { getRoles, postRole, deleteRole } from './roles/roleActions'
+import { getRoleBindings, postRoleBinding, deleteRoleBinding } from './roleBindings/roleBindingActions'
+import { getClusterRoles, postClusterRole, deleteClusterRole } from './clusterRoles/clusterRoleActions'
+import {
+  getClusterRoleBindings, postClusterRoleBinding, deleteClusterRoleBinding
+} from './clusterRoleBindings/clusterRoleBindingActions'
+
 import { getCharts, getChart, getChartVersions, getChartVersion } from './charts'
 import { getReleases, getRelease, deleteRelease } from './releases'
 import { tokenValidator } from '../../middleware'
@@ -89,6 +97,30 @@ const storageClassApi = `/${version}/:tenantId/clusters/:clusterId/k8sapi/apis/s
 router.get(`${storageClassApi}`, tokenValidator, getStorageClasses)
 router.post(`${storageClassApi}`, tokenValidator, postStorageClass)
 router.delete(`${storageClassApi}/:storageClassName`, tokenValidator, deleteStorageClass)
+
+// RBAC
+const rbacClusterBase = `${clusterK8sApiBase}/apis/rbac.authorization.k8s.io`
+const rbacClusterBaseV1 = `${rbacClusterBase}/v1`
+
+router.get(`${rbacClusterBaseV1}/roles`, tokenValidator, getRoles)
+router.get(`${rbacClusterBaseV1}/namespaces/:namespace/roles`, tokenValidator, getRoles)
+router.post(`${rbacClusterBaseV1}/namespaces/:namespace/roles`, tokenValidator, postRole)
+router.delete(`${rbacClusterBaseV1}/namespaces/:namespace/roles/:roleName`, tokenValidator, deleteRole)
+
+router.get(`${rbacClusterBaseV1}/rolebindings`, tokenValidator, getRoleBindings)
+router.get(`${rbacClusterBaseV1}/namespaces/:namespace/rolebindings`, tokenValidator, getRoleBindings)
+router.post(`${rbacClusterBaseV1}/namespaces/:namespace/rolebindings`, tokenValidator, postRoleBinding)
+router.delete(`${rbacClusterBaseV1}/namespaces/:namespace/rolebindings/:roleBindingName`, tokenValidator, deleteRoleBinding)
+
+router.get(`${rbacClusterBaseV1}/clusterroles`, tokenValidator, getClusterRoles)
+router.get(`${rbacClusterBaseV1}/clusterroles`, tokenValidator, getClusterRoles)
+router.post(`${rbacClusterBaseV1}/clusterroles`, tokenValidator, postClusterRole)
+router.delete(`${rbacClusterBaseV1}/clusterroles/:clusterRoleName`, tokenValidator, deleteClusterRole)
+
+router.get(`${rbacClusterBaseV1}/clusterrolebindings`, tokenValidator, getClusterRoleBindings)
+router.get(`${rbacClusterBaseV1}/clusterrolebindings`, tokenValidator, getClusterRoleBindings)
+router.post(`${rbacClusterBaseV1}/clusterrolebindings`, tokenValidator, postClusterRoleBinding)
+router.delete(`${rbacClusterBaseV1}/clusterrolebindings/:clusterRoleBindingName`, tokenValidator, deleteClusterRoleBinding)
 
 // Monocular
 const monocularClusterBase = `${k8sapi}/namespaces/kube-system/services/monocular-api-svc::80/proxy`

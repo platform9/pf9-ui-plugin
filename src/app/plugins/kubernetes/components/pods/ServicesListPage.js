@@ -73,7 +73,7 @@ const renderEndpoints = endpoints => {
 }
 
 export const options = {
-  addUrl: '/ui/kubernetes/services/add',
+  addUrl: '/ui/kubernetes/pods/services/add',
   addText: 'Add Service',
   deleteFn: serviceActions.delete,
   columns: [

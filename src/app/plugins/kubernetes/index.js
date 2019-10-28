@@ -122,12 +122,12 @@ Kubernetes.registerPlugin = pluginManager => {
       },
       {
         name: 'Add Deployment',
-        link: { path: '/deployments/add', exact: true },
+        link: { path: '/pods/deployments/add', exact: true },
         component: () => <AddResourcePage resourceType="deployment" />,
       },
       {
         name: 'Add Service',
-        link: { path: '/services/add', exact: true },
+        link: { path: '/pods/services/add', exact: true },
         component: () => <AddResourcePage resourceType="service" />,
       },
       {

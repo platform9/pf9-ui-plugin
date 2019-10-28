@@ -13,6 +13,9 @@ const styles = theme => ({
     // backgroundColor: theme.palette.grey[50],
     fontWeight: 'bold',
     color: theme.palette.text.primary,
+    '& > tr': {
+      height: 46,
+    },
   },
   checkboxCell: {
     display: ['flex', '!important'],
@@ -32,7 +35,7 @@ const styles = theme => ({
   },
   checkAllCell: {
     paddingRight: 0,
-    minWidth: 60
+    minWidth: 60,
   },
 })
 

@@ -20,7 +20,7 @@ const stopPropagation = e => {
   e.stopPropagation()
 }
 
-export default ({ onClose, row: repository }) => {
+export default ({ onClose, rows: [repository] }) => {
   const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
   const [update, updating] = useDataUpdater(repositoryActions.updateRepoClusters, onClose)
   const [selectedRows, updateSelectedRows] = useState(pluck('clusterId', repository.clusters))
