@@ -16,7 +16,12 @@ import useParams from 'core/hooks/useParams'
 import useReactRouter from 'use-react-router'
 import { clusterActions } from '../actions'
 import { pick } from 'ramda'
+import { pathJoin } from 'utils/misc'
+import { k8sPrefix } from 'app/constants'
+
 const { qbert } = ApiClient.getInstance()
+
+const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
 const initialContext = {
   containersCidr: '10.20.0.0/16',
@@ -83,12 +88,12 @@ const AddBareOsClusterPage = () => {
   }
 
   return (
-    <Wizard onComplete={handleSubmit(params)} context={initialContext}>
-      {({ wizardContext, setWizardContext, onNext }) => {
-        return (
-          <>
-            <WizardStep stepId="basic" label="Basic Info">
-              <FormWrapper title="Add Cluster">
+    <FormWrapper title="Add Bare OS Cluster" backUrl={listUrl}>
+      <Wizard onComplete={handleSubmit(params)} context={initialContext}>
+        {({ wizardContext, setWizardContext, onNext }) => {
+          return (
+            <>
+              <WizardStep stepId="basic" label="Basic Info">
                 <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                   {({ setFieldValue, values }) => (
                     <>
@@ -118,11 +123,9 @@ const AddBareOsClusterPage = () => {
                     </>
                   )}
                 </ValidatedForm>
-              </FormWrapper>
-            </WizardStep>
+              </WizardStep>
 
-            <WizardStep stepId="workers" label="Woker Nodes">
-              <FormWrapper title="Worker Nodes">
+              <WizardStep stepId="workers" label="Woker Nodes">
                 <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                   {({ setFieldValue, values }) => (
                     <>
@@ -134,11 +137,9 @@ const AddBareOsClusterPage = () => {
                     </>
                   )}
                 </ValidatedForm>
-              </FormWrapper>
-            </WizardStep>
+              </WizardStep>
 
-            <WizardStep stepId="network" label="Network Info">
-              <FormWrapper title="Network Info">
+              <WizardStep stepId="network" label="Network Info">
                 <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                   {({ setFieldValue, values }) => (
                     <>
@@ -147,10 +148,15 @@ const AddBareOsClusterPage = () => {
                         label="Virtual IP address for cluster"
                         info={
                           <div>
-                            Specify the virtual IP address that will be used to provide access to the API server endpoint for this cluster.
-                            A virtual IP must be specified if you want to grow the number of masters in the future.
-                            Refer to <a href="https://docs.platform9.com/support/ha-for-baremetal-multimaster-kubernetes-cluster-service-type-load-balancer/" target="_blank">this article</a>
-                            for more information re how the VIP service operates, VIP configuration, etc.
+                            Specify the virtual IP address that will be used to provide access to
+                            the API server endpoint for this cluster.
+                            A virtual IP must be specified if you want to grow the number of masters
+                            in the future.
+                            Refer
+                            to <a href="https://docs.platform9.com/support/ha-for-baremetal-multimaster-kubernetes-cluster-service-type-load-balancer/" target="_blank">this
+                            article</a>
+                            for more information re how the VIP service operates, VIP configuration,
+                            etc.
                           </div>
                         }
                         required={params.masterNodes.length > 1}
@@ -173,12 +179,12 @@ const AddBareOsClusterPage = () => {
                       />
 
                       {values.enableMetallb &&
-                        <TextField
-                          id="metallbCidr"
-                          label="Address pool range(s) for Metal LB"
-                          info="Provide the IP address pool that MetalLB load-balancer is allowed to allocate from. You need to specify an explicit start-end range of IPs for the pool.  It takes the following format: startIP1-endIP1,startIP2-endIP2"
-                          required
-                        />
+                      <TextField
+                        id="metallbCidr"
+                        label="Address pool range(s) for Metal LB"
+                        info="Provide the IP address pool that MetalLB load-balancer is allowed to allocate from. You need to specify an explicit start-end range of IPs for the pool.  It takes the following format: startIP1-endIP1,startIP2-endIP2"
+                        required
+                      />
                       }
 
                       {/* API FQDN */}
@@ -214,11 +220,9 @@ const AddBareOsClusterPage = () => {
                     </>
                   )}
                 </ValidatedForm>
-              </FormWrapper>
-            </WizardStep>
+              </WizardStep>
 
-            <WizardStep stepId="advanced" label="Advanced Configuration">
-              <FormWrapper title="Advanced Configuration">
+              <WizardStep stepId="advanced" label="Advanced Configuration">
                 <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                   {({ setFieldValue, values }) => (
                     <>
@@ -240,11 +244,11 @@ const AddBareOsClusterPage = () => {
                       />
 
                       {values.runtimeConfigOption === 'custom' &&
-                        <TextField
-                          id="customRuntimeConfig"
-                          label="Custom API Configuration"
-                          info=""
-                        />
+                      <TextField
+                        id="customRuntimeConfig"
+                        label="Custom API Configuration"
+                        info=""
+                      />
                       }
 
                       {/* Enable Application Catalog */}
@@ -263,20 +267,18 @@ const AddBareOsClusterPage = () => {
                     </>
                   )}
                 </ValidatedForm>
-              </FormWrapper>
-            </WizardStep>
+              </WizardStep>
 
-            <WizardStep stepId="review" label="Review">
-              <FormWrapper title="Review">
+              <WizardStep stepId="review" label="Review">
                 <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                   <BareOsClusterReviewTable data={wizardContext} />
                 </ValidatedForm>
-              </FormWrapper>
-            </WizardStep>
-          </>
-        )
-      }}
-    </Wizard>
+              </WizardStep>
+            </>
+          )
+        }}
+      </Wizard>
+    </FormWrapper>
   )
 }
 

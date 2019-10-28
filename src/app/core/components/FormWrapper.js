@@ -28,6 +28,7 @@ class FormWrapper extends React.PureComponent {
       children,
       classes,
       title,
+      className,
     } = this.props
     return (
       <Grid container>
@@ -48,7 +49,9 @@ class FormWrapper extends React.PureComponent {
             }
           </Grid>
           <Divider className={classes.divider} />
-          {children}
+          <div className={className}>
+            {children}
+          </div>
         </Grid>
       </Grid>
     )

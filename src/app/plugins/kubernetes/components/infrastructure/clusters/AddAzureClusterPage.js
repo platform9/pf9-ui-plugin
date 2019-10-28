@@ -20,6 +20,10 @@ import useParams from 'core/hooks/useParams'
 import useReactRouter from 'use-react-router'
 import { pick } from 'ramda'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
+import { pathJoin } from 'utils/misc'
+import { k8sPrefix } from 'app/constants'
+
+const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
 const initialContext = {
   template: 'small',
@@ -83,7 +87,7 @@ const handleTemplateChoice = ({ setWizardContext, setFieldValue }) => option => 
       allowWorkloadsOnMaster: false,
       masterFlavor: 'Standard_A4_v2',
       workerFlavor: 'Standard_A4_v2',
-    }
+    },
   }
 
   if (!options[option]) return
@@ -135,12 +139,12 @@ const AddAzureClusterPage = () => {
   }
 
   return (
-    <Wizard onComplete={handleSubmit(params)} context={initialContext}>
-      {({ wizardContext, setWizardContext, onNext }) => {
-        return (
-          <>
-            <WizardStep stepId="basic" label="Basic Info">
-              <FormWrapper title="Add Cluster">
+    <FormWrapper title="Add Azure Cluster" backUrl={listUrl}>
+      <Wizard onComplete={handleSubmit(params)} context={initialContext}>
+        {({ wizardContext, setWizardContext, onNext }) => {
+          return (
+            <>
+              <WizardStep stepId="basic" label="Basic Info">
                 <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                   {({ setFieldValue, values }) => (
                     <>
@@ -199,11 +203,9 @@ const AddAzureClusterPage = () => {
                     </>
                   )}
                 </ValidatedForm>
-              </FormWrapper>
-            </WizardStep>
+              </WizardStep>
 
-            <WizardStep stepId="config" label="Cluster Configuration">
-              <FormWrapper title="Cluster Configuration">
+              <WizardStep stepId="config" label="Cluster Configuration">
                 <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                   {({ setFieldValue, values }) => (
                     <>
@@ -216,12 +218,12 @@ const AddAzureClusterPage = () => {
 
                       {/* Azure Availability Zone */}
                       {values.useAllAvailabilityZones ||
-                        <AzureAvailabilityZoneChooser
-                          id="zones"
-                          info="Select from the Availability Zones for the specified region"
-                          onChange={getParamsUpdater('zones')}
-                          required
-                        />
+                      <AzureAvailabilityZoneChooser
+                        id="zones"
+                        info="Select from the Availability Zones for the specified region"
+                        onChange={getParamsUpdater('zones')}
+                        required
+                      />
                       }
 
                       {/* Master node SKU */}
@@ -279,11 +281,9 @@ const AddAzureClusterPage = () => {
                     </>
                   )}
                 </ValidatedForm>
-              </FormWrapper>
-            </WizardStep>
+              </WizardStep>
 
-            <WizardStep stepId="network" label="Network Info">
-              <FormWrapper title="Network Info">
+              <WizardStep stepId="network" label="Network Info">
                 <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                   {({ setFieldValue, values }) => (
                     <>
@@ -304,59 +304,59 @@ const AddAzureClusterPage = () => {
                       />
 
                       {values.network === 'existing' &&
-                        <>
-                          {/* Resource group */}
-                          <PicklistField
-                            DropdownComponent={AzureResourceGroupPicklist}
-                            disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
-                            id="vnetResourceGroup"
-                            label="Resource group"
-                            cloudProviderId={params.cloudProviderId}
-                            cloudProviderRegionId={params.cloudProviderRegionId}
-                            onChange={getParamsUpdater('resourceGroup')}
-                            info="Select the resource group that your networking resources belong to."
-                            required
-                          />
+                      <>
+                        {/* Resource group */}
+                        <PicklistField
+                          DropdownComponent={AzureResourceGroupPicklist}
+                          disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
+                          id="vnetResourceGroup"
+                          label="Resource group"
+                          cloudProviderId={params.cloudProviderId}
+                          cloudProviderRegionId={params.cloudProviderRegionId}
+                          onChange={getParamsUpdater('resourceGroup')}
+                          info="Select the resource group that your networking resources belong to."
+                          required
+                        />
 
-                          {/* Existing network.  I don't get the point of this field. */}
-                          <PicklistField
-                            DropdownComponent={AzureVnetPicklist}
-                            disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
-                            id="vnetName"
-                            label="Select existing network"
-                            cloudProviderId={params.cloudProviderId}
-                            cloudProviderRegionId={params.cloudProviderRegionId}
-                            resourceGroup={params.resourceGroup}
-                            info="Select the network for your cluster."
-                            required
-                          />
+                        {/* Existing network.  I don't get the point of this field. */}
+                        <PicklistField
+                          DropdownComponent={AzureVnetPicklist}
+                          disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
+                          id="vnetName"
+                          label="Select existing network"
+                          cloudProviderId={params.cloudProviderId}
+                          cloudProviderRegionId={params.cloudProviderRegionId}
+                          resourceGroup={params.resourceGroup}
+                          info="Select the network for your cluster."
+                          required
+                        />
 
-                          {/* Master node subnet */}
-                          <PicklistField
-                            DropdownComponent={AzureSubnetPicklist}
-                            disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
-                            id="masterSubnetName"
-                            label="Master node subnet"
-                            cloudProviderId={params.cloudProviderId}
-                            cloudProviderRegionId={params.cloudProviderRegionId}
-                            resourceGroup={params.resourceGroup}
-                            info="Select the subnet for your master nodes. Can be the same as worker node subnet."
-                            required
-                          />
+                        {/* Master node subnet */}
+                        <PicklistField
+                          DropdownComponent={AzureSubnetPicklist}
+                          disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
+                          id="masterSubnetName"
+                          label="Master node subnet"
+                          cloudProviderId={params.cloudProviderId}
+                          cloudProviderRegionId={params.cloudProviderRegionId}
+                          resourceGroup={params.resourceGroup}
+                          info="Select the subnet for your master nodes. Can be the same as worker node subnet."
+                          required
+                        />
 
-                          {/* Worker node subnet */}
-                          <PicklistField
-                            DropdownComponent={AzureSubnetPicklist}
-                            disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
-                            id="workerSubnetName"
-                            label="Worker node subnet"
-                            cloudProviderId={params.cloudProviderId}
-                            cloudProviderRegionId={params.cloudProviderRegionId}
-                            resourceGroup={params.resourceGroup}
-                            info="Select the subnet for your worker nodes. Can be the same as master node subnet."
-                            required
-                          />
-                        </>
+                        {/* Worker node subnet */}
+                        <PicklistField
+                          DropdownComponent={AzureSubnetPicklist}
+                          disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
+                          id="workerSubnetName"
+                          label="Worker node subnet"
+                          cloudProviderId={params.cloudProviderId}
+                          cloudProviderRegionId={params.cloudProviderRegionId}
+                          resourceGroup={params.resourceGroup}
+                          info="Select the subnet for your worker nodes. Can be the same as master node subnet."
+                          required
+                        />
+                      </>
                       }
 
                       {/* API FQDN */}
@@ -392,11 +392,9 @@ const AddAzureClusterPage = () => {
                     </>
                   )}
                 </ValidatedForm>
-              </FormWrapper>
-            </WizardStep>
+              </WizardStep>
 
-            <WizardStep stepId="advanced" label="Advanced Configuration">
-              <FormWrapper title="Advanced Configuration">
+              <WizardStep stepId="advanced" label="Advanced Configuration">
                 <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                   {({ setFieldValue, values }) => (
                     <>
@@ -418,11 +416,11 @@ const AddAzureClusterPage = () => {
                       />
 
                       {values.runtimeConfigOption === 'custom' &&
-                        <TextField
-                          id="customRuntimeConfig"
-                          label="Custom API Configuration"
-                          info=""
-                        />
+                      <TextField
+                        id="customRuntimeConfig"
+                        label="Custom API Configuration"
+                        info=""
+                      />
                       }
 
                       {/* Enable Application Catalog */}
@@ -441,20 +439,18 @@ const AddAzureClusterPage = () => {
                     </>
                   )}
                 </ValidatedForm>
-              </FormWrapper>
-            </WizardStep>
+              </WizardStep>
 
-            <WizardStep stepId="review" label="Review">
-              <FormWrapper title="Review">
+              <WizardStep stepId="review" label="Review">
                 <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                   <AzureClusterReviewTable data={wizardContext} />
                 </ValidatedForm>
-              </FormWrapper>
-            </WizardStep>
-          </>
-        )
-      }}
-    </Wizard>
+              </WizardStep>
+            </>
+          )
+        }}
+      </Wizard>
+    </FormWrapper>
   )
 }
 

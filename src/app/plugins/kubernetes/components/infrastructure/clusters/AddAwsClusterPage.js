@@ -21,6 +21,10 @@ import useParams from 'core/hooks/useParams'
 import useReactRouter from 'use-react-router'
 import { pick } from 'ramda'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
+import { pathJoin } from 'utils/misc'
+import { k8sPrefix } from 'app/constants'
+
+const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
 const initialContext = {
   template: 'small',
@@ -90,7 +94,7 @@ const handleTemplateChoice = ({ setWizardContext, setFieldValue }) => option => 
       allowWorkloadsOnMaster: false,
       masterFlavor: 't2.large',
       workerFlavor: 't2.large',
-    }
+    },
   }
 
   if (!options[option]) return
@@ -177,14 +181,14 @@ const renderCustomNetworkingFields = ({ params, getParamsUpdater, values, setFie
             />
 
             {params.isPrivate &&
-              <AwsZoneVpcMappings
-                type="private"
-                cloudProviderId={params.cloudProviderId}
-                cloudProviderRegionId={params.cloudProviderRegionId}
-                onChange={getParamsUpdater('privateSubnets')}
-                vpcId={params.vpcId}
-                azs={params.azs}
-              />
+            <AwsZoneVpcMappings
+              type="private"
+              cloudProviderId={params.cloudProviderId}
+              cloudProviderRegionId={params.cloudProviderRegionId}
+              onChange={getParamsUpdater('privateSubnets')}
+              vpcId={params.vpcId}
+              azs={params.azs}
+            />
             }
           </>
         )
@@ -278,12 +282,12 @@ const AddAwsClusterPage = () => {
   }
 
   return (
-    <Wizard onComplete={handleSubmit(params)} context={initialContext}>
-      {({ wizardContext, setWizardContext, onNext }) => {
-        return (
-          <>
-            <WizardStep stepId="basic" label="Basic Info">
-              <FormWrapper title="Add Cluster">
+    <FormWrapper title="Add AWS Cluster" backUrl={listUrl}>
+      <Wizard onComplete={handleSubmit(params)} context={initialContext}>
+        {({ wizardContext, setWizardContext, onNext }) => {
+          return (
+            <>
+              <WizardStep stepId="basic" label="Basic Info">
                 <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                   {({ setFieldValue, values }) => (
                     <>
@@ -332,14 +336,14 @@ const AddAwsClusterPage = () => {
 
                       {/* AWS Availability Zone */}
                       {values.region &&
-                        <AwsAvailabilityZoneChooser
-                          id="azs"
-                          info="Select from the Availability Zones for the specified region"
-                          cloudProviderId={params.cloudProviderId}
-                          cloudProviderRegionId={params.cloudProviderRegionId}
-                          onChange={getParamsUpdater('azs')}
-                          required
-                        />
+                      <AwsAvailabilityZoneChooser
+                        id="azs"
+                        info="Select from the Availability Zones for the specified region"
+                        cloudProviderId={params.cloudProviderId}
+                        cloudProviderRegionId={params.cloudProviderRegionId}
+                        onChange={getParamsUpdater('azs')}
+                        required
+                      />
                       }
 
                       {/* SSH Key */}
@@ -356,11 +360,9 @@ const AddAwsClusterPage = () => {
                     </>
                   )}
                 </ValidatedForm>
-              </FormWrapper>
-            </WizardStep>
+              </WizardStep>
 
-            <WizardStep stepId="config" label="Cluster Configuration">
-              <FormWrapper title="Cluster Configuration">
+              <WizardStep stepId="config" label="Cluster Configuration">
                 <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                   {({ setFieldValue, values }) => (
                     <>
@@ -431,22 +433,20 @@ const AddAwsClusterPage = () => {
 
                       {/* Max num worker nodes (autoscaling) */}
                       {values.enableCAS &&
-                        <TextField
-                          id="numMaxWorkers"
-                          type="number"
-                          label="Maximum number of worker nodes"
-                          info="Maximum number of worker nodes this cluster may be scaled up to."
-                          required={values.enableCAS}
-                        />
+                      <TextField
+                        id="numMaxWorkers"
+                        type="number"
+                        label="Maximum number of worker nodes"
+                        info="Maximum number of worker nodes this cluster may be scaled up to."
+                        required={values.enableCAS}
+                      />
                       }
                     </>
                   )}
                 </ValidatedForm>
-              </FormWrapper>
-            </WizardStep>
+              </WizardStep>
 
-            <WizardStep stepId="network" label="Network Info">
-              <FormWrapper title="Network Info">
+              <WizardStep stepId="network" label="Network Info">
                 <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                   {({ setFieldValue, values }) => (
                     <>
@@ -457,25 +457,32 @@ const AddAwsClusterPage = () => {
                         info="Select this option if you want Platform9 to automatically generate the endpoints or if you do not have access to Route 53."
                       />
 
-                      {values.usePf9Domain || renderCustomNetworkingFields({ params, getParamsUpdater, values, setFieldValue, setWizardContext, wizardContext })}
+                      {values.usePf9Domain || renderCustomNetworkingFields({
+                        params,
+                        getParamsUpdater,
+                        values,
+                        setFieldValue,
+                        setWizardContext,
+                        wizardContext,
+                      })}
 
                       {/* API FQDN */}
                       {values.usePf9Domain ||
-                        <TextField
-                          id="externalDnsName"
-                          label="API FQDN"
-                          info="FQDN used to reference cluster API. To ensure the API can be accessed securely at the FQDN, the FQDN will be included in the API server certificate's Subject Alt Names. If deploying onto AWS, we will automatically create the DNS records for this FQDN into AWS Route 53."
-                          required
-                        />
+                      <TextField
+                        id="externalDnsName"
+                        label="API FQDN"
+                        info="FQDN used to reference cluster API. To ensure the API can be accessed securely at the FQDN, the FQDN will be included in the API server certificate's Subject Alt Names. If deploying onto AWS, we will automatically create the DNS records for this FQDN into AWS Route 53."
+                        required
+                      />
                       }
                       {/* Services FQDN */}
                       {values.usePf9Domain ||
-                        <TextField
-                          id="serviceFqdn"
-                          label="Services FQDN"
-                          info="FQDN used to reference cluster services. If deploying onto AWS, we will automatically create the DNS records for this FQDN into AWS Route 53."
-                          required
-                        />
+                      <TextField
+                        id="serviceFqdn"
+                        label="Services FQDN"
+                        info="FQDN used to reference cluster services. If deploying onto AWS, we will automatically create the DNS records for this FQDN into AWS Route 53."
+                        required
+                      />
                       }
 
                       {/* Containers CIDR */}
@@ -513,21 +520,19 @@ const AddAwsClusterPage = () => {
 
                       {/* HTTP proxy */}
                       {values.networkPlugin === 'calico' &&
-                        <TextField
-                          id="mtuSize"
-                          label="MTU Size"
-                          info="Maximum Transmission Unit (MTU) for the interface (in bytes)"
-                          required={values.networkPlugin === 'calico'}
-                        />
+                      <TextField
+                        id="mtuSize"
+                        label="MTU Size"
+                        info="Maximum Transmission Unit (MTU) for the interface (in bytes)"
+                        required={values.networkPlugin === 'calico'}
+                      />
                       }
                     </>
                   )}
                 </ValidatedForm>
-              </FormWrapper>
-            </WizardStep>
+              </WizardStep>
 
-            <WizardStep stepId="advanced" label="Advanced Configuration">
-              <FormWrapper title="Advanced Configuration">
+              <WizardStep stepId="advanced" label="Advanced Configuration">
                 <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                   {({ setFieldValue, values }) => (
                     <>
@@ -549,11 +554,11 @@ const AddAwsClusterPage = () => {
                       />
 
                       {values.runtimeConfigOption === 'custom' &&
-                        <TextField
-                          id="customRuntimeConfig"
-                          label="Custom API Configuration"
-                          info=""
-                        />
+                      <TextField
+                        id="customRuntimeConfig"
+                        label="Custom API Configuration"
+                        info=""
+                      />
                       }
 
                       {/* Enable Application Catalog */}
@@ -579,20 +584,18 @@ const AddAwsClusterPage = () => {
                     </>
                   )}
                 </ValidatedForm>
-              </FormWrapper>
-            </WizardStep>
+              </WizardStep>
 
-            <WizardStep stepId="review" label="Review">
-              <FormWrapper title="Review">
+              <WizardStep stepId="review" label="Review">
                 <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                   <AwsClusterReviewTable data={wizardContext} />
                 </ValidatedForm>
-              </FormWrapper>
-            </WizardStep>
-          </>
-        )
-      }}
-    </Wizard>
+              </WizardStep>
+            </>
+          )
+        }}
+      </Wizard>
+    </FormWrapper>
   )
 }
 

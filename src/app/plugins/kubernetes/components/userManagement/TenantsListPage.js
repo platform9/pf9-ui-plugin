@@ -2,6 +2,8 @@ import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { mngmTenantActions } from 'k8s/components/userManagement/actions'
 
 export const options = {
+  addUrl: '/ui/kubernetes/user_management/tenants/add',
+  addText: 'Create a New Tenant',
   columns: [
     { id: 'id', label: 'OpenStack ID', display: false },
     { id: 'name', label: 'Name' },
