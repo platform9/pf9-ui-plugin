@@ -1,7 +1,9 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import CloseButton from 'core/components/buttons/CloseButton'
 import { withStyles } from '@material-ui/styles'
 import { Divider, Grid, Typography } from '@material-ui/core'
+import { withProgress } from 'core/components/progress/Progress'
 
 const styles = theme => ({
   root: {
@@ -10,14 +12,14 @@ const styles = theme => ({
     padding: theme.spacing(5),
   },
   title: {
-    marginBottom: theme.spacing(2)
+    marginBottom: theme.spacing(2),
   },
   divider: {
-    marginBottom: theme.spacing(2)
+    marginBottom: theme.spacing(2),
   },
   buttonBase: {
     textTransform: 'none',
-  }
+  },
 })
 
 @withStyles(styles)
@@ -43,9 +45,9 @@ class FormWrapper extends React.PureComponent {
               </Typography>
             </Grid>
             {backUrl &&
-              <Grid item>
-                <CloseButton to={backUrl} />
-              </Grid>
+            <Grid item>
+              <CloseButton to={backUrl} />
+            </Grid>
             }
           </Grid>
           <Divider className={classes.divider} />
@@ -58,4 +60,12 @@ class FormWrapper extends React.PureComponent {
   }
 }
 
-export default FormWrapper
+FormWrapper.propTypes = {
+  backUrl: PropTypes.string,
+  title: PropTypes.string,
+}
+
+export default withProgress(FormWrapper, {
+  renderContentOnMount: true,
+  message: 'Submitting form...',
+})
