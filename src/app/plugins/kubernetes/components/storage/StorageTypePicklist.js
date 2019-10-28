@@ -5,7 +5,6 @@ import Picklist from 'core/components/Picklist'
 // We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
 const StorageTypePicklist = forwardRef(({
   loading,
-  onChange,
   ...rest,
 }, ref) => {
   const options = [
@@ -18,7 +17,6 @@ const StorageTypePicklist = forwardRef(({
   return <Picklist
     {...rest}
     ref={ref}
-    onChange={onChange}
     options={options}
   />
 })
