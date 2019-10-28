@@ -3,10 +3,7 @@ import PropTypes from 'prop-types'
 import Picklist from 'core/components/Picklist'
 
 // We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
-const StorageTypePicklist = forwardRef(({
-  loading,
-  ...rest,
-}, ref) => {
+const StorageTypePicklist = forwardRef((props, ref) => {
   const options = [
     { label: 'gp2', value: 'gp2' },
     { label: 'io1', value: 'io1' },
@@ -15,7 +12,7 @@ const StorageTypePicklist = forwardRef(({
   ]
 
   return <Picklist
-    {...rest}
+    {...props}
     ref={ref}
     options={options}
   />
