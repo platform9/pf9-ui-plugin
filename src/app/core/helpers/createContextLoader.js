@@ -1,10 +1,10 @@
 import {
   path, pick, isEmpty, identity, assoc, find, whereEq, when, isNil, reject, filter, always, append,
   of, pipe, over, lensPath, pickAll, view, has, equals, values, either, sortBy, reverse, mergeLeft,
-  map,
+  map, toLower,
 } from 'ramda'
 import moize from 'moize'
-import { ensureFunction, ensureArray, emptyObj, emptyArr, upsertAllBy } from 'utils/fp'
+import { ensureFunction, ensureArray, emptyObj, emptyArr, upsertAllBy, pathStr } from 'utils/fp'
 import { memoizePromise, uncamelizeString } from 'utils/misc'
 import { defaultUniqueIdentifier, allKey } from 'app/constants'
 
@@ -16,6 +16,7 @@ export const getContextLoader = key => {
   return loaders[key]
 }
 const arrayIfNil = when(isNil, always(emptyArr))
+const stringIfNil = when(isNil, always(''))
 const arrayIfEmpty = when(isEmpty, always(emptyArr))
 
 /**
@@ -83,7 +84,7 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
     defaultOrderDirection = 'asc',
     sortWith = (items, { orderBy = defaultOrderBy, orderDirection = defaultOrderDirection }) =>
       pipe(
-        sortBy(path(orderBy.split('.'))),
+        sortBy(pipe(pathStr(orderBy), stringIfNil, toLower)),
         orderDirection === 'asc' ? identity : reverse,
       )(items),
     fetchSuccessMessage = (params) => `Successfully fetched ${entityName} items`,
