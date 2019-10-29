@@ -17,6 +17,23 @@ const reservedTenantNames = ['admin', 'services', 'Default', 'heat']
 const filterValidTenants = tenant => !reservedTenantNames.includes(tenant.name)
 export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
   listFn: async () => keystone.getAllTenantsAllUsers(),
+  deleteFn: async ({ id }) => keystone.deleteProject(id),
+  createFn: async ({ name, description, users }) => {
+    const createdTenant = await keystone.createProject({
+      name,
+      description,
+      enabled: true,
+      domain_id: 'default',
+      is_domain: false,
+    })
+    const tenantUsers = await Promise.all(Object.entries(users).map(([userId, roleId]) =>
+      keystone.addUserRole({ tenantId: createdTenant.id, userId, roleId }),
+    ))
+    return {
+      ...createdTenant,
+      users: tenantUsers,
+    }
+  },
   dataMapper: async (allTenantsAllUsers, params, loadFromContext) => {
     const namespaces = await loadFromContext(namespacesCacheKey)
     const heatTenantId = pipe(
@@ -158,11 +175,14 @@ export const mngmGroupMappingActions = createCRUDActions(mngmGroupMappingsCacheK
 export const mngmRolesCacheKey = 'managementRoles'
 export const mngmRoleActions = createCRUDActions(mngmRolesCacheKey, {
   listFn: async () => {
-    const roles = await keystone.getRoles()
-    return roles.filter(role => ['admin', '_member_'].includes(role.name))
+    return keystone.getRoles()
   },
-  dataMapper: roles => roles.map(role => ({
-    ...role,
-    name: role.displayName || role.name,
-  })),
+  dataMapper: (roles, params) => pipe(
+    filterIf(!params.allRoles, role => ['admin', '_member_'].includes(role.name)),
+    map(role => ({
+      ...role,
+      name: role.displayName || role.name,
+    })),
+  )(roles),
+  defaultOrderBy: 'name',
 })

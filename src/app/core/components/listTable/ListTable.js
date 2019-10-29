@@ -11,14 +11,15 @@ import { compose, ensureFunction, except } from 'app/utils/fp'
 import { withAppContext } from 'core/AppProvider'
 import MoreMenu from 'core/components/MoreMenu'
 import {
-  any, assoc, assocPath, equals, pipe, pluck, path, prop, propEq, propOr, uniq, update,
+  any, assoc, assocPath, equals, pipe, pluck, prop, propEq, propOr, uniq, update,
 } from 'ramda'
 import ListTableHead from './ListTableHead'
 import ListTableToolbar from './ListTableToolbar'
 import Progress from 'core/components/progress/Progress'
 import { filterSpecPropType } from 'core/components/cardTable/CardTableToolbar'
-import { isNilOrEmpty, emptyArr } from 'utils/fp'
+import { isNilOrEmpty, emptyArr, pathStr, emptyObj } from 'utils/fp'
 import { listTableActionPropType } from 'core/components/listTable/ListTableBatchActions'
+import moize from 'moize'
 
 const styles = theme => ({
   root: {
@@ -121,7 +122,7 @@ class ListTable extends PureComponent {
     }
   }
 
-  handleClick = row => event => {
+  handleClick = moize(row => event => {
     const { selected } = this.state
     const { multiSelection, onSelectedRowsChange, selectedRows = selected } = this.props
     if (!multiSelection) {
@@ -163,7 +164,7 @@ class ListTable extends PureComponent {
         selected: newSelected,
       })
     }
-  }
+  }, { maxSize: 100 })
 
   handleChangePage = (event, page) => this.setState({ page })
 
@@ -326,9 +327,8 @@ class ListTable extends PureComponent {
     return filters ? this.applyFilters(searchData) : searchData
   }
 
-  renderCell = (columnDef, contents, row) => {
-    const { classes } = this.props
-    const { cellProps = {}, id, render, Component: CellComponent } = columnDef
+  renderCell = moize((columnDef, contents, row, isSelected, cellClass) => {
+    const { cellProps = emptyObj, id, render, Component: CellComponent } = columnDef
     let renderedCell = contents
 
     if (typeof contents === 'boolean') { renderedCell = String(renderedCell) }
@@ -339,13 +339,15 @@ class ListTable extends PureComponent {
     if (render) {
       renderedCell = render(contents, row, this.props.context)
     } else if (CellComponent) {
-      renderedCell = <CellComponent row={row} data={contents} />
+      renderedCell = <CellComponent key={id} row={row} data={contents} isSelected={isSelected} />
     }
 
     return (
-      <TableCell className={classes.cell} key={id} {...cellProps}>{renderedCell}</TableCell>
+      <TableCell className={cellClass} key={id} {...cellProps}>{renderedCell}</TableCell>
     )
-  }
+  }, {
+    maxSize: 1000,
+  })
 
   renderRowActions = row => {
     const { rowActions, onReload, onActionComplete = onReload } = this.props
@@ -366,7 +368,7 @@ class ListTable extends PureComponent {
   }
 
   renderRow = row => {
-    const { multiSelection, showCheckboxes, uniqueIdentifier } = this.props
+    const { multiSelection, showCheckboxes, uniqueIdentifier, classes } = this.props
     const isSelected = this.isSelected(row)
 
     const checkboxProps = showCheckboxes ? {
@@ -388,7 +390,7 @@ class ListTable extends PureComponent {
             : <Radio checked={isSelected} color="primary" />}
         </TableCell>)}
         {this.getSortedVisibleColumns().map(columnDef =>
-          this.renderCell(columnDef, path((columnDef.id || '').split('.'), row), row),
+          this.renderCell(columnDef, pathStr(columnDef.id, row), row, isSelected, classes.cell),
         )}
         {this.renderRowActions(row)}
       </TableRow>

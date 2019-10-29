@@ -23,6 +23,7 @@ const ValidatedFormInput = ({
     values,
     errors,
     setFieldValue,
+    getFieldValue,
     defineField,
     validateField,
     showErrorsOnBlur,
@@ -30,6 +31,7 @@ const ValidatedFormInput = ({
 
   const defineCurrentField = defineField(id)
   const setCurrentFieldValue = setFieldValue(id)
+  const getCurrentFieldValue = getFieldValue(id)
   const validateCurrentField = validateField(id)
   const currentInitialValue = initialValue !== undefined
     ? initialValue : initialValues[id]
@@ -86,6 +88,7 @@ const ValidatedFormInput = ({
     onChange: handleChange,
     onBlur: handleBlur,
     value: currentValue,
+    getCurrentValue: getCurrentFieldValue,
     hasError,
     errorMessage,
     required,

@@ -32,6 +32,7 @@ import LoggingEditPage from './components/logging/LoggingEditPage'
 import DashboardPage from './components/dashboard/DashboardPage'
 import AddResourcePage from 'k8s/components/pods/AddResourcePage'
 import DeployedAppDetailsPage from 'k8s/components/apps/DeployedAppDetailsPage'
+import AddTenantPage from 'k8s/components/userManagement/AddTenantPage'
 
 class Kubernetes extends React.PureComponent {
   render () {
@@ -179,6 +180,11 @@ Kubernetes.registerPlugin = pluginManager => {
         name: 'Tenants & Users',
         link: { path: '/user_management', exact: true },
         component: UserManagementIndexPage,
+      },
+      {
+        name: 'Add Tenant',
+        link: { path: '/user_management/tenants/add', exact: true },
+        component: AddTenantPage,
       },
       {
         name: 'Create Prometheus Instance',

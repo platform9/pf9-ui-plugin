@@ -7,7 +7,7 @@ const defaultTestTenant = 'Development Team Tenant'
 export const keystoneEndpoint = `${config.host}/keystone`
 export const keystoneAdminEndpoint = `${config.host}/keystone_admin`
 export const makeClient = () => new ApiClient({ keystoneEndpoint })
-export const makeAdminClient = () => new ApiClient({ keystoneEndpoint })
+export const makeAdminClient = () => new ApiClient({ keystoneEndpoint: keystoneAdminEndpoint })
 
 export const getUserPass = () => {
   const username = config.username || config.simulator.username

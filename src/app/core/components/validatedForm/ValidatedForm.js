@@ -4,7 +4,7 @@ import ValidatedFormDebug from './ValidatedFormDebug'
 import { withStyles } from '@material-ui/styles'
 import { setStateLens } from 'app/utils/fp'
 import { parseValidator } from 'core/utils/fieldValidators'
-import { pathEq, toPairs } from 'ramda'
+import { pathEq, toPairs, path, lensPath, over, set, identity } from 'ramda'
 import { withRouter } from 'react-router-dom'
 import moize from 'moize'
 
@@ -17,8 +17,8 @@ const styles = theme => ({
   root: {
     display: 'flex',
     flexFlow: 'column wrap',
-    width: '50%',
-    maxWidth: 400,
+    width: ({ fullWidth }) => fullWidth ? '100%' : '50%',
+    maxWidth: ({ fullWidth }) => fullWidth ? null : 400,
     minWidth: 300,
     '& .MuiFormControl-root': {
       width: '100%',
@@ -55,9 +55,13 @@ class ValidatedForm extends PureComponent {
    * Note: many components use event.target.value but we only need value here.
    * Note: values can be passed up to parent component by supplying a setContext function prop
    */
-  setFieldValue = moize(field => (value, validateAll) => {
-    this.setState(setStateLens(value, ['values', field]),
-      () => {
+  setFieldValue = moize(field => {
+    const fieldLens = lensPath(['values', field])
+    return (updaterFn, validateAll) => {
+      const stateUpdater = typeof updaterFn === 'function'
+        ? over(fieldLens, updaterFn)
+        : set(fieldLens, updaterFn)
+      this.setState(stateUpdater, () => {
         if (this.state.showingErrors ||
           (this.props.showErrorsOnBlur && pathEq(['errors', field, 'hasError'], true, this.state))
         ) {
@@ -71,8 +75,12 @@ class ValidatedForm extends PureComponent {
         if (this.props.setContext) {
           this.props.setContext(this.state.values)
         }
-      },
-    )
+      })
+    }
+  })
+
+  getFieldValue = moize(field => (getterFn = identity) => {
+    return getterFn(path(['values', field], this.state))
   })
 
   /**
@@ -123,6 +131,7 @@ class ValidatedForm extends PureComponent {
     fields: {}, // child fields inject data here
     errors: {},
     setFieldValue: this.setFieldValue,
+    getFieldValue: this.getFieldValue,
     defineField: this.defineField,
     validateField: this.validateField,
     showingErrors: false,
@@ -194,6 +203,9 @@ ValidatedForm.propTypes = {
   triggerSubmit: PropTypes.func,
 
   showErrorsOnBlur: PropTypes.bool,
+
+  // eslint-disable-next-line react/no-unused-prop-types
+  fullWidth: PropTypes.bool,
 }
 
 ValidatedForm.defaultProps = {

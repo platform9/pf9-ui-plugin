@@ -7,7 +7,10 @@ import KeyValues, { EntryShape } from 'core/components/KeyValues'
 import withFormContext from 'core/components/validatedForm/withFormContext'
 
 // We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
-const KeyValuesField = React.forwardRef(({ id, value, required, label, hasError, errorMessage, onChange, keySuggestions, valueSuggestions, ...restProps }, ref) =>
+const KeyValuesField = React.forwardRef(({
+  id, value, getCurrentValue, required, label, hasError,
+  errorMessage, onChange, keySuggestions, valueSuggestions, ...restProps
+}, ref) =>
   <FormControl id={id} error={hasError} {...restProps} ref={ref}>
     <Typography variant="caption">{required ? `${label} *` : label}</Typography>
     <KeyValues

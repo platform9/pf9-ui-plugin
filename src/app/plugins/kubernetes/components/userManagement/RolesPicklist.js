@@ -8,21 +8,27 @@ import { allKey } from 'app/constants'
 import { mngmRoleActions } from 'k8s/components/userManagement/actions'
 
 // We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
-const RolesPicklist = forwardRef(({ loading, onChange, selectFirst, ...rest }, ref) => {
-  const [roles, rolesLoading] = useDataLoader(mngmRoleActions.list)
+const RolesPicklist = forwardRef(({
+  allRoles,
+  loading, onChange, value, selectFirst, disabled,
+  ...rest
+}, ref) => {
+  const [roles, rolesLoading] = useDataLoader(mngmRoleActions.list, { allRoles })
   const options = useMemo(() => projectAs(
     { label: 'name', value: 'id' }, roles,
   ), [roles])
 
   // Select the first role as soon as roles are loaded
   useEffect(() => {
-    if (!isEmpty(options) && selectFirst) {
+    if (!isEmpty(options) && selectFirst && !disabled && !value) {
       onChange(propOr(allKey, 'value', head(options)))
     }
-  }, [options])
+  }, [options, disabled])
 
   return <Picklist
     {...rest}
+    disabled={disabled}
+    value={value}
     ref={ref}
     onChange={onChange}
     loading={loading || rolesLoading}
@@ -36,6 +42,7 @@ RolesPicklist.propTypes = {
   label: PropTypes.string,
   formField: PropTypes.bool,
   selectFirst: PropTypes.bool,
+  allRoles: PropTypes.bool,
 }
 
 RolesPicklist.defaultProps = {
@@ -44,7 +51,8 @@ RolesPicklist.defaultProps = {
   label: 'Role',
   formField: false,
   showAll: false,
-  selectFirst: true
+  selectFirst: true,
+  allRoles: true,
 }
 
 export default RolesPicklist

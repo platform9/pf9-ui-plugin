@@ -1,5 +1,6 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { mngmTenantActions } from 'k8s/components/userManagement/actions'
+import { pluck } from 'ramda'
 
 export const options = {
   addUrl: '/ui/kubernetes/user_management/tenants/add',
@@ -9,6 +10,12 @@ export const options = {
     { id: 'name', label: 'Name' },
     { id: 'description', label: 'Description' },
     { id: 'clusters', label: 'Mapped Clusters' },
+    {
+      id: 'users',
+      label: 'Users',
+      display: false,
+      render: users => pluck('name', users).join(', '),
+    },
   ],
   loaderFn: mngmTenantActions.list,
   deleteFn: mngmTenantActions.delete,

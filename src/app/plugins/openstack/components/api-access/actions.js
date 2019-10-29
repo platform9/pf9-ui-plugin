@@ -2,6 +2,7 @@
 // which endpoint to use for each service (internal, public, admin)
 import ApiClient from 'api-client/ApiClient'
 import createContextLoader from 'core/helpers/createContextLoader'
+import { emptyObj } from 'utils/fp'
 
 const serviceMappings = {
   aodh: 'internal',
@@ -30,7 +31,7 @@ export const serviceCatalogContextKey = 'serviceCatalog'
 
 export const loadServiceCatalog = createContextLoader(serviceCatalogContextKey, async () => {
   const services = await keystone.getServicesForActiveRegion()
-  return Object.entries(services).map(([name, service]) => {
+  return Object.entries(services || emptyObj).map(([name, service]) => {
     const iface = whichInterface(service)
     const endpoint = (service && service[iface]) || service[Object.keys(service)[0]]
     return {

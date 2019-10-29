@@ -1,17 +1,18 @@
 import axios from 'axios'
 import { pluck } from 'ramda'
 import { getHighestRole } from './helpers'
+import { pathJoin } from 'utils/misc'
 
 const authConstructors = {
   password: (username, password) => ({
     user: {
       name: username,
       domain: { id: 'default' },
-      password
-    }
+      password,
+    },
   }),
 
-  token: token => ({ id: token })
+  token: token => ({ id: token }),
 }
 
 const constructAuthBody = (method, ...args) => {
@@ -19,9 +20,9 @@ const constructAuthBody = (method, ...args) => {
     auth: {
       identity: {
         methods: [method],
-        [method]: authConstructors[method](...args)
+        [method]: authConstructors[method](...args),
       },
-    }
+    },
   }
 
   return body
@@ -52,21 +53,35 @@ class Keystone {
   }
 
   get endpoint () { return this.client.options.keystoneEndpoint }
+
   get adminEndpoint () { return this.client.options.keystoneAdminEndpoint }
+
   get v3 () { return `${this.endpoint}/v3` }
+
   get adminV3 () { return `${this.endpoint}/v3` }
 
   get catalogUrl () { return `${this.v3}/auth/catalog` }
+
   get projectsAuthUrl () { return `${this.v3}/auth/projects` }
+
   get endpointsUrl () { return `${this.v3}/endpoints` }
+
   get regionsUrl () { return `${this.v3}/regions` }
+
   get projectsUrl () { return `${this.v3}/projects` }
-  get tenantsUrl () { return `${this.adminV3}/PF9-KSADM/all_tenants_all_users` }
+
+  get allTenantsAllUsersUrl () { return `${this.adminV3}/PF9-KSADM/all_tenants_all_users` }
+
   get tokensUrl () { return `${this.v3}/auth/tokens?nocatalog` }
+
   get usersUrl () { return `${this.v3}/users` }
+
   get credentialsUrl () { return `${this.v3}/credentials` }
+
   get groupsUrl () { return `${this.v3}/groups` }
+
   get groupMappingsUrl () { return `${this.v3}/OS-FEDERATION/mappings` }
+
   get rolesUrl () { return `${this.v3}/roles` }
 
   getProject = async (id) => {
@@ -85,8 +100,29 @@ class Keystone {
   }
 
   getAllTenantsAllUsers = async () => {
-    const response = await axios.get(this.tenantsUrl, this.client.getAuthHeaders())
+    const response = await axios.get(this.allTenantsAllUsersUrl, this.client.getAuthHeaders())
     return response.data.tenants
+  }
+
+  addUserRole = async ({ tenantId, userId, roleId }) => {
+    const response = await axios.put(pathJoin(
+      this.projectsUrl,
+      `${tenantId}/users/${userId}/roles/${roleId}`,
+    ))
+    console.log(response)
+    return { tenantId, userId, roleId }
+  }
+
+  deleteUserRole = async ({ tenantId, userId, roleId }) => {
+    try {
+      await axios.delete(pathJoin(
+        this.projectsUrl,
+        `${tenantId}/users/${userId}/roles/${roleId}`,
+      ))
+      return { tenantId, userId, roleId }
+    } catch (err) {
+      throw new Error(`Unable to delete non-existant project`)
+    }
   }
 
   getGroups = async () => {
@@ -142,7 +178,7 @@ class Keystone {
         username: _user.name,
         userId: _user.id,
         tenantId: projectId,
-        role
+        role,
       }
       this.client.activeProjectId = projectId
       this.client.scopedToken = scopedToken
