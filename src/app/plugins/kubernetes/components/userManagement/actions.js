@@ -1,18 +1,20 @@
 import ApiClient from 'api-client/ApiClient'
 import {
   any, pluck, pipe, uniq, map, head, values, groupBy, prop, innerJoin, pathEq, flatten, find,
-  propEq, filter, when, isNil, always,
+  propEq, filter, when, isNil, always, partition,
 } from 'ramda'
 import { tryJsonParse } from 'utils/misc'
 import { namespacesCacheKey } from 'k8s/components/namespaces/actions'
 import createCRUDActions from 'core/helpers/createCRUDActions'
-import { upsertAllBy, emptyObj } from 'utils/fp'
+import { upsertAllBy, emptyObj, emptyArr, filterIf } from 'utils/fp'
 import { uuidRegex } from 'app/constants'
 import createContextLoader from 'core/helpers/createContextLoader'
 
 const { keystone } = ApiClient.getInstance()
 
 export const mngmTenantsCacheKey = 'managementTenants'
+const reservedTenantNames = ['admin', 'services', 'Default', 'heat']
+const filterValidTenants = tenant => !reservedTenantNames.includes(tenant.name)
 export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
   listFn: async () => keystone.getAllTenantsAllUsers(),
   dataMapper: async (allTenantsAllUsers, params, loadFromContext) => {
@@ -21,13 +23,10 @@ export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
       find(propEq('name', 'heat')),
       prop('id'),
     )(allTenantsAllUsers)
+
     return pipe(
-      filter(tenant =>
-        params.blacklisted
-          ? ['admin', 'services', 'Default', 'heat'].includes(tenant.name)
-          : (tenant.domain_id !== heatTenantId &&
-          !['admin', 'services', 'Default', 'heat'].includes(tenant.name)),
-      ),
+      filterIf(!params.includeBlacklisted, filterValidTenants),
+      filter(tenant => tenant.domain_id !== heatTenantId),
       map(tenant => ({
         ...tenant,
         users: tenant.users.filter(user => user.username !== 'admin@platform9.net'),
@@ -49,11 +48,12 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
     return keystone.getUsers()
   },
   dataMapper: async (users, { systemUsers }, loadFromContext) => {
-    const [credentials, tenants, blacklistedTenantIds] = await Promise.all([
+    const [credentials, allTenants] = await Promise.all([
       loadFromContext('credentials'),
-      loadFromContext(mngmTenantsCacheKey),
-      loadFromContext(mngmTenantsCacheKey, { blacklisted: true }).then(pluck('id')),
+      loadFromContext(mngmTenantsCacheKey, { includeBlacklisted: true }),
     ])
+    const [validTenants, blacklistedTenants] = partition(filterValidTenants, allTenants)
+    const blacklistedTenantIds = pluck('id', blacklistedTenants)
 
     // Get all tenant users and assign their corresponding tenant ID
     const pluckUsers = map(tenant =>
@@ -69,7 +69,7 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
       // Get user tenant names and concat them with commas
       tenants: innerJoin(
         (tenant, id) => tenant.id === id,
-        tenants,
+        validTenants,
         uniq(pluck('tenantId', groupedUsers)),
       ).map(prop('name')).join(', '),
     }))
@@ -103,7 +103,7 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
       unifyTenantUsers,
       upsertAllBy(prop('id'), allUsers),
       filterUsers,
-    )(tenants)
+    )(validTenants)
   },
 })
 
@@ -122,7 +122,7 @@ export const mngmGroupActions = createCRUDActions(mngmGroupsCacheKey, {
           flatten,
           find(pathEq(['group', 'id'], group.id)),
         )(mappingRules)
-      }) || { rules: [] }
+      }) || { rules: emptyArr }
       // Filter out the rules not belonging to current group
       const mappingRules = tryJsonParse(groupMapping.rules)
       const groupRules = mappingRules.reduce((groupRules, rule) => {
@@ -131,7 +131,7 @@ export const mngmGroupActions = createCRUDActions(mngmGroupsCacheKey, {
           return groupRules.concat(rule.remote.slice(2))
         }
         return groupRules
-      }, [])
+      }, emptyArr)
       // Stringify the results
       const samlAttributesString = groupRules.reduce((samlAttributes, rule) => {
         if (rule.hasOwnProperty('any_one_of')) {
@@ -140,7 +140,7 @@ export const mngmGroupActions = createCRUDActions(mngmGroupsCacheKey, {
           return samlAttributes.concat(`${rule.type} != ${rule.not_any_of.join(', ')}`)
         }
         return samlAttributes
-      }, []).join(' AND ')
+      }, emptyArr).join(' AND ')
 
       return {
         ...group,

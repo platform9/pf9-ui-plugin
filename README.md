@@ -13,7 +13,10 @@ This is the new home for all things Platform9 UI related.
 
 `cp config.example.js config.js`
 
-Edit `config.js` and make the necessary tweaks.
+edit the username / password to be whatever you'd like (usually your pf9 email)
+
+`config.js` is already specified in the .gitignore.
+
 
 **Starting the Simulator Server
 

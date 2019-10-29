@@ -1,0 +1,10 @@
+---
+- name: serenity
+  endpoints:
+  - name: ui
+    port: 8080
+    httpPath: "/ui"
+  egresses: []
+  logfiles:
+  - path: "/var/log/nginx/access.log"
+  - path: "/var/log/nginx/error.log"

@@ -29,6 +29,10 @@ import ChartVersion from '../models/monocular/ChartVersion'
 import Release from '../models/monocular/Release'
 import Repository from '../models/monocular/Repository'
 import StorageClass from '../models/qbert/StorageClass'
+import K8sRole from '../models/qbert/Role'
+import RoleBinding from '../models/qbert/RoleBinding'
+import ClusterRole from '../models/qbert/ClusterRole'
+import ClusterRoleBinding from '../models/qbert/ClusterRoleBinding'
 import ClusterRepository from '../models/qbert/Repository'
 import PrometheusInstance from '../models/prometheus/PrometheusInstance'
 import Logging from '../models/qbert/Logging'
@@ -222,6 +226,96 @@ function loadPreset () {
 
   // Storage Classes
   StorageClass.create({ data: { metadata: { name: 'fakeStorageClass', annotations: { 'storageclass.kubernetes.io/is-default-class': 'true' } } }, context, config: { clusterId: cluster.uuid } })
+
+  // RBAC
+  const role = K8sRole.create({
+    data: {
+      metadata: {
+        name: 'testRole',
+        namespace: defaultNamespace.name
+      },
+      rules: [
+        {
+          apiGroups: [''],
+          resources: ['pods'],
+          verbs: ['create', 'delete', 'get', 'list', 'patch', 'update']
+        }
+      ]
+    },
+    context,
+    config: {
+      clusterId: cluster.uuid,
+      namespace: defaultNamespace.name
+    }
+  })
+
+  const clusterRole = ClusterRole.create({
+    data: {
+      metadata: {
+        name: 'testClusterRole'
+      },
+      rules: [
+        {
+          apiGroups: [''],
+          resources: ['pods'],
+          verbs: ['create', 'delete', 'get', 'list', 'patch', 'update']
+        }
+      ]
+    },
+    context,
+    config: {
+      clusterId: cluster.uuid
+    }
+  })
+
+  RoleBinding.create({
+    data: {
+      metadata: {
+        name: 'testRoleBinding'
+      },
+      roleRef: {
+        kind: 'Role',
+        name: role.metadata.name,
+        apiGroup: 'rbac.authorization.k8s.io'
+      },
+      subjects: [
+        {
+          kind: 'User',
+          name: adminUser.name,
+          apiGroup: 'rbac.authorization.k8s.io'
+        }
+      ]
+    },
+    context,
+    config: {
+      clusterId: cluster.uuid,
+      namespace: defaultNamespace.name
+    }
+  })
+
+  ClusterRoleBinding.create({
+    data: {
+      metadata: {
+        name: 'testClusterRoleBinding'
+      },
+      roleRef: {
+        kind: 'ClusterRole',
+        apiGroup: 'rbac.authorization.k8s.io',
+        name: clusterRole.metadata.name
+      },
+      subjects: [
+        {
+          kind: 'User',
+          name: adminUser.name,
+          apiGroup: 'rbac.authorization.k8s.io'
+        }
+      ]
+    },
+    context,
+    config: {
+      clusterId: cluster.uuid
+    }
+  })
 
   // Monocular Charts
   range(3).forEach(i => {

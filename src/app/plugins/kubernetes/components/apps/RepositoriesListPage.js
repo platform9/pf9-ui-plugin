@@ -14,8 +14,13 @@ const concatClusterNames = pipe(
 export const options = {
   loaderFn: repositoryActions.list,
   deleteFn: repositoryActions.delete,
-  rowActions: [
-    { icon: <EditIcon />, label: 'Edit repo clusters', dialog: EditRepoClustersDialog },
+  batchActions: [
+    {
+      cond: rows => rows.length === 1,
+      icon: <EditIcon />,
+      label: 'Edit repo clusters',
+      dialog: EditRepoClustersDialog,
+    },
   ],
   addText: 'Add New Repository',
   renderAddDialog: onClose => <AddRepoDialog onClose={onClose} />,

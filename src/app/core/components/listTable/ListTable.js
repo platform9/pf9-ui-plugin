@@ -17,7 +17,7 @@ import ListTableHead from './ListTableHead'
 import ListTableToolbar from './ListTableToolbar'
 import Progress from 'core/components/progress/Progress'
 import { filterSpecPropType } from 'core/components/cardTable/CardTableToolbar'
-import { isNilOrEmpty } from 'utils/fp'
+import { isNilOrEmpty, emptyArr } from 'utils/fp'
 import { listTableActionPropType } from 'core/components/listTable/ListTableBatchActions'
 
 const styles = theme => ({
@@ -50,7 +50,7 @@ export const pluckVisibleColumnIds = columns =>
 class ListTable extends PureComponent {
   constructor (props) {
     super(props)
-    const { columns, visibleColumns, columnsOrder, rowsPerPage, orderBy, orderDirection } = props
+    const { columns, selectedRows, visibleColumns, columnsOrder, rowsPerPage, orderBy, orderDirection } = props
     this.state = {
       columns,
       visibleColumns: visibleColumns || pluckVisibleColumnIds(columns),
@@ -59,7 +59,7 @@ class ListTable extends PureComponent {
       orderBy: orderBy || columns[0].id,
       orderDirection: orderDirection || 'asc',
       page: 0,
-      selected: [],
+      selected: selectedRows || emptyArr,
       searchTerm: '',
       filterValues: {},
     }
@@ -93,56 +93,76 @@ class ListTable extends PureComponent {
 
   areAllSelected = data => {
     const { selected } = this.state
-    return data.every(row => selected.includes(row))
+    const { selectedRows = selected } = this.props
+    return data.every(row => selectedRows.includes(row))
   }
 
   handleSelectAllClick = (event, checked) => {
-    const { paginate } = this.props
     const { selected } = this.state
+    const { paginate, onSelectedRowsChange, selectedRows = selected } = this.props
     const filteredData = this.getFilteredRows()
     const paginatedData = paginate ? this.paginate(filteredData) : filteredData
 
     let newSelected
     if (checked) {
       // Add active paginated rows that are not already selected
-      newSelected = uniq([...selected, ...paginatedData])
+      newSelected = uniq([...selectedRows, ...paginatedData])
     } else {
       // Remove active paginated rows from selected
-      newSelected = selected.filter(row => !paginatedData.includes(row))
+      newSelected = selectedRows.filter(row => !paginatedData.includes(row))
     }
-    this.setState({
-      selected: newSelected,
-    })
+    if (onSelectedRowsChange) {
+      // Controlled mode
+      onSelectedRowsChange(newSelected)
+    } else {
+      this.setState({
+        selected: newSelected,
+      })
+    }
   }
 
   handleClick = row => event => {
     const { selected } = this.state
-    const { multiSelection } = this.props
+    const { multiSelection, onSelectedRowsChange, selectedRows = selected } = this.props
     if (!multiSelection) {
-      this.setState({ selected: [row] })
+      if (onSelectedRowsChange) {
+        // Controlled mode
+        onSelectedRowsChange([row])
+      } else {
+        this.setState({
+          selected: [row],
+        })
+      }
       return
     }
-    const selectedIndex = selected.indexOf(row)
+    const selectedIndex = selectedRows.indexOf(row)
     let newSelected = []
 
     if (selectedIndex === -1) {
       // not found
-      newSelected = newSelected.concat(selected, row)
+      newSelected = newSelected.concat(selectedRows, row)
     } else if (selectedIndex === 0) {
       // first
-      newSelected = newSelected.concat(selected.slice(1))
-    } else if (selectedIndex === selected.length - 1) {
+      newSelected = newSelected.concat(selectedRows.slice(1))
+    } else if (selectedIndex === selectedRows.length - 1) {
       // last
-      newSelected = newSelected.concat(selected.slice(0, -1))
+      newSelected = newSelected.concat(selectedRows.slice(0, -1))
     } else if (selectedIndex > 0) {
       // somewhere inbetween
       newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1),
+        selectedRows.slice(0, selectedIndex),
+        selectedRows.slice(selectedIndex + 1),
       )
     }
 
-    this.setState({ selected: newSelected })
+    if (onSelectedRowsChange) {
+      // Controlled mode
+      onSelectedRowsChange(newSelected)
+    } else {
+      this.setState({
+        selected: newSelected,
+      })
+    }
   }
 
   handleChangePage = (event, page) => this.setState({ page })
@@ -159,21 +179,29 @@ class ListTable extends PureComponent {
   }
 
   handleDelete = async () => {
-    const { onDelete, data } = this.props
+    const { selected, page, rowsPerPage } = this.state
+    const { onDelete, data, selectedRows = selected, onSelectedRowsChange } = this.props
     if (!onDelete) {
       return
     }
-    const { selected, page, rowsPerPage } = this.state
     const maxPage = Math.ceil(data.length / rowsPerPage) - 1
     const pastPage =
-      (page === maxPage && selected.length === data.length % rowsPerPage) ||
-      selected.length === rowsPerPage
+      (page === maxPage && selectedRows.length === data.length % rowsPerPage) ||
+      selectedRows.length === rowsPerPage
 
-    await onDelete(selected)
+    await onDelete(selectedRows)
 
     this.setState({
-      selected: [],
       page: pastPage ? page - 1 : page,
+    }, () => {
+      if (onSelectedRowsChange) {
+        // Controlled mode
+        onSelectedRowsChange(emptyArr)
+      } else {
+        this.setState({
+          selected: emptyArr,
+        })
+      }
     })
   }
 
@@ -274,7 +302,11 @@ class ListTable extends PureComponent {
       ele => ele[target].match(new RegExp(searchTerm, 'i')) !== null)
   }
 
-  isSelected = row => this.state.selected.includes(row)
+  isSelected = row => {
+    const { selected } = this.state
+    const { selectedRows = selected } = this.props
+    return selectedRows.includes(row)
+  }
 
   paginate = data => {
     const { page, rowsPerPage } = this.state
@@ -296,18 +328,22 @@ class ListTable extends PureComponent {
 
   renderCell = (columnDef, contents, row) => {
     const { classes } = this.props
-    const { cellProps = {} } = columnDef
-    let _contents = contents
+    const { cellProps = {}, id, render, Component: CellComponent } = columnDef
+    let renderedCell = contents
 
-    if (typeof contents === 'boolean') { _contents = String(_contents) }
+    if (typeof contents === 'boolean') { renderedCell = String(renderedCell) }
 
     // Allow for customized rendering in the columnDef.  The render function might need
     // to know more about the entire object (row) being rendered and in some cases the
     // entire context (FIXME: This component should not even be aware of `context`)
-    if (columnDef.render) { _contents = columnDef.render(contents, row, this.props.context) }
+    if (render) {
+      renderedCell = render(contents, row, this.props.context)
+    } else if (CellComponent) {
+      renderedCell = <CellComponent row={row} data={contents} />
+    }
 
     return (
-      <TableCell className={classes.cell} key={columnDef.id} {...cellProps}>{_contents}</TableCell>
+      <TableCell className={classes.cell} key={id} {...cellProps}>{renderedCell}</TableCell>
     )
   }
 
@@ -385,6 +421,15 @@ class ListTable extends PureComponent {
 
   render () {
     const {
+      orderDirection,
+      orderBy,
+      searchTerm,
+      selected,
+      visibleColumns,
+      filterValues,
+      rowsPerPage,
+    } = this.state
+    const {
       batchActions,
       classes,
       columns,
@@ -404,17 +449,8 @@ class ListTable extends PureComponent {
       onEdit,
       editCond,
       editDisabledInfo,
+      selectedRows = selected,
     } = this.props
-
-    const {
-      orderDirection,
-      orderBy,
-      searchTerm,
-      selected,
-      visibleColumns,
-      filterValues,
-      rowsPerPage,
-    } = this.state
 
     if (!data) {
       return null
@@ -432,7 +468,7 @@ class ListTable extends PureComponent {
           canDragColumns={canDragColumns}
           columns={this.getSortedVisibleColumns()}
           onColumnsSwitch={this.handleColumnsSwitch}
-          numSelected={selected.length}
+          numSelected={selectedRows.length}
           order={orderDirection}
           orderBy={orderBy}
           onSelectAllClick={this.handleSelectAllClick}
@@ -453,7 +489,7 @@ class ListTable extends PureComponent {
           <Grid item xs={12} zeroMinWidth>
             <div className={classes.root}>
               <ListTableToolbar
-                selected={selected}
+                selected={selectedRows}
                 onAdd={onAdd && this.handleAdd}
                 onDelete={onDelete && this.handleDelete}
                 deleteCond={deleteCond}
@@ -566,7 +602,10 @@ ListTable.propTypes = {
   /**
    * Wether or not to allow selecting multiple rows (checkboxes) or just one at a time (radio boxes)
    */
-  multiSelection: PropTypes.bool
+  multiSelection: PropTypes.bool,
+
+  selectedRows: PropTypes.array,
+  onSelectedRowsChange: PropTypes.func,
 }
 
 ListTable.defaultProps = {

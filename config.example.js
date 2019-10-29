@@ -24,11 +24,11 @@ const config = {
     host: 'http://localhost:3000',
     apiHost: 'http://localhost:4444',
     simulator: {
-      preset: 'base',
+      preset: 'dev',
       username: OS_USERNAME || 'user@domain.com',
       password: OS_PASSWORD || 'secret',
     },
-    region: OS_REGION,
+    region: OS_REGION || 'Default Region',
     // Show development version of the UI
     developer: true,
   },
