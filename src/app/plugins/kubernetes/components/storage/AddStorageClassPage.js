@@ -11,6 +11,7 @@ import CheckboxField from 'core/components/validatedForm/CheckboxField'
 import CodeMirror from 'core/components/validatedForm/CodeMirror'
 import { codeMirrorOptions, allKey } from 'app/constants'
 import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
+import StorageTypePicklist from './StorageTypePicklist'
 import storageClassesActions, { storageClassesCacheKey } from './actions'
 import useParams from 'core/hooks/useParams'
 import useDataLoader from 'core/hooks/useDataLoader'
@@ -67,6 +68,13 @@ const BasicStep = ({ onSubmit, triggerSubmit }) => {
             onChange={getParamsUpdater('clusterId')}
             value={params.clusterId}
             onlyHealthyClusters
+            required
+          />
+          <PicklistField
+            DropdownComponent={StorageTypePicklist}
+            id="storageType"
+            label="Storage Type"
+            info="Select the storage type for this storage class. The list of available storage types is specific to the cloud provider that the cluster belongs to."
             required
           />
           <CheckboxField
@@ -131,7 +139,7 @@ const getInitialStorageClassYaml = (wizardContext) => {
     },
     provisioner: 'kubernetes.io/aws-ebs',
     parameters: {
-      type: 'gp2', // TODO: Add picklist for type
+      type: wizardContext.storageType,
     },
   }
 
