@@ -4,14 +4,14 @@ import Tab from 'core/components/tabs/Tab'
 import PageContainer from 'core/components/pageContainer/PageContainer'
 import ApiAccessListPage from './ApiAccessListPage'
 
-
 const ApiAccessPage = () => (
-<PageContainer>
+  <PageContainer>
     <Tabs>
-        <Tab value="apiAccess" label="API Access"> <ApiAccessListPage></ApiAccessListPage>
-        </Tab>
+      <Tab value="apiAccess" label="API Access">
+        <ApiAccessListPage />
+      </Tab>
     </Tabs>
-</PageContainer>
+  </PageContainer>
 )
 
 export default ApiAccessPage

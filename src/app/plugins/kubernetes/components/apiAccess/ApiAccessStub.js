@@ -1,7 +1,7 @@
 const ApiAccessStub = {
-    apiAccess: [{
+  apiAccess: [{
 
-    }]
+  }]
 }
 
-export default ApiAccessStub;
+export default ApiAccessStub

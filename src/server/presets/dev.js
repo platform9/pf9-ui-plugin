@@ -258,7 +258,6 @@ function loadPreset () {
 
   // API Access
   ApiAccess.create({ data: { metadata: { name: 'fakeService', annotations: { 'storageclass.kubernetes.io/is-default-class': 'true' } } }, context, config: { clusterId: cluster.uuid } })
-
 }
 
 export default loadPreset

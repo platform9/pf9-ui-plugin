@@ -54,14 +54,14 @@ const styles = theme => ({
     backgroundColor: 'inherit',
     overflow: 'hidden',
     borderRight: 0,
-    overflowY: 'auto'
+    overflowY: 'auto',
   },
   drawerHeader: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'flex-end',
     padding: '0 8px',
-    minHeight: 50
+    minHeight: 50,
   },
   inputRoot: {
     color: 'inherit',

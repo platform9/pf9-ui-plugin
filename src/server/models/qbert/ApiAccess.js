@@ -26,4 +26,4 @@ const options = {
 
 const ApiAccess = createModel(options)
 
-export default ApiAccess;
+export default ApiAccess
