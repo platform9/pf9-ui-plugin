@@ -9,9 +9,10 @@ import useReactRouter from 'use-react-router'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import { k8sPrefix } from 'app/constants'
 import { pathJoin } from 'utils/misc'
-import { mngmTenantActions, mngmUserActions } from 'k8s/components/userManagement/actions'
 import useDataLoader from 'core/hooks/useDataLoader'
-import UserRolesTableField from 'k8s/components/userManagement/UserRolesTableField'
+import UserRolesTableField from 'k8s/components/userManagement/tenants/UserRolesTableField'
+import { mngmTenantActions } from 'k8s/components/userManagement/tenants/actions'
+import { mngmUserActions } from 'k8s/components/userManagement/users/actions'
 
 const listUrl = pathJoin(k8sPrefix, 'user_management')
 

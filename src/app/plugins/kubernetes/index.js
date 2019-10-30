@@ -32,7 +32,7 @@ import LoggingEditPage from './components/logging/LoggingEditPage'
 import DashboardPage from './components/dashboard/DashboardPage'
 import AddResourcePage from 'k8s/components/pods/AddResourcePage'
 import DeployedAppDetailsPage from 'k8s/components/apps/DeployedAppDetailsPage'
-import AddTenantPage from 'k8s/components/userManagement/AddTenantPage'
+import AddTenantPage from 'k8s/components/userManagement/tenants/AddTenantPage'
 
 class Kubernetes extends React.PureComponent {
   render () {

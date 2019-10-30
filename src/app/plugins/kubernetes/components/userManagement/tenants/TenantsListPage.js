@@ -1,6 +1,6 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { mngmTenantActions } from 'k8s/components/userManagement/actions'
 import { pluck } from 'ramda'
+import { mngmTenantActions } from 'k8s/components/userManagement/tenants/actions'
 
 export const options = {
   addUrl: '/ui/kubernetes/user_management/tenants/add',
