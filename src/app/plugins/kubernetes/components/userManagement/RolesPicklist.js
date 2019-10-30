@@ -20,10 +20,10 @@ const RolesPicklist = forwardRef(({
 
   // Select the first role as soon as roles are loaded
   useEffect(() => {
-    if (!isEmpty(options) && selectFirst && !disabled && !value) {
+    if (selectFirst && !(disabled || value || isEmpty(options))) {
       onChange(propOr(allKey, 'value', head(options)))
     }
-  }, [options, disabled])
+  }, [options, disabled, selectFirst])
 
   return <Picklist
     {...rest}
@@ -51,7 +51,8 @@ RolesPicklist.defaultProps = {
   label: 'Role',
   formField: false,
   showAll: false,
-  selectFirst: true,
+  showNone: false,
+  selectFirst: false,
   allRoles: true,
 }
 

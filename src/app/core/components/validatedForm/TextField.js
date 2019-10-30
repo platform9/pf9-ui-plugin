@@ -33,7 +33,7 @@ class TextField extends PureComponent {
   }
 
   render () {
-    const { value, label, classes, hasError, errorMessage, required, getCurrentValue, ...restProps } = this.props
+    const { value, label, classes, hasError, errorMessage, required, updateFieldValue, getCurrentValue, ...restProps } = this.props
     return (
       <BaseTextField
         {...restProps}

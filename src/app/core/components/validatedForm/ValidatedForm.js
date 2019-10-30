@@ -57,13 +57,11 @@ class ValidatedForm extends PureComponent {
    */
   setFieldValue = moize(field => {
     const fieldLens = lensPath(['values', field])
-    return (updaterFn, validateAll) => {
-      const stateUpdater = typeof updaterFn === 'function'
-        ? over(fieldLens, updaterFn)
-        : set(fieldLens, updaterFn)
-      this.setState(stateUpdater, () => {
+    const hasErrPath = ['errors', field, 'hasError']
+    return (value, validateAll) => {
+      this.setState(set(fieldLens, value), () => {
         if (this.state.showingErrors ||
-          (this.props.showErrorsOnBlur && pathEq(['errors', field, 'hasError'], true, this.state))
+          (this.props.showErrorsOnBlur && pathEq(hasErrPath, true, this.state))
         ) {
           if (validateAll) {
             this.validateForm()
@@ -71,9 +69,26 @@ class ValidatedForm extends PureComponent {
             this.validateField(field)(null)
           }
         }
-        // Pass field up to parent if there is a parent
-        if (this.props.setContext) {
-          this.props.setContext(this.state.values)
+      })
+    }
+  })
+
+  /**
+   * This can be used to update a field value using an updaterFn instead of assigning a value directly
+   */
+  updateFieldValue = moize(field => {
+    const fieldLens = lensPath(['values', field])
+    const hasErrPath = ['errors', field, 'hasError']
+    return (updaterFn, validateAll) => {
+      this.setState(over(fieldLens, updaterFn), () => {
+        if (this.state.showingErrors ||
+          (this.props.showErrorsOnBlur && pathEq(hasErrPath, true, this.state))
+        ) {
+          if (validateAll) {
+            this.validateForm()
+          } else {
+            this.validateField(field)(null)
+          }
         }
       })
     }
@@ -131,6 +146,7 @@ class ValidatedForm extends PureComponent {
     fields: {}, // child fields inject data here
     errors: {},
     setFieldValue: this.setFieldValue,
+    updateFieldValue: this.updateFieldValue,
     getFieldValue: this.getFieldValue,
     defineField: this.defineField,
     validateField: this.validateField,
@@ -197,7 +213,6 @@ ValidatedForm.propTypes = {
   // Initial values
   initialValues: PropTypes.object,
 
-  // Set parent context
   onSubmit: PropTypes.func,
 
   triggerSubmit: PropTypes.func,

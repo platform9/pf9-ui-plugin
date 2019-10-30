@@ -21,7 +21,7 @@ const useStyles = makeStyles(theme => ({
 const stopPropagation = e => {
   e.stopPropagation()
 }
-const UserRolesTableField = withFormContext(({ id, users, loading, onChange, getCurrentValue, hasError, errorMessage }) => {
+const UserRolesTableField = withFormContext(({ id, users, loading, onChange, updateFieldValue, getCurrentValue, hasError, errorMessage }) => {
   const classes = useStyles()
   const [selectedRows, setSelectedRows] = useState(emptyArr)
   const handleSelectedRowsChange = useCallback(selectedRows => {
@@ -42,15 +42,14 @@ const UserRolesTableField = withFormContext(({ id, users, loading, onChange, get
       Component: ({ row, isSelected }) => {
         const [currentRole, setCurrentRole] = useState(getCurrentValue(prop(row.id)))
         const handleChange = useCallback(role => {
-          onChange(assoc(row.id, role))
+          updateFieldValue(assoc(row.id, role))
           setCurrentRole(role)
         }, [row])
         return <div className={classes.rolesPicklist}>
           <RolesPicklist
-            formField={false}
-            disabled={!isSelected}
             onClick={isSelected ? stopPropagation : noop}
-            value={currentRole}
+            selectFirst={isSelected}
+            value={isSelected ? currentRole : null}
             onChange={handleChange}
           />
         </div>
