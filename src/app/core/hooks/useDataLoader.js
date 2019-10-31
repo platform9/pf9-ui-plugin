@@ -16,10 +16,17 @@ const onErrorHandler = moize((loaderFn, showToast) => (errorMessage, catchedErr,
  * Hook to load data using the specified loader function
  * @param {contextLoaderFn} loaderFn
  * @param {object} [params] Any set of params passed to the loader function
- * @param {boolean} [invalidateCache=false] Reset cache before performing the loading when component mounts
+ * @param {object} [options] Additional custom options
+ * @param {boolean} [options.loadOnDemand] If true, data won't be automatically loaded on component mount or update
+ * @param {boolean} [options.invalidateCache] Reset cache before performing the loading for the first time
  * @returns {[array, boolean, function]} Returns an array with the loaded data, a loading boolean and a function to reload the data
  */
-const useDataLoader = (loaderFn, params = emptyObj, invalidateCache = false) => {
+const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
+  const {
+    loadOnDemand = true,
+    invalidateCache = false,
+  } = options
+
   // Use this ref to invalidate the cache on component mount so we will force data refetch
   // Invalidating the cache clears all the cache for this entity, unlike using the "refetch"
   // param, which only refreshes data for the current set of params
@@ -75,6 +82,7 @@ const useDataLoader = (loaderFn, params = emptyObj, invalidateCache = false) => 
       setData(result)
       setLoading(false)
     }
+    return result
   }
 
   // Memoize the params dependency as we want to make sure it really changed and not just got a new reference
@@ -82,8 +90,10 @@ const useDataLoader = (loaderFn, params = emptyObj, invalidateCache = false) => 
 
   // Load the data on component mount and every time the params change
   useEffect(() => {
-    loadData()
-  }, [memoizedParams, currentTenant, currentRegion])
+    if (!loadOnDemand) {
+      loadData()
+    }
+  }, [memoizedParams, currentTenant, currentRegion, loadOnDemand])
 
   // When unmounted, set the unmounted ref to true to prevent further state updates
   useEffect(() => {
