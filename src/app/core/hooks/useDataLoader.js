@@ -23,7 +23,7 @@ const onErrorHandler = moize((loaderFn, showToast) => (errorMessage, catchedErr,
  */
 const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
   const {
-    loadOnDemand = true,
+    loadOnDemand = false,
     invalidateCache = false,
   } = options
 

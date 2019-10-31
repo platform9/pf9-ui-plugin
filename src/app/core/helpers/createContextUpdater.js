@@ -139,8 +139,12 @@ function createContextUpdater (cacheKey, dataUpdaterFn, options = {}) {
       additionalOptions,
       dumpCache: true,
     })
+    const loadFromContext = (key, params = emptyObj, refetch) => {
+      const loaderFn = getContextLoader(key)
+      return loaderFn({ getContext, setContext, params, refetch, additionalOptions })
+    }
     try {
-      const output = await dataUpdaterFn(params, prevItems)
+      const output = await dataUpdaterFn(params, prevItems, loadFromContext)
       const operationSwitchCase = switchCase(
         // If no operation is chosen (ie "any" or a custom operation), just replace the whole array with the new output
         isNil(output) ? identity : always(output),
