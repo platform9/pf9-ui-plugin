@@ -3,6 +3,7 @@ import { withRouter } from 'react-router-dom'
 import { Grid, Paper, Tab as MDTab, Tabs as MDTabs } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import { compose } from 'utils/fp'
+import PropTypes from 'prop-types'
 
 const TabContext = React.createContext({})
 export const Consumer = TabContext.Consumer
@@ -15,7 +16,6 @@ const styles = theme => ({
     boxShadow: '0 0 0 0',
     backgroundColor: theme.palette.background.default,
   },
-
   tabColor: {
     color: theme.palette.text.primary,
   },
@@ -24,12 +24,13 @@ const styles = theme => ({
 const tabStyles = theme => ({
   root: {
     textTransform: 'none',
-    fontSize: '21px',
+    fontSize: ({ compact }) => compact ? 14 : 21,
     minWidth: 100,
     padding: 0,
-    marginRight: 15,
+    marginRight: ({ compact }) => compact ? 10 : 15,
     margin: '0 0 -1px',
     cursor: 'default',
+    minHeight: ({ compact }) => compact ? 34 : 48,
     '&:hover:not(.Mui-selected)': {
       cursor: 'pointer',
       boxShadow: `inset 0 -2px 0 ${theme.palette.primary.main}`,
@@ -37,7 +38,8 @@ const tabStyles = theme => ({
     },
   },
   wrapper: {
-    padding: '5px 15px 15px',
+    padding: ({ compact }) => compact ? theme.spacing(0.5, 1, 1) : theme.spacing(0.5, 2, 1),
+    marginBottom: ({ compact }) => compact ? 0 : theme.spacing(1),
     transition: 'all .2s',
     lineHeight: 1,
   },
@@ -58,9 +60,10 @@ class Tabs extends PureComponent {
   }
 
   static getDerivedStateFromProps (props, state) {
-    if (props.location.hash && props.location.hash !== state.value) {
+    if (props.useUrlHashes &&
+      props.location.hash && props.location.hash !== state.value) {
       return {
-        value: props.location.hash || false,
+        value: props.location.hash.substr(1) || false,
       }
     }
     return null
@@ -79,30 +82,35 @@ class Tabs extends PureComponent {
 
   render () {
     const { tabs, value } = this.state
-    const { children, classes } = this.props
+    const { children, classes, useUrlHashes, compact } = this.props
     return (
-      <Provider value={this.state}>
-        <Grid container justify="center">
-          <Grid item xs={12} zeroMinWidth>
-            <Paper className={this.props.classes.root}>
-              <div className={classes.tabColor}>
-                <MDTabs
-                  value={value}
-                  onChange={this.handleChange}
-                  indicatorColor="primary"
-                  textColor="inherit"
-                  TabIndicatorProps={{ style: { display: 'none' } }}
-                >
-                  {tabs.map(tab =>
-                    <CustomTab key={tab.value} value={tab.value} label={tab.label} href={tab.value} />,
-                  )}
-                </MDTabs>
+      <Grid container justify="center">
+        <Grid item xs={12} zeroMinWidth>
+          <Paper className={this.props.classes.root}>
+            <div className={classes.tabColor}>
+              <MDTabs
+                value={value}
+                onChange={this.handleChange}
+                indicatorColor="primary"
+                textColor="inherit"
+                TabIndicatorProps={{ style: { display: 'none' } }}
+              >
+                {tabs.map(tab =>
+                  <CustomTab
+                    compact={compact}
+                    key={tab.value}
+                    value={tab.value}
+                    label={tab.label}
+                    href={useUrlHashes ? `#${tab.value}` : null} />,
+                )}
+              </MDTabs>
+              <Provider value={this.state}>
                 {children}
-              </div>
-            </Paper>
-          </Grid>
+              </Provider>
+            </div>
+          </Paper>
         </Grid>
-      </Provider>
+      </Grid>
     )
   }
 }
@@ -110,16 +118,24 @@ class Tabs extends PureComponent {
 export const withTabContext = Component => props => {
   return (
     <Consumer>
-      {
-        ({ value, addTab }) =>
-          <Component
-            {...props}
-            activeTab={value}
-            addTab={addTab}
-          />
-      }
+      {({ value, addTab }) =>
+        <Component
+          {...props}
+          activeTab={value}
+          addTab={addTab}
+        />}
     </Consumer>
   )
+}
+
+Tabs.propTypes = {
+  compact: PropTypes.bool,
+  useUrlHashes: PropTypes.bool,
+}
+
+Tabs.defaultProps = {
+  compact: false,
+  useUrlHashes: true,
 }
 
 export default compose(
