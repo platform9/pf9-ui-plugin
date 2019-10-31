@@ -37,5 +37,6 @@ AwsAvailabilityZoneChooser.propTypes = {
   onChange: PropTypes.func,
   ...ValidatedFormInputPropTypes,
 }
+AwsAvailabilityZoneChooser.displayName = 'AwsAvailabilityZoneChooser'
 
 export default AwsAvailabilityZoneChooser
