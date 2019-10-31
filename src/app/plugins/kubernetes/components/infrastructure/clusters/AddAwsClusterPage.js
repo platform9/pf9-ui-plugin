@@ -19,10 +19,13 @@ import WizardStep from 'core/components/wizard/WizardStep'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import useParams from 'core/hooks/useParams'
 import useReactRouter from 'use-react-router'
-import { pick } from 'ramda'
+import { pick, propEq } from 'ramda'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
+import { cloudProviderActions } from 'k8s/components/infrastructure/cloudProviders/actions'
+import { getContextLoader } from 'core/helpers/createContextLoader'
 import { pathJoin } from 'utils/misc'
 import { k8sPrefix } from 'app/constants'
+import useDataLoader from 'core/hooks/useDataLoader'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
@@ -243,6 +246,11 @@ const renderCustomNetworkingFields = ({ params, getParamsUpdater, values, setFie
   )
 }
 
+const alphaNumericAndHyphensOnly = s => {
+  s = s.replace(/[^a-zA-Z0-9-_.]/g,'-'); // replace non-valid url characters with hyphen
+  return s.replace(/^-+/,''); // eliminate leading hyphens
+}
+
 const AddAwsClusterPage = () => {
   const { params, getParamsUpdater } = useParams()
   const { history } = useReactRouter()
@@ -251,10 +259,15 @@ const AddAwsClusterPage = () => {
   }
   const [create, loading] = useDataUpdater(clusterActions.create, onComplete)
 
+  // It's a little weird to load cloud providers here but React won't let me use a hook inside of handleSubmit.
+  // They can't get to the submit button without first setting a cloud provider so in theory
+  // this should already exist before handleSubmit is called.
+  const [cloudProviders] = useDataLoader(cloudProviderActions.list)
+
   const handleSubmit = params => async data => {
     const body = {
       // basic info
-      ...pick('nodePoolUuid name region azs ami sshKey'.split(' '), data),
+      ...pick('name region azs ami sshKey'.split(' '), data),
 
       // cluster configuration
       ...pick('masterFlavor workerFlavor numMasters enableCAS numWorkers numMaxWorkers allowWorkloadsOnMaster numSpotWorkers spotPrice'.split(' '), data),
@@ -267,6 +280,12 @@ const AddAwsClusterPage = () => {
     }
     if (data.httpProxy) { body.httpProxy = data.httpProxy }
     if (data.networkPlugin === 'calico') { body.mtuSize = data.mtuSize }
+
+    body.externalDnsName = data.usePf9Domain ? 'auto-generate' : alphaNumericAndHypensOnly(data.externalDnsName)
+    body.serviceFqdn = data.usePf9Domain ? 'auto-generate' : alphaNumericAndHypensOnly(data.serviceFqdn)
+
+    // Get the nodePoolUuid from the cloudProviderId.  There is a 1-to-1 mapping between cloudProviderId and nodePoolUuuid right now.
+    body.nodePoolUuid = cloudProviders.find(propEq('uuid', data.cloudProviderId)).nodePoolUuid
 
     data.runtimeConfig = {
       default: '',
@@ -302,11 +321,10 @@ const AddAwsClusterPage = () => {
                       {/* Cloud Provider */}
                       <PicklistField
                         DropdownComponent={CloudProviderPicklist}
-                        id="nodePoolUuid"
+                        id="cloudProviderId"
                         label="Cloud Provider"
                         onChange={getParamsUpdater('cloudProviderId')}
                         info="Nodes will be provisioned using this cloud provider."
-                        value={params.cloudProviderId}
                         type="aws"
                         required
                       />
