@@ -31,7 +31,7 @@ export default ({ onClose, app }) => {
       <ValidatedForm onSubmit={handleSubmit}>
         <Progress loading={deployingApp} renderContentOnMount inline>
           <DialogContent>
-            <TextField id="releaseName" label="Application Name" required />
+            <TextField id="releaseName" label="Application Name" />
             <PicklistField
               DropdownComponent={NamespacePicklist}
               id="namespace"

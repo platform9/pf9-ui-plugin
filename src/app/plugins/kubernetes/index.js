@@ -13,8 +13,9 @@ import NamespacesListPage from './components/namespaces/NamespacesListPage'
 import OnboardingPage from './components/onboarding/OnboardingPage'
 import PodsIndexPage from './components/pods/PodsIndexPage'
 import StorageClassesPage from './components/storage/StorageClassesPage'
-import UpdateCloudProviderPage from './components/infrastructure/cloudProviders/UpdateCloudProviderPage'
-import StorageClassesAddPage from './components/storage/StorageClassesAddPage'
+import UpdateCloudProviderPage
+  from './components/infrastructure/cloudProviders/UpdateCloudProviderPage'
+import StorageClassesAddPage from './components/storage/AddStorageClassPage'
 import UserManagementIndexPage from './components/userManagement/UserManagementIndexPage'
 import AppDetailsPage from 'k8s/components/apps/AppDetailsPage'
 import AddPrometheusInstancePage from './components/prometheus/AddPrometheusInstancePage'
@@ -22,13 +23,16 @@ import PrometheusMonitoringPage from './components/prometheus/PrometheusMonitori
 import UpdatePrometheusInstancePage from './components/prometheus/UpdatePrometheusInstancePage'
 import UpdatePrometheusRulePage from './components/prometheus/UpdatePrometheusRulePage'
 import UpdatePrometheusServiceMonitorPage from './components/prometheus/UpdateServiceMonitorPage'
-import UpdatePrometheusAlertManagerPage from './components/prometheus/UpdatePrometheusAlertManagerPage'
+import UpdatePrometheusAlertManagerPage
+  from './components/prometheus/UpdatePrometheusAlertManagerPage'
 import LoggingIndexPage from './components/logging/LoggingIndexPage'
 import LoggingAddPage from './components/logging/LoggingAddPage'
 import LoggingEditPage from './components/logging/LoggingEditPage'
 // import config from '../../../../config'
 import DashboardPage from './components/dashboard/DashboardPage'
 import AddResourcePage from 'k8s/components/pods/AddResourcePage'
+import DeployedAppDetailsPage from 'k8s/components/apps/DeployedAppDetailsPage'
+import AddTenantPage from 'k8s/components/userManagement/tenants/AddTenantPage'
 
 class Kubernetes extends React.PureComponent {
   render () {
@@ -98,6 +102,11 @@ Kubernetes.registerPlugin = pluginManager => {
         component: AppsIndexPage,
       },
       {
+        name: 'Deployed App Details',
+        link: { path: '/apps/deployed/:clusterId/:release', exact: true },
+        component: DeployedAppDetailsPage,
+      },
+      {
         name: 'App Details',
         link: { path: '/apps/:clusterId/:release/:id', exact: true },
         component: AppDetailsPage,
@@ -114,12 +123,12 @@ Kubernetes.registerPlugin = pluginManager => {
       },
       {
         name: 'Add Deployment',
-        link: { path: '/deployments/add', exact: true },
+        link: { path: '/pods/deployments/add', exact: true },
         component: () => <AddResourcePage resourceType="deployment" />,
       },
       {
         name: 'Add Service',
-        link: { path: '/services/add', exact: true },
+        link: { path: '/pods/services/add', exact: true },
         component: () => <AddResourcePage resourceType="service" />,
       },
       {
@@ -171,6 +180,11 @@ Kubernetes.registerPlugin = pluginManager => {
         name: 'Tenants & Users',
         link: { path: '/user_management', exact: true },
         component: UserManagementIndexPage,
+      },
+      {
+        name: 'Add Tenant',
+        link: { path: '/user_management/tenants/add', exact: true },
+        component: AddTenantPage,
       },
       {
         name: 'Create Prometheus Instance',

@@ -69,7 +69,7 @@ export const options = {
   deleteFn: deploymentActions.delete,
   deleteCond: () => false,
   deleteDisabledInfo: 'Feature not yet implemented',
-  addUrl: '/ui/kubernetes/deployments/add',
+  addUrl: '/ui/kubernetes/pods/deployments/add',
   addText: 'Add Deployment',
   columns: [
     { id: 'name', label: 'Name', render: renderName },

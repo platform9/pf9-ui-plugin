@@ -1,5 +1,5 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { mngmGroupsCacheKey } from 'k8s/components/userManagement/actions'
+import { mngmGroupsCacheKey } from 'k8s/components/userManagement/groups/actions'
 
 export const options = {
   columns: [

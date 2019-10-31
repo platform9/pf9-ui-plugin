@@ -31,6 +31,7 @@ const getKubernetesVersion = async clusterId => {
 }
 
 export const hasMasterNode = propSatisfies(isTruthy, 'hasMasterNode')
+export const hasHealthyMasterNodes = propSatisfies(healthyMasterNodes => healthyMasterNodes.length > 0, 'healthyMasterNodes')
 export const masterlessCluster = propSatisfies(isTruthy, 'masterless')
 export const hasPrometheusEnabled = compose(castFuzzyBool, path(['tags', 'pf9-system:monitoring']))
 export const hasAppCatalogEnabled = propSatisfies(isTruthy, 'appCatalogEnabled')
@@ -49,18 +50,20 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
       const nodeIds = pluck('uuid', nodesInCluster)
       const combinedNodes = combinedHosts.filter(x => nodeIds.includes(x.resmgr.id))
       const calcNodesTotals = calcUsageTotals(combinedNodes)
+      const dashboardLink = `${qbertEndpoint}/clusters/${cluster.uuid}/k8sapi/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:443/proxy/`
+      const host = qbertEndpoint.match(/(.*?)\/qbert/)[1]
+      const grafanaLink = `${host}/k8s/v1/clusters/${cluster.uuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:grafana-ui:80/proxy/`
       const usage = {
         compute: calcNodesTotals('usage.compute.current', 'usage.compute.max'),
         memory: calcNodesTotals('usage.memory.current', 'usage.memory.max'),
         disk: calcNodesTotals('usage.disk.current', 'usage.disk.max'),
+        grafanaLink: hasPrometheusEnabled(cluster) ? grafanaLink : null,
       }
       const masterNodes = nodesInCluster.filter(node => node.isMaster === 1)
       const healthyMasterNodes = masterNodes.filter(
         node => node.status === 'ok' && node.api_responding === 1)
       const hasMasterNode = healthyMasterNodes.length > 0
       const clusterOk = nodesInCluster.length > 0 && cluster.status === 'ok'
-      const dashboardLink = `${qbertEndpoint}/clusters/${cluster.uuid}/k8sapi/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:443/proxy/`
-      const host = qbertEndpoint.match(/(.*?)\/qbert/)[1]
       const fuzzyBools = ['allowWorkloadsOnMaster', 'privileged', 'appCatalogEnabled'].reduce(
         (accum, key) => {
           accum[key] = castFuzzyBool(cluster[key])
@@ -123,12 +126,13 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
   },
   uniqueIdentifier: 'uuid',
   dataMapper: (items,
-    { masterNodeClusters, masterlessClusters, hasControlPanel, appCatalogClusters, prometheusClusters }) => pipe(
+    { masterNodeClusters, masterlessClusters, hasControlPanel, healthyClusters, appCatalogClusters, prometheusClusters }) => pipe(
     filterIf(masterNodeClusters, hasMasterNode),
     filterIf(masterlessClusters, masterlessCluster),
     filterIf(prometheusClusters, hasPrometheusEnabled),
     filterIf(appCatalogClusters, hasAppCatalogEnabled),
     filterIf(hasControlPanel, either(hasMasterNode, masterlessCluster)),
+    filterIf(healthyClusters, hasHealthyMasterNodes),
   )(items),
   defaultOrderBy: 'name',
 })

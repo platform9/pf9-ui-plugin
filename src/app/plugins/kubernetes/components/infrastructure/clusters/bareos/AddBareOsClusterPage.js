@@ -8,6 +8,7 @@ import KeyValuesField from 'core/components/validatedForm/KeyValuesField'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import TextField from 'core/components/validatedForm/TextField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
+import VipInterfaceChooser from './VipInterfaceChooser'
 import Wizard from 'core/components/wizard/Wizard'
 import WizardStep from 'core/components/wizard/WizardStep'
 import useDataUpdater from 'core/hooks/useDataUpdater'
@@ -15,7 +16,12 @@ import useParams from 'core/hooks/useParams'
 import useReactRouter from 'use-react-router'
 import { clusterActions } from '../actions'
 import { pick } from 'ramda'
+import { pathJoin } from 'utils/misc'
+import { k8sPrefix } from 'app/constants'
+
 const { qbert } = ApiClient.getInstance()
+
+const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
 const initialContext = {
   containersCidr: '10.20.0.0/16',
@@ -31,13 +37,12 @@ const runtimeConfigOptions = [
 ]
 
 const AddBareOsClusterPage = () => {
-  const { params } = useParams()
+  const { params, getParamsUpdater } = useParams()
   const { history } = useReactRouter()
-  const onComplete = success => {
-    if (!success) { return console.error('Unable to create cluster') }
+  const onComplete = () => {
     history.push('/ui/kubernetes/infrastructure#clusters')
   }
-  const [create] = useDataUpdater(clusterActions.create, onComplete) // eslint-disable-line
+  const [create, loading] = useDataUpdater(clusterActions.create, onComplete) // eslint-disable-line
 
   const handleSubmit = params => async data => {
     const body = {
@@ -56,7 +61,7 @@ const AddBareOsClusterPage = () => {
     if (data.httpProxy) { body.httpProxy = data.httpProxy }
     if (data.networkPlugin === 'calico') { body.mtuSize = data.mtuSize }
     if (data.enableMetallb) {
-      data.metallbCidr = `${data.metalAddressPoolStart}-${data.metalAddressPoolEnd}`
+      body.metallbCidr = data.metallbCidr
     }
 
     data.runtimeConfig = {
@@ -83,12 +88,12 @@ const AddBareOsClusterPage = () => {
   }
 
   return (
-    <Wizard onComplete={handleSubmit(params)} context={initialContext}>
-      {({ wizardContext, setWizardContext, onNext }) => {
-        return (
-          <>
-            <WizardStep stepId="basic" label="Basic Info">
-              <FormWrapper title="Add Cluster">
+    <FormWrapper title="Add Bare OS Cluster" backUrl={listUrl} loading={loading}>
+      <Wizard onComplete={handleSubmit(params)} context={initialContext}>
+        {({ wizardContext, setWizardContext, onNext }) => {
+          return (
+            <>
+              <WizardStep stepId="basic" label="Basic Info">
                 <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                   {({ setFieldValue, values }) => (
                     <>
@@ -105,6 +110,7 @@ const AddBareOsClusterPage = () => {
                       {/* Master nodes */}
                       <ClusterHostChooser
                         id="masterNodes"
+                        onChange={getParamsUpdater('masterNodes')}
                         isMaster
                       />
 
@@ -117,11 +123,9 @@ const AddBareOsClusterPage = () => {
                     </>
                   )}
                 </ValidatedForm>
-              </FormWrapper>
-            </WizardStep>
+              </WizardStep>
 
-            <WizardStep stepId="workers" label="Woker Nodes">
-              <FormWrapper title="Worker Nodes">
+              <WizardStep stepId="workers" label="Woker Nodes">
                 <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                   {({ setFieldValue, values }) => (
                     <>
@@ -133,11 +137,9 @@ const AddBareOsClusterPage = () => {
                     </>
                   )}
                 </ValidatedForm>
-              </FormWrapper>
-            </WizardStep>
+              </WizardStep>
 
-            <WizardStep stepId="network" label="Network Info">
-              <FormWrapper title="Network Info">
+              <WizardStep stepId="network" label="Network Info">
                 <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                   {({ setFieldValue, values }) => (
                     <>
@@ -146,18 +148,26 @@ const AddBareOsClusterPage = () => {
                         label="Virtual IP address for cluster"
                         info={
                           <div>
-                            Specify the virtual IP address that will be used to provide access to the API server endpoint for this cluster.
-                            Refer to <a href="https://docs.platform9.com/support/ha-for-baremetal-multimaster-kubernetes-cluster-service-type-load-balancer/">this article</a>
-                            for more information re how the VIP service operates, VIP configuration, etc.
+                            Specify the virtual IP address that will be used to provide access to
+                            the API server endpoint for this cluster.
+                            A virtual IP must be specified if you want to grow the number of masters
+                            in the future.
+                            Refer
+                            to <a href="https://docs.platform9.com/support/ha-for-baremetal-multimaster-kubernetes-cluster-service-type-load-balancer/" target="_blank">this
+                            article</a>
+                            for more information re how the VIP service operates, VIP configuration,
+                            etc.
                           </div>
                         }
-                        required
+                        required={params.masterNodes.length > 1}
                       />
 
-                      <TextField
+                      <PicklistField
+                        DropdownComponent={VipInterfaceChooser}
                         id="masterVipIface"
                         label="Physical interface for virtual IP association"
                         info="Provide the name of the network interface that the virtual IP should be bound to. The virtual IP should be reachable from the network this interface connects to. Note: All master nodes should use the same interface (eg: ens3) that the virtual IP will be bound to."
+                        masterNodes={params.masterNodes}
                         required
                       />
 
@@ -169,20 +179,12 @@ const AddBareOsClusterPage = () => {
                       />
 
                       {values.enableMetallb &&
-                        <>
-                          <TextField
-                            id="metalAddressPoolStart"
-                            label="Start of address pool for MetalLB"
-                            info="Provide the IP address pool that MetalLB load-balancer is allowed to allocate from. You need to specify an explicit start-end range of IPs for the pool."
-                            required
-                          />
-                          <TextField
-                            id="metalAddressPoolEnd"
-                            label="End of address pool for MetalLB"
-                            info="Provide the IP address pool that MetalLB load-balancer is allowed to allocate from. You need to specify an explicit start-end range of IPs for the pool."
-                            required
-                          />
-                        </>
+                      <TextField
+                        id="metallbCidr"
+                        label="Address pool range(s) for Metal LB"
+                        info="Provide the IP address pool that MetalLB load-balancer is allowed to allocate from. You need to specify an explicit start-end range of IPs for the pool.  It takes the following format: startIP1-endIP1,startIP2-endIP2"
+                        required
+                      />
                       }
 
                       {/* API FQDN */}
@@ -218,11 +220,9 @@ const AddBareOsClusterPage = () => {
                     </>
                   )}
                 </ValidatedForm>
-              </FormWrapper>
-            </WizardStep>
+              </WizardStep>
 
-            <WizardStep stepId="advanced" label="Advanced Configuration">
-              <FormWrapper title="Advanced Configuration">
+              <WizardStep stepId="advanced" label="Advanced Configuration">
                 <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                   {({ setFieldValue, values }) => (
                     <>
@@ -244,11 +244,11 @@ const AddBareOsClusterPage = () => {
                       />
 
                       {values.runtimeConfigOption === 'custom' &&
-                        <TextField
-                          id="customRuntimeConfig"
-                          label="Custom API Configuration"
-                          info=""
-                        />
+                      <TextField
+                        id="customRuntimeConfig"
+                        label="Custom API Configuration"
+                        info=""
+                      />
                       }
 
                       {/* Enable Application Catalog */}
@@ -267,20 +267,18 @@ const AddBareOsClusterPage = () => {
                     </>
                   )}
                 </ValidatedForm>
-              </FormWrapper>
-            </WizardStep>
+              </WizardStep>
 
-            <WizardStep stepId="review" label="Review">
-              <FormWrapper title="Review">
+              <WizardStep stepId="review" label="Review">
                 <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                   <BareOsClusterReviewTable data={wizardContext} />
                 </ValidatedForm>
-              </FormWrapper>
-            </WizardStep>
-          </>
-        )
-      }}
-    </Wizard>
+              </WizardStep>
+            </>
+          )
+        }}
+      </Wizard>
+    </FormWrapper>
   )
 }
 

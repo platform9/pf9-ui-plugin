@@ -1,10 +1,10 @@
 import {
   path, pick, isEmpty, identity, assoc, find, whereEq, when, isNil, reject, filter, always, append,
   of, pipe, over, lensPath, pickAll, view, has, equals, values, either, sortBy, reverse, mergeLeft,
-  map,
+  map, toLower, is,
 } from 'ramda'
 import moize from 'moize'
-import { ensureFunction, ensureArray, emptyObj, emptyArr, upsertAllBy } from 'utils/fp'
+import { ensureFunction, ensureArray, emptyObj, emptyArr, upsertAllBy, pathStr } from 'utils/fp'
 import { memoizePromise, uncamelizeString } from 'utils/misc'
 import { defaultUniqueIdentifier, allKey } from 'app/constants'
 
@@ -16,6 +16,7 @@ export const getContextLoader = key => {
   return loaders[key]
 }
 const arrayIfNil = when(isNil, always(emptyArr))
+const stringIfNil = when(isNil, always(''))
 const arrayIfEmpty = when(isEmpty, always(emptyArr))
 
 /**
@@ -83,7 +84,7 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
     defaultOrderDirection = 'asc',
     sortWith = (items, { orderBy = defaultOrderBy, orderDirection = defaultOrderDirection }) =>
       pipe(
-        sortBy(path(orderBy.split('.'))),
+        sortBy(pipe(pathStr(orderBy), stringIfNil, when(is(String), toLower))),
         orderDirection === 'asc' ? identity : reverse,
       )(items),
     fetchSuccessMessage = (params) => `Successfully fetched ${entityName} items`,
@@ -122,8 +123,7 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
    * @param {object} [args.refetch] Invalidates the cache and calls the dataFetchFn() to fetch the
    * data from server
    *
-   * @param {boolean} [args.rawData] Return raw server data without any additional postprocessing
-   * (via dataMapper) or sorting
+   * @param {boolean} [args.dumpCache] Return all the cached data
    *
    * @param {object} [args.additionalOptions] Additional custom options
    *
@@ -134,7 +134,17 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
    * @returns {Promise<array>} Fetched or cached items
    */
   const contextLoaderFn = memoizePromise(
-    async ({ getContext, setContext, params = emptyObj, refetch = false, rawData = false, additionalOptions = emptyObj }) => {
+    async ({ getContext, setContext, params = emptyObj, refetch = false, dumpCache = false, additionalOptions = emptyObj }) => {
+      const loadFromContext = (key, params = emptyObj, refetchDeep = refetchCascade && refetch) => {
+        const loaderFn = getContextLoader(key)
+        return loaderFn({ getContext, setContext, params, refetch: refetchDeep, additionalOptions })
+      }
+      // Just return all the cached data (don't try to refetch the data)
+      // Used by context updater functions
+      if (dumpCache) {
+        const allCachedData = getContext(view(dataLens)) || emptyArr
+        return memoizedDataMapper(allCachedData, params, loadFromContext)
+      }
       // Get the required values from the provided params
       const providedRequiredParams = pipe(
         pick(allRequiredParams),
@@ -152,10 +162,7 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
         pickAll(allIndexKeys),
         reject(either(isNil, equals(allKey))),
       )(params)
-      const loadFromContext = (key, params = emptyObj, refetchDeep = refetchCascade && refetch) => {
-        const loaderFn = getContextLoader(key)
-        return loaderFn({ getContext, setContext, params, refetch: refetchDeep, additionalOptions })
-      }
+
       try {
         if (!refetch && !contextLoaderFn._invalidatedCache) {
           const allCachedParams = getContext(view(paramsLens)) || emptyArr
@@ -171,9 +178,6 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
               // Return the constant emptyArr to avoid unnecessary re-renderings
               arrayIfEmpty,
             ))
-            if (rawData) {
-              return cachedItems
-            }
             const mappedData = await memoizedDataMapper(cachedItems, params, loadFromContext)
             return sortWith(mappedData, params)
           }
@@ -210,9 +214,6 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
         if (onSuccess) {
           const parsedSuccessMesssage = ensureFunction(fetchSuccessMessage)(params)
           await onSuccess(parsedSuccessMesssage, params)
-        }
-        if (rawData) {
-          return itemsWithParams
         }
         const mappedData = await memoizedDataMapper(itemsWithParams, params, loadFromContext)
         return sortWith(mappedData, params)

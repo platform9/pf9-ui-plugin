@@ -25,7 +25,7 @@ class ConfirmationDialog extends React.PureComponent {
     return (
       <Dialog
         open={open}
-        onClose={this.handleClose}
+        onClose={this.handleCancel}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
@@ -51,9 +51,11 @@ class ConfirmationDialog extends React.PureComponent {
 ConfirmationDialog.propTypes = {
   open: PropTypes.bool.isRequired,
   title: PropTypes.string,
-  text: PropTypes.string,
+  text: PropTypes.node,
   cancelText: PropTypes.string,
   confirmText: PropTypes.string,
+  onCancel: PropTypes.func,
+  onConfirm: PropTypes.func,
 }
 
 ConfirmationDialog.defaultProps = {

@@ -1,5 +1,5 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { mngmRolesCacheKey } from 'k8s/components/userManagement/actions'
+import { mngmRolesCacheKey } from 'k8s/components/userManagement/roles/actions'
 
 export const options = {
   columns: [

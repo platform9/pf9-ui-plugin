@@ -14,7 +14,6 @@ const useStyles = makeStyles(theme => ({
     display: 'inline-block',
     marginTop: theme.spacing(1),
     marginRight: theme.spacing(0.5),
-    maxWidth: 100,
     textOverflow: 'clip',
     whiteSpace: 'pre-wrap',
     overflow: 'hidden',
@@ -41,7 +40,6 @@ const useStyles = makeStyles(theme => ({
     flexBasis: 'auto',
     flexShrink: 1,
     flexGrow: 1,
-    overflow: 'hidden',
   },
   icon: {
     width: '100%',
@@ -57,37 +55,18 @@ const useStyles = makeStyles(theme => ({
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1),
   },
-  info: {
-    overflow: 'hidden',
-    position: 'relative',
-    /* use this value to count block height */
-    lineHeight: '1.5em',
-    /* max-height = line-height (1.2) * lines max number (3) */
-    maxHeight: '4.5em',
-    textAligh: 'justify',
-    marginRight: '-1em',
-    paddingRight: '1em',
-    '&:before': {
-      content: '\'...\'',
-      position: 'absolute',
-      right: theme.spacing(1),
-      bottom: 0,
-    },
-    '&:after': {
-      content: '\'\'',
-      position: 'absolute',
-      right: 0,
-      width: '2em',
-      height: '1em',
-      marginTop: '0.2em',
-      background: 'white',
-    },
-  },
   content: {
     flex: '1 0 auto',
-    height: 140,
+    minHeight: 156,
+    maxHeight: 156,
+    transition: 'max-height 0.3s cubic-bezier(0, 1, 0, 1)',
+    '&:hover': {
+      maxHeight: 312,
+      transition: 'max-height 0.6s ease-in-out',
+    },
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+    padding: theme.spacing(1, 2, 0),
   },
   actions: {
     display: 'flex',

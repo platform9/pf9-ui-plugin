@@ -39,6 +39,7 @@ const useStyles = makeStyles(theme => ({
   },
   content: {
     zIndex: 0,
+    minHeight: 400,
   },
 }))
 

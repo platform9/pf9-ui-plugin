@@ -40,6 +40,7 @@ const useStyles = makeStyles(theme => ({
   },
   search: {
     margin: theme.spacing(1, 2, 0, 2),
+    maxWidth: 240,
   },
   rowActions: {
     color: 'inherit',

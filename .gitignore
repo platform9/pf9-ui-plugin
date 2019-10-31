@@ -15,3 +15,8 @@ coverage/*
 .vscode
 cypress/screenshots/*
 cypress/videos/*
+
+build-container/
+node-v*-linux-x64.tar.gz
+node/
+

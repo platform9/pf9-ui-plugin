@@ -1,14 +1,14 @@
 import React, { useMemo } from 'react'
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core'
-import { withInfoTooltip } from 'app/core/components/InfoTooltip'
-import { compose } from 'app/utils/fp'
+import { withInfoTooltip } from 'core/components/InfoTooltip'
+import { compose } from 'utils/fp'
 import TenantRoleSelector from 'core/components/TenantRoleSelector'
 import { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
 import useDataLoader from 'core/hooks/useDataLoader'
 import tenantActions from 'openstack/components/tenants/actions'
 import Progress from 'core/components/progress/Progress'
 
-// TODO revise and improve this component
+// TODO revise and improve this component, check UserRolesTableField used in kubernetes
 const TenantRolesContainer = ({ value, setFieldValue, id, roles }) => {
   const [tenants, loadingTenants] = useDataLoader(tenantActions.list)
 

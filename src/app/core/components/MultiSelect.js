@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import { makeStyles, createStyles } from '@material-ui/styles'
 import Box from '@material-ui/core/Box'
@@ -11,6 +11,7 @@ import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank'
 import CheckBoxIcon from '@material-ui/icons/CheckBox'
 import SearchIcon from '@material-ui/icons/Search'
 import * as Fuse from 'fuse.js'
+import { Typography, FormHelperText } from '@material-ui/core'
 
 const FUSE_OPTIONS = {
   keys: ['value', 'label'],
@@ -18,10 +19,18 @@ const FUSE_OPTIONS = {
 
 const useStyles = makeStyles(theme => createStyles({
   container: {
+    position: 'relative',
     display: 'inline-flex',
     flexDirection: 'column',
-    padding: 8,
-    border: `1px solid ${theme.palette.common.black}`,
+    padding: theme.spacing(2, 1, 1, 1),
+    borderRadius: 4,
+    border: `1px solid ${theme.palette.grey[400]}`,
+  },
+  label: {
+    position: 'absolute',
+    top: -12,
+    backgroundColor: 'white',
+    padding: 4,
   },
   searchInputWrapper: {
     marginBottom: 4,
@@ -31,7 +40,7 @@ const useStyles = makeStyles(theme => createStyles({
   },
   input: {
     boxSizing: 'border-box',
-    height: 30,
+    height: 28,
     padding: 6,
     fontSize: 13,
   },
@@ -39,7 +48,7 @@ const useStyles = makeStyles(theme => createStyles({
     paddingLeft: 8,
   },
   searchIcon: {
-    color: '#bababa',
+    color: '#BABABA',
   },
   positionStart: {
     marginRight: 0,
@@ -64,80 +73,70 @@ const useStyles = makeStyles(theme => createStyles({
   },
 }))
 
-const MultiSelect = ({ label, options, values, onChange, maxOptions, sortSelectedFirst }) => {
-  const classes = useStyles()
+const MultiSelect = React.forwardRef(
+  ({
+    id, label, hasError, required, errorMessage,
+    options, values, onChange, maxOptions, sortSelectedFirst,
+  }, ref) => {
+    const classes = useStyles()
 
-  const sortOptions = (options) => {
-    const sortBySelected = (a, b) => values.includes(b.value) - values.includes(a.value)
-    const sortedOptions = sortSelectedFirst ? options.sort(sortBySelected) : options
-    return sortedOptions
-  }
+    const [term, setTerm] = useState('')
+    const fuse = useMemo(() => new Fuse(options, FUSE_OPTIONS), [options])
 
-  const [visibleOptions, setVisibleOptions] = useState(sortOptions(options))
-  const [fuse, setFuse] = useState(null)
-
-  useEffect(() => {
-    setFuse(new Fuse(options, FUSE_OPTIONS))
     // Change visibleOptions when we receive async changes to options.
     // `options` is originally `[]` during most async data loading.
-    setVisibleOptions(sortOptions(options))
-  }, [options])
+    const sortedOptions = useMemo(() => {
+      const visibleOptions = term ? fuse.search(term) : options
+      const sortBySelected = (a, b) => values.includes(b.value) - values.includes(a.value)
+      return sortSelectedFirst ? visibleOptions.sort(sortBySelected) : visibleOptions
+    }, [term, fuse, values, sortSelectedFirst])
 
-  const toggleOption = (value) => {
-    const updatedValues = values.includes(value)
-      ? values.filter(currentValue => currentValue !== value)
-      : [...values, value]
+    const toggleOption = (value) => {
+      const updatedValues = values.includes(value)
+        ? values.filter(currentValue => currentValue !== value)
+        : [...values, value]
 
-    onChange(updatedValues)
-  }
-
-  const onSearchChange = (term) => {
-    if (!term) {
-      setVisibleOptions(sortOptions(options))
-    } else if (fuse) {
-      const searchResults = fuse.search(term)
-      setVisibleOptions(sortOptions(searchResults))
+      onChange(updatedValues)
     }
-  }
 
-  const onHitEnter = () => {
-    if (visibleOptions.length === 1) {
-      toggleOption(visibleOptions[0].value)
+    const onHitEnter = () => {
+      if (sortedOptions.length === 1) {
+        toggleOption(sortedOptions[0].value)
+      }
     }
-  }
 
-  return (
-    <Box className={classes.container}>
-      <SearchField classes={classes} onSearchChange={onSearchChange} onHitEnter={onHitEnter} />
-      <Box
-        className={classes.options}
-        style={{ height: maxOptions ? getOptionsHeight(maxOptions) : 'initial' }}
-      >
-        {visibleOptions.map((option) => (
-          <Option
-            classes={classes}
-            key={option.value}
-            label={option.label}
-            value={option.value}
-            checked={values.includes(option.value)}
-            onChange={() => toggleOption(option.value)}
-          />
-        ))}
-      </Box>
-    </Box>
-  )
-}
+    return (
+      <FormControl className={classes.container} id={id} error={hasError} ref={ref}>
+        <Typography className={classes.label} variant="caption">{required
+          ? `${label} *`
+          : label}</Typography>
+        <SearchField classes={classes} term={term} onSearchChange={setTerm} onHitEnter={onHitEnter} />
+        <Box
+          className={classes.options}
+          style={{ height: maxOptions ? getOptionsHeight(maxOptions) : 'initial' }}
+        >
+          {sortedOptions.map((option) => (
+            <Option
+              classes={classes}
+              key={option.value}
+              label={option.label}
+              value={option.value}
+              checked={values.includes(option.value)}
+              onChange={() => toggleOption(option.value)}
+            />
+          ))}
+        </Box>
+        {errorMessage && <FormHelperText>{errorMessage}</FormHelperText>}
+      </FormControl>
+    )
+  })
 
-const SearchField = ({ classes, onSearchChange, onHitEnter }) => {
-  const [term, setTerm] = useState('')
-
-  useEffect(() => onSearchChange(term), [term])
-
+const SearchField = ({ classes, term, onSearchChange, onHitEnter }) => {
   const handleKeyDown = (event) => {
     if (event.key === 'Enter') {
       onHitEnter()
     } else if (event.key === 'Escape') {
-      setTerm('')
+      onSearchChange('')
     }
   }
 
@@ -145,7 +144,7 @@ const SearchField = ({ classes, onSearchChange, onHitEnter }) => {
     <FormControl className={classes.searchInputWrapper}>
       <OutlinedInput
         value={term}
-        onChange={(e) => setTerm(e.target.value)}
+        onChange={e => onSearchChange(e.target.value)}
         onKeyDown={handleKeyDown}
         startAdornment={
           <InputAdornment position="start" classes={{ positionStart: classes.positionStart }}>

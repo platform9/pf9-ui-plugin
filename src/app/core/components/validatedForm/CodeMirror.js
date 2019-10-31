@@ -26,6 +26,7 @@ const CodeMirror = ({
   id,
   label,
   value,
+  getCurrentValue,
   classes,
   hasError,
   errorMessage,

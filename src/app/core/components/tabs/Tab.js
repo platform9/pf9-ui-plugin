@@ -6,15 +6,12 @@ import { withTabContext } from 'core/components/tabs/Tabs'
 class Tab extends PureComponent {
   componentDidMount () {
     const { addTab, value, label } = this.props
-
-    // The hash is prefixed to make it compatible with hashes in the URL.
-    // This allows the page to be reloaded and the correct tab to be selected.
-    addTab({ value: `#${value}`, label })
+    addTab({ value, label })
   }
 
   render () {
     const { activeTab, value, children } = this.props
-    if (`#${value}` !== activeTab) { return null }
+    if (value !== activeTab) { return null }
     return (
       <Typography component="div">{children}</Typography>
     )

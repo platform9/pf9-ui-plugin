@@ -4,7 +4,7 @@ import SubmitButton from 'core/components/SubmitButton'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import TextField from 'core/components/validatedForm/TextField'
 import NoAutofillHack from 'core/components/NoAutofillHack'
-import TenantRolesContainer from 'core/components/validatedForm/TenantRolesContainer'
+import TenantRolesContainer from 'openstack/components/users/TenantRolesContainer'
 import userActions from './actions'
 
 const roles = ['None', 'Role1', 'Role2', 'Role3']

@@ -12,6 +12,7 @@ import { emptyObj, emptyArr } from 'utils/fp'
 import SimpleLink from 'core/components/SimpleLink'
 import AppDeployDialog from 'k8s/components/apps/AppDeployDialog'
 import PageContainer from 'core/components/pageContainer/PageContainer'
+import ExternalLink from 'core/components/ExternalLink'
 
 const useStyles = makeStyles(theme => ({
   backLink: {
@@ -21,16 +22,17 @@ const useStyles = makeStyles(theme => ({
   card: {
     display: 'flex',
     flexFlow: 'column nowrap',
-    paddingBottom: theme.spacing(3),
+    padding: theme.spacing(1, 1, 3, 1),
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     overflowWrap: 'break-word',
   },
   paper: {
-    paddingBottom: theme.spacing(3),
+    padding: theme.spacing(1, 1, 3, 1),
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     overflowWrap: 'break-word',
+    backgroundColor: '#e2f4ff'
   },
   icon: {
     width: '100%',
@@ -63,7 +65,7 @@ const AppDetailsPage = () => {
       onClose={() => setShowingDeployDialog(false)} />}
     <Progress loading={loadingApp} overlay renderContentOnMount>
       <Grid container justify="center" spacing={3}>
-        <Grid item xs={4}>
+        <Grid item xs={3} lg={2}>
           {app.logoUrl && <Card className={classes.card}>
             <CardMedia className={classes.icon} image={app.logoUrl} title={app.name} />
             <Button
@@ -88,7 +90,7 @@ const AppDetailsPage = () => {
               Home
             </Typography>
             <Typography variant="body2" component="div">
-              {app.home && <SimpleLink target="_blank" src={app.home} />}
+              {app.home && <ExternalLink url={app.home} />}
             </Typography>
             <br />
             <Typography
@@ -98,7 +100,7 @@ const AppDetailsPage = () => {
             <Typography variant="body2" component="div">
               {(app.sources || emptyArr).map(source =>
                 <div key={source}>
-                  <SimpleLink target="_blank" src={source} />
+                  <ExternalLink url={source} />
                 </div>)}
             </Typography>
             <br />
@@ -109,12 +111,12 @@ const AppDetailsPage = () => {
             <Typography variant="body2" component="div">
               {(app.maintainers || emptyArr).map(maintainer =>
                 <div key={maintainer.email}>
-                  <SimpleLink target="_blank" src={`mailto: ${maintainer.email}`}>{maintainer.name}</SimpleLink>
+                  <ExternalLink url={`mailto: ${maintainer.email}`}>{maintainer.name}</ExternalLink>
                 </div>)}
             </Typography>
           </Paper>
         </Grid>
-        <Grid item xs={8} zeroMinWidth>
+        <Grid item xs={9} lg={10} zeroMinWidth>
           <AppVersionPicklist
             label="Application Version"
             appId={params.appId}
