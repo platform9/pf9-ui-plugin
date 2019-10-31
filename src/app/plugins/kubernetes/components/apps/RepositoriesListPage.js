@@ -23,7 +23,7 @@ export const options = {
     },
   ],
   addText: 'Add New Repository',
-  renderAddDialog: onClose => <AddRepoDialog onClose={onClose} />,
+  AddDialog: AddRepoDialog,
   columns: [
     { id: 'name', label: 'Name' },
     { id: 'url', label: 'URL' },

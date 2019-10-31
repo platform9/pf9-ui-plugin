@@ -25,7 +25,7 @@ class ConfirmationDialog extends React.PureComponent {
     return (
       <Dialog
         open={open}
-        onClose={this.handleClose}
+        onClose={this.handleCancel}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >

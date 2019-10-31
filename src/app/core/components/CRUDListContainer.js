@@ -1,102 +1,106 @@
-import { compose } from 'app/utils/fp'
+import { isNilOrEmpty, emptyArr, emptyObj } from 'app/utils/fp'
 import PropTypes from 'prop-types'
-import React from 'react'
-import { withRouter } from 'react-router-dom'
+import React, { useState, useMemo, useCallback, useRef } from 'react'
 import ConfirmationDialog from './ConfirmationDialog'
-import { mapAsync } from 'utils/async'
+import useToggler from 'core/hooks/useToggler'
+import { defaultUniqueIdentifier } from 'app/constants'
+import { pluck, path } from 'ramda'
+import useReactRouter from 'use-react-router'
+import { pathJoin } from 'utils/misc'
 
-class CRUDListContainer extends React.PureComponent {
-  componentDidMount () {
-    if (this.props.getQuery) {
-      console.error(`TODO: remove getQuery usage from CRUDListContainer`)
-    }
-  }
+const CRUDListContainer = ({ children, nameProp, AddDialog, EditDialog, addUrl, editUrl, onRemove, uniqueIdentifier }) => {
+  const uniqueIdentifierPath = uniqueIdentifier.split('.')
+  const { history } = useReactRouter()
+  const deletePromise = useRef()
+  const [showingConfirmDialog, toggleConfirmDialog] = useToggler()
+  const [showingEditDialog, toggleEditDialog] = useToggler()
+  const [showingAddDialog, toggleAddDialog] = useToggler()
+  const [selectedItems, setSelectedItems] = useState(null)
 
-  state = {
-    showConfirmation: false,
-    selectedItems: null,
-  }
+  const deleteEnabled = !!onRemove
+  const editEnabled = EditDialog || editUrl
+  const addEnabled = AddDialog || addUrl
 
-  deleteConfirmText = () => {
-    const { selectedItems } = this.state
-    if (!selectedItems) {
+  const deleteConfirmText = useMemo(() => {
+    if (isNilOrEmpty(selectedItems)) {
       return
     }
-    const selectedNames = selectedItems.map(x => x.name).join(', ')
+    const selectedNames = pluck(nameProp, selectedItems).join(', ')
     return `This will permanently delete the following: ${selectedNames}`
-  }
+  }, [selectedItems])
 
-  handleDelete = selected => {
-    this.setState({ showConfirmation: true, selectedItems: selected })
+  const handleDelete = selected => {
+    setSelectedItems(selected)
+    toggleConfirmDialog()
     // Stash the promise resolver so it can used to resolve later on in
     // response to user interaction (delete confirmation).
-    return new Promise(resolve => { this.resolveDelete = resolve })
+    return new Promise(resolve => { deletePromise.current = resolve })
   }
 
-  handleDeleteCancel = () => {
-    this.setState({ showConfirmation: false })
-  }
+  const handleDeleteConfirm = useCallback(async () => {
+    toggleConfirmDialog()
+    await Promise.all(selectedItems.map(onRemove))
+    deletePromise.current()
+  }, [selectedItems, onRemove])
 
-  handleDeleteConfirm = async () => {
-    this.setState({ showConfirmation: false })
-    const items = this.state.selectedItems || []
-
-    await mapAsync(this.handleRemove, items)
-
-    this.setState({ selectedItems: [] })
-    // The user resolves the promise by clicking "confirm".
-    this.resolveDelete()
-  }
-
-  handleRemove = async id => {
-    const { onRemove } = this.props
-
-    if (onRemove) {
-      return onRemove(id)
-    }
-    return null
-  }
-
-  redirectToAdd = () => {
-    if (this.props.addUrl) {
-      this.props.history.push(this.props.addUrl)
+  const handleAdd = () => {
+    if (addUrl) {
+      history.push(addUrl)
+    } else if (AddDialog) {
+      toggleAddDialog()
     }
   }
 
-  redirectToEdit = (selectedIds) => {
-    const { uniqueIdentifier } = this.props
-    if (this.props.editUrl) {
-      const selectedId = selectedIds[0][uniqueIdentifier]
-      this.props.history.push(`${this.props.editUrl}/${selectedId}`)
+  const handleEdit = (selected = emptyArr) => {
+    if (editUrl) {
+      const [selectedRow = emptyObj] = selected
+      const selectedId = path(uniqueIdentifierPath, selectedRow)
+      if (!selectedId) {
+        console.error(`Unable to redirect to edit page, the current id (${uniqueIdentifier}) is not defined for the selected items`, selected)
+        return
+      }
+      history.push(pathJoin(editUrl, selectedId))
+    } else if (EditDialog) {
+      setSelectedItems(selected)
+      toggleEditDialog()
     }
   }
 
-  render () {
-    return (
-      <div>
-        <ConfirmationDialog
-          open={this.state.showConfirmation}
-          text={this.deleteConfirmText()}
-          onCancel={this.handleDeleteCancel}
-          onConfirm={this.handleDeleteConfirm}
-        />
-        {this.props.children({
-          onDelete: this.handleDelete,
-          onAdd: this.props.addUrl && this.redirectToAdd,
-          onEdit: this.props.editUrl && this.redirectToEdit,
-        })}
-      </div>
-    )
-  }
+  return <>
+    {AddDialog && <AddDialog
+      open={showingAddDialog}
+      onClose={toggleAddDialog}
+    />}
+    {EditDialog && <EditDialog
+      rows={selectedItems}
+      open={showingEditDialog}
+      onClose={toggleEditDialog}
+    />}
+    {onRemove && <ConfirmationDialog
+      open={showingConfirmDialog}
+      text={deleteConfirmText}
+      onCancel={toggleConfirmDialog}
+      onConfirm={handleDeleteConfirm}
+    />}
+    {children({
+      onDelete: deleteEnabled ? handleDelete : null,
+      onAdd: addEnabled ? handleAdd : null,
+      onEdit: editEnabled ? handleEdit : null,
+    })}
+  </>
 }
 
 CRUDListContainer.propTypes = {
+  nameProp: PropTypes.string,
+  AddDialog: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+  EditDialog: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+
   addUrl: PropTypes.string,
   editUrl: PropTypes.string,
 
   /**
    * Handler that is responsible for deleting the entity.
-   * It is passed the id of the entity.
+   * It is passed the selected rows
    */
   onRemove: PropTypes.func,
 
@@ -117,9 +121,8 @@ CRUDListContainer.propTypes = {
 }
 
 CRUDListContainer.defaultProps = {
-  uniqueIdentifier: 'id',
+  nameProp: 'name',
+  uniqueIdentifier: defaultUniqueIdentifier,
 }
 
-export default compose(
-  withRouter,
-)(CRUDListContainer)
+export default CRUDListContainer

@@ -182,9 +182,6 @@ class ListTable extends PureComponent {
   handleDelete = async () => {
     const { selected, page, rowsPerPage } = this.state
     const { onDelete, data, selectedRows = selected, onSelectedRowsChange } = this.props
-    if (!onDelete) {
-      return
-    }
     const maxPage = Math.ceil(data.length / rowsPerPage) - 1
     const pastPage =
       (page === maxPage && selectedRows.length === data.length % rowsPerPage) ||
@@ -350,7 +347,7 @@ class ListTable extends PureComponent {
   })
 
   renderRowActions = row => {
-    const { rowActions, onReload, onActionComplete = onReload } = this.props
+    const { rowActions, onRefresh, onActionComplete = onRefresh } = this.props
     if (isNilOrEmpty(rowActions)) { return null }
     return (
       <TableCell>
