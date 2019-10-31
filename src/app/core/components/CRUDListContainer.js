@@ -7,17 +7,32 @@ import { defaultUniqueIdentifier } from 'app/constants'
 import { pluck, path } from 'ramda'
 import useReactRouter from 'use-react-router'
 import { pathJoin } from 'utils/misc'
+import PageContainerHeader from 'core/components/pageContainer/PageContainerHeader'
+import CreateButton from 'core/components/buttons/CreateButton'
+import useDataUpdater from 'core/hooks/useDataUpdater'
 
-const CRUDListContainer = ({ children, nameProp, AddDialog, EditDialog, addUrl, editUrl, onRemove, uniqueIdentifier }) => {
+const CRUDListContainer = ({
+  children,
+  reload,
+  nameProp,
+  addText,
+  AddDialog,
+  EditDialog,
+  addUrl,
+  editUrl,
+  deleteFn,
+  uniqueIdentifier,
+}) => {
+  const [handleRemove, deleting] = deleteFn ? useDataUpdater(deleteFn, reload) : emptyArr
   const uniqueIdentifierPath = uniqueIdentifier.split('.')
   const { history } = useReactRouter()
   const deletePromise = useRef()
   const [showingConfirmDialog, toggleConfirmDialog] = useToggler()
   const [showingEditDialog, toggleEditDialog] = useToggler()
   const [showingAddDialog, toggleAddDialog] = useToggler()
-  const [selectedItems, setSelectedItems] = useState(null)
+  const [selectedItems, setSelectedItems] = useState(emptyArr)
 
-  const deleteEnabled = !!onRemove
+  const deleteEnabled = !!handleRemove
   const editEnabled = EditDialog || editUrl
   const addEnabled = AddDialog || addUrl
 
@@ -39,9 +54,9 @@ const CRUDListContainer = ({ children, nameProp, AddDialog, EditDialog, addUrl, 
 
   const handleDeleteConfirm = useCallback(async () => {
     toggleConfirmDialog()
-    await Promise.all(selectedItems.map(onRemove))
+    await Promise.all(selectedItems.map(handleRemove))
     deletePromise.current()
-  }, [selectedItems, onRemove])
+  }, [selectedItems, handleRemove])
 
   const handleAdd = () => {
     if (addUrl) {
@@ -76,21 +91,28 @@ const CRUDListContainer = ({ children, nameProp, AddDialog, EditDialog, addUrl, 
       open={showingEditDialog}
       onClose={toggleEditDialog}
     />}
-    {onRemove && <ConfirmationDialog
+    {handleRemove && <ConfirmationDialog
       open={showingConfirmDialog}
       text={deleteConfirmText}
       onCancel={toggleConfirmDialog}
       onConfirm={handleDeleteConfirm}
     />}
+    {addEnabled && <PageContainerHeader>
+      <CreateButton onClick={handleAdd}>
+        {addText}
+      </CreateButton>
+    </PageContainerHeader>}
     {children({
       onDelete: deleteEnabled ? handleDelete : null,
       onAdd: addEnabled ? handleAdd : null,
       onEdit: editEnabled ? handleEdit : null,
+      deleting,
     })}
   </>
 }
 
 CRUDListContainer.propTypes = {
+  addText: PropTypes.string,
   nameProp: PropTypes.string,
   AddDialog: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
   EditDialog: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
@@ -102,7 +124,7 @@ CRUDListContainer.propTypes = {
    * Handler that is responsible for deleting the entity.
    * It is passed the selected rows
    */
-  onRemove: PropTypes.func,
+  deleteFn: PropTypes.func,
 
   /*
     Some objects have a unique identifier other than 'id'
@@ -121,6 +143,7 @@ CRUDListContainer.propTypes = {
 }
 
 CRUDListContainer.defaultProps = {
+  addText: 'Add',
   nameProp: 'name',
   uniqueIdentifier: defaultUniqueIdentifier,
 }

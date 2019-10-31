@@ -2,15 +2,11 @@ import React, { useCallback } from 'react'
 import CRUDListContainer from 'core/components/CRUDListContainer'
 import ListTable from 'core/components/listTable/ListTable'
 import useDataLoader from 'core/hooks/useDataLoader'
-import useDataUpdater from 'core/hooks/useDataUpdater'
-import { emptyArr } from 'utils/fp'
 import { getContextLoader } from 'core/helpers/createContextLoader'
 import { getContextUpdater } from 'core/helpers/createContextUpdater'
 import { createUsePrefParamsHook } from 'core/hooks/useParams'
 import { pick } from 'ramda'
 import { listTablePrefs } from 'app/constants'
-import PageContainerHeader from 'core/components/pageContainer/PageContainerHeader'
-import CreateButton from 'core/components/buttons/CreateButton'
 
 /**
  * This helper removes a lot of boilerplate from standard CRUD operations.
@@ -97,35 +93,29 @@ const createCRUDComponents = options => {
 
   // ListContainer
   const ListContainer = ({ data, loading, reload, ...restProps }) => {
-    const [handleRemove, deleting] = deleteFn ? useDataUpdater(deleteFn, reload) : emptyArr
     const refetch = useCallback(() => reload(true), [reload])
     return (
       <CRUDListContainer
         items={data}
+        reload={reload}
+        addText={addText}
         editUrl={editUrl}
         addUrl={addUrl}
-        onRemove={handleRemove}
+        deleteFn={deleteFn}
         uniqueIdentifier={uniqueIdentifier}
         AddDialog={AddDialog}
         EditDialog={EditDialog}
       >
-        {handlers => <>
-          {handlers.onAdd && <PageContainerHeader>
-            <CreateButton onClick={handlers.onAdd}>
-              {addText}
-            </CreateButton>
-          </PageContainerHeader>}
-          <List
-            loading={loading || deleting}
-            data={data}
-            batchActions={batchActions}
-            rowActions={rowActions}
-            onRefresh={reload}
-            onReload={refetch}
-            {...handlers}
-            {...restProps}
-          />
-        </>}
+        {(handlers, deleting) => <List
+          loading={loading || deleting}
+          data={data}
+          batchActions={batchActions}
+          rowActions={rowActions}
+          onRefresh={reload}
+          onReload={refetch}
+          {...handlers}
+          {...restProps}
+        />}
       </CRUDListContainer>
     )
   }
