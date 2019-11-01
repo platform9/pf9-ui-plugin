@@ -27,9 +27,6 @@ const styles = theme => ({
     marginTop: theme.spacing(3),
     minHeight: 300,
   },
-  table: {
-    minWidth: 800,
-  },
   tableWrapper: {
     overflowX: 'auto',
   },

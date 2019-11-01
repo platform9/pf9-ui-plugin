@@ -45,7 +45,7 @@ const tabStyles = theme => ({
   },
 })
 
-const CustomTab = withStyles(tabStyles)(MDTab)
+const CustomTab = withStyles(tabStyles)(({ compact, ...rest }) => <MDTab {...rest} />)
 
 class Tabs extends PureComponent {
   addTab = tab => {

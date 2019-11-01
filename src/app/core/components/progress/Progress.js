@@ -11,12 +11,14 @@ const styles = theme => ({
     display: 'flex',
     flexFlow: 'column nowrap',
     position: 'relative',
+    minWidth: 350,
   },
   rootInline: {
     display: 'flex',
     flexFlow: 'row nowrap',
     alignItems: 'center',
     position: 'relative',
+    minWidth: 100,
   },
   message: {
     fontWeight: 'bold',

@@ -32,7 +32,7 @@ const ClusterScaleDialog = ({ rows: [cluster], onClose }) => {
   return (
     <Dialog open onClose={onClose} onClick={stopPropagation}>
       <DialogTitle>Scale Cluster</DialogTitle>
-      <ValidatedForm initialValues={initialValues} onSubmit={handleSubmit}>
+      <ValidatedForm initialValues={initialValues} fullWidth onSubmit={handleSubmit}>
         <Progress loading={scalingCluster} renderContentOnMount maxHeight={60}>
           <DialogContent>
             <TextField id="numMasters" type="number" label="Num master nodes" disabled />

@@ -20,6 +20,7 @@ const styles = theme => ({
     width: ({ fullWidth }) => fullWidth ? '100%' : '50%',
     maxWidth: ({ fullWidth }) => fullWidth ? null : 400,
     minWidth: 300,
+    marginBottom: theme.spacing(1),
     '& .MuiFormControl-root': {
       width: '100%',
       marginTop: theme.spacing(1),

@@ -82,16 +82,14 @@ const CRUDListContainer = ({
   }
 
   return <>
-    {AddDialog && <AddDialog
-      open={showingAddDialog}
+    {AddDialog && showingAddDialog && <AddDialog
       onClose={toggleAddDialog}
     />}
-    {EditDialog && <EditDialog
+    {EditDialog && showingEditDialog && <EditDialog
       rows={selectedItems}
-      open={showingEditDialog}
       onClose={toggleEditDialog}
     />}
-    {handleRemove && <ConfirmationDialog
+    {handleRemove && showingConfirmDialog && <ConfirmationDialog
       open={showingConfirmDialog}
       text={deleteConfirmText}
       onCancel={toggleConfirmDialog}
