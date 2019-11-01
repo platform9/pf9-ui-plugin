@@ -12,7 +12,7 @@ import { filterSpecPropType } from 'core/components/cardTable/CardTableToolbar'
 const styles = theme => ({
   root: {
     width: '100%',
-    marginTop: theme.spacing(3),
+    marginTop: theme.spacing(2),
     minHeight: 300,
   },
   table: {

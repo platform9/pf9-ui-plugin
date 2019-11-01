@@ -117,14 +117,16 @@ class ListTableHead extends React.PureComponent {
                 placement={column.numeric ? 'bottom-end' : 'bottom-start'}
                 enterDelay={300}
               >
-                <TableSortLabel
-                  className={classes.headLabel}
-                  active={orderBy === column.id}
-                  direction={order}
-                  onClick={this.createSortHandler(column.id)}
-                >
-                  {column.label} {idx === 0 ? `(${rowCount})` : ''}
-                </TableSortLabel>
+                {!column.disableSorting
+                  ? <TableSortLabel
+                    className={classes.headLabel}
+                    active={orderBy === column.id}
+                    direction={order}
+                    onClick={this.createSortHandler(column.id)}
+                  >
+                    {column.label} {idx === 0 ? `(${rowCount})` : ''}
+                  </TableSortLabel>
+                  : <span>{column.label} {idx === 0 ? `(${rowCount})` : ''}</span>}
               </Tooltip>
             </TableCell>)}
         </TableRow>
@@ -139,6 +141,7 @@ ListTableHead.propTypes = {
     label: PropTypes.string,
     display: PropTypes.bool,
     excluded: PropTypes.bool,
+    disableSorting: PropTypes.bool,
   })).isRequired,
   canDragColumns: PropTypes.bool,
   onColumnsSwitch: PropTypes.func,

@@ -11,7 +11,7 @@ import { compose, ensureFunction, except } from 'app/utils/fp'
 import { withAppContext } from 'core/AppProvider'
 import MoreMenu from 'core/components/MoreMenu'
 import {
-  any, assoc, assocPath, equals, pipe, pluck, prop, propEq, propOr, uniq, update,
+  max, any, assoc, assocPath, equals, pipe, pluck, prop, propEq, propOr, uniq, update,
 } from 'ramda'
 import ListTableHead from './ListTableHead'
 import ListTableToolbar from './ListTableToolbar'
@@ -24,7 +24,7 @@ import moize from 'moize'
 const styles = theme => ({
   root: {
     width: '100%',
-    marginTop: theme.spacing(3),
+    marginTop: theme.spacing(2),
     minHeight: 300,
   },
   tableWrapper: {
@@ -38,6 +38,8 @@ const styles = theme => ({
     margin: theme.spacing(1, 3),
   },
 })
+
+const minSearchLength = 3
 
 // Reject all columns that are not visible or excluded
 export const pluckVisibleColumnIds = columns =>
@@ -177,17 +179,11 @@ class ListTable extends PureComponent {
   }
 
   handleDelete = async () => {
-    const { selected, page, rowsPerPage } = this.state
+    const { selected } = this.state
     const { onDelete, data, selectedRows = selected, onSelectedRowsChange } = this.props
-    const maxPage = Math.ceil(data.length / rowsPerPage) - 1
-    const pastPage =
-      (page === maxPage && selectedRows.length === data.length % rowsPerPage) ||
-      selectedRows.length === rowsPerPage
-
     await onDelete(selectedRows)
-
     this.setState({
-      page: pastPage ? page - 1 : page,
+      page: this.getCurrentPage(data.length),
     }, () => {
       if (onSelectedRowsChange) {
         // Controlled mode
@@ -293,8 +289,7 @@ class ListTable extends PureComponent {
 
   filterBySearch = (data, target) => {
     const { searchTerm } = this.state
-    return data.filter(
-      ele => ele[target].match(new RegExp(searchTerm, 'i')) !== null)
+    return data.filter(ele => ele[target].match(new RegExp(searchTerm, 'i')) !== null)
   }
 
   isSelected = row => {
@@ -304,10 +299,13 @@ class ListTable extends PureComponent {
   }
 
   paginate = data => {
-    const { page, rowsPerPage } = this.state
-    const startIdx = page * rowsPerPage
+    const { rowsPerPage, searchTerm } = this.state
+
+    const startIdx = this.getCurrentPage(data.length) * rowsPerPage
     const endIdx = startIdx + rowsPerPage
-    return data.slice(startIdx, endIdx)
+    return !searchTerm || searchTerm.length < minSearchLength
+      ? data.slice(startIdx, endIdx)
+      : data
   }
 
   getFilteredRows = () => {
@@ -315,7 +313,7 @@ class ListTable extends PureComponent {
     const { searchTerm } = this.state
 
     const sortedData = onSortChange ? data : this.sortData(data)
-    const searchData = searchTerm === ''
+    const searchData = !searchTerm || searchTerm.length < minSearchLength
       ? sortedData
       : this.filterBySearch(sortedData, searchTarget)
     return filters ? this.applyFilters(searchData) : searchData
@@ -391,14 +389,20 @@ class ListTable extends PureComponent {
     )
   }
 
-  renderPaginationControls = count => {
+  getCurrentPage = count => {
     const { page, rowsPerPage } = this.state
+    const lastPage = max(Math.ceil(count / rowsPerPage) - 1, 0)
+    return page > lastPage ? lastPage : page
+  }
+
+  renderPaginationControls = count => {
+    const { rowsPerPage } = this.state
     return (
       <TablePagination
         component="div"
         count={count}
         rowsPerPage={rowsPerPage}
-        page={page}
+        page={this.getCurrentPage(count)}
         backIconButtonProps={{ 'arial-label': 'Previous Page' }}
         nextIconButtonProps={{ 'arial-label': 'Next Page' }}
         onChangePage={this.handleChangePage}
@@ -412,7 +416,9 @@ class ListTable extends PureComponent {
     if (this.props.loading) {
       return null
     }
-    return <Typography className={this.props.classes.emptyList} variant="h6">{this.props.emptyText}</Typography>
+    return <Typography className={this.props.classes.emptyList} variant="h6">
+      {this.props.emptyText}
+    </Typography>
   }
 
   render () {
@@ -470,7 +476,7 @@ class ListTable extends PureComponent {
           onSelectAllClick={this.handleSelectAllClick}
           onRequestSort={this.handleRequestSort}
           checked={selectedAll}
-          rowCount={data.length}
+          rowCount={filteredData.length}
           showCheckboxes={multiSelection && showCheckboxes}
         />
         <TableBody>
@@ -527,6 +533,7 @@ ListTable.propTypes = {
     label: PropTypes.string,
     render: PropTypes.func,
     sortWith: PropTypes.func,
+    disableSorting: PropTypes.bool,
     /* Not displayed columns will only appear in the columns selector */
     display: PropTypes.bool,
     /* Excluded columns will neither appear in the grid nor in the columns selector */
