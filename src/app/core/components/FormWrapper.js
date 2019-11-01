@@ -1,11 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import CloseButton from 'core/components/buttons/CloseButton'
-import { withStyles } from '@material-ui/styles'
+import { makeStyles } from '@material-ui/styles'
 import { Divider, Grid, Typography } from '@material-ui/core'
-import { withProgress } from 'core/components/progress/Progress'
+import Progress from 'core/components/progress/Progress'
+import { pick, keys } from 'ramda'
 
-const styles = theme => ({
+const useStyles = makeStyles(theme => ({
   root: {
     marginTop: theme.spacing(5),
     marginBottom: theme.spacing(5),
@@ -20,52 +21,55 @@ const styles = theme => ({
   buttonBase: {
     textTransform: 'none',
   },
-})
+}))
 
-@withStyles(styles)
-class FormWrapper extends React.PureComponent {
-  render () {
-    const {
-      backUrl,
-      children,
-      classes,
-      title,
-      className,
-    } = this.props
-    return (
-      <Grid container>
-        <Grid item xs={11}>
-          <Grid container justify="space-between">
-            <Grid item>
-              <Typography
-                variant="h5"
-                className={classes.title}
-              >
-                {title}
-              </Typography>
-            </Grid>
-            {backUrl &&
-            <Grid item>
-              <CloseButton to={backUrl} />
-            </Grid>
-            }
+const FormWrapper = ({
+  backUrl,
+  children,
+  title,
+  className,
+  ...rest,
+}) => {
+  const classes = useStyles()
+  const progressProps = pick(keys(Progress.propTypes), rest)
+  return (
+    <Grid container>
+      <Grid item xs={11}>
+        <Grid container justify="space-between">
+          <Grid item>
+            <Typography
+              variant="h5"
+              className={classes.title}
+            >
+              {title}
+            </Typography>
           </Grid>
-          <Divider className={classes.divider} />
-          <div className={className}>
-            {children}
-          </div>
+          {backUrl &&
+          <Grid item>
+            <CloseButton to={backUrl} />
+          </Grid>
+          }
         </Grid>
+        <Divider className={classes.divider} />
+        <div className={className}>
+          <Progress {...progressProps}>
+            {children}
+          </Progress>
+        </div>
       </Grid>
-    )
-  }
+    </Grid>
+  )
 }
 
 FormWrapper.propTypes = {
   backUrl: PropTypes.string,
   title: PropTypes.string,
+  ...Progress.propTypes,
 }
 
-export default withProgress(FormWrapper, {
+FormWrapper.defaultProps = {
   renderContentOnMount: true,
   message: 'Submitting form...',
-})
+}
+
+export default FormWrapper

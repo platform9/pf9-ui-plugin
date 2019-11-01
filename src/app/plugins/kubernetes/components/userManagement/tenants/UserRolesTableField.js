@@ -1,7 +1,7 @@
 import withFormContext from 'core/components/validatedForm/withFormContext'
 import React, { useState, useCallback, useMemo } from 'react'
-import { emptyArr, noop } from 'utils/fp'
-import { pluck, pickAll, prop, assoc } from 'ramda'
+import { noop, emptyArr } from 'utils/fp'
+import { pluck, pickAll, prop, assoc, partition } from 'ramda'
 import RolesPicklist from 'k8s/components/userManagement/tenants/RolesPicklist'
 import { FormControl, FormHelperText } from '@material-ui/core'
 import ListTable from 'core/components/listTable/ListTable'
@@ -14,16 +14,33 @@ const useStyles = makeStyles(theme => ({
       margin: 0,
     },
     '& .MuiSelect-select': {
-      minWidth: 120,
+      minWidth: 150,
     },
   },
 }))
 const stopPropagation = e => {
   e.stopPropagation()
 }
-const UserRolesTableField = withFormContext(({ id, users, loading, onChange, updateFieldValue, getCurrentValue, hasError, errorMessage }) => {
+const UserRolesTableField = withFormContext(({
+  value = emptyArr,
+  id,
+  users,
+  onChange,
+  updateFieldValue,
+  getCurrentValue,
+  hasError,
+  errorMessage,
+}) => {
   const classes = useStyles()
-  const [selectedRows, setSelectedRows] = useState(emptyArr)
+  const userIds = Object.keys(value)
+  // Split between selected and unselected users
+  const [initialSelectedRows, unselectedRows] = useMemo(() =>
+    partition(({ id }) => userIds.includes(id), users), [])
+  // Put the selected users first
+  const rows = useMemo(() =>
+    [...initialSelectedRows, ...unselectedRows], [initialSelectedRows])
+
+  const [selectedRows, setSelectedRows] = useState(initialSelectedRows)
   const handleSelectedRowsChange = useCallback(selectedRows => {
     const selectedUserIds = pluck('id', selectedRows)
     const usersObj = getCurrentValue(pickAll(selectedUserIds))
@@ -31,14 +48,15 @@ const UserRolesTableField = withFormContext(({ id, users, loading, onChange, upd
     setSelectedRows(selectedRows)
   }, [getCurrentValue, onChange])
   const columns = useMemo(() => [
-    { id: 'id', label: 'OpenStack ID', display: false },
-    { id: 'username', label: 'Username' },
-    { id: 'displayname', label: 'Display Name' },
+    { id: 'id', label: 'OpenStack ID', display: false, disableSorting: true },
+    { id: 'username', label: 'Username', disableSorting: true },
+    { id: 'displayname', label: 'Display Name', display: false, disableSorting: true },
     {
       id: 'role',
       label: 'Roles',
+      disableSorting: true,
       // Create the roles cell component on the-fly to allow access to the
-      // current function scope "getCurrentValue" and "onChange" functions
+      // current function scope "getCurrentValue" and "updateFieldValue" functions
       Component: ({ row, isSelected }) => {
         const [currentRole, setCurrentRole] = useState(getCurrentValue(prop(row.id)))
         const handleChange = useCallback(role => {
@@ -55,15 +73,15 @@ const UserRolesTableField = withFormContext(({ id, users, loading, onChange, upd
         </div>
       },
     },
-  ], [getCurrentValue, onChange])
+  ], [getCurrentValue, updateFieldValue])
 
   return <FormControl id={id} error={hasError}>
     <ListTable
+      onSortChange={noop}
       searchTarget="username"
       columns={columns}
-      data={users}
+      data={rows}
       rowsPerPage={10}
-      loading={loading}
       selectedRows={selectedRows}
       onSelectedRowsChange={handleSelectedRowsChange} />
     {errorMessage && <FormHelperText>{errorMessage}</FormHelperText>}

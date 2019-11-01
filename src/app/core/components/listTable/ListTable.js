@@ -452,6 +452,7 @@ class ListTable extends PureComponent {
       editCond,
       editDisabledInfo,
       selectedRows = selected,
+      size,
     } = this.props
 
     if (!data) {
@@ -465,7 +466,7 @@ class ListTable extends PureComponent {
     // const shouldShowPagination = paginate && sortedData.length > this.state.rowsPerPage
 
     const tableContent = paginatedData && paginatedData.length
-      ? <Table className={classes.table}>
+      ? <Table className={classes.table} size={size}>
         <ListTableHead
           canDragColumns={canDragColumns}
           columns={this.getSortedVisibleColumns()}
@@ -609,6 +610,8 @@ ListTable.propTypes = {
 
   selectedRows: PropTypes.array,
   onSelectedRowsChange: PropTypes.func,
+  size: PropTypes.oneOf(['small', 'medium']),
+
 }
 
 ListTable.defaultProps = {
@@ -621,6 +624,7 @@ ListTable.defaultProps = {
   rowsPerPage: 10,
   emptyText: 'No data found',
   loading: false,
+  size: 'medium',
 }
 
 export default compose(

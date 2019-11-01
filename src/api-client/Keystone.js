@@ -72,6 +72,8 @@ class Keystone {
 
   get allTenantsAllUsersUrl () { return `${this.adminV3}/PF9-KSADM/all_tenants_all_users` }
 
+  get tenantRoleAssignments () { return `${this.adminV3}/role_assignments` }
+
   get tokensUrl () { return `${this.v3}/auth/tokens?nocatalog` }
 
   get usersUrl () { return `${this.v3}/users` }
@@ -102,6 +104,17 @@ class Keystone {
   getAllTenantsAllUsers = async () => {
     const response = await axios.get(this.allTenantsAllUsersUrl, this.client.getAuthHeaders())
     return response.data.tenants
+  }
+
+  getTenantRoleAssignments = async tenantId => {
+    const response = await axios.get(this.tenantRoleAssignments, {
+      ...this.client.getAuthHeaders(),
+      params: {
+        'scope.project.id': tenantId,
+        'include_names': true
+      },
+    })
+    return response.data.role_assignments
   }
 
   addUserRole = async ({ tenantId, userId, roleId }) => {
