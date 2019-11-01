@@ -34,12 +34,14 @@ const initialContext = {
   numWorkers: 1,
   enableCAS: false,
   usePf9Domain: true,
-  network: 'newVpc',
+  network: 'newPublic',
   containersCidr: '10.20.0.0/16',
   servicesCidr: '10.21.0.0/16',
   networkPlugin: 'flannel',
   mtuSize: 1440,
   runtimeConfigOption: 'default',
+  isPrivate: false,
+  internalElb: false,
 }
 
 const templateOptions = [
@@ -101,16 +103,7 @@ const handleTemplateChoice = ({ setWizardContext, setFieldValue }) => option => 
   Object.entries(options[option]).forEach(([key, value]) => {
     setFieldValue(key)(value)
   })
-
-  // set common default settings
-  // TODO: Choose the first AZ by default
 }
-
-const networkOptions = [
-  { label: '+ Create new VPC', value: 'newVpc' },
-  { label: 'Use existing VPC', value: 'existing' },
-  { label: 'Use existing VPC with VPN', value: 'existingNewVpn' },
-]
 
 const networkPluginOptions = [
   { label: 'Flannel', value: 'flannel' },
@@ -124,6 +117,14 @@ const handleNetworkPluginChange = ({ setWizardContext, setFieldValue }) => optio
     setFieldValue('privileged')(true)
   }
 }
+
+const networkOptions = [
+  { label: 'Create new VPC (public)', value: 'newPublic' },
+  { label: 'Create new VPC (public + private)', value: 'newPublicPrivate' },
+  { label: 'Use existing VPC (public)', value: 'existingPublic' },
+  { label: 'Use existing VPC (public + private)', value: 'existingPublicPrivate' },
+  { label: 'Use existing VPC (private VPN only)', value: 'existingPrivate' },
+]
 
 // These fields are only rendered when the user opts to not use a `platform9.net` domain.
 const renderCustomNetworkingFields = ({ params, getParamsUpdater, values, setFieldValue, setWizardContext, wizardContext }) => {
@@ -141,15 +142,35 @@ const renderCustomNetworkingFields = ({ params, getParamsUpdater, values, setFie
 
   const renderNetworkFields = networkOption => {
     switch (networkOption) {
-      case 'newVpc':
+      case 'newPublic':
+      case 'newPublicPrivate':
+        return null
+      case 'existingPublic':
         return (
-          <CheckboxField
-            id="isPrivate"
-            label="Deploy nodes using private subnet"
-            info=""
-          />
+          <>
+            <PicklistField
+              DropdownComponent={AwsClusterVpcPicklist}
+              id="vpc"
+              label="VPC"
+              azs={params.azs}
+              onChange={getParamsUpdater('vpcId')}
+              cloudProviderId={params.cloudProviderId}
+              cloudProviderRegionId={params.cloudProviderRegionId}
+              info=""
+              required
+            />
+
+            <AwsZoneVpcMappings
+              type="public"
+              cloudProviderId={params.cloudProviderId}
+              cloudProviderRegionId={params.cloudProviderRegionId}
+              onChange={getParamsUpdater('subnets')}
+              vpcId={params.vpcId}
+              azs={params.azs}
+            />
+          </>
         )
-      case 'existing':
+      case 'existingPublicPrivate':
         return (
           <>
             <PicklistField
@@ -173,14 +194,6 @@ const renderCustomNetworkingFields = ({ params, getParamsUpdater, values, setFie
               azs={params.azs}
             />
 
-            <CheckboxField
-              id="isPrivate"
-              label="Deploy nodes using private subnet"
-              onChange={getParamsUpdater('isPrivate')}
-              info=""
-            />
-
-            {params.isPrivate &&
             <AwsZoneVpcMappings
               type="private"
               cloudProviderId={params.cloudProviderId}
@@ -189,16 +202,16 @@ const renderCustomNetworkingFields = ({ params, getParamsUpdater, values, setFie
               vpcId={params.vpcId}
               azs={params.azs}
             />
-            }
           </>
         )
-      case 'existingNewVpn':
+      case 'existingPrivate':
         return (
           <>
             <PicklistField
               DropdownComponent={AwsClusterVpcPicklist}
               id="vpc"
               label="VPC"
+              azs={params.azs}
               onChange={getParamsUpdater('vpcId')}
               cloudProviderId={params.cloudProviderId}
               cloudProviderRegionId={params.cloudProviderRegionId}

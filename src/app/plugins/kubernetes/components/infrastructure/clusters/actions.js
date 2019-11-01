@@ -45,7 +45,7 @@ const createAwsCluster = async (data, loadFromContext) => {
     ...pick('masterFlavor workerFlavor numMasters enableCAS numWorkers numMaxWorkers allowWorkloadsOnMaster numSpotWorkers spotPrice'.split(' '), data),
 
     // network info
-    ...pick('domainId vpc isPrivate privateSubnets subnets externalDnsName serviceFqdn containersCidr servicesCidr networkPlugin'.split(' '), data),
+    ...pick('domainId vpc isPrivate privateSubnets subnets internalElb externalDnsName serviceFqdn containersCidr servicesCidr networkPlugin'.split(' '), data),
 
     // advanced configuration
     ...pick('privileged appCatalogEnabled customAmi tags'.split(' '), data),
@@ -69,8 +69,9 @@ const createAwsCluster = async (data, loadFromContext) => {
     custom: data.customRuntimeConfig,
   }[data.runtimeConfigOption]
 
-  // TODO: azs
-  // TODO: vpc
+  // Set other fields based on what the user chose for 'networkOptions'
+  if (['newPublicPrivate', 'existingPublicPrivate', 'existingPrivate'].includes(data.network)) { body.isPrivate = true }
+  if (data.network === 'existingPrivate') { body.internalElb = true }
 
   const response = await qbert.createCluster(body)
   return response
