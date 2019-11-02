@@ -7,11 +7,12 @@ const EndpointsListPage = () => {
 
   const options = {
     cacheKey: 'apiAccess',
-    uniqueIdentifier: 'service',
+    uniqueIdentifier: 'name',
     loaderFn: endpointsActions.list,
     columns,
     name: 'API Access',
     title: 'API Access',
+    showCheckboxes: false,
   }
 
   const { ListPage } = createCRUDComponents(options)
@@ -20,7 +21,7 @@ const EndpointsListPage = () => {
 }
 
 const getColumns = () => [
-  { id: 'service', label: 'Service' },
+  { id: 'name', label: 'Service' },
   { id: 'type', label: 'Type' },
   { id: 'url', label: 'URL' }
 ]
