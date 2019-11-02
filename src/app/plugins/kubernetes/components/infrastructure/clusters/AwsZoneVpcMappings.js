@@ -20,12 +20,15 @@ const AwsZoneVpcMappings = ({ azs=[], type, cloudProviderId, cloudProviderRegion
 
   const isPublic = type === 'public'
 
-  const options = vpc.Subnets.filter(x => x.MapPublicIpOnLaunch === isPublic && azs.includes(x.AvailabilityZone))
+  const subnets = pathStrOr([], 'Subnets', vpc)
+  const options = subnets
+    .filter(x => x.MapPublicIpOnLaunch === isPublic && azs.includes(x.AvailabilityZone))
   const subnetsByAz = groupBy(prop('AvailabilityZone'), options)
 
   const handleChange = az => subnetId => {
-    setSubnetMappings({ ...subnetMappings, [az]: subnetId })
-    onChange && onChange(Object.values(subnetMappings))
+    const mappings = { ...subnetMappings, [az]: subnetId }
+    setSubnetMappings(mappings)
+    onChange && onChange(Object.values(mappings))
   }
 
   return (
@@ -33,9 +36,9 @@ const AwsZoneVpcMappings = ({ azs=[], type, cloudProviderId, cloudProviderRegion
       {Object.keys(subnetsByAz).map(az => (
         <PicklistField
           label={`Availability Zone (${type}): ${az}`}
-          key={`az-subnet-${type}-${az}`}
+          key={`az-subnet-${type}-${az}-${az.CidrBlock}`}
           id={`az-subnet-${type}-${az}`}
-          options={projectAs({ label: 'CidrBlock', value: 'VpcId' }, subnetsByAz[az])}
+          options={projectAs({ label: 'CidrBlock', value: 'SubnetId' }, subnetsByAz[az])}
           onChange={handleChange(az)}
           info=""
         />
@@ -53,5 +56,7 @@ AwsZoneVpcMappings.propTypes = {
   onChange: PropTypes.func,
   ...ValidatedFormInputPropTypes,
 }
+
+AwsZoneVpcMappings.displayName = 'AwsZoneVpcMappings'
 
 export default AwsZoneVpcMappings

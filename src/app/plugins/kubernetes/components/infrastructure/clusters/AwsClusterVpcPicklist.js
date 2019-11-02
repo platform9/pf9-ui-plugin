@@ -7,12 +7,23 @@ import Picklist from 'core/components/Picklist'
 import { loadCloudProviderRegionDetails } from 'k8s/components/infrastructure/cloudProviders/actions'
 
 const AwsClusterVpcPicklist = forwardRef(({
-  cloudProviderId, cloudProviderRegionId, hasError, errorMessage, ...rest
+  azs, cloudProviderId, cloudProviderRegionId, hasError, errorMessage, ...rest
 }, ref) => {
   const [details, loading] = useDataLoader(loadCloudProviderRegionDetails, { cloudProviderId, cloudProviderRegionId })
 
   const vpcs = pathStrOr([], '0.vpcs', details)
-  const options = vpcs.map(x => ({ label: `${x.VpcName}-${x.CidrBlock}`, value: x.VpcId }))
+
+  // Filter out any VPC's that don't have valid subnets for all the AZ's the user previously selected
+  const hasAllAzs = vpc => {
+    const azsInVpc = pathStrOr([], 'Subnets', vpc).map(x => x.AvailabilityZone)
+    return azs.every(az => azsInVpc.includes(az))
+  }
+
+  const toOption = vpc => ({ label: `${vpc.VpcName}-${vpc.CidrBlock}`, value: vpc.VpcId })
+
+  const options = vpcs
+    .filter(hasAllAzs)
+    .map(toOption)
 
   return (
     <Picklist
@@ -28,11 +39,13 @@ const AwsClusterVpcPicklist = forwardRef(({
 
 AwsClusterVpcPicklist.propTypes = {
   id: PropTypes.string.isRequired,
+  azs: PropTypes.array.isRequired,
   cloudProviderId: PropTypes.string,
   cloudProviderRegionId: PropTypes.string,
   initialValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   onChange: PropTypes.func,
   ...ValidatedFormInputPropTypes,
 }
+AwsClusterVpcPicklist.displayName = 'AwsClusterVpcPicklist'
 
 export default AwsClusterVpcPicklist

@@ -19,7 +19,6 @@ import WizardStep from 'core/components/wizard/WizardStep'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import useParams from 'core/hooks/useParams'
 import useReactRouter from 'use-react-router'
-import { pick } from 'ramda'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import { pathJoin } from 'utils/misc'
 import { k8sPrefix } from 'app/constants'
@@ -35,12 +34,14 @@ const initialContext = {
   numWorkers: 1,
   enableCAS: false,
   usePf9Domain: true,
-  network: 'newVpc',
+  network: 'newPublic',
   containersCidr: '10.20.0.0/16',
   servicesCidr: '10.21.0.0/16',
   networkPlugin: 'flannel',
   mtuSize: 1440,
   runtimeConfigOption: 'default',
+  isPrivate: false,
+  internalElb: false,
 }
 
 const templateOptions = [
@@ -102,16 +103,7 @@ const handleTemplateChoice = ({ setWizardContext, setFieldValue }) => option => 
   Object.entries(options[option]).forEach(([key, value]) => {
     setFieldValue(key)(value)
   })
-
-  // set common default settings
-  // TODO: Choose the first AZ by default
 }
-
-const networkOptions = [
-  { label: '+ Create new VPC', value: 'newVpc' },
-  { label: 'Use existing VPC', value: 'existing' },
-  { label: 'Use existing VPC with VPN', value: 'existingNewVpn' },
-]
 
 const networkPluginOptions = [
   { label: 'Flannel', value: 'flannel' },
@@ -125,6 +117,14 @@ const handleNetworkPluginChange = ({ setWizardContext, setFieldValue }) => optio
     setFieldValue('privileged')(true)
   }
 }
+
+const networkOptions = [
+  { label: 'Create new VPC (public)', value: 'newPublic' },
+  { label: 'Create new VPC (public + private)', value: 'newPublicPrivate' },
+  { label: 'Use existing VPC (public)', value: 'existingPublic' },
+  { label: 'Use existing VPC (public + private)', value: 'existingPublicPrivate' },
+  { label: 'Use existing VPC (private VPN only)', value: 'existingPrivate' },
+]
 
 // These fields are only rendered when the user opts to not use a `platform9.net` domain.
 const renderCustomNetworkingFields = ({ params, getParamsUpdater, values, setFieldValue, setWizardContext, wizardContext }) => {
@@ -142,21 +142,42 @@ const renderCustomNetworkingFields = ({ params, getParamsUpdater, values, setFie
 
   const renderNetworkFields = networkOption => {
     switch (networkOption) {
-      case 'newVpc':
-        return (
-          <CheckboxField
-            id="isPrivate"
-            label="Deploy nodes using private subnet"
-            info=""
-          />
-        )
-      case 'existing':
+      case 'newPublic':
+      case 'newPublicPrivate':
+        return null
+      case 'existingPublic':
         return (
           <>
             <PicklistField
               DropdownComponent={AwsClusterVpcPicklist}
               id="vpc"
               label="VPC"
+              azs={params.azs}
+              onChange={getParamsUpdater('vpcId')}
+              cloudProviderId={params.cloudProviderId}
+              cloudProviderRegionId={params.cloudProviderRegionId}
+              info=""
+              required
+            />
+
+            <AwsZoneVpcMappings
+              type="public"
+              cloudProviderId={params.cloudProviderId}
+              cloudProviderRegionId={params.cloudProviderRegionId}
+              onChange={getParamsUpdater('subnets')}
+              vpcId={params.vpcId}
+              azs={params.azs}
+            />
+          </>
+        )
+      case 'existingPublicPrivate':
+        return (
+          <>
+            <PicklistField
+              DropdownComponent={AwsClusterVpcPicklist}
+              id="vpc"
+              label="VPC"
+              azs={params.azs}
               onChange={getParamsUpdater('vpcId')}
               cloudProviderId={params.cloudProviderId}
               cloudProviderRegionId={params.cloudProviderRegionId}
@@ -173,14 +194,6 @@ const renderCustomNetworkingFields = ({ params, getParamsUpdater, values, setFie
               azs={params.azs}
             />
 
-            <CheckboxField
-              id="isPrivate"
-              label="Deploy nodes using private subnet"
-              onChange={getParamsUpdater('isPrivate')}
-              info=""
-            />
-
-            {params.isPrivate &&
             <AwsZoneVpcMappings
               type="private"
               cloudProviderId={params.cloudProviderId}
@@ -189,16 +202,16 @@ const renderCustomNetworkingFields = ({ params, getParamsUpdater, values, setFie
               vpcId={params.vpcId}
               azs={params.azs}
             />
-            }
           </>
         )
-      case 'existingNewVpn':
+      case 'existingPrivate':
         return (
           <>
             <PicklistField
               DropdownComponent={AwsClusterVpcPicklist}
               id="vpc"
               label="VPC"
+              azs={params.azs}
               onChange={getParamsUpdater('vpcId')}
               cloudProviderId={params.cloudProviderId}
               cloudProviderRegionId={params.cloudProviderRegionId}
@@ -246,43 +259,12 @@ const renderCustomNetworkingFields = ({ params, getParamsUpdater, values, setFie
 const AddAwsClusterPage = () => {
   const { params, getParamsUpdater } = useParams()
   const { history } = useReactRouter()
-  const onComplete = () => {
-    history.push('/ui/kubernetes/infrastructure#clusters')
-  }
-  const [create, loading] = useDataUpdater(clusterActions.create, onComplete)
-
-  const handleSubmit = params => async data => {
-    const body = {
-      // basic info
-      ...pick('nodePoolUuid name region azs ami sshKey'.split(' '), data),
-
-      // cluster configuration
-      ...pick('masterFlavor workerFlavor numMasters enableCAS numWorkers numMaxWorkers allowWorkloadsOnMaster numSpotWorkers spotPrice'.split(' '), data),
-
-      // network info
-      ...pick('domainId vpc isPrivate privateSubnets subnets externalDnsName serviceFqdn containersCidr servicesCidr networkPlugin'.split(' '), data),
-
-      // advanced configuration
-      ...pick('privileged appCatalogEnabled customAmi tags'.split(' '), data),
-    }
-    if (data.httpProxy) { body.httpProxy = data.httpProxy }
-    if (data.networkPlugin === 'calico') { body.mtuSize = data.mtuSize }
-
-    data.runtimeConfig = {
-      default: '',
-      all: 'api/all=true',
-      custom: data.customRuntimeConfig,
-    }[data.runtimeConfigOption]
-
-    // TODO: azs
-    // TODO: vpc
-
-    await create(body)
-    return body
-  }
+  const onComplete = () => history.push('/ui/kubernetes/infrastructure#clusters')
+  const [createAwsClusterAction] = useDataUpdater(clusterActions.create, onComplete)
+  const handleSubmit = params => data => createAwsClusterAction({ ...data, ...params, clusterType: 'aws' })
 
   return (
-    <FormWrapper title="Add AWS Cluster" backUrl={listUrl} loading={loading}>
+    <FormWrapper title="Add AWS Cluster" backUrl={listUrl}>
       <Wizard onComplete={handleSubmit(params)} context={initialContext}>
         {({ wizardContext, setWizardContext, onNext }) => {
           return (
@@ -302,11 +284,10 @@ const AddAwsClusterPage = () => {
                       {/* Cloud Provider */}
                       <PicklistField
                         DropdownComponent={CloudProviderPicklist}
-                        id="nodePoolUuid"
+                        id="cloudProviderId"
                         label="Cloud Provider"
                         onChange={getParamsUpdater('cloudProviderId')}
                         info="Nodes will be provisioned using this cloud provider."
-                        value={params.cloudProviderId}
                         type="aws"
                         required
                       />

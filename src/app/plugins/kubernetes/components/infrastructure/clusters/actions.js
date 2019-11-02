@@ -2,11 +2,11 @@ import ApiClient from 'api-client/ApiClient'
 import calcUsageTotals from 'k8s/util/calcUsageTotals'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { allKey } from 'app/constants'
-import { castFuzzyBool } from 'utils/misc'
+import { castFuzzyBool, sanitizeUrl } from 'utils/misc'
 import { clustersCacheKey, combinedHostsCacheKey, loadCombinedHosts } from 'k8s/components/infrastructure/common/actions'
 import { filterIf, isTruthy, updateWith } from 'utils/fp'
 import { mapAsync } from 'utils/async'
-import { pluck, pathOr, pipe, either, propSatisfies, compose, path, propEq } from 'ramda'
+import { pluck, pathOr, pick, pipe, either, propSatisfies, compose, path, propEq } from 'ramda'
 import { rawNodesCacheKey } from 'k8s/components/infrastructure/nodes/actions'
 
 const { qbert } = ApiClient.getInstance()
@@ -36,8 +36,52 @@ export const masterlessCluster = propSatisfies(isTruthy, 'masterless')
 export const hasPrometheusEnabled = compose(castFuzzyBool, path(['tags', 'pf9-system:monitoring']))
 export const hasAppCatalogEnabled = propSatisfies(isTruthy, 'appCatalogEnabled')
 
+const createAwsCluster = async (data, loadFromContext) => {
+  const { cloudProviderId, domainId, usePf9Domain } = data
+  const body = {
+    // basic info
+    ...pick('name region azs ami sshKey'.split(' '), data),
+    // cluster configuration
+    ...pick('masterFlavor workerFlavor numMasters enableCAS numWorkers numMaxWorkers allowWorkloadsOnMaster numSpotWorkers spotPrice'.split(' '), data),
+
+    // network info
+    ...pick('domainId vpc isPrivate privateSubnets subnets internalElb externalDnsName serviceFqdn containersCidr servicesCidr networkPlugin'.split(' '), data),
+
+    // advanced configuration
+    ...pick('privileged appCatalogEnabled customAmi tags'.split(' '), data),
+  }
+  if (data.httpProxy) { body.httpProxy = data.httpProxy }
+  if (data.networkPlugin === 'calico') { body.mtuSize = data.mtuSize }
+
+  body.externalDnsName = usePf9Domain ? 'auto-generate' : sanitizeUrl(data.externalDnsName)
+  body.serviceFqdn = usePf9Domain ? 'auto-generate' : sanitizeUrl(data.serviceFqdn)
+
+  // Follow up with backend team to find out why platform9.net is not showing up in the domain list and why we are hard-coding this id.
+  body.domainId = usePf9Domain ? '/hostedzone/Z2LZB5ZNQY6JC2' : domainId
+
+  // Get the nodePoolUuid from the cloudProviderId.  There is a 1-to-1 mapping between cloudProviderId and nodePoolUuuid right now.
+  const cloudProviders = await loadFromContext('cloudProviders')
+  body.nodePoolUuid = cloudProviders.find(propEq('uuid', cloudProviderId)).nodePoolUuid
+
+  data.runtimeConfig = {
+    default: '',
+    all: 'api/all=true',
+    custom: data.customRuntimeConfig,
+  }[data.runtimeConfigOption]
+
+  // Set other fields based on what the user chose for 'networkOptions'
+  if (['newPublicPrivate', 'existingPublicPrivate', 'existingPrivate'].includes(data.network)) { body.isPrivate = true }
+  if (data.network === 'existingPrivate') { body.internalElb = true }
+
+  const response = await qbert.createCluster(body)
+  return response
+}
+
 export const clusterActions = createCRUDActions(clustersCacheKey, {
-  createFn: (params) => qbert.createCluster(params),
+  createFn: (params, _, loadFromContext) => {
+    if (params.clusterType === 'aws') { return createAwsCluster(params, loadFromContext) }
+  },
+
   listFn: async (params, loadFromContext) => {
     const [rawNodes, combinedHosts, rawClusters, qbertEndpoint] = await Promise.all([
       loadFromContext(rawNodesCacheKey),
@@ -101,8 +145,8 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
       }
     }, rawClusters)
   },
-  deleteFn: async ({ id }) => {
-    await qbert.deleteCluster(id)
+  deleteFn: async ({ uuid }) => {
+    await qbert.deleteCluster(uuid)
     // Refresh clusters since combinedHosts will still
     // have references to the deleted cluster.
     loadCombinedHosts.invalidateCache()

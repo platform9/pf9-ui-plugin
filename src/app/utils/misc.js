@@ -131,3 +131,13 @@ export const uncamelizeString = inputStr => inputStr
 export const capitalizeString = inputStr => inputStr
 // uppercase the first character
   .replace(/^./, str => str.toUpperCase())
+
+/**
+ * Transform a string so that it only has alpha-numeric and hypens.  Useful for FQDN's.
+ * @param {string} str
+ * @returns {string}
+ */
+export const sanitizeUrl = str =>
+  str
+    .replace(/[^a-zA-Z0-9-_.]/g, '-') // replace non-valid url characters with hyphen
+    .replace(/^-+/, '') // eliminate leading hyphens
