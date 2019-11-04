@@ -449,6 +449,7 @@ class ListTable extends PureComponent {
       editCond,
       editDisabledInfo,
       selectedRows = selected,
+      showToolbar
     } = this.props
 
     if (!data) {
@@ -487,31 +488,33 @@ class ListTable extends PureComponent {
         <Grid container justify="center">
           <Grid item xs={12} zeroMinWidth>
             <div className={classes.root}>
-              <ListTableToolbar
-                selected={selectedRows}
-                onAdd={onAdd && this.handleAdd}
-                onDelete={onDelete && this.handleDelete}
-                deleteCond={deleteCond}
-                deleteDisabledInfo={deleteDisabledInfo}
-                onEdit={onEdit && this.handleEdit}
-                editCond={editCond}
-                editDisabledInfo={editDisabledInfo}
-                onSearchChange={this.handleSearch}
-                searchTerm={searchTerm}
-                columns={columns}
-                visibleColumns={visibleColumns}
-                onColumnToggle={this.handleColumnToggle}
-                filters={filters}
-                filterValues={filterValues}
-                onFilterUpdate={this.handleFilterUpdate}
-                onFiltersReset={this.handleFiltersReset}
-                onReload={onReload}
-                onRefresh={onRefresh}
-                batchActions={batchActions}
-                rowsPerPage={rowsPerPage}
-                onChangeRowsPerPage={this.handleChangeRowsPerPage}
-                rowsPerPageOptions={[5, 10, 25, 50, 100]}
-              />
+              {showToolbar &&
+                <ListTableToolbar
+                  selected={selectedRows}
+                  onAdd={onAdd && this.handleAdd}
+                  onDelete={onDelete && this.handleDelete}
+                  deleteCond={deleteCond}
+                  deleteDisabledInfo={deleteDisabledInfo}
+                  onEdit={onEdit && this.handleEdit}
+                  editCond={editCond}
+                  editDisabledInfo={editDisabledInfo}
+                  onSearchChange={this.handleSearch}
+                  searchTerm={searchTerm}
+                  columns={columns}
+                  visibleColumns={visibleColumns}
+                  onColumnToggle={this.handleColumnToggle}
+                  filters={filters}
+                  filterValues={filterValues}
+                  onFilterUpdate={this.handleFilterUpdate}
+                  onFiltersReset={this.handleFiltersReset}
+                  onReload={onReload}
+                  onRefresh={onRefresh}
+                  batchActions={batchActions}
+                  rowsPerPage={rowsPerPage}
+                  onChangeRowsPerPage={this.handleChangeRowsPerPage}
+                  rowsPerPageOptions={[5, 10, 25, 50, 100]}
+                />
+              }
               <div className={classes.tableWrapper}>
                 {tableContent}
               </div>
@@ -605,6 +608,7 @@ ListTable.propTypes = {
 
   selectedRows: PropTypes.array,
   onSelectedRowsChange: PropTypes.func,
+  showToolbar: PropTypes.bool,
 }
 
 ListTable.defaultProps = {
@@ -617,6 +621,7 @@ ListTable.defaultProps = {
   rowsPerPage: 10,
   emptyText: 'No data found',
   loading: false,
+  showToolbar: true,
 }
 
 export default compose(

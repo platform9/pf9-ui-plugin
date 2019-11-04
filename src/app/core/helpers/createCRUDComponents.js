@@ -52,6 +52,7 @@ const createCRUDComponents = options => {
     searchTarget = 'name',
     multiSelection = true,
     showCheckboxes,
+    showToolbar,
   } = options
 
   // List
@@ -88,6 +89,7 @@ const createCRUDComponents = options => {
         onRowsPerPageChange={getParamsUpdater('rowsPerPage')}
         onColumnsChange={getParamsUpdater('visibleColumns', 'columnsOrder')}
         showCheckboxes={showCheckboxes}
+        showToolbar={showToolbar}
       />
     )
   }

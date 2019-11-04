@@ -12,6 +12,7 @@ const KubeConfigListPage = () => {
     columns,
     name: 'API Access',
     title: 'API Access',
+    showToolbar: false,
   }
 
   const { ListPage } = createCRUDComponents(options)

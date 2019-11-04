@@ -13,6 +13,7 @@ const EndpointsListPage = () => {
     name: 'API Access',
     title: 'API Access',
     showCheckboxes: false,
+    showToolbar: false,
   }
 
   const { ListPage } = createCRUDComponents(options)
