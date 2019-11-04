@@ -77,7 +77,6 @@ class Context {
     this.prometheusServiceMonitors = []
     this.prometheusAlertManagers = []
     this.loggings = []
-    this.apiAccess = []
   }
 
   createSimUser = () => {

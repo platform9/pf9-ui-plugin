@@ -4,7 +4,6 @@ import { readFile } from 'fs'
 import {
   getCloudProviders, postCloudProvider, putCloudProvider, deleteCloudProvider,
 } from './cloudProviders/cloudProviderActions'
-import { getApiAccess } from './apiAccess/apiAccessActions'
 
 import getCpTypes from './cloudProviders/getTypes'
 import { getCpDetails, getCpRegionDetails } from './cloudProviders/getCpDetails'
@@ -159,9 +158,5 @@ router.get(loggingBase, tokenValidator, getLoggings)
 router.post(loggingBase, tokenValidator, postLogging)
 router.put(`${loggingBase}/:loggingId`, tokenValidator, putLogging)
 router.delete(`${loggingBase}/:loggingId`, tokenValidator, deleteLogging)
-
-// API Access
-const apiAccessBase = `${clusterK8sApiBase}/apis/logging.pf9.io/v1alpha1/outputs1`
-router.get(apiAccessBase, tokenValidator, getApiAccess)
 
 export default router
