@@ -13,22 +13,26 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import UserRolesTableField from 'k8s/components/userManagement/tenants/UserRolesTableField'
 import { mngmTenantActions } from 'k8s/components/userManagement/tenants/actions'
 import { mngmUserActions } from 'k8s/components/userManagement/users/actions'
+import Progress from 'core/components/progress/Progress'
 
 const listUrl = pathJoin(k8sPrefix, 'user_management')
 
 const initialContext = {
   name: '',
   description: '',
-  users: {},
+  roleAssignments: {},
 }
 
-export const AddTenantForm = () => {
+const AddTenantPage = () => {
   const { history } = useReactRouter()
   const onComplete = useCallback(success => success && history.push(listUrl), [history])
   const [handleAdd, submitting] = useDataUpdater(mngmTenantActions.create, onComplete)
   const [users, loadingUsers] = useDataLoader(mngmUserActions.list)
 
-  return <FormWrapper title="New Tenant" loading={submitting} backUrl={listUrl}>
+  return <FormWrapper
+    title="New Tenant"
+    loading={submitting}
+    backUrl={listUrl}>
     <Wizard onComplete={handleAdd} context={initialContext}>
       {({ wizardContext, setWizardContext, onNext }) => <>
         <WizardStep stepId="basic" label="Basic Info">
@@ -43,7 +47,9 @@ export const AddTenantForm = () => {
             can access this Tenant, and hence the clusters that map to this Tenant.
           </Typography>
           <ValidatedForm fullWidth initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
-            <UserRolesTableField required id="users" users={users} loading={loadingUsers} />
+            <Progress renderContentOnMount={!loadingUsers} loading={loadingUsers} message={'Loading Users...'}>
+              <UserRolesTableField required id="roleAssignments" users={users} />
+            </Progress>
           </ValidatedForm>
         </WizardStep>
       </>}
@@ -51,4 +57,4 @@ export const AddTenantForm = () => {
   </FormWrapper>
 }
 
-export default AddTenantForm
+export default AddTenantPage

@@ -10,6 +10,7 @@ import {
 import { emptyObj, upsertAllBy } from 'utils/fp'
 import { uuidRegex } from 'app/constants'
 import createContextLoader from 'core/helpers/createContextLoader'
+import { castBoolToStr } from 'utils/misc'
 
 const { keystone } = ApiClient.getInstance()
 
@@ -62,7 +63,7 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
         find(propEq('user_id', user.id)),
         when(isNil, always(emptyObj)),
         propEq('type', 'totp'),
-        mfaEnabled => mfaEnabled ? 'enabled' : 'disabled',
+        castBoolToStr('enabled', 'disabled'),
       )(credentials),
     }))
 

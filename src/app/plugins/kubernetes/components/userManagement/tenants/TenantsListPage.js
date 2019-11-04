@@ -1,6 +1,8 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { pluck } from 'ramda'
+import { pipe, pluck, join } from 'ramda'
 import { mngmTenantActions } from 'k8s/components/userManagement/tenants/actions'
+import { k8sPrefix } from 'app/constants'
+import { pathJoin } from 'utils/misc'
 
 export const options = {
   addUrl: '/ui/kubernetes/user_management/tenants/add',
@@ -14,12 +16,12 @@ export const options = {
       id: 'users',
       label: 'Users',
       display: false,
-      render: users => pluck('name', users).join(', '),
+      render: pipe(pluck('name'), join(', ')),
     },
   ],
+  editUrl: pathJoin(k8sPrefix, 'user_management/tenants/edit'),
   loaderFn: mngmTenantActions.list,
   deleteFn: mngmTenantActions.delete,
-  // editUrl: '/ui/kubernetes/infrastructure/tenants/edit',
   name: 'Tenants',
   title: 'Tenants',
   uniqueIdentifier: 'id',

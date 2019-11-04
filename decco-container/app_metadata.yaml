@@ -4,6 +4,9 @@
   - name: ui
     port: 8080
     httpPath: "/ui"
+  - name: ui-redirect
+    port: 8080
+    httpPath: "/"
   egresses: []
   logfiles:
   - path: "/var/log/nginx/access.log"

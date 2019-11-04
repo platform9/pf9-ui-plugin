@@ -85,6 +85,11 @@ const theme = {
       root: {
         padding: '8px',
       }
+    },
+    MuiDialogActions: {
+      root: {
+        padding: '8px 16px'
+      }
     }
   },
   palette: {

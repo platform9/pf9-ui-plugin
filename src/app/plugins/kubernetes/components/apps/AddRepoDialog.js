@@ -13,7 +13,7 @@ import TextField from 'core/components/validatedForm/TextField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 
-export default ({ open, onClose }) => {
+export default ({ onClose }) => {
   const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
   const [create, creating] = useDataUpdater(repositoryActions.create, onClose)
   const [selectedClusters, updateSelectedClusters] = useState(emptyArr)
@@ -41,7 +41,7 @@ export default ({ open, onClose }) => {
   }
 
   return (
-    <Dialog fullWidth open={open} onClose={onClose}>
+    <Dialog open fullWidth onClose={onClose}>
       <DialogTitle>Add New Repository</DialogTitle>
       <DialogContent>
         <Progress loading={loadingClusters || creating} inline renderContentOnMount>
