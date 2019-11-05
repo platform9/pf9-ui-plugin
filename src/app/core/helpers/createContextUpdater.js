@@ -75,7 +75,7 @@ function createContextUpdater (cacheKey, dataUpdaterFn, options = {}) {
         ['delete', 'delete'],
       )(operation)
       // Display entity ID if available
-      const withId = allPass(map(idPath => hasPath(idPath, params), uniqueIdentifierPaths))
+      const withId = allPass(map(hasPath, uniqueIdentifierPaths), params)
         ? ` with ${head(uniqueIdentifierPaths).join('.')}: ${path(head(uniqueIdentifierPaths), params)}`
         : ''
       // Specific error handling
