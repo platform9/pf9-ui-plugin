@@ -1,5 +1,5 @@
 export function hexToRGBA(hex = '', alpha = 1) {
-  if (hex.indexOf('#') === -1 || !hex.length || hex.length > 7) {
+  if (!hex.includes('#') || !hex.length || hex.length > 7) {
     console.error('invalid hex provided')
   }
   if (hex.length === 4) {
