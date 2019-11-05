@@ -14,7 +14,9 @@ import StatusCard from './status-card.tsx'
 import { podActions, deploymentActions, serviceActions } from '../pods/actions'
 import { clusterActions } from '../infrastructure/clusters/actions'
 import { loadNodes } from '../infrastructure/nodes/actions'
-import { mngmUserActions, mngmTenantActions } from '../userManagement/actions'
+import { mngmUserActions } from '../userManagement/users/actions'
+import { mngmTenantActions } from '../userManagement/tenants/actions'
+
 import { allKey } from 'app/constants'
 // import { appActions } from '../apps/actions'
 import { cloudProviderActions } from '../infrastructure/cloudProviders/actions'
@@ -182,7 +184,6 @@ const Dashboard = () => {
           <StatusCard {...report} />
         ))}
       </div>
-      {/* <StatusCard /> */}
     </section>
   )
 }
