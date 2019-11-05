@@ -34,3 +34,7 @@ body {
 #sidebar {
   grid-area: sd;
 }
+
+*:any-link {
+    text-decoration: none;
+}

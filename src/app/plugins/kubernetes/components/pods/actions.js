@@ -176,9 +176,9 @@ export const serviceActions = createCRUDActions(kubeServicesCacheKey, {
           ...(type === 'NodePort' ? ['&lt;nodes&gt;'] : []),
         ]
         const clusterIp = pathStr('spec.clusterIP', service)
-        const status = !clusterIp || (type === 'LoadBalancer' && !externalEndpoints.length)
-          ? 'Pending'
-          : 'OK'
+        const status = clusterIp && (type !== 'LoadBalancer' || externalEndpoints.length > 0)
+          ? 'OK'
+          : 'Pending'
         return {
           ...service,
           dashboardUrl,

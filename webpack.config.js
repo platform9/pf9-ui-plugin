@@ -16,7 +16,7 @@ const extractCSS = new MiniCssExtractPlugin({
   // Options similar to the same options in webpackOptions.output
   // both options are optional
   filename: isProd ? '[name].[hash].styles.css' : '[name].styles.css',
-  chunkFilename: isProd ? '[id].[hash].styles.css' : '[id].styles.css',
+  chunkFilename: isProd ? '[id].[hash].styles.css' : '[id].styles.css'
 })
 
 const appEntry = []
@@ -30,7 +30,7 @@ const publicPath = isProd ? '/ui/' : `http://localhost:${port}/ui`
 
 module.exports = {
   entry: {
-    app: appEntry,
+    app: appEntry
   },
   mode: isProd ? 'production' : 'development',
   devtool: isProd ? 'source-map' : 'cheap-module-eval-source-map',
@@ -43,13 +43,13 @@ module.exports = {
     hot: true,
     open: false,
     historyApiFallback: {
-      index: '/ui/index.html',
-    },
+      index: '/ui/index.html'
+    }
   },
   output: {
     filename: isDev ? '[name]-bundle.js' : '[name].[hash]-bundle.js',
     publicPath,
-    path: outputPath,
+    path: outputPath
   },
   module: {
     rules: [
@@ -59,10 +59,15 @@ module.exports = {
         use: 'babel-loader'
       },
       {
+        test: /\.tsx?$/,
+        exclude: /node_modules/,
+        use: 'awesome-typescript-loader'
+      },
+      {
         test: /\.css$/,
         exclude: /node_modules/,
-        use: ['style-loader', 'css-loader'],
-      },
+        use: ['style-loader', 'css-loader']
+      }
     ]
   },
   context: contextPath,
@@ -87,9 +92,7 @@ module.exports = {
     }
   },
   plugins: [
-    ...(isProd
-      ? []
-      : [new webpack.NamedModulesPlugin()]),
+    ...(isProd ? [] : [new webpack.NamedModulesPlugin()]),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(env)
     }),
@@ -118,7 +121,7 @@ module.exports = {
       utils: path.resolve(__dirname, 'src/app/utils'),
       app: path.resolve(__dirname, 'src/app'),
       server: path.resolve(__dirname, 'src/server'),
-      'api-client': path.resolve(__dirname, 'src/api-client'),
-    },
+      'api-client': path.resolve(__dirname, 'src/api-client')
+    }
   }
 }
