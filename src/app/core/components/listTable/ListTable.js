@@ -20,12 +20,16 @@ import { filterSpecPropType } from 'core/components/cardTable/CardTableToolbar'
 import { isNilOrEmpty, emptyArr, pathStr, emptyObj } from 'utils/fp'
 import { listTableActionPropType } from 'core/components/listTable/ListTableBatchActions'
 import moize from 'moize'
+import clsx from 'clsx'
 
 const styles = theme => ({
   root: {
     width: '100%',
     marginTop: theme.spacing(2),
     minHeight: 300,
+  },
+  compactTableHeight: {
+    minHeight: 'auto',
   },
   tableWrapper: {
     overflowX: 'auto',
@@ -452,8 +456,8 @@ class ListTable extends PureComponent {
       editCond,
       editDisabledInfo,
       selectedRows = selected,
-      showToolbar,
       size,
+      compactTable,
     } = this.props
 
     if (!data) {
@@ -491,8 +495,8 @@ class ListTable extends PureComponent {
       <Progress loading={loading} overlay renderContentOnMount>
         <Grid container justify="center">
           <Grid item xs={12} zeroMinWidth>
-            <div className={classes.root}>
-              {showToolbar &&
+            <div className={clsx(classes.root, compactTable && classes.compactTableHeight)}>
+              {!compactTable &&
                 <ListTableToolbar
                   selected={selectedRows}
                   onAdd={onAdd && this.handleAdd}
@@ -522,7 +526,7 @@ class ListTable extends PureComponent {
               <div className={classes.tableWrapper}>
                 {tableContent}
               </div>
-              {this.renderPaginationControls(filteredData.length)}
+              {!compactTable && this.renderPaginationControls(filteredData.length)}
             </div>
           </Grid>
         </Grid>
@@ -613,8 +617,8 @@ ListTable.propTypes = {
 
   selectedRows: PropTypes.array,
   onSelectedRowsChange: PropTypes.func,
-  showToolbar: PropTypes.bool,
   size: PropTypes.oneOf(['small', 'medium']),
+  compactTable: PropTypes.bool,
 }
 
 ListTable.defaultProps = {
@@ -629,6 +633,7 @@ ListTable.defaultProps = {
   loading: false,
   showToolbar: true,
   size: 'medium',
+  compactTable: false,
 }
 
 export default compose(

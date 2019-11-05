@@ -54,7 +54,6 @@ const styles = theme => ({
     backgroundColor: 'inherit',
     overflow: 'hidden',
     borderRight: 0,
-    overflowY: 'auto',
   },
   drawerHeader: {
     display: 'flex',
