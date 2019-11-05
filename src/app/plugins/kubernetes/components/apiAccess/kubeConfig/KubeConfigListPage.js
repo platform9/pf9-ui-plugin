@@ -5,8 +5,8 @@ import kubeConfigActions from './actions'
 
 const useStyles = makeStyles(theme => ({
   link: {
-    display: 'inline-block',
-    marginTop: theme.spacing(5),
+    display: 'block',
+    width: 'fit-content',
     textDecoration: 'none',
     '&:hover': {
       textDecoration: 'underline',

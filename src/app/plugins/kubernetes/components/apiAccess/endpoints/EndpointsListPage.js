@@ -5,7 +5,8 @@ import endpointsActions from './actions'
 
 const useStyles = makeStyles(theme => ({
   link: {
-    display: 'inline-block',
+    display: 'block',
+    width: 'fit-content',
     marginTop: theme.spacing(5),
     textDecoration: 'none',
     '&:hover': {
