@@ -1,7 +1,7 @@
 import {
-  path, pick, isEmpty, identity, assoc, find, whereEq, when, isNil, reject, filter, always, append,
-  of, pipe, over, lensPath, pickAll, view, has, equals, values, either, sortBy, reverse, mergeLeft,
-  map, toLower, is,
+  pick, isEmpty, identity, assoc, find, whereEq, when, isNil, reject, filter, always, append, of,
+  pipe, over, lensPath, pickAll, view, has, equals, values, either, sortBy, reverse, mergeLeft, map,
+  toLower, is, __,
 } from 'ramda'
 import moize from 'moize'
 import { ensureFunction, ensureArray, emptyObj, emptyArr, upsertAllBy, pathStr } from 'utils/fp'
@@ -24,7 +24,7 @@ const arrayIfEmpty = when(isEmpty, always(emptyArr))
  *
  * @typedef {object} createContextLoader~Options
  *
- * @property {string} [uniqueIdentifier="id"] Unique primary key of the entity
+ * @property {string|array} [uniqueIdentifier="id"] Unique primary key of the entity
  *
  * @property {string} [entityName] Name of the entity, it defaults to the the provided entity "cacheKey"
  * formatted with added spaces and removing the last "s"
@@ -90,7 +90,7 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
     fetchSuccessMessage = (params) => `Successfully fetched ${entityName} items`,
     fetchErrorMessage = (catchedErr, params) => `Error when trying to fetch ${entityName} items`,
   } = options
-  const uniqueIdentifierPath = uniqueIdentifier.split('.')
+  const uniqueIdentifierStrPaths = uniqueIdentifier ? ensureArray(uniqueIdentifier) : emptyArr
   const dataLens = lensPath([dataCacheKey, cacheKey])
   const paramsLens = lensPath([paramsCacheKey, cacheKey])
   const allIndexKeys = indexBy ? ensureArray(indexBy) : emptyArr
@@ -192,7 +192,8 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
         )
 
         // Insert or update the existing items (using `uniqueIdentifier` to prevent duplicates)
-        const upsertNewItems = pipe(arrayIfNil, upsertAllBy(path(uniqueIdentifierPath), itemsWithParams))
+        const matchUniqueIdentifiers = item => map(pathStr(__, item), uniqueIdentifierStrPaths)
+        const upsertNewItems = pipe(arrayIfNil, upsertAllBy(matchUniqueIdentifiers, itemsWithParams))
 
         // If cache has been invalidated or we are refetching, empty the cached data array
         const cleanPrevItems = contextLoaderFn._invalidatedCache || refetch

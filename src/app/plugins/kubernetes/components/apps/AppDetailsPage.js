@@ -48,7 +48,7 @@ const AppDetailsPage = () => {
   const { match: { params: routeParams } } = useReactRouter()
   const { params, getParamsUpdater } = useParams({
     clusterId: routeParams.clusterId,
-    appId: routeParams.id,
+    id: routeParams.id,
     release: routeParams.release,
   })
   const [showingDeployDialog, setShowingDeployDialog] = useState(false)
@@ -119,7 +119,7 @@ const AppDetailsPage = () => {
         <Grid item xs={9} lg={10} zeroMinWidth>
           <AppVersionPicklist
             label="Application Version"
-            appId={params.appId}
+            appId={params.id}
             clusterId={params.clusterId}
             release={params.release}
             value={params.version}

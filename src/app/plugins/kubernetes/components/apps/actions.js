@@ -26,15 +26,15 @@ export const releaseDetailCacheKey = 'deployment'
 export const repositoriesWithClustersCacheKey = 'repositoriesWithClusters'
 export const repositoriesCacheKey = 'repositories'
 
-export const appDetailLoader = createContextLoader(singleAppCacheKey, async ({ clusterId, appId, release, version }) => {
-  const chart = await qbert.getChart(clusterId, appId, release, version)
+export const appDetailLoader = createContextLoader(singleAppCacheKey, async ({ clusterId, id, release, version }) => {
+  const chart = await qbert.getChart(clusterId, id, release, version)
   return {
     ...chart,
     readmeMarkdown: await qbert.getChartReadmeContents(clusterId, chart.attributes.readme),
   }
 }, {
-  uniqueIdentifier,
-  indexBy: ['clusterId', 'appId', 'release', 'version'],
+  uniqueIdentifier: ['id', 'clusterId'],
+  indexBy: ['clusterId', 'id', 'release', 'version'],
   dataMapper: async (items, { clusterId }) => {
     const monocularUrl = await qbert.clusterMonocularBaseUrl(clusterId, null)
     return map(({ id, ...item }) => {
@@ -114,7 +114,7 @@ export const appActions = createCRUDActions(appsCacheKey, {
     deploy: `Successfully deployed App ${name}`,
   })(operation),
   entityName: 'App Catalog',
-  uniqueIdentifier,
+  uniqueIdentifier: ['id', 'clusterId'],
   indexBy: 'clusterId',
   dataMapper: async (items, { clusterId, repositoryId }) => {
     const monocularUrl = await qbert.clusterMonocularBaseUrl(clusterId, null)
