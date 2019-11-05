@@ -1,5 +1,5 @@
 import moize from 'moize'
-import { isEmpty, isNil } from 'ramda'
+import { isEmpty, isNil, test, allPass, both, is, complement, cond, always } from 'ramda'
 import { isPlainObject } from '../../utils/misc'
 
 class FieldValidator {
@@ -20,27 +20,32 @@ export const customValidator = (validator, errorMessage) =>
   new FieldValidator(validator, errorMessage)
 
 const fieldIsUnset = value => isNil(value) || isEmpty(value) || value === false
+export const hasMinLength = moize(minLen => both(is(String), val => val.length >= minLen))
+export const hasOneLowerChar = both(is(String), test(/[a-z]/))
+export const hasOneUpperChar = both(is(String), test(/[A-Z]/))
+export const hasOneNumber = both(is(String), test(/[0-9]/))
+export const hasOneSpecialChar = both(is(String), test(/[-!@#$%^&*()?]/))
 
 export const emailValidator = new FieldValidator(
   email =>
     fieldIsUnset(email) ||
     /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/i.test(
-      email
+      email,
     ),
-  'Email is invalid'
+  'Email is invalid',
 )
 
 export const requiredValidator = new FieldValidator(
   value => !fieldIsUnset(value),
-  'Field is required'
+  'Field is required',
 )
 
 export const matchFieldValidator = moize(
   id =>
     new FieldValidator(
       (value, formFields) => value === formFields[id],
-      'Fields do not match'
-    )
+      'Fields do not match',
+    ),
 )
 
 export const lengthValidator = (minLength, maxLength) =>
@@ -49,32 +54,50 @@ export const lengthValidator = (minLength, maxLength) =>
       fieldIsUnset(value) ||
       (value.toString().length >= minLength &&
         value.toString().length <= maxLength),
-    `Length must be between ${minLength} and ${maxLength}`
+    `Length must be between ${minLength} and ${maxLength}`,
   )
 
 export const minLengthValidator = moize(
   minLength =>
     new FieldValidator(
       value => fieldIsUnset(value) || value.toString().length >= minLength,
-      `Length must be greater than ${minLength}`
-    )
+      `Length must be greater than ${minLength}`,
+    ),
 )
 
 export const maxLengthValidator = moize(
   maxLength =>
     new FieldValidator(
       value => fieldIsUnset(value) || value.toString().length <= maxLength,
-      `Length must be less than ${maxLength}`
-    )
+      `Length must be less than ${maxLength}`,
+    ),
+)
+
+export const passwordValidator = new FieldValidator(
+  value => fieldIsUnset(value) || allPass([
+    hasMinLength(8),
+    hasOneLowerChar,
+    hasOneUpperChar,
+    hasOneNumber,
+    hasOneSpecialChar,
+  ])(value),
+  cond([
+    [complement(hasMinLength(8)), always('Password must be at least 8 characters long')],
+    [complement(hasOneLowerChar), always('Password must contain at least one lowercase letter')],
+    [complement(hasOneUpperChar), always('Password must contain at least one uppercase letter')],
+    [complement(hasOneNumber), always('Password must contain at least one number')],
+    [complement(hasOneSpecialChar), always('Password must contain at least one special character')],
+  ]),
 )
 
 export const validators = {
   email: emailValidator,
+  password: passwordValidator,
   required: requiredValidator,
   matchField: matchFieldValidator,
   length: lengthValidator,
   minLength: minLengthValidator,
-  maxLength: maxLengthValidator
+  maxLength: maxLengthValidator,
 }
 
 export const parseValidator = (key, spec) => {
