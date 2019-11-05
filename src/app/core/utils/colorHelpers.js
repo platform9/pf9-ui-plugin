@@ -1,4 +1,4 @@
-export function hexToRGBA(hex = '', alpha = 1) {
+export function hexToRGBA (hex = '', alpha = 1) {
   if (!hex.includes('#') || !hex.length || hex.length > 7) {
     console.error('invalid hex provided')
   }
