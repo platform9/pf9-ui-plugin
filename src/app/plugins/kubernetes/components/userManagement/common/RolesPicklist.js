@@ -9,7 +9,7 @@ import { mngmRoleActions } from 'k8s/components/userManagement/roles/actions'
 
 // We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
 const RolesPicklist = forwardRef(({
-  allRoles,
+  allRoles, id,
   loading, onChange, value, selectFirst, disabled,
   ...rest
 }, ref) => {

@@ -2,7 +2,7 @@ import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import TextField from 'core/components/validatedForm/TextField'
 import React, { useMemo, useCallback } from 'react'
 import { Typography } from '@material-ui/core'
-import UserRolesTableField from 'k8s/components/userManagement/tenants/UserRolesTableField'
+import TenantRolesTableField from 'k8s/components/userManagement/users/TenantRolesTableField'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import {
   mngmTenantActions, mngmTenantRoleAssignmentsLoader,
@@ -20,25 +20,25 @@ import WizardStep from 'core/components/wizard/WizardStep'
 
 const listUrl = pathJoin(k8sPrefix, 'user_management')
 
-const EditTenantPage = () => {
+const EditUserPage = () => {
   const { match, history } = useReactRouter()
-  const tenantId = match.params.id
+  const userId = match.params.id
   const onComplete = useCallback(
     success => success && history.push(listUrl),
     [history])
-  const [tenants, loadingTenants] = useDataLoader(mngmTenantActions.list)
-  const tenant = useMemo(
-    () => tenants.find(propEq('id', tenantId)) || emptyObj,
-    [tenants, tenantId])
   const [users, loadingUsers] = useDataLoader(mngmUserActions.list)
-  const [update, updating] = useDataUpdater(mngmTenantActions.update, onComplete)
+  const tenant = useMemo(
+    () => users.find(propEq('id', userId)) || emptyObj,
+    [users, userId])
+  const [tenants, loadingTenants] = useDataLoader(mngmTenantActions.list)
+  const [update, updating] = useDataUpdater(mngmUserActions.update, onComplete)
   const [roleAssignments, loadingRoleAssignments] = useDataLoader(mngmTenantRoleAssignmentsLoader, {
-    tenantId,
+    userId,
   })
   const initialContext = useMemo(() => ({
-    id: tenantId,
+    id: userId,
     name: tenant.name,
-    description: tenant.description || '',
+    displayName: tenant.displayName || '',
     roleAssignments: roleAssignments.reduce((acc, roleAssignment) => ({
       ...acc,
       [pathStr('user.id', roleAssignment)]: pathStr('role.id', roleAssignment),
@@ -46,25 +46,25 @@ const EditTenantPage = () => {
   }), [tenant, roleAssignments])
 
   return <FormWrapper
-    title={`Edit Tenant ${tenant.name}`}
+    title={`Edit User ${tenant.name}`}
     loading={loadingUsers || loadingTenants || loadingRoleAssignments || updating}
     renderContentOnMount={false}
-    message={updating ? 'Submitting form...' : 'Loading Tenant...'}
+    message={updating ? 'Submitting form...' : 'Loading User...'}
     backUrl={listUrl}>
     <Wizard onComplete={update} context={initialContext}>
       {({ wizardContext, setWizardContext, onNext }) => <>
         <WizardStep stepId="basic" label="Basic Info">
           <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
-            <TextField id="name" label="Name" required />
-            <TextField id="description" label="Description" />
+            <TextField id="name" label="User Name" required />
+            <TextField id="displayName" label="Display Name" />
           </ValidatedForm>
         </WizardStep>
-        <WizardStep stepId="users" label="Users and Roles">
+        <WizardStep stepId="tenants" label="Tenants and Roles">
           <Typography variant="body1" component="p">
             Which users can access this tenant?
           </Typography>
           <ValidatedForm fullWidth initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
-            <UserRolesTableField required id="roleAssignments" users={users} />
+            <TenantRolesTableField required id="roleAssignments" tenants={tenants} />
           </ValidatedForm>
         </WizardStep>
       </>}
@@ -72,4 +72,4 @@ const EditTenantPage = () => {
   </FormWrapper>
 }
 
-export default EditTenantPage
+export default EditUserPage

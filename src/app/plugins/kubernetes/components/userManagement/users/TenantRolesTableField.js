@@ -21,10 +21,10 @@ const useStyles = makeStyles(theme => ({
 const stopPropagation = e => {
   e.stopPropagation()
 }
-const UserRolesTableField = withFormContext(({
+const TenantRolesTableField = withFormContext(({
   value = emptyArr,
   id,
-  users,
+  tenants,
   onChange,
   updateFieldValue,
   getCurrentValue,
@@ -32,25 +32,26 @@ const UserRolesTableField = withFormContext(({
   errorMessage,
 }) => {
   const classes = useStyles()
-  const userIds = Object.keys(value)
-  // Split between selected and unselected users
+  const tenantIds = Object.keys(value)
+  // Split between selected and unselected tenants
   const [initialSelectedRows, unselectedRows] = useMemo(() =>
-    partition(({ id }) => userIds.includes(id), users), [])
-  // Put the selected users first
+    partition(({ id }) => tenantIds.includes(id), tenants), [])
+  // Put the selected tenants first
   const rows = useMemo(() =>
     [...initialSelectedRows, ...unselectedRows], [initialSelectedRows])
 
   const [selectedRows, setSelectedRows] = useState(initialSelectedRows)
   const handleSelectedRowsChange = useCallback(selectedRows => {
-    const selectedUserIds = pluck('id', selectedRows)
-    const usersObj = getCurrentValue(pickAll(selectedUserIds))
-    onChange(usersObj)
+    const selectedTenantIds = pluck('id', selectedRows)
+    const tenantsObj = getCurrentValue(pickAll(selectedTenantIds))
+    onChange(tenantsObj)
     setSelectedRows(selectedRows)
   }, [getCurrentValue, onChange])
+
   const columns = useMemo(() => [
     { id: 'id', label: 'OpenStack ID', display: false, disableSorting: true },
-    { id: 'username', label: 'Username', disableSorting: true },
-    { id: 'displayname', label: 'Display Name', display: false, disableSorting: true },
+    { id: 'name', label: 'Tenant', disableSorting: true },
+    { id: 'description', label: 'Description', display: false, disableSorting: true },
     {
       id: 'role',
       label: 'Roles',
@@ -78,7 +79,7 @@ const UserRolesTableField = withFormContext(({
   return <FormControl id={id} error={hasError}>
     <ListTable
       onSortChange={noop}
-      searchTarget="username"
+      searchTarget="name"
       columns={columns}
       data={rows}
       rowsPerPage={10}
@@ -88,4 +89,4 @@ const UserRolesTableField = withFormContext(({
   </FormControl>
 })
 
-export default UserRolesTableField
+export default TenantRolesTableField

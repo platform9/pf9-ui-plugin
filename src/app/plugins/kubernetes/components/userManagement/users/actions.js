@@ -7,7 +7,7 @@ import {
   partition, pluck, map, head, innerJoin, uniq, prop, pipe, find, propEq, when, isNil, always,
   filter, flatten, groupBy, values,
 } from 'ramda'
-import { emptyObj, upsertAllBy } from 'utils/fp'
+import { emptyObj, upsertAllBy, emptyArr, pathStr } from 'utils/fp'
 import { uuidRegex } from 'app/constants'
 import createContextLoader from 'core/helpers/createContextLoader'
 import { castBoolToStr } from 'utils/misc'
@@ -25,6 +25,12 @@ export const mngmUsersCacheKey = 'managementUsers'
 export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
   listFn: async () => {
     return keystone.getUsers()
+  },
+  createFn: async () => {
+    // TODO
+  },
+  updateFn: async ({ name, displayName, tenants }) => {
+    // TODO
   },
   dataMapper: async (users, { systemUsers }, loadFromContext) => {
     const [credentials, allTenants] = await Promise.all([
@@ -85,3 +91,15 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
     )(validTenants)
   },
 })
+
+export const mngmUserRoleAssignmentsCacheKey = 'managementUserRoleAssignments'
+export const mngmUserRoleAssignmentsLoader = createContextLoader(mngmUserRoleAssignmentsCacheKey,
+  async ({ userId, tenantId }) => {
+    const roleAssignments = await keystone.getUserRoleAssignments(userId, tenantId) || emptyArr
+    return roleAssignments.map(roleAssignment => ({
+      ...roleAssignment,
+      id: `${pathStr('user.id', roleAssignment)}-${pathStr('role.id', roleAssignment)}`,
+    }))
+  }, {
+    indexBy: 'tenantId',
+  })

@@ -5,27 +5,27 @@ const theme = {
       'sm',
       'md',
       'lg',
-      'xl'
+      'xl',
     ],
     values: {
       xs: 0,
       sm: 600,
       md: 960,
       lg: 1280,
-      xl: 1920
-    }
+      xl: 1920,
+    },
   },
   direction: 'ltr',
   mixins: {
     toolbar: {
       minHeight: 56,
       '@media (min-width:0px) and (orientation: landscape)': {
-        minHeight: 48
+        minHeight: 48,
       },
       '@media (min-width:600px)': {
-        minHeight: 64
-      }
-    }
+        minHeight: 64,
+      },
+    },
   },
   overrides: {
     MuiSvgIcon: {
@@ -36,11 +36,11 @@ const theme = {
     MuiInput: {
       root: {
         fontSize: '14px',
-      }
+      },
     },
     MuiInputLabel: {
       root: {
-        color: '#aaa',
+        color: '#AAA',
       },
       outlined: {
         transform: 'translate(14px, 8px) scale(1)',
@@ -48,13 +48,13 @@ const theme = {
       shrink: {
         fontSize: '16px',
         color: '#333',
-      }
+      },
     },
     MuiMenuItem: {
       root: {
         fontSize: '13px',
         minHeight: '19px',
-      }
+      },
     },
     MuiOutlinedInput: {
       root: {
@@ -63,88 +63,105 @@ const theme = {
       },
       input: {
         padding: '6.5px 14px',
-      }
+      },
     },
     MuiTooltip: {
       tooltip: {
         fontSize: 12,
-        padding: '7px 11px'
-      }
+        padding: '7px 11px',
+      },
     },
     MuiToolbar: {
       dense: {
-        height: 55
-      }
+        height: 55,
+      },
     },
     MuiButton: {
       contained: {
-        boxShadow: 'none'
-      }
+        boxShadow: 'none',
+      },
     },
     MuiTableCell: {
       root: {
         padding: '8px',
-      }
+      },
     },
     MuiDialogActions: {
       root: {
-        padding: '8px 16px'
-      }
-    }
+        padding: '8px 16px',
+      },
+    },
+    MuiListItem: {
+      dense: {
+        paddingTop: 0,
+        paddingBottom: 0,
+      },
+    },
+    MuiListItemIcon: {
+      root: {
+        minWidth: 32,
+      },
+    },
+    MuiListItemText: {
+      root: {
+        paddingTop: 0,
+        paddingBottom: 0,
+      },
+    },
   },
   palette: {
     common: {
       black: '#000',
-      white: '#fff'
+      white: '#FFF',
     },
     type: 'light',
     primary: {
-      light: '#aee0ff',
-      main: '#4aa3df',
-      dark: '#1e699c',
-      contrastText: '#fff'
+      light: '#AEE0FF',
+      main: '#4AA3DF',
+      dark: '#1E699C',
+      contrastText: '#FFF',
     },
     secondary: {
-      50: '#fbe9e7',
-      100: '#ffccbc',
-      200: '#ffab91',
-      300: '#ff8a65',
-      400: '#ff7043',
-      500: '#ff5722',
-      600: '#f4511e',
-      700: '#e64a19',
-      800: '#d84315',
-      900: '#bf360c',
-      A100: '#ff9e80',
-      A200: '#ff6e40',
-      A400: '#ff3d00',
-      A700: '#dd2c00',
-      main: '#ff3d00',
-      light: '#ff6e40',
-      dark: '#dd2c00',
-      contrastText: '#fff'
+      50: '#FBE9E7',
+      100: '#FFCCBC',
+      200: '#FFAB91',
+      300: '#FF8A65',
+      400: '#FF7043',
+      500: '#FF5722',
+      600: '#F4511E',
+      700: '#E64A19',
+      800: '#D84315',
+      900: '#BF360C',
+      A100: '#FF9E80',
+      A200: '#FF6E40',
+      A400: '#FF3D00',
+      A700: '#DD2C00',
+      main: '#FF3D00',
+      light: '#FF6E40',
+      dark: '#DD2C00',
+      contrastText: '#FFF',
     },
     error: {
-      light: '#e57373',
-      main: '#f44336',
-      dark: '#d32f2f',
-      contrastText: '#fff'
+      light: '#E57373',
+      main: '#F44336',
+      dark: '#D32F2F',
+      contrastText: '#FFF',
     },
     grey: {
-      50: '#fafafa',
-      100: '#f5f5f5',
-      200: '#eeeeee',
-      300: '#e0e0e0',
-      400: '#bdbdbd',
-      500: '#9e9e9e',
+      50: '#FAFAFA',
+      100: '#F5F5F5',
+      200: '#EEEEEE',
+      300: '#E0E0E0',
+      400: '#BDBDBD',
+      500: '#9E9E9E',
       600: '#757575',
       700: '#616161',
       800: '#424242',
       900: '#212121',
-      A100: '#d5d5d5',
-      A200: '#aaaaaa',
+      A100: '#D5D5D5',
+      A200: '#AAAAAA',
       A400: '#303030',
-      A700: '#616161'
+      A700: '#616161',
     },
     contrastThreshold: 3,
     tonalOffset: 0.2,
@@ -152,12 +169,12 @@ const theme = {
       primary: 'rgba(0, 0, 0, 0.87)',
       secondary: 'rgba(0, 0, 0, 0.54)',
       disabled: 'rgba(0, 0, 0, 0.38)',
-      hint: 'rgba(0, 0, 0, 0.38)'
+      hint: 'rgba(0, 0, 0, 0.38)',
     },
     divider: 'rgba(0, 0, 0, 0.12)',
     background: {
-      paper: '#fff',
-      default: '#fff'
+      paper: '#FFF',
+      default: '#FFF',
     },
     action: {
       active: 'rgba(0, 0, 0, 0.54)',
@@ -165,12 +182,12 @@ const theme = {
       hoverOpacity: 0.08,
       selected: 'rgba(0, 0, 0, 0.14)',
       disabled: 'rgba(0, 0, 0, 0.26)',
-      disabledBackground: 'rgba(0, 0, 0, 0.12)'
+      disabledBackground: 'rgba(0, 0, 0, 0.12)',
     },
     sidebar: {
       background: '#243748',
-      text: '#aee0ff'
-    }
+      text: '#AEE0FF',
+    },
   },
   props: {},
   shadows: [
@@ -198,7 +215,7 @@ const theme = {
     '0px 10px 13px -6px rgba(0,0,0,0.2),0px 21px 33px 3px rgba(0,0,0,0.14),0px 8px 40px 7px rgba(0,0,0,0.12)',
     '0px 10px 14px -6px rgba(0,0,0,0.2),0px 22px 35px 3px rgba(0,0,0,0.14),0px 8px 42px 7px rgba(0,0,0,0.12)',
     '0px 11px 14px -7px rgba(0,0,0,0.2),0px 23px 36px 3px rgba(0,0,0,0.14),0px 9px 44px 8px rgba(0,0,0,0.12)',
-    '0px 11px 15px -7px rgba(0,0,0,0.2),0px 24px 38px 3px rgba(0,0,0,0.14),0px 9px 46px 8px rgba(0,0,0,0.12)'
+    '0px 11px 15px -7px rgba(0,0,0,0.2),0px 24px 38px 3px rgba(0,0,0,0.14),0px 9px 46px 8px rgba(0,0,0,0.12)',
   ],
   typography: {
     fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
@@ -213,7 +230,7 @@ const theme = {
       letterSpacing: '-.04em',
       lineHeight: '1.14286em',
       marginLeft: '-.04em',
-      color: 'rgba(0, 0, 0, 0.54)'
+      color: 'rgba(0, 0, 0, 0.54)',
     },
     display3: {
       fontSize: '3.5rem',
@@ -222,7 +239,7 @@ const theme = {
       letterSpacing: '-.02em',
       lineHeight: '1.30357em',
       marginLeft: '-.02em',
-      color: 'rgba(0, 0, 0, 0.54)'
+      color: 'rgba(0, 0, 0, 0.54)',
     },
     display2: {
       fontSize: '2.8125rem',
@@ -230,35 +247,35 @@ const theme = {
       fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
       lineHeight: '1.13333em',
       marginLeft: '-.02em',
-      color: 'rgba(0, 0, 0, 0.54)'
+      color: 'rgba(0, 0, 0, 0.54)',
     },
     display1: {
       fontSize: '2.125rem',
       fontWeight: 400,
       fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
       lineHeight: '1.20588em',
-      color: 'rgba(0, 0, 0, 0.54)'
+      color: 'rgba(0, 0, 0, 0.54)',
     },
     headline: {
       fontSize: '1.5rem',
       fontWeight: 400,
       fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
       lineHeight: '1.35417em',
-      color: 'rgba(0, 0, 0, 0.87)'
+      color: 'rgba(0, 0, 0, 0.87)',
     },
     title: {
       fontSize: '1.3125rem',
       fontWeight: 500,
       fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
       lineHeight: '1.16667em',
-      color: 'rgba(0, 0, 0, 0.87)'
+      color: 'rgba(0, 0, 0, 0.87)',
     },
     subheading: {
       fontSize: '1rem',
       fontWeight: 400,
       fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
       lineHeight: '1.5em',
-      color: 'rgba(0, 0, 0, 0.87)'
+      color: 'rgba(0, 0, 0, 0.87)',
     },
     body2: {
       color: 'rgba(0, 0, 0, 0.87)',
@@ -266,7 +283,7 @@ const theme = {
       fontWeight: 400,
       fontSize: '0.75rem',
       lineHeight: 1.4,
-      letterSpacing: '0.01071em'
+      letterSpacing: '0.01071em',
     },
     body1: {
       color: 'rgba(0, 0, 0, 0.87)',
@@ -274,7 +291,7 @@ const theme = {
       fontWeight: 400,
       fontSize: '0.875rem',
       lineHeight: 1.5,
-      letterSpacing: '0.00938em'
+      letterSpacing: '0.00938em',
     },
     caption: {
       color: 'rgba(0, 0, 0, 0.87)',
@@ -282,7 +299,7 @@ const theme = {
       fontWeight: 400,
       fontSize: '0.75rem',
       lineHeight: 1.66,
-      letterSpacing: '0.03333em'
+      letterSpacing: '0.03333em',
     },
     button: {
       color: 'rgba(0, 0, 0, 0.87)',
@@ -291,7 +308,7 @@ const theme = {
       fontSize: '0.875rem',
       lineHeight: 1.75,
       letterSpacing: '0.02857em',
-      textTransform: 'none'
+      textTransform: 'none',
     },
     h1: {
       color: 'rgba(0, 0, 0, 0.87)',
@@ -299,7 +316,7 @@ const theme = {
       fontWeight: 300,
       fontSize: '6rem',
       lineHeight: 1,
-      letterSpacing: '-0.01562em'
+      letterSpacing: '-0.01562em',
     },
     h2: {
       color: 'rgba(0, 0, 0, 0.87)',
@@ -307,7 +324,7 @@ const theme = {
       fontWeight: 300,
       fontSize: '3.75rem',
       lineHeight: 1,
-      letterSpacing: '-0.00833em'
+      letterSpacing: '-0.00833em',
     },
     h3: {
       color: '#222',
@@ -315,7 +332,7 @@ const theme = {
       fontWeight: 400,
       fontSize: '21px',
       lineHeight: 1.04,
-      letterSpacing: '0em'
+      letterSpacing: '0em',
     },
     h4: {
       color: 'rgba(0, 0, 0, 0.87)',
@@ -323,7 +340,7 @@ const theme = {
       fontWeight: 400,
       fontSize: '2.125rem',
       lineHeight: 1.17,
-      letterSpacing: '0.00735em'
+      letterSpacing: '0.00735em',
     },
     h5: {
       color: 'rgba(0, 0, 0, 0.87)',
@@ -331,7 +348,7 @@ const theme = {
       fontWeight: 400,
       fontSize: '1.6rem',
       lineHeight: 1.33,
-      letterSpacing: '0em'
+      letterSpacing: '0em',
     },
     h6: {
       color: 'rgba(0, 0, 0, 0.87)',
@@ -339,7 +356,7 @@ const theme = {
       fontWeight: 500,
       fontSize: '1.25rem',
       lineHeight: 1.6,
-      letterSpacing: '0.0075em'
+      letterSpacing: '0.0075em',
     },
     subtitle1: {
       color: 'rgba(0, 0, 0, 0.87)',
@@ -347,7 +364,7 @@ const theme = {
       fontWeight: 400,
       fontSize: '1.3125rem',
       lineHeight: 1.45,
-      letterSpacing: '0.00938em'
+      letterSpacing: '0.00938em',
     },
     subtitle2: {
       color: 'rgba(0, 0, 0, 0.87)',
@@ -355,7 +372,7 @@ const theme = {
       fontWeight: 500,
       fontSize: '0.875rem',
       lineHeight: 1.4,
-      letterSpacing: '0.00714em'
+      letterSpacing: '0.00714em',
     },
     body1Next: {
       color: 'rgba(0, 0, 0, 0.87)',
@@ -363,7 +380,7 @@ const theme = {
       fontWeight: 400,
       fontSize: '0.875rem',
       lineHeight: 1.5,
-      letterSpacing: '0.00938em'
+      letterSpacing: '0.00938em',
     },
     body2Next: {
       color: 'rgba(0, 0, 0, 0.87)',
@@ -371,7 +388,7 @@ const theme = {
       fontWeight: 400,
       fontSize: '0.75rem',
       lineHeight: 1.5,
-      letterSpacing: '0.01071em'
+      letterSpacing: '0.01071em',
     },
     buttonNext: {
       color: 'rgba(0, 0, 0, 0.87)',
@@ -380,7 +397,7 @@ const theme = {
       fontSize: '0.875rem',
       lineHeight: 1.75,
       letterSpacing: '0.02857em',
-      textTransform: 'uppercase'
+      textTransform: 'uppercase',
     },
     captionNext: {
       color: 'rgba(0, 0, 0, 0.87)',
@@ -388,7 +405,7 @@ const theme = {
       fontWeight: 400,
       fontSize: '0.75rem',
       lineHeight: 1.66,
-      letterSpacing: '0.03333em'
+      letterSpacing: '0.03333em',
     },
     overline: {
       color: 'rgba(0, 0, 0, 0.87)',
@@ -397,11 +414,11 @@ const theme = {
       fontSize: '0.75rem',
       lineHeight: 2.66,
       letterSpacing: '0.08333em',
-      textTransform: 'uppercase'
-    }
+      textTransform: 'uppercase',
+    },
   },
   shape: {
-    borderRadius: 4
+    borderRadius: 4,
   },
   spacing: 8,
   transitions: {
@@ -409,7 +426,7 @@ const theme = {
       easeInOut: 'cubic-bezier(0.4, 0, 0.2, 1)',
       easeOut: 'cubic-bezier(0.0, 0, 0.2, 1)',
       easeIn: 'cubic-bezier(0.4, 0, 1, 1)',
-      sharp: 'cubic-bezier(0.4, 0, 0.6, 1)'
+      sharp: 'cubic-bezier(0.4, 0, 0.6, 1)',
     },
     duration: {
       shortest: 150,
@@ -418,8 +435,8 @@ const theme = {
       standard: 300,
       complex: 375,
       enteringScreen: 225,
-      leavingScreen: 195
-    }
+      leavingScreen: 195,
+    },
   },
   zIndex: {
     mobileStepper: 1000,
@@ -427,8 +444,8 @@ const theme = {
     drawer: 1200,
     modal: 1300,
     snackbar: 1400,
-    tooltip: 1500
-  }
+    tooltip: 1500,
+  },
 }
 
 export default theme

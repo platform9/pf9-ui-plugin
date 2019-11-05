@@ -20,7 +20,7 @@ export const customValidator = (validator, errorMessage) =>
   new FieldValidator(validator, errorMessage)
 
 const fieldIsUnset = value => isNil(value) || isEmpty(value) || value === false
-export const hasMinLength = moize(minLen => both(is(String), val => val.length >= minLen))
+export const hasMinLength = minLen => both(is(String), val => val.length >= minLen)
 export const hasOneLowerChar = both(is(String), test(/[a-z]/))
 export const hasOneUpperChar = both(is(String), test(/[A-Z]/))
 export const hasOneNumber = both(is(String), test(/[0-9]/))
@@ -81,13 +81,14 @@ export const passwordValidator = new FieldValidator(
     hasOneNumber,
     hasOneSpecialChar,
   ])(value),
-  cond([
+  // Show a different error message depending on the validation error
+  value => cond([
     [complement(hasMinLength(8)), always('Password must be at least 8 characters long')],
     [complement(hasOneLowerChar), always('Password must contain at least one lowercase letter')],
     [complement(hasOneUpperChar), always('Password must contain at least one uppercase letter')],
     [complement(hasOneNumber), always('Password must contain at least one number')],
     [complement(hasOneSpecialChar), always('Password must contain at least one special character')],
-  ]),
+  ])(value),
 )
 
 export const validators = {

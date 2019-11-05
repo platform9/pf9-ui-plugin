@@ -41,7 +41,7 @@ export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
     loadFromContext,
   ) => {
     const currentTenant = prevItems.find(propEq('id', tenantId))
-    const prevRoleAssignmentsArr = await loadFromContext(mngmRoleAssignmentsLoader, {
+    const prevRoleAssignmentsArr = await loadFromContext(mngmTenantRoleAssignmentsLoader, {
       tenantId,
     })
     const updateTenantPromise = keystone.updateProject(tenantId, {
@@ -104,8 +104,8 @@ export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
   },
 })
 
-export const mngmRoleAssignmentsCacheKey = 'managementRoleAssignments'
-export const mngmRoleAssignmentsLoader = createContextLoader(mngmRoleAssignmentsCacheKey,
+export const mngmTenantRoleAssignmentsCacheKey = 'managementTenantRoleAssignments'
+export const mngmTenantRoleAssignmentsLoader = createContextLoader(mngmTenantRoleAssignmentsCacheKey,
   async ({ tenantId }) => {
     const roleAssignments = await keystone.getTenantRoleAssignments(tenantId) || emptyArr
     return roleAssignments.map(roleAssignment => ({
