@@ -17,7 +17,6 @@ const useStyles = makeStyles(theme => ({
 
 const EndpointsListPage = () => {
   const classes = useStyles()
-  const columns = getColumns()
 
   const options = {
     cacheKey: 'endpoints',
@@ -40,7 +39,7 @@ const EndpointsListPage = () => {
   )
 }
 
-const getColumns = () => [
+const columns = [
   { id: 'name', label: 'Service' },
   { id: 'type', label: 'Type' },
   { id: 'url', label: 'URL' },

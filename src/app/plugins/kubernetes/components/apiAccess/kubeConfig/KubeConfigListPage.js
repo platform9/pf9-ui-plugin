@@ -19,7 +19,6 @@ const useStyles = makeStyles(theme => ({
 
 const KubeConfigListPage = () => {
   const classes = useStyles()
-  const columns = getColumns()
 
   const options = {
     cacheKey: 'kubeconfig',
@@ -49,7 +48,7 @@ const KubeConfigListPage = () => {
   )
 }
 
-const getColumns = () => [
+const columns = [
   { id: 'cluster', label: 'Cluster' },
   { id: 'kubeConfig', label: 'kubeconfig', render: (value) => kubeConfigLink(value) },
   { id: 'url', label: 'URL' },
