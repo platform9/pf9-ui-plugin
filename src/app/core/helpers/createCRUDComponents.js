@@ -53,6 +53,7 @@ const createCRUDComponents = options => {
     multiSelection = true,
     showCheckboxes,
     compactTable,
+    blankFirstColumn,
   } = options
 
   // List
@@ -90,6 +91,7 @@ const createCRUDComponents = options => {
         onColumnsChange={getParamsUpdater('visibleColumns', 'columnsOrder')}
         showCheckboxes={showCheckboxes}
         compactTable={compactTable}
+        blankFirstColumn={blankFirstColumn}
       />
     )
   }

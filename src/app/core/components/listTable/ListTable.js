@@ -458,6 +458,7 @@ class ListTable extends PureComponent {
       selectedRows = selected,
       size,
       compactTable,
+      blankFirstColumn,
     } = this.props
 
     if (!data) {
@@ -484,6 +485,7 @@ class ListTable extends PureComponent {
           checked={selectedAll}
           rowCount={filteredData.length}
           showCheckboxes={multiSelection && showCheckboxes}
+          blankFirstColumn={blankFirstColumn}
         />
         <TableBody>
           {paginatedData.map(this.renderRow)}

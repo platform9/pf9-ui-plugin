@@ -11,7 +11,10 @@ const useStyles = makeStyles(theme => ({
     '&:hover': {
       textDecoration: 'underline',
     }
-  }
+  },
+  clusterConfig: {
+    marginTop: theme.spacing(5),
+  },
 }))
 
 const KubeConfigListPage = () => {
@@ -25,6 +28,7 @@ const KubeConfigListPage = () => {
     columns,
     name: 'Kubeconfig',
     compactTable: true,
+    blankFirstColumn: true,
   }
 
   const { ListPage } = createCRUDComponents(options)
@@ -40,6 +44,7 @@ const KubeConfigListPage = () => {
         Learn more about kubeconfig
       </a>
       <ListPage />
+      <p className={classes.clusterConfig}>Select a cluster above to populate its kubeconfig below.</p>
     </>
   )
 }
