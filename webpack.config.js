@@ -16,7 +16,7 @@ const extractCSS = new MiniCssExtractPlugin({
   // Options similar to the same options in webpackOptions.output
   // both options are optional
   filename: isProd ? '[name].[hash].styles.css' : '[name].styles.css',
-  chunkFilename: isProd ? '[id].[hash].styles.css' : '[id].styles.css'
+  chunkFilename: isProd ? '[id].[hash].styles.css' : '[id].styles.css',
 })
 
 const appEntry = []
@@ -30,7 +30,7 @@ const publicPath = isProd ? '/ui/' : `http://localhost:${port}/ui`
 
 module.exports = {
   entry: {
-    app: appEntry
+    app: appEntry,
   },
   mode: isProd ? 'production' : 'development',
   devtool: isProd ? 'source-map' : 'cheap-module-eval-source-map',
@@ -43,32 +43,32 @@ module.exports = {
     hot: true,
     open: false,
     historyApiFallback: {
-      index: '/ui/index.html'
-    }
+      index: '/ui/index.html',
+    },
   },
   output: {
     filename: isDev ? '[name]-bundle.js' : '[name].[hash]-bundle.js',
     publicPath,
-    path: outputPath
+    path: outputPath,
   },
   module: {
     rules: [
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        use: 'babel-loader'
+        use: 'babel-loader',
       },
       {
         test: /\.tsx?$/,
         exclude: /node_modules/,
-        use: 'awesome-typescript-loader'
+        use: 'awesome-typescript-loader',
       },
       {
         test: /\.css$/,
         exclude: /node_modules/,
-        use: ['style-loader', 'css-loader']
-      }
-    ]
+        use: ['style-loader', 'css-loader'],
+      },
+    ],
   },
   context: contextPath,
   optimization: {
@@ -78,37 +78,35 @@ module.exports = {
       new TerserPlugin({
         cache: true,
         parallel: true,
-        sourceMap: true
-      })
+        sourceMap: true,
+      }),
     ],
     splitChunks: {
       cacheGroups: {
         vendor: {
           test: /[\\/]node_modules[\\/]/,
           name: 'vendor',
-          chunks: 'all'
-        }
-      }
-    }
+          chunks: 'all',
+        },
+      },
+    },
   },
   plugins: [
     ...(isProd ? [] : [new webpack.NamedModulesPlugin()]),
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify(env)
+      'process.env.NODE_ENV': JSON.stringify(env),
     }),
     extractCSS,
     new HtmlWebpackPlugin({
       inject: true,
-      template: isProd
-        ? './static/index-with-tracking.html'
-        : './static/index.html',
+      template: isProd ? './static/index-with-tracking.html' : './static/index.html',
       favicon: './static/favicon.ico',
-      title: 'Caching'
+      title: 'Caching',
     }),
     new webpack.HashedModuleIdsPlugin(),
     new CopyWebpackPlugin([{ from: './static' }], {
-      copyUnmodified: false
-    })
+      copyUnmodified: false,
+    }),
   ],
   resolve: {
     alias: {
@@ -121,7 +119,7 @@ module.exports = {
       utils: path.resolve(__dirname, 'src/app/utils'),
       app: path.resolve(__dirname, 'src/app'),
       server: path.resolve(__dirname, 'src/server'),
-      'api-client': path.resolve(__dirname, 'src/api-client')
-    }
-  }
+      'api-client': path.resolve(__dirname, 'src/api-client'),
+    },
+  },
 }
