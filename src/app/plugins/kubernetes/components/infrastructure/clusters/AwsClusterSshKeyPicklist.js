@@ -7,7 +7,7 @@ import Picklist from 'core/components/Picklist'
 import { loadCloudProviderRegionDetails } from 'k8s/components/infrastructure/cloudProviders/actions'
 
 const AwsClusterSshKeyPicklist = forwardRef(({
-  cloudProviderId, cloudProviderRegionId, hasError, errorMessage, ...rest
+  cloudProviderId, cloudProviderRegionId, ...rest
 }, ref) => {
   const [details, loading] = useDataLoader(loadCloudProviderRegionDetails, { cloudProviderId, cloudProviderRegionId })
 
@@ -20,8 +20,6 @@ const AwsClusterSshKeyPicklist = forwardRef(({
       ref={ref}
       loading={loading}
       options={options}
-      error={hasError}
-      helperText={errorMessage}
     />
   )
 })

@@ -51,11 +51,11 @@ const FormWrapper = ({
           }
         </Grid>
         <Divider className={classes.divider} />
-        <div className={className}>
-          <Progress {...progressProps}>
+        <Progress {...progressProps}>
+          <div className={className}>
             {children}
-          </Progress>
-        </div>
+          </div>
+        </Progress>
       </Grid>
     </Grid>
   )
