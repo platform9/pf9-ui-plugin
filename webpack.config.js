@@ -56,14 +56,19 @@ module.exports = {
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        use: 'babel-loader'
+        use: 'babel-loader',
+      },
+      {
+        test: /\.tsx?$/,
+        exclude: /node_modules/,
+        use: 'awesome-typescript-loader',
       },
       {
         test: /\.css$/,
         exclude: /node_modules/,
         use: ['style-loader', 'css-loader'],
       },
-    ]
+    ],
   },
   context: contextPath,
   optimization: {
@@ -73,39 +78,35 @@ module.exports = {
       new TerserPlugin({
         cache: true,
         parallel: true,
-        sourceMap: true
-      })
+        sourceMap: true,
+      }),
     ],
     splitChunks: {
       cacheGroups: {
         vendor: {
           test: /[\\/]node_modules[\\/]/,
           name: 'vendor',
-          chunks: 'all'
-        }
-      }
-    }
+          chunks: 'all',
+        },
+      },
+    },
   },
   plugins: [
-    ...(isProd
-      ? []
-      : [new webpack.NamedModulesPlugin()]),
+    ...(isProd ? [] : [new webpack.NamedModulesPlugin()]),
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify(env)
+      'process.env.NODE_ENV': JSON.stringify(env),
     }),
     extractCSS,
     new HtmlWebpackPlugin({
       inject: true,
-      template: isProd
-        ? './static/index-with-tracking.html'
-        : './static/index.html',
+      template: isProd ? './static/index-with-tracking.html' : './static/index.html',
       favicon: './static/favicon.ico',
-      title: 'Caching'
+      title: 'Caching',
     }),
     new webpack.HashedModuleIdsPlugin(),
     new CopyWebpackPlugin([{ from: './static' }], {
-      copyUnmodified: false
-    })
+      copyUnmodified: false,
+    }),
   ],
   resolve: {
     alias: {
@@ -120,5 +121,5 @@ module.exports = {
       server: path.resolve(__dirname, 'src/server'),
       'api-client': path.resolve(__dirname, 'src/api-client'),
     },
-  }
+  },
 }

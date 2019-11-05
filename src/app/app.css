@@ -14,9 +14,9 @@ body {
   grid-template-columns: repeat(9, 1fr);
   grid-auto-rows: minmax(100px, auto);
   grid-template-areas:
-    "hd hd hd hd   hd   hd   hd   hd   hd"
-    "sd sd sd main main main main main main"
-    "ft ft ft ft   ft   ft   ft   ft   ft";
+    'hd hd hd hd   hd   hd   hd   hd   hd'
+    'sd sd sd main main main main main main'
+    'ft ft ft ft   ft   ft   ft   ft   ft';
 }
 
 #nav-menu {
@@ -33,4 +33,8 @@ body {
 
 #sidebar {
   grid-area: sd;
+}
+
+*:any-link {
+  text-decoration: none;
 }
