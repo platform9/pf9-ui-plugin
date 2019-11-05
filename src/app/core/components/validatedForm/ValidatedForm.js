@@ -4,7 +4,7 @@ import ValidatedFormDebug from './ValidatedFormDebug'
 import { withStyles } from '@material-ui/styles'
 import { setStateLens } from 'app/utils/fp'
 import { parseValidator } from 'core/utils/fieldValidators'
-import { pathEq, toPairs, path, lensPath, over, set, identity } from 'ramda'
+import { pathEq, toPairs, path, lensPath, over, set, identity, dissocPath } from 'ramda'
 import { withRouter } from 'react-router-dom'
 import moize from 'moize'
 
@@ -50,6 +50,10 @@ class ValidatedForm extends PureComponent {
   defineField = moize(field => spec => {
     this.setState(setStateLens(spec, ['fields', field]))
   })
+
+  removeField = field => {
+    this.setState(dissocPath(['fields', field]))
+  }
 
   /**
    * Child components invoke this from their 'onChange' (or equivalent).
@@ -150,6 +154,7 @@ class ValidatedForm extends PureComponent {
     updateFieldValue: this.updateFieldValue,
     getFieldValue: this.getFieldValue,
     defineField: this.defineField,
+    removeField: this.removeField,
     validateField: this.validateField,
     showingErrors: false,
     showErrorsOnBlur: this.props.showErrorsOnBlur,

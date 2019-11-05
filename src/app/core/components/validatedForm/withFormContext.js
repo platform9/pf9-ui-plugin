@@ -26,6 +26,7 @@ const ValidatedFormInput = ({
     updateFieldValue,
     getFieldValue,
     defineField,
+    removeField,
     validateField,
     showErrorsOnBlur,
   } = useContext(ValidatedFormContext)
@@ -52,6 +53,9 @@ const ValidatedFormInput = ({
       setCurrentFieldValue(currentInitialValue)
     }
   }, [validations, required])
+
+  // Remove the field when component unmounts
+  useEffect(() => () => removeField(id), [])
 
   // Notify value changes to the form when the field is controlled
   useEffect(() => {
