@@ -633,7 +633,6 @@ ListTable.defaultProps = {
   rowsPerPage: 10,
   emptyText: 'No data found',
   loading: false,
-  showToolbar: true,
   size: 'medium',
   compactTable: false,
 }
