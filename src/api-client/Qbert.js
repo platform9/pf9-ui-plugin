@@ -625,7 +625,7 @@ class Qbert {
   }
 
   getCoreApiResourcesList = async (clusterId) => {
-    return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/api/v1`)
+    return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1`)
   }
 }
 

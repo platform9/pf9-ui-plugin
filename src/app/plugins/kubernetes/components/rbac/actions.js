@@ -130,6 +130,8 @@ export const roleActions = createCRUDActions(rolesCacheKey, {
       namespace: pathStr('metadata.namespace', item),
       clusterName: pipe(find(propEq('uuid', item.clusterId)), prop('name'))(clusters),
       created: pathStr('metadata.creationTimestamp', item),
+      pickerLabel: `Role: ${item.metadata.name}`,
+      pickerValue: `Role:${item.metadata.name}`
     }))
   },
   uniqueIdentifier,
@@ -176,6 +178,8 @@ export const clusterRoleActions = createCRUDActions(clusterRolesCacheKey, {
       name: pathStr('metadata.name', item),
       clusterName: pipe(find(propEq('uuid', item.clusterId)), prop('name'))(clusters),
       created: pathStr('metadata.creationTimestamp', item),
+      pickerLabel: `Cluster Role: ${item.metadata.name}`,
+      pickerValue: `ClusterRole:${item.metadata.name}`
     }))
   },
   uniqueIdentifier,

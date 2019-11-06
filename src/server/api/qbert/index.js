@@ -167,6 +167,6 @@ router.delete(`${loggingBase}/:loggingId`, tokenValidator, deleteLogging)
 router.get(`${clusterK8sApiBase}/apis`, tokenValidator, getApiGroupList)
 router.get(`${clusterK8sApiBase}/apis/extensions/v1beta1`, tokenValidator, getExtensionsApiResources)
 router.get(`${clusterK8sApiBase}/apis/apps/v1`, tokenValidator, getAppsApiResources)
-router.get(`${clusterK8sApiBase}/apis/api/v1`, tokenValidator, getCoreApiResources)
+router.get(`${clusterK8sApiBase}/api/v1`, tokenValidator, getCoreApiResources)
 
 export default router

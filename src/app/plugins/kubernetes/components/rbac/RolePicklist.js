@@ -1,8 +1,9 @@
 import React, { forwardRef, useMemo, useEffect } from 'react'
 import Picklist from 'core/components/Picklist'
+import { projectAs } from 'utils/fp'
 import useDataLoader from 'core/hooks/useDataLoader'
 import PropTypes from 'prop-types'
-import { isEmpty, propOr, head } from 'ramda'
+import { isEmpty, propOr, head, uniqBy, prop } from 'ramda'
 import { allKey } from 'app/constants'
 import { roleActions, clusterRoleActions } from './actions'
 
@@ -13,17 +14,13 @@ const RolePicklist = forwardRef(
     const [clusterRoles, clusterRolesLoading] = useDataLoader(clusterRoleActions.list, { clusterId })
 
     const options = useMemo(() => {
-      // Pass in Role/ClusterRole in value to know which type of role
-      // was selected when forming the request body
-      const mappedRoles = roles.map(role => ({
-        label: `Role: ${role.name}`,
-        value: `Role:${role.name}`
-      }))
-      const mappedClusterRoles = clusterRoles.map(role => ({
-        label: `Cluster Role: ${role.name}`,
-        value: `ClusterRole:${role.name}`
-      }))
-      return showAllRoleTypes ? [...mappedRoles, ...mappedClusterRoles] : mappedClusterRoles
+      const _roles = projectAs(
+        { label: 'pickerLabel', value: 'pickerValue' }, uniqBy(prop('pickerValue'), roles),
+      )
+      const _clusterRoles = projectAs(
+        { label: 'pickerLabel', value: 'pickerValue' }, uniqBy(prop('pickerValue'), clusterRoles),
+      )
+      return showAllRoleTypes ? [..._roles, ..._clusterRoles] : _clusterRoles
     }, [roles, clusterRoles])
 
     // Select the first item as soon as data is loaded

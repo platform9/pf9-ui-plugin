@@ -7,9 +7,7 @@ import { createUsePrefParamsHook } from 'core/hooks/useParams'
 import { listTablePrefs } from 'app/constants'
 import { pick } from 'ramda'
 
-const defaultParams = {
-  masterNodeClusters: true,
-}
+const defaultParams = {}
 const usePrefParams = createUsePrefParamsHook('RoleBindings', listTablePrefs)
 
 const ListPage = ({ ListContainer }) => {

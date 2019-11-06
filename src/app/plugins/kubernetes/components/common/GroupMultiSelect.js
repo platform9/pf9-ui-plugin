@@ -7,7 +7,7 @@ import MultiSelect from 'core/components/MultiSelect'
 import { mngmGroupActions } from 'k8s/components/userManagement/groups/actions'
 
 const GroupPicker = forwardRef(({ onChange, ...rest }, ref) => {
-  const [groups, loadingGroups] = useDataLoader(mngmGroupActions.list)
+  const [groups, loadingGroups] = useDataLoader(mngmGroupActions.list, { orderBy: 'name' })
   const [values, setValues] = React.useState([])
 
   const handleValuesChange = values => {
@@ -16,12 +16,11 @@ const GroupPicker = forwardRef(({ onChange, ...rest }, ref) => {
   }
 
   const groupsList = projectAs({ label: 'name', value: 'name' }, groups)
-  const sortedGroupsList = sortByProperty(groupsList, 'label')
 
   return (
     <MultiSelect
       label="Groups"
-      options={sortedGroupsList}
+      options={groupsList}
       values={values}
       onChange={handleValuesChange}
       loading={loadingGroups}

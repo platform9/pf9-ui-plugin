@@ -25,11 +25,11 @@ const useStyles = makeStyles(theme => ({
   },
   groupHeader: {
     flexGrow: 0,
-    minWidth: '120px',
+    minWidth: '200px',
   },
   groupColumn: {
     flexGrow: 0,
-    minWidth: '120px',
+    minWidth: '200px',
     fontWeight: '600',
   },
   resource: {
@@ -42,7 +42,7 @@ const useStyles = makeStyles(theme => ({
 
 const RbacChecklist = ({ clusterId, onChange, value, ...rest }) => {
   const [checkedItems, setCheckedItems] = useState(emptyObj)
-  const [apiGroups, loadingApiGroups] = useDataLoader(apiGroupsLoader, { clusterId })
+  const [apiGroups, loadingApiGroups] = useDataLoader(apiGroupsLoader, { clusterId, orderBy: 'name' })
 
   const classes = useStyles()
 

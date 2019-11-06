@@ -7,7 +7,7 @@ import MultiSelect from 'core/components/MultiSelect'
 import { mngmUserActions } from 'k8s/components/userManagement/users/actions'
 
 const UserPicker = forwardRef(({ onChange, ...rest }, ref) => {
-  const [users, loadingUsers] = useDataLoader(mngmUserActions.list)
+  const [users, loadingUsers] = useDataLoader(mngmUserActions.list, { orderBy: 'username' })
   const [values, setValues] = React.useState([])
 
   const handleValuesChange = values => {
@@ -16,12 +16,11 @@ const UserPicker = forwardRef(({ onChange, ...rest }, ref) => {
   }
 
   const usersList = projectAs({ label: 'username', value: 'username' }, users)
-  const sortedUsersList = sortByProperty(usersList, 'label')
 
   return (
     <MultiSelect
       label="Users"
-      options={sortedUsersList}
+      options={usersList}
       values={values}
       onChange={handleValuesChange}
       loading={loadingUsers}
