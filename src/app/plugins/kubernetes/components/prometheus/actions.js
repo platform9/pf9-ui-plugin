@@ -62,6 +62,7 @@ export const prometheusInstanceActions = createCRUDActions(prometheusInstancesCa
     await qbert.deletePrometheusInstance(instance.clusterUuid, instance.namespace, instance.name)
   },
   dataMapper: async (items, params, loadFromContext) => {
+    console.log(items)
     const clusters = await loadFromContext(clustersCacheKey)
     return items.map(mapPrometheusInstance(clusters))
   },

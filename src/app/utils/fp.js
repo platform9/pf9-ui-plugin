@@ -1,6 +1,6 @@
 import {
   T, cond, equals, always, adjust, update, findIndex, assocPath, curry, pathOr, remove, values,
-  groupBy, filter, either, isNil, isEmpty, path,
+  groupBy, filter, either, isNil, isEmpty, path, sortBy, compose as rCompose, toLower, prop
 } from 'ramda'
 import moize from 'moize'
 
@@ -277,3 +277,8 @@ export const switchCase = (defaultValue, ...cases) => input =>
  */
 export const objSwitchCase = (casesObj, defaultValue) => input =>
   casesObj.hasOwnProperty(input) ? casesObj[input] : defaultValue
+
+export const sortByProperty = (list, attr) => {
+  const sortByPropCaseInsensitive = sortBy(rCompose(toLower, prop(attr)))
+  return sortByPropCaseInsensitive(list)
+}

@@ -36,6 +36,11 @@ import AddTenantPage from 'k8s/components/userManagement/tenants/AddTenantPage'
 import EditTenantPage from 'k8s/components/userManagement/tenants/EditTenantPage'
 import AddUserPage from 'k8s/components/userManagement/users/AddUserPage'
 import EditUserPage from 'k8s/components/userManagement/users/EditUserPage'
+import RbacIndexPage from './components/rbac/RbacIndexPage'
+import AddRolePage from './components/rbac/AddRolePage'
+import AddClusterRolePage from './components/rbac/AddClusterRolePage'
+import AddRoleBindingPage from './components/rbac/AddRoleBindingPage'
+import AddClusterRoleBindingPage from './components/rbac/AddClusterRoleBindingPage'
 
 class Kubernetes extends React.PureComponent {
   render () {
@@ -234,6 +239,31 @@ Kubernetes.registerPlugin = pluginManager => {
         link: { path: '/onboarding', exact: true },
         component: OnboardingPage,
       },
+      {
+        name: 'RBAC',
+        link: { path: '/rbac', exact: true },
+        component: RbacIndexPage,
+      },
+      {
+        name: 'Add Role',
+        link: { path: '/rbac/roles/add', exact: true },
+        component: AddRolePage,
+      },
+      {
+        name: 'Add Cluster Role',
+        link: { path: '/rbac/clusterroles/add', exact: true },
+        component: AddClusterRolePage,
+      },
+      {
+        name: 'Add Role Binding',
+        link: { path: '/rbac/rolebindings/add', exact: true },
+        component: AddRoleBindingPage,
+      },
+      {
+        name: 'Add Cluster Role Binding',
+        link: { path: '/rbac/clusterrolebindings/add', exact: true },
+        component: AddClusterRoleBindingPage,
+      }
     ],
   )
 
@@ -341,6 +371,7 @@ Kubernetes.registerPlugin = pluginManager => {
     { name: 'Namespaces', icon: 'object-group', link: { path: '/namespaces' } },
     { name: 'Prometheus Monitoring (BETA)', icon: 'chart-area', link: { path: '/prometheus' } },
     { name: 'Logging (beta)', icon: 'clipboard-list', link: { path: '/logging' } },
+    { name: 'RBAC', icon: 'user-shield', link: { path: '/rbac' } },
     { name: 'API Access', icon: 'key', link: { path: '/api_access' } },
     {
       name: 'Tenants & Users',

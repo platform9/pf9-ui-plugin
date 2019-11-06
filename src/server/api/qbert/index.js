@@ -42,6 +42,10 @@ import {
 
 import { getLoggings, postLogging, putLogging, deleteLogging } from './logging/loggingActions'
 
+import {
+  getApiGroupList, getExtensionsApiResources, getAppsApiResources, getCoreApiResources
+} from './apiResources/apiResourceActions'
+
 // TODO
 // import { deployApplication } from './applications'
 import { getRepositoriesForCluster } from './repositories/actions'
@@ -158,5 +162,11 @@ router.get(loggingBase, tokenValidator, getLoggings)
 router.post(loggingBase, tokenValidator, postLogging)
 router.put(`${loggingBase}/:loggingId`, tokenValidator, putLogging)
 router.delete(`${loggingBase}/:loggingId`, tokenValidator, deleteLogging)
+
+// API Resources
+router.get(`${clusterK8sApiBase}/apis`, tokenValidator, getApiGroupList)
+router.get(`${clusterK8sApiBase}/apis/extensions/v1beta1`, tokenValidator, getExtensionsApiResources)
+router.get(`${clusterK8sApiBase}/apis/apps/v1`, tokenValidator, getAppsApiResources)
+router.get(`${clusterK8sApiBase}/apis/api/v1`, tokenValidator, getCoreApiResources)
 
 export default router

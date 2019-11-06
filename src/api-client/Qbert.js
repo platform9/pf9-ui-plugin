@@ -337,6 +337,63 @@ class Qbert {
     return response && response.items
   }
 
+  /* RBAC */
+  getClusterRoles = async (clusterId) => {
+    const response = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/roles`)
+    return normalizeClusterizedResponse(clusterId, response)
+  }
+
+  createClusterRole = async (clusterId, namespace, body) => {
+    const response = await this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/${namespace}/roles`, body)
+    return normalizeClusterizedUpdate(clusterId, response)
+  }
+
+  deleteClusterRole = async (clusterId, namespace, name) => {
+    return this.client.basicDelete(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/${namespace}/roles/${name}`)
+  }
+
+  getClusterClusterRoles = async (clusterId) => {
+    const response = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterroles`)
+    return normalizeClusterizedResponse(clusterId, response)
+  }
+
+  createClusterClusterRole = async (clusterId, body) => {
+    const response = await this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterroles`, body)
+    return normalizeClusterizedUpdate(clusterId, response)
+  }
+
+  deleteClusterClusterRole = async (clusterId, name) => {
+    return this.client.basicDelete(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterroles/${name}`)
+  }
+
+  getClusterRoleBindings = async (clusterId) => {
+    const response = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/rolebindings`)
+    return normalizeClusterizedResponse(clusterId, response)
+  }
+
+  createClusterRoleBinding = async (clusterId, namespace, body) => {
+    const response = await this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/${namespace}/rolebindings`, body)
+    return normalizeClusterizedUpdate(clusterId, response)
+  }
+
+  deleteClusterRoleBinding = async (clusterId, namespace, name) => {
+    return this.client.basicDelete(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/${namespace}/rolebindings/${name}`)
+  }
+
+  getClusterClusterRoleBindings = async (clusterId) => {
+    const response = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterrolebindings`)
+    return normalizeClusterizedResponse(clusterId, response)
+  }
+
+  createClusterClusterRoleBinding = async (clusterId, body) => {
+    const response = await this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterrolebindings`, body)
+    return normalizeClusterizedUpdate(clusterId, response)
+  }
+
+  deleteClusterClusterRoleBinding = async (clusterId, name) => {
+    return this.client.basicDelete(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterrolebindings/${name}`)
+  }
+
   /* Managed Apps */
   getPrometheusInstances = async (clusterUuid) => {
     try {
@@ -555,6 +612,20 @@ class Qbert {
     const url = `${await this.getLoggingsBaseUrl(clusterUuid)}/${loggingUuid}`
     const response = await this.client.basicDelete(url)
     return response
+  }
+
+  // API Resources
+  getApiGroupList = async (clusterId) => {
+    return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis`)
+  }
+
+  getApiResourcesList = async (config) => {
+    const { clusterId, apiGroup } = config
+    return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/${apiGroup}`)
+  }
+
+  getCoreApiResourcesList = async (clusterId) => {
+    return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/api/v1`)
   }
 }
 
