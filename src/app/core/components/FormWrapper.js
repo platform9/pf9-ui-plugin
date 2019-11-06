@@ -28,7 +28,7 @@ const FormWrapper = ({
   children,
   title,
   className,
-  ...rest,
+  ...rest
 }) => {
   const classes = useStyles()
   const progressProps = pick(keys(Progress.propTypes), rest)

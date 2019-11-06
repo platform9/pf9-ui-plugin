@@ -11,7 +11,7 @@ import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 const ClusterPicklist = forwardRef(({
   loading, onChange,
   onlyPrometheusEnabled, onlyMasterNodeClusters, onlyAppCatalogEnabled, onlyHealthyClusters,
-  ...rest,
+  ...rest
 }, ref) => {
   const defaultParams = {
     masterNodeClusters: onlyMasterNodeClusters,
@@ -48,7 +48,7 @@ ClusterPicklist.propTypes = {
   onlyMasterNodeClusters: PropTypes.bool,
   onlyAppCatalogEnabled: PropTypes.bool,
   onlyPrometheusEnabled: PropTypes.bool,
-  onlyHealthyClusters: PropTypes.bool
+  onlyHealthyClusters: PropTypes.bool,
 }
 
 ClusterPicklist.defaultProps = {
