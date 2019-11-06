@@ -484,7 +484,7 @@ class ListTable extends PureComponent {
           onRequestSort={this.handleRequestSort}
           checked={selectedAll}
           rowCount={filteredData.length}
-          showCheckboxes={multiSelection && showCheckboxes}
+          showCheckboxes={showCheckboxes}
           blankFirstColumn={blankFirstColumn}
         />
         <TableBody>
