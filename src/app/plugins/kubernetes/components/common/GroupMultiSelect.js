@@ -1,6 +1,6 @@
 import React, { forwardRef } from 'react'
 import PropTypes from 'prop-types'
-import { projectAs, sortByProperty } from 'utils/fp'
+import { projectAs } from 'utils/fp'
 import { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
 import useDataLoader from 'core/hooks/useDataLoader'
 import MultiSelect from 'core/components/MultiSelect'
