@@ -164,6 +164,8 @@ export const prometheusServiceMonitorActions = createCRUDActions(prometheusServi
       namespace: metadata.namespace,
       labels: metadata.labels,
       port: spec.endpoints.map(prop('port')).join(', '),
+      namespaceSelector: (spec.namespaceSelector && spec.namespaceSelector.matchNames && spec.namespaceSelector.matchNames.join(', ')) || '-',
+      selector: spec.selector,
     }))(items)
   },
   uniqueIdentifier,
