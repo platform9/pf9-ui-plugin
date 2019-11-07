@@ -41,10 +41,10 @@ const AddCloudProviderForm = ({ loading, onComplete, ...rest }) => {
     <Typography variant="subtitle1">Cloud Provider Type</Typography>
     <Typography variant="body1">Select one of the supported Cloud Provider Types:</Typography>
     <div className={classes.cloudProviderCards}>
-      <CloudProviderCard active={activeProvider === 'aws'} onClick={() => setActiveProvider('aws')} type="aws" />
-      <CloudProviderCard active={activeProvider === 'azure'} onClick={() => setActiveProvider('azure')} type="azure" />
-      <CloudProviderCard active={activeProvider === 'openstack'} onClick={() => setActiveProvider('openstack')} type="openstack" />
-      <CloudProviderCard active={activeProvider === 'vmware'} onClick={() => setActiveProvider('vmware')} type="vmware" />
+      <CloudProviderCard active={activeProvider === 'aws'} onClick={setActiveProvider} type="aws" />
+      <CloudProviderCard active={activeProvider === 'azure'} onClick={setActiveProvider} type="azure" />
+      <CloudProviderCard active={activeProvider === 'openstack'} onClick={setActiveProvider} type="openstack" />
+      <CloudProviderCard active={activeProvider === 'vmware'} onClick={setActiveProvider} type="vmware" />
     </div>
     <ActiveForm loading={loading} onComplete={onComplete} {...rest} />
   </div>

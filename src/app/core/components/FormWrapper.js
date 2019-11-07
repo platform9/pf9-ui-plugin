@@ -24,7 +24,7 @@ const useStyles = makeStyles(theme => ({
 }))
 
 const FormWrapper = ({
-  backUrl,
+  backUrl = undefined,
   children,
   title,
   className,

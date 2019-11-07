@@ -4,11 +4,11 @@ import { Link } from 'react-router-dom'
 
 // Hooks
 import { makeStyles } from '@material-ui/styles'
-import useDataLoader from '../../../../core/hooks/useDataLoader'
+import useDataLoader from 'core/hooks/useDataLoader'
 
 // Components
 import { Typography, CircularProgress } from '@material-ui/core'
-import { hexToRGBA } from '../../../../core/utils/colorHelpers'
+import { hexToRGBA } from 'core/utils/colorHelpers'
 
 const useStyles = makeStyles((theme: any) => ({
   headerIcon: {

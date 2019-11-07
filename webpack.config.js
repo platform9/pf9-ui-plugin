@@ -68,6 +68,12 @@ module.exports = {
         exclude: /node_modules/,
         use: ['style-loader', 'css-loader'],
       },
+      {
+        enforce: 'pre',
+        exclude: /node_modules/,
+        test: /\.js$/,
+        loader: 'source-map-loader'
+      },
     ],
   },
   context: contextPath,
@@ -109,6 +115,7 @@ module.exports = {
     }),
   ],
   resolve: {
+    extensions: ['.json', '.js', 'ts', '.tsx'],
     alias: {
       // IDE's seem to solve paths according to the order in which they are defined
       // so we must put first the more specific aliases
