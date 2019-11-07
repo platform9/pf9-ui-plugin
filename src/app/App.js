@@ -49,7 +49,8 @@ const renderPluginRoutes = (id, plugin) => {
 
         {/* TODO implement generic login page? */}
         <Route path={pathJoin(plugin.basePath, 'login')} component={null} />
-        <Route path={pathJoin(plugin.basePath, 'reset_password')} component={ResetPasswordPage} />
+        <Route path={pathJoin(plugin.basePath, 'reset_password')} exact component={ResetPasswordPage} />
+        <Route path={pathJoin(plugin.basePath, 'forgot_password')} exact component={ForgotPasswordPage} />
         <Route path={pathJoin(plugin.basePath, 'logout')} exact component={LogoutPage} />
         {defaultRoute && <Redirect to={defaultRoute || '/ui/404'} />}
         {showFooter && renderFooter()}
