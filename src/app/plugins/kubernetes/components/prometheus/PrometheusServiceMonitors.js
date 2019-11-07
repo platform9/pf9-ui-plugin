@@ -10,8 +10,7 @@ export const columns = [
   { id: 'clusterName', label: 'Cluster' },
   { id: 'namespace', label: 'Namespace' },
   { id: 'labels', label: 'Labels', render: renderKeyValues },
-  { id: 'port', label: 'Port' },
-  { id: 'selector', label: 'Selector', render: renderKeyValues },
+  { id: 'port', label: 'Endpoints' },
 ]
 
 export const options = {

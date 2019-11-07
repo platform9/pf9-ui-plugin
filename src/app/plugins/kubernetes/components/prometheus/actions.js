@@ -133,7 +133,6 @@ export const prometheusRuleActions = createCRUDActions(prometheusRulesCacheKey, 
 })
 
 /* Service Monitors */
-
 export const prometheusServiceMonitorsCacheKey = 'prometheusServiceMonitors'
 export const prometheusServiceMonitorActions = createCRUDActions(prometheusServiceMonitorsCacheKey, {
   listFn: async (params, loadFromContext) => {
@@ -165,7 +164,6 @@ export const prometheusServiceMonitorActions = createCRUDActions(prometheusServi
       namespace: metadata.namespace,
       labels: metadata.labels,
       port: spec.endpoints.map(prop('port')).join(', '),
-      selector: spec.selector.matchLabels,
     }))(items)
   },
   uniqueIdentifier,
