@@ -447,7 +447,6 @@ class ListTable extends PureComponent {
       onReload,
       onRefresh,
       loading,
-      multiSelection,
       onAdd,
       onDelete,
       deleteCond,
