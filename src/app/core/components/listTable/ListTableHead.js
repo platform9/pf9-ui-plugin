@@ -72,6 +72,7 @@ class ListTableHead extends React.PureComponent {
       orderBy,
       rowCount,
       showCheckboxes,
+      multiSelection,
     } = this.props
 
     const renderHeaderCheckbox = !blankFirstColumn && showCheckboxes
@@ -79,16 +80,18 @@ class ListTableHead extends React.PureComponent {
       ? null
       : <TableCell padding="checkbox" key="_checkAll" className={clsx(classes.cellLabel,
         classes.checkAllCell)}>
-        <label className={classes.checkboxCell}>
-          <Checkbox
-            className={classes.checkbox}
-            indeterminate={!checked && numSelected > 0 && numSelected < rowCount}
-            checked={checked}
-            onChange={onSelectAllClick}
-            color='primary'
-          />
-          {numSelected > 0 ? <span>({numSelected})</span> : null}
-        </label>
+        {multiSelection &&
+          <label className={classes.checkboxCell}>
+            <Checkbox
+              className={classes.checkbox}
+              indeterminate={!checked && numSelected > 0 && numSelected < rowCount}
+              checked={checked}
+              onChange={onSelectAllClick}
+              color='primary'
+            />
+            {numSelected > 0 ? <span>({numSelected})</span> : null}
+          </label>
+        }
       </TableCell>
 
     const firstBlank = blankFirstColumn ? <TableCell
