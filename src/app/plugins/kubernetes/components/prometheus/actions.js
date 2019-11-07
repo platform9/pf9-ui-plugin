@@ -37,7 +37,6 @@ export const mapPrometheusInstance = curry((clusters, { clusterId, metadata, spe
   cpu: pathStrOrNull('resources.requests.cpu', spec),
   storage: pathStrOrNull('resources.requests.storage', spec),
   memory: pathStrOrNull('resources.requests.memory', spec),
-  version: metadata.resourceVersion,
   retention: spec.retention,
   replicas: spec.replicas,
   dashboard: pathOr('', ['annotations', 'service_path'], metadata),
