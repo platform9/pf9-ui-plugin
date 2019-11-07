@@ -30,7 +30,7 @@ import {
 } from 'core/utils/fieldValidators'
 import { mngmTenantActions } from 'k8s/components/userManagement/tenants/actions'
 
-const listUrl = pathJoin(k8sPrefix, 'user_management')
+const listUrl = pathJoin(k8sPrefix, 'user_management#users')
 
 const initialContext = {
   name: '',
@@ -77,7 +77,7 @@ const AddUserPage = () => {
         <WizardStep stepId="basic" label="Basic Info">
           <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
             {({ values }) => <>
-              <TextField id="name" label="User Name" required />
+              <TextField id="name" label="Username or Email" required />
               <TextField id="displayName" label="Display Name" />
               <FormControl component="fieldset">
                 <FormLabel component="legend"><p>Activate User Account</p></FormLabel>

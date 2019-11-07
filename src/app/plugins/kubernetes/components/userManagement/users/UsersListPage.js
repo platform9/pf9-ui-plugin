@@ -9,7 +9,7 @@ export const options = {
     { id: 'username', label: 'Username' },
     { id: 'displayname', label: 'Display Name' },
     { id: 'twoFactor', label: 'Two-Factor Authentication' },
-    { id: 'tenants', label: 'Tenants' },
+    { id: 'tenantNames', label: 'Tenants' },
   ],
   cacheKey: mngmUsersCacheKey,
   addText: 'Create a new User',
