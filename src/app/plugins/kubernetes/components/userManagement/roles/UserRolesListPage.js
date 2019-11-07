@@ -11,6 +11,7 @@ export const options = {
   name: 'Roles',
   title: 'Roles',
   uniqueIdentifier: 'id',
+  showCheckboxes: false,
 }
 
 const { ListPage: UserRolesListPage } = createCRUDComponents(options)
