@@ -15,7 +15,7 @@ import { tryCatchAsync } from 'utils/async'
 
 const { keystone } = ApiClient.getInstance()
 
-const isSystemUser = ({ username }) => {
+export const isSystemUser = ({ username }) => {
   return uuidRegex.test(username)
 }
 export const mngmCredentialsCacheKey = 'managementCredentials'

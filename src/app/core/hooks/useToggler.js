@@ -1,10 +1,11 @@
-import { useReducer } from 'react'
+import { useReducer, useCallback } from 'react'
 
 const useToggler = (initialValue = false) => {
-  const [active, toggle] = useReducer(
+  const [active, toggleVal] = useReducer(
     prevValue => !prevValue,
     initialValue,
   )
+  const toggle = useCallback(() => toggleVal(), [toggleVal])
   return [active, toggle]
 }
 

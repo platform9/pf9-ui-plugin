@@ -60,27 +60,32 @@ const createCRUDComponents = options => {
   const List = ({
     onDelete, onEdit, batchActions, rowActions, data, onRefresh, onReload, loading,
     visibleColumns, columnsOrder, rowsPerPage, orderBy, orderDirection,
-    getParamsUpdater, filters,
+    getParamsUpdater, filters, ...rest
   }) => {
     return (
       <ListTable
+        {...rest}
+        onAdd={null}
+        columns={columns}
         deleteCond={deleteCond}
         deleteDisabledInfo={deleteDisabledInfo}
         editCond={editCond}
         editDisabledInfo={editDisabledInfo}
         multiSelection={multiSelection}
+        searchTarget={searchTarget}
+        uniqueIdentifier={uniqueIdentifier}
+        showCheckboxes={showCheckboxes}
+        compactTable={compactTable}
+        blankFirstColumn={blankFirstColumn}
         loading={loading}
         onReload={onReload}
         onRefresh={onRefresh}
-        columns={columns}
         filters={filters}
         data={data}
         onDelete={onDelete}
         onEdit={onEdit}
         batchActions={batchActions}
         rowActions={rowActions}
-        searchTarget={searchTarget}
-        uniqueIdentifier={uniqueIdentifier}
         visibleColumns={visibleColumns}
         columnsOrder={columnsOrder}
         rowsPerPage={rowsPerPage}
@@ -89,9 +94,6 @@ const createCRUDComponents = options => {
         onSortChange={getParamsUpdater('orderBy', 'orderDirection')}
         onRowsPerPageChange={getParamsUpdater('rowsPerPage')}
         onColumnsChange={getParamsUpdater('visibleColumns', 'columnsOrder')}
-        showCheckboxes={showCheckboxes}
-        compactTable={compactTable}
-        blankFirstColumn={blankFirstColumn}
       />
     )
   }

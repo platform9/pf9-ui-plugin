@@ -458,6 +458,7 @@ class ListTable extends PureComponent {
       size,
       compactTable,
       blankFirstColumn,
+      extraToolbarContent,
     } = this.props
 
     if (!data) {
@@ -499,6 +500,7 @@ class ListTable extends PureComponent {
             <div className={clsx(classes.root, compactTable && classes.compactTableHeight)}>
               {!compactTable &&
                 <ListTableToolbar
+                  extraToolbarContent={extraToolbarContent}
                   selected={selectedRows}
                   onAdd={onAdd && this.handleAdd}
                   onDelete={onDelete && this.handleDelete}
@@ -620,6 +622,8 @@ ListTable.propTypes = {
   onSelectedRowsChange: PropTypes.func,
   size: PropTypes.oneOf(['small', 'medium']),
   compactTable: PropTypes.bool,
+
+  extraToolbarContent: PropTypes.node,
 }
 
 ListTable.defaultProps = {

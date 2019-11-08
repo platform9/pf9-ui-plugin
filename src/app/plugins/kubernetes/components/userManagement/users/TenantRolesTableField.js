@@ -37,9 +37,10 @@ const TenantRolesTableField = withFormContext(({
   const [initialSelectedRows, unselectedRows] = useMemo(() =>
     partition(({ id }) => tenantIds.includes(id), tenants), [])
   // Put the selected tenants first
-  const rows = useMemo(() =>
-    [...initialSelectedRows, ...unselectedRows], [initialSelectedRows])
-
+  const rows = useMemo(
+    () => [...initialSelectedRows, ...unselectedRows],
+    [initialSelectedRows],
+  )
   const [selectedRows, setSelectedRows] = useState(initialSelectedRows)
   const handleSelectedRowsChange = useCallback(selectedRows => {
     const selectedTenantIds = pluck('id', selectedRows)
