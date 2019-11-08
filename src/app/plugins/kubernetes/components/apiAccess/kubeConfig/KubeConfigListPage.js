@@ -1,7 +1,10 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import kubeConfigActions from './actions'
+import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
+import TextField from 'core/components/validatedForm/TextField'
+import DownloadDialog from './DownloadDialog'
 
 const useStyles = makeStyles(theme => ({
   link: {
@@ -18,7 +21,15 @@ const useStyles = makeStyles(theme => ({
 }))
 
 const KubeConfigListPage = () => {
+  const [isDialogOpen, setDialogOpen] = useState(false)
   const classes = useStyles()
+
+  const handleClickDownload = (row) => {
+    setDialogOpen(true)
+  }
+  const handleDialogClose = () => setDialogOpen(false)
+
+  const columns = getColumns(handleClickDownload)
 
   const options = {
     cacheKey: 'kubeconfig',
@@ -28,6 +39,8 @@ const KubeConfigListPage = () => {
     name: 'Kubeconfig',
     compactTable: true,
     blankFirstColumn: true,
+    multiSelection: false,
+    onSelect: handleClickDownload,
   }
 
   const { ListPage } = createCRUDComponents(options)
@@ -44,18 +57,25 @@ const KubeConfigListPage = () => {
       </a>
       <ListPage />
       <p className={classes.clusterConfig}>Select a cluster above to populate its kubeconfig below.</p>
+      <ValidatedForm>
+        <TextField id="config" rows={9} multiline />
+      </ValidatedForm>
+      <DownloadDialog onClose={handleDialogClose} isDialogOpen={isDialogOpen} />
     </>
   )
 }
 
-const columns = [
+const getColumns = (handleClickDownload) => [
   { id: 'cluster', label: 'Cluster' },
-  { id: 'kubeConfig', label: 'kubeconfig', render: (value) => kubeConfigLink(value) },
+  {
+    id: 'kubeConfig',
+    label: 'kubeconfig',
+    render: (contents, row) => kubeConfigLink(row, handleClickDownload),
+  },
   { id: 'url', label: 'URL' },
 ]
 
-// TODO: implement kubebonfig link
-const kubeConfigLink = (value) =>
-  <a href='#'>Download kubeconfig</a>
+const kubeConfigLink = (row, handleClickDownload) =>
+  <a onClick={() => handleClickDownload(row)}>Download kubeconfig</a>
 
 export default KubeConfigListPage
