@@ -27,13 +27,16 @@ const listUrl = pathJoin(k8sPrefix, 'user_management#users')
 const useStyles = makeStyles(theme => ({
   toggableField: {
     position: 'relative',
+    '& .Mui-disabled': {
+      color: theme.palette.text.primary,
+    },
   },
   toggableFieldBtn: {
     position: 'absolute',
     top: 14,
     right: 0,
     width: 80,
-    marginRight: -100
+    marginRight: -100,
   },
 }))
 
