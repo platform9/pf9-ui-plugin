@@ -155,11 +155,11 @@ Password must contain the following:
         <Grid item md={5} lg={4}>
           <Paper className={classes.paper}>
             <img src="/ui/images/logo-color.png" className={classes.img} />
+            <Typography variant="subtitle1" align="center">
+                Password Reset
+            </Typography>
             <ValidatedForm onSubmit={handleFormSubmit}>
               {({ values }) => <>
-                <Typography variant="subtitle1" align="center">
-                    Password Reset
-                </Typography>
                 {!params.isSetNewPasswordSuccessful ? (<><TextField
                   id="email"
                   label="Email"
