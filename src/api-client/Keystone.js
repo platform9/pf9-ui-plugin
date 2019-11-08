@@ -117,12 +117,11 @@ class Keystone {
     return response.data.role_assignments
   }
 
-  getUserRoleAssignments = async (userId, tenantId) => {
+  getUserRoleAssignments = async userId => {
     const response = await axios.get(this.roleAssignments, {
       ...this.client.getAuthHeaders(),
       params: {
-        'scope.project.id': tenantId,
-        'scope.user.id': userId,
+        'user.id': userId,
         'include_names': true
       },
     })

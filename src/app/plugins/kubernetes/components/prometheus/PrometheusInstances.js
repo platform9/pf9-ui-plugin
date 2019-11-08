@@ -20,13 +20,12 @@ export const columns = [
   { id: 'clusterName', label: 'Cluster' },
   { id: 'namespace', label: 'Namespace' },
   // { id: 'dashboard', label: 'Dashboard', render: renderDashboardLink },
-  { id: 'serviceMonitorSelector', label: 'Service Monitor', render: renderKeyValues },
+  { id: 'serviceMonitorSelector', label: 'Service Monitor Selectors', render: renderKeyValues },
   { id: 'alertManagersSelector', label: 'Alert Managers' },
   { id: 'cpu', label: 'CPU' },
   { id: 'storage', label: 'Storage', display: false },
   { id: 'memory', label: 'Memory' },
   { id: 'retention', label: 'Retention' },
-  { id: 'version', label: 'Version' },
   { id: 'replicas', label: 'Replicas' },
 ]
 

@@ -451,7 +451,6 @@ class ListTable extends PureComponent {
       onReload,
       onRefresh,
       loading,
-      multiSelection,
       onAdd,
       onDelete,
       deleteCond,
@@ -463,6 +462,7 @@ class ListTable extends PureComponent {
       size,
       compactTable,
       blankFirstColumn,
+      extraToolbarContent,
     } = this.props
 
     if (!data) {
@@ -488,7 +488,7 @@ class ListTable extends PureComponent {
           onRequestSort={this.handleRequestSort}
           checked={selectedAll}
           rowCount={filteredData.length}
-          showCheckboxes={multiSelection && showCheckboxes}
+          showCheckboxes={showCheckboxes}
           blankFirstColumn={blankFirstColumn}
         />
         <TableBody>
@@ -504,6 +504,7 @@ class ListTable extends PureComponent {
             <div className={clsx(classes.root, compactTable && classes.compactTableHeight)}>
               {!compactTable &&
                 <ListTableToolbar
+                  extraToolbarContent={extraToolbarContent}
                   selected={selectedRows}
                   onAdd={onAdd && this.handleAdd}
                   onDelete={onDelete && this.handleDelete}
@@ -626,6 +627,8 @@ ListTable.propTypes = {
   onSelect: PropTypes.func,
   size: PropTypes.oneOf(['small', 'medium']),
   compactTable: PropTypes.bool,
+
+  extraToolbarContent: PropTypes.node,
 }
 
 ListTable.defaultProps = {
