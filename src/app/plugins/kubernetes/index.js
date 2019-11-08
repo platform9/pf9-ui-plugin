@@ -155,7 +155,7 @@ Kubernetes.registerPlugin = pluginManager => {
         component: NamespacesListPage,
       },
       {
-        name: 'Prometheus Monitoring (BETA)',
+        name: 'Monitoring (beta)',
         link: { path: '/prometheus', exact: true },
         component: PrometheusMonitoringPage,
       },
@@ -369,7 +369,7 @@ Kubernetes.registerPlugin = pluginManager => {
     },
     { name: 'Storage Classes', icon: 'hdd', link: { path: '/storage_classes' } },
     { name: 'Namespaces', icon: 'object-group', link: { path: '/namespaces' } },
-    { name: 'Prometheus Monitoring (BETA)', icon: 'chart-area', link: { path: '/prometheus' } },
+    { name: 'Monitoring (beta)', icon: 'chart-area', link: { path: '/prometheus' } },
     { name: 'Logging (beta)', icon: 'clipboard-list', link: { path: '/logging' } },
     { name: 'RBAC', icon: 'user-shield', link: { path: '/rbac' } },
     { name: 'API Access', icon: 'key', link: { path: '/api_access' } },
