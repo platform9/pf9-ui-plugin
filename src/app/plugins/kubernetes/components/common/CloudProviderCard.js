@@ -69,7 +69,7 @@ const CloudProviderCard = props => {
       return
     }
     if (onClick) {
-      onClick()
+      onClick(type)
     } else {
       history.push(src)
     }

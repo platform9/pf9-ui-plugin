@@ -26,7 +26,7 @@ import {
 } from '@material-ui/icons'
 
 // Components
-import StatusCard from './status-card.tsx'
+import StatusCard from './status-card'
 
 const useStyles = makeStyles(theme => ({
   cardRow: {
@@ -137,6 +137,7 @@ const statusReports = [
       validateFieldHealthAndQuantity({
         list: clusters,
         success: [{ path: 'status', value: 'ok' }],
+        pending: [{ path: 'status', value: 'pending' }],
       }),
   },
 ]

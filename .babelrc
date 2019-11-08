@@ -1,5 +1,9 @@
 {
-  "presets": [["@babel/preset-env", {"modules": false}], "@babel/react"],
+  "presets": [
+    ["@babel/preset-env", { "modules": false }],
+    "@babel/react",
+    "@babel/preset-typescript"
+  ],
   "plugins": [
     "@babel/plugin-syntax-dynamic-import",
     "@babel/plugin-transform-runtime",
