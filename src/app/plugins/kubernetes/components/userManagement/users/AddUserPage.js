@@ -4,7 +4,7 @@ import TextField from 'core/components/validatedForm/TextField'
 import Wizard from 'core/components/wizard/Wizard'
 import WizardStep from 'core/components/wizard/WizardStep'
 import FormWrapper from 'core/components/FormWrapper'
-import { Typography, List } from '@material-ui/core'
+import { Typography } from '@material-ui/core'
 import useReactRouter from 'use-react-router'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import { k8sPrefix } from 'app/constants'
@@ -18,35 +18,17 @@ import FormLabel from '@material-ui/core/FormLabel'
 import RadioGroup from '@material-ui/core/RadioGroup'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 import Radio from '@material-ui/core/Radio'
-import ListItem from '@material-ui/core/ListItem'
-import ListItemIcon from '@material-ui/core/ListItemIcon'
-import CheckIcon from '@material-ui/icons/Check'
-import ClearIcon from '@material-ui/icons/Clear'
-import ListItemText from '@material-ui/core/ListItemText'
-import { propSatisfies } from 'ramda'
-import {
-  hasOneSpecialChar, hasOneNumber, hasOneUpperChar, hasOneLowerChar, hasMinLength,
-  requiredValidator, passwordValidator,
-} from 'core/utils/fieldValidators'
 import { mngmTenantActions } from 'k8s/components/userManagement/tenants/actions'
+import UserPasswordField from 'k8s/components/userManagement/users/UserPasswordField'
 
 const listUrl = pathJoin(k8sPrefix, 'user_management#users')
 
 const initialContext = {
-  name: '',
-  displayName: '',
+  username: '',
+  displayname: '',
   password: '',
   roleAssignments: {},
 }
-
-const CheckListItem = ({ children, checked }) => <ListItem>
-  <ListItemIcon>
-    {checked ? <CheckIcon /> : <ClearIcon color="error" />}
-  </ListItemIcon>
-  <ListItemText primary={children} />
-</ListItem>
-
-const passwordValidators = [requiredValidator, passwordValidator]
 
 const AddUserPage = () => {
   const { history } = useReactRouter()
@@ -77,8 +59,8 @@ const AddUserPage = () => {
         <WizardStep stepId="basic" label="Basic Info">
           <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
             {({ values }) => <>
-              <TextField id="name" label="Username or Email" required />
-              <TextField id="displayName" label="Display Name" />
+              <TextField id="username" label="Username or Email" required />
+              <TextField id="displayname" label="Display Name" />
               <FormControl component="fieldset">
                 <FormLabel component="legend"><p>Activate User Account</p></FormLabel>
                 <RadioGroup value={activationType} onChange={
@@ -94,29 +76,7 @@ const AddUserPage = () => {
                     label={createUserPasswordLabel} />
                 </RadioGroup>
               </FormControl>
-              {activationType === 'createPassword' && <>
-                <TextField id="password" label="Password" type="password" validations={passwordValidators} />
-                <Typography variant="body1" component="div">
-                  Password must contain the following:
-                  <List dense>
-                    <CheckListItem checked={propSatisfies(hasMinLength(8), 'password', values)}>
-                      At least 8 characters long
-                    </CheckListItem>
-                    <CheckListItem checked={propSatisfies(hasOneLowerChar, 'password', values)}>
-                      1 Lowercase letter
-                    </CheckListItem>
-                    <CheckListItem checked={propSatisfies(hasOneUpperChar, 'password', values)}>
-                      1 Uppercase letter
-                    </CheckListItem>
-                    <CheckListItem checked={propSatisfies(hasOneNumber, 'password', values)}>
-                      1 Number
-                    </CheckListItem>
-                    <CheckListItem checked={propSatisfies(hasOneSpecialChar, 'password', values)}>
-                      1 Special character - !@#$%^&*()?
-                    </CheckListItem>
-                  </List>
-                </Typography>
-              </>}
+              {activationType === 'createPassword' && <UserPasswordField value={values.password} />}
             </>}
           </ValidatedForm>
         </WizardStep>

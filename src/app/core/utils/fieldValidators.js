@@ -1,5 +1,5 @@
 import moize from 'moize'
-import { isEmpty, isNil, test, allPass, both, is, complement, cond, always } from 'ramda'
+import { isEmpty, isNil, test, allPass, both, is, complement, cond, always, curry } from 'ramda'
 import { isPlainObject } from '../../utils/misc'
 
 class FieldValidator {
@@ -20,7 +20,7 @@ export const customValidator = (validator, errorMessage) =>
   new FieldValidator(validator, errorMessage)
 
 const fieldIsUnset = value => isNil(value) || isEmpty(value) || value === false
-export const hasMinLength = minLen => both(is(String), val => val.length >= minLen)
+export const hasMinLength = curry((minLen, value) => both(is(String), val => val.length >= minLen)(value))
 export const hasOneLowerChar = both(is(String), test(/[a-z]/))
 export const hasOneUpperChar = both(is(String), test(/[A-Z]/))
 export const hasOneNumber = both(is(String), test(/[0-9]/))

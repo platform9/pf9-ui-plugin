@@ -4,8 +4,7 @@ import { namespacesCacheKey } from 'k8s/components/namespaces/actions'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { filterIf, pathStr, emptyArr } from 'utils/fp'
 import createContextLoader from 'core/helpers/createContextLoader'
-import { pipeAsync, mapAsync } from 'utils/async'
-import { mngmUserActions } from 'k8s/components/userManagement/users/actions'
+import { pipeAsync, mapAsync, tryCatchAsync } from 'utils/async'
 
 const { keystone } = ApiClient.getInstance()
 
@@ -16,7 +15,7 @@ export const filterValidTenants = tenant => !reservedTenantNames.includes(tenant
 export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
   listFn: async () => keystone.getAllTenantsAllUsers(),
   deleteFn: async ({ id }) => {
-    mngmUserActions.invalidateCache()
+    mngmTenantActions.invalidateCache()
     return keystone.deleteProject(id)
   },
   createFn: async ({ name, description, roleAssignments }) => {
@@ -27,9 +26,15 @@ export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
       domain_id: 'default',
       is_domain: false,
     })
-    const tenantUsers = await Promise.all(Object.entries(roleAssignments).map(([userId, roleId]) =>
-      keystone.addUserRole({ tenantId: createdTenant.id, userId, roleId }),
-    ))
+    const tenantUsers = await tryCatchAsync(
+      () =>
+        Promise.all(Object.entries(roleAssignments).map(([userId, roleId]) =>
+          keystone.addUserRole({ tenantId: createdTenant.id, userId, roleId }),
+        )),
+      err => {
+        console.warn(err.message)
+        return emptyArr
+      })(null)
     return {
       ...createdTenant,
       users: tenantUsers,
@@ -44,17 +49,18 @@ export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
     const prevRoleAssignmentsArr = await loadFromContext(mngmTenantRoleAssignmentsCacheKey, {
       tenantId,
     })
-    const updateTenantPromise = keystone.updateProject(tenantId, {
-      ...omit(['users'], currentTenant),
-      name,
-      description,
-    })
     const prevRoleAssignments = prevRoleAssignmentsArr.reduce((acc, roleAssignment) => ({
       ...acc,
       [pathStr('user.id', roleAssignment)]: pathStr('role.id', roleAssignment),
     }), {})
     const mergedUserIds = keys({ ...prevRoleAssignments, ...roleAssignments })
-    // Perform the user/role update operations
+
+    // Perform the api calls to update the tenant and the user/role assignments
+    const updateTenantPromise = keystone.updateProject(tenantId, {
+      ...omit(['users'], currentTenant),
+      name,
+      description,
+    })
     const updateUserRolesPromises = mergedUserIds.map(userId => {
       const prevRoleId = prevRoleAssignments[userId]
       const currRoleId = roleAssignments[userId]
@@ -72,12 +78,16 @@ export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
       }
       return Promise.resolve(null)
     }, [])
-
     // Resolve tenant and user/roles operation promises and filter out null responses
-    const [updatedTenant, ...updatedTenantUsers] = await Promise.all([
+    const [updatedTenant, updatedTenantUsers] = await Promise.all([
       updateTenantPromise,
-      ...updateUserRolesPromises,
-    ]).then(reject(isNil))
+      tryCatchAsync(
+        () => Promise.all(updateUserRolesPromises).then(reject(isNil)),
+        err => {
+          console.warn(err.message)
+          return emptyArr
+        })(null),
+    ])
 
     return {
       ...currentTenant,

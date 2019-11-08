@@ -46,7 +46,7 @@ const EditTenantPage = () => {
   }), [tenant, roleAssignments])
 
   return <FormWrapper
-    title={`Edit Tenant ${tenant.name}`}
+    title={`Edit Tenant ${tenant.name || ''}`}
     loading={loadingUsers || loadingTenants || loadingRoleAssignments || updating}
     renderContentOnMount={false}
     message={updating ? 'Submitting form...' : 'Loading Tenant...'}

@@ -8,6 +8,7 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import {
   mngmUserActions, mngmUserRoleAssignmentsLoader,
 } from 'k8s/components/userManagement/users/actions'
+import { TextField as BaseTextField } from '@material-ui/core'
 import { emptyObj, pathStr } from 'utils/fp'
 import useReactRouter from 'use-react-router'
 import FormWrapper from 'core/components/FormWrapper'
@@ -16,8 +17,43 @@ import { pathJoin } from 'utils/misc'
 import { k8sPrefix } from 'app/constants'
 import Wizard from 'core/components/wizard/Wizard'
 import WizardStep from 'core/components/wizard/WizardStep'
+import UserPasswordField from 'k8s/components/userManagement/users/UserPasswordField'
+import useToggler from 'core/hooks/useToggler'
+import SimpleLink from 'core/components/SimpleLink'
+import makeStyles from '@material-ui/styles/makeStyles'
 
 const listUrl = pathJoin(k8sPrefix, 'user_management#users')
+
+const useStyles = makeStyles(theme => ({
+  toggableField: {
+    position: 'relative',
+  },
+  toggableFieldBtn: {
+    position: 'absolute',
+    top: 14,
+    right: 0,
+    width: 80,
+    marginRight: -100
+  },
+}))
+
+const ToggableTextField = ({ id, label, value, required = false, TextFieldComponent = TextField }) => {
+  const classes = useStyles()
+  const [showingField, toggleField] = useToggler()
+  return <div className={classes.toggableField}>
+    {showingField
+      ? <TextFieldComponent
+        id={id}
+        label={label}
+        required={required} />
+      : <BaseTextField label={label} value={value} disabled />}
+    <SimpleLink className={classes.toggableFieldBtn} onClick={toggleField}>{
+      showingField
+        ? 'Cancel'
+        : 'Change'}
+    </SimpleLink>
+  </div>
+}
 
 const EditUserPage = () => {
   const { match, history } = useReactRouter()
@@ -36,7 +72,7 @@ const EditUserPage = () => {
   })
   const initialContext = useMemo(() => ({
     id: userId,
-    name: user.name,
+    username: user.username || user.email,
     displayname: user.displayname || '',
     roleAssignments: roleAssignments.reduce((acc, roleAssignment) => ({
       ...acc,
@@ -45,7 +81,7 @@ const EditUserPage = () => {
   }), [user, roleAssignments])
 
   return <FormWrapper
-    title={`Edit User ${user.name}`}
+    title={`Edit User ${user.displayname || user.username || ''}`}
     loading={loadingUsers || loadingTenants || loadingRoleAssignments || updating}
     renderContentOnMount={false}
     message={updating ? 'Submitting form...' : 'Loading User...'}
@@ -54,8 +90,9 @@ const EditUserPage = () => {
       {({ wizardContext, setWizardContext, onNext }) => <>
         <WizardStep stepId="basic" label="Basic Info">
           <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
-            <TextField id="name" label="Username or Email" required />
-            <TextField id="displayname" label="Display Name" />
+            <ToggableTextField id="username" label="Username or Email" value={user.username} required />
+            <ToggableTextField id="displayname" label="Display Name" value={user.displayname} />
+            <ToggableTextField id="password" label="Password" value={user.password || '********'} TextFieldComponent={UserPasswordField} />
           </ValidatedForm>
         </WizardStep>
         <WizardStep stepId="tenants" label="Tenants and Roles">

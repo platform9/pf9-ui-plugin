@@ -75,7 +75,7 @@ function createContextUpdater (cacheKey, dataUpdaterFn, options = {}) {
         ['delete', 'delete'],
       )(operation)
       // Display entity ID if available
-      const withId = allPass(map(hasPath, uniqueIdentifierPaths), params)
+      const withId = hasPath(head(uniqueIdentifierPaths), params)
         ? ` with ${head(uniqueIdentifierPaths).join('.')}: ${path(head(uniqueIdentifierPaths), params)}`
         : ''
       // Specific error handling
@@ -86,7 +86,9 @@ function createContextUpdater (cacheKey, dataUpdaterFn, options = {}) {
     },
   } = options
   const allIndexKeys = indexBy ? ensureArray(indexBy) : emptyArr
-  const uniqueIdentifierPaths = uniqueIdentifier ? ensureArray(uniqueIdentifier).map(split('.')) : emptyArr
+  const uniqueIdentifierPaths = uniqueIdentifier
+    ? ensureArray(uniqueIdentifier).map(split('.'))
+    : emptyArr
   const dataLens = lensPath([dataCacheKey, cacheKey])
 
   /**
