@@ -129,8 +129,6 @@ function createContextUpdater (cacheKey, dataUpdaterFn, options = {}) {
       pickAll(allIndexKeys),
       reject(either(isNil, equals(allKey))),
     )(params)
-    const matchIdentifier = idPath => pathEq(idPath, path(idPath, params))
-    const matchAllIdentifiers = allPass(map(matchIdentifier, uniqueIdentifierPaths))
     const loader = contextLoader || getContextLoader(cacheKey)
     if (!loader) {
       throw new Error(`Context Loader with key ${cacheKey} not found`)
@@ -148,6 +146,8 @@ function createContextUpdater (cacheKey, dataUpdaterFn, options = {}) {
     }
     try {
       const output = await dataUpdaterFn(params, prevItems, loadFromContext)
+      const matchIdentifier = idPath => pathEq(idPath, path(idPath, output))
+      const matchAllIdentifiers = allPass(map(matchIdentifier, uniqueIdentifierPaths))
       const operationSwitchCase = switchCase(
         // If no operation is chosen (ie "any" or a custom operation), just replace the whole array with the new output
         isNil(output) ? identity : always(output),
