@@ -6,9 +6,9 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import MultiSelect from 'core/components/MultiSelect'
 import { mngmGroupActions } from 'k8s/components/userManagement/groups/actions'
 
-const GroupPicker = forwardRef(({ onChange, ...rest }, ref) => {
+const GroupPicker = forwardRef(({ onChange, initialValue, ...rest }, ref) => {
   const [groups, loadingGroups] = useDataLoader(mngmGroupActions.list, { orderBy: 'name' })
-  const [values, setValues] = React.useState([])
+  const [values, setValues] = React.useState(initialValue || [])
 
   const handleValuesChange = values => {
     setValues(values)

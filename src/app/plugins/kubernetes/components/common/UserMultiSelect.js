@@ -6,10 +6,9 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import MultiSelect from 'core/components/MultiSelect'
 import { mngmUserActions } from 'k8s/components/userManagement/users/actions'
 
-const UserPicker = forwardRef(({ onChange, ...rest }, ref) => {
+const UserPicker = forwardRef(({ onChange, initialValue, ...rest }, ref) => {
   const [users, loadingUsers] = useDataLoader(mngmUserActions.list, { orderBy: 'username' })
-  const [values, setValues] = React.useState([])
-
+  const [values, setValues] = React.useState(initialValue || [])
   const handleValuesChange = values => {
     setValues(values)
     onChange && onChange(values)

@@ -25,6 +25,7 @@ const useStyles = makeStyles(theme => createStyles({
     padding: theme.spacing(2, 1, 1, 1),
     borderRadius: 4,
     border: `1px solid ${theme.palette.grey[400]}`,
+    maxHeight: '350px',
   },
   label: {
     position: 'absolute',

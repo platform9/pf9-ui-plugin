@@ -31,6 +31,20 @@ export const postClusterRole = (req, res) => {
   res.status(201).send(newClusterRole)
 }
 
+// Todo
+// export const putClusterRole = (req, res) => {
+//   const { name, clusterId } = req.params
+//   const clusterRole = { ...req.body }
+
+//   const existingClusterRole = ClusterRole.findByName({ name, context, config: { clusterId } })
+//   if (!existingClusterRole) {
+//     return res.status(404).send({ code: 404, message: `clusterRole ${name} does not exist`})
+//   }
+
+//   console.log(existingClusterRole)
+//   res.status(200).send(existingClusterRole)
+// }
+
 export const deleteClusterRole = (req, res) => {
   const { clusterRoleName, clusterId } = req.params
   console.log('Attempting to delete clusterRole: ', clusterRoleName)

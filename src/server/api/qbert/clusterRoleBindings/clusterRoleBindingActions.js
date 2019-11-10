@@ -31,6 +31,20 @@ export const postClusterRoleBinding = (req, res) => {
   res.status(201).send(newClusterRoleBinding)
 }
 
+// Todo
+// export const putClusterRoleBinding = (req, res) => {
+//   const { name, clusterId } = req.params
+//   const clusterRoleBinding = { ...req.body }
+
+//   const existingClusterRoleBinding = ClusterRoleBinding.findByName({ name, context, config: { clusterId } })
+//   if (!existingClusterRoleBinding) {
+//     return res.status(404).send({ code: 404, message: `clusterRoleBinding ${name} does not exist`})
+//   }
+
+//   console.log(existingClusterRoleBinding)
+//   res.status(200).send(existingClusterRoleBinding)
+// }
+
 export const deleteClusterRoleBinding = (req, res) => {
   const { clusterRoleBindingName, clusterId } = req.params
   console.log('Attempting to delete clusterRoleBinding: ', clusterRoleBindingName)

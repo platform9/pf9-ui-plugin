@@ -14,6 +14,10 @@ import { emptyObj } from 'utils/fp'
 import Progress from 'core/components/progress/Progress'
 
 const useStyles = makeStyles(theme => ({
+  container: {
+    maxHeight: '500px',
+    overflow: 'scroll',
+  },
   header: {
     display: 'flex',
     borderBottom: '1px solid #aaa',
@@ -95,11 +99,13 @@ const RbacChecklist = ({ clusterId, onChange, value, ...rest }) => {
 
   return (
     <Progress loading={loadingApiGroups} renderContentOnMount inline>
-      <div className={classes.header}>
-        <div className={classes.groupHeader}>API Group</div>
-        <div>Resources</div>
+      <div className={classes.container}>
+        <div className={classes.header}>
+          <div className={classes.groupHeader}>API Group</div>
+          <div>Resources</div>
+        </div>
+        {apiGroups.map(renderApiGroup)}
       </div>
-      {apiGroups.map(renderApiGroup)}
     </Progress>
   )
 }

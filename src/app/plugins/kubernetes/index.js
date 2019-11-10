@@ -43,6 +43,10 @@ import AddClusterRolePage from './components/rbac/AddClusterRolePage'
 import AddRoleBindingPage from './components/rbac/AddRoleBindingPage'
 import AddClusterRoleBindingPage from './components/rbac/AddClusterRoleBindingPage'
 import EditClusterPage from 'k8s/components/infrastructure/clusters/EditClusterPage'
+import UpdateRolePage from './components/rbac/UpdateRolePage'
+import UpdateClusterRolePage from './components/rbac/UpdateClusterRolePage'
+import UpdateRoleBindingPage from './components/rbac/UpdateRoleBindingPage'
+import UpdateClusterRoleBindingPage from './components/rbac/UpdateClusterRoleBindingPage'
 
 class Kubernetes extends React.PureComponent {
   render () {
@@ -290,6 +294,26 @@ Kubernetes.registerPlugin = pluginManager => {
         name: 'Add Cluster Role Binding',
         link: { path: '/rbac/clusterrolebindings/add', exact: true },
         component: AddClusterRoleBindingPage,
+      },
+      {
+        name: 'Update Role',
+        link: { path: '/rbac/roles/edit/:id', exact: true },
+        component: UpdateRolePage,
+      },
+      {
+        name: 'Update Cluster Role',
+        link: { path: '/rbac/clusterroles/edit/:id', exact: true },
+        component: UpdateClusterRolePage,
+      },
+      {
+        name: 'Update Role Binding',
+        link: { path: '/rbac/rolebindings/edit/:id', exact: true },
+        component: UpdateRoleBindingPage,
+      },
+      {
+        name: 'Update Cluster Role Binding',
+        link: { path: '/rbac/clusterrolebindings/edit/:id', exact: true },
+        component: UpdateClusterRoleBindingPage,
       },
     ],
   )

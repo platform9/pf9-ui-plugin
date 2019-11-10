@@ -41,6 +41,7 @@ export const options = {
   ],
   cacheKey: clusterRoleBindingsCacheKey,
   deleteFn: clusterRoleBindingActions.delete,
+  editUrl: '/ui/kubernetes/rbac/clusterrolebindings/edit',
   name: 'Cluster Role Bindings',
   title: 'Cluster Role Bindings',
   ListPage,

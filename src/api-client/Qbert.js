@@ -354,6 +354,11 @@ class Qbert {
     return normalizeClusterizedUpdate(clusterId, response)
   }
 
+  updateClusterRole = async (clusterId, namespace, name, body) => {
+    const response = await this.client.basicPut(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/${namespace}/roles/${name}`, body)
+    return normalizeClusterizedUpdate(clusterId, response)
+  }
+
   deleteClusterRole = async (clusterId, namespace, name) => {
     return this.client.basicDelete(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/${namespace}/roles/${name}`)
   }
@@ -365,6 +370,11 @@ class Qbert {
 
   createClusterClusterRole = async (clusterId, body) => {
     const response = await this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterroles`, body)
+    return normalizeClusterizedUpdate(clusterId, response)
+  }
+
+  updateClusterClusterRole = async (clusterId, name, body) => {
+    const response = await this.client.basicPut(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterroles/${name}`, body)
     return normalizeClusterizedUpdate(clusterId, response)
   }
 
@@ -382,6 +392,11 @@ class Qbert {
     return normalizeClusterizedUpdate(clusterId, response)
   }
 
+  updateClusterRoleBinding = async (clusterId, namespace, name, body) => {
+    const response = await this.client.basicPut(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/${namespace}/rolebindings/${name}`, body)
+    return normalizeClusterizedUpdate(clusterId, response)
+  }
+
   deleteClusterRoleBinding = async (clusterId, namespace, name) => {
     return this.client.basicDelete(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/${namespace}/rolebindings/${name}`)
   }
@@ -393,6 +408,11 @@ class Qbert {
 
   createClusterClusterRoleBinding = async (clusterId, body) => {
     const response = await this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterrolebindings`, body)
+    return normalizeClusterizedUpdate(clusterId, response)
+  }
+
+  updateClusterClusterRoleBinding = async (clusterId, name, body) => {
+    const response = await this.client.basicPut(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterrolebindings/${name}`, body)
     return normalizeClusterizedUpdate(clusterId, response)
   }
 

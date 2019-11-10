@@ -31,6 +31,20 @@ export const postRoleBinding = (req, res) => {
   res.status(201).send(newRoleBinding)
 }
 
+// Todo
+// export const putRoleBinding = (req, res) => {
+//   const { name, namespace, clusterId } = req.params
+//   const roleBinding = { ...req.body }
+
+//   const existingRoleBinding = RoleBinding.findByName({ name, context, config: { clusterId, namespace } })
+//   if (!existingRoleBinding) {
+//     return res.status(404).send({ code: 404, message: `roleBinding ${name} does not exist`})
+//   }
+
+//   console.log(existingRoleBinding)
+//   res.status(200).send(existingRoleBinding)
+// }
+
 export const deleteRoleBinding = (req, res) => {
   // TODO: account for tenancy
   const { roleBindingName, clusterId, namespace } = req.params

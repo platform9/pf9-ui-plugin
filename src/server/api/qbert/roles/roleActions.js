@@ -31,6 +31,20 @@ export const postRole = (req, res) => {
   res.status(201).send(newRole)
 }
 
+// Todo
+// export const putRole = (req, res) => {
+//   const { name, namespace, clusterId } = req.params
+//   const role = { ...req.body }
+
+//   const existingRole = Role.findByName({ name, context, config: { clusterId, namespace } })
+//   if (!existingRole) {
+//     return res.status(404).send({ code: 404, message: `role ${name} does not exist`})
+//   }
+
+//   console.log(existingRole)
+//   res.status(200).send(existingRole)
+// }
+
 export const deleteRole = (req, res) => {
   // TODO: account for tenancy
   const { roleName, clusterId, namespace } = req.params

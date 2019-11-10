@@ -41,6 +41,7 @@ export const options = {
   ],
   cacheKey: rolesCacheKey,
   deleteFn: roleActions.delete,
+  editUrl: '/ui/kubernetes/rbac/roles/edit',
   name: 'Roles',
   title: 'Roles',
   ListPage,
