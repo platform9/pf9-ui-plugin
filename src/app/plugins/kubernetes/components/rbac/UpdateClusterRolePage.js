@@ -52,6 +52,7 @@ const UpdateClusterRolePage = () => {
           clusterId={clusterRole.clusterId}
           onChange={getParamsUpdater('rbac')}
           value={params.rbac}
+          initialRules={clusterRole.rules}
         /> }
         <SubmitButton>Update Cluster Role</SubmitButton>
       </ValidatedForm>

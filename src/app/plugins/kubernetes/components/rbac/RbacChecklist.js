@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useState, useEffect } from 'react'
 // import { projectAs } from 'utils/fp'
 import { makeStyles } from '@material-ui/styles'
 import useDataLoader from 'core/hooks/useDataLoader'
@@ -12,6 +12,7 @@ import { compose } from 'app/utils/fp'
 import { assocPath, dissocPath, hasPath, curry, ifElse } from 'ramda'
 import { emptyObj } from 'utils/fp'
 import Progress from 'core/components/progress/Progress'
+import setRbacObject from './SetRbacObject'
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -44,7 +45,7 @@ const useStyles = makeStyles(theme => ({
   },
 }))
 
-const RbacChecklist = ({ clusterId, onChange, value, ...rest }) => {
+const RbacChecklist = ({ clusterId, onChange, value, initialRules, ...rest }) => {
   const [checkedItems, setCheckedItems] = useState(emptyObj)
   const [apiGroups, loadingApiGroups] = useDataLoader(apiGroupsLoader, { clusterId, orderBy: 'name' })
 
@@ -61,6 +62,15 @@ const RbacChecklist = ({ clusterId, onChange, value, ...rest }) => {
     setCheckedItems(newCheckedItems)
     onChange(newCheckedItems)
   }, [checkedItems])
+
+  useEffect(() => {
+    if (!initialRules || !apiGroups) {
+      return
+    }
+    const rules = setRbacObject(initialRules, apiGroups)
+    setCheckedItems(rules)
+    onChange(rules)
+  }, [initialRules, apiGroups])
 
   const renderVerb = useCallback(curry((groupName, resourceName, verb) =>
     <FormControlLabel

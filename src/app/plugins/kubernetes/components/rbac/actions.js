@@ -405,7 +405,6 @@ export const clusterRoleBindingActions = createCRUDActions(clusterRoleBindingsCa
   },
   dataMapper: async (items, params, loadFromContext) => {
     const clusters = await loadFromContext(clustersCacheKey, { healthyClusters: true })
-    console.log(items)
     return items.map(item => ({
       ...item,
       id: pathStr('metadata.uid', item),
