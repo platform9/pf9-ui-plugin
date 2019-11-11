@@ -1,5 +1,7 @@
 import { assocPath } from 'ramda'
 
+// This function needs to be modernized, but can be
+// done perhaps after kubecon release
 const setRbacObject = (rules, apiGroups) => {
   let rbac = {}
   const wildCardRules = []
