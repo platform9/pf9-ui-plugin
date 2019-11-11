@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import kubeConfigActions from './actions'
@@ -6,6 +6,7 @@ import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import TextField from 'core/components/validatedForm/TextField'
 import DownloadDialog from './DownloadDialog'
 import SimpleLink from 'core/components/SimpleLink'
+import useToggler from 'core/hooks/useToggler'
 
 const useStyles = makeStyles(theme => ({
   link: {
@@ -18,15 +19,10 @@ const useStyles = makeStyles(theme => ({
 }))
 
 const KubeConfigListPage = () => {
-  const [isDialogOpen, setDialogOpen] = useState(false)
+  const [isDialogOpen, toggleDialog] = useToggler()
   const classes = useStyles()
 
-  const handleClickDownload = (row) => {
-    setDialogOpen(true)
-  }
-  const handleDialogClose = () => setDialogOpen(false)
-
-  const columns = getColumns(handleClickDownload)
+  const columns = getColumns(toggleDialog)
 
   const options = {
     cacheKey: 'kubeconfig',
@@ -37,7 +33,7 @@ const KubeConfigListPage = () => {
     compactTable: true,
     blankFirstColumn: true,
     multiSelection: false,
-    onSelect: handleClickDownload,
+    onSelect: toggleDialog,
   }
 
   const { ListPage } = createCRUDComponents(options)
@@ -57,7 +53,7 @@ const KubeConfigListPage = () => {
       <ValidatedForm>
         <TextField id="config" rows={9} multiline />
       </ValidatedForm>
-      <DownloadDialog onClose={handleDialogClose} isDialogOpen={isDialogOpen} />
+      <DownloadDialog onClose={toggleDialog} isDialogOpen={isDialogOpen} />
     </>
   )
 }
