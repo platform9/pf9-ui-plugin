@@ -51,6 +51,9 @@ const styles = theme => ({
   paragraph: {
     textAlign: 'center',
   },
+  errorContainer: {
+    width: '150px'
+  }
 })
 
 export class LoginPage extends React.PureComponent {
@@ -171,7 +174,11 @@ export class LoginPage extends React.PureComponent {
                 {this.renderInputfield()}
                 {this.renderMFACheckbox()}
                 {this.state.MFAcheckbox && this.renderMFAInput()}
-                {loginFailed && <Alert variant="error" message="Login failed" />}
+                {loginFailed && (
+                  <div className={classes.errorContainer}>
+                    <Alert variant="error" message="Login failed" />
+                  </div>
+                )}
                 <Button type="submit" className={classes.signinButton} variant="contained" color="primary">
                   SIGN IN
                 </Button>
