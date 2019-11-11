@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import kubeConfigActions from './actions'
@@ -22,7 +22,7 @@ const KubeConfigListPage = () => {
   const [isDialogOpen, toggleDialog] = useToggler()
   const classes = useStyles()
 
-  const columns = getColumns(toggleDialog)
+  const columns = useMemo(() => getColumns(toggleDialog), [toggleDialog])
 
   const options = {
     cacheKey: 'kubeconfig',
