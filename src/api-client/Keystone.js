@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { pluck } from 'ramda'
+import { pluck, pipe, values, head } from 'ramda'
 import { getHighestRole } from './helpers'
 import { pathJoin } from 'utils/misc'
 
@@ -111,7 +111,7 @@ class Keystone {
       ...this.client.getAuthHeaders(),
       params: {
         'scope.project.id': tenantId,
-        'include_names': true
+        'include_names': true,
       },
     })
     return response.data.role_assignments
@@ -122,7 +122,7 @@ class Keystone {
       ...this.client.getAuthHeaders(),
       params: {
         'user.id': userId,
-        'include_names': true
+        'include_names': true,
       },
     })
     return response.data.role_assignments
@@ -281,16 +281,18 @@ class Keystone {
   }
 
   getServicesForActiveRegion = async () => {
-    if (!this.client.serviceCatalog) {
-      await this.getServiceCatalog()
-    }
+    const {
+      activeRegion,
+      serviceCatalog = await this.getServiceCatalog(),
+    } = this.client
+    const servicesByRegion = groupByRegion(serviceCatalog)
 
-    const servicesByRegion = groupByRegion(this.client.serviceCatalog)
-    if (!this.client.activeRegion) {
+    if (!activeRegion || !servicesByRegion.hasOwnProperty(activeRegion)) {
       // Just assume the first region we come across if there isn't one set.
-      this.client.activeRegion = this.client.serviceCatalog[0].endpoints[0].region
+      return pipe(values, head)(servicesByRegion)
+      // return null
     }
-    return servicesByRegion[this.client.activeRegion]
+    return servicesByRegion[activeRegion]
   }
 
   getCredentials = async () => {

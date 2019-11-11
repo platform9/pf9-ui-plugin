@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { __, contains, partition, uniq } from 'ramda'
+import { __, partition, uniq, includes } from 'ramda'
 
 const roleNames = {
   'pf9-ostackhost-neutron': 'Hypervisor',
@@ -29,7 +29,7 @@ const neutronComponents = [
 export const localizeRole = role => roleNames[role] || role
 
 export const localizeRoles = (roles = []) => {
-  const isNeutronRole = contains(__, neutronComponents)
+  const isNeutronRole = includes(__, neutronComponents)
   const [neutronRoles, normalRoles] = partition(isNeutronRole, roles)
   const hasAllNetworkRoles = neutronRoles.length === neutronComponents.length
   return uniq([
