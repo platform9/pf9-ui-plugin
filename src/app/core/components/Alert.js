@@ -34,13 +34,13 @@ const useStyles = makeStyles(theme => ({
   icon: {
     position: 'absolute',
     left: theme.spacing(2),
-    top: theme.spacing(3),
+    top: theme.spacing(1),
     fontSize: 28,
   },
   close: {
     position: 'absolute',
     right: theme.spacing(2),
-    top: theme.spacing(3),
+    top: theme.spacing(1),
     padding: theme.spacing(1),
     margin: theme.spacing(-1),
   },
