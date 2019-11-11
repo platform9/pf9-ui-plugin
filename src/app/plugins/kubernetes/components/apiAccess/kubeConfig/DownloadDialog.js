@@ -5,6 +5,7 @@ import TextField from 'core/components/validatedForm/TextField'
 import { Dialog, DialogTitle, DialogContent, RadioGroup, Radio, Grid, FormControlLabel } from '@material-ui/core'
 import CancelButton from 'core/components/buttons/CancelButton'
 import SubmitButton from 'core/components/buttons/SubmitButton'
+import { passwordValidator } from 'core/utils/fieldValidators'
 
 const useStyles = makeStyles(theme => ({
   dialog: {
@@ -77,13 +78,19 @@ const PasswordForm = ({ classes }) =>
         <h3>Username</h3>
       </Grid>
       <Grid item xs={8} zeroMinWidth>
-        <TextField id="username" />
+        <TextField id="username" label="username" required />
       </Grid>
       <Grid item xs={4} zeroMinWidth>
         <h3>Password</h3>
       </Grid>
       <Grid item xs={8} zeroMinWidth>
-        <TextField id="password" type="password" />
+        <TextField
+          id="password"
+          label="password"
+          type="password"
+          validations={[passwordValidator]}
+          required
+        />
       </Grid>
     </Grid>
   </ValidatedForm>
