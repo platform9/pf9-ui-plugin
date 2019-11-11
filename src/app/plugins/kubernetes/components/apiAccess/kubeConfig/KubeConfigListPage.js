@@ -22,9 +22,9 @@ const KubeConfigListPage = () => {
   const [isDialogOpen, toggleDialog] = useToggler()
   const classes = useStyles()
 
-  const columns = useMemo(() => getColumns(toggleDialog), [toggleDialog])
+  const columns = getColumns(toggleDialog)
 
-  const options = {
+  const options = useMemo(() => ({
     cacheKey: 'kubeconfig',
     uniqueIdentifier: 'cluster',
     loaderFn: kubeConfigActions.list,
@@ -34,7 +34,7 @@ const KubeConfigListPage = () => {
     blankFirstColumn: true,
     multiSelection: false,
     onSelect: toggleDialog,
-  }
+  }), [toggleDialog])
 
   const { ListPage } = createCRUDComponents(options)
 
