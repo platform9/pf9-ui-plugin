@@ -5,15 +5,12 @@ import kubeConfigActions from './actions'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import TextField from 'core/components/validatedForm/TextField'
 import DownloadDialog from './DownloadDialog'
+import SimpleLink from 'core/components/SimpleLink'
 
 const useStyles = makeStyles(theme => ({
   link: {
     display: 'block',
     width: 'fit-content',
-    textDecoration: 'none',
-    '&:hover': {
-      textDecoration: 'underline',
-    }
   },
   clusterConfig: {
     marginTop: theme.spacing(5),
@@ -49,12 +46,12 @@ const KubeConfigListPage = () => {
     <>
       <h2>Download kubeconfig</h2>
       <p>The kubeconfig file is required to authenticate with a cluster and switch between multiple clusters between multiple users while using the kubectl command line.</p>
-      <a className={classes.link} href="https://kubernetes.io/docs/user-guide/kubectl-overview/">
+      <SimpleLink className={classes.link} href="https://kubernetes.io/docs/user-guide/kubectl-overview/">
         Learn more about kubectl
-      </a>
-      <a className={classes.link} href="https://kubernetes.io/docs/user-guide/kubeconfig-file/">
+      </SimpleLink>
+      <SimpleLink className={classes.link} href="https://kubernetes.io/docs/user-guide/kubeconfig-file/">
         Learn more about kubeconfig
-      </a>
+      </SimpleLink>
       <ListPage />
       <p className={classes.clusterConfig}>Select a cluster above to populate its kubeconfig below.</p>
       <ValidatedForm>
@@ -76,6 +73,6 @@ const getColumns = (handleClickDownload) => [
 ]
 
 const kubeConfigLink = (row, handleClickDownload) =>
-  <a onClick={() => handleClickDownload(row)}>Download kubeconfig</a>
+  <SimpleLink onClick={() => handleClickDownload(row)}>Download kubeconfig</SimpleLink>
 
 export default KubeConfigListPage
