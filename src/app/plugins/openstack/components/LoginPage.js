@@ -125,7 +125,8 @@ export class LoginPage extends React.PureComponent {
         label={
           <div>
             <span>I have a Multi-Factor Authentication (MFA) token. (</span>
-            <SimpleLink src="http://www.platform9.com">more info</SimpleLink>
+            <SimpleLink src='https://platform9.com/support/setup-multi-factor-authentication-with-platform9/'
+              target='_blank' rel='noopener'>more info</SimpleLink>
             <span>)</span>
           </div>
         }
@@ -149,8 +150,8 @@ export class LoginPage extends React.PureComponent {
     const { classes } = this.props
     return <Fragment>
       <Typography className={classes.paragraph} variant="caption" color="textSecondary">
-        By signing in, you agree to our <SimpleLink src="http://www.platform9.com">Terms of
-        Service</SimpleLink>.
+        By signing in, you agree to our <SimpleLink src="https://platform9.com/terms-conditions/"
+          target="_blank" rel="noopener">Terms of Service</SimpleLink>.
       </Typography>
       <Typography className={classes.paragraph} variant="caption" color="textSecondary">
         © 2014-2018 Platform9 Systems, Inc.
