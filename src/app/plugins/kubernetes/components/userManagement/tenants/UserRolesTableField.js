@@ -6,6 +6,9 @@ import RolesPicklist from 'k8s/components/userManagement/common/RolesPicklist'
 import { FormControl, FormHelperText } from '@material-ui/core'
 import ListTable from 'core/components/listTable/ListTable'
 import { makeStyles } from '@material-ui/styles'
+import SystemUsersToggle from 'k8s/components/userManagement/users/SystemUsersToggle'
+import { isSystemUser } from 'k8s/components/userManagement/users/actions'
+import useToggler from 'core/hooks/useToggler'
 
 const useStyles = makeStyles(theme => ({
   rolesPicklist: {
@@ -33,12 +36,15 @@ const UserRolesTableField = withFormContext(({
 }) => {
   const classes = useStyles()
   const userIds = Object.keys(value)
+  const [showingSystemUsers, toggleSystemUsers] = useToggler()
   // Split between selected and unselected users
   const [initialSelectedRows, unselectedRows] = useMemo(() =>
     partition(({ id }) => userIds.includes(id), users), [])
   // Put the selected users first
   const rows = useMemo(() =>
     [...initialSelectedRows, ...unselectedRows], [initialSelectedRows])
+  const filteredRows = useMemo(() => rows.filter(user => showingSystemUsers || !isSystemUser(user)),
+    [rows, showingSystemUsers])
 
   const [selectedRows, setSelectedRows] = useState(initialSelectedRows)
   const handleSelectedRowsChange = useCallback(selectedRows => {
@@ -77,10 +83,12 @@ const UserRolesTableField = withFormContext(({
 
   return <FormControl id={id} error={hasError}>
     <ListTable
+      extraToolbarContent={
+        <SystemUsersToggle checked={showingSystemUsers} toggle={toggleSystemUsers} />}
       onSortChange={noop}
       searchTarget="username"
       columns={columns}
-      data={rows}
+      data={filteredRows}
       rowsPerPage={10}
       selectedRows={selectedRows}
       onSelectedRowsChange={handleSelectedRowsChange} />

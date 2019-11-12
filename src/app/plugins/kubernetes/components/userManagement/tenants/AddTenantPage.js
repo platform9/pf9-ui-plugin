@@ -23,11 +23,13 @@ const initialContext = {
   roleAssignments: {},
 }
 
+const userParams = { systemUsers: true }
+
 const AddTenantPage = () => {
   const { history } = useReactRouter()
   const onComplete = useCallback(success => success && history.push(listUrl), [history])
   const [handleAdd, submitting] = useDataUpdater(mngmTenantActions.create, onComplete)
-  const [users, loadingUsers] = useDataLoader(mngmUserActions.list)
+  const [users, loadingUsers] = useDataLoader(mngmUserActions.list, userParams)
 
   return <FormWrapper
     title="New Tenant"

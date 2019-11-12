@@ -72,7 +72,7 @@ const FilterDropdown = ({
 }
 
 const ListTableToolbar = ({
-  columns, filterValues, filters,
+  columns, filterValues, filters, extraToolbarContent,
   onAdd, onColumnToggle, onDelete, onEdit, onFilterUpdate,
   onFiltersReset, onSearchChange, onReload, onRefresh,
   batchActions = emptyArr, searchTerm, selected, visibleColumns,
@@ -131,7 +131,7 @@ const ListTableToolbar = ({
               />
             ))
             : filters}
-
+          {extraToolbarContent}
           {onSearchChange && (
             <SearchBar className={classes.search} onSearchChange={onSearchChange} searchTerm={searchTerm} />
           )}

@@ -20,6 +20,8 @@ import WizardStep from 'core/components/wizard/WizardStep'
 
 const listUrl = pathJoin(k8sPrefix, 'user_management')
 
+const userParams = { systemUsers: true }
+
 const EditTenantPage = () => {
   const { match, history } = useReactRouter()
   const tenantId = match.params.id
@@ -30,7 +32,7 @@ const EditTenantPage = () => {
   const tenant = useMemo(
     () => tenants.find(propEq('id', tenantId)) || emptyObj,
     [tenants, tenantId])
-  const [users, loadingUsers] = useDataLoader(mngmUserActions.list)
+  const [users, loadingUsers] = useDataLoader(mngmUserActions.list, userParams)
   const [update, updating] = useDataUpdater(mngmTenantActions.update, onComplete)
   const [roleAssignments, loadingRoleAssignments] = useDataLoader(mngmTenantRoleAssignmentsLoader, {
     tenantId,
@@ -46,7 +48,7 @@ const EditTenantPage = () => {
   }), [tenant, roleAssignments])
 
   return <FormWrapper
-    title={`Edit Tenant ${tenant.name}`}
+    title={`Edit Tenant ${tenant.name || ''}`}
     loading={loadingUsers || loadingTenants || loadingRoleAssignments || updating}
     renderContentOnMount={false}
     message={updating ? 'Submitting form...' : 'Loading Tenant...'}

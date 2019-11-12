@@ -1,5 +1,5 @@
 import { emptyObj } from 'utils/fp'
-import { useMemo, useState, useCallback } from 'react'
+import { useMemo, useState, useCallback, useReducer } from 'react'
 import moize from 'moize'
 import { isEmpty, pick, zipObj } from 'ramda'
 import { useScopedPreferences } from 'core/providers/PreferencesProvider'
@@ -20,10 +20,10 @@ import { useScopedPreferences } from 'core/providers/PreferencesProvider'
  *   return <Picklist onChange={clusterId => updateParams({ clusterId })}
  */
 const useParams = (defaultParams = emptyObj) => {
-  const [params, setParams] = useState(defaultParams)
-  const updateParams = useCallback(
-    newParams => setParams({ ...params, ...newParams }),
-    [params])
+  const [params, updateParams] = useReducer(
+    (prevParams, newParams) => ({ ...prevParams, ...newParams }),
+    defaultParams,
+  )
   const getParamsUpdater = useMemo(() => {
     return moize((...keys) =>
       (...values) => updateParams(zipObj(keys, values)),
