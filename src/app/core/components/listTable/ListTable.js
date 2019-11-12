@@ -127,7 +127,7 @@ class ListTable extends PureComponent {
 
   handleClick = moize(row => event => {
     const { selected } = this.state
-    const { multiSelection, onSelectedRowsChange, selectedRows = selected } = this.props
+    const { multiSelection, onSelectedRowsChange, onSelect, selectedRows = selected } = this.props
     if (!multiSelection) {
       if (onSelectedRowsChange) {
         // Controlled mode
@@ -136,6 +136,8 @@ class ListTable extends PureComponent {
         this.setState({
           selected: [row],
         })
+
+        onSelect && onSelect(row)
       }
       return
     }
@@ -166,6 +168,8 @@ class ListTable extends PureComponent {
       this.setState({
         selected: newSelected,
       })
+
+      onSelect && onSelect(row)
     }
   }, { maxSize: 100 })
 
@@ -620,6 +624,7 @@ ListTable.propTypes = {
 
   selectedRows: PropTypes.array,
   onSelectedRowsChange: PropTypes.func,
+  onSelect: PropTypes.func,
   size: PropTypes.oneOf(['small', 'medium']),
   compactTable: PropTypes.bool,
 
