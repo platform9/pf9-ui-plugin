@@ -25,7 +25,7 @@ const ListPage = ({ ListContainer }) => {
     return (
       <PageContainer floatingHeader={false}>
         <Tabs>
-          <Tab value="namespace" label="Name Spaces">
+          <Tab value="namespace" label="Namespaces">
             <ListContainer
               loading={loading}
               reload={reload}
@@ -53,7 +53,7 @@ export const options = {
   columns: [
     { id: 'name', label: 'Name' },
     { id: 'clusterName', label: 'Cluster' },
-    { id: 'created', label: 'Created' }
+    { id: 'created', label: 'Created' },
   ],
   loaderFn: namespaceActions.list,
   deleteFn: namespaceActions.delete,
