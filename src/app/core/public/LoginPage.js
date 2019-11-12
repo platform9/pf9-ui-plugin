@@ -161,7 +161,7 @@ export class LoginPage extends React.PureComponent {
         of Service</ExternalLink>.
       </Typography>
       <Typography className={classes.paragraph} variant="caption" color="textSecondary">
-        © 2014-2018 Platform9 Systems, Inc.
+        © 2014-2019 Platform9 Systems, Inc.
       </Typography>
     </Fragment>
   }
@@ -183,9 +183,7 @@ export class LoginPage extends React.PureComponent {
                 {this.renderMFACheckbox()}
                 {this.state.MFAcheckbox && this.renderMFAInput()}
                 {loginFailed && (
-                  <div className={classes.errorContainer}>
-                    <Alert variant="error" message="Login failed" />
-                  </div>
+                  <Alert small variant="error" message="Login failed" />
                 )}
                 <Button type="submit" disabled={loading} className={classes.signinButton} variant="contained" color="primary">
                   {loading ? 'Attempting login...' : 'Sign In'}

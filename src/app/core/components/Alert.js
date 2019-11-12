@@ -27,6 +27,14 @@ const useStyles = makeStyles(theme => ({
     width: '100%',
     border: 0,
   },
+  rootSmall: {
+    maxWidth: 800,
+    padding: theme.spacing(1, 1),
+    margin: theme.spacing(2, 0),
+    width: '100%',
+    border: 0,
+    display: 'flex',
+  },
   success: { color: green[600] },
   error: { color: theme.palette.error.dark },
   info: { color: theme.palette.primary.dark },
@@ -37,12 +45,23 @@ const useStyles = makeStyles(theme => ({
     top: theme.spacing(1),
     fontSize: 28,
   },
+  iconSmall: {
+    fontSize: 28,
+    flexGrow: 0,
+    alignSelf: 'center',
+  },
   close: {
     position: 'absolute',
     right: theme.spacing(2),
     top: theme.spacing(1),
     padding: theme.spacing(1),
     margin: theme.spacing(-1),
+  },
+  closeSmall: {
+    flexGrow: 0,
+    padding: theme.spacing(1),
+    margin: theme.spacing(-1),
+    alignSelf: 'center',
   },
   iconVariant: {
     opacity: 0.9,
@@ -52,24 +71,28 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     alignItems: 'center',
   },
+  messageSmall: {
+    alignSelf: 'center',
+    flexGrow: 1
+  },
 }))
 
-const Alert = ({ children, message, variant }) => {
+const Alert = ({ children, message, variant, small }) => {
   const classes = useStyles()
   const [open, setOpen] = useState(true)
   if (!open) { return null }
   const Icon = variantIcon[variant]
 
   return (
-    <Paper className={classes.root}>
-      <Icon className={clsx(classes.icon, classes.iconVariant, classes[variant])} />
-      {message && <Typography variant="body1" color="inherit">{message}</Typography>}
+    <Paper className={small ? classes.rootSmall : classes.root}>
+      <Icon className={clsx(small ? classes.iconSmall : classes.icon, classes.iconVariant, classes[variant])} />
+      {message && <Typography variant="body1" color="inherit" className={small ? classes.messageSmall : ''}>{message}</Typography>}
       {children}
       <IconButton
         key='close'
         aria-label='Close'
         color='inherit'
-        className={classes.close}
+        className={small ? classes.closeSmall : classes.close}
         onClick={() => setOpen(false)}
       >
         <CloseIcon />
