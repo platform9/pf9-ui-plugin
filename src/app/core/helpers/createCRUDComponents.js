@@ -54,6 +54,7 @@ const createCRUDComponents = options => {
     showCheckboxes,
     compactTable,
     blankFirstColumn,
+    onSelect,
   } = options
 
   // List
@@ -80,6 +81,7 @@ const createCRUDComponents = options => {
         loading={loading}
         onReload={onReload}
         onRefresh={onRefresh}
+        onSelect={onSelect}
         filters={filters}
         data={data}
         onDelete={onDelete}

@@ -68,10 +68,10 @@ export const options = {
   addUrl: '/ui/kubernetes/infrastructure/nodes/add',
   columns,
   cacheKey: nodesCacheKey,
-  editUrl: '/ui/kubernetes/infrastructure/nodes/edit',
   name: 'Nodes',
   title: 'Nodes',
   uniqueIdentifier: 'uuid',
+  showCheckboxes: false
 }
 
 const { ListPage, List } = createCRUDComponents(options)
