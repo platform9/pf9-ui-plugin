@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import kubeConfigActions from './actions'
@@ -7,6 +7,7 @@ import TextField from 'core/components/validatedForm/TextField'
 import DownloadDialog from './DownloadDialog'
 import SimpleLink from 'core/components/SimpleLink'
 import useToggler from 'core/hooks/useToggler'
+import useDataUpdater from 'core/hooks/useDataUpdater'
 
 const useStyles = makeStyles(theme => ({
   link: {
@@ -20,7 +21,14 @@ const useStyles = makeStyles(theme => ({
 
 const KubeConfigListPage = () => {
   const [isDialogOpen, toggleDialog] = useToggler()
+  const [selectedClusterId, setSelectedClusterId] = useState()
+  const [getKubeconfig] = useDataUpdater(kubeConfigActions.getKubeconfig)
   const classes = useStyles()
+
+  const onSelect = (row) => {
+    setSelectedClusterId(row.clusterId)
+    toggleDialog()
+  }
 
   const columns = getColumns(toggleDialog)
 
@@ -33,8 +41,13 @@ const KubeConfigListPage = () => {
     compactTable: true,
     blankFirstColumn: true,
     multiSelection: false,
-    onSelect: toggleDialog,
+    onSelect,
   }), [toggleDialog])
+
+  const downloadKubeconfig = async (clusterId) => {
+    const kubeconfig = await getKubeconfig({ clusterId })
+    console.log({ kubeconfig })
+  }
 
   const { ListPage } = createCRUDComponents(options)
 
@@ -53,7 +66,11 @@ const KubeConfigListPage = () => {
       <ValidatedForm>
         <TextField id="config" rows={9} multiline />
       </ValidatedForm>
-      <DownloadDialog onClose={toggleDialog} isDialogOpen={isDialogOpen} />
+      <DownloadDialog
+        onDownload={() => downloadKubeconfig(selectedClusterId)}
+        onClose={toggleDialog}
+        isDialogOpen={isDialogOpen}
+      />
     </>
   )
 }
