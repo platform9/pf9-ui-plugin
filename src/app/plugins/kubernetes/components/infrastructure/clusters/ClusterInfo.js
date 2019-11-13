@@ -27,6 +27,47 @@ const openstackProps = cluster => ({
   'MetalLB CIDR': cluster.metallbCidr,
 })
 
+const awsCloudProps = cluster => ({
+  'Region': cluster.region,
+  'Master Flavor': cluster.masterFlavor,
+  'Worker Flavor': cluster.workerFlavor,
+  'SSH Key': cluster.sshKey,
+  'Service FQDN': cluster.serviceFqdn,
+  'Ami': cluster.ami,
+  'Domain Id': cluster.domainId,
+  'Is Private': cluster.isPrivate,
+  'Use Pf9 Domain': cluster.usePf9Domain,
+  'Internal Elb': cluster.internalElb,
+  'Azs': cluster.azs,
+  'Num Spot Workers': cluster.numSpotWorkers,
+  'Spot Worker Flavor': cluster.spotWorkerFlavor,
+  'Spot Price': cluster.spotPrice
+})
+
+// TODO: Need to add Azure cloud properties
+const renderCloudInfo = cluster => {
+  switch (cluster.cloudProviderType) {
+    case 'aws':
+      return (
+        <InfoPanel
+          title="Cloud Properties"
+          items={awsCloudProps(cluster.cloudProperties)}
+        />
+      )
+    case 'local':
+      return (
+        <InfoPanel
+          title="OpenStack Properties"
+          items={openstackProps(cluster.cloudProperties)}
+        />
+      )
+    default:
+      return (
+        <InfoPanel title="Cloud Properties" items={{ 'Data not found': '' }} />
+      )
+  }
+}
+
 const useStyles = makeStyles(theme => ({
   root: {
     flexGrow: 1,
@@ -59,7 +100,7 @@ const ClusterInfo = () => {
           <InfoPanel title="Overview" items={overviewStats(cluster)} />
         </Grid>
         <Grid item xs={6}>
-          <InfoPanel title="OpenStack Properties" items={openstackProps(cluster)} />
+          {renderCloudInfo(cluster)}
         </Grid>
       </Grid>
     </Progress>
