@@ -24,7 +24,8 @@ const mapLoggings = (cluster, loggings) => {
   })
 
   return {
-    cluster: cluster.name,
+    cluster: cluster.id,
+    clusterName: cluster.name,
     status: cluster.status,
     logStorage: logStorage,
     logDestination: logDestination,
