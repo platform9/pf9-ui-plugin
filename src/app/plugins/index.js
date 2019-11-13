@@ -6,8 +6,10 @@ import theme from './theme'
 const devEnabled = window.localStorage.enableDevPlugin === 'true'
 
 const plugins = [
-  openstack,
+  // Order here is important as it will define the default Dashboard route
+  // for fallback routes (when trying to reach the base url)
   kubernetes,
+  openstack,
   theme,
   ...(devEnabled ? [developer] : []),
 ]
