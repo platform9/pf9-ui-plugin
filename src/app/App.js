@@ -16,6 +16,7 @@ import moize from 'moize'
 import plugins from 'app/plugins'
 import pluginManager from 'core/utils/pluginManager'
 import ResetPasswordPage from './plugins/openstack/components/ResetPasswordPage'
+import ForgotPasswordPage from './plugins/openstack/components/ForgotPasswordPage'
 
 plugins.forEach(plugin => plugin.registerPlugin(pluginManager))
 
