@@ -10,6 +10,7 @@ import { withAppContext } from 'core/AppProvider'
 import Alert from 'core/components/Alert'
 import { withRouter } from 'react-router'
 import SimpleLink from 'core/components/SimpleLink'
+import ExternalLink from 'core/components/ExternalLink'
 
 const styles = theme => ({
   root: {
@@ -125,7 +126,9 @@ export class LoginPage extends React.PureComponent {
         label={
           <div>
             <span>I have a Multi-Factor Authentication (MFA) token. (</span>
-            <SimpleLink src="http://www.platform9.com">more info</SimpleLink>
+            <ExternalLink
+              src='https://platform9.com/support/setup-multi-factor-authentication-with-platform9/'
+            >more info</ExternalLink>
             <span>)</span>
           </div>
         }
@@ -149,8 +152,7 @@ export class LoginPage extends React.PureComponent {
     const { classes } = this.props
     return <Fragment>
       <Typography className={classes.paragraph} variant="caption" color="textSecondary">
-        By signing in, you agree to our <SimpleLink src="http://www.platform9.com">Terms of
-        Service</SimpleLink>.
+        By signing in, you agree to our <ExternalLink src="https://platform9.com/terms-conditions/">Terms of Service</ExternalLink>.
       </Typography>
       <Typography className={classes.paragraph} variant="caption" color="textSecondary">
         © 2014-2018 Platform9 Systems, Inc.
