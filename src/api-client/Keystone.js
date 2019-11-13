@@ -290,7 +290,6 @@ class Keystone {
     if (!activeRegion || !servicesByRegion.hasOwnProperty(activeRegion)) {
       // Just assume the first region we come across if there isn't one set.
       return pipe(values, head)(servicesByRegion)
-      // return null
     }
     return servicesByRegion[activeRegion]
   }
