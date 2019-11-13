@@ -142,7 +142,7 @@ export const options = {
     { id: 'tags', label: 'Metadata', render: data => JSON.stringify(data) },
   ],
   cacheKey: clustersCacheKey,
-  editUrl: '/ui/kubernetes/infrastructure/clusters/edit',
+  // editUrl: '/ui/kubernetes/infrastructure/clusters/edit',
   name: 'Clusters',
   title: 'Clusters',
   uniqueIdentifier: 'uuid',
