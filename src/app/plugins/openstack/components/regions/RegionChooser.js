@@ -14,9 +14,9 @@ import { appUrlRoot } from 'app/constants'
 const currentSectionRegex = new RegExp(`^${appUrlRoot}/[^/]+/?[^/]*`, 'i')
 
 const RegionChooser = props => {
+  const { keystone, setActiveRegion } = ApiClient.getInstance()
   const { history, location } = useReactRouter()
   const { pathname, hash = '' } = location
-  const { setActiveRegion } = ApiClient.getInstance()
   const [tooltipOpen, setTooltipOpen] = useState(false)
   const { prefs: { lastRegion }, updatePrefs } = useScopedPreferences('RegionChooser')
   const [loading, setLoading] = useState(false)
@@ -41,6 +41,7 @@ const RegionChooser = props => {
     const lastRegion = regions.find(propEq('id', region))
     await updatePrefs({ lastRegion })
     setActiveRegion(region)
+    await keystone.resetCookie()
     invalidateLoadersCache()
 
     // Changing the Region will cause all the current active `useDataLoader`
