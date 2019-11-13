@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useCallback } from 'react'
 import { pluck } from 'ramda'
 // This table essentially has the same functionality as the <NodesList>
 // except that it is only the nodes from the a single cluster.
@@ -10,18 +10,11 @@ import useReactRouter from 'use-react-router'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
 
-const ListTable = createListTableComponent({
-  title: 'Cluster Nodes',
-  emptyText: 'No instances found.',
-  name: 'ClusterNodes',
-  columns,
-  uniqueIdentifier: 'uuid',
-})
-
 const ClusterNodes = () => {
   const { match } = useReactRouter()
   const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
-  const [nodes, loadingNodes] = useDataLoader(loadNodes)
+  const [nodes, loadingNodes, reload] = useDataLoader(loadNodes)
+  const handleRefresh = useCallback(() => reload(true), [reload])
   const clusterNodes = useMemo(() => {
     const cluster = clusters.find(cluster => cluster.uuid === match.params.id)
     if (cluster) {
@@ -30,6 +23,16 @@ const ClusterNodes = () => {
     }
     return emptyArr
   }, [clusters, nodes, match])
+
+  const ListTable = createListTableComponent({
+    title: 'Cluster Nodes',
+    emptyText: 'No instances found.',
+    name: 'ClusterNodes',
+    columns,
+    uniqueIdentifier: 'uuid',
+    onReload: handleRefresh,
+    showCheckboxes: false,
+  })
 
   return <ListTable data={clusterNodes} loading={loadingClusters || loadingNodes} />
 }
