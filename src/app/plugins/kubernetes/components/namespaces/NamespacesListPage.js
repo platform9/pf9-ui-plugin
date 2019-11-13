@@ -57,7 +57,6 @@ export const options = {
   ],
   loaderFn: namespaceActions.list,
   deleteFn: namespaceActions.delete,
-  editUrl: '/ui/kubernetes/namespaces/edit',
   name: 'Namespaces',
   title: 'Namespaces',
   ListPage
