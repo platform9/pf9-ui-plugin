@@ -11,6 +11,7 @@ import Alert from 'core/components/Alert'
 import { withRouter } from 'react-router'
 import SimpleLink from 'core/components/SimpleLink'
 import ExternalLink from 'core/components/ExternalLink'
+import { forgotPasswordUrl } from 'app/constants'
 
 const styles = theme => ({
   root: {
@@ -101,6 +102,10 @@ export class LoginPage extends React.PureComponent {
     this.setState({ [name]: event.target.checked })
   }
 
+  handleForgotPassword = () => e => {
+    this.props.history.push(forgotPasswordUrl)
+  }
+
   renderInputfield = () => {
     const { classes } = this.props
     return <Fragment>
@@ -185,7 +190,7 @@ export class LoginPage extends React.PureComponent {
                   SIGN IN
                 </Button>
                 <Typography className={classes.forgotPwd} gutterBottom>
-                  <SimpleLink src="http://www.platform9.com">Forgot password?</SimpleLink>
+                  <SimpleLink onClick={this.handleForgotPassword()} src={forgotPasswordUrl}>Forgot password?</SimpleLink>
                 </Typography>
               </form>
               {this.renderFooter()}
