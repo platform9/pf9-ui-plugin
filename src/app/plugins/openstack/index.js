@@ -72,7 +72,7 @@ OpenStack.registerPlugin = pluginManager => {
     [
       {
         name: 'Dashboard',
-        link: { path: '/', exact: true, default: false },
+        link: { path: '/dashboard', exact: true, default: false },
         component: DashboardPage
       },
       {

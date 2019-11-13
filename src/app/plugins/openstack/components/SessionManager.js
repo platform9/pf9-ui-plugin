@@ -79,6 +79,7 @@ const SessionManager = withRouter(props => {
 
     if (lastRegion) { setActiveRegion(lastRegion) }
     const { scopedToken, user } = await keystone.changeProjectScope(activeTenant.id)
+    await keystone.resetCookie()
 
     setStorage('user', user)
     setStorage('tokens', { unscopedToken, currentToken: scopedToken })

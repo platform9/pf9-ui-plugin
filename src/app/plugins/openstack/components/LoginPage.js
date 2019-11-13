@@ -54,8 +54,8 @@ const styles = theme => ({
     textAlign: 'center',
   },
   errorContainer: {
-    width: '150px'
-  }
+    width: '150px',
+  },
 })
 
 export class LoginPage extends React.PureComponent {
@@ -132,7 +132,7 @@ export class LoginPage extends React.PureComponent {
           <div>
             <span>I have a Multi-Factor Authentication (MFA) token. (</span>
             <ExternalLink
-              src='https://platform9.com/support/setup-multi-factor-authentication-with-platform9/'
+              url='https://platform9.com/support/setup-multi-factor-authentication-with-platform9/'
             >more info</ExternalLink>
             <span>)</span>
           </div>
@@ -157,7 +157,8 @@ export class LoginPage extends React.PureComponent {
     const { classes } = this.props
     return <Fragment>
       <Typography className={classes.paragraph} variant="caption" color="textSecondary">
-        By signing in, you agree to our <ExternalLink src="https://platform9.com/terms-conditions/">Terms of Service</ExternalLink>.
+        By signing in, you agree to our <ExternalLink url="https://platform9.com/terms-conditions/">Terms
+        of Service</ExternalLink>.
       </Typography>
       <Typography className={classes.paragraph} variant="caption" color="textSecondary">
         © 2014-2018 Platform9 Systems, Inc.

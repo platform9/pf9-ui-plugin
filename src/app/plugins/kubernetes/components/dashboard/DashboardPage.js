@@ -2,10 +2,8 @@
 import React from 'react'
 import { makeStyles } from '@material-ui/styles'
 import { pathEq } from 'ramda'
-
 // Constants
 import { allKey } from 'app/constants'
-
 // Actions
 import { podActions, deploymentActions, serviceActions } from '../pods/actions'
 import { clusterActions } from '../infrastructure/clusters/actions'
@@ -13,18 +11,10 @@ import { loadNodes } from '../infrastructure/nodes/actions'
 import { mngmUserActions } from '../userManagement/users/actions'
 import { mngmTenantActions } from '../userManagement/tenants/actions'
 import { cloudProviderActions } from '../infrastructure/cloudProviders/actions'
-
 // Icons
 import {
-  People,
-  SettingsApplications,
-  RecentActors,
-  Storage,
-  Layers,
-  FilterNone,
-  Cloud,
+  People, SettingsApplications, RecentActors, Storage, Layers, FilterNone, Cloud,
 } from '@material-ui/icons'
-
 // Components
 import StatusCard from './status-card'
 
@@ -168,12 +158,12 @@ const DashboardPage = () => {
     <section name="dashboard-status-container" className={cardColumn}>
       <div className={cardRow}>
         {statusReports.map(report => (
-          <StatusCard {...report} />
+          <StatusCard key={report.route} {...report} />
         ))}
       </div>
       <div className={cardRow}>
         {serviceReports.map(report => (
-          <StatusCard {...report} />
+          <StatusCard key={report.route} {...report} />
         ))}
       </div>
     </section>
