@@ -24,10 +24,10 @@ const mapLoggings = (cluster, loggings) => {
   })
 
   return {
-    cluster: cluster.uuid,
+    cluster: cluster.name,
     status: cluster.status,
-    logStorage,
-    logDestination,
+    logStorage: logStorage,
+    logDestination: logDestination,
   }
 }
 
@@ -40,7 +40,7 @@ const loggingActions = createCRUDActions(loggingsCacheKey, {
       return response ? mapLoggings(cluster, response) : null
     }, clusters)
 
-    return loggings.filter(cluster => cluster !== null)
+    return loggings.filter((logStorage) => logStorage != null)
   },
   createFn: async data => {
     return qbert.createLogging(data)

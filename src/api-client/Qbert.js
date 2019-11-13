@@ -593,6 +593,7 @@ class Qbert {
       return response
     } catch (e) {
       console.log(`Could not fetch loggings for cluster ${clusterUuid}`)
+      return []
     }
   }
 
