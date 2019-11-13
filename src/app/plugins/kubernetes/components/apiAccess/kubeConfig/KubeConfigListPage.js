@@ -7,7 +7,9 @@ import TextField from 'core/components/validatedForm/TextField'
 import DownloadDialog from './DownloadDialog'
 import SimpleLink from 'core/components/SimpleLink'
 import useToggler from 'core/hooks/useToggler'
-import useDataUpdater from 'core/hooks/useDataUpdater'
+import ApiClient from 'api-client/ApiClient'
+
+const { qbert } = ApiClient.getInstance()
 
 const useStyles = makeStyles(theme => ({
   link: {
@@ -22,7 +24,7 @@ const useStyles = makeStyles(theme => ({
 const KubeConfigListPage = () => {
   const [isDialogOpen, toggleDialog] = useToggler()
   const [selectedClusterId, setSelectedClusterId] = useState()
-  const [getKubeconfig] = useDataUpdater(kubeConfigActions.getKubeconfig)
+  const [kubeconfig, setKubeconfig] = useState('')
   const classes = useStyles()
 
   const onSelect = (row) => {
@@ -45,8 +47,9 @@ const KubeConfigListPage = () => {
   }), [toggleDialog])
 
   const downloadKubeconfig = async (clusterId) => {
-    const kubeconfig = await getKubeconfig({ clusterId })
-    console.log({ kubeconfig })
+    const kubeconfig = await qbert.getKubeConfig(clusterId)
+    setKubeconfig(kubeconfig)
+    toggleDialog()
   }
 
   const { ListPage } = createCRUDComponents(options)
@@ -64,7 +67,7 @@ const KubeConfigListPage = () => {
       <ListPage />
       <p className={classes.clusterConfig}>Select a cluster above to populate its kubeconfig below.</p>
       <ValidatedForm>
-        <TextField id="config" rows={9} multiline />
+        <TextField id="config" value={kubeconfig} rows={9} multiline />
       </ValidatedForm>
       <DownloadDialog
         onDownload={() => downloadKubeconfig(selectedClusterId)}
