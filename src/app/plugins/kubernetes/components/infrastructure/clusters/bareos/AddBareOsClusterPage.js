@@ -18,6 +18,7 @@ import { clusterActions } from '../actions'
 import { pick } from 'ramda'
 import { pathJoin } from 'utils/misc'
 import { k8sPrefix } from 'app/constants'
+import { RadioGroup, Radio, FormControlLabel, FormLabel, FormControl } from '@material-ui/core';
 
 const { qbert } = ApiClient.getInstance()
 
@@ -37,7 +38,7 @@ const runtimeConfigOptions = [
 ]
 
 const AddBareOsClusterPage = () => {
-  const { params, getParamsUpdater } = useParams()
+  const { params, getParamsUpdater, updateParams } = useParams({networkPlugin: 'flannel'})
   const { history } = useReactRouter()
   const onComplete = () => {
     history.push('/ui/kubernetes/infrastructure#clusters')
@@ -59,7 +60,7 @@ const AddBareOsClusterPage = () => {
       ...pick('privileged appCatalogEnabled customAmi tags'.split(' '), data),
     }
     if (data.httpProxy) { body.httpProxy = data.httpProxy }
-    if (data.networkPlugin === 'calico') { body.mtuSize = data.mtuSize }
+    if (params.networkPlugin === 'calico') { body.mtuSize = data.mtuSize }
     if (data.enableMetallb) {
       body.metallbCidr = data.metallbCidr
     }
@@ -192,7 +193,6 @@ const AddBareOsClusterPage = () => {
                         id="externalDnsName"
                         label="API FQDN"
                         info="FQDN used to reference cluster API. To ensure the API can be accessed securely at the FQDN, the FQDN will be included in the API server certificate's Subject Alt Names. If deploying onto AWS, we will automatically create the DNS records for this FQDN into AWS Route 53."
-                        required
                       />
 
                       {/* Containers CIDR */}
@@ -217,6 +217,24 @@ const AddBareOsClusterPage = () => {
                         label="HTTP Proxy"
                         info="Specify the HTTP proxy for this cluster.  Leave blank for none.  Uses format of <scheme>://<username>:<password>@<host>:<port> where <username>:<password>@ is optional."
                       />
+                      <FormLabel component="legend">Network Backend</FormLabel>
+                      <RadioGroup id="networkPlugin" value={params.networkPlugin} onChange={(e) => updateParams({'networkPlugin': e.target.value})}>
+                        <FormControlLabel
+                          value="flannel"
+                          control={<Radio color="primary" />}
+                          label="Flannel"
+                        />
+                        <FormControlLabel
+                          value="calico"
+                          control={<Radio color="primary" />}
+                          label="Calico"
+                        />
+                        <FormControlLabel
+                          value="canal"
+                          control={<Radio color="primary" />}
+                          label="Calico with Flannel Newtworking"
+                        />
+                      </RadioGroup>
                     </>
                   )}
                 </ValidatedForm>
@@ -230,7 +248,7 @@ const AddBareOsClusterPage = () => {
                       <CheckboxField
                         id="privileged"
                         label="Privileged"
-                        disabled={['calico', 'canal', 'weave'].includes(values.networkPlugin)}
+                        disabled={['calico', 'canal'].includes(params.networkPlugin)}
                         info="Allows this cluster to run privileged containers. Read this article for more information."
                       />
 
