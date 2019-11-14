@@ -83,7 +83,7 @@ PicklistField.propTypes = {
   options: PropTypes.arrayOf(optionPropType),
   initialValue: numOrString,
   onChange: PropTypes.func,
-  info: PropTypes.string,
+  info: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
   placement: PropTypes.string,
   showNone: PropTypes.bool,
   showAll: PropTypes.bool,
