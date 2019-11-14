@@ -18,7 +18,7 @@ import { clusterActions } from '../actions'
 import { pick } from 'ramda'
 import { pathJoin } from 'utils/misc'
 import { k8sPrefix } from 'app/constants'
-import { RadioGroup, Radio, FormControlLabel, FormLabel, FormControl } from '@material-ui/core';
+import { RadioGroup, Radio, FormControlLabel, FormLabel } from '@material-ui/core'
 
 const { qbert } = ApiClient.getInstance()
 
@@ -38,7 +38,7 @@ const runtimeConfigOptions = [
 ]
 
 const AddBareOsClusterPage = () => {
-  const { params, getParamsUpdater, updateParams } = useParams({networkPlugin: 'flannel'})
+  const { params, getParamsUpdater, updateParams } = useParams({ networkPlugin: 'flannel' })
   const { history } = useReactRouter()
   const onComplete = () => {
     history.push('/ui/kubernetes/infrastructure#clusters')
@@ -218,7 +218,7 @@ const AddBareOsClusterPage = () => {
                         info="Specify the HTTP proxy for this cluster.  Leave blank for none.  Uses format of <scheme>://<username>:<password>@<host>:<port> where <username>:<password>@ is optional."
                       />
                       <FormLabel component="legend">Network Backend</FormLabel>
-                      <RadioGroup id="networkPlugin" value={params.networkPlugin} onChange={(e) => updateParams({'networkPlugin': e.target.value})}>
+                      <RadioGroup id="networkPlugin" value={params.networkPlugin} onChange={(e) => updateParams({ 'networkPlugin': e.target.value })}>
                         <FormControlLabel
                           value="flannel"
                           control={<Radio color="primary" />}
