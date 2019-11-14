@@ -1,16 +1,25 @@
+import React, { useEffect, useState } from 'react'
+import useReactRouter from 'use-react-router'
 import axios from 'axios'
-
-import React, { PureComponent } from 'react'
-import PropTypes from 'prop-types'
-import { withStyles } from '@material-ui/styles'
-import { withRouter } from 'react-router-dom'
+import { makeStyles } from '@material-ui/styles'
 import clsx from 'clsx'
 import Intercom from 'core/components/integrations/Intercom'
 import Navbar, { drawerWidth } from 'core/components/Navbar'
 import Toolbar from 'core/components/Toolbar'
 import track from 'utils/tracking'
+import useToggler from 'core/hooks/useToggler'
+import { emptyObj } from 'utils/fp'
+import { Switch, Redirect, Route } from 'react-router'
+import moize from 'moize'
+import { toPairs, apply } from 'ramda'
+import { pathJoin } from 'utils/misc'
+import ResetPasswordPage from 'openstack/components/ResetPasswordPage'
+import ForgotPasswordPage from 'openstack/components/ForgotPasswordPage'
+import LogoutPage from 'openstack/components/LogoutPage'
+import DeveloperToolsEmbed from 'developer/components/DeveloperToolsEmbed'
+import pluginManager from 'core/utils/pluginManager'
 
-const styles = theme => ({
+const useStyles = makeStyles(theme => ({
   root: {
     flexGrow: 1,
   },
@@ -50,84 +59,129 @@ const styles = theme => ({
     padding: '0 8px',
     ...theme.mixins.toolbar,
   },
-})
+}))
 
-@withRouter
-@withStyles(styles, { withTheme: true })
-class AppContainer extends PureComponent {
-  async componentDidMount () {
-    // Note: urlOrigin may or may not be changed to use a specific path instead of
-    // window.location.origin, this depends on whether the new UI is intended to be
-    // accessed from the master DU or from each region.
-    const urlOrigin = window.location.origin
-    // Timestamp tag used for preventing browser caching of features.json
-    const timestamp = new Date().getTime()
-    try {
-      const response = await axios.get(`${urlOrigin}/clarity/features.json?tag=${timestamp}`)
-      this.setState({ withStackSlider: !!response.data.experimental.openstackEnabled })
-    } catch (err) {
-      console.error('No features.json')
-      // Just set slider to true for now as a default.
-      // This is fine from the old UI perspective because if routed to the
-      // dashboard (which is what happens today), the old UI can handle
-      // the stack switching appropriately.
-      this.setState({ withStackSlider: true })
-    }
+const renderPluginRoutes = (id, plugin) => {
+  const defaultRoute = plugin.getDefaultRoute()
+  const genericRoutes = [
+    // TODO implement generic login page?
+    { link: { path: pathJoin(plugin.basePath, 'login') }, component: null },
+    {
+      link: { path: pathJoin(plugin.basePath, 'reset_password') },
+      exact: true,
+      component: ResetPasswordPage,
+    },
+    {
+      link: { path: pathJoin(plugin.basePath, 'forgot_password') },
+      exact: true,
+      component: ForgotPasswordPage,
+    },
+    { link: { path: pathJoin(plugin.basePath, 'logout') }, exact: true, component: LogoutPage },
+    {
+      link: { path: pathJoin(plugin.basePath, '') },
+      // TODO: Implement 404 page
+      render: () => <Redirect to={defaultRoute || '/ui/404'} />,
+    },
+  ]
+  return [...plugin.getRoutes(), ...genericRoutes].map(route => {
+    const { component: Component, render, link } = route
+    return <Route
+      key={link.path}
+      path={link.path}
+      exact={link.exact || false}
+      render={render}
+      component={Component} />
+  })
+}
+
+const getSections = moize(plugins =>
+  toPairs(plugins).map(([id, plugin]) => ({
+    id,
+    name: plugin.name,
+    links: plugin.getNavItems(),
+  })))
+
+const renderPlugins = moize(plugins =>
+  toPairs(plugins).map(apply(renderPluginRoutes)).flat(),
+)
+
+const loadFeatures = async setFeatures => {
+  // Note: urlOrigin may or may not be changed to use a specific path instead of
+  // window.location.origin, this depends on whether the new UI is intended to be
+  // accessed from the master DU or from each region.
+  const urlOrigin = window.location.origin
+  // Timestamp tag used for preventing browser caching of features.json
+  const timestamp = new Date().getTime()
+  try {
+    const response = await axios.get(`${urlOrigin}/clarity/features.json?tag=${timestamp}`)
+    setFeatures({
+      withStackSlider: !!response.data.experimental.openstackEnabled,
+    })
+  } catch (err) {
+    console.error('No features.json')
+    // Just set slider to true for now as a default.
+    // This is fine from the old UI perspective because if routed to the
+    // dashboard (which is what happens today), the old UI can handle
+    // the stack switching appropriately.
+    setFeatures({
+      withStackSlider: true,
+    })
   }
+}
 
-  componentWillMount () {
-    const { history } = this.props
+const AppContainer = () => {
+  const [drawerOpen, toggleDrawer] = useToggler()
+  const [features, setFeatures] = useState(emptyObj)
+  const { history } = useReactRouter()
+  const classes = useStyles()
 
-    this.unlisten = this.props.history.listen((location, action) => {
+  useEffect(() => {
+    const unlisten = history.listen((location, action) => {
       track('pageLoad', { route: `${location.pathname}${location.hash}` })
     })
 
     // This is to send page event for the first page the user lands on
     track('pageLoad', { route: `${history.location.pathname}${history.location.hash}` })
-  }
 
-  componentWillUnmount () {
-    this.unlisten()
-  }
+    // Pass the `setFeatures` function to update the features as we can't use `await` inside of a `useEffect`
+    loadFeatures(setFeatures)
 
-  state = {
-    open: true,
-  }
+    return unlisten
+  }, [])
 
-  handleDrawerToggle = () => {
-    this.setState({ open: !this.state.open })
-  }
+  const plugins = pluginManager.getPlugins()
+  const sections = getSections(plugins)
+  const devEnabled = window.localStorage.enableDevPlugin === 'true'
 
-  render () {
-    const { classes, sections } = this.props
-    const { open, withStackSlider } = this.state
-
-    return (
-      <div className={classes.root}>
-        <div className={classes.appFrame}>
-          <Toolbar />
-          <Navbar
-            withStackSlider={withStackSlider}
-            drawerWidth={drawerWidth}
-            sections={sections}
-            open={open}
-            handleDrawerToggle={this.handleDrawerToggle} />
-          <main className={clsx(classes.content, classes['content-left'], {
-            [classes.contentShift]: open,
-            [classes['contentShift-left']]: open,
-          })}>
-            <div className={classes.drawerHeader} />
-            <div>{this.props.children}</div>
-          </main>
-        </div>
-        <Intercom />
+  return (
+    <div className={classes.root} id="_main-container">
+      <div className={classes.appFrame}>
+        <Toolbar />
+        <Navbar
+          withStackSlider={features.withStackSlider}
+          drawerWidth={drawerWidth}
+          sections={sections}
+          open={drawerOpen}
+          handleDrawerToggle={toggleDrawer} />
+        <main className={clsx(classes.content, classes['content-left'], {
+          [classes.contentShift]: drawerOpen,
+          [classes['contentShift-left']]: drawerOpen,
+        })}>
+          <div className={classes.drawerHeader} />
+          <div>
+            <Switch>
+              {renderPlugins(plugins)}
+            </Switch>
+            {devEnabled && <DeveloperToolsEmbed />}
+          </div>
+        </main>
       </div>
-    )
-  }
+      <Intercom />
+    </div>
+  )
 }
 
 AppContainer.propTypes = {
-  classes: PropTypes.object,
   sections: Navbar.propTypes.sections,
 }
 

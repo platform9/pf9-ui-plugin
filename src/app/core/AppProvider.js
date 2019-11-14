@@ -71,7 +71,10 @@ AppProvider.propTypes = {
 }
 
 AppProvider.defaultProps = {
-  initialContext: {},
+  initialContext: {
+    initialized: false,
+    sessionLoaded: false
+  },
 }
 
 export const withAppContext = Component => props =>
