@@ -9,7 +9,7 @@ import SimpleLink from 'core/components/SimpleLink'
 import useToggler from 'core/hooks/useToggler'
 import ApiClient from 'api-client/ApiClient'
 
-const { qbert } = ApiClient.getInstance()
+const { qbert, keystone } = ApiClient.getInstance()
 
 const useStyles = makeStyles(theme => ({
   link: {
@@ -79,16 +79,18 @@ const KubeConfigListPage = () => {
   }), [toggleDialog, downloadedKubeconfigs, currentKubeconfig, generateYaml])
 
   const downloadKubeconfig = async (cluster, generateYaml) => {
+    const newToken = await keystone.renewScopedToken()
     const kubeconfig = await qbert.getKubeConfig(cluster.id)
+    const kubeconfigWithToken = kubeconfig.replace('__INSERT_BEARER_TOKEN_HERE__', newToken)
     setDownloadedKubeconfigs({
       ...downloadedKubeconfigs,
-      [cluster.id]: kubeconfig,
+      [cluster.id]: kubeconfigWithToken,
     })
-    setCurrentKubeconfig(kubeconfig)
+    setCurrentKubeconfig(kubeconfigWithToken)
     toggleDialog()
 
     if (generateYaml) {
-      downloadYamlFile(cluster.name, kubeconfig)
+      downloadYamlFile(cluster.name, kubeconfigWithToken)
     }
   }
 
