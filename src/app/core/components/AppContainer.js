@@ -128,7 +128,7 @@ class AppContainer extends PureComponent {
 
 AppContainer.propTypes = {
   classes: PropTypes.object,
-  sections: Navbar.propTypes.sections
+  sections: Navbar.propTypes.sections,
 }
 
 export default AppContainer

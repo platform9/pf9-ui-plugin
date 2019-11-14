@@ -5,7 +5,6 @@ import AppContainer from 'core/components/AppContainer'
 import HotKeysProvider from 'core/providers/HotKeysProvider'
 import PreferencesProvider from 'core/providers/PreferencesProvider'
 import { ToastProvider } from 'core/providers/ToastProvider'
-import DeveloperToolsEmbed from 'developer/components/DeveloperToolsEmbed'
 import LogoutPage from 'openstack/components/LogoutPage'
 import SessionManager from 'openstack/components/SessionManager'
 import ThemeManager from './ThemeManager'
@@ -17,46 +16,33 @@ import plugins from 'app/plugins'
 import pluginManager from 'core/utils/pluginManager'
 import ResetPasswordPage from './plugins/openstack/components/ResetPasswordPage'
 import ForgotPasswordPage from './plugins/openstack/components/ForgotPasswordPage'
+import DeveloperToolsEmbed from 'developer/components/DeveloperToolsEmbed'
 
 plugins.forEach(plugin => plugin.registerPlugin(pluginManager))
 
-const renderFooter = () => (
-  <div id="_main-footer">
-    TODO: Footer
-  </div>
-)
-
 const renderPluginRoutes = (id, plugin) => {
-  const options = plugin.getOptions()
-  // TODO: Implement 404 page
   const defaultRoute = plugin.getDefaultRoute()
-  const { showFooter } = options
-  return <Route key={id} path={plugin.basePath}
-    exact={false}
-    render={() => {
-      return <Switch>
-        {/* Plugin components */}
-        {plugin.getComponents().map((PluginComponent, idx) =>
-          <PluginComponent key={idx} />)}
-
-        {/* Plugin specific routes */}
-        {plugin.getRoutes().map(route => {
-          const { component: Component, link } = route
-          return <Route key={route.name}
-            path={link.path}
-            exact={link.exact || false}
-            component={Component} />
-        })}
-
-        {/* TODO implement generic login page? */}
-        <Route path={pathJoin(plugin.basePath, 'login')} component={null} />
-        <Route path={pathJoin(plugin.basePath, 'reset_password')} exact component={ResetPasswordPage} />
-        <Route path={pathJoin(plugin.basePath, 'forgot_password')} exact component={ForgotPasswordPage} />
-        <Route path={pathJoin(plugin.basePath, 'logout')} exact component={LogoutPage} />
-        {defaultRoute && <Redirect to={defaultRoute || '/ui/404'} />}
-        {showFooter && renderFooter()}
-      </Switch>
-    }} />
+  const genericRoutes = [
+    // TODO implement generic login page?
+    { link: { path: pathJoin(plugin.basePath, 'login') }, component: null },
+    { link: { path: pathJoin(plugin.basePath, 'reset_password') }, exact: true, component: ResetPasswordPage },
+    { link: { path: pathJoin(plugin.basePath, 'forgot_password') }, exact: true, component: ForgotPasswordPage },
+    { link: { path: pathJoin(plugin.basePath, 'logout') }, exact: true, component: LogoutPage },
+    {
+      link: { path: pathJoin(plugin.basePath, '') },
+      // TODO: Implement 404 page
+      render: () => <Redirect to={defaultRoute || '/ui/404'} />,
+    },
+  ]
+  return [...plugin.getRoutes(), ...genericRoutes].map(route => {
+    const { component: Component, render, link } = route
+    return <Route
+      key={link.path}
+      path={link.path}
+      exact={link.exact || false}
+      render={render}
+      component={Component} />
+  })
 }
 
 const getSections = moize(plugins =>
@@ -67,7 +53,7 @@ const getSections = moize(plugins =>
   })))
 
 const renderPlugins = moize(plugins =>
-  toPairs(plugins).map(apply(renderPluginRoutes)),
+  toPairs(plugins).map(apply(renderPluginRoutes)).flat(),
 )
 
 const App = () => {
@@ -82,9 +68,10 @@ const App = () => {
               <ToastProvider>
                 <div id="_main-container">
                   <SessionManager>
-                    <AppContainer
-                      sections={getSections(plugins)}>
-                      {renderPlugins(plugins)}
+                    <AppContainer sections={getSections(plugins)}>
+                      <Switch>
+                        {renderPlugins(plugins)}
+                      </Switch>
                       {devEnabled && <DeveloperToolsEmbed />}
                     </AppContainer>
                   </SessionManager>

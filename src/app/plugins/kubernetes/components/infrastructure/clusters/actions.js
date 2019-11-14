@@ -42,7 +42,7 @@ const createAwsCluster = async (data, loadFromContext) => {
     // basic info
     ...pick('name region azs ami sshKey'.split(' '), data),
     // cluster configuration
-    ...pick('masterFlavor workerFlavor numMasters enableCAS numWorkers numMaxWorkers allowWorkloadsOnMaster numSpotWorkers spotPrice'.split(' '), data),
+    ...pick('masterFlavor workerFlavor numMasters enableCAS numWorkers allowWorkloadsOnMaster numSpotWorkers spotPrice'.split(' '), data),
 
     // network info
     ...pick('domainId vpc isPrivate privateSubnets subnets internalElb externalDnsName serviceFqdn containersCidr servicesCidr networkPlugin'.split(' '), data),
@@ -52,6 +52,11 @@ const createAwsCluster = async (data, loadFromContext) => {
   }
   if (data.httpProxy) { body.httpProxy = data.httpProxy }
   if (data.networkPlugin === 'calico') { body.mtuSize = data.mtuSize }
+
+  if (data.enableCAS) {
+    body.numMinWorkers = data.numWorkers
+    body.numMaxWorkers = data.numMaxWorkers
+  }
 
   body.externalDnsName = usePf9Domain ? 'auto-generate' : sanitizeUrl(data.externalDnsName)
   body.serviceFqdn = usePf9Domain ? 'auto-generate' : sanitizeUrl(data.serviceFqdn)
@@ -73,7 +78,11 @@ const createAwsCluster = async (data, loadFromContext) => {
   if (['newPublicPrivate', 'existingPublicPrivate', 'existingPrivate'].includes(data.network)) { body.isPrivate = true }
   if (data.network === 'existingPrivate') { body.internalElb = true }
 
-  const response = await qbert.createCluster(body)
+  const createResponse = await qbert.createCluster(body)
+  const uuid = createResponse.uuid
+
+  // The POST call only returns the `uuid` and that's it.  We need to perform a GET afterwards and return that to add to the cache.
+  const response = await qbert.getClusterDetails(uuid)
   return response
 }
 

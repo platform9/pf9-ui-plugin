@@ -4,7 +4,7 @@ import { Menu, MenuItem, Typography } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import { withRouter } from 'react-router'
 import { withAppContext } from 'core/AppProvider'
-import { logoutUrl } from 'app/constants'
+import { logoutUrl, resetPasswordUrl } from 'app/constants'
 
 const styles = theme => ({
   avatar: {
@@ -27,6 +27,7 @@ class UserMenu extends React.PureComponent {
   state = { anchorEl: null }
   handleClick = event => this.setState({ anchorEl: event.currentTarget })
   handleClose = () => this.setState({ anchorEl: null })
+  handleChangePassword = () => this.props.history.push(resetPasswordUrl)
   logout = () => this.props.history.push(logoutUrl)
 
   render () {
@@ -45,7 +46,7 @@ class UserMenu extends React.PureComponent {
           getContentAnchorEl={null}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
         >
-          <MenuItem onClick={this.handleClose}>Change Password</MenuItem>
+          <MenuItem onClick={this.handleChangePassword}>Change Password</MenuItem>
           <MenuItem onClick={this.handleClose}>SSH Keys</MenuItem>
           <MenuItem onClick={this.logout}>Sign Out</MenuItem>
         </Menu>

@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { pluck, pipe, values, head } from 'ramda'
+import { pluck, pipe, values, head, path } from 'ramda'
 import { getHighestRole } from './helpers'
 import { pathJoin } from 'utils/misc'
 
@@ -215,6 +215,20 @@ class Keystone {
     }
   }
 
+  resetCookie = async () => {
+    const services = await this.getServicesForActiveRegion()
+    const linksUrl = path(['regioninfo', 'public', 'url'], services)
+
+    // set cookie for accessing hostagent rpms
+    try {
+      const { data: { links = {} } } = await axios.get(linksUrl)
+      const token2cookieUrl = links.token2cookie
+      await axios.get(token2cookieUrl)
+    } catch (err) {
+      console.warn('Setting session cookie for accessing hostagent rpms failed')
+    }
+  }
+
   authenticate = async (username, password) => {
     const body = constructAuthBody('password', username, password)
 
@@ -290,7 +304,6 @@ class Keystone {
     if (!activeRegion || !servicesByRegion.hasOwnProperty(activeRegion)) {
       // Just assume the first region we come across if there isn't one set.
       return pipe(values, head)(servicesByRegion)
-      // return null
     }
     return servicesByRegion[activeRegion]
   }
