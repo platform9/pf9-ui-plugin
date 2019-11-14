@@ -10,14 +10,11 @@ import { withAppContext } from 'core/providers/AppProvider'
 import Alert from 'core/components/Alert'
 import { withRouter } from 'react-router'
 import SimpleLink from 'core/components/SimpleLink'
-<<<<<<< HEAD:src/app/core/public/LoginPage.js
 import ExternalLink from 'core/components/ExternalLink'
 import { forgotPasswordUrl } from 'app/constants.js'
 import { pathJoin } from 'utils/misc'
 import { imageUrlRoot, dashboardUrl } from 'app/constants'
-=======
 import moment from 'moment'
->>>>>>> Updated current copyright year to use moment:src/app/plugins/openstack/components/LoginPage.js
 
 const styles = theme => ({
   root: {
