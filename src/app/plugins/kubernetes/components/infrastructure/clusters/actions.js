@@ -37,7 +37,7 @@ export const hasPrometheusEnabled = compose(castFuzzyBool, path(['tags', 'pf9-sy
 export const hasAppCatalogEnabled = propSatisfies(isTruthy, 'appCatalogEnabled')
 
 const createAwsCluster = async (data, loadFromContext) => {
-  const { cloudProviderId, domainId, usePf9Domain } = data
+  const { domainId, usePf9Domain } = data
   const body = {
     // basic info
     ...pick('name region azs ami sshKey'.split(' '), data),
@@ -45,13 +45,11 @@ const createAwsCluster = async (data, loadFromContext) => {
     ...pick('masterFlavor workerFlavor numMasters enableCAS numWorkers allowWorkloadsOnMaster numSpotWorkers spotPrice'.split(' '), data),
 
     // network info
-    ...pick('domainId vpc isPrivate privateSubnets subnets internalElb externalDnsName serviceFqdn containersCidr servicesCidr networkPlugin'.split(' '), data),
+    ...pick('vpc isPrivate privateSubnets subnets internalElb serviceFqdn containersCidr servicesCidr networkPlugin'.split(' '), data),
 
     // advanced configuration
     ...pick('privileged appCatalogEnabled customAmi tags'.split(' '), data),
   }
-  if (data.httpProxy) { body.httpProxy = data.httpProxy }
-  if (data.networkPlugin === 'calico') { body.mtuSize = data.mtuSize }
 
   if (data.enableCAS) {
     body.numMinWorkers = data.numWorkers
@@ -64,30 +62,15 @@ const createAwsCluster = async (data, loadFromContext) => {
   // Follow up with backend team to find out why platform9.net is not showing up in the domain list and why we are hard-coding this id.
   body.domainId = usePf9Domain ? '/hostedzone/Z2LZB5ZNQY6JC2' : domainId
 
-  // Get the nodePoolUuid from the cloudProviderId.  There is a 1-to-1 mapping between cloudProviderId and nodePoolUuuid right now.
-  const cloudProviders = await loadFromContext('cloudProviders')
-  body.nodePoolUuid = cloudProviders.find(propEq('uuid', cloudProviderId)).nodePoolUuid
-
-  data.runtimeConfig = {
-    default: '',
-    all: 'api/all=true',
-    custom: data.customRuntimeConfig,
-  }[data.runtimeConfigOption]
-
   // Set other fields based on what the user chose for 'networkOptions'
   if (['newPublicPrivate', 'existingPublicPrivate', 'existingPrivate'].includes(data.network)) { body.isPrivate = true }
   if (data.network === 'existingPrivate') { body.internalElb = true }
 
-  const createResponse = await qbert.createCluster(body)
-  const uuid = createResponse.uuid
-
-  // The POST call only returns the `uuid` and that's it.  We need to perform a GET afterwards and return that to add to the cache.
-  const response = await qbert.getClusterDetails(uuid)
-  return response
+  return createGenericCluster(body, data, loadFromContext)
 }
 
 const createAzureCluster = async (data, loadFromContext) => {
-  const { cloudProviderId } = data
+
   const body = {
     // basic info
     ...pick('name location zones sshKey'.split(' '), data),
@@ -101,21 +84,31 @@ const createAzureCluster = async (data, loadFromContext) => {
     // advanced configuration
     ...pick('privileged appCatalogEnabled tags'.split(' '), data),
   }
+
+  if (data.useAllAvailabilityZones) { body.zones = [] }
+
+  return createGenericCluster(body, data, loadFromContext)
+}
+
+const createGenericCluster = async (body, data, loadFromContext) => {
+  const { cloudProviderId } = data
   // Get the nodePoolUuid from the cloudProviderId.  There is a 1-to-1 mapping between cloudProviderId and nodePoolUuuid right now.
   const cloudProviders = await loadFromContext('cloudProviders')
   body.nodePoolUuid = cloudProviders.find(propEq('uuid', cloudProviderId)).nodePoolUuid
 
-  if (data.useAllAvailabilityZones) { body.zones = [] }
   if (data.httpProxy) { body.httpProxy = data.httpProxy }
   if (data.networkPlugin === 'calico') { body.mtuSize = data.mtuSize }
-
-  data.runtimeConfig = {
+  body.runtimeConfig = {
     default: '',
     all: 'api/all=true',
     custom: data.customRuntimeConfig,
   }[data.runtimeConfigOption]
 
-  const response = await qbert.createCluster(body)
+  const createResponse = await qbert.createCluster(body)
+  const uuid = createResponse.uuid
+
+  // The POST call only returns the `uuid` and that's it.  We need to perform a GET afterwards and return that to add to the cache.
+  const response = await qbert.getClusterDetails(uuid)
   return response
 }
 
