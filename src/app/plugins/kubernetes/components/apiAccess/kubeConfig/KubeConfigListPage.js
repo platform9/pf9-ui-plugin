@@ -40,7 +40,7 @@ const KubeConfigListPage = () => {
     }
   }
 
-  const clickDownloadYamlFile = (clusterId, clusterName) => {
+  const handleDownloadYamlFileClick = (clusterId, clusterName) => {
     setSelectedCluster({ id: clusterId, name: clusterName })
     setGenerateYaml(true)
 
@@ -64,7 +64,7 @@ const KubeConfigListPage = () => {
     setGenerateYaml(false)
   }
 
-  const columns = getColumns(clickDownloadYamlFile)
+  const columns = getColumns(handleDownloadYamlFileClick)
 
   const options = useMemo(() => ({
     cacheKey: 'kubeconfig',
@@ -115,7 +115,7 @@ const KubeConfigListPage = () => {
         <TextField id="config" value={currentKubeconfig} rows={9} multiline />
       </ValidatedForm>
       <DownloadDialog
-        onDownload={() => downloadKubeconfig(selectedCluster, generateYaml)}
+        onDownloadClick={() => downloadKubeconfig(selectedCluster, generateYaml)}
         onClose={handleCloseDialog}
         isDialogOpen={isDialogOpen}
       />
@@ -123,17 +123,17 @@ const KubeConfigListPage = () => {
   )
 }
 
-const getColumns = (clickDownloadYamlFile) => [
+const getColumns = (handleDownloadYamlFileClick) => [
   { id: 'cluster', label: 'Cluster' },
   {
     id: 'kubeConfig',
     label: 'kubeconfig',
-    render: (contents, row) => kubeConfigLink(row, clickDownloadYamlFile),
+    render: (contents, row) => kubeConfigLink(row, handleDownloadYamlFileClick),
   },
   { id: 'url', label: 'URL' },
 ]
 
-const kubeConfigLink = (row, clickDownloadYamlFile) =>
-  <SimpleLink onClick={() => clickDownloadYamlFile(row.clusterId, row.cluster)}>Download kubeconfig</SimpleLink>
+const kubeConfigLink = (row, handleDownloadYamlFileClick) =>
+  <SimpleLink onClick={() => handleDownloadYamlFileClick(row.clusterId, row.cluster)}>Download kubeconfig</SimpleLink>
 
 export default KubeConfigListPage
