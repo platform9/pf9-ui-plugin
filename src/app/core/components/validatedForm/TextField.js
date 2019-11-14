@@ -56,7 +56,6 @@ class TextField extends PureComponent {
 TextField.propTypes = {
   id: PropTypes.string.isRequired,
   label: PropTypes.string,
-  info: PropTypes.string,
   initialValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   onChange: PropTypes.func,
   ...ValidatedFormInputPropTypes,
