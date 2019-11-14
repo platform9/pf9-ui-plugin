@@ -16,12 +16,12 @@ const LogoutPage = () => {
   const { history } = useReactRouter()
   const { destroySession, setContext } = useContext(AppContext)
 
-  useEffect(async () => {
+  useEffect(() => {
     clear('user')
     clear('tokens')
     destroySession()
     invalidateLoadersCache()
-    await setContext(pipe(
+    setContext(pipe(
       assoc(dataCacheKey, emptyArr),
       assoc(paramsCacheKey, emptyArr),
     ))
