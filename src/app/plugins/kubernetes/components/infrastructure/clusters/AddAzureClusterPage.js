@@ -18,10 +18,11 @@ import WizardStep from 'core/components/wizard/WizardStep'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import useParams from 'core/hooks/useParams'
 import useReactRouter from 'use-react-router'
-import { pick } from 'ramda'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import { pathJoin } from 'utils/misc'
 import { k8sPrefix } from 'app/constants'
+import ExternalLink from 'core/components/ExternalLink'
+import Code from 'core/components/CodeBlock'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
@@ -105,41 +106,12 @@ const networkOptions = [
 const AddAzureClusterPage = () => {
   const { params, getParamsUpdater } = useParams()
   const { history } = useReactRouter()
-  const onComplete = () => {
-    history.push('/ui/kubernetes/infrastructure#clusters')
-  }
-  const [create, loading] = useDataUpdater(clusterActions.create, onComplete)
-
-  const handleSubmit = params => async data => {
-    const body = {
-      // basic info
-      ...pick('nodePoolUuid name location zones sshKey'.split(' '), data),
-
-      // cluster configuration
-      ...pick('masterSku workerSku numMasters numWorkers allowWorkloadsOnMaster'.split(' '), data),
-
-      // network info
-      ...pick('assignPublicIps vnetResourceGroup vnetName masterSubnetName workerSubnetName externalDnsName serviceFqdn containersCidr servicesCidr networkPlugin'.split(' '), data),
-
-      // advanced configuration
-      ...pick('privileged appCatalogEnabled customAmi tags'.split(' '), data),
-    }
-    if (data.useAllAvailabilityZones) { body.zones = [] }
-    if (data.httpProxy) { body.httpProxy = data.httpProxy }
-    if (data.networkPlugin === 'calico') { body.mtuSize = data.mtuSize }
-
-    data.runtimeConfig = {
-      default: '',
-      all: 'api/all=true',
-      custom: data.customRuntimeConfig,
-    }[data.runtimeConfigOption]
-
-    await create(body)
-    return body
-  }
+  const onComplete = () => history.push('/ui/kubernetes/infrastructure#clusters')
+  const [createAzureClusterAction, creatingAzureCluster] = useDataUpdater(clusterActions.create, onComplete)
+  const handleSubmit = params => data => createAzureClusterAction({ ...data, ...params, clusterType: 'azure' })
 
   return (
-    <FormWrapper title="Add Azure Cluster" backUrl={listUrl} loading={loading}>
+    <FormWrapper title="Add Azure Cluster" backUrl={listUrl} loading={creatingAzureCluster}>
       <Wizard onComplete={handleSubmit(params)} context={initialContext}>
         {({ wizardContext, setWizardContext, onNext }) => {
           return (
@@ -159,7 +131,7 @@ const AddAzureClusterPage = () => {
                       {/* Cloud Provider */}
                       <PicklistField
                         DropdownComponent={CloudProviderPicklist}
-                        id="nodePoolUuid"
+                        id="cloudProviderId"
                         label="Cloud Provider"
                         onChange={getParamsUpdater('cloudProviderId')}
                         info="Nodes will be provisioned using this cloud provider."
@@ -363,7 +335,7 @@ const AddAzureClusterPage = () => {
                       <TextField
                         id="externalDnsName"
                         label="API FQDN"
-                        info="FQDN used to reference cluster API. To ensure the API can be accessed securely at the FQDN, the FQDN will be included in the API server certificate's Subject Alt Names. If deploying onto AWS, we will automatically create the DNS records for this FQDN into AWS Route 53."
+                        info="FQDN (Fully Qualified Domain Name) is used to reference cluster API. To ensure the API can be accessed securely at the FQDN, the FQDN will be included in the API server certificate's Subject Alt Names. If deploying onto a cloud provider, we will automatically create the DNS records for this FQDN using the cloud provider’s DNS service."
                         required
                       />
 
@@ -387,7 +359,7 @@ const AddAzureClusterPage = () => {
                       <TextField
                         id="httpProxy"
                         label="HTTP Proxy"
-                        info="Specify the HTTP proxy for this cluster.  Leave blank for none.  Uses format of <scheme>://<username>:<password>@<host>:<port> where <username>:<password>@ is optional."
+                        info={<div>(Optional) Specify the HTTP proxy for this cluster. Uses format of <Code><span>{`<scheme>://<username>:<password>@<host>:<port>`}</span></Code> where <Code><span>{`<username>:<password>@`}</span></Code> is optional.</div>}
                       />
                     </>
                   )}
@@ -403,7 +375,7 @@ const AddAzureClusterPage = () => {
                         id="privileged"
                         label="Privileged"
                         disabled={['calico', 'canal', 'weave'].includes(values.networkPlugin)}
-                        info="Allows this cluster to run privileged containers. Read this article for more information."
+                        info={<div>Allows this cluster to run privileged containers. Read <ExternalLink url="https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities">this article</ExternalLink> for more information.</div>}
                       />
 
                       {/* Advanced API Configuration */}

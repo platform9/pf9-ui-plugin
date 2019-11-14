@@ -15,6 +15,9 @@ let loaders = {}
 export const getContextLoader = key => {
   return loaders[key]
 }
+export const invalidateLoadersCache = () => {
+  Object.values(loaders).forEach(loader => loader.invalidateCache())
+}
 const arrayIfNil = when(isNil, always(emptyArr))
 const stringIfNil = when(isNil, always(''))
 const arrayIfEmpty = when(isEmpty, always(emptyArr))
@@ -134,7 +137,7 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
    * @returns {Promise<array>} Fetched or cached items
    */
   const contextLoaderFn = memoizePromise(
-    async ({ getContext, setContext, params = emptyObj, refetch = false, dumpCache = false, additionalOptions = emptyObj }) => {
+    async ({ getContext, setContext, params = emptyObj, refetch = contextLoaderFn._invalidatedCache, dumpCache = false, additionalOptions = emptyObj }) => {
       const loadFromContext = (key, params = emptyObj, refetchDeep = refetchCascade && refetch) => {
         const loaderFn = getContextLoader(key)
         return loaderFn({ getContext, setContext, params, refetch: refetchDeep, additionalOptions })

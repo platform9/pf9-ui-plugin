@@ -6,7 +6,7 @@ import { Button, Grid, Paper, TextField, Typography } from '@material-ui/core'
 import useParams from 'core/hooks/useParams'
 import Progress from 'core/components/progress/Progress'
 import Alert from 'core/components/Alert'
-import { loginUrl, forgotPasswordApiUrl } from 'app/constants'
+import { loginUrl, forgotPasswordApiUrl } from 'app/constants.js'
 
 const useStyles = makeStyles(theme => ({
   root: {

@@ -1,7 +1,8 @@
 import axios from 'axios'
-import { pluck, pipe, values, head } from 'ramda'
+import { pluck, pipe, values, head, path } from 'ramda'
 import { getHighestRole } from './helpers'
 import { pathJoin } from 'utils/misc'
+import { pathStr } from 'utils/fp'
 
 const authConstructors = {
   password: (username, password) => ({
@@ -16,7 +17,7 @@ const authConstructors = {
 }
 
 const constructAuthBody = (method, ...args) => {
-  const body = {
+  return {
     auth: {
       identity: {
         methods: [method],
@@ -24,8 +25,6 @@ const constructAuthBody = (method, ...args) => {
       },
     },
   }
-
-  return body
 }
 
 const groupByRegion = catalog => {
@@ -192,40 +191,32 @@ class Keystone {
     try {
       const response = await axios.post(this.tokensUrl, body)
       const scopedToken = response.headers['x-subject-token']
-      const _user = response.data.token.user
-      const roles = response.data.token.roles
-
+      const user = pathStr('data.token.user', response)
+      const roles = pathStr('data.token.roles', response)
       const roleNames = pluck('name', roles)
       const role = getHighestRole(roleNames)
-
-      const user = {
-        username: _user.name,
-        userId: _user.id,
-        tenantId: projectId,
-        role,
-      }
       this.client.activeProjectId = projectId
       this.client.scopedToken = scopedToken
       await this.getServiceCatalog()
-      return { scopedToken, user }
+
+      return { user, role, scopedToken }
     } catch (err) {
       // authentication failed
       console.error(err)
-      return null
+      return {}
     }
   }
 
   authenticate = async (username, password) => {
     const body = constructAuthBody('password', username, password)
-
     try {
       const response = await axios.post(this.tokensUrl, body)
       const unscopedToken = response.headers['x-subject-token']
       this.client.unscopedToken = unscopedToken
-      return unscopedToken
+      return { unscopedToken, username }
     } catch (err) {
       // authentication failed
-      return null
+      return {}
     }
   }
 
@@ -255,6 +246,21 @@ class Keystone {
       // authentication failed
       console.error(err)
       return null
+    }
+  }
+
+  resetCookie = async () => {
+    const services = await this.getServicesForActiveRegion()
+    const linksUrl = path(['regioninfo', 'public', 'url'], services)
+
+    // set cookie for accessing hostagent rpms
+    try {
+      const authHeaders = this.client.getAuthHeaders()
+      const { data: { links } } = await axios.get(linksUrl, authHeaders)
+      const token2cookieUrl = links.token2cookie
+      await axios.get(token2cookieUrl, authHeaders)
+    } catch (err) {
+      console.warn('Setting session cookie for accessing hostagent rpms failed')
     }
   }
 
@@ -290,7 +296,6 @@ class Keystone {
     if (!activeRegion || !servicesByRegion.hasOwnProperty(activeRegion)) {
       // Just assume the first region we come across if there isn't one set.
       return pipe(values, head)(servicesByRegion)
-      // return null
     }
     return servicesByRegion[activeRegion]
   }

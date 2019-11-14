@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Typography } from '@material-ui/core'
 import { compose, lensPath, set } from 'ramda'
-import { withAppContext } from 'core/AppProvider'
+import { withAppContext } from 'core/providers/AppProvider'
 
 class TypographyVariant extends React.PureComponent {
   lens = () => lensPath(this.props.path.split('.'))

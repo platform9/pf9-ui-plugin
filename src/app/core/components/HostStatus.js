@@ -43,7 +43,7 @@ const getTimeDriftSupportLink = host => isDebian(host)
 
 const HostStatus = ({ host = {} }) => {
   const classes = useStyles()
-  const { uiState, warnings, supportRole } = host
+  const { uiState = '', warnings, supportRole } = host
   const getStatusContents = objSwitchCase({
     'online': <><CheckIcon style={greenStyle} />Connected</>,
 

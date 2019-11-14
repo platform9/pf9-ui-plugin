@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { assocPath, flatten, pipe } from 'ramda'
+import { dataCacheKey, paramsCacheKey } from 'core/helpers/createContextLoader'
 
 export const AppContext = React.createContext({})
 
@@ -15,7 +16,6 @@ class AppProvider extends React.PureComponent {
         session: {
           unscopedToken,
           username,
-          loginSuccessful: true,
         },
       })
     },
@@ -28,7 +28,11 @@ class AppProvider extends React.PureComponent {
 
     destroySession: async () => {
       return this.state.setContext({
+        [dataCacheKey]: [],
+        [paramsCacheKey]: [],
         session: {},
+        currentTenant: null,
+        userDetails: null,
       })
     },
 
@@ -71,7 +75,9 @@ AppProvider.propTypes = {
 }
 
 AppProvider.defaultProps = {
-  initialContext: {},
+  initialContext: {
+    initialized: false,
+  },
 }
 
 export const withAppContext = Component => props =>

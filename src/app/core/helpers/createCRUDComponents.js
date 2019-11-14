@@ -41,6 +41,7 @@ const createCRUDComponents = options => {
     rowActions = [],
     uniqueIdentifier = 'id',
     addText = 'Add',
+    addButton,
     addUrl,
     AddDialog,
     EditDialog,
@@ -109,6 +110,7 @@ const createCRUDComponents = options => {
         items={data}
         reload={reload}
         addText={addText}
+        addButton={addButton}
         editUrl={editUrl}
         addUrl={addUrl}
         deleteFn={deleteFn}

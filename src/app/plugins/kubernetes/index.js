@@ -72,21 +72,25 @@ Kubernetes.registerPlugin = pluginManager => {
       {
         name: 'Create Cluster',
         link: { path: '/infrastructure/clusters/add', exact: true },
+        requiredRoles: 'admin',
         component: AddClusterPage,
       },
       {
         name: 'Create AWS Cluster',
         link: { path: '/infrastructure/clusters/addAws', exact: true },
+        requiredRoles: 'admin',
         component: AddAwsClusterPage,
       },
       {
         name: 'Create Azure Cluster',
         link: { path: '/infrastructure/clusters/addAzure', exact: true },
+        requiredRoles: 'admin',
         component: AddAzureClusterPage,
       },
       {
         name: 'Create Bare OS Cluster',
         link: { path: '/infrastructure/clusters/addBareOs', exact: true },
+        requiredRoles: 'admin',
         component: AddBareOsClusterPage,
       },
       {
@@ -97,11 +101,13 @@ Kubernetes.registerPlugin = pluginManager => {
       {
         name: 'Create Cloud Provider',
         link: { path: '/infrastructure/cloudProviders/add', exact: true },
+        requiredRoles: 'admin',
         component: AddCloudProviderPage,
       },
       {
         name: 'Update Cloud Provider',
         link: { path: '/infrastructure/cloudProviders/edit/:id', exact: true },
+        requiredRoles: 'admin',
         component: UpdateCloudProviderPage,
       },
       {
@@ -186,26 +192,31 @@ Kubernetes.registerPlugin = pluginManager => {
       },
       {
         name: 'Tenants & Users',
+        requiredRoles: 'admin',
         link: { path: '/user_management', exact: true },
         component: UserManagementIndexPage,
       },
       {
         name: 'Add Tenant',
+        requiredRoles: 'admin',
         link: { path: '/user_management/tenants/add', exact: true },
         component: AddTenantPage,
       },
       {
         name: 'Edit Tenant',
+        requiredRoles: 'admin',
         link: { path: '/user_management/tenants/edit/:id', exact: true },
         component: EditTenantPage,
       },
       {
         name: 'Add User',
+        requiredRoles: 'admin',
         link: { path: '/user_management/users/add', exact: true },
         component: AddUserPage,
       },
       {
         name: 'Edit User',
+        requiredRoles: 'admin',
         link: { path: '/user_management/users/edit/:id', exact: true },
         component: EditUserPage,
       },
@@ -241,21 +252,25 @@ Kubernetes.registerPlugin = pluginManager => {
       },
       {
         name: 'RBAC',
+        requiredRoles: 'admin',
         link: { path: '/rbac', exact: true },
         component: RbacIndexPage,
       },
       {
         name: 'Add Role',
+        requiredRoles: 'admin',
         link: { path: '/rbac/roles/add', exact: true },
         component: AddRolePage,
       },
       {
         name: 'Add Cluster Role',
+        requiredRoles: 'admin',
         link: { path: '/rbac/clusterroles/add', exact: true },
         component: AddClusterRolePage,
       },
       {
         name: 'Add Role Binding',
+        requiredRoles: 'admin',
         link: { path: '/rbac/rolebindings/add', exact: true },
         component: AddRoleBindingPage,
       },
@@ -263,7 +278,7 @@ Kubernetes.registerPlugin = pluginManager => {
         name: 'Add Cluster Role Binding',
         link: { path: '/rbac/clusterrolebindings/add', exact: true },
         component: AddClusterRoleBindingPage,
-      }
+      },
     ],
   )
 
@@ -288,9 +303,20 @@ Kubernetes.registerPlugin = pluginManager => {
       ...clarityLink('/infrastructureK8s'),
       icon: 'building',
       nestedLinks: [
-        { name: 'Clusters', ...clarityLink('/infrastructureK8s#clusters') },
-        { name: 'Nodes', ...clarityLink('/infrastructureK8s#nodes') },
-        { name: 'Cloud Providers', ...clarityLink('/infrastructureK8s#cps') },
+        {
+          name: 'Clusters',
+          ...clarityLink('/infrastructureK8s#clusters'),
+        },
+        {
+          name: 'Nodes',
+          requiredRoles: 'admin',
+          ...clarityLink('/infrastructureK8s#nodes'),
+        },
+        {
+          name: 'Cloud Providers',
+          requiredRoles: 'admin',
+          ...clarityLink('/infrastructureK8s#cps'),
+        },
       ],
     },
     {
@@ -321,6 +347,7 @@ Kubernetes.registerPlugin = pluginManager => {
       name: 'Tenants & Users',
       icon: 'user',
       ...clarityLink('/kubernetes/users'),
+      requiredRoles: 'admin',
       nestedLinks: [
         { name: 'Tenants', ...clarityLink('/kubernetes/users#tenants') },
         { name: 'Users', ...clarityLink('/kubernetes/users#users') },
@@ -343,8 +370,12 @@ Kubernetes.registerPlugin = pluginManager => {
       icon: 'building',
       nestedLinks: [
         { name: 'Clusters', link: { path: '/infrastructure#clusters' } },
-        { name: 'Nodes', link: { path: '/infrastructure#nodes' } },
-        { name: 'Cloud Providers', link: { path: '/infrastructure#cloudProviders' } },
+        { name: 'Nodes', requiredRoles: 'admin', link: { path: '/infrastructure#nodes' } },
+        {
+          name: 'Cloud Providers',
+          requiredRoles: 'admin',
+          link: { path: '/infrastructure#cloudProviders' },
+        },
       ],
     },
     {
@@ -371,12 +402,18 @@ Kubernetes.registerPlugin = pluginManager => {
     { name: 'Namespaces', icon: 'object-group', link: { path: '/namespaces' } },
     { name: 'Monitoring (beta)', icon: 'chart-area', link: { path: '/prometheus' } },
     { name: 'Logging (beta)', icon: 'clipboard-list', link: { path: '/logging' } },
-    { name: 'RBAC', icon: 'user-shield', link: { path: '/rbac' } },
+    {
+      name: 'RBAC',
+      icon: 'user-shield',
+      requiredRoles: 'admin',
+      link: { path: '/rbac' },
+    },
     { name: 'API Access', icon: 'key', link: { path: '/api_access' } },
     {
       name: 'Tenants & Users',
       link: { path: '/user_management' },
       icon: 'user',
+      requiredRoles: 'admin',
       nestedLinks: [
         { name: 'Tenants', link: { path: '/user_management#tenants' } },
         { name: 'Users', link: { path: '/user_management#users' } },

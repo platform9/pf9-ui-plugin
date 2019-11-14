@@ -1,6 +1,6 @@
 import React from 'react'
 import 'app/app.css'
-import AppContext from 'core/AppProvider'
+import AppContext from 'core/providers/AppProvider'
 import HotKeysProvider from 'core/providers/HotKeysProvider'
 import ThemeManager from 'app/ThemeManager'
 import { ToastProvider } from 'core/providers/ToastProvider'

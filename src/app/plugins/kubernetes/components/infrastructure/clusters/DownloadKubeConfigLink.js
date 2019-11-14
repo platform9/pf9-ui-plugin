@@ -1,7 +1,7 @@
 import React from 'react'
 import { compose } from 'ramda'
 import ApiClient from 'api-client/ApiClient'
-import { withAppContext } from 'core/AppProvider'
+import { withAppContext } from 'core/providers/AppProvider'
 import SimpleLink from 'core/components/SimpleLink'
 
 class DownloadKubeConfigLink extends React.PureComponent {

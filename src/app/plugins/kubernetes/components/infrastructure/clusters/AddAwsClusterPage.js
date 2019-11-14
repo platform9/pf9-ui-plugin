@@ -260,11 +260,11 @@ const AddAwsClusterPage = () => {
   const { params, getParamsUpdater } = useParams()
   const { history } = useReactRouter()
   const onComplete = () => history.push('/ui/kubernetes/infrastructure#clusters')
-  const [createAwsClusterAction] = useDataUpdater(clusterActions.create, onComplete)
+  const [createAwsClusterAction, creatingAwsCluster] = useDataUpdater(clusterActions.create, onComplete)
   const handleSubmit = params => data => createAwsClusterAction({ ...data, ...params, clusterType: 'aws' })
 
   return (
-    <FormWrapper title="Add AWS Cluster" backUrl={listUrl}>
+    <FormWrapper title="Add AWS Cluster" backUrl={listUrl} loading={creatingAwsCluster}>
       <Wizard onComplete={handleSubmit(params)} context={initialContext}>
         {({ wizardContext, setWizardContext, onNext }) => {
           return (
@@ -452,7 +452,7 @@ const AddAwsClusterPage = () => {
                       <TextField
                         id="externalDnsName"
                         label="API FQDN"
-                        info="FQDN used to reference cluster API. To ensure the API can be accessed securely at the FQDN, the FQDN will be included in the API server certificate's Subject Alt Names. If deploying onto AWS, we will automatically create the DNS records for this FQDN into AWS Route 53."
+                        info="FQDN (Fully Qualified Domain Name) is used to reference cluster API. To ensure the API can be accessed securely at the FQDN, the FQDN will be included in the API server certificate's Subject Alt Names. If deploying onto a cloud provider, we will automatically create the DNS records for this FQDN using the cloud provider’s DNS service."
                         required
                       />
                       }

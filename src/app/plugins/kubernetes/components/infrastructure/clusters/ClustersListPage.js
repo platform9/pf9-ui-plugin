@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import DownloadKubeConfigLink from './DownloadKubeConfigLink'
 import KubeCLI from './KubeCLI'
 import ExternalLink from 'core/components/ExternalLink'
@@ -18,6 +18,9 @@ import ProgressBar from 'core/components/progress/ProgressBar'
 import ClusterStatusSpan from 'k8s/components/infrastructure/clusters/ClusterStatusSpan'
 import ResourceUsageTable from 'k8s/components/infrastructure/common/ResourceUsageTable'
 import DashboardLink from './DashboardLink'
+import CreateButton from 'core/components/buttons/CreateButton'
+import { AppContext } from 'core/providers/AppProvider'
+import { both, prop } from 'ramda'
 
 const getClusterPopoverContent = (healthyMasterNodes, masterNodes) =>
   `${healthyMasterNodes.length} of ${masterNodes.length} master nodes healthy (3 required)`
@@ -31,6 +34,11 @@ const getPendingClusterPopoversContent = (cpType, taskStatus) => objSwitchCase({
 
 const renderStatus = (status,
   { highlyAvailable, healthyMasterNodes, masterNodes, cloudProviderType, progressPercent, taskStatus }) => {
+  if (!status || !taskStatus) {
+    // TODO probably a better way to handle this.
+    // But if we get undefined status The UI currently crashes
+    return null
+  }
   switch (taskStatus) {
     case 'success':
       const clusterStatus = <ClusterStatusSpan
@@ -61,6 +69,22 @@ const renderStatus = (status,
         Unhealthy
       </ClusterStatusSpan>
 
+    case 'deleting':
+      return <ClusterStatusSpan
+        title="The cluster is spinning down."
+        status="pause"
+      >
+        Deleting
+      </ClusterStatusSpan>
+
+    case 'creating':
+      return <ClusterStatusSpan
+        title="The cluster is spinning up."
+        status="pause"
+      >
+        Creating
+      </ClusterStatusSpan>
+
     default:
       if (progressPercent) {
         return <div>
@@ -89,12 +113,14 @@ const renderLinks = links => {
   )
 }
 
+const toMHz = value => value * 1024
+
 const renderStats = (_, { usage }) => {
   const hasValidStats = usage && usage.compute && usage.compute.current
   if (!hasValidStats) { return null }
   return (
     <div>
-      <ResourceUsageTable valueConverter={value => value * 1024} units="MHz" label="CPU" stats={usage.compute} />
+      <ResourceUsageTable valueConverter={toMHz} units="MHz" label="CPU" stats={usage.compute} />
       <ResourceUsageTable units="GiB" label="Memory" stats={usage.memory} />
       <ResourceUsageTable units="GiB" label="Storage" stats={usage.disk} />
       {usage.grafanaLink &&
@@ -110,14 +136,26 @@ const canAttachNode = ([row]) => row.cloudProviderType === 'local'
 const canDetachNode = ([row]) => row.cloudProviderType === 'local'
 const canScaleCluster = ([row]) => row.cloudProviderType === 'aws'
 const canUpgradeCluster = (selected) => false
+const canDeleteCluster = ([row]) => !(['creating', 'deleting'].includes(row.taskStatus))
 
 const upgradeCluster = (selected) => {
   console.log('TODO: upgradeCluster')
 }
 
+const isAdmin = (selected, getContext) => {
+  const { role } = getContext(prop('userDetails'))
+  return role === 'admin'
+}
+
 export const options = {
   addUrl: '/ui/kubernetes/infrastructure/clusters/add',
-  addText: 'Add Cluster',
+  addButton: ({ onClick }) => {
+    const { userDetails: { role } } = useContext(AppContext)
+    if (role !== 'admin') {
+      return null
+    }
+    return <CreateButton onClick={onClick}>Add Cluster</CreateButton>
+  },
   columns: [
     { id: 'name', label: 'Cluster name', render: renderClusterDetailLink },
     { id: 'status', label: 'Status', render: renderStatus },
@@ -147,31 +185,32 @@ export const options = {
   title: 'Clusters',
   uniqueIdentifier: 'uuid',
   multiSelection: false,
+  deleteCond: both(isAdmin, canDeleteCluster),
   batchActions: [
     {
-      cond: canAttachNode,
+      cond: both(isAdmin, canAttachNode),
       icon: <AttachIcon />,
       label: 'Attach node',
       dialog: ClusterAttachNodeDialog,
     },
     {
-      cond: canDetachNode,
+      cond: both(isAdmin, canDetachNode),
       icon: <DetachIcon />,
       label: 'Detach node',
       dialog: ClusterDetachNodeDialog,
     },
     {
-      cond: canScaleCluster,
+      cond: both(isAdmin, canScaleCluster),
       icon: <ScaleIcon />,
       label: 'Scale cluster',
       dialog: ClusterScaleDialog,
     },
     {
-      cond: canUpgradeCluster,
+      cond: both(isAdmin, canUpgradeCluster),
       icon: <UpgradeIcon />,
       label: 'Upgrade cluster',
       action: upgradeCluster,
-      disabledInfo: 'Feature not yet implemented'
+      disabledInfo: 'Feature not yet implemented',
     },
   ],
 }

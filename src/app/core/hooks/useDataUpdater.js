@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo, useContext, useEffect, useRef } from 'react'
 import { ToastContext } from 'core/providers/ToastProvider'
-import { AppContext } from 'core/AppProvider'
+import { AppContext } from 'core/providers/AppProvider'
 import { emptyObj } from 'utils/fp'
 import { isEmpty } from 'ramda'
 

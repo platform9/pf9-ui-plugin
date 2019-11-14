@@ -6,7 +6,7 @@ import { withInfoTooltip } from 'core/components/InfoTooltip'
 import { loadCombinedHosts } from 'k8s/components/infrastructure/common/actions'
 import withDataLoader from 'core/hocs/withDataLoader'
 import withDataMapper from 'core/hocs/withDataMapper'
-import { withAppContext } from 'core/AppProvider'
+import { withAppContext } from 'core/providers/AppProvider'
 
 class NodesChooser extends React.PureComponent {
   state = {
