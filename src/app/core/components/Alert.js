@@ -21,78 +21,59 @@ const variantIcon = {
 const useStyles = makeStyles(theme => ({
   root: {
     maxWidth: 800,
-    position: 'relative',
-    padding: theme.spacing(1, 8),
+    position: ({ small }) => small ? 'initial' : 'relative',
+    padding: ({ small }) => small ? theme.spacing(1, 1) : theme.spacing(1, 8),
     margin: theme.spacing(2, 0),
-    width: '100%',
     border: 0,
-  },
-  rootSmall: {
-    maxWidth: 800,
-    padding: theme.spacing(1, 1),
-    margin: theme.spacing(2, 0),
-    width: '100%',
-    border: 0,
-    display: 'flex',
+    display: ({ small }) => small ? 'flex' : 'block'
   },
   success: { color: green[600] },
   error: { color: theme.palette.error.dark },
   info: { color: theme.palette.primary.dark },
   warning: { color: amber[700] },
   icon: {
-    position: 'absolute',
-    left: theme.spacing(2),
-    top: theme.spacing(1),
+    position: ({ small }) => small ? 'initial' : 'absolute',
+    left: ({ small }) => small ? 'initial' : theme.spacing(2),
+    top: ({ small }) => small ? 'initial' : theme.spacing(1),
     fontSize: 28,
-  },
-  iconSmall: {
-    fontSize: 28,
-    flexGrow: 0,
-    alignSelf: 'center',
+    flexGrow: ({ small }) => small ? 0 : 'initial',
+    alignSelf: ({ small }) => small ? 'center' : 'initial',
   },
   close: {
-    position: 'absolute',
-    right: theme.spacing(2),
-    top: theme.spacing(1),
+    position: ({ small }) => small ? 'initial' : 'absolute',
+    right: ({ small }) => small ? 'initial' : theme.spacing(2),
+    top: ({ small }) => small ? 'initial' : theme.spacing(1),
     padding: theme.spacing(1),
     margin: theme.spacing(-1),
-  },
-  closeSmall: {
-    flexGrow: 0,
-    padding: theme.spacing(1),
-    margin: theme.spacing(-1),
-    alignSelf: 'center',
+    flexGrow: ({ small }) => small ? 0 : 'initial',
+    alignSelf: ({ small }) => small ? 'center' : 'initial',
   },
   iconVariant: {
     opacity: 0.9,
     marginRight: theme.spacing(1),
   },
   message: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-  messageSmall: {
-    alignSelf: 'center',
-    flexGrow: 1
+    alignSelf: ({ small }) => small ? 'center' : 'initial',
+    flexGrow: ({ small }) => small ? 1 : 'initial',
   },
 }))
 
 const Alert = ({ children, message, variant, small }) => {
-  const classes = useStyles()
+  const classes = useStyles({ small })
   const [open, setOpen] = useState(true)
   if (!open) { return null }
   const Icon = variantIcon[variant]
 
   return (
-    <Paper className={small ? classes.rootSmall : classes.root}>
-      <Icon className={clsx(small ? classes.iconSmall : classes.icon, classes.iconVariant, classes[variant])} />
-      {message && <Typography variant="body1" color="inherit" className={small ? classes.messageSmall : ''}>{message}</Typography>}
+    <Paper className={classes.root}>
+      <Icon className={clsx(classes.icon, classes.iconVariant, classes[variant])} />
+      {message && <Typography variant="body1" color="inherit" className={classes.message}>{message}</Typography>}
       {children}
       <IconButton
         key='close'
         aria-label='Close'
         color='inherit'
-        className={small ? classes.closeSmall : classes.close}
+        className={classes.close}
         onClick={() => setOpen(false)}
       >
         <CloseIcon />
