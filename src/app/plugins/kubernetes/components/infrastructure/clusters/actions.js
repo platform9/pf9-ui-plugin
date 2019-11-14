@@ -70,7 +70,6 @@ const createAwsCluster = async (data, loadFromContext) => {
 }
 
 const createAzureCluster = async (data, loadFromContext) => {
-
   const body = {
     // basic info
     ...pick('name location zones sshKey'.split(' '), data),
