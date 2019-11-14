@@ -31,6 +31,11 @@ const getPendingClusterPopoversContent = (cpType, taskStatus) => objSwitchCase({
 
 const renderStatus = (status,
   { highlyAvailable, healthyMasterNodes, masterNodes, cloudProviderType, progressPercent, taskStatus }) => {
+  if (!status || !taskStatus) {
+    // TODO probably a better way to handle this.
+    // But if we get undefined status The UI currently crashes
+    return null
+  }
   switch (taskStatus) {
     case 'success':
       const clusterStatus = <ClusterStatusSpan
@@ -59,6 +64,22 @@ const renderStatus = (status,
         status="fail"
       >
         Unhealthy
+      </ClusterStatusSpan>
+
+    case 'deleting':
+      return <ClusterStatusSpan
+        title="The cluster is spinning down."
+        status="pause"
+      >
+        Deleting
+      </ClusterStatusSpan>
+
+    case 'creating':
+      return <ClusterStatusSpan
+        title="The cluster is spinning up."
+        status="pause"
+      >
+        Creating
       </ClusterStatusSpan>
 
     default:
@@ -110,6 +131,7 @@ const canAttachNode = ([row]) => row.cloudProviderType === 'local'
 const canDetachNode = ([row]) => row.cloudProviderType === 'local'
 const canScaleCluster = ([row]) => row.cloudProviderType === 'aws'
 const canUpgradeCluster = (selected) => false
+const canDeleteCluster = ([row]) => !(['creating', 'deleting'].includes(row.taskStatus))
 
 const upgradeCluster = (selected) => {
   console.log('TODO: upgradeCluster')
@@ -147,6 +169,7 @@ export const options = {
   title: 'Clusters',
   uniqueIdentifier: 'uuid',
   multiSelection: false,
+  deleteCond: canDeleteCluster,
   batchActions: [
     {
       cond: canAttachNode,

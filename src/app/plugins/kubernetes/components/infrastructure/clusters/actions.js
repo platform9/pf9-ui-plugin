@@ -77,9 +77,43 @@ const createAwsCluster = async (data, loadFromContext) => {
   return response
 }
 
+const createAzureCluster = async (data, loadFromContext) => {
+  const { cloudProviderId } = data
+  const body = {
+    // basic info
+    ...pick('name location zones sshKey'.split(' '), data),
+
+    // cluster configuration
+    ...pick('masterSku workerSku numMasters numWorkers allowWorkloadsOnMaster'.split(' '), data),
+
+    // network info
+    ...pick('assignPublicIps vnetResourceGroup vnetName masterSubnetName workerSubnetName externalDnsName serviceFqdn containersCidr servicesCidr networkPlugin'.split(' '), data),
+
+    // advanced configuration
+    ...pick('privileged appCatalogEnabled tags'.split(' '), data),
+  }
+  // Get the nodePoolUuid from the cloudProviderId.  There is a 1-to-1 mapping between cloudProviderId and nodePoolUuuid right now.
+  const cloudProviders = await loadFromContext('cloudProviders')
+  body.nodePoolUuid = cloudProviders.find(propEq('uuid', cloudProviderId)).nodePoolUuid
+
+  if (data.useAllAvailabilityZones) { body.zones = [] }
+  if (data.httpProxy) { body.httpProxy = data.httpProxy }
+  if (data.networkPlugin === 'calico') { body.mtuSize = data.mtuSize }
+
+  data.runtimeConfig = {
+    default: '',
+    all: 'api/all=true',
+    custom: data.customRuntimeConfig,
+  }[data.runtimeConfigOption]
+
+  const response = await qbert.createCluster(body)
+  return response
+}
+
 export const clusterActions = createCRUDActions(clustersCacheKey, {
   createFn: (params, _, loadFromContext) => {
     if (params.clusterType === 'aws') { return createAwsCluster(params, loadFromContext) }
+    if (params.clusterType === 'azure') { return createAzureCluster(params, loadFromContext) }
   },
 
   listFn: async (params, loadFromContext) => {

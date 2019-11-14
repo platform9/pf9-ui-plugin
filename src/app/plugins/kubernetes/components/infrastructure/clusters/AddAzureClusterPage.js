@@ -105,41 +105,12 @@ const networkOptions = [
 const AddAzureClusterPage = () => {
   const { params, getParamsUpdater } = useParams()
   const { history } = useReactRouter()
-  const onComplete = () => {
-    history.push('/ui/kubernetes/infrastructure#clusters')
-  }
-  const [create, loading] = useDataUpdater(clusterActions.create, onComplete)
-
-  const handleSubmit = params => async data => {
-    const body = {
-      // basic info
-      ...pick('nodePoolUuid name location zones sshKey'.split(' '), data),
-
-      // cluster configuration
-      ...pick('masterSku workerSku numMasters numWorkers allowWorkloadsOnMaster'.split(' '), data),
-
-      // network info
-      ...pick('assignPublicIps vnetResourceGroup vnetName masterSubnetName workerSubnetName externalDnsName serviceFqdn containersCidr servicesCidr networkPlugin'.split(' '), data),
-
-      // advanced configuration
-      ...pick('privileged appCatalogEnabled customAmi tags'.split(' '), data),
-    }
-    if (data.useAllAvailabilityZones) { body.zones = [] }
-    if (data.httpProxy) { body.httpProxy = data.httpProxy }
-    if (data.networkPlugin === 'calico') { body.mtuSize = data.mtuSize }
-
-    data.runtimeConfig = {
-      default: '',
-      all: 'api/all=true',
-      custom: data.customRuntimeConfig,
-    }[data.runtimeConfigOption]
-
-    await create(body)
-    return body
-  }
+  const onComplete = () => history.push('/ui/kubernetes/infrastructure#clusters')
+  const [createAzureClusterAction, creatingAzureCluster] = useDataUpdater(clusterActions.create, onComplete)
+  const handleSubmit = params => data => createAzureClusterAction({ ...data, ...params, clusterType: 'azure' })
 
   return (
-    <FormWrapper title="Add Azure Cluster" backUrl={listUrl} loading={loading}>
+    <FormWrapper title="Add Azure Cluster" backUrl={listUrl} loading={creatingAzureCluster}>
       <Wizard onComplete={handleSubmit(params)} context={initialContext}>
         {({ wizardContext, setWizardContext, onNext }) => {
           return (
@@ -159,7 +130,7 @@ const AddAzureClusterPage = () => {
                       {/* Cloud Provider */}
                       <PicklistField
                         DropdownComponent={CloudProviderPicklist}
-                        id="nodePoolUuid"
+                        id="cloudProviderId"
                         label="Cloud Provider"
                         onChange={getParamsUpdater('cloudProviderId')}
                         info="Nodes will be provisioned using this cloud provider."
