@@ -2,7 +2,7 @@ import React from 'react'
 import ApiClient from 'api-client/ApiClient'
 import PropTypes from 'prop-types'
 import { compose } from 'app/utils/fp'
-import { withAppContext } from 'core/AppProvider'
+import { withAppContext } from 'core/providers/AppProvider'
 import CRUDListContainer from 'core/components/CRUDListContainer'
 import createListTableComponent from 'core/helpers/createListTableComponent'
 

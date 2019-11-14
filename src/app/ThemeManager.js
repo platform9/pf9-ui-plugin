@@ -1,8 +1,10 @@
 import React, { useContext, useEffect } from 'react'
 import { createMuiTheme } from '@material-ui/core/styles'
 import { ThemeProvider } from '@material-ui/styles'
-import { AppContext } from 'core/AppProvider'
+import { AppContext } from 'core/providers/AppProvider'
 import defaultThemeJson from 'core/themes/defaultTheme'
+
+const loadingStyles = { width: '100%', fontSize: '20px', textAlign: 'center', marginTop: '4rem' }
 
 // TODO: use PreferencesProvider to pick the user specific theme
 const ThemeManager = ({ children, themeName = 'default' }) => {
@@ -33,10 +35,9 @@ const ThemeManager = ({ children, themeName = 'default' }) => {
   }, [themeName])
 
   const { theme } = context
-
   // Rendering the app before the theme is loaded will have issues because `withStyles`
   // requires the `theme` object to exist.
-  if (!theme) { return <div>Loading theme...</div> }
+  if (!theme) { return <h2 style={loadingStyles}>Loading theme...</h2> }
 
   return (
     <ThemeProvider theme={theme}>{children}</ThemeProvider>

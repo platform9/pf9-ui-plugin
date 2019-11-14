@@ -1,7 +1,7 @@
 import React from 'react'
 import ApiClient from 'api-client/ApiClient'
 import { compose, keyValueArrToObj } from 'app/utils/fp'
-import { withAppContext } from 'core/AppProvider'
+import { withAppContext } from 'core/providers/AppProvider'
 import FormWrapper from 'core/components/FormWrapper'
 import { withRouter } from 'react-router-dom'
 import requiresAuthentication from '../../util/requiresAuthentication'
