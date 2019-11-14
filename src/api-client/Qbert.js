@@ -7,6 +7,14 @@ const normalizeClusterizedResponse = (clusterId, response) => propOr([], 'items'
   x => ({ ...x, clusterId }))
 const normalizeClusterizedUpdate = (clusterId, response) => ({ ...response, clusterId })
 
+const normalizeCluster = baseUrl => cluster => ({
+  ...cluster,
+  endpoint: cluster.externalDnsName || cluster.masterIp,
+  kubeconfigUrl: `${baseUrl}/kubeconfig/${cluster.uuid}`,
+  isUpgrading: cluster.taskStatus === 'upgrading',
+  nodes: [],
+})
+
 /* eslint-disable camelcase */
 class Qbert {
   constructor (client) {
@@ -110,20 +118,18 @@ class Qbert {
   getClusters = async () => {
     const rawClusters = await this.client.basicGet(`${await this.baseUrl()}/clusters`)
     const baseUrl = await this.baseUrl()
-    return rawClusters.map(cluster => ({
-      ...cluster,
-      endpoint: cluster.externalDnsName || cluster.masterIp,
-      kubeconfigUrl: `${baseUrl}/kubeconfig/${cluster.uuid}`,
-      isUpgrading: cluster.taskStatus === 'upgrading',
-      nodes: [],
-    }))
+    return rawClusters.map(normalizeCluster(baseUrl))
   }
 
   getClusterDetails = async (clusterId) => {
-    return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}`)
+    const cluster = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}`)
+    const baseUrl = await this.baseUrl()
+    return normalizeCluster(baseUrl)(cluster)
   }
 
   createCluster = async (params) => {
+    // Note: This API response only returns new `uuid` in the response.
+    // You might want to do a GET afterwards if you need any of the cluster information.
     return this.client.basicPost(`${await this.baseUrl()}/clusters`, params)
   }
 

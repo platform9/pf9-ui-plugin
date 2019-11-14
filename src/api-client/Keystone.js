@@ -221,9 +221,10 @@ class Keystone {
 
     // set cookie for accessing hostagent rpms
     try {
-      const { data: { links = {} } } = await axios.get(linksUrl)
+      const authHeaders = this.client.getAuthHeaders()
+      const { data: { links } } = await axios.get(linksUrl, authHeaders)
       const token2cookieUrl = links.token2cookie
-      await axios.get(token2cookieUrl)
+      await axios.get(token2cookieUrl, authHeaders)
     } catch (err) {
       console.warn('Setting session cookie for accessing hostagent rpms failed')
     }

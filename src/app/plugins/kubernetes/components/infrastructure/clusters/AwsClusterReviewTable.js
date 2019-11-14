@@ -12,6 +12,7 @@ const bool2str = value => value ? 'true' : 'false'
 
 // TODO: azs, networking info, services/api FQDN auto-generate, MTU size
 const AwsClusterReviewTable = ({ data }) => {
+  const numWorkers = data.enableCAS ? `${data.numWorkers} - ${data.numMaxWorkers}` : data.numWorkers
   return (
     <React.Fragment>
       <Table>
@@ -20,11 +21,11 @@ const AwsClusterReviewTable = ({ data }) => {
           <DataRow label="Region" value={data.region} />
           <DataRow label="Operating system" value={data.ami} />
           <DataRow label="Master node instance type" value={data.masterFlavor} />
-          <DataRow label="Num master nodes" value={data.numMasters} />
           <DataRow label="Worker node instance type" value={data.workerFlavor} />
-          <DataRow label="Num worker nodes" value={data.numWorkers} />
-          <DataRow label="SSH key" value={data.sshKey} />
           <DataRow label="Enable auto scaling" value={bool2str(data.enableCAS)} />
+          <DataRow label="Num master nodes" value={data.numMasters} />
+          <DataRow label="Num worker nodes" value={numWorkers} />
+          <DataRow label="SSH key" value={data.sshKey} />
           <DataRow label="Allow workloads on master nodes" value={bool2str(data.allowWorkloadsOnMaster)} />
           <DataRow label="Containers CIDR" value={data.containersCidr} />
           <DataRow label="Services CIDR" value={data.servicesCidr} />
