@@ -22,6 +22,7 @@ import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import { pathJoin } from 'utils/misc'
 import { k8sPrefix } from 'app/constants'
 import ExternalLink from 'core/components/ExternalLink'
+import Code from 'core/components/CodeBlock'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
@@ -358,7 +359,7 @@ const AddAzureClusterPage = () => {
                       <TextField
                         id="httpProxy"
                         label="HTTP Proxy"
-                        info="Specify the HTTP proxy for this cluster.  Leave blank for none.  Uses format of <scheme>://<username>:<password>@<host>:<port> where <username>:<password>@ is optional."
+                        info={<div>(Optional) Specify the HTTP proxy for this cluster. Uses format of <Code><span>{`<scheme>://<username>:<password>@<host>:<port>`}</span></Code> where <Code><span>{`<username>:<password>@`}</span></Code> is optional.</div>}
                       />
                     </>
                   )}
