@@ -1,28 +1,23 @@
-import React, { useEffect, useState } from 'react'
-import useReactRouter from 'use-react-router'
+import React, { useEffect, useState, useContext } from 'react'
 import axios from 'axios'
 import { makeStyles } from '@material-ui/styles'
 import clsx from 'clsx'
 import Intercom from 'core/components/integrations/Intercom'
 import Navbar, { drawerWidth } from 'core/components/Navbar'
 import Toolbar from 'core/components/Toolbar'
-import track from 'utils/tracking'
 import useToggler from 'core/hooks/useToggler'
-import { emptyObj } from 'utils/fp'
+import { emptyObj, isNilOrEmpty, ensureArray } from 'utils/fp'
 import { Switch, Redirect, Route } from 'react-router'
 import moize from 'moize'
 import { toPairs, apply } from 'ramda'
 import { pathJoin } from 'utils/misc'
-import ResetPasswordPage from 'openstack/components/ResetPasswordPage'
-import ForgotPasswordPage from 'openstack/components/ForgotPasswordPage'
-import LogoutPage from 'openstack/components/LogoutPage'
 import DeveloperToolsEmbed from 'developer/components/DeveloperToolsEmbed'
 import pluginManager from 'core/utils/pluginManager'
+import { logoutUrl, dashboardUrl } from 'app/constants'
+import LogoutPage from 'core/public/LogoutPage'
+import { AppContext } from 'core/providers/AppProvider'
 
 const useStyles = makeStyles(theme => ({
-  root: {
-    flexGrow: 1,
-  },
   appFrame: {
     zIndex: 1,
     overflow: 'hidden',
@@ -61,29 +56,20 @@ const useStyles = makeStyles(theme => ({
   },
 }))
 
-const renderPluginRoutes = (id, plugin) => {
+const renderPluginRoutes = role => (id, plugin) => {
   const defaultRoute = plugin.getDefaultRoute()
   const genericRoutes = [
-    // TODO implement generic login page?
-    { link: { path: pathJoin(plugin.basePath, 'login') }, component: null },
-    {
-      link: { path: pathJoin(plugin.basePath, 'reset_password') },
-      exact: true,
-      component: ResetPasswordPage,
-    },
-    {
-      link: { path: pathJoin(plugin.basePath, 'forgot_password') },
-      exact: true,
-      component: ForgotPasswordPage,
-    },
-    { link: { path: pathJoin(plugin.basePath, 'logout') }, exact: true, component: LogoutPage },
     {
       link: { path: pathJoin(plugin.basePath, '') },
       // TODO: Implement 404 page
       render: () => <Redirect to={defaultRoute || '/ui/404'} />,
     },
   ]
-  return [...plugin.getRoutes(), ...genericRoutes].map(route => {
+  const filteredRoutes = plugin.getRoutes()
+    .filter(({ requiredRoles }) =>
+      isNilOrEmpty(requiredRoles) || ensureArray(requiredRoles).includes(role))
+
+  return [...filteredRoutes, ...genericRoutes].map(route => {
     const { component: Component, render, link } = route
     return <Route
       key={link.path}
@@ -94,15 +80,18 @@ const renderPluginRoutes = (id, plugin) => {
   })
 }
 
-const getSections = moize(plugins =>
-  toPairs(plugins).map(([id, plugin]) => ({
-    id,
-    name: plugin.name,
-    links: plugin.getNavItems(),
-  })))
+const getSections = moize((plugins, role) =>
+  toPairs(plugins)
+    .map(([id, plugin]) => ({
+      id,
+      name: plugin.name,
+      links: plugin.getNavItems()
+        .filter(({ requiredRoles }) =>
+          isNilOrEmpty(requiredRoles) || ensureArray(requiredRoles).includes(role)),
+    })))
 
-const renderPlugins = moize(plugins =>
-  toPairs(plugins).map(apply(renderPluginRoutes)).flat(),
+const renderPlugins = moize((plugins, role) =>
+  toPairs(plugins).map(apply(renderPluginRoutes(role))).flat(),
 )
 
 const loadFeatures = async setFeatures => {
@@ -129,32 +118,23 @@ const loadFeatures = async setFeatures => {
   }
 }
 
-const AppContainer = () => {
+const AuthenticatedContainer = () => {
   const [drawerOpen, toggleDrawer] = useToggler()
   const [features, setFeatures] = useState(emptyObj)
-  const { history } = useReactRouter()
+  const { userDetails: { role } } = useContext(AppContext)
   const classes = useStyles()
 
   useEffect(() => {
-    const unlisten = history.listen((location, action) => {
-      track('pageLoad', { route: `${location.pathname}${location.hash}` })
-    })
-
-    // This is to send page event for the first page the user lands on
-    track('pageLoad', { route: `${history.location.pathname}${history.location.hash}` })
-
     // Pass the `setFeatures` function to update the features as we can't use `await` inside of a `useEffect`
     loadFeatures(setFeatures)
-
-    return unlisten
   }, [])
 
   const plugins = pluginManager.getPlugins()
-  const sections = getSections(plugins)
+  const sections = getSections(plugins, role)
   const devEnabled = window.localStorage.enableDevPlugin === 'true'
 
   return (
-    <div className={classes.root} id="_main-container">
+    <>
       <div className={classes.appFrame}>
         <Toolbar />
         <Navbar
@@ -170,19 +150,17 @@ const AppContainer = () => {
           <div className={classes.drawerHeader} />
           <div>
             <Switch>
-              {renderPlugins(plugins)}
+              {renderPlugins(plugins, role)}
+              <Route path={logoutUrl} component={LogoutPage} />
+              <Redirect to={dashboardUrl} />
             </Switch>
             {devEnabled && <DeveloperToolsEmbed />}
           </div>
         </main>
       </div>
       <Intercom />
-    </div>
+    </>
   )
 }
 
-AppContainer.propTypes = {
-  sections: Navbar.propTypes.sections,
-}
-
-export default AppContainer
+export default AuthenticatedContainer

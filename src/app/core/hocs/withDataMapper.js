@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import { mapObjIndexed, pipe, prop } from 'ramda'
-import { AppContext } from 'core/AppProvider'
+import { AppContext } from 'core/providers/AppProvider'
 import { dataCacheKey } from 'core/helpers/createContextLoader'
 
 const withDataMapper = mappers => Component => props => {

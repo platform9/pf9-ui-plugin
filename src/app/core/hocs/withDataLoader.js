@@ -1,6 +1,6 @@
 import React from 'react'
 import DataLoader from 'core/DataLoader'
-import { withAppContext } from 'core/AppProvider'
+import { withAppContext } from 'core/providers/AppProvider'
 
 const withDataLoader = (loaders, options) => Component => withAppContext(props => {
   return <DataLoader loaders={loaders} options={options} {...props}>

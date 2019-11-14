@@ -5,13 +5,15 @@ import {
   Button, Checkbox, FormControlLabel, Grid, Paper, TextField, Typography,
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
-import { compose } from 'app/utils/fp'
-import { withAppContext } from 'core/AppProvider'
+import { compose } from 'utils/fp'
+import { withAppContext } from 'core/providers/AppProvider'
 import Alert from 'core/components/Alert'
 import { withRouter } from 'react-router'
 import SimpleLink from 'core/components/SimpleLink'
 import ExternalLink from 'core/components/ExternalLink'
-import { forgotPasswordUrl } from 'app/constants'
+import { forgotPasswordUrl } from 'app/constants.js'
+import { pathJoin } from 'utils/misc'
+import { imageUrlRoot, dashboardUrl } from 'app/constants'
 
 const styles = theme => ({
   root: {
@@ -29,6 +31,9 @@ const styles = theme => ({
     marginRight: 'auto',
   },
   form: {
+    display: 'flex',
+    flexFlow: 'column nowrap',
+    alignItems: 'center',
     paddingTop: theme.spacing(3),
   },
   textField: {
@@ -54,7 +59,11 @@ const styles = theme => ({
     textAlign: 'center',
   },
   errorContainer: {
-    width: '150px',
+    width: '90%',
+    '& .MuiPaper-root': {
+      width: 'initial',
+      boxShadow: 'initial'
+    },
   },
 })
 
@@ -78,24 +87,15 @@ export class LoginPage extends React.PureComponent {
     const { keystone } = ApiClient.getInstance()
 
     this.setState({ loginFailed: false, loading: true })
-    const unscopedToken = await keystone.authenticate(username, password)
-    this.setState({ loading: false })
+    const { unscopedToken } = await keystone.authenticate(username, password)
 
     if (!unscopedToken) {
-      return this.setState({ loginFailed: true })
+      return this.setState({ loading: false, loginFailed: true })
     }
 
-    onAuthSuccess({ username, unscopedToken })
-  }
+    await onAuthSuccess({ username, unscopedToken })
 
-  renderStatus = () => {
-    const { loading, loginFailed } = this.state
-    return (
-      <div className="login-status">
-        {loading && <div className="login-start">Attempting login...</div>}
-        {loginFailed && <div className="login-failed login-result">Login attempt failed.</div>}
-      </div>
-    )
+    this.props.history.push(dashboardUrl)
   }
 
   handleChangeBox = name => event => {
@@ -168,13 +168,13 @@ export class LoginPage extends React.PureComponent {
 
   render () {
     const { classes } = this.props
-    const { loginFailed } = this.state
+    const { loginFailed, loading } = this.state
     return (
       <div className="login-page">
         <Grid container justify="center" className={classes.root}>
           <Grid item md={4} lg={3}>
             <Paper className={classes.paper}>
-              <img src="/ui/images/logo-color.png" className={classes.img} />
+              <img alt="Platform 9" src={pathJoin(imageUrlRoot, 'logo-color.png')} className={classes.img} />
               <form className={classes.form} onSubmit={this.performLogin}>
                 <Typography variant="subtitle1" align="center">
                   Please sign in
@@ -187,11 +187,12 @@ export class LoginPage extends React.PureComponent {
                     <Alert variant="error" message="Login failed" />
                   </div>
                 )}
-                <Button type="submit" className={classes.signinButton} variant="contained" color="primary">
-                  SIGN IN
+                <Button type="submit" disabled={loading} className={classes.signinButton} variant="contained" color="primary">
+                  {loading ? 'Attempting login...' : 'Sign In'}
                 </Button>
                 <Typography className={classes.forgotPwd} gutterBottom>
-                  <SimpleLink onClick={this.handleForgotPassword()} src={forgotPasswordUrl}>Forgot password?</SimpleLink>
+                  <SimpleLink onClick={this.handleForgotPassword()} src={forgotPasswordUrl}>Forgot
+                    password?</SimpleLink>
                 </Typography>
               </form>
               {this.renderFooter()}

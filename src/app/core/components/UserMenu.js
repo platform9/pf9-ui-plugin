@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { Menu, MenuItem, Typography } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import { withRouter } from 'react-router'
-import { withAppContext } from 'core/AppProvider'
+import { withAppContext } from 'core/providers/AppProvider'
 import { logoutUrl, resetPasswordUrl } from 'app/constants'
 
 const styles = theme => ({
