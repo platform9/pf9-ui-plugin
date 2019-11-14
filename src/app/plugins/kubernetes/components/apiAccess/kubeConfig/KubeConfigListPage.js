@@ -24,12 +24,19 @@ const useStyles = makeStyles(theme => ({
 const KubeConfigListPage = () => {
   const [isDialogOpen, toggleDialog] = useToggler()
   const [selectedClusterId, setSelectedClusterId] = useState()
-  const [kubeconfig, setKubeconfig] = useState('')
+  const [downloadedKubeconfigs, setDownloadedKubeconfigs] = useState({})
+  const [currentKubeconfig, setCurrentKubeconfig] = useState('')
   const classes = useStyles()
 
   const onSelect = (row) => {
     setSelectedClusterId(row.clusterId)
-    toggleDialog()
+    const kubeconfig = downloadedKubeconfigs[row.clusterId]
+
+    if (kubeconfig != null) {
+      setCurrentKubeconfig(kubeconfig)
+    } else {
+      toggleDialog()
+    }
   }
 
   const columns = getColumns(toggleDialog)
@@ -44,11 +51,15 @@ const KubeConfigListPage = () => {
     blankFirstColumn: true,
     multiSelection: false,
     onSelect,
-  }), [toggleDialog])
+  }), [toggleDialog, downloadedKubeconfigs])
 
   const downloadKubeconfig = async (clusterId) => {
     const kubeconfig = await qbert.getKubeConfig(clusterId)
-    setKubeconfig(kubeconfig)
+    setDownloadedKubeconfigs({
+      ...downloadedKubeconfigs,
+      [clusterId]: kubeconfig,
+    })
+    setCurrentKubeconfig(kubeconfig)
     toggleDialog()
   }
 
@@ -67,7 +78,7 @@ const KubeConfigListPage = () => {
       <ListPage />
       <p className={classes.clusterConfig}>Select a cluster above to populate its kubeconfig below.</p>
       <ValidatedForm>
-        <TextField id="config" value={kubeconfig} rows={9} multiline />
+        <TextField id="config" value={currentKubeconfig} rows={9} multiline />
       </ValidatedForm>
       <DownloadDialog
         onDownload={() => downloadKubeconfig(selectedClusterId)}
