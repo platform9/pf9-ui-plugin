@@ -113,13 +113,14 @@ const renderLinks = links => {
   )
 }
 
+const toMHz = value => value * 1024
+
 const renderStats = (_, { usage }) => {
   const hasValidStats = usage && usage.compute && usage.compute.current
   if (!hasValidStats) { return null }
   return (
     <div>
-      <ResourceUsageTable valueConverter={
-        value => value * 1024} units="MHz" label="CPU" stats={usage.compute} />
+      <ResourceUsageTable valueConverter={toMHz} units="MHz" label="CPU" stats={usage.compute} />
       <ResourceUsageTable units="GiB" label="Memory" stats={usage.memory} />
       <ResourceUsageTable units="GiB" label="Storage" stats={usage.disk} />
       {usage.grafanaLink &&
@@ -184,7 +185,7 @@ export const options = {
   title: 'Clusters',
   uniqueIdentifier: 'uuid',
   multiSelection: false,
-  deleteCond:  both(isAdmin, canDeleteCluster),
+  deleteCond: both(isAdmin, canDeleteCluster),
   batchActions: [
     {
       cond: both(isAdmin, canAttachNode),

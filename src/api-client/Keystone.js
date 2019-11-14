@@ -199,9 +199,7 @@ class Keystone {
       this.client.scopedToken = scopedToken
       await this.getServiceCatalog()
 
-      return {
-        user, role, scopedToken,
-      }
+      return { user, role, scopedToken }
     } catch (err) {
       // authentication failed
       console.error(err)
