@@ -23,23 +23,48 @@ const useStyles = makeStyles(theme => ({
 
 const KubeConfigListPage = () => {
   const [isDialogOpen, toggleDialog] = useToggler()
-  const [selectedClusterId, setSelectedClusterId] = useState()
+  const [selectedCluster, setSelectedCluster] = useState()
   const [downloadedKubeconfigs, setDownloadedKubeconfigs] = useState({})
   const [currentKubeconfig, setCurrentKubeconfig] = useState('')
+  const [generateYaml, setGenerateYaml] = useState(false)
   const classes = useStyles()
 
   const onSelect = (row) => {
-    setSelectedClusterId(row.clusterId)
+    setSelectedCluster({ id: row.clusterId, name: row.cluster })
     const kubeconfig = downloadedKubeconfigs[row.clusterId]
 
-    if (kubeconfig != null) {
+    if (kubeconfig) {
       setCurrentKubeconfig(kubeconfig)
     } else {
       toggleDialog()
     }
   }
 
-  const columns = getColumns(toggleDialog)
+  const clickDownloadYamlFile = (clusterId, clusterName) => {
+    setSelectedCluster({ id: clusterId, name: clusterName })
+    setGenerateYaml(true)
+
+    const kubeconfig = downloadedKubeconfigs[clusterId]
+
+    if (kubeconfig) {
+      downloadYamlFile(clusterName, kubeconfig)
+    } else {
+      toggleDialog()
+    }
+  }
+
+  const downloadYamlFile = (clusterName, kubeconfig) => {
+    const blob = new Blob([kubeconfig], { type: 'application/octet-stream' })
+    let elem = window.document.createElement('a')
+    elem.href = window.URL.createObjectURL(blob)
+    elem.download = `${clusterName}.yml`
+    document.body.appendChild(elem)
+    elem.click()
+    document.body.removeChild(elem)
+    setGenerateYaml(false)
+  }
+
+  const columns = getColumns(clickDownloadYamlFile)
 
   const options = useMemo(() => ({
     cacheKey: 'kubeconfig',
@@ -51,16 +76,25 @@ const KubeConfigListPage = () => {
     blankFirstColumn: true,
     multiSelection: false,
     onSelect,
-  }), [toggleDialog, downloadedKubeconfigs])
+  }), [toggleDialog, downloadedKubeconfigs, currentKubeconfig, generateYaml])
 
-  const downloadKubeconfig = async (clusterId) => {
-    const kubeconfig = await qbert.getKubeConfig(clusterId)
+  const downloadKubeconfig = async (cluster, generateYaml) => {
+    const kubeconfig = await qbert.getKubeConfig(cluster.id)
     setDownloadedKubeconfigs({
       ...downloadedKubeconfigs,
-      [clusterId]: kubeconfig,
+      [cluster.id]: kubeconfig,
     })
     setCurrentKubeconfig(kubeconfig)
     toggleDialog()
+
+    if (generateYaml) {
+      downloadYamlFile(cluster.name, kubeconfig)
+    }
+  }
+
+  const handleCloseDialog = () => {
+    toggleDialog()
+    setGenerateYaml(false)
   }
 
   const { ListPage } = createCRUDComponents(options)
@@ -81,25 +115,25 @@ const KubeConfigListPage = () => {
         <TextField id="config" value={currentKubeconfig} rows={9} multiline />
       </ValidatedForm>
       <DownloadDialog
-        onDownload={() => downloadKubeconfig(selectedClusterId)}
-        onClose={toggleDialog}
+        onDownload={() => downloadKubeconfig(selectedCluster, generateYaml)}
+        onClose={handleCloseDialog}
         isDialogOpen={isDialogOpen}
       />
     </>
   )
 }
 
-const getColumns = (handleClickDownload) => [
+const getColumns = (clickDownloadYamlFile) => [
   { id: 'cluster', label: 'Cluster' },
   {
     id: 'kubeConfig',
     label: 'kubeconfig',
-    render: (contents, row) => kubeConfigLink(row, handleClickDownload),
+    render: (contents, row) => kubeConfigLink(row, clickDownloadYamlFile),
   },
   { id: 'url', label: 'URL' },
 ]
 
-const kubeConfigLink = (row, handleClickDownload) =>
-  <SimpleLink onClick={() => handleClickDownload(row)}>Download kubeconfig</SimpleLink>
+const kubeConfigLink = (row, clickDownloadYamlFile) =>
+  <SimpleLink onClick={() => clickDownloadYamlFile(row.clusterId, row.cluster)}>Download kubeconfig</SimpleLink>
 
 export default KubeConfigListPage
