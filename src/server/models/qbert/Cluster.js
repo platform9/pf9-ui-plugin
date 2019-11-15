@@ -94,7 +94,7 @@ const options = {
     })
 
     const currentTime = getCurrentTime()
-    return { nodePoolUuid: uuid.v4(), cloudProperties: cloudProperties, cloudProviderUuid: uuid.v4(), created_at: currentTime, lastOk: currentTime, lastOp: currentTime, ...input }
+    return { nodePoolUuid: uuid.v4(), cloudProperties: cloudProperties, cloudProviderUuid: uuid.v4(), created_at: currentTime, externalDnsName: faker.internet.domainName(), lastOk: currentTime, lastOp: currentTime, ...input }
   },
   loaderFn: (clusters) => {
     return clusters.map((cluster) => {

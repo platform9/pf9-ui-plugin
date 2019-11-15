@@ -38,3 +38,7 @@ body {
 *:any-link {
   text-decoration: none;
 }
+
+.fa-xl {
+    font-size: 1.66666em;
+}
