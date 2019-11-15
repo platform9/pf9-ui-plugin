@@ -36,11 +36,12 @@ class Wizard extends PureComponent {
     )
   }
 
+  handleOriginBack = () => {
+    const { history, originPath } = this.props
+    history.push(originPath)
+  }
+
   handleBack = () => {
-    if (this.canBackAtFirstStep()) {
-      this.props.history.push(this.props.originPath)
-      return
-    }
     this.setState(
       state => ({ activeStep: state.activeStep - 1 }),
       this.activateStep,
@@ -98,12 +99,10 @@ class Wizard extends PureComponent {
         {renderStepsContent({ wizardContext, setWizardContext, onNext: this.onNext })}
         <WizardButtons>
           {onCancel && <CancelButton onClick={onCancel} />}
-          {(this.hasBack() || this.canBackAtFirstStep()) &&
-          <PrevButton onClick={this.handleBack} />}
-          {this.hasNext() &&
-          <NextButton onClick={this.handleNext}>Next</NextButton>}
-          {this.isLastStep() &&
-          <NextButton onClick={this.handleNext}>{submitLabel}</NextButton>}
+          {this.hasBack() && <PrevButton onClick={this.handleBack} />}
+          {this.canBackAtFirstStep() && <PrevButton onClick={this.handleOriginBack} />}
+          {this.hasNext() && <NextButton onClick={this.handleNext}>Next</NextButton>}
+          {this.isLastStep() && <NextButton onClick={this.handleNext}>{submitLabel}</NextButton>}
         </WizardButtons>
       </WizardContext.Provider>
     )
