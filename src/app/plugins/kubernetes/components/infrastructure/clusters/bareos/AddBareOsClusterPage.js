@@ -28,6 +28,7 @@ const initialContext = {
   servicesCidr: '10.21.0.0/16',
   networkPlugin: 'flannel',
   runtimeConfigOption: 'default',
+  mtuSize: 1440,
 }
 
 const runtimeConfigOptions = [
@@ -35,6 +36,19 @@ const runtimeConfigOptions = [
   { label: 'All API groups and versions', value: 'all' },
   { label: 'Custom', value: 'custom' },
 ]
+
+const networkPluginOptions = [
+  { label: 'Flannel', value: 'flannel' },
+  { label: 'Calico', value: 'calico' },
+  { label: 'Canal (experimental)', value: 'canal' },
+]
+
+const handleNetworkPluginChange = ({ setWizardContext, setFieldValue }) => option => {
+  if (['calico', 'canal', 'weave'].includes(option)) {
+    setWizardContext({ privileged: true, custom: option })
+    setFieldValue('privileged')(true)
+  }
+}
 
 const AddBareOsClusterPage = () => {
   const { params, getParamsUpdater } = useParams()
@@ -192,7 +206,6 @@ const AddBareOsClusterPage = () => {
                         id="externalDnsName"
                         label="API FQDN"
                         info="FQDN used to reference cluster API. To ensure the API can be accessed securely at the FQDN, the FQDN will be included in the API server certificate's Subject Alt Names. If deploying onto AWS, we will automatically create the DNS records for this FQDN into AWS Route 53."
-                        required
                       />
 
                       {/* Containers CIDR */}
@@ -217,6 +230,22 @@ const AddBareOsClusterPage = () => {
                         label="HTTP Proxy"
                         info="Specify the HTTP proxy for this cluster.  Leave blank for none.  Uses format of <scheme>://<username>:<password>@<host>:<port> where <username>:<password>@ is optional."
                       />
+                      <PicklistField
+                        id="networkPlugin"
+                        label="Network backend"
+                        options={networkPluginOptions}
+                        info=""
+                        onChange={handleNetworkPluginChange({ setWizardContext, setFieldValue })}
+                        required
+                      />
+                      {values.networkPlugin === 'calico' &&
+                      <TextField
+                        id="mtuSize"
+                        label="MTU Size"
+                        info="Maximum Transmission Unit (MTU) for the interface (in bytes)"
+                        required={values.networkPlugin === 'calico'}
+                      />
+                      }
                     </>
                   )}
                 </ValidatedForm>
