@@ -119,7 +119,7 @@ const loadFeatures = async setFeatures => {
 }
 
 const AuthenticatedContainer = () => {
-  const [drawerOpen, toggleDrawer] = useToggler()
+  const [drawerOpen, toggleDrawer] = useToggler(true)
   const [features, setFeatures] = useState(emptyObj)
   const { userDetails: { role } } = useContext(AppContext)
   const classes = useStyles()
