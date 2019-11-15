@@ -128,7 +128,7 @@ class Keystone {
   }
 
   addUserRole = async ({ tenantId, userId, roleId }) => {
-    const response = await axios.put(pathJoin(
+    axios.put(pathJoin(
       this.projectsUrl,
       `${tenantId}/users/${userId}/roles/${roleId}`,
     ), null, this.client.getAuthHeaders())
