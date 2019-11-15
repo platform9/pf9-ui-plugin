@@ -1,7 +1,7 @@
 import React, { useContext, useCallback, PureComponent, useMemo } from 'react'
 import moize from 'moize'
 import { equals, curry, pathOr, propOr, zipObj } from 'ramda'
-import { withAppContext, AppContext } from 'core/AppProvider'
+import { withAppContext, AppContext } from 'core/providers/AppProvider'
 import { getStorage, setStorage } from '../utils/pf9Storage'
 import { emptyObj } from 'utils/fp'
 

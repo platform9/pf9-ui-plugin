@@ -5,7 +5,7 @@ import {
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import { compose } from 'app/utils/fp'
-import { withAppContext } from 'core/AppProvider'
+import { withAppContext } from 'core/providers/AppProvider'
 import ListTable from 'core/components/listTable/ListTable'
 import SubmitButton from 'core/components/SubmitButton'
 import PicklistField from 'core/components/validatedForm/PicklistField'

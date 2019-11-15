@@ -13,21 +13,15 @@ import { propSatisfies } from 'ramda'
 import useParams from 'core/hooks/useParams'
 
 import {
-  hasOneSpecialChar,
-  hasOneNumber,
-  hasOneUpperChar,
-  hasOneLowerChar,
-  hasMinLength,
-  requiredValidator,
-  passwordValidator,
-  emailValidator
+  hasOneSpecialChar, hasOneNumber, hasOneUpperChar, hasOneLowerChar, hasMinLength,
+  requiredValidator, passwordValidator, emailValidator,
 } from 'core/utils/fieldValidators'
 import Progress from 'core/components/progress/Progress'
 import TextField from 'core/components/validatedForm/TextField'
 import Alert from 'core/components/Alert'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
-import { compose } from 'app/utils/fp'
-import { loginUrl, resetPasswordApiUrl } from 'app/constants'
+import { compose } from 'utils/fp'
+import { loginUrl, resetPasswordApiUrl } from 'app/constants.js'
 
 const styles = theme => ({
   root: {

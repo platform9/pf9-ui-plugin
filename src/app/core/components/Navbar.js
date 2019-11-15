@@ -17,6 +17,7 @@ import { assoc, flatten, pluck, prop, propEq, propOr, where } from 'ramda'
 import { matchPath, withRouter } from 'react-router'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { imageUrls, clarityDashboardUrl } from 'app/constants'
+import { hexToRGBA } from 'core/utils/colorHelpers'
 
 export const drawerWidth = 180
 
@@ -85,6 +86,10 @@ const styles = theme => ({
   currentNavLink: {
     backgroundColor: [theme.palette.background.default, '!important'],
     color: 'rgba(0, 0, 0, .87) !important',
+
+    '&:hover *': {
+      color: 'rgba(0, 0, 0, .87) !important',
+    },
   },
   navHeading: {
     backgroundColor: theme.palette.grey[50],
@@ -101,8 +106,10 @@ const styles = theme => ({
     padding: 0,
   },
   navIcon: {
-    textAlign: 'center',
-    minWidth: 26,
+    minWidth: 28,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   navMenu: {
     padding: 0,
@@ -110,11 +117,15 @@ const styles = theme => ({
   },
   navMenuItem: {
     padding: theme.spacing(1, 0.5, 1, 1),
+    minHeight: theme.spacing(6),
     backgroundColor: theme.palette.sidebar.background,
     color: theme.palette.sidebar.text,
     borderBottom: '1px solid #07283e',
     '&:hover': {
-      backgroundColor: theme.palette.sidebar.background,
+      backgroundColor: hexToRGBA(theme.palette.background.paper, 0.15),
+    },
+    '&:hover *': {
+      color: theme.palette.primary.contrastText // override child color styles
     },
     display: 'flex',
     flexFlow: 'row nowrap',
@@ -308,7 +319,7 @@ class Navbar extends PureComponent {
           [classes.currentNavLink]: !!isCurrentNavLink,
         })}>
         {icon && <div className={classes.navIcon}>
-          <FontAwesomeIcon>{icon}</FontAwesomeIcon>
+          <FontAwesomeIcon size="xl">{icon}</FontAwesomeIcon>
         </div>}
         {open && <ListItemText
           classes={{
@@ -351,7 +362,7 @@ class Navbar extends PureComponent {
       onClick={handleClick}
       key={link.path}>
       {icon && <div className={classes.navIcon}>
-        <FontAwesomeIcon>{icon}</FontAwesomeIcon>
+        <FontAwesomeIcon size="xl">{icon}</FontAwesomeIcon>
       </div>}
       {open && <ListItemText
         classes={{
@@ -428,7 +439,7 @@ class Navbar extends PureComponent {
     >
       <div className={classes.drawerHeader}>
         <IconButton className={classes.toggleButton} onClick={handleDrawerToggle}>
-          <FontAwesomeIcon>{open ? 'angle-double-left' : 'angle-double-right'}</FontAwesomeIcon>
+          <FontAwesomeIcon size="xl">{open ? 'angle-double-left' : 'angle-double-right'}</FontAwesomeIcon>
         </IconButton>
       </div>
       <Divider />

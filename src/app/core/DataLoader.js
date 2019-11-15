@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import DisplayError from './components/DisplayError'
 import Progress from './components/progress/Progress'
 import { mapObjIndexed, equals } from 'ramda'
-import { withAppContext } from 'core/AppProvider'
+import { withAppContext } from 'core/providers/AppProvider'
 import { propsAsync } from 'utils/async'
 
 /**

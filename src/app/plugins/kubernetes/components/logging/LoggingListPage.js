@@ -114,7 +114,7 @@ const renderStatus = (classes, value) => {
 const renderList = (values) => map(value => (<div key={value}>{value}</div>), values)
 
 const getColumns = (classes) => [
-  { id: 'cluster', label: 'Cluster' },
+  { id: 'clusterName', label: 'Cluster' },
   { id: 'status', label: 'Status', render: (value) => renderStatus(classes, value) },
   { id: 'logStorage', label: 'Log Storage', render: renderList },
   { id: 'logDestination', label: 'Log Destination', render: renderList },

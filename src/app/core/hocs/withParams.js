@@ -2,7 +2,7 @@ import React from 'react'
 import { mapObjIndexed } from 'ramda'
 import { ensureFunction } from 'utils/fp'
 import PropTypes from 'prop-types'
-import { withAppContext } from 'core/AppProvider'
+import { withAppContext } from 'core/providers/AppProvider'
 
 class ParamsWrapper extends React.PureComponent {
   state = this.props.defaultParams

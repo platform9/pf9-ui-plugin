@@ -1,10 +1,11 @@
-import React, { useState, Fragment } from 'react'
+import React, { useState, Fragment, useContext } from 'react'
 import PropTypes from 'prop-types'
 import { Tooltip } from '@material-ui/core'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { makeStyles } from '@material-ui/styles'
 import clsx from 'clsx'
 import { ensureFunction } from 'utils/fp'
+import { AppContext } from 'core/providers/AppProvider'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -41,7 +42,8 @@ const useStyles = makeStyles(theme => ({
 const ListTableAction = ({ cond, action, label, disabledInfo, dialog, icon, selected, onRefresh }) => {
   const { root, actionLabel, actionIcon, disabledAction } = useStyles()
   const [dialogOpened, setDialogOpened] = useState(false)
-  const isActionEnabled = !cond || cond(selected)
+  const { getContext } = useContext(AppContext)
+  const isActionEnabled = !cond || cond(selected, getContext)
   const info = isActionEnabled || !disabledInfo
     ? label
     : ensureFunction(disabledInfo)(selected)

@@ -2,7 +2,7 @@ import React from 'react'
 import Panel from './Panel'
 import { compose, lensPath, set } from 'ramda'
 import { TextField } from '@material-ui/core'
-import { withAppContext } from 'core/AppProvider'
+import { withAppContext } from 'core/providers/AppProvider'
 import { withStyles } from '@material-ui/styles'
 
 const styles = theme => ({

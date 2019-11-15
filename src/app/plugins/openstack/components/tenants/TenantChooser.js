@@ -1,6 +1,6 @@
 import React, { useState, useContext, useCallback, useMemo } from 'react'
 import ApiClient from 'api-client/ApiClient'
-import { AppContext } from 'core/AppProvider'
+import { AppContext } from 'core/providers/AppProvider'
 import { emptyArr } from 'app/utils/fp'
 import Selector from 'core/components/Selector'
 import { useScopedPreferences } from 'core/providers/PreferencesProvider'
@@ -27,7 +27,7 @@ const TenantChooser = props => {
     const tenant = tenants.find(x => x.name === tenantName)
     if (!tenant) { return }
 
-    await keystone.changeProjectScope(tenant.id)
+    const { user, role } = await keystone.changeProjectScope(tenant.id)
     // Clear any data that should change when the user changes tenant.
     // The data will then be reloaded when it is needed.
     await setContext(pipe(
@@ -37,6 +37,7 @@ const TenantChooser = props => {
       // Changing the currentTenant will cause all the current active `useDataLoader`
       // hooks to reload its data
       assoc('currentTenant', tenant),
+      assoc('userDetails', { ...user, role }),
     ))
     setLoading(false)
   }
