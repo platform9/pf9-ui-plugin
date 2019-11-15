@@ -7,6 +7,7 @@ import AttachIcon from '@material-ui/icons/AddToQueue'
 import DetachIcon from '@material-ui/icons/RemoveFromQueue'
 import ScaleIcon from '@material-ui/icons/TrendingUp'
 import UpgradeIcon from '@material-ui/icons/PresentToAll'
+import InsertChartIcon from '@material-ui/icons/InsertChart'
 import { clustersCacheKey } from '../common/actions'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import ClusterAttachNodeDialog from './ClusterAttachNodeDialog'
@@ -21,6 +22,7 @@ import DashboardLink from './DashboardLink'
 import CreateButton from 'core/components/buttons/CreateButton'
 import { AppContext } from 'core/providers/AppProvider'
 import { both, prop } from 'ramda'
+import PrometheusAddonDialog from 'k8s/components/prometheus/PrometheusAddonDialog'
 
 const getClusterPopoverContent = (healthyMasterNodes, masterNodes) =>
   `${healthyMasterNodes.length} of ${masterNodes.length} master nodes healthy (3 required)`
@@ -211,6 +213,12 @@ export const options = {
       label: 'Upgrade cluster',
       action: upgradeCluster,
       disabledInfo: 'Feature not yet implemented',
+    },
+    {
+      cond: isAdmin,
+      icon: <InsertChartIcon />,
+      label: 'Monitoring',
+      dialog: PrometheusAddonDialog,
     },
   ],
 }
