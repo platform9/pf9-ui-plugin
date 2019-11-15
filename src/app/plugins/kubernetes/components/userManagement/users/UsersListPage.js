@@ -44,6 +44,7 @@ export const options = {
   ],
   addText: 'Create a new User',
   addUrl: pathJoin(k8sPrefix, 'user_management/users/add'),
+  deleteFn: mngmUserActions.delete,
   editUrl: pathJoin(k8sPrefix, 'user_management/users/edit'),
   name: 'Users',
   title: 'Users',
