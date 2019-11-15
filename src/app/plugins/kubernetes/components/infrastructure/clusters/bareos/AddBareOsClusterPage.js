@@ -89,7 +89,7 @@ const AddBareOsClusterPage = () => {
 
   return (
     <FormWrapper title="Add Bare OS Cluster" backUrl={listUrl} loading={loading}>
-      <Wizard onComplete={handleSubmit(params)} context={initialContext}>
+      <Wizard onComplete={handleSubmit(params)} context={initialContext} originPath={`${k8sPrefix}/infrastructure/clusters/add`}>
         {({ wizardContext, setWizardContext, onNext }) => {
           return (
             <>
