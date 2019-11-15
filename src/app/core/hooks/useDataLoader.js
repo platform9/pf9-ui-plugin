@@ -3,7 +3,7 @@ import moize from 'moize'
 import { emptyArr, emptyObj } from 'utils/fp'
 import { isEmpty } from 'ramda'
 import { ToastContext } from 'core/providers/ToastProvider'
-import { AppContext } from 'core/AppProvider'
+import { AppContext } from 'core/providers/AppProvider'
 import { memoizedDep } from 'utils/misc'
 
 const onErrorHandler = moize((loaderFn, showToast) => (errorMessage, catchedErr, params) => {

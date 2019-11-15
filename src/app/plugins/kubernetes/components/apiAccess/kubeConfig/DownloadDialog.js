@@ -22,7 +22,7 @@ const useStyles = makeStyles(theme => ({
   },
 }))
 
-const DownloadDialog = ({ onClose, isDialogOpen }) => {
+const DownloadDialog = ({ onDownloadClick, onClose, isDialogOpen }) => {
   const classes = useStyles()
   const [authMethod, setAuthMethod] = useState('token')
 
@@ -63,7 +63,7 @@ const DownloadDialog = ({ onClose, isDialogOpen }) => {
           }
           <Grid item xs={12} zeroMinWidth className={classes.formButtons}>
             <CancelButton onClick={onClose}>Cancel</CancelButton>
-            <SubmitButton>{authMethod === 'token' ? tokenConfirm : passwordConfirm}</SubmitButton>
+            <SubmitButton onClick={onDownloadClick}>{authMethod === 'token' ? tokenConfirm : passwordConfirm}</SubmitButton>
           </Grid>
         </Grid>
       </DialogContent>

@@ -2,12 +2,12 @@
 export const defaultUniqueIdentifier = 'id'
 export const appUrlRoot = '/ui'
 export const imageUrlRoot = `${appUrlRoot}/images`
-export const loginUrl = `${appUrlRoot}/openstack/login`
-export const resetPasswordUrl = `${appUrlRoot}/openstack/reset_password`
+export const loginUrl = `${appUrlRoot}/login`
+export const resetPasswordUrl = `${appUrlRoot}/reset_password`
+export const forgotPasswordUrl = `${appUrlRoot}/forgot_password`
+export const logoutUrl = `${appUrlRoot}/logout`
 export const resetPasswordApiUrl = '/clemency/reset/password/'
-export const forgotPasswordUrl = `${appUrlRoot}/openstack/forgot_password`
 export const forgotPasswordApiUrl = '/clemency/request'
-export const logoutUrl = `${appUrlRoot}/openstack/logout`
 export const dashboardUrl = `${appUrlRoot}/kubernetes/`
 export const allKey = '__all__'
 export const noneKey = '__none__'

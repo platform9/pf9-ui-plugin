@@ -5,7 +5,7 @@ import { SketchPicker } from 'react-color'
 import { ClickAwayListener } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 
-import { withAppContext } from 'core/AppProvider'
+import { withAppContext } from 'core/providers/AppProvider'
 
 const styles = theme => ({
   color: {

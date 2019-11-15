@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useContext } from 'react'
 import Tabs from 'core/components/tabs/Tabs'
 import Tab from 'core/components/tabs/Tab'
 
@@ -9,6 +9,7 @@ import InfrastructureStats from './InfrastructureStats'
 import PageContainer from 'core/components/pageContainer/PageContainer'
 import { FormControlLabel, Switch } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
+import { AppContext } from 'core/providers/AppProvider'
 
 const useStyles = makeStyles(theme => ({
   infrastructureHeader: {
@@ -34,6 +35,7 @@ const InfrastructurePage = () => {
   const classes = useStyles()
   const [statsVisible, setStatsVisble] = useState(true)
   const toggleStats = useCallback(() => setStatsVisble(!statsVisible), [statsVisible])
+  const { userDetails: { role } } = useContext(AppContext)
 
   return <PageContainer header={<div className={classes.infrastructureHeader}>
     <StatsToggle statsVisible={statsVisible} toggleStats={toggleStats} />
@@ -41,8 +43,10 @@ const InfrastructurePage = () => {
   </div>}>
     <Tabs>
       <Tab value="clusters" label="Clusters"><ClustersListPage /></Tab>
-      <Tab value="nodes" label="Nodes"><NodesListPage /></Tab>
-      <Tab value="cloudProviders" label="Cloud Providers"><CloudProvidersListPage /></Tab>
+      {role === 'admin' &&
+      <Tab value="nodes" label="Nodes"><NodesListPage /></Tab>}
+      {role === 'admin' &&
+      <Tab value="cloudProviders" label="Cloud Providers"><CloudProvidersListPage /></Tab>}
     </Tabs>
   </PageContainer>
 }

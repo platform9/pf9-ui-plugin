@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import ExternalLink from 'core/components/ExternalLink'
 import { compose, propOr } from 'ramda'
-import { withAppContext } from 'core/AppProvider'
+import { withAppContext } from 'core/providers/AppProvider'
 import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab'
 import {
   Button, Dialog, DialogActions, DialogContent, DialogTitle, Table, TableBody, TableRow, TableCell,

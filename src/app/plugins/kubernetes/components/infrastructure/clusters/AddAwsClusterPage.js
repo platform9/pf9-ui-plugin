@@ -22,6 +22,8 @@ import useReactRouter from 'use-react-router'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import { pathJoin } from 'utils/misc'
 import { k8sPrefix } from 'app/constants'
+import ExternalLink from 'core/components/ExternalLink'
+import Code from 'core/components/CodeBlock'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
@@ -249,7 +251,7 @@ const renderCustomNetworkingFields = ({ params, getParamsUpdater, values, setFie
         id="network"
         label="Network"
         options={networkOptions}
-        info="Select a network configuration. Read this article for detailed information about each network configuration type."
+        info={<div>Select a network configuration. Read <ExternalLink url="https://docs.platform9.com/kubernetes/networking/configurations-supported-aws-cloud-provider/">this article</ExternalLink> for detailed information about each network configuration type.</div>}
       />
       {renderNetworkFields(values.network)}
     </>
@@ -486,7 +488,7 @@ const AddAwsClusterPage = () => {
                       <TextField
                         id="httpProxy"
                         label="HTTP Proxy"
-                        info="Specify the HTTP proxy for this cluster.  Leave blank for none.  Uses format of <scheme>://<username>:<password>@<host>:<port> where <username>:<password>@ is optional."
+                        info={<div>(Optional) Specify the HTTP proxy for this cluster. Uses format of <Code><span>{`<scheme>://<username>:<password>@<host>:<port>`}</span></Code> where <Code><span>{`<username>:<password>@`}</span></Code> is optional.</div>}
                       />
 
                       {/* Network plugin */}
@@ -522,7 +524,7 @@ const AddAwsClusterPage = () => {
                         id="privileged"
                         label="Privileged"
                         disabled={['calico', 'canal', 'weave'].includes(values.networkPlugin)}
-                        info="Allows this cluster to run privileged containers. Read this article for more information."
+                        info={<div>Allows this cluster to run privileged containers. Read <ExternalLink url="https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities">this article</ExternalLink> for more information.</div>}
                       />
 
                       {/* Advanced API Configuration */}

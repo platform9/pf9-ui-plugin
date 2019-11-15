@@ -16,6 +16,7 @@ const CRUDListContainer = ({
   reload,
   nameProp,
   addText,
+  addButton: AddButton,
   AddDialog,
   EditDialog,
   addUrl,
@@ -96,9 +97,9 @@ const CRUDListContainer = ({
       onConfirm={handleDeleteConfirm}
     />}
     {addEnabled && <PageContainerHeader>
-      <CreateButton onClick={handleAdd}>
-        {addText}
-      </CreateButton>
+      {AddButton
+        ? <AddButton onClick={handleAdd} />
+        : <CreateButton onClick={handleAdd}>{addText}</CreateButton>}
     </PageContainerHeader>}
     {children({
       onDelete: deleteEnabled ? handleDelete : null,
