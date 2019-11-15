@@ -62,7 +62,7 @@ export const options = {
 const { ListPage: ListPageContainer } = createCRUDComponents(options)
 
 export default () => (
-  <PageContainer floatingHeader={false}>
+  <PageContainer>
     <Tabs>
       <Tab value="storage" label="Storage Classes">
         <ListPageContainer />

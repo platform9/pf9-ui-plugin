@@ -73,6 +73,7 @@ const TenantChooser = props => {
         onChoose={handleChoose}
         onSearchChange={setTenantSearch}
         searchTerm={tenantSearch}
+        type='Tenant'
       />
     </Tooltip>
   )

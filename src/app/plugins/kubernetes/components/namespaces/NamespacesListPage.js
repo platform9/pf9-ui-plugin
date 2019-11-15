@@ -23,7 +23,7 @@ const ListPage = ({ ListContainer }) => {
       params
     )
     return (
-      <PageContainer floatingHeader={false}>
+      <PageContainer>
         <Tabs>
           <Tab value="namespace" label="Namespaces">
             <ListContainer

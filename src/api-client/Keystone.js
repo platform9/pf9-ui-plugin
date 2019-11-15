@@ -128,11 +128,10 @@ class Keystone {
   }
 
   addUserRole = async ({ tenantId, userId, roleId }) => {
-    const response = await axios.put(pathJoin(
+    axios.put(pathJoin(
       this.projectsUrl,
       `${tenantId}/users/${userId}/roles/${roleId}`,
-    ))
-    console.log(response)
+    ), null, this.client.getAuthHeaders())
     return { tenantId, userId, roleId }
   }
 
@@ -141,7 +140,7 @@ class Keystone {
       await axios.delete(pathJoin(
         this.projectsUrl,
         `${tenantId}/users/${userId}/roles/${roleId}`,
-      ))
+      ), this.client.getAuthHeaders())
       return { tenantId, userId, roleId }
     } catch (err) {
       throw new Error(`Unable to delete non-existant project`)
@@ -172,7 +171,7 @@ class Keystone {
   updateProject = async (id, params) => {
     const body = { project: params }
     const url = `${this.projectsUrl}/${id}`
-    const response = await axios.patch(url, body, this.client.getAuthHeaders())
+    const response = await axios.put(url, body, this.client.getAuthHeaders())
     return response.data.project
   }
 
