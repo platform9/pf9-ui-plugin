@@ -31,6 +31,10 @@ const tabStyles = theme => ({
     margin: '0 0 -1px',
     cursor: 'default',
     minHeight: ({ compact }) => compact ? 34 : 48,
+    color: '#B7B7B7',
+    '&.Mui-selected': {
+      color: theme.palette.text.primary,
+    },
     '&:hover:not(.Mui-selected)': {
       cursor: 'pointer',
       boxShadow: `inset 0 -2px 0 ${theme.palette.primary.main}`,
