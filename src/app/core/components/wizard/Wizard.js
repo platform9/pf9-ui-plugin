@@ -37,7 +37,7 @@ class Wizard extends PureComponent {
   }
 
   handleBack = () => {
-    if (this.canBackAtFirstStep) {
+    if (this.canBackAtFirstStep()) {
       this.props.history.push(this.props.originPath)
       return
     }
