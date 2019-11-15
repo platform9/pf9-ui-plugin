@@ -19,9 +19,7 @@ export const mngmRoleActions = createCRUDActions(mngmRolesCacheKey, {
 })
 
 function getKubernetesRoles () {
-  return new Promise((resolve) => {
-    resolve(hardcodedKubeRoles)
-  })
+  return Promise.resolve(hardcodedKubeRoles)
 }
 
 // Generally not a fan of this, but we dont have a lot of options.
