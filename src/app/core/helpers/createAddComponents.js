@@ -27,7 +27,7 @@ const createAddComponents = options => {
     const [handleAdd, loading] = useDataUpdater(createFn, onComplete)
 
     return (
-      <FormWrapper title={title} backUrl={listUrl}>
+      <FormWrapper title={title} backUrl={listUrl} loading={loading}>
         <FormComponent {...props} loading={loading} onComplete={handleAdd} />
       </FormWrapper>
     )
