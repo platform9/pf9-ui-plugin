@@ -9,7 +9,6 @@ import useReactRouter from 'use-react-router'
 import { propEq } from 'ramda'
 import useParams from 'core/hooks/useParams'
 import RbacChecklist from './RbacChecklist'
-import { allKey } from 'app/constants'
 import FormWrapper from 'core/components/FormWrapper'
 import PresetField from 'core/components/PresetField'
 
@@ -21,10 +20,11 @@ const defaultParams = {
 const UpdateRolePage = () => {
   const { match, history } = useReactRouter()
   const roleId = match.params.id
+  const clusterId = match.params.clusterId
   const onComplete = useCallback(
     success => success && history.push('/ui/kubernetes/rbac'),
     [history])
-  const [roles] = useDataLoader(roleActions.list, { clusterId: allKey })
+  const [roles] = useDataLoader(roleActions.list, { clusterId })
   const role = useMemo(
     () => roles.find(propEq('id', roleId)) || emptyObj,
     [roles, roleId])

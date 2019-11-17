@@ -42,6 +42,7 @@ export const options = {
   cacheKey: clusterRolesCacheKey,
   deleteFn: clusterRoleActions.delete,
   editUrl: '/ui/kubernetes/rbac/clusterroles/edit',
+  editWithClusterId: true,
   name: 'Cluster Roles',
   title: 'Cluster Roles',
   ListPage,

@@ -8,7 +8,6 @@ import { emptyObj } from 'utils/fp'
 import useReactRouter from 'use-react-router'
 import { propEq } from 'ramda'
 import useParams from 'core/hooks/useParams'
-import { allKey } from 'app/constants'
 import UserMultiSelect from 'k8s/components/common/UserMultiSelect'
 import GroupMultiSelect from 'k8s/components/common/GroupMultiSelect'
 import FormWrapper from 'core/components/FormWrapper'
@@ -22,10 +21,11 @@ const defaultParams = {
 const UpdateRoleBindingPage = () => {
   const { match, history } = useReactRouter()
   const roleBindingId = match.params.id
+  const clusterId = match.params.clusterId
   const onComplete = useCallback(
     success => success && history.push('/ui/kubernetes/rbac#roleBindings'),
     [history])
-  const [roleBindings] = useDataLoader(roleBindingActions.list, { clusterId: allKey })
+  const [roleBindings] = useDataLoader(roleBindingActions.list, { clusterId })
   const roleBinding = useMemo(
     () => roleBindings.find(propEq('id', roleBindingId)) || emptyObj,
     [roleBindings, roleBindingId])

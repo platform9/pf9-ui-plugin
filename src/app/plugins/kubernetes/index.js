@@ -297,22 +297,22 @@ Kubernetes.registerPlugin = pluginManager => {
       },
       {
         name: 'Update Role',
-        link: { path: '/rbac/roles/edit/:id', exact: true },
+        link: { path: '/rbac/roles/edit/:id/cluster/:clusterId', exact: true },
         component: UpdateRolePage,
       },
       {
         name: 'Update Cluster Role',
-        link: { path: '/rbac/clusterroles/edit/:id', exact: true },
+        link: { path: '/rbac/clusterroles/edit/:id/cluster/:clusterId', exact: true },
         component: UpdateClusterRolePage,
       },
       {
         name: 'Update Role Binding',
-        link: { path: '/rbac/rolebindings/edit/:id', exact: true },
+        link: { path: '/rbac/rolebindings/edit/:id/cluster/:clusterId', exact: true },
         component: UpdateRoleBindingPage,
       },
       {
         name: 'Update Cluster Role Binding',
-        link: { path: '/rbac/clusterrolebindings/edit/:id', exact: true },
+        link: { path: '/rbac/clusterrolebindings/edit/:id/cluster/:clusterId', exact: true },
         component: UpdateClusterRoleBindingPage,
       },
     ],
