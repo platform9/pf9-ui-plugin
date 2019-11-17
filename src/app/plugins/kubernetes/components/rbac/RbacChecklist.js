@@ -12,7 +12,7 @@ import { compose } from 'app/utils/fp'
 import { assocPath, dissocPath, hasPath, curry, ifElse } from 'ramda'
 import { emptyObj } from 'utils/fp'
 import Progress from 'core/components/progress/Progress'
-import setRbacObject from './SetRbacObject'
+import setRbacObject from './setRbacObject'
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -64,7 +64,7 @@ const RbacChecklist = ({ clusterId, onChange, value, initialRules, ...rest }) =>
   }, [checkedItems])
 
   useEffect(() => {
-    if (!initialRules || !apiGroups) {
+    if (!initialRules || !apiGroups || !apiGroups.length) {
       return
     }
     const rules = setRbacObject(initialRules, apiGroups)

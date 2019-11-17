@@ -1,131 +1,98 @@
-import { assocPath } from 'ramda'
+import { flatten, mergeDeepLeft, uniq } from 'ramda'
 
-// This function needs to be modernized, but can be
-// done perhaps after kubecon release
-const setRbacObject = (rules, apiGroups) => {
-  let rbac = {}
-  const wildCardRules = []
+const processApiGroup = (apiGroup, apiGroupsList) => {
+  if (apiGroup === '*') {
+    return apiGroupsList.map(group => group.name)
+  } else if (apiGroup === '') {
+    return 'core'
+  } else {
+    return apiGroup
+  }
+}
 
-  rules.map(rule => {
-    // UI does not have support for nonResourceURLs
-    if (rule.nonResourceURLs) {
-      return
+const processApiGroupResources = (apiGroup, rule, apiGroupsList) => {
+  const apiGroupFromList = apiGroupsList.find(_apiGroup => (
+    _apiGroup.name === apiGroup
+  ))
+  const resourceNames = apiGroupFromList.resources.map(resource => resource.name)
+  const resources = rule.resources.map(resource => {
+    if (resource === '*') {
+      return resourceNames
+    } else {
+      return resource
     }
-    rule.apiGroups.map(apiGroup => {
-      rule.resources.map(resource => {
-        rule.verbs.map(verb => {
-          if (apiGroup === '*' || resource === '*' || verb === '*') {
-            wildCardRules.push(rule)
-          } else if (apiGroup === '') {
-            rbac = assocPath(['core', resource, verb], true, rbac)
-          } else {
-            rbac = assocPath([apiGroup, resource, verb], true, rbac)
-          }
-        })
-      })
-    })
   })
+  const flattenedResources = flatten(resources)
+  // Account for potential duplicates with wildcard + a specified resource
+  // Remove resource if it does not exist in the api group
+  const validatedResources = uniq(flattenedResources.filter(resource => {
+    return resourceNames.includes(resource)
+  }))
+  return uniq(validatedResources)
+}
 
-  // Wildcard processing
-  if (wildCardRules.length) {
-    wildCardRules.map(rule => {
-      const apiGroupsWildCard = rule.apiGroups.includes('*')
-      const resourcesWildCard = rule.resources.includes('*')
-      const verbsWildCard = rule.verbs.includes('*')
-
-      if (apiGroupsWildCard) {
-        apiGroups.map(apiGroup => {
-          if (resourcesWildCard) {
-            // Add all resources that belong to apiGroup
-            apiGroup.resources.map(resource => {
-              if (verbsWildCard) {
-                // Add all verbs that belong to resource
-                resource.verbs.map(verb => {
-                  rbac = assocPath([apiGroup.name, resource.name, verb], true, rbac)
-                })
-              } else {
-                // Add verbs that belong to rule
-                rule.verbs.map(verb => {
-                  rbac = assocPath([apiGroup.name, resource.name, verb], true, rbac)
-                })
-              }
-            })
-          } else {
-            rule.resources.map(resourceName => {
-              // Need to get full list of verbs that belong to the
-              // resource in case of verbs wildcard
-              const resource = apiGroup.resources.find(_resource => (
-                _resource.name === resourceName
-              ))
-              // If resource not in apiGroup, skip resource
-              if (!resource) {
-                return
-              }
-              if (verbsWildCard) {
-                // Add all verbs that belong to resource
-                resource.verbs.map(verb => {
-                  rbac = assocPath([apiGroup.name, resource.name, verb], true, rbac)
-                })
-              } else {
-                // Add verbs that belong to rule
-                rule.verbs.map(verb => {
-                  rbac = assocPath([apiGroup.name, resource.name, verb], true, rbac)
-                })
-              }
-            })
-          }
-        })
+const processApiGroupVerbs = (item, rule, apiGroupsList) => {
+  const apiGroupFromList = apiGroupsList.find(_apiGroup => (
+    _apiGroup.name === item.apiGroup
+  ))
+  const resourcesWithVerbs = item.resources.map(resource => {
+    const resourceFromList = apiGroupFromList.resources.find(_resource => (
+      _resource.name === resource
+    ))
+    const verbs = rule.verbs.map(verb => {
+      if (verb === '*') {
+        return resourceFromList.verbs
       } else {
-        rule.apiGroups.map(apiGroupName => {
-          // Need to get full list of resources that belong to
-          // apiGroup in case of resources wildcard
-          const apiGroup = apiGroups.find(_apiGroup => (
-            _apiGroup.name === apiGroupName
-          ))
-          if (resourcesWildCard) {
-            // Add all resources that belong to apiGroup
-            apiGroup.resources.map(resource => {
-              if (verbsWildCard) {
-                // Add all verbs that belong to resource
-                resource.verbs.map(verb => {
-                  rbac = assocPath([apiGroup.name, resource.name, verb], true, rbac)
-                })
-              } else {
-                // Add verbs that belong to rule
-                rule.verbs.map(verb => {
-                  rbac = assocPath([apiGroup.name, resource.name, verb], true, rbac)
-                })
-              }
-            })
-          } else {
-            rule.resources.map(resourceName => {
-              // Need to get full list of verbs that belong to the
-              // resource in case of verbs wildcard
-              const resource = apiGroup.resources.find(_resource => (
-                _resource.name === resourceName
-              ))
-              // If resource not in apiGroup, skip resource
-              if (!resource) {
-                return
-              }
-              if (verbsWildCard) {
-                // Add all verbs that belong to resource
-                resource.verbs.map(verb => {
-                  rbac = assocPath([apiGroup.name, resource.name, verb], true, rbac)
-                })
-              } else {
-                // Add verbs that belong to rule
-                rule.verbs.map(verb => {
-                  rbac = assocPath([apiGroup.name, resource.name, verb], true, rbac)
-                })
-              }
-            })
-          }
-        })
+        return verb
       }
     })
-  }
+    const flattenedVerbs = flatten(verbs)
+    // Account for potential duplicates with wildcard + a specified verb
+    // Remove verb if it does not exist in the resource
+    const validatedVerbs = uniq(flattenedVerbs.filter(verb => {
+      return resourceFromList.verbs.includes(verb)
+    }))
+    return { resource, verbs: validatedVerbs }
+  })
+  const verbsByResource = resourcesWithVerbs.reduce((accum, current) => {
+    const verbsObject = current.verbs.reduce((accum, verb) => {
+      return { ...accum, ...{ [verb]: true } }
+    }, {})
+    const resourceVerbs = { [current.resource]: verbsObject }
+    return { ...accum, ...resourceVerbs }
+  }, {})
+  return verbsByResource
+}
 
+const processRule = (rule, apiGroups) => {
+  const ruleApiGroups = flatten(rule.apiGroups.map(apiGroup => (
+    processApiGroup(apiGroup, apiGroups)
+  )))
+
+  const withResources = ruleApiGroups.map(apiGroup => {
+    const resources = processApiGroupResources(apiGroup, rule, apiGroups)
+    return { apiGroup, resources }
+  })
+
+  const withVerbs = withResources.map(item => {
+    const apiGroupVerbs = processApiGroupVerbs(item, rule, apiGroups)
+    return { [item.apiGroup]: apiGroupVerbs }
+  })
+
+  const translatedRule = withVerbs.reduce((accum, current) => {
+    return { ...accum, ...current }
+  }, {})
+  return translatedRule
+}
+
+const setRbacObject = (rules, apiGroups) => {
+  const rbac = rules.reduce((accum, current) => {
+    if (current.nonResourceURLs) {
+      return accum
+    }
+    const newRules = processRule(current, apiGroups)
+    return mergeDeepLeft(accum, newRules)
+  }, {})
   return rbac
 }
 

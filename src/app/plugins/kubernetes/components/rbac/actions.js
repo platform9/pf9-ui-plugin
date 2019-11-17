@@ -5,7 +5,6 @@ import { mapAsync, someAsync } from 'utils/async'
 import { clustersCacheKey } from '../infrastructure/common/actions'
 import createContextLoader from 'core/helpers/createContextLoader'
 import { pathStr } from 'utils/fp'
-// import { parseClusterParams } from 'k8s/components/infrastructure/clusters/actions'
 import { allKey } from 'app/constants'
 
 const { qbert } = ApiClient.getInstance()
