@@ -41,6 +41,7 @@ import AddRolePage from './components/rbac/AddRolePage'
 import AddClusterRolePage from './components/rbac/AddClusterRolePage'
 import AddRoleBindingPage from './components/rbac/AddRoleBindingPage'
 import AddClusterRoleBindingPage from './components/rbac/AddClusterRoleBindingPage'
+import EditClusterPage from 'k8s/components/infrastructure/clusters/EditClusterPage'
 
 class Kubernetes extends React.PureComponent {
   render () {
@@ -92,6 +93,11 @@ Kubernetes.registerPlugin = pluginManager => {
         link: { path: '/infrastructure/clusters/addBareOs', exact: true },
         requiredRoles: 'admin',
         component: AddBareOsClusterPage,
+      },
+      {
+        name: 'Edit Cluster',
+        link: { path: '/infrastructure/clusters/edit/:id', exact: true },
+        component: EditClusterPage,
       },
       {
         name: 'Cluster Details',
