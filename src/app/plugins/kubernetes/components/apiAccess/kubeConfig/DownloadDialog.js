@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import TextField from 'core/components/validatedForm/TextField'
@@ -28,21 +28,6 @@ const useStyles = makeStyles(theme => ({
 const DownloadDialog = ({ onDownloadClick, onClose, isDialogOpen }) => {
   const classes = useStyles()
   const [authMethod, setAuthMethod] = useState('token')
-  const [note, setNote] = useState()
-  const [confirmLabel, setConfirmLabel] = useState()
-  const [type, setType] = useState()
-
-  useEffect(() => {
-    if (authMethod === 'token') {
-      setNote('Token authentication is the preferred method for downloading kubeconfig. The kubeconfig will remain valid for the next 24 hours.')
-      setConfirmLabel('Download Config')
-      setType('button')
-    } else {
-      setNote('Password authentication is less secure than token authentication, but the kubeconfig will remain functional for as long as the username and password are valid.')
-      setConfirmLabel('Validate Credentials')
-      setType('submit')
-    }
-  }, [authMethod])
 
   const handleSubmit = async (params) => {
     const { username, password } = params
@@ -78,7 +63,11 @@ const DownloadDialog = ({ onDownloadClick, onClose, isDialogOpen }) => {
               &nbsp;
             </Grid>
             <Grid item xs={8} zeroMinWidth>
-              <b>Note: </b>{note}
+              <b>Note: </b>
+              {authMethod === 'token'
+                ? 'Token authentication is the preferred method for downloading kubeconfig. The kubeconfig will remain valid for the next 24 hours.'
+                : 'Password authentication is less secure than token authentication, but the kubeconfig will remain functional for as long as the username and password are valid.'
+              }
             </Grid>
             {authMethod === 'password' &&
               <Grid item xs={12} zeroMinWidth>
@@ -89,7 +78,9 @@ const DownloadDialog = ({ onDownloadClick, onClose, isDialogOpen }) => {
             }
             <Grid item xs={12} zeroMinWidth className={classes.formButtons}>
               <CancelButton onClick={onClose}>Cancel</CancelButton>
-              <SubmitButton type={type} onClick={handleSubmit}>{confirmLabel}</SubmitButton>
+              <SubmitButton type={authMethod === 'token' ? 'button' : 'submit'} onClick={handleSubmit}>
+                {authMethod === 'token' ? 'Download Config' : 'Validate Credentials'}
+              </SubmitButton>
             </Grid>
           </Grid>
         </ValidatedForm>
