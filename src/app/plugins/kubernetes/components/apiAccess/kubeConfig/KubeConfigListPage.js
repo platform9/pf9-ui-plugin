@@ -9,7 +9,7 @@ import SimpleLink from 'core/components/SimpleLink'
 import useToggler from 'core/hooks/useToggler'
 import ApiClient from 'api-client/ApiClient'
 
-const { qbert, keystone } = ApiClient.getInstance()
+const { qbert } = ApiClient.getInstance()
 
 const useStyles = makeStyles(theme => ({
   link: {
@@ -78,10 +78,9 @@ const KubeConfigListPage = () => {
     onSelect,
   }), [toggleDialog, downloadedKubeconfigs, currentKubeconfig, generateYaml])
 
-  const downloadKubeconfig = async (cluster, generateYaml) => {
-    const newToken = await keystone.renewScopedToken()
+  const downloadKubeconfig = async (cluster, generateYaml, token) => {
     const kubeconfig = await qbert.getKubeConfig(cluster.id)
-    const kubeconfigWithToken = kubeconfig.replace('__INSERT_BEARER_TOKEN_HERE__', newToken)
+    const kubeconfigWithToken = kubeconfig.replace('__INSERT_BEARER_TOKEN_HERE__', token)
     setDownloadedKubeconfigs({
       ...downloadedKubeconfigs,
       [cluster.id]: kubeconfigWithToken,
@@ -117,7 +116,7 @@ const KubeConfigListPage = () => {
         <TextField id="config" value={currentKubeconfig} rows={9} multiline />
       </ValidatedForm>
       <DownloadDialog
-        onDownloadClick={() => downloadKubeconfig(selectedCluster, generateYaml)}
+        onDownloadClick={(token) => downloadKubeconfig(selectedCluster, generateYaml, token)}
         onClose={handleCloseDialog}
         isDialogOpen={isDialogOpen}
       />
