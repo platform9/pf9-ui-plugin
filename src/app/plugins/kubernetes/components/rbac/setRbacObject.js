@@ -1,4 +1,4 @@
-import { flatten, includes, mergeAll, mergeDeepLeft, propEq, uniq } from 'ramda'
+import { flatten, mergeAll, mergeDeepLeft, propEq, uniq } from 'ramda'
 
 const processApiGroup = (apiGroup, apiGroupsList) => {
   if (apiGroup === '*') {
