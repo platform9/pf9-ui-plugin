@@ -8,6 +8,7 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import { Typography } from '@material-ui/core'
 import BlockChooser from 'core/components/BlockChooser'
+import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -18,7 +19,8 @@ const useStyles = makeStyles(theme => ({
     maxWidth: '800px',
   },
   workerCount: {
-    marginTop: theme.spacing(4),
+    margin: `${theme.spacing(4)}px 0px`,
+
   }
 }))
 
@@ -45,20 +47,24 @@ const ScaleWorkers = ({ cluster }) => {
             </Typography>
           </div>
           <div className={classes.workerCount}>
-            <Typography variant="body1">
-              You currently have {cluster.numWorkers} worker nodes.
+            <Typography variant="subtitle1">
+              You currently have <b>{cluster.numWorkers}</b> worker nodes.
             </Typography>
+          </div>
+          <div>
             <BlockChooser
               options={[
                 {
                   id: 'add',
-                  title: 'Add worker nodes',
-                  description: 'add',
+                  title: 'Add',
+                  icon: <FontAwesomeIcon size="2x">layer-plus</FontAwesomeIcon>,
+                  description: 'Add worker nodes to the cluster',
                 },
                 {
                   id: 'remove',
-                  title: 'Remove worker nodes',
-                  description: 'remove',
+                  icon: <FontAwesomeIcon size="2x">layer-minus</FontAwesomeIcon>,
+                  title: 'Remove',
+                  description: 'Remove worker nodes from the cluster',
                 }
               ]}
             />
