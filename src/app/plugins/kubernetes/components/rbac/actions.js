@@ -263,21 +263,21 @@ export const roleBindingActions = createCRUDActions(roleBindingsCacheKey, {
     return qbert.createClusterRoleBinding(data.clusterId, data.namespace, body)
   },
   updateFn: async data => {
-    const users = data.users.map((user) => {
-      return {
+    const users = data.users.map((user) =>
+      {
         kind: 'User',
         name: user,
         apiGroup: 'rbac.authorization.k8s.io'
       }
     })
 
-    const groups = data.groups.map((group) => {
-      return {
+    const groups = data.groups.map((group) =>
+      {
         kind: 'Group',
         name: group,
         apiGroup: 'rbac.authorization.k8s.io'
       }
-    })
+    )
 
     const subjects = [...users, ...groups]
 
@@ -329,21 +329,21 @@ export const clusterRoleBindingActions = createCRUDActions(clusterRoleBindingsCa
     return qbert.getClusterClusterRoleBindings(clusterId)
   },
   createFn: async data => {
-    const users = data.users.map((user) => {
-      return {
+    const users = data.users.map((user) =>
+      {
         kind: 'User',
         name: user,
         apiGroup: 'rbac.authorization.k8s.io'
       }
-    })
+    )
 
-    const groups = data.groups.map((group) => {
-      return {
+    const groups = data.groups.map((group) =>
+      {
         kind: 'Group',
         name: group,
         apiGroup: 'rbac.authorization.k8s.io'
       }
-    })
+    )
 
     const subjects = [...users, ...groups]
 
