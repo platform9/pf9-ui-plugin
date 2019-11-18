@@ -26,6 +26,15 @@ export const hasOneUpperChar = both(is(String), test(/[A-Z]/))
 export const hasOneNumber = both(is(String), test(/[0-9]/))
 export const hasOneSpecialChar = both(is(String), test(/[-!@#$%^&*()?]/))
 
+export const namespaceValidator = new FieldValidator(
+  namespace =>
+    fieldIsUnset(namespace) ||
+    /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/gi.test(
+      namespace,
+    ),
+  "Namespace is invalid, alphanumeric characters and '-' only",
+)
+
 export const emailValidator = new FieldValidator(
   email =>
     fieldIsUnset(email) ||

@@ -76,6 +76,7 @@ const RegionChooser = props => {
         onChoose={handleRegionSelect}
         onSearchChange={setSearchText}
         searchTerm={regionSearch}
+        type='Region'
       />
     </Tooltip>
   )

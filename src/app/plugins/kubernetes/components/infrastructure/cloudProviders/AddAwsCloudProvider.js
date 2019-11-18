@@ -31,6 +31,7 @@ const helpText = <Typography variant="body1" component="div">
         <li>EBS Volume Management</li>
         <li>VPC Management</li>
       </ul>
+      <p><ExternalLink url="https://github.com/platform9/support-locker/blob/master/pmk/aws-policy.json">View the exact IAM policy we require</ExternalLink></p>
     </div>
   </Alert>
 </Typography>

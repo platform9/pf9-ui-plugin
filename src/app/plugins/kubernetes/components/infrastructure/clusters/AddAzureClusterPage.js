@@ -112,7 +112,7 @@ const AddAzureClusterPage = () => {
 
   return (
     <FormWrapper title="Add Azure Cluster" backUrl={listUrl} loading={creatingAzureCluster}>
-      <Wizard onComplete={handleSubmit(params)} context={initialContext}>
+      <Wizard onComplete={handleSubmit(params)} context={initialContext} originPath={`${k8sPrefix}/infrastructure/clusters/add`}>
         {({ wizardContext, setWizardContext, onNext }) => {
           return (
             <>

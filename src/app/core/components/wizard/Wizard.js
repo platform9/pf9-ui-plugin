@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import WizardButtons from 'core/components/wizard/WizardButtons'
 import NextButton from 'core/components/buttons/NextButton'
@@ -15,6 +16,7 @@ class Wizard extends PureComponent {
   lastStep = () => this.state.steps.length - 1
   hasNext = () => this.state.activeStep < this.lastStep()
   hasBack = () => this.state.activeStep > 0
+  canBackAtFirstStep = () => this.state.activeStep === 0 && !!this.props.originPath
 
   // Callbacks indexed by step ID to be called before navigating to the next step
   nextCb = {}
@@ -32,6 +34,11 @@ class Wizard extends PureComponent {
       state => ({ steps: [...state.steps, newStep] }),
       this.activateStep,
     )
+  }
+
+  handleOriginBack = () => {
+    const { history, originPath } = this.props
+    history.push(originPath)
   }
 
   handleBack = () => {
@@ -92,12 +99,10 @@ class Wizard extends PureComponent {
         {renderStepsContent({ wizardContext, setWizardContext, onNext: this.onNext })}
         <WizardButtons>
           {onCancel && <CancelButton onClick={onCancel} />}
-          {this.hasBack() &&
-          <PrevButton onClick={this.handleBack} />}
-          {this.hasNext() &&
-          <NextButton onClick={this.handleNext}>Next</NextButton>}
-          {this.isLastStep() &&
-          <NextButton onClick={this.handleNext}>{submitLabel}</NextButton>}
+          {this.hasBack() && <PrevButton onClick={this.handleBack} />}
+          {this.canBackAtFirstStep() && <PrevButton onClick={this.handleOriginBack} />}
+          {this.hasNext() && <NextButton onClick={this.handleNext}>Next</NextButton>}
+          {this.isLastStep() && <NextButton onClick={this.handleNext}>{submitLabel}</NextButton>}
         </WizardButtons>
       </WizardContext.Provider>
     )
@@ -105,6 +110,7 @@ class Wizard extends PureComponent {
 }
 
 Wizard.propTypes = {
+  originPath: PropTypes.string,
   showSteps: PropTypes.bool,
   onComplete: PropTypes.func,
   onCancel: PropTypes.func,
@@ -122,4 +128,4 @@ Wizard.defaultProps = {
   },
 }
 
-export default Wizard
+export default withRouter(Wizard)

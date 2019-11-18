@@ -21,41 +21,45 @@ const variantIcon = {
 const useStyles = makeStyles(theme => ({
   root: {
     maxWidth: 800,
-    position: 'relative',
-    padding: theme.spacing(1, 8),
+    position: ({ small }) => small ? 'initial' : 'relative',
+    padding: ({ small }) => small ? theme.spacing(1, 1) : theme.spacing(1, 8),
     margin: theme.spacing(2, 0),
-    width: '100%',
     border: 0,
+    display: ({ small }) => small ? 'flex' : 'block'
   },
   success: { color: green[600] },
   error: { color: theme.palette.error.dark },
   info: { color: theme.palette.primary.dark },
   warning: { color: amber[700] },
   icon: {
-    position: 'absolute',
-    left: theme.spacing(2),
-    top: theme.spacing(1),
+    position: ({ small }) => small ? 'initial' : 'absolute',
+    left: ({ small }) => small ? 'initial' : theme.spacing(2),
+    top: ({ small }) => small ? 'initial' : theme.spacing(1),
     fontSize: 28,
+    flexGrow: ({ small }) => small ? 0 : 'initial',
+    alignSelf: ({ small }) => small ? 'center' : 'initial',
   },
   close: {
-    position: 'absolute',
-    right: theme.spacing(2),
-    top: theme.spacing(1),
+    position: ({ small }) => small ? 'initial' : 'absolute',
+    right: ({ small }) => small ? 'initial' : theme.spacing(2),
+    top: ({ small }) => small ? 'initial' : theme.spacing(1),
     padding: theme.spacing(1),
     margin: theme.spacing(-1),
+    flexGrow: ({ small }) => small ? 0 : 'initial',
+    alignSelf: ({ small }) => small ? 'center' : 'initial',
   },
   iconVariant: {
     opacity: 0.9,
     marginRight: theme.spacing(1),
   },
   message: {
-    display: 'flex',
-    alignItems: 'center',
+    alignSelf: ({ small }) => small ? 'center' : 'initial',
+    flexGrow: ({ small }) => small ? 1 : 'initial',
   },
 }))
 
-const Alert = ({ children, message, variant }) => {
-  const classes = useStyles()
+const Alert = ({ children, message, variant, small }) => {
+  const classes = useStyles({ small })
   const [open, setOpen] = useState(true)
   if (!open) { return null }
   const Icon = variantIcon[variant]
@@ -63,7 +67,7 @@ const Alert = ({ children, message, variant }) => {
   return (
     <Paper className={classes.root}>
       <Icon className={clsx(classes.icon, classes.iconVariant, classes[variant])} />
-      {message && <Typography variant="body1" color="inherit">{message}</Typography>}
+      {message && <Typography variant="body1" color="inherit" className={classes.message}>{message}</Typography>}
       {children}
       <IconButton
         key='close'

@@ -14,6 +14,7 @@ import ExternalLink from 'core/components/ExternalLink'
 import { forgotPasswordUrl } from 'app/constants.js'
 import { pathJoin } from 'utils/misc'
 import { imageUrlRoot, dashboardUrl } from 'app/constants'
+import moment from 'moment'
 
 const styles = theme => ({
   root: {
@@ -161,7 +162,7 @@ export class LoginPage extends React.PureComponent {
         of Service</ExternalLink>.
       </Typography>
       <Typography className={classes.paragraph} variant="caption" color="textSecondary">
-        © 2014-2018 Platform9 Systems, Inc.
+        © 2014-{moment().year()} Platform9 Systems, Inc.
       </Typography>
     </Fragment>
   }
@@ -183,9 +184,7 @@ export class LoginPage extends React.PureComponent {
                 {this.renderMFACheckbox()}
                 {this.state.MFAcheckbox && this.renderMFAInput()}
                 {loginFailed && (
-                  <div className={classes.errorContainer}>
-                    <Alert variant="error" message="Login failed" />
-                  </div>
+                  <Alert small variant="error" message="Login failed" />
                 )}
                 <Button type="submit" disabled={loading} className={classes.signinButton} variant="contained" color="primary">
                   {loading ? 'Attempting login...' : 'Sign In'}
