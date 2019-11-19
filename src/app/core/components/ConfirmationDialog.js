@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import {
   Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
 } from '@material-ui/core'
+import { withProgress } from 'core/components/progress/Progress'
 
 class ConfirmationDialog extends React.PureComponent {
   handleCancel = () => {
@@ -65,4 +66,7 @@ ConfirmationDialog.defaultProps = {
   confirmText: 'Confirm',
 }
 
-export default ConfirmationDialog
+export default withProgress(ConfirmationDialog, {
+  renderContentOnMount: true,
+  message: 'Please wait...'
+})

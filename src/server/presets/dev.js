@@ -184,7 +184,7 @@ function loadPreset () {
 
   // Clusters
   const cluster = Cluster.create({ data: { name: 'fakeCluster1', sshKey: 'someKey', tags: { 'pf9-system:monitoring': 'true' } }, context, raw: true })
-  const cluster2 = Cluster.create({ data: { name: 'fakeCluster2', sshKey: 'someKey' }, context, raw: true })
+  const cluster2 = Cluster.create({ data: { name: 'fakeCluster2', canUpgrade: true, sshKey: 'someKey' }, context, raw: true })
   const cluster3 = Cluster.create({ data: { name: 'fakeCluster3' }, context })
   const cluster4 = Cluster.create({ data: { name: 'mockAwsCluster', cloudProviderType: 'aws' }, context })
   const cluster5 = Cluster.create({ data: { name: 'mockOpenStackCluster', cloudProviderType: 'openstack' }, context })
