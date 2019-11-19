@@ -56,8 +56,10 @@ const ClusterDetailsPage = () => {
         </>
       }
     >
-      {loading ? <Progress message="Loading Nodes..." /> : null}
-      {!loading ? <NodeDetail {...selectedNode} /> : null}
+    { loading
+      ? <Progress message="Loading Nodes..." />
+      : <NodeDetail {...selectedNode} />
+    }
     </PageContainer>
   )
 }
