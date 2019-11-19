@@ -6,11 +6,11 @@ import { pathJoin } from 'utils/misc'
 import useReactRouter from 'use-react-router'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
-import { Typography } from '@material-ui/core'
+import { Typography, Theme } from '@material-ui/core'
 import BlockChooser from 'core/components/BlockChooser'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {
     marginTop: theme.spacing(2),
     display: 'flex',
@@ -20,7 +20,6 @@ const useStyles = makeStyles(theme => ({
   },
   workerCount: {
     margin: `${theme.spacing(4)}px 0px`,
-
   }
 }))
 
@@ -32,7 +31,7 @@ const clusterTypeDisplay = {
 }
 
 const ScaleWorkers = ({ cluster }) => {
-  const classes = useStyles()
+  const classes = useStyles({})
   const { name, cloudProviderType } = cluster
   const isLocal = cloudProviderType === 'local'
   const isCloud = ['aws', 'azure'].includes(cloudProviderType)
@@ -57,12 +56,12 @@ const ScaleWorkers = ({ cluster }) => {
                 {
                   id: 'add',
                   title: 'Add',
-                  icon: <FontAwesomeIcon size="2x">layer-plus</FontAwesomeIcon>,
+                  icon: <FontAwesomeIcon size="2x" name="layer-plus" />,
                   description: 'Add worker nodes to the cluster',
                 },
                 {
                   id: 'remove',
-                  icon: <FontAwesomeIcon size="2x">layer-minus</FontAwesomeIcon>,
+                  icon: <FontAwesomeIcon size="2x" name="layer-minus" />,
                   title: 'Remove',
                   description: 'Remove worker nodes from the cluster',
                 }
@@ -81,7 +80,7 @@ const ScaleWorkers = ({ cluster }) => {
 }
 
 const ScaleWorkersPage = () => {
-  const classes = useStyles()
+  const classes = useStyles({})
   const { id } = useReactRouter().match.params
   const [clusters, loading] = useDataLoader(clusterActions.list)
   const cluster = (clusters || []).find(x => x.uuid === id)

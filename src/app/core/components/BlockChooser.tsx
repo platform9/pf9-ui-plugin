@@ -40,7 +40,7 @@ interface BlockOption {
 }
 interface Props {
   options: BlockOption[]
-  onChange(id: string):void
+  onChange?: (id: string) => void
 }
 
 // This component presents large format blocks that the user can choose between.
