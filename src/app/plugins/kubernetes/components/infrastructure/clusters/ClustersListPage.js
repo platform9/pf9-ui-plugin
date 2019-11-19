@@ -21,6 +21,7 @@ import DashboardLink from './DashboardLink'
 import CreateButton from 'core/components/buttons/CreateButton'
 import { AppContext } from 'core/providers/AppProvider'
 import { both, prop } from 'ramda'
+import ClusterUpgradeDialog from 'k8s/components/infrastructure/clusters/ClusterUpgradeDialog'
 
 const getClusterPopoverContent = (healthyMasterNodes, masterNodes) =>
   `${healthyMasterNodes.length} of ${masterNodes.length} master nodes healthy (3 required)`
@@ -135,12 +136,8 @@ const renderClusterDetailLink = (name, cluster) =>
 const canAttachNode = ([row]) => row.cloudProviderType === 'local'
 const canDetachNode = ([row]) => row.cloudProviderType === 'local'
 const canScaleCluster = ([row]) => row.cloudProviderType === 'aws'
-const canUpgradeCluster = (selected) => false
+const canUpgradeCluster = ([row]) => row.canUpgrade
 const canDeleteCluster = ([row]) => !(['creating', 'deleting'].includes(row.taskStatus))
-
-const upgradeCluster = (selected) => {
-  console.log('TODO: upgradeCluster')
-}
 
 const isAdmin = (selected, getContext) => {
   const { role } = getContext(prop('userDetails'))
@@ -209,8 +206,7 @@ export const options = {
       cond: both(isAdmin, canUpgradeCluster),
       icon: <UpgradeIcon />,
       label: 'Upgrade cluster',
-      action: upgradeCluster,
-      disabledInfo: 'Feature not yet implemented',
+      dialog: ClusterUpgradeDialog,
     },
   ],
 }

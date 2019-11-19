@@ -10,7 +10,9 @@ import { getCpDetails, getCpRegionDetails } from './cloudProviders/getCpDetails'
 // Nodes
 import getNodes from './nodes/getNodes'
 // Clusters
-import { getClusters, postCluster, putCluster, deleteCluster } from './clusters/clusterActions'
+import {
+  getClusters, postCluster, putCluster, deleteCluster, upgradeCluster,
+} from './clusters/clusterActions'
 import getClusterVersion from './clusters/getClusterVersion'
 import { attachNodes, detachNodes } from './clusters/attachOperations'
 import getKubeConfig from './kubeConfig/getKubeConfig'
@@ -23,13 +25,16 @@ import { getServices, postService, deleteService } from './services/serviceActio
 import {
   getStorageClasses, postStorageClass, deleteStorageClass,
 } from './storageClasses/storageClassActions'
-
 // RBAC
 import { getRoles, postRole, deleteRole } from './roles/roleActions'
-import { getRoleBindings, postRoleBinding, deleteRoleBinding } from './roleBindings/roleBindingActions'
-import { getClusterRoles, postClusterRole, deleteClusterRole } from './clusterRoles/clusterRoleActions'
 import {
-  getClusterRoleBindings, postClusterRoleBinding, deleteClusterRoleBinding
+  getRoleBindings, postRoleBinding, deleteRoleBinding,
+} from './roleBindings/roleBindingActions'
+import {
+  getClusterRoles, postClusterRole, deleteClusterRole,
+} from './clusterRoles/clusterRoleActions'
+import {
+  getClusterRoleBindings, postClusterRoleBinding, deleteClusterRoleBinding,
 } from './clusterRoleBindings/clusterRoleBindingActions'
 
 import { getCharts, getChart, getChartVersions, getChartVersion } from './charts'
@@ -43,9 +48,8 @@ import {
 import { getLoggings, postLogging, putLogging, deleteLogging } from './logging/loggingActions'
 
 import {
-  getApiGroupList, getExtensionsApiResources, getAppsApiResources, getCoreApiResources
+  getApiGroupList, getExtensionsApiResources, getAppsApiResources, getCoreApiResources,
 } from './apiResources/apiResourceActions'
-
 // TODO
 // import { deployApplication } from './applications'
 import { getRepositoriesForCluster } from './repositories/actions'
@@ -69,6 +73,7 @@ router.get(`/${version}/:tenantId/clusters`, tokenValidator, getClusters)
 router.post(`/${version}/:tenantId/clusters`, tokenValidator, postCluster)
 router.put(`/${version}/:tenantId/clusters/:clusterId`, tokenValidator, putCluster)
 router.delete(`/${version}/:tenantId/clusters/:clusterId`, tokenValidator, deleteCluster)
+router.post(`/${version}/:tenantId/clusters/:clusterId/upgrade`, tokenValidator, upgradeCluster)
 router.get(`/${version}/:tenantId/clusters/:clusterId/k8sapi/version`, tokenValidator, getClusterVersion)
 
 router.post(`/${version}/:tenantId/clusters/:clusterId/attach`, tokenValidator, attachNodes)

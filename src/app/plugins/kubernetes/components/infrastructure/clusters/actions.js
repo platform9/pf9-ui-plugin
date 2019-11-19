@@ -6,9 +6,11 @@ import { castFuzzyBool, sanitizeUrl } from 'utils/misc'
 import {
   clustersCacheKey, combinedHostsCacheKey, loadCombinedHosts,
 } from 'k8s/components/infrastructure/common/actions'
-import { filterIf, isTruthy, updateWith } from 'utils/fp'
+import { filterIf, isTruthy, updateWith, adjustWith } from 'utils/fp'
 import { mapAsync } from 'utils/async'
-import { pluck, pathOr, pick, pipe, either, propSatisfies, compose, path, propEq } from 'ramda'
+import {
+  pluck, pathOr, pick, pipe, either, propSatisfies, compose, path, propEq, mergeLeft,
+} from 'ramda'
 import { rawNodesCacheKey } from 'k8s/components/infrastructure/nodes/actions'
 
 const { qbert } = ApiClient.getInstance()
@@ -33,7 +35,8 @@ const getKubernetesVersion = async clusterId => {
 }
 
 export const hasMasterNode = propSatisfies(isTruthy, 'hasMasterNode')
-export const hasHealthyMasterNodes = propSatisfies(healthyMasterNodes => healthyMasterNodes.length > 0, 'healthyMasterNodes')
+export const hasHealthyMasterNodes = propSatisfies(
+  healthyMasterNodes => healthyMasterNodes.length > 0, 'healthyMasterNodes')
 export const masterlessCluster = propSatisfies(isTruthy, 'masterless')
 export const hasPrometheusEnabled = compose(castFuzzyBool, path(['tags', 'pf9-system:monitoring']))
 export const hasAppCatalogEnabled = propSatisfies(isTruthy, 'appCatalogEnabled')
@@ -205,6 +208,14 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
         ...cluster,
         numWorkers,
       }, prevItems)
+    },
+    upgradeCluster: async ({ uuid }, prevItems) => {
+      await qbert.upgradeCluster(uuid)
+
+      // Update the cluster in the cache
+      return adjustWith(propEq('uuid', uuid), mergeLeft({
+        canUpgrade: false,
+      }), prevItems)
     },
   },
   uniqueIdentifier: 'uuid',
