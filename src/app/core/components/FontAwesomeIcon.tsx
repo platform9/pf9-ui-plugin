@@ -2,6 +2,7 @@ import React, { forwardRef } from 'react'
 import clsx from 'clsx'
 
 interface Props {
+  [key: string]: any // support for the ...rest props
   children?: any
   size?: string
   solid?: boolean
