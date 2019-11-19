@@ -43,13 +43,6 @@ const networkPluginOptions = [
   { label: 'Canal (experimental)', value: 'canal' },
 ]
 
-const handleNetworkPluginChange = ({ setWizardContext, setFieldValue }) => option => {
-  if (['calico', 'canal', 'weave'].includes(option)) {
-    setWizardContext({ privileged: true, custom: option })
-    setFieldValue('privileged')(true)
-  }
-}
-
 const AddBareOsClusterPage = () => {
   const { params, getParamsUpdater } = useParams()
   const { history } = useReactRouter()
@@ -235,7 +228,6 @@ const AddBareOsClusterPage = () => {
                         label="Network backend"
                         options={networkPluginOptions}
                         info=""
-                        onChange={handleNetworkPluginChange({ setWizardContext, setFieldValue })}
                         required
                       />
                       {values.networkPlugin === 'calico' &&
@@ -243,7 +235,7 @@ const AddBareOsClusterPage = () => {
                         id="mtuSize"
                         label="MTU Size"
                         info="Maximum Transmission Unit (MTU) for the interface (in bytes)"
-                        required={values.networkPlugin === 'calico'}
+                        required
                       />
                       }
                     </>
@@ -259,7 +251,8 @@ const AddBareOsClusterPage = () => {
                       <CheckboxField
                         id="privileged"
                         label="Privileged"
-                        disabled={['calico', 'canal', 'weave'].includes(values.networkPlugin)}
+                        value={values.privileged || ['calico', 'canal', 'weave'].includes(wizardContext.networkPlugin)}
+                        disabled={['calico', 'canal', 'weave'].includes(wizardContext.networkPlugin)}
                         info="Allows this cluster to run privileged containers. Read this article for more information."
                       />
 

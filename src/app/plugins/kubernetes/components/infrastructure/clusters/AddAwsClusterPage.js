@@ -507,7 +507,7 @@ const AddAwsClusterPage = () => {
                         id="mtuSize"
                         label="MTU Size"
                         info="Maximum Transmission Unit (MTU) for the interface (in bytes)"
-                        required={values.networkPlugin === 'calico'}
+                        required
                       />
                       }
                     </>
