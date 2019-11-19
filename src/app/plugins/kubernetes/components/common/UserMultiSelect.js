@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react'
+import React, { forwardRef, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { projectAs } from 'utils/fp'
 import { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
@@ -9,12 +9,16 @@ import { mngmUserActions } from 'k8s/components/userManagement/users/actions'
 const UserPicker = forwardRef(({ onChange, initialValue, ...rest }, ref) => {
   const [users, loadingUsers] = useDataLoader(mngmUserActions.list, { orderBy: 'username' })
   const [values, setValues] = React.useState(initialValue || [])
+
   const handleValuesChange = values => {
     setValues(values)
     onChange && onChange(values)
   }
 
   const usersList = projectAs({ label: 'username', value: 'username' }, users)
+  useEffect(() => {
+    onChange && onChange(values)
+  }, [initialValue])
 
   return (
     <MultiSelect

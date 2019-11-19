@@ -1,6 +1,6 @@
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import SubmitButton from 'core/components/SubmitButton'
-import React, { useMemo, useCallback, useEffect } from 'react'
+import React, { useMemo, useCallback } from 'react'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import { roleBindingActions } from 'k8s/components/rbac/actions'
 import useDataLoader from 'core/hooks/useDataLoader'
@@ -25,32 +25,26 @@ const UpdateRoleBindingPage = () => {
   const onComplete = useCallback(
     success => success && history.push('/ui/kubernetes/rbac#roleBindings'),
     [history])
-  const [roleBindings] = useDataLoader(roleBindingActions.list, { clusterId })
+  const [roleBindings, loading] = useDataLoader(roleBindingActions.list, { clusterId })
   const roleBinding = useMemo(
     () => roleBindings.find(propEq('id', roleBindingId)) || emptyObj,
     [roleBindings, roleBindingId])
-  // const [update, updating] = useDataUpdater(roleBindingActions.update, onComplete)
-  const { params, updateParams, getParamsUpdater } = useParams(defaultParams)
 
-  const [updateRoleBindingAction] = useDataUpdater(roleBindingActions.update, onComplete)
-  const handleSubmit = params => data => updateRoleBindingAction({ ...data, ...params })
-  useEffect(() => {
-    updateParams({
-      users: roleBinding.users,
-      groups: roleBinding.groups,
-      name: roleBinding.name,
-      role: roleBinding.roleRef,
-      clusterId: roleBinding.clusterId,
-      namespace: roleBinding.namespace,
-    })
-  }, [roleBinding])
+  const { params, getParamsUpdater } = useParams(defaultParams)
+
+  const [updateRoleBindingAction, updating] = useDataUpdater(roleBindingActions.update, onComplete)
+  const handleSubmit = useCallback(
+    data => updateRoleBindingAction(({ ...roleBinding, ...params, ...data })),
+    [roleBinding, params])
 
   return (
     <FormWrapper
       title="Edit Role Binding"
       backUrl='/ui/kubernetes/rbac#roleBindings'
+      loading={loading || updating}
+      message={loading ? 'Loading role binding...' : 'Submitting form...'}
     >
-      <ValidatedForm onSubmit={handleSubmit(params)}>
+      <ValidatedForm onSubmit={handleSubmit}>
         <PresetField label='Name' value={roleBinding.name} />
         <PresetField label='Cluster' value={roleBinding.clusterName} />
         <PresetField label='Namespace' value={roleBinding.namespace} />

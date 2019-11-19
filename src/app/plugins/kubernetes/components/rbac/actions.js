@@ -287,7 +287,7 @@ export const roleBindingActions = createCRUDActions(roleBindingsCacheKey, {
         name: data.name,
       },
       subjects,
-      roleRef: data.role
+      roleRef: data.roleRef
     }
     return qbert.updateClusterRoleBinding(data.clusterId, data.namespace, data.name, body)
   },
@@ -309,8 +309,8 @@ export const roleBindingActions = createCRUDActions(roleBindingsCacheKey, {
       namespace: pathStr('metadata.namespace', item),
       clusterName: pipe(find(propEq('uuid', item.clusterId)), prop('name'))(clusters),
       created: pathStr('metadata.creationTimestamp', item),
-      users: getSubjectsOfKind(item.subjects, 'User'),
-      groups: getSubjectsOfKind(item.subjects, 'Group'),
+      users: item.subjects ? getSubjectsOfKind(item.subjects, 'User') : [],
+      groups: item.subjects ? getSubjectsOfKind(item.subjects, 'Group') : [],
     }))
   },
   uniqueIdentifier,
@@ -389,7 +389,7 @@ export const clusterRoleBindingActions = createCRUDActions(clusterRoleBindingsCa
         name: data.name,
       },
       subjects,
-      roleRef: data.role
+      roleRef: data.roleRef
     }
     return qbert.updateClusterClusterRoleBinding(data.clusterId, data.name, body)
   },

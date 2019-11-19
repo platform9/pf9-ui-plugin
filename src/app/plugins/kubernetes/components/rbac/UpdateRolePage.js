@@ -27,6 +27,8 @@ const UpdateRolePage = () => {
     () => roles.find(propEq('id', roleId)) || emptyObj,
     [roles, roleId])
   const [updateRoleAction, updating] = useDataUpdater(roleActions.update, onComplete)
+  // I have to look into why this update action does not work
+  // with the new architecture suggested in the role update pages
   const handleSubmit = useCallback(
     data => updateRoleAction(({ ...role, ...data })),
     [role])
@@ -39,9 +41,9 @@ const UpdateRolePage = () => {
       message={loading ? 'Loading role...' : 'Submitting form...'}
     >
       <ValidatedForm onSubmit={handleSubmit}>
-        <PresetField id="name" label='Name' value={role.name} />
-        <PresetField id="cluster" label='Cluster' value={role.clusterName} />
-        <PresetField id="namespace" label='Namespace' value={role.namespace} />
+        <PresetField label='Name' value={role.name} />
+        <PresetField label='Cluster' value={role.clusterName} />
+        <PresetField label='Namespace' value={role.namespace} />
         {role.clusterId && <RbacChecklist
           id="rbac"
           clusterId={role.clusterId}

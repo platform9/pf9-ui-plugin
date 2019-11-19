@@ -1,6 +1,6 @@
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import SubmitButton from 'core/components/SubmitButton'
-import React, { useMemo, useCallback, useEffect } from 'react'
+import React, { useMemo, useCallback } from 'react'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import { clusterRoleBindingActions } from 'k8s/components/rbac/actions'
 import useDataLoader from 'core/hooks/useDataLoader'
@@ -25,28 +25,23 @@ const UpdateClusterRoleBindingPage = () => {
   const onComplete = useCallback(
     success => success && history.push('/ui/kubernetes/rbac#clusterRoleBindings'),
     [history])
-  const [clusterRoleBindings] = useDataLoader(clusterRoleBindingActions.list, { clusterId })
+  const [clusterRoleBindings, loading] = useDataLoader(clusterRoleBindingActions.list, { clusterId })
   const clusterRoleBinding = useMemo(
     () => clusterRoleBindings.find(propEq('id', clusterRoleBindingId)) || emptyObj,
     [clusterRoleBindings, clusterRoleBindingId])
-  const { params, updateParams, getParamsUpdater } = useParams(defaultParams)
+  const { params, getParamsUpdater } = useParams(defaultParams)
 
-  const [updateClusterRoleBindingAction] = useDataUpdater(clusterRoleBindingActions.update, onComplete)
-  const handleSubmit = data => updateClusterRoleBindingAction({ ...data, ...params })
-  useEffect(() => {
-    updateParams({
-      users: clusterRoleBinding.users,
-      groups: clusterRoleBinding.groups,
-      name: clusterRoleBinding.name,
-      role: clusterRoleBinding.roleRef,
-      clusterId: clusterRoleBinding.clusterId,
-    })
-  }, [clusterRoleBinding])
+  const [updateClusterRoleBindingAction, updating] = useDataUpdater(clusterRoleBindingActions.update, onComplete)
+  const handleSubmit = useCallback(
+    data => updateClusterRoleBindingAction(({ ...clusterRoleBinding, ...params, ...data })),
+    [clusterRoleBinding, params])
 
   return (
     <FormWrapper
       title="Edit Cluster Role Binding"
       backUrl='/ui/kubernetes/rbac#clusterRoleBindings'
+      loading={loading || updating}
+      message={loading ? 'Loading cluster role...' : 'Submitting form...'}
     >
       <ValidatedForm onSubmit={handleSubmit}>
         <PresetField label='Name' value={clusterRoleBinding.name} />

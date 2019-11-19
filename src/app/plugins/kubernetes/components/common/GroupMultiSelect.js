@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react'
+import React, { forwardRef, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { projectAs } from 'utils/fp'
 import { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
@@ -16,6 +16,9 @@ const GroupPicker = forwardRef(({ onChange, initialValue, ...rest }, ref) => {
   }
 
   const groupsList = projectAs({ label: 'name', value: 'name' }, groups)
+  useEffect(() => {
+    onChange && onChange(values)
+  }, [initialValue])
 
   return (
     <MultiSelect
