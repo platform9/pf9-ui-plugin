@@ -29,8 +29,8 @@ const UpdateClusterRolePage = () => {
     () => clusterRoles.find(propEq('id', clusterRoleId)) || emptyObj,
     [clusterRoles, clusterRoleId])
   const [updateClusterRoleAction] = useDataUpdater(clusterRoleActions.update, onComplete)
-  const handleSubmit = params => data => updateClusterRoleAction({ ...data, ...params })
   const { params, updateParams, getParamsUpdater } = useParams(defaultParams)
+  const handleSubmit = data => updateClusterRoleAction({ ...data, ...params })
   useEffect(() => {
     updateParams({
       name: clusterRole.name,
@@ -44,7 +44,7 @@ const UpdateClusterRolePage = () => {
       title="Edit Cluster Role"
       backUrl='/ui/kubernetes/rbac#clusterRoles'
     >
-      <ValidatedForm onSubmit={handleSubmit(params)}>
+      <ValidatedForm onSubmit={handleSubmit}>
         <PresetField label='Name' value={clusterRole.name} />
         <PresetField label='Cluster' value={clusterRole.clusterName} />
         { clusterRole.clusterId && <RbacChecklist

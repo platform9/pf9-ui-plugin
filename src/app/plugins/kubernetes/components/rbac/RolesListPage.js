@@ -42,7 +42,9 @@ export const options = {
   cacheKey: rolesCacheKey,
   deleteFn: roleActions.delete,
   editUrl: '/ui/kubernetes/rbac/roles/edit',
-  editWithClusterId: true,
+  customEditUrlFn: (item, itemId) => (
+    `/ui/kubernetes/rbac/roles/edit/${itemId}/cluster/${item.clusterId}`
+  ),
   name: 'Roles',
   title: 'Roles',
   ListPage,

@@ -48,7 +48,7 @@ const createCRUDComponents = options => {
     editUrl,
     editCond,
     editDisabledInfo,
-    editWithClusterId,
+    customEditUrlFn,
     debug,
     name,
     searchTarget = 'name',
@@ -113,7 +113,7 @@ const createCRUDComponents = options => {
         addText={addText}
         addButton={addButton}
         editUrl={editUrl}
-        editWithClusterId={editWithClusterId}
+        customEditUrlFn={customEditUrlFn}
         addUrl={addUrl}
         deleteFn={deleteFn}
         uniqueIdentifier={uniqueIdentifier}

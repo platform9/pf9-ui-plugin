@@ -21,7 +21,7 @@ const CRUDListContainer = ({
   EditDialog,
   addUrl,
   editUrl,
-  editWithClusterId,
+  customEditUrlFn,
   deleteFn,
   uniqueIdentifier,
 }) => {
@@ -72,12 +72,11 @@ const CRUDListContainer = ({
     if (editUrl) {
       const [selectedRow = emptyObj] = selected
       const selectedId = path(uniqueIdentifierPath, selectedRow)
-      const selectedClusterId = selectedRow.clusterId
       if (!selectedId) {
         console.error(`Unable to redirect to edit page, the current id (${uniqueIdentifier}) is not defined for the selected items`, selected)
         return
       }
-      history.push(editWithClusterId ? pathJoin(editUrl, selectedId, 'cluster', selectedClusterId)
+      history.push(customEditUrlFn ? customEditUrlFn(selectedRow, selectedId)
         : pathJoin(editUrl, selectedId))
     } else if (EditDialog) {
       setSelectedItems(selected)

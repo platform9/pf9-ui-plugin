@@ -32,7 +32,7 @@ const UpdateClusterRoleBindingPage = () => {
   const { params, updateParams, getParamsUpdater } = useParams(defaultParams)
 
   const [updateClusterRoleBindingAction] = useDataUpdater(clusterRoleBindingActions.update, onComplete)
-  const handleSubmit = params => data => updateClusterRoleBindingAction({ ...data, ...params })
+  const handleSubmit = data => updateClusterRoleBindingAction({ ...data, ...params })
   useEffect(() => {
     updateParams({
       users: clusterRoleBinding.users,
@@ -48,7 +48,7 @@ const UpdateClusterRoleBindingPage = () => {
       title="Edit Cluster Role Binding"
       backUrl='/ui/kubernetes/rbac#clusterRoleBindings'
     >
-      <ValidatedForm onSubmit={handleSubmit(params)}>
+      <ValidatedForm onSubmit={handleSubmit}>
         <PresetField label='Name' value={clusterRoleBinding.name} />
         <PresetField label='Cluster' value={clusterRoleBinding.clusterName} />
         { clusterRoleBinding.roleRef &&
