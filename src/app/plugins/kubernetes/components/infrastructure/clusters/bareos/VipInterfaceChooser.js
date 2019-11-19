@@ -11,7 +11,7 @@ const VipInterfaceChooser = forwardRef(({
   masterNodes, hasError, errorMessage, ...rest
 }, ref) => {
   const [nodes, loading] = useDataLoader(loadNodes)
-  const masters = nodes.filter(node => masterNodes.includes(node.uuid))
+  const masters = nodes.filter(node => masterNodes && masterNodes.includes(node.uuid))
 
   const options = uniq(masters.map(node => {
     const interfacesObj = pathStrOr([], 'combined.networkInterfaces', node)

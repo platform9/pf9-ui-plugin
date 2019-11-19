@@ -26,3 +26,9 @@ export const deleteCluster = (req, res) => {
   Cluster.delete({ id: clusterId, context })
   res.status(200).send({})
 }
+
+export const upgradeCluster = (req, res) => {
+  const { clusterId } = req.params
+  const upgradedCluster = Cluster.update({ id: clusterId, data: { canUpgrade: false }, context })
+  res.status(200).send(upgradedCluster)
+}

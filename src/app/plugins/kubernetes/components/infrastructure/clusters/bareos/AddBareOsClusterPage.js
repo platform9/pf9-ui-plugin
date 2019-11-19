@@ -28,12 +28,19 @@ const initialContext = {
   servicesCidr: '10.21.0.0/16',
   networkPlugin: 'flannel',
   runtimeConfigOption: 'default',
+  mtuSize: 1440,
 }
 
 const runtimeConfigOptions = [
   { label: 'Default API groups and versions', value: 'default' },
   { label: 'All API groups and versions', value: 'all' },
   { label: 'Custom', value: 'custom' },
+]
+
+const networkPluginOptions = [
+  { label: 'Flannel', value: 'flannel' },
+  { label: 'Calico', value: 'calico' },
+  { label: 'Canal (experimental)', value: 'canal' },
 ]
 
 const AddBareOsClusterPage = () => {
@@ -159,7 +166,7 @@ const AddBareOsClusterPage = () => {
                             etc.
                           </div>
                         }
-                        required={params.masterNodes.length > 1}
+                        required={params.masterNodes && params.masterNodes.length > 1}
                       />
 
                       <PicklistField
@@ -192,7 +199,6 @@ const AddBareOsClusterPage = () => {
                         id="externalDnsName"
                         label="API FQDN"
                         info="FQDN used to reference cluster API. To ensure the API can be accessed securely at the FQDN, the FQDN will be included in the API server certificate's Subject Alt Names. If deploying onto AWS, we will automatically create the DNS records for this FQDN into AWS Route 53."
-                        required
                       />
 
                       {/* Containers CIDR */}
@@ -217,6 +223,21 @@ const AddBareOsClusterPage = () => {
                         label="HTTP Proxy"
                         info="Specify the HTTP proxy for this cluster.  Leave blank for none.  Uses format of <scheme>://<username>:<password>@<host>:<port> where <username>:<password>@ is optional."
                       />
+                      <PicklistField
+                        id="networkPlugin"
+                        label="Network backend"
+                        options={networkPluginOptions}
+                        info=""
+                        required
+                      />
+                      {values.networkPlugin === 'calico' &&
+                      <TextField
+                        id="mtuSize"
+                        label="MTU Size"
+                        info="Maximum Transmission Unit (MTU) for the interface (in bytes)"
+                        required
+                      />
+                      }
                     </>
                   )}
                 </ValidatedForm>
@@ -230,7 +251,8 @@ const AddBareOsClusterPage = () => {
                       <CheckboxField
                         id="privileged"
                         label="Privileged"
-                        disabled={['calico', 'canal', 'weave'].includes(values.networkPlugin)}
+                        value={values.privileged || ['calico', 'canal', 'weave'].includes(wizardContext.networkPlugin)}
+                        disabled={['calico', 'canal', 'weave'].includes(wizardContext.networkPlugin)}
                         info="Allows this cluster to run privileged containers. Read this article for more information."
                       />
 
