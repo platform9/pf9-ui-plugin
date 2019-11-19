@@ -8,6 +8,7 @@ import AddNamespacePage from './components/namespaces/AddNamespacePage'
 import ApiAccessPage from './components/apiAccess/ApiAccessPage'
 import AppsIndexPage from './components/apps/AppsIndexPage'
 import ClusterDetailsPage from './components/infrastructure/clusters/ClusterDetailsPage'
+import NodeDetailsPage from './components/infrastructure/nodes/NodeDetailsPage'
 import InfrastructurePage from './components/infrastructure/InfrastructurePage'
 import NamespacesListPage from './components/namespaces/NamespacesListPage'
 import OnboardingPage from './components/onboarding/OnboardingPage'
@@ -103,6 +104,11 @@ Kubernetes.registerPlugin = pluginManager => {
         name: 'Cluster Details',
         link: { path: '/infrastructure/clusters/:id', exact: true },
         component: ClusterDetailsPage,
+      },
+      {
+        name: 'Node Details',
+        link: { path: '/infrastructure/nodes/:id', exact: true },
+        component: NodeDetailsPage,
       },
       {
         name: 'Create Cloud Provider',

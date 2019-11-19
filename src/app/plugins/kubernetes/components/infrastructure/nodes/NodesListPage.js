@@ -44,13 +44,15 @@ const getSpotInstance = pipe(
   castFuzzyBool,
   castBoolToStr(),
 )
+const renderNodeDetailLink = (name, node) =>
+  <SimpleLink src={`/ui/kubernetes/infrastructure/nodes/${node.uuid}`}>{name}</SimpleLink>
 
 const renderClusterLink = (clusterName, { clusterUuid }) => clusterUuid &&
   <SimpleLink src={`/ui/kubernetes/infrastructure/clusters/${clusterUuid}`}>{clusterName}</SimpleLink>
 
 export const columns = [
   { id: 'uuid', label: 'UUID', display: false },
-  { id: 'name', label: 'Name' },
+  { id: 'name', label: 'Name', render: renderNodeDetailLink },
   { id: 'status', label: 'Status', render: renderStatus },
   { id: 'logs', label: 'Logs', display: false, render: renderLogs },
   { id: 'primaryIp', label: 'Primary IP' },
