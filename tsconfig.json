@@ -17,6 +17,7 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "sourceMap": true,
+    "esModuleInterop": true,
     "lib": ["esnext", "dom"],
     "paths": {
       "developer/*": ["src/app/plugins/developer/*"],
