@@ -166,7 +166,7 @@ const AddBareOsClusterPage = () => {
                             etc.
                           </div>
                         }
-                        required={params.masterNodes.length > 1}
+                        required={params.masterNodes && params.masterNodes.length > 1}
                       />
 
                       <PicklistField
