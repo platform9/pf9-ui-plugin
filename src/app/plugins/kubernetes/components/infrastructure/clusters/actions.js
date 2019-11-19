@@ -3,7 +3,9 @@ import calcUsageTotals from 'k8s/util/calcUsageTotals'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { allKey } from 'app/constants'
 import { castFuzzyBool, sanitizeUrl } from 'utils/misc'
-import { clustersCacheKey, combinedHostsCacheKey, loadCombinedHosts } from 'k8s/components/infrastructure/common/actions'
+import {
+  clustersCacheKey, combinedHostsCacheKey, loadCombinedHosts,
+} from 'k8s/components/infrastructure/common/actions'
 import { filterIf, isTruthy, updateWith } from 'utils/fp'
 import { mapAsync } from 'utils/async'
 import { pluck, pathOr, pick, pipe, either, propSatisfies, compose, path, propEq } from 'ramda'
@@ -107,16 +109,10 @@ const createGenericCluster = async (body, data, loadFromContext) => {
   const uuid = createResponse.uuid
 
   // The POST call only returns the `uuid` and that's it.  We need to perform a GET afterwards and return that to add to the cache.
-  const response = await qbert.getClusterDetails(uuid)
-  return response
+  return qbert.getClusterDetails(uuid)
 }
 
 export const clusterActions = createCRUDActions(clustersCacheKey, {
-  createFn: (params, _, loadFromContext) => {
-    if (params.clusterType === 'aws') { return createAwsCluster(params, loadFromContext) }
-    if (params.clusterType === 'azure') { return createAzureCluster(params, loadFromContext) }
-  },
-
   listFn: async (params, loadFromContext) => {
     const [rawNodes, combinedHosts, rawClusters, qbertEndpoint] = await Promise.all([
       loadFromContext(rawNodesCacheKey),
@@ -179,6 +175,14 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
         hasLoadBalancer: castFuzzyBool(cluster.enableMetallb || pathOr(false, ['cloudProperties', 'enableLbaas'], cluster)),
       }
     }, rawClusters)
+  },
+  createFn: (params, _, loadFromContext) => {
+    if (params.clusterType === 'aws') { return createAwsCluster(params, loadFromContext) }
+    if (params.clusterType === 'azure') { return createAzureCluster(params, loadFromContext) }
+  },
+  updateFn: async ({ uuid, name, tags }) => {
+    await qbert.updateCluster(uuid, { name, tags })
+    return { name, tags }
   },
   deleteFn: async ({ uuid }) => {
     await qbert.deleteCluster(uuid)
