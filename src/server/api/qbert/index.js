@@ -27,7 +27,7 @@ import {
 } from './storageClasses/storageClassActions'
 // RBAC
 import { getRoles, postRole, putRole, deleteRole } from './roles/roleActions'
-import { 
+import {
   getRoleBindings, postRoleBinding, putRoleBinding, deleteRoleBinding
 } from './roleBindings/roleBindingActions'
 import {
