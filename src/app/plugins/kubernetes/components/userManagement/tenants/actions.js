@@ -15,8 +15,7 @@ export const filterValidTenants = tenant => !reservedTenantNames.includes(tenant
 export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
   listFn: async () => keystone.getAllTenantsAllUsers(),
   deleteFn: async ({ id }) => {
-    mngmTenantActions.invalidateCache()
-    return keystone.deleteProject(id)
+    await keystone.deleteProject(id)
   },
   createFn: async ({ name, description, roleAssignments }) => {
     const createdTenant = await keystone.createProject({
@@ -96,7 +95,7 @@ export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
     }
   },
   dataMapper: async (allTenantsAllUsers, params, loadFromContext) => {
-    const namespaces = await loadFromContext(namespacesCacheKey)
+    const namespaces = await loadFromContext(namespacesCacheKey, {}, true)
     const heatTenantId = pipe(
       find(propEq('name', 'heat')),
       prop('id'),
@@ -116,12 +115,7 @@ export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
 
 export const mngmTenantRoleAssignmentsCacheKey = 'managementTenantRoleAssignments'
 export const mngmTenantRoleAssignmentsLoader = createContextLoader(mngmTenantRoleAssignmentsCacheKey,
-  async ({ tenantId }) => {
-    const roleAssignments = await keystone.getTenantRoleAssignments(tenantId) || emptyArr
-    return roleAssignments.map(roleAssignment => ({
-      ...roleAssignment,
-      id: `${pathStr('user.id', roleAssignment)}-${pathStr('role.id', roleAssignment)}`,
-    }))
-  }, {
+  async ({ tenantId }) => (await keystone.getTenantRoleAssignments(tenantId) || emptyArr), {
+    uniqueIdentifier: ['user.id', 'role.id'],
     indexBy: 'tenantId',
   })

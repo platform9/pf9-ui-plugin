@@ -28,8 +28,7 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
     return keystone.getUsers()
   },
   deleteFn: async ({ id }) => {
-    mngmUserActions.invalidateCache()
-    return keystone.deleteUser(id)
+    await keystone.deleteUser(id)
   },
   createFn: async ({ username, displayname, password, roleAssignments }) => {
     const createdUser = await keystone.createUser({
@@ -40,7 +39,7 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
       password: password || undefined,
       default_project_id: head(keys(roleAssignments)),
     })
-    const userTenants = await tryCatchAsync(
+    await tryCatchAsync(
       () =>
         Promise.all(Object.entries(roleAssignments).map(([tenantId, roleId]) =>
           keystone.addUserRole({ userId: createdUser.id, tenantId, roleId }),
@@ -49,10 +48,7 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
         console.warn(err.message)
         return emptyArr
       })(null)
-    return {
-      ...createdUser,
-      tenants: userTenants,
-    }
+    return createdUser
   },
   updateFn: async (
     { id: userId, username, displayname, password, roleAssignments },
@@ -97,7 +93,7 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
     }, [])
 
     // Resolve tenant and user/roles operation promises and filter out null responses
-    const [updatedUser, updatedUserTenants] = await Promise.all([
+    const [updatedUser] = await Promise.all([
       updatedUserPromise,
       tryCatchAsync(
         () => Promise.all(updateTenantRolesPromises).then(reject(isNil)),
@@ -109,13 +105,12 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
     return {
       ...currentUser,
       ...updatedUser,
-      tenants: updatedUserTenants,
     }
   },
   dataMapper: async (users, { systemUsers }, loadFromContext) => {
     const [credentials, allTenants] = await Promise.all([
-      loadFromContext(mngmCredentialsCacheKey),
-      loadFromContext(mngmTenantsCacheKey, { includeBlacklisted: true }),
+      loadFromContext(mngmCredentialsCacheKey, {}, true),
+      loadFromContext(mngmTenantsCacheKey, { includeBlacklisted: true }, true),
     ])
     const [validTenants, blacklistedTenants] = partition(filterValidTenants, allTenants)
     const blacklistedTenantIds = pluck('id', blacklistedTenants)
@@ -128,20 +123,15 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
       })),
     )
 
-    // Unify all users with the same ID
-    const unifyTenantUsers = map(groupedUsers => {
-      const tenants = innerJoin(
+    // Unify all users with the same ID and group the tenants
+    const unifyTenantUsers = map(groupedUsers => ({
+      ...omit(['tenantId'], head(groupedUsers)),
+      tenants: innerJoin(
         (tenant, id) => tenant.id === id,
         validTenants,
         uniq(pluck('tenantId', groupedUsers)),
-      )
-      return {
-        ...head(groupedUsers),
-        tenants,
-        // Get user tenant names and concat them with commas
-        tenantNames: tenants.map(prop('name')).join(', '),
-      }
-    })
+      ),
+    }))
 
     const allUsers = users.map(user => ({
       id: user.id,
@@ -178,12 +168,8 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
 
 export const mngmUserRoleAssignmentsCacheKey = 'managementUserRoleAssignments'
 export const mngmUserRoleAssignmentsLoader = createContextLoader(mngmUserRoleAssignmentsCacheKey,
-  async ({ userId }) => {
-    const roleAssignments = await keystone.getUserRoleAssignments(userId) || emptyArr
-    return roleAssignments.map(roleAssignment => ({
-      ...roleAssignment,
-      id: `${pathStr('user.id', roleAssignment)}-${pathStr('role.id', roleAssignment)}`,
-    }))
-  }, {
+  async ({ userId }) => (await keystone.getUserRoleAssignments(userId) || emptyArr),
+  {
+    uniqueIdentifier: ['user.id', 'role.id'],
     indexBy: 'userId',
   })

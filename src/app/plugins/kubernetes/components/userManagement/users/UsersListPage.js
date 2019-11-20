@@ -7,7 +7,7 @@ import React, { useMemo } from 'react'
 import useToggler from 'core/hooks/useToggler'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { mngmUserActions } from './actions'
-import { pick } from 'ramda'
+import { pipe, pluck, join, pick } from 'ramda'
 import { createUsePrefParamsHook } from 'core/hooks/useParams'
 
 const defaultParams = { systemUsers: true }
@@ -40,7 +40,7 @@ export const options = {
     { id: 'username', label: 'Username' },
     { id: 'displayname', label: 'Display Name' },
     { id: 'twoFactor', label: 'Two-Factor Authentication' },
-    { id: 'tenantNames', label: 'Tenants' },
+    { id: 'tenants', label: 'Tenants', render: pipe(pluck('name'), join(', ')) },
   ],
   addText: 'Create a new User',
   addUrl: pathJoin(k8sPrefix, 'user_management/users/add'),
