@@ -23,7 +23,7 @@ const PrometheusAddonDialog = ({ rows: [cluster], onClose }) => {
           return
         }
         const monId = monPkg[0].ID
-        appbert.toggleMonitoring(cluster.uuid, monId, !enabled).then(() => {
+        appbert.toggleAddon(cluster.uuid, monId, !enabled).then(() => {
           onClose()
         })
       })

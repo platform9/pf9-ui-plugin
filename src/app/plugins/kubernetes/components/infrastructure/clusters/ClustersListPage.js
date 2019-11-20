@@ -8,6 +8,7 @@ import DetachIcon from '@material-ui/icons/RemoveFromQueue'
 import ScaleIcon from '@material-ui/icons/TrendingUp'
 import UpgradeIcon from '@material-ui/icons/PresentToAll'
 import InsertChartIcon from '@material-ui/icons/InsertChart'
+import DescriptionIcon from '@material-ui/icons/Description'
 import { clustersCacheKey } from '../common/actions'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import ClusterAttachNodeDialog from './ClusterAttachNodeDialog'
@@ -25,6 +26,7 @@ import { both, prop } from 'ramda'
 import PrometheusAddonDialog from 'k8s/components/prometheus/PrometheusAddonDialog'
 import ClusterUpgradeDialog from 'k8s/components/infrastructure/clusters/ClusterUpgradeDialog'
 import ClusterSync from './ClusterSync'
+import LoggingAddonDialog from 'k8s/components/logging/LoggingAddonDialog'
 
 const getClusterPopoverContent = (healthyMasterNodes, masterNodes) =>
   `${healthyMasterNodes.length} of ${masterNodes.length} master nodes healthy (3 required)`
@@ -213,6 +215,12 @@ export const options = {
       label: 'Monitoring',
       dialog: PrometheusAddonDialog,
     },
+    {
+      cond: isAdmin,
+      icon: <DescriptionIcon />,
+      label: 'Logging',
+      dialog: LoggingAddonDialog,
+    }
   ],
 }
 
