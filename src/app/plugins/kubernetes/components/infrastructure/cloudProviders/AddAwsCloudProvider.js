@@ -52,7 +52,7 @@ const AddAwsCloudProvider = ({ onComplete }) => {
         This is the part of the AWS two part accesskey required for API access.&nbsp;
         <ExternalLink url={awsAccessHelpUrl}>Here</ExternalLink> is info on getting your AWS access and secret key.
       </span>} />
-      <TextField required id="secret" label="Secret Key" info="The client secret key" />
+      <TextField required id="secret" type="password" label="Secret Key" info="The client secret key" />
       <SubmitButton>Add Cloud Provider</SubmitButton>
     </ValidatedForm>
   </>
