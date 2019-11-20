@@ -39,6 +39,9 @@ const awsCloudProps = cluster => ({
   'Use Pf9 Domain': cluster.usePf9Domain,
   'Internal Elb': cluster.internalElb,
   'Azs': cluster.azs,
+  /* 'Num Spot Workers': cluster.numSpotWorkers,
+  'Spot Worker Flavor': cluster.spotWorkerFlavor,
+  'Spot Price': cluster.spotPrice */
 })
 
 // TODO: Need to add Azure cloud properties
