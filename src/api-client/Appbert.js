@@ -21,11 +21,10 @@ class Appbert {
   }
 
   toggleMonitoring = async (clusterUuid, pkgId, on) => {
-    if (on === true) {
+    if (on) {
       return this.client.basicPut(`${await this.baseUrl()}/clusters/${clusterUuid}/${pkgId}`)
-    } else {
-      return this.client.basicDelete(`${await this.baseUrl()}/clusters/${clusterUuid}/${pkgId}`)
     }
+    return this.client.basicDelete(`${await this.baseUrl()}/clusters/${clusterUuid}/${pkgId}`)
   }
 }
 
