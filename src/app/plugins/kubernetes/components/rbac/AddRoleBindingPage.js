@@ -65,13 +65,13 @@ export const AddRoleBindingForm = () => {
           id="users"
           info="Select users to assign this role"
           onChange={getParamsUpdater('users')}
-          required
+          value={params.users}
         />
         <GroupMultiSelect
           id="groups"
           info="Select groups to assign this role"
           onChange={getParamsUpdater('groups')}
-          required
+          value={params.groups}
         />
         <SubmitButton>Add Role Binding</SubmitButton>
       </ValidatedForm>

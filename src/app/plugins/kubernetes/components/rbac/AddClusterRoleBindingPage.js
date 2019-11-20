@@ -53,13 +53,11 @@ export const AddClusterRoleBindingForm = () => {
           id="users"
           info="Select users to assign this role"
           onChange={getParamsUpdater('users')}
-          required
         />
         <GroupMultiSelect
           id="groups"
           info="Select groups to assign this role"
           onChange={getParamsUpdater('groups')}
-          required
         />
         <SubmitButton>Add Cluster Role Binding</SubmitButton>
       </ValidatedForm>

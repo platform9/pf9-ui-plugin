@@ -29,12 +29,12 @@ const UpdateClusterRoleBindingPage = () => {
   const clusterRoleBinding = useMemo(
     () => clusterRoleBindings.find(propEq('id', clusterRoleBindingId)) || emptyObj,
     [clusterRoleBindings, clusterRoleBindingId])
-  const { params, getParamsUpdater } = useParams(defaultParams)
+  const { getParamsUpdater } = useParams(defaultParams)
 
   const [updateClusterRoleBindingAction, updating] = useDataUpdater(clusterRoleBindingActions.update, onComplete)
   const handleSubmit = useCallback(
-    data => updateClusterRoleBindingAction(({ ...clusterRoleBinding, ...params, ...data })),
-    [clusterRoleBinding, params])
+    data => updateClusterRoleBindingAction(({ ...clusterRoleBinding, ...data })),
+    [clusterRoleBinding])
 
   return (
     <FormWrapper
@@ -54,14 +54,12 @@ const UpdateClusterRoleBindingPage = () => {
           info="Select users to assign this role"
           onChange={getParamsUpdater('users')}
           initialValue={clusterRoleBinding.users}
-          required
         />}
         { clusterRoleBinding.groups && <GroupMultiSelect
           id="groups"
           info="Select groups to assign this role"
           onChange={getParamsUpdater('groups')}
           initialValue={clusterRoleBinding.groups}
-          required
         />}
         <SubmitButton>Update Cluster Role Binding</SubmitButton>
       </ValidatedForm>

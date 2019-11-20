@@ -1,43 +1,33 @@
-import React, { forwardRef, useEffect } from 'react'
+import React, { forwardRef } from 'react'
 import PropTypes from 'prop-types'
 import { projectAs } from 'utils/fp'
-import { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
+import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
 import useDataLoader from 'core/hooks/useDataLoader'
 import MultiSelect from 'core/components/MultiSelect'
 import { mngmGroupActions } from 'k8s/components/userManagement/groups/actions'
 
-const GroupPicker = forwardRef(({ onChange, initialValue, ...rest }, ref) => {
+const GroupMultiSelect = forwardRef(({ onChange, value, ...rest }, ref) => {
   const [groups, loadingGroups] = useDataLoader(mngmGroupActions.list, { orderBy: 'name' })
-  const [values, setValues] = React.useState(initialValue || [])
-
-  const handleValuesChange = values => {
-    setValues(values)
-    onChange && onChange(values)
-  }
-
   const groupsList = projectAs({ label: 'name', value: 'name' }, groups)
-  useEffect(() => {
-    onChange && onChange(values)
-  }, [initialValue])
 
   return (
     <MultiSelect
       label="Groups"
       options={groupsList}
-      values={values}
-      onChange={handleValuesChange}
+      values={value}
+      onChange={onChange}
       loading={loadingGroups}
       {...rest}
     />
   )
 })
 
-GroupPicker.propTypes = {
+GroupMultiSelect.propTypes = {
   id: PropTypes.string.isRequired,
   initialValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   onChange: PropTypes.func,
   ...ValidatedFormInputPropTypes,
 }
-GroupPicker.displayName = 'GroupPicker'
+GroupMultiSelect.displayName = 'GroupMultiSelect'
 
-export default GroupPicker
+export default withFormContext(GroupMultiSelect)

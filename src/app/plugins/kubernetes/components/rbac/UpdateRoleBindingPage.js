@@ -30,12 +30,12 @@ const UpdateRoleBindingPage = () => {
     () => roleBindings.find(propEq('id', roleBindingId)) || emptyObj,
     [roleBindings, roleBindingId])
 
-  const { params, getParamsUpdater } = useParams(defaultParams)
+  const { getParamsUpdater } = useParams(defaultParams)
 
   const [updateRoleBindingAction, updating] = useDataUpdater(roleBindingActions.update, onComplete)
   const handleSubmit = useCallback(
-    data => updateRoleBindingAction(({ ...roleBinding, ...params, ...data })),
-    [roleBinding, params])
+    data => updateRoleBindingAction(({ ...roleBinding, ...data })),
+    [roleBinding])
 
   return (
     <FormWrapper
@@ -56,14 +56,12 @@ const UpdateRoleBindingPage = () => {
           info="Select users to assign this role"
           onChange={getParamsUpdater('users')}
           initialValue={roleBinding.users}
-          required
         />}
         { roleBinding.groups && <GroupMultiSelect
           id="groups"
           info="Select groups to assign this role"
           onChange={getParamsUpdater('groups')}
           initialValue={roleBinding.groups}
-          required
         />}
         <SubmitButton>Update Role Binding</SubmitButton>
       </ValidatedForm>
