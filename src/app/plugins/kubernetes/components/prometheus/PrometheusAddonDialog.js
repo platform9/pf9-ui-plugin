@@ -45,10 +45,10 @@ const PrometheusAddonDialog = ({ rows: [cluster], onClose }) => {
         </p>
       </DialogContent>
       <DialogActions>
-        <Button color='primary' type='submit' variant='contained' onClick={toggleMonitoring}>
+        <Button color="primary" type="submit" variant="contained" onClick={toggleMonitoring}>
           {enabled === true ? 'Disable' : 'Enable'}
         </Button>
-        <Button variant='contained' onClick={onClose}>
+        <Button variant="contained" onClick={onClose}>
           Cancel
         </Button>
       </DialogActions>
