@@ -13,7 +13,6 @@ import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import TextField from 'core/components/validatedForm/TextField'
 import { validators } from 'core/utils/fieldValidators'
 import SubmitButton from 'core/components/buttons/SubmitButton'
-import { spacing } from 'material-ui/styles'
 
 // Limit the number of workers that can be scaled at a time to prevent overload
 const MAX_SCALE_AT_A_TIME = 15
