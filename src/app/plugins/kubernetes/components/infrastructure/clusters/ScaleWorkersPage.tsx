@@ -13,6 +13,7 @@ import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import TextField from 'core/components/validatedForm/TextField'
 import { validators } from 'core/utils/fieldValidators'
 import SubmitButton from 'core/components/buttons/SubmitButton'
+import { spacing } from 'material-ui/styles'
 
 // Limit the number of workers that can be scaled at a time to prevent overload
 const MAX_SCALE_AT_A_TIME = 15
@@ -26,7 +27,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     maxWidth: '800px',
   },
   workerCount: {
-    margin: `${theme.spacing(4)}px 0px`,
+    margin: theme.spacing(4, 0),
   }
 }))
 
@@ -147,7 +148,7 @@ const ScaleWorkersPage = () => {
   const classes = useStyles({})
   const { id } = useReactRouter().match.params
   const [clusters, loading] = useDataLoader(clusterActions.list)
-  const cluster = (clusters || []).find(x => x.uuid === id)
+  const cluster = clusters.find(x => x.uuid === id)
 
   return (
     <FormWrapper

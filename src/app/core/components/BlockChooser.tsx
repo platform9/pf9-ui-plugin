@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme:Theme) => ({
     maxWidth: '100px',
   },
   text: {
-    padding: `0 ${theme.spacing(2)}px`,
+    padding: theme.spacing(0, 2),
     width: '100%',
     textAlign: 'left',
   },
