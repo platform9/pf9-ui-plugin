@@ -1,8 +1,7 @@
 import React, { forwardRef } from 'react'
 import clsx from 'clsx'
 
-interface Props {
-  [key: string]: any // support for the ...rest props
+interface Props extends React.HTMLAttributes<HTMLElement> {
   children?: any
   size?: string
   solid?: boolean
