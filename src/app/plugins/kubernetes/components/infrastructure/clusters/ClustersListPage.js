@@ -24,6 +24,7 @@ import { AppContext } from 'core/providers/AppProvider'
 import { both, prop } from 'ramda'
 import PrometheusAddonDialog from 'k8s/components/prometheus/PrometheusAddonDialog'
 import ClusterUpgradeDialog from 'k8s/components/infrastructure/clusters/ClusterUpgradeDialog'
+import ClusterSync from './ClusterSync'
 
 const getClusterPopoverContent = (healthyMasterNodes, masterNodes) =>
   `${healthyMasterNodes.length} of ${masterNodes.length} master nodes healthy (3 required)`
@@ -72,21 +73,17 @@ const renderStatus = (status,
         Unhealthy
       </ClusterStatusSpan>
 
-    case 'deleting':
-      return <ClusterStatusSpan
-        title="The cluster is spinning down."
-        status="pause"
-      >
-        Deleting
-      </ClusterStatusSpan>
-
     case 'creating':
-      return <ClusterStatusSpan
-        title="The cluster is spinning up."
-        status="pause"
-      >
-        Creating
-      </ClusterStatusSpan>
+    case 'updating':
+    case 'deleting':
+    case 'upgrading':
+      return (
+        <ClusterSync taskStatus={taskStatus}>
+          <ClusterStatusSpan title="The cluster is spinning down.">
+            {capitalizeString(taskStatus)}
+          </ClusterStatusSpan>
+        </ClusterSync>
+      )
 
     default:
       if (progressPercent) {
