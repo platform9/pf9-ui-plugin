@@ -5,6 +5,7 @@ import createCRUDActions from 'core/helpers/createCRUDActions'
 import { filterIf, pathStr, emptyArr } from 'utils/fp'
 import createContextLoader from 'core/helpers/createContextLoader'
 import { pipeAsync, mapAsync, tryCatchAsync } from 'utils/async'
+import { mngmUsersCacheKey } from 'k8s/components/userManagement/users/actions'
 
 const { keystone } = ApiClient.getInstance()
 
@@ -17,7 +18,7 @@ export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
   deleteFn: async ({ id }) => {
     await keystone.deleteProject(id)
   },
-  createFn: async ({ name, description, roleAssignments }) => {
+  createFn: async ({ name, description, roleAssignments }, _, loadFromContext) => {
     const createdTenant = await keystone.createProject({
       name,
       description,
@@ -25,7 +26,8 @@ export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
       domain_id: 'default',
       is_domain: false,
     })
-    const tenantUsers = await tryCatchAsync(
+    const users = await loadFromContext(mngmUsersCacheKey)
+    await tryCatchAsync(
       () =>
         Promise.all(Object.entries(roleAssignments).map(([userId, roleId]) =>
           keystone.addUserRole({ tenantId: createdTenant.id, userId, roleId }),
@@ -34,9 +36,10 @@ export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
         console.warn(err.message)
         return emptyArr
       })(null)
+    const userKeys = Object.keys(roleAssignments)
     return {
       ...createdTenant,
-      users: tenantUsers,
+      users: users.filter(user => userKeys.includes(user.id)),
     }
   },
   updateFn: async (
@@ -45,9 +48,12 @@ export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
     loadFromContext,
   ) => {
     const currentTenant = prevItems.find(propEq('id', tenantId))
-    const prevRoleAssignmentsArr = await loadFromContext(mngmTenantRoleAssignmentsCacheKey, {
-      tenantId,
-    })
+    const [users, prevRoleAssignmentsArr] = Promise.all([
+      loadFromContext(mngmUsersCacheKey),
+      loadFromContext(mngmTenantRoleAssignmentsCacheKey, {
+        tenantId,
+      }),
+    ])
     const prevRoleAssignments = prevRoleAssignmentsArr.reduce((acc, roleAssignment) => ({
       ...acc,
       [pathStr('user.id', roleAssignment)]: pathStr('role.id', roleAssignment),
@@ -78,7 +84,7 @@ export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
       return Promise.resolve(null)
     }, [])
     // Resolve tenant and user/roles operation promises and filter out null responses
-    const [updatedTenant, updatedTenantUsers] = await Promise.all([
+    const [updatedTenant] = await Promise.all([
       updateTenantPromise,
       tryCatchAsync(
         () => Promise.all(updateUserRolesPromises).then(reject(isNil)),
@@ -87,11 +93,10 @@ export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
           return emptyArr
         })(null),
     ])
-
+    const userKeys = Object.keys(roleAssignments)
     return {
-      ...currentTenant,
       ...updatedTenant,
-      users: updatedTenantUsers,
+      users: users.filter(user => userKeys.includes(user.id)),
     }
   },
   dataMapper: async (allTenantsAllUsers, params, loadFromContext) => {

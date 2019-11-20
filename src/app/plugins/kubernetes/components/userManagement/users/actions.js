@@ -102,10 +102,7 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
           return emptyArr
         })(null),
     ])
-    return {
-      ...currentUser,
-      ...updatedUser,
-    }
+    return updatedUser
   },
   dataMapper: async (users, { systemUsers }, loadFromContext) => {
     const [credentials, allTenants] = await Promise.all([
