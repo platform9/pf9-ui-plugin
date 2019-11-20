@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import DownloadKubeConfigLink from './DownloadKubeConfigLink'
 import KubeCLI from './KubeCLI'
 import ExternalLink from 'core/components/ExternalLink'
@@ -108,6 +108,40 @@ const renderLinks = links => {
   )
 }
 
+const renderNodeLink = ({ uuid, name }) => (
+  <div key={uuid}>
+    <SimpleLink src={`/ui/kubernetes/infrastructure/clusters/${uuid}`}>
+      {name}
+    </SimpleLink>
+  </div>
+)
+
+const NodesCell = ({ nodes }) => {
+  if (!nodes || !nodes.length) {
+    return <div>0</div>
+  }
+  const [expanded, setExpanded] = useState(false)
+  return (
+    <div>
+      {expanded ? (
+        <div>
+          {nodes.map(renderNodeLink)}
+          <SimpleLink onClick={() => setExpanded(!expanded)}>
+            (less details)
+          </SimpleLink>
+        </div>
+      ) : (
+        <div>
+          {nodes.length}&nbsp;
+          <SimpleLink onClick={() => setExpanded(!expanded)}>
+            (more details)
+          </SimpleLink>
+        </div>
+      )}
+    </div>
+  )
+}
+
 const toMHz = value => value * 1024
 
 const renderStats = (_, { usage }) => {
@@ -158,6 +192,7 @@ export const options = {
     { id: 'servicesCidr', label: 'Services CIDR' },
     { id: 'endpoint', label: 'API endpoint' },
     { id: 'cloudProviderName', label: 'Cloud provider' },
+    { id: 'nodes', label: 'Nodes', render: nodes => <NodesCell nodes={nodes} /> },
     { id: 'allowWorkloadsOnMaster', label: 'Master Workloads' },
     { id: 'privileged', label: 'Privileged' },
     { id: 'hasVpn', label: 'VPN' },
