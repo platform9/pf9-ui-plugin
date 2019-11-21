@@ -20,6 +20,18 @@ import { both, prop } from 'ramda'
 import PrometheusAddonDialog from 'k8s/components/prometheus/PrometheusAddonDialog'
 import ClusterUpgradeDialog from 'k8s/components/infrastructure/clusters/ClusterUpgradeDialog'
 import ClusterSync from './ClusterSync'
+import { Typography } from '@material-ui/core'
+import { makeStyles } from '@material-ui/styles'
+
+const useStyles = makeStyles(theme => ({
+  link: {
+    cursor: 'pointer',
+    color: theme.palette.primary.main,
+    '&:hover': {
+      textDecoration: 'underline',
+    }
+  }
+}))
 
 const getClusterPopoverContent = (healthyMasterNodes, masterNodes) =>
   `${healthyMasterNodes.length} of ${masterNodes.length} master nodes healthy (3 required)`
@@ -117,6 +129,8 @@ const renderNodeLink = ({ uuid, name }) => (
 )
 
 const NodesCell = ({ nodes }) => {
+  const classes = useStyles()
+
   if (!nodes || !nodes.length) {
     return <div>0</div>
   }
@@ -126,16 +140,16 @@ const NodesCell = ({ nodes }) => {
       {expanded ? (
         <div>
           {nodes.map(renderNodeLink)}
-          <SimpleLink onClick={() => setExpanded(!expanded)}>
+          <Typography onClick={() => setExpanded(!expanded)} className={classes.link} component="a">
             (less details)
-          </SimpleLink>
+          </Typography>
         </div>
       ) : (
         <div>
           {nodes.length}&nbsp;
-          <SimpleLink onClick={() => setExpanded(!expanded)}>
+          <Typography onClick={() => setExpanded(!expanded)} className={classes.link} component="a">
             (more details)
-          </SimpleLink>
+          </Typography>
         </div>
       )}
     </div>
