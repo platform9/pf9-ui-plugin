@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { k8sPrefix } from 'app/constants'
 import { makeStyles } from '@material-ui/styles'
 import FormWrapper from 'core/components/FormWrapper'
@@ -13,6 +13,7 @@ import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import TextField from 'core/components/validatedForm/TextField'
 import { validators } from 'core/utils/fieldValidators'
 import SubmitButton from 'core/components/buttons/SubmitButton'
+import useParams from 'core/hooks/useParams'
 
 // Limit the number of workers that can be scaled at a time to prevent overload
 const MAX_SCALE_AT_A_TIME = 15
@@ -39,7 +40,7 @@ const clusterTypeDisplay = {
 
 const ScaleWorkers = ({ cluster }) => {
   const classes = useStyles({})
-  const [scaleType, setScaleType] = useState(null)
+  const { params, getParamsUpdater } = useParams()
   const { name, cloudProviderType } = cluster
   const isLocal = cloudProviderType === 'local'
   const isCloud = ['aws', 'azure'].includes(cloudProviderType)
@@ -52,7 +53,7 @@ const ScaleWorkers = ({ cluster }) => {
   const chooseType = (
     <div>
       <BlockChooser
-        onChange={setScaleType}
+        onChange={getParamsUpdater('scaleType')}
         options={[
           {
             id: 'add',
@@ -71,6 +72,9 @@ const ScaleWorkers = ({ cluster }) => {
     </div>
   )
 
+  const calcMin = value => params.scaleType === 'add' ? value : Math.max(value - MAX_SCALE_AT_A_TIME, 1)
+  const calcMax = value => params.scaleType === 'add' ? value + MAX_SCALE_AT_A_TIME : Math.max(value - MAX_SCALE_AT_A_TIME, 1)
+
   const chooseScaleNum = (
     <ValidatedForm initialValues={cluster} onSubmit={handleSubmit}>
       {!cluster.enableCAS &&
@@ -81,8 +85,8 @@ const ScaleWorkers = ({ cluster }) => {
           info="Number of worker nodes to deploy."
           required
           validations={[
-            validators.minValue(cluster.numWorkers),
-            validators.maxValue(cluster.numWorkers + MAX_SCALE_AT_A_TIME),
+            validators.minValue(calcMin(cluster.numWorkers)),
+            validators.maxValue(calcMax(cluster.numWorkers)),
           ]}
         />
       }
@@ -95,8 +99,8 @@ const ScaleWorkers = ({ cluster }) => {
             label="Minimum number of worker nodes"
             info="Minimum number of worker nodes this cluster may be scaled down to."
             validations={[
-              validators.minValue(cluster.numMinWorkers),
-              validators.maxValue(cluster.numMinWorkers + MAX_SCALE_AT_A_TIME),
+              validators.minValue(calcMin(cluster.numMinWorkers)),
+              validators.maxValue(calcMax(cluster.numMinWorkers)),
             ]}
             required
           />
@@ -107,13 +111,14 @@ const ScaleWorkers = ({ cluster }) => {
             label="Maximum number of worker nodes"
             info="Maximum number of worker nodes this cluster may be scaled up to."
             validations={[
-              validators.maxValue(cluster.numMaxWorkers + MAX_SCALE_AT_A_TIME),
+              validators.minValue(calcMin(cluster.numMaxWorkers)),
+              validators.maxValue(calcMax(cluster.numMaxWorkers)),
             ]}
             required
           />
         </>
       )}
-      <SubmitButton>{scaleType === 'add' ? 'Add' : 'Remove'} workers</SubmitButton>
+      <SubmitButton>{params.scaleType === 'add' ? 'Add' : 'Remove'} workers</SubmitButton>
     </ValidatedForm>
   )
 
@@ -131,7 +136,7 @@ const ScaleWorkers = ({ cluster }) => {
               You currently have <b>{cluster.numWorkers}</b> worker nodes.
             </Typography>
           </div>
-          {scaleType ? chooseScaleNum : chooseType}
+          {params.scaleType ? chooseScaleNum : chooseType}
         </>
       }
       {isLocal &&
