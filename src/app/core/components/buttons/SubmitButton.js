@@ -18,7 +18,7 @@ const SubmitButton = ({ children, classes, disabled, ...rest }) => {
     ...rest,
   }
 
-  return <Button {...params}>{children || 'Submit'}</Button>
+  return <Button type="submit" {...params}>{children || 'Submit'}</Button>
 }
 
 export default withStyles(styles)(SubmitButton)
