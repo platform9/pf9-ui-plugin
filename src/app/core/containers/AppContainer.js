@@ -10,12 +10,13 @@ import track from 'utils/tracking'
 import useReactRouter from 'use-react-router'
 import { makeStyles } from '@material-ui/styles'
 import { Route, Redirect, Switch } from 'react-router'
-import { resetPasswordUrl, forgotPasswordUrl, loginUrl } from 'app/constants'
+import { dashboardUrl, resetPasswordUrl, forgotPasswordUrl, loginUrl } from 'app/constants'
 import ResetPasswordPage from 'core/public/ResetPasswordPage'
 import ForgotPasswordPage from 'core/public/ForgotPasswordPage'
 import { isNilOrEmpty } from 'utils/fp'
 import LoginPage from 'core/public/LoginPage'
 import Progress from 'core/components/progress/Progress'
+import { getCookieValue } from 'utils/misc'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -49,6 +50,21 @@ const AppContainer = props => {
   }, [])
 
   const restoreSession = async () => {
+    // When trying to login with cookie with pmkft
+    if (history.location.pathname === '/ui/pmkft/login') {
+      const scopedToken = getCookieValue('X-Auth-Token')
+
+      // Start from scratch to make use of prebuilt functions
+      // for standard login page
+      const { unscopedToken, username } = await keystone.getUnscopedTokenWithToken(scopedToken)
+      if (!unscopedToken) {
+        history.push(loginUrl)
+        return
+      }
+      await setupSession({ username, unscopedToken })
+      history.push(dashboardUrl)
+      return
+    }
     // Attempt to restore the session
     const tokens = getStorage('tokens')
     const user = getStorage('user') || {}

@@ -219,6 +219,26 @@ class Keystone {
     }
   }
 
+  getUnscopedTokenWithToken = async (token) => {
+    const authBody = constructAuthBody('token', token)
+    const body = {
+      ...authBody,
+      auth: {
+        ...authBody.auth,
+        scope: 'unscoped'
+      }
+    }
+    try {
+      const response = await axios.post(this.tokensUrl, body)
+      const username = response.data.token.user.name
+      const unscopedToken = response.headers['x-subject-token']
+      this.client.unscopedToken = unscopedToken
+      return { unscopedToken, username }
+    } catch (err) {
+      return {}
+    }
+  }
+
   renewToken = async (unscopedToken) => {
     const body = constructAuthBody('token', unscopedToken)
     try {
