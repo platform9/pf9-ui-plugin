@@ -42,5 +42,6 @@ export const loadNodes = createContextLoader(nodesCacheKey, async (params, loadF
     logs: `${qbertUrl}/logs/${node.uuid}`,
   }))
 }, {
+  refetchCascade: true,
   uniqueIdentifier: 'uuid',
 })
