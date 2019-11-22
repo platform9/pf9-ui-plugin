@@ -16,6 +16,7 @@ class Wizard extends PureComponent {
   lastStep = () => this.state.steps.length - 1
   hasNext = () => this.state.activeStep < this.lastStep()
   hasBack = () => this.state.activeStep > 0
+  isFinishAndReviewVisible = () => this.state.activeStep < this.state.steps.length - 2
   canBackAtFirstStep = () => this.state.activeStep === 0 && !!this.props.originPath
 
   // Callbacks indexed by step ID to be called before navigating to the next step
@@ -71,6 +72,25 @@ class Wizard extends PureComponent {
     )
   }
 
+  onFinishAndReview = () => {
+    const { onComplete } = this.props
+    const { activeStep } = this.state
+
+    if (this.nextCb[activeStep] && this.nextCb[activeStep]() === false) {
+      return
+    }
+
+    this.setState(
+      state => ({ activeStep: state.steps.length - 1 }),
+      () => {
+        this.activateStep()
+        if (this.isComplete()) {
+          onComplete(this.state.wizardContext)
+        }
+      },
+    )
+  }
+
   setWizardContext = newValues => {
     this.setState(
       state => ({ wizardContext: { ...state.wizardContext, ...newValues } }),
@@ -90,7 +110,7 @@ class Wizard extends PureComponent {
 
   render () {
     const { wizardContext, setWizardContext, steps, activeStep } = this.state
-    const { showSteps, children, submitLabel, onCancel } = this.props
+    const { showSteps, children, submitLabel, finishAndReviewLabel, onCancel, canReview } = this.props
     const renderStepsContent = ensureFunction(children)
 
     return (
@@ -103,6 +123,7 @@ class Wizard extends PureComponent {
           {this.canBackAtFirstStep() && <PrevButton onClick={this.handleOriginBack} />}
           {this.hasNext() && <NextButton onClick={this.handleNext}>Next</NextButton>}
           {this.isLastStep() && <NextButton onClick={this.handleNext}>{submitLabel}</NextButton>}
+          {canReview && this.isFinishAndReviewVisible() && <NextButton onClick={this.onFinishAndReview}>{finishAndReviewLabel}</NextButton>}
         </WizardButtons>
       </WizardContext.Provider>
     )
@@ -116,12 +137,14 @@ Wizard.propTypes = {
   onCancel: PropTypes.func,
   context: PropTypes.object,
   submitLabel: PropTypes.string,
+  finishAndReviewLabel: PropTypes.string,
   children: PropTypes.oneOfType([PropTypes.array, PropTypes.func]).isRequired,
 }
 
 Wizard.defaultProps = {
   showSteps: true,
   submitLabel: 'Complete',
+  finishAndReviewLabel: 'Finish And Review',
   onComplete: value => {
     console.info('Wizard#onComplete handler not implemented.  Falling back to console.log')
     console.log(value)
