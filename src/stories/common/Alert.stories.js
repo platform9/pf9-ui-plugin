@@ -31,22 +31,22 @@ const content = <>
 </>
 
 addStories('Common Components/Alert', {
-  'info': () => (
+  info: () => (
     <Alert variant="info">
       {content}
     </Alert>
   ),
-  'success': () => (
+  success: () => (
     <Alert variant="success">
       {content}
     </Alert>
   ),
-  'warning': () => (
+  warning: () => (
     <Alert variant="warning">
       {content}
     </Alert>
   ),
-  'error': () => (
+  error: () => (
     <Alert variant="error">
       {content}
     </Alert>

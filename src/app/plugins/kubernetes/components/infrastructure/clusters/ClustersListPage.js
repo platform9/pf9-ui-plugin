@@ -31,8 +31,8 @@ const useStyles = makeStyles(theme => ({
     color: theme.palette.primary.main,
     '&:hover': {
       textDecoration: 'underline',
-    }
-  }
+    },
+  },
 }))
 
 const getClusterPopoverContent = (healthyMasterNodes, masterNodes) =>
@@ -40,7 +40,7 @@ const getClusterPopoverContent = (healthyMasterNodes, masterNodes) =>
 
 const getPendingClusterPopoversContent = (cpType, taskStatus) => objSwitchCase({
   creating: `The ${cpType} resources are being created.`,
-  converging: `One or more hosts are joining the cluster`,
+  converging: 'One or more hosts are joining the cluster',
   updating: `The ${cpType} resources are being updated`,
   deleting: `The cluster and its underlying ${cpType} resources are being deleted`,
 })(taskStatus)
@@ -53,7 +53,7 @@ const renderStatus = (status,
     return null
   }
   switch (taskStatus) {
-    case 'success':
+    case 'success': {
       const clusterStatus = <ClusterStatusSpan
         label="Cluster"
         title={status === 'ok'
@@ -73,19 +73,19 @@ const renderStatus = (status,
         {clusterStatus}
         {haStatus}
       </div>
-
-    case 'error':
+    }
+    case 'error': {
       return <ClusterStatusSpan
         title="The last cluster operation (create, update, or delete) failed."
         status="fail"
       >
         Unhealthy
       </ClusterStatusSpan>
-
+    }
     case 'creating':
     case 'updating':
     case 'deleting':
-    case 'upgrading':
+    case 'upgrading': {
       return (
         <ClusterSync taskStatus={taskStatus}>
           <ClusterStatusSpan title="The cluster is spinning down.">
@@ -93,8 +93,8 @@ const renderStatus = (status,
           </ClusterStatusSpan>
         </ClusterSync>
       )
-
-    default:
+    }
+    default: {
       if (progressPercent) {
         return <div>
           <ProgressBar height={20} animated containedPercent percent={progressPercent
@@ -108,6 +108,7 @@ const renderStatus = (status,
         </div>
       }
       return <ClusterStatusSpan>{capitalizeString(status)}</ClusterStatusSpan>
+    }
   }
 }
 
@@ -257,7 +258,7 @@ export const options = {
       icon: <DescriptionIcon />,
       label: 'Logging',
       dialog: LoggingAddonDialog,
-    }
+    },
   ],
 }
 

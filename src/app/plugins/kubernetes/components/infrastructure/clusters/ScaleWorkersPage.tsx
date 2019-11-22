@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { FunctionComponent } from 'react'
 import { k8sPrefix } from 'app/constants'
 import { makeStyles } from '@material-ui/styles'
 import FormWrapper from 'core/components/FormWrapper'
@@ -40,7 +40,12 @@ const clusterTypeDisplay = {
   azure: 'Azure',
 }
 
-const ScaleWorkers = ({ cluster, onSubmit }) => {
+interface ScaleWorkersProps {
+  cluster: any
+  onSubmit(data): Promise<void> | void
+}
+
+const ScaleWorkers: FunctionComponent<ScaleWorkersProps> = ({ cluster, onSubmit }) => {
   const classes = useStyles({})
   const { params, getParamsUpdater } = useParams()
   const { name, cloudProviderType } = cluster
@@ -70,11 +75,11 @@ const ScaleWorkers = ({ cluster, onSubmit }) => {
     </div>
   )
 
-  const calcMin = value => params.scaleType === 'add'
+  const calcMin = (value: number): number => params.scaleType === 'add'
     ? value
     : Math.max(value - MAX_SCALE_AT_A_TIME, 1)
 
-  const calcMax = value => params.scaleType === 'add'
+  const calcMax = (value: number): number => params.scaleType === 'add'
     ? value + MAX_SCALE_AT_A_TIME
     : value
 
@@ -144,20 +149,20 @@ const ScaleWorkers = ({ cluster, onSubmit }) => {
   )
 }
 
-const ScaleWorkersPage = () => {
+const ScaleWorkersPage: FunctionComponent = () => {
   const classes = useStyles({})
   const { match, history } = useReactRouter()
   const { id } = match.params
   const [clusters, loading] = useDataLoader(clusterActions.list)
 
-  const onComplete = () => {
+  const onComplete = (): void => {
     history.push(listUrl)
   }
 
   const [update, updating] = useDataUpdater(clusterActions.update, onComplete)
   const cluster = clusters.find((x) => x.uuid === id)
 
-  const handleSubmit = async (data) => {
+  const handleSubmit = async (data): Promise<void> => {
     await update({ ...cluster, ...data })
   }
 

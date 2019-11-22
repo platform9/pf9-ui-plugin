@@ -1,10 +1,8 @@
-import {
-  clear, clearAll, getStorage, LOCAL_STORAGE_NAMESPACE, setStorage,
-} from '../pf9Storage'
+import { clear, clearAll, getStorage, LOCAL_STORAGE_NAMESPACE, setStorage } from '../pf9Storage'
 
-let originalLocalStorage = global.localStorage
+const originalLocalStorage = global.localStorage
 
-let storage = {}
+const storage = {}
 const mockLocalStorage = {
   getItem: key => storage[key],
   setItem: (key, value) => { storage[key] = value }

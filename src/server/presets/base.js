@@ -1,15 +1,14 @@
 /* eslint-disable no-unused-vars */
-import context from '../context'
 import Region from '../models/openstack/Region'
 import Role from '../models/openstack/Role'
 import Tenant from '../models/openstack/Tenant'
 import User from '../models/openstack/User'
 import Flavor from '../models/openstack/Flavor'
-import Volume from '../models/openstack/Volume'
+
 // import Token from '../models/Token'
 
 function loadPreset () {
-  console.log(`Loading 'base' preset.`)
+  console.log('Loading \'base\' preset.')
   const serviceTenant = new Tenant({ name: 'service' })
   const adminRole = new Role({ name: 'admin' })
   const memberRole = new Role({ name: '_member_' })

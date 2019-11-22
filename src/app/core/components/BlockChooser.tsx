@@ -1,9 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, FunctionComponent } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import { Radio, Typography, Theme } from '@material-ui/core'
 import clsx from 'clsx'
 
-const useStyles = makeStyles((theme:Theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {
     padding: theme.spacing(2),
     border: '1px solid',
@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme:Theme) => ({
   selected: {
     border: '1px solid #ccc',
     borderRadius: '4px',
-    backgroundColor: '#eee',
+    backgroundColor: '#EEE',
   }
 }))
 
@@ -38,6 +38,7 @@ interface BlockOption {
   description: string | JSX.Element
   icon?: JSX.Element
 }
+
 interface Props {
   options: BlockOption[]
   onChange?: (id: string) => void
@@ -46,7 +47,7 @@ interface Props {
 // This component presents large format blocks that the user can choose between.
 // It is useful for choosing between major options that require a large amount of
 // screen real-estate (help text, icons, etc on each option).
-const BlockChooser = ({ options = [], onChange }: Props) => {
+const BlockChooser: FunctionComponent<Props> = ({ options = [], onChange }) => {
   const classes = useStyles({})
   const [choice, setChoice] = useState<string>()
 

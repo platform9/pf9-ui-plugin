@@ -7,6 +7,7 @@ export const attachNodes = (req, res) => {
   const { clusterId } = req.params
   const cluster = Cluster.findById({ id: clusterId, context, raw: true })
   const nodes = req.body
+  // eslint-disable-next-line no-unused-vars
   for (const node of nodes) {
     const _node = Node.findById({ id: node.uuid, context, raw: true })
     attachNodeToCluster(_node, cluster)
@@ -18,6 +19,7 @@ export const detachNodes = (req, res) => {
   const { clusterId } = req.params
   const cluster = Cluster.findById({ id: clusterId, context, raw: true })
   const nodes = req.body
+  // eslint-disable-next-line no-unused-vars
   for (const node of nodes) {
     const _node = Node.findById({ id: node.uuid, context, raw: true })
     detachNodeFromCluster(_node, cluster)

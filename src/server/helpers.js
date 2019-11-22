@@ -7,8 +7,8 @@ export const findById = arr => id => (typeof arr === 'function' ? arr() : arr).f
 
 export const updateById = (arr) => {
   return (id, data) => {
-    let _arr = typeof arr === 'function' ? arr() : arr
-    let index = _arr.findIndex(x => x.id === id)
+    const _arr = typeof arr === 'function' ? arr() : arr
+    const index = _arr.findIndex(x => x.id === id)
     _arr[index] = Object.assign(_arr[index], data)
     return _arr[index]
   }

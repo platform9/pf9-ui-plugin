@@ -40,7 +40,7 @@ class Selector extends PureComponent {
   }
 
   sortList = list => {
-    let _list = [...list]
+    const _list = [...list]
     return _list.sort((a, b) => (a < b ? -1 : 1))
   }
 

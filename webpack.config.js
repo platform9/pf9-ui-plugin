@@ -78,6 +78,7 @@ module.exports = {
   },
   context: contextPath,
   optimization: {
+    namedModules: !isProd,
     runtimeChunk: 'single',
     minimize: isProd,
     minimizer: [
@@ -98,7 +99,6 @@ module.exports = {
     },
   },
   plugins: [
-    ...(isProd ? [] : [new webpack.NamedModulesPlugin()]),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(env),
     }),

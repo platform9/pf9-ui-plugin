@@ -18,7 +18,7 @@ addStories('Common Components/ConfirmationDialog', {
     <ConfirmationDialog open />
   ),
 
-  'Callbacks': () => (
+  Callbacks: () => (
     <ConfirmationDialog open onCancel={handleCancel} onConfirm={handleConfirm} />
   ),
 

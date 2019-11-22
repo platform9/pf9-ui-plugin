@@ -1,6 +1,6 @@
 import {
   T, cond, equals, always, adjust, update, findIndex, assocPath, curry, pathOr, remove, values,
-  groupBy, filter, either, isNil, isEmpty, path, sortBy, compose as rCompose, toLower, prop
+  groupBy, filter, either, isNil, isEmpty, path, sortBy, compose as rCompose, toLower, prop,
 } from 'ramda'
 import moize from 'moize'
 
@@ -91,7 +91,7 @@ export const setStateLens = (value, paths) => state => {
 }
 
 export const range = (start, end) => {
-  let arr = []
+  const arr = []
   for (let i = start; i <= end; i++) {
     arr.push(i)
   }

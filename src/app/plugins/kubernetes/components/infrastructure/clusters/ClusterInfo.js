@@ -10,13 +10,13 @@ import { emptyObj } from 'utils/fp'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 
 const overviewStats = cluster => ({
-  'Status':              cluster.status,
-  'CloudProvider':       cluster.cloudProviderName,
+  Status:              cluster.status,
+  CloudProvider:       cluster.cloudProviderName,
   'Cloud Provider Type': cluster.cloudProviderType,
   'Kubernetes Version':  cluster.version || 'unavailable',
   'Containers CIDR':     cluster.containersCidr,
   'Services CIDR':       cluster.servicesCidr,
-  'Privileged':          cluster.privileged,
+  Privileged:          cluster.privileged,
   'Unique ID':           cluster.uuid,
 })
 
@@ -28,17 +28,17 @@ const openstackProps = cluster => ({
 })
 
 const awsCloudProps = cluster => ({
-  'Region': cluster.region,
+  Region: cluster.region,
   'Master Flavor': cluster.masterFlavor,
   'Worker Flavor': cluster.workerFlavor,
   'SSH Key': cluster.sshKey,
   'Service FQDN': cluster.serviceFqdn,
-  'Ami': cluster.ami,
+  Ami: cluster.ami,
   'Domain Id': cluster.domainId,
   'Is Private': cluster.isPrivate,
   'Use Pf9 Domain': cluster.usePf9Domain,
   'Internal Elb': cluster.internalElb,
-  'Azs': cluster.azs,
+  Azs: cluster.azs,
   /* 'Num Spot Workers': cluster.numSpotWorkers,
   'Spot Worker Flavor': cluster.spotWorkerFlavor,
   'Spot Price': cluster.spotPrice */

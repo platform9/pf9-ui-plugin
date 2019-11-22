@@ -42,16 +42,17 @@ export const makeRegionedClient = async (tenantName = defaultTestTenant) => {
   return client
 }
 
-export const waitUntil = async ({ condition, delay, maxRetries }) =>
-  new Promise(async (resolve, reject) => {
-    let done = await condition()
-    let retry = 0
-    while (!done && retry++ < maxRetries) {
-      await sleep(delay)
-      done = await condition()
-    }
-    done ? resolve() : reject(new Error('Task not done within time.'))
-  })
+export const waitUntil = async ({ condition, delay, maxRetries }) => {
+  let done = await condition()
+  let retry = 0
+  while (!done && retry++ < maxRetries) {
+    await sleep(delay)
+    done = await condition()
+  }
+  if (!done) {
+    throw new Error('Task not done within time.')
+  }
+}
 
 export const sleep = (delay) =>
   new Promise(resolve => setTimeout(resolve, delay))

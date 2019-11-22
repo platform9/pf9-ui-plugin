@@ -55,7 +55,7 @@ const KubeConfigListPage = () => {
 
   const downloadYamlFile = (clusterName, kubeconfig) => {
     const blob = new Blob([kubeconfig], { type: 'application/octet-stream' })
-    let elem = window.document.createElement('a')
+    const elem = window.document.createElement('a')
     elem.href = window.URL.createObjectURL(blob)
     elem.download = `${clusterName}.yml`
     document.body.appendChild(elem)
