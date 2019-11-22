@@ -15,8 +15,11 @@ const { appbert } = ApiClient.getInstance()
 const logEnabledCacheKey = 'logAddonEnabled'
 
 const logEnabledLoader = createContextLoader(logEnabledCacheKey, async cluster => {
-  return hasLoggingEnabled(cluster)
-})
+  return {
+    uuid: cluster.uuid,
+    enabled: hasLoggingEnabled(cluster)
+  }
+}, { uniqueIdentifier: 'uuid' })
 
 const LoggingAddonDialog = ({ rows: [cluster], onClose }) => {
   const toggleLogging = async () => {
