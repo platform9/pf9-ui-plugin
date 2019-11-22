@@ -13,6 +13,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     backgroundColor: hexToRGBA(theme.palette.primary.main, 0.15),
     padding: `2px ${theme.spacing(1)}px`,
     margin: theme.spacing(0.5),
+    wordBreak: 'break-all',
+    whiteSpace: 'pre-wrap',
 
     "& *": {
       fontFamily: "Courier"

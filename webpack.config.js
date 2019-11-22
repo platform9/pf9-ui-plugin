@@ -115,7 +115,7 @@ module.exports = {
     }),
   ],
   resolve: {
-    extensions: ['.json', '.js', 'ts', '.tsx'],
+    extensions: ['.json', '.js', '.ts', '.tsx'],
     alias: {
       // IDE's seem to solve paths according to the order in which they are defined
       // so we must put first the more specific aliases

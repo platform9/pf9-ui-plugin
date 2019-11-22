@@ -26,6 +26,11 @@ export const hasOneUpperChar = both(is(String), test(/[A-Z]/))
 export const hasOneNumber = both(is(String), test(/[0-9]/))
 export const hasOneSpecialChar = both(is(String), test(/[-!@#$%^&*()?]/))
 
+export const masterNodeLengthValidator = new FieldValidator(
+  nodes => (fieldIsUnset(nodes) || [1, 3, 5].includes(nodes.length)),
+  'You can only have 1, 3 or 5 master nodes',
+)
+
 export const namespaceValidator = new FieldValidator(
   namespace =>
     fieldIsUnset(namespace) ||
