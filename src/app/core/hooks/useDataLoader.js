@@ -9,7 +9,7 @@ import { memoizedDep } from 'utils/misc'
 const onErrorHandler = moize((loaderFn, showToast) => (errorMessage, catchedErr, params) => {
   const key = loaderFn.getKey()
   console.error(`Error when fetching items for entity "${key}"`, catchedErr)
-  showToast(errorMessage, 'error')
+  showToast(errorMessage + (catchedErr.message ? `\n${catchedErr.message}` : ''), 'error')
 })
 
 /**

@@ -91,7 +91,7 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
         orderDirection === 'asc' ? identity : reverse,
       )(items),
     fetchSuccessMessage = (params) => `Successfully fetched ${entityName} items`,
-    fetchErrorMessage = (catchedErr, params) => `Error when trying to fetch ${entityName} items. ${pathStr('response.data.error.message', catchedErr)}`,
+    fetchErrorMessage = (catchedErr, params) => `Error when trying to fetch ${entityName} items`,
   } = options
   const uniqueIdentifierStrPaths = uniqueIdentifier ? ensureArray(uniqueIdentifier) : emptyArr
   const dataLens = lensPath([dataCacheKey, cacheKey])

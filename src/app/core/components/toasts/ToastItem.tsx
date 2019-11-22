@@ -29,6 +29,7 @@ interface ToastItemProps {
   variant: MessageTypes
   onClose: () => void
   toastsTimeout: number
+
   [key: string]: any // ...rest props
 }
 
@@ -56,6 +57,9 @@ const useStyles = makeStyles<Theme>(theme => ({
     display: 'flex',
     alignItems: 'center',
   },
+  text: {
+    display: 'inline-block',
+  },
   close: {}
 }))
 
@@ -72,7 +76,9 @@ const ToastItem: FunctionComponent<ToastItemProps> = ({ message, variant, toasts
     message={
       <span id="client-snackbar" className={classes.message}>
         <Icon className={clsx(classes.icon, classes.iconVariant)} />
-        {message}
+        <div className={classes.text}>
+          {message.split('\n').map((i, key) => <div key={key}>{i}</div>)}
+        </div>
       </span>
     }
     action={[

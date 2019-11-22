@@ -11,6 +11,7 @@ import Nova from './Nova'
 import Qbert from './Qbert'
 import ResMgr from './ResMgr'
 import { normalizeResponse } from 'api-client/helpers'
+import { pathStrOr } from 'utils/fp'
 
 class ApiClient {
   static init (options = {}) {
@@ -54,6 +55,10 @@ class ApiClient {
     this.activeRegion = null
 
     this.axiosInstance = axios.create({ ...defaultAxiosConfig, ...(options.axios || {}) })
+    this.axiosInstance.interceptors.response.use(
+      response => response,
+      error => Promise.reject(pathStrOr(error, 'response.data', error)),
+    )
   }
 
   serialize = () => {
