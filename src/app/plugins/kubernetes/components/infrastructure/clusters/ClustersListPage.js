@@ -178,8 +178,8 @@ const renderStats = (_, { usage }) => {
 const renderClusterDetailLink = (name, cluster) =>
   <SimpleLink src={`/ui/kubernetes/infrastructure/clusters/${cluster.uuid}`}>{name}</SimpleLink>
 
-const canScaleMasters = ([row]) => row.cloudProviderType === 'aws'
-const canScaleWorkers = ([row]) => row.cloudProviderType === 'aws'
+const canScaleMasters = ([row]) => row.taskStatus === 'success'
+const canScaleWorkers = ([row]) => row.taskStatus === 'success'
 const canUpgradeCluster = (selected) => false
 const canDeleteCluster = ([row]) => !(['creating', 'deleting'].includes(row.taskStatus))
 
