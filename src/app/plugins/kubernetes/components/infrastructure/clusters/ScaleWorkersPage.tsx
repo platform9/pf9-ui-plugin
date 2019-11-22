@@ -29,10 +29,11 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   workerCount: {
     margin: theme.spacing(4, 0),
-  }
+  },
 }))
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
+
 const clusterTypeDisplay = {
   local: 'BareOS',
   aws: 'AWS',
@@ -63,18 +64,23 @@ const ScaleWorkers = ({ cluster, onSubmit }) => {
             icon: <FontAwesomeIcon size="2x" name="layer-minus" />,
             title: 'Remove',
             description: 'Remove worker nodes from the cluster',
-          }
+          },
         ]}
       />
     </div>
   )
 
-  const calcMin = value => params.scaleType === 'add' ? value : Math.max(value - MAX_SCALE_AT_A_TIME, 1)
-  const calcMax = value => params.scaleType === 'add' ? value + MAX_SCALE_AT_A_TIME : Math.max(value - MAX_SCALE_AT_A_TIME, 1)
+  const calcMin = value => params.scaleType === 'add'
+    ? value
+    : Math.max(value - MAX_SCALE_AT_A_TIME, 1)
+
+  const calcMax = value => params.scaleType === 'add'
+    ? value + MAX_SCALE_AT_A_TIME
+    : value
 
   const chooseScaleNum = (
     <ValidatedForm initialValues={cluster} onSubmit={onSubmit}>
-      {!cluster.enableCAS &&
+      {!cluster.enableCAS && (
         <TextField
           id="numWorkers"
           type="number"
@@ -82,11 +88,10 @@ const ScaleWorkers = ({ cluster, onSubmit }) => {
           info="Number of worker nodes to deploy."
           required
           validations={[
-            validators.minValue(calcMin(cluster.numWorkers)),
-            validators.maxValue(calcMax(cluster.numWorkers)),
+            validators.rangeValue(calcMin(cluster.numWorkers), calcMax(cluster.numWorkers)),
           ]}
         />
-      }
+      )}
 
       {!!cluster.enableCAS && (
         <>
@@ -96,8 +101,7 @@ const ScaleWorkers = ({ cluster, onSubmit }) => {
             label="Minimum number of worker nodes"
             info="Minimum number of worker nodes this cluster may be scaled down to."
             validations={[
-              validators.minValue(calcMin(cluster.numMinWorkers)),
-              validators.maxValue(calcMax(cluster.numMinWorkers)),
+              validators.rangeValue(calcMin(cluster.numMinWorkers), calcMax(cluster.numMinWorkers)),
             ]}
             required
           />
@@ -108,8 +112,7 @@ const ScaleWorkers = ({ cluster, onSubmit }) => {
             label="Maximum number of worker nodes"
             info="Maximum number of worker nodes this cluster may be scaled up to."
             validations={[
-              validators.minValue(calcMin(cluster.numMaxWorkers)),
-              validators.maxValue(calcMax(cluster.numMaxWorkers)),
+              validators.rangeValue(calcMin(cluster.numMaxWorkers), calcMax(cluster.numMaxWorkers)),
             ]}
             required
           />
@@ -121,7 +124,7 @@ const ScaleWorkers = ({ cluster, onSubmit }) => {
 
   return (
     <div>
-      {isCloud &&
+      {isCloud && (
         <>
           <div>
             <Typography variant="subtitle1">
@@ -135,32 +138,27 @@ const ScaleWorkers = ({ cluster, onSubmit }) => {
           </div>
           {params.scaleType ? chooseScaleNum : chooseType}
         </>
-      }
-      {isLocal &&
-        <div>
-          TODO
-        </div>
-      }
+      )}
+      {isLocal && <div>TODO</div>}
     </div>
   )
 }
 
 const ScaleWorkersPage = () => {
   const classes = useStyles({})
-  const { id } = useReactRouter().match.params
+  const { match, history } = useReactRouter()
+  const { id } = match.params
   const [clusters, loading] = useDataLoader(clusterActions.list)
 
   const onComplete = () => {
-    console.log('done')
+    history.push(listUrl)
   }
 
   const [update, updating] = useDataUpdater(clusterActions.update, onComplete)
-  const cluster = clusters.find(x => x.uuid === id)
+  const cluster = clusters.find((x) => x.uuid === id)
 
-  const handleSubmit = data => {
-    console.log('------')
-    update({ ...cluster, ...data })
-    console.log(data)
+  const handleSubmit = async (data) => {
+    await update({ ...cluster, ...data })
   }
 
   return (
