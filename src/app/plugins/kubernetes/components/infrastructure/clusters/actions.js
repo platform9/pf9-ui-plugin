@@ -119,7 +119,7 @@ const createBareOSCluster = async (data = {}, loadFromContext) => {
 
   // 1. Get the nodePoolUuid from the nodePools API and look for the pool with name 'defaultPool'
   const nodePools = await qbert.getNodePools()
-  data.nodePoolUuid = nodePools?.find(x => x.name === 'defaultPool').uuid
+  data.nodePoolUuid = nodePools.find(x => x.name === 'defaultPool').uuid
 
   // 2. Create the cluster
   const cluster = await createGenericCluster(body, data, loadFromContext)
