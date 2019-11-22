@@ -183,9 +183,11 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
     if (params.clusterType === 'aws') { return createAwsCluster(params, loadFromContext) }
     if (params.clusterType === 'azure') { return createAzureCluster(params, loadFromContext) }
   },
-  updateFn: async ({ uuid, name, tags }) => {
-    await qbert.updateCluster(uuid, { name, tags })
-    return { name, tags }
+  updateFn: async ({ uuid, ...params }) => {
+    const updateableParams = 'name tags numWorkers numMinWorkers numMaxWorkers'.split(' ')
+    const body = pick(updateableParams, params)
+    await qbert.updateCluster(uuid, body)
+    return body
   },
   deleteFn: async ({ uuid }) => {
     await qbert.deleteCluster(uuid)

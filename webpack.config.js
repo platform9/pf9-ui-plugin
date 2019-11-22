@@ -26,7 +26,7 @@ appEntry.push('@babel/polyfill')
 appEntry.push('./index.js')
 
 const port = 3000
-const publicPath = isProd ? '/ui/' : `http://localhost:${port}/ui`
+const publicPath = '/ui'
 
 module.exports = {
   entry: {

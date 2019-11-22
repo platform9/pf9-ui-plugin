@@ -14,6 +14,7 @@ import TextField from 'core/components/validatedForm/TextField'
 import { validators } from 'core/utils/fieldValidators'
 import SubmitButton from 'core/components/buttons/SubmitButton'
 import useParams from 'core/hooks/useParams'
+import useDataUpdater from 'core/hooks/useDataUpdater'
 
 // Limit the number of workers that can be scaled at a time to prevent overload
 const MAX_SCALE_AT_A_TIME = 15
@@ -38,17 +39,13 @@ const clusterTypeDisplay = {
   azure: 'Azure',
 }
 
-const ScaleWorkers = ({ cluster }) => {
+const ScaleWorkers = ({ cluster, onSubmit }) => {
   const classes = useStyles({})
   const { params, getParamsUpdater } = useParams()
   const { name, cloudProviderType } = cluster
   const isLocal = cloudProviderType === 'local'
   const isCloud = ['aws', 'azure'].includes(cloudProviderType)
   const type: string = clusterTypeDisplay[cloudProviderType]
-
-  const handleSubmit = data => {
-    console.log(data)
-  }
 
   const chooseType = (
     <div>
@@ -76,7 +73,7 @@ const ScaleWorkers = ({ cluster }) => {
   const calcMax = value => params.scaleType === 'add' ? value + MAX_SCALE_AT_A_TIME : Math.max(value - MAX_SCALE_AT_A_TIME, 1)
 
   const chooseScaleNum = (
-    <ValidatedForm initialValues={cluster} onSubmit={handleSubmit}>
+    <ValidatedForm initialValues={cluster} onSubmit={onSubmit}>
       {!cluster.enableCAS &&
         <TextField
           id="numWorkers"
@@ -152,18 +149,30 @@ const ScaleWorkersPage = () => {
   const classes = useStyles({})
   const { id } = useReactRouter().match.params
   const [clusters, loading] = useDataLoader(clusterActions.list)
+
+  const onComplete = () => {
+    console.log('done')
+  }
+
+  const [update, updating] = useDataUpdater(clusterActions.update, onComplete)
   const cluster = clusters.find(x => x.uuid === id)
+
+  const handleSubmit = data => {
+    console.log('------')
+    update({ ...cluster, ...data })
+    console.log(data)
+  }
 
   return (
     <FormWrapper
       className={classes.root}
       title="Scale Workers"
       backUrl={listUrl}
-      loading={loading}
+      loading={loading || updating}
       renderContentOnMount={false}
-      message="Loading cluster..."
+      message={updating ? 'Scaling cluster...' : 'Loading cluster...'}
     >
-      <ScaleWorkers cluster={cluster} />
+      <ScaleWorkers cluster={cluster} onSubmit={handleSubmit} />
     </FormWrapper>
   )
 }
