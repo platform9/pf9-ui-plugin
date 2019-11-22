@@ -6,6 +6,7 @@ import SimpleLink from 'core/components/SimpleLink'
 import ScaleIcon from '@material-ui/icons/TrendingUp'
 import UpgradeIcon from '@material-ui/icons/PresentToAll'
 import InsertChartIcon from '@material-ui/icons/InsertChart'
+import DescriptionIcon from '@material-ui/icons/Description'
 import { clustersCacheKey } from '../common/actions'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { capitalizeString } from 'utils/misc'
@@ -20,6 +21,7 @@ import { both, prop } from 'ramda'
 import PrometheusAddonDialog from 'k8s/components/prometheus/PrometheusAddonDialog'
 import ClusterUpgradeDialog from 'k8s/components/infrastructure/clusters/ClusterUpgradeDialog'
 import ClusterSync from './ClusterSync'
+import LoggingAddonDialog from 'k8s/components/logging/LoggingAddonDialog'
 import { Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 
@@ -29,8 +31,8 @@ const useStyles = makeStyles(theme => ({
     color: theme.palette.primary.main,
     '&:hover': {
       textDecoration: 'underline',
-    }
-  }
+    },
+  },
 }))
 
 const getClusterPopoverContent = (healthyMasterNodes, masterNodes) =>
@@ -38,7 +40,7 @@ const getClusterPopoverContent = (healthyMasterNodes, masterNodes) =>
 
 const getPendingClusterPopoversContent = (cpType, taskStatus) => objSwitchCase({
   creating: `The ${cpType} resources are being created.`,
-  converging: `One or more hosts are joining the cluster`,
+  converging: 'One or more hosts are joining the cluster',
   updating: `The ${cpType} resources are being updated`,
   deleting: `The cluster and its underlying ${cpType} resources are being deleted`,
 })(taskStatus)
@@ -51,7 +53,7 @@ const renderStatus = (status,
     return null
   }
   switch (taskStatus) {
-    case 'success':
+    case 'success': {
       const clusterStatus = <ClusterStatusSpan
         label="Cluster"
         title={status === 'ok'
@@ -71,19 +73,19 @@ const renderStatus = (status,
         {clusterStatus}
         {haStatus}
       </div>
-
-    case 'error':
+    }
+    case 'error': {
       return <ClusterStatusSpan
         title="The last cluster operation (create, update, or delete) failed."
         status="fail"
       >
         Unhealthy
       </ClusterStatusSpan>
-
+    }
     case 'creating':
     case 'updating':
     case 'deleting':
-    case 'upgrading':
+    case 'upgrading': {
       return (
         <ClusterSync taskStatus={taskStatus}>
           <ClusterStatusSpan title="The cluster is spinning down.">
@@ -91,8 +93,8 @@ const renderStatus = (status,
           </ClusterStatusSpan>
         </ClusterSync>
       )
-
-    default:
+    }
+    default: {
       if (progressPercent) {
         return <div>
           <ProgressBar height={20} animated containedPercent percent={progressPercent
@@ -106,6 +108,7 @@ const renderStatus = (status,
         </div>
       }
       return <ClusterStatusSpan>{capitalizeString(status)}</ClusterStatusSpan>
+    }
   }
 }
 
@@ -175,8 +178,8 @@ const renderStats = (_, { usage }) => {
 const renderClusterDetailLink = (name, cluster) =>
   <SimpleLink src={`/ui/kubernetes/infrastructure/clusters/${cluster.uuid}`}>{name}</SimpleLink>
 
-const canScaleMasters = ([row]) => row.cloudProviderType === 'aws'
-const canScaleWorkers = ([row]) => row.cloudProviderType === 'aws'
+const canScaleMasters = ([row]) => row.taskStatus === 'success'
+const canScaleWorkers = ([row]) => row.taskStatus === 'success'
 const canUpgradeCluster = (selected) => false
 const canDeleteCluster = ([row]) => !(['creating', 'deleting'].includes(row.taskStatus))
 
@@ -249,6 +252,12 @@ export const options = {
       icon: <InsertChartIcon />,
       label: 'Monitoring',
       dialog: PrometheusAddonDialog,
+    },
+    {
+      cond: isAdmin,
+      icon: <DescriptionIcon />,
+      label: 'Logging',
+      dialog: LoggingAddonDialog,
     },
   ],
 }

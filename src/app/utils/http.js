@@ -10,7 +10,7 @@ const urlWithHost = url => {
 const authTokenHeader = () => ({ 'X-Auth-Token': registry.getInstance().token })
 const jsonHeaders = () => ({
   'Content-Type': 'application/json',
-  'Accept': 'application/json',
+  Accept: 'application/json',
 })
 
 const http = {

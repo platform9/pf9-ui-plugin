@@ -3,7 +3,7 @@ import 'app/app.css'
 import AppContext from 'core/providers/AppProvider'
 import HotKeysProvider from 'core/providers/HotKeysProvider'
 import ThemeManager from 'app/ThemeManager'
-import { ToastProvider } from 'core/providers/ToastProvider'
+import ToastProvider from 'core/providers/ToastProvider'
 import { decorateAction } from '@storybook/addon-actions'
 import { storiesOf } from '@storybook/react'
 import PreferencesProvider from 'core/providers/PreferencesProvider'
@@ -47,7 +47,7 @@ export const addStoriesFromModule = mod =>
   (section, stories) => addStories(section, stories, mod)
 
 export const range = n => {
-  let arr = []
+  const arr = []
   for (let i = 0; i < n; i++) {
     arr.push(i)
   }

@@ -6,7 +6,7 @@ import { applyJsonPatch, updateInArray } from '../../../app/utils/fp'
 
 const create = (params) => {
   if (!params.clusterId) {
-    console.error(`In create call for PrometheusInstance, clusterId is a required param.`)
+    console.error('In create call for PrometheusInstance, clusterId is a required param.')
   }
   const defaults = {
     cpu: '500m',

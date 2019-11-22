@@ -10,14 +10,14 @@ export const formattedValue = (bytes, unit='Bytes', decimalDigits=2) => {
   if (units.indexOf(unit)===-1) {
     return 'Output unit not found.'
   }
-  let pos = units.indexOf(unit)
+  const pos = units.indexOf(unit)
   return addComma(bytes/Math.pow(1024, pos), decimalDigits)+' '+unit
 }
 
 export const addComma = (num, decimalDigits=2) => {
-  let floorPart = Math.floor(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-  let roundPart = Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-  let decimalPart = (num-Math.floor(num)).toFixed(decimalDigits).substring(2)
+  const floorPart = Math.floor(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+  const roundPart = Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+  const decimalPart = (num-Math.floor(num)).toFixed(decimalDigits).substring(2)
   if (decimalDigits===0) return roundPart
   else if ((num-Math.floor(num)).toFixed(decimalDigits).startsWith('1')) return roundPart+'.'+decimalPart
   return floorPart+'.'+decimalPart

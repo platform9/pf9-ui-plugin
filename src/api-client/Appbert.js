@@ -20,7 +20,7 @@ class Appbert {
     return this.client.basicGet(`${await this.baseUrl()}/packages`)
   }
 
-  toggleMonitoring = async (clusterUuid, pkgId, on) => {
+  toggleAddon = async (clusterUuid, pkgId, on) => {
     if (on) {
       return this.client.basicPut(`${await this.baseUrl()}/clusters/${clusterUuid}/${pkgId}`)
     }

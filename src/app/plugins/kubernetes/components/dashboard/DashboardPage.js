@@ -16,7 +16,7 @@ import {
   People, SettingsApplications, RecentActors, Storage, Layers, FilterNone, Cloud,
 } from '@material-ui/icons'
 // Components
-import StatusCard from './status-card'
+import StatusCard from './StatusCard'
 
 const useStyles = makeStyles(theme => ({
   cardRow: {

@@ -5,23 +5,23 @@ const chartVersionDefaults = {}
 const createFn = (_params = {}, context) => {
   const { iconUrl, ...params } = _params
   return {
-    'id': `stable/${faker.hacker.noun()}`,
-    'type': 'chartVersion',
+    id: `stable/${faker.hacker.noun()}`,
+    type: 'chartVersion',
     ...params,
     attributes: {
-      'created': faker.date.past(),
-      'app_version': `v${faker.system.semver()}`,
-      'icons': [
+      created: faker.date.past(),
+      app_version: `v${faker.system.semver()}`,
+      icons: [
         {
-          'name': faker.hacker.noun(),
-          'path': faker.image.imageUrl(),
+          name: faker.hacker.noun(),
+          path: faker.image.imageUrl(),
         },
       ],
-      'readme': '/assets/stable/aerospike/0.2.9/README.md',
-      'urls': [
+      readme: '/assets/stable/aerospike/0.2.9/README.md',
+      urls: [
         faker.internet.url(),
       ],
-      'version': faker.system.semver(),
+      version: faker.system.semver(),
     },
   }
 }

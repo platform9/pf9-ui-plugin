@@ -56,7 +56,7 @@ const AppDetailsPage = () => {
   const [[app = emptyObj], loadingApp] = useDataLoader(appDetailLoader, params)
 
   return <PageContainer header={
-    <SimpleLink src={`/ui/kubernetes/apps`} className={classes.backLink}>
+    <SimpleLink src={'/ui/kubernetes/apps'} className={classes.backLink}>
       « Back to Application Catalog
     </SimpleLink>}>
     {showingDeployDialog &&

@@ -47,7 +47,7 @@ const useStyles = makeStyles(theme => ({
   },
 }))
 
-const backUrl = `/ui/kubernetes/apps#deployedApps`
+const backUrl = '/ui/kubernetes/apps#deployedApps'
 
 const DeployedAppDetailsPage = () => {
   const classes = useStyles()

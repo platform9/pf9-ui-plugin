@@ -45,19 +45,19 @@ const HostStatus = ({ host = {} }) => {
   const classes = useStyles()
   const { uiState = '', warnings, supportRole } = host
   const getStatusContents = objSwitchCase({
-    'online': <><CheckIcon style={greenStyle} />Connected</>,
+    online: <><CheckIcon style={greenStyle} />Connected</>,
 
-    'offline': <><WarningIcon style={yellowStyle} />Offline since {host.lastResponse}</>,
+    offline: <><WarningIcon style={yellowStyle} />Offline since {host.lastResponse}</>,
 
-    'drifted': warnings ? warnings.map(warning =>
+    drifted: warnings ? warnings.map(warning =>
       <ExternalLink url={getTimeDriftSupportLink(host)}>
         <WarningIcon style={yellowStyle} />{warning}
       </ExternalLink>) : capitalizeString(uiState),
 
-    'pending': <>
+    pending: <>
       <i className={clsx(classes.loading, 'fal fa-lg fa-spin fa-sync')} />Discovering</>,
 
-    'error': <><WarningIcon style={orangeStyle} />Error authorizing host. Please contact
+    error: <><WarningIcon style={orangeStyle} />Error authorizing host. Please contact
       support.</>,
 
     'invalid-credentials': <><WarningIcon style={orangeStyle} />

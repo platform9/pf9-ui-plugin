@@ -94,11 +94,56 @@ const createAzureCluster = async (data, loadFromContext) => {
   return createGenericCluster(body, data, loadFromContext)
 }
 
+const createBareOSCluster = async (data = {}, loadFromContext) => {
+  const keysToPluck = [
+    'name',
+    'masterNodes',
+    'allowWorkloadsOnMaster',
+    'workerNodes',
+    'masterVipIpv4',
+    'masterVipIface',
+    'metallbCidr',
+    'externalDnsName',
+    'containersCidr',
+    'servicesCidr',
+    'mtuSize',
+    'privileged',
+    'appCatalogEnabled',
+    'tags',
+  ]
+  const body = pick(keysToPluck, data)
+
+  if (data.enableMetallb) {
+    body.metallbCidr = data.metallbCidr
+  }
+
+  // 1. Get the nodePoolUuid from the nodePools API and look for the pool with name 'defaultPool'
+  const nodePools = await qbert.getNodePools()
+  data.nodePoolUuid = nodePools.find(x => x.name === 'defaultPool').uuid
+
+  // 2. Create the cluster
+  const cluster = await createGenericCluster(body, data, loadFromContext)
+
+  // 3. Attach the nodes
+  const { masterNodes, workerNodes = [] } = data
+  const nodes = [
+    ...masterNodes.map(uuid => ({ isMaster: true, uuid })),
+    ...workerNodes.map(uuid => ({ isMaster: false, uuid })),
+  ]
+  // TODO verify `clusterUuid` is on the cluster response object.
+  qbert.attachNodes(cluster.clusterUuid, nodes)
+
+  return cluster
+}
+
 const createGenericCluster = async (body, data, loadFromContext) => {
   const { cloudProviderId } = data
-  // Get the nodePoolUuid from the cloudProviderId.  There is a 1-to-1 mapping between cloudProviderId and nodePoolUuuid right now.
-  const cloudProviders = await loadFromContext('cloudProviders')
-  body.nodePoolUuid = cloudProviders.find(propEq('uuid', cloudProviderId)).nodePoolUuid
+
+  if (!body.nodePoolUuid && !!cloudProviderId) {
+    // Get the nodePoolUuid from the cloudProviderId.  There is a 1-to-1 mapping between cloudProviderId and nodePoolUuuid right now.
+    const cloudProviders = await loadFromContext('cloudProviders')
+    body.nodePoolUuid = cloudProviders.find(propEq('uuid', cloudProviderId)).nodePoolUuid
+  }
 
   if (data.httpProxy) { body.httpProxy = data.httpProxy }
   if (data.networkPlugin === 'calico') { body.mtuSize = data.mtuSize }
@@ -182,10 +227,13 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
   createFn: (params, _, loadFromContext) => {
     if (params.clusterType === 'aws') { return createAwsCluster(params, loadFromContext) }
     if (params.clusterType === 'azure') { return createAzureCluster(params, loadFromContext) }
+    if (params.clusterType === 'local') { return createBareOSCluster(params, loadFromContext) }
   },
-  updateFn: async ({ uuid, name, tags }) => {
-    await qbert.updateCluster(uuid, { name, tags })
-    return { name, tags }
+  updateFn: async ({ uuid, ...params }) => {
+    const updateableParams = 'name tags numWorkers numMinWorkers numMaxWorkers'.split(' ')
+    const body = pick(updateableParams, params)
+    await qbert.updateCluster(uuid, body)
+    return body
   },
   deleteFn: async ({ uuid }) => {
     await qbert.deleteCluster(uuid)

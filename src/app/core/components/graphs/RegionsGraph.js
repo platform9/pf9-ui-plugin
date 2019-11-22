@@ -3,7 +3,7 @@ import { withStyles } from '@material-ui/styles'
 import SvgCloud from './SvgCloud'
 
 const styles = theme => ({
-  'svg': {
+  svg: {
     'max-height': '100%',
     position: 'absolute'
   }

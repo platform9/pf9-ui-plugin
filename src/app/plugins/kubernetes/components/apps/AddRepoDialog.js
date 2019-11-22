@@ -55,13 +55,13 @@ export default ({ onClose }) => {
                     <TextField id="source" label="Source" info="URL that points to the source core" />
                   </ValidatedForm>
                 </WizardStep>
-                <WizardStep stepId="repoClusters" label="Repository clusters">
+                {clusters.length ? <WizardStep stepId="repoClusters" label="Repository clusters">
                   <Table>
                     <TableBody>
                       {clusters.map(renderClusterRow)}
                     </TableBody>
                   </Table>
-                </WizardStep>
+                </WizardStep> : null}
               </>
             }
           </Wizard>

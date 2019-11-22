@@ -16,11 +16,11 @@ const styles = theme => ({
   },
 })
 
-const Panel = withStyles(styles)(({ classes, title, children, ...rest }) => (
+const Panel = withStyles(styles)(({ classes, title, children, titleVariant = 'subtitle1', ...rest }) => (
   <div className={classes.root}>
     <ExpansionPanel defaultExpanded {...rest}>
       <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-        <Typography variant="subtitle1">{title}</Typography>
+        <Typography variant={titleVariant}>{title}</Typography>
       </ExpansionPanelSummary>
       <ExpansionPanelDetails>
         <div style={{ width: '100%' }}>

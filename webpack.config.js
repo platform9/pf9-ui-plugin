@@ -26,7 +26,7 @@ appEntry.push('@babel/polyfill')
 appEntry.push('./index.js')
 
 const port = 3000
-const publicPath = isProd ? '/ui/' : `http://localhost:${port}/ui`
+const publicPath = '/ui'
 
 module.exports = {
   entry: {
@@ -78,6 +78,7 @@ module.exports = {
   },
   context: contextPath,
   optimization: {
+    namedModules: !isProd,
     runtimeChunk: 'single',
     minimize: isProd,
     minimizer: [
@@ -98,7 +99,6 @@ module.exports = {
     },
   },
   plugins: [
-    ...(isProd ? [] : [new webpack.NamedModulesPlugin()]),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(env),
     }),
@@ -115,7 +115,7 @@ module.exports = {
     }),
   ],
   resolve: {
-    extensions: ['.json', '.js', 'ts', '.tsx'],
+    extensions: ['.json', '.js', '.ts', '.tsx'],
     alias: {
       // IDE's seem to solve paths according to the order in which they are defined
       // so we must put first the more specific aliases

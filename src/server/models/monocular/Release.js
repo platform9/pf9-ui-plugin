@@ -5,17 +5,17 @@ const releaseDefaults = {}
 const createFn = (_params = {}, context) => {
   const { iconUrl, ...params } = _params
   return {
-    'id': faker.hacker.noun(),
-    'type': 'release',
+    id: faker.hacker.noun(),
+    type: 'release',
     ...params,
     attributes: {
-      'chartIcon': faker.image.imageUrl(),
-      'chartName': 'spark',
-      'chartVersion': '0.2.1',
-      'name': faker.company.companyName(),
-      'namespace': 'default',
-      'status': 'DEPLOYED',
-      'updated': faker.date.past()
+      chartIcon: faker.image.imageUrl(),
+      chartName: 'spark',
+      chartVersion: '0.2.1',
+      name: faker.company.companyName(),
+      namespace: 'default',
+      status: 'DEPLOYED',
+      updated: faker.date.past()
     }
   }
 }

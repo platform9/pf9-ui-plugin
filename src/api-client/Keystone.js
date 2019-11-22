@@ -28,7 +28,7 @@ const constructAuthBody = (method, ...args) => {
 }
 
 const groupByRegion = catalog => {
-  let regions = {}
+  const regions = {}
   catalog.forEach(service => {
     const { name } = service
     service.endpoints.forEach(endpoint => {
@@ -110,7 +110,7 @@ class Keystone {
       ...this.client.getAuthHeaders(),
       params: {
         'scope.project.id': tenantId,
-        'include_names': true,
+        include_names: true,
       },
     })
     return response.data.role_assignments
@@ -121,7 +121,7 @@ class Keystone {
       ...this.client.getAuthHeaders(),
       params: {
         'user.id': userId,
-        'include_names': true,
+        include_names: true,
       },
     })
     return response.data.role_assignments
@@ -143,7 +143,7 @@ class Keystone {
       ), this.client.getAuthHeaders())
       return { tenantId, userId, roleId }
     } catch (err) {
-      throw new Error(`Unable to delete non-existant project`)
+      throw new Error('Unable to delete non-existant project')
     }
   }
 
@@ -180,7 +180,7 @@ class Keystone {
       await axios.delete(`${this.projectsUrl}/${projectId}`, this.client.getAuthHeaders())
       return projectId
     } catch (err) {
-      throw new Error(`Unable to delete non-existant project`)
+      throw new Error('Unable to delete non-existant project')
     }
   }
 
@@ -352,7 +352,7 @@ class Keystone {
       await axios.delete(`${this.usersUrl}/${userId}`, this.client.getAuthHeaders())
       return userId
     } catch (err) {
-      throw new Error(`Unable to delete non-existant user`)
+      throw new Error('Unable to delete non-existant user')
     }
   }
 }

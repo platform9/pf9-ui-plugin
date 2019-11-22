@@ -15,9 +15,10 @@
   "plugins": [
     "import",
     "react",
-    "cypress"
+    "cypress",
+    "@typescript-eslint/eslint-plugin"
   ],
-  "extends": ["standard", "standard-react"],
+  "extends": ["standard", "standard-with-typescript", "standard-react"],
 
   "rules": {
     "semi": ["error","never"],
@@ -33,21 +34,32 @@
     "react/no-unused-prop-types": "warn",
     "no-new": 0,
     "space-infix-ops": 0,
+    "no-prototype-builtins": 0,
 
     // Allow for "table" alignment, ex:
     // { id: 'name',       type: 'string' }
     // { id: 'longerName', type: 'string' }
     "no-multi-spaces": [2, { "exceptions": { "ObjectExpression": true } } ],
     "key-spacing": [2, { "mode": "minimum" }],
-    "standard/no-callback-literal": 0
+    "standard/no-callback-literal": 0,
+    "@typescript-eslint/strict-boolean-expressions": "off"
   },
 
   "settings": {
     "import/parser": "babel-eslint",
     "react": {
-      "version": "16.6" // React version, default to the latest React stable release
+      "version": "16.9" // React version, default to the latest React stable release
     }
   },
-  "globals": {
-  }
+
+  "overrides": [
+    {
+      "files": ["*.ts","*.tsx"],
+      "parser": "@typescript-eslint/parser",
+      "parserOptions": {
+        "sourceType": "module",
+        "project": "./tsconfig.json"
+      }
+    }
+  ]
 }

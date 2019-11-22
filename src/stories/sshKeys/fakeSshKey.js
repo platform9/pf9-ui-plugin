@@ -1,7 +1,7 @@
 import faker from 'faker'
 
 const fakeSshKey = () => {
-  let sshKey = {
+  const sshKey = {
     keypair: {
       name: faker.random.word(),
       fingerprint: faker.random.word(),

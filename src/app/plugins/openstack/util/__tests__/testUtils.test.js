@@ -1,7 +1,4 @@
-import {
-  lastCall,
-  mockResponse,
-} from '../testUtils'
+import { lastCall, mockResponse } from '../testUtils'
 
 it('mockResponse', async () => {
   const response = await mockResponse({ foo: 'bar', headers: { headerKey: 'headerValue' } })
@@ -10,6 +7,6 @@ it('mockResponse', async () => {
 })
 
 it('lastResponse', () => {
-  const fn = { mock: { calls: [ 5, 4, 2, 7 ] } }
+  const fn = { mock: { calls: [5, 4, 2, 7] } }
   expect(lastCall(fn)).toEqual(7)
 })

@@ -62,8 +62,8 @@ export const castFuzzyBool = value => {
     true: true,
     0: false,
     1: true,
-    'False': false,
-    'True': true,
+    False: false,
+    True: true,
   }
 
   if (mappings[value] !== undefined) { return mappings[value] }

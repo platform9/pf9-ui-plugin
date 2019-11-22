@@ -367,7 +367,7 @@ const AddAzureClusterPage = () => {
                       <TextField
                         id="httpProxy"
                         label="HTTP Proxy"
-                        info={<div>(Optional) Specify the HTTP proxy for this cluster. Uses format of <Code><span>{`<scheme>://<username>:<password>@<host>:<port>`}</span></Code> where <Code><span>{`<username>:<password>@`}</span></Code> is optional.</div>}
+                        info={<div>(Optional) Specify the HTTP proxy for this cluster. Uses format of <Code><span>{'<scheme>://<username>:<password>@<host>:<port>'}</span></Code> where <Code><span>{'<username>:<password>@'}</span></Code> is optional.</div>}
                       />
                     </>
                   )}

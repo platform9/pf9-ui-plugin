@@ -26,6 +26,11 @@ export const hasOneUpperChar = both(is(String), test(/[A-Z]/))
 export const hasOneNumber = both(is(String), test(/[0-9]/))
 export const hasOneSpecialChar = both(is(String), test(/[-!@#$%^&*()?]/))
 
+export const masterNodeLengthValidator = new FieldValidator(
+  nodes => (fieldIsUnset(nodes) || [1, 3, 5].includes(nodes.length)),
+  'You can only have 1, 3 or 5 master nodes',
+)
+
 export const namespaceValidator = new FieldValidator(
   namespace =>
     fieldIsUnset(namespace) ||
@@ -71,7 +76,7 @@ export const minLengthValidator = moize(
     new FieldValidator(
       value => fieldIsUnset(value) || value.toString().length >= minLength,
       `Length must be greater than ${minLength}`,
-    ),
+    )
 )
 
 export const maxLengthValidator = moize(
@@ -79,7 +84,7 @@ export const maxLengthValidator = moize(
     new FieldValidator(
       value => fieldIsUnset(value) || value.toString().length <= maxLength,
       `Length must be less than ${maxLength}`,
-    ),
+    )
 )
 
 export const minValueValidator = moize(
@@ -87,7 +92,15 @@ export const minValueValidator = moize(
     new FieldValidator(
       value => fieldIsUnset(value) || Number(value) >= min,
       `Value must be greater than or equal to ${min}`,
-    ),
+    )
+)
+
+export const rangeValueValidator = moize(
+  (min, max) =>
+    new FieldValidator(
+      value => fieldIsUnset(value) || (Number(value) >= min && Number(value) <= max),
+      `Value must be between ${min} and ${max}`
+    )
 )
 
 export const maxValueValidator = moize(
@@ -95,7 +108,7 @@ export const maxValueValidator = moize(
     new FieldValidator(
       value => fieldIsUnset(value) || Number(value) <= max,
       `Value must be less than or equal to ${max}`,
-    ),
+    )
 )
 
 export const passwordValidator = new FieldValidator(
@@ -126,6 +139,7 @@ export const validators = {
   maxLength: maxLengthValidator,
   minValue: minValueValidator,
   maxValue: maxValueValidator,
+  rangeValue: rangeValueValidator,
 }
 
 export const parseValidator = (key, spec) => {

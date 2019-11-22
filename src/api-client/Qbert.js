@@ -466,7 +466,7 @@ class Qbert {
       role: 'alert-rules',
     }
 
-    let prometheusBody = {
+    const prometheusBody = {
       apiVersion,
       kind: 'Prometheus',
       metadata: {
@@ -486,7 +486,7 @@ class Qbert {
     // TODO: How do we specifiy "Enable persistent storage" in the API call?  What does this field mean in the
     // context of a Prometheus Instance?  Where will it be stored?  Do we need to specify PVC and StorageClasses?
 
-    let serviceMonitorBody = {
+    const serviceMonitorBody = {
       apiVersion,
       kind: 'ServiceMonitor',
       metadata: {
@@ -508,7 +508,7 @@ class Qbert {
     }
     */
 
-    let prometheusRulesBody = {
+    const prometheusRulesBody = {
       apiVersion,
       kind: 'PrometheusRule',
       metadata: {

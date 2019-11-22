@@ -1,11 +1,9 @@
 // Libs
-import * as React from 'react'
+import React, { FunctionComponent } from 'react'
 import { Link } from 'react-router-dom'
-
 // Hooks
 import { makeStyles } from '@material-ui/styles'
 import useDataLoader from 'core/hooks/useDataLoader'
-
 // Components
 import { Typography, CircularProgress } from '@material-ui/core'
 import { hexToRGBA } from 'core/utils/colorHelpers'
@@ -25,7 +23,7 @@ const useStyles = makeStyles((theme: any) => ({
     padding: `${theme.spacing(1.5)}px ${theme.spacing(1.5)}px ${theme.spacing(0.5)}px ${theme.spacing(1.5)}px`,
     borderRadius: '5px',
     transition: 'transform .1s ease',
-    "&:hover": {
+    '&:hover': {
       backgroundColor: hexToRGBA('#243748', 0.95),
       transform: 'scale(1.025)'
     }
@@ -59,16 +57,16 @@ const useStyles = makeStyles((theme: any) => ({
 
 type PropertyFunction<T> = (p: any) => T
 
-interface Props {
+interface StatusCardProps {
   route: string
   title: string
   icon: string | PropertyFunction<JSX.Element>
   quantity: number
   dataLoader: [() => any, {}] // todo figure out typings here.
-  quantityFn(data: any[]): { quantity: number; working: number; pending: number }
+  quantityFn(data: any[]): { quantity: number, working: number, pending: number }
 }
 
-export default function StatusCard({ route, title, icon: Icon, dataLoader, quantityFn }: Props) {
+const StatusCard: FunctionComponent<StatusCardProps> = ({ route, title, icon: Icon, dataLoader, quantityFn }) => {
   const { row, contentContainer, headerIcon, cardTitle } = useStyles({})
   const [data, loading] = useDataLoader(...dataLoader)
   const { quantity, working, pending = 0 } = quantityFn(data)
@@ -100,7 +98,14 @@ export default function StatusCard({ route, title, icon: Icon, dataLoader, quant
   )
 }
 
-function CardDetails({ quantity, failed, pending }) {
+export default StatusCard
+
+interface CardDetailsProps {
+  quantity: number
+  failed: number
+  pending: number
+}
+const CardDetails: FunctionComponent<CardDetailsProps> = ({ quantity, failed, pending }) => {
   const { row, failedText, pendingText, text } = useStyles({})
   return (
     <div className={row}>

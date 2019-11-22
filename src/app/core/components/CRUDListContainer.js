@@ -58,6 +58,7 @@ const CRUDListContainer = ({
     toggleConfirmDialog()
     await Promise.all(selectedItems.map(handleRemove))
     deletePromise.current()
+    reload()
   }, [selectedItems, handleRemove])
 
   const handleAdd = () => {
@@ -84,13 +85,18 @@ const CRUDListContainer = ({
     }
   }
 
+  const handleClose = toggleDialog => () => {
+    toggleDialog()
+    reload()
+  }
+
   return <>
     {AddDialog && showingAddDialog && <AddDialog
-      onClose={toggleAddDialog}
+      onClose={handleClose(toggleAddDialog)}
     />}
     {EditDialog && showingEditDialog && <EditDialog
       rows={selectedItems}
-      onClose={toggleEditDialog}
+      onClose={handleClose(toggleEditDialog)}
     />}
     {handleRemove && showingConfirmDialog && <ConfirmationDialog
       open={showingConfirmDialog}

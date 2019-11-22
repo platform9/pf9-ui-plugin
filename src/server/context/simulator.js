@@ -198,7 +198,7 @@ class Context {
   }
 
   updateUser = (id, input) => {
-    let user = User.updateById(id, input)
+    const user = User.updateById(id, input)
     if (!user) {
       throw new Error('Unable to update non-existent user')
     }
@@ -230,7 +230,7 @@ class Context {
   }
 
   updateNetwork = (id, input) => {
-    let network = Network.updateById(id, input)
+    const network = Network.updateById(id, input)
     if (!network) {
       throw new Error('Unable to update non-existent network')
     }
@@ -262,7 +262,7 @@ class Context {
   }
 
   updateRouter = (id, input) => {
-    let router = Router.updateById(id, input)
+    const router = Router.updateById(id, input)
     if (!router) {
       throw new Error('Unable to update non-existent router')
     }
@@ -294,7 +294,7 @@ class Context {
   }
 
   updateFloatingIp = (id, input) => {
-    let floatingIp = FloatingIp.updateById(id, input)
+    const floatingIp = FloatingIp.updateById(id, input)
     if (!floatingIp) {
       throw new Error('Unable to update non-existent floating IP')
     }
@@ -326,7 +326,7 @@ class Context {
   }
 
   updateVolume = (id, input) => {
-    let volume = Volume.updateById(id, input)
+    const volume = Volume.updateById(id, input)
     if (!volume) {
       throw new Error('Unable to update non-existent volume')
     }
@@ -363,7 +363,7 @@ class Context {
   getResMgrHosts = () => ResMgrHost.getCollection().map(x => x.asJson())
 
   getResMgrHostRole = (id, role) => {
-    let hostRole = ResMgrHost.getHostRole(id, role)
+    const hostRole = ResMgrHost.getHostRole(id, role)
     if (!hostRole) {
       throw new Error('Unable to find designated role for designated host')
     }
@@ -371,7 +371,7 @@ class Context {
   }
 
   updateResMgrRole = (id, role, input) => {
-    let hostRole = ResMgrHost.updateHostRole(id, role, input)
+    const hostRole = ResMgrHost.updateHostRole(id, role, input)
     if (!hostRole) {
       throw new Error('Unable to update non-existent resMgrHost')
     }
