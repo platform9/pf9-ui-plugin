@@ -2,7 +2,7 @@ import { useMemo, useEffect, useState, useCallback, useContext, useRef } from 'r
 import moize from 'moize'
 import { emptyArr, emptyObj } from 'utils/fp'
 import { isEmpty } from 'ramda'
-import { ToastContext } from 'core/providers/ToastProvider'
+import { useToast } from 'core/providers/ToastProvider'
 import { AppContext } from 'core/providers/AppProvider'
 import { memoizedDep } from 'utils/misc'
 
@@ -42,7 +42,7 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState(emptyArr)
   const { getContext, setContext, currentTenant, currentRegion } = useContext(AppContext)
-  const showToast = useContext(ToastContext)
+  const showToast = useToast()
 
   // Set a custom error handler for all loading functions using this hook
   // We do this here because we have access to the ToastContext, unlike in the dataLoader functions

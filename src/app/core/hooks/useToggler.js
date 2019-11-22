@@ -5,7 +5,7 @@ const useToggler = (initialValue = false) => {
     prevValue => !prevValue,
     initialValue,
   )
-  const toggle = useCallback(() => toggleVal(), [toggleVal])
+  const toggle = useCallback(() => toggleVal(), [])
   return [active, toggle]
 }
 

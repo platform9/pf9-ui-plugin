@@ -28,7 +28,7 @@ const useParams = (defaultParams = emptyObj) => {
     return moize((...keys) =>
       (...values) => updateParams(zipObj(keys, values)),
     )
-  }, [updateParams])
+  }, [])
 
   return { params, updateParams, getParamsUpdater }
 }
