@@ -120,7 +120,7 @@ const createCRUDComponents = options => {
         AddDialog={AddDialog}
         EditDialog={EditDialog}
       >
-        {(handlers, deleting) => <List
+        {({ deleting, ...handlers }) => <List
           loading={loading || deleting}
           data={data}
           batchActions={batchActions}

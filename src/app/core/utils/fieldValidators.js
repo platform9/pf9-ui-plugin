@@ -87,6 +87,22 @@ export const maxLengthValidator = moize(
     ),
 )
 
+export const minValueValidator = moize(
+  min =>
+    new FieldValidator(
+      value => fieldIsUnset(value) || Number(value) >= min,
+      `Value must be greater than or equal to ${min}`,
+    ),
+)
+
+export const maxValueValidator = moize(
+  max =>
+    new FieldValidator(
+      value => fieldIsUnset(value) || Number(value) <= max,
+      `Value must be less than or equal to ${max}`,
+    ),
+)
+
 export const passwordValidator = new FieldValidator(
   value => fieldIsUnset(value) || allPass([
     hasMinLength(8),
@@ -113,6 +129,8 @@ export const validators = {
   length: lengthValidator,
   minLength: minLengthValidator,
   maxLength: maxLengthValidator,
+  minValue: minValueValidator,
+  maxValue: maxValueValidator,
 }
 
 export const parseValidator = (key, spec) => {

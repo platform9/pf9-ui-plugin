@@ -26,15 +26,15 @@ import {
   getStorageClasses, postStorageClass, deleteStorageClass,
 } from './storageClasses/storageClassActions'
 // RBAC
-import { getRoles, postRole, putRole, deleteRole } from './roles/roleActions'
+import { getRoles, postRole, deleteRole } from './roles/roleActions'
 import {
-  getRoleBindings, postRoleBinding, putRoleBinding, deleteRoleBinding
+  getRoleBindings, postRoleBinding, deleteRoleBinding
 } from './roleBindings/roleBindingActions'
 import {
-  getClusterRoles, postClusterRole, putClusterRole, deleteClusterRole
+  getClusterRoles, postClusterRole, deleteClusterRole
 } from './clusterRoles/clusterRoleActions'
 import {
-  getClusterRoleBindings, postClusterRoleBinding, putClusterRoleBinding, deleteClusterRoleBinding
+  getClusterRoleBindings, postClusterRoleBinding, deleteClusterRoleBinding
 } from './clusterRoleBindings/clusterRoleBindingActions'
 
 import { getCharts, getChart, getChartVersions, getChartVersion } from './charts'
@@ -114,25 +114,25 @@ const rbacClusterBaseV1 = `${rbacClusterBase}/v1`
 router.get(`${rbacClusterBaseV1}/roles`, tokenValidator, getRoles)
 router.get(`${rbacClusterBaseV1}/namespaces/:namespace/roles`, tokenValidator, getRoles)
 router.post(`${rbacClusterBaseV1}/namespaces/:namespace/roles`, tokenValidator, postRole)
-router.put(`${rbacClusterBaseV1}/namespaces/:namespace/roles/:name`, tokenValidator, putRole)
+// router.put(`${rbacClusterBaseV1}/namespaces/:namespace/roles/:name`, tokenValidator, putRole)
 router.delete(`${rbacClusterBaseV1}/namespaces/:namespace/roles/:roleName`, tokenValidator, deleteRole)
 
 router.get(`${rbacClusterBaseV1}/rolebindings`, tokenValidator, getRoleBindings)
 router.get(`${rbacClusterBaseV1}/namespaces/:namespace/rolebindings`, tokenValidator, getRoleBindings)
 router.post(`${rbacClusterBaseV1}/namespaces/:namespace/rolebindings`, tokenValidator, postRoleBinding)
-router.put(`${rbacClusterBaseV1}/namespaces/:namespace/rolebindings/:name`, tokenValidator, putRoleBinding)
+// router.put(`${rbacClusterBaseV1}/namespaces/:namespace/rolebindings/:name`, tokenValidator, putRoleBinding)
 router.delete(`${rbacClusterBaseV1}/namespaces/:namespace/rolebindings/:roleBindingName`, tokenValidator, deleteRoleBinding)
 
 router.get(`${rbacClusterBaseV1}/clusterroles`, tokenValidator, getClusterRoles)
 router.get(`${rbacClusterBaseV1}/clusterroles`, tokenValidator, getClusterRoles)
 router.post(`${rbacClusterBaseV1}/clusterroles`, tokenValidator, postClusterRole)
-router.put(`${rbacClusterBaseV1}/clusterroles/:name`, tokenValidator, putClusterRole)
+// router.put(`${rbacClusterBaseV1}/clusterroles/:name`, tokenValidator, putClusterRole)
 router.delete(`${rbacClusterBaseV1}/clusterroles/:clusterRoleName`, tokenValidator, deleteClusterRole)
 
 router.get(`${rbacClusterBaseV1}/clusterrolebindings`, tokenValidator, getClusterRoleBindings)
 router.get(`${rbacClusterBaseV1}/clusterrolebindings`, tokenValidator, getClusterRoleBindings)
 router.post(`${rbacClusterBaseV1}/clusterrolebindings`, tokenValidator, postClusterRoleBinding)
-router.post(`${rbacClusterBaseV1}/clusterrolebindings/:name`, tokenValidator, putClusterRoleBinding)
+// router.post(`${rbacClusterBaseV1}/clusterrolebindings/:name`, tokenValidator, putClusterRoleBinding)
 router.delete(`${rbacClusterBaseV1}/clusterrolebindings/:clusterRoleBindingName`, tokenValidator, deleteClusterRoleBinding)
 
 // Monocular
