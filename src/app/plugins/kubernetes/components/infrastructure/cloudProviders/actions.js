@@ -103,6 +103,6 @@ export const loadCloudProviderRegionDetails = createContextLoader(
   {
     uniqueIdentifier: ['cloudProviderId', 'cloudProviderRegionId'],
     indexBy: ['cloudProviderId', 'cloudProviderRegionId'],
-    fetchErrorMessage: (err) => err.response.data,
+    fetchErrorMessage: (err) => err,
   },
 )
