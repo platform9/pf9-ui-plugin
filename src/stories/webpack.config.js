@@ -7,6 +7,12 @@ const baseConfig = require('../../webpack.config.js')
 
 module.exports = async ({ config, mode }) => {
   config.resolve = R.mergeDeepRight(config.resolve || {}, baseConfig.resolve)
+  // Add the typescript loader
+  config.module.rules = [...config.module.rules, {
+    test: /\.tsx?$/,
+    exclude: /node_modules/,
+    use: 'awesome-typescript-loader',
+  }]
 
   // Return the altered config
   return config
