@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo, useContext, useEffect, useRef } from 'react'
-import { ToastContext } from 'core/providers/ToastProvider'
+import { useToast } from 'core/providers/ToastProvider'
 import { AppContext } from 'core/providers/AppProvider'
 import { emptyObj } from 'utils/fp'
 import { isEmpty } from 'ramda'
@@ -20,7 +20,7 @@ const useDataUpdater = (updaterFn, onComplete) => {
   const updaterPromisesBuffer = useRef([])
   const [loading, setLoading] = useState(false)
   const { getContext, setContext } = useContext(AppContext)
-  const showToast = useContext(ToastContext)
+  const showToast = useToast()
   const additionalOptions = useMemo(() => ({
     onSuccess: (successMessage, params) => {
       const key = updaterFn.getKey()
