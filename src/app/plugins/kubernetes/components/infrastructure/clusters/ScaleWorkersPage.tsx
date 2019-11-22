@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { k8sPrefix } from 'app/constants'
 import { makeStyles } from '@material-ui/styles'
 import FormWrapper from 'core/components/FormWrapper'
@@ -13,6 +13,8 @@ import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import TextField from 'core/components/validatedForm/TextField'
 import { validators } from 'core/utils/fieldValidators'
 import SubmitButton from 'core/components/buttons/SubmitButton'
+import useParams from 'core/hooks/useParams'
+import useDataUpdater from 'core/hooks/useDataUpdater'
 
 // Limit the number of workers that can be scaled at a time to prevent overload
 const MAX_SCALE_AT_A_TIME = 15
@@ -27,32 +29,29 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   workerCount: {
     margin: theme.spacing(4, 0),
-  }
+  },
 }))
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
+
 const clusterTypeDisplay = {
   local: 'BareOS',
   aws: 'AWS',
   azure: 'Azure',
 }
 
-const ScaleWorkers = ({ cluster }) => {
+const ScaleWorkers = ({ cluster, onSubmit }) => {
   const classes = useStyles({})
-  const [scaleType, setScaleType] = useState(null)
+  const { params, getParamsUpdater } = useParams()
   const { name, cloudProviderType } = cluster
   const isLocal = cloudProviderType === 'local'
   const isCloud = ['aws', 'azure'].includes(cloudProviderType)
   const type: string = clusterTypeDisplay[cloudProviderType]
 
-  const handleSubmit = data => {
-    console.log(data)
-  }
-
   const chooseType = (
     <div>
       <BlockChooser
-        onChange={setScaleType}
+        onChange={getParamsUpdater('scaleType')}
         options={[
           {
             id: 'add',
@@ -65,15 +64,23 @@ const ScaleWorkers = ({ cluster }) => {
             icon: <FontAwesomeIcon size="2x" name="layer-minus" />,
             title: 'Remove',
             description: 'Remove worker nodes from the cluster',
-          }
+          },
         ]}
       />
     </div>
   )
 
+  const calcMin = value => params.scaleType === 'add'
+    ? value
+    : Math.max(value - MAX_SCALE_AT_A_TIME, 1)
+
+  const calcMax = value => params.scaleType === 'add'
+    ? value + MAX_SCALE_AT_A_TIME
+    : value
+
   const chooseScaleNum = (
-    <ValidatedForm initialValues={cluster} onSubmit={handleSubmit}>
-      {!cluster.enableCAS &&
+    <ValidatedForm initialValues={cluster} onSubmit={onSubmit}>
+      {!cluster.enableCAS && (
         <TextField
           id="numWorkers"
           type="number"
@@ -81,11 +88,10 @@ const ScaleWorkers = ({ cluster }) => {
           info="Number of worker nodes to deploy."
           required
           validations={[
-            validators.minValue(cluster.numWorkers),
-            validators.maxValue(cluster.numWorkers + MAX_SCALE_AT_A_TIME),
+            validators.rangeValue(calcMin(cluster.numWorkers), calcMax(cluster.numWorkers)),
           ]}
         />
-      }
+      )}
 
       {!!cluster.enableCAS && (
         <>
@@ -95,8 +101,7 @@ const ScaleWorkers = ({ cluster }) => {
             label="Minimum number of worker nodes"
             info="Minimum number of worker nodes this cluster may be scaled down to."
             validations={[
-              validators.minValue(cluster.numMinWorkers),
-              validators.maxValue(cluster.numMinWorkers + MAX_SCALE_AT_A_TIME),
+              validators.rangeValue(calcMin(cluster.numMinWorkers), calcMax(cluster.numMinWorkers)),
             ]}
             required
           />
@@ -107,19 +112,19 @@ const ScaleWorkers = ({ cluster }) => {
             label="Maximum number of worker nodes"
             info="Maximum number of worker nodes this cluster may be scaled up to."
             validations={[
-              validators.maxValue(cluster.numMaxWorkers + MAX_SCALE_AT_A_TIME),
+              validators.rangeValue(calcMin(cluster.numMaxWorkers), calcMax(cluster.numMaxWorkers)),
             ]}
             required
           />
         </>
       )}
-      <SubmitButton>{scaleType === 'add' ? 'Add' : 'Remove'} workers</SubmitButton>
+      <SubmitButton>{params.scaleType === 'add' ? 'Add' : 'Remove'} workers</SubmitButton>
     </ValidatedForm>
   )
 
   return (
     <div>
-      {isCloud &&
+      {isCloud && (
         <>
           <div>
             <Typography variant="subtitle1">
@@ -131,34 +136,41 @@ const ScaleWorkers = ({ cluster }) => {
               You currently have <b>{cluster.numWorkers}</b> worker nodes.
             </Typography>
           </div>
-          {scaleType ? chooseScaleNum : chooseType}
+          {params.scaleType ? chooseScaleNum : chooseType}
         </>
-      }
-      {isLocal &&
-        <div>
-          TODO
-        </div>
-      }
+      )}
+      {isLocal && <div>TODO</div>}
     </div>
   )
 }
 
 const ScaleWorkersPage = () => {
   const classes = useStyles({})
-  const { id } = useReactRouter().match.params
+  const { match, history } = useReactRouter()
+  const { id } = match.params
   const [clusters, loading] = useDataLoader(clusterActions.list)
-  const cluster = clusters.find(x => x.uuid === id)
+
+  const onComplete = () => {
+    history.push(listUrl)
+  }
+
+  const [update, updating] = useDataUpdater(clusterActions.update, onComplete)
+  const cluster = clusters.find((x) => x.uuid === id)
+
+  const handleSubmit = async (data) => {
+    await update({ ...cluster, ...data })
+  }
 
   return (
     <FormWrapper
       className={classes.root}
       title="Scale Workers"
       backUrl={listUrl}
-      loading={loading}
+      loading={loading || updating}
       renderContentOnMount={false}
-      message="Loading cluster..."
+      message={updating ? 'Scaling cluster...' : 'Loading cluster...'}
     >
-      <ScaleWorkers cluster={cluster} />
+      <ScaleWorkers cluster={cluster} onSubmit={handleSubmit} />
     </FormWrapper>
   )
 }
