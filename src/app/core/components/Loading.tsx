@@ -7,20 +7,20 @@ const useStyles = makeStyles<Theme, { justify: string }>((theme: Theme) => ({
   flex: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: ({justify}) => justify || 'flex-start'
+    justifyContent: ({ justify }) => justify || 'flex-start',
   },
   spacer: {
-    width: theme.spacing()
+    width: theme.spacing(),
   },
   rotateContainer: {
     width: '22px',
     height: '22px',
   },
   rotate: {
-    animation: '$spin 750ms infinite forwards'
+    animation: '$spin 750ms infinite forwards',
   },
   rotateReverse: {
-    animation: '$spinReverse 750ms infinite forwards'
+    animation: '$spinReverse 750ms infinite forwards',
   },
   '@keyframes spinReverse': {
     '0%': {
@@ -37,7 +37,7 @@ const useStyles = makeStyles<Theme, { justify: string }>((theme: Theme) => ({
     '100%': {
       transform: 'rotate(360deg)',
     },
-  }
+  },
 }))
 
 interface Props extends SvgIconProps {
@@ -48,16 +48,25 @@ interface Props extends SvgIconProps {
   icon: React.ComponentType<SvgIconProps>
 }
 
-const Loading = ({children, icon: IconComponent, loading = true, reverse = false, justify = undefined, ...iconProps}: Props) => {
-  const { rotate, rotateReverse, flex, spacer, rotateContainer } = useStyles({justify})
+const Loading = ({
+  children,
+  icon: IconComponent,
+  loading = true,
+  reverse = false,
+  justify = undefined,
+  ...iconProps
+}: Props): JSX.Element => {
+  const { rotate, rotateReverse, flex, spacer, rotateContainer } = useStyles({ justify })
   const rotateCls = reverse ? rotateReverse : rotate
-  return <div className={flex}>
-    <div className={ `${rotateContainer} ${loading ? rotateCls : ''}` }>
-      <IconComponent {...iconProps} />
+  return (
+    <div className={flex}>
+      <div className={`${rotateContainer} ${loading ? rotateCls : ''}`}>
+        <IconComponent {...iconProps} />
+      </div>
+      <span className={spacer} />
+      {children}
     </div>
-    <span className={spacer} />
-    {children}  
-  </div>
+  )
 }
 
 export default Loading

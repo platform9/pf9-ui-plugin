@@ -66,19 +66,17 @@ const ClusterHostChooser = forwardRef(
       <React.Fragment>
         <Progress loading={loading} renderContentOnMount>
           <div className={tableContainer}>
-            {pollForNodes ? (
-              <>
-                <Loading
-                  icon={Refresh}
-                  loading={isLoading}
-                  color={isLoading ? 'action' : 'primary'}
-                  justify="flex-end"
-                  onClick={() => loadMore(true)}
-                >
-                  {isLoading ? 'reloading...' : `reloading ${fetchingIn}s`}
-                </Loading>
-              </>
-            ) : null}
+            {pollForNodes && (
+              <Loading
+                icon={Refresh}
+                loading={isLoading}
+                color={isLoading ? 'action' : 'primary'}
+                justify="flex-end"
+                onClick={() => loadMore(true)}
+              >
+                {isLoading ? 'reloading...' : `reloading ${fetchingIn}s`}
+              </Loading>
+            )}
             <Table ref={ref} className={table}>
               <TableHead>
                 <TableRow>
@@ -91,12 +89,11 @@ const ClusterHostChooser = forwardRef(
                 </TableRow>
               </TableHead>
               <TableBody>
-                { !orphanedNodes.length
-                  ? <TableRow colSpan={4}>
+                { orphanedNodes.length === 0 && (
+                  <TableRow colSpan={4}>
                     <TableCell colSpan={4} align="center"><Typography variant="body1">There are no nodes available.</Typography></TableCell>
                   </TableRow>
-                  : null
-                }
+                )}
                 {orphanedNodes.map(orphanedNode => (
                   <TableRow key={orphanedNode.uuid}>
                     <TableCell>
@@ -109,10 +106,7 @@ const ClusterHostChooser = forwardRef(
                 ))}
               </TableBody>
             </Table>
-            { hasError
-              ? <Typography variant="body1" className={errorText}>{errorMessage}</Typography>
-              : null
-            }
+            { hasError && <Typography variant="body1" className={errorText}>{errorMessage}</Typography> }
           </div>
         </Progress>
       </React.Fragment>

@@ -226,7 +226,7 @@ const AddBareOsClusterPage = () => {
                       <TextField
                         id="httpProxy"
                         label="HTTP Proxy"
-                        info={<div>(Optional) Specify the HTTP proxy for this cluster. Uses format of <CodeBlock><span>{`<scheme>://<username>:<password>@<host>:<port>`}</span></CodeBlock> where <CodeBlock><span>{`<username>:<password>@`}</span></CodeBlock> is optional.</div>}
+                        info={<div>(Optional) Specify the HTTP proxy for this cluster. Uses format of <CodeBlock><span>{'<scheme>://<username>:<password>@<host>:<port>'}</span></CodeBlock> where <CodeBlock><span>{'<username>:<password>@'}</span></CodeBlock> is optional.</div>}
                       />
                       <PicklistField
                         id="networkPlugin"

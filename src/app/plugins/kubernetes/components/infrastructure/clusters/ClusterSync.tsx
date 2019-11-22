@@ -12,7 +12,7 @@ const iconColors = new Map<string, SvgIconProps['color']>([
 
 const ClusterSync: FunctionComponent<{ taskStatus: string }> = ({ children, taskStatus }) => {
   return (
-    <Loading icon={SyncIcon} reverse={true} color={iconColors.get(taskStatus)}>
+    <Loading icon={SyncIcon} reverse color={iconColors.get(taskStatus)}>
       {children}
     </Loading>
   )

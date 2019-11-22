@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const installCommand = '> curl -O https://raw.githubusercontent.com/platform9/express-cli/master/cli-setup.sh | bash ./cli-setup.sh'
 
-const DownloadCliWalkthrough = () => {
+const DownloadCliWalkthrough = (): JSX.Element => {
   return (
     <>
       <Typography component="span">
@@ -66,7 +66,7 @@ interface NumberedStepProps {
   description: string | JSX.Element
 }
 
-const NumberedSteps = ({ step, title, description }: NumberedStepProps) => {
+const NumberedSteps = ({ step, title, description }: NumberedStepProps): JSX.Element => {
   const classes = useStyles({})
   return (
     <div className={classes.row}>
