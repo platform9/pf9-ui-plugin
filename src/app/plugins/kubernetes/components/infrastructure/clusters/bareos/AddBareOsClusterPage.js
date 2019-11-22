@@ -1,5 +1,4 @@
 import React from 'react'
-import ApiClient from 'api-client/ApiClient'
 import FormWrapper from 'core/components/FormWrapper'
 import BareOsClusterReviewTable from './BareOsClusterReviewTable'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
@@ -15,7 +14,6 @@ import useDataUpdater from 'core/hooks/useDataUpdater'
 import useParams from 'core/hooks/useParams'
 import useReactRouter from 'use-react-router'
 import { clusterActions } from '../actions'
-import { pick } from 'ramda'
 import { pathJoin } from 'utils/misc'
 import { k8sPrefix } from 'app/constants'
 import DownloadCliWalkthrough from './DownloadCliWalkthrough'
@@ -25,8 +23,6 @@ import { Typography } from '@material-ui/core'
 import { masterNodeLengthValidator, requiredValidator } from 'core/utils/fieldValidators'
 import CodeBlock from 'core/components/CodeBlock'
 import ExternalLink from 'core/components/ExternalLink'
-
-const { qbert } = ApiClient.getInstance()
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
@@ -64,60 +60,12 @@ const AddBareOsClusterPage = () => {
   const classes = useStyles()
   const { params, getParamsUpdater } = useParams()
   const { history } = useReactRouter()
-  const onComplete = () => {
-    history.push('/ui/kubernetes/infrastructure#clusters')
-  }
-  const [create, loading] = useDataUpdater(clusterActions.create, onComplete) // eslint-disable-line
-
-  const handleSubmit = params => async data => {
-    const body = {
-      // basic info
-      ...pick('name'.split(' '), data),
-
-      // cluster configuration
-      ...pick('allowWorkloadsOnMaster'.split(' '), data),
-
-      // network info
-      ...pick('assignPublicIps masterSubnetName workerSubnetName externalDnsName serviceFqdn containersCidr servicesCidr networkPlugin'.split(' '), data),
-
-      // advanced configuration
-      ...pick('privileged appCatalogEnabled customAmi tags'.split(' '), data),
-    }
-    if (data.httpProxy) {
-      body.httpProxy = data.httpProxy
-    }
-    if (data.networkPlugin === 'calico') {
-      body.mtuSize = data.mtuSize
-    }
-    if (data.enableMetallb) {
-      body.metallbCidr = data.metallbCidr
-    }
-
-    data.runtimeConfig = {
-      default: '',
-      all: 'api/all=true',
-      custom: data.customRuntimeConfig,
-    }[data.runtimeConfigOption]
-
-    // 1. Get the nodePoolUuid from the nodePools API and look for the pool with name 'defaultPool'
-    const nodePools = await qbert.getNodePools()
-    data.nodePoolUuid = nodePools.find(x => x.name === 'defaultPool').uuid
-
-    // 2. Create the cluster
-    await create(body)
-
-    // 3. Attach the nodes
-    const nodes = [
-      ...data.masterNodes.map(uuid => ({ isMaster: true, uuid })),
-      ...data.workerNodes.map(uuid => ({ isMaster: false, uuid })),
-    ]
-    qbert.attachNodes(body.clusterUuid, nodes)
-
-    return body
-  }
+  const onComplete = () => history.push('/ui/kubernetes/infrastructure#clusters')
+  const [createBareOSClusterAction, creatingBareOSCluster] = useDataUpdater(clusterActions.create, onComplete) // eslint-disable-line
+  const handleSubmit = params => data => createBareOSClusterAction({ ...data, ...params, clusterType: 'local' })
 
   return (
-    <FormWrapper title="Add Bare OS Cluster" backUrl={listUrl} loading={loading}>
+    <FormWrapper title="Add Bare OS Cluster" backUrl={listUrl} loading={creatingBareOSCluster}>
       <Wizard
         onComplete={handleSubmit(params)}
         context={initialContext}
