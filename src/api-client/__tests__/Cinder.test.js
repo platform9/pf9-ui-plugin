@@ -1,7 +1,4 @@
-import {
-  makeRegionedClient,
-  waitUntil
-} from '../helpers'
+import { makeRegionedClient, waitUntil } from '../helpers'
 import axios from 'axios'
 
 describe('Volumes', async () => {
@@ -283,8 +280,8 @@ const waitForVolumeCreate = params => async () => {
   const client = await makeRegionedClient()
   const services = await client.keystone.getServicesForActiveRegion()
   const url = `${services.cinderv3.admin.url}/volumes/${params}`
-  let response = await axios.get(url, client.getAuthHeaders())
-  let flag = (response.data.volume.status === 'available')
+  const response = await axios.get(url, client.getAuthHeaders())
+  const flag = (response.data.volume.status === 'available')
   return flag
 }
 
@@ -303,8 +300,8 @@ const waitForSnapshotCreate = params => async () => {
   const client = await makeRegionedClient()
   const services = await client.keystone.getServicesForActiveRegion()
   const url = `${services.cinderv3.admin.url}/snapshots/${params}`
-  let response = await axios.get(url, client.getAuthHeaders())
-  let flag = (response.data.snapshot.status === 'available')
+  const response = await axios.get(url, client.getAuthHeaders())
+  const flag = (response.data.snapshot.status === 'available')
   return flag
 }
 

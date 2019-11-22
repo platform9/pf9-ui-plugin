@@ -22,7 +22,7 @@ const ComponentWithToast = withToast(props =>
   </div>)
 
 addStories('Common Components/Toast', {
-  'Default': () => (
+  Default: () => (
     <ComponentWithToast />
   ),
 })

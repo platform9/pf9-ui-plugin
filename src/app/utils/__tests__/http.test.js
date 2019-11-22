@@ -19,7 +19,7 @@ describe('http', () => {
           method: 'POST',
           body: JSON.stringify(body),
           headers: {
-            'Accept': 'application/json',
+            Accept: 'application/json',
             'Content-Type': 'application/json'
           }
         }
@@ -63,7 +63,7 @@ describe('http', () => {
           method: 'POST',
           body: JSON.stringify(body),
           headers: {
-            'Accept': 'application/json',
+            Accept: 'application/json',
             'Content-Type': 'application/json',
             'X-Auth-Token': 'secretToken',
           }

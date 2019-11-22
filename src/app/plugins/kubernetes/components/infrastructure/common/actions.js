@@ -27,7 +27,7 @@ export const loadCombinedHosts = createContextLoader(combinedHostsCacheKey, asyn
     loadFromContext(resMgrHostsCacheKey),
   ])
 
-  let hostsById = {}
+  const hostsById = {}
   // We don't want to perform a check to see if the object exists yet for each type of host
   // so make a utility to make it cleaner.
   const setHost = (type, id, value) => {

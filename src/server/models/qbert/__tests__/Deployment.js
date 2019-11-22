@@ -14,6 +14,7 @@ describe('Deployment', () => {
       expect(context.deployments.length).toBe(1)
       expect(deployment).toMatchObject({ metadata: { name: 'fakeDeployment', namespace: 'default' } })
       expect(context.pods.length).toBe(2)
+      // eslint-disable-next-line no-unused-vars
       for (const pod of context.pods) {
         expect(pod).toMatchObject({ metadata: { ownerReferences: [{ name: 'fakeDeployment', uid: deployment.metadata.uid }] } })
       }

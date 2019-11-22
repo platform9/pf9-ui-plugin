@@ -27,7 +27,7 @@ const ClusterHostChooser = forwardRef(({
   const hosts = nodes.filter(notAssignedToCluster).filter(notInExcludeList)
 
   const toggleHost = uuid => () => {
-    const newHosts = isSelected(uuid) ? value.filter(x => x !== uuid) : [ ...value, uuid ]
+    const newHosts = isSelected(uuid) ? value.filter(x => x !== uuid) : [...value, uuid]
     onChange(newHosts)
   }
 

@@ -40,7 +40,7 @@ class ServicePicker extends React.PureComponent {
     const { onChange } = this.props
     const { catalog } = this.state
 
-    let baseUrl = catalog[service].url
+    const baseUrl = catalog[service].url
 
     // Handle the weird cases where we can't use the catalog's url as is.
     if (service === 'keystone') {

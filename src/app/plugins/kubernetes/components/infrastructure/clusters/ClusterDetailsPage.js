@@ -25,7 +25,7 @@ const ClusterDetailsPage = () => {
   const { name } = clusters.find(x => x.uuid === match.params.id) || {}
   return <PageContainer header={<>
     <Typography variant="h3">Cluster {name}</Typography>
-    <SimpleLink src={`/ui/kubernetes/infrastructure#clusters`} className={classes.backLink}>
+    <SimpleLink src={'/ui/kubernetes/infrastructure#clusters'} className={classes.backLink}>
       « Back to Cluster List
     </SimpleLink></>}>
     <Tabs>

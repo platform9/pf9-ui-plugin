@@ -98,7 +98,7 @@ export class ToastProvider extends PureComponent {
         type,
         isOpen: true,
         onClose: this.dismissToast(id)
-      }, ...prevState.toasts ],
+      }, ...prevState.toasts],
     })
   })
 

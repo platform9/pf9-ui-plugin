@@ -69,10 +69,10 @@ const FormExample = ({ expanded = false }) => (
             customValidator(
               value => /[0-9]+/.test(value),
               (value, formFields, fieldKey) =>
-                `This is a custom validator that fails when text does not contain a number.` +
+                'This is a custom validator that fails when text does not contain a number.' +
                 `The current value of field '${fieldKey}' is ${value}.` +
                 `From here we have access to other form fields as well, like 'name' with value ${
-                  formFields['name']
+                  formFields.name
                 }`
             )
           ]}

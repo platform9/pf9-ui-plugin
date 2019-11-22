@@ -1,7 +1,7 @@
 import moment from 'moment'
 
 export const range = count => {
-  let arr = []
+  const arr = []
   for (let i = 0; i < count; i++) {
     arr.push(i)
   }

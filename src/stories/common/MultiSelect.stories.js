@@ -21,7 +21,7 @@ const options = [
 ]
 
 addStories('Common Components/MultiSelect', {
-  'default': () => {
+  default: () => {
     const [values, setValues] = useState([])
 
     return (
@@ -36,7 +36,7 @@ addStories('Common Components/MultiSelect', {
 })
 
 addStories('Common Components/MultiSelect', {
-  'maxOptions': () => {
+  maxOptions: () => {
     const [values, setValues] = useState([])
 
     return (
@@ -52,7 +52,7 @@ addStories('Common Components/MultiSelect', {
 })
 
 addStories('Common Components/MultiSelect', {
-  'sortSelectedFirst': () => {
+  sortSelectedFirst: () => {
     const [values, setValues] = useState([])
 
     return (

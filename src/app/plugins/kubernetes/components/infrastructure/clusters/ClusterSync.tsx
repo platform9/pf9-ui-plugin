@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { FunctionComponent } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import SyncIcon from '@material-ui/icons/Sync'
 import { Theme } from '@material-ui/core'
@@ -34,14 +34,14 @@ const iconColors = new Map<string, SvgIconProps['color']>([
   ['upgrading', 'primary'],
 ])
 
-const ClusterSync = ({children, taskStatus}) => {
+const ClusterSync: FunctionComponent<{ taskStatus: string }> = ({ children, taskStatus }) => {
   const { rotate, flex, spacer } = useStyles({})
   return <div className={flex}>
     <div className={rotate}>
       <SyncIcon color={iconColors.get(taskStatus)} />
     </div>
     <span className={spacer} />
-    {children}  
+    {children}
   </div>
 }
 

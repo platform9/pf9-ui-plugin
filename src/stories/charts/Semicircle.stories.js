@@ -5,7 +5,7 @@ import { addStoriesFromModule } from '../helpers'
 const addStories = addStoriesFromModule(module)
 
 addStories('Charts', {
-  'SemiCircle': () => (
+  SemiCircle: () => (
     <SemiCircleGraph
       label="0.7 GHz used / 13.2 GHz"
       percentage={70} />

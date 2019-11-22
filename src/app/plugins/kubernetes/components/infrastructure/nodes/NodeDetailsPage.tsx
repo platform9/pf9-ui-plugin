@@ -1,16 +1,19 @@
 // Libs
-import React from 'react'
+import React, { FunctionComponent } from 'react'
 import { makeStyles } from '@material-ui/styles'
-import { Typography, Theme, Card, CardHeader, CardContent } from '@material-ui/core'
+import {
+  Typography,
+  Theme,
+  Card,
+  CardHeader,
+  CardContent
+} from '@material-ui/core'
 import useReactRouter from 'use-react-router'
-
 // Actions
 import useDataLoader from 'core/hooks/useDataLoader'
 import { loadNodes } from './actions'
-
 // Components
 import PageContainer from 'core/components/pageContainer/PageContainer'
-
 // Models
 import { ICombinedNode } from './model'
 import SimpleLink from 'core/components/SimpleLink'
@@ -38,7 +41,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const AnyLink: any = SimpleLink
 
-const ClusterDetailsPage = () => {
+const ClusterDetailsPage: FunctionComponent = () => {
   const { match } = useReactRouter()
   const classes = useStyles({})
   const [nodes, loading] = useDataLoader(loadNodes)
@@ -50,21 +53,21 @@ const ClusterDetailsPage = () => {
       header={
         <>
           <Typography variant="h3">Node {selectedNode.name}</Typography>
-          <AnyLink src={`/ui/kubernetes/infrastructure#nodes`} className={classes.backLink}>
+          <AnyLink src={'/ui/kubernetes/infrastructure#nodes'} className={classes.backLink}>
             <span>« Back to Node List</span>
           </AnyLink>
         </>
       }
     >
-    { loading
-      ? <Progress message="Loading Nodes..." />
-      : <NodeDetail {...selectedNode} />
-    }
+      {loading
+        ? <Progress message="Loading Nodes..." />
+        : <NodeDetail {...selectedNode} />
+      }
     </PageContainer>
   )
 }
 
-const NodeDetail = ({ uuid, name, combined, ...rest }: ICombinedNode) => {
+const NodeDetail: FunctionComponent<ICombinedNode> = ({ uuid, name, combined, ...rest }) => {
   const { flex, card } = useStyles({})
   const hostId = uuid
   const roles = combined?.roles
@@ -101,7 +104,7 @@ const NodeDetail = ({ uuid, name, combined, ...rest }: ICombinedNode) => {
   )
 }
 
-const DetailRow = ({ label, value }) => {
+const DetailRow: FunctionComponent<{ label: string, value: any }> = ({ label, value }) => {
   const { rowHeader, rowValue } = useStyles({})
   return (
     <tr>

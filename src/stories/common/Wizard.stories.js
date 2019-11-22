@@ -7,7 +7,7 @@ import { action } from '@storybook/addon-actions'
 const addStories = addStoriesFromModule(module)
 
 addStories('Wizard', {
-  'Default': () => (
+  Default: () => (
     <Wizard onComplete={action('Submit action')}>
       {[
         <WizardStep key="first" stepId="first" label="First" info="This is the first">

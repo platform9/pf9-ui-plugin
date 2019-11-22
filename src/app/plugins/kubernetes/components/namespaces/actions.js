@@ -24,7 +24,7 @@ const namespacesMapper = async (items, params, loadFromContext) => {
 
 const namespaceActions = createCRUDActions(namespacesCacheKey, {
   listFn: async (params, loadFromContext) => {
-    const [ clusterId, clusters ] = await parseClusterParams(params, loadFromContext)
+    const [clusterId, clusters] = await parseClusterParams(params, loadFromContext)
     if (clusterId === allKey) {
       return someAsync(pluck('uuid', clusters).map(qbert.getClusterNamespaces)).then(flatten)
     }

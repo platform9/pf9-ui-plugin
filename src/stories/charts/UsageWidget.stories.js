@@ -5,7 +5,7 @@ import { addStoriesFromModule } from '../helpers'
 const addStories = addStoriesFromModule(module)
 
 addStories('Charts', {
-  'UsageWidget': () => (
+  UsageWidget: () => (
     <UsageWidget
       percision={1}
       title="Compute"

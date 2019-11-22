@@ -43,7 +43,7 @@ import { range } from '../util'
 import { strict as assert } from 'assert'
 
 function loadPreset () {
-  console.log(`Loading 'dev' preset.`)
+  console.log('Loading \'dev\' preset.')
 
   // Tenants
   const serviceTenant = new Tenant({ name: 'service' })
@@ -70,8 +70,8 @@ function loadPreset () {
 
   // Create a bunch of misc users
   range(2).forEach(i => {
-    let email = `user${i}@platform9.com`
-    let user = new User({
+    const email = `user${i}@platform9.com`
+    const user = new User({
       email,
       username: email,
       name: email,
@@ -85,7 +85,7 @@ function loadPreset () {
 
   // Tenants & users
   range(4).forEach(i => {
-    let tenant = new TenantUser({
+    const tenant = new TenantUser({
       description: `Test tenant ${i} description`,
       domain_id: '77c53dae6ab6421caaddc34cd56becb4',
       enabled: true,
@@ -94,8 +94,8 @@ function loadPreset () {
     })
     // Add a bunch of users for the current Tenant
     range(2).forEach(j => {
-      let email = `tenant${i}User${j}@platform9.com`
-      let user = new User({
+      const email = `tenant${i}User${j}@platform9.com`
+      const user = new User({
         id: j,
         email,
         username: email,
@@ -145,7 +145,7 @@ function loadPreset () {
   new Router({ name: 'Test router 1', tenant_id: '1234abcd', project: 'Dev Tenant', admin_state_up: true, status: 'ACTIVE' })
 
   // Floating IPs
-  new FloatingIp({ floating_ip_address: '123.234.123', subnet_id: 'qwertyuiop', port_id: 'asdfasdf', 'project_id': '1234abcd', 'tenant_id': '1234abcd', 'fixed_ip_address': '10.1.10.123', 'description': 'preset floating ip', 'floating_network_id': 'zxcvbnm', 'status': 'ACTIVE', 'router_id': 'awsd' })
+  new FloatingIp({ floating_ip_address: '123.234.123', subnet_id: 'qwertyuiop', port_id: 'asdfasdf', project_id: '1234abcd', tenant_id: '1234abcd', fixed_ip_address: '10.1.10.123', description: 'preset floating ip', floating_network_id: 'zxcvbnm', status: 'ACTIVE', router_id: 'awsd' })
 
   // Volumes
   new Volume({ name: 'TestVolume1', description: 'Docker storage test.', volume_type: 'sfvol', metadata: '', size: 15, bootable: false, status: 'available', tenant: 'Dev Team Tenant', source: 'Image', host: 'host.company.sys', instance: 'Test Instance 1', device: '/dev/vdb', attachedMode: 'rw', readonly: false })

@@ -4,10 +4,10 @@ import { Button } from '@material-ui/core'
 
 const ExportDataButton = ({ children, color, data, filename, variant }) => {
   const exportData = () => {
-    let dataStr = JSON.stringify(data, null, 4)
-    let dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr)
-    let exportFileDefaultName = filename
-    let linkElement = document.createElement('a')
+    const dataStr = JSON.stringify(data, null, 4)
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr)
+    const exportFileDefaultName = filename
+    const linkElement = document.createElement('a')
     linkElement.setAttribute('href', dataUri)
     linkElement.setAttribute('download', exportFileDefaultName)
     linkElement.click()

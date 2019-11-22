@@ -274,7 +274,7 @@ class ApiHelper extends React.PureComponent {
 
     // This needs to be done in render because it needs values from DataLoader.
     const initialValue = pick(
-      [ 'baseUrl', 'method', 'service' ],
+      ['baseUrl', 'method', 'service'],
       this.state
     )
 
