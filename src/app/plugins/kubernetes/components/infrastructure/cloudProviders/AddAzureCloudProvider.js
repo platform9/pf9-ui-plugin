@@ -55,7 +55,7 @@ const AddAzureCloudProvider = ({ onComplete }) => {
       <TextField required id="name" label="Name" info="Name of the cloud provider" />
       <TextField required id="tenantId" label="Tenant ID" info="The tenant ID of the service principal" />
       <TextField required id="clientId" label="Client ID" info="The client ID of the service principal" />
-      <TextField required id="secret" label="Client Secret" info="The client secret of the service principal" />
+      <TextField required id="secret" type="password" label="Client Secret" info="The client secret of the service principal" />
       <TextField required id="subscriptionId" label="Subscription ID" info="The ID of the subscription that correlates to the service principal." />
       <SubmitButton>Add Cloud Provider</SubmitButton>
     </ValidatedForm>

@@ -141,3 +141,8 @@ export const sanitizeUrl = str =>
   str
     .replace(/[^a-zA-Z0-9-_.]/g, '-') // replace non-valid url characters with hyphen
     .replace(/^-+/, '') // eliminate leading hyphens
+
+export const getCookieValue = (name) => {
+  const val = document.cookie.match('(^|[^;]+)\\s*' + name + '\\s*=\\s*([^;]+)')
+  return val ? val.pop() : ''
+}

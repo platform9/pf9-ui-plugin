@@ -4,6 +4,8 @@ import AddAwsClusterPage from './components/infrastructure/clusters/AddAwsCluste
 import AddAzureClusterPage from './components/infrastructure/clusters/AddAzureClusterPage'
 import AddClusterPage from './components/infrastructure/clusters/AddClusterPage'
 import AddBareOsClusterPage from './components/infrastructure/clusters/bareos/AddBareOsClusterPage'
+import ScaleMastersPage from './components/infrastructure/clusters/ScaleMastersPage'
+import ScaleWorkersPage from './components/infrastructure/clusters/ScaleWorkersPage'
 import AddNamespacePage from './components/namespaces/AddNamespacePage'
 import ApiAccessPage from './components/apiAccess/ApiAccessPage'
 import AppsIndexPage from './components/apps/AppsIndexPage'
@@ -103,6 +105,18 @@ Kubernetes.registerPlugin = pluginManager => {
         name: 'Edit Cluster',
         link: { path: '/infrastructure/clusters/edit/:id', exact: true },
         component: EditClusterPage,
+      },
+      {
+        name: 'Scale Masters',
+        link: { path: '/infrastructure/clusters/scaleMasters/:id', exact: true },
+        requiredRoles: 'admin',
+        component: ScaleMastersPage,
+      },
+      {
+        name: 'Scale Workers',
+        link: { path: '/infrastructure/clusters/scaleWorkers/:id', exact: true },
+        requiredRoles: 'admin',
+        component: ScaleWorkersPage,
       },
       {
         name: 'Cluster Details',

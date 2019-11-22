@@ -1,19 +1,14 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import DownloadKubeConfigLink from './DownloadKubeConfigLink'
 import KubeCLI from './KubeCLI'
 import ExternalLink from 'core/components/ExternalLink'
 import SimpleLink from 'core/components/SimpleLink'
-import AttachIcon from '@material-ui/icons/AddToQueue'
-import DetachIcon from '@material-ui/icons/RemoveFromQueue'
 import ScaleIcon from '@material-ui/icons/TrendingUp'
 import UpgradeIcon from '@material-ui/icons/PresentToAll'
 import InsertChartIcon from '@material-ui/icons/InsertChart'
 import DescriptionIcon from '@material-ui/icons/Description'
 import { clustersCacheKey } from '../common/actions'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import ClusterAttachNodeDialog from './ClusterAttachNodeDialog'
-import ClusterDetachNodeDialog from './ClusterDetachNodeDialog'
-import ClusterScaleDialog from './ClusterScaleDialog'
 import { capitalizeString } from 'utils/misc'
 import { objSwitchCase } from 'utils/fp'
 import ProgressBar from 'core/components/progress/ProgressBar'
@@ -27,6 +22,18 @@ import PrometheusAddonDialog from 'k8s/components/prometheus/PrometheusAddonDial
 import ClusterUpgradeDialog from 'k8s/components/infrastructure/clusters/ClusterUpgradeDialog'
 import ClusterSync from './ClusterSync'
 import LoggingAddonDialog from 'k8s/components/logging/LoggingAddonDialog'
+import { Typography } from '@material-ui/core'
+import { makeStyles } from '@material-ui/styles'
+
+const useStyles = makeStyles(theme => ({
+  link: {
+    cursor: 'pointer',
+    color: theme.palette.primary.main,
+    '&:hover': {
+      textDecoration: 'underline',
+    }
+  }
+}))
 
 const getClusterPopoverContent = (healthyMasterNodes, masterNodes) =>
   `${healthyMasterNodes.length} of ${masterNodes.length} master nodes healthy (3 required)`
@@ -115,6 +122,42 @@ const renderLinks = links => {
   )
 }
 
+const renderNodeLink = ({ uuid, name }) => (
+  <div key={uuid}>
+    <SimpleLink src={`/ui/kubernetes/infrastructure/nodes/${uuid}`}>
+      {name}
+    </SimpleLink>
+  </div>
+)
+
+const NodesCell = ({ nodes }) => {
+  const classes = useStyles()
+
+  if (!nodes || !nodes.length) {
+    return <div>0</div>
+  }
+  const [expanded, setExpanded] = useState(false)
+  return (
+    <div>
+      {expanded ? (
+        <div>
+          {nodes.map(renderNodeLink)}
+          <Typography onClick={() => setExpanded(!expanded)} className={classes.link} component="a">
+            (less details)
+          </Typography>
+        </div>
+      ) : (
+        <div>
+          {nodes.length}&nbsp;
+          <Typography onClick={() => setExpanded(!expanded)} className={classes.link} component="a">
+            (more details)
+          </Typography>
+        </div>
+      )}
+    </div>
+  )
+}
+
 const toMHz = value => value * 1024
 
 const renderStats = (_, { usage }) => {
@@ -134,10 +177,9 @@ const renderStats = (_, { usage }) => {
 const renderClusterDetailLink = (name, cluster) =>
   <SimpleLink src={`/ui/kubernetes/infrastructure/clusters/${cluster.uuid}`}>{name}</SimpleLink>
 
-const canAttachNode = ([row]) => row.cloudProviderType === 'local'
-const canDetachNode = ([row]) => row.cloudProviderType === 'local'
-const canScaleCluster = ([row]) => row.cloudProviderType === 'aws'
-const canUpgradeCluster = ([row]) => row.canUpgrade
+const canScaleMasters = ([row]) => row.cloudProviderType === 'aws'
+const canScaleWorkers = ([row]) => row.cloudProviderType === 'aws'
+const canUpgradeCluster = (selected) => false
 const canDeleteCluster = ([row]) => !(['creating', 'deleting'].includes(row.taskStatus))
 
 const isAdmin = (selected, getContext) => {
@@ -166,6 +208,7 @@ export const options = {
     { id: 'servicesCidr', label: 'Services CIDR' },
     { id: 'endpoint', label: 'API endpoint' },
     { id: 'cloudProviderName', label: 'Cloud provider' },
+    { id: 'nodes', label: 'Nodes', render: nodes => <NodesCell nodes={nodes} /> },
     { id: 'allowWorkloadsOnMaster', label: 'Master Workloads' },
     { id: 'privileged', label: 'Privileged' },
     { id: 'hasVpn', label: 'VPN' },
@@ -186,22 +229,16 @@ export const options = {
   deleteCond: both(isAdmin, canDeleteCluster),
   batchActions: [
     {
-      cond: both(isAdmin, canAttachNode),
-      icon: <AttachIcon />,
-      label: 'Attach node',
-      dialog: ClusterAttachNodeDialog,
-    },
-    {
-      cond: both(isAdmin, canDetachNode),
-      icon: <DetachIcon />,
-      label: 'Detach node',
-      dialog: ClusterDetachNodeDialog,
-    },
-    {
-      cond: both(isAdmin, canScaleCluster),
+      cond: both(isAdmin, canScaleMasters),
       icon: <ScaleIcon />,
-      label: 'Scale cluster',
-      dialog: ClusterScaleDialog,
+      label: 'Scale masters',
+      routeTo: rows => `/ui/kubernetes/infrastructure/clusters/scaleMasters/${rows[0].uuid}`,
+    },
+    {
+      cond: both(isAdmin, canScaleWorkers),
+      icon: <ScaleIcon />,
+      label: 'Scale workers',
+      routeTo: rows => `/ui/kubernetes/infrastructure/clusters/scaleWorkers/${rows[0].uuid}`,
     },
     {
       cond: both(isAdmin, canUpgradeCluster),

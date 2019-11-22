@@ -6,6 +6,7 @@ import { makeStyles } from '@material-ui/styles'
 import clsx from 'clsx'
 import { ensureFunction } from 'utils/fp'
 import { AppContext } from 'core/providers/AppProvider'
+import { withRouter } from 'react-router-dom'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -39,7 +40,7 @@ const useStyles = makeStyles(theme => ({
   },
 }))
 
-const ListTableAction = ({ cond, action, label, disabledInfo, dialog, icon, selected, onRefresh }) => {
+const ListTableAction = withRouter(({ cond, action, label, disabledInfo, dialog, icon, selected, onRefresh, routeTo, history }) => {
   const { root, actionLabel, actionIcon, disabledAction } = useStyles()
   const [dialogOpened, setDialogOpened] = useState(false)
   const { getContext } = useContext(AppContext)
@@ -61,10 +62,10 @@ const ListTableAction = ({ cond, action, label, disabledInfo, dialog, icon, sele
       <div className={clsx(root, {
         [disabledAction]: !isActionEnabled,
       })} onClick={isActionEnabled ? () => {
-        if (dialog) {
-          setDialogOpened(true)
-        } else {
-          action(selected)
+        if (dialog) { setDialogOpened(true) }
+        if (action) { action(selected) }
+        if (routeTo) {
+          history.push(routeTo(selected))
         }
       } : null}>
         {typeof icon === 'string'
@@ -73,7 +74,7 @@ const ListTableAction = ({ cond, action, label, disabledInfo, dialog, icon, sele
         <div className={actionLabel}>{label}</div>
       </div>
     </Tooltip></Fragment>
-}
+})
 
 const ListTableBatchActions = ({ batchActions = [], selected = [], onRefresh }) => {
   if (selected.length === 0 || batchActions.length === 0) { return null }
@@ -83,11 +84,15 @@ const ListTableBatchActions = ({ batchActions = [], selected = [], onRefresh }) 
 
 export const listTableActionPropType = PropTypes.shape({
   label: PropTypes.string.isRequired,
-  action: PropTypes.func,
   icon: PropTypes.oneOfType([PropTypes.node, PropTypes.string]),
   cond: PropTypes.func,
   disabledInfo: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
+
+  // When clicking one of the batch action icons you can specify the logic as a dialog, route, or arbitrary function.
+  // Only one of these should be used at a time.
   dialog: PropTypes.func,  // a React class or function
+  routeTo: PropTypes.func,
+  action: PropTypes.func,
 })
 
 ListTableBatchActions.propTypes = {

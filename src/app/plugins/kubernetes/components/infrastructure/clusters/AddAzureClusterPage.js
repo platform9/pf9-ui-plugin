@@ -43,9 +43,10 @@ const initialContext = {
 }
 
 const templateOptions = [
-  { label: 'small (single dev) - 1 node master + worker (Standard_A1_v2)', value: 'small' },
-  { label: 'medium (internal team) - 1 master + 3 workers (Standard_A2_v2)', value: 'medium' },
-  { label: 'large (production) - 3 masters + 5 workers (Standard_A4_v2)', value: 'large' },
+  { label: 'small - 1 node master + worker (Standard_A1_v2)', value: 'small' },
+  { label: 'medium - 1 master + 3 workers (Standard_A2_v2)', value: 'medium' },
+  { label: 'large - 3 masters + 5 workers (Standard_A4_v2)', value: 'large' },
+  { label: 'custom', value: 'custom' },
 ]
 
 const numMasterOptions = [
@@ -66,7 +67,7 @@ const runtimeConfigOptions = [
 // small (single dev) - 1 node master + worker - select instance type (default t2.small)
 // medium (internal team) - 1 master + 3 workers - select instance (default t2.medium)
 // large (production) - 3 master + 5 workers - no workload on masters (default t2.large)
-const handleTemplateChoice = ({ setWizardContext, setFieldValue }) => option => {
+const handleTemplateChoice = ({ setWizardContext, setFieldValue, paramUpdater }) => option => {
   const options = {
     small: {
       numMasters: 1,
@@ -89,12 +90,23 @@ const handleTemplateChoice = ({ setWizardContext, setFieldValue }) => option => 
       masterFlavor: 'Standard_A4_v2',
       workerFlavor: 'Standard_A4_v2',
     },
+    custom: {
+      numMasters: 3,
+      numWorkers: 5,
+      allowWorkloadsOnMaster: false,
+      masterFlavor: 'Standard_A4_v2',
+      workerFlavor: 'Standard_A4_v2',
+    },
   }
 
-  if (!options[option]) return
-  setWizardContext(options[option])
-  Object.entries(options[option]).forEach(([key, value]) => {
-    setFieldValue(key)(value)
+  paramUpdater(option)
+
+  // setImmediate is used because we need the fields to show up in the form before their values can be set
+  setImmediate(() => {
+    setWizardContext(options[option])
+    Object.entries(options[option]).forEach(([key, value]) => {
+      setFieldValue(key)(value)
+    })
   })
 }
 
@@ -116,7 +128,7 @@ const AddAzureClusterPage = () => {
         {({ wizardContext, setWizardContext, onNext }) => {
           return (
             <>
-              <WizardStep stepId="basic" label="Basic Info">
+              <WizardStep stepId="config" label="Cluster Configuration">
                 <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                   {({ setFieldValue, values }) => (
                     <>
@@ -154,15 +166,6 @@ const AddAzureClusterPage = () => {
                         required
                       />
 
-                      {/* Template Chooser */}
-                      <PicklistField
-                        id="template"
-                        label="Cluster Template"
-                        options={templateOptions}
-                        onChange={handleTemplateChoice({ setWizardContext, setFieldValue })}
-                        info="Set common options from one of the available templates"
-                      />
-
                       {/* SSH Key */}
                       <TextField
                         id="sshKey"
@@ -172,84 +175,89 @@ const AddAzureClusterPage = () => {
                         rows={3}
                         required
                       />
-                    </>
-                  )}
-                </ValidatedForm>
-              </WizardStep>
 
-              <WizardStep stepId="config" label="Cluster Configuration">
-                <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
-                  {({ setFieldValue, values }) => (
-                    <>
-                      <CheckboxField
-                        id="useAllAvailabilityZones"
-                        label="Use all availability zones"
-                        onChange={checked => checked || getParamsUpdater('zones')([])}
-                        info=""
+                      {/* Template Chooser */}
+                      <PicklistField
+                        id="template"
+                        label="Cluster Template"
+                        options={templateOptions}
+                        onChange={handleTemplateChoice({ setWizardContext, setFieldValue, paramUpdater: getParamsUpdater('template') })}
+                        info="Set common options from one of the available templates"
                       />
 
-                      {/* Azure Availability Zone */}
-                      {values.useAllAvailabilityZones ||
-                      <AzureAvailabilityZoneChooser
-                        id="zones"
-                        info="Select from the Availability Zones for the specified region"
-                        onChange={getParamsUpdater('zones')}
-                        required
-                      />
+                      {params.template === 'custom' &&
+                        <>
+                          <CheckboxField
+                            id="useAllAvailabilityZones"
+                            label="Use all availability zones"
+                            onChange={checked => checked || getParamsUpdater('zones')([])}
+                            info=""
+                          />
+
+                          {/* Azure Availability Zone */}
+                          {values.useAllAvailabilityZones ||
+                          <AzureAvailabilityZoneChooser
+                            id="zones"
+                            info="Select from the Availability Zones for the specified region"
+                            onChange={getParamsUpdater('zones')}
+                            required
+                          />
+                          }
+
+                          {/* Master node SKU */}
+                          <PicklistField
+                            DropdownComponent={AzureSkuPicklist}
+                            disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
+                            id="masterSku"
+                            label="Master Node SKU"
+                            cloudProviderId={params.cloudProviderId}
+                            cloudProviderRegionId={params.cloudProviderRegionId}
+                            filterByZones={!values.useAllAvailabilityZones}
+                            selectedZones={params.zones}
+                            info="Choose an instance type used by master nodes."
+                            required
+                          />
+
+                          {/* Num master nodes */}
+                          <PicklistField
+                            id="numMasters"
+                            options={numMasterOptions}
+                            label="Number of master nodes"
+                            info="Number of master nodes to deploy.  3 nodes are required for an High Availability (HA) cluster."
+                            required
+                          />
+
+                          {/* Worker node SKU */}
+                          <PicklistField
+                            DropdownComponent={AzureSkuPicklist}
+                            disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
+                            id="workerSku"
+                            label="Worker Node SKU"
+                            cloudProviderId={params.cloudProviderId}
+                            cloudProviderRegionId={params.cloudProviderRegionId}
+                            filterByZones={!values.useAllAvailabilityZones}
+                            selectedZones={params.zones}
+                            info="Choose an instance type used by worker nodes."
+                            required
+                          />
+
+                          {/* Num worker nodes */}
+                          <TextField
+                            id="numWorkers"
+                            type="number"
+                            label="Number of worker nodes"
+                            info="Number of worker nodes to deploy."
+                            required
+                          />
+
+                          {/* Allow workloads on masters */}
+                          <CheckboxField
+                            id="allowWorkloadsOnMaster"
+                            label="Allow workloads on master nodes"
+                            info="It is highly recommended to not enable workloads on master nodes for production or critical workload clusters."
+                          />
+                        </>
                       }
-
-                      {/* Master node SKU */}
-                      <PicklistField
-                        DropdownComponent={AzureSkuPicklist}
-                        disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
-                        id="masterSku"
-                        label="Master Node SKU"
-                        cloudProviderId={params.cloudProviderId}
-                        cloudProviderRegionId={params.cloudProviderRegionId}
-                        filterByZones={!values.useAllAvailabilityZones}
-                        selectedZones={params.zones}
-                        info="Choose an instance type used by master nodes."
-                        required
-                      />
-
-                      {/* Num master nodes */}
-                      <PicklistField
-                        id="numMasters"
-                        options={numMasterOptions}
-                        label="Number of master nodes"
-                        info="Number of master nodes to deploy.  3 nodes are required for an High Availability (HA) cluster."
-                        required
-                      />
-
-                      {/* Worker node SKU */}
-                      <PicklistField
-                        DropdownComponent={AzureSkuPicklist}
-                        disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
-                        id="workerSku"
-                        label="Worker Node SKU"
-                        cloudProviderId={params.cloudProviderId}
-                        cloudProviderRegionId={params.cloudProviderRegionId}
-                        filterByZones={!values.useAllAvailabilityZones}
-                        selectedZones={params.zones}
-                        info="Choose an instance type used by worker nodes."
-                        required
-                      />
-
-                      {/* Num worker nodes */}
-                      <TextField
-                        id="numWorkers"
-                        type="number"
-                        label="Number of worker nodes"
-                        info="Number of worker nodes to deploy."
-                        required
-                      />
-
-                      {/* Allow workloads on masters */}
-                      <CheckboxField
-                        id="allowWorkloadsOnMaster"
-                        label="Allow workloads on master nodes"
-                        info="It is highly recommended to not enable workloads on master nodes for production or critical workload clusters."
-                      />
                     </>
                   )}
                 </ValidatedForm>

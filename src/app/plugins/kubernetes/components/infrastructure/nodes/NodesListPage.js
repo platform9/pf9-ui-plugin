@@ -61,7 +61,7 @@ export const columns = [
   { id: 'storage', label: 'Storage', render: renderStats('disk') },
   { id: 'clusterName', label: 'Cluster', render: renderClusterLink },
   { id: 'isMaster', label: 'Is Master?', render: isMaster },
-  { id: 'isSpotInstance', label: 'Spot Instance?', render: getSpotInstance },
+  { id: 'isSpotInstance', label: 'Spot Instance?', display: false, render: getSpotInstance },
   { id: 'assignedRoles', label: 'Assigned Roles', render: renderRoles },
 ]
 
