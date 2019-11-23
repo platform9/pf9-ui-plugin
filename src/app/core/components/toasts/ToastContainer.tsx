@@ -6,6 +6,7 @@ import ToastItem, { MessageTypes } from 'core/components/toasts/ToastItem'
 const useStyles = makeStyles<Theme>(theme => ({
   root: {
     marginBottom: 80,
+    maxWidth: 600,
     // Intercom uses a ridiculously high zIndex so we have to be even more ridiculous
     zIndex: 9999999999,
     display: 'flex',

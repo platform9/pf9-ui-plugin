@@ -1,6 +1,7 @@
 import {
   T, cond, equals, always, adjust, update, findIndex, assocPath, curry, pathOr, remove, values,
   groupBy, filter, either, isNil, isEmpty, path, sortBy, compose as rCompose, toLower, prop,
+  hasPath,
 } from 'ramda'
 import moize from 'moize'
 
@@ -114,6 +115,7 @@ export const keyValueArrToObj = (arr = []) =>
     return accum
   }, {})
 
+export const hasPathStr = curry((str, obj) => hasPath(str.split('.'), obj))
 export const pathStr = curry((str, obj) => path(str.split('.'), obj))
 export const pathStrOr = curry((defaultValue, str, obj) => pathOr(defaultValue, str.split('.'), obj))
 export const pathStrOrNull = curry((str, obj) => pathOr(null, str.split('.'), obj))

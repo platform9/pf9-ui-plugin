@@ -29,8 +29,8 @@ const useDataUpdater = (updaterFn, onComplete) => {
     },
     onError: (errorMessage, catchedErr, params) => {
       const key = updaterFn.getKey()
-      console.error(`Error when updating entity "${key}"`, catchedErr)
-      showToast(errorMessage + (catchedErr.message ? `\n${catchedErr.message}` : ''), 'error')
+      console.error(`Error when updating items for entity "${key}"`, catchedErr)
+      showToast(errorMessage + `\n${catchedErr.message || catchedErr}`, 'error')
     },
   }), [showToast])
 

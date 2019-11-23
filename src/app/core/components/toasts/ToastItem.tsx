@@ -9,6 +9,8 @@ import green from '@material-ui/core/colors/green'
 import amber from '@material-ui/core/colors/amber'
 import WarningIcon from '@material-ui/icons/Warning'
 import { makeStyles } from '@material-ui/styles'
+import { split, reject, pipe, map } from 'ramda'
+import { isNilOrEmpty } from 'utils/fp'
 
 export enum MessageTypes {
   success = 'success',
@@ -34,6 +36,10 @@ interface ToastItemProps {
 }
 
 const useStyles = makeStyles<Theme>(theme => ({
+  content: {
+    display: 'flex',
+    flexFlow: 'row nowrap',
+  },
   success: {
     backgroundColor: green[600],
   },
@@ -63,6 +69,12 @@ const useStyles = makeStyles<Theme>(theme => ({
   close: {}
 }))
 
+const renderMessages = pipe(
+  split('\n'),
+  reject(isNilOrEmpty),
+  map((i, key) => <div key={key}>{i}</div>)
+)
+
 const ToastItem: FunctionComponent<ToastItemProps> = ({ message, variant, toastsTimeout, onClose, className, ...rest }) => {
   const classes = useStyles({})
   const Icon = variantIcon[variant]
@@ -70,28 +82,28 @@ const ToastItem: FunctionComponent<ToastItemProps> = ({ message, variant, toasts
     const timeoutId = setTimeout(onClose, toastsTimeout + 2000)
     return () => clearTimeout(timeoutId)
   }, [])
+
   return <SnackbarContent
-    className={clsx(classes[variant], className)}
-    aria-describedby="client-snackbar"
+    className={clsx(classes.content, classes[variant], className)}
     message={
-      <span id="client-snackbar" className={classes.message}>
+      <span className={classes.message}>
         <Icon className={clsx(classes.icon, classes.iconVariant)} />
         <div className={classes.text}>
-          {message.split('\n').map((i, key) => <div key={key}>{i}</div>)}
+          {renderMessages(message)}
         </div>
       </span>
     }
-    action={[
+    action={
       <IconButton
         key="close"
         aria-label="Close"
         color="inherit"
+        size="small"
         className={classes.close}
         onClick={onClose}
       >
         <CloseIcon className={classes.icon} />
-      </IconButton>,
-    ]}
+      </IconButton>}
     {...rest}
   />
 }

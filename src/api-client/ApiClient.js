@@ -11,7 +11,8 @@ import Nova from './Nova'
 import Qbert from './Qbert'
 import ResMgr from './ResMgr'
 import { normalizeResponse } from 'api-client/helpers'
-import { pathStrOr } from 'utils/fp'
+import { hasPathStr, pathStr } from 'utils/fp'
+import { prop, has, cond, T, identity } from 'ramda'
 
 class ApiClient {
   static init (options = {}) {
@@ -54,10 +55,16 @@ class ApiClient {
     this.catalog = {}
     this.activeRegion = null
 
+    const getResponseError = cond([
+      [hasPathStr('response.data.error'), pathStr('response.data.error')],
+      [has('error'), prop('error')],
+      [T, identity],
+    ])
+
     this.axiosInstance = axios.create({ ...defaultAxiosConfig, ...(options.axios || {}) })
     this.axiosInstance.interceptors.response.use(
       response => response,
-      error => Promise.reject(pathStrOr(error, 'response.data', error)),
+      error => Promise.reject(getResponseError(error)),
     )
   }
 

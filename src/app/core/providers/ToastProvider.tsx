@@ -11,7 +11,7 @@ import ToastContainer, { ToastOptions } from 'core/components/toasts/ToastContai
 import { except, pipe } from 'utils/fp'
 import { MessageTypes } from 'core/components/toasts/ToastItem'
 
-const toastsTimeout = 8000
+const toastsTimeout = 10000
 const concurrentToasts = 5
 
 interface ToastReducerAction {

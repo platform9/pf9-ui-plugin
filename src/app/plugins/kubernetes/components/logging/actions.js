@@ -2,6 +2,7 @@ import ApiClient from 'api-client/ApiClient'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { clustersCacheKey } from 'k8s/components/infrastructure/common/actions'
 import { mapAsync } from 'utils/async'
+import { propOr } from 'ramda'
 
 const { qbert } = ApiClient.getInstance()
 
@@ -10,8 +11,7 @@ export const loggingsCacheKey = 'loggings'
 const mapLoggings = (cluster, loggings) => {
   const logStorage = []
   const logDestination = []
-
-  loggings.items.forEach(item => {
+  propOr([], 'items', loggings).forEach(item => {
     if (item.spec.type === 'elasticsearch') {
       logStorage.push('ElasticSearch')
       const urlParam = item.spec.params.find(param => param.name === 'url')
@@ -24,7 +24,8 @@ const mapLoggings = (cluster, loggings) => {
   })
 
   return {
-    cluster: cluster.id,
+    id: cluster.uuid,
+    cluster: cluster.uuid,
     clusterName: cluster.name,
     status: cluster.status,
     logStorage,
