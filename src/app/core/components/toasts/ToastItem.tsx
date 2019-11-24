@@ -73,7 +73,7 @@ const renderMessages = pipe(
   split('\n'),
   reject(isNilOrEmpty),
   toPairs,
-  map(([key, i]) => <div key={key}>{i}</div>),
+  map(([key, msg]) => <div key={key}>{msg}</div>),
 )
 
 const ToastItem: FunctionComponent<ToastItemProps> = ({ message, variant, toastsTimeout, onClose, className, ...rest }) => {
