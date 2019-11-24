@@ -9,7 +9,7 @@ import green from '@material-ui/core/colors/green'
 import amber from '@material-ui/core/colors/amber'
 import WarningIcon from '@material-ui/icons/Warning'
 import { makeStyles } from '@material-ui/styles'
-import { split, reject, pipe, map } from 'ramda'
+import { split, reject, pipe, map, toPairs } from 'ramda'
 import { isNilOrEmpty } from 'utils/fp'
 
 export enum MessageTypes {
@@ -72,7 +72,8 @@ const useStyles = makeStyles<Theme>(theme => ({
 const renderMessages = pipe(
   split('\n'),
   reject(isNilOrEmpty),
-  map((i, key) => <div key={key}>{i}</div>)
+  toPairs,
+  map(([key, i]) => <div key={key}>{i}</div>),
 )
 
 const ToastItem: FunctionComponent<ToastItemProps> = ({ message, variant, toastsTimeout, onClose, className, ...rest }) => {

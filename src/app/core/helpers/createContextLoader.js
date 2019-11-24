@@ -91,7 +91,7 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
         orderDirection === 'asc' ? identity : reverse,
       )(items),
     fetchSuccessMessage = (params) => `Successfully fetched ${entityName} items`,
-    fetchErrorMessage = (catchedErr, params) => `Error when trying to fetch ${entityName} items`,
+    fetchErrorMessage = (catchedErr, params) => `Unable to fetch ${entityName} items`,
   } = options
   const uniqueIdentifierStrPaths = uniqueIdentifier ? ensureArray(uniqueIdentifier) : emptyArr
   const dataLens = lensPath([dataCacheKey, cacheKey])
@@ -155,6 +155,10 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
       )(params)
       // If not all the required params are provided, skip this request and just return an empty array
       if (requiredParams && values(providedRequiredParams).length < allRequiredParams.length) {
+        // Show up a warning when trying to refetch the data without providing some of the required params
+        if (refetch && !contextLoaderFn._invalidatedCache) {
+          console.warn(`Some of the required params were not provided for ${cacheKey} loader, returning an empty array`)
+        }
         return emptyArr
       }
       const {
