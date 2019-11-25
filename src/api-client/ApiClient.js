@@ -57,6 +57,7 @@ class ApiClient {
 
     const getResponseError = cond([
       [hasPathStr('response.data.error'), pathStr('response.data.error')],
+      [hasPathStr('response.data.message'), pathStr('response.data.message')],
       [has('error'), prop('error')],
       [T, identity],
     ])
