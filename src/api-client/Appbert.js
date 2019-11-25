@@ -5,9 +5,7 @@ class Appbert {
   }
 
   endpoint = async () => {
-    const services = await this.client.keystone.getServicesForActiveRegion()
-    const endpoint = services.appbert.admin.url
-    return endpoint
+    return this.client.keystone.getServiceEndpoint('appbert', 'admin')
   }
 
   baseUrl = async () => `${await this.endpoint()}`

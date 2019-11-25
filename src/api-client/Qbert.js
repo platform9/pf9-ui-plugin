@@ -23,8 +23,7 @@ class Qbert {
   }
 
   endpoint = async () => {
-    const services = await this.client.keystone.getServicesForActiveRegion()
-    const endpoint = services.qbert.admin.url
+    const endpoint = await this.client.keystone.getServiceEndpoint('qbert', 'admin')
     const mappedEndpoint = endpoint.replace(/v(1|2|3)$/, `v3/${this.client.activeProjectId}`)
 
     // Certain operations like column renderers from ListTable need to prepend the Qbert URL to links
@@ -36,8 +35,7 @@ class Qbert {
   }
 
   monocularBaseUrl = async () => {
-    const services = await this.client.keystone.getServicesForActiveRegion()
-    return services.monocular.public.url
+    return this.client.keystone.getServiceEndpoint('monocular', 'public')
   }
 
   baseUrl = async () => `${await this.endpoint()}`

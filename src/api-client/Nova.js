@@ -13,9 +13,7 @@ class Nova {
   }
 
   async endpoint () {
-    const services = await this.client.keystone.getServicesForActiveRegion()
-    const endpoint = services.nova.internal.url
-    return endpoint
+    return this.client.keystone.getServiceEndpoint('nova', 'internal')
   }
 
   flavorsUrl = async () => `${await this.endpoint()}/flavors`
@@ -40,8 +38,7 @@ class Nova {
 
   deleteFlavor = async (id) => {
     const url = `${await this.flavorsUrl()}/${id}`
-    const response = await axios.delete(url, this.client.getAuthHeaders())
-    return response
+    return axios.delete(url, this.client.getAuthHeaders())
   }
 
   // Allow these methods to be accessed programatically as well.
@@ -54,8 +51,7 @@ class Nova {
   async getInstances () {
     const url = `${await this.instancesUrl()}/detail`
     const response = await axios.get(url, this.client.getAuthHeaders())
-    const servers = response.data.servers.map(instance => renameKey('OS-EXT-STS:vm_state', 'state')(instance))
-    return servers
+    return response.data.servers.map(instance => renameKey('OS-EXT-STS:vm_state', 'state')(instance))
   }
 
   async getHypervisors () {
@@ -78,8 +74,7 @@ class Nova {
 
   async deleteSshKey (id) {
     const url = `${await this.sshKeysUrl()}/${id}`
-    const response = await axios.delete(url, this.client.getAuthHeaders())
-    return response
+    return axios.delete(url, this.client.getAuthHeaders())
   }
 }
 

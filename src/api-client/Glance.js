@@ -13,9 +13,7 @@ class Glance {
   }
 
   async endpoint () {
-    const services = await this.client.keystone.getServicesForActiveRegion()
-    const endpoint = services.glance.admin.url
-    return endpoint
+    return this.client.keystone.getServiceEndpoint('glance', 'admin')
   }
 
   v2 = async () => `${await this.endpoint()}/v2`
@@ -41,8 +39,7 @@ class Glance {
 
   async deleteImage (id) {
     const url = `${await this.imagesUrl()}/${id}`
-    const response = await axios.delete(url, this.client.getAuthHeaders())
-    return response
+    return axios.delete(url, this.client.getAuthHeaders())
   }
 
   async getImageSchema () {

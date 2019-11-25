@@ -7,9 +7,7 @@ class Cinder {
   }
 
   async endpoint () {
-    const services = await this.client.keystone.getServicesForActiveRegion()
-    const endpoint = services.cinderv3.admin.url
-    return endpoint
+    return this.client.keystone.getServiceEndpoint('cinderv3', 'admin')
   }
 
   volumesUrl = async () => `${await this.endpoint()}/volumes`

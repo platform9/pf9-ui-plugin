@@ -6,9 +6,7 @@ class Murano {
   }
 
   async endpoint () {
-    const services = await this.client.keystone.getServicesForActiveRegion()
-    const endpoint = services.murano.internal.url
-    return endpoint
+    return this.client.keystone.getServiceEndpoint('murano', 'internal')
   }
 
   v1 = async () => `${await this.endpoint()}/v1`
@@ -46,8 +44,7 @@ class Murano {
   async deleteApplication (id) {
     const url = `${await this.applicationUrl()}/${id}`
     try {
-      const response = await axios.delete(url, this.client.getAuthHeaders())
-      return response
+      await axios.delete(url, this.client.getAuthHeaders())
     } catch (err) {
       console.log(err)
     }

@@ -44,8 +44,7 @@ class ResMgr {
   }
 
   async endpoint () {
-    const services = await this.client.keystone.getServicesForActiveRegion()
-    const endpoint = services.resmgr.internal.url
+    const endpoint = await this.client.keystone.getServiceEndpoint('resmgr', 'internal')
     const v1Endpoint = `${endpoint}/v1`
     return v1Endpoint
   }
@@ -58,8 +57,7 @@ class ResMgr {
 
   async unauthorizeHost (id) {
     const url = `${await this.endpoint()}/hosts/${id}`
-    const response = await axios.delete(url, this.client.getAuthHeaders())
-    return response
+    return axios.delete(url, this.client.getAuthHeaders())
   }
 }
 

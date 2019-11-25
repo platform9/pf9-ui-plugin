@@ -1,7 +1,7 @@
 import axios from 'axios'
-import { pluck, pipe, values, head, path } from 'ramda'
+import { pluck, pipe, values, head } from 'ramda'
 import { getHighestRole } from './helpers'
-import { pathJoin } from 'utils/misc'
+import { pathJoin, capitalizeString } from 'utils/misc'
 import { pathStr } from 'utils/fp'
 
 const authConstructors = {
@@ -268,12 +268,10 @@ class Keystone {
     }
   }
 
+  // set cookie for accessing hostagent rpms
   resetCookie = async () => {
-    const services = await this.getServicesForActiveRegion()
-    const linksUrl = path(['regioninfo', 'public', 'url'], services)
-
-    // set cookie for accessing hostagent rpms
     try {
+      const linksUrl = await this.getServiceEndpoint('regioninfo', 'public')
       const authHeaders = this.client.getAuthHeaders()
       const { data: { links } } = await axios.get(linksUrl, authHeaders)
       const token2cookieUrl = links.token2cookie
@@ -317,6 +315,15 @@ class Keystone {
       return pipe(values, head)(servicesByRegion)
     }
     return servicesByRegion[activeRegion]
+  }
+
+  getServiceEndpoint = async (serviceName, type) => {
+    const services = await this.getServicesForActiveRegion()
+    const endpoint = pathStr(`${serviceName}.${type}.url`, services)
+    if (!endpoint) {
+      throw new Error(`${capitalizeString(serviceName)} endpoint not available in active region`)
+    }
+    return endpoint
   }
 
   getCredentials = async () => {
