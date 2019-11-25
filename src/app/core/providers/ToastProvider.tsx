@@ -6,7 +6,7 @@ import React, {
   useContext
 } from 'react'
 import uuid from 'uuid'
-import { append, takeLast } from 'ramda'
+import { append, takeLast, reject, whereEq } from 'ramda'
 import ToastContainer, { ToastOptions } from 'core/components/toasts/ToastContainer'
 import { except, pipe } from 'utils/fp'
 import { MessageTypes } from 'core/components/toasts/ToastItem'
@@ -24,6 +24,11 @@ const toastReducer: Reducer<ToastOptions[], ToastReducerAction> = (state, { type
     case 'add':
       return pipe(
         takeLast(concurrentToasts - 1),
+        // Remove previous duplicated messages to prevent flooding the screen
+        reject(whereEq({
+          text: payload.text,
+          variant: payload.variant,
+        })),
         append(payload)
       )(state)
     case 'remove':
