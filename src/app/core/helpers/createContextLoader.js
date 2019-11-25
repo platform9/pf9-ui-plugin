@@ -190,7 +190,7 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
           }
         }
         // if refetch = true or no cached params have been found, fetch the items
-        const fetchedItems = await dataFetchFn(params, loadFromContext)
+        const fetchedItems = await dataFetchFn(params, loadFromContext, getContext)
 
         // We can't rely on the server to index the data, as sometimes it simply doesn't return the
         // params used for the query, so we will add them to the items in order to be able to find them afterwards

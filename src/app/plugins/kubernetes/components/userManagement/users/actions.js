@@ -19,7 +19,12 @@ export const isSystemUser = ({ username }) => {
   return uuidRegex.test(username)
 }
 export const mngmCredentialsCacheKey = 'managementCredentials'
-createContextLoader(mngmCredentialsCacheKey, () => keystone.getCredentials())
+createContextLoader(mngmCredentialsCacheKey, (params, loadFromContext, getContext) => {
+  const { role } = getContext(prop('userDetails'))
+  return role === 'admin'
+    ? keystone.getCredentials()
+    : emptyArr
+})
 
 const adminUserNames = ['heatadmin', 'admin@platform9.net']
 export const mngmUsersCacheKey = 'managementUsers'

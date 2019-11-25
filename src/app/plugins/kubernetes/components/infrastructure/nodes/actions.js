@@ -12,7 +12,10 @@ export const rawNodesCacheKey = 'rawNodes'
 
 createContextLoader(rawNodesCacheKey, async () => {
   return qbert.getNodes()
-}, { uniqueIdentifier: 'uuid' })
+}, {
+  entityName: 'Node',
+  uniqueIdentifier: 'uuid',
+})
 
 export const loadNodes = createContextLoader(nodesCacheKey, async (params, loadFromContext) => {
   const [rawNodes, combinedHosts, serviceCatalog] = await Promise.all([
