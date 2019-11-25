@@ -11,9 +11,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   step: {
     marginRight: theme.spacing(2),
-    flex: `0 0 ${theme.spacing(6)}px`,
-    width: theme.spacing(6),
-    height: theme.spacing(6),
+    flex: `0 0 ${theme.spacing(4.5)}px`,
+    width: theme.spacing(4.5),
+    height: theme.spacing(4.5),
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',

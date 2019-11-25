@@ -18,15 +18,6 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const AnyLink: any = SimpleLink
 
-enum CloudProviders {
-  Aws = 'aws',
-  Azure = 'azure'
-}
-
-const keys = Object.values(CloudProviders)
-
-console.error(keys)
-
 const ClusterDetailsPage: FunctionComponent = () => {
   const { spacer } = useStyles({})
   return (

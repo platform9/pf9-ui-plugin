@@ -40,7 +40,9 @@ const ClusterHostChooser = forwardRef(
 
     if (pollForNodes) {
       useInterval(() => {
-        setFetchingIn(fetchingIn - 1)
+        if (!loading) {
+          setFetchingIn(fetchingIn - 1)
+        }
       }, 1000)
 
       if (fetchingIn < 0) {
@@ -63,53 +65,49 @@ const ClusterHostChooser = forwardRef(
     }
 
     return (
-      <React.Fragment>
-        <Progress loading={loading} renderContentOnMount>
-          <div className={tableContainer}>
-            {pollForNodes && (
-              <Loading
-                icon={Refresh}
-                loading={isLoading}
-                color={isLoading ? 'action' : 'primary'}
-                justify="flex-end"
-                onClick={() => loadMore(true)}
-              >
-                {isLoading ? 'reloading...' : `reloading ${fetchingIn}s`}
-              </Loading>
+      <div className={tableContainer}>
+        {pollForNodes && (
+          <Loading
+            icon={Refresh}
+            loading={isLoading}
+            color={isLoading ? 'action' : 'primary'}
+            justify="flex-end"
+            onClick={() => loadMore(true)}
+          >
+            {isLoading ? 'loading...' : `reloading ${fetchingIn}s`}
+          </Loading>
+        )}
+        <Table ref={ref} className={table}>
+          <TableHead>
+            <TableRow>
+              <TableCell>
+                <Checkbox checked={allSelected()} onChange={toggleAll} />
+              </TableCell>
+              <TableCell>Hostname</TableCell>
+              <TableCell>IP Address</TableCell>
+              <TableCell>Operating System</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            { orphanedNodes.length === 0 && (
+              <TableRow colSpan={4}>
+                <TableCell colSpan={4} align="center"><Typography variant="body1">There are no nodes available.</Typography></TableCell>
+              </TableRow>
             )}
-            <Table ref={ref} className={table}>
-              <TableHead>
-                <TableRow>
-                  <TableCell>
-                    <Checkbox checked={allSelected()} onChange={toggleAll} />
-                  </TableCell>
-                  <TableCell>Hostname</TableCell>
-                  <TableCell>IP Address</TableCell>
-                  <TableCell>Operating System</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                { orphanedNodes.length === 0 && (
-                  <TableRow colSpan={4}>
-                    <TableCell colSpan={4} align="center"><Typography variant="body1">There are no nodes available.</Typography></TableCell>
-                  </TableRow>
-                )}
-                {orphanedNodes.map(orphanedNode => (
-                  <TableRow key={orphanedNode.uuid}>
-                    <TableCell>
-                      <Checkbox checked={isSelected(orphanedNode.uuid)} onChange={toggleHost(orphanedNode.uuid)} />
-                    </TableCell>
-                    <TableCell>{orphanedNode.name}</TableCell>
-                    <TableCell>{orphanedNode.primaryIp}</TableCell>
-                    <TableCell>{orphanedNode.combined.osInfo}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            { hasError && <Typography variant="body1" className={errorText}>{errorMessage}</Typography> }
-          </div>
-        </Progress>
-      </React.Fragment>
+            {orphanedNodes.map(orphanedNode => (
+              <TableRow key={orphanedNode.uuid}>
+                <TableCell>
+                  <Checkbox checked={isSelected(orphanedNode.uuid)} onChange={toggleHost(orphanedNode.uuid)} />
+                </TableCell>
+                <TableCell>{orphanedNode.name}</TableCell>
+                <TableCell>{orphanedNode.primaryIp}</TableCell>
+                <TableCell>{orphanedNode.combined.osInfo}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+        { hasError && <Typography variant="body1" className={errorText}>{errorMessage}</Typography> }
+      </div>
     )
   },
 )
