@@ -9,6 +9,7 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import { mngmUserActions } from './actions'
 import { pipe, pluck, join, pick } from 'ramda'
 import { createUsePrefParamsHook } from 'core/hooks/useParams'
+import { arrayIfNil } from 'utils/fp'
 
 const defaultParams = { systemUsers: true }
 const usePrefParams = createUsePrefParamsHook('ManagementUsers', listTablePrefs)
@@ -21,7 +22,6 @@ const ListPage = ({ ListContainer }) => {
     const filteredRows = useMemo(
       () => data.filter(user => showingSystemUsers || !isSystemUser(user)),
       [data, showingSystemUsers])
-
     return <ListContainer
       loading={loading}
       reload={reload}
@@ -40,7 +40,7 @@ export const options = {
     { id: 'username', label: 'Username' },
     { id: 'displayname', label: 'Display Name' },
     { id: 'twoFactor', label: 'Two-Factor Authentication' },
-    { id: 'tenants', label: 'Tenants', render: pipe(pluck('name'), join(', ')) },
+    { id: 'tenants', label: 'Tenants', render: pipe(arrayIfNil, pluck('name'), join(', ')) },
   ],
   addText: 'Create a new User',
   addUrl: pathJoin(k8sPrefix, 'user_management/users/add'),

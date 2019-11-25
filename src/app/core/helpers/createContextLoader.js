@@ -1,10 +1,13 @@
 import {
-  pick, isEmpty, identity, assoc, find, whereEq, when, isNil, reject, filter, always, append, of,
-  pipe, over, lensPath, pickAll, view, has, equals, values, either, sortBy, reverse, mergeLeft, map,
-  toLower, is, __,
+  pick, identity, assoc, find, whereEq, when, isNil, reject, filter, always, append, of, pipe, over,
+  lensPath, pickAll, view, has, equals, values, either, sortBy, reverse, mergeLeft, map, toLower,
+  is, __,
 } from 'ramda'
 import moize from 'moize'
-import { ensureFunction, ensureArray, emptyObj, emptyArr, upsertAllBy, pathStr } from 'utils/fp'
+import {
+  ensureFunction, ensureArray, emptyObj, emptyArr, upsertAllBy, pathStr, arrayIfEmpty, stringIfNil,
+  arrayIfNil,
+} from 'utils/fp'
 import { memoizePromise, uncamelizeString } from 'utils/misc'
 import { defaultUniqueIdentifier, allKey } from 'app/constants'
 
@@ -18,9 +21,6 @@ export const getContextLoader = key => {
 export const invalidateLoadersCache = () => {
   Object.values(loaders).forEach(loader => loader.invalidateCache())
 }
-const arrayIfNil = when(isNil, always(emptyArr))
-const stringIfNil = when(isNil, always(''))
-const arrayIfEmpty = when(isEmpty, always(emptyArr))
 
 /**
  * Context Loader options
