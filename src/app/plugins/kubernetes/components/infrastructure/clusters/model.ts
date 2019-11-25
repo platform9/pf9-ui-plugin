@@ -47,7 +47,7 @@ export interface ICluster {
   nodePoolName: string
   cloudProviderUuid: string
   cloudProviderName: string
-  cloudProviderType: 'aws' | 'azure' | 'bareos'
+  cloudProviderType: CloudProviders
   cloudProperties: CloudProperties
   tags: Tags
   endpoint: string
@@ -64,6 +64,12 @@ export interface ICluster {
   links: Links
   hasVpn: boolean
   hasLoadBalancer: boolean
+}
+
+enum CloudProviders {
+  Aws = 'aws',
+  Azure = 'azure',
+  BareOS = 'bareos',
 }
 
 type CloudProperties = AzureCloudProperties | AwsCloudProperties
