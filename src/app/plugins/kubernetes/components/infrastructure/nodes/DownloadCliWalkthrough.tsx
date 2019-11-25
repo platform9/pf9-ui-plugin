@@ -2,11 +2,12 @@ import React from 'react'
 import { Typography, Theme } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import CodeBlock from 'core/components/CodeBlock'
+import SimpleLink from 'core/components/SimpleLink'
 
 const useStyles = makeStyles((theme: Theme) => ({
   row: {
     display: 'flex',
-    margin: theme.spacing(2, 0)
+    margin: theme.spacing(2, 0),
   },
   step: {
     marginRight: theme.spacing(2),
@@ -18,11 +19,14 @@ const useStyles = makeStyles((theme: Theme) => ({
     justifyContent: 'center',
     border: `2px solid ${theme.palette.text.primary}`,
     borderRadius: '100%',
-    color: theme.palette.text.primary
+    color: theme.palette.text.primary,
   },
 }))
 
-const installCommand = '> curl -O https://raw.githubusercontent.com/platform9/express-cli/master/cli-setup.sh | bash ./cli-setup.sh'
+const AnyLink: any = SimpleLink
+
+const installCommand =
+  '> curl -O https://raw.githubusercontent.com/platform9/express-cli/master/cli-setup.sh | bash ./cli-setup.sh'
 
 const DownloadCliWalkthrough = (): JSX.Element => {
   return (
@@ -32,7 +36,10 @@ const DownloadCliWalkthrough = (): JSX.Element => {
         CLI on each of your physical or virtual machines that you wish to add to the cluster. Follow
         the instructions below to download the CLI
       </Typography>
-      <p>{' '}</p>
+      <p>
+        <AnyLink src="">What is BareOS?</AnyLink>
+      </p>
+      <p> </p>
       <Typography variant="h6">Pre-requisites</Typography>
       <p>
         <Typography component="span">
@@ -75,10 +82,11 @@ const NumberedSteps = ({ step, title, description }: NumberedStepProps): JSX.Ele
       </Typography>
       <div>
         <Typography variant="subtitle2">{title}</Typography>
-        { typeof description === 'string'
-          ? <Typography variant="body1">{description}</Typography>
-          : description
-        }
+        {typeof description === 'string' ? (
+          <Typography variant="body1">{description}</Typography>
+        ) : (
+          description
+        )}
       </div>
     </div>
   )
