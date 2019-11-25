@@ -18,6 +18,15 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const AnyLink: any = SimpleLink
 
+enum CloudProviders {
+  Aws = 'aws',
+  Azure = 'azure'
+}
+
+const keys = Object.values(CloudProviders)
+
+console.error(keys)
+
 const ClusterDetailsPage: FunctionComponent = () => {
   const { spacer } = useStyles({})
   return (
@@ -25,7 +34,7 @@ const ClusterDetailsPage: FunctionComponent = () => {
       <Typography variant="h5">Download CLI</Typography>
       <p> </p>
       <DownloadCliWalkthrough />
-      <p className={spacer}></p>
+      <p className={spacer} />
       <Typography variant="h6">CLI Advanced Options</Typography>
       <p> </p>
       <Typography component="p" variant="subtitle2">
