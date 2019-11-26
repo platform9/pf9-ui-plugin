@@ -30,10 +30,11 @@ class Wizard extends PureComponent {
     }
   }
 
+  getActiveStepId = ({ steps }, activeStep) => steps[activeStep] ? ({ activeStepId: steps[activeStep].stepId }) : {}
+
   addStep = newStep => {
     this.setState(
-      state => ({ steps: [...state.steps, newStep] }),
-      this.activateStep,
+      state => ({ steps: [...state.steps, newStep], ...this.getActiveStepId({ steps: [...state.steps, newStep] }, state.activeStep) })
     )
   }
 
@@ -44,8 +45,7 @@ class Wizard extends PureComponent {
 
   handleBack = () => {
     this.setState(
-      state => ({ activeStep: state.activeStep - 1 }),
-      this.activateStep,
+      state => ({ activeStep: state.activeStep - 1, ...this.getActiveStepId(state, state.activeStep - 1) })
     )
   }
 
@@ -62,9 +62,8 @@ class Wizard extends PureComponent {
     }
 
     this.setState(
-      state => ({ activeStep: state.activeStep + 1 }),
+      state => ({ activeStep: state.activeStep + 1, ...this.getActiveStepId(state, state.activeStep + 1) }),
       () => {
-        this.activateStep()
         if (this.isComplete()) {
           onComplete(this.state.wizardContext)
         }
@@ -81,9 +80,8 @@ class Wizard extends PureComponent {
     }
 
     this.setState(
-      state => ({ activeStep: state.steps.length - 1 }),
+      state => ({ activeStep: state.steps.length - 1, ...this.getActiveStepId(state, state.steps.length - 1) }),
       () => {
-        this.activateStep()
         if (this.isComplete()) {
           onComplete(this.state.wizardContext)
         }
@@ -110,7 +108,7 @@ class Wizard extends PureComponent {
 
   render () {
     const { wizardContext, setWizardContext, steps, activeStep } = this.state
-    const { showSteps, children, submitLabel, finishAndReviewLabel, onCancel, canReview } = this.props
+    const { showSteps, children, submitLabel, finishAndReviewLabel, onCancel, showFinishAndReviewButton } = this.props
     const renderStepsContent = ensureFunction(children)
 
     return (
@@ -123,7 +121,7 @@ class Wizard extends PureComponent {
           {this.canBackAtFirstStep() && <PrevButton onClick={this.handleOriginBack} />}
           {this.hasNext() && <NextButton onClick={this.handleNext}>Next</NextButton>}
           {this.isLastStep() && <NextButton onClick={this.handleNext}>{submitLabel}</NextButton>}
-          {canReview && this.isFinishAndReviewVisible() && <NextButton onClick={this.onFinishAndReview}>{finishAndReviewLabel}</NextButton>}
+          {showFinishAndReviewButton && this.isFinishAndReviewVisible() && <NextButton onClick={this.onFinishAndReview}>{finishAndReviewLabel}</NextButton>}
         </WizardButtons>
       </WizardContext.Provider>
     )
@@ -137,6 +135,7 @@ Wizard.propTypes = {
   onCancel: PropTypes.func,
   context: PropTypes.object,
   submitLabel: PropTypes.string,
+  showFinishAndReviewButton: PropTypes.bool,
   finishAndReviewLabel: PropTypes.string,
   children: PropTypes.oneOfType([PropTypes.array, PropTypes.func]).isRequired,
 }
