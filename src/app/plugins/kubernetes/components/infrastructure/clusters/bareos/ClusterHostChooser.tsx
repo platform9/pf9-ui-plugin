@@ -53,8 +53,6 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef(({
 },
 ref,
 ) => {
-  // TODO: need to figure out a way to do validtion with our system to select 1, 3, or 5 nodes only for masters
-  // const isValid = () => !isMaster || [1, 3, 5].includes(value.length)
 
   const { table, tableContainer, errorText } = useStyles({ hasError })
   const allSelected = () => value.length === orphanedNodes.length && value.length > 0
