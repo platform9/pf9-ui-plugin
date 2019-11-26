@@ -119,7 +119,7 @@ const createBareOSCluster = async (data = {}, loadFromContext) => {
 
   // 1. Get the nodePoolUuid from the nodePools API and look for the pool with name 'defaultPool'
   const nodePools = await qbert.getNodePools()
-  data.nodePoolUuid = nodePools.find(x => x.name === 'defaultPool').uuid
+  body.nodePoolUuid = nodePools.find(x => x.name === 'defaultPool').uuid
 
   // 2. Create the cluster
   const cluster = await createGenericCluster(body, data, loadFromContext)
@@ -130,8 +130,8 @@ const createBareOSCluster = async (data = {}, loadFromContext) => {
     ...masterNodes.map(uuid => ({ isMaster: true, uuid })),
     ...workerNodes.map(uuid => ({ isMaster: false, uuid })),
   ]
-  // TODO verify `clusterUuid` is on the cluster response object.
-  qbert.attachNodes(cluster.clusterUuid, nodes)
+
+  await qbert.attach(cluster.uuid, nodes)
 
   return cluster
 }

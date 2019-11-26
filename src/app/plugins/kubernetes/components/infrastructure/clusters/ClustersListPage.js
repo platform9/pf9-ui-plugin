@@ -35,6 +35,13 @@ const useStyles = makeStyles(theme => ({
   },
 }))
 
+const renderCloudProviderType = (type, cluster) => {
+  if (type === 'local') {
+    return 'BareOS'
+  }
+  return capitalizeString(type)
+}
+
 const getClusterPopoverContent = (healthyMasterNodes, masterNodes) =>
   `${healthyMasterNodes.length} of ${masterNodes.length} master nodes healthy (3 required)`
 
@@ -201,7 +208,7 @@ export const options = {
     { id: 'name', label: 'Cluster name', render: renderClusterDetailLink },
     { id: 'status', label: 'Status', render: renderStatus },
     { id: 'links', label: 'Links', render: renderLinks },
-    { id: 'cloudProviderType', label: 'Deployment Type' },
+    { id: 'cloudProviderType', label: 'Deployment Type', render: renderCloudProviderType },
     { id: 'resource_utilization', label: 'Resource Utilization', render: renderStats },
     { id: 'version', label: 'Kubernetes Version' },
     { id: 'networkPlugin', label: 'Network Backend' },
