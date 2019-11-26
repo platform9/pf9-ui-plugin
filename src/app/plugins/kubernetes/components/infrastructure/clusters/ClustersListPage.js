@@ -5,6 +5,7 @@ import ExternalLink from 'core/components/ExternalLink'
 import SimpleLink from 'core/components/SimpleLink'
 import ScaleIcon from '@material-ui/icons/TrendingUp'
 import UpgradeIcon from '@material-ui/icons/PresentToAll'
+import SeeDetailsIcon from '@material-ui/icons/Subject'
 import InsertChartIcon from '@material-ui/icons/InsertChart'
 import DescriptionIcon from '@material-ui/icons/Description'
 import { clustersCacheKey } from '../common/actions'
@@ -236,6 +237,11 @@ export const options = {
   multiSelection: false,
   deleteCond: both(isAdmin, canDeleteCluster),
   batchActions: [
+    {
+      icon: <SeeDetailsIcon />,
+      label: 'See details',
+      routeTo: rows => `/ui/kubernetes/infrastructure/clusters/${rows[0].uuid}`,
+    },
     {
       cond: both(isAdmin, canScaleMasters),
       icon: <ScaleIcon />,
