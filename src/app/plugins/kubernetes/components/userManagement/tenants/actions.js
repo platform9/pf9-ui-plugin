@@ -14,11 +14,8 @@ export const mngmTenantsCacheKey = 'managementTenants'
 const reservedTenantNames = ['admin', 'services', 'Default', 'heat']
 export const filterValidTenants = tenant => !reservedTenantNames.includes(tenant.name)
 export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
-  listFn: (params, loadFromContext, getContext) => {
-    const { role } = getContext(prop('userDetails'))
-    return role === 'admin'
-      ? keystone.getAllTenantsAllUsers()
-      : emptyArr
+  listFn: () => {
+    return keystone.getAllTenantsAllUsers()
   },
   deleteFn: async ({ id }) => {
     await keystone.deleteProject(id)
@@ -121,6 +118,7 @@ export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
       })),
     )(allTenantsAllUsers)
   },
+  requiredRoles: 'admin',
 })
 
 export const mngmTenantRoleAssignmentsCacheKey = 'managementTenantRoleAssignments'

@@ -1,12 +1,12 @@
 import {
   pick, identity, assoc, find, whereEq, when, isNil, reject, filter, always, append, of, pipe, over,
   lensPath, pickAll, view, has, equals, values, either, sortBy, reverse, mergeLeft, map, toLower,
-  is, __,
+  is, __, propOr,
 } from 'ramda'
 import moize from 'moize'
 import {
   ensureFunction, ensureArray, emptyObj, emptyArr, upsertAllBy, pathStr, arrayIfEmpty, stringIfNil,
-  arrayIfNil,
+  arrayIfNil, isNilOrEmpty,
 } from 'utils/fp'
 import { memoizePromise, uncamelizeString } from 'utils/misc'
 import { defaultUniqueIdentifier, allKey } from 'app/constants'
@@ -46,6 +46,9 @@ export const invalidateLoadersCache = () => {
  * @property {bool} [refetchCascade=false] Indicate wether or not to refetch all the resources
  * loaded using `loadFromContext` in the loader or mapper functions
  *
+ * @property {string|array} [requiredRoles] Role or roles that the user must have in order for the data to be fetched
+ * If the user doesn't have any of the provided roles then an empty array will be returned
+ *
  * @property {string} [defaultOrderBy=uniqueIdentifier] ID of the field that will be used to sort the returned items
  *
  * @property {string} [defaultOrderDirection='asc'] Sorting direction (asc/desc)
@@ -83,6 +86,7 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
     requiredParams = indexBy,
     dataMapper = identity,
     refetchCascade = false,
+    requiredRoles,
     defaultOrderBy = uniqueIdentifier,
     defaultOrderDirection = 'asc',
     sortWith = (items, { orderBy = defaultOrderBy, orderDirection = defaultOrderDirection }) =>
@@ -138,6 +142,13 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
    */
   const contextLoaderFn = memoizePromise(
     async ({ getContext, setContext, params = emptyObj, refetch = contextLoaderFn._invalidatedCache, dumpCache = false, additionalOptions = emptyObj }) => {
+
+      // Make sure the user has to the required roles
+      const { role } = getContext(propOr(emptyObj, 'userDetails'))
+      if (!isNilOrEmpty(requiredRoles) && !ensureArray(requiredRoles).includes(role)) {
+        return emptyArr
+      }
+
       const loadFromContext = (key, params = emptyObj, refetchDeep = refetchCascade && refetch) => {
         const loaderFn = getContextLoader(key)
         return loaderFn({ getContext, setContext, params, refetch: refetchDeep, additionalOptions })
@@ -190,7 +201,7 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
           }
         }
         // if refetch = true or no cached params have been found, fetch the items
-        const fetchedItems = await dataFetchFn(params, loadFromContext, getContext)
+        const fetchedItems = await dataFetchFn(params, loadFromContext)
 
         // We can't rely on the server to index the data, as sometimes it simply doesn't return the
         // params used for the query, so we will add them to the items in order to be able to find them afterwards
