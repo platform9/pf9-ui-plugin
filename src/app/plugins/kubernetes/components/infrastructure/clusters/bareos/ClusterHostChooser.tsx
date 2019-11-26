@@ -43,109 +43,109 @@ interface Props {
 
 // TODO: is forwardRef actually needed here?
 const ClusterHostChooser: React.ComponentType<Props> = forwardRef(({
-    isMaster = false,
-    onChange,
-    value = [],
-    excludeList = [],
-    hasError,
-    errorMessage,
-    pollForNodes = false,
-  },
-  ref,
+  isMaster = false,
+  onChange,
+  value = [],
+  excludeList = [],
+  hasError,
+  errorMessage,
+  pollForNodes = false,
+},
+ref,
 ) => {
-    // TODO: need to figure out a way to do validtion with our system to select 1, 3, or 5 nodes only for masters
-    // const isValid = () => !isMaster || [1, 3, 5].includes(value.length)
+  // TODO: need to figure out a way to do validtion with our system to select 1, 3, or 5 nodes only for masters
+  // const isValid = () => !isMaster || [1, 3, 5].includes(value.length)
 
-    const { table, tableContainer, errorText } = useStyles({ hasError })
-    const allSelected = () => value.length === orphanedNodes.length && value.length > 0
-    const toggleAll = () => onChange(allSelected() ? [] : orphanedNodes.map((x) => x.uuid))
-    const isSelected = (uuid) => value.includes(uuid)
+  const { table, tableContainer, errorText } = useStyles({ hasError })
+  const allSelected = () => value.length === orphanedNodes.length && value.length > 0
+  const toggleAll = () => onChange(allSelected() ? [] : orphanedNodes.map((x) => x.uuid))
+  const isSelected = (uuid) => value.includes(uuid)
 
-    const [nodes, loading, loadMore] = useDataLoader(loadNodes)
+  const [nodes, loading, loadMore] = useDataLoader(loadNodes)
 
-    const [fetchingIn, setFetchingIn] = useState(5)
+  const [fetchingIn, setFetchingIn] = useState(5)
 
-    if (pollForNodes) {
-      useInterval(() => {
-        if (!loading) {
-          setFetchingIn(fetchingIn - 1)
-        }
-      }, 1000)
-
-      if (fetchingIn < 0) {
-        loadMore(true)
-        setFetchingIn(5)
+  if (pollForNodes) {
+    useInterval(() => {
+      if (!loading) {
+        setFetchingIn(fetchingIn - 1)
       }
+    }, 1000)
+
+    if (fetchingIn < 0) {
+      loadMore(true)
+      setFetchingIn(5)
     }
-    const isLoading = loading || fetchingIn === 0
+  }
+  const isLoading = loading || fetchingIn === 0
 
-    const notAssignedToCluster = (node) => !node.clusterUuid
+  const notAssignedToCluster = (node) => !node.clusterUuid
 
-    // exclude list does not filter anything if isMaster
-    const notInExcludeList = (node) => isMaster || !excludeList.includes(node.uuid)
+  // exclude list does not filter anything if isMaster
+  const notInExcludeList = (node) => isMaster || !excludeList.includes(node.uuid)
 
-    const orphanedNodes = nodes.filter(notAssignedToCluster).filter(notInExcludeList)
+  const orphanedNodes = nodes.filter(notAssignedToCluster).filter(notInExcludeList)
 
-    const toggleHost = (uuid) => () => {
-      const newHosts = isSelected(uuid) ? value.filter((x) => x !== uuid) : [...value, uuid]
-      onChange(newHosts)
-    }
+  const toggleHost = (uuid) => () => {
+    const newHosts = isSelected(uuid) ? value.filter((x) => x !== uuid) : [...value, uuid]
+    onChange(newHosts)
+  }
 
-    return (
-      <div className={tableContainer}>
-        {pollForNodes && (
-          <Loading
-            icon={Refresh}
-            loading={isLoading}
-            color={isLoading ? 'action' : 'primary'}
-            justify="flex-end"
-            onClick={() => loadMore(true)}
-          >
-            {isLoading ? 'loading...' : `reloading ${fetchingIn}s`}
-          </Loading>
-        )}
-        <Table ref={ref} className={table}>
-          <TableHead>
+  return (
+    <div className={tableContainer}>
+      {pollForNodes && (
+        <Loading
+          icon={Refresh}
+          loading={isLoading}
+          color={isLoading ? 'action' : 'primary'}
+          justify="flex-end"
+          onClick={() => loadMore(true)}
+        >
+          {isLoading ? 'loading...' : `reloading ${fetchingIn}s`}
+        </Loading>
+      )}
+      <Table ref={ref} className={table}>
+        <TableHead>
+          <TableRow>
+            <TableCell>
+              <Checkbox checked={allSelected()} onChange={toggleAll} />
+            </TableCell>
+            <TableCell>Hostname</TableCell>
+            <TableCell>IP Address</TableCell>
+            <TableCell>Operating System</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {orphanedNodes.length === 0 && (
             <TableRow>
-              <TableCell>
-                <Checkbox checked={allSelected()} onChange={toggleAll} />
+              <TableCell colSpan={4} align="center">
+                <Typography variant="body1">There are no nodes available.</Typography>
               </TableCell>
-              <TableCell>Hostname</TableCell>
-              <TableCell>IP Address</TableCell>
-              <TableCell>Operating System</TableCell>
             </TableRow>
-          </TableHead>
-          <TableBody>
-            {orphanedNodes.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={4} align="center">
-                  <Typography variant="body1">There are no nodes available.</Typography>
-                </TableCell>
-              </TableRow>
-            )}
-            {orphanedNodes.map((orphanedNode = {}) => (
-              <TableRow key={orphanedNode.uuid}>
-                <TableCell>
-                  <Checkbox
-                    checked={isSelected(orphanedNode.uuid)}
-                    onChange={toggleHost(orphanedNode.uuid)}
-                  />
-                </TableCell>
-                <TableCell>{orphanedNode.name}</TableCell>
-                <TableCell>{orphanedNode.primaryIp}</TableCell>
-                <TableCell>{orphanedNode.combined?.osInfo}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        {hasError && (
-          <Typography variant="body1" className={errorText}>
-            {errorMessage}
-          </Typography>
-        )}
-      </div>
-    )
-  },
+          )}
+          {orphanedNodes.map((orphanedNode = {}) => (
+            <TableRow key={orphanedNode.uuid}>
+              <TableCell>
+                <Checkbox
+                  checked={isSelected(orphanedNode.uuid)}
+                  onChange={toggleHost(orphanedNode.uuid)}
+                />
+              </TableCell>
+              <TableCell>{orphanedNode.name}</TableCell>
+              <TableCell>{orphanedNode.primaryIp}</TableCell>
+              <TableCell>{orphanedNode.combined?.osInfo}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+      {hasError && (
+        <Typography variant="body1" className={errorText}>
+          {errorMessage}
+        </Typography>
+      )}
+    </div>
+  )
+},
 )
 
 export default withFormContext(ClusterHostChooser) as React.FC<Props>

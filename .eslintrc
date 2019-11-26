@@ -42,7 +42,8 @@
     "no-multi-spaces": [2, { "exceptions": { "ObjectExpression": true } } ],
     "key-spacing": [2, { "mode": "minimum" }],
     "standard/no-callback-literal": 0,
-    "@typescript-eslint/strict-boolean-expressions": "off"
+    "@typescript-eslint/strict-boolean-expressions": "off",
+    "@typescript-eslint/explicit-function-return-type": "off"
   },
 
   "settings": {
