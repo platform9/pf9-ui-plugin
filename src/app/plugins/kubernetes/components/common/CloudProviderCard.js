@@ -53,7 +53,7 @@ const icons = {
 }
 
 const labels = {
-  aws: 'Amazon AWS Provider',
+  aws: 'Amazon AWS',
   azure: 'Microsoft Azure',
   openstack: 'OpenStack',
   vmware: 'VMware',
