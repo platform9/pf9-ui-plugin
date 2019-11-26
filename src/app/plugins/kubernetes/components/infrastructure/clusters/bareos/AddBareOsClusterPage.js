@@ -180,7 +180,6 @@ const AddBareOsClusterPage = () => {
                         label="Physical interface for virtual IP association"
                         info="Provide the name of the network interface that the virtual IP should be bound to. The virtual IP should be reachable from the network this interface connects to. Note: All master nodes should use the same interface (eg: ens3) that the virtual IP will be bound to."
                         masterNodes={params.masterNodes}
-                        required={(params.masterNodes || []).length > 1}
                       />
 
                       {/* Assign public IP's */}
