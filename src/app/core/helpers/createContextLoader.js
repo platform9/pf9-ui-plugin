@@ -142,8 +142,7 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
    */
   const contextLoaderFn = memoizePromise(
     async ({ getContext, setContext, params = emptyObj, refetch = contextLoaderFn._invalidatedCache, dumpCache = false, additionalOptions = emptyObj }) => {
-
-      // Make sure the user has to the required roles
+      // Make sure the user has the required roles
       const { role } = getContext(propOr(emptyObj, 'userDetails'))
       if (!isNilOrEmpty(requiredRoles) && !ensureArray(requiredRoles).includes(role)) {
         return emptyArr

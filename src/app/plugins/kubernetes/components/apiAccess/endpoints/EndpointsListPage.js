@@ -2,7 +2,7 @@ import React from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import endpointsActions from './actions'
-import SimpleLink from 'core/components/SimpleLink'
+import ExternalLink from 'core/components/ExternalLink'
 
 const useStyles = makeStyles(theme => ({
   link: {
@@ -31,7 +31,7 @@ const EndpointsListPage = () => {
     <>
       <h2>API Endpoints</h2>
       <ListPage />
-      <SimpleLink className={classes.link} href="/clarity/docs/qbert/">See qbert API Documentation</SimpleLink>
+      <ExternalLink className={classes.link} url="/clarity/docs/qbert/">See qbert API Documentation</ExternalLink>
     </>
   )
 }

@@ -2,9 +2,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import SimpleLink from 'core/components/SimpleLink'
 
-const ExternalLink = ({ url, children, newWindow = true }) => {
-  const moreProps = newWindow ? { target: '_blank', rel: 'noopener' } : {}
-  return (<SimpleLink src={url} {...moreProps}>{children || url}</SimpleLink>)
+const ExternalLink = ({ url, children, newWindow = true, ...rest }) => {
+  const targetBlankProps = newWindow ? { target: '_blank', rel: 'noopener' } : {}
+  return (<SimpleLink src={url} {...targetBlankProps} {...rest}>{children || url}</SimpleLink>)
 }
 
 ExternalLink.propTypes = {

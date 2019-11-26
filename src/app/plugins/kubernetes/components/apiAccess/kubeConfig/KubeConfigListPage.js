@@ -8,6 +8,7 @@ import DownloadDialog from './DownloadDialog'
 import SimpleLink from 'core/components/SimpleLink'
 import useToggler from 'core/hooks/useToggler'
 import ApiClient from 'api-client/ApiClient'
+import ExternalLink from 'core/components/ExternalLink'
 
 const { qbert } = ApiClient.getInstance()
 
@@ -104,12 +105,12 @@ const KubeConfigListPage = () => {
     <>
       <h2>Download kubeconfig</h2>
       <p>The kubeconfig file is required to authenticate with a cluster and switch between multiple clusters between multiple users while using the kubectl command line.</p>
-      <SimpleLink className={classes.link} href="https://kubernetes.io/docs/user-guide/kubectl-overview/">
+      <ExternalLink className={classes.link} url="https://kubernetes.io/docs/user-guide/kubectl-overview/">
         Learn more about kubectl
-      </SimpleLink>
-      <SimpleLink className={classes.link} href="https://kubernetes.io/docs/user-guide/kubeconfig-file/">
+      </ExternalLink>
+      <ExternalLink className={classes.link} url="https://kubernetes.io/docs/user-guide/kubeconfig-file/">
         Learn more about kubeconfig
-      </SimpleLink>
+      </ExternalLink>
       <ListPage />
       <p className={classes.clusterConfig}>Select a cluster above to populate its kubeconfig below.</p>
       <ValidatedForm>
