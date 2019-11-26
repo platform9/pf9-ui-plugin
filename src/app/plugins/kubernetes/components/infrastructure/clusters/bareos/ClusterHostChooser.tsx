@@ -53,7 +53,6 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef(({
 },
 ref,
 ) => {
-
   const { table, tableContainer, errorText } = useStyles({ hasError })
   const allSelected = () => value.length === orphanedNodes.length && value.length > 0
   const toggleAll = () => onChange(allSelected() ? [] : orphanedNodes.map((x) => x.uuid))
