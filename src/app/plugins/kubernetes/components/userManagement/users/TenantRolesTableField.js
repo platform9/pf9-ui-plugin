@@ -67,6 +67,7 @@ const TenantRolesTableField = withFormContext(({
         }, [row])
         return <div className={classes.rolesPicklist}>
           <RolesPicklist
+            name={`tenant-${row.id}-roleId`}
             onClick={isSelected ? stopPropagation : noop}
             selectFirst={isSelected}
             value={isSelected ? currentRole : null}

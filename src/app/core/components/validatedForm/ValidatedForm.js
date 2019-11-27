@@ -4,7 +4,7 @@ import ValidatedFormDebug from './ValidatedFormDebug'
 import { withStyles } from '@material-ui/styles'
 import { setStateLens } from 'app/utils/fp'
 import { parseValidator } from 'core/utils/fieldValidators'
-import { pathEq, toPairs, path, lensPath, over, set, identity, dissocPath } from 'ramda'
+import { pathEq, toPairs, path, lensPath, over, set, identity, dissocPath, pick } from 'ramda'
 import { withRouter } from 'react-router-dom'
 import moize from 'moize'
 
@@ -173,7 +173,7 @@ class ValidatedForm extends PureComponent {
 
   handleSubmit = event => {
     const { clearOnSubmit, onSubmit } = this.props
-    const { initialValues, values, showingErrors } = this.state
+    const { initialValues, values, fields, showingErrors } = this.state
     if (event) {
       event.preventDefault()
     }
@@ -185,7 +185,8 @@ class ValidatedForm extends PureComponent {
     }
 
     if (onSubmit) {
-      onSubmit(values)
+      // Only send the values from the fields defined in the form
+      onSubmit(pick(Object.keys(fields), values))
     }
 
     if (clearOnSubmit) {
