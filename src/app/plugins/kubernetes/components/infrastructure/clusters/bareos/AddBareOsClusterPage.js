@@ -23,7 +23,7 @@ import { k8sPrefix } from 'app/constants'
 import { makeStyles } from '@material-ui/styles'
 import { Typography } from '@material-ui/core'
 import { masterNodeLengthValidator, requiredValidator } from 'core/utils/fieldValidators'
-import { pipe } from 'ramda'
+import { allPass } from 'ramda'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
@@ -130,7 +130,10 @@ const AddBareOsClusterPage = () => {
                       <Typography>Select one or more nodes to add to the cluster as <strong>worker</strong> nodes</Typography>
                       <ClusterHostChooser
                         id="workerNodes"
-                        filterFn={pipe(isUnassignedNode, excludeNodes(wizardContext.masterNodes))}
+                        filterFn={allPass([
+                          isUnassignedNode,
+                          excludeNodes(wizardContext.masterNodes)
+                        ])}
                         onChange={getParamsUpdater('workerNodes')}
                         validations={wizardContext.allowWorkloadsOnMaster ? null : [requiredValidator]}
                       />

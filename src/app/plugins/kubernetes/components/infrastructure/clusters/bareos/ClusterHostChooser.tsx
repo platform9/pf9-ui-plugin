@@ -28,7 +28,7 @@ export const isUnassignedNode = (node: ICombinedNode) => !node.clusterUuid
 export const excludeNodes = (excludeList: string[] = []) => (node: ICombinedNode) => !excludeList.includes(node.uuid)
 export const isMaster = (node: ICombinedNode) => !!node.isMaster
 export const isNotMaster = (node: ICombinedNode) => !node.isMaster
-export const inCluster = (clusterUuid: string):any => (node: ICombinedNode) => node.clusterUuid === clusterUuid
+export const inCluster = (clusterUuid: string) => (node: ICombinedNode) => node.clusterUuid === clusterUuid
 
 // TODO: all the ValidatedForm stuff is in JS and we need the props to be merged
 // into this component.  Refactor this later on when we can convert

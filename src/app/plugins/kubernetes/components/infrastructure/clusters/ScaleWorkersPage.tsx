@@ -18,7 +18,7 @@ import useDataUpdater from 'core/hooks/useDataUpdater'
 import ClusterHostChooser, { isUnassignedNode, inCluster, isNotMaster } from './bareos/ClusterHostChooser'
 import { customValidator } from 'core/utils/fieldValidators'
 import { ICluster } from './model'
-import { pipe } from 'ramda'
+import { allPass } from 'ramda'
 
 // Limit the number of workers that can be scaled at a time to prevent overload
 const MAX_SCALE_AT_A_TIME = 15
@@ -123,7 +123,7 @@ const ScaleWorkers: FunctionComponent<ScaleWorkersProps> = ({ cluster, onSubmit,
     <ValidatedForm onSubmit={params.scaleType === 'add' ? onAttach : onDetach}>
       <ClusterHostChooser
         id="workersToAdd"
-        filterFn={pipe(isNotMaster, inCluster(cluster.uuid))}
+        filterFn={isUnassignedNode}
         validations={[minScaleValidator, maxScaleValidator]}
         required
       />
@@ -131,7 +131,20 @@ const ScaleWorkers: FunctionComponent<ScaleWorkersProps> = ({ cluster, onSubmit,
     </ValidatedForm>
   )
 
-  const removeBareOsWorkerNodes = null // TOOD
+  const removeBareOsWorkerNodes = (
+    <ValidatedForm onSubmit={params.scaleType === 'add' ? onAttach : onDetach}>
+      <ClusterHostChooser
+        id="workersToRemove"
+        filterFn={allPass([
+          isNotMaster,
+          inCluster(cluster.uuid)
+        ])}
+        validations={[minScaleValidator, maxScaleValidator]}
+        required
+      />
+      <SubmitButton>{params.scaleType === 'add' ? 'Add' : 'Remove'} workers</SubmitButton>
+    </ValidatedForm>
+  )
 
   return (
     <div>
@@ -182,28 +195,38 @@ const ScaleWorkersPage: FunctionComponent = () => {
   const { id } = match.params
   const [clusters, loading] = useDataLoader(clusterActions.list)
 
-  const onComplete = (): void => {
-    history.push(listUrl)
-  }
-
+  const onComplete = () => history.push(listUrl)
   const [update, updating] = useDataUpdater(clusterActions.update, onComplete)
+  const [attach, isAttaching] = useDataUpdater(clusterActions.attachNodes, onComplete)
+  const [detach, isDetaching] = useDataUpdater(clusterActions.detachNodes, onComplete)
+  const isUpdating = updating || isAttaching || isDetaching
+
   const cluster = clusters.find((x) => x.uuid === id)
 
   const handleSubmit = async (data): Promise<void> => {
     await update({ ...cluster, ...data })
   }
 
-  const handleAttach = () => console.log('TODO: handleAttach')
-  const handleDetach = () => console.log('TODO: handleDetach')
+  const handleAttach = (data: { workersToAdd: string[] }) => {
+    const uuids = data.workersToAdd
+    const nodes = uuids.map(uuid => ({ uuid, isMaster: false }))
+    return attach({ cluster, nodes })
+  }
+
+  const handleDetach = (data: { workersToRemove: string[] }) => {
+    const uuids = data.workersToRemove
+    const nodes = uuids.map(uuid => ({ uuid, isMaster: false }))
+    return detach({ cluster, nodes })
+  }
 
   return (
     <FormWrapper
       className={classes.root}
       title="Scale Workers"
       backUrl={listUrl}
-      loading={loading || updating}
+      loading={loading || isUpdating}
       renderContentOnMount={false}
-      message={updating ? 'Scaling cluster...' : 'Loading cluster...'}
+      message={isUpdating ? 'Scaling cluster...' : 'Loading cluster...'}
     >
       <ScaleWorkers cluster={cluster} onSubmit={handleSubmit} onAttach={handleAttach} onDetach={handleDetach} />
     </FormWrapper>
