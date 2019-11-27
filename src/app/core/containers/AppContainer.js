@@ -1,7 +1,7 @@
 import React, { useEffect, useContext } from 'react'
 import ApiClient from 'api-client/ApiClient'
 import { AppContext } from 'core/providers/AppProvider'
-import { usePreferences } from 'core/providers/PreferencesProvider'
+import { usePreferences, useScopedPreferences } from 'core/providers/PreferencesProvider'
 import { setStorage, getStorage } from 'core/utils/pf9Storage'
 import { loadUserTenants } from 'openstack/components/tenants/actions'
 import { head, path, pathOr, propEq } from 'ramda'
@@ -34,6 +34,7 @@ const AppContainer = props => {
   const { keystone, setActiveRegion } = ApiClient.getInstance()
   const { history } = useReactRouter()
   const [, initUserPreferences] = usePreferences()
+  const { updatePrefs } = useScopedPreferences('Tenants')
   const { initialized, session, appLoaded, getContext, setContext } = useContext(AppContext)
 
   useEffect(() => {
@@ -70,7 +71,6 @@ const AppContainer = props => {
     const user = getStorage('user') || {}
     const { name: username } = user
     let unscopedToken = tokens && tokens.unscopedToken
-
     if (username && unscopedToken) {
       // We need to make sure the token has not expired.
       unscopedToken = await keystone.renewToken(unscopedToken)
@@ -106,6 +106,8 @@ const AppContainer = props => {
     const { scopedToken, user, role } = await keystone.changeProjectScope(activeTenant.id)
     await keystone.resetCookie()
 
+    updatePrefs({ lastTenant: activeTenant })
+    setStorage('userTenants', tenants)
     setStorage('user', user)
     setStorage('tokens', { unscopedToken, currentToken: scopedToken })
 

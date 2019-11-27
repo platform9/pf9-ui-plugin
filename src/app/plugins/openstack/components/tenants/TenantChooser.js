@@ -9,6 +9,7 @@ import { Tooltip } from '@material-ui/core'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { dataCacheKey, paramsCacheKey } from 'core/helpers/createContextLoader'
 import { loadUserTenants } from 'openstack/components/tenants/actions'
+import { getStorage, setStorage } from 'core/utils/pf9Storage'
 
 const TenantChooser = props => {
   const { keystone } = ApiClient.getInstance()
@@ -27,7 +28,11 @@ const TenantChooser = props => {
     const tenant = tenants.find(x => x.name === tenantName)
     if (!tenant) { return }
 
-    const { user, role } = await keystone.changeProjectScope(tenant.id)
+    const { user, role, scopedToken } = await keystone.changeProjectScope(tenant.id)
+    // Update localStorage scopedToken upon changing project scope
+    const existingTokens = getStorage('tokens')
+    setStorage('tokens', { ...existingTokens, currentToken: scopedToken })
+
     // Clear any data that should change when the user changes tenant.
     // The data will then be reloaded when it is needed.
     await setContext(pipe(

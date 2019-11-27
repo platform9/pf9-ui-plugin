@@ -69,7 +69,7 @@ export interface ICluster {
 enum CloudProviders {
   Aws = 'aws',
   Azure = 'azure',
-  BareOS = 'bareos',
+  BareOS = 'local',
 }
 
 type CloudProperties = AzureCloudProperties | AwsCloudProperties

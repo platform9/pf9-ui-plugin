@@ -31,7 +31,10 @@ const RegionChooser = props => {
     if (lastRegion && find(propEq('id', lastRegion.id), regions)) {
       return lastRegion.id
     }
-    return pipe(head, prop('id'))(regions)
+    // Old UI requires lastRegion to initialize
+    const defaultRegion = pipe(head, prop('id'))(regions)
+    updatePrefs({ lastRegion: defaultRegion })
+    return defaultRegion
   }, [regions, lastRegion, selectedRegion])
 
   const handleRegionSelect = useCallback(async region => {

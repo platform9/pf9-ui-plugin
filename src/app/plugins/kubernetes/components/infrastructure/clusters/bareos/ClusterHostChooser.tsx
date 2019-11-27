@@ -1,21 +1,14 @@
 import React, { forwardRef, useState } from 'react'
-import withFormContext from 'core/components/validatedForm/withFormContext'
-import {
-  Checkbox,
-  Table,
-  TableHead,
-  TableCell,
-  TableRow,
-  TableBody,
-  Typography,
-  Theme,
-} from '@material-ui/core'
-import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
-import useDataLoader from 'core/hooks/useDataLoader'
 import Loading from 'core/components/Loading'
-import { Refresh } from '@material-ui/icons'
+import useDataLoader from 'core/hooks/useDataLoader'
 import useInterval from 'core/hooks/useInterval'
+import withFormContext from 'core/components/validatedForm/withFormContext'
+import { Checkbox, Table, TableHead, TableCell, TableRow, TableBody, Typography, Theme } from '@material-ui/core'
+import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
+import { Refresh } from '@material-ui/icons'
 import { makeStyles } from '@material-ui/styles'
+import { identity } from 'ramda'
+import { ICombinedNode } from '../../nodes/model'
 
 const useStyles = makeStyles<any, any>((theme: Theme) => ({
   table: {
@@ -31,118 +24,118 @@ const useStyles = makeStyles<any, any>((theme: Theme) => ({
   },
 }))
 
-interface Props {
-  isMaster: boolean
-  value: string[]
-  excludeList: string[]
-  hasError: boolean
-  errorMessage: string
-  pollForNodes: boolean
-  onChange: (nodes: string[]) => void
+export const isUnassignedNode = (node: ICombinedNode) => !node.clusterUuid
+export const excludeNodes = (excludeList: string[] = []) => (node: ICombinedNode) => !excludeList.includes(node.uuid)
+export const isMaster = (node: ICombinedNode) => !!node.isMaster
+export const isNotMaster = (node: ICombinedNode) => !node.isMaster
+export const inCluster = (clusterUuid: string) => (node: ICombinedNode) => node.clusterUuid === clusterUuid
+
+// TODO: all the ValidatedForm stuff is in JS and we need the props to be merged
+// into this component.  Refactor this later on when we can convert
+// ValidatedForm.js to TypeScript.
+export interface IValidatedForm {
+  id: string
+  validations?: any[] // What's the best way to type this?
+  required?: boolean
+  initialValues?: any
+}
+
+interface Props extends IValidatedForm {
+  value?: string[]
+  hasError?: boolean
+  errorMessage?: string
+  pollForNodes?: boolean
+  onChange?: (nodes: string[]) => void
+  filterFn?: (node: ICombinedNode) => boolean
 }
 
 // TODO: is forwardRef actually needed here?
-const ClusterHostChooser: React.ComponentType<Props> = forwardRef(({
-  isMaster = false,
-  onChange,
-  value = [],
-  excludeList = [],
-  hasError,
-  errorMessage,
-  pollForNodes = false,
-},
-ref,
-) => {
-  const { table, tableContainer, errorText } = useStyles({ hasError })
-  const allSelected = () => value.length === orphanedNodes.length && value.length > 0
-  const toggleAll = () => onChange(allSelected() ? [] : orphanedNodes.map((x) => x.uuid))
-  const isSelected = (uuid) => value.includes(uuid)
+const ClusterHostChooser: React.ComponentType<Props> = forwardRef(
+  (
+    { filterFn = identity, onChange, value = [], hasError, errorMessage, pollForNodes = false },
+    ref,
+  ) => {
+    const { table, tableContainer, errorText } = useStyles({ hasError })
+    const [nodes, loading, loadMore] = useDataLoader(loadNodes)
+    const [fetchingIn, setFetchingIn] = useState(5)
 
-  const [nodes, loading, loadMore] = useDataLoader(loadNodes)
+    if (pollForNodes) {
+      useInterval(() => {
+        if (!loading) {
+          setFetchingIn(fetchingIn - 1)
+        }
+      }, 1000)
 
-  const [fetchingIn, setFetchingIn] = useState(5)
-
-  if (pollForNodes) {
-    useInterval(() => {
-      if (!loading) {
-        setFetchingIn(fetchingIn - 1)
+      if (fetchingIn < 0) {
+        loadMore(true)
+        setFetchingIn(5)
       }
-    }, 1000)
-
-    if (fetchingIn < 0) {
-      loadMore(true)
-      setFetchingIn(5)
     }
-  }
-  const isLoading = loading || fetchingIn === 0
+    const isLoading = loading || fetchingIn === 0
 
-  const notAssignedToCluster = (node) => !node.clusterUuid
+    const selectableNodes = nodes.filter(filterFn)
 
-  // exclude list does not filter anything if isMaster
-  const notInExcludeList = (node) => isMaster || !excludeList.includes(node.uuid)
+    const allSelected = () => value.length === selectableNodes.length && value.length > 0
+    const toggleAll = () => onChange(allSelected() ? [] : selectableNodes.map((x) => x.uuid))
+    const isSelected = (uuid) => value.includes(uuid)
 
-  const orphanedNodes = nodes.filter(notAssignedToCluster).filter(notInExcludeList)
+    const toggleHost = (uuid) => () => {
+      const newHosts = isSelected(uuid) ? value.filter((x) => x !== uuid) : [...value, uuid]
+      onChange(newHosts)
+    }
 
-  const toggleHost = (uuid) => () => {
-    const newHosts = isSelected(uuid) ? value.filter((x) => x !== uuid) : [...value, uuid]
-    onChange(newHosts)
-  }
-
-  return (
-    <div className={tableContainer}>
-      {pollForNodes && (
-        <Loading
-          icon={Refresh}
-          loading={isLoading}
-          color={isLoading ? 'action' : 'primary'}
-          justify="flex-end"
-          onClick={() => loadMore(true)}
-        >
-          {isLoading ? 'loading...' : `reloading ${fetchingIn}s`}
-        </Loading>
-      )}
-      <Table ref={ref} className={table}>
-        <TableHead>
-          <TableRow>
-            <TableCell>
-              <Checkbox checked={allSelected()} onChange={toggleAll} />
-            </TableCell>
-            <TableCell>Hostname</TableCell>
-            <TableCell>IP Address</TableCell>
-            <TableCell>Operating System</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {orphanedNodes.length === 0 && (
+    return (
+      <div className={tableContainer}>
+        {pollForNodes && (
+          <Loading
+            icon={Refresh}
+            loading={isLoading}
+            color={isLoading ? 'action' : 'primary'}
+            justify="flex-end"
+            onClick={() => loadMore(true)}
+          >
+            {isLoading ? 'loading...' : `reloading ${fetchingIn}s`}
+          </Loading>
+        )}
+        <Table ref={ref} className={table}>
+          <TableHead>
             <TableRow>
-              <TableCell colSpan={4} align="center">
-                <Typography variant="body1">There are no nodes available.</Typography>
-              </TableCell>
-            </TableRow>
-          )}
-          {orphanedNodes.map((orphanedNode = {}) => (
-            <TableRow key={orphanedNode.uuid}>
               <TableCell>
-                <Checkbox
-                  checked={isSelected(orphanedNode.uuid)}
-                  onChange={toggleHost(orphanedNode.uuid)}
-                />
+                <Checkbox checked={allSelected()} onChange={toggleAll} />
               </TableCell>
-              <TableCell>{orphanedNode.name}</TableCell>
-              <TableCell>{orphanedNode.primaryIp}</TableCell>
-              <TableCell>{orphanedNode.combined?.osInfo}</TableCell>
+              <TableCell>Hostname</TableCell>
+              <TableCell>IP Address</TableCell>
+              <TableCell>Operating System</TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-      {hasError && (
-        <Typography variant="body1" className={errorText}>
-          {errorMessage}
-        </Typography>
-      )}
-    </div>
-  )
-},
+          </TableHead>
+          <TableBody>
+            {selectableNodes.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={4} align="center">
+                  <Typography variant="body1">There are no nodes available.</Typography>
+                </TableCell>
+              </TableRow>
+            )}
+            {selectableNodes.map((node = {}) => (
+              <TableRow key={node.uuid} onClick={toggleHost(node.uuid)}>
+                <TableCell>
+                  <Checkbox checked={isSelected(node.uuid)} />
+                </TableCell>
+                <TableCell>{node.name}</TableCell>
+                <TableCell>{node.primaryIp}</TableCell>
+                <TableCell>{node.combined?.osInfo}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+        {hasError && (
+          <Typography variant="body1" className={errorText}>
+            {errorMessage}
+          </Typography>
+        )}
+      </div>
+    )
+  },
 )
 
 export default withFormContext(ClusterHostChooser) as React.FC<Props>

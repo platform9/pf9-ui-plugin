@@ -2,7 +2,6 @@ import React from 'react'
 import FormWrapper from 'core/components/FormWrapper'
 import BareOsClusterReviewTable from './BareOsClusterReviewTable'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
-import ClusterHostChooser from './ClusterHostChooser'
 import KeyValuesField from 'core/components/validatedForm/KeyValuesField'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import TextField from 'core/components/validatedForm/TextField'
@@ -13,16 +12,18 @@ import WizardStep from 'core/components/wizard/WizardStep'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import useParams from 'core/hooks/useParams'
 import useReactRouter from 'use-react-router'
+import DownloadCliWalkthrough from '../../nodes/DownloadCliWalkthrough'
+import Panel from 'app/plugins/theme/components/Panel'
+import CodeBlock from 'core/components/CodeBlock'
+import ExternalLink from 'core/components/ExternalLink'
+import ClusterHostChooser, { excludeNodes, isUnassignedNode } from './ClusterHostChooser'
 import { clusterActions } from '../actions'
 import { pathJoin } from 'utils/misc'
 import { k8sPrefix } from 'app/constants'
-import DownloadCliWalkthrough from '../../nodes/DownloadCliWalkthrough'
-import Panel from 'app/plugins/theme/components/Panel'
 import { makeStyles } from '@material-ui/styles'
 import { Typography } from '@material-ui/core'
 import { masterNodeLengthValidator, requiredValidator } from 'core/utils/fieldValidators'
-import CodeBlock from 'core/components/CodeBlock'
-import ExternalLink from 'core/components/ExternalLink'
+import { allPass } from 'ramda'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
@@ -91,11 +92,11 @@ const AddBareOsClusterPage = () => {
                       <Typography>Select one or more nodes to add to the cluster as <strong>master</strong> nodes</Typography>
                       <ClusterHostChooser
                         id="masterNodes"
+                        filterFn={isUnassignedNode}
                         onChange={getParamsUpdater('masterNodes')}
                         validations={[masterNodeLengthValidator]}
                         pollForNodes
                         required
-                        isMaster
                       />
 
                       {/* Workloads on masters */}
@@ -129,7 +130,10 @@ const AddBareOsClusterPage = () => {
                       <Typography>Select one or more nodes to add to the cluster as <strong>worker</strong> nodes</Typography>
                       <ClusterHostChooser
                         id="workerNodes"
-                        excludeList={wizardContext.masterNodes || []}
+                        filterFn={allPass([
+                          isUnassignedNode,
+                          excludeNodes(wizardContext.masterNodes)
+                        ])}
                         onChange={getParamsUpdater('workerNodes')}
                         validations={wizardContext.allowWorkloadsOnMaster ? null : [requiredValidator]}
                       />

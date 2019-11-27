@@ -279,7 +279,7 @@ const AddAwsClusterPage = () => {
 
   return (
     <FormWrapper title="Add AWS Cluster" backUrl={listUrl} loading={creatingAwsCluster}>
-      <Wizard onComplete={handleSubmit(params)} context={initialContext} originPath={`${k8sPrefix}/infrastructure/clusters/add`}>
+      <Wizard onComplete={handleSubmit(params)} context={initialContext} originPath={`${k8sPrefix}/infrastructure/clusters/add`} showFinishAndReviewButton>
         {({ wizardContext, setWizardContext, onNext }) => {
           return (
             <>
