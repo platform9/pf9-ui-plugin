@@ -11,12 +11,11 @@ import BlockChooser from 'core/components/BlockChooser'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import TextField from 'core/components/validatedForm/TextField'
-import { validators } from 'core/utils/fieldValidators'
+import { validators, customValidator } from 'core/utils/fieldValidators'
 import SubmitButton from 'core/components/buttons/SubmitButton'
 import useParams from 'core/hooks/useParams'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import ClusterHostChooser, { isUnassignedNode, inCluster, isNotMaster } from './bareos/ClusterHostChooser'
-import { customValidator } from 'core/utils/fieldValidators'
 import { ICluster } from './model'
 import { allPass } from 'ramda'
 
@@ -30,7 +29,7 @@ const maxScaleValidator = customValidator(
 
 const minScaleValidator = customValidator(
   (selections) => selections.length > 0,
-  `You must select at least 1 node.`
+  'You must select at least 1 node.'
 )
 
 const useStyles = makeStyles((theme: Theme) => ({
