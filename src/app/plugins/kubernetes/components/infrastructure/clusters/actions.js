@@ -286,6 +286,7 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
       await qbert.detach(cluster.uuid, nodes)
       loadCombinedHosts.invalidateCache()
       return prevItems
+    },
   },
   uniqueIdentifier: 'uuid',
   dataMapper: (items,
