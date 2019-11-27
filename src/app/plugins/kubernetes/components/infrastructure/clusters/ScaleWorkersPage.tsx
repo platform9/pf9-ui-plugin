@@ -218,8 +218,7 @@ const ScaleWorkersPage: FunctionComponent = () => {
 
   const handleDetach = (data: { workersToRemove: string[] }) => {
     const uuids = data.workersToRemove
-    const nodes = uuids.map(uuid => ({ uuid, isMaster: false }))
-    return detach({ cluster, nodes })
+    return detach({ cluster, nodes: uuids })
   }
 
   return (

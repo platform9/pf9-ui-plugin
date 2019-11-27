@@ -272,7 +272,8 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
     },
     detachNodes: async ({ cluster, nodes }, prevItems) => {
       await qbert.detach(cluster.uuid, nodes)
-      // TODO: how are we supposed to update the cache here
+      // TODO: how are we supposed to update the cache here.  Also
+      // TODO: Toast says "Successfully updated cluster" but should be something more specific
       return prevItems
     },
   },
