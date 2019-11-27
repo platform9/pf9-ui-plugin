@@ -83,6 +83,12 @@ export const options = {
   editDisabledInfo: ([selectedRow]) => {
     return 'Editing an Openstack cloud provider is not currently supported'
   },
+  deleteCond: ([selectedRow]) => {
+    return selectedRow.type !== 'local'
+  },
+  deleteDisabledInfo: () => {
+    return 'Deleting local cloud provider is not currently supported'
+  },
   name: 'CloudProviders',
   rowActions: [],
   title: 'Cloud Providers',
