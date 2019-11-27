@@ -117,12 +117,9 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef(
               </TableRow>
             )}
             {selectableNodes.map((node = {}) => (
-              <TableRow key={node.uuid}>
+              <TableRow key={node.uuid} onClick={toggleHost(node.uuid)}>
                 <TableCell>
-                  <Checkbox
-                    checked={isSelected(node.uuid)}
-                    onChange={toggleHost(node.uuid)}
-                  />
+                  <Checkbox checked={isSelected(node.uuid)} />
                 </TableCell>
                 <TableCell>{node.name}</TableCell>
                 <TableCell>{node.primaryIp}</TableCell>

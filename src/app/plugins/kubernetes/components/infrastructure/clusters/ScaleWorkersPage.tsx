@@ -197,8 +197,11 @@ const ScaleWorkersPage: FunctionComponent = () => {
 
   const onComplete = () => history.push(listUrl)
   const [update, updating] = useDataUpdater(clusterActions.update, onComplete)
+
+  // TypeScript is not able to infer that the customOperations are actually there so we need to work around it
   const [attach, isAttaching] = useDataUpdater((clusterActions as any).attachNodes, onComplete)
   const [detach, isDetaching] = useDataUpdater((clusterActions as any).detachNodes, onComplete)
+
   const isUpdating = updating || isAttaching || isDetaching
 
   const cluster = clusters.find((x) => x.uuid === id)

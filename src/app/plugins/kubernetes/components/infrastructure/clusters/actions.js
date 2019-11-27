@@ -271,7 +271,7 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
       return prevItems
     },
     detachNodes: async ({ cluster, nodes }, prevItems) => {
-      await qbert.attach(cluster.uuid, nodes)
+      await qbert.detach(cluster.uuid, nodes)
       // TODO: how are we supposed to update the cache here
       return prevItems
     },
