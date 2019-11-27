@@ -95,8 +95,21 @@ class ApiClient {
     return { headers }
   }
 
-  basicGet = async url => {
-    const response = await this.axiosInstance.get(url, this.getAuthHeaders())
+  rawGet = (url, config) => this.axiosInstance.get(url, config)
+
+  rawPost = (url, data, config) => this.axiosInstance.post(url, data, config)
+
+  rawPut = (url, data, config) => this.axiosInstance.put(url, data, config)
+
+  rawPatch = (url, data, config) => this.axiosInstance.patch(url, data, config)
+
+  rawDelete = (url, config) => this.axiosInstance.delete(url, config)
+
+  basicGet = async (url, params) => {
+    const response = await this.axiosInstance.get(url, {
+      params,
+      ...this.getAuthHeaders(),
+    })
     return normalizeResponse(response)
   }
 

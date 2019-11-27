@@ -1,4 +1,3 @@
-import axios from 'axios'
 import { pluck, pipe, values, head } from 'ramda'
 import { getHighestRole } from './helpers'
 import { pathJoin, capitalizeString } from 'utils/misc'
@@ -86,61 +85,55 @@ class Keystone {
   get rolesUrl () { return `${this.v3}/roles` }
 
   getProject = async (id) => {
-    const response = await axios.get(`${this.projectsUrl}/${id}`, this.client.getAuthHeaders())
-    return response.data.project
+    const data = await this.client.basicGet(`${this.projectsUrl}/${id}`)
+    return data.project
   }
 
   getProjectsAuth = async () => {
-    const response = await axios.get(this.projectsAuthUrl, this.client.getAuthHeaders(false))
+    const response = await this.client.rawGet(this.projectsAuthUrl, this.client.getAuthHeaders(false))
     return response.data.projects
   }
 
   getProjects = async (scoped = false) => {
-    const response = await axios.get(this.projectsUrl, this.client.getAuthHeaders(scoped))
+    const response = await this.client.rawGet(this.projectsUrl, this.client.getAuthHeaders(scoped))
     return response.data.projects
   }
 
   getAllTenantsAllUsers = async () => {
-    const response = await axios.get(this.allTenantsAllUsersUrl, this.client.getAuthHeaders())
-    return response.data.tenants
+    const data = await this.client.basicGet(this.allTenantsAllUsersUrl)
+    return data.tenants
   }
 
   getTenantRoleAssignments = async tenantId => {
-    const response = await axios.get(this.roleAssignments, {
-      ...this.client.getAuthHeaders(),
-      params: {
-        'scope.project.id': tenantId,
-        include_names: true,
-      },
+    const data = await this.client.basicGet(this.roleAssignments, {
+      'scope.project.id': tenantId,
+      include_names: true,
     })
-    return response.data.role_assignments
+    return data.role_assignments
   }
 
   getUserRoleAssignments = async userId => {
-    const response = await axios.get(this.roleAssignments, {
-      ...this.client.getAuthHeaders(),
-      params: {
-        'user.id': userId,
-        include_names: true,
-      },
+    const data = await this.client.basicGet(this.roleAssignments, {
+      'user.id': userId,
+      include_names: true,
     })
-    return response.data.role_assignments
+    return data.role_assignments
   }
 
   addUserRole = async ({ tenantId, userId, roleId }) => {
-    axios.put(pathJoin(
+    await this.client.basicPut(pathJoin(
       this.projectsUrl,
       `${tenantId}/users/${userId}/roles/${roleId}`,
-    ), null, this.client.getAuthHeaders())
+    ), null)
     return { tenantId, userId, roleId }
   }
 
   deleteUserRole = async ({ tenantId, userId, roleId }) => {
     try {
-      await axios.delete(pathJoin(
+      await this.client.basicDelete(pathJoin(
         this.projectsUrl,
         `${tenantId}/users/${userId}/roles/${roleId}`,
-      ), this.client.getAuthHeaders())
+      ))
       return { tenantId, userId, roleId }
     } catch (err) {
       throw new Error('Unable to delete non-existant project')
@@ -148,36 +141,36 @@ class Keystone {
   }
 
   getGroups = async () => {
-    const response = await axios.get(this.groupsUrl, this.client.getAuthHeaders())
-    return response.data.groups
+    const data = await this.client.basicGet(this.groupsUrl)
+    return data.groups
   }
 
   getGroupMappings = async () => {
-    const response = await axios.get(this.groupMappingsUrl, this.client.getAuthHeaders())
-    return response.data.mappings
+    const data = await this.client.basicGet(this.groupMappingsUrl)
+    return data.mappings
   }
 
   getRoles = async () => {
-    const response = await axios.get(this.rolesUrl, this.client.getAuthHeaders())
-    return response.data.roles
+    const data = await this.client.basicGet(this.rolesUrl)
+    return data.roles
   }
 
   createProject = async (params) => {
     const body = { project: params }
-    const response = await axios.post(this.projectsUrl, body, this.client.getAuthHeaders())
-    return response.data.project
+    const data = await this.client.basicPost(this.projectsUrl, body)
+    return data.project
   }
 
   updateProject = async (id, params) => {
     const body = { project: params }
     const url = `${this.projectsUrl}/${id}`
-    const response = await axios.put(url, body, this.client.getAuthHeaders())
-    return response.data.project
+    const data = await this.client.basicPut(url, body)
+    return data.project
   }
 
   deleteProject = async (projectId) => {
     try {
-      await axios.delete(`${this.projectsUrl}/${projectId}`, this.client.getAuthHeaders())
+      await this.client.basicDelete(`${this.projectsUrl}/${projectId}`)
       return projectId
     } catch (err) {
       throw new Error('Unable to delete non-existant project')
@@ -188,7 +181,7 @@ class Keystone {
     const body = constructAuthBody('token', this.client.unscopedToken)
     body.auth.scope = { project: { id: projectId } }
     try {
-      const response = await axios.post(this.tokensUrl, body)
+      const response = await this.client.rawPost(this.tokensUrl, body)
       const scopedToken = response.headers['x-subject-token']
       const roles = pathStr('data.token.roles', response)
       const roleNames = pluck('name', roles)
@@ -218,7 +211,7 @@ class Keystone {
   authenticate = async (username, password) => {
     const body = constructAuthBody('password', username, password)
     try {
-      const response = await axios.post(this.tokensUrl, body)
+      const response = await this.client.rawPost(this.tokensUrl, body)
       const unscopedToken = response.headers['x-subject-token']
       this.client.unscopedToken = unscopedToken
       return { unscopedToken, username }
@@ -234,11 +227,11 @@ class Keystone {
       ...authBody,
       auth: {
         ...authBody.auth,
-        scope: 'unscoped'
-      }
+        scope: 'unscoped',
+      },
     }
     try {
-      const response = await axios.post(this.tokensUrl, body)
+      const response = await this.client.rawPost(this.tokensUrl, body)
       const username = response.data.token.user.name
       const unscopedToken = response.headers['x-subject-token']
       this.client.unscopedToken = unscopedToken
@@ -251,7 +244,7 @@ class Keystone {
   renewToken = async (unscopedToken) => {
     const body = constructAuthBody('token', unscopedToken)
     try {
-      const response = await axios.post(this.tokensUrl, body)
+      const response = await this.client.rawPost(this.tokensUrl, body)
       const newUnscopedToken = response.headers['x-subject-token']
       this.client.unscopedToken = newUnscopedToken
       return newUnscopedToken
@@ -262,11 +255,12 @@ class Keystone {
   }
 
   renewScopedToken = async () => {
+    console.log('renewScopedToken')
     const body = constructAuthBody('token', this.client.unscopedToken)
     const projectId = this.client.activeProjectId
     body.auth.scope = { project: { id: projectId } }
     try {
-      const response = await axios.post(this.tokensUrl, body)
+      const response = await this.client.rawPost(this.tokensUrl, body)
       const scopedToken = response.headers['x-subject-token']
       this.client.scopedToken = scopedToken
       return scopedToken
@@ -281,18 +275,18 @@ class Keystone {
   resetCookie = async () => {
     try {
       const linksUrl = await this.getServiceEndpoint('regioninfo', 'public')
-      const authHeaders = this.client.getAuthHeaders()
-      const { data: { links } } = await axios.get(linksUrl, authHeaders)
+      const { data: { links } } = await this.client.basicGet(linksUrl)
       const token2cookieUrl = links.token2cookie
-      await axios.get(token2cookieUrl, { ...authHeaders, withCredentials: true })
+      const authHeaders = this.client.getAuthHeaders()
+      await this.client.rawGet(token2cookieUrl, { ...authHeaders, withCredentials: true })
     } catch (err) {
       console.warn('Setting session cookie for accessing hostagent rpms failed')
     }
   }
 
   getRegions = async () => {
-    const response = await axios.get(this.regionsUrl, this.client.getAuthHeaders())
-    return response.data.regions
+    const data = await this.client.basicGet(this.regionsUrl)
+    return data.regions
   }
 
   // Allow programmatic access
@@ -301,15 +295,15 @@ class Keystone {
   }
 
   getServiceCatalog = async () => {
-    const response = await axios.get(this.catalogUrl, this.client.getAuthHeaders())
-    this.client.serviceCatalog = response.data.catalog
-    return response.data.catalog
+    const data = await this.client.basicGet(this.catalogUrl)
+    this.client.serviceCatalog = data.catalog
+    return data.catalog
   }
 
   getEndpoints = async () => {
-    const response = await axios.get(this.endpointsUrl, this.client.getAuthHeaders())
-    this.client.endpoints = response.data.endpoints
-    return response.data.endpoints
+    const data = await this.client.basicGet(this.endpointsUrl)
+    this.client.endpoints = data.endpoints
+    return data.endpoints
   }
 
   getServicesForActiveRegion = async () => {
@@ -336,36 +330,36 @@ class Keystone {
   }
 
   getCredentials = async () => {
-    const response = await axios.get(this.credentialsUrl, this.client.getAuthHeaders())
-    return response.data.credentials
+    const data = await this.client.basicGet(this.credentialsUrl)
+    return data.credentials
   }
 
   getUser = async (id) => {
-    const response = await axios.get(`${this.usersUrl}/${id}`, this.client.getAuthHeaders())
-    return response.data.user
+    const data = await this.client.basicGet(`${this.usersUrl}/${id}`)
+    return data.user
   }
 
   getUsers = async () => {
-    const response = await axios.get(this.usersUrl, this.client.getAuthHeaders())
-    return response.data.users
+    const data = await this.client.basicGet(this.usersUrl)
+    return data.users
   }
 
   createUser = async (params) => {
     const body = { user: params }
-    const response = await axios.post(this.usersUrl, body, this.client.getAuthHeaders())
-    return response.data.user
+    const data = await this.client.basicPost(this.usersUrl, body)
+    return data.user
   }
 
   updateUser = async (id, params) => {
     const body = { user: params }
     const url = `${this.usersUrl}/${id}`
-    const response = await axios.patch(url, body, this.client.getAuthHeaders())
-    return response.data.user
+    const data = await this.client.basicPatch(url, body)
+    return data.user
   }
 
   deleteUser = async (userId) => {
     try {
-      await axios.delete(`${this.usersUrl}/${userId}`, this.client.getAuthHeaders())
+      await this.client.basicDelete(`${this.usersUrl}/${userId}`)
       return userId
     } catch (err) {
       throw new Error('Unable to delete non-existant user')
