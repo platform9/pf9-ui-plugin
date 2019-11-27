@@ -190,10 +190,19 @@ class Keystone {
     try {
       const response = await axios.post(this.tokensUrl, body)
       const scopedToken = response.headers['x-subject-token']
-      const user = pathStr('data.token.user', response)
       const roles = pathStr('data.token.roles', response)
       const roleNames = pluck('name', roles)
       const role = getHighestRole(roleNames)
+      const _user = pathStr('data.token.user', response)
+      // Extra properties in user are required to ensure
+      // functionality in the old UI
+      const user = {
+        ..._user,
+        username: _user.name,
+        userId: _user.id,
+        role: role,
+        displayName: _user.displayname || _user.name
+      }
       this.client.activeProjectId = projectId
       this.client.scopedToken = scopedToken
       await this.getServiceCatalog()
