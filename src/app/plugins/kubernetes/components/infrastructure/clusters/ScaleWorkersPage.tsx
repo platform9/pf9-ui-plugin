@@ -15,9 +15,23 @@ import { validators } from 'core/utils/fieldValidators'
 import SubmitButton from 'core/components/buttons/SubmitButton'
 import useParams from 'core/hooks/useParams'
 import useDataUpdater from 'core/hooks/useDataUpdater'
+import ClusterHostChooser, { isUnassignedNode, inCluster, isNotMaster } from './bareos/ClusterHostChooser'
+import { customValidator } from 'core/utils/fieldValidators'
+import { ICluster } from './model'
+import { pipe } from 'ramda'
 
 // Limit the number of workers that can be scaled at a time to prevent overload
 const MAX_SCALE_AT_A_TIME = 15
+
+const maxScaleValidator = customValidator(
+  (selections) => selections.length <= MAX_SCALE_AT_A_TIME,
+  `Clusters can only be scaled up to ${MAX_SCALE_AT_A_TIME} nodes at a time.`
+)
+
+const minScaleValidator = customValidator(
+  (selections) => selections.length > 0,
+  `You must select at least 1 node.`
+)
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -41,11 +55,13 @@ const clusterTypeDisplay = {
 }
 
 interface ScaleWorkersProps {
-  cluster: any
+  cluster: ICluster
   onSubmit(data): Promise<void> | void
+  onAttach(data): Promise<void> | void
+  onDetach(data): Promise<void> | void
 }
 
-const ScaleWorkers: FunctionComponent<ScaleWorkersProps> = ({ cluster, onSubmit }) => {
+const ScaleWorkers: FunctionComponent<ScaleWorkersProps> = ({ cluster, onSubmit, onAttach, onDetach }) => {
   const classes = useStyles({})
   const { params, getParamsUpdater } = useParams()
   const { name, cloudProviderType } = cluster
@@ -53,35 +69,11 @@ const ScaleWorkers: FunctionComponent<ScaleWorkersProps> = ({ cluster, onSubmit 
   const isCloud = ['aws', 'azure'].includes(cloudProviderType)
   const type: string = clusterTypeDisplay[cloudProviderType]
 
-  const chooseType = (
-    <div>
-      <BlockChooser
-        onChange={getParamsUpdater('scaleType')}
-        options={[
-          {
-            id: 'add',
-            title: 'Add',
-            icon: <FontAwesomeIcon size="2x" name="layer-plus" />,
-            description: 'Add worker nodes to the cluster',
-          },
-          {
-            id: 'remove',
-            icon: <FontAwesomeIcon size="2x" name="layer-minus" />,
-            title: 'Remove',
-            description: 'Remove worker nodes from the cluster',
-          },
-        ]}
-      />
-    </div>
-  )
+  const calcMin = (value: number): number =>
+    params.scaleType === 'add' ? value : Math.max(value - MAX_SCALE_AT_A_TIME, 1)
 
-  const calcMin = (value: number): number => params.scaleType === 'add'
-    ? value
-    : Math.max(value - MAX_SCALE_AT_A_TIME, 1)
-
-  const calcMax = (value: number): number => params.scaleType === 'add'
-    ? value + MAX_SCALE_AT_A_TIME
-    : value
+  const calcMax = (value: number): number =>
+    params.scaleType === 'add' ? value + MAX_SCALE_AT_A_TIME : value
 
   const chooseScaleNum = (
     <ValidatedForm initialValues={cluster} onSubmit={onSubmit}>
@@ -127,8 +119,41 @@ const ScaleWorkers: FunctionComponent<ScaleWorkersProps> = ({ cluster, onSubmit 
     </ValidatedForm>
   )
 
+  const addBareOsWorkerNodes = (
+    <ValidatedForm onSubmit={params.scaleType === 'add' ? onAttach : onDetach}>
+      <ClusterHostChooser
+        id="workersToAdd"
+        filterFn={pipe(isNotMaster, inCluster(cluster.uuid))}
+        validations={[minScaleValidator, maxScaleValidator]}
+        required
+      />
+      <SubmitButton>{params.scaleType === 'add' ? 'Add' : 'Remove'} workers</SubmitButton>
+    </ValidatedForm>
+  )
+
+  const removeBareOsWorkerNodes = null // TOOD
+
   return (
     <div>
+      {!!params.scaleType || (
+        <BlockChooser
+          onChange={getParamsUpdater('scaleType')}
+          options={[
+            {
+              id: 'add',
+              title: 'Add',
+              icon: <FontAwesomeIcon size="2x" name="layer-plus" />,
+              description: 'Add worker nodes to the cluster',
+            },
+            {
+              id: 'remove',
+              icon: <FontAwesomeIcon size="2x" name="layer-minus" />,
+              title: 'Remove',
+              description: 'Remove worker nodes from the cluster',
+            },
+          ]}
+        />
+      )}
       {isCloud && (
         <>
           <div>
@@ -141,10 +166,12 @@ const ScaleWorkers: FunctionComponent<ScaleWorkersProps> = ({ cluster, onSubmit 
               You currently have <b>{cluster.numWorkers}</b> worker nodes.
             </Typography>
           </div>
-          {params.scaleType ? chooseScaleNum : chooseType}
+          {params.scaleType && chooseScaleNum}
         </>
       )}
-      {isLocal && <div>TODO</div>}
+      {isLocal &&
+        !!params.scaleType &&
+        (params.scaleType === 'add' ? addBareOsWorkerNodes : removeBareOsWorkerNodes)}
     </div>
   )
 }
@@ -166,6 +193,9 @@ const ScaleWorkersPage: FunctionComponent = () => {
     await update({ ...cluster, ...data })
   }
 
+  const handleAttach = () => console.log('TODO: handleAttach')
+  const handleDetach = () => console.log('TODO: handleDetach')
+
   return (
     <FormWrapper
       className={classes.root}
@@ -175,7 +205,7 @@ const ScaleWorkersPage: FunctionComponent = () => {
       renderContentOnMount={false}
       message={updating ? 'Scaling cluster...' : 'Loading cluster...'}
     >
-      <ScaleWorkers cluster={cluster} onSubmit={handleSubmit} />
+      <ScaleWorkers cluster={cluster} onSubmit={handleSubmit} onAttach={handleAttach} onDetach={handleDetach} />
     </FormWrapper>
   )
 }
