@@ -1,9 +1,11 @@
 
-import React from 'react'
+import React, { useCallback } from 'react'
 import { castFuzzyBool } from 'utils/misc'
 import { compose, path } from 'ramda'
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@material-ui/core'
 import ApiClient from 'api-client/ApiClient'
+import useDataUpdater from 'core/hooks/useDataUpdater'
+import { clusterActions } from '../infrastructure/clusters/actions'
 
 export const hasLoggingEnabled = compose(castFuzzyBool, path(['tags', 'pf9-system:logging']))
 
@@ -11,8 +13,13 @@ const { appbert } = ApiClient.getInstance()
 
 const LoggingAddonDialog = ({ rows: [cluster], onClose }) => {
   const enabled = hasLoggingEnabled(cluster)
+  const [tagUpdater] = useDataUpdater(clusterActions.updateTag, success => {
+    if (success) {
+      onClose()
+    }
+  })
 
-  const toggleLogging = async () => {
+  const toggleLogging = useCallback(async () => {
     try {
       const pkgs = await appbert.getPackages()
       const logPkg = pkgs.find(pkg => (
@@ -21,18 +28,20 @@ const LoggingAddonDialog = ({ rows: [cluster], onClose }) => {
 
       if (!logPkg) {
         console.log('no logging package found')
-        onClose()
         return
       }
 
       const logId = logPkg.ID
       await appbert.toggleAddon(cluster.uuid, logId, !enabled)
-      onClose()
     } catch (e) {
       // TODO: Raise toaster notification
       console.log(e)
     }
-  }
+
+    const val = !enabled
+    const key = 'pf9-system:logging'
+    tagUpdater({ cluster, key, val })
+  }, [tagUpdater, cluster, enabled])
 
   return (
     <Dialog open onClose={onClose}>

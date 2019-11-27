@@ -265,6 +265,18 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
         canUpgrade: false,
       }), prevItems)
     },
+    updateTag: async ({ cluster, key, val }, prevItems) => {
+      const tags = cluster.tags || {}
+
+      if (key in tags) {
+        tags[key] = val
+      }
+
+      return updateWith(propEq('uuid', cluster.uuid), {
+        ...cluster,
+        tags,
+      }, prevItems)
+    },
   },
   uniqueIdentifier: 'uuid',
   dataMapper: (items,
