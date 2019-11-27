@@ -135,16 +135,17 @@ function createContextUpdater (cacheKey, dataUpdaterFn, options = {}) {
     if (!loader) {
       throw new Error(`Context Loader with key ${cacheKey} not found`)
     }
+    const loaderAdditionalOptions = { onError }
     const prevItems = await loader({
       getContext,
       setContext,
       params,
-      additionalOptions,
+      additionalOptions: loaderAdditionalOptions,
       dumpCache: true,
     })
     const loadFromContext = (key, params = emptyObj, refetch) => {
       const loaderFn = getContextLoader(key)
-      return loaderFn({ getContext, setContext, params, refetch, additionalOptions })
+      return loaderFn({ getContext, setContext, params, refetch, additionalOptions: loaderAdditionalOptions })
     }
     try {
       const output = await dataUpdaterFn(params, prevItems, loadFromContext)
@@ -162,7 +163,7 @@ function createContextUpdater (cacheKey, dataUpdaterFn, options = {}) {
           getContext,
           setContext,
           params,
-          additionalOptions,
+          additionalOptions: loaderAdditionalOptions,
         })
         const parsedSuccessMesssage = ensureFunction(successMessage)(updatedItems, prevItems, params, operation)
         await onSuccess(parsedSuccessMesssage, params)
