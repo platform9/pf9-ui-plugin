@@ -48,7 +48,11 @@ class ValidatedForm extends PureComponent {
    * This function will be called by the child components when they are initialized.
    */
   defineField = moize(field => spec => {
-    this.setState(setStateLens(spec, ['fields', field]))
+    this.setState(setStateLens(spec, ['fields', field]), () => {
+      if (this.state.showingErrors) {
+        this.validateField(field)(null)
+      }
+    })
   })
 
   removeField = field => {
@@ -108,6 +112,10 @@ class ValidatedForm extends PureComponent {
    */
   validateField = moize(field => () => {
     const { fields, values } = this.state
+    // Skip validation if the field has not been defined yet
+    if (!fields.hasOwnProperty(field)) {
+      return true
+    }
     const fieldValue = values[field]
     const { validations } = fields[field]
 
