@@ -211,7 +211,7 @@ class CardTable extends PureComponent {
       <Progress loading={loading} overlay renderContentOnMount>
         <Grid container justify="center">
           <Grid item xs={12} zeroMinWidth>
-            <Paper className={classes.root}>
+            <Paper className={classes.root} elevation={0}>
               <CardTableToolbar
                 title={title}
                 sorting={sorting}
