@@ -50,7 +50,7 @@ export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
     loadFromContext,
   ) => {
     const currentTenant = prevItems.find(propEq('id', tenantId))
-    const [users, prevRoleAssignmentsArr] = Promise.all([
+    const [users, prevRoleAssignmentsArr] = await Promise.all([
       loadFromContext(mngmUsersCacheKey),
       loadFromContext(mngmTenantRoleAssignmentsCacheKey, {
         tenantId,
