@@ -44,7 +44,24 @@ const awsCloudProps = cluster => ({
   'Spot Price': cluster.spotPrice */
 })
 
-// TODO: Need to add Azure cloud properties
+const azureCloudProps = cluster => ({
+  Location: cluster.location,
+  'SSH Key': cluster.sshKey,
+  'Assign Public Ips': cluster.assignPublicIps,
+  'Master Sku': cluster.masterSku,
+  'Master Scale Set Name': cluster.masterScaleSetName,
+  'Worker Sku': cluster.workerSku,
+  'Worker Scale Set Name': cluster.workerScaleSetName,
+  Zones: cluster.zones,
+  'Primary Scale Set Name': cluster.primaryScaleSetName,
+  'Resource Group': cluster.resourceGroup,
+  'Security Group Name': cluster.securityGroupName,
+  'Subnet Name': cluster.subnetName,
+  'VNet Name': cluster.vnetName,
+  'VNet Resource Name': cluster.vnetResourceGroup,
+  'Load Balance IP': cluster.loadbalancerIP,
+})
+
 const renderCloudInfo = cluster => {
   switch (cluster.cloudProviderType) {
     case 'aws':
@@ -59,6 +76,13 @@ const renderCloudInfo = cluster => {
         <InfoPanel
           title="OpenStack Properties"
           items={openstackProps(cluster.cloudProperties)}
+        />
+      )
+    case 'azure':
+      return (
+        <InfoPanel
+          title="Cloud Properties"
+          items={azureCloudProps(cluster.cloudProperties)}
         />
       )
     default:
