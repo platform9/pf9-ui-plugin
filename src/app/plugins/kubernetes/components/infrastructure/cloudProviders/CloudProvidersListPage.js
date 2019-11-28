@@ -77,18 +77,10 @@ export const options = {
   ],
   cacheKey: cloudProvidersCacheKey,
   editUrl: '/ui/kubernetes/infrastructure/cloudProviders/edit',
-  editCond: ([selectedRow]) => {
-    return selectedRow.type !== 'openstack'
-  },
-  editDisabledInfo: ([selectedRow]) => {
-    return 'Editing an Openstack cloud provider is not currently supported'
-  },
-  deleteCond: ([selectedRow]) => {
-    return selectedRow.type !== 'local'
-  },
-  deleteDisabledInfo: () => {
-    return 'Deleting local cloud provider is not currently supported'
-  },
+  editCond: ([selectedRow]) => selectedRow.type !== 'openstack',
+  editDisabledInfo: () => 'Editing an Openstack cloud provider is not currently supported',
+  deleteCond: ([selectedRow]) => selectedRow.type !== 'local',
+  deleteDisabledInfo: () => 'Deleting local cloud provider is not currently supported',
   name: 'CloudProviders',
   rowActions: [],
   title: 'Cloud Providers',
