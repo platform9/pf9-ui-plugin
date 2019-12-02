@@ -23,7 +23,7 @@ class PreferencesComponent extends PureComponent {
     },
 
     getUserPreferences: () => {
-      const { session } = this.props.context
+      const { session } = this.props
       // Try to get preferences from session, otherwise get it from localStorage
       return propOr(
         getStorageUserPrefs(session.username),
@@ -31,7 +31,7 @@ class PreferencesComponent extends PureComponent {
         session)
     },
 
-    // Utility function that sets both context.session.userPreferences[key] and
+    // Utility function that sets both session.userPreferences[key] and
     // also sets it in localStorage
     updateScopedUserPreferences: curry(async (scopeKey, values) => {
       const { getScopedUserPreferences } = this.state
@@ -45,14 +45,14 @@ class PreferencesComponent extends PureComponent {
       await this.props.updateSession(['userPreferences', scopeKey], newValue)
 
       // Update local storage
-      const { username } = this.props.context.session
+      const { username } = this.props.session
       const prefs = getStorageUserPrefs(username)
       prefs[scopeKey] = newValue
       setUserPrefs(username, prefs)
     }),
 
     getScopedUserPreferences: moize(key => {
-      const { session } = this.props.context
+      const { session } = this.props
       // Try to get preferences from session, otherwise get it from localStorage
       return pathOr(
         getStorageUserPrefs(session.username)[key],

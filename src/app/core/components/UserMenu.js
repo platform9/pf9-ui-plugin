@@ -31,9 +31,9 @@ class UserMenu extends React.PureComponent {
   logout = () => this.props.history.push(logoutUrl)
 
   render () {
-    const { classes, className, context } = this.props
+    const { classes, className, session } = this.props
     const { anchorEl } = this.state
-    const username = context.session.username || '?'
+    const username = session.username || '?'
 
     return (
       <div className={`${classes.avatar} ${className}`}>

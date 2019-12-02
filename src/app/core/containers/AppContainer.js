@@ -35,7 +35,7 @@ const AppContainer = props => {
   const { history } = useReactRouter()
   const [, initUserPreferences] = usePreferences()
   const { updatePrefs } = useScopedPreferences('Tenants')
-  const { initialized, session, appLoaded, getContext, setContext } = useContext(AppContext)
+  const { initialized, initSession, session, appLoaded, getContext, setContext } = useContext(AppContext)
 
   useEffect(() => {
     const unlisten = history.listen((location, action) => {
@@ -84,8 +84,6 @@ const AppContainer = props => {
 
   // Handler that gets invoked on successful authentication
   const setupSession = async ({ username, unscopedToken }) => {
-    const { initSession } = getContext()
-
     await setContext({
       appLoaded: true,
       initialized: false

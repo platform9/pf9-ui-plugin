@@ -1,31 +1,25 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import Panel from './Panel'
-import { compose, lensPath, set } from 'ramda'
+import { lensPath, set } from 'ramda'
 import { TextField } from '@material-ui/core'
-import { withAppContext } from 'core/providers/AppProvider'
-import { withStyles } from '@material-ui/styles'
+import { AppContext } from 'core/providers/AppProvider'
 
-const styles = theme => ({
-})
-
-const MiscPanel = ({ context, setContext }) => {
+const MiscPanel = () => {
+  const { theme, setContext } = useContext(AppContext)
   const handleChange = path => e => {
     const lens = lensPath(path.split('.'))
     const { value } = e.target
-    setContext({ theme: set(lens, value, context.theme) })
+    setContext({ theme: set(lens, value, theme) })
   }
 
   return (
     <Panel title="Misc">
       <div>
         spacing.unit &nbsp;
-        <TextField type="number" value={context.theme.spacing(1)} onChange={handleChange('spacing.unit')} />
+        <TextField type="number" value={theme.spacing(1)} onChange={handleChange('spacing.unit')} />
       </div>
     </Panel>
   )
 }
 
-export default compose(
-  withAppContext,
-  withStyles(styles),
-)(MiscPanel)
+export default MiscPanel

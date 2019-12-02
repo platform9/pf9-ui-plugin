@@ -9,6 +9,7 @@ import { pick } from 'ramda'
 
 const defaultParams = {
   masterNodeClusters: true,
+  clusterId: null
 }
 const usePrefParams = createUsePrefParamsHook('ClusterRoles', listTablePrefs)
 
