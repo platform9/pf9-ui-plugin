@@ -10,7 +10,7 @@ import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import BlockChooser from 'core/components/BlockChooser'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
-//import { validators, customValidator } from 'core/utils/fieldValidators'
+// import { validators, customValidator } from 'core/utils/fieldValidators'
 import SubmitButton from 'core/components/buttons/SubmitButton'
 import useParams from 'core/hooks/useParams'
 import useDataUpdater from 'core/hooks/useDataUpdater'
@@ -44,14 +44,14 @@ interface IConstraint {
 
 export const scaleConstraints: IConstraint[] = [
   // shrink
-  { startNum: 1, desiredNum: 0, relation: 'deny', message: 'You can not remove master node from a single master cluster. (If you wish to delete the cluster, please choose the ‘delete’ operation on the cluster on the infrastructure page instead', },
-  { startNum: 2, desiredNum: 1, relation: 'warn', message: 'Removing this master node will reduce the total number of masters in this cluster down to 1. For cluster high availability we recommend always having 3 masters nodes in a cluster', },
+  { startNum: 1, desiredNum: 0, relation: 'deny', message: 'You can not remove master node from a single master cluster. (If you wish to delete the cluster, please choose the ‘delete’ operation on the cluster on the infrastructure page instead' },
+  { startNum: 2, desiredNum: 1, relation: 'warn', message: 'Removing this master node will reduce the total number of masters in this cluster down to 1. For cluster high availability we recommend always having 3 masters nodes in a cluster' },
   { startNum: 3, desiredNum: 2, relation: 'warn', message: 'For high availability, we recommend having atleast 3 masters in a cluster at any time. Removing this master will result in an even number of masters for this cluster (2 master nodes after removal of this node). We recommend having an odd number of masters for your cluster at any time.' },
   { startNum: 4, desiredNum: 3, relation: 'allow', message: '' },
   { startNum: 5, desiredNum: 4, relation: 'warn', message: 'Removing this master node will result in an even number of master nodes for this cluster (4 master nodes after removal of this node). We recommend having an odd number of masters for your cluster at any time.' },
 
   // grow
-  { startNum: 1, desiredNum: 2, relation: 'deny', message: 'You can not add master nodes to a single master cluster. (You need to create a multi-master cluster with atleast 2 masters before you can add more masters to the cluster).', },
+  { startNum: 1, desiredNum: 2, relation: 'deny', message: 'You can not add master nodes to a single master cluster. (You need to create a multi-master cluster with atleast 2 masters before you can add more masters to the cluster).' },
   { startNum: 2, desiredNum: 3, relation: 'allow', message: '' },
   { startNum: 3, desiredNum: 4, relation: 'warn', message: 'Adding this master node will result in an even number of master nodes for this cluster (4 master nodes after adding of this node). We recommend having an odd number of masters for your cluster at any time.' },
   { startNum: 4, desiredNum: 5, relation: 'allow', message: '' },
