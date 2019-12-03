@@ -41,6 +41,7 @@ const createCRUDComponents = options => {
     rowActions = [],
     uniqueIdentifier = 'id',
     addText = 'Add',
+    emptyText = 'No data found',
     addButton,
     addUrl,
     AddDialog,
@@ -69,6 +70,7 @@ const createCRUDComponents = options => {
       <ListTable
         {...rest}
         onAdd={null}
+        emptyText={emptyText}
         columns={columns}
         deleteCond={deleteCond}
         deleteDisabledInfo={deleteDisabledInfo}
