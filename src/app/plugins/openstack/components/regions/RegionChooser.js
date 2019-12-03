@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, useContext } from 'react'
+import React, { useState, useCallback, useMemo, useContext, useEffect } from 'react'
 import useReactRouter from 'use-react-router'
 import Selector from 'core/components/Selector'
 import { pluck, propEq, find, pipe, head, prop, assoc } from 'ramda'
@@ -58,6 +58,11 @@ const RegionChooser = props => {
   const handleTooltipOpen = useCallback(() => setTooltipOpen(true))
 
   const regionNames = useMemo(() => pluck('id', regions), [regions])
+
+  useEffect(() => {
+    const lastRegion = regions.find(propEq('id', curRegion))
+    updatePrefs({ lastRegion })
+  }, [curRegion])
 
   return (
     <Tooltip
