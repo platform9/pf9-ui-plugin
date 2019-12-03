@@ -21,6 +21,7 @@ import ClusterHostChooser, {
 } from './bareos/ClusterHostChooser'
 import { ICluster } from './model'
 import { allPass } from 'ramda'
+import Alert from 'core/components/Alert'
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -42,16 +43,17 @@ interface IConstraint {
   message: string
 }
 
+// To eliminate excessive branching logic, an explicit state transition table is used.
 export const scaleConstraints: IConstraint[] = [
   // shrink
-  { startNum: 1, desiredNum: 0, relation: 'deny', message: 'You can not remove master node from a single master cluster. (If you wish to delete the cluster, please choose the ‘delete’ operation on the cluster on the infrastructure page instead' },
+  { startNum: 1, desiredNum: 0, relation: 'deny', message: 'You cannot remove master node from a single master cluster. (If you wish to delete the cluster, please choose the ‘delete’ operation on the cluster on the infrastructure page instead' },
   { startNum: 2, desiredNum: 1, relation: 'warn', message: 'Removing this master node will reduce the total number of masters in this cluster down to 1. For cluster high availability we recommend always having 3 masters nodes in a cluster' },
-  { startNum: 3, desiredNum: 2, relation: 'warn', message: 'For high availability, we recommend having atleast 3 masters in a cluster at any time. Removing this master will result in an even number of masters for this cluster (2 master nodes after removal of this node). We recommend having an odd number of masters for your cluster at any time.' },
+  { startNum: 3, desiredNum: 2, relation: 'warn', message: 'For high availability, we recommend having a tleast 3 masters in a cluster at any time. Removing this master will result in an even number of masters for this cluster (2 master nodes after removal of this node). We recommend having an odd number of masters for your cluster at any time.' },
   { startNum: 4, desiredNum: 3, relation: 'allow', message: '' },
   { startNum: 5, desiredNum: 4, relation: 'warn', message: 'Removing this master node will result in an even number of master nodes for this cluster (4 master nodes after removal of this node). We recommend having an odd number of masters for your cluster at any time.' },
 
   // grow
-  { startNum: 1, desiredNum: 2, relation: 'deny', message: 'You can not add master nodes to a single master cluster. (You need to create a multi-master cluster with atleast 2 masters before you can add more masters to the cluster).' },
+  { startNum: 1, desiredNum: 2, relation: 'deny', message: 'You cannot add master nodes to a single master cluster. (You need to create a multi-master cluster with at least 2 masters before you can add more masters to the cluster).' },
   { startNum: 2, desiredNum: 3, relation: 'allow', message: '' },
   { startNum: 3, desiredNum: 4, relation: 'warn', message: 'Adding this master node will result in an even number of master nodes for this cluster (4 master nodes after adding of this node). We recommend having an odd number of masters for your cluster at any time.' },
   { startNum: 4, desiredNum: 5, relation: 'allow', message: '' },
@@ -75,28 +77,45 @@ const ScaleMasters: FunctionComponent<ScaleMasterProps> = ({
 }) => {
   const { params, getParamsUpdater } = useParams()
 
-  const addBareOsMasterNodes = (
-    <ValidatedForm onSubmit={params.scaleType === 'add' ? onAttach : onDetach}>
-      <ClusterHostChooser id="mastersToAdd" filterFn={isUnassignedNode} validations={[]} required />
-      <SubmitButton>{params.scaleType === 'add' ? 'Add' : 'Remove'} masters</SubmitButton>
-    </ValidatedForm>
-  )
+  const isMaster = node => node.isMaster === 1 // Backend returns integer 0 and 1 instead of true and false
+  const numMasters =(cluster.nodes || []).filter(isMaster).length
+  const delta = params.scaleType === 'add' ? 1 : -1
+  const desiredMasters = numMasters + delta
+  const transition = scaleConstraints.find(t => t.startNum === numMasters && t.desiredNum === desiredMasters)
 
-  const removeBareOsMasterNodes = (
-    <ValidatedForm onSubmit={params.scaleType === 'add' ? onAttach : onDetach}>
-      <ClusterHostChooser
-        id="mastersToRemove"
-        filterFn={allPass([isNotMaster, inCluster(cluster.uuid)])}
-        validations={[]}
-        required
-      />
-      <SubmitButton>{params.scaleType === 'add' ? 'Add' : 'Remove'} masters</SubmitButton>
-    </ValidatedForm>
-  )
+  const addBareOsMasterNodes = () => {
+    const { message, relation } = transition
+    if (relation === 'deny') return <Alert message={message} variant="error" />
+    return (
+      <ValidatedForm onSubmit={params.scaleType === 'add' ? onAttach : onDetach}>
+        {relation === 'warn' && <Alert message={message} variant="warning" />}
+        <ClusterHostChooser id="mastersToAdd" filterFn={isUnassignedNode} validations={[]} multiple={false} required />
+        <SubmitButton>{params.scaleType === 'add' ? 'Add' : 'Remove'} masters</SubmitButton>
+      </ValidatedForm>
+    )
+  }
+
+  const removeBareOsMasterNodes = () => {
+    const { message, relation } = transition
+    if (relation === 'deny') return <Alert message={message} variant="error" />
+    return (
+      <ValidatedForm onSubmit={params.scaleType === 'add' ? onAttach : onDetach}>
+        {relation === 'warn' && <Alert message={message} variant="warning" />}
+        <ClusterHostChooser
+          id="mastersToRemove"
+          filterFn={allPass([isNotMaster, inCluster(cluster.uuid)])}
+          validations={[]}
+          multiple={false}
+          required
+        />
+        <SubmitButton>{params.scaleType === 'add' ? 'Add' : 'Remove'} masters</SubmitButton>
+      </ValidatedForm>
+    )
+  }
 
   return (
     <div>
-      {!!params.scaleType || (
+      {!params.scaleType && (
         <BlockChooser
           onChange={getParamsUpdater('scaleType')}
           options={[
@@ -116,7 +135,7 @@ const ScaleMasters: FunctionComponent<ScaleMasterProps> = ({
         />
       )}
       {!!params.scaleType &&
-        (params.scaleType === 'add' ? addBareOsMasterNodes : removeBareOsMasterNodes)}
+        (params.scaleType === 'add' ? addBareOsMasterNodes() : removeBareOsMasterNodes())}
     </div>
   )
 }

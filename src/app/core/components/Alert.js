@@ -58,7 +58,7 @@ const useStyles = makeStyles(theme => ({
   },
 }))
 
-const Alert = ({ children, message, variant, small }) => {
+const Alert = ({ children, message, variant, small, showClose }) => {
   const classes = useStyles({ small })
   const [open, setOpen] = useState(true)
   if (!open) { return null }
@@ -69,15 +69,17 @@ const Alert = ({ children, message, variant, small }) => {
       <Icon className={clsx(classes.icon, classes.iconVariant, classes[variant])} />
       {message && <Typography variant="body1" color="inherit" className={classes.message}>{message}</Typography>}
       {children}
-      <IconButton
-        key='close'
-        aria-label='Close'
-        color='inherit'
-        className={classes.close}
-        onClick={() => setOpen(false)}
-      >
-        <CloseIcon />
-      </IconButton>
+      {showClose &&
+        <IconButton
+          key='close'
+          aria-label='Close'
+          color='inherit'
+          className={classes.close}
+          onClick={() => setOpen(false)}
+        >
+          <CloseIcon />
+        </IconButton>
+      }
     </Paper>
   )
 }
@@ -90,6 +92,12 @@ Alert.propTypes = {
   message: PropTypes.node,
 
   variant: PropTypes.oneOf(['success', 'warning', 'error', 'info']).isRequired,
+  small: PropTypes.bool,
+  showClose: PropTypes.bool,
+}
+
+Alert.defaultProps = {
+  showClose: false,
 }
 
 export default Alert
