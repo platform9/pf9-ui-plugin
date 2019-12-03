@@ -106,6 +106,13 @@ const AppContainer = props => {
     const { scopedToken, user, role } = await keystone.changeProjectScope(activeTenant.id)
     await keystone.resetCookie()
 
+    // Identify the user in Segment using Keystone ID
+    if (typeof analytics != 'undefined') {
+      analytics.identify(user.id, {
+        email: user.name,
+      })
+    }
+
     updatePrefs({ lastTenant: activeTenant })
     setStorage('userTenants', tenants)
     setStorage('user', user)
