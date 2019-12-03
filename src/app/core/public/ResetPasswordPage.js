@@ -21,7 +21,7 @@ import TextField from 'core/components/validatedForm/TextField'
 import Alert from 'core/components/Alert'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import { compose } from 'utils/fp'
-import { loginUrl, resetPasswordApiUrl } from 'app/constants.js'
+import { loginUrl, resetPasswordApiUrl, resetPasswordUrl } from 'app/constants.js'
 
 const styles = theme => ({
   root: {
@@ -116,24 +116,21 @@ const ResetPasswordPage = props => {
       return
     }
 
-    updateParams({
-      loading: true
+    await updateParams({
+      loading: true,
     })
 
-    const body = { username: params.emailId, password: params.confirmPassword }
-    let newState
-
     try {
-      const response = await axios.post(resetPasswordApiUrl, body)
+      const body = { username: params.emailId, password: params.confirmPassword }
+      const newResetPasswordApiUrl =
+        resetPasswordApiUrl + history.location.pathname.replace(resetPasswordUrl, '')
+      const response = await axios.post(newResetPasswordApiUrl, body)
 
-      newState =
-        response.status === 200
-          ? { isSetNewPasswordSuccessful: true }
-          : { isError: true }
+      response.status === 200
+        ? updateParams({ isSetNewPasswordSuccessful: true, loading: false })
+        : updateParams({ isError: true, loading: false })
     } catch (err) {
-      newState = { isError: true }
-    } finally {
-      updateParams({ ...newState, loading: false })
+      updateParams({ isError: true, loading: false })
     }
   }
 

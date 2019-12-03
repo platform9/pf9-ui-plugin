@@ -79,6 +79,11 @@ const AppContainer = props => {
       }
     }
     await setContext({ appLoaded: true })
+
+    if (history.location.pathname === forgotPasswordUrl) return history.push(forgotPasswordUrl)
+
+    if (history.location.pathname.includes(resetPasswordUrl)) return history.push(history.location.pathname)
+
     history.push(loginUrl)
   }
 
