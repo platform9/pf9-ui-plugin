@@ -1,9 +1,11 @@
 
-import React from 'react'
+import React, { useCallback } from 'react'
 import { castFuzzyBool } from 'utils/misc'
 import { compose, path } from 'ramda'
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@material-ui/core'
 import ApiClient from 'api-client/ApiClient'
+import useDataUpdater from 'core/hooks/useDataUpdater'
+import { clusterActions } from '../infrastructure/clusters/actions'
 
 export const hasPrometheusEnabled = compose(castFuzzyBool, path(['tags', 'pf9-system:monitoring']))
 
@@ -11,26 +13,35 @@ const { appbert } = ApiClient.getInstance()
 
 const PrometheusAddonDialog = ({ rows: [cluster], onClose }) => {
   const enabled = hasPrometheusEnabled(cluster)
-  const toggleMonitoring = () => {
+  const [tagUpdater] = useDataUpdater(clusterActions.updateTag, success => {
+    if (success) {
+      onClose()
+    }
+  })
+
+  const toggleMonitoring = useCallback(async () => {
     try {
-      appbert.getPackages().then(pkgs => {
-        const monPkg = (pkgs || []).filter(pkg => (
-          pkg.name === 'pf9-mon'
-        ))
-        if (monPkg === null || monPkg.length === 0) {
-          console.log('no monitoring package found')
-          onClose()
-          return
-        }
-        const monId = monPkg[0].ID
-        appbert.toggleAddon(cluster.uuid, monId, !enabled).then(() => {
-          onClose()
-        })
-      })
+      const pkgs = await appbert.getPackages()
+      const monPkg = pkgs.find(pkg => (
+        pkg.name === 'pf9-mon'
+      ))
+
+      if (!monPkg) {
+        console.log('no monitoring package found')
+        return
+      }
+
+      const monId = monPkg.ID
+      await appbert.toggleAddon(cluster.uuid, monId, !enabled)
     } catch (e) {
+      // TODO: Raise toaster notification
       console.log(e)
     }
-  }
+
+    const val = !enabled
+    const key = 'pf9-system:monitoring'
+    tagUpdater({ cluster, key, val })
+  }, [tagUpdater, cluster, enabled])
 
   return (
     <Dialog open onClose={onClose}>
