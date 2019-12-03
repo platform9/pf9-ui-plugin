@@ -32,7 +32,8 @@ export const columns = [
 export const options = {
   cacheKey: prometheusInstancesCacheKey,
   addUrl: '/ui/kubernetes/prometheus/instances/add',
-  addText: 'New Instance',
+  addText: 'New Monitoring Stack',
+  emptyText: 'Please enable monitoring on at least one cluster',
   columns,
   editUrl: '/ui/kubernetes/prometheus/instances/edit',
   name: 'PrometheusInstances',
