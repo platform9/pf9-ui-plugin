@@ -3,6 +3,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import endpointsActions from './actions'
 import ExternalLink from 'core/components/ExternalLink'
+import { qbertApiLink } from 'app/constants'
 
 const useStyles = makeStyles(theme => ({
   link: {
@@ -31,7 +32,7 @@ const EndpointsListPage = () => {
     <>
       <h2>API Endpoints</h2>
       <ListPage />
-      <ExternalLink className={classes.link} url="https://docs.platform9.com/kubernetes/Qbert-API-Reference">See Qbert API documentation</ExternalLink>
+      <ExternalLink className={classes.link} url={qbertApiLink}>See Qbert API documentation</ExternalLink>
     </>
   )
 }
