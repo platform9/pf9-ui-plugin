@@ -31,7 +31,7 @@ const EndpointsListPage = () => {
     <>
       <h2>API Endpoints</h2>
       <ListPage />
-      <ExternalLink className={classes.link} url="/clarity/docs/qbert/">See qbert API Documentation</ExternalLink>
+      <ExternalLink className={classes.link} url="https://docs.platform9.com/kubernetes/Qbert-API-Reference">See Qbert API documentation</ExternalLink>
     </>
   )
 }
