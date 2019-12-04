@@ -94,9 +94,10 @@ const renderStatus = (status,
     case 'updating':
     case 'deleting':
     case 'upgrading': {
+      const spanContent = `The cluster is ${taskStatus}.`
       return (
         <ClusterSync taskStatus={taskStatus}>
-          <ClusterStatusSpan title="The cluster is spinning down.">
+          <ClusterStatusSpan title={spanContent}>
             {capitalizeString(taskStatus)}
           </ClusterStatusSpan>
         </ClusterSync>
@@ -141,11 +142,11 @@ const renderNodeLink = ({ uuid, name }) => (
 
 const NodesCell = ({ nodes }) => {
   const classes = useStyles()
+  const [expanded, setExpanded] = useState(false)
 
   if (!nodes || !nodes.length) {
     return <div>0</div>
   }
-  const [expanded, setExpanded] = useState(false)
   return (
     <div>
       {expanded ? (
