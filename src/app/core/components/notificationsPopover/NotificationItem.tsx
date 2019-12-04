@@ -14,13 +14,14 @@ const useStyles = makeStyles(theme => ({
   },
   icon: {
     marginTop: theme.spacing(1),
-    width: theme.spacing(9),
+    minWidth: theme.spacing(6),
     fontWeight: 'bold',
     color: theme.palette.error.main,
   },
   content: {
     display: 'flex',
-    flexFlow: 'column nowrap'
+    flexFlow: 'column nowrap',
+    paddingRight: theme.spacing(2),
   },
 }))
 
