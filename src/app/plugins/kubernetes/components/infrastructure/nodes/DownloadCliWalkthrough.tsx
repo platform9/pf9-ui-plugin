@@ -37,7 +37,7 @@ const DownloadCliWalkthrough = (): JSX.Element => {
         the instructions below to download the CLI
       </Typography>
       <p>
-        <AnyLink src="">What is BareOS?</AnyLink>
+        <AnyLink src="https://docs.platform9.com/kubernetes/on-premise-kubernetes/what-is-bareos">What is BareOS?</AnyLink>
       </p>
       <p> </p>
       <Typography variant="h6">Pre-requisites</Typography>
