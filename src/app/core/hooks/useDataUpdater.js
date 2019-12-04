@@ -3,6 +3,7 @@ import { useToast } from 'core/providers/ToastProvider'
 import { AppContext } from 'core/providers/AppProvider'
 import { emptyObj } from 'utils/fp'
 import { isEmpty } from 'ramda'
+import { useNotifications } from 'core/components/notificationsPopover/NotificationsPopover'
 
 /**
  * Hook to update data using the specified updater function
@@ -21,6 +22,7 @@ const useDataUpdater = (updaterFn, onComplete) => {
   const [loading, setLoading] = useState(false)
   const { getContext, setContext } = useContext(AppContext)
   const showToast = useToast()
+  const [registerNotification] = useNotifications()
   const additionalOptions = useMemo(() => ({
     onSuccess: (successMessage, params) => {
       const key = updaterFn.getKey()
@@ -31,8 +33,9 @@ const useDataUpdater = (updaterFn, onComplete) => {
       const key = updaterFn.getKey()
       console.error(`Error when updating items for entity "${key}"`, catchedErr)
       showToast(errorMessage + `\n${catchedErr.message || catchedErr}`, 'error')
+      registerNotification(errorMessage, catchedErr.message || catchedErr, 'error')
     },
-  }), [showToast])
+  }), [])
 
   // The following function will handle the calls to the data updating and
   // set the loading state variable to true in the meantime, while also taking care

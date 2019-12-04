@@ -3,11 +3,20 @@ import { assocPath, flatten, Dictionary, assoc, mergeLeft } from 'ramda'
 import { dataCacheKey, paramsCacheKey } from 'core/helpers/createContextLoader'
 import useStateAsync from 'core/hooks/useStateAsync'
 
+export interface Notification {
+  id: string
+  title: string
+  message: string
+  date: string
+  type: 'warning' | 'error' | 'info'
+}
+
 interface IAppContext {
   initialized: boolean
   session: Dictionary<string>
   [dataCacheKey]: any[]
   [paramsCacheKey]: any[]
+  notifications: Notification[]
   currentTenant?: string
   currentRegion?: string
   userDetails?: any
@@ -26,6 +35,7 @@ const initialContext: IAppContext = {
   session: {},
   [dataCacheKey]: [],
   [paramsCacheKey]: [],
+  notifications: []
 }
 
 export const AppContext = React.createContext<IAppContext & IAppContextActions>({
@@ -56,6 +66,7 @@ const AppProvider = ({ children }) => {
     await setContextBase(mergeLeft({
       [dataCacheKey]: [],
       [paramsCacheKey]: [],
+      notifications: [],
       session: {},
       currentTenant: null,
       userDetails: null,

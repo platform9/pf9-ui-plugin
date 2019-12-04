@@ -1,13 +1,13 @@
 import React, { useCallback, useState } from 'react'
 import { except } from 'app/utils/fp'
 import { Typography } from '@material-ui/core'
-import { makeStyles, createStyles } from '@material-ui/styles'
+import { makeStyles } from '@material-ui/styles'
 import ExpansionPanel from 'core/components/expansionPanel/ExpansionPanel'
 import { Link } from 'react-router-dom'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import RightAlign from 'core/components/RightAlign'
 
-const useStyles = makeStyles(theme => createStyles({
+const useStyles = makeStyles(theme => ({
   root: {
     padding: '20px 40px 80px',
     background: '#f3f3f4',

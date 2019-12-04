@@ -5,11 +5,13 @@ import { isEmpty } from 'ramda'
 import { useToast } from 'core/providers/ToastProvider'
 import { AppContext } from 'core/providers/AppProvider'
 import { memoizedDep } from 'utils/misc'
+import { useNotifications } from 'core/components/notificationsPopover/NotificationsPopover'
 
-const onErrorHandler = moize((loaderFn, showToast) => (errorMessage, catchedErr, params) => {
+const onErrorHandler = moize((loaderFn, showToast, registerNotification) => (errorMessage, catchedErr, params) => {
   const key = loaderFn.getKey()
   console.error(`Error when fetching items for entity "${key}"`, catchedErr)
   showToast(errorMessage + `\n${catchedErr.message || catchedErr}`, 'error')
+  registerNotification(errorMessage, catchedErr.message || catchedErr, 'error')
 })
 
 /**
@@ -43,14 +45,15 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
   const [data, setData] = useState(emptyArr)
   const { getContext, setContext, currentTenant, currentRegion } = useContext(AppContext)
   const showToast = useToast()
+  const [registerNotification] = useNotifications()
 
   // Set a custom error handler for all loading functions using this hook
   // We do this here because we have access to the ToastContext, unlike in the dataLoader functions
   const additionalOptions = useMemo(() => ({
     // Even if using useMemo, every instance of useDataLoader will create a new function, thus
     // forcing the recalling of the loading function as the memoization of the promise will not work,
-    //  so we are forced to create a memoized error handler outside of the hook
-    onError: onErrorHandler(loaderFn, showToast),
+    // so we are forced to create a memoized error handler outside of the hook
+    onError: onErrorHandler(loaderFn, showToast, registerNotification),
   }), [])
 
   // The following function will handle the calls to the data loading and
