@@ -97,7 +97,7 @@ const EditUserPage = () => {
             {({ values }) => <>
               <ToggableTextField id="username" label="Username or Email" initialValue={user.username} required />
               <ToggableTextField id="displayname" label="Display Name" initialValue={user.displayname} />
-              <ToggableTextField id="password" label="Password" initialValue={user.password || '********'} value={values.password} TextFieldComponent={UserPasswordField} />
+              <ToggableTextField id="password" label="Password" initialValue={'********'} value={values.password} TextFieldComponent={UserPasswordField} />
             </>}
           </ValidatedForm>
         </WizardStep>
