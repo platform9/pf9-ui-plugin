@@ -58,9 +58,10 @@ const RegionChooser = props => {
   const regionNames = useMemo(() => pluck('id', regions), [regions])
 
   useEffect(() => {
+    if (!curRegionId || !regions.length) { return }
     const lastRegion = regions.find(propEq('id', curRegionId))
     updatePrefs({ lastRegion })
-  }, [curRegionId])
+  }, [curRegionId, regions])
 
   return (
     <Tooltip
