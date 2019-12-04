@@ -24,7 +24,7 @@ const RegionChooser = props => {
   const [regions, loadingRegions] = useDataLoader(regionActions.list)
   const { setContext } = useContext(AppContext)
   const [selectedRegion, setRegion] = useState()
-  const curRegion = useMemo(() => {
+  const curRegionId = useMemo(() => {
     if (selectedRegion) {
       return selectedRegion
     }
@@ -38,8 +38,6 @@ const RegionChooser = props => {
     const [currentSection = appUrlRoot] = currentSectionRegex.exec(pathname + hash) || []
     setLoading(true)
     setRegion(region)
-    const lastRegion = regions.find(propEq('id', region))
-    await updatePrefs({ lastRegion })
     setActiveRegion(region)
     await keystone.resetCookie()
     invalidateLoadersCache()
@@ -60,9 +58,9 @@ const RegionChooser = props => {
   const regionNames = useMemo(() => pluck('id', regions), [regions])
 
   useEffect(() => {
-    const lastRegion = regions.find(propEq('id', curRegion))
+    const lastRegion = regions.find(propEq('id', curRegionId))
     updatePrefs({ lastRegion })
-  }, [curRegion])
+  }, [curRegionId])
 
   return (
     <Tooltip
@@ -76,7 +74,7 @@ const RegionChooser = props => {
         onMouseLeave={handleTooltipClose}
         onClick={handleTooltipClose}
         className={props.className}
-        name={curRegion || 'Current Region'}
+        name={curRegionId || 'Current Region'}
         list={regionNames}
         onChoose={handleRegionSelect}
         onSearchChange={setSearchText}
