@@ -507,6 +507,7 @@ const AddAwsClusterPage = () => {
                         info=""
                         onChange={handleNetworkPluginChange({ setWizardContext, setFieldValue })}
                         required
+                        disabled={!values.usePf9Domain}
                       />
 
                       {/* HTTP proxy */}
