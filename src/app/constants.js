@@ -43,5 +43,10 @@ export const codeMirrorOptions = Object.freeze({
  * @type {object}
  */
 export const defaultAxiosConfig = Object.freeze({
+  headers: {
+    common: {
+      'Content-Type': 'application/json;charset=UTF-8',
+    },
+  },
   timeout: 120000,
 })
