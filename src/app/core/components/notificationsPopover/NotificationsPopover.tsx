@@ -1,16 +1,10 @@
-import React, { useCallback, useContext } from 'react'
+import React, { useContext } from 'react'
 import { Popover, Typography, Tooltip, Button } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { AppContext } from 'core/providers/AppProvider'
-import { over, lensProp, prepend, always, take } from 'ramda'
-import uuid from 'uuid'
 import NotificationItem
   from 'core/components/notificationsPopover/NotificationItem'
-import moment from 'moment'
-import { emptyArr, pipe } from 'utils/fp'
-
-const maxNotifications = 30
 
 const useStyles = makeStyles(theme => ({
   title: {
@@ -66,11 +60,10 @@ const usePopoverStyles = makeStyles(theme => ({
 }))
 
 const NotificationsPopover = ({ className }) => {
-  const { notifications } = useContext(AppContext)
+  const { notifications, clearNotifications } = useContext(AppContext)
   const classes = useStyles({})
   const popoverClasses = usePopoverStyles({})
   const [anchorEl, setAnchorEl] = React.useState(null)
-  const [, clearNotifications] = useNotifications()
 
   const handleClick = event => {
     setAnchorEl(event.currentTarget)
@@ -128,33 +121,5 @@ const NotificationsPopover = ({ className }) => {
   </div>
 }
 
-type UseNotificationsReturnType = [
-  (title: string, message: string, type: 'warning' | 'error' | 'info') => Promise<void>,
-  () => Promise<void>
-]
-
-export const useNotifications = (): UseNotificationsReturnType => {
-  const { setContext } = useContext(AppContext)
-  const notifLens = lensProp('notifications')
-  const registerNotification = useCallback(async (title, message, type) => {
-    await setContext(over(
-      notifLens,
-      pipe(
-        take(maxNotifications - 1),
-        prepend({
-          id: uuid.v4(),
-          title,
-          message,
-          date: moment().format(),
-          type
-        })))
-    )
-  }, [setContext])
-  const clearNotifications = useCallback(async () => {
-    await setContext(over(notifLens, always(emptyArr)))
-  }, [setContext])
-
-  return [registerNotification, clearNotifications]
-}
 
 export default NotificationsPopover

@@ -1,7 +1,23 @@
 import React, { useCallback, SetStateAction } from 'react'
-import { assocPath, flatten, Dictionary, assoc, mergeLeft } from 'ramda'
+import {
+  assocPath,
+  flatten,
+  Dictionary,
+  assoc,
+  mergeLeft,
+  lensProp,
+  over,
+  take,
+  prepend,
+  always
+} from 'ramda'
 import { dataCacheKey, paramsCacheKey } from 'core/helpers/createContextLoader'
 import useStateAsync from 'core/hooks/useStateAsync'
+import { pipe, emptyArr } from 'utils/fp'
+import moment from 'moment'
+import uuid from 'uuid'
+
+const maxNotifications = 30
 
 export interface Notification {
   id: string
@@ -28,6 +44,8 @@ interface IAppContextActions {
   initSession: (unscopedToken: string, username: string) => void
   updateSession: <T>(path: string, value: T) => void
   destroySession: () => void
+  registerNotification: (title: string, message: string, type: 'warning' | 'error' | 'info') => Promise<void>
+  clearNotifications: () => Promise<void>
 }
 
 const initialContext: IAppContext = {
@@ -38,14 +56,7 @@ const initialContext: IAppContext = {
   notifications: []
 }
 
-export const AppContext = React.createContext<IAppContext & IAppContextActions>({
-  ...initialContext,
-  getContext: () => null,
-  setContext: () => null,
-  initSession: () => null,
-  updateSession: () => null,
-  destroySession: () => null,
-})
+export const AppContext = React.createContext<IAppContext & Partial<IAppContextActions>>(initialContext)
 
 const AppProvider = ({ children }) => {
   const [context, setContextBase] = useStateAsync<IAppContext>(initialContext)
@@ -84,7 +95,26 @@ const AppProvider = ({ children }) => {
       ? setterFn
       : context => ({ ...context, ...setterFn })
     )
-  }, [context, setContextBase])
+  }, [])
+
+  const notifLens = lensProp('notifications')
+  const registerNotification = useCallback(async (title, message, type) => {
+    await setContext(over(
+      notifLens,
+      pipe(
+        take(maxNotifications - 1),
+        prepend({
+          id: uuid.v4(),
+          title,
+          message,
+          date: moment().format(),
+          type
+        })))
+    )
+  }, [setContext])
+  const clearNotifications = useCallback(async () => {
+    await setContext(over(notifLens, always(emptyArr)))
+  }, [setContext])
 
   return (
     <AppContext.Provider value={{
@@ -94,6 +124,8 @@ const AppProvider = ({ children }) => {
       initSession,
       updateSession,
       destroySession,
+      registerNotification,
+      clearNotifications,
     }}>
       {children}
     </AppContext.Provider>

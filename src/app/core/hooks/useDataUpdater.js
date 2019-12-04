@@ -3,7 +3,6 @@ import { useToast } from 'core/providers/ToastProvider'
 import { AppContext } from 'core/providers/AppProvider'
 import { emptyObj } from 'utils/fp'
 import { isEmpty } from 'ramda'
-import { useNotifications } from 'core/components/notificationsPopover/NotificationsPopover'
 
 /**
  * Hook to update data using the specified updater function
@@ -20,9 +19,8 @@ const useDataUpdater = (updaterFn, onComplete) => {
   // are performed with different params, and the previous one didn't have time to finish
   const updaterPromisesBuffer = useRef([])
   const [loading, setLoading] = useState(false)
-  const { getContext, setContext } = useContext(AppContext)
+  const { getContext, setContext, registerNotification } = useContext(AppContext)
   const showToast = useToast()
-  const [registerNotification] = useNotifications()
   const additionalOptions = useMemo(() => ({
     onSuccess: (successMessage, params) => {
       const key = updaterFn.getKey()

@@ -5,7 +5,6 @@ import { isEmpty } from 'ramda'
 import { useToast } from 'core/providers/ToastProvider'
 import { AppContext } from 'core/providers/AppProvider'
 import { memoizedDep } from 'utils/misc'
-import { useNotifications } from 'core/components/notificationsPopover/NotificationsPopover'
 
 const onErrorHandler = moize((loaderFn, showToast, registerNotification) => (errorMessage, catchedErr, params) => {
   const key = loaderFn.getKey()
@@ -43,9 +42,8 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
   const loaderPromisesBuffer = useRef([])
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState(emptyArr)
-  const { getContext, setContext, currentTenant, currentRegion } = useContext(AppContext)
+  const { getContext, setContext, currentTenant, currentRegion, registerNotification } = useContext(AppContext)
   const showToast = useToast()
-  const [registerNotification] = useNotifications()
 
   // Set a custom error handler for all loading functions using this hook
   // We do this here because we have access to the ToastContext, unlike in the dataLoader functions
