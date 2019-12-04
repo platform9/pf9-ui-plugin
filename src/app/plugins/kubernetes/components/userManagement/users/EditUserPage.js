@@ -40,7 +40,7 @@ const useStyles = makeStyles(theme => ({
   },
 }))
 
-const ToggableTextField = ({ id, label, value, required = false, TextFieldComponent = TextField }) => {
+const ToggableTextField = ({ id, label, initialValue, value, required = false, TextFieldComponent = TextField }) => {
   const classes = useStyles()
   const [showingField, toggleField] = useToggler()
   return <div className={classes.toggableField}>
@@ -48,8 +48,9 @@ const ToggableTextField = ({ id, label, value, required = false, TextFieldCompon
       ? <TextFieldComponent
         id={id}
         label={label}
+        value={value}
         required={required} />
-      : <BaseTextField label={label} value={value} disabled />}
+      : <BaseTextField label={label} value={initialValue} disabled />}
     <SimpleLink className={classes.toggableFieldBtn} onClick={toggleField}>{
       showingField
         ? 'Cancel'
@@ -93,9 +94,11 @@ const EditUserPage = () => {
       {({ wizardContext, setWizardContext, onNext }) => <>
         <WizardStep stepId="basic" label="Basic Info">
           <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
-            <ToggableTextField id="username" label="Username or Email" value={user.username} required />
-            <ToggableTextField id="displayname" label="Display Name" value={user.displayname} />
-            <ToggableTextField id="password" label="Password" value={user.password || '********'} TextFieldComponent={UserPasswordField} />
+            {({ values }) => <>
+              <ToggableTextField id="username" label="Username or Email" initialValue={user.username} required />
+              <ToggableTextField id="displayname" label="Display Name" initialValue={user.displayname} />
+              <ToggableTextField id="password" label="Password" initialValue={user.password || '********'} value={values.password} TextFieldComponent={UserPasswordField} />
+            </>}
           </ValidatedForm>
         </WizardStep>
         <WizardStep stepId="tenants" label="Tenants and Roles">

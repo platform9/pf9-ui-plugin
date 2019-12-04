@@ -1,5 +1,5 @@
 import ApiClient from 'api-client/ApiClient'
-import { keys, pluck, pipe, prop, find, propEq, filter, always, isNil, reject, omit } from 'ramda'
+import { keys, pluck, pipe, prop, find, propEq, filter, always, isNil, reject } from 'ramda'
 import { namespacesCacheKey } from 'k8s/components/namespaces/actions'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { filterIf, pathStr, emptyArr } from 'utils/fp'
@@ -49,7 +49,6 @@ export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
     prevItems,
     loadFromContext,
   ) => {
-    const currentTenant = prevItems.find(propEq('id', tenantId))
     const [users, prevRoleAssignmentsArr] = await Promise.all([
       loadFromContext(mngmUsersCacheKey),
       loadFromContext(mngmTenantRoleAssignmentsCacheKey, {
@@ -64,7 +63,6 @@ export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
 
     // Perform the api calls to update the tenant and the user/role assignments
     const updateTenantPromise = keystone.updateProject(tenantId, {
-      ...omit(['users'], currentTenant),
       name,
       description,
     })
