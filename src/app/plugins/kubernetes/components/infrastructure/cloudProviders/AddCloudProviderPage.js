@@ -14,6 +14,7 @@ const useStyles = makeStyles(theme => ({
   root: {
     display: 'flex',
     flexFlow: 'column nowrap',
+    paddingLeft: theme.spacing(9),
   },
   cloudProviderCards: {
     maxWidth: 800,

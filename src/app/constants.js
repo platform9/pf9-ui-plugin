@@ -10,6 +10,12 @@ export const logoutUrl = `${appUrlRoot}/logout`
 export const resetPasswordApiUrl = '/clemency/reset/password/'
 export const forgotPasswordApiUrl = '/clemency/request'
 export const dashboardUrl = `${appUrlRoot}/kubernetes/`
+export const createPodUrl = 'https://kubernetes.io/docs/tasks/configure-pod-container/communicate-containers-same-pod/#creating-a-pod-that-runs-two-containers'
+export const createDeploymentUrl =
+'https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#creating-a-deployment'
+export const createServiceUrl =
+'https://kubernetes.io/docs/tutorials/connecting-apps/connecting-frontend-backend/#creating-the-backend-service-object'
+
 export const allKey = '__all__'
 export const noneKey = '__none__'
 export const listTablePrefs = ['visibleColumns', 'columnsOrder', 'rowsPerPage', 'orderBy', 'orderDirection']

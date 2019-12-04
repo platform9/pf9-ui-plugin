@@ -45,7 +45,7 @@ export default ({ onClose }) => {
       <DialogTitle>Add New Repository</DialogTitle>
       <DialogContent>
         <Progress loading={loadingClusters || creating} inline renderContentOnMount>
-          <Wizard onComplete={handleSubmit} onCancel={onClose} showSteps={false}>
+          <Wizard onComplete={handleSubmit} onCancel={onClose} showSteps={false} disableGutters>
             {({ onNext, setWizardContext }) =>
               <>
                 <WizardStep stepId="repoFields" label="Repository fields">

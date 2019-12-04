@@ -4,10 +4,11 @@ import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import SubmitButton from 'core/components/SubmitButton'
 import CodeMirror from 'core/components/validatedForm/CodeMirror'
-import { codeMirrorOptions, k8sPrefix } from 'app/constants'
+import { codeMirrorOptions, k8sPrefix, createPodUrl, createDeploymentUrl, createServiceUrl } from 'app/constants'
 import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
 import NamespacePicklist from 'k8s/components/common/NamespacePicklist'
 import useParams from 'core/hooks/useParams'
+import { makeStyles } from '@material-ui/styles'
 import { Typography } from '@material-ui/core'
 import ExternalLink from 'core/components/ExternalLink'
 import useReactRouter from 'use-react-router'
@@ -20,12 +21,11 @@ import Progress from 'core/components/progress/Progress'
 import Button from '@material-ui/core/Button'
 import { requiredValidator, customValidator } from 'core/utils/fieldValidators'
 
-const createPodUrl =
-  'https://kubernetes.io/docs/tasks/configure-pod-container/communicate-containers-same-pod/#creating-a-pod-that-runs-two-containers'
-const createDeploymentUrl =
-  'https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#creating-a-deployment'
-const createServiceUrl =
-  'https://kubernetes.io/docs/tutorials/connecting-apps/connecting-frontend-backend/#creating-the-backend-service-object'
+const useStyles = makeStyles((theme) => ({
+  root: {
+    paddingLeft: theme.spacing(9),
+  },
+}))
 
 const helpText = <Typography variant="body1" component="div">
   <p>
@@ -141,9 +141,10 @@ export const AddResourceForm = ({ resourceType = 'pod' }) => {
   const insertYamlTemplate = useCallback(() => updateParams({
     yaml: yamlTemplates[params.resourceType],
   }), [params])
+  const classes = useStyles()
 
   return (
-    <FormWrapper title='New Resource' backUrl={listRoutes[resourceType]}>
+    <FormWrapper title='New Resource' backUrl={listRoutes[resourceType]} className={classes.root}>
       {helpText}<br />
       <Progress overlay loading={adding} renderContentOnMount>
         <ValidatedForm onSubmit={handleAdd}>

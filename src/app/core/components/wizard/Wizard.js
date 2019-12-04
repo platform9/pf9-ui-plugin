@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
+import { withStyles } from '@material-ui/styles'
 import WizardButtons from 'core/components/wizard/WizardButtons'
 import NextButton from 'core/components/buttons/NextButton'
 import PrevButton from 'core/components/buttons/PrevButton'
@@ -9,7 +10,13 @@ import WizzardStepper from 'core/components/wizard/WizardStepper'
 import CancelButton from 'core/components/buttons/CancelButton'
 
 export const WizardContext = React.createContext({})
+const styles = (theme) => ({
+  wizardContainer: {
+    paddingLeft: theme.spacing(9),
+  },
+})
 
+@withStyles(styles)
 class Wizard extends PureComponent {
   isLastStep = () => this.state.activeStep === this.state.steps.length - 1
   isComplete = () => this.state.activeStep > this.state.steps.length - 1
@@ -108,21 +115,34 @@ class Wizard extends PureComponent {
 
   render () {
     const { wizardContext, setWizardContext, steps, activeStep } = this.state
-    const { showSteps, children, submitLabel, finishAndReviewLabel, onCancel, showFinishAndReviewButton } = this.props
+    const {
+      showSteps,
+      children,
+      submitLabel,
+      finishAndReviewLabel,
+      onCancel,
+      showFinishAndReviewButton,
+      classes,
+      disableGutters,
+    } = this.props
     const renderStepsContent = ensureFunction(children)
 
     return (
       <WizardContext.Provider value={this.state}>
-        {showSteps && <WizzardStepper steps={steps} activeStep={activeStep} />}
-        {renderStepsContent({ wizardContext, setWizardContext, onNext: this.onNext })}
-        <WizardButtons>
-          {onCancel && <CancelButton onClick={onCancel} />}
-          {this.hasBack() && <PrevButton onClick={this.handleBack} />}
-          {this.canBackAtFirstStep() && <PrevButton onClick={this.handleOriginBack} />}
-          {this.hasNext() && <NextButton onClick={this.handleNext}>Next</NextButton>}
-          {this.isLastStep() && <NextButton onClick={this.handleNext}>{submitLabel}</NextButton>}
-          {showFinishAndReviewButton && this.isFinishAndReviewVisible() && <NextButton onClick={this.onFinishAndReview}>{finishAndReviewLabel}</NextButton>}
-        </WizardButtons>
+        <div className={disableGutters ? '' : classes.wizardContainer}>
+          {showSteps && <WizzardStepper steps={steps} activeStep={activeStep} />}
+          {renderStepsContent({ wizardContext, setWizardContext, onNext: this.onNext })}
+          <WizardButtons>
+            {onCancel && <CancelButton onClick={onCancel} />}
+            {this.hasBack() && <PrevButton onClick={this.handleBack} />}
+            {this.canBackAtFirstStep() && <PrevButton onClick={this.handleOriginBack} />}
+            {this.hasNext() && <NextButton onClick={this.handleNext}>Next</NextButton>}
+            {this.isLastStep() && <NextButton onClick={this.handleNext}>{submitLabel}</NextButton>}
+            {showFinishAndReviewButton && this.isFinishAndReviewVisible() && (
+              <NextButton onClick={this.onFinishAndReview}>{finishAndReviewLabel}</NextButton>
+            )}
+          </WizardButtons>
+        </div>
       </WizardContext.Provider>
     )
   }
