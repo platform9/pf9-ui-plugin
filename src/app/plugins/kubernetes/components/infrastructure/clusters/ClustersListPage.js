@@ -47,16 +47,12 @@ const renderCloudProviderType = (type, cluster) => {
   return capitalizeString(type)
 }
 
-const getPendingClusterPopoversContent = (cpType, taskStatus) => {
-  const content = objSwitchCase({
-    creating: `The ${cpType} resources are being created.`,
-    converging: 'One or more hosts are joining the cluster',
-    updating: `The ${cpType} resources are being updated`,
-    deleting: `The cluster and its underlying ${cpType} resources are being deleted`,
-  })(taskStatus)
-
-  return content
-}
+const getPendingClusterPopoversContent = (cpType, taskStatus) => objSwitchCase({
+  creating: `The ${cpType} resources are being created.`,
+  converging: 'One or more hosts are joining the cluster',
+  updating: `The ${cpType} resources are being updated`,
+  deleting: `The cluster and its underlying ${cpType} resources are being deleted`,
+})(taskStatus)
 
 const getConnectionStatus = (nodes) => {
   let connectionStatus
