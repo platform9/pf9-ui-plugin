@@ -91,6 +91,7 @@ const AddBareOsClusterPage = () => {
                       {/* Master nodes */}
                       <Typography>Select one or more nodes to add to the cluster as <strong>master</strong> nodes</Typography>
                       <ClusterHostChooser
+                        multiple
                         id="masterNodes"
                         filterFn={isUnassignedNode}
                         onChange={getParamsUpdater('masterNodes')}
@@ -129,6 +130,7 @@ const AddBareOsClusterPage = () => {
                       {/* Worker nodes */}
                       <Typography>Select one or more nodes to add to the cluster as <strong>worker</strong> nodes</Typography>
                       <ClusterHostChooser
+                        multiple
                         id="workerNodes"
                         filterFn={allPass([
                           isUnassignedNode,
