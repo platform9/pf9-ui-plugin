@@ -33,6 +33,7 @@ const theme = {
         fontSize: '22px',
       },
     },
+    /*
     MuiInput: {
       root: {
         fontSize: '14px',
@@ -50,12 +51,6 @@ const theme = {
         color: '#333',
       },
     },
-    MuiMenuItem: {
-      root: {
-        fontSize: '13px',
-        minHeight: '19px',
-      },
-    },
     MuiOutlinedInput: {
       root: {
         fontSize: '13px',
@@ -63,6 +58,13 @@ const theme = {
       },
       input: {
         padding: '6.5px 14px',
+      },
+    },
+    */
+    MuiMenuItem: {
+      root: {
+        fontSize: '13px',
+        minHeight: '19px',
       },
     },
     MuiTooltip: {

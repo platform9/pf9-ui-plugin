@@ -11,8 +11,8 @@ const styles = () => ({
   // https://github.com/mui-org/material-ui/issues/14530
   label: {
     backgroundColor: 'white',
-    padding: '0 5px',
-    margin: '0 -5px',
+    // padding: '0 5px',
+    // margin: '0 -5px',
   },
 })
 
@@ -43,7 +43,7 @@ class TextField extends PureComponent {
           },
         }}
         label={required ? `${label} *` : label}
-        variant={variant || 'standard'}
+        variant={variant || 'outlined'}
         error={hasError}
         value={value !== undefined ? value : ''}
         onChange={this.handleChange}

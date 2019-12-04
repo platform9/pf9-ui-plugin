@@ -22,6 +22,7 @@ const styles = theme => ({
 })
 
 const tabStyles = theme => ({
+  /*
   root: {
     textTransform: 'none',
     fontSize: ({ compact }) => compact ? 14 : 21,
@@ -47,6 +48,7 @@ const tabStyles = theme => ({
     transition: 'all .2s',
     lineHeight: 1,
   },
+  */
 })
 
 const CustomTab = withStyles(tabStyles)(({ compact, ...rest }) => <MDTab {...rest} />)
@@ -97,11 +99,9 @@ class Tabs extends PureComponent {
                 onChange={this.handleChange}
                 indicatorColor="primary"
                 textColor="inherit"
-                TabIndicatorProps={{ style: { display: 'none' } }}
               >
                 {tabs.map(tab =>
-                  <CustomTab
-                    compact={compact}
+                  <MDTab
                     key={tab.value}
                     value={tab.value}
                     label={tab.label}
