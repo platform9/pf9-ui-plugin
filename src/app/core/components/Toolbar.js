@@ -7,6 +7,7 @@ import MaterialToolbar from '@material-ui/core/Toolbar/Toolbar'
 import { AppBar } from '@material-ui/core'
 import { imageUrls } from 'app/constants'
 import { makeStyles } from '@material-ui/styles'
+import NotificationsPopover from 'core/components/notificationsPopover/NotificationsPopover'
 
 const useStyles = makeStyles(theme => ({
   appBar: {
@@ -45,6 +46,7 @@ const Toolbar = ({ open }) => {
       <div className={classes.rightTools}>
         <RegionChooser />
         <TenantChooser className={classes.leftMargin} />
+        <NotificationsPopover className={classes.leftMargin} />
         <UserMenu className={classes.leftMargin} />
       </div>
     </MaterialToolbar>

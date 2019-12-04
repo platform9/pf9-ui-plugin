@@ -179,12 +179,13 @@ const isTransientState = (taskStatus, nodes) =>
   isConverging(nodes)
 
 const renderTransientStatus = (taskStatus, nodes) => {
-  const status = isConverging(nodes) ? 'converging' : taskStatus
+  const currentStatus = isConverging(nodes) ? 'converging' : taskStatus
+  const spanContent = `The cluster is ${currentStatus}.`
 
   return (
-    <ClusterSync taskStatus={status}>
-      <ClusterStatusSpan title="The cluster is spinning down.">
-        {capitalizeString(status)}
+    <ClusterSync taskStatus={currentStatus}>
+      <ClusterStatusSpan title={spanContent}>
+        {capitalizeString(currentStatus)}
       </ClusterStatusSpan>
     </ClusterSync>
   )
@@ -280,11 +281,11 @@ const renderNodeLink = ({ uuid, name }) => (
 
 const NodesCell = ({ nodes }) => {
   const classes = useStyles()
+  const [expanded, setExpanded] = useState(false)
 
   if (!nodes || !nodes.length) {
     return <div>0</div>
   }
-  const [expanded, setExpanded] = useState(false)
   return (
     <div>
       {expanded ? (
@@ -326,7 +327,7 @@ const renderClusterDetailLink = (name, cluster) =>
   <SimpleLink src={`/ui/kubernetes/infrastructure/clusters/${cluster.uuid}`}>{name}</SimpleLink>
 
 const canScaleMasters = ([cluster]) => cluster.taskStatus === 'success' && cluster.cloudProviderType === 'bareos' && cluster.numMasters > 1
-const canScaleWorkers = ([cluster]) => cluster.taskStatus === 'success'
+const canScaleWorkers = ([cluster]) => cluster.taskStatus === 'success' && cluster.cloudProviderType !== 'azure'
 const canUpgradeCluster = (selected) => false
 const canDeleteCluster = ([row]) => !(['creating', 'deleting'].includes(row.taskStatus))
 

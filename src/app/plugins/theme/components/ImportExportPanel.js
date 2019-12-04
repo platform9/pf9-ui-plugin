@@ -21,7 +21,7 @@ class ImportExportPanel extends React.PureComponent {
   }
 
   render () {
-    const { classes, context } = this.props
+    const { classes, theme } = this.props
 
     return (
       <Panel title="Theme Management">
@@ -36,7 +36,7 @@ class ImportExportPanel extends React.PureComponent {
 
         <ExportDataButton
           filename="theme.json"
-          data={context.theme}
+          data={theme}
           color="secondary"
         >
           Export

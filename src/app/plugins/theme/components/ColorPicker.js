@@ -41,10 +41,10 @@ class ColorPicker extends React.PureComponent {
 
   lens = () => lensPath(this.props.path.split('.'))
 
-  getColor = () => view(this.lens(), this.props.context.theme)
+  getColor = () => view(this.lens(), this.props.theme)
 
   handleChange = color => this.props.setContext({
-    theme: set(this.lens(), color.hex, this.props.context.theme)
+    theme: set(this.lens(), color.hex, this.props.theme)
   })
 
   render () {
@@ -81,7 +81,7 @@ class ColorPicker extends React.PureComponent {
 }
 
 ColorPicker.propTypes = {
-  // A lens path specified from context.theme as the root context.
+  // A lens path specified from theme as the root
   // For convenience we specify a string with the path deliminated by '.'.
   // Example: 'palette.primary.light'
   path: PropTypes.string.isRequired,

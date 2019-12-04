@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, useContext } from 'react'
+import React, { useState, useCallback, useMemo, useContext, useEffect } from 'react'
 import useReactRouter from 'use-react-router'
 import Selector from 'core/components/Selector'
 import { pluck, propEq, find, pipe, head, prop, assoc } from 'ramda'
@@ -24,7 +24,7 @@ const RegionChooser = props => {
   const [regions, loadingRegions] = useDataLoader(regionActions.list)
   const { setContext } = useContext(AppContext)
   const [selectedRegion, setRegion] = useState()
-  const curRegion = useMemo(() => {
+  const curRegionId = useMemo(() => {
     if (selectedRegion) {
       return selectedRegion
     }
@@ -38,8 +38,6 @@ const RegionChooser = props => {
     const [currentSection = appUrlRoot] = currentSectionRegex.exec(pathname + hash) || []
     setLoading(true)
     setRegion(region)
-    const lastRegion = regions.find(propEq('id', region))
-    await updatePrefs({ lastRegion })
     setActiveRegion(region)
     await keystone.resetCookie()
     invalidateLoadersCache()
@@ -59,6 +57,11 @@ const RegionChooser = props => {
 
   const regionNames = useMemo(() => pluck('id', regions), [regions])
 
+  useEffect(() => {
+    const lastRegion = regions.find(propEq('id', curRegionId))
+    updatePrefs({ lastRegion })
+  }, [curRegionId])
+
   return (
     <Tooltip
       open={tooltipOpen}
@@ -71,7 +74,7 @@ const RegionChooser = props => {
         onMouseLeave={handleTooltipClose}
         onClick={handleTooltipClose}
         className={props.className}
-        name={curRegion || 'Current Region'}
+        name={curRegionId || 'Current Region'}
         list={regionNames}
         onChoose={handleRegionSelect}
         onSearchChange={setSearchText}

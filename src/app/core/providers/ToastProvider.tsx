@@ -1,9 +1,10 @@
 import React, {
-  FunctionComponent,
+  FC,
   useReducer,
   useCallback,
   Reducer,
-  useContext
+  useContext,
+  createContext
 } from 'react'
 import uuid from 'uuid'
 import { append, takeLast, reject, whereEq } from 'ramda'
@@ -40,11 +41,10 @@ const toastReducer: Reducer<ToastOptions[], ToastReducerAction> = (state, { type
 
 type ShowToastFn = (text: string, type?: MessageTypes) => void
 
-const ToastContext = React.createContext<ShowToastFn>(null)
+const ToastContext = createContext<ShowToastFn>(null)
 
-const ToastProvider: FunctionComponent = ({ children }) => {
+const ToastProvider: FC = ({ children }) => {
   const [toasts, dispatch] = useReducer(toastReducer, [])
-
   const showToast: ShowToastFn = useCallback((text, variant = MessageTypes.info) => {
     const payload: ToastOptions = {
       id: uuid.v4(),
@@ -54,7 +54,8 @@ const ToastProvider: FunctionComponent = ({ children }) => {
       onClose: () => dispatch({ type: 'remove', payload })
     }
     dispatch({ type: 'add', payload })
-  }, [dispatch])
+  }, [])
+
   return (
     <ToastContext.Provider value={showToast}>
       <ToastContainer toasts={toasts} toastsTimeout={toastsTimeout} />

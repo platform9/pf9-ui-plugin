@@ -59,7 +59,6 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
     prevItems,
     loadFromContext,
   ) => {
-    const currentUser = prevItems.find(propEq('id', userId))
     const prevRoleAssignmentsArr = await loadFromContext(mngmUserRoleAssignmentsCacheKey, {
       userId,
     })
@@ -71,9 +70,7 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
 
     // Perform the api calls to update the user and the tenant/role assignments
     const updatedUserPromise = keystone.updateUser(userId, {
-      ...omit(['tenants'], currentUser),
       name: username,
-      username,
       email: username,
       displayname,
       password: password || undefined,

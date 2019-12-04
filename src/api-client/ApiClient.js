@@ -120,7 +120,6 @@ class ApiClient {
 
   basicPatch = async (url, body) => {
     const config = this.getAuthHeaders()
-    config.headers['Content-Type'] = 'application/json-patch+json'
     const response = await this.axiosInstance.patch(url, body, config)
     return normalizeResponse(response)
   }

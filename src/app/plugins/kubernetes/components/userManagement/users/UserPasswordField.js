@@ -21,7 +21,7 @@ const CheckListItem = ({ children, checked }) => <ListItem>
 </ListItem>
 
 const UserPasswordField = ({ value }) => <>
-  <TextField id="password" label="Password" type="password" validations={passwordValidators} />
+  <TextField id="password" label="Password" value={value} type="password" validations={passwordValidators} />
   <Typography variant="body1" component="div">
     Password must contain the following:
     <List dense>

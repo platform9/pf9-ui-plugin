@@ -43,5 +43,13 @@ export const codeMirrorOptions = Object.freeze({
  * @type {object}
  */
 export const defaultAxiosConfig = Object.freeze({
+  // While headers here will apply for all requests, is important to remember that
+  // some services like Openstack will require custom headers for specific methods
+  // like "Content-Type": "application/json-patch+json" for PATCH
+  headers: {
+    common: {
+      'Content-Type': 'application/json;charset=UTF-8',
+    },
+  },
   timeout: 120000,
 })

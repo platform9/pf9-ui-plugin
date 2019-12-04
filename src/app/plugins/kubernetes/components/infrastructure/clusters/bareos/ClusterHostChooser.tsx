@@ -3,7 +3,7 @@ import Loading from 'core/components/Loading'
 import useDataLoader from 'core/hooks/useDataLoader'
 import useInterval from 'core/hooks/useInterval'
 import withFormContext from 'core/components/validatedForm/withFormContext'
-import { Checkbox, Table, TableHead, TableCell, TableRow, TableBody, Typography, Theme } from '@material-ui/core'
+import { Checkbox, Radio, Table, TableHead, TableCell, TableRow, TableBody, Typography, Theme } from '@material-ui/core'
 import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
 import { Refresh } from '@material-ui/icons'
 import { makeStyles } from '@material-ui/styles'
@@ -47,17 +47,20 @@ interface Props extends IValidatedForm {
   pollForNodes?: boolean
   onChange?: (nodes: string[]) => void
   filterFn?: (node: ICombinedNode) => boolean
+  multiple?: boolean
 }
 
 // TODO: is forwardRef actually needed here?
 const ClusterHostChooser: React.ComponentType<Props> = forwardRef(
   (
-    { filterFn = identity, onChange, value = [], hasError, errorMessage, pollForNodes = false },
+    { filterFn = identity, onChange, value = [], hasError, errorMessage, pollForNodes = false, multiple = false },
     ref,
   ) => {
     const { table, tableContainer, errorText } = useStyles({ hasError })
     const [nodes, loading, loadMore] = useDataLoader(loadNodes)
     const [fetchingIn, setFetchingIn] = useState(5)
+
+    const Warning = ({ children }) => <Typography variant="body1" className={errorText}>{children}</Typography>
 
     if (pollForNodes) {
       useInterval(() => {
@@ -80,10 +83,13 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef(
     const isSelected = (uuid) => value.includes(uuid)
 
     const toggleHost = (uuid) => () => {
-      const newHosts = isSelected(uuid) ? value.filter((x) => x !== uuid) : [...value, uuid]
+      const newHosts = isSelected(uuid)
+        ? value.filter((x) => x !== uuid)
+        : multiple ? [...value, uuid] : [uuid]
       onChange(newHosts)
     }
 
+    // TODO: The <Table> logic should be abstracted in a <TableChooser> that supports both multiple and single.
     return (
       <div className={tableContainer}>
         {pollForNodes && (
@@ -101,7 +107,7 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef(
           <TableHead>
             <TableRow>
               <TableCell>
-                <Checkbox checked={allSelected()} onChange={toggleAll} />
+                {multiple && <Checkbox checked={allSelected()} onChange={toggleAll} />}
               </TableCell>
               <TableCell>Hostname</TableCell>
               <TableCell>IP Address</TableCell>
@@ -119,7 +125,10 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef(
             {selectableNodes.map((node = {}) => (
               <TableRow key={node.uuid} onClick={toggleHost(node.uuid)}>
                 <TableCell>
-                  <Checkbox checked={isSelected(node.uuid)} />
+                  {multiple
+                    ? <Checkbox checked={isSelected(node.uuid)} />
+                    : <Radio checked={isSelected(node.uuid)} />
+                  }
                 </TableCell>
                 <TableCell>{node.name}</TableCell>
                 <TableCell>{node.primaryIp}</TableCell>
@@ -128,11 +137,7 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef(
             ))}
           </TableBody>
         </Table>
-        {hasError && (
-          <Typography variant="body1" className={errorText}>
-            {errorMessage}
-          </Typography>
-        )}
+        {hasError && <Warning>{errorMessage}</Warning>}
       </div>
     )
   },

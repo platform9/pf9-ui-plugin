@@ -1,7 +1,7 @@
 import {
   pick, identity, assoc, find, whereEq, when, isNil, reject, filter, always, append, of, pipe, over,
   lensPath, pickAll, view, has, equals, values, either, sortBy, reverse, mergeLeft, map, toLower,
-  is, __, propOr,
+  is, __, propOr, head,
 } from 'ramda'
 import moize from 'moize'
 import {
@@ -87,7 +87,7 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
     dataMapper = identity,
     refetchCascade = false,
     requiredRoles,
-    defaultOrderBy = uniqueIdentifier,
+    defaultOrderBy = head(ensureArray(uniqueIdentifier)),
     defaultOrderDirection = 'asc',
     sortWith = (items, { orderBy = defaultOrderBy, orderDirection = defaultOrderDirection }) =>
       pipe(

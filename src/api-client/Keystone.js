@@ -255,7 +255,6 @@ class Keystone {
   }
 
   renewScopedToken = async () => {
-    console.log('renewScopedToken')
     const body = constructAuthBody('token', this.client.unscopedToken)
     const projectId = this.client.activeProjectId
     body.auth.scope = { project: { id: projectId } }
@@ -275,7 +274,7 @@ class Keystone {
   resetCookie = async () => {
     try {
       const linksUrl = await this.getServiceEndpoint('regioninfo', 'public')
-      const { data: { links } } = await this.client.basicGet(linksUrl)
+      const { links } = await this.client.basicGet(linksUrl)
       const token2cookieUrl = links.token2cookie
       const authHeaders = this.client.getAuthHeaders()
       await this.client.rawGet(token2cookieUrl, { ...authHeaders, withCredentials: true })

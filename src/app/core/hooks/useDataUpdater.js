@@ -19,7 +19,7 @@ const useDataUpdater = (updaterFn, onComplete) => {
   // are performed with different params, and the previous one didn't have time to finish
   const updaterPromisesBuffer = useRef([])
   const [loading, setLoading] = useState(false)
-  const { getContext, setContext } = useContext(AppContext)
+  const { getContext, setContext, registerNotification } = useContext(AppContext)
   const showToast = useToast()
   const additionalOptions = useMemo(() => ({
     onSuccess: (successMessage, params) => {
@@ -31,8 +31,9 @@ const useDataUpdater = (updaterFn, onComplete) => {
       const key = updaterFn.getKey()
       console.error(`Error when updating items for entity "${key}"`, catchedErr)
       showToast(errorMessage + `\n${catchedErr.message || catchedErr}`, 'error')
+      registerNotification(errorMessage, catchedErr.message || catchedErr, 'error')
     },
-  }), [showToast])
+  }), [])
 
   // The following function will handle the calls to the data updating and
   // set the loading state variable to true in the meantime, while also taking care

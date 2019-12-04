@@ -2,14 +2,14 @@ import React, { useState } from 'react'
 import { Button } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 
-const styles = theme => ({
+const useStyles = makeStyles(theme => ({
   root: {
     marginTop: theme.spacing(4),
   }
-})
+}))
 
 const CustomizeExpander = ({ children }) => {
-  const classes = makeStyles(styles)()
+  const classes = useStyles({})
   const [expanded, setExpanded] = useState(false)
   const toggleExpanded = () => setExpanded(!expanded)
 

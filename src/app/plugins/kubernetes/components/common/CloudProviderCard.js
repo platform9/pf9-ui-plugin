@@ -65,14 +65,9 @@ const CloudProviderCard = props => {
   const classes = useStyles(props)
   const { history } = useReactRouter()
   const handleClick = () => {
-    if (disabled) {
-      return
-    }
-    if (onClick) {
-      onClick(type)
-    } else {
-      history.push(src)
-    }
+    if (disabled) return
+    if (onClick) return onClick(type)
+    history.push(src)
   }
   return <div className={classes.root} onClick={handleClick}>
     <div className={classes.logoContainer}><img alt={type} src={image} /></div>
