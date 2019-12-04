@@ -25,13 +25,13 @@ import makeStyles from '@material-ui/styles/makeStyles'
 const listUrl = pathJoin(k8sPrefix, 'user_management#users')
 
 const useStyles = makeStyles(theme => ({
-  toggableField: {
+  togglableField: {
     position: 'relative',
     '& .Mui-disabled': {
       color: theme.palette.text.primary,
     },
   },
-  toggableFieldBtn: {
+  togglableFieldBtn: {
     position: 'absolute',
     top: 14,
     right: 0,
@@ -40,10 +40,10 @@ const useStyles = makeStyles(theme => ({
   },
 }))
 
-const ToggableTextField = ({ id, label, initialValue, value, required = false, TextFieldComponent = TextField }) => {
+const TogglableTextField = ({ id, label, initialValue, value, required = false, TextFieldComponent = TextField }) => {
   const classes = useStyles()
   const [showingField, toggleField] = useToggler()
-  return <div className={classes.toggableField}>
+  return <div className={classes.togglableField}>
     {showingField
       ? <TextFieldComponent
         id={id}
@@ -51,7 +51,7 @@ const ToggableTextField = ({ id, label, initialValue, value, required = false, T
         value={value}
         required={required} />
       : <BaseTextField label={label} value={initialValue} disabled />}
-    <SimpleLink className={classes.toggableFieldBtn} onClick={toggleField}>{
+    <SimpleLink className={classes.togglableFieldBtn} onClick={toggleField}>{
       showingField
         ? 'Cancel'
         : 'Change'}
@@ -95,9 +95,9 @@ const EditUserPage = () => {
         <WizardStep stepId="basic" label="Basic Info">
           <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
             {({ values }) => <>
-              <ToggableTextField id="username" label="Username or Email" initialValue={user.username} required />
-              <ToggableTextField id="displayname" label="Display Name" initialValue={user.displayname} />
-              <ToggableTextField id="password" label="Password" initialValue={'********'} value={values.password} TextFieldComponent={UserPasswordField} />
+              <TogglableTextField id="username" label="Username or Email" initialValue={user.username} required />
+              <TogglableTextField id="displayname" label="Display Name" initialValue={user.displayname} />
+              <TogglableTextField id="password" label="Password" initialValue={'********'} value={values.password} TextFieldComponent={UserPasswordField} />
             </>}
           </ValidatedForm>
         </WizardStep>

@@ -40,7 +40,7 @@ const usePopoverStyles = makeStyles(theme => ({
     flexFlow: 'column nowrap',
     padding: 0,
     backgroundColor: '#FFF',
-    marginTop: 40,
+    marginTop: theme.spacing(5),
     width: 400,
     maxHeight: 600,
     border: 0,
@@ -120,6 +120,5 @@ const NotificationsPopover = ({ className }) => {
     </Popover>
   </div>
 }
-
 
 export default NotificationsPopover
