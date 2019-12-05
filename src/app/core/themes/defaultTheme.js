@@ -184,10 +184,23 @@ const theme = {
       disabled: 'rgba(0, 0, 0, 0.26)',
       disabledBackground: 'rgba(0, 0, 0, 0.12)',
     },
-    sidebar: {
-      background: '#243748',
-      text: '#AEE0FF',
+    header: {
+      background: '#606060',
     },
+    sidebar: {
+      background: '#f3f3f3',
+      text: '#606060',
+      activeText: '#222222',
+      hoverText: '#222222',
+    },
+    card: {
+      background: 'rgba(2, 194, 172, 0.1)',
+    },
+    wizard: {
+      dark: '#02c2ac',
+      light: 'rgba(2, 194, 172, 0.2)',
+      medium: 'rgba(2, 194, 172, 0.5)',
+    }
   },
   props: {},
   shadows: [

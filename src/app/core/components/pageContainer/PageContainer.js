@@ -27,7 +27,6 @@ const useStyles = makeStyles(theme => ({
     justifyContent: 'space-between',
     paddingBottom: theme.spacing(1),
     marginBottom: theme.spacing(2),
-    borderBottom: '1px solid #ccc',
   },
   extraHeader: {
     position: ({ floatingHeader }) => floatingHeader ? 'absolute' : 'static',
