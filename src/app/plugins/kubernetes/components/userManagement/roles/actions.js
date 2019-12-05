@@ -15,7 +15,7 @@ export const mngmRoleActions = createCRUDActions(mngmRolesCacheKey, {
     map(role => ({
       ...role,
       name: role.displayName || role.name,
-      description: role => ['admin', '_member_'].includes(role.name)
+      description: ['admin', '_member_'].includes(role.name)
         ? hardcodedKubeRolesDescriptions[role.name]
         : role.description,
     })),
