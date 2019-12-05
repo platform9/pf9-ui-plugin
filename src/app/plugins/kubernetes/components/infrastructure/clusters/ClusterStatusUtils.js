@@ -50,17 +50,15 @@ export const getHealthStatusAndMessage = (healthyMasterNodes = [], nodes = [], n
 }
 
 const getNodesHealthStatus = (healthyCount, count, threshold) => {
-  let healthStatus
-
   if (healthyCount === count) {
-    healthStatus = healthy
-  } else if (healthyCount >= threshold) {
-    healthStatus = partiallyHealthy
-  } else {
-    healthStatus = unhealthy
+    return healthy
   }
 
-  return healthStatus
+  if (healthyCount >= threshold) {
+    return partiallyHealthy
+  }
+
+  return unhealthy
 }
 
 const clusterHealthStatusAndMessageTable = [
