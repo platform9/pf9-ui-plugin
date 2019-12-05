@@ -375,16 +375,17 @@ Kubernetes.registerPlugin = pluginManager => {
         },
       ],
     },
-    {
-      name: 'App Catalog',
-      ...clarityLink('/kubernetes/apps'),
-      icon: 'th',
-      nestedLinks: [
-        { name: 'App Catalog', ...clarityLink('/kubernetes/apps#catalog') },
-        { name: 'Deployed Apps', ...clarityLink('/kubernetes/apps#deployed_apps') },
-        { name: 'Repositories', ...clarityLink('/kubernetes/apps#repositories') },
-      ],
-    },
+    // TODO: enable this when backend side is implemented
+    // {
+    //   name: 'App Catalog',
+    //   ...clarityLink('/kubernetes/apps'),
+    //   icon: 'th',
+    //   nestedLinks: [
+    //     { name: 'App Catalog', ...clarityLink('/kubernetes/apps#catalog') },
+    //     { name: 'Deployed Apps', ...clarityLink('/kubernetes/apps#deployed_apps') },
+    //     { name: 'Repositories', ...clarityLink('/kubernetes/apps#repositories') },
+    //   ],
+    // },
     {
       name: 'Pods, Deployments, Services',
       ...clarityLink('/podsK8s'),
@@ -434,16 +435,17 @@ Kubernetes.registerPlugin = pluginManager => {
         },
       ],
     },
-    {
-      name: 'App Catalog',
-      link: { path: '/apps' },
-      icon: 'th',
-      nestedLinks: [
-        { name: 'App Catalog', link: { path: '/apps#appCatalog' } },
-        { name: 'Deployed Apps', link: { path: '/apps#deployedApps' } },
-        { name: 'Repositories', link: { path: '/apps#repositories' } },
-      ],
-    },
+    // TODO: enable this when backend side is implemented
+    // {
+    //   name: 'App Catalog',
+    //   link: { path: '/apps' },
+    //   icon: 'th',
+    //   nestedLinks: [
+    //     { name: 'App Catalog', link: { path: '/apps#appCatalog' } },
+    //     { name: 'Deployed Apps', link: { path: '/apps#deployedApps' } },
+    //     { name: 'Repositories', link: { path: '/apps#repositories' } },
+    //   ],
+    // },
     {
       name: 'Pods, Deployments, Services',
       link: { path: '/pods' },

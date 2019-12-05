@@ -90,7 +90,7 @@ const ScaleMasters: FunctionComponent<ScaleMasterProps> = ({
     return (
       <ValidatedForm onSubmit={params.scaleType === 'add' ? onAttach : onDetach}>
         {relation === 'warn' && <Alert message={message} variant="warning" />}
-        <ClusterHostChooser id="mastersToAdd" filterFn={isUnassignedNode} validations={[]} multiple={false} required />
+        <ClusterHostChooser id="mastersToAdd" filterFn={isUnassignedNode} validations={[]} required />
         <SubmitButton>{params.scaleType === 'add' ? 'Add' : 'Remove'} masters</SubmitButton>
       </ValidatedForm>
     )
@@ -106,7 +106,6 @@ const ScaleMasters: FunctionComponent<ScaleMasterProps> = ({
           id="mastersToRemove"
           filterFn={allPass([isNotMaster, inCluster(cluster.uuid)])}
           validations={[]}
-          multiple={false}
           required
         />
         <SubmitButton>{params.scaleType === 'add' ? 'Add' : 'Remove'} masters</SubmitButton>

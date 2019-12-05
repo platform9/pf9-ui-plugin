@@ -20,7 +20,7 @@ const QontoConnector = withStyles(theme => ({
   },
   completed: {
     '& $line': {
-      borderColor: theme.palette.primary.dark,
+      borderColor: theme.palette.wizard.medium,
     },
   },
   disabled: {
@@ -51,13 +51,15 @@ const useQontoStepIconStyles = makeStyles(theme => ({
     borderRadius: stepIconsSize / 2,
     textAlign: 'center',
     color: theme.palette.primary.contrastText,
-    backgroundColor: theme.palette.primary.dark,
+    backgroundColor: theme.palette.wizard.light,
+    '&.active': {
+      backgroundColor: theme.palette.wizard.dark,
+    }
   },
   completed: {
     height: stepIconsSize / 2,
     marginTop: stepIconsSize / 4,
-    color: theme.palette.primary.contrastText,
-    backgroundColor: theme.palette.primary.dark,
+    color: theme.palette.wizard.dark,
     zIndex: 1,
     fontSize: 18,
   },
@@ -72,9 +74,8 @@ function QontoStepIcon (props) {
         [classes.active]: active,
       })}
     >
-      <div className={classes.circle}>{completed
-        ? <Check className={classes.completed} />
-        : icon}
+      <div className={clsx(classes.circle, { active })}>
+        {completed ? <Check className={classes.completed} /> : icon}
       </div>
     </div>
   )

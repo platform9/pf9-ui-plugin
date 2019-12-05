@@ -8,7 +8,6 @@ import {
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import { compose, ensureFunction, except } from 'app/utils/fp'
-import { withAppContext } from 'core/providers/AppProvider'
 import MoreMenu from 'core/components/MoreMenu'
 import {
   max, any, assoc, assocPath, equals, pipe, pluck, prop, propEq, propOr, uniq, update,
@@ -335,9 +334,8 @@ class ListTable extends PureComponent {
 
     // Allow for customized rendering in the columnDef.  The render function might need
     // to know more about the entire object (row) being rendered and in some cases the
-    // entire context (FIXME: This component should not even be aware of `context`)
     if (render) {
-      renderedCell = render(contents, row, this.props.context)
+      renderedCell = render(contents, row)
     } else if (CellComponent) {
       renderedCell = <CellComponent key={id} row={row} data={contents} isSelected={isSelected} />
     }
@@ -647,5 +645,4 @@ ListTable.defaultProps = {
 
 export default compose(
   withStyles(styles),
-  withAppContext,
 )(ListTable)

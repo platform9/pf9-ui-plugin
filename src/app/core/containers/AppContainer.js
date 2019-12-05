@@ -10,7 +10,7 @@ import track from 'utils/tracking'
 import useReactRouter from 'use-react-router'
 import { makeStyles } from '@material-ui/styles'
 import { Route, Redirect, Switch } from 'react-router'
-import { dashboardUrl, resetPasswordUrl, forgotPasswordUrl, loginUrl } from 'app/constants'
+import { dashboardUrl, resetPasswordUrl, resetPasswordThroughEmailUrl, forgotPasswordUrl, loginUrl } from 'app/constants'
 import ResetPasswordPage from 'core/public/ResetPasswordPage'
 import ForgotPasswordPage from 'core/public/ForgotPasswordPage'
 import { isNilOrEmpty } from 'utils/fp'
@@ -79,6 +79,11 @@ const AppContainer = props => {
       }
     }
     await setContext({ appLoaded: true })
+
+    if (history.location.pathname === forgotPasswordUrl) return history.push(forgotPasswordUrl)
+
+    if (history.location.hash.includes(resetPasswordThroughEmailUrl)) return history.push(history.location.hash.slice().replace('#', 'ui'))
+
     history.push(loginUrl)
   }
 

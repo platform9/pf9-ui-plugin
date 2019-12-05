@@ -121,6 +121,7 @@ const ScaleWorkers: FunctionComponent<ScaleWorkersProps> = ({ cluster, onSubmit,
   const addBareOsWorkerNodes = (
     <ValidatedForm onSubmit={params.scaleType === 'add' ? onAttach : onDetach}>
       <ClusterHostChooser
+        multiple
         id="workersToAdd"
         filterFn={isUnassignedNode}
         validations={[minScaleValidator, maxScaleValidator]}
@@ -133,6 +134,7 @@ const ScaleWorkers: FunctionComponent<ScaleWorkersProps> = ({ cluster, onSubmit,
   const removeBareOsWorkerNodes = (
     <ValidatedForm onSubmit={params.scaleType === 'add' ? onAttach : onDetach}>
       <ClusterHostChooser
+        multiple
         id="workersToRemove"
         filterFn={allPass([
           isNotMaster,

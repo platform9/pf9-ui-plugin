@@ -25,6 +25,15 @@ import ClusterSync from './ClusterSync'
 import LoggingAddonDialog from 'k8s/components/logging/LoggingAddonDialog'
 import { Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
+import {
+  getConnectionStatus,
+  connectionStatusFields,
+  isConverging,
+  getHealthStatusAndMessage,
+  clusterHealthStatusFields,
+  isTransientState,
+  isSteadyState,
+} from './ClusterStatusUtils'
 
 const useStyles = makeStyles(theme => ({
   link: {
@@ -43,9 +52,6 @@ const renderCloudProviderType = (type, cluster) => {
   return capitalizeString(type)
 }
 
-const getClusterPopoverContent = (healthyMasterNodes, masterNodes) =>
-  `${healthyMasterNodes.length} of ${masterNodes.length} master nodes healthy (3 required)`
-
 const getPendingClusterPopoversContent = (cpType, taskStatus) => objSwitchCase({
   creating: `The ${cpType} resources are being created.`,
   converging: 'One or more hosts are joining the cluster',
@@ -53,72 +59,84 @@ const getPendingClusterPopoversContent = (cpType, taskStatus) => objSwitchCase({
   deleting: `The cluster and its underlying ${cpType} resources are being deleted`,
 })(taskStatus)
 
-const renderStatus = (status,
-  { highlyAvailable, healthyMasterNodes, masterNodes, cloudProviderType, progressPercent, taskStatus }) => {
-  if (!status || !taskStatus) {
-    // TODO probably a better way to handle this.
-    // But if we get undefined status The UI currently crashes
-    return null
-  }
-  switch (taskStatus) {
-    case 'success': {
-      const clusterStatus = <ClusterStatusSpan
-        label="Cluster"
-        title={status === 'ok'
-          ? 'The Cluster is healthy'
-          : 'The Platform9 Managed Kubernetes software is converging to the desired state on one or more cluster nodes.'}
-        status={status === 'ok' ? 'ok' : 'pause'}>
-        {status === 'ok' ? 'Connected' : capitalizeString(status)}
-      </ClusterStatusSpan>
-      const haStatus = cloudProviderType === 'aws' && <ClusterStatusSpan
-        label="HA"
-        title={getClusterPopoverContent(healthyMasterNodes, masterNodes)}
-        status={highlyAvailable ? 'ok' : 'fail'}>
-        {highlyAvailable ? 'Healthy' : 'Unhealthy'}
-      </ClusterStatusSpan>
+const renderConnectionStatus = (_, { nodes }) => {
+  const connectionStatus = getConnectionStatus(nodes)
+  const fields = connectionStatusFields[connectionStatus]
 
-      return <div>
-        {clusterStatus}
-        {haStatus}
-      </div>
-    }
-    case 'error': {
-      return <ClusterStatusSpan
-        title="The last cluster operation (create, update, or delete) failed."
-        status="fail"
-      >
-        Unhealthy
+  return (
+    <ClusterStatusSpan
+      title={fields.message}
+      status={fields.clusterStatus}>
+      {fields.label}
+    </ClusterStatusSpan>
+  )
+}
+
+const renderTransientStatus = (taskStatus, nodes) => {
+  const currentStatus = isConverging(nodes) ? 'converging' : taskStatus
+  const spanContent = `The cluster is ${currentStatus}.`
+
+  return (
+    <ClusterSync taskStatus={currentStatus}>
+      <ClusterStatusSpan title={spanContent}>
+        {capitalizeString(currentStatus)}
       </ClusterStatusSpan>
-    }
-    case 'creating':
-    case 'updating':
-    case 'deleting':
-    case 'upgrading': {
-      const spanContent = `The cluster is ${taskStatus}.`
-      return (
-        <ClusterSync taskStatus={taskStatus}>
-          <ClusterStatusSpan title={spanContent}>
-            {capitalizeString(taskStatus)}
-          </ClusterStatusSpan>
-        </ClusterSync>
-      )
-    }
-    default: {
-      if (progressPercent) {
-        return <div>
-          <ProgressBar height={20} animated containedPercent percent={progressPercent
-            ? (+progressPercent).toFixed(0)
-            : 0} />
-          <ClusterStatusSpan
-            status="loading"
-            title={getPendingClusterPopoversContent(cloudProviderType, taskStatus)}>
-            {capitalizeString(taskStatus)}
-          </ClusterStatusSpan>
-        </div>
-      }
-      return <ClusterStatusSpan>{capitalizeString(status)}</ClusterStatusSpan>
-    }
+    </ClusterSync>
+  )
+}
+
+const renderGenericHealthStatus = (status, taskStatus, progressPercent, cloudProviderType) => {
+  if (progressPercent) {
+    return (
+      <div>
+        <ProgressBar height={20} animated containedPercent percent={progressPercent
+          ? (+progressPercent).toFixed(0)
+          : 0}
+        />
+        <ClusterStatusSpan
+          status="loading"
+          title={getPendingClusterPopoversContent(cloudProviderType, taskStatus)}>
+          {capitalizeString(taskStatus)}
+        </ClusterStatusSpan>
+      </div>
+    )
+  } else if (status) {
+    return <ClusterStatusSpan>{capitalizeString(status)}</ClusterStatusSpan>
   }
+}
+
+const renderClusterHealthStatus = (healthyMasterNodes, nodes, numMasters, numWorkers) => {
+  const [healthStatus, message] = getHealthStatusAndMessage(healthyMasterNodes, nodes, numMasters, numWorkers)
+  const fields = clusterHealthStatusFields[healthStatus]
+
+  return (
+    <ClusterStatusSpan
+      title={message}
+      status={fields.status}
+    >
+      {fields.label}
+    </ClusterStatusSpan>
+  )
+}
+
+const renderHealthStatus = (status, {
+  taskStatus,
+  cloudProviderType,
+  progressPercent,
+  healthyMasterNodes,
+  nodes,
+  numMasters,
+  numWorkers,
+}) => {
+  if (isTransientState(taskStatus, nodes)) {
+    return renderTransientStatus(taskStatus, nodes)
+  }
+
+  if (isSteadyState(taskStatus, nodes)) {
+    return renderClusterHealthStatus(healthyMasterNodes, nodes, numMasters, numWorkers)
+  }
+
+  return renderGenericHealthStatus(status, taskStatus, progressPercent, cloudProviderType)
 }
 
 const renderLinks = links => {
@@ -208,7 +226,8 @@ export const options = {
   },
   columns: [
     { id: 'name', label: 'Cluster name', render: renderClusterDetailLink },
-    { id: 'status', label: 'Status', render: renderStatus },
+    { id: 'connectionStatus', label: 'Connection status', render: renderConnectionStatus },
+    { id: 'healthStatus', label: 'Health status', render: renderHealthStatus },
     { id: 'links', label: 'Links', render: renderLinks },
     { id: 'cloudProviderType', label: 'Deployment Type', render: renderCloudProviderType },
     { id: 'resource_utilization', label: 'Resource Utilization', render: renderStats },

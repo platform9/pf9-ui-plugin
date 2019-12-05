@@ -12,19 +12,20 @@ const useStyles = makeStyles((theme: any) => ({
   headerIcon: {
     width: theme.spacing(5),
     height: theme.spacing(5),
+    color: theme.palette.primary.dark,
   },
   contentContainer: {
     display: 'flex',
     flexDirection: 'column',
-    backgroundColor: '#243748',
+    backgroundColor: theme.palette.card.status,
     width: '12rem',
     height: '7.25rem',
     margin: theme.spacing(1),
-    padding: `${theme.spacing(1.5)}px ${theme.spacing(1.5)}px ${theme.spacing(0.5)}px ${theme.spacing(1.5)}px`,
+    padding: theme.spacing(1.5, 1.5, 0.5, 1.5),
     borderRadius: '5px',
     transition: 'transform .1s ease',
     '&:hover': {
-      backgroundColor: hexToRGBA('#243748', 0.95),
+      backgroundColor: hexToRGBA(theme.palette.card.status, 0.95),
       transform: 'scale(1.025)'
     }
   },
@@ -35,6 +36,9 @@ const useStyles = makeStyles((theme: any) => ({
     marginBottom: theme.spacing(1),
     alignItems: 'center',
     flex: 1,
+  },
+  progress: {
+    color: theme.palette.primary.dark,
   },
   text: {
     color: theme.palette.secondary.contrastText, // white
@@ -67,7 +71,7 @@ interface StatusCardProps {
 }
 
 const StatusCard: FunctionComponent<StatusCardProps> = ({ route, title, icon: Icon, dataLoader, quantityFn }) => {
-  const { row, contentContainer, headerIcon, cardTitle } = useStyles({})
+  const { row, contentContainer, headerIcon, cardTitle, progress } = useStyles({})
   const [data, loading] = useDataLoader(...dataLoader)
   const { quantity, working, pending = 0 } = quantityFn(data)
   const failed = quantity - (working + pending)
@@ -88,7 +92,7 @@ const StatusCard: FunctionComponent<StatusCardProps> = ({ route, title, icon: Ic
         </div>
         {loading ? (
           <div className={row}>
-            <CircularProgress size={32} />
+            <CircularProgress className={progress} size={32} />
           </div>
         ) : (
           <CardDetails quantity={quantity} pending={pending} failed={failed} />
@@ -105,6 +109,7 @@ interface CardDetailsProps {
   failed: number
   pending: number
 }
+
 const CardDetails: FunctionComponent<CardDetailsProps> = ({ quantity, failed, pending }) => {
   const { row, failedText, pendingText, text } = useStyles({})
   return (

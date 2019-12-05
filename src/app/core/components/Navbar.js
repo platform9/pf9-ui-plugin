@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import {
-  Collapse, Divider, Drawer, ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary,
+  Collapse, Drawer, ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary,
   IconButton, ListItemText, MenuItem, MenuList, Typography,
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
@@ -81,14 +81,14 @@ const styles = theme => ({
   },
   activeNavItem: {
     backgroundColor: theme.palette.background.default,
-    color: 'rgba(0, 0, 0, .87)',
+    color: theme.palette.sidebar.activeText,
   },
   currentNavLink: {
     backgroundColor: [theme.palette.background.default, '!important'],
-    color: 'rgba(0, 0, 0, .87) !important',
+    color: [theme.palette.sidebar.activeText, '!important'],
 
     '&:hover *': {
-      color: 'rgba(0, 0, 0, .87) !important',
+      color: [theme.palette.sidebar.hoverText, '!important'],
     },
   },
   navHeading: {
@@ -120,12 +120,11 @@ const styles = theme => ({
     minHeight: theme.spacing(6),
     backgroundColor: theme.palette.sidebar.background,
     color: theme.palette.sidebar.text,
-    borderBottom: '1px solid #07283e',
     '&:hover': {
       backgroundColor: hexToRGBA(theme.palette.background.paper, 0.15),
     },
     '&:hover *': {
-      color: theme.palette.primary.contrastText // override child color styles
+      color: theme.palette.sidebar.hoverText, // override child color styles
     },
     display: 'flex',
     flexFlow: 'row nowrap',
@@ -153,7 +152,7 @@ const styles = theme => ({
   currentNavMenuText: {
     fontSize: 12,
     fontWeight: 500,
-    color: 'rgba(0, 0, 0, 0.87)',
+    color: theme.palette.sidebar.activeText,
   },
   navMenuList: {
     borderLeft: `${theme.spacing(1)}px solid #6dc6fe`,
@@ -442,7 +441,6 @@ class Navbar extends PureComponent {
           <FontAwesomeIcon size="xl">{open ? 'angle-double-left' : 'angle-double-right'}</FontAwesomeIcon>
         </IconButton>
       </div>
-      <Divider />
       {withStackSlider ? this.renderStackSlider() : null}
       {filteredSections.length > 1
         ? this.renderSections(filteredSections)

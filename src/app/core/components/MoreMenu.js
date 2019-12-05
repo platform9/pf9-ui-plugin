@@ -25,7 +25,7 @@ class MoreMenu extends React.PureComponent {
   handleClick = (action, label) => e => {
     e.stopPropagation()
     this.handleClose(e)
-    action && action(this.props.data, this.props.context)
+    action && action(this.props.data, this.props.getContext())
     this.setState({ openedAction: label })
   }
 
@@ -35,7 +35,7 @@ class MoreMenu extends React.PureComponent {
 
   render () {
     const { anchorEl, openedAction } = this.state
-    const { data, context } = this.props
+    const { data, getContext } = this.props
 
     return (
       <div>
@@ -58,7 +58,7 @@ class MoreMenu extends React.PureComponent {
           onClick={e => e.stopPropagation()}
         >
           {this.props.items.map(({ action, cond, icon, label }) =>
-            <MenuItem key={label} onClick={this.handleClick(action, label)} disabled={cond && !cond(data, context)}>
+            <MenuItem key={label} onClick={this.handleClick(action, label)} disabled={cond && !cond(data, getContext())}>
               {icon && icon}
               {label}
             </MenuItem>

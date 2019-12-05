@@ -11,6 +11,7 @@ import { namespaceValidator } from 'core/utils/fieldValidators'
 
 const defaultParams = {
   masterNodeClusters: true,
+  clusterId: null,
 }
 export const AddNamespaceForm = ({ onComplete }) => {
   const { params, getParamsUpdater } = useParams(defaultParams)

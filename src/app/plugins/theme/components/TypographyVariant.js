@@ -8,7 +8,7 @@ class TypographyVariant extends React.PureComponent {
   lens = () => lensPath(this.props.path.split('.'))
 
   handleChange = color => this.props.setContext({
-    theme: set(this.lens(), color.hex, this.props.context.theme)
+    theme: set(this.lens(), color.hex, this.props.theme)
   })
 
   render () {
