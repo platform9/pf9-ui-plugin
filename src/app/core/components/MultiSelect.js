@@ -12,6 +12,7 @@ import CheckBoxIcon from '@material-ui/icons/CheckBox'
 import SearchIcon from '@material-ui/icons/Search'
 import * as Fuse from 'fuse.js'
 import { Typography, FormHelperText } from '@material-ui/core'
+import { emptyArr } from 'utils/fp'
 
 const FUSE_OPTIONS = {
   keys: ['value', 'label'],
@@ -77,7 +78,7 @@ const useStyles = makeStyles(theme => createStyles({
 const MultiSelect = React.forwardRef(
   ({
     id, label, hasError, required, errorMessage,
-    options, values, onChange, maxOptions, sortSelectedFirst,
+    options, values = emptyArr, onChange, maxOptions, sortSelectedFirst,
   }, ref) => {
     const classes = useStyles()
 
