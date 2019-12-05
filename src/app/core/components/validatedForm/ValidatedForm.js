@@ -23,8 +23,8 @@ const styles = theme => ({
     marginBottom: theme.spacing(1),
     '& .MuiFormControl-root': {
       width: '100%',
-      marginTop: theme.spacing(2),
-      marginBottom: theme.spacing(2),
+      marginTop: theme.spacing(1.5),
+      marginBottom: theme.spacing(1.5),
     },
   },
 })

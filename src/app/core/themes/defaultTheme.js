@@ -51,16 +51,16 @@ const theme = {
         color: '#333',
       },
     },
+    */
     MuiOutlinedInput: {
       root: {
-        fontSize: '13px',
-        minWidth: '120px',
+        // fontSize: '13px',
+        // minWidth: '120px',
       },
       input: {
-        padding: '6.5px 14px',
+        padding: '12px 16px',
       },
     },
-    */
     MuiMenuItem: {
       root: {
         fontSize: '13px',
