@@ -31,7 +31,7 @@ const tabStyles = theme => ({
     margin: '0 0 -1px',
     cursor: 'default',
     minHeight: ({ compact }) => compact ? 34 : 48,
-    color: theme.palette.text.disabled,
+    color: theme.palette.text.secondary,
     '&.Mui-selected': {
       color: theme.palette.text.primary,
     },

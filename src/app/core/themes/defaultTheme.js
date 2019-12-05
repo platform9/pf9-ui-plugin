@@ -117,8 +117,8 @@ const theme = {
     type: 'light',
     primary: {
       light: '#AEE0FF',
-      main: '#4AA3DF',
-      dark: '#1E699C',
+      main: '#606060',
+      dark: '#373737',
       contrastText: '#FFF',
     },
     secondary: {
@@ -142,9 +142,9 @@ const theme = {
       contrastText: '#FFF',
     },
     error: {
-      light: '#E57373',
-      main: '#F44336',
-      dark: '#D32F2F',
+      light: '#f67878',
+      main: '#b6453f',
+      dark: '#bc3636',
       contrastText: '#FFF',
     },
     grey: {
@@ -189,12 +189,13 @@ const theme = {
     },
     sidebar: {
       background: '#f3f3f3',
-      text: '#606060',
-      activeText: '#222222',
-      hoverText: '#222222',
+      text: '#646464',
+      activeText: '#1c1c1c',
+      hoverText: '#1c1c1c',
     },
     card: {
       background: 'rgba(2, 194, 172, 0.1)',
+      status: '#696969',
     },
     wizard: {
       dark: '#02c2ac',
