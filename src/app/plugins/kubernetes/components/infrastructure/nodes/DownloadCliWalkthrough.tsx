@@ -3,6 +3,7 @@ import { Typography, Theme } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import CodeBlock from 'core/components/CodeBlock'
 import SimpleLink from 'core/components/SimpleLink'
+import { whatIsBareOSLink } from 'app/constants'
 
 const useStyles = makeStyles((theme: Theme) => ({
   row: {
@@ -37,7 +38,7 @@ const DownloadCliWalkthrough = (): JSX.Element => {
         the instructions below to download the CLI
       </Typography>
       <p>
-        <AnyLink src="">What is BareOS?</AnyLink>
+        <AnyLink src={whatIsBareOSLink}>What is BareOS?</AnyLink>
       </p>
       <p> </p>
       <Typography variant="h6">Pre-requisites</Typography>

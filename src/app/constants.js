@@ -17,6 +17,10 @@ export const uuidRegex = new RegExp(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[
 
 export const k8sPrefix = `${appUrlRoot}/kubernetes`
 
+// Documentation links
+export const qbertApiLink = 'https://docs.platform9.com/kubernetes/Qbert-API-Reference'
+export const whatIsBareOSLink = 'https://docs.platform9.com/kubernetes/on-premise-kubernetes/what-is-bareos'
+
 // Errors
 export const addError = 'ERR_ADD'
 export const updateError = 'ERR_UPDATE'
