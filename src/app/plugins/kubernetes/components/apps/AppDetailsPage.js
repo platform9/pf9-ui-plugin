@@ -50,6 +50,7 @@ const AppDetailsPage = () => {
     clusterId: routeParams.clusterId,
     id: routeParams.id,
     release: routeParams.release,
+    version: null,
   })
   const [showingDeployDialog, setShowingDeployDialog] = useState(false)
   // We are just interested in the first (and only) item

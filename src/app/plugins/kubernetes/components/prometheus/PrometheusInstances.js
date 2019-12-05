@@ -9,7 +9,7 @@ const renderKeyValues = obj => Object.entries(obj)
 
 // Disabling for now until the backend has the links for this working
 /*
-const renderDashboardLink = (field, row, context) => {
+const renderDashboardLink = (field, row) => {
   const link = ApiCLient.getInstance().qbert.getPrometheusDashboardLink(row)
   return <ExternalLink url={link}>dashboard</ExternalLink>
 }

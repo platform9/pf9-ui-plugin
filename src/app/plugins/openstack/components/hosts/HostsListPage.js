@@ -6,7 +6,7 @@ import requiresAuthentication from '../../util/requiresAuthentication'
 import HostsListContainer from './HostsListContainer'
 import createContextLoader from 'core/helpers/createContextLoader'
 
-const loadHosts = createContextLoader('hosts', async ({ context }) => {
+const loadHosts = createContextLoader('hosts', async () => {
   // const hosts = await ApiClient.getInstance().resmgr.getHosts()
   return ApiClient.getInstance().nova.getHypervisors()
 })

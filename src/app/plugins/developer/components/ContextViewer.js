@@ -25,7 +25,8 @@ class ContextViewer extends React.PureComponent {
   handleSearchChange = searchTerm => this.setState({ searchTerm })
 
   render () {
-    const { context } = this.props
+    const { getContext } = this.props
+    const context = getContext()
     const { searchTerm } = this.state
     const cleanContext = removeBadKeys(context)
     const searchedContext = searchTerm === ''

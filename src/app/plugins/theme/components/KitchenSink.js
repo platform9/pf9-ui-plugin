@@ -8,7 +8,7 @@ import WizardExample from './examples/WizardExample'
 import TypographyExample from './examples/TypographyExample'
 import { withAppContext } from 'core/providers/AppProvider'
 
-const KitchenSink = ({ context: { theme } }) => (
+const KitchenSink = ({ theme }) => (
   <div>
     <FormExample />
     <WizardExample />
