@@ -25,10 +25,15 @@ import ClusterSync from './ClusterSync'
 import LoggingAddonDialog from 'k8s/components/logging/LoggingAddonDialog'
 import { Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
-
-const healthy = 'healthy'
-const partiallyHealthy = 'partially_healthy'
-const unhealthy = 'unhealthy'
+import {
+  getConnectionStatus,
+  connectionStatusFields,
+  isConverging,
+  getHealthStatusAndMessage,
+  clusterHealthStatusFields,
+  isTransientState,
+  isSteadyState,
+} from './ClusterStatusUtils'
 
 const useStyles = makeStyles(theme => ({
   link: {
@@ -54,125 +59,18 @@ const getPendingClusterPopoversContent = (cpType, taskStatus) => objSwitchCase({
   deleting: `The cluster and its underlying ${cpType} resources are being deleted`,
 })(taskStatus)
 
-const getConnectionStatus = (nodes) => {
-  let connectionStatus
-
-  if (nodes.every(node => node.status === 'ok' || node.status === 'failed')) {
-    connectionStatus = 'connected'
-  } else if (nodes.find(node => node.status === 'ok' || node.status === 'failed')) {
-    connectionStatus = 'partially connected'
-  } else {
-    connectionStatus = 'disconnected'
-  }
-
-  return connectionStatus
-}
-
 const renderConnectionStatus = (_, { nodes }) => {
   const connectionStatus = getConnectionStatus(nodes)
-  let message
-  let clusterStatus
-  let label
+  const fields = connectionStatusFields[connectionStatus]
 
-  switch (connectionStatus) {
-    case 'connected':
-      message = 'All nodes in the cluster are conected to Platform9 management plane.'
-      clusterStatus = 'ok'
-      label = 'Connected'
-      break
-    case 'disconnected':
-      message = 'All nodes in the cluster are disconected from Platform9 management plane.'
-      clusterStatus = 'fail'
-      label = 'Disconnected'
-      break
-    case 'partially connected':
-      message = 'Some nodes in the cluster are not connected to Platform9 management plane.'
-      clusterStatus = 'pause'
-      label = 'Partially Connected'
-      break
-    default:
-  }
   return (
     <ClusterStatusSpan
-      title={message}
-      status={clusterStatus}>
-      {label}
+      title={fields.message}
+      status={fields.clusterStatus}>
+      {fields.label}
     </ClusterStatusSpan>
   )
 }
-
-const getHealthStatusAndMessage = (healthyMasterNodes = [], nodes, numMasters, numWorkers) => {
-  const healthyMasterNodesCount = healthyMasterNodes.length
-  const healthyWorkersNodesCount = nodes.filter(node => !node.isMaster && node.status === 'ok').length
-  const mastersQuorumNumber = numMasters // TODO: how to get quorum number of masters?
-  const workersQuorumNumber = Math.ceil(numWorkers/2)
-  const mastersHealthStatus = getNodesHealthStatus(healthyMasterNodesCount, numMasters, mastersQuorumNumber)
-  const workersHealthStatus = getNodesHealthStatus(healthyWorkersNodesCount, numWorkers, workersQuorumNumber)
-
-  return getClusterHealthStatusAndMessage(mastersHealthStatus, workersHealthStatus)
-}
-
-const getNodesHealthStatus = (healthyCount, count, threshold) => {
-  let healthStatus
-
-  if (healthyCount === count) {
-    healthStatus = healthy
-  } else if (healthyCount >= threshold) {
-    healthStatus = partiallyHealthy
-  } else {
-    healthStatus = unhealthy
-  }
-
-  return healthStatus
-}
-
-const getClusterHealthStatusAndMessage = (mastersHealthStatus, workersHealthStatus) => {
-  let healthStatus
-  let message
-
-  if (mastersHealthStatus === healthy && workersHealthStatus === healthy) {
-    healthStatus = healthy
-    message = 'All masters and all workers are healthy'
-  } else if (mastersHealthStatus === healthy && workersHealthStatus === partiallyHealthy) {
-    healthStatus = healthy
-    message = 'All masters are healthy, majority of workers (> 50%) are healthy'
-  } else if (mastersHealthStatus === healthy && workersHealthStatus === unhealthy) {
-    healthStatus = unhealthy
-    message = 'All masters are healthy but majority of workers (> 50%) are unhealthy'
-  } else if (mastersHealthStatus === partiallyHealthy && workersHealthStatus === healthy) {
-    healthStatus = partiallyHealthy
-    message = 'Quorum number of masters are healthy, all workers are healthy'
-  } else if (mastersHealthStatus === partiallyHealthy && workersHealthStatus === partiallyHealthy) {
-    healthStatus = partiallyHealthy
-    message = 'Quorum number of masters are healthy, majority of workers (>50%) are healthy'
-  } else if (mastersHealthStatus === partiallyHealthy && workersHealthStatus === unhealthy) {
-    healthStatus = unhealthy
-    message = 'Quorum number of masters are healthy but majority of workers (> 50%) are unhealthy'
-  } else if (mastersHealthStatus === unhealthy && workersHealthStatus === healthy) {
-    healthStatus = unhealthy
-    message = 'Less than quorum number of masters are healthy, all workers are healthy'
-  } else if (mastersHealthStatus === unhealthy && workersHealthStatus === partiallyHealthy) {
-    healthStatus = unhealthy
-    message = 'Less than quorum number of masters are healthy, majority of workers (>50%) are healthy'
-  } else if (mastersHealthStatus === unhealthy && workersHealthStatus === unhealthy) {
-    healthStatus = unhealthy
-    message = 'Less than quorum number of masters are healthy, and majority of workers (>50%) are unhealthy'
-  }
-
-  return [healthStatus, message]
-}
-
-const isConverging = (nodes) => !!nodes.find(node => node.status === 'converging')
-
-const isSteadyState = (taskStatus, nodes) =>
-  !isConverging(nodes) && (taskStatus === 'success' || taskStatus === 'error')
-
-const isTransientState = (taskStatus, nodes) =>
-  taskStatus === 'creating' ||
-  taskStatus === 'deleting' ||
-  taskStatus === 'updating' ||
-  taskStatus === 'upgrading' ||
-  isConverging(nodes)
 
 const renderTransientStatus = (taskStatus, nodes) => {
   const currentStatus = isConverging(nodes) ? 'converging' : taskStatus
@@ -209,31 +107,14 @@ const renderGenericHealthStatus = (status, taskStatus, progressPercent, cloudPro
 
 const renderClusterHealthStatus = (healthyMasterNodes, nodes, numMasters, numWorkers) => {
   const [healthStatus, message] = getHealthStatusAndMessage(healthyMasterNodes, nodes, numMasters, numWorkers)
-  let status
-  let label
-
-  switch (healthStatus) {
-    case 'healthy':
-      status = 'ok'
-      label = 'Healthy'
-      break
-    case 'partially_healthy':
-      status = 'pause'
-      label = 'Partially healthy'
-      break
-    case 'unhealthy':
-      status = 'fail'
-      label = 'Unhealthy'
-      break
-    default:
-  }
+  const fields = clusterHealthStatusFields[healthStatus]
 
   return (
     <ClusterStatusSpan
       title={message}
-      status={status}
+      status={fields.status}
     >
-      {label}
+      {fields.label}
     </ClusterStatusSpan>
   )
 }
@@ -249,11 +130,13 @@ const renderHealthStatus = (status, {
 }) => {
   if (isTransientState(taskStatus, nodes)) {
     return renderTransientStatus(taskStatus, nodes)
-  } else if (isSteadyState(taskStatus, nodes)) {
-    return renderClusterHealthStatus(healthyMasterNodes, nodes, numMasters, numWorkers)
-  } else {
-    renderGenericHealthStatus(status, taskStatus, progressPercent, cloudProviderType)
   }
+
+  if (isSteadyState(taskStatus, nodes)) {
+    return renderClusterHealthStatus(healthyMasterNodes, nodes, numMasters, numWorkers)
+  }
+
+  return renderGenericHealthStatus(status, taskStatus, progressPercent, cloudProviderType)
 }
 
 const renderLinks = links => {
