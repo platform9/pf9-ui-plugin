@@ -19,12 +19,13 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'flex-end',
     minHeight: 50,
   },
+
 }))
 
 const StatsToggle = ({ statsVisible, toggleStats }) => {
   return <FormControlLabel
     control={
-      <Switch onChange={toggleStats} checked={statsVisible} />
+      <Switch onChange={toggleStats} checked={statsVisible} color="primary" />
     }
     label="Show Stats"
     labelPlacement="start"

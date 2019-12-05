@@ -9,11 +9,17 @@ const useStyles = makeStyles(theme => ({
   },
   header: {
     padding: theme.spacing(1.5, 2),
-    backgroundColor: 'rgba(74, 163, 223, .2)',
+    backgroundColor: theme.palette.card.background,
   },
   content: {
     display: 'flex',
     justifyContent: 'center',
+    backgroundColor: theme.palette.card.background,
+    paddingTop: 0,
+    paddingBottom: theme.spacing(1.5),
+    '&:last-child': {
+      paddingBottom: theme.spacing(1.5),
+    }
   },
   headerContent: {
     display: 'flex',

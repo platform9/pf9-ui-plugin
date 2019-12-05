@@ -41,7 +41,8 @@ const styles = theme => ({
   label: {
     paddingTop: 5,
     textAlign: 'center',
-    width: '100%'
+    width: '100%',
+    whiteSpace: 'nowrap',
   }
 })
 
