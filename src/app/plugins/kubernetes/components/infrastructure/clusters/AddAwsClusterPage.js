@@ -30,8 +30,8 @@ const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 const initialContext = {
   template: 'small',
   ami: 'ubuntu',
-  masterFlavor: 't2.small',
-  workerFlavor: 't2.small',
+  masterFlavor: 't2.medium',
+  workerFlavor: 't2.medium',
   numMasters: 1,
   numWorkers: 1,
   enableCAS: false,
@@ -47,7 +47,7 @@ const initialContext = {
 }
 
 const templateOptions = [
-  { label: 'small - 1 node master + worker (t2.small)', value: 'small' },
+  { label: 'small - 1 node master + worker (t2.medium)', value: 'small' },
   { label: 'medium - 1 master + 3 workers (t2.medium)', value: 'medium' },
   { label: 'large - 3 masters + 5 workers (t2.large)', value: 'large' },
   { label: 'custom', value: 'custom' },
@@ -82,8 +82,8 @@ const handleTemplateChoice = ({ setWizardContext, setFieldValue, paramUpdater })
       numMasters: 1,
       numWorkers: 0,
       allowWorkloadsOnMaster: true,
-      masterFlavor: 't2.small',
-      workerFlavor: 't2.small',
+      masterFlavor: 't2.medium',
+      workerFlavor: 't2.medium',
     },
     medium: {
       numMasters: 1,
