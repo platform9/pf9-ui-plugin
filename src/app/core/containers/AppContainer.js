@@ -82,6 +82,7 @@ const AppContainer = props => {
 
     if (history.location.pathname === forgotPasswordUrl) return history.push(forgotPasswordUrl)
 
+    // TODO: Need to fix this code after synching up with backend.
     if (history.location.hash.includes(resetPasswordThroughEmailUrl)) return history.push(history.location.hash.slice().replace('#', '/ui'))
 
     history.push(loginUrl)
