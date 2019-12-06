@@ -41,7 +41,7 @@ const EditClusterPage = () => {
     // The cluster ID is not present in the form as a field so it won't be passed as a value to the submit function
     uuid: initialValues.uuid,
     tags: tagsArrToObj(tags),
-  }), [update])
+  }), [update, initialValues])
 
   return <FormWrapper
     title={`Edit Cluster ${initialValues.name || ''}`}

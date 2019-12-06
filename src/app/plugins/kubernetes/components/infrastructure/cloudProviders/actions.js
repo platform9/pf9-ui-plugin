@@ -26,7 +26,7 @@ export const cloudProviderActions = createCRUDActions(cloudProvidersCacheKey, {
     return {
       // TODO we need "nodePoolUuid"
       ...pick(['name', 'type'], params),
-      ...result
+      ...result,
     }
   },
   updateFn: ({ uuid, ...data }) => qbert.updateCloudProvider(uuid, data),
@@ -56,29 +56,31 @@ export const cloudProviderActions = createCRUDActions(cloudProvidersCacheKey, {
       combinedHosts.filter(propSatisfies(id => nodeIds.includes(id), 'id'))
     const usagePathStr = 'resmgr.extensions.resource_usage.data'
 
-    return items.map(cloudProvider => {
-      const descriptiveType = cloudProviderTypes[cloudProvider.type] || capitalizeString(cloudProvider.type)
-      const filterCpClusters = propEq('nodePoolUuid', cloudProvider.nodePoolUuid)
-      const cpClusters = clusters.filter(filterCpClusters)
-      const cpNodes = pluck('nodes', cpClusters).flat()
-      const cpHosts = getNodesHosts(pluck('uuid', cpNodes))
-      const calcDeployedCapacity = calcUsageTotals(cpHosts)
-      const deployedCapacity = {
-        compute: calcDeployedCapacity(`${usagePathStr}.cpu.used`, `${usagePathStr}.cpu.total`),
-        memory: calcDeployedCapacity(
-          item => pathStrOr(0, `${usagePathStr}.memory.total`, item) - pathStrOr(0, `${usagePathStr}.memory.available`, item),
-          `${usagePathStr}.memory.total`, true),
-        disk: calcDeployedCapacity(`${usagePathStr}.disk.used`, `${usagePathStr}.disk.total`),
-      }
+    return items
+      .filter(({ type }) => type !== 'local')
+      .map(cloudProvider => {
+        const descriptiveType = cloudProviderTypes[cloudProvider.type] || capitalizeString(cloudProvider.type)
+        const filterCpClusters = propEq('nodePoolUuid', cloudProvider.nodePoolUuid)
+        const cpClusters = clusters.filter(filterCpClusters)
+        const cpNodes = pluck('nodes', cpClusters).flat()
+        const cpHosts = getNodesHosts(pluck('uuid', cpNodes))
+        const calcDeployedCapacity = calcUsageTotals(cpHosts)
+        const deployedCapacity = {
+          compute: calcDeployedCapacity(`${usagePathStr}.cpu.used`, `${usagePathStr}.cpu.total`),
+          memory: calcDeployedCapacity(
+            item => pathStrOr(0, `${usagePathStr}.memory.total`, item) - pathStrOr(0, `${usagePathStr}.memory.available`, item),
+            `${usagePathStr}.memory.total`, true),
+          disk: calcDeployedCapacity(`${usagePathStr}.disk.used`, `${usagePathStr}.disk.total`),
+        }
 
-      return {
-        ...cloudProvider,
-        descriptiveType,
-        deployedCapacity,
-        clusters: cpClusters,
-        nodes: cpNodes,
-      }
-    })
+        return {
+          ...cloudProvider,
+          descriptiveType,
+          deployedCapacity,
+          clusters: cpClusters,
+          nodes: cpNodes,
+        }
+      })
   },
   uniqueIdentifier: 'uuid',
 })
