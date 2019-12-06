@@ -118,13 +118,13 @@ const clusterHealthStatusAndMessageTable = [
   },
 ]
 
-export const isConverging = (nodes) => !!nodes.find(node => node.status === 'converging')
+export const hasConvergingNodes = (nodes) => !!nodes.find(node => node.status === 'converging')
 
 export const isSteadyState = (taskStatus, nodes) =>
-  !isConverging(nodes) && ['success', 'error'].includes(taskStatus)
+  !hasConvergingNodes(nodes) && ['success', 'error'].includes(taskStatus)
 
 export const isTransientState = (taskStatus, nodes) =>
-  ['creating', 'deleting', 'updating', 'upgrading'].includes(taskStatus) || isConverging(nodes)
+  ['creating', 'deleting', 'updating', 'upgrading', 'converging'].includes(taskStatus) || hasConvergingNodes(nodes)
 
 export const clusterHealthStatusFields = {
   [healthy]: {
