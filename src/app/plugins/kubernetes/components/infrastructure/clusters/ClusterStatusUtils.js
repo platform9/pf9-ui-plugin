@@ -1,6 +1,7 @@
 const healthy = 'healthy'
 const partiallyHealthy = 'partially_healthy'
 const unhealthy = 'unhealthy'
+const unknown = 'unknown'
 
 const nodeStatusOkOrFailed = (node) => node.status === 'ok' || node.status === 'failed'
 
@@ -35,6 +36,12 @@ export const connectionStatusFields = {
 }
 
 export const getHealthStatusAndMessage = (healthyMasterNodes = [], nodes = [], numMasters, numWorkers) => {
+  const connectionStatus = getConnectionStatus(nodes)
+
+  if (connectionStatus === 'disconnected') {
+    return [unknown, 'Cluster is disconnected']
+  }
+
   const healthyMasterNodesCount = healthyMasterNodes.length
   const healthyWorkersNodesCount = nodes.filter(node => !node.isMaster && node.status === 'ok').length
   const mastersQuorumNumber = numMasters // TODO: how to get quorum number of masters?
@@ -138,5 +145,9 @@ export const clusterHealthStatusFields = {
   [unhealthy]: {
     status: 'fail',
     label: 'Unhealthy',
+  },
+  [unknown]: {
+    status: 'pause',
+    label: 'Unknown'
   },
 }

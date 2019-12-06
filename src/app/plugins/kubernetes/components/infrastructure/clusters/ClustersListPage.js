@@ -11,7 +11,6 @@ import DescriptionIcon from '@material-ui/icons/Description'
 import { clustersCacheKey } from '../common/actions'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { capitalizeString } from 'utils/misc'
-import { objSwitchCase } from 'utils/fp'
 import ProgressBar from 'core/components/progress/ProgressBar'
 import ClusterStatusSpan from 'k8s/components/infrastructure/clusters/ClusterStatusSpan'
 import ResourceUsageTable from 'k8s/components/infrastructure/common/ResourceUsageTable'
@@ -82,7 +81,7 @@ const renderTransientStatus = (taskStatus, nodes, progressPercent) => {
         />
       }
       <ClusterSync taskStatus={currentStatus}>
-        <ClusterStatusSpan status='loading' title={spanContent}>
+        <ClusterStatusSpan title={spanContent}>
           {capitalizeString(currentStatus)}
         </ClusterStatusSpan>
       </ClusterSync>
