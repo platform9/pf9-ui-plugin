@@ -38,6 +38,8 @@ const EditClusterPage = () => {
   const [update, updating] = useDataUpdater(clusterActions.update, onComplete)
   const handleSubmit = useCallback(({ tags, ...cluster }) => update({
     ...cluster,
+    // The cluster ID is not present in the form as a field so it won't be passed as a value to the submit function
+    uuid: initialValues.uuid,
     tags: tagsArrToObj(tags),
   }), [update])
 
