@@ -24,7 +24,7 @@ const useStyles = makeStyles(theme => ({
   },
 }))
 
-const AddCloudProviderForm = ({ loading, onComplete, ...rest }) => {
+export const AddCloudProviderForm = ({ loading, onComplete, ...rest }) => {
   const classes = useStyles()
   const [activeProvider, setActiveProvider] = useState('aws')
   const ActiveForm = useMemo(() => objSwitchCase({
@@ -50,9 +50,21 @@ const AddCloudProviderForm = ({ loading, onComplete, ...rest }) => {
   </div>
 }
 
+const DisabledAddCloudProviderForm = () => {
+  const classes = useStyles()
+
+  return <div className={classes.root}>
+    <Typography variant="subtitle1">Cloud Provider Type (Comming Soon)</Typography>
+    <div className={classes.cloudProviderCards}>
+      <CloudProviderCard disabled type="aws" />
+      <CloudProviderCard disabled type="azure" />
+    </div>
+  </div>
+}
+
 export const options = {
   createFn: cloudProviderActions.create,
-  FormComponent: AddCloudProviderForm,
+  FormComponent: DisabledAddCloudProviderForm,
   listUrl: '/ui/kubernetes/infrastructure#cloudProviders',
   name: 'AddCloudProvider',
   title: 'New Cloud Provider',

@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react'
 import DownloadKubeConfigLink from './DownloadKubeConfigLink'
-import KubeCLI from './KubeCLI'
+// import KubeCLI from './KubeCLI' // commented out till we support cli links
 import ExternalLink from 'core/components/ExternalLink'
 import SimpleLink from 'core/components/SimpleLink'
 import ScaleIcon from '@material-ui/icons/TrendingUp'

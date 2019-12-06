@@ -66,7 +66,7 @@ export const columns = [
 ]
 
 export const options = {
-  addText: 'Download CLI',
+  addText: 'Onboard a Node',
   addUrl: '/ui/kubernetes/infrastructure/nodes/cli/download',
   columns,
   cacheKey: nodesCacheKey,
