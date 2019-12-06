@@ -82,7 +82,7 @@ const AppContainer = props => {
 
     if (history.location.pathname === forgotPasswordUrl) return history.push(forgotPasswordUrl)
 
-    if (history.location.hash.includes(resetPasswordThroughEmailUrl)) return history.push(history.location.hash.slice().replace('#', 'ui'))
+    if (history.location.hash.includes(resetPasswordThroughEmailUrl)) return history.push(history.location.hash.slice().replace('#', '/ui'))
 
     history.push(loginUrl)
   }
