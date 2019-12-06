@@ -145,7 +145,7 @@ const renderLinks = links => {
     <div>
       {links.dashboard && <ExternalLink url={links.dashboard}>Dashboard</ExternalLink>}
       {links.kubeconfig && <DownloadKubeConfigLink cluster={links.kubeconfig.cluster} />}
-      {links.cli && <KubeCLI {...links.cli} />}
+      {/* {links.cli && <KubeCLI {...links.cli} />} */}
     </div>
   )
 }
