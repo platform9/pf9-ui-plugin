@@ -24,7 +24,9 @@ export const hasMinLength = curry((minLen, value) => both(is(String), val => val
 export const hasOneLowerChar = both(is(String), test(/[a-z]/))
 export const hasOneUpperChar = both(is(String), test(/[A-Z]/))
 export const hasOneNumber = both(is(String), test(/[0-9]/))
-export const hasOneSpecialChar = both(is(String), test(/[-!@#$%^&*()?]/))
+
+export const specialChars = '-+!@#$%^&*()?'
+export const hasOneSpecialChar = both(is(String), test(new RegExp(`[${specialChars}]`)))
 
 export const masterNodeLengthValidator = new FieldValidator(
   nodes => (fieldIsUnset(nodes) || [1, 3, 5].includes(nodes.length)),
@@ -125,7 +127,7 @@ export const passwordValidator = new FieldValidator(
     [complement(hasOneLowerChar), always('Password must contain at least one lowercase letter')],
     [complement(hasOneUpperChar), always('Password must contain at least one uppercase letter')],
     [complement(hasOneNumber), always('Password must contain at least one number')],
-    [complement(hasOneSpecialChar), always('Password must contain at least one special character')],
+    [complement(hasOneSpecialChar), always(`Password must contain at least one special character, valid characters: "${specialChars}"`)],
   ])(value),
 )
 

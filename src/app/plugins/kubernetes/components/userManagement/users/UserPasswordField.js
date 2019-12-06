@@ -2,7 +2,7 @@ import TextField from 'core/components/validatedForm/TextField'
 import { Typography, List } from '@material-ui/core'
 import {
   hasMinLength, hasOneLowerChar, hasOneUpperChar, hasOneNumber, hasOneSpecialChar,
-  requiredValidator, passwordValidator,
+  requiredValidator, passwordValidator, specialChars,
 } from 'core/utils/fieldValidators'
 import React from 'react'
 import ListItem from '@material-ui/core/ListItem'
@@ -38,7 +38,7 @@ const UserPasswordField = ({ value }) => <>
         1 Number
       </CheckListItem>
       <CheckListItem checked={hasOneSpecialChar(value)}>
-        1 Special character - !@#$%^&*()?
+        1 Special character - {specialChars}
       </CheckListItem>
     </List>
   </Typography>
