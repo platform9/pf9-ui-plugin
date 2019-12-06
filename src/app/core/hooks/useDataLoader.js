@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useState, useCallback, useContext, useRef } from 'react'
+import { useMemo, useEffect, useCallback, useContext, useRef, useReducer } from 'react'
 import moize from 'moize'
 import { emptyArr, emptyObj } from 'utils/fp'
 import { isEmpty } from 'ramda'
@@ -6,11 +6,33 @@ import { useToast } from 'core/providers/ToastProvider'
 import { AppContext } from 'core/providers/AppProvider'
 import { memoizedDep } from 'utils/misc'
 
-const onErrorHandler = moize((loaderFn, showToast, registerNotification) => (errorMessage, catchedErr, params) => {
-  const key = loaderFn.getKey()
-  console.error(`Error when fetching items for entity "${key}"`, catchedErr)
-  showToast(errorMessage + `\n${catchedErr.message || catchedErr}`, 'error')
-  registerNotification(errorMessage, catchedErr.message || catchedErr, 'error')
+const onErrorHandler = moize((loaderFn, showToast, registerNotification) =>
+  (errorMessage, catchedErr, params) => {
+    const key = loaderFn.getKey()
+    console.error(`Error when fetching items for entity "${key}"`, catchedErr)
+    showToast(errorMessage + `\n${catchedErr.message || catchedErr}`, 'error')
+    registerNotification(errorMessage, catchedErr.message || catchedErr, 'error')
+  })
+
+const dataLoaderReducer = (state, { type, payload }) => {
+  switch (type) {
+    case 'startLoading':
+      return state.loading ? state : {
+        ...state,
+        loading: true,
+      }
+    case 'finishLoading':
+    default:
+      return {
+        loading: false,
+        data: payload,
+      }
+  }
+}
+
+const initState = loadOnDemand => ({
+  loading: !loadOnDemand,
+  data: emptyArr,
 })
 
 /**
@@ -40,8 +62,7 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
   // The aim of this is to prevent issues in the case two or more subsequent data loading requests
   // are performed with different params, and the previous one didn't have time to finish
   const loaderPromisesBuffer = useRef([])
-  const [loading, setLoading] = useState(false)
-  const [data, setData] = useState(emptyArr)
+  const [{ loading, data }, dispatch] = useReducer(dataLoaderReducer, loadOnDemand, initState)
   const { getContext, setContext, currentTenant, currentRegion, registerNotification } = useContext(AppContext)
   const showToast = useToast()
 
@@ -61,7 +82,7 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
   const loadData = async (refetch) => {
     // No need to update loading state if a request is already in progress
     if (isEmpty(loaderPromisesBuffer.current)) {
-      setLoading(true)
+      dispatch({ type: 'startLoading' })
     }
     if (invalidatingCache.current) {
       loaderFn.invalidateCache && loaderFn.invalidateCache()
@@ -80,8 +101,7 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
     // With this condition, we ensure that all promises except the last one will be ignored
     if (isEmpty(loaderPromisesBuffer.current) &&
       !unmounted.current) {
-      setData(result)
-      setLoading(false)
+      dispatch({ type: 'finishLoading', payload: result })
     }
     return result
   }
