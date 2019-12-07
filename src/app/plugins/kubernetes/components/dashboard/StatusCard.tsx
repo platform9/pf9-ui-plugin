@@ -12,7 +12,7 @@ const useStyles = makeStyles((theme: any) => ({
   headerIcon: {
     width: theme.spacing(5),
     height: theme.spacing(5),
-    color: theme.palette.primary.dark,
+    color: theme.palette.text.secondary,
   },
   contentContainer: {
     display: 'flex',
@@ -24,6 +24,7 @@ const useStyles = makeStyles((theme: any) => ({
     padding: theme.spacing(1.5, 1.5, 0.5, 1.5),
     borderRadius: '5px',
     transition: 'transform .1s ease',
+    boxShadow: '1px 1px 4px -2px rgba(0,0,0,0.35)',
     '&:hover': {
       backgroundColor: hexToRGBA(theme.palette.card.status, 0.95),
       transform: 'scale(1.025)'
@@ -41,20 +42,20 @@ const useStyles = makeStyles((theme: any) => ({
     color: theme.palette.primary.dark,
   },
   text: {
-    color: theme.palette.secondary.contrastText, // white
+    color: theme.palette.text.secondary,
     marginLeft: '1px',
   },
   cardTitle: {
     marginLeft: theme.spacing(1),
     fontWeight: 400,
-    color: theme.palette.secondary.contrastText, // white
+    color: theme.palette.text.secondary,
   },
   failedText: {
     color: theme.palette.error.light,
     marginLeft: theme.spacing(2),
   },
   pendingText: {
-    color: '#FEC35D',
+    color: '#cb9f53',
     marginLeft: theme.spacing(2),
   },
 }))

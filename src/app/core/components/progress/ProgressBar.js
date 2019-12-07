@@ -21,7 +21,7 @@ const useStyles = makeStyles(theme => ({
     paddingLeft: ({ compact }) =>
       compact ? null : theme.spacing(1),
     color: 'rgba(0, 0, 0, 0.87)',
-    fontSize: '0.7rem',
+    fontSize: '12px',
     letterSpacing: 0.1,
   },
   progressContainer: {
@@ -43,7 +43,7 @@ const useStyles = makeStyles(theme => ({
   progress: {
     display: 'flex',
     flexFlow: 'row nowrap',
-    fontSize: '0.75rem',
+    fontSize: '12px',
     alignItems: 'center',
     justifyContent: 'center',
     width: ({ percent }) => `${percent}%`,

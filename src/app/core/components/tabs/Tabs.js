@@ -22,7 +22,6 @@ const styles = theme => ({
 })
 
 const tabStyles = theme => ({
-  /*
   root: {
     textTransform: 'none',
     fontSize: ({ compact }) => compact ? 14 : 21,
@@ -48,7 +47,6 @@ const tabStyles = theme => ({
     transition: 'all .2s',
     lineHeight: 1,
   },
-  */
 })
 
 const CustomTab = withStyles(tabStyles)(({ compact, ...rest }) => <MDTab {...rest} />)
@@ -101,7 +99,8 @@ class Tabs extends PureComponent {
                 textColor="inherit"
               >
                 {tabs.map(tab =>
-                  <MDTab
+                  <CustomTab
+                    compact={compact}
                     key={tab.value}
                     value={tab.value}
                     label={tab.label}

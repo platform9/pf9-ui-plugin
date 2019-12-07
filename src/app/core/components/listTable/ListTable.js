@@ -34,7 +34,7 @@ const styles = theme => ({
     overflowX: 'auto',
   },
   cell: {
-    fontSize: '13px',
+    fontSize: '12px',
   },
   emptyList: {
     textAlign: 'left',
