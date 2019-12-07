@@ -1,67 +1,65 @@
 import React from 'react'
 import { makeStyles } from '@material-ui/styles'
 import { Theme } from '@material-ui/core'
-import { SvgIconProps } from '@material-ui/core/SvgIcon'
+import clsx from 'clsx'
 
-const useStyles = makeStyles<Theme, { justify: string }>((theme: Theme) => ({
+interface IStyles {
+  iconColor: 'primary' | 'secondary' | 'disabled'
+  justify: string
+  clickable: boolean
+  reverse: boolean
+}
+
+const useStyles = makeStyles<Theme, IStyles>((theme: Theme) => ({
   flex: {
     display: 'flex',
+    flexDirection: ({ reverse }) => (reverse ? 'row-reverse' : 'row'),
     alignItems: 'center',
     justifyContent: ({ justify }) => justify || 'flex-start',
   },
   spacer: {
-    width: theme.spacing(),
+    width: theme.spacing(0.5),
   },
   rotateContainer: {
     width: '22px',
     height: '22px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: ({ clickable }) => (clickable ? 'pointer' : 'default'),
   },
-  rotate: {
-    animation: '$spin 750ms infinite forwards',
-  },
-  rotateReverse: {
-    animation: '$spinReverse 750ms infinite forwards',
-  },
-  '@keyframes spinReverse': {
-    '0%': {
-      transform: 'rotate(360deg)',
-    },
-    '100%': {
-      transform: 'rotate(0deg)',
-    },
-  },
-  '@keyframes spin': {
-    '0%': {
-      transform: 'rotate(0deg)',
-    },
-    '100%': {
-      transform: 'rotate(360deg)',
-    },
+  icon: {
+    color: ({ iconColor }) => theme.palette.text[iconColor],
   },
 }))
 
-interface Props extends SvgIconProps {
+interface Props {
+  color?: 'primary' | 'secondary' | 'disabled'
   children?: any
   loading?: boolean
   reverse?: boolean
   justify?: string
-  icon: React.ComponentType<SvgIconProps>
+  onClick?: () => void
 }
 
 const Loading = ({
   children,
-  icon: IconComponent,
   loading = true,
   reverse = false,
   justify = undefined,
-  ...iconProps
+  color = 'primary',
+  onClick = undefined,
 }: Props): JSX.Element => {
-  const { rotate, rotateReverse, flex, spacer, rotateContainer } = useStyles({ justify })
-  const rotateCls = reverse ? rotateReverse : rotate
+  const { flex, spacer, rotateContainer, icon } = useStyles({
+    justify,
+    clickable: !!onClick,
+    iconColor: color,
+    reverse,
+  })
   return (
     <div className={flex}>
-      <div className={`${rotateContainer} ${loading ? rotateCls : ''}`}>
-        <IconComponent {...iconProps} />
+      <div className={rotateContainer} onClick={onClick}>
+        <i className={clsx({ 'fa-spin': loading }, icon, 'fal fa-md fa-sync')} />
       </div>
       <span className={spacer} />
       {children}
