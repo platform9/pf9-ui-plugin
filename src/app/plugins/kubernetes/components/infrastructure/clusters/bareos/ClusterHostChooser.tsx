@@ -64,7 +64,7 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef(
 
     const Warning = ({ children }) => <Typography variant="body1" className={errorText}>{children}</Typography>
 
-    const onReload = useCallback( () => {
+    const onReload = useCallback(() => {
       setLastFetchTs(new Date().valueOf())
       setLastFetchMsg(moment().fromNow())
       loadMore(true)
