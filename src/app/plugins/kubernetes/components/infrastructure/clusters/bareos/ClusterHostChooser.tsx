@@ -29,7 +29,7 @@ export const excludeNodes = (excludeList: string[] = []) => (node: ICombinedNode
 export const isMaster = (node: ICombinedNode) => !!node.isMaster
 export const isNotMaster = (node: ICombinedNode) => !node.isMaster
 export const inCluster = (clusterUuid: string) => (node: ICombinedNode) => node.clusterUuid === clusterUuid
-const fiveMinutes = 1000 * 60 * 5
+const refreshDuration = 1000 * 60 * 5
 
 // TODO: all the ValidatedForm stuff is in JS and we need the props to be merged
 // into this component.  Refactor this later on when we can convert
@@ -77,7 +77,7 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef(
         }
       }, 1000)
       const currentTs = new Date().valueOf()
-      if (currentTs - lastFetchTs > fiveMinutes) {
+      if (currentTs - lastFetchTs > refreshDuration) {
         onReload()
       }
     }
