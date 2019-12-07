@@ -27,7 +27,7 @@ const styles = theme => ({
     paddingRight: 4,
   },
   headLabel: {
-    fontSize: '13px',
+    fontSize: '12px',
     whiteSpace: 'nowrap',
   },
   cellLabel: {
