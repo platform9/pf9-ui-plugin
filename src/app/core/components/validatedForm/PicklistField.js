@@ -23,7 +23,7 @@ const useStyles = makeStyles(() => ({
 const PicklistField = React.forwardRef(({
   DropdownComponent, id, info, placement,
   label, required, value, showNone, updateFieldValue, getCurrentValue,
-  hasError, errorMessage, options, ...restProps
+  hasError, errorMessage, options, disabled, ...restProps
 }, ref) => {
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
@@ -35,6 +35,7 @@ const PicklistField = React.forwardRef(({
     <InfoTooltip open={open} info={info} placement={placement}>
       <DropdownComponent
         {...restProps}
+        disabled={disabled}
         InputLabelProps={{
           classes: {
             root: classes.label,
@@ -42,9 +43,9 @@ const PicklistField = React.forwardRef(({
         }}
         formField
         label={required ? `${label} *` : label}
-        onMouseEnter={openTooltip}
+        onMouseEnter={!disabled ? openTooltip : undefined}
         onMouseLeave={closeTooltip}
-        onFocus={openTooltip}
+        onFocus={!disabled ? openTooltip : undefined}
         onBlur={closeTooltip}
         onClick={closeTooltip}
         ref={ref}
