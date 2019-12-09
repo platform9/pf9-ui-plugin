@@ -20,7 +20,7 @@ const overviewStats = cluster => ({
   'Unique ID':           cluster.uuid,
 })
 
-const openstackProps = cluster => ({
+const bareOsProps = cluster => ({
   'Load Balancer': cluster.hasLoadBalancer,
   'Physical Network Interface': cluster.masterVipIface,
   'Virtual IP Address': cluster.masterVipIpv4,
@@ -74,8 +74,8 @@ const renderCloudInfo = cluster => {
     case 'local':
       return (
         <InfoPanel
-          title="OpenStack Properties"
-          items={openstackProps(cluster.cloudProperties)}
+          title="More Info"
+          items={bareOsProps(cluster.cloudProperties)}
         />
       )
     case 'azure':
