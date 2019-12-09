@@ -121,7 +121,7 @@ class Wizard extends PureComponent {
           {this.canBackAtFirstStep() && <PrevButton onClick={this.handleOriginBack} />}
           {this.hasNext() && <NextButton onClick={this.handleNext}>Next</NextButton>}
           {this.isLastStep() && <NextButton onClick={this.handleNext}>{submitLabel}</NextButton>}
-          {showFinishAndReviewButton && this.isFinishAndReviewVisible() && <NextButton onClick={this.onFinishAndReview}>{finishAndReviewLabel}</NextButton>}
+          {showFinishAndReviewButton && this.isFinishAndReviewVisible() && <NextButton onClick={this.onFinishAndReview} showForward={false}>{finishAndReviewLabel}</NextButton>}
         </WizardButtons>
       </WizardContext.Provider>
     )
@@ -143,7 +143,7 @@ Wizard.propTypes = {
 Wizard.defaultProps = {
   showSteps: true,
   submitLabel: 'Complete',
-  finishAndReviewLabel: 'Finish And Review',
+  finishAndReviewLabel: 'Finish and Review',
   onComplete: value => {
     console.info('Wizard#onComplete handler not implemented.  Falling back to console.log')
     console.log(value)

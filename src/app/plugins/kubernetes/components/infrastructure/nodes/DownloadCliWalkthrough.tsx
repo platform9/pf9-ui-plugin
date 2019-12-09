@@ -29,14 +29,26 @@ const AnyLink: any = SimpleLink
 const installCommand =
   '> curl -O https://raw.githubusercontent.com/platform9/express-cli/master/cli-setup.sh | bash ./cli-setup.sh'
 
-const DownloadCliWalkthrough = (): JSX.Element => {
+// Not super enthused about this. Need to have different content for bareos flow vs landing page.
+export const DownloadCliBareOSWalkthrough = (): JSX.Element => (
+  <>
+    <Typography component="span">
+      In order to create a BareOS cluster, you need to first download and install the Platform9 CLI
+      on each of your physical or virtual machines that you wish to add to the cluster. Follow the
+      instructions below to download the CLI
+    </Typography>
+    <DownloadCliWalkthrough />
+  </>
+)
+
+const defaultFinalStep = {
+  title: 'Refresh grid',
+  description: 'Once you have installed the CLI on the required nodes, refresh the grid above. You should now see those nodes in the grid and you can select them to be added to your cluster',
+}
+
+const DownloadCliWalkthrough = ({ finalStep = defaultFinalStep }): JSX.Element => {
   return (
     <>
-      <Typography component="span">
-        In order to create a BareOS cluster, you need to first download and install the Platform9
-        CLI on each of your physical or virtual machines that you wish to add to the cluster. Follow
-        the instructions below to download the CLI
-      </Typography>
       <p>
         <AnyLink src={whatIsBareOSLink}>What is BareOS?</AnyLink>
       </p>
@@ -61,8 +73,7 @@ const DownloadCliWalkthrough = (): JSX.Element => {
       />
       <NumberedSteps
         step={3}
-        title="Refresh grid"
-        description="Once you have installed the CLI on the required nodes, refresh the grid above. You should now see those nodes in the grid and you can select them to be added to your cluster"
+        {...finalStep}
       />
     </>
   )

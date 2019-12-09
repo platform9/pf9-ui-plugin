@@ -22,8 +22,8 @@ const AddClusterPage = () => {
   return (
     <FormWrapper className={classes.root} title="Select one of the supported Cloud Provider Types:" backUrl={listUrl}>
       <CloudProviderCard type="other" src={`${k8sPrefix}/infrastructure/clusters/addBareOs`} />
-      <CloudProviderCard type="aws" src={`${k8sPrefix}/infrastructure/clusters/addAws`} />
-      <CloudProviderCard type="azure" src={`${k8sPrefix}/infrastructure/clusters/addAzure`} />
+      <CloudProviderCard disabled type="aws" src={`${k8sPrefix}/infrastructure/clusters/addAws`} />
+      <CloudProviderCard disabled type="azure" src={`${k8sPrefix}/infrastructure/clusters/addAzure`} />
     </FormWrapper>
   )
 }

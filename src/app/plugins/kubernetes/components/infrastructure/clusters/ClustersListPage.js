@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react'
 import DownloadKubeConfigLink from './DownloadKubeConfigLink'
-import KubeCLI from './KubeCLI'
+// import KubeCLI from './KubeCLI' // commented out till we support cli links
 import ExternalLink from 'core/components/ExternalLink'
 import SimpleLink from 'core/components/SimpleLink'
 import ScaleIcon from '@material-ui/icons/TrendingUp'
@@ -129,7 +129,7 @@ const renderLinks = links => {
     <div>
       {links.dashboard && <ExternalLink url={links.dashboard}>Dashboard</ExternalLink>}
       {links.kubeconfig && <DownloadKubeConfigLink cluster={links.kubeconfig.cluster} />}
-      {links.cli && <KubeCLI {...links.cli} />}
+      {/* {links.cli && <KubeCLI {...links.cli} />} */}
     </div>
   )
 }
@@ -189,7 +189,7 @@ const renderStats = (_, { usage }) => {
 const renderClusterDetailLink = (name, cluster) =>
   <SimpleLink src={`/ui/kubernetes/infrastructure/clusters/${cluster.uuid}`}>{name}</SimpleLink>
 
-const canScaleMasters = ([cluster]) => cluster.taskStatus === 'success' && cluster.cloudProviderType === 'bareos' && cluster.numMasters > 1
+const canScaleMasters = ([cluster]) => cluster.taskStatus === 'success' && cluster.cloudProviderType === 'bareos' && (cluster.nodes || []).length > 1
 const canScaleWorkers = ([cluster]) => cluster.taskStatus === 'success' && cluster.cloudProviderType !== 'azure'
 const canUpgradeCluster = (selected) => false
 const canDeleteCluster = ([row]) => !(['creating', 'deleting'].includes(row.taskStatus))

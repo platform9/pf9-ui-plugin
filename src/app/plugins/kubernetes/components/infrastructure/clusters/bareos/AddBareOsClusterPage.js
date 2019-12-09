@@ -12,7 +12,7 @@ import WizardStep from 'core/components/wizard/WizardStep'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import useParams from 'core/hooks/useParams'
 import useReactRouter from 'use-react-router'
-import DownloadCliWalkthrough from '../../nodes/DownloadCliWalkthrough'
+import { DownloadCliBareOSWalkthrough } from '../../nodes/DownloadCliWalkthrough'
 import Panel from 'app/plugins/theme/components/Panel'
 import CodeBlock from 'core/components/CodeBlock'
 import ExternalLink from 'core/components/ExternalLink'
@@ -111,7 +111,7 @@ const AddBareOsClusterPage = () => {
                         title="Not seeing the nodes you wish to add?"
                         defaultExpanded={false}
                       >
-                        <DownloadCliWalkthrough />
+                        <DownloadCliBareOSWalkthrough />
                       </Panel>
                     </div>
                   )}
@@ -136,6 +136,7 @@ const AddBareOsClusterPage = () => {
                           isUnassignedNode,
                           excludeNodes(wizardContext.masterNodes)
                         ])}
+                        pollForNodes
                         onChange={getParamsUpdater('workerNodes')}
                         validations={wizardContext.allowWorkloadsOnMaster ? null : [requiredValidator]}
                       />
@@ -144,7 +145,7 @@ const AddBareOsClusterPage = () => {
                         title="Not seeing the nodes you wish to add?"
                         defaultExpanded={false}
                       >
-                        <DownloadCliWalkthrough />
+                        <DownloadCliBareOSWalkthrough />
                       </Panel>
                     </div>
                   )}

@@ -18,13 +18,13 @@ const styles = theme => ({
     display: 'flex',
     flexFlow: 'column wrap',
     width: ({ fullWidth }) => fullWidth ? '100%' : '50%',
-    maxWidth: ({ fullWidth }) => fullWidth ? null : 400,
+    maxWidth: ({ fullWidth }) => fullWidth ? null : 600,
     minWidth: 300,
     marginBottom: theme.spacing(1),
     '& .MuiFormControl-root': {
       width: '100%',
-      marginTop: theme.spacing(1),
-      marginBottom: theme.spacing(1),
+      marginTop: theme.spacing(1.5),
+      marginBottom: theme.spacing(1.5),
     },
   },
 })

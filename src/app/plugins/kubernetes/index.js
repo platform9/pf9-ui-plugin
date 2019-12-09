@@ -125,7 +125,7 @@ Kubernetes.registerPlugin = pluginManager => {
         component: ClusterDetailsPage,
       },
       {
-        name: 'Download CLI',
+        name: 'Onboard a Node',
         link: { path: '/infrastructure/nodes/cli/download', exact: true },
         component: DownloadCliPage,
       },

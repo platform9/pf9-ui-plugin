@@ -54,6 +54,9 @@ const useStyles = makeStyles(theme => ({
     padding: theme.spacing(0, 1),
     minHeight: theme.spacing(6),
   },
+  contentMain: {
+    paddingLeft: theme.spacing(2),
+  }
 }))
 
 const renderPluginRoutes = role => (id, plugin) => {
@@ -148,7 +151,7 @@ const AuthenticatedContainer = () => {
           [classes['contentShift-left']]: drawerOpen,
         })}>
           <div className={classes.drawerHeader} />
-          <div>
+          <div className={classes.contentMain}>
             <Switch>
               {renderPlugins(plugins, role)}
               <Route path={logoutUrl} component={LogoutPage} />

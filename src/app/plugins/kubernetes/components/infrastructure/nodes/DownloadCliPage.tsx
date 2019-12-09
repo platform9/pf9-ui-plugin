@@ -17,14 +17,23 @@ const useStyles = makeStyles((theme: Theme) => ({
 }))
 
 const AnyLink: any = SimpleLink
+const finalStep = {
+  title: 'Node ready to be added',
+  description: 'This node is now ready to be added to a BareOS cluster. Use the "create cluster" or "scale cluster" operations to add the node to a cluster',
+}
 
 const ClusterDetailsPage: FunctionComponent = () => {
   const { spacer } = useStyles({})
   return (
     <PageContainer>
-      <Typography variant="h5">Download CLI</Typography>
+      <Typography variant="h5">Onboard a new node</Typography>
       <p> </p>
-      <DownloadCliWalkthrough />
+      <Typography component="span">
+        In order to add a physical or virtual node to your BareOS cluster, you need to first
+        download and install the Platform9 CLI on that node. Follow the instructions below to
+        download and install the CLI on your node
+      </Typography>
+      <DownloadCliWalkthrough finalStep={finalStep} />
       <p className={spacer} />
       <Typography variant="h6">CLI Advanced Options</Typography>
       <p> </p>

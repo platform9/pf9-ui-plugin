@@ -97,7 +97,6 @@ class Tabs extends PureComponent {
                 onChange={this.handleChange}
                 indicatorColor="primary"
                 textColor="inherit"
-                TabIndicatorProps={{ style: { display: 'none' } }}
               >
                 {tabs.map(tab =>
                   <CustomTab

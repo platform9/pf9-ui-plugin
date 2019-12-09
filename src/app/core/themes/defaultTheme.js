@@ -35,7 +35,7 @@ const theme = {
     },
     MuiInput: {
       root: {
-        fontSize: '14px',
+        fontSize: '16px',
       },
     },
     MuiInputLabel: {
@@ -43,32 +43,32 @@ const theme = {
         color: '#AAA',
       },
       outlined: {
-        transform: 'translate(14px, 8px) scale(1)',
+        transform: 'translate(16px, 16px) scale(1)',
       },
       shrink: {
         fontSize: '16px',
         color: '#333',
       },
     },
-    MuiMenuItem: {
-      root: {
-        fontSize: '13px',
-        minHeight: '19px',
-      },
-    },
     MuiOutlinedInput: {
       root: {
-        fontSize: '13px',
+        fontSize: '16px',
         minWidth: '120px',
       },
       input: {
-        padding: '6.5px 14px',
+        padding: '12px 16px',
+      },
+    },
+    MuiMenuItem: {
+      root: {
+        fontSize: '16px',
+        minHeight: '18px',
       },
     },
     MuiTooltip: {
       tooltip: {
         fontSize: 12,
-        padding: '7px 11px',
+        padding: '8px 12px',
       },
     },
     MuiToolbar: {
@@ -117,8 +117,8 @@ const theme = {
     type: 'light',
     primary: {
       light: '#AEE0FF',
-      main: '#606060',
-      dark: '#373737',
+      main: '#4AA3DF',
+      dark: '#1E699C',
       contrastText: '#FFF',
     },
     secondary: {
@@ -142,9 +142,9 @@ const theme = {
       contrastText: '#FFF',
     },
     error: {
-      light: '#f67878',
-      main: '#b6453f',
-      dark: '#bc3636',
+      light: '#E57373',
+      main: '#F44336',
+      dark: '#D32F2F',
       contrastText: '#FFF',
     },
     grey: {
@@ -195,12 +195,12 @@ const theme = {
     },
     card: {
       background: 'rgba(2, 194, 172, 0.1)',
-      status: '#696969',
+      status: 'rgba(243, 243, 243, 1.0)',
     },
     wizard: {
       dark: '#02c2ac',
       light: 'rgba(2, 194, 172, 0.2)',
-      medium: 'rgba(2, 194, 172, 0.5)',
+      medium: 'rgba(2, 194, 172, 0.4)',
     }
   },
   props: {},
@@ -344,7 +344,7 @@ const theme = {
       color: '#222',
       fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
       fontWeight: 400,
-      fontSize: '21px',
+      fontSize: '20px',
       lineHeight: 1.04,
       letterSpacing: '0em',
     },
