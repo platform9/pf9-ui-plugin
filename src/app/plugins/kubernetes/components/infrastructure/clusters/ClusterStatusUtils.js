@@ -2,6 +2,7 @@ const healthy = 'healthy'
 const partiallyHealthy = 'partially_healthy'
 const unhealthy = 'unhealthy'
 const unknown = 'unknown'
+const error = 'error'
 
 const nodeStatusOkOrFailed = (node) => node.status === 'ok' || node.status === 'failed'
 
@@ -35,11 +36,15 @@ export const connectionStatusFields = {
   },
 }
 
-export const getHealthStatusAndMessage = (healthyMasterNodes = [], nodes = [], numMasters, numWorkers) => {
+export const getHealthStatusAndMessage = (healthyMasterNodes = [], nodes = [], numMasters, numWorkers, taskStatus, taskError) => {
   const connectionStatus = getConnectionStatus(nodes)
 
   if (connectionStatus === 'disconnected') {
     return [unknown, 'Cluster is disconnected']
+  }
+
+  if (taskStatus === 'error') {
+    return [error, taskError]
   }
 
   const healthyMasterNodesCount = healthyMasterNodes.length
@@ -149,5 +154,9 @@ export const clusterHealthStatusFields = {
   [unknown]: {
     status: 'pause',
     label: 'Unknown'
+  },
+  [error]: {
+    status: 'error',
+    label: 'Error'
   },
 }

@@ -89,8 +89,8 @@ const renderTransientStatus = (taskStatus, nodes, progressPercent) => {
   )
 }
 
-const renderClusterHealthStatus = (healthyMasterNodes, nodes, numMasters, numWorkers) => {
-  const [healthStatus, message] = getHealthStatusAndMessage(healthyMasterNodes, nodes, numMasters, numWorkers)
+const renderClusterHealthStatus = (healthyMasterNodes, nodes, numMasters, numWorkers, taskStatus, error) => {
+  const [healthStatus, message] = getHealthStatusAndMessage(healthyMasterNodes, nodes, numMasters, numWorkers, taskStatus, error)
   const fields = clusterHealthStatusFields[healthStatus]
 
   return (
@@ -105,7 +105,7 @@ const renderClusterHealthStatus = (healthyMasterNodes, nodes, numMasters, numWor
 
 const renderHealthStatus = (status, {
   taskStatus,
-  cloudProviderType,
+  taskError,
   progressPercent,
   healthyMasterNodes,
   nodes,
@@ -117,7 +117,7 @@ const renderHealthStatus = (status, {
   }
 
   if (isSteadyState(taskStatus, nodes)) {
-    return renderClusterHealthStatus(healthyMasterNodes, nodes, numMasters, numWorkers)
+    return renderClusterHealthStatus(healthyMasterNodes, nodes, numMasters, numWorkers, taskStatus, taskError)
   }
 
   return status && <ClusterStatusSpan>{capitalizeString(status)}</ClusterStatusSpan>
