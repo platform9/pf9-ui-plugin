@@ -29,8 +29,8 @@ const ClusterDetailsPage = () => {
       « Back to Cluster List
     </SimpleLink></>}>
     <Tabs>
-      <Tab value="info" label="Info"><ClusterInfo /></Tab>
-      <Tab value="nodes" label="Nodes"><ClusterNodes /></Tab>
+      <Tab value="configuration" label="Configuration"><ClusterInfo /></Tab>
+      <Tab value="nodesAndHealthInfo" label="Nodes & Health Info"><ClusterNodes /></Tab>
     </Tabs>
   </PageContainer>
 }
