@@ -1,9 +1,8 @@
 import React from 'react'
-import { CloudProviders } from "../clusters/model"
+import { CloudProviders } from '../clusters/model'
 import { capitalizeString } from 'utils/misc'
 import NextButton from 'core/components/buttons/NextButton'
 import useReactRouter from 'use-react-router'
-
 
 interface Props {
   type: CloudProviders
