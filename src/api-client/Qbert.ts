@@ -451,12 +451,8 @@ class Qbert extends ApiService {
 
   createPrometheusInstance = async (clusterId, data) => {
     const requests: { cpu?: string, memory?: string } = {}
-    if (data.cpu) {
-      requests.cpu = data.cpu
-    }
-    if (data.memory) {
-      requests.memory = data.memory
-    }
+    if (data.cpu) { requests.cpu = data.cpu }
+    if (data.memory) { requests.memory = data.memory }
     // if (data.storage) { requests.storage = data.storage }
 
     const apiVersion = 'monitoring.coreos.com/v1'

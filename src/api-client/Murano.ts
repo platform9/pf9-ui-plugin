@@ -2,7 +2,7 @@ import axios from 'axios'
 import ApiService from 'api-client/ApiService'
 
 class Murano extends ApiService {
-  endpoint() {
+  endpoint () {
     return this.client.keystone.getServiceEndpoint('murano', 'internal')
   }
 

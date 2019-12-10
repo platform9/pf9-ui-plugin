@@ -41,7 +41,7 @@ interface IAppContext {
 interface IAppContextActions {
   getContext: <T>(getter: (context: IAppContext) => T) => T
   setContext: <T>(setter: SetStateAction<IAppContext>) => Promise<IAppContext>
-  initSession: (unscopedToken: string, username: string) => void
+  initSession: (unscopedToken: string, username: string, expiresAt: string) => void
   updateSession: <T>(path: string, value: T) => void
   destroySession: () => void
   registerNotification: (title: string, message: string, type: 'warning' | 'error' | 'info') => Promise<void>
@@ -60,10 +60,12 @@ export const AppContext = React.createContext<IAppContext & Partial<IAppContextA
 
 const AppProvider = ({ children }) => {
   const [context, setContextBase] = useStateAsync<IAppContext>(initialContext)
-  const initSession = async (unscopedToken: string, username: string) => {
+
+  const initSession = async (unscopedToken: string, username: string, expiresAt: string) => {
     await setContextBase(assoc('session', {
       unscopedToken,
       username,
+      expiresAt,
     }))
   }
 
@@ -116,17 +118,18 @@ const AppProvider = ({ children }) => {
     await setContext(over(notifLens, always(emptyArr)))
   }, [setContext])
 
+  const actions: IAppContextActions = {
+    getContext,
+    setContext,
+    initSession,
+    updateSession,
+    destroySession,
+    registerNotification,
+    clearNotifications,
+  }
+
   return (
-    <AppContext.Provider value={{
-      ...context,
-      getContext,
-      setContext,
-      initSession,
-      updateSession,
-      destroySession,
-      registerNotification,
-      clearNotifications,
-    }}>
+    <AppContext.Provider value={{ ...context, ...actions }}>
       {children}
     </AppContext.Provider>
   )

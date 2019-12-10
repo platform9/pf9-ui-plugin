@@ -88,13 +88,13 @@ export class LoginPage extends React.PureComponent {
     const { keystone } = ApiClient.getInstance()
 
     this.setState({ loginFailed: false, loading: true })
-    const { unscopedToken } = await keystone.authenticate(username, password)
+    const { unscopedToken, expiresAt, issuedAt } = await keystone.authenticate(username, password)
 
     if (!unscopedToken) {
       return this.setState({ loading: false, loginFailed: true })
     }
 
-    await onAuthSuccess({ username, unscopedToken })
+    await onAuthSuccess({ username, unscopedToken, expiresAt, issuedAt })
 
     this.props.history.push(dashboardUrl)
   }
