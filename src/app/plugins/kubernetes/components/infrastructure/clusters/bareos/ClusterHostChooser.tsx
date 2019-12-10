@@ -24,6 +24,7 @@ const useStyles = makeStyles<any, any>((theme: Theme) => ({
   },
 }))
 
+export const isConnected = (node: ICombinedNode) => node.status === 'ok'
 export const isUnassignedNode = (node: ICombinedNode) => !node.clusterUuid
 export const excludeNodes = (excludeList: string[] = []) => (node: ICombinedNode) => !excludeList.includes(node.uuid)
 export const isMaster = (node: ICombinedNode) => !!node.isMaster

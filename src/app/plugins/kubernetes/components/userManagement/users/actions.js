@@ -13,7 +13,7 @@ import createContextLoader from 'core/helpers/createContextLoader'
 import { castBoolToStr } from 'utils/misc'
 import { tryCatchAsync } from 'utils/async'
 
-const { keystone } = ApiClient.getInstance()
+const { keystone, clemency } = ApiClient.getInstance()
 
 export const isSystemUser = ({ username }) => {
   return uuidRegex.test(username)
@@ -22,7 +22,7 @@ export const mngmCredentialsCacheKey = 'managementCredentials'
 createContextLoader(mngmCredentialsCacheKey, () => {
   return keystone.getCredentials()
 }, {
-  requiredRoles: 'admin'
+  requiredRoles: 'admin',
 })
 
 const adminUserNames = ['heatadmin', 'admin@platform9.net']
@@ -35,14 +35,23 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
     await keystone.deleteUser(id)
   },
   createFn: async ({ username, displayname, password, roleAssignments }) => {
-    const createdUser = await keystone.createUser({
-      email: username,
-      name: username,
-      username,
-      displayname,
-      password: password || undefined,
-      default_project_id: head(keys(roleAssignments)),
-    })
+    const createdUser = password
+      ? await keystone.createUser({
+        email: username,
+        name: username,
+        username,
+        displayname,
+        password: password || undefined,
+        default_project_id: head(keys(roleAssignments)),
+      })
+      : await clemency.createUser({
+        username,
+        displayname,
+        tenants: keys(roleAssignments),
+      })
+    if (createdUser.role === '_member_') {
+      return createdUser
+    }
     await tryCatchAsync(
       () =>
         Promise.all(Object.entries(roleAssignments).map(([tenantId, roleId]) =>

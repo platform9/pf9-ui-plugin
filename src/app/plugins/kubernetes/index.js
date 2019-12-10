@@ -458,8 +458,9 @@ Kubernetes.registerPlugin = pluginManager => {
     },
     { name: 'Storage Classes', icon: 'hdd', link: { path: '/storage_classes' } },
     { name: 'Namespaces', icon: 'object-group', link: { path: '/namespaces' } },
-    { name: 'Monitoring (beta)', icon: 'chart-area', link: { path: '/prometheus' } },
-    { name: 'Logging (beta)', icon: 'clipboard-list', link: { path: '/logging' } },
+    // TODO: Disabled till all CRUD operations are implemented
+    // { name: 'Monitoring (beta)', icon: 'chart-area', link: { path: '/prometheus' } },
+    // { name: 'Logging (beta)', icon: 'clipboard-list', link: { path: '/logging' } },
     {
       name: 'RBAC',
       icon: 'user-shield',

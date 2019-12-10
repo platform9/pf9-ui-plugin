@@ -16,7 +16,7 @@ import { DownloadCliBareOSWalkthrough } from '../../nodes/DownloadCliWalkthrough
 import Panel from 'app/plugins/theme/components/Panel'
 import CodeBlock from 'core/components/CodeBlock'
 import ExternalLink from 'core/components/ExternalLink'
-import ClusterHostChooser, { excludeNodes, isUnassignedNode } from './ClusterHostChooser'
+import ClusterHostChooser, { excludeNodes, isConnected, isUnassignedNode } from './ClusterHostChooser'
 import { clusterActions } from '../actions'
 import { pathJoin } from 'utils/misc'
 import { k8sPrefix } from 'app/constants'
@@ -93,7 +93,10 @@ const AddBareOsClusterPage = () => {
                       <ClusterHostChooser
                         multiple
                         id="masterNodes"
-                        filterFn={isUnassignedNode}
+                        filterFn={allPass([
+                          isConnected,
+                          isUnassignedNode
+                        ])}
                         onChange={getParamsUpdater('masterNodes')}
                         validations={[masterNodeLengthValidator]}
                         pollForNodes
@@ -134,6 +137,7 @@ const AddBareOsClusterPage = () => {
                         id="workerNodes"
                         filterFn={allPass([
                           isUnassignedNode,
+                          isConnected,
                           excludeNodes(wizardContext.masterNodes)
                         ])}
                         pollForNodes

@@ -7,7 +7,6 @@ import ScaleIcon from '@material-ui/icons/TrendingUp'
 import UpgradeIcon from '@material-ui/icons/PresentToAll'
 import SeeDetailsIcon from '@material-ui/icons/Subject'
 import InsertChartIcon from '@material-ui/icons/InsertChart'
-import DescriptionIcon from '@material-ui/icons/Description'
 import { clustersCacheKey } from '../common/actions'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { capitalizeString } from 'utils/misc'
@@ -21,7 +20,6 @@ import { both, prop } from 'ramda'
 import PrometheusAddonDialog from 'k8s/components/prometheus/PrometheusAddonDialog'
 import ClusterUpgradeDialog from 'k8s/components/infrastructure/clusters/ClusterUpgradeDialog'
 import ClusterSync from './ClusterSync'
-import LoggingAddonDialog from 'k8s/components/logging/LoggingAddonDialog'
 import { Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import {
@@ -281,12 +279,13 @@ export const options = {
       label: 'Monitoring',
       dialog: PrometheusAddonDialog,
     },
-    {
-      cond: isAdmin,
+    // Disable logging till all CRUD features for log datastores are implemented.
+    /* {
+      cond: false,
       icon: <DescriptionIcon />,
       label: 'Logging',
       dialog: LoggingAddonDialog,
-    },
+    }, */
   ],
 }
 

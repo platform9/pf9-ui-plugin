@@ -10,6 +10,8 @@ import Neutron from './Neutron'
 import Nova from './Nova'
 import Qbert from './Qbert'
 import ResMgr from './ResMgr'
+import Clemency from 'api-client/Clemency'
+
 import { normalizeResponse } from 'api-client/helpers'
 import { hasPathStr, pathStr } from 'utils/fp'
 import { prop, has, cond, T, identity } from 'ramda'
@@ -51,6 +53,7 @@ class ApiClient {
     this.murano = new Murano(this)
     this.resmgr = new ResMgr(this)
     this.qbert = new Qbert(this)
+    this.clemency = new Clemency(this)
 
     this.catalog = {}
     this.activeRegion = null
