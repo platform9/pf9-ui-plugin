@@ -12,7 +12,6 @@ export const PromptToAddProvider = ({ type, src }: Props) => {
   const humanReadableType = capitalizeString(type)
   const { history } = useReactRouter()
   const handleClick = () => {
-    console.error(src)
     history.push(src)
   }
   return (
