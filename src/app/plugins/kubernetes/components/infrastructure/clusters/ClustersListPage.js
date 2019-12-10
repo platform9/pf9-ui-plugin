@@ -49,7 +49,11 @@ const renderCloudProviderType = (type, cluster) => {
   return capitalizeString(type)
 }
 
-const renderConnectionStatus = (_, { taskStatus, nodes, progressPercent }) => {
+const getNodesDetailsUrl = (uuid) => `/ui/kubernetes/infrastructure/clusters/${uuid}#nodesAndHealthInfo`
+
+const renderConnectionStatus = (_, { taskStatus, nodes, progressPercent, uuid }) => {
+  const nodesDetailsUrl = getNodesDetailsUrl(uuid)
+
   if (isTransientState(taskStatus, nodes)) {
     return renderTransientStatus(taskStatus, nodes, progressPercent)
   }
@@ -61,7 +65,7 @@ const renderConnectionStatus = (_, { taskStatus, nodes, progressPercent }) => {
     <ClusterStatusSpan
       title={fields.message}
       status={fields.clusterStatus}>
-      {fields.label}
+      <SimpleLink src={nodesDetailsUrl}>{fields.label}</SimpleLink>
     </ClusterStatusSpan>
   )
 }
@@ -127,7 +131,7 @@ const renderHealthStatus = (status, {
   }
 
   if (isSteadyState(taskStatus, nodes)) {
-    const nodesDetailsUrl = `/ui/kubernetes/infrastructure/clusters/${uuid}#nodesAndHealthInfo`
+    const nodesDetailsUrl = getNodesDetailsUrl(uuid)
     return renderClusterHealthStatus(healthyMasterNodes, nodes, numMasters, numWorkers, taskError, nodesDetailsUrl)
   }
 
