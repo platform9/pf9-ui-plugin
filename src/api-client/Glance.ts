@@ -1,4 +1,5 @@
 import axios from 'axios'
+import ApiService from 'api-client/ApiService'
 
 /*
 const op = op => (path, value) => ({ op: 'replace', path, value })
@@ -7,12 +8,8 @@ const removeOp = op('remove')
 const replaceOp = op('replace')
 */
 
-class Glance {
-  constructor (client) {
-    this.client = client
-  }
-
-  async endpoint () {
+class Glance extends ApiService {
+  endpoint() {
     return this.client.keystone.getServiceEndpoint('glance', 'admin')
   }
 
@@ -20,13 +17,13 @@ class Glance {
 
   imagesUrl = async () => `${await this.v2()}/images`
 
-  async getImages () {
+  async getImages() {
     const url = `${await this.imagesUrl()}?limit=1000`
     const response = await axios.get(url, this.client.getAuthHeaders())
     return response.data.images
   }
 
-  async createImage (params) {
+  async createImage(params) {
     const url = await this.imagesUrl()
     // TODO: support adding additional user properties
     try {
@@ -37,18 +34,18 @@ class Glance {
     }
   }
 
-  async deleteImage (id) {
+  async deleteImage(id) {
     const url = `${await this.imagesUrl()}/${id}`
     return axios.delete(url, this.client.getAuthHeaders())
   }
 
-  async getImageSchema () {
+  async getImageSchema() {
     const url = `${await this.v2()}/schemas/images`
     const response = await axios.get(url, this.client.getAuthHeaders())
     return response.data.properties.images
   }
 
-  async updateImage (image, imageId) {
+  async updateImage(image, imageId) {
     const url = `${await this.imagesUrl()}/${imageId}`
     const headers = {
       ...this.client.getAuthHeaders().headers,
@@ -71,7 +68,7 @@ class Glance {
     'protected',
   ]
 
-  get excludedImageFields () {
+  get excludedImageFields() {
     return [
       ...this.blacklistedImageProperties,
       ...this.hiddenImageProperties,

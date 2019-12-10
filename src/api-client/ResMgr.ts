@@ -1,5 +1,6 @@
 import axios from 'axios'
-import { __, partition, uniq, includes } from 'ramda'
+import { partition, uniq, includes } from 'ramda'
+import ApiService from 'api-client/ApiService'
 
 const roleNames = {
   'pf9-ostackhost-neutron': 'Hypervisor',
@@ -28,8 +29,8 @@ const neutronComponents = [
 
 export const localizeRole = role => roleNames[role] || role
 
-export const localizeRoles = (roles = []) => {
-  const isNeutronRole = includes(__, neutronComponents)
+export const localizeRoles = (roles: string[] = []) => {
+  const isNeutronRole = role => includes(role, neutronComponents)
   const [neutronRoles, normalRoles] = partition(isNeutronRole, roles)
   const hasAllNetworkRoles = neutronRoles.length === neutronComponents.length
   return uniq([
@@ -38,15 +39,10 @@ export const localizeRoles = (roles = []) => {
   ])
 }
 
-class ResMgr {
-  constructor (client) {
-    this.client = client
-  }
-
+class ResMgr extends ApiService {
   async endpoint () {
     const endpoint = await this.client.keystone.getServiceEndpoint('resmgr', 'internal')
-    const v1Endpoint = `${endpoint}/v1`
-    return v1Endpoint
+    return `${endpoint}/v1`
   }
 
   async getHosts () {

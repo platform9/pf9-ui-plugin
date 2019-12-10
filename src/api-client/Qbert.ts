@@ -1,11 +1,23 @@
-import { propOr } from 'ramda'
+import { propOr, map, pipe, mergeLeft } from 'ramda'
 import { keyValueArrToObj } from 'utils/fp'
 import { pathJoin } from 'utils/misc'
 import { normalizeResponse } from 'api-client/helpers'
+import ApiService from 'api-client/ApiService'
 
-const normalizeClusterizedResponse = (clusterId, response) => propOr([], 'items', response).map(
-  x => ({ ...x, clusterId }))
-const normalizeClusterizedUpdate = (clusterId, response) => ({ ...response, clusterId })
+interface GenericObject {
+  [key: string]: any
+}
+
+// TODO: Fix these typings
+const normalizeClusterizedResponse = (clusterId: string, response: GenericObject) =>
+  pipe<GenericObject, GenericObject[], Array<GenericObject & { clusterId: string }>>(
+    propOr<GenericObject[]>([], 'items'),
+    map(mergeLeft({ clusterId }))
+  )(response)
+
+const normalizeClusterizedUpdate = (clusterId, response) => ({
+  ...response, clusterId
+})
 
 const normalizeCluster = baseUrl => cluster => ({
   ...cluster,
@@ -16,11 +28,8 @@ const normalizeCluster = baseUrl => cluster => ({
 })
 
 /* eslint-disable camelcase */
-class Qbert {
-  constructor (client) {
-    this.client = client
-    this.cachedEndpoint = ''
-  }
+class Qbert extends ApiService {
+  cachedEndpoint = ''
 
   endpoint = async () => {
     const endpoint = await this.client.keystone.getServiceEndpoint('qbert', 'admin')
@@ -34,7 +43,7 @@ class Qbert {
     return mappedEndpoint
   }
 
-  monocularBaseUrl = async () => {
+  monocularBaseUrl = () => {
     return this.client.keystone.getServiceEndpoint('monocular', 'public')
   }
 
@@ -441,9 +450,13 @@ class Qbert {
   }
 
   createPrometheusInstance = async (clusterId, data) => {
-    const requests = {}
-    if (data.cpu) { requests.cpu = data.cpu }
-    if (data.memory) { requests.memory = data.memory }
+    const requests: { cpu?: string, memory?: string } = {}
+    if (data.cpu) {
+      requests.cpu = data.cpu
+    }
+    if (data.memory) {
+      requests.memory = data.memory
+    }
     // if (data.storage) { requests.storage = data.storage }
 
     const apiVersion = 'monitoring.coreos.com/v1'
@@ -520,8 +533,8 @@ class Qbert {
     }
 
     const response = await this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${data.namespace}/prometheuses`, prometheusBody)
-    this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${data.namespace}/servicemonitors`, serviceMonitorBody)
-    this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${data.namespace}/prometheusrules`, prometheusRulesBody)
+    await this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${data.namespace}/servicemonitors`, serviceMonitorBody)
+    await this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${data.namespace}/prometheusrules`, prometheusRulesBody)
     // this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/alertmanagers`, alertManagerBody)
     return response
   }
@@ -585,7 +598,7 @@ class Qbert {
   }
 
   getPrometheusDashboardLink =
-    instance => `${this.cachedEndpoint}/clusters/${instance.clusterUuid}/k8sapi${instance.dashboard}`
+  instance => `${this.cachedEndpoint}/clusters/${instance.clusterUuid}/k8sapi${instance.dashboard}`
 
   // TODO: Loggings
   getLoggingsBaseUrl = async (clusterUuid) => `${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/logging.pf9.io/v1alpha1/outputs`

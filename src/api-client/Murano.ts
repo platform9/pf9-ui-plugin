@@ -1,11 +1,8 @@
 import axios from 'axios'
+import ApiService from 'api-client/ApiService'
 
-class Murano {
-  constructor (client) {
-    this.client = client
-  }
-
-  async endpoint () {
+class Murano extends ApiService {
+  endpoint() {
     return this.client.keystone.getServiceEndpoint('murano', 'internal')
   }
 

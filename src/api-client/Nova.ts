@@ -1,4 +1,5 @@
 import axios from 'axios'
+import ApiService from 'api-client/ApiService'
 
 // Returns a transducer function instead being passed the obj directly
 // so it can be used in Array#map/filter/etc as well.
@@ -7,12 +8,8 @@ const renameKey = (srcKey, destKey) => obj => Object.keys(obj).reduce(
   {}
 )
 
-class Nova {
-  constructor (client) {
-    this.client = client
-  }
-
-  async endpoint () {
+class Nova extends ApiService {
+  endpoint() {
     return this.client.keystone.getServiceEndpoint('nova', 'internal')
   }
 
@@ -48,31 +45,31 @@ class Nova {
     delete: this.deleteFlavor.bind(this),
   }
 
-  async getInstances () {
+  async getInstances() {
     const url = `${await this.instancesUrl()}/detail`
     const response = await axios.get(url, this.client.getAuthHeaders())
     return response.data.servers.map(instance => renameKey('OS-EXT-STS:vm_state', 'state')(instance))
   }
 
-  async getHypervisors () {
+  async getHypervisors() {
     const url = `${await this.hypervisorsUrl()}/detail`
     const response = await axios.get(url, this.client.getAuthHeaders())
     return response.data.hypervisors
   }
 
-  async getSshKeys () {
+  async getSshKeys() {
     const url = `${await this.sshKeysUrl()}`
     const response = await axios.get(url, this.client.getAuthHeaders())
     return response.data.keypairs.map(x => x.keypair)
   }
 
-  async createSshKey (params) {
+  async createSshKey(params) {
     const url = await this.sshKeysUrl()
     const response = await axios.post(url, { keypair: params }, this.client.getAuthHeaders())
     return response.data.keypair
   }
 
-  async deleteSshKey (id) {
+  async deleteSshKey(id) {
     const url = `${await this.sshKeysUrl()}/${id}`
     return axios.delete(url, this.client.getAuthHeaders())
   }
