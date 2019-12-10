@@ -26,7 +26,7 @@ import { Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import {
   getConnectionStatus,
-  connectionStatusFields,
+  connectionStatusFieldsTable,
   hasConvergingNodes,
   getHealthStatusAndMessage,
   clusterHealthStatusFields,
@@ -57,7 +57,7 @@ const renderConnectionStatus = (_, { taskStatus, nodes, progressPercent }) => {
   }
 
   const connectionStatus = getConnectionStatus(nodes)
-  const fields = connectionStatusFields[connectionStatus]
+  const fields = connectionStatusFieldsTable[connectionStatus]
 
   return (
     <ClusterStatusSpan

@@ -32,12 +32,12 @@ const useStyles = makeStyles(theme => ({
     },
   },
   loading: {
-    marginRight: 3,
-    fontSize: 15,
+    marginRight: theme.spacing(0.375),
+    fontSize: 14,
   },
   error: {
-    marginRight: 3,
-    fontSize: 15,
+    marginRight: theme.spacing(0.375),
+    fontSize: 14,
   },
 }))
 

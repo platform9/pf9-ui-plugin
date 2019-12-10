@@ -1,12 +1,32 @@
-const healthy = 'healthy'
-const partiallyHealthy = 'partially_healthy'
-const unhealthy = 'unhealthy'
-const unknown = 'unknown'
-const error = 'error'
+type HealthStatus = 'healthy' | 'partially_healthy' | 'unhealthy' | 'unknown' | 'error'
+type ConnectionStatus = 'connected' | 'partially_connected' | 'disconnected'
 
-const nodeStatusOkOrFailed = (node) => node.status === 'ok' || node.status === 'failed'
+interface Node {
+  status: 'ok' | 'failed' | 'converging'
+  isMaster: boolean
+}
 
-export const getConnectionStatus = (nodes) => {
+interface ConnectionStatusFields {
+  message: string
+  clusterStatus: string
+  label: string
+}
+
+interface HealthStatusFields {
+  status: string
+  label: string
+}
+
+interface HealthStatusAndMessage {
+  mastersHealthStatus: HealthStatus
+  workersHealthStatus: HealthStatus
+  healthStatus: HealthStatus
+  message: string
+}
+
+const nodeStatusOkOrFailed = (node: Node): boolean => node.status === 'ok' || node.status === 'failed'
+
+export function getConnectionStatus (nodes: Node[]): ConnectionStatus {
   if (nodes.every(nodeStatusOkOrFailed)) {
     return 'connected'
   }
@@ -18,7 +38,7 @@ export const getConnectionStatus = (nodes) => {
   return 'disconnected'
 }
 
-export const connectionStatusFields = {
+export const connectionStatusFieldsTable: {[status in ConnectionStatus]: ConnectionStatusFields} = {
   connected: {
     message: 'All nodes in the cluster are conected to Platform9 management plane.',
     clusterStatus: 'ok',
@@ -36,15 +56,22 @@ export const connectionStatusFields = {
   },
 }
 
-export const getHealthStatusAndMessage = (healthyMasterNodes = [], nodes = [], numMasters, numWorkers, taskStatus, taskError) => {
+export function getHealthStatusAndMessage (
+  healthyMasterNodes = [],
+  nodes: Node[] = [],
+  numMasters: number,
+  numWorkers: number,
+  taskStatus: string,
+  taskError: string,
+): [HealthStatus, string] {
   const connectionStatus = getConnectionStatus(nodes)
 
   if (connectionStatus === 'disconnected') {
-    return [unknown, 'Cluster is disconnected']
+    return ['unknown', 'Cluster is disconnected']
   }
 
   if (taskStatus === 'error') {
-    return [error, taskError]
+    return ['error', taskError]
   }
 
   const healthyMasterNodesCount = healthyMasterNodes.length
@@ -61,101 +88,101 @@ export const getHealthStatusAndMessage = (healthyMasterNodes = [], nodes = [], n
   return [healthStatusAndMessage.healthStatus, healthStatusAndMessage.message]
 }
 
-const getNodesHealthStatus = (healthyCount, count, threshold) => {
+function getNodesHealthStatus (healthyCount: number, count: number, threshold: number): HealthStatus {
   if (healthyCount === count) {
-    return healthy
+    return 'healthy'
   }
 
   if (healthyCount >= threshold) {
-    return partiallyHealthy
+    return 'partially_healthy'
   }
 
-  return unhealthy
+  return 'unhealthy'
 }
 
-const clusterHealthStatusAndMessageTable = [
+const clusterHealthStatusAndMessageTable: HealthStatusAndMessage[] = [
   {
-    mastersHealthStatus: healthy,
-    workersHealthStatus: healthy,
-    healthStatus: healthy,
+    mastersHealthStatus: 'healthy',
+    workersHealthStatus: 'healthy',
+    healthStatus: 'healthy',
     message: 'All masters and all workers are healthy',
   },
   {
-    mastersHealthStatus: healthy,
-    workersHealthStatus: partiallyHealthy,
-    healthStatus: healthy,
+    mastersHealthStatus: 'healthy',
+    workersHealthStatus: 'partially_healthy',
+    healthStatus: 'healthy',
     message: 'All masters are healthy, majority of workers (> 50%) are healthy',
   },
   {
-    mastersHealthStatus: healthy,
-    workersHealthStatus: unhealthy,
-    healthStatus: unhealthy,
+    mastersHealthStatus: 'healthy',
+    workersHealthStatus: 'unhealthy',
+    healthStatus: 'unhealthy',
     message: 'All masters are healthy but majority of workers (> 50%) are unhealthy',
   },
   {
-    mastersHealthStatus: partiallyHealthy,
-    workersHealthStatus: healthy,
-    healthStatus: partiallyHealthy,
+    mastersHealthStatus: 'partially_healthy',
+    workersHealthStatus: 'healthy',
+    healthStatus: 'partially_healthy',
     message: 'Quorum number of masters are healthy, all workers are healthy',
   },
   {
-    mastersHealthStatus: partiallyHealthy,
-    workersHealthStatus: partiallyHealthy,
-    healthStatus: partiallyHealthy,
+    mastersHealthStatus: 'partially_healthy',
+    workersHealthStatus: 'partially_healthy',
+    healthStatus: 'partially_healthy',
     message: 'Quorum number of masters are healthy, majority of workers (>50%) are healthy',
   },
   {
-    mastersHealthStatus: partiallyHealthy,
-    workersHealthStatus: unhealthy,
-    healthStatus: unhealthy,
+    mastersHealthStatus: 'partially_healthy',
+    workersHealthStatus: 'unhealthy',
+    healthStatus: 'unhealthy',
     message: 'Quorum number of masters are healthy but majority of workers (> 50%) are unhealthy',
   },
   {
-    mastersHealthStatus: unhealthy,
-    workersHealthStatus: healthy,
-    healthStatus: unhealthy,
+    mastersHealthStatus: 'unhealthy',
+    workersHealthStatus: 'healthy',
+    healthStatus: 'unhealthy',
     message: 'Less than quorum number of masters are healthy, all workers are healthy',
   },
   {
-    mastersHealthStatus: unhealthy,
-    workersHealthStatus: partiallyHealthy,
-    healthStatus: unhealthy,
+    mastersHealthStatus: 'unhealthy',
+    workersHealthStatus: 'partially_healthy',
+    healthStatus: 'unhealthy',
     message: 'Less than quorum number of masters are healthy, majority of workers (>50%) are healthy',
   },
   {
-    mastersHealthStatus: unhealthy,
-    workersHealthStatus: unhealthy,
-    healthStatus: unhealthy,
+    mastersHealthStatus: 'unhealthy',
+    workersHealthStatus: 'unhealthy',
+    healthStatus: 'unhealthy',
     message: 'Less than quorum number of masters are healthy, and majority of workers (>50%) are unhealthy',
   },
 ]
 
-export const hasConvergingNodes = (nodes) => !!nodes.find(node => node.status === 'converging')
+export const hasConvergingNodes = (nodes: Node[]): boolean => !!nodes.find(node => node.status === 'converging')
 
-export const isSteadyState = (taskStatus, nodes) =>
+export const isSteadyState = (taskStatus: string, nodes: Node[]): boolean =>
   !hasConvergingNodes(nodes) && ['success', 'error'].includes(taskStatus)
 
-export const isTransientState = (taskStatus, nodes) =>
+export const isTransientState = (taskStatus: string, nodes: Node[]): boolean =>
   ['creating', 'deleting', 'updating', 'upgrading', 'converging'].includes(taskStatus) || hasConvergingNodes(nodes)
 
-export const clusterHealthStatusFields = {
-  [healthy]: {
+export const clusterHealthStatusFields: {[status in HealthStatus]: HealthStatusFields} = {
+  healthy: {
     status: 'ok',
     label: 'Healthy',
   },
-  [partiallyHealthy]: {
+  partially_healthy: {
     status: 'pause',
     label: 'Partially healthy',
   },
-  [unhealthy]: {
+  unhealthy: {
     status: 'fail',
     label: 'Unhealthy',
   },
-  [unknown]: {
+  unknown: {
     status: 'pause',
     label: 'Unknown'
   },
-  [error]: {
+  error: {
     status: 'error',
     label: 'Error'
   },
