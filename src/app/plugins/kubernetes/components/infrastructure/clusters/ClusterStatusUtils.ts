@@ -1,4 +1,4 @@
-type HealthStatus = 'healthy' | 'partially_healthy' | 'unhealthy' | 'unknown' | 'error'
+type HealthStatus = 'healthy' | 'partially_healthy' | 'unhealthy' | 'unknown'
 type ConnectionStatus = 'connected' | 'partially_connected' | 'disconnected'
 
 interface Node {
@@ -61,17 +61,11 @@ export function getHealthStatusAndMessage (
   nodes: Node[] = [],
   numMasters: number,
   numWorkers: number,
-  taskStatus: string,
-  taskError: string,
 ): [HealthStatus, string] {
   const connectionStatus = getConnectionStatus(nodes)
 
   if (connectionStatus === 'disconnected') {
     return ['unknown', 'Cluster is disconnected']
-  }
-
-  if (taskStatus === 'error') {
-    return ['error', taskError]
   }
 
   const healthyMasterNodesCount = healthyMasterNodes.length
@@ -181,9 +175,5 @@ export const clusterHealthStatusFields: {[status in HealthStatus]: HealthStatusF
   unknown: {
     status: 'pause',
     label: 'Unknown'
-  },
-  error: {
-    status: 'error',
-    label: 'Error'
   },
 }

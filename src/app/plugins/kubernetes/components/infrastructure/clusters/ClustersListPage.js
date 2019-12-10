@@ -89,17 +89,28 @@ const renderTransientStatus = (taskStatus, nodes, progressPercent) => {
   )
 }
 
-const renderClusterHealthStatus = (healthyMasterNodes, nodes, numMasters, numWorkers, taskStatus, error) => {
-  const [healthStatus, message] = getHealthStatusAndMessage(healthyMasterNodes, nodes, numMasters, numWorkers, taskStatus, error)
+const renderErrorStatus = (taskError) =>
+  <ClusterStatusSpan
+    title={taskError}
+    status='error'
+  >
+    Error
+  </ClusterStatusSpan>
+
+const renderClusterHealthStatus = (healthyMasterNodes, nodes, numMasters, numWorkers, taskError) => {
+  const [healthStatus, message] = getHealthStatusAndMessage(healthyMasterNodes, nodes, numMasters, numWorkers)
   const fields = clusterHealthStatusFields[healthStatus]
 
   return (
-    <ClusterStatusSpan
-      title={message}
-      status={fields.status}
-    >
-      {fields.label}
-    </ClusterStatusSpan>
+    <div>
+      <ClusterStatusSpan
+        title={message}
+        status={fields.status}
+      >
+        {fields.label}
+      </ClusterStatusSpan>
+      {taskError && renderErrorStatus(taskError)}
+    </div>
   )
 }
 
@@ -117,7 +128,7 @@ const renderHealthStatus = (status, {
   }
 
   if (isSteadyState(taskStatus, nodes)) {
-    return renderClusterHealthStatus(healthyMasterNodes, nodes, numMasters, numWorkers, taskStatus, taskError)
+    return renderClusterHealthStatus(healthyMasterNodes, nodes, numMasters, numWorkers, taskError)
   }
 
   return status && <ClusterStatusSpan>{capitalizeString(status)}</ClusterStatusSpan>
