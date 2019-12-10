@@ -9,6 +9,7 @@ import AddOpenstackCloudProvider from 'k8s/components/infrastructure/cloudProvid
 import AddVmwareCloudProvider from 'k8s/components/infrastructure/cloudProviders/AddVmwareCloudProvider'
 import { Typography } from '@material-ui/core'
 import AddAzureCloudProvider from 'k8s/components/infrastructure/cloudProviders/AddAzureCloudProvider'
+import useReactRouter from 'use-react-router'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -26,7 +27,9 @@ const useStyles = makeStyles(theme => ({
 
 export const AddCloudProviderForm = ({ loading, onComplete, ...rest }) => {
   const classes = useStyles()
-  const [activeProvider, setActiveProvider] = useState('aws')
+  const { location } = useReactRouter()
+  const providerType = new URLSearchParams(location.search).get('type') || 'aws'
+  const [activeProvider, setActiveProvider] = useState(providerType)
   const ActiveForm = useMemo(() => objSwitchCase({
     aws: AddAwsCloudProvider,
     openstack: AddOpenstackCloudProvider,
