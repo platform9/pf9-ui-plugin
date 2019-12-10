@@ -195,7 +195,7 @@ const theme = {
     },
     card: {
       background: 'rgba(2, 194, 172, 0.1)',
-      status: 'rgba(243, 243, 243, 1.0)',
+      status: '#f3f3f3',
     },
     wizard: {
       dark: '#02c2ac',
