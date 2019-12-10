@@ -7,7 +7,6 @@ import ScaleIcon from '@material-ui/icons/TrendingUp'
 import UpgradeIcon from '@material-ui/icons/PresentToAll'
 import SeeDetailsIcon from '@material-ui/icons/Subject'
 import InsertChartIcon from '@material-ui/icons/InsertChart'
-import DescriptionIcon from '@material-ui/icons/Description'
 import { clustersCacheKey } from '../common/actions'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { capitalizeString } from 'utils/misc'
@@ -287,7 +286,6 @@ export const options = {
     },
     // Disable logging till all CRUD features for log datastores are implemented.
     /* {
-      
       cond: false,
       icon: <DescriptionIcon />,
       label: 'Logging',
