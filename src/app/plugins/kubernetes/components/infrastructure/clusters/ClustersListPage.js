@@ -7,11 +7,9 @@ import ScaleIcon from '@material-ui/icons/TrendingUp'
 import UpgradeIcon from '@material-ui/icons/PresentToAll'
 import SeeDetailsIcon from '@material-ui/icons/Subject'
 import InsertChartIcon from '@material-ui/icons/InsertChart'
-import DescriptionIcon from '@material-ui/icons/Description'
 import { clustersCacheKey } from '../common/actions'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { capitalizeString } from 'utils/misc'
-import { objSwitchCase } from 'utils/fp'
 import ProgressBar from 'core/components/progress/ProgressBar'
 import ClusterStatusSpan from 'k8s/components/infrastructure/clusters/ClusterStatusSpan'
 import ResourceUsageTable from 'k8s/components/infrastructure/common/ResourceUsageTable'
@@ -22,13 +20,12 @@ import { both, prop } from 'ramda'
 import PrometheusAddonDialog from 'k8s/components/prometheus/PrometheusAddonDialog'
 import ClusterUpgradeDialog from 'k8s/components/infrastructure/clusters/ClusterUpgradeDialog'
 import ClusterSync from './ClusterSync'
-import LoggingAddonDialog from 'k8s/components/logging/LoggingAddonDialog'
 import { Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import {
   getConnectionStatus,
-  connectionStatusFields,
-  isConverging,
+  connectionStatusFieldsTable,
+  hasConvergingNodes,
   getHealthStatusAndMessage,
   clusterHealthStatusFields,
   isTransientState,
@@ -52,16 +49,13 @@ const renderCloudProviderType = (type, cluster) => {
   return capitalizeString(type)
 }
 
-const getPendingClusterPopoversContent = (cpType, taskStatus) => objSwitchCase({
-  creating: `The ${cpType} resources are being created.`,
-  converging: 'One or more hosts are joining the cluster',
-  updating: `The ${cpType} resources are being updated`,
-  deleting: `The cluster and its underlying ${cpType} resources are being deleted`,
-})(taskStatus)
+const renderConnectionStatus = (_, { taskStatus, nodes, progressPercent }) => {
+  if (isTransientState(taskStatus, nodes)) {
+    return renderTransientStatus(taskStatus, nodes, progressPercent)
+  }
 
-const renderConnectionStatus = (_, { nodes }) => {
   const connectionStatus = getConnectionStatus(nodes)
-  const fields = connectionStatusFields[connectionStatus]
+  const fields = connectionStatusFieldsTable[connectionStatus]
 
   return (
     <ClusterStatusSpan
@@ -72,56 +66,55 @@ const renderConnectionStatus = (_, { nodes }) => {
   )
 }
 
-const renderTransientStatus = (taskStatus, nodes) => {
-  const currentStatus = isConverging(nodes) ? 'converging' : taskStatus
+const renderTransientStatus = (taskStatus, nodes, progressPercent) => {
+  const currentStatus = hasConvergingNodes(nodes) ? 'converging' : taskStatus
   const spanContent = `The cluster is ${currentStatus}.`
 
   return (
-    <ClusterSync taskStatus={currentStatus}>
-      <ClusterStatusSpan title={spanContent}>
-        {capitalizeString(currentStatus)}
-      </ClusterStatusSpan>
-    </ClusterSync>
-  )
-}
-
-const renderGenericHealthStatus = (status, taskStatus, progressPercent, cloudProviderType) => {
-  if (progressPercent) {
-    return (
-      <div>
+    <div>
+      {progressPercent &&
         <ProgressBar height={20} animated containedPercent percent={progressPercent
           ? (+progressPercent).toFixed(0)
           : 0}
         />
-        <ClusterStatusSpan
-          status="loading"
-          title={getPendingClusterPopoversContent(cloudProviderType, taskStatus)}>
-          {capitalizeString(taskStatus)}
+      }
+      <ClusterSync taskStatus={currentStatus}>
+        <ClusterStatusSpan title={spanContent}>
+          {capitalizeString(currentStatus)}
         </ClusterStatusSpan>
-      </div>
-    )
-  } else if (status) {
-    return <ClusterStatusSpan>{capitalizeString(status)}</ClusterStatusSpan>
-  }
+      </ClusterSync>
+    </div>
+  )
 }
 
-const renderClusterHealthStatus = (healthyMasterNodes, nodes, numMasters, numWorkers) => {
+const renderErrorStatus = (taskError) =>
+  <ClusterStatusSpan
+    title={taskError}
+    status='error'
+  >
+    Error
+  </ClusterStatusSpan>
+
+const renderClusterHealthStatus = (healthyMasterNodes, nodes, numMasters, numWorkers, taskError) => {
   const [healthStatus, message] = getHealthStatusAndMessage(healthyMasterNodes, nodes, numMasters, numWorkers)
   const fields = clusterHealthStatusFields[healthStatus]
 
   return (
-    <ClusterStatusSpan
-      title={message}
-      status={fields.status}
-    >
-      {fields.label}
-    </ClusterStatusSpan>
+    <div>
+      <ClusterStatusSpan
+        title={message}
+        status={fields.status}
+      >
+        {fields.label}
+      </ClusterStatusSpan>
+      {taskError && renderErrorStatus(taskError)}
+    </div>
   )
 }
 
 const renderHealthStatus = (status, {
   taskStatus,
-  cloudProviderType,
+  taskError,
   progressPercent,
   healthyMasterNodes,
   nodes,
@@ -129,14 +122,14 @@ const renderHealthStatus = (status, {
   numWorkers,
 }) => {
   if (isTransientState(taskStatus, nodes)) {
-    return renderTransientStatus(taskStatus, nodes)
+    return renderTransientStatus(taskStatus, nodes, progressPercent)
   }
 
   if (isSteadyState(taskStatus, nodes)) {
-    return renderClusterHealthStatus(healthyMasterNodes, nodes, numMasters, numWorkers)
+    return renderClusterHealthStatus(healthyMasterNodes, nodes, numMasters, numWorkers, taskError)
   }
 
-  return renderGenericHealthStatus(status, taskStatus, progressPercent, cloudProviderType)
+  return status && <ClusterStatusSpan>{capitalizeString(status)}</ClusterStatusSpan>
 }
 
 const renderLinks = links => {
@@ -286,12 +279,13 @@ export const options = {
       label: 'Monitoring',
       dialog: PrometheusAddonDialog,
     },
-    {
-      cond: isAdmin,
+    // Disable logging till all CRUD features for log datastores are implemented.
+    /* {
+      cond: false,
       icon: <DescriptionIcon />,
       label: 'Logging',
       dialog: LoggingAddonDialog,
-    },
+    }, */
   ],
 }
 

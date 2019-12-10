@@ -23,6 +23,10 @@ import { pathJoin } from 'utils/misc'
 import { k8sPrefix } from 'app/constants'
 import ExternalLink from 'core/components/ExternalLink'
 import Code from 'core/components/CodeBlock'
+import { cloudProviderActions } from '../cloudProviders/actions'
+import useDataLoader from 'core/hooks/useDataLoader'
+import { PromptToAddProvider } from '../cloudProviders/PromptToAddProvider'
+import { CloudProviders } from './model'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
@@ -120,147 +124,152 @@ const AddAzureClusterPage = () => {
   const { history } = useReactRouter()
   const onComplete = () => history.push('/ui/kubernetes/infrastructure#clusters')
   const [createAzureClusterAction, creatingAzureCluster] = useDataUpdater(clusterActions.create, onComplete)
-  const handleSubmit = params => data => createAzureClusterAction({ ...data, ...params, clusterType: 'azure' })
+  const handleSubmit = params => data => createAzureClusterAction({ ...data, ...params, clusterType: CloudProviders.Azure })
 
+  const [cloudProviders, loading] = useDataLoader(cloudProviderActions.list)
+  const hasAzureProvider = !!cloudProviders.some(provider => provider.type === CloudProviders.Azure)
   return (
-    <FormWrapper title="Add Azure Cluster" backUrl={listUrl} loading={creatingAzureCluster}>
-      <Wizard onComplete={handleSubmit(params)} context={initialContext} originPath={`${k8sPrefix}/infrastructure/clusters/add`} showFinishAndReviewButton>
+    <FormWrapper title="Add Azure Cluster" backUrl={listUrl} loading={creatingAzureCluster || loading} message={loading ? 'loading...' : 'Submitting form...'}>
+      <Wizard disableNext={!hasAzureProvider} onComplete={handleSubmit(params)} context={initialContext} originPath={`${k8sPrefix}/infrastructure/clusters/add`} showFinishAndReviewButton>
         {({ wizardContext, setWizardContext, onNext }) => {
           return (
             <>
               <WizardStep stepId="config" label="Cluster Configuration">
-                <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
-                  {({ setFieldValue, values }) => (
-                    <>
-                      {/* Cluster Name */}
-                      <TextField
-                        id="name"
-                        label="Name"
-                        info="Name of the cluster"
-                        required
-                      />
+                { loading ? null : hasAzureProvider
+                  ? <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
+                    {({ setFieldValue, values }) => (
+                      <>
+                        {/* Cluster Name */}
+                        <TextField
+                          id="name"
+                          label="Name"
+                          info="Name of the cluster"
+                          required
+                        />
 
-                      {/* Cloud Provider */}
-                      <PicklistField
-                        DropdownComponent={CloudProviderPicklist}
-                        id="cloudProviderId"
-                        label="Cloud Provider"
-                        onChange={getParamsUpdater('cloudProviderId')}
-                        info="Nodes will be provisioned using this cloud provider."
-                        value={params.cloudProviderId}
-                        type="azure"
-                        required
-                      />
+                        {/* Cloud Provider */}
+                        <PicklistField
+                          DropdownComponent={CloudProviderPicklist}
+                          id="cloudProviderId"
+                          label="Cloud Provider"
+                          onChange={getParamsUpdater('cloudProviderId')}
+                          info="Nodes will be provisioned using this cloud provider."
+                          value={params.cloudProviderId}
+                          type="azure"
+                          required
+                        />
 
-                      {/* AWS Region */}
-                      <PicklistField
-                        DropdownComponent={CloudProviderRegionPicklist}
-                        disabled={!params.cloudProviderId}
-                        id="location"
-                        label="Region"
-                        cloudProviderId={params.cloudProviderId}
-                        onChange={getParamsUpdater('cloudProviderRegionId')}
-                        info="Region "
-                        value={params.cloudProviderRegionId}
-                        type="aws"
-                        required
-                      />
+                        {/* AWS Region */}
+                        <PicklistField
+                          DropdownComponent={CloudProviderRegionPicklist}
+                          disabled={!params.cloudProviderId}
+                          id="location"
+                          label="Region"
+                          cloudProviderId={params.cloudProviderId}
+                          onChange={getParamsUpdater('cloudProviderRegionId')}
+                          info="Region "
+                          value={params.cloudProviderRegionId}
+                          type="aws"
+                          required
+                        />
 
-                      {/* SSH Key */}
-                      <TextField
-                        id="sshKey"
-                        label="Public SSH key"
-                        info="Copy/paste your public SSH key"
-                        multiline
-                        rows={3}
-                        required
-                      />
+                        {/* SSH Key */}
+                        <TextField
+                          id="sshKey"
+                          label="Public SSH key"
+                          info="Copy/paste your public SSH key"
+                          multiline
+                          rows={3}
+                          required
+                        />
 
-                      {/* Template Chooser */}
-                      <PicklistField
-                        id="template"
-                        label="Cluster Template"
-                        options={templateOptions}
-                        onChange={handleTemplateChoice({ setWizardContext, setFieldValue, paramUpdater: getParamsUpdater('template') })}
-                        info="Set common options from one of the available templates"
-                      />
+                        {/* Template Chooser */}
+                        <PicklistField
+                          id="template"
+                          label="Cluster Template"
+                          options={templateOptions}
+                          onChange={handleTemplateChoice({ setWizardContext, setFieldValue, paramUpdater: getParamsUpdater('template') })}
+                          info="Set common options from one of the available templates"
+                        />
 
-                      {params.template === 'custom' &&
-                        <>
-                          <CheckboxField
-                            id="useAllAvailabilityZones"
-                            label="Use all availability zones"
-                            onChange={checked => checked || getParamsUpdater('zones')([])}
-                            info=""
-                          />
+                        {params.template === 'custom' &&
+                          <>
+                            <CheckboxField
+                              id="useAllAvailabilityZones"
+                              label="Use all availability zones"
+                              onChange={checked => checked || getParamsUpdater('zones')([])}
+                              info=""
+                            />
 
-                          {/* Azure Availability Zone */}
-                          {values.useAllAvailabilityZones ||
-                          <AzureAvailabilityZoneChooser
-                            id="zones"
-                            info="Select from the Availability Zones for the specified region"
-                            onChange={getParamsUpdater('zones')}
-                            required
-                          />
-                          }
+                            {/* Azure Availability Zone */}
+                            {values.useAllAvailabilityZones ||
+                            <AzureAvailabilityZoneChooser
+                              id="zones"
+                              info="Select from the Availability Zones for the specified region"
+                              onChange={getParamsUpdater('zones')}
+                              required
+                            />
+                            }
 
-                          {/* Master node SKU */}
-                          <PicklistField
-                            DropdownComponent={AzureSkuPicklist}
-                            disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
-                            id="masterSku"
-                            label="Master Node SKU"
-                            cloudProviderId={params.cloudProviderId}
-                            cloudProviderRegionId={params.cloudProviderRegionId}
-                            filterByZones={!values.useAllAvailabilityZones}
-                            selectedZones={params.zones}
-                            info="Choose an instance type used by master nodes."
-                            required
-                          />
+                            {/* Master node SKU */}
+                            <PicklistField
+                              DropdownComponent={AzureSkuPicklist}
+                              disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
+                              id="masterSku"
+                              label="Master Node SKU"
+                              cloudProviderId={params.cloudProviderId}
+                              cloudProviderRegionId={params.cloudProviderRegionId}
+                              filterByZones={!values.useAllAvailabilityZones}
+                              selectedZones={params.zones}
+                              info="Choose an instance type used by master nodes."
+                              required
+                            />
 
-                          {/* Num master nodes */}
-                          <PicklistField
-                            id="numMasters"
-                            options={numMasterOptions}
-                            label="Number of master nodes"
-                            info="Number of master nodes to deploy.  3 nodes are required for an High Availability (HA) cluster."
-                            required
-                          />
+                            {/* Num master nodes */}
+                            <PicklistField
+                              id="numMasters"
+                              options={numMasterOptions}
+                              label="Number of master nodes"
+                              info="Number of master nodes to deploy.  3 nodes are required for an High Availability (HA) cluster."
+                              required
+                            />
 
-                          {/* Worker node SKU */}
-                          <PicklistField
-                            DropdownComponent={AzureSkuPicklist}
-                            disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
-                            id="workerSku"
-                            label="Worker Node SKU"
-                            cloudProviderId={params.cloudProviderId}
-                            cloudProviderRegionId={params.cloudProviderRegionId}
-                            filterByZones={!values.useAllAvailabilityZones}
-                            selectedZones={params.zones}
-                            info="Choose an instance type used by worker nodes."
-                            required
-                          />
+                            {/* Worker node SKU */}
+                            <PicklistField
+                              DropdownComponent={AzureSkuPicklist}
+                              disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
+                              id="workerSku"
+                              label="Worker Node SKU"
+                              cloudProviderId={params.cloudProviderId}
+                              cloudProviderRegionId={params.cloudProviderRegionId}
+                              filterByZones={!values.useAllAvailabilityZones}
+                              selectedZones={params.zones}
+                              info="Choose an instance type used by worker nodes."
+                              required
+                            />
 
-                          {/* Num worker nodes */}
-                          <TextField
-                            id="numWorkers"
-                            type="number"
-                            label="Number of worker nodes"
-                            info="Number of worker nodes to deploy."
-                            required
-                          />
+                            {/* Num worker nodes */}
+                            <TextField
+                              id="numWorkers"
+                              type="number"
+                              label="Number of worker nodes"
+                              info="Number of worker nodes to deploy."
+                              required
+                            />
 
-                          {/* Allow workloads on masters */}
-                          <CheckboxField
-                            id="allowWorkloadsOnMaster"
-                            label="Allow workloads on master nodes"
-                            info="It is highly recommended to not enable workloads on master nodes for production or critical workload clusters."
-                          />
-                        </>
-                      }
-                    </>
-                  )}
-                </ValidatedForm>
+                            {/* Allow workloads on masters */}
+                            <CheckboxField
+                              id="allowWorkloadsOnMaster"
+                              label="Allow workloads on master nodes"
+                              info="It is highly recommended to not enable workloads on master nodes for production or critical workload clusters."
+                            />
+                          </>
+                        }
+                      </>
+                    )}ui/kubernetes/infrastructure/cloudProviders/add
+                  </ValidatedForm>
+                  : <PromptToAddProvider type={CloudProviders.Azure} src={`${k8sPrefix}/infrastructure/cloudProviders/add?type=${CloudProviders.Azure}`} />
+                }
               </WizardStep>
 
               <WizardStep stepId="network" label="Network Info">

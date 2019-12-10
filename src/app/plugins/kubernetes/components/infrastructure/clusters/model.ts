@@ -66,7 +66,7 @@ export interface ICluster {
   hasLoadBalancer: boolean
 }
 
-enum CloudProviders {
+export enum CloudProviders {
   Aws = 'aws',
   Azure = 'azure',
   BareOS = 'local',
