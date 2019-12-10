@@ -87,15 +87,15 @@ const renderTransientStatus = (taskStatus, nodes, progressPercent) => {
   )
 }
 
-const renderErrorStatus = (taskError) =>
+const renderErrorStatus = (taskError, nodesDetailsUrl) =>
   <ClusterStatusSpan
     title={taskError}
     status='error'
   >
-    Error
+    <SimpleLink src={nodesDetailsUrl}>Error</SimpleLink>
   </ClusterStatusSpan>
 
-const renderClusterHealthStatus = (healthyMasterNodes, nodes, numMasters, numWorkers, taskError) => {
+const renderClusterHealthStatus = (healthyMasterNodes, nodes, numMasters, numWorkers, taskError, nodesDetailsUrl) => {
   const [healthStatus, message] = getHealthStatusAndMessage(healthyMasterNodes, nodes, numMasters, numWorkers)
   const fields = clusterHealthStatusFields[healthStatus]
 
@@ -105,9 +105,9 @@ const renderClusterHealthStatus = (healthyMasterNodes, nodes, numMasters, numWor
         title={message}
         status={fields.status}
       >
-        {fields.label}
+        <SimpleLink src={nodesDetailsUrl}>{fields.label}</SimpleLink>
       </ClusterStatusSpan>
-      {taskError && renderErrorStatus(taskError)}
+      {taskError && renderErrorStatus(taskError, nodesDetailsUrl)}
     </div>
   )
 }
@@ -120,13 +120,15 @@ const renderHealthStatus = (status, {
   nodes,
   numMasters,
   numWorkers,
+  uuid,
 }) => {
   if (isTransientState(taskStatus, nodes)) {
     return renderTransientStatus(taskStatus, nodes, progressPercent)
   }
 
   if (isSteadyState(taskStatus, nodes)) {
-    return renderClusterHealthStatus(healthyMasterNodes, nodes, numMasters, numWorkers, taskError)
+    const nodesDetailsUrl = `/ui/kubernetes/infrastructure/clusters/${uuid}#nodesAndHealthInfo`
+    return renderClusterHealthStatus(healthyMasterNodes, nodes, numMasters, numWorkers, taskError, nodesDetailsUrl)
   }
 
   return status && <ClusterStatusSpan>{capitalizeString(status)}</ClusterStatusSpan>
