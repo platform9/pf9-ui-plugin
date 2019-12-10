@@ -4,7 +4,7 @@ import { maybeFnOrNull } from 'utils/fp'
 import ExternalLink from 'core/components/ExternalLink'
 import ProgressBar from 'core/components/progress/ProgressBar'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { pathOr, pipe } from 'ramda'
+import { pathOr, pipe, prop } from 'ramda'
 import { castBoolToStr, castFuzzyBool, columnPathLookup } from 'utils/misc'
 import SimpleLink from 'core/components/SimpleLink'
 import { nodesCacheKey } from 'k8s/components/infrastructure/nodes/actions'
@@ -16,6 +16,8 @@ import {
 } from '../clusters/ClusterStatusUtils'
 import DeAuthIcon from '@material-ui/icons/DeleteForever'
 import NodeDeAuthDialog from './NodeDeAuthDialog'
+import SettingsPhoneIcon from '@material-ui/icons/SettingsPhone'
+import RemoteSupportDialog from './RemoteSupportDialog'
 
 const isMaster = pipe(castFuzzyBool, castBoolToStr())
 
@@ -115,6 +117,11 @@ export const columns = [
   { id: 'assignedRoles', label: 'Assigned Roles', render: renderRoles },
 ]
 
+const isAdmin = (selected, getContext) => {
+  const { role } = getContext(prop('userDetails'))
+  return role === 'admin'
+}
+
 export const options = {
   addText: 'Onboard a Node',
   addUrl: '/ui/kubernetes/infrastructure/nodes/cli/download',
@@ -130,8 +137,14 @@ export const options = {
       icon: <DeAuthIcon />,
       label: 'Deauthorize node',
       dialog: NodeDeAuthDialog,
-    }
-  ],
+    },
+    {
+      cond: isAdmin,
+      icon: <SettingsPhoneIcon />,
+      label: 'Configure Remote Support',
+      dialog: RemoteSupportDialog,
+    },
+  ]
 }
 
 const { ListPage, List } = createCRUDComponents(options)

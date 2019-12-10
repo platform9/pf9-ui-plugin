@@ -51,6 +51,14 @@ class ResMgr extends ApiService {
     return response.data
   }
 
+  async pushRole (hostId, role, body) {
+    return await this.client.basicPut(`${await this.endpoint()}/hosts/${hostId}/roles/${role}`, body)
+  }
+
+  async removeRole (hostId, role) {
+    return await this.client.basicDelete(`${await this.endpoint()}/hosts/${hostId}/roles/${role}`)
+  }
+
   async unauthorizeHost (id) {
     const url = `${await this.endpoint()}/hosts/${id}`
     return axios.delete(url, this.client.getAuthHeaders())
