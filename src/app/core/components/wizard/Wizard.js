@@ -14,9 +14,9 @@ class Wizard extends PureComponent {
   isLastStep = () => this.state.activeStep === this.state.steps.length - 1
   isComplete = () => this.state.activeStep > this.state.steps.length - 1
   lastStep = () => this.state.steps.length - 1
-  hasNext = () => this.state.activeStep < this.lastStep()
+  hasNext = () => this.state.activeStep < this.lastStep() && !this.props.disableNext
   hasBack = () => this.state.activeStep > 0
-  isFinishAndReviewVisible = () => this.state.activeStep < this.state.steps.length - 2
+  isFinishAndReviewVisible = () => this.state.activeStep < this.state.steps.length - 2 && !this.props.disableNext
   canBackAtFirstStep = () => this.state.activeStep === 0 && !!this.props.originPath
 
   // Callbacks indexed by step ID to be called before navigating to the next step
@@ -137,6 +137,7 @@ Wizard.propTypes = {
   submitLabel: PropTypes.string,
   showFinishAndReviewButton: PropTypes.bool,
   finishAndReviewLabel: PropTypes.string,
+  disableNext: PropTypes.bool,
   children: PropTypes.oneOfType([PropTypes.array, PropTypes.func]).isRequired,
 }
 
