@@ -54,7 +54,7 @@ export const columns = [
   { id: 'uuid', label: 'UUID', display: false },
   { id: 'name', label: 'Name', render: renderNodeDetailLink },
   { id: 'status', label: 'Status', render: renderStatus },
-  { id: 'logs', label: 'Logs', display: false, render: renderLogs },
+  { id: 'logs', label: 'Logs', render: renderLogs },
   { id: 'primaryIp', label: 'Primary IP' },
   { id: 'compute', label: 'Compute', render: renderStats('compute') },
   { id: 'memory', label: 'Memory', render: renderStats('memory') },

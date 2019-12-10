@@ -42,7 +42,8 @@ export const loadNodes = createContextLoader(nodesCacheKey, async (params, loadF
   return rawNodes.map(node => ({
     ...node,
     combined: combinedHostsObj[node.uuid],
-    logs: `${qbertUrl}/logs/${node.uuid}`,
+    // qbert v3 link fails authorization so we have to use v1 link for logs
+    logs: `${qbertUrl}/logs/${node.uuid}`.replace(/v3/, 'v1'),
   }))
 }, {
   refetchCascade: true,
