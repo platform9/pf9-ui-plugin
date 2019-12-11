@@ -1,12 +1,11 @@
 import createContextLoader from 'core/helpers/createContextLoader'
-import createContextUpdater from 'core/helpers/createContextUpdater'
 import ApiClient from 'api-client/ApiClient'
 import { serviceCatalogContextKey } from 'openstack/components/api-access/actions'
 import { pathStrOrNull, pipeWhenTruthy } from 'utils/fp'
 import { find, propEq, prop } from 'ramda'
 import createContextUpdater from 'core/helpers/createContextUpdater'
 
-const { qbert, resmgr } = ApiClient.getInstance()
+const { qbert } = ApiClient.getInstance()
 
 export const nodesCacheKey = 'nodes'
 export const rawNodesCacheKey = 'rawNodes'
@@ -20,14 +19,11 @@ createContextLoader(rawNodesCacheKey, async () => {
 })
 
 export const loadNodes = createContextLoader(nodesCacheKey, async (params, loadFromContext) => {
-  console.log('loadNodes was called')
   const [rawNodes, combinedHosts, serviceCatalog] = await Promise.all([
     loadFromContext(rawNodesCacheKey),
     loadFromContext(combinedHostsCacheKey),
     loadFromContext(serviceCatalogContextKey),
   ])
-
-  console.log(combinedHosts)
 
   const combinedHostsObj = combinedHosts.reduce(
     (accum, host) => {

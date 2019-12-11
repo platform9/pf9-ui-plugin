@@ -2,7 +2,10 @@ import { combineHost } from './combineHosts'
 import createContextLoader from 'core/helpers/createContextLoader'
 import ApiClient from 'api-client/ApiClient'
 import createCRUDActions from 'core/helpers/createCRUDActions'
-import { rawNodesCacheKey } from 'k8s/components/infrastructure/nodes/actions'
+import { rawNodesCacheKey, loadNodes } from 'k8s/components/infrastructure/nodes/actions'
+import createContextUpdater from 'core/helpers/createContextUpdater'
+import { uniq } from 'ramda'
+import { except } from 'utils/fp'
 
 export const clustersCacheKey = 'clusters'
 export const resMgrHostsCacheKey = 'resMgrHosts'
@@ -42,3 +45,33 @@ export const loadCombinedHosts = createContextLoader(combinedHostsCacheKey, asyn
 }, {
   uniqueIdentifier: 'id',
 })
+
+// Important: How do I get this function to also trigger a nodes list refresh?
+export const updateRemoteSupport = createContextUpdater(combinedHostsCacheKey, async (data,
+  currentItems) => {
+  const { id, enableSupport } = data
+  const host = currentItems.find(x => x.id === id)
+  const supportRoleName = 'pf9-support'
+  loadNodes.invalidateCache(false)
+  // If the role push/delete fails, how do I handle that?
+  // Temporary solution using the pre-existing host object
+  // Future solution will require consumption of pf9-notifications for reactive updates
+  if (enableSupport) {
+    await resmgr.pushRole(id, supportRoleName)
+    console.log('enabling support', host)
+    return {
+      roles: uniq([...host.roles, supportRoleName]),
+      roleStatus: 'converging',
+      uiState: 'pending',
+      supportRole: true,
+    }
+  }
+  console.log('removing support', host)
+  await resmgr.removeRole(id, supportRoleName)
+  return {
+    roles: except(supportRoleName, host.roles),
+    roleStatus: 'converging',
+    uiState: 'pending',
+    supportRole: false,
+  }
+}, { operation: 'update' })

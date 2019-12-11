@@ -156,7 +156,6 @@ function createContextUpdater (cacheKey, dataUpdaterFn, options = {}) {
     }
     try {
       const output = await dataUpdaterFn(params, prevItems, loadFromContext)
-      console.log('output', output)
       const operationSwitchCase = switchCase(
         // If no operation is chosen (ie "any" or a custom operation), just replace the whole array with the new output
         isNil(output) ? identity : always(output),
@@ -164,9 +163,7 @@ function createContextUpdater (cacheKey, dataUpdaterFn, options = {}) {
         ['update', adjustWith(matchAllIdentifiers, mergeLeft(output))],
         ['delete', removeWith(matchAllIdentifiers)],
       )
-      console.log('dataLens', dataLens)
       await setContext(over(dataLens, operationSwitchCase(operation)))
-      console.log('context finished setting')
 
       if (onSuccess) {
         const updatedItems = await loader({

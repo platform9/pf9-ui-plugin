@@ -1,34 +1,25 @@
 import React, { useState, useCallback } from 'react'
 import ExternalLink from 'core/components/ExternalLink'
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@material-ui/core'
-import { loadNodes, updateRemoteSupport } from 'k8s/components/infrastructure/nodes/actions'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import Checkbox from 'core/components/validatedForm/CheckboxField'
 import Progress from 'core/components/progress/Progress'
 import useDataUpdater from 'core/hooks/useDataUpdater'
-import useDataLoader from 'core/hooks/useDataLoader'
+import { updateRemoteSupport } from 'k8s/components/infrastructure/common/actions'
 
 // The modal is technically inside the row, so clicking anything inside
 // the modal window will cause the table row to be toggled.
 const stopPropagation = e => e.stopPropagation()
 
 const RemoteSupportDialog = ({ rows: [node], onClose }) => {
-  const reloadNodesAndClose = async () => {
-    await reloadNodes(true)
-    onClose()
-  }
-
-  const [updateNode, updatingNode] = useDataUpdater(updateRemoteSupport, reloadNodesAndClose)
-  const [nodes, loadingNodes, reloadNodes] = useDataLoader(loadNodes)
+  const [updateNode, updatingNode] = useDataUpdater(updateRemoteSupport, onClose)
   const [enableSupport, setEnableSupport] = useState(node.combined.supportRole)
-  
   const handleSubmit = useCallback(async ({ enableSupport }) => {
-    console.log(enableSupport)
     // If no change, just close the modal
     if (enableSupport === node.combined.supportRole) { return onClose() }
     await updateNode({ id: node.uuid, enableSupport })
   }, [node])
-  
+
   const initialValues = { enableSupport }
   return (
     <Dialog open onClose={onClose} onClick={stopPropagation}>

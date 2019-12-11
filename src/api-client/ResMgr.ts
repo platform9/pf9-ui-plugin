@@ -52,11 +52,11 @@ class ResMgr extends ApiService {
   }
 
   async pushRole (hostId, role, body) {
-    return await this.client.basicPut(`${await this.endpoint()}/hosts/${hostId}/roles/${role}`, body)
+    return this.client.basicPut(`${await this.endpoint()}/hosts/${hostId}/roles/${role}`, body)
   }
 
-  async removeRole (hostId, role) {
-    return await this.client.basicDelete(`${await this.endpoint()}/hosts/${hostId}/roles/${role}`)
+  async removeRole (hostId, role): Promise<void> {
+    await this.client.basicDelete(`${await this.endpoint()}/hosts/${hostId}/roles/${role}`)
   }
 
   async unauthorizeHost (id) {
