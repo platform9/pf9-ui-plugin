@@ -57,10 +57,11 @@ export const connectionStatusFieldsTable: {[status in ConnectionStatus]: Connect
 }
 
 export function getHealthStatusAndMessage (
-  healthyMasterNodes = [],
   nodes: Node[] = [],
-  numMasters: number,
-  numWorkers: number,
+  masterNodes: Node[] = [],
+  workerNodes: Node[] = [],
+  healthyMasterNodes: Node[] = [],
+  healthyWorkerNodes: Node[] = [],
 ): [HealthStatus, string] {
   const connectionStatus = getConnectionStatus(nodes)
 
@@ -69,11 +70,11 @@ export function getHealthStatusAndMessage (
   }
 
   const healthyMasterNodesCount = healthyMasterNodes.length
-  const healthyWorkersNodesCount = nodes.filter(node => !node.isMaster && node.status === 'ok').length
-  const mastersQuorumNumber = numMasters // TODO: how to get quorum number of masters?
-  const workersQuorumNumber = Math.ceil(numWorkers/2)
-  const mastersHealthStatus = getNodesHealthStatus(healthyMasterNodesCount, numMasters, mastersQuorumNumber)
-  const workersHealthStatus = getNodesHealthStatus(healthyWorkersNodesCount, numWorkers, workersQuorumNumber)
+  const healthyWorkersNodesCount = healthyWorkerNodes.length
+  const mastersQuorumNumber = healthyMasterNodesCount // TODO: how to get quorum number of masters?
+  const workersQuorumNumber = Math.ceil(workerNodes.length/2)
+  const mastersHealthStatus = getNodesHealthStatus(healthyMasterNodesCount, masterNodes.length, mastersQuorumNumber)
+  const workersHealthStatus = getNodesHealthStatus(healthyWorkersNodesCount, workerNodes.length, workersQuorumNumber)
   const healthStatusAndMessage = clusterHealthStatusAndMessageTable.find(item =>
     item.mastersHealthStatus === mastersHealthStatus &&
     item.workersHealthStatus === workersHealthStatus

@@ -183,8 +183,11 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
         grafanaLink: hasPrometheusEnabled(cluster) ? grafanaLink : null,
       }
       const masterNodes = nodesInCluster.filter(node => node.isMaster === 1)
+      const workerNodes = nodesInCluster.filter(node => node.isMaster === 0)
       const healthyMasterNodes = masterNodes.filter(
-        node => node.status === 'ok' && node.api_responding === 1)
+        node => node.status === 'ok')
+      const healthyWorkerNodes = workerNodes.filter(
+        node => node.status === 'ok')
       const hasMasterNode = healthyMasterNodes.length > 0
       const clusterOk = nodesInCluster.length > 0 && cluster.status === 'ok'
       const fuzzyBools = ['allowWorkloadsOnMaster', 'privileged', 'appCatalogEnabled'].reduce(
@@ -207,8 +210,10 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
         version: version || 'N/A',
         nodes: nodesInCluster,
         masterNodes,
+        workerNodes,
         progressPercent,
         healthyMasterNodes,
+        healthyWorkerNodes,
         hasMasterNode,
         highlyAvailable: healthyMasterNodes.length > 2,
         links: {
