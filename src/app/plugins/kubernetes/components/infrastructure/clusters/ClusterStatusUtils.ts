@@ -56,13 +56,19 @@ export const connectionStatusFieldsTable: {[status in ConnectionStatus]: Connect
   },
 }
 
-export function getHealthStatusAndMessage (
-  nodes: Node[] = [],
-  masterNodes: Node[] = [],
-  workerNodes: Node[] = [],
-  healthyMasterNodes: Node[] = [],
-  healthyWorkerNodes: Node[] = [],
-): [HealthStatus, string] {
+export function getHealthStatusAndMessage ({
+  nodes = [],
+  masterNodes = [],
+  workerNodes = [],
+  healthyMasterNodes = [],
+  healthyWorkerNodes = [],
+}: {
+  nodes: Node[]
+  masterNodes: Node[]
+  workerNodes: Node[]
+  healthyMasterNodes: Node[]
+  healthyWorkerNodes: Node[]
+}): [HealthStatus, string] {
   const connectionStatus = getConnectionStatus(nodes)
 
   if (connectionStatus === 'disconnected') {

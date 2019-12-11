@@ -99,8 +99,8 @@ const renderErrorStatus = (taskError, nodesDetailsUrl) =>
     <SimpleLink src={nodesDetailsUrl}>Error</SimpleLink>
   </ClusterStatusSpan>
 
-const renderClusterHealthStatus = (nodes, masterNodes, workerNodes, healthyMasterNodes, healthyWorkerNodes, taskError, nodesDetailsUrl) => {
-  const [healthStatus, message] = getHealthStatusAndMessage(nodes, masterNodes, workerNodes, healthyMasterNodes, healthyWorkerNodes)
+const renderClusterHealthStatus = ({ nodes, masterNodes, workerNodes, healthyMasterNodes, healthyWorkerNodes, taskError, nodesDetailsUrl }) => {
+  const [healthStatus, message] = getHealthStatusAndMessage({ nodes, masterNodes, workerNodes, healthyMasterNodes, healthyWorkerNodes })
   const fields = clusterHealthStatusFields[healthStatus]
 
   return (
@@ -133,7 +133,7 @@ const renderHealthStatus = (status, {
 
   if (isSteadyState(taskStatus, nodes)) {
     const nodesDetailsUrl = getNodesDetailsUrl(uuid)
-    return renderClusterHealthStatus(nodes, masterNodes, workerNodes, healthyMasterNodes, healthyWorkerNodes, taskError, nodesDetailsUrl)
+    return renderClusterHealthStatus({ nodes, masterNodes, workerNodes, healthyMasterNodes, healthyWorkerNodes, taskError, nodesDetailsUrl })
   }
 
   return status && <ClusterStatusSpan>{capitalizeString(status)}</ClusterStatusSpan>
