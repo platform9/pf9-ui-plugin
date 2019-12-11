@@ -126,10 +126,6 @@ const loadFeatures = async setFeatures => {
   }
 }
 
-const contentBackgroundColor = (path) => {
-  if (path === '/ui/kubernetes/dashboard') { return '#f6fafe' }
-}
-
 const AuthenticatedContainer = () => {
   const [drawerOpen, toggleDrawer] = useToggler(true)
   const [features, setFeatures] = useState(emptyObj)

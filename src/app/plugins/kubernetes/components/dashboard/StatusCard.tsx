@@ -89,7 +89,7 @@ interface StatusCardProps {
 }
 
 const StatusCard: FunctionComponent<StatusCardProps> = ({ entity, route, addRoute, title, icon: Icon, dataLoader, quantityFn }) => {
-  const { row, rowColumn, contentContainer, headerIcon, cardTitle, progress, text, arrowIcon, verticalCenter } = useStyles({})
+  const { row, rowColumn, contentContainer, headerIcon, cardTitle, text, arrowIcon, verticalCenter } = useStyles({})
   const [data, loading] = useDataLoader(...dataLoader)
   const { quantity } = quantityFn(data)
   const iconComponent =
