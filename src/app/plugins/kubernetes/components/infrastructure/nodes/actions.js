@@ -20,11 +20,14 @@ createContextLoader(rawNodesCacheKey, async () => {
 })
 
 export const loadNodes = createContextLoader(nodesCacheKey, async (params, loadFromContext) => {
+  console.log('loadNodes was called')
   const [rawNodes, combinedHosts, serviceCatalog] = await Promise.all([
     loadFromContext(rawNodesCacheKey),
     loadFromContext(combinedHostsCacheKey),
     loadFromContext(serviceCatalogContextKey),
   ])
+
+  console.log(combinedHosts)
 
   const combinedHostsObj = combinedHosts.reduce(
     (accum, host) => {
@@ -83,6 +86,7 @@ export const updateRemoteSupport = createContextUpdater(combinedHostsCacheKey, a
     }
   } else {
     await resmgr.removeRole(id, supportRoleName)
+    console.log(host.roles.filter(role => role !== supportRoleName))
     return {
       ...host,
       roles: host.roles.filter(role => role !== supportRoleName),
