@@ -1,11 +1,18 @@
 import React from 'react'
-import PropTypes from 'prop-types'
-import {
-  Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
-} from '@material-ui/core'
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core'
 import { withProgress } from 'core/components/progress/Progress'
 
-class ConfirmationDialog extends React.PureComponent {
+interface IConfirmationDialog {
+  open: boolean
+  title?: string
+  text?: JSX.Element
+  cancelText?: string
+  confirmText?: string
+  onCancel?: () => void
+  onConfirm?: () => void
+}
+
+class ConfirmationDialog extends React.PureComponent<IConfirmationDialog> {
   handleCancel = () => {
     this.props.onCancel && this.props.onCancel()
   }
@@ -17,10 +24,10 @@ class ConfirmationDialog extends React.PureComponent {
   render () {
     const {
       open,
-      title,
-      text,
-      cancelText,
-      confirmText,
+      title = 'Are you sure?',
+      text = 'Are you sure?',
+      cancelText = 'Cancel',
+      confirmText = 'Confirm',
     } = this.props
 
     return (
@@ -49,24 +56,7 @@ class ConfirmationDialog extends React.PureComponent {
   }
 }
 
-ConfirmationDialog.propTypes = {
-  open: PropTypes.bool.isRequired,
-  title: PropTypes.string,
-  text: PropTypes.node,
-  cancelText: PropTypes.string,
-  confirmText: PropTypes.string,
-  onCancel: PropTypes.func,
-  onConfirm: PropTypes.func,
-}
-
-ConfirmationDialog.defaultProps = {
-  title: 'Are you sure?',
-  text: 'Are you sure?',
-  cancelText: 'Cancel',
-  confirmText: 'Confirm',
-}
-
 export default withProgress(ConfirmationDialog, {
   renderContentOnMount: true,
   message: 'Please wait...'
-})
+}) as React.ComponentType<IConfirmationDialog>

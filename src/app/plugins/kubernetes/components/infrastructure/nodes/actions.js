@@ -51,8 +51,10 @@ export const loadNodes = createContextLoader(nodesCacheKey, async (params, loadF
   uniqueIdentifier: 'uuid',
 })
 
-export const deauthNode = createContextUpdater('nodes', (params, prevItems, loadFromContext) => {
-  // TODO: need to clear out rawNodes as well?
-  console.log('TODO: deauth node', params)
-  return prevItems
+export const deAuthNode = createContextUpdater('nodes', (node, prevItems, loadFromContext) => {
+  // TODO: This doesn't seem to be updating the node list table for some reason
+  const newItems = prevItems.filter(_node => node.uuid !== _node.uuid)
+  return newItems
+}, {
+  successMessage: ([node]) => `Successfully de-authorized node ${node.name} (${node.primaryIp})`,
 })

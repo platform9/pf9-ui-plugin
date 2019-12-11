@@ -1,21 +1,19 @@
 import React, { useCallback } from 'react'
-import { deauthNode } from 'k8s/components/infrastructure/nodes/actions'
+import { deAuthNode } from 'k8s/components/infrastructure/nodes/actions'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import ConfirmationDialog from 'core/components/ConfirmationDialog'
-import Typography from '@material-ui/core/Typography'
 
-const NodeDeauthDialog = ({ rows: [node], onClose }) => {
-  const [deauth, updating] = useDataUpdater(nodeActions.deAuth, onClose)
+const NodeDeAuthDialog = ({ rows: [node], onClose }) => {
+  const [deauth] = useDataUpdater(deAuthNode, onClose)
   const handeSubmit = useCallback(() => deauth(node), [deauth])
 
   return (
     <ConfirmationDialog
-      loading={updating}
       title="De-authorize node"
       text={<>
-        <Typography variant="body1">
-          You are about to de-authorize the node {node.name} ({node.primaryIp})</Typography><br />
-        <Typography variant="body1">Are you sure?</Typography>
+          You are about to de-authorize the node {node.name} ({node.primaryIp})
+        <br />
+        Are you sure?
       </>}
       open
       onCancel={onClose}
@@ -23,4 +21,4 @@ const NodeDeauthDialog = ({ rows: [node], onClose }) => {
   )
 }
 
-export default NodeDeauthDialog
+export default NodeDeAuthDialog
