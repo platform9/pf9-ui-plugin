@@ -4,6 +4,7 @@ import { serviceCatalogContextKey } from 'openstack/components/api-access/action
 import { pathStrOrNull, pipeWhenTruthy } from 'utils/fp'
 import { find, propEq, prop } from 'ramda'
 import { combinedHostsCacheKey } from 'k8s/components/infrastructure/common/actions'
+import createContextUpdater from 'core/helpers/createContextUpdater'
 
 const { qbert } = ApiClient.getInstance()
 
@@ -48,4 +49,10 @@ export const loadNodes = createContextLoader(nodesCacheKey, async (params, loadF
 }, {
   refetchCascade: true,
   uniqueIdentifier: 'uuid',
+})
+
+export const deauthNode = createContextUpdater('nodes', (params, prevItems, loadFromContext) => {
+  // TODO: need to clear out rawNodes as well?
+  console.log('TODO: deauth node', params)
+  return prevItems
 })
