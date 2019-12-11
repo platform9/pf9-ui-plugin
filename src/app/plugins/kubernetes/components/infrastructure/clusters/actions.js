@@ -184,10 +184,8 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
       }
       const masterNodes = nodesInCluster.filter(node => node.isMaster === 1)
       const workerNodes = nodesInCluster.filter(node => node.isMaster === 0)
-      const healthyMasterNodes = masterNodes.filter(
-        node => node.status === 'ok')
-      const healthyWorkerNodes = workerNodes.filter(
-        node => node.status === 'ok')
+      const healthyMasterNodes = masterNodes.filter(node => node.status === 'ok')
+      const healthyWorkerNodes = workerNodes.filter(node => node.status === 'ok')
       const hasMasterNode = healthyMasterNodes.length > 0
       const clusterOk = nodesInCluster.length > 0 && cluster.status === 'ok'
       const fuzzyBools = ['allowWorkloadsOnMaster', 'privileged', 'appCatalogEnabled'].reduce(
