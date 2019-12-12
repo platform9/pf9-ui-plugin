@@ -38,14 +38,14 @@ const ClusterNodes = () => {
 
   const MasterNodesTable = createListTableComponent({
     title: 'Master Nodes',
-    name: 'ClusterNodes',
+    name: 'MasterNodes',
     columns: removeColumnIds(columns, ['isMaster']),
     ...commonTableProperties,
   })
 
   const WorkerNodesTable = createListTableComponent({
-    title: 'Master Nodes',
-    name: 'ClusterNodes',
+    title: 'Worker Nodes',
+    name: 'WorkerNodes',
     columns: removeColumnIds(columns, ['isMaster', 'api_responding']),
     ...commonTableProperties,
   })
