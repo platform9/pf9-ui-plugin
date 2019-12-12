@@ -12,6 +12,7 @@ const styles = theme => ({
     color: theme.palette.dashboardCard.primary,
     border: `1px solid ${theme.palette.dashboardCard.primary}`,
     background: theme.palette.dashboardCard.button,
+    whiteSpace: 'nowrap',
   }
 })
 

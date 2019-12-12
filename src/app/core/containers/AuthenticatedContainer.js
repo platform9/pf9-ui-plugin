@@ -29,11 +29,12 @@ const useStyles = makeStyles(theme => ({
   content: {
     overflowX: 'auto',
     flexGrow: 1,
-    backgroundColor: props => (
-      props.path === '/ui/kubernetes/dashboard'
-        ? theme.palette.background.dashboard
-        : theme.palette.background.default
-    ),
+    // backgroundColor: props => (
+    //   props.path === '/ui/kubernetes/dashboard'
+    //     ? theme.palette.background.dashboard
+    //     : theme.palette.background.default
+    // )
+    backgroundColor: theme.palette.background.default,
     padding: theme.spacing(3),
     transition: theme.transitions.create('margin', {
       easing: theme.transitions.easing.sharp,

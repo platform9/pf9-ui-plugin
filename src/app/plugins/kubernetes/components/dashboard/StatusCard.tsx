@@ -23,11 +23,12 @@ const useStyles = makeStyles((theme: any) => ({
     backgroundColor: theme.palette.dashboardCard.background,
     width: '280px',
     height: '170px',
-    margin: theme.spacing(1),
+    margin: theme.spacing(1.25),
     padding: theme.spacing(2.5, 1, 0.5, 1),
     borderRadius: '5px',
     transition: 'transform .1s ease',
-    boxShadow: '1px 1px 4px -2px rgba(0,0,0,0.35)',
+    // boxShadow: '1px 1px 4px -2px rgba(0,0,0,0.35)',
+    boxShadow: '0 2.5px 1.5px -3.5px rgba(0, 0, 0, 0.2), 0 1.5px 7px 1px rgba(0, 0, 0, 0.12), 0 1px 3px -1.5px rgba(0, 0, 0, 0.14)',
     '&:hover': {
       backgroundColor: hexToRGBA(theme.palette.dashboardCard.background, 0.95),
       transform: 'scale(1.025)'
@@ -40,6 +41,7 @@ const useStyles = makeStyles((theme: any) => ({
     marginBottom: theme.spacing(1),
     flex: 1,
     justifyContent: 'space-between',
+    alignItems: 'flex-start',
     '&:first-of-type': {
       borderBottom: `1px solid ${theme.palette.dashboardCard.divider}`
     }
@@ -54,7 +56,7 @@ const useStyles = makeStyles((theme: any) => ({
   },
   cardTitle: {
     marginLeft: theme.spacing(1),
-    fontWeight: 'bold',
+    fontWeight: 800,
     color: theme.palette.dashboardCard.text,
     fontSize: '14px',
   },
@@ -71,7 +73,8 @@ const useStyles = makeStyles((theme: any) => ({
     },
   },
   verticalCenter: {
-    alignSelf: 'center',
+    display: 'flex',
+    alignItems: 'center',
   }
 }))
 
@@ -108,7 +111,7 @@ const StatusCard: FunctionComponent<StatusCardProps> = ({ entity, route, addRout
             </Typography>
           </Link>
         </div>
-        <div className={rowColumn}>
+        <div className={clsx(rowColumn, verticalCenter)}>
           {iconComponent}
           {loading ? (
             <CircularProgress size={32} />
@@ -117,13 +120,13 @@ const StatusCard: FunctionComponent<StatusCardProps> = ({ entity, route, addRout
           )}
         </div>
       </div>
-      <div className={row}>
-        <div className={clsx(rowColumn, verticalCenter)}>
+      <div className={clsx(row, verticalCenter)}>
+        <div className={rowColumn}>
           <Link to={addRoute}>
             <CardButton>Add {entity}</CardButton>
           </Link>
         </div>
-        <div className={clsx(rowColumn, verticalCenter)}>
+        <div className={rowColumn}>
           <Link to={route}>
             <FontAwesomeIcon size="2x" className={arrowIcon}>arrow-right</FontAwesomeIcon>
           </Link>
