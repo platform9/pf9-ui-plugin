@@ -2,6 +2,7 @@ import React from 'react'
 import { Typography, Divider } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import ExternalLink from 'core/components/ExternalLink'
+import SimpleLink from 'core/components/SimpleLink'
 
 const useStyles = makeStyles((theme) => ({
   title: {
@@ -45,7 +46,7 @@ const HelpPage = () => {
       </Typography>
       <Typography variant="subtitle1" className={classes.text}>
         You should have received an invite to join the channel already. If you haven't, send an
-        request to <a href="mailto:support-ft@platform9.com">support-ft@platform9.com</a>
+        request to <SimpleLink href="mailto:support-ft@platform9.com">support-ft@platform9.com</SimpleLink>
       </Typography>
     </>
   )
