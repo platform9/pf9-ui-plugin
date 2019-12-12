@@ -1,26 +1,28 @@
 import React from 'react'
-import { Typography, Theme } from '@material-ui/core'
+import { Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import CodeBlock from 'core/components/CodeBlock'
 import SimpleLink from 'core/components/SimpleLink'
 import { whatIsBareOSLink } from 'app/constants'
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles((theme: any) => ({
   row: {
     display: 'flex',
     margin: theme.spacing(2, 0),
   },
   step: {
+    color: theme.palette.secondary.contrastText,
     marginRight: theme.spacing(2),
-    flex: `0 0 ${theme.spacing(4.5)}px`,
-    width: theme.spacing(4.5),
-    height: theme.spacing(4.5),
+    flex: `0 0 ${theme.spacing(3.5)}px`,
+    width: theme.spacing(3.5),
+    height: theme.spacing(3.5),
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    border: `2px solid ${theme.palette.text.primary}`,
+    // border: `2px solid ${theme.palette.text.primary}`,
+    backgroundColor: theme.palette.wizard.dark,
     borderRadius: '100%',
-    color: theme.palette.text.primary,
+    // color: theme.palette.text.primary,
   },
 }))
 
@@ -89,7 +91,7 @@ const NumberedSteps = ({ step, title, description }: NumberedStepProps): JSX.Ele
   const classes = useStyles({})
   return (
     <div className={classes.row}>
-      <Typography variant="h6" className={classes.step}>
+      <Typography variant="body1" className={classes.step}>
         {step}
       </Typography>
       <div>

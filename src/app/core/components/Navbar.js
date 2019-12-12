@@ -39,7 +39,6 @@ const styles = theme => ({
     }),
   },
   drawerClose: {
-    marginTop: theme.spacing(8),
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,

@@ -12,7 +12,7 @@ import WizardStep from 'core/components/wizard/WizardStep'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import useParams from 'core/hooks/useParams'
 import useReactRouter from 'use-react-router'
-import { DownloadCliBareOSWalkthrough } from '../../nodes/DownloadCliWalkthrough'
+import DownloadCliWalkthrough, { DownloadCliBareOSWalkthrough } from '../../nodes/DownloadCliWalkthrough'
 import Panel from 'app/plugins/theme/components/Panel'
 import CodeBlock from 'core/components/CodeBlock'
 import ExternalLink from 'core/components/ExternalLink'
@@ -24,6 +24,8 @@ import { makeStyles } from '@material-ui/styles'
 import { Typography } from '@material-ui/core'
 import { masterNodeLengthValidator, requiredValidator } from 'core/utils/fieldValidators'
 import { allPass } from 'ramda'
+import useDataLoader from 'core/hooks/useDataLoader'
+import { loadNodes } from '../../nodes/actions'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
@@ -57,6 +59,11 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
+const finalStep = {
+  title: 'Node ready to be added',
+  description: 'This node is now ready to be added to a BareOS cluster. Use the "create cluster" or "scale cluster" operations to add the node to a cluster',
+}
+
 const AddBareOsClusterPage = () => {
   const classes = useStyles()
   const { params, getParamsUpdater } = useParams()
@@ -64,13 +71,17 @@ const AddBareOsClusterPage = () => {
   const onComplete = () => history.push('/ui/kubernetes/infrastructure#clusters')
   const [createBareOSClusterAction, creatingBareOSCluster] = useDataUpdater(clusterActions.create, onComplete) // eslint-disable-line
   const handleSubmit = params => data => createBareOSClusterAction({ ...data, ...params, clusterType: 'local' })
+  const [nodes, loading] = useDataLoader(loadNodes)
+
+  const hasFreeNodes = nodes.filter(isUnassignedNode).length > 0
 
   return (
-    <FormWrapper title="Add Bare OS Cluster" backUrl={listUrl} loading={creatingBareOSCluster}>
+    <FormWrapper title="Add Bare OS Cluster" backUrl={listUrl} loading={creatingBareOSCluster || loading} message={loading ? 'loading...' : 'Submitting form...'}>
       <Wizard
         onComplete={handleSubmit(params)}
         context={initialContext}
         originPath={`${k8sPrefix}/infrastructure/clusters/add`}
+        disableNext={!hasFreeNodes}
       >
         {({ wizardContext, setWizardContext, onNext }) => {
           return (
@@ -83,40 +94,54 @@ const AddBareOsClusterPage = () => {
                   triggerSubmit={onNext}
                 >
                   {({ setFieldValue, values }) => (
-                    <div className={classes.formWidth}>
-                      {/* Cluster Name */}
-                      <div className={classes.inputWidth}>
-                        <TextField id="name" label="Name" info="Name of the cluster" required />
-                      </div>
-                      {/* Master nodes */}
-                      <Typography>Select one or more nodes to add to the cluster as <strong>master</strong> nodes</Typography>
-                      <ClusterHostChooser
-                        multiple
-                        id="masterNodes"
-                        filterFn={allPass([
-                          isConnected,
-                          isUnassignedNode
-                        ])}
-                        onChange={getParamsUpdater('masterNodes')}
-                        validations={[masterNodeLengthValidator]}
-                        pollForNodes
-                        required
-                      />
+                    <>
+                      { loading ? null : !hasFreeNodes
+                        ? <>
+                          <Typography variant="h5">Onboard node(s) to be added to your BareOS cluster</Typography>
+                          <p> </p>
+                          <Typography component="span">
+                            In order to create a BareOS cluster, you need to first download and install the
+                            Platform9 CLI on each of your physical or virtual machines that you wish to add
+                            to the cluster.  Follow the instructions below to download the CLI
+                          </Typography>
+                          <DownloadCliWalkthrough finalStep={finalStep} />
+                        </>
+                        : <div className={classes.formWidth}>
+                          {/* Cluster Name */}
+                          <div className={classes.inputWidth}>
+                            <TextField id="name" label="Name" info="Name of the cluster" required />
+                          </div>
+                          {/* Master nodes */}
+                          <Typography>Select one or more nodes to add to the cluster as <strong>master</strong> nodes</Typography>
+                          <ClusterHostChooser
+                            multiple
+                            id="masterNodes"
+                            filterFn={allPass([
+                              isConnected,
+                              isUnassignedNode
+                            ])}
+                            onChange={getParamsUpdater('masterNodes')}
+                            validations={[masterNodeLengthValidator]}
+                            pollForNodes
+                            required
+                          />
 
-                      {/* Workloads on masters */}
-                      <CheckboxField
-                        id="allowWorkloadsOnMaster"
-                        label="Allow workloads on master nodes"
-                        info="It is highly recommended to not enable workloads on master nodes for production or critical workload clusters."
-                      />
-                      <Panel
-                        titleVariant="subtitle2"
-                        title="Not seeing the nodes you wish to add?"
-                        defaultExpanded={false}
-                      >
-                        <DownloadCliBareOSWalkthrough />
-                      </Panel>
-                    </div>
+                          {/* Workloads on masters */}
+                          <CheckboxField
+                            id="allowWorkloadsOnMaster"
+                            label="Allow workloads on master nodes"
+                            info="It is highly recommended to not enable workloads on master nodes for production or critical workload clusters."
+                          />
+                          <Panel
+                            titleVariant="subtitle2"
+                            title="Not seeing the nodes you wish to add?"
+                            defaultExpanded={false}
+                          >
+                            <DownloadCliBareOSWalkthrough />
+                          </Panel>
+                        </div>
+                      }
+                    </>
                   )}
                 </ValidatedForm>
               </WizardStep>
