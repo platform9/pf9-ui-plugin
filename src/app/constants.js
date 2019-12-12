@@ -2,6 +2,7 @@
 export const defaultUniqueIdentifier = 'id'
 export const appUrlRoot = '/ui'
 export const imageUrlRoot = `${appUrlRoot}/images`
+export const helpUrl = `${appUrlRoot}/help`
 export const loginUrl = `${appUrlRoot}/login`
 export const loginWithCookieUrl = `${appUrlRoot}/pmkft/login`
 export const resetPasswordUrl = `${appUrlRoot}/reset/password`
