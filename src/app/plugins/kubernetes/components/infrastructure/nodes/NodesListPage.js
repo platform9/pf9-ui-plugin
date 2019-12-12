@@ -78,7 +78,7 @@ export const options = {
   multiSelection: false,
   batchActions: [
     {
-      cond: ([node]) => true || !node.clusterUuid,
+      cond: ([node]) => !node.clusterUuid,
       icon: <DeAuthIcon />,
       label: 'Deauthorize node',
       dialog: NodeDeAuthDialog,

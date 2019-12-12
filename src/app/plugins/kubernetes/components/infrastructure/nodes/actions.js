@@ -6,7 +6,7 @@ import { find, propEq, prop } from 'ramda'
 import { combinedHostsCacheKey } from 'k8s/components/infrastructure/common/actions'
 import createContextUpdater from 'core/helpers/createContextUpdater'
 
-const { qbert } = ApiClient.getInstance()
+const { resmgr, qbert } = ApiClient.getInstance()
 
 export const nodesCacheKey = 'nodes'
 export const rawNodesCacheKey = 'rawNodes'
@@ -51,8 +51,9 @@ export const loadNodes = createContextLoader(nodesCacheKey, async (params, loadF
   uniqueIdentifier: 'uuid',
 })
 
-export const deAuthNode = createContextUpdater('nodes', (node, prevItems, loadFromContext) => {
+export const deAuthNode = createContextUpdater('nodes', async (node, prevItems, loadFromContext) => {
   // TODO: This doesn't seem to be updating the node list table for some reason
+  await resmgr.unauthorizeHost(node.uuid)
   const newItems = prevItems.filter(_node => node.uuid !== _node.uuid)
   return newItems
 }, {
