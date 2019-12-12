@@ -16,6 +16,7 @@ import pluginManager from 'core/utils/pluginManager'
 import { logoutUrl, dashboardUrl } from 'app/constants'
 import LogoutPage from 'core/public/LogoutPage'
 import { AppContext } from 'core/providers/AppProvider'
+import useReactRouter from 'use-react-router'
 
 const useStyles = makeStyles(theme => ({
   appFrame: {
@@ -28,6 +29,11 @@ const useStyles = makeStyles(theme => ({
   content: {
     overflowX: 'auto',
     flexGrow: 1,
+    // backgroundColor: props => (
+    //   props.path === '/ui/kubernetes/dashboard'
+    //     ? theme.palette.background.dashboard
+    //     : theme.palette.background.default
+    // )
     backgroundColor: theme.palette.background.default,
     padding: theme.spacing(3),
     transition: theme.transitions.create('margin', {
@@ -125,7 +131,8 @@ const AuthenticatedContainer = () => {
   const [drawerOpen, toggleDrawer] = useToggler(true)
   const [features, setFeatures] = useState(emptyObj)
   const { userDetails: { role } } = useContext(AppContext)
-  const classes = useStyles()
+  const { history } = useReactRouter()
+  const classes = useStyles({ path: history.location.pathname })
 
   useEffect(() => {
     // Pass the `setFeatures` function to update the features as we can't use `await` inside of a `useEffect`

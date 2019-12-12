@@ -109,6 +109,8 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
     maxArgs: 2, // We don't care about the third argument (loadFromContext) as it shouldn't make any difference
     // isPromise: true,
   })
+  const invalidateCacheSymbol = Symbol('invalidateCache')
+  const invalidateCascadeSymbol = Symbol('invalidateCache')
 
   /**
    * Context loader function, uses a custom loader function to load data from the server
@@ -141,14 +143,17 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
    * @returns {Promise<array>} Fetched or cached items
    */
   const contextLoaderFn = memoizePromise(
-    async ({ getContext, setContext, params = emptyObj, refetch = contextLoaderFn._invalidatedCache, dumpCache = false, additionalOptions = emptyObj }) => {
+    async ({ getContext, setContext, params = emptyObj, refetch = contextLoaderFn[invalidateCacheSymbol], dumpCache = false, additionalOptions = emptyObj }) => {
+      const invalidateCache = contextLoaderFn[invalidateCacheSymbol]
+      const cascade = contextLoaderFn[invalidateCascadeSymbol]
+
       // Make sure the user has the required roles
       const { role } = getContext(propOr(emptyObj, 'userDetails'))
       if (!isNilOrEmpty(requiredRoles) && !ensureArray(requiredRoles).includes(role)) {
         return emptyArr
       }
 
-      const loadFromContext = (key, params = emptyObj, refetchDeep = refetchCascade && refetch) => {
+      const loadFromContext = (key, params = emptyObj, refetchDeep = cascade && refetch) => {
         const loaderFn = getContextLoader(key)
         return loaderFn({ getContext, setContext, params, refetch: refetchDeep, additionalOptions })
       }
@@ -166,7 +171,7 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
       // If not all the required params are provided, skip this request and just return an empty array
       if (requiredParams && values(providedRequiredParams).length < allRequiredParams.length) {
         // Show up a warning when trying to refetch the data without providing some of the required params
-        if (refetch && !contextLoaderFn._invalidatedCache) {
+        if (refetch && !invalidateCache) {
           console.warn(`Some of the required params were not provided for ${cacheKey} loader, returning an empty array`)
         }
         return emptyArr
@@ -181,7 +186,10 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
       )(params)
 
       try {
-        if (!refetch && !contextLoaderFn._invalidatedCache) {
+        contextLoaderFn[invalidateCacheSymbol] = false
+        contextLoaderFn[invalidateCascadeSymbol] = refetchCascade
+
+        if (!refetch && !invalidateCache) {
           const allCachedParams = getContext(view(paramsLens)) || emptyArr
 
           // If the provided params are already cached
@@ -213,12 +221,12 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
         const upsertNewItems = pipe(arrayIfNil, upsertAllBy(matchUniqueIdentifiers, itemsWithParams))
 
         // If cache has been invalidated or we are refetching, empty the cached data array
-        const cleanPrevItems = contextLoaderFn._invalidatedCache || refetch
+        const cleanPrevItems = invalidateCache || refetch
           ? always(emptyArr)
           : identity
 
         // Update cachedParams so that we know this query has already been resolved
-        const updateParams = pipe(arrayIfNil, contextLoaderFn._invalidatedCache || refetch
+        const updateParams = pipe(arrayIfNil, invalidateCache || refetch
           ? always(of(providedIndexedParams)) // Reset the params array if cache has been invalidated
           : append(providedIndexedParams))
 
@@ -227,7 +235,6 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
           over(dataLens, pipe(cleanPrevItems, upsertNewItems)),
           over(paramsLens, updateParams),
         ))
-        contextLoaderFn._invalidatedCache = false
 
         if (onSuccess) {
           const parsedSuccessMesssage = ensureFunction(fetchSuccessMessage)(params)
@@ -243,14 +250,16 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
         return emptyArr
       }
     })
-  contextLoaderFn._invalidatedCache = true
+  contextLoaderFn[invalidateCacheSymbol] = true
+  contextLoaderFn[invalidateCascadeSymbol] = refetchCascade
   /**
    * Invalidate the current cache
    * Subsequent calls will reset current cache params and data
    * @function
    */
-  contextLoaderFn.invalidateCache = () => {
-    contextLoaderFn._invalidatedCache = true
+  contextLoaderFn.invalidateCache = (cascade = refetchCascade) => {
+    contextLoaderFn[invalidateCacheSymbol] = true
+    contextLoaderFn[invalidateCascadeSymbol] = cascade
   }
   /**
    * Function to retrieve the current cacheKey

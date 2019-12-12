@@ -1,7 +1,8 @@
 // libs
-import React from 'react'
+import React, { useContext } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import { pathEq } from 'ramda'
+import { AppContext } from 'core/providers/AppProvider'
 // Constants
 import { allKey } from 'app/constants'
 // Actions
@@ -33,7 +34,9 @@ const useStyles = makeStyles(theme => ({
 
 const serviceReports = [
   {
+    entity: 'pod',
     route: '/ui/kubernetes/pods',
+    addRoute: '/ui/kubernetes/pods/add',
     title: 'Pods',
     icon: FilterNone,
     dataLoader: [podActions.list, { clusterId: allKey }],
@@ -51,7 +54,9 @@ const serviceReports = [
       }),
   },
   {
+    entity: 'deployment',
     route: '/ui/kubernetes/pods#deployments',
+    addRoute: '/ui/kubernetes/pods/deployments/add',
     title: 'Deployments',
     icon: '/ui/images/dynamic_feed.svg',
     dataLoader: [deploymentActions.list, { clusterId: allKey }],
@@ -62,7 +67,9 @@ const serviceReports = [
     }),
   },
   {
+    entity: 'service',
     route: '/ui/kubernetes/pods#services',
+    addRoute: '/ui/kubernetes/pods/services/add',
     title: 'Services',
     icon: SettingsApplications,
     dataLoader: [serviceActions.list, { clusterId: allKey }],
@@ -73,8 +80,11 @@ const serviceReports = [
       }),
   },
   {
+    entity: 'cloud',
+    permissions: ['admin'],
     route: '/ui/kubernetes/infrastructure#cloudProviders',
-    title: 'Clouds',
+    addRoute: '/ui/kubernetes/infrastructure/cloudProviders/add',
+    title: 'Cloud Accounts',
     icon: Cloud,
     dataLoader: [cloudProviderActions.list],
     quantityFn: clouds => ({
@@ -86,8 +96,11 @@ const serviceReports = [
 ]
 const statusReports = [
   {
+    entity: 'user',
+    permissions: ['admin'],
     route: '/ui/kubernetes/user_management#users',
-    title: 'Enrolled Users',
+    addRoute: '/ui/kubernetes/user_management/users/add',
+    title: 'Users',
     icon: People,
     dataLoader: [mngmUserActions.list],
     quantityFn: users => ({
@@ -97,8 +110,11 @@ const statusReports = [
     }),
   },
   {
+    entity: 'tenant',
+    permissions: ['admin'],
     route: '/ui/kubernetes/user_management#tenants',
-    title: 'Active Tenants',
+    addRoute: '/ui/kubernetes/user_management/tenants/add',
+    title: 'Tenants',
     icon: RecentActors,
     dataLoader: [mngmTenantActions.list],
     quantityFn: tenants => ({
@@ -108,7 +124,10 @@ const statusReports = [
     }),
   },
   {
+    entity: 'node',
+    permissions: ['admin'],
     route: '/ui/kubernetes/infrastructure#nodes',
+    addRoute: '/ui/kubernetes/infrastructure/nodes/cli/download',
     title: 'Nodes',
     icon: Storage,
     dataLoader: [loadNodes],
@@ -119,7 +138,10 @@ const statusReports = [
       }),
   },
   {
+    entity: 'cluster',
+    permissions: ['admin'], // Technically non-admins have read-only access
     route: '/ui/kubernetes/infrastructure#clusters',
+    addRoute: '/ui/kubernetes/infrastructure/clusters/add',
     title: 'Clusters',
     icon: Layers,
     dataLoader: [clusterActions.list],
@@ -151,18 +173,27 @@ const validateFieldHealthAndQuantity = ({ list, success, pending = [] }) => {
   )
 }
 
+const reportsWithPerms = (reports) => {
+  const { userDetails: { role } } = useContext(AppContext)
+  return reports.filter((report) => {
+    // No permissions property means no restrictions
+    if (!report.permissions) { return true }
+    return report.permissions.includes(role)
+  })
+}
+
 const DashboardPage = () => {
   const { cardColumn, cardRow } = useStyles()
 
   return (
     <section name="dashboard-status-container" className={cardColumn}>
       <div className={cardRow}>
-        {statusReports.map(report => (
+        {reportsWithPerms(statusReports).map(report => (
           <StatusCard key={report.route} {...report} />
         ))}
       </div>
       <div className={cardRow}>
-        {serviceReports.map(report => (
+        {reportsWithPerms(serviceReports).map(report => (
           <StatusCard key={report.route} {...report} />
         ))}
       </div>
