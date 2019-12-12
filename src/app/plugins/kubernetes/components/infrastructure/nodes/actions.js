@@ -51,11 +51,12 @@ export const loadNodes = createContextLoader(nodesCacheKey, async (params, loadF
   uniqueIdentifier: 'uuid',
 })
 
-export const deAuthNode = createContextUpdater('nodes', async (node, prevItems, loadFromContext) => {
-  // TODO: This doesn't seem to be updating the node list table for some reason
+export const deAuthNode = createContextUpdater('nodes', async (node, prevItems) => {
   await resmgr.unauthorizeHost(node.uuid)
-  const newItems = prevItems.filter(_node => node.uuid !== _node.uuid)
-  return newItems
+  // Something in `createContextUpdater` is refreshing the API calls for nodes automagically.
+  // This what I would be doing manually so it works out fine but I'm a bit concerned
+  // that it is not being invoked explicitly from within this action.
+  return prevItems
 }, {
   successMessage: ([node]) => `Successfully de-authorized node ${node.name} (${node.primaryIp})`,
 })
