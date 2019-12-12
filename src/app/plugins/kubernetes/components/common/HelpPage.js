@@ -25,27 +25,26 @@ const HelpPage = () => {
       </Typography>
       <Divider />
       <Typography variant="subtitle1" className={classes.text}>
-        Need help? You are currently using the free tier account of Platform9 Managed Kubernetes
-        (PMK). There are two ways to get help free tier account:
+        Need help?  You are currently using the free-tier account of Platform9 Managed Kubernetes (PMK).
+        There are 2 ways to get help free tier account:
       </Typography>
+
       <Typography variant="h5">Documentation & Knowledge Base</Typography>
       <Typography variant="subtitle1" className={classes.text}>
-        Use our documentation and knowledge base to get help wrt various product features and
-        capabilities:
+        Use our documentation and knowledge base to get help with various product features and capabilities.
       </Typography>
       <Typography variant="subtitle1" className={classes.text}>
-        Reference the PMK documentation at{' '}
-        <ExternalLink url="https://docs.platform9.com/kubernetes/overview/">
-          https://docs.platform9.com/kubernetes/overview/
-        </ExternalLink>
+        Reference the PMK documentation at
+        &nbsp;<ExternalLink url="https://docs.platform9.com/kubernetes/overview/">https://docs.platform9.com/kubernetes/overview/</ExternalLink>
       </Typography>
+
       <Typography variant="h5">Support</Typography>
       <Typography variant="subtitle1" className={classes.text}>
-        Use our public slack channel to ask questions. The channel url is -{' '}
-        <ExternalLink url="https://kplane.slack.com">kplane.slack.com</ExternalLink>
+        Use our public slack channel to ask questions. The channel url is:
+        &nbsp;<ExternalLink url="https://kplane.slack.com">kplane.slack.com</ExternalLink>
       </Typography>
       <Typography variant="subtitle1" className={classes.text}>
-        You should have received an invite to join the channel already. If you haven't, send an
+        You should have received an invite to join the channel already.  If you haven't, send a
         request to <SimpleLink href="mailto:support-ft@platform9.com">support-ft@platform9.com</SimpleLink>
       </Typography>
     </>
