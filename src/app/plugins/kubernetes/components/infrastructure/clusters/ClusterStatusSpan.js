@@ -23,7 +23,7 @@ const useStyles = makeStyles(theme => ({
       width: 14,
       marginRight: 3,
       borderRadius: '50%',
-      display: ({ status }) => !status || status === 'loading' ? 'none' : 'inline-block',
+      display: ({ status }) => !status || ['loading', 'error'].includes(status) ? 'none' : 'inline-block',
       backgroundColor: ({ status }) => objSwitchCase({
         ok: '#31DA6D',
         pause: '#fec35d',
@@ -32,19 +32,24 @@ const useStyles = makeStyles(theme => ({
     },
   },
   loading: {
-    marginRight: 3,
-    fontSize: 15,
+    marginRight: theme.spacing(0.375),
+    fontSize: 14,
+  },
+  error: {
+    marginRight: theme.spacing(0.375),
+    fontSize: 14,
   },
 }))
 
 const ClusterStatusSpan = props => {
   const { label, title, children, status } = props
-  const { loading, circle, label: labelCls, root } = useStyles(props)
+  const { loading, error, circle, label: labelCls, root } = useStyles(props)
   return <div className={root}>
     {label && <span className={labelCls}>{label}:</span>}
     <Tooltip title={title || children}>
       <span className={circle}>
         {status === 'loading' && <i className={clsx(loading, 'fal fa-lg fa-spin fa-sync')} />}
+        {status === 'error' && <i className={clsx(error, 'fas fa-exclamation-triangle')} />}
         {children}
       </span>
     </Tooltip>
@@ -54,7 +59,7 @@ const ClusterStatusSpan = props => {
 ClusterStatusSpan.propTypes = {
   label: PropTypes.string,
   title: PropTypes.string,
-  status: PropTypes.oneOf(['ok', 'fail', 'pause', 'loading'])
+  status: PropTypes.oneOf(['ok', 'fail', 'pause', 'loading', 'error'])
 }
 
 export default ClusterStatusSpan

@@ -1,10 +1,11 @@
 import { useMemo, useEffect, useCallback, useContext, useRef, useReducer } from 'react'
 import moize from 'moize'
 import { emptyArr, emptyObj } from 'utils/fp'
-import { isEmpty } from 'ramda'
+import { isEmpty, path } from 'ramda'
 import { useToast } from 'core/providers/ToastProvider'
 import { AppContext } from 'core/providers/AppProvider'
 import { memoizedDep } from 'utils/misc'
+import { dataCacheKey } from 'core/helpers/createContextLoader'
 
 const onErrorHandler = moize((loaderFn, showToast, registerNotification) =>
   (errorMessage, catchedErr, params) => {
@@ -49,6 +50,11 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
     loadOnDemand = false,
     invalidateCache = false,
   } = options
+  const { getContext, setContext, currentTenant, currentRegion, registerNotification } = useContext(AppContext)
+
+  const cacheKey = loaderFn.getKey()
+  const cachePath = [dataCacheKey, cacheKey]
+  const cachedData = getContext(path(cachePath))
 
   // Use this ref to invalidate the cache on component mount so we will force data refetch
   // Invalidating the cache clears all the cache for this entity, unlike using the "refetch"
@@ -63,7 +69,6 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
   // are performed with different params, and the previous one didn't have time to finish
   const loaderPromisesBuffer = useRef([])
   const [{ loading, data }, dispatch] = useReducer(dataLoaderReducer, loadOnDemand, initState)
-  const { getContext, setContext, currentTenant, currentRegion, registerNotification } = useContext(AppContext)
   const showToast = useToast()
 
   // Set a custom error handler for all loading functions using this hook
@@ -114,7 +119,7 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
     if (!loadOnDemand) {
       loadData()
     }
-  }, [memoizedParams, currentTenant, currentRegion, loadOnDemand])
+  }, [memoizedParams, cachedData, currentTenant, currentRegion, loadOnDemand])
 
   // When unmounted, set the unmounted ref to true to prevent further state updates
   useEffect(() => {

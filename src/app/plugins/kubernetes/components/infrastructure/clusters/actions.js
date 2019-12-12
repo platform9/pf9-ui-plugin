@@ -9,7 +9,7 @@ import {
 import { filterIf, isTruthy, updateWith, adjustWith } from 'utils/fp'
 import { mapAsync } from 'utils/async'
 import {
-  pluck, pathOr, pick, pipe, either, propSatisfies, compose, path, propEq, mergeLeft,
+  pluck, pathOr, pick, pipe, either, propSatisfies, compose, path, propEq, mergeLeft, partition,
 } from 'ramda'
 import { rawNodesCacheKey } from 'k8s/components/infrastructure/nodes/actions'
 
@@ -182,9 +182,10 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
         disk: calcNodesTotals('usage.disk.current', 'usage.disk.max'),
         grafanaLink: hasPrometheusEnabled(cluster) ? grafanaLink : null,
       }
-      const masterNodes = nodesInCluster.filter(node => node.isMaster === 1)
-      const healthyMasterNodes = masterNodes.filter(
-        node => node.status === 'ok' && node.api_responding === 1)
+      const isMasterNode = node => node.isMaster === 1
+      const [masterNodes, workerNodes] = partition(isMasterNode, nodesInCluster)
+      const healthyMasterNodes = masterNodes.filter(node => node.status === 'ok')
+      const healthyWorkerNodes = workerNodes.filter(node => node.status === 'ok')
       const hasMasterNode = healthyMasterNodes.length > 0
       const clusterOk = nodesInCluster.length > 0 && cluster.status === 'ok'
       const fuzzyBools = ['allowWorkloadsOnMaster', 'privileged', 'appCatalogEnabled'].reduce(
@@ -207,8 +208,10 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
         version: version || 'N/A',
         nodes: nodesInCluster,
         masterNodes,
+        workerNodes,
         progressPercent,
         healthyMasterNodes,
+        healthyWorkerNodes,
         hasMasterNode,
         highlyAvailable: healthyMasterNodes.length > 2,
         links: {

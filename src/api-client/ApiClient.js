@@ -39,6 +39,13 @@ class ApiClient {
     return client
   }
 
+  unscopedToken = null
+  scopedToken = null
+  catalog = null
+  activeProjectId = null
+  serviceCatalog = null
+  endpoints = null
+
   constructor (options = {}) {
     this.options = options
     if (!options.keystoneEndpoint) {
@@ -122,8 +129,7 @@ class ApiClient {
   }
 
   basicPatch = async (url, body) => {
-    const config = this.getAuthHeaders()
-    const response = await this.axiosInstance.patch(url, body, config)
+    const response = await this.axiosInstance.patch(url, body, this.getAuthHeaders())
     return normalizeResponse(response)
   }
 

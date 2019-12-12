@@ -1,10 +1,8 @@
 // Appbert provides information about clusters and the managed apps (packages) installed on them.
-class Appbert {
-  constructor (client) {
-    this.client = client
-  }
+import ApiService from 'api-client/ApiService'
 
-  endpoint = async () => {
+class Appbert extends ApiService {
+  endpoint = () => {
     return this.client.keystone.getServiceEndpoint('appbert', 'admin')
   }
 

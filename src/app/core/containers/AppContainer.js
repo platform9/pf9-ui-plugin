@@ -4,19 +4,23 @@ import { AppContext } from 'core/providers/AppProvider'
 import { usePreferences, useScopedPreferences } from 'core/providers/PreferencesProvider'
 import { setStorage, getStorage } from 'core/utils/pf9Storage'
 import { loadUserTenants } from 'openstack/components/tenants/actions'
-import { head, path, pathOr, propEq } from 'ramda'
+import { head, path, pathOr, propEq, isEmpty } from 'ramda'
 import AuthenticatedContainer from 'core/containers/AuthenticatedContainer'
 import track from 'utils/tracking'
 import useReactRouter from 'use-react-router'
 import { makeStyles } from '@material-ui/styles'
 import { Route, Redirect, Switch } from 'react-router'
-import { dashboardUrl, resetPasswordUrl, resetPasswordThroughEmailUrl, forgotPasswordUrl, loginUrl } from 'app/constants'
+import {
+  dashboardUrl, resetPasswordUrl, resetPasswordThroughEmailUrl, forgotPasswordUrl, loginUrl,
+} from 'app/constants'
 import ResetPasswordPage from 'core/public/ResetPasswordPage'
 import ForgotPasswordPage from 'core/public/ForgotPasswordPage'
 import { isNilOrEmpty } from 'utils/fp'
 import LoginPage from 'core/public/LoginPage'
 import Progress from 'core/components/progress/Progress'
 import { getCookieValue } from 'utils/misc'
+import moment from 'moment'
+import { useToast } from 'core/providers/ToastProvider'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -29,13 +33,14 @@ const useStyles = makeStyles(theme => ({
  * Renders children when logged in.
  * Otherwise shows the <LoginPage>
  */
-const AppContainer = props => {
+const AppContainer = () => {
   const classes = useStyles()
   const { keystone, setActiveRegion } = ApiClient.getInstance()
   const { history } = useReactRouter()
+  const showToast = useToast()
   const [, initUserPreferences] = usePreferences()
   const { updatePrefs } = useScopedPreferences('Tenants')
-  const { initialized, initSession, session, appLoaded, getContext, setContext } = useContext(AppContext)
+  const { initialized, initSession, session, appLoaded, destroySession, getContext, setContext } = useContext(AppContext)
 
   useEffect(() => {
     const unlisten = history.listen((location, action) => {
@@ -49,6 +54,23 @@ const AppContainer = props => {
 
     return unlisten
   }, [])
+
+  useEffect(() => {
+    if (!isEmpty(session)) {
+      const id = setInterval(() => {
+        // Check if session has expired
+        const { expiresAt } = session
+        const sessionExpired = moment().isAfter(expiresAt)
+        if (sessionExpired) {
+          destroySession()
+          showToast('The session has expired, please log in again', 'warning')
+          clearInterval(id)
+        }
+      }, 1000)
+      // Reset the interval if the session changes
+      return () => clearInterval(id)
+    }
+  }, [session])
 
   const restoreSession = async () => {
     // When trying to login with cookie with pmkft
@@ -70,12 +92,12 @@ const AppContainer = props => {
     const tokens = getStorage('tokens')
     const user = getStorage('user') || {}
     const { name: username } = user
-    let unscopedToken = tokens && tokens.unscopedToken
-    if (username && unscopedToken) {
+    const currUnscopedToken = tokens && tokens.unscopedToken
+    if (username && currUnscopedToken) {
       // We need to make sure the token has not expired.
-      unscopedToken = await keystone.renewToken(unscopedToken)
+      const { unscopedToken, expiresAt, issuedAt } = await keystone.renewToken(currUnscopedToken)
       if (unscopedToken && user) {
-        return setupSession({ username, unscopedToken })
+        return setupSession({ username, unscopedToken, expiresAt, issuedAt })
       }
     }
     await setContext({ appLoaded: true })
@@ -89,14 +111,17 @@ const AppContainer = props => {
   }
 
   // Handler that gets invoked on successful authentication
-  const setupSession = async ({ username, unscopedToken }) => {
+  const setupSession = async ({ username, unscopedToken, expiresAt, issuedAt }) => {
     await setContext({
       appLoaded: true,
-      initialized: false
+      initialized: false,
     })
 
+    const timeDiff = moment(expiresAt).diff(issuedAt)
+    const localExpiresAt = moment().add(timeDiff).format()
+
     // Set up the scopedToken
-    await initSession(unscopedToken, username)
+    await initSession(unscopedToken, username, localExpiresAt)
     // The order matters, we need the session to be able to init the user preferences
     const userPreferences = await initUserPreferences(username)
 

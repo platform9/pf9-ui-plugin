@@ -1,6 +1,6 @@
 import { setupFromConfig } from 'utils/registry'
 import config from '../../config'
-import ApiClient from 'api-client/index'
+import ApiClient from 'api-client/ApiClient'
 import './app.css'
 
 setupFromConfig(config)

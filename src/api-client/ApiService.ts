@@ -5,8 +5,6 @@ abstract class ApiService {
   }
 
   abstract endpoint(): string | Promise<string>
-
-  abstract baseUrl(): string | Promise<string>
 }
 
 export default ApiService

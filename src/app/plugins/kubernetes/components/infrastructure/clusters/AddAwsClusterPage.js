@@ -158,8 +158,8 @@ const renderCustomNetworkingFields = ({ params, getParamsUpdater, values, setFie
     setWizardContext({ serviceFdqn: service })
   }
 
-  const renderNetworkFields = networkOption => {
-    switch (networkOption) {
+  const renderNetworkFields = ({ network, usePf9Domain }) => {
+    switch (network) {
       case 'newPublic':
       case 'newPublicPrivate':
         return null
@@ -176,6 +176,7 @@ const renderCustomNetworkingFields = ({ params, getParamsUpdater, values, setFie
               cloudProviderRegionId={params.cloudProviderRegionId}
               info=""
               required
+              disabled={usePf9Domain}
             />
 
             <AwsZoneVpcMappings
@@ -185,6 +186,7 @@ const renderCustomNetworkingFields = ({ params, getParamsUpdater, values, setFie
               onChange={getParamsUpdater('subnets')}
               vpcId={params.vpcId}
               azs={params.azs}
+              disabled={usePf9Domain}
             />
           </>
         )
@@ -201,6 +203,7 @@ const renderCustomNetworkingFields = ({ params, getParamsUpdater, values, setFie
               cloudProviderRegionId={params.cloudProviderRegionId}
               info=""
               required
+              disabled={usePf9Domain}
             />
 
             <AwsZoneVpcMappings
@@ -210,6 +213,7 @@ const renderCustomNetworkingFields = ({ params, getParamsUpdater, values, setFie
               onChange={getParamsUpdater('subnets')}
               vpcId={params.vpcId}
               azs={params.azs}
+              disabled={usePf9Domain}
             />
 
             <AwsZoneVpcMappings
@@ -219,6 +223,7 @@ const renderCustomNetworkingFields = ({ params, getParamsUpdater, values, setFie
               onChange={getParamsUpdater('privateSubnets')}
               vpcId={params.vpcId}
               azs={params.azs}
+              disabled={usePf9Domain}
             />
           </>
         )
@@ -235,6 +240,7 @@ const renderCustomNetworkingFields = ({ params, getParamsUpdater, values, setFie
               cloudProviderRegionId={params.cloudProviderRegionId}
               info=""
               required
+              disabled={usePf9Domain}
             />
 
             <AwsZoneVpcMappings
@@ -244,6 +250,7 @@ const renderCustomNetworkingFields = ({ params, getParamsUpdater, values, setFie
               onChange={getParamsUpdater('privateSubnets')}
               vpcId={params.vpcId}
               azs={params.azs}
+              disabled={usePf9Domain}
             />
           </>
         )
@@ -261,15 +268,17 @@ const renderCustomNetworkingFields = ({ params, getParamsUpdater, values, setFie
         cloudProviderRegionId={params.cloudProviderRegionId}
         info="Select the base domain name to be used for the API and service FQDNs"
         required
+        disabled={values.usePf9Domain}
       />
 
       <PicklistField
         id="network"
         label="Network"
         options={networkOptions}
+        disabled={values.usePf9Domain}
         info={<div>Select a network configuration. Read <ExternalLink url="https://docs.platform9.com/kubernetes/networking/configurations-supported-aws-cloud-provider/">this article</ExternalLink> for detailed information about each network configuration type.</div>}
       />
-      {renderNetworkFields(values.network)}
+      {renderNetworkFields(values)}
     </>
   )
 }
@@ -464,8 +473,7 @@ const AddAwsClusterPage = () => {
                         label="Use the platform9.net domain"
                         info="Select this option if you want Platform9 to automatically generate the endpoints or if you do not have access to Route 53."
                       />
-
-                      {values.usePf9Domain || renderCustomNetworkingFields({
+                      {renderCustomNetworkingFields({
                         params,
                         getParamsUpdater,
                         values,
@@ -474,24 +482,21 @@ const AddAwsClusterPage = () => {
                         wizardContext,
                       })}
 
-                      {/* API FQDN */}
-                      {values.usePf9Domain ||
-                      <TextField
+                      {/* API FQDN */}<TextField
                         id="externalDnsName"
                         label="API FQDN"
                         info="FQDN (Fully Qualified Domain Name) is used to reference cluster API. To ensure the API can be accessed securely at the FQDN, the FQDN will be included in the API server certificate's Subject Alt Names. If deploying onto a cloud provider, we will automatically create the DNS records for this FQDN using the cloud provider’s DNS service."
                         required
+                        disabled={values.usePf9Domain}
                       />
-                      }
                       {/* Services FQDN */}
-                      {values.usePf9Domain ||
                       <TextField
                         id="serviceFqdn"
                         label="Services FQDN"
                         info="FQDN used to reference cluster services. If deploying onto AWS, we will automatically create the DNS records for this FQDN into AWS Route 53."
                         required
+                        disabled={values.usePf9Domain}
                       />
-                      }
 
                       {/* Containers CIDR */}
                       <TextField

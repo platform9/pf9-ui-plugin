@@ -1,4 +1,5 @@
 import axios from 'axios'
+import ApiService from 'api-client/ApiService'
 
 // Returns a transducer function instead being passed the obj directly
 // so it can be used in Array#map/filter/etc as well.
@@ -7,12 +8,8 @@ const renameKey = (srcKey, destKey) => obj => Object.keys(obj).reduce(
   {}
 )
 
-class Nova {
-  constructor (client) {
-    this.client = client
-  }
-
-  async endpoint () {
+class Nova extends ApiService {
+  endpoint () {
     return this.client.keystone.getServiceEndpoint('nova', 'internal')
   }
 

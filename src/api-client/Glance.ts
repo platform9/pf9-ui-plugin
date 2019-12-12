@@ -1,4 +1,5 @@
 import axios from 'axios'
+import ApiService from 'api-client/ApiService'
 
 /*
 const op = op => (path, value) => ({ op: 'replace', path, value })
@@ -7,12 +8,8 @@ const removeOp = op('remove')
 const replaceOp = op('replace')
 */
 
-class Glance {
-  constructor (client) {
-    this.client = client
-  }
-
-  async endpoint () {
+class Glance extends ApiService {
+  endpoint () {
     return this.client.keystone.getServiceEndpoint('glance', 'admin')
   }
 

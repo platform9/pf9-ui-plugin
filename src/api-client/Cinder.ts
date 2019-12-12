@@ -1,18 +1,15 @@
 /* eslint-disable camelcase */
 import axios from 'axios'
+import ApiService from 'api-client/ApiService'
 
-class Cinder {
-  constructor (client) {
-    this.client = client
-  }
-
-  async endpoint () {
+class Cinder extends ApiService {
+  endpoint = () => {
     return this.client.keystone.getServiceEndpoint('cinderv3', 'admin')
   }
 
   volumesUrl = async () => `${await this.endpoint()}/volumes`
 
-  async setRegionUrls () {
+  async getRegionUrls () {
     const services = (await this.client.keystone.getServiceCatalog()).find(
       x => x.name === 'cinderv3').endpoints
     const baseUrlsByRegion = services.reduce((accum, service) => {
@@ -59,8 +56,7 @@ class Cinder {
 
   async deleteVolume (id) {
     const url = `${await this.volumesUrl()}/${id}`
-    const response = await axios.delete(url, this.client.getAuthHeaders())
-    return response
+    return axios.delete(url, this.client.getAuthHeaders())
   }
 
   async updateVolume (id, params) {
@@ -134,12 +130,12 @@ class Cinder {
 
   async updateVolumeType (id, params, keysToDelete = []) {
     const url = `${await this.endpoint()}/types/${id}`
-    const { extra_specs, ...rest } = params
+    const { extra_specs: extraSpecs, ...rest } = params
     const baseResponse = await axios.put(url, { volume_type: rest }, this.client.getAuthHeaders())
-    await axios.post(`${url}/extra_specs`, { extra_specs }, this.client.getAuthHeaders())
-    keysToDelete.forEach(async key => {
-      await axios.delete(`${url}/extra_specs/${key}`, this.client.getAuthHeaders())
-    })
+    await axios.post(`${url}/extra_specs`, { extra_specs: extraSpecs }, this.client.getAuthHeaders())
+    await Promise.all(keysToDelete.map(async key => {
+      return axios.delete(`${url}/extra_specs/${key}`, this.client.getAuthHeaders())
+    }))
     return baseResponse.data
   }
 
@@ -191,7 +187,7 @@ class Cinder {
   }
 
   async getDefaultQuotasForRegion (region) {
-    const urls = await this.setRegionUrls()
+    const urls = await this.getRegionUrls()
     const url = `${urls[region]}/os-quota-class-sets/defaults`
     const quotas = await axios.get(url, this.client.getAuthHeaders())
     return quotas.data.quota_class_set
@@ -204,7 +200,7 @@ class Cinder {
   }
 
   async getQuotasForRegion (projectId, region) {
-    const urls = await this.setRegionUrls()
+    const urls = await this.getRegionUrls()
     const url = `${urls[region]}/os-quota-sets/${projectId}?usage=true`
     const quota = await axios.get(url, this.client.getAuthHeaders())
     return quota.data.quota_set
@@ -217,7 +213,7 @@ class Cinder {
   }
 
   async setQuotasForRegion (params, projectId, region) {
-    const urls = await this.setRegionUrls()
+    const urls = await this.getRegionUrls()
     const url = `${urls[region]}/os-quota-sets/${projectId}`
     const quotas = await axios.put(url, { quota_set: params }, this.client.getAuthHeaders())
     return quotas.data.quota_set

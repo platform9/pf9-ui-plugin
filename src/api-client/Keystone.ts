@@ -2,25 +2,32 @@ import { pluck, pipe, values, head } from 'ramda'
 import { getHighestRole } from './helpers'
 import { pathJoin, capitalizeString } from 'utils/misc'
 import { pathStr } from 'utils/fp'
+import ApiService from 'api-client/ApiService'
 
-const authConstructors = {
-  password: (username, password) => ({
-    user: {
-      name: username,
-      domain: { id: 'default' },
-      password,
+const constructAuthFromToken = (token: string, projectId?: string) => {
+  return {
+    auth: {
+      ...(projectId ? { scope: { project: { id: projectId } } } : {}),
+      identity: {
+        methods: ['token'],
+        token: { id: token }
+      },
     },
-  }),
-
-  token: token => ({ id: token }),
+  }
 }
 
-const constructAuthBody = (method, ...args) => {
+const constructAuthFromCredentials = (username, password) => {
   return {
     auth: {
       identity: {
-        methods: [method],
-        [method]: authConstructors[method](...args),
+        methods: ['password'],
+        password: {
+          user: {
+            name: username,
+            domain: { id: 'default' },
+            password,
+          },
+        }
       },
     },
   }
@@ -45,18 +52,14 @@ const groupByRegion = catalog => {
   return regions
 }
 
-class Keystone {
-  constructor (client) {
-    this.client = client
+class Keystone extends ApiService {
+  endpoint = () => {
+    return this.client.options.keystoneEndpoint
   }
 
-  get endpoint () { return this.client.options.keystoneEndpoint }
+  get v3 () { return `${this.endpoint()}/v3` }
 
-  get adminEndpoint () { return this.client.options.keystoneAdminEndpoint }
-
-  get v3 () { return `${this.endpoint}/v3` }
-
-  get adminV3 () { return `${this.endpoint}/v3` }
+  get adminV3 () { return `${this.endpoint()}/v3` }
 
   get catalogUrl () { return `${this.v3}/auth/catalog` }
 
@@ -178,12 +181,12 @@ class Keystone {
   }
 
   changeProjectScope = async (projectId) => {
-    const body = constructAuthBody('token', this.client.unscopedToken)
-    body.auth.scope = { project: { id: projectId } }
+    const body = constructAuthFromToken(this.client.unscopedToken, projectId)
     try {
       const response = await this.client.rawPost(this.tokensUrl, body)
       const scopedToken = response.headers['x-subject-token']
-      const roles = pathStr('data.token.roles', response)
+      // FIXME: fix typings here
+      const roles = pathStr('data.token.roles', response) as Array<{ [key: string]: any }>
       const roleNames = pluck('name', roles)
       const role = getHighestRole(roleNames)
       const _user = pathStr('data.token.user', response)
@@ -194,7 +197,7 @@ class Keystone {
         username: _user.name,
         userId: _user.id,
         role: role,
-        displayName: _user.displayname || _user.name
+        displayName: _user.displayname || _user.name,
       }
       this.client.activeProjectId = projectId
       this.client.scopedToken = scopedToken
@@ -209,12 +212,13 @@ class Keystone {
   }
 
   authenticate = async (username, password) => {
-    const body = constructAuthBody('password', username, password)
+    const body = constructAuthFromCredentials(username, password)
     try {
       const response = await this.client.rawPost(this.tokensUrl, body)
+      const { expires_at: expiresAt, issued_at: issuedAt } = response.data.token
       const unscopedToken = response.headers['x-subject-token']
       this.client.unscopedToken = unscopedToken
-      return { unscopedToken, username }
+      return { unscopedToken, username, expiresAt, issuedAt }
     } catch (err) {
       // authentication failed
       return {}
@@ -222,7 +226,7 @@ class Keystone {
   }
 
   getUnscopedTokenWithToken = async (token) => {
-    const authBody = constructAuthBody('token', token)
+    const authBody = constructAuthFromToken(token)
     const body = {
       ...authBody,
       auth: {
@@ -241,13 +245,14 @@ class Keystone {
     }
   }
 
-  renewToken = async (unscopedToken) => {
-    const body = constructAuthBody('token', unscopedToken)
+  renewToken = async (currUnscopedToken) => {
+    const body = constructAuthFromToken(currUnscopedToken)
     try {
       const response = await this.client.rawPost(this.tokensUrl, body)
-      const newUnscopedToken = response.headers['x-subject-token']
-      this.client.unscopedToken = newUnscopedToken
-      return newUnscopedToken
+      const { expires_at: expiresAt, issued_at: issuedAt } = response.data.token
+      const unscopedToken = response.headers['x-subject-token']
+      this.client.unscopedToken = unscopedToken
+      return { unscopedToken, expiresAt, issuedAt }
     } catch (err) {
       // authentication failed
       return null
@@ -255,9 +260,8 @@ class Keystone {
   }
 
   renewScopedToken = async () => {
-    const body = constructAuthBody('token', this.client.unscopedToken)
     const projectId = this.client.activeProjectId
-    body.auth.scope = { project: { id: projectId } }
+    const body = constructAuthFromToken(this.client.unscopedToken, projectId)
     try {
       const response = await this.client.rawPost(this.tokensUrl, body)
       const scopedToken = response.headers['x-subject-token']
@@ -277,7 +281,9 @@ class Keystone {
       const { links } = await this.client.basicGet(linksUrl)
       const token2cookieUrl = links.token2cookie
       const authHeaders = this.client.getAuthHeaders()
-      await this.client.rawGet(token2cookieUrl, { ...authHeaders, withCredentials: true })
+      await this.client.rawGet(token2cookieUrl, {
+        ...authHeaders, withCredentials: true
+      })
     } catch (err) {
       console.warn('Setting session cookie for accessing hostagent rpms failed')
     }

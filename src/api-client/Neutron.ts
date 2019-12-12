@@ -1,11 +1,8 @@
 import axios from 'axios'
+import ApiService from 'api-client/ApiService'
 
-class Neutron {
-  constructor (client) {
-    this.client = client
-  }
-
-  async endpoint () {
+class Neutron extends ApiService {
+  endpoint () {
     return this.client.keystone.getServiceEndpoint('neutron', 'admin')
   }
 
@@ -15,7 +12,7 @@ class Neutron {
     const services = (await this.client.keystone.getServiceCatalog()).find(
       x => x.name === 'neutron').endpoints
     return services.reduce((accum, service) => {
-      accum[service.region] = service.url + '/v2.0'
+      accum[service.region] = `${service.url}/v2.0`
       return accum
     }, {})
   }

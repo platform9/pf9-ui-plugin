@@ -10,7 +10,6 @@ import InsertChartIcon from '@material-ui/icons/InsertChart'
 import { clustersCacheKey } from '../common/actions'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { capitalizeString } from 'utils/misc'
-import { objSwitchCase } from 'utils/fp'
 import ProgressBar from 'core/components/progress/ProgressBar'
 import ClusterStatusSpan from 'k8s/components/infrastructure/clusters/ClusterStatusSpan'
 import ResourceUsageTable from 'k8s/components/infrastructure/common/ResourceUsageTable'
@@ -25,8 +24,8 @@ import { Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import {
   getConnectionStatus,
-  connectionStatusFields,
-  isConverging,
+  connectionStatusFieldsTable,
+  hasConvergingNodes,
   getHealthStatusAndMessage,
   clusterHealthStatusFields,
   isTransientState,
@@ -50,91 +49,94 @@ const renderCloudProviderType = (type, cluster) => {
   return capitalizeString(type)
 }
 
-const getPendingClusterPopoversContent = (cpType, taskStatus) => objSwitchCase({
-  creating: `The ${cpType} resources are being created.`,
-  converging: 'One or more hosts are joining the cluster',
-  updating: `The ${cpType} resources are being updated`,
-  deleting: `The cluster and its underlying ${cpType} resources are being deleted`,
-})(taskStatus)
+const getNodesDetailsUrl = (uuid) => `/ui/kubernetes/infrastructure/clusters/${uuid}#nodesAndHealthInfo`
 
-const renderConnectionStatus = (_, { nodes }) => {
+const renderConnectionStatus = (_, { taskStatus, nodes, progressPercent, uuid }) => {
+  const nodesDetailsUrl = getNodesDetailsUrl(uuid)
+
+  if (isTransientState(taskStatus, nodes)) {
+    return renderTransientStatus(taskStatus, nodes, progressPercent)
+  }
+
   const connectionStatus = getConnectionStatus(nodes)
-  const fields = connectionStatusFields[connectionStatus]
+  const fields = connectionStatusFieldsTable[connectionStatus]
 
   return (
     <ClusterStatusSpan
       title={fields.message}
       status={fields.clusterStatus}>
-      {fields.label}
+      <SimpleLink src={nodesDetailsUrl}>{fields.label}</SimpleLink>
     </ClusterStatusSpan>
   )
 }
 
-const renderTransientStatus = (taskStatus, nodes) => {
-  const currentStatus = isConverging(nodes) ? 'converging' : taskStatus
+const renderTransientStatus = (taskStatus, nodes, progressPercent) => {
+  const currentStatus = hasConvergingNodes(nodes) ? 'converging' : taskStatus
   const spanContent = `The cluster is ${currentStatus}.`
 
   return (
-    <ClusterSync taskStatus={currentStatus}>
-      <ClusterStatusSpan title={spanContent}>
-        {capitalizeString(currentStatus)}
-      </ClusterStatusSpan>
-    </ClusterSync>
-  )
-}
-
-const renderGenericHealthStatus = (status, taskStatus, progressPercent, cloudProviderType) => {
-  if (progressPercent) {
-    return (
-      <div>
+    <div>
+      {progressPercent &&
         <ProgressBar height={20} animated containedPercent percent={progressPercent
           ? (+progressPercent).toFixed(0)
           : 0}
         />
-        <ClusterStatusSpan
-          status="loading"
-          title={getPendingClusterPopoversContent(cloudProviderType, taskStatus)}>
-          {capitalizeString(taskStatus)}
+      }
+      <ClusterSync taskStatus={currentStatus}>
+        <ClusterStatusSpan title={spanContent}>
+          {capitalizeString(currentStatus)}
         </ClusterStatusSpan>
-      </div>
-    )
-  } else if (status) {
-    return <ClusterStatusSpan>{capitalizeString(status)}</ClusterStatusSpan>
-  }
+      </ClusterSync>
+    </div>
+  )
 }
 
-const renderClusterHealthStatus = (healthyMasterNodes, nodes, numMasters, numWorkers) => {
-  const [healthStatus, message] = getHealthStatusAndMessage(healthyMasterNodes, nodes, numMasters, numWorkers)
+const renderErrorStatus = (taskError, nodesDetailsUrl) =>
+  <ClusterStatusSpan
+    title={taskError}
+    status='error'
+  >
+    <SimpleLink src={nodesDetailsUrl}>Error</SimpleLink>
+  </ClusterStatusSpan>
+
+const renderClusterHealthStatus = ({ nodes, masterNodes, workerNodes, healthyMasterNodes, healthyWorkerNodes, taskError, nodesDetailsUrl }) => {
+  const [healthStatus, message] = getHealthStatusAndMessage({ nodes, masterNodes, workerNodes, healthyMasterNodes, healthyWorkerNodes })
   const fields = clusterHealthStatusFields[healthStatus]
 
   return (
-    <ClusterStatusSpan
-      title={message}
-      status={fields.status}
-    >
-      {fields.label}
-    </ClusterStatusSpan>
+    <div>
+      <ClusterStatusSpan
+        title={message}
+        status={fields.status}
+      >
+        <SimpleLink src={nodesDetailsUrl}>{fields.label}</SimpleLink>
+      </ClusterStatusSpan>
+      {taskError && renderErrorStatus(taskError, nodesDetailsUrl)}
+    </div>
   )
 }
 
 const renderHealthStatus = (status, {
   taskStatus,
-  cloudProviderType,
+  taskError,
   progressPercent,
-  healthyMasterNodes,
   nodes,
-  numMasters,
-  numWorkers,
+  masterNodes,
+  workerNodes,
+  healthyMasterNodes,
+  healthyWorkerNodes,
+  uuid,
 }) => {
   if (isTransientState(taskStatus, nodes)) {
-    return renderTransientStatus(taskStatus, nodes)
+    return renderTransientStatus(taskStatus, nodes, progressPercent)
   }
 
   if (isSteadyState(taskStatus, nodes)) {
-    return renderClusterHealthStatus(healthyMasterNodes, nodes, numMasters, numWorkers)
+    const nodesDetailsUrl = getNodesDetailsUrl(uuid)
+    return renderClusterHealthStatus({ nodes, masterNodes, workerNodes, healthyMasterNodes, healthyWorkerNodes, taskError, nodesDetailsUrl })
   }
 
-  return renderGenericHealthStatus(status, taskStatus, progressPercent, cloudProviderType)
+  return status && <ClusterStatusSpan>{capitalizeString(status)}</ClusterStatusSpan>
 }
 
 const renderLinks = links => {
