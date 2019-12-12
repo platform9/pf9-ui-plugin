@@ -4,7 +4,7 @@ import { AppContext } from 'core/providers/AppProvider'
 import { usePreferences, useScopedPreferences } from 'core/providers/PreferencesProvider'
 import { setStorage, getStorage } from 'core/utils/pf9Storage'
 import { loadUserTenants } from 'openstack/components/tenants/actions'
-import { head, path, pathOr, propEq, isEmpty } from 'ramda'
+import { head, path, pathOr, propEq, isEmpty, isNil } from 'ramda'
 import AuthenticatedContainer from 'core/containers/AuthenticatedContainer'
 import track from 'utils/tracking'
 import useReactRouter from 'use-react-router'
@@ -95,7 +95,14 @@ const AppContainer = () => {
     const currUnscopedToken = tokens && tokens.unscopedToken
     if (username && currUnscopedToken) {
       // We need to make sure the token has not expired.
-      const { unscopedToken, expiresAt, issuedAt } = await keystone.renewToken(currUnscopedToken)
+      const response = await keystone.renewToken(currUnscopedToken)
+
+      if (isNil(response)) {
+        return history.push(loginUrl)
+      }
+
+      const { unscopedToken, expiresAt, issuedAt } = response
+
       if (unscopedToken && user) {
         return setupSession({ username, unscopedToken, expiresAt, issuedAt })
       }

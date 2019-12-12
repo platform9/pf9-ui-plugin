@@ -15,6 +15,7 @@ import { forgotPasswordUrl } from 'app/constants.js'
 import { pathJoin } from 'utils/misc'
 import { imageUrlRoot, dashboardUrl } from 'app/constants'
 import moment from 'moment'
+import ToastContainer from 'core/components/toasts/ToastContainer'
 
 const styles = theme => ({
   root: {
@@ -168,14 +169,31 @@ export class LoginPage extends React.PureComponent {
   }
 
   render () {
-    const { classes } = this.props
+    const { classes, history: { location: { toastData } } } = this.props
     const { loginFailed, loading } = this.state
+
     return (
       <div className="login-page">
+        {toastData && (
+          <ToastContainer
+            toasts={[
+              {
+                id: toastData.id,
+                isOpen: toastData.isOpen,
+                variant: toastData.variant,
+                text: toastData.text,
+              },
+            ]}
+          />
+        )}
         <Grid container justify="center" className={classes.root}>
           <Grid item md={4} lg={3}>
             <Paper className={classes.paper}>
-              <img alt="Platform 9" src={pathJoin(imageUrlRoot, 'logo-color.png')} className={classes.img} />
+              <img
+                alt="Platform 9"
+                src={pathJoin(imageUrlRoot, 'logo-color.png')}
+                className={classes.img}
+              />
               <form className={classes.form} onSubmit={this.performLogin}>
                 <Typography variant="subtitle1" align="center">
                   Please sign in
@@ -183,15 +201,20 @@ export class LoginPage extends React.PureComponent {
                 {this.renderInputfield()}
                 {this.renderMFACheckbox()}
                 {this.state.MFAcheckbox && this.renderMFAInput()}
-                {loginFailed && (
-                  <Alert small variant="error" message="Login failed" />
-                )}
-                <Button type="submit" disabled={loading} className={classes.signinButton} variant="contained" color="primary">
+                {loginFailed && <Alert small variant="error" message="Login failed" />}
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className={classes.signinButton}
+                  variant="contained"
+                  color="primary"
+                >
                   {loading ? 'Attempting login...' : 'Sign In'}
                 </Button>
                 <Typography className={classes.forgotPwd} gutterBottom>
-                  <SimpleLink onClick={this.handleForgotPassword()} src={forgotPasswordUrl}>Forgot
-                    password?</SimpleLink>
+                  <SimpleLink onClick={this.handleForgotPassword()} src={forgotPasswordUrl}>
+                    Forgot password?
+                  </SimpleLink>
                 </Typography>
               </form>
               {this.renderFooter()}
