@@ -110,6 +110,7 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
     // isPromise: true,
   })
   const invalidateCacheSymbol = Symbol('invalidateCache')
+  const invalidateCascadeSymbol = Symbol('invalidateCache')
 
   /**
    * Context loader function, uses a custom loader function to load data from the server
@@ -144,6 +145,7 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
   const contextLoaderFn = memoizePromise(
     async ({ getContext, setContext, params = emptyObj, refetch = contextLoaderFn[invalidateCacheSymbol], dumpCache = false, additionalOptions = emptyObj }) => {
       const invalidateCache = contextLoaderFn[invalidateCacheSymbol]
+      const cascade = contextLoaderFn[invalidateCascadeSymbol]
 
       // Make sure the user has the required roles
       const { role } = getContext(propOr(emptyObj, 'userDetails'))
@@ -151,7 +153,7 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
         return emptyArr
       }
 
-      const loadFromContext = (key, params = emptyObj, refetchDeep = refetchCascade && refetch) => {
+      const loadFromContext = (key, params = emptyObj, refetchDeep = cascade && refetch) => {
         const loaderFn = getContextLoader(key)
         return loaderFn({ getContext, setContext, params, refetch: refetchDeep, additionalOptions })
       }
@@ -185,6 +187,7 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
 
       try {
         contextLoaderFn[invalidateCacheSymbol] = false
+        contextLoaderFn[invalidateCascadeSymbol] = refetchCascade
 
         if (!refetch && !invalidateCache) {
           const allCachedParams = getContext(view(paramsLens)) || emptyArr
@@ -248,13 +251,15 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
       }
     })
   contextLoaderFn[invalidateCacheSymbol] = true
+  contextLoaderFn[invalidateCascadeSymbol] = refetchCascade
   /**
    * Invalidate the current cache
    * Subsequent calls will reset current cache params and data
    * @function
    */
-  contextLoaderFn.invalidateCache = () => {
+  contextLoaderFn.invalidateCache = (cascade = refetchCascade) => {
     contextLoaderFn[invalidateCacheSymbol] = true
+    contextLoaderFn[invalidateCascadeSymbol] = cascade
   }
   /**
    * Function to retrieve the current cacheKey
