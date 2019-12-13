@@ -58,5 +58,7 @@ export const deAuthNode = createContextUpdater('nodes', async (node, prevItems) 
   // that it is not being invoked explicitly from within this action.
   return prevItems
 }, {
-  successMessage: ([node]) => `Successfully de-authorized node ${node.name} (${node.primaryIp})`,
+  successMessage: (updatedItems, prevItems, node) => {
+    return `Successfully de-authorized node ${node.name} (${node.primaryIp})`
+  },
 })

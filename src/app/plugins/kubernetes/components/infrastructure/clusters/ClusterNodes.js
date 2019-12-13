@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback } from 'react'
-import { pluck } from 'ramda'
+import { pluck, partition } from 'ramda'
 // This table essentially has the same functionality as the <NodesList>
 // except that it is only the nodes from the a single cluster.
 import { columns } from '../nodes/NodesListPage'
@@ -15,26 +15,49 @@ const ClusterNodes = () => {
   const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
   const [nodes, loadingNodes, reload] = useDataLoader(loadNodes)
   const handleRefresh = useCallback(() => reload(true), [reload])
-  const clusterNodes = useMemo(() => {
+  const [masterNodes, workerNodes] = useMemo(() => {
     const cluster = clusters.find(cluster => cluster.uuid === match.params.id)
     if (cluster) {
       const clusterNodesUids = pluck('uuid', cluster.nodes)
-      return nodes.filter(node => clusterNodesUids.includes(node.uuid))
+      const clusterNodes = nodes.filter(node => clusterNodesUids.includes(node.uuid))
+      const isMasterNode = node => node.isMaster === 1
+      return partition(isMasterNode, clusterNodes)
     }
     return emptyArr
   }, [clusters, nodes, match])
 
-  const ListTable = createListTableComponent({
-    title: 'Cluster Nodes',
+  const commonTableProperties = {
     emptyText: 'No instances found.',
-    name: 'ClusterNodes',
-    columns,
     uniqueIdentifier: 'uuid',
     onReload: handleRefresh,
     showCheckboxes: false,
+    compactTable: true,
+  }
+
+  const removeColumnIds = (columns, ids) => columns.filter(column => !ids.includes(column.id))
+
+  const MasterNodesTable = createListTableComponent({
+    title: 'Master Nodes',
+    name: 'MasterNodes',
+    columns: removeColumnIds(columns, ['isMaster']),
+    ...commonTableProperties,
   })
 
-  return <ListTable data={clusterNodes} loading={loadingClusters || loadingNodes} />
+  const WorkerNodesTable = createListTableComponent({
+    title: 'Worker Nodes',
+    name: 'WorkerNodes',
+    columns: removeColumnIds(columns, ['isMaster', 'api_responding']),
+    ...commonTableProperties,
+  })
+
+  return (
+    <div>
+      <h2>Master Nodes</h2>
+      <MasterNodesTable data={masterNodes} loading={loadingClusters || loadingNodes} />
+      <h2>Worker Nodes</h2>
+      <WorkerNodesTable data={workerNodes} loading={loadingClusters || loadingNodes} />
+    </div>
+  )
 }
 
 export default ClusterNodes

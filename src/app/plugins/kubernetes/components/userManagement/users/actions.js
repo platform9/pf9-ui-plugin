@@ -35,6 +35,7 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
     await keystone.deleteUser(id)
   },
   createFn: async ({ username, displayname, password, roleAssignments }) => {
+    const defaultTenantId = pipe(keys, head)(roleAssignments)
     const createdUser = password
       ? await keystone.createUser({
         email: username,
@@ -42,12 +43,12 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
         username,
         displayname,
         password: password || undefined,
-        default_project_id: head(keys(roleAssignments)),
+        default_project_id: defaultTenantId,
       })
       : await clemency.createUser({
         username,
         displayname,
-        tenants: keys(roleAssignments),
+        tenants: defaultTenantId,
       })
     if (createdUser.role === '_member_') {
       return createdUser

@@ -2,17 +2,21 @@ import React from 'react'
 import { localizeRoles } from 'api-client/ResMgr'
 import { maybeFnOrNull } from 'utils/fp'
 import ExternalLink from 'core/components/ExternalLink'
-import HostStatus from 'core/components/HostStatus'
 import ProgressBar from 'core/components/progress/ProgressBar'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { pathOr, pipe } from 'ramda'
 import { castBoolToStr, castFuzzyBool, columnPathLookup } from 'utils/misc'
 import SimpleLink from 'core/components/SimpleLink'
 import { nodesCacheKey } from 'k8s/components/infrastructure/nodes/actions'
+import ClusterStatusSpan from 'k8s/components/infrastructure/clusters/ClusterStatusSpan'
+import ClusterSync from '../clusters/ClusterSync'
+import {
+  connectionStatusFieldsTable,
+  clusterHealthStatusFields,
+} from '../clusters/ClusterStatusUtils'
 import DeAuthIcon from '@material-ui/icons/DeleteForever'
 import NodeDeAuthDialog from './NodeDeAuthDialog'
 
-const renderStatus = (_, node) => (<HostStatus host={node.combined} />)
 const isMaster = pipe(castFuzzyBool, castBoolToStr())
 
 const renderRoles = (_, node) => {
@@ -52,10 +56,54 @@ const renderNodeDetailLink = (name, node) =>
 const renderClusterLink = (clusterName, { clusterUuid }) => clusterUuid &&
   <SimpleLink src={`/ui/kubernetes/infrastructure/clusters/${clusterUuid}`}>{clusterName}</SimpleLink>
 
+const renderConverging = () =>
+  <ClusterSync taskStatus={'converging'}>
+    <ClusterStatusSpan>
+      Converging
+    </ClusterStatusSpan>
+  </ClusterSync>
+
+const renderConnectionStatus = (_, { status, combined }) => {
+  if (status === 'converging') {
+    return renderConverging()
+  }
+
+  const connectionStatus = status === 'disconnected' ? 'disconnected' : 'connected'
+  const showLastResponse = status === 'disconnected' && combined && combined.lastResponse
+
+  const fields = connectionStatusFieldsTable[connectionStatus]
+  return (
+    <ClusterStatusSpan status={fields.clusterStatus}>
+      {fields.label}
+      <br />
+      {showLastResponse && `since ${combined.lastResponse}`}
+    </ClusterStatusSpan>
+  )
+}
+
+const renderHealthStatus = (_, { status }) => {
+  if (status === 'converging') {
+    return renderConverging()
+  }
+
+  const healthStatus = status === 'disconnected' ? 'unknown' : status === 'ok' ? 'healthy' : 'unhealthy'
+  const fields = clusterHealthStatusFields[healthStatus]
+
+  return (
+    <ClusterStatusSpan status={fields.status}>
+      {fields.label}
+    </ClusterStatusSpan>
+  )
+}
+
+const renderApiServer = (_, { isMaster, api_responding: apiResponding }) => !!isMaster && (!!apiResponding).toString()
+
 export const columns = [
   { id: 'uuid', label: 'UUID', display: false },
   { id: 'name', label: 'Name', render: renderNodeDetailLink },
-  { id: 'status', label: 'Status', render: renderStatus },
+  { id: 'connectionStatus', label: 'Connection status', render: renderConnectionStatus },
+  { id: 'healthStatus', label: 'Health status', render: renderHealthStatus },
+  { id: 'api_responding', label: 'API server', render: renderApiServer },
   { id: 'logs', label: 'Logs', render: renderLogs },
   { id: 'primaryIp', label: 'Primary IP' },
   { id: 'compute', label: 'Compute', render: renderStats('compute') },

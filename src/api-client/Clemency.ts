@@ -3,11 +3,11 @@ import ApiService from 'api-client/ApiService'
 
 class Clemency extends ApiService {
   endpoint () {
-    return config.host
+    return config.apiHost
   }
 
-  baseUrl () {
-    return `${this.endpoint}/clemency`
+  get baseUrl () {
+    return `${this.endpoint()}/clemency`
   }
 
   requestNewPassword = async (username) => {
@@ -26,10 +26,9 @@ class Clemency extends ApiService {
     return this.client.basicPost(`${this.baseUrl}/reset/password/#${secret}`, body)
   }
 
-  createUser = async params => {
-    const { tenants, ...user } = params
-    const body = { user, tenants }
-    return this.client.basicPost(`${this.baseUrl}/createacct`, body)
+  createUser = async body => {
+    const response = await this.client.basicPost(`${this.baseUrl}/createacct`, body)
+    return response.user
   }
 
   verifyActivateLink = async secret => {
