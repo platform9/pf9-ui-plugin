@@ -133,7 +133,7 @@
     "test:integration": "cross-env NODE_ENV=test cypress run",
     "test:integration:watch": "cross-env NODE_ENV=test cypress open",
     "cypress": "cross-env NODE_ENV=test cypress open",
-    "cypress:record": "cross-env NODE_ENV=test cypress run --record --key $CYPRESS_RECORD_KEY",
+    "cypress:record": "cross-env NODE_ENV=test cypress run --record --key $CYPRESS_RECORD_KEY --parallel",
     "test:unit": "cross-env NODE_ENV=test jest --coverage src/app src/server",
     "test:unit:watch": "cross-env NODE_ENV=test jest --watch --coverage src/app src/server"
   },
