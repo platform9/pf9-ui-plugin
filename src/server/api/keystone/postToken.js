@@ -1,6 +1,11 @@
 import Tenant from '../../models/openstack/Tenant'
 import Token from '../../models/openstack/Token'
 import User from '../../models/openstack/User'
+import config from '../../../../config'
+import { path } from 'ramda'
+
+const simUsername = path(['simulator', 'username'], config)
+const simToken = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
 
 const postToken = (req, res) => {
   const auth = req.body.auth
@@ -12,8 +17,8 @@ const postToken = (req, res) => {
         message:
           message || 'The request you made requires authentication.',
         title:
-        title || 'Unauthorized'
-      }
+          title || 'Unauthorized',
+      },
     })
   }
   if (!auth || !auth.identity) {
@@ -28,7 +33,9 @@ const postToken = (req, res) => {
     if (!user) {
       return sendAuthError()
     }
-    const token = new Token({ user })
+    const token = name === simUsername
+      ? new Token({ user, id: simToken })
+      : new Token({ user })
     return res.set('X-Subject-Token', token.id).status(201).send({ token: token.asJson() })
   }
 
@@ -42,7 +49,9 @@ const postToken = (req, res) => {
     const user = unscopedToken.user
     const tenantScopeId = auth.scope && auth.scope.project && auth.scope.project.id
     const tenant = Tenant.findById(tenantScopeId)
-    const scopedToken = new Token({ user, tenant })
+    const scopedToken = user.name === simUsername
+      ? new Token({ user, tenant, id: simToken })
+      : new Token({ user, tenant })
     return res.set('X-Subject-Token', scopedToken.id).status(201).send({ token: scopedToken.asJson() })
   }
 
