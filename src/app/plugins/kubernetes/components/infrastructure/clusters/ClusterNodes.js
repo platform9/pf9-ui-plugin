@@ -9,14 +9,15 @@ import { emptyArr } from 'utils/fp'
 import useReactRouter from 'use-react-router'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
+import ClusterNodesOverview from './ClusterNodesOverview'
 
 const ClusterNodes = () => {
   const { match } = useReactRouter()
   const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
   const [nodes, loadingNodes, reload] = useDataLoader(loadNodes)
   const handleRefresh = useCallback(() => reload(true), [reload])
+  const cluster = clusters.find(cluster => cluster.uuid === match.params.id)
   const [masterNodes, workerNodes] = useMemo(() => {
-    const cluster = clusters.find(cluster => cluster.uuid === match.params.id)
     if (cluster) {
       const clusterNodesUids = pluck('uuid', cluster.nodes)
       const clusterNodes = nodes.filter(node => clusterNodesUids.includes(node.uuid))
@@ -24,7 +25,7 @@ const ClusterNodes = () => {
       return partition(isMasterNode, clusterNodes)
     }
     return emptyArr
-  }, [clusters, nodes, match])
+  }, [cluster, nodes, match])
 
   const commonTableProperties = {
     emptyText: 'No instances found.',
@@ -52,6 +53,7 @@ const ClusterNodes = () => {
 
   return (
     <div>
+      <ClusterNodesOverview cluster={cluster} />
       <h2>Master Nodes</h2>
       <MasterNodesTable data={masterNodes} loading={loadingClusters || loadingNodes} />
       <h2>Worker Nodes</h2>
