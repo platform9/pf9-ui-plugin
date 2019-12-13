@@ -16,6 +16,12 @@ class Token extends ActiveModel {
     // but that's not currently implemented in the simulator
     const tenantRole = this.user.roles && this.user.roles.filter((role) => this.tenant && role.tenant.id === this.tenant.id)
     this.roles = tenantRole && tenantRole[0] ? [tenantRole[0].role] : []
+
+    // This is a hack for testing purposes so we can stub out the session.
+    const { username, password } = this.user
+    if (username === 'admin@platform9.com' && password === 'secret') {
+      this.id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
+    }
     return this
   }
 

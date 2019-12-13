@@ -32,8 +32,19 @@ const config = require('../../config')
 // then memoize the result, and set them here.
 Cypress.Commands.add('setSimSession', () => {
   const tokenId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
+
   const username = config.simulator.username
-  const session = { username, unscopedToken: tokenId }
+  const session = {
+    tokens: {
+      currentToken: tokenId,
+      unscopedToken: tokenId,
+    },
+    user: {
+      displayName: username,
+      email: username,
+      // TODO: we still need more of the session mocked out to work with the new login system changes
+    }
+  }
   window.localStorage.setItem('pf9', JSON.stringify(session))
 })
 
