@@ -13,8 +13,9 @@ import { toPairs, apply } from 'ramda'
 import { pathJoin } from 'utils/misc'
 import DeveloperToolsEmbed from 'developer/components/DeveloperToolsEmbed'
 import pluginManager from 'core/utils/pluginManager'
-import { logoutUrl, dashboardUrl } from 'app/constants'
+import { logoutUrl, dashboardUrl, helpUrl } from 'app/constants'
 import LogoutPage from 'core/public/LogoutPage'
+import HelpPage from 'app/plugins/kubernetes/components/common/HelpPage'
 import { AppContext } from 'core/providers/AppProvider'
 import useReactRouter from 'use-react-router'
 
@@ -161,6 +162,7 @@ const AuthenticatedContainer = () => {
           <div className={classes.contentMain}>
             <Switch>
               {renderPlugins(plugins, role)}
+              <Route path={helpUrl} component={HelpPage} />>
               <Route path={logoutUrl} component={LogoutPage} />
               <Redirect to={dashboardUrl} />
             </Switch>

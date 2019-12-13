@@ -4,8 +4,9 @@ import { serviceCatalogContextKey } from 'openstack/components/api-access/action
 import { pathStrOrNull, pipeWhenTruthy } from 'utils/fp'
 import { find, propEq, prop } from 'ramda'
 import { combinedHostsCacheKey } from 'k8s/components/infrastructure/common/actions'
+import createContextUpdater from 'core/helpers/createContextUpdater'
 
-const { qbert } = ApiClient.getInstance()
+const { resmgr, qbert } = ApiClient.getInstance()
 
 export const nodesCacheKey = 'nodes'
 export const rawNodesCacheKey = 'rawNodes'
@@ -48,4 +49,14 @@ export const loadNodes = createContextLoader(nodesCacheKey, async (params, loadF
 }, {
   refetchCascade: true,
   uniqueIdentifier: 'uuid',
+})
+
+export const deAuthNode = createContextUpdater('nodes', async (node, prevItems) => {
+  await resmgr.unauthorizeHost(node.uuid)
+  // Something in `createContextUpdater` is refreshing the API calls for nodes automagically.
+  // This what I would be doing manually so it works out fine but I'm a bit concerned
+  // that it is not being invoked explicitly from within this action.
+  return prevItems
+}, {
+  successMessage: ([node]) => `Successfully de-authorized node ${node.name} (${node.primaryIp})`,
 })
