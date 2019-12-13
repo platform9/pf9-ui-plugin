@@ -1,8 +1,10 @@
 import React from 'react'
-import { Grid } from '@material-ui/core'
+import { Grid, Dialog, DialogTitle, DialogContent } from '@material-ui/core'
+import CloseIcon from '@material-ui/icons/Close'
+import { makeStyles } from '@material-ui/styles'
 import ClusterStatusSpan from 'k8s/components/infrastructure/clusters/ClusterStatusSpan'
 import ProgressBar from 'core/components/progress/ProgressBar'
-import { makeStyles } from '@material-ui/styles'
+import useToggler from 'core/hooks/useToggler'
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -23,7 +25,11 @@ const useStyles = makeStyles(theme => ({
     marginLeft: theme.spacing(1)
   },
   error: {
+    cursor: 'pointer',
     marginTop: theme.spacing(2),
+    '&:hover': {
+      textDecoration: 'underline',
+    }
   },
   resourceContainer: {
     display: 'flex',
@@ -39,10 +45,15 @@ const useStyles = makeStyles(theme => ({
   progressBar: {
     marginLeft: theme.spacing(2)
   },
+  closeIcon: {
+    cursor: 'pointer',
+    float: 'right',
+  },
 }))
 
 const ClusterNodesOverview = ({ cluster = {} }) => {
   const classes = useStyles()
+  const [isDialogOpen, toggleDialog] = useToggler()
 
   if (!cluster) {
     return null
@@ -72,7 +83,15 @@ const ClusterNodesOverview = ({ cluster = {} }) => {
           statusLabel='Connected'
           message='Healthy > 50% of worker nodes are healthy'
         />
-        {!!cluster.taskError && <Error classes={classes} taskError={cluster.taskError} />}
+        {!!cluster.taskError && <Error classes={classes} onClick={toggleDialog} />}
+        <Dialog open={isDialogOpen}>
+          <DialogTitle>
+            <CloseIcon className={classes.closeIcon} onClick={toggleDialog} />
+          </DialogTitle>
+          <DialogContent>
+            {cluster.taskError}
+          </DialogContent>
+        </Dialog>
       </Grid>
       <Grid container item xs={6}>
         <ResourceUtilization classes={classes} />
@@ -92,10 +111,10 @@ const Status = ({ classes, status, statusLabel, title, message }) =>
     </div>
   </div>
 
-const Error = ({ classes, taskError }) =>
+const Error = ({ classes, onClick }) =>
   <div className={classes.error}>
     <ClusterStatusSpan status='error'>
-      <a className={classes.title}>The last cluster operation failed (see error)</a>
+      <span onClick={onClick} className={classes.title}>The last cluster operation failed (see error)</span>
     </ClusterStatusSpan>
   </div>
 
