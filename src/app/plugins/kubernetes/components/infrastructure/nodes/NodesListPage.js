@@ -96,14 +96,14 @@ const renderHealthStatus = (_, { status }) => {
   )
 }
 
-const renderAPIServer = (_, { isMaster, api_responding: apiResponding }) => !!isMaster && (!!apiResponding).toString()
+const renderApiServer = (_, { isMaster, api_responding: apiResponding }) => !!isMaster && (!!apiResponding).toString()
 
 export const columns = [
   { id: 'uuid', label: 'UUID', display: false },
   { id: 'name', label: 'Name', render: renderNodeDetailLink },
   { id: 'connectionStatus', label: 'Connection status', render: renderConnectionStatus },
   { id: 'healthStatus', label: 'Health status', render: renderHealthStatus },
-  { id: 'api_responding', label: 'API server', render: renderAPIServer },
+  { id: 'api_responding', label: 'API server', render: renderApiServer },
   { id: 'logs', label: 'Logs', render: renderLogs },
   { id: 'primaryIp', label: 'Primary IP' },
   { id: 'compute', label: 'Compute', render: renderStats('compute') },
