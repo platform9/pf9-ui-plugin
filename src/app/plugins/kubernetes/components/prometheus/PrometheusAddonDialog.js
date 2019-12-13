@@ -52,7 +52,7 @@ const PrometheusAddonDialog = ({ rows: [cluster], onClose }) => {
         </p>
         <p>
           After enabling the monitoring add-on, you will be able to access Prometheus metrics and Grafana
-          dashboards for Kubernetes. In addition, users will be able to spin up their own prometheus instances for application monitoring.
+          dashboards for Kubernetes. In addition, users will be able to spin up their own Prometheus instances for application monitoring.
         </p>
       </DialogContent>
       <DialogActions>
