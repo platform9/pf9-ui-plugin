@@ -423,7 +423,7 @@ class Navbar extends PureComponent {
       onClick={handleClick}
       key={link.path}>
       {icon && <div className={classes.navIcon}>
-        <FontAwesomeIcon size="xl">{icon}</FontAwesomeIcon>
+        <FontAwesomeIcon title={name} size="xl">{icon}</FontAwesomeIcon>
       </div>}
       {open && <ListItemText
         classes={{
