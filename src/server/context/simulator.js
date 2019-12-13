@@ -15,8 +15,6 @@ import Token from '../models/openstack/Token'
 import Application from '../models/openstack/Application'
 import SshKey from '../models/openstack/SshKey'
 
-const config = require('../../../config')
-
 const defaultQuota = {
   cores: 10,
   ram: 10000,

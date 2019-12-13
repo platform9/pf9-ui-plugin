@@ -1,6 +1,6 @@
 describe('clusters', () => {
   beforeEach(() => {
-    cy.setSimSession()
+    cy.login()
   })
 
   context('list clusters', () => {

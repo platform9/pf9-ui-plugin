@@ -28,24 +28,51 @@ const config = require('../../config')
 
 // Allow the session to be stubbed out.
 // The hard-coded token id is explicitly whitelisted in the simulator.
-// TODO: For true e2e tests we can have this command make actual API calls to login,
-// then memoize the result, and set them here.
-Cypress.Commands.add('setSimSession', () => {
-  const tokenId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
-
-  const username = config.simulator.username
-  const session = {
-    tokens: {
-      currentToken: tokenId,
-      unscopedToken: tokenId,
+Cypress.Commands.add('login', () => {
+  const name = config.simulator.username
+  const password = config.simulator.password
+  cy.request({
+    method: 'POST',
+    url: `${config.apiHost}/keystone/v3/auth/tokens?nocatalog`,
+    body: {
+      auth: {
+        identity: {
+          methods: ['password'],
+          password: {
+            user: { name, password, domain: { id: 'default' } },
+          },
+        },
+      },
     },
-    user: {
-      displayName: username,
-      email: username,
-      // TODO: we still need more of the session mocked out to work with the new login system changes
-    }
-  }
-  window.localStorage.setItem('pf9', JSON.stringify(session))
+  })
+    .its('body')
+    .then(({ token: { id, user } }) => {
+      return cy.request({
+        method: 'GET',
+        url: `${config.apiHost}/keystone/v3/auth/projects`,
+        headers: {
+          Authorization: `Bearer ${id}`, // required for k8s proxy api
+          'X-Auth-Token': id, // required for OpenStack
+        },
+      }).then(({ body: { projects } }) => {
+        const session = {
+          userTenants: projects,
+          tokens: {
+            currentToken: id,
+            unscopedToken: id,
+          },
+          user: {
+            ...user,
+            username: user.name,
+            userId: user.id,
+            roles: user.roles,
+            displayName: user.displayname,
+            role: 'admin',
+          },
+        }
+        window.localStorage.setItem('pf9', JSON.stringify(session))
+      })
+    })
 })
 
 // For use with <ListTable>.  This will select the row containing the given text.
@@ -63,7 +90,7 @@ Cypress.Commands.add(
     // Allow just the menu to be opened if no action is supplied.
     action && menu.contains(action).click()
     return menu
-  }
+  },
 )
 
 Cypress.Commands.add(
@@ -72,10 +99,9 @@ Cypress.Commands.add(
   subject => {
     cy.wrap(subject).should($subject => {
       const classNames = $subject.attr('class')
-      console.log(classNames)
       expect(classNames).to.contain('disabled')
     })
-  }
+  },
 )
 
 Cypress.Commands.add(
@@ -86,7 +112,7 @@ Cypress.Commands.add(
       const classNames = $subject.attr('class')
       expect(classNames).not.to.contain('disabled')
     })
-  }
+  },
 )
 
 Cypress.Commands.add(
@@ -97,7 +123,7 @@ Cypress.Commands.add(
     cy.get(selector).click()
     cy.wait(100) // During development the modal closes before we can see it is even open
     cy.get(selector).should('not.exist') // Wait for the modal to close before proceeding.
-  }
+  },
 )
 
 Cypress.Commands.add(
@@ -108,5 +134,5 @@ Cypress.Commands.add(
     }
     // Give time for simulator context to be initialized before using the APIs
     cy.wait(200)
-  }
+  },
 )
