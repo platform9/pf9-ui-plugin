@@ -94,7 +94,7 @@ const ClusterNodesOverview = ({ cluster = {} }) => {
         </Dialog>
       </Grid>
       <Grid container item xs={6}>
-        <ResourceUtilization classes={classes} />
+        <ResourceUtilization classes={classes} usage={cluster.usage} />
       </Grid>
     </Grid>
   )
@@ -118,30 +118,35 @@ const Error = ({ classes, onClick }) =>
     </ClusterStatusSpan>
   </div>
 
-const ResourceUtilization = ({ classes }) => {
+const ResourceUtilization = ({ classes, usage }) => {
+  if (!usage) {
+    return null
+  }
+
+  const { compute, memory, disk } = usage
   return (
     <div>
       <div className={classes.title}>Cluster Resource Utilization:</div>
       <Resource
         classes={classes}
         label='CPU:'
-        value='25'
+        value={compute.max.toFixed(1)}
         unit='GHz'
-        percentage={0.5}
+        percentage={Math.round(compute.percent)}
       />
       <Resource
         classes={classes}
         label='Memory:'
-        value='25'
-        unit='GHz'
-        percentage={0.5}
+        value={memory.max.toFixed(1)}
+        unit='GiB'
+        percentage={Math.round(memory.percent)}
       />
       <Resource
         classes={classes}
         label='Storage:'
-        value='25'
-        unit='GHz'
-        percentage={0.5}
+        value={disk.max.toFixed(1)}
+        unit='GiB'
+        percentage={Math.round(disk.percent)}
       />
     </div>
   )
@@ -153,7 +158,7 @@ const Resource = ({ classes, label, value, unit, percentage }) =>
       <span className={classes.resourceLabel}>{label}</span>
       {` ${value} ${unit}`}
     </span>
-    <span className={classes.progressBar}><ProgressBar percent={percentage * 100} /></span>
+    <span className={classes.progressBar}><ProgressBar percent={percentage} /></span>
   </div>
 
 export default ClusterNodesOverview
