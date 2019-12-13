@@ -35,8 +35,6 @@ describe('login', () => {
     cy.contains(config.region)
   })
 
-  // TODO: this test is not currently working because the localStorage session format has
-  // change since we last worked with Cypress tests.  Need to update how we mock out the session.
   it('remembers the login state on refresh', () => {
     cy.login()
     cy.visit('/')
