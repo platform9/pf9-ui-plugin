@@ -18,7 +18,6 @@ import LogoutPage from 'core/public/LogoutPage'
 import HelpPage from 'app/plugins/kubernetes/components/common/HelpPage'
 import { AppContext } from 'core/providers/AppProvider'
 import useReactRouter from 'use-react-router'
-import ChangePasswordPage from 'core/components/ChangePasswordPage'
 
 const useStyles = makeStyles(theme => ({
   appFrame: {
@@ -132,7 +131,7 @@ const loadFeatures = async setFeatures => {
 const AuthenticatedContainer = () => {
   const [drawerOpen, toggleDrawer] = useToggler(true)
   const [features, setFeatures] = useState(emptyObj)
-  const { userDetails: { role }, isChangePassword } = useContext(AppContext)
+  const { userDetails: { role } } = useContext(AppContext)
   const { history } = useReactRouter()
   const classes = useStyles({ path: history.location.pathname })
 
@@ -159,7 +158,6 @@ const AuthenticatedContainer = () => {
           [classes.contentShift]: drawerOpen,
           [classes['contentShift-left']]: drawerOpen,
         })}>
-          {isChangePassword && <ChangePasswordPage />}
           <div className={classes.drawerHeader} />
           <div className={classes.contentMain}>
             <Switch>
