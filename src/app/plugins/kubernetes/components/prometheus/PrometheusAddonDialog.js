@@ -51,7 +51,7 @@ const PrometheusAddonDialog = ({ rows: [cluster], onClose }) => {
           <b>Note:</b> Monitoring is a Beta feature
         </p>
         <p>
-          After enabling monitoring add on, you will be able to access prometheus metrics and Grafana
+          After enabling monitoring add-on, you will be able to access prometheus metrics and Grafana
           dashboards for Kubernetes. In addition, users will be able to spin up their own prometheus instances for application monitoring.
         </p>
       </DialogContent>
