@@ -16,13 +16,37 @@ import moize from 'moize'
 import { assoc, flatten, pluck, prop, propEq, propOr, where } from 'ramda'
 import { matchPath, withRouter } from 'react-router'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
-import { imageUrls, clarityDashboardUrl } from 'app/constants'
-import { hexToRGBA } from 'core/utils/colorHelpers'
+import { imageUrls, clarityDashboardUrl, k8sPrefix } from 'app/constants'
 
 export const drawerWidth = 180
 
 const styles = theme => ({
+  logoTitle: {
+    backgroundImage: `url(${imageUrls.logoBlue})`,
+    backgroundRepeat: 'no-repeat',
+    backgroundSize: 135,
+    height: 20,
+    backgroundPosition: 'center -36px',
+  },
+  logo: {
+    justifySelf: 'center',
+    maxHeight: 45,
+    backgroundImage: `url(${imageUrls.logoBlue})`,
+    backgroundRepeat: 'no-repeat',
+    transition: `width ${theme.transitions.duration.enteringScreen}ms ease`,
+    width: 40,
+    backgroundSize: 115,
+    height: 24,
+    backgroundPosition: 'center -6px',
+  },
+  logoOpen: {
+    width: drawerWidth,
+  },
+  logoClose: {
+    width: 168,
+  },
   drawer: {
+    zIndex: 1200,
     position: 'relative',
     width: drawerWidth,
     flexShrink: 0,
@@ -39,29 +63,28 @@ const styles = theme => ({
     }),
   },
   drawerClose: {
-    marginTop: theme.spacing(8),
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    overflowX: 'hidden',
-    width: (theme.spacing(6)) + 1,
-    [theme.breakpoints.up('sm')]: {
-      width: theme.spacing(5.5),
-    },
+    width: (theme.spacing(6)) + 2,
+    // [theme.breakpoints.up('sm')]: {
+    //   width: theme.spacing(5.5),
+    // },
   },
   paper: {
-    marginTop: 55,
+    // marginTop: 55,
     backgroundColor: 'inherit',
     overflow: 'hidden',
     borderRight: 0,
   },
   drawerHeader: {
-    display: 'flex',
+    display: 'grid',
+    gridTemplateColumns: '50px 1fr',
+    height: 55,
+    position: 'relative',
     alignItems: 'center',
-    justifyContent: 'flex-end',
-    padding: '0 8px',
-    minHeight: 50,
+    cursor: 'pointer',
   },
   inputRoot: {
     color: 'inherit',
@@ -110,30 +133,40 @@ const styles = theme => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    '& > i': {
+      maxHeight: 28,
+      maxWidth: 28,
+    }
   },
   navMenu: {
     padding: 0,
     width: '100%',
   },
   navMenuItem: {
-    padding: theme.spacing(1, 0.5, 1, 1),
+    display: 'grid',
+    gridTemplateColumns: '50px 1fr',
+    padding: 0,
     minHeight: theme.spacing(6),
     backgroundColor: theme.palette.sidebar.background,
     color: theme.palette.sidebar.text,
+
+    transition: 'background .2s ease',
+
+    '& i, & span': {
+      transition: 'color .2s ease',
+    },
     '&:hover': {
-      backgroundColor: hexToRGBA(theme.palette.background.paper, 0.15),
+      backgroundColor: theme.palette.background.paper,
     },
     '&:hover *': {
       color: theme.palette.sidebar.hoverText, // override child color styles
     },
-    display: 'flex',
-    flexFlow: 'row nowrap',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    borderTop: '2px solid transparent',
+    borderBottom: '2px solid transparent',
   },
   navMenuTextRoot: {
     flexGrow: 1,
-    padding: theme.spacing(0, 0, 0, 1),
+    padding: theme.spacing(0, 0.5, 0, 1),
     whiteSpace: 'normal',
     margin: 0,
   },
@@ -143,11 +176,23 @@ const styles = theme => ({
     color: theme.palette.sidebar.text,
   },
   toggleButton: {
+    background: theme.palette.sidebar.background,
+    borderRadius: 0,
+    color: theme.palette.sidebar.hoverText,
+    boxShadow: 'inset 1px 0px 4px -2px',
     fontSize: 12,
     fontWeight: 500,
-    color: theme.palette.sidebar.text,
     textAlign: 'center',
-    padding: 4,
+    padding: theme.spacing(0.5),
+    position: 'absolute',
+    top: theme.spacing(),
+    left: '100%',
+    zIndex: 1200,
+    width: 27,
+    height: 39,
+    '&:hover': {
+      backgroundColor: theme.palette.sidebar.background,
+    },
   },
   currentNavMenuText: {
     fontSize: 12,
@@ -161,6 +206,15 @@ const styles = theme => ({
     display: 'flex',
     alignItems: 'center',
     marginBottom: '10px',
+    marginTop: '10px',
+  },
+  sliderLogoOpen: {
+    backgroundSize: '125px !important',
+    backgroundPosition: '7px center !important',
+  },
+  sliderLogoClosed: {
+    backgroundSize: '130px !important',
+    backgroundPosition: '9px center !important',
   },
   sliderLogo: {
     flexGrow: 1,
@@ -170,11 +224,15 @@ const styles = theme => ({
     justifyContent: 'left',
     alignItems: 'center',
     height: '45px',
-    maxWidth: '90%',
+    // maxWidth: '90%',
     margin: '2px',
     padding: '0 7px',
     borderRadius: theme.shape.borderRadius,
     boxSizing: 'border-box',
+
+    backgroundImage: 'url(/ui/images/logo-kubernetes-h.png)',
+    backgroundRepeat: 'no-repeat',
+
   },
   sliderLogoImage: {
     maxHeight: 26,
@@ -205,6 +263,10 @@ class Navbar extends PureComponent {
     expandedItems: [],
     activeNavItem: null,
     filterText: '',
+  }
+
+  handleLogoClick = () => {
+    this.props.history.push(`${k8sPrefix}/dashboard`)
   }
 
   handleEscKey = () => {
@@ -408,9 +470,10 @@ class Navbar extends PureComponent {
       {open && <a href={clarityDashboardUrl}>
         <ChevronLeftIcon className={classes.sliderArrow} />
       </a>}
-      <div className={classes.sliderLogo}>
-        <img src={imageUrls.kubernetes} className={classes.sliderLogoImage} />
-      </div>
+      <div className={clsx(classes.sliderLogo, {
+        [classes.sliderLogoOpen]: open,
+        [classes.sliderLogoClosed]: !open,
+      })} />
       {open && <a href={clarityDashboardUrl}>
         <ChevronRightIcon className={classes.sliderArrow} />
       </a>}
@@ -421,31 +484,39 @@ class Navbar extends PureComponent {
     const { classes, withStackSlider, sections, open, handleDrawerToggle } = this.props
     const filteredSections = sections.filter(where({ links: notEmpty }))
 
-    return <Drawer
-      variant="permanent"
+    return <div
       className={clsx(classes.drawer, {
         [classes.drawerOpen]: open,
         [classes.drawerClose]: !open,
-      })}
-      classes={{
-        paper: clsx(classes.paper, {
+      })}>
+      <IconButton className={classes.toggleButton} onClick={handleDrawerToggle}>
+        <FontAwesomeIcon size="xl">{open ? 'angle-double-left' : 'angle-double-right'}</FontAwesomeIcon>
+      </IconButton>
+      <Drawer
+        variant="permanent"
+        className={clsx(classes.drawer, {
           [classes.drawerOpen]: open,
           [classes.drawerClose]: !open,
-        }),
-      }}
-      anchor="left"
-      open={open}
-    >
-      <div className={classes.drawerHeader}>
-        <IconButton className={classes.toggleButton} onClick={handleDrawerToggle}>
-          <FontAwesomeIcon size="xl">{open ? 'angle-double-left' : 'angle-double-right'}</FontAwesomeIcon>
-        </IconButton>
-      </div>
-      {withStackSlider ? this.renderStackSlider() : null}
-      {filteredSections.length > 1
-        ? this.renderSections(filteredSections)
-        : this.renderSectionLinks(propOr([], 'links', filteredSections[0]))}
-    </Drawer>
+        })}
+        classes={{
+          paper: clsx(classes.paper, {
+            [classes.drawerOpen]: open,
+            [classes.drawerClose]: !open,
+          }),
+        }}
+        anchor="left"
+        open={open}
+      >
+        <div className={classes.drawerHeader} onClick={this.handleLogoClick}>
+          <div className={classes.logo} />
+          <div className={classes.logoTitle} />
+        </div>
+        {withStackSlider ? this.renderStackSlider() : null}
+        {filteredSections.length > 1
+          ? this.renderSections(filteredSections)
+          : this.renderSectionLinks(propOr([], 'links', filteredSections[0]))}
+      </Drawer>
+    </div>
   }
 }
 
