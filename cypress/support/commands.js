@@ -1,4 +1,6 @@
 const config = require('../../config')
+const name = config.simulator.username
+const password = config.simulator.password
 
 // ***********************************************
 // This example commands.js shows you how to
@@ -12,7 +14,7 @@ const config = require('../../config')
 //
 //
 // -- This is a parent command --
-// Cypress.Commands.add("login", (email, password) => { ... })
+// Cypress.Commands.add("login", () => { ... })
 //
 //
 // -- This is a child command --
@@ -28,9 +30,14 @@ const config = require('../../config')
 
 // Allow the session to be stubbed out.
 // The hard-coded token id is explicitly whitelisted in the simulator.
+// We put the session variable outside of the command to allow it to be saved for
+// subsequent requests and improve performance
+let session
 Cypress.Commands.add('login', () => {
-  const name = config.simulator.username
-  const password = config.simulator.password
+  if (session) {
+    window.localStorage.setItem('pf9', JSON.stringify(session))
+    return
+  }
   cy.request({
     method: 'POST',
     url: `${config.apiHost}/keystone/v3/auth/tokens?nocatalog`,
@@ -55,7 +62,7 @@ Cypress.Commands.add('login', () => {
           'X-Auth-Token': id, // required for OpenStack
         },
       }).then(({ body: { projects } }) => {
-        const session = {
+        session = {
           userTenants: projects,
           tokens: {
             currentToken: id,
