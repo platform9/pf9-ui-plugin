@@ -47,6 +47,7 @@ export const mngmGroupActions = createCRUDActions(mngmGroupsCacheKey, {
       }
     })
   },
+  entityName: 'Group',
 })
 export const mngmGroupMappingsCacheKey = 'managementGroupMappings'
 export const mngmGroupMappingActions = createCRUDActions(mngmGroupMappingsCacheKey, {

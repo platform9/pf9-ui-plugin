@@ -117,6 +117,7 @@ export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
     )(allTenantsAllUsers)
   },
   requiredRoles: 'admin',
+  entityName: 'Tenant',
 })
 
 export const mngmTenantRoleAssignmentsCacheKey = 'managementTenantRoleAssignments'

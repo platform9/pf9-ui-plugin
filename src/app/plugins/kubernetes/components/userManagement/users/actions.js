@@ -172,6 +172,7 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
       filterUsers,
     )(validTenants)
   },
+  entityName: 'User',
 })
 
 export const mngmUserRoleAssignmentsCacheKey = 'managementUserRoleAssignments'
