@@ -1,10 +1,10 @@
 import ApiClient from 'api-client/ApiClient'
-import { keys, pluck, pipe, prop, find, propEq, filter, always, isNil, reject } from 'ramda'
+import { keys, pluck, pipe, prop, find, propEq, filter, always, isNil, reject, map } from 'ramda'
 import { namespacesCacheKey } from 'k8s/components/namespaces/actions'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { filterIf, pathStr, emptyArr } from 'utils/fp'
 import createContextLoader from 'core/helpers/createContextLoader'
-import { pipeAsync, mapAsync, tryCatchAsync } from 'utils/async'
+import { tryCatchAsync } from 'utils/async'
 import { mngmUsersCacheKey } from 'k8s/components/userManagement/users/actions'
 
 const { keystone } = ApiClient.getInstance()
@@ -100,15 +100,15 @@ export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
     }
   },
   dataMapper: async (allTenantsAllUsers, params, loadFromContext) => {
-    const namespaces = await loadFromContext(namespacesCacheKey, {}, true)
+    const namespaces = await loadFromContext(namespacesCacheKey)
     const heatTenantId = pipe(
       find(propEq('name', 'heat')),
       prop('id'),
     )(allTenantsAllUsers)
-    return pipeAsync(
+    return pipe(
       filterIf(!params.includeBlacklisted, filterValidTenants),
       filter(tenant => tenant.domain_id !== heatTenantId),
-      mapAsync(async tenant => ({
+      map(tenant => ({
         ...tenant,
         users: tenant.users.filter(user => user.username !== 'admin@platform9.net'),
         clusters: pluck('clusterName', namespaces
@@ -116,6 +116,7 @@ export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
       })),
     )(allTenantsAllUsers)
   },
+  refetchCascade: true,
   requiredRoles: 'admin',
   entityName: 'Tenant',
 })
