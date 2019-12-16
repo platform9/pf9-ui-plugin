@@ -1,7 +1,7 @@
 import ApiClient from 'api-client/ApiClient'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import {
-  mngmTenantsCacheKey, filterValidTenants,
+  mngmTenantsCacheKey, filterValidTenants, mngmTenantActions,
 } from 'k8s/components/userManagement/tenants/actions'
 import {
   partition, pluck, map, head, innerJoin, uniq, prop, pipe, find, propEq, when, isNil, always,
@@ -35,6 +35,7 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
     await keystone.deleteUser(id)
   },
   createFn: async ({ username, displayname, password, roleAssignments }) => {
+    const defaultTenantId = pipe(keys, head)(roleAssignments)
     const createdUser = password
       ? await keystone.createUser({
         email: username,
@@ -42,12 +43,12 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
         username,
         displayname,
         password: password || undefined,
-        default_project_id: head(keys(roleAssignments)),
+        default_project_id: defaultTenantId,
       })
       : await clemency.createUser({
         username,
         displayname,
-        tenants: keys(roleAssignments),
+        tenants: defaultTenantId,
       })
     if (createdUser.role === '_member_') {
       return createdUser
@@ -61,6 +62,8 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
         console.warn(err.message)
         return emptyArr
       })(null)
+    // We must invalidate the tenants cache so that they will contain the newly created user
+    mngmTenantActions.invalidateCache()
     return createdUser
   },
   updateFn: async (
@@ -116,8 +119,8 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
   },
   dataMapper: async (users, { systemUsers }, loadFromContext) => {
     const [credentials, allTenants] = await Promise.all([
-      loadFromContext(mngmCredentialsCacheKey, {}, true),
-      loadFromContext(mngmTenantsCacheKey, { includeBlacklisted: true }, true),
+      loadFromContext(mngmCredentialsCacheKey, {}),
+      loadFromContext(mngmTenantsCacheKey, { includeBlacklisted: true }),
     ])
     const [validTenants, blacklistedTenants] = partition(filterValidTenants, allTenants)
     const blacklistedTenantIds = pluck('id', blacklistedTenants)
@@ -171,6 +174,8 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
       filterUsers,
     )(validTenants)
   },
+  refetchCascade: true,
+  entityName: 'User',
 })
 
 export const mngmUserRoleAssignmentsCacheKey = 'managementUserRoleAssignments'

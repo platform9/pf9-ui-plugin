@@ -48,6 +48,8 @@ export const podActions = createCRUDActions(podsCacheKey, {
         return {
           ...pod,
           dashboardUrl,
+          id: pathStr('metadata.uid', pod),
+          name: pathStr('metadata.name', pod),
           namespace: pathStr('metadata.namespace', pod),
           labels: pathStr('metadata.labels', pod),
           clusterName: pipe(find(propEq('uuid', clusterId)), prop('name'))(clusters),

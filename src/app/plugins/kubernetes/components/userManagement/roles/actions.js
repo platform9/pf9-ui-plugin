@@ -21,6 +21,7 @@ export const mngmRoleActions = createCRUDActions(mngmRolesCacheKey, {
     })),
   )(roles),
   defaultOrderBy: 'name',
+  entityName: 'Role',
 })
 
 // Generally not a fan of this, but we dont have a lot of options.

@@ -5,7 +5,6 @@ import RegionChooser from 'openstack/components/regions/RegionChooser'
 import UserMenu from 'core/components/UserMenu'
 import MaterialToolbar from '@material-ui/core/Toolbar/Toolbar'
 import { AppBar } from '@material-ui/core'
-import { imageUrls } from 'app/constants'
 import { makeStyles } from '@material-ui/styles'
 import NotificationsPopover from 'core/components/notificationsPopover/NotificationsPopover'
 import HelpContainer from 'core/components/HelpContainer'
@@ -22,10 +21,6 @@ const useStyles = makeStyles(theme => ({
   },
   hide: {
     display: 'none',
-  },
-  logo: {
-    marginLeft: 45,
-    height: '100%',
   },
   rightTools: {
     position: 'absolute',
@@ -44,7 +39,6 @@ const Toolbar = ({ open }) => {
   const classes = useStyles()
   return <AppBar className={classes.appBar}>
     <MaterialToolbar variant="dense" disableGutters={!open}>
-      <img src={imageUrls.logo} className={classes.logo} />
       <div className={classes.rightTools}>
         <HelpContainer />
         <RegionChooser className={classes.leftMargin} />

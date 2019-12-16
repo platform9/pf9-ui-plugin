@@ -57,7 +57,7 @@ const DisabledAddCloudProviderForm = () => {
   const classes = useStyles()
 
   return <div className={classes.root}>
-    <Typography variant="subtitle1">Cloud Provider Type (Comming Soon)</Typography>
+    <Typography variant="subtitle1">Cloud Provider Type (Coming Soon)</Typography>
     <div className={classes.cloudProviderCards}>
       <CloudProviderCard disabled type="aws" />
       <CloudProviderCard disabled type="azure" />

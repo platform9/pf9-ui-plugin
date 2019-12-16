@@ -55,7 +55,7 @@ const listRoutes = {
 
 const yamlTemplates = {
   pod: `apiVersion: v1
-kind: pod
+kind: Pod
 metadata:
   name: redis-django
   labels:
