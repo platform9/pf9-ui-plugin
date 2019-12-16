@@ -51,7 +51,7 @@ class ResMgr extends ApiService {
     return response.data
   }
 
-  async pushRole (hostId, role, body) {
+  async addRole (hostId, role, body) {
     return this.client.basicPut(`${await this.endpoint()}/hosts/${hostId}/roles/${role}`, body)
   }
 

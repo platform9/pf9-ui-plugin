@@ -80,7 +80,7 @@ export const updateRemoteSupport = createContextUpdater(combinedHostsCacheKey, a
   // Temporary solution using the pre-existing host object
   // Future solution will require consumption of pf9-notifications for reactive updates
   if (enableSupport) {
-    await resmgr.pushRole(id, supportRoleName)
+    await resmgr.addRole(id, supportRoleName)
     return {
       ...host,
       roles: [...host.roles, supportRoleName],
