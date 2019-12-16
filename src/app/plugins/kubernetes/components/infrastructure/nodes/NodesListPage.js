@@ -18,6 +18,8 @@ import DeAuthIcon from '@material-ui/icons/DeleteForever'
 import NodeDeAuthDialog from './NodeDeAuthDialog'
 import SettingsPhoneIcon from '@material-ui/icons/SettingsPhone'
 import RemoteSupportDialog from './RemoteSupportDialog'
+import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
+import { Tooltip } from '@material-ui/core'
 
 const isMaster = pipe(castFuzzyBool, castBoolToStr())
 
@@ -65,6 +67,14 @@ const renderConverging = () =>
     </ClusterStatusSpan>
   </ClusterSync>
 
+const renderRemoteSupport = () =>
+  <div>
+    (Advanced Remote Support Enabled)&nbsp;
+    <Tooltip title={'Advanced Remote Support is currently enabled on this node. To disable it, select the \'Configure Host\' action from the actions bar.'}>
+      <FontAwesomeIcon>question-circle</FontAwesomeIcon>
+    </Tooltip>
+  </div>
+
 const renderConnectionStatus = (_, { status, combined }) => {
   if (status === 'converging') {
     return renderConverging()
@@ -75,11 +85,14 @@ const renderConnectionStatus = (_, { status, combined }) => {
 
   const fields = connectionStatusFieldsTable[connectionStatus]
   return (
-    <ClusterStatusSpan status={fields.clusterStatus}>
-      {fields.label}
-      <br />
-      {showLastResponse && `since ${combined.lastResponse}`}
-    </ClusterStatusSpan>
+    <div>
+      <ClusterStatusSpan status={fields.clusterStatus}>
+        {fields.label}
+        <br />
+        {showLastResponse && `since ${combined.lastResponse}`}
+      </ClusterStatusSpan>
+      {combined.supportRole && renderRemoteSupport()}
+    </div>
   )
 }
 
