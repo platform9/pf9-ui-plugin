@@ -3,12 +3,14 @@ import PropTypes from 'prop-types'
 import DisplayError from './components/DisplayError'
 import Progress from './components/progress/Progress'
 import { mapObjIndexed, equals } from 'ramda'
-import { withAppContext } from 'core/providers/AppProvider'
 import { propsAsync } from 'utils/async'
+import { cacheStoreKey } from 'core/caching/cacheReducers'
+import { connect } from 'react-redux'
 
 /**
  * @deprecated Use useDataLoader hook instead
  */
+@connect(store => ({ cache: store[cacheStoreKey] }))
 class DataLoader extends PureComponent {
   state = {
     loading: false,
@@ -29,10 +31,10 @@ class DataLoader extends PureComponent {
 
   loadAll = async refetch => {
     this.setState({ loading: true }, async () => {
-      const { loaders, getContext, setContext } = this.props
+      const { loaders, params } = this.props
       try {
         await propsAsync(mapObjIndexed(loaderFn =>
-          loaderFn({ getContext, setContext, refetch }), loaders,
+          loaderFn(params, refetch), loaders,
         ))
         this.setState({ loading: false, error: null })
       } catch (err) {
@@ -77,4 +79,4 @@ DataLoader.defaultProps = {
   },
 }
 
-export default withAppContext(DataLoader)
+export default DataLoader

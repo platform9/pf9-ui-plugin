@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useState } from 'react'
 import DownloadKubeConfigLink from './DownloadKubeConfigLink'
 // import KubeCLI from './KubeCLI' // commented out till we support cli links
 import ExternalLink from 'core/components/ExternalLink'
@@ -15,22 +15,18 @@ import ClusterStatusSpan from 'k8s/components/infrastructure/clusters/ClusterSta
 import ResourceUsageTable from 'k8s/components/infrastructure/common/ResourceUsageTable'
 import DashboardLink from './DashboardLink'
 import CreateButton from 'core/components/buttons/CreateButton'
-import { AppContext } from 'core/providers/AppProvider'
-import { both, prop } from 'ramda'
+import { both, path, prop } from 'ramda'
 import PrometheusAddonDialog from 'k8s/components/prometheus/PrometheusAddonDialog'
 import ClusterUpgradeDialog from 'k8s/components/infrastructure/clusters/ClusterUpgradeDialog'
 import ClusterSync from './ClusterSync'
 import { Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import {
-  getConnectionStatus,
-  connectionStatusFieldsTable,
-  hasConvergingNodes,
-  getHealthStatusAndMessage,
-  clusterHealthStatusFields,
-  isTransientState,
-  isSteadyState,
+  getConnectionStatus, connectionStatusFieldsTable, hasConvergingNodes, getHealthStatusAndMessage,
+  clusterHealthStatusFields, isTransientState, isSteadyState,
 } from './ClusterStatusUtils'
+import { sessionStoreKey } from 'core/session/sessionReducers'
+import { useSelector } from 'react-redux'
 
 const useStyles = makeStyles(theme => ({
   link: {
@@ -210,15 +206,16 @@ const canScaleWorkers = ([cluster]) => cluster.taskStatus === 'success' && clust
 const canUpgradeCluster = (selected) => false
 const canDeleteCluster = ([row]) => !(['creating', 'deleting'].includes(row.taskStatus))
 
-const isAdmin = (selected, getContext) => {
-  const { role } = getContext(prop('userDetails'))
+const isAdmin = (selected, store) => {
+  const { role } = path([sessionStoreKey, 'userDetails'], store)
   return role === 'admin'
 }
 
 export const options = {
   addUrl: '/ui/kubernetes/infrastructure/clusters/add',
   addButton: ({ onClick }) => {
-    const { userDetails: { role } } = useContext(AppContext)
+    const session = useSelector(prop(sessionStoreKey))
+    const { userDetails: { role } } = session
     if (role !== 'admin') {
       return null
     }

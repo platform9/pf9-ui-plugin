@@ -1,8 +1,5 @@
 import React from 'react'
-import ApiClient from 'api-client/ApiClient'
 import PropTypes from 'prop-types'
-import { compose } from 'app/utils/fp'
-import { withAppContext } from 'core/providers/AppProvider'
 import CRUDListContainer from 'core/components/CRUDListContainer'
 import createListTableComponent from 'core/helpers/createListTableComponent'
 
@@ -27,13 +24,14 @@ export const ImageList = createListTableComponent({
   columns,
 })
 
+// TODO Create redux store key for images since AppProvider is gone
 class ImageListContainer extends React.PureComponent {
   handleRemove = async id => {
-    const { images, setContext } = this.props
-    const { glance } = ApiClient.getInstance()
-    await glance.deleteImage(id)
-    const newImages = images.filter(x => x.id !== id)
-    setContext({ images: newImages })
+    // const { images, setContext } = this.props
+    // const { glance } = ApiClient.getInstance()
+    // await glance.deleteImage(id)
+    // const newImages = images.filter(x => x.id !== id)
+    // setContext({ images: newImages })
   }
 
   render () {
@@ -54,6 +52,4 @@ ImageListContainer.propTypes = {
   images: PropTypes.arrayOf(PropTypes.object)
 }
 
-export default compose(
-  withAppContext,
-)(ImageListContainer)
+export default ImageListContainer

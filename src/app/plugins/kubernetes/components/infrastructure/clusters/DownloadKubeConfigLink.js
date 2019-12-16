@@ -1,7 +1,5 @@
 import React from 'react'
-import { compose } from 'ramda'
 import ApiClient from 'api-client/ApiClient'
-import { withAppContext } from 'core/providers/AppProvider'
 import SimpleLink from 'core/components/SimpleLink'
 
 class DownloadKubeConfigLink extends React.PureComponent {
@@ -32,6 +30,4 @@ class DownloadKubeConfigLink extends React.PureComponent {
   }
 }
 
-export default compose(
-  withAppContext,
-)(DownloadKubeConfigLink)
+export default DownloadKubeConfigLink

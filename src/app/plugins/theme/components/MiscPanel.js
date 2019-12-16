@@ -1,15 +1,18 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import Panel from './Panel'
-import { lensPath, set } from 'ramda'
+import { prop, lensPath, set } from 'ramda'
 import { TextField } from '@material-ui/core'
-import { AppContext } from 'core/providers/AppProvider'
+import { useSelector, useDispatch } from 'react-redux'
+import { themeActions } from 'core/themes/themeReducers'
 
 const MiscPanel = () => {
-  const { theme, setContext } = useContext(AppContext)
+  const theme = useSelector(prop('theme'))
+  const dispatch = useDispatch()
+
   const handleChange = path => e => {
     const lens = lensPath(path.split('.'))
     const { value } = e.target
-    setContext({ theme: set(lens, value, theme) })
+    dispatch(themeActions.setTheme(set(lens, value, theme)))
   }
 
   return (

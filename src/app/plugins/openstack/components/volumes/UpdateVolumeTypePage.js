@@ -1,15 +1,14 @@
 import React from 'react'
-import { compose } from 'app/utils/fp'
 import FormWrapper from 'core/components/FormWrapper'
 import DataUpdater from 'core/DataUpdater'
-import requiresAuthentication from '../../util/requiresAuthentication'
-import { loadVolumeTypes, updateVolumeType } from './actions'
+import { volumeTypeActions } from './actions'
 import UpdateVolumeTypeForm from './UpdateVolumeTypeForm'
+import { withRouter } from 'react-router'
 
 const UpdateVolumeTypePage = props => (
   <DataUpdater
-    loaderFn={loadVolumeTypes}
-    updateFn={updateVolumeType}
+    loaderFn={volumeTypeActions.list}
+    updateFn={volumeTypeActions.update}
     objId={props.match.params.volumeTypeId}
     backUrl="/ui/openstack/storage#volumeTypes"
   >
@@ -21,6 +20,4 @@ const UpdateVolumeTypePage = props => (
   </DataUpdater>
 )
 
-export default compose(
-  requiresAuthentication,
-)(UpdateVolumeTypePage)
+export default withRouter(UpdateVolumeTypePage)

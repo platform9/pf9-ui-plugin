@@ -12,7 +12,7 @@ import DataLoader from 'core/DataLoader'
 import React from 'react'
 import { loadImages } from '../images/actions'
 import ImageChooser from '../images/ImageChooser.js'
-import { loadVolumes, loadVolumeSnapshots, loadVolumeTypes } from './actions'
+import { volumeActions, volumeTypeActions, volumeSnapshotActions } from './actions'
 import VolumeChooser from './VolumeChooser'
 import VolumeSnapshotChooser from './VolumeSnapshotChooser'
 
@@ -66,7 +66,7 @@ class AddVolumeForm extends React.PureComponent {
                 <Picklist name="sourceType" label="Volume Source" value={sourceType} onChange={this.setField('sourceType')} options={sourceTypes} />
                 {sourceType === 'Snapshot' &&
                   <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
-                    <DataLoader loaders={{ volumeSnapshots: loadVolumeSnapshots }}>
+                    <DataLoader loaders={{ volumeSnapshots: volumeSnapshotActions.list }}>
                       {({ data }) =>
                         <VolumeSnapshotChooser data={data.volumeSnapshots} onChange={value => setWizardContext({ snapshot_id: value })} initialValue={wizardContext.snapshot_id} />
                       }
@@ -75,7 +75,7 @@ class AddVolumeForm extends React.PureComponent {
                 }
                 {sourceType === 'Another Volume' &&
                   <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
-                    <DataLoader loaders={{ volumes: loadVolumes }}>
+                    <DataLoader loaders={{ volumes: volumeActions.list }}>
                       {({ data }) =>
                         <VolumeChooser data={data.volumes} onChange={value => setWizardContext({ volume_id: value })} initialValue={wizardContext.volume_id} />
                       }
@@ -94,7 +94,7 @@ class AddVolumeForm extends React.PureComponent {
               </WizardStep>
 
               <WizardStep stepId="basic" label="Basic">
-                <DataLoader loaders={{ volumeTypes: loadVolumeTypes }}>
+                <DataLoader loaders={{ volumeTypes: volumeTypeActions.list }}>
                   {({ data }) =>
                     <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
                       <TextField id="name" label="Volume Name" onChange={this.setField('name')} />

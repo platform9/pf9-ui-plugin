@@ -1,7 +1,7 @@
 import React from 'react'
 
 import DeveloperIndexPage from './components/DeveloperIndexPage'
-import ContextViewer from './components/ContextViewer'
+import StoreViewer from './components/StoreViewer'
 
 class Developer extends React.PureComponent {
   render () {
@@ -24,9 +24,9 @@ Developer.registerPlugin = pluginManager => {
         component: DeveloperIndexPage
       },
       {
-        name: 'ContextViewer',
+        name: 'StoreViewer',
         link: { path: '/context', exact: true },
-        component: ContextViewer
+        component: StoreViewer
       },
     ]
   )

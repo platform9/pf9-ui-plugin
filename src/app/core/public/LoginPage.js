@@ -6,7 +6,6 @@ import {
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import { compose } from 'utils/fp'
-import { withAppContext } from 'core/providers/AppProvider'
 import Alert from 'core/components/Alert'
 import { withRouter } from 'react-router'
 import SimpleLink from 'core/components/SimpleLink'
@@ -211,7 +210,6 @@ LoginPage.propTypes = {
 }
 
 export default compose(
-  withAppContext,
   withRouter,
   withStyles(styles),
 )(LoginPage)

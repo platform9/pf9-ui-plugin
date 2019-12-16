@@ -1,11 +1,13 @@
 import React from 'react'
+import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { arrToObjByKey, compose } from 'app/utils/fp'
-import { withAppContext } from 'core/providers/AppProvider'
+import { arrToObjByKey } from 'app/utils/fp'
 import Picklist from 'core/components/Picklist'
 import { loadServiceCatalog } from 'openstack/components/api-access/actions'
 import { prop } from 'ramda'
+import { cacheStoreKey } from 'core/caching/cacheReducers'
 
+@connect(store => ({ cache: store[cacheStoreKey] }))
 class ServicePicker extends React.PureComponent {
   state = {
     services: [],
@@ -13,14 +15,13 @@ class ServicePicker extends React.PureComponent {
     isMounted: false,
   }
 
-  async componentDidMount () {
+  componentDidMount () {
     this.setState(
       // For some strange reason the component is being unmounted before
       // loadServiceCatalog completes.  Need this hack to work around it.
       { isMounted: true },
       async () => {
-        const { getContext, setContext } = this.props
-        const catalog = await loadServiceCatalog({ getContext, setContext })
+        const catalog = await loadServiceCatalog()
         const catalogMap = arrToObjByKey('name', catalog)
         if (this.state.isMounted) {
           this.setState({
@@ -80,6 +81,4 @@ ServicePicker.propTypes = {
   value: PropTypes.string.isRequired,
 }
 
-export default compose(
-  withAppContext,
-)(ServicePicker)
+export default ServicePicker

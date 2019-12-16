@@ -1,64 +1,59 @@
 import React, { useContext, useCallback, PureComponent, useMemo } from 'react'
+import { connect } from 'react-redux'
 import moize from 'moize'
-import { equals, curry, pathOr, propOr, zipObj } from 'ramda'
-import { withAppContext, AppContext } from 'core/providers/AppProvider'
+import { curry, zipObj, mergeLeft } from 'ramda'
 import { getStorage, setStorage } from '../utils/pf9Storage'
 import { emptyObj } from 'utils/fp'
+import { sessionStoreKey, sessionActions } from 'core/session/sessionReducers'
+import { bindActionCreators } from 'redux'
 
 const userPreferencesKey = username => `user-preferences-${username}`
 const setUserPrefs = (username, prefs) => setStorage(userPreferencesKey(username), prefs)
-const getStorageUserPrefs = username => getStorage(userPreferencesKey(username)) || {}
+const getStorageUserPrefs = username => getStorage(userPreferencesKey(username)) || emptyObj
 
 export const PreferencesContext = React.createContext({})
 export const { Consumer: PreferencesConsumer } = PreferencesContext
 export const { Provider: PreferencesProvider } = PreferencesContext
 
+@connect(
+  store => ({ session: store[sessionStoreKey] }),
+  dispatch => ({ actions: bindActionCreators(sessionActions, dispatch) }),
+)
 class PreferencesComponent extends PureComponent {
   state = {
-    initUserPreferences: async username => {
-      const userPrefs = getStorageUserPrefs(username)
-      await this.props.updateSession('userPreferences', userPrefs)
-      this.state.getScopedUserPreferences.clear()
-      return userPrefs
-    },
+    username: null,
+    userPreferences: {},
 
-    getUserPreferences: () => {
-      const { session } = this.props
-      // Try to get preferences from session, otherwise get it from localStorage
-      return propOr(
-        getStorageUserPrefs(session.username),
-        'userPreferences',
-        session)
-    },
-
-    // Utility function that sets both session.userPreferences[key] and
+    // Utility function that sets both state.userPreferences[key] and
     // also sets it in localStorage
-    updateScopedUserPreferences: curry(async (scopeKey, values) => {
-      const { getScopedUserPreferences } = this.state
-      const prevValue = getScopedUserPreferences(scopeKey)
-      const newValue = { ...prevValue, ...values }
-
-      // Update memoized values
-      getScopedUserPreferences.update([scopeKey], newValue)
-
-      // Update app context
-      await this.props.updateSession(['userPreferences', scopeKey], newValue)
+    updateScopedPreferences: curry(async (scopeKey, values) => {
+      const { userPreferences } = this.state
+      const currentPrefs = userPreferences[scopeKey]
+      const newPrefs = { ...currentPrefs, ...values }
 
       // Update local storage
       const { username } = this.props.session
       const prefs = getStorageUserPrefs(username)
-      prefs[scopeKey] = newValue
-      setUserPrefs(username, prefs)
+      setUserPrefs(username, {
+        ...prefs,
+        [scopeKey]: newPrefs,
+      })
+      // Update state
+      this.setState(mergeLeft({
+        userPreferences: newPrefs,
+      }))
     }),
+  }
 
-    getScopedUserPreferences: moize(key => {
-      const { session } = this.props
-      // Try to get preferences from session, otherwise get it from localStorage
-      return pathOr(
-        getStorageUserPrefs(session.username)[key],
-        ['userPreferences', key],
-        session) || emptyObj
-    }, { equals }),
+  static getDerivedStateFromProps (nextProps, prevState) {
+    const { username } = nextProps.session
+    if (username && username !== prevState.username) {
+      return {
+        userPreferences: getStorageUserPrefs(username),
+        username,
+      }
+    }
+    return prevState
   }
 
   render () {
@@ -71,13 +66,8 @@ class PreferencesComponent extends PureComponent {
 }
 
 export const usePreferences = () => {
-  const { session } = useContext(AppContext)
-  const { getUserPreferences, initUserPreferences } = useContext(PreferencesContext)
-  const userPreferences = useMemo(getUserPreferences, [session.userPreferences])
-  return [
-    userPreferences,
-    initUserPreferences,
-  ]
+  const { userPreferences } = useContext(PreferencesContext)
+  return userPreferences
 }
 
 /**
@@ -87,9 +77,9 @@ export const usePreferences = () => {
  * @returns {{getPrefsUpdater: *, updatePrefs: *, prefs: *}}
  */
 export const useScopedPreferences = (storeKey, defaultPrefs = emptyObj) => {
-  const { updateScopedUserPreferences, getScopedUserPreferences } = useContext(PreferencesContext)
+  const { updateScopedPreferences, userPreferences } = useContext(PreferencesContext)
   const updatePreferences = useCallback(async values => {
-    return updateScopedUserPreferences(storeKey, values)
+    return updateScopedPreferences(storeKey, values)
   }, [storeKey])
   const getPrefsUpdater = useMemo(() => {
     return moize((...keys) =>
@@ -99,7 +89,7 @@ export const useScopedPreferences = (storeKey, defaultPrefs = emptyObj) => {
   }, [updatePreferences])
 
   return {
-    prefs: { ...defaultPrefs, ...getScopedUserPreferences(storeKey) },
+    prefs: { ...defaultPrefs, ...(userPreferences[storeKey] || emptyObj) },
     updatePrefs: updatePreferences,
     getPrefsUpdater,
   }
@@ -108,12 +98,8 @@ export const useScopedPreferences = (storeKey, defaultPrefs = emptyObj) => {
 export const withPreferences = Component => props =>
   <PreferencesConsumer>
     {
-      ({ initUserPreferences, getUserPreferences }) =>
-        <Component
-          {...props}
-          preferences={getUserPreferences()}
-          initUserPreferences={initUserPreferences}
-        />
+      ({ userPreferences }) =>
+        <Component {...props} preferences={userPreferences} />
     }
   </PreferencesConsumer>
 
@@ -121,14 +107,14 @@ export const withScopedPreferences = storeKey => Component => {
   return props =>
     <PreferencesConsumer>
       {
-        ({ updateScopedUserPreferences, getScopedUserPreferences }) =>
+        ({ updateScopedPreferences, userPreferences }) =>
           <Component
             {...props}
-            preferences={getScopedUserPreferences(storeKey)}
-            updatePreferences={updateScopedUserPreferences(storeKey)}
+            preferences={userPreferences[storeKey] || emptyObj}
+            updatePreferences={updateScopedPreferences(storeKey)}
           />
       }
     </PreferencesConsumer>
 }
 
-export default withAppContext(PreferencesComponent)
+export default PreferencesComponent

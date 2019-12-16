@@ -1,15 +1,9 @@
-import {
-  useMemo,
-  useCallback,
-  useReducer,
-  useEffect,
-  useContext,
-  Reducer
-} from 'react'
+import { useMemo, useCallback, useReducer, useEffect, Reducer } from 'react'
 import moize from 'moize'
-import { isEmpty, pick, zipObj, Dictionary } from 'ramda'
+import { useSelector } from 'react-redux'
+import { prop, isEmpty, pick, zipObj, Dictionary } from 'ramda'
 import { useScopedPreferences } from 'core/providers/PreferencesProvider'
-import { AppContext } from 'core/providers/AppProvider'
+import { sessionStoreKey } from 'core/session/sessionReducers'
 
 type ValueOf<T> = T[keyof T];
 
@@ -73,7 +67,7 @@ const useParams = <T extends Dictionary<any>>(defaultParams?: T): UseParamsRetur
     })
   }, [])
 
-  const { currentTenant, currentRegion } = useContext(AppContext)
+  const { currentTenant, currentRegion } = useSelector(prop(sessionStoreKey))
   // Reset the params when the tenant or the region are changed
   useEffect(() => {
     dispatch({ type: 'replace', payload: defaultParams || {} })

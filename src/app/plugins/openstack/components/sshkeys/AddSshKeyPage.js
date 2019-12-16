@@ -1,30 +1,22 @@
-import React, { PureComponent } from 'react'
-import { withRouter } from 'react-router-dom'
-import { compose } from 'app/utils/fp'
-import { withAppContext } from 'core/providers/AppProvider'
+import React from 'react'
 import FormWrapper from 'core/components/FormWrapper'
-import requiresAuthentication from '../../util/requiresAuthentication'
 import sshKeyActions from './actions'
 import AddSshKeyForm from './AddSshKeyForm'
+import useDataUpdater from 'core/hooks/useDataUpdater'
+import useReactRouter from 'use-react-router'
 
-class AddSshKeyPage extends PureComponent {
-  handleAdd = async sshKey => {
-    const { setContext, getContext, history } = this.props
-    await sshKeyActions.create({ getContext, setContext, params: sshKey })
-    history.push('/ui/openstack/sshkeys')
-  }
-
-  render () {
-    return (
-      <FormWrapper title="Add SSH Key" backUrl="/ui/openstack/sshkeys">
-        <AddSshKeyForm onComplete={this.handleAdd} />
-      </FormWrapper>
-    )
-  }
+const AddSshKeyPage = () => {
+  const { history } = useReactRouter()
+  const [create, creating] = useDataUpdater(sshKeyActions.create, success => {
+    if (success) {
+      history.push('/ui/openstack/sshkeys')
+    }
+  })
+  return (
+    <FormWrapper loading={creating} title="Add SSH Key" backUrl="/ui/openstack/sshkeys">
+      <AddSshKeyForm onComplete={create} />
+    </FormWrapper>
+  )
 }
 
-export default compose(
-  withAppContext,
-  withRouter,
-  requiresAuthentication
-)(AddSshKeyPage)
+export default AddSshKeyPage

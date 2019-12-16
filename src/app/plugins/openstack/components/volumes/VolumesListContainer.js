@@ -1,15 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import ApiClient from 'api-client/ApiClient'
+import useReactRouter from 'use-react-router'
 import PhotoCameraIcon from '@material-ui/icons/PhotoCamera'
-import { compose } from 'app/utils/fp'
-import { withAppContext } from 'core/providers/AppProvider'
 import CRUDListContainer from 'core/components/CRUDListContainer'
 import createListTableComponent from 'core/helpers/createListTableComponent'
-import { withRouter } from 'react-router'
-import getVolumes from 'server/api/cinder/getVolumes'
-import { dataCacheKey } from 'core/helpers/createContextLoader'
-import { assocPath } from 'ramda'
+import useDataUpdater from 'core/hooks/useDataUpdater'
+import { volumeActions } from 'openstack/components/volumes/actions'
 
 const columns = [
   { id: 'name', label: 'Name' },
@@ -40,44 +36,34 @@ export const VolumesList = createListTableComponent({
   columns,
 })
 
-class VolumesListContainer extends React.PureComponent {
-  handleRemove = async id => {
-    const { getContext, setContext } = this.props
-    // TODO: use createContextUpdater
-    await ApiClient.getInstance().cinder.deleteVolume(id)
-    const newVolumes = (await getVolumes({ getContext, setContext }))
-      .filter(x => x.id !== id)
-    setContext(assocPath([dataCacheKey, 'volumes'], newVolumes))
+const VolumesListContainer = ({ volumes }) => {
+  const { history } = useReactRouter()
+  const [remove, removing] = useDataUpdater(volumeActions.delete)
+  const handleRemove = async id => {
+    remove({ id })
   }
-
-  handleSnapshot = async volume => {
-    this.props.history.push(`/ui/openstack/storage/volumes/snapshot/${volume.id}`)
+  const handleSnapshot = volume => {
+    history.push(`/ui/openstack/storage/volumes/snapshot/${volume.id}`)
   }
+  const rowActions = [
+    { icon: <PhotoCameraIcon />, label: 'Snapshot', action: handleSnapshot },
+  ]
 
-  render () {
-    const rowActions = [
-      { icon: <PhotoCameraIcon />, label: 'Snapshot', action: this.handleSnapshot },
-    ]
-
-    return (
-      <CRUDListContainer
-        items={this.props.volumes}
-        addUrl="/ui/openstack/storage/volumes/add"
-        editUrl="/ui/openstack/storage/volumes/edit"
-        onRemove={this.handleRemove}
-      >
-        {handlers =>
-          <VolumesList data={this.props.volumes} {...handlers} rowActions={rowActions} />}
-      </CRUDListContainer>
-    )
-  }
+  return (
+    <CRUDListContainer
+      items={volumes}
+      addUrl="/ui/openstack/storage/volumes/add"
+      editUrl="/ui/openstack/storage/volumes/edit"
+      onRemove={handleRemove}
+    >
+      {handlers =>
+        <VolumesList loading={removing} data={volumes} {...handlers} rowActions={rowActions} />}
+    </CRUDListContainer>
+  )
 }
 
 VolumesListContainer.propTypes = {
   volumes: PropTypes.arrayOf(PropTypes.object),
 }
 
-export default compose(
-  withAppContext,
-  withRouter,
-)(VolumesListContainer)
+export default VolumesListContainer

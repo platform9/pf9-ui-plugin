@@ -1,15 +1,16 @@
-import React, { useState, useCallback, useMemo, useContext, useEffect } from 'react'
+import React, { useState, useCallback, useMemo, useEffect } from 'react'
 import useReactRouter from 'use-react-router'
 import Selector from 'core/components/Selector'
-import { pluck, propEq, find, pipe, head, prop, assoc } from 'ramda'
+import { pluck, propEq, find, pipe, head, prop } from 'ramda'
 import { useScopedPreferences } from 'core/providers/PreferencesProvider'
 import { Tooltip } from '@material-ui/core'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { regionActions } from 'k8s/components/infrastructure/common/actions'
-import { AppContext } from 'core/providers/AppProvider'
-import { invalidateLoadersCache } from 'core/helpers/createContextLoader'
+import { sessionActions } from 'core/session/sessionReducers'
+import { cacheActions } from 'core/caching/cacheReducers'
 import ApiClient from 'api-client/ApiClient'
 import { appUrlRoot } from 'app/constants'
+import { useDispatch } from 'react-redux'
 
 const currentSectionRegex = new RegExp(`^${appUrlRoot}/[^/]+/?[^/]*`, 'i')
 
@@ -22,7 +23,7 @@ const RegionChooser = props => {
   const [loading, setLoading] = useState(false)
   const [regionSearch, setSearchText] = useState('')
   const [regions, loadingRegions] = useDataLoader(regionActions.list)
-  const { setContext } = useContext(AppContext)
+  const dispatch = useDispatch()
   const [selectedRegion, setRegion] = useState()
   const curRegionId = useMemo(() => {
     if (selectedRegion) {
@@ -40,11 +41,12 @@ const RegionChooser = props => {
     setRegion(region)
     setActiveRegion(region)
     await keystone.resetCookie()
-    invalidateLoadersCache()
 
-    // Changing the Region will cause all the current active `useDataLoader`
-    // hooks to reload its data
-    setContext(assoc('currentRegion', region))
+    dispatch(sessionActions.updateSession({
+      currentRegion: region,
+    }))
+    // Clearing the cache will cause all the current loaders to reload its data
+    dispatch(cacheActions.clearCache())
 
     // Redirect to the root of the current section (there's no need to reload all the app)
     history.push(currentSection)

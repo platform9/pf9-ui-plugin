@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
-import { withAppContext } from 'core/providers/AppProvider'
 import DataLoader from 'core/DataLoader'
 import { compose } from 'ramda'
 import { withRouter } from 'react-router'
@@ -18,8 +17,8 @@ class DataUpdater extends PureComponent {
   findById = (arr = [], id) => arr.find(x => x.id === id)
 
   handleSubmit = async params => {
-    const { updateFn, objId, backUrl, getContext, setContext, history } = this.props
-    await updateFn({ params: { id: objId, ...params }, getContext, setContext, objId })
+    const { updateFn, objId, backUrl, history } = this.props
+    await updateFn({ id: objId, ...params })
     if (backUrl) {
       history.push(backUrl)
     }
@@ -60,6 +59,5 @@ DataUpdater.propTypes = {
 }
 
 export default compose(
-  withAppContext,
   withRouter,
 )(DataUpdater)

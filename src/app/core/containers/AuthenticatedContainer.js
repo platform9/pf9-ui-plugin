@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react'
+import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { makeStyles } from '@material-ui/styles'
 import clsx from 'clsx'
@@ -9,15 +9,16 @@ import useToggler from 'core/hooks/useToggler'
 import { emptyObj, isNilOrEmpty, ensureArray } from 'utils/fp'
 import { Switch, Redirect, Route } from 'react-router'
 import moize from 'moize'
-import { toPairs, apply } from 'ramda'
+import { toPairs, apply, prop } from 'ramda'
 import { pathJoin } from 'utils/misc'
 import DeveloperToolsEmbed from 'developer/components/DeveloperToolsEmbed'
 import pluginManager from 'core/utils/pluginManager'
 import { logoutUrl, dashboardUrl, helpUrl } from 'app/constants'
 import LogoutPage from 'core/public/LogoutPage'
 import HelpPage from 'app/plugins/kubernetes/components/common/HelpPage'
-import { AppContext } from 'core/providers/AppProvider'
 import useReactRouter from 'use-react-router'
+import { sessionStoreKey } from 'core/session/sessionReducers'
+import { useSelector } from 'react-redux'
 
 const useStyles = makeStyles(theme => ({
   appFrame: {
@@ -131,7 +132,7 @@ const loadFeatures = async setFeatures => {
 const AuthenticatedContainer = () => {
   const [drawerOpen, toggleDrawer] = useToggler(true)
   const [features, setFeatures] = useState(emptyObj)
-  const { userDetails: { role } } = useContext(AppContext)
+  const { userDetails: { role } } = useSelector(prop(sessionStoreKey))
   const { history } = useReactRouter()
   const classes = useStyles({ path: history.location.pathname })
 

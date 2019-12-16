@@ -1,13 +1,11 @@
 /* eslint-disable camelcase */
 import React from 'react'
 import PropTypes from 'prop-types'
-import ApiClient from 'api-client/ApiClient'
-import { compose, keyValueArrToObj } from 'app/utils/fp'
-import { withAppContext } from 'core/providers/AppProvider'
+import { keyValueArrToObj } from 'app/utils/fp'
 import CRUDListContainer from 'core/components/CRUDListContainer'
 import createListTableComponent from 'core/helpers/createListTableComponent'
-import { dataCacheKey } from 'core/helpers/createContextLoader'
-import { assocPath } from 'ramda'
+import useDataUpdater from 'core/hooks/useDataUpdater'
+import { volumeTypeActions } from 'openstack/components/volumes/actions'
 
 // Promote `volume_backend_name` from `extra_specs` into its own field
 // This is a rather tedious pattern.  If we are doing it elsewhere we
@@ -34,35 +32,26 @@ export const VolumeTypesList = createListTableComponent({
   columns,
 })
 
-class VolumeTypesListContainer extends React.PureComponent {
-  handleRemove = async id => {
-    const { volumeTypes, setContext } = this.props
-    const { cinder } = ApiClient.getInstance()
-    // TODO: use createContextUpdater
-    await cinder.deleteVolumeType(id)
-    const newVolumeTypes = volumeTypes.filter(x => x.id !== id)
-    setContext(assocPath([dataCacheKey, 'volumeTypes'], newVolumeTypes))
+const VolumeTypesListContainer = ({ volumeTypes = [] }) => {
+  const [remove, removing] = useDataUpdater(volumeTypeActions.delete)
+  const handleRemove = async id => {
+    remove({ id })
   }
-
-  render () {
-    const volumeTypes = (this.props.volumeTypes || []).map(convertVolumeType)
-    return (
-      <CRUDListContainer
-        items={volumeTypes}
-        onRemove={this.handleRemove}
-        addUrl="/ui/openstack/storage/volumeTypes/add"
-        editUrl="/ui/openstack/storage/volumeTypes/edit"
-      >
-        {handlers => <VolumeTypesList data={volumeTypes} {...handlers} />}
-      </CRUDListContainer>
-    )
-  }
+  const convertedVolumeTypes = volumeTypes.map(convertVolumeType)
+  return (
+    <CRUDListContainer
+      items={convertedVolumeTypes}
+      onRemove={handleRemove}
+      addUrl="/ui/openstack/storage/volumeTypes/add"
+      editUrl="/ui/openstack/storage/volumeTypes/edit"
+    >
+      {handlers => <VolumeTypesList loading={removing} data={convertedVolumeTypes} {...handlers} />}
+    </CRUDListContainer>
+  )
 }
 
 VolumeTypesListContainer.propTypes = {
   volumeTypes: PropTypes.arrayOf(PropTypes.object)
 }
 
-export default compose(
-  withAppContext,
-)(VolumeTypesListContainer)
+export default VolumeTypesListContainer

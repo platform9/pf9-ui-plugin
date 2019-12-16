@@ -1,8 +1,9 @@
-import { useState, useCallback, useMemo, useContext, useEffect, useRef } from 'react'
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react'
 import { useToast } from 'core/providers/ToastProvider'
-import { AppContext } from 'core/providers/AppProvider'
 import { emptyObj } from 'utils/fp'
 import { isEmpty } from 'ramda'
+import { useDispatch } from 'react-redux'
+import { notificationActions } from 'core/notifications/notificationReducers'
 
 /**
  * Hook to update data using the specified updater function
@@ -13,27 +14,31 @@ import { isEmpty } from 'ramda'
 const useDataUpdater = (updaterFn, onComplete) => {
   // We use this ref to flag when the component has been unmounted so we prevent further state updates
   const unmounted = useRef(false)
+  const { cacheKey } = updaterFn
 
   // FIFO buffer of sequentialized data updating promises
   // The aim of this is to prevent issues in the case two or more subsequent data updating requests
   // are performed with different params, and the previous one didn't have time to finish
   const updaterPromisesBuffer = useRef([])
   const [loading, setLoading] = useState(false)
-  const { getContext, setContext, registerNotification } = useContext(AppContext)
+  const dispatch = useDispatch()
   const showToast = useToast()
-  const additionalOptions = useMemo(() => ({
-    onSuccess: (successMessage, params) => {
-      const key = updaterFn.getKey()
-      console.info(`Entity "${key}" updated successfully`)
-      showToast(successMessage, 'success')
-    },
-    onError: (errorMessage, catchedErr, params) => {
-      const key = updaterFn.getKey()
-      console.error(`Error when updating items for entity "${key}"`, catchedErr)
-      showToast(errorMessage + `\n${catchedErr.message || catchedErr}`, 'error')
-      registerNotification(errorMessage, catchedErr.message || catchedErr, 'error')
-    },
-  }), [])
+  const additionalOptions = useMemo(() => {
+    const dispatchRegisterNotif = (title, message, type) => {
+      dispatch(notificationActions.registerNotification({ title, message, type }))
+    }
+    return {
+      onSuccess: (successMessage, params) => {
+        console.info(`Entity "${cacheKey}" updated successfully`)
+        showToast(successMessage, 'success')
+      },
+      onError: (errorMessage, catchedErr, params) => {
+        console.error(`Error when updating items for entity "${cacheKey}"`, catchedErr)
+        showToast(errorMessage + `\n${catchedErr.message || catchedErr}`, 'error')
+        dispatchRegisterNotif(errorMessage, catchedErr.message || catchedErr, 'error')
+      },
+    }
+  }, [])
 
   // The following function will handle the calls to the data updating and
   // set the loading state variable to true in the meantime, while also taking care
@@ -47,7 +52,7 @@ const useDataUpdater = (updaterFn, onComplete) => {
     // Create a new promise that will wait for the previous promises in the buffer before running the new request
     const currentPromise = (async () => {
       await Promise.all(updaterPromisesBuffer.current) // Wait for previous promises to resolve
-      const result = await updaterFn({ getContext, setContext, params, additionalOptions })
+      const result = await updaterFn(params, additionalOptions)
       updaterPromisesBuffer.current.shift() // Delete the oldest promise in the sequence (FIFO)
       return result
     })()
@@ -62,7 +67,8 @@ const useDataUpdater = (updaterFn, onComplete) => {
         await onComplete(successful)
       }
     }
-  }, [updaterFn, onComplete, getContext, setContext])
+    return successful
+  }, [updaterFn, onComplete])
 
   useEffect(() => {
     return () => {

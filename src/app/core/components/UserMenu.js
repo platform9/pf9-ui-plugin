@@ -3,8 +3,9 @@ import PropTypes from 'prop-types'
 import { Menu, MenuItem, Typography } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import { withRouter } from 'react-router'
-import { withAppContext } from 'core/providers/AppProvider'
 import { logoutUrl, resetPasswordUrl } from 'app/constants'
+import { connect } from 'react-redux'
+import { sessionStoreKey } from 'core/session/sessionReducers'
 
 const styles = theme => ({
   avatar: {
@@ -23,6 +24,9 @@ const styles = theme => ({
 
 @withStyles(styles)
 @withRouter
+@connect(
+  store => ({ session: store[sessionStoreKey] }),
+)
 class UserMenu extends React.PureComponent {
   state = { anchorEl: null }
   handleClick = event => this.setState({ anchorEl: event.currentTarget })
@@ -58,4 +62,4 @@ UserMenu.propTypes = {
   classes: PropTypes.object,
 }
 
-export default withAppContext(UserMenu)
+export default UserMenu

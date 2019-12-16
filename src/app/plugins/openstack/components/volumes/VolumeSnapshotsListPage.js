@@ -1,15 +1,11 @@
 import React from 'react'
-import { compose } from 'app/utils/fp'
 import DataLoader from 'core/DataLoader'
-import requiresAuthentication from '../../util/requiresAuthentication'
-import { loadVolumeSnapshots } from './actions'
+import { volumeSnapshotActions } from './actions'
 import VolumeSnapshotsListContainer from './VolumeSnapshotsListContainer'
 
 const VolumeSnapshotsListPage = () =>
-  <DataLoader loaders={{ volumeSnapshots: loadVolumeSnapshots }}>
+  <DataLoader loaders={{ volumeSnapshots: volumeSnapshotActions.list }}>
     {({ data }) => <VolumeSnapshotsListContainer volumeSnapshots={data.volumeSnapshots} />}
   </DataLoader>
 
-export default compose(
-  requiresAuthentication,
-)(VolumeSnapshotsListPage)
+export default VolumeSnapshotsListPage

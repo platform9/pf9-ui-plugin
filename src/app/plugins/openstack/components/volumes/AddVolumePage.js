@@ -1,14 +1,10 @@
 import React from 'react'
-import ApiClient from 'api-client/ApiClient'
-import { withRouter } from 'react-router-dom'
-import { compose, keyValueArrToObj, range } from 'app/utils/fp'
-import { withAppContext } from 'core/providers/AppProvider'
+import { keyValueArrToObj, range } from 'app/utils/fp'
 import FormWrapper from 'core/components/FormWrapper'
-import { loadVolumes } from './actions'
 import AddVolumeForm from './AddVolumeForm'
-import { dataCacheKey } from 'core/helpers/createContextLoader'
-import { assocPath } from 'ramda'
-import { mapAsync } from 'utils/async'
+import useReactRouter from 'use-react-router'
+import useDataUpdater from 'core/hooks/useDataUpdater'
+import { volumeActions } from 'openstack/components/volumes/actions'
 
 const constructBatch = (numVolumes, prefix, data) =>
   range(1, numVolumes)
@@ -19,37 +15,22 @@ const constructBatch = (numVolumes, prefix, data) =>
       metadata: keyValueArrToObj(volume.metadata),
     }))
 
-const { cinder } = ApiClient.getInstance()
+const AddVolumePage = () => {
+  const { history } = useReactRouter()
+  const [create, creating] = useDataUpdater(volumeActions.create)
 
-class AddVolumePage extends React.PureComponent {
-  handleAdd = async volume => {
-    const { setContext, getContext, history } = this.props
-    try {
-      const { numVolumes, volumeNamePrefix, ...rest } = volume
-      const volumesToCreate = constructBatch(numVolumes, volumeNamePrefix, rest)
-      const existing = await loadVolumes({ setContext, getContext })
-      // TODO: use createContextUpdater
-      const createdVolumes = await mapAsync(
-        data => cinder.createVolume(data),
-        volumesToCreate,
-      )
-      setContext(assocPath([dataCacheKey, 'volumes'], [...existing, ...createdVolumes]))
-      history.push('/ui/openstack/storage#volumes')
-    } catch (err) {
-      console.error(err)
-    }
+  const handleAdd = async volume => {
+    const { numVolumes, volumeNamePrefix, ...rest } = volume
+    const volumesToCreate = constructBatch(numVolumes, volumeNamePrefix, rest)
+    await Promise.all(volumesToCreate.map(create))
+    history.push('/ui/openstack/storage#volumes')
   }
 
-  render () {
-    return (
-      <FormWrapper title="Add Volume" backUrl="/ui/openstack/storage#volumes">
-        <AddVolumeForm onComplete={this.handleAdd} />
-      </FormWrapper>
-    )
-  }
+  return (
+    <FormWrapper loading={creating} title="Add Volume" backUrl="/ui/openstack/storage#volumes">
+      <AddVolumeForm onComplete={handleAdd} />
+    </FormWrapper>
+  )
 }
 
-export default compose(
-  withAppContext,
-  withRouter,
-)(AddVolumePage)
+export default AddVolumePage

@@ -1,6 +1,5 @@
 import React from 'react'
 import { compose, propOr } from 'ramda'
-import { withAppContext } from 'core/providers/AppProvider'
 import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab'
 import {
   Button, Dialog, DialogActions, DialogContent, DialogTitle, Table, TableBody, TableRow, TableCell,
@@ -10,6 +9,8 @@ import withDataLoader from 'core/hocs/withDataLoader'
 import withDataMapper from 'core/hocs/withDataMapper'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
+import { connect } from 'react-redux'
+import { cacheStoreKey } from 'core/caching/cacheReducers'
 
 // The modal is technically inside the row, so clicking anything inside
 // the modal window will cause the table row to be toggled.
@@ -20,6 +21,7 @@ const stopPropagation = e => {
   e.stopPropagation()
 }
 
+@connect(store => ({ cache: store[cacheStoreKey] }))
 class ClusterDetachNodeDialog extends React.PureComponent {
   state = {}
 
@@ -28,13 +30,13 @@ class ClusterDetachNodeDialog extends React.PureComponent {
   }
 
   handleSubmit = async () => {
-    const { row, getContext, setContext } = this.props
+    const { row } = this.props
 
     const nodeUuids = Object.keys(this.state)
       .filter(uuid => this.state[uuid] === 'detach')
 
     const clusterUuid = row.uuid
-    await clusterActions.detachNodesFromCluster({ getContext, setContext, params: { clusterUuid, nodeUuids } })
+    await clusterActions.detachNodesFromCluster({ clusterUuid, nodeUuids })
     this.handleClose()
   }
 
@@ -108,7 +110,6 @@ class ClusterDetachNodeDialog extends React.PureComponent {
 }
 
 export default compose(
-  withAppContext,
   withDataLoader({ nodes: loadNodes }),
   withDataMapper({ nodes: propOr([], 'nodes') }),
 )(ClusterDetachNodeDialog)

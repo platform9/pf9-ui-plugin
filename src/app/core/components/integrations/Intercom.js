@@ -1,9 +1,12 @@
-import React, { useContext, useMemo } from 'react'
-import { AppContext } from 'core/providers/AppProvider'
+import React, { useMemo } from 'react'
 import BaseIntercom from 'react-intercom'
+import { useSelector } from 'react-redux'
+import { prop } from 'ramda'
+import { sessionStoreKey } from 'core/session/sessionReducers'
 
 const Intercom = () => {
-  const { session: { username } } = useContext(AppContext)
+  const session = useSelector(prop(sessionStoreKey))
+  const { username } = session
   const options = useMemo(() => ({
     appID: 'vk6p8zue',
     email: username,
@@ -14,7 +17,7 @@ const Intercom = () => {
     pf9_role: 'TODO', // We don't have this information yet in the session.
     widget: { activator: '#IntercomDefaultWidget' },
   }), [username])
-  return <BaseIntercom {...options} />
+  return username ? <BaseIntercom {...options} /> : null
 }
 
 export default Intercom

@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import ApiHelper from 'developer/components/ApiHelper'
-import ContextViewer from 'developer/components/ContextViewer'
+import StoreViewer from 'developer/components/StoreViewer'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import SimpleLink from 'core/components/SimpleLink'
 import { compose } from 'app/utils/fp'
@@ -71,7 +71,7 @@ class DeveloperToolsEmbed extends React.PureComponent {
         {/* {<Button onClick={this.collapse}>collapse devtools</Button>} */}
         <Typography className={classes.title} variant="subtitle1">Developer Tools</Typography>
         <Panel title="Context Viewer">
-          <ContextViewer />
+          <StoreViewer />
         </Panel>
         <Panel title="API helper">
           <ApiHelper />

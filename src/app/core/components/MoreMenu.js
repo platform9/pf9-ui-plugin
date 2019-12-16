@@ -4,8 +4,9 @@ import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
 import IconButton from '@material-ui/core/IconButton'
 import MoreVertIcon from '@material-ui/icons/MoreVert'
-import { withAppContext } from 'core/providers/AppProvider'
+import { connect } from 'react-redux'
 
+@connect(store => ({ store }))
 class MoreMenu extends React.PureComponent {
   state = {
     anchorEl: null,
@@ -35,7 +36,7 @@ class MoreMenu extends React.PureComponent {
 
   render () {
     const { anchorEl, openedAction } = this.state
-    const { data, getContext } = this.props
+    const { data, store } = this.props
 
     return (
       <div>
@@ -58,7 +59,7 @@ class MoreMenu extends React.PureComponent {
           onClick={e => e.stopPropagation()}
         >
           {this.props.items.map(({ action, cond, icon, label }) =>
-            <MenuItem key={label} onClick={this.handleClick(action, label)} disabled={cond && !cond(data, getContext())}>
+            <MenuItem key={label} onClick={this.handleClick(action, label)} disabled={cond && !cond(data, store)}>
               {icon && icon}
               {label}
             </MenuItem>
@@ -96,4 +97,4 @@ MoreMenu.propTypes = {
   onComplete: PropTypes.func,
 }
 
-export default withAppContext(MoreMenu)
+export default MoreMenu

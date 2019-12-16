@@ -1,6 +1,6 @@
 import { hot } from 'react-hot-loader'
 import React from 'react'
-import AppProvider from 'core/providers/AppProvider'
+import { Provider } from 'react-redux'
 import HotKeysProvider from 'core/providers/HotKeysProvider'
 import PreferencesProvider from 'core/providers/PreferencesProvider'
 import ToastProvider from 'core/providers/ToastProvider'
@@ -9,16 +9,15 @@ import ThemeManager from './ThemeManager'
 import { BrowserRouter as Router } from 'react-router-dom'
 import plugins from 'app/plugins'
 import pluginManager from 'core/utils/pluginManager'
+import store from './store'
 
 plugins.forEach(plugin => plugin.registerPlugin(pluginManager))
 
 const App = () => {
-  // TODO: AppProvider and PreferencesProvider are tighly related
-  // so they could probably be merged into a single component
   return (
     <Router>
-      <HotKeysProvider>
-        <AppProvider>
+      <Provider store={store}>
+        <HotKeysProvider>
           <PreferencesProvider>
             <ThemeManager>
               <ToastProvider>
@@ -26,8 +25,8 @@ const App = () => {
               </ToastProvider>
             </ThemeManager>
           </PreferencesProvider>
-        </AppProvider>
-      </HotKeysProvider>
+        </HotKeysProvider>
+      </Provider>
     </Router>
   )
 }

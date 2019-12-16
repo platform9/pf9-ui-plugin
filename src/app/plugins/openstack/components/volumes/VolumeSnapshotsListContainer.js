@@ -1,13 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import ApiClient from 'api-client/ApiClient'
-import { compose } from 'app/utils/fp'
-import { withAppContext } from 'core/providers/AppProvider'
 import CRUDListContainer from 'core/components/CRUDListContainer'
 import createListTableComponent from 'core/helpers/createListTableComponent'
-import { loadVolumeSnapshots } from 'openstack/components/volumes/actions'
-import { dataCacheKey } from 'core/helpers/createContextLoader'
-import { assocPath } from 'ramda'
+import { volumeSnapshotActions } from 'openstack/components/volumes/actions'
+import useDataUpdater from 'core/hooks/useDataUpdater'
 
 export const columns = [
   { id: 'id', label: 'OpenStack ID' },
@@ -27,34 +23,25 @@ export const VolumeSnapshotsList = createListTableComponent({
   columns,
 })
 
-class VolumeSnapshotsListContainer extends React.PureComponent {
-  handleRemove = async id => {
-    const { getContext, setContext } = this.props
-    // TODO: use createContextUpdater
-    await ApiClient.getInstance().cinder.deleteSnapshot(id)
-    const newVolumeSnapshots = (await loadVolumeSnapshots({ getContext, setContext }))
-      .filter(x => x.id !== id)
-    setContext(assocPath([dataCacheKey, 'volumeSnapshots'], newVolumeSnapshots))
+const VolumeSnapshotsListContainer = ({ volumeSnapshots }) => {
+  const [remove, removing] = useDataUpdater(volumeSnapshotActions.delete)
+  const handleRemove = async id => {
+    remove({ id })
   }
 
-  render () {
-    const { volumeSnapshots } = this.props
-    return (
-      <CRUDListContainer
-        items={volumeSnapshots}
-        editUrl="/ui/openstack/storage/volumeSnapshots/edit"
-        onRemove={this.handleRemove}
-      >
-        {handlers => <VolumeSnapshotsList data={volumeSnapshots} {...handlers} />}
-      </CRUDListContainer>
-    )
-  }
+  return (
+    <CRUDListContainer
+      items={volumeSnapshots}
+      editUrl="/ui/openstack/storage/volumeSnapshots/edit"
+      onRemove={handleRemove}
+    >
+      {handlers => <VolumeSnapshotsList loading={removing} data={volumeSnapshots} {...handlers} />}
+    </CRUDListContainer>
+  )
 }
 
 VolumeSnapshotsListContainer.propTypes = {
   volumeSnapshots: PropTypes.arrayOf(PropTypes.object),
 }
 
-export default compose(
-  withAppContext,
-)(VolumeSnapshotsListContainer)
+export default VolumeSnapshotsListContainer

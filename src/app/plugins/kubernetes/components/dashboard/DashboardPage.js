@@ -1,8 +1,7 @@
 // libs
-import React, { useContext } from 'react'
+import React from 'react'
 import { makeStyles } from '@material-ui/styles'
-import { pathEq } from 'ramda'
-import { AppContext } from 'core/providers/AppProvider'
+import { pathEq, prop } from 'ramda'
 // Constants
 import { allKey } from 'app/constants'
 // Actions
@@ -18,6 +17,8 @@ import {
 } from '@material-ui/icons'
 // Components
 import StatusCard from './StatusCard'
+import { useSelector } from 'react-redux'
+import { sessionStoreKey } from 'core/session/sessionReducers'
 
 const useStyles = makeStyles(theme => ({
   cardRow: {
@@ -174,7 +175,8 @@ const validateFieldHealthAndQuantity = ({ list, success, pending = [] }) => {
 }
 
 const reportsWithPerms = (reports) => {
-  const { userDetails: { role } } = useContext(AppContext)
+  const session = useSelector(prop(sessionStoreKey))
+  const { userDetails: { role } } = session
   return reports.filter((report) => {
     // No permissions property means no restrictions
     if (!report.permissions) { return true }

@@ -1,11 +1,12 @@
-import React, { useState, Fragment, useContext } from 'react'
+import React, { useState, Fragment } from 'react'
 import PropTypes from 'prop-types'
 import { Tooltip } from '@material-ui/core'
+import { useSelector } from 'react-redux'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { makeStyles } from '@material-ui/styles'
 import clsx from 'clsx'
+import { identity } from 'ramda'
 import { ensureFunction } from 'utils/fp'
-import { AppContext } from 'core/providers/AppProvider'
 import { withRouter } from 'react-router-dom'
 
 const useStyles = makeStyles(theme => ({
@@ -43,8 +44,8 @@ const useStyles = makeStyles(theme => ({
 const ListTableAction = withRouter(({ cond, action, label, disabledInfo, dialog, icon, selected, onRefresh, routeTo, history }) => {
   const { root, actionLabel, actionIcon, disabledAction } = useStyles()
   const [dialogOpened, setDialogOpened] = useState(false)
-  const { getContext } = useContext(AppContext)
-  const isActionEnabled = !cond || cond(selected, getContext)
+  const store = useSelector(identity)
+  const isActionEnabled = !cond || cond(selected, store)
   const info = isActionEnabled || !disabledInfo
     ? label
     : ensureFunction(disabledInfo)(selected)

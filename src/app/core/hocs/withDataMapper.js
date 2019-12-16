@@ -1,14 +1,15 @@
-import React, { useContext } from 'react'
-import { mapObjIndexed, pipe, prop } from 'ramda'
-import { AppContext } from 'core/providers/AppProvider'
-import { dataCacheKey } from 'core/helpers/createContextLoader'
+import React from 'react'
+import { mapObjIndexed, prop } from 'ramda'
+import { dataCacheKey, cacheStoreKey } from 'core/caching/cacheReducers'
+import { useSelector } from 'react-redux'
 
+/**
+ * @deprecated Use redux connect instead
+ */
 const withDataMapper = mappers => Component => props => {
-  const { getContext } = useContext(AppContext)
-  const mappedData = mapObjIndexed(mapper => {
-    const dataContextMapper = pipe(prop(dataCacheKey), mapper)
-    return getContext(dataContextMapper)
-  }, mappers)
+  const cache = useSelector(prop(cacheStoreKey))
+  const { [dataCacheKey]: dataCache } = cache
+  const mappedData = mapObjIndexed(mapper => mapper(dataCache), mappers)
   return <Component {...props} data={mappedData} />
 }
 

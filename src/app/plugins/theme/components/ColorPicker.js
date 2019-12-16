@@ -4,8 +4,10 @@ import { compose, lensPath, set, view } from 'ramda'
 import { SketchPicker } from 'react-color'
 import { ClickAwayListener } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
-import { withAppContext } from 'core/providers/AppProvider'
 import debounce from 'core/utils/debounce'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import { themeStoreKey, themeActions } from 'core/themes/themeReducers'
 
 const styles = theme => ({
   paletteSection: {
@@ -41,6 +43,10 @@ const styles = theme => ({
   },
 })
 
+@connect(
+  store => ({ theme: store[themeStoreKey] }),
+  dispatch => ({ actions: bindActionCreators(themeActions, dispatch) })
+)
 class ColorPicker extends React.PureComponent {
   state = { open: false }
   handleClick = () => this.setState({ open: !this.state.open })
@@ -51,9 +57,7 @@ class ColorPicker extends React.PureComponent {
   getColor = () => view(this.lens(), this.props.theme)
 
   handleChange = debounce(color => {
-    this.props.setContext({
-      theme: set(this.lens(), color.hex, this.props.theme)
-    })
+    this.props.actions.setTheme(set(this.lens(), color.hex, this.props.theme))
   })
 
   render () {
@@ -97,6 +101,5 @@ ColorPicker.propTypes = {
 }
 
 export default compose(
-  withAppContext,
   withStyles(styles),
 )(ColorPicker)
