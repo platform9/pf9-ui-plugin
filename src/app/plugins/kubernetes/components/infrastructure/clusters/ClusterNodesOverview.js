@@ -44,6 +44,12 @@ const useStyles = makeStyles(theme => ({
   },
 }))
 
+const clusterConnectionMessages = {
+  connected: 'All nodes in the cluster are conected',
+  disconnected: 'All nodes in the cluster are disconected',
+  partially_connected: 'Some nodes in the cluster are not connected',
+}
+
 const masterNodesHealthMessages = {
   healthy: 'All masters are healthy',
   partially_healthy: 'Quorum number of masters are healthy',
@@ -69,6 +75,7 @@ const ClusterNodesOverview = ({ cluster }) => {
   const connectionFields = connectionStatusFieldsTable[cluster.connectionStatus]
   const masterNodesFields = clusterHealthStatusFields[cluster.masterNodesHealthStatus]
   const workerNodesFields = clusterHealthStatusFields[cluster.workerNodesHealthStatus]
+  const clusterConnectionMessage = clusterConnectionMessages[cluster.connectionStatus]
   const masterNodesMessage = masterNodesHealthMessages[cluster.masterNodesHealthStatus]
   const workerNodesMessage = workerNodesHealthMessages[cluster.workerNodesHealthStatus]
 
@@ -80,7 +87,7 @@ const ClusterNodesOverview = ({ cluster }) => {
           title='Cluster Connection Status:'
           status={connectionFields.clusterStatus}
           statusLabel={connectionFields.label}
-          message={connectionFields.message}
+          message={clusterConnectionMessage}
         />
         <Status
           classes={classes}
