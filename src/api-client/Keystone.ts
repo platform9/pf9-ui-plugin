@@ -255,7 +255,7 @@ class Keystone extends ApiService {
       return { unscopedToken, expiresAt, issuedAt }
     } catch (err) {
       // authentication failed
-      return null
+      return {}
     }
   }
 

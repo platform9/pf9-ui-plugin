@@ -175,6 +175,7 @@ const theme = {
     background: {
       paper: '#FFF',
       default: '#FFF',
+      dashboard: '#edeff1'
     },
     action: {
       active: 'rgba(0, 0, 0, 0.54)',
@@ -192,6 +193,14 @@ const theme = {
       text: '#646464',
       activeText: '#1c1c1c',
       hoverText: '#1c1c1c',
+    },
+    dashboardCard: {
+      background: '#FFF',
+      primary: '#4aa3df',
+      text: '#606060',
+      icon: '#b7b7b7',
+      button: '#FFF',
+      divider: '#dddddd',
     },
     card: {
       background: 'rgba(2, 194, 172, 0.1)',

@@ -1,3 +1,4 @@
+type TransientStatus = 'creating' | 'deleting' | 'updating' | 'upgrading' | 'converging'
 type HealthStatus = 'healthy' | 'partially_healthy' | 'unhealthy' | 'unknown'
 type ConnectionStatus = 'connected' | 'partially_connected' | 'disconnected'
 
@@ -26,7 +27,15 @@ interface HealthStatusAndMessage {
 
 const nodeStatusOkOrFailed = (node: Node): boolean => node.status === 'ok' || node.status === 'failed'
 
-export function getConnectionStatus (nodes: Node[]): ConnectionStatus {
+export function getConnectionStatus (taskStatus: string, nodes: Node[]): ConnectionStatus | TransientStatus {
+  if (isTransientStatus(taskStatus)) {
+    return taskStatus as TransientStatus
+  }
+
+  if (hasConvergingNodes(nodes)) {
+    return 'converging'
+  }
+
   if (nodes.every(nodeStatusOkOrFailed)) {
     return 'connected'
   }
@@ -38,7 +47,7 @@ export function getConnectionStatus (nodes: Node[]): ConnectionStatus {
   return 'disconnected'
 }
 
-export const connectionStatusFieldsTable: {[status in ConnectionStatus]: ConnectionStatusFields} = {
+export const connectionStatusFieldsTable: {[status in ConnectionStatus | 'converging']: ConnectionStatusFields} = {
   connected: {
     message: 'All nodes in the cluster are conected to Platform9 management plane.',
     clusterStatus: 'ok',
@@ -54,39 +63,57 @@ export const connectionStatusFieldsTable: {[status in ConnectionStatus]: Connect
     clusterStatus: 'pause',
     label: 'Partially Connected',
   },
+  converging: {
+    message: '',
+    clusterStatus: 'loading',
+    label: 'Converging',
+  },
 }
 
-export function getHealthStatusAndMessage ({
-  nodes = [],
-  masterNodes = [],
-  workerNodes = [],
-  healthyMasterNodes = [],
-  healthyWorkerNodes = [],
-}: {
-  nodes: Node[]
-  masterNodes: Node[]
-  workerNodes: Node[]
-  healthyMasterNodes: Node[]
-  healthyWorkerNodes: Node[]
-}): [HealthStatus, string] {
-  const connectionStatus = getConnectionStatus(nodes)
-
-  if (connectionStatus === 'disconnected') {
-    return ['unknown', 'Cluster is disconnected']
+export function getMasterNodesHealthStatus (masterNodes: Node[] = [], healthyMasterNodes: Node[] = []): HealthStatus | TransientStatus {
+  if (hasConvergingNodes(masterNodes)) {
+    return 'converging'
   }
 
   const healthyMasterNodesCount = healthyMasterNodes.length
-  const healthyWorkersNodesCount = healthyWorkerNodes.length
   const mastersQuorumNumber = healthyMasterNodesCount // TODO: how to get quorum number of masters?
+  return getNodesHealthStatus(healthyMasterNodesCount, masterNodes.length, mastersQuorumNumber)
+}
+
+export function getWorkerNodesHealthStatus (workerNodes: Node[] = [], healthyWorkerNodes: Node[] = []): HealthStatus | TransientStatus {
+  if (hasConvergingNodes(workerNodes)) {
+    return 'converging'
+  }
+
+  const healthyWorkersNodesCount = healthyWorkerNodes.length
   const workersQuorumNumber = Math.ceil(workerNodes.length/2)
-  const mastersHealthStatus = getNodesHealthStatus(healthyMasterNodesCount, masterNodes.length, mastersQuorumNumber)
-  const workersHealthStatus = getNodesHealthStatus(healthyWorkersNodesCount, workerNodes.length, workersQuorumNumber)
+  return getNodesHealthStatus(healthyWorkersNodesCount, workerNodes.length, workersQuorumNumber)
+}
+
+export function getHealthStatus (
+  connectionStatus: ConnectionStatus | TransientStatus,
+  masterNodesHealthStatus: HealthStatus,
+  workerNodesHealthStatus: HealthStatus,
+) {
+  if (isTransientStatus(connectionStatus)) {
+    return connectionStatus
+  }
+
   const healthStatusAndMessage = clusterHealthStatusAndMessageTable.find(item =>
-    item.mastersHealthStatus === mastersHealthStatus &&
-    item.workersHealthStatus === workersHealthStatus
+    item.mastersHealthStatus === masterNodesHealthStatus &&
+    item.workersHealthStatus === workerNodesHealthStatus
   )
 
-  return [healthStatusAndMessage.healthStatus, healthStatusAndMessage.message]
+  return healthStatusAndMessage.healthStatus
+}
+
+export function getHealthStatusMessage (masterNodesHealthStatus: HealthStatus, workerNodesHealthStatus: HealthStatus): string {
+  const healthStatusAndMessage = clusterHealthStatusAndMessageTable.find(item =>
+    item.mastersHealthStatus === masterNodesHealthStatus &&
+    item.workersHealthStatus === workerNodesHealthStatus
+  )
+
+  return healthStatusAndMessage.message
 }
 
 function getNodesHealthStatus (healthyCount: number, count: number, threshold: number): HealthStatus {
@@ -163,10 +190,10 @@ export const hasConvergingNodes = (nodes: Node[]): boolean => !!nodes.find(node 
 export const isSteadyState = (taskStatus: string, nodes: Node[]): boolean =>
   !hasConvergingNodes(nodes) && ['success', 'error'].includes(taskStatus)
 
-export const isTransientState = (taskStatus: string, nodes: Node[]): boolean =>
-  ['creating', 'deleting', 'updating', 'upgrading', 'converging'].includes(taskStatus) || hasConvergingNodes(nodes)
+export const isTransientStatus = (status: string): boolean =>
+  ['creating', 'deleting', 'updating', 'upgrading', 'converging'].includes(status)
 
-export const clusterHealthStatusFields: {[status in HealthStatus]: HealthStatusFields} = {
+export const clusterHealthStatusFields: {[status in HealthStatus | 'converging']: HealthStatusFields} = {
   healthy: {
     status: 'ok',
     label: 'Healthy',
@@ -182,5 +209,9 @@ export const clusterHealthStatusFields: {[status in HealthStatus]: HealthStatusF
   unknown: {
     status: 'pause',
     label: 'Unknown'
+  },
+  converging: {
+    status: 'loading',
+    label: 'Converging'
   },
 }

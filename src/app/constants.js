@@ -2,6 +2,7 @@
 export const defaultUniqueIdentifier = 'id'
 export const appUrlRoot = '/ui'
 export const imageUrlRoot = `${appUrlRoot}/images`
+export const helpUrl = `${appUrlRoot}/help`
 export const loginUrl = `${appUrlRoot}/login`
 export const loginWithCookieUrl = `${appUrlRoot}/pmkft/login`
 export const resetPasswordUrl = `${appUrlRoot}/reset/password`
@@ -38,6 +39,7 @@ export const clarityUrlRoot = '/clarity/index.html#'
 export const clarityDashboardUrl = `${clarityUrlRoot}/dashboard`
 
 export const imageUrls = Object.freeze({
+  logoBlue: `${imageUrlRoot}/logo-color.png`,
   logo: `${imageUrlRoot}/logo.png`,
   loading: `${imageUrlRoot}/loading.gif`,
   kubernetes: `${imageUrlRoot}/logo-kubernetes-h.png`,

@@ -4,10 +4,16 @@ import { compose, lensPath, set, view } from 'ramda'
 import { SketchPicker } from 'react-color'
 import { ClickAwayListener } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
-
 import { withAppContext } from 'core/providers/AppProvider'
+import debounce from 'core/utils/debounce'
 
 const styles = theme => ({
+  paletteSection: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    alignItems: 'center',
+    padding: theme.spacing(0.5)
+  },
   color: {
     width: '36px',
     height: '14px',
@@ -20,6 +26,7 @@ const styles = theme => ({
     boxShadow: '0 0 0 1px rgba(0,0,0,.1)',
     display: 'inline-block',
     cursor: 'pointer',
+    maxWidth: 36,
   },
   popover: {
     position: 'absolute',
@@ -43,8 +50,10 @@ class ColorPicker extends React.PureComponent {
 
   getColor = () => view(this.lens(), this.props.theme)
 
-  handleChange = color => this.props.setContext({
-    theme: set(this.lens(), color.hex, this.props.theme)
+  handleChange = debounce(color => {
+    this.props.setContext({
+      theme: set(this.lens(), color.hex, this.props.theme)
+    })
   })
 
   render () {
@@ -68,8 +77,8 @@ class ColorPicker extends React.PureComponent {
 
     return (
       <ClickAwayListener onClickAway={this.handleClose}>
-        <div>
-          {this.props.path}&nbsp;
+        <div className={classes.paletteSection}>
+          {this.props.title}
           <div className={classes.swatch} onClick={this.handleClick}>
             <div className={classes.color} style={{ backgroundColor: color }} />
           </div>

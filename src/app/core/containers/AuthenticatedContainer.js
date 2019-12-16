@@ -13,9 +13,11 @@ import { toPairs, apply } from 'ramda'
 import { pathJoin } from 'utils/misc'
 import DeveloperToolsEmbed from 'developer/components/DeveloperToolsEmbed'
 import pluginManager from 'core/utils/pluginManager'
-import { logoutUrl, dashboardUrl } from 'app/constants'
+import { logoutUrl, dashboardUrl, helpUrl } from 'app/constants'
 import LogoutPage from 'core/public/LogoutPage'
+import HelpPage from 'app/plugins/kubernetes/components/common/HelpPage'
 import { AppContext } from 'core/providers/AppProvider'
+import useReactRouter from 'use-react-router'
 
 const useStyles = makeStyles(theme => ({
   appFrame: {
@@ -29,6 +31,11 @@ const useStyles = makeStyles(theme => ({
     marginTop: 55, // header height is hardcoded to 55px. account for that here.
     overflowX: 'auto',
     flexGrow: 1,
+    // backgroundColor: props => (
+    //   props.path === '/ui/kubernetes/dashboard'
+    //     ? theme.palette.background.dashboard
+    //     : theme.palette.background.default
+    // )
     backgroundColor: theme.palette.background.default,
     padding: theme.spacing(3),
     paddingTop: theme.spacing(2),
@@ -127,7 +134,8 @@ const AuthenticatedContainer = () => {
   const [drawerOpen, toggleDrawer] = useToggler(true)
   const [features, setFeatures] = useState(emptyObj)
   const { userDetails: { role } } = useContext(AppContext)
-  const classes = useStyles()
+  const { history } = useReactRouter()
+  const classes = useStyles({ path: history.location.pathname })
 
   useEffect(() => {
     // Pass the `setFeatures` function to update the features as we can't use `await` inside of a `useEffect`
@@ -155,6 +163,7 @@ const AuthenticatedContainer = () => {
           <div className={classes.contentMain}>
             <Switch>
               {renderPlugins(plugins, role)}
+              <Route path={helpUrl} component={HelpPage} />>
               <Route path={logoutUrl} component={LogoutPage} />
               <Redirect to={dashboardUrl} />
             </Switch>

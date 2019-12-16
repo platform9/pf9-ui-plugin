@@ -146,7 +146,7 @@ const AddBareOsClusterPage = () => {
                 </ValidatedForm>
               </WizardStep>
 
-              <WizardStep stepId="workers" label="Select Woker Nodes">
+              <WizardStep stepId="workers" label="Select Worker Nodes">
                 <ValidatedForm
                   fullWidth
                   initialValues={wizardContext}
