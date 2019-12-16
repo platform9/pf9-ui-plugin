@@ -12,6 +12,12 @@ import {
   pluck, pathOr, pick, pipe, either, propSatisfies, compose, path, propEq, mergeLeft, partition,
 } from 'ramda'
 import { rawNodesCacheKey } from 'k8s/components/infrastructure/nodes/actions'
+import {
+  getMasterNodesHealthStatus,
+  getWorkerNodesHealthStatus,
+  getConnectionStatus,
+  getHealthStatus,
+} from './ClusterStatusUtils'
 
 const { qbert } = ApiClient.getInstance()
 
@@ -186,6 +192,10 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
       const [masterNodes, workerNodes] = partition(isMasterNode, nodesInCluster)
       const healthyMasterNodes = masterNodes.filter(node => node.status === 'ok')
       const healthyWorkerNodes = workerNodes.filter(node => node.status === 'ok')
+      const masterNodesHealthStatus = getMasterNodesHealthStatus(masterNodes, healthyMasterNodes)
+      const workerNodesHealthStatus = getWorkerNodesHealthStatus(workerNodes, healthyWorkerNodes)
+      const connectionStatus = getConnectionStatus(nodesInCluster.taskStatus, nodesInCluster)
+      const healthStatus = getHealthStatus(connectionStatus, masterNodesHealthStatus, workerNodesHealthStatus)
       const hasMasterNode = healthyMasterNodes.length > 0
       const clusterOk = nodesInCluster.length > 0 && cluster.status === 'ok'
       const fuzzyBools = ['allowWorkloadsOnMaster', 'privileged', 'appCatalogEnabled'].reduce(
@@ -212,6 +222,10 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
         progressPercent,
         healthyMasterNodes,
         healthyWorkerNodes,
+        masterNodesHealthStatus,
+        workerNodesHealthStatus,
+        connectionStatus,
+        healthStatus,
         hasMasterNode,
         highlyAvailable: healthyMasterNodes.length > 2,
         links: {

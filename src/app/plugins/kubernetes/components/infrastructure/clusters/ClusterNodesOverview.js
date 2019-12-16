@@ -5,6 +5,10 @@ import { makeStyles } from '@material-ui/styles'
 import ClusterStatusSpan from 'k8s/components/infrastructure/clusters/ClusterStatusSpan'
 import ProgressBar from 'core/components/progress/ProgressBar'
 import useToggler from 'core/hooks/useToggler'
+import {
+  connectionStatusFieldsTable,
+  clusterHealthStatusFields,
+} from './ClusterStatusUtils'
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -51,7 +55,21 @@ const useStyles = makeStyles(theme => ({
   },
 }))
 
-const ClusterNodesOverview = ({ cluster = {} }) => {
+const masterNodesHealthMessages = {
+  healthy: 'All masters are healthy',
+  partially_healthy: 'Quorum number of masters are healthy',
+  unhealthy: 'Less than quorum number of masters are healthy',
+  unknown: 'Unknown',
+}
+
+const workerNodesHealthMessages = {
+  healthy: 'All workers are healthy',
+  partially_healthy: 'Majority of workers (> 50%) are healthy',
+  unhealthy: 'Majority of workers (> 50%) are unhealthy',
+  unknown: 'Unknown',
+}
+
+const ClusterNodesOverview = ({ cluster }) => {
   const classes = useStyles()
   const [isDialogOpen, toggleDialog] = useToggler()
 
@@ -59,29 +77,35 @@ const ClusterNodesOverview = ({ cluster = {} }) => {
     return null
   }
 
+  const connectionFields = connectionStatusFieldsTable[cluster.connectionStatus]
+  const masterNodesFields = clusterHealthStatusFields[cluster.masterNodesHealthStatus]
+  const workerNodesFields = clusterHealthStatusFields[cluster.workerNodesHealthStatus]
+  const masterNodesMessage = masterNodesHealthMessages[cluster.masterNodesHealthStatus]
+  const workerNodesMessage = workerNodesHealthMessages[cluster.workerNodesHealthStatus]
+
   return (
     <Grid container spacing={4} className={classes.container}>
       <Grid item xs={6}>
         <Status
           classes={classes}
           title='Cluster Connection Status:'
-          status='ok'
-          statusLabel='Connected'
-          message='All nodes of the cluster are connected'
+          status={connectionFields.clusterStatus}
+          statusLabel={connectionFields.label}
+          message={connectionFields.message}
         />
         <Status
           classes={classes}
           title='Master Nodes Health Status:'
-          status='ok'
-          statusLabel='Connected'
-          message='Healthy All master nodes are healthy'
+          status={masterNodesFields.status}
+          statusLabel={masterNodesFields.label}
+          message={masterNodesMessage}
         />
         <Status
           classes={classes}
           title='Worker Nodes Health Status:'
-          status='ok'
-          statusLabel='Connected'
-          message='Healthy > 50% of worker nodes are healthy'
+          status={workerNodesFields.status}
+          statusLabel={workerNodesFields.label}
+          message={workerNodesMessage}
         />
         {!!cluster.taskError && <Error classes={classes} onClick={toggleDialog} />}
         <Dialog open={isDialogOpen}>
