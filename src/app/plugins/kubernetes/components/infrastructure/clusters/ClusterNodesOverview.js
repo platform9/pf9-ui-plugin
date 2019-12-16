@@ -3,8 +3,8 @@ import { Grid, Dialog, DialogTitle, DialogContent } from '@material-ui/core'
 import CloseIcon from '@material-ui/icons/Close'
 import { makeStyles } from '@material-ui/styles'
 import ClusterStatusSpan from 'k8s/components/infrastructure/clusters/ClusterStatusSpan'
-import ProgressBar from 'core/components/progress/ProgressBar'
 import useToggler from 'core/hooks/useToggler'
+import ResourceUsageTable from 'k8s/components/infrastructure/common/ResourceUsageTable'
 import {
   connectionStatusFieldsTable,
   clusterHealthStatusFields,
@@ -35,19 +35,8 @@ const useStyles = makeStyles(theme => ({
       textDecoration: 'underline',
     }
   },
-  resourceContainer: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+  resources: {
     marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(2),
-  },
-  resourceLabel: {
-    fontWeight: 500,
-    marginRight: theme.spacing(0.25)
-  },
-  progressBar: {
-    marginLeft: theme.spacing(2)
   },
   closeIcon: {
     cursor: 'pointer',
@@ -142,6 +131,8 @@ const Error = ({ classes, onClick }) =>
     </ClusterStatusSpan>
   </div>
 
+const toMHz = value => value * 1024
+
 const ResourceUtilization = ({ classes, usage }) => {
   if (!usage) {
     return null
@@ -151,38 +142,13 @@ const ResourceUtilization = ({ classes, usage }) => {
   return (
     <div>
       <div className={classes.title}>Cluster Resource Utilization:</div>
-      <Resource
-        classes={classes}
-        label='CPU:'
-        value={compute.max.toFixed(1)}
-        unit='GHz'
-        percentage={Math.round(compute.percent)}
-      />
-      <Resource
-        classes={classes}
-        label='Memory:'
-        value={memory.max.toFixed(1)}
-        unit='GiB'
-        percentage={Math.round(memory.percent)}
-      />
-      <Resource
-        classes={classes}
-        label='Storage:'
-        value={disk.max.toFixed(1)}
-        unit='GiB'
-        percentage={Math.round(disk.percent)}
-      />
+      <div className={classes.resources}>
+        <ResourceUsageTable valueConverter={toMHz} units="MHz" label="CPU" stats={compute} />
+        <ResourceUsageTable units="GiB" label="Memory" stats={memory} />
+        <ResourceUsageTable units="GiB" label="Storage" stats={disk} />
+      </div>
     </div>
   )
 }
-
-const Resource = ({ classes, label, value, unit, percentage }) =>
-  <div className={classes.resourceContainer}>
-    <span>
-      <span className={classes.resourceLabel}>{label}</span>
-      {` ${value} ${unit}`}
-    </span>
-    <span className={classes.progressBar}><ProgressBar percent={percentage} /></span>
-  </div>
 
 export default ClusterNodesOverview
