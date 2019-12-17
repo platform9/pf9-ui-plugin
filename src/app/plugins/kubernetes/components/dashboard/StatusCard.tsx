@@ -98,10 +98,6 @@ const StatusCard: FunctionComponent<StatusCardProps> = ({ entity, route, addRout
   const [data, loading] = useDataLoader(...dataLoader)
   const { quantity } = quantityFn(data)
 
-  const iconComponent = (icon) => (
-    <FontAwesomeIcon className={headerIcon}>{icon}</FontAwesomeIcon>
-  )
-
   return (
     <div className={contentContainer}>
       <div className={row}>
@@ -113,11 +109,9 @@ const StatusCard: FunctionComponent<StatusCardProps> = ({ entity, route, addRout
           </Link>
         </div>
         <div className={clsx(rowColumn, verticalCenter)}>
-          {iconComponent(icon)}
+          <FontAwesomeIcon className={headerIcon}>{icon}</FontAwesomeIcon>
           {loading ? (
-            <div>
-              <CircularProgress className={spinner} size={32} />
-            </div>
+            <CircularProgress className={spinner} size={32} />
           ): (
             <span className={text}>{quantity}</span>
           )}
