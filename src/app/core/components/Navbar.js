@@ -22,11 +22,11 @@ export const drawerWidth = 180
 
 const styles = theme => ({
   logoTitle: {
-    backgroundImage: `url(${imageUrls.logoBlue})`,
+    backgroundImage: `url(${imageUrls.logo})`,
     backgroundRepeat: 'no-repeat',
-    backgroundSize: 135,
+    backgroundSize: 180,
     height: 20,
-    backgroundPosition: 'center -36px',
+    backgroundPosition: '-55px -12px',
   },
   logo: {
     justifySelf: 'center',
@@ -85,6 +85,7 @@ const styles = theme => ({
     position: 'relative',
     alignItems: 'center',
     cursor: 'pointer',
+    backgroundColor: theme.palette.header.background,
   },
   inputRoot: {
     color: 'inherit',
@@ -176,10 +177,9 @@ const styles = theme => ({
     color: theme.palette.sidebar.text,
   },
   toggleButton: {
-    background: theme.palette.sidebar.background,
+    background: theme.palette.header.background,
     borderRadius: 0,
-    color: theme.palette.sidebar.hoverText,
-    boxShadow: 'inset 1px 0px 4px -2px',
+    color: theme.palette.primary.contrastText,
     fontSize: 12,
     fontWeight: 500,
     textAlign: 'center',
@@ -191,7 +191,7 @@ const styles = theme => ({
     width: 27,
     height: 39,
     '&:hover': {
-      backgroundColor: theme.palette.sidebar.background,
+      backgroundColor: 'transparent',
     },
   },
   currentNavMenuText: {

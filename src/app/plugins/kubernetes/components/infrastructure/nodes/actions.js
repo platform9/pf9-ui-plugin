@@ -3,15 +3,16 @@ import ApiClient from 'api-client/ApiClient'
 import { serviceCatalogContextKey } from 'openstack/components/api-access/actions'
 import { pathStrOrNull, pipeWhenTruthy } from 'utils/fp'
 import { find, propEq, prop } from 'ramda'
-import { combinedHostsCacheKey } from 'k8s/components/infrastructure/common/actions'
 import createContextUpdater from 'core/helpers/createContextUpdater'
+import { loadCombinedHosts } from 'k8s/components/infrastructure/common/actions'
 
-const { resmgr, qbert } = ApiClient.getInstance()
+const { qbert, resmgr } = ApiClient.getInstance()
 
 export const nodesCacheKey = 'nodes'
 export const rawNodesCacheKey = 'rawNodes'
+export const combinedHostsCacheKey = 'combinedHosts'
 
-createContextLoader(rawNodesCacheKey, async () => {
+export const loadRawNodes = createContextLoader(rawNodesCacheKey, async () => {
   return qbert.getNodes()
 }, {
   entityName: 'Node',
@@ -19,6 +20,13 @@ createContextLoader(rawNodesCacheKey, async () => {
 })
 
 export const loadNodes = createContextLoader(nodesCacheKey, async (params, loadFromContext) => {
+  // Invalidate dependent caches when reloading so that only new data is used.
+  // This is required for cases where combinedHosts or rawNodes are edited, and the
+  // nodes list needs to be updated for example.
+  // It seems like the refetchCascade option is supposed to handle this but I don't think it
+  // is doing it properly at the moment
+  loadRawNodes.invalidateCache(false)
+  loadCombinedHosts.invalidateCache(false)
   const [rawNodes, combinedHosts, serviceCatalog] = await Promise.all([
     loadFromContext(rawNodesCacheKey),
     loadFromContext(combinedHostsCacheKey),
@@ -62,3 +70,32 @@ export const deAuthNode = createContextUpdater('nodes', async (node, prevItems) 
     return `Successfully de-authorized node ${node.name} (${node.primaryIp})`
   },
 })
+
+// Important: How do I get this function to also trigger a nodes list refresh?
+export const updateRemoteSupport = createContextUpdater(combinedHostsCacheKey, async (data, currentItems) => {
+  const { id, enableSupport } = data
+  const host = currentItems.find(x => x.id === id)
+  const supportRoleName = 'pf9-support'
+  // If the role push/delete fails, how do I handle that?
+  // Temporary solution using the pre-existing host object
+  // Future solution will require consumption of pf9-notifications for reactive updates
+  if (enableSupport) {
+    await resmgr.addRole(id, supportRoleName)
+    return {
+      ...host,
+      roles: [...host.roles, supportRoleName],
+      roleStatus: 'converging',
+      uiState: 'pending',
+      supportRole: true
+    }
+  } else {
+    await resmgr.removeRole(id, supportRoleName)
+    return {
+      ...host,
+      roles: host.roles.filter(role => role !== supportRoleName),
+      roleStatus: 'converging',
+      uiState: 'pending',
+      supportRole: false
+    }
+  }
+}, { operation: 'update' })

@@ -4,7 +4,7 @@ import { maybeFnOrNull } from 'utils/fp'
 import ExternalLink from 'core/components/ExternalLink'
 import ProgressBar from 'core/components/progress/ProgressBar'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { pathOr, pipe } from 'ramda'
+import { pathOr, pipe, prop } from 'ramda'
 import { castBoolToStr, castFuzzyBool, columnPathLookup } from 'utils/misc'
 import SimpleLink from 'core/components/SimpleLink'
 import { nodesCacheKey } from 'k8s/components/infrastructure/nodes/actions'
@@ -16,6 +16,10 @@ import {
 } from '../clusters/ClusterStatusUtils'
 import DeAuthIcon from '@material-ui/icons/DeleteForever'
 import NodeDeAuthDialog from './NodeDeAuthDialog'
+import SettingsPhoneIcon from '@material-ui/icons/SettingsPhone'
+import RemoteSupportDialog from './RemoteSupportDialog'
+import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
+import { Tooltip } from '@material-ui/core'
 
 const isMaster = pipe(castFuzzyBool, castBoolToStr())
 
@@ -63,6 +67,14 @@ const renderConverging = () =>
     </ClusterStatusSpan>
   </ClusterSync>
 
+const renderRemoteSupport = () =>
+  <div>
+    (Advanced Remote Support Enabled)&nbsp;
+    <Tooltip title={'Advanced Remote Support is currently enabled on this node. To disable it, select the \'Configure Host\' action from the actions bar.'}>
+      <FontAwesomeIcon>question-circle</FontAwesomeIcon>
+    </Tooltip>
+  </div>
+
 const renderConnectionStatus = (_, { status, combined }) => {
   if (status === 'converging') {
     return renderConverging()
@@ -73,11 +85,14 @@ const renderConnectionStatus = (_, { status, combined }) => {
 
   const fields = connectionStatusFieldsTable[connectionStatus]
   return (
-    <ClusterStatusSpan status={fields.clusterStatus}>
-      {fields.label}
-      <br />
-      {showLastResponse && `since ${combined.lastResponse}`}
-    </ClusterStatusSpan>
+    <div>
+      <ClusterStatusSpan status={fields.clusterStatus}>
+        {fields.label}
+        <br />
+        {showLastResponse && `since ${combined.lastResponse}`}
+      </ClusterStatusSpan>
+      {combined.supportRole && renderRemoteSupport()}
+    </div>
   )
 }
 
@@ -115,6 +130,11 @@ export const columns = [
   { id: 'assignedRoles', label: 'Assigned Roles', render: renderRoles },
 ]
 
+const isAdmin = (selected, getContext) => {
+  const { role } = getContext(prop('userDetails'))
+  return role === 'admin'
+}
+
 export const options = {
   addText: 'Onboard a Node',
   addUrl: '/ui/kubernetes/infrastructure/nodes/cli/download',
@@ -130,8 +150,14 @@ export const options = {
       icon: <DeAuthIcon />,
       label: 'Deauthorize node',
       dialog: NodeDeAuthDialog,
-    }
-  ],
+    },
+    {
+      cond: isAdmin,
+      icon: <SettingsPhoneIcon />,
+      label: 'Configure Remote Support',
+      dialog: RemoteSupportDialog,
+    },
+  ]
 }
 
 const { ListPage, List } = createCRUDComponents(options)
