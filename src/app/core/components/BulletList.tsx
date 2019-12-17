@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/styles'
 import clsx from 'clsx'
 
 interface Props {
-  items: (string | JSX.Element)[]
+  items: Array<string | JSX.Element>
   type?: string
   className?: string
 }
@@ -15,12 +15,12 @@ const useStyles = makeStyles<any, Partial<Props>>((theme: Theme) => ({
     margin: 0,
     paddingLeft: theme.spacing(2),
     marginLeft: theme.spacing(2),
-    listStyleType: ({type}) => type,
+    listStyleType: ({ type }) => type,
   },
 }))
 
 export default ({ items = [], type = 'disc', className = undefined }: Props) => {
-  const styles = useStyles({type})
+  const styles = useStyles({ type })
   return (
     <ul className={clsx(styles.ul, className)}>
       {items.map((item, idx) => (

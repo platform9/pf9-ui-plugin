@@ -64,9 +64,9 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const nodeServices = ['Prometheus', 'Fluentd', 'Kubeadm']
 
-const BareOSClusterRequirements = ({onComplete}) => {
+const BareOSClusterRequirements = ({ onComplete }) => {
   const classes = useStyles({})
-  const handleClick = useCallback( () => {
+  const handleClick = useCallback(() => {
     onComplete('BareOS')
   }, [onComplete])
   return (
@@ -98,7 +98,7 @@ const BareOSClusterRequirements = ({onComplete}) => {
     </ClusterRequirementsContainer>
   )
 }
-export default BareOSClusterRequirements 
+export default BareOSClusterRequirements
 
 const HardwareSpec = ({ title, icon }) => {
   const classes = useStyles({})

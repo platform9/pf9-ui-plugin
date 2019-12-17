@@ -23,10 +23,12 @@ const useStyles = makeStyles<Theme>(theme => ({
   }
 }))
 
-export interface ToastOptions extends MessageOptions {}
+export interface ToastOptions extends MessageOptions {
+  id: string
+}
 
 interface ToastContainerProps {
-  toasts: ToastOptions[]
+  toasts: MessageOptions[]
   toastsTimeout: number
 }
 

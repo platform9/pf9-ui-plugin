@@ -29,9 +29,9 @@ const useStyles = makeStyles((theme: Theme) => ({
 const AwsReqsLeftSection = ['ELB Management', 'Route 53 DNS Configuration', 'Access to 2 or more Availability Zones within the region']
 const AwsReqsRightSection = ['EC2 Instance Management', 'EBS Volume Management', 'VPC Management']
 
-const AwsClusterRequirements = ({onComplete}) => {
+const AwsClusterRequirements = ({ onComplete }) => {
   const classes = useStyles({})
-  const handleClick = useCallback( () => {
+  const handleClick = useCallback(() => {
     onComplete('Aws')
   }, [onComplete])
   return (
@@ -52,4 +52,4 @@ const AwsClusterRequirements = ({onComplete}) => {
     </ClusterRequirementsContainer>
   )
 }
-export default AwsClusterRequirements 
+export default AwsClusterRequirements
