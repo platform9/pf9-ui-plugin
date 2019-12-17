@@ -1,11 +1,17 @@
 import React from 'react'
-import { Typography } from '@material-ui/core'
+import { Typography, Paper } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import CodeBlock from 'core/components/CodeBlock'
 import SimpleLink from 'core/components/SimpleLink'
 import { whatIsBareOSLink } from 'app/constants'
+import Theme from 'core/themes/model'
 
-const useStyles = makeStyles((theme: any) => ({
+const useStyles = makeStyles((theme: Theme) => ({
+  paper: {
+    padding: theme.spacing(2, 8),
+    margin: theme.spacing(2, 0),
+    backgroundColor: theme.palette.card.background,
+  },
   row: {
     display: 'flex',
     margin: theme.spacing(2, 0),
@@ -50,6 +56,7 @@ const defaultFinalStep = {
 }
 
 const DownloadCliWalkthrough = ({ finalStep = defaultFinalStep }): JSX.Element => {
+  const classes = useStyles({})
   return (
     <>
       <p>
@@ -63,21 +70,23 @@ const DownloadCliWalkthrough = ({ finalStep = defaultFinalStep }): JSX.Element =
           CentOS is coming soon!)
         </Typography>
       </p>
-      <Typography variant="h6">Install and Run</Typography>
-      <NumberedSteps
-        step={1}
-        title="Download and install the CLI"
-        description={<CodeBlock>{installCommand}</CodeBlock>}
-      />
-      <NumberedSteps
-        step={2}
-        title="Run the CLI to prepare your node with required pre-requisites to be added to a Kubernetes cluster"
-        description={<CodeBlock>> pf9ctl cluster prep-node</CodeBlock>}
-      />
-      <NumberedSteps
-        step={3}
-        {...finalStep}
-      />
+      <Paper className={classes.paper} elevation={0}>
+        <Typography variant="h6">Install and Run</Typography>
+        <NumberedSteps
+          step={1}
+          title="Download and install the CLI"
+          description={<CodeBlock>{installCommand}</CodeBlock>}
+        />
+        <NumberedSteps
+          step={2}
+          title="Run the CLI to prepare your node with required pre-requisites to be added to a Kubernetes cluster"
+          description={<CodeBlock>> pf9ctl cluster prep-node</CodeBlock>}
+        />
+        <NumberedSteps
+          step={3}
+          {...finalStep}
+        />
+      </Paper>
     </>
   )
 }
