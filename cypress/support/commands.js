@@ -1,6 +1,6 @@
 const config = require('../../config')
-const name = config.simulator.username
-const password = config.simulator.password
+const name = 'admin@platform9.com'
+const password = 'secret'
 
 // ***********************************************
 // This example commands.js shows you how to
