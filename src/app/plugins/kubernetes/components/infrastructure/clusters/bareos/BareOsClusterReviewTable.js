@@ -17,7 +17,7 @@ const DataRow = ({ label, value }) => (
 
 const bool2str = (value) => (value ? 'true' : 'false')
 
-const getFilteredNodesFormattedName = (nodes, filterList) =>
+const getFilteredNodesFormattedName = (nodes, filterList = []) =>
   nodes
     .filter((node) => filterList.includes(node.uuid))
     .map((node) => `${node.name} - ${node.primaryIp}`)
@@ -25,6 +25,7 @@ const getFilteredNodesFormattedName = (nodes, filterList) =>
 // TODO: azs, networking info, services/api FQDN auto-generate, MTU size
 const BareOsClusterReviewTable = ({ data }) => {
   const [nodes] = useDataLoader(loadNodes)
+  // TODO why are form elements undefined here? wtf.
   const masterNodes = getFilteredNodesFormattedName(nodes, data.masterNodes)
   const workerNodes = getFilteredNodesFormattedName(nodes, data.workerNodes)
   return (
