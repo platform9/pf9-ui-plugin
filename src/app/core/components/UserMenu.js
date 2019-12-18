@@ -46,7 +46,7 @@ class UserMenu extends React.PureComponent {
           getContentAnchorEl={null}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
         >
-          <MenuItem onClick={this.handleChangePassword}>Change Password</MenuItem>
+          { false && <MenuItem onClick={this.handleChangePassword}>Change Password</MenuItem> }
           <MenuItem onClick={this.logout}>Sign Out</MenuItem>
         </Menu>
       </div>
