@@ -76,7 +76,7 @@ export function getMasterNodesHealthStatus (masterNodes: Node[] = [], healthyMas
   }
 
   const healthyMasterNodesCount = healthyMasterNodes.length
-  const mastersQuorumNumber = healthyMasterNodesCount // TODO: how to get quorum number of masters?
+  const mastersQuorumNumber = masterNodes.length // TODO: how to get quorum number of masters?
   return getNodesHealthStatus(healthyMasterNodesCount, masterNodes.length, mastersQuorumNumber)
 }
 
