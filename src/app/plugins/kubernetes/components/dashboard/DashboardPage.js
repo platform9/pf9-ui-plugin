@@ -14,12 +14,22 @@ import { mngmTenantActions } from '../userManagement/tenants/actions'
 import { cloudProviderActions } from '../infrastructure/cloudProviders/actions'
 // Icons
 import {
-  People, SettingsApplications, RecentActors, Storage, Layers, FilterNone, Cloud,
+  People,
+  SettingsApplications,
+  RecentActors,
+  Storage,
+  Layers,
+  FilterNone,
+  Cloud,
 } from '@material-ui/icons'
 // Components
 import StatusCard from './StatusCard'
+import { Typography } from '@material-ui/core'
+import { capitalizeString, normalizeUsername } from 'utils/misc'
 
-const useStyles = makeStyles(theme => ({
+import ClusterSetup from '../onboarding/cluster-setup'
+
+const useStyles = makeStyles((theme) => ({
   cardRow: {
     display: 'flex',
     flexDirection: 'row',
@@ -40,7 +50,7 @@ const serviceReports = [
     title: 'Pods',
     icon: FilterNone,
     dataLoader: [podActions.list, { clusterId: allKey }],
-    quantityFn: pods =>
+    quantityFn: (pods) =>
       validateFieldHealthAndQuantity({
         list: pods,
         success: [
@@ -60,7 +70,7 @@ const serviceReports = [
     title: 'Deployments',
     icon: '/ui/images/dynamic_feed.svg',
     dataLoader: [deploymentActions.list, { clusterId: allKey }],
-    quantityFn: deployments => ({
+    quantityFn: (deployments) => ({
       quantity: deployments.length,
       working: deployments.length,
       pending: 0,
@@ -73,7 +83,7 @@ const serviceReports = [
     title: 'Services',
     icon: SettingsApplications,
     dataLoader: [serviceActions.list, { clusterId: allKey }],
-    quantityFn: services =>
+    quantityFn: (services) =>
       validateFieldHealthAndQuantity({
         list: services,
         success: [{ path: 'status', value: 'OK' }],
@@ -87,7 +97,7 @@ const serviceReports = [
     title: 'Cloud Accounts',
     icon: Cloud,
     dataLoader: [cloudProviderActions.list],
-    quantityFn: clouds => ({
+    quantityFn: (clouds) => ({
       quantity: clouds.length,
       working: clouds.length,
       pending: 0,
@@ -103,7 +113,7 @@ const statusReports = [
     title: 'Users',
     icon: People,
     dataLoader: [mngmUserActions.list],
-    quantityFn: users => ({
+    quantityFn: (users) => ({
       quantity: users.length,
       working: users.length,
       pending: 0,
@@ -117,7 +127,7 @@ const statusReports = [
     title: 'Tenants',
     icon: RecentActors,
     dataLoader: [mngmTenantActions.list],
-    quantityFn: tenants => ({
+    quantityFn: (tenants) => ({
       quantity: tenants.length,
       working: tenants.length,
       pending: 0,
@@ -131,7 +141,7 @@ const statusReports = [
     title: 'Nodes',
     icon: Storage,
     dataLoader: [loadNodes],
-    quantityFn: nodes =>
+    quantityFn: (nodes) =>
       validateFieldHealthAndQuantity({
         list: nodes,
         success: [{ path: 'status', value: 'ok' }],
@@ -145,7 +155,7 @@ const statusReports = [
     title: 'Clusters',
     icon: Layers,
     dataLoader: [clusterActions.list],
-    quantityFn: clusters =>
+    quantityFn: (clusters) =>
       validateFieldHealthAndQuantity({
         list: clusters,
         success: [{ path: 'status', value: 'ok' }],
@@ -174,29 +184,41 @@ const validateFieldHealthAndQuantity = ({ list, success, pending = [] }) => {
 }
 
 const reportsWithPerms = (reports) => {
-  const { userDetails: { role } } = useContext(AppContext)
+  const {
+    userDetails: { role },
+  } = useContext(AppContext)
   return reports.filter((report) => {
     // No permissions property means no restrictions
-    if (!report.permissions) { return true }
+    if (!report.permissions) {
+      return true
+    }
     return report.permissions.includes(role)
   })
 }
 
 const DashboardPage = () => {
   const { cardColumn, cardRow } = useStyles()
-
+  const { session } = useContext(AppContext)
+  const username = capitalizeString(normalizeUsername(session.username))
   return (
     <section name="dashboard-status-container" className={cardColumn}>
-      <div className={cardRow}>
-        {reportsWithPerms(statusReports).map(report => (
-          <StatusCard key={report.route} {...report} />
-        ))}
-      </div>
-      <div className={cardRow}>
-        {reportsWithPerms(serviceReports).map(report => (
-          <StatusCard key={report.route} {...report} />
-        ))}
-      </div>
+      <Typography variant="h5">Welcome {username}!</Typography>
+      <ClusterSetup />
+
+      {false && (
+        <>
+          <div className={cardRow}>
+            {reportsWithPerms(statusReports).map((report) => (
+              <StatusCard key={report.route} {...report} />
+            ))}
+          </div>
+          <div className={cardRow}>
+            {reportsWithPerms(serviceReports).map((report) => (
+              <StatusCard key={report.route} {...report} />
+            ))}
+          </div>
+        </>
+      )}
     </section>
   )
 }
