@@ -293,11 +293,11 @@ const AddBareOsClusterPage = () => {
                       )}
 
                       {/* Enable Application Catalog */}
-                      <CheckboxField
+                      {/* <CheckboxField
                         id="appCatalogEnabled"
                         label="Enable Application Catalog"
                         info="Enable the Helm Application Catalog on this cluster"
-                      />
+                      /> */}
 
                       {/* Tags */}
                       <KeyValuesField

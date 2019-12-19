@@ -13,9 +13,11 @@ import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 
 const useStyles = makeStyles((theme: any) => ({
   headerIcon: {
-    width: theme.spacing(5),
-    height: theme.spacing(5),
+    fontSize: '36px',
     color: theme.palette.dashboardCard.icon,
+  },
+  spinner: {
+    marginLeft: theme.spacing(1),
   },
   contentContainer: {
     display: 'flex',
@@ -91,16 +93,11 @@ interface StatusCardProps {
   quantityFn(data: any[]): { quantity: number, working: number, pending: number }
 }
 
-const StatusCard: FunctionComponent<StatusCardProps> = ({ entity, route, addRoute, title, icon: Icon, dataLoader, quantityFn }) => {
-  const { row, rowColumn, contentContainer, headerIcon, cardTitle, text, arrowIcon, verticalCenter } = useStyles({})
+const StatusCard: FunctionComponent<StatusCardProps> = ({ entity, route, addRoute, title, icon, dataLoader, quantityFn }) => {
+  const { row, rowColumn, contentContainer, headerIcon, spinner, cardTitle, text, arrowIcon, verticalCenter } = useStyles({})
   const [data, loading] = useDataLoader(...dataLoader)
   const { quantity } = quantityFn(data)
-  const iconComponent =
-    typeof Icon === 'string' ? (
-      <img className={headerIcon} alt="" src={Icon} />
-    ) : (
-      <Icon className={headerIcon} color="primary" />
-    )
+
   return (
     <div className={contentContainer}>
       <div className={row}>
@@ -112,9 +109,9 @@ const StatusCard: FunctionComponent<StatusCardProps> = ({ entity, route, addRout
           </Link>
         </div>
         <div className={clsx(rowColumn, verticalCenter)}>
-          {iconComponent}
+          <FontAwesomeIcon className={headerIcon}>{icon}</FontAwesomeIcon>
           {loading ? (
-            <CircularProgress size={32} />
+            <CircularProgress className={spinner} size={32} />
           ): (
             <span className={text}>{quantity}</span>
           )}

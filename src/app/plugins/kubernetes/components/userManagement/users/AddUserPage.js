@@ -35,7 +35,7 @@ const AddUserPage = () => {
   const onComplete = useCallback(success => success && history.push(listUrl), [history])
   const [handleAdd, submitting] = useDataUpdater(mngmUserActions.create, onComplete)
   const [tenants, loadingTenants] = useDataLoader(mngmTenantActions.list)
-  const [activationType, setActivationType] = useState('activationByEmail')
+  const [activationType, setActivationType] = useState('createPassword')
 
   const activationByEmailLabel = <>
     <div>Send activation email to the user.</div>
@@ -65,10 +65,10 @@ const AddUserPage = () => {
                 <FormLabel component="legend"><p>Activate User Account</p></FormLabel>
                 <RadioGroup value={activationType} onChange={
                   e => setActivationType(e.target.value)}>
-                  <FormControlLabel
+                  { false && <FormControlLabel
                     value="activationByEmail"
                     control={<Radio />}
-                    label={activationByEmailLabel} />
+                    label={activationByEmailLabel} />}
                   <br />
                   <FormControlLabel
                     value="createPassword"

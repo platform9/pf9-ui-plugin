@@ -12,10 +12,6 @@ import { loadNodes } from '../infrastructure/nodes/actions'
 import { mngmUserActions } from '../userManagement/users/actions'
 import { mngmTenantActions } from '../userManagement/tenants/actions'
 import { cloudProviderActions } from '../infrastructure/cloudProviders/actions'
-// Icons
-import {
-  People, SettingsApplications, RecentActors, Storage, Layers, FilterNone, Cloud,
-} from '@material-ui/icons'
 // Components
 import StatusCard from './StatusCard'
 
@@ -38,7 +34,7 @@ const serviceReports = [
     route: '/ui/kubernetes/pods',
     addRoute: '/ui/kubernetes/pods/add',
     title: 'Pods',
-    icon: FilterNone,
+    icon: 'cubes',
     dataLoader: [podActions.list, { clusterId: allKey }],
     quantityFn: pods =>
       validateFieldHealthAndQuantity({
@@ -58,7 +54,7 @@ const serviceReports = [
     route: '/ui/kubernetes/pods#deployments',
     addRoute: '/ui/kubernetes/pods/deployments/add',
     title: 'Deployments',
-    icon: '/ui/images/dynamic_feed.svg',
+    icon: 'window',
     dataLoader: [deploymentActions.list, { clusterId: allKey }],
     quantityFn: deployments => ({
       quantity: deployments.length,
@@ -71,7 +67,7 @@ const serviceReports = [
     route: '/ui/kubernetes/pods#services',
     addRoute: '/ui/kubernetes/pods/services/add',
     title: 'Services',
-    icon: SettingsApplications,
+    icon: 'tasks-alt',
     dataLoader: [serviceActions.list, { clusterId: allKey }],
     quantityFn: services =>
       validateFieldHealthAndQuantity({
@@ -85,7 +81,7 @@ const serviceReports = [
     route: '/ui/kubernetes/infrastructure#cloudProviders',
     addRoute: '/ui/kubernetes/infrastructure/cloudProviders/add',
     title: 'Cloud Accounts',
-    icon: Cloud,
+    icon: 'cloud',
     dataLoader: [cloudProviderActions.list],
     quantityFn: clouds => ({
       quantity: clouds.length,
@@ -101,7 +97,7 @@ const statusReports = [
     route: '/ui/kubernetes/user_management#users',
     addRoute: '/ui/kubernetes/user_management/users/add',
     title: 'Users',
-    icon: People,
+    icon: 'user',
     dataLoader: [mngmUserActions.list],
     quantityFn: users => ({
       quantity: users.length,
@@ -115,7 +111,7 @@ const statusReports = [
     route: '/ui/kubernetes/user_management#tenants',
     addRoute: '/ui/kubernetes/user_management/tenants/add',
     title: 'Tenants',
-    icon: RecentActors,
+    icon: 'users-class',
     dataLoader: [mngmTenantActions.list],
     quantityFn: tenants => ({
       quantity: tenants.length,
@@ -129,7 +125,7 @@ const statusReports = [
     route: '/ui/kubernetes/infrastructure#nodes',
     addRoute: '/ui/kubernetes/infrastructure/nodes/cli/download',
     title: 'Nodes',
-    icon: Storage,
+    icon: 'ball-pile',
     dataLoader: [loadNodes],
     quantityFn: nodes =>
       validateFieldHealthAndQuantity({
@@ -143,7 +139,7 @@ const statusReports = [
     route: '/ui/kubernetes/infrastructure#clusters',
     addRoute: '/ui/kubernetes/infrastructure/clusters/add',
     title: 'Clusters',
-    icon: Layers,
+    icon: 'project-diagram',
     dataLoader: [clusterActions.list],
     quantityFn: clusters =>
       validateFieldHealthAndQuantity({
