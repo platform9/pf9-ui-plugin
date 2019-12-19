@@ -84,8 +84,10 @@ const AppContainer = () => {
         history.push(loginUrl)
         return
       }
-      await setupSession({ username, unscopedToken, expiresAt, issuedAt })
-      history.push(dashboardUrl)
+      const success = await setupSession({ username, unscopedToken, expiresAt, issuedAt })
+      if (success) {
+        history.push(dashboardUrl)
+      }
       return
     }
     // Attempt to restore the session
@@ -127,40 +129,52 @@ const AppContainer = () => {
     const timeDiff = moment(expiresAt).diff(issuedAt)
     const localExpiresAt = moment().add(timeDiff).format()
 
-    // Set up the scopedToken
-    await initSession(unscopedToken, username, localExpiresAt)
-    // The order matters, we need the session to be able to init the user preferences
-    const userPreferences = await initUserPreferences(username)
+    try {
+      // Set up the scopedToken
+      await initSession(unscopedToken, username, localExpiresAt)
+      // The order matters, we need the session to be able to init the user preferences
+      const userPreferences = await initUserPreferences(username)
 
-    const lastTenant = pathOr('service', ['Tenants', 'lastTenant', 'name'], userPreferences)
-    const lastRegion = path(['RegionChooser', 'lastRegion', 'id'], userPreferences)
+      const lastTenant = pathOr('service', ['Tenants', 'lastTenant', 'name'], userPreferences)
+      const lastRegion = path(['RegionChooser', 'lastRegion', 'id'], userPreferences)
 
-    const tenants = await loadUserTenants({ getContext, setContext })
-    const activeTenant = tenants.find(propEq('name', lastTenant)) || head(tenants)
+      const tenants = await loadUserTenants({ getContext, setContext })
+      if (isNilOrEmpty(tenants)) {
+        throw new Error('No tenants found, please contact support')
+      }
+      const activeTenant = tenants.find(propEq('name', lastTenant)) || head(tenants)
+      if (lastRegion) { setActiveRegion(lastRegion) }
 
-    if (lastRegion) { setActiveRegion(lastRegion) }
-    const { scopedToken, user, role } = await keystone.changeProjectScope(activeTenant.id)
-    await keystone.resetCookie()
+      const { scopedToken, user, role } = await keystone.changeProjectScope(activeTenant.id)
+      await keystone.resetCookie()
+      /* eslint-disable */
+      // Identify the user in Segment using Keystone ID
+      if (typeof analytics !== 'undefined') {
+        analytics.identify(user.id, {
+          email: user.name,
+        })
+      }
 
-    /* eslint-disable */
-    // Identify the user in Segment using Keystone ID
-    if (typeof analytics !== 'undefined') {
-      analytics.identify(user.id, {
-        email: user.name,
+      /* eslint-enable */
+      updatePrefs({ lastTenant: activeTenant })
+      setStorage('userTenants', tenants)
+      setStorage('user', user)
+      setStorage('tokens', { unscopedToken, currentToken: scopedToken })
+
+      await setContext({
+        initialized: true,
+        currentTenant: activeTenant,
+        userDetails: { ...user, role },
       })
+    } catch (err) {
+      await setContext({
+        appLoaded: false,
+        initialized: false,
+      })
+      showToast(`There has been an error initializing the session.\n${err.message}`, 'error')
+      return false
     }
-
-    /* eslint-enable */
-    updatePrefs({ lastTenant: activeTenant })
-    setStorage('userTenants', tenants)
-    setStorage('user', user)
-    setStorage('tokens', { unscopedToken, currentToken: scopedToken })
-
-    await setContext({
-      initialized: true,
-      currentTenant: activeTenant,
-      userDetails: { ...user, role },
-    })
+    return true
   }
 
   const loadingMessage = appLoaded
