@@ -2,6 +2,9 @@ import React, { FunctionComponent } from 'react'
 import { Theme } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import { hexToRGBA } from 'core/utils/colorHelpers'
+import { useToast } from 'core/providers/ToastProvider'
+import { CopyToClipboard } from 'react-copy-to-clipboard'
+import { MessageTypes } from 'core/components/toasts/ToastItem'
 
 interface Props {
   children: any
@@ -15,6 +18,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     margin: theme.spacing(0.5),
     wordBreak: 'break-all',
     whiteSpace: 'pre-wrap',
+    cursor: 'copy',
 
     '& *': {
       fontFamily: 'Courier'
@@ -24,7 +28,10 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const CodeBlock: FunctionComponent<Props> = ({ children }) => {
   const styles = useStyles({})
-  return <pre className={styles.pre}>{children}</pre>
+  const showToast = useToast()
+  const handleOnCopy = () => showToast('Text copied to clipboard successfuly...', MessageTypes.success)
+
+  return <CopyToClipboard text={children} onCopy={handleOnCopy}><pre className={styles.pre}>{children}</pre></CopyToClipboard>
 }
 
 export default CodeBlock

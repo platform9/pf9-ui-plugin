@@ -27,8 +27,8 @@ const useStyles = makeStyles((theme: Theme) => ({
 const AnyLink: any = SimpleLink
 
 const installCommand =
-  '> curl -O https://raw.githubusercontent.com/platform9/express-cli/master/cli-setup.sh\n' +
-  '> bash ./cli-setup.sh'
+  'curl -O https://raw.githubusercontent.com/platform9/express-cli/master/cli-setup.sh\n' +
+  'bash ./cli-setup.sh'
 
 // Not super enthused about this. Need to have different content for bareos flow vs landing page.
 export const DownloadCliBareOSWalkthrough = (): JSX.Element => (
@@ -70,7 +70,7 @@ const DownloadCliWalkthrough = ({ finalStep = defaultFinalStep }): JSX.Element =
       <NumberedSteps
         step={2}
         title="Run the CLI to prepare your node with required pre-requisites to be added to a Kubernetes cluster"
-        description={<CodeBlock>> pf9ctl cluster prep-node</CodeBlock>}
+        description={<CodeBlock>pf9ctl cluster prep-node</CodeBlock>}
       />
       <NumberedSteps
         step={3}
