@@ -50,11 +50,18 @@ const clusterConnectionMessages = {
   partially_connected: 'Some nodes in the cluster are not connected',
 }
 
-const masterNodesHealthMessages = {
-  healthy: 'All masters are healthy',
-  partially_healthy: 'Quorum number of masters are healthy',
-  unhealthy: 'Less than quorum number of masters are healthy',
-  unknown: 'Unknown',
+const masterNodesHealthMessages = ({ masterNodesHealthStatus, healthyMasterNodes, masterNodes }) => {
+  switch (masterNodesHealthStatus) {
+    case 'healthy':
+      return 'All masters are healthy'
+    case 'partially_healthy':
+      return `${healthyMasterNodes.length} of ${masterNodes.length} masters are healthy. Quorum established`
+    case 'unhealthy':
+      return `only ${healthyMasterNodes.length} of ${masterNodes.length} masters are healthy. Quorum failed`
+    case 'unknown ':
+    default:
+      return 'Unknown'
+  }
 }
 
 const workerNodesHealthMessages = {
@@ -76,7 +83,7 @@ const ClusterNodesOverview = ({ cluster }) => {
   const masterNodesFields = clusterHealthStatusFields[cluster.masterNodesHealthStatus]
   const workerNodesFields = clusterHealthStatusFields[cluster.workerNodesHealthStatus]
   const clusterConnectionMessage = clusterConnectionMessages[cluster.connectionStatus]
-  const masterNodesMessage = masterNodesHealthMessages[cluster.masterNodesHealthStatus]
+  const masterNodesMessage = masterNodesHealthMessages(cluster)
   const workerNodesMessage = workerNodesHealthMessages[cluster.workerNodesHealthStatus]
 
   return (

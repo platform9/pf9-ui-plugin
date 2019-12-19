@@ -79,12 +79,12 @@ const AppContainer = () => {
 
       // Start from scratch to make use of prebuilt functions
       // for standard login page
-      const { unscopedToken, username } = await keystone.getUnscopedTokenWithToken(scopedToken)
+      const { unscopedToken, username, expiresAt, issuedAt } = await keystone.getUnscopedTokenWithToken(scopedToken)
       if (!unscopedToken) {
         history.push(loginUrl)
         return
       }
-      await setupSession({ username, unscopedToken })
+      await setupSession({ username, unscopedToken, expiresAt, issuedAt })
       history.push(dashboardUrl)
       return
     }

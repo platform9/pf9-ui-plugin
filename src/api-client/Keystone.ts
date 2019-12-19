@@ -237,9 +237,10 @@ class Keystone extends ApiService {
     try {
       const response = await this.client.rawPost(this.tokensUrl, body)
       const username = response.data.token.user.name
+      const { expires_at: expiresAt, issued_at: issuedAt } = response.data.token
       const unscopedToken = response.headers['x-subject-token']
       this.client.unscopedToken = unscopedToken
-      return { unscopedToken, username }
+      return { unscopedToken, username, expiresAt, issuedAt }
     } catch (err) {
       return {}
     }

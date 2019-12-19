@@ -17,7 +17,7 @@ const DataRow = ({ label, value }) => (
 
 const bool2str = (value) => (value ? 'true' : 'false')
 
-const getFilteredNodesFormattedName = (nodes, filterList) =>
+const getFilteredNodesFormattedName = (nodes, filterList = []) =>
   nodes
     .filter((node) => filterList.includes(node.uuid))
     .map((node) => `${node.name} - ${node.primaryIp}`)
