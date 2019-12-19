@@ -63,7 +63,7 @@ const styles = theme => ({
     width: '90%',
     '& .MuiPaper-root': {
       width: 'initial',
-      boxShadow: 'initial'
+      boxShadow: 'initial',
     },
   },
 })
@@ -94,9 +94,12 @@ export class LoginPage extends React.PureComponent {
       return this.setState({ loading: false, loginFailed: true })
     }
 
-    await onAuthSuccess({ username, unscopedToken, expiresAt, issuedAt })
+    const authSuccess = await onAuthSuccess({ username, unscopedToken, expiresAt, issuedAt })
 
-    this.props.history.push(dashboardUrl)
+    if (authSuccess) {
+      return this.props.history.push(dashboardUrl)
+    }
+    return this.setState({ loginFailed: true, loading: false })
   }
 
   handleChangeBox = name => event => {
