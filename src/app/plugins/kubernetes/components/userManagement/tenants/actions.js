@@ -1,8 +1,10 @@
 import ApiClient from 'api-client/ApiClient'
-import { keys, pluck, pipe, prop, find, propEq, filter, always, isNil, reject, map } from 'ramda'
+import {
+  keys, pluck, pipe, prop, find, propEq, filter, always, isNil, reject, map, last,
+} from 'ramda'
 import { namespacesCacheKey } from 'k8s/components/namespaces/actions'
 import createCRUDActions from 'core/helpers/createCRUDActions'
-import { filterIf, pathStr, emptyArr } from 'utils/fp'
+import { filterIf, pathStr, emptyArr, objSwitchCase } from 'utils/fp'
 import createContextLoader from 'core/helpers/createContextLoader'
 import { tryCatchAsync } from 'utils/async'
 import { mngmUsersCacheKey } from 'k8s/components/userManagement/users/actions'
@@ -119,6 +121,17 @@ export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
   refetchCascade: true,
   requiredRoles: 'admin',
   entityName: 'Tenant',
+  successMessage: (updatedItems, prevItems, { id }, operation) => objSwitchCase({
+    create: `Tenant ${prop('name', last(updatedItems))} created successfully`,
+    update: `Tenant ${pipe(
+      find(propEq('id', id)),
+      prop('name'),
+    )(prevItems)} updated successfully`,
+    delete: `Tenant ${pipe(
+      find(propEq('id', id)),
+      prop('name'),
+    )(prevItems)} deleted successfully`,
+  })(operation),
 })
 
 export const mngmTenantRoleAssignmentsCacheKey = 'managementTenantRoleAssignments'
