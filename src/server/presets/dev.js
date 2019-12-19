@@ -38,7 +38,7 @@ import PrometheusInstance from '../models/prometheus/PrometheusInstance'
 import Logging from '../models/qbert/Logging'
 import LoggingStub from '../../app/plugins/kubernetes/components/logging/LoggingStub'
 import { attachNodeToCluster } from '../models/qbert/Operations'
-// import Token from '../models/openstack/Token'
+import Token from '../models/openstack/Token'
 import { range } from '../util'
 import { strict as assert } from 'assert'
 
@@ -70,6 +70,13 @@ function loadPreset () {
   const adminUser = new User({ id: 'id-user-admin', name: 'admin@platform9.com', password: 'secret', tenant: serviceTenant })
   adminUser.addRole(serviceTenant, adminRole)
   adminUser.rolePair = context.getTenantRoles(adminUser.id)
+
+  // Create a token for tests
+  new Token({
+    id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+    user: adminUser,
+    tenant: serviceTenant,
+  })
 
   // Create a bunch of misc users
   range(2).forEach(i => {

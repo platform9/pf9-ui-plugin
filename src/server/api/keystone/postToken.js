@@ -50,7 +50,7 @@ const postToken = (req, res) => {
     const tenantScopeId = auth.scope && auth.scope.project && auth.scope.project.id
     const tenant = Tenant.findById(tenantScopeId)
     const scopedToken = user.name === simUsername
-      ? new Token({ user, tenant, id: simToken })
+      ? unscopedToken
       : new Token({ user, tenant })
     return res.set('X-Subject-Token', scopedToken.id).status(201).send({ token: scopedToken.asJson() })
   }

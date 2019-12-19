@@ -1,6 +1,5 @@
 const config = require('../../config')
-const name = 'admin@platform9.com'
-const password = 'secret'
+const sessionJson = require('../fixtures/session')
 
 // ***********************************************
 // This example commands.js shows you how to
@@ -30,56 +29,8 @@ const password = 'secret'
 
 // Allow the session to be stubbed out.
 // The hard-coded token id is explicitly whitelisted in the simulator.
-// We put the session variable outside of the command to allow it to be saved for
-// subsequent requests and improve performance
-let session
 Cypress.Commands.add('login', () => {
-  if (session) {
-    window.localStorage.setItem('pf9', JSON.stringify(session))
-    return
-  }
-  cy.request({
-    method: 'POST',
-    url: `${config.apiHost}/keystone/v3/auth/tokens?nocatalog`,
-    body: {
-      auth: {
-        identity: {
-          methods: ['password'],
-          password: {
-            user: { name, password, domain: { id: 'default' } },
-          },
-        },
-      },
-    },
-  })
-    .its('body')
-    .then(({ token: { id, user } }) => {
-      return cy.request({
-        method: 'GET',
-        url: `${config.apiHost}/keystone/v3/auth/projects`,
-        headers: {
-          Authorization: `Bearer ${id}`, // required for k8s proxy api
-          'X-Auth-Token': id, // required for OpenStack
-        },
-      }).then(({ body: { projects } }) => {
-        session = {
-          userTenants: projects,
-          tokens: {
-            currentToken: id,
-            unscopedToken: id,
-          },
-          user: {
-            ...user,
-            username: user.name,
-            userId: user.id,
-            roles: user.roles,
-            displayName: user.displayname,
-            role: 'admin',
-          },
-        }
-        window.localStorage.setItem('pf9', JSON.stringify(session))
-      })
-    })
+  window.localStorage.setItem('pf9', JSON.stringify(sessionJson))
 })
 
 // For use with <ListTable>.  This will select the row containing the given text.
