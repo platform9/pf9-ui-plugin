@@ -7,6 +7,7 @@ import ExternalLink from 'core/components/ExternalLink'
 import ClusterStatusSpan from 'k8s/components/infrastructure/clusters/ClusterStatusSpan'
 import createListTableComponent from 'core/helpers/createListTableComponent'
 import { noop } from 'utils/fp'
+import { capitalizeString } from 'utils/misc'
 import {
   clusterHealthStatusFields,
 } from '../clusters/ClusterStatusUtils'
@@ -98,9 +99,21 @@ const TaskStatusDialog = ({ isOpen, toggleOpen, node }) => {
   )
 }
 
+const renderStatus = (_, { status }) => {
+  if (status === 'none') {
+    return <EmptyStatus />
+  }
+
+  return (
+    <ClusterStatusSpan status={status === 'completed' ? 'ok' : 'fail'}>
+      {capitalizeString(status)}
+    </ClusterStatusSpan>
+  )
+}
+
 const columns = [
   { id: 'task', label: 'Task', disableSorting: true },
-  { id: 'status', label: 'Status' },
+  { id: 'status', label: 'Status', render: renderStatus },
 ]
 
 const TasksTable = createListTableComponent({
@@ -143,6 +156,11 @@ const HealthStatus = ({ healthStatus }) => {
     </ClusterStatusSpan>
   )
 }
+
+const EmptyStatus = () =>
+  <span style={{ visibility: 'hidden' }}>
+    <ClusterStatusSpan status='pause' />
+  </span>
 
 const healthStatusMessage = {
   healthy: 'No errors encountered while installing some components on this node',
