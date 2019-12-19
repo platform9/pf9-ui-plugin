@@ -66,7 +66,14 @@ const TasksTable = createListTableComponent({
 
 const Tasks =({ allTasks, lastFailedTask }) => {
   const failedTaskIndex = allTasks.indexOf(lastFailedTask)
-  const getStatus = (index) => index === failedTaskIndex ? 'failed' : index <= failedTaskIndex ? 'completed' : 'none'
+  const completedTasks = failedTaskIndex >=0 ? failedTaskIndex : allTasks.length
+  const getStatus = (index) => {
+    if (failedTaskIndex < 0) {
+      return 'completed'
+    }
+
+    return index === failedTaskIndex ? 'failed' : index <= failedTaskIndex ? 'completed' : 'none'
+  }
   const getTaskName = (value, index) => `${index + 1}. ${value}`
   const tasksWithStatus = allTasks.map((value, index) => ({
     task: getTaskName(value, index),
@@ -76,7 +83,7 @@ const Tasks =({ allTasks, lastFailedTask }) => {
   return (
     <div>
       <TasksTable data={tasksWithStatus} onSortChange={noop} />
-      <div>{failedTaskIndex} out of {allTasks.length} tasks completed</div>
+      <div>{completedTasks} out of {allTasks.length} tasks completed</div>
     </div>
   )
 }
