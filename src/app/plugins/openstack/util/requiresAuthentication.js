@@ -5,7 +5,7 @@ import { AppContext } from 'core/providers/AppProvider'
 const requiresAuthentication = WrappedComponent => {
   return props => {
     const { session } = useContext(AppContext)
-    const isAuthenticated = session && session.user
+    const isAuthenticated = session && !!session.username
 
     // We need to delay rendering authenticated components until
     // authentication is completed.  Otherwise components will attempt
