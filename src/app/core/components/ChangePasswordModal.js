@@ -6,7 +6,6 @@ import ListItem from '@material-ui/core/ListItem'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
 import CheckIcon from '@material-ui/icons/Check'
 import ClearIcon from '@material-ui/icons/Clear'
-import RemoveRedEye from '@material-ui/icons/RemoveRedEye'
 import ListItemText from '@material-ui/core/ListItemText'
 import { propSatisfies, isNil } from 'ramda'
 import useParams from 'core/hooks/useParams'
@@ -19,6 +18,9 @@ import SubmitButton from 'core/components/buttons/SubmitButton'
 import { AppContext } from 'core/providers/AppProvider'
 import { logoutUrl } from 'app/constants.js'
 import { useToast } from 'core/providers/ToastProvider'
+import Visibility from '@material-ui/icons/Visibility'
+import VisibilityOff from '@material-ui/icons/VisibilityOff'
+import IconButton from '@material-ui/core/IconButton'
 import {
   hasOneSpecialChar,
   hasOneNumber,
@@ -161,10 +163,12 @@ const ChangePasswordModal = (props) => {
                       InputProps={{
                         endAdornment: (
                           <InputAdornment position="end">
-                            <RemoveRedEye
-                              className={classes.eye}
+                            <IconButton
+                              aria-label="toggle password visibility"
                               onClick={togglePasswordMask('isOldPasswordMasked')}
-                            />
+                            >
+                              {params.isOldPasswordMasked ? <Visibility /> : <VisibilityOff />}
+                            </IconButton>
                           </InputAdornment>
                         ),
                       }}
@@ -180,10 +184,12 @@ const ChangePasswordModal = (props) => {
                       InputProps={{
                         endAdornment: (
                           <InputAdornment position="end">
-                            <RemoveRedEye
-                              className={classes.eye}
+                            <IconButton
+                              aria-label="toggle password visibility"
                               onClick={togglePasswordMask('isNewPasswordMasked')}
-                            />
+                            >
+                              {params.isNewPasswordMasked ? <Visibility /> : <VisibilityOff />}
+                            </IconButton>
                           </InputAdornment>
                         ),
                       }}
@@ -199,10 +205,12 @@ const ChangePasswordModal = (props) => {
                       InputProps={{
                         endAdornment: (
                           <InputAdornment position="end">
-                            <RemoveRedEye
-                              className={classes.eye}
+                            <IconButton
+                              aria-label="toggle password visibility"
                               onClick={togglePasswordMask('isConfirmPasswordMasked')}
-                            />
+                            >
+                              {params.isConfirmPasswordMasked ? <Visibility /> : <VisibilityOff />}
+                            </IconButton>
                           </InputAdornment>
                         ),
                       }}
