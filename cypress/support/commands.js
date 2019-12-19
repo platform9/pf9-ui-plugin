@@ -29,9 +29,6 @@ const sessionJson = require('../fixtures/session')
 
 // Allow the session to be stubbed out.
 // The hard-coded token id is explicitly whitelisted in the simulator.
-// We put the session variable outside of the command to allow it to be saved for
-// subsequent requests and improve performance
-let session
 Cypress.Commands.add('login', () => {
   window.localStorage.setItem('pf9', JSON.stringify(sessionJson))
 })
