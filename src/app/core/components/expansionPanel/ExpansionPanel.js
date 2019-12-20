@@ -42,7 +42,11 @@ const useStyles = makeStyles(theme => createStyles({
     border: '1px solid rgba(74, 163, 223, 0.5)',
     borderLeft: '0px',
     borderRight: '0px',
-    padding: '40px'
+    padding: '40px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start'
   }
 }))
 

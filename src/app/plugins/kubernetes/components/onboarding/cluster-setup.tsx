@@ -4,9 +4,7 @@ import { makeStyles } from '@material-ui/styles'
 import ExpansionPanel from 'core/components/expansionPanel/ExpansionPanel'
 import Theme from 'core/themes/model'
 import { except } from 'utils/fp'
-import SimpleLink from 'core/components/SimpleLink'
 import OnboardWizard from './onboard-wizard'
-import ExternalLink from 'core/components/ExternalLink'
 import NextButton from 'core/components/buttons/NextButton'
 import useReactRouter from 'use-react-router'
 import CodeBlock from 'core/components/CodeBlock'
@@ -14,14 +12,6 @@ import CodeBlock from 'core/components/CodeBlock'
 const useStyles = makeStyles<Theme>((theme) => ({
   container: {
     maxWidth: 800,
-  },
-  rightAlign: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    '& a:first-child': {
-      marginRight: theme.spacing(2),
-    },
   },
 }))
 
@@ -51,19 +41,6 @@ const ClusterSetup = () => {
 
   return (
     <div className={classes.container}>
-      <div className={classes.rightAlign}>
-        <SimpleLink src="/ui/kubernetes/user_management#users" icon="user-plus">
-          Invite Team Member
-        </SimpleLink>
-        <ExternalLink
-          url="https://docs.platform9.com/kubernetes/create-multimaster-bareos-cluster/"
-          icon="file-alt"
-        >
-          Setup Documentation
-        </ExternalLink>
-      </div>
-      {/* <ButtonLink url="/ui/kubernetes/dashboard" icon="file-alt" label="Setup Documentation" /> */}
-
       <OnboardWizard
         title="Create your first Kubernetes cluster"
         body="Create your first Kubernetes cluster so you can start running some appications on it."
@@ -101,9 +78,11 @@ const ClusterSetup = () => {
           onClick={togglePanel(3)}
           stepNumber={3}
           completed
-          summary="View Cluster Dashboard"
+          summary="Enable Monitoring For Your Cluster (Beta)"
         >
-          <div>Stuff goes here</div>
+          <Typography variant="body1" component="span">
+          Now that your cluster is created, enable monitoring to view the cluster’s health stats realtime in a dashboard
+          </Typography>
         </ExpansionPanel>
       </OnboardWizard>
     </div>

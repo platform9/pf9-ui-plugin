@@ -18,6 +18,7 @@ import { Typography } from '@material-ui/core'
 import { capitalizeString, normalizeUsername } from 'utils/misc'
 
 import ClusterSetup from '../onboarding/cluster-setup'
+import PodSetup from '../onboarding/pod-setup'
 
 const useStyles = makeStyles((theme) => ({
   cardRow: {
@@ -194,6 +195,7 @@ const DashboardPage = () => {
     <section name="dashboard-status-container" className={cardColumn}>
       <Typography variant="h5">Welcome {username}!</Typography>
       <ClusterSetup />
+      <PodSetup />
 
       {false && (
         <>
