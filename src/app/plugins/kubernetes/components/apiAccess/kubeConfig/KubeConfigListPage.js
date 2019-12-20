@@ -77,6 +77,8 @@ const KubeConfigListPage = () => {
     blankFirstColumn: true,
     multiSelection: false,
     onSelect,
+    emptyText: 'There are no clusters available',
+    renderEmptyTable: true,
   }), [toggleDialog, downloadedKubeconfigs, currentKubeconfig, generateYaml])
 
   const downloadKubeconfig = async (cluster, generateYaml, token) => {
