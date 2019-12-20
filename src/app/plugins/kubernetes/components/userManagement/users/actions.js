@@ -5,10 +5,9 @@ import {
 } from 'k8s/components/userManagement/tenants/actions'
 import {
   partition, pluck, map, head, innerJoin, uniq, prop, pipe, find, propEq, when, isNil, always,
-  filter, flatten, groupBy, values, omit, keys, reject,
+  filter, flatten, groupBy, values, omit, keys, reject, last,
 } from 'ramda'
-import { emptyObj, upsertAllBy, emptyArr, pathStr } from 'utils/fp'
-import { uuidRegex } from 'app/constants'
+import { emptyObj, upsertAllBy, emptyArr, pathStr, objSwitchCase } from 'utils/fp'
 import createContextLoader from 'core/helpers/createContextLoader'
 import { castBoolToStr } from 'utils/misc'
 import { tryCatchAsync } from 'utils/async'
@@ -16,7 +15,7 @@ import { tryCatchAsync } from 'utils/async'
 const { keystone, clemency } = ApiClient.getInstance()
 
 export const isSystemUser = ({ username }) => {
-  return uuidRegex.test(username)
+  return username === 'kplane-clustmgr'
 }
 export const mngmCredentialsCacheKey = 'managementCredentials'
 createContextLoader(mngmCredentialsCacheKey, () => {
@@ -176,6 +175,17 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
   },
   refetchCascade: true,
   entityName: 'User',
+  successMessage: (updatedItems, prevItems, { id }, operation) => objSwitchCase({
+    create: `User ${prop('name', last(updatedItems))} created successfully`,
+    update: `User ${pipe(
+      find(propEq('id', id)),
+      prop('name'),
+    )(prevItems)} updated successfully`,
+    delete: `User ${pipe(
+      find(propEq('id', id)),
+      prop('name'),
+    )(prevItems)} deleted successfully`,
+  })(operation),
 })
 
 export const mngmUserRoleAssignmentsCacheKey = 'managementUserRoleAssignments'

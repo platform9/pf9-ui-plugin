@@ -96,7 +96,7 @@ const renderConnectionStatus = (_, { status, combined }) => {
   )
 }
 
-const renderHealthStatus = (_, { status }) => {
+const renderHealthStatus = (_, { status }, onClick) => {
   if (status === 'converging') {
     return renderConverging()
   }
@@ -105,8 +105,11 @@ const renderHealthStatus = (_, { status }) => {
   const fields = clusterHealthStatusFields[healthStatus]
 
   return (
-    <ClusterStatusSpan status={fields.status}>
-      {fields.label}
+    <ClusterStatusSpan title={fields.label} status={fields.status}>
+      {onClick
+        ? <SimpleLink onClick={onClick}>{fields.label}</SimpleLink>
+        : fields.label
+      }
     </ClusterStatusSpan>
   )
 }
