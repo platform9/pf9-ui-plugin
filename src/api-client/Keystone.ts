@@ -363,6 +363,13 @@ class Keystone extends ApiService {
     return data.user
   }
 
+  updateUserPassword = async (id, params) => {
+    const body = { user: params }
+    const url = `${this.usersUrl}/${id}/password`
+    const data = await this.client.basicPost(url, body)
+    return data.user
+  }
+
   deleteUser = async (userId) => {
     try {
       await this.client.basicDelete(`${this.usersUrl}/${userId}`)
