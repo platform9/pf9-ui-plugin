@@ -8,7 +8,6 @@ import {
   filter, flatten, groupBy, values, omit, keys, reject, last,
 } from 'ramda'
 import { emptyObj, upsertAllBy, emptyArr, pathStr, objSwitchCase } from 'utils/fp'
-import { uuidRegex } from 'app/constants'
 import createContextLoader from 'core/helpers/createContextLoader'
 import { castBoolToStr } from 'utils/misc'
 import { tryCatchAsync } from 'utils/async'
@@ -16,7 +15,7 @@ import { tryCatchAsync } from 'utils/async'
 const { keystone, clemency } = ApiClient.getInstance()
 
 export const isSystemUser = ({ username }) => {
-  return uuidRegex.test(username)
+  return username === 'kplane-clustmgr'
 }
 export const mngmCredentialsCacheKey = 'managementCredentials'
 createContextLoader(mngmCredentialsCacheKey, () => {
