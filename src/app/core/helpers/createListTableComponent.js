@@ -27,6 +27,7 @@ const createListTableComponent = ({
     preferences: { visibleColumns, columnsOrder, rowsPerPage },
     updatePreferences,
     loading,
+    onSortChange,
   }) => (!data || data.length === 0
     ? <h1>{emptyText}</h1>
     : <ListTable
@@ -47,6 +48,7 @@ const createListTableComponent = ({
       onRefresh={onRefresh}
       onRowsPerPageChange={rowsPerPage => updatePreferences({ rowsPerPage })}
       onColumnsChange={updatePreferences}
+      onSortChange={onSortChange}
       uniqueIdentifier={uniqueIdentifier}
       loading={loading}
       compactTable={compactTable}
