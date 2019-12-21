@@ -3,6 +3,7 @@ stages:
   - build
   - test
 cache:
+  key: same-everywhere
   paths:
     - node_modules/
 install_dependencies:
