@@ -17,3 +17,6 @@ install_dependencies:
 test_lint:
   stage: test
   script: yarn lint
+test_unit:
+  stage: test
+  script: yarn test:unit
