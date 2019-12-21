@@ -1,0 +1,18 @@
+image: node:12
+stages:
+  - build
+  - test
+cache:
+  paths:
+    - node_modules/
+install_dependencies:
+  stage: build
+  script:
+    - cp config.example.js config.js
+    - yarn
+  artifacts:
+    paths:
+      - node_modules/
+test_lint:
+  stage: test
+  script: yarn lint
