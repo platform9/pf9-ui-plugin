@@ -1,5 +1,4 @@
 import React, { useCallback } from 'react'
-import { Typography } from '@material-ui/core'
 import ExpansionPanel from 'core/components/expansionPanel/ExpansionPanel'
 import OnboardWizard from './onboard-wizard'
 import NextButton from 'core/components/buttons/NextButton'
@@ -8,7 +7,10 @@ import useReactRouter from 'use-react-router'
 
 const PodSetup = () => {
   const { history } = useReactRouter()
-  const handleCreatePod = () => {}
+
+  const handleCreatePod = useCallback(() => {
+    history.push('/ui/kubernetes/pods/add')
+  }, [])
 
   return (
     <OnboardWizard
@@ -24,24 +26,6 @@ const PodSetup = () => {
           Create Pod
         </NextButton>
       </ExpansionPanel>
-      {/* <ExpansionPanel
-        stepNumber={2}
-        summary="Access Your Application Externally"
-        completed={false}
-      >
-        <Typography variant="body1" component="span">
-          TODO
-        </Typography>
-      </ExpansionPanel>
-      <ExpansionPanel
-        stepNumber={3}
-        completed={false}
-        summary="Scale Your Application"
-      >
-        <Typography variant="body1" component="span">
-          TODO
-        </Typography>
-      </ExpansionPanel> */}
     </OnboardWizard>
   )
 }

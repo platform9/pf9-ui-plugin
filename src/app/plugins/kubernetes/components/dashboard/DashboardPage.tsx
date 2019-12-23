@@ -188,11 +188,11 @@ const reportsWithPerms = (reports) => {
 }
 
 const DashboardPage = () => {
-  const { cardColumn, cardRow } = useStyles()
+  const { cardColumn, cardRow } = useStyles({})
   const { session } = useContext(AppContext)
   const username = capitalizeString(normalizeUsername(session.username))
   return (
-    <section name="dashboard-status-container" className={cardColumn}>
+    <section className={cardColumn}>
       <Typography variant="h5">Welcome {username}!</Typography>
       <ClusterSetup />
       <PodSetup />
