@@ -418,22 +418,6 @@ class ListTable extends PureComponent {
     )
   }
 
-  renderEmptyTableRow = () => {
-    const { loading, emptyText } = this.props
-
-    if (loading) {
-      return null
-    }
-
-    return (
-      <TableRow>
-        <TableCell colSpan={4} align="center">
-          <Typography variant="body1">{emptyText}</Typography>
-        </TableCell>
-      </TableRow>
-    )
-  }
-
   renderEmptyList = () => {
     if (this.props.loading) {
       return null
@@ -477,7 +461,6 @@ class ListTable extends PureComponent {
       compactTable,
       blankFirstColumn,
       extraToolbarContent,
-      renderEmptyTable,
     } = this.props
 
     if (!data) {
@@ -490,7 +473,7 @@ class ListTable extends PureComponent {
     // Always show pagination control bar to make sure the height doesn't change frequently.
     // const shouldShowPagination = paginate && sortedData.length > this.state.rowsPerPage
 
-    const tableContent = paginatedData && (paginatedData.length || renderEmptyTable)
+    const tableContent = paginatedData && paginatedData.length
       ? <Table className={classes.table} size={size}>
         <ListTableHead
           canDragColumns={canDragColumns}
@@ -507,10 +490,7 @@ class ListTable extends PureComponent {
           blankFirstColumn={blankFirstColumn}
         />
         <TableBody>
-          {paginatedData.length
-            ? paginatedData.map(this.renderRow)
-            : this.renderEmptyTableRow()
-          }
+          {paginatedData.map(this.renderRow)}
         </TableBody>
       </Table>
       : this.renderEmptyList()
@@ -592,7 +572,6 @@ ListTable.propTypes = {
   visibleColumns: PropTypes.arrayOf(PropTypes.string),
   rowsPerPage: PropTypes.number,
   emptyText: PropTypes.string,
-  renderEmptyTable: PropTypes.bool,
 
   /**
    * List of filters
@@ -659,7 +638,6 @@ ListTable.defaultProps = {
   canDragColumns: true,
   rowsPerPage: 10,
   emptyText: 'No data found',
-  renderEmptyTable: false,
   loading: false,
   size: 'medium',
   compactTable: false,
