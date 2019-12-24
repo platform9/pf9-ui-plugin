@@ -1,13 +1,14 @@
 // Libs
 import React, { FunctionComponent } from 'react'
 import { Typography, Theme } from '@material-ui/core'
+import { makeStyles } from '@material-ui/styles'
 
 // Components
 import PageContainer from 'core/components/pageContainer/PageContainer'
 import SimpleLink from 'core/components/SimpleLink'
 import CodeBlock from 'core/components/CodeBlock'
 import DownloadCliWalkthrough from './DownloadCliWalkthrough'
-import { makeStyles } from '@material-ui/styles'
+import CopyToClipboard from 'core/components/CopyToClipboard'
 
 const useStyles = makeStyles((theme: Theme) => ({
   spacer: {
@@ -41,8 +42,8 @@ const ClusterDetailsPage: FunctionComponent = () => {
         Create clusters and more directly using the CLI
       </Typography>
       <Typography component="span" variant="body1">
-        You can use the <CodeBlock>pf9ctl</CodeBlock> CLI directly to use one or more PMK clusters.
-        Type <CodeBlock>pf9ctl --help</CodeBlock> to see the full features and options the CLI
+        You can use the <CopyToClipboard copyText="pf9ctl"><CodeBlock>pf9ctl</CodeBlock></CopyToClipboard> CLI directly to use one or more PMK clusters.
+        Type <CopyToClipboard copyText="pf9ctl --help"><CodeBlock>pf9ctl --help</CodeBlock></CopyToClipboard> to see the full features and options the CLI
         supports
       </Typography>
       <p> </p>
