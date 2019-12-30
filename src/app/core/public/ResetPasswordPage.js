@@ -180,12 +180,7 @@ const ResetPasswordPage = props => {
   )
 
   return (
-    <Progress
-      loading={params.loading}
-      overlay
-      renderContentOnMount
-      message="Processing..."
-    >
+    <Progress loading={params.loading} overlay renderContentOnMount message="Processing...">
       <Grid container justify="center" className={classes.root}>
         <Grid item md={5} lg={4}>
           <Paper className={classes.paper}>
@@ -231,10 +226,7 @@ const ResetPasswordPage = props => {
                         {renderPasswordValidationCheck(values)}
                         {params.isError && (
                           <div className={classes.alertContainer}>
-                            <Alert
-                              variant="error"
-                              message={params.errorMessage}
-                            />
+                            <Alert variant="error" message={params.errorMessage} />
                           </div>
                         )}
                         <SubmitButton label="RESET MY PASSWORD" />
@@ -242,7 +234,7 @@ const ResetPasswordPage = props => {
                     ) : (
                       <>
                         <Typography className={classes.paragraph} component="p">
-                          Your was reset successfully.
+                          Your password has been reset successfully.
                         </Typography>
                         <SubmitButton label="RETURN TO LOGIN SCREEN" />
                       </>
