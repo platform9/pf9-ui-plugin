@@ -8,7 +8,7 @@ import Progress from 'core/components/progress/Progress'
 import { loginUrl, forgotPasswordUrl, resetPasswordUrl } from 'app/constants.js'
 import { Link } from 'react-router-dom'
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme: any) => ({
   root: {
     padding: theme.spacing(8),
     overflow: 'auto'
