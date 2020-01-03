@@ -9,16 +9,26 @@ import SimpleLink from 'core/components/SimpleLink'
 import useToggler from 'core/hooks/useToggler'
 import ApiClient from 'api-client/ApiClient'
 import ExternalLink from 'core/components/ExternalLink'
+import useDataLoader from 'core/hooks/useDataLoader'
 
 const { qbert } = ApiClient.getInstance()
 
 const useStyles = makeStyles(theme => ({
+  container: {
+    marginTop: theme.spacing(3),
+    '& h6': {
+      marginLeft: 0,
+    }
+  },
   link: {
     display: 'block',
     width: 'fit-content',
   },
   clusterConfig: {
     marginTop: theme.spacing(5),
+  },
+  tableContainer: {
+    minHeight: ({ loading }) => loading ? theme.spacing(35) : theme.spacing(),
   },
 }))
 
@@ -28,7 +38,9 @@ const KubeConfigListPage = () => {
   const [downloadedKubeconfigs, setDownloadedKubeconfigs] = useState({})
   const [currentKubeconfig, setCurrentKubeconfig] = useState('')
   const [generateYaml, setGenerateYaml] = useState(false)
-  const classes = useStyles()
+
+  const [clusters, loadingClusters] = useDataLoader(kubeConfigActions.list)
+  const classes = useStyles({ loading: loadingClusters })
 
   const onSelect = (row) => {
     setSelectedCluster({ id: row.clusterId, name: row.cluster })
@@ -77,6 +89,7 @@ const KubeConfigListPage = () => {
     blankFirstColumn: true,
     multiSelection: false,
     onSelect,
+    emptyText: 'There are no available clusters from which you can download a kubeconfig',
   }), [toggleDialog, downloadedKubeconfigs, currentKubeconfig, generateYaml])
 
   const downloadKubeconfig = async (cluster, generateYaml, token) => {
@@ -102,7 +115,7 @@ const KubeConfigListPage = () => {
   const { ListPage } = createCRUDComponents(options)
 
   return (
-    <>
+    <section className={classes.container}>
       <h2>Download kubeconfig</h2>
       <p>The kubeconfig file is required to authenticate with a cluster and switch between multiple clusters between multiple users while using the kubectl command line.</p>
       <ExternalLink className={classes.link} url="https://kubernetes.io/docs/user-guide/kubectl-overview/">
@@ -111,17 +124,22 @@ const KubeConfigListPage = () => {
       <ExternalLink className={classes.link} url="https://kubernetes.io/docs/user-guide/kubeconfig-file/">
         Learn more about kubeconfig
       </ExternalLink>
-      <ListPage />
-      <p className={classes.clusterConfig}>Select a cluster above to populate its kubeconfig below.</p>
-      <ValidatedForm>
-        <TextField id="config" value={currentKubeconfig} rows={9} multiline />
-      </ValidatedForm>
-      <DownloadDialog
-        onDownloadClick={(token) => downloadKubeconfig(selectedCluster, generateYaml, token)}
-        onClose={handleCloseDialog}
-        isDialogOpen={isDialogOpen}
-      />
-    </>
+      <div className={classes.tableContainer}>
+        <ListPage overlayProgress={false} />
+      </div>
+      { !loadingClusters && clusters.length > 0 && <>
+        <p className={classes.clusterConfig}>Select a cluster above to populate its kubeconfig below.</p>
+        <ValidatedForm>
+          <TextField id="config" value={currentKubeconfig} rows={9} multiline />
+        </ValidatedForm>
+        <DownloadDialog
+          onDownloadClick={(token) => downloadKubeconfig(selectedCluster, generateYaml, token)}
+          onClose={handleCloseDialog}
+          isDialogOpen={isDialogOpen}
+        />
+      </>
+      }
+    </section>
   )
 }
 
