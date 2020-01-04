@@ -11,10 +11,12 @@ import useReactRouter from 'use-react-router'
 import { makeStyles } from '@material-ui/styles'
 import { Route, Redirect, Switch } from 'react-router'
 import {
-  dashboardUrl, resetPasswordUrl, resetPasswordThroughEmailUrl, forgotPasswordUrl, loginUrl,
+  activateUserUrl, dashboardUrl, resetPasswordUrl, resetPasswordThroughEmailUrl,
+  forgotPasswordUrl, loginUrl,
 } from 'app/constants'
 import ResetPasswordPage from 'core/public/ResetPasswordPage'
 import ForgotPasswordPage from 'core/public/ForgotPasswordPage'
+import ActivateUserPage from 'core/public/ActivateUserPage'
 import { isNilOrEmpty } from 'utils/fp'
 import LoginPage from 'core/public/LoginPage'
 import Progress from 'core/components/progress/Progress'
@@ -113,6 +115,8 @@ const AppContainer = () => {
 
     if (history.location.pathname === forgotPasswordUrl) return history.push(forgotPasswordUrl)
 
+    if (history.location.pathname.includes(activateUserUrl)) return
+
     // TODO: Need to fix this code after synching up with backend.
     if (history.location.hash.includes(resetPasswordThroughEmailUrl)) return history.push(history.location.hash.slice().replace('#', '/ui'))
 
@@ -190,6 +194,7 @@ const AppContainer = () => {
     <Switch>
       <Route path={resetPasswordUrl} component={ResetPasswordPage} />
       <Route path={forgotPasswordUrl} component={ForgotPasswordPage} />
+      <Route path={activateUserUrl} component={ActivateUserPage} />
       <Route path={loginUrl}>
         <LoginPage onAuthSuccess={setupSession} />
       </Route>

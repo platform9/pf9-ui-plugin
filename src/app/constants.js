@@ -8,6 +8,7 @@ export const loginWithCookieUrl = `${appUrlRoot}/pmkft/login`
 export const resetPasswordUrl = `${appUrlRoot}/reset/password`
 export const resetPasswordThroughEmailUrl = '/reset/password'
 export const forgotPasswordUrl = `${appUrlRoot}/forgot_password`
+export const activateUserUrl = `${appUrlRoot}/users/activate`
 export const logoutUrl = `${appUrlRoot}/logout`
 export const resetPasswordApiUrl = '/clemency/reset/password'
 export const forgotPasswordApiUrl = '/clemency/request'
