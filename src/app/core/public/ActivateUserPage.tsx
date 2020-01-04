@@ -37,7 +37,7 @@ export const ActivateUserPage = props => {
   const { params, updateParams } = useParams({
     loading: true,
   })
-  const classes = useStyles()
+  const classes = useStyles({})
   const { history, location } = useReactRouter()
 
   const searchParams = new URLSearchParams(location.search)
