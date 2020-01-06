@@ -24,6 +24,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const CodeBlock: FunctionComponent<Props> = ({ children }) => {
   const styles = useStyles({})
+
   return <pre className={styles.pre}>{children}</pre>
 }
 

@@ -67,12 +67,12 @@ const AddUserPage = () => {
                   e => setActivationType(e.target.value)}>
                   { false && <FormControlLabel
                     value="activationByEmail"
-                    control={<Radio />}
+                    control={<Radio color="primary" />}
                     label={activationByEmailLabel} />}
                   <br />
                   <FormControlLabel
                     value="createPassword"
-                    control={<Radio />}
+                    control={<Radio color="primary" />}
                     label={createUserPasswordLabel} />
                 </RadioGroup>
               </FormControl>
