@@ -20,10 +20,8 @@ class Clemency extends ApiService {
   }
 
   resetPassword = async (secret, username, password) => {
-    const body = {
-      username, password,
-    }
-    return this.client.basicPost(`${this.baseUrl}/reset/password/${secret}`, body)
+    const body = { username, password }
+    return this.client.basicPost(`${this.baseUrl}/reset/password${secret}`, body)
   }
 
   createUser = async body => {

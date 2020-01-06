@@ -14,7 +14,7 @@ import {
   activateUserUrl, dashboardUrl, resetPasswordUrl, resetPasswordThroughEmailUrl,
   forgotPasswordUrl, loginUrl,
 } from 'app/constants'
-import ResetPasswordPage from 'core/public/ResetPasswordPage'
+import ResetPasswordPage from 'core/public/ResetPasswordPage.tsx'
 import ForgotPasswordPage from 'core/public/ForgotPasswordPage'
 import ActivateUserPage from 'core/public/ActivateUserPage'
 import { isNilOrEmpty } from 'utils/fp'
