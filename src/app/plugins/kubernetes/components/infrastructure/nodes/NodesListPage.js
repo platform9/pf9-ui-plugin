@@ -21,8 +21,6 @@ import RemoteSupportDialog from './RemoteSupportDialog'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { Tooltip } from '@material-ui/core'
 
-const isMaster = pipe(castFuzzyBool, castBoolToStr())
-
 const renderRoles = (_, node) => {
   const roles = pathOr([], ['combined', 'roles'], node)
   return localizeRoles(roles).join(', ')
@@ -114,6 +112,8 @@ const renderHealthStatus = (_, { status }, onClick) => {
   )
 }
 
+const renderRole = (_, { isMaster }) => isMaster ? 'Master' : 'Worker'
+
 const renderApiServer = (_, { isMaster, api_responding: apiResponding }) => !!isMaster && (!!apiResponding).toString()
 
 export const columns = [
@@ -128,7 +128,7 @@ export const columns = [
   { id: 'memory', label: 'Memory', render: renderStats('memory') },
   { id: 'storage', label: 'Storage', render: renderStats('disk') },
   { id: 'clusterName', label: 'Cluster', render: renderClusterLink },
-  { id: 'isMaster', label: 'Is Master?', render: isMaster },
+  { id: 'isMaster', label: 'Role', render: renderRole },
   { id: 'isSpotInstance', label: 'Spot Instance?', display: false, render: getSpotInstance },
   { id: 'assignedRoles', label: 'Assigned Roles', render: renderRoles },
 ]
