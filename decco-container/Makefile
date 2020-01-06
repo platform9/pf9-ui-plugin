@@ -71,6 +71,7 @@ push: image
 	docker push $(IMAGE_REPO):$(IMAGE_TAG) || \
 	(aws ecr get-login --region=us-west-1 --no-include-email |sh && \
 	 docker push $(IMAGE_REPO):$(IMAGE_TAG))
+	docker rmi $(IMAGE_REPO):$(IMAGE_TAG)
 
 clean:
 	rm -rf $(CONTAINER_BUILD_DIR)
