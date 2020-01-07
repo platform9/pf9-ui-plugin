@@ -19,10 +19,10 @@ const useStyles = makeStyles(theme => ({
   value: {
     fontSize: 12,
     whiteSpace: 'nowrap',
-    width: 77,
+    width: 125,
   },
   percent: {
-    width: 142,
+    width: 152,
   },
 }))
 
@@ -36,7 +36,7 @@ const ResourceUsageTable = ({ label, valueConverter, usedText, units, stats, pre
     <Tooltip title={`${curStr} ${units} of ${maxStr} ${units} ${usedText}`}>
       <div className={classes.root}>
         <span className={classes.label}>{label}:</span>
-        <span className={classes.value}>{curStr} {units}</span>
+        <span className={classes.value}>{curStr}/{maxStr} {units}</span>
         <span className={classes.percent}>
           <ProgressBar
             width={140}

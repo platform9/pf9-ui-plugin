@@ -142,7 +142,7 @@ const renderHealthStatus = (_, {
 }
 
 const renderLinks = links => {
-  if (!links) { return null }
+  if (!links) { return <Empty /> }
   return (
     <div>
       {links.dashboard && <ExternalLink url={links.dashboard}>Dashboard</ExternalLink>}
@@ -165,7 +165,7 @@ const NodesCell = ({ nodes }) => {
   const [expanded, setExpanded] = useState(false)
 
   if (!nodes || !nodes.length) {
-    return <div>0</div>
+    return <Empty />
   }
   return (
     <div>
@@ -192,15 +192,15 @@ const toMHz = value => value * 1024
 
 const renderStats = (_, { usage }) => {
   const hasValidStats = usage && usage.compute && usage.compute.current
-  if (!hasValidStats) { return null }
+  if (!hasValidStats) { return <Empty /> }
   return (
-    <div>
+    <>
       <ResourceUsageTable valueConverter={toMHz} units="MHz" label="CPU" stats={usage.compute} />
       <ResourceUsageTable units="GiB" label="Memory" stats={usage.memory} />
       <ResourceUsageTable units="GiB" label="Storage" stats={usage.disk} />
       {usage.grafanaLink &&
       <DashboardLink label="Grafana" link={usage.grafanaLink} />}
-    </div>
+    </>
   )
 }
 
