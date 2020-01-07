@@ -11,6 +11,7 @@ import { hexToRGBA } from 'core/utils/colorHelpers'
 import CardButton from 'core/components/buttons/CardButton'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import PieUsageWidget from 'core/components/widgets/PieUsageWidget'
+import { PieDataEntry } from 'core/components/graphs/PieGraph'
 
 const useStyles = makeStyles((theme: any) => ({
   headerIcon: {
@@ -94,12 +95,6 @@ const useStyles = makeStyles((theme: any) => ({
 }))
 
 type PropertyFunction<T> = (p: any) => T
-
-interface PieDataEntry {
-  value: number
-  name: string
-  color: string
-}
 
 interface StatusCardProps {
   entity: string

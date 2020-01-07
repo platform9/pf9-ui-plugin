@@ -2,14 +2,14 @@ import React from 'react'
 import { PieChart, Pie, Cell } from 'recharts'
 import { useTheme } from '@material-ui/core/styles'
 
-interface Entry {
+export interface PieDataEntry {
   value: number
   name: string
   color: string
 }
 
 interface Props {
-  data: Entry[]
+  data: PieDataEntry[]
   sideLength: number
   arcWidth: number
   percent: number
