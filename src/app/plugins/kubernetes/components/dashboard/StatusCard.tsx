@@ -77,6 +77,10 @@ const useStyles = makeStyles((theme: any) => ({
     display: 'flex',
     alignItems: 'center',
   },
+  horizontalCenter: {
+    flexGrow: 1,
+    textAlign: 'center',
+  },
   header: {
     height: '76px',
   },
@@ -113,7 +117,7 @@ const StatusCard: FunctionComponent<StatusCardProps> = ({ entity, route, addRout
   const { quantity, pieData, piePrimary } = quantityFn(data)
   const {
     row, rowColumn, contentContainer, headerIcon, spinner, cardTitle, text, arrowIcon,
-    verticalCenter, header, links, chart
+    verticalCenter, horizontalCenter, header, links, chart
   } = useStyles({ pieData: !!pieData })
 
   return (
@@ -147,8 +151,14 @@ const StatusCard: FunctionComponent<StatusCardProps> = ({ entity, route, addRout
           </Link>
         </div>
       </div>
-      {pieData && pieData.length > 0 && <div className={clsx(row, chart, verticalCenter)}>
-        <PieUsageWidget sideLength={110} arcWidth={12} primary={piePrimary} data={pieData} />
+      {pieData && <div className={clsx(row, chart, verticalCenter)}>
+        {loading ? (
+          <div className={horizontalCenter}>
+            <CircularProgress className={spinner} size={64} />
+          </div>
+        ) : (
+          <PieUsageWidget sideLength={110} arcWidth={12} primary={piePrimary} data={pieData} />
+        )}
       </div>}
     </div>
   )

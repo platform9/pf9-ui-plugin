@@ -77,7 +77,7 @@ const PieUsageWidget = ({ primary, data, sideLength = 110, arcWidth = 12, ...res
   ), 0)
   const primaryObj = data.find(x => x.name === primary)
   const primaryNum = primaryObj.value
-  const percent = primaryNum / total
+  const percent = primaryNum / total || 0
 
   return (
     <div className={container}>
@@ -87,6 +87,7 @@ const PieUsageWidget = ({ primary, data, sideLength = 110, arcWidth = 12, ...res
         data={data}
         percent={percent}
         primary={primary}
+        empty={!total}
         {...rest}
       />
       <PieLegend data={data} />

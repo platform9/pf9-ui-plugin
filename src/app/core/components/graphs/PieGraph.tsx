@@ -14,16 +14,21 @@ interface Props {
   arcWidth: number
   percent: number
   primary: string
+  empty: boolean
 }
 
-const PieGraph = ({ data, sideLength, arcWidth, percent, primary, ...rest }: Props) => {
+const emptyData = [
+  { name: 'empty', value: 1, color: 'empty' }
+]
+
+const PieGraph = ({ data, sideLength, arcWidth, percent, primary, empty, ...rest }: Props) => {
   const theme: any = useTheme()
   const radius = Math.floor(sideLength / 2)
 
   return (
     <PieChart width={sideLength + 10} height={sideLength + 10}>
       <Pie
-        data={data}
+        data={empty ? emptyData : data}
         cx={radius}
         cy={radius}
         innerRadius={radius - arcWidth}
@@ -32,10 +37,11 @@ const PieGraph = ({ data, sideLength, arcWidth, percent, primary, ...rest }: Pro
         {...rest}
       >
         {
-          data.map((entry, index) => <Cell key={entry.name} fill={theme.palette.pieChart[entry.color]} />)
+          empty ? emptyData.map((entry, index) => <Cell key={entry.name} fill={theme.palette.pieChart[entry.color]} />)
+            : data.map((entry, index) => <Cell key={entry.name} fill={theme.palette.pieChart[entry.color]} />)
         }
       </Pie>
-      { percent && <text
+      { percent !== undefined && <text
         x={radius + 5}
         y={radius + 5}
         fill={theme.palette.dashboardCard.text}
