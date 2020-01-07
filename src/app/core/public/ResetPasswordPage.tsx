@@ -13,6 +13,7 @@ import IconButton from '@material-ui/core/IconButton'
 import { propSatisfies } from 'ramda'
 import useParams from 'core/hooks/useParams'
 import ApiClient from 'api-client/ApiClient'
+import { IApiData } from 'api-client/Clemency'
 
 import {
   hasOneSpecialChar,
@@ -29,7 +30,7 @@ import Progress from 'core/components/progress/Progress'
 import TextField from 'core/components/validatedForm/TextField'
 import Alert from 'core/components/Alert'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
-import { loginUrl, resetPasswordUrl } from 'app/constants.js'
+import { loginUrl } from 'app/constants.js'
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -66,7 +67,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }))
 
-interface State {
+interface IState {
   loading: boolean
   isError: boolean
   emailId: string
@@ -78,14 +79,17 @@ interface State {
   isConfirmPasswordMasked: boolean
 }
 
-interface Validator {
+interface IValidator {
   displayText: string
-  validator(): boolean
+  validator: (value: string | number) => boolean
 }
 
 type PasswordMasked = 'isConfirmPasswordMasked' | 'isNewPasswordMasked'
+type IPasswordMask = (key: PasswordMasked) => { [key: string]: JSX.Element }
+type IPasswordValidationCheck = (passwordValue: string) => JSX.Element
+type ITogglePasswordMask = (key: PasswordMasked) => () => void
 
-const initialState: State = {
+const initialState: IState = {
   loading: false,
   isError: false,
   emailId: '',
@@ -102,7 +106,7 @@ const confirmPasswordValidator = [
   matchFieldValidator('newPassword').withMessage('Passwords do not match'),
 ]
 const emailValidators = [requiredValidator, emailValidator]
-const passwordValidatorList: Validator[] = [
+const passwordValidatorList: IValidator[] = [
   {
     displayText: 'At least 8 characters long',
     validator: hasMinLength(8),
@@ -126,21 +130,21 @@ const passwordValidatorList: Validator[] = [
 ]
 const { clemency } = ApiClient.getInstance()
 
-const CheckListItem = ({ children, checked }: { children: any, checked: boolean }): JSX.Element => (
+const CheckListItem: React.FC<{checked: boolean}> = ({ children, checked }) => (
   <ListItem>
     <ListItemIcon>{checked ? <CheckIcon /> : <ClearIcon color="error" />}</ListItemIcon>
     <ListItemText primary={children} />
   </ListItem>
 )
 
-const renderPasswordValidationCheck = (values: string): JSX.Element => (
+const renderPasswordValidationCheck: IPasswordValidationCheck = (passwordValue) => (
   <Typography variant="body1" component="div">
     Password must contain the following:
     <List dense>
-      {passwordValidatorList.map((record: Validator) => (
+      {passwordValidatorList.map((record: IValidator) => (
         <CheckListItem
           key={record.displayText}
-          checked={propSatisfies(record.validator, 'newPassword', values)}
+          checked={propSatisfies(record.validator, 'newPassword', passwordValue)}
         >
           {record.displayText}
         </CheckListItem>
@@ -149,14 +153,13 @@ const renderPasswordValidationCheck = (values: string): JSX.Element => (
   </Typography>
 )
 
-const ResetPasswordPage: React.FunctionComponent = (): JSX.Element => {
+const ResetPasswordPage: React.FC = () => {
   const { params, updateParams, getParamsUpdater } = useParams(initialState)
   const classes = useStyles({})
-  const { history } = useReactRouter()
+  const { history, match } = useReactRouter()
 
-  const togglePasswordMask = (key: PasswordMasked) => (): void => updateParams({ [key]: !params[key] })
-
-  const renderPasswordMask = (key: PasswordMasked): { [key: string]: JSX.Element } => ({
+  const togglePasswordMask: ITogglePasswordMask = (key) => () => updateParams({ [key]: !params[key] })
+  const renderPasswordMask: IPasswordMask = (key) => ({
     endAdornment: (
       <InputAdornment position="end">
         <IconButton
@@ -169,7 +172,7 @@ const ResetPasswordPage: React.FunctionComponent = (): JSX.Element => {
     ),
   })
 
-  const SubmitButton = ({ label }: { label: string }): JSX.Element => (
+  const SubmitButton: React.FC<{label: string}> = ({ label }) => (
     <Button type="submit" className={classes.resetPwdButton} variant="contained" color="primary">
       {label}
     </Button>
@@ -185,8 +188,12 @@ const ResetPasswordPage: React.FunctionComponent = (): JSX.Element => {
     })
 
     try {
-      const secret = history.location?.pathname.replace(resetPasswordUrl, '')
-      const response = await clemency.resetPassword(secret, params.emailId, params.confirmPassword)
+      const options: IApiData = {
+        secret: match.params.id,
+        username: params.emailId,
+        password: params.confirmPassword
+      }
+      const response = await clemency.resetPassword(options)
 
       if (!response.success) {
         throw new Error('Unable to reset password')
@@ -248,7 +255,7 @@ const ResetPasswordPage: React.FunctionComponent = (): JSX.Element => {
                     ) : (
                       <>
                         <Typography className={classes.paragraph} component="p">
-                          Your password has been reset successfully.
+                            Your password has been reset successfully.
                         </Typography>
                         <SubmitButton label="Return to login screen" />
                       </>
