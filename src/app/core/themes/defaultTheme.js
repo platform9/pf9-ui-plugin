@@ -210,6 +210,12 @@ const theme = {
       dark: '#02c2ac',
       light: 'rgba(2, 194, 172, 0.2)',
       medium: 'rgba(2, 194, 172, 0.4)',
+    },
+    pieChart: {
+      success: '#4adf74',
+      warning: '#fed16c',
+      error: '#e44c34',
+      unknown: '#f5a623',
     }
   },
   props: {},
