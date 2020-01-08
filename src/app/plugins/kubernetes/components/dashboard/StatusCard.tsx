@@ -11,6 +11,7 @@ import { hexToRGBA } from 'core/utils/colorHelpers'
 import CardButton from 'core/components/buttons/CardButton'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import PieUsageWidget from 'core/components/widgets/PieUsageWidget'
+import { PieDataEntry } from 'core/components/graphs/PieGraph'
 
 const useStyles = makeStyles((theme: any) => ({
   headerIcon: {
@@ -77,6 +78,10 @@ const useStyles = makeStyles((theme: any) => ({
     display: 'flex',
     alignItems: 'center',
   },
+  horizontalCenter: {
+    flexGrow: 1,
+    textAlign: 'center',
+  },
   header: {
     height: '76px',
   },
@@ -90,12 +95,6 @@ const useStyles = makeStyles((theme: any) => ({
 }))
 
 type PropertyFunction<T> = (p: any) => T
-
-interface PieDataEntry {
-  value: number
-  name: string
-  color: string
-}
 
 interface StatusCardProps {
   entity: string
@@ -113,7 +112,7 @@ const StatusCard: FunctionComponent<StatusCardProps> = ({ entity, route, addRout
   const { quantity, pieData, piePrimary } = quantityFn(data)
   const {
     row, rowColumn, contentContainer, headerIcon, spinner, cardTitle, text, arrowIcon,
-    verticalCenter, header, links, chart
+    verticalCenter, horizontalCenter, header, links, chart
   } = useStyles({ pieData: !!pieData })
 
   return (
@@ -147,8 +146,14 @@ const StatusCard: FunctionComponent<StatusCardProps> = ({ entity, route, addRout
           </Link>
         </div>
       </div>
-      {pieData && pieData.length > 0 && <div className={clsx(row, chart, verticalCenter)}>
-        <PieUsageWidget sideLength={110} arcWidth={12} primary={piePrimary} data={pieData} />
+      {pieData && <div className={clsx(row, chart, verticalCenter)}>
+        {loading ? (
+          <div className={horizontalCenter}>
+            <CircularProgress className={spinner} size={64} />
+          </div>
+        ) : (
+          <PieUsageWidget sideLength={110} arcWidth={12} primary={piePrimary} data={pieData} />
+        )}
       </div>}
     </div>
   )

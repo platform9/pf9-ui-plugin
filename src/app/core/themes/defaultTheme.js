@@ -216,6 +216,7 @@ const theme = {
       warning: '#fed16c',
       error: '#e44c34',
       unknown: '#f5a623',
+      empty: '#edeff1',
     }
   },
   props: {},

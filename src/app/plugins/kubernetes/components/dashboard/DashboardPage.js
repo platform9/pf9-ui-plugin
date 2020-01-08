@@ -97,7 +97,7 @@ const bottomReports = [
     dataLoader: [podActions.list, { clusterId: allKey }],
     quantityFn: pods => ({
       quantity: pods.length,
-      pieData: pods.length ? [
+      pieData: [
         {
           name: 'running',
           value: pods.filter(pod => pod.status.phase === 'Running').length,
@@ -118,7 +118,7 @@ const bottomReports = [
           value: pods.filter(pod => pod.status.phase === 'Failed').length,
           color: 'error',
         },
-      ] : [],
+      ],
       piePrimary: 'running',
     }),
   },
@@ -132,7 +132,7 @@ const bottomReports = [
     dataLoader: [clusterActions.list],
     quantityFn: clusters => ({
       quantity: clusters.length,
-      pieData: clusters.length ? [
+      pieData: [
         {
           name: 'healthy',
           value: clusters.filter(cluster => cluster.healthStatus === 'healthy').length,
@@ -153,7 +153,7 @@ const bottomReports = [
           value: clusters.filter(cluster => cluster.healthStatus === 'unhealthy').length,
           color: 'error',
         },
-      ] : [],
+      ],
       piePrimary: 'healthy',
     })
   },
@@ -167,7 +167,7 @@ const bottomReports = [
     dataLoader: [loadNodes],
     quantityFn: nodes => ({
       quantity: nodes.length,
-      pieData: nodes.length ? [
+      pieData: [
         {
           name: 'healthy',
           value: nodes.filter(node => nodeHealthStatus(node) === 'healthy').length,
@@ -188,7 +188,7 @@ const bottomReports = [
           value: nodes.filter(node => nodeHealthStatus(node) === 'unhealthy').length,
           color: 'error',
         },
-      ] : [],
+      ],
       piePrimary: 'healthy',
     }),
   },
