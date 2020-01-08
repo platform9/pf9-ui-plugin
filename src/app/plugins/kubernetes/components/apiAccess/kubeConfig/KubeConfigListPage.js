@@ -37,7 +37,6 @@ const KubeConfigListPage = () => {
   const [selectedCluster, setSelectedCluster] = useState()
   const [downloadedKubeconfigs, setDownloadedKubeconfigs] = useState({})
   const [currentKubeconfig, setCurrentKubeconfig] = useState('')
-  const [generateYaml, setGenerateYaml] = useState(false)
 
   const [clusters, loadingClusters] = useDataLoader(kubeConfigActions.list)
   const classes = useStyles({ loading: loadingClusters })
@@ -55,8 +54,6 @@ const KubeConfigListPage = () => {
 
   const handleDownloadYamlFileClick = (clusterId, clusterName) => {
     setSelectedCluster({ id: clusterId, name: clusterName })
-    setGenerateYaml(true)
-
     const kubeconfig = downloadedKubeconfigs[clusterId]
 
     if (kubeconfig) {
@@ -74,7 +71,6 @@ const KubeConfigListPage = () => {
     document.body.appendChild(elem)
     elem.click()
     document.body.removeChild(elem)
-    setGenerateYaml(false)
   }
 
   const columns = getColumns(handleDownloadYamlFileClick)
@@ -90,9 +86,9 @@ const KubeConfigListPage = () => {
     multiSelection: false,
     onSelect,
     emptyText: 'There are no available clusters from which you can download a kubeconfig',
-  }), [toggleDialog, downloadedKubeconfigs, currentKubeconfig, generateYaml])
+  }), [toggleDialog, downloadedKubeconfigs, currentKubeconfig])
 
-  const downloadKubeconfig = async (cluster, generateYaml, token) => {
+  const downloadKubeconfig = async (cluster, token) => {
     const kubeconfig = await qbert.getKubeConfig(cluster.id)
     const kubeconfigWithToken = kubeconfig.replace('__INSERT_BEARER_TOKEN_HERE__', token)
     setDownloadedKubeconfigs({
@@ -101,15 +97,7 @@ const KubeConfigListPage = () => {
     })
     setCurrentKubeconfig(kubeconfigWithToken)
     toggleDialog()
-
-    if (generateYaml) {
-      downloadYamlFile(cluster.name, kubeconfigWithToken)
-    }
-  }
-
-  const handleCloseDialog = () => {
-    toggleDialog()
-    setGenerateYaml(false)
+    downloadYamlFile(cluster.name, kubeconfigWithToken)
   }
 
   const { ListPage } = createCRUDComponents(options)
@@ -133,8 +121,8 @@ const KubeConfigListPage = () => {
           <TextField id="config" value={currentKubeconfig} rows={9} multiline />
         </ValidatedForm>
         <DownloadDialog
-          onDownloadClick={(token) => downloadKubeconfig(selectedCluster, generateYaml, token)}
-          onClose={handleCloseDialog}
+          onDownloadClick={(token) => downloadKubeconfig(selectedCluster, token)}
+          onClose={toggleDialog}
           isDialogOpen={isDialogOpen}
         />
       </>
