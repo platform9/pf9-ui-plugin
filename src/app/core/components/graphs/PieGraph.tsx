@@ -24,11 +24,12 @@ const emptyData = [
 const PieGraph = ({ data, sideLength, arcWidth, percent, primary, empty, ...rest }: Props) => {
   const theme: any = useTheme()
   const radius = Math.floor(sideLength / 2)
+  const items = empty ? emptyData : data
 
   return (
     <PieChart width={sideLength + 10} height={sideLength + 10}>
       <Pie
-        data={empty ? emptyData : data}
+        data={items}
         cx={radius}
         cy={radius}
         innerRadius={radius - arcWidth}
@@ -36,9 +37,8 @@ const PieGraph = ({ data, sideLength, arcWidth, percent, primary, empty, ...rest
         paddingAngle={0}
         {...rest}
       >
-        {
-          empty ? emptyData.map((entry, index) => <Cell key={entry.name} fill={theme.palette.pieChart[entry.color]} />)
-            : data.map((entry, index) => <Cell key={entry.name} fill={theme.palette.pieChart[entry.color]} />)
+        { items.map(
+          (entry, index) => <Cell key={entry.name} fill={theme.palette.pieChart[entry.color]} />)
         }
       </Pie>
       { percent !== undefined && <text
