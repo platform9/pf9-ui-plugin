@@ -4,7 +4,7 @@ import { maybeFnOrNull } from 'utils/fp'
 import ExternalLink from 'core/components/ExternalLink'
 import ProgressBar from 'core/components/progress/ProgressBar'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { pathOr, pipe, prop } from 'ramda'
+import { pathOr, pipe } from 'ramda'
 import { castBoolToStr, castFuzzyBool, columnPathLookup } from 'utils/misc'
 import SimpleLink from 'core/components/SimpleLink'
 import { nodesCacheKey } from 'k8s/components/infrastructure/nodes/actions'
@@ -20,6 +20,7 @@ import SettingsPhoneIcon from '@material-ui/icons/SettingsPhone'
 import RemoteSupportDialog from './RemoteSupportDialog'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { Tooltip } from '@material-ui/core'
+import { isAdminRole } from 'k8s/util/helpers'
 
 const isMaster = pipe(castFuzzyBool, castBoolToStr())
 
@@ -134,8 +135,7 @@ export const columns = [
 ]
 
 const isAdmin = (selected, getContext) => {
-  const { role } = getContext(prop('userDetails'))
-  return role === 'admin'
+  return isAdminRole(getContext)
 }
 
 export const options = {

@@ -30,40 +30,40 @@ const SimpleLink: ComponentType<Props> = forwardRef((
   { onClick, src, children, staticContext, className, icon, ...rest },
   ref
 ) => {
-    const classes = useStyles({})
-    const { history } = useReactRouter()
-    const handleClick = useCallback(
-      (e) => {
-        // Prevent links inside of a table row from triggering row selection.
-        e.stopPropagation()
-        if (onClick) {
-          e.preventDefault()
-          onClick(e)
-        }
-        // If there is no provided onClick, just use the `src` as a normal link.
-        if (src && !src.startsWith('http')) {
-          // local paths should use the History's push state
-          e.preventDefault()
-          return history.push(src)
-        }
-        // Any path that starts with http should be treated as an external link
-      },
-      [src, history],
-    )
+  const classes = useStyles({})
+  const { history } = useReactRouter()
+  const handleClick = useCallback(
+    (e) => {
+      // Prevent links inside of a table row from triggering row selection.
+      e.stopPropagation()
+      if (onClick) {
+        e.preventDefault()
+        onClick(e)
+      }
+      // If there is no provided onClick, just use the `src` as a normal link.
+      if (src && !src.startsWith('http')) {
+        // local paths should use the History's push state
+        e.preventDefault()
+        return history.push(src)
+      }
+      // Any path that starts with http should be treated as an external link
+    },
+    [src, history],
+  )
 
-    return (
-      <Link
-        className={clsx(className, classes.root)}
-        ref={ref}
-        href={src || null}
-        onClick={handleClick}
-        {...rest}
-      >
-        {!!icon && <FontAwesomeIcon className={classes.icon}>{icon}</FontAwesomeIcon>}
-        {children || src}
-      </Link>
-    )
-  },
+  return (
+    <Link
+      className={clsx(className, classes.root)}
+      ref={ref}
+      href={src || null}
+      onClick={handleClick}
+      {...rest}
+    >
+      {!!icon && <FontAwesomeIcon className={classes.icon}>{icon}</FontAwesomeIcon>}
+      {children || src}
+    </Link>
+  )
+},
 )
 
 export default SimpleLink as React.FC<Props>

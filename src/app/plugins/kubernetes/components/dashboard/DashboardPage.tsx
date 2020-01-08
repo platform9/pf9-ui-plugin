@@ -1,5 +1,5 @@
 // libs
-import React, { useContext } from 'react'
+import React, { useContext, useMemo, useCallback } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import { pathEq } from 'ramda'
 import { AppContext } from 'core/providers/AppProvider'
@@ -17,8 +17,15 @@ import StatusCard from './StatusCard'
 import { Typography } from '@material-ui/core'
 import { capitalizeString, normalizeUsername } from 'utils/misc'
 
-import ClusterSetup from '../onboarding/cluster-setup'
-import PodSetup from '../onboarding/pod-setup'
+import ClusterSetup, {
+  clustersHaveMonitoring,
+  clustersHaveAccess,
+} from '../onboarding/cluster-setup'
+import PodSetup, { podSetupComplete } from '../onboarding/pod-setup'
+import useDataLoader from 'core/hooks/useDataLoader'
+import Progress from 'core/components/progress/Progress'
+import identity from 'ramda/es/identity'
+import { isAdminRole } from 'k8s/util/helpers'
 
 const useStyles = makeStyles((theme) => ({
   cardRow: {
@@ -154,21 +161,32 @@ const statusReports = [
       }),
   },
 ]
-
-const validateFieldHealthAndQuantity = ({ list, success, pending = [] }) => {
+interface IHealthAndQuantityReturn {
+  quantity: number
+  working: number
+  pending: number
+}
+interface IHealthAndQuantityParams {
+  list: any[]
+  success: any[]
+  pending?: any[]
+}
+const validateFieldHealthAndQuantity = ({ list, success, pending = [] }: IHealthAndQuantityParams) => {
   return list.reduce(
-    (agg, curr) => {
+    (agg: IHealthAndQuantityReturn, curr) => {
       const isWorkingStatus = success.some(({ path, value }) =>
         pathEq(path.split('.'), value)(curr),
       )
       const isPendingStatus = pending.some(({ path, value }) =>
         pathEq(path.split('.'), value)(curr),
       )
-      return {
-        quantity: (agg.quantity += 1),
+      const returnIteration = {
+        // linter doesn't want assigns in returns?
+        quantity: agg.quantity += 1,
         working: isWorkingStatus ? agg.working + 1 : agg.working,
         pending: isPendingStatus ? agg.pending + 1 : agg.pending,
       }
+      return returnIteration
     },
     { quantity: 0, working: 0, pending: 0 },
   )
@@ -187,28 +205,75 @@ const reportsWithPerms = (reports) => {
   })
 }
 
+const promptOnboardingSetup = (items: boolean[]) => {
+  const isComplete = items.every(identity)
+  // If any step is not ready then we need to return true to prompt for it.
+  return !isComplete
+}
+
 const DashboardPage = () => {
+  // need to be able to force update because states are captured in local storage :(
+  const [, updateState] = React.useState()
+  const forceUpdate = useCallback(() => updateState({}), [])
+
   const { cardColumn, cardRow } = useStyles({})
-  const { session } = useContext(AppContext)
+  const { getContext, session } = useContext(AppContext)
+  const isAdmin = isAdminRole(getContext)
   const username = capitalizeString(normalizeUsername(session.username))
+  const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
+  const [pods, loadingPods] = useDataLoader(podActions.list)
+  const hasClusters = !!clusters.length
+  const hasMonitoring = clustersHaveMonitoring(clusters)
+  const hasAccess = clustersHaveAccess()
+  const isLoading = loadingClusters || loadingPods
+
+  const showClusters = promptOnboardingSetup([hasClusters, hasAccess, hasMonitoring])
+  const showPods = !podSetupComplete(pods)
+  const showOnboarding = isAdmin && (showClusters || showPods)
+
+  const handleComplete = useCallback(() => {
+    forceUpdate()
+  }, [])
+
+  const initialExpandedClusterPanel = useMemo(
+    () =>
+      Math.min(
+        ...[hasClusters, hasAccess, hasMonitoring].reduce(
+          (ret, val, idx) => (!val ? ret.concat(idx) : ret),
+          [],
+        ),
+      ),
+    [hasClusters, hasMonitoring, hasAccess],
+  )
+
   return (
     <section className={cardColumn}>
       <Typography variant="h5">Welcome {username}!</Typography>
-      <ClusterSetup />
-      <PodSetup />
-
-      {false && (
+      {isLoading ? (
+        <Progress loading={isLoading} overlay renderContentOnMount />
+      ) : (
         <>
-          <div className={cardRow}>
-            {reportsWithPerms(statusReports).map((report) => (
-              <StatusCard key={report.route} {...report} />
-            ))}
-          </div>
-          <div className={cardRow}>
-            {reportsWithPerms(serviceReports).map((report) => (
-              <StatusCard key={report.route} {...report} />
-            ))}
-          </div>
+          {showOnboarding && (
+            <>
+              <ClusterSetup initialPanel={initialExpandedClusterPanel} onComplete={handleComplete} />
+              <PodSetup onComplete={handleComplete} initialPanel={showClusters ? undefined : 0} />
+            </>
+          )}
+
+          {!showOnboarding && (
+            <>
+              <div className={cardRow}>
+                {reportsWithPerms(statusReports).map((report) => (
+                  <StatusCard key={report.route} {...report} />
+                ))}
+              </div>
+              <div className={cardRow}>
+                {reportsWithPerms(serviceReports).map((report) => (
+                  <StatusCard key={report.route} {...report} />
+                ))}
+              </div>
+            </>
+          )}
         </>
       )}
     </section>

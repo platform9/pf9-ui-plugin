@@ -19,7 +19,12 @@ export const uuidRegex = new RegExp(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[
 
 export const k8sPrefix = `${appUrlRoot}/kubernetes`
 
+export const OnboardingAccessSetup = 'onboarding/api-access'
+export const OnboardingMonitoringSetup = 'onboarding/monitoring-enabled'
+export const OnboardingPodSetup = 'onboarding/pod-setup'
+
 // Documentation links
+export const gettingStartedLink = 'https://docs.platform9.com/kubernetes/getting-started/bare-metal-preinstall-checklist/'
 export const qbertApiLink = 'https://docs.platform9.com/kubernetes/Qbert-API-Reference'
 export const whatIsBareOSLink = 'https://docs.platform9.com/kubernetes/on-premise-kubernetes/what-is-bareos'
 export const BareOSSetupDocumentation = 'https://docs.platform9.com/kubernetes/create-multimaster-bareos-cluster/'

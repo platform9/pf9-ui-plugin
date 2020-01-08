@@ -23,30 +23,33 @@ const useStyles = makeStyles<Theme>((theme) => ({
     '& a:first-child': {
       marginRight: theme.spacing(2),
     },
-  }
+  },
 }))
 
 export interface Props {
   title: string
   body: string
+  renderLinks?: boolean
 }
 
-const OnboardWizard: FC<Props> = ({ title, body, children }) => {
+const OnboardWizard: FC<Props> = ({ title, body, children, renderLinks = true }) => {
   const { ctaHeader, onboardWizard, rightAlign } = useStyles({})
 
   return (
     <section className={onboardWizard}>
-      <div className={rightAlign}>
-        <SimpleLink src="/ui/kubernetes/user_management#users" icon="user-plus">
-          Invite Team Member
-        </SimpleLink>
-        <ExternalLink
-          url="https://docs.platform9.com/kubernetes/create-multimaster-bareos-cluster/"
-          icon="file-alt"
-        >
-          Setup Documentation
-        </ExternalLink>
-      </div>
+      {renderLinks && (
+        <div className={rightAlign}>
+          <SimpleLink src="/ui/kubernetes/user_management#users" icon="user-plus">
+            Invite Team Member
+          </SimpleLink>
+          <ExternalLink
+            url="https://docs.platform9.com/kubernetes/create-multimaster-bareos-cluster/"
+            icon="file-alt"
+          >
+            Setup Documentation
+          </ExternalLink>
+        </div>
+      )}
       <header className={ctaHeader}>
         <Typography variant="h6">{title}</Typography>
         <p> </p>
