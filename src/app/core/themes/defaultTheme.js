@@ -214,6 +214,13 @@ const theme = {
     code: {
       background: '#FDF6F5',
       text: '#E5513A',
+    },
+    pieChart: {
+      success: '#4adf74',
+      warning: '#fed16c',
+      error: '#e44c34',
+      unknown: '#f5a623',
+      empty: '#edeff1',
     }
   },
   props: {},

@@ -10,6 +10,8 @@ import { Typography, CircularProgress } from '@material-ui/core'
 import { hexToRGBA } from 'core/utils/colorHelpers'
 import CardButton from 'core/components/buttons/CardButton'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
+import PieUsageWidget from 'core/components/widgets/PieUsageWidget'
+import { PieDataEntry } from 'core/components/graphs/PieGraph'
 
 const useStyles = makeStyles((theme: any) => ({
   headerIcon: {
@@ -20,21 +22,19 @@ const useStyles = makeStyles((theme: any) => ({
     marginLeft: theme.spacing(1),
   },
   contentContainer: {
-    display: 'flex',
-    flexDirection: 'column',
     backgroundColor: theme.palette.dashboardCard.background,
     width: '280px',
-    height: '170px',
+    height: ({ pieData }: any) => pieData ? '360px' : '170px',
     margin: theme.spacing(1.25),
     padding: theme.spacing(2.5, 1, 0.5, 1),
     borderRadius: '5px',
     transition: 'transform .1s ease',
-    // boxShadow: '1px 1px 4px -2px rgba(0,0,0,0.35)',
     boxShadow: '0 2.5px 1.5px -3.5px rgba(0, 0, 0, 0.2), 0 1.5px 7px 1px rgba(0, 0, 0, 0.12), 0 1px 3px -1.5px rgba(0, 0, 0, 0.14)',
     '&:hover': {
       backgroundColor: hexToRGBA(theme.palette.dashboardCard.background, 0.95),
       transform: 'scale(1.025)'
-    }
+    },
+    overflowX: 'hidden',
   },
   row: {
     display: 'flex',
@@ -45,7 +45,7 @@ const useStyles = makeStyles((theme: any) => ({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     '&:first-of-type': {
-      borderBottom: `1px solid ${theme.palette.dashboardCard.divider}`
+      borderBottom: `1px solid ${theme.palette.dashboardCard.divider}`,
     }
   },
   rowColumn: {
@@ -77,7 +77,21 @@ const useStyles = makeStyles((theme: any) => ({
   verticalCenter: {
     display: 'flex',
     alignItems: 'center',
-  }
+  },
+  horizontalCenter: {
+    flexGrow: 1,
+    textAlign: 'center',
+  },
+  header: {
+    height: '76px',
+  },
+  links: {
+    height: '76px',
+  },
+  chart: {
+    borderTop: `1px solid ${theme.palette.dashboardCard.divider}`,
+    height: '180px',
+  },
 }))
 
 type PropertyFunction<T> = (p: any) => T
@@ -90,17 +104,20 @@ interface StatusCardProps {
   icon: string | PropertyFunction<JSX.Element>
   quantity: number
   dataLoader: [() => any, {}] // todo figure out typings here.
-  quantityFn(data: any[]): { quantity: number, working: number, pending: number }
+  quantityFn(data: any[]): { quantity: number, pieData: PieDataEntry[], piePrimary: string }
 }
 
 const StatusCard: FunctionComponent<StatusCardProps> = ({ entity, route, addRoute, title, icon, dataLoader, quantityFn }) => {
-  const { row, rowColumn, contentContainer, headerIcon, spinner, cardTitle, text, arrowIcon, verticalCenter } = useStyles({})
   const [data, loading] = useDataLoader(...dataLoader)
-  const { quantity } = quantityFn(data)
+  const { quantity, pieData, piePrimary } = quantityFn(data)
+  const {
+    row, rowColumn, contentContainer, headerIcon, spinner, cardTitle, text, arrowIcon,
+    verticalCenter, horizontalCenter, header, links, chart
+  } = useStyles({ pieData: !!pieData })
 
   return (
     <div className={contentContainer}>
-      <div className={row}>
+      <div className={clsx(row, header)}>
         <div className={rowColumn}>
           <Link to={route}>
             <Typography variant="h6" className={cardTitle}>
@@ -117,7 +134,7 @@ const StatusCard: FunctionComponent<StatusCardProps> = ({ entity, route, addRout
           )}
         </div>
       </div>
-      <div className={clsx(row, verticalCenter)}>
+      <div className={clsx(row, links, verticalCenter)}>
         <div className={rowColumn}>
           <Link to={addRoute}>
             <CardButton>Add {entity}</CardButton>
@@ -129,6 +146,15 @@ const StatusCard: FunctionComponent<StatusCardProps> = ({ entity, route, addRout
           </Link>
         </div>
       </div>
+      {pieData && <div className={clsx(row, chart, verticalCenter)}>
+        {loading ? (
+          <div className={horizontalCenter}>
+            <CircularProgress className={spinner} size={64} />
+          </div>
+        ) : (
+          <PieUsageWidget sideLength={110} arcWidth={12} primary={piePrimary} data={pieData} />
+        )}
+      </div>}
     </div>
   )
 }

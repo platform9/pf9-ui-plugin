@@ -1,7 +1,6 @@
 // libs
 import React, { useContext, useMemo, useCallback } from 'react'
 import { makeStyles } from '@material-ui/styles'
-import { pathEq } from 'ramda'
 import { AppContext } from 'core/providers/AppProvider'
 // Constants
 import { allKey } from 'app/constants'
@@ -40,69 +39,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const serviceReports = [
-  {
-    entity: 'pod',
-    route: '/ui/kubernetes/pods',
-    addRoute: '/ui/kubernetes/pods/add',
-    title: 'Pods',
-    icon: 'cubes',
-    dataLoader: [podActions.list, { clusterId: allKey }],
-    quantityFn: (pods) =>
-      validateFieldHealthAndQuantity({
-        list: pods,
-        success: [
-          { path: 'status.phase', value: 'Running' },
-          { path: 'status.phase', value: 'Succeeded' },
-        ],
-        pending: [
-          { path: 'status.phase', value: 'Pending' },
-          { path: 'status.phase', value: 'Unknown' },
-        ],
-      }),
-  },
-  {
-    entity: 'deployment',
-    route: '/ui/kubernetes/pods#deployments',
-    addRoute: '/ui/kubernetes/pods/deployments/add',
-    title: 'Deployments',
-    icon: 'window',
-    dataLoader: [deploymentActions.list, { clusterId: allKey }],
-    quantityFn: (deployments) => ({
-      quantity: deployments.length,
-      working: deployments.length,
-      pending: 0,
-    }),
-  },
-  {
-    entity: 'service',
-    route: '/ui/kubernetes/pods#services',
-    addRoute: '/ui/kubernetes/pods/services/add',
-    title: 'Services',
-    icon: 'tasks-alt',
-    dataLoader: [serviceActions.list, { clusterId: allKey }],
-    quantityFn: (services) =>
-      validateFieldHealthAndQuantity({
-        list: services,
-        success: [{ path: 'status', value: 'OK' }],
-      }),
-  },
-  {
-    entity: 'cloud',
-    permissions: ['admin'],
-    route: '/ui/kubernetes/infrastructure#cloudProviders',
-    addRoute: '/ui/kubernetes/infrastructure/cloudProviders/add',
-    title: 'Cloud Accounts',
-    icon: 'cloud',
-    dataLoader: [cloudProviderActions.list],
-    quantityFn: (clouds) => ({
-      quantity: clouds.length,
-      working: clouds.length,
-      pending: 0,
-    }),
-  },
-]
-const statusReports = [
+const topReports = [
   {
     entity: 'user',
     permissions: ['admin'],
@@ -111,10 +48,8 @@ const statusReports = [
     title: 'Users',
     icon: 'user',
     dataLoader: [mngmUserActions.list],
-    quantityFn: (users) => ({
+    quantityFn: users => ({
       quantity: users.length,
-      working: users.length,
-      pending: 0,
     }),
   },
   {
@@ -125,25 +60,79 @@ const statusReports = [
     title: 'Tenants',
     icon: 'users-class',
     dataLoader: [mngmTenantActions.list],
-    quantityFn: (tenants) => ({
+    quantityFn: tenants => ({
       quantity: tenants.length,
-      working: tenants.length,
-      pending: 0,
     }),
   },
   {
-    entity: 'node',
+    entity: 'deployment',
+    route: '/ui/kubernetes/pods#deployments',
+    addRoute: '/ui/kubernetes/pods/deployments/add',
+    title: 'Deployments',
+    icon: 'window',
+    dataLoader: [deploymentActions.list, { clusterId: allKey }],
+    quantityFn: (deployments) => ({
+      quantity: deployments.length,
+    }),
+  },
+  {
+    entity: 'service',
+    route: '/ui/kubernetes/pods#services',
+    addRoute: '/ui/kubernetes/pods/services/add',
+    title: 'Services',
+    icon: 'tasks-alt',
+    dataLoader: [serviceActions.list, { clusterId: allKey }],
+    quantityFn: services => ({
+      quantity: services.length,
+    }),
+  },
+]
+const bottomReports = [
+  {
+    entity: 'cloud',
     permissions: ['admin'],
-    route: '/ui/kubernetes/infrastructure#nodes',
-    addRoute: '/ui/kubernetes/infrastructure/nodes/cli/download',
-    title: 'Nodes',
-    icon: 'ball-pile',
-    dataLoader: [loadNodes],
-    quantityFn: (nodes) =>
-      validateFieldHealthAndQuantity({
-        list: nodes,
-        success: [{ path: 'status', value: 'ok' }],
-      }),
+    route: '/ui/kubernetes/infrastructure#cloudProviders',
+    addRoute: '/ui/kubernetes/infrastructure/cloudProviders/add',
+    title: 'Cloud Accounts',
+    icon: 'cloud',
+    dataLoader: [cloudProviderActions.list],
+    quantityFn: clouds => ({
+      quantity: clouds.length
+    }),
+  },
+  {
+    entity: 'pod',
+    route: '/ui/kubernetes/pods',
+    addRoute: '/ui/kubernetes/pods/add',
+    title: 'Pods',
+    icon: 'cubes',
+    dataLoader: [podActions.list, { clusterId: allKey }],
+    quantityFn: pods => ({
+      quantity: pods.length,
+      pieData: [
+        {
+          name: 'running',
+          value: pods.filter(pod => pod.status.phase === 'Running').length,
+          color: 'success',
+        },
+        {
+          name: 'pending',
+          value: pods.filter(pod => pod.status.phase === 'Pending').length,
+          color: 'warning',
+        },
+        {
+          name: 'unknown',
+          value: pods.filter(pod => pod.status.phase === 'Unknown').length,
+          color: 'unknown',
+        },
+        {
+          name: 'failed',
+          value: pods.filter(pod => pod.status.phase === 'Failed').length,
+          color: 'error',
+        },
+      ],
+      piePrimary: 'running',
+    }),
   },
   {
     entity: 'cluster',
@@ -153,44 +142,69 @@ const statusReports = [
     title: 'Clusters',
     icon: 'project-diagram',
     dataLoader: [clusterActions.list],
-    quantityFn: (clusters) =>
-      validateFieldHealthAndQuantity({
-        list: clusters,
-        success: [{ path: 'status', value: 'ok' }],
-        pending: [{ path: 'status', value: 'pending' }],
-      }),
+    quantityFn: clusters => ({
+      quantity: clusters.length,
+      pieData: [
+        {
+          name: 'healthy',
+          value: clusters.filter(cluster => cluster.healthStatus === 'healthy').length,
+          color: 'success',
+        },
+        {
+          name: 'partially_healthy',
+          value: clusters.filter(cluster => cluster.healthStatus === 'partially_healthy').length,
+          color: 'warning',
+        },
+        {
+          name: 'converging',
+          value: clusters.filter(cluster => cluster.healthStatus === 'converging').length,
+          color: 'unknown',
+        },
+        {
+          name: 'unhealthy',
+          value: clusters.filter(cluster => cluster.healthStatus === 'unhealthy').length,
+          color: 'error',
+        },
+      ],
+      piePrimary: 'healthy',
+    })
+  },
+  {
+    entity: 'node',
+    permissions: ['admin'],
+    route: '/ui/kubernetes/infrastructure#nodes',
+    addRoute: '/ui/kubernetes/infrastructure/nodes/cli/download',
+    title: 'Nodes',
+    icon: 'ball-pile',
+    dataLoader: [loadNodes],
+    quantityFn: nodes => ({
+      quantity: nodes.length,
+      pieData: [
+        {
+          name: 'healthy',
+          value: nodes.filter(node => nodeHealthStatus(node) === 'healthy').length,
+          color: 'success',
+        },
+        {
+          name: 'unknown',
+          value: nodes.filter(node => nodeHealthStatus(node) === 'unknown').length,
+          color: 'unknown',
+        },
+        {
+          name: 'converging',
+          value: nodes.filter(node => nodeHealthStatus(node) === 'converging').length,
+          color: 'warning',
+        },
+        {
+          name: 'unhealthy',
+          value: nodes.filter(node => nodeHealthStatus(node) === 'unhealthy').length,
+          color: 'error',
+        },
+      ],
+      piePrimary: 'healthy',
+    }),
   },
 ]
-interface IHealthAndQuantityReturn {
-  quantity: number
-  working: number
-  pending: number
-}
-interface IHealthAndQuantityParams {
-  list: any[]
-  success: any[]
-  pending?: any[]
-}
-const validateFieldHealthAndQuantity = ({ list, success, pending = [] }: IHealthAndQuantityParams) => {
-  return list.reduce(
-    (agg: IHealthAndQuantityReturn, curr) => {
-      const isWorkingStatus = success.some(({ path, value }) =>
-        pathEq(path.split('.'), value)(curr),
-      )
-      const isPendingStatus = pending.some(({ path, value }) =>
-        pathEq(path.split('.'), value)(curr),
-      )
-      const returnIteration = {
-        // linter doesn't want assigns in returns?
-        quantity: agg.quantity += 1,
-        working: isWorkingStatus ? agg.working + 1 : agg.working,
-        pending: isPendingStatus ? agg.pending + 1 : agg.pending,
-      }
-      return returnIteration
-    },
-    { quantity: 0, working: 0, pending: 0 },
-  )
-}
 
 const reportsWithPerms = (reports) => {
   const {
@@ -204,11 +218,14 @@ const reportsWithPerms = (reports) => {
     return report.permissions.includes(role)
   })
 }
-
 const promptOnboardingSetup = (items: boolean[]) => {
   const isComplete = items.every(identity)
   // If any step is not ready then we need to return true to prompt for it.
   return !isComplete
+}
+const nodeHealthStatus = ({ status }) => {
+  if (status === 'converging') { return status }
+  return status === 'disconnected' ? 'unknown' : status === 'ok' ? 'healthy' : 'unhealthy'
 }
 
 const DashboardPage = () => {
@@ -263,12 +280,12 @@ const DashboardPage = () => {
           {!showOnboarding && (
             <>
               <div className={cardRow}>
-                {reportsWithPerms(statusReports).map((report) => (
+                {reportsWithPerms(topReports).map(report => (
                   <StatusCard key={report.route} {...report} />
                 ))}
               </div>
               <div className={cardRow}>
-                {reportsWithPerms(serviceReports).map((report) => (
+                {reportsWithPerms(bottomReports).map(report => (
                   <StatusCard key={report.route} {...report} />
                 ))}
               </div>

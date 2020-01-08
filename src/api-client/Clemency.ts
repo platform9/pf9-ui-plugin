@@ -16,14 +16,14 @@ class Clemency extends ApiService {
   }
 
   verifyPasswordReset = async (secret) => {
-    return this.client.basicGet(`${this.baseUrl}/reset/password/#${secret}`)
+    return this.client.basicGet(`${this.baseUrl}/reset/password/${secret}`)
   }
 
   resetPassword = async (secret, username, password) => {
     const body = {
       username, password,
     }
-    return this.client.basicPost(`${this.baseUrl}/reset/password/#${secret}`, body)
+    return this.client.basicPost(`${this.baseUrl}/reset/password/${secret}`, body)
   }
 
   createUser = async body => {
@@ -31,8 +31,9 @@ class Clemency extends ApiService {
     return response.user
   }
 
-  verifyActivateLink = async secret => {
-    return this.client.basicGet(`${this.baseUrl}/activate/#${secret}`)
+  // this url format is strange but is a requirement for the API
+  verifyActivateLink = async (username, otp) => {
+    return this.client.basicGet(`${this.baseUrl}/activate/username=${username}&otp=${otp}`)
   }
 
   updateUser = async body => {

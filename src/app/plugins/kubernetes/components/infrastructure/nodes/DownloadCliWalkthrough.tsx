@@ -5,6 +5,7 @@ import CodeBlock from 'core/components/CodeBlock'
 import SimpleLink from 'core/components/SimpleLink'
 import { whatIsBareOSLink } from 'app/constants'
 import Theme from 'core/themes/model'
+import CopyToClipboard from 'core/components/CopyToClipboard'
 
 const useStyles = makeStyles((theme: Theme) => ({
   paper: {
@@ -34,9 +35,11 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const AnyLink: any = SimpleLink
 
-const installCommand =
-  '> curl -O https://raw.githubusercontent.com/platform9/express-cli/master/cli-setup.sh\n' +
-  '> bash ./cli-setup.sh'
+const installCommand = {
+  displayText: '> curl -O https://raw.githubusercontent.com/platform9/express-cli/master/cli-setup.sh\n' +
+  '> bash ./cli-setup.sh',
+  copyText: 'curl -O https://raw.githubusercontent.com/platform9/express-cli/master/cli-setup.sh \nbash ./cli-setup.sh',
+}
 
 // Not super enthused about this. Need to have different content for bareos flow vs landing page.
 export const DownloadCliBareOSWalkthrough = (): JSX.Element => (
@@ -75,12 +78,19 @@ const DownloadCliWalkthrough = ({ finalStep = defaultFinalStep }): JSX.Element =
         <NumberedSteps
           step={1}
           title="Download and install the CLI"
-          description={<CodeBlock>{installCommand}</CodeBlock>}
+          description={
+            <CopyToClipboard copyText={installCommand.copyText}>
+              <CodeBlock>{installCommand.displayText}</CodeBlock>
+            </CopyToClipboard>}
         />
         <NumberedSteps
           step={2}
           title="Run the CLI to prepare your node with required pre-requisites to be added to a Kubernetes cluster"
-          description={<CodeBlock>> pf9ctl cluster prep-node</CodeBlock>}
+          description={
+            <CopyToClipboard copyText="pf9ctl cluster prep-node">
+              <CodeBlock>pf9ctl cluster prep-node</CodeBlock>
+            </CopyToClipboard>
+          }
         />
         <NumberedSteps
           step={3}

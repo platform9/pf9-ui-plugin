@@ -6,6 +6,9 @@ import ExternalLink from 'core/components/ExternalLink'
 import { qbertApiLink } from 'app/constants'
 
 const useStyles = makeStyles(theme => ({
+  container: {
+    marginBottom: theme.spacing(3),
+  },
   link: {
     display: 'block',
     width: 'fit-content',
@@ -29,11 +32,11 @@ const EndpointsListPage = () => {
   const { ListPage } = createCRUDComponents(options)
 
   return (
-    <>
+    <section className={classes.container}>
       <h2>API Endpoints</h2>
       <ListPage />
       <ExternalLink className={classes.link} url={qbertApiLink}>See Qbert API documentation</ExternalLink>
-    </>
+    </section>
   )
 }
 

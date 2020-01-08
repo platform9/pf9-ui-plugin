@@ -42,6 +42,7 @@ const createCRUDComponents = options => {
     uniqueIdentifier = 'id',
     addText = 'Add',
     emptyText = 'No data found',
+    renderEmptyTable = false,
     addButton,
     addUrl,
     AddDialog,
@@ -71,6 +72,7 @@ const createCRUDComponents = options => {
         {...rest}
         onAdd={null}
         emptyText={emptyText}
+        renderEmptyTable={renderEmptyTable}
         columns={columns}
         deleteCond={deleteCond}
         deleteDisabledInfo={deleteDisabledInfo}
