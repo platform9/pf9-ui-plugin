@@ -1,5 +1,5 @@
 import React from 'react'
-import PieGraph from 'core/components/graphs/PieGraph'
+import PieGraph, { PieDataEntry } from 'core/components/graphs/PieGraph'
 import { makeStyles } from '@material-ui/styles'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { useTheme } from '@material-ui/core/styles'
@@ -28,17 +28,11 @@ const useStyles = makeStyles((theme: Theme) => ({
   }
 }))
 
-interface Entry {
-  value: number
-  name: string
-  color: string
-}
-
 interface PieUsageWidgetProps {
   primary: string
   sideLength: number
   arcWidth: number
-  data: Entry[]
+  data: PieDataEntry[]
 }
 
 const PieLegend = ({ data }) => {
@@ -77,7 +71,7 @@ const PieUsageWidget = ({ primary, data, sideLength = 110, arcWidth = 12, ...res
   ), 0)
   const primaryObj = data.find(x => x.name === primary)
   const primaryNum = primaryObj.value
-  const percent = primaryNum / total
+  const percent = primaryNum / total || 0
 
   return (
     <div className={container}>
@@ -87,6 +81,7 @@ const PieUsageWidget = ({ primary, data, sideLength = 110, arcWidth = 12, ...res
         data={data}
         percent={percent}
         primary={primary}
+        empty={!total}
         {...rest}
       />
       <PieLegend data={data} />
