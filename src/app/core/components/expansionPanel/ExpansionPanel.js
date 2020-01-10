@@ -83,29 +83,29 @@ const ExpansionPanel = ({
 }) => {
   const classes = useStyles()
 
-  const [overlay, setOverlay] = useState(false)
+  const [showOverlay, setShowOverlay] = useState(false)
 
   const handleConfirm = useCallback(
     (e) => {
       onSkip()
       handleToggleOverlay(e)
     },
-    [overlay],
+    [showOverlay],
   )
 
   const handleToggleOverlay = useCallback(
     (e) => {
-      setOverlay(!overlay)
+      setShowOverlay(!showOverlay)
       e && e.stopPropagation()
     },
-    [overlay],
+    [showOverlay],
   )
 
   return (
     <MDExpansionPanel
       className={classes.root}
       expanded={expanded}
-      onClick={overlay ? undefined : onClick}
+      onClick={showOverlay ? undefined : onClick}
     >
       <ExpansionPanelSummary>
         {expanded ? <ExpandMore /> : <ChevronRight />}
@@ -123,7 +123,7 @@ const ExpansionPanel = ({
       </ExpansionPanelSummary>
       <ExpansionPanelDetails className={classes.panelDetails}>
         {children}
-        <Dialog open={overlay}>
+        <Dialog open={showOverlay}>
           <DialogTitle>{skipConfirmTitle}</DialogTitle>
           <DialogContent>
             <Typography>

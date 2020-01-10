@@ -253,13 +253,9 @@ const DashboardPage = () => {
   }, [])
 
   const initialExpandedClusterPanel = useMemo(
-    () =>
-      Math.min(
-        ...[hasClusters, hasAccess, hasMonitoring].reduce(
-          (ret, val, idx) => (!val ? ret.concat(idx) : ret),
-          [],
-        ),
-      ),
+    () => {
+      return [hasClusters, hasAccess, hasMonitoring].findIndex((item) => !item)
+    },
     [hasClusters, hasMonitoring, hasAccess],
   )
 
