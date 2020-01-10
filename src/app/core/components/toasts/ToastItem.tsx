@@ -11,13 +11,7 @@ import WarningIcon from '@material-ui/icons/Warning'
 import { makeStyles } from '@material-ui/styles'
 import { split, reject, pipe, map, toPairs } from 'ramda'
 import { isNilOrEmpty } from 'utils/fp'
-
-export enum MessageTypes {
-  success = 'success',
-  warning = 'warning',
-  error = 'error',
-  info = 'info'
-}
+import { MessageTypes } from './model'
 
 const variantIcon = {
   [MessageTypes.success]: CheckCircleIcon,

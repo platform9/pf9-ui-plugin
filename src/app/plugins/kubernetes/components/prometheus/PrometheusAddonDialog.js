@@ -6,6 +6,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mate
 import ApiClient from 'api-client/ApiClient'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import { clusterActions } from '../infrastructure/clusters/actions'
+import { OnboardingMonitoringSetup } from 'app/constants'
 
 export const hasPrometheusEnabled = compose(castFuzzyBool, path(['tags', 'pf9-system:monitoring']))
 
@@ -15,7 +16,7 @@ const PrometheusAddonDialog = ({ rows: [cluster], onClose }) => {
   const enabled = hasPrometheusEnabled(cluster)
   const [tagUpdater] = useDataUpdater(clusterActions.updateTag, success => {
     if (success) {
-      onClose()
+      onClose(success)
     }
   })
 
@@ -33,6 +34,9 @@ const PrometheusAddonDialog = ({ rows: [cluster], onClose }) => {
 
       const monId = monPkg.ID
       await appbert.toggleAddon(cluster.uuid, monId, !enabled)
+      if (!enabled) {
+        localStorage.setItem(OnboardingMonitoringSetup, 'true')
+      }
     } catch (e) {
       // TODO: Raise toaster notification
       console.log(e)

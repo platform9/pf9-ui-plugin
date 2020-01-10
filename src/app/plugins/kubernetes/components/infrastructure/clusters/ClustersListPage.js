@@ -16,7 +16,7 @@ import ResourceUsageTable from 'k8s/components/infrastructure/common/ResourceUsa
 import DashboardLink from './DashboardLink'
 import CreateButton from 'core/components/buttons/CreateButton'
 import { AppContext } from 'core/providers/AppProvider'
-import { both, prop } from 'ramda'
+import { both } from 'ramda'
 import PrometheusAddonDialog from 'k8s/components/prometheus/PrometheusAddonDialog'
 import ClusterUpgradeDialog from 'k8s/components/infrastructure/clusters/ClusterUpgradeDialog'
 import ClusterSync from './ClusterSync'
@@ -28,6 +28,7 @@ import {
   clusterHealthStatusFields,
   isTransientStatus,
 } from './ClusterStatusUtils'
+import { isAdminRole } from 'k8s/util/helpers'
 
 const useStyles = makeStyles(theme => ({
   link: {
@@ -212,8 +213,7 @@ const canUpgradeCluster = (selected) => false
 const canDeleteCluster = ([row]) => !(['creating', 'deleting'].includes(row.taskStatus))
 
 const isAdmin = (selected, getContext) => {
-  const { role } = getContext(prop('userDetails'))
-  return role === 'admin'
+  return isAdminRole(getContext)
 }
 
 export const options = {

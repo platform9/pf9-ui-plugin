@@ -9,6 +9,7 @@ import SimpleLink from 'core/components/SimpleLink'
 import useToggler from 'core/hooks/useToggler'
 import ApiClient from 'api-client/ApiClient'
 import ExternalLink from 'core/components/ExternalLink'
+import { OnboardingAccessSetup } from 'app/constants'
 import useDataLoader from 'core/hooks/useDataLoader'
 
 const { qbert } = ApiClient.getInstance()
@@ -105,6 +106,7 @@ const KubeConfigListPage = () => {
     if (generateYaml) {
       downloadYamlFile(cluster.name, kubeconfigWithToken)
     }
+    localStorage.setItem(OnboardingAccessSetup, 'true')
   }
 
   const handleCloseDialog = () => {

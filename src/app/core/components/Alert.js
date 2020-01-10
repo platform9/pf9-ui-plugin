@@ -10,6 +10,7 @@ import green from '@material-ui/core/colors/green'
 import amber from '@material-ui/core/colors/amber'
 import WarningIcon from '@material-ui/icons/Warning'
 import { makeStyles } from '@material-ui/styles'
+import { hexToRGBA } from 'core/utils/colorHelpers'
 
 const variantIcon = {
   success: CheckCircleIcon,
@@ -22,10 +23,11 @@ const useStyles = makeStyles(theme => ({
   root: {
     maxWidth: 800,
     position: ({ small }) => small ? 'initial' : 'relative',
-    padding: ({ small }) => small ? theme.spacing(1, 1) : theme.spacing(1, 8),
+    padding: ({ small }) => small ? theme.spacing(2, 1) : theme.spacing(2, 8),
     margin: theme.spacing(2, 0),
     border: 0,
-    display: ({ small }) => small ? 'flex' : 'block'
+    display: ({ small }) => small ? 'flex' : 'block',
+    backgroundColor: hexToRGBA(theme.palette.primary.main, 0.1)
   },
   success: { color: green[600] },
   error: { color: theme.palette.error.dark },
@@ -33,8 +35,8 @@ const useStyles = makeStyles(theme => ({
   warning: { color: amber[700] },
   icon: {
     position: ({ small }) => small ? 'initial' : 'absolute',
-    left: ({ small }) => small ? 'initial' : theme.spacing(2),
-    top: ({ small }) => small ? 'initial' : theme.spacing(1),
+    left: ({ small }) => small ? 'initial' : theme.spacing(3),
+    top: ({ small }) => small ? 'initial' : theme.spacing(3),
     fontSize: 28,
     flexGrow: ({ small }) => small ? 0 : 'initial',
     alignSelf: ({ small }) => small ? 'center' : 'initial',
@@ -65,7 +67,7 @@ const Alert = ({ children, message, variant, small, showClose }) => {
   const Icon = variantIcon[variant]
 
   return (
-    <Paper className={classes.root}>
+    <Paper className={classes.root} elevation={0}>
       <Icon className={clsx(classes.icon, classes.iconVariant, classes[variant])} />
       {message && <Typography variant="body1" color="inherit" className={classes.message}>{message}</Typography>}
       {children}

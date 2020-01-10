@@ -1,8 +1,7 @@
 import React, { FunctionComponent } from 'react'
-import { Theme } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
-import { hexToRGBA } from 'core/utils/colorHelpers'
 
+import Theme from 'core/themes/model'
 interface Props {
   children: any
 }
@@ -10,8 +9,9 @@ interface Props {
 const useStyles = makeStyles((theme: Theme) => ({
   pre: {
     display: 'inline-block',
-    backgroundColor: hexToRGBA(theme.palette.primary.main, 0.15),
-    padding: `2px ${theme.spacing(1)}px`,
+    backgroundColor: theme.palette.code.background,
+    color: theme.palette.code.text,
+    padding: theme.spacing(1, 2),
     margin: theme.spacing(0.5),
     wordBreak: 'break-all',
     whiteSpace: 'pre-wrap',

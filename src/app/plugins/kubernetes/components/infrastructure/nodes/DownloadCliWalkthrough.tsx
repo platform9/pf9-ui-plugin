@@ -1,27 +1,35 @@
 import React from 'react'
-import { Typography, Theme } from '@material-ui/core'
+import { Typography, Paper } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import CodeBlock from 'core/components/CodeBlock'
 import SimpleLink from 'core/components/SimpleLink'
 import { whatIsBareOSLink } from 'app/constants'
+import Theme from 'core/themes/model'
 import CopyToClipboard from 'core/components/CopyToClipboard'
 
 const useStyles = makeStyles((theme: Theme) => ({
+  paper: {
+    padding: theme.spacing(2, 8),
+    margin: theme.spacing(2, 0),
+    backgroundColor: theme.palette.card.background,
+  },
   row: {
     display: 'flex',
     margin: theme.spacing(2, 0),
   },
   step: {
+    color: theme.palette.secondary.contrastText,
     marginRight: theme.spacing(2),
-    flex: `0 0 ${theme.spacing(4.5)}px`,
-    width: theme.spacing(4.5),
-    height: theme.spacing(4.5),
+    flex: `0 0 ${theme.spacing(3.5)}px`,
+    width: theme.spacing(3.5),
+    height: theme.spacing(3.5),
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    border: `2px solid ${theme.palette.text.primary}`,
+    // border: `2px solid ${theme.palette.text.primary}`,
+    backgroundColor: theme.palette.wizard.dark,
     borderRadius: '100%',
-    color: theme.palette.text.primary,
+    // color: theme.palette.text.primary,
   },
 }))
 
@@ -51,6 +59,7 @@ const defaultFinalStep = {
 }
 
 const DownloadCliWalkthrough = ({ finalStep = defaultFinalStep }): JSX.Element => {
+  const classes = useStyles({})
   return (
     <>
       <p>
@@ -64,28 +73,30 @@ const DownloadCliWalkthrough = ({ finalStep = defaultFinalStep }): JSX.Element =
           CentOS is coming soon!)
         </Typography>
       </p>
-      <Typography variant="h6">Install and Run</Typography>
-      <NumberedSteps
-        step={1}
-        title="Download and install the CLI"
-        description={
-          <CopyToClipboard copyText={installCommand.copyText}>
-            <CodeBlock>{installCommand.displayText}</CodeBlock>
-          </CopyToClipboard>}
-      />
-      <NumberedSteps
-        step={2}
-        title="Run the CLI to prepare your node with required pre-requisites to be added to a Kubernetes cluster"
-        description={
-          <CopyToClipboard copyText="pf9ctl cluster prep-node">
-            <CodeBlock>pf9ctl cluster prep-node</CodeBlock>
-          </CopyToClipboard>
-        }
-      />
-      <NumberedSteps
-        step={3}
-        {...finalStep}
-      />
+      <Paper className={classes.paper} elevation={0}>
+        <Typography variant="h6">Install and Run</Typography>
+        <NumberedSteps
+          step={1}
+          title="Download and install the CLI"
+          description={
+            <CopyToClipboard copyText={installCommand.copyText}>
+              <CodeBlock>{installCommand.displayText}</CodeBlock>
+            </CopyToClipboard>}
+        />
+        <NumberedSteps
+          step={2}
+          title="Run the CLI to prepare your node with required pre-requisites to be added to a Kubernetes cluster"
+          description={
+            <CopyToClipboard copyText="pf9ctl cluster prep-node">
+              <CodeBlock>pf9ctl cluster prep-node</CodeBlock>
+            </CopyToClipboard>
+          }
+        />
+        <NumberedSteps
+          step={3}
+          {...finalStep}
+        />
+      </Paper>
     </>
   )
 }
@@ -100,7 +111,7 @@ const NumberedSteps = ({ step, title, description }: NumberedStepProps): JSX.Ele
   const classes = useStyles({})
   return (
     <div className={classes.row}>
-      <Typography variant="h6" className={classes.step}>
+      <Typography variant="body1" className={classes.step}>
         {step}
       </Typography>
       <div>

@@ -6,9 +6,9 @@ import { makeStyles } from '@material-ui/styles'
 // Components
 import PageContainer from 'core/components/pageContainer/PageContainer'
 import SimpleLink from 'core/components/SimpleLink'
-import CodeBlock from 'core/components/CodeBlock'
 import DownloadCliWalkthrough from './DownloadCliWalkthrough'
 import CopyToClipboard from 'core/components/CopyToClipboard'
+import CodeBlock from 'core/components/CodeBlock'
 
 const useStyles = makeStyles((theme: Theme) => ({
   spacer: {
@@ -35,6 +35,7 @@ const ClusterDetailsPage: FunctionComponent = () => {
         download and install the CLI on your node
       </Typography>
       <DownloadCliWalkthrough finalStep={finalStep} />
+
       <p className={spacer} />
       <Typography variant="h6">CLI Advanced Options</Typography>
       <p> </p>
@@ -46,7 +47,7 @@ const ClusterDetailsPage: FunctionComponent = () => {
         Type <CopyToClipboard copyText="pf9ctl --help"><CodeBlock>pf9ctl --help</CodeBlock></CopyToClipboard> to see the full features and options the CLI
         supports
       </Typography>
-      <p> </p>
+      <p>{' '}</p>
       <Typography variant="body1">
         See <AnyLink src="">CLI Documentation</AnyLink> for more info on whats supported with the
         CLI

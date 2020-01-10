@@ -1,5 +1,5 @@
 // libs
-import React, { useContext } from 'react'
+import React, { useContext, useMemo, useCallback } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import { AppContext } from 'core/providers/AppProvider'
 // Constants
@@ -13,8 +13,20 @@ import { mngmTenantActions } from '../userManagement/tenants/actions'
 import { cloudProviderActions } from '../infrastructure/cloudProviders/actions'
 // Components
 import StatusCard from './StatusCard'
+import { Typography } from '@material-ui/core'
+import { capitalizeString, normalizeUsername } from 'utils/misc'
 
-const useStyles = makeStyles(theme => ({
+import ClusterSetup, {
+  clustersHaveMonitoring,
+  clustersHaveAccess,
+} from '../onboarding/cluster-setup'
+import PodSetup, { podSetupComplete } from '../onboarding/pod-setup'
+import useDataLoader from 'core/hooks/useDataLoader'
+import Progress from 'core/components/progress/Progress'
+import identity from 'ramda/es/identity'
+import { isAdminRole } from 'k8s/util/helpers'
+
+const useStyles = makeStyles((theme) => ({
   cardRow: {
     display: 'flex',
     flexDirection: 'row',
@@ -59,7 +71,7 @@ const topReports = [
     title: 'Deployments',
     icon: 'window',
     dataLoader: [deploymentActions.list, { clusterId: allKey }],
-    quantityFn: deployments => ({
+    quantityFn: (deployments) => ({
       quantity: deployments.length,
     }),
   },
@@ -195,34 +207,88 @@ const bottomReports = [
 ]
 
 const reportsWithPerms = (reports) => {
-  const { userDetails: { role } } = useContext(AppContext)
+  const {
+    userDetails: { role },
+  } = useContext(AppContext)
   return reports.filter((report) => {
     // No permissions property means no restrictions
-    if (!report.permissions) { return true }
+    if (!report.permissions) {
+      return true
+    }
     return report.permissions.includes(role)
   })
 }
-
+const promptOnboardingSetup = (items: boolean[]) => {
+  const isComplete = items.every(identity)
+  // If any step is not ready then we need to return true to prompt for it.
+  return !isComplete
+}
 const nodeHealthStatus = ({ status }) => {
   if (status === 'converging') { return status }
   return status === 'disconnected' ? 'unknown' : status === 'ok' ? 'healthy' : 'unhealthy'
 }
 
 const DashboardPage = () => {
-  const { cardColumn, cardRow } = useStyles()
+  // need to be able to force update because states are captured in local storage :(
+  const [, updateState] = React.useState()
+  const forceUpdate = useCallback(() => updateState({}), [])
+
+  const { cardColumn, cardRow } = useStyles({})
+  const { getContext, session } = useContext(AppContext)
+  const isAdmin = isAdminRole(getContext)
+  const username = capitalizeString(normalizeUsername(session.username))
+  const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
+  const [pods, loadingPods] = useDataLoader(podActions.list)
+  const hasClusters = !!clusters.length
+  const hasMonitoring = clustersHaveMonitoring(clusters)
+  const hasAccess = clustersHaveAccess()
+  const isLoading = loadingClusters || loadingPods
+
+  const showClusters = promptOnboardingSetup([hasClusters, hasAccess, hasMonitoring])
+  const showPods = !podSetupComplete(pods)
+  const showOnboarding = isAdmin && (showClusters || showPods)
+
+  const handleComplete = useCallback(() => {
+    forceUpdate()
+  }, [])
+
+  const initialExpandedClusterPanel = useMemo(
+    () => {
+      return [hasClusters, hasAccess, hasMonitoring].findIndex((item) => !item)
+    },
+    [hasClusters, hasMonitoring, hasAccess],
+  )
 
   return (
-    <section name="dashboard-status-container" className={cardColumn}>
-      <div className={cardRow}>
-        {reportsWithPerms(topReports).map(report => (
-          <StatusCard key={report.route} {...report} />
-        ))}
-      </div>
-      <div className={cardRow}>
-        {reportsWithPerms(bottomReports).map(report => (
-          <StatusCard key={report.route} {...report} />
-        ))}
-      </div>
+    <section className={cardColumn}>
+      <Typography variant="h5">Welcome {username}!</Typography>
+      {isLoading ? (
+        <Progress loading={isLoading} overlay renderContentOnMount />
+      ) : (
+        <>
+          {showOnboarding && (
+            <>
+              <ClusterSetup initialPanel={initialExpandedClusterPanel} onComplete={handleComplete} />
+              <PodSetup onComplete={handleComplete} initialPanel={showClusters ? undefined : 0} />
+            </>
+          )}
+
+          {!showOnboarding && (
+            <>
+              <div className={cardRow}>
+                {reportsWithPerms(topReports).map(report => (
+                  <StatusCard key={report.route} {...report} />
+                ))}
+              </div>
+              <div className={cardRow}>
+                {reportsWithPerms(bottomReports).map(report => (
+                  <StatusCard key={report.route} {...report} />
+                ))}
+              </div>
+            </>
+          )}
+        </>
+      )}
     </section>
   )
 }

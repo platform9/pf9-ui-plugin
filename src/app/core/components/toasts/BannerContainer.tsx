@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from 'react'
-import { Snackbar, Theme } from '@material-ui/core'
+import { Theme } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
-import ToastItem from 'core/components/toasts/ToastItem'
+// import BannerItem from 'core/components/toasts/BannerItem'
 
 import { MessageOptions } from './model'
 
@@ -23,32 +23,23 @@ const useStyles = makeStyles<Theme>(theme => ({
   }
 }))
 
-export interface ToastOptions extends MessageOptions {
-  id: string
+export interface BannerOptions extends MessageOptions {
+  dismissable: boolean
 }
 
-interface ToastContainerProps {
-  toasts: MessageOptions[]
+interface BannerContainerProps {
+  toasts: BannerOptions[]
   toastsTimeout: number
 }
 
-const ToastContainer: FunctionComponent<ToastContainerProps> = ({ toasts, toastsTimeout }) => {
+const BannerContainer: FunctionComponent<BannerContainerProps> = ({ toasts }) => {
   const classes = useStyles({})
   return <div className={classes.root}>
     {toasts.map(({ id, isOpen, text, onClose, variant }) =>
-      <Snackbar
-        className={classes.toastItem}
-        key={id}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right',
-        }}
-        open={isOpen}
-        autoHideDuration={toastsTimeout}
-      >
-        <ToastItem onClose={onClose} variant={variant} message={text} toastsTimeout={toastsTimeout} />
-      </Snackbar>)}
+      // <BannerItem />
+      <div />
+    )}
   </div>
 }
 
-export default ToastContainer
+export default BannerContainer
