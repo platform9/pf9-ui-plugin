@@ -19,6 +19,9 @@ NODEJS_DOWNLOAD_SCRIPT = $(shell pwd)/download-nodejs-latest-v10.x.sh
 NODE_BIN := $(NODEJS_DIR)/bin/node
 NPM_BIN := $(NODE_BIN) $(NODEJS_DIR)/bin/npm --scripts-prepend-node-path=true
 
+YARN_DIR := $(TOP_DIR)/yarn
+YARN_BIN := $(YARN_DIR)/bin/yarn
+
 # example usage: $(call download_nodejs,"linux","/path/to/node")
 define download_nodejs
 tar xz --strip-components=1 -C $2 --file $(shell ${NODEJS_DOWNLOAD_SCRIPT} $1 $(TOP_DIR))
@@ -43,18 +46,28 @@ $(NODEJS_DIR):
 	mkdir -p $@
 	$(call download_nodejs,"linux",$@)
 
+$(YARN_DIR):
+	mkdir -p $@	
+	wget -O $@/latest.tar.gz https://yarnpkg.com/latest.tar.gz
+	tar xf $@/latest.tar.gz -C $@ --strip-components=1 
+
 dependencies: $(NODEJS_DIR)
 	pushd $(TOP_DIR) && \
-	$(NPM_BIN) install && \
+	PATH=$(NODEJS_DIR)/bin:$$PATH $(YARN_BIN) && \
 	popd
 
-build: $(NODEJS_DIR) | dependencies
+yarn: $(YARN_DIR)
+
+yarn-clean:
+	rm -rf $(YARN_DIR)
+
+build: $(NODEJS_DIR) $(YARN_DIR) | dependencies
 	echo "NODE VERSION: "
 	$(NODE_BIN) --version
 	echo "NPM VERSION: "
 	$(NPM_BIN) --version
 	echo "building (npm run build)..."
-	NODE_ENV=$(ENV_TYPE) $(NPM_BIN) run build 
+	NODE_ENV=$(ENV_TYPE) PATH=$(NODEJS_DIR)/bin:$$PATH $(YARN_BIN) build 
 
 rpm: build ${UI_PLUGIN_RPM}
 
