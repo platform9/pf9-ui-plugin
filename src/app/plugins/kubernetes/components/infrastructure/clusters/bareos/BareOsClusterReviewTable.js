@@ -25,6 +25,7 @@ const getFilteredNodesFormattedName = (nodes, filterList = []) =>
 // TODO: azs, networking info, services/api FQDN auto-generate, MTU size
 const BareOsClusterReviewTable = ({ data }) => {
   const [nodes] = useDataLoader(loadNodes)
+  // TODO why are form elements undefined here? wtf.
   const masterNodes = getFilteredNodesFormattedName(nodes, data.masterNodes)
   const workerNodes = getFilteredNodesFormattedName(nodes, data.workerNodes)
   return (
