@@ -42,12 +42,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 }))
 
 const AnyLink: any = SimpleLink
-
-const installCommand = {
-  displayText:
-    'curl -O https://raw.githubusercontent.com/platform9/express-cli/master/cli-setup.sh',
-  copyText: 'curl -O https://raw.githubusercontent.com/platform9/express-cli/master/cli-setup.sh',
-}
+const installCommand = 'curl -O https://raw.githubusercontent.com/platform9/express-cli/master/cli-setup.sh'
 
 // Not super enthused about this. Need to have different content for bareos flow vs landing page.
 export const DownloadCliBareOSWalkthrough = (): JSX.Element => (
@@ -87,16 +82,16 @@ const DownloadCliWalkthrough = ({ finalStep = defaultFinalStep }): JSX.Element =
         <Typography variant="h6">Install and Run</Typography>
         <NumberedSteps
           step={1}
-          title="Download CLI installer (or Skip to Step 3 if you have the CLI installed already)"
+          title="Download CLI installer (or skip to Step 3 if you have the CLI installed already)"
           description={
-            <CopyToClipboard copyText={installCommand.copyText}>
-              <CodeBlock>{installCommand.displayText}</CodeBlock>
+            <CopyToClipboard copyText={installCommand}>
+              <CodeBlock>{installCommand}</CodeBlock>
             </CopyToClipboard>
           }
         />
         <NumberedSteps
           step={2}
-          title="Run the CLI installer (or Skip to Step 3 if you have the CLI installed already)"
+          title="Run the CLI installer (or skip to Step 3 if you have the CLI installed already)"
           description={
             <CopyToClipboard copyText="bash ./cli-setup.sh">
               <CodeBlock>bash ./cli-setup.sh</CodeBlock>
