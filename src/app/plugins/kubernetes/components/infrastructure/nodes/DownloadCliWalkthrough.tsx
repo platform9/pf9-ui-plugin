@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { FC, useContext } from 'react'
 import { Typography, Paper } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import CodeBlock from 'core/components/CodeBlock'
@@ -6,6 +6,7 @@ import SimpleLink from 'core/components/SimpleLink'
 import { whatIsBareOSLink } from 'app/constants'
 import Theme from 'core/themes/model'
 import CopyToClipboard from 'core/components/CopyToClipboard'
+import { AppContext } from 'core/providers/AppProvider'
 
 const useStyles = makeStyles((theme: Theme) => ({
   paper: {
@@ -31,14 +32,21 @@ const useStyles = makeStyles((theme: Theme) => ({
     borderRadius: '100%',
     // color: theme.palette.text.primary,
   },
+  spacer: {
+    margin: theme.spacing(1, 0),
+  },
+  linkText: {
+    textDecoration: 'underline',
+    color: theme.palette.primary.main,
+  },
 }))
 
 const AnyLink: any = SimpleLink
 
 const installCommand = {
-  displayText: '> curl -O https://raw.githubusercontent.com/platform9/express-cli/master/cli-setup.sh\n' +
-  '> bash ./cli-setup.sh',
-  copyText: 'curl -O https://raw.githubusercontent.com/platform9/express-cli/master/cli-setup.sh \nbash ./cli-setup.sh',
+  displayText:
+    'curl -O https://raw.githubusercontent.com/platform9/express-cli/master/cli-setup.sh',
+  copyText: 'curl -O https://raw.githubusercontent.com/platform9/express-cli/master/cli-setup.sh',
 }
 
 // Not super enthused about this. Need to have different content for bareos flow vs landing page.
@@ -54,12 +62,14 @@ export const DownloadCliBareOSWalkthrough = (): JSX.Element => (
 )
 
 const defaultFinalStep = {
-  title: 'Refresh grid',
-  description: 'Once you have installed the CLI on the required nodes, refresh the grid above. You should now see those nodes in the grid and you can select them to be added to your cluster',
+  title: 'Refresh this page',
+  description:
+    'After refreshing, you should now see those nodes. Select them to be added to your cluster',
 }
 
 const DownloadCliWalkthrough = ({ finalStep = defaultFinalStep }): JSX.Element => {
   const classes = useStyles({})
+  const { session } = useContext(AppContext)
   return (
     <>
       <p>
@@ -77,25 +87,48 @@ const DownloadCliWalkthrough = ({ finalStep = defaultFinalStep }): JSX.Element =
         <Typography variant="h6">Install and Run</Typography>
         <NumberedSteps
           step={1}
-          title="Download and install the CLI"
+          title="Download CLI installer (or Skip to Step 3 if you have the CLI installed already)"
           description={
             <CopyToClipboard copyText={installCommand.copyText}>
               <CodeBlock>{installCommand.displayText}</CodeBlock>
-            </CopyToClipboard>}
+            </CopyToClipboard>
+          }
         />
         <NumberedSteps
           step={2}
-          title="Run the CLI to prepare your node with required pre-requisites to be added to a Kubernetes cluster"
+          title="Run the CLI installer (or Skip to Step 3 if you have the CLI installed already)"
+          description={
+            <CopyToClipboard copyText="bash ./cli-setup.sh">
+              <CodeBlock>bash ./cli-setup.sh</CodeBlock>
+            </CopyToClipboard>
+          }
+        >
+          <Typography variant="subtitle2" className={classes.spacer}>
+            The installer will ask for your PMK account info. Here's your info for quick use:
+          </Typography>
+          <Typography variant="body1">
+            Your Platform9 account management URL:{' '}
+            <CopyToClipboard copyText={window.location.origin}>
+              <span className={classes.linkText}>{window.location.origin}</span>
+            </CopyToClipboard>
+          </Typography>
+          <Typography variant="body1">
+            Your Platform9 username:{' '}
+            <CopyToClipboard copyText={session.username}>
+              <span className={classes.linkText}>{session.username}</span>
+            </CopyToClipboard>
+          </Typography>
+        </NumberedSteps>
+        <NumberedSteps
+          step={3}
+          title="Run the CLI to prepare your node (NOTE: The CLI, once installed, can also connect to and work with remote nodes using ssh so you only really need to install it once!)"
           description={
             <CopyToClipboard copyText="pf9ctl cluster prep-node">
               <CodeBlock>pf9ctl cluster prep-node</CodeBlock>
             </CopyToClipboard>
           }
         />
-        <NumberedSteps
-          step={3}
-          {...finalStep}
-        />
+        <NumberedSteps step={4} {...finalStep} />
       </Paper>
     </>
   )
@@ -107,7 +140,12 @@ interface NumberedStepProps {
   description: string | JSX.Element
 }
 
-const NumberedSteps = ({ step, title, description }: NumberedStepProps): JSX.Element => {
+const NumberedSteps: FC<NumberedStepProps> = ({
+  step,
+  title,
+  description,
+  children,
+}): JSX.Element => {
   const classes = useStyles({})
   return (
     <div className={classes.row}>
@@ -121,6 +159,7 @@ const NumberedSteps = ({ step, title, description }: NumberedStepProps): JSX.Ele
         ) : (
           description
         )}
+        {children}
       </div>
     </div>
   )

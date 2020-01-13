@@ -29,12 +29,15 @@ import { loadNodes } from '../../nodes/actions'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
+const defaultMonitoringTagEnabled = { key: 'pf9-system:monitoring', value: 'true' }
+
 const initialContext = {
   containersCidr: '10.20.0.0/16',
   servicesCidr: '10.21.0.0/16',
   networkPlugin: 'flannel',
   runtimeConfigOption: 'default',
   mtuSize: 1440,
+  tags: [defaultMonitoringTagEnabled]
 }
 
 const runtimeConfigOptions = [
