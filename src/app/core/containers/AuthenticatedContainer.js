@@ -28,6 +28,7 @@ const useStyles = makeStyles(theme => ({
     width: '100%',
   },
   content: {
+    marginTop: 55, // header height is hardcoded to 55px. account for that here.
     overflowX: 'auto',
     flexGrow: 1,
     // backgroundColor: props => (
@@ -37,6 +38,7 @@ const useStyles = makeStyles(theme => ({
     // )
     backgroundColor: theme.palette.background.default,
     padding: theme.spacing(3),
+    paddingTop: theme.spacing(2),
     transition: theme.transitions.create('margin', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
@@ -158,7 +160,6 @@ const AuthenticatedContainer = () => {
           [classes.contentShift]: drawerOpen,
           [classes['contentShift-left']]: drawerOpen,
         })}>
-          <div className={classes.drawerHeader} />
           <div className={classes.contentMain}>
             <Switch>
               {renderPlugins(plugins, role)}

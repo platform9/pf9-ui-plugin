@@ -2,7 +2,6 @@ import React from 'react'
 import { withRouter } from 'react-router-dom'
 import ListTable from 'core/components/listTable/ListTable'
 import { withScopedPreferences } from 'core/providers/PreferencesProvider'
-import requiresAuthentication from 'openstack/util/requiresAuthentication'
 import { compose } from 'ramda'
 
 const createListTableComponent = ({
@@ -17,6 +16,7 @@ const createListTableComponent = ({
   showCheckboxes,
   onReload,
   onRefresh,
+  compactTable = false,
 }) => {
   const CustomListTable = ({
     data,
@@ -25,7 +25,9 @@ const createListTableComponent = ({
     onEdit,
     rowActions,
     preferences: { visibleColumns, columnsOrder, rowsPerPage },
-    updatePreferences
+    updatePreferences,
+    loading,
+    onSortChange,
   }) => (!data || data.length === 0
     ? <h1>{emptyText}</h1>
     : <ListTable
@@ -46,14 +48,16 @@ const createListTableComponent = ({
       onRefresh={onRefresh}
       onRowsPerPageChange={rowsPerPage => updatePreferences({ rowsPerPage })}
       onColumnsChange={updatePreferences}
+      onSortChange={onSortChange}
       uniqueIdentifier={uniqueIdentifier}
+      loading={loading}
+      compactTable={compactTable}
     />)
 
   CustomListTable.displayName = displayName
 
   return compose(
     withRouter,
-    requiresAuthentication,
     withScopedPreferences(name)
   )(CustomListTable)
 }

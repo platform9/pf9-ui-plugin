@@ -147,3 +147,11 @@ export const getCookieValue = (name) => {
   const val = document.cookie.match('(^|[^;]+)\\s*' + name + '\\s*=\\s*([^;]+)')
   return val ? val.pop() : ''
 }
+
+export const normalizeUsername = (name = '') => {
+  if (!name) return name
+
+  // split emails from @ sign and take the left hand side
+  const [username] = name.split('@')
+  return username
+}

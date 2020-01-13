@@ -49,7 +49,7 @@ const icons = {
   azure: `${rootPath}/icon-cloudproviders-azure${iconSize}.png`,
   openstack: `${rootPath}/icon-cloudproviders-openstack${iconSize}.png`,
   vmware: `${rootPath}/icon-cloudproviders-vmware${iconSize}.png`,
-  other: `${rootPath}/icon-cloudproviders-other${iconSize}.png`,
+  local: `${rootPath}/icon-cloudproviders-other${iconSize}.png`,
 }
 
 const labels = {
@@ -57,7 +57,7 @@ const labels = {
   azure: 'Microsoft Azure',
   openstack: 'OpenStack',
   vmware: 'VMware',
-  other: 'Bare OS',
+  local: 'Bare OS',
 }
 
 const CloudProviderCard = props => {
@@ -76,7 +76,7 @@ const CloudProviderCard = props => {
 }
 
 CloudProviderCard.propTypes = {
-  type: PropTypes.oneOf(['aws', 'azure', 'openstack', 'vmware', 'other']).isRequired,
+  type: PropTypes.oneOf(['aws', 'azure', 'openstack', 'vmware', 'local']).isRequired,
   src: PropTypes.string,
   onClick: PropTypes.func,
   // eslint-disable-next-line react/no-unused-prop-types

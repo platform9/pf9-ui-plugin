@@ -8,6 +8,7 @@ export const loginWithCookieUrl = `${appUrlRoot}/pmkft/login`
 export const resetPasswordUrl = `${appUrlRoot}/reset/password`
 export const resetPasswordThroughEmailUrl = '/reset/password'
 export const forgotPasswordUrl = `${appUrlRoot}/forgot_password`
+export const activateUserUrl = `${appUrlRoot}/users/activate`
 export const logoutUrl = `${appUrlRoot}/logout`
 export const resetPasswordApiUrl = '/clemency/reset/password'
 export const forgotPasswordApiUrl = '/clemency/request'
@@ -19,9 +20,19 @@ export const uuidRegex = new RegExp(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[
 
 export const k8sPrefix = `${appUrlRoot}/kubernetes`
 
+export const OnboardingAccessSetup = 'onboarding/api-access'
+export const OnboardingMonitoringSetup = 'onboarding/monitoring-enabled'
+export const OnboardingPodSetup = 'onboarding/pod-setup'
+
 // Documentation links
+export const gettingStartedLink = 'https://docs.platform9.com/kubernetes/getting-started/bare-metal-preinstall-checklist/'
 export const qbertApiLink = 'https://docs.platform9.com/kubernetes/Qbert-API-Reference'
 export const whatIsBareOSLink = 'https://docs.platform9.com/kubernetes/on-premise-kubernetes/what-is-bareos'
+export const BareOSSetupDocumentation = 'https://docs.platform9.com/kubernetes/create-multimaster-bareos-cluster/'
+
+export const azureServicePrincipalPortal = 'https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal'
+export const azureGetValuesForSigningin = 'https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal#get-values-for-signing-in'
+export const azureCreateANewApplicationSecret = 'https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal#create-a-new-application-secret'
 
 // Errors
 export const addError = 'ERR_ADD'

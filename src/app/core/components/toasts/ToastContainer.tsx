@@ -1,7 +1,9 @@
 import React, { FunctionComponent } from 'react'
 import { Snackbar, Theme } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
-import ToastItem, { MessageTypes } from 'core/components/toasts/ToastItem'
+import ToastItem from 'core/components/toasts/ToastItem'
+
+import { MessageOptions } from './model'
 
 const useStyles = makeStyles<Theme>(theme => ({
   root: {
@@ -21,16 +23,12 @@ const useStyles = makeStyles<Theme>(theme => ({
   }
 }))
 
-export interface ToastOptions {
+export interface ToastOptions extends MessageOptions {
   id: string
-  text: string
-  variant: MessageTypes
-  isOpen: boolean
-  onClose: () => void
 }
 
 interface ToastContainerProps {
-  toasts: ToastOptions[]
+  toasts: MessageOptions[]
   toastsTimeout: number
 }
 

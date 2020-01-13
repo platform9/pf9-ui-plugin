@@ -5,8 +5,8 @@ import TextField from 'core/components/validatedForm/TextField'
 import { Dialog, DialogTitle, DialogContent, RadioGroup, Radio, Grid, FormControlLabel } from '@material-ui/core'
 import CancelButton from 'core/components/buttons/CancelButton'
 import SubmitButton from 'core/components/buttons/SubmitButton'
-import { passwordValidator } from 'core/utils/fieldValidators'
 import ApiClient from 'api-client/ApiClient'
+import Alert from 'core/components/Alert'
 
 const { keystone } = ApiClient.getInstance()
 
@@ -28,8 +28,16 @@ const useStyles = makeStyles(theme => ({
 const DownloadDialog = ({ onDownloadClick, onClose, isDialogOpen }) => {
   const classes = useStyles()
   const [authMethod, setAuthMethod] = useState('token')
+  const [errorMessage, setErrorMessage] = useState()
+
+  const handleClose = () => {
+    setErrorMessage(null)
+    onClose()
+  }
 
   const handleSubmit = async (params) => {
+    setErrorMessage(null)
+
     const { username, password } = params
     const token = authMethod === 'token'
       ? await tokenAuth()
@@ -37,11 +45,13 @@ const DownloadDialog = ({ onDownloadClick, onClose, isDialogOpen }) => {
 
     if (token) {
       await onDownloadClick(token)
+    } else {
+      setErrorMessage('Invalid Credentials')
     }
   }
 
   return (
-    <Dialog open={isDialogOpen} onClose={onClose}>
+    <Dialog open={isDialogOpen} onClose={handleClose}>
       <DialogTitle>Download Kubeconfig</DialogTitle>
       <DialogContent>
         <ValidatedForm onSubmit={handleSubmit} fullWidth>
@@ -74,10 +84,11 @@ const DownloadDialog = ({ onDownloadClick, onClose, isDialogOpen }) => {
                 <PasswordForm
                   classes={classes}
                 />
+                {errorMessage && <Alert small variant="error" message={errorMessage} />}
               </Grid>
             }
             <Grid item xs={12} zeroMinWidth className={classes.formButtons}>
-              <CancelButton onClick={onClose}>Cancel</CancelButton>
+              <CancelButton onClick={handleClose}>Cancel</CancelButton>
               <SubmitButton type={authMethod === 'token' ? 'button' : 'submit'} onClick={handleSubmit}>
                 {authMethod === 'token' ? 'Download Config' : 'Validate Credentials'}
               </SubmitButton>
@@ -105,7 +116,6 @@ const PasswordForm = ({ classes }) =>
         id="password"
         label="password"
         type="password"
-        validations={[passwordValidator]}
         required
       />
     </Grid>

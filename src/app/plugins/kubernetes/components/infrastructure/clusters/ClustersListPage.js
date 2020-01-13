@@ -16,21 +16,19 @@ import ResourceUsageTable from 'k8s/components/infrastructure/common/ResourceUsa
 import DashboardLink from './DashboardLink'
 import CreateButton from 'core/components/buttons/CreateButton'
 import { AppContext } from 'core/providers/AppProvider'
-import { both, prop } from 'ramda'
+import { both } from 'ramda'
 import PrometheusAddonDialog from 'k8s/components/prometheus/PrometheusAddonDialog'
 import ClusterUpgradeDialog from 'k8s/components/infrastructure/clusters/ClusterUpgradeDialog'
 import ClusterSync from './ClusterSync'
 import { Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import {
-  getConnectionStatus,
+  getHealthStatusMessage,
   connectionStatusFieldsTable,
-  hasConvergingNodes,
-  getHealthStatusAndMessage,
   clusterHealthStatusFields,
-  isTransientState,
-  isSteadyState,
+  isTransientStatus,
 } from './ClusterStatusUtils'
+import { isAdminRole } from 'k8s/util/helpers'
 
 const useStyles = makeStyles(theme => ({
   link: {
@@ -51,14 +49,13 @@ const renderCloudProviderType = (type, cluster) => {
 
 const getNodesDetailsUrl = (uuid) => `/ui/kubernetes/infrastructure/clusters/${uuid}#nodesAndHealthInfo`
 
-const renderConnectionStatus = (_, { taskStatus, nodes, progressPercent, uuid }) => {
+const renderConnectionStatus = (_, { connectionStatus, progressPercent, uuid }) => {
   const nodesDetailsUrl = getNodesDetailsUrl(uuid)
 
-  if (isTransientState(taskStatus, nodes)) {
-    return renderTransientStatus(taskStatus, nodes, progressPercent)
+  if (isTransientStatus(connectionStatus)) {
+    return renderTransientStatus(connectionStatus, progressPercent)
   }
 
-  const connectionStatus = getConnectionStatus(nodes)
   const fields = connectionStatusFieldsTable[connectionStatus]
 
   return (
@@ -70,9 +67,8 @@ const renderConnectionStatus = (_, { taskStatus, nodes, progressPercent, uuid })
   )
 }
 
-const renderTransientStatus = (taskStatus, nodes, progressPercent) => {
-  const currentStatus = hasConvergingNodes(nodes) ? 'converging' : taskStatus
-  const spanContent = `The cluster is ${currentStatus}.`
+const renderTransientStatus = (connectionStatus, progressPercent) => {
+  const spanContent = `The cluster is ${connectionStatus}.`
 
   return (
     <div>
@@ -82,9 +78,9 @@ const renderTransientStatus = (taskStatus, nodes, progressPercent) => {
           : 0}
         />
       }
-      <ClusterSync taskStatus={currentStatus}>
+      <ClusterSync taskStatus={connectionStatus}>
         <ClusterStatusSpan title={spanContent}>
-          {capitalizeString(currentStatus)}
+          {capitalizeString(connectionStatus)}
         </ClusterStatusSpan>
       </ClusterSync>
     </div>
@@ -99,8 +95,14 @@ const renderErrorStatus = (taskError, nodesDetailsUrl) =>
     <SimpleLink src={nodesDetailsUrl}>Error</SimpleLink>
   </ClusterStatusSpan>
 
-const renderClusterHealthStatus = ({ nodes, masterNodes, workerNodes, healthyMasterNodes, healthyWorkerNodes, taskError, nodesDetailsUrl }) => {
-  const [healthStatus, message] = getHealthStatusAndMessage({ nodes, masterNodes, workerNodes, healthyMasterNodes, healthyWorkerNodes })
+const renderClusterHealthStatus = ({
+  healthStatus,
+  masterNodesHealthStatus,
+  workerNodesHealthStatus,
+  taskError,
+  nodesDetailsUrl,
+}) => {
+  const message = getHealthStatusMessage(masterNodesHealthStatus, workerNodesHealthStatus)
   const fields = clusterHealthStatusFields[healthStatus]
 
   return (
@@ -116,27 +118,27 @@ const renderClusterHealthStatus = ({ nodes, masterNodes, workerNodes, healthyMas
   )
 }
 
-const renderHealthStatus = (status, {
-  taskStatus,
+const renderHealthStatus = (_, {
+  healthStatus,
+  masterNodesHealthStatus,
+  workerNodesHealthStatus,
   taskError,
   progressPercent,
-  nodes,
-  masterNodes,
-  workerNodes,
-  healthyMasterNodes,
-  healthyWorkerNodes,
   uuid,
 }) => {
-  if (isTransientState(taskStatus, nodes)) {
-    return renderTransientStatus(taskStatus, nodes, progressPercent)
+  if (isTransientStatus(healthStatus)) {
+    return renderTransientStatus(healthStatus, progressPercent)
   }
 
-  if (isSteadyState(taskStatus, nodes)) {
-    const nodesDetailsUrl = getNodesDetailsUrl(uuid)
-    return renderClusterHealthStatus({ nodes, masterNodes, workerNodes, healthyMasterNodes, healthyWorkerNodes, taskError, nodesDetailsUrl })
-  }
+  const nodesDetailsUrl = getNodesDetailsUrl(uuid)
 
-  return status && <ClusterStatusSpan>{capitalizeString(status)}</ClusterStatusSpan>
+  return renderClusterHealthStatus({
+    healthStatus,
+    masterNodesHealthStatus,
+    workerNodesHealthStatus,
+    taskError,
+    nodesDetailsUrl,
+  })
 }
 
 const renderLinks = links => {
@@ -211,8 +213,7 @@ const canUpgradeCluster = (selected) => false
 const canDeleteCluster = ([row]) => !(['creating', 'deleting'].includes(row.taskStatus))
 
 const isAdmin = (selected, getContext) => {
-  const { role } = getContext(prop('userDetails'))
-  return role === 'admin'
+  return isAdminRole(getContext)
 }
 
 export const options = {
@@ -232,12 +233,12 @@ export const options = {
     { id: 'cloudProviderType', label: 'Deployment Type', render: renderCloudProviderType },
     { id: 'resource_utilization', label: 'Resource Utilization', render: renderStats },
     { id: 'version', label: 'Kubernetes Version' },
+    { id: 'nodes', label: 'Nodes', render: nodes => <NodesCell nodes={nodes} /> },
     { id: 'networkPlugin', label: 'Network Backend' },
     { id: 'containersCidr', label: 'Containers CIDR' },
     { id: 'servicesCidr', label: 'Services CIDR' },
     { id: 'endpoint', label: 'API endpoint' },
     { id: 'cloudProviderName', label: 'Cloud provider' },
-    { id: 'nodes', label: 'Nodes', render: nodes => <NodesCell nodes={nodes} /> },
     { id: 'allowWorkloadsOnMaster', label: 'Master Workloads' },
     { id: 'privileged', label: 'Privileged' },
     { id: 'hasVpn', label: 'VPN' },

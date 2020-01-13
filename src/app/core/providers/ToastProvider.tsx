@@ -10,7 +10,7 @@ import uuid from 'uuid'
 import { append, takeLast, reject, whereEq } from 'ramda'
 import ToastContainer, { ToastOptions } from 'core/components/toasts/ToastContainer'
 import { except, pipe } from 'utils/fp'
-import { MessageTypes } from 'core/components/toasts/ToastItem'
+import { MessageTypes } from 'core/components/toasts/model'
 
 const toastsTimeout = 10000
 const concurrentToasts = 5

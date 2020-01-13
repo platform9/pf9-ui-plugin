@@ -18,7 +18,7 @@ const ThemeManager = ({ children, themeName = 'default' }) => {
     })
     const loadTheme = async name => {
       try {
-        const jsonTheme = await import(`core/themes/${name}.json`)
+        const jsonTheme = await import('core/themes/' + name + '.json')
         if (!jsonTheme) { console.error(`Unable to load ${name}.json`) }
         if (jsonTheme) { console.info(`Loaded ${name}.json`) }
         setContext({

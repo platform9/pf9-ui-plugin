@@ -62,12 +62,12 @@ function createContextUpdater (cacheKey, dataUpdaterFn, options = {}) {
     operation = 'any',
     contextLoader,
     successMessage = (updatedItems, prevItems, params, operation) =>
-      `Successfully ${switchCase(
+      `${entityName} ${switchCase(
         'updated',
         ['create', 'created'],
         ['update', 'updated'],
         ['delete', 'deleted'],
-      )(operation)} ${entityName}`,
+      )(operation)} successfully`,
     errorMessage = (prevItems, params, catchedErr, operation) => {
       const action = switchCase(
         'update',

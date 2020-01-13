@@ -4,17 +4,19 @@ import { AppContext } from 'core/providers/AppProvider'
 import { usePreferences, useScopedPreferences } from 'core/providers/PreferencesProvider'
 import { setStorage, getStorage } from 'core/utils/pf9Storage'
 import { loadUserTenants } from 'openstack/components/tenants/actions'
-import { head, path, pathOr, propEq, isEmpty } from 'ramda'
+import { head, path, pathOr, propEq, isEmpty, isNil } from 'ramda'
 import AuthenticatedContainer from 'core/containers/AuthenticatedContainer'
 import track from 'utils/tracking'
 import useReactRouter from 'use-react-router'
 import { makeStyles } from '@material-ui/styles'
 import { Route, Redirect, Switch } from 'react-router'
 import {
-  dashboardUrl, resetPasswordUrl, resetPasswordThroughEmailUrl, forgotPasswordUrl, loginUrl
+  activateUserUrl, dashboardUrl, resetPasswordUrl, resetPasswordThroughEmailUrl,
+  forgotPasswordUrl, loginUrl,
 } from 'app/constants'
 import ResetPasswordPage from 'core/public/ResetPasswordPage'
 import ForgotPasswordPage from 'core/public/ForgotPasswordPage'
+import ActivateUserPage from 'core/public/ActivateUserPage'
 import { isNilOrEmpty } from 'utils/fp'
 import LoginPage from 'core/public/LoginPage'
 import Progress from 'core/components/progress/Progress'
@@ -84,8 +86,10 @@ const AppContainer = () => {
         history.push(loginUrl)
         return
       }
-      await setupSession({ username, unscopedToken, expiresAt, issuedAt })
-      history.push(dashboardUrl)
+      const success = await setupSession({ username, unscopedToken, expiresAt, issuedAt })
+      if (success) {
+        history.push(dashboardUrl)
+      }
       return
     }
     // Attempt to restore the session
@@ -95,7 +99,14 @@ const AppContainer = () => {
     const currUnscopedToken = tokens && tokens.unscopedToken
     if (username && currUnscopedToken) {
       // We need to make sure the token has not expired.
-      const { unscopedToken, expiresAt, issuedAt } = await keystone.renewToken(currUnscopedToken)
+      const response = await keystone.renewToken(currUnscopedToken)
+
+      if (isNil(response)) {
+        return history.push(loginUrl)
+      }
+
+      const { unscopedToken, expiresAt, issuedAt } = response
+
       if (unscopedToken && user) {
         return setupSession({ username, unscopedToken, expiresAt, issuedAt })
       }
@@ -103,6 +114,8 @@ const AppContainer = () => {
     await setContext({ appLoaded: true })
 
     if (history.location.pathname === forgotPasswordUrl) return history.push(forgotPasswordUrl)
+
+    if (history.location.pathname.includes(activateUserUrl)) return
 
     // TODO: Need to fix this code after synching up with backend.
     if (history.location.hash.includes(resetPasswordThroughEmailUrl)) return history.push(history.location.hash.slice().replace('#', '/ui'))
@@ -120,40 +133,52 @@ const AppContainer = () => {
     const timeDiff = moment(expiresAt).diff(issuedAt)
     const localExpiresAt = moment().add(timeDiff).format()
 
-    // Set up the scopedToken
-    await initSession(unscopedToken, username, localExpiresAt)
-    // The order matters, we need the session to be able to init the user preferences
-    const userPreferences = await initUserPreferences(username)
+    try {
+      // Set up the scopedToken
+      await initSession(unscopedToken, username, localExpiresAt)
+      // The order matters, we need the session to be able to init the user preferences
+      const userPreferences = await initUserPreferences(username)
 
-    const lastTenant = pathOr('service', ['Tenants', 'lastTenant', 'name'], userPreferences)
-    const lastRegion = path(['RegionChooser', 'lastRegion', 'id'], userPreferences)
+      const lastTenant = pathOr('service', ['Tenants', 'lastTenant', 'name'], userPreferences)
+      const lastRegion = path(['RegionChooser', 'lastRegion', 'id'], userPreferences)
 
-    const tenants = await loadUserTenants({ getContext, setContext })
-    const activeTenant = tenants.find(propEq('name', lastTenant)) || head(tenants)
+      const tenants = await loadUserTenants({ getContext, setContext })
+      if (isNilOrEmpty(tenants)) {
+        throw new Error('No tenants found, please contact support')
+      }
+      const activeTenant = tenants.find(propEq('name', lastTenant)) || head(tenants)
+      if (lastRegion) { setActiveRegion(lastRegion) }
 
-    if (lastRegion) { setActiveRegion(lastRegion) }
-    const { scopedToken, user, role } = await keystone.changeProjectScope(activeTenant.id)
-    await keystone.resetCookie()
+      const { scopedToken, user, role } = await keystone.changeProjectScope(activeTenant.id)
+      await keystone.resetCookie()
+      /* eslint-disable */
+      // Identify the user in Segment using Keystone ID
+      if (typeof analytics !== 'undefined') {
+        analytics.identify(user.id, {
+          email: user.name,
+        })
+      }
 
-    /* eslint-disable */
-    // Identify the user in Segment using Keystone ID
-    if (typeof analytics !== 'undefined') {
-      analytics.identify(user.id, {
-        email: user.name,
+      /* eslint-enable */
+      updatePrefs({ lastTenant: activeTenant })
+      setStorage('userTenants', tenants)
+      setStorage('user', user)
+      setStorage('tokens', { unscopedToken, currentToken: scopedToken })
+
+      await setContext({
+        initialized: true,
+        currentTenant: activeTenant,
+        userDetails: { ...user, role },
       })
+    } catch (err) {
+      await setContext({
+        appLoaded: false,
+        initialized: false,
+      })
+      showToast(`There has been an error initializing the session.\n${err.message}`, 'error')
+      return false
     }
-
-    /* eslint-enable */
-    updatePrefs({ lastTenant: activeTenant })
-    setStorage('userTenants', tenants)
-    setStorage('user', user)
-    setStorage('tokens', { unscopedToken, currentToken: scopedToken })
-
-    await setContext({
-      initialized: true,
-      currentTenant: activeTenant,
-      userDetails: { ...user, role },
-    })
+    return true
   }
 
   const loadingMessage = appLoaded
@@ -169,6 +194,7 @@ const AppContainer = () => {
     <Switch>
       <Route path={resetPasswordUrl} component={ResetPasswordPage} />
       <Route path={forgotPasswordUrl} component={ForgotPasswordPage} />
+      <Route path={activateUserUrl} component={ActivateUserPage} />
       <Route path={loginUrl}>
         <LoginPage onAuthSuccess={setupSession} />
       </Route>
