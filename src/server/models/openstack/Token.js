@@ -26,7 +26,7 @@ class Token extends ActiveModel {
   static validateToken = tokenId => Token.findById(tokenId) || null
 
   asJson = () => {
-    const json = {
+    return {
       ...super.asJson(),
       expires_at: moment().add(1, 'day').format(),
       issued_at: moment().format(),
@@ -34,7 +34,6 @@ class Token extends ActiveModel {
       roles: mapAsJson(this.roles),
       user: jsonOrNull(this.user),
     }
-    return json
   }
 }
 

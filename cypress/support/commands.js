@@ -1,4 +1,5 @@
 const config = require('../../config')
+const sessionJson = require('../fixtures/session')
 
 // ***********************************************
 // This example commands.js shows you how to
@@ -12,7 +13,7 @@ const config = require('../../config')
 //
 //
 // -- This is a parent command --
-// Cypress.Commands.add("login", (email, password) => { ... })
+// Cypress.Commands.add("login", () => { ... })
 //
 //
 // -- This is a child command --
@@ -28,13 +29,8 @@ const config = require('../../config')
 
 // Allow the session to be stubbed out.
 // The hard-coded token id is explicitly whitelisted in the simulator.
-// TODO: For true e2e tests we can have this command make actual API calls to login,
-// then memoize the result, and set them here.
-Cypress.Commands.add('setSimSession', () => {
-  const tokenId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
-  const username = config.simulator.username
-  const session = { username, unscopedToken: tokenId }
-  window.localStorage.setItem('pf9', JSON.stringify(session))
+Cypress.Commands.add('login', () => {
+  window.localStorage.setItem('pf9', JSON.stringify(sessionJson))
 })
 
 // For use with <ListTable>.  This will select the row containing the given text.
@@ -52,7 +48,7 @@ Cypress.Commands.add(
     // Allow just the menu to be opened if no action is supplied.
     action && menu.contains(action).click()
     return menu
-  }
+  },
 )
 
 Cypress.Commands.add(
@@ -61,10 +57,9 @@ Cypress.Commands.add(
   subject => {
     cy.wrap(subject).should($subject => {
       const classNames = $subject.attr('class')
-      console.log(classNames)
       expect(classNames).to.contain('disabled')
     })
-  }
+  },
 )
 
 Cypress.Commands.add(
@@ -75,7 +70,7 @@ Cypress.Commands.add(
       const classNames = $subject.attr('class')
       expect(classNames).not.to.contain('disabled')
     })
-  }
+  },
 )
 
 Cypress.Commands.add(
@@ -86,7 +81,7 @@ Cypress.Commands.add(
     cy.get(selector).click()
     cy.wait(100) // During development the modal closes before we can see it is even open
     cy.get(selector).should('not.exist') // Wait for the modal to close before proceeding.
-  }
+  },
 )
 
 Cypress.Commands.add(
@@ -97,5 +92,5 @@ Cypress.Commands.add(
     }
     // Give time for simulator context to be initialized before using the APIs
     cy.wait(200)
-  }
+  },
 )
