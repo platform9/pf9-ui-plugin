@@ -57,16 +57,16 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: ({ animated, percent }) => {
       if (animated) {
         return '#4AA3DF'
-      } else {
-        const value = Math.round(percent)
-        switch (true) {
-          case (value >= 90):
-            return '#E44C33'
-          case (value >= 80):
-            return '#F5A623'
-          default:
-            return '#4ADF74'
-        }
+      }
+
+      const value = Math.round(percent)
+      switch (true) {
+        case (value >= 90):
+          return '#E44C33'
+        case (value >= 80):
+          return '#F5A623'
+        default:
+          return '#4ADF74'
       }
     },
     animation: '$stripes 2s linear infinite',
