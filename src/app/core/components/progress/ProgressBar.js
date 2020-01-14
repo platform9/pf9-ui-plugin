@@ -55,19 +55,11 @@ const useStyles = makeStyles(theme => ({
       : null,
     backgroundSize: '40px 40px',
     backgroundColor: ({ animated, percent }) => {
-      if (animated) {
-        return '#4AA3DF'
-      }
+      if (animated) return theme.primary.main
+      if (percent >= 90) return theme.palette.error.main
+      if (percent >= 80) return theme.palette.warning.main
 
-      const value = Math.round(percent)
-      switch (true) {
-        case (value >= 90):
-          return '#E44C33'
-        case (value >= 80):
-          return '#F5A623'
-        default:
-          return '#4ADF74'
-      }
+      return theme.palette.success.main
     },
     animation: '$stripes 2s linear infinite',
     color: '#FFF',
