@@ -38,16 +38,19 @@ import PrometheusInstance from '../models/prometheus/PrometheusInstance'
 import Logging from '../models/qbert/Logging'
 import LoggingStub from '../../app/plugins/kubernetes/components/logging/LoggingStub'
 import { attachNodeToCluster } from '../models/qbert/Operations'
-// import Token from '../models/openstack/Token'
+import Token from '../models/openstack/Token'
 import { range } from '../util'
 import { strict as assert } from 'assert'
 
 function loadPreset () {
   console.log('Loading \'dev\' preset.')
 
+  // Hard-coding a few of the id's directly instead of randomly generating UUID's so we can stub them
+  // out for tests.
+
   // Tenants
-  const serviceTenant = new Tenant({ name: 'service' })
-  const testTenant = new Tenant({ name: 'test' })
+  const serviceTenant = new Tenant({ id: 'id-tenant-service', name: 'service' })
+  const testTenant = new Tenant({ id: 'id-tenant-test', name: 'test' })
 
   // Create a bunch of tenants
   range(2).forEach(i => {
@@ -58,15 +61,22 @@ function loadPreset () {
   const region = new Region({ id: 'Default Region' })
 
   // Roles
-  const adminRole = new Role({ name: 'admin' })
-  const memberRole = new Role({ name: '_member_' })
+  const adminRole = new Role({ id: 'id-role-admin', name: 'admin' })
+  const memberRole = new Role({ id: 'id-role-member', name: '_member_' })
 
   // Users
 
   // Create an admin user
-  const adminUser = new User({ name: 'admin@platform9.com', password: 'secret', tenant: serviceTenant })
+  const adminUser = new User({ id: 'id-user-admin', name: 'admin@platform9.com', password: 'secret', tenant: serviceTenant })
   adminUser.addRole(serviceTenant, adminRole)
   adminUser.rolePair = context.getTenantRoles(adminUser.id)
+
+  // Create a token for tests
+  new Token({
+    id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+    user: adminUser,
+    tenant: serviceTenant,
+  })
 
   // Create a bunch of misc users
   range(2).forEach(i => {

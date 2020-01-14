@@ -13,6 +13,5 @@ if (simulator) {
   if (preset) {
     const loaderPreset = require(`./presets/${preset}.js`).default
     loaderPreset()
-    context.createSimUser()
   }
 }

@@ -146,13 +146,7 @@ function createContextUpdater (cacheKey, dataUpdaterFn, options = {}) {
     })
     const loadFromContext = (key, params = emptyObj, refetch) => {
       const loaderFn = getContextLoader(key)
-      return loaderFn({
-        getContext,
-        setContext,
-        params,
-        refetch,
-        additionalOptions: loaderAdditionalOptions,
-      })
+      return loaderFn({ getContext, setContext, params, refetch, additionalOptions: loaderAdditionalOptions })
     }
     try {
       const output = await dataUpdaterFn(params, prevItems, loadFromContext)
