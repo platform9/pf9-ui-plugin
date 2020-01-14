@@ -233,6 +233,7 @@ export const options = {
     { id: 'cloudProviderType', label: 'Deployment Type', render: renderCloudProviderType },
     { id: 'resource_utilization', label: 'Resource Utilization', render: renderStats },
     { id: 'version', label: 'Kubernetes Version' },
+    { id: 'created_at', label: 'Created at' },
     { id: 'nodes', label: 'Nodes', render: nodes => <NodesCell nodes={nodes} /> },
     { id: 'networkPlugin', label: 'Network Backend' },
     { id: 'containersCidr', label: 'Containers CIDR' },
@@ -300,4 +301,6 @@ export const options = {
 const { ListPage, List } = createCRUDComponents(options)
 export const NodesList = List
 
-export default ListPage
+const ClustersListPage = () => <ListPage orderBy='created_at' orderDirection='desc' />
+
+export default ClustersListPage

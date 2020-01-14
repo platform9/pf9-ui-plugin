@@ -319,7 +319,7 @@ class ListTable extends PureComponent {
     const { searchTarget, data, filters, onSortChange } = this.props
     const { searchTerm } = this.state
 
-    const sortedData = onSortChange ? data : this.sortData(data)
+    const sortedData = onSortChange ? this.sortData(data) : data
     const searchData = !searchTerm || searchTerm.length < minSearchLength
       ? sortedData
       : this.filterBySearch(sortedData, searchTarget)
