@@ -13,7 +13,7 @@ import { except, notEmpty } from 'app/utils/fp'
 import clsx from 'clsx'
 import { withHotKeys } from 'core/providers/HotKeysProvider'
 import moize from 'moize'
-import { assoc, flatten, pluck, prop, propEq, propOr, where } from 'ramda'
+import { assoc, flatten, pluck, prop, propEq, propOr, where, equals } from 'ramda'
 import { matchPath, withRouter } from 'react-router'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { imageUrls, clarityDashboardUrl, k8sPrefix } from 'app/constants'
@@ -208,14 +208,6 @@ const styles = theme => ({
     marginBottom: '10px',
     marginTop: '10px',
   },
-  sliderLogoOpen: {
-    backgroundSize: '125px !important',
-    backgroundPosition: '7px center !important',
-  },
-  sliderLogoClosed: {
-    backgroundSize: '130px !important',
-    backgroundPosition: '9px center !important',
-  },
   sliderLogo: {
     flexGrow: 1,
     textAlign: 'center',
@@ -229,10 +221,27 @@ const styles = theme => ({
     padding: '0 7px',
     borderRadius: theme.shape.borderRadius,
     boxSizing: 'border-box',
-
-    backgroundImage: 'url(/ui/images/logo-kubernetes-h.png)',
     backgroundRepeat: 'no-repeat',
-
+  },
+  kubernetesLogoOpen: {
+    backgroundImage: 'url(/ui/images/logo-kubernetes-h.png)',
+    backgroundSize: '120px',
+    backgroundPosition: '7px center',
+  },
+  kubernetesLogoClosed: {
+    backgroundImage: 'url(/ui/images/logo-kubernetes-h.png)',
+    backgroundSize: '130px',
+    backgroundPosition: '9px center',
+  },
+  openstackLogoOpen: {
+    backgroundImage: 'url(/ui/images/logo-sidenav-os.svg)',
+    backgroundSize: '120px',
+    backgroundPosition: '10px center !important',
+  },
+  openstackLogoClosed: {
+    backgroundImage: 'url(/ui/images/logo-sidenav-os.svg)',
+    backgroundSize: '175px',
+    backgroundPosition: '7px center',
   },
   sliderLogoImage: {
     maxHeight: 26,
@@ -456,7 +465,7 @@ class Navbar extends PureComponent {
   }
 
   renderSectionLinks = sectionLinks => {
-    const { classes } = this.props
+    const { classes, stack } = this.props
     const { filterText } = this.state
     const filteredLinks = filterText ? this.getFilteredLinks(sectionLinks) : sectionLinks
     return <MenuList component="nav" className={classes.navMenu}>
@@ -465,14 +474,16 @@ class Navbar extends PureComponent {
   }
 
   renderStackSlider = () => {
-    const { classes, open } = this.props
+    const { classes, open, stack } = this.props
     return <div className={classes.sliderContainer}>
       {open && <a href={clarityDashboardUrl}>
         <ChevronLeftIcon className={classes.sliderArrow} />
       </a>}
       <div className={clsx(classes.sliderLogo, {
-        [classes.sliderLogoOpen]: open,
-        [classes.sliderLogoClosed]: !open,
+        [classes.kubernetesLogoOpen]: open && stack === 'kubernetes',
+        [classes.kubernetesLogoClosed]: !open && stack === 'kubernetes',
+        [classes.openstackLogoOpen]: open && stack === 'openstack',
+        [classes.openstackLogoClosed]: !open && stack === 'openstack',
       })} />
       {open && <a href={clarityDashboardUrl}>
         <ChevronRightIcon className={classes.sliderArrow} />
@@ -481,8 +492,11 @@ class Navbar extends PureComponent {
   }
 
   render () {
-    const { classes, withStackSlider, sections, open, handleDrawerToggle } = this.props
-    const filteredSections = sections.filter(where({ links: notEmpty }))
+    const { classes, withStackSlider, sections, open, handleDrawerToggle, stack } = this.props
+    // const filteredSections = sections.filter(where({ links: notEmpty }))
+    // Because ironic regions will not currently support kubernetes, assume always
+    // one filtered section, either openstack (ironic) or kubernetes
+    const filteredSections = sections.filter(where({ id: equals(stack) }))
 
     return <div
       className={clsx(classes.drawer, {
@@ -546,6 +560,7 @@ Navbar.propTypes = {
   sections: PropTypes.arrayOf(
     PropTypes.shape(sectionPropType),
   ).isRequired,
+  stack: PropTypes.string,
 }
 
 Navbar.defaultProps = {

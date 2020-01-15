@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useContext } from 'react'
-import axios from 'axios'
 import { makeStyles } from '@material-ui/styles'
 import clsx from 'clsx'
 import Intercom from 'core/components/integrations/Intercom'
@@ -13,11 +12,14 @@ import { toPairs, apply } from 'ramda'
 import { pathJoin } from 'utils/misc'
 import DeveloperToolsEmbed from 'developer/components/DeveloperToolsEmbed'
 import pluginManager from 'core/utils/pluginManager'
-import { logoutUrl, dashboardUrl, helpUrl } from 'app/constants'
+import { logoutUrl, dashboardUrl, helpUrl, ironicWizardUrl, clarityDashboardUrl } from 'app/constants'
 import LogoutPage from 'core/public/LogoutPage'
 import HelpPage from 'app/plugins/kubernetes/components/common/HelpPage'
 import { AppContext } from 'core/providers/AppProvider'
 import useReactRouter from 'use-react-router'
+import ApiClient from 'api-client/ApiClient'
+
+const { keystone } = ApiClient.getInstance()
 
 const useStyles = makeStyles(theme => ({
   appFrame: {
@@ -106,41 +108,51 @@ const renderPlugins = moize((plugins, role) =>
   toPairs(plugins).map(apply(renderPluginRoutes(role))).flat(),
 )
 
-const loadFeatures = async setFeatures => {
-  // Note: urlOrigin may or may not be changed to use a specific path instead of
-  // window.location.origin, this depends on whether the new UI is intended to be
-  // accessed from the master DU or from each region.
-  const urlOrigin = window.location.origin
-  // Timestamp tag used for preventing browser caching of features.json
-  const timestamp = new Date().getTime()
+const redirectToAppropriateStack = (ironicEnabled, kubernetesEnabled, history) => {
+  // If it is neither ironic nor kubernetes, bump user to old UI
+  // TODO: For production, I need to always bump user to old UI in both ironic
+  // and standard openstack cases, but I don't want to do that yet for development.
+  // In fact maybe just never do that for development build since old ui is not running.
+  if (!ironicEnabled && !kubernetesEnabled) {
+    window.location = clarityDashboardUrl
+  } else if (ironicEnabled && history.location.pathname.includes('kubernetes')) {
+    history.push(ironicWizardUrl)
+  } else if (!ironicEnabled && history.location.pathname.includes('ironic')) {
+    history.push(dashboardUrl)
+  }
+}
+
+const loadRegionFeatures = async (setRegionFeatures, history) => {
   try {
-    const response = await axios.get(`${urlOrigin}/clarity/features.json?tag=${timestamp}`)
-    setFeatures({
-      withStackSlider: !!response.data.experimental.openstackEnabled,
+    const features = await keystone.getFeatures()
+
+    setRegionFeatures({
+      kubernetes: features.experimental.containervisor,
+      ironic: features.experimental.ironic,
+      openstack: features.experimental.openstackEnabled,
     })
+
+    redirectToAppropriateStack(features.experimental.ironic, features.experimental.containervisor, history)
   } catch (err) {
-    console.error('No features.json')
-    // Just set slider to true for now as a default.
-    // This is fine from the old UI perspective because if routed to the
-    // dashboard (which is what happens today), the old UI can handle
-    // the stack switching appropriately.
-    setFeatures({
-      withStackSlider: true,
-    })
+    console.error(err)
   }
 }
 
 const AuthenticatedContainer = () => {
   const [drawerOpen, toggleDrawer] = useToggler(true)
-  const [features, setFeatures] = useState(emptyObj)
-  const { userDetails: { role } } = useContext(AppContext)
+  const [regionFeatures, setRegionFeatures] = useState(emptyObj)
+  const { userDetails: { role }, currentRegion } = useContext(AppContext)
   const { history } = useReactRouter()
   const classes = useStyles({ path: history.location.pathname })
 
   useEffect(() => {
-    // Pass the `setFeatures` function to update the features as we can't use `await` inside of a `useEffect`
-    loadFeatures(setFeatures)
-  }, [])
+    // Pass the `setRegionFeatures` function to update the features as we can't use `await` inside of a `useEffect`
+    loadRegionFeatures(setRegionFeatures, history)
+  }, [currentRegion])
+
+  const withStackSlider = regionFeatures.openstack && regionFeatures.kubernetes
+  // stack is the name of the plugin (ex. openstack, kubernetes, developer, theme)
+  const stack = history.location.pathname.includes('kubernetes') ? 'kubernetes' : 'openstack'
 
   const plugins = pluginManager.getPlugins()
   const sections = getSections(plugins, role)
@@ -151,10 +163,11 @@ const AuthenticatedContainer = () => {
       <div className={classes.appFrame}>
         <Toolbar />
         <Navbar
-          withStackSlider={features.withStackSlider}
+          withStackSlider={withStackSlider}
           drawerWidth={drawerWidth}
           sections={sections}
           open={drawerOpen}
+          stack={stack}
           handleDrawerToggle={toggleDrawer} />
         <main className={clsx(classes.content, classes['content-left'], {
           [classes.contentShift]: drawerOpen,
