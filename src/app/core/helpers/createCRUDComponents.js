@@ -143,7 +143,7 @@ const createCRUDComponents = options => {
   const createStandardListPage = () => {
     const usePrefParams = createUsePrefParamsHook(name, listTablePrefs)
     // ListPage
-    return (props) => {
+    return () => {
       const { params, getParamsUpdater } = usePrefParams(defaultParams)
       const [data, loading, reload] = useDataLoader(loaderFn, params)
       return <>
@@ -153,7 +153,6 @@ const createCRUDComponents = options => {
           loading={loading}
           reload={reload}
           {...pick(listTablePrefs, params)}
-          {...props}
         />
         {debug && <pre>{JSON.stringify(data, null, 4)}</pre>}
       </>
