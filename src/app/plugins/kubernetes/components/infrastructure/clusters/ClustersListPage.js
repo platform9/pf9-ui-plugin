@@ -301,6 +301,4 @@ export const options = {
 const { ListPage, List } = createCRUDComponents(options)
 export const NodesList = List
 
-const ClustersListPage = () => <ListPage orderBy='created_at' orderDirection='desc' />
-
-export default ClustersListPage
+export default ListPage
