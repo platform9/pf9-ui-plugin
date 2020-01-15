@@ -103,13 +103,13 @@ const DownloadCliWalkthrough = ({ finalStep = defaultFinalStep }): JSX.Element =
           </Typography>
           <Typography variant="body1">
             Your Platform9 account management URL:{' '}
-            <CopyToClipboard copyText={window.location.origin}>
+            <CopyToClipboard copyText={window.location.origin} codeBlock={false}>
               <span className={classes.linkText}>{window.location.origin}</span>
             </CopyToClipboard>
           </Typography>
           <Typography variant="body1">
             Your Platform9 username:{' '}
-            <CopyToClipboard copyText={session.username}>
+            <CopyToClipboard copyText={session.username} codeBlock={false}>
               <span className={classes.linkText}>{session.username}</span>
             </CopyToClipboard>
           </Typography>
