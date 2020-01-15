@@ -102,16 +102,13 @@ const createUrlWithQueryString = (url: string, params: GenericKVP) => {
   }
   params = { ...params }
 
-  if (url.indexOf(':') !== -1) {
+  if (url.includes(':')) {
     // nice utility to reconstruct urls from objects / models
-    const matches = url.match(/:([0-9_a-z]+)/gi)
-    if (matches) {
-      matches.forEach((match) => {
-        const key = match.replace(':', '')
-        url = url.replace(match, params[key])
-        delete params[key]
-      })
-    }
+    (url.match(/:([0-9_a-z]+)/gi) || []).forEach((match) => {
+      const key = match.replace(':', '')
+      url = url.replace(match, params[key])
+      delete params[key]
+    })
   }
 
   if (Object.keys(params).length > 0) {
@@ -122,8 +119,8 @@ const createUrlWithQueryString = (url: string, params: GenericKVP) => {
 
 export const paramsToQueryString = (params: GenericKVP) => {
   const searchParams = new URLSearchParams()
-  for (const key of Object.keys(params)) {
-    searchParams.append(key, params[key])
+  for (const [key, value] of Object.entries(params)) {
+    searchParams.append(key, value)
   }
   return searchParams.toString()
 }
