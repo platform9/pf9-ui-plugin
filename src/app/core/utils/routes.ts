@@ -1,0 +1,129 @@
+import { k8sPrefix } from 'app/constants'
+interface GenericKVP {[key: string]: string}
+
+const routes = {
+  cluster: {
+    list: `${k8sPrefix}/infrastructure#clusters`,
+    edit: `${k8sPrefix}/infrastructure/clusters/edit/:id`,
+    detail: `${k8sPrefix}/infrastructure/clusters/:id`,
+    add: `${k8sPrefix}/infrastructure/clusters/add`,
+    addAws: `${k8sPrefix}/infrastructure/clusters/addAws`,
+    addAzure: `${k8sPrefix}/infrastructure/clusters/addAzure`,
+    addBareOs: `${k8sPrefix}/infrastructure/clusters/addBareOs`,
+    scaleMasters: `${k8sPrefix}/infrastructure/clusters/scaleMasters/:id`,
+    scaleWorkers: `${k8sPrefix}/infrastructure/clusters/scaleWorkers/:id`,
+  },
+  dashboard: `${k8sPrefix}/dashboard`,
+  apiAccess: `${k8sPrefix}/api_access`,
+  nodes: {
+    detail: `${k8sPrefix}/infrastructure/nodes/:id`,
+    download: `${k8sPrefix}/infrastructure/nodes/cli/download`,
+  },
+  cloudProviders: {
+    edit: `${k8sPrefix}/infrastructure/cloudProviders/edit/:id`,
+    add: `${k8sPrefix}/infrastructure/cloudProviders/add`,
+  },
+  apps: {
+    list: `${k8sPrefix}/apps`,
+    detail: `${k8sPrefix}/apps/:clusterId/:release/:id`,
+    deployed: `${k8sPrefix}/apps/deployed/:clusterId/:release`,
+  },
+  pods: {
+    list: `${k8sPrefix}/pods`,
+    add: `${k8sPrefix}/pods/add`,
+    addDeployments: `${k8sPrefix}/pods/deployments/add`,
+    addServices: `${k8sPrefix}/pods/services/add`,
+  },
+  storage: {
+    list: `${k8sPrefix}/storage_classes`,
+    add: `${k8sPrefix}/storage_classes/add`,
+  },
+  logging: {
+    list: `${k8sPrefix}/logging`,
+    add: `${k8sPrefix}/logging/add`,
+    edit: `${k8sPrefix}/logging/edit/:id`,
+  },
+  namespaces: {
+    list: `${k8sPrefix}/namespaces`,
+    add: `${k8sPrefix}/namespaces/add`,
+  },
+  userManagement: {
+    list: `${k8sPrefix}/user_management`,
+    addTenant: `${k8sPrefix}/user_management/tenants/add`,
+    editTenant: `${k8sPrefix}/user_management/tenants/edit/:id`,
+    addUser: `${k8sPrefix}/user_management/users/add`,
+    editUser: `${k8sPrefix}/user_management/users/edit/:id`,
+  },
+  prometheus: {
+    list: `${k8sPrefix}/prometheus`,
+    add: `${k8sPrefix}/prometheus/instances/add`,
+    edit: `${k8sPrefix}/prometheus/instances/edit/:id`,
+    editRules: `${k8sPrefix}/prometheus/rules/edit/:id`,
+    editServiceMonitors: `${k8sPrefix}/prometheus/serviceMonitors/edit/:id`,
+    editAlertManagers: `${k8sPrefix}/prometheus/alertManagers/edit/:id`,
+  },
+  rbac: {
+    list: `${k8sPrefix}/rbac`,
+    addRoles: `${k8sPrefix}/rbac/roles/add`,
+    addClusterRoles: `${k8sPrefix}/rbac/clusterroles/add`,
+    addRoleBindings: `${k8sPrefix}/rbac/rolebindings/add`,
+    addClusterRoleBindings: `${k8sPrefix}/rbac/clusterrolebindings/add`,
+    editRoles: `${k8sPrefix}/rbac/roles/edit/:id/cluster/:clusterId`,
+    editClusterRoles: `${k8sPrefix}/rbac/clusterroles/edit/:id/cluster/:clusterId`,
+    editRoleBindings: `${k8sPrefix}/rbac/rolebindings/edit/:id/cluster/:clusterId`,
+    editClusterRoleBindings: `${k8sPrefix}/rbac/clusterrolebindings/edit/:id/cluster/:clusterId`,
+  }
+}
+
+export const pathToCreateCluster = (params?: GenericKVP) => {
+  return createUrlWithQueryString(routes.cluster.add, params)
+}
+export const pathToClusters = (params?: GenericKVP) => {
+  return createUrlWithQueryString(routes.cluster.list, params)
+}
+export const pathToClusterDetail = (params: {id: string} & GenericKVP) => {
+  return createUrlWithQueryString(routes.cluster.detail, params)
+}
+
+/*
+  We can re-create urls with dynamic content via this helper.
+  Also appends any kvp's to query string params that aren't in the URL
+
+  e.g.
+    createUrlWithQueryString(Routes.Cluster.Detail, {id: 'asdf'})
+    produces /ui/kubernetes/infrastructure/clusters/asdf`,
+*/
+const createUrlWithQueryString = (url: string, params: GenericKVP) => {
+  if (!url) {
+    console.error('URL is not defined for action: ', params)
+  }
+  if (!params) {
+    return url
+  }
+  params = { ...params }
+
+  if (url.indexOf(':') !== -1) {
+    // nice utility to reconstruct urls from objects / models
+    const matches = url.match(/:([0-9_a-z]+)/gi)
+    if (matches) {
+      matches.forEach((match) => {
+        const key = match.replace(':', '')
+        url = url.replace(match, params[key])
+        delete params[key]
+      })
+    }
+  }
+
+  if (Object.keys(params).length > 0) {
+    url = `${url}?${paramsToQueryString(params)}`
+  }
+  return url
+}
+
+export const paramsToQueryString = (params: GenericKVP) => {
+  const searchParams = new URLSearchParams()
+  for (const key of Object.keys(params)) {
+    searchParams.append(key, params[key])
+  }
+  return searchParams.toString()
+}
