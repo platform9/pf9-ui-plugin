@@ -9,7 +9,7 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
 import ChevronRightIcon from '@material-ui/icons/ChevronRight'
 import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'
-import { except, notEmpty } from 'app/utils/fp'
+import { except } from 'app/utils/fp'
 import clsx from 'clsx'
 import { withHotKeys } from 'core/providers/HotKeysProvider'
 import moize from 'moize'
@@ -465,7 +465,7 @@ class Navbar extends PureComponent {
   }
 
   renderSectionLinks = sectionLinks => {
-    const { classes, stack } = this.props
+    const { classes } = this.props
     const { filterText } = this.state
     const filteredLinks = filterText ? this.getFilteredLinks(sectionLinks) : sectionLinks
     return <MenuList component="nav" className={classes.navMenu}>
