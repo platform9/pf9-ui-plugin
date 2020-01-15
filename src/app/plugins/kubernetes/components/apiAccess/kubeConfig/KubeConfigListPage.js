@@ -109,21 +109,21 @@ const KubeConfigListPage = () => {
     <section className={classes.container}>
       <h2>Download kubeconfig</h2>
       <span className={classes.detail}>
-        <span>To authenticate with a cluster you need a</span>
+        <span>The</span>
         <ExternalLink
           className={classes.link}
           url="https://kubernetes.io/docs/user-guide/kubeconfig-file/"
         >
           kubeconfig
         </ExternalLink>
-        <span>file. Used in conjunction with the</span>
+        <span>file is required to authenticate with and operate on a cluster using the</span>
         <ExternalLink
           className={classes.link}
           url="https://kubernetes.io/docs/user-guide/kubectl-overview/"
         >
           kubectl
         </ExternalLink>
-        <span>command line, you can switch between multiple clusters and users</span>
+        <span>command line</span>
       </span>
       <Progress loading={loadingClusters}>
         <div>
