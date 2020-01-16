@@ -4,10 +4,9 @@ import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import TextField from 'core/components/validatedForm/TextField'
 import { RadioGroup, Radio, Grid, FormControlLabel } from '@material-ui/core'
 import SubmitButton from 'core/components/buttons/SubmitButton'
-import ApiClient from 'api-client/ApiClient'
 import Alert from 'core/components/Alert'
-
-const { keystone } = ApiClient.getInstance()
+import { generateKubeConfig } from 'k8s/components/infrastructure/clusters/kubeconfig'
+import downloadFile from 'core/utils/downloadFile'
 
 const useStyles = makeStyles(theme => ({
   radioGroup: {
@@ -28,24 +27,33 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-const DownloadKubeConfigForm = ({ onSubmit, apiError }) => {
+const DownloadKubeConfigForm = ({
+  cluster,
+  onSubmit,
+  apiError = undefined,
+  autoDownload = true,
+}) => {
   const classes = useStyles()
   const [authMethod, setAuthMethod] = useState('token')
   const [errorMessage, setErrorMessage] = useState()
 
   const handleSubmit = async (params) => {
     setErrorMessage(null)
-
     const { username, password } = params
-    const token = authMethod === 'token'
-      ? await tokenAuth()
-      : await passwordAuth(username, password)
+    const kubeconfig = await generateKubeConfig(cluster.uuid, authMethod, { username, password })
 
-    if (token) {
-      await onSubmit(token)
-    } else {
-      setErrorMessage('Invalid Credentials')
+    if (!kubeconfig) {
+      // No kubeconfig means the username/password authentication failed.
+      return setErrorMessage('Invalid credentials')
     }
+
+    if (autoDownload) {
+      downloadFile({
+        filename: `${cluster.name}.yaml`,
+        contents: kubeconfig
+      })
+    }
+    return onSubmit(kubeconfig)
   }
 
   const errorToDisplay = errorMessage || apiError
@@ -84,7 +92,6 @@ const DownloadKubeConfigForm = ({ onSubmit, apiError }) => {
           </Grid>
         }
         {!!errorToDisplay && <div className={classes.errorContainer}><Alert small variant="error" message={errorToDisplay} /></div>}
-        {/* {apiError && <Alert small variant="error" message={apiError} />} */}
         <Grid item xs={12} zeroMinWidth className={classes.formButtons}>
           <SubmitButton type={authMethod === 'token' ? 'button' : 'submit'} onClick={handleSubmit}>
             {authMethod === 'token' ? 'Download Config' : 'Validate + Download Config'}
@@ -115,14 +122,5 @@ const PasswordForm = ({ classes }) =>
       />
     </Grid>
   </Grid>
-
-const tokenAuth = async () => keystone.renewScopedToken()
-
-const passwordAuth = async (username, password) => {
-  if (username && password) {
-    const authResult = await keystone.authenticate(username, password)
-    return authResult.unscopedToken
-  }
-}
 
 export default DownloadKubeConfigForm
