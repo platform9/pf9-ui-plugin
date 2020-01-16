@@ -12,7 +12,6 @@ import {
 import kubeConfigActions from './actions'
 import DownloadKubeConfigForm from './DownloadKubeConfigForm'
 import SimpleLink from 'core/components/SimpleLink'
-import ApiClient from 'api-client/ApiClient'
 import ExternalLink from 'core/components/ExternalLink'
 import { OnboardingAccessSetup } from 'app/constants'
 import useDataLoader from 'core/hooks/useDataLoader'
@@ -20,8 +19,6 @@ import Progress from 'core/components/progress/Progress'
 import { pathToCreateCluster } from 'app/core/utils/routes'
 import CodeBlock from 'core/components/CodeBlock'
 import CopyToClipboard from 'core/components/CopyToClipboard'
-
-const { qbert } = ApiClient.getInstance()
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -68,41 +65,20 @@ const KubeConfigListPage = () => {
   const [clusters, loadingClusters] = useDataLoader(kubeConfigActions.list)
   const classes = useStyles()
 
-  const downloadYamlFile = (clusterName, kubeconfig) => {
-    const blob = new Blob([kubeconfig], { type: 'application/octet-stream' })
-    const elem = window.document.createElement('a')
-    elem.href = window.URL.createObjectURL(blob)
-    elem.download = `${clusterName}.yml`
-    document.body.appendChild(elem)
-    elem.click()
-    document.body.removeChild(elem)
-  }
-
-  const handleKubeconfigAction = (clusterName, kubeconfigWithToken) => {
-    downloadYamlFile(clusterName, kubeconfigWithToken)
-    localStorage.setItem(OnboardingAccessSetup, 'true')
-  }
-
-  const downloadKubeconfig = async (cluster, token) => {
+  const handleDownloadKubeConfig = cluster => kubeconfig => {
     setErrorMessage(null)
 
-    if (downloadedKubeconfigs[cluster.clusterId]) {
-      handleKubeconfigAction(cluster.cluster, downloadedKubeconfigs[cluster.clusterId])
-      return
+    if (!kubeconfig) {
+      const message = 'An error occured while trying to download the kubeconfig.'
+      return setErrorMessage(message)
     }
 
-    try {
-      const kubeconfig = await qbert.getKubeConfig(cluster.clusterId)
-      const kubeconfigWithToken = kubeconfig.replace('__INSERT_BEARER_TOKEN_HERE__', token)
-      setDownloadedKubeconfigs({
-        ...downloadedKubeconfigs,
-        [cluster.clusterId]: kubeconfigWithToken,
-      })
-      handleKubeconfigAction(cluster.cluster, kubeconfigWithToken)
-    } catch (e) {
-      const message = e.message || 'An error occoured while trying to download the kubeconfig.'
-      setErrorMessage(message)
-    }
+    setDownloadedKubeconfigs({
+      ...downloadedKubeconfigs,
+      [cluster.uuid]: kubeconfig,
+    })
+
+    localStorage.setItem(OnboardingAccessSetup, 'true')
   }
 
   return (
@@ -116,14 +92,14 @@ const KubeConfigListPage = () => {
         >
           kubeconfig
         </ExternalLink>
-        <span>file is required to authenticate with and operate on a cluster using the</span>
+        <span>file is required to authenticate to a cluster using the </span>
         <ExternalLink
           className={classes.link}
           url="https://kubernetes.io/docs/user-guide/kubectl-overview/"
         >
           kubectl
         </ExternalLink>
-        <span>command line</span>
+        <span>CLI, Octant, Kubernetes Dashboard, and other clients.</span>
       </span>
       <Progress loading={loadingClusters}>
         <div>
@@ -151,29 +127,30 @@ const KubeConfigListPage = () => {
                 </TableRow>
               )}
               {clusters.map((cluster = {}) => (
-                <TableRow key={cluster.clusterId} onClick={() => setSelectedCluster(cluster)}>
+                <TableRow key={cluster.uuid} onClick={() => setSelectedCluster(cluster)}>
                   <TableCell padding="checkbox">
                     <Radio
-                      checked={!!selectedCluster && selectedCluster.clusterId === cluster.clusterId}
+                      checked={!!selectedCluster && selectedCluster.uuid === cluster.uuid}
                     />
                   </TableCell>
-                  <TableCell>{cluster.cluster}</TableCell>
-                  <TableCell>{cluster.url}</TableCell>
+                  <TableCell>{cluster.name}</TableCell>
+                  <TableCell>{cluster.externalDnsName}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </div>
       </Progress>
-      {!!selectedCluster && !downloadedKubeconfigs[selectedCluster.clusterId] && (
+      {!!selectedCluster && !downloadedKubeconfigs[selectedCluster.uuid] && (
         <DownloadKubeConfigForm
-          onSubmit={(token) => downloadKubeconfig(selectedCluster, token)}
+          cluster={selectedCluster}
+          onSubmit={handleDownloadKubeConfig(selectedCluster)}
           apiError={errorMessage}
         />
       )}
-      {!!selectedCluster && downloadedKubeconfigs[selectedCluster.clusterId] && (
-        <CopyToClipboard copyText={downloadedKubeconfigs[selectedCluster.clusterId]} inline={false} header={selectedCluster.cluster}>
-          <CodeBlock>{downloadedKubeconfigs[selectedCluster.clusterId]}</CodeBlock>
+      {!!selectedCluster && downloadedKubeconfigs[selectedCluster.uuid] && (
+        <CopyToClipboard copyText={downloadedKubeconfigs[selectedCluster.uuid]} inline={false} header={selectedCluster.name}>
+          <CodeBlock>{downloadedKubeconfigs[selectedCluster.uuid]}</CodeBlock>
         </CopyToClipboard>
       )}
     </section>

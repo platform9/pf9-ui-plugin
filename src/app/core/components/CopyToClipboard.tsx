@@ -131,9 +131,11 @@ const CopyToClipboard: FunctionComponent<Props> = ({
       )}
     </div>
   )
+
+  // readOnly is needed in textarea to silence React warning about missing onChange
   return (
     <div className={classes.copyContainer}>
-      <textarea ref={textAreaRef} value={copyText} className={classes.textArea} />
+      <textarea ref={textAreaRef} value={copyText} className={classes.textArea} readOnly />
       {!!header && (
         <div className={classes.header}>
           <p>{header}</p>
