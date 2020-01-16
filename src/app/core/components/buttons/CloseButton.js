@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { Link } from 'react-router-dom'
 import { makeStyles } from '@material-ui/styles'
+import { Tooltip } from '@material-ui/core'
 
 const useStyles = makeStyles(theme => ({
   icon: {
@@ -15,15 +16,16 @@ const useStyles = makeStyles(theme => ({
 
 const CloseButton = props => {
   const classes = useStyles()
-  if (props.to) {
-    return (
-      <Link to={props.to}>
-        <FontAwesomeIcon className={classes.icon} solid size="2x" {...props}>times-circle</FontAwesomeIcon>
-      </Link>
-    )
-  }
+  const icon = <FontAwesomeIcon className={classes.icon} solid size="2x" {...props}>
+    times-circle
+  </FontAwesomeIcon>
+
   return (
-    <FontAwesomeIcon className={classes.icon} solid size="2x" {...props}>times-circle</FontAwesomeIcon>
+    <Tooltip title="Cancel" placement="bottom">
+      {props.to
+        ? <Link to={props.to}>{icon}</Link>
+        : icon}
+    </Tooltip>
   )
 }
 

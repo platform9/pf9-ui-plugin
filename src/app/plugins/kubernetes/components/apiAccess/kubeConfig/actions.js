@@ -4,15 +4,13 @@ import { clustersCacheKey } from 'k8s/components/infrastructure/common/actions'
 export const kubeConfigCacheKey = 'apiAccess-kubeConfig'
 
 const kubeConfigActions = createCRUDActions(kubeConfigCacheKey, {
-  listFn: async (params, loadFromContext) => {
-    const clusters = await loadFromContext(clustersCacheKey)
-    return clusters.map(cluster => ({
-      clusterId: cluster.uuid,
-      cluster: cluster.name,
-      url: cluster.externalDnsName,
-      kubeconfigUrl: cluster.kubeconfigUrl,
-    }))
+  uniqueIdentifier: 'uuid',
+  sortWith: (clusters, params) => {
+    return clusters.sort(
+      (a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+    )
   },
+  listFn: async (params, loadFromContext) => loadFromContext(clustersCacheKey),
 })
 
 export default kubeConfigActions

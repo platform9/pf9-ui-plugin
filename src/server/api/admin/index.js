@@ -13,7 +13,6 @@ const loadPreset = (req, res) => {
   context.resetContext()
   const loaderPreset = require(`../../presets/${preset}.js`).default
   loaderPreset && loaderPreset()
-  context.createSimUser()
   res.sendStatus(200)
 }
 
