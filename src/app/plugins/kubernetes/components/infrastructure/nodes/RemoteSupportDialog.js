@@ -6,6 +6,7 @@ import Checkbox from 'core/components/validatedForm/CheckboxField'
 import Progress from 'core/components/progress/Progress'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import { updateRemoteSupport } from 'k8s/components/infrastructure/common/actions'
+import { remoteMonitoringDocs } from 'app/constants'
 
 // The modal is technically inside the row, so clicking anything inside
 // the modal window will cause the table row to be toggled.
@@ -29,7 +30,7 @@ const RemoteSupportDialog = ({ rows: [node], onClose }) => {
           <DialogContent>
             <p>
               You may enable or disable Advanced Remote Support on this node. Please refer to the
-              following <ExternalLink url="https://docs.platform9.com/support/enabling-remote-ssh-on-linux-hosts-managed-by-platform9-host-agent/">
+              following <ExternalLink url={remoteMonitoringDocs}>
               article</ExternalLink> for more information.
             </p>
             <Checkbox id="enableSupport" onChange={() => setEnableSupport(!enableSupport)} label="Enable Advanced Remote Support" />
