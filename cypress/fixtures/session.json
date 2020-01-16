@@ -1,26 +1,41 @@
 {
   "userTenants": [
     {
-      "id": "52d5f76e-7af8-447f-a5a3-683d9c3b3c4a",
+      "id": "2915d709-0cea-4afc-b182-b0d118818e48",
       "name": "Tenant #0",
-      "description": "0"
-    },
-    {
-      "id": "ec88e3ab-2f86-427f-bcee-f232cee036c8",
-      "name": "Tenant #1",
-      "description": "1"
+      "description": "Test tenant 0 description"
     },
     {
       "id": "id-tenant-service",
       "name": "service",
-      "description": ""
+      "description": "Service tenant"
     },
     {
-      "id": "id-tenant-test",
-      "name": "test",
-      "description": ""
+      "id": 1,
+      "name": "Tenant #1",
+      "description": "Test tenant 1 description"
+    },
+    {
+      "id": 2,
+      "name": "Tenant #2",
+      "description": "Test tenant 2 description"
     }
   ],
+  "user-preferences-admin@platform9.com": {
+    "Tenants": {
+      "lastTenant": {
+        "id": "id-tenant-service",
+        "name": "service",
+        "description": "Service tenant"
+      }
+    },
+    "RegionChooser": {
+      "lastRegion": {
+        "id": "Default Region",
+        "description": ""
+      }
+    }
+  },
   "user": {
     "id": "id-user-admin",
     "displayname": "admin@platform9.com",
@@ -32,13 +47,14 @@
       {
         "tenant": {
           "id": "id-tenant-service",
-          "created_at": "2019-12-18T10:54:31.022Z",
+          "created_at": "2020-01-16T19:04:26.384Z",
           "name": "service",
-          "description": ""
+          "description": "Service tenant",
+          "enabled": true
         },
         "role": {
           "id": "id-role-admin",
-          "created_at": "2019-12-18T10:54:31.022Z",
+          "created_at": "2020-01-16T19:04:26.384Z",
           "name": "admin",
           "description": "",
           "displayName": ""

@@ -1,18 +1,20 @@
 /* eslint-disable camelcase */
 import context from '../../context'
 import ActiveModel from '../ActiveModel'
-import { findById } from '../../helpers'
+import { findById, mapAsJson } from '../../helpers'
 
 const coll = () => context.tenantUsers
 
 class TenantUser extends ActiveModel {
-  constructor (params = {}) {
-    super(params)
-    this.name = params.name || ''
-    this.description = params.description || ''
-    this.enabled = params.enabled || ''
-    this.domain_id = params.domain_id || ''
-    this.users = params.users || []
+  constructor (tenant, users, params = {}) {
+    super(tenant.asJson())
+    const tenantUserParams = {
+      enabled: true,
+      domain_id: null,
+      users,
+      ...params
+    }
+    Object.assign(this, tenantUserParams, tenant.asJson())
     return this
   }
 
@@ -28,7 +30,7 @@ class TenantUser extends ActiveModel {
     description: this.description,
     enabled: this.enabled,
     domain_id: this.domain_id,
-    users: this.users,
+    users: mapAsJson(this.users),
   })
 }
 
