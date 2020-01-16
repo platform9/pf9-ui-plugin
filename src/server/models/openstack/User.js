@@ -18,6 +18,10 @@ class User extends ActiveModel {
     this.tenantId = params.tenantId || ''
     this.username = params.username || params.name || params.email || ''
     this.rolePair = params.rolePair || []
+    this.enabled = params.enabled !== false
+    this.is_local = params.is_local !== false
+    this.domain_id = params.domain_id || 'default'
+    this.default_project_id = params.tenantId
   }
 
   static getCollection = coll
@@ -40,6 +44,15 @@ class User extends ActiveModel {
   getTenants = () => []
 
   addRole = (tenant, role) => this.roles.push({ tenant, role })
+  removeRole = (tenantId, roleId) => {
+    const idx = this.roles.findIndex(({ tenant, role }) =>
+      tenant.id === tenantId && role.id === roleId)
+    if (!idx) {
+      throw new Error('User role not found')
+    }
+    this.roles.splice(idx, 1)
+    return this.roles
+  }
 
   asJson = () => {
     return {
@@ -47,10 +60,12 @@ class User extends ActiveModel {
       displayname: this.displayname,
       email: this.email,
       name: this.name,
+      enabled: this.enabled,
       username: this.username,
-      tenantId: this.tenantId,
+      default_project_id: this.tenantId,
       roles: this.roles,
-      rolePair: this.rolePair
+      rolePair: this.rolePair,
+      domain_id: this.domain_id
     }
   }
 }

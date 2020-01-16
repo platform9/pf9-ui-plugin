@@ -10,6 +10,15 @@ class Tenant extends ActiveModel {
     super(params)
     this.name = params.name || ''
     this.description = params.description || ''
+    this.is_domain = false
+    this.enabled = params.enabled !== false
+    this.parent_id = params.parent_id || 'default'
+    this.domain_id = params.domain_id || 'default'
+    return this
+  }
+
+  update (params = {}) {
+    Object.assign(this, params)
     return this
   }
 
@@ -21,6 +30,10 @@ class Tenant extends ActiveModel {
     ...super.asJson(),
     name: this.name,
     description: this.description,
+    enabled: this.enabled,
+    is_domain: this.is_domain,
+    parent_id: this.parent_id,
+    domain_id: this.domain_id,
   })
 }
 
