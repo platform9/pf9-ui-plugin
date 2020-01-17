@@ -1,5 +1,6 @@
 describe('users', () => {
-  beforeEach(() => {
+  before(() => {
+    cy.resetServerContext('dev')
     cy.login()
   })
 

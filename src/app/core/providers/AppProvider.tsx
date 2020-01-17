@@ -1,4 +1,4 @@
-import React, { useCallback, SetStateAction } from 'react'
+import React, { useCallback, SetStateAction, useRef, useEffect } from 'react'
 import {
   assocPath,
   flatten,
@@ -9,7 +9,7 @@ import {
   over,
   take,
   prepend,
-  always
+  always,
 } from 'ramda'
 import { dataCacheKey, paramsCacheKey } from 'core/helpers/createContextLoader'
 import useStateAsync from 'core/hooks/useStateAsync'
@@ -53,13 +53,14 @@ const initialContext: IAppContext = {
   session: {},
   [dataCacheKey]: [],
   [paramsCacheKey]: [],
-  notifications: []
+  notifications: [],
 }
 
 export const AppContext = React.createContext<IAppContext & Partial<IAppContextActions>>(initialContext)
 
 const AppProvider = ({ children }) => {
   const [context, setContextBase] = useStateAsync<IAppContext>(initialContext)
+  const contextRef = useRef(context)
 
   const initSession = async (unscopedToken: string, username: string, expiresAt: string) => {
     await setContextBase(assoc('session', {
@@ -86,16 +87,20 @@ const AppProvider = ({ children }) => {
     }))
   }
 
-  // Get an updated version of the current context
-  const getContext = useCallback(getterFn => {
-    // Return all values if no getterFn is specified
-    return getterFn ? getterFn(context) : context
+  useEffect(() => {
+    contextRef.current = context
   }, [context])
+
+  // Get an updated version of the current context
+  const getContext = getterFn => {
+    // Return all values if no getterFn is specified
+    return getterFn ? getterFn(contextRef.current) : contextRef.current
+  }
 
   const setContext = useCallback(async setterFn => {
     return setContextBase(setterFn instanceof Function
       ? setterFn
-      : context => ({ ...context, ...setterFn })
+      : context => ({ ...context, ...setterFn }),
     )
   }, [])
 
@@ -110,8 +115,8 @@ const AppProvider = ({ children }) => {
           title,
           message,
           date: moment().format(),
-          type
-        })))
+          type,
+        }))),
     )
   }, [setContext])
   const clearNotifications = useCallback(async () => {

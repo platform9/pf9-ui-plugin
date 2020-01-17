@@ -4,7 +4,6 @@ import Region from '../models/openstack/Region'
 import Role from '../models/openstack/Role'
 import Group from '../models/openstack/Group'
 import Tenant from '../models/openstack/Tenant'
-import TenantUser from '../models/openstack/TenantUser'
 import User from '../models/openstack/User'
 import Flavor from '../models/openstack/Flavor'
 import Instance from '../models/openstack/Instance'
@@ -56,10 +55,9 @@ function loadPreset () {
   })
   // Create a bunch of tenants
   range(3).map(i => new Tenant({
-    description: `Test tenant ${i} description`,
-    domain_id: '77c53dae6ab6421caaddc34cd56becb4',
+    description: `Test tenant #${i} description`,
     enabled: true,
-    id: i,
+    id: (i + 1).toString(),
     name: `Tenant #${i}`,
   }))
   const tenants = Tenant.getCollection()
@@ -76,12 +74,11 @@ function loadPreset () {
   // Create an admin user
   const adminUser = new User({
     id: 'id-user-admin',
-    name: 'admin@platform9.com',
+    email: 'admin@platform9.com',
     password: 'secret',
     tenantId: serviceTenant.id,
   })
   adminUser.addRole(serviceTenant, adminRole)
-  adminUser.rolePair = context.getTenantRoles(adminUser.id)
 
   // Create a token for tests
   new Token({
@@ -100,25 +97,22 @@ function loadPreset () {
       const userId = ++i
       const email = `tenant${tenant.id}User${userId}@platform9.com`
       const user = new User({
-        id: userId,
+        id: userId.toString(),
+        name: `Test user ${userId}`,
         email,
-        username: email,
-        name: email,
         password: 'secret',
         tenantId: tenant.id,
-        displayname: `Test user ${userId}`,
         enabled: true,
         mfa: {
           enabled: false,
         },
       })
       user.addRole(tenant, memberRole)
-      user.rolePair = context.getTenantRoles(user.id)
       return user
     })
-    new TenantUser(tenant, users, tenantParams)
+    tenant.addUsers(users)
   })
-  TenantUser.findById(serviceTenant.id).addUser(adminUser)
+  Tenant.findById(serviceTenant.id).addUser(adminUser)
 
   // Groups
   new Group({
@@ -388,7 +382,8 @@ function loadPreset () {
     data: {
       name: 'mockOpenstackProvider',
       type: 'openstack',
-    }, context,
+    },
+    context,
   })
   CloudProvider.create({
     data: { name: 'mockLocalProvider', type: 'local' },
@@ -401,27 +396,33 @@ function loadPreset () {
       name: 'fakeCluster1',
       sshKey: 'someKey',
       tags: { 'pf9-system:monitoring': 'true' },
-    }, context, raw: true,
+    },
+    context,
+    raw: true,
   })
   const cluster2 = Cluster.create({
     data: {
       name: 'fakeCluster2',
       canUpgrade: true,
       sshKey: 'someKey',
-    }, context, raw: true,
+    },
+    context,
+    raw: true,
   })
   const cluster3 = Cluster.create({ data: { name: 'fakeCluster3' }, context })
   const cluster4 = Cluster.create({
     data: {
       name: 'mockAwsCluster',
       cloudProviderType: 'aws',
-    }, context,
+    },
+    context,
   })
   const cluster5 = Cluster.create({
     data: {
       name: 'mockOpenStackCluster',
       cloudProviderType: 'openstack',
-    }, context,
+    },
+    context,
   })
 
   // Nodes
@@ -505,7 +506,9 @@ function loadPreset () {
         name: 'fakeStorageClass',
         annotations: { 'storageclass.kubernetes.io/is-default-class': 'true' },
       },
-    }, context, config: { clusterId: cluster.uuid },
+    },
+    context,
+    config: { clusterId: cluster.uuid },
   })
 
   // RBAC
