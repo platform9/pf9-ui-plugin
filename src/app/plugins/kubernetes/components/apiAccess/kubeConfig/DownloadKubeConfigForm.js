@@ -30,21 +30,22 @@ const useStyles = makeStyles(theme => ({
 const DownloadKubeConfigForm = ({
   cluster,
   onSubmit,
-  apiError = undefined,
   autoDownload = true,
 }) => {
   const classes = useStyles()
   const [authMethod, setAuthMethod] = useState('token')
   const [errorMessage, setErrorMessage] = useState()
+  const [submitting, setSubmitting] = useState(false)
 
   const handleSubmit = async (params) => {
     setErrorMessage(null)
+    setSubmitting(true)
     const { username, password } = params
-    const kubeconfig = await generateKubeConfig(cluster.uuid, authMethod, { username, password })
+    const { error, kubeconfig } = await generateKubeConfig(cluster.uuid, authMethod, { username, password })
 
-    if (!kubeconfig) {
-      // No kubeconfig means the username/password authentication failed.
-      return setErrorMessage('Invalid credentials')
+    if (error) {
+      setSubmitting(false)
+      return setErrorMessage(error)
     }
 
     if (autoDownload) {
@@ -53,10 +54,9 @@ const DownloadKubeConfigForm = ({
         contents: kubeconfig
       })
     }
+    setSubmitting(false)
     return onSubmit(kubeconfig)
   }
-
-  const errorToDisplay = errorMessage || apiError
 
   return (
     <ValidatedForm onSubmit={handleSubmit} fullWidth>
@@ -91,9 +91,9 @@ const DownloadKubeConfigForm = ({
             />
           </Grid>
         }
-        {!!errorToDisplay && <div className={classes.errorContainer}><Alert small variant="error" message={errorToDisplay} /></div>}
+        {!!errorMessage && <div className={classes.errorContainer}><Alert small variant="error" message={errorMessage} /></div>}
         <Grid item xs={12} zeroMinWidth className={classes.formButtons}>
-          <SubmitButton type={authMethod === 'token' ? 'button' : 'submit'} onClick={handleSubmit}>
+          <SubmitButton type={authMethod === 'token' ? 'button' : 'submit'} onClick={handleSubmit} disabled={submitting}>
             {authMethod === 'token' ? 'Download Config' : 'Validate + Download Config'}
           </SubmitButton>
         </Grid>

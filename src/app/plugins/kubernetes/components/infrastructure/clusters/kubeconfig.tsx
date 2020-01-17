@@ -3,6 +3,10 @@ import ApiClient from 'api-client/ApiClient'
 type AuthMethod = 'token' | 'password'
 interface UserCreds { username: string, password: string }
 
+interface KubeConfigError { error: string }
+interface KubeConfigSuccess { kubeconfig: string }
+type KubeConfigResponse = KubeConfigError | KubeConfigSuccess
+
 const { keystone } = ApiClient.getInstance()
 
 const tokenAuth = () => keystone.renewScopedToken()
@@ -24,14 +28,22 @@ const getKubeConfigTemplate = async (clusterUuid: string): Promise<string> => {
   return kubeconfig
 }
 
-export const generateKubeConfig = async (clusterUuid: string, authMethod: AuthMethod, userCreds?: UserCreds): Promise<string> => {
-  const template = await getKubeConfigTemplate(clusterUuid)
+export const generateKubeConfig = async (
+  clusterUuid: string,
+  authMethod: AuthMethod,
+  userCreds?: UserCreds,
+): Promise<KubeConfigResponse> => {
+  try {
+    const token = authMethod === 'token'
+      ? await tokenAuth()
+      : await passwordAuth(userCreds.username, userCreds.password)
 
-  const token = authMethod === 'token'
-    ? await tokenAuth()
-    : await passwordAuth(userCreds.username, userCreds.password)
+    if (!token) return { error: 'Invalid Credentials' }
 
-  if (!token) return null
-
-  return template.replace('__INSERT_BEARER_TOKEN_HERE__', token)
+    const template = await getKubeConfigTemplate(clusterUuid)
+    return { kubeconfig: template.replace('__INSERT_BEARER_TOKEN_HERE__', token) }
+  } catch (e) {
+    const error = e.message || 'An error occured while trying to download the kubeconfig.'
+    return { error }
+  }
 }
