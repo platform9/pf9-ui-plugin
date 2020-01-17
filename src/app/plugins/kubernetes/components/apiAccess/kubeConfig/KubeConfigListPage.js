@@ -60,19 +60,11 @@ const useStyles = makeStyles((theme) => ({
 const KubeConfigListPage = () => {
   const [selectedCluster, setSelectedCluster] = useState()
   const [downloadedKubeconfigs, setDownloadedKubeconfigs] = useState({})
-  const [errorMessage, setErrorMessage] = useState()
 
   const [clusters, loadingClusters] = useDataLoader(kubeConfigActions.list)
   const classes = useStyles()
 
   const handleDownloadKubeConfig = cluster => kubeconfig => {
-    setErrorMessage(null)
-
-    if (!kubeconfig) {
-      const message = 'An error occured while trying to download the kubeconfig.'
-      return setErrorMessage(message)
-    }
-
     setDownloadedKubeconfigs({
       ...downloadedKubeconfigs,
       [cluster.uuid]: kubeconfig,
@@ -145,7 +137,6 @@ const KubeConfigListPage = () => {
         <DownloadKubeConfigForm
           cluster={selectedCluster}
           onSubmit={handleDownloadKubeConfig(selectedCluster)}
-          apiError={errorMessage}
         />
       )}
       {!!selectedCluster && downloadedKubeconfigs[selectedCluster.uuid] && (
