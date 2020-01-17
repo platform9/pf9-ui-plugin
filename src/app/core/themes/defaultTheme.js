@@ -147,6 +147,16 @@ const theme = {
       dark: '#D32F2F',
       contrastText: '#FFF',
     },
+    warning: {
+      light: '#FFB74D',
+      main: '#FF9800',
+      dark: '#F57C00',
+    },
+    success: {
+      light: '#81C784',
+      main: '#4ADF74',
+      dark: '#388E3C',
+    },
     grey: {
       50: '#FAFAFA',
       100: '#F5F5F5',

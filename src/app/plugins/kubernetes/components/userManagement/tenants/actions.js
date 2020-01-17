@@ -1,13 +1,11 @@
 import ApiClient from 'api-client/ApiClient'
-import {
-  keys, pluck, pipe, prop, find, propEq, filter, always, isNil, reject, map, last,
-} from 'ramda'
-import { namespacesCacheKey } from 'k8s/components/namespaces/actions'
-import createCRUDActions from 'core/helpers/createCRUDActions'
-import { filterIf, pathStr, emptyArr, objSwitchCase } from 'utils/fp'
 import createContextLoader from 'core/helpers/createContextLoader'
-import { tryCatchAsync } from 'utils/async'
+import createCRUDActions from 'core/helpers/createCRUDActions'
+import { namespacesCacheKey } from 'k8s/components/namespaces/actions'
 import { mngmUsersCacheKey } from 'k8s/components/userManagement/users/actions'
+import { always, filter, find, isNil, keys, map, pipe, pluck, prop, propEq, reject } from 'ramda'
+import { tryCatchAsync } from 'utils/async'
+import { emptyArr, filterIf, objSwitchCase, pathStr } from 'utils/fp'
 
 const { keystone } = ApiClient.getInstance()
 
@@ -121,8 +119,8 @@ export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
   refetchCascade: true,
   requiredRoles: 'admin',
   entityName: 'Tenant',
-  successMessage: (updatedItems, prevItems, { id }, operation) => objSwitchCase({
-    create: `Tenant ${prop('name', last(updatedItems))} created successfully`,
+  successMessage: (updatedItems, prevItems, { id, name }, operation) => objSwitchCase({
+    create: `Tenant ${name} created successfully`,
     update: `Tenant ${pipe(
       find(propEq('id', id)),
       prop('name'),

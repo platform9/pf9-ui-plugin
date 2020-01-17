@@ -10,7 +10,7 @@ const deleteUser = (req, res) => {
   }
   user.destroy()
   console.log('User destroyed')
-  res.status(200).send({})
+  res.status(204).send(null)
 }
 
 export default deleteUser

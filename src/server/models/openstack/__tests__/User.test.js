@@ -28,7 +28,7 @@ describe('User', () => {
   describe('asJson', () => {
     it('creates a JSON version of the User', () => {
       const user = new User({ username: 'admin@platform9.com' })
-      expect(user.asJson()).toMatchObject({ username: 'admin@platform9.com' })
+      expect(user).toHaveProperty('username', 'admin@platform9.com')
     })
 
     it('should exclude the password from the JSON output', () => {

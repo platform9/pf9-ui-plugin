@@ -19,7 +19,7 @@ function loadPreset () {
   new Flavor({ name: 'm1.medium', ram: 4096, disk: 40, vcpus: 2 })
   new Flavor({ name: 'm1.large', ram: 8192, disk: 80, vcpus: 4 })
   new Flavor({ name: 'm1.xlarge', ram: 16384, disk: 160, vcpus: 8 })
-  adminUser.addRole(adminRole)
+  adminUser.addRole(serviceTenant, adminRole)
 }
 
 export default loadPreset

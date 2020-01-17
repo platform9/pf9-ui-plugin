@@ -1,7 +1,8 @@
-import context from '../../context'
+import Tenant from '../../models/openstack/Tenant'
+import { mapAsJson } from '../../helpers'
 
 const getProjects = (req, res) => {
-  const tenants = context.getTenants()
+  const tenants = mapAsJson(Tenant.getCollection())
   return res.send({ projects: tenants })
 }
 

@@ -1,6 +1,7 @@
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import TextField from 'core/components/validatedForm/TextField'
 import React, { useMemo, useCallback } from 'react'
+import clsx from 'clsx'
 import TenantRolesTableField from 'k8s/components/userManagement/users/TenantRolesTableField'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import { mngmTenantActions } from 'k8s/components/userManagement/tenants/actions'
@@ -8,7 +9,7 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import {
   mngmUserActions, mngmUserRoleAssignmentsLoader,
 } from 'k8s/components/userManagement/users/actions'
-import { TextField as BaseTextField } from '@material-ui/core'
+import { TextField as BaseTextField, Typography } from '@material-ui/core'
 import { emptyObj, pathStr } from 'utils/fp'
 import useReactRouter from 'use-react-router'
 import FormWrapper from 'core/components/FormWrapper'
@@ -43,7 +44,7 @@ const useStyles = makeStyles(theme => ({
 const TogglableTextField = ({ id, label, initialValue, value, required = false, TextFieldComponent = TextField }) => {
   const classes = useStyles()
   const [showingField, toggleField] = useToggler()
-  return <div className={classes.togglableField}>
+  return <div className={clsx('togglableField', classes.togglableField)}>
     {showingField
       ? <TextFieldComponent
         id={id}
@@ -102,6 +103,9 @@ const EditUserPage = () => {
           </ValidatedForm>
         </WizardStep>
         <WizardStep stepId="tenants" label="Tenants and Roles">
+          <Typography variant="body1" component="p">
+            Select one or more tenants that should map to this user.
+          </Typography>
           <ValidatedForm fullWidth initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
             <TenantRolesTableField required id="roleAssignments" tenants={tenants} />
           </ValidatedForm>
