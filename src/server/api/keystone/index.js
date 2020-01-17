@@ -14,6 +14,7 @@ import getCatalog from './getCatalog'
 // Users
 import getUsers from './getUsers'
 import postUser from './postUser'
+import patchUser from './patchUser'
 import deleteUser from './deleteUser'
 import getRoles from './getRoles'
 import addUserRole from './addUserRole'
@@ -43,6 +44,7 @@ router.get('/v3/auth/catalog', tokenValidator, getCatalog)
 
 router.get('/v3/users', tokenValidator, getUsers)
 router.post('/v3/users', tokenValidator, postUser)
+router.patch('/v3/users/:userId', tokenValidator, patchUser)
 router.delete('/v3/users/:userId', tokenValidator, deleteUser)
 
 router.get('/v3/PF9-KSADM/all_tenants_all_users', tokenValidator, getTenantUsers)

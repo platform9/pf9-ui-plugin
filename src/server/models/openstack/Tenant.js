@@ -40,16 +40,18 @@ class Tenant extends ActiveModel {
     parent_id: this.parent_id,
     domain_id: this.domain_id,
     ...withUsers ? {
-      users: this.users.map(user => ({
-        id: user.id,
-        username: user.email || user.name,
-        mfa: user.mfa,
-        displayname: user.name || '',
-        name: user.email || user.name,
-        tenantId: user.default_project_id,
-        enabled: true,
-        email: user.email,
-      })),
+      users: this.users
+        .filter(user => !user.destroyed)
+        .map(user => ({
+          id: user.id,
+          username: user.email || user.name,
+          mfa: user.mfa,
+          displayname: user.name || '',
+          name: user.email || user.name,
+          tenantId: user.default_project_id,
+          enabled: true,
+          email: user.email,
+        })),
     } : {},
   })
 }

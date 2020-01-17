@@ -3,6 +3,8 @@
 import uuid from 'uuid'
 
 class ActiveModel {
+  destroyed = false
+
   constructor (params = {}) {
     if (!this.constructor.getCollection) {
       throw new Error(`${this.constructor.name} must implement class method 'getCollection'`)
@@ -21,6 +23,7 @@ class ActiveModel {
       col.splice(idx, 1)
       return id
     }
+    this.destroyed = true
   }
 
   asJson () {

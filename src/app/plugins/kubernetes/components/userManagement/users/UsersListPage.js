@@ -50,6 +50,7 @@ export const options = {
   title: 'Users',
   uniqueIdentifier: 'id',
   searchTarget: 'username',
+  nameProp: 'username',
   multiSelection: false,
   ListPage,
 }

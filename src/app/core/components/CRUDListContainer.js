@@ -58,7 +58,6 @@ const CRUDListContainer = ({
     toggleConfirmDialog()
     await Promise.all(selectedItems.map(handleRemove))
     await deletePromise.current()
-    console.log('aqui arribo amic de lanima')
     reload()
   }, [selectedItems, handleRemove])
 
@@ -67,6 +66,7 @@ const CRUDListContainer = ({
       history.push(addUrl)
     } else if (AddDialog) {
       toggleAddDialog()
+      reload()
     }
   }
 
@@ -83,6 +83,7 @@ const CRUDListContainer = ({
     } else if (EditDialog) {
       setSelectedItems(selected)
       toggleEditDialog()
+      reload()
     }
   }
 

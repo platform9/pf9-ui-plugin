@@ -1,7 +1,6 @@
 import Catalog from '../models/openstack/Catalog'
 import Flavor from '../models/openstack/Flavor'
 import Instance from '../models/openstack/Instance'
-import Role from '../models/openstack/Role'
 import Tenant from '../models/openstack/Tenant'
 import User from '../models/openstack/User'
 import Volume from '../models/openstack/Volume'
