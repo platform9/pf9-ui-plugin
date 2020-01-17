@@ -283,15 +283,15 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
       }), prevItems)
     },
     updateTag: async ({ cluster, key, val }, prevItems) => {
-      const tags = cluster.tags ? { ...cluster.tags } : {}
-      tags[key] = val
-      const body = { tags }
+      const body = {
+        tags: { ...cluster.tags || {}, [key]: val }
+      }
 
       await qbert.updateCluster(cluster.uuid, body)
 
       return updateWith(propEq('uuid', cluster.uuid), {
         ...cluster,
-        tags,
+        ...body,
       }, prevItems)
     },
     attachNodes: async ({ cluster, nodes }, prevItems) => {
