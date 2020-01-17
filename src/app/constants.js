@@ -29,6 +29,7 @@ export const gettingStartedLink = 'https://docs.platform9.com/kubernetes/getting
 export const qbertApiLink = 'https://docs.platform9.com/kubernetes/Qbert-API-Reference'
 export const whatIsBareOSLink = 'https://docs.platform9.com/kubernetes/on-premise-kubernetes/what-is-bareos'
 export const BareOSSetupDocumentation = 'https://docs.platform9.com/kubernetes/create-multimaster-bareos-cluster/'
+export const remoteMonitoringDocs = 'https://docs.platform9.com/kubernetes/enable-remote-monitoring/'
 
 export const azureServicePrincipalPortal = 'https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal'
 export const azureGetValuesForSigningin = 'https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal#get-values-for-signing-in'

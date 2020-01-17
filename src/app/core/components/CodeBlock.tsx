@@ -16,10 +16,17 @@ const useStyles = makeStyles((theme: Theme) => ({
     wordBreak: 'break-all',
     whiteSpace: 'pre-wrap',
 
+    maxHeight: 400,
+    overflow: 'auto',
+
     '& *': {
-      fontFamily: 'Courier'
-    }
-  }
+      fontFamily: 'Courier',
+    },
+    '&::-webkit-scrollbar': {
+      width: 0,
+      background: 'transparent',
+    },
+  },
 }))
 
 const CodeBlock: FunctionComponent<Props> = ({ children }) => {

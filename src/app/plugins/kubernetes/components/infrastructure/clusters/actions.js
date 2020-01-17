@@ -315,7 +315,8 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
     filterIf(hasControlPanel, either(hasMasterNode, masterlessCluster)),
     filterIf(healthyClusters, hasHealthyMasterNodes),
   )(items),
-  defaultOrderBy: 'name',
+  defaultOrderBy: 'created_at',
+  defaultOrderDirection: 'desc',
 })
 
 // If params.clusterId is not assigned it fetches all clusters and extracts the clusterId from the first cluster

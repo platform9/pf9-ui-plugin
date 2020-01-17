@@ -1,161 +1,160 @@
-import React, { useMemo, useState } from 'react'
+import React, { useState } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
-import createCRUDComponents from 'core/helpers/createCRUDComponents'
+import {
+  Table,
+  TableHead,
+  TableCell,
+  TableRow,
+  TableBody,
+  Radio,
+  Typography,
+} from '@material-ui/core'
 import kubeConfigActions from './actions'
-import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
-import TextField from 'core/components/validatedForm/TextField'
-import DownloadDialog from './DownloadDialog'
+import DownloadKubeConfigForm from './DownloadKubeConfigForm'
 import SimpleLink from 'core/components/SimpleLink'
-import useToggler from 'core/hooks/useToggler'
-import ApiClient from 'api-client/ApiClient'
 import ExternalLink from 'core/components/ExternalLink'
 import { OnboardingAccessSetup } from 'app/constants'
 import useDataLoader from 'core/hooks/useDataLoader'
+import Progress from 'core/components/progress/Progress'
+import { pathToCreateCluster } from 'app/core/utils/routes'
+import CodeBlock from 'core/components/CodeBlock'
+import CopyToClipboard from 'core/components/CopyToClipboard'
 
-const { qbert } = ApiClient.getInstance()
-
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   container: {
     marginTop: theme.spacing(3),
     '& h6': {
       marginLeft: 0,
-    }
+    },
+  },
+  detail: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    '& a': {
+      margin: theme.spacing(0, 0.5),
+    },
   },
   link: {
     display: 'block',
     width: 'fit-content',
   },
   clusterConfig: {
-    marginTop: theme.spacing(5),
+    margin: theme.spacing(2, 0),
   },
   tableContainer: {
-    minHeight: ({ loading }) => loading ? theme.spacing(35) : theme.spacing(),
+    border: 'none',
+    marginBottom: theme.spacing(2),
+  },
+  noClusters: {
+    border: 'none',
+    '& td': {
+      border: 'none',
+      '& > div': {
+        display: 'flex',
+        alignItems: 'center',
+      },
+    },
   },
 }))
 
 const KubeConfigListPage = () => {
-  const [isDialogOpen, toggleDialog] = useToggler()
   const [selectedCluster, setSelectedCluster] = useState()
   const [downloadedKubeconfigs, setDownloadedKubeconfigs] = useState({})
-  const [currentKubeconfig, setCurrentKubeconfig] = useState('')
-  const [generateYaml, setGenerateYaml] = useState(false)
+  const [errorMessage, setErrorMessage] = useState()
 
   const [clusters, loadingClusters] = useDataLoader(kubeConfigActions.list)
-  const classes = useStyles({ loading: loadingClusters })
+  const classes = useStyles()
 
-  const onSelect = (row) => {
-    setSelectedCluster({ id: row.clusterId, name: row.cluster })
-    const kubeconfig = downloadedKubeconfigs[row.clusterId]
+  const handleDownloadKubeConfig = cluster => kubeconfig => {
+    setErrorMessage(null)
 
-    if (kubeconfig) {
-      setCurrentKubeconfig(kubeconfig)
-    } else {
-      toggleDialog()
+    if (!kubeconfig) {
+      const message = 'An error occured while trying to download the kubeconfig.'
+      return setErrorMessage(message)
     }
-  }
 
-  const handleDownloadYamlFileClick = (clusterId, clusterName) => {
-    setSelectedCluster({ id: clusterId, name: clusterName })
-    setGenerateYaml(true)
-
-    const kubeconfig = downloadedKubeconfigs[clusterId]
-
-    if (kubeconfig) {
-      downloadYamlFile(clusterName, kubeconfig)
-    } else {
-      toggleDialog()
-    }
-  }
-
-  const downloadYamlFile = (clusterName, kubeconfig) => {
-    const blob = new Blob([kubeconfig], { type: 'application/octet-stream' })
-    const elem = window.document.createElement('a')
-    elem.href = window.URL.createObjectURL(blob)
-    elem.download = `${clusterName}.yml`
-    document.body.appendChild(elem)
-    elem.click()
-    document.body.removeChild(elem)
-    setGenerateYaml(false)
-  }
-
-  const columns = getColumns(handleDownloadYamlFileClick)
-
-  const options = useMemo(() => ({
-    cacheKey: 'kubeconfig',
-    uniqueIdentifier: 'cluster',
-    loaderFn: kubeConfigActions.list,
-    columns,
-    name: 'Kubeconfig',
-    compactTable: true,
-    blankFirstColumn: true,
-    multiSelection: false,
-    onSelect,
-    emptyText: 'There are no available clusters from which you can download a kubeconfig',
-  }), [toggleDialog, downloadedKubeconfigs, currentKubeconfig, generateYaml])
-
-  const downloadKubeconfig = async (cluster, generateYaml, token) => {
-    const kubeconfig = await qbert.getKubeConfig(cluster.id)
-    const kubeconfigWithToken = kubeconfig.replace('__INSERT_BEARER_TOKEN_HERE__', token)
     setDownloadedKubeconfigs({
       ...downloadedKubeconfigs,
-      [cluster.id]: kubeconfigWithToken,
+      [cluster.uuid]: kubeconfig,
     })
-    setCurrentKubeconfig(kubeconfigWithToken)
-    toggleDialog()
 
-    if (generateYaml) {
-      downloadYamlFile(cluster.name, kubeconfigWithToken)
-    }
     localStorage.setItem(OnboardingAccessSetup, 'true')
   }
-
-  const handleCloseDialog = () => {
-    toggleDialog()
-    setGenerateYaml(false)
-  }
-
-  const { ListPage } = createCRUDComponents(options)
 
   return (
     <section className={classes.container}>
       <h2>Download kubeconfig</h2>
-      <p>The kubeconfig file is required to authenticate with a cluster and switch between multiple clusters between multiple users while using the kubectl command line.</p>
-      <ExternalLink className={classes.link} url="https://kubernetes.io/docs/user-guide/kubectl-overview/">
-        Learn more about kubectl
-      </ExternalLink>
-      <ExternalLink className={classes.link} url="https://kubernetes.io/docs/user-guide/kubeconfig-file/">
-        Learn more about kubeconfig
-      </ExternalLink>
-      <div className={classes.tableContainer}>
-        <ListPage overlayProgress={false} />
-      </div>
-      { !loadingClusters && clusters.length > 0 && <>
-        <p className={classes.clusterConfig}>Select a cluster above to populate its kubeconfig below.</p>
-        <ValidatedForm>
-          <TextField id="config" value={currentKubeconfig} rows={9} multiline />
-        </ValidatedForm>
-        <DownloadDialog
-          onDownloadClick={(token) => downloadKubeconfig(selectedCluster, generateYaml, token)}
-          onClose={handleCloseDialog}
-          isDialogOpen={isDialogOpen}
+      <span className={classes.detail}>
+        <span>The</span>
+        <ExternalLink
+          className={classes.link}
+          url="https://kubernetes.io/docs/user-guide/kubeconfig-file/"
+        >
+          kubeconfig
+        </ExternalLink>
+        <span>file is required to authenticate to a cluster using the </span>
+        <ExternalLink
+          className={classes.link}
+          url="https://kubernetes.io/docs/user-guide/kubectl-overview/"
+        >
+          kubectl
+        </ExternalLink>
+        <span>CLI, Octant, Kubernetes Dashboard, and other clients.</span>
+      </span>
+      <Progress loading={loadingClusters}>
+        <div>
+          <h4 className={classes.clusterConfig}>Select a cluster to continue.</h4>
+          <Table className={classes.tableContainer}>
+            <TableHead>
+              <TableRow>
+                <TableCell padding="checkbox" />
+                <TableCell>Cluster</TableCell>
+                <TableCell>URL</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {clusters.length === 0 && (
+                <TableRow className={classes.noClusters}>
+                  <TableCell colSpan={3} align="left">
+                    <div>
+                      <Typography variant="body1">
+                        There are no clusters available. You need to{' '}
+                        <SimpleLink src={pathToCreateCluster()}>create a cluster</SimpleLink> first
+                        to continue.
+                      </Typography>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )}
+              {clusters.map((cluster = {}) => (
+                <TableRow key={cluster.uuid} onClick={() => setSelectedCluster(cluster)}>
+                  <TableCell padding="checkbox">
+                    <Radio
+                      checked={!!selectedCluster && selectedCluster.uuid === cluster.uuid}
+                    />
+                  </TableCell>
+                  <TableCell>{cluster.name}</TableCell>
+                  <TableCell>{cluster.externalDnsName}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </Progress>
+      {!!selectedCluster && !downloadedKubeconfigs[selectedCluster.uuid] && (
+        <DownloadKubeConfigForm
+          cluster={selectedCluster}
+          onSubmit={handleDownloadKubeConfig(selectedCluster)}
+          apiError={errorMessage}
         />
-      </>
-      }
+      )}
+      {!!selectedCluster && downloadedKubeconfigs[selectedCluster.uuid] && (
+        <CopyToClipboard copyText={downloadedKubeconfigs[selectedCluster.uuid]} inline={false} header={selectedCluster.name}>
+          <CodeBlock>{downloadedKubeconfigs[selectedCluster.uuid]}</CodeBlock>
+        </CopyToClipboard>
+      )}
     </section>
   )
 }
-
-const getColumns = (handleDownloadYamlFileClick) => [
-  { id: 'cluster', label: 'Cluster' },
-  {
-    id: 'kubeConfig',
-    label: 'kubeconfig',
-    render: (contents, row) => kubeConfigLink(row, handleDownloadYamlFileClick),
-  },
-  { id: 'url', label: 'URL' },
-]
-
-const kubeConfigLink = (row, handleDownloadYamlFileClick) =>
-  <SimpleLink onClick={() => handleDownloadYamlFileClick(row.clusterId, row.cluster)}>Download kubeconfig</SimpleLink>
 
 export default KubeConfigListPage
