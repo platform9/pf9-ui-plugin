@@ -53,6 +53,7 @@ const createCRUDComponents = options => {
     customEditUrlFn,
     debug,
     name,
+    nameProp,
     searchTarget = 'name',
     multiSelection = true,
     showCheckboxes,
@@ -112,6 +113,7 @@ const createCRUDComponents = options => {
     const refetch = useCallback(() => reload(true), [reload])
     return (
       <CRUDListContainer
+        nameProp={nameProp}
         items={data}
         reload={reload}
         addText={addText}

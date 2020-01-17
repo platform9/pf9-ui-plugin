@@ -30,6 +30,7 @@ const sessionJson = require('../fixtures/session')
 // Allow the session to be stubbed out.
 // The hard-coded token id is explicitly whitelisted in the simulator.
 Cypress.Commands.add('login', () => {
+  // FIXME we should be using cy.fixture instead of importing the fixture manually
   window.localStorage.setItem('pf9', JSON.stringify(sessionJson))
 })
 

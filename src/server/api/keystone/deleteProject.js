@@ -2,7 +2,6 @@ import Tenant from '../../models/openstack/Tenant'
 
 const deleteProject = (req, res) => {
   const { projectId } = req.params
-  console.log('Attempting to delete projectId: ', projectId)
   const project = Tenant.findById(projectId)
   if (!project) {
     console.log('Project NOT found')
@@ -10,7 +9,7 @@ const deleteProject = (req, res) => {
   }
   project.destroy()
   console.log('Project destroyed')
-  res.status(200).send({})
+  res.status(204).send(null)
 }
 
 export default deleteProject
