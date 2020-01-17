@@ -159,16 +159,6 @@ class Context {
     return id
   }
 
-  getTenantRoles = id => {
-    const user = User.findById(id).asJson()
-    return user.roles.map(({ tenant, role }) => (JSON.stringify({
-      // tenant: Tenant.findById(tenant.id).asJson(),
-      // role: Role.findById(role.id).asJson()
-      tenant: Tenant.findById(tenant.id).asJson().name,
-      role: Role.findById(role.id).asJson().name
-    })))
-  }
-
   getUser = (id) => {
     const user = User.findById(id)
     if (!user) {

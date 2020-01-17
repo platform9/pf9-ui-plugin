@@ -14,16 +14,11 @@ export const updateById = (arr) => {
   }
 }
 
-export const isNumeric = n =>
-  !Number.isNaN(parseFloat(n)) && Number.isFinite(+n)
-
-export const tryParseNumber = n => isNumeric(n) ? +n : n
-
 export const pluck = key => obj => obj[key]
 
 export const ensureArray = maybeArr => (maybeArr && maybeArr instanceof Array) ? maybeArr : []
 
-export const mapAsJson = arr => ensureArray(arr).map(x => (x.asJson && x.asJson()) || null)
+export const mapAsJson = (arr, ...params) => ensureArray(arr).map(x => (x.asJson && x.asJson(...params)) || null)
 
 export const jsonOrNull = obj => (obj && obj.asJson && obj.asJson()) || null
 

@@ -1,6 +1,9 @@
+import { path } from 'ramda'
+import Role from './Role'
+import Tenant from './Tenant'
 import context from '../../context'
-import ActiveModel from '../ActiveModel'
 import { findById, updateById } from '../../helpers'
+import ActiveModel from '../ActiveModel'
 
 const coll = () => context.users
 
@@ -9,15 +12,13 @@ class User extends ActiveModel {
     super(params)
     // These fields have a lot of overlap and it's a bit unclear what is needed and what is not.
     // We should clean this up once we can figure out more specifically what fields should be used.
-    this.displayname = params.displayname || params.name || params.email || ''
     this.name = params.name || params.email || ''
     this.email = params.email || ''
-    this.mfa = params.mfa || false
+    this.mfa = params.mfa || { enabled: false }
     this.password = params.password
     this.roles = params.roles || []
     this.tenantId = params.tenantId || ''
     this.username = params.username || params.name || params.email || ''
-    this.rolePair = params.rolePair || []
     this.enabled = params.enabled !== false
     this.is_local = params.is_local !== false
     this.domain_id = params.domain_id || 'default'
@@ -36,7 +37,7 @@ class User extends ActiveModel {
     if (!user) {
       return null
     }
-    const attemptedPassword = `${password}${user.mfa || ''}`
+    const attemptedPassword = `${password}${path(['mfa', 'enabled'], user) ? '1' : ''}`
     return user.password === attemptedPassword ? user : null
   }
 
@@ -54,18 +55,25 @@ class User extends ActiveModel {
     return this.roles
   }
 
+  get rolePair () {
+    return this.roles.map(({ tenant, role }) => (JSON.stringify({
+      tenant: Tenant.findById(tenant.id).name,
+      role: Role.findById(role.id).name,
+    })))
+  }
+
   asJson = () => {
     return {
       ...super.asJson(),
-      displayname: this.displayname,
-      email: this.email,
       name: this.name,
+      email: this.email,
+      description: this.description,
+      is_local: true,
+      password_expires_at: null,
       enabled: this.enabled,
-      username: this.username,
+      mfa: this.mfa,
       default_project_id: this.tenantId,
-      roles: this.roles,
-      rolePair: this.rolePair,
-      domain_id: this.domain_id
+      domain_id: this.domain_id,
     }
   }
 }

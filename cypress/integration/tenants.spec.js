@@ -1,5 +1,6 @@
 describe('tenants', () => {
-  beforeEach(() => {
+  before(() => {
+    cy.resetServerContext('dev')
     cy.login()
   })
 
@@ -25,52 +26,51 @@ describe('tenants', () => {
     })
 
     it('select the users and roles and submit', () => {
-      cy.contains('tenant1User5@platform9.com').click().wait(200)
+      cy.contains('Test user 5').click().wait(200)
       cy.contains('Complete').click().wait(1000)
       cy.contains('Tenant Tenant#Test created successfully')
-      cy.contains('Tenant#Test')
+      cy.contains('tr', 'Tenant#Test')
     })
   })
 
   context('edit tenant', () => {
     it('shows the edit tenant dialog', () => {
-      cy.contains('Tenant#Test').click()
+      cy.contains('tr', 'Tenant#Test').click().wait(200)
       cy.contains('Edit').click().wait(200)
       cy.contains('Edit Tenant Tenant#Test')
     })
 
     it('updates the tenant name and description and move to next step', () => {
-      cy.get('input#name').clear().type('Tenant#Test edited')
+      cy.get('input#name').clear().type('Tenant#Test #EDITED#')
       cy.get('input#description').clear().type('Tenant#Test Description edited')
       cy.contains('Next').click()
       cy.contains('Which users can access this tenant?')
     })
 
     it('change selected users and roles and submit', () => {
-      cy.get('tr.Mui-selected')
-        .first()
-        .should('contain', 'tenant1User5@platform9.com')
-        .click()
+      cy.contains('tr', 'Test user 5')
+        .find('.MuiCheckbox-root').click()
+        .wait(200)
 
-      cy.contains('tenant2User7@platform9.com').click()
-      cy.get('tr.Mui-selected')
-        .last()
-        .find('#roleId').select('admin').wait(200)
+      cy.contains('tr', 'Test user 7')
+        .find('.MuiSelect-root').click()
+
+      cy.contains('li', 'admin').click().wait(200)
 
       cy.contains('Complete').click().wait(1000)
       cy.contains('Tenant Tenant#Test updated successfully')
-      cy.contains('Tenant#Test edited')
+      cy.contains('Tenant#Test #EDITED#')
     })
   })
 
   context('remove tenant', () => {
     it('delete the newly created tenant', () => {
-      cy.contains('Tenant #1').click()
+      cy.contains('Tenant#Test #EDITED#').click()
       cy.contains('Delete').click().wait(200)
       cy.contains('Are you sure?')
       cy.contains('Confirm').click().wait(1000)
-      cy.contains('Tenant Tenant#Test deleted successfully')
-      cy.contains('Tenant #1').should('not.exist')
+      cy.contains('Tenant Tenant#Test #EDITED# deleted successfully')
+      cy.contains('tr', 'Tenant#Test #EDITED#').should('not.exist')
     })
   })
 })
