@@ -41,6 +41,11 @@ class User extends ActiveModel {
     return user.password === attemptedPassword ? user : null
   }
 
+  update (params = {}) {
+    Object.assign(this, params)
+    return this
+  }
+
   // TODO
   getTenants = () => []
 
@@ -48,7 +53,7 @@ class User extends ActiveModel {
   removeRole = (tenantId, roleId) => {
     const idx = this.roles.findIndex(({ tenant, role }) =>
       tenant.id === tenantId && role.id === roleId)
-    if (!idx) {
+    if (idx == null) {
       throw new Error('User role not found')
     }
     this.roles.splice(idx, 1)

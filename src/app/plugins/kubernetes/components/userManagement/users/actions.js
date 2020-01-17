@@ -109,6 +109,7 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
           return emptyArr
         })(null),
     ])
+    console.log(updatedUser)
     return updatedUser
   },
   dataMapper: async (users, { systemUsers }, loadFromContext) => {
@@ -170,15 +171,15 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
   },
   refetchCascade: true,
   entityName: 'User',
-  successMessage: (updatedItems, prevItems, { id, name }, operation) => objSwitchCase({
-    create: `User ${name} created successfully`,
+  successMessage: (updatedItems, prevItems, { id, username, displayname }, operation) => objSwitchCase({
+    create: `User ${displayname || username} created successfully`,
     update: `User ${pipe(
       find(propEq('id', id)),
-      prop('name'),
+      prop('username'),
     )(prevItems)} updated successfully`,
     delete: `User ${pipe(
       find(propEq('id', id)),
-      prop('name'),
+      prop('username'),
     )(prevItems)} deleted successfully`,
   })(operation),
 })
