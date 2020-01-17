@@ -54,7 +54,13 @@ const useStyles = makeStyles(theme => ({
       ? 'linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent)'
       : null,
     backgroundSize: '40px 40px',
-    backgroundColor: ({ animated }) => animated ? '#4AA3DF' : '#4ADF74',
+    backgroundColor: ({ animated, percent }) => {
+      if (animated) return theme.primary.main
+      if (percent >= 90) return theme.palette.error.main
+      if (percent >= 80) return theme.palette.warning.main
+
+      return theme.palette.success.main
+    },
     animation: '$stripes 2s linear infinite',
     color: '#FFF',
   },
@@ -83,7 +89,7 @@ ProgressBar.defaultProps = {
   animated: false,
   containedPercent: false,
   compact: false,
-  width: 125,
+  width: 145,
   height: 15,
   label: progress => `${progress}%`,
 }

@@ -194,13 +194,13 @@ const renderStats = (_, { usage }) => {
   const hasValidStats = usage && usage.compute && usage.compute.current
   if (!hasValidStats) { return null }
   return (
-    <div>
+    <>
       <ResourceUsageTable valueConverter={toMHz} units="MHz" label="CPU" stats={usage.compute} />
       <ResourceUsageTable units="GiB" label="Memory" stats={usage.memory} />
       <ResourceUsageTable units="GiB" label="Storage" stats={usage.disk} />
       {usage.grafanaLink &&
       <DashboardLink label="Grafana" link={usage.grafanaLink} />}
-    </div>
+    </>
   )
 }
 
