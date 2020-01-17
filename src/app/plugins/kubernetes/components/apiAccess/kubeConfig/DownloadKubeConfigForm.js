@@ -44,6 +44,7 @@ const DownloadKubeConfigForm = ({
     const { error, kubeconfig } = await generateKubeConfig(cluster.uuid, authMethod, { username, password })
 
     if (error) {
+      setSubmitting(false)
       return setErrorMessage(error)
     }
 
