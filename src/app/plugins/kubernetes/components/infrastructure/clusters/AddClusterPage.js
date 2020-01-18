@@ -60,7 +60,6 @@ const AddClusterPage = () => {
           type={CloudProviders.BareOS}
         />
         <CloudProviderCard
-          disabled
           active={activeProvider === CloudProviders.Aws}
           onClick={setActiveProvider}
           type={CloudProviders.Aws}
