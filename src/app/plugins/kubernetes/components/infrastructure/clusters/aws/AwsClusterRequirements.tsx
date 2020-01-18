@@ -37,7 +37,7 @@ const AwsClusterRequirements = ({ onComplete }) => {
   return (
     <ClusterRequirementsContainer title="Amazon AWS Deployment">
       <Typography className={classes.text}>Use your existing AWS credentials to create and manage Kubernetes clusters and associated resources within your AWS public cloud environment.</Typography>
-      <Typography className={classes.text}>You can create multiple AWS cloud providers - each AWS cloud provider should be associated with a unique set of AWS credentials.</Typography>
+      <Typography className={classes.text}>You can create multiple AWS cloud providers; each AWS cloud provider should be associated with a unique set of AWS credentials.</Typography>
 
       <Alert variant="info">
         <Typography className={classes.alertTitle} variant="subtitle2">The following permissions are required on your AWS account in order to deploy fully automated Managed Kubernetes clusters:</Typography>
@@ -47,7 +47,7 @@ const AwsClusterRequirements = ({ onComplete }) => {
         </div>
       </Alert>
       <div>
-        <SubmitButton onClick={handleClick}>Deploy With Aws</SubmitButton>
+        <SubmitButton onClick={handleClick}>Deploy With AWS</SubmitButton>
       </div>
     </ClusterRequirementsContainer>
   )
