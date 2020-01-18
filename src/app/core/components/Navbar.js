@@ -222,26 +222,23 @@ const styles = theme => ({
     borderRadius: theme.shape.borderRadius,
     boxSizing: 'border-box',
     backgroundRepeat: 'no-repeat',
-  },
-  kubernetesLogoOpen: {
-    backgroundImage: 'url(/ui/images/logo-kubernetes-h.png)',
-    backgroundSize: '120px',
-    backgroundPosition: '7px center',
-  },
-  kubernetesLogoClosed: {
-    backgroundImage: 'url(/ui/images/logo-kubernetes-h.png)',
-    backgroundSize: '130px',
-    backgroundPosition: '9px center',
-  },
-  openstackLogoOpen: {
-    backgroundImage: 'url(/ui/images/logo-sidenav-os.svg)',
-    backgroundSize: '120px',
-    backgroundPosition: '10px center !important',
-  },
-  openstackLogoClosed: {
-    backgroundImage: 'url(/ui/images/logo-sidenav-os.svg)',
-    backgroundSize: '175px',
-    backgroundPosition: '7px center',
+    backgroundImage: ({ stack }) => stack === 'openstack'
+      ? 'url(/ui/images/logo-sidenav-os.svg)'
+      : 'url(/ui/images/logo-kubernetes-h.png)',
+    backgroundSize: ({ open, stack }) => {
+      if (stack === 'kubernetes') {
+        return open ? '120px' : '130px'
+      } else if (stack === 'openstack') {
+        return open ? '120px' : '175px'
+      }
+    },
+    backgroundPosition: ({ open, stack }) => {
+      if (stack === 'kubernetes') {
+        return open ? '7px center' : '9px center'
+      } else if (stack === 'openstack') {
+        return open ? '10px center' : '7px center'
+      }
+    },
   },
   sliderLogoImage: {
     maxHeight: 26,
@@ -474,17 +471,12 @@ class Navbar extends PureComponent {
   }
 
   renderStackSlider = () => {
-    const { classes, open, stack } = this.props
+    const { classes, open } = this.props
     return <div className={classes.sliderContainer}>
       {open && <a href={clarityDashboardUrl}>
         <ChevronLeftIcon className={classes.sliderArrow} />
       </a>}
-      <div className={clsx(classes.sliderLogo, {
-        [classes.kubernetesLogoOpen]: open && stack === 'kubernetes',
-        [classes.kubernetesLogoClosed]: !open && stack === 'kubernetes',
-        [classes.openstackLogoOpen]: open && stack === 'openstack',
-        [classes.openstackLogoClosed]: !open && stack === 'openstack',
-      })} />
+      <div className={classes.sliderLogo} />
       {open && <a href={clarityDashboardUrl}>
         <ChevronRightIcon className={classes.sliderArrow} />
       </a>}
