@@ -53,6 +53,8 @@ import AppCatalogPage from 'k8s/components/apps/AppCatalogPage'
 import SshKeysPage from './components/sshkeys/SshKeysListPage'
 import AddSshKeyPage from './components/sshkeys/AddSshKeyPage'
 
+import IronicSetupPage from './components/ironicSetup/IronicSetupPage'
+
 class OpenStack extends React.PureComponent {
   render () {
     return (
@@ -249,12 +251,22 @@ OpenStack.registerPlugin = pluginManager => {
         name: 'Hosts',
         link: { path: '/hosts', exact: true },
         component: HostsListPage
+      },
+      {
+        name: 'IronicSetup',
+        link: { path: '/ironic/setup', exact: true },
+        component: IronicSetupPage
       }
     ]
   )
 
   plugin.registerNavItems(
     [
+      {
+        name: 'Bare Metal Setup',
+        link: { path: '/ironic/setup' },
+        icon: 'cogs'
+      },
       /* Comment out the nav items since first UI release will be K8s only
       {
         name: 'Dashboard',

@@ -9,11 +9,11 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
 import ChevronRightIcon from '@material-ui/icons/ChevronRight'
 import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'
-import { except, notEmpty } from 'app/utils/fp'
+import { except } from 'app/utils/fp'
 import clsx from 'clsx'
 import { withHotKeys } from 'core/providers/HotKeysProvider'
 import moize from 'moize'
-import { assoc, flatten, pluck, prop, propEq, propOr, where } from 'ramda'
+import { assoc, flatten, pluck, prop, propEq, propOr, where, equals } from 'ramda'
 import { matchPath, withRouter } from 'react-router'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { imageUrls, clarityDashboardUrl, k8sPrefix } from 'app/constants'
@@ -208,14 +208,6 @@ const styles = theme => ({
     marginBottom: '10px',
     marginTop: '10px',
   },
-  sliderLogoOpen: {
-    backgroundSize: '125px !important',
-    backgroundPosition: '7px center !important',
-  },
-  sliderLogoClosed: {
-    backgroundSize: '130px !important',
-    backgroundPosition: '9px center !important',
-  },
   sliderLogo: {
     flexGrow: 1,
     textAlign: 'center',
@@ -229,10 +221,24 @@ const styles = theme => ({
     padding: '0 7px',
     borderRadius: theme.shape.borderRadius,
     boxSizing: 'border-box',
-
-    backgroundImage: 'url(/ui/images/logo-kubernetes-h.png)',
     backgroundRepeat: 'no-repeat',
-
+    backgroundImage: ({ stack }) => stack === 'openstack'
+      ? 'url(/ui/images/logo-sidenav-os.svg)'
+      : 'url(/ui/images/logo-kubernetes-h.png)',
+    backgroundSize: ({ open, stack }) => {
+      if (stack === 'kubernetes') {
+        return open ? '120px' : '130px'
+      } else if (stack === 'openstack') {
+        return open ? '120px' : '175px'
+      }
+    },
+    backgroundPosition: ({ open, stack }) => {
+      if (stack === 'kubernetes') {
+        return open ? '7px center' : '9px center'
+      } else if (stack === 'openstack') {
+        return open ? '10px center' : '7px center'
+      }
+    },
   },
   sliderLogoImage: {
     maxHeight: 26,
@@ -470,10 +476,7 @@ class Navbar extends PureComponent {
       {open && <a href={clarityDashboardUrl}>
         <ChevronLeftIcon className={classes.sliderArrow} />
       </a>}
-      <div className={clsx(classes.sliderLogo, {
-        [classes.sliderLogoOpen]: open,
-        [classes.sliderLogoClosed]: !open,
-      })} />
+      <div className={classes.sliderLogo} />
       {open && <a href={clarityDashboardUrl}>
         <ChevronRightIcon className={classes.sliderArrow} />
       </a>}
@@ -481,8 +484,11 @@ class Navbar extends PureComponent {
   }
 
   render () {
-    const { classes, withStackSlider, sections, open, handleDrawerToggle } = this.props
-    const filteredSections = sections.filter(where({ links: notEmpty }))
+    const { classes, withStackSlider, sections, open, handleDrawerToggle, stack } = this.props
+    // const filteredSections = sections.filter(where({ links: notEmpty }))
+    // Because ironic regions will not currently support kubernetes, assume always
+    // one filtered section, either openstack (ironic) or kubernetes
+    const filteredSections = sections.filter(where({ id: equals(stack) }))
 
     return <div
       className={clsx(classes.drawer, {
@@ -546,6 +552,7 @@ Navbar.propTypes = {
   sections: PropTypes.arrayOf(
     PropTypes.shape(sectionPropType),
   ).isRequired,
+  stack: PropTypes.string,
 }
 
 Navbar.defaultProps = {

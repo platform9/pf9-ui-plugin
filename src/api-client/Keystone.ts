@@ -275,6 +275,20 @@ class Keystone extends ApiService {
     }
   }
 
+  getFeatures = async () => {
+    try {
+      const linksUrl = await this.getServiceEndpoint('regioninfo', 'public')
+      const { links } = await this.client.basicGet(linksUrl)
+      const featuresUrl = links.features
+      const timestamp = new Date().getTime()
+      const features = await this.client.basicGet(`${featuresUrl}?tag=${timestamp}`)
+      return features
+    } catch (err) {
+      console.error(err)
+      return null
+    }
+  }
+
   // set cookie for accessing hostagent rpms
   resetCookie = async () => {
     try {
