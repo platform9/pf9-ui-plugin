@@ -58,6 +58,10 @@ const renderConnectionStatus = (_, { connectionStatus, progressPercent, uuid }) 
 
   const fields = connectionStatusFieldsTable[connectionStatus]
 
+  if (!fields) {
+    return <span>N/A</span>
+  }
+
   return (
     <ClusterStatusSpan
       title={fields.message}

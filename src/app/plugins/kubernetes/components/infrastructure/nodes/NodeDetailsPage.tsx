@@ -1,13 +1,7 @@
 // Libs
-import React, { FunctionComponent } from 'react'
+import React, { useMemo, FC } from 'react'
 import { makeStyles } from '@material-ui/styles'
-import {
-  Typography,
-  Theme,
-  Card,
-  CardHeader,
-  CardContent
-} from '@material-ui/core'
+import { Typography, Theme, Card, CardHeader, CardContent, Grid } from '@material-ui/core'
 import useReactRouter from 'use-react-router'
 // Actions
 import useDataLoader from 'core/hooks/useDataLoader'
@@ -18,74 +12,136 @@ import PageContainer from 'core/components/pageContainer/PageContainer'
 import { ICombinedNode } from './model'
 import SimpleLink from 'core/components/SimpleLink'
 import Progress from 'core/components/progress/Progress'
+import UsageWidget from 'core/components/widgets/UsageWidget'
+import calcUsageTotals from 'k8s/util/calcUsageTotals'
+import ExternalLink from 'core/components/ExternalLink'
+import HelpContainer from 'core/components/HelpContainer'
+import { pathToClusterDetail, pathToNodes } from 'core/utils/routes'
 
 // Styles
 const useStyles = makeStyles((theme: Theme) => ({
   backLink: {
     marginBottom: theme.spacing(2),
   },
-  flex: {
+  detailContainer: {
     display: 'flex',
+    marginTop: theme.spacing(2),
+  },
+  rowHelp: {
+    width: 24,
   },
   rowHeader: {
     display: 'flex',
     justifyContent: 'flex-end',
   },
   rowValue: {
-    marginLeft: theme.spacing(0.5)
+    marginLeft: theme.spacing(0.5),
   },
   card: {
     marginRight: theme.spacing(2),
   },
 }))
 
-const AnyLink: any = SimpleLink
-
-const ClusterDetailsPage: FunctionComponent = () => {
+const ClusterDetailsPage: FC = () => {
   const { match } = useReactRouter()
   const classes = useStyles({})
   const [nodes, loading] = useDataLoader(loadNodes)
   const selectedNode: ICombinedNode = nodes.find(
     (x: ICombinedNode) => x.uuid === match.params.id
   ) || {}
+
+  const totals = useMemo(
+    () => ({
+      compute: calcUsageTotals(
+        [selectedNode],
+        'combined.usage.compute.current',
+        'combined.usage.compute.max',
+      ),
+      memory: calcUsageTotals(
+        [selectedNode],
+        'combined.usage.memory.current',
+        'combined.usage.memory.max',
+      ),
+      disk: calcUsageTotals(
+        [selectedNode],
+        'combined.usage.disk.current',
+        'combined.usage.disk.max',
+      ),
+    }),
+    [selectedNode],
+  )
+
   return (
     <PageContainer
       header={
         <>
-          <Typography variant="h3">Node {selectedNode.name}</Typography>
-          <AnyLink src={'/ui/kubernetes/infrastructure#nodes'} className={classes.backLink}>
+          <Typography variant="h5">Node {selectedNode.name}</Typography>
+          <SimpleLink src={pathToNodes()} className={classes.backLink}>
             <span>« Back to Node List</span>
-          </AnyLink>
+          </SimpleLink>
         </>
       }
     >
-      {loading
-        ? <Progress message="Loading Nodes..." />
-        : <NodeDetail {...selectedNode} />
-      }
+      <Progress loading={loading} message="Loading Nodes..." minHeight={200}>
+        <Grid container spacing={1}>
+          <Grid item xs={4}>
+            <UsageWidget
+              title="Compute"
+              stats={totals.compute}
+              units="GHz"
+              headerImg={'/ui/images/icon-compute.svg'}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <UsageWidget
+              title="Memory"
+              stats={totals.memory}
+              units="GiB"
+              headerImg={'/ui/images/icon-memory.svg'}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <UsageWidget
+              title="Storage"
+              stats={totals.disk}
+              units="GiB"
+              headerImg={'/ui/images/icon-storage.svg'}
+            />
+          </Grid>
+        </Grid>
+        <NodeDetail {...selectedNode} />
+      </Progress>
     </PageContainer>
   )
 }
 
-const NodeDetail: FunctionComponent<ICombinedNode> = ({ uuid, name, combined, ...rest }) => {
-  const { flex, card } = useStyles({})
+const NodeDetail: FC<ICombinedNode> = (node) => {
+  const { uuid, combined, logs, clusterName, clusterUuid } = node
+  const { detailContainer, card } = useStyles({})
   const hostId = uuid
   const roles = combined?.roles
-  const hostname = name
-  const os = combined?.osInfo
-  const hypervisorType = combined?.resmgr?.hypervisor_info?.hypervisor_type
+  const operatingSystem = combined?.resmgr?.info?.os_info || combined?.osInfo
+  const primaryNetwork = combined?.qbert?.primaryIp
+  const networkInterfaces = combined?.networkInterfaces || {}
+  const CPUArchitecture = combined?.resmgr?.info?.arch
 
   return (
-    <div className={flex}>
+    <div className={detailContainer}>
       <Card className={card}>
         <CardHeader title="Misc" />
         <CardContent>
           <table>
             <tbody>
-              <DetailRow label="Host ID" value={hostId} />
+              <DetailRow
+                label="Node UUID"
+                value={hostId}
+                helpMessage="This is the unique ID that PMK as assigned to this node"
+              />
+              <DetailRow label="CPU Architecture" value={CPUArchitecture} />
+              <DetailRow label="Operating System" value={operatingSystem} />
+              {!!clusterName && <DetailRow label="Cluster info" value={<SimpleLink src={pathToClusterDetail({ id: clusterUuid })}>{clusterName}</SimpleLink>} />}
               <DetailRow label="Roles" value={roles} />
-              <DetailRow label="Hypervisor Type" value={hypervisorType} />
-              <DetailRow label="Operating System" value={os} />
+              <DetailRow label="Logs" value={<ExternalLink url={logs}>View Logs</ExternalLink>} />
             </tbody>
           </table>
         </CardContent>
@@ -95,7 +151,15 @@ const NodeDetail: FunctionComponent<ICombinedNode> = ({ uuid, name, combined, ..
         <CardContent>
           <table>
             <tbody>
-              <DetailRow label="Hostname" value={hostname} />
+              {Object.entries(networkInterfaces).map(([interfaceName, interfaceIp]) => (
+                <DetailRow
+                  key={interfaceIp}
+                  label={
+                    interfaceIp === primaryNetwork ? `${interfaceName} (primary)` : interfaceName
+                  }
+                  value={interfaceIp}
+                />
+              ))}
             </tbody>
           </table>
         </CardContent>
@@ -104,15 +168,24 @@ const NodeDetail: FunctionComponent<ICombinedNode> = ({ uuid, name, combined, ..
   )
 }
 
-const DetailRow: FunctionComponent<{ label: string, value: any }> = ({ label, value }) => {
-  const { rowHeader, rowValue } = useStyles({})
+const DetailRow: FC<{ label: string, value: string | React.ReactNode, helpMessage?: string }> = ({
+  label,
+  value,
+  helpMessage,
+}) => {
+  const { rowHeader, rowValue, rowHelp } = useStyles({})
   return (
     <tr>
       <td>
-        <Typography className={rowHeader} variant="subtitle2">{label}:</Typography>
+        <Typography className={rowHeader} variant="subtitle2">
+          {label}:
+        </Typography>
       </td>
       <td>
-        <Typography className={rowValue}>{value}</Typography>
+        { typeof value === 'string' ? <Typography className={rowValue}>{value}</Typography> : value }
+      </td>
+      <td className={rowHelp}>
+        {!!helpMessage && <HelpContainer title={helpMessage} color="black" />}
       </td>
     </tr>
   )
