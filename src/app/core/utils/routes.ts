@@ -16,10 +16,12 @@ const routes = {
   dashboard: `${k8sPrefix}/dashboard`,
   apiAccess: `${k8sPrefix}/api_access`,
   nodes: {
+    list: `${k8sPrefix}/infrastructure#nodes`,
     detail: `${k8sPrefix}/infrastructure/nodes/:id`,
     download: `${k8sPrefix}/infrastructure/nodes/cli/download`,
   },
   cloudProviders: {
+    list: `${k8sPrefix}/infrastructure#cloudProviders`,
     edit: `${k8sPrefix}/infrastructure/cloudProviders/edit/:id`,
     add: `${k8sPrefix}/infrastructure/cloudProviders/add`,
   },
@@ -83,6 +85,10 @@ export const pathToClusters = (params?: GenericKVP) => {
 }
 export const pathToClusterDetail = (params: {id: string} & GenericKVP) => {
   return createUrlWithQueryString(routes.cluster.detail, params)
+}
+
+export const pathToNodes = (params?: GenericKVP) => {
+  return createUrlWithQueryString(routes.nodes.list, params)
 }
 
 /*
