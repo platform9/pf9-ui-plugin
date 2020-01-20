@@ -20,10 +20,10 @@ class ActiveModel {
     const id = this.id
     const idx = col.findIndex(x => x.id === id)
     if (idx > -1) {
+      this.destroyed = true
       col.splice(idx, 1)
       return id
     }
-    this.destroyed = true
   }
 
   asJson () {
