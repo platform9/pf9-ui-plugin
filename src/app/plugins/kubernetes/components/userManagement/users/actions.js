@@ -27,6 +27,8 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
   },
   deleteFn: async ({ id }) => {
     await keystone.deleteUser(id)
+    // We must invalidate the tenants cache so that they will not contain the deleted user
+    mngmTenantActions.invalidateCache()
   },
   createFn: async ({ username, displayname, password, roleAssignments }) => {
     const defaultTenantId = pipe(keys, head)(roleAssignments)
@@ -109,7 +111,6 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
           return emptyArr
         })(null),
     ])
-    console.log(updatedUser)
     return updatedUser
   },
   dataMapper: async (users, { systemUsers }, loadFromContext) => {

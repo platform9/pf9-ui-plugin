@@ -77,8 +77,7 @@ describe('users', () => {
       cy.contains('Are you sure?')
       cy.contains('Confirm').click()
       cy.contains('User User#Test *EDITED* deleted successfully')
-      // TODO: Fix this
-      // cy.contains('tr', 'User#Test *EDITED*').should('not.exist')
+      cy.contains('tr', 'User#Test *EDITED*').should('not.exist')
     })
   })
 })
