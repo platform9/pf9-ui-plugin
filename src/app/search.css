@@ -1,0 +1,75 @@
+a.st-ui-result {
+  display: block;
+  position: relative;
+  padding: 12px 18px 14px 0;
+  cursor: pointer;
+  border-bottom: 1px solid #e9edf2;
+  text-align: left;
+  text-decoration: none;
+}
+
+.st-ui-type-heading {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.st-ui-type-detail {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: #8b9bad;
+}
+
+.center {
+  text-align: center;
+  display: block;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+}
+
+.hero {
+  background-image: url("/ui/images/hero.png");
+  background-position: center;
+  background-size: cover;
+  height: 350px;
+  padding: 0 20px;
+  text-align: center;
+  width: 100%;
+}
+
+.hero-welcome {
+  top: 15%;
+  position: relative;
+  color: white;
+}
+
+.hero-welcome h1 {
+  font-size: 48px;
+  font-weight: 500;
+  color: white;
+  letter-spacing: 2.3px;
+}
+
+.hero-welcome h2 {
+  font-weight: normal;
+  font-size: 24px;
+  letter-spacing: 2.3px;
+  color: white;
+}
+
+.hero-welcome h3 {
+  font-weight: normal;
+  font-size: 15px;
+  letter-spacing: 2.3px;
+  color: white;
+}
+
+.sui-layout-header {
+  border-bottom: none
+}
+
+.sui-layout-body {
+  background: transparent !important
+}
