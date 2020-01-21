@@ -25,7 +25,7 @@ const selectProps = { displayEmpty: true }
 // We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
 const Picklist = React.forwardRef((props, ref) => {
   const {
-    disabled, showAll, showNone, label, name, value, options, onChange, loading, formField, ...restProps
+    disabled, showAll, showNone, noneLabel, label, name, value, options, onChange, loading, formField, ...restProps
   } = props
   const classes = useStyles(props)
   const inputProps = useMemo(() => ({ name: label, id: name }), [label, name])
@@ -36,8 +36,8 @@ const Picklist = React.forwardRef((props, ref) => {
       // Hack to work around Material UI's Select ignoring empty string as a value
       value: option.value === '' ? noneKey : option.value,
     })),
+    showNone ? prepend({ label: noneLabel || 'None', value: noneKey }) : identity,
     showAll ? prepend({ label: 'All', value: allKey }) : identity,
-    showNone ? prepend({ label: 'None', value: noneKey }) : identity,
     map(option => <MenuItem value={option.value} key={option.value}>{option.label}</MenuItem>),
   )(options), [options])
 
@@ -90,6 +90,7 @@ Picklist.propTypes = {
   label: PropTypes.string.isRequired,
   loading: PropTypes.bool,
   name: PropTypes.string.isRequired,
+  noneLabel: PropTypes.string,
   onChange: PropTypes.func,
   options: PropTypes.arrayOf(optionPropType),
   showAll: PropTypes.bool,

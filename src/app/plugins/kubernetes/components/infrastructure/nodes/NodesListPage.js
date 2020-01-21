@@ -4,10 +4,10 @@ import { maybeFnOrNull } from 'utils/fp'
 import ExternalLink from 'core/components/ExternalLink'
 import ProgressBar from 'core/components/progress/ProgressBar'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { pathOr, pipe } from 'ramda'
+import { pathOr, pipe, pick } from 'ramda'
 import { castBoolToStr, castFuzzyBool, columnPathLookup } from 'utils/misc'
 import SimpleLink from 'core/components/SimpleLink'
-import { nodesCacheKey } from 'k8s/components/infrastructure/nodes/actions'
+import { loadNodes, nodesCacheKey } from 'k8s/components/infrastructure/nodes/actions'
 import ClusterStatusSpan from 'k8s/components/infrastructure/clusters/ClusterStatusSpan'
 import ClusterSync from '../clusters/ClusterSync'
 import {
@@ -21,6 +21,53 @@ import RemoteSupportDialog from './RemoteSupportDialog'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { Tooltip } from '@material-ui/core'
 import { isAdminRole } from 'k8s/util/helpers'
+import { listTablePrefs } from 'app/constants'
+import { createUsePrefParamsHook } from 'core/hooks/useParams'
+import useDataLoader from 'core/hooks/useDataLoader'
+import DetachStatePicklist from './DetachStatePicklist'
+import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
+import { allKey } from 'app/constants'
+
+const defaultParams = {
+  clusterId: allKey
+}
+const usePrefParams = createUsePrefParamsHook('Nodes', listTablePrefs)
+
+const ListPage = ({ ListContainer }) => {
+  return () => {
+    const { params, updateParams, getParamsUpdater } = usePrefParams(defaultParams)
+    const [data, loading, reload] = useDataLoader(loadNodes, params)
+    // Filter nodes based on cluster
+    const filteredNodes = data.filter(node => {
+      if (params.clusterId === allKey) {
+        return true
+      } else if (params.clusterId === "") {
+        return !node.clusterUuid
+      } else if (params.clusterId) {
+        return node.clusterUuid === params.clusterId
+      } else {
+        return true
+      }
+    })
+
+    return <ListContainer
+      loading={loading}
+      reload={reload}
+      data={filteredNodes}
+      getParamsUpdater={getParamsUpdater}
+      filters={<>
+        <ClusterPicklist
+          onChange={getParamsUpdater('clusterId')}
+          value={params.clusterId}
+          noneLabel="No Cluster"
+          selectFirst={false}
+          showNone
+        />
+      </>}
+      {...pick(listTablePrefs, params)}
+    />
+  }
+}
 
 const renderRoles = (_, node) => {
   const roles = pathOr([], ['combined', 'roles'], node)
@@ -160,10 +207,11 @@ export const options = {
       label: 'Configure Remote Support',
       dialog: RemoteSupportDialog,
     },
-  ]
+  ],
+  ListPage,
 }
 
-const { ListPage, List } = createCRUDComponents(options)
-export const NodesList = List
+const components = createCRUDComponents(options)
+export const NodesList = components.List
 
-export default ListPage
+export default components.ListPage
