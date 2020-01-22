@@ -2,7 +2,7 @@ import React from 'react'
 import { Grid, Dialog, DialogTitle, DialogContent } from '@material-ui/core'
 import CloseIcon from '@material-ui/icons/Close'
 import { makeStyles } from '@material-ui/styles'
-import ClusterStatusSpan from 'k8s/components/infrastructure/clusters/ClusterStatusSpan'
+import ClusterStatusSpan from 'k8s/components/infrastructure/clusters/ClusterStatus'
 import useToggler from 'core/hooks/useToggler'
 import ResourceUsageTable from 'k8s/components/infrastructure/common/ResourceUsageTable'
 import {

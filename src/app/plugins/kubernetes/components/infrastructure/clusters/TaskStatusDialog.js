@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/styles'
 import CloseIcon from '@material-ui/icons/Close'
 import clsx from 'clsx'
 import ExternalLink from 'core/components/ExternalLink'
-import ClusterStatusSpan from 'k8s/components/infrastructure/clusters/ClusterStatusSpan'
+import ClusterStatusSpan from 'k8s/components/infrastructure/clusters/ClusterStatus'
 import createListTableComponent from 'core/helpers/createListTableComponent'
 import { noop } from 'utils/fp'
 import { capitalizeString } from 'utils/misc'
@@ -66,7 +66,7 @@ const TaskStatusDialog = ({ isOpen, toggleOpen, node }) => {
   }
 
   const { name, isMaster, logs, status } = node
-  const { all_tasks: allTasks, last_failed_task: lastFailedTask } = node.combined.resmgr.extensions.pf9_kube_status.data
+  const { all_tasks: allTasks = [], last_failed_task: lastFailedTask } = node.combined.resmgr.extensions.pf9_kube_status.data
   const healthStatus = status === 'disconnected' ? 'unknown' : status === 'ok' ? 'healthy' : 'unhealthy'
 
   return (

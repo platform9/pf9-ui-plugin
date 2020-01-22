@@ -1,12 +1,10 @@
 import React from 'react'
 import InfoPanel from 'core/components/InfoPanel'
-import UsageWidget from 'core/components/widgets/UsageWidget'
+
 import useReactRouter from 'use-react-router'
 import { Grid } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import useDataLoader from 'core/hooks/useDataLoader'
-import Progress from 'core/components/progress/Progress'
-import { emptyObj } from 'utils/fp'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 
 const overviewStats = cluster => ({
@@ -102,32 +100,18 @@ const useStyles = makeStyles(theme => ({
 const ClusterInfo = () => {
   const { match } = useReactRouter()
   const classes = useStyles()
-  const [clusters, loading] = useDataLoader(clusterActions.list)
+  const [clusters] = useDataLoader(clusterActions.list)
   const cluster = clusters.find(x => x.uuid === match.params.id) || {}
-  const { usage = emptyObj } = cluster
 
   return (
-    <Progress loading={loading}>
-      <Grid container spacing={4} className={classes.root}>
-        <Grid item xs={4}>
-          <UsageWidget units="GHz" title="Compute" stats={usage.compute} />
-        </Grid>
-        <Grid item xs={4}>
-          <UsageWidget units="GiB" title="Memory" stats={usage.memory} />
-        </Grid>
-        <Grid item xs={4}>
-          <UsageWidget units="GiB" title="Storage" stats={usage.disk} />
-        </Grid>
+    <Grid container spacing={4} className={classes.root}>
+      <Grid item xs={6}>
+        <InfoPanel title="Overview" items={overviewStats(cluster)} />
       </Grid>
-      <Grid container spacing={4} className={classes.root}>
-        <Grid item xs={6}>
-          <InfoPanel title="Overview" items={overviewStats(cluster)} />
-        </Grid>
-        <Grid item xs={6}>
-          {renderCloudInfo(cluster)}
-        </Grid>
+      <Grid item xs={6}>
+        {renderCloudInfo(cluster)}
       </Grid>
-    </Progress>
+    </Grid>
   )
 }
 

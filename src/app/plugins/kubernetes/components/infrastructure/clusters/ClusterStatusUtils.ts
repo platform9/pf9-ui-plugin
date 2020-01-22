@@ -1,5 +1,7 @@
+import { ICluster, HealthStatus } from "./model"
+import { pathToClusterNodes } from "core/utils/routes"
+
 type TransientStatus = 'creating' | 'deleting' | 'updating' | 'upgrading' | 'converging'
-type HealthStatus = 'healthy' | 'partially_healthy' | 'unhealthy' | 'unknown'
 type ConnectionStatus = 'connected' | 'partially_connected' | 'disconnected'
 
 interface Node {
@@ -214,4 +216,28 @@ export const clusterHealthStatusFields: {[status in HealthStatus | 'converging']
     status: 'loading',
     label: 'Converging'
   },
+}
+
+interface ClusterHealthStatusFields extends HealthStatusFields {
+  message: string
+  nodesDetailsUrl: string
+}
+
+export const getClusterHealthStatus = (cluster: ICluster) => {
+  if (!cluster.healthStatus || !cluster.masterNodesHealthStatus || !cluster.workerNodesHealthStatus) {
+    return null
+  }
+  const fields: ClusterHealthStatusFields = clusterHealthStatusFields[cluster.healthStatus]
+  fields.message = getHealthStatusMessage(cluster.masterNodesHealthStatus, cluster.workerNodesHealthStatus)
+  fields.nodesDetailsUrl = pathToClusterNodes({id: cluster.uuid})
+  return fields
+}
+
+export const getClusterConnectionStatus = (cluster: ICluster) => {
+  if (!cluster.connectionStatus) {
+    return null
+  }
+  const fields: ConnectionStatusFields & { nodesDetailsUrl: string } = connectionStatusFieldsTable[cluster.connectionStatus]
+  fields.nodesDetailsUrl = pathToClusterNodes({id: cluster.uuid})
+  return fields
 }

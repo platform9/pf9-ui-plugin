@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback } from 'react'
-import { pluck, partition } from 'ramda'
+import { pluck } from 'ramda'
 // This table essentially has the same functionality as the <NodesList>
 // except that it is only the nodes from the a single cluster.
 import { columns } from '../nodes/NodesListPage'
@@ -9,9 +9,10 @@ import { emptyArr } from 'utils/fp'
 import useReactRouter from 'use-react-router'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
-import ClusterNodesOverview from './ClusterNodesOverview'
 import useToggler from 'core/hooks/useToggler'
 import TaskStatusDialog from './TaskStatusDialog'
+
+const tableColumns = columns.filter(column => !['clusterName', 'isSpotInstance'].includes(column.id))
 
 const ClusterNodes = () => {
   const { match } = useReactRouter()
@@ -21,25 +22,13 @@ const ClusterNodes = () => {
   const [nodes, loadingNodes, reload] = useDataLoader(loadNodes)
   const handleRefresh = useCallback(() => reload(true), [reload])
   const cluster = clusters.find(cluster => cluster.uuid === match.params.id)
-  const [masterNodes, workerNodes] = useMemo(() => {
+  const nodesInCluster = useMemo(() => {
     if (cluster) {
       const clusterNodesUids = pluck('uuid', cluster.nodes)
-      const clusterNodes = nodes.filter(node => clusterNodesUids.includes(node.uuid))
-      const isMasterNode = node => node.isMaster === 1
-      return partition(isMasterNode, clusterNodes)
+      return nodes.filter(node => clusterNodesUids.includes(node.uuid))
     }
     return emptyArr
   }, [cluster, nodes, match])
-
-  const commonTableProperties = {
-    emptyText: 'No instances found.',
-    uniqueIdentifier: 'uuid',
-    onReload: handleRefresh,
-    showCheckboxes: false,
-    compactTable: true,
-  }
-
-  const removeColumnIds = (columns, ids) => columns.filter(column => !ids.includes(column.id))
 
   const addTaskStatusModal = (columns) => {
     const healthStatusColumn = { ...columns.find(column => column.id === 'healthStatus') }
@@ -52,30 +41,22 @@ const ClusterNodes = () => {
     return columns.map(column => column.id === 'healthStatus' ? { ...column, render: updatedRender } : column)
   }
 
-  const masterNodesColumns = addTaskStatusModal(removeColumnIds(columns, ['isMaster']))
-  const workerNodesColumns = addTaskStatusModal(removeColumnIds(columns, ['isMaster', 'api_responding']))
+  const nodeColumns = addTaskStatusModal(tableColumns)
 
-  const MasterNodesTable = createListTableComponent({
-    title: 'Master Nodes',
-    name: 'MasterNodes',
-    columns: masterNodesColumns,
-    ...commonTableProperties,
-  })
-
-  const WorkerNodesTable = createListTableComponent({
-    title: 'Worker Nodes',
-    name: 'WorkerNodes',
-    columns: workerNodesColumns,
-    ...commonTableProperties,
+  const NodesTable = createListTableComponent({
+    title: 'Nodes',
+    name: 'nodes',
+    columns: nodeColumns,
+    emptyText: 'No instances found.',
+    uniqueIdentifier: 'uuid',
+    onReload: handleRefresh,
+    showCheckboxes: false,
+    compactTable: true,
   })
 
   return (
     <div>
-      <ClusterNodesOverview cluster={cluster} />
-      <h2>Master Nodes</h2>
-      <MasterNodesTable data={masterNodes} loading={loadingClusters || loadingNodes} />
-      <h2>Worker Nodes</h2>
-      <WorkerNodesTable data={workerNodes} loading={loadingClusters || loadingNodes} />
+      <NodesTable data={nodesInCluster} loading={loadingClusters || loadingNodes} />
       <TaskStatusDialog isOpen={showTaskDialog} toggleOpen={toggleTaskDialog} node={selectedNode} />
     </div>
   )
