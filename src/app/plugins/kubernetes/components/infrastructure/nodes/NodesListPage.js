@@ -21,12 +21,10 @@ import RemoteSupportDialog from './RemoteSupportDialog'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { Tooltip } from '@material-ui/core'
 import { isAdminRole } from 'k8s/util/helpers'
-import { listTablePrefs } from 'app/constants'
+import { listTablePrefs, allKey } from 'app/constants'
 import { createUsePrefParamsHook } from 'core/hooks/useParams'
 import useDataLoader from 'core/hooks/useDataLoader'
-import DetachStatePicklist from './DetachStatePicklist'
 import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
-import { allKey } from 'app/constants'
 
 const defaultParams = {
   clusterId: allKey
@@ -35,13 +33,13 @@ const usePrefParams = createUsePrefParamsHook('Nodes', listTablePrefs)
 
 const ListPage = ({ ListContainer }) => {
   return () => {
-    const { params, updateParams, getParamsUpdater } = usePrefParams(defaultParams)
+    const { params, getParamsUpdater } = usePrefParams(defaultParams)
     const [data, loading, reload] = useDataLoader(loadNodes, params)
     // Filter nodes based on cluster
     const filteredNodes = data.filter(node => {
       if (params.clusterId === allKey) {
         return true
-      } else if (params.clusterId === "") {
+      } else if (params.clusterId === '') {
         return !node.clusterUuid
       } else if (params.clusterId) {
         return node.clusterUuid === params.clusterId
