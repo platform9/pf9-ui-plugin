@@ -159,6 +159,23 @@ const createGenericCluster = async (body, data, loadFromContext) => {
     custom: data.customRuntimeConfig,
   }[data.runtimeConfigOption]
 
+  // This is currently supported by all cloud providers except GCP (which we
+  // don't have yet anyways)
+  if (data.etcdBackup) {
+    body.etcdBackup = {
+      isEtcdBackupEnabled: 1,
+      storageType: 'local',
+      storageProperties: {
+        localPath: data.etcdStoragePath,
+      },
+      intervalInMins: data.etcdBackupInterval,
+    }
+  } else {
+    body.etcdBackup = {
+      isEtcdBackupEnabled: 0,
+    }
+  }
+
   const createResponse = await qbert.createCluster(body)
   const uuid = createResponse.uuid
 
@@ -238,6 +255,7 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
         ...fuzzyBools,
         hasVpn: castFuzzyBool(pathOr(false, ['cloudProperties', 'internalElb'], cluster)),
         hasLoadBalancer: castFuzzyBool(cluster.enableMetallb || pathOr(false, ['cloudProperties', 'enableLbaas'], cluster)),
+        etcdBackupEnabled: !!cluster.etcdBackup.isEtcdBackupEnabled,
       }
     }, rawClusters)
   },
@@ -249,7 +267,28 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
   updateFn: async ({ uuid, ...params }) => {
     const updateableParams = 'name tags numWorkers numMinWorkers numMaxWorkers'.split(' ')
     const body = pick(updateableParams, params)
+
+    // This is currently supported by all cloud providers except GCP (which we
+    // don't have yet anyways)
+    if (params.etcdBackup) {
+      body.etcdBackup = {
+        isEtcdBackupEnabled: 1,
+        storageType: 'local',
+        storageProperties: {
+          localPath: params.etcdStoragePath,
+        },
+        intervalInMins: params.etcdBackupInterval,
+      }
+    } else {
+      body.etcdBackup = {
+        isEtcdBackupEnabled: 0,
+      }
+    }
+
     await qbert.updateCluster(uuid, body)
+    // Doing this will help update the table, but the cache remains incorrect...
+    // Same issue regarding cache applies to anything else updated this function
+    body.etcdBackupEnabled = !!body.etcdBackup
     return body
   },
   deleteFn: async ({ uuid }) => {

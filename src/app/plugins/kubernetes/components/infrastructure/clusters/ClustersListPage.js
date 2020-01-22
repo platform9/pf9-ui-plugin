@@ -151,6 +151,7 @@ export const options = {
     { id: 'hasVpn', label: 'VPN' },
     { id: 'appCatalogEnabled', label: 'App Catalog', render: x => x ? 'Enabled' : 'Not Enabled' },
     { id: 'hasLoadBalancer', label: 'Load Balancer' },
+    { id: 'etcdBackupEnabled', label: 'Etcd Backup', render: x => x ? 'Enabled' : 'Not Enabled' },
 
     // TODO: We probably want to write a metadata renderer for this kind of format
     //

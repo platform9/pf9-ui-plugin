@@ -6,16 +6,20 @@ import { Grid } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
+import { path, pathOr } from 'ramda'
 
 const overviewStats = cluster => ({
-  Status:              cluster.status,
-  CloudProvider:       cluster.cloudProviderName,
-  'Cloud Provider Type': cluster.cloudProviderType,
-  'Kubernetes Version':  cluster.version || 'unavailable',
-  'Containers CIDR':     cluster.containersCidr,
-  'Services CIDR':       cluster.servicesCidr,
-  Privileged:          cluster.privileged,
-  'Unique ID':           cluster.uuid,
+  Status:                 cluster.status,
+  CloudProvider:          cluster.cloudProviderName,
+  'Cloud Provider Type':  cluster.cloudProviderType,
+  'Kubernetes Version':   cluster.version || 'unavailable',
+  'Containers CIDR':      cluster.containersCidr,
+  'Services CIDR':        cluster.servicesCidr,
+  Privileged:             cluster.privileged,
+  'Unique ID':            cluster.uuid,
+  'Etcd Backup':          path(['etcdBackup', 'isEtcdBackupEnabled'], cluster) ? 'Enabled' : 'Not Enabled',
+  'Etcd Storage Path':    pathOr('N/A', ['etcdBackup', 'storageProperties', 'localPath'], cluster),
+  'Etcd Backup Interval': pathOr('N/A', ['etcdBackup', 'intervalInMins'], cluster),
 })
 
 const bareOsProps = cluster => ({
