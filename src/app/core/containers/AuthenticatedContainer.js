@@ -1,23 +1,26 @@
-import React, { useEffect, useState, useContext } from 'react'
 import { makeStyles } from '@material-ui/styles'
+import ApiClient from 'api-client/ApiClient'
+import { clarityDashboardUrl, dashboardUrl, helpUrl, ironicWizardUrl, logoutUrl } from 'app/constants'
+import HelpPage from 'app/plugins/kubernetes/components/common/HelpPage'
 import clsx from 'clsx'
 import Intercom from 'core/components/integrations/Intercom'
 import Navbar, { drawerWidth } from 'core/components/Navbar'
+import BannerContainer from 'core/components/notifications/BannerContainer'
+import SimpleLink from 'core/components/SimpleLink'
 import Toolbar from 'core/components/Toolbar'
 import useToggler from 'core/hooks/useToggler'
-import { emptyObj, isNilOrEmpty, ensureArray } from 'utils/fp'
-import { Switch, Redirect, Route } from 'react-router'
-import moize from 'moize'
-import { toPairs, apply } from 'ramda'
-import { pathJoin } from 'utils/misc'
-import DeveloperToolsEmbed from 'developer/components/DeveloperToolsEmbed'
-import pluginManager from 'core/utils/pluginManager'
-import { logoutUrl, dashboardUrl, helpUrl, ironicWizardUrl, clarityDashboardUrl } from 'app/constants'
-import LogoutPage from 'core/public/LogoutPage'
-import HelpPage from 'app/plugins/kubernetes/components/common/HelpPage'
 import { AppContext } from 'core/providers/AppProvider'
+import { useBanner } from 'core/providers/BannerProvider'
+import LogoutPage from 'core/public/LogoutPage'
+import pluginManager from 'core/utils/pluginManager'
+import DeveloperToolsEmbed from 'developer/components/DeveloperToolsEmbed'
+import moize from 'moize'
+import { apply, toPairs } from 'ramda'
+import React, { useContext, useEffect, useState } from 'react'
+import { Redirect, Route, Switch } from 'react-router'
 import useReactRouter from 'use-react-router'
-import ApiClient from 'api-client/ApiClient'
+import { emptyObj, ensureArray, isNilOrEmpty } from 'utils/fp'
+import { pathJoin } from 'utils/misc'
 
 const { keystone } = ApiClient.getInstance()
 
@@ -67,7 +70,7 @@ const useStyles = makeStyles(theme => ({
   },
   contentMain: {
     paddingLeft: theme.spacing(2),
-  }
+  },
 }))
 
 const renderPluginRoutes = role => (id, plugin) => {
@@ -108,7 +111,8 @@ const renderPlugins = moize((plugins, role) =>
   toPairs(plugins).map(apply(renderPluginRoutes(role))).flat(),
 )
 
-const redirectToAppropriateStack = (ironicEnabled, kubernetesEnabled, history) => {
+const redirectToAppropriateStack = (ironicEnabled, kubernetesEnabled,
+  history) => {
   // If it is neither ironic nor kubernetes, bump user to old UI
   // TODO: For production, I need to always bump user to old UI in both ironic
   // and standard openstack cases, but I don't want to do that yet for development.
@@ -139,8 +143,13 @@ const loadRegionFeatures = async (setRegionFeatures, history) => {
   }
 }
 
+const checkInitialRequirements = (showBanner) => {
+  // TODO: implement initial checks and show a banner (or banners) if required
+}
+
 const AuthenticatedContainer = () => {
   const [drawerOpen, toggleDrawer] = useToggler(true)
+  const showBanner = useBanner()
   const [regionFeatures, setRegionFeatures] = useState(emptyObj)
   const { userDetails: { role }, currentRegion } = useContext(AppContext)
   const { history } = useReactRouter()
@@ -149,6 +158,7 @@ const AuthenticatedContainer = () => {
   useEffect(() => {
     // Pass the `setRegionFeatures` function to update the features as we can't use `await` inside of a `useEffect`
     loadRegionFeatures(setRegionFeatures, history)
+    checkInitialRequirements(showBanner)
   }, [currentRegion])
 
   const withStackSlider = regionFeatures.openstack && regionFeatures.kubernetes
@@ -163,6 +173,7 @@ const AuthenticatedContainer = () => {
     <>
       <div className={classes.appFrame}>
         <Toolbar />
+        <BannerContainer />
         <Navbar
           withStackSlider={withStackSlider}
           drawerWidth={drawerWidth}
