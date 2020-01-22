@@ -8,9 +8,9 @@ import React, {
 } from 'react'
 import uuid from 'uuid'
 import { append, takeLast, reject, whereEq } from 'ramda'
-import ToastContainer, { ToastOptions } from 'core/components/toasts/ToastContainer'
+import ToastContainer, { ToastOptions } from 'core/components/notifications/ToastContainer'
 import { except, pipe } from 'utils/fp'
-import { MessageTypes } from 'core/components/toasts/model'
+import { MessageTypes } from 'core/components/notifications/model'
 
 const toastsTimeout = 10000
 const concurrentToasts = 5
