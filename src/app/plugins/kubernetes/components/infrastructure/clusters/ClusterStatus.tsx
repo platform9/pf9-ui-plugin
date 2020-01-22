@@ -116,7 +116,7 @@ const renderTransientStatus = (connectionStatus, progressPercent, variant) => {
 }
 
 interface IClusterStatusProps {cluster: ICluster, variant: StatusVariant}
-export const ClusterHealthStatus: FC<IClusterStatusProps> = ({cluster, variant = 'table'}) => {
+export const ClusterHealthStatus: FC<IClusterStatusProps> = ({ cluster, variant = 'table' }) => {
   if (isTransientStatus(cluster.healthStatus)) {
     return renderTransientStatus(cluster.healthStatus, cluster.progressPercent, variant)
   }
@@ -141,7 +141,7 @@ export const ClusterHealthStatus: FC<IClusterStatusProps> = ({cluster, variant =
   )
 }
 
-export const ClusterConnectionStatus: FC<IClusterStatusProps> = ({cluster, variant = 'table'}) => {
+export const ClusterConnectionStatus: FC<IClusterStatusProps> = ({ cluster, variant = 'table' }) => {
   if (isTransientStatus(cluster.connectionStatus)) {
     return renderTransientStatus(cluster.connectionStatus, cluster.progressPercent, variant)
   }
@@ -156,7 +156,7 @@ export const ClusterConnectionStatus: FC<IClusterStatusProps> = ({cluster, varia
       title={fields.message}
       status={fields.clusterStatus}
       variant={variant}>
-        { variant === 'header' ? fields.label : <SimpleLink src={fields.nodesDetailsUrl}>{fields.label}</SimpleLink> }
+      { variant === 'header' ? fields.label : <SimpleLink src={fields.nodesDetailsUrl}>{fields.label}</SimpleLink> }
     </ClusterStatusSpan>
   )
 }

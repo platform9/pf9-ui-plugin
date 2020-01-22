@@ -1,5 +1,5 @@
-import { ICluster, HealthStatus } from "./model"
-import { pathToClusterNodes } from "core/utils/routes"
+import { ICluster, HealthStatus } from './model'
+import { pathToClusterNodes } from 'core/utils/routes'
 
 type TransientStatus = 'creating' | 'deleting' | 'updating' | 'upgrading' | 'converging'
 type ConnectionStatus = 'connected' | 'partially_connected' | 'disconnected'
@@ -229,7 +229,7 @@ export const getClusterHealthStatus = (cluster: ICluster) => {
   }
   const fields: ClusterHealthStatusFields = clusterHealthStatusFields[cluster.healthStatus]
   fields.message = getHealthStatusMessage(cluster.masterNodesHealthStatus, cluster.workerNodesHealthStatus)
-  fields.nodesDetailsUrl = pathToClusterNodes({id: cluster.uuid})
+  fields.nodesDetailsUrl = pathToClusterNodes({ id: cluster.uuid })
   return fields
 }
 
@@ -238,6 +238,6 @@ export const getClusterConnectionStatus = (cluster: ICluster) => {
     return null
   }
   const fields: ConnectionStatusFields & { nodesDetailsUrl: string } = connectionStatusFieldsTable[cluster.connectionStatus]
-  fields.nodesDetailsUrl = pathToClusterNodes({id: cluster.uuid})
+  fields.nodesDetailsUrl = pathToClusterNodes({ id: cluster.uuid })
   return fields
 }
