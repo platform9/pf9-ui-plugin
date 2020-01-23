@@ -2,15 +2,19 @@ import React from 'react'
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core'
 import { withProgress } from 'core/components/progress/Progress'
 
+type SlideDirection = 'up' | 'down' | 'left' | 'right'
 interface IConfirmationDialog {
   open: boolean
   title?: string
   text?: JSX.Element
   cancelText?: string
   confirmText?: string
+  slideDirection?: SlideDirection
   onCancel?: () => void
   onConfirm?: () => void
 }
+
+// const Transition = (props: IConfirmationDialog) => <Slide direction={props.slideDirection || 'left'} {...props} />
 
 class ConfirmationDialog extends React.PureComponent<IConfirmationDialog> {
   handleCancel = () => {
@@ -27,7 +31,7 @@ class ConfirmationDialog extends React.PureComponent<IConfirmationDialog> {
       title = 'Are you sure?',
       text = 'Are you sure?',
       cancelText = 'Cancel',
-      confirmText = 'Confirm',
+      confirmText = 'Confirm'
     } = this.props
 
     return (
