@@ -84,7 +84,6 @@ export const ConvergingNodesWithTasksToggler: FC = () => {
     return emptyArr
   }, [cluster, nodes, match])
 
-
   const { ellipsis, renderPane, divider, flex, paneHeader, paneBody, gridContainer } = useStyles({})
   const allSelectedNodeTasks = selectedNode?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.all_tasks || []
   const lastSelectedNodesFailedTask = selectedNode?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.last_failed_task || []
@@ -92,73 +91,73 @@ export const ConvergingNodesWithTasksToggler: FC = () => {
 
   return (
     <Progress loading={loadingClusters || loadingNodes}>
-    <Grid container className={gridContainer}>
-      <Grid item xs={4}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell padding="checkbox" />
-              <TableCell>Hostname & IP</TableCell>
-              <TableCell>Installation Status</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {nodesInCluster && nodesInCluster.map((node) => {
-              const allTasks = node?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.all_tasks || []
-              const completedTasks = node?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.completed_tasks || []
-              const percentComplete = (completedTasks.length / allTasks.length) * 100
-              const lastCompletedStep = allTasks[completedTasks.length - 1]
-              const progressLabel = `Steps ${completedTasks.length} of ${allTasks.length}: ${lastCompletedStep || ''}`
-              return (
-                <TableRow key={node.uuid} onClick={() => setSelectedNode(node)}>
-                  <TableCell padding="checkbox">
-                    <Radio checked={selectedNode && selectedNode.uuid === node.uuid} />
-                  </TableCell>
-                  <TableCell>
-                    <Tooltip title={node.name}>
-                      <span className={ellipsis}>{node.name}</span>
-                    </Tooltip>
-                    <span>({node.primaryIp})</span>
-                  </TableCell>
-                  <TableCell>
-                    <ProgressBar
-                      compact
-                      width={175}
-                      percent={percentComplete}
-                      label={
-                        <Tooltip title={progressLabel}>
-                          <span className={ellipsis}>{progressLabel}</span>
-                        </Tooltip>
-                      }
-                    />
-                  </TableCell>
-                </TableRow>
-              )
-            })}
-          </TableBody>
-        </Table>
-      </Grid>
-      <Grid item xs={8} className={flex}>
-        <div className={divider} />
-        <Card className={renderPane}>
-          <header className={paneHeader}>
-            <Tooltip title={selectedNodeTitle}>
-              <Typography variant="h6">
-                {selectedNodeTitle}
-              </Typography>
-            </Tooltip>
-            <ExternalLink url="" icon="clipboard-list">
+      <Grid container className={gridContainer}>
+        <Grid item xs={4}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell padding="checkbox" />
+                <TableCell>Hostname & IP</TableCell>
+                <TableCell>Installation Status</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {nodesInCluster && nodesInCluster.map((node) => {
+                const allTasks = node?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.all_tasks || []
+                const completedTasks = node?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.completed_tasks || []
+                const percentComplete = (completedTasks.length / allTasks.length) * 100
+                const lastCompletedStep = allTasks[completedTasks.length - 1]
+                const progressLabel = `Steps ${completedTasks.length} of ${allTasks.length}: ${lastCompletedStep || ''}`
+                return (
+                  <TableRow key={node.uuid} onClick={() => setSelectedNode(node)}>
+                    <TableCell padding="checkbox">
+                      <Radio checked={selectedNode && selectedNode.uuid === node.uuid} />
+                    </TableCell>
+                    <TableCell>
+                      <Tooltip title={node.name}>
+                        <span className={ellipsis}>{node.name}</span>
+                      </Tooltip>
+                      <span>({node.primaryIp})</span>
+                    </TableCell>
+                    <TableCell>
+                      <ProgressBar
+                        compact
+                        width={175}
+                        percent={percentComplete}
+                        label={
+                          <Tooltip title={progressLabel}>
+                            <span className={ellipsis}>{progressLabel}</span>
+                          </Tooltip>
+                        }
+                      />
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
+            </TableBody>
+          </Table>
+        </Grid>
+        <Grid item xs={8} className={flex}>
+          <div className={divider} />
+          <Card className={renderPane}>
+            <header className={paneHeader}>
+              <Tooltip title={selectedNodeTitle}>
+                <Typography variant="h6">
+                  {selectedNodeTitle}
+                </Typography>
+              </Tooltip>
+              <ExternalLink url="" icon="clipboard-list">
               View Logs
-            </ExternalLink>
-          </header>
-          <article className={paneBody}>
-            {selectedNode && (
-              <Tasks allTasks={allSelectedNodeTasks} lastFailedTask={lastSelectedNodesFailedTask} />
-            )}
-          </article>
-        </Card>
+              </ExternalLink>
+            </header>
+            <article className={paneBody}>
+              {selectedNode && (
+                <Tasks allTasks={allSelectedNodeTasks} lastFailedTask={lastSelectedNodesFailedTask} />
+              )}
+            </article>
+          </Card>
+        </Grid>
       </Grid>
-    </Grid>
     </Progress>
   )
 }

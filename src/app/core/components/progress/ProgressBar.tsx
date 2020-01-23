@@ -85,7 +85,7 @@ const ProgressBar = props => {
     label = progress => `${progress}%`,
     variant = 'progress'
   } = props
-  const classes = useStyles({percent, animated, compact, width, height, variant})
+  const classes = useStyles({ percent, animated, compact, width, height, variant })
   return (
     <div className={classes.root}>
       <div className={classes.progressContainer}>

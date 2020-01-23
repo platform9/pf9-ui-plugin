@@ -177,9 +177,9 @@ export interface Palette {
   card: Card
   wizard: Wizard
   code: Code
-  warning: DefaultColorSwatch;
-  success: DefaultColorSwatch;
-  pieChart: PieChart;
+  warning: DefaultColorSwatch
+  success: DefaultColorSwatch
+  pieChart: PieChart
 }
 
 export interface Action {
@@ -349,11 +349,11 @@ export interface ZIndex {
 }
 
 export interface PieChart {
-  success: string;
-  warning: string;
-  error:   string;
-  unknown: string;
-  empty:   string;
+  success: string
+  warning: string
+  error: string
+  unknown: string
+  empty: string
 }
 
 type Theme = ITheme & DefaultTheme
