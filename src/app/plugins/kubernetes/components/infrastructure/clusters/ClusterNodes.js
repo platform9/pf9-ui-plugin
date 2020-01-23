@@ -31,10 +31,10 @@ const ClusterNodes = () => {
       return nodes.filter((node) => clusterNodesUids.includes(node.uuid))
     }
     return emptyArr
-  }, [cluster, nodes, match])
+  }, [cluster, nodes])
 
   const addTaskStatusModal = (columns) => {
-    const healthStatusColumn = { ...columns.find((column) => column.id === 'healthStatus') }
+    const healthStatusColumn = columns.find((column) => column.id === 'healthStatus')
     const originalRender = healthStatusColumn.render
     const updatedRender = (_, node) => {
       setSelectedNode(node)
@@ -61,7 +61,7 @@ const ClusterNodes = () => {
 
   return (
     <Progress loading={loadingClusters || loadingNodes}>
-      <NodesTable data={nodesInCluster} loading={loadingClusters || loadingNodes} />
+      <NodesTable data={nodesInCluster} />
       <TaskStatusDialog isOpen={showTaskDialog} toggleOpen={toggleTaskDialog} node={selectedNode} />
     </Progress>
   )

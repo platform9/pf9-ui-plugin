@@ -31,8 +31,8 @@ const useStyles = makeStyles<Theme, Props>((theme: Theme) => ({
     alignItems: 'center',
     '&:before': {
       content: '\' \'',
-      height: ({ variant }) => variant === 'header' ? 14 : 12,
-      width: ({ variant }) => variant === 'header' ? 14 : 12,
+      height: ({ variant }) => variant === 'header' ? theme.typography.body1.fontSize : theme.typography.body2.fontSize,
+      width: ({ variant }) => variant === 'header' ? theme.typography.body1.fontSize : theme.typography.body2.fontSize,
       marginRight: 5,
       borderRadius: '50%',
       // display: ({ status }) => !status || ['loading', 'error'].includes(status) ? 'none' : 'inline-block',
@@ -45,11 +45,11 @@ const useStyles = makeStyles<Theme, Props>((theme: Theme) => ({
   },
   loading: {
     marginRight: theme.spacing(0.375),
-    fontSize: ({ variant }) => variant === 'header' ? 14 : 12,
+    fontSize: ({ variant }) => variant === 'header' ? theme.typography.body1.fontSize : theme.typography.body2.fontSize,
   },
   error: {
     marginRight: theme.spacing(0.375),
-    fontSize: ({ variant }) => variant === 'header' ? 14 : 12,
+    fontSize: ({ variant }) => variant === 'header' ? theme.typography.body1.fontSize : theme.typography.body2.fontSize,
   },
 }))
 

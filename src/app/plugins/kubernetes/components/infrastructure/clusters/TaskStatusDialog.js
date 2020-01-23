@@ -68,7 +68,8 @@ const TaskStatusDialog = ({ isOpen, toggleOpen, node }) => {
   const { name, isMaster, logs, status } = node
   const {
     all_tasks: allTasks = [],
-    last_failed_task: lastFailedTask
+    last_failed_task: lastFailedTask,
+    completed_tasks: completedTasks
   } = pathStrOr({}, 'combined.resmgr.extensions.pf9_kube_status.data', node)
   const healthStatus = status === 'disconnected' ? 'unknown' : status === 'ok' ? 'healthy' : 'unhealthy'
 
@@ -96,7 +97,7 @@ const TaskStatusDialog = ({ isOpen, toggleOpen, node }) => {
           Here is a log of what got installed
           {healthStatus === 'unhealthy' && ' and where we ran into an error'}:
         </span>
-        <Tasks allTasks={allTasks} lastFailedTask={lastFailedTask} />
+        <Tasks allTasks={allTasks} lastFailedTask={lastFailedTask} completedTasks={completedTasks} />
       </DialogContent>
     </Dialog>
   )

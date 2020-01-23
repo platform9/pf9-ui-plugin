@@ -131,12 +131,10 @@ const ClusterStatusAndUsage = ({ cluster }) => {
     <Grid container className={classes.statsContainer}>
       <Grid item xs={4}>
         <div className={classes.statusItems}>
-          <HeaderCard title={name} body={
-            <>
-              <ClusterConnectionStatus cluster={cluster} variant="header" />
-              <ClusterHealthStatus cluster={cluster} variant="header" />
-            </>
-          } />
+          <HeaderCard title={name}>
+            <ClusterConnectionStatus cluster={cluster} variant="header" />
+            <ClusterHealthStatus cluster={cluster} variant="header" />
+          </HeaderCard>
         </div>
       </Grid>
       <Grid item xs={8}>
@@ -150,7 +148,7 @@ const ClusterStatusAndUsage = ({ cluster }) => {
   )
 }
 
-const HeaderCard = ({ title, body }) => {
+const HeaderCard = ({ title, children }) => {
   const classes = useStyles()
   return (
     <Card className={classes.headerCardContainer}>
@@ -160,7 +158,7 @@ const HeaderCard = ({ title, body }) => {
         <FontAwesomeIcon className={classes.headerIcon}>project-diagram</FontAwesomeIcon>
       </header>
       <div className={classes.headerCardBody}>
-        {body}
+        {children}
       </div>
       <hr className={classes.cardBoarder} />
     </Card>

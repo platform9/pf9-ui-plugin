@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { FC } from 'react'
 import { ensureFunction } from 'utils/fp'
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
@@ -12,7 +12,7 @@ interface Props {
   width?: string | number
   height?: string | number
   containedPercent?: boolean
-  label?: string | React.ReactNode | LabelRenderProp
+  label?: string | JSX.Element | LabelRenderProp
   variant?: 'progress' | 'health'
   color?: 'error' | 'success'
 }
@@ -78,18 +78,17 @@ const useStyles = makeStyles<Theme, Props>(theme => ({
   },
 }))
 
-const ProgressBar = props => {
-  const {
-    percent,
-    animated = false,
-    containedPercent = false,
-    compact = false,
-    width = 145,
-    height = 15,
-    label = progress => `${progress}%`,
-    variant = 'progress',
-    color = undefined
-  } = props
+const ProgressBar: FC<Props> = ({
+  percent,
+  animated = false,
+  containedPercent = false,
+  compact = false,
+  width = 145,
+  height = 15,
+  label = progress => `${progress}%`,
+  variant = 'progress',
+  color = undefined
+}) => {
   const classes = useStyles({ percent, animated, compact, width, height, variant, color })
   return (
     <div className={classes.root}>
