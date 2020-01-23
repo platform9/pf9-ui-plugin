@@ -1,5 +1,5 @@
 import React from 'react'
-import { Dialog, DialogTitle, DialogContent } from '@material-ui/core'
+import { Dialog, DialogTitle, DialogContent, Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import CloseIcon from '@material-ui/icons/Close'
 import clsx from 'clsx'
@@ -93,7 +93,7 @@ const TaskStatusDialog = ({ isOpen, toggleOpen, node }) => {
           Here is a log of what got installed
           {healthStatus === 'unhealthy' && ' and where we ran into an error'}:
         </span>
-        <Tasks allTasks={allTasks} lastFailedTask={lastFailedTask} classes={classes} />
+        <Tasks allTasks={allTasks} lastFailedTask={lastFailedTask} />
       </DialogContent>
     </Dialog>
   )
@@ -118,12 +118,15 @@ const columns = [
 
 const TasksTable = createListTableComponent({
   columns,
+  uniqueIdentifier: 'task',
   showCheckboxes: false,
   paginate: false,
   compactTable: true,
+  emptyText: <Typography variant="body1">No status information available.</Typography>
 })
 
-const Tasks =({ allTasks, lastFailedTask, classes }) => {
+export const Tasks = ({ allTasks, lastFailedTask }) => {
+  const classes = useStyles()
   const failedTaskIndex = allTasks.indexOf(lastFailedTask)
   const completedTasks = failedTaskIndex >=0 ? failedTaskIndex : allTasks.length
   const getStatus = (index) => {

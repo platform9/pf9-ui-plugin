@@ -35,6 +35,7 @@ const UsageBar = ({ stat }) => {
     <ProgressBar
       compact
       percent={percent}
+      variant="health"
       label={p => <span><strong>{p}%</strong> - {cur}/{max}{stat.units} {stat.type}</span>}
     />
   )

@@ -10,13 +10,24 @@ import ClusterNodes from './ClusterNodes'
 import PageContainer from 'core/components/pageContainer/PageContainer'
 import SimpleLink from 'core/components/SimpleLink'
 import { makeStyles } from '@material-ui/styles'
-import { Typography, Grid } from '@material-ui/core'
+import { Grid, Card, Typography } from '@material-ui/core'
 import useDataLoader from 'core/hooks/useDataLoader'
 import useReactRouter from 'use-react-router'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import { ClusterConnectionStatus, ClusterHealthStatus } from 'k8s/components/infrastructure/clusters/ClusterStatus'
+import { ConvergingNodesWithTasksToggler } from '../nodes/ConvergingNodeBreakdown'
+import { pathToClusters } from 'core/utils/routes'
+import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 
 const useStyles = makeStyles((theme) => ({
+  cardBoarder: {
+    height: 1,
+    display: 'flex',
+    border: 'none',
+    backgroundColor: theme.palette.text.disabled,
+    borderRadius: '100%',
+    margin: theme.spacing(0, 1),
+  },
   backLink: {
     marginBottom: theme.spacing(2),
   },
@@ -33,11 +44,48 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'flex-start',
-    paddingTop: theme.spacing(),
     '& > *': {
       marginRight: theme.spacing(2)
     }
-  }
+  },
+  headerCardContainer: {
+    minWidth: 300,
+    minHeight: 150,
+    display: 'grid',
+    gridTemplateRows: '66px 1fr 1px',
+    padding: theme.spacing(2, 0, 1.5, 0),
+  },
+  headerCardBody: {
+    display: 'block',
+    margin: theme.spacing(0, 3),
+  },
+  headerCardHeader: {
+    margin: theme.spacing(0, 2),
+    display: 'grid',
+    gridTemplateColumns: '1fr auto',
+    gridTemplateAreas: `
+      "header icon"
+      "cluster icon"
+    `,
+    '& h6': {
+      gridArea: 'header',
+      margin: 0,
+      fontSize: theme.spacing(2.5),
+      color: theme.palette.text.primary,
+    },
+    '& p': {
+      gridArea: 'cluster',
+      margin: '6px 0 6px 8px',
+      fontSize: theme.spacing(2),
+      color: theme.palette.text.secondary,
+    }
+  },
+  headerIcon: {
+    gridArea: 'icon',
+    fontSize: '36px',
+    marginTop: theme.spacing(),
+    color: theme.palette.dashboardCard.icon,
+  },
 }))
 
 const ClusterDetailsPage = () => {
@@ -45,13 +93,12 @@ const ClusterDetailsPage = () => {
   const classes = useStyles()
   const [clusters, loading] = useDataLoader(clusterActions.list)
   const cluster = clusters.find((x) => x.uuid === match.params.id) || {}
-  const { name } = cluster
   return (
     <PageContainer
       header={
         <>
-          <Typography variant="h5">Cluster {name}</Typography>
-          <SimpleLink src={'/ui/kubernetes/infrastructure#clusters'} className={classes.backLink}>
+          <span />
+          <SimpleLink src={pathToClusters()} className={classes.backLink}>
             « Back to Cluster List
           </SimpleLink>
         </>
@@ -60,11 +107,14 @@ const ClusterDetailsPage = () => {
       <Progress loading={loading}>
         <ClusterStatusAndUsage cluster={cluster} />
         <Tabs>
-          <Tab value="configuration" label="Details">
-            <ClusterInfo />
-          </Tab>
-          <Tab value="nodesAndHealthInfo" label="Nodes & Health Info">
+          <Tab value="nodes" label="Nodes">
             <ClusterNodes />
+          </Tab>
+          <Tab value="convergingNodes" label="Converging Nodes">
+            <ConvergingNodesWithTasksToggler />
+          </Tab>
+          <Tab value="clusterDetails" label="Cluster Details">
+            <ClusterInfo />
           </Tab>
         </Tabs>
       </Progress>
@@ -75,14 +125,18 @@ const ClusterDetailsPage = () => {
 export default ClusterDetailsPage
 
 const ClusterStatusAndUsage = ({ cluster }) => {
-  const { usage = emptyObj } = cluster
+  const { usage = emptyObj, name } = cluster
   const classes = useStyles()
   return (
     <Grid container className={classes.statsContainer}>
       <Grid item xs={4}>
         <div className={classes.statusItems}>
-          <ClusterConnectionStatus cluster={cluster} variant="header" />
-          <ClusterHealthStatus cluster={cluster} variant="header" />
+          <HeaderCard title={name} body={
+            <>
+              <ClusterConnectionStatus cluster={cluster} variant="header" />
+              <ClusterHealthStatus cluster={cluster} variant="header" />
+            </>
+          } />
         </div>
       </Grid>
       <Grid item xs={8}>
@@ -93,5 +147,22 @@ const ClusterStatusAndUsage = ({ cluster }) => {
         </div>
       </Grid>
     </Grid>
+  )
+}
+
+const HeaderCard = ({ title, body }) => {
+  const classes = useStyles()
+  return (
+    <Card className={classes.headerCardContainer}>
+      <header className={classes.headerCardHeader}>
+        <Typography variant="h6">Cluster</Typography>
+        <Typography variant="subtitle1" component="p">{title}</Typography>
+        <FontAwesomeIcon className={classes.headerIcon}>project-diagram</FontAwesomeIcon>
+      </header>
+      <div className={classes.headerCardBody}>
+        {body}
+      </div>
+      <hr className={classes.cardBoarder} />
+    </Card>
   )
 }

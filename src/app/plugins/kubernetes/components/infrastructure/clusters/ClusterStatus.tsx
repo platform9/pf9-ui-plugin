@@ -27,14 +27,13 @@ const useStyles = makeStyles<Theme, Props>(theme => ({
   },
   circle: {
     display: 'inline-flex',
-    flexDirection: ({ variant }) => variant === 'header' ? 'column-reverse' : 'row',
+    flexDirection: 'row',
     alignItems: 'center',
     '&:before': {
       content: '\' \'',
-      height: ({ variant }) => variant === 'header' ? 30 : 14,
-      width: ({ variant }) => variant === 'header' ? 30 : 14,
-      marginTop: ({ variant }) => variant === 'header' ? theme.spacing() : 0,
-      marginRight: 3,
+      height: ({ variant }) => variant === 'header' ? 14 : 12,
+      width: ({ variant }) => variant === 'header' ? 14 : 12,
+      marginRight: 5,
       borderRadius: '50%',
       // display: ({ status }) => !status || ['loading', 'error'].includes(status) ? 'none' : 'inline-block',
       backgroundColor: ({ status }) => ({
@@ -46,11 +45,11 @@ const useStyles = makeStyles<Theme, Props>(theme => ({
   },
   loading: {
     marginRight: theme.spacing(0.375),
-    fontSize: ({ variant }) => variant === 'header' ? 20 : 14,
+    fontSize: ({ variant }) => variant === 'header' ? 14 : 12,
   },
   error: {
     marginRight: theme.spacing(0.375),
-    fontSize: ({ variant }) => variant === 'header' ? 20 : 14,
+    fontSize: ({ variant }) => variant === 'header' ? 14 : 12,
   },
 }))
 
@@ -68,7 +67,7 @@ const ClusterStatusSpan: FC<Props> = props => {
   return <div className={root}>
     {label && <span className={labelCls}>{label}:</span>}
     <Tooltip title={title || children}>
-      <Typography className={circle} variant={variant === 'header' ? 'h5' : 'body2'}>
+      <Typography className={circle} variant={variant === 'header' ? 'body1' : 'body2'}>
         {status === 'loading' && <i className={clsx(loading, 'fal fa-lg fa-spin fa-sync')} />}
         {status === 'error' && <i className={clsx(error, 'fas fa-exclamation-triangle')} />}
         {children}
@@ -115,7 +114,7 @@ const renderTransientStatus = (connectionStatus, progressPercent, variant) => {
   )
 }
 
-interface IClusterStatusProps {cluster: ICluster, variant: StatusVariant}
+interface IClusterStatusProps { cluster: ICluster, variant: StatusVariant }
 export const ClusterHealthStatus: FC<IClusterStatusProps> = ({ cluster, variant = 'table' }) => {
   if (isTransientStatus(cluster.healthStatus)) {
     return renderTransientStatus(cluster.healthStatus, cluster.progressPercent, variant)

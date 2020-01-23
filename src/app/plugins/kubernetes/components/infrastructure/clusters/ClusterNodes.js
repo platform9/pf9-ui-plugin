@@ -11,8 +11,11 @@ import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
 import useToggler from 'core/hooks/useToggler'
 import TaskStatusDialog from './TaskStatusDialog'
+import Progress from 'core/components/progress/Progress'
 
-const tableColumns = columns.filter(column => !['clusterName', 'isSpotInstance'].includes(column.id))
+const tableColumns = columns.filter(
+  (column) => !['clusterName', 'isSpotInstance'].includes(column.id),
+)
 
 const ClusterNodes = () => {
   const { match } = useReactRouter()
@@ -21,24 +24,26 @@ const ClusterNodes = () => {
   const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
   const [nodes, loadingNodes, reload] = useDataLoader(loadNodes)
   const handleRefresh = useCallback(() => reload(true), [reload])
-  const cluster = clusters.find(cluster => cluster.uuid === match.params.id)
+  const cluster = clusters.find((cluster) => cluster.uuid === match.params.id)
   const nodesInCluster = useMemo(() => {
     if (cluster) {
       const clusterNodesUids = pluck('uuid', cluster.nodes)
-      return nodes.filter(node => clusterNodesUids.includes(node.uuid))
+      return nodes.filter((node) => clusterNodesUids.includes(node.uuid))
     }
     return emptyArr
   }, [cluster, nodes, match])
 
   const addTaskStatusModal = (columns) => {
-    const healthStatusColumn = { ...columns.find(column => column.id === 'healthStatus') }
+    const healthStatusColumn = { ...columns.find((column) => column.id === 'healthStatus') }
     const originalRender = healthStatusColumn.render
     const updatedRender = (_, node) => {
       setSelectedNode(node)
       return originalRender(_, node, toggleTaskDialog)
     }
 
-    return columns.map(column => column.id === 'healthStatus' ? { ...column, render: updatedRender } : column)
+    return columns.map((column) =>
+      column.id === 'healthStatus' ? { ...column, render: updatedRender } : column,
+    )
   }
 
   const nodeColumns = addTaskStatusModal(tableColumns)
@@ -55,10 +60,10 @@ const ClusterNodes = () => {
   })
 
   return (
-    <div>
+    <Progress loading={loadingClusters || loadingNodes}>
       <NodesTable data={nodesInCluster} loading={loadingClusters || loadingNodes} />
       <TaskStatusDialog isOpen={showTaskDialog} toggleOpen={toggleTaskDialog} node={selectedNode} />
-    </div>
+    </Progress>
   )
 }
 
