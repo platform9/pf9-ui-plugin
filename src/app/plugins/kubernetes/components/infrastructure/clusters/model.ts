@@ -1,3 +1,5 @@
+export type HealthStatus = 'healthy' | 'partially_healthy' | 'unhealthy' | 'unknown'
+
 export interface ICluster {
   name: string
   uuid: string
@@ -59,6 +61,12 @@ export interface ICluster {
   masterNodes: any[]
   progressPercent: null
   healthyMasterNodes: any[]
+  workerNodes: any[]
+  healthyWorkerNodes: any[]
+  masterNodesHealthStatus: HealthStatus
+  workerNodesHealthStatus: HealthStatus
+  connectionStatus: string
+  healthStatus: string
   hasMasterNode: boolean
   highlyAvailable: boolean
   links: Links

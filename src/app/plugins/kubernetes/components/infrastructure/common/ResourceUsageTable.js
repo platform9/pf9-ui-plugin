@@ -40,6 +40,7 @@ const ResourceUsageTable = ({ label, valueConverter, usedText, units, stats, pre
         <span className={classes.percent}>
           <ProgressBar
             width={140}
+            variant="health"
             percent={percent}
             label={percentStr}
           />
