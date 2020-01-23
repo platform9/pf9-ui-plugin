@@ -16,7 +16,7 @@ import ClusterSync from './ClusterSync'
 import { capitalizeString } from 'utils/misc'
 import Theme from 'core/themes/model'
 
-const useStyles = makeStyles<Theme, Props>(theme => ({
+const useStyles = makeStyles<Theme, Props>((theme: Theme) => ({
   root: {
     display: 'flex',
     flexFlow: 'row nowrap',
@@ -37,10 +37,10 @@ const useStyles = makeStyles<Theme, Props>(theme => ({
       borderRadius: '50%',
       // display: ({ status }) => !status || ['loading', 'error'].includes(status) ? 'none' : 'inline-block',
       backgroundColor: ({ status }) => ({
-        ok: '#31DA6D',
-        pause: '#fec35d',
-        fail: '#F16E3F',
-      }[status] || '#F16E3F')
+        ok: theme.palette.pieChart.success,
+        pause: theme.palette.pieChart.warning,
+        fail: theme.palette.pieChart.error,
+      }[status] || theme.palette.pieChart.error)
     },
   },
   loading: {
