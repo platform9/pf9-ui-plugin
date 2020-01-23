@@ -43,8 +43,6 @@ const ListPage = ({ ListContainer }) => {
         return !node.clusterUuid
       } else if (params.clusterId) {
         return node.clusterUuid === params.clusterId
-      } else {
-        return true
       }
     })
 
