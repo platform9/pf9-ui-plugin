@@ -1,7 +1,6 @@
 import React, { useState, FC, useMemo } from 'react'
 import useReactRouter from 'use-react-router'
 import {
-  Grid,
   Table,
   TableHead,
   TableRow,
@@ -29,8 +28,7 @@ const useStyles = makeStyles<Theme, {}>((theme) => ({
     marginTop: theme.spacing(2),
   },
   ellipsis: {
-    maxWidth: 175,
-    width: 175,
+    maxWidth: 160,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
@@ -43,14 +41,11 @@ const useStyles = makeStyles<Theme, {}>((theme) => ({
     transition: 'all 2s ease-out',
     minWidth: '400px',
     background: 'white',
-    marginLeft: '16px',
   },
   divider: {
-    display: 'flex',
     backgroundColor: 'transparent',
-    flex: '0 0 5px',
+    width: 5,
     borderRadius: '10px',
-    marginLeft: '16px',
     boxShadow: 'inset 0px 0px 2px 1px rgba(0,0,0,0.25)',
   },
   flex: {
@@ -66,6 +61,16 @@ const useStyles = makeStyles<Theme, {}>((theme) => ({
   paneBody: {
     padding: theme.spacing(2),
   },
+  tableChooser: {
+    marginTop: theme.spacing(2),
+    display: 'grid',
+    gridTemplateColumns: `
+      minmax(400px, 450px)
+      5px
+      minmax(400px, 600px)
+    `,
+    gridGap: theme.spacing(2),
+  }
 }))
 
 export const ConvergingNodesWithTasksToggler: FC = () => {
@@ -84,80 +89,81 @@ export const ConvergingNodesWithTasksToggler: FC = () => {
     return emptyArr
   }, [cluster, nodes, match])
 
-  const { ellipsis, renderPane, divider, flex, paneHeader, paneBody, gridContainer } = useStyles({})
-  const allSelectedNodeTasks = selectedNode?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.all_tasks || []
+  const { ellipsis, renderPane, divider, paneHeader, paneBody, tableChooser } = useStyles({})
+  const selectedNodeAllTasks = selectedNode?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.all_tasks || []
+  const selectedNodeCompletedTasks = selectedNode?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.completed_tasks || []
   const lastSelectedNodesFailedTask = selectedNode?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.last_failed_task || []
   const selectedNodeTitle = `${selectedNode?.name || 'Choose a node to continue'}${selectedNode?.isMaster ? ' (master)' : ''}`
 
   return (
     <Progress loading={loadingClusters || loadingNodes}>
-      <Grid container className={gridContainer}>
-        <Grid item xs={4}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell padding="checkbox" />
-                <TableCell>Hostname & IP</TableCell>
-                <TableCell>Installation Status</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {nodesInCluster && nodesInCluster.map((node) => {
-                const allTasks = node?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.all_tasks || []
-                const completedTasks = node?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.completed_tasks || []
-                const percentComplete = (completedTasks.length / allTasks.length) * 100
-                const lastCompletedStep = allTasks[completedTasks.length - 1]
-                const progressLabel = `Steps ${completedTasks.length} of ${allTasks.length}: ${lastCompletedStep || ''}`
-                return (
-                  <TableRow key={node.uuid} onClick={() => setSelectedNode(node)}>
-                    <TableCell padding="checkbox">
-                      <Radio checked={selectedNode && selectedNode.uuid === node.uuid} />
-                    </TableCell>
-                    <TableCell>
-                      <Tooltip title={node.name}>
-                        <span className={ellipsis}>{node.name}</span>
-                      </Tooltip>
-                      <span>({node.primaryIp})</span>
-                    </TableCell>
-                    <TableCell>
-                      <ProgressBar
-                        compact
-                        width={175}
-                        percent={percentComplete}
-                        label={
-                          <Tooltip title={progressLabel}>
-                            <span className={ellipsis}>{progressLabel}</span>
-                          </Tooltip>
-                        }
-                      />
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
-        </Grid>
-        <Grid item xs={8} className={flex}>
-          <div className={divider} />
-          <Card className={renderPane}>
-            <header className={paneHeader}>
-              <Tooltip title={selectedNodeTitle}>
-                <Typography variant="h6">
-                  {selectedNodeTitle}
-                </Typography>
-              </Tooltip>
-              <ExternalLink url="" icon="clipboard-list">
-              View Logs
+      <div className={tableChooser}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell padding="checkbox" />
+              <TableCell>Hostname & IP</TableCell>
+              <TableCell>Installation Status</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {nodesInCluster && nodesInCluster.map((node) => {
+              const lastFailedTask = node?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.last_failed_task || null
+              const allTasks = node?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.all_tasks || []
+              const completedTasks = node?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.completed_tasks || []
+              const percentComplete = (completedTasks.length / allTasks.length) * 100
+              const lastCompletedStep = allTasks[completedTasks.length - 1]
+              const progressLabel = `Steps ${completedTasks.length} of ${allTasks.length}: ${lastCompletedStep || ''}`
+              return (
+                <TableRow key={node.uuid} onClick={() => setSelectedNode(node)}>
+                  <TableCell padding="checkbox">
+                    <Radio checked={selectedNode && selectedNode.uuid === node.uuid} />
+                  </TableCell>
+                  <TableCell>
+                    <Tooltip title={node.name}>
+                      <span className={ellipsis}>{node.name}</span>
+                    </Tooltip>
+                    <span>({node.primaryIp})</span>
+                  </TableCell>
+                  <TableCell>
+                    <ProgressBar
+                      compact
+                      width={'100%'}
+                      percent={percentComplete}
+                      color={lastFailedTask ? 'error' : 'success'}
+                      label={
+                        <Tooltip title={progressLabel}>
+                          <span className={ellipsis}>{progressLabel}</span>
+                        </Tooltip>
+                      }
+                    />
+                  </TableCell>
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </Table>
+        <div className={divider} />
+        <Card className={renderPane}>
+          <header className={paneHeader}>
+            <Tooltip title={selectedNodeTitle}>
+              <Typography variant="h6">
+                {selectedNodeTitle}
+              </Typography>
+            </Tooltip>
+            { !!selectedNode && (
+              <ExternalLink url={selectedNode?.logs} icon="clipboard-list">
+                View Logs
               </ExternalLink>
-            </header>
-            <article className={paneBody}>
-              {selectedNode && (
-                <Tasks allTasks={allSelectedNodeTasks} lastFailedTask={lastSelectedNodesFailedTask} />
-              )}
-            </article>
-          </Card>
-        </Grid>
-      </Grid>
+            )}
+          </header>
+          <article className={paneBody}>
+            {selectedNode && (
+              <Tasks allTasks={selectedNodeAllTasks} lastFailedTask={lastSelectedNodesFailedTask} completedTasks={selectedNodeCompletedTasks} />
+            )}
+          </article>
+        </Card>
+      </div>
     </Progress>
   )
 }

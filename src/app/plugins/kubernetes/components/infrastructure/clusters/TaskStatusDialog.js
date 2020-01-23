@@ -6,7 +6,7 @@ import clsx from 'clsx'
 import ExternalLink from 'core/components/ExternalLink'
 import ClusterStatusSpan from 'k8s/components/infrastructure/clusters/ClusterStatus'
 import createListTableComponent from 'core/helpers/createListTableComponent'
-import { noop } from 'utils/fp'
+import { noop, pathStrOr } from 'utils/fp'
 import { capitalizeString } from 'utils/misc'
 import {
   clusterHealthStatusFields,
@@ -66,7 +66,10 @@ const TaskStatusDialog = ({ isOpen, toggleOpen, node }) => {
   }
 
   const { name, isMaster, logs, status } = node
-  const { all_tasks: allTasks = [], last_failed_task: lastFailedTask } = node.combined.resmgr.extensions.pf9_kube_status.data
+  const {
+    all_tasks: allTasks = [],
+    last_failed_task: lastFailedTask
+  } = pathStrOr({}, 'combined.resmgr.extensions.pf9_kube_status.data', node)
   const healthStatus = status === 'disconnected' ? 'unknown' : status === 'ok' ? 'healthy' : 'unhealthy'
 
   return (
@@ -125,12 +128,12 @@ const TasksTable = createListTableComponent({
   emptyText: <Typography variant="body1">No status information available.</Typography>
 })
 
-export const Tasks = ({ allTasks, lastFailedTask }) => {
+export const Tasks = ({ allTasks, completedTasks = [], lastFailedTask }) => {
   const classes = useStyles()
   const failedTaskIndex = allTasks.indexOf(lastFailedTask)
-  const completedTasks = failedTaskIndex >=0 ? failedTaskIndex : allTasks.length
+  const completedTaskCount = failedTaskIndex >=0 ? failedTaskIndex : completedTasks.length
   const getStatus = (index) => {
-    if (failedTaskIndex < 0) {
+    if (index <= (completedTasks.length - 1)) {
       return 'completed'
     }
 
@@ -145,7 +148,7 @@ export const Tasks = ({ allTasks, lastFailedTask }) => {
   return (
     <div>
       <TasksTable data={tasksWithStatus} onSortChange={noop} />
-      <div className={classes.tasksCompleted}>{completedTasks} out of {allTasks.length} tasks completed</div>
+      <div className={classes.tasksCompleted}>{completedTaskCount} out of {allTasks.length} tasks completed</div>
     </div>
   )
 }

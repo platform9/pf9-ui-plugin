@@ -14,6 +14,7 @@ interface Props {
   containedPercent?: boolean
   label?: string | React.ReactNode | LabelRenderProp
   variant?: 'progress' | 'health'
+  color?: 'error' | 'success'
 }
 
 const useStyles = makeStyles<Theme, Props>(theme => ({
@@ -61,7 +62,10 @@ const useStyles = makeStyles<Theme, Props>(theme => ({
       ? 'linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent)'
       : null,
     backgroundSize: '40px 40px',
-    backgroundColor: ({ animated, percent, variant }) => {
+    backgroundColor: ({ animated, percent, variant, color }) => {
+      if (color) {
+        return theme.palette[color].main
+      }
       if (animated) return theme.palette.primary.main
       if (variant === 'health') {
         if (percent >= 90) return theme.palette.error.main
@@ -83,9 +87,10 @@ const ProgressBar = props => {
     width = 145,
     height = 15,
     label = progress => `${progress}%`,
-    variant = 'progress'
+    variant = 'progress',
+    color = undefined
   } = props
-  const classes = useStyles({ percent, animated, compact, width, height, variant })
+  const classes = useStyles({ percent, animated, compact, width, height, variant, color })
   return (
     <div className={classes.root}>
       <div className={classes.progressContainer}>
