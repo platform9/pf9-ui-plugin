@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback } from 'react'
 import {
   Typography,
   Dialog,
@@ -12,7 +12,7 @@ import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import Progress from 'core/components/progress/Progress'
 import TextField from 'core/components/validatedForm/TextField'
 import useDataUpdater from 'core/hooks/useDataUpdater'
-import DeauthNodeDialog from '../nodes/DeauthNodeDialog'
+// import DeauthNodeDialog from '../nodes/DeauthNodeDialog'
 import { ICluster } from './model'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 
@@ -23,18 +23,18 @@ interface IClusterDeleteDialog {
 
 const stopPropagation = (e) => e.stopPropagation()
 const ClusterDeleteDialog: React.FC<IClusterDeleteDialog> = ({ rows: [cluster], onClose }) => {
-  const [showDeauthNodeDialog, setShowDeauthNodeDialog] = useState(false)
+  // const [showDeauthNodeDialog, setShowDeauthNodeDialog] = useState(false)
   const [deleteCluster, deletingCluster] = useDataUpdater(clusterActions.delete, () =>
-    setShowDeauthNodeDialog(true),
+    // TODO: If deauth node feature is supported after cluster delete then enable this feature
+    // cluster?.nodes.length > 0 ? setShowDeauthNodeDialog(true) : onClose()
+    onClose(),
   )
-  const title = `Confirm delete cluster "${cluster.name}"?`
+  const title = `Confirm delete cluster "${cluster?.name}"?`
   const handleDelete = useCallback(async () => {
     await deleteCluster(cluster)
   }, [cluster])
 
-  if (showDeauthNodeDialog) {
-    return <DeauthNodeDialog nodeList={cluster.nodes} onClose={onClose} />
-  }
+  // if (showDeauthNodeDialog) return <DeauthNodeDialog nodeList={cluster.nodes} onClose={onClose} />
 
   return (
     <Dialog open onClose={onClose} onClick={stopPropagation}>

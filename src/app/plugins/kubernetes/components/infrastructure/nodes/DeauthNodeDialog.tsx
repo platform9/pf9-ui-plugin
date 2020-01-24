@@ -1,5 +1,4 @@
-import React, { useCallback, useState } from 'react'
-import { pluck } from 'ramda'
+import React, { useState } from 'react'
 import {
   Typography,
   DialogActions,
@@ -19,21 +18,29 @@ interface IDeauthNodeDialogProps {
   onClose: () => void
 }
 
+interface IDeauthNode {
+  uuid: string
+  name: string
+  primaryIp: string
+  role: string
+}
+
+type IHandleOnSelectAll = (selectedNode: IDeauthNode[], isSelected: boolean) => void
+type IHandleDeauthNodeSelection = (selectedNode: IDeauthNode, isSelected) => void
+
 const column = [
   { id: 'name', label: 'Name' },
   { id: 'status', label: 'Status' },
   { id: 'primaryIp', label: 'IP' },
   { id: 'role', label: 'Role' },
 ]
-
-const getNodeId = pluck('id')
 const stopPropagation = (e) => e.stopPropagation()
 const getNodeList = (nodeList) =>
   nodeList.map(({ uuid, status, primaryIp, name, isMaster }) => {
     const healthStatus =
       status === 'disconnected' ? 'unknown' : status === 'ok' ? 'healthy' : 'unhealthy'
     const role = isMaster ? 'Master' : 'Worker'
-    return { id: uuid, name, status: healthStatus, primaryIp, role }
+    return { uuid, name, status: healthStatus, primaryIp, role }
   })
 
 const DeauthNodeDialog: React.FunctionComponent<IDeauthNodeDialogProps> = ({
@@ -42,22 +49,20 @@ const DeauthNodeDialog: React.FunctionComponent<IDeauthNodeDialogProps> = ({
 }) => {
   const [selectedNodeList, setSelectedNodeList] = useState([])
   const [deAuthNodeList, deAuthingNode] = useDataUpdater(deAuthNode, onClose)
-  const handleDelete = useCallback(async () => {
-    await deAuthNodeList(getNodeId(selectedNodeList))
-  }, [nodeList])
-  const nodeData = getNodeList(nodeList)
-  const handleDeauthNodeSelection = (node, isSelected: boolean) => {
-    const selectedIndex: number = nodeData.indexOf(node)
+  const handleDelete = async () => {
+    const responseList = await Promise.all(selectedNodeList.map((node) => deAuthNodeList(node)))
+    console.log(JSON.stringify(responseList))
+  }
+  const nodeData: IDeauthNode[] = getNodeList(nodeList)
+  const handleDeauthNodeSelection: IHandleDeauthNodeSelection = (selectedNode, isSelected) => {
     if (isSelected) {
-      setSelectedNodeList(selectedNodeList.filter((n) => n.id !== node.id))
+      setSelectedNodeList(selectedNodeList.filter((node) => node.uuid !== selectedNode.uuid))
     } else {
-      setSelectedNodeList(
-        [].concat(nodeData.slice(0, selectedIndex), nodeData.slice(selectedIndex + 1)),
-      )
+      setSelectedNodeList(selectedNodeList.concat([selectedNode]))
     }
   }
 
-  const handleOnSelectAll = (selectedNodes, selected) => {
+  const handleOnSelectAll: IHandleOnSelectAll = (selectedNodes, selected) => {
     selected ? setSelectedNodeList(selectedNodes) : setSelectedNodeList([])
   }
 
@@ -74,6 +79,7 @@ const DeauthNodeDialog: React.FunctionComponent<IDeauthNodeDialogProps> = ({
             multiSelection
             columns={column}
             data={nodeData}
+            selectedRows={selectedNodeList}
             onSelect={handleDeauthNodeSelection}
             onSelectAll={handleOnSelectAll}
           />

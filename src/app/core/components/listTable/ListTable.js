@@ -1,4 +1,3 @@
-/* eslint-disable space-before-function-paren */
 /* eslint-disable react/no-did-update-set-state */
 
 import React, { PureComponent } from 'react'
@@ -138,7 +137,7 @@ class ListTable extends PureComponent {
       newSelected = uniq([...selectedRows, ...paginatedData])
     } else {
       // Remove active paginated rows from selected
-      newSelected = selectedRows.filter(row => !paginatedData.includes(row))
+      newSelected = selectedRows.filter((row) => !paginatedData.includes(row))
     }
     if (onSelectedRowsChange) {
       // Controlled mode
@@ -153,8 +152,9 @@ class ListTable extends PureComponent {
   }
 
   handleClick = moize(
-    (row, isSelected) => (event) => {
+    (row) => (event) => {
       const { selected } = this.state
+      const isSelected = this.isSelected(row)
       const { multiSelection, onSelectedRowsChange, onSelect, selectedRows = selected } = this.props
       if (!multiSelection) {
         if (onSelectedRowsChange) {
@@ -336,7 +336,7 @@ class ListTable extends PureComponent {
   isSelected = (row) => {
     const { selected } = this.state
     const { selectedRows = selected } = this.props
-    return selectedRows.includes(row)
+    return includes(row, selectedRows)
   }
 
   paginate = (data) => {
@@ -413,11 +413,11 @@ class ListTable extends PureComponent {
 
     const checkboxProps = showCheckboxes
       ? {
-        onClick: this.handleClick(row, isSelected),
-        role: 'checkbox',
-        tabIndex: -1,
-        selected: isSelected,
-      }
+          onClick: this.handleClick(row),
+          role: 'checkbox',
+          tabIndex: -1,
+          selected: isSelected,
+        }
       : {}
 
     const uid = uniqueIdentifier instanceof Function ? uniqueIdentifier(row) : row[uniqueIdentifier]
@@ -670,7 +670,7 @@ ListTable.propTypes = {
 
   selectedRows: PropTypes.array,
   onSelectedRowsChange: PropTypes.func,
-  onSelect: PropTypes.funcselectedRows,
+  onSelect: PropTypes.func,
   size: PropTypes.oneOf(['small', 'medium']),
   compactTable: PropTypes.bool,
 

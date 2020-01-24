@@ -55,7 +55,7 @@ const useStyles = makeStyles(theme => ({
       : null,
     backgroundSize: '40px 40px',
     backgroundColor: ({ animated, percent }) => {
-      if (animated) return theme.primary.main
+      if (animated) return theme.palette.primary.main
       if (percent >= 90) return theme.palette.error.main
       if (percent >= 80) return theme.palette.warning.main
 

@@ -60,11 +60,15 @@ export const loadNodes = createContextLoader(nodesCacheKey, async (params, loadF
 })
 
 export const deAuthNode = createContextUpdater('nodes', async (node, prevItems) => {
-  await resmgr.unauthorizeHost(node.uuid)
+  console.log(JSON.stringify(node))
+  // eslint-disable-next-line no-debugger
+  debugger
+  const response = await resmgr.unauthorizeHost(node.uuid)
+  console.log(JSON.stringify(node))
   // Something in `createContextUpdater` is refreshing the API calls for nodes automagically.
   // This what I would be doing manually so it works out fine but I'm a bit concerned
   // that it is not being invoked explicitly from within this action.
-  return prevItems
+  return response
 }, {
   successMessage: (updatedItems, prevItems, node) => {
     return `Successfully de-authorized node ${node.name} (${node.primaryIp})`

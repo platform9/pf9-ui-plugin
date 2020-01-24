@@ -301,7 +301,7 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
     return body
   },
   deleteFn: async ({ uuid }) => {
-    // await qbert.deleteCluster(uuid)
+    await qbert.deleteCluster(uuid)
     // Refresh clusters since combinedHosts will still
     // have references to the deleted cluster.
     loadCombinedHosts.invalidateCache()
