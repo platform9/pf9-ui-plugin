@@ -47,6 +47,7 @@ const createCRUDComponents = options => {
     addUrl,
     AddDialog,
     EditDialog,
+    DeleteDialog,
     editUrl,
     editCond,
     editDisabledInfo,
@@ -125,6 +126,7 @@ const createCRUDComponents = options => {
         uniqueIdentifier={uniqueIdentifier}
         AddDialog={AddDialog}
         EditDialog={EditDialog}
+        DeleteDialog={DeleteDialog}
       >
         {({ deleting, ...handlers }) => <List
           loading={loading || deleting}

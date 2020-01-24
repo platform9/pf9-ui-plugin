@@ -19,6 +19,7 @@ const CRUDListContainer = ({
   addButton: AddButton,
   AddDialog,
   EditDialog,
+  DeleteDialog,
   addUrl,
   editUrl,
   customEditUrlFn,
@@ -56,6 +57,9 @@ const CRUDListContainer = ({
 
   const handleDeleteConfirm = useCallback(async () => {
     toggleConfirmDialog()
+
+    if (DeleteDialog) return
+
     await Promise.all(selectedItems.map(handleRemove))
     await deletePromise.current()
     reload()
@@ -100,7 +104,10 @@ const CRUDListContainer = ({
       rows={selectedItems}
       onClose={handleClose(toggleEditDialog)}
     />}
-    {handleRemove && showingConfirmDialog && <ConfirmationDialog
+    {DeleteDialog && showingConfirmDialog && <DeleteDialog
+      onClose={toggleConfirmDialog}
+      rows={selectedItems} />}
+    {!DeleteDialog && handleRemove && showingConfirmDialog && <ConfirmationDialog
       open={showingConfirmDialog}
       text={deleteConfirmText}
       onCancel={toggleConfirmDialog}

@@ -10,7 +10,7 @@ import { withStyles } from '@material-ui/styles'
 import { compose, ensureFunction, except } from 'app/utils/fp'
 import MoreMenu from 'core/components/MoreMenu'
 import {
-  max, any, assoc, assocPath, equals, pipe, pluck, prop, propEq, propOr, uniq, update,
+  max, any, assoc, assocPath, equals, pipe, pluck, prop, propEq, propOr, uniq, update, includes,
 } from 'ramda'
 import ListTableHead from './ListTableHead'
 import ListTableToolbar from './ListTableToolbar'
@@ -97,12 +97,12 @@ class ListTable extends PureComponent {
   areAllSelected = data => {
     const { selected } = this.state
     const { selectedRows = selected } = this.props
-    return data.every(row => selectedRows.includes(row))
+    return data.every(row => includes(row, selectedRows))
   }
 
   handleSelectAllClick = (event, checked) => {
     const { selected } = this.state
-    const { paginate, onSelectedRowsChange, selectedRows = selected } = this.props
+    const { paginate, onSelectedRowsChange, selectedRows = selected, onSelectAll } = this.props
     const filteredData = this.getFilteredRows()
     const paginatedData = paginate ? this.paginate(filteredData) : filteredData
 
@@ -122,10 +122,13 @@ class ListTable extends PureComponent {
         selected: newSelected,
       })
     }
+
+    onSelectAll && onSelectAll(newSelected, checked)
   }
 
   handleClick = moize(row => event => {
     const { selected } = this.state
+    const isSelected = this.isSelected(row)
     const { multiSelection, onSelectedRowsChange, onSelect, selectedRows = selected } = this.props
     if (!multiSelection) {
       if (onSelectedRowsChange) {
@@ -168,7 +171,7 @@ class ListTable extends PureComponent {
         selected: newSelected,
       })
 
-      onSelect && onSelect(row)
+      onSelect && onSelect(row, isSelected)
     }
   }, { maxSize: 100 })
 
@@ -302,7 +305,7 @@ class ListTable extends PureComponent {
   isSelected = row => {
     const { selected } = this.state
     const { selectedRows = selected } = this.props
-    return selectedRows.includes(row)
+    return includes(row, selectedRows)
   }
 
   paginate = data => {
@@ -461,6 +464,7 @@ class ListTable extends PureComponent {
       compactTable,
       blankFirstColumn,
       extraToolbarContent,
+      multiSelection,
     } = this.props
 
     if (!data) {
@@ -488,6 +492,7 @@ class ListTable extends PureComponent {
           rowCount={filteredData.length}
           showCheckboxes={showCheckboxes}
           blankFirstColumn={blankFirstColumn}
+          multiSelection={multiSelection}
         />
         <TableBody>
           {paginatedData.map(this.renderRow)}
