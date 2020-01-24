@@ -2,6 +2,7 @@ import React, { FC } from 'react'
 import { ensureFunction } from 'utils/fp'
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
+import { Typography } from '@material-ui/core'
 
 type LabelRenderProp = (value: string) => string
 
@@ -96,11 +97,11 @@ const ProgressBar: FC<Props> = ({
         <div
           className={classes.progress}
         >
-          {containedPercent ? ensureFunction(label)(percent) : null}
+          <Typography variant="body2">{containedPercent ? ensureFunction(label)(percent) : null}</Typography>
         </div>
       </div>
       {!containedPercent && <div className={classes.label}>
-        <span>{ensureFunction(label)(percent)}</span>
+        <Typography variant="body2">{ensureFunction(label)(percent)}</Typography>
       </div>}
     </div>
   )
