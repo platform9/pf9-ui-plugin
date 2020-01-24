@@ -29,7 +29,7 @@ const createListTableComponent = ({
     loading,
     onSortChange,
   }) => (!data || data.length === 0
-    ? <h1>{emptyText}</h1>
+    ? typeof emptyText === 'string' ? <h1>{emptyText}</h1> : emptyText
     : <ListTable
       title={title}
       columns={columns}

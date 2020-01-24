@@ -8,7 +8,7 @@ import { pathOr, pipe, pick } from 'ramda'
 import { castBoolToStr, castFuzzyBool, columnPathLookup } from 'utils/misc'
 import SimpleLink from 'core/components/SimpleLink'
 import { loadNodes, nodesCacheKey } from 'k8s/components/infrastructure/nodes/actions'
-import ClusterStatusSpan from 'k8s/components/infrastructure/clusters/ClusterStatusSpan'
+import ClusterStatusSpan from 'k8s/components/infrastructure/clusters/ClusterStatus'
 import ClusterSync from '../clusters/ClusterSync'
 import {
   connectionStatusFieldsTable,
@@ -78,6 +78,7 @@ const UsageBar = ({ stat }) => {
     <ProgressBar
       compact
       percent={percent}
+      variant="health"
       label={p => <span><strong>{p}%</strong> - {cur}/{max}{stat.units} {stat.type}</span>}
     />
   )

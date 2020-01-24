@@ -5,7 +5,9 @@ const routes = {
   cluster: {
     list: `${k8sPrefix}/infrastructure#clusters`,
     edit: `${k8sPrefix}/infrastructure/clusters/edit/:id`,
-    detail: `${k8sPrefix}/infrastructure/clusters/:id`,
+    detail: `${k8sPrefix}/infrastructure/clusters/:id#clusterDetails`,
+    nodes: `${k8sPrefix}/infrastructure/clusters/:id#nodes`,
+    convergingNodes: `${k8sPrefix}/infrastructure/clusters/:id#convergingNodes`,
     add: `${k8sPrefix}/infrastructure/clusters/add`,
     addAws: `${k8sPrefix}/infrastructure/clusters/addAws`,
     addAzure: `${k8sPrefix}/infrastructure/clusters/addAzure`,
@@ -85,6 +87,12 @@ export const pathToClusters = (params?: GenericKVP) => {
 }
 export const pathToClusterDetail = (params: {id: string} & GenericKVP) => {
   return createUrlWithQueryString(routes.cluster.detail, params)
+}
+export const pathToClusterNodes = (params: {id: string} & GenericKVP) => {
+  return createUrlWithQueryString(routes.cluster.nodes, params)
+}
+export const pathToClusterConvergingNodes = (params: {id: string} & GenericKVP) => {
+  return createUrlWithQueryString(routes.cluster.convergingNodes, params)
 }
 
 export const pathToNodes = (params?: GenericKVP) => {

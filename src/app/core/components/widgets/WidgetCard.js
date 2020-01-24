@@ -24,7 +24,7 @@ const useStyles = makeStyles(theme => ({
   headerContent: {
     display: 'flex',
     flexFlow: 'row nowrap',
-    justifyContent: 'space-between',
+    justifyContent: ({ image }) => image ? 'space-between' : 'center',
     alignItems: 'center',
     padding: theme.spacing(0, 1),
   },
@@ -37,7 +37,7 @@ const useStyles = makeStyles(theme => ({
 }))
 
 const HeaderContent = ({ title, image }) => {
-  const { headerContent, headerImg } = useStyles()
+  const { headerContent, headerImg } = useStyles({ image })
   return <div className={headerContent}>
     <div>
       {title}

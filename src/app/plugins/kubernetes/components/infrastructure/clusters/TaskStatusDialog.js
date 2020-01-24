@@ -1,12 +1,12 @@
 import React from 'react'
-import { Dialog, DialogTitle, DialogContent } from '@material-ui/core'
+import { Dialog, DialogTitle, DialogContent, Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import CloseIcon from '@material-ui/icons/Close'
 import clsx from 'clsx'
 import ExternalLink from 'core/components/ExternalLink'
-import ClusterStatusSpan from 'k8s/components/infrastructure/clusters/ClusterStatusSpan'
+import ClusterStatusSpan from 'k8s/components/infrastructure/clusters/ClusterStatus'
 import createListTableComponent from 'core/helpers/createListTableComponent'
-import { noop } from 'utils/fp'
+import { noop, pathStrOr } from 'utils/fp'
 import { capitalizeString } from 'utils/misc'
 import {
   clusterHealthStatusFields,
@@ -66,7 +66,11 @@ const TaskStatusDialog = ({ isOpen, toggleOpen, node }) => {
   }
 
   const { name, isMaster, logs, status } = node
-  const { all_tasks: allTasks, last_failed_task: lastFailedTask } = node.combined.resmgr.extensions.pf9_kube_status.data
+  const {
+    all_tasks: allTasks = [],
+    last_failed_task: lastFailedTask,
+    completed_tasks: completedTasks
+  } = pathStrOr({}, 'combined.resmgr.extensions.pf9_kube_status.data', node)
   const healthStatus = status === 'disconnected' ? 'unknown' : status === 'ok' ? 'healthy' : 'unhealthy'
 
   return (
@@ -93,7 +97,7 @@ const TaskStatusDialog = ({ isOpen, toggleOpen, node }) => {
           Here is a log of what got installed
           {healthStatus === 'unhealthy' && ' and where we ran into an error'}:
         </span>
-        <Tasks allTasks={allTasks} lastFailedTask={lastFailedTask} classes={classes} />
+        <Tasks allTasks={allTasks} lastFailedTask={lastFailedTask} completedTasks={completedTasks} />
       </DialogContent>
     </Dialog>
   )
@@ -118,16 +122,19 @@ const columns = [
 
 const TasksTable = createListTableComponent({
   columns,
+  uniqueIdentifier: 'task',
   showCheckboxes: false,
   paginate: false,
   compactTable: true,
+  emptyText: <Typography variant="body1">No status information available.</Typography>
 })
 
-const Tasks =({ allTasks, lastFailedTask, classes }) => {
+export const Tasks = ({ allTasks, completedTasks = [], lastFailedTask }) => {
+  const classes = useStyles()
   const failedTaskIndex = allTasks.indexOf(lastFailedTask)
-  const completedTasks = failedTaskIndex >=0 ? failedTaskIndex : allTasks.length
+  const completedTaskCount = failedTaskIndex >=0 ? failedTaskIndex : completedTasks.length
   const getStatus = (index) => {
-    if (failedTaskIndex < 0) {
+    if (index <= (completedTasks.length - 1)) {
       return 'completed'
     }
 
@@ -142,7 +149,7 @@ const Tasks =({ allTasks, lastFailedTask, classes }) => {
   return (
     <div>
       <TasksTable data={tasksWithStatus} onSortChange={noop} />
-      <div className={classes.tasksCompleted}>{completedTasks} out of {allTasks.length} tasks completed</div>
+      <div className={classes.tasksCompleted}>{completedTaskCount} out of {allTasks.length} tasks completed</div>
     </div>
   )
 }
