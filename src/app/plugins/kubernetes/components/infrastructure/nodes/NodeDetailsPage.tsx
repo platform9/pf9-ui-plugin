@@ -17,12 +17,18 @@ import calcUsageTotals from 'k8s/util/calcUsageTotals'
 import ExternalLink from 'core/components/ExternalLink'
 import HelpContainer from 'core/components/HelpContainer'
 import { pathToClusterDetail, pathToNodes } from 'core/utils/routes'
+import partition from 'ramda/es/partition'
 
-export const orderInterfaces = (networkInterfaces: {[key: string]: string}, primaryNetwork: string) => Object.entries(networkInterfaces).sort((first, second) => {
-  if (second[1] === primaryNetwork) return 1
-  if (first[1] === primaryNetwork) return -1
-  return 0
-})
+const isPrimaryNetwork = (primaryNetwork) => ([name, ip]) => ip === primaryNetwork
+
+export const orderInterfaces = (
+  networkInterfaces: { [key: string]: string },
+  primaryNetwork: string,
+) => {
+  return [].concat(
+    ...partition(isPrimaryNetwork(primaryNetwork), Object.entries(networkInterfaces)),
+  )
+}
 
 // Styles
 const useStyles = makeStyles((theme: Theme) => ({
