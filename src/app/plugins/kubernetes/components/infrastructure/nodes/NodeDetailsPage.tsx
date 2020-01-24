@@ -18,6 +18,12 @@ import ExternalLink from 'core/components/ExternalLink'
 import HelpContainer from 'core/components/HelpContainer'
 import { pathToClusterDetail, pathToNodes } from 'core/utils/routes'
 
+export const orderInterfaces = (networkInterfaces: {[key: string]: string}, primaryNetwork: string) => Object.entries(networkInterfaces).sort((first, second) => {
+  if (second[1] === primaryNetwork) return 1
+  if (first[1] === primaryNetwork) return -1
+  return 0
+})
+
 // Styles
 const useStyles = makeStyles((theme: Theme) => ({
   backLink: {
@@ -125,6 +131,8 @@ const NodeDetail: FC<ICombinedNode> = (node) => {
   const networkInterfaces = combined?.networkInterfaces || {}
   const CPUArchitecture = combined?.resmgr?.info?.arch
 
+  const orderedInterfaces = orderInterfaces(networkInterfaces, primaryNetwork)
+
   return (
     <div className={detailContainer}>
       <Card className={card}>
@@ -151,7 +159,7 @@ const NodeDetail: FC<ICombinedNode> = (node) => {
         <CardContent>
           <table>
             <tbody>
-              {Object.entries(networkInterfaces).map(([interfaceName, interfaceIp]) => (
+              {orderedInterfaces.map(([interfaceName, interfaceIp]) => (
                 <DetailRow
                   key={interfaceIp}
                   label={
