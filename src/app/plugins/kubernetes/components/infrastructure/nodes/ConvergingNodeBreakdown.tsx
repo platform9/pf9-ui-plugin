@@ -40,7 +40,7 @@ const useStyles = makeStyles<Theme, {}>((theme) => ({
     minHeight: '300px',
     transition: 'all 2s ease-out',
     minWidth: '400px',
-    background: 'white',
+    background: theme.palette.background.paper,
   },
   divider: {
     backgroundColor: 'transparent',
