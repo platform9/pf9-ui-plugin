@@ -173,7 +173,7 @@ const renderNetworkInterfaces = (_, node) => {
   const networkInterfaces = pathStrOr({}, 'combined.networkInterfaces', node)
   const orderedInterfaces = orderInterfaces(networkInterfaces, primaryNetwork)
   return orderedInterfaces.map(([interfaceName, interfaceIp]) => (
-    <Typography variant="body2" className="no-wrap-text">{interfaceIp === primaryNetwork ? `${interfaceName} (primary)` : interfaceName} - {interfaceIp}</Typography>
+    <Typography key={`${interfaceName}-${interfaceIp}`} variant="body2" className="no-wrap-text">{interfaceIp === primaryNetwork ? `${interfaceName} (primary)` : interfaceName} - {interfaceIp}</Typography>
   ))
 }
 

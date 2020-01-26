@@ -34,7 +34,9 @@ const routes = {
     deployed: `${k8sPrefix}/apps/deployed/:clusterId/:release`,
   },
   pods: {
-    list: `${k8sPrefix}/pods`,
+    list: `${k8sPrefix}/pods#pods`,
+    deployments: `${k8sPrefix}/pods#deployments`,
+    services: `${k8sPrefix}/pods#services`,
     add: `${k8sPrefix}/pods/add`,
     addDeployments: `${k8sPrefix}/pods/deployments/add`,
     addServices: `${k8sPrefix}/pods/services/add`,
@@ -53,7 +55,8 @@ const routes = {
     add: `${k8sPrefix}/namespaces/add`,
   },
   userManagement: {
-    list: `${k8sPrefix}/user_management`,
+    users: `${k8sPrefix}/user_management#users`,
+    tenants: `${k8sPrefix}/user_management#tenants`,
     addTenant: `${k8sPrefix}/user_management/tenants/add`,
     editTenant: `${k8sPrefix}/user_management/tenants/edit/:id`,
     addUser: `${k8sPrefix}/user_management/users/add`,
@@ -80,8 +83,18 @@ const routes = {
   }
 }
 
-export const pathToCreateCluster = (params?: GenericKVP) => {
+// cluster
+export const pathToAddCluster = (params?: GenericKVP) => {
   return createUrlWithQueryString(routes.cluster.add, params)
+}
+export const pathToAddBareOSCluster = (params?: GenericKVP) => {
+  return createUrlWithQueryString(routes.cluster.addBareOs, params)
+}
+export const pathToAddAwsCluster = (params?: GenericKVP) => {
+  return createUrlWithQueryString(routes.cluster.addAws, params)
+}
+export const pathToAddAzureCluster = (params?: GenericKVP) => {
+  return createUrlWithQueryString(routes.cluster.addAzure, params)
 }
 export const pathToClusters = (params?: GenericKVP) => {
   return createUrlWithQueryString(routes.cluster.list, params)
@@ -95,13 +108,86 @@ export const pathToClusterNodes = (params: {id: string} & GenericKVP) => {
 export const pathToClusterConvergingNodes = (params: {id: string} & GenericKVP) => {
   return createUrlWithQueryString(routes.cluster.convergingNodes, params)
 }
+export const pathToEditCluster = (params: {id: string} & GenericKVP) => {
+  return createUrlWithQueryString(routes.cluster.edit, params)
+}
+export const pathToScaleMasters = (params: {id: string} & GenericKVP) => {
+  return createUrlWithQueryString(routes.cluster.scaleMasters, params)
+}
+export const pathToScaleWorkers = (params: {id: string} & GenericKVP) => {
+  return createUrlWithQueryString(routes.cluster.scaleWorkers, params)
+}
 
+// dashboard
+export const pathToDashboard = (params: GenericKVP) => {
+  return createUrlWithQueryString(routes.dashboard, params)
+}
+
+// apiAccess
+export const pathToApiAccess = (params: GenericKVP) => {
+  return createUrlWithQueryString(routes.apiAccess, params)
+}
+
+// nodes
 export const pathToNodes = (params?: GenericKVP) => {
   return createUrlWithQueryString(routes.nodes.list, params)
 }
+export const pathToNodeDetail = (params?: {id: string} & GenericKVP) => {
+  return createUrlWithQueryString(routes.nodes.detail, params)
+}
+export const pathToNodeDownload = (params?: GenericKVP) => {
+  return createUrlWithQueryString(routes.nodes.download, params)
+}
 
-export const pathToCreateCloudProvider = (params?: {type?: CloudProviders} & GenericKVP) => {
+// cloudProviders
+export const pathToAddCloudProvider = (params?: {type?: CloudProviders} & GenericKVP) => {
   return createUrlWithQueryString(routes.cloudProviders.add, params)
+}
+export const pathToCloudProviders = (params?: GenericKVP) => {
+  return createUrlWithQueryString(routes.cloudProviders.list, params)
+}
+export const pathToEditCloudProvider = (params?: {id: string} & GenericKVP) => {
+  return createUrlWithQueryString(routes.cloudProviders.edit, params)
+}
+
+// pods
+export const pathToPods = (params?: GenericKVP) => {
+  return createUrlWithQueryString(routes.pods.list, params)
+}
+export const pathToPodDeployments = (params?: GenericKVP) => {
+  return createUrlWithQueryString(routes.pods.deployments, params)
+}
+export const pathToPodServices = (params?: GenericKVP) => {
+  return createUrlWithQueryString(routes.pods.services, params)
+}
+export const pathToAddPods = (params?: GenericKVP) => {
+  return createUrlWithQueryString(routes.pods.add, params)
+}
+export const pathToPodsAddDeployments = (params?: GenericKVP) => {
+  return createUrlWithQueryString(routes.pods.addDeployments, params)
+}
+export const pathToPodsAddServices = (params?: GenericKVP) => {
+  return createUrlWithQueryString(routes.pods.addServices, params)
+}
+
+// userManagement
+export const pathToUsers = (params?: GenericKVP) => {
+  return createUrlWithQueryString(routes.userManagement.users, params)
+}
+export const pathToTenants = (params?: GenericKVP) => {
+  return createUrlWithQueryString(routes.userManagement.tenants, params)
+}
+export const pathToAddTenant = (params?: GenericKVP) => {
+  return createUrlWithQueryString(routes.userManagement.addTenant, params)
+}
+export const pathToEditTenant = (params?: {id: string} & GenericKVP) => {
+  return createUrlWithQueryString(routes.userManagement.editTenant, params)
+}
+export const pathToAddUser = (params?: GenericKVP) => {
+  return createUrlWithQueryString(routes.userManagement.addUser, params)
+}
+export const pathToEditUser = (params?: {id: string} & GenericKVP) => {
+  return createUrlWithQueryString(routes.userManagement.editUser, params)
 }
 
 /*

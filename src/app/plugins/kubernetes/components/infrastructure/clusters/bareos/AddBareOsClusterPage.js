@@ -10,7 +10,6 @@ import VipInterfaceChooser from './VipInterfaceChooser'
 import Wizard from 'core/components/wizard/Wizard'
 import WizardStep from 'core/components/wizard/WizardStep'
 import useDataUpdater from 'core/hooks/useDataUpdater'
-import useParams from 'core/hooks/useParams'
 import useReactRouter from 'use-react-router'
 import DownloadCliWalkthrough from '../../nodes/DownloadCliWalkthrough'
 import Panel from 'app/plugins/theme/components/Panel'
@@ -26,6 +25,7 @@ import { allPass } from 'ramda'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { loadNodes } from '../../nodes/actions'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
+import { pathToAddCluster, pathToClusters } from 'core/utils/routes'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
@@ -68,24 +68,30 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
+const canFinishAndReview = ({ masterNodes, workerNodes, allowWorkloadsOnMaster }) => {
+  const hasMasters = !!masterNodes && masterNodes.length > 0
+  const hasWorkers = !!workerNodes && workerNodes.length > 0
+  return hasMasters && (!!allowWorkloadsOnMaster || hasWorkers)
+}
+
 const AddBareOsClusterPage = () => {
   const classes = useStyles()
-  const { params, getParamsUpdater } = useParams()
   const { history } = useReactRouter()
-  const onComplete = () => history.push('/ui/kubernetes/infrastructure#clusters')
+  const onComplete = () => history.push(pathToClusters())
   const [createBareOSClusterAction, creatingBareOSCluster] = useDataUpdater(clusterActions.create, onComplete) // eslint-disable-line
-  const handleSubmit = params => data => createBareOSClusterAction({ ...data, ...params, clusterType: 'local' })
+
+  const handleSubmit = data => createBareOSClusterAction({ ...data, clusterType: 'local' })
   const [nodes, loading] = useDataLoader(loadNodes)
 
   const hasFreeNodes = nodes.filter(isUnassignedNode).length > 0
-
   return (
     <FormWrapper title="Add Bare OS Cluster" backUrl={listUrl} loading={creatingBareOSCluster || loading} message={loading ? 'loading...' : 'Submitting form...'}>
       <Wizard
-        onComplete={handleSubmit(params)}
+        onComplete={handleSubmit}
         context={initialContext}
-        originPath={`${k8sPrefix}/infrastructure/clusters/add`}
+        originPath={pathToAddCluster()}
         disableNext={!hasFreeNodes}
+        showFinishAndReviewButton={canFinishAndReview}
       >
         {({ wizardContext, setWizardContext, onNext }) => {
           return (
@@ -103,7 +109,7 @@ const AddBareOsClusterPage = () => {
                         {/* Cluster Name */}
                         <FormFieldCard title="Name your Kubernetes Cluster">
                           <div className={classes.inputWidth}>
-                            <TextField id="name" label="Name" info="Name of the cluster" required />
+                            <TextField id="name" label="Name" info="Name of the cluster" onChange={value => setWizardContext({ name: value })} required />
                           </div>
                         </FormFieldCard>
                         <FormFieldCard
@@ -119,7 +125,7 @@ const AddBareOsClusterPage = () => {
                                 isConnected,
                                 isUnassignedNode
                               ])}
-                              onChange={getParamsUpdater('masterNodes')}
+                              onChange={(value) => setWizardContext({ masterNodes: value })}
                               validations={[masterNodeLengthValidator]}
                               pollForNodes
                               required
@@ -129,6 +135,7 @@ const AddBareOsClusterPage = () => {
                             <div className={classes.inputWidth}>
                               <CheckboxField
                                 id="allowWorkloadsOnMaster"
+                                onChange={(value) => setWizardContext({ allowWorkloadsOnMaster: value })}
                                 label="Make all Master nodes Master + Worker"
                                 info="It is highly recommended to not enable workloads on master nodes for production or critical workload clusters."
                               />
@@ -170,7 +177,7 @@ const AddBareOsClusterPage = () => {
                               excludeNodes(wizardContext.masterNodes)
                             ])}
                             pollForNodes
-                            onChange={getParamsUpdater('workerNodes')}
+                            onChange={(value) => setWizardContext({ workerNodes: value })}
                             validations={wizardContext.allowWorkloadsOnMaster ? null : [requiredValidator]}
                           />
                         </div>
@@ -215,7 +222,7 @@ const AddBareOsClusterPage = () => {
                                 etc.
                               </div>
                             }
-                            required={(params.masterNodes || []).length > 1}
+                            required={(wizardContext.masterNodes || []).length > 1}
                           />
 
                           <PicklistField
@@ -223,8 +230,8 @@ const AddBareOsClusterPage = () => {
                             id="masterVipIface"
                             label="Physical interface for virtual IP association"
                             info="Provide the name of the network interface that the virtual IP should be bound to. The virtual IP should be reachable from the network this interface connects to. Note: All master nodes should use the same interface (eg: ens3) that the virtual IP will be bound to."
-                            masterNodes={params.masterNodes}
-                            required={(params.masterNodes || []).length > 1}
+                            masterNodes={wizardContext.masterNodes}
+                            required={(wizardContext.masterNodes || []).length > 1}
                           />
 
                           {/* Assign public IP's */}

@@ -31,6 +31,7 @@ export const qbertApiLink = 'https://docs.platform9.com/kubernetes/Qbert-API-Ref
 export const whatIsBareOSLink = 'https://docs.platform9.com/kubernetes/on-premise-kubernetes/what-is-bareos'
 export const BareOSSetupDocumentation = 'https://docs.platform9.com/kubernetes/create-multimaster-bareos-cluster/'
 export const remoteMonitoringDocs = 'https://docs.platform9.com/kubernetes/enable-remote-monitoring/'
+export const managedContainerChecklist = 'https://docs.platform9.com/getting-started/managed-container-cloud-requirements-checklist'
 
 export const runtimePrivileged = 'https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities'
 export const awsNetworkingConfigurations = 'https://docs.platform9.com/kubernetes/networking/configurations-supported-aws-cloud-provider/'

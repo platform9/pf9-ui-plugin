@@ -5,6 +5,7 @@ import BulletList from 'core/components/BulletList'
 import Alert from 'core/components/Alert'
 import SubmitButton from 'core/components/buttons/SubmitButton'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
+import { pathToAddAwsCluster } from 'core/utils/routes'
 
 const useStyles = makeStyles((theme: Theme) => ({
   requirements: {
@@ -32,7 +33,7 @@ const AwsReqsRightSection = ['EC2 Instance Management', 'EBS Volume Management',
 const AwsClusterRequirements = ({ onComplete }) => {
   const classes = useStyles({})
   const handleClick = useCallback(() => {
-    onComplete('Aws')
+    onComplete(pathToAddAwsCluster())
   }, [onComplete])
   return (
     <FormFieldCard title="Amazon AWS Deployment">

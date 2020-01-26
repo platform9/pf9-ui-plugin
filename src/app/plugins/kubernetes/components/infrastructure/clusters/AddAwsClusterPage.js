@@ -30,7 +30,7 @@ import { cloudProviderActions } from '../cloudProviders/actions'
 import { PromptToAddProvider } from '../cloudProviders/PromptToAddProvider'
 import { makeStyles } from '@material-ui/styles'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
-import { pathToCreateCloudProvider } from 'core/utils/routes'
+import { pathToAddCloudProvider, pathToAddCluster, pathToClusters } from 'core/utils/routes'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
@@ -306,7 +306,7 @@ const AddAwsClusterPage = () => {
   const classes = useStyles()
   const { params, getParamsUpdater } = useParams()
   const { history } = useReactRouter()
-  const onComplete = () => history.push('/ui/kubernetes/infrastructure#clusters')
+  const onComplete = () => history.push(pathToClusters())
   const [createAwsClusterAction, creatingAwsCluster] = useDataUpdater(clusterActions.create, onComplete)
   const handleSubmit = params => data => createAwsClusterAction({ ...data, ...params, clusterType: CloudProviders.Aws })
 
@@ -315,7 +315,7 @@ const AddAwsClusterPage = () => {
 
   return (
     <FormWrapper title="Add AWS Cluster" backUrl={listUrl} loading={creatingAwsCluster || loading} message={loading ? 'loading...' : 'Submitting form...'}>
-      <Wizard disableNext={!hasAwsProvider} onComplete={handleSubmit(params)} context={initialContext} originPath={`${k8sPrefix}/infrastructure/clusters/add`} showFinishAndReviewButton>
+      <Wizard disableNext={!hasAwsProvider} onComplete={handleSubmit(params)} context={initialContext} originPath={pathToAddCluster()} showFinishAndReviewButton>
         {({ wizardContext, setWizardContext, onNext }) => {
           return (
             <>
@@ -485,7 +485,7 @@ const AddAwsClusterPage = () => {
                       <div className={classes.inputWidth}>
                         <PromptToAddProvider
                           type={CloudProviders.Aws}
-                          src={pathToCreateCloudProvider({ type: CloudProviders.Aws })}
+                          src={pathToAddCloudProvider({ type: CloudProviders.Aws })}
                         />
                       </div>
                     </FormFieldCard>

@@ -6,6 +6,7 @@ import SubmitButton from 'core/components/buttons/SubmitButton'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import ExternalLink from 'core/components/ExternalLink'
 import { azureServicePrincipalPortal, azureGetValuesForSigningin, azureCreateANewApplicationSecret } from 'app/constants'
+import { pathToAddAzureCluster } from 'core/utils/routes'
 
 const useStyles = makeStyles((theme: Theme) => ({
   requirements: {
@@ -31,7 +32,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 const AzureClusterRequirements = ({ onComplete }) => {
   const classes = useStyles({})
   const handleClick = useCallback(() => {
-    onComplete('Azure')
+    onComplete(pathToAddAzureCluster())
   }, [onComplete])
   return (
     <FormFieldCard title="Amazon AWS Deployment">

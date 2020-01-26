@@ -4,6 +4,8 @@ import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
 import SimpleLink from 'core/components/SimpleLink'
 import ExternalLink from 'core/components/ExternalLink'
+import { BareOSSetupDocumentation } from 'app/constants'
+import { pathToUsers } from 'core/utils/routes'
 
 const useStyles = makeStyles<Theme>((theme) => ({
   onboardWizard: {
@@ -39,11 +41,11 @@ const OnboardWizard: FC<Props> = ({ title, body, children, renderLinks = true })
     <section className={onboardWizard}>
       {renderLinks && (
         <div className={rightAlign}>
-          <SimpleLink src="/ui/kubernetes/user_management#users" icon="user-plus">
+          <SimpleLink src={pathToUsers()} icon="user-plus">
             Invite Team Member
           </SimpleLink>
           <ExternalLink
-            url="https://docs.platform9.com/kubernetes/create-multimaster-bareos-cluster/"
+            url={BareOSSetupDocumentation}
             icon="file-alt"
           >
             Setup Documentation

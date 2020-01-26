@@ -29,7 +29,7 @@ import { PromptToAddProvider } from '../cloudProviders/PromptToAddProvider'
 import { CloudProviders } from './model'
 import { makeStyles } from '@material-ui/styles'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
-import { pathToCreateCloudProvider } from 'core/utils/routes'
+import { pathToAddCloudProvider, pathToAddCluster, pathToClusters } from 'core/utils/routes'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
@@ -142,7 +142,7 @@ const AddAzureClusterPage = () => {
   const classes = useStyles()
   const { params, getParamsUpdater } = useParams()
   const { history } = useReactRouter()
-  const onComplete = () => history.push('/ui/kubernetes/infrastructure#clusters')
+  const onComplete = () => history.push(pathToClusters())
   const [createAzureClusterAction, creatingAzureCluster] = useDataUpdater(clusterActions.create, onComplete)
   const handleSubmit = params => data => createAzureClusterAction({ ...data, ...params, clusterType: CloudProviders.Azure })
 
@@ -150,7 +150,7 @@ const AddAzureClusterPage = () => {
   const hasAzureProvider = !!cloudProviders.some(provider => provider.type === CloudProviders.Azure)
   return (
     <FormWrapper title="Add Azure Cluster" backUrl={listUrl} loading={creatingAzureCluster || loading} message={loading ? 'loading...' : 'Submitting form...'}>
-      <Wizard disableNext={!hasAzureProvider} onComplete={handleSubmit(params)} context={initialContext} originPath={`${k8sPrefix}/infrastructure/clusters/add`} showFinishAndReviewButton>
+      <Wizard disableNext={!hasAzureProvider} onComplete={handleSubmit(params)} context={initialContext} originPath={pathToAddCluster()} showFinishAndReviewButton>
         {({ wizardContext, setWizardContext, onNext }) => {
           return (
             <>
@@ -296,7 +296,7 @@ const AddAzureClusterPage = () => {
                     <div className={classes.formWidth}>
                       <FormFieldCard title="Configure Your Cluster">
                         <div className={classes.inputWidth}>
-                          <PromptToAddProvider type={CloudProviders.Azure} src={pathToCreateCloudProvider({ type: CloudProviders.Azure })} />
+                          <PromptToAddProvider type={CloudProviders.Azure} src={pathToAddCloudProvider({ type: CloudProviders.Azure })} />
                         </div>
                       </FormFieldCard>
                     </div>

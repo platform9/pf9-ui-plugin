@@ -11,6 +11,7 @@ import withDataLoader from 'core/hocs/withDataLoader'
 import withDataMapper from 'core/hocs/withDataMapper'
 import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
 import { cloudProviderActions } from 'k8s/components/infrastructure/cloudProviders/actions'
+import { managedContainerChecklist } from 'app/constants'
 
 // The modal is technically inside the row, so clicking anything inside
 // the modal window will cause the table row to be toggled.
@@ -77,7 +78,7 @@ class ClusterAttachNodeDialog extends PureComponent {
           <p>
             <b>IMPORTANT</b>:
             Before adding nodes to a cluster, please ensure that you have followed the requirements
-            in <ExternalLink url="https://docs.platform9.com/getting-started/managed-container-cloud-requirements-checklist/">this
+            in <ExternalLink url={managedContainerChecklist}>this
             article</ExternalLink> for
             each node.
           </p>

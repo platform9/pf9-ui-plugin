@@ -17,6 +17,7 @@ import { assoc, flatten, pluck, prop, propEq, propOr, where, equals } from 'ramd
 import { matchPath, withRouter } from 'react-router'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { imageUrls, clarityDashboardUrl, k8sPrefix } from 'app/constants'
+import { pathToDashboard } from 'core/utils/routes'
 
 export const drawerWidth = 180
 
@@ -272,7 +273,7 @@ class Navbar extends PureComponent {
   }
 
   handleLogoClick = () => {
-    this.props.history.push(`${k8sPrefix}/dashboard`)
+    this.props.history.push(pathToDashboard())
   }
 
   handleEscKey = () => {
