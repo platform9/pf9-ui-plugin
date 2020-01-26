@@ -5,7 +5,7 @@ import SubmitButton from 'core/components/SubmitButton'
 import Alert from 'core/components/Alert'
 import { Typography } from '@material-ui/core'
 import ExternalLink from 'core/components/ExternalLink'
-import { FormFieldCard } from '../clusters/bareos/BareosClusterRequirements'
+import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import { makeStyles } from '@material-ui/styles'
 import { iamPolicy, awsAccessHelpUrl } from 'app/constants'
 

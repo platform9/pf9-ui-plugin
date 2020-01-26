@@ -29,7 +29,7 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import { cloudProviderActions } from '../cloudProviders/actions'
 import { PromptToAddProvider } from '../cloudProviders/PromptToAddProvider'
 import { makeStyles } from '@material-ui/styles'
-import { FormFieldCard } from './bareos/BareosClusterRequirements'
+import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import { pathToCreateCloudProvider } from 'core/utils/routes'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')

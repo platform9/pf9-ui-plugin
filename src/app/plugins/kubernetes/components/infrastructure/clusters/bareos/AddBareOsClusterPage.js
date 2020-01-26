@@ -25,7 +25,7 @@ import { masterNodeLengthValidator, requiredValidator } from 'core/utils/fieldVa
 import { allPass } from 'ramda'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { loadNodes } from '../../nodes/actions'
-import { FormFieldCard } from './BareosClusterRequirements'
+import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 

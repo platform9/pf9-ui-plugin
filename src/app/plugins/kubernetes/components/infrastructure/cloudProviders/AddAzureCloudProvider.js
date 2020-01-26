@@ -6,11 +6,8 @@ import Alert from 'core/components/Alert'
 import { Typography } from '@material-ui/core'
 import ExternalLink from 'core/components/ExternalLink'
 import { makeStyles } from '@material-ui/styles'
-import { FormFieldCard } from '../clusters/bareos/BareosClusterRequirements'
-
-const azureHowToUrl = 'https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal'
-const signinHelpUrl = 'https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal#get-values-for-signing-in'
-const createNewSecretUrl = 'https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal#create-a-new-application-secret'
+import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
+import { azureServicePrincipalPortal, azureGetValuesForSigningin, azureCreateANewApplicationSecret } from 'app/constants'
 
 const useStyles = makeStyles(theme => ({
   formWidth: {
@@ -54,15 +51,15 @@ const AddAzureCloudProvider = ({ onComplete }) => {
                   to be able to perform the necessary operations on Managed Kubernetes clusters, your
                   credentials must have a 'contributor' role assigned, or a similar read/write role where the
                   user is able to access subscriptions, and create/update/delete Azure resources.
-                  See <ExternalLink url={azureHowToUrl}>this article</ExternalLink> for detailed steps.
+                  See <ExternalLink url={azureServicePrincipalPortal}>this article</ExternalLink> for detailed steps.
                 </p>
                 <p>
-                  See the section under <ExternalLink url={signinHelpUrl}>get values for signing
+                  See the section under <ExternalLink url={azureGetValuesForSigningin}>get values for signing
                   in</ExternalLink> to find the tenant and client IDs.
                 </p>
                 <p>
                   A client secret must be present before creating an Azure cloud provider. To learn more about
-                  creating a client secret, see <ExternalLink url={createNewSecretUrl}>create a new
+                  creating a client secret, see <ExternalLink url={azureCreateANewApplicationSecret}>create a new
                   application secret</ExternalLink>.
                 </p>
               </div>

@@ -3,7 +3,7 @@ import { makeStyles } from '@material-ui/styles'
 import { Theme, Typography } from '@material-ui/core'
 import Alert from 'core/components/Alert'
 import SubmitButton from 'core/components/buttons/SubmitButton'
-import { FormFieldCard } from '../bareos/BareosClusterRequirements'
+import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import ExternalLink from 'core/components/ExternalLink'
 import { azureServicePrincipalPortal, azureGetValuesForSigningin, azureCreateANewApplicationSecret } from 'app/constants'
 

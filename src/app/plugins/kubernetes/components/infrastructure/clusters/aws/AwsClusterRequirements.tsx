@@ -4,7 +4,7 @@ import { Theme, Typography } from '@material-ui/core'
 import BulletList from 'core/components/BulletList'
 import Alert from 'core/components/Alert'
 import SubmitButton from 'core/components/buttons/SubmitButton'
-import { FormFieldCard } from '../bareos/BareosClusterRequirements'
+import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 
 const useStyles = makeStyles((theme: Theme) => ({
   requirements: {

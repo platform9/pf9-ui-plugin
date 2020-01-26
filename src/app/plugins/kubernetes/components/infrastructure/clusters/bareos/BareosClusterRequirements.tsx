@@ -7,6 +7,7 @@ import SubmitButton from 'core/components/buttons/SubmitButton'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import ExternalLink from 'core/components/ExternalLink'
 import { BareOSSetupDocumentation } from 'app/constants'
+import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -108,20 +109,6 @@ const HardwareSpec = ({ title, icon }) => {
         <FontAwesomeIcon className={classes.blueIcon}>{icon}</FontAwesomeIcon>
       </span>
       <Typography>{title}</Typography>
-    </div>
-  )
-}
-
-interface ContainerProps {title: string, link?: JSX.Element}
-export const FormFieldCard: React.FC<ContainerProps> = ({ title, link = undefined, children }) => {
-  const classes = useStyles({})
-  return (
-    <div className={classes.root}>
-      <header className={classes.requirementsTitle}>
-        <Typography variant="subtitle1">{title}</Typography>
-        { !!link && link }
-      </header>
-      {children}
     </div>
   )
 }
