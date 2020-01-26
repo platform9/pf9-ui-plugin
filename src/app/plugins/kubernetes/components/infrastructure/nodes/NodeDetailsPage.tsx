@@ -17,6 +17,18 @@ import calcUsageTotals from 'k8s/util/calcUsageTotals'
 import ExternalLink from 'core/components/ExternalLink'
 import HelpContainer from 'core/components/HelpContainer'
 import { pathToClusterDetail, pathToNodes } from 'core/utils/routes'
+import partition from 'ramda/es/partition'
+
+const isPrimaryNetwork = (primaryNetwork) => ([name, ip]) => ip === primaryNetwork
+
+export const orderInterfaces = (
+  networkInterfaces: { [key: string]: string },
+  primaryNetwork: string,
+) => {
+  return [].concat(
+    ...partition(isPrimaryNetwork(primaryNetwork), Object.entries(networkInterfaces)),
+  )
+}
 
 // Styles
 const useStyles = makeStyles((theme: Theme) => ({
@@ -125,6 +137,8 @@ const NodeDetail: FC<ICombinedNode> = (node) => {
   const networkInterfaces = combined?.networkInterfaces || {}
   const CPUArchitecture = combined?.resmgr?.info?.arch
 
+  const orderedInterfaces = orderInterfaces(networkInterfaces, primaryNetwork)
+
   return (
     <div className={detailContainer}>
       <Card className={card}>
@@ -151,7 +165,7 @@ const NodeDetail: FC<ICombinedNode> = (node) => {
         <CardContent>
           <table>
             <tbody>
-              {Object.entries(networkInterfaces).map(([interfaceName, interfaceIp]) => (
+              {orderedInterfaces.map(([interfaceName, interfaceIp]) => (
                 <DetailRow
                   key={interfaceIp}
                   label={
