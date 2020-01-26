@@ -16,7 +16,7 @@ import moize from 'moize'
 import { assoc, flatten, pluck, prop, propEq, propOr, where, equals } from 'ramda'
 import { matchPath, withRouter } from 'react-router'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
-import { imageUrls, clarityDashboardUrl, k8sPrefix } from 'app/constants'
+import { imageUrls, clarityDashboardUrl } from 'app/constants'
 import { pathToDashboard } from 'core/utils/routes'
 
 export const drawerWidth = 180
