@@ -119,12 +119,12 @@ export const pathToScaleWorkers = (params: {id: string} & GenericKVP) => {
 }
 
 // dashboard
-export const pathToDashboard = (params: GenericKVP) => {
+export const pathToDashboard = (params?: GenericKVP) => {
   return createUrlWithQueryString(routes.dashboard, params)
 }
 
 // apiAccess
-export const pathToApiAccess = (params: GenericKVP) => {
+export const pathToApiAccess = (params?: GenericKVP) => {
   return createUrlWithQueryString(routes.apiAccess, params)
 }
 
