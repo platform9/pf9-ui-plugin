@@ -195,7 +195,7 @@ const AddBareOsClusterPage = () => {
                 >
                   {({ setFieldValue, values }) => (
                     <div className={classes.formWidth}>
-                      <FormFieldCard title="Configure Network">
+                      <FormFieldCard title="Networking Details">
                         <div className={classes.inputWidth}>
                           <TextField
                             id="masterVipIpv4"
@@ -301,7 +301,7 @@ const AddBareOsClusterPage = () => {
                 >
                   {({ setFieldValue, values }) => (
                     <div className={classes.formWidth}>
-                      <FormFieldCard title="Advanced Configuration">
+                      <FormFieldCard title="Final Tweaks">
                         <div className={classes.inputWidth}>
                           {/* Privileged */}
                           <CheckboxField
@@ -349,7 +349,7 @@ const AddBareOsClusterPage = () => {
                 </ValidatedForm>
               </WizardStep>
 
-              <WizardStep stepId="review" label="Finish and Review">
+              <WizardStep stepId="review" label="Review">
                 <ValidatedForm
                   initialValues={wizardContext}
                   onSubmit={setWizardContext}
