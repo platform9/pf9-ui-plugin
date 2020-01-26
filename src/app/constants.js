@@ -32,6 +32,12 @@ export const whatIsBareOSLink = 'https://docs.platform9.com/kubernetes/on-premis
 export const BareOSSetupDocumentation = 'https://docs.platform9.com/kubernetes/create-multimaster-bareos-cluster/'
 export const remoteMonitoringDocs = 'https://docs.platform9.com/kubernetes/enable-remote-monitoring/'
 
+export const runtimePrivileged = 'https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities'
+export const awsNetworkingConfigurations = 'https://docs.platform9.com/kubernetes/networking/configurations-supported-aws-cloud-provider/'
+
+export const awsAccessHelpUrl = 'http://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys' 
+export const iamPolicy = 'https://github.com/platform9/support-locker/blob/master/pmk/aws-policy.json'
+
 export const azureServicePrincipalPortal = 'https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal'
 export const azureGetValuesForSigningin = 'https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal#get-values-for-signing-in'
 export const azureCreateANewApplicationSecret = 'https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal#create-a-new-application-secret'

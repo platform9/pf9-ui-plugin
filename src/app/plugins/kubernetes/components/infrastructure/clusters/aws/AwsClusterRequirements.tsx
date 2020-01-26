@@ -4,7 +4,7 @@ import { Theme, Typography } from '@material-ui/core'
 import BulletList from 'core/components/BulletList'
 import Alert from 'core/components/Alert'
 import SubmitButton from 'core/components/buttons/SubmitButton'
-import { ClusterRequirementsContainer } from '../bareos/BareosClusterRequirements'
+import { FormFieldCard } from '../bareos/BareosClusterRequirements'
 
 const useStyles = makeStyles((theme: Theme) => ({
   requirements: {
@@ -35,7 +35,7 @@ const AwsClusterRequirements = ({ onComplete }) => {
     onComplete('Aws')
   }, [onComplete])
   return (
-    <ClusterRequirementsContainer title="Amazon AWS Deployment">
+    <FormFieldCard title="Amazon AWS Deployment">
       <Typography className={classes.text}>Use your existing AWS credentials to create and manage Kubernetes clusters and associated resources within your AWS public cloud environment.</Typography>
       <Typography className={classes.text}>You can create multiple AWS cloud providers; each AWS cloud provider should be associated with a unique set of AWS credentials.</Typography>
 
@@ -49,7 +49,7 @@ const AwsClusterRequirements = ({ onComplete }) => {
       <div>
         <SubmitButton onClick={handleClick}>Deploy With AWS</SubmitButton>
       </div>
-    </ClusterRequirementsContainer>
+    </FormFieldCard>
   )
 }
 export default AwsClusterRequirements

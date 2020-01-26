@@ -222,8 +222,8 @@ const theme = {
       medium: 'rgba(2, 194, 172, 0.4)',
     },
     code: {
-      background: '#FDF6F5',
-      text: '#E5513A',
+      background: '#606060',
+      text: '#d7d7d7',
     },
     pieChart: {
       success: '#4adf74',

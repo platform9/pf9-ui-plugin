@@ -70,8 +70,8 @@ const BareOSClusterRequirements = ({ onComplete }) => {
     onComplete('BareOS')
   }, [onComplete])
   return (
-    <ClusterRequirementsContainer
-      title="BareOS Ubuntu Single Node Cluster"
+    <FormFieldCard
+      title="BareOS Ubuntu Cluster"
       link={
         <div>
           <FontAwesomeIcon className={classes.blueIcon} size="md">file-alt</FontAwesomeIcon>{' '}
@@ -95,7 +95,7 @@ const BareOSClusterRequirements = ({ onComplete }) => {
       <div>
         <SubmitButton onClick={handleClick}>Deploy With Bare OS</SubmitButton>
       </div>
-    </ClusterRequirementsContainer>
+    </FormFieldCard>
   )
 }
 export default BareOSClusterRequirements
@@ -113,12 +113,12 @@ const HardwareSpec = ({ title, icon }) => {
 }
 
 interface ContainerProps {title: string, link?: JSX.Element}
-export const ClusterRequirementsContainer: React.FC<ContainerProps> = ({ title, link = undefined, children }) => {
+export const FormFieldCard: React.FC<ContainerProps> = ({ title, link = undefined, children }) => {
   const classes = useStyles({})
   return (
     <div className={classes.root}>
       <header className={classes.requirementsTitle}>
-        <Typography variant="subtitle2">{title}</Typography>
+        <Typography variant="subtitle1">{title}</Typography>
         { !!link && link }
       </header>
       {children}

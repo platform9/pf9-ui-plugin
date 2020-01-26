@@ -26,6 +26,10 @@ const useStyles = makeStyles<Theme>((theme) => ({
     },
     marginTop: theme.spacing(2),
   },
+  centerContent: {
+    display: 'flex',
+    alignItems: 'center'
+  }
 }))
 
 export const clustersHaveMonitoring = (clusters: any[]) =>
@@ -126,7 +130,7 @@ const ClusterSetup = ({ onComplete, initialPanel = Panels.Cluster }: Props) => {
           onSkip={handleSkipAccess}
           skipConfirmTitle="Skip the API access step in your getting started wizard?"
         >
-          <Typography variant="body1" component="span">
+          <Typography className={classes.centerContent} variant="body1" component="span">
             To access your cluster, you need to download the kubeconfig for your cluster and
             download <CodeBlock>kubectl</CodeBlock>
           </Typography>

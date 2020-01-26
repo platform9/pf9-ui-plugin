@@ -1,4 +1,5 @@
 import { k8sPrefix } from 'app/constants'
+import { CloudProviders } from 'k8s/components/infrastructure/clusters/model'
 interface GenericKVP {[key: string]: string}
 
 const routes = {
@@ -97,6 +98,10 @@ export const pathToClusterConvergingNodes = (params: {id: string} & GenericKVP) 
 
 export const pathToNodes = (params?: GenericKVP) => {
   return createUrlWithQueryString(routes.nodes.list, params)
+}
+
+export const pathToCreateCloudProvider = (params?: {type?: CloudProviders} & GenericKVP) => {
+  return createUrlWithQueryString(routes.cloudProviders.add, params)
 }
 
 /*

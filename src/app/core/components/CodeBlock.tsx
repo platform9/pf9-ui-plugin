@@ -8,6 +8,8 @@ interface Props {
 
 const useStyles = makeStyles((theme: Theme) => ({
   pre: {
+    fontWeight: 600,
+    fontFamily: 'monospace',
     display: 'inline-block',
     backgroundColor: theme.palette.code.background,
     color: theme.palette.code.text,
