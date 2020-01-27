@@ -25,7 +25,7 @@ const UserPasswordField = ({ value }) => <>
   <Typography variant="body1" component="div">
     Password must contain the following:
     <List dense>
-      <CheckListItem checked={hasMinLength(8, value)}>
+      <CheckListItem checked={hasMinLength(8)(value)}>
         At least 8 characters long
       </CheckListItem>
       <CheckListItem checked={hasOneLowerChar(value)}>
