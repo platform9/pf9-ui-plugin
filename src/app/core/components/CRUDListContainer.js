@@ -57,9 +57,6 @@ const CRUDListContainer = ({
 
   const handleDeleteConfirm = useCallback(async () => {
     toggleConfirmDialog()
-
-    if (DeleteDialog) return
-
     await Promise.all(selectedItems.map(handleRemove))
     await deletePromise.current()
     reload()
