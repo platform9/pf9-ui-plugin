@@ -43,6 +43,10 @@ export const azureServicePrincipalPortal = 'https://docs.microsoft.com/en-us/azu
 export const azureGetValuesForSigningin = 'https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal#get-values-for-signing-in'
 export const azureCreateANewApplicationSecret = 'https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal#create-a-new-application-secret'
 
+export const createPodUrl = 'https://kubernetes.io/docs/tasks/configure-pod-container/communicate-containers-same-pod/#creating-a-pod-that-runs-two-containers'
+export const createDeploymentUrl = 'https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#creating-a-deployment'
+export const createServiceUrl = 'https://kubernetes.io/docs/tutorials/connecting-apps/connecting-frontend-backend/#creating-the-backend-service-object'
+
 // Errors
 export const addError = 'ERR_ADD'
 export const updateError = 'ERR_UPDATE'

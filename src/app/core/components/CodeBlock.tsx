@@ -13,7 +13,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     display: 'inline-block',
     backgroundColor: theme.palette.code.background,
     color: theme.palette.code.text,
-    padding: theme.spacing(1, 2),
+    padding: theme.spacing(),
     margin: theme.spacing(0.5),
     wordBreak: 'break-all',
     whiteSpace: 'pre-wrap',

@@ -2,7 +2,7 @@ import { k8sPrefix } from 'app/constants'
 import { CloudProviders } from 'k8s/components/infrastructure/clusters/model'
 interface GenericKVP {[key: string]: string}
 
-const routes = {
+export const routes = {
   cluster: {
     list: `${k8sPrefix}/infrastructure#clusters`,
     edit: `${k8sPrefix}/infrastructure/clusters/edit/:id`,
