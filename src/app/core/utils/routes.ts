@@ -1,4 +1,4 @@
-import { k8sPrefix } from 'app/constants'
+import { k8sPrefix, appUrlRoot } from 'app/constants'
 interface GenericKVP {[key: string]: string}
 
 const routes = {
@@ -76,7 +76,8 @@ const routes = {
     editClusterRoles: `${k8sPrefix}/rbac/clusterroles/edit/:id/cluster/:clusterId`,
     editRoleBindings: `${k8sPrefix}/rbac/rolebindings/edit/:id/cluster/:clusterId`,
     editClusterRoleBindings: `${k8sPrefix}/rbac/clusterrolebindings/edit/:id/cluster/:clusterId`,
-  }
+  },
+  resetPassword: `${appUrlRoot}/reset/password/:id`
 }
 
 export const pathToCreateCluster = (params?: GenericKVP) => {
@@ -97,6 +98,10 @@ export const pathToClusterConvergingNodes = (params: {id: string} & GenericKVP) 
 
 export const pathToNodes = (params?: GenericKVP) => {
   return createUrlWithQueryString(routes.nodes.list, params)
+}
+
+export const pathToResetPasswordUrl = (params?: {id: string} & GenericKVP) => {
+  return createUrlWithQueryString(routes.resetPassword, params)
 }
 
 /*

@@ -42,3 +42,7 @@ body {
 .fa-xl {
     font-size: 1.66666em;
 }
+
+.no-wrap-text {
+    white-space: nowrap;
+}
