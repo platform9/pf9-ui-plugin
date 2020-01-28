@@ -11,7 +11,7 @@ class Route<T = null> {
   public url: string
   public path: RouterPathFn<T>
 
-  constructor(url: string) {
+  constructor (url: string) {
     this.url = url
     // compiler dislikes an inline type definition "this.path: RouterPathFn<T>"
     const path: RouterPathFn<T> = (...params: OptionalParamType<T>) => {
