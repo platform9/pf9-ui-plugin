@@ -111,7 +111,7 @@ const KubeConfigListPage = () => {
                     <div>
                       <Typography variant="body1">
                         There are no clusters available. You need to{' '}
-                        <SimpleLink src={routes.clusters.add.path()}>create a cluster</SimpleLink> first
+                        <SimpleLink src={routes.cluster.add.path()}>create a cluster</SimpleLink> first
                         to continue.
                       </Typography>
                     </div>
