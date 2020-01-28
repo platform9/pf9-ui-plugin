@@ -40,6 +40,7 @@ const useStyles = makeStyles<Theme, Props>((theme: Theme) => ({
         ok: theme.palette.pieChart.success,
         pause: theme.palette.pieChart.warning,
         fail: theme.palette.pieChart.error,
+        unknown: theme.palette.primary.main,
       }[status] || theme.palette.pieChart.error)
     },
   },
@@ -79,7 +80,7 @@ const ClusterStatusSpan: FC<Props> = props => {
 ClusterStatusSpan.propTypes = {
   label: PropTypes.string,
   title: PropTypes.string,
-  status: PropTypes.oneOf(['ok', 'fail', 'pause', 'loading', 'error'])
+  status: PropTypes.oneOf(['ok', 'fail', 'pause', 'loading', 'error', 'unknown'])
 }
 
 export default ClusterStatusSpan
@@ -114,8 +115,8 @@ const renderTransientStatus = (connectionStatus, progressPercent, variant) => {
   )
 }
 
-interface IClusterStatusProps { cluster: ICluster, variant: StatusVariant }
-export const ClusterHealthStatus: FC<IClusterStatusProps> = ({ cluster, variant = 'table' }) => {
+interface IClusterStatusProps { cluster: ICluster, variant: StatusVariant, message?: string }
+export const ClusterHealthStatus: FC<IClusterStatusProps> = ({ cluster, variant = 'table', message = undefined }) => {
   if (isTransientStatus(cluster.healthStatus)) {
     return renderTransientStatus(cluster.healthStatus, cluster.progressPercent, variant)
   }
@@ -123,7 +124,15 @@ export const ClusterHealthStatus: FC<IClusterStatusProps> = ({ cluster, variant 
   const fields = getClusterHealthStatus(cluster)
 
   if (!fields) {
-    return <span>N/A</span>
+    return (
+      <ClusterStatusSpan
+        title={message || 'unknown'}
+        status="unknown"
+        variant={variant}
+      >
+        { message || 'unknown' }
+      </ClusterStatusSpan>
+    )
   }
 
   return (
@@ -140,14 +149,22 @@ export const ClusterHealthStatus: FC<IClusterStatusProps> = ({ cluster, variant 
   )
 }
 
-export const ClusterConnectionStatus: FC<IClusterStatusProps> = ({ cluster, variant = 'table' }) => {
+export const ClusterConnectionStatus: FC<IClusterStatusProps> = ({ cluster, variant = 'table', message = undefined }) => {
   if (isTransientStatus(cluster.connectionStatus)) {
     return renderTransientStatus(cluster.connectionStatus, cluster.progressPercent, variant)
   }
   const fields = getClusterConnectionStatus(cluster)
 
   if (!fields) {
-    return <span>N/A</span>
+    return (
+      <ClusterStatusSpan
+        title={message || 'unknown'}
+        status="unknown"
+        variant={variant}
+      >
+        { message || 'unknown' }
+      </ClusterStatusSpan>
+    )
   }
 
   return (

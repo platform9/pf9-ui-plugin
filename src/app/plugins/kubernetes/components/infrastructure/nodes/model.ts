@@ -1,3 +1,5 @@
+export type IUseDataLoader<T> = [T[], boolean, (ignoreCache?: boolean) => T[]]
+
 export interface Combined {
   qbert: ICombinedNode
   resmgr: Resmgr

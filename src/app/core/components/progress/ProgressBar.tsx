@@ -15,7 +15,7 @@ interface Props {
   containedPercent?: boolean
   label?: string | JSX.Element | LabelRenderProp
   variant?: 'progress' | 'health'
-  color?: 'error' | 'success'
+  color?: 'error' | 'success' | 'primary'
 }
 
 const useStyles = makeStyles<Theme, Props>(theme => ({
