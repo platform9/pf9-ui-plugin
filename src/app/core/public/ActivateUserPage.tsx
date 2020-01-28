@@ -5,7 +5,7 @@ import { makeStyles } from '@material-ui/styles'
 import { Button, Grid, Paper, Typography } from '@material-ui/core'
 import Progress from 'core/components/progress/Progress'
 import { loginUrl, forgotPasswordUrl } from 'app/constants.js'
-import { pathToResetPasswordUrl } from 'core/utils/routes'
+import { routes } from 'core/utils/routes'
 import { Link } from 'react-router-dom'
 
 const useStyles = makeStyles((theme: any) => ({
@@ -47,7 +47,7 @@ export const ActivateUserPage = props => {
     const validateSecret = async () => {
       try {
         const response = await clemency.verifyActivateLink(username, otp)
-        history.push(pathToResetPasswordUrl({ id: response.value }))
+        history.push(routes.password.reset.path({ id: response.value }))
       } catch (e) {
         setLoading(false)
       }

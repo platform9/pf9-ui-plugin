@@ -73,7 +73,8 @@ const useStyles = makeStyles<Theme, StyleProps>((theme: Theme) => ({
     position: 'relative',
     '& > p': {
       paddingLeft: 20,
-      fontWeight: 'bold'
+      fontWeight: 'bold',
+      fontSize: theme.typography.subtitle1.fontSize
     },
     '&:before': {
       content: '""',

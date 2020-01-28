@@ -6,6 +6,9 @@ export enum UserRoles {
   // TODO figure out what other roles we have for users
 }
 export const isAdminRole = (getContext) => {
-  const { role } = getContext(prop('userDetails'))
-  return role === UserRoles.Admin
+  const ctx = getContext(prop('userDetails'))
+  if (!ctx) {
+    return false
+  }
+  return ctx.role === UserRoles.Admin
 }

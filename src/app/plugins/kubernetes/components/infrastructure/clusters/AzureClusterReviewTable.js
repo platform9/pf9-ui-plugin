@@ -23,7 +23,7 @@ const AzureClusterReviewTable = ({ data }) => {
           <DataRow label="Num master nodes" value={data.numMasters} />
           <DataRow label="Num worker nodes" value={data.numWorkers} />
           <DataRow label="SSH key" value={data.sshKey} />
-          <DataRow label="Allow workloads on master nodes" value={bool2str(data.allowWorkloadsOnMaster)} />
+          <DataRow label="Make all Master nodes Master + Worker" value={bool2str(data.allowWorkloadsOnMaster)} />
           <DataRow label="Assign public IP's" value={bool2str(data.assignPublicIps)} />
           <DataRow label="Containers CIDR" value={data.containersCidr} />
           <DataRow label="Services CIDR" value={data.servicesCidr} />
