@@ -25,24 +25,8 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import Progress from 'core/components/progress/Progress'
 import identity from 'ramda/es/identity'
 import { isAdminRole } from 'k8s/util/helpers'
-import {
-  pathToNodeDownload,
-  pathToNodes,
-  pathToClusters,
-  pathToAddCluster,
-  pathToCloudProviders,
-  pathToAddCloudProvider,
-  pathToTenants,
-  pathToUsers,
-  pathToAddUser,
-  pathToAddTenant,
-  pathToPods,
-  pathToAddPods,
-  pathToPodDeployments,
-  pathToPodsAddDeployments,
-  pathToPodServices,
-  pathToPodsAddServices,
-} from 'core/utils/routes'
+import { routes } from 'core/utils/routes'
+import { CloudProviders } from '../infrastructure/clusters/model'
 
 const useStyles = makeStyles((theme) => ({
   cardRow: {
@@ -61,8 +45,8 @@ const topReports = [
   {
     entity: 'user',
     permissions: ['admin'],
-    route: pathToUsers(),
-    addRoute: pathToAddUser(),
+    route: routes.userManagement.users.path(),
+    addRoute: routes.userManagement.addUser.path(),
     title: 'Users',
     icon: 'user',
     dataLoader: [mngmUserActions.list],
@@ -73,8 +57,8 @@ const topReports = [
   {
     entity: 'tenant',
     permissions: ['admin'],
-    route: pathToTenants(),
-    addRoute: pathToAddTenant(),
+    route: routes.userManagement.tenants.path(),
+    addRoute: routes.userManagement.addTenant.path(),
     title: 'Tenants',
     icon: 'users-class',
     dataLoader: [mngmTenantActions.list],
@@ -84,8 +68,8 @@ const topReports = [
   },
   {
     entity: 'deployment',
-    route: pathToPodDeployments(),
-    addRoute: pathToPodsAddDeployments(),
+    route: routes.pods.deployments.path(),
+    addRoute: routes.pods.addDeployments.path(),
     title: 'Deployments',
     icon: 'window',
     dataLoader: [deploymentActions.list, { clusterId: allKey }],
@@ -95,8 +79,8 @@ const topReports = [
   },
   {
     entity: 'service',
-    route: pathToPodServices(),
-    addRoute: pathToPodsAddServices(),
+    route: routes.pods.services.path(),
+    addRoute: routes.pods.addServices.path(),
     title: 'Services',
     icon: 'tasks-alt',
     dataLoader: [serviceActions.list, { clusterId: allKey }],
@@ -109,8 +93,8 @@ const bottomReports = [
   {
     entity: 'cloud',
     permissions: ['admin'],
-    route: pathToCloudProviders(),
-    addRoute: pathToAddCloudProvider(),
+    route: routes.cloudProviders.list.path(),
+    addRoute: routes.cloudProviders.add.path({ type: CloudProviders.Aws }),
     title: 'Cloud Accounts',
     icon: 'cloud',
     dataLoader: [cloudProviderActions.list],
@@ -120,8 +104,8 @@ const bottomReports = [
   },
   {
     entity: 'pod',
-    route: pathToPods(),
-    addRoute: pathToAddPods(),
+    route: routes.pods.list.path(),
+    addRoute: routes.pods.add.path(),
     title: 'Pods',
     icon: 'cubes',
     dataLoader: [podActions.list, { clusterId: allKey }],
@@ -155,8 +139,8 @@ const bottomReports = [
   {
     entity: 'cluster',
     permissions: ['admin'], // Technically non-admins have read-only access
-    route: pathToClusters(),
-    addRoute: pathToAddCluster(),
+    route: routes.cluster.list.path(),
+    addRoute: routes.cluster.add.path(),
     title: 'Clusters',
     icon: 'project-diagram',
     dataLoader: [clusterActions.list],
@@ -190,8 +174,8 @@ const bottomReports = [
   {
     entity: 'node',
     permissions: ['admin'],
-    route: pathToNodes(),
-    addRoute: pathToNodeDownload(),
+    route: routes.nodes.list.path(),
+    addRoute: routes.nodes.download.path(),
     title: 'Nodes',
     icon: 'ball-pile',
     dataLoader: [loadNodes],

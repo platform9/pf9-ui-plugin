@@ -5,7 +5,7 @@ import Theme from 'core/themes/model'
 import SimpleLink from 'core/components/SimpleLink'
 import ExternalLink from 'core/components/ExternalLink'
 import { BareOSSetupDocumentation } from 'app/constants'
-import { pathToUsers } from 'core/utils/routes'
+import { routes } from 'core/utils/routes'
 
 const useStyles = makeStyles<Theme>((theme) => ({
   onboardWizard: {
@@ -41,7 +41,7 @@ const OnboardWizard: FC<Props> = ({ title, body, children, renderLinks = true })
     <section className={onboardWizard}>
       {renderLinks && (
         <div className={rightAlign}>
-          <SimpleLink src={pathToUsers()} icon="user-plus">
+          <SimpleLink src={routes.userManagement.users.path()} icon="user-plus">
             Invite Team Member
           </SimpleLink>
           <ExternalLink

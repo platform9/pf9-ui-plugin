@@ -8,7 +8,7 @@ import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import ExternalLink from 'core/components/ExternalLink'
 import { BareOSSetupDocumentation } from 'app/constants'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
-import { pathToAddBareOSCluster } from 'core/utils/routes'
+import { routes } from 'core/utils/routes'
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -69,7 +69,7 @@ const nodeServices = ['Prometheus', 'Fluentd', 'Kubeadm']
 const BareOSClusterRequirements = ({ onComplete }) => {
   const classes = useStyles({})
   const handleClick = useCallback(() => {
-    onComplete(pathToAddBareOSCluster())
+    onComplete(routes.cluster.addBareOs.path())
   }, [onComplete])
   return (
     <FormFieldCard

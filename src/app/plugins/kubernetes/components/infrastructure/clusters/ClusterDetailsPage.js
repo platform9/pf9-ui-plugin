@@ -16,7 +16,7 @@ import useReactRouter from 'use-react-router'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import { ClusterConnectionStatus, ClusterHealthStatus } from 'k8s/components/infrastructure/clusters/ClusterStatus'
 import { ConvergingNodesWithTasksToggler } from '../nodes/ConvergingNodeBreakdown'
-import { pathToClusters } from 'core/utils/routes'
+import { routes } from 'core/utils/routes'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 
 const useStyles = makeStyles((theme) => ({
@@ -98,7 +98,7 @@ const ClusterDetailsPage = () => {
       header={
         <>
           <span />
-          <SimpleLink src={pathToClusters()} className={classes.backLink}>
+          <SimpleLink src={routes.cluster.list.path()} className={classes.backLink}>
             « Back to Cluster List
           </SimpleLink>
         </>

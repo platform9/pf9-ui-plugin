@@ -16,7 +16,7 @@ import UsageWidget from 'core/components/widgets/UsageWidget'
 import calcUsageTotals from 'k8s/util/calcUsageTotals'
 import ExternalLink from 'core/components/ExternalLink'
 import HelpContainer from 'core/components/HelpContainer'
-import { pathToClusterDetail, pathToNodes } from 'core/utils/routes'
+import { routes } from 'core/utils/routes'
 import partition from 'ramda/es/partition'
 
 const isPrimaryNetwork = (primaryNetwork) => ([name, ip]) => ip === primaryNetwork
@@ -88,7 +88,7 @@ const ClusterDetailsPage: FC = () => {
       header={
         <>
           <Typography variant="h5">Node {selectedNode.name}</Typography>
-          <SimpleLink src={pathToNodes()} className={classes.backLink}>
+          <SimpleLink src={routes.nodes.list.path()} className={classes.backLink}>
             <span>« Back to Node List</span>
           </SimpleLink>
         </>
@@ -153,7 +153,7 @@ const NodeDetail: FC<ICombinedNode> = (node) => {
               />
               <DetailRow label="CPU Architecture" value={CPUArchitecture} />
               <DetailRow label="Operating System" value={operatingSystem} />
-              {!!clusterName && <DetailRow label="Cluster info" value={<SimpleLink src={pathToClusterDetail({ id: clusterUuid })}>{clusterName}</SimpleLink>} />}
+              {!!clusterName && <DetailRow label="Cluster info" value={<SimpleLink src={routes.cluster.detail.path({ id: clusterUuid })}>{clusterName}</SimpleLink>} />}
               <DetailRow label="Roles" value={roles} />
               <DetailRow label="Logs" value={<ExternalLink url={logs}>View Logs</ExternalLink>} />
             </tbody>

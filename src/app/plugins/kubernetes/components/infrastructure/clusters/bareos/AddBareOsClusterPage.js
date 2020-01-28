@@ -25,7 +25,7 @@ import { allPass } from 'ramda'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { loadNodes } from '../../nodes/actions'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
-import { pathToAddCluster, pathToClusters } from 'core/utils/routes'
+import { routes } from 'core/utils/routes'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
@@ -77,7 +77,7 @@ const canFinishAndReview = ({ masterNodes, workerNodes, allowWorkloadsOnMaster }
 const AddBareOsClusterPage = () => {
   const classes = useStyles()
   const { history } = useReactRouter()
-  const onComplete = () => history.push(pathToClusters())
+  const onComplete = () => history.push(routes.cluster.list.path())
   const [createBareOSClusterAction, creatingBareOSCluster] = useDataUpdater(clusterActions.create, onComplete) // eslint-disable-line
 
   const handleSubmit = data => createBareOSClusterAction({ ...data, clusterType: 'local' })
@@ -89,7 +89,7 @@ const AddBareOsClusterPage = () => {
       <Wizard
         onComplete={handleSubmit}
         context={initialContext}
-        originPath={pathToAddCluster()}
+        originPath={routes.cluster.add.path()}
         disableNext={!hasFreeNodes}
         showFinishAndReviewButton={canFinishAndReview}
       >

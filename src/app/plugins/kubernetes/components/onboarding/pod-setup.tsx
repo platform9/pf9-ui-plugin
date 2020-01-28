@@ -9,7 +9,7 @@ import { podActions } from '../pods/actions'
 import { Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
-import { pathToAddPods } from 'core/utils/routes'
+import { routes } from 'core/utils/routes'
 
 const useStyles = makeStyles<Theme>((theme) => ({
   container: {
@@ -32,7 +32,7 @@ const PodSetup = ({ onComplete, initialPanel }: Props) => {
   const { history } = useReactRouter()
 
   const handleCreatePod = useCallback(() => {
-    history.push(pathToAddPods())
+    history.push(routes.pods.add.path())
   }, [])
 
   const handleSkipPods = useCallback(() => {

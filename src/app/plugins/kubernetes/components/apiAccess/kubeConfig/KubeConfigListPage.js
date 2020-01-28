@@ -16,7 +16,7 @@ import ExternalLink from 'core/components/ExternalLink'
 import { OnboardingAccessSetup } from 'app/constants'
 import useDataLoader from 'core/hooks/useDataLoader'
 import Progress from 'core/components/progress/Progress'
-import { pathToAddCluster } from 'app/core/utils/routes'
+import { routes } from 'app/core/utils/routes'
 import CodeBlock from 'core/components/CodeBlock'
 import CopyToClipboard from 'core/components/CopyToClipboard'
 
@@ -111,7 +111,7 @@ const KubeConfigListPage = () => {
                     <div>
                       <Typography variant="body1">
                         There are no clusters available. You need to{' '}
-                        <SimpleLink src={pathToAddCluster()}>create a cluster</SimpleLink> first
+                        <SimpleLink src={routes.clusters.add.path()}>create a cluster</SimpleLink> first
                         to continue.
                       </Typography>
                     </div>

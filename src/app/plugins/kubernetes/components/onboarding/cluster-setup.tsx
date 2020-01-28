@@ -12,7 +12,7 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import { clusterActions } from '../infrastructure/clusters/actions'
 import PrometheusAddonDialog from '../prometheus/PrometheusAddonDialog'
 import { ICluster } from '../infrastructure/clusters/model'
-import { pathToAddCluster, pathToApiAccess } from 'core/utils/routes'
+import { routes } from 'core/utils/routes'
 
 const useStyles = makeStyles<Theme>((theme) => ({
   container: {
@@ -61,11 +61,11 @@ const ClusterSetup = ({ onComplete, initialPanel = Panels.Cluster }: Props) => {
   const [activePanels, setActivePanels] = useState(new Set([initialPanel]))
 
   const handleCreateCluster = useCallback(() => {
-    history.push(pathToAddCluster())
+    history.push(routes.cluster.add.path())
   }, [])
 
   const handleAccessCluster = useCallback(() => {
-    history.push(pathToApiAccess())
+    history.push(routes.apiAccess.path())
   }, [])
 
   const togglePanel = useCallback(
