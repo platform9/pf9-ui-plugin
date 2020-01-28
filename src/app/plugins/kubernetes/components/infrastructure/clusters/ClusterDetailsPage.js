@@ -20,7 +20,7 @@ import { routes } from 'core/utils/routes'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import PollingData from 'core/components/PollingData'
 
-const tenSeconds = 1000 * 10
+const oneSecond = 1000
 
 const useStyles = makeStyles((theme) => ({
   cardBoarder: {
@@ -110,7 +110,7 @@ const ClusterDetailsPage = () => {
       }
     >
       <>
-        <PollingData hidden loading={loading} onReload={reload} refreshDuration={tenSeconds} />
+        <PollingData hidden loading={loading} onReload={reload} refreshDuration={oneSecond * 10} />
         <ClusterStatusAndUsage cluster={cluster} loading={loading} />
         <Tabs>
           <Tab value="nodes" label="Nodes">

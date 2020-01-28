@@ -96,7 +96,7 @@ const getProgressColor = (all: string[], completed: string[], failed: string) =>
   }
   return 'error'
 }
-const tenSeconds = 1000 * 10
+const oneSecond = 1000
 
 export const ConvergingNodesWithTasksToggler: FC = () => {
   const { match } = useReactRouter()
@@ -124,7 +124,7 @@ export const ConvergingNodesWithTasksToggler: FC = () => {
     <Progress loading={loadingClusters}>
       <div className={tableChooser}>
         <div className={tablePolling}>
-          <PollingData loading={loadingNodes} onReload={reload} refreshDuration={tenSeconds} />
+          <PollingData loading={loadingNodes} onReload={reload} refreshDuration={oneSecond * 10} />
         </div>
         <Table>
           <TableHead>
