@@ -126,7 +126,7 @@ const TasksTable = createListTableComponent({
   showCheckboxes: false,
   paginate: false,
   compactTable: true,
-  emptyText: <Typography variant="body1">No status information available.</Typography>
+  emptyText: <Typography variant="body1">No status information currently available.</Typography>
 })
 
 export const Tasks = ({ allTasks, completedTasks = [], lastFailedTask }) => {

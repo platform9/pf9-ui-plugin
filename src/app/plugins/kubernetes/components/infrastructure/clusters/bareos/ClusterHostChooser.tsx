@@ -1,14 +1,12 @@
-import React, { forwardRef, useState, useCallback } from 'react'
-import Loading from 'core/components/Loading'
+import React, { forwardRef } from 'react'
 import useDataLoader from 'core/hooks/useDataLoader'
-import useInterval from 'core/hooks/useInterval'
 import withFormContext from 'core/components/validatedForm/withFormContext'
 import { Checkbox, Radio, Table, TableHead, TableCell, TableRow, TableBody, Typography, Theme } from '@material-ui/core'
 import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
 import { makeStyles } from '@material-ui/styles'
 import { identity } from 'ramda'
-import { ICombinedNode } from '../../nodes/model'
-import moment from 'moment'
+import { ICombinedNode, IUseDataLoader } from '../../nodes/model'
+import PollingData from 'core/components/PollingData'
 
 const useStyles = makeStyles<any, any>((theme: Theme) => ({
   table: {
@@ -30,7 +28,6 @@ export const excludeNodes = (excludeList: string[] = []) => (node: ICombinedNode
 export const isMaster = (node: ICombinedNode) => !!node.isMaster
 export const isNotMaster = (node: ICombinedNode) => !node.isMaster
 export const inCluster = (clusterUuid: string) => (node: ICombinedNode) => node.clusterUuid === clusterUuid
-const refreshDuration = 1000 * 60 * 5
 
 // TODO: all the ValidatedForm stuff is in JS and we need the props to be merged
 // into this component.  Refactor this later on when we can convert
@@ -52,6 +49,8 @@ interface Props extends IValidatedForm {
   multiple?: boolean
 }
 
+const emptyNode: ICombinedNode = {} as any
+
 // TODO: is forwardRef actually needed here?
 const ClusterHostChooser: React.ComponentType<Props> = forwardRef(
   (
@@ -59,29 +58,9 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef(
     ref,
   ) => {
     const { table, tableContainer, errorText } = useStyles({ hasError })
-    const [nodes, loading, loadMore] = useDataLoader(loadNodes)
-    const [lastFetchMsg, setLastFetchMsg] = useState(moment().fromNow())
-    const [lastFetchTs, setLastFetchTs] = useState(new Date().valueOf())
+    const [nodes, loading, loadMore]: IUseDataLoader<ICombinedNode> = useDataLoader(loadNodes) as any
 
     const Warning = ({ children }) => <Typography variant="body1" className={errorText}>{children}</Typography>
-
-    const onReload = useCallback(() => {
-      setLastFetchTs(new Date().valueOf())
-      setLastFetchMsg(moment().fromNow())
-      loadMore(true)
-    }, [])
-
-    if (pollForNodes) {
-      useInterval(() => {
-        if (!loading) {
-          setLastFetchMsg(moment(lastFetchTs).fromNow())
-        }
-      }, 1000)
-      const currentTs = new Date().valueOf()
-      if (currentTs - lastFetchTs > refreshDuration) {
-        onReload()
-      }
-    }
 
     const selectableNodes = nodes.filter(filterFn)
 
@@ -100,14 +79,7 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef(
     return (
       <div className={tableContainer}>
         {pollForNodes && (
-          <Loading
-            loading={loading}
-            justify="flex-start"
-            onClick={onReload}
-            reverse
-          >
-            <Typography variant="caption" color="textSecondary">{loading ? 'loading...' : lastFetchMsg}</Typography>
-          </Loading>
+          <PollingData loading={loading} onReload={loadMore} pause={!pollForNodes} />
         )}
         <Table ref={ref} className={table}>
           <TableHead>
@@ -128,7 +100,7 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef(
                 </TableCell>
               </TableRow>
             )}
-            {selectableNodes.map((node = {}) => (
+            {selectableNodes.map((node = emptyNode) => (
               <TableRow key={node.uuid} onClick={toggleHost(node.uuid)}>
                 <TableCell>
                   {multiple

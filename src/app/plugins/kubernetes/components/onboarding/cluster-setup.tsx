@@ -12,6 +12,7 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import { clusterActions } from '../infrastructure/clusters/actions'
 import PrometheusAddonDialog from '../prometheus/PrometheusAddonDialog'
 import { ICluster } from '../infrastructure/clusters/model'
+import { routes } from 'core/utils/routes'
 
 const useStyles = makeStyles<Theme>((theme) => ({
   container: {
@@ -26,6 +27,10 @@ const useStyles = makeStyles<Theme>((theme) => ({
     },
     marginTop: theme.spacing(2),
   },
+  centerContent: {
+    display: 'flex',
+    alignItems: 'center'
+  }
 }))
 
 export const clustersHaveMonitoring = (clusters: any[]) =>
@@ -56,11 +61,11 @@ const ClusterSetup = ({ onComplete, initialPanel = Panels.Cluster }: Props) => {
   const [activePanels, setActivePanels] = useState(new Set([initialPanel]))
 
   const handleCreateCluster = useCallback(() => {
-    history.push('/ui/kubernetes/infrastructure/clusters/add')
+    history.push(routes.cluster.add.path())
   }, [])
 
   const handleAccessCluster = useCallback(() => {
-    history.push('/ui/kubernetes/api_access')
+    history.push(routes.apiAccess.path())
   }, [])
 
   const togglePanel = useCallback(
@@ -126,7 +131,7 @@ const ClusterSetup = ({ onComplete, initialPanel = Panels.Cluster }: Props) => {
           onSkip={handleSkipAccess}
           skipConfirmTitle="Skip the API access step in your getting started wizard?"
         >
-          <Typography variant="body1" component="span">
+          <Typography className={classes.centerContent} variant="body1" component="span">
             To access your cluster, you need to download the kubeconfig for your cluster and
             download <CodeBlock>kubectl</CodeBlock>
           </Typography>

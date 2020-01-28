@@ -16,7 +16,8 @@ import moize from 'moize'
 import { assoc, flatten, pluck, prop, propEq, propOr, where, equals } from 'ramda'
 import { matchPath, withRouter } from 'react-router'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
-import { imageUrls, clarityDashboardUrl, k8sPrefix } from 'app/constants'
+import { imageUrls, clarityDashboardUrl } from 'app/constants'
+import { routes } from 'core/utils/routes'
 
 export const drawerWidth = 180
 
@@ -272,7 +273,7 @@ class Navbar extends PureComponent {
   }
 
   handleLogoClick = () => {
-    this.props.history.push(`${k8sPrefix}/dashboard`)
+    this.props.history.push(routes.dashboard.path())
   }
 
   handleEscKey = () => {

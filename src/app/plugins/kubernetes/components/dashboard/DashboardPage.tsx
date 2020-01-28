@@ -25,6 +25,8 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import Progress from 'core/components/progress/Progress'
 import identity from 'ramda/es/identity'
 import { isAdminRole } from 'k8s/util/helpers'
+import { routes } from 'core/utils/routes'
+import { CloudProviders } from '../infrastructure/clusters/model'
 
 const useStyles = makeStyles((theme) => ({
   cardRow: {
@@ -43,31 +45,31 @@ const topReports = [
   {
     entity: 'user',
     permissions: ['admin'],
-    route: '/ui/kubernetes/user_management#users',
-    addRoute: '/ui/kubernetes/user_management/users/add',
+    route: routes.userManagement.users.path(),
+    addRoute: routes.userManagement.addUser.path(),
     title: 'Users',
     icon: 'user',
     dataLoader: [mngmUserActions.list],
-    quantityFn: users => ({
+    quantityFn: (users) => ({
       quantity: users.length,
     }),
   },
   {
     entity: 'tenant',
     permissions: ['admin'],
-    route: '/ui/kubernetes/user_management#tenants',
-    addRoute: '/ui/kubernetes/user_management/tenants/add',
+    route: routes.userManagement.tenants.path(),
+    addRoute: routes.userManagement.addTenant.path(),
     title: 'Tenants',
     icon: 'users-class',
     dataLoader: [mngmTenantActions.list],
-    quantityFn: tenants => ({
+    quantityFn: (tenants) => ({
       quantity: tenants.length,
     }),
   },
   {
     entity: 'deployment',
-    route: '/ui/kubernetes/pods#deployments',
-    addRoute: '/ui/kubernetes/pods/deployments/add',
+    route: routes.deployments.list.path(),
+    addRoute: routes.deployments.add.path(),
     title: 'Deployments',
     icon: 'window',
     dataLoader: [deploymentActions.list, { clusterId: allKey }],
@@ -77,12 +79,12 @@ const topReports = [
   },
   {
     entity: 'service',
-    route: '/ui/kubernetes/pods#services',
-    addRoute: '/ui/kubernetes/pods/services/add',
+    route: routes.services.list.path(),
+    addRoute: routes.services.add.path(),
     title: 'Services',
     icon: 'tasks-alt',
     dataLoader: [serviceActions.list, { clusterId: allKey }],
-    quantityFn: services => ({
+    quantityFn: (services) => ({
       quantity: services.length,
     }),
   },
@@ -91,43 +93,43 @@ const bottomReports = [
   {
     entity: 'cloud',
     permissions: ['admin'],
-    route: '/ui/kubernetes/infrastructure#cloudProviders',
-    addRoute: '/ui/kubernetes/infrastructure/cloudProviders/add',
+    route: routes.cloudProviders.list.path(),
+    addRoute: routes.cloudProviders.add.path({ type: CloudProviders.Aws }),
     title: 'Cloud Accounts',
     icon: 'cloud',
     dataLoader: [cloudProviderActions.list],
-    quantityFn: clouds => ({
-      quantity: clouds.length
+    quantityFn: (clouds) => ({
+      quantity: clouds.length,
     }),
   },
   {
     entity: 'pod',
-    route: '/ui/kubernetes/pods',
-    addRoute: '/ui/kubernetes/pods/add',
+    route: routes.pods.list.path(),
+    addRoute: routes.pods.add.path(),
     title: 'Pods',
     icon: 'cubes',
     dataLoader: [podActions.list, { clusterId: allKey }],
-    quantityFn: pods => ({
+    quantityFn: (pods) => ({
       quantity: pods.length,
       pieData: [
         {
           name: 'running',
-          value: pods.filter(pod => pod.status.phase === 'Running').length,
+          value: pods.filter((pod) => pod.status.phase === 'Running').length,
           color: 'success',
         },
         {
           name: 'pending',
-          value: pods.filter(pod => pod.status.phase === 'Pending').length,
+          value: pods.filter((pod) => pod.status.phase === 'Pending').length,
           color: 'warning',
         },
         {
           name: 'unknown',
-          value: pods.filter(pod => pod.status.phase === 'Unknown').length,
+          value: pods.filter((pod) => pod.status.phase === 'Unknown').length,
           color: 'unknown',
         },
         {
           name: 'failed',
-          value: pods.filter(pod => pod.status.phase === 'Failed').length,
+          value: pods.filter((pod) => pod.status.phase === 'Failed').length,
           color: 'error',
         },
       ],
@@ -137,67 +139,67 @@ const bottomReports = [
   {
     entity: 'cluster',
     permissions: ['admin'], // Technically non-admins have read-only access
-    route: '/ui/kubernetes/infrastructure#clusters',
-    addRoute: '/ui/kubernetes/infrastructure/clusters/add',
+    route: routes.cluster.list.path(),
+    addRoute: routes.cluster.add.path(),
     title: 'Clusters',
     icon: 'project-diagram',
     dataLoader: [clusterActions.list],
-    quantityFn: clusters => ({
+    quantityFn: (clusters) => ({
       quantity: clusters.length,
       pieData: [
         {
           name: 'healthy',
-          value: clusters.filter(cluster => cluster.healthStatus === 'healthy').length,
+          value: clusters.filter((cluster) => cluster.healthStatus === 'healthy').length,
           color: 'success',
         },
         {
           name: 'partially_healthy',
-          value: clusters.filter(cluster => cluster.healthStatus === 'partially_healthy').length,
+          value: clusters.filter((cluster) => cluster.healthStatus === 'partially_healthy').length,
           color: 'warning',
         },
         {
           name: 'converging',
-          value: clusters.filter(cluster => cluster.healthStatus === 'converging').length,
+          value: clusters.filter((cluster) => cluster.healthStatus === 'converging').length,
           color: 'unknown',
         },
         {
           name: 'unhealthy',
-          value: clusters.filter(cluster => cluster.healthStatus === 'unhealthy').length,
+          value: clusters.filter((cluster) => cluster.healthStatus === 'unhealthy').length,
           color: 'error',
         },
       ],
       piePrimary: 'healthy',
-    })
+    }),
   },
   {
     entity: 'node',
     permissions: ['admin'],
-    route: '/ui/kubernetes/infrastructure#nodes',
-    addRoute: '/ui/kubernetes/infrastructure/nodes/cli/download',
+    route: routes.nodes.list.path(),
+    addRoute: routes.nodes.download.path(),
     title: 'Nodes',
     icon: 'ball-pile',
     dataLoader: [loadNodes],
-    quantityFn: nodes => ({
+    quantityFn: (nodes) => ({
       quantity: nodes.length,
       pieData: [
         {
           name: 'healthy',
-          value: nodes.filter(node => nodeHealthStatus(node) === 'healthy').length,
+          value: nodes.filter((node) => nodeHealthStatus(node) === 'healthy').length,
           color: 'success',
         },
         {
           name: 'unknown',
-          value: nodes.filter(node => nodeHealthStatus(node) === 'unknown').length,
+          value: nodes.filter((node) => nodeHealthStatus(node) === 'unknown').length,
           color: 'unknown',
         },
         {
           name: 'converging',
-          value: nodes.filter(node => nodeHealthStatus(node) === 'converging').length,
+          value: nodes.filter((node) => nodeHealthStatus(node) === 'converging').length,
           color: 'warning',
         },
         {
           name: 'unhealthy',
-          value: nodes.filter(node => nodeHealthStatus(node) === 'unhealthy').length,
+          value: nodes.filter((node) => nodeHealthStatus(node) === 'unhealthy').length,
           color: 'error',
         },
       ],
@@ -224,7 +226,9 @@ const promptOnboardingSetup = (items: boolean[]) => {
   return !isComplete
 }
 const nodeHealthStatus = ({ status }) => {
-  if (status === 'converging') { return status }
+  if (status === 'converging') {
+    return status
+  }
   return status === 'disconnected' ? 'unknown' : status === 'ok' ? 'healthy' : 'unhealthy'
 }
 
@@ -252,12 +256,9 @@ const DashboardPage = () => {
     forceUpdate()
   }, [])
 
-  const initialExpandedClusterPanel = useMemo(
-    () => {
-      return [hasClusters, hasAccess, hasMonitoring].findIndex((item) => !item)
-    },
-    [hasClusters, hasMonitoring, hasAccess],
-  )
+  const initialExpandedClusterPanel = useMemo(() => {
+    return [hasClusters, hasAccess, hasMonitoring].findIndex((item) => !item)
+  }, [hasClusters, hasMonitoring, hasAccess])
 
   return (
     <section className={cardColumn}>
@@ -268,7 +269,10 @@ const DashboardPage = () => {
         <>
           {showOnboarding && (
             <>
-              <ClusterSetup initialPanel={initialExpandedClusterPanel} onComplete={handleComplete} />
+              <ClusterSetup
+                initialPanel={initialExpandedClusterPanel}
+                onComplete={handleComplete}
+              />
               <PodSetup onComplete={handleComplete} initialPanel={showClusters ? undefined : 0} />
             </>
           )}
@@ -276,12 +280,12 @@ const DashboardPage = () => {
           {!showOnboarding && (
             <>
               <div className={cardRow}>
-                {reportsWithPerms(topReports).map(report => (
+                {reportsWithPerms(topReports).map((report) => (
                   <StatusCard key={report.route} {...report} />
                 ))}
               </div>
               <div className={cardRow}>
-                {reportsWithPerms(bottomReports).map(report => (
+                {reportsWithPerms(bottomReports).map((report) => (
                   <StatusCard key={report.route} {...report} />
                 ))}
               </div>

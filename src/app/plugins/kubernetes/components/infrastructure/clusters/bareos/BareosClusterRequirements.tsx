@@ -7,6 +7,8 @@ import SubmitButton from 'core/components/buttons/SubmitButton'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import ExternalLink from 'core/components/ExternalLink'
 import { BareOSSetupDocumentation } from 'app/constants'
+import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
+import { routes } from 'core/utils/routes'
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -62,16 +64,16 @@ const useStyles = makeStyles((theme: Theme) => ({
   }
 }))
 
-const nodeServices = ['Prometheus', 'Fluentd', 'Kubeadm']
+const nodeServices = ['Prometheus', 'Grafana']
 
 const BareOSClusterRequirements = ({ onComplete }) => {
   const classes = useStyles({})
   const handleClick = useCallback(() => {
-    onComplete('BareOS')
+    onComplete(routes.cluster.addBareOs.path())
   }, [onComplete])
   return (
-    <ClusterRequirementsContainer
-      title="BareOS Ubuntu Single Node Cluster"
+    <FormFieldCard
+      title="BareOS Ubuntu Cluster"
       link={
         <div>
           <FontAwesomeIcon className={classes.blueIcon} size="md">file-alt</FontAwesomeIcon>{' '}
@@ -79,23 +81,22 @@ const BareOSClusterRequirements = ({ onComplete }) => {
         </div>
       }
     >
-      <Typography className={classes.text}>All you need is a single VM or physical server.</Typography>
-      <Typography className={classes.text}>Deploy a single node master + worker with:</Typography>
+      <Typography className={classes.text}>Create a BareOS cluster using Ubuntu physical or virtual machines</Typography>
+      <Typography className={classes.text}>Cluster comes built in with:</Typography>
       <BulletList className={classes.bulletList} items={nodeServices} />
 
       <Alert variant="info">
         <Typography className={classes.alertTitle} variant="subtitle2">Minimum Hardware Requirements:</Typography>
         <div className={classes.requirements}>
-          <HardwareSpec title="4 CPUs" icon="microchip" />
-          <HardwareSpec title="8GB RAM" icon="memory" />
-          <HardwareSpec title="30GB HDD" icon="hdd" />
-          <HardwareSpec title="1 NIC" icon="ethernet" />
+          <HardwareSpec title="2 VCPUs" icon="microchip" />
+          <HardwareSpec title="5GB RAM" icon="memory" />
+          <HardwareSpec title="20GB HDD" icon="hdd" />
         </div>
       </Alert>
       <div>
         <SubmitButton onClick={handleClick}>Deploy With Bare OS</SubmitButton>
       </div>
-    </ClusterRequirementsContainer>
+    </FormFieldCard>
   )
 }
 export default BareOSClusterRequirements
@@ -108,20 +109,6 @@ const HardwareSpec = ({ title, icon }) => {
         <FontAwesomeIcon className={classes.blueIcon}>{icon}</FontAwesomeIcon>
       </span>
       <Typography>{title}</Typography>
-    </div>
-  )
-}
-
-interface ContainerProps {title: string, link?: JSX.Element}
-export const ClusterRequirementsContainer: React.FC<ContainerProps> = ({ title, link = undefined, children }) => {
-  const classes = useStyles({})
-  return (
-    <div className={classes.root}>
-      <header className={classes.requirementsTitle}>
-        <Typography variant="subtitle2">{title}</Typography>
-        { !!link && link }
-      </header>
-      {children}
     </div>
   )
 }

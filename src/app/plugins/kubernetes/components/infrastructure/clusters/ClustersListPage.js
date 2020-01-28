@@ -21,6 +21,7 @@ import ClusterUpgradeDialog from 'k8s/components/infrastructure/clusters/Cluster
 import { Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import { isAdminRole } from 'k8s/util/helpers'
+import { routes } from 'core/utils/routes'
 
 const useStyles = makeStyles(theme => ({
   link: {
@@ -123,7 +124,7 @@ const isAdmin = (selected, getContext) => {
 }
 
 export const options = {
-  addUrl: '/ui/kubernetes/infrastructure/clusters/add',
+  addUrl: routes.cluster.add.path(),
   addButton: ({ onClick }) => {
     const { userDetails: { role } } = useContext(AppContext)
     if (role !== 'admin') {

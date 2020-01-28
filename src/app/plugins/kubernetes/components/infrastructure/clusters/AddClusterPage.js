@@ -34,8 +34,8 @@ const AddClusterPage = () => {
   const providerType = new URLSearchParams(location.search).get('type') || CloudProviders.BareOS
   const [activeProvider, setActiveProvider] = useState(providerType)
 
-  const handleNextView = (type) => {
-    history.push(`${k8sPrefix}/infrastructure/clusters/add${type}`)
+  const handleNextView = (url) => {
+    history.push(url)
   }
 
   const ActiveView = useMemo(
