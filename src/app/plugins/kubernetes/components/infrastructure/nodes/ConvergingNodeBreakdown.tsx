@@ -175,7 +175,7 @@ export const ConvergingNodesWithTasksToggler: FC = () => {
         <div className={divider} />
         <Card className={renderPane}>
           <header className={paneHeader}>
-            <Tooltip title={selectedNodeTitle}>
+            <Tooltip title={selectedNodeTitle || ''}>
               <Typography variant="h6">
                 {selectedNodeTitle}
               </Typography>
