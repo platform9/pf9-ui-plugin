@@ -169,13 +169,13 @@ function createContextUpdater (cacheKey, dataUpdaterFn, options = {}) {
         const parsedSuccessMesssage = ensureFunction(successMessage)(updatedItems, prevItems, params, operation)
         await onSuccess(parsedSuccessMesssage, params)
       }
-      return true
+      return [true, output]
     } catch (err) {
       if (onError) {
         const parsedErrorMesssage = ensureFunction(errorMessage)(prevItems, params, err, operation)
         await onError(parsedErrorMesssage, err, params)
       }
-      return false
+      return [false, null]
     }
   })
   contextUpdaterFn.getKey = () => cacheKey
