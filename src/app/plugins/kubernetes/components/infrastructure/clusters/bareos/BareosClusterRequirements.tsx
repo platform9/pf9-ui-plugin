@@ -64,7 +64,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   }
 }))
 
-const nodeServices = ['Prometheus', 'Fluentd', 'Kubeadm']
+const nodeServices = ['Prometheus', 'Grafana']
 
 const BareOSClusterRequirements = ({ onComplete }) => {
   const classes = useStyles({})
@@ -81,17 +81,16 @@ const BareOSClusterRequirements = ({ onComplete }) => {
         </div>
       }
     >
-      <Typography className={classes.text}>All you need is a single VM or physical server.</Typography>
-      <Typography className={classes.text}>Deploy a single node master + worker with:</Typography>
+      <Typography className={classes.text}>Create a BareOS cluster using Ubuntu physical or virtual machines</Typography>
+      <Typography className={classes.text}>Cluster comes built in with:</Typography>
       <BulletList className={classes.bulletList} items={nodeServices} />
 
       <Alert variant="info">
         <Typography className={classes.alertTitle} variant="subtitle2">Minimum Hardware Requirements:</Typography>
         <div className={classes.requirements}>
-          <HardwareSpec title="4 CPUs" icon="microchip" />
-          <HardwareSpec title="8GB RAM" icon="memory" />
-          <HardwareSpec title="30GB HDD" icon="hdd" />
-          <HardwareSpec title="1 NIC" icon="ethernet" />
+          <HardwareSpec title="2 VCPUs" icon="microchip" />
+          <HardwareSpec title="5GB RAM" icon="memory" />
+          <HardwareSpec title="20GB HDD" icon="hdd" />
         </div>
       </Alert>
       <div>
