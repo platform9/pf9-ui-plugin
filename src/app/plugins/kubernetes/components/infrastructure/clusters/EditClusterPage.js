@@ -14,6 +14,7 @@ import KeyValuesField from 'core/components/validatedForm/KeyValuesField'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
 import SubmitButton from 'core/components/SubmitButton'
 import useParams from 'core/hooks/useParams'
+import EtcdBackupFields from './EtcdBackupFields'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
@@ -82,29 +83,7 @@ const EditClusterPage = () => {
         value={params.etcdBackup}
       />
 
-      {/* Etcd Storage Path */}
-      {params.etcdBackup && (
-        <TextField
-          id="etcdStoragePath"
-          label="Storage Path"
-          info="This is the disk path where the etcd backup data will be stored on each master node of this cluster"
-          required
-        />
-      )}
-
-      {/* Etcd Backup Interval */}
-      {/* https://stackoverflow.com/questions/47798104/set-min-max-on-textfield-type-number */}
-      {params.etcdBackup && (
-        <TextField
-          id="etcdBackupInterval"
-          label="Backup Interval (minutes)"
-          type="number"
-          step="1"
-          InputProps={{ inputProps: { min: 1 } }}
-          info="Specify how often the backup should be taken."
-          required
-        />
-      )}
+      {params.etcdBackup && <EtcdBackupFields />}
 
       {/* Tags */}
       <KeyValuesField
