@@ -8,7 +8,7 @@ import FormWrapper from 'core/components/FormWrapper'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import TextField from 'core/components/validatedForm/TextField'
 import { pathJoin } from 'utils/misc'
-import { k8sPrefix } from 'app/constants'
+import { k8sPrefix, defaultEtcBackupPath } from 'app/constants'
 import { clusterActions } from './actions'
 import KeyValuesField from 'core/components/validatedForm/KeyValuesField'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
@@ -37,7 +37,7 @@ const EditClusterPage = () => {
         ...cluster,
         tags: tagsObjToArr(tags),
         etcdBackup: !!etcdBackup.isEtcdBackupEnabled,
-        etcdStoragePath: path(['storageProperties, localStorage'], etcdBackup) || '/etc/pf9/etcd-backup',
+        etcdStoragePath: path(['storageProperties, localStorage'], etcdBackup) || defaultEtcBackupPath,
         etcdBackupInterval: etcdBackup.intervalInMins || 1,
       }),
     )(clusters),

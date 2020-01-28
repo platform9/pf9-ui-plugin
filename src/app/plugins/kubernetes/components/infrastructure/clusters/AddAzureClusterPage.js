@@ -20,13 +20,14 @@ import useParams from 'core/hooks/useParams'
 import useReactRouter from 'use-react-router'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import { pathJoin } from 'utils/misc'
-import { k8sPrefix } from 'app/constants'
+import { k8sPrefix, defaultEtcBackupPath } from 'app/constants'
 import ExternalLink from 'core/components/ExternalLink'
 import Code from 'core/components/CodeBlock'
 import { cloudProviderActions } from '../cloudProviders/actions'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { PromptToAddProvider } from '../cloudProviders/PromptToAddProvider'
 import { CloudProviders } from './model'
+import EtcdBackupFields from './EtcdBackupFields'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
@@ -44,7 +45,7 @@ const initialContext = {
   runtimeConfigOption: 'default',
   useAllAvailabilityZones: true,
   assignPublicIps: false,
-  etcdStoragePath: '/etc/pf9/etcd-backup',
+  etcdStoragePath: defaultEtcBackupPath,
   etcdBackupInterval: 1,
 }
 
@@ -399,33 +400,11 @@ const AddAzureClusterPage = () => {
                       {/* Etcd Backup */}
                       <CheckboxField
                         id="etcdBackup"
-                        label="Enable Etcd Backup"
+                        label="Enable etcd Backup"
                         info="Enable automated etcd backups on this cluster"
                       />
 
-                      {/* Etcd Storage Path */}
-                      {values.etcdBackup && (
-                        <TextField
-                          id="etcdStoragePath"
-                          label="Storage Path"
-                          info="This is the disk path where the etcd backup data will be stored on each master node of this cluster"
-                          required
-                        />
-                      )}
-
-                      {/* Etcd Backup Interval */}
-                      {/* https://stackoverflow.com/questions/47798104/set-min-max-on-textfield-type-number */}
-                      {values.etcdBackup && (
-                        <TextField
-                          id="etcdBackupInterval"
-                          label="Backup Interval (minutes)"
-                          type="number"
-                          step="1"
-                          InputProps={{ inputProps: { min: 1 } }}
-                          info="Specify how often the backup should be taken."
-                          required
-                        />
-                      )}
+                      {values.etcdBackup && <EtcdBackupFields />}
 
                       {/* Advanced API Configuration */}
                       <PicklistField

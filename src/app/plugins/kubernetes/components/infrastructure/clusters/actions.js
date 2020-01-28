@@ -40,6 +40,19 @@ const getKubernetesVersion = async clusterId => {
   }
 }
 
+const getEtcdBackupPayload = (data) => (
+  data.etcdBackup ? {
+    isEtcdBackupEnabled: 1,
+    storageType: 'local',
+    storageProperties: {
+      localPath: data.etcdStoragePath,
+    },
+    intervalInMins: data.etcdBackupInterval,
+  } : {
+    isEtcdBackupEnabled: 0,
+  }
+)
+
 export const hasMasterNode = propSatisfies(isTruthy, 'hasMasterNode')
 export const hasHealthyMasterNodes = propSatisfies(
   healthyMasterNodes => healthyMasterNodes.length > 0, 'healthyMasterNodes')
@@ -161,20 +174,7 @@ const createGenericCluster = async (body, data, loadFromContext) => {
 
   // This is currently supported by all cloud providers except GCP (which we
   // don't have yet anyways)
-  if (data.etcdBackup) {
-    body.etcdBackup = {
-      isEtcdBackupEnabled: 1,
-      storageType: 'local',
-      storageProperties: {
-        localPath: data.etcdStoragePath,
-      },
-      intervalInMins: data.etcdBackupInterval,
-    }
-  } else {
-    body.etcdBackup = {
-      isEtcdBackupEnabled: 0,
-    }
-  }
+  data.etcdBackup = getEtcdBackupPayload(data)
 
   const createResponse = await qbert.createCluster(body)
   const uuid = createResponse.uuid
@@ -255,7 +255,7 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
         ...fuzzyBools,
         hasVpn: castFuzzyBool(pathOr(false, ['cloudProperties', 'internalElb'], cluster)),
         hasLoadBalancer: castFuzzyBool(cluster.enableMetallb || pathOr(false, ['cloudProperties', 'enableLbaas'], cluster)),
-        etcdBackupEnabled: !!cluster.etcdBackup.isEtcdBackupEnabled,
+        etcdBackupEnabled: castFuzzyBool(pathOr(false, ['etcdBackup', 'isEtcdBackupEnabled'], cluster)),
       }
     }, rawClusters)
   },
@@ -270,25 +270,13 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
 
     // This is currently supported by all cloud providers except GCP (which we
     // don't have yet anyways)
-    if (params.etcdBackup) {
-      body.etcdBackup = {
-        isEtcdBackupEnabled: 1,
-        storageType: 'local',
-        storageProperties: {
-          localPath: params.etcdStoragePath,
-        },
-        intervalInMins: params.etcdBackupInterval,
-      }
-    } else {
-      body.etcdBackup = {
-        isEtcdBackupEnabled: 0,
-      }
-    }
+    body.etcdBackup = getEtcdBackupPayload(params)
 
     await qbert.updateCluster(uuid, body)
     // Doing this will help update the table, but the cache remains incorrect...
     // Same issue regarding cache applies to anything else updated this function
-    body.etcdBackupEnabled = !!body.etcdBackup
+    // body.etcdBackupEnabled = !!body.etcdBackup
+    clusterActions.invalidateCache()
     return body
   },
   deleteFn: async ({ uuid }) => {
