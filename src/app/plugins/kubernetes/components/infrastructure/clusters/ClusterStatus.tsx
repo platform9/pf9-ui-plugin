@@ -128,8 +128,9 @@ export const ClusterHealthStatus: FC<IClusterStatusProps> = ({ cluster, variant 
       <ClusterStatusSpan
         title={message || 'unknown'}
         status="unknown"
-        variant={variant}>
-          { message || 'unknown' }
+        variant={variant}
+      >
+        { message || 'unknown' }
       </ClusterStatusSpan>
     )
   }
@@ -159,8 +160,9 @@ export const ClusterConnectionStatus: FC<IClusterStatusProps> = ({ cluster, vari
       <ClusterStatusSpan
         title={message || 'unknown'}
         status="unknown"
-        variant={variant}>
-          { message || 'unknown' }
+        variant={variant}
+      >
+        { message || 'unknown' }
       </ClusterStatusSpan>
     )
   }
