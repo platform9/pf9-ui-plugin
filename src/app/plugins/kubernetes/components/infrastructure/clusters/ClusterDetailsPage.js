@@ -1,7 +1,7 @@
 import React from 'react'
 import Tabs from 'core/components/tabs/Tabs'
 import Tab from 'core/components/tabs/Tab'
-import Progress from 'core/components/progress/Progress'
+import clsx from 'clsx'
 import UsageWidget from 'core/components/widgets/UsageWidget'
 import { emptyObj } from 'utils/fp'
 
@@ -18,6 +18,9 @@ import { ClusterConnectionStatus, ClusterHealthStatus } from 'k8s/components/inf
 import { ConvergingNodesWithTasksToggler } from '../nodes/ConvergingNodeBreakdown'
 import { routes } from 'core/utils/routes'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
+import PollingData from 'core/components/PollingData'
+
+const tenSeconds = 1000 * 10
 
 const useStyles = makeStyles((theme) => ({
   cardBoarder: {
@@ -62,10 +65,10 @@ const useStyles = makeStyles((theme) => ({
   headerCardHeader: {
     margin: theme.spacing(0, 2),
     display: 'grid',
-    gridTemplateColumns: '1fr auto',
+    gridTemplateColumns: '1fr 45px',
     gridTemplateAreas: `
       "header icon"
-      "cluster icon"
+      "cluster cluster"
     `,
     '& h6': {
       gridArea: 'header',
@@ -81,17 +84,19 @@ const useStyles = makeStyles((theme) => ({
     }
   },
   headerIcon: {
+    color: theme.palette.text.secondary,
     gridArea: 'icon',
     fontSize: '36px',
-    marginTop: theme.spacing(),
-    color: theme.palette.dashboardCard.icon,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 }))
 
 const ClusterDetailsPage = () => {
   const { match } = useReactRouter()
   const classes = useStyles()
-  const [clusters, loading] = useDataLoader(clusterActions.list)
+  const [clusters, loading, reload] = useDataLoader(clusterActions.list)
   const cluster = clusters.find((x) => x.uuid === match.params.id) || {}
   return (
     <PageContainer
@@ -104,8 +109,9 @@ const ClusterDetailsPage = () => {
         </>
       }
     >
-      <Progress loading={loading}>
-        <ClusterStatusAndUsage cluster={cluster} />
+      <>
+        <PollingData hidden loading={loading} onReload={reload} refreshDuration={tenSeconds} />
+        <ClusterStatusAndUsage cluster={cluster} loading={loading} />
         <Tabs>
           <Tab value="nodes" label="Nodes">
             <ClusterNodes />
@@ -117,23 +123,23 @@ const ClusterDetailsPage = () => {
             <ClusterInfo />
           </Tab>
         </Tabs>
-      </Progress>
+      </>
     </PageContainer>
   )
 }
 
 export default ClusterDetailsPage
 
-const ClusterStatusAndUsage = ({ cluster }) => {
+const ClusterStatusAndUsage = ({ cluster, loading }) => {
   const { usage = emptyObj, name } = cluster
   const classes = useStyles()
   return (
     <Grid container className={classes.statsContainer}>
       <Grid item xs={4}>
         <div className={classes.statusItems}>
-          <HeaderCard title="Cluster" subtitle={name} icon="project-diagram">
-            <ClusterConnectionStatus cluster={cluster} variant="header" />
-            <ClusterHealthStatus cluster={cluster} variant="header" />
+          <HeaderCard title="Cluster" subtitle={name} icon="project-diagram" loading={loading}>
+            <ClusterConnectionStatus cluster={cluster} variant="header" message={loading ? 'loading' : undefined} />
+            <ClusterHealthStatus cluster={cluster} variant="header" message={loading ? 'loading' : undefined} />
           </HeaderCard>
         </div>
       </Grid>
@@ -148,14 +154,14 @@ const ClusterStatusAndUsage = ({ cluster }) => {
   )
 }
 
-const HeaderCard = ({ title, subtitle, icon, children }) => {
+const HeaderCard = ({ title, subtitle, icon, loading=false, children }) => {
   const classes = useStyles()
   return (
     <Card className={classes.headerCardContainer}>
       <header className={classes.headerCardHeader}>
         <Typography variant="h6">{title}</Typography>
         <Typography variant="subtitle1" component="p">{subtitle}</Typography>
-        <FontAwesomeIcon className={classes.headerIcon}>{icon}</FontAwesomeIcon>
+        <FontAwesomeIcon className={clsx({ 'fa-spin': loading }, classes.headerIcon)}>{ loading ? 'sync' : icon}</FontAwesomeIcon>
       </header>
       <div className={classes.headerCardBody}>
         {children}

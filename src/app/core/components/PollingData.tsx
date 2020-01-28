@@ -10,6 +10,7 @@ import useInterval from 'core/hooks/useInterval'
 
 interface Props<T> {
   loading: boolean
+  hidden?: boolean
   pause?: boolean
   pollIntervalMs?: number
   refreshDuration?: number
@@ -22,6 +23,7 @@ const defaultRefreshDuration = 1000 * 60 * 5
 function PollingData<T> ({
   loading,
   onReload,
+  hidden = false,
   pause = false,
   pollIntervalMs = 5000,
   refreshDuration = defaultRefreshDuration,
@@ -46,6 +48,10 @@ function PollingData<T> ({
     if ((currentTs - lastFetchTs) > refreshDuration) {
       reload()
     }
+  }
+
+  if (hidden) {
+    return null
   }
 
   return (

@@ -77,7 +77,7 @@ const canFinishAndReview = ({ masterNodes, workerNodes, allowWorkloadsOnMaster }
 const AddBareOsClusterPage = () => {
   const classes = useStyles()
   const { history } = useReactRouter()
-  const onComplete = () => history.push(routes.cluster.list.path())
+  const onComplete = (_, { uuid }) => history.push(routes.cluster.convergingNodes.path({ id: uuid }))
   const [createBareOSClusterAction, creatingBareOSCluster] = useDataUpdater(clusterActions.create, onComplete) // eslint-disable-line
 
   const handleSubmit = data => createBareOSClusterAction({ ...data, clusterType: 'local' })

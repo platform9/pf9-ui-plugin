@@ -1,4 +1,4 @@
-import React, { useState, FC, useMemo, useCallback } from 'react'
+import React, { useState, FC, useMemo } from 'react'
 import useReactRouter from 'use-react-router'
 import {
   Table,
@@ -101,8 +101,8 @@ const tenSeconds = 1000 * 10
 export const ConvergingNodesWithTasksToggler: FC = () => {
   const { match } = useReactRouter()
   const [selectedNode, setSelectedNode] = useState(null)
-  const [clusters, loadingClusters, reloadClusters]: IUseDataLoader<ICluster> = useDataLoader(clusterActions.list) as any
-  const [nodes, loadingNodes, reloadNodes]: IUseDataLoader<ICombinedNode> = useDataLoader(loadNodes) as any
+  const [clusters, loadingClusters]: IUseDataLoader<ICluster> = useDataLoader(clusterActions.list) as any
+  const [nodes, loadingNodes, reload]: IUseDataLoader<ICombinedNode> = useDataLoader(loadNodes) as any
   const cluster = clusters.find((cluster) => cluster.uuid === match.params.id)
   const nodesInCluster = useMemo(() => {
     if (cluster) {
@@ -114,11 +114,6 @@ export const ConvergingNodesWithTasksToggler: FC = () => {
     return emptyArr
   }, [cluster, nodes, match])
 
-  const handleReload = useCallback((ignoreCache) => {
-    reloadClusters(ignoreCache)
-    return reloadNodes(ignoreCache)
-  }, [])
-
   const { ellipsis, renderPane, divider, paneHeader, paneBody, tableChooser, tablePolling } = useStyles({})
   const selectedNodeAllTasks = selectedNode?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.all_tasks || []
   const selectedNodeCompletedTasks = selectedNode?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.completed_tasks || []
@@ -129,7 +124,7 @@ export const ConvergingNodesWithTasksToggler: FC = () => {
     <Progress loading={loadingClusters}>
       <div className={tableChooser}>
         <div className={tablePolling}>
-          <PollingData loading={loadingNodes} onReload={handleReload} refreshDuration={tenSeconds} />
+          <PollingData loading={loadingNodes} onReload={reload} refreshDuration={tenSeconds} />
         </div>
         <Table>
           <TableHead>
