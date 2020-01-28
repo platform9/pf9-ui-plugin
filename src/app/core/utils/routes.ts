@@ -1,4 +1,4 @@
-import { k8sPrefix } from 'app/constants'
+import { k8sPrefix, appUrlRoot } from 'app/constants'
 import { CloudProviders } from 'k8s/components/infrastructure/clusters/model'
 
 interface GenericKVP {[key: string]: string}
@@ -99,6 +99,9 @@ export const routes = {
     editClusterRoles: new Route<{id: string, clusterId: string}>(`${k8sPrefix}/rbac/clusterroles/edit/:id/cluster/:clusterId`),
     editRoleBindings: new Route<{id: string, clusterId: string}>(`${k8sPrefix}/rbac/rolebindings/edit/:id/cluster/:clusterId`),
     editClusterRoleBindings: new Route<{id: string, clusterId: string}>(`${k8sPrefix}/rbac/clusterrolebindings/edit/:id/cluster/:clusterId`),
+  },
+  password: {
+    reset: new Route<{id: string}>(`${appUrlRoot}/reset/password/:id`),
   }
 }
 

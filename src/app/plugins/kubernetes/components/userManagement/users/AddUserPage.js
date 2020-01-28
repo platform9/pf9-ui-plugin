@@ -65,7 +65,7 @@ const AddUserPage = () => {
                 <FormLabel component="legend"><p>Activate User Account</p></FormLabel>
                 <RadioGroup value={activationType} onChange={
                   e => setActivationType(e.target.value)}>
-                  {false && <FormControlLabel
+                  { <FormControlLabel
                     value="activationByEmail"
                     control={<Radio color="primary" />}
                     label={activationByEmailLabel} />}

@@ -152,7 +152,7 @@ const AuthenticatedContainer = () => {
 
   const withStackSlider = regionFeatures.openstack && regionFeatures.kubernetes
   // stack is the name of the plugin (ex. openstack, kubernetes, developer, theme)
-  const stack = history.location.pathname.includes('kubernetes') ? 'kubernetes' : 'openstack'
+  const stack = history.location.pathname.includes('openstack') ? 'openstack' : 'kubernetes'
 
   const plugins = pluginManager.getPlugins()
   const sections = getSections(plugins, role)
@@ -176,7 +176,7 @@ const AuthenticatedContainer = () => {
           <div className={classes.contentMain}>
             <Switch>
               {renderPlugins(plugins, role)}
-              <Route path={helpUrl} component={HelpPage} />>
+              <Route path={helpUrl} component={HelpPage} />
               <Route path={logoutUrl} component={LogoutPage} />
               <Redirect to={dashboardUrl} />
             </Switch>
