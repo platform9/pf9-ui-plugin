@@ -51,8 +51,8 @@ const useStyles = makeStyles((theme) => ({
 
 const listRoutes = {
   pod: routes.pods.list,
-  deployment: routes.pods.deployments,
-  service: routes.pods.services,
+  deployment: routes.deployments.list,
+  service: routes.services.list,
 }
 const linksByResourceType = {
   pod: { icon: 'cubes', url: createPodUrl, label: 'How do I create a pod?' },

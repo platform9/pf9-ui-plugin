@@ -68,8 +68,8 @@ const topReports = [
   },
   {
     entity: 'deployment',
-    route: routes.pods.deployments.path(),
-    addRoute: routes.pods.addDeployments.path(),
+    route: routes.deployments.list.path(),
+    addRoute: routes.deployments.add.path(),
     title: 'Deployments',
     icon: 'window',
     dataLoader: [deploymentActions.list, { clusterId: allKey }],
@@ -79,8 +79,8 @@ const topReports = [
   },
   {
     entity: 'service',
-    route: routes.pods.services.path(),
-    addRoute: routes.pods.addServices.path(),
+    route: routes.services.list.path(),
+    addRoute: routes.services.add.path(),
     title: 'Services',
     icon: 'tasks-alt',
     dataLoader: [serviceActions.list, { clusterId: allKey }],

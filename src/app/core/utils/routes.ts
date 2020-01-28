@@ -54,11 +54,15 @@ export const routes = {
   },
   pods: {
     list: new Route(`${k8sPrefix}/pods#pods`),
-    deployments: new Route(`${k8sPrefix}/pods#deployments`),
-    services: new Route(`${k8sPrefix}/pods#services`),
     add: new Route(`${k8sPrefix}/pods/add`),
-    addDeployments: new Route(`${k8sPrefix}/pods/deployments/add`),
-    addServices: new Route(`${k8sPrefix}/pods/services/add`),
+  },
+  services: {
+    list: new Route(`${k8sPrefix}/pods#services`),
+    add: new Route(`${k8sPrefix}/pods/services/add`)
+  },
+  deployments: {
+    list: new Route(`${k8sPrefix}/pods#deployments`),
+    add: new Route(`${k8sPrefix}/pods/deployments/add`)
   },
   storage: {
     list: new Route(`${k8sPrefix}/storage_classes`),
