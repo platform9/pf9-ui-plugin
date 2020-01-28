@@ -9,7 +9,7 @@ import SeeDetailsIcon from '@material-ui/icons/Subject'
 import InsertChartIcon from '@material-ui/icons/InsertChart'
 import { clustersCacheKey } from '../common/actions'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { capitalizeString } from 'utils/misc'
+import { capitalizeString, castBoolToStr } from 'utils/misc'
 import { ClusterConnectionStatus, ClusterHealthStatus } from 'k8s/components/infrastructure/clusters/ClusterStatus'
 import ResourceUsageTable from 'k8s/components/infrastructure/common/ResourceUsageTable'
 import DashboardLink from './DashboardLink'
@@ -152,6 +152,7 @@ export const options = {
     { id: 'hasVpn', label: 'VPN' },
     { id: 'appCatalogEnabled', label: 'App Catalog', render: x => x ? 'Enabled' : 'Not Enabled' },
     { id: 'hasLoadBalancer', label: 'Load Balancer' },
+    { id: 'etcdBackupEnabled', label: 'etcd Backup', render: castBoolToStr('Enabled', 'Not Enabled') },
 
     // TODO: We probably want to write a metadata renderer for this kind of format
     //

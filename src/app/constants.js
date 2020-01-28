@@ -25,6 +25,8 @@ export const OnboardingAccessSetup = 'onboarding/api-access'
 export const OnboardingMonitoringSetup = 'onboarding/monitoring-enabled'
 export const OnboardingPodSetup = 'onboarding/pod-setup'
 
+export const defaultEtcBackupPath = '/etc/pf9/etcd-backup'
+
 // Documentation links
 export const gettingStartedLink = 'https://docs.platform9.com/kubernetes/getting-started/bare-metal-preinstall-checklist/'
 export const qbertApiLink = 'https://docs.platform9.com/kubernetes/Qbert-API-Reference'
