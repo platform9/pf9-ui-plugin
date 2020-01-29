@@ -10,15 +10,15 @@ import track from 'utils/tracking'
 const LogoutPage = () => {
   const { destroySession, session: { username } } = useContext(AppContext)
 
-  track('event', {
-    eventName: 'PF9 Logged Out',
-    eventProperties: {
-      username,
-      du_domain: window.location.origin,
-    }
-  })
-
   useEffect(() => {
+    track('event', {
+      eventName: 'PF9 Logged Out',
+      eventProperties: {
+        username,
+        du_domain: window.location.origin,
+      }
+    })
+
     clear('user')
     clear('tokens')
     invalidateLoadersCache()
