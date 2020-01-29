@@ -1,7 +1,5 @@
-import React, { FunctionComponent, useContext } from 'react'
-import { Theme } from '@material-ui/core'
-import { makeStyles } from '@material-ui/styles'
-import BannerItem from 'core/components/notifications/BannerItem'
+import React, { FC, useEffect } from 'react'
+import { makeStyles, Theme } from '@material-ui/core'
 import { BannerContext } from 'core/providers/BannerProvider'
 
 const useStyles = makeStyles<Theme>(theme => ({
@@ -14,17 +12,27 @@ const useStyles = makeStyles<Theme>(theme => ({
     top: 55,
     left: 0,
     right: 0,
+    height: 30,
+    color: theme.palette.secondary.contrastText,
+    justifyContent: 'center',
+    width: '100%',
+    backgroundColor: '#F5A623',
   },
 }))
 
-const BannerContainer: FunctionComponent = () => {
-  const classes = useStyles({})
-  const { banners } = useContext(BannerContext)
-  return <div className={classes.root}>
-    {banners.map(({ id, content, onClose, variant }) =>
-      <BannerItem key={id} variant={variant} onClose={onClose}>{content}</BannerItem>,
-    )}
-  </div>
+const bannerContainerRef = React.createRef<HTMLDivElement>()
+
+const BannerContainer: FC = props => {
+  const classes = useStyles(props)
+  const { setBannerContainer } = React.useContext(BannerContext)
+
+  useEffect(() => {
+    // We must set the bannerContainer element ref in the state when the component is mounted
+    // so that it is correctly updated and reflected in the BannerContent consumers
+    setBannerContainer(bannerContainerRef.current)
+  }, [])
+
+  return <div className={classes.root} ref={bannerContainerRef} />
 }
 
 export default BannerContainer
