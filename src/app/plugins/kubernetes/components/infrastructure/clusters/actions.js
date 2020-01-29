@@ -18,8 +18,16 @@ import {
   getConnectionStatus,
   getHealthStatus,
 } from './ClusterStatusUtils'
+import track from 'utils/tracking'
 
 const { qbert } = ApiClient.getInstance()
+
+const trackClusterCreation = (params) => {
+    track('event', {
+    eventName: 'WZ New Cluster Finished',
+    eventProperties: params,
+  })
+}
 
 const getProgressPercent = async clusterId => {
   try {
@@ -90,7 +98,15 @@ const createAwsCluster = async (data, loadFromContext) => {
   if (['newPublicPrivate', 'existingPublicPrivate', 'existingPrivate'].includes(data.network)) { body.isPrivate = true }
   if (data.network === 'existingPrivate') { body.internalElb = true }
 
-  return createGenericCluster(body, data, loadFromContext)
+  const cluster = createGenericCluster(body, data, loadFromContext)
+
+  // Placed beneath API call -- send the tracking when the request is successful
+  trackClusterCreation({
+    clusterType: 'aws',
+    clusterName: data.name,
+  })
+
+  return cluster
 }
 
 const createAzureCluster = async (data, loadFromContext) => {
@@ -110,7 +126,15 @@ const createAzureCluster = async (data, loadFromContext) => {
 
   if (data.useAllAvailabilityZones) { body.zones = [] }
 
-  return createGenericCluster(body, data, loadFromContext)
+  const cluster = createGenericCluster(body, data, loadFromContext)
+
+  // Placed beneath API call -- send the tracking when the request is successful
+  trackClusterCreation({
+    clusterType: 'aws',
+    clusterName: data.name,
+  })
+
+  return cluster
 }
 
 const createBareOSCluster = async (data = {}, loadFromContext) => {
@@ -142,6 +166,12 @@ const createBareOSCluster = async (data = {}, loadFromContext) => {
 
   // 2. Create the cluster
   const cluster = await createGenericCluster(body, data, loadFromContext)
+
+  // Placed beneath API call -- send the tracking when the request is successful
+  trackClusterCreation({
+    clusterType: 'local',
+    clusterName: data.name,
+  })
 
   // 3. Attach the nodes
   const { masterNodes, workerNodes = [] } = data
