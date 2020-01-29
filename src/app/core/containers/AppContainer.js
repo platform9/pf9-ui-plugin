@@ -113,12 +113,15 @@ const AppContainer = () => {
     }
     await setContext({ appLoaded: true })
 
-    if (history.location.pathname === forgotPasswordUrl) return history.push(forgotPasswordUrl)
+    // Allow the following paths to load as entry point when user is not logged in
+    if (history.location.pathname === forgotPasswordUrl) return
 
     if (history.location.pathname.includes(activateUserUrl)) return
 
     // TODO: Need to fix this code after synching up with backend.
     if (history.location.hash.includes(resetPasswordThroughEmailUrl)) return history.push(history.location.hash.slice().replace('#', '/ui'))
+
+    if (history.location.pathname.includes(resetPasswordThroughEmailUrl)) return
 
     history.push(loginUrl)
   }
