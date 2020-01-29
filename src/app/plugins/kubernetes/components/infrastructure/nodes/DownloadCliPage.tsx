@@ -9,18 +9,32 @@ import PageContainer from 'core/components/pageContainer/PageContainer'
 import { DownloadCliOnboardNodeWalkthrough } from './DownloadCliWalkthrough'
 import CopyToClipboard from 'core/components/CopyToClipboard'
 import CodeBlock from 'core/components/CodeBlock'
+import SimpleLink from 'core/components/SimpleLink'
+import { routes } from 'core/utils/routes'
 
 const useStyles = makeStyles((theme: Theme) => ({
   spacer: {
     height: theme.spacing(2),
     width: theme.spacing(2),
   },
+  backLink: {
+    marginBottom: theme.spacing(2),
+  },
 }))
 
-const ClusterDetailsPage: FunctionComponent = () => {
-  const { spacer } = useStyles({})
+const DownloadCliPage: FunctionComponent = () => {
+  const { spacer, backLink } = useStyles({})
   return (
-    <PageContainer>
+    <PageContainer
+      header={
+        <>
+          <span />
+          <SimpleLink src={routes.nodes.list.path()} className={backLink}>
+            « Back to Node List
+          </SimpleLink>
+        </>
+      }
+    >
       <Typography variant="h5">Onboard a new node</Typography>
       <p> </p>
       <Typography component="span">
@@ -50,4 +64,4 @@ const ClusterDetailsPage: FunctionComponent = () => {
     </PageContainer>
   )
 }
-export default ClusterDetailsPage
+export default DownloadCliPage
