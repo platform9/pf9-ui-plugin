@@ -18,10 +18,11 @@ import { AppContext } from 'core/providers/AppProvider'
 import { both } from 'ramda'
 import PrometheusAddonDialog from 'k8s/components/prometheus/PrometheusAddonDialog'
 import ClusterUpgradeDialog from 'k8s/components/infrastructure/clusters/ClusterUpgradeDialog'
-import { Typography } from '@material-ui/core'
+import { Typography, Tooltip } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import { isAdminRole } from 'k8s/util/helpers'
 import { routes } from 'core/utils/routes'
+import CodeBlock from 'core/components/CodeBlock'
 
 const useStyles = makeStyles(theme => ({
   link: {
@@ -40,13 +41,8 @@ const renderCloudProviderType = (type, cluster) => {
   return capitalizeString(type)
 }
 
-const renderConnectionStatus = (_, cluster) => {
-  return <ClusterConnectionStatus cluster={cluster} />
-}
-
-const renderHealthStatus = (_, cluster) => {
-  return <ClusterHealthStatus cluster={cluster} />
-}
+const renderConnectionStatus = (_, cluster) => <ClusterConnectionStatus cluster={cluster} />
+const renderHealthStatus = (_, cluster) => <ClusterHealthStatus cluster={cluster} />
 
 const renderLinks = links => {
   if (!links) { return null }
@@ -114,6 +110,35 @@ const renderStats = (_, { usage }) => {
 const renderClusterDetailLink = (name, cluster) =>
   <SimpleLink src={`/ui/kubernetes/infrastructure/clusters/${cluster.uuid}`}>{name}</SimpleLink>
 
+const renderBooleanField = (key) => (_, cluster) => (
+  <Typography variant="body2">{ cluster[key] ? 'Enabled' : 'Not Enabled' }</Typography>
+)
+
+const renderCloudProvider = (_, { cloudProviderType, cloudProviderName }) => (
+  <Typography variant="body2">{ cloudProviderType === 'local' ? '' : cloudProviderName }</Typography>
+)
+
+const renderMetaData = (_, { tags }) => {
+  // TODO get the backend to update how tags are returned, this is a bit of hackery to render gracefully
+  const tagsNullValue = '{}'
+  let content
+  if (typeof tags === 'object') {
+    const values = Object.values(tags)
+    content = values.length > 0 ? JSON.stringify(values.map(JSON.parse), null, 2) : tagsNullValue
+  } else {
+    content = JSON.stringify(tags) || tagsNullValue
+  }
+
+  if (content === tagsNullValue) {
+    return ''
+  }
+  return (
+    <Tooltip title={<CodeBlock>{content}</CodeBlock>}>
+      <SimpleLink src="">View</SimpleLink>
+    </Tooltip>
+  )
+}
+
 const canScaleMasters = ([cluster]) => cluster.taskStatus === 'success' && cluster.cloudProviderType === 'local' && (cluster.nodes || []).length > 1
 const canScaleWorkers = ([cluster]) => cluster.taskStatus === 'success' && cluster.cloudProviderType !== 'azure'
 const canUpgradeCluster = (selected) => false
@@ -134,8 +159,8 @@ export const options = {
   },
   columns: [
     { id: 'name', label: 'Cluster name', render: renderClusterDetailLink },
-    { id: 'connectionStatus', label: 'Connection status', render: renderConnectionStatus },
-    { id: 'healthStatus', label: 'Health status', render: renderHealthStatus },
+    { id: 'connectionStatus', label: 'Connection status', render: renderConnectionStatus, tooltip: 'Whether the cluster is connected to the PMK management plane' },
+    { id: 'healthStatus', label: 'Health status', render: renderHealthStatus, tooltip: 'Cluster health' },
     { id: 'links', label: 'Links', render: renderLinks },
     { id: 'cloudProviderType', label: 'Deployment Type', render: renderCloudProviderType },
     { id: 'resource_utilization', label: 'Resource Utilization', render: renderStats },
@@ -146,17 +171,17 @@ export const options = {
     { id: 'containersCidr', label: 'Containers CIDR' },
     { id: 'servicesCidr', label: 'Services CIDR' },
     { id: 'endpoint', label: 'API endpoint' },
-    { id: 'cloudProviderName', label: 'Cloud provider' },
-    { id: 'allowWorkloadsOnMaster', label: 'Master Workloads' },
-    { id: 'privileged', label: 'Privileged' },
-    { id: 'hasVpn', label: 'VPN' },
-    { id: 'appCatalogEnabled', label: 'App Catalog', render: x => x ? 'Enabled' : 'Not Enabled' },
-    { id: 'hasLoadBalancer', label: 'Load Balancer' },
+    { id: 'cloudProviderName', label: 'Cloud provider', render: renderCloudProvider },
+    { id: 'allowWorkloadsOnMaster', label: 'Master Workloads', render: renderBooleanField('allowWorkloadsOnMaster'), tooltip: 'Whether masters are enabled to run workloads' },
+    { id: 'privileged', label: 'Privileged', render: renderBooleanField('privileged'), tooltip: 'Whether any container on the cluster can enable privileged mode' },
+    { id: 'hasVpn', label: 'VPN', render: renderBooleanField('hasVpn') },
+    { id: 'appCatalogEnabled', label: 'App Catalog', render: renderBooleanField('appCatalogEnabled'), tooltip: 'Whether helm application catalog is enabled for this cluster' },
+    { id: 'hasLoadBalancer', label: 'Load Balancer', render: renderBooleanField('hasLoadBalancer') },
 
     // TODO: We probably want to write a metadata renderer for this kind of format
     //
     // since we use it in a few places for tags / metadata.
-    { id: 'tags', label: 'Metadata', render: data => JSON.stringify(data) },
+    { id: 'tags', label: 'Metadata', render: renderMetaData },
   ],
   cacheKey: clustersCacheKey,
   editUrl: '/ui/kubernetes/infrastructure/clusters/edit',

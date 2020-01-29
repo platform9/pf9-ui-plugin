@@ -6,17 +6,23 @@ import { Grid } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
+import { capitalizeString } from 'utils/misc'
 
-const overviewStats = cluster => ({
-  Status:              cluster.status,
-  CloudProvider:       cluster.cloudProviderName,
-  'Cloud Provider Type': cluster.cloudProviderType,
-  'Kubernetes Version':  cluster.version || 'unavailable',
-  'Containers CIDR':     cluster.containersCidr,
-  'Services CIDR':       cluster.servicesCidr,
-  Privileged:          cluster.privileged,
-  'Unique ID':           cluster.uuid,
-})
+const overviewStats = cluster => {
+  const fields = {}
+  if (cluster.cloudProviderType !== 'local') {
+    fields['Cloud Provider'] = cluster.cloudProviderName
+  }
+  return {
+    ...fields,
+    'Cloud Provider Type': cluster.cloudProviderType === 'local' ? 'BareOS' : capitalizeString(cluster.cloudProviderType || ''),
+    'Kubernetes Version':  cluster.version || 'unavailable',
+    'Containers CIDR':     cluster.containersCidr,
+    'Services CIDR':       cluster.servicesCidr,
+    Privileged:          cluster.privileged,
+    'Unique ID':           cluster.uuid,
+  }
+}
 
 const bareOsProps = cluster => ({
   'Load Balancer': cluster.hasLoadBalancer,

@@ -103,14 +103,20 @@ const TaskStatusDialog = ({ isOpen, toggleOpen, node }) => {
   )
 }
 
+const statusMap = new Map([
+  ['fail', 'Failed'],
+  ['ok', 'Completed'],
+  ['loading', 'In Progress'],
+])
+
 const renderStatus = (_, { status }) => {
   if (status === 'none') {
     return <EmptyStatus />
   }
 
   return (
-    <ClusterStatusSpan status={status === 'completed' ? 'ok' : 'fail'}>
-      {capitalizeString(status)}
+    <ClusterStatusSpan status={status} title={statusMap.get(status)}>
+      {statusMap.get(status)}
     </ClusterStatusSpan>
   )
 }
@@ -134,11 +140,16 @@ export const Tasks = ({ allTasks, completedTasks = [], lastFailedTask }) => {
   const failedTaskIndex = allTasks.indexOf(lastFailedTask)
   const completedTaskCount = failedTaskIndex >=0 ? failedTaskIndex : completedTasks.length
   const getStatus = (index) => {
-    if (index <= (completedTasks.length - 1)) {
-      return 'completed'
+    if (index === failedTaskIndex) {
+      return 'fail'
     }
-
-    return index === failedTaskIndex ? 'failed' : index <= failedTaskIndex ? 'completed' : 'none'
+    if (index < completedTasks.length || index <= failedTaskIndex) {
+      return 'ok'
+    }
+    if (index === completedTasks.length && completedTasks.length > 0 && failedTaskIndex > -1) {
+      return 'loading'
+    }
+    return 'none'
   }
   const getTaskName = (value, index) => `${index + 1}. ${value}`
   const tasksWithStatus = allTasks.map((value, index) => ({
@@ -166,7 +177,7 @@ const HealthStatus = ({ healthStatus }) => {
 
 const EmptyStatus = () =>
   <span style={{ visibility: 'hidden' }}>
-    <ClusterStatusSpan status='pause' />
+    <ClusterStatusSpan status="pause" title="pause" />
   </span>
 
 const healthStatusMessage = {

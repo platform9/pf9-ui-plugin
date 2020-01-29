@@ -98,6 +98,15 @@ const getProgressColor = (all: string[], completed: string[], failed: string) =>
 }
 const oneSecond = 1000
 
+const sortNodesByTasks = (prevNode: ICombinedNode, currNode: ICombinedNode) => {
+  const prevNodeCompletedTasks = prevNode?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.completed_tasks || []
+  const currNodeCompletedTasks = currNode?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.completed_tasks || []
+
+  if (prevNodeCompletedTasks.length < currNodeCompletedTasks.length) return 1 // move curr before prev
+  if (prevNodeCompletedTasks.length > currNodeCompletedTasks.length) return -1 // move prev before curr
+  return 0
+}
+
 export const ConvergingNodesWithTasksToggler: FC = () => {
   const { match } = useReactRouter()
   const [selectedNode, setSelectedNode] = useState(null)
@@ -107,12 +116,14 @@ export const ConvergingNodesWithTasksToggler: FC = () => {
   const nodesInCluster = useMemo(() => {
     if (cluster) {
       const clusterNodesUids = pluck<any, any[]>('uuid', cluster.nodes)
-      const filteredNodes = nodes.filter((node) => clusterNodesUids.includes(node.uuid))
-      setSelectedNode(filteredNodes[0] || null)
+      const filteredNodes = nodes.filter((node) => clusterNodesUids.includes(node.uuid)).sort(sortNodesByTasks)
+      if (!selectedNode) {
+        setSelectedNode(filteredNodes[0] || null)
+      }
       return filteredNodes
     }
     return emptyArr
-  }, [cluster, nodes, match])
+  }, [cluster, nodes, selectedNode])
 
   const { ellipsis, renderPane, divider, paneHeader, paneBody, tableChooser, tablePolling } = useStyles({})
   const selectedNodeAllTasks = selectedNode?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.all_tasks || []
@@ -141,7 +152,9 @@ export const ConvergingNodesWithTasksToggler: FC = () => {
               const completedTasks = node?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.completed_tasks || []
               const percentComplete = (completedTasks.length / allTasks.length) * 100
               const lastCompletedStep = allTasks[completedTasks.length - 1]
-              const progressLabel = `Steps ${completedTasks.length} of ${allTasks.length}: ${lastCompletedStep || ''}`
+              const progressLabel = completedTasks.length > 0 && completedTasks.length === allTasks.length
+                ? `Completed all ${completedTasks.length} tasks successfully`
+                : `Steps ${completedTasks.length} of ${allTasks.length}: ${lastCompletedStep || ''}`
               const progressColor = getProgressColor(allTasks, completedTasks, lastFailedTask)
               return (
                 <TableRow key={node.uuid} onClick={() => setSelectedNode(node)}>
