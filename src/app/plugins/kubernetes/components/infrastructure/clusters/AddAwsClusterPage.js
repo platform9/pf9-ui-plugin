@@ -21,13 +21,14 @@ import useParams from 'core/hooks/useParams'
 import useReactRouter from 'use-react-router'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import { pathJoin } from 'utils/misc'
-import { k8sPrefix, runtimePrivileged, awsNetworkingConfigurations } from 'app/constants'
+import { k8sPrefix, runtimePrivileged, awsNetworkingConfigurations, defaultEtcBackupPath } from 'app/constants'
 import ExternalLink from 'core/components/ExternalLink'
 import Code from 'core/components/CodeBlock'
 import { CloudProviders } from './model'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { cloudProviderActions } from '../cloudProviders/actions'
 import { PromptToAddProvider } from '../cloudProviders/PromptToAddProvider'
+import EtcdBackupFields from './EtcdBackupFields'
 import { makeStyles } from '@material-ui/styles'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import { routes } from 'core/utils/routes'
@@ -67,6 +68,8 @@ const initialContext = {
   runtimeConfigOption: 'default',
   isPrivate: false,
   internalElb: false,
+  etcdStoragePath: defaultEtcBackupPath,
+  etcdBackupInterval: 1, // in minutes
 }
 
 const templateOptions = [
@@ -592,6 +595,15 @@ const AddAwsClusterPage = () => {
                             disabled={['calico', 'canal', 'weave'].includes(values.networkPlugin)}
                             info={<div>Allows this cluster to run privileged containers. Read <ExternalLink url={runtimePrivileged}>this article</ExternalLink> for more information.</div>}
                           />
+
+                          {/* Etcd Backup */}
+                          <CheckboxField
+                            id="etcdBackup"
+                            label="Enable etcd Backup"
+                            info="Enable automated etcd backups on this cluster"
+                          />
+
+                          {values.etcdBackup && <EtcdBackupFields />}
 
                           {/* Advanced API Configuration */}
                           <PicklistField

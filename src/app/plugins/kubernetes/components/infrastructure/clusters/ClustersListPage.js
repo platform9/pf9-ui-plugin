@@ -177,6 +177,7 @@ export const options = {
     { id: 'hasVpn', label: 'VPN', render: renderBooleanField('hasVpn') },
     { id: 'appCatalogEnabled', label: 'App Catalog', render: renderBooleanField('appCatalogEnabled'), tooltip: 'Whether helm application catalog is enabled for this cluster' },
     { id: 'hasLoadBalancer', label: 'Load Balancer', render: renderBooleanField('hasLoadBalancer') },
+    { id: 'etcdBackupEnabled', label: 'etcd Backup', render: renderBooleanField('etcdBackupEnabled') },
 
     // TODO: We probably want to write a metadata renderer for this kind of format
     //

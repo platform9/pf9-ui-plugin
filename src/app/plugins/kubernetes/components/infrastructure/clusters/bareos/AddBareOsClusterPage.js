@@ -18,12 +18,13 @@ import ExternalLink from 'core/components/ExternalLink'
 import ClusterHostChooser, { excludeNodes, isConnected, isUnassignedNode } from './ClusterHostChooser'
 import { clusterActions } from '../actions'
 import { pathJoin } from 'utils/misc'
-import { k8sPrefix, runtimePrivileged } from 'app/constants'
+import { k8sPrefix, runtimePrivileged, defaultEtcBackupPath } from 'app/constants'
 import { makeStyles } from '@material-ui/styles'
 import { masterNodeLengthValidator, requiredValidator } from 'core/utils/fieldValidators'
 import { allPass } from 'ramda'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { loadNodes } from '../../nodes/actions'
+import EtcdBackupFields from '../EtcdBackupFields'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import { routes } from 'core/utils/routes'
 
@@ -37,6 +38,8 @@ const initialContext = {
   networkPlugin: 'flannel',
   runtimeConfigOption: 'default',
   mtuSize: 1440,
+  etcdStoragePath: defaultEtcBackupPath,
+  etcdBackupInterval: 1,
   tags: [defaultMonitoringTagEnabled]
 }
 
@@ -318,6 +321,15 @@ const AddBareOsClusterPage = () => {
                             disabled={['calico', 'canal', 'weave'].includes(wizardContext.networkPlugin)}
                             info={<div>Allows this cluster to run privileged containers. Read <ExternalLink url={runtimePrivileged}>this article</ExternalLink> for more information.</div>}
                           />
+
+                          {/* Etcd Backup */}
+                          <CheckboxField
+                            id="etcdBackup"
+                            label="Enable etcd Backup"
+                            info="Enable automated etcd backups on this cluster"
+                          />
+
+                          {values.etcdBackup && <EtcdBackupFields />}
 
                           {/* Advanced API Configuration */}
                           <PicklistField

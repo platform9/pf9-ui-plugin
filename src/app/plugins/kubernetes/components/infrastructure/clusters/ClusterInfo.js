@@ -6,6 +6,7 @@ import { Grid } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
+import { path, pathOr } from 'ramda'
 import { capitalizeString } from 'utils/misc'
 
 const overviewStats = cluster => {
@@ -21,6 +22,9 @@ const overviewStats = cluster => {
     'Services CIDR':       cluster.servicesCidr,
     Privileged:          cluster.privileged,
     'Unique ID':           cluster.uuid,
+    'etcd Backup':          path(['etcdBackup', 'isEtcdBackupEnabled'], cluster) ? 'Enabled' : 'Not Enabled',
+    'etcd Storage Path':    pathOr('N/A', ['etcdBackup', 'storageProperties', 'localPath'], cluster),
+    'etcd Backup Interval': pathOr('N/A', ['etcdBackup', 'intervalInMins'], cluster),
   }
 }
 
@@ -32,31 +36,31 @@ const bareOsProps = cluster => ({
 })
 
 const awsCloudProps = cluster => ({
-  Region: cluster.region,
+  'Region': cluster.region,
   'Master Flavor': cluster.masterFlavor,
   'Worker Flavor': cluster.workerFlavor,
   'SSH Key': cluster.sshKey,
   'Service FQDN': cluster.serviceFqdn,
-  Ami: cluster.ami,
+  'Ami': cluster.ami,
   'Domain Id': cluster.domainId,
   'Is Private': cluster.isPrivate,
   'Use Pf9 Domain': cluster.usePf9Domain,
   'Internal Elb': cluster.internalElb,
-  Azs: cluster.azs,
+  'Azs': cluster.azs,
   /* 'Num Spot Workers': cluster.numSpotWorkers,
   'Spot Worker Flavor': cluster.spotWorkerFlavor,
   'Spot Price': cluster.spotPrice */
 })
 
 const azureCloudProps = cluster => ({
-  Location: cluster.location,
+  'Location': cluster.location,
   'SSH Key': cluster.sshKey,
   'Assign Public Ips': cluster.assignPublicIps,
   'Master Sku': cluster.masterSku,
   'Master Scale Set Name': cluster.masterScaleSetName,
   'Worker Sku': cluster.workerSku,
   'Worker Scale Set Name': cluster.workerScaleSetName,
-  Zones: cluster.zones,
+  'Zones': cluster.zones,
   'Primary Scale Set Name': cluster.primaryScaleSetName,
   'Resource Group': cluster.resourceGroup,
   'Security Group Name': cluster.securityGroupName,
@@ -65,6 +69,8 @@ const azureCloudProps = cluster => ({
   'VNet Resource Name': cluster.vnetResourceGroup,
   'Load Balance IP': cluster.loadbalancerIP,
 })
+
+/* eslint-enable quote-props */
 
 const renderCloudInfo = cluster => {
   switch (cluster.cloudProviderType) {
