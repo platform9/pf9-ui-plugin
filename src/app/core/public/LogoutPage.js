@@ -2,7 +2,7 @@ import React, { useEffect, useContext } from 'react'
 import { AppContext } from 'core/providers/AppProvider'
 import { clear } from 'core/utils/pf9Storage'
 import { invalidateLoadersCache } from 'core/helpers/createContextLoader'
-import track from 'utils/tracking'
+import trackEvent from 'utils/tracking'
 
 // We are abusing the React component system a little bit here.  This is really
 // nothing but an action but I didn't want to clutter the Navbar component with
@@ -11,12 +11,9 @@ const LogoutPage = () => {
   const { destroySession, session: { username } } = useContext(AppContext)
 
   useEffect(() => {
-    track('event', {
-      eventName: 'PF9 Logged Out',
-      eventProperties: {
-        username,
-        du_domain: window.location.origin,
-      }
+    trackEvent('PF9 Logged Out', {
+      username,
+      du_domain: window.location.origin,
     })
 
     clear('user')
