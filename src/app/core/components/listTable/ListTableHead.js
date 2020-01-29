@@ -117,7 +117,7 @@ class ListTableHead extends React.PureComponent {
               sortDirection={column.sort !== false && orderBy === column.id ? order : false}
             >
               <Tooltip
-                title={column.label}
+                title={column.tooltip || column.label}
                 placement={column.numeric ? 'bottom-end' : 'bottom-start'}
                 enterDelay={300}
               >
@@ -143,6 +143,7 @@ ListTableHead.propTypes = {
   columns: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.string,
     label: PropTypes.string,
+    tooltip: PropTypes.string,
     display: PropTypes.bool,
     excluded: PropTypes.bool,
     disableSorting: PropTypes.bool,
