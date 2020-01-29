@@ -60,31 +60,31 @@ export interface Extensions {
   physical_nics: PhysicalNics
   mounted_nfs: MountedNFS
   node_metadata: NodeMetadata
-  pf9_kube_status: Pf9KubeStatus;
+  pf9_kube_status: Pf9KubeStatus
   ip_address: IPAddress
   selinux_status: SelinuxStatus
   cpu_stats: CPUStats
 }
 
 export interface Pf9KubeStatus {
-  status: string;
-  data:   Pf9KubeStatusData;
+  status: string
+  data: Pf9KubeStatusData
 }
 
 export interface Pf9KubeStatusData {
-  pf9_kube_start_attempt:   number;
-  last_failed_status_check: string;
-  last_failed_task:         string;
-  all_tasks:                string[];
-  current_task:             string;
-  current_status_check:     string;
-  completed_tasks:          string[];
-  pf9_kube_service_state:   boolean;
-  all_status_checks:        string[];
-  last_failed_status_time:  string;
-  pf9_kube_node_state:      string;
-  total_task_count:         number;
-  status_check_timestamp:   string;
+  pf9_kube_start_attempt: number
+  last_failed_status_check: string
+  last_failed_task: string
+  all_tasks: string[]
+  current_task: string
+  current_status_check: string
+  completed_tasks: string[]
+  pf9_kube_service_state: boolean
+  all_status_checks: string[]
+  last_failed_status_time: string
+  pf9_kube_node_state: string
+  total_task_count: number
+  status_check_timestamp: string
 }
 
 export interface CloudMetadata {

@@ -7,7 +7,6 @@ import ExternalLink from 'core/components/ExternalLink'
 import ClusterStatusSpan from 'k8s/components/infrastructure/clusters/ClusterStatus'
 import createListTableComponent from 'core/helpers/createListTableComponent'
 import { noop, pathStrOr } from 'utils/fp'
-import { capitalizeString } from 'utils/misc'
 import {
   clusterHealthStatusFields,
 } from '../clusters/ClusterStatusUtils'
