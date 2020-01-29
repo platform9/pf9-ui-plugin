@@ -137,7 +137,7 @@ const ClusterStatusAndUsage = ({ cluster, loading }) => {
     <Grid container className={classes.statsContainer}>
       <Grid item xs={4}>
         <div className={classes.statusItems}>
-          <HeaderCard title="Cluster" subtitle={name} icon="project-diagram" loading={loading}>
+          <HeaderCard title="Cluster" subtitle={name} icon="project-diagram">
             <ClusterConnectionStatus cluster={cluster} variant="header" message={loading ? 'loading' : undefined} />
             <ClusterHealthStatus cluster={cluster} variant="header" message={loading ? 'loading' : undefined} />
           </HeaderCard>
