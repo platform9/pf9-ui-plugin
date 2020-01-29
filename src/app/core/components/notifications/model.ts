@@ -18,7 +18,6 @@ export interface MessageOptions {
 export interface BannerContentOptions {
   id: string
   content: ReactNode
-  variant: MessageTypes
   dismissable: boolean
   onClose: () => void
 }

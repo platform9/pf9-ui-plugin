@@ -6,11 +6,9 @@ import clsx from 'clsx'
 import Intercom from 'core/components/integrations/Intercom'
 import Navbar, { drawerWidth } from 'core/components/Navbar'
 import BannerContainer from 'core/components/notifications/BannerContainer'
-import SimpleLink from 'core/components/SimpleLink'
 import Toolbar from 'core/components/Toolbar'
 import useToggler from 'core/hooks/useToggler'
 import { AppContext } from 'core/providers/AppProvider'
-import { useBanner } from 'core/providers/BannerProvider'
 import LogoutPage from 'core/public/LogoutPage'
 import pluginManager from 'core/utils/pluginManager'
 import DeveloperToolsEmbed from 'developer/components/DeveloperToolsEmbed'
@@ -111,6 +109,17 @@ const renderPlugins = moize((plugins, role) =>
   toPairs(plugins).map(apply(renderPluginRoutes(role))).flat(),
 )
 
+const renderPluginComponents = (id, plugin) => {
+  const pluginComponents = plugin.getComponents()
+
+  return <Route key={plugin.basePath} path={plugin.basePath} exact={false}>
+    {pluginComponents.map(PluginComponent => <PluginComponent />)}
+  </Route>
+}
+const renderRawComponents = moize(plugins =>
+  toPairs(plugins).map(apply(renderPluginComponents)).flat(),
+)
+
 const redirectToAppropriateStack = (ironicEnabled, kubernetesEnabled,
   history) => {
   // If it is neither ironic nor kubernetes, bump user to old UI
@@ -143,13 +152,8 @@ const loadRegionFeatures = async (setRegionFeatures, history) => {
   }
 }
 
-const checkInitialRequirements = (showBanner) => {
-  // TODO: implement initial checks and show a banner (or banners) if required
-}
-
 const AuthenticatedContainer = () => {
   const [drawerOpen, toggleDrawer] = useToggler(true)
-  const showBanner = useBanner()
   const [regionFeatures, setRegionFeatures] = useState(emptyObj)
   const { userDetails: { role }, currentRegion } = useContext(AppContext)
   const { history } = useReactRouter()
@@ -158,7 +162,6 @@ const AuthenticatedContainer = () => {
   useEffect(() => {
     // Pass the `setRegionFeatures` function to update the features as we can't use `await` inside of a `useEffect`
     loadRegionFeatures(setRegionFeatures, history)
-    checkInitialRequirements(showBanner)
   }, [currentRegion])
 
   const withStackSlider = regionFeatures.openstack && regionFeatures.kubernetes
@@ -186,6 +189,7 @@ const AuthenticatedContainer = () => {
           [classes['contentShift-left']]: drawerOpen,
         })}>
           <div className={classes.contentMain}>
+            {renderRawComponents(plugins)}
             <Switch>
               {renderPlugins(plugins, role)}
               <Route path={helpUrl} component={HelpPage} />
