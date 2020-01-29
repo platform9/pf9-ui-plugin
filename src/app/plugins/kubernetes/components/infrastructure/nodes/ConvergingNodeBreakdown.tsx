@@ -87,8 +87,7 @@ const getTaskContent = (
   completed: string[],
   failed: string,
   message: string,
-): { message: string; color: 'success' | 'primary' | 'error' } => {
-
+): { message: string, color: 'success' | 'primary' | 'error' } => {
   // TODO get backend to update the last_failed_task to be null rather than 'None'
 
   const failedIdx = all.indexOf(failed)
