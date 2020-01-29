@@ -249,7 +249,7 @@ const ResetPasswordPage: React.FC = () => {
                           InputProps={renderPasswordMask('isConfirmPasswordMasked')}
                         />
                         {renderPasswordValidationCheck(values)}
-                        {params.isError && <Alert variant="error" message={params.errorMessage} />}
+                        {params.isError && <Alert small variant="error" message={params.errorMessage} />}
                         <SubmitButton label="Reset my password" />
                       </>
                     ) : (
