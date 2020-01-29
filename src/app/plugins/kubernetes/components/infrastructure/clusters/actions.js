@@ -23,7 +23,7 @@ import track from 'utils/tracking'
 const { qbert } = ApiClient.getInstance()
 
 const trackClusterCreation = (params) => {
-    track('event', {
+  track('event', {
     eventName: 'WZ New Cluster Finished',
     eventProperties: params,
   })
