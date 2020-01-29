@@ -18,7 +18,7 @@ import ExternalLink from 'core/components/ExternalLink'
 import ClusterHostChooser, { excludeNodes, isConnected, isUnassignedNode } from './ClusterHostChooser'
 import { clusterActions } from '../actions'
 import { pathJoin } from 'utils/misc'
-import { k8sPrefix, runtimePrivileged, defaultEtcBackupPath } from 'app/constants'
+import { k8sPrefix, runtimePrivileged, defaultEtcBackupPath, pmkCliOverview } from 'app/constants'
 import { makeStyles } from '@material-ui/styles'
 import { masterNodeLengthValidator, requiredValidator } from 'core/utils/fieldValidators'
 import { allPass } from 'ramda'
@@ -27,6 +27,7 @@ import { loadNodes } from '../../nodes/actions'
 import EtcdBackupFields from '../EtcdBackupFields'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import { routes } from 'core/utils/routes'
+import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
@@ -68,7 +69,10 @@ const useStyles = makeStyles(theme => ({
   },
   inline: {
     display: 'grid',
-  }
+  },
+  blueIcon: {
+    color: theme.palette.primary.main,
+  },
 }))
 
 const canFinishAndReview = ({ masterNodes, workerNodes, allowWorkloadsOnMaster }) => {
@@ -117,6 +121,12 @@ const AddBareOsClusterPage = () => {
                         </FormFieldCard>
                         <FormFieldCard
                           title={<span>Select nodes to add as <u>Master</u> nodes</span>}
+                          link={
+                            <div>
+                              <FontAwesomeIcon className={classes.blueIcon} size="md">file-alt</FontAwesomeIcon>{' '}
+                              <ExternalLink url={pmkCliOverview}>Not Seeing Any Nodes?</ExternalLink>
+                            </div>
+                          }
                         >
                           <div className={classes.tableWidth}>
                             {/* Master nodes */}
@@ -148,6 +158,12 @@ const AddBareOsClusterPage = () => {
                             titleVariant="subtitle2"
                             title="Get the PF9 CLI"
                             defaultExpanded={false}
+                            link={
+                              <div>
+                                <FontAwesomeIcon className={classes.blueIcon} size="md">code</FontAwesomeIcon>{' '}
+                                <ExternalLink url={pmkCliOverview}>See all Options</ExternalLink>
+                              </div>
+                            }
                           >
                             <DownloadCliWalkthrough />
                           </Panel>
@@ -168,7 +184,15 @@ const AddBareOsClusterPage = () => {
                   {({ setFieldValue, values }) => (
                     <div className={classes.formWidth}>
                       {/* Worker nodes */}
-                      <FormFieldCard title={<span>Select nodes to add as <u>Worker</u> nodes</span>}>
+                      <FormFieldCard
+                        title={<span>Select nodes to add as <u>Worker</u> nodes</span>}
+                        link={
+                          <div>
+                            <FontAwesomeIcon className={classes.blueIcon} size="md">file-alt</FontAwesomeIcon>{' '}
+                            <ExternalLink url={pmkCliOverview}>Not Seeing Any Nodes?</ExternalLink>
+                          </div>
+                        }
+                      >
                         {/* <Typography>Select one or more nodes to add to the cluster as <strong>worker</strong> nodes</Typography> */}
                         <div className={classes.tableWidth}>
                           <ClusterHostChooser
@@ -188,6 +212,12 @@ const AddBareOsClusterPage = () => {
                           titleVariant="subtitle2"
                           title="Get the PF9 CLI"
                           defaultExpanded={false}
+                          link={
+                            <div>
+                              <FontAwesomeIcon className={classes.blueIcon} size="md">code</FontAwesomeIcon>{' '}
+                              <ExternalLink url={pmkCliOverview}>See all Options</ExternalLink>
+                            </div>
+                          }
                         >
                           <DownloadCliWalkthrough />
                         </Panel>

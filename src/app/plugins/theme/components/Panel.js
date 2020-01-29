@@ -14,13 +14,21 @@ const styles = theme => ({
     fontSize: theme.typography.pxToRem(15),
     fontWeight: theme.typography.fontWeightRegular,
   },
+  summary: {
+    display: 'flex',
+    flex: 1,
+    justifyContent: 'space-between'
+  },
 })
 
-const Panel = withStyles(styles)(({ classes, title, children, titleVariant = 'subtitle1', ...rest }) => (
+const Panel = withStyles(styles)(({ classes, title, children, link = null, titleVariant = 'subtitle1', ...rest }) => (
   <div className={classes.root}>
     <ExpansionPanel defaultExpanded {...rest}>
       <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-        <Typography variant={titleVariant}>{title}</Typography>
+        <div className={classes.summary}>
+          <Typography variant={titleVariant}>{title}</Typography>
+          { link !== null && link }
+        </div>
       </ExpansionPanelSummary>
       <ExpansionPanelDetails>
         <div style={{ width: '100%' }}>

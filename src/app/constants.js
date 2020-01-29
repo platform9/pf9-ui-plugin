@@ -34,6 +34,8 @@ export const whatIsBareOSLink = 'https://docs.platform9.com/kubernetes/on-premis
 export const BareOSSetupDocumentation = 'https://docs.platform9.com/kubernetes/create-multimaster-bareos-cluster/'
 export const remoteMonitoringDocs = 'https://docs.platform9.com/kubernetes/enable-remote-monitoring/'
 export const managedContainerChecklist = 'https://docs.platform9.com/getting-started/managed-container-cloud-requirements-checklist'
+export const pmkCliOverview = 'https://docs.platform9.com/kubernetes/PMK-CLI/overview/'
+export const pmkCliCreate = 'https://docs.platform9.com/kubernetes/PMK-CLI/create/'
 
 export const runtimePrivileged = 'https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities'
 export const awsNetworkingConfigurations = 'https://docs.platform9.com/kubernetes/networking/configurations-supported-aws-cloud-provider/'
