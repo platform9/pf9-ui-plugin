@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback } from 'react'
+import React, { useMemo, useCallback } from 'react'
 import { pluck } from 'ramda'
 // This table essentially has the same functionality as the <NodesList>
 // except that it is only the nodes from the a single cluster.
@@ -9,18 +9,15 @@ import { emptyArr } from 'utils/fp'
 import useReactRouter from 'use-react-router'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
-import useToggler from 'core/hooks/useToggler'
-import TaskStatusDialog from './TaskStatusDialog'
 import Progress from 'core/components/progress/Progress'
+import { routes } from 'core/utils/routes'
 
 const tableColumns = columns.filter(
   (column) => !['clusterName', 'isSpotInstance'].includes(column.id),
 )
 
 const ClusterNodes = () => {
-  const { match } = useReactRouter()
-  const [selectedNode, setSelectedNode] = useState()
-  const [showTaskDialog, toggleTaskDialog] = useToggler()
+  const { history, match } = useReactRouter()
   const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
   const [nodes, loadingNodes, reload] = useDataLoader(loadNodes)
   const handleRefresh = useCallback(() => reload(true), [reload])
@@ -33,12 +30,15 @@ const ClusterNodes = () => {
     return emptyArr
   }, [cluster, nodes])
 
-  const addTaskStatusModal = (columns) => {
+  const handleViewNodeHealth = (node) => {
+    history.push(routes.cluster.convergingNodes.path({ id: cluster.uuid, node: node.uuid }))
+  }
+
+  const addLinkToNodeHealth = (columns) => {
     const healthStatusColumn = columns.find((column) => column.id === 'healthStatus')
     const originalRender = healthStatusColumn.render
     const updatedRender = (_, node) => {
-      setSelectedNode(node)
-      return originalRender(_, node, toggleTaskDialog)
+      return originalRender(_, node, handleViewNodeHealth)
     }
 
     return columns.map((column) =>
@@ -46,7 +46,7 @@ const ClusterNodes = () => {
     )
   }
 
-  const nodeColumns = addTaskStatusModal(tableColumns)
+  const nodeColumns = addLinkToNodeHealth(tableColumns)
 
   const NodesTable = createListTableComponent({
     title: 'Nodes',
@@ -62,7 +62,6 @@ const ClusterNodes = () => {
   return (
     <Progress loading={loadingClusters || loadingNodes}>
       <NodesTable data={nodesInCluster} />
-      <TaskStatusDialog isOpen={showTaskDialog} toggleOpen={toggleTaskDialog} node={selectedNode} />
     </Progress>
   )
 }
