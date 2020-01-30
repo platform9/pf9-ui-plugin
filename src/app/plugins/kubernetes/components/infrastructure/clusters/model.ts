@@ -1,4 +1,4 @@
-import { ICombinedNode } from "../nodes/model"
+import { ICombinedNode } from '../nodes/model'
 
 export type HealthStatus = 'healthy' | 'partially_healthy' | 'unhealthy' | 'unknown'
 
@@ -95,7 +95,7 @@ export enum CloudProvidersFriendlyName {
 
 type CloudProperties = AzureCloudProperties | AwsCloudProperties | BareOSCloudProperties
 
-export interface AzureCloudProperties {
+interface AzureCloudProperties {
   location: string
   zones: string
   masterSku: string
@@ -104,7 +104,7 @@ export interface AzureCloudProperties {
   sshKey: string
 }
 
-export interface AwsCloudProperties {
+interface AwsCloudProperties {
   region: string
   masterFlavor: string
   workerFlavor: string
@@ -121,32 +121,37 @@ export interface AwsCloudProperties {
   spotPrice: string
 }
 
-export interface BareOSCloudProperties {
+interface BareOSCloudProperties {
   masterNodes: string
   statusOfMasters: string
   statusOfWorkers: string
 }
 
-export interface EtcdBackup {}
-
-export interface Links {
+interface EtcdBackup {
+  storageProperties: EtcdBackupStorageProperties
+  intervalInMins: string
+}
+interface EtcdBackupStorageProperties {
+  localPath: string
+}
+interface Links {
   dashboard: null
   kubeconfig: null
   cli: null
 }
 
-export interface Tags {
+interface Tags {
   [key: string]: string
 }
 
-export interface Usage {
+interface Usage {
   compute: Metric
   memory: Metric
   disk: Metric
   grafanaLink?: string
 }
 
-export interface Metric {
+interface Metric {
   current: number
   max: number
   percent: number

@@ -19,7 +19,6 @@ import { ConvergingNodesWithTasksToggler } from '../nodes/ConvergingNodeBreakdow
 import { routes } from 'core/utils/routes'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import PollingData from 'core/components/PollingData'
-import DashboardLink from './DashboardLink'
 import DownloadKubeConfigLink from './DownloadKubeConfigLink'
 import ExternalLink from 'core/components/ExternalLink'
 
