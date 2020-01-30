@@ -33,6 +33,7 @@ const useStyles = makeStyles((theme) => ({
   },
   backLink: {
     marginBottom: theme.spacing(2),
+    marginLeft: 'auto',
   },
   row: {
     display: 'flex',
@@ -101,12 +102,9 @@ const ClusterDetailsPage = () => {
   return (
     <PageContainer
       header={
-        <>
-          <span />
-          <SimpleLink src={routes.cluster.list.path()} className={classes.backLink}>
-            « Back to Cluster List
-          </SimpleLink>
-        </>
+        <SimpleLink src={routes.cluster.list.path()} className={classes.backLink}>
+          « Back to Cluster List
+        </SimpleLink>
       }
     >
       <>

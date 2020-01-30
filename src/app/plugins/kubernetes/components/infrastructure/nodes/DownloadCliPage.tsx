@@ -19,6 +19,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   backLink: {
     marginBottom: theme.spacing(2),
+    marginLeft: 'auto',
   },
 }))
 
@@ -27,12 +28,9 @@ const DownloadCliPage: FunctionComponent = () => {
   return (
     <PageContainer
       header={
-        <>
-          <span />
-          <SimpleLink src={routes.nodes.list.path()} className={backLink}>
-            « Back to Node List
-          </SimpleLink>
-        </>
+        <SimpleLink src={routes.nodes.list.path()} className={backLink}>
+          « Back to Node List
+        </SimpleLink>
       }
     >
       <Typography variant="h5">Onboard a new node</Typography>
