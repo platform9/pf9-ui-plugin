@@ -48,6 +48,7 @@ import UpdateClusterRolePage from './components/rbac/UpdateClusterRolePage'
 import UpdateRoleBindingPage from './components/rbac/UpdateRoleBindingPage'
 import UpdateClusterRoleBindingPage from './components/rbac/UpdateClusterRoleBindingPage'
 import OnboardingBanner from './components/onboarding/OnboardingBanner'
+import AdjustNodePage from './components/infrastructure/clusters/AdjustNodePage'
 
 class Kubernetes extends React.PureComponent {
   render() {
@@ -100,6 +101,12 @@ Kubernetes.registerPlugin = (pluginManager) => {
       name: 'Edit Cluster',
       link: { path: '/infrastructure/clusters/edit/:id', exact: true },
       component: EditClusterPage,
+    },
+    {
+      name: 'Adjust Node',
+      link: { path: '/infrastructure/clusters/adjust/:id', exact: true },
+      requiredRoles: 'admin',
+      component: AdjustNodePage,
     },
     {
       name: 'Scale Masters',

@@ -33,6 +33,7 @@ export const annotateCloudStack = (host) => {
 
 export const annotateResmgrFields = (host) => {
   const { resmgr } = host
+  if (!resmgr) return null
   return {
     ...host,
     id: resmgr.id,
@@ -51,6 +52,7 @@ export const annotateResmgrFields = (host) => {
 }
 
 export const annotateUiState = (host) => {
+  if (!host) return null
   const { resmgr } = host
 
   /* TODO:
@@ -72,7 +74,10 @@ export const annotateUiState = (host) => {
    * This section should be flagged for further review.
    */
   const { roles, roleStatus, responding, warnings } = host
-  if (roles.length === 0 || (roles.length === 1 && roles.includes('pf9-support'))) {
+  if (
+    (roles && roles.length === 0) ||
+    ((roles && roles.length === 0) === 1 && roles.includes('pf9-support'))
+  ) {
     host.uiState = 'unauthorized'
   }
 
@@ -90,7 +95,7 @@ export const annotateUiState = (host) => {
 
   if (!host.uiState && !responding) {
     host.uiState = 'offline'
-    const lastResponseTime = resmgr.info.last_response_time
+    const lastResponseTime = pathStrOrNull('info.last_response_time', resmgr)
     host.lastResponse = moment.utc(lastResponseTime).fromNow(true)
     host.lastResponseData =
       lastResponseTime &&

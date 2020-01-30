@@ -261,7 +261,7 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
     return mapAsync(async (cluster) => {
       const nodesInCluster = rawNodes.filter((node) => node.clusterUuid === cluster.uuid)
       const nodeIds = pluck('uuid', nodesInCluster)
-      const combinedNodes = combinedHosts.filter((x) => nodeIds.includes(x.resmgr.id))
+      const combinedNodes = combinedHosts.filter((x) => nodeIds.includes(path(['resmgr', 'id'], x)))
       const calcNodesTotals = calcUsageTotalByPath(combinedNodes)
       const dashboardLink = `${qbertEndpoint}/clusters/${cluster.uuid}/k8sapi/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:443/proxy/`
       const host = qbertEndpoint.match(/(.*?)\/qbert/)[1]

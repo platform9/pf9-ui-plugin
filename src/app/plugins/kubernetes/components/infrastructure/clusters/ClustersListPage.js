@@ -6,6 +6,7 @@ import SimpleLink from 'core/components/SimpleLink'
 import ScaleIcon from '@material-ui/icons/TrendingUp'
 import UpgradeIcon from '@material-ui/icons/PresentToAll'
 import SeeDetailsIcon from '@material-ui/icons/Subject'
+import TuneIcon from '@material-ui/icons/Tune'
 import InsertChartIcon from '@material-ui/icons/InsertChart'
 import { clustersCacheKey } from '../common/actions'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
@@ -223,16 +224,10 @@ export const options = {
       routeTo: (rows) => `/ui/kubernetes/infrastructure/clusters/${rows[0].uuid}`,
     },
     {
-      cond: both(isAdmin, canScaleMasters),
-      icon: <ScaleIcon />,
-      label: 'Scale masters',
-      routeTo: (rows) => `/ui/kubernetes/infrastructure/clusters/scaleMasters/${rows[0].uuid}`,
-    },
-    {
-      cond: both(isAdmin, canScaleWorkers),
-      icon: <ScaleIcon />,
-      label: 'Scale workers',
-      routeTo: (rows) => `/ui/kubernetes/infrastructure/clusters/scaleWorkers/${rows[0].uuid}`,
+      cond: both(isAdmin, canScaleWorkers) || both(isAdmin, canScaleMasters),
+      icon: <TuneIcon />,
+      label: 'Adjust nodes',
+      routeTo: (rows) => `/ui/kubernetes/infrastructure/clusters/adjust/${rows[0].uuid}`,
     },
     {
       cond: both(isAdmin, canUpgradeCluster),
