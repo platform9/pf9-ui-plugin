@@ -12,11 +12,36 @@ class Route<T extends OptionalGenericKVP = null> {
   constructor (public url: string) {}
 
   public path: RouterPathFn<T> = (params: OptionalParamType<T>) => {
-    return createUrlWithQueryString(this.url, params)
+    return this.createUrlWithQueryString(
+      new URL(this.url, window.location.origin),
+      params
+    )
   }
 
   public toString (): string {
     return this.path(null)
+  }
+
+  private createUrlWithQueryString(url: URL, params: OptionalParamType<T>) {
+    if (!params || Object.keys(params || []).length === 0) {
+      return this.url
+    }
+    const fields: GenericKVP = { ...params as any }
+    
+    if (url.pathname.includes(':')) {
+      // nice utility to reconstruct urls from objects / models
+      (url.pathname.match(/:([0-9_a-z]+)/gi) || []).forEach((match) => {
+        const key = match.replace(':', '')
+        url.pathname = url.pathname.replace(match, fields[key])
+        delete fields[key]
+      })
+    }
+  
+    for (const [key, value] of Object.entries(fields)) {
+      url.searchParams.append(key, value)
+    }
+  
+    return `${url.toString().replace(url.origin, '')}`
   }
 }
 
@@ -106,51 +131,4 @@ export const routes = {
   password: {
     reset: new Route<{id: string}>(`${appUrlRoot}/reset/password/:id`),
   }
-}
-
-/*
-  We can re-create urls with dynamic content via this helper.
-  Also appends any kvp's to query string params that aren't in the URL
-
-  e.g.
-    createUrlWithQueryString(Routes.Cluster.Detail, {id: 'asdf'})
-    produces /ui/kubernetes/infrastructure/clusters/asdf`,
-*/
-const createUrlWithQueryString = (url: string, params?: GenericKVP) => {
-  if (!url) {
-    console.error('URL is not defined for action: ', params)
-  }
-  if (!params) {
-    return url
-  }
-  params = { ...params }
-  let hash = ''
-
-  if (url.includes('#')) {
-    const [urlPart, hashPart] = url.split('#')
-    url = urlPart
-    hash = `#${hashPart}`
-  }
-
-  if (url.includes(':')) {
-    // nice utility to reconstruct urls from objects / models
-    (url.match(/:([0-9_a-z]+)/gi) || []).forEach((match) => {
-      const key = match.replace(':', '')
-      url = url.replace(match, params[key])
-      delete params[key]
-    })
-  }
-
-  if (Object.keys(params).length > 0) {
-    url = `${url}?${paramsToQueryString(params)}`
-  }
-  return `${url}${hash}`
-}
-
-export const paramsToQueryString = (params: GenericKVP) => {
-  const searchParams = new URLSearchParams()
-  for (const [key, value] of Object.entries(params)) {
-    searchParams.append(key, value)
-  }
-  return searchParams.toString()
 }
