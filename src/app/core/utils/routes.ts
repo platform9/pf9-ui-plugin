@@ -22,12 +22,12 @@ class Route<T extends OptionalGenericKVP = null> {
     return this.path(null)
   }
 
-  private createUrlWithQueryString(url: URL, params: OptionalParamType<T>) {
+  private createUrlWithQueryString (url: URL, params: OptionalParamType<T>) {
     if (!params || Object.keys(params || []).length === 0) {
       return this.url
     }
     const fields: GenericKVP = { ...params as any }
-    
+
     if (url.pathname.includes(':')) {
       // nice utility to reconstruct urls from objects / models
       (url.pathname.match(/:([0-9_a-z]+)/gi) || []).forEach((match) => {
@@ -36,11 +36,11 @@ class Route<T extends OptionalGenericKVP = null> {
         delete fields[key]
       })
     }
-  
+
     for (const [key, value] of Object.entries(fields)) {
       url.searchParams.append(key, value)
     }
-  
+
     return `${url.toString().replace(url.origin, '')}`
   }
 }
