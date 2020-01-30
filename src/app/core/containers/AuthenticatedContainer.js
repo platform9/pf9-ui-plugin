@@ -130,6 +130,7 @@ const loadRegionFeatures = async (setRegionFeatures, history) => {
       kubernetes: features.experimental.containervisor,
       ironic: features.experimental.ironic,
       openstack: features.experimental.openstackEnabled,
+      intercom: features.experimental.intercom,
     })
 
     redirectToAppropriateStack(features.experimental.ironic, features.experimental.containervisor, history)
@@ -184,7 +185,7 @@ const AuthenticatedContainer = () => {
           </div>
         </main>
       </div>
-      <Intercom />
+      {regionFeatures.intercom && <Intercom />}
     </>
   )
 }
