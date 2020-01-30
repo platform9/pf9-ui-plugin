@@ -5,7 +5,6 @@ import HelpPage from 'app/plugins/kubernetes/components/common/HelpPage'
 import clsx from 'clsx'
 import Intercom from 'core/components/integrations/Intercom'
 import Navbar, { drawerWidth } from 'core/components/Navbar'
-import BannerContainer from 'core/components/notifications/BannerContainer'
 import Toolbar from 'core/components/Toolbar'
 import useToggler from 'core/hooks/useToggler'
 import { AppContext } from 'core/providers/AppProvider'
@@ -34,14 +33,8 @@ const useStyles = makeStyles(theme => ({
     marginTop: 55, // header height is hardcoded to 55px. account for that here.
     overflowX: 'auto',
     flexGrow: 1,
-    // backgroundColor: props => (
-    //   props.path === '/ui/kubernetes/dashboard'
-    //     ? theme.palette.background.dashboard
-    //     : theme.palette.background.default
-    // )
     backgroundColor: theme.palette.background.default,
-    padding: theme.spacing(3),
-    paddingTop: theme.spacing(2),
+    padding: 0,
     transition: theme.transitions.create('margin', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
@@ -67,7 +60,7 @@ const useStyles = makeStyles(theme => ({
     minHeight: theme.spacing(6),
   },
   contentMain: {
-    paddingLeft: theme.spacing(2),
+    padding: theme.spacing(3, 3, 3, 5),
   },
 }))
 
@@ -113,7 +106,8 @@ const renderPluginComponents = (id, plugin) => {
   const pluginComponents = plugin.getComponents()
 
   return <Route key={plugin.basePath} path={plugin.basePath} exact={false}>
-    {pluginComponents.map(PluginComponent => <PluginComponent />)}
+    {pluginComponents.map((PluginComponent, idx) =>
+      <PluginComponent key={idx} />)}
   </Route>
 }
 const renderRawComponents = moize(plugins =>
@@ -176,7 +170,6 @@ const AuthenticatedContainer = () => {
     <>
       <div className={classes.appFrame}>
         <Toolbar />
-        <BannerContainer />
         <Navbar
           withStackSlider={withStackSlider}
           drawerWidth={drawerWidth}
@@ -188,6 +181,7 @@ const AuthenticatedContainer = () => {
           [classes.contentShift]: drawerOpen,
           [classes['contentShift-left']]: drawerOpen,
         })}>
+          {/* <BannerContainer /> */}
           <div className={classes.contentMain}>
             {renderRawComponents(plugins)}
             <Switch>

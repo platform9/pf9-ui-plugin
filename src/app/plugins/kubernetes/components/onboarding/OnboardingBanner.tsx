@@ -1,41 +1,74 @@
-import React, { FC } from 'react'
-import BannerContent from 'core/components/notifications/BannerContent'
+import React, { FC, useCallback, useMemo, useState } from 'react'
+import { Button, Theme, Typography } from '@material-ui/core'
+import { makeStyles } from '@material-ui/styles'
+import BaseOnboardingBanner
+  from 'core/components/onboarding/BaseOnboardingBanner'
 
-// const useStyles = makeStyles<Theme>(theme => ({
-//   content: {
-//     height: 30,
-//     display: 'flex',
-//     flexFlow: 'row nowrap',
-//     textAlign: 'center',
-//     color: theme.palette.secondary.contrastText,
-//     justifyContent: 'center',
-//     width: '100%',
-//     backgroundColor: '#F5A623',
-//   },
-//   icon: {
-//     fontSize: 20,
-//   },
-//   iconVariant: {
-//     opacity: 0.9,
-//     marginRight: theme.spacing(1),
-//   },
-//   message: {
-//     display: 'flex',
-//     alignItems: 'center',
-//   },
-//   text: {
-//     display: 'inline-block',
-//   },
-//   close: {
-//     position: 'absolute',
-//     right: 0,
-//   },
-// }))
+type NumberType<L extends number> = L
+// The next type defines the number of steps
+type NumStepsType = NumberType<5>
 
+interface ArrayFixed<T, L extends number> extends Array<T> {
+  0: T
+  length: L
+}
+
+const useStyles = makeStyles<Theme>(theme => ({
+  button: {
+    lineHeight: 1.2,
+    minHeight: theme.spacing(4.5),
+    borderRadius: 0,
+    backgroundColor: theme.palette.secondary.contrastText,
+    color: '#F5A623',
+  },
+}))
+
+// TODO
 const OnboardingBanner: FC = props => {
-  return <BannerContent>
-    Welcome to Platform9
-  </BannerContent>
+  const classes = useStyles(props)
+  const [currentStep, setCurrentStep] = useState(0)
+  const handleStepClick = useCallback(step => {
+    setCurrentStep(step)
+  }, [])
+  const stepsContent = useMemo<ArrayFixed<React.ReactElement, NumStepsType>>(() => [
+    <>
+      <Typography variant="body1">
+        Get started now, and you can have your Kubernetes private cloud
+        operational
+        within minutes!
+      </Typography>
+      <Button variant="contained" className={classes.button}>
+        + Add Host
+      </Button>
+    </>,
+    <Typography variant="body1">Step 2</Typography>,
+    <Typography variant="body1">Step 3</Typography>,
+    <Typography variant="body1">Step 4</Typography>,
+    <Typography variant="body1">Step 5</Typography>,
+  ], [classes])
+  const offCourseContent = useMemo<ArrayFixed<string, NumStepsType>>(() => [
+    'To proceed with setup, Add a Host',
+    'Lorem ipsum',
+    'Lorem ipsum',
+    'Lorem ipsum',
+    'Lorem ipsum',
+  ], [])
+  const inProgressText = useMemo<ArrayFixed<string, NumStepsType>>(() => [
+    'Add Host',
+    'Lorem ipsum',
+    'Lorem ipsum',
+    'Lorem ipsum',
+    'Lorem ipsum',
+  ], [])
+
+  return <BaseOnboardingBanner
+    activeStep={currentStep}
+    onStepClick={handleStepClick}
+    currentState={'default'}
+    stepsContent={stepsContent}
+    inProgressText={inProgressText}
+    offCourseContent={offCourseContent}
+  />
 }
 
 export default OnboardingBanner
