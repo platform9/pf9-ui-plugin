@@ -5,17 +5,16 @@ import { BannerContext } from 'core/providers/BannerProvider'
 const useStyles = makeStyles<Theme>(theme => ({
   root: {
     // Intercom uses a ridiculously high zIndex so we have to be even more ridiculous
-    zIndex: 9999999999,
+    zIndex: 9999999998,
     display: 'flex',
-    flexFlow: 'column nowrap',
-    position: 'fixed',
+    flexFlow: 'row nowrap',
+    justifyContent: 'space-between',
     top: 55,
     left: 0,
     right: 0,
-    height: 30,
+    minHeight: 30,
+    padding: theme.spacing(2, 4),
     color: theme.palette.secondary.contrastText,
-    justifyContent: 'center',
-    width: '100%',
     backgroundColor: '#F5A623',
   },
 }))
