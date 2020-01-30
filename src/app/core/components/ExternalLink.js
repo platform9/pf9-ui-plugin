@@ -2,9 +2,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import SimpleLink from 'core/components/SimpleLink'
 
-const ExternalLink = ({ url, children, newWindow }) => {
-  const moreProps = newWindow ? { target: '_blank', rel: 'noopener' } : {}
-  return (<SimpleLink src={url} {...moreProps}>{children}</SimpleLink>)
+const ExternalLink = ({ url, children, newWindow = true, ...rest }) => {
+  const targetBlankProps = newWindow ? { target: '_blank', rel: 'noopener' } : {}
+  return (<SimpleLink src={url} {...targetBlankProps} {...rest}>{children || url}</SimpleLink>)
 }
 
 ExternalLink.propTypes = {
@@ -15,11 +15,7 @@ ExternalLink.propTypes = {
   newWindow: PropTypes.bool,
 
   // The link contents.  Usually just simple text but can be any node.
-  children: PropTypes.node.isRequired,
-}
-
-ExternalLink.defaultProps = {
-  newWindow: true,
+  children: PropTypes.node,
 }
 
 export default ExternalLink

@@ -1,6 +1,6 @@
 import React from 'react'
 import { compose } from 'app/utils/fp'
-import { withAppContext } from 'core/AppProvider'
+import { withAppContext } from 'core/providers/AppProvider'
 import SearchBar from 'core/components/SearchBar'
 import { omit } from 'ramda'
 import JsonView from 'react-json-view'
@@ -25,7 +25,8 @@ class ContextViewer extends React.PureComponent {
   handleSearchChange = searchTerm => this.setState({ searchTerm })
 
   render () {
-    const { context } = this.props
+    const { getContext } = this.props
+    const context = getContext()
     const { searchTerm } = this.state
     const cleanContext = removeBadKeys(context)
     const searchedContext = searchTerm === ''

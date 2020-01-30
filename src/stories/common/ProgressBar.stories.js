@@ -8,7 +8,7 @@ addStories('Common Components/ProgressBar', {
   'Progress bar': () => (
     <ProgressBar percent={40} label={progress => `${progress}% used`} />
   ),
-  'Compact': () => (
+  Compact: () => (
     <ProgressBar
       compact
       percent={40}

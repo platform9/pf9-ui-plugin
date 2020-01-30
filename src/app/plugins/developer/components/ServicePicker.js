@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { arrToObjByKey, compose } from 'app/utils/fp'
-import { withAppContext } from 'core/AppProvider'
+import { withAppContext } from 'core/providers/AppProvider'
 import Picklist from 'core/components/Picklist'
 import { loadServiceCatalog } from 'openstack/components/api-access/actions'
 import { prop } from 'ramda'
@@ -40,7 +40,7 @@ class ServicePicker extends React.PureComponent {
     const { onChange } = this.props
     const { catalog } = this.state
 
-    let baseUrl = catalog[service].url
+    const baseUrl = catalog[service].url
 
     // Handle the weird cases where we can't use the catalog's url as is.
     if (service === 'keystone') {

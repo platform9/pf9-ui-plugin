@@ -1,10 +1,13 @@
 import {
-  hasPath, path, assocPath, pathEq, always, over, append, lensPath, identity, isNil,
+  hasPath, path, assocPath, pathEq, always, over, append, lensPath, identity, isNil, pipe, pickAll,
+  reject, either, equals, mergeLeft, allPass, map, head, split,
 } from 'ramda'
-import { emptyObj, ensureFunction, removeWith, updateWith, switchCase } from 'utils/fp'
+import {
+  emptyObj, ensureFunction, removeWith, switchCase, emptyArr, ensureArray, adjustWith,
+} from 'utils/fp'
 import { dataCacheKey, getContextLoader } from 'core/helpers/createContextLoader'
 import { memoizePromise, uncamelizeString } from 'utils/misc'
-import { defaultUniqueIdentifier, notFoundErr } from 'app/constants'
+import { defaultUniqueIdentifier, notFoundErr, allKey } from 'app/constants'
 
 let updaters = {}
 export const getContextUpdater = (key, operation) => {
@@ -20,6 +23,8 @@ export const getContextUpdater = (key, operation) => {
  *
  * @property {string} [entityName] Name of the entity, it defaults to the the provided entity "cacheKey"
  * formatted with added spaces and removing the last "s"
+ *
+ * @property {string|array} [indexBy] Keys to use to index the values
  *
  * @property {("create"|"update"|"delete")|string} [operation="any"] CRUD operation, it can be
  * "create", "update", "delete" for specific cache adjustments or any custom string to
@@ -53,14 +58,16 @@ function createContextUpdater (cacheKey, dataUpdaterFn, options = {}) {
   const {
     uniqueIdentifier = defaultUniqueIdentifier,
     entityName = uncamelizeString(cacheKey).replace(/s$/, ''), // Remove trailing "s"
+    indexBy,
     operation = 'any',
     contextLoader,
-    successMessage = (updatedItems, prevItems, params, operation) => `Successfully ${switchCase(
-      'updated',
-      ['create', 'created'],
-      ['update', 'updated'],
-      ['delete', 'deleted'],
-    )(operation)} ${entityName}`,
+    successMessage = (updatedItems, prevItems, params, operation) =>
+      `${entityName} ${switchCase(
+        'updated',
+        ['create', 'created'],
+        ['update', 'updated'],
+        ['delete', 'deleted'],
+      )(operation)} successfully`,
     errorMessage = (prevItems, params, catchedErr, operation) => {
       const action = switchCase(
         'update',
@@ -69,8 +76,8 @@ function createContextUpdater (cacheKey, dataUpdaterFn, options = {}) {
         ['delete', 'delete'],
       )(operation)
       // Display entity ID if available
-      const withId = hasPath(uniqueIdentifierPath, params)
-        ? ` with ${uniqueIdentifier}: ${path(uniqueIdentifierPath, params)}`
+      const withId = hasPath(head(uniqueIdentifierPaths), params)
+        ? ` with ${head(uniqueIdentifierPaths).join('.')}: ${path(head(uniqueIdentifierPaths), params)}`
         : ''
       // Specific error handling
       return switchCase(
@@ -79,7 +86,10 @@ function createContextUpdater (cacheKey, dataUpdaterFn, options = {}) {
       )(catchedErr.message)
     },
   } = options
-  const uniqueIdentifierPath = uniqueIdentifier.split('.')
+  const allIndexKeys = indexBy ? ensureArray(indexBy) : emptyArr
+  const uniqueIdentifierPaths = uniqueIdentifier
+    ? ensureArray(uniqueIdentifier).map(split('.'))
+    : emptyArr
   const dataLens = lensPath([dataCacheKey, cacheKey])
 
   /**
@@ -110,34 +120,42 @@ function createContextUpdater (cacheKey, dataUpdaterFn, options = {}) {
     getContext,
     setContext,
     params = emptyObj,
-    loaderParams = emptyObj,
     additionalOptions = emptyObj,
-    noDataMapping = false,
   }) => {
     const {
       onSuccess = (successMessage, params) => console.info(successMessage),
       onError = (errorMessage, catchedErr, params) => console.error(errorMessage, catchedErr),
     } = additionalOptions
-    const id = path(uniqueIdentifierPath, params)
+    const providedIndexedParams = pipe(
+      pickAll(allIndexKeys),
+      reject(either(isNil, equals(allKey))),
+    )(params)
+    const matchIdentifier = idPath => pathEq(idPath, path(idPath, params))
+    const matchAllIdentifiers = allPass(map(matchIdentifier, uniqueIdentifierPaths))
     const loader = contextLoader || getContextLoader(cacheKey)
     if (!loader) {
       throw new Error(`Context Loader with key ${cacheKey} not found`)
     }
+    const loaderAdditionalOptions = { onError }
     const prevItems = await loader({
       getContext,
       setContext,
-      params: loaderParams,
-      additionalOptions,
-      noDataMapping, // Return the raw server data without any post processing
+      params,
+      additionalOptions: loaderAdditionalOptions,
+      dumpCache: true,
     })
+    const loadFromContext = (key, params = emptyObj, refetch) => {
+      const loaderFn = getContextLoader(key)
+      return loaderFn({ getContext, setContext, params, refetch, additionalOptions: loaderAdditionalOptions })
+    }
     try {
-      const output = await dataUpdaterFn(params, prevItems)
+      const output = await dataUpdaterFn(params, prevItems, loadFromContext)
       const operationSwitchCase = switchCase(
         // If no operation is chosen (ie "any" or a custom operation), just replace the whole array with the new output
         isNil(output) ? identity : always(output),
-        ['create', append(output)],
-        ['update', updateWith(pathEq(uniqueIdentifierPath, id), output)],
-        ['delete', removeWith(pathEq(uniqueIdentifierPath, id))],
+        ['create', append(mergeLeft(providedIndexedParams, output))],
+        ['update', adjustWith(matchAllIdentifiers, mergeLeft(output))],
+        ['delete', removeWith(matchAllIdentifiers)],
       )
       await setContext(over(dataLens, operationSwitchCase(operation)))
 
@@ -145,19 +163,19 @@ function createContextUpdater (cacheKey, dataUpdaterFn, options = {}) {
         const updatedItems = await loader({
           getContext,
           setContext,
-          params: loaderParams,
-          additionalOptions,
+          params,
+          additionalOptions: loaderAdditionalOptions,
         })
         const parsedSuccessMesssage = ensureFunction(successMessage)(updatedItems, prevItems, params, operation)
         await onSuccess(parsedSuccessMesssage, params)
       }
-      return true
+      return [true, output]
     } catch (err) {
       if (onError) {
         const parsedErrorMesssage = ensureFunction(errorMessage)(prevItems, params, err, operation)
         await onError(parsedErrorMesssage, err, params)
       }
-      return false
+      return [false, null]
     }
   })
   contextUpdaterFn.getKey = () => cacheKey

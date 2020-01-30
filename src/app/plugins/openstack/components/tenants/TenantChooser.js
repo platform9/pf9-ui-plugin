@@ -1,6 +1,6 @@
 import React, { useState, useContext, useCallback, useMemo } from 'react'
 import ApiClient from 'api-client/ApiClient'
-import { AppContext } from 'core/AppProvider'
+import { AppContext } from 'core/providers/AppProvider'
 import { emptyArr } from 'app/utils/fp'
 import Selector from 'core/components/Selector'
 import { useScopedPreferences } from 'core/providers/PreferencesProvider'
@@ -9,6 +9,7 @@ import { Tooltip } from '@material-ui/core'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { dataCacheKey, paramsCacheKey } from 'core/helpers/createContextLoader'
 import { loadUserTenants } from 'openstack/components/tenants/actions'
+import { getStorage, setStorage } from 'core/utils/pf9Storage'
 
 const TenantChooser = props => {
   const { keystone } = ApiClient.getInstance()
@@ -27,7 +28,11 @@ const TenantChooser = props => {
     const tenant = tenants.find(x => x.name === tenantName)
     if (!tenant) { return }
 
-    await keystone.changeProjectScope(tenant.id)
+    const { user, role, scopedToken } = await keystone.changeProjectScope(tenant.id)
+    // Update localStorage scopedToken upon changing project scope
+    const existingTokens = getStorage('tokens')
+    setStorage('tokens', { ...existingTokens, currentToken: scopedToken })
+
     // Clear any data that should change when the user changes tenant.
     // The data will then be reloaded when it is needed.
     await setContext(pipe(
@@ -37,6 +42,7 @@ const TenantChooser = props => {
       // Changing the currentTenant will cause all the current active `useDataLoader`
       // hooks to reload its data
       assoc('currentTenant', tenant),
+      assoc('userDetails', { ...user, role }),
     ))
     setLoading(false)
   }
@@ -72,6 +78,7 @@ const TenantChooser = props => {
         onChoose={handleChoose}
         onSearchChange={setTenantSearch}
         searchTerm={tenantSearch}
+        type='Tenant'
       />
     </Tooltip>
   )

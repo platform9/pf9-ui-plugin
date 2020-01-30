@@ -8,6 +8,7 @@ import Namespace from './Namespace'
 import Pod from './Pod'
 import Service from './Service'
 import StorageClass from './StorageClass'
+import Logging from './Logging'
 import { attachNodeToCluster } from './Operations'
 import uuid from 'uuid'
 
@@ -93,7 +94,7 @@ const options = {
     })
 
     const currentTime = getCurrentTime()
-    return { nodePoolUuid: uuid.v4(), cloudProperties: cloudProperties, cloudProviderUuid: uuid.v4(), created_at: currentTime, lastOk: currentTime, lastOp: currentTime, ...input }
+    return { nodePoolUuid: uuid.v4(), cloudProperties: cloudProperties, cloudProviderUuid: uuid.v4(), created_at: faker.date.recent(), externalDnsName: faker.internet.domainName(), lastOk: currentTime, lastOp: currentTime, ...input }
   },
   loaderFn: (clusters) => {
     return clusters.map((cluster) => {
@@ -114,6 +115,7 @@ const options = {
     Pod.deleteAllInCluster({ clusterId: id, context })
     Service.deleteAllInCluster({ clusterId: id, context })
     StorageClass.deleteAllInCluster({ clusterId: id, context })
+    Logging.deleteAllInCluster({ clusterId: id, context })
   }
 }
 

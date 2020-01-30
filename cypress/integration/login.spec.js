@@ -1,6 +1,8 @@
 import config from '../../config'
 
-const { username, password } = config.simulator
+const signInText = 'Sign In'
+const username = 'admin@platform9.com'
+const password = 'secret'
 
 describe('login', () => {
   it('reports failed logins', () => {
@@ -12,7 +14,7 @@ describe('login', () => {
     cy.get('#password')
       .type('badpassword')
 
-    cy.contains('SIGN IN')
+    cy.contains(signInText)
       .click()
 
     cy.contains('Login failed')
@@ -27,15 +29,15 @@ describe('login', () => {
       .clear()
       .type(password)
 
-    cy.contains('SIGN IN')
+    cy.contains(signInText)
       .click()
 
-    cy.contains('Current Region')
+    cy.contains(config.region)
   })
 
   it('remembers the login state on refresh', () => {
-    cy.setSimSession()
+    cy.login()
     cy.visit('/')
-    cy.contains('Current Region')
+    cy.contains(config.region)
   })
 })

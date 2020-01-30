@@ -1,11 +1,11 @@
 describe('clusters', () => {
   beforeEach(() => {
-    cy.setSimSession()
+    cy.login()
   })
 
   context('list clusters', () => {
     it('lists clusters', () => {
-      cy.visit('/ui/kubernetes/clusters')
+      cy.visit('/ui/kubernetes/infrastructure')
       cy.contains('fakeCluster1')
     })
   })
@@ -17,54 +17,55 @@ describe('clusters', () => {
     })
 
     it('shows nodes on cluster details', () => {
-      cy.contains('Nodes').click()
-      cy.contains('Cluster Nodes')
+      cy.contains('Nodes & Health Info').click()
+      cy.contains('Master Nodes')
     })
   })
 
   context('create cluster', () => {
     it('shows the cluster create form', () => {
-      cy.visit('/ui/kubernetes/clusters')
-      cy.contains('Add').click()
-      cy.contains('Add Cluster')
+      cy.visit('/ui/kubernetes/infrastructure')
+      cy.contains('+ Add Cluster').click()
+      cy.contains('Select one of the supported Cloud Provider Types:')
+      cy.contains('Bare OS').click()
+      cy.contains('Add Bare OS Cluster')
     })
   })
 
   context('cluster actions', () => {
     before(() => {
       cy.resetServerContext('dev')
+      cy.login()
     })
 
-    context('attach node', () => {
-      it('shows the modal for adding nodes to the cluster', () => {
-        cy.visit('/ui/kubernetes/clusters')
-        cy.row('fakeCluster1')
-          .rowAction('Attach node')
-        cy.contains('Attach Node to Cluster')
+    context('scale workers', () => {
+      it('shows the page for adding nodes to the cluster', () => {
+        cy.visit('/ui/kubernetes/infrastructure')
+        cy.row('fakeCluster1').click()
+        cy.contains('div', 'Scale workers').click()
+        cy.contains('Add').click()
+        cy.contains('button', 'Add workers')
       })
 
-      it('selects "master" on the node', () => {
-        cy.get('div[role=dialog]').contains('tr', 'fakeNode2').contains('Master').click()
-      })
-
-      it('closes the modal on attach', () => {
-        cy.contains('button', 'Attach').click()
-        cy.contains('Attach Node to Cluster').should('not.exist')
+      it('selects "fakeNode3" on the node and submits', () => {
+        cy.contains('tr', 'fakeNode3').click()
+        cy.contains('button', 'Add workers').click()
+        cy.contains('Successfully updated Cluster')
       })
 
       it('should not allow the node to be added to another cluster', () => {
-        cy.row('fakeCluster1')
-          .rowAction('Attach node')
-        cy.get('div[role=dialog]').contains('fakeNode2').should('not.exist')
+        cy.visit('/ui/kubernetes/infrastructure')
+        cy.row('fakeCluster2').click()
+        cy.contains('div', 'Scale workers').click()
+        cy.contains('Add').click()
       })
 
-      it('should show "No nodes available to attach"', () => {
-        cy.contains('No nodes available to attach')
+      it('should show "There are no nodes available."', () => {
+        cy.contains('There are no nodes available.')
       })
 
       it('closes the modal on cancel', () => {
-        cy.contains('Cancel').click()
-        cy.contains('Attach Node to Cluster').should('not.exist')
+        cy.get('[title=Cancel]').click()
       })
 
       it('only allows attaching for "local" cloudProviders', () => {
@@ -79,7 +80,7 @@ describe('clusters', () => {
 
     context('detach node', () => {
       it('only allows detaching for "local" cloudProviders', () => {
-        cy.visit('/ui/kubernetes/clusters')
+        cy.visit('/ui/kubernetes/infrastructure')
         cy.row('mockOpenStackCluster').rowAction().contains('Detach node').isDisabled()
         cy.closeModal()
         cy.row('mockAwsCluster').rowAction().contains('Detach node').isDisabled()
@@ -89,7 +90,7 @@ describe('clusters', () => {
       })
 
       it('show the modal for detaching nodes from the cluster', () => {
-        cy.visit('/ui/kubernetes/clusters')
+        cy.visit('/ui/kubernetes/infrastructure')
         cy.row('fakeCluster1')
           .rowAction('Detach node')
         cy.contains('Detach node from cluster')
@@ -111,7 +112,7 @@ describe('clusters', () => {
       })
 
       it('still shows the node as detached after a page reload (backend data updated)', () => {
-        cy.visit('/ui/kubernetes/clusters')
+        cy.visit('/ui/kubernetes/infrastructure')
         cy.row('fakeCluster1')
           .rowAction('Detach node')
         cy.contains('No nodes available to detach')
@@ -125,7 +126,7 @@ describe('clusters', () => {
 
     context('scale cluster', () => {
       it('only allows scaling for "AWS" cloudProviders', () => {
-        cy.visit('/ui/kubernetes/clusters')
+        cy.visit('/ui/kubernetes/infrastructure')
         cy.row('mockOpenStackCluster').rowAction().contains('Scale cluster').isDisabled()
         cy.closeModal()
         cy.row('mockAwsCluster').rowAction().contains('Scale cluster').isEnabled()
@@ -151,7 +152,7 @@ describe('clusters', () => {
       })
 
       it('should show the cluster with the new number of worker nodes', () => {
-        cy.visit('/ui/kubernetes/clusters')
+        cy.visit('/ui/kubernetes/infrastructure')
         cy.row('mockAwsCluster')
           .rowAction('Scale cluster')
         cy.get('#numWorkers input').should('have.value', '3')

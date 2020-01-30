@@ -61,7 +61,7 @@ describe('Token', () => {
     it('creates a JSON version of the Token', () => {
       const token = new Token()
       const json = token.asJson()
-      expect(Object.keys(json)).toEqual(['id', 'project', 'roles', 'user'])
+      expect(Object.keys(json)).toEqual(['id', 'expires_at', 'issued_at', 'project', 'roles', 'user'])
     })
   })
 })

@@ -1,7 +1,6 @@
 import Catalog from '../models/openstack/Catalog'
 import Flavor from '../models/openstack/Flavor'
 import Instance from '../models/openstack/Instance'
-import Role from '../models/openstack/Role'
 import Tenant from '../models/openstack/Tenant'
 import User from '../models/openstack/User'
 import Volume from '../models/openstack/Volume'
@@ -14,8 +13,6 @@ import ResMgrHost from '../models/resmgr/ResMgrHost'
 import Token from '../models/openstack/Token'
 import Application from '../models/openstack/Application'
 import SshKey from '../models/openstack/SshKey'
-
-const config = require('../../../config')
 
 const defaultQuota = {
   cores: 10,
@@ -64,6 +61,10 @@ class Context {
     this.deployments = []
     this.services = []
     this.storageClasses = []
+    this.k8sRoles = []
+    this.roleBindings = []
+    this.clusterRoles = []
+    this.clusterRoleBindings = []
     this.charts = []
     this.chartVersions = []
     this.releases = []
@@ -73,17 +74,6 @@ class Context {
     this.prometheusServiceMonitors = []
     this.prometheusAlertManagers = []
     this.loggings = []
-  }
-
-  createSimUser = () => {
-    if (config.simulator) {
-      const { username, password } = config.simulator
-      if (username && password) {
-        const user = new User({ name: username, password })
-        // construct a token with a hard-coded id to make testing easier
-        new Token({ user, id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' })
-      }
-    }
   }
 
   validateToken = id => Token.validateToken(id)
@@ -168,16 +158,6 @@ class Context {
     return id
   }
 
-  getTenantRoles = id => {
-    const user = User.findById(id).asJson()
-    return user.roles.map(({ tenant, role }) => (JSON.stringify({
-      // tenant: Tenant.findById(tenant.id).asJson(),
-      // role: Role.findById(role.id).asJson()
-      tenant: Tenant.findById(tenant.id).asJson().name,
-      role: Role.findById(role.id).asJson().name
-    })))
-  }
-
   getUser = (id) => {
     const user = User.findById(id)
     if (!user) {
@@ -194,7 +174,7 @@ class Context {
   }
 
   updateUser = (id, input) => {
-    let user = User.updateById(id, input)
+    const user = User.updateById(id, input)
     if (!user) {
       throw new Error('Unable to update non-existent user')
     }
@@ -226,7 +206,7 @@ class Context {
   }
 
   updateNetwork = (id, input) => {
-    let network = Network.updateById(id, input)
+    const network = Network.updateById(id, input)
     if (!network) {
       throw new Error('Unable to update non-existent network')
     }
@@ -258,7 +238,7 @@ class Context {
   }
 
   updateRouter = (id, input) => {
-    let router = Router.updateById(id, input)
+    const router = Router.updateById(id, input)
     if (!router) {
       throw new Error('Unable to update non-existent router')
     }
@@ -290,7 +270,7 @@ class Context {
   }
 
   updateFloatingIp = (id, input) => {
-    let floatingIp = FloatingIp.updateById(id, input)
+    const floatingIp = FloatingIp.updateById(id, input)
     if (!floatingIp) {
       throw new Error('Unable to update non-existent floating IP')
     }
@@ -322,7 +302,7 @@ class Context {
   }
 
   updateVolume = (id, input) => {
-    let volume = Volume.updateById(id, input)
+    const volume = Volume.updateById(id, input)
     if (!volume) {
       throw new Error('Unable to update non-existent volume')
     }
@@ -359,7 +339,7 @@ class Context {
   getResMgrHosts = () => ResMgrHost.getCollection().map(x => x.asJson())
 
   getResMgrHostRole = (id, role) => {
-    let hostRole = ResMgrHost.getHostRole(id, role)
+    const hostRole = ResMgrHost.getHostRole(id, role)
     if (!hostRole) {
       throw new Error('Unable to find designated role for designated host')
     }
@@ -367,7 +347,7 @@ class Context {
   }
 
   updateResMgrRole = (id, role, input) => {
-    let hostRole = ResMgrHost.updateHostRole(id, role, input)
+    const hostRole = ResMgrHost.updateHostRole(id, role, input)
     if (!hostRole) {
       throw new Error('Unable to update non-existent resMgrHost')
     }

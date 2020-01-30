@@ -1,5 +1,6 @@
 import React from 'react'
 import useReactRouter from 'use-react-router'
+import { map } from 'ramda'
 import { makeStyles, createStyles } from '@material-ui/styles'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
@@ -50,6 +51,7 @@ const LoggingListPage = () => {
 
   // TODO: onEdit and onDelete
   const options = {
+    cacheKey: 'loggings',
     addText: 'New Logging',
     uniqueIdentifier: 'cluster',
     loaderFn: loggingActions.list,
@@ -109,10 +111,10 @@ const renderStatus = (classes, value) => {
   )
 }
 
-const renderList = (values) => values.map(value => (<div>{value}</div>))
+const renderList = (values) => map(value => (<div key={value}>{value}</div>), values)
 
 const getColumns = (classes) => [
-  { id: 'cluster', label: 'Cluster' },
+  { id: 'clusterName', label: 'Cluster' },
   { id: 'status', label: 'Status', render: (value) => renderStatus(classes, value) },
   { id: 'logStorage', label: 'Log Storage', render: renderList },
   { id: 'logDestination', label: 'Log Destination', render: renderList },

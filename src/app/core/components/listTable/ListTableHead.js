@@ -13,6 +13,9 @@ const styles = theme => ({
     // backgroundColor: theme.palette.grey[50],
     fontWeight: 'bold',
     color: theme.palette.text.primary,
+    '& > tr': {
+      height: 46,
+    },
   },
   checkboxCell: {
     display: ['flex', '!important'],
@@ -24,7 +27,7 @@ const styles = theme => ({
     paddingRight: 4,
   },
   headLabel: {
-    fontSize: '13px',
+    fontSize: '12px',
     whiteSpace: 'nowrap',
   },
   cellLabel: {
@@ -32,9 +35,7 @@ const styles = theme => ({
   },
   checkAllCell: {
     paddingRight: 0,
-  },
-  emptyCheckAllCell: {
-    paddingRight: 20,
+    minWidth: 60,
   },
 })
 
@@ -71,25 +72,27 @@ class ListTableHead extends React.PureComponent {
       orderBy,
       rowCount,
       showCheckboxes,
+      multiSelection,
     } = this.props
 
-    const headerCheckbox = showCheckboxes && !blankFirstColumn
-      ? <TableCell padding="checkbox" key="_checkAll" className={clsx(classes.cellLabel,
-        classes.checkAllCell, {
-          [classes.emptyCheckAllCell]: !numSelected,
-        })}>
-        <label className={classes.checkboxCell}>
-          <Checkbox
-            className={classes.checkbox}
-            indeterminate={!checked && numSelected > 0 && numSelected < rowCount}
-            checked={checked}
-            onChange={onSelectAllClick}
-            color='primary'
-          />
-          {numSelected > 0 ? <span>({numSelected})</span> : null}
-        </label>
+    const renderHeaderCheckbox = !blankFirstColumn && showCheckboxes
+    const headerCheckbox = !renderHeaderCheckbox
+      ? null
+      : <TableCell padding="checkbox" key="_checkAll" className={clsx(classes.cellLabel,
+        classes.checkAllCell)}>
+        {multiSelection &&
+          <label className={classes.checkboxCell}>
+            <Checkbox
+              className={classes.checkbox}
+              indeterminate={!checked && numSelected > 0 && numSelected < rowCount}
+              checked={checked}
+              onChange={onSelectAllClick}
+              color='primary'
+            />
+            {numSelected > 0 ? <span>({numSelected})</span> : null}
+          </label>
+        }
       </TableCell>
-      : null
 
     const firstBlank = blankFirstColumn ? <TableCell
       padding="checkbox"
@@ -114,18 +117,20 @@ class ListTableHead extends React.PureComponent {
               sortDirection={column.sort !== false && orderBy === column.id ? order : false}
             >
               <Tooltip
-                title={column.label}
+                title={column.tooltip || column.label}
                 placement={column.numeric ? 'bottom-end' : 'bottom-start'}
                 enterDelay={300}
               >
-                <TableSortLabel
-                  className={classes.headLabel}
-                  active={orderBy === column.id}
-                  direction={order}
-                  onClick={this.createSortHandler(column.id)}
-                >
-                  {column.label} {idx === 0 ? `(${rowCount})` : ''}
-                </TableSortLabel>
+                {!column.disableSorting
+                  ? <TableSortLabel
+                    className={classes.headLabel}
+                    active={orderBy === column.id}
+                    direction={order}
+                    onClick={this.createSortHandler(column.id)}
+                  >
+                    {column.label} {idx === 0 ? `(${rowCount})` : ''}
+                  </TableSortLabel>
+                  : <span>{column.label} {idx === 0 ? `(${rowCount})` : ''}</span>}
               </Tooltip>
             </TableCell>)}
         </TableRow>
@@ -138,8 +143,10 @@ ListTableHead.propTypes = {
   columns: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.string,
     label: PropTypes.string,
+    tooltip: PropTypes.string,
     display: PropTypes.bool,
     excluded: PropTypes.bool,
+    disableSorting: PropTypes.bool,
   })).isRequired,
   canDragColumns: PropTypes.bool,
   onColumnsSwitch: PropTypes.func,

@@ -1,5 +1,6 @@
 const path = require('path')
 const webpack = require('webpack')
+const HardSourceWebpackPlugin = require('hard-source-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
@@ -26,7 +27,7 @@ appEntry.push('@babel/polyfill')
 appEntry.push('./index.js')
 
 const port = 3000
-const publicPath = isProd ? '/ui/' : `http://localhost:${port}/ui`
+const publicPath = '/ui'
 
 module.exports = {
   entry: {
@@ -56,56 +57,72 @@ module.exports = {
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        use: 'babel-loader'
+        use: 'babel-loader?cacheDirectory',
+      },
+      {
+        test: /\.tsx?$/,
+        exclude: /node_modules/,
+        use: 'awesome-typescript-loader',
       },
       {
         test: /\.css$/,
         exclude: /node_modules/,
         use: ['style-loader', 'css-loader'],
       },
-    ]
+      {
+        enforce: 'pre',
+        exclude: /node_modules/,
+        test: /\.js$/,
+        loader: 'source-map-loader'
+      },
+    ],
   },
   context: contextPath,
   optimization: {
+    namedModules: !isProd,
     runtimeChunk: 'single',
     minimize: isProd,
     minimizer: [
       new TerserPlugin({
         cache: true,
         parallel: true,
-        sourceMap: true
-      })
+        sourceMap: true,
+      }),
     ],
     splitChunks: {
       cacheGroups: {
         vendor: {
           test: /[\\/]node_modules[\\/]/,
           name: 'vendor',
-          chunks: 'all'
-        }
-      }
-    }
+          chunks: 'all',
+        },
+      },
+    },
   },
   plugins: [
-    ...(isProd
-      ? []
-      : [new webpack.NamedModulesPlugin()]),
+    ...(!isProd ? [new HardSourceWebpackPlugin({
+      info: {
+        mode: 'none',
+        level: 'info',
+      },
+    })] : []),
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify(env)
+      'process.env.NODE_ENV': JSON.stringify(env),
     }),
     extractCSS,
     new HtmlWebpackPlugin({
       inject: true,
-      template: './static/index.html',
+      template: isProd ? './static/index-with-tracking.html' : './static/index.html',
       favicon: './static/favicon.ico',
-      title: 'Caching'
+      title: 'Caching',
     }),
     new webpack.HashedModuleIdsPlugin(),
     new CopyWebpackPlugin([{ from: './static' }], {
-      copyUnmodified: false
-    })
+      copyUnmodified: false,
+    }),
   ],
   resolve: {
+    extensions: ['.json', '.js', '.ts', '.tsx'],
     alias: {
       // IDE's seem to solve paths according to the order in which they are defined
       // so we must put first the more specific aliases
@@ -118,5 +135,5 @@ module.exports = {
       server: path.resolve(__dirname, 'src/server'),
       'api-client': path.resolve(__dirname, 'src/api-client'),
     },
-  }
+  },
 }

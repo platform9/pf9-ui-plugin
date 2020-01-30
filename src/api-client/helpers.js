@@ -7,7 +7,7 @@ const defaultTestTenant = 'Development Team Tenant'
 export const keystoneEndpoint = `${config.host}/keystone`
 export const keystoneAdminEndpoint = `${config.host}/keystone_admin`
 export const makeClient = () => new ApiClient({ keystoneEndpoint })
-export const makeAdminClient = () => new ApiClient({ keystoneEndpoint })
+export const makeAdminClient = () => new ApiClient({ keystoneEndpoint: keystoneAdminEndpoint })
 
 export const getUserPass = () => {
   const username = config.username || config.simulator.username
@@ -42,16 +42,17 @@ export const makeRegionedClient = async (tenantName = defaultTestTenant) => {
   return client
 }
 
-export const waitUntil = async ({ condition, delay, maxRetries }) =>
-  new Promise(async (resolve, reject) => {
-    let done = await condition()
-    let retry = 0
-    while (!done && retry++ < maxRetries) {
-      await sleep(delay)
-      done = await condition()
-    }
-    done ? resolve() : reject(new Error('Task not done within time.'))
-  })
+export const waitUntil = async ({ condition, delay, maxRetries }) => {
+  let done = await condition()
+  let retry = 0
+  while (!done && retry++ < maxRetries) {
+    await sleep(delay)
+    done = await condition()
+  }
+  if (!done) {
+    throw new Error('Task not done within time.')
+  }
+}
 
 export const sleep = (delay) =>
   new Promise(resolve => setTimeout(resolve, delay))

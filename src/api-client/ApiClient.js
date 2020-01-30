@@ -10,7 +10,11 @@ import Neutron from './Neutron'
 import Nova from './Nova'
 import Qbert from './Qbert'
 import ResMgr from './ResMgr'
+import Clemency from 'api-client/Clemency'
+
 import { normalizeResponse } from 'api-client/helpers'
+import { hasPathStr, pathStr } from 'utils/fp'
+import { prop, has, cond, T, identity } from 'ramda'
 
 class ApiClient {
   static init (options = {}) {
@@ -35,6 +39,13 @@ class ApiClient {
     return client
   }
 
+  unscopedToken = null
+  scopedToken = null
+  catalog = null
+  activeProjectId = null
+  serviceCatalog = null
+  endpoints = null
+
   constructor (options = {}) {
     this.options = options
     if (!options.keystoneEndpoint) {
@@ -49,11 +60,23 @@ class ApiClient {
     this.murano = new Murano(this)
     this.resmgr = new ResMgr(this)
     this.qbert = new Qbert(this)
+    this.clemency = new Clemency(this)
 
     this.catalog = {}
     this.activeRegion = null
 
+    const getResponseError = cond([
+      [hasPathStr('response.data.error'), pathStr('response.data.error')],
+      [hasPathStr('response.data.message'), pathStr('response.data.message')],
+      [has('error'), prop('error')],
+      [T, identity],
+    ])
+
     this.axiosInstance = axios.create({ ...defaultAxiosConfig, ...(options.axios || {}) })
+    this.axiosInstance.interceptors.response.use(
+      response => response,
+      error => Promise.reject(getResponseError(error)),
+    )
   }
 
   serialize = () => {
@@ -82,8 +105,21 @@ class ApiClient {
     return { headers }
   }
 
-  basicGet = async url => {
-    const response = await this.axiosInstance.get(url, this.getAuthHeaders())
+  rawGet = (url, config) => this.axiosInstance.get(url, config)
+
+  rawPost = (url, data, config) => this.axiosInstance.post(url, data, config)
+
+  rawPut = (url, data, config) => this.axiosInstance.put(url, data, config)
+
+  rawPatch = (url, data, config) => this.axiosInstance.patch(url, data, config)
+
+  rawDelete = (url, config) => this.axiosInstance.delete(url, config)
+
+  basicGet = async (url, params) => {
+    const response = await this.axiosInstance.get(url, {
+      params,
+      ...this.getAuthHeaders(),
+    })
     return normalizeResponse(response)
   }
 
@@ -93,9 +129,7 @@ class ApiClient {
   }
 
   basicPatch = async (url, body) => {
-    const config = this.getAuthHeaders()
-    config.headers['Content-Type'] = 'application/json-patch+json'
-    const response = await this.axiosInstance.patch(url, body, config)
+    const response = await this.axiosInstance.patch(url, body, this.getAuthHeaders())
     return normalizeResponse(response)
   }
 

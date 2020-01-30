@@ -9,14 +9,13 @@ const styles = theme => ({
   infoTooltip: {
     background: theme.palette.common.white,
     color: theme.palette.text.primary,
-    borderRadius: 0,
     border: 0,
     maxWidth: 300,
     fontSize: 14,
     display: 'flex',
     flexFlow: 'row nowrap',
-    paddingTop: 0,
-    marginTop: 0,
+    borderRadius: 3,
+    marginTop: -7,
   },
   infoIcon: {
     fontSize: theme.spacing(2.4),
@@ -39,6 +38,7 @@ class InfoTooltip extends PureComponent {
 
     return (
       info ? <Tooltip
+        interactive
         open={open}
         placement={placement}
         classes={{ tooltip: classes.infoTooltip }}

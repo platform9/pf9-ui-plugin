@@ -2,6 +2,7 @@
 import context from '../../context'
 import ActiveModel from '../ActiveModel'
 import { findById, mapAsJson, jsonOrNull } from '../../helpers'
+import moment from 'moment'
 
 const coll = () => context.tokens
 
@@ -25,13 +26,14 @@ class Token extends ActiveModel {
   static validateToken = tokenId => Token.findById(tokenId) || null
 
   asJson = () => {
-    const json = {
+    return {
       ...super.asJson(),
+      expires_at: moment().add(1, 'day').format(),
+      issued_at: moment().format(),
       project: jsonOrNull(this.tenant),
       roles: mapAsJson(this.roles),
       user: jsonOrNull(this.user),
     }
-    return json
   }
 }
 

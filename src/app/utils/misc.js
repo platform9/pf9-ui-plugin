@@ -14,6 +14,31 @@ export const parseJSON = str => {
   }
 }
 
+/**
+ * Given a number of seconds returns the number of
+ * years, months, days, hours and minutes in a human readable format
+ * @param seconds
+ * @returns {string}
+ */
+export const secondsToString = seconds => {
+  const min = 60
+  const hour = min * 60
+  const day = hour * 24
+  const month = day * 30
+  const year = day * 365
+  const units = { year, month, day, hour, min }
+  let remainingSeconds = seconds
+  const results = Object.entries(units).reduce((acc, [unitName, unitSeconds]) => {
+    const amount = Math.floor(remainingSeconds / unitSeconds)
+    remainingSeconds %= units[unitName]
+    if (amount >= 1) {
+      return [...acc, `${amount} ${unitName}${amount >= 2 ? 's' : ''}`]
+    }
+    return acc
+  }, [])
+  return results.join(', ')
+}
+
 export const isNumeric = n =>
   !Number.isNaN(parseFloat(n)) && Number.isFinite(+n)
 
@@ -37,8 +62,8 @@ export const castFuzzyBool = value => {
     true: true,
     0: false,
     1: true,
-    'False': false,
-    'True': true,
+    False: false,
+    True: true,
   }
 
   if (mappings[value] !== undefined) { return mappings[value] }
@@ -97,3 +122,36 @@ export const uncamelizeString = inputStr => inputStr
   .replace(/([A-Z])/g, ' $1')
   // uppercase the first character
   .replace(/^./, str => str.toUpperCase())
+
+/**
+ * Capitalize the first letter of the given string
+ * @param inputStr
+ * @returns {*}
+ */
+export const capitalizeString = inputStr => inputStr
+// uppercase the first character
+  .replace(/^./, str => str.toUpperCase())
+
+/**
+ * Transform a string so that it only has alpha-numeric and hypens.  Useful for FQDN's.
+ * @param {string} str
+ * @returns {string}
+ */
+export const sanitizeUrl = str =>
+  str
+    .replace(/[^a-zA-Z0-9-_.]/g, '-') // replace non-valid url characters with hyphen
+    .replace(/^-+/, '') // eliminate leading hyphens
+    .replace(/\.+$/, '') // eliminate trailing dots
+
+export const getCookieValue = (name) => {
+  const val = document.cookie.match('(^|[^;]+)\\s*' + name + '\\s*=\\s*([^;]+)')
+  return val ? val.pop() : ''
+}
+
+export const normalizeUsername = (name = '') => {
+  if (!name) return name
+
+  // split emails from @ sign and take the left hand side
+  const [username] = name.split('@')
+  return username
+}

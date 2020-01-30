@@ -15,6 +15,9 @@ const styles = theme => ({
     marginTop: theme.spacing(4),
     width: '100%',
   },
+  title: {
+    marginBottom: theme.spacing(1),
+  },
   button: {
     display: 'block',
     marginTop: theme.spacing(2),
@@ -65,8 +68,8 @@ class DeveloperToolsEmbed extends React.PureComponent {
     // This is currently UI developers only so leaving always expanded
     return (
       <div className={classes.root}>
-        {false && <Button onClick={this.collapse}>collapse devtools</Button>}
-        <Typography variant="subtitle1">Developer Tools</Typography>
+        {/* {<Button onClick={this.collapse}>collapse devtools</Button>} */}
+        <Typography className={classes.title} variant="subtitle1">Developer Tools</Typography>
         <Panel title="Context Viewer">
           <ContextViewer />
         </Panel>

@@ -2,7 +2,8 @@ import context from '../../../context'
 import Logging from '../../../models/qbert/Logging'
 
 export const getLoggings = (req, res) => {
-  const loggings = Logging.list({ context })
+  const { clusterId } = req.params
+  const loggings = Logging.list({ context, config: { clusterId } })
   return res.send(loggings)
 }
 

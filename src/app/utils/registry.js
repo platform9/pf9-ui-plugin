@@ -1,5 +1,5 @@
 // Used for storing global variables across the modules
-let registry = {}
+const registry = {}
 
 export const getInstance = () => registry
 

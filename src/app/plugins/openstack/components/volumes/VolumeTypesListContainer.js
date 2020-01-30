@@ -3,7 +3,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import ApiClient from 'api-client/ApiClient'
 import { compose, keyValueArrToObj } from 'app/utils/fp'
-import { withAppContext } from 'core/AppProvider'
+import { withAppContext } from 'core/providers/AppProvider'
 import CRUDListContainer from 'core/components/CRUDListContainer'
 import createListTableComponent from 'core/helpers/createListTableComponent'
 import { dataCacheKey } from 'core/helpers/createContextLoader'
@@ -13,7 +13,7 @@ import { assocPath } from 'ramda'
 // This is a rather tedious pattern.  If we are doing it elsewhere we
 // should probably create some utility function for it.
 const convertVolumeType = x => {
-  let cloned = { ...x }
+  const cloned = { ...x }
   const backendNameItem = x.extra_specs.find(x => x.key === 'volume_backend_name')
   cloned.volume_backend_name = (backendNameItem && backendNameItem.value) || ''
   cloned.extra_specs = x.extra_specs.filter(x => x.key !== 'volume_backend_name')

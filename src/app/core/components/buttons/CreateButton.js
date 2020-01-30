@@ -4,7 +4,7 @@ import { withStyles } from '@material-ui/styles'
 
 const styles = theme => ({
   baseButton: {
-    margin: theme.spacing(1),
+    margin: 0,
     borderRadius: 2,
     textTransform: 'none',
     height: 40,

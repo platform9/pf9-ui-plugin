@@ -14,7 +14,7 @@ const styles = theme => ({
   },
 })
 
-const NextButton = ({ children, classes, disabled, ...rest }) => {
+const NextButton = ({ children, classes, disabled, showForward = true, ...rest }) => {
   const params = {
     className: classes.baseButton,
     color: disabled ? 'primary' : 'primary',
@@ -26,7 +26,7 @@ const NextButton = ({ children, classes, disabled, ...rest }) => {
   return (
     <Button {...params}>
       {children || 'Next'}
-      <Icon className={classes.rightIcon}>arrow_forward</Icon>
+      {showForward && <Icon className={classes.rightIcon}>arrow_forward</Icon>}
     </Button>
   )
 }

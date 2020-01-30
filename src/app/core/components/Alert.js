@@ -1,79 +1,89 @@
-import React, { PureComponent } from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import clsx from 'clsx'
+import { Paper, IconButton, Typography } from '@material-ui/core'
 import CheckCircleIcon from '@material-ui/icons/CheckCircle'
 import ErrorIcon from '@material-ui/icons/Error'
 import InfoIcon from '@material-ui/icons/Info'
 import CloseIcon from '@material-ui/icons/Close'
 import green from '@material-ui/core/colors/green'
 import amber from '@material-ui/core/colors/amber'
-import IconButton from '@material-ui/core/IconButton'
 import WarningIcon from '@material-ui/icons/Warning'
-import { withStyles } from '@material-ui/styles'
-import Typography from '@material-ui/core/Typography'
+import { makeStyles } from '@material-ui/styles'
+import { hexToRGBA } from 'core/utils/colorHelpers'
 
 const variantIcon = {
   success: CheckCircleIcon,
   warning: WarningIcon,
   error: ErrorIcon,
-  info: InfoIcon
+  info: InfoIcon,
 }
 
-const styles = theme => ({
-  success: { backgroundColor: green[600] },
-  error: { backgroundColor: theme.palette.error.dark },
-  info: { backgroundColor: theme.palette.primary.dark },
-  warning: { backgroundColor: amber[700] },
-  icon: { fontSize: 20 },
+const useStyles = makeStyles(theme => ({
+  root: {
+    maxWidth: 800,
+    position: ({ small }) => small ? 'initial' : 'relative',
+    padding: ({ small }) => small ? theme.spacing(2, 1) : theme.spacing(2, 8),
+    margin: theme.spacing(2, 0),
+    border: 0,
+    display: ({ small }) => small ? 'flex' : 'block',
+    backgroundColor: hexToRGBA(theme.palette.primary.main, 0.1)
+  },
+  success: { color: green[600] },
+  error: { color: theme.palette.error.dark },
+  info: { color: theme.palette.primary.dark },
+  warning: { color: amber[700] },
+  icon: {
+    position: ({ small }) => small ? 'initial' : 'absolute',
+    left: ({ small }) => small ? 'initial' : theme.spacing(3),
+    top: ({ small }) => small ? 'initial' : theme.spacing(3),
+    fontSize: 28,
+    flexGrow: ({ small }) => small ? 0 : 'initial',
+    alignSelf: ({ small }) => small ? 'center' : 'initial',
+  },
+  close: {
+    position: ({ small }) => small ? 'initial' : 'absolute',
+    right: ({ small }) => small ? 'initial' : theme.spacing(2),
+    top: ({ small }) => small ? 'initial' : theme.spacing(1),
+    padding: theme.spacing(1),
+    margin: theme.spacing(-1),
+    flexGrow: ({ small }) => small ? 0 : 'initial',
+    alignSelf: ({ small }) => small ? 'center' : 'initial',
+  },
   iconVariant: {
     opacity: 0.9,
-    marginRight: theme.spacing(1)
+    marginRight: theme.spacing(1),
   },
   message: {
-    color: theme.palette.primary.contrastText,
-    display: 'flex',
-    alignItems: 'center',
+    alignSelf: ({ small }) => small ? 'center' : 'initial',
+    flexGrow: ({ small }) => small ? 1 : 'initial',
   },
-  container: {
-    color: theme.palette.primary.contrastText,
-    display: 'flex',
-    justifyContent: 'space-between',
-    margin: `${theme.spacing(1)}px 0`,
-    padding: theme.spacing(1),
-    width: '100%',
-  }
-})
+}))
 
-@withStyles(styles)
-class Alert extends PureComponent {
-  state = { open: true }
+const Alert = ({ children, message, variant, small, showClose }) => {
+  const classes = useStyles({ small })
+  const [open, setOpen] = useState(true)
+  if (!open) { return null }
+  const Icon = variantIcon[variant]
 
-  onClose = () => { this.setState({ open: false }) }
-  render () {
-    if (!this.state.open) { return null }
-
-    const { classes, children, message, variant } = this.props
-    const Icon = variantIcon[variant]
-
-    return (
-      <div className={clsx(classes.container, classes[variant])}>
-        <span className={classes.message}>
-          <Icon className={clsx(classes.icon, classes.iconVariant)} />
-          {message && <Typography variant="body1" color="inherit">{message}</Typography>}
-          {children}
-        </span>
+  return (
+    <Paper className={classes.root} elevation={0}>
+      <Icon className={clsx(classes.icon, classes.iconVariant, classes[variant])} />
+      {message && <Typography variant="body1" color="inherit" className={classes.message}>{message}</Typography>}
+      {children}
+      {showClose &&
         <IconButton
           key='close'
           aria-label='Close'
           color='inherit'
           className={classes.close}
-          onClick={this.onClose}
+          onClick={() => setOpen(false)}
         >
-          <CloseIcon className={classes.icon} />
+          <CloseIcon />
         </IconButton>
-      </div>
-    )
-  }
+      }
+    </Paper>
+  )
 }
 
 Alert.propTypes = {
@@ -84,6 +94,12 @@ Alert.propTypes = {
   message: PropTypes.node,
 
   variant: PropTypes.oneOf(['success', 'warning', 'error', 'info']).isRequired,
+  small: PropTypes.bool,
+  showClose: PropTypes.bool,
+}
+
+Alert.defaultProps = {
+  showClose: false,
 }
 
 export default Alert

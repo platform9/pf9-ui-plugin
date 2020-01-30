@@ -1,6 +1,7 @@
 import {
   T, cond, equals, always, adjust, update, findIndex, assocPath, curry, pathOr, remove, values,
-  groupBy, filter, either, isNil, isEmpty, path,
+  groupBy, filter, either, isNil, isEmpty, path, sortBy, compose as rCompose, toLower, prop,
+  hasPath, when, pathEq,
 } from 'ramda'
 import moize from 'moize'
 
@@ -16,6 +17,9 @@ export const isTruthy = x => !!x
 export const exists = x => x !== undefined
 export const noop = () => {}
 export const isNilOrEmpty = either(isNil, isEmpty)
+export const arrayIfNil = when(isNil, always(emptyArr))
+export const stringIfNil = when(isNil, always(''))
+export const arrayIfEmpty = when(isEmpty, always(emptyArr))
 
 // Works for arrays and strings.  All other types return false.
 export const notEmpty = arr => !!(arr && arr.length)
@@ -91,7 +95,7 @@ export const setStateLens = (value, paths) => state => {
 }
 
 export const range = (start, end) => {
-  let arr = []
+  const arr = []
   for (let i = start; i <= end; i++) {
     arr.push(i)
   }
@@ -114,9 +118,11 @@ export const keyValueArrToObj = (arr = []) =>
     return accum
   }, {})
 
+export const hasPathStr = curry((str, obj) => hasPath(str.split('.'), obj))
 export const pathStr = curry((str, obj) => path(str.split('.'), obj))
 export const pathStrOr = curry((defaultValue, str, obj) => pathOr(defaultValue, str.split('.'), obj))
 export const pathStrOrNull = curry((str, obj) => pathOr(null, str.split('.'), obj))
+export const pathEqStr = curry((str, val, obj) => pathEq(str.split('.'), val, obj))
 
 // I didn't see anything in Ramda that would allow me to create a "Maybe"
 // composition so creating a simple version here.
@@ -186,7 +192,7 @@ export const updateInArray = curry((predicateFn, updateFn, arr) =>
 // Like `updateInArray` but stops after finding the element to update
 // Also like ramda `adjust` but using a predicateFn
 export const adjustWith = curry((predicateFn, updateFn, arr) =>
-  adjust(findIndex(predicateFn, arr), updateFn, arr),
+  adjust(findIndex(predicateFn, arr), updateFn, arr)
 )
 
 // Like ramda `update` but using a predicateFn
@@ -277,3 +283,8 @@ export const switchCase = (defaultValue, ...cases) => input =>
  */
 export const objSwitchCase = (casesObj, defaultValue) => input =>
   casesObj.hasOwnProperty(input) ? casesObj[input] : defaultValue
+
+export const sortByProperty = (list, attr) => {
+  const sortByPropCaseInsensitive = sortBy(rCompose(toLower, prop(attr)))
+  return sortByPropCaseInsensitive(list)
+}

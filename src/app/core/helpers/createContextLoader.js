@@ -1,10 +1,13 @@
 import {
-  path, pick, isEmpty, identity, assoc, find, whereEq, when, isNil, reject, filter, always, append,
-  of, pipe, over, lensPath, pickAll, view, has, equals, values, either, sortBy, reverse, mergeLeft,
-  map,
+  pick, identity, assoc, find, whereEq, when, isNil, reject, filter, always, append, of, pipe, over,
+  lensPath, pickAll, view, has, equals, values, either, sortBy, reverse, mergeLeft, map, toLower,
+  is, __, propOr, head,
 } from 'ramda'
 import moize from 'moize'
-import { ensureFunction, ensureArray, emptyObj, emptyArr, upsertAllBy } from 'utils/fp'
+import {
+  ensureFunction, ensureArray, emptyObj, emptyArr, upsertAllBy, pathStr, arrayIfEmpty, stringIfNil,
+  arrayIfNil, isNilOrEmpty,
+} from 'utils/fp'
 import { memoizePromise, uncamelizeString } from 'utils/misc'
 import { defaultUniqueIdentifier, allKey } from 'app/constants'
 
@@ -15,15 +18,16 @@ let loaders = {}
 export const getContextLoader = key => {
   return loaders[key]
 }
-const arrayIfNil = when(isNil, always(emptyArr))
-const arrayIfEmpty = when(isEmpty, always(emptyArr))
+export const invalidateLoadersCache = () => {
+  Object.values(loaders).forEach(loader => loader.invalidateCache())
+}
 
 /**
  * Context Loader options
  *
  * @typedef {object} createContextLoader~Options
  *
- * @property {string} [uniqueIdentifier="id"] Unique primary key of the entity
+ * @property {string|array} [uniqueIdentifier="id"] Unique primary key of the entity
  *
  * @property {string} [entityName] Name of the entity, it defaults to the the provided entity "cacheKey"
  * formatted with added spaces and removing the last "s"
@@ -41,6 +45,9 @@ const arrayIfEmpty = when(isEmpty, always(emptyArr))
  *
  * @property {bool} [refetchCascade=false] Indicate wether or not to refetch all the resources
  * loaded using `loadFromContext` in the loader or mapper functions
+ *
+ * @property {string|array} [requiredRoles] Role or roles that the user must have in order for the data to be fetched
+ * If the user doesn't have any of the provided roles then an empty array will be returned
  *
  * @property {string} [defaultOrderBy=uniqueIdentifier] ID of the field that will be used to sort the returned items
  *
@@ -79,17 +86,18 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
     requiredParams = indexBy,
     dataMapper = identity,
     refetchCascade = false,
-    defaultOrderBy = uniqueIdentifier,
+    requiredRoles,
+    defaultOrderBy = head(ensureArray(uniqueIdentifier)),
     defaultOrderDirection = 'asc',
     sortWith = (items, { orderBy = defaultOrderBy, orderDirection = defaultOrderDirection }) =>
       pipe(
-        sortBy(path(orderBy.split('.'))),
+        sortBy(pipe(pathStr(orderBy), stringIfNil, when(is(String), toLower))),
         orderDirection === 'asc' ? identity : reverse,
       )(items),
     fetchSuccessMessage = (params) => `Successfully fetched ${entityName} items`,
-    fetchErrorMessage = (catchedErr, params) => `Error when trying to fetch ${entityName} items`,
+    fetchErrorMessage = (catchedErr, params) => `Unable to fetch ${entityName} items`,
   } = options
-  const uniqueIdentifierPath = uniqueIdentifier.split('.')
+  const uniqueIdentifierStrPaths = uniqueIdentifier ? ensureArray(uniqueIdentifier) : emptyArr
   const dataLens = lensPath([dataCacheKey, cacheKey])
   const paramsLens = lensPath([paramsCacheKey, cacheKey])
   const allIndexKeys = indexBy ? ensureArray(indexBy) : emptyArr
@@ -122,8 +130,7 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
    * @param {object} [args.refetch] Invalidates the cache and calls the dataFetchFn() to fetch the
    * data from server
    *
-   * @param {boolean} [args.rawData] Return raw server data without any additional postprocessing
-   * (via dataMapper) or sorting
+   * @param {boolean} [args.dumpCache] Return all the cached data
    *
    * @param {object} [args.additionalOptions] Additional custom options
    *
@@ -134,7 +141,23 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
    * @returns {Promise<array>} Fetched or cached items
    */
   const contextLoaderFn = memoizePromise(
-    async ({ getContext, setContext, params = emptyObj, refetch = false, rawData = false, additionalOptions = emptyObj }) => {
+    async ({ getContext, setContext, params = emptyObj, refetch = contextLoaderFn._invalidatedCache, dumpCache = false, additionalOptions = emptyObj }) => {
+      // Make sure the user has the required roles
+      const { role } = getContext(propOr(emptyObj, 'userDetails'))
+      if (!isNilOrEmpty(requiredRoles) && !ensureArray(requiredRoles).includes(role)) {
+        return emptyArr
+      }
+
+      const loadFromContext = (key, params = emptyObj, refetchDeep = refetchCascade && refetch) => {
+        const loaderFn = getContextLoader(key)
+        return loaderFn({ getContext, setContext, params, refetch: refetchDeep, additionalOptions })
+      }
+      // Just return all the cached data (don't try to refetch the data)
+      // Used by context updater functions
+      if (dumpCache) {
+        const allCachedData = getContext(view(dataLens)) || emptyArr
+        return memoizedDataMapper(allCachedData, params, loadFromContext)
+      }
       // Get the required values from the provided params
       const providedRequiredParams = pipe(
         pick(allRequiredParams),
@@ -142,6 +165,10 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
       )(params)
       // If not all the required params are provided, skip this request and just return an empty array
       if (requiredParams && values(providedRequiredParams).length < allRequiredParams.length) {
+        // Show up a warning when trying to refetch the data without providing some of the required params
+        if (refetch && !contextLoaderFn._invalidatedCache) {
+          console.warn(`Some of the required params were not provided for ${cacheKey} loader, returning an empty array`)
+        }
         return emptyArr
       }
       const {
@@ -152,10 +179,7 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
         pickAll(allIndexKeys),
         reject(either(isNil, equals(allKey))),
       )(params)
-      const loadFromContext = (key, params = emptyObj, refetchDeep = refetchCascade && refetch) => {
-        const loaderFn = getContextLoader(key)
-        return loaderFn({ getContext, setContext, params, refetch: refetchDeep, additionalOptions })
-      }
+
       try {
         if (!refetch && !contextLoaderFn._invalidatedCache) {
           const allCachedParams = getContext(view(paramsLens)) || emptyArr
@@ -171,9 +195,6 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
               // Return the constant emptyArr to avoid unnecessary re-renderings
               arrayIfEmpty,
             ))
-            if (rawData) {
-              return cachedItems
-            }
             const mappedData = await memoizedDataMapper(cachedItems, params, loadFromContext)
             return sortWith(mappedData, params)
           }
@@ -188,7 +209,8 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
         )
 
         // Insert or update the existing items (using `uniqueIdentifier` to prevent duplicates)
-        const upsertNewItems = pipe(arrayIfNil, upsertAllBy(path(uniqueIdentifierPath), itemsWithParams))
+        const matchUniqueIdentifiers = item => map(pathStr(__, item), uniqueIdentifierStrPaths)
+        const upsertNewItems = pipe(arrayIfNil, upsertAllBy(matchUniqueIdentifiers, itemsWithParams))
 
         // If cache has been invalidated or we are refetching, empty the cached data array
         const cleanPrevItems = contextLoaderFn._invalidatedCache || refetch
@@ -210,9 +232,6 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
         if (onSuccess) {
           const parsedSuccessMesssage = ensureFunction(fetchSuccessMessage)(params)
           await onSuccess(parsedSuccessMesssage, params)
-        }
-        if (rawData) {
-          return itemsWithParams
         }
         const mappedData = await memoizedDataMapper(itemsWithParams, params, loadFromContext)
         return sortWith(mappedData, params)

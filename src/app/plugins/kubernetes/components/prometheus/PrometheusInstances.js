@@ -9,7 +9,7 @@ const renderKeyValues = obj => Object.entries(obj)
 
 // Disabling for now until the backend has the links for this working
 /*
-const renderDashboardLink = (field, row, context) => {
+const renderDashboardLink = (field, row) => {
   const link = ApiCLient.getInstance().qbert.getPrometheusDashboardLink(row)
   return <ExternalLink url={link}>dashboard</ExternalLink>
 }
@@ -20,20 +20,20 @@ export const columns = [
   { id: 'clusterName', label: 'Cluster' },
   { id: 'namespace', label: 'Namespace' },
   // { id: 'dashboard', label: 'Dashboard', render: renderDashboardLink },
-  { id: 'serviceMonitorSelector', label: 'Service Monitor', render: renderKeyValues },
+  { id: 'serviceMonitorSelector', label: 'Service Monitor Selectors', render: renderKeyValues },
   { id: 'alertManagersSelector', label: 'Alert Managers' },
   { id: 'cpu', label: 'CPU' },
   { id: 'storage', label: 'Storage', display: false },
   { id: 'memory', label: 'Memory' },
   { id: 'retention', label: 'Retention' },
-  { id: 'version', label: 'Version' },
   { id: 'replicas', label: 'Replicas' },
 ]
 
 export const options = {
   cacheKey: prometheusInstancesCacheKey,
   addUrl: '/ui/kubernetes/prometheus/instances/add',
-  addText: 'New Instance',
+  addText: 'New Monitoring Stack',
+  emptyText: 'Please enable monitoring on at least one cluster',
   columns,
   editUrl: '/ui/kubernetes/prometheus/instances/edit',
   name: 'PrometheusInstances',

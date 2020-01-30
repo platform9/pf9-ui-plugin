@@ -38,6 +38,7 @@ class ResMgrHost extends ActiveModel {
   static getHostRole = (id, role) => {
     return ResMgrRoles.getHostRole(id, role)
   }
+
   static updateHostRole = (id, role, input) => {
     const resMgrHost = this.findById(id)
     if (!resMgrHost) {

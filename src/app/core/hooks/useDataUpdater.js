@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo, useContext, useEffect, useRef } from 'react'
-import { ToastContext } from 'core/providers/ToastProvider'
-import { AppContext } from 'core/AppProvider'
+import { useToast } from 'core/providers/ToastProvider'
+import { AppContext } from 'core/providers/AppProvider'
 import { emptyObj } from 'utils/fp'
 import { isEmpty } from 'ramda'
 
@@ -19,8 +19,8 @@ const useDataUpdater = (updaterFn, onComplete) => {
   // are performed with different params, and the previous one didn't have time to finish
   const updaterPromisesBuffer = useRef([])
   const [loading, setLoading] = useState(false)
-  const { getContext, setContext } = useContext(AppContext)
-  const showToast = useContext(ToastContext)
+  const { getContext, setContext, registerNotification } = useContext(AppContext)
+  const showToast = useToast()
   const additionalOptions = useMemo(() => ({
     onSuccess: (successMessage, params) => {
       const key = updaterFn.getKey()
@@ -29,10 +29,11 @@ const useDataUpdater = (updaterFn, onComplete) => {
     },
     onError: (errorMessage, catchedErr, params) => {
       const key = updaterFn.getKey()
-      console.error(`Error when updating entity "${key}"`, catchedErr)
-      showToast(errorMessage, 'error')
+      console.error(`Error when updating items for entity "${key}"`, catchedErr)
+      showToast(errorMessage + `\n${catchedErr.message || catchedErr}`, 'error')
+      registerNotification(errorMessage, catchedErr.message || catchedErr, 'error')
     },
-  }), [showToast])
+  }), [])
 
   // The following function will handle the calls to the data updating and
   // set the loading state variable to true in the meantime, while also taking care
@@ -51,17 +52,17 @@ const useDataUpdater = (updaterFn, onComplete) => {
       return result
     })()
     updaterPromisesBuffer.current.push(currentPromise)
-    const successful = await currentPromise
+    const [successful, output] = await currentPromise
 
     // With this condition, we ensure that all promises except the last one will be ignored
     if (isEmpty(updaterPromisesBuffer.current) &&
       !unmounted.current) {
       setLoading(false)
       if (onComplete) {
-        await onComplete(successful)
+        await onComplete(successful, output)
       }
     }
-  }, [updaterFn, getContext, setContext])
+  }, [updaterFn, onComplete, getContext, setContext])
 
   useEffect(() => {
     return () => {

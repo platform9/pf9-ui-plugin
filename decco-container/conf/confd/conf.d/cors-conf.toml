@@ -1,0 +1,8 @@
+[template]
+src = 'cors.conf'
+dest = '/etc/nginx/conf.d/pf9/cors.conf'
+owner = 'root'
+mode = '0644'
+keys = [
+    '/fqdn'
+]

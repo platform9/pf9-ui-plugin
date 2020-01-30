@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import PropTypes from 'prop-types'
 import AddIcon from '@material-ui/icons/Add'
 import ListTableColumnButton from 'core/components/listTable/ListTableColumnSelector'
-import ListTableBatchActions from './ListTableBatchActions'
+import ListTableBatchActions, { listTableActionPropType } from './ListTableBatchActions'
 import PerPageControl from './PerPageControl'
 import SearchBar from 'core/components/SearchBar'
 import clsx from 'clsx'
@@ -10,9 +10,13 @@ import { Button, Toolbar, Tooltip } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import Picklist from 'core/components/Picklist'
+import { emptyArr } from 'utils/fp'
+import { both, T } from 'ramda'
 
 const useStyles = makeStyles(theme => ({
   root: {
+    display: 'flex',
+    flexFlow: 'row nowrap',
     paddingRight: theme.spacing(1),
     color: theme.palette.grey[600],
     '& .MuiOutlinedInput-root': {
@@ -21,11 +25,9 @@ const useStyles = makeStyles(theme => ({
     },
   },
   highlight: {},
-  spacer: {
-    flex: '0 0 auto',
-  },
   actions: {
-    flex: '1 1 100%',
+    flexGrow: 1,
+    justifySelf: 'flex-end',
   },
   button: {
     cursor: 'pointer',
@@ -38,23 +40,10 @@ const useStyles = makeStyles(theme => ({
   },
   search: {
     margin: theme.spacing(1, 2, 0, 2),
+    maxWidth: 240,
   },
   rowActions: {
     color: 'inherit',
-  },
-  action: {
-    marginTop: theme.spacing(2),
-    marginLeft: theme.spacing(1),
-    marginRight: theme.spacing(1),
-    cursor: 'pointer',
-    display: 'flex',
-    flexFlow: 'column nowrap',
-    alignItems: 'center',
-    lineHeight: 2,
-    fontSize: theme.typography.fontSize * 0.8,
-  },
-  actionIcon: {
-    fontSize: '1.7em',
   },
 }))
 
@@ -83,25 +72,43 @@ const FilterDropdown = ({
 }
 
 const ListTableToolbar = ({
-  columns, filterValues, filters,
+  columns, filterValues, filters, extraToolbarContent,
   onAdd, onColumnToggle, onDelete, onEdit, onFilterUpdate,
-  onFiltersReset, onSearchChange, onRefresh,
-  batchActions, searchTerm, selected, visibleColumns,
+  onFiltersReset, onSearchChange, onReload, onRefresh,
+  batchActions = emptyArr, searchTerm, selected, visibleColumns,
   rowsPerPage, onChangeRowsPerPage, rowsPerPageOptions,
+  editCond, editDisabledInfo, deleteCond, deleteDisabledInfo,
 }) => {
   const classes = useStyles()
   const numSelected = (selected || []).length
-  const refreshButton = useMemo(() =>
-    onRefresh && <Tooltip title="Refresh list">
+  const reloadButton = useMemo(() =>
+    onReload && <Tooltip title="Refresh list">
       <FontAwesomeIcon
         className={classes.button}
         solid
         size="lg"
         aria-label="Refresh list"
-        onClick={onRefresh}>
+        onClick={onReload}>
         sync
       </FontAwesomeIcon>
-    </Tooltip>, [onRefresh])
+    </Tooltip>, [onReload])
+
+  const allActions = useMemo(() => [...batchActions,
+    ...(onEdit ? [{
+      label: 'Edit',
+      action: onEdit,
+      icon: 'edit',
+      cond: both(() => numSelected === 1, editCond || T),
+      disabledInfo: editDisabledInfo,
+    }] : emptyArr),
+    ...(onDelete ? [{
+      label: 'Delete',
+      action: onDelete,
+      icon: 'trash-alt',
+      cond: deleteCond,
+      disabledInfo: deleteDisabledInfo,
+    }] : emptyArr),
+  ], [numSelected, batchActions, onEdit, onDelete])
 
   return (
     <Toolbar
@@ -109,24 +116,7 @@ const ListTableToolbar = ({
         [classes.highlight]: numSelected > 0,
       })}
     >
-      <ListTableBatchActions actionClassName={classes.action} actionIconClassName={classes.actionIcon} batchActions={batchActions} selected={selected} />
-      {numSelected === 1 && onEdit && (
-        <Tooltip title="Edit">
-          <div className={classes.action} onClick={onEdit}>
-            <FontAwesomeIcon className={classes.actionIcon}>edit</FontAwesomeIcon>
-            Edit
-          </div>
-        </Tooltip>
-      )}
-      {numSelected > 0 && onDelete && (
-        <Tooltip title="Delete">
-          <div className={classes.action} onClick={onDelete}>
-            <FontAwesomeIcon className={classes.actionIcon}>trash-alt</FontAwesomeIcon>
-            Delete
-          </div>
-        </Tooltip>
-      )}
-      <div className={classes.spacer} />
+      <ListTableBatchActions batchActions={allActions} selected={selected} onRefresh={onRefresh} />
       <div className={classes.actions}>
         <Toolbar className={classes.toolbar}>
           {Array.isArray(filters)
@@ -141,7 +131,7 @@ const ListTableToolbar = ({
               />
             ))
             : filters}
-
+          {extraToolbarContent}
           {onSearchChange && (
             <SearchBar className={classes.search} onSearchChange={onSearchChange} searchTerm={searchTerm} />
           )}
@@ -159,7 +149,7 @@ const ListTableToolbar = ({
               </Button>
             </Tooltip>
           )}
-          {refreshButton}
+          {reloadButton}
           <PerPageControl
             value={rowsPerPage}
             onChangeRowsPerPage={onChangeRowsPerPage}
@@ -193,18 +183,16 @@ ListTableToolbar.propTypes = {
   filterValues: PropTypes.object,
   onAdd: PropTypes.func,
   onDelete: PropTypes.func,
+  deleteCond: PropTypes.func,
+  deleteDisabledInfo: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+  editCond: PropTypes.func,
+  editDisabledInfo: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
   onEdit: PropTypes.func,
   onFilterUpdate: PropTypes.func,
   onFiltersReset: PropTypes.func,
   onRefresh: PropTypes.func,
-  batchActions: PropTypes.arrayOf(
-    PropTypes.shape({
-      label: PropTypes.string.isRequired,
-      action: PropTypes.func,
-      icon: PropTypes.node,
-      cond: PropTypes.func,
-    })
-  ),
+  onReload: PropTypes.func,
+  batchActions: PropTypes.arrayOf(listTableActionPropType),
   selected: PropTypes.array,
   visibleColumns: PropTypes.array,
   onColumnToggle: PropTypes.func,

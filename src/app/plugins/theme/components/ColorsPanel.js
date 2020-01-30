@@ -1,46 +1,49 @@
 import React from 'react'
 import ColorPicker from './ColorPicker'
 import Panel from './Panel'
+import { useTheme } from '@material-ui/core/styles'
+import { Typography } from '@material-ui/core'
 
-const ColorsPanel = () => (
-  <Panel title="Palette" defaultExpanded>
-    <ColorPicker path="palette.common.white" />
-    <ColorPicker path="palette.common.black" />
-    <br />
+const ColorGroup = ({ title, colors, parent = 'palette' }) => {
+  return (
+    <>
+      <Typography variant="h6">{`${parent}.${title}`}</Typography>
+      {Object.entries(colors).map(([name, color]) => (
+        <ColorPicker path={`${parent}.${title}.${name}`} title={name} />
+      ))}
+      <br />
+    </>
+  )
+}
 
-    <ColorPicker path="palette.background.paper" />
-    <ColorPicker path="palette.background.default" />
-    <br />
+const ColorsPanel = () => {
+  const theme = useTheme()
+  const paletteKeys = Object.keys(theme.palette).filter(
+    (key) => typeof theme.palette[key] === 'object',
+  )
+  const typographyKeys = Object.keys(theme.typography).filter(
+    (key) => typeof theme.typography[key] === 'object',
+  )
 
-    <ColorPicker path="palette.primary.light" />
-    <ColorPicker path="palette.primary.main" />
-    <ColorPicker path="palette.primary.dark" />
-    <ColorPicker path="palette.primary.contrastText" />
-    <br />
-
-    <ColorPicker path="palette.secondary.light" />
-    <ColorPicker path="palette.secondary.main" />
-    <ColorPicker path="palette.secondary.dark" />
-    <ColorPicker path="palette.secondary.contrastText" />
-    <br />
-
-    <ColorPicker path="palette.sidebar.background" />
-    <ColorPicker path="palette.sidebar.text" />
-    <br />
-
-    <ColorPicker path="palette.error.light" />
-    <ColorPicker path="palette.error.main" />
-    <ColorPicker path="palette.error.dark" />
-    <ColorPicker path="palette.error.contrastText" />
-    <br />
-
-    <ColorPicker path="palette.text.primary" />
-    <ColorPicker path="palette.text.secondary" />
-    <ColorPicker path="palette.text.disabled" />
-    <ColorPicker path="palette.text.hint" />
-
-    <br />
-  </Panel>
-)
+  return (
+    <>
+      <Panel title="Palette" defaultExpanded>
+        {paletteKeys.map((name) => (
+          <ColorGroup title={name} colors={theme.palette[name]} />
+        ))}
+      </Panel>
+      <Panel title="Typography" defaultExpanded>
+        {typographyKeys.map((name) => {
+          return (
+            <>
+              <ColorPicker path={`typography.${name}.color`} title={name} />
+              <br />
+            </>
+          )
+        })}
+      </Panel>
+    </>
+  )
+}
 
 export default ColorsPanel

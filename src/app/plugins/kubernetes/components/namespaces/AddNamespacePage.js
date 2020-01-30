@@ -7,15 +7,17 @@ import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
 import TextField from 'core/components/validatedForm/TextField'
 import { namespacesCacheKey } from './actions'
 import useParams from 'core/hooks/useParams'
+import { namespaceValidator } from 'core/utils/fieldValidators'
 
 const defaultParams = {
   masterNodeClusters: true,
+  clusterId: null,
 }
 export const AddNamespaceForm = ({ onComplete }) => {
   const { params, getParamsUpdater } = useParams(defaultParams)
   return (
     <ValidatedForm onSubmit={onComplete}>
-      <TextField id="name" label="Name" required />
+      <TextField id="name" label="Name" required validations={[namespaceValidator]} />
       <PicklistField
         DropdownComponent={ClusterPicklist}
         id="clusterId"

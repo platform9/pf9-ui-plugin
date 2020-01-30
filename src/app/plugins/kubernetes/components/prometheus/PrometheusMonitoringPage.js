@@ -7,25 +7,17 @@ import PrometheusInstances from './PrometheusInstances'
 import PrometheusRules from './PrometheusRules'
 import PrometheusServiceMonitors from './PrometheusServiceMonitors'
 import PrometheusAlertManagers from './PrometheusAlertManagers'
+import PageContainer from 'core/components/pageContainer/PageContainer'
 
-import { compose } from 'ramda'
-import { withAppContext } from 'core/AppProvider'
+const PrometheusMonitoringPage = () => (
+  <PageContainer>
+    <Tabs>
+      <Tab value="instances" label="Instances"><PrometheusInstances /></Tab>
+      <Tab value="rules" label="Rules"><PrometheusRules /></Tab>
+      <Tab value="serviceMonitors" label="Service Monitors"><PrometheusServiceMonitors /></Tab>
+      <Tab value="alerts" label="Alert Managers"><PrometheusAlertManagers /></Tab>
+    </Tabs>
+  </PageContainer>
+)
 
-class PrometheusMonitoringPage extends React.PureComponent {
-  render () {
-    return (
-      <div>
-        <Tabs>
-          <Tab value="instances" label="Instances"><PrometheusInstances /></Tab>
-          <Tab value="rules" label="Rules"><PrometheusRules /></Tab>
-          <Tab value="serviceMonitors" label="Service Monitors"><PrometheusServiceMonitors /></Tab>
-          <Tab value="alerts" label="Alert Managers"><PrometheusAlertManagers /></Tab>
-        </Tabs>
-      </div>
-    )
-  }
-}
-
-export default compose(
-  withAppContext,
-)(PrometheusMonitoringPage)
+export default PrometheusMonitoringPage

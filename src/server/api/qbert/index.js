@@ -10,7 +10,9 @@ import { getCpDetails, getCpRegionDetails } from './cloudProviders/getCpDetails'
 // Nodes
 import getNodes from './nodes/getNodes'
 // Clusters
-import { getClusters, postCluster, putCluster, deleteCluster } from './clusters/clusterActions'
+import {
+  getClusters, postCluster, putCluster, deleteCluster, upgradeCluster,
+} from './clusters/clusterActions'
 import getClusterVersion from './clusters/getClusterVersion'
 import { attachNodes, detachNodes } from './clusters/attachOperations'
 import getKubeConfig from './kubeConfig/getKubeConfig'
@@ -23,6 +25,17 @@ import { getServices, postService, deleteService } from './services/serviceActio
 import {
   getStorageClasses, postStorageClass, deleteStorageClass,
 } from './storageClasses/storageClassActions'
+// RBAC
+import { getRoles, postRole, deleteRole } from './roles/roleActions'
+import {
+  getRoleBindings, postRoleBinding, deleteRoleBinding
+} from './roleBindings/roleBindingActions'
+import {
+  getClusterRoles, postClusterRole, deleteClusterRole
+} from './clusterRoles/clusterRoleActions'
+import {
+  getClusterRoleBindings, postClusterRoleBinding, deleteClusterRoleBinding
+} from './clusterRoleBindings/clusterRoleBindingActions'
 
 import { getCharts, getChart, getChartVersions, getChartVersion } from './charts'
 import { getReleases, getRelease, deleteRelease } from './releases'
@@ -34,6 +47,9 @@ import {
 
 import { getLoggings, postLogging, putLogging, deleteLogging } from './logging/loggingActions'
 
+import {
+  getApiGroupList, getExtensionsApiResources, getAppsApiResources, getCoreApiResources,
+} from './apiResources/apiResourceActions'
 // TODO
 // import { deployApplication } from './applications'
 import { getRepositoriesForCluster } from './repositories/actions'
@@ -57,6 +73,7 @@ router.get(`/${version}/:tenantId/clusters`, tokenValidator, getClusters)
 router.post(`/${version}/:tenantId/clusters`, tokenValidator, postCluster)
 router.put(`/${version}/:tenantId/clusters/:clusterId`, tokenValidator, putCluster)
 router.delete(`/${version}/:tenantId/clusters/:clusterId`, tokenValidator, deleteCluster)
+router.post(`/${version}/:tenantId/clusters/:clusterId/upgrade`, tokenValidator, upgradeCluster)
 router.get(`/${version}/:tenantId/clusters/:clusterId/k8sapi/version`, tokenValidator, getClusterVersion)
 
 router.post(`/${version}/:tenantId/clusters/:clusterId/attach`, tokenValidator, attachNodes)
@@ -90,6 +107,34 @@ router.get(`${storageClassApi}`, tokenValidator, getStorageClasses)
 router.post(`${storageClassApi}`, tokenValidator, postStorageClass)
 router.delete(`${storageClassApi}/:storageClassName`, tokenValidator, deleteStorageClass)
 
+// RBAC
+const rbacClusterBase = `${clusterK8sApiBase}/apis/rbac.authorization.k8s.io`
+const rbacClusterBaseV1 = `${rbacClusterBase}/v1`
+
+router.get(`${rbacClusterBaseV1}/roles`, tokenValidator, getRoles)
+router.get(`${rbacClusterBaseV1}/namespaces/:namespace/roles`, tokenValidator, getRoles)
+router.post(`${rbacClusterBaseV1}/namespaces/:namespace/roles`, tokenValidator, postRole)
+// router.put(`${rbacClusterBaseV1}/namespaces/:namespace/roles/:name`, tokenValidator, putRole)
+router.delete(`${rbacClusterBaseV1}/namespaces/:namespace/roles/:roleName`, tokenValidator, deleteRole)
+
+router.get(`${rbacClusterBaseV1}/rolebindings`, tokenValidator, getRoleBindings)
+router.get(`${rbacClusterBaseV1}/namespaces/:namespace/rolebindings`, tokenValidator, getRoleBindings)
+router.post(`${rbacClusterBaseV1}/namespaces/:namespace/rolebindings`, tokenValidator, postRoleBinding)
+// router.put(`${rbacClusterBaseV1}/namespaces/:namespace/rolebindings/:name`, tokenValidator, putRoleBinding)
+router.delete(`${rbacClusterBaseV1}/namespaces/:namespace/rolebindings/:roleBindingName`, tokenValidator, deleteRoleBinding)
+
+router.get(`${rbacClusterBaseV1}/clusterroles`, tokenValidator, getClusterRoles)
+router.get(`${rbacClusterBaseV1}/clusterroles`, tokenValidator, getClusterRoles)
+router.post(`${rbacClusterBaseV1}/clusterroles`, tokenValidator, postClusterRole)
+// router.put(`${rbacClusterBaseV1}/clusterroles/:name`, tokenValidator, putClusterRole)
+router.delete(`${rbacClusterBaseV1}/clusterroles/:clusterRoleName`, tokenValidator, deleteClusterRole)
+
+router.get(`${rbacClusterBaseV1}/clusterrolebindings`, tokenValidator, getClusterRoleBindings)
+router.get(`${rbacClusterBaseV1}/clusterrolebindings`, tokenValidator, getClusterRoleBindings)
+router.post(`${rbacClusterBaseV1}/clusterrolebindings`, tokenValidator, postClusterRoleBinding)
+// router.post(`${rbacClusterBaseV1}/clusterrolebindings/:name`, tokenValidator, putClusterRoleBinding)
+router.delete(`${rbacClusterBaseV1}/clusterrolebindings/:clusterRoleBindingName`, tokenValidator, deleteClusterRoleBinding)
+
 // Monocular
 const monocularClusterBase = `${k8sapi}/namespaces/kube-system/services/monocular-api-svc::80/proxy`
 const monocularClusterBaseV1 = `${monocularClusterBase}/v1`
@@ -121,10 +166,16 @@ router.patch(`${monitoringBase}/namespaces/:namespace/prometheuses/:name`, token
 router.delete(`${monitoringBase}/namespaces/:namespace/prometheuses/:name`, tokenValidator, deletePrometheusInstance)
 
 // TODO: check Logging urls
-const loggingBase = `/${version}/:tenantId/apis/logging.pf9.io/v1alpha1`
-router.get(`${loggingBase}/loggings`, tokenValidator, getLoggings)
-router.post(`${loggingBase}/loggings`, tokenValidator, postLogging)
-router.put(`${loggingBase}/loggings/:clusterId`, tokenValidator, putLogging)
-router.delete(`${loggingBase}/loggings/:clusterId`, tokenValidator, deleteLogging)
+const loggingBase = `${clusterK8sApiBase}/apis/logging.pf9.io/v1alpha1/outputs`
+router.get(loggingBase, tokenValidator, getLoggings)
+router.post(loggingBase, tokenValidator, postLogging)
+router.put(`${loggingBase}/:loggingId`, tokenValidator, putLogging)
+router.delete(`${loggingBase}/:loggingId`, tokenValidator, deleteLogging)
+
+// API Resources
+router.get(`${clusterK8sApiBase}/apis`, tokenValidator, getApiGroupList)
+router.get(`${clusterK8sApiBase}/apis/extensions/v1beta1`, tokenValidator, getExtensionsApiResources)
+router.get(`${clusterK8sApiBase}/apis/apps/v1`, tokenValidator, getAppsApiResources)
+router.get(`${clusterK8sApiBase}/api/v1`, tokenValidator, getCoreApiResources)
 
 export default router

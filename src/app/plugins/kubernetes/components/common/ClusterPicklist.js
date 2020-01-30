@@ -4,19 +4,20 @@ import { isEmpty, propOr, head } from 'ramda'
 import Picklist from 'core/components/Picklist'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { projectAs } from 'utils/fp'
-import { clusterActions } from '../infrastructure/actions'
 import { allKey } from 'app/constants'
+import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 
 // We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
 const ClusterPicklist = forwardRef(({
-  loading, onChange,
-  onlyPrometheusEnabled, onlyMasterNodeClusters, onlyAppCatalogEnabled,
-  ...rest,
+  loading, onChange, selectFirst,
+  onlyPrometheusEnabled, onlyMasterNodeClusters, onlyAppCatalogEnabled, onlyHealthyClusters,
+  ...rest
 }, ref) => {
   const defaultParams = {
     masterNodeClusters: onlyMasterNodeClusters,
     appCatalogClusters: onlyAppCatalogEnabled,
     prometheusClusters: onlyPrometheusEnabled,
+    healthyClusters: onlyHealthyClusters,
   }
   const [clusters, clustersLoading] = useDataLoader(clusterActions.list, defaultParams)
   const options = useMemo(() => projectAs(
@@ -25,7 +26,7 @@ const ClusterPicklist = forwardRef(({
 
   // Select the first cluster as soon as clusters are loaded
   useEffect(() => {
-    if (!isEmpty(options)) {
+    if (!isEmpty(options) && selectFirst) {
       onChange(propOr(allKey, 'value', head(options)))
     }
   }, [options])
@@ -47,6 +48,8 @@ ClusterPicklist.propTypes = {
   onlyMasterNodeClusters: PropTypes.bool,
   onlyAppCatalogEnabled: PropTypes.bool,
   onlyPrometheusEnabled: PropTypes.bool,
+  onlyHealthyClusters: PropTypes.bool,
+  selectFirst: PropTypes.bool,
 }
 
 ClusterPicklist.defaultProps = {
@@ -57,6 +60,8 @@ ClusterPicklist.defaultProps = {
   onlyMasterNodeClusters: false,
   onlyAppCatalogEnabled: false,
   onlyPrometheusEnabled: false,
+  onlyHealthyClusters: false,
+  selectFirst: true,
 }
 
 export default ClusterPicklist

@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import WizardButtons from 'core/components/wizard/WizardButtons'
 import NextButton from 'core/components/buttons/NextButton'
@@ -13,8 +14,13 @@ class Wizard extends PureComponent {
   isLastStep = () => this.state.activeStep === this.state.steps.length - 1
   isComplete = () => this.state.activeStep > this.state.steps.length - 1
   lastStep = () => this.state.steps.length - 1
-  hasNext = () => this.state.activeStep < this.lastStep()
+  hasNext = () => this.state.activeStep < this.lastStep() && !this.props.disableNext
   hasBack = () => this.state.activeStep > 0
+  isFinishAndReviewVisible = () => this.state.activeStep < this.state.steps.length - 2 && !this.props.disableNext
+  canBackAtFirstStep = () => this.state.activeStep === 0 && !!this.props.originPath
+
+  // Callbacks indexed by step ID to be called before navigating to the next step
+  nextCb = {}
 
   activateStep = () => {
     // Activate the step if we don't have one already
@@ -24,35 +30,58 @@ class Wizard extends PureComponent {
     }
   }
 
+  getActiveStepId = ({ steps }, activeStep) => steps[activeStep] ? ({ activeStepId: steps[activeStep].stepId }) : {}
+
   addStep = newStep => {
     this.setState(
-      state => ({ steps: [...state.steps, newStep] }),
-      this.activateStep,
+      state => ({ steps: [...state.steps, newStep], ...this.getActiveStepId({ steps: [...state.steps, newStep] }, state.activeStep) })
     )
+  }
+
+  handleOriginBack = () => {
+    const { history, originPath } = this.props
+    history.push(originPath)
   }
 
   handleBack = () => {
     this.setState(
-      state => ({ activeStep: state.activeStep - 1 }),
-      this.activateStep,
+      state => ({ activeStep: state.activeStep - 1, ...this.getActiveStepId(state, state.activeStep - 1) })
     )
   }
 
   onNext = (cb) => {
-    this.nextCb = cb
+    this.nextCb[this.state.activeStep] = cb
   }
 
   handleNext = () => {
     const { onComplete } = this.props
+    const { activeStep } = this.state
 
-    if (this.nextCb && this.nextCb() === false) {
+    if (this.nextCb[activeStep] && this.nextCb[activeStep]() === false) {
       return
     }
 
     this.setState(
-      state => ({ activeStep: state.activeStep + 1 }),
+      state => ({ activeStep: state.activeStep + 1, ...this.getActiveStepId(state, state.activeStep + 1) }),
       () => {
-        this.activateStep()
+        if (this.isComplete()) {
+          onComplete(this.state.wizardContext)
+        }
+      },
+    )
+  }
+
+  onFinishAndReview = () => {
+    const { onComplete } = this.props
+    const { activeStep } = this.state
+
+    if (this.nextCb[activeStep] && this.nextCb[activeStep]() === false) {
+      return
+    }
+
+    this.setState(
+      state => ({ activeStep: state.steps.length - 1, ...this.getActiveStepId(state, state.steps.length - 1) }),
+      () => {
         if (this.isComplete()) {
           onComplete(this.state.wizardContext)
         }
@@ -79,7 +108,8 @@ class Wizard extends PureComponent {
 
   render () {
     const { wizardContext, setWizardContext, steps, activeStep } = this.state
-    const { showSteps, children, submitLabel, onCancel } = this.props
+    const { showSteps, children, submitLabel, finishAndReviewLabel, onCancel, showFinishAndReviewButton } = this.props
+    const shouldShowFinishAndReview = typeof showFinishAndReviewButton === 'function' ? showFinishAndReviewButton(wizardContext) : showFinishAndReviewButton
     const renderStepsContent = ensureFunction(children)
 
     return (
@@ -88,12 +118,11 @@ class Wizard extends PureComponent {
         {renderStepsContent({ wizardContext, setWizardContext, onNext: this.onNext })}
         <WizardButtons>
           {onCancel && <CancelButton onClick={onCancel} />}
-          {this.hasBack() &&
-          <PrevButton onClick={this.handleBack} />}
-          {this.hasNext() &&
-          <NextButton onClick={this.handleNext}>Next</NextButton>}
-          {this.isLastStep() &&
-          <NextButton onClick={this.handleNext}>{submitLabel}</NextButton>}
+          {this.hasBack() && <PrevButton onClick={this.handleBack} />}
+          {this.canBackAtFirstStep() && <PrevButton onClick={this.handleOriginBack} />}
+          {this.hasNext() && <NextButton onClick={this.handleNext}>Next</NextButton>}
+          {this.isLastStep() && <NextButton onClick={this.handleNext}>{submitLabel}</NextButton>}
+          {shouldShowFinishAndReview && this.isFinishAndReviewVisible() && <NextButton onClick={this.onFinishAndReview} showForward={false}>{finishAndReviewLabel}</NextButton>}
         </WizardButtons>
       </WizardContext.Provider>
     )
@@ -101,21 +130,26 @@ class Wizard extends PureComponent {
 }
 
 Wizard.propTypes = {
+  originPath: PropTypes.string,
   showSteps: PropTypes.bool,
   onComplete: PropTypes.func,
   onCancel: PropTypes.func,
   context: PropTypes.object,
   submitLabel: PropTypes.string,
+  showFinishAndReviewButton: PropTypes.oneOfType([PropTypes.bool, PropTypes.func]),
+  finishAndReviewLabel: PropTypes.string,
+  disableNext: PropTypes.bool,
   children: PropTypes.oneOfType([PropTypes.array, PropTypes.func]).isRequired,
 }
 
 Wizard.defaultProps = {
   showSteps: true,
   submitLabel: 'Complete',
+  finishAndReviewLabel: 'Finish and Review',
   onComplete: value => {
     console.info('Wizard#onComplete handler not implemented.  Falling back to console.log')
     console.log(value)
   },
 }
 
-export default Wizard
+export default withRouter(Wizard)

@@ -1,20 +1,25 @@
 import React from 'react'
-
-import AddCloudProviderPage from './components/infrastructure/AddCloudProviderPage'
-import AddAwsClusterPage from './components/infrastructure/AddAwsClusterPage'
-import AddClusterPage from './components/infrastructure/AddClusterPage'
-import AddDeploymentPage from './components/pods/AddDeploymentPage'
+import AddCloudProviderPage from './components/infrastructure/cloudProviders/AddCloudProviderPage'
+import AddAwsClusterPage from './components/infrastructure/clusters/AddAwsClusterPage'
+import AddAzureClusterPage from './components/infrastructure/clusters/AddAzureClusterPage'
+import AddClusterPage from './components/infrastructure/clusters/AddClusterPage'
+import AddBareOsClusterPage from './components/infrastructure/clusters/bareos/AddBareOsClusterPage'
+import ScaleMastersPage from './components/infrastructure/clusters/ScaleMastersPage'
+import ScaleWorkersPage from './components/infrastructure/clusters/ScaleWorkersPage'
 import AddNamespacePage from './components/namespaces/AddNamespacePage'
-import AddPodPage from './components/pods/AddPodPage'
-import AddServicePage from './components/pods/AddServicePage'
 import ApiAccessPage from './components/apiAccess/ApiAccessPage'
 import AppsIndexPage from './components/apps/AppsIndexPage'
-import ClusterDetailsPage from './components/infrastructure/ClusterDetailsPage'
+import ClusterDetailsPage from './components/infrastructure/clusters/ClusterDetailsPage'
+import DownloadCliPage from './components/infrastructure/nodes/DownloadCliPage'
+import NodeDetailsPage from './components/infrastructure/nodes/NodeDetailsPage'
 import InfrastructurePage from './components/infrastructure/InfrastructurePage'
 import NamespacesListPage from './components/namespaces/NamespacesListPage'
+import OnboardingPage from './components/onboarding/OnboardingPage'
 import PodsIndexPage from './components/pods/PodsIndexPage'
 import StorageClassesPage from './components/storage/StorageClassesPage'
-import UpdateCloudProviderPage from './components/infrastructure/UpdateCloudProviderPage'
+import UpdateCloudProviderPage
+  from './components/infrastructure/cloudProviders/UpdateCloudProviderPage'
+import StorageClassesAddPage from './components/storage/AddStorageClassPage'
 import UserManagementIndexPage from './components/userManagement/UserManagementIndexPage'
 import AppDetailsPage from 'k8s/components/apps/AppDetailsPage'
 import AddPrometheusInstancePage from './components/prometheus/AddPrometheusInstancePage'
@@ -27,8 +32,24 @@ import UpdatePrometheusAlertManagerPage
 import LoggingIndexPage from './components/logging/LoggingIndexPage'
 import LoggingAddPage from './components/logging/LoggingAddPage'
 import LoggingEditPage from './components/logging/LoggingEditPage'
-import config from '../../../../config'
+// import config from '../../../../config'
 import DashboardPage from './components/dashboard/DashboardPage'
+import AddResourcePage from 'k8s/components/pods/AddResourcePage'
+import DeployedAppDetailsPage from 'k8s/components/apps/DeployedAppDetailsPage'
+import AddTenantPage from 'k8s/components/userManagement/tenants/AddTenantPage'
+import EditTenantPage from 'k8s/components/userManagement/tenants/EditTenantPage'
+import AddUserPage from 'k8s/components/userManagement/users/AddUserPage'
+import EditUserPage from 'k8s/components/userManagement/users/EditUserPage'
+import RbacIndexPage from './components/rbac/RbacIndexPage'
+import AddRolePage from './components/rbac/AddRolePage'
+import AddClusterRolePage from './components/rbac/AddClusterRolePage'
+import AddRoleBindingPage from './components/rbac/AddRoleBindingPage'
+import AddClusterRoleBindingPage from './components/rbac/AddClusterRoleBindingPage'
+import EditClusterPage from 'k8s/components/infrastructure/clusters/EditClusterPage'
+import UpdateRolePage from './components/rbac/UpdateRolePage'
+import UpdateClusterRolePage from './components/rbac/UpdateClusterRolePage'
+import UpdateRoleBindingPage from './components/rbac/UpdateRoleBindingPage'
+import UpdateClusterRoleBindingPage from './components/rbac/UpdateClusterRoleBindingPage'
 
 class Kubernetes extends React.PureComponent {
   render () {
@@ -60,12 +81,43 @@ Kubernetes.registerPlugin = pluginManager => {
       {
         name: 'Create Cluster',
         link: { path: '/infrastructure/clusters/add', exact: true },
+        requiredRoles: 'admin',
         component: AddClusterPage,
       },
       {
         name: 'Create AWS Cluster',
         link: { path: '/infrastructure/clusters/addAws', exact: true },
+        requiredRoles: 'admin',
         component: AddAwsClusterPage,
+      },
+      {
+        name: 'Create Azure Cluster',
+        link: { path: '/infrastructure/clusters/addAzure', exact: true },
+        requiredRoles: 'admin',
+        component: AddAzureClusterPage,
+      },
+      {
+        name: 'Create Bare OS Cluster',
+        link: { path: '/infrastructure/clusters/addBareOs', exact: true },
+        requiredRoles: 'admin',
+        component: AddBareOsClusterPage,
+      },
+      {
+        name: 'Edit Cluster',
+        link: { path: '/infrastructure/clusters/edit/:id', exact: true },
+        component: EditClusterPage,
+      },
+      {
+        name: 'Scale Masters',
+        link: { path: '/infrastructure/clusters/scaleMasters/:id', exact: true },
+        requiredRoles: 'admin',
+        component: ScaleMastersPage,
+      },
+      {
+        name: 'Scale Workers',
+        link: { path: '/infrastructure/clusters/scaleWorkers/:id', exact: true },
+        requiredRoles: 'admin',
+        component: ScaleWorkersPage,
       },
       {
         name: 'Cluster Details',
@@ -73,19 +125,36 @@ Kubernetes.registerPlugin = pluginManager => {
         component: ClusterDetailsPage,
       },
       {
+        name: 'Onboard a Node',
+        link: { path: '/infrastructure/nodes/cli/download', exact: true },
+        component: DownloadCliPage,
+      },
+      {
+        name: 'Node Details',
+        link: { path: '/infrastructure/nodes/:id', exact: true },
+        component: NodeDetailsPage,
+      },
+      {
         name: 'Create Cloud Provider',
         link: { path: '/infrastructure/cloudProviders/add', exact: true },
+        requiredRoles: 'admin',
         component: AddCloudProviderPage,
       },
       {
         name: 'Update Cloud Provider',
         link: { path: '/infrastructure/cloudProviders/edit/:id', exact: true },
+        requiredRoles: 'admin',
         component: UpdateCloudProviderPage,
       },
       {
         name: 'App Catalog',
         link: { path: '/apps', exact: true },
         component: AppsIndexPage,
+      },
+      {
+        name: 'Deployed App Details',
+        link: { path: '/apps/deployed/:clusterId/:release', exact: true },
+        component: DeployedAppDetailsPage,
       },
       {
         name: 'App Details',
@@ -100,17 +169,17 @@ Kubernetes.registerPlugin = pluginManager => {
       {
         name: 'Add Pod',
         link: { path: '/pods/add', exact: true },
-        component: AddPodPage,
+        component: () => <AddResourcePage resourceType="pod" />,
       },
       {
         name: 'Add Deployment',
-        link: { path: '/deployments/add', exact: true },
-        component: AddDeploymentPage,
+        link: { path: '/pods/deployments/add', exact: true },
+        component: () => <AddResourcePage resourceType="deployment" />,
       },
       {
         name: 'Add Service',
-        link: { path: '/services/add', exact: true },
-        component: AddServicePage,
+        link: { path: '/pods/services/add', exact: true },
+        component: () => <AddResourcePage resourceType="service" />,
       },
       {
         name: 'Storage Classes',
@@ -118,12 +187,17 @@ Kubernetes.registerPlugin = pluginManager => {
         component: StorageClassesPage,
       },
       {
+        name: 'Add Storage Class',
+        link: { path: '/storage_classes/add', exact: true },
+        component: StorageClassesAddPage,
+      },
+      {
         name: 'Namespaces',
         link: { path: '/namespaces', exact: true },
         component: NamespacesListPage,
       },
       {
-        name: 'Prometheus Monitoring (BETA)',
+        name: 'Monitoring (beta)',
         link: { path: '/prometheus', exact: true },
         component: PrometheusMonitoringPage,
       },
@@ -154,8 +228,33 @@ Kubernetes.registerPlugin = pluginManager => {
       },
       {
         name: 'Tenants & Users',
+        requiredRoles: 'admin',
         link: { path: '/user_management', exact: true },
         component: UserManagementIndexPage,
+      },
+      {
+        name: 'Add Tenant',
+        requiredRoles: 'admin',
+        link: { path: '/user_management/tenants/add', exact: true },
+        component: AddTenantPage,
+      },
+      {
+        name: 'Edit Tenant',
+        requiredRoles: 'admin',
+        link: { path: '/user_management/tenants/edit/:id', exact: true },
+        component: EditTenantPage,
+      },
+      {
+        name: 'Add User',
+        requiredRoles: 'admin',
+        link: { path: '/user_management/users/add', exact: true },
+        component: AddUserPage,
+      },
+      {
+        name: 'Edit User',
+        requiredRoles: 'admin',
+        link: { path: '/user_management/users/edit/:id', exact: true },
+        component: EditUserPage,
       },
       {
         name: 'Create Prometheus Instance',
@@ -182,6 +281,60 @@ Kubernetes.registerPlugin = pluginManager => {
         link: { path: '/prometheus/alertManagers/edit/:id', exact: true },
         component: UpdatePrometheusAlertManagerPage,
       },
+      {
+        name: 'Guided Onboarding',
+        link: { path: '/onboarding', exact: true },
+        component: OnboardingPage,
+      },
+      {
+        name: 'RBAC',
+        requiredRoles: 'admin',
+        link: { path: '/rbac', exact: true },
+        component: RbacIndexPage,
+      },
+      {
+        name: 'Add Role',
+        requiredRoles: 'admin',
+        link: { path: '/rbac/roles/add', exact: true },
+        component: AddRolePage,
+      },
+      {
+        name: 'Add Cluster Role',
+        requiredRoles: 'admin',
+        link: { path: '/rbac/clusterroles/add', exact: true },
+        component: AddClusterRolePage,
+      },
+      {
+        name: 'Add Role Binding',
+        requiredRoles: 'admin',
+        link: { path: '/rbac/rolebindings/add', exact: true },
+        component: AddRoleBindingPage,
+      },
+      {
+        name: 'Add Cluster Role Binding',
+        link: { path: '/rbac/clusterrolebindings/add', exact: true },
+        component: AddClusterRoleBindingPage,
+      },
+      {
+        name: 'Update Role',
+        link: { path: '/rbac/roles/edit/:id/cluster/:clusterId', exact: true },
+        component: UpdateRolePage,
+      },
+      {
+        name: 'Update Cluster Role',
+        link: { path: '/rbac/clusterroles/edit/:id/cluster/:clusterId', exact: true },
+        component: UpdateClusterRolePage,
+      },
+      {
+        name: 'Update Role Binding',
+        link: { path: '/rbac/rolebindings/edit/:id/cluster/:clusterId', exact: true },
+        component: UpdateRoleBindingPage,
+      },
+      {
+        name: 'Update Cluster Role Binding',
+        link: { path: '/rbac/clusterrolebindings/edit/:id/cluster/:clusterId', exact: true },
+        component: UpdateClusterRoleBindingPage,
+      },
     ],
   )
 
@@ -189,8 +342,10 @@ Kubernetes.registerPlugin = pluginManager => {
   const clarityBase = path => `${hostPrefix}/clarity/index.html#${path}`
   const clarityLink = path => ({ link: { path: clarityBase(path), external: true } })
 
-  // For development we can set this manually
-  const useClarityLinks = !(window.localStorage.disableClarityLinks === 'true' || config.developer)
+  // const useClarityLinks = !(window.localStorage.disableClarityLinks === 'true' || config.developer)
+
+  // New builds should default to just the new UI
+  const useClarityLinks = false
 
   // These nav items will redirect to the old "clarity" UI while the new UI is under development.
   const clarityNavItems = [
@@ -204,21 +359,33 @@ Kubernetes.registerPlugin = pluginManager => {
       ...clarityLink('/infrastructureK8s'),
       icon: 'building',
       nestedLinks: [
-        { name: 'Clusters', ...clarityLink('/infrastructureK8s#clusters') },
-        { name: 'Nodes', ...clarityLink('/infrastructureK8s#nodes') },
-        { name: 'Cloud Providers', ...clarityLink('/infrastructureK8s#cps') },
+        {
+          name: 'Clusters',
+          ...clarityLink('/infrastructureK8s#clusters'),
+        },
+        {
+          name: 'Nodes',
+          requiredRoles: 'admin',
+          ...clarityLink('/infrastructureK8s#nodes'),
+        },
+        {
+          name: 'Cloud Providers',
+          requiredRoles: 'admin',
+          ...clarityLink('/infrastructureK8s#cps'),
+        },
       ],
     },
-    {
-      name: 'App Catalog',
-      ...clarityLink('/kubernetes/apps'),
-      icon: 'th',
-      nestedLinks: [
-        { name: 'App Catalog', ...clarityLink('/kubernetes/apps#catalog') },
-        { name: 'Deployed Apps', ...clarityLink('/kubernetes/apps#deployed_apps') },
-        { name: 'Repositories', ...clarityLink('/kubernetes/apps#repositories') },
-      ],
-    },
+    // TODO: enable this when backend side is implemented
+    // {
+    //   name: 'App Catalog',
+    //   ...clarityLink('/kubernetes/apps'),
+    //   icon: 'th',
+    //   nestedLinks: [
+    //     { name: 'App Catalog', ...clarityLink('/kubernetes/apps#catalog') },
+    //     { name: 'Deployed Apps', ...clarityLink('/kubernetes/apps#deployed_apps') },
+    //     { name: 'Repositories', ...clarityLink('/kubernetes/apps#repositories') },
+    //   ],
+    // },
     {
       name: 'Pods, Deployments, Services',
       ...clarityLink('/podsK8s'),
@@ -237,6 +404,7 @@ Kubernetes.registerPlugin = pluginManager => {
       name: 'Tenants & Users',
       icon: 'user',
       ...clarityLink('/kubernetes/users'),
+      requiredRoles: 'admin',
       nestedLinks: [
         { name: 'Tenants', ...clarityLink('/kubernetes/users#tenants') },
         { name: 'Users', ...clarityLink('/kubernetes/users#users') },
@@ -259,20 +427,25 @@ Kubernetes.registerPlugin = pluginManager => {
       icon: 'building',
       nestedLinks: [
         { name: 'Clusters', link: { path: '/infrastructure#clusters' } },
-        { name: 'Nodes', link: { path: '/infrastructure#nodes' } },
-        { name: 'Cloud Providers', link: { path: '/infrastructure#cloudProviders' } },
+        { name: 'Nodes', requiredRoles: 'admin', link: { path: '/infrastructure#nodes' } },
+        {
+          name: 'Cloud Providers',
+          requiredRoles: 'admin',
+          link: { path: '/infrastructure#cloudProviders' },
+        },
       ],
     },
-    {
-      name: 'App Catalog',
-      link: { path: '/apps' },
-      icon: 'th',
-      nestedLinks: [
-        { name: 'App Catalog', link: { path: '/apps#appCatalog' } },
-        { name: 'Deployed Apps', link: { path: '/apps#deployedApps' } },
-        { name: 'Repositories', link: { path: '/apps#repositories' } },
-      ],
-    },
+    // TODO: enable this when backend side is implemented
+    // {
+    //   name: 'App Catalog',
+    //   link: { path: '/apps' },
+    //   icon: 'th',
+    //   nestedLinks: [
+    //     { name: 'App Catalog', link: { path: '/apps#appCatalog' } },
+    //     { name: 'Deployed Apps', link: { path: '/apps#deployedApps' } },
+    //     { name: 'Repositories', link: { path: '/apps#repositories' } },
+    //   ],
+    // },
     {
       name: 'Pods, Deployments, Services',
       link: { path: '/pods' },
@@ -285,13 +458,21 @@ Kubernetes.registerPlugin = pluginManager => {
     },
     { name: 'Storage Classes', icon: 'hdd', link: { path: '/storage_classes' } },
     { name: 'Namespaces', icon: 'object-group', link: { path: '/namespaces' } },
-    { name: 'Prometheus Monitoring (BETA)', icon: 'chart-area', link: { path: '/prometheus' } },
-    { name: 'Logging (beta)', icon: 'clipboard-list', link: { path: '/logging' } },
+    // TODO: Disabled till all CRUD operations are implemented
+    // { name: 'Monitoring (beta)', icon: 'chart-area', link: { path: '/prometheus' } },
+    // { name: 'Logging (beta)', icon: 'clipboard-list', link: { path: '/logging' } },
+    {
+      name: 'RBAC',
+      icon: 'user-shield',
+      requiredRoles: 'admin',
+      link: { path: '/rbac' },
+    },
     { name: 'API Access', icon: 'key', link: { path: '/api_access' } },
     {
       name: 'Tenants & Users',
       link: { path: '/user_management' },
       icon: 'user',
+      requiredRoles: 'admin',
       nestedLinks: [
         { name: 'Tenants', link: { path: '/user_management#tenants' } },
         { name: 'Users', link: { path: '/user_management#users' } },

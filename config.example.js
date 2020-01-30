@@ -5,46 +5,38 @@
  * a delete in git.
  */
 
-const {
-  OS_API_HOST,
-  OS_USERNAME,
-  OS_PASSWORD,
-  // controls which region the GraphQL server uses
-  OS_REGION,
-} = (process && process.env) || {}
-
 const config = {
   production: {
     host: '',
     apiHost: '',
-    region: OS_REGION,
+    region: '',
   },
 
   development: {
     host: 'http://localhost:3000',
     apiHost: 'http://localhost:4444',
     simulator: {
-      preset: 'base',
-      username: OS_USERNAME || 'user@domain.com',
-      password: OS_PASSWORD || 'secret',
+      preset: 'dev',
+      username: 'admin@platform9.com',
+      password: 'secret',
     },
-    region: OS_REGION,
+    region: 'Default Region',
     // Show development version of the UI
     developer: true,
   },
 
   test: {
     host: 'http://localhost:3000',
-    apiHost: OS_API_HOST || 'http://localhost:4444',
+    apiHost: 'http://localhost:4444',
     simulator: {
       preset: 'base',
-      username: OS_USERNAME || 'user@domain.com',
-      password: OS_PASSWORD || 'secret',
+      username: 'admin@platform9.com',
+      password: 'secret',
     },
     // Use the following for testing against a real DU
-    username: OS_USERNAME || 'user@domain.com',
-    password: OS_PASSWORD || 'secret',
-    region: OS_REGION,
+    username: 'admin@platfrom9.com',
+    password: 'secret',
+    region: 'Default Region',
   },
 }
 

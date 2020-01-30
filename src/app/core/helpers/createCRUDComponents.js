@@ -1,12 +1,7 @@
 import React, { useCallback } from 'react'
 import CRUDListContainer from 'core/components/CRUDListContainer'
 import ListTable from 'core/components/listTable/ListTable'
-import TopAddButtonAndDialog from 'core/components/TopAddButtonAndDialog'
-import requiresAuthentication from 'openstack/util/requiresAuthentication'
 import useDataLoader from 'core/hooks/useDataLoader'
-import useDataUpdater from 'core/hooks/useDataUpdater'
-import { withRouter } from 'react-router-dom'
-import { emptyArr } from 'utils/fp'
 import { getContextLoader } from 'core/helpers/createContextLoader'
 import { getContextUpdater } from 'core/helpers/createContextUpdater'
 import { createUsePrefParamsHook } from 'core/hooks/useParams'
@@ -38,47 +33,68 @@ const createCRUDComponents = options => {
     cacheKey,
     loaderFn = cacheKey ? getContextLoader(cacheKey) : null,
     deleteFn = cacheKey ? getContextUpdater(cacheKey, 'delete') : null,
+    deleteCond,
+    deleteDisabledInfo,
     defaultParams = {},
     columns = [],
     batchActions = [],
     rowActions = [],
     uniqueIdentifier = 'id',
     addText = 'Add',
+    emptyText = 'No data found',
+    renderEmptyTable = false,
+    addButton,
     addUrl,
-    renderAddDialog,
+    AddDialog,
+    EditDialog,
     editUrl,
+    editCond,
+    editDisabledInfo,
+    customEditUrlFn,
     debug,
     name,
+    nameProp,
+    searchTarget = 'name',
+    multiSelection = true,
+    showCheckboxes,
+    compactTable,
+    blankFirstColumn,
+    onSelect,
   } = options
 
   // List
   const List = ({
-    onAdd, onDelete, onEdit, batchActions, rowActions, data, onRefresh, onActionComplete, loading,
+    onDelete, onEdit, batchActions, rowActions, data, onRefresh, onReload, loading,
     visibleColumns, columnsOrder, rowsPerPage, orderBy, orderDirection,
-    getParamsUpdater, filters,
+    getParamsUpdater, filters, ...rest
   }) => {
-    // Disabling the "No data found" message for now because there create action is
-    // tied to the ListTable and if there are no entities there won't be any way
-    // for the user to create new ones.
-    // TODO: We need to decouple the Add functionality from the ListTable completely.
-    // if (!data || data.length === 0) {
-    //   return <h1>No data found.</h1>
-    // }
     return (
       <ListTable
-        loading={loading}
-        onActionComplete={onActionComplete}
-        onRefresh={onRefresh}
+        {...rest}
+        onAdd={null}
+        emptyText={emptyText}
+        renderEmptyTable={renderEmptyTable}
         columns={columns}
+        deleteCond={deleteCond}
+        deleteDisabledInfo={deleteDisabledInfo}
+        editCond={editCond}
+        editDisabledInfo={editDisabledInfo}
+        multiSelection={multiSelection}
+        searchTarget={searchTarget}
+        uniqueIdentifier={uniqueIdentifier}
+        showCheckboxes={showCheckboxes}
+        compactTable={compactTable}
+        blankFirstColumn={blankFirstColumn}
+        loading={loading}
+        onReload={onReload}
+        onRefresh={onRefresh}
+        onSelect={onSelect}
         filters={filters}
         data={data}
-        onAdd={onAdd}
         onDelete={onDelete}
         onEdit={onEdit}
         batchActions={batchActions}
         rowActions={rowActions}
-        searchTarget="name"
-        uniqueIdentifier={uniqueIdentifier}
         visibleColumns={visibleColumns}
         columnsOrder={columnsOrder}
         rowsPerPage={rowsPerPage}
@@ -93,37 +109,36 @@ const createCRUDComponents = options => {
   List.displayName = `${name}List`
 
   // ListContainer
-  const ListContainer = withRouter(({ history, data, loading, reload, ...restProps }) => {
-    const [handleRemove, deleting] = deleteFn ? useDataUpdater(deleteFn, reload) : emptyArr
-    const refetch = useCallback(() => reload(true))
+  const ListContainer = ({ data, loading, reload, ...restProps }) => {
+    const refetch = useCallback(() => reload(true), [reload])
     return (
       <CRUDListContainer
+        nameProp={nameProp}
         items={data}
+        reload={reload}
+        addText={addText}
+        addButton={addButton}
         editUrl={editUrl}
-        onRemove={handleRemove}
+        customEditUrlFn={customEditUrlFn}
+        addUrl={addUrl}
+        deleteFn={deleteFn}
         uniqueIdentifier={uniqueIdentifier}
+        AddDialog={AddDialog}
+        EditDialog={EditDialog}
       >
-        {handlers => <>
-          <TopAddButtonAndDialog
-            addUrl={addUrl}
-            addText={addText}
-            renderAddDialog={renderAddDialog}
-            reload={reload}
-          />
-          <List
-            loading={loading || deleting}
-            data={data}
-            batchActions={batchActions}
-            rowActions={rowActions}
-            onRefresh={refetch}
-            onActionComplete={reload}
-            {...handlers}
-            {...restProps}
-          />
-        </>}
+        {({ deleting, ...handlers }) => <List
+          loading={loading || deleting}
+          data={data}
+          batchActions={batchActions}
+          rowActions={rowActions}
+          onRefresh={reload}
+          onReload={refetch}
+          {...handlers}
+          {...restProps}
+        />}
       </CRUDListContainer>
     )
-  })
+  }
 
   ListContainer.displayName = `${name}ListContainer`
 
@@ -146,9 +161,9 @@ const createCRUDComponents = options => {
     }
   }
 
-  const ListPage = requiresAuthentication(options.ListPage
+  const ListPage = options.ListPage
     ? options.ListPage({ ListContainer })
-    : createStandardListPage())
+    : createStandardListPage()
 
   ListPage.displayName = `${name}ListPage`
 

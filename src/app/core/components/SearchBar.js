@@ -11,6 +11,9 @@ import clsx from 'clsx'
 const styles = theme => ({
   SearchBar: {
     outline: 'none',
+    '& .MuiOutlinedInput-input': {
+      padding: theme.spacing(1, 2),
+    },
   },
   searchIcon: {
     fontSize: 15,

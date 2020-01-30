@@ -1,0 +1,80 @@
+{
+  "userTenants": [
+    {
+      "id": "1",
+      "name": "Tenant #0",
+      "description": "Test tenant #0 description",
+      "enabled": true,
+      "is_domain": false,
+      "parent_id": "default",
+      "domain_id": "default"
+    },
+    {
+      "id": "2",
+      "name": "Tenant #1",
+      "description": "Test tenant #1 description",
+      "enabled": true,
+      "is_domain": false,
+      "parent_id": "default",
+      "domain_id": "default"
+    },
+    {
+      "id": "3",
+      "name": "Tenant #2",
+      "description": "Test tenant #2 description",
+      "enabled": true,
+      "is_domain": false,
+      "parent_id": "default",
+      "domain_id": "default"
+    },
+    {
+      "id": "id-tenant-service",
+      "name": "service",
+      "description": "Service tenant",
+      "enabled": true,
+      "is_domain": false,
+      "parent_id": "default",
+      "domain_id": "default"
+    }
+  ],
+  "user-preferences-admin@platform9.com": {
+    "Tenants": {
+      "lastTenant": {
+        "id": "id-tenant-service",
+        "name": "service",
+        "description": "Service tenant",
+        "enabled": true,
+        "is_domain": false,
+        "parent_id": "default",
+        "domain_id": "default"
+      }
+    },
+    "RegionChooser": {
+      "lastRegion": {
+        "id": "Default Region",
+        "description": ""
+      }
+    }
+  },
+  "user": {
+    "id": "id-user-admin",
+    "name": "admin@platform9.com",
+    "email": "admin@platform9.com",
+    "is_local": true,
+    "password_expires_at": null,
+    "enabled": true,
+    "mfa": {
+      "enabled": false
+    },
+    "default_project_id": "id-tenant-service",
+    "domain_id": "default",
+    "username": "admin@platform9.com",
+    "userId": "id-user-admin",
+    "role": "admin",
+    "displayName": "admin@platform9.com"
+  },
+  "tokens": {
+    "unscopedToken": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+    "currentToken": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+  }
+}

@@ -3,8 +3,9 @@ import PropTypes from 'prop-types'
 import { Menu, MenuItem, Typography } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import { withRouter } from 'react-router'
-import { withAppContext } from 'core/AppProvider'
+import { withAppContext } from 'core/providers/AppProvider'
 import { logoutUrl } from 'app/constants'
+import ChangePasswordModal from './ChangePasswordModal'
 
 const styles = theme => ({
   avatar: {
@@ -24,15 +25,23 @@ const styles = theme => ({
 @withStyles(styles)
 @withRouter
 class UserMenu extends React.PureComponent {
-  state = { anchorEl: null }
+  state = { anchorEl: null, showChangePasswordModal: false }
   handleClick = event => this.setState({ anchorEl: event.currentTarget })
   handleClose = () => this.setState({ anchorEl: null })
   logout = () => this.props.history.push(logoutUrl)
 
+  handleChangePassword = () => this.setState({ showChangePasswordModal: true, anchorEl: null })
+
+  handleCancelChangePassword = () => this.setState({ showChangePasswordModal: false })
+
   render () {
-    const { classes, className, context } = this.props
-    const { anchorEl } = this.state
-    const username = context.session.username || '?'
+    const { classes, className, session } = this.props
+    const { anchorEl, showChangePasswordModal } = this.state
+    const username = session.username || '?'
+
+    if (showChangePasswordModal) {
+      return <ChangePasswordModal onCancel={this.handleCancelChangePassword} />
+    }
 
     return (
       <div className={`${classes.avatar} ${className}`}>
@@ -45,8 +54,7 @@ class UserMenu extends React.PureComponent {
           getContentAnchorEl={null}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
         >
-          <MenuItem onClick={this.handleClose}>Change Password</MenuItem>
-          <MenuItem onClick={this.handleClose}>SSH Keys</MenuItem>
+          { false && <MenuItem onClick={this.handleChangePassword}>Change Password</MenuItem> }
           <MenuItem onClick={this.logout}>Sign Out</MenuItem>
         </Menu>
       </div>

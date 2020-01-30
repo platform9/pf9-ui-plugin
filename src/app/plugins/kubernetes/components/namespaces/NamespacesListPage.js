@@ -6,30 +6,44 @@ import namespaceActions from './actions'
 import { createUsePrefParamsHook } from 'core/hooks/useParams'
 import { listTablePrefs } from 'app/constants'
 import { pick } from 'ramda'
+import PageContainer from 'core/components/pageContainer/PageContainer'
+import Tabs from 'core/components/tabs/Tabs'
+import Tab from 'core/components/tabs/Tab'
 
 const defaultParams = {
-  masterNodeClusters: true,
+  masterNodeClusters: true
 }
 const usePrefParams = createUsePrefParamsHook('Namespaces', listTablePrefs)
 
 const ListPage = ({ ListContainer }) => {
   return () => {
     const { params, getParamsUpdater } = usePrefParams(defaultParams)
-    const [namespaces, loading, reload] = useDataLoader(namespaceActions.list, params)
-    return <ListContainer
-      loading={loading}
-      reload={reload}
-      data={namespaces}
-      getParamsUpdater={getParamsUpdater}
-      filters={
-        <ClusterPicklist
-          onChange={getParamsUpdater('clusterId')}
-          value={params.clusterId}
-          onlyMasterNodeClusters
-        />
-      }
-      {...pick(listTablePrefs, params)}
-    />
+    const [namespaces, loading, reload] = useDataLoader(
+      namespaceActions.list,
+      params
+    )
+    return (
+      <PageContainer>
+        <Tabs>
+          <Tab value="namespace" label="Namespaces">
+            <ListContainer
+              loading={loading}
+              reload={reload}
+              data={namespaces}
+              getParamsUpdater={getParamsUpdater}
+              filters={
+                <ClusterPicklist
+                  onChange={getParamsUpdater('clusterId')}
+                  value={params.clusterId}
+                  onlyMasterNodeClusters
+                />
+              }
+              {...pick(listTablePrefs, params)}
+            />
+          </Tab>
+        </Tabs>
+      </PageContainer>
+    )
   }
 }
 
@@ -43,10 +57,9 @@ export const options = {
   ],
   loaderFn: namespaceActions.list,
   deleteFn: namespaceActions.delete,
-  editUrl: '/ui/kubernetes/namespaces/edit',
   name: 'Namespaces',
   title: 'Namespaces',
-  ListPage,
+  ListPage
 }
 
 const components = createCRUDComponents(options)

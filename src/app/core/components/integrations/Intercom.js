@@ -1,5 +1,5 @@
 import React, { useContext, useMemo } from 'react'
-import { AppContext } from 'core/AppProvider'
+import { AppContext } from 'core/providers/AppProvider'
 import BaseIntercom from 'react-intercom'
 
 const Intercom = () => {

@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import {
-  Collapse, Divider, Drawer, ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary,
+  Collapse, Drawer, ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary,
   IconButton, ListItemText, MenuItem, MenuList, Typography,
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
@@ -9,19 +9,45 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
 import ChevronRightIcon from '@material-ui/icons/ChevronRight'
 import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'
-import { except, notEmpty } from 'app/utils/fp'
+import { except } from 'app/utils/fp'
 import clsx from 'clsx'
 import { withHotKeys } from 'core/providers/HotKeysProvider'
 import moize from 'moize'
-import { assoc, flatten, pluck, prop, propEq, propOr, where } from 'ramda'
+import { assoc, flatten, pluck, prop, propEq, propOr, where, equals } from 'ramda'
 import { matchPath, withRouter } from 'react-router'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { imageUrls, clarityDashboardUrl } from 'app/constants'
+import { routes } from 'core/utils/routes'
 
 export const drawerWidth = 180
 
 const styles = theme => ({
+  logoTitle: {
+    backgroundImage: `url(${imageUrls.logo})`,
+    backgroundRepeat: 'no-repeat',
+    backgroundSize: 180,
+    height: 20,
+    backgroundPosition: '-55px -12px',
+  },
+  logo: {
+    justifySelf: 'center',
+    maxHeight: 45,
+    backgroundImage: `url(${imageUrls.logoBlue})`,
+    backgroundRepeat: 'no-repeat',
+    transition: `width ${theme.transitions.duration.enteringScreen}ms ease`,
+    width: 40,
+    backgroundSize: 115,
+    height: 24,
+    backgroundPosition: 'center -6px',
+  },
+  logoOpen: {
+    width: drawerWidth,
+  },
+  logoClose: {
+    width: 168,
+  },
   drawer: {
+    zIndex: 1200,
     position: 'relative',
     width: drawerWidth,
     flexShrink: 0,
@@ -38,29 +64,29 @@ const styles = theme => ({
     }),
   },
   drawerClose: {
-    marginTop: theme.spacing(8),
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    overflowX: 'hidden',
-    width: (theme.spacing(6)) + 1,
-    [theme.breakpoints.up('sm')]: {
-      width: theme.spacing(5.5),
-    },
+    width: (theme.spacing(6)) + 2,
+    // [theme.breakpoints.up('sm')]: {
+    //   width: theme.spacing(5.5),
+    // },
   },
   paper: {
-    marginTop: 55,
+    // marginTop: 55,
     backgroundColor: 'inherit',
     overflow: 'hidden',
     borderRight: 0,
   },
   drawerHeader: {
-    display: 'flex',
+    display: 'grid',
+    gridTemplateColumns: '50px 1fr',
+    height: 55,
+    position: 'relative',
     alignItems: 'center',
-    justifyContent: 'flex-end',
-    padding: '0 8px',
-    minHeight: 50,
+    cursor: 'pointer',
+    backgroundColor: theme.palette.header.background,
   },
   inputRoot: {
     color: 'inherit',
@@ -80,11 +106,15 @@ const styles = theme => ({
   },
   activeNavItem: {
     backgroundColor: theme.palette.background.default,
-    color: 'rgba(0, 0, 0, .87)',
+    color: theme.palette.sidebar.activeText,
   },
   currentNavLink: {
     backgroundColor: [theme.palette.background.default, '!important'],
-    color: 'rgba(0, 0, 0, .87) !important',
+    color: [theme.palette.sidebar.activeText, '!important'],
+
+    '&:hover *': {
+      color: [theme.palette.sidebar.hoverText, '!important'],
+    },
   },
   navHeading: {
     backgroundColor: theme.palette.grey[50],
@@ -101,29 +131,44 @@ const styles = theme => ({
     padding: 0,
   },
   navIcon: {
-    textAlign: 'center',
-    minWidth: 26,
+    minWidth: 28,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    '& > i': {
+      maxHeight: 28,
+      maxWidth: 28,
+    }
   },
   navMenu: {
     padding: 0,
     width: '100%',
   },
   navMenuItem: {
-    padding: theme.spacing(1, 0.5, 1, 1),
+    display: 'grid',
+    gridTemplateColumns: '50px 1fr',
+    padding: 0,
+    minHeight: theme.spacing(6),
     backgroundColor: theme.palette.sidebar.background,
     color: theme.palette.sidebar.text,
-    borderBottom: '1px solid #07283e',
-    '&:hover': {
-      backgroundColor: theme.palette.sidebar.background,
+
+    transition: 'background .2s ease',
+
+    '& i, & span': {
+      transition: 'color .2s ease',
     },
-    display: 'flex',
-    flexFlow: 'row nowrap',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    '&:hover': {
+      backgroundColor: theme.palette.background.paper,
+    },
+    '&:hover *': {
+      color: theme.palette.sidebar.hoverText, // override child color styles
+    },
+    borderTop: '2px solid transparent',
+    borderBottom: '2px solid transparent',
   },
   navMenuTextRoot: {
     flexGrow: 1,
-    padding: theme.spacing(0, 0, 0, 1),
+    padding: theme.spacing(0, 0.5, 0, 1),
     whiteSpace: 'normal',
     margin: 0,
   },
@@ -133,16 +178,27 @@ const styles = theme => ({
     color: theme.palette.sidebar.text,
   },
   toggleButton: {
+    background: theme.palette.header.background,
+    borderRadius: 0,
+    color: theme.palette.primary.contrastText,
     fontSize: 12,
     fontWeight: 500,
-    color: theme.palette.sidebar.text,
     textAlign: 'center',
-    padding: 4,
+    padding: theme.spacing(0.5),
+    position: 'absolute',
+    top: theme.spacing(),
+    left: '100%',
+    zIndex: 1200,
+    width: 27,
+    height: 39,
+    '&:hover': {
+      backgroundColor: 'transparent',
+    },
   },
   currentNavMenuText: {
     fontSize: 12,
     fontWeight: 500,
-    color: 'rgba(0, 0, 0, 0.87)',
+    color: theme.palette.sidebar.activeText,
   },
   navMenuList: {
     borderLeft: `${theme.spacing(1)}px solid #6dc6fe`,
@@ -151,6 +207,7 @@ const styles = theme => ({
     display: 'flex',
     alignItems: 'center',
     marginBottom: '10px',
+    marginTop: '10px',
   },
   sliderLogo: {
     flexGrow: 1,
@@ -160,11 +217,29 @@ const styles = theme => ({
     justifyContent: 'left',
     alignItems: 'center',
     height: '45px',
-    maxWidth: '90%',
+    // maxWidth: '90%',
     margin: '2px',
     padding: '0 7px',
     borderRadius: theme.shape.borderRadius,
     boxSizing: 'border-box',
+    backgroundRepeat: 'no-repeat',
+    backgroundImage: ({ stack }) => stack === 'openstack'
+      ? 'url(/ui/images/logo-sidenav-os.svg)'
+      : 'url(/ui/images/logo-kubernetes-h.png)',
+    backgroundSize: ({ open, stack }) => {
+      if (stack === 'kubernetes') {
+        return open ? '120px' : '130px'
+      } else if (stack === 'openstack') {
+        return open ? '120px' : '175px'
+      }
+    },
+    backgroundPosition: ({ open, stack }) => {
+      if (stack === 'kubernetes') {
+        return open ? '7px center' : '9px center'
+      } else if (stack === 'openstack') {
+        return open ? '10px center' : '7px center'
+      }
+    },
   },
   sliderLogoImage: {
     maxHeight: 26,
@@ -195,6 +270,10 @@ class Navbar extends PureComponent {
     expandedItems: [],
     activeNavItem: null,
     filterText: '',
+  }
+
+  handleLogoClick = () => {
+    this.props.history.push(routes.dashboard.path())
   }
 
   handleEscKey = () => {
@@ -308,7 +387,7 @@ class Navbar extends PureComponent {
           [classes.currentNavLink]: !!isCurrentNavLink,
         })}>
         {icon && <div className={classes.navIcon}>
-          <FontAwesomeIcon>{icon}</FontAwesomeIcon>
+          <FontAwesomeIcon size="xl">{icon}</FontAwesomeIcon>
         </div>}
         {open && <ListItemText
           classes={{
@@ -351,7 +430,7 @@ class Navbar extends PureComponent {
       onClick={handleClick}
       key={link.path}>
       {icon && <div className={classes.navIcon}>
-        <FontAwesomeIcon>{icon}</FontAwesomeIcon>
+        <FontAwesomeIcon title={name} size="xl">{icon}</FontAwesomeIcon>
       </div>}
       {open && <ListItemText
         classes={{
@@ -398,9 +477,7 @@ class Navbar extends PureComponent {
       {open && <a href={clarityDashboardUrl}>
         <ChevronLeftIcon className={classes.sliderArrow} />
       </a>}
-      <div className={classes.sliderLogo}>
-        <img src={imageUrls.kubernetes} className={classes.sliderLogoImage} />
-      </div>
+      <div className={classes.sliderLogo} />
       {open && <a href={clarityDashboardUrl}>
         <ChevronRightIcon className={classes.sliderArrow} />
       </a>}
@@ -408,35 +485,45 @@ class Navbar extends PureComponent {
   }
 
   render () {
-    const { classes, withStackSlider, sections, open, handleDrawerToggle } = this.props
-    const filteredSections = sections.filter(where({ links: notEmpty }))
+    const { classes, withStackSlider, sections, open, handleDrawerToggle, stack } = this.props
+    // const filteredSections = sections.filter(where({ links: notEmpty }))
+    // Because ironic regions will not currently support kubernetes, assume always
+    // one filtered section, either openstack (ironic) or kubernetes
+    const filteredSections = sections.filter(where({ id: equals(stack) }))
 
-    return <Drawer
-      variant="permanent"
+    return <div
       className={clsx(classes.drawer, {
         [classes.drawerOpen]: open,
         [classes.drawerClose]: !open,
-      })}
-      classes={{
-        paper: clsx(classes.paper, {
+      })}>
+      <IconButton className={classes.toggleButton} onClick={handleDrawerToggle}>
+        <FontAwesomeIcon size="xl">{open ? 'angle-double-left' : 'angle-double-right'}</FontAwesomeIcon>
+      </IconButton>
+      <Drawer
+        variant="permanent"
+        className={clsx(classes.drawer, {
           [classes.drawerOpen]: open,
           [classes.drawerClose]: !open,
-        }),
-      }}
-      anchor="left"
-      open={open}
-    >
-      <div className={classes.drawerHeader}>
-        <IconButton className={classes.toggleButton} onClick={handleDrawerToggle}>
-          <FontAwesomeIcon>{open ? 'angle-double-left' : 'angle-double-right'}</FontAwesomeIcon>
-        </IconButton>
-      </div>
-      <Divider />
-      {withStackSlider ? this.renderStackSlider() : null}
-      {filteredSections.length > 1
-        ? this.renderSections(filteredSections)
-        : this.renderSectionLinks(propOr([], 'links', filteredSections[0]))}
-    </Drawer>
+        })}
+        classes={{
+          paper: clsx(classes.paper, {
+            [classes.drawerOpen]: open,
+            [classes.drawerClose]: !open,
+          }),
+        }}
+        anchor="left"
+        open={open}
+      >
+        <div className={classes.drawerHeader} onClick={this.handleLogoClick}>
+          <div className={classes.logo} />
+          <div className={classes.logoTitle} />
+        </div>
+        {withStackSlider ? this.renderStackSlider() : null}
+        {filteredSections.length > 1
+          ? this.renderSections(filteredSections)
+          : this.renderSectionLinks(propOr([], 'links', filteredSections[0]))}
+      </Drawer>
+    </div>
   }
 }
 
@@ -466,6 +553,7 @@ Navbar.propTypes = {
   sections: PropTypes.arrayOf(
     PropTypes.shape(sectionPropType),
   ).isRequired,
+  stack: PropTypes.string,
 }
 
 Navbar.defaultProps = {

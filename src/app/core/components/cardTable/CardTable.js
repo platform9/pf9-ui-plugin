@@ -12,7 +12,7 @@ import { filterSpecPropType } from 'core/components/cardTable/CardTableToolbar'
 const styles = theme => ({
   root: {
     width: '100%',
-    marginTop: theme.spacing(3),
+    marginTop: theme.spacing(2),
     minHeight: 300,
   },
   table: {
@@ -211,7 +211,7 @@ class CardTable extends PureComponent {
       <Progress loading={loading} overlay renderContentOnMount>
         <Grid container justify="center">
           <Grid item xs={12} zeroMinWidth>
-            <Paper className={classes.root}>
+            <Paper className={classes.root} elevation={0}>
               <CardTableToolbar
                 title={title}
                 sorting={sorting}

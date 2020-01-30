@@ -33,7 +33,7 @@ class TextField extends PureComponent {
   }
 
   render () {
-    const { value, classes, hasError, errorMessage, ...restProps } = this.props
+    const { value, label, classes, hasError, errorMessage, required, updateFieldValue, getCurrentValue, variant, ...restProps } = this.props
     return (
       <BaseTextField
         {...restProps}
@@ -42,7 +42,8 @@ class TextField extends PureComponent {
             root: classes.label,
           },
         }}
-        variant="outlined"
+        label={required ? `${label} *` : label}
+        variant={variant || 'outlined'}
         error={hasError}
         value={value !== undefined ? value : ''}
         onChange={this.handleChange}
@@ -55,7 +56,6 @@ class TextField extends PureComponent {
 TextField.propTypes = {
   id: PropTypes.string.isRequired,
   label: PropTypes.string,
-  info: PropTypes.string,
   initialValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   onChange: PropTypes.func,
   ...ValidatedFormInputPropTypes,

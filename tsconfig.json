@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "outDir": "/built",
+    "allowJs": true,
+    "checkJs": false,
+    "target": "es2017",
+    "baseUrl": ".",
+    "module": "commonjs",
+    "jsx": "react",
+    "noUnusedLocals": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": false,
+    "moduleResolution": "node",
+    "pretty": true,
+    "experimentalDecorators": true,
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "lib": ["esnext", "dom"],
+    "paths": {
+      "developer/*": ["src/app/plugins/developer/*"],
+      "k8s/*": ["src/app/plugins/kubernetes/*"],
+      "openstack/*": ["src/app/plugins/openstack/*"],
+      "core/*": ["src/app/core/*"],
+      "utils/*": ["src/app/utils/*"],
+      "app/*": ["src/app/*"],
+      "server/*": ["src/server/*"],
+      "api-client/*": ["src/api-client/*"]
+    }
+  },
+  "exclude": ["./config*.js"],
+  "include": ["./src/**/*"]
+}
