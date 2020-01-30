@@ -22,14 +22,19 @@ class Route<T extends OptionalGenericKVP = null> {
     return this.path(null)
   }
 
+  /*
+    createUrlWithQueryString(routes.cluster.edit, {id: 'asdf', name: 'fdsa'})
+    produces /ui/kubernetes/infrastructure/clusters/edit/asdf?name=fdsa`,
+  */
   private createUrlWithQueryString (url: URL, params: OptionalParamType<T>) {
     if (!params || Object.keys(params || []).length === 0) {
       return this.url
     }
     const fields: GenericKVP = { ...params as any }
 
+    // nice utility to reconstruct urls from objects / models
+    // replace pathname variables (e.g. '/:id') with params when applicable
     if (url.pathname.includes(':')) {
-      // nice utility to reconstruct urls from objects / models
       (url.pathname.match(/:([0-9_a-z]+)/gi) || []).forEach((match) => {
         const key = match.replace(':', '')
         url.pathname = url.pathname.replace(match, fields[key])
@@ -37,10 +42,12 @@ class Route<T extends OptionalGenericKVP = null> {
       })
     }
 
+    // Tack on the remaining key values from our params to the URL's searchParams
     for (const [key, value] of Object.entries(fields)) {
       url.searchParams.append(key, value)
     }
 
+    // URL requires an origin, but these routes need to omit the origin
     return `${url.toString().replace(url.origin, '')}`
   }
 }
