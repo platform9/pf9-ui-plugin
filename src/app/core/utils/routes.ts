@@ -1,23 +1,22 @@
 import { k8sPrefix, appUrlRoot } from 'app/constants'
 import { CloudProviders } from 'k8s/components/infrastructure/clusters/model'
 
-interface GenericKVP {[key: string]: string}
+interface GenericKVP { [key: string]: string }
+type OptionalGenericKVP = GenericKVP | null | void
 
 // This will make a parameter optional if no type definition is passed
-type RouterPathFn<T> = (...params: OptionalParamType<T>) => string
-type OptionalParamType<T> = T extends null ? [GenericKVP?] : [T & GenericKVP]
+type OptionalParamType<T extends OptionalGenericKVP> = T extends null ? void | GenericKVP : T & GenericKVP
+type RouterPathFn<T extends OptionalGenericKVP> = (params: OptionalParamType<T>) => string
 
-export class Route<T = null> {
-  public url: string
-  public path: RouterPathFn<T>
+export class Route<T extends OptionalGenericKVP = null> {
+  constructor (public url: string) {}
 
-  constructor (url: string) {
-    this.url = url
-    // compiler dislikes an inline type definition "this.path: RouterPathFn<T>"
-    const path: RouterPathFn<T> = (...params: OptionalParamType<T>) => {
-      return createUrlWithQueryString(this.url, ...params)
-    }
-    this.path = path
+  public path: RouterPathFn<T> = (params: OptionalParamType<T>) => {
+    return createUrlWithQueryString(this.url, params)
+  }
+
+  public toString (): string {
+    return this.path(null)
   }
 }
 
