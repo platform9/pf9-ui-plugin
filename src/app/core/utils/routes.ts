@@ -7,7 +7,7 @@ interface GenericKVP {[key: string]: string}
 type RouterPathFn<T> = (...params: OptionalParamType<T>) => string
 type OptionalParamType<T> = T extends null ? [GenericKVP?] : [T & GenericKVP]
 
-class Route<T = null> {
+export class Route<T = null> {
   public url: string
   public path: RouterPathFn<T>
 

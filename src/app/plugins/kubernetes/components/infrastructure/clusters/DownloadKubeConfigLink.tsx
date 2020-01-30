@@ -6,9 +6,10 @@ import DownloadKubeConfigForm from 'k8s/components/apiAccess/kubeConfig/Download
 
 interface Props {
   cluster: ICluster
+  icon?: string
 }
 
-const DownloadKubeConfigLink = ({ cluster }: Props) => {
+const DownloadKubeConfigLink = ({ cluster, icon }: Props) => {
   const [showModal, setModal] = useState(false)
 
   const handleOpen = () => setModal(true)
@@ -26,7 +27,7 @@ const DownloadKubeConfigLink = ({ cluster }: Props) => {
   return (
     <div>
       {showModal && renderModalContent()}
-      <SimpleLink src="" onClick={handleOpen}>kubeconfig</SimpleLink>
+      <SimpleLink src="" icon={icon} onClick={handleOpen}>Kubeconfig</SimpleLink>
     </div>
   )
 }
