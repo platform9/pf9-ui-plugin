@@ -34,6 +34,7 @@ export const orderInterfaces = (
 const useStyles = makeStyles((theme: Theme) => ({
   backLink: {
     marginBottom: theme.spacing(2),
+    marginLeft: 'auto',
   },
   detailContainer: {
     display: 'flex',
@@ -89,7 +90,7 @@ const ClusterDetailsPage: FC = () => {
         <>
           <Typography variant="h5">Node {selectedNode.name}</Typography>
           <SimpleLink src={routes.nodes.list.path()} className={classes.backLink}>
-            <span>« Back to Node List</span>
+            « Back to Node List
           </SimpleLink>
         </>
       }

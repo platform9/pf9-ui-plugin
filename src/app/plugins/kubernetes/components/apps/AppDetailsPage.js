@@ -17,7 +17,7 @@ import ExternalLink from 'core/components/ExternalLink'
 const useStyles = makeStyles(theme => ({
   backLink: {
     marginBottom: theme.spacing(2),
-    alignSelf: 'flex-end',
+    marginLeft: 'auto',
   },
   card: {
     display: 'flex',

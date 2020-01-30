@@ -155,7 +155,7 @@ export const AddResourceForm = ({ resourceType = 'pod' }) => {
   const formattedResourceName = capitalizeString(params.resourceType)
 
   return (
-    <FormWrapper title="New Resource" backUrl={listRoutes[params.resourceType]}>
+    <FormWrapper title="New Resource" backUrl={listRoutes[params.resourceType].toString()}>
       <Progress overlay loading={adding} renderContentOnMount>
         <ValidatedForm onSubmit={handleAdd}>
           <div className={classes.formWidth}>
