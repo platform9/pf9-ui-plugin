@@ -124,6 +124,13 @@ const createUrlWithQueryString = (url: string, params?: GenericKVP) => {
     return url
   }
   params = { ...params }
+  let hash = ''
+
+  if (url.includes('#')) {
+    const [urlPart, hashPart] = url.split('#')
+    url = urlPart
+    hash = `#${hashPart}`
+  }
 
   if (url.includes(':')) {
     // nice utility to reconstruct urls from objects / models
@@ -137,7 +144,7 @@ const createUrlWithQueryString = (url: string, params?: GenericKVP) => {
   if (Object.keys(params).length > 0) {
     url = `${url}?${paramsToQueryString(params)}`
   }
-  return url
+  return `${url}${hash}`
 }
 
 export const paramsToQueryString = (params: GenericKVP) => {

@@ -146,7 +146,8 @@ const renderConnectionStatus = (_, { status, combined }) => {
   )
 }
 
-const renderHealthStatus = (_, { status }, onClick) => {
+const renderHealthStatus = (_, node, onClick) => {
+  const { status } = node
   if (status === 'converging') {
     return renderConverging()
   }
@@ -157,7 +158,7 @@ const renderHealthStatus = (_, { status }, onClick) => {
   return (
     <ClusterStatusSpan title={fields.label} status={fields.status}>
       {onClick
-        ? <SimpleLink onClick={onClick}>{fields.label}</SimpleLink>
+        ? <SimpleLink onClick={() => onClick(node)}>{fields.label}</SimpleLink>
         : fields.label
       }
     </ClusterStatusSpan>
@@ -225,6 +226,7 @@ export const options = {
       icon: <DeAuthIcon />,
       label: 'Deauthorize node',
       dialog: NodeDeAuthDialog,
+      disabledInfo: 'You can only de-authorize a node when it\'s not associated with any cluster. Detach the node from the cluster first.'
     },
     {
       cond: isAdmin,
