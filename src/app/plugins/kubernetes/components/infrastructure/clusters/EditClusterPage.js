@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useEffect } from 'react'
 import useReactRouter from 'use-react-router'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { find, propEq, pipe, when, always, isNil, path } from 'ramda'
-import { emptyObj } from 'utils/fp'
+import { emptyObj, objToKeyValueArr, keyValueArrToObj } from 'utils/fp'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import FormWrapper from 'core/components/FormWrapper'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
@@ -17,9 +17,6 @@ import useParams from 'core/hooks/useParams'
 import EtcdBackupFields from './EtcdBackupFields'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
-
-const tagsObjToArr = tags => Object.entries(tags).map(([key, value]) => ({ key, value }))
-const tagsArrToObj = tags => tags.reduce((acc, { key, value }) => ({ ...acc, [key]: value }), {})
 
 const EditClusterPage = () => {
   const { match, history } = useReactRouter()
@@ -36,7 +33,7 @@ const EditClusterPage = () => {
       when(isNil, always(emptyObj)),
       ({ tags = {}, etcdBackup = {}, ...cluster }) => ({
         ...cluster,
-        tags: tagsObjToArr(tags),
+        tags: objToKeyValueArr(tags),
         etcdBackup: !!etcdBackup.isEtcdBackupEnabled,
         etcdStoragePath: path(['storageProperties, localStorage'], etcdBackup) || defaultEtcBackupPath,
         etcdBackupInterval: etcdBackup.intervalInMins || 1,
@@ -56,7 +53,7 @@ const EditClusterPage = () => {
     ...cluster,
     // The cluster ID is not present in the form as a field so it won't be passed as a value to the submit function
     uuid: initialValues.uuid,
-    tags: tagsArrToObj(tags),
+    tags: keyValueArrToObj(tags),
   }), [update, initialValues])
 
   return <FormWrapper

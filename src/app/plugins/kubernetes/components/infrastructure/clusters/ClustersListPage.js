@@ -119,20 +119,8 @@ const renderCloudProvider = (_, { cloudProviderType, cloudProviderName }) => (
 )
 
 const renderMetaData = (_, { tags }) => {
-  // TODO get the backend to update how tags are returned, this is a bit of hackery to render gracefully
-  const tagsNullValue = '{}'
-  let content
-  if (typeof tags === 'object') {
-    content = JSON.stringify(tags)
-    // const values = tags['0'] ? Object.values(tags) :
-    // content = values.length > 0 ? JSON.stringify(values.map(JSON.parse), null, 2) : tagsNullValue
-  } else {
-    content = `${tags || ''}` || tagsNullValue
-  }
+  const content = JSON.stringify(tags, null, 2)
 
-  if (content === tagsNullValue) {
-    return ''
-  }
   return (
     <Tooltip title={<CodeBlock>{content}</CodeBlock>}>
       <SimpleLink src="">View</SimpleLink>

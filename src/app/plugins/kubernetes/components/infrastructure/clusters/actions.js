@@ -6,7 +6,7 @@ import { castFuzzyBool, sanitizeUrl } from 'utils/misc'
 import {
   clustersCacheKey, combinedHostsCacheKey, loadCombinedHosts,
 } from 'k8s/components/infrastructure/common/actions'
-import { filterIf, isTruthy, updateWith, adjustWith } from 'utils/fp'
+import { filterIf, isTruthy, updateWith, adjustWith, keyValueArrToObj } from 'utils/fp'
 import { mapAsync } from 'utils/async'
 import {
   pluck, pathOr, pick, pipe, either, propSatisfies, compose, path, propEq, mergeLeft, partition,
@@ -77,8 +77,10 @@ const createAwsCluster = async (data, loadFromContext) => {
     ...pick('vpc isPrivate privateSubnets subnets internalElb serviceFqdn containersCidr servicesCidr networkPlugin'.split(' '), data),
 
     // advanced configuration
-    ...pick('privileged appCatalogEnabled customAmi tags'.split(' '), data),
+    ...pick('privileged appCatalogEnabled customAmi'.split(' '), data),
   }
+
+  body.tags = keyValueArrToObj(data.tags)
 
   if (data.enableCAS) {
     body.numMinWorkers = data.numWorkers
@@ -118,8 +120,10 @@ const createAzureCluster = async (data, loadFromContext) => {
     ...pick('assignPublicIps vnetResourceGroup vnetName masterSubnetName workerSubnetName externalDnsName serviceFqdn containersCidr servicesCidr networkPlugin'.split(' '), data),
 
     // advanced configuration
-    ...pick('privileged appCatalogEnabled tags'.split(' '), data),
+    ...pick('privileged appCatalogEnabled'.split(' '), data),
   }
+
+  body.tags = keyValueArrToObj(data.tags)
 
   if (data.useAllAvailabilityZones) { body.zones = [] }
 
@@ -149,9 +153,10 @@ const createBareOSCluster = async (data = {}, loadFromContext) => {
     'mtuSize',
     'privileged',
     'appCatalogEnabled',
-    'tags',
   ]
   const body = pick(keysToPluck, data)
+
+  body.tags = keyValueArrToObj(data.tags)
 
   if (data.enableMetallb) {
     body.metallbCidr = data.metallbCidr
