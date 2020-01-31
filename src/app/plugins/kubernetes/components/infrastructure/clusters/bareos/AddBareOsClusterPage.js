@@ -18,7 +18,7 @@ import ExternalLink from 'core/components/ExternalLink'
 import ClusterHostChooser, { excludeNodes, isConnected, isUnassignedNode } from './ClusterHostChooser'
 import { clusterActions } from '../actions'
 import { pathJoin } from 'utils/misc'
-import { k8sPrefix, runtimePrivileged, defaultEtcBackupPath, pmkCliOverview, defaultMonitoringTag } from 'app/constants'
+import { k8sPrefix, runtimePrivileged, defaultEtcBackupPath, pmkCliOverview } from 'app/constants'
 import { makeStyles } from '@material-ui/styles'
 import { masterNodeLengthValidator, requiredValidator } from 'core/utils/fieldValidators'
 import { allPass } from 'ramda'
@@ -28,6 +28,7 @@ import EtcdBackupFields from '../EtcdBackupFields'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import { routes } from 'core/utils/routes'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
+import Alert from 'core/components/Alert'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
@@ -39,7 +40,8 @@ const initialContext = {
   mtuSize: 1440,
   etcdStoragePath: defaultEtcBackupPath,
   etcdBackupInterval: 1,
-  tags: [defaultMonitoringTag],
+  prometheusMonitoringEnabled: true,
+  tags: [],
 }
 
 const runtimeConfigOptions = [
@@ -393,6 +395,15 @@ const AddBareOsClusterPage = () => {
                         />
 
                         {values.etcdBackup && <EtcdBackupFields />}
+
+                        {/* Prometheus monitoring */}
+                        <CheckboxField
+                          id="prometheusMonitoringEnabled"
+                          label="Enable monitoring with prometheus"
+                          info="This deploys an instance of prometheus on the cluster."
+                        />
+
+                        { !values.prometheusMonitoringEnabled && <Alert small variant="error" message="The PMK management plane is not able to monitor the cluster health." /> }
 
                         {/* Advanced API Configuration */}
                         <PicklistField

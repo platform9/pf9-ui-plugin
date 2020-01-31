@@ -8,6 +8,7 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import { path, pathOr } from 'ramda'
 import { capitalizeString } from 'utils/misc'
+import { boolToFormattedText } from 'core/utils/renderHelpers'
 
 const overviewStats = cluster => {
   const fields = {}
@@ -22,7 +23,7 @@ const overviewStats = cluster => {
     'Services CIDR':       cluster.servicesCidr,
     Privileged:          cluster.privileged,
     'Unique ID':           cluster.uuid,
-    'etcd Backup':          path(['etcdBackup', 'isEtcdBackupEnabled'], cluster) ? 'Enabled' : 'Not Enabled',
+    'etcd Backup':          boolToFormattedText(path(['etcdBackup', 'isEtcdBackupEnabled'], cluster)),
     'etcd Storage Path':    pathOr('N/A', ['etcdBackup', 'storageProperties', 'localPath'], cluster),
     'etcd Backup Interval': pathOr('N/A', ['etcdBackup', 'intervalInMins'], cluster),
   }

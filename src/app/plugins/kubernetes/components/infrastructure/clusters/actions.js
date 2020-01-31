@@ -1,7 +1,7 @@
 import ApiClient from 'api-client/ApiClient'
 import calcUsageTotals from 'k8s/util/calcUsageTotals'
 import createCRUDActions from 'core/helpers/createCRUDActions'
-import { allKey } from 'app/constants'
+import { allKey, defaultMonitoringTag } from 'app/constants'
 import { castFuzzyBool, sanitizeUrl } from 'utils/misc'
 import {
   clustersCacheKey, combinedHostsCacheKey, loadCombinedHosts,
@@ -80,8 +80,6 @@ const createAwsCluster = async (data, loadFromContext) => {
     ...pick('privileged appCatalogEnabled customAmi'.split(' '), data),
   }
 
-  body.tags = keyValueArrToObj(data.tags)
-
   if (data.enableCAS) {
     body.numMinWorkers = data.numWorkers
     body.numMaxWorkers = data.numMaxWorkers
@@ -123,8 +121,6 @@ const createAzureCluster = async (data, loadFromContext) => {
     ...pick('privileged appCatalogEnabled'.split(' '), data),
   }
 
-  body.tags = keyValueArrToObj(data.tags)
-
   if (data.useAllAvailabilityZones) { body.zones = [] }
 
   const cluster = createGenericCluster(body, data, loadFromContext)
@@ -155,8 +151,6 @@ const createBareOSCluster = async (data = {}, loadFromContext) => {
     'appCatalogEnabled',
   ]
   const body = pick(keysToPluck, data)
-
-  body.tags = keyValueArrToObj(data.tags)
 
   if (data.enableMetallb) {
     body.metallbCidr = data.metallbCidr
@@ -206,7 +200,10 @@ const createGenericCluster = async (body, data, loadFromContext) => {
 
   // This is currently supported by all cloud providers except GCP (which we
   // don't have yet anyways)
-  data.etcdBackup = getEtcdBackupPayload(data)
+  body.etcdBackup = getEtcdBackupPayload(data)
+
+  const tags = data.prometheusMonitoringEnabled ? [defaultMonitoringTag] : []
+  body.tags = keyValueArrToObj([tags].concat(data.tags))
 
   const createResponse = await qbert.createCluster(body)
   const uuid = createResponse.uuid

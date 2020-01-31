@@ -10,6 +10,7 @@ import { path } from 'ramda'
 import { ICluster, CloudProviders, CloudProvidersFriendlyName } from './model'
 import Theme from 'core/themes/model'
 import moment from 'moment'
+import { boolToFormattedText } from 'core/utils/renderHelpers'
 
 interface IClusterDetailFields {
   id: string
@@ -18,8 +19,6 @@ interface IClusterDetailFields {
   condition?: (cluster: ICluster) => boolean
   render?: (value: string | boolean) => string
 }
-
-const renderBooleanField = (value) => value ? 'Enabled' : 'Not Enabled'
 
 const getFieldsForCard = (fields: IClusterDetailFields[], cluster: ICluster) => {
   const fieldsToDisplay = {}
@@ -43,11 +42,11 @@ const clusterOverviewFields: IClusterDetailFields[] = [
   { id: 'containersCidr', title: 'Containers CIDR', required: true },
   { id: 'servicesCidr', title: 'Services CIDR', required: true },
   { id: 'endpoint', title: 'API Endpoint', required: true },
-  { id: 'allowWorkloadsOnMaster', title: 'Master + Worker', required: true, render: renderBooleanField },
-  { id: 'privileged', title: 'Privileged', required: true, render: renderBooleanField },
+  { id: 'allowWorkloadsOnMaster', title: 'Master + Worker', required: true, render: boolToFormattedText },
+  { id: 'privileged', title: 'Privileged', required: true, render: boolToFormattedText },
   { id: 'uuid', title: 'Unique ID', required: true },
   { id: 'dockerRoot', title: 'Docker Root Directory', required: true },
-  { id: 'etcdBackupEnabled', title: 'ETCD Backup', required: true, render: renderBooleanField },
+  { id: 'etcdBackupEnabled', title: 'ETCD Backup', required: true, render: boolToFormattedText },
   { id: 'etcdBackup.storageProperties.localPath', title: 'ETCD Backup Storage Path', required: false, condition: (cluster) => !!cluster.etcdBackupEnabled },
   { id: 'etcdBackup.intervalInMins', title: 'ETCD Backup Interval', required: false, condition: (cluster) => !!cluster.etcdBackupEnabled },
   { id: 'etcdDataDir', title: 'ETCD Data Directory', required: true },
@@ -61,7 +60,7 @@ const clusterOverviewFields: IClusterDetailFields[] = [
 // BareOS
 const bareOsNetworkingFields = [
   { id: 'networkPlugin', title: 'Network Backend', required: true },
-  { id: 'hasLoadBalancer', title: 'Load Balancer', required: false, render: renderBooleanField },
+  { id: 'hasLoadBalancer', title: 'Load Balancer', required: false, render: boolToFormattedText },
   { id: 'masterVipIface', title: 'Physical Network Interface', required: false },
   { id: 'masterVipIpv4', title: 'Virtual IP Address', required: false },
   { id: 'metallbCidr', title: 'MetalLB CIDR', required: false },
@@ -76,9 +75,9 @@ const awsCloudFields = [
   { id: 'cloudProperties.serviceFqdn', title: 'Service FQDN', required: true },
   { id: 'cloudProperties.ami', title: 'AMI', required: true },
   { id: 'cloudProperties.domainId', title: 'Domain Id', required: true },
-  { id: 'cloudProperties.isPrivate', title: 'Is Private', required: true, render: renderBooleanField },
-  { id: 'cloudProperties.usePf9Domain', title: 'Use Pf9 Domain', required: true, render: renderBooleanField },
-  { id: 'cloudProperties.internalElb', title: 'Internal ELB', required: true, render: renderBooleanField },
+  { id: 'cloudProperties.isPrivate', title: 'Is Private', required: true, render: boolToFormattedText },
+  { id: 'cloudProperties.usePf9Domain', title: 'Use Pf9 Domain', required: true, render: boolToFormattedText },
+  { id: 'cloudProperties.internalElb', title: 'Internal ELB', required: true, render: boolToFormattedText },
   { id: 'cloudProperties.azs', title: 'AZs', required: true },
 ]
 

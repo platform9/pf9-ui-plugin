@@ -23,6 +23,7 @@ import { makeStyles } from '@material-ui/styles'
 import { isAdminRole } from 'k8s/util/helpers'
 import { routes } from 'core/utils/routes'
 import CodeBlock from 'core/components/CodeBlock'
+import { boolToFormattedText } from 'core/utils/renderHelpers'
 
 const useStyles = makeStyles(theme => ({
   link: {
@@ -111,7 +112,7 @@ const renderClusterDetailLink = (name, cluster) =>
   <SimpleLink src={`/ui/kubernetes/infrastructure/clusters/${cluster.uuid}`}>{name}</SimpleLink>
 
 const renderBooleanField = (key) => (_, cluster) => (
-  <Typography variant="body2">{ cluster[key] ? 'Enabled' : 'Not Enabled' }</Typography>
+  <Typography variant="body2">{boolToFormattedText(!!cluster[key])}</Typography>
 )
 
 const renderCloudProvider = (_, { cloudProviderType, cloudProviderName }) => (
