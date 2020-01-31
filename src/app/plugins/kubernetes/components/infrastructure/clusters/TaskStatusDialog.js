@@ -114,7 +114,7 @@ const renderStatus = (_, { status }) => {
   }
 
   return (
-    <ClusterStatusSpan status={status} title={statusMap.get(status)}>
+    <ClusterStatusSpan iconStatus status={status} title={statusMap.get(status)}>
       {statusMap.get(status)}
     </ClusterStatusSpan>
   )
@@ -168,7 +168,7 @@ const HealthStatus = ({ healthStatus }) => {
   const fields = clusterHealthStatusFields[healthStatus]
 
   return (
-    <ClusterStatusSpan title={fields.label} status={fields.status}>
+    <ClusterStatusSpan iconStatus title={fields.label} status={fields.status}>
       {fields.label}
     </ClusterStatusSpan>
   )
@@ -176,7 +176,7 @@ const HealthStatus = ({ healthStatus }) => {
 
 const EmptyStatus = () =>
   <span style={{ visibility: 'hidden' }}>
-    <ClusterStatusSpan status="pause" title="pause" />
+    <ClusterStatusSpan iconStatus status="pause" title="pause" />
   </span>
 
 const healthStatusMessage = {
