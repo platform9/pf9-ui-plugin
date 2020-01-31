@@ -69,6 +69,11 @@ export const imageUrls = Object.freeze({
 })
 
 // k8s
+export const defaultMonitoringTag = Object.freeze({
+  key: 'pf9-system:monitoring',
+  value: 'true',
+})
+
 export const codeMirrorOptions = Object.freeze({
   mode: 'yaml',
 })

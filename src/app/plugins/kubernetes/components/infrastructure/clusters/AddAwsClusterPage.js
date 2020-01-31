@@ -21,7 +21,10 @@ import useParams from 'core/hooks/useParams'
 import useReactRouter from 'use-react-router'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import { pathJoin } from 'utils/misc'
-import { k8sPrefix, runtimePrivileged, awsNetworkingConfigurations, defaultEtcBackupPath } from 'app/constants'
+import {
+  k8sPrefix, runtimePrivileged, awsNetworkingConfigurations, defaultEtcBackupPath,
+  defaultMonitoringTag
+} from 'app/constants'
 import ExternalLink from 'core/components/ExternalLink'
 import Code from 'core/components/CodeBlock'
 import { CloudProviders } from './model'
@@ -70,6 +73,7 @@ const initialContext = {
   internalElb: false,
   etcdStoragePath: defaultEtcBackupPath,
   etcdBackupInterval: 1, // in minutes
+  tags: [defaultMonitoringTag],
 }
 
 const templateOptions = [

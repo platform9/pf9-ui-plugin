@@ -18,7 +18,7 @@ import ExternalLink from 'core/components/ExternalLink'
 import ClusterHostChooser, { excludeNodes, isConnected, isUnassignedNode } from './ClusterHostChooser'
 import { clusterActions } from '../actions'
 import { pathJoin } from 'utils/misc'
-import { k8sPrefix, runtimePrivileged, defaultEtcBackupPath, pmkCliOverview } from 'app/constants'
+import { k8sPrefix, runtimePrivileged, defaultEtcBackupPath, pmkCliOverview, defaultMonitoringTag } from 'app/constants'
 import { makeStyles } from '@material-ui/styles'
 import { masterNodeLengthValidator, requiredValidator } from 'core/utils/fieldValidators'
 import { allPass } from 'ramda'
@@ -31,8 +31,6 @@ import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
-const defaultMonitoringTagEnabled = { key: 'pf9-system:monitoring', value: 'true' }
-
 const initialContext = {
   containersCidr: '10.20.0.0/16',
   servicesCidr: '10.21.0.0/16',
@@ -41,7 +39,7 @@ const initialContext = {
   mtuSize: 1440,
   etcdStoragePath: defaultEtcBackupPath,
   etcdBackupInterval: 1,
-  tags: [defaultMonitoringTagEnabled]
+  tags: [defaultMonitoringTag]
 }
 
 const runtimeConfigOptions = [
