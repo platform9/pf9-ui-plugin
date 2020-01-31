@@ -140,7 +140,7 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef<HTMLElement, P
             {selectableNodes.length === 0 && (
               <TableRow>
                 <TableCell colSpan={5} align="center">
-                  <Typography variant="body1">Waiting... Connect Nodes Using the PR9 CLI</Typography>
+                  <Typography variant="body1">Waiting... Connect Nodes Using the PF9 CLI</Typography>
                 </TableCell>
               </TableRow>
             )}

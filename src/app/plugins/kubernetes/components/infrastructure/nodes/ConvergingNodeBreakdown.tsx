@@ -16,7 +16,6 @@ import Theme from 'core/themes/model'
 import { makeStyles } from '@material-ui/styles'
 import ExternalLink from 'core/components/ExternalLink'
 import { Tasks } from '../clusters/TaskStatusDialog'
-import Progress from 'core/components/progress/Progress'
 import pluck from 'ramda/es/pluck'
 import { emptyArr } from 'utils/fp'
 import { clusterActions } from '../clusters/actions'
@@ -154,82 +153,80 @@ export const ConvergingNodesWithTasksToggler: FC = () => {
   const selectedNodeTitle = `${selectedNode?.name || 'Choose a node to continue'}${selectedNode?.isMaster ? ' (master)' : ''}`
 
   return (
-    <Progress loading={loadingClusters}>
-      <div className={tableChooser}>
-        <div className={tablePolling}>
-          <PollingData loading={loadingNodes} onReload={handleReload} refreshDuration={oneSecond * 10} />
-        </div>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell padding="checkbox" />
-              <TableCell>Hostname & IP</TableCell>
-              <TableCell>Installation Status</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {nodesInCluster && nodesInCluster.map((node) => {
-              const lastFailedTask = node?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.last_failed_task || null
-              const allTasks = node?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.all_tasks || []
-              const completedTasks = node?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.completed_tasks || []
-              const percentComplete = (completedTasks.length / allTasks.length) * 100
-              const lastCompletedStep = allTasks[completedTasks.length - 1]
-              const { color: progressColor, message: progressLabel } = getTaskContent(allTasks, completedTasks, lastFailedTask, lastCompletedStep)
-              return (
-                <TableRow key={node.uuid} onClick={() => setSelectedNode(node)}>
-                  <TableCell padding="checkbox">
-                    <Radio checked={selectedNode && selectedNode.uuid === node.uuid} />
-                  </TableCell>
-                  <TableCell>
-                    <Tooltip title={node.name}>
-                      <span className={ellipsis}>{node.name}</span>
-                    </Tooltip>
-                    <span>({node.primaryIp})</span>
-                  </TableCell>
-                  <TableCell>
-                    <ProgressBar
-                      compact
-                      width={'100%'}
-                      percent={percentComplete}
-                      color={progressColor}
-                      label={
-                        <Tooltip title={progressLabel}>
-                          <span className={ellipsis}>{progressLabel}</span>
-                        </Tooltip>
-                      }
-                    />
-                  </TableCell>
-                </TableRow>
-              )
-            })}
-          </TableBody>
-        </Table>
-        <div className={divider} />
-        <Card className={renderPane}>
-          <header className={paneHeader}>
-            <div className={paneHeaderTitle}>
-              <Tooltip title={selectedNodeTitle || ''}>
-                <Typography variant="h6">
-                  {selectedNodeTitle}
-                </Typography>
-              </Tooltip>
-              { !!selectedNode && (
-                <ExternalLink url={selectedNode?.logs} icon="clipboard-list">
-                  View Logs
-                </ExternalLink>
-              )}
-            </div>
-            <div className={paneHeaderStatus}>
-              { !!selectedNode && renderNodeHealthStatus(null, selectedNode) }
-            </div>
-          </header>
-          <article className={paneBody}>
-            {selectedNode && (
-              <Tasks allTasks={selectedNodeAllTasks} lastFailedTask={lastSelectedNodesFailedTask} completedTasks={selectedNodeCompletedTasks} />
-            )}
-          </article>
-        </Card>
+    <div className={tableChooser}>
+      <div className={tablePolling}>
+        <PollingData loading={loadingNodes || loadingClusters} onReload={handleReload} refreshDuration={oneSecond * 10} />
       </div>
-    </Progress>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell padding="checkbox" />
+            <TableCell>Hostname & IP</TableCell>
+            <TableCell>Installation Status</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {nodesInCluster && nodesInCluster.map((node) => {
+            const lastFailedTask = node?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.last_failed_task || null
+            const allTasks = node?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.all_tasks || []
+            const completedTasks = node?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.completed_tasks || []
+            const percentComplete = (completedTasks.length / allTasks.length) * 100
+            const lastCompletedStep = allTasks[completedTasks.length - 1]
+            const { color: progressColor, message: progressLabel } = getTaskContent(allTasks, completedTasks, lastFailedTask, lastCompletedStep)
+            return (
+              <TableRow key={node.uuid} onClick={() => setSelectedNode(node)}>
+                <TableCell padding="checkbox">
+                  <Radio checked={selectedNode && selectedNode.uuid === node.uuid} />
+                </TableCell>
+                <TableCell>
+                  <Tooltip title={node.name}>
+                    <span className={ellipsis}>{node.name}</span>
+                  </Tooltip>
+                  <span>({node.primaryIp})</span>
+                </TableCell>
+                <TableCell>
+                  <ProgressBar
+                    compact
+                    width={'100%'}
+                    percent={percentComplete}
+                    color={progressColor}
+                    label={
+                      <Tooltip title={progressLabel}>
+                        <span className={ellipsis}>{progressLabel}</span>
+                      </Tooltip>
+                    }
+                  />
+                </TableCell>
+              </TableRow>
+            )
+          })}
+        </TableBody>
+      </Table>
+      <div className={divider} />
+      <Card className={renderPane}>
+        <header className={paneHeader}>
+          <div className={paneHeaderTitle}>
+            <Tooltip title={selectedNodeTitle || ''}>
+              <Typography variant="h6">
+                {selectedNodeTitle}
+              </Typography>
+            </Tooltip>
+            { !!selectedNode && (
+              <ExternalLink url={selectedNode?.logs} icon="clipboard-list">
+                View Logs
+              </ExternalLink>
+            )}
+          </div>
+          <div className={paneHeaderStatus}>
+            { !!selectedNode && renderNodeHealthStatus(null, selectedNode) }
+          </div>
+        </header>
+        <article className={paneBody}>
+          {selectedNode && (
+            <Tasks allTasks={selectedNodeAllTasks} lastFailedTask={lastSelectedNodesFailedTask} completedTasks={selectedNodeCompletedTasks} />
+          )}
+        </article>
+      </Card>
+    </div>
   )
 }

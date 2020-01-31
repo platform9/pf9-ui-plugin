@@ -69,7 +69,7 @@ class SemiCircleGraph extends React.PureComponent {
               <path className={classes.barProgress} fill="none"
                 d={describeArc(arcSize, arcSize, arcSize, 0, angle)} />
             </svg>
-            <Typography variant="h5" className={classes.percent}>
+            <Typography variant="h6" className={classes.percent}>
               {percentage}%
             </Typography>
             <Typography variant="caption" className={classes.label}>
