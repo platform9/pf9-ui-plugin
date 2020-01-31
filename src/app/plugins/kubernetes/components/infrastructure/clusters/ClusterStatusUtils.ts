@@ -32,6 +32,8 @@ interface HealthStatusAndMessage {
 const nodeStatusOkOrFailed = (node: Node): boolean => node.status === 'ok' || node.status === 'failed'
 
 export function getConnectionStatus (taskStatus: string, nodes: Node[]): ConnectionStatus | TransientStatus {
+  if (!nodes.length) return 'disconnected'
+
   if (isTransientStatus(taskStatus)) {
     return taskStatus as TransientStatus
   }

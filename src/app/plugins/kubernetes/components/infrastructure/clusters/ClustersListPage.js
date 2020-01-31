@@ -18,6 +18,7 @@ import { AppContext } from 'core/providers/AppProvider'
 import { both } from 'ramda'
 import PrometheusAddonDialog from 'k8s/components/prometheus/PrometheusAddonDialog'
 import ClusterUpgradeDialog from 'k8s/components/infrastructure/clusters/ClusterUpgradeDialog'
+import ClusterDeleteDialog from './ClusterDeleteDialog'
 import { Typography, Tooltip } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import { isAdminRole } from 'k8s/util/helpers'
@@ -180,6 +181,7 @@ export const options = {
   uniqueIdentifier: 'uuid',
   multiSelection: false,
   deleteCond: both(isAdmin, canDeleteCluster),
+  DeleteDialog: ClusterDeleteDialog,
   batchActions: [
     {
       icon: <SeeDetailsIcon />,
