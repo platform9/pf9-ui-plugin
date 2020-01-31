@@ -34,6 +34,22 @@ export const masterNodeLengthValidator = new FieldValidator(
   'You can only have 1, 3 or 5 master nodes',
 )
 
+export const minWorkerNodeValidator = moize(
+  min =>
+    new FieldValidator(
+      nodes => fieldIsUnset(nodes) || nodes.length >= min,
+      `You must select at least ${min} node.`,
+    ),
+)
+
+export const maxWorkerNodeValidator = moize(
+  max =>
+    new FieldValidator(
+      nodes => fieldIsUnset(nodes) || nodes.length <= max,
+      `Clusters can only be scaled up to ${max} nodes at a time.`
+    ),
+)
+
 export const namespaceValidator = new FieldValidator(
   (namespace) => fieldIsUnset(namespace) || /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/gi.test(namespace),
   "Namespace is invalid, alphanumeric characters and '-' only",

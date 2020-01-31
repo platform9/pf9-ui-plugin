@@ -1,5 +1,5 @@
 import { condLiteral, pathStrOrNull, pipe } from 'utils/fp'
-import { __, both, includes, T } from 'ramda'
+import { __, both, includes, isEmpty, T } from 'ramda'
 import { localizeRoles } from 'api-client/ResMgr'
 import moment from 'moment'
 
@@ -33,7 +33,7 @@ export const annotateCloudStack = (host) => {
 
 export const annotateResmgrFields = (host) => {
   const { resmgr } = host
-  if (!resmgr) return null
+  if (!resmgr) return {}
   return {
     ...host,
     id: resmgr.id,
@@ -52,7 +52,7 @@ export const annotateResmgrFields = (host) => {
 }
 
 export const annotateUiState = (host) => {
-  if (!host) return null
+  if (!host) return {}
   const { resmgr } = host
 
   /* TODO:
@@ -73,11 +73,8 @@ export const annotateUiState = (host) => {
    *
    * This section should be flagged for further review.
    */
-  const { roles, roleStatus, responding, warnings } = host
-  if (
-    (roles && roles.length === 0) ||
-    ((roles && roles.length === 0) === 1 && roles.includes('pf9-support'))
-  ) {
+  const { roles = [], roleStatus, responding, warnings } = host
+  if (isEmpty(roles) || (roles.length === 1 && roles.includes('pf9-support'))) {
     host.uiState = 'unauthorized'
   }
 
