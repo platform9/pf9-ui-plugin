@@ -1,5 +1,5 @@
 import React from 'react'
-import { Card, CardHeader, CardContent } from '@material-ui/core'
+import { Card, CardHeader, CardContent, Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import PropTypes from 'prop-types'
 
@@ -39,9 +39,9 @@ const useStyles = makeStyles(theme => ({
 const HeaderContent = ({ title, image }) => {
   const { headerContent, headerImg } = useStyles({ image })
   return <div className={headerContent}>
-    <div>
+    <Typography variant="h6">
       {title}
-    </div>
+    </Typography>
     {image && <div className={headerImg}>
       {typeof image === 'string' ? <img alt="" src={image} /> : image}
     </div>}
