@@ -136,7 +136,7 @@ export const ConvergingNodesWithTasksToggler: FC = () => {
   const handleReload = useCallback((ignoreCache) => {
     reloadClusters(ignoreCache)
     return reloadNodes(ignoreCache)
-  }, [])
+  }, [reloadClusters, reloadNodes])
 
   const { ellipsis, renderPane, divider, paneHeader, paneBody, tableChooser, tablePolling } = useStyles({})
   const selectedNodeAllTasks = selectedNode?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.all_tasks || []
