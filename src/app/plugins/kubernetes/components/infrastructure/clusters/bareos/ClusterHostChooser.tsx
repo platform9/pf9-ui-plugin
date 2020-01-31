@@ -113,8 +113,8 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef<HTMLElement, P
       const newHosts = isSelected(uuid)
         ? value.filter((x) => x !== uuid)
         : multiple
-        ? [...value, uuid]
-        : [uuid]
+          ? [...value, uuid]
+          : [uuid]
       onChange(newHosts)
     }
 
