@@ -73,7 +73,7 @@ const initialContext = {
 
 const templateOptions = [
   { label: 'small - 1 node master + worker (Standard_A1_v2)', value: 'small' },
-    { label: 'medium - 1 master + 3 workers (Standard_A2_v2)', value: 'medium' },
+  { label: 'medium - 1 master + 3 workers (Standard_A2_v2)', value: 'medium' },
   { label: 'large - 3 masters + 5 workers (Standard_A4_v2)', value: 'large' },
   { label: 'custom', value: 'custom' },
 ]
