@@ -35,7 +35,7 @@ const HelpPage = () => {
       </Typography>
       <Typography variant="subtitle1" className={classes.text}>
         Reference the PMK documentation at
-        &nbsp;<ExternalLink url="https://docs.platform9.com/kubernetes/overview/">https://docs.platform9.com/kubernetes/overview/</ExternalLink>
+        &nbsp;<ExternalLink url="https://docs.platform9.com/kubernetes/introduction/overview">https://docs.platform9.com/kubernetes/overview/</ExternalLink>
       </Typography>
 
       <Typography variant="h5">Support</Typography>
