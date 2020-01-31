@@ -169,7 +169,8 @@ const renderRole = (_, { isMaster }) => isMaster ? 'Master' : 'Worker'
 
 const renderApiServer = (_, { isMaster, api_responding: apiResponding }) => !!isMaster && (!!apiResponding).toString()
 
-export const renderNetworkInterfaces = (_, node, { wrapText = false }) => {
+export const renderNetworkInterfaces = (_, node, options = {}) => {
+  const { wrapText = false } = options
   const primaryNetwork = pathStrOr(node.primaryIp, 'combined.qbert.primaryIp', node)
   const networkInterfaces = pathStrOr({}, 'combined.networkInterfaces', node)
   const orderedInterfaces = orderInterfaces(networkInterfaces, primaryNetwork)
