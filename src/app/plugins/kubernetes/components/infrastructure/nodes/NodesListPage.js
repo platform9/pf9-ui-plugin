@@ -146,7 +146,7 @@ const renderConnectionStatus = (_, { status, combined }) => {
   )
 }
 
-const renderHealthStatus = (_, node, onClick) => {
+export const renderNodeHealthStatus = (_, node, onClick = undefined) => {
   const { status } = node
   if (status === 'converging') {
     return renderConverging()
@@ -192,7 +192,7 @@ const renderUUID = (_, { uuid }) => {
 export const columns = [
   { id: 'name', label: 'Name', render: renderNodeDetailLink },
   { id: 'connectionStatus', label: 'Connection status', render: renderConnectionStatus },
-  { id: 'healthStatus', label: 'Health status', render: renderHealthStatus },
+  { id: 'healthStatus', label: 'Health status', render: renderNodeHealthStatus },
   { id: 'api_responding', label: 'API server', render: renderApiServer },
   { id: 'logs', label: 'Logs', render: renderLogs },
   { id: 'primaryIp', label: 'Network Interfaces', render: renderNetworkInterfaces },
