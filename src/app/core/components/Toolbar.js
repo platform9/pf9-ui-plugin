@@ -6,7 +6,7 @@ import UserMenu from 'core/components/UserMenu'
 import MaterialToolbar from '@material-ui/core/Toolbar/Toolbar'
 import { AppBar } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
-import NotificationsPopover from 'core/components/notificationsPopover/NotificationsPopover'
+import NotificationsPopover from 'core/components/notifications/NotificationsPopover'
 import HelpContainer from 'core/components/HelpContainer'
 import { helpUrl } from 'app/constants'
 

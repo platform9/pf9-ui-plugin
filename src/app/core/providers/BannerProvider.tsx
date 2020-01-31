@@ -1,65 +1,22 @@
-import React, {
-  FC,
-  useReducer,
-  useCallback,
-  Reducer,
-  useContext,
-  createContext
-} from 'react'
-import uuid from 'uuid'
-import { append, takeLast, reject, whereEq } from 'ramda'
-import { except, pipe } from 'utils/fp'
-import { MessageTypes, MessageOptions } from 'core/components/toasts/model'
-// import BannerContainer from 'core/components/toasts/BannerContainer'
+import React, { createContext, FC, useState } from 'react'
 
-const concurrentBanners = 5
-
-interface BannerReducerAction {
-  type: 'add' | 'remove'
-  payload: MessageOptions
+interface BannerContextType {
+  bannerContainer: HTMLDivElement
+  setBannerContainer: (container: HTMLDivElement) => void
 }
 
-const bannerReducer: Reducer<MessageOptions[], BannerReducerAction> = (state, { type, payload }) => {
-  switch (type) {
-    case 'add':
-      return pipe(
-        takeLast(concurrentBanners - 1),
-        // Remove previous duplicated messages to prevent flooding the screen
-        reject(whereEq({
-          text: payload.text,
-          variant: payload.variant,
-        })),
-        append(payload)
-      )(state)
-    case 'remove':
-      return except(payload, state)
-    default:
-      return state
+export const BannerContext = createContext<BannerContextType>({
+  bannerContainer: null,
+  setBannerContainer: container => {
+    console.error('BannerContainer not found')
   }
-}
-
-type ShowBannerFn = (text: string, type?: MessageTypes, dismissable?: boolean) => void
-
-const BannerContext = createContext<ShowBannerFn>(null)
+})
 
 const BannerProvider: FC = ({ children }) => {
-  const [banners, dispatch] = useReducer(bannerReducer, [])
-  console.log(banners)
-  const showBanner: ShowBannerFn = useCallback((text, variant = MessageTypes.info, dismissable = true) => {
-    const payload = {
-      id: uuid.v4(),
-      text,
-      variant,
-      dismissable,
-      isOpen: true,
-      onClose: () => dispatch({ type: 'remove', payload })
-    }
-    dispatch({ type: 'add', payload })
-  }, [])
+  const [bannerContainer, setBannerContainer] = useState(null)
 
   return (
-    <BannerContext.Provider value={showBanner}>
-      {/* <BannerContainer banners={banners} /> */}
+    <BannerContext.Provider value={{ bannerContainer, setBannerContainer }}>
       {children}
     </BannerContext.Provider>
   )
@@ -69,9 +26,5 @@ export default BannerProvider
 
 export const withBanner = Component => props =>
   <BannerContext.Consumer>
-    {showBanner => <Component {...props} showBanner={showBanner} />}
+    {bannerContainer => <Component {...props} bannerContainer={bannerContainer} />}
   </BannerContext.Consumer>
-
-export const useBanner: () => ShowBannerFn = () => {
-  return useContext(BannerContext)
-}

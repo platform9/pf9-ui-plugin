@@ -1,3 +1,4 @@
+import { ReactNode } from 'react'
 
 export enum MessageTypes {
   success = 'success',
@@ -11,5 +12,12 @@ export interface MessageOptions {
   text: string
   variant: MessageTypes
   isOpen: boolean
+  onClose: () => void
+}
+
+export interface BannerContentOptions {
+  id: string
+  content: ReactNode
+  dismissable: boolean
   onClose: () => void
 }
