@@ -1,3 +1,5 @@
+import { ICombinedNode } from '../nodes/model'
+
 export type HealthStatus = 'healthy' | 'partially_healthy' | 'unhealthy' | 'unknown'
 
 export interface ICluster {
@@ -18,12 +20,12 @@ export interface ICluster {
   flannelPublicIfaceLabel: string
   dockerRoot: string
   etcdDataDir: string
-  lastOp: null
+  lastOp: string | null
   lastOk: null
   keystoneEnabled: number
   authzEnabled: number
   taskStatus: string
-  taskError: string
+  taskError: string | null
   numMasters: number
   numWorkers: number
   privileged: boolean
@@ -45,6 +47,10 @@ export interface ICluster {
   enableCAS: number
   numMinWorkers: number
   numMaxWorkers: number
+  etcdHeartbeatIntervalMs: string
+  etcdElectionTimeoutMs: string
+  masterStatus: string
+  workerStatus: string
   nodePoolUuid: string
   nodePoolName: string
   cloudProviderUuid: string
@@ -52,16 +58,17 @@ export interface ICluster {
   cloudProviderType: CloudProviders
   cloudProperties: CloudProperties
   tags: Tags
+  etcdBackup: EtcdBackup
   endpoint: string
   kubeconfigUrl: string
   isUpgrading: boolean
-  nodes: any[]
+  nodes: ICombinedNode[]
   usage: Usage
   version: string
-  masterNodes: any[]
+  masterNodes: ICombinedNode[]
+  workerNodes: ICombinedNode[]
   progressPercent: null
   healthyMasterNodes: any[]
-  workerNodes: any[]
   healthyWorkerNodes: any[]
   masterNodesHealthStatus: HealthStatus
   workerNodesHealthStatus: HealthStatus
@@ -72,6 +79,7 @@ export interface ICluster {
   links: Links
   hasVpn: boolean
   hasLoadBalancer: boolean
+  etcdBackupEnabled: boolean
 }
 
 export enum CloudProviders {
@@ -79,10 +87,15 @@ export enum CloudProviders {
   Azure = 'azure',
   BareOS = 'local',
 }
+export enum CloudProvidersFriendlyName {
+  aws = 'AWS',
+  azure = 'Azure',
+  local = 'BareOS',
+}
 
-type CloudProperties = AzureCloudProperties | AwsCloudProperties
+type CloudProperties = AzureCloudProperties | AwsCloudProperties | BareOSCloudProperties
 
-export interface AzureCloudProperties {
+interface AzureCloudProperties {
   location: string
   zones: string
   masterSku: string
@@ -91,7 +104,7 @@ export interface AzureCloudProperties {
   sshKey: string
 }
 
-export interface AwsCloudProperties {
+interface AwsCloudProperties {
   region: string
   masterFlavor: string
   workerFlavor: string
@@ -108,24 +121,37 @@ export interface AwsCloudProperties {
   spotPrice: string
 }
 
-export interface Links {
+interface BareOSCloudProperties {
+  masterNodes: string
+  statusOfMasters: string
+  statusOfWorkers: string
+}
+
+interface EtcdBackup {
+  storageProperties: EtcdBackupStorageProperties
+  intervalInMins: string
+}
+interface EtcdBackupStorageProperties {
+  localPath: string
+}
+interface Links {
   dashboard: null
   kubeconfig: null
   cli: null
 }
 
-export interface Tags {
+interface Tags {
   [key: string]: string
 }
 
-export interface Usage {
+interface Usage {
   compute: Metric
   memory: Metric
   disk: Metric
   grafanaLink?: string
 }
 
-export interface Metric {
+interface Metric {
   current: number
   max: number
   percent: number

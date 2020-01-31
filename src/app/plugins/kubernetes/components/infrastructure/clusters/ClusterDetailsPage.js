@@ -19,6 +19,8 @@ import { ConvergingNodesWithTasksToggler } from '../nodes/ConvergingNodeBreakdow
 import { routes } from 'core/utils/routes'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import PollingData from 'core/components/PollingData'
+import DownloadKubeConfigLink from './DownloadKubeConfigLink'
+import ExternalLink from 'core/components/ExternalLink'
 
 const oneSecond = 1000
 
@@ -53,11 +55,18 @@ const useStyles = makeStyles((theme) => ({
     }
   },
   headerCardContainer: {
-    minWidth: 300,
-    minHeight: 150,
+    minWidth: 320,
+    minHeight: 175,
     display: 'grid',
-    gridTemplateRows: '66px 1fr 1px',
-    padding: theme.spacing(2, 0, 1.5, 0),
+    gridTemplateRows: ({ hasLinks }) => (`58px 1fr 2px ${hasLinks ? 46 : 12}px`),
+    paddingTop: theme.spacing(),
+  },
+  harderCardFooter: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    paddingTop: 4,
   },
   headerCardBody: {
     display: 'block',
@@ -66,7 +75,7 @@ const useStyles = makeStyles((theme) => ({
   headerCardHeader: {
     margin: theme.spacing(0, 2),
     display: 'grid',
-    gridTemplateColumns: '1fr 45px',
+    gridTemplateColumns: '1fr 38px',
     gridTemplateAreas: `
       "header icon"
       "cluster cluster"
@@ -79,7 +88,7 @@ const useStyles = makeStyles((theme) => ({
     },
     '& p': {
       gridArea: 'cluster',
-      margin: '6px 0 6px 8px',
+      margin: '4px 0 0px 8px',
       fontSize: theme.spacing(2),
       color: theme.palette.text.secondary,
     }
@@ -87,11 +96,21 @@ const useStyles = makeStyles((theme) => ({
   headerIcon: {
     color: theme.palette.text.secondary,
     gridArea: 'icon',
-    fontSize: '36px',
+    fontSize: '30px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
   },
+  verticalLink: {
+    display: 'flex',
+    alignItems: 'center',
+    flexDirection: 'column',
+    fontSize: '12px',
+    '& i': {
+      marginBottom: theme.spacing(0.5),
+      fontSize: theme.spacing(3),
+    }
+  }
 }))
 
 const ClusterDetailsPage = () => {
@@ -129,13 +148,17 @@ const ClusterDetailsPage = () => {
 export default ClusterDetailsPage
 
 const ClusterStatusAndUsage = ({ cluster, loading }) => {
-  const { usage = emptyObj, name } = cluster
+  const { usage = emptyObj, name, links = emptyObj } = cluster
   const classes = useStyles()
+  const clusterLinks = {
+    grafana: usage.grafanaLink,
+    ...links,
+  }
   return (
     <Grid container className={classes.statsContainer}>
       <Grid item xs={4}>
         <div className={classes.statusItems}>
-          <HeaderCard title="Cluster" subtitle={name} icon="project-diagram">
+          <HeaderCard title="Cluster" subtitle={name} icon="project-diagram" links={clusterLinks}>
             <ClusterConnectionStatus cluster={cluster} variant="header" message={loading ? 'loading' : undefined} />
             <ClusterHealthStatus cluster={cluster} variant="header" message={loading ? 'loading' : undefined} />
           </HeaderCard>
@@ -152,8 +175,9 @@ const ClusterStatusAndUsage = ({ cluster, loading }) => {
   )
 }
 
-const HeaderCard = ({ title, subtitle, icon, loading=false, children }) => {
-  const classes = useStyles()
+const HeaderCard = ({ title, subtitle, icon, loading=false, links, children }) => {
+  const hasLinks = !!links.grafana || !!links.dashboard || !!links.kubeconfig
+  const classes = useStyles({ hasLinks })
   return (
     <Card className={classes.headerCardContainer}>
       <header className={classes.headerCardHeader}>
@@ -165,6 +189,11 @@ const HeaderCard = ({ title, subtitle, icon, loading=false, children }) => {
         {children}
       </div>
       <hr className={classes.cardBoarder} />
+      <footer className={classes.harderCardFooter}>
+        { !!links.grafana && <ExternalLink icon="chart-line" className={classes.verticalLink} url={links.grafana}>Grafana</ExternalLink> }
+        { !!links.dashboard && <ExternalLink icon="tachometer" className={classes.verticalLink} url={links.dashboard}>Dashboard</ExternalLink> }
+        { !!links.kubeconfig && <DownloadKubeConfigLink icon="cogs" className={classes.verticalLink} cluster={links.kubeconfig.cluster} /> }
+      </footer>
     </Card>
   )
 }

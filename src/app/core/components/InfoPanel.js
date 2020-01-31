@@ -22,7 +22,7 @@ const cast = x => {
 }
 const InfoPanel = withStyles(styles)(({ classes, items, title }) => (
   <Card>
-    <CardHeader title={title} />
+    <CardHeader title={title} titleTypographyProps={{ variant: 'h6' }} />
     <Divider />
     <CardContent>
       <div className={classes.root}>

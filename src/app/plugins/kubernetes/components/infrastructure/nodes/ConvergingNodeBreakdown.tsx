@@ -122,7 +122,7 @@ export const ConvergingNodesWithTasksToggler: FC = () => {
   const cluster = clusters.find((cluster) => cluster.uuid === match.params.id)
   const nodesInCluster = useMemo(() => {
     if (cluster) {
-      const clusterNodesUids = pluck<any, any[]>('uuid', cluster.nodes)
+      const clusterNodesUids = pluck<'uuid', ICombinedNode>('uuid', cluster.nodes)
       const filteredNodes = nodes.filter((node) => clusterNodesUids.includes(node.uuid)).sort(sortNodesByTasks)
       if (!selectedNode) {
         const nodeToSelect = linkedNodeUUID ? filteredNodes.find(node => node.uuid === linkedNodeUUID) : filteredNodes[0]

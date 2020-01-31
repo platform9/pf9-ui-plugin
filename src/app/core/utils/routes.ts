@@ -8,7 +8,7 @@ type OptionalGenericKVP = GenericKVP | null | void
 type OptionalParamType<T extends OptionalGenericKVP> = T extends null ? void | GenericKVP : T & GenericKVP
 type RouterPathFn<T extends OptionalGenericKVP> = (params: OptionalParamType<T>) => string
 
-class Route<T extends OptionalGenericKVP = null> {
+export class Route<T extends OptionalGenericKVP = null> {
   constructor (public url: string) {}
 
   public path: RouterPathFn<T> = (params: OptionalParamType<T>) => {
