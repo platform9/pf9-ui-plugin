@@ -25,6 +25,7 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import PollingData from 'core/components/PollingData'
 import { IUseDataLoader, ICombinedNode } from './model'
 import { ICluster } from '../clusters/model'
+import { renderNodeHealthStatus } from './NodesListPage'
 
 const useStyles = makeStyles<Theme, {}>((theme) => ({
   gridContainer: {
@@ -54,11 +55,19 @@ const useStyles = makeStyles<Theme, {}>((theme) => ({
   flex: {
     display: 'flex',
   },
-  paneHeader: {
-    padding: theme.spacing(2),
+  paneHeaderStatus: {
+    paddingLeft: theme.spacing(3),
+  },
+  paneHeaderTitle: {
+    padding: theme.spacing(2, 2, 0.5, 2),
     display: 'grid',
     gridGap: theme.spacing(2),
     gridTemplateColumns: '1fr 100px',
+    alignItems: 'center',
+  },
+  paneHeader: {
+    display: 'grid',
+    gridTemplateRows: '1fr 24px',
     alignItems: 'center',
   },
   paneBody: {
@@ -133,7 +142,7 @@ export const ConvergingNodesWithTasksToggler: FC = () => {
     return emptyArr
   }, [cluster, nodes, selectedNode])
 
-  const { ellipsis, renderPane, divider, paneHeader, paneBody, tableChooser, tablePolling } = useStyles({})
+  const { ellipsis, renderPane, divider, paneHeader, paneHeaderTitle, paneHeaderStatus, paneBody, tableChooser, tablePolling } = useStyles({})
   const selectedNodeAllTasks = selectedNode?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.all_tasks || []
   const selectedNodeCompletedTasks = selectedNode?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.completed_tasks || []
   const lastSelectedNodesFailedTask = selectedNode?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.last_failed_task || []
@@ -193,16 +202,21 @@ export const ConvergingNodesWithTasksToggler: FC = () => {
         <div className={divider} />
         <Card className={renderPane}>
           <header className={paneHeader}>
-            <Tooltip title={selectedNodeTitle || ''}>
-              <Typography variant="h6">
-                {selectedNodeTitle}
-              </Typography>
-            </Tooltip>
-            { !!selectedNode && (
-              <ExternalLink url={selectedNode?.logs} icon="clipboard-list">
-                View Logs
-              </ExternalLink>
-            )}
+            <div className={paneHeaderTitle}>
+              <Tooltip title={selectedNodeTitle || ''}>
+                <Typography variant="h6">
+                  {selectedNodeTitle}
+                </Typography>
+              </Tooltip>
+              { !!selectedNode && (
+                <ExternalLink url={selectedNode?.logs} icon="clipboard-list">
+                  View Logs
+                </ExternalLink>
+              )}
+            </div>
+            <div className={paneHeaderStatus}>
+              { !!selectedNode && renderNodeHealthStatus(null, selectedNode) }
+            </div>
           </header>
           <article className={paneBody}>
             {selectedNode && (

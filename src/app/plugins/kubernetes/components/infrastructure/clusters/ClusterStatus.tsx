@@ -2,7 +2,6 @@ import { Tooltip, Typography } from '@material-ui/core'
 import clsx from 'clsx'
 import React, { FC } from 'react'
 import { makeStyles } from '@material-ui/styles'
-import PropTypes from 'prop-types'
 import SimpleLink from 'core/components/SimpleLink'
 
 import {
@@ -77,12 +76,6 @@ const ClusterStatusSpan: FC<Props> = props => {
   </div>
 }
 
-ClusterStatusSpan.propTypes = {
-  label: PropTypes.string,
-  title: PropTypes.string,
-  status: PropTypes.oneOf(['ok', 'fail', 'pause', 'loading', 'error', 'unknown'])
-}
-
 export default ClusterStatusSpan
 
 const renderErrorStatus = (taskError, nodesDetailsUrl, variant) => (
@@ -91,7 +84,7 @@ const renderErrorStatus = (taskError, nodesDetailsUrl, variant) => (
     status='error'
     variant={variant}
   >
-    <SimpleLink src={nodesDetailsUrl}>Error</SimpleLink>
+    <SimpleLink variant="error" src={nodesDetailsUrl}>Error</SimpleLink>
   </ClusterStatusSpan>
 )
 
