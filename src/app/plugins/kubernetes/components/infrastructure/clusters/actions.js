@@ -153,7 +153,6 @@ const createBareOSCluster = async (data = {}, loadFromContext) => {
     'mtuSize',
     'privileged',
     'appCatalogEnabled',
-    // 'tags',
   ]
   const body = pick(keysToPluck, data)
 
