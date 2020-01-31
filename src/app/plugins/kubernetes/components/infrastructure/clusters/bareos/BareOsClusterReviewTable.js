@@ -5,7 +5,7 @@ import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
 import useDataLoader from 'core/hooks/useDataLoader'
 import CodeBlock from 'core/components/CodeBlock'
 import { makeStyles } from '@material-ui/styles'
-import { boolToFormattedText } from 'core/utils/renderHelpers'
+import { castBoolToStr } from 'utils/misc'
 
 const useStyles = makeStyles(theme => ({
   cell: {
@@ -49,14 +49,14 @@ const BareOsClusterReviewTable = ({ data }) => {
           label="Physical interface for virtual IP association"
           value={data.masterVipIface}
         />
-        <DataRow label="MetalLB" value={boolToFormattedText(data.enableMetallb)} />
+        <DataRow label="MetalLB" value={castBoolToStr()(data.enableMetallb)} />
         {data.enableMetalLb && <DataRow label="MetalLB CIDR" value={data.metalLbCidr} />}
         <DataRow label="API FQDN" value={data.externalDnsName} />
         <DataRow label="Containers CIDR" value={data.containersCidr} />
         <DataRow label="Services CIDR" value={data.servicesCidr} />
-        <DataRow label="Privileged" value={boolToFormattedText(data.privileged)} />
-        <DataRow label="Application catalog" value={boolToFormattedText(data.appCatalogEnabled)} />
-        <DataRow label="Prometheus monitoring" value={boolToFormattedText(data.prometheusMonitoringEnabled)} />
+        <DataRow label="Privileged" value={castBoolToStr()(data.privileged)} />
+        <DataRow label="Application catalog" value={castBoolToStr()(data.appCatalogEnabled)} />
+        <DataRow label="Prometheus monitoring" value={castBoolToStr()(data.prometheusMonitoringEnabled)} />
         <DataRow label="Tags" value={<CodeBlock>{JSON.stringify(data.tags || [], null, 2)}</CodeBlock>} />
       </TableBody>
     </Table>

@@ -10,7 +10,7 @@ import { path } from 'ramda'
 import { ICluster, CloudProviders, CloudProvidersFriendlyName } from './model'
 import Theme from 'core/themes/model'
 import moment from 'moment'
-import { boolToFormattedText } from 'core/utils/renderHelpers'
+import { castBoolToStr } from 'utils/misc'
 
 interface IClusterDetailFields {
   id: string
@@ -42,11 +42,11 @@ const clusterOverviewFields: IClusterDetailFields[] = [
   { id: 'containersCidr', title: 'Containers CIDR', required: true },
   { id: 'servicesCidr', title: 'Services CIDR', required: true },
   { id: 'endpoint', title: 'API Endpoint', required: true },
-  { id: 'allowWorkloadsOnMaster', title: 'Master + Worker', required: true, render: boolToFormattedText },
-  { id: 'privileged', title: 'Privileged', required: true, render: boolToFormattedText },
+  { id: 'allowWorkloadsOnMaster', title: 'Master + Worker', required: true, render: castBoolToStr() },
+  { id: 'privileged', title: 'Privileged', required: true, render: castBoolToStr() },
   { id: 'uuid', title: 'Unique ID', required: true },
   { id: 'dockerRoot', title: 'Docker Root Directory', required: true },
-  { id: 'etcdBackupEnabled', title: 'ETCD Backup', required: true, render: boolToFormattedText },
+  { id: 'etcdBackupEnabled', title: 'ETCD Backup', required: true, render: castBoolToStr() },
   { id: 'etcdBackup.storageProperties.localPath', title: 'ETCD Backup Storage Path', required: false, condition: (cluster) => !!cluster.etcdBackupEnabled },
   { id: 'etcdBackup.intervalInMins', title: 'ETCD Backup Interval', required: false, condition: (cluster) => !!cluster.etcdBackupEnabled },
   { id: 'etcdDataDir', title: 'ETCD Data Directory', required: true },
@@ -60,7 +60,7 @@ const clusterOverviewFields: IClusterDetailFields[] = [
 // BareOS
 const bareOsNetworkingFields = [
   { id: 'networkPlugin', title: 'Network Backend', required: true },
-  { id: 'hasLoadBalancer', title: 'Load Balancer', required: false, render: boolToFormattedText },
+  { id: 'hasLoadBalancer', title: 'Load Balancer', required: false, render: castBoolToStr() },
   { id: 'masterVipIface', title: 'Physical Network Interface', required: false },
   { id: 'masterVipIpv4', title: 'Virtual IP Address', required: false },
   { id: 'metallbCidr', title: 'MetalLB CIDR', required: false },
@@ -75,9 +75,9 @@ const awsCloudFields = [
   { id: 'cloudProperties.serviceFqdn', title: 'Service FQDN', required: true },
   { id: 'cloudProperties.ami', title: 'AMI', required: true },
   { id: 'cloudProperties.domainId', title: 'Domain Id', required: true },
-  { id: 'cloudProperties.isPrivate', title: 'Is Private', required: true, render: boolToFormattedText },
-  { id: 'cloudProperties.usePf9Domain', title: 'Use Pf9 Domain', required: true, render: boolToFormattedText },
-  { id: 'cloudProperties.internalElb', title: 'Internal ELB', required: true, render: boolToFormattedText },
+  { id: 'cloudProperties.isPrivate', title: 'Is Private', required: true, render: castBoolToStr() },
+  { id: 'cloudProperties.usePf9Domain', title: 'Use Pf9 Domain', required: true, render: castBoolToStr() },
+  { id: 'cloudProperties.internalElb', title: 'Internal ELB', required: true, render: castBoolToStr() },
   { id: 'cloudProperties.azs', title: 'AZs', required: true },
 ]
 

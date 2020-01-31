@@ -9,7 +9,7 @@ import SeeDetailsIcon from '@material-ui/icons/Subject'
 import InsertChartIcon from '@material-ui/icons/InsertChart'
 import { clustersCacheKey } from '../common/actions'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { capitalizeString } from 'utils/misc'
+import { capitalizeString, castBoolToStr } from 'utils/misc'
 import { ClusterConnectionStatus, ClusterHealthStatus } from 'k8s/components/infrastructure/clusters/ClusterStatus'
 import ResourceUsageTable from 'k8s/components/infrastructure/common/ResourceUsageTable'
 import DashboardLink from './DashboardLink'
@@ -23,7 +23,6 @@ import { makeStyles } from '@material-ui/styles'
 import { isAdminRole } from 'k8s/util/helpers'
 import { routes } from 'core/utils/routes'
 import CodeBlock from 'core/components/CodeBlock'
-import { boolToFormattedText } from 'core/utils/renderHelpers'
 
 const useStyles = makeStyles(theme => ({
   link: {
@@ -112,7 +111,7 @@ const renderClusterDetailLink = (name, cluster) =>
   <SimpleLink src={`/ui/kubernetes/infrastructure/clusters/${cluster.uuid}`}>{name}</SimpleLink>
 
 const renderBooleanField = (key) => (_, cluster) => (
-  <Typography variant="body2">{boolToFormattedText(!!cluster[key])}</Typography>
+  <Typography variant="body2">{castBoolToStr()(!!cluster[key])}</Typography>
 )
 
 const renderCloudProvider = (_, { cloudProviderType, cloudProviderName }) => (

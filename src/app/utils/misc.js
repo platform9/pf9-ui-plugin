@@ -72,7 +72,7 @@ export const castFuzzyBool = value => {
 
 export const columnPathLookup = _path => (_, row) => path(_path.split('.'), row)
 
-export const castBoolToStr = (t = 'yes', f = 'no') => value => value ? t : f
+export const castBoolToStr = (t = 'Enabled', f = 'Not Enabled') => value => value ? t : f
 
 export const tryJsonParse = moize(val => typeof val === 'string' ? JSON.parse(val) : val)
 
