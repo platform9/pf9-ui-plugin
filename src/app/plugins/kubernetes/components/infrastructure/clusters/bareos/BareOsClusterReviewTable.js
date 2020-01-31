@@ -3,19 +3,29 @@ import { Table, TableBody, TableCell, TableRow, Typography } from '@material-ui/
 
 import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
 import useDataLoader from 'core/hooks/useDataLoader'
+import CodeBlock from 'core/components/CodeBlock'
+import { makeStyles } from '@material-ui/styles'
+import { castBoolToStr } from 'utils/misc'
 
-const DataRow = ({ label, value }) => (
-  <TableRow>
-    <TableCell>{label}</TableCell>
-    <TableCell>
-      {Array.isArray(value)
-        ? value.map((val) => <Typography variant="body2">{val}</Typography>)
-        : value}
-    </TableCell>
-  </TableRow>
-)
+const useStyles = makeStyles(theme => ({
+  cell: {
+    paddingRight: [theme.spacing(0.5), '!important'],
+  },
+}))
 
-const bool2str = (value) => (value ? 'true' : 'false')
+const DataRow = ({ label, value }) => {
+  const classes = useStyles()
+  return (
+    <TableRow>
+      <TableCell>{label}</TableCell>
+      <TableCell className={classes.cell}>
+        {Array.isArray(value)
+          ? value.map((val, idx) => <Typography key={idx} variant="body2">{val}</Typography>)
+          : value}
+      </TableCell>
+    </TableRow>
+  )
+}
 
 const getFilteredNodesFormattedName = (nodes, filterList = []) =>
   nodes
@@ -32,21 +42,22 @@ const BareOsClusterReviewTable = ({ data }) => {
     <Table>
       <TableBody>
         <DataRow label="Name" value={data.name} />
-        <DataRow label="Master nodes" value={masterNodes} />
+        <DataRow label={`Master${data.allowWorkloadsOnMaster ? ' + Worker' : ''} nodes`} value={masterNodes} />
         <DataRow label="Worker nodes" value={workerNodes} />
         <DataRow label="Virtual IP address for cluster" value={data.masterVipIpv4} />
         <DataRow
           label="Physical interface for virtual IP association"
           value={data.masterVipIface}
         />
-        <DataRow label="Enable MetalLB" value={bool2str(data.enableMetallb)} />
+        <DataRow label="MetalLB" value={castBoolToStr()(data.enableMetallb)} />
         {data.enableMetalLb && <DataRow label="MetalLB CIDR" value={data.metalLbCidr} />}
         <DataRow label="API FQDN" value={data.externalDnsName} />
         <DataRow label="Containers CIDR" value={data.containersCidr} />
         <DataRow label="Services CIDR" value={data.servicesCidr} />
-        <DataRow label="Privileged" value={bool2str(data.privileged)} />
-        <DataRow label="Enable application catalog" value={bool2str(data.appCatalogEnabled)} />
-        <DataRow label="Tags" value={JSON.stringify(data.tags || [])} />
+        <DataRow label="Privileged" value={castBoolToStr()(data.privileged)} />
+        <DataRow label="Application catalog" value={castBoolToStr()(data.appCatalogEnabled)} />
+        <DataRow label="Prometheus monitoring" value={castBoolToStr()(data.prometheusMonitoringEnabled)} />
+        <DataRow label="Tags" value={<CodeBlock>{JSON.stringify(data.tags || [], null, 2)}</CodeBlock>} />
       </TableBody>
     </Table>
   )

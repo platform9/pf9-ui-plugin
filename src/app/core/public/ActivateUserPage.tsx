@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import useReactRouter from 'use-react-router'
 import ApiClient from 'api-client/ApiClient'
 import { makeStyles } from '@material-ui/styles'
 import { Button, Grid, Paper, Typography } from '@material-ui/core'
-import useParams from 'core/hooks/useParams'
 import Progress from 'core/components/progress/Progress'
-import { loginUrl, forgotPasswordUrl, resetPasswordUrl } from 'app/constants.js'
+import { loginUrl, forgotPasswordUrl } from 'app/constants.js'
+import { routes } from 'core/utils/routes'
 import { Link } from 'react-router-dom'
 
 const useStyles = makeStyles((theme: any) => ({
@@ -34,9 +34,7 @@ const useStyles = makeStyles((theme: any) => ({
 }))
 
 export const ActivateUserPage = props => {
-  const { params, updateParams } = useParams({
-    loading: true,
-  })
+  const [loading, setLoading] = useState(true)
   const classes = useStyles({})
   const { history, location } = useReactRouter()
 
@@ -49,9 +47,9 @@ export const ActivateUserPage = props => {
     const validateSecret = async () => {
       try {
         const response = await clemency.verifyActivateLink(username, otp)
-        history.push(`${resetPasswordUrl}/${response.value}`)
+        history.push(routes.password.reset.path({ id: response.value }))
       } catch (e) {
-        updateParams({ loading: false })
+        setLoading(false)
       }
     }
     validateSecret()
@@ -59,7 +57,7 @@ export const ActivateUserPage = props => {
 
   return (
     <Progress
-      loading={params.loading}
+      loading={loading}
       overlay
       renderContentOnMount
       message="Processing..."
@@ -68,7 +66,7 @@ export const ActivateUserPage = props => {
         <Grid item md={5} lg={4}>
           <Paper className={classes.paper}>
             <img src="/ui/images/logo-color.png" className={classes.img} />
-            {!params.loading && <div>
+            {!loading && <div>
               <Typography variant="subtitle1" align="center">
                 Password Reset Failed
               </Typography>

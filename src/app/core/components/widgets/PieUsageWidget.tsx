@@ -3,7 +3,7 @@ import PieGraph, { PieDataEntry } from 'core/components/graphs/PieGraph'
 import { makeStyles } from '@material-ui/styles'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { useTheme } from '@material-ui/core/styles'
-import { Theme } from '@material-ui/core'
+import { Theme, Typography } from '@material-ui/core'
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -53,8 +53,8 @@ const PieLegend = ({ data }) => {
                   className={legendCircle}
                 >circle</FontAwesomeIcon>
               </td>
-              <td className={legendValue}>{entry.value}</td>
-              <td className={legendName}>{entry.name}</td>
+              <td className={legendValue}><Typography variant="body2">{entry.value}</Typography></td>
+              <td className={legendName}><Typography variant="body2">{entry.name}</Typography></td>
             </tr>
           )) }
         </tbody>

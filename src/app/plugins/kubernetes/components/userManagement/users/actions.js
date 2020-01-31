@@ -1,16 +1,11 @@
 import ApiClient from 'api-client/ApiClient'
-import createCRUDActions from 'core/helpers/createCRUDActions'
-import {
-  mngmTenantsCacheKey, filterValidTenants, mngmTenantActions,
-} from 'k8s/components/userManagement/tenants/actions'
-import {
-  partition, pluck, map, head, innerJoin, uniq, prop, pipe, find, propEq, when, isNil, always,
-  filter, flatten, groupBy, values, omit, keys, reject, last,
-} from 'ramda'
-import { emptyObj, upsertAllBy, emptyArr, pathStr, objSwitchCase } from 'utils/fp'
 import createContextLoader from 'core/helpers/createContextLoader'
-import { castBoolToStr } from 'utils/misc'
+import createCRUDActions from 'core/helpers/createCRUDActions'
+import { filterValidTenants, mngmTenantActions, mngmTenantsCacheKey } from 'k8s/components/userManagement/tenants/actions'
+import { always, filter, find, flatten, groupBy, head, innerJoin, isNil, keys, map, omit, partition, pipe, pluck, prop, propEq, reject, uniq, values, when } from 'ramda'
 import { tryCatchAsync } from 'utils/async'
+import { emptyArr, emptyObj, objSwitchCase, pathStr, upsertAllBy } from 'utils/fp'
+import { castBoolToStr } from 'utils/misc'
 
 const { keystone, clemency } = ApiClient.getInstance()
 
@@ -32,6 +27,8 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
   },
   deleteFn: async ({ id }) => {
     await keystone.deleteUser(id)
+    // We must invalidate the tenants cache so that they will not contain the deleted user
+    mngmTenantActions.invalidateCache()
   },
   createFn: async ({ username, displayname, password, roleAssignments }) => {
     const defaultTenantId = pipe(keys, head)(roleAssignments)
@@ -175,15 +172,15 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
   },
   refetchCascade: true,
   entityName: 'User',
-  successMessage: (updatedItems, prevItems, { id }, operation) => objSwitchCase({
-    create: `User ${prop('name', last(updatedItems))} created successfully`,
+  successMessage: (updatedItems, prevItems, { id, username, displayname }, operation) => objSwitchCase({
+    create: `User ${displayname || username} created successfully`,
     update: `User ${pipe(
       find(propEq('id', id)),
-      prop('name'),
+      prop('username'),
     )(prevItems)} updated successfully`,
     delete: `User ${pipe(
       find(propEq('id', id)),
-      prop('name'),
+      prop('username'),
     )(prevItems)} deleted successfully`,
   })(operation),
 })

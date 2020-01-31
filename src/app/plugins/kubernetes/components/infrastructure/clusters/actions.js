@@ -1,12 +1,12 @@
 import ApiClient from 'api-client/ApiClient'
 import calcUsageTotals from 'k8s/util/calcUsageTotals'
 import createCRUDActions from 'core/helpers/createCRUDActions'
-import { allKey } from 'app/constants'
+import { allKey, defaultMonitoringTag } from 'app/constants'
 import { castFuzzyBool, sanitizeUrl } from 'utils/misc'
 import {
   clustersCacheKey, combinedHostsCacheKey, loadCombinedHosts,
 } from 'k8s/components/infrastructure/common/actions'
-import { filterIf, isTruthy, updateWith, adjustWith } from 'utils/fp'
+import { filterIf, isTruthy, updateWith, adjustWith, keyValueArrToObj } from 'utils/fp'
 import { mapAsync } from 'utils/async'
 import {
   pluck, pathOr, pick, pipe, either, propSatisfies, compose, path, propEq, mergeLeft, partition,
@@ -18,8 +18,13 @@ import {
   getConnectionStatus,
   getHealthStatus,
 } from './ClusterStatusUtils'
+import { trackEvent } from 'utils/tracking'
 
 const { qbert } = ApiClient.getInstance()
+
+const trackClusterCreation = (params) => {
+  trackEvent('WZ New Cluster Finished', params)
+}
 
 const getProgressPercent = async clusterId => {
   try {
@@ -40,6 +45,19 @@ const getKubernetesVersion = async clusterId => {
   }
 }
 
+const getEtcdBackupPayload = (data) => (
+  data.etcdBackup ? {
+    isEtcdBackupEnabled: 1,
+    storageType: 'local',
+    storageProperties: {
+      localPath: data.etcdStoragePath,
+    },
+    intervalInMins: data.etcdBackupInterval,
+  } : {
+    isEtcdBackupEnabled: 0,
+  }
+)
+
 export const hasMasterNode = propSatisfies(isTruthy, 'hasMasterNode')
 export const hasHealthyMasterNodes = propSatisfies(
   healthyMasterNodes => healthyMasterNodes.length > 0, 'healthyMasterNodes')
@@ -59,7 +77,7 @@ const createAwsCluster = async (data, loadFromContext) => {
     ...pick('vpc isPrivate privateSubnets subnets internalElb serviceFqdn containersCidr servicesCidr networkPlugin'.split(' '), data),
 
     // advanced configuration
-    ...pick('privileged appCatalogEnabled customAmi tags'.split(' '), data),
+    ...pick('privileged appCatalogEnabled customAmi'.split(' '), data),
   }
 
   if (data.enableCAS) {
@@ -77,7 +95,15 @@ const createAwsCluster = async (data, loadFromContext) => {
   if (['newPublicPrivate', 'existingPublicPrivate', 'existingPrivate'].includes(data.network)) { body.isPrivate = true }
   if (data.network === 'existingPrivate') { body.internalElb = true }
 
-  return createGenericCluster(body, data, loadFromContext)
+  const cluster = createGenericCluster(body, data, loadFromContext)
+
+  // Placed beneath API call -- send the tracking when the request is successful
+  trackClusterCreation({
+    clusterType: 'aws',
+    clusterName: data.name,
+  })
+
+  return cluster
 }
 
 const createAzureCluster = async (data, loadFromContext) => {
@@ -92,12 +118,20 @@ const createAzureCluster = async (data, loadFromContext) => {
     ...pick('assignPublicIps vnetResourceGroup vnetName masterSubnetName workerSubnetName externalDnsName serviceFqdn containersCidr servicesCidr networkPlugin'.split(' '), data),
 
     // advanced configuration
-    ...pick('privileged appCatalogEnabled tags'.split(' '), data),
+    ...pick('privileged appCatalogEnabled'.split(' '), data),
   }
 
   if (data.useAllAvailabilityZones) { body.zones = [] }
 
-  return createGenericCluster(body, data, loadFromContext)
+  const cluster = createGenericCluster(body, data, loadFromContext)
+
+  // Placed beneath API call -- send the tracking when the request is successful
+  trackClusterCreation({
+    clusterType: 'aws',
+    clusterName: data.name,
+  })
+
+  return cluster
 }
 
 const createBareOSCluster = async (data = {}, loadFromContext) => {
@@ -115,7 +149,6 @@ const createBareOSCluster = async (data = {}, loadFromContext) => {
     'mtuSize',
     'privileged',
     'appCatalogEnabled',
-    'tags',
   ]
   const body = pick(keysToPluck, data)
 
@@ -129,6 +162,12 @@ const createBareOSCluster = async (data = {}, loadFromContext) => {
 
   // 2. Create the cluster
   const cluster = await createGenericCluster(body, data, loadFromContext)
+
+  // Placed beneath API call -- send the tracking when the request is successful
+  trackClusterCreation({
+    clusterType: 'local',
+    clusterName: data.name,
+  })
 
   // 3. Attach the nodes
   const { masterNodes, workerNodes = [] } = data
@@ -158,6 +197,13 @@ const createGenericCluster = async (body, data, loadFromContext) => {
     all: 'api/all=true',
     custom: data.customRuntimeConfig,
   }[data.runtimeConfigOption]
+
+  // This is currently supported by all cloud providers except GCP (which we
+  // don't have yet anyways)
+  body.etcdBackup = getEtcdBackupPayload(data)
+
+  const tags = data.prometheusMonitoringEnabled ? [defaultMonitoringTag] : []
+  body.tags = keyValueArrToObj([tags].concat(data.tags))
 
   const createResponse = await qbert.createCluster(body)
   const uuid = createResponse.uuid
@@ -194,7 +240,7 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
       const healthyWorkerNodes = workerNodes.filter(node => node.status === 'ok')
       const masterNodesHealthStatus = getMasterNodesHealthStatus(masterNodes, healthyMasterNodes)
       const workerNodesHealthStatus = getWorkerNodesHealthStatus(workerNodes, healthyWorkerNodes)
-      const connectionStatus = getConnectionStatus(nodesInCluster.taskStatus, nodesInCluster)
+      const connectionStatus = getConnectionStatus(cluster.taskStatus, nodesInCluster)
       const healthStatus = getHealthStatus(connectionStatus, masterNodesHealthStatus, workerNodesHealthStatus)
       const hasMasterNode = healthyMasterNodes.length > 0
       const clusterOk = nodesInCluster.length > 0 && cluster.status === 'ok'
@@ -238,6 +284,7 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
         ...fuzzyBools,
         hasVpn: castFuzzyBool(pathOr(false, ['cloudProperties', 'internalElb'], cluster)),
         hasLoadBalancer: castFuzzyBool(cluster.enableMetallb || pathOr(false, ['cloudProperties', 'enableLbaas'], cluster)),
+        etcdBackupEnabled: castFuzzyBool(pathOr(false, ['etcdBackup', 'isEtcdBackupEnabled'], cluster)),
       }
     }, rawClusters)
   },
@@ -249,7 +296,16 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
   updateFn: async ({ uuid, ...params }) => {
     const updateableParams = 'name tags numWorkers numMinWorkers numMaxWorkers'.split(' ')
     const body = pick(updateableParams, params)
+
+    // This is currently supported by all cloud providers except GCP (which we
+    // don't have yet anyways)
+    body.etcdBackup = getEtcdBackupPayload(params)
+
     await qbert.updateCluster(uuid, body)
+    // Doing this will help update the table, but the cache remains incorrect...
+    // Same issue regarding cache applies to anything else updated this function
+    // body.etcdBackupEnabled = !!body.etcdBackup
+    clusterActions.invalidateCache()
     return body
   },
   deleteFn: async ({ uuid }) => {
@@ -283,15 +339,15 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
       }), prevItems)
     },
     updateTag: async ({ cluster, key, val }, prevItems) => {
-      const tags = cluster.tags || {}
-
-      if (key in tags) {
-        tags[key] = val
+      const body = {
+        tags: { ...cluster.tags || {}, [key]: val }
       }
+
+      await qbert.updateCluster(cluster.uuid, body)
 
       return updateWith(propEq('uuid', cluster.uuid), {
         ...cluster,
-        tags,
+        ...body,
       }, prevItems)
     },
     attachNodes: async ({ cluster, nodes }, prevItems) => {

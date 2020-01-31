@@ -32,7 +32,6 @@ import UpdatePrometheusAlertManagerPage
 import LoggingIndexPage from './components/logging/LoggingIndexPage'
 import LoggingAddPage from './components/logging/LoggingAddPage'
 import LoggingEditPage from './components/logging/LoggingEditPage'
-// import config from '../../../../config'
 import DashboardPage from './components/dashboard/DashboardPage'
 import AddResourcePage from 'k8s/components/pods/AddResourcePage'
 import DeployedAppDetailsPage from 'k8s/components/apps/DeployedAppDetailsPage'
@@ -50,6 +49,7 @@ import UpdateRolePage from './components/rbac/UpdateRolePage'
 import UpdateClusterRolePage from './components/rbac/UpdateClusterRolePage'
 import UpdateRoleBindingPage from './components/rbac/UpdateRoleBindingPage'
 import UpdateClusterRoleBindingPage from './components/rbac/UpdateClusterRoleBindingPage'
+import OnboardingBanner from './components/onboarding/OnboardingBanner'
 
 class Kubernetes extends React.PureComponent {
   render () {
@@ -65,6 +65,7 @@ Kubernetes.registerPlugin = pluginManager => {
   const plugin = pluginManager.registerPlugin(
     'kubernetes', 'Kubernetes', '/ui/kubernetes',
   )
+  plugin.registerComponent(OnboardingBanner)
 
   plugin.registerRoutes(
     [

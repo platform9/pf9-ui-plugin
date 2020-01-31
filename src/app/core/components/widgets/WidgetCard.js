@@ -1,5 +1,5 @@
 import React from 'react'
-import { Card, CardHeader, CardContent } from '@material-ui/core'
+import { Card, CardHeader, CardContent, Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import PropTypes from 'prop-types'
 
@@ -24,7 +24,7 @@ const useStyles = makeStyles(theme => ({
   headerContent: {
     display: 'flex',
     flexFlow: 'row nowrap',
-    justifyContent: 'space-between',
+    justifyContent: ({ image }) => image ? 'space-between' : 'center',
     alignItems: 'center',
     padding: theme.spacing(0, 1),
   },
@@ -37,11 +37,11 @@ const useStyles = makeStyles(theme => ({
 }))
 
 const HeaderContent = ({ title, image }) => {
-  const { headerContent, headerImg } = useStyles()
+  const { headerContent, headerImg } = useStyles({ image })
   return <div className={headerContent}>
-    <div>
+    <Typography variant="h6">
       {title}
-    </div>
+    </Typography>
     {image && <div className={headerImg}>
       {typeof image === 'string' ? <img alt="" src={image} /> : image}
     </div>}

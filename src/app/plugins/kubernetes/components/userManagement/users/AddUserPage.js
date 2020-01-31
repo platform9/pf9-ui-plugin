@@ -65,7 +65,7 @@ const AddUserPage = () => {
                 <FormLabel component="legend"><p>Activate User Account</p></FormLabel>
                 <RadioGroup value={activationType} onChange={
                   e => setActivationType(e.target.value)}>
-                  { false && <FormControlLabel
+                  { <FormControlLabel
                     value="activationByEmail"
                     control={<Radio color="primary" />}
                     label={activationByEmailLabel} />}
@@ -82,7 +82,7 @@ const AddUserPage = () => {
         </WizardStep>
         <WizardStep stepId="tenants" label="Tenants and Roles">
           <Typography variant="body1" component="p">
-            Select one or more tenants that should map to this User.
+            Select one or more tenants that should map to this user.
           </Typography>
           <ValidatedForm fullWidth initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
             <Progress renderContentOnMount={!loadingTenants} loading={loadingTenants} message={'Loading Tenants...'}>

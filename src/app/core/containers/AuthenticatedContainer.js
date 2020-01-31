@@ -1,23 +1,25 @@
-import React, { useEffect, useState, useContext } from 'react'
-import axios from 'axios'
 import { makeStyles } from '@material-ui/styles'
+import ApiClient from 'api-client/ApiClient'
+import { clarityDashboardUrl, dashboardUrl, helpUrl, ironicWizardUrl, logoutUrl } from 'app/constants'
+import HelpPage from 'app/plugins/kubernetes/components/common/HelpPage'
 import clsx from 'clsx'
 import Intercom from 'core/components/integrations/Intercom'
 import Navbar, { drawerWidth } from 'core/components/Navbar'
 import Toolbar from 'core/components/Toolbar'
 import useToggler from 'core/hooks/useToggler'
-import { emptyObj, isNilOrEmpty, ensureArray } from 'utils/fp'
-import { Switch, Redirect, Route } from 'react-router'
-import moize from 'moize'
-import { toPairs, apply } from 'ramda'
-import { pathJoin } from 'utils/misc'
-import DeveloperToolsEmbed from 'developer/components/DeveloperToolsEmbed'
-import pluginManager from 'core/utils/pluginManager'
-import { logoutUrl, dashboardUrl, helpUrl } from 'app/constants'
-import LogoutPage from 'core/public/LogoutPage'
-import HelpPage from 'app/plugins/kubernetes/components/common/HelpPage'
 import { AppContext } from 'core/providers/AppProvider'
+import LogoutPage from 'core/public/LogoutPage'
+import pluginManager from 'core/utils/pluginManager'
+import DeveloperToolsEmbed from 'developer/components/DeveloperToolsEmbed'
+import moize from 'moize'
+import { apply, toPairs } from 'ramda'
+import React, { useContext, useEffect, useState } from 'react'
+import { Redirect, Route, Switch } from 'react-router'
 import useReactRouter from 'use-react-router'
+import { emptyObj, ensureArray, isNilOrEmpty } from 'utils/fp'
+import { pathJoin } from 'utils/misc'
+
+const { keystone } = ApiClient.getInstance()
 
 const useStyles = makeStyles(theme => ({
   appFrame: {
@@ -31,14 +33,8 @@ const useStyles = makeStyles(theme => ({
     marginTop: 55, // header height is hardcoded to 55px. account for that here.
     overflowX: 'auto',
     flexGrow: 1,
-    // backgroundColor: props => (
-    //   props.path === '/ui/kubernetes/dashboard'
-    //     ? theme.palette.background.dashboard
-    //     : theme.palette.background.default
-    // )
     backgroundColor: theme.palette.background.default,
-    padding: theme.spacing(3),
-    paddingTop: theme.spacing(2),
+    padding: 0,
     transition: theme.transitions.create('margin', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
@@ -64,8 +60,8 @@ const useStyles = makeStyles(theme => ({
     minHeight: theme.spacing(6),
   },
   contentMain: {
-    paddingLeft: theme.spacing(2),
-  }
+    padding: theme.spacing(3, 3, 3, 5),
+  },
 }))
 
 const renderPluginRoutes = role => (id, plugin) => {
@@ -106,41 +102,65 @@ const renderPlugins = moize((plugins, role) =>
   toPairs(plugins).map(apply(renderPluginRoutes(role))).flat(),
 )
 
-const loadFeatures = async setFeatures => {
-  // Note: urlOrigin may or may not be changed to use a specific path instead of
-  // window.location.origin, this depends on whether the new UI is intended to be
-  // accessed from the master DU or from each region.
-  const urlOrigin = window.location.origin
-  // Timestamp tag used for preventing browser caching of features.json
-  const timestamp = new Date().getTime()
+const renderPluginComponents = (id, plugin) => {
+  const pluginComponents = plugin.getComponents()
+
+  return <Route key={plugin.basePath} path={plugin.basePath} exact={false}>
+    {pluginComponents.map((PluginComponent, idx) =>
+      <PluginComponent key={idx} />)}
+  </Route>
+}
+const renderRawComponents = moize(plugins =>
+  toPairs(plugins).map(apply(renderPluginComponents)).flat(),
+)
+
+const redirectToAppropriateStack = (ironicEnabled, kubernetesEnabled,
+  history) => {
+  // If it is neither ironic nor kubernetes, bump user to old UI
+  // TODO: For production, I need to always bump user to old UI in both ironic
+  // and standard openstack cases, but I don't want to do that yet for development.
+  // In fact maybe just never do that for development build since old ui is not running.
+  if (!ironicEnabled && !kubernetesEnabled) {
+    window.location = clarityDashboardUrl
+  } else if (ironicEnabled && history.location.pathname.includes('kubernetes')) {
+    history.push(ironicWizardUrl)
+  } else if (!ironicEnabled && history.location.pathname.includes('ironic')) {
+    history.push(dashboardUrl)
+  }
+}
+
+const loadRegionFeatures = async (setRegionFeatures, history) => {
   try {
-    const response = await axios.get(`${urlOrigin}/clarity/features.json?tag=${timestamp}`)
-    setFeatures({
-      withStackSlider: !!response.data.experimental.openstackEnabled,
+    const features = await keystone.getFeatures()
+
+    setRegionFeatures({
+      kubernetes: features.experimental.containervisor,
+      ironic: features.experimental.ironic,
+      openstack: features.experimental.openstackEnabled,
+      intercom: features.experimental.intercom,
     })
+
+    redirectToAppropriateStack(features.experimental.ironic, features.experimental.containervisor, history)
   } catch (err) {
-    console.error('No features.json')
-    // Just set slider to true for now as a default.
-    // This is fine from the old UI perspective because if routed to the
-    // dashboard (which is what happens today), the old UI can handle
-    // the stack switching appropriately.
-    setFeatures({
-      withStackSlider: true,
-    })
+    console.error(err)
   }
 }
 
 const AuthenticatedContainer = () => {
   const [drawerOpen, toggleDrawer] = useToggler(true)
-  const [features, setFeatures] = useState(emptyObj)
-  const { userDetails: { role } } = useContext(AppContext)
+  const [regionFeatures, setRegionFeatures] = useState(emptyObj)
+  const { userDetails: { role }, currentRegion } = useContext(AppContext)
   const { history } = useReactRouter()
   const classes = useStyles({ path: history.location.pathname })
 
   useEffect(() => {
-    // Pass the `setFeatures` function to update the features as we can't use `await` inside of a `useEffect`
-    loadFeatures(setFeatures)
-  }, [])
+    // Pass the `setRegionFeatures` function to update the features as we can't use `await` inside of a `useEffect`
+    loadRegionFeatures(setRegionFeatures, history)
+  }, [currentRegion])
+
+  const withStackSlider = regionFeatures.openstack && regionFeatures.kubernetes
+  // stack is the name of the plugin (ex. openstack, kubernetes, developer, theme)
+  const stack = history.location.pathname.includes('openstack') ? 'openstack' : 'kubernetes'
 
   const plugins = pluginManager.getPlugins()
   const sections = getSections(plugins, role)
@@ -151,19 +171,22 @@ const AuthenticatedContainer = () => {
       <div className={classes.appFrame}>
         <Toolbar />
         <Navbar
-          withStackSlider={features.withStackSlider}
+          withStackSlider={withStackSlider}
           drawerWidth={drawerWidth}
           sections={sections}
           open={drawerOpen}
+          stack={stack}
           handleDrawerToggle={toggleDrawer} />
         <main className={clsx(classes.content, classes['content-left'], {
           [classes.contentShift]: drawerOpen,
           [classes['contentShift-left']]: drawerOpen,
         })}>
+          {/* <BannerContainer /> */}
           <div className={classes.contentMain}>
+            {renderRawComponents(plugins)}
             <Switch>
               {renderPlugins(plugins, role)}
-              <Route path={helpUrl} component={HelpPage} />>
+              <Route path={helpUrl} component={HelpPage} />
               <Route path={logoutUrl} component={LogoutPage} />
               <Redirect to={dashboardUrl} />
             </Switch>
@@ -171,7 +194,7 @@ const AuthenticatedContainer = () => {
           </div>
         </main>
       </div>
-      <Intercom />
+      {regionFeatures.intercom && <Intercom />}
     </>
   )
 }

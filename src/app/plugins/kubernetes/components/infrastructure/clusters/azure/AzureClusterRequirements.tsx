@@ -3,9 +3,10 @@ import { makeStyles } from '@material-ui/styles'
 import { Theme, Typography } from '@material-ui/core'
 import Alert from 'core/components/Alert'
 import SubmitButton from 'core/components/buttons/SubmitButton'
-import { ClusterRequirementsContainer } from '../bareos/BareosClusterRequirements'
+import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import ExternalLink from 'core/components/ExternalLink'
 import { azureServicePrincipalPortal, azureGetValuesForSigningin, azureCreateANewApplicationSecret } from 'app/constants'
+import { routes } from 'core/utils/routes'
 
 const useStyles = makeStyles((theme: Theme) => ({
   requirements: {
@@ -31,10 +32,10 @@ const useStyles = makeStyles((theme: Theme) => ({
 const AzureClusterRequirements = ({ onComplete }) => {
   const classes = useStyles({})
   const handleClick = useCallback(() => {
-    onComplete('Azure')
+    onComplete(routes.cluster.addAzure.path())
   }, [onComplete])
   return (
-    <ClusterRequirementsContainer title="Amazon AWS Deployment">
+    <FormFieldCard title="Amazon AWS Deployment">
       <Typography className={classes.text}>
         Use your existing Azure credentials to create and manage Kubernetes clusters and associated
         resources within your Azure public cloud environment.
@@ -76,7 +77,7 @@ const AzureClusterRequirements = ({ onComplete }) => {
       <div>
         <SubmitButton onClick={handleClick}>Deploy With Azure</SubmitButton>
       </div>
-    </ClusterRequirementsContainer>
+    </FormFieldCard>
   )
 }
 export default AzureClusterRequirements

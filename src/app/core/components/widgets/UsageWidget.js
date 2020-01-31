@@ -3,7 +3,17 @@ import PropTypes from 'prop-types'
 import SemiCircleGraph from 'core/components/graphs/SemiCircleGraph'
 import WidgetCard from 'core/components/widgets/WidgetCard'
 
-const UsageWidget = ({ title, headerImg, precision, units, usedText, stats, ...rest }) => {
+const defaultStats = { current: 0, max: 0, percent: 0 }
+
+const UsageWidget = ({
+  title,
+  headerImg,
+  precision = 1,
+  units = '',
+  usedText = 'used',
+  stats = defaultStats,
+  ...rest
+}) => {
   const { current, max, percent } = stats
 
   const curStr = current.toFixed(precision) + units
@@ -30,13 +40,6 @@ UsageWidget.propTypes = {
     max: PropTypes.number,
     percent: PropTypes.number,
   }),
-}
-
-UsageWidget.defaultProps = {
-  stats: { current: 0, max: 0, percent: 0 },
-  usedText: 'used',
-  units: '',
-  precision: 1,
 }
 
 export default UsageWidget

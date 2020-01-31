@@ -3,6 +3,8 @@
 import uuid from 'uuid'
 
 class ActiveModel {
+  destroyed = false
+
   constructor (params = {}) {
     if (!this.constructor.getCollection) {
       throw new Error(`${this.constructor.name} must implement class method 'getCollection'`)
@@ -18,6 +20,7 @@ class ActiveModel {
     const id = this.id
     const idx = col.findIndex(x => x.id === id)
     if (idx > -1) {
+      this.destroyed = true
       col.splice(idx, 1)
       return id
     }

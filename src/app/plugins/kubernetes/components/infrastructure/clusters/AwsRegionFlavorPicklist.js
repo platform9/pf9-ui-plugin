@@ -7,25 +7,33 @@ import Picklist from 'core/components/Picklist'
 import { withInfoTooltip } from 'core/components/InfoTooltip'
 import { loadCloudProviderRegionDetails } from 'k8s/components/infrastructure/cloudProviders/actions'
 
-const AwsRegionFlavorPicklist = forwardRef(({
-  cloudProviderId, cloudProviderRegionId, hasError, errorMessage, ...rest
-}, ref) => {
-  const [details, loading] = useDataLoader(loadCloudProviderRegionDetails, { cloudProviderId, cloudProviderRegionId })
+const blackListedFlavors = ['micro', 'nano', 'small']
 
-  const flavors = pathStrOr([], '0.flavors', details)
-  const options = flavors.map(x => ({ label: x, value: x }))
+const isBlackListedFlavor = (flavor) => !blackListedFlavors.some((name) => flavor.includes(name))
 
-  return (
-    <Picklist
-      {...rest}
-      ref={ref}
-      loading={loading}
-      options={options}
-      error={hasError}
-      helperText={errorMessage}
-    />
-  )
-})
+const AwsRegionFlavorPicklist = forwardRef(
+  ({ cloudProviderId, cloudProviderRegionId, hasError, errorMessage, ...rest }, ref
+  ) => {
+    const [details, loading] = useDataLoader(loadCloudProviderRegionDetails, {
+      cloudProviderId,
+      cloudProviderRegionId,
+    })
+
+    const flavors = pathStrOr([], '0.flavors', details).filter(isBlackListedFlavor)
+    const options = flavors.map((x) => ({ label: x, value: x }))
+
+    return (
+      <Picklist
+        {...rest}
+        ref={ref}
+        loading={loading}
+        options={options}
+        error={hasError}
+        helperText={errorMessage}
+      />
+    )
+  },
+)
 
 AwsRegionFlavorPicklist.propTypes = {
   id: PropTypes.string.isRequired,
@@ -36,6 +44,4 @@ AwsRegionFlavorPicklist.propTypes = {
   ...ValidatedFormInputPropTypes,
 }
 
-export default compose(
-  withInfoTooltip,
-)(AwsRegionFlavorPicklist)
+export default compose(withInfoTooltip)(AwsRegionFlavorPicklist)

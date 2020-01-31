@@ -7,6 +7,7 @@ import ApiClient from 'api-client/ApiClient'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import { clusterActions } from '../infrastructure/clusters/actions'
 import { OnboardingMonitoringSetup } from 'app/constants'
+import { useToast } from 'core/providers/ToastProvider'
 
 export const hasPrometheusEnabled = compose(castFuzzyBool, path(['tags', 'pf9-system:monitoring']))
 
@@ -14,6 +15,7 @@ const { appbert } = ApiClient.getInstance()
 
 const PrometheusAddonDialog = ({ rows: [cluster], onClose }) => {
   const enabled = hasPrometheusEnabled(cluster)
+  const showToast = useToast()
   const [tagUpdater] = useDataUpdater(clusterActions.updateTag, success => {
     if (success) {
       onClose(success)
@@ -28,8 +30,8 @@ const PrometheusAddonDialog = ({ rows: [cluster], onClose }) => {
       ))
 
       if (!monPkg) {
-        console.log('no monitoring package found')
-        return
+        showToast('No monitoring package found', 'error')
+        return onClose(false)
       }
 
       const monId = monPkg.ID
@@ -38,8 +40,8 @@ const PrometheusAddonDialog = ({ rows: [cluster], onClose }) => {
         localStorage.setItem(OnboardingMonitoringSetup, 'true')
       }
     } catch (e) {
-      // TODO: Raise toaster notification
-      console.log(e)
+      showToast('Failed to update monitoring status', 'error')
+      return onClose(false)
     }
 
     const val = !enabled

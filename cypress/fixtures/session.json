@@ -1,53 +1,74 @@
 {
   "userTenants": [
     {
-      "id": "52d5f76e-7af8-447f-a5a3-683d9c3b3c4a",
+      "id": "1",
       "name": "Tenant #0",
-      "description": "0"
+      "description": "Test tenant #0 description",
+      "enabled": true,
+      "is_domain": false,
+      "parent_id": "default",
+      "domain_id": "default"
     },
     {
-      "id": "ec88e3ab-2f86-427f-bcee-f232cee036c8",
+      "id": "2",
       "name": "Tenant #1",
-      "description": "1"
+      "description": "Test tenant #1 description",
+      "enabled": true,
+      "is_domain": false,
+      "parent_id": "default",
+      "domain_id": "default"
+    },
+    {
+      "id": "3",
+      "name": "Tenant #2",
+      "description": "Test tenant #2 description",
+      "enabled": true,
+      "is_domain": false,
+      "parent_id": "default",
+      "domain_id": "default"
     },
     {
       "id": "id-tenant-service",
       "name": "service",
-      "description": ""
-    },
-    {
-      "id": "id-tenant-test",
-      "name": "test",
-      "description": ""
+      "description": "Service tenant",
+      "enabled": true,
+      "is_domain": false,
+      "parent_id": "default",
+      "domain_id": "default"
     }
   ],
+  "user-preferences-admin@platform9.com": {
+    "Tenants": {
+      "lastTenant": {
+        "id": "id-tenant-service",
+        "name": "service",
+        "description": "Service tenant",
+        "enabled": true,
+        "is_domain": false,
+        "parent_id": "default",
+        "domain_id": "default"
+      }
+    },
+    "RegionChooser": {
+      "lastRegion": {
+        "id": "Default Region",
+        "description": ""
+      }
+    }
+  },
   "user": {
     "id": "id-user-admin",
-    "displayname": "admin@platform9.com",
-    "email": "",
     "name": "admin@platform9.com",
+    "email": "admin@platform9.com",
+    "is_local": true,
+    "password_expires_at": null,
+    "enabled": true,
+    "mfa": {
+      "enabled": false
+    },
+    "default_project_id": "id-tenant-service",
+    "domain_id": "default",
     "username": "admin@platform9.com",
-    "tenantId": "",
-    "roles": [
-      {
-        "tenant": {
-          "id": "id-tenant-service",
-          "created_at": "2019-12-18T10:54:31.022Z",
-          "name": "service",
-          "description": ""
-        },
-        "role": {
-          "id": "id-role-admin",
-          "created_at": "2019-12-18T10:54:31.022Z",
-          "name": "admin",
-          "description": "",
-          "displayName": ""
-        }
-      }
-    ],
-    "rolePair": [
-      "{\"tenant\":\"service\",\"role\":\"admin\"}"
-    ],
     "userId": "id-user-admin",
     "role": "admin",
     "displayName": "admin@platform9.com"

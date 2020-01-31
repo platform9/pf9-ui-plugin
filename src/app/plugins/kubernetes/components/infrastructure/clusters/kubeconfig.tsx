@@ -35,8 +35,8 @@ export const generateKubeConfig = async (
 ): Promise<KubeConfigResponse> => {
   try {
     const token = authMethod === 'token'
-    ? await tokenAuth()
-    : await passwordAuth(userCreds.username, userCreds.password)
+      ? await tokenAuth()
+      : await passwordAuth(userCreds.username, userCreds.password)
 
     if (!token) return { error: 'Invalid Credentials' }
 

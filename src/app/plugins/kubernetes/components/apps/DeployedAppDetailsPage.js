@@ -14,7 +14,7 @@ import ConfirmationDialog from 'core/components/ConfirmationDialog'
 const useStyles = makeStyles(theme => ({
   backLink: {
     marginBottom: theme.spacing(2),
-    alignSelf: 'flex-end',
+    marginLeft: 'auto',
   },
   card: {
     display: 'flex',

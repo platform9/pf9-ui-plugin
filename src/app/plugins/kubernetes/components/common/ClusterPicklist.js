@@ -9,7 +9,7 @@ import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 
 // We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
 const ClusterPicklist = forwardRef(({
-  loading, onChange,
+  loading, onChange, selectFirst,
   onlyPrometheusEnabled, onlyMasterNodeClusters, onlyAppCatalogEnabled, onlyHealthyClusters,
   ...rest
 }, ref) => {
@@ -26,7 +26,7 @@ const ClusterPicklist = forwardRef(({
 
   // Select the first cluster as soon as clusters are loaded
   useEffect(() => {
-    if (!isEmpty(options)) {
+    if (!isEmpty(options) && selectFirst) {
       onChange(propOr(allKey, 'value', head(options)))
     }
   }, [options])
@@ -49,6 +49,7 @@ ClusterPicklist.propTypes = {
   onlyAppCatalogEnabled: PropTypes.bool,
   onlyPrometheusEnabled: PropTypes.bool,
   onlyHealthyClusters: PropTypes.bool,
+  selectFirst: PropTypes.bool,
 }
 
 ClusterPicklist.defaultProps = {
@@ -60,6 +61,7 @@ ClusterPicklist.defaultProps = {
   onlyAppCatalogEnabled: false,
   onlyPrometheusEnabled: false,
   onlyHealthyClusters: false,
+  selectFirst: true,
 }
 
 export default ClusterPicklist

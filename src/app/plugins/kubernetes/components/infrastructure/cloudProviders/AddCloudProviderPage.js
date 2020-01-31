@@ -7,7 +7,6 @@ import { objSwitchCase } from 'utils/fp'
 import AddAwsCloudProvider from 'k8s/components/infrastructure/cloudProviders/AddAwsCloudProvider'
 import AddOpenstackCloudProvider from 'k8s/components/infrastructure/cloudProviders/AddOpenstackCloudProvider'
 import AddVmwareCloudProvider from 'k8s/components/infrastructure/cloudProviders/AddVmwareCloudProvider'
-import { Typography } from '@material-ui/core'
 import AddAzureCloudProvider from 'k8s/components/infrastructure/cloudProviders/AddAzureCloudProvider'
 import useReactRouter from 'use-react-router'
 
@@ -43,34 +42,20 @@ export const AddCloudProviderForm = ({ loading, onComplete, ...rest }) => {
   }
 
   return <div className={classes.root}>
-    <Typography variant="subtitle1">Cloud Provider Type</Typography>
-    <Typography variant="body1">Select one of the supported Cloud Provider Types:</Typography>
     <div className={classes.cloudProviderCards}>
       <CloudProviderCard active={activeProvider === 'aws'} onClick={setActiveProvider} type="aws" />
-      <CloudProviderCard active={activeProvider === 'azure'} onClick={setActiveProvider} type="azure" />
+      <CloudProviderCard disabled active={activeProvider === 'azure'} onClick={setActiveProvider} type="azure" />
     </div>
     <ActiveForm loading={loading} onComplete={handleOnComplete} {...rest} />
   </div>
 }
 
-const DisabledAddCloudProviderForm = () => {
-  const classes = useStyles()
-
-  return <div className={classes.root}>
-    <Typography variant="subtitle1">Cloud Provider Type (Coming Soon)</Typography>
-    <div className={classes.cloudProviderCards}>
-      <CloudProviderCard disabled type="aws" />
-      <CloudProviderCard disabled type="azure" />
-    </div>
-  </div>
-}
-
 export const options = {
   createFn: cloudProviderActions.create,
-  FormComponent: DisabledAddCloudProviderForm,
+  FormComponent: AddCloudProviderForm,
   listUrl: '/ui/kubernetes/infrastructure#cloudProviders',
   name: 'AddCloudProvider',
-  title: 'New Cloud Provider',
+  title: 'Select A Cloud Provider Type',
 }
 
 const { AddPage } = createAddComponents(options)

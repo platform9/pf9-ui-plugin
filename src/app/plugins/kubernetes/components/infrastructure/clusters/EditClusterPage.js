@@ -1,22 +1,22 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useEffect } from 'react'
 import useReactRouter from 'use-react-router'
 import useDataLoader from 'core/hooks/useDataLoader'
-import { find, propEq, pipe, when, always, isNil } from 'ramda'
-import { emptyObj } from 'utils/fp'
+import { find, propEq, pipe, when, always, isNil, path } from 'ramda'
+import { emptyObj, objToKeyValueArr, keyValueArrToObj } from 'utils/fp'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import FormWrapper from 'core/components/FormWrapper'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import TextField from 'core/components/validatedForm/TextField'
 import { pathJoin } from 'utils/misc'
-import { k8sPrefix } from 'app/constants'
+import { k8sPrefix, defaultEtcBackupPath } from 'app/constants'
 import { clusterActions } from './actions'
 import KeyValuesField from 'core/components/validatedForm/KeyValuesField'
+import CheckboxField from 'core/components/validatedForm/CheckboxField'
 import SubmitButton from 'core/components/SubmitButton'
+import useParams from 'core/hooks/useParams'
+import EtcdBackupFields from './EtcdBackupFields'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
-
-const tagsObjToArr = tags => Object.entries(tags).map(([key, value]) => ({ key, value }))
-const tagsArrToObj = tags => tags.reduce((acc, { key, value }) => ({ ...acc, [key]: value }), {})
 
 const EditClusterPage = () => {
   const { match, history } = useReactRouter()
@@ -25,22 +25,35 @@ const EditClusterPage = () => {
     success => success && history.push(listUrl),
     [history])
   const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
+  const { params, updateParams, getParamsUpdater } = useParams({})
+
   const initialValues = useMemo(
     () => pipe(
       find(propEq('uuid', clusterId)),
       when(isNil, always(emptyObj)),
-      ({ tags = {}, ...cluster }) => ({
+      ({ tags = {}, etcdBackup = {}, ...cluster }) => ({
         ...cluster,
-        tags: tagsObjToArr(tags),
+        tags: objToKeyValueArr(tags),
+        etcdBackup: !!etcdBackup.isEtcdBackupEnabled,
+        etcdStoragePath: path(['storageProperties, localStorage'], etcdBackup) || defaultEtcBackupPath,
+        etcdBackupInterval: etcdBackup.intervalInMins || 1,
       }),
     )(clusters),
     [clusters, clusterId])
+
+  useEffect(() => {
+    const { etcdBackup } = find(propEq('uuid', clusterId))(clusters) || {}
+    if (!etcdBackup) { return }
+    updateParams({ etcdBackup: !!etcdBackup.isEtcdBackupEnabled })
+  }, [clusters, clusterId])
+
+  // Need to add etcdBackup stuff to here
   const [update, updating] = useDataUpdater(clusterActions.update, onComplete)
   const handleSubmit = useCallback(({ tags, ...cluster }) => update({
     ...cluster,
     // The cluster ID is not present in the form as a field so it won't be passed as a value to the submit function
     uuid: initialValues.uuid,
-    tags: tagsArrToObj(tags),
+    tags: keyValueArrToObj(tags),
   }), [update, initialValues])
 
   return <FormWrapper
@@ -57,6 +70,18 @@ const EditClusterPage = () => {
         info="Name of the cluster"
         required
       />
+
+      {/* Etcd Backup */}
+      <CheckboxField
+        id="etcdBackup"
+        label="Enable Etcd Backup"
+        info="Enable automated etcd backups on this cluster"
+        onChange={getParamsUpdater('etcdBackup')}
+        value={params.etcdBackup}
+      />
+
+      {params.etcdBackup && <EtcdBackupFields />}
+
       {/* Tags */}
       <KeyValuesField
         id="tags"

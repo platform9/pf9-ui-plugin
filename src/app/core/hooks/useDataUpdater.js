@@ -52,14 +52,14 @@ const useDataUpdater = (updaterFn, onComplete) => {
       return result
     })()
     updaterPromisesBuffer.current.push(currentPromise)
-    const successful = await currentPromise
+    const [successful, output] = await currentPromise
 
     // With this condition, we ensure that all promises except the last one will be ignored
     if (isEmpty(updaterPromisesBuffer.current) &&
       !unmounted.current) {
       setLoading(false)
       if (onComplete) {
-        await onComplete(successful)
+        await onComplete(successful, output)
       }
     }
   }, [updaterFn, onComplete, getContext, setContext])

@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { AppContext } from 'core/providers/AppProvider'
 import NotificationItem
-  from 'core/components/notificationsPopover/NotificationItem'
+  from 'core/components/notifications/NotificationItem'
 
 const useStyles = makeStyles(theme => ({
   title: {

@@ -161,9 +161,9 @@ export interface Tooltip {
 export interface Palette {
   common: Common
   type: string
-  primary: Error
+  primary: DefaultColorSwatch
   secondary: { [key: string]: string }
-  error: Error
+  error: DefaultColorSwatch
   grey: { [key: string]: string }
   contrastThreshold: number
   tonalOffset: number
@@ -177,6 +177,9 @@ export interface Palette {
   card: Card
   wizard: Wizard
   code: Code
+  warning: DefaultColorSwatch
+  success: DefaultColorSwatch
+  pieChart: PieChart
 }
 
 export interface Action {
@@ -218,11 +221,11 @@ export interface DashboardCard {
   divider: string
 }
 
-export interface Error {
+export interface DefaultColorSwatch {
   light: string
   main: string
   dark: string
-  contrastText: string
+  contrastText?: string
 }
 
 export interface Header {
@@ -343,6 +346,14 @@ export interface ZIndex {
   modal: number
   snackbar: number
   tooltip: number
+}
+
+export interface PieChart {
+  success: string
+  warning: string
+  error: string
+  unknown: string
+  empty: string
 }
 
 type Theme = ITheme & DefaultTheme

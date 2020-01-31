@@ -6,7 +6,7 @@ import { setStorage, getStorage } from 'core/utils/pf9Storage'
 import { loadUserTenants } from 'openstack/components/tenants/actions'
 import { head, path, pathOr, propEq, isEmpty, isNil } from 'ramda'
 import AuthenticatedContainer from 'core/containers/AuthenticatedContainer'
-import track from 'utils/tracking'
+import { trackPage } from 'utils/tracking'
 import useReactRouter from 'use-react-router'
 import { makeStyles } from '@material-ui/styles'
 import { Route, Redirect, Switch } from 'react-router'
@@ -46,11 +46,11 @@ const AppContainer = () => {
 
   useEffect(() => {
     const unlisten = history.listen((location, action) => {
-      track('pageLoad', { route: `${location.pathname}${location.hash}` })
+      trackPage(`${location.pathname}${location.hash}`)
     })
 
     // This is to send page event for the first page the user lands on
-    track('pageLoad', { route: `${history.location.pathname}${history.location.hash}` })
+    trackPage(`${history.location.pathname}${history.location.hash}`)
 
     restoreSession()
 
@@ -113,12 +113,15 @@ const AppContainer = () => {
     }
     await setContext({ appLoaded: true })
 
-    if (history.location.pathname === forgotPasswordUrl) return history.push(forgotPasswordUrl)
+    // Allow the following paths to load as entry point when user is not logged in
+    if (history.location.pathname === forgotPasswordUrl) return
 
     if (history.location.pathname.includes(activateUserUrl)) return
 
     // TODO: Need to fix this code after synching up with backend.
     if (history.location.hash.includes(resetPasswordThroughEmailUrl)) return history.push(history.location.hash.slice().replace('#', '/ui'))
+
+    if (history.location.pathname.includes(resetPasswordThroughEmailUrl)) return
 
     history.push(loginUrl)
   }

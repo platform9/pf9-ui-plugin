@@ -47,12 +47,14 @@ const createCRUDComponents = options => {
     addUrl,
     AddDialog,
     EditDialog,
+    DeleteDialog,
     editUrl,
     editCond,
     editDisabledInfo,
     customEditUrlFn,
     debug,
     name,
+    nameProp,
     searchTarget = 'name',
     multiSelection = true,
     showCheckboxes,
@@ -112,6 +114,7 @@ const createCRUDComponents = options => {
     const refetch = useCallback(() => reload(true), [reload])
     return (
       <CRUDListContainer
+        nameProp={nameProp}
         items={data}
         reload={reload}
         addText={addText}
@@ -123,6 +126,7 @@ const createCRUDComponents = options => {
         uniqueIdentifier={uniqueIdentifier}
         AddDialog={AddDialog}
         EditDialog={EditDialog}
+        DeleteDialog={DeleteDialog}
       >
         {({ deleting, ...handlers }) => <List
           loading={loading || deleting}

@@ -99,8 +99,7 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
     const result = await currentPromise
 
     // With this condition, we ensure that all promises except the last one will be ignored
-    if (isEmpty(loaderPromisesBuffer.current) &&
-      !unmounted.current) {
+    if (isEmpty(loaderPromisesBuffer.current)) {
       dispatch({ type: 'finishLoading', payload: result })
     }
     return result

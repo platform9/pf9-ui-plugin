@@ -41,9 +41,6 @@ const useStyles = makeStyles(theme => ({
     marginTop: theme.spacing(1),
     textAlign: 'justify'
   },
-  errorContainer: {
-    width: '150px'
-  }
 }))
 
 const ForgotPasswordPage = props => {
@@ -126,9 +123,7 @@ const ForgotPasswordPage = props => {
                       onChange={handleEmailChange()}
                     />
                     {params.isError && (
-                      <div className={classes.errorContainer}>
-                        <Alert variant="error" message="Something went wrong" />
-                      </div>
+                      <Alert small variant="error" message="Something went wrong" />
                     )}
                     <SubmitButton label="Reset my password" />
                   </>

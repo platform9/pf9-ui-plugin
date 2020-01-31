@@ -15,6 +15,7 @@ import { forgotPasswordUrl } from 'app/constants.js'
 import { pathJoin } from 'utils/misc'
 import { imageUrlRoot, dashboardUrl } from 'app/constants'
 import moment from 'moment'
+import { trackEvent } from 'utils/tracking'
 
 const styles = theme => ({
   root: {
@@ -97,6 +98,10 @@ export class LoginPage extends React.PureComponent {
     const authSuccess = await onAuthSuccess({ username, unscopedToken, expiresAt, issuedAt })
 
     if (authSuccess) {
+      trackEvent('PF9 Signed In', {
+        username,
+        duDomain: window.location.origin,
+      })
       return this.props.history.push(dashboardUrl)
     }
     return this.setState({ loginFailed: true, loading: false })

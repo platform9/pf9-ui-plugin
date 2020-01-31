@@ -1,19 +1,18 @@
-import React, { useCallback, SetStateAction } from 'react'
+import React, { PureComponent, SetStateAction } from 'react'
 import {
-  assocPath,
-  flatten,
-  Dictionary,
+  always,
   assoc,
-  mergeLeft,
+  assocPath,
+  Dictionary,
+  flatten,
   lensProp,
+  mergeLeft,
   over,
-  take,
   prepend,
-  always
+  take,
 } from 'ramda'
 import { dataCacheKey, paramsCacheKey } from 'core/helpers/createContextLoader'
-import useStateAsync from 'core/hooks/useStateAsync'
-import { pipe, emptyArr } from 'utils/fp'
+import { emptyArr, pipe } from 'utils/fp'
 import moment from 'moment'
 import uuid from 'uuid'
 
@@ -53,30 +52,31 @@ const initialContext: IAppContext = {
   session: {},
   [dataCacheKey]: [],
   [paramsCacheKey]: [],
-  notifications: []
+  notifications: [],
 }
 
 export const AppContext = React.createContext<IAppContext & Partial<IAppContextActions>>(initialContext)
 
-const AppProvider = ({ children }) => {
-  const [context, setContextBase] = useStateAsync<IAppContext>(initialContext)
+const notifLens = lensProp('notifications')
 
-  const initSession = async (unscopedToken: string, username: string, expiresAt: string) => {
-    await setContextBase(assoc('session', {
+class AppProvider extends PureComponent {
+  state: IAppContext = initialContext
+  initSession = async (unscopedToken: string, username: string, expiresAt: string) => {
+    await this.setContext(assoc('session', {
       unscopedToken,
       username,
       expiresAt,
     }))
   }
 
-  const updateSession = async (path, value) => {
-    await setContextBase(
+  updateSession = async (path, value) => {
+    await this.setContext(
       assocPath(flatten(['session', path]), value),
     )
   }
 
-  const destroySession = async () => {
-    await setContextBase(mergeLeft({
+  destroySession = async () => {
+    await this.setContext(mergeLeft({
       [dataCacheKey]: [],
       [paramsCacheKey]: [],
       notifications: [],
@@ -87,21 +87,20 @@ const AppProvider = ({ children }) => {
   }
 
   // Get an updated version of the current context
-  const getContext = useCallback(getterFn => {
+  getContext = getterFn => {
     // Return all values if no getterFn is specified
-    return getterFn ? getterFn(context) : context
-  }, [context])
+    return getterFn ? getterFn(this.state) : this.state
+  }
 
-  const setContext = useCallback(async setterFn => {
-    return setContextBase(setterFn instanceof Function
-      ? setterFn
-      : context => ({ ...context, ...setterFn })
-    )
-  }, [])
+  // We must add a trailing comma to the generic (<T, >) to sidestep the JSX ambiguity
+  setContext = async <T, > (setterFn) => {
+    return new Promise<T>(resolve => {
+      this.setState(setterFn, resolve)
+    })
+  }
 
-  const notifLens = lensProp('notifications')
-  const registerNotification = useCallback(async (title, message, type) => {
-    await setContext(over(
+  registerNotification = async (title, message, type) => {
+    await this.setContext(over(
       notifLens,
       pipe(
         take(maxNotifications - 1),
@@ -110,29 +109,33 @@ const AppProvider = ({ children }) => {
           title,
           message,
           date: moment().format(),
-          type
-        })))
+          type,
+        }))),
     )
-  }, [setContext])
-  const clearNotifications = useCallback(async () => {
-    await setContext(over(notifLens, always(emptyArr)))
-  }, [setContext])
-
-  const actions: IAppContextActions = {
-    getContext,
-    setContext,
-    initSession,
-    updateSession,
-    destroySession,
-    registerNotification,
-    clearNotifications,
   }
 
-  return (
-    <AppContext.Provider value={{ ...context, ...actions }}>
-      {children}
-    </AppContext.Provider>
-  )
+  clearNotifications = async () => {
+    await this.setContext(over(notifLens, always(emptyArr)))
+  }
+
+  render () {
+    const context = this.state
+    const actions: IAppContextActions = {
+      getContext: this.getContext,
+      setContext: this.setContext,
+      initSession: this.initSession,
+      updateSession: this.updateSession,
+      destroySession: this.destroySession,
+      registerNotification: this.registerNotification,
+      clearNotifications: this.clearNotifications,
+    }
+
+    return (
+      <AppContext.Provider value={{ ...context, ...actions }}>
+        {this.props.children}
+      </AppContext.Provider>
+    )
+  }
 }
 
 export const withAppContext = Component => props =>

@@ -11,6 +11,7 @@ const useStyles = makeStyles(() => ({
   // https://github.com/mui-org/material-ui/issues/14530
   label: {
     backgroundColor: 'white',
+    borderRadius: 5,
     padding: '0 5px',
     margin: '0 -5px',
   },

@@ -4,7 +4,8 @@ import { Theme, Typography } from '@material-ui/core'
 import BulletList from 'core/components/BulletList'
 import Alert from 'core/components/Alert'
 import SubmitButton from 'core/components/buttons/SubmitButton'
-import { ClusterRequirementsContainer } from '../bareos/BareosClusterRequirements'
+import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
+import { routes } from 'core/utils/routes'
 
 const useStyles = makeStyles((theme: Theme) => ({
   requirements: {
@@ -32,12 +33,12 @@ const AwsReqsRightSection = ['EC2 Instance Management', 'EBS Volume Management',
 const AwsClusterRequirements = ({ onComplete }) => {
   const classes = useStyles({})
   const handleClick = useCallback(() => {
-    onComplete('Aws')
+    onComplete(routes.cluster.addAws.path())
   }, [onComplete])
   return (
-    <ClusterRequirementsContainer title="Amazon AWS Deployment">
+    <FormFieldCard title="Amazon AWS Deployment">
       <Typography className={classes.text}>Use your existing AWS credentials to create and manage Kubernetes clusters and associated resources within your AWS public cloud environment.</Typography>
-      <Typography className={classes.text}>You can create multiple AWS cloud providers - each AWS cloud provider should be associated with a unique set of AWS credentials.</Typography>
+      <Typography className={classes.text}>You can create multiple AWS cloud providers; each AWS cloud provider should be associated with a unique set of AWS credentials.</Typography>
 
       <Alert variant="info">
         <Typography className={classes.alertTitle} variant="subtitle2">The following permissions are required on your AWS account in order to deploy fully automated Managed Kubernetes clusters:</Typography>
@@ -47,9 +48,9 @@ const AwsClusterRequirements = ({ onComplete }) => {
         </div>
       </Alert>
       <div>
-        <SubmitButton onClick={handleClick}>Deploy With Aws</SubmitButton>
+        <SubmitButton onClick={handleClick}>Deploy With AWS</SubmitButton>
       </div>
-    </ClusterRequirementsContainer>
+    </FormFieldCard>
   )
 }
 export default AwsClusterRequirements
