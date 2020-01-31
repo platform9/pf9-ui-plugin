@@ -243,7 +243,7 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
       const healthyWorkerNodes = workerNodes.filter(node => node.status === 'ok')
       const masterNodesHealthStatus = getMasterNodesHealthStatus(masterNodes, healthyMasterNodes)
       const workerNodesHealthStatus = getWorkerNodesHealthStatus(workerNodes, healthyWorkerNodes)
-      const connectionStatus = getConnectionStatus(nodesInCluster.taskStatus, nodesInCluster)
+      const connectionStatus = getConnectionStatus(cluster.taskStatus, nodesInCluster)
       const healthStatus = getHealthStatus(connectionStatus, masterNodesHealthStatus, workerNodesHealthStatus)
       const hasMasterNode = healthyMasterNodes.length > 0
       const clusterOk = nodesInCluster.length > 0 && cluster.status === 'ok'

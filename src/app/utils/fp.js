@@ -1,9 +1,5 @@
-import {
-  T, cond, equals, always, adjust, update, findIndex, assocPath, curry, pathOr, remove, values,
-  groupBy, filter, either, isNil, isEmpty, path, sortBy, compose as rCompose, toLower, prop,
-  hasPath, when, pathEq,
-} from 'ramda'
 import moize from 'moize'
+import { adjust, always, assocPath, cond, curry, either, equals, filter, findIndex, groupBy, hasPath, isEmpty, isNil, path, pathEq, pathOr, remove, T, update, values, when } from 'ramda'
 
 // State hook initializers
 
@@ -283,8 +279,3 @@ export const switchCase = (defaultValue, ...cases) => input =>
  */
 export const objSwitchCase = (casesObj, defaultValue) => input =>
   casesObj.hasOwnProperty(input) ? casesObj[input] : defaultValue
-
-export const sortByProperty = (list, attr) => {
-  const sortByPropCaseInsensitive = sortBy(rCompose(toLower, prop(attr)))
-  return sortByPropCaseInsensitive(list)
-}

@@ -1,23 +1,23 @@
-import React, { useEffect, useState, useContext } from 'react'
 import { makeStyles } from '@material-ui/styles'
+import ApiClient from 'api-client/ApiClient'
+import { clarityDashboardUrl, dashboardUrl, helpUrl, ironicWizardUrl, logoutUrl } from 'app/constants'
+import HelpPage from 'app/plugins/kubernetes/components/common/HelpPage'
 import clsx from 'clsx'
 import Intercom from 'core/components/integrations/Intercom'
 import Navbar, { drawerWidth } from 'core/components/Navbar'
 import Toolbar from 'core/components/Toolbar'
 import useToggler from 'core/hooks/useToggler'
-import { emptyObj, isNilOrEmpty, ensureArray } from 'utils/fp'
-import { Switch, Redirect, Route } from 'react-router'
-import moize from 'moize'
-import { toPairs, apply } from 'ramda'
-import { pathJoin } from 'utils/misc'
-import DeveloperToolsEmbed from 'developer/components/DeveloperToolsEmbed'
-import pluginManager from 'core/utils/pluginManager'
-import { logoutUrl, dashboardUrl, helpUrl, ironicWizardUrl, clarityDashboardUrl } from 'app/constants'
-import LogoutPage from 'core/public/LogoutPage'
-import HelpPage from 'app/plugins/kubernetes/components/common/HelpPage'
 import { AppContext } from 'core/providers/AppProvider'
+import LogoutPage from 'core/public/LogoutPage'
+import pluginManager from 'core/utils/pluginManager'
+import DeveloperToolsEmbed from 'developer/components/DeveloperToolsEmbed'
+import moize from 'moize'
+import { apply, toPairs } from 'ramda'
+import React, { useContext, useEffect, useState } from 'react'
+import { Redirect, Route, Switch } from 'react-router'
 import useReactRouter from 'use-react-router'
-import ApiClient from 'api-client/ApiClient'
+import { emptyObj, ensureArray, isNilOrEmpty } from 'utils/fp'
+import { pathJoin } from 'utils/misc'
 
 const { keystone } = ApiClient.getInstance()
 
@@ -33,14 +33,8 @@ const useStyles = makeStyles(theme => ({
     marginTop: 55, // header height is hardcoded to 55px. account for that here.
     overflowX: 'auto',
     flexGrow: 1,
-    // backgroundColor: props => (
-    //   props.path === '/ui/kubernetes/dashboard'
-    //     ? theme.palette.background.dashboard
-    //     : theme.palette.background.default
-    // )
     backgroundColor: theme.palette.background.default,
-    padding: theme.spacing(3),
-    paddingTop: theme.spacing(2),
+    padding: 0,
     transition: theme.transitions.create('margin', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
@@ -66,8 +60,8 @@ const useStyles = makeStyles(theme => ({
     minHeight: theme.spacing(6),
   },
   contentMain: {
-    paddingLeft: theme.spacing(2),
-  }
+    padding: theme.spacing(3, 3, 3, 5),
+  },
 }))
 
 const renderPluginRoutes = role => (id, plugin) => {
@@ -108,7 +102,20 @@ const renderPlugins = moize((plugins, role) =>
   toPairs(plugins).map(apply(renderPluginRoutes(role))).flat(),
 )
 
-const redirectToAppropriateStack = (ironicEnabled, kubernetesEnabled, history) => {
+const renderPluginComponents = (id, plugin) => {
+  const pluginComponents = plugin.getComponents()
+
+  return <Route key={plugin.basePath} path={plugin.basePath} exact={false}>
+    {pluginComponents.map((PluginComponent, idx) =>
+      <PluginComponent key={idx} />)}
+  </Route>
+}
+const renderRawComponents = moize(plugins =>
+  toPairs(plugins).map(apply(renderPluginComponents)).flat(),
+)
+
+const redirectToAppropriateStack = (ironicEnabled, kubernetesEnabled,
+  history) => {
   // If it is neither ironic nor kubernetes, bump user to old UI
   // TODO: For production, I need to always bump user to old UI in both ironic
   // and standard openstack cases, but I don't want to do that yet for development.
@@ -174,7 +181,9 @@ const AuthenticatedContainer = () => {
           [classes.contentShift]: drawerOpen,
           [classes['contentShift-left']]: drawerOpen,
         })}>
+          {/* <BannerContainer /> */}
           <div className={classes.contentMain}>
+            {renderRawComponents(plugins)}
             <Switch>
               {renderPlugins(plugins, role)}
               <Route path={helpUrl} component={HelpPage} />

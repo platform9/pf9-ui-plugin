@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from 'react'
 import { Snackbar, Theme } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
-import ToastItem from 'core/components/toasts/ToastItem'
+import ToastItem from 'core/components/notifications/ToastItem'
 
 import { MessageOptions } from './model'
 

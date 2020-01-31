@@ -1,5 +1,4 @@
 import { Tooltip, Typography } from '@material-ui/core'
-import clsx from 'clsx'
 import React, { FC } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import SimpleLink from 'core/components/SimpleLink'
@@ -8,12 +7,24 @@ import {
   isTransientStatus,
   getClusterHealthStatus,
   getClusterConnectionStatus,
+  IClusterStatus,
 } from './ClusterStatusUtils'
 import { ICluster } from './model'
 import ProgressBar from 'core/components/progress/ProgressBar'
-import ClusterSync from './ClusterSync'
 import { capitalizeString } from 'utils/misc'
 import Theme from 'core/themes/model'
+import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
+import clsx from 'clsx'
+
+const getIconOrBubbleColor = (status: IClusterStatus, theme: Theme) =>
+  ({
+    ok: theme.palette.pieChart.success,
+    pause: theme.palette.pieChart.warning,
+    fail: theme.palette.pieChart.error,
+    error: theme.palette.pieChart.error,
+    loading: theme.palette.primary.main,
+    unknown: theme.palette.primary.main,
+  }[status] || theme.palette.pieChart.error)
 
 const useStyles = makeStyles<Theme, Props>((theme: Theme) => ({
   root: {
@@ -25,61 +36,71 @@ const useStyles = makeStyles<Theme, Props>((theme: Theme) => ({
     width: 50,
   },
   circle: {
-    display: 'inline-flex',
-    flexDirection: 'row',
+    display: 'grid',
     alignItems: 'center',
+    gridTemplateColumns: '20px 1fr',
+    gridGap: theme.spacing(),
+    justifyItems: 'center',
     '&:before': {
-      content: '\' \'',
-      height: ({ variant }) => variant === 'header' ? theme.typography.body1.fontSize : theme.typography.body2.fontSize,
-      width: ({ variant }) => variant === 'header' ? theme.typography.body1.fontSize : theme.typography.body2.fontSize,
-      marginRight: 5,
+      content: '""',
+      display: ({ iconStatus }) => (iconStatus === true ? 'none' : 'inherit'),
+      height: ({ variant }) =>
+        variant === 'header' ? theme.typography.body1.fontSize : theme.typography.body2.fontSize,
+      width: ({ variant }) =>
+        variant === 'header' ? theme.typography.body1.fontSize : theme.typography.body2.fontSize,
       borderRadius: '50%',
-      // display: ({ status }) => !status || ['loading', 'error'].includes(status) ? 'none' : 'inline-block',
-      backgroundColor: ({ status }) => ({
-        ok: theme.palette.pieChart.success,
-        pause: theme.palette.pieChart.warning,
-        fail: theme.palette.pieChart.error,
-        unknown: theme.palette.primary.main,
-      }[status] || theme.palette.pieChart.error)
+      backgroundColor: ({ status }) => getIconOrBubbleColor(status, theme)
     },
   },
-  loading: {
-    marginRight: theme.spacing(0.375),
-    fontSize: ({ variant }) => variant === 'header' ? theme.typography.body1.fontSize : theme.typography.body2.fontSize,
-  },
-  error: {
-    marginRight: theme.spacing(0.375),
-    fontSize: ({ variant }) => variant === 'header' ? theme.typography.body1.fontSize : theme.typography.body2.fontSize,
+  iconColor: {
+    fontSize: ({ variant }) => (variant === 'header' ? theme.typography.subtitle1.fontSize : 16),
+    color: ({ status }) => getIconOrBubbleColor(status, theme)
   },
 }))
 
 type StatusVariant = 'table' | 'header'
 
+const iconMap = new Map([
+  ['fail', { icon: 'times', classes: '' }],
+  ['ok', { icon: 'check', classes: '' }],
+  ['pause', { icon: 'pause-circle', classes: '' }],
+  ['unknown', { icon: 'question-circle', classes: '' }],
+  ['error', { icon: 'exclamation-triangle', classes: '' }],
+  ['loading', { icon: 'sync', classes: 'fa-spin' }],
+])
+
 interface Props {
   label?: string
   title: string
-  status?: string
+  status?: IClusterStatus
   variant: StatusVariant
+  iconStatus?: boolean
 }
-const ClusterStatusSpan: FC<Props> = props => {
-  const { label, title, children, status, variant } = props
-  const { loading, error, circle, label: labelCls, root } = useStyles(props)
-  return <div className={root}>
-    {label && <span className={labelCls}>{label}:</span>}
-    <Tooltip title={title || children}>
-      <Typography className={circle} variant={variant === 'header' ? 'body1' : 'body2'}>
-        {status === 'loading' && <i className={clsx(loading, 'fal fa-lg fa-spin fa-sync')} />}
-        {status === 'error' && <i className={clsx(error, 'fas fa-exclamation-triangle')} />}
-        {children}
-      </Typography>
-    </Tooltip>
-  </div>
+const ClusterStatusSpan: FC<Props> = (props) => {
+  const { label, title, children, status, variant, iconStatus } = props
+  const { circle, label: labelCls, root, iconColor } = useStyles(props)
+  return (
+    <div className={root}>
+      {label && <span className={labelCls}>{label}:</span>}
+      <Tooltip title={title || children}>
+        <Typography className={circle} variant={variant === 'header' ? 'body1' : 'body2'}>
+          {!!iconStatus && (
+            <FontAwesomeIcon className={clsx(iconColor, iconMap.get(status).classes)}>
+              {iconMap.get(status).icon}
+            </FontAwesomeIcon>
+          )}
+          {children}
+        </Typography>
+      </Tooltip>
+    </div>
+  )
 }
 
 export default ClusterStatusSpan
 
 const renderErrorStatus = (taskError, nodesDetailsUrl, variant) => (
   <ClusterStatusSpan
+    iconStatus
     title={taskError}
     status='error'
     variant={variant}
@@ -93,23 +114,31 @@ const renderTransientStatus = (connectionStatus, progressPercent, variant) => {
 
   return (
     <div>
-      {progressPercent &&
-        <ProgressBar height={20} animated containedPercent percent={progressPercent
-          ? (+progressPercent).toFixed(0)
-          : 0}
+      {progressPercent && (
+        <ProgressBar
+          height={20}
+          animated
+          containedPercent
+          percent={progressPercent ? (+progressPercent).toFixed(0) : 0}
         />
-      }
-      <ClusterSync taskStatus={connectionStatus}>
-        <ClusterStatusSpan title={spanContent} variant={variant}>
-          {capitalizeString(connectionStatus)}
-        </ClusterStatusSpan>
-      </ClusterSync>
+      )}
+      <ClusterStatusSpan title={spanContent} variant={variant} status="loading" iconStatus>
+        {capitalizeString(connectionStatus)}
+      </ClusterStatusSpan>
     </div>
   )
 }
 
-interface IClusterStatusProps { cluster: ICluster, variant: StatusVariant, message?: string }
-export const ClusterHealthStatus: FC<IClusterStatusProps> = ({ cluster, variant = 'table', message = undefined }) => {
+interface IClusterStatusProps {
+  cluster: ICluster
+  variant: StatusVariant
+  message?: string
+}
+export const ClusterHealthStatus: FC<IClusterStatusProps> = ({
+  cluster,
+  variant = 'table',
+  message = undefined,
+}) => {
   if (isTransientStatus(cluster.healthStatus)) {
     return renderTransientStatus(cluster.healthStatus, cluster.progressPercent, variant)
   }
@@ -118,31 +147,31 @@ export const ClusterHealthStatus: FC<IClusterStatusProps> = ({ cluster, variant 
 
   if (!fields) {
     return (
-      <ClusterStatusSpan
-        title={message || 'unknown'}
-        status="unknown"
-        variant={variant}
-      >
-        { message || 'unknown' }
+      <ClusterStatusSpan title={message || 'unknown'} status="unknown" variant={variant}>
+        {message || 'unknown'}
       </ClusterStatusSpan>
     )
   }
 
   return (
     <div>
-      <ClusterStatusSpan
-        title={fields.message}
-        status={fields.status}
-        variant={variant}
-      >
-        { variant === 'header' ? fields.label : <SimpleLink src={fields.nodesDetailsUrl}>{fields.label}</SimpleLink> }
+      <ClusterStatusSpan title={fields.message} status={fields.status} variant={variant}>
+        {variant === 'header' ? (
+          fields.label
+        ) : (
+          <SimpleLink src={fields.nodesDetailsUrl}>{fields.label}</SimpleLink>
+        )}
       </ClusterStatusSpan>
       {cluster.taskError && renderErrorStatus(cluster.taskError, fields.nodesDetailsUrl, variant)}
     </div>
   )
 }
 
-export const ClusterConnectionStatus: FC<IClusterStatusProps> = ({ cluster, variant = 'table', message = undefined }) => {
+export const ClusterConnectionStatus: FC<IClusterStatusProps> = ({
+  cluster,
+  variant = 'table',
+  message = undefined,
+}) => {
   if (isTransientStatus(cluster.connectionStatus)) {
     return renderTransientStatus(cluster.connectionStatus, cluster.progressPercent, variant)
   }
@@ -150,22 +179,19 @@ export const ClusterConnectionStatus: FC<IClusterStatusProps> = ({ cluster, vari
 
   if (!fields) {
     return (
-      <ClusterStatusSpan
-        title={message || 'unknown'}
-        status="unknown"
-        variant={variant}
-      >
-        { message || 'unknown' }
+      <ClusterStatusSpan title={message || 'unknown'} status="unknown" variant={variant}>
+        {message || 'unknown'}
       </ClusterStatusSpan>
     )
   }
 
   return (
-    <ClusterStatusSpan
-      title={fields.message}
-      status={fields.clusterStatus}
-      variant={variant}>
-      { variant === 'header' ? fields.label : <SimpleLink src={fields.nodesDetailsUrl}>{fields.label}</SimpleLink> }
+    <ClusterStatusSpan title={fields.message} status={fields.clusterStatus} variant={variant}>
+      {variant === 'header' ? (
+        fields.label
+      ) : (
+        <SimpleLink src={fields.nodesDetailsUrl}>{fields.label}</SimpleLink>
+      )}
     </ClusterStatusSpan>
   )
 }

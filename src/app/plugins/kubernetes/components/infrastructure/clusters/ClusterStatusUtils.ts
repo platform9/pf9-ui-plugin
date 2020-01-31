@@ -4,6 +4,8 @@ import { routes } from 'core/utils/routes'
 type TransientStatus = 'creating' | 'deleting' | 'updating' | 'upgrading' | 'converging'
 type ConnectionStatus = 'connected' | 'partially_connected' | 'disconnected'
 
+export type IClusterStatus = 'ok' | 'pause' | 'fail' | 'unknown' | 'error' | 'loading'
+
 interface Node {
   status: 'ok' | 'failed' | 'converging'
   isMaster: boolean
@@ -11,12 +13,12 @@ interface Node {
 
 interface ConnectionStatusFields {
   message: string
-  clusterStatus: string
+  clusterStatus: IClusterStatus
   label: string
 }
 
 interface HealthStatusFields {
-  status: string
+  status: IClusterStatus
   label: string
 }
 
