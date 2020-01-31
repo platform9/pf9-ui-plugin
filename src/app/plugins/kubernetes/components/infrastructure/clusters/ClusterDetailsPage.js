@@ -44,15 +44,18 @@ const useStyles = makeStyles((theme) => ({
   },
   statsContainer: {
     maxWidth: 1000,
-    marginBottom: theme.spacing(3),
+    marginBottom: theme.spacing(1),
+    '& .MuiGrid-item': {
+      marginBottom: theme.spacing(2),
+    },
   },
   statusItems: {
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'flex-start',
     '& > *': {
-      marginRight: theme.spacing(2)
-    }
+      marginRight: theme.spacing(2),
+    },
   },
   headerCardContainer: {
     minWidth: 320,
@@ -90,7 +93,7 @@ const useStyles = makeStyles((theme) => ({
       margin: '4px 0 0px 8px',
       fontSize: theme.spacing(2),
       color: theme.palette.text.secondary,
-    }
+    },
   },
   headerIcon: {
     color: theme.palette.text.secondary,
@@ -108,8 +111,8 @@ const useStyles = makeStyles((theme) => ({
     '& i': {
       marginBottom: theme.spacing(0.5),
       fontSize: theme.spacing(3),
-    }
-  }
+    },
+  },
 }))
 
 const ClusterDetailsPage = () => {
@@ -120,13 +123,19 @@ const ClusterDetailsPage = () => {
   return (
     <PageContainer
       header={
-        <SimpleLink src={routes.cluster.list.path()} className={classes.backLink}>
+        <SimpleLink
+          src={routes.cluster.list.path()}
+          className={classes.backLink}>
           « Back to Cluster List
         </SimpleLink>
       }
     >
       <>
-        <PollingData hidden loading={loading} onReload={reload} refreshDuration={oneSecond * 10} />
+        <PollingData
+          hidden
+          loading={loading}
+          onReload={reload}
+          refreshDuration={oneSecond * 10} />
         <ClusterStatusAndUsage cluster={cluster} loading={loading} />
         <Tabs>
           <Tab value="nodes" label="Nodes">
@@ -155,26 +164,32 @@ const ClusterStatusAndUsage = ({ cluster, loading }) => {
   }
   return (
     <Grid container className={classes.statsContainer}>
-      <Grid item xs={4}>
-        <div className={classes.statusItems}>
-          <HeaderCard title="Cluster" subtitle={name} icon="project-diagram" links={clusterLinks}>
-            <ClusterConnectionStatus cluster={cluster} variant="header" message={loading ? 'loading' : undefined} />
-            <ClusterHealthStatus cluster={cluster} variant="header" message={loading ? 'loading' : undefined} />
-          </HeaderCard>
-        </div>
+      <Grid item lg={4} className={classes.statusItems}>
+        <HeaderCard
+          title="Cluster"
+          subtitle={name}
+          icon="project-diagram"
+          links={clusterLinks}>
+          <ClusterConnectionStatus
+            cluster={cluster}
+            variant="header"
+            message={loading ? 'loading' : undefined} />
+          <ClusterHealthStatus
+            cluster={cluster}
+            variant="header"
+            message={loading ? 'loading' : undefined} />
+        </HeaderCard>
       </Grid>
-      <Grid item xs={8}>
-        <div className={classes.row}>
-          <UsageWidget units="GHz" title="Compute" stats={usage.compute} />
-          <UsageWidget units="GiB" title="Memory" stats={usage.memory} />
-          <UsageWidget units="GiB" title="Storage" stats={usage.disk} />
-        </div>
+      <Grid item lg={8} className={classes.row}>
+        <UsageWidget units="GHz" title="Compute" stats={usage.compute} />
+        <UsageWidget units="GiB" title="Memory" stats={usage.memory} />
+        <UsageWidget units="GiB" title="Storage" stats={usage.disk} />
       </Grid>
     </Grid>
   )
 }
 
-const HeaderCard = ({ title, subtitle, icon, loading=false, links, children }) => {
+const HeaderCard = ({ title, subtitle, icon, loading = false, links, children }) => {
   const hasLinks = !!links.grafana || !!links.dashboard || !!links.kubeconfig
   const classes = useStyles({ hasLinks })
   return (
@@ -182,16 +197,30 @@ const HeaderCard = ({ title, subtitle, icon, loading=false, links, children }) =
       <header className={classes.headerCardHeader}>
         <Typography variant="h6">{title}</Typography>
         <Typography variant="subtitle1" component="p">{subtitle}</Typography>
-        <FontAwesomeIcon className={clsx({ 'fa-spin': loading }, classes.headerIcon)}>{ loading ? 'sync' : icon}</FontAwesomeIcon>
+        <FontAwesomeIcon className={clsx({ 'fa-spin': loading }, classes.headerIcon)}>
+          {loading ? 'sync' : icon}
+        </FontAwesomeIcon>
       </header>
       <div className={classes.headerCardBody}>
         {children}
       </div>
       <hr className={classes.cardBoarder} />
       <footer className={classes.harderCardFooter}>
-        { !!links.grafana && <ExternalLink icon="chart-line" className={classes.verticalLink} url={links.grafana}>Grafana</ExternalLink> }
-        { !!links.dashboard && <ExternalLink icon="tachometer" className={classes.verticalLink} url={links.dashboard}>Dashboard</ExternalLink> }
-        { !!links.kubeconfig && <DownloadKubeConfigLink icon="cogs" className={classes.verticalLink} cluster={links.kubeconfig.cluster} /> }
+        {!!links.grafana &&
+        <ExternalLink
+          icon="chart-line"
+          className={classes.verticalLink}
+          url={links.grafana}>Grafana</ExternalLink>}
+        {!!links.dashboard &&
+        <ExternalLink
+          icon="tachometer"
+          className={classes.verticalLink}
+          url={links.dashboard}>Dashboard</ExternalLink>}
+        {!!links.kubeconfig &&
+        <DownloadKubeConfigLink
+          icon="cogs"
+          className={classes.verticalLink}
+          cluster={links.kubeconfig.cluster} />}
       </footer>
     </Card>
   )

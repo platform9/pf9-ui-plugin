@@ -29,9 +29,18 @@ const useStyles = makeStyles<Theme, { variant: ISimpleLinkVariant }>((theme) => 
 // We need to destructure staticContext even though we are not using it in order to
 // work around this issue: https://github.com/ReactTraining/react-router/issues/4683
 // We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
-const SimpleLink: ComponentType<Props> = forwardRef((
-  { onClick, src, children, staticContext, className, icon, variant, ...rest },
-  ref
+const SimpleLink: ComponentType<Props> = forwardRef<HTMLElement, Props>((
+  {
+    onClick,
+    src,
+    children,
+    staticContext,
+    className,
+    icon,
+    variant,
+    ...rest
+  },
+  ref,
 ) => {
   const classes = useStyles({ variant })
   const { history } = useReactRouter()
@@ -62,11 +71,11 @@ const SimpleLink: ComponentType<Props> = forwardRef((
       onClick={handleClick}
       {...rest}
     >
-      {!!icon && <FontAwesomeIcon className={classes.icon}>{icon}</FontAwesomeIcon>}
+      {!!icon &&
+      <FontAwesomeIcon className={classes.icon}>{icon}</FontAwesomeIcon>}
       {children || src}
     </Link>
   )
-},
-)
+})
 
-export default SimpleLink as React.FC<Props>
+export default SimpleLink
