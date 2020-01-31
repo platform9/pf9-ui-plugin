@@ -13,7 +13,7 @@ const isBlackListedFlavor = (flavor) => !blackListedFlavors.some((name) => flavo
 
 const AwsRegionFlavorPicklist = forwardRef(
   ({ cloudProviderId, cloudProviderRegionId, hasError, errorMessage, ...rest }, ref
-) => {
+  ) => {
     const [details, loading] = useDataLoader(loadCloudProviderRegionDetails, {
       cloudProviderId,
       cloudProviderRegionId,
