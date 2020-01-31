@@ -62,11 +62,10 @@ const useStyles = makeStyles((theme) => ({
     paddingTop: theme.spacing(),
   },
   harderCardFooter: {
-    display: 'flex',
-    flexDirection: 'row',
+    display: 'grid',
     alignItems: 'center',
-    justifyContent: 'space-around',
-    paddingTop: 4,
+    paddingTop: theme.spacing(0.5),
+    gridTemplateColumns: 'repeat(3, 1fr)',
   },
   headerCardBody: {
     display: 'block',
