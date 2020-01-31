@@ -61,7 +61,7 @@ const useStyles = makeStyles(theme => ({
     width: 715,
   },
   tableWidth: {
-    maxWidth: 560,
+    maxWidth: 715,
   },
   inputWidth: {
     maxWidth: 350,

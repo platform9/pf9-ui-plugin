@@ -71,7 +71,7 @@ const renderRoles = (_, node) => {
   return localizeRoles(roles).join(', ')
 }
 
-const UsageBar = ({ stat }) => {
+export const UsageBar = ({ stat }) => {
   const percent = Math.round((stat.current * 100) / stat.max)
   const cur = stat.current.toFixed(2)
   const max = stat.max.toFixed(2)
@@ -169,12 +169,14 @@ const renderRole = (_, { isMaster }) => isMaster ? 'Master' : 'Worker'
 
 const renderApiServer = (_, { isMaster, api_responding: apiResponding }) => !!isMaster && (!!apiResponding).toString()
 
-const renderNetworkInterfaces = (_, node) => {
+export const renderNetworkInterfaces = (_, node, { wrapText = false }) => {
   const primaryNetwork = pathStrOr(node.primaryIp, 'combined.qbert.primaryIp', node)
   const networkInterfaces = pathStrOr({}, 'combined.networkInterfaces', node)
   const orderedInterfaces = orderInterfaces(networkInterfaces, primaryNetwork)
   return orderedInterfaces.map(([interfaceName, interfaceIp]) => (
-    <Typography key={`${interfaceName}-${interfaceIp}`} variant="body2" className="no-wrap-text">{interfaceIp === primaryNetwork ? `${interfaceName} (primary)` : interfaceName} - {interfaceIp}</Typography>
+    <Typography key={`${interfaceName}-${interfaceIp}`} variant="body2" className={!wrapText ? 'no-wrap-text' : ''}>
+      {interfaceIp === primaryNetwork ? `${interfaceName} (primary)` : interfaceName} - {interfaceIp}
+    </Typography>
   ))
 }
 
