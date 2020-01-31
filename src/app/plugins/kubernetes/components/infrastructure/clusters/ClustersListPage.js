@@ -124,7 +124,7 @@ const renderMetaData = (_, { tags }) => {
   let content
   if (typeof tags === 'object') {
     content = JSON.stringify(tags)
-    // const values = tags['0'] ? Object.values(tags) : 
+    // const values = tags['0'] ? Object.values(tags) :
     // content = values.length > 0 ? JSON.stringify(values.map(JSON.parse), null, 2) : tagsNullValue
   } else {
     content = `${tags || ''}` || tagsNullValue
