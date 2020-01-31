@@ -23,7 +23,6 @@ import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import { pathJoin } from 'utils/misc'
 import {
   k8sPrefix, runtimePrivileged, awsNetworkingConfigurations, defaultEtcBackupPath,
-  defaultMonitoringTag
 } from 'app/constants'
 import ExternalLink from 'core/components/ExternalLink'
 import Code from 'core/components/CodeBlock'
@@ -35,6 +34,7 @@ import EtcdBackupFields from './EtcdBackupFields'
 import { makeStyles } from '@material-ui/styles'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import { routes } from 'core/utils/routes'
+import Alert from 'core/components/Alert'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
@@ -73,7 +73,8 @@ const initialContext = {
   internalElb: false,
   etcdStoragePath: defaultEtcBackupPath,
   etcdBackupInterval: 1, // in minutes
-  tags: [defaultMonitoringTag],
+  prometheusMonitoringEnabled: true,
+  tags: [],
 }
 
 const templateOptions = [
@@ -608,6 +609,15 @@ const AddAwsClusterPage = () => {
                           />
 
                           {values.etcdBackup && <EtcdBackupFields />}
+
+                          {/* Prometheus monitoring */}
+                          <CheckboxField
+                            id="prometheusMonitoringEnabled"
+                            label="Enable monitoring with prometheus"
+                            info="This deploys an instance of prometheus on the cluster."
+                          />
+
+                          { !values.prometheusMonitoringEnabled && <Alert small variant="error" message="The PMK management plane is not able to monitor the cluster health." /> }
 
                           {/* Advanced API Configuration */}
                           <PicklistField

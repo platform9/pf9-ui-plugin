@@ -1,5 +1,6 @@
 import React from 'react'
 import { Table, TableBody, TableCell, TableRow } from '@material-ui/core'
+import { castBoolToStr } from 'utils/misc'
 
 const DataRow = ({ label, value }) => (
   <TableRow>
@@ -7,8 +8,6 @@ const DataRow = ({ label, value }) => (
     <TableCell>{value}</TableCell>
   </TableRow>
 )
-
-const bool2str = value => value ? 'true' : 'false'
 
 // TODO: azs, networking info, services/api FQDN auto-generate, MTU size
 const AwsClusterReviewTable = ({ data }) => {
@@ -22,16 +21,17 @@ const AwsClusterReviewTable = ({ data }) => {
           <DataRow label="Operating system" value={data.ami} />
           <DataRow label="Master node instance type" value={data.masterFlavor} />
           <DataRow label="Worker node instance type" value={data.workerFlavor} />
-          <DataRow label="Enable auto scaling" value={bool2str(data.enableCAS)} />
+          <DataRow label="Auto scaling" value={castBoolToStr()(data.enableCAS)} />
           <DataRow label="Num master nodes" value={data.numMasters} />
           <DataRow label="Num worker nodes" value={numWorkers} />
           <DataRow label="SSH key" value={data.sshKey} />
-          <DataRow label="Make all Master nodes Master + Worker" value={bool2str(data.allowWorkloadsOnMaster)} />
+          <DataRow label="Make all Master nodes Master + Worker" value={castBoolToStr()(data.allowWorkloadsOnMaster)} />
           <DataRow label="Containers CIDR" value={data.containersCidr} />
           <DataRow label="Services CIDR" value={data.servicesCidr} />
           <DataRow label="Network backend" value={data.networkPlugin} />
-          <DataRow label="Privileged" value={bool2str(data.privileged)} />
-          <DataRow label="Enable application catalog" value={bool2str(data.appCatalogEnabled)} />
+          <DataRow label="Privileged" value={castBoolToStr()(data.privileged)} />
+          <DataRow label="Application catalog" value={castBoolToStr()(data.appCatalogEnabled)} />
+          <DataRow label="Prometheus monitoring" value={castBoolToStr()(data.prometheusMonitoringEnabled)} />
           <DataRow label="Tags" value={JSON.stringify(data.tags || [])} />
         </TableBody>
       </Table>

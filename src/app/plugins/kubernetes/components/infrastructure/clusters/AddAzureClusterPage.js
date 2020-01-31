@@ -20,7 +20,7 @@ import useParams from 'core/hooks/useParams'
 import useReactRouter from 'use-react-router'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import { pathJoin } from 'utils/misc'
-import { k8sPrefix, runtimePrivileged, defaultEtcBackupPath, defaultMonitoringTag } from 'app/constants'
+import { k8sPrefix, runtimePrivileged, defaultEtcBackupPath } from 'app/constants'
 import ExternalLink from 'core/components/ExternalLink'
 import Code from 'core/components/CodeBlock'
 import { cloudProviderActions } from '../cloudProviders/actions'
@@ -31,6 +31,7 @@ import EtcdBackupFields from './EtcdBackupFields'
 import { makeStyles } from '@material-ui/styles'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import { routes } from 'core/utils/routes'
+import Alert from 'core/components/Alert'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
@@ -66,7 +67,8 @@ const initialContext = {
   assignPublicIps: false,
   etcdStoragePath: defaultEtcBackupPath,
   etcdBackupInterval: 1,
-  tags: [defaultMonitoringTag],
+  prometheusMonitoringEnabled: true,
+  tags: [],
 }
 
 const templateOptions = [
@@ -444,6 +446,15 @@ const AddAzureClusterPage = () => {
                           />
 
                           {values.etcdBackup && <EtcdBackupFields />}
+
+                          {/* Prometheus monitoring */}
+                          <CheckboxField
+                            id="prometheusMonitoringEnabled"
+                            label="Enable monitoring with prometheus"
+                            info="This deploys an instance of prometheus on the cluster."
+                          />
+
+                          { !values.prometheusMonitoringEnabled && <Alert small variant="error" message="The PMK management plane is not able to monitor the cluster health." /> }
 
                           {/* Advanced API Configuration */}
                           <PicklistField
