@@ -32,7 +32,7 @@ interface ContainerProps {
   link?: JSX.Element
   className?: string
 }
-export const FormFieldCard: React.FC<ContainerProps> = ({ title, link = undefined, className = undefined, children }) => {
+export const FormFieldCard: React.FC<ContainerProps> = ({ title, link, className, children }) => {
   const classes = useStyles({})
   return (
     <div className={clsx(classes.root, className)}>
