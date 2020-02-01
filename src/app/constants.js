@@ -55,6 +55,11 @@ export const createServiceUrl = 'https://kubernetes.io/docs/tutorials/connecting
 
 export const persistVolumesStorageClasses = 'https://kubernetes.io/docs/concepts/storage/persistent-volumes/#storageclasses'
 
+// Api Access
+
+export const kubeconfigFile = 'https://kubernetes.io/docs/user-guide/kubeconfig-file/'
+export const kubectlOverview = 'https://kubernetes.io/docs/user-guide/kubectl-overview/'
+
 // Errors
 export const addError = 'ERR_ADD'
 export const updateError = 'ERR_UPDATE'

@@ -45,7 +45,7 @@ const EndpointsListPage = () => {
         link={
           <div>
             <FontAwesomeIcon className={classes.blueIcon} size="md">file-alt</FontAwesomeIcon>{' '}
-            <ExternalLink url={qbertApiLink}>Qbert API Documentation</ExternalLink>
+            <ExternalLink url={qbertApiLink}>Want to know more about Qbert?</ExternalLink>
           </div>
         }
       >

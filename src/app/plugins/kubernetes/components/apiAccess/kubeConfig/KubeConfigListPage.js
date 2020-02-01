@@ -13,13 +13,14 @@ import kubeConfigActions from './actions'
 import DownloadKubeConfigForm from './DownloadKubeConfigForm'
 import SimpleLink from 'core/components/SimpleLink'
 import ExternalLink from 'core/components/ExternalLink'
-import { OnboardingAccessSetup } from 'app/constants'
+import { OnboardingAccessSetup, kubeconfigFile } from 'app/constants'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { routes } from 'app/core/utils/routes'
 import CodeBlock from 'core/components/CodeBlock'
 import CopyToClipboard from 'core/components/CopyToClipboard'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import PollingData from 'core/components/PollingData'
+import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 
 const useStyles = makeStyles((theme) => ({
   formCard: {
@@ -40,9 +41,10 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.primary.main,
   },
   container: {
-    paddingLeft: theme.spacing()
+    paddingLeft: theme.spacing(),
   },
   detail: {
+    marginTop: theme.spacing(),
     display: 'flex',
     flexWrap: 'wrap',
     '& a': {
@@ -94,25 +96,21 @@ const KubeConfigListPage = () => {
         onReload={reloadClusters}
         refreshDuration={1000 * 60 * 10}
       />
-      <FormFieldCard title="Download kubeconfig" className={classes.formCard}>
+      <FormFieldCard
+        title="Download kubeconfig"
+        className={classes.formCard}
+        link={
+          <div>
+            <FontAwesomeIcon className={classes.blueIcon} size="md">
+              cogs
+            </FontAwesomeIcon>{' '}
+            <ExternalLink url={kubeconfigFile}>
+              Used to authenticate against clients.
+            </ExternalLink>
+          </div>
+        }
+      >
         <div className={classes.container}>
-          <span className={classes.detail}>
-            The
-            <ExternalLink
-              className={classes.link}
-              url="https://kubernetes.io/docs/user-guide/kubeconfig-file/"
-            >
-              kubeconfig
-            </ExternalLink>{' '}
-            file is required to authenticate to a cluster using the{' '}
-            <ExternalLink
-              className={classes.link}
-              url="https://kubernetes.io/docs/user-guide/kubectl-overview/"
-            >
-              kubectl
-            </ExternalLink>{' '}
-            CLI, Octant, Kubernetes Dashboard, and other clients.
-          </span>
           <h4 className={classes.clusterConfig}>Select a cluster to continue.</h4>
           <Table className={classes.tableContainer}>
             <TableHead>
