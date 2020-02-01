@@ -145,7 +145,7 @@ export const Tasks = ({ allTasks, completedTasks = [], lastFailedTask }) => {
     if (index < completedTasks.length || index <= failedTaskIndex) {
       return 'ok'
     }
-    if (index === completedTasks.length && completedTasks.length > 0 && failedTaskIndex > -1) {
+    if (index === completedTasks.length && completedTasks.length > 0 && failedTaskIndex === -1) {
       return 'loading'
     }
     return 'none'

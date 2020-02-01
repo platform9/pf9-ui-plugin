@@ -9,7 +9,6 @@ import { castBoolToStr, castFuzzyBool, columnPathLookup } from 'utils/misc'
 import SimpleLink from 'core/components/SimpleLink'
 import { loadNodes, nodesCacheKey } from 'k8s/components/infrastructure/nodes/actions'
 import ClusterStatusSpan from 'k8s/components/infrastructure/clusters/ClusterStatus'
-import ClusterSync from '../clusters/ClusterSync'
 import {
   connectionStatusFieldsTable,
   clusterHealthStatusFields,
@@ -110,12 +109,11 @@ const renderNodeDetailLink = (name, node) =>
 const renderClusterLink = (clusterName, { clusterUuid }) => clusterUuid &&
   <SimpleLink src={`/ui/kubernetes/infrastructure/clusters/${clusterUuid}`}>{clusterName}</SimpleLink>
 
-const renderConverging = () =>
-  <ClusterSync taskStatus={'converging'}>
-    <ClusterStatusSpan>
-      Converging
-    </ClusterStatusSpan>
-  </ClusterSync>
+const renderConverging = () => (
+  <ClusterStatusSpan status="loading" iconStatus>
+    Converging
+  </ClusterStatusSpan>
+)
 
 const renderRemoteSupport = () =>
   <div>
