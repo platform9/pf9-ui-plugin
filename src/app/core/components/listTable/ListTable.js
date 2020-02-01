@@ -305,7 +305,7 @@ class ListTable extends PureComponent {
   isSelected = row => {
     const { selected } = this.state
     const { selectedRows = selected } = this.props
-    return pluck('uuid', selectedRows).includes(path(['uuid'], row))
+    return includes(row, selectedRows)
   }
 
   paginate = data => {
