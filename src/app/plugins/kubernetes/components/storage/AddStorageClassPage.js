@@ -36,7 +36,6 @@ const useStyles = makeStyles((theme) => ({
   },
   blueIcon: {
     color: theme.palette.primary.main,
-    marginRight: theme.spacing(0.5),
   },
 }))
 
@@ -122,7 +121,7 @@ const CustomizeStep = ({ wizardContext, onSubmit, triggerSubmit }) => {
               <div>
                 <FontAwesomeIcon className={classes.blueIcon} size="md">
                   hdd
-                </FontAwesomeIcon>
+                </FontAwesomeIcon>{' '}
                 <ExternalLink url={persistVolumesStorageClasses}>
                   How do I configure a storage class?
                 </ExternalLink>

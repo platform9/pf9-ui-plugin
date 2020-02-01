@@ -27,10 +27,6 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     marginLeft: theme.spacing(2),
   },
-  blueIcon: {
-    color: theme.palette.primary.main,
-    marginRight: theme.spacing(0.5),
-  },
 }))
 
 export const AddNamespaceForm = ({ onComplete }) => {
