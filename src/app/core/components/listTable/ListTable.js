@@ -10,7 +10,7 @@ import { withStyles } from '@material-ui/styles'
 import { compose, ensureFunction, except } from 'app/utils/fp'
 import MoreMenu from 'core/components/MoreMenu'
 import {
-  max, any, assoc, assocPath, equals, pipe, pluck, path, prop, propEq, propOr, uniq, update, includes,
+  max, any, assoc, assocPath, equals, pipe, pluck, prop, propEq, propOr, uniq, update, includes,
 } from 'ramda'
 import ListTableHead from './ListTableHead'
 import ListTableToolbar from './ListTableToolbar'
