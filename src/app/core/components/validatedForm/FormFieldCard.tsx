@@ -2,6 +2,7 @@ import React from 'react'
 import { Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
+import clsx from 'clsx'
 
 export const useStyles = makeStyles<Theme>((theme) => ({
   root: {
@@ -29,11 +30,12 @@ export const useStyles = makeStyles<Theme>((theme) => ({
 interface ContainerProps {
   title: string
   link?: JSX.Element
+  className?: string
 }
-export const FormFieldCard: React.FC<ContainerProps> = ({ title, link = undefined, children }) => {
+export const FormFieldCard: React.FC<ContainerProps> = ({ title, link, className, children }) => {
   const classes = useStyles({})
   return (
-    <div className={classes.root}>
+    <div className={clsx(classes.root, className)}>
       <header className={classes.requirementsTitle}>
         <Typography variant="subtitle1">{title}</Typography>
         {!!link && link}

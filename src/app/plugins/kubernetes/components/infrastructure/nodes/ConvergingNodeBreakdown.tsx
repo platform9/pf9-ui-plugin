@@ -122,7 +122,7 @@ const sortNodesByTasks = (prevNode: ICombinedNode, currNode: ICombinedNode) => {
 export const ConvergingNodesWithTasksToggler: FC = () => {
   const { match, location } = useReactRouter()
   const searchParams = new URLSearchParams(location.search)
-  const linkedNodeUUID = searchParams.get('node')
+  const linkedNodeUUID = searchParams.get('node') || null
 
   const [selectedNode, setSelectedNode] = useState(null)
   const [clusters, loadingClusters, reloadClusters]: IUseDataLoader<ICluster> = useDataLoader(clusterActions.list) as any
@@ -132,10 +132,11 @@ export const ConvergingNodesWithTasksToggler: FC = () => {
     if (cluster) {
       const clusterNodesUids = pluck<'uuid', ICombinedNode>('uuid', cluster.nodes)
       const filteredNodes = nodes.filter((node) => clusterNodesUids.includes(node.uuid)).sort(sortNodesByTasks)
-      if (!selectedNode) {
-        const nodeToSelect = linkedNodeUUID ? filteredNodes.find(node => node.uuid === linkedNodeUUID) : filteredNodes[0]
-        setSelectedNode(nodeToSelect || null)
-      }
+
+      const uuid = selectedNode ? selectedNode.uuid : (linkedNodeUUID || filteredNodes[0]?.uuid)
+      const nodeToSelect = filteredNodes.find(node => node.uuid === uuid)
+      setSelectedNode(nodeToSelect || null) // always update as node data refreshes
+
       return filteredNodes
     }
     return emptyArr

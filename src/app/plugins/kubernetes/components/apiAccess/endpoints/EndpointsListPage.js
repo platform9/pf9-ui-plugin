@@ -4,16 +4,23 @@ import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import endpointsActions from './actions'
 import ExternalLink from 'core/components/ExternalLink'
 import { qbertApiLink } from 'app/constants'
+import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
+import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 
 const useStyles = makeStyles(theme => ({
-  container: {
-    marginBottom: theme.spacing(3),
+  formWidth: {
+    width: 715,
   },
-  link: {
-    display: 'block',
-    width: 'fit-content',
-    marginTop: theme.spacing(5),
-  }
+  inputWidth: {
+    maxWidth: 350,
+  },
+  submit: {
+    display: 'flex',
+    marginLeft: theme.spacing(2),
+  },
+  blueIcon: {
+    color: theme.palette.primary.main
+  },
 }))
 
 const EndpointsListPage = () => {
@@ -32,11 +39,19 @@ const EndpointsListPage = () => {
   const { ListPage } = createCRUDComponents(options)
 
   return (
-    <section className={classes.container}>
-      <h2>API Endpoints</h2>
-      <ListPage />
-      <ExternalLink className={classes.link} url={qbertApiLink}>See Qbert API documentation</ExternalLink>
-    </section>
+    <div className={classes.formWidth}>
+      <FormFieldCard
+        title="API Endpoints"
+        link={
+          <div>
+            <FontAwesomeIcon className={classes.blueIcon} size="md">file-alt</FontAwesomeIcon>{' '}
+            <ExternalLink url={qbertApiLink}>Want to know more about Qbert?</ExternalLink>
+          </div>
+        }
+      >
+        <ListPage />
+      </FormFieldCard>
+    </div>
   )
 }
 

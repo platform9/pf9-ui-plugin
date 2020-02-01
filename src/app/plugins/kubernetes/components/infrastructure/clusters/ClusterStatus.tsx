@@ -53,7 +53,7 @@ const useStyles = makeStyles<Theme, Props>((theme: Theme) => ({
     },
   },
   iconColor: {
-    fontSize: ({ variant }) => (variant === 'header' ? theme.typography.subtitle1.fontSize : 16),
+    fontSize: ({ variant }) => (variant === 'header' ? '1rem' : theme.typography.body1.fontSize),
     color: ({ status }) => getIconOrBubbleColor(status, theme)
   },
 }))
