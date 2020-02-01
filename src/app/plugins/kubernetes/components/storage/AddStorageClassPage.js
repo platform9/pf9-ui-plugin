@@ -3,26 +3,46 @@ import yaml from 'js-yaml'
 import createAddComponents from 'core/helpers/createAddComponents'
 import Wizard from 'core/components/wizard/Wizard'
 import WizardStep from 'core/components/wizard/WizardStep'
-import FormWrapper from 'core/components/FormWrapper'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import TextField from 'core/components/validatedForm/TextField'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
 import CodeMirror from 'core/components/validatedForm/CodeMirror'
-import { codeMirrorOptions, allKey } from 'app/constants'
+import { codeMirrorOptions, allKey, persistVolumesStorageClasses } from 'app/constants'
 import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
 import StorageTypePicklist from './StorageTypePicklist'
 import storageClassesActions, { storageClassesCacheKey } from './actions'
 import useParams from 'core/hooks/useParams'
 import useDataLoader from 'core/hooks/useDataLoader'
+import { makeStyles } from '@material-ui/styles'
+import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
+import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
+import ExternalLink from 'core/components/ExternalLink'
 
 const initialContext = {
   isDefault: false,
 }
 
-export const AddStorageClassForm = ({ onComplete }) =>
+const useStyles = makeStyles((theme) => ({
+  formWidth: {
+    width: 715,
+  },
+  tableWidth: {
+    width: 687, // oddly specific, this is so the tooltip doesn't overlay on the card
+    marginBottom: theme.spacing(),
+  },
+  inputWidth: {
+    maxWidth: 350,
+  },
+  blueIcon: {
+    color: theme.palette.primary.main,
+    marginRight: theme.spacing(0.5),
+  },
+}))
+
+export const AddStorageClassForm = ({ onComplete }) => (
   <Wizard onComplete={onComplete} context={initialContext}>
-    {({ wizardContext, setWizardContext, onNext }) =>
+    {({ wizardContext, setWizardContext, onNext }) => (
       <>
         <BasicStep onSubmit={setWizardContext} triggerSubmit={onNext} />
         <CustomizeStep
@@ -31,90 +51,98 @@ export const AddStorageClassForm = ({ onComplete }) =>
           triggerSubmit={onNext}
         />
       </>
-    }
+    )}
   </Wizard>
+)
 
 const BasicStep = ({ onSubmit, triggerSubmit }) => {
+  const classes = useStyles()
   const listStorageClassesParams = {
     clusterId: allKey,
     healthyClusters: true,
   }
   const [storageClasses] = useDataLoader(storageClassesActions.list, listStorageClassesParams)
   const { params, getParamsUpdater } = useParams()
-  const defaultStorageClassForCurrentCluster = storageClass =>
+  const defaultStorageClassForCurrentCluster = (storageClass) =>
     storageClass.clusterId === params.clusterId &&
     storageClass.metadata.annotations['storageclass.kubernetes.io/is-default-class'] === 'true'
   const defaultExists = !!storageClasses.find(defaultStorageClassForCurrentCluster)
 
   return (
     <WizardStep stepId="basic" label="Basic">
-      <p>
-        Create a new storage class on a specific cluster by specifying the storage type that maps to the cloud provider for that cluster.
-      </p>
-      <br />
-      <FormWrapper title="Add Storage Class">
-        <ValidatedForm onSubmit={onSubmit} triggerSubmit={triggerSubmit}>
-          <TextField
-            id="name"
-            label="Name"
-            info="Name for this storage class."
-            required
-          />
-          <PicklistField
-            DropdownComponent={ClusterPicklist}
-            id="clusterId"
-            label="Cluster"
-            info="The cluster to deploy this storage class on."
-            onChange={getParamsUpdater('clusterId')}
-            value={params.clusterId}
-            onlyHealthyClusters
-            required
-          />
-          <PicklistField
-            DropdownComponent={StorageTypePicklist}
-            id="storageType"
-            label="Storage Type"
-            info="Select the storage type for this storage class. The list of available storage types is specific to the cloud provider that the cluster belongs to."
-            required
-          />
-          <CheckboxField
-            id="isDefault"
-            label="Use as Default Storage Class"
-            info={defaultExists && 'A default storage class already exists on this cluster.'}
-            disabled={defaultExists}
-          />
-        </ValidatedForm>
-      </FormWrapper>
+      <ValidatedForm onSubmit={onSubmit} triggerSubmit={triggerSubmit}>
+        <div className={classes.formWidth}>
+          <FormFieldCard title="Name Your Storage Class">
+            <div className={classes.inputWidth}>
+              <TextField id="name" label="Name" info="Name for this storage class." required />
+              <PicklistField
+                DropdownComponent={ClusterPicklist}
+                id="clusterId"
+                label="Cluster"
+                info="The cluster to deploy this storage class on."
+                onChange={getParamsUpdater('clusterId')}
+                value={params.clusterId}
+                onlyHealthyClusters
+                required
+              />
+              <PicklistField
+                DropdownComponent={StorageTypePicklist}
+                id="storageType"
+                label="Storage Type"
+                info="Select the storage type for this storage class. The list of available storage types is specific to the cloud provider that the cluster belongs to."
+                required
+              />
+              <CheckboxField
+                id="isDefault"
+                label="Use as Default Storage Class"
+                info={defaultExists && 'A default storage class already exists on this cluster.'}
+                disabled={defaultExists}
+              />
+            </div>
+          </FormFieldCard>
+        </div>
+      </ValidatedForm>
     </WizardStep>
   )
 }
 
 const CustomizeStep = ({ wizardContext, onSubmit, triggerSubmit }) => {
+  const classes = useStyles()
   const storageClassYaml = getInitialStorageClassYaml(wizardContext)
   const { params, getParamsUpdater, updateParams } = useParams({ storageClassYaml })
   useEffect(() => updateParams({ storageClassYaml }), [wizardContext])
 
   return (
     <WizardStep stepId="customize" label="Customize" key={wizardContext}>
-      <p>
-        Optionally edit the storage class YAML for advanced configuration. See this <a href='https://kubernetes.io/docs/concepts/storage/persistent-volumes/#storageclasses'>article</a> for more information.
-      </p>
-      <p>
-        <b>NOTE:</b> In case of a conflict with options selected on the previous page, changes you make here will override them.
-      </p>
-      <br />
-      <FormWrapper title="Customize">
-        <ValidatedForm onSubmit={onSubmit} triggerSubmit={triggerSubmit}>
-          <CodeMirror
-            id="storageClassYaml"
-            label="Storage Class YAML"
-            options={codeMirrorOptions}
-            onChange={getParamsUpdater('storageClassYaml')}
-            initialValue={params.storageClassYaml}
-            required
-          />
-        </ValidatedForm>
-      </FormWrapper>
+      <ValidatedForm onSubmit={onSubmit} triggerSubmit={triggerSubmit}>
+        <div className={classes.formWidth}>
+          <FormFieldCard
+            title="Advanced Usage"
+            link={
+              <div>
+                <FontAwesomeIcon className={classes.blueIcon} size="md">
+                  hdd
+                </FontAwesomeIcon>
+                <ExternalLink url={persistVolumesStorageClasses}>
+                  How do I configure a storage class?
+                </ExternalLink>
+              </div>
+            }
+          >
+            <div className={classes.tableWidth}>
+              <CodeMirror
+                id="storageClassYaml"
+                label="Storage Class YAML"
+                options={codeMirrorOptions}
+                onChange={getParamsUpdater('storageClassYaml')}
+                initialValue={params.storageClassYaml}
+                info="In case of a conflict with options selected on the previous page, changes you make here will override them."
+                required
+              />
+            </div>
+          </FormFieldCard>
+        </div>
+      </ValidatedForm>
     </WizardStep>
   )
 }

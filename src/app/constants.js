@@ -51,6 +51,10 @@ export const createPodUrl = 'https://kubernetes.io/docs/tasks/configure-pod-cont
 export const createDeploymentUrl = 'https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#creating-a-deployment'
 export const createServiceUrl = 'https://kubernetes.io/docs/tutorials/connecting-apps/connecting-frontend-backend/#creating-the-backend-service-object'
 
+// Storage
+
+export const persistVolumesStorageClasses = 'https://kubernetes.io/docs/concepts/storage/persistent-volumes/#storageclasses'
+
 // Errors
 export const addError = 'ERR_ADD'
 export const updateError = 'ERR_UPDATE'
