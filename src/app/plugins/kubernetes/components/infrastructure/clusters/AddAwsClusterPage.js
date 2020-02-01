@@ -62,7 +62,7 @@ const initialContext = {
   numMasters: 1,
   numWorkers: 1,
   enableCAS: false,
-  usePf9Domain: true,
+  usePf9Domain: false,
   network: 'newPublic',
   containersCidr: '10.20.0.0/16',
   servicesCidr: '10.21.0.0/16',
@@ -323,7 +323,7 @@ const AddAwsClusterPage = () => {
 
   return (
     <FormWrapper title="Add AWS Cluster" backUrl={listUrl} loading={creatingAwsCluster || loading} message={loading ? 'loading...' : 'Submitting form...'}>
-      <Wizard disableNext={!hasAwsProvider} onComplete={handleSubmit(params)} context={initialContext} originPath={routes.cluster.add.path()} showFinishAndReviewButton>
+      <Wizard disableNext={!hasAwsProvider} onComplete={handleSubmit(params)} context={initialContext} originPath={routes.cluster.add.path()}>
         {({ wizardContext, setWizardContext, onNext }) => {
           return (
             <>
@@ -508,11 +508,11 @@ const AddAwsClusterPage = () => {
                       <FormFieldCard title="Networking Details">
                         <div className={classes.inputWidth}>
                           {/* Use PF9 domain */}
-                          <CheckboxField
+                          {/* <CheckboxField
                             id="usePf9Domain"
                             label="Use the platform9.net domain"
                             info="Select this option if you want Platform9 to automatically generate the endpoints or if you do not have access to Route 53."
-                          />
+                          /> */}
                           {renderCustomNetworkingFields({
                             params,
                             getParamsUpdater,
@@ -522,7 +522,8 @@ const AddAwsClusterPage = () => {
                             wizardContext,
                           })}
 
-                          {/* API FQDN */}<TextField
+                          {/* API FQDN */}
+                          <TextField
                             id="externalDnsName"
                             label="API FQDN"
                             info="FQDN (Fully Qualified Domain Name) is used to reference cluster API. To ensure the API can be accessed securely at the FQDN, the FQDN will be included in the API server certificate's Subject Alt Names. If deploying onto a cloud provider, we will automatically create the DNS records for this FQDN using the cloud provider’s DNS service."

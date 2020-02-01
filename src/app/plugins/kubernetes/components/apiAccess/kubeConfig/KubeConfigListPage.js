@@ -13,21 +13,38 @@ import kubeConfigActions from './actions'
 import DownloadKubeConfigForm from './DownloadKubeConfigForm'
 import SimpleLink from 'core/components/SimpleLink'
 import ExternalLink from 'core/components/ExternalLink'
-import { OnboardingAccessSetup } from 'app/constants'
+import { OnboardingAccessSetup, kubeconfigFile } from 'app/constants'
 import useDataLoader from 'core/hooks/useDataLoader'
-import Progress from 'core/components/progress/Progress'
 import { routes } from 'app/core/utils/routes'
 import CodeBlock from 'core/components/CodeBlock'
 import CopyToClipboard from 'core/components/CopyToClipboard'
+import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
+import PollingData from 'core/components/PollingData'
+import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 
 const useStyles = makeStyles((theme) => ({
+  formCard: {
+    marginTop: theme.spacing(0.5),
+  },
+  formWidth: {
+    width: 715,
+    marginTop: theme.spacing(4),
+  },
+  inputWidth: {
+    maxWidth: 350,
+  },
+  submit: {
+    display: 'flex',
+    marginLeft: theme.spacing(2),
+  },
+  blueIcon: {
+    color: theme.palette.primary.main,
+  },
   container: {
-    marginTop: theme.spacing(3),
-    '& h6': {
-      marginLeft: 0,
-    },
+    paddingLeft: theme.spacing(),
   },
   detail: {
+    marginTop: theme.spacing(),
     display: 'flex',
     flexWrap: 'wrap',
     '& a': {
@@ -61,10 +78,10 @@ const KubeConfigListPage = () => {
   const [selectedCluster, setSelectedCluster] = useState()
   const [downloadedKubeconfigs, setDownloadedKubeconfigs] = useState({})
 
-  const [clusters, loadingClusters] = useDataLoader(kubeConfigActions.list)
+  const [clusters, loadingClusters, reloadClusters] = useDataLoader(kubeConfigActions.list)
   const classes = useStyles()
 
-  const handleDownloadKubeConfig = cluster => kubeconfig => {
+  const handleDownloadKubeConfig = (cluster) => (kubeconfig) => {
     setDownloadedKubeconfigs({
       ...downloadedKubeconfigs,
       [cluster.uuid]: kubeconfig,
@@ -72,29 +89,28 @@ const KubeConfigListPage = () => {
 
     localStorage.setItem(OnboardingAccessSetup, 'true')
   }
-
   return (
-    <section className={classes.container}>
-      <h2>Download kubeconfig</h2>
-      <span className={classes.detail}>
-        <span>The</span>
-        <ExternalLink
-          className={classes.link}
-          url="https://kubernetes.io/docs/user-guide/kubeconfig-file/"
-        >
-          kubeconfig
-        </ExternalLink>
-        <span>file is required to authenticate to a cluster using the </span>
-        <ExternalLink
-          className={classes.link}
-          url="https://kubernetes.io/docs/user-guide/kubectl-overview/"
-        >
-          kubectl
-        </ExternalLink>
-        <span>CLI, Octant, Kubernetes Dashboard, and other clients.</span>
-      </span>
-      <Progress loading={loadingClusters}>
-        <div>
+    <section className={classes.formWidth}>
+      <PollingData
+        loading={loadingClusters}
+        onReload={reloadClusters}
+        refreshDuration={1000 * 60 * 10}
+      />
+      <FormFieldCard
+        title="Download kubeconfig"
+        className={classes.formCard}
+        link={
+          <div>
+            <FontAwesomeIcon className={classes.blueIcon} size="md">
+              cogs
+            </FontAwesomeIcon>{' '}
+            <ExternalLink url={kubeconfigFile}>
+              Used to authenticate against clients.
+            </ExternalLink>
+          </div>
+        }
+      >
+        <div className={classes.container}>
           <h4 className={classes.clusterConfig}>Select a cluster to continue.</h4>
           <Table className={classes.tableContainer}>
             <TableHead>
@@ -111,8 +127,8 @@ const KubeConfigListPage = () => {
                     <div>
                       <Typography variant="body1">
                         There are no clusters available. You need to{' '}
-                        <SimpleLink src={routes.cluster.add.path()}>create a cluster</SimpleLink> first
-                        to continue.
+                        <SimpleLink src={routes.cluster.add.path()}>create a cluster</SimpleLink>{' '}
+                        first to continue.
                       </Typography>
                     </div>
                   </TableCell>
@@ -121,9 +137,7 @@ const KubeConfigListPage = () => {
               {clusters.map((cluster = {}) => (
                 <TableRow key={cluster.uuid} onClick={() => setSelectedCluster(cluster)}>
                   <TableCell padding="checkbox">
-                    <Radio
-                      checked={!!selectedCluster && selectedCluster.uuid === cluster.uuid}
-                    />
+                    <Radio checked={!!selectedCluster && selectedCluster.uuid === cluster.uuid} />
                   </TableCell>
                   <TableCell>{cluster.name}</TableCell>
                   <TableCell>{cluster.externalDnsName}</TableCell>
@@ -131,19 +145,23 @@ const KubeConfigListPage = () => {
               ))}
             </TableBody>
           </Table>
+          {!!selectedCluster && !downloadedKubeconfigs[selectedCluster.uuid] && (
+            <DownloadKubeConfigForm
+              cluster={selectedCluster}
+              onSubmit={handleDownloadKubeConfig(selectedCluster)}
+            />
+          )}
+          {!!selectedCluster && downloadedKubeconfigs[selectedCluster.uuid] && (
+            <CopyToClipboard
+              copyText={downloadedKubeconfigs[selectedCluster.uuid]}
+              inline={false}
+              header={selectedCluster.name}
+            >
+              <CodeBlock>{downloadedKubeconfigs[selectedCluster.uuid]}</CodeBlock>
+            </CopyToClipboard>
+          )}
         </div>
-      </Progress>
-      {!!selectedCluster && !downloadedKubeconfigs[selectedCluster.uuid] && (
-        <DownloadKubeConfigForm
-          cluster={selectedCluster}
-          onSubmit={handleDownloadKubeConfig(selectedCluster)}
-        />
-      )}
-      {!!selectedCluster && downloadedKubeconfigs[selectedCluster.uuid] && (
-        <CopyToClipboard copyText={downloadedKubeconfigs[selectedCluster.uuid]} inline={false} header={selectedCluster.name}>
-          <CodeBlock>{downloadedKubeconfigs[selectedCluster.uuid]}</CodeBlock>
-        </CopyToClipboard>
-      )}
+      </FormFieldCard>
     </section>
   )
 }
