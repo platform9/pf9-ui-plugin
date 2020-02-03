@@ -1,19 +1,12 @@
 import React, { useState } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
-import {
-  Table,
-  TableHead,
-  TableCell,
-  TableRow,
-  TableBody,
-  Radio,
-  Typography,
-} from '@material-ui/core'
+import { Radio, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@material-ui/core'
 import kubeConfigActions from './actions'
+import { kubeconfigFileLink } from 'k8s/links'
 import DownloadKubeConfigForm from './DownloadKubeConfigForm'
 import SimpleLink from 'core/components/SimpleLink'
 import ExternalLink from 'core/components/ExternalLink'
-import { OnboardingAccessSetup, kubeconfigFile } from 'app/constants'
+import { onboardingAccessSetup } from 'app/constants'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { routes } from 'app/core/utils/routes'
 import CodeBlock from 'core/components/CodeBlock'
@@ -87,7 +80,7 @@ const KubeConfigListPage = () => {
       [cluster.uuid]: kubeconfig,
     })
 
-    localStorage.setItem(OnboardingAccessSetup, 'true')
+    localStorage.setItem(onboardingAccessSetup, 'true')
   }
   return (
     <section className={classes.formWidth}>
@@ -104,7 +97,7 @@ const KubeConfigListPage = () => {
             <FontAwesomeIcon className={classes.blueIcon} size="md">
               cogs
             </FontAwesomeIcon>{' '}
-            <ExternalLink url={kubeconfigFile}>
+            <ExternalLink url={kubeconfigFileLink}>
               Used to authenticate against clients.
             </ExternalLink>
           </div>

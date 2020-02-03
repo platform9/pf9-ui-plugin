@@ -21,9 +21,8 @@ import useParams from 'core/hooks/useParams'
 import useReactRouter from 'use-react-router'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import { pathJoin } from 'utils/misc'
-import {
-  k8sPrefix, runtimePrivileged, awsNetworkingConfigurations, defaultEtcBackupPath,
-} from 'app/constants'
+import { awsNetworkingConfigurationsLink, runtimePrivilegedLink } from 'k8s/links'
+import { defaultEtcBackupPath, k8sPrefix } from 'app/constants'
 import ExternalLink from 'core/components/ExternalLink'
 import Code from 'core/components/CodeBlock'
 import { CloudProviders } from './model'
@@ -303,7 +302,10 @@ const renderCustomNetworkingFields = ({ params, getParamsUpdater, values, setFie
         label="Network"
         options={networkOptions}
         disabled={values.usePf9Domain}
-        info={<div>Select a network configuration. Read <ExternalLink url={awsNetworkingConfigurations}>this article</ExternalLink> for detailed information about each network configuration type.</div>}
+        info={<div>Select a network configuration.
+          Read <ExternalLink url={awsNetworkingConfigurationsLink}>this
+            article</ExternalLink> for detailed information about each network
+          configuration type.</div>}
       />
       {renderNetworkFields(values)}
     </>
@@ -599,7 +601,11 @@ const AddAwsClusterPage = () => {
                             id="privileged"
                             label="Privileged"
                             disabled={['calico', 'canal', 'weave'].includes(values.networkPlugin)}
-                            info={<div>Allows this cluster to run privileged containers. Read <ExternalLink url={runtimePrivileged}>this article</ExternalLink> for more information.</div>}
+                            info={<div>Allows this cluster to run privileged
+                              containers.
+                              Read <ExternalLink url={runtimePrivilegedLink}>this
+                                article</ExternalLink> for more information.
+                            </div>}
                           />
 
                           {/* Etcd Backup */}

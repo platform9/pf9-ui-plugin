@@ -7,7 +7,7 @@ import { Typography } from '@material-ui/core'
 import ExternalLink from 'core/components/ExternalLink'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import { makeStyles } from '@material-ui/styles'
-import { iamPolicy, awsAccessHelpUrl } from 'app/constants'
+import { awsAccessHelpLink, iamPolicyLink } from 'k8s/links'
 
 const useStyles = makeStyles(theme => ({
   formWidth: {
@@ -52,12 +52,14 @@ const AddAwsCloudProvider = ({ onComplete }) => {
                 <ul>
                   <li>ELB Management</li>
                   <li>Route 53 DNS Configuration</li>
-                  <li>Access to 2 or more Availability Zones within the region</li>
+                  <li>Access to 2 or more Availability Zones within the region
+                  </li>
                   <li>EC2 Instance Management</li>
                   <li>EBS Volume Management</li>
                   <li>VPC Management</li>
                 </ul>
-                <p><ExternalLink url={iamPolicy}>View the exact IAM policy we require</ExternalLink></p>
+                <p><ExternalLink url={iamPolicyLink}>View the exact IAM policy
+                  we require</ExternalLink></p>
               </div>
             </Alert>
           </Typography>
@@ -66,7 +68,7 @@ const AddAwsCloudProvider = ({ onComplete }) => {
             <TextField required id="name" label="Name" info="Name of the cloud provider" />
             <TextField required id="key" label="AWS Access Key ID" info={<span>
               This is the part of the AWS two part accesskey required for API access.&nbsp;
-              <ExternalLink url={awsAccessHelpUrl}>Here</ExternalLink> is info on getting your AWS access and secret key.
+              <ExternalLink url={awsAccessHelpLink}>Here</ExternalLink> is info on getting your AWS access and secret key.
             </span>} />
             <TextField required id="secret" type="password" label="Secret Key" info="The client secret key" />
             <SubmitButton>Add Cloud Provider</SubmitButton>

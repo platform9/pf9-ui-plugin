@@ -19,8 +19,9 @@ import useDataUpdater from 'core/hooks/useDataUpdater'
 import useParams from 'core/hooks/useParams'
 import useReactRouter from 'use-react-router'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
+import { runtimePrivilegedLink } from 'k8s/links'
 import { pathJoin } from 'utils/misc'
-import { k8sPrefix, runtimePrivileged, defaultEtcBackupPath } from 'app/constants'
+import { defaultEtcBackupPath, k8sPrefix } from 'app/constants'
 import ExternalLink from 'core/components/ExternalLink'
 import Code from 'core/components/CodeBlock'
 import { cloudProviderActions } from '../cloudProviders/actions'
@@ -435,7 +436,11 @@ const AddAzureClusterPage = () => {
                             id="privileged"
                             label="Privileged"
                             disabled={['calico', 'canal', 'weave'].includes(values.networkPlugin)}
-                            info={<div>Allows this cluster to run privileged containers. Read <ExternalLink url={runtimePrivileged}>this article</ExternalLink> for more information.</div>}
+                            info={<div>Allows this cluster to run privileged
+                              containers.
+                              Read <ExternalLink url={runtimePrivilegedLink}>this
+                                article</ExternalLink> for more information.
+                            </div>}
                           />
 
                           {/* Etcd Backup */}

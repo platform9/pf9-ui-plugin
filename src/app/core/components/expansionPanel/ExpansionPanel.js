@@ -1,20 +1,12 @@
 import React, { useCallback, useState } from 'react'
-import { makeStyles, createStyles } from '@material-ui/styles'
-import {
-  ExpansionPanel as MDExpansionPanel,
-  ExpansionPanelSummary,
-  ExpansionPanelDetails,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  Typography,
-} from '@material-ui/core'
-import { ExpandMore, ChevronRight } from '@material-ui/icons'
+import { createStyles, makeStyles } from '@material-ui/styles'
+import { Dialog, DialogContent, DialogTitle, ExpansionPanel as MDExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, Typography } from '@material-ui/core'
+import { ChevronRight, ExpandMore } from '@material-ui/icons'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import CancelButton from '../buttons/CancelButton'
 import NextButton from '../buttons/NextButton'
 import ExternalLink from '../ExternalLink'
-import { gettingStartedLink } from 'app/constants'
+import { gettingStartedLink } from 'k8s/links'
 import CloseButton from '../buttons/CloseButton'
 
 const useStyles = makeStyles((theme) =>

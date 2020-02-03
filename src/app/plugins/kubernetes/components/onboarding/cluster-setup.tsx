@@ -1,5 +1,11 @@
 import React, { useCallback, useState } from 'react'
-import { Table, TableCell, TableRow, TableBody, Typography } from '@material-ui/core'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+  Typography,
+} from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import ExpansionPanel from 'core/components/expansionPanel/ExpansionPanel'
 import Theme from 'core/themes/model'
@@ -7,7 +13,7 @@ import OnboardWizard from './onboard-wizard'
 import NextButton from 'core/components/buttons/NextButton'
 import useReactRouter from 'use-react-router'
 import CodeBlock from 'core/components/CodeBlock'
-import { OnboardingAccessSetup, OnboardingMonitoringSetup } from 'app/constants'
+import { onboardingAccessSetup, onboardingMonitoringSetup } from 'app/constants'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { clusterActions } from '../infrastructure/clusters/actions'
 import PrometheusAddonDialog from '../prometheus/PrometheusAddonDialog'
@@ -35,9 +41,9 @@ const useStyles = makeStyles<Theme>((theme) => ({
 
 export const clustersHaveMonitoring = (clusters: any[]) =>
   !!clusters.find((cluster) => !!cluster?.combined?.usage?.grafanaLink) ||
-  !!localStorage.getItem(OnboardingMonitoringSetup)
+  !!localStorage.getItem(onboardingMonitoringSetup)
 
-export const clustersHaveAccess = () => !!localStorage.getItem(OnboardingAccessSetup)
+export const clustersHaveAccess = () => !!localStorage.getItem(onboardingAccessSetup)
 
 interface Props {
   onComplete: () => void
@@ -78,7 +84,7 @@ const ClusterSetup = ({ onComplete, initialPanel = Panels.Cluster }: Props) => {
     [activePanels],
   )
   const handleSkipAccess = useCallback(() => {
-    localStorage.setItem(OnboardingAccessSetup, 'true')
+    localStorage.setItem(onboardingAccessSetup, 'true')
     const panelsToKeep = new Set(activePanels)
     panelsToKeep.delete(Panels.Access)
     if (!hasMonitoring) {
@@ -91,7 +97,7 @@ const ClusterSetup = ({ onComplete, initialPanel = Panels.Cluster }: Props) => {
   }, [activePanels])
 
   const handleSkipMonitoring = useCallback(() => {
-    localStorage.setItem(OnboardingMonitoringSetup, 'true')
+    localStorage.setItem(onboardingMonitoringSetup, 'true')
     const panelsToKeep = new Set(activePanels)
     panelsToKeep.delete(Panels.Monitoring)
     setActivePanels(panelsToKeep)

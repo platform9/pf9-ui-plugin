@@ -3,7 +3,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import endpointsActions from './actions'
 import ExternalLink from 'core/components/ExternalLink'
-import { qbertApiLink } from 'app/constants'
+import { qbertApiLink } from 'k8s/links'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 
