@@ -1,4 +1,4 @@
-import { pluck, flatten } from 'ramda'
+import { pluck, flatten, pathOr } from 'ramda'
 import { allKey } from 'app/constants'
 import ApiClient from 'api-client/ApiClient'
 import { clustersCacheKey } from 'k8s/components/infrastructure/common/actions'
@@ -19,6 +19,7 @@ const namespacesMapper = async (items, params, loadFromContext) => {
   return items.map(ns => ({
     ...ns,
     clusterName: findClusterName(clusters, ns.clusterId),
+    status: pathOr('N/A', ['status', 'phase'], ns)
   }))
 }
 
