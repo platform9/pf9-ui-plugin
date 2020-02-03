@@ -1,4 +1,3 @@
-
 import React, { useCallback } from 'react'
 import { castFuzzyBool } from 'utils/misc'
 import { compose, path } from 'ramda'
@@ -6,7 +5,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mate
 import ApiClient from 'api-client/ApiClient'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import { clusterActions } from '../infrastructure/clusters/actions'
-import { OnboardingMonitoringSetup } from 'app/constants'
+import { onboardingMonitoringSetup } from 'app/constants'
 import { useToast } from 'core/providers/ToastProvider'
 
 export const hasPrometheusEnabled = compose(castFuzzyBool, path(['tags', 'pf9-system:monitoring']))
@@ -37,7 +36,7 @@ const PrometheusAddonDialog = ({ rows: [cluster], onClose }) => {
       const monId = monPkg.ID
       await appbert.toggleAddon(cluster.uuid, monId, !enabled)
       if (!enabled) {
-        localStorage.setItem(OnboardingMonitoringSetup, 'true')
+        localStorage.setItem(onboardingMonitoringSetup, 'true')
       }
     } catch (e) {
       showToast('Failed to update monitoring status', 'error')

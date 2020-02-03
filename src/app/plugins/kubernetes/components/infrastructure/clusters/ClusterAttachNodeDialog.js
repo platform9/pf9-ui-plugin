@@ -3,15 +3,12 @@ import ExternalLink from 'core/components/ExternalLink'
 import { compose, propOr } from 'ramda'
 import { withAppContext } from 'core/providers/AppProvider'
 import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab'
-import {
-  Button, Dialog, DialogActions, DialogContent, DialogTitle, Table, TableBody, TableRow, TableCell,
-  Typography,
-} from '@material-ui/core'
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Table, TableBody, TableCell, TableRow, Typography } from '@material-ui/core'
 import withDataLoader from 'core/hocs/withDataLoader'
 import withDataMapper from 'core/hocs/withDataMapper'
 import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
 import { cloudProviderActions } from 'k8s/components/infrastructure/cloudProviders/actions'
-import { managedContainerChecklist } from 'app/constants'
+import { managedContainerChecklistLink } from 'k8s/links'
 
 // The modal is technically inside the row, so clicking anything inside
 // the modal window will cause the table row to be toggled.
@@ -77,8 +74,9 @@ class ClusterAttachNodeDialog extends PureComponent {
         <DialogContent>
           <p>
             <b>IMPORTANT</b>:
-            Before adding nodes to a cluster, please ensure that you have followed the requirements
-            in <ExternalLink url={managedContainerChecklist}>this
+            Before adding nodes to a cluster, please ensure that you have
+            followed the requirements
+            in <ExternalLink url={managedContainerChecklistLink}>this
             article</ExternalLink> for
             each node.
           </p>

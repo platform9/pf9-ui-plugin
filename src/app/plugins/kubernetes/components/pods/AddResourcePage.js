@@ -4,12 +4,7 @@ import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import SubmitButton from 'core/components/SubmitButton'
 import CodeMirror from 'core/components/validatedForm/CodeMirror'
-import {
-  codeMirrorOptions,
-  createDeploymentUrl,
-  createServiceUrl,
-  createPodUrl,
-} from 'app/constants'
+import { codeMirrorOptions } from 'app/constants'
 import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
 import NamespacePicklist from 'k8s/components/common/NamespacePicklist'
 import useParams from 'core/hooks/useParams'
@@ -19,12 +14,13 @@ import useDataUpdater from 'core/hooks/useDataUpdater'
 import FormWrapper from 'core/components/FormWrapper'
 import { objSwitchCase } from 'utils/fp'
 import moize from 'moize'
-import { deploymentActions, serviceActions, podActions } from 'k8s/components/pods/actions'
+import { deploymentActions, podActions, serviceActions } from 'k8s/components/pods/actions'
 import Progress from 'core/components/progress/Progress'
 import Button from '@material-ui/core/Button'
-import { requiredValidator, customValidator } from 'core/utils/fieldValidators'
+import { customValidator, requiredValidator } from 'core/utils/fieldValidators'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import { makeStyles } from '@material-ui/styles'
+import { createDeploymentLink, createPodLink, createServiceLink } from 'k8s/links'
 import { capitalizeString } from 'utils/misc'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { routes } from 'core/utils/routes'
@@ -55,9 +51,17 @@ const listRoutes = {
   service: routes.services.list,
 }
 const linksByResourceType = {
-  pod: { icon: 'cubes', url: createPodUrl, label: 'How do I create a pod?' },
-  deployment: { icon: 'window', url: createDeploymentUrl, label: 'How do I create a deployment?' },
-  service: { icon: 'tasks-alt', url: createServiceUrl, label: 'How do I create a service?' },
+  pod: { icon: 'cubes', url: createPodLink, label: 'How do I create a pod?' },
+  deployment: {
+    icon: 'window',
+    url: createDeploymentLink,
+    label: 'How do I create a deployment?',
+  },
+  service: {
+    icon: 'tasks-alt',
+    url: createServiceLink,
+    label: 'How do I create a service?',
+  },
 }
 
 const yamlTemplates = {

@@ -5,7 +5,11 @@ import Alert from 'core/components/Alert'
 import SubmitButton from 'core/components/buttons/SubmitButton'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import ExternalLink from 'core/components/ExternalLink'
-import { azureServicePrincipalPortal, azureGetValuesForSigningin, azureCreateANewApplicationSecret } from 'app/constants'
+import {
+  azureCreateANewApplicationSecretLink,
+  azureGetValuesForSigninginLink,
+  azureServicePrincipalPortalLink,
+} from 'k8s/links'
 import { routes } from 'core/utils/routes'
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -53,14 +57,14 @@ const AzureClusterRequirements = ({ onComplete }) => {
           In order to be able to perform the necessary operations on Managed Kubernetes clusters,
           your credentials must have a ‘contributor’ role assigned, or a similar read/write role
           where the user is able to access subscriptions, and create/update/delete Azure resources.
-          <ExternalLink url={azureServicePrincipalPortal}>
+          <ExternalLink url={azureServicePrincipalPortalLink}>
             See this article
           </ExternalLink>{' '}
           for detailed steps.
         </Typography>
         <Typography className={classes.alertTitle} variant="body1">
           See the{' '}
-          <ExternalLink url={azureGetValuesForSigningin}>
+          <ExternalLink url={azureGetValuesForSigninginLink}>
             section under get values
           </ExternalLink>{' '}
           for signing in to find the tenant and client IDs.
@@ -68,7 +72,7 @@ const AzureClusterRequirements = ({ onComplete }) => {
         <Typography className={classes.alertTitle} variant="body1">
           A client secret must be present before creating an Azure cloud provider. To learn more
           about creating a client secret, see{' '}
-          <ExternalLink url={azureCreateANewApplicationSecret}>
+          <ExternalLink url={azureCreateANewApplicationSecretLink}>
             create a new application secret
           </ExternalLink>
           .

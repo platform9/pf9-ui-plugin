@@ -8,7 +8,8 @@ import TextField from 'core/components/validatedForm/TextField'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
 import CodeMirror from 'core/components/validatedForm/CodeMirror'
-import { codeMirrorOptions, allKey, persistVolumesStorageClasses } from 'app/constants'
+import { allKey, codeMirrorOptions } from 'app/constants'
+import { persistVolumesStorageClassesLink } from 'k8s/links'
 import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
 import StorageTypePicklist from './StorageTypePicklist'
 import storageClassesActions, { storageClassesCacheKey } from './actions'
@@ -122,7 +123,7 @@ const CustomizeStep = ({ wizardContext, onSubmit, triggerSubmit }) => {
                 <FontAwesomeIcon className={classes.blueIcon} size="md">
                   hdd
                 </FontAwesomeIcon>{' '}
-                <ExternalLink url={persistVolumesStorageClasses}>
+                <ExternalLink url={persistVolumesStorageClassesLink}>
                   How do I configure a storage class?
                 </ExternalLink>
               </div>
