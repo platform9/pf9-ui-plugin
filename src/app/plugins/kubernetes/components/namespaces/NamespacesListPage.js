@@ -15,6 +15,8 @@ const defaultParams = {
 }
 const usePrefParams = createUsePrefParamsHook('Namespaces', listTablePrefs)
 
+const canDeleteNameSpace = ([namespace]) => namespace.status !== 'Terminating'
+
 const ListPage = ({ ListContainer }) => {
   return () => {
     const { params, getParamsUpdater } = usePrefParams(defaultParams)
@@ -52,11 +54,13 @@ export const options = {
   addText: 'Add Namespace',
   columns: [
     { id: 'name', label: 'Name' },
+    { id: 'status', label: 'Status' },
     { id: 'clusterName', label: 'Cluster' },
     { id: 'created', label: 'Created' },
   ],
   loaderFn: namespaceActions.list,
   deleteFn: namespaceActions.delete,
+  deleteCond: canDeleteNameSpace,
   name: 'Namespaces',
   title: 'Namespaces',
   ListPage
