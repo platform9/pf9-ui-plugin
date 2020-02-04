@@ -25,10 +25,7 @@ import {
 } from 'ramda'
 import { rawNodesCacheKey } from 'k8s/components/infrastructure/nodes/actions'
 import {
-  getMasterNodesHealthStatus,
-  getWorkerNodesHealthStatus,
-  getConnectionStatus,
-  getHealthStatus,
+  getMasterNodesHealthStatus, getWorkerNodesHealthStatus, getConnectionStatus, getHealthStatus,
 } from './ClusterStatusUtils'
 import { trackEvent } from 'utils/tracking'
 
@@ -232,6 +229,7 @@ const createGenericCluster = async (body, data, loadFromContext) => {
   if (data.networkPlugin === 'calico') {
     body.mtuSize = data.mtuSize
   }
+  body.networkPlugin = data.networkPlugin
   body.runtimeConfig = {
     default: '',
     all: 'api/all=true',
