@@ -21,6 +21,9 @@
   "extends": ["standard", "standard-with-typescript", "standard-react"],
 
   "rules": {
+    "max-len": [
+      "warn", { "code": 100, "tabWidth": 2 }
+    ],
     "semi": ["error","never"],
     "comma-dangle": ["error", {
       "arrays": "only-multiline",
@@ -35,6 +38,7 @@
     "no-new": 0,
     "space-infix-ops": 0,
     "no-prototype-builtins": 0,
+    "space-before-function-paren": "off",
 
     // Allow for "table" alignment, ex:
     // { id: 'name',       type: 'string' }
@@ -44,7 +48,17 @@
     "standard/no-callback-literal": 0,
     "@typescript-eslint/strict-boolean-expressions": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
-    "@typescript-eslint/no-floating-promises": "off"
+    "@typescript-eslint/no-floating-promises": "off",
+    "@typescript-eslint/member-delimiter-style": ["error", {
+      "multiline": {
+        "delimiter": "none",
+        "requireLast": true
+      },
+      "singleline": {
+        "delimiter": "semi",
+        "requireLast": false
+      }
+    }]
   },
 
   "settings": {
