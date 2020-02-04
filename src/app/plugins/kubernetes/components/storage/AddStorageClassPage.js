@@ -19,6 +19,8 @@ import { makeStyles } from '@material-ui/styles'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import ExternalLink from 'core/components/ExternalLink'
+import { clusterActions } from '../infrastructure/clusters/actions'
+import { propEq } from 'ramda'
 
 const initialContext = {
   isDefault: false,
@@ -44,7 +46,11 @@ export const AddStorageClassForm = ({ onComplete }) => (
   <Wizard onComplete={onComplete} context={initialContext}>
     {({ wizardContext, setWizardContext, onNext }) => (
       <>
-        <BasicStep onSubmit={setWizardContext} triggerSubmit={onNext} />
+        <BasicStep
+          onSubmit={setWizardContext}
+          triggerSubmit={onNext}
+          wizardContext={wizardContext}
+        />
         <CustomizeStep
           wizardContext={wizardContext}
           onSubmit={setWizardContext}
@@ -55,18 +61,32 @@ export const AddStorageClassForm = ({ onComplete }) => (
   </Wizard>
 )
 
-const BasicStep = ({ onSubmit, triggerSubmit }) => {
+const BasicStep = ({ onSubmit, triggerSubmit, wizardContext }) => {
   const classes = useStyles()
   const listStorageClassesParams = {
     clusterId: allKey,
     healthyClusters: true,
   }
+  const [clusters] = useDataLoader(clusterActions.list, [])
   const [storageClasses] = useDataLoader(storageClassesActions.list, listStorageClassesParams)
   const { params, getParamsUpdater } = useParams()
   const defaultStorageClassForCurrentCluster = (storageClass) =>
     storageClass.clusterId === params.clusterId &&
     storageClass.metadata.annotations['storageclass.kubernetes.io/is-default-class'] === 'true'
   const defaultExists = !!storageClasses.find(defaultStorageClassForCurrentCluster)
+
+  // We need to know the cloud provider type for the selected cluster because we will conditionally
+  // render different fields in the UI depending on  this.
+  // Also, we need this information in later stages when we construct the YAML so we will store
+  // it in the 'wizardContext'
+  useEffect(() => {
+    const selectedCluster = clusters.find(propEq('uuid', params.clusterId))
+    if (!selectedCluster) {
+      return
+    }
+    const clusterType = (selectedCluster && selectedCluster.cloudProviderType) || ''
+    onSubmit({ clusterType })
+  }, [params.clusterId])
 
   return (
     <WizardStep stepId="basic" label="Basic">
@@ -85,13 +105,23 @@ const BasicStep = ({ onSubmit, triggerSubmit }) => {
                 onlyHealthyClusters
                 required
               />
-              <PicklistField
-                DropdownComponent={StorageTypePicklist}
-                id="storageType"
-                label="Storage Type"
-                info="Select the storage type for this storage class. The list of available storage types is specific to the cloud provider that the cluster belongs to."
-                required
-              />
+              {wizardContext.clusterType === 'aws' && (
+                <PicklistField
+                  DropdownComponent={StorageTypePicklist}
+                  id="storageType"
+                  label="Storage Type"
+                  info="Select the storage type for this storage class. The list of available storage types is specific to the cloud provider that the cluster belongs to."
+                  required
+                />
+              )}
+              {wizardContext.clusterType === 'local' && (
+                <TextField
+                  id="provisioner"
+                  label="Provisioner"
+                  info="Name of provisioner to use"
+                  required
+                />
+              )}
               <CheckboxField
                 id="isDefault"
                 label="Use as Default Storage Class"
@@ -108,9 +138,19 @@ const BasicStep = ({ onSubmit, triggerSubmit }) => {
 
 const CustomizeStep = ({ wizardContext, onSubmit, triggerSubmit }) => {
   const classes = useStyles()
-  const storageClassYaml = getInitialStorageClassYaml(wizardContext)
-  const { params, getParamsUpdater, updateParams } = useParams({ storageClassYaml })
-  useEffect(() => updateParams({ storageClassYaml }), [wizardContext])
+  const { params, getParamsUpdater, updateParams } = useParams({ storageClassYaml: '' })
+
+  // If any of the parameters change we need to update the YAML, but we also need to allow
+  // the user to make overrides, so we are using useEffect.
+  useEffect(() => {
+    const storageClassYaml = getInitialStorageClassYaml(wizardContext)
+    updateParams({ storageClassYaml })
+  }, [
+    wizardContext.name,
+    wizardContext.clusterType,
+    wizardContext.isDefault,
+    wizardContext.storageType,
+  ])
 
   return (
     <WizardStep stepId="customize" label="Customize" key={wizardContext}>
@@ -135,7 +175,7 @@ const CustomizeStep = ({ wizardContext, onSubmit, triggerSubmit }) => {
                 label="Storage Class YAML"
                 options={codeMirrorOptions}
                 onChange={getParamsUpdater('storageClassYaml')}
-                initialValue={params.storageClassYaml}
+                value={params.storageClassYaml}
                 info="In case of a conflict with options selected on the previous page, changes you make here will override them."
                 required
               />
@@ -148,27 +188,31 @@ const CustomizeStep = ({ wizardContext, onSubmit, triggerSubmit }) => {
 }
 
 const getInitialStorageClassYaml = (wizardContext) => {
-  const isInvalidContext = wizardContext.name == null || wizardContext.isDefault == null
-  if (isInvalidContext) {
-    return
+  const values = {
+    name: '',
+    isDefault: false,
+    provisioner: '',
+    storageType: '',
+    ...wizardContext,
   }
-
   const storageClass = {
     apiVersion: 'storage.k8s.io/v1',
     kind: 'StorageClass',
     metadata: {
-      name: wizardContext.name,
+      name: values.name,
       annotations: {
-        'storageclass.kubernetes.io/is-default-class': wizardContext.isDefault.toString(),
+        'storageclass.kubernetes.io/is-default-class': values.isDefault.toString(),
       },
       labels: {
-        'kubernetes.io/cluster-service': true.toString(),
+        'kubernetes.io/cluster-service': 'true',
       },
     },
-    provisioner: 'kubernetes.io/aws-ebs',
-    parameters: {
-      type: wizardContext.storageType,
-    },
+  }
+  if (values.clusterType === 'aws') {
+    storageClass.provisioner = 'kubernetes.io/aws-ebs'
+    storageClass.parameters = {
+      type: values.storageType,
+    }
   }
 
   return yaml.safeDump(storageClass)
