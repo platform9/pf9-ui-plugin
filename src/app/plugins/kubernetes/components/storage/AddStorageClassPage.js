@@ -46,7 +46,6 @@ export const AddStorageClassForm = ({ onComplete }) => (
   <Wizard onComplete={onComplete} context={initialContext}>
     {({ wizardContext, setWizardContext, onNext }) => (
       <>
-        <pre>{JSON.stringify(wizardContext, null, 4)}</pre>
         <BasicStep
           onSubmit={setWizardContext}
           triggerSubmit={onNext}
