@@ -139,9 +139,19 @@ const BasicStep = ({ onSubmit, triggerSubmit, wizardContext }) => {
 
 const CustomizeStep = ({ wizardContext, onSubmit, triggerSubmit }) => {
   const classes = useStyles()
-  const storageClassYaml = getInitialStorageClassYaml(wizardContext)
-  const { params, getParamsUpdater, updateParams } = useParams({ storageClassYaml })
-  useEffect(() => updateParams({ storageClassYaml }), [wizardContext])
+  const { params, getParamsUpdater, updateParams } = useParams({ storageClassYaml: '' })
+
+  // If any of the parameters change we need to update the YAML, but we also need to allow
+  // the user to make overrides, so we are using useEffect.
+  useEffect(() => {
+    const storageClassYaml = getInitialStorageClassYaml(wizardContext)
+    updateParams({ storageClassYaml })
+  }, [
+    wizardContext.name,
+    wizardContext.clusterType,
+    wizardContext.isDefault,
+    wizardContext.storageType,
+  ])
 
   return (
     <WizardStep stepId="customize" label="Customize" key={wizardContext}>
@@ -166,7 +176,7 @@ const CustomizeStep = ({ wizardContext, onSubmit, triggerSubmit }) => {
                 label="Storage Class YAML"
                 options={codeMirrorOptions}
                 onChange={getParamsUpdater('storageClassYaml')}
-                initialValue={params.storageClassYaml}
+                value={params.storageClassYaml}
                 info="In case of a conflict with options selected on the previous page, changes you make here will override them."
                 required
               />
@@ -186,9 +196,6 @@ const getInitialStorageClassYaml = (wizardContext) => {
     storageType: '',
     ...wizardContext,
   }
-  console.log(wizardContext)
-  console.log(values)
-  console.log(values.name)
   const storageClass = {
     apiVersion: 'storage.k8s.io/v1',
     kind: 'StorageClass',
@@ -208,7 +215,6 @@ const getInitialStorageClassYaml = (wizardContext) => {
       type: values.storageType,
     }
   }
-  console.log(storageClass)
 
   return yaml.safeDump(storageClass)
 }
