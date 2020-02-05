@@ -2,7 +2,9 @@ import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 import Picklist from 'core/components/Picklist'
 import InfoTooltip from 'app/core/components/InfoTooltip'
-import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
+import withFormContext, {
+  ValidatedFormInputPropTypes,
+} from 'core/components/validatedForm/withFormContext'
 import { compose } from 'utils/fp'
 import { makeStyles } from '@material-ui/styles'
 
