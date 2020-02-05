@@ -51,16 +51,20 @@ const renderForm = (props = {}) => () => (
       <PicklistField
         id="items"
         label="List of items"
-        options={[{
-          label: 'Item 1',
-          value: 'item_1',
-        }, {
-          label: 'Item 2',
-          value: 'item_2',
-        }, {
-          label: 'Item 3',
-          value: 'item_3',
-        }]}
+        options={[
+          {
+            label: 'Item 1',
+            value: 'item_1',
+          },
+          {
+            label: 'Item 2',
+            value: 'item_2',
+          },
+          {
+            label: 'Item 3',
+            value: 'item_3',
+          },
+        ]}
         info="List of items"
       />
       <TextField
@@ -69,12 +73,11 @@ const renderForm = (props = {}) => () => (
         placeholder="Description"
         validations={[
           customValidator(
-            value => /[0-9]+/.test(value),
+            (value) => /[0-9]+/.test(value),
             (value, formFields, fieldKey) =>
               'This is a custom validator that fails when text does not contain a number.' +
               `The current value of field '${fieldKey}' is ${value}.` +
-              `From here we have access to other form fields as well, like 'name' with value ${
-                formFields.name}`,
+              `From here we have access to other form fields as well, like 'name' with value ${formFields.name}`,
           ),
         ]}
       />
@@ -85,7 +88,9 @@ const renderForm = (props = {}) => () => (
         info="Conditions text"
         validations={{ required: { message: 'You must accept the terms' } }}
       />
-      <Button variant="outlined" type="submit">Submit</Button>
+      <Button variant="outlined" type="submit">
+        Submit
+      </Button>
     </ValidatedForm>
   </FormWrapper>
 )

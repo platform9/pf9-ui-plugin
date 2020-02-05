@@ -10,20 +10,20 @@ const randomKubeConfig = (cluster) => {
       {
         cluster: {
           'certificate-authority-data': faker.random.uuid(),
-          server: `https://${faker.internet.ip()}`
+          server: `https://${faker.internet.ip()}`,
         },
-        name: cluster.name
-      }
+        name: cluster.name,
+      },
     ],
     contexts: [
       {
         context: {
           cluster: cluster.name,
           namespace: 'default',
-          user: 'user@platform9.net'
+          user: 'user@platform9.net',
         },
-        name: 'default'
-      }
+        name: 'default',
+      },
     ],
     'current-context': 'default',
     kind: 'Config',
@@ -32,10 +32,10 @@ const randomKubeConfig = (cluster) => {
       {
         name: 'user@platform9.net',
         user: {
-          token: '__INSERT_BEARER_TOKEN_HERE__'
-        }
-      }
-    ]
+          token: '__INSERT_BEARER_TOKEN_HERE__',
+        },
+      },
+    ],
   }
 
   const configYaml = yaml.safeDump(configObject)

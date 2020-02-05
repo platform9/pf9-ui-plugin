@@ -5,7 +5,8 @@ import { capitalizeString } from 'utils/misc'
 import calcUsageTotals from 'k8s/util/calcUsageTotals'
 import { pathStrOr } from 'utils/fp'
 import {
-  clustersCacheKey, combinedHostsCacheKey,
+  clustersCacheKey,
+  combinedHostsCacheKey,
 } from 'k8s/components/infrastructure/common/actions'
 import ApiClient from 'api-client/ApiClient'
 

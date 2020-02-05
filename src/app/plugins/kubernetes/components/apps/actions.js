@@ -1,6 +1,21 @@
 import {
-  mergeLeft, filter, identity, prop, pluck, map, pipe, pathEq, head, values, groupBy, propEq, find,
-  propOr, pick, F, flatten,
+  mergeLeft,
+  filter,
+  identity,
+  prop,
+  pluck,
+  map,
+  pipe,
+  pathEq,
+  head,
+  values,
+  groupBy,
+  propEq,
+  find,
+  propOr,
+  pick,
+  F,
+  flatten,
 } from 'ramda'
 import ApiClient from 'api-client/ApiClient'
 import { emptyArr, objSwitchCase, pathStr, filterIf, pathStrOr } from 'utils/fp'

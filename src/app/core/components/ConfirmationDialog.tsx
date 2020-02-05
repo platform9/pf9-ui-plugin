@@ -1,6 +1,11 @@
 import React from 'react'
 import {
-  Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from '@material-ui/core'
 import { withProgress } from 'core/components/progress/Progress'
 

@@ -5,7 +5,7 @@ import { findById, updateById } from '../../helpers'
 const coll = () => context.images
 
 class Image extends ActiveModel {
-  constructor (params = {}) {
+  constructor(params = {}) {
     super(params)
     this.name = params.name || ''
     this.status = params.status || ''
@@ -40,7 +40,7 @@ class Image extends ActiveModel {
     return updateById(coll)(imageId, data)
   }
 
-  static findByName = name => Image.getCollection().find(x => x.name === name)
+  static findByName = (name) => Image.getCollection().find((x) => x.name === name)
 
   asJson = () => {
     return {
@@ -63,7 +63,7 @@ class Image extends ActiveModel {
       schema: this.schema,
       virtual_size: this.virtual_size,
       tags: this.tags,
-      created_at: this.created_at
+      created_at: this.created_at,
     }
   }
 }

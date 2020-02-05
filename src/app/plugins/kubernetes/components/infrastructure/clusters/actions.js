@@ -4,16 +4,31 @@ import createCRUDActions from 'core/helpers/createCRUDActions'
 import { allKey, defaultMonitoringTag } from 'app/constants'
 import { castFuzzyBool, sanitizeUrl } from 'utils/misc'
 import {
-  clustersCacheKey, combinedHostsCacheKey, loadCombinedHosts,
+  clustersCacheKey,
+  combinedHostsCacheKey,
+  loadCombinedHosts,
 } from 'k8s/components/infrastructure/common/actions'
 import { filterIf, isTruthy, updateWith, adjustWith, keyValueArrToObj } from 'utils/fp'
 import { mapAsync } from 'utils/async'
 import {
-  pluck, pathOr, pick, pipe, either, propSatisfies, compose, path, propEq, mergeLeft, partition,
+  pluck,
+  pathOr,
+  pick,
+  pipe,
+  either,
+  propSatisfies,
+  compose,
+  path,
+  propEq,
+  mergeLeft,
+  partition,
 } from 'ramda'
 import { rawNodesCacheKey } from 'k8s/components/infrastructure/nodes/actions'
 import {
-  getMasterNodesHealthStatus, getWorkerNodesHealthStatus, getConnectionStatus, getHealthStatus,
+  getMasterNodesHealthStatus,
+  getWorkerNodesHealthStatus,
+  getConnectionStatus,
+  getHealthStatus,
 } from './ClusterStatusUtils'
 import { trackEvent } from 'utils/tracking'
 
@@ -45,16 +60,16 @@ const getKubernetesVersion = async (clusterId) => {
 const getEtcdBackupPayload = (data) =>
   data.etcdBackup
     ? {
-      isEtcdBackupEnabled: 1,
-      storageType: 'local',
-      storageProperties: {
-        localPath: data.etcdStoragePath,
-      },
-      intervalInMins: data.etcdBackupInterval,
-    }
+        isEtcdBackupEnabled: 1,
+        storageType: 'local',
+        storageProperties: {
+          localPath: data.etcdStoragePath,
+        },
+        intervalInMins: data.etcdBackupInterval,
+      }
     : {
-      isEtcdBackupEnabled: 0,
-    }
+        isEtcdBackupEnabled: 0,
+      }
 
 export const hasMasterNode = propSatisfies(isTruthy, 'hasMasterNode')
 export const hasHealthyMasterNodes = propSatisfies(

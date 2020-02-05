@@ -6,7 +6,5 @@ import CreateButton from 'core/components/buttons/CreateButton'
 const addStories = addStoriesFromModule(module)
 
 addStories('Common Components/Buttons', {
-  'Create Button': () => (
-    <CreateButton>Add Cluster</CreateButton>
-  ),
+  'Create Button': () => <CreateButton>Add Cluster</CreateButton>,
 })

@@ -35,25 +35,37 @@ const options = {
           metadata: {
             name: `${_input.metadata.name}-${uuid.v4()}`,
             namespace: _input.namespace,
-            ownerReferences: [{ name: _input.metadata.name, uid: deploymentUuid }]
-          }
+            ownerReferences: [{ name: _input.metadata.name, uid: deploymentUuid }],
+          },
         },
         context,
         config: {
           clusterId: _input.clusterId,
-          namespace: _input.namespace
-        }
+          namespace: _input.namespace,
+        },
       })
     }
 
-    return { ..._input, name: _input.metadata.name, uuid: deploymentUuid, metadata: { ..._input.metadata, namespace: _input.namespace, creationTimestamp: getCurrentTime() } }
+    return {
+      ..._input,
+      name: _input.metadata.name,
+      uuid: deploymentUuid,
+      metadata: {
+        ..._input.metadata,
+        namespace: _input.namespace,
+        creationTimestamp: getCurrentTime(),
+      },
+    }
   },
   loaderFn: (deployments) => {
     return deployments.map((deployment) => {
-      const newDeployment = { ...deployment, metadata: { ...deployment.metadata, uid: deployment.uuid } }
+      const newDeployment = {
+        ...deployment,
+        metadata: { ...deployment.metadata, uid: deployment.uuid },
+      }
       return omit(['name', 'uuid', 'namespace', 'clusterId'], newDeployment)
     })
-  }
+  },
 }
 
 const Deployment = createModel(options)

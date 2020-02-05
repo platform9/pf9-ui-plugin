@@ -1,6 +1,11 @@
 import React, { useCallback, useState } from 'react'
 import {
-  Typography, Dialog, DialogContent, DialogActions, Button, DialogTitle,
+  Typography,
+  Dialog,
+  DialogContent,
+  DialogActions,
+  Button,
+  DialogTitle,
 } from '@material-ui/core'
 
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'

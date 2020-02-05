@@ -21,10 +21,10 @@ const DataRow = ({ label, value }) => {
       <TableCell className={classes.cell}>
         {Array.isArray(value)
           ? value.map((val, idx) => (
-            <Typography key={idx} variant="body2">
-              {val}
-            </Typography>
-          ))
+              <Typography key={idx} variant="body2">
+                {val}
+              </Typography>
+            ))
           : value}
       </TableCell>
     </TableRow>

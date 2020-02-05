@@ -4,13 +4,32 @@ import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import Checkbox from 'core/components/Checkbox'
 import {
-  Radio, Typography, Grid, Table, TableBody, TableCell, TablePagination, TableRow,
+  Radio,
+  Typography,
+  Grid,
+  Table,
+  TableBody,
+  TableCell,
+  TablePagination,
+  TableRow,
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import { compose, ensureFunction, except } from 'app/utils/fp'
 import MoreMenu from 'core/components/MoreMenu'
 import {
-  max, any, assoc, assocPath, equals, pipe, pluck, prop, propEq, propOr, uniq, update, includes,
+  max,
+  any,
+  assoc,
+  assocPath,
+  equals,
+  pipe,
+  pluck,
+  prop,
+  propEq,
+  propOr,
+  uniq,
+  update,
+  includes,
 } from 'ramda'
 import ListTableHead from './ListTableHead'
 import ListTableToolbar from './ListTableToolbar'
@@ -394,11 +413,11 @@ class ListTable extends PureComponent {
 
     const checkboxProps = showCheckboxes
       ? {
-        onClick: this.handleClick(row),
-        role: 'checkbox',
-        tabIndex: -1,
-        selected: isSelected,
-      }
+          onClick: this.handleClick(row),
+          role: 'checkbox',
+          tabIndex: -1,
+          selected: isSelected,
+        }
       : {}
 
     const uid = uniqueIdentifier instanceof Function ? uniqueIdentifier(row) : row[uniqueIdentifier]

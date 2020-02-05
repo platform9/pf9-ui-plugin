@@ -8,7 +8,13 @@ const coll = () => context.resMgrHosts
 const G = 1000 * 1000 * 1000
 const defaultUsed = 1.2 * G
 const defaultTotal = 2.3 * G
-const generateMockStat = (stat, units='GB', type='used', used=defaultUsed, total=defaultTotal) => ({
+const generateMockStat = (
+  stat,
+  units = 'GB',
+  type = 'used',
+  used = defaultUsed,
+  total = defaultTotal,
+) => ({
   [stat]: { used, total, units, type, available: total - used },
 })
 
@@ -18,12 +24,12 @@ const generateMockUsageStats = () => ({
       ...generateMockStat('cpu', 'GHz'),
       ...generateMockStat('memory', 'GB'),
       ...generateMockStat('disk', 'GB'),
-    }
-  }
+    },
+  },
 })
 
 class ResMgrHost extends ActiveModel {
-  constructor (params = {}) {
+  constructor(params = {}) {
     super(params)
     this.roles = params.roles || []
     this.info = params.info || ''

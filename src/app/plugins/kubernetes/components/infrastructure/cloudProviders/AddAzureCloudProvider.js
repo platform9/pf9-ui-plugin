@@ -8,7 +8,8 @@ import ExternalLink from 'core/components/ExternalLink'
 import { makeStyles } from '@material-ui/styles'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import {
-  azureCreateANewApplicationSecretLink, azureGetValuesForSigninginLink,
+  azureCreateANewApplicationSecretLink,
+  azureGetValuesForSigninginLink,
   azureServicePrincipalPortalLink,
 } from 'k8s/links'
 

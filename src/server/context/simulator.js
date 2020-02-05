@@ -22,11 +22,11 @@ const defaultQuota = {
 }
 
 class Context {
-  constructor () {
+  constructor() {
     this.resetContext()
   }
 
-  resetContext () {
+  resetContext() {
     this.novaTimeout = 6 * 1000
     this.users = []
     this.tenantUsers = []
@@ -76,9 +76,9 @@ class Context {
     this.loggings = []
   }
 
-  validateToken = id => Token.validateToken(id)
+  validateToken = (id) => Token.validateToken(id)
 
-  getFlavor = id => {
+  getFlavor = (id) => {
     const flavor = Flavor.findById(id)
     if (!flavor) {
       throw new Error('Unable to find non-existent flavor')
@@ -86,7 +86,7 @@ class Context {
     return flavor.asJson()
   }
 
-  getFlavors = () => Flavor.getCollection().map(x => x.asJson())
+  getFlavors = () => Flavor.getCollection().map((x) => x.asJson())
 
   createFlavor = ({ input }) => {
     const flavor = new Flavor({ ...input })
@@ -101,7 +101,7 @@ class Context {
     return flavor.asJson()
   }
 
-  removeFlavor = id => {
+  removeFlavor = (id) => {
     const flavor = Flavor.findById(id)
     if (!flavor) {
       throw new Error('Unable to remove non-existent flavor')
@@ -110,7 +110,7 @@ class Context {
     return id
   }
 
-  getInstances = () => Instance.getCollection().map(x => x.asJson())
+  getInstances = () => Instance.getCollection().map((x) => x.asJson())
 
   createInstance = ({ input }) => {
     const instance = new Instance({ ...input })
@@ -125,7 +125,7 @@ class Context {
     return instance.asJson()
   }
 
-  removeFlavor = id => {
+  removeFlavor = (id) => {
     const flavor = Flavor.findById(id)
     if (!flavor) {
       throw new Error('Unable to remove non-existent flavor')
@@ -134,8 +134,7 @@ class Context {
     return id
   }
 
-  getTenants = () =>
-    Tenant.getCollection().map(x => x.asJson())
+  getTenants = () => Tenant.getCollection().map((x) => x.asJson())
 
   createTenant = ({ input }) => {
     const tenant = new Tenant({ ...input })
@@ -149,7 +148,7 @@ class Context {
     }
   }
 
-  removeTenant = id => {
+  removeTenant = (id) => {
     const tenant = Tenant.findById(id)
     if (!tenant) {
       throw new Error('Unable to remove non-existent tenant')
@@ -166,7 +165,7 @@ class Context {
     return user.asJson()
   }
 
-  getUsers = () => User.getCollection().map(x => x.asJson())
+  getUsers = () => User.getCollection().map((x) => x.asJson())
 
   createUser = ({ input }) => {
     const user = new User(input)
@@ -181,7 +180,7 @@ class Context {
     return user.asJson()
   }
 
-  removeUser = id => {
+  removeUser = (id) => {
     const user = User.findById(id)
     if (!user) {
       throw new Error('Unable to remove non-existent user')
@@ -190,7 +189,7 @@ class Context {
     return id
   }
 
-  getNetwork = id => {
+  getNetwork = (id) => {
     const network = Network.findById(id)
     if (!network) {
       throw new Error('Unable to get non-existent network')
@@ -198,7 +197,7 @@ class Context {
     return network.asJson()
   }
 
-  getNetworks = () => Network.getCollection().map(x => x.asJson())
+  getNetworks = () => Network.getCollection().map((x) => x.asJson())
 
   createNetwork = ({ input }) => {
     const network = new Network(input)
@@ -222,7 +221,7 @@ class Context {
     return network
   }
 
-  getRouter = id => {
+  getRouter = (id) => {
     const router = Router.findById(id)
     if (!router) {
       throw new Error('Unable to get non-existent router')
@@ -230,7 +229,7 @@ class Context {
     return router.asJson()
   }
 
-  getRouters = () => Router.getCollection().map(x => x.asJson())
+  getRouters = () => Router.getCollection().map((x) => x.asJson())
 
   createRouter = ({ input }) => {
     const router = new Router(input)
@@ -254,7 +253,7 @@ class Context {
     return router
   }
 
-  getFloatingIp = id => {
+  getFloatingIp = (id) => {
     const floatingIp = FloatingIp.findById(id)
     if (!floatingIp) {
       throw new Error('Unable to get non-existent floating IP')
@@ -262,7 +261,7 @@ class Context {
     return floatingIp.asJson()
   }
 
-  getFloatingIps = () => FloatingIp.getCollection().map(x => x.asJson())
+  getFloatingIps = () => FloatingIp.getCollection().map((x) => x.asJson())
 
   createFloatingIp = ({ input }) => {
     const floatingIp = new FloatingIp(input)
@@ -294,7 +293,7 @@ class Context {
     return volume.asJson()
   }
 
-  getVolumes = () => Volume.getCollection().map(x => x.asJson())
+  getVolumes = () => Volume.getCollection().map((x) => x.asJson())
 
   createVolume = ({ input }) => {
     const volume = new Volume(input)
@@ -309,7 +308,7 @@ class Context {
     return volume.asJson()
   }
 
-  removeVolume = id => {
+  removeVolume = (id) => {
     const volume = Volume.findById(id)
     if (!volume) {
       throw new Error('Unable to delete non-existent volume')
@@ -326,7 +325,7 @@ class Context {
     return hypervisor.asJson()
   }
 
-  getHypervisors = () => Hypervisor.getCollection().map(x => x.asJson())
+  getHypervisors = () => Hypervisor.getCollection().map((x) => x.asJson())
 
   getResMgrHost = (id) => {
     const resMgrHost = ResMgrHost.findById(id)
@@ -336,7 +335,7 @@ class Context {
     return resMgrHost.asJson()
   }
 
-  getResMgrHosts = () => ResMgrHost.getCollection().map(x => x.asJson())
+  getResMgrHosts = () => ResMgrHost.getCollection().map((x) => x.asJson())
 
   getResMgrHostRole = (id, role) => {
     const hostRole = ResMgrHost.getHostRole(id, role)
@@ -364,7 +363,7 @@ class Context {
     return image
   }
 
-  getImages = () => Image.getCollection().map(x => x.asJson())
+  getImages = () => Image.getCollection().map((x) => x.asJson())
 
   updateImage = (id, input) => {
     const image = Image.updateById(id, input)
@@ -374,7 +373,7 @@ class Context {
     return image.asJson()
   }
 
-  removeImage = id => {
+  removeImage = (id) => {
     const image = Image.findById(id)
     if (!image) {
       throw new Error('Unable to delete non-existent image')
@@ -383,7 +382,7 @@ class Context {
     return id
   }
 
-  getApplication = id => {
+  getApplication = (id) => {
     const application = Application.findById(id)
     if (!application) {
       throw new Error('Unable to find non-existent application')
@@ -391,7 +390,7 @@ class Context {
     return application.asJson()
   }
 
-  getApplications = () => Application.getCollection().map(x => x.asJson())
+  getApplications = () => Application.getCollection().map((x) => x.asJson())
 
   createApplication = ({ input }) => {
     const application = new Application(input)
@@ -406,7 +405,7 @@ class Context {
     return application.asJson()
   }
 
-  removeApplication = id => {
+  removeApplication = (id) => {
     const application = Application.findById(id)
     if (!application) {
       throw new Error('Unable to delete non-existent application')
@@ -415,7 +414,7 @@ class Context {
     return id
   }
 
-  getSshKey = id => {
+  getSshKey = (id) => {
     const sshKey = SshKey.findById(id)
     if (!sshKey) {
       throw new Error('Unable to find non-existent ssh key')
@@ -423,14 +422,14 @@ class Context {
     return sshKey.asJson()
   }
 
-  getSshKeys = () => SshKey.getCollection().map(x => x.asJson())
+  getSshKeys = () => SshKey.getCollection().map((x) => x.asJson())
 
   createSshKey = ({ input }) => {
     const sshKey = new SshKey(input)
     return sshKey.asJson()
   }
 
-  removeSshKey = name => {
+  removeSshKey = (name) => {
     const sshKey = SshKey.findByName(name)
     if (!sshKey) {
       throw new Error('Unable to delete non-existent ssh key')

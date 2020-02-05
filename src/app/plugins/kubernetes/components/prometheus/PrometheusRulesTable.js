@@ -1,7 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {
-  Button, Table, TableBody, TableCell, TableHead, TableRow, Typography,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Typography,
 } from '@material-ui/core'
 import { isNilOrEmpty } from 'utils/fp'
 

@@ -9,7 +9,10 @@ describe('Storage Class', () => {
 
   describe('Basic functionality', () => {
     it('creates a Storage Class', () => {
-      const storageClass = StorageClass.create({ data: { metadata: { name: 'fakeStorageClass' } }, context })
+      const storageClass = StorageClass.create({
+        data: { metadata: { name: 'fakeStorageClass' } },
+        context,
+      })
       expect(storageClass).toBeDefined()
       expect(context.storageClasses.length).toBe(1)
       expect(storageClass).toMatchObject({ metadata: { name: 'fakeStorageClass' } })

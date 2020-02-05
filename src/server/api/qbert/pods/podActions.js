@@ -10,8 +10,8 @@ export const getPods = (req, res) => {
     kind: 'PodList',
     metadata: {
       resourceVersion: '5201088',
-      selfLink: '/api/v1/pods'
-    }
+      selfLink: '/api/v1/pods',
+    },
   }
   return res.send(response)
 }

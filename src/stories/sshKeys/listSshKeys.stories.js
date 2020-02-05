@@ -12,9 +12,7 @@ const someSshKeys = range(3).map(fakeSshKey)
 const deleteAction = action('Delete SSH Key')
 
 addStories('SSH Key Management/Listing keys', {
-  'With no keys': () => (
-    <SshKeysList data={[]} onAdd={addAction} onDelete={deleteAction} />
-  ),
+  'With no keys': () => <SshKeysList data={[]} onAdd={addAction} onDelete={deleteAction} />,
 
   'With some keys': () => (
     <SshKeysList data={someSshKeys} onAdd={addAction} onDelete={deleteAction} />
@@ -23,8 +21,6 @@ addStories('SSH Key Management/Listing keys', {
   'With pagination': () => {
     const numSshKeys = number('numSshKeys', 7, { range: true, min: 0, max: 15, step: 1 })
     const sshKeys = range(numSshKeys).map(fakeSshKey)
-    return (
-      <SshKeysList data={sshKeys} onAdd={addAction} onDelete={deleteAction} />
-    )
+    return <SshKeysList data={sshKeys} onAdd={addAction} onDelete={deleteAction} />
   },
 })

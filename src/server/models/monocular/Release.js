@@ -15,8 +15,8 @@ const createFn = (_params = {}, context) => {
       name: faker.company.companyName(),
       namespace: 'default',
       status: 'DEPLOYED',
-      updated: faker.date.past()
-    }
+      updated: faker.date.past(),
+    },
   }
 }
 

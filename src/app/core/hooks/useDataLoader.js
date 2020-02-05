@@ -21,9 +21,9 @@ const dataLoaderReducer = (state, { type, payload }) => {
       return state.loading
         ? state
         : {
-          ...state,
-          loading: true,
-        }
+            ...state,
+            loading: true,
+          }
     case 'finishLoading':
     default:
       return {

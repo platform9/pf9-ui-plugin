@@ -23,7 +23,9 @@ export const addComma = (num, decimalDigits = 2) => {
     .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
   const decimalPart = (num - Math.floor(num)).toFixed(decimalDigits).substring(2)
   if (decimalDigits === 0) return roundPart
-  else if ((num - Math.floor(num)).toFixed(decimalDigits).startsWith('1')) { return roundPart + '.' + decimalPart }
+  else if ((num - Math.floor(num)).toFixed(decimalDigits).startsWith('1')) {
+    return roundPart + '.' + decimalPart
+  }
   return floorPart + '.' + decimalPart
 }
 

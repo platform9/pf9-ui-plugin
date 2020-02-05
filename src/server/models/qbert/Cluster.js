@@ -68,24 +68,36 @@ const options = {
     }
     if (input.numMasters) {
       // Create the master nodes and attach to cluster
-      [...Array(input.numMasters)].map(() => {
+      ;[...Array(input.numMasters)].map(() => {
         const name = `${input.name}-node-${faker.random.number()}`
-        const resMgrHost = new ResMgrHost({ roles: ['pf9-containervisor'], info: { hostname: name } })
-        const node = Node.create({ data: { name: name, api_responding: 1, isMaster: 1, uuid: resMgrHost.id }, context })
+        const resMgrHost = new ResMgrHost({
+          roles: ['pf9-containervisor'],
+          info: { hostname: name },
+        })
+        const node = Node.create({
+          data: { name: name, api_responding: 1, isMaster: 1, uuid: resMgrHost.id },
+          context,
+        })
         attachNodeToCluster(node, input)
       })
     }
     if (input.numWorkers) {
       // Create the worker nodes and attach to cluster
-      [...Array(input.numWorkers)].map(() => {
+      ;[...Array(input.numWorkers)].map(() => {
         const name = `${input.name}-node-${faker.random.number()}`
-        const resMgrHost = new ResMgrHost({ roles: ['pf9-containervisor'], info: { hostname: name } })
-        const node = Node.create({ data: { name: name, api_responding: 0, isMaster: 0, uuid: resMgrHost.id }, context })
+        const resMgrHost = new ResMgrHost({
+          roles: ['pf9-containervisor'],
+          info: { hostname: name },
+        })
+        const node = Node.create({
+          data: { name: name, api_responding: 0, isMaster: 0, uuid: resMgrHost.id },
+          context,
+        })
         attachNodeToCluster(node, input)
       })
     }
 
-    Object.keys(input).forEach(key => {
+    Object.keys(input).forEach((key) => {
       // If property needs to go into cloudProperties
       if (!defaultKeys.includes(key)) {
         cloudProperties[key] = input[key]
@@ -94,7 +106,16 @@ const options = {
     })
 
     const currentTime = getCurrentTime()
-    return { nodePoolUuid: uuid.v4(), cloudProperties: cloudProperties, cloudProviderUuid: uuid.v4(), created_at: faker.date.recent(), externalDnsName: faker.internet.domainName(), lastOk: currentTime, lastOp: currentTime, ...input }
+    return {
+      nodePoolUuid: uuid.v4(),
+      cloudProperties: cloudProperties,
+      cloudProviderUuid: uuid.v4(),
+      created_at: faker.date.recent(),
+      externalDnsName: faker.internet.domainName(),
+      lastOk: currentTime,
+      lastOp: currentTime,
+      ...input,
+    }
   },
   loaderFn: (clusters) => {
     return clusters.map((cluster) => {
@@ -106,7 +127,7 @@ const options = {
   onDeleteFn: (id, context, obj) => {
     // Need to clean up all resources on this cluster
     // Clean up attached nodes
-    (obj.nodes || []).forEach((node) => {
+    ;(obj.nodes || []).forEach((node) => {
       Node.delete({ id: node.uuid, context })
     })
 
@@ -116,7 +137,7 @@ const options = {
     Service.deleteAllInCluster({ clusterId: id, context })
     StorageClass.deleteAllInCluster({ clusterId: id, context })
     Logging.deleteAllInCluster({ clusterId: id, context })
-  }
+  },
 }
 
 const Cluster = createModel(options)

@@ -1,6 +1,11 @@
 import React from 'react'
 import {
-  Dialog, DialogTitle, DialogContent, Typography, DialogActions, Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Typography,
+  DialogActions,
+  Button,
 } from '@material-ui/core'
 import useDataLoader from 'core/hooks/useDataLoader'
 import Progress from 'core/components/progress/Progress'

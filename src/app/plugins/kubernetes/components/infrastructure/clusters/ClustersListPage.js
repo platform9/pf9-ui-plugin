@@ -11,7 +11,8 @@ import { clustersCacheKey } from '../common/actions'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { capitalizeString, castBoolToStr } from 'utils/misc'
 import {
-  ClusterConnectionStatus, ClusterHealthStatus,
+  ClusterConnectionStatus,
+  ClusterHealthStatus,
 } from 'k8s/components/infrastructure/clusters/ClusterStatus'
 import ResourceUsageTable from 'k8s/components/infrastructure/common/ResourceUsageTable'
 import DashboardLink from './DashboardLink'

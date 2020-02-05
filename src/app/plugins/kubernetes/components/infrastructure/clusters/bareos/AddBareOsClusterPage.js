@@ -16,7 +16,9 @@ import Panel from 'app/plugins/theme/components/Panel'
 import CodeBlock from 'core/components/CodeBlock'
 import ExternalLink from 'core/components/ExternalLink'
 import ClusterHostChooser, {
-  excludeNodes, isConnected, isUnassignedNode,
+  excludeNodes,
+  isConnected,
+  isUnassignedNode,
 } from './ClusterHostChooser'
 import { clusterActions } from '../actions'
 import { pathJoin } from 'utils/misc'

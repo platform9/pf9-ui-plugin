@@ -11,7 +11,11 @@ import useReactRouter from 'use-react-router'
 import { makeStyles } from '@material-ui/styles'
 import { Route, Redirect, Switch } from 'react-router'
 import {
-  activateUserUrl, dashboardUrl, resetPasswordUrl, resetPasswordThroughEmailUrl, forgotPasswordUrl,
+  activateUserUrl,
+  dashboardUrl,
+  resetPasswordUrl,
+  resetPasswordThroughEmailUrl,
+  forgotPasswordUrl,
   loginUrl,
 } from 'app/constants'
 import ResetPasswordPage from 'core/public/ResetPasswordPage'
@@ -132,7 +136,9 @@ const AppContainer = () => {
     if (history.location.pathname.includes(activateUserUrl)) return
 
     // TODO: Need to fix this code after synching up with backend.
-    if (history.location.hash.includes(resetPasswordThroughEmailUrl)) { return history.push(history.location.hash.slice().replace('#', '/ui')) }
+    if (history.location.hash.includes(resetPasswordThroughEmailUrl)) {
+      return history.push(history.location.hash.slice().replace('#', '/ui'))
+    }
 
     if (history.location.pathname.includes(resetPasswordThroughEmailUrl)) return
 

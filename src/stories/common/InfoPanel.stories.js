@@ -11,7 +11,5 @@ const items = {
   quantity: 5,
 }
 addStories('Common Components/InfoPanel', {
-  'w/ some data': () => (
-    <InfoPanel title="Details" items={items} />
-  )
+  'w/ some data': () => <InfoPanel title="Details" items={items} />,
 })

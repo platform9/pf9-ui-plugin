@@ -70,16 +70,16 @@ const ListTableAction = withRouter(
             onClick={
               isActionEnabled
                 ? () => {
-                  if (dialog) {
-                    setDialogOpened(true)
+                    if (dialog) {
+                      setDialogOpened(true)
+                    }
+                    if (action) {
+                      action(selected)
+                    }
+                    if (routeTo) {
+                      history.push(routeTo(selected))
+                    }
                   }
-                  if (action) {
-                    action(selected)
-                  }
-                  if (routeTo) {
-                    history.push(routeTo(selected))
-                  }
-                }
                 : null
             }
           >

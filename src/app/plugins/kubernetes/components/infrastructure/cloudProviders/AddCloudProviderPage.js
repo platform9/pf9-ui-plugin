@@ -5,12 +5,9 @@ import { makeStyles } from '@material-ui/styles'
 import CloudProviderCard from 'k8s/components/common/CloudProviderCard'
 import { objSwitchCase } from 'utils/fp'
 import AddAwsCloudProvider from 'k8s/components/infrastructure/cloudProviders/AddAwsCloudProvider'
-import AddOpenstackCloudProvider
-  from 'k8s/components/infrastructure/cloudProviders/AddOpenstackCloudProvider'
-import AddVmwareCloudProvider
-  from 'k8s/components/infrastructure/cloudProviders/AddVmwareCloudProvider'
-import AddAzureCloudProvider
-  from 'k8s/components/infrastructure/cloudProviders/AddAzureCloudProvider'
+import AddOpenstackCloudProvider from 'k8s/components/infrastructure/cloudProviders/AddOpenstackCloudProvider'
+import AddVmwareCloudProvider from 'k8s/components/infrastructure/cloudProviders/AddVmwareCloudProvider'
+import AddAzureCloudProvider from 'k8s/components/infrastructure/cloudProviders/AddAzureCloudProvider'
 import useReactRouter from 'use-react-router'
 
 const useStyles = makeStyles((theme) => ({

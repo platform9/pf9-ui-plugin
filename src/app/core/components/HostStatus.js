@@ -63,11 +63,11 @@ const HostStatus = ({ host = {} }) => {
 
       drifted: warnings
         ? warnings.map((warning) => (
-          <ExternalLink url={getTimeDriftSupportLink(host)}>
-            <WarningIcon style={yellowStyle} />
-            {warning}
-          </ExternalLink>
-        ))
+            <ExternalLink url={getTimeDriftSupportLink(host)}>
+              <WarningIcon style={yellowStyle} />
+              {warning}
+            </ExternalLink>
+          ))
         : capitalizeString(uiState),
 
       pending: (

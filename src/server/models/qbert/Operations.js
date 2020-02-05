@@ -7,5 +7,5 @@ export const attachNodeToCluster = (node, cluster) => {
 export const detachNodeFromCluster = (node, cluster) => {
   node.clusterUuid = null
   node.clusterName = null
-  cluster.nodes = cluster.nodes.filter((n) => (n.uuid !== node.uuid))
+  cluster.nodes = cluster.nodes.filter((n) => n.uuid !== node.uuid)
 }

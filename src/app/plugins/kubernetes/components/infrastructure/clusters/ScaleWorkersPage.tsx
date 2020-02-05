@@ -16,7 +16,9 @@ import SubmitButton from 'core/components/buttons/SubmitButton'
 import useParams from 'core/hooks/useParams'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import ClusterHostChooser, {
-  isUnassignedNode, inCluster, isNotMaster,
+  isUnassignedNode,
+  inCluster,
+  isNotMaster,
 } from './bareos/ClusterHostChooser'
 import { ICluster } from './model'
 import { allPass } from 'ramda'

@@ -1,8 +1,14 @@
 import TextField from 'core/components/validatedForm/TextField'
 import { Typography, List } from '@material-ui/core'
 import {
-  hasMinLength, hasOneLowerChar, hasOneUpperChar, hasOneNumber, hasOneSpecialChar,
-  requiredValidator, passwordValidator, specialChars,
+  hasMinLength,
+  hasOneLowerChar,
+  hasOneUpperChar,
+  hasOneNumber,
+  hasOneSpecialChar,
+  requiredValidator,
+  passwordValidator,
+  specialChars,
 } from 'core/utils/fieldValidators'
 import React from 'react'
 import ListItem from '@material-ui/core/ListItem'

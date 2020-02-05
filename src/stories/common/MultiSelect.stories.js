@@ -26,7 +26,7 @@ addStories('Common Components/MultiSelect', {
 
     return (
       <MultiSelect
-        label='Select one or more option'
+        label="Select one or more option"
         options={options}
         values={values}
         onChange={setValues}
@@ -41,7 +41,7 @@ addStories('Common Components/MultiSelect', {
 
     return (
       <MultiSelect
-        label='Select one or more option'
+        label="Select one or more option"
         options={options}
         values={values}
         onChange={setValues}
@@ -57,7 +57,7 @@ addStories('Common Components/MultiSelect', {
 
     return (
       <MultiSelect
-        label='Select one or more option'
+        label="Select one or more option"
         options={options}
         values={values}
         onChange={setValues}

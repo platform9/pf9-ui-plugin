@@ -1,8 +1,13 @@
 import React, { useCallback, useState } from 'react'
 import { createStyles, makeStyles } from '@material-ui/styles'
 import {
-  Dialog, DialogContent, DialogTitle, ExpansionPanel as MDExpansionPanel, ExpansionPanelDetails,
-  ExpansionPanelSummary, Typography,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  ExpansionPanel as MDExpansionPanel,
+  ExpansionPanelDetails,
+  ExpansionPanelSummary,
+  Typography,
 } from '@material-ui/core'
 import { ChevronRight, ExpandMore } from '@material-ui/icons'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'

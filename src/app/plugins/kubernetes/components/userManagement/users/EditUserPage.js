@@ -7,7 +7,8 @@ import useDataUpdater from 'core/hooks/useDataUpdater'
 import { mngmTenantActions } from 'k8s/components/userManagement/tenants/actions'
 import useDataLoader from 'core/hooks/useDataLoader'
 import {
-  mngmUserActions, mngmUserRoleAssignmentsLoader,
+  mngmUserActions,
+  mngmUserRoleAssignmentsLoader,
 } from 'k8s/components/userManagement/users/actions'
 import { TextField as BaseTextField, Typography } from '@material-ui/core'
 import { emptyObj, pathStr } from 'utils/fp'
