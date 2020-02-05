@@ -11,9 +11,10 @@ import namespaceActions from 'k8s/components/namespaces/actions'
 const NamespacePicklist = forwardRef(
   ({ clusterId, loading, onChange, selectFirst, ...rest }, ref) => {
     const [namespaces, namespacesLoading] = useDataLoader(namespaceActions.list, { clusterId })
-    const options = useMemo(() => projectAs(
-      { label: 'name', value: 'name' }, uniqBy(prop('name'), namespaces),
-    ), [namespaces])
+    const options = useMemo(
+      () => projectAs({ label: 'name', value: 'name' }, uniqBy(prop('name'), namespaces)),
+      [namespaces],
+    )
     // Select the first item as soon as data is loaded
     useEffect(() => {
       if (!isEmpty(options) && selectFirst) {
@@ -21,14 +22,17 @@ const NamespacePicklist = forwardRef(
       }
     }, [options])
 
-    return <Picklist
-      {...rest}
-      ref={ref}
-      onChange={onChange}
-      loading={loading || namespacesLoading}
-      options={options}
-    />
-  })
+    return (
+      <Picklist
+        {...rest}
+        ref={ref}
+        onChange={onChange}
+        loading={loading || namespacesLoading}
+        options={options}
+      />
+    )
+  },
+)
 
 NamespacePicklist.propTypes = {
   ...Picklist.propTypes,

@@ -1,6 +1,9 @@
 import React, { useCallback, useState } from 'react'
 import { createStyles, makeStyles } from '@material-ui/styles'
-import { Dialog, DialogContent, DialogTitle, ExpansionPanel as MDExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, Typography } from '@material-ui/core'
+import {
+  Dialog, DialogContent, DialogTitle, ExpansionPanel as MDExpansionPanel, ExpansionPanelDetails,
+  ExpansionPanelSummary, Typography,
+} from '@material-ui/core'
 import { ChevronRight, ExpandMore } from '@material-ui/icons'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import CancelButton from '../buttons/CancelButton'
@@ -121,7 +124,8 @@ const ExpansionPanel = ({
             <Typography>
               If you are all set, you can remove this step from your getting started wizard. You can
               always visit the “getting started” section in our support documentation{' '}
-              <ExternalLink url={gettingStartedLink}>here</ExternalLink> if you need help in the future.
+              <ExternalLink url={gettingStartedLink}>here</ExternalLink> if you need help in the
+              future.
             </Typography>
             <div className={classes.actionRow}>
               <CancelButton onClick={handleToggleOverlay} />

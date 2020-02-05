@@ -7,7 +7,8 @@ import clsx from 'clsx'
 export const useStyles = makeStyles<Theme>((theme) => ({
   root: {
     borderRadius: 4,
-    boxShadow: '0 2.5px 2.5px -1.5px rgba(0, 0, 0, 0.2), 0 1.5px 7px 1px rgba(0, 0, 0, 0.12), 0 4px 5px 0.5px rgba(0, 0, 0, 0.14)',
+    boxShadow:
+      '0 2.5px 2.5px -1.5px rgba(0, 0, 0, 0.2), 0 1.5px 7px 1px rgba(0, 0, 0, 0.12), 0 4px 5px 0.5px rgba(0, 0, 0, 0.14)',
     padding: theme.spacing(3, 2),
     marginTop: theme.spacing(4),
     display: 'flex',

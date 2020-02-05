@@ -19,7 +19,8 @@ interface Props {
 const useStyles = makeStyles<Theme, { variant: ISimpleLinkVariant }>((theme) => ({
   root: {
     cursor: 'pointer',
-    color: ({ variant }) => variant === 'error' ? theme.palette.error.main : theme.palette.primary.main
+    color: ({ variant }) =>
+      variant === 'error' ? theme.palette.error.main : theme.palette.primary.main,
   },
   icon: {
     marginRight: '6px',
@@ -29,53 +30,42 @@ const useStyles = makeStyles<Theme, { variant: ISimpleLinkVariant }>((theme) => 
 // We need to destructure staticContext even though we are not using it in order to
 // work around this issue: https://github.com/ReactTraining/react-router/issues/4683
 // We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
-const SimpleLink: ComponentType<Props> = forwardRef<HTMLElement, Props>((
-  {
-    onClick,
-    src,
-    children,
-    staticContext,
-    className,
-    icon,
-    variant,
-    ...rest
-  },
-  ref,
-) => {
-  const classes = useStyles({ variant })
-  const { history } = useReactRouter()
-  const handleClick = useCallback(
-    (e) => {
-      // Prevent links inside of a table row from triggering row selection.
-      e.stopPropagation()
-      if (onClick) {
-        e.preventDefault()
-        onClick(e)
-      }
-      // If there is no provided onClick, just use the `src` as a normal link.
-      if (src && !src.startsWith('http')) {
-        // local paths should use the History's push state
-        e.preventDefault()
-        return history.push(src)
-      }
-      // Any path that starts with http should be treated as an external link
-    },
-    [src, history],
-  )
+const SimpleLink: ComponentType<Props> = forwardRef<HTMLElement, Props>(
+  ({ onClick, src, children, staticContext, className, icon, variant, ...rest }, ref) => {
+    const classes = useStyles({ variant })
+    const { history } = useReactRouter()
+    const handleClick = useCallback(
+      (e) => {
+        // Prevent links inside of a table row from triggering row selection.
+        e.stopPropagation()
+        if (onClick) {
+          e.preventDefault()
+          onClick(e)
+        }
+        // If there is no provided onClick, just use the `src` as a normal link.
+        if (src && !src.startsWith('http')) {
+          // local paths should use the History's push state
+          e.preventDefault()
+          return history.push(src)
+        }
+        // Any path that starts with http should be treated as an external link
+      },
+      [src, history],
+    )
 
-  return (
-    <Link
-      className={clsx(className, classes.root)}
-      ref={ref}
-      href={src || null}
-      onClick={handleClick}
-      {...rest}
-    >
-      {!!icon &&
-      <FontAwesomeIcon className={classes.icon}>{icon}</FontAwesomeIcon>}
-      {children || src}
-    </Link>
-  )
-})
+    return (
+      <Link
+        className={clsx(className, classes.root)}
+        ref={ref}
+        href={src || null}
+        onClick={handleClick}
+        {...rest}
+      >
+        {!!icon && <FontAwesomeIcon className={classes.icon}>{icon}</FontAwesomeIcon>}
+        {children || src}
+      </Link>
+    )
+  },
+)
 
 export default SimpleLink

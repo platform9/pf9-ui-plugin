@@ -5,7 +5,7 @@ import ProgressBar from 'core/components/progress/ProgressBar'
 import Tooltip from '@material-ui/core/Tooltip'
 import { identity } from 'ramda'
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
     flexFlow: 'row nowrap',
@@ -36,14 +36,11 @@ const ResourceUsageTable = ({ label, valueConverter, usedText, units, stats, pre
     <Tooltip title={`${curStr} ${units} of ${maxStr} ${units} ${usedText}`}>
       <div className={classes.root}>
         <span className={classes.label}>{label}:</span>
-        <span className={classes.value}>{curStr}/{maxStr} {units}</span>
+        <span className={classes.value}>
+          {curStr}/{maxStr} {units}
+        </span>
         <span className={classes.percent}>
-          <ProgressBar
-            width={140}
-            variant="health"
-            percent={percent}
-            label={percentStr}
-          />
+          <ProgressBar width={140} variant="health" percent={percent} label={percentStr} />
         </span>
       </div>
     </Tooltip>

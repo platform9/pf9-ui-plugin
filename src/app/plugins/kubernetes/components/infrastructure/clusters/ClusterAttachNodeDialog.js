@@ -3,7 +3,10 @@ import ExternalLink from 'core/components/ExternalLink'
 import { compose, propOr } from 'ramda'
 import { withAppContext } from 'core/providers/AppProvider'
 import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab'
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Table, TableBody, TableCell, TableRow, Typography } from '@material-ui/core'
+import {
+  Button, Dialog, DialogActions, DialogContent, DialogTitle, Table, TableBody, TableCell, TableRow,
+  Typography,
+} from '@material-ui/core'
 import withDataLoader from 'core/hocs/withDataLoader'
 import withDataMapper from 'core/hocs/withDataMapper'
 import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
@@ -12,9 +15,11 @@ import { managedContainerChecklistLink } from 'k8s/links'
 
 // The modal is technically inside the row, so clicking anything inside
 // the modal window will cause the table row to be toggled.
-const stopPropagation = e => {
+const stopPropagation = (e) => {
   // Except for <a href=""> style links
-  if (e.target.tagName.toUpperCase() === 'A') { return }
+  if (e.target.tagName.toUpperCase() === 'A') {
+    return
+  }
   e.preventDefault()
   e.stopPropagation()
 }
@@ -30,8 +35,8 @@ class ClusterAttachNodeDialog extends PureComponent {
     const { row, getContext, setContext } = this.props
 
     const nodes = Object.keys(this.state)
-      .filter(uuid => this.state[uuid] !== 'unassigned')
-      .map(uuid => ({ uuid, isMaster: this.state[uuid] === 'master' }))
+      .filter((uuid) => this.state[uuid] !== 'unassigned')
+      .map((uuid) => ({ uuid, isMaster: this.state[uuid] === 'master' }))
 
     const clusterUuid = row.uuid
     await cloudProviderActions.attachNodesToCluster({
@@ -42,13 +47,13 @@ class ClusterAttachNodeDialog extends PureComponent {
     this.handleClose()
   }
 
-  setNodeRole = uuid => (e, value) => {
+  setNodeRole = (uuid) => (e, value) => {
     e.preventDefault()
     e.stopPropagation()
     this.setState({ [uuid]: value || 'unassigned' })
   }
 
-  renderNodeRow = node => {
+  renderNodeRow = (node) => {
     const uuid = node.uuid
     const value = this.state[uuid] || 'unassigned'
     return (
@@ -65,33 +70,31 @@ class ClusterAttachNodeDialog extends PureComponent {
     )
   }
 
-  render () {
-    const { data: { nodes } } = this.props
-    const freeNodes = nodes.filter(x => !x.clusterUuid)
+  render() {
+    const {
+      data: { nodes },
+    } = this.props
+    const freeNodes = nodes.filter((x) => !x.clusterUuid)
     return (
       <Dialog open onClose={this.handleClose} onClick={stopPropagation}>
         <DialogTitle>Attach Node to Cluster</DialogTitle>
         <DialogContent>
           <p>
-            <b>IMPORTANT</b>:
-            Before adding nodes to a cluster, please ensure that you have
-            followed the requirements
-            in <ExternalLink url={managedContainerChecklistLink}>this
-            article</ExternalLink> for
-            each node.
+            <b>IMPORTANT</b>: Before adding nodes to a cluster, please ensure that you have followed
+            the requirements in{' '}
+            <ExternalLink url={managedContainerChecklistLink}>this article</ExternalLink> for each
+            node.
           </p>
 
           <p>
             Choose the nodes you would like to add to this cluster as well as their corresponding
             role.
           </p>
-          {freeNodes.length === 0 &&
-          <Typography variant="h5">No nodes available to attach</Typography>
-          }
+          {freeNodes.length === 0 && (
+            <Typography variant="h5">No nodes available to attach</Typography>
+          )}
           <Table>
-            <TableBody>
-              {freeNodes.map(this.renderNodeRow)}
-            </TableBody>
+            <TableBody>{freeNodes.map(this.renderNodeRow)}</TableBody>
           </Table>
         </DialogContent>
         <DialogActions>

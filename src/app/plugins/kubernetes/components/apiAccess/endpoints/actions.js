@@ -8,8 +8,8 @@ const endpointsActions = createCRUDActions(endpointsCacheKey, {
   listFn: async (params, loadFromContext) => {
     const whitelist = ['qbert', 'keystone']
     const services = await loadFromContext(serviceCatalogContextKey)
-    return services.filter(service => whitelist.includes(service.name))
-  }
+    return services.filter((service) => whitelist.includes(service.name))
+  },
 })
 
 export default endpointsActions

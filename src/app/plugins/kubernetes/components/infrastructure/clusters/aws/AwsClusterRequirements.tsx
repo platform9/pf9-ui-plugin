@@ -12,22 +12,26 @@ const useStyles = makeStyles((theme: Theme) => ({
     display: 'flex',
     flexFlow: 'row nowrap',
     justifyContent: 'space-between',
-    margin: theme.spacing(4)
+    margin: theme.spacing(4),
   },
   alertTitle: {
     marginLeft: theme.spacing(2),
-    marginTop: theme.spacing(1)
+    marginTop: theme.spacing(1),
   },
   text: {
     marginTop: theme.spacing(1),
-    marginLeft: theme.spacing(1)
+    marginLeft: theme.spacing(1),
   },
   bulletList: {
     marginLeft: theme.spacing(2),
-    flex: 1
-  }
+    flex: 1,
+  },
 }))
-const AwsReqsLeftSection = ['ELB Management', 'Route 53 DNS Configuration', 'Access to 2 or more Availability Zones within the region']
+const AwsReqsLeftSection = [
+  'ELB Management',
+  'Route 53 DNS Configuration',
+  'Access to 2 or more Availability Zones within the region',
+]
 const AwsReqsRightSection = ['EC2 Instance Management', 'EBS Volume Management', 'VPC Management']
 
 const AwsClusterRequirements = ({ onComplete }) => {
@@ -37,11 +41,20 @@ const AwsClusterRequirements = ({ onComplete }) => {
   }, [onComplete])
   return (
     <FormFieldCard title="Amazon AWS Deployment">
-      <Typography className={classes.text}>Use your existing AWS credentials to create and manage Kubernetes clusters and associated resources within your AWS public cloud environment.</Typography>
-      <Typography className={classes.text}>You can create multiple AWS cloud providers; each AWS cloud provider should be associated with a unique set of AWS credentials.</Typography>
+      <Typography className={classes.text}>
+        Use your existing AWS credentials to create and manage Kubernetes clusters and associated
+        resources within your AWS public cloud environment.
+      </Typography>
+      <Typography className={classes.text}>
+        You can create multiple AWS cloud providers; each AWS cloud provider should be associated
+        with a unique set of AWS credentials.
+      </Typography>
 
       <Alert variant="info">
-        <Typography className={classes.alertTitle} variant="subtitle2">The following permissions are required on your AWS account in order to deploy fully automated Managed Kubernetes clusters:</Typography>
+        <Typography className={classes.alertTitle} variant="subtitle2">
+          The following permissions are required on your AWS account in order to deploy fully
+          automated Managed Kubernetes clusters:
+        </Typography>
         <div className={classes.requirements}>
           <BulletList className={classes.bulletList} items={AwsReqsLeftSection} />
           <BulletList className={classes.bulletList} items={AwsReqsRightSection} />

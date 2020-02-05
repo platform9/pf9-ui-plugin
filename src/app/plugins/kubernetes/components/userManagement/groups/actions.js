@@ -12,15 +12,11 @@ export const mngmGroupActions = createCRUDActions(mngmGroupsCacheKey, {
   dataMapper: async (groups, params, loadFromContext) => {
     // Retrieve the group mappings from the cache
     const mappings = await loadFromContext(mngmGroupMappingsCacheKey)
-    return groups.map(group => {
+    return groups.map((group) => {
       // Find the mapping that contains a rule belonging to the current group
-      const groupMapping = mappings.find(mapping => {
+      const groupMapping = mappings.find((mapping) => {
         const mappingRules = tryJsonParse(mapping.rules)
-        return pipe(
-          pluck('local'),
-          flatten,
-          find(pathEq(['group', 'id'], group.id)),
-        )(mappingRules)
+        return pipe(pluck('local'), flatten, find(pathEq(['group', 'id'], group.id)))(mappingRules)
       }) || { rules: emptyArr }
       // Filter out the rules not belonging to current group
       const mappingRules = tryJsonParse(groupMapping.rules)
@@ -32,14 +28,16 @@ export const mngmGroupActions = createCRUDActions(mngmGroupsCacheKey, {
         return groupRules
       }, emptyArr)
       // Stringify the results
-      const samlAttributesString = groupRules.reduce((samlAttributes, rule) => {
-        if (rule.hasOwnProperty('any_one_of')) {
-          return samlAttributes.concat(`${rule.type} = ${rule.any_one_of.join(', ')}`)
-        } else if (rule.hasOwnProperty('not_any_of')) {
-          return samlAttributes.concat(`${rule.type} != ${rule.not_any_of.join(', ')}`)
-        }
-        return samlAttributes
-      }, emptyArr).join(' AND ')
+      const samlAttributesString = groupRules
+        .reduce((samlAttributes, rule) => {
+          if (rule.hasOwnProperty('any_one_of')) {
+            return samlAttributes.concat(`${rule.type} = ${rule.any_one_of.join(', ')}`)
+          } else if (rule.hasOwnProperty('not_any_of')) {
+            return samlAttributes.concat(`${rule.type} != ${rule.not_any_of.join(', ')}`)
+          }
+          return samlAttributes
+        }, emptyArr)
+        .join(' AND ')
 
       return {
         ...group,

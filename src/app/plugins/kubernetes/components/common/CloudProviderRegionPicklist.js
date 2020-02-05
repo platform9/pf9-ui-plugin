@@ -10,12 +10,7 @@ const CloudProviderRegionPicklist = forwardRef(({ cloudProviderId, ...rest }, re
   const [details, loading] = useDataLoader(loadCloudProviderDetails, { cloudProviderId })
   const options = pluck('RegionName', details)
 
-  return <Picklist
-    {...rest}
-    ref={ref}
-    loading={loading}
-    options={options}
-  />
+  return <Picklist {...rest} ref={ref} loading={loading} options={options} />
 })
 
 CloudProviderRegionPicklist.propTypes = {

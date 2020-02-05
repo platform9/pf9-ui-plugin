@@ -11,7 +11,7 @@ import { FormControlLabel, Switch } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import { AppContext } from 'core/providers/AppProvider'
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   infrastructureHeader: {
     display: 'flex',
     flexGrow: 1,
@@ -19,37 +19,52 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'flex-end',
     minHeight: 50,
   },
-
 }))
 
 const StatsToggle = ({ statsVisible, toggleStats }) => {
-  return <FormControlLabel
-    control={
-      <Switch onChange={toggleStats} checked={statsVisible} color="primary" />
-    }
-    label="Show Stats"
-    labelPlacement="start"
-  />
+  return (
+    <FormControlLabel
+      control={<Switch onChange={toggleStats} checked={statsVisible} color="primary" />}
+      label="Show Stats"
+      labelPlacement="start"
+    />
+  )
 }
 
 const InfrastructurePage = () => {
   const classes = useStyles()
   const [statsVisible, setStatsVisble] = useState(true)
   const toggleStats = useCallback(() => setStatsVisble(!statsVisible), [statsVisible])
-  const { userDetails: { role } } = useContext(AppContext)
+  const {
+    userDetails: { role },
+  } = useContext(AppContext)
 
-  return <PageContainer header={<div className={classes.infrastructureHeader}>
-    <StatsToggle statsVisible={statsVisible} toggleStats={toggleStats} />
-    <InfrastructureStats visible={statsVisible} />
-  </div>}>
-    <Tabs>
-      <Tab value="clusters" label="Clusters"><ClustersListPage /></Tab>
-      {role === 'admin' &&
-      <Tab value="nodes" label="Nodes"><NodesListPage /></Tab>}
-      {role === 'admin' &&
-      <Tab value="cloudProviders" label="Cloud Providers"><CloudProvidersListPage /></Tab>}
-    </Tabs>
-  </PageContainer>
+  return (
+    <PageContainer
+      header={
+        <div className={classes.infrastructureHeader}>
+          <StatsToggle statsVisible={statsVisible} toggleStats={toggleStats} />
+          <InfrastructureStats visible={statsVisible} />
+        </div>
+      }
+    >
+      <Tabs>
+        <Tab value="clusters" label="Clusters">
+          <ClustersListPage />
+        </Tab>
+        {role === 'admin' && (
+          <Tab value="nodes" label="Nodes">
+            <NodesListPage />
+          </Tab>
+        )}
+        {role === 'admin' && (
+          <Tab value="cloudProviders" label="Cloud Providers">
+            <CloudProvidersListPage />
+          </Tab>
+        )}
+      </Tabs>
+    </PageContainer>
+  )
 }
 
 export default InfrastructurePage

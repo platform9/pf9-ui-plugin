@@ -5,7 +5,7 @@ import ToastItem from 'core/components/notifications/ToastItem'
 
 import { MessageOptions } from './model'
 
-const useStyles = makeStyles<Theme>(theme => ({
+const useStyles = makeStyles<Theme>((theme) => ({
   root: {
     marginBottom: 80,
     maxWidth: 600,
@@ -15,12 +15,12 @@ const useStyles = makeStyles<Theme>(theme => ({
     flexFlow: 'column nowrap',
     position: 'absolute',
     right: theme.spacing(1),
-    bottom: theme.spacing(1)
+    bottom: theme.spacing(1),
   },
   toastItem: {
     position: 'relative',
-    margin: theme.spacing(1, 0)
-  }
+    margin: theme.spacing(1, 0),
+  },
 }))
 
 export interface ToastOptions extends MessageOptions {
@@ -34,21 +34,29 @@ interface ToastContainerProps {
 
 const ToastContainer: FunctionComponent<ToastContainerProps> = ({ toasts, toastsTimeout }) => {
   const classes = useStyles({})
-  return <div className={classes.root}>
-    {toasts.map(({ id, isOpen, text, onClose, variant }) =>
-      <Snackbar
-        className={classes.toastItem}
-        key={id}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right',
-        }}
-        open={isOpen}
-        autoHideDuration={toastsTimeout}
-      >
-        <ToastItem onClose={onClose} variant={variant} message={text} toastsTimeout={toastsTimeout} />
-      </Snackbar>)}
-  </div>
+  return (
+    <div className={classes.root}>
+      {toasts.map(({ id, isOpen, text, onClose, variant }) => (
+        <Snackbar
+          className={classes.toastItem}
+          key={id}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right',
+          }}
+          open={isOpen}
+          autoHideDuration={toastsTimeout}
+        >
+          <ToastItem
+            onClose={onClose}
+            variant={variant}
+            message={text}
+            toastsTimeout={toastsTimeout}
+          />
+        </Snackbar>
+      ))}
+    </div>
+  )
 }
 
 export default ToastContainer

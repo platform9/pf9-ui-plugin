@@ -15,7 +15,9 @@ import DownloadCliWalkthrough from '../../nodes/DownloadCliWalkthrough'
 import Panel from 'app/plugins/theme/components/Panel'
 import CodeBlock from 'core/components/CodeBlock'
 import ExternalLink from 'core/components/ExternalLink'
-import ClusterHostChooser, { excludeNodes, isConnected, isUnassignedNode } from './ClusterHostChooser'
+import ClusterHostChooser, {
+  excludeNodes, isConnected, isUnassignedNode,
+} from './ClusterHostChooser'
 import { clusterActions } from '../actions'
 import { pathJoin } from 'utils/misc'
 import { defaultEtcBackupPath, k8sPrefix } from 'app/constants'
@@ -57,7 +59,7 @@ const networkPluginOptions = [
   { label: 'Canal (experimental)', value: 'canal' },
 ]
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   formWidth: {
     width: 715,
   },
@@ -85,22 +87,28 @@ const canFinishAndReview = ({ masterNodes, workerNodes, allowWorkloadsOnMaster }
 const AddBareOsClusterPage = () => {
   const classes = useStyles()
   const { history } = useReactRouter()
-  const onComplete = (_,
-    { uuid }) => history.push(routes.cluster.convergingNodes.path({ id: uuid }))
-  const [createBareOSClusterAction, creatingBareOSCluster] = useDataUpdater(clusterActions.create, onComplete) // eslint-disable-line
+  const onComplete = (_, { uuid }) =>
+    history.push(routes.cluster.convergingNodes.path({ id: uuid }))
+  const [createBareOSClusterAction, creatingBareOSCluster] = useDataUpdater(
+    clusterActions.create,
+    onComplete,
+  ) // eslint-disable-line
 
-  const handleSubmit = data => createBareOSClusterAction({
-    ...data,
-    clusterType: 'local',
-  })
+  const handleSubmit = (data) =>
+    createBareOSClusterAction({
+      ...data,
+      clusterType: 'local',
+    })
   const [nodes, loading] = useDataLoader(loadNodes)
 
   const hasFreeNodes = nodes.filter(isUnassignedNode).length > 0
   return (
     <FormWrapper
-      title="Add Bare OS Cluster" backUrl={listUrl}
+      title="Add Bare OS Cluster"
+      backUrl={listUrl}
       loading={creatingBareOSCluster || loading}
-      message={loading ? 'loading...' : 'Submitting form...'}>
+      message={loading ? 'loading...' : 'Submitting form...'}
+    >
       <Wizard
         onComplete={handleSubmit}
         context={initialContext}
@@ -108,7 +116,7 @@ const AddBareOsClusterPage = () => {
         disableNext={!hasFreeNodes}
         showFinishAndReviewButton={canFinishAndReview}
       >
-        {({ wizardContext, setWizardContext, onNext }) =>
+        {({ wizardContext, setWizardContext, onNext }) => (
           <>
             <WizardStep stepId="basic" label="Select Master Nodes">
               <ValidatedForm
@@ -124,22 +132,28 @@ const AddBareOsClusterPage = () => {
                       <FormFieldCard title="Name your Kubernetes Cluster">
                         <div className={classes.inputWidth}>
                           <TextField
-                            id="name" label="Name"
+                            id="name"
+                            label="Name"
                             info="Name of the cluster"
-                            onChange={value => setWizardContext({ name: value })}
-                            required />
+                            onChange={(value) => setWizardContext({ name: value })}
+                            required
+                          />
                         </div>
                       </FormFieldCard>
                       <FormFieldCard
-                        title={<span>Select nodes to add as <u>Master</u> nodes</span>}
+                        title={
+                          <span>
+                            Select nodes to add as <u>Master</u> nodes
+                          </span>
+                        }
                         link={
                           <div>
-                            <FontAwesomeIcon
-                              className={classes.blueIcon}
-                              size="md">file-alt</FontAwesomeIcon>{' '}
-                            <ExternalLink url={pmkCliOverviewLink}>Not Seeing
-                              Any
-                              Nodes?</ExternalLink>
+                            <FontAwesomeIcon className={classes.blueIcon} size="md">
+                              file-alt
+                            </FontAwesomeIcon>{' '}
+                            <ExternalLink url={pmkCliOverviewLink}>
+                              Not Seeing Any Nodes?
+                            </ExternalLink>
                           </div>
                         }
                       >
@@ -149,10 +163,7 @@ const AddBareOsClusterPage = () => {
                           <ClusterHostChooser
                             multiple
                             id="masterNodes"
-                            filterFn={allPass([
-                              isConnected,
-                              isUnassignedNode,
-                            ])}
+                            filterFn={allPass([isConnected, isUnassignedNode])}
                             onChange={(value) => setWizardContext({ masterNodes: value })}
                             validations={[masterNodeLengthValidator]}
                             pollForNodes
@@ -163,7 +174,9 @@ const AddBareOsClusterPage = () => {
                           <div className={classes.inputWidth}>
                             <CheckboxField
                               id="allowWorkloadsOnMaster"
-                              onChange={(value) => setWizardContext({ allowWorkloadsOnMaster: value })}
+                              onChange={(value) =>
+                                setWizardContext({ allowWorkloadsOnMaster: value })
+                              }
                               label="Make all Master nodes Master + Worker"
                               info="It is highly recommended to not enable workloads on master nodes for production or critical workload clusters."
                             />
@@ -175,11 +188,10 @@ const AddBareOsClusterPage = () => {
                           defaultExpanded={false}
                           link={
                             <div>
-                              <FontAwesomeIcon
-                                className={classes.blueIcon}
-                                size="md">code</FontAwesomeIcon>{' '}
-                              <ExternalLink url={pmkCliOverviewLink}>See all
-                                Options</ExternalLink>
+                              <FontAwesomeIcon className={classes.blueIcon} size="md">
+                                code
+                              </FontAwesomeIcon>{' '}
+                              <ExternalLink url={pmkCliOverviewLink}>See all Options</ExternalLink>
                             </div>
                           }
                         >
@@ -204,14 +216,18 @@ const AddBareOsClusterPage = () => {
                     {/* Worker nodes */}
                     <FormFieldCard
                       title={
-                        <span>Select nodes to add as <u>Worker</u> nodes</span>}
+                        <span>
+                          Select nodes to add as <u>Worker</u> nodes
+                        </span>
+                      }
                       link={
                         <div>
-                          <FontAwesomeIcon
-                            className={classes.blueIcon}
-                            size="md">file-alt</FontAwesomeIcon>{' '}
-                          <ExternalLink url={pmkCliOverviewLink}>Not Seeing Any
-                            Nodes?</ExternalLink>
+                          <FontAwesomeIcon className={classes.blueIcon} size="md">
+                            file-alt
+                          </FontAwesomeIcon>{' '}
+                          <ExternalLink url={pmkCliOverviewLink}>
+                            Not Seeing Any Nodes?
+                          </ExternalLink>
                         </div>
                       }
                     >
@@ -227,7 +243,9 @@ const AddBareOsClusterPage = () => {
                           ])}
                           pollForNodes
                           onChange={(value) => setWizardContext({ workerNodes: value })}
-                          validations={wizardContext.allowWorkloadsOnMaster ? null : [requiredValidator]}
+                          validations={
+                            wizardContext.allowWorkloadsOnMaster ? null : [requiredValidator]
+                          }
                         />
                       </div>
                       <Panel
@@ -236,11 +254,10 @@ const AddBareOsClusterPage = () => {
                         defaultExpanded={false}
                         link={
                           <div>
-                            <FontAwesomeIcon
-                              className={classes.blueIcon}
-                              size="md">code</FontAwesomeIcon>{' '}
-                            <ExternalLink url={pmkCliOverviewLink}>See all
-                              Options</ExternalLink>
+                            <FontAwesomeIcon className={classes.blueIcon} size="md">
+                              code
+                            </FontAwesomeIcon>{' '}
+                            <ExternalLink url={pmkCliOverviewLink}>See all Options</ExternalLink>
                           </div>
                         }
                       >
@@ -267,21 +284,18 @@ const AddBareOsClusterPage = () => {
                           label="Virtual IP address for cluster"
                           info={
                             <div>
-                              Specify the virtual IP address that will be used
-                              to provide access to
-                              the API server endpoint for this cluster. A
-                              virtual IP must be specified
-                              if you want to grow the number of masters in the
-                              future. Refer to{' '}
+                              Specify the virtual IP address that will be used to provide access to
+                              the API server endpoint for this cluster. A virtual IP must be
+                              specified if you want to grow the number of masters in the future.
+                              Refer to{' '}
                               <a
                                 href="https://docs.platform9.com/support/ha-for-baremetal-multimaster-kubernetes-cluster-service-type-load-balancer/"
                                 target="_blank"
                               >
                                 this article
                               </a>{' '}
-                              for more information re how the VIP service
-                              operates, VIP configuration,
-                              etc.
+                              for more information re how the VIP service operates, VIP
+                              configuration, etc.
                             </div>
                           }
                           required={(wizardContext.masterNodes || []).length > 1}
@@ -339,10 +353,15 @@ const AddBareOsClusterPage = () => {
                         <TextField
                           id="httpProxy"
                           label="HTTP Proxy"
-                          info={<div className={classes.inline}>(Optional)
-                            Specify the HTTP proxy for this cluster. Uses format
-                            of <CodeBlock><span>{'<scheme>://<username>:<password>@<host>:<port>'}</span></CodeBlock> where
-                            username and password are optional.</div>}
+                          info={
+                            <div className={classes.inline}>
+                              (Optional) Specify the HTTP proxy for this cluster. Uses format of{' '}
+                              <CodeBlock>
+                                <span>{'<scheme>://<username>:<password>@<host>:<port>'}</span>
+                              </CodeBlock>{' '}
+                              where username and password are optional.
+                            </div>
+                          }
                         />
                         <PicklistField
                           id="networkPlugin"
@@ -380,13 +399,20 @@ const AddBareOsClusterPage = () => {
                         <CheckboxField
                           id="privileged"
                           label="Privileged"
-                          value={values.privileged || ['calico', 'canal', 'weave'].includes(wizardContext.networkPlugin)}
-                          disabled={['calico', 'canal', 'weave'].includes(wizardContext.networkPlugin)}
-                          info={<div>
-                            Allows this cluster to run privileged containers.
-                            Read <ExternalLink url={runtimePrivilegedLink}>this
-                            article</ExternalLink> for more information.
-                          </div>}
+                          value={
+                            values.privileged ||
+                            ['calico', 'canal', 'weave'].includes(wizardContext.networkPlugin)
+                          }
+                          disabled={['calico', 'canal', 'weave'].includes(
+                            wizardContext.networkPlugin,
+                          )}
+                          info={
+                            <div>
+                              Allows this cluster to run privileged containers. Read{' '}
+                              <ExternalLink url={runtimePrivilegedLink}>this article</ExternalLink>{' '}
+                              for more information.
+                            </div>
+                          }
                         />
 
                         {/* Etcd Backup */}
@@ -405,7 +431,13 @@ const AddBareOsClusterPage = () => {
                           info="This deploys an instance of prometheus on the cluster."
                         />
 
-                        { !values.prometheusMonitoringEnabled && <Alert small variant="error" message="The PMK management plane is not able to monitor the cluster health." /> }
+                        {!values.prometheusMonitoringEnabled && (
+                          <Alert
+                            small
+                            variant="error"
+                            message="The PMK management plane is not able to monitor the cluster health."
+                          />
+                        )}
 
                         {/* Advanced API Configuration */}
                         <PicklistField
@@ -460,7 +492,7 @@ const AddBareOsClusterPage = () => {
               </ValidatedForm>
             </WizardStep>
           </>
-        }
+        )}
       </Wizard>
     </FormWrapper>
   )

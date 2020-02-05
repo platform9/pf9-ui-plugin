@@ -8,7 +8,7 @@ import { compose, pick } from 'ramda'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import clsx from 'clsx'
 
-const styles = theme => ({
+const styles = (theme) => ({
   SearchBar: {
     outline: 'none',
     '& .MuiOutlinedInput-input': {
@@ -44,7 +44,7 @@ const styles = theme => ({
 // The selector containing searchBar needs to keep state of searchBar in parent component.
 // To keep it aligned, please keep searchTerm in parent component of searchBar
 class SearchBar extends PureComponent {
-  handleSearch = event => {
+  handleSearch = (event) => {
     this.props.onSearchChange(event.target.value)
   }
 
@@ -52,37 +52,39 @@ class SearchBar extends PureComponent {
     this.props.onSearchChange('')
   }
 
-  render () {
+  render() {
     const { classes, searchTerm, className } = this.props
     return (
-      searchTerm !== undefined && <TextField
-        variant="outlined"
-        placeholder='Search'
-        className={clsx(classes.SearchBar, className)}
-        onChange={this.handleSearch}
-        value={searchTerm}
-        type="search"
-        InputProps={{
-          classes: pick(['root', 'adornedStart', 'adornedEnd'], classes),
-          startAdornment: (
-            <InputAdornment position="start">
-              <FontAwesomeIcon className={classes.searchIcon}>{'search'}</FontAwesomeIcon>
-            </InputAdornment>
-          ),
-          endAdornment: (
-            <InputAdornment
-              position="end"
-              style={{ visibility: searchTerm.length > 0 ? '' : 'hidden' }}
-            >
-              <ClearIcon
-                className={classes.clearIcon}
-                color="action"
-                onClick={this.handleClear}
-              />
-            </InputAdornment>
-          ),
-        }}
-      />
+      searchTerm !== undefined && (
+        <TextField
+          variant="outlined"
+          placeholder="Search"
+          className={clsx(classes.SearchBar, className)}
+          onChange={this.handleSearch}
+          value={searchTerm}
+          type="search"
+          InputProps={{
+            classes: pick(['root', 'adornedStart', 'adornedEnd'], classes),
+            startAdornment: (
+              <InputAdornment position="start">
+                <FontAwesomeIcon className={classes.searchIcon}>{'search'}</FontAwesomeIcon>
+              </InputAdornment>
+            ),
+            endAdornment: (
+              <InputAdornment
+                position="end"
+                style={{ visibility: searchTerm.length > 0 ? '' : 'hidden' }}
+              >
+                <ClearIcon
+                  className={classes.clearIcon}
+                  color="action"
+                  onClick={this.handleClear}
+                />
+              </InputAdornment>
+            ),
+          }}
+        />
+      )
     )
   }
 }
@@ -91,6 +93,4 @@ SearchBar.propTypes = {
   onSearchChange: PropTypes.func.isRequired,
 }
 
-export default compose(
-  withStyles(styles, { withTheme: true }),
-)(SearchBar)
+export default compose(withStyles(styles, { withTheme: true }))(SearchBar)

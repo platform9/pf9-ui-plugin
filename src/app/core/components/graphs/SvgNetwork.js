@@ -1,7 +1,7 @@
 import React from 'react'
 import { withStyles } from '@material-ui/styles'
 
-const styles = theme => ({
+const styles = (theme) => ({
   network: {
     fill: '#6CA2D1',
     stroke: '#FFF',
@@ -11,14 +11,12 @@ const styles = theme => ({
 
 @withStyles(styles)
 class SvgNetwork extends React.PureComponent {
-  render () {
+  render() {
     const { classes } = this.props
     const side = 43
     const transform = 'scale(1, 0.6) rotate(45)'
 
-    return (
-      <rect className={classes.network} width={side} height={side} transform={transform} />
-    )
+    return <rect className={classes.network} width={side} height={side} transform={transform} />
   }
 }
 

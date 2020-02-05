@@ -9,7 +9,7 @@ import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import { makeStyles } from '@material-ui/styles'
 import { awsAccessHelpLink, iamPolicyLink } from 'k8s/links'
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   formWidth: {
     width: 715,
   },
@@ -18,8 +18,8 @@ const useStyles = makeStyles(theme => ({
   },
   inputWidth: {
     maxWidth: 350,
-    marginBottom: theme.spacing(3)
-  }
+    marginBottom: theme.spacing(3),
+  },
 }))
 
 const initialValues = {
@@ -34,14 +34,13 @@ const AddAwsCloudProvider = ({ onComplete }) => {
         <FormFieldCard title="Create AWS Cloud Provider">
           <Typography variant="body1" component="div">
             <p>
-              Create a new cloud provider for your Amazon Web Services (AWS) public cloud.
-              This cloud provider will work using your existing AWS credentials to create and
-              manage Kubernetes clusters and associated resources within your AWS public
-              cloud environment.
+              Create a new cloud provider for your Amazon Web Services (AWS) public cloud. This
+              cloud provider will work using your existing AWS credentials to create and manage
+              Kubernetes clusters and associated resources within your AWS public cloud environment.
             </p>
             <p>
-              You can create multiple AWS cloud providers - each AWS cloud provider should
-              be associated with a unique set of AWS credentials.
+              You can create multiple AWS cloud providers - each AWS cloud provider should be
+              associated with a unique set of AWS credentials.
             </p>
             <Alert variant="info">
               <div>
@@ -52,25 +51,41 @@ const AddAwsCloudProvider = ({ onComplete }) => {
                 <ul>
                   <li>ELB Management</li>
                   <li>Route 53 DNS Configuration</li>
-                  <li>Access to 2 or more Availability Zones within the region
-                  </li>
+                  <li>Access to 2 or more Availability Zones within the region</li>
                   <li>EC2 Instance Management</li>
                   <li>EBS Volume Management</li>
                   <li>VPC Management</li>
                 </ul>
-                <p><ExternalLink url={iamPolicyLink}>View the exact IAM policy
-                  we require</ExternalLink></p>
+                <p>
+                  <ExternalLink url={iamPolicyLink}>
+                    View the exact IAM policy we require
+                  </ExternalLink>
+                </p>
               </div>
             </Alert>
           </Typography>
           <div className={classes.inputWidth}>
             <p>Specify AWS Credentials:</p>
             <TextField required id="name" label="Name" info="Name of the cloud provider" />
-            <TextField required id="key" label="AWS Access Key ID" info={<span>
-              This is the part of the AWS two part accesskey required for API access.&nbsp;
-              <ExternalLink url={awsAccessHelpLink}>Here</ExternalLink> is info on getting your AWS access and secret key.
-            </span>} />
-            <TextField required id="secret" type="password" label="Secret Key" info="The client secret key" />
+            <TextField
+              required
+              id="key"
+              label="AWS Access Key ID"
+              info={
+                <span>
+                  This is the part of the AWS two part accesskey required for API access.&nbsp;
+                  <ExternalLink url={awsAccessHelpLink}>Here</ExternalLink> is info on getting your
+                  AWS access and secret key.
+                </span>
+              }
+            />
+            <TextField
+              required
+              id="secret"
+              type="password"
+              label="Secret Key"
+              info="The client secret key"
+            />
             <SubmitButton>Add Cloud Provider</SubmitButton>
           </div>
         </FormFieldCard>

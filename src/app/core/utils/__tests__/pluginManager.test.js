@@ -9,12 +9,10 @@ describe('pluginManager', () => {
   })
 
   test('registerRoutes', () => {
-    plugin.registerRoutes(
-      [
-        { name: 'Dashboard', link: { path: '/', exact: true }, component: <h1>Dashboard</h1> },
-        { name: 'Login', link: { path: '/login' }, component: <h1>Login</h1> },
-      ]
-    )
+    plugin.registerRoutes([
+      { name: 'Dashboard', link: { path: '/', exact: true }, component: <h1>Dashboard</h1> },
+      { name: 'Login', link: { path: '/login' }, component: <h1>Login</h1> },
+    ])
     const routes = plugin.getRoutes()
     expect(routes.length).toBe(2)
 
@@ -24,12 +22,10 @@ describe('pluginManager', () => {
   })
 
   test('registerNavItems', () => {
-    plugin.registerNavItems(
-      [
-        { name: 'Dashboard', link: { path: '/' } },
-        { name: 'Tenants', link: { path: '/tenants' } },
-      ]
-    )
+    plugin.registerNavItems([
+      { name: 'Dashboard', link: { path: '/' } },
+      { name: 'Tenants', link: { path: '/tenants' } },
+    ])
     const navItems = plugin.getNavItems()
     expect(navItems.length).toBe(2)
     expect(navItems[0].name).toBe('Dashboard')
@@ -38,18 +34,14 @@ describe('pluginManager', () => {
   })
 
   test('clearAll', () => {
-    plugin.registerRoutes(
-      [
-        { name: 'Dashboard', link: { path: '/', exact: true }, component: <h1>Dashboard</h1> },
-        { name: 'Login', link: { path: '/login' }, component: <h1>Login</h1> },
-      ]
-    )
-    plugin.registerNavItems(
-      [
-        { name: 'Dashboard', link: { path: '/' } },
-        { name: 'Tenants', link: { path: '/tenants' } },
-      ]
-    )
+    plugin.registerRoutes([
+      { name: 'Dashboard', link: { path: '/', exact: true }, component: <h1>Dashboard</h1> },
+      { name: 'Login', link: { path: '/login' }, component: <h1>Login</h1> },
+    ])
+    plugin.registerNavItems([
+      { name: 'Dashboard', link: { path: '/' } },
+      { name: 'Tenants', link: { path: '/tenants' } },
+    ])
     expect(plugin.getNavItems().length).toEqual(2)
     expect(plugin.getRoutes().length).toEqual(2)
     plugin.clearAll()

@@ -18,68 +18,81 @@ const FUSE_OPTIONS = {
   keys: ['value', 'label'],
 }
 
-const useStyles = makeStyles(theme => createStyles({
-  container: {
-    position: 'relative',
-    display: 'inline-flex',
-    flexDirection: 'column',
-    padding: theme.spacing(2, 1, 1, 1),
-    borderRadius: 4,
-    border: `1px solid ${theme.palette.grey[400]}`,
-    maxHeight: '350px',
-  },
-  label: {
-    position: 'absolute',
-    top: -12,
-    backgroundColor: 'white',
-    padding: 4,
-  },
-  searchInputWrapper: {
-    marginBottom: 4,
-  },
-  notchedOutline: {
-    borderRadius: 0,
-  },
-  input: {
-    boxSizing: 'border-box',
-    height: 28,
-    padding: 6,
-    fontSize: 13,
-  },
-  adornedStart: {
-    paddingLeft: 8,
-  },
-  searchIcon: {
-    color: '#BABABA',
-  },
-  positionStart: {
-    marginRight: 0,
-  },
-  formControlLabelRoot: {
-    marginLeft: -6,
-    margin: '2px 0',
-  },
-  checkbox: {
-    padding: 4,
-  },
-  checkboxSize: {
-    fontSize: 16,
-  },
-  options: {
-    overflowY: 'auto',
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  optionLabel: {
-    fontSize: 13,
-  },
-}))
+const useStyles = makeStyles((theme) =>
+  createStyles({
+    container: {
+      position: 'relative',
+      display: 'inline-flex',
+      flexDirection: 'column',
+      padding: theme.spacing(2, 1, 1, 1),
+      borderRadius: 4,
+      border: `1px solid ${theme.palette.grey[400]}`,
+      maxHeight: '350px',
+    },
+    label: {
+      position: 'absolute',
+      top: -12,
+      backgroundColor: 'white',
+      padding: 4,
+    },
+    searchInputWrapper: {
+      marginBottom: 4,
+    },
+    notchedOutline: {
+      borderRadius: 0,
+    },
+    input: {
+      boxSizing: 'border-box',
+      height: 28,
+      padding: 6,
+      fontSize: 13,
+    },
+    adornedStart: {
+      paddingLeft: 8,
+    },
+    searchIcon: {
+      color: '#BABABA',
+    },
+    positionStart: {
+      marginRight: 0,
+    },
+    formControlLabelRoot: {
+      marginLeft: -6,
+      margin: '2px 0',
+    },
+    checkbox: {
+      padding: 4,
+    },
+    checkboxSize: {
+      fontSize: 16,
+    },
+    options: {
+      overflowY: 'auto',
+      display: 'flex',
+      flexDirection: 'column',
+    },
+    optionLabel: {
+      fontSize: 13,
+    },
+  }),
+)
 
 const MultiSelect = React.forwardRef(
-  ({
-    id, label, hasError, required, errorMessage,
-    options, values = emptyArr, onChange, maxOptions, sortSelectedFirst,
-  }, ref) => {
+  (
+    {
+      id,
+      label,
+      hasError,
+      required,
+      errorMessage,
+      options,
+      values = emptyArr,
+      onChange,
+      maxOptions,
+      sortSelectedFirst,
+    },
+    ref,
+  ) => {
     const classes = useStyles()
 
     const [term, setTerm] = useState('')
@@ -95,7 +108,7 @@ const MultiSelect = React.forwardRef(
 
     const toggleOption = (value) => {
       const updatedValues = values.includes(value)
-        ? values.filter(currentValue => currentValue !== value)
+        ? values.filter((currentValue) => currentValue !== value)
         : [...values, value]
 
       onChange(updatedValues)
@@ -109,10 +122,15 @@ const MultiSelect = React.forwardRef(
 
     return (
       <FormControl className={classes.container} id={id} error={hasError} ref={ref}>
-        <Typography className={classes.label} variant="caption">{required
-          ? `${label} *`
-          : label}</Typography>
-        <SearchField classes={classes} term={term} onSearchChange={setTerm} onHitEnter={onHitEnter} />
+        <Typography className={classes.label} variant="caption">
+          {required ? `${label} *` : label}
+        </Typography>
+        <SearchField
+          classes={classes}
+          term={term}
+          onSearchChange={setTerm}
+          onHitEnter={onHitEnter}
+        />
         <Box
           className={classes.options}
           style={{ height: maxOptions ? getOptionsHeight(maxOptions) : 'initial' }}
@@ -131,7 +149,8 @@ const MultiSelect = React.forwardRef(
         {errorMessage && <FormHelperText>{errorMessage}</FormHelperText>}
       </FormControl>
     )
-  })
+  },
+)
 
 const SearchField = ({ classes, term, onSearchChange, onHitEnter }) => {
   const handleKeyDown = (event) => {
@@ -146,7 +165,7 @@ const SearchField = ({ classes, term, onSearchChange, onHitEnter }) => {
     <FormControl className={classes.searchInputWrapper}>
       <OutlinedInput
         value={term}
-        onChange={e => onSearchChange(e.target.value)}
+        onChange={(e) => onSearchChange(e.target.value)}
         onKeyDown={handleKeyDown}
         startAdornment={
           <InputAdornment position="start" classes={{ positionStart: classes.positionStart }}>
@@ -163,7 +182,7 @@ const SearchField = ({ classes, term, onSearchChange, onHitEnter }) => {
   )
 }
 
-const Option = ({ classes, label, ...checkboxProps }) =>
+const Option = ({ classes, label, ...checkboxProps }) => (
   <FormControlLabel
     label={label}
     control={
@@ -177,6 +196,7 @@ const Option = ({ classes, label, ...checkboxProps }) =>
     }
     classes={{ root: classes.formControlLabelRoot, label: classes.optionLabel }}
   />
+)
 
 const getOptionsHeight = (maxOptions) => maxOptions * 28
 

@@ -4,8 +4,10 @@ const originalLocalStorage = global.localStorage
 
 const storage = {}
 const mockLocalStorage = {
-  getItem: key => storage[key],
-  setItem: (key, value) => { storage[key] = value }
+  getItem: (key) => storage[key],
+  setItem: (key, value) => {
+    storage[key] = value
+  },
 }
 
 describe('pf9Storage', () => {

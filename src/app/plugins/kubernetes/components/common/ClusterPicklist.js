@@ -8,37 +8,47 @@ import { allKey } from 'app/constants'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 
 // We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
-const ClusterPicklist = forwardRef(({
-  loading, onChange, selectFirst,
-  onlyPrometheusEnabled, onlyMasterNodeClusters, onlyAppCatalogEnabled, onlyHealthyClusters,
-  ...rest
-}, ref) => {
-  const defaultParams = {
-    masterNodeClusters: onlyMasterNodeClusters,
-    appCatalogClusters: onlyAppCatalogEnabled,
-    prometheusClusters: onlyPrometheusEnabled,
-    healthyClusters: onlyHealthyClusters,
-  }
-  const [clusters, clustersLoading] = useDataLoader(clusterActions.list, defaultParams)
-  const options = useMemo(() => projectAs(
-    { label: 'name', value: 'uuid' }, clusters,
-  ), [clusters])
-
-  // Select the first cluster as soon as clusters are loaded
-  useEffect(() => {
-    if (!isEmpty(options) && selectFirst) {
-      onChange(propOr(allKey, 'value', head(options)))
+const ClusterPicklist = forwardRef(
+  (
+    {
+      loading,
+      onChange,
+      selectFirst,
+      onlyPrometheusEnabled,
+      onlyMasterNodeClusters,
+      onlyAppCatalogEnabled,
+      onlyHealthyClusters,
+      ...rest
+    },
+    ref,
+  ) => {
+    const defaultParams = {
+      masterNodeClusters: onlyMasterNodeClusters,
+      appCatalogClusters: onlyAppCatalogEnabled,
+      prometheusClusters: onlyPrometheusEnabled,
+      healthyClusters: onlyHealthyClusters,
     }
-  }, [options])
+    const [clusters, clustersLoading] = useDataLoader(clusterActions.list, defaultParams)
+    const options = useMemo(() => projectAs({ label: 'name', value: 'uuid' }, clusters), [clusters])
 
-  return <Picklist
-    {...rest}
-    ref={ref}
-    onChange={onChange}
-    loading={loading || clustersLoading}
-    options={options}
-  />
-})
+    // Select the first cluster as soon as clusters are loaded
+    useEffect(() => {
+      if (!isEmpty(options) && selectFirst) {
+        onChange(propOr(allKey, 'value', head(options)))
+      }
+    }, [options])
+
+    return (
+      <Picklist
+        {...rest}
+        ref={ref}
+        onChange={onChange}
+        loading={loading || clustersLoading}
+        options={options}
+      />
+    )
+  },
+)
 
 ClusterPicklist.propTypes = {
   ...Picklist.propTypes,

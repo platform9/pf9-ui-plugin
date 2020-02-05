@@ -11,7 +11,7 @@ import { BrowserRouter as Router } from 'react-router-dom'
 import plugins from 'app/plugins'
 import pluginManager from 'core/utils/pluginManager'
 
-plugins.forEach(plugin => plugin.registerPlugin(pluginManager))
+plugins.forEach((plugin) => plugin.registerPlugin(pluginManager))
 
 const App = () => {
   // TODO: Simplify and combine some of these providers

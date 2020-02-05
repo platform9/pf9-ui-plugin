@@ -8,7 +8,7 @@ export const PageContext = React.createContext({
   extraHeaderContainer: null,
 })
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
     flexFlow: 'column nowrap',
@@ -29,8 +29,8 @@ const useStyles = makeStyles(theme => ({
     marginBottom: theme.spacing(2),
   },
   extraHeader: {
-    position: ({ floatingHeader }) => floatingHeader ? 'absolute' : 'static',
-    top: ({ floatingHeader }) => floatingHeader ? '100%' : 'none',
+    position: ({ floatingHeader }) => (floatingHeader ? 'absolute' : 'static'),
+    top: ({ floatingHeader }) => (floatingHeader ? '100%' : 'none'),
     right: 0,
     display: 'flex',
     flexFlow: 'row nowrap',
@@ -57,21 +57,17 @@ const PageContainer = ({ children, header = undefined, ...rest }) => {
     setExtraHeaderContainer(extraHeaderRef.current)
   }, [])
 
-  return <div className={classes.root}>
-    <div className={classes.header}>
-      {header && <div className={classes.headerContents}>
-        {header}
-      </div>}
-      <div className={classes.extraHeader} ref={extraHeaderRef} />
+  return (
+    <div className={classes.root}>
+      <div className={classes.header}>
+        {header && <div className={classes.headerContents}>{header}</div>}
+        <div className={classes.extraHeader} ref={extraHeaderRef} />
+      </div>
+      <div className={classes.content}>
+        <PageContext.Provider value={{ extraHeaderContainer }}>{children}</PageContext.Provider>
+      </div>
     </div>
-    <div className={classes.content}>
-      <PageContext.Provider
-        value={{ extraHeaderContainer }}
-      >
-        {children}
-      </PageContext.Provider>
-    </div>
-  </div>
+  )
 }
 
 PageContainer.propTypes = {

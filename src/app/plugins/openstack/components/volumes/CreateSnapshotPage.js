@@ -11,10 +11,12 @@ import { dataCacheKey } from 'core/helpers/createContextLoader'
 import { assocPath } from 'ramda'
 
 class CreateSnapshotPage extends React.PureComponent {
-  handleAdd = async snapshotData => {
+  handleAdd = async (snapshotData) => {
     const { setContext, getContext, history, match } = this.props
     const { volumeId } = match.params
-    if (!volumeId) { return console.error('Invalid volumeId') }
+    if (!volumeId) {
+      return console.error('Invalid volumeId')
+    }
     try {
       const params = {
         volume_id: volumeId,
@@ -23,14 +25,16 @@ class CreateSnapshotPage extends React.PureComponent {
       }
       const existingSnapshots = await loadVolumeSnapshots({ setContext, getContext })
       const createdSnapshot = await ApiClient.getInstance().cinder.snapshotVolume(params)
-      setContext(assocPath([dataCacheKey, 'volumeSnapshots'], [...existingSnapshots, createdSnapshot]))
+      setContext(
+        assocPath([dataCacheKey, 'volumeSnapshots'], [...existingSnapshots, createdSnapshot]),
+      )
       history.push('/ui/openstack/storage#volumeSnapshots')
     } catch (err) {
       console.error(err)
     }
   }
 
-  render () {
+  render() {
     return (
       <FormWrapper title="Create Snapshot" backUrl="/ui/openstack/storage#volumes">
         <CreateSnapshotForm onComplete={this.handleAdd} />
@@ -39,8 +43,4 @@ class CreateSnapshotPage extends React.PureComponent {
   }
 }
 
-export default compose(
-  withAppContext,
-  withRouter,
-  requiresAuthentication
-)(CreateSnapshotPage)
+export default compose(withAppContext, withRouter, requiresAuthentication)(CreateSnapshotPage)

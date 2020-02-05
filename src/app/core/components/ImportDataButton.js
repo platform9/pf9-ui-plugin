@@ -6,7 +6,7 @@ const ImportDataButton = ({ children, id, onImport, ...rest }) => {
   const importData = ({ target }) => {
     const file = target.files[0]
     const fileReader = new FileReader()
-    fileReader.onloadend = e => {
+    fileReader.onloadend = (e) => {
       onImport(e.target.result)
       // Reset the target value so the next onloadend still triggers.
       // https://stackoverflow.com/questions/26634616/filereader-upload-same-file-again-not-working
@@ -25,7 +25,9 @@ const ImportDataButton = ({ children, id, onImport, ...rest }) => {
         onChange={importData}
       />
       <label htmlFor={id}>
-        <Button component="span" {...rest}>{children}</Button>
+        <Button component="span" {...rest}>
+          {children}
+        </Button>
       </label>
     </React.Fragment>
   )

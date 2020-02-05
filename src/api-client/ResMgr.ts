@@ -27,39 +27,36 @@ const neutronComponents = [
   'pf9-neutron-metadata-agent',
 ]
 
-export const localizeRole = role => roleNames[role] || role
+export const localizeRole = (role) => roleNames[role] || role
 
 export const localizeRoles = (roles: string[] = []) => {
-  const isNeutronRole = role => includes(role, neutronComponents)
+  const isNeutronRole = (role) => includes(role, neutronComponents)
   const [neutronRoles, normalRoles] = partition(isNeutronRole, roles)
   const hasAllNetworkRoles = neutronRoles.length === neutronComponents.length
-  return uniq([
-    ...normalRoles.map(localizeRole),
-    ...hasAllNetworkRoles ? ['Network Node'] : []
-  ])
+  return uniq([...normalRoles.map(localizeRole), ...(hasAllNetworkRoles ? ['Network Node'] : [])])
 }
 
 class ResMgr extends ApiService {
-  async endpoint () {
+  async endpoint() {
     const endpoint = await this.client.keystone.getServiceEndpoint('resmgr', 'internal')
     return `${endpoint}/v1`
   }
 
-  async getHosts () {
+  async getHosts() {
     const url = `${await this.endpoint()}/hosts`
     const response = await axios.get(url, this.client.getAuthHeaders())
     return response.data
   }
 
-  async addRole (hostId, role, body) {
+  async addRole(hostId, role, body) {
     return this.client.basicPut(`${await this.endpoint()}/hosts/${hostId}/roles/${role}`, body)
   }
 
-  async removeRole (hostId, role): Promise<void> {
+  async removeRole(hostId, role): Promise<void> {
     await this.client.basicDelete(`${await this.endpoint()}/hosts/${hostId}/roles/${role}`)
   }
 
-  async unauthorizeHost (id) {
+  async unauthorizeHost(id) {
     const url = `${await this.endpoint()}/hosts/${id}`
     return axios.delete(url, this.client.getAuthHeaders())
   }

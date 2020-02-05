@@ -8,7 +8,7 @@ import NetworksWidget from 'core/components/widgets/NetworksWidget'
 import calcUsageTotals from 'k8s/util/calcUsageTotals'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     alignSelf: 'normal',
     margin: theme.spacing(1, 0),
@@ -18,32 +18,52 @@ const useStyles = makeStyles(theme => ({
 const InfrastructureStats = ({ visible }) => {
   const classes = useStyles()
   const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
-  const totals = useMemo(() => ({
-    compute: calcUsageTotals(clusters, 'usage.compute.current', 'usage.compute.max'),
-    memory: calcUsageTotals(clusters, 'usage.memory.current', 'usage.memory.max'),
-    disk: calcUsageTotals(clusters, 'usage.disk.current', 'usage.disk.max'),
-  }), [clusters])
+  const totals = useMemo(
+    () => ({
+      compute: calcUsageTotals(clusters, 'usage.compute.current', 'usage.compute.max'),
+      memory: calcUsageTotals(clusters, 'usage.memory.current', 'usage.memory.max'),
+      disk: calcUsageTotals(clusters, 'usage.disk.current', 'usage.disk.max'),
+    }),
+    [clusters],
+  )
   // TODO: fix the number of networks
   const numNetworks = 1
 
-  return <Collapse className={classes.root} in={visible}>
-    <Progress loading={loadingClusters} renderContentOnMount minHeight={200}>
-      <Grid container spacing={1}>
-        <Grid item xs={3}>
-          <UsageWidget title="Compute" stats={totals.compute} units="GHz" headerImg={'/ui/images/icon-compute.svg'} />
+  return (
+    <Collapse className={classes.root} in={visible}>
+      <Progress loading={loadingClusters} renderContentOnMount minHeight={200}>
+        <Grid container spacing={1}>
+          <Grid item xs={3}>
+            <UsageWidget
+              title="Compute"
+              stats={totals.compute}
+              units="GHz"
+              headerImg={'/ui/images/icon-compute.svg'}
+            />
+          </Grid>
+          <Grid item xs={3}>
+            <UsageWidget
+              title="Memory"
+              stats={totals.memory}
+              units="GiB"
+              headerImg={'/ui/images/icon-memory.svg'}
+            />
+          </Grid>
+          <Grid item xs={3}>
+            <UsageWidget
+              title="Storage"
+              stats={totals.disk}
+              units="GiB"
+              headerImg={'/ui/images/icon-storage.svg'}
+            />
+          </Grid>
+          <Grid item xs={3}>
+            <NetworksWidget numNetworks={numNetworks} />
+          </Grid>
         </Grid>
-        <Grid item xs={3}>
-          <UsageWidget title="Memory" stats={totals.memory} units="GiB" headerImg={'/ui/images/icon-memory.svg'} />
-        </Grid>
-        <Grid item xs={3}>
-          <UsageWidget title="Storage" stats={totals.disk} units="GiB" headerImg={'/ui/images/icon-storage.svg'} />
-        </Grid>
-        <Grid item xs={3}>
-          <NetworksWidget numNetworks={numNetworks} />
-        </Grid>
-      </Grid>
-    </Progress>
-  </Collapse>
+      </Progress>
+    </Collapse>
+  )
 }
 
 export default InfrastructureStats

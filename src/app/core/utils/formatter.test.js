@@ -30,7 +30,9 @@ describe('Value Formatters Test', () => {
 
 describe('Date Formatters Test', () => {
   it('Date reformatting', () => {
-    expect(formattedDate('1998-12-17T03:24:00Z')).toEqual(moment('1998-12-17T03:24:00Z', 'YYYY-MM-DDTHH:mm:ssZ').format('lll'))
+    expect(formattedDate('1998-12-17T03:24:00Z')).toEqual(
+      moment('1998-12-17T03:24:00Z', 'YYYY-MM-DDTHH:mm:ssZ').format('lll'),
+    )
   })
 
   it('Input error handling', () => {

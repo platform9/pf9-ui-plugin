@@ -7,7 +7,7 @@ import { withAppContext } from 'core/providers/AppProvider'
 import { logoutUrl } from 'app/constants'
 import ChangePasswordModal from './ChangePasswordModal'
 
-const styles = theme => ({
+const styles = (theme) => ({
   avatar: {
     position: 'relative',
     float: 'right',
@@ -26,7 +26,7 @@ const styles = theme => ({
 @withRouter
 class UserMenu extends React.PureComponent {
   state = { anchorEl: null, showChangePasswordModal: false }
-  handleClick = event => this.setState({ anchorEl: event.currentTarget })
+  handleClick = (event) => this.setState({ anchorEl: event.currentTarget })
   handleClose = () => this.setState({ anchorEl: null })
   logout = () => this.props.history.push(logoutUrl)
 
@@ -34,7 +34,7 @@ class UserMenu extends React.PureComponent {
 
   handleCancelChangePassword = () => this.setState({ showChangePasswordModal: false })
 
-  render () {
+  render() {
     const { classes, className, session } = this.props
     const { anchorEl, showChangePasswordModal } = this.state
     const username = session.username || '?'
@@ -45,7 +45,9 @@ class UserMenu extends React.PureComponent {
 
     return (
       <div className={`${classes.avatar} ${className}`}>
-        <Typography color="inherit" variant="subtitle2" onClick={this.handleClick}>{username} &#9662;</Typography>
+        <Typography color="inherit" variant="subtitle2" onClick={this.handleClick}>
+          {username} &#9662;
+        </Typography>
         <Menu
           id="user-menu"
           anchorEl={anchorEl}
@@ -54,7 +56,7 @@ class UserMenu extends React.PureComponent {
           getContentAnchorEl={null}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
         >
-          { false && <MenuItem onClick={this.handleChangePassword}>Change Password</MenuItem> }
+          {false && <MenuItem onClick={this.handleChangePassword}>Change Password</MenuItem>}
           <MenuItem onClick={this.logout}>Sign Out</MenuItem>
         </Menu>
       </div>

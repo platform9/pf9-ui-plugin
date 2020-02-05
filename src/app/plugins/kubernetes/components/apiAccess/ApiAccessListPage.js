@@ -6,8 +6,8 @@ import { Divider } from '@material-ui/core'
 
 const useStyles = makeStyles((theme) => ({
   container: {
-    maxWidth: 700
-  }
+    maxWidth: 700,
+  },
 }))
 
 const ApiAccessListPage = () => {

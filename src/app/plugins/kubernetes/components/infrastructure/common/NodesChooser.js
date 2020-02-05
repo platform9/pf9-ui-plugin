@@ -13,23 +13,29 @@ class NodesChooser extends React.PureComponent {
     selected: [],
   }
 
-  handleMultiSelect = selected => {
+  handleMultiSelect = (selected) => {
     this.setState({ selected })
     this.props.onChange(selected)
   }
 
   validSelection = () => [1, 3, 5].contains(this.state.selected.length)
 
-  render () {
-    const { data: { combinedHosts }, label, name } = this.props
-    const authorized = x => x.uiState !== 'unauthorized'
-    const validCloudStack = x => x.cloudStack === 'k8s' || x.cloudStack === 'both'
-    const hasQbert = x => !!x.qbert
-    const pending = x => x.uiState === 'unauthorized'
-    const authorizedK8sHosts = combinedHosts.filter(allPass([authorized, validCloudStack, hasQbert]))
+  render() {
+    const {
+      data: { combinedHosts },
+      label,
+      name,
+    } = this.props
+    const authorized = (x) => x.uiState !== 'unauthorized'
+    const validCloudStack = (x) => x.cloudStack === 'k8s' || x.cloudStack === 'both'
+    const hasQbert = (x) => !!x.qbert
+    const pending = (x) => x.uiState === 'unauthorized'
+    const authorizedK8sHosts = combinedHosts.filter(
+      allPass([authorized, validCloudStack, hasQbert]),
+    )
     const pendingHosts = combinedHosts.filter(pending)
     const hosts = [...authorizedK8sHosts, ...pendingHosts]
-    const hostOptions = hosts.map(h => ({
+    const hostOptions = hosts.map((h) => ({
       value: h.resmgr.id,
       label: h.resmgr.info.hostname,
     }))

@@ -7,17 +7,21 @@ import { prometheusServiceMonitorsCacheKey } from './actions'
 import { keyValueArrToObj, objToKeyValueArr } from 'utils/fp'
 
 class UpdateServiceMonitorForm extends React.PureComponent {
-  handleUpdate = data => {
+  handleUpdate = (data) => {
     const newData = { ...data, labels: keyValueArrToObj(data.labels) }
     this.props.onComplete(newData)
   }
 
-  render () {
+  render() {
     const initialValues = { ...this.props.initialValues }
     initialValues.labels = objToKeyValueArr(initialValues.labels)
     return (
       <ValidatedForm initialValues={initialValues} onSubmit={this.handleUpdate}>
-        <KeyValuesField id="labels" label="App Labels" info="Key/value pairs for app that Prometheus will monitor" />
+        <KeyValuesField
+          id="labels"
+          label="App Labels"
+          info="Key/value pairs for app that Prometheus will monitor"
+        />
         <SubmitButton>Update service monitor</SubmitButton>
       </ValidatedForm>
     )

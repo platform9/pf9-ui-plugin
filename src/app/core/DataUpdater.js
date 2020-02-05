@@ -11,13 +11,13 @@ import { withRouter } from 'react-router'
  * @deprecated Use useDataUpdater hook instead
  */
 class DataUpdater extends PureComponent {
-  componentDidMount () {
+  componentDidMount() {
     console.warn('DataUpdater component is deprecated, please use `useDataUpdater` hook instead')
   }
 
-  findById = (arr = [], id) => arr.find(x => x.id === id)
+  findById = (arr = [], id) => arr.find((x) => x.id === id)
 
-  handleSubmit = async params => {
+  handleSubmit = async (params) => {
     const { updateFn, objId, backUrl, getContext, setContext, history } = this.props
     await updateFn({ params: { id: objId, ...params }, getContext, setContext, objId })
     if (backUrl) {
@@ -25,12 +25,14 @@ class DataUpdater extends PureComponent {
     }
   }
 
-  render () {
+  render() {
     const { loaderFn, objId, children } = this.props
     return (
       <DataLoader loaders={{ updaterData: loaderFn }}>
         {({ data }) => {
-          if (!data.updaterData) { return null }
+          if (!data.updaterData) {
+            return null
+          }
           return children({
             data: this.findById(data.updaterData, objId),
             onSubmit: this.handleSubmit,
@@ -59,7 +61,4 @@ DataUpdater.propTypes = {
   backUrl: PropTypes.string,
 }
 
-export default compose(
-  withAppContext,
-  withRouter,
-)(DataUpdater)
+export default compose(withAppContext, withRouter)(DataUpdater)

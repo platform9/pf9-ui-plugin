@@ -10,7 +10,9 @@ import InsertChartIcon from '@material-ui/icons/InsertChart'
 import { clustersCacheKey } from '../common/actions'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { capitalizeString, castBoolToStr } from 'utils/misc'
-import { ClusterConnectionStatus, ClusterHealthStatus } from 'k8s/components/infrastructure/clusters/ClusterStatus'
+import {
+  ClusterConnectionStatus, ClusterHealthStatus,
+} from 'k8s/components/infrastructure/clusters/ClusterStatus'
 import ResourceUsageTable from 'k8s/components/infrastructure/common/ResourceUsageTable'
 import DashboardLink from './DashboardLink'
 import CreateButton from 'core/components/buttons/CreateButton'
@@ -25,7 +27,7 @@ import { isAdminRole } from 'k8s/util/helpers'
 import { routes } from 'core/utils/routes'
 import CodeBlock from 'core/components/CodeBlock'
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   link: {
     cursor: 'pointer',
     color: theme.palette.primary.main,
@@ -45,8 +47,10 @@ const renderCloudProviderType = (type, cluster) => {
 const renderConnectionStatus = (_, cluster) => <ClusterConnectionStatus cluster={cluster} />
 const renderHealthStatus = (_, cluster) => <ClusterHealthStatus cluster={cluster} />
 
-const renderLinks = links => {
-  if (!links) { return null }
+const renderLinks = (links) => {
+  if (!links) {
+    return null
+  }
   return (
     <div>
       {links.dashboard && <ExternalLink url={links.dashboard}>Dashboard</ExternalLink>}
@@ -58,9 +62,7 @@ const renderLinks = links => {
 
 const renderNodeLink = ({ uuid, name }) => (
   <div key={uuid}>
-    <SimpleLink src={`/ui/kubernetes/infrastructure/nodes/${uuid}`}>
-      {name}
-    </SimpleLink>
+    <SimpleLink src={`/ui/kubernetes/infrastructure/nodes/${uuid}`}>{name}</SimpleLink>
   </div>
 )
 
@@ -92,31 +94,33 @@ const NodesCell = ({ nodes }) => {
   )
 }
 
-const toMHz = value => value * 1024
+const toMHz = (value) => value * 1024
 
 const renderStats = (_, { usage }) => {
   const hasValidStats = usage && usage.compute && usage.compute.current
-  if (!hasValidStats) { return null }
+  if (!hasValidStats) {
+    return null
+  }
   return (
     <>
       <ResourceUsageTable valueConverter={toMHz} units="MHz" label="CPU" stats={usage.compute} />
       <ResourceUsageTable units="GiB" label="Memory" stats={usage.memory} />
       <ResourceUsageTable units="GiB" label="Storage" stats={usage.disk} />
-      {usage.grafanaLink &&
-      <DashboardLink label="Grafana" link={usage.grafanaLink} />}
+      {usage.grafanaLink && <DashboardLink label="Grafana" link={usage.grafanaLink} />}
     </>
   )
 }
 
-const renderClusterDetailLink = (name, cluster) =>
+const renderClusterDetailLink = (name, cluster) => (
   <SimpleLink src={`/ui/kubernetes/infrastructure/clusters/${cluster.uuid}`}>{name}</SimpleLink>
+)
 
 const renderBooleanField = (key) => (_, cluster) => (
   <Typography variant="body2">{castBoolToStr()(!!cluster[key])}</Typography>
 )
 
 const renderCloudProvider = (_, { cloudProviderType, cloudProviderName }) => (
-  <Typography variant="body2">{ cloudProviderType === 'local' ? '' : cloudProviderName }</Typography>
+  <Typography variant="body2">{cloudProviderType === 'local' ? '' : cloudProviderName}</Typography>
 )
 
 const renderMetaData = (_, { tags }) => {
@@ -129,10 +133,14 @@ const renderMetaData = (_, { tags }) => {
   )
 }
 
-const canScaleMasters = ([cluster]) => cluster.taskStatus === 'success' && cluster.cloudProviderType === 'local' && (cluster.nodes || []).length > 1
-const canScaleWorkers = ([cluster]) => cluster.taskStatus === 'success' && cluster.cloudProviderType !== 'azure'
+const canScaleMasters = ([cluster]) =>
+  cluster.taskStatus === 'success' &&
+  cluster.cloudProviderType === 'local' &&
+  (cluster.nodes || []).length > 1
+const canScaleWorkers = ([cluster]) =>
+  cluster.taskStatus === 'success' && cluster.cloudProviderType !== 'azure'
 const canUpgradeCluster = (selected) => false
-const canDeleteCluster = ([row]) => !(['creating', 'deleting'].includes(row.taskStatus))
+const canDeleteCluster = ([row]) => !['creating', 'deleting'].includes(row.taskStatus)
 
 const isAdmin = (selected, getContext) => {
   return isAdminRole(getContext)
@@ -141,7 +149,9 @@ const isAdmin = (selected, getContext) => {
 export const options = {
   addUrl: routes.cluster.add.path(),
   addButton: ({ onClick }) => {
-    const { userDetails: { role } } = useContext(AppContext)
+    const {
+      userDetails: { role },
+    } = useContext(AppContext)
     if (role !== 'admin') {
       return null
     }
@@ -149,25 +159,58 @@ export const options = {
   },
   columns: [
     { id: 'name', label: 'Cluster name', render: renderClusterDetailLink },
-    { id: 'connectionStatus', label: 'Connection status', render: renderConnectionStatus, tooltip: 'Whether the cluster is connected to the PMK management plane' },
-    { id: 'healthStatus', label: 'Health status', render: renderHealthStatus, tooltip: 'Cluster health' },
+    {
+      id: 'connectionStatus',
+      label: 'Connection status',
+      render: renderConnectionStatus,
+      tooltip: 'Whether the cluster is connected to the PMK management plane',
+    },
+    {
+      id: 'healthStatus',
+      label: 'Health status',
+      render: renderHealthStatus,
+      tooltip: 'Cluster health',
+    },
     { id: 'links', label: 'Links', render: renderLinks },
     { id: 'cloudProviderType', label: 'Deployment Type', render: renderCloudProviderType },
     { id: 'resource_utilization', label: 'Resource Utilization', render: renderStats },
     { id: 'version', label: 'Kubernetes Version' },
     { id: 'created_at', label: 'Created at' },
-    { id: 'nodes', label: 'Nodes', render: nodes => <NodesCell nodes={nodes} /> },
+    { id: 'nodes', label: 'Nodes', render: (nodes) => <NodesCell nodes={nodes} /> },
     { id: 'networkPlugin', label: 'Network Backend' },
     { id: 'containersCidr', label: 'Containers CIDR' },
     { id: 'servicesCidr', label: 'Services CIDR' },
     { id: 'endpoint', label: 'API endpoint' },
     { id: 'cloudProviderName', label: 'Cloud provider', render: renderCloudProvider },
-    { id: 'allowWorkloadsOnMaster', label: 'Master Workloads', render: renderBooleanField('allowWorkloadsOnMaster'), tooltip: 'Whether masters are enabled to run workloads' },
-    { id: 'privileged', label: 'Privileged', render: renderBooleanField('privileged'), tooltip: 'Whether any container on the cluster can enable privileged mode' },
+    {
+      id: 'allowWorkloadsOnMaster',
+      label: 'Master Workloads',
+      render: renderBooleanField('allowWorkloadsOnMaster'),
+      tooltip: 'Whether masters are enabled to run workloads',
+    },
+    {
+      id: 'privileged',
+      label: 'Privileged',
+      render: renderBooleanField('privileged'),
+      tooltip: 'Whether any container on the cluster can enable privileged mode',
+    },
     { id: 'hasVpn', label: 'VPN', render: renderBooleanField('hasVpn') },
-    { id: 'appCatalogEnabled', label: 'App Catalog', render: renderBooleanField('appCatalogEnabled'), tooltip: 'Whether helm application catalog is enabled for this cluster' },
-    { id: 'hasLoadBalancer', label: 'Load Balancer', render: renderBooleanField('hasLoadBalancer') },
-    { id: 'etcdBackupEnabled', label: 'etcd Backup', render: renderBooleanField('etcdBackupEnabled') },
+    {
+      id: 'appCatalogEnabled',
+      label: 'App Catalog',
+      render: renderBooleanField('appCatalogEnabled'),
+      tooltip: 'Whether helm application catalog is enabled for this cluster',
+    },
+    {
+      id: 'hasLoadBalancer',
+      label: 'Load Balancer',
+      render: renderBooleanField('hasLoadBalancer'),
+    },
+    {
+      id: 'etcdBackupEnabled',
+      label: 'etcd Backup',
+      render: renderBooleanField('etcdBackupEnabled'),
+    },
 
     // TODO: We probably want to write a metadata renderer for this kind of format
     //
@@ -186,19 +229,19 @@ export const options = {
     {
       icon: <SeeDetailsIcon />,
       label: 'See details',
-      routeTo: rows => `/ui/kubernetes/infrastructure/clusters/${rows[0].uuid}`,
+      routeTo: (rows) => `/ui/kubernetes/infrastructure/clusters/${rows[0].uuid}`,
     },
     {
       cond: both(isAdmin, canScaleMasters),
       icon: <ScaleIcon />,
       label: 'Scale masters',
-      routeTo: rows => `/ui/kubernetes/infrastructure/clusters/scaleMasters/${rows[0].uuid}`,
+      routeTo: (rows) => `/ui/kubernetes/infrastructure/clusters/scaleMasters/${rows[0].uuid}`,
     },
     {
       cond: both(isAdmin, canScaleWorkers),
       icon: <ScaleIcon />,
       label: 'Scale workers',
-      routeTo: rows => `/ui/kubernetes/infrastructure/clusters/scaleWorkers/${rows[0].uuid}`,
+      routeTo: (rows) => `/ui/kubernetes/infrastructure/clusters/scaleWorkers/${rows[0].uuid}`,
     },
     {
       cond: both(isAdmin, canUpgradeCluster),

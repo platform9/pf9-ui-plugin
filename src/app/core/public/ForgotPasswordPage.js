@@ -8,26 +8,26 @@ import Progress from 'core/components/progress/Progress'
 import Alert from 'core/components/Alert'
 import { loginUrl, forgotPasswordApiUrl } from 'app/constants.js'
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     padding: theme.spacing(8),
-    overflow: 'auto'
+    overflow: 'auto',
   },
   paper: {
-    padding: theme.spacing(4)
+    padding: theme.spacing(4),
   },
   img: {
     maxHeight: '70%',
     maxWidth: '70%',
     display: 'block',
-    margin: 'auto'
+    margin: 'auto',
   },
   form: {
-    paddingTop: theme.spacing(3)
+    paddingTop: theme.spacing(3),
   },
   textField: {
     minWidth: '100%',
-    marginTop: theme.spacing(1)
+    marginTop: theme.spacing(1),
   },
   resetPwdButton: {
     minWidth: '80%',
@@ -35,32 +35,32 @@ const useStyles = makeStyles(theme => ({
     display: 'block',
     marginLeft: 'auto',
     marginRight: 'auto',
-    textTransform: 'uppercase'
+    textTransform: 'uppercase',
   },
   paragraph: {
     marginTop: theme.spacing(1),
-    textAlign: 'justify'
+    textAlign: 'justify',
   },
 }))
 
-const ForgotPasswordPage = props => {
+const ForgotPasswordPage = (props) => {
   const { params, updateParams } = useParams({
     loading: false,
     isError: false,
     emailId: '',
     isResetSuccessful: false,
-    errorMessage: 'Reset password failed'
+    errorMessage: 'Reset password failed',
   })
   const { history } = useReactRouter()
   const classes = useStyles()
 
-  const handleEmailChange = () => event => {
+  const handleEmailChange = () => (event) => {
     updateParams({
-      emailId: event.target.value
+      emailId: event.target.value,
     })
   }
 
-  const handleFormSubmit = async event => {
+  const handleFormSubmit = async (event) => {
     event.preventDefault()
 
     if (params.isResetSuccessful) {
@@ -68,7 +68,7 @@ const ForgotPasswordPage = props => {
     }
 
     updateParams({
-      loading: true
+      loading: true,
     })
 
     const body = { username: params.emailId }
@@ -85,23 +85,13 @@ const ForgotPasswordPage = props => {
   }
 
   const SubmitButton = ({ label }) => (
-    <Button
-      type="submit"
-      className={classes.resetPwdButton}
-      variant="contained"
-      color="primary"
-    >
+    <Button type="submit" className={classes.resetPwdButton} variant="contained" color="primary">
       {label}
     </Button>
   )
 
   return (
-    <Progress
-      loading={params.loading}
-      overlay
-      renderContentOnMount
-      message="Processing..."
-    >
+    <Progress loading={params.loading} overlay renderContentOnMount message="Processing...">
       <div className="forgot-password-page">
         <Grid container justify="center" className={classes.root}>
           <Grid item md={4} lg={3}>
@@ -130,9 +120,8 @@ const ForgotPasswordPage = props => {
                 ) : (
                   <>
                     <Typography className={classes.paragraph} component="p">
-                      Your request was received successfully. You should receive
-                      an email shortly for <b>{params.emailId}</b> with
-                      instructions to reset your password.
+                      Your request was received successfully. You should receive an email shortly
+                      for <b>{params.emailId}</b> with instructions to reset your password.
                     </Typography>
                     <SubmitButton label="Return to login screen" />
                   </>

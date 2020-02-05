@@ -6,23 +6,19 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import Picklist from 'core/components/Picklist'
 import { loadCloudProviderRegionDetails } from 'k8s/components/infrastructure/cloudProviders/actions'
 
-const AwsClusterSshKeyPicklist = forwardRef(({
-  cloudProviderId, cloudProviderRegionId, ...rest
-}, ref) => {
-  const [details, loading] = useDataLoader(loadCloudProviderRegionDetails, { cloudProviderId, cloudProviderRegionId })
+const AwsClusterSshKeyPicklist = forwardRef(
+  ({ cloudProviderId, cloudProviderRegionId, ...rest }, ref) => {
+    const [details, loading] = useDataLoader(loadCloudProviderRegionDetails, {
+      cloudProviderId,
+      cloudProviderRegionId,
+    })
 
-  const keypairs = pathStrOr([], '0.keyPairs', details)
-  const options = keypairs.map(x => ({ label: x.KeyName, value: x.KeyName }))
+    const keypairs = pathStrOr([], '0.keyPairs', details)
+    const options = keypairs.map((x) => ({ label: x.KeyName, value: x.KeyName }))
 
-  return (
-    <Picklist
-      {...rest}
-      ref={ref}
-      loading={loading}
-      options={options}
-    />
-  )
-})
+    return <Picklist {...rest} ref={ref} loading={loading} options={options} />
+  },
+)
 
 AwsClusterSshKeyPicklist.propTypes = {
   id: PropTypes.string.isRequired,

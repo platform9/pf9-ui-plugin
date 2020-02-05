@@ -37,7 +37,7 @@ import Alert from 'core/components/Alert'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   formWidth: {
     width: 715,
   },
@@ -46,11 +46,11 @@ const useStyles = makeStyles(theme => ({
   },
   inputWidth: {
     maxWidth: 350,
-    marginBottom: theme.spacing(3)
+    marginBottom: theme.spacing(3),
   },
   inline: {
     display: 'grid',
-  }
+  },
 }))
 
 const initialContext = {
@@ -106,7 +106,7 @@ const runtimeConfigOptions = [
 // small (single dev) - 1 node master + worker - select instance type (default t2.small)
 // medium (internal team) - 1 master + 3 workers - select instance (default t2.medium)
 // large (production) - 3 master + 5 workers - no workload on masters (default t2.large)
-const handleTemplateChoice = ({ setWizardContext, setFieldValue, paramUpdater }) => option => {
+const handleTemplateChoice = ({ setWizardContext, setFieldValue, paramUpdater }) => (option) => {
   const options = {
     small: {
       numMasters: 1,
@@ -155,7 +155,7 @@ const networkPluginOptions = [
   { label: 'Canal (experimental)', value: 'canal' },
 ]
 
-const handleNetworkPluginChange = ({ setWizardContext, setFieldValue }) => option => {
+const handleNetworkPluginChange = ({ setWizardContext, setFieldValue }) => (option) => {
   if (['calico', 'canal', 'weave'].includes(option)) {
     setWizardContext({ privileged: true })
     setFieldValue('privileged')(true)
@@ -171,7 +171,14 @@ const networkOptions = [
 ]
 
 // These fields are only rendered when the user opts to not use a `platform9.net` domain.
-const renderCustomNetworkingFields = ({ params, getParamsUpdater, values, setFieldValue, setWizardContext, wizardContext }) => {
+const renderCustomNetworkingFields = ({
+  params,
+  getParamsUpdater,
+  values,
+  setFieldValue,
+  setWizardContext,
+  wizardContext,
+}) => {
   const updateFqdns = (value, label) => {
     const name = values.name || wizardContext.name
 
@@ -302,10 +309,13 @@ const renderCustomNetworkingFields = ({ params, getParamsUpdater, values, setFie
         label="Network"
         options={networkOptions}
         disabled={values.usePf9Domain}
-        info={<div>Select a network configuration.
-          Read <ExternalLink url={awsNetworkingConfigurationsLink}>this
-            article</ExternalLink> for detailed information about each network
-          configuration type.</div>}
+        info={
+          <div>
+            Select a network configuration. Read{' '}
+            <ExternalLink url={awsNetworkingConfigurationsLink}>this article</ExternalLink> for
+            detailed information about each network configuration type.
+          </div>
+        }
       />
       {renderNetworkFields(values)}
     </>
@@ -317,15 +327,29 @@ const AddAwsClusterPage = () => {
   const { params, getParamsUpdater } = useParams()
   const { history } = useReactRouter()
   const onComplete = () => history.push(routes.cluster.list.path())
-  const [createAwsClusterAction, creatingAwsCluster] = useDataUpdater(clusterActions.create, onComplete)
-  const handleSubmit = params => data => createAwsClusterAction({ ...data, ...params, clusterType: CloudProviders.Aws })
+  const [createAwsClusterAction, creatingAwsCluster] = useDataUpdater(
+    clusterActions.create,
+    onComplete,
+  )
+  const handleSubmit = (params) => (data) =>
+    createAwsClusterAction({ ...data, ...params, clusterType: CloudProviders.Aws })
 
   const [cloudProviders, loading] = useDataLoader(cloudProviderActions.list)
-  const hasAwsProvider = !!cloudProviders.some(provider => provider.type === CloudProviders.Aws)
+  const hasAwsProvider = !!cloudProviders.some((provider) => provider.type === CloudProviders.Aws)
 
   return (
-    <FormWrapper title="Add AWS Cluster" backUrl={listUrl} loading={creatingAwsCluster || loading} message={loading ? 'loading...' : 'Submitting form...'}>
-      <Wizard disableNext={!hasAwsProvider} onComplete={handleSubmit(params)} context={initialContext} originPath={routes.cluster.add.path()}>
+    <FormWrapper
+      title="Add AWS Cluster"
+      backUrl={listUrl}
+      loading={creatingAwsCluster || loading}
+      message={loading ? 'loading...' : 'Submitting form...'}
+    >
+      <Wizard
+        disableNext={!hasAwsProvider}
+        onComplete={handleSubmit(params)}
+        context={initialContext}
+        originPath={routes.cluster.add.path()}
+      >
         {({ wizardContext, setWizardContext, onNext }) => {
           return (
             <>
@@ -419,7 +443,9 @@ const AddAwsClusterPage = () => {
                                 {/* Master node instance type */}
                                 <PicklistField
                                   DropdownComponent={AwsRegionFlavorPicklist}
-                                  disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
+                                  disabled={
+                                    !(params.cloudProviderId && params.cloudProviderRegionId)
+                                  }
                                   id="masterFlavor"
                                   label="Master Node Instance Type"
                                   cloudProviderId={params.cloudProviderId}
@@ -440,7 +466,9 @@ const AddAwsClusterPage = () => {
                                 {/* Worker node instance type */}
                                 <PicklistField
                                   DropdownComponent={AwsRegionFlavorPicklist}
-                                  disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
+                                  disabled={
+                                    !(params.cloudProviderId && params.cloudProviderRegionId)
+                                  }
                                   id="workerFlavor"
                                   label="Worker Node Instance Type"
                                   cloudProviderId={params.cloudProviderId}
@@ -504,7 +532,11 @@ const AddAwsClusterPage = () => {
               </WizardStep>
 
               <WizardStep stepId="network" label="Network Info">
-                <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
+                <ValidatedForm
+                  initialValues={wizardContext}
+                  onSubmit={setWizardContext}
+                  triggerSubmit={onNext}
+                >
                   {({ setFieldValue, values }) => (
                     <div className={classes.formWidth}>
                       <FormFieldCard title="Networking Details">
@@ -561,7 +593,15 @@ const AddAwsClusterPage = () => {
                           <TextField
                             id="httpProxy"
                             label="HTTP Proxy"
-                            info={<div className={classes.inline}>(Optional) Specify the HTTP proxy for this cluster. Uses format of <Code><span>{'<scheme>://<username>:<password>@<host>:<port>'}</span></Code> where username and password are optional.</div>}
+                            info={
+                              <div className={classes.inline}>
+                                (Optional) Specify the HTTP proxy for this cluster. Uses format of{' '}
+                                <Code>
+                                  <span>{'<scheme>://<username>:<password>@<host>:<port>'}</span>
+                                </Code>{' '}
+                                where username and password are optional.
+                              </div>
+                            }
                           />
 
                           {/* Network plugin */}
@@ -570,19 +610,22 @@ const AddAwsClusterPage = () => {
                             label="Network backend"
                             options={networkPluginOptions}
                             info=""
-                            onChange={handleNetworkPluginChange({ setWizardContext, setFieldValue })}
+                            onChange={handleNetworkPluginChange({
+                              setWizardContext,
+                              setFieldValue,
+                            })}
                             required
                           />
 
                           {/* HTTP proxy */}
-                          {values.networkPlugin === 'calico' &&
+                          {values.networkPlugin === 'calico' && (
                             <TextField
                               id="mtuSize"
                               label="MTU Size"
                               info="Maximum Transmission Unit (MTU) for the interface (in bytes)"
                               required
                             />
-                          }
+                          )}
                         </div>
                       </FormFieldCard>
                     </div>
@@ -591,7 +634,11 @@ const AddAwsClusterPage = () => {
               </WizardStep>
 
               <WizardStep stepId="advanced" label="Advanced Configuration">
-                <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
+                <ValidatedForm
+                  initialValues={wizardContext}
+                  onSubmit={setWizardContext}
+                  triggerSubmit={onNext}
+                >
                   {({ setFieldValue, values }) => (
                     <div className={classes.formWidth}>
                       <FormFieldCard title="Final Tweaks">
@@ -601,11 +648,15 @@ const AddAwsClusterPage = () => {
                             id="privileged"
                             label="Privileged"
                             disabled={['calico', 'canal', 'weave'].includes(values.networkPlugin)}
-                            info={<div>Allows this cluster to run privileged
-                              containers.
-                              Read <ExternalLink url={runtimePrivilegedLink}>this
-                                article</ExternalLink> for more information.
-                            </div>}
+                            info={
+                              <div>
+                                Allows this cluster to run privileged containers. Read{' '}
+                                <ExternalLink url={runtimePrivilegedLink}>
+                                  this article
+                                </ExternalLink>{' '}
+                                for more information.
+                              </div>
+                            }
                           />
 
                           {/* Etcd Backup */}
@@ -624,7 +675,13 @@ const AddAwsClusterPage = () => {
                             info="This deploys an instance of prometheus on the cluster."
                           />
 
-                          { !values.prometheusMonitoringEnabled && <Alert small variant="error" message="The PMK management plane is not able to monitor the cluster health." /> }
+                          {!values.prometheusMonitoringEnabled && (
+                            <Alert
+                              small
+                              variant="error"
+                              message="The PMK management plane is not able to monitor the cluster health."
+                            />
+                          )}
 
                           {/* Advanced API Configuration */}
                           <PicklistField
@@ -635,13 +692,13 @@ const AddAwsClusterPage = () => {
                             required
                           />
 
-                          {values.runtimeConfigOption === 'custom' &&
-                          <TextField
-                            id="customRuntimeConfig"
-                            label="Custom API Configuration"
-                            info=""
-                          />
-                          }
+                          {values.runtimeConfigOption === 'custom' && (
+                            <TextField
+                              id="customRuntimeConfig"
+                              label="Custom API Configuration"
+                              info=""
+                            />
+                          )}
 
                           {/* Enable Application Catalog */}
                           <CheckboxField
@@ -671,7 +728,11 @@ const AddAwsClusterPage = () => {
               </WizardStep>
 
               <WizardStep stepId="review" label="Review">
-                <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
+                <ValidatedForm
+                  initialValues={wizardContext}
+                  onSubmit={setWizardContext}
+                  triggerSubmit={onNext}
+                >
                   <div className={classes.formWidth}>
                     <FormFieldCard title="Finish and Review">
                       <div className={classes.tableWidth}>

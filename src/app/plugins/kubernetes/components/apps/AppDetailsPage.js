@@ -14,7 +14,7 @@ import AppDeployDialog from 'k8s/components/apps/AppDeployDialog'
 import PageContainer from 'core/components/pageContainer/PageContainer'
 import ExternalLink from 'core/components/ExternalLink'
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   backLink: {
     marginBottom: theme.spacing(2),
     marginLeft: 'auto',
@@ -32,7 +32,7 @@ const useStyles = makeStyles(theme => ({
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     overflowWrap: 'break-word',
-    backgroundColor: '#e2f4ff'
+    backgroundColor: '#e2f4ff',
   },
   icon: {
     width: '100%',
@@ -45,7 +45,9 @@ const useStyles = makeStyles(theme => ({
 
 const AppDetailsPage = () => {
   const classes = useStyles()
-  const { match: { params: routeParams } } = useReactRouter()
+  const {
+    match: { params: routeParams },
+  } = useReactRouter()
   const { params, getParamsUpdater } = useParams({
     clusterId: routeParams.clusterId,
     id: routeParams.id,
@@ -56,81 +58,80 @@ const AppDetailsPage = () => {
   // We are just interested in the first (and only) item
   const [[app = emptyObj], loadingApp] = useDataLoader(appDetailLoader, params)
 
-  return <PageContainer header={
-    <SimpleLink src={'/ui/kubernetes/apps'} className={classes.backLink}>
-      « Back to Application Catalog
-    </SimpleLink>}>
-    {showingDeployDialog &&
-    <AppDeployDialog
-      app={app}
-      onClose={() => setShowingDeployDialog(false)} />}
-    <Progress loading={loadingApp} overlay renderContentOnMount>
-      <Grid container justify="center" spacing={3}>
-        <Grid item xs={3} lg={2}>
-          {app.logoUrl && <Card className={classes.card}>
-            <CardMedia className={classes.icon} image={app.logoUrl} title={app.name} />
-            <Button
-              variant="outlined"
-              color="primary"
-              onClick={() => setShowingDeployDialog(true)}
-            >
-              Deploy
-            </Button>
-          </Card>}
-          <Paper className={classes.paper}>
-            <Typography
-              variant="subtitle2">
-              Application Version
-            </Typography>
-            <Typography variant="body2" component="div">
-              {params.version}
-            </Typography>
+  return (
+    <PageContainer
+      header={
+        <SimpleLink src={'/ui/kubernetes/apps'} className={classes.backLink}>
+          « Back to Application Catalog
+        </SimpleLink>
+      }
+    >
+      {showingDeployDialog && (
+        <AppDeployDialog app={app} onClose={() => setShowingDeployDialog(false)} />
+      )}
+      <Progress loading={loadingApp} overlay renderContentOnMount>
+        <Grid container justify="center" spacing={3}>
+          <Grid item xs={3} lg={2}>
+            {app.logoUrl && (
+              <Card className={classes.card}>
+                <CardMedia className={classes.icon} image={app.logoUrl} title={app.name} />
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  onClick={() => setShowingDeployDialog(true)}
+                >
+                  Deploy
+                </Button>
+              </Card>
+            )}
+            <Paper className={classes.paper}>
+              <Typography variant="subtitle2">Application Version</Typography>
+              <Typography variant="body2" component="div">
+                {params.version}
+              </Typography>
+              <br />
+              <Typography variant="subtitle2">Home</Typography>
+              <Typography variant="body2" component="div">
+                {app.home && <ExternalLink url={app.home} />}
+              </Typography>
+              <br />
+              <Typography variant="subtitle2">Source Repository</Typography>
+              <Typography variant="body2" component="div">
+                {(app.sources || emptyArr).map((source) => (
+                  <div key={source}>
+                    <ExternalLink url={source} />
+                  </div>
+                ))}
+              </Typography>
+              <br />
+              <Typography variant="subtitle2">Maintainers</Typography>
+              <Typography variant="body2" component="div">
+                {(app.maintainers || emptyArr).map((maintainer) => (
+                  <div key={maintainer.email}>
+                    <ExternalLink url={`mailto: ${maintainer.email}`}>
+                      {maintainer.name}
+                    </ExternalLink>
+                  </div>
+                ))}
+              </Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={9} lg={10} zeroMinWidth>
+            <AppVersionPicklist
+              label="Application Version"
+              appId={params.id}
+              clusterId={params.clusterId}
+              release={params.release}
+              value={params.version}
+              onChange={getParamsUpdater('version')}
+            />
             <br />
-            <Typography
-              variant="subtitle2">
-              Home
-            </Typography>
-            <Typography variant="body2" component="div">
-              {app.home && <ExternalLink url={app.home} />}
-            </Typography>
-            <br />
-            <Typography
-              variant="subtitle2">
-              Source Repository
-            </Typography>
-            <Typography variant="body2" component="div">
-              {(app.sources || emptyArr).map(source =>
-                <div key={source}>
-                  <ExternalLink url={source} />
-                </div>)}
-            </Typography>
-            <br />
-            <Typography
-              variant="subtitle2">
-              Maintainers
-            </Typography>
-            <Typography variant="body2" component="div">
-              {(app.maintainers || emptyArr).map(maintainer =>
-                <div key={maintainer.email}>
-                  <ExternalLink url={`mailto: ${maintainer.email}`}>{maintainer.name}</ExternalLink>
-                </div>)}
-            </Typography>
-          </Paper>
+            <Markdown>{app.readmeMarkdown || ''}</Markdown>
+          </Grid>
         </Grid>
-        <Grid item xs={9} lg={10} zeroMinWidth>
-          <AppVersionPicklist
-            label="Application Version"
-            appId={params.id}
-            clusterId={params.clusterId}
-            release={params.release}
-            value={params.version}
-            onChange={getParamsUpdater('version')} />
-          <br />
-          <Markdown>{app.readmeMarkdown || ''}</Markdown>
-        </Grid>
-      </Grid>
-    </Progress>
-  </PageContainer>
+      </Progress>
+    </PageContainer>
+  )
 }
 
 export default AppDetailsPage

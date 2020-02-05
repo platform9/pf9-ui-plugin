@@ -2,7 +2,7 @@ import axios from 'axios'
 import ApiService from 'api-client/ApiService'
 
 class Murano extends ApiService {
-  endpoint () {
+  endpoint() {
     return this.client.keystone.getServiceEndpoint('murano', 'internal')
   }
 
@@ -12,13 +12,13 @@ class Murano extends ApiService {
 
   uploadUrl = async () => `${await this.v1()}/catalog/packagesHot`
 
-  async getApplications () {
+  async getApplications() {
     const url = await this.applicationUrl()
     const response = await axios.get(url, this.client.getAuthHeaders())
     return response.data.packages
   }
 
-  async getApplication (id) {
+  async getApplication(id) {
     const url = `${await this.applicationUrl()}/${id}`
     try {
       const response = await axios.get(url, this.client.getAuthHeaders())
@@ -28,7 +28,7 @@ class Murano extends ApiService {
     }
   }
 
-  async uploadApplications (params) {
+  async uploadApplications(params) {
     const url = await this.uploadUrl()
     try {
       const response = await axios.post(url, params, this.client.getAuthHeaders())
@@ -38,7 +38,7 @@ class Murano extends ApiService {
     }
   }
 
-  async deleteApplication (id) {
+  async deleteApplication(id) {
     const url = `${await this.applicationUrl()}/${id}`
     try {
       await axios.delete(url, this.client.getAuthHeaders())
@@ -47,7 +47,7 @@ class Murano extends ApiService {
     }
   }
 
-  async updateApplication (id, params) {
+  async updateApplication(id, params) {
     const url = `${await this.applicationUrl()}/${id}`
     try {
       const response = await axios.put(url, { package: params }, this.client.getAuthHeaders())

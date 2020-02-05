@@ -4,10 +4,10 @@ export const getInstance = () => {
   if (global.localStorage === undefined) {
     return {}
   }
-  return JSON.parse(localStorage.getItem(LOCAL_STORAGE_NAMESPACE) ||'{}')
+  return JSON.parse(localStorage.getItem(LOCAL_STORAGE_NAMESPACE) || '{}')
 }
 
-export const getStorage = key => getInstance()[key]
+export const getStorage = (key) => getInstance()[key]
 
 export const setStorage = (key, value) => {
   const current = getInstance()
@@ -15,7 +15,7 @@ export const setStorage = (key, value) => {
   localStorage.setItem(LOCAL_STORAGE_NAMESPACE, JSON.stringify(current))
 }
 
-export const clear = key => {
+export const clear = (key) => {
   const current = getInstance()
   delete current[key]
   localStorage.setItem(LOCAL_STORAGE_NAMESPACE, JSON.stringify(current))

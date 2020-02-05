@@ -2,10 +2,10 @@ import React from 'react'
 import { FormControl, MenuItem, Select, TableCell, TableRow } from '@material-ui/core'
 
 class TenantRoleSelector extends React.PureComponent {
-  render () {
+  render() {
     const { tenant, roles, status, handleChange } = this.props
     return (
-      <TableRow key={tenant.id} >
+      <TableRow key={tenant.id}>
         <TableCell>{tenant.name}</TableCell>
         <TableCell>
           <FormControl>
@@ -13,16 +13,14 @@ class TenantRoleSelector extends React.PureComponent {
               value={status[tenant.name] || 'None'}
               onChange={handleChange(tenant)}
               inputProps={{
-                id: tenant.id
+                id: tenant.id,
               }}
             >
-              {roles.map(role =>
-                <MenuItem
-                  value={role}
-                  key={role}
-                >
+              {roles.map((role) => (
+                <MenuItem value={role} key={role}>
                   {role}
-                </MenuItem>)}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
         </TableCell>

@@ -14,7 +14,9 @@ import { Grid, Card, Typography } from '@material-ui/core'
 import useDataLoader from 'core/hooks/useDataLoader'
 import useReactRouter from 'use-react-router'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
-import { ClusterConnectionStatus, ClusterHealthStatus } from 'k8s/components/infrastructure/clusters/ClusterStatus'
+import {
+  ClusterConnectionStatus, ClusterHealthStatus,
+} from 'k8s/components/infrastructure/clusters/ClusterStatus'
 import { ConvergingNodesWithTasksToggler } from '../nodes/ConvergingNodeBreakdown'
 import { routes } from 'core/utils/routes'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
@@ -61,7 +63,7 @@ const useStyles = makeStyles((theme) => ({
     minWidth: 320,
     minHeight: 175,
     display: 'grid',
-    gridTemplateRows: ({ hasLinks }) => (`58px 1fr 2px ${hasLinks ? 46 : 12}px`),
+    gridTemplateRows: ({ hasLinks }) => `58px 1fr 2px ${hasLinks ? 46 : 12}px`,
     paddingTop: theme.spacing(),
   },
   harderCardFooter: {
@@ -123,19 +125,13 @@ const ClusterDetailsPage = () => {
   return (
     <PageContainer
       header={
-        <SimpleLink
-          src={routes.cluster.list.path()}
-          className={classes.backLink}>
+        <SimpleLink src={routes.cluster.list.path()} className={classes.backLink}>
           « Back to Cluster List
         </SimpleLink>
       }
     >
       <>
-        <PollingData
-          hidden
-          loading={loading}
-          onReload={reload}
-          refreshDuration={oneSecond * 10} />
+        <PollingData hidden loading={loading} onReload={reload} refreshDuration={oneSecond * 10} />
         <ClusterStatusAndUsage cluster={cluster} loading={loading} />
         <Tabs>
           <Tab value="nodes" label="Nodes">
@@ -165,19 +161,17 @@ const ClusterStatusAndUsage = ({ cluster, loading }) => {
   return (
     <Grid container className={classes.statsContainer}>
       <Grid item lg={4} className={classes.statusItems}>
-        <HeaderCard
-          title="Cluster"
-          subtitle={name}
-          icon="project-diagram"
-          links={clusterLinks}>
+        <HeaderCard title="Cluster" subtitle={name} icon="project-diagram" links={clusterLinks}>
           <ClusterConnectionStatus
             cluster={cluster}
             variant="header"
-            message={loading ? 'loading' : undefined} />
+            message={loading ? 'loading' : undefined}
+          />
           <ClusterHealthStatus
             cluster={cluster}
             variant="header"
-            message={loading ? 'loading' : undefined} />
+            message={loading ? 'loading' : undefined}
+          />
         </HeaderCard>
       </Grid>
       <Grid item lg={8} className={classes.row}>
@@ -196,31 +190,33 @@ const HeaderCard = ({ title, subtitle, icon, loading = false, links, children })
     <Card className={classes.headerCardContainer}>
       <header className={classes.headerCardHeader}>
         <Typography variant="h6">{title}</Typography>
-        <Typography variant="subtitle1" component="p">{subtitle}</Typography>
+        <Typography variant="subtitle1" component="p">
+          {subtitle}
+        </Typography>
         <FontAwesomeIcon className={clsx({ 'fa-spin': loading }, classes.headerIcon)}>
           {loading ? 'sync' : icon}
         </FontAwesomeIcon>
       </header>
-      <div className={classes.headerCardBody}>
-        {children}
-      </div>
+      <div className={classes.headerCardBody}>{children}</div>
       <hr className={classes.cardBoarder} />
       <footer className={classes.harderCardFooter}>
-        {!!links.grafana &&
-        <ExternalLink
-          icon="chart-line"
-          className={classes.verticalLink}
-          url={links.grafana}>Grafana</ExternalLink>}
-        {!!links.dashboard &&
-        <ExternalLink
-          icon="tachometer"
-          className={classes.verticalLink}
-          url={links.dashboard}>Dashboard</ExternalLink>}
-        {!!links.kubeconfig &&
-        <DownloadKubeConfigLink
-          icon="cogs"
-          className={classes.verticalLink}
-          cluster={links.kubeconfig.cluster} />}
+        {!!links.grafana && (
+          <ExternalLink icon="chart-line" className={classes.verticalLink} url={links.grafana}>
+            Grafana
+          </ExternalLink>
+        )}
+        {!!links.dashboard && (
+          <ExternalLink icon="tachometer" className={classes.verticalLink} url={links.dashboard}>
+            Dashboard
+          </ExternalLink>
+        )}
+        {!!links.kubeconfig && (
+          <DownloadKubeConfigLink
+            icon="cogs"
+            className={classes.verticalLink}
+            cluster={links.kubeconfig.cluster}
+          />
+        )}
       </footer>
     </Card>
   )

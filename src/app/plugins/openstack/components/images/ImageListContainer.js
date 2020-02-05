@@ -17,7 +17,7 @@ const columns = [
   { id: 'disk_format', label: 'Disk Format' },
   { id: 'virtual_size', label: 'Virtual Disk Size' },
   { id: 'size', label: 'File Size' },
-  { id: 'created_at', label: 'Created' }
+  { id: 'created_at', label: 'Created' },
 ]
 
 export const ImageList = createListTableComponent({
@@ -28,15 +28,15 @@ export const ImageList = createListTableComponent({
 })
 
 class ImageListContainer extends React.PureComponent {
-  handleRemove = async id => {
+  handleRemove = async (id) => {
     const { images, setContext } = this.props
     const { glance } = ApiClient.getInstance()
     await glance.deleteImage(id)
-    const newImages = images.filter(x => x.id !== id)
+    const newImages = images.filter((x) => x.id !== id)
     setContext({ images: newImages })
   }
 
-  render () {
+  render() {
     return (
       <CRUDListContainer
         items={this.props.images}
@@ -44,16 +44,14 @@ class ImageListContainer extends React.PureComponent {
         editUrl="/ui/openstack/images/edit"
         onRemove={this.handleRemove}
       >
-        {handlers => <ImageList data={this.props.images} {...handlers} />}
+        {(handlers) => <ImageList data={this.props.images} {...handlers} />}
       </CRUDListContainer>
     )
   }
 }
 
 ImageListContainer.propTypes = {
-  images: PropTypes.arrayOf(PropTypes.object)
+  images: PropTypes.arrayOf(PropTypes.object),
 }
 
-export default compose(
-  withAppContext,
-)(ImageListContainer)
+export default compose(withAppContext)(ImageListContainer)

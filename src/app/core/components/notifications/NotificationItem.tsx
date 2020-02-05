@@ -6,7 +6,7 @@ import { Typography } from '@material-ui/core'
 import { secondsToString } from 'utils/misc'
 import moment from 'moment'
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
     flexFlow: 'row nowrap',
@@ -28,14 +28,18 @@ const useStyles = makeStyles(theme => ({
 const NotificationItem: FC<{ notification: Notification }> = ({ notification }) => {
   const classes = useStyles({})
   const timePassed = secondsToString(moment().diff(notification.date, 's'))
-  return <div className={classes.root}>
-    <FontAwesomeIcon className={classes.icon}>times-circle</FontAwesomeIcon>
-    <div className={classes.content}>
-      <Typography variant="subtitle2">{notification.title}</Typography>
-      <Typography variant="body1">{notification.message}</Typography>
-      <Typography variant="body2" color="textSecondary">{timePassed ? `${timePassed} ago` : 'Just now'}</Typography>
+  return (
+    <div className={classes.root}>
+      <FontAwesomeIcon className={classes.icon}>times-circle</FontAwesomeIcon>
+      <div className={classes.content}>
+        <Typography variant="subtitle2">{notification.title}</Typography>
+        <Typography variant="body1">{notification.message}</Typography>
+        <Typography variant="body2" color="textSecondary">
+          {timePassed ? `${timePassed} ago` : 'Just now'}
+        </Typography>
+      </div>
     </div>
-  </div>
+  )
 }
 
 export default NotificationItem

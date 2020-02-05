@@ -3,9 +3,10 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { prometheusInstancesCacheKey } from './actions'
 
-const renderKeyValues = obj => Object.entries(obj)
-  .map(([key, value]) => `${key}: ${value}`)
-  .join(', ')
+const renderKeyValues = (obj) =>
+  Object.entries(obj)
+    .map(([key, value]) => `${key}: ${value}`)
+    .join(', ')
 
 // Disabling for now until the backend has the links for this working
 /*

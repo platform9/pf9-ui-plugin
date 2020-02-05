@@ -12,10 +12,18 @@ import PageContainer from 'core/components/pageContainer/PageContainer'
 const PrometheusMonitoringPage = () => (
   <PageContainer>
     <Tabs>
-      <Tab value="instances" label="Instances"><PrometheusInstances /></Tab>
-      <Tab value="rules" label="Rules"><PrometheusRules /></Tab>
-      <Tab value="serviceMonitors" label="Service Monitors"><PrometheusServiceMonitors /></Tab>
-      <Tab value="alerts" label="Alert Managers"><PrometheusAlertManagers /></Tab>
+      <Tab value="instances" label="Instances">
+        <PrometheusInstances />
+      </Tab>
+      <Tab value="rules" label="Rules">
+        <PrometheusRules />
+      </Tab>
+      <Tab value="serviceMonitors" label="Service Monitors">
+        <PrometheusServiceMonitors />
+      </Tab>
+      <Tab value="alerts" label="Alert Managers">
+        <PrometheusAlertManagers />
+      </Tab>
     </Tabs>
   </PageContainer>
 )

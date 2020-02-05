@@ -16,20 +16,17 @@ import FormWrapper from 'core/components/FormWrapper'
 
 const defaultParams = {
   users: [],
-  groups: []
+  groups: [],
 }
 export const AddRoleBindingForm = () => {
   const { params, getParamsUpdater } = useParams(defaultParams)
   const { history } = useReactRouter()
-  const onComplete = success => success && history.push('/ui/kubernetes/rbac#roleBindings')
+  const onComplete = (success) => success && history.push('/ui/kubernetes/rbac#roleBindings')
   const [createRoleBindingAction] = useDataUpdater(roleBindingActions.create, onComplete)
-  const handleSubmit = params => data => createRoleBindingAction({ ...data, ...params })
+  const handleSubmit = (params) => (data) => createRoleBindingAction({ ...data, ...params })
 
   return (
-    <FormWrapper
-      title="Add Role Binding"
-      backUrl='/ui/kubernetes/rbac#roleBindings'
-    >
+    <FormWrapper title="Add Role Binding" backUrl="/ui/kubernetes/rbac#roleBindings">
       <ValidatedForm onSubmit={handleSubmit(params)}>
         <TextField id="name" label="Name" required />
         <PicklistField

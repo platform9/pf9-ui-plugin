@@ -27,7 +27,7 @@ import { listTablePrefs } from 'app/constants'
  * some of the `options` are.
  */
 
-const createCRUDComponents = options => {
+const createCRUDComponents = (options) => {
   const {
     // We can either provide the cacheKey to autoresolve the loader, or the loaderFn/deleteFn functions directly
     cacheKey,
@@ -65,9 +65,22 @@ const createCRUDComponents = options => {
 
   // List
   const List = ({
-    onDelete, onEdit, batchActions, rowActions, data, onRefresh, onReload, loading,
-    visibleColumns, columnsOrder, rowsPerPage, orderBy, orderDirection,
-    getParamsUpdater, filters, ...rest
+    onDelete,
+    onEdit,
+    batchActions,
+    rowActions,
+    data,
+    onRefresh,
+    onReload,
+    loading,
+    visibleColumns,
+    columnsOrder,
+    rowsPerPage,
+    orderBy,
+    orderDirection,
+    getParamsUpdater,
+    filters,
+    ...rest
   }) => {
     return (
       <ListTable
@@ -128,16 +141,18 @@ const createCRUDComponents = options => {
         EditDialog={EditDialog}
         DeleteDialog={DeleteDialog}
       >
-        {({ deleting, ...handlers }) => <List
-          loading={loading || deleting}
-          data={data}
-          batchActions={batchActions}
-          rowActions={rowActions}
-          onRefresh={reload}
-          onReload={refetch}
-          {...handlers}
-          {...restProps}
-        />}
+        {({ deleting, ...handlers }) => (
+          <List
+            loading={loading || deleting}
+            data={data}
+            batchActions={batchActions}
+            rowActions={rowActions}
+            onRefresh={reload}
+            onReload={refetch}
+            {...handlers}
+            {...restProps}
+          />
+        )}
       </CRUDListContainer>
     )
   }
@@ -150,22 +165,22 @@ const createCRUDComponents = options => {
     return () => {
       const { params, getParamsUpdater } = usePrefParams(defaultParams)
       const [data, loading, reload] = useDataLoader(loaderFn, params)
-      return <>
-        <ListContainer
-          getParamsUpdater={getParamsUpdater}
-          data={data}
-          loading={loading}
-          reload={reload}
-          {...pick(listTablePrefs, params)}
-        />
-        {debug && <pre>{JSON.stringify(data, null, 4)}</pre>}
-      </>
+      return (
+        <>
+          <ListContainer
+            getParamsUpdater={getParamsUpdater}
+            data={data}
+            loading={loading}
+            reload={reload}
+            {...pick(listTablePrefs, params)}
+          />
+          {debug && <pre>{JSON.stringify(data, null, 4)}</pre>}
+        </>
+      )
     }
   }
 
-  const ListPage = options.ListPage
-    ? options.ListPage({ ListContainer })
-    : createStandardListPage()
+  const ListPage = options.ListPage ? options.ListPage({ ListContainer }) : createStandardListPage()
 
   ListPage.displayName = `${name}ListPage`
 

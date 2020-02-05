@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { makeStyles } from '@material-ui/styles'
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
     marginBottom: '10px',
@@ -27,10 +27,7 @@ const PresetField = ({ label, value }) => {
 
 PresetField.propTypes = {
   label: PropTypes.string,
-  value: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.number,
-  ]),
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 }
 
 export default PresetField

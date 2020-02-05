@@ -11,14 +11,14 @@ export const loggingsCacheKey = 'loggings'
 const mapLoggings = (cluster, loggings) => {
   const logStorage = []
   const logDestination = []
-  propOr([], 'items', loggings).forEach(item => {
+  propOr([], 'items', loggings).forEach((item) => {
     if (item.spec.type === 'elasticsearch') {
       logStorage.push('ElasticSearch')
-      const urlParam = item.spec.params.find(param => param.name === 'url')
+      const urlParam = item.spec.params.find((param) => param.name === 'url')
       logDestination.push(urlParam.value)
     } else if (item.spec.type === 's3') {
       logStorage.push('AWS-S3')
-      const bucketParam = item.spec.params.find(param => param.name === 's3_bucket')
+      const bucketParam = item.spec.params.find((param) => param.name === 's3_bucket')
       logDestination.push(bucketParam.value)
     }
   })
@@ -37,20 +37,20 @@ const loggingActions = createCRUDActions(loggingsCacheKey, {
   listFn: async (params, loadFromContext) => {
     const clusters = await loadFromContext(clustersCacheKey)
 
-    const loggings = await mapAsync(async cluster => {
+    const loggings = await mapAsync(async (cluster) => {
       const response = await qbert.getLoggings(cluster.uuid)
       return response ? mapLoggings(cluster, response) : null
     }, clusters)
 
-    return loggings.filter(logStorage => logStorage != null)
+    return loggings.filter((logStorage) => logStorage != null)
   },
-  createFn: async data => {
+  createFn: async (data) => {
     return qbert.createLogging(data)
   },
   deleteFn: async ({ cluster }) => {
     await qbert.deleteLogging(cluster)
   },
-  updateFn: async data => {
+  updateFn: async (data) => {
     return qbert.updateLogging(data)
   },
 })

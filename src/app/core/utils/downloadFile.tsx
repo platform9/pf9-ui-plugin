@@ -7,7 +7,7 @@ interface DownloadParams {
 const downloadFile = ({
   filename,
   contents,
-  contentType = 'application/octet-stream'
+  contentType = 'application/octet-stream',
 }: DownloadParams): void => {
   const blob = new Blob([contents], { type: contentType })
   const elem = window.document.createElement('a')

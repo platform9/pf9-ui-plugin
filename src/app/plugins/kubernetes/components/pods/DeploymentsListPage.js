@@ -22,45 +22,54 @@ const ListPage = ({ ListContainer }) => {
   return () => {
     const { params, updateParams, getParamsUpdater } = usePrefParams(defaultParams)
     const [data, loading, reload] = useDataLoader(deploymentActions.list, params)
-    const updateClusterId = useCallback(clusterId => {
+    const updateClusterId = useCallback((clusterId) => {
       updateParams({
         clusterId,
-        namespace: allKey
+        namespace: allKey,
       })
     }, [])
-    return <ListContainer
-      loading={loading}
-      reload={reload}
-      data={data}
-      getParamsUpdater={getParamsUpdater}
-      filters={<>
-        <ClusterPicklist
-          onChange={updateClusterId}
-          value={params.clusterId}
-          onlyMasterNodeClusters
-        />
-        <NamespacePicklist
-          selectFirst={false}
-          onChange={getParamsUpdater('namespace')}
-          value={params.namespace}
-          clusterId={params.clusterId}
-          disabled={!params.clusterId}
-        />
-      </>}
-      {...pick(listTablePrefs, params)}
-    />
+    return (
+      <ListContainer
+        loading={loading}
+        reload={reload}
+        data={data}
+        getParamsUpdater={getParamsUpdater}
+        filters={
+          <>
+            <ClusterPicklist
+              onChange={updateClusterId}
+              value={params.clusterId}
+              onlyMasterNodeClusters
+            />
+            <NamespacePicklist
+              selectFirst={false}
+              onChange={getParamsUpdater('namespace')}
+              value={params.namespace}
+              clusterId={params.clusterId}
+              disabled={!params.clusterId}
+            />
+          </>
+        }
+        {...pick(listTablePrefs, params)}
+      />
+    )
   }
 }
 
 const renderName = (name, { dashboardUrl }) => {
-  return <span>
-    {name}<br />
-    <ExternalLink url={dashboardUrl}>dashboard
-      <FontAwesomeIcon size="sm">file-alt</FontAwesomeIcon></ExternalLink>
-  </span>
+  return (
+    <span>
+      {name}
+      <br />
+      <ExternalLink url={dashboardUrl}>
+        dashboard
+        <FontAwesomeIcon size="sm">file-alt</FontAwesomeIcon>
+      </ExternalLink>
+    </span>
+  )
 }
 
-const renderAge = created => {
+const renderAge = (created) => {
   return secondsToString(moment().diff(created, 's'))
 }
 

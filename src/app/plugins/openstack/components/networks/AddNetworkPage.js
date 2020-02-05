@@ -14,7 +14,7 @@ const initialValue = {
   port_security_enabled: false,
   external: false,
   admin_state_up: false,
-  status: ''
+  status: '',
 }
 
 export const AddNetworkForm = ({ onComplete }) => (

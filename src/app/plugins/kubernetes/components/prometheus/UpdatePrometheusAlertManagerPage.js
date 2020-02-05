@@ -6,14 +6,19 @@ import createUpdateComponents from 'core/helpers/createUpdateComponents'
 import { prometheusAlertManagersCacheKey } from './actions'
 
 class UpdatePrometheusAlertManagerForm extends React.PureComponent {
-  handleUpdate = data => {
+  handleUpdate = (data) => {
     this.props.onComplete(data)
   }
 
-  render () {
+  render() {
     return (
       <ValidatedForm initialValues={this.props.initialValues} onSubmit={this.handleUpdate}>
-        <TextField id="replicas" label="# of instances" info="Number of Alert Manager instances" type="number" />
+        <TextField
+          id="replicas"
+          label="# of instances"
+          info="Number of Alert Manager instances"
+          type="number"
+        />
         <SubmitButton>Update Alert Manager</SubmitButton>
       </ValidatedForm>
     )

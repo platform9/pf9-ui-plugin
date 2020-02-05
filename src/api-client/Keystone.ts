@@ -10,7 +10,7 @@ const constructAuthFromToken = (token: string, projectId?: string) => {
       ...(projectId ? { scope: { project: { id: projectId } } } : {}),
       identity: {
         methods: ['token'],
-        token: { id: token }
+        token: { id: token },
       },
     },
   }
@@ -27,17 +27,17 @@ const constructAuthFromCredentials = (username, password) => {
             domain: { id: 'default' },
             password,
           },
-        }
+        },
       },
     },
   }
 }
 
-const groupByRegion = catalog => {
+const groupByRegion = (catalog) => {
   const regions = {}
-  catalog.forEach(service => {
+  catalog.forEach((service) => {
     const { name } = service
-    service.endpoints.forEach(endpoint => {
+    service.endpoints.forEach((endpoint) => {
       const { region } = endpoint
       regions[region] = regions[region] || {}
       regions[region][name] = regions[region][name] || {}
@@ -57,35 +57,65 @@ class Keystone extends ApiService {
     return this.client.options.keystoneEndpoint
   }
 
-  get v3 () { return `${this.endpoint()}/v3` }
+  get v3() {
+    return `${this.endpoint()}/v3`
+  }
 
-  get adminV3 () { return `${this.endpoint()}/v3` }
+  get adminV3() {
+    return `${this.endpoint()}/v3`
+  }
 
-  get catalogUrl () { return `${this.v3}/auth/catalog` }
+  get catalogUrl() {
+    return `${this.v3}/auth/catalog`
+  }
 
-  get projectsAuthUrl () { return `${this.v3}/auth/projects` }
+  get projectsAuthUrl() {
+    return `${this.v3}/auth/projects`
+  }
 
-  get endpointsUrl () { return `${this.v3}/endpoints` }
+  get endpointsUrl() {
+    return `${this.v3}/endpoints`
+  }
 
-  get regionsUrl () { return `${this.v3}/regions` }
+  get regionsUrl() {
+    return `${this.v3}/regions`
+  }
 
-  get projectsUrl () { return `${this.v3}/projects` }
+  get projectsUrl() {
+    return `${this.v3}/projects`
+  }
 
-  get allTenantsAllUsersUrl () { return `${this.adminV3}/PF9-KSADM/all_tenants_all_users` }
+  get allTenantsAllUsersUrl() {
+    return `${this.adminV3}/PF9-KSADM/all_tenants_all_users`
+  }
 
-  get roleAssignments () { return `${this.adminV3}/role_assignments` }
+  get roleAssignments() {
+    return `${this.adminV3}/role_assignments`
+  }
 
-  get tokensUrl () { return `${this.v3}/auth/tokens?nocatalog` }
+  get tokensUrl() {
+    return `${this.v3}/auth/tokens?nocatalog`
+  }
 
-  get usersUrl () { return `${this.v3}/users` }
+  get usersUrl() {
+    return `${this.v3}/users`
+  }
 
-  get credentialsUrl () { return `${this.v3}/credentials` }
+  get credentialsUrl() {
+    return `${this.v3}/credentials`
+  }
 
-  get groupsUrl () { return `${this.v3}/groups` }
+  get groupsUrl() {
+    return `${this.v3}/groups`
+  }
 
-  get groupMappingsUrl () { return `${this.v3}/OS-FEDERATION/mappings` }
+  get groupMappingsUrl() {
+    return `${this.v3}/OS-FEDERATION/mappings`
+  }
 
-  get rolesUrl () { return `${this.v3}/roles` }
+  get rolesUrl() {
+    return `${this.v3}/roles`
+  }
 
   getProject = async (id) => {
     const data = await this.client.basicGet(`${this.projectsUrl}/${id}`)
@@ -93,7 +123,10 @@ class Keystone extends ApiService {
   }
 
   getProjectsAuth = async () => {
-    const response = await this.client.rawGet(this.projectsAuthUrl, this.client.getAuthHeaders(false))
+    const response = await this.client.rawGet(
+      this.projectsAuthUrl,
+      this.client.getAuthHeaders(false),
+    )
     return response.data.projects
   }
 
@@ -107,7 +140,7 @@ class Keystone extends ApiService {
     return data.tenants
   }
 
-  getTenantRoleAssignments = async tenantId => {
+  getTenantRoleAssignments = async (tenantId) => {
     const data = await this.client.basicGet(this.roleAssignments, {
       'scope.project.id': tenantId,
       include_names: true,
@@ -115,7 +148,7 @@ class Keystone extends ApiService {
     return data.role_assignments
   }
 
-  getUserRoleAssignments = async userId => {
+  getUserRoleAssignments = async (userId) => {
     const data = await this.client.basicGet(this.roleAssignments, {
       'user.id': userId,
       include_names: true,
@@ -124,19 +157,18 @@ class Keystone extends ApiService {
   }
 
   addUserRole = async ({ tenantId, userId, roleId }) => {
-    await this.client.basicPut(pathJoin(
-      this.projectsUrl,
-      `${tenantId}/users/${userId}/roles/${roleId}`,
-    ), null)
+    await this.client.basicPut(
+      pathJoin(this.projectsUrl, `${tenantId}/users/${userId}/roles/${roleId}`),
+      null,
+    )
     return { tenantId, userId, roleId }
   }
 
   deleteUserRole = async ({ tenantId, userId, roleId }) => {
     try {
-      await this.client.basicDelete(pathJoin(
-        this.projectsUrl,
-        `${tenantId}/users/${userId}/roles/${roleId}`,
-      ))
+      await this.client.basicDelete(
+        pathJoin(this.projectsUrl, `${tenantId}/users/${userId}/roles/${roleId}`),
+      )
       return { tenantId, userId, roleId }
     } catch (err) {
       throw new Error('Unable to delete non-existant project')
@@ -297,7 +329,8 @@ class Keystone extends ApiService {
       const token2cookieUrl = links.token2cookie
       const authHeaders = this.client.getAuthHeaders()
       await this.client.rawGet(token2cookieUrl, {
-        ...authHeaders, withCredentials: true
+        ...authHeaders,
+        withCredentials: true,
       })
     } catch (err) {
       console.warn('Setting session cookie for accessing hostagent rpms failed')
@@ -327,10 +360,7 @@ class Keystone extends ApiService {
   }
 
   getServicesForActiveRegion = async () => {
-    const {
-      activeRegion,
-      serviceCatalog = await this.getServiceCatalog(),
-    } = this.client
+    const { activeRegion, serviceCatalog = await this.getServiceCatalog() } = this.client
     const servicesByRegion = groupByRegion(serviceCatalog)
 
     if (!activeRegion || !servicesByRegion.hasOwnProperty(activeRegion)) {

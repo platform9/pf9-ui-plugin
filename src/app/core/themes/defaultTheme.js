@@ -1,12 +1,6 @@
 const theme = {
   breakpoints: {
-    keys: [
-      'xs',
-      'sm',
-      'md',
-      'lg',
-      'xl',
-    ],
+    keys: ['xs', 'sm', 'md', 'lg', 'xl'],
     values: {
       xs: 0,
       sm: 600,
@@ -185,7 +179,7 @@ const theme = {
     background: {
       paper: '#FFF',
       default: '#FFF',
-      dashboard: '#edeff1'
+      dashboard: '#edeff1',
     },
     action: {
       active: 'rgba(0, 0, 0, 0.54)',
@@ -231,7 +225,7 @@ const theme = {
       error: '#e44c34',
       unknown: '#f5a623',
       empty: '#edeff1',
-    }
+    },
   },
   props: {},
   shadows: [

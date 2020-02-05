@@ -4,17 +4,17 @@ import Typography from '@material-ui/core/Typography'
 import { withTabContext } from 'core/components/tabs/Tabs'
 
 class Tab extends PureComponent {
-  componentDidMount () {
+  componentDidMount() {
     const { addTab, value, label } = this.props
     addTab({ value, label })
   }
 
-  render () {
+  render() {
     const { activeTab, value, children } = this.props
-    if (value !== activeTab) { return null }
-    return (
-      <Typography component="div">{children}</Typography>
-    )
+    if (value !== activeTab) {
+      return null
+    }
+    return <Typography component="div">{children}</Typography>
   }
 }
 

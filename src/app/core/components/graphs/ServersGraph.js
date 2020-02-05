@@ -2,28 +2,28 @@ import React from 'react'
 import { withStyles } from '@material-ui/styles'
 import SvgArc from './SemiCircleGraph'
 
-const styles = theme => ({
+const styles = (theme) => ({
   svg: {
     'max-height': '100%',
-    position: 'absolute'
-  }
+    position: 'absolute',
+  },
 })
 
 @withStyles(styles)
 class ServersGraph extends React.PureComponent {
   state = {
-    hover: false
+    hover: false,
   }
 
   mouseEnterUpdate = () => {
-    this.setState(state => ({ hover: true }))
+    this.setState((state) => ({ hover: true }))
   }
 
   mouseLeaveUpdate = () => {
-    this.setState(state => ({ hover: false }))
+    this.setState((state) => ({ hover: false }))
   }
 
-  render () {
+  render() {
     const { classes } = this.props
     const { hover } = this.state
 

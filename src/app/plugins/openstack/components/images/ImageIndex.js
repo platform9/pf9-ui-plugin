@@ -8,8 +8,12 @@ import PageContainer from 'core/components/pageContainer/PageContainer'
 const ImageIndex = () => (
   <PageContainer>
     <Tabs>
-      <Tab value="images" label="Imported Images"><ImageListPage /></Tab>
-      <Tab value="builtimages" label="Download Prebuilt Images"><ImageCardListPage /></Tab>
+      <Tab value="images" label="Imported Images">
+        <ImageListPage />
+      </Tab>
+      <Tab value="builtimages" label="Download Prebuilt Images">
+        <ImageCardListPage />
+      </Tab>
     </Tabs>
   </PageContainer>
 )

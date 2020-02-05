@@ -8,25 +8,23 @@ import { decorateAction } from '@storybook/addon-actions'
 import { storiesOf } from '@storybook/react'
 import PreferencesProvider from 'core/providers/PreferencesProvider'
 
-const objToJsonDetails = obj => JSON.stringify(obj, null, 4)
-const isArray = x => x instanceof Array
-const isObject = x => typeof x === 'object' && !isArray(x)
+const objToJsonDetails = (obj) => JSON.stringify(obj, null, 4)
+const isArray = (x) => x instanceof Array
+const isObject = (x) => typeof x === 'object' && !isArray(x)
 
 export const jsonDetailLogger = decorateAction([
-  args => args.map(x => (isObject(x) ? objToJsonDetails(x) : x)),
+  (args) => args.map((x) => (isObject(x) ? objToJsonDetails(x) : x)),
 ])
 
 // HotKeysProvider has a dependency on AppContext.  It is needed for rendering the sidenav.
 // ToastProvider has a dependency on ThemeManager
-export const appDecorators = storyFn => (
+export const appDecorators = (storyFn) => (
   <div style={{ padding: '16px', backgroundColor: '#fff' }}>
     <HotKeysProvider>
       <AppContext>
         <PreferencesProvider>
           <ThemeManager>
-            <ToastProvider>
-              {storyFn()}
-            </ToastProvider>
+            <ToastProvider>{storyFn()}</ToastProvider>
           </ThemeManager>
         </PreferencesProvider>
       </AppContext>
@@ -35,18 +33,16 @@ export const appDecorators = storyFn => (
 )
 
 export const addStory = (section, subsection, story, mod) =>
-  storiesOf(section, mod)
-    .add(subsection, story)
+  storiesOf(section, mod).add(subsection, story)
 
 export const addStories = (section, stories, mod) =>
   Object.entries(stories).forEach(([subsection, story]) =>
     addStory(section, subsection, story, mod),
   )
 
-export const addStoriesFromModule = mod =>
-  (section, stories) => addStories(section, stories, mod)
+export const addStoriesFromModule = (mod) => (section, stories) => addStories(section, stories, mod)
 
-export const range = n => {
+export const range = (n) => {
   const arr = []
   for (let i = 0; i < n; i++) {
     arr.push(i)
@@ -54,8 +50,6 @@ export const range = n => {
   return arr
 }
 
-export const randomInt = (min, max) =>
-  Math.floor(Math.random() * (max - min + 1) + min)
+export const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1) + min)
 
-export const randomItem = arr =>
-  arr[randomInt(0, arr.length - 1)]
+export const randomItem = (arr) => arr[randomInt(0, arr.length - 1)]

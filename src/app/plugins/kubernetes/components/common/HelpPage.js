@@ -27,30 +27,28 @@ const HelpPage = () => {
       </Typography>
       <Divider />
       <Typography variant="subtitle1" className={classes.text}>
-        Need help?  You are currently using the free-tier account of Platform9 Managed Kubernetes (PMK).
-        There are 2 ways to get help free tier account:
+        Need help? You are currently using the free-tier account of Platform9 Managed Kubernetes
+        (PMK). There are 2 ways to get help free tier account:
       </Typography>
 
       <Typography variant="h5">Documentation & Knowledge Base</Typography>
       <Typography variant="subtitle1" className={classes.text}>
-        Use our documentation and knowledge base to get help with various
-        product features and capabilities.
+        Use our documentation and knowledge base to get help with various product features and
+        capabilities.
       </Typography>
       <Typography variant="subtitle1" className={classes.text}>
-        Reference the PMK documentation at
-        &nbsp;<ExternalLink url={pmkDocumentationLink} />
+        Reference the PMK documentation at &nbsp;
+        <ExternalLink url={pmkDocumentationLink} />
       </Typography>
 
       <Typography variant="h5">Support</Typography>
       <Typography variant="subtitle1" className={classes.text}>
-        Use our public slack channel to ask questions. The channel url is:
-        &nbsp;<ExternalLink url={publicSlackLink} />
+        Use our public slack channel to ask questions. The channel url is: &nbsp;
+        <ExternalLink url={publicSlackLink} />
       </Typography>
       <Typography variant="subtitle1" className={classes.text}>
-        You should have received an invite to join the channel already. If you
-        haven't, send a
-        request
-        to <SimpleLink href={`mailto:${supportEmail}`}>{supportEmail}</SimpleLink>
+        You should have received an invite to join the channel already. If you haven't, send a
+        request to <SimpleLink href={`mailto:${supportEmail}`}>{supportEmail}</SimpleLink>
       </Typography>
     </>
   )

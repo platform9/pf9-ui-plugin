@@ -8,7 +8,7 @@ import { assoc } from 'ramda'
 import { makeStyles } from '@material-ui/styles'
 import { Button } from '@material-ui/core'
 
-const useKeyValueStyles = makeStyles(theme => ({
+const useKeyValueStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
     flexFlow: 'row nowrap',
@@ -21,7 +21,7 @@ const useKeyValueStyles = makeStyles(theme => ({
     marginRight: theme.spacing(0.5),
     '& .MuiFormControl-root': {
       marginTop: theme.spacing(0.5),
-      marginBottom: 0
+      marginBottom: 0,
     },
   },
   deleteButton: {
@@ -42,7 +42,7 @@ const KeyValue = ({ entry = {}, onChange, onDelete, keySuggestions, valueSuggest
     onChange(state)
   }, [state])
 
-  const handleChange = field => value => setState(assoc(field, value, state))
+  const handleChange = (field) => (value) => setState(assoc(field, value, state))
 
   return (
     <div className={classes.root}>
@@ -61,12 +61,14 @@ const KeyValue = ({ entry = {}, onChange, onDelete, keySuggestions, valueSuggest
         suggestions={valueSuggestions}
         className={classes.autocomplete}
       />
-      <IconButton className={classes.deleteButton} onClick={onDelete}><DeleteIcon /></IconButton>
+      <IconButton className={classes.deleteButton} onClick={onDelete}>
+        <DeleteIcon />
+      </IconButton>
     </div>
   )
 }
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
     flexFlow: 'column',
@@ -85,7 +87,7 @@ const newEntry = () => ({ id: uuid.v4(), key: '', value: '' })
 // functionality if we delete anything in the middle of the array.
 // This forces us to inject an id field into every entry and then
 // filter it out before submitting. :(
-const addId = entry => ({ ...entry, id: uuid.v4() })
+const addId = (entry) => ({ ...entry, id: uuid.v4() })
 
 const KeyValues = ({ entries: _entries, onChange, keySuggestions, valueSuggestions }) => {
   const classes = useStyles()
@@ -93,12 +95,12 @@ const KeyValues = ({ entries: _entries, onChange, keySuggestions, valueSuggestio
   const [entries, setEntries] = useState(entriesWithId)
 
   const addBlankEntry = () => setEntries([...entries, newEntry()])
-  const deleteEntry = id => () => setEntries(entries.filter(x => x.id !== id))
-  const handleChange = entry => setEntries(entries.map(x => (x.id === entry.id) ? entry : x))
+  const deleteEntry = (id) => () => setEntries(entries.filter((x) => x.id !== id))
+  const handleChange = (entry) => setEntries(entries.map((x) => (x.id === entry.id ? entry : x)))
 
   useEffect(() => {
     // Remove empty entries and strip out id
-    const noEmptyKeys = x => x.key.length > 0
+    const noEmptyKeys = (x) => x.key.length > 0
     const removeId = ({ key, value }) => ({ key, value })
     const sanitized = (entries || []).filter(noEmptyKeys).map(removeId)
     onChange && onChange(sanitized)
@@ -106,7 +108,7 @@ const KeyValues = ({ entries: _entries, onChange, keySuggestions, valueSuggestio
 
   return (
     <div className={classes.root}>
-      {entries.map(entry => (
+      {entries.map((entry) => (
         <KeyValue
           key={entry.id}
           keySuggestions={keySuggestions}

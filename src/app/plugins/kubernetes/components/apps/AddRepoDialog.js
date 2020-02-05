@@ -17,23 +17,32 @@ export default ({ onClose }) => {
   const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
   const [create, creating] = useDataUpdater(repositoryActions.create, onClose)
   const [selectedClusters, updateSelectedClusters] = useState(emptyArr)
-  const toggleRow = useCallback(uuid => () => {
-    updateSelectedClusters(selectedClusters.includes(uuid)
-      ? except(uuid, selectedClusters)
-      : [...selectedClusters, uuid],
-    )
-  }, [selectedClusters])
+  const toggleRow = useCallback(
+    (uuid) => () => {
+      updateSelectedClusters(
+        selectedClusters.includes(uuid)
+          ? except(uuid, selectedClusters)
+          : [...selectedClusters, uuid],
+      )
+    },
+    [selectedClusters],
+  )
   const handleSubmit = useCallback(
-    async data => {
+    async (data) => {
       return create({ ...data, clusters: selectedClusters })
     },
-    [selectedClusters])
+    [selectedClusters],
+  )
 
   const renderClusterRow = ({ uuid, name }) => {
     return (
       <TableRow key={uuid}>
         <TableCell padding="checkbox">
-          <Checkbox checked={selectedClusters.includes(uuid)} onClick={toggleRow(uuid)} color="primary" />
+          <Checkbox
+            checked={selectedClusters.includes(uuid)}
+            onClick={toggleRow(uuid)}
+            color="primary"
+          />
         </TableCell>
         <TableCell>{name}</TableCell>
       </TableRow>
@@ -46,24 +55,33 @@ export default ({ onClose }) => {
       <DialogContent>
         <Progress loading={loadingClusters || creating} inline renderContentOnMount>
           <Wizard onComplete={handleSubmit} onCancel={onClose} showSteps={false}>
-            {({ onNext, setWizardContext }) =>
+            {({ onNext, setWizardContext }) => (
               <>
                 <WizardStep stepId="repoFields" label="Repository fields">
                   <ValidatedForm triggerSubmit={onNext} onSubmit={setWizardContext}>
                     <TextField id="name" label="Name" required />
-                    <TextField id="url" label="URL" required info="The URL that points to the helm chart store" />
-                    <TextField id="source" label="Source" info="URL that points to the source core" />
+                    <TextField
+                      id="url"
+                      label="URL"
+                      required
+                      info="The URL that points to the helm chart store"
+                    />
+                    <TextField
+                      id="source"
+                      label="Source"
+                      info="URL that points to the source core"
+                    />
                   </ValidatedForm>
                 </WizardStep>
-                {clusters.length ? <WizardStep stepId="repoClusters" label="Repository clusters">
-                  <Table>
-                    <TableBody>
-                      {clusters.map(renderClusterRow)}
-                    </TableBody>
-                  </Table>
-                </WizardStep> : null}
+                {clusters.length ? (
+                  <WizardStep stepId="repoClusters" label="Repository clusters">
+                    <Table>
+                      <TableBody>{clusters.map(renderClusterRow)}</TableBody>
+                    </Table>
+                  </WizardStep>
+                ) : null}
               </>
-            }
+            )}
           </Wizard>
         </Progress>
       </DialogContent>

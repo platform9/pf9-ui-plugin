@@ -1,21 +1,26 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Button, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@material-ui/core'
+import {
+  Button, Table, TableBody, TableCell, TableHead, TableRow, Typography,
+} from '@material-ui/core'
 import { isNilOrEmpty } from 'utils/fp'
 
-const renderKeyValues = obj => Object.entries(obj)
-  .map(([key, value]) => `${key}: ${value}`)
-  .join(', ')
+const renderKeyValues = (obj) =>
+  Object.entries(obj)
+    .map(([key, value]) => `${key}: ${value}`)
+    .join(', ')
 
 const PrometheusRulesTable = ({ rules, onDelete }) => {
   var groups = rules
-  const allRules = groups.map(group =>
-    group.rules.map(rule => ({
-      ...rule,
-      group: group.name,
-      labels: isNilOrEmpty(rule.labels) ? {} : rule.labels,
-    }))
-  ).flat()
+  const allRules = groups
+    .map((group) =>
+      group.rules.map((rule) => ({
+        ...rule,
+        group: group.name,
+        labels: isNilOrEmpty(rule.labels) ? {} : rule.labels,
+      })),
+    )
+    .flat()
 
   return (
     <div>
@@ -39,7 +44,11 @@ const PrometheusRulesTable = ({ rules, onDelete }) => {
               <TableCell>{rule.expr}</TableCell>
               <TableCell>{renderKeyValues(rule.labels)}</TableCell>
               <TableCell>{rule.for || '-'}</TableCell>
-              <TableCell><Button size="small" color="primary" onClick={onDelete(rule.id)}>Delete</Button></TableCell>
+              <TableCell>
+                <Button size="small" color="primary" onClick={onDelete(rule.id)}>
+                  Delete
+                </Button>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

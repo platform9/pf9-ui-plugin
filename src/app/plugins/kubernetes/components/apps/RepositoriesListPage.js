@@ -6,17 +6,14 @@ import EditRepoClustersDialog from 'k8s/components/apps/EditRepoClustersDialog'
 import { unless, isNil, join, pipe, pluck } from 'ramda'
 import AddRepoDialog from 'k8s/components/apps/AddRepoDialog'
 
-const concatClusterNames = pipe(
-  pluck('clusterName'),
-  unless(isNil, join(', ')),
-)
+const concatClusterNames = pipe(pluck('clusterName'), unless(isNil, join(', ')))
 
 export const options = {
   loaderFn: repositoryActions.list,
   deleteFn: repositoryActions.delete,
   batchActions: [
     {
-      cond: rows => rows.length === 1,
+      cond: (rows) => rows.length === 1,
       icon: <EditIcon />,
       label: 'Edit repo clusters',
       dialog: EditRepoClustersDialog,

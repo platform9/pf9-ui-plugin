@@ -10,14 +10,16 @@ const columns = [
 ]
 
 const ImageChooser = ({ data, onChange, initialValue }) => {
-  if (!data) { return null }
+  if (!data) {
+    return null
+  }
   return (
     <div>
       <ListTableSelect
         columns={columns}
         data={data}
-        onChange={value => onChange(value.id)}
-        initialValue={initialValue && data.find(x => x.id === initialValue)}
+        onChange={(value) => onChange(value.id)}
+        initialValue={initialValue && data.find((x) => x.id === initialValue)}
       />
     </div>
   )

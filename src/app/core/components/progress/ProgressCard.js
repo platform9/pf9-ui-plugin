@@ -3,7 +3,7 @@ import { Card, CardContent, CircularProgress, Typography } from '@material-ui/co
 import { withStyles } from '@material-ui/styles'
 import { addComma } from '../../utils/formatters'
 
-const styles = theme => ({
+const styles = (theme) => ({
   card: {
     minWidth: 200,
     maxHeight: 300,
@@ -36,18 +36,17 @@ const styles = theme => ({
 
 @withStyles(styles)
 class ProgressCard extends PureComponent {
-  render () {
-    const { classes, card: { title, used, total, unit } } = this.props
-    const completed = Math.round(used / total * 100)
+  render() {
+    const {
+      classes,
+      card: { title, used, total, unit },
+    } = this.props
+    const completed = Math.round((used / total) * 100)
     return (
       <div className={classes.card}>
         <Card>
           <CardContent className={classes.title}>
-            <Typography
-              variant="h6"
-              align="center"
-              className={classes.title}
-            >
+            <Typography variant="h6" align="center" className={classes.title}>
               {title}
             </Typography>
           </CardContent>
@@ -59,19 +58,12 @@ class ProgressCard extends PureComponent {
                 size={150}
                 value={completed}
               />
-              <Typography
-                className={classes.percentage}
-                variant="h5"
-              >
+              <Typography className={classes.percentage} variant="h5">
                 {completed}%
               </Typography>
             </div>
             <div className={classes.description}>
-              <Typography
-                variant="subtitle1"
-                align="center"
-                noWrap
-              >
+              <Typography variant="subtitle1" align="center" noWrap>
                 {addComma(used, 0)} {unit} used of {addComma(total, 0)} {unit}
               </Typography>
             </div>

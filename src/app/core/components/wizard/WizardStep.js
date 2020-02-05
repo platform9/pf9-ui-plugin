@@ -3,10 +3,9 @@ import PropTypes from 'prop-types'
 import { WizardContext } from 'core/components/wizard/Wizard'
 import { makeStyles } from '@material-ui/styles'
 
-const wizardStepStyles = makeStyles(theme => ({
+const wizardStepStyles = makeStyles((theme) => ({
   root: {
-    display: ({ stepId, activeStepId }) =>
-      stepId === activeStepId ? 'block' : 'none',
+    display: ({ stepId, activeStepId }) => (stepId === activeStepId ? 'block' : 'none'),
   },
 }))
 
@@ -25,9 +24,9 @@ const WizardStep = ({ label, stepId, children, keepContentMounted }) => {
     }
   }, [activeStepId])
 
-  return activeStepId === stepId || (rendered && keepContentMounted)
-    ? <div className={classes.root}>{children}</div>
-    : null
+  return activeStepId === stepId || (rendered && keepContentMounted) ? (
+    <div className={classes.root}>{children}</div>
+  ) : null
 }
 
 // Validations should be an object with a rule definition

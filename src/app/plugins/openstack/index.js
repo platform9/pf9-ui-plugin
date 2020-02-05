@@ -56,218 +56,211 @@ import AddSshKeyPage from './components/sshkeys/AddSshKeyPage'
 import IronicSetupPage from './components/ironicSetup/IronicSetupPage'
 
 class OpenStack extends React.PureComponent {
-  render () {
-    return (
-      <h1>OpenStack Plugin</h1>
-    )
+  render() {
+    return <h1>OpenStack Plugin</h1>
   }
 }
 
 OpenStack.__name__ = 'openstack'
 
-OpenStack.registerPlugin = pluginManager => {
-  const plugin = pluginManager.registerPlugin(
-    'openstack', 'OpenStack', '/ui/openstack'
-  )
+OpenStack.registerPlugin = (pluginManager) => {
+  const plugin = pluginManager.registerPlugin('openstack', 'OpenStack', '/ui/openstack')
 
-  plugin.registerRoutes(
-    [
-      {
-        name: 'Dashboard',
-        link: { path: '/dashboard', exact: true, default: false },
-        component: DashboardPage
-      },
-      {
-        name: 'Tenants',
-        link: { path: '/tenants', exact: true },
-        component: TenantsListPage
-      },
-      {
-        name: 'AddTenant',
-        link: { path: '/tenants/add' },
-        component: AddTenantPage
-      },
-      {
-        name: 'Users',
-        link: { path: '/users', exact: true },
-        component: UsersListPage
-      },
-      {
-        name: 'AddUser',
-        link: { path: '/users/add' },
-        component: AddUserPage
-      },
-      {
-        name: 'EditUser',
-        link: { path: '/users/edit/:userId' },
-        component: UpdateUserPage
-      },
-      {
-        name: 'Flavors',
-        link: { path: '/flavors', exact: true },
-        component: FlavorsListPage
-      },
-      {
-        name: 'AddFlavor',
-        link: { path: '/flavors/add' },
-        component: AddFlavorPage
-      },
-      {
-        name: 'Instances',
-        link: { path: '/instances', exact: true },
-        component: InstancesPage
-      },
-      {
-        name: 'Networks',
-        link: { path: '/networks', exact: true },
-        component: NetworksPage
-      },
-      {
-        name: 'AddNetwork',
-        link: { path: '/networks/add' },
-        component: AddNetworkPage
-      },
-      {
-        name: 'EditNetwork',
-        link: { path: '/networks/edit/:networkId', exact: true },
-        component: UpdateNetworkPage
-      },
-      {
-        name: 'Routers',
-        link: { path: '/routers', exact: true },
-        component: RoutersPage
-      },
-      {
-        name: 'AddRouter',
-        link: { path: '/routers/add' },
-        component: AddRouterPage
-      },
-      {
-        name: 'EditRouter',
-        link: { path: '/routers/edit/:routerId', exact: true },
-        component: UpdateRouterPage
-      },
-      {
-        name: 'FloatingIps',
-        link: { path: '/floatingips', exact: true },
-        component: FloatingIpsPage
-      },
-      {
-        name: 'AddFloatingIp',
-        link: { path: '/floatingips/add' },
-        component: AddFloatingIpPage
-      },
-      {
-        name: 'EditFloatingIp',
-        link: { path: '/floatingips/edit/:floatingIpId', exact: true },
-        component: UpdateFloatingIpPage
-      },
-      {
-        name: 'ApiAccess',
-        link: { path: '/apiaccess' },
-        component: ApiAccessPage
-      },
-      {
-        name: 'storage',
-        link: { path: '/storage', exact: true },
-        component: StorageIndex
-      },
-      {
-        name: 'Volumes',
-        link: { path: '/storage#volumes', exact: true },
-        component: VolumesListPage
-      },
-      {
-        name: 'AddVolume',
-        link: { path: '/storage/volumes/add', exact: true },
-        component: AddVolumePage
-      },
-      {
-        name: 'EditVolume',
-        link: { path: '/storage/volumes/edit/:volumeId', exact: true },
-        component: UpdateVolumePage
-      },
-      {
-        name: 'AddVolumeType',
-        link: { path: '/storage/volumeTypes/add', exact: true },
-        component: AddVolumeTypePage
-      },
-      {
-        name: 'EditVolumeType',
-        link: { path: '/storage/volumeTypes/edit/:volumeTypeId', exact: true },
-        component: UpdateVolumeTypePage
-      },
-      {
-        name: 'CreateSnapshot',
-        link: { path: '/storage/volumes/snapshot/:volumeId', exact: true },
-        component: CreateSnapshotPage
-      },
-      {
-        name: 'VolumeSnapshots',
-        link: { path: '/storage#volumeSnapshots', exact: true },
-        component: VolumeSnapshotsListPage
-      },
-      {
-        name: 'EditVolumeSnapshot',
-        link: { path: '/storage/volumeSnapshots/edit/:volumeSnapshotId', exact: true },
-        component: UpdateVolumeSnapshotPage
-      },
-      {
-        name: 'Images',
-        link: { path: '/images', exact: true },
-        component: ImageIndex
-      },
-      {
-        name: 'ImagesList',
-        link: { path: '/images#images', exact: true },
-        component: ImageListPage
-      },
-      {
-        name: 'AddImages',
-        link: { path: '/images/add', exact: true },
-        component: AddImagePage
-      },
-      {
-        name: 'EditImage',
-        link: { path: '/images/edit/:imageId', exact: true },
-        component: UpdateImagePage
-      },
-      {
-        name: 'Applications',
-        link: { path: '/applications', exact: true },
-        component: AppCatalogPage
-      },
-      {
-        name: 'SshKeys',
-        link: { path: '/sshkeys', exact: true },
-        component: SshKeysPage
-      },
-      {
-        name: 'AddSshKey',
-        link: { path: '/sshkeys/add', exact: true },
-        component: AddSshKeyPage
-      },
-      {
-        name: 'Hosts',
-        link: { path: '/hosts', exact: true },
-        component: HostsListPage
-      },
-      {
-        name: 'IronicSetup',
-        link: { path: '/ironic/setup', exact: true },
-        component: IronicSetupPage
-      }
-    ]
-  )
+  plugin.registerRoutes([
+    {
+      name: 'Dashboard',
+      link: { path: '/dashboard', exact: true, default: false },
+      component: DashboardPage,
+    },
+    {
+      name: 'Tenants',
+      link: { path: '/tenants', exact: true },
+      component: TenantsListPage,
+    },
+    {
+      name: 'AddTenant',
+      link: { path: '/tenants/add' },
+      component: AddTenantPage,
+    },
+    {
+      name: 'Users',
+      link: { path: '/users', exact: true },
+      component: UsersListPage,
+    },
+    {
+      name: 'AddUser',
+      link: { path: '/users/add' },
+      component: AddUserPage,
+    },
+    {
+      name: 'EditUser',
+      link: { path: '/users/edit/:userId' },
+      component: UpdateUserPage,
+    },
+    {
+      name: 'Flavors',
+      link: { path: '/flavors', exact: true },
+      component: FlavorsListPage,
+    },
+    {
+      name: 'AddFlavor',
+      link: { path: '/flavors/add' },
+      component: AddFlavorPage,
+    },
+    {
+      name: 'Instances',
+      link: { path: '/instances', exact: true },
+      component: InstancesPage,
+    },
+    {
+      name: 'Networks',
+      link: { path: '/networks', exact: true },
+      component: NetworksPage,
+    },
+    {
+      name: 'AddNetwork',
+      link: { path: '/networks/add' },
+      component: AddNetworkPage,
+    },
+    {
+      name: 'EditNetwork',
+      link: { path: '/networks/edit/:networkId', exact: true },
+      component: UpdateNetworkPage,
+    },
+    {
+      name: 'Routers',
+      link: { path: '/routers', exact: true },
+      component: RoutersPage,
+    },
+    {
+      name: 'AddRouter',
+      link: { path: '/routers/add' },
+      component: AddRouterPage,
+    },
+    {
+      name: 'EditRouter',
+      link: { path: '/routers/edit/:routerId', exact: true },
+      component: UpdateRouterPage,
+    },
+    {
+      name: 'FloatingIps',
+      link: { path: '/floatingips', exact: true },
+      component: FloatingIpsPage,
+    },
+    {
+      name: 'AddFloatingIp',
+      link: { path: '/floatingips/add' },
+      component: AddFloatingIpPage,
+    },
+    {
+      name: 'EditFloatingIp',
+      link: { path: '/floatingips/edit/:floatingIpId', exact: true },
+      component: UpdateFloatingIpPage,
+    },
+    {
+      name: 'ApiAccess',
+      link: { path: '/apiaccess' },
+      component: ApiAccessPage,
+    },
+    {
+      name: 'storage',
+      link: { path: '/storage', exact: true },
+      component: StorageIndex,
+    },
+    {
+      name: 'Volumes',
+      link: { path: '/storage#volumes', exact: true },
+      component: VolumesListPage,
+    },
+    {
+      name: 'AddVolume',
+      link: { path: '/storage/volumes/add', exact: true },
+      component: AddVolumePage,
+    },
+    {
+      name: 'EditVolume',
+      link: { path: '/storage/volumes/edit/:volumeId', exact: true },
+      component: UpdateVolumePage,
+    },
+    {
+      name: 'AddVolumeType',
+      link: { path: '/storage/volumeTypes/add', exact: true },
+      component: AddVolumeTypePage,
+    },
+    {
+      name: 'EditVolumeType',
+      link: { path: '/storage/volumeTypes/edit/:volumeTypeId', exact: true },
+      component: UpdateVolumeTypePage,
+    },
+    {
+      name: 'CreateSnapshot',
+      link: { path: '/storage/volumes/snapshot/:volumeId', exact: true },
+      component: CreateSnapshotPage,
+    },
+    {
+      name: 'VolumeSnapshots',
+      link: { path: '/storage#volumeSnapshots', exact: true },
+      component: VolumeSnapshotsListPage,
+    },
+    {
+      name: 'EditVolumeSnapshot',
+      link: { path: '/storage/volumeSnapshots/edit/:volumeSnapshotId', exact: true },
+      component: UpdateVolumeSnapshotPage,
+    },
+    {
+      name: 'Images',
+      link: { path: '/images', exact: true },
+      component: ImageIndex,
+    },
+    {
+      name: 'ImagesList',
+      link: { path: '/images#images', exact: true },
+      component: ImageListPage,
+    },
+    {
+      name: 'AddImages',
+      link: { path: '/images/add', exact: true },
+      component: AddImagePage,
+    },
+    {
+      name: 'EditImage',
+      link: { path: '/images/edit/:imageId', exact: true },
+      component: UpdateImagePage,
+    },
+    {
+      name: 'Applications',
+      link: { path: '/applications', exact: true },
+      component: AppCatalogPage,
+    },
+    {
+      name: 'SshKeys',
+      link: { path: '/sshkeys', exact: true },
+      component: SshKeysPage,
+    },
+    {
+      name: 'AddSshKey',
+      link: { path: '/sshkeys/add', exact: true },
+      component: AddSshKeyPage,
+    },
+    {
+      name: 'Hosts',
+      link: { path: '/hosts', exact: true },
+      component: HostsListPage,
+    },
+    {
+      name: 'IronicSetup',
+      link: { path: '/ironic/setup', exact: true },
+      component: IronicSetupPage,
+    },
+  ])
 
-  plugin.registerNavItems(
-    [
-      {
-        name: 'Bare Metal Setup',
-        link: { path: '/ironic/setup' },
-        icon: 'cogs'
-      },
-      /* Comment out the nav items since first UI release will be K8s only
+  plugin.registerNavItems([
+    {
+      name: 'Bare Metal Setup',
+      link: { path: '/ironic/setup' },
+      icon: 'cogs',
+    },
+    /* Comment out the nav items since first UI release will be K8s only
       {
         name: 'Dashboard',
         link: { path: '/' }
@@ -325,8 +318,7 @@ OpenStack.registerPlugin = pluginManager => {
         link: { path: '/hosts' }
       }
       /**/
-    ]
-  )
+  ])
 }
 
 export default OpenStack

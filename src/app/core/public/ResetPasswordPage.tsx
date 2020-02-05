@@ -16,15 +16,8 @@ import ApiClient from 'api-client/ApiClient'
 import { IApiData } from 'api-client/Clemency'
 
 import {
-  hasOneSpecialChar,
-  hasOneNumber,
-  hasOneUpperChar,
-  hasOneLowerChar,
-  hasMinLength,
-  requiredValidator,
-  passwordValidator,
-  emailValidator,
-  matchFieldValidator,
+  hasOneSpecialChar, hasOneNumber, hasOneUpperChar, hasOneLowerChar, hasMinLength,
+  requiredValidator, passwordValidator, emailValidator, matchFieldValidator,
 } from 'core/utils/fieldValidators'
 import Progress from 'core/components/progress/Progress'
 import TextField from 'core/components/validatedForm/TextField'
@@ -130,7 +123,7 @@ const passwordValidatorList: IValidator[] = [
 ]
 const { clemency } = ApiClient.getInstance()
 
-const CheckListItem: React.FC<{checked: boolean}> = ({ children, checked }) => (
+const CheckListItem: React.FC<{ checked: boolean }> = ({ children, checked }) => (
   <ListItem>
     <ListItemIcon>{checked ? <CheckIcon /> : <ClearIcon color="error" />}</ListItemIcon>
     <ListItemText primary={children} />
@@ -158,21 +151,19 @@ const ResetPasswordPage: React.FC = () => {
   const classes = useStyles({})
   const { history, match } = useReactRouter()
 
-  const togglePasswordMask: ITogglePasswordMask = (key) => () => updateParams({ [key]: !params[key] })
+  const togglePasswordMask: ITogglePasswordMask = (key) => () =>
+    updateParams({ [key]: !params[key] })
   const renderPasswordMask: IPasswordMask = (key) => ({
     endAdornment: (
       <InputAdornment position="end">
-        <IconButton
-          aria-label="toggle password visibility"
-          onClick={togglePasswordMask(key)}
-        >
+        <IconButton aria-label="toggle password visibility" onClick={togglePasswordMask(key)}>
           {params[key] ? <Visibility /> : <VisibilityOff />}
         </IconButton>
       </InputAdornment>
     ),
   })
 
-  const SubmitButton: React.FC<{label: string}> = ({ label }) => (
+  const SubmitButton: React.FC<{ label: string }> = ({ label }) => (
     <Button type="submit" className={classes.resetPwdButton} variant="contained" color="primary">
       {label}
     </Button>
@@ -191,7 +182,7 @@ const ResetPasswordPage: React.FC = () => {
       const options: IApiData = {
         secret: match.params.id,
         username: params.emailId,
-        password: params.confirmPassword
+        password: params.confirmPassword,
       }
       const response = await clemency.resetPassword(options)
 
@@ -249,13 +240,15 @@ const ResetPasswordPage: React.FC = () => {
                           InputProps={renderPasswordMask('isConfirmPasswordMasked')}
                         />
                         {renderPasswordValidationCheck(values)}
-                        {params.isError && <Alert small variant="error" message={params.errorMessage} />}
+                        {params.isError && (
+                          <Alert small variant="error" message={params.errorMessage} />
+                        )}
                         <SubmitButton label="Reset my password" />
                       </>
                     ) : (
                       <>
                         <Typography className={classes.paragraph} component="p">
-                            Your password has been reset successfully.
+                          Your password has been reset successfully.
                         </Typography>
                         <SubmitButton label="Return to login screen" />
                       </>

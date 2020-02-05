@@ -13,16 +13,16 @@ export const loadUserTenants = createContextLoader(userTenantsCacheKey, async ()
 
 const tenantActions = createCRUDActions(tenantsCacheKey, {
   listFn: async () => keystone.getProjects(),
-  createFn: async data => {
+  createFn: async (data) => {
     return keystone.createTenant(data)
   },
-  updateFn: async data => {
+  updateFn: async (data) => {
     const { id } = data
     return keystone.updateTenant(id, data)
   },
   deleteFn: async ({ id }) => {
     await keystone.deleteTenant(id)
-  }
+  },
 })
 
 export default tenantActions

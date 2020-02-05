@@ -7,7 +7,7 @@ import { objSwitchCase } from 'utils/fp'
 
 const stepIconsSize = 20
 
-const useStyles = makeStyles<Theme>(theme => ({
+const useStyles = makeStyles<Theme>((theme) => ({
   title: {
     display: 'flex',
     alignItems: 'center',
@@ -50,7 +50,7 @@ interface StepProps {
   onClick: MouseEventHandler
 }
 
-const useStepStyles = makeStyles<Theme, StepProps>(theme => ({
+const useStepStyles = makeStyles<Theme, StepProps>((theme) => ({
   root: {
     display: 'flex',
     alignItems: 'center',
@@ -64,16 +64,15 @@ const useStepStyles = makeStyles<Theme, StepProps>(theme => ({
     textAlign: 'center',
     borderStyle: 'solid',
     borderWidth: 1,
-    borderColor: ({ active, completed }) => active || completed
-      ? 'transparent' : theme.palette.primary.contrastText,
-    backgroundColor: ({ active, completed }) => active || completed
-      ? '#FAD291' : 'inherit',
-    color: ({ active }) => active ? '#F5A623' : theme.palette.primary.contrastText,
-    cursor: ({ completed }) => completed ? 'pointer' : 'default',
+    borderColor: ({ active, completed }) =>
+      active || completed ? 'transparent' : theme.palette.primary.contrastText,
+    backgroundColor: ({ active, completed }) => (active || completed ? '#FAD291' : 'inherit'),
+    color: ({ active }) => (active ? '#F5A623' : theme.palette.primary.contrastText),
+    cursor: ({ completed }) => (completed ? 'pointer' : 'default'),
   },
 }))
 
-const BannerStep: FC<StepProps> = props => {
+const BannerStep: FC<StepProps> = (props) => {
   const classes = useStepStyles(props)
   const { step, onClick } = props
   return (
@@ -93,7 +92,7 @@ interface OnboardingBannerProps {
   inProgressText: string[]
 }
 
-const BaseOnboardingBanner: FC<OnboardingBannerProps> = props => {
+const BaseOnboardingBanner: FC<OnboardingBannerProps> = (props) => {
   const classes = useStyles(props)
   const {
     title = 'Welcome to Platform9',
@@ -106,37 +105,44 @@ const BaseOnboardingBanner: FC<OnboardingBannerProps> = props => {
   } = props
   const numSteps = stepsContent.length
   const steps = range(1, numSteps + 1)
-  const handleStepClick = useCallback(step => {
-    if (step <= activeStep) {
-      onStepClick(step)
-    }
-  }, [activeStep])
-  const renderContent: (currentState: string) => React.ReactNode = objSwitchCase({
-    default: stepsContent[activeStep],
-    offCourse: offCourseContent[activeStep],
-  }, null)
+  const handleStepClick = useCallback(
+    (step) => {
+      if (step <= activeStep) {
+        onStepClick(step)
+      }
+    },
+    [activeStep],
+  )
+  const renderContent: (currentState: string) => React.ReactNode = objSwitchCase(
+    {
+      default: stepsContent[activeStep],
+      offCourse: offCourseContent[activeStep],
+    },
+    null,
+  )
 
-  return <BannerContent>
-    <Typography variant="subtitle2" className={classes.title}>
-      {title}
-    </Typography>
-    <div className={classes.body}>
-      {renderContent(currentState)}
-    </div>
-    {currentState === 'inProgress' && <div className={classes.inProgress}>
-      In Progress: {inProgressText[activeStep]}
-    </div>}
-    <div className={classes.steps}>
-      {steps.map(step => (
-        <BannerStep
-          key={step}
-          onClick={() => handleStepClick(step)}
-          active={activeStep + 1 === step}
-          completed={activeStep + 1 > step}
-          step={step} />
-      ))}
-    </div>
-  </BannerContent>
+  return (
+    <BannerContent>
+      <Typography variant="subtitle2" className={classes.title}>
+        {title}
+      </Typography>
+      <div className={classes.body}>{renderContent(currentState)}</div>
+      {currentState === 'inProgress' && (
+        <div className={classes.inProgress}>In Progress: {inProgressText[activeStep]}</div>
+      )}
+      <div className={classes.steps}>
+        {steps.map((step) => (
+          <BannerStep
+            key={step}
+            onClick={() => handleStepClick(step)}
+            active={activeStep + 1 === step}
+            completed={activeStep + 1 > step}
+            step={step}
+          />
+        ))}
+      </div>
+    </BannerContent>
+  )
 }
 
 export default BaseOnboardingBanner

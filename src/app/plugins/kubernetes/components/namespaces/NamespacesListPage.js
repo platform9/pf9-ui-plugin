@@ -11,7 +11,7 @@ import Tabs from 'core/components/tabs/Tabs'
 import Tab from 'core/components/tabs/Tab'
 
 const defaultParams = {
-  masterNodeClusters: true
+  masterNodeClusters: true,
 }
 const usePrefParams = createUsePrefParamsHook('Namespaces', listTablePrefs)
 
@@ -20,10 +20,7 @@ const canDeleteNameSpace = ([namespace]) => namespace.status !== 'Terminating'
 const ListPage = ({ ListContainer }) => {
   return () => {
     const { params, getParamsUpdater } = usePrefParams(defaultParams)
-    const [namespaces, loading, reload] = useDataLoader(
-      namespaceActions.list,
-      params
-    )
+    const [namespaces, loading, reload] = useDataLoader(namespaceActions.list, params)
     return (
       <PageContainer>
         <Tabs>
@@ -63,7 +60,7 @@ export const options = {
   deleteCond: canDeleteNameSpace,
   name: 'Namespaces',
   title: 'Namespaces',
-  ListPage
+  ListPage,
 }
 
 const components = createCRUDComponents(options)

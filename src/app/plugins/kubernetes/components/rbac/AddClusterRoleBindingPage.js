@@ -15,20 +15,20 @@ import FormWrapper from 'core/components/FormWrapper'
 
 const defaultParams = {
   users: [],
-  groups: []
+  groups: [],
 }
 export const AddClusterRoleBindingForm = () => {
   const { params, getParamsUpdater } = useParams(defaultParams)
   const { history } = useReactRouter()
-  const onComplete = success => success && history.push('/ui/kubernetes/rbac#clusterRoleBindings')
-  const [createClusterRoleBindingAction] = useDataUpdater(clusterRoleBindingActions.create, onComplete)
-  const handleSubmit = params => data => createClusterRoleBindingAction({ ...data, ...params })
+  const onComplete = (success) => success && history.push('/ui/kubernetes/rbac#clusterRoleBindings')
+  const [createClusterRoleBindingAction] = useDataUpdater(
+    clusterRoleBindingActions.create,
+    onComplete,
+  )
+  const handleSubmit = (params) => (data) => createClusterRoleBindingAction({ ...data, ...params })
 
   return (
-    <FormWrapper
-      title="Add Cluster Role Binding"
-      backUrl='/ui/kubernetes/rbac#clusterRoleBindings'
-    >
+    <FormWrapper title="Add Cluster Role Binding" backUrl="/ui/kubernetes/rbac#clusterRoleBindings">
       <ValidatedForm onSubmit={handleSubmit(params)}>
         <TextField id="name" label="Name" required />
         <PicklistField

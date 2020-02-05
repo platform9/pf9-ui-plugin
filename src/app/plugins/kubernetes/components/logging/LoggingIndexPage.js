@@ -7,7 +7,9 @@ import PageContainer from 'core/components/pageContainer/PageContainer'
 const LoggingIndexPage = () => (
   <PageContainer>
     <Tabs>
-      <Tab value="logging" label="Logging"><LoggingListPage /></Tab>
+      <Tab value="logging" label="Logging">
+        <LoggingListPage />
+      </Tab>
     </Tabs>
   </PageContainer>
 )

@@ -10,11 +10,11 @@ export interface IApiData {
 type IResetPassword = ({ secret, username, password }: IApiData) => Promise<any>
 
 class Clemency extends ApiService {
-  endpoint (): string {
+  endpoint(): string {
     return config.apiHost
   }
 
-  get baseUrl (): string {
+  get baseUrl(): string {
     return `${this.endpoint()}/clemency`
   }
 

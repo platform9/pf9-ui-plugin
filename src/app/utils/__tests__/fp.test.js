@@ -33,15 +33,15 @@ describe('functional programming utils', () => {
   })
 
   it('compose', () => {
-    const sq = x => x * x
-    const half = x => x / 2
+    const sq = (x) => x * x
+    const half = (x) => x / 2
     const value = compose(half, sq)(4)
     expect(value).toEqual(8)
   })
 
   it('pipe', () => {
-    const sq = x => x * x
-    const half = x => x / 2
+    const sq = (x) => x * x
+    const half = (x) => x / 2
     const value = pipe(sq, half)(4)
     expect(value).toEqual(8)
   })
@@ -88,7 +88,7 @@ describe('functional programming utils', () => {
 
   it('condLiteral', () => {
     const arr = [1, 3, 5, 7, 14, 15]
-    const divisibleBy = n1 => n2 => n2 % n1 === 0
+    const divisibleBy = (n1) => (n2) => n2 % n1 === 0
 
     // without catch all
     const fn = condLiteral(
@@ -104,7 +104,7 @@ describe('functional programming utils', () => {
       [divisibleBy(3), 'three'],
       [divisibleBy(5), 'five'],
       [divisibleBy(7), 'seven'],
-      [T, 'unknown']
+      [T, 'unknown'],
     )
     const result2 = arr.map(fn2)
     expect(result2).toEqual(['unknown', 'three', 'five', 'seven', 'seven', 'three'])
@@ -132,8 +132,8 @@ describe('functional programming utils', () => {
       { id: 1, name: 'foo' },
       { id: 2, name: 'bar' },
     ]
-    const findById = id => propEq('id', id)
-    const updateFn = obj => ({ ...obj, name: 'changed' })
+    const findById = (id) => propEq('id', id)
+    const updateFn = (obj) => ({ ...obj, name: 'changed' })
 
     const updatedItems = updateInArray(findById(2), updateFn, items)
     expect(updatedItems).toEqual([
@@ -145,17 +145,13 @@ describe('functional programming utils', () => {
   it('applyJsonPatch', () => {
     const original = {
       spec: {
-        groups: [
-          { rules: [{ name: 'changeMe' }] }
-        ]
-      }
+        groups: [{ rules: [{ name: 'changeMe' }] }],
+      },
     }
     const expected = {
       spec: {
-        groups: [
-          { rules: [{ name: 'I have been changed' }] }
-        ]
-      }
+        groups: [{ rules: [{ name: 'I have been changed' }] }],
+      },
     }
     const patch = {
       op: 'replace',

@@ -6,7 +6,7 @@ import ZoomInIcon from '@material-ui/icons/ZoomIn'
 import React from 'react'
 import SimpleLink from 'core/components/SimpleLink'
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   card: {
     display: 'flex',
   },
@@ -80,12 +80,7 @@ const AppCard = ({
   clusterId,
   onDeploy,
   onDownload,
-  application: {
-    id,
-    logoUrl,
-    name,
-    description,
-  },
+  application: { id, logoUrl, name, description },
 }) => {
   const classes = useStyles()
   const detailUrl = `/ui/kubernetes/apps/${clusterId}/${id}`
@@ -94,20 +89,14 @@ const AppCard = ({
       <Card className={classes.card}>
         <div className={classes.header}>
           <CardMedia className={classes.icon} image={logoUrl} title={name} />
-          <Button
-            variant="outlined"
-            color="primary"
-            onClick={onDeploy}
-          >
+          <Button variant="outlined" color="primary" onClick={onDeploy}>
             Deploy
           </Button>
         </div>
         <div className={classes.details}>
           <CardContent className={classes.content}>
             <SimpleLink src={detailUrl}>
-              <Typography variant="subtitle1">
-                {name}
-              </Typography>
+              <Typography variant="subtitle1">{name}</Typography>
             </SimpleLink>
             <Typography variant="body2" className={classes.text}>
               {description}

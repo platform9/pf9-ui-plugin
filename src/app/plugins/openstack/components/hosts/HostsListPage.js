@@ -11,11 +11,10 @@ const loadHosts = createContextLoader('hosts', async () => {
   return ApiClient.getInstance().nova.getHypervisors()
 })
 
-const HostsListPage = () =>
+const HostsListPage = () => (
   <DataLoader loaders={{ hosts: loadHosts }}>
     {({ data }) => <HostsListContainer hosts={data.hosts} />}
   </DataLoader>
+)
 
-export default compose(
-  requiresAuthentication,
-)(HostsListPage)
+export default compose(requiresAuthentication)(HostsListPage)

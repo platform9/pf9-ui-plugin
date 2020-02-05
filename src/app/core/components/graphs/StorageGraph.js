@@ -2,17 +2,17 @@ import React from 'react'
 import { withStyles } from '@material-ui/styles'
 import SvgArc from './SemiCircleGraph'
 
-const styles = theme => ({
+const styles = (theme) => ({
   svg: {
     'max-height': '100%',
-    position: 'absolute'
-  }
+    position: 'absolute',
+  },
 })
 
 @withStyles(styles)
 class StorageGraph extends React.PureComponent {
   state = {
-    hover: false
+    hover: false,
   }
 
   mouseEnterUpdate = () => {
@@ -27,7 +27,7 @@ class StorageGraph extends React.PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { classes } = this.props
     const { hover } = this.state
     // Placeholder value

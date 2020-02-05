@@ -2,8 +2,8 @@ import React, { useContext } from 'react'
 import { AppContext } from 'core/providers/AppProvider'
 
 // Wraps a component class to make it require authentication.
-const requiresAuthentication = WrappedComponent => {
-  return props => {
+const requiresAuthentication = (WrappedComponent) => {
+  return (props) => {
     const { session } = useContext(AppContext)
     const isAuthenticated = session && !!session.username
 

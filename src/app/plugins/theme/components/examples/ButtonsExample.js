@@ -37,8 +37,12 @@ const ButtonsExample = ({ expanded = false }) => (
     <hr />
 
     <Button variant="contained">Default</Button>
-    <Button variant="contained" color="primary">Primary</Button>
-    <Button variant="contained" color="secondary">Secondary</Button>
+    <Button variant="contained" color="primary">
+      Primary
+    </Button>
+    <Button variant="contained" color="secondary">
+      Secondary
+    </Button>
 
     <CustomizeExpander>
       <ColorPicker path="palette.grey.300" />
@@ -50,11 +54,14 @@ const ButtonsExample = ({ expanded = false }) => (
       <br />
       <br />
 
-      <ExternalLink url="https://material-ui.com/components/buttons/" newWindow>Material-UI Docs</ExternalLink>
+      <ExternalLink url="https://material-ui.com/components/buttons/" newWindow>
+        Material-UI Docs
+      </ExternalLink>
       <br />
-      <ExternalLink url="https://material-ui.com/api/button/" newWindow>Material-UI API</ExternalLink>
+      <ExternalLink url="https://material-ui.com/api/button/" newWindow>
+        Material-UI API
+      </ExternalLink>
     </CustomizeExpander>
-
   </Panel>
 )
 

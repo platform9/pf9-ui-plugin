@@ -3,14 +3,14 @@ import Button from '@material-ui/core/Button'
 import Icon from '@material-ui/core/Icon'
 import { withStyles } from '@material-ui/styles'
 
-const styles = theme => ({
+const styles = (theme) => ({
   baseButton: {
     margin: theme.spacing(1),
     borderRadius: 2,
     textTransform: 'none',
   },
   rightIcon: {
-    marginLeft: theme.spacing(1)
+    marginLeft: theme.spacing(1),
   },
 })
 

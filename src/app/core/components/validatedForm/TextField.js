@@ -17,23 +17,31 @@ const styles = () => ({
 })
 
 class TextField extends PureComponent {
-  handleChange = e => {
+  handleChange = (e) => {
     const { onChange, type } = this.props
     // HTML specs says that <input type="number"> return strings but it's more useful if we
     // convert it to a `Number` to reduce type casting all over the place.
     const strVal = e.target.value
-    const value =
-      type && type.toLowerCase() === 'number' && strVal !== ''
-        ? Number(strVal)
-        : strVal
+    const value = type && type.toLowerCase() === 'number' && strVal !== '' ? Number(strVal) : strVal
 
     if (onChange) {
       onChange(value)
     }
   }
 
-  render () {
-    const { value, label, classes, hasError, errorMessage, required, updateFieldValue, getCurrentValue, variant, ...restProps } = this.props
+  render() {
+    const {
+      value,
+      label,
+      classes,
+      hasError,
+      errorMessage,
+      required,
+      updateFieldValue,
+      getCurrentValue,
+      variant,
+      ...restProps
+    } = this.props
     return (
       <BaseTextField
         {...restProps}

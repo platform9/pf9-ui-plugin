@@ -9,10 +9,10 @@ const networkActions = createCRUDActions(networksCacheKey, {
   listFn: async () => {
     return neutron.getNetworks()
   },
-  createFn: async data => {
+  createFn: async (data) => {
     return neutron.createNetwork(data)
   },
-  updateFn: async data => {
+  updateFn: async (data) => {
     const { id } = data
     return neutron.updateNetwork(id, data)
   },

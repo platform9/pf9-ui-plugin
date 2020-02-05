@@ -34,14 +34,17 @@ const storageClassActions = createCRUDActions(storageClassesCacheKey, {
   },
   dataMapper: async (items, params, loadFromContext) => {
     const clusters = await loadFromContext(clustersCacheKey, params)
-    return map(storageClass => ({
-      ...storageClass,
-      id: pathStr('metadata.uid', storageClass),
-      name: pathStr('metadata.name', storageClass),
-      clusterName: pipe(find(propEq('uuid', storageClass.clusterId)), prop('name'))(clusters),
-      type: pathStr('parameters.type', storageClass),
-      created: pathStr('metadata.creationTimestamp', storageClass),
-    }), items)
+    return map(
+      (storageClass) => ({
+        ...storageClass,
+        id: pathStr('metadata.uid', storageClass),
+        name: pathStr('metadata.name', storageClass),
+        clusterName: pipe(find(propEq('uuid', storageClass.clusterId)), prop('name'))(clusters),
+        type: pathStr('parameters.type', storageClass),
+        created: pathStr('metadata.creationTimestamp', storageClass),
+      }),
+      items,
+    )
   },
   uniqueIdentifier: 'metadata.uid',
   indexBy: 'clusterId',

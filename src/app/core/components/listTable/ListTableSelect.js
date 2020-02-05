@@ -4,10 +4,10 @@ import { withStyles } from '@material-ui/styles'
 import { Grid, Paper, Radio, Table, TableBody, TableCell, TableRow } from '@material-ui/core'
 import ListTableHead from './ListTableHead'
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     width: '100%',
-    marginTop: theme.spacing(3)
+    marginTop: theme.spacing(3),
   },
   table: {
     minWidth: 800,
@@ -20,29 +20,35 @@ const styles = theme => ({
 class ListTableSelect extends React.PureComponent {
   state = { selected: this.props.initialValue }
 
-  handleClick = row => event => {
+  handleClick = (row) => (event) => {
     const { onChange } = this.props
     this.setState({ selected: row })
     onChange && onChange(row)
   }
 
-  isSelected = row => this.state.selected === row
+  isSelected = (row) => this.state.selected === row
 
   renderCell = (columnDef, contents) => {
     const { cellProps = {} } = columnDef
     let _contents = contents
 
-    if (typeof contents === 'boolean') { _contents = String(_contents) }
+    if (typeof contents === 'boolean') {
+      _contents = String(_contents)
+    }
 
     // Allow for customized rendering in the columnDef
-    if (columnDef.render) { _contents = columnDef.render(contents) }
+    if (columnDef.render) {
+      _contents = columnDef.render(contents)
+    }
 
     return (
-      <TableCell key={columnDef.id} {...cellProps}>{_contents}</TableCell>
+      <TableCell key={columnDef.id} {...cellProps}>
+        {_contents}
+      </TableCell>
     )
   }
 
-  renderRow = row => {
+  renderRow = (row) => {
     const { columns } = this.props
     const isSelected = this.isSelected(row)
 
@@ -51,14 +57,12 @@ class ListTableSelect extends React.PureComponent {
         <TableCell padding="checkbox">
           <Radio checked={isSelected} color="primary" />
         </TableCell>
-        {columns.map((columnDef, colIdx) =>
-          this.renderCell(columnDef, row[columnDef.id]))
-        }
+        {columns.map((columnDef, colIdx) => this.renderCell(columnDef, row[columnDef.id]))}
       </TableRow>
     )
   }
 
-  render () {
+  render() {
     const { classes, columns, data } = this.props
 
     if (!data) {
@@ -71,13 +75,8 @@ class ListTableSelect extends React.PureComponent {
           <Paper className={classes.root}>
             <div className={classes.tableWrapper}>
               <Table className={classes.table}>
-                <ListTableHead
-                  columns={columns}
-                  blankFirstColumn
-                />
-                <TableBody>
-                  {data.map(this.renderRow)}
-                </TableBody>
+                <ListTableHead columns={columns} blankFirstColumn />
+                <TableBody>{data.map(this.renderRow)}</TableBody>
               </Table>
             </div>
           </Paper>

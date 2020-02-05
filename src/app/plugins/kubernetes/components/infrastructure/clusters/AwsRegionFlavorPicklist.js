@@ -12,8 +12,7 @@ const blackListedFlavors = ['micro', 'nano', 'small']
 const isBlackListedFlavor = (flavor) => !blackListedFlavors.some((name) => flavor.includes(name))
 
 const AwsRegionFlavorPicklist = forwardRef(
-  ({ cloudProviderId, cloudProviderRegionId, hasError, errorMessage, ...rest }, ref
-  ) => {
+  ({ cloudProviderId, cloudProviderRegionId, hasError, errorMessage, ...rest }, ref) => {
     const [details, loading] = useDataLoader(loadCloudProviderRegionDetails, {
       cloudProviderId,
       cloudProviderRegionId,

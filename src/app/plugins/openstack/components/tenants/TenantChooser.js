@@ -11,7 +11,7 @@ import { dataCacheKey, paramsCacheKey } from 'core/helpers/createContextLoader'
 import { loadUserTenants } from 'openstack/components/tenants/actions'
 import { getStorage, setStorage } from 'core/utils/pf9Storage'
 
-const TenantChooser = props => {
+const TenantChooser = (props) => {
   const { keystone } = ApiClient.getInstance()
   const { updatePrefs } = useScopedPreferences('Tenants')
   const [tenantSearch, setTenantSearch] = useState('')
@@ -21,12 +21,14 @@ const TenantChooser = props => {
   const [tooltipOpen, setTooltipOpen] = useState(false)
   const [tenants, loadingTenants] = useDataLoader(loadUserTenants)
 
-  const updateCurrentTenant = async tenantName => {
+  const updateCurrentTenant = async (tenantName) => {
     setLoading(true)
     setCurrentTenantName(tenantName)
 
-    const tenant = tenants.find(x => x.name === tenantName)
-    if (!tenant) { return }
+    const tenant = tenants.find((x) => x.name === tenantName)
+    if (!tenant) {
+      return
+    }
 
     const { user, role, scopedToken } = await keystone.changeProjectScope(tenant.id)
     // Update localStorage scopedToken upon changing project scope
@@ -35,38 +37,39 @@ const TenantChooser = props => {
 
     // Clear any data that should change when the user changes tenant.
     // The data will then be reloaded when it is needed.
-    await setContext(pipe(
-      // Reset all the data cache
-      assoc(dataCacheKey, emptyArr),
-      assoc(paramsCacheKey, emptyArr),
-      // Changing the currentTenant will cause all the current active `useDataLoader`
-      // hooks to reload its data
-      assoc('currentTenant', tenant),
-      assoc('userDetails', { ...user, role }),
-    ))
+    await setContext(
+      pipe(
+        // Reset all the data cache
+        assoc(dataCacheKey, emptyArr),
+        assoc(paramsCacheKey, emptyArr),
+        // Changing the currentTenant will cause all the current active `useDataLoader`
+        // hooks to reload its data
+        assoc('currentTenant', tenant),
+        assoc('userDetails', { ...user, role }),
+      ),
+    )
     setLoading(false)
   }
 
-  const handleChoose = useCallback(async lastTenant => {
-    const fullTenantObj = tenants.find(propEq('name', lastTenant))
-    updatePrefs({ lastTenant: fullTenantObj })
-    await updateCurrentTenant(lastTenant)
-  }, [tenants])
+  const handleChoose = useCallback(
+    async (lastTenant) => {
+      const fullTenantObj = tenants.find(propEq('name', lastTenant))
+      updatePrefs({ lastTenant: fullTenantObj })
+      await updateCurrentTenant(lastTenant)
+    },
+    [tenants],
+  )
 
   const tenantNames = useMemo(() => {
-    const isUserTenant = x => x.description !== 'Heat stack user project'
-    return (tenants || []).filter(isUserTenant).map(x => x.name)
+    const isUserTenant = (x) => x.description !== 'Heat stack user project'
+    return (tenants || []).filter(isUserTenant).map((x) => x.name)
   }, [tenants])
 
   const handleTooltipClose = useCallback(() => setTooltipOpen(false))
   const handleTooltipOpen = useCallback(() => setTooltipOpen(true))
 
   return (
-    <Tooltip
-      open={tooltipOpen}
-      title="Tenant"
-      placement="bottom"
-    >
+    <Tooltip open={tooltipOpen} title="Tenant" placement="bottom">
       <Selector
         loading={loading || loadingTenants}
         onMouseEnter={handleTooltipOpen}
@@ -78,7 +81,7 @@ const TenantChooser = props => {
         onChoose={handleChoose}
         onSearchChange={setTenantSearch}
         searchTerm={tenantSearch}
-        type='Tenant'
+        type="Tenant"
       />
     </Tooltip>
   )

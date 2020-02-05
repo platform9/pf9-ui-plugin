@@ -4,7 +4,7 @@ import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import TextField from 'core/components/validatedForm/TextField'
 import KeyValuesField from 'core/components/validatedForm/KeyValuesField'
 
-const UpdateVolumeSnapshotForm = ({ volumeSnapshot, onSubmit }) =>
+const UpdateVolumeSnapshotForm = ({ volumeSnapshot, onSubmit }) => (
   <ValidatedForm
     initialValues={volumeSnapshot}
     backUrl="/ui/openstack/storage#volumeSnapshots"
@@ -15,5 +15,6 @@ const UpdateVolumeSnapshotForm = ({ volumeSnapshot, onSubmit }) =>
     <KeyValuesField id="metadata" label="Metadata" />
     <SubmitButton>Update Volume Snapshot</SubmitButton>
   </ValidatedForm>
+)
 
 export default UpdateVolumeSnapshotForm
