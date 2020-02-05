@@ -5,7 +5,9 @@ import { FormControl, FormControlLabel, FormHelperText } from '@material-ui/core
 import { withStyles } from '@material-ui/styles'
 import { withInfoTooltip } from 'app/core/components/InfoTooltip'
 import { compose } from 'app/utils/fp'
-import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
+import withFormContext, {
+  ValidatedFormInputPropTypes,
+} from 'core/components/validatedForm/withFormContext'
 
 const styles = (theme) => ({
   formControl: {
