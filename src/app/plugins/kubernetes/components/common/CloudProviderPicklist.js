@@ -10,19 +10,15 @@ import { cloudProviderActions } from 'k8s/components/infrastructure/cloudProvide
 const CloudProviderPicklist = forwardRef(({ type, ...rest }, ref) => {
   const [cloudProviders, loading] = useDataLoader(cloudProviderActions.list)
   const options = useMemo(
-    () => projectAs(
-      { value: 'uuid', label: 'name' },
-      cloudProviders.filter(type ? propEq('type', type) : identity)
-    ),
-    [cloudProviders]
+    () =>
+      projectAs(
+        { value: 'uuid', label: 'name' },
+        cloudProviders.filter(type ? propEq('type', type) : identity),
+      ),
+    [cloudProviders],
   )
 
-  return <Picklist
-    {...rest}
-    ref={ref}
-    loading={loading}
-    options={options}
-  />
+  return <Picklist {...rest} ref={ref} loading={loading} options={options} />
 })
 
 CloudProviderPicklist.propTypes = {

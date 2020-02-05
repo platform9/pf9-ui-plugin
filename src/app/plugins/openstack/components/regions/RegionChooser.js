@@ -13,12 +13,15 @@ import { appUrlRoot } from 'app/constants'
 
 const currentSectionRegex = new RegExp(`^${appUrlRoot}/[^/]+/?[^/]*`, 'i')
 
-const RegionChooser = props => {
+const RegionChooser = (props) => {
   const { keystone, setActiveRegion } = ApiClient.getInstance()
   const { history, location } = useReactRouter()
   const { pathname, hash = '' } = location
   const [tooltipOpen, setTooltipOpen] = useState(false)
-  const { prefs: { lastRegion }, updatePrefs } = useScopedPreferences('RegionChooser')
+  const {
+    prefs: { lastRegion },
+    updatePrefs,
+  } = useScopedPreferences('RegionChooser')
   const [loading, setLoading] = useState(false)
   const [regionSearch, setSearchText] = useState('')
   const [regions, loadingRegions] = useDataLoader(regionActions.list)
@@ -34,23 +37,26 @@ const RegionChooser = props => {
     return pipe(head, prop('id'))(regions)
   }, [regions, lastRegion, selectedRegion])
 
-  const handleRegionSelect = useCallback(async region => {
-    const [currentSection = appUrlRoot] = currentSectionRegex.exec(pathname + hash) || []
-    setLoading(true)
-    setRegion(region)
-    setActiveRegion(region)
-    await keystone.resetCookie()
-    invalidateLoadersCache()
+  const handleRegionSelect = useCallback(
+    async (region) => {
+      const [currentSection = appUrlRoot] = currentSectionRegex.exec(pathname + hash) || []
+      setLoading(true)
+      setRegion(region)
+      setActiveRegion(region)
+      await keystone.resetCookie()
+      invalidateLoadersCache()
 
-    // Changing the Region will cause all the current active `useDataLoader`
-    // hooks to reload its data
-    setContext(assoc('currentRegion', region))
+      // Changing the Region will cause all the current active `useDataLoader`
+      // hooks to reload its data
+      setContext(assoc('currentRegion', region))
 
-    // Redirect to the root of the current section (there's no need to reload all the app)
-    history.push(currentSection)
+      // Redirect to the root of the current section (there's no need to reload all the app)
+      history.push(currentSection)
 
-    setLoading(false)
-  }, [regions, pathname, hash])
+      setLoading(false)
+    },
+    [regions, pathname, hash],
+  )
 
   const handleTooltipClose = useCallback(() => setTooltipOpen(false))
   const handleTooltipOpen = useCallback(() => setTooltipOpen(true))
@@ -58,17 +64,15 @@ const RegionChooser = props => {
   const regionNames = useMemo(() => pluck('id', regions), [regions])
 
   useEffect(() => {
-    if (!curRegionId || !regions.length) { return }
+    if (!curRegionId || !regions.length) {
+      return
+    }
     const lastRegion = regions.find(propEq('id', curRegionId))
     updatePrefs({ lastRegion })
   }, [curRegionId, regions])
 
   return (
-    <Tooltip
-      open={tooltipOpen}
-      title="Region"
-      placement="bottom"
-    >
+    <Tooltip open={tooltipOpen} title="Region" placement="bottom">
       <Selector
         loading={loading || loadingRegions}
         onMouseEnter={handleTooltipOpen}
@@ -80,7 +84,7 @@ const RegionChooser = props => {
         onChoose={handleRegionSelect}
         onSearchChange={setSearchText}
         searchTerm={regionSearch}
-        type='Region'
+        type="Region"
       />
     </Tooltip>
   )

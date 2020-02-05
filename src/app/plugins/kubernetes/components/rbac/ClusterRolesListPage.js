@@ -9,7 +9,7 @@ import { pick } from 'ramda'
 
 const defaultParams = {
   masterNodeClusters: true,
-  clusterId: null
+  clusterId: null,
 }
 const usePrefParams = createUsePrefParamsHook('ClusterRoles', listTablePrefs)
 
@@ -17,18 +17,22 @@ const ListPage = ({ ListContainer }) => {
   return () => {
     const { params, getParamsUpdater } = usePrefParams(defaultParams)
     const [data, loading, reload] = useDataLoader(clusterRoleActions.list, params)
-    return <ListContainer
-      loading={loading}
-      reload={reload}
-      data={data}
-      getParamsUpdater={getParamsUpdater}
-      filters={<ClusterPicklist
-        onChange={getParamsUpdater('clusterId')}
-        value={params.clusterId}
-        onlyMasterNodeClusters
-      />}
-      {...pick(listTablePrefs, params)}
-    />
+    return (
+      <ListContainer
+        loading={loading}
+        reload={reload}
+        data={data}
+        getParamsUpdater={getParamsUpdater}
+        filters={
+          <ClusterPicklist
+            onChange={getParamsUpdater('clusterId')}
+            value={params.clusterId}
+            onlyMasterNodeClusters
+          />
+        }
+        {...pick(listTablePrefs, params)}
+      />
+    )
   }
 }
 
@@ -43,9 +47,8 @@ export const options = {
   cacheKey: clusterRolesCacheKey,
   deleteFn: clusterRoleActions.delete,
   editUrl: '/ui/kubernetes/rbac/clusterroles/edit',
-  customEditUrlFn: (item, itemId) => (
-    `/ui/kubernetes/rbac/clusterroles/edit/${itemId}/cluster/${item.clusterId}`
-  ),
+  customEditUrlFn: (item, itemId) =>
+    `/ui/kubernetes/rbac/clusterroles/edit/${itemId}/cluster/${item.clusterId}`,
   name: 'Cluster Roles',
   title: 'Cluster Roles',
   ListPage,

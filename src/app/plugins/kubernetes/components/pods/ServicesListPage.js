@@ -20,56 +20,77 @@ const ListPage = ({ ListContainer }) => {
   return () => {
     const { params, updateParams, getParamsUpdater } = usePrefParams(defaultParams)
     const [data, loading, reload] = useDataLoader(serviceActions.list, params)
-    const updateClusterId = useCallback(clusterId => {
+    const updateClusterId = useCallback((clusterId) => {
       updateParams({
         clusterId,
         namespace: allKey,
       })
     }, [])
-    return <ListContainer
-      loading={loading}
-      reload={reload}
-      data={data}
-      getParamsUpdater={getParamsUpdater}
-      filters={<>
-        <ClusterPicklist
-          onChange={updateClusterId}
-          value={params.clusterId}
-          onlyMasterNodeClusters
-        />
-        <NamespacePicklist
-          selectFirst={false}
-          onChange={getParamsUpdater('namespace')}
-          value={params.namespace}
-          clusterId={params.clusterId}
-          disabled={!params.clusterId}
-        />
-      </>}
-      {...pick(listTablePrefs, params)}
-    />
+    return (
+      <ListContainer
+        loading={loading}
+        reload={reload}
+        data={data}
+        getParamsUpdater={getParamsUpdater}
+        filters={
+          <>
+            <ClusterPicklist
+              onChange={updateClusterId}
+              value={params.clusterId}
+              onlyMasterNodeClusters
+            />
+            <NamespacePicklist
+              selectFirst={false}
+              onChange={getParamsUpdater('namespace')}
+              value={params.namespace}
+              clusterId={params.clusterId}
+              disabled={!params.clusterId}
+            />
+          </>
+        }
+        {...pick(listTablePrefs, params)}
+      />
+    )
   }
 }
 
 const renderName = (name, { dashboardUrl }) => {
-  return <span>
-    {name}<br />
-    <ExternalLink url={dashboardUrl}>dashboard
-      <FontAwesomeIcon size="sm">file-alt</FontAwesomeIcon></ExternalLink>
-  </span>
+  return (
+    <span>
+      {name}
+      <br />
+      <ExternalLink url={dashboardUrl}>
+        dashboard
+        <FontAwesomeIcon size="sm">file-alt</FontAwesomeIcon>
+      </ExternalLink>
+    </span>
+  )
 }
 const successColor = {
   color: '#4ADF74',
 }
-const renderStatus = status => {
-  return status === 'OK'
-    ? <span><i style={successColor} className="fa-fw fa-lg fa-sm fa-check fal" />&nbsp;OK</span>
-    : <span><i className="fa-fw fa-lg fa-sm fa-spin fa-spinner fal" />&nbsp;Pending</span>
+const renderStatus = (status) => {
+  return status === 'OK' ? (
+    <span>
+      <i style={successColor} className="fa-fw fa-lg fa-sm fa-check fal" />
+      &nbsp;OK
+    </span>
+  ) : (
+    <span>
+      <i className="fa-fw fa-lg fa-sm fa-spin fa-spinner fal" />
+      &nbsp;Pending
+    </span>
+  )
 }
 
-const renderEndpoints = endpoints => {
-  return <>
-    {endpoints.map((endpoint, i) => <div key={i}>{endpoint}</div>)}
-  </>
+const renderEndpoints = (endpoints) => {
+  return (
+    <>
+      {endpoints.map((endpoint, i) => (
+        <div key={i}>{endpoint}</div>
+      ))}
+    </>
+  )
 }
 
 export const options = {

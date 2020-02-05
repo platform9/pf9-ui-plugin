@@ -11,12 +11,12 @@ const { qbert } = ApiClient.getInstance()
 export const namespacesCacheKey = 'namespaces'
 
 const findClusterName = (clusters, clusterId) => {
-  const cluster = clusters.find(x => x.uuid === clusterId)
+  const cluster = clusters.find((x) => x.uuid === clusterId)
   return (cluster && cluster.name) || ''
 }
 const namespacesMapper = async (items, params, loadFromContext) => {
   const clusters = await loadFromContext(clustersCacheKey)
-  return items.map(ns => ({
+  return items.map((ns) => ({
     ...ns,
     clusterName: findClusterName(clusters, ns.clusterId),
     status: pathOr('N/A', ['status', 'phase'], ns)
@@ -36,12 +36,12 @@ const namespaceActions = createCRUDActions(namespacesCacheKey, {
     return qbert.createNamespace(clusterId, body)
   },
   deleteFn: async ({ id }, currentItems) => {
-    const { clusterId, name } = currentItems.find(ns => ns.id === id)
+    const { clusterId, name } = currentItems.find((ns) => ns.id === id)
     await qbert.deleteNamespace(clusterId, name)
   },
   uniqueIdentifier: 'id',
   indexBy: 'clusterId',
-  dataMapper: namespacesMapper
+  dataMapper: namespacesMapper,
 })
 
 export default namespaceActions

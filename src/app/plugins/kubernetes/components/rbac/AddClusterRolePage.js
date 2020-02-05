@@ -26,12 +26,14 @@ export const AddClusterRoleForm = ({ onComplete }) => {
         value={params.clusterId}
         required
       />
-      { params.clusterId && <RbacChecklist
-        id="rbac"
-        clusterId={params.clusterId}
-        onChange={getParamsUpdater('rbac')}
-        value={params.rbac}
-      /> }
+      {params.clusterId && (
+        <RbacChecklist
+          id="rbac"
+          clusterId={params.clusterId}
+          onChange={getParamsUpdater('rbac')}
+          value={params.rbac}
+        />
+      )}
       <SubmitButton>Add Cluster Role</SubmitButton>
     </ValidatedForm>
   )

@@ -28,10 +28,10 @@ const usePrefParams = createUsePrefParamsHook('AppCatalog', listTablePrefs)
 
 const AppCatalogPage = () => {
   const { params, updateParams, getParamsUpdater } = usePrefParams(defaultParams)
-  const updateClusterId = useCallback(clusterId => {
+  const updateClusterId = useCallback((clusterId) => {
     updateParams({
       clusterId,
-      repositoryId: allKey
+      repositoryId: allKey,
     })
   }, [])
   const [showingDeployDialog, setShowingDeployDialog] = useState(false)
@@ -39,57 +39,69 @@ const AppCatalogPage = () => {
   const [activeApp, setActiveApp] = useState()
   const [apps, loading, reload] = useDataLoader(appActions.list, params)
   const handleRefresh = useCallback(() => reload(true), [reload])
-  const handleDeploy = useCallback(moize(app => () => {
-    setActiveApp(app)
-    setShowingDeployDialog(true)
-  }), [])
-  const handleDownload = useCallback(moize(app => () => {
-    setActiveApp(app)
-    setShowingDownloadDialog(true)
-  }), [])
+  const handleDeploy = useCallback(
+    moize((app) => () => {
+      setActiveApp(app)
+      setShowingDeployDialog(true)
+    }),
+    [],
+  )
+  const handleDownload = useCallback(
+    moize((app) => () => {
+      setActiveApp(app)
+      setShowingDownloadDialog(true)
+    }),
+    [],
+  )
   const renderCardItems = useCallback(
-    item =>
+    (item) => (
       <AppCard
         key={item.id}
         application={item}
         onDeploy={handleDeploy(item)}
         onDownload={handleDownload(item)}
-        clusterId={params.clusterId} />,
-    [params.clusterId])
+        clusterId={params.clusterId}
+      />
+    ),
+    [params.clusterId],
+  )
 
-  return <>
-    {showingDeployDialog &&
-    <AppDeployDialog
-      app={activeApp}
-      onClose={() => setShowingDeployDialog(false)} />}
-    {showingDownloadDialog &&
-    <AppDownloadDialog
-      app={activeApp}
-      onClose={() => setShowingDownloadDialog(false)} />}
-    <CardTable
-      loading={loading}
-      onRefresh={handleRefresh}
-      data={apps}
-      sorting={sortingConfig}
-      orderBy={params.orderBy}
-      orderDirection={params.orderDirection}
-      onSortChange={getParamsUpdater('orderBy', 'orderDirection')}
-      searchTarget="name"
-      filters={<>
-        <ClusterPicklist
-          showAll={false}
-          onlyAppCatalogEnabled
-          onChange={updateClusterId}
-          value={params.clusterId} />
-        <RepositoryPicklist
-          onChange={getParamsUpdater('repositoryId')}
-          value={params.repositoryId}
-        />
-      </>}
-    >
-      {renderCardItems}
-    </CardTable>
-  </>
+  return (
+    <>
+      {showingDeployDialog && (
+        <AppDeployDialog app={activeApp} onClose={() => setShowingDeployDialog(false)} />
+      )}
+      {showingDownloadDialog && (
+        <AppDownloadDialog app={activeApp} onClose={() => setShowingDownloadDialog(false)} />
+      )}
+      <CardTable
+        loading={loading}
+        onRefresh={handleRefresh}
+        data={apps}
+        sorting={sortingConfig}
+        orderBy={params.orderBy}
+        orderDirection={params.orderDirection}
+        onSortChange={getParamsUpdater('orderBy', 'orderDirection')}
+        searchTarget="name"
+        filters={
+          <>
+            <ClusterPicklist
+              showAll={false}
+              onlyAppCatalogEnabled
+              onChange={updateClusterId}
+              value={params.clusterId}
+            />
+            <RepositoryPicklist
+              onChange={getParamsUpdater('repositoryId')}
+              value={params.repositoryId}
+            />
+          </>
+        }
+      >
+        {renderCardItems}
+      </CardTable>
+    </>
+  )
 }
 
 export default AppCatalogPage

@@ -28,38 +28,42 @@ const createListTableComponent = ({
     updatePreferences,
     loading,
     onSortChange,
-  }) => (!data || data.length === 0
-    ? typeof emptyText === 'string' ? <h1>{emptyText}</h1> : emptyText
-    : <ListTable
-      title={title}
-      columns={columns}
-      data={data}
-      onAdd={onAdd}
-      onDelete={onDelete}
-      onEdit={onEdit}
-      rowActions={rowActions}
-      paginate={paginate}
-      showCheckboxes={showCheckboxes}
-      searchTarget={searchTarget}
-      visibleColumns={visibleColumns}
-      columnsOrder={columnsOrder}
-      rowsPerPage={rowsPerPage}
-      onReload={onReload}
-      onRefresh={onRefresh}
-      onRowsPerPageChange={rowsPerPage => updatePreferences({ rowsPerPage })}
-      onColumnsChange={updatePreferences}
-      onSortChange={onSortChange}
-      uniqueIdentifier={uniqueIdentifier}
-      loading={loading}
-      compactTable={compactTable}
-    />)
+  }) =>
+    !data || data.length === 0 ? (
+      typeof emptyText === 'string' ? (
+        <h1>{emptyText}</h1>
+      ) : (
+        emptyText
+      )
+    ) : (
+      <ListTable
+        title={title}
+        columns={columns}
+        data={data}
+        onAdd={onAdd}
+        onDelete={onDelete}
+        onEdit={onEdit}
+        rowActions={rowActions}
+        paginate={paginate}
+        showCheckboxes={showCheckboxes}
+        searchTarget={searchTarget}
+        visibleColumns={visibleColumns}
+        columnsOrder={columnsOrder}
+        rowsPerPage={rowsPerPage}
+        onReload={onReload}
+        onRefresh={onRefresh}
+        onRowsPerPageChange={(rowsPerPage) => updatePreferences({ rowsPerPage })}
+        onColumnsChange={updatePreferences}
+        onSortChange={onSortChange}
+        uniqueIdentifier={uniqueIdentifier}
+        loading={loading}
+        compactTable={compactTable}
+      />
+    )
 
   CustomListTable.displayName = displayName
 
-  return compose(
-    withRouter,
-    withScopedPreferences(name)
-  )(CustomListTable)
+  return compose(withRouter, withScopedPreferences(name))(CustomListTable)
 }
 
 export default createListTableComponent

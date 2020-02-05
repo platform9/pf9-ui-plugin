@@ -23,7 +23,7 @@ const defaultConfig = {
 
 let serverInstance
 
-export function startServer (config = defaultConfig) {
+export function startServer(config = defaultConfig) {
   console.log('Starting simulator server.')
   const app = express()
 
@@ -56,7 +56,7 @@ export function startServer (config = defaultConfig) {
   serverInstance = http.createServer(app).listen(config.port)
 }
 
-export function stopServer () {
+export function stopServer() {
   if (serverInstance) {
     console.log('Stopping simulator server.')
     return serverInstance.close()

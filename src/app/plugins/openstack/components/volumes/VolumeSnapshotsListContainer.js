@@ -28,16 +28,17 @@ export const VolumeSnapshotsList = createListTableComponent({
 })
 
 class VolumeSnapshotsListContainer extends React.PureComponent {
-  handleRemove = async id => {
+  handleRemove = async (id) => {
     const { getContext, setContext } = this.props
     // TODO: use createContextUpdater
     await ApiClient.getInstance().cinder.deleteSnapshot(id)
-    const newVolumeSnapshots = (await loadVolumeSnapshots({ getContext, setContext }))
-      .filter(x => x.id !== id)
+    const newVolumeSnapshots = (await loadVolumeSnapshots({ getContext, setContext })).filter(
+      (x) => x.id !== id,
+    )
     setContext(assocPath([dataCacheKey, 'volumeSnapshots'], newVolumeSnapshots))
   }
 
-  render () {
+  render() {
     const { volumeSnapshots } = this.props
     return (
       <CRUDListContainer
@@ -45,7 +46,7 @@ class VolumeSnapshotsListContainer extends React.PureComponent {
         editUrl="/ui/openstack/storage/volumeSnapshots/edit"
         onRemove={this.handleRemove}
       >
-        {handlers => <VolumeSnapshotsList data={volumeSnapshots} {...handlers} />}
+        {(handlers) => <VolumeSnapshotsList data={volumeSnapshots} {...handlers} />}
       </CRUDListContainer>
     )
   }
@@ -55,6 +56,4 @@ VolumeSnapshotsListContainer.propTypes = {
   volumeSnapshots: PropTypes.arrayOf(PropTypes.object),
 }
 
-export default compose(
-  withAppContext,
-)(VolumeSnapshotsListContainer)
+export default compose(withAppContext)(VolumeSnapshotsListContainer)

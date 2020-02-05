@@ -14,17 +14,18 @@ import { routes } from 'core/utils/routes'
 const useStyles = makeStyles<Theme>((theme) => ({
   container: {
     maxWidth: 800,
-  }
+  },
 }))
 interface Props {
   onComplete: () => void
   initialPanel?: number
 }
 
-export const podSetupComplete = (pods: any[]) => !!pods.length || !!localStorage.getItem(onboardingPodSetup)
+export const podSetupComplete = (pods: any[]) =>
+  !!pods.length || !!localStorage.getItem(onboardingPodSetup)
 
 enum Panels {
-  CreatePod = 0
+  CreatePod = 0,
 }
 
 const PodSetup = ({ onComplete, initialPanel }: Props) => {
@@ -40,7 +41,9 @@ const PodSetup = ({ onComplete, initialPanel }: Props) => {
     onComplete()
   }, [])
 
-  const [activePanels, setActivePanels] = useState(new Set(initialPanel !== undefined ? [initialPanel] : []))
+  const [activePanels, setActivePanels] = useState(
+    new Set(initialPanel !== undefined ? [initialPanel] : []),
+  )
   const [pods, loadingPods] = useDataLoader(podActions.list)
   const hasPods = podSetupComplete(pods)
 

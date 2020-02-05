@@ -37,12 +37,14 @@ export const AddRoleForm = ({ onComplete }) => {
         value={params.namespace}
         required
       />
-      { params.clusterId && <RbacChecklist
-        id="rbac"
-        clusterId={params.clusterId}
-        onChange={getParamsUpdater('rbac')}
-        value={params.rbac}
-      /> }
+      {params.clusterId && (
+        <RbacChecklist
+          id="rbac"
+          clusterId={params.clusterId}
+          onChange={getParamsUpdater('rbac')}
+          value={params.rbac}
+        />
+      )}
       <SubmitButton>Add Role</SubmitButton>
     </ValidatedForm>
   )

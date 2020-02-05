@@ -44,10 +44,7 @@ const OnboardWizard: FC<Props> = ({ title, body, children, renderLinks = true })
           <SimpleLink src={routes.userManagement.users.path()} icon="user-plus">
             Invite Team Member
           </SimpleLink>
-          <ExternalLink
-            url={bareOSSetupDocumentationLink}
-            icon="file-alt"
-          >
+          <ExternalLink url={bareOSSetupDocumentationLink} icon="file-alt">
             Setup Documentation
           </ExternalLink>
         </div>

@@ -11,7 +11,7 @@ import clsx from 'clsx'
 
 // This is being called 'Base' because it is standalone and does not
 // integrate with ValidatedForm.
-@withStyles(theme => ({
+@withStyles((theme) => ({
   dropdownButton: { cursor: 'pointer' },
 
   // Unfortunately the `anchorEl` system in Material-UI is extremely
@@ -38,7 +38,7 @@ class AutocompleteBase extends PureComponent {
       return suggestions
     }
     const r = new RegExp(value)
-    const matched = (suggestions || []).filter(x => r.test(x))
+    const matched = (suggestions || []).filter((x) => r.test(x))
     return matched
   }
 
@@ -48,8 +48,10 @@ class AutocompleteBase extends PureComponent {
     }
   }
 
-  handleChange = event => {
-    if (!event || !event.target) { return }
+  handleChange = (event) => {
+    if (!event || !event.target) {
+      return
+    }
     const value = event.target.value
     this.setState({ value, open: true }, this.propogateChange)
   }
@@ -59,7 +61,7 @@ class AutocompleteBase extends PureComponent {
   // and deleting the suggestions when then makes it behave as if the suggestion
   // was never clicked.  `onBlur` does not happen until `onMouseUp` so this seems
   // to work.  Not sure about tap events.
-  handleClick = item => () => {
+  handleClick = (item) => () => {
     this.setState({ value: item, open: false }, this.propogateChange)
   }
 
@@ -68,30 +70,41 @@ class AutocompleteBase extends PureComponent {
   }
 
   toggleOpen = () => {
-    this.setState(state => ({ open: !state.open }))
+    this.setState((state) => ({ open: !state.open }))
   }
 
-  renderSuggestions = suggestions => {
+  renderSuggestions = (suggestions) => {
     const { open } = this.state
     const { classes } = this.props
-    if (!open || !suggestions || suggestions.length === 0) { return null }
+    if (!open || !suggestions || suggestions.length === 0) {
+      return null
+    }
     return (
       <Paper className={`${classes.container} ${classes.absolute}`}>
-        <MenuList
-          open
-          className={classes.container}>
-          {suggestions.map(item => (
-            <MenuItem key={item} onMouseDown={this.handleClick(item)}>{item}</MenuItem>
+        <MenuList open className={classes.container}>
+          {suggestions.map((item) => (
+            <MenuItem key={item} onMouseDown={this.handleClick(item)}>
+              {item}
+            </MenuItem>
           ))}
         </MenuList>
       </Paper>
     )
   }
 
-  render () {
+  render() {
     const matched = this.matchedSuggestions()
     const { value } = this.state
-    const { className, classes, suggestions, onChange, initialValue, label, id, ...other } = this.props
+    const {
+      className,
+      classes,
+      suggestions,
+      onChange,
+      initialValue,
+      label,
+      id,
+      ...other
+    } = this.props
     const DropdownIcon = <ArrowDropDownIcon className={classes.dropdownButton} />
 
     return (

@@ -31,18 +31,14 @@ const createCRUDActions = (cacheKey, options) => {
   const {
     service,
     entity = cacheKey,
-    createFn = async data => service
-      ? apiClient[service][entity].create(data)
-      : throwErr('create'),
-    listFn = async params => service
-      ? apiClient[service][entity].list(params)
-      : throwErr('list'),
-    updateFn = async ({ [uniqueIdentifier]: id, ...data }) => service
-      ? apiClient[service][entity].update(id, data)
-      : throwErr('update'),
-    deleteFn = async ({ [uniqueIdentifier]: id }) => service
-      ? apiClient[service][entity].delete(id)
-      : throwErr('delete'),
+    createFn = async (data) =>
+      service ? apiClient[service][entity].create(data) : throwErr('create'),
+    listFn = async (params) =>
+      service ? apiClient[service][entity].list(params) : throwErr('list'),
+    updateFn = async ({ [uniqueIdentifier]: id, ...data }) =>
+      service ? apiClient[service][entity].update(id, data) : throwErr('update'),
+    deleteFn = async ({ [uniqueIdentifier]: id }) =>
+      service ? apiClient[service][entity].delete(id) : throwErr('delete'),
     customOperations = {},
     uniqueIdentifier = defaultUniqueIdentifier,
     ...rest
@@ -53,19 +49,23 @@ const createCRUDActions = (cacheKey, options) => {
     ...rest,
   })
 
-  const throwErr = operation => () => {
-    throw new Error(`"service" option for operation "${operation}" and entity "${entity}" not defined`)
+  const throwErr = (operation) => () => {
+    throw new Error(
+      `"service" option for operation "${operation}" and entity "${entity}" not defined`,
+    )
   }
 
   return {
     // Custom operations
-    ...mapObjIndexed((customOperationFn, operation) =>
-      createContextUpdater(cacheKey, customOperationFn, {
-        uniqueIdentifier,
-        operation,
-        ...rest,
-      }),
-    customOperations),
+    ...mapObjIndexed(
+      (customOperationFn, operation) =>
+        createContextUpdater(cacheKey, customOperationFn, {
+          uniqueIdentifier,
+          operation,
+          ...rest,
+        }),
+      customOperations,
+    ),
 
     list: contextLoader,
 

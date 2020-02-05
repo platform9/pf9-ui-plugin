@@ -13,10 +13,7 @@ import {
 } from 'ramda'
 import { rawNodesCacheKey } from 'k8s/components/infrastructure/nodes/actions'
 import {
-  getMasterNodesHealthStatus,
-  getWorkerNodesHealthStatus,
-  getConnectionStatus,
-  getHealthStatus,
+  getMasterNodesHealthStatus, getWorkerNodesHealthStatus, getConnectionStatus, getHealthStatus,
 } from './ClusterStatusUtils'
 import { trackEvent } from 'utils/tracking'
 
@@ -26,7 +23,7 @@ const trackClusterCreation = (params) => {
   trackEvent('WZ New Cluster Finished', params)
 }
 
-const getProgressPercent = async clusterId => {
+const getProgressPercent = async (clusterId) => {
   try {
     const { progressPercent } = await qbert.getClusterDetails(clusterId)
     return progressPercent
@@ -35,7 +32,7 @@ const getProgressPercent = async clusterId => {
     return null
   }
 }
-const getKubernetesVersion = async clusterId => {
+const getKubernetesVersion = async (clusterId) => {
   try {
     const version = await qbert.getKubernetesVersion(clusterId)
     return version && version.gitVersion && version.gitVersion.substr(1)
@@ -45,22 +42,25 @@ const getKubernetesVersion = async clusterId => {
   }
 }
 
-const getEtcdBackupPayload = (data) => (
-  data.etcdBackup ? {
-    isEtcdBackupEnabled: 1,
-    storageType: 'local',
-    storageProperties: {
-      localPath: data.etcdStoragePath,
-    },
-    intervalInMins: data.etcdBackupInterval,
-  } : {
-    isEtcdBackupEnabled: 0,
-  }
-)
+const getEtcdBackupPayload = (data) =>
+  data.etcdBackup
+    ? {
+      isEtcdBackupEnabled: 1,
+      storageType: 'local',
+      storageProperties: {
+        localPath: data.etcdStoragePath,
+      },
+      intervalInMins: data.etcdBackupInterval,
+    }
+    : {
+      isEtcdBackupEnabled: 0,
+    }
 
 export const hasMasterNode = propSatisfies(isTruthy, 'hasMasterNode')
 export const hasHealthyMasterNodes = propSatisfies(
-  healthyMasterNodes => healthyMasterNodes.length > 0, 'healthyMasterNodes')
+  (healthyMasterNodes) => healthyMasterNodes.length > 0,
+  'healthyMasterNodes',
+)
 export const masterlessCluster = propSatisfies(isTruthy, 'masterless')
 export const hasPrometheusEnabled = compose(castFuzzyBool, path(['tags', 'pf9-system:monitoring']))
 export const hasAppCatalogEnabled = propSatisfies(isTruthy, 'appCatalogEnabled')
@@ -71,10 +71,20 @@ const createAwsCluster = async (data, loadFromContext) => {
     // basic info
     ...pick('name region azs ami sshKey'.split(' '), data),
     // cluster configuration
-    ...pick('masterFlavor workerFlavor numMasters enableCAS numWorkers allowWorkloadsOnMaster numSpotWorkers spotPrice'.split(' '), data),
+    ...pick(
+      'masterFlavor workerFlavor numMasters enableCAS numWorkers allowWorkloadsOnMaster numSpotWorkers spotPrice'.split(
+        ' ',
+      ),
+      data,
+    ),
 
     // network info
-    ...pick('vpc isPrivate privateSubnets subnets internalElb serviceFqdn containersCidr servicesCidr networkPlugin'.split(' '), data),
+    ...pick(
+      'vpc isPrivate privateSubnets subnets internalElb serviceFqdn containersCidr servicesCidr networkPlugin'.split(
+        ' ',
+      ),
+      data,
+    ),
 
     // advanced configuration
     ...pick('privileged appCatalogEnabled customAmi'.split(' '), data),
@@ -92,8 +102,12 @@ const createAwsCluster = async (data, loadFromContext) => {
   body.domainId = usePf9Domain ? '/hostedzone/Z2LZB5ZNQY6JC2' : domainId
 
   // Set other fields based on what the user chose for 'networkOptions'
-  if (['newPublicPrivate', 'existingPublicPrivate', 'existingPrivate'].includes(data.network)) { body.isPrivate = true }
-  if (data.network === 'existingPrivate') { body.internalElb = true }
+  if (['newPublicPrivate', 'existingPublicPrivate', 'existingPrivate'].includes(data.network)) {
+    body.isPrivate = true
+  }
+  if (data.network === 'existingPrivate') {
+    body.internalElb = true
+  }
 
   const cluster = createGenericCluster(body, data, loadFromContext)
 
@@ -115,13 +129,20 @@ const createAzureCluster = async (data, loadFromContext) => {
     ...pick('masterSku workerSku numMasters numWorkers allowWorkloadsOnMaster'.split(' '), data),
 
     // network info
-    ...pick('assignPublicIps vnetResourceGroup vnetName masterSubnetName workerSubnetName externalDnsName serviceFqdn containersCidr servicesCidr networkPlugin'.split(' '), data),
+    ...pick(
+      'assignPublicIps vnetResourceGroup vnetName masterSubnetName workerSubnetName externalDnsName serviceFqdn containersCidr servicesCidr networkPlugin'.split(
+        ' ',
+      ),
+      data,
+    ),
 
     // advanced configuration
     ...pick('privileged appCatalogEnabled'.split(' '), data),
   }
 
-  if (data.useAllAvailabilityZones) { body.zones = [] }
+  if (data.useAllAvailabilityZones) {
+    body.zones = []
+  }
 
   const cluster = createGenericCluster(body, data, loadFromContext)
 
@@ -158,7 +179,7 @@ const createBareOSCluster = async (data = {}, loadFromContext) => {
 
   // 1. Get the nodePoolUuid from the nodePools API and look for the pool with name 'defaultPool'
   const nodePools = await qbert.getNodePools()
-  body.nodePoolUuid = nodePools.find(x => x.name === 'defaultPool').uuid
+  body.nodePoolUuid = nodePools.find((x) => x.name === 'defaultPool').uuid
 
   // 2. Create the cluster
   const cluster = await createGenericCluster(body, data, loadFromContext)
@@ -172,8 +193,8 @@ const createBareOSCluster = async (data = {}, loadFromContext) => {
   // 3. Attach the nodes
   const { masterNodes, workerNodes = [] } = data
   const nodes = [
-    ...masterNodes.map(uuid => ({ isMaster: true, uuid })),
-    ...workerNodes.map(uuid => ({ isMaster: false, uuid })),
+    ...masterNodes.map((uuid) => ({ isMaster: true, uuid })),
+    ...workerNodes.map((uuid) => ({ isMaster: false, uuid })),
   ]
 
   await qbert.attach(cluster.uuid, nodes)
@@ -190,8 +211,12 @@ const createGenericCluster = async (body, data, loadFromContext) => {
     body.nodePoolUuid = cloudProviders.find(propEq('uuid', cloudProviderId)).nodePoolUuid
   }
 
-  if (data.httpProxy) { body.httpProxy = data.httpProxy }
-  if (data.networkPlugin === 'calico') { body.mtuSize = data.mtuSize }
+  if (data.httpProxy) {
+    body.httpProxy = data.httpProxy
+  }
+  if (data.networkPlugin === 'calico') {
+    body.mtuSize = data.mtuSize
+  }
   body.runtimeConfig = {
     default: '',
     all: 'api/all=true',
@@ -220,10 +245,10 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
       qbert.getClusters(),
       qbert.baseUrl(),
     ])
-    return mapAsync(async cluster => {
-      const nodesInCluster = rawNodes.filter(node => node.clusterUuid === cluster.uuid)
+    return mapAsync(async (cluster) => {
+      const nodesInCluster = rawNodes.filter((node) => node.clusterUuid === cluster.uuid)
       const nodeIds = pluck('uuid', nodesInCluster)
-      const combinedNodes = combinedHosts.filter(x => nodeIds.includes(x.resmgr.id))
+      const combinedNodes = combinedHosts.filter((x) => nodeIds.includes(x.resmgr.id))
       const calcNodesTotals = calcUsageTotals(combinedNodes)
       const dashboardLink = `${qbertEndpoint}/clusters/${cluster.uuid}/k8sapi/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:443/proxy/`
       const host = qbertEndpoint.match(/(.*?)\/qbert/)[1]
@@ -234,14 +259,18 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
         disk: calcNodesTotals('usage.disk.current', 'usage.disk.max'),
         grafanaLink: hasPrometheusEnabled(cluster) ? grafanaLink : null,
       }
-      const isMasterNode = node => node.isMaster === 1
+      const isMasterNode = (node) => node.isMaster === 1
       const [masterNodes, workerNodes] = partition(isMasterNode, nodesInCluster)
-      const healthyMasterNodes = masterNodes.filter(node => node.status === 'ok')
-      const healthyWorkerNodes = workerNodes.filter(node => node.status === 'ok')
+      const healthyMasterNodes = masterNodes.filter((node) => node.status === 'ok')
+      const healthyWorkerNodes = workerNodes.filter((node) => node.status === 'ok')
       const masterNodesHealthStatus = getMasterNodesHealthStatus(masterNodes, healthyMasterNodes)
       const workerNodesHealthStatus = getWorkerNodesHealthStatus(workerNodes, healthyWorkerNodes)
       const connectionStatus = getConnectionStatus(cluster.taskStatus, nodesInCluster)
-      const healthStatus = getHealthStatus(connectionStatus, masterNodesHealthStatus, workerNodesHealthStatus)
+      const healthStatus = getHealthStatus(
+        connectionStatus,
+        masterNodesHealthStatus,
+        workerNodesHealthStatus,
+      )
       const hasMasterNode = healthyMasterNodes.length > 0
       const clusterOk = nodesInCluster.length > 0 && cluster.status === 'ok'
       const fuzzyBools = ['allowWorkloadsOnMaster', 'privileged', 'appCatalogEnabled'].reduce(
@@ -251,12 +280,9 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
         },
         {},
       )
-      const progressPercent = cluster.taskStatus === 'converging'
-        ? await getProgressPercent(cluster.uuid)
-        : null
-      const version = hasMasterNode
-        ? await getKubernetesVersion(cluster.uuid)
-        : null
+      const progressPercent =
+        cluster.taskStatus === 'converging' ? await getProgressPercent(cluster.uuid) : null
+      const version = hasMasterNode ? await getKubernetesVersion(cluster.uuid) : null
 
       return {
         ...cluster,
@@ -283,15 +309,25 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
         },
         ...fuzzyBools,
         hasVpn: castFuzzyBool(pathOr(false, ['cloudProperties', 'internalElb'], cluster)),
-        hasLoadBalancer: castFuzzyBool(cluster.enableMetallb || pathOr(false, ['cloudProperties', 'enableLbaas'], cluster)),
-        etcdBackupEnabled: castFuzzyBool(pathOr(false, ['etcdBackup', 'isEtcdBackupEnabled'], cluster)),
+        hasLoadBalancer: castFuzzyBool(
+          cluster.enableMetallb || pathOr(false, ['cloudProperties', 'enableLbaas'], cluster),
+        ),
+        etcdBackupEnabled: castFuzzyBool(
+          pathOr(false, ['etcdBackup', 'isEtcdBackupEnabled'], cluster),
+        ),
       }
     }, rawClusters)
   },
   createFn: (params, _, loadFromContext) => {
-    if (params.clusterType === 'aws') { return createAwsCluster(params, loadFromContext) }
-    if (params.clusterType === 'azure') { return createAzureCluster(params, loadFromContext) }
-    if (params.clusterType === 'local') { return createBareOSCluster(params, loadFromContext) }
+    if (params.clusterType === 'aws') {
+      return createAwsCluster(params, loadFromContext)
+    }
+    if (params.clusterType === 'azure') {
+      return createAzureCluster(params, loadFromContext)
+    }
+    if (params.clusterType === 'local') {
+      return createBareOSCluster(params, loadFromContext)
+    }
   },
   updateFn: async ({ uuid, ...params }) => {
     const updateableParams = 'name tags numWorkers numMinWorkers numMaxWorkers'.split(' ')
@@ -325,30 +361,42 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
       await qbert.updateCluster(cluster.uuid, body)
 
       // Update the cluster in the cache
-      return updateWith(propEq('uuid', cluster.uuid), {
-        ...cluster,
-        numWorkers,
-      }, prevItems)
+      return updateWith(
+        propEq('uuid', cluster.uuid),
+        {
+          ...cluster,
+          numWorkers,
+        },
+        prevItems,
+      )
     },
     upgradeCluster: async ({ uuid }, prevItems) => {
       await qbert.upgradeCluster(uuid)
 
       // Update the cluster in the cache
-      return adjustWith(propEq('uuid', uuid), mergeLeft({
-        canUpgrade: false,
-      }), prevItems)
+      return adjustWith(
+        propEq('uuid', uuid),
+        mergeLeft({
+          canUpgrade: false,
+        }),
+        prevItems,
+      )
     },
     updateTag: async ({ cluster, key, val }, prevItems) => {
       const body = {
-        tags: { ...cluster.tags || {}, [key]: val }
+        tags: { ...(cluster.tags || {}), [key]: val },
       }
 
       await qbert.updateCluster(cluster.uuid, body)
 
-      return updateWith(propEq('uuid', cluster.uuid), {
-        ...cluster,
-        ...body,
-      }, prevItems)
+      return updateWith(
+        propEq('uuid', cluster.uuid),
+        {
+          ...cluster,
+          ...body,
+        },
+        prevItems,
+      )
     },
     attachNodes: async ({ cluster, nodes }, prevItems) => {
       await qbert.attach(cluster.uuid, nodes)
@@ -362,15 +410,25 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
     },
   },
   uniqueIdentifier: 'uuid',
-  dataMapper: (items,
-    { masterNodeClusters, masterlessClusters, hasControlPanel, healthyClusters, appCatalogClusters, prometheusClusters }) => pipe(
-    filterIf(masterNodeClusters, hasMasterNode),
-    filterIf(masterlessClusters, masterlessCluster),
-    filterIf(prometheusClusters, hasPrometheusEnabled),
-    filterIf(appCatalogClusters, hasAppCatalogEnabled),
-    filterIf(hasControlPanel, either(hasMasterNode, masterlessCluster)),
-    filterIf(healthyClusters, hasHealthyMasterNodes),
-  )(items),
+  dataMapper: (
+    items,
+    {
+      masterNodeClusters,
+      masterlessClusters,
+      hasControlPanel,
+      healthyClusters,
+      appCatalogClusters,
+      prometheusClusters,
+    },
+  ) =>
+    pipe(
+      filterIf(masterNodeClusters, hasMasterNode),
+      filterIf(masterlessClusters, masterlessCluster),
+      filterIf(prometheusClusters, hasPrometheusEnabled),
+      filterIf(appCatalogClusters, hasAppCatalogEnabled),
+      filterIf(hasControlPanel, either(hasMasterNode, masterlessCluster)),
+      filterIf(healthyClusters, hasHealthyMasterNodes),
+    )(items),
   defaultOrderBy: 'created_at',
   defaultOrderDirection: 'desc',
 })

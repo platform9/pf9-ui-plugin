@@ -7,19 +7,19 @@ import grey from '@material-ui/core/colors/grey'
 import { compose } from 'ramda'
 import ListTableFiltersPopover from 'core/components/listTable/ListTableFilters'
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     outline: 'none',
-    padding: theme.spacing(2)
+    padding: theme.spacing(2),
   },
   clearIcon: {
     '&:hover': {
       color: grey[800],
     },
     '&:active': {
-      color: grey[200]
-    }
-  }
+      color: grey[200],
+    },
+  },
 })
 
 class ListTableFiltersButton extends React.PureComponent {
@@ -30,7 +30,7 @@ class ListTableFiltersButton extends React.PureComponent {
     anchorEl: null,
   }
 
-  handleClick = event => {
+  handleClick = (event) => {
     this.setState({
       open: true,
       anchorEl: event.currentTarget,
@@ -44,60 +44,65 @@ class ListTableFiltersButton extends React.PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { classes, columns, filters, filterValues, onFilterUpdate, onFiltersReset } = this.props
     const { open, anchorEl } = this.state
 
-    return <React.Fragment>
-      <Tooltip title="Filter list">
-        <IconButton
-          className={classes.root}
-          aria-owns={open ? 'simple-popper' : undefined}
-          aria-label="Filter list"
-          aria-haspopup="true"
-          variant="contained"
-          onClick={this.handleClick}>
-          <FilterListIcon />
-        </IconButton>
-      </Tooltip>
-      <Popover
-        open={open}
-        onClose={this.handleClose}
-        anchorEl={anchorEl}
-        ref={this.inputRef}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'center',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'center',
-        }}>
-        <ListTableFiltersPopover
-          columns={columns}
-          filters={filters}
-          filterValues={filterValues}
-          onFilterUpdate={onFilterUpdate}
-          onFiltersReset={onFiltersReset} />
-      </Popover>
-    </React.Fragment>
+    return (
+      <React.Fragment>
+        <Tooltip title="Filter list">
+          <IconButton
+            className={classes.root}
+            aria-owns={open ? 'simple-popper' : undefined}
+            aria-label="Filter list"
+            aria-haspopup="true"
+            variant="contained"
+            onClick={this.handleClick}
+          >
+            <FilterListIcon />
+          </IconButton>
+        </Tooltip>
+        <Popover
+          open={open}
+          onClose={this.handleClose}
+          anchorEl={anchorEl}
+          ref={this.inputRef}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'center',
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'center',
+          }}
+        >
+          <ListTableFiltersPopover
+            columns={columns}
+            filters={filters}
+            filterValues={filterValues}
+            onFilterUpdate={onFilterUpdate}
+            onFiltersReset={onFiltersReset}
+          />
+        </Popover>
+      </React.Fragment>
+    )
   }
 }
 
 ListTableFiltersButton.propTypes = {
-  filters: PropTypes.arrayOf(PropTypes.shape({
-    columnId: PropTypes.string.isRequired,
-    label: PropTypes.string, // Will override column label
-    type: PropTypes.oneOf(['select', 'multiselect', 'checkbox', 'custom']).isRequired,
-    render: PropTypes.func, // Use for rendering a custom component, received props: {value, onChange}
-    filterWith: PropTypes.func, // Custom filtering function, received params: (filterValue, value, row)
-    items: PropTypes.array, // Array of possible values (only when using select/multiselect)
-  })),
+  filters: PropTypes.arrayOf(
+    PropTypes.shape({
+      columnId: PropTypes.string.isRequired,
+      label: PropTypes.string, // Will override column label
+      type: PropTypes.oneOf(['select', 'multiselect', 'checkbox', 'custom']).isRequired,
+      render: PropTypes.func, // Use for rendering a custom component, received props: {value, onChange}
+      filterWith: PropTypes.func, // Custom filtering function, received params: (filterValue, value, row)
+      items: PropTypes.array, // Array of possible values (only when using select/multiselect)
+    }),
+  ),
   filterValues: PropTypes.object,
   onFilterUpdate: PropTypes.func,
   onFiltersReset: PropTypes.func,
 }
 
-export default compose(
-  withStyles(styles)
-)(ListTableFiltersButton)
+export default compose(withStyles(styles))(ListTableFiltersButton)

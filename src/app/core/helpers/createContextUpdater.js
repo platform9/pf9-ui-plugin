@@ -54,7 +54,7 @@ export const getContextUpdater = (key, operation) => {
  * @returns {contextUpdaterFn} Function that once called will update data from the server and
  * the cache
  */
-function createContextUpdater (cacheKey, dataUpdaterFn, options = {}) {
+function createContextUpdater(cacheKey, dataUpdaterFn, options = {}) {
   const {
     uniqueIdentifier = defaultUniqueIdentifier,
     entityName = uncamelizeString(cacheKey).replace(/s$/, ''), // Remove trailing "s"
@@ -77,13 +77,16 @@ function createContextUpdater (cacheKey, dataUpdaterFn, options = {}) {
       )(operation)
       // Display entity ID if available
       const withId = hasPath(head(uniqueIdentifierPaths), params)
-        ? ` with ${head(uniqueIdentifierPaths).join('.')}: ${path(head(uniqueIdentifierPaths), params)}`
+        ? ` with ${head(uniqueIdentifierPaths).join('.')}: ${path(
+            head(uniqueIdentifierPaths),
+            params,
+          )}`
         : ''
       // Specific error handling
-      return switchCase(
-        `Error when trying to ${action} ${entityName}${withId}`,
-        [notFoundErr, `Unable to find ${entityName}${withId} when trying to ${action}`],
-      )(catchedErr.message)
+      return switchCase(`Error when trying to ${action} ${entityName}${withId}`, [
+        notFoundErr,
+        `Unable to find ${entityName}${withId} when trying to ${action}`,
+      ])(catchedErr.message)
     },
   } = options
   const allIndexKeys = indexBy ? ensureArray(indexBy) : emptyArr
@@ -116,72 +119,87 @@ function createContextUpdater (cacheKey, dataUpdaterFn, options = {}) {
    *
    * @param {function} [args.additionalOptions.onError] Custom logic to perfom after error
    */
-  const contextUpdaterFn = memoizePromise(async ({
-    getContext,
-    setContext,
-    params = emptyObj,
-    additionalOptions = emptyObj,
-  }) => {
-    const {
-      onSuccess = (successMessage, params) => console.info(successMessage),
-      onError = (errorMessage, catchedErr, params) => console.error(errorMessage, catchedErr),
-    } = additionalOptions
-    const providedIndexedParams = pipe(
-      pickAll(allIndexKeys),
-      reject(either(isNil, equals(allKey))),
-    )(params)
-    const matchIdentifier = idPath => pathEq(idPath, path(idPath, params))
-    const matchAllIdentifiers = allPass(map(matchIdentifier, uniqueIdentifierPaths))
-    const loader = contextLoader || getContextLoader(cacheKey)
-    if (!loader) {
-      throw new Error(`Context Loader with key ${cacheKey} not found`)
-    }
-    const loaderAdditionalOptions = { onError }
-    const prevItems = await loader({
-      getContext,
-      setContext,
-      params,
-      additionalOptions: loaderAdditionalOptions,
-      dumpCache: true,
-    })
-    const loadFromContext = (key, params = emptyObj, refetch) => {
-      const loaderFn = getContextLoader(key)
-      return loaderFn({ getContext, setContext, params, refetch, additionalOptions: loaderAdditionalOptions })
-    }
-    try {
-      const output = await dataUpdaterFn(params, prevItems, loadFromContext)
-      const operationSwitchCase = switchCase(
-        // If no operation is chosen (ie "any" or a custom operation), just replace the whole array with the new output
-        isNil(output) ? identity : always(output),
-        ['create', append(mergeLeft(providedIndexedParams, output))],
-        ['update', adjustWith(matchAllIdentifiers, mergeLeft(output))],
-        ['delete', removeWith(matchAllIdentifiers)],
-      )
-      await setContext(over(dataLens, operationSwitchCase(operation)))
-
-      if (onSuccess) {
-        const updatedItems = await loader({
+  const contextUpdaterFn = memoizePromise(
+    async ({ getContext, setContext, params = emptyObj, additionalOptions = emptyObj }) => {
+      const {
+        onSuccess = (successMessage, params) => console.info(successMessage),
+        onError = (errorMessage, catchedErr, params) => console.error(errorMessage, catchedErr),
+      } = additionalOptions
+      const providedIndexedParams = pipe(
+        pickAll(allIndexKeys),
+        reject(either(isNil, equals(allKey))),
+      )(params)
+      const matchIdentifier = (idPath) => pathEq(idPath, path(idPath, params))
+      const matchAllIdentifiers = allPass(map(matchIdentifier, uniqueIdentifierPaths))
+      const loader = contextLoader || getContextLoader(cacheKey)
+      if (!loader) {
+        throw new Error(`Context Loader with key ${cacheKey} not found`)
+      }
+      const loaderAdditionalOptions = { onError }
+      const prevItems = await loader({
+        getContext,
+        setContext,
+        params,
+        additionalOptions: loaderAdditionalOptions,
+        dumpCache: true,
+      })
+      const loadFromContext = (key, params = emptyObj, refetch) => {
+        const loaderFn = getContextLoader(key)
+        return loaderFn({
           getContext,
           setContext,
           params,
+          refetch,
           additionalOptions: loaderAdditionalOptions,
         })
-        const parsedSuccessMesssage = ensureFunction(successMessage)(updatedItems, prevItems, params, operation)
-        await onSuccess(parsedSuccessMesssage, params)
       }
-      return [true, output]
-    } catch (err) {
-      if (onError) {
-        const parsedErrorMesssage = ensureFunction(errorMessage)(prevItems, params, err, operation)
-        await onError(parsedErrorMesssage, err, params)
+      try {
+        const output = await dataUpdaterFn(params, prevItems, loadFromContext)
+        const operationSwitchCase = switchCase(
+          // If no operation is chosen (ie "any" or a custom operation), just replace the whole array with the new output
+          isNil(output) ? identity : always(output),
+          ['create', append(mergeLeft(providedIndexedParams, output))],
+          ['update', adjustWith(matchAllIdentifiers, mergeLeft(output))],
+          ['delete', removeWith(matchAllIdentifiers)],
+        )
+        await setContext(over(dataLens, operationSwitchCase(operation)))
+
+        if (onSuccess) {
+          const updatedItems = await loader({
+            getContext,
+            setContext,
+            params,
+            additionalOptions: loaderAdditionalOptions,
+          })
+          const parsedSuccessMesssage = ensureFunction(successMessage)(
+            updatedItems,
+            prevItems,
+            params,
+            operation,
+          )
+          await onSuccess(parsedSuccessMesssage, params)
+        }
+        return [true, output]
+      } catch (err) {
+        if (onError) {
+          const parsedErrorMesssage = ensureFunction(errorMessage)(
+            prevItems,
+            params,
+            err,
+            operation,
+          )
+          await onError(parsedErrorMesssage, err, params)
+        }
+        return [false, null]
       }
-      return [false, null]
-    }
-  })
+    },
+  )
   contextUpdaterFn.getKey = () => cacheKey
 
   if (hasPath([cacheKey, operation], updaters)) {
-    console.warn(`Context Updater function with key ${cacheKey} and operation ${operation} already exists`)
+    console.warn(
+      `Context Updater function with key ${cacheKey} and operation ${operation} already exists`,
+    )
   }
   updaters = assocPath([cacheKey, operation], contextUpdaterFn, updaters)
   return contextUpdaterFn

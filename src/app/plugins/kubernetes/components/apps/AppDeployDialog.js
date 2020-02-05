@@ -14,16 +14,19 @@ export default ({ onClose, app }) => {
   const { history } = useReactRouter()
   const { clusterId, id: chartId, name } = app
   const [release, appId] = chartId.split('/')
-  const [deployApp, deployingApp] = useDataUpdater(appActions.deploy, success => {
+  const [deployApp, deployingApp] = useDataUpdater(appActions.deploy, (success) => {
     onClose()
     if (success) {
       // After deploying, redirect to deployed apps list
       history.push('/ui/kubernetes/apps#deployedApps')
     }
   })
-  const handleSubmit = useCallback(async values => {
-    deployApp({ chartId, clusterId, ...values })
-  }, [chartId])
+  const handleSubmit = useCallback(
+    async (values) => {
+      deployApp({ chartId, clusterId, ...values })
+    },
+    [chartId],
+  )
 
   return (
     <Dialog open onClose={onClose}>
@@ -54,11 +57,7 @@ export default ({ onClose, app }) => {
             <Button variant="contained" onClick={onClose}>
               Cancel
             </Button>
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-            >
+            <Button type="submit" variant="contained" color="primary">
               Deploy
             </Button>
           </DialogActions>

@@ -12,17 +12,17 @@ class MoreMenu extends React.PureComponent {
     openedAction: null,
   }
 
-  handleOpen = e => {
+  handleOpen = (e) => {
     e.stopPropagation()
     this.setState({ anchorEl: e.currentTarget })
   }
 
-  handleClose = e => {
+  handleClose = (e) => {
     e.stopPropagation()
     this.setState({ anchorEl: null })
   }
 
-  handleClick = (action, label) => e => {
+  handleClick = (action, label) => (e) => {
     e.stopPropagation()
     this.handleClose(e)
     action && action(this.props.data, this.props.getContext())
@@ -33,7 +33,7 @@ class MoreMenu extends React.PureComponent {
     this.setState({ openedAction: null }, this.props.onComplete)
   }
 
-  render () {
+  render() {
     const { anchorEl, openedAction } = this.state
     const { data, getContext } = this.props
 
@@ -41,7 +41,11 @@ class MoreMenu extends React.PureComponent {
       <div>
         {this.props.items.map(({ dialog, label }) => {
           const Modal = dialog
-          return openedAction === label && <Modal key={label} onClose={this.handleModalClose} row={this.props.data} />
+          return (
+            openedAction === label && (
+              <Modal key={label} onClose={this.handleModalClose} row={this.props.data} />
+            )
+          )
         })}
         <IconButton
           aria-label="More Actions"
@@ -55,14 +59,18 @@ class MoreMenu extends React.PureComponent {
           anchorEl={anchorEl}
           open={!!anchorEl}
           onClose={this.handleClose}
-          onClick={e => e.stopPropagation()}
+          onClick={(e) => e.stopPropagation()}
         >
-          {this.props.items.map(({ action, cond, icon, label }) =>
-            <MenuItem key={label} onClick={this.handleClick(action, label)} disabled={cond && !cond(data, getContext())}>
+          {this.props.items.map(({ action, cond, icon, label }) => (
+            <MenuItem
+              key={label}
+              onClick={this.handleClick(action, label)}
+              disabled={cond && !cond(data, getContext())}
+            >
               {icon && icon}
               {label}
             </MenuItem>
-          )}
+          ))}
         </Menu>
       </div>
     )
@@ -82,7 +90,7 @@ MoreMenu.propTypes = {
 
       // cond :: fn -> bool
       cond: PropTypes.func,
-    })
+    }),
   ),
 
   /**

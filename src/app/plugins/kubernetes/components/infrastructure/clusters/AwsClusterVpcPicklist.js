@@ -6,36 +6,37 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import Picklist from 'core/components/Picklist'
 import { loadCloudProviderRegionDetails } from 'k8s/components/infrastructure/cloudProviders/actions'
 
-const AwsClusterVpcPicklist = forwardRef(({
-  azs, cloudProviderId, cloudProviderRegionId, hasError, errorMessage, ...rest
-}, ref) => {
-  const [details, loading] = useDataLoader(loadCloudProviderRegionDetails, { cloudProviderId, cloudProviderRegionId })
+const AwsClusterVpcPicklist = forwardRef(
+  ({ azs, cloudProviderId, cloudProviderRegionId, hasError, errorMessage, ...rest }, ref) => {
+    const [details, loading] = useDataLoader(loadCloudProviderRegionDetails, {
+      cloudProviderId,
+      cloudProviderRegionId,
+    })
 
-  const vpcs = pathStrOr([], '0.vpcs', details)
+    const vpcs = pathStrOr([], '0.vpcs', details)
 
-  // Filter out any VPC's that don't have valid subnets for all the AZ's the user previously selected
-  const hasAllAzs = vpc => {
-    const azsInVpc = pathStrOr([], 'Subnets', vpc).map(x => x.AvailabilityZone)
-    return azs.every(az => azsInVpc.includes(az))
-  }
+    // Filter out any VPC's that don't have valid subnets for all the AZ's the user previously selected
+    const hasAllAzs = (vpc) => {
+      const azsInVpc = pathStrOr([], 'Subnets', vpc).map((x) => x.AvailabilityZone)
+      return azs.every((az) => azsInVpc.includes(az))
+    }
 
-  const toOption = vpc => ({ label: `${vpc.VpcName}-${vpc.CidrBlock}`, value: vpc.VpcId })
+    const toOption = (vpc) => ({ label: `${vpc.VpcName}-${vpc.CidrBlock}`, value: vpc.VpcId })
 
-  const options = vpcs
-    .filter(hasAllAzs)
-    .map(toOption)
+    const options = vpcs.filter(hasAllAzs).map(toOption)
 
-  return (
-    <Picklist
-      {...rest}
-      ref={ref}
-      loading={loading}
-      options={options}
-      error={hasError}
-      helperText={errorMessage}
-    />
-  )
-})
+    return (
+      <Picklist
+        {...rest}
+        ref={ref}
+        loading={loading}
+        options={options}
+        error={hasError}
+        helperText={errorMessage}
+      />
+    )
+  },
+)
 
 AwsClusterVpcPicklist.propTypes = {
   id: PropTypes.string.isRequired,

@@ -11,11 +11,14 @@ import { appVersionLoader } from 'k8s/components/apps/actions'
 const AppVersionPicklist = forwardRef(
   ({ clusterId, appId, release, loading, onChange, selectFirst, ...rest }, ref) => {
     const [versions, versionsLoading] = useDataLoader(appVersionLoader, {
-      clusterId, appId, release,
+      clusterId,
+      appId,
+      release,
     })
-    const options = useMemo(() => projectAs(
-      { label: 'versionLabel', value: 'version' }, versions,
-    ), [versions])
+    const options = useMemo(
+      () => projectAs({ label: 'versionLabel', value: 'version' }, versions),
+      [versions],
+    )
 
     // Select the first item as soon as data is loaded
     useEffect(() => {
@@ -24,14 +27,17 @@ const AppVersionPicklist = forwardRef(
       }
     }, [options])
 
-    return <Picklist
-      {...rest}
-      ref={ref}
-      onChange={onChange}
-      loading={loading || versionsLoading}
-      options={options}
-    />
-  })
+    return (
+      <Picklist
+        {...rest}
+        ref={ref}
+        onChange={onChange}
+        loading={loading || versionsLoading}
+        options={options}
+      />
+    )
+  },
+)
 
 AppVersionPicklist.propTypes = {
   ...Picklist.propTypes,

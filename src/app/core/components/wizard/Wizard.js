@@ -16,7 +16,9 @@ class Wizard extends PureComponent {
   lastStep = () => this.state.steps.length - 1
   hasNext = () => this.state.activeStep < this.lastStep() && !this.props.disableNext
   hasBack = () => this.state.activeStep > 0
-  isFinishAndReviewVisible = () => this.state.activeStep < this.state.steps.length - 2 && !this.props.disableNext
+  isFinishAndReviewVisible = () =>
+    this.state.activeStep < this.state.steps.length - 2 && !this.props.disableNext
+
   canBackAtFirstStep = () => this.state.activeStep === 0 && !!this.props.originPath
 
   // Callbacks indexed by step ID to be called before navigating to the next step
@@ -30,12 +32,14 @@ class Wizard extends PureComponent {
     }
   }
 
-  getActiveStepId = ({ steps }, activeStep) => steps[activeStep] ? ({ activeStepId: steps[activeStep].stepId }) : {}
+  getActiveStepId = ({ steps }, activeStep) =>
+    steps[activeStep] ? { activeStepId: steps[activeStep].stepId } : {}
 
-  addStep = newStep => {
-    this.setState(
-      state => ({ steps: [...state.steps, newStep], ...this.getActiveStepId({ steps: [...state.steps, newStep] }, state.activeStep) })
-    )
+  addStep = (newStep) => {
+    this.setState((state) => ({
+      steps: [...state.steps, newStep],
+      ...this.getActiveStepId({ steps: [...state.steps, newStep] }, state.activeStep),
+    }))
   }
 
   handleOriginBack = () => {
@@ -44,9 +48,10 @@ class Wizard extends PureComponent {
   }
 
   handleBack = () => {
-    this.setState(
-      state => ({ activeStep: state.activeStep - 1, ...this.getActiveStepId(state, state.activeStep - 1) })
-    )
+    this.setState((state) => ({
+      activeStep: state.activeStep - 1,
+      ...this.getActiveStepId(state, state.activeStep - 1),
+    }))
   }
 
   onNext = (cb) => {
@@ -62,7 +67,10 @@ class Wizard extends PureComponent {
     }
 
     this.setState(
-      state => ({ activeStep: state.activeStep + 1, ...this.getActiveStepId(state, state.activeStep + 1) }),
+      (state) => ({
+        activeStep: state.activeStep + 1,
+        ...this.getActiveStepId(state, state.activeStep + 1),
+      }),
       () => {
         if (this.isComplete()) {
           onComplete(this.state.wizardContext)
@@ -80,7 +88,10 @@ class Wizard extends PureComponent {
     }
 
     this.setState(
-      state => ({ activeStep: state.steps.length - 1, ...this.getActiveStepId(state, state.steps.length - 1) }),
+      (state) => ({
+        activeStep: state.steps.length - 1,
+        ...this.getActiveStepId(state, state.steps.length - 1),
+      }),
       () => {
         if (this.isComplete()) {
           onComplete(this.state.wizardContext)
@@ -89,10 +100,8 @@ class Wizard extends PureComponent {
     )
   }
 
-  setWizardContext = newValues => {
-    this.setState(
-      state => ({ wizardContext: { ...state.wizardContext, ...newValues } }),
-    )
+  setWizardContext = (newValues) => {
+    this.setState((state) => ({ wizardContext: { ...state.wizardContext, ...newValues } }))
   }
 
   state = {
@@ -106,10 +115,20 @@ class Wizard extends PureComponent {
     setWizardContext: this.setWizardContext,
   }
 
-  render () {
+  render() {
     const { wizardContext, setWizardContext, steps, activeStep } = this.state
-    const { showSteps, children, submitLabel, finishAndReviewLabel, onCancel, showFinishAndReviewButton } = this.props
-    const shouldShowFinishAndReview = typeof showFinishAndReviewButton === 'function' ? showFinishAndReviewButton(wizardContext) : showFinishAndReviewButton
+    const {
+      showSteps,
+      children,
+      submitLabel,
+      finishAndReviewLabel,
+      onCancel,
+      showFinishAndReviewButton,
+    } = this.props
+    const shouldShowFinishAndReview =
+      typeof showFinishAndReviewButton === 'function'
+        ? showFinishAndReviewButton(wizardContext)
+        : showFinishAndReviewButton
     const renderStepsContent = ensureFunction(children)
 
     return (
@@ -122,7 +141,11 @@ class Wizard extends PureComponent {
           {this.canBackAtFirstStep() && <PrevButton onClick={this.handleOriginBack} />}
           {this.hasNext() && <NextButton onClick={this.handleNext}>Next</NextButton>}
           {this.isLastStep() && <NextButton onClick={this.handleNext}>{submitLabel}</NextButton>}
-          {shouldShowFinishAndReview && this.isFinishAndReviewVisible() && <NextButton onClick={this.onFinishAndReview} showForward={false}>{finishAndReviewLabel}</NextButton>}
+          {shouldShowFinishAndReview && this.isFinishAndReviewVisible() && (
+            <NextButton onClick={this.onFinishAndReview} showForward={false}>
+              {finishAndReviewLabel}
+            </NextButton>
+          )}
         </WizardButtons>
       </WizardContext.Provider>
     )
@@ -146,7 +169,7 @@ Wizard.defaultProps = {
   showSteps: true,
   submitLabel: 'Complete',
   finishAndReviewLabel: 'Finish and Review',
-  onComplete: value => {
+  onComplete: (value) => {
     console.info('Wizard#onComplete handler not implemented.  Falling back to console.log')
     console.log(value)
   },

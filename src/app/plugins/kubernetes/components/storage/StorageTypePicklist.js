@@ -11,11 +11,7 @@ const StorageTypePicklist = forwardRef((props, ref) => {
     { label: 'st1', value: 'st1' },
   ]
 
-  return <Picklist
-    {...props}
-    ref={ref}
-    options={options}
-  />
+  return <Picklist {...props} ref={ref} options={options} />
 })
 
 StorageTypePicklist.propTypes = {

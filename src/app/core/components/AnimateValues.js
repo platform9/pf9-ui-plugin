@@ -18,18 +18,15 @@ class AnimateValues extends React.PureComponent {
     }
   }
 
-  calcValues = timePercent => {
+  calcValues = (timePercent) => {
     const { values, method } = this.props
     const percent = this.calcEasing(timePercent, method)
-    return Object.keys(values).reduce(
-      (accum, key) => {
-        const [start, end] = values[key]
-        const delta = end - start
-        accum[key] = delta * percent
-        return accum
-      },
-      {}
-    )
+    return Object.keys(values).reduce((accum, key) => {
+      const [start, end] = values[key]
+      const delta = end - start
+      accum[key] = delta * percent
+      return accum
+    }, {})
   }
 
   state = {
@@ -49,7 +46,7 @@ class AnimateValues extends React.PureComponent {
     this.setState({ elapsed: duration })
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.subscription = requestAnimationFrame(this.tick)
   }
 
@@ -57,7 +54,7 @@ class AnimateValues extends React.PureComponent {
     cancelAnimationFrame(this.subscription)
   }
 
-  render () {
+  render() {
     const { children, duration } = this.props
     const timePercent = this.state.elapsed / duration
     const values = this.calcValues(timePercent)
@@ -95,7 +92,7 @@ AnimateValues.propTypes = {
   children: PropTypes.func.isRequired,
 
   /** The easing method used to interpolate the values */
-  method: PropTypes.oneOf(['linear'])
+  method: PropTypes.oneOf(['linear']),
 }
 
 AnimateValues.defaultProps = {

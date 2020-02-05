@@ -7,7 +7,7 @@ import { Check } from '@material-ui/icons'
 
 const stepIconsSize = 36
 
-const QontoConnector = withStyles(theme => ({
+const QontoConnector = withStyles((theme) => ({
   alternativeLabel: {
     top: 10,
     left: `calc(-50% + ${stepIconsSize}px)`,
@@ -34,7 +34,7 @@ const QontoConnector = withStyles(theme => ({
   },
 }))(StepConnector)
 
-const useQontoStepIconStyles = makeStyles(theme => ({
+const useQontoStepIconStyles = makeStyles((theme) => ({
   root: {
     color: '#EAEAF0',
     display: 'flex',
@@ -54,7 +54,7 @@ const useQontoStepIconStyles = makeStyles(theme => ({
     backgroundColor: theme.palette.wizard.light,
     '&.active': {
       backgroundColor: theme.palette.wizard.dark,
-    }
+    },
   },
   completed: {
     height: stepIconsSize / 2,
@@ -65,7 +65,7 @@ const useQontoStepIconStyles = makeStyles(theme => ({
   },
 }))
 
-function QontoStepIcon (props) {
+function QontoStepIcon(props) {
   const classes = useQontoStepIconStyles()
   const { active, completed, icon } = props
   return (
@@ -86,7 +86,7 @@ QontoStepIcon.propTypes = {
   completed: PropTypes.bool,
 }
 
-const WizzardStepper = ({ activeStep, steps }) =>
+const WizzardStepper = ({ activeStep, steps }) => (
   <Stepper alternativeLabel activeStep={activeStep} connector={<QontoConnector />}>
     {steps.map(({ stepId, label }) => (
       <Step key={stepId}>
@@ -94,5 +94,6 @@ const WizzardStepper = ({ activeStep, steps }) =>
       </Step>
     ))}
   </Stepper>
+)
 
 export default WizzardStepper

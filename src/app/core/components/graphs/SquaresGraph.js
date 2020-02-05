@@ -4,7 +4,7 @@ import { range } from 'ramda'
 import PropTypes from 'prop-types'
 import { Typography } from '@material-ui/core'
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     padding: theme.spacing(1),
     width: ({ width }) => width,
@@ -50,16 +50,20 @@ const SquaresGraph = ({ num, label, ...rest }) => {
   const columns = Math.ceil(num / squaresPerColumn)
   let squareKey = num
 
-  return <div className={classes.root}>
-    <div className={classes.squaresContainer}>
-      {range(0, columns).map(col => <div key={col} className={classes.squareColumn}>
-        {range(0, 5).map(() => squareKey ? <Square key={--squareKey} /> : null)}
-      </div>)}
+  return (
+    <div className={classes.root}>
+      <div className={classes.squaresContainer}>
+        {range(0, columns).map((col) => (
+          <div key={col} className={classes.squareColumn}>
+            {range(0, 5).map(() => (squareKey ? <Square key={--squareKey} /> : null))}
+          </div>
+        ))}
+      </div>
+      <Typography variant="caption" className={classes.label}>
+        {label}
+      </Typography>
     </div>
-    <Typography variant="caption" className={classes.label}>
-      {label}
-    </Typography>
-  </div>
+  )
 }
 
 SquaresGraph.propTypes = {

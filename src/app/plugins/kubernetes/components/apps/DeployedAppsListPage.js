@@ -11,7 +11,7 @@ import { listTablePrefs } from 'app/constants'
 import { pick } from 'ramda'
 import NamespacePicklist from 'k8s/components/common/NamespacePicklist'
 
-const styles = theme => ({
+const styles = (theme) => ({
   icon: {
     width: '100%',
     minWidth: 100,
@@ -21,16 +21,19 @@ const styles = theme => ({
   },
 })
 
-const IconCell = withStyles(styles)(({ classes, ...rest }) =>
-  <CardMedia className={classes.icon} {...rest} />)
+const IconCell = withStyles(styles)(({ classes, ...rest }) => (
+  <CardMedia className={classes.icon} {...rest} />
+))
 
-const renderDeployedAppIcon = (chartIcon, { clusterId, id }) =>
+const renderDeployedAppIcon = (chartIcon, { clusterId, id }) => (
   <SimpleLink src={`/ui/kubernetes/apps/deployed/${clusterId}/${id}`}>
     <IconCell image={chartIcon} title="icon" />
   </SimpleLink>
+)
 
-const renderDeployedAppLink = (name, { clusterId, id }) =>
+const renderDeployedAppLink = (name, { clusterId, id }) => (
   <SimpleLink src={`/ui/kubernetes/apps/deployed/${clusterId}/${id}`}>{name}</SimpleLink>
+)
 
 const defaultParams = {
   masterNodeClusters: true,
@@ -41,27 +44,31 @@ const ListPage = ({ ListContainer }) => {
   return () => {
     const { params, getParamsUpdater } = usePrefParams(defaultParams)
     const [data, loading, reload] = useDataLoader(releaseActions.list, params)
-    return <ListContainer
-      loading={loading}
-      reload={reload}
-      data={data}
-      getParamsUpdater={getParamsUpdater}
-      filters={<>
-        <ClusterPicklist
-          onChange={getParamsUpdater('clusterId')}
-          value={params.clusterId}
-          onlyAppCatalogEnabled
-        />
-        <NamespacePicklist
-          selectFirst={false}
-          onChange={getParamsUpdater('namespace')}
-          value={params.namespace}
-          clusterId={params.clusterId}
-          disabled={!params.clusterId}
-        />
-      </>}
-      {...pick(listTablePrefs, params)}
-    />
+    return (
+      <ListContainer
+        loading={loading}
+        reload={reload}
+        data={data}
+        getParamsUpdater={getParamsUpdater}
+        filters={
+          <>
+            <ClusterPicklist
+              onChange={getParamsUpdater('clusterId')}
+              value={params.clusterId}
+              onlyAppCatalogEnabled
+            />
+            <NamespacePicklist
+              selectFirst={false}
+              onChange={getParamsUpdater('namespace')}
+              value={params.namespace}
+              clusterId={params.clusterId}
+              disabled={!params.clusterId}
+            />
+          </>
+        }
+        {...pick(listTablePrefs, params)}
+      />
+    )
   }
 }
 

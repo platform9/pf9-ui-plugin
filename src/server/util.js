@@ -1,6 +1,6 @@
 import moment from 'moment'
 
-export const range = count => {
+export const range = (count) => {
   const arr = []
   for (let i = 0; i < count; i++) {
     arr.push(i)
@@ -8,4 +8,4 @@ export const range = count => {
   return arr
 }
 
-export const getCurrentTime = (format='YYYY-MM-DDTHH:mm:ss.SSS[Z]') => moment().format(format)
+export const getCurrentTime = (format = 'YYYY-MM-DDTHH:mm:ss.SSS[Z]') => moment().format(format)

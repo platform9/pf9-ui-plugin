@@ -11,14 +11,18 @@ import { roleActions, clusterRoleActions } from './actions'
 const RolePicklist = forwardRef(
   ({ clusterId, loading, onChange, selectFirst, showAllRoleTypes, ...rest }, ref) => {
     const [roles, rolesLoading] = useDataLoader(roleActions.list, { clusterId })
-    const [clusterRoles, clusterRolesLoading] = useDataLoader(clusterRoleActions.list, { clusterId })
+    const [clusterRoles, clusterRolesLoading] = useDataLoader(clusterRoleActions.list, {
+      clusterId,
+    })
 
     const options = useMemo(() => {
       const _roles = projectAs(
-        { label: 'pickerLabel', value: 'pickerValue' }, uniqBy(prop('pickerValue'), roles),
+        { label: 'pickerLabel', value: 'pickerValue' },
+        uniqBy(prop('pickerValue'), roles),
       )
       const _clusterRoles = projectAs(
-        { label: 'pickerLabel', value: 'pickerValue' }, uniqBy(prop('pickerValue'), clusterRoles),
+        { label: 'pickerLabel', value: 'pickerValue' },
+        uniqBy(prop('pickerValue'), clusterRoles),
       )
       return showAllRoleTypes ? [..._roles, ..._clusterRoles] : _clusterRoles
     }, [roles, clusterRoles])
@@ -30,14 +34,17 @@ const RolePicklist = forwardRef(
       }
     }, [options])
 
-    return <Picklist
-      {...rest}
-      ref={ref}
-      onChange={onChange}
-      loading={loading || rolesLoading || clusterRolesLoading}
-      options={options}
-    />
-  })
+    return (
+      <Picklist
+        {...rest}
+        ref={ref}
+        onChange={onChange}
+        loading={loading || rolesLoading || clusterRolesLoading}
+        options={options}
+      />
+    )
+  },
+)
 
 RolePicklist.propTypes = {
   ...Picklist.propTypes,

@@ -25,13 +25,19 @@ const AwsClusterReviewTable = ({ data }) => {
           <DataRow label="Num master nodes" value={data.numMasters} />
           <DataRow label="Num worker nodes" value={numWorkers} />
           <DataRow label="SSH key" value={data.sshKey} />
-          <DataRow label="Make all Master nodes Master + Worker" value={castBoolToStr()(data.allowWorkloadsOnMaster)} />
+          <DataRow
+            label="Make all Master nodes Master + Worker"
+            value={castBoolToStr()(data.allowWorkloadsOnMaster)}
+          />
           <DataRow label="Containers CIDR" value={data.containersCidr} />
           <DataRow label="Services CIDR" value={data.servicesCidr} />
           <DataRow label="Network backend" value={data.networkPlugin} />
           <DataRow label="Privileged" value={castBoolToStr()(data.privileged)} />
           <DataRow label="Application catalog" value={castBoolToStr()(data.appCatalogEnabled)} />
-          <DataRow label="Prometheus monitoring" value={castBoolToStr()(data.prometheusMonitoringEnabled)} />
+          <DataRow
+            label="Prometheus monitoring"
+            value={castBoolToStr()(data.prometheusMonitoringEnabled)}
+          />
           <DataRow label="Tags" value={JSON.stringify(data.tags || [])} />
         </TableBody>
       </Table>

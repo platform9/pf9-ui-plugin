@@ -20,11 +20,7 @@ export const AddUserForm = ({ onComplete }) => (
     <TextField id="username" label="Username" />
     <TextField id="displayname" label="Display Name" />
     <TextField id="password" label="Password" type="password" />
-    <TenantRolesContainer
-      id="rolePair"
-      label="TenantRoleSelectors"
-      roles={roles}
-    />
+    <TenantRolesContainer id="rolePair" label="TenantRoleSelectors" roles={roles} />
     <SubmitButton>Add User</SubmitButton>
   </ValidatedForm>
 )

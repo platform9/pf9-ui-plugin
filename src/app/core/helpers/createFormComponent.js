@@ -5,14 +5,18 @@ import TextField from 'core/components/validatedForm/TextField'
 import Checkbox from 'core/components/validatedForm/CheckboxField'
 
 const createFormComponent = ({ submitLabel, initialValue, displayName, fields }) => {
-  const mapField = spec => {
+  const mapField = (spec) => {
     const props = {
       ...spec,
       key: spec.id,
       type: spec.type || 'string',
     }
-    if (props.type === 'string' || props.type === 'number') { return <TextField {...props} /> }
-    if (props.type === 'boolean') { return <Checkbox {...props} /> }
+    if (props.type === 'string' || props.type === 'number') {
+      return <TextField {...props} />
+    }
+    if (props.type === 'boolean') {
+      return <Checkbox {...props} />
+    }
   }
 
   // We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595

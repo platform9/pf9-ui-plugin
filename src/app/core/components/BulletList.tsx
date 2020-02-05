@@ -24,12 +24,7 @@ export default ({ items = [], type = 'disc', className = undefined }: Props) => 
   return (
     <ul className={clsx(styles.ul, className)}>
       {items.map((item, idx) => (
-        <li key={idx}>
-          { typeof item === 'string'
-            ? <Typography>{item}</Typography>
-            : item
-          }
-        </li>
+        <li key={idx}>{typeof item === 'string' ? <Typography>{item}</Typography> : item}</li>
       ))}
     </ul>
   )

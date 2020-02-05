@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   column: {
     margin: theme.spacing(2, 0),
     display: 'flex',
-    flexDirection: 'column'
+    flexDirection: 'column',
   },
   row: {
     display: 'flex',
@@ -45,7 +45,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     color: theme.palette.primary.main,
   },
 }))
-const installCommand = 'curl -O https://raw.githubusercontent.com/platform9/express-cli/master/cli-setup.sh'
+const installCommand =
+  'curl -O https://raw.githubusercontent.com/platform9/express-cli/master/cli-setup.sh'
 
 // Not super enthused about this. Need to have different content for bareos flow vs landing page.
 export const DownloadCliOnboardNodeWalkthrough = (): JSX.Element => (
@@ -53,8 +54,8 @@ export const DownloadCliOnboardNodeWalkthrough = (): JSX.Element => (
     <Typography variant="h6">Pre-requisites</Typography>
     <p>
       <Typography component="span">
-        You will need a physical or virtual machine with Ubuntu 16.04 installed. (Support for
-        CentOS is coming soon!)
+        You will need a physical or virtual machine with Ubuntu 16.04 installed. (Support for CentOS
+        is coming soon!)
       </Typography>
     </p>
     <DownloadCliWalkthrough />
@@ -66,7 +67,9 @@ const DownloadCliWalkthrough = (): JSX.Element => {
   const { session } = useContext(AppContext)
   return (
     <Paper className={classes.paper} elevation={0}>
-      <Typography variant="h6">Use the PF9 CLI to connect nodes to the Platform9 Management Plane</Typography>
+      <Typography variant="h6">
+        Use the PF9 CLI to connect nodes to the Platform9 Management Plane
+      </Typography>
       <NumberedSteps
         step={1}
         title="Download the CLI"

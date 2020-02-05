@@ -2,7 +2,7 @@ import { flatten, mergeAll, mergeDeepLeft, propEq, uniq } from 'ramda'
 
 const processApiGroup = (apiGroup, apiGroupsList) => {
   if (apiGroup === '*') {
-    return apiGroupsList.map(group => group.name)
+    return apiGroupsList.map((group) => group.name)
   } else if (apiGroup === '') {
     return ['core']
   } else {
@@ -11,35 +11,35 @@ const processApiGroup = (apiGroup, apiGroupsList) => {
 }
 
 const processApiGroupResources = (apiGroup, rule, apiGroupsList) => {
-  const apiGroupFromList = apiGroupsList.find(_apiGroup => (
-    _apiGroup.name === apiGroup
-  ))
-  const resourceNames = apiGroupFromList.resources.map(resource => resource.name)
-  const resources = rule.resources.map(resource =>
-    resource === '*' ? resourceNames : [resource]
+  const apiGroupFromList = apiGroupsList.find((_apiGroup) => _apiGroup.name === apiGroup)
+  const resourceNames = apiGroupFromList.resources.map((resource) => resource.name)
+  const resources = rule.resources.map((resource) =>
+    resource === '*' ? resourceNames : [resource],
   )
   const flattenedResources = flatten(resources)
   // Account for potential duplicates with wildcard + a specified resource
   // Remove resource if it does not exist in the api group
-  const validatedResources = uniq(flattenedResources.filter(resource => resourceNames.includes(resource)))
+  const validatedResources = uniq(
+    flattenedResources.filter((resource) => resourceNames.includes(resource)),
+  )
   return uniq(validatedResources)
 }
 
 const processApiGroupVerbs = (item, rule, apiGroupsList) => {
   const apiGroupFromList = apiGroupsList.find(propEq('name', item.apiGroup))
-  const resourcesWithVerbs = item.resources.map(resource => {
-    const resourceFromList = apiGroupFromList.resources.find(_resource => (
-      _resource.name === resource
-    ))
-    const verbs = rule.verbs.map(verb =>
-      verb === '*' ? resourceFromList.verbs : [verb]
+  const resourcesWithVerbs = item.resources.map((resource) => {
+    const resourceFromList = apiGroupFromList.resources.find(
+      (_resource) => _resource.name === resource,
     )
+    const verbs = rule.verbs.map((verb) => (verb === '*' ? resourceFromList.verbs : [verb]))
     const flattenedVerbs = flatten(verbs)
     // Account for potential duplicates with wildcard + a specified verb
     // Remove verb if it does not exist in the resource
-    const validatedVerbs = uniq(flattenedVerbs.filter(verb => {
-      return resourceFromList.verbs.includes(verb)
-    }))
+    const validatedVerbs = uniq(
+      flattenedVerbs.filter((verb) => {
+        return resourceFromList.verbs.includes(verb)
+      }),
+    )
     return { resource, verbs: validatedVerbs }
   })
   const verbsByResource = resourcesWithVerbs.reduce((accum, current) => {
@@ -51,16 +51,16 @@ const processApiGroupVerbs = (item, rule, apiGroupsList) => {
 }
 
 const processRule = (rule, apiGroups) => {
-  const ruleApiGroups = flatten(rule.apiGroups.map(apiGroup => (
-    processApiGroup(apiGroup, apiGroups)
-  )))
+  const ruleApiGroups = flatten(
+    rule.apiGroups.map((apiGroup) => processApiGroup(apiGroup, apiGroups)),
+  )
 
-  const withResources = ruleApiGroups.map(apiGroup => {
+  const withResources = ruleApiGroups.map((apiGroup) => {
     const resources = processApiGroupResources(apiGroup, rule, apiGroups)
     return { apiGroup, resources }
   })
 
-  const withVerbs = withResources.map(item => {
+  const withVerbs = withResources.map((item) => {
     const apiGroupVerbs = processApiGroupVerbs(item, rule, apiGroups)
     return { [item.apiGroup]: apiGroupVerbs }
   })

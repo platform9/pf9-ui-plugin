@@ -13,30 +13,31 @@ import { routes } from 'core/utils/routes'
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
     borderRadius: 4,
-    boxShadow: '0 2.5px 2.5px -1.5px rgba(0, 0, 0, 0.2), 0 1.5px 7px 1px rgba(0, 0, 0, 0.12), 0 4px 5px 0.5px rgba(0, 0, 0, 0.14)',
+    boxShadow:
+      '0 2.5px 2.5px -1.5px rgba(0, 0, 0, 0.2), 0 1.5px 7px 1px rgba(0, 0, 0, 0.12), 0 4px 5px 0.5px rgba(0, 0, 0, 0.14)',
     padding: theme.spacing(3, 2),
     marginTop: theme.spacing(4),
     display: 'flex',
     flexFlow: 'column nowrap',
     justifyContent: 'space-between',
-    alignItems: 'stretch'
+    alignItems: 'stretch',
   },
   requirements: {
     display: 'flex',
     flexFlow: 'row nowrap',
     justifyContent: 'space-between',
-    margin: theme.spacing(4)
+    margin: theme.spacing(4),
   },
   alertTitle: {
     marginLeft: theme.spacing(4),
-    marginTop: theme.spacing(2)
+    marginTop: theme.spacing(2),
   },
   text: {
     marginTop: theme.spacing(1),
-    marginLeft: theme.spacing(1)
+    marginLeft: theme.spacing(1),
   },
   bulletList: {
-    marginLeft: theme.spacing(2)
+    marginLeft: theme.spacing(2),
   },
   requirementsTitle: {
     display: 'flex',
@@ -46,7 +47,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     color: theme.palette.text.primary,
     borderBottom: `1px solid ${theme.palette.text.primary}`,
     padding: theme.spacing(1, 1, 1.5, 1),
-    marginBottom: theme.spacing(1)
+    marginBottom: theme.spacing(1),
   },
   blueIcon: {
     color: theme.palette.primary.main,
@@ -56,12 +57,12 @@ const useStyles = makeStyles((theme: Theme) => ({
     borderRadius: 4,
     border: `1px solid ${theme.palette.primary.main}`,
     backgroundColor: theme.palette.background.paper,
-    marginRight: theme.spacing(2)
+    marginRight: theme.spacing(2),
   },
   flex: {
     display: 'flex',
-    alignItems: 'center'
-  }
+    alignItems: 'center',
+  },
 }))
 
 const nodeServices = ['Prometheus', 'Grafana']
@@ -76,18 +77,23 @@ const BareOSClusterRequirements = ({ onComplete }) => {
       title="BareOS Ubuntu Cluster"
       link={
         <div>
-          <FontAwesomeIcon className={classes.blueIcon} size="md">file-alt</FontAwesomeIcon>{' '}
-          <ExternalLink url={bareOSSetupDocumentationLink}>BareOS Setup
-            Documentation</ExternalLink>
+          <FontAwesomeIcon className={classes.blueIcon} size="md">
+            file-alt
+          </FontAwesomeIcon>{' '}
+          <ExternalLink url={bareOSSetupDocumentationLink}>BareOS Setup Documentation</ExternalLink>
         </div>
       }
     >
-      <Typography className={classes.text}>Create a BareOS cluster using Ubuntu physical or virtual machines</Typography>
+      <Typography className={classes.text}>
+        Create a BareOS cluster using Ubuntu physical or virtual machines
+      </Typography>
       <Typography className={classes.text}>Cluster comes built in with:</Typography>
       <BulletList className={classes.bulletList} items={nodeServices} />
 
       <Alert variant="info">
-        <Typography className={classes.alertTitle} variant="subtitle2">Minimum Hardware Requirements:</Typography>
+        <Typography className={classes.alertTitle} variant="subtitle2">
+          Minimum Hardware Requirements:
+        </Typography>
         <div className={classes.requirements}>
           <HardwareSpec title="2 VCPUs" icon="microchip" />
           <HardwareSpec title="5GB RAM" icon="memory" />

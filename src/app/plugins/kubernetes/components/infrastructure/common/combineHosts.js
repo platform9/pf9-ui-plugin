@@ -18,21 +18,20 @@ const openstackRoles = [
 
 const k8sRoles = ['Containervisor']
 
-export const annotateCloudStack = host => {
+export const annotateCloudStack = (host) => {
   const localizedRoles = localizeRoles(host.roles)
   const isOpenStack = () => localizedRoles.some(includes(__, openstackRoles))
   const isK8s = () => localizedRoles.some(includes(__, k8sRoles))
-  const cloudStack =
-    condLiteral(
-      [both(isOpenStack, isK8s), 'both'],
-      [isOpenStack, 'openstack'],
-      [isK8s, 'k8s'],
-      [T, 'unknown']
-    )(host)
+  const cloudStack = condLiteral(
+    [both(isOpenStack, isK8s), 'both'],
+    [isOpenStack, 'openstack'],
+    [isK8s, 'k8s'],
+    [T, 'unknown'],
+  )(host)
   return { ...host, cloudStack }
 }
 
-export const annotateResmgrFields = host => {
+export const annotateResmgrFields = (host) => {
   const { resmgr } = host
   return {
     ...host,
@@ -51,7 +50,7 @@ export const annotateResmgrFields = host => {
   }
 }
 
-export const annotateUiState = host => {
+export const annotateUiState = (host) => {
   const { resmgr } = host
 
   /* TODO:
@@ -78,34 +77,49 @@ export const annotateUiState = host => {
   }
 
   if (responding) {
-    if (['converging', 'retrying'].includes(roleStatus)) { host.uiState = 'pending' }
-    if (roleStatus === 'ok' && roles.length > 0) { host.uiState = 'online' }
-    if (warnings && warnings.length > 0) { host.uiState = 'drifted' }
+    if (['converging', 'retrying'].includes(roleStatus)) {
+      host.uiState = 'pending'
+    }
+    if (roleStatus === 'ok' && roles.length > 0) {
+      host.uiState = 'online'
+    }
+    if (warnings && warnings.length > 0) {
+      host.uiState = 'drifted'
+    }
   }
 
   if (!host.uiState && !responding) {
     host.uiState = 'offline'
     const lastResponseTime = resmgr.info.last_response_time
     host.lastResponse = moment.utc(lastResponseTime).fromNow(true)
-    host.lastResponseData = lastResponseTime && lastResponseTime.split(' ').join('T').concat('Z')
+    host.lastResponseData =
+      lastResponseTime &&
+      lastResponseTime
+        .split(' ')
+        .join('T')
+        .concat('Z')
     // Even though the host is offline we may or may not have stats for it
     // depending on if the roles were authorized successfully in the past.
     host.hasStats = roleStatus === 'ok'
   }
 
   const credentials = pathStrOrNull('extensions.hypervisor_details.data.credentials', resmgr)
-  if (credentials === 'invalid') { host.uiState = 'invalid' }
-  if (roleStatus === 'failed') { host.uiState = 'error' }
+  if (credentials === 'invalid') {
+    host.uiState = 'invalid'
+  }
+  if (roleStatus === 'failed') {
+    host.uiState = 'error'
+  }
 
   return { ...host }
 }
 
-export const annotateNovaFields = host => {
+export const annotateNovaFields = (host) => {
   // TODO: add nova specific logic in here
   return { ...host }
 }
 
-export const calcResourceUtilization = host => {
+export const calcResourceUtilization = (host) => {
   const usage = pathStrOrNull('resmgr.extensions.resource_usage.data')(host)
   if (!usage) return { ...host }
   const { cpu, memory, disk } = usage
@@ -135,7 +149,7 @@ export const calcResourceUtilization = host => {
       max: disk.total / Gi,
       units: 'GB',
       type: 'used',
-    }
+    },
   }
 
   return {
@@ -144,11 +158,10 @@ export const calcResourceUtilization = host => {
   }
 }
 
-export const combineHost =
-  pipe(
-    annotateResmgrFields,
-    annotateUiState,
-    annotateNovaFields,
-    annotateCloudStack,
-    calcResourceUtilization,
-  )
+export const combineHost = pipe(
+  annotateResmgrFields,
+  annotateUiState,
+  annotateNovaFields,
+  annotateCloudStack,
+  calcResourceUtilization,
+)

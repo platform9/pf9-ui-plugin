@@ -7,26 +7,32 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import Picklist from 'core/components/Picklist'
 import { loadCloudProviderRegionDetails } from 'k8s/components/infrastructure/cloudProviders/actions'
 
-const AzureVnetPicklist = forwardRef(({
-  cloudProviderId, cloudProviderRegionId, resourceGroup, hasError, errorMessage, ...rest
-}, ref) => {
-  const [details, loading] = useDataLoader(loadCloudProviderRegionDetails, { cloudProviderId, cloudProviderRegionId })
+const AzureVnetPicklist = forwardRef(
+  (
+    { cloudProviderId, cloudProviderRegionId, resourceGroup, hasError, errorMessage, ...rest },
+    ref,
+  ) => {
+    const [details, loading] = useDataLoader(loadCloudProviderRegionDetails, {
+      cloudProviderId,
+      cloudProviderRegionId,
+    })
 
-  const networks = pathStrOr([], '0.virtualNetworks', details)
-  const netsMatchingResourceGroup = networks.filter(propEq('resourceGroup', resourceGroup))
-  const options = netsMatchingResourceGroup.map(x => ({ label: x.name, value: x.name }))
+    const networks = pathStrOr([], '0.virtualNetworks', details)
+    const netsMatchingResourceGroup = networks.filter(propEq('resourceGroup', resourceGroup))
+    const options = netsMatchingResourceGroup.map((x) => ({ label: x.name, value: x.name }))
 
-  return (
-    <Picklist
-      {...rest}
-      ref={ref}
-      loading={loading}
-      options={options}
-      error={hasError}
-      helperText={errorMessage}
-    />
-  )
-})
+    return (
+      <Picklist
+        {...rest}
+        ref={ref}
+        loading={loading}
+        options={options}
+        error={hasError}
+        helperText={errorMessage}
+      />
+    )
+  },
+)
 
 AzureVnetPicklist.propTypes = {
   id: PropTypes.string.isRequired,

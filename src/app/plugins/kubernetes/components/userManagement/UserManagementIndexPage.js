@@ -9,10 +9,16 @@ import PageContainer from 'core/components/pageContainer/PageContainer'
 const UserManagementIndexPage = () => (
   <PageContainer>
     <Tabs>
-      <Tab value="tenants" label="Tenants"><TenantsListPage /></Tab>
-      <Tab value="users" label="Users"><UsersListPage /></Tab>
+      <Tab value="tenants" label="Tenants">
+        <TenantsListPage />
+      </Tab>
+      <Tab value="users" label="Users">
+        <UsersListPage />
+      </Tab>
       {/* <Tab value="userGroups" label="Groups"><UserGroupsListPage /></Tab> */}
-      <Tab value="roles" label="Roles"><UserRolesListPage /></Tab>
+      <Tab value="roles" label="Roles">
+        <UserRolesListPage />
+      </Tab>
     </Tabs>
   </PageContainer>
 )

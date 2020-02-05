@@ -8,9 +8,19 @@ import PicklistField from 'core/components/validatedForm/PicklistField'
 import { loadCloudProviderRegionDetails } from 'k8s/components/infrastructure/cloudProviders/actions'
 
 /* Displays multiple picklists to allow the user to specify a subnet for each AZ in the VPC */
-const AwsZoneVpcMappings = ({ azs=[], type, cloudProviderId, cloudProviderRegionId, vpcId, onChange }) => {
+const AwsZoneVpcMappings = ({
+  azs = [],
+  type,
+  cloudProviderId,
+  cloudProviderRegionId,
+  vpcId,
+  onChange,
+}) => {
   if (!vpcId) return null
-  const [details] = useDataLoader(loadCloudProviderRegionDetails, { cloudProviderId, cloudProviderRegionId })
+  const [details] = useDataLoader(loadCloudProviderRegionDetails, {
+    cloudProviderId,
+    cloudProviderRegionId,
+  })
   const [subnetMappings, setSubnetMappings] = useState({})
 
   const vpcs = pathStrOr([], '0.vpcs', details)
@@ -21,11 +31,12 @@ const AwsZoneVpcMappings = ({ azs=[], type, cloudProviderId, cloudProviderRegion
   const isPublic = type === 'public'
 
   const subnets = pathStrOr([], 'Subnets', vpc)
-  const options = subnets
-    .filter(x => x.MapPublicIpOnLaunch === isPublic && azs.includes(x.AvailabilityZone))
+  const options = subnets.filter(
+    (x) => x.MapPublicIpOnLaunch === isPublic && azs.includes(x.AvailabilityZone),
+  )
   const subnetsByAz = groupBy(prop('AvailabilityZone'), options)
 
-  const handleChange = az => subnetId => {
+  const handleChange = (az) => (subnetId) => {
     const mappings = { ...subnetMappings, [az]: subnetId }
     setSubnetMappings(mappings)
     onChange && onChange(Object.values(mappings))
@@ -33,7 +44,7 @@ const AwsZoneVpcMappings = ({ azs=[], type, cloudProviderId, cloudProviderRegion
 
   return (
     <>
-      {Object.keys(subnetsByAz).map(az => (
+      {Object.keys(subnetsByAz).map((az) => (
         <PicklistField
           label={`Availability Zone (${type}): ${az}`}
           key={`az-subnet-${type}-${az}-${az.CidrBlock}`}

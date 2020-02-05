@@ -13,9 +13,11 @@ import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 
 // The modal is technically inside the row, so clicking anything inside
 // the modal window will cause the table row to be toggled.
-const stopPropagation = e => {
+const stopPropagation = (e) => {
   // Except for <a href=""> style links
-  if (e.target.tagName.toUpperCase() === 'A') { return }
+  if (e.target.tagName.toUpperCase() === 'A') {
+    return
+  }
   e.preventDefault()
   e.stopPropagation()
 }
@@ -24,12 +26,14 @@ export default ({ onClose, rows: [repository] }) => {
   const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
   const [update, updating] = useDataUpdater(repositoryActions.updateRepoClusters, onClose)
   const [selectedRows, updateSelectedRows] = useState(pluck('clusterId', repository.clusters))
-  const toggleRow = useCallback(uuid => () => {
-    updateSelectedRows(selectedRows.includes(uuid)
-      ? except(uuid, selectedRows)
-      : [...selectedRows, uuid],
-    )
-  }, [selectedRows])
+  const toggleRow = useCallback(
+    (uuid) => () => {
+      updateSelectedRows(
+        selectedRows.includes(uuid) ? except(uuid, selectedRows) : [...selectedRows, uuid],
+      )
+    },
+    [selectedRows],
+  )
   const handleSubmit = async () => {
     update({ id: repository.id, clusters: selectedRows })
   }
@@ -38,7 +42,11 @@ export default ({ onClose, rows: [repository] }) => {
     return (
       <TableRow key={uuid}>
         <TableCell padding="checkbox">
-          <Checkbox checked={selectedRows.includes(uuid)} onClick={toggleRow(uuid)} color="primary" />
+          <Checkbox
+            checked={selectedRows.includes(uuid)}
+            onClick={toggleRow(uuid)}
+            color="primary"
+          />
         </TableCell>
         <TableCell>{name}</TableCell>
       </TableRow>
@@ -49,16 +57,12 @@ export default ({ onClose, rows: [repository] }) => {
       <DialogTitle>Edit Cluster Access for {repository.name}</DialogTitle>
       <Progress loading={loadingClusters || updating} inline>
         <DialogContent>
-          <p>
-            Select the clusters to add this repository to:
-          </p>
-          {clusters.length === 0 &&
-          <Typography variant="h5">No clusters available to add</Typography>
-          }
+          <p>Select the clusters to add this repository to:</p>
+          {clusters.length === 0 && (
+            <Typography variant="h5">No clusters available to add</Typography>
+          )}
           <Table>
-            <TableBody>
-              {clusters.map(renderClusterRow)}
-            </TableBody>
+            <TableBody>{clusters.map(renderClusterRow)}</TableBody>
           </Table>
         </DialogContent>
         <DialogActions>

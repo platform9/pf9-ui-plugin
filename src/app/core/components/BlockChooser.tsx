@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     border: '1px solid #ccc',
     borderRadius: '4px',
     backgroundColor: '#EEE',
-  }
+  },
 }))
 
 interface BlockOption {
@@ -58,17 +58,22 @@ const BlockChooser: FunctionComponent<Props> = ({ options = [], onChange }) => {
 
   return (
     <div className={classes.root}>
-      {options.map(option => {
+      {options.map((option) => {
         const active = choice === option.id
         return (
-          <div className={clsx(classes.choice, active && classes.selected)} key={option.id} onClick={handleOnChange(option.id)}>
+          <div
+            className={clsx(classes.choice, active && classes.selected)}
+            key={option.id}
+            onClick={handleOnChange(option.id)}
+          >
             <Radio checked={active} color="primary" />
             <div className={classes.icon}>{option.icon}</div>
             <div className={classes.text}>
               <Typography variant="subtitle1">{option.title}</Typography>
               <Typography variant="body1">{option.description}</Typography>
             </div>
-          </div>)
+          </div>
+        )
       })}
     </div>
   )

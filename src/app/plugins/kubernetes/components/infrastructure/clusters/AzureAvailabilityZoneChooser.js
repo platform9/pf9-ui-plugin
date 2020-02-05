@@ -6,7 +6,7 @@ import MultiSelect from 'core/components/MultiSelect'
 const AzureAvailabilityZoneChooser = forwardRef(({ onChange, ...rest }, ref) => {
   const [values, setValues] = React.useState([])
 
-  const handleValuesChange = values => {
+  const handleValuesChange = (values) => {
     setValues(values)
     onChange && onChange(values)
   }

@@ -5,11 +5,10 @@ import requiresAuthentication from '../../util/requiresAuthentication'
 import { loadImages } from './actions'
 import ImageListContainer from './ImageListContainer'
 
-const ImageListPage = () =>
+const ImageListPage = () => (
   <DataLoader loaders={{ images: loadImages }}>
     {({ data }) => <ImageListContainer images={data.images} />}
   </DataLoader>
+)
 
-export default compose(
-  requiresAuthentication,
-)(ImageListPage)
+export default compose(requiresAuthentication)(ImageListPage)

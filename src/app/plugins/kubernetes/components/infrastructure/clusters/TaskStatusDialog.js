@@ -7,11 +7,9 @@ import ExternalLink from 'core/components/ExternalLink'
 import ClusterStatusSpan from 'k8s/components/infrastructure/clusters/ClusterStatus'
 import createListTableComponent from 'core/helpers/createListTableComponent'
 import { noop, pathStrOr } from 'utils/fp'
-import {
-  clusterHealthStatusFields,
-} from '../clusters/ClusterStatusUtils'
+import { clusterHealthStatusFields } from '../clusters/ClusterStatusUtils'
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     minWidth: theme.spacing(75),
   },
@@ -68,9 +66,10 @@ const TaskStatusDialog = ({ isOpen, toggleOpen, node }) => {
   const {
     all_tasks: allTasks = [],
     last_failed_task: lastFailedTask,
-    completed_tasks: completedTasks
+    completed_tasks: completedTasks,
   } = pathStrOr({}, 'combined.resmgr.extensions.pf9_kube_status.data', node)
-  const healthStatus = status === 'disconnected' ? 'unknown' : status === 'ok' ? 'healthy' : 'unhealthy'
+  const healthStatus =
+    status === 'disconnected' ? 'unknown' : status === 'ok' ? 'healthy' : 'unhealthy'
 
   return (
     <Dialog classes={{ paperWidthSm: classes.root }} open={isOpen}>
@@ -96,7 +95,11 @@ const TaskStatusDialog = ({ isOpen, toggleOpen, node }) => {
           Here is a log of what got installed
           {healthStatus === 'unhealthy' && ' and where we ran into an error'}:
         </span>
-        <Tasks allTasks={allTasks} lastFailedTask={lastFailedTask} completedTasks={completedTasks} />
+        <Tasks
+          allTasks={allTasks}
+          lastFailedTask={lastFailedTask}
+          completedTasks={completedTasks}
+        />
       </DialogContent>
     </Dialog>
   )
@@ -131,13 +134,13 @@ const TasksTable = createListTableComponent({
   showCheckboxes: false,
   paginate: false,
   compactTable: true,
-  emptyText: <Typography variant="body1">No status information currently available.</Typography>
+  emptyText: <Typography variant="body1">No status information currently available.</Typography>,
 })
 
 export const Tasks = ({ allTasks, completedTasks = [], lastFailedTask }) => {
   const classes = useStyles()
   const failedTaskIndex = allTasks.indexOf(lastFailedTask)
-  const completedTaskCount = failedTaskIndex >=0 ? failedTaskIndex : completedTasks.length
+  const completedTaskCount = failedTaskIndex >= 0 ? failedTaskIndex : completedTasks.length
   const getStatus = (index) => {
     if (index === failedTaskIndex) {
       return 'fail'
@@ -159,7 +162,9 @@ export const Tasks = ({ allTasks, completedTasks = [], lastFailedTask }) => {
   return (
     <div>
       <TasksTable data={tasksWithStatus} onSortChange={noop} />
-      <div className={classes.tasksCompleted}>{completedTaskCount} out of {allTasks.length} tasks completed</div>
+      <div className={classes.tasksCompleted}>
+        {completedTaskCount} out of {allTasks.length} tasks completed
+      </div>
     </div>
   )
 }
@@ -174,10 +179,11 @@ const HealthStatus = ({ healthStatus }) => {
   )
 }
 
-const EmptyStatus = () =>
+const EmptyStatus = () => (
   <span style={{ visibility: 'hidden' }}>
     <ClusterStatusSpan iconStatus status="pause" title="pause" />
   </span>
+)
 
 const healthStatusMessage = {
   healthy: 'No errors encountered while installing some components on this node',

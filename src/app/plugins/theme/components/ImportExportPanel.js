@@ -7,20 +7,20 @@ import { createMuiTheme } from '@material-ui/core/styles'
 import { withAppContext } from 'core/providers/AppProvider'
 import { withStyles } from '@material-ui/styles'
 
-const styles = theme => ({
+const styles = (theme) => ({
   marginRight: {
     marginRight: theme.spacing(2),
-  }
+  },
 })
 
 class ImportExportPanel extends React.PureComponent {
-  handleImport = themeStr => {
+  handleImport = (themeStr) => {
     const themeJson = JSON.parse(themeStr)
     const theme = createMuiTheme(themeJson)
     this.props.setContext({ theme, themeJson })
   }
 
-  render () {
+  render() {
     const { classes, theme } = this.props
 
     return (
@@ -34,11 +34,7 @@ class ImportExportPanel extends React.PureComponent {
           Import
         </ImportDataButton>
 
-        <ExportDataButton
-          filename="theme.json"
-          data={theme}
-          color="secondary"
-        >
+        <ExportDataButton filename="theme.json" data={theme} color="secondary">
           Export
         </ExportDataButton>
       </Panel>
@@ -46,7 +42,4 @@ class ImportExportPanel extends React.PureComponent {
   }
 }
 
-export default compose(
-  withAppContext,
-  withStyles(styles),
-)(ImportExportPanel)
+export default compose(withAppContext, withStyles(styles))(ImportExportPanel)

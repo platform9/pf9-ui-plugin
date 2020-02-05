@@ -6,32 +6,34 @@ import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import loggingActions from './actions'
 
-const useStyles = makeStyles(theme => createStyles({
-  titleAndCreateButton: {
-    display: 'flex',
-    justifyContent: 'space-between',
-  },
-  enabledIcon: {
-    fontSize: 13,
-    fontWeight: 600,
-    color: '#4adf74',
-  },
-  disabledIcon: {
-    fontSize: 13,
-    fontWeight: 600,
-    color: '#e44c34',
-  },
-  configuringIcon: {
-    fontSize: 13,
-    fontWeight: 300,
-    color: '#606060',
-  },
-  failedIcon: {
-    fontSize: 13,
-    fontWeight: 600,
-    color: '#e44c34',
-  },
-}))
+const useStyles = makeStyles((theme) =>
+  createStyles({
+    titleAndCreateButton: {
+      display: 'flex',
+      justifyContent: 'space-between',
+    },
+    enabledIcon: {
+      fontSize: 13,
+      fontWeight: 600,
+      color: '#4adf74',
+    },
+    disabledIcon: {
+      fontSize: 13,
+      fontWeight: 600,
+      color: '#e44c34',
+    },
+    configuringIcon: {
+      fontSize: 13,
+      fontWeight: 300,
+      color: '#606060',
+    },
+    failedIcon: {
+      fontSize: 13,
+      fontWeight: 600,
+      color: '#e44c34',
+    },
+  }),
+)
 
 const addUrl = '/ui/kubernetes/logging/add'
 const editUrl = '/ui/kubernetes/logging/edit'
@@ -71,47 +73,30 @@ const renderStatus = (classes, value) => {
   let icon
   switch (value) {
     case status.ENABLED:
-      icon = (
-        <FontAwesomeIcon className={classes.enabledIcon}>
-            check
-        </FontAwesomeIcon>
-      )
+      icon = <FontAwesomeIcon className={classes.enabledIcon}>check</FontAwesomeIcon>
       break
     case status.DISABLED:
-      icon = (
-        <FontAwesomeIcon className={classes.disabledIcon}>
-            times
-        </FontAwesomeIcon>
-      )
+      icon = <FontAwesomeIcon className={classes.disabledIcon}>times</FontAwesomeIcon>
       break
     case status.CONFIGURING:
-      icon = (
-        <FontAwesomeIcon className={classes.configuringIcon}>
-            sync
-        </FontAwesomeIcon>
-      )
+      icon = <FontAwesomeIcon className={classes.configuringIcon}>sync</FontAwesomeIcon>
       break
     case status.FAILED:
-      icon = (
-        <FontAwesomeIcon className={classes.failedIcon}>
-            exclamation-circle
-        </FontAwesomeIcon>
-      )
+      icon = <FontAwesomeIcon className={classes.failedIcon}>exclamation-circle</FontAwesomeIcon>
       break
     default:
-      icon = (
-        <FontAwesomeIcon className={classes.enabledIcon}>
-          check
-        </FontAwesomeIcon>
-      )
+      icon = <FontAwesomeIcon className={classes.enabledIcon}>check</FontAwesomeIcon>
   }
 
   return (
-    <span>{icon}{value}</span>
+    <span>
+      {icon}
+      {value}
+    </span>
   )
 }
 
-const renderList = (values) => map(value => (<div key={value}>{value}</div>), values)
+const renderList = (values) => map((value) => <div key={value}>{value}</div>, values)
 
 const getColumns = (classes) => [
   { id: 'clusterName', label: 'Cluster' },
@@ -125,13 +110,13 @@ const getActions = (classes, history) => [
     icon: 'check',
     label: 'Enable',
     action: () => {},
-    cond: (clusters) => clusters.every(cluster => cluster.status === status.DISABLED)
+    cond: (clusters) => clusters.every((cluster) => cluster.status === status.DISABLED),
   },
   {
     icon: 'times',
     label: 'Disable',
     action: () => {},
-    cond: (clusters) => clusters.every(cluster => cluster.status === status.ENABLED)
+    cond: (clusters) => clusters.every((cluster) => cluster.status === status.ENABLED),
   },
 ]
 

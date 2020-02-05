@@ -2,7 +2,6 @@
 import React, { FunctionComponent } from 'react'
 import { Typography, Theme } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
-
 // Components
 import PageContainer from 'core/components/pageContainer/PageContainer'
 // import SimpleLink from 'core/components/SimpleLink'
@@ -48,13 +47,19 @@ const DownloadCliPage: FunctionComponent = () => {
       <Typography component="p" variant="subtitle2">
         Create clusters and more directly using the CLI
       </Typography>
-      <p>{' '}</p>
+      <p> </p>
       <Typography component="span" variant="body1">
-        You can use the <CopyToClipboard copyText="pf9ctl"><CodeBlock>pf9ctl</CodeBlock></CopyToClipboard> CLI directly to use one or more PMK clusters.
-        Type <CopyToClipboard copyText="pf9ctl --help"><CodeBlock>pf9ctl --help</CodeBlock></CopyToClipboard> to see the full features and options the CLI
-        supports
+        You can use the{' '}
+        <CopyToClipboard copyText="pf9ctl">
+          <CodeBlock>pf9ctl</CodeBlock>
+        </CopyToClipboard>{' '}
+        CLI directly to use one or more PMK clusters. Type{' '}
+        <CopyToClipboard copyText="pf9ctl --help">
+          <CodeBlock>pf9ctl --help</CodeBlock>
+        </CopyToClipboard>{' '}
+        to see the full features and options the CLI supports
       </Typography>
-      <p>{' '}</p>
+      <p> </p>
       {/* <Typography variant="body1">
         See <SimpleLink src="">CLI Documentation</SimpleLink> for more info on whats supported with the
         CLI

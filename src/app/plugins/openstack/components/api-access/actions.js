@@ -25,7 +25,7 @@ const serviceMappings = {
 
 const { keystone } = ApiClient.getInstance()
 
-const whichInterface = serviceName => serviceMappings[serviceName] || 'internal'
+const whichInterface = (serviceName) => serviceMappings[serviceName] || 'internal'
 
 export const serviceCatalogContextKey = 'serviceCatalog'
 

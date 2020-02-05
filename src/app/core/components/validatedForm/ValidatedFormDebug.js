@@ -7,9 +7,8 @@ import { ValidatedFormConsumer } from 'core/components/validatedForm/ValidatedFo
  */
 const ValidatedFormDebug = () => (
   <ValidatedFormConsumer>
-    {props => <pre>{JSON.stringify(props, null, 4)}</pre>}
+    {(props) => <pre>{JSON.stringify(props, null, 4)}</pre>}
   </ValidatedFormConsumer>
-
 )
 
 export default ValidatedFormDebug

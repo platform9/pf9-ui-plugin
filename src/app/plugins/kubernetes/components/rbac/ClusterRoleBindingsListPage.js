@@ -16,18 +16,22 @@ const ListPage = ({ ListContainer }) => {
   return () => {
     const { params, getParamsUpdater } = usePrefParams(defaultParams)
     const [data, loading, reload] = useDataLoader(clusterRoleBindingActions.list, params)
-    return <ListContainer
-      loading={loading}
-      reload={reload}
-      data={data}
-      getParamsUpdater={getParamsUpdater}
-      filters={<ClusterPicklist
-        onChange={getParamsUpdater('clusterId')}
-        value={params.clusterId}
-        onlyMasterNodeClusters
-      />}
-      {...pick(listTablePrefs, params)}
-    />
+    return (
+      <ListContainer
+        loading={loading}
+        reload={reload}
+        data={data}
+        getParamsUpdater={getParamsUpdater}
+        filters={
+          <ClusterPicklist
+            onChange={getParamsUpdater('clusterId')}
+            value={params.clusterId}
+            onlyMasterNodeClusters
+          />
+        }
+        {...pick(listTablePrefs, params)}
+      />
+    )
   }
 }
 
@@ -42,9 +46,8 @@ export const options = {
   cacheKey: clusterRoleBindingsCacheKey,
   deleteFn: clusterRoleBindingActions.delete,
   editUrl: '/ui/kubernetes/rbac/clusterrolebindings/edit',
-  customEditUrlFn: (item, itemId) => (
-    `/ui/kubernetes/rbac/clusterrolebindings/edit/${itemId}/cluster/${item.clusterId}`
-  ),
+  customEditUrlFn: (item, itemId) =>
+    `/ui/kubernetes/rbac/clusterrolebindings/edit/${itemId}/cluster/${item.clusterId}`,
   name: 'Cluster Role Bindings',
   title: 'Cluster Role Bindings',
   ListPage,

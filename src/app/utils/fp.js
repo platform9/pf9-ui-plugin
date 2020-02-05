@@ -1,5 +1,8 @@
 import moize from 'moize'
-import { adjust, always, assocPath, cond, curry, either, equals, filter, findIndex, groupBy, hasPath, isEmpty, isNil, path, pathEq, pathOr, remove, T, update, values, when } from 'ramda'
+import {
+  adjust, always, assocPath, cond, curry, either, equals, filter, findIndex, groupBy, hasPath,
+  isEmpty, isNil, path, pathEq, pathOr, remove, T, update, values, when,
+} from 'ramda'
 
 // State hook initializers
 
@@ -8,9 +11,9 @@ export const emptyObj = Object.freeze({})
 
 // Functional programming helpers
 
-export const pluck = key => obj => obj[key]
-export const isTruthy = x => !!x
-export const exists = x => x !== undefined
+export const pluck = (key) => (obj) => obj[key]
+export const isTruthy = (x) => !!x
+export const exists = (x) => x !== undefined
 export const noop = () => {}
 export const isNilOrEmpty = either(isNil, isEmpty)
 export const arrayIfNil = when(isNil, always(emptyArr))
@@ -18,38 +21,40 @@ export const stringIfNil = when(isNil, always(''))
 export const arrayIfEmpty = when(isEmpty, always(emptyArr))
 
 // Works for arrays and strings.  All other types return false.
-export const notEmpty = arr => !!(arr && arr.length)
+export const notEmpty = (arr) => !!(arr && arr.length)
 
-export const hasKeys = obj => {
-  if (!(obj instanceof Object)) { return false }
+export const hasKeys = (obj) => {
+  if (!(obj instanceof Object)) {
+    return false
+  }
   return Object.keys(obj).length > 0
 }
 
-export const compose = (...fns) =>
-  fns.reduce((f, g) => (...args) => f(g(...args)))
+export const compose = (...fns) => fns.reduce((f, g) => (...args) => f(g(...args)))
 export const pipe = (...fns) => compose(...fns.reverse())
-export const pick = key => obj => obj[key]
+export const pick = (key) => (obj) => obj[key]
 
 // Project the keys from the array of objects and rename them at the same time
 // Ex:
 // const values = [{ a: 123, b: 456 }, { c: 555 }]
 // const mappings = { first: 'a', second: 'b', third: 'c' }
 // projectAs(mappings, values) -> [{ first: 123, second: 456 }, { third: 555 }]
-export const projectAs = curry((mappings, arr) => arr.map(obj => Object.keys(mappings).reduce(
-  (accum, destKey) => {
-    const srcKey = mappings[destKey]
-    if (exists(obj[srcKey])) {
-      accum[destKey] = obj[srcKey]
-    }
-    return accum
-  },
-  {},
-)))
+export const projectAs = curry((mappings, arr) =>
+  arr.map((obj) =>
+    Object.keys(mappings).reduce((accum, destKey) => {
+      const srcKey = mappings[destKey]
+      if (exists(obj[srcKey])) {
+        accum[destKey] = obj[srcKey]
+      }
+      return accum
+    }, {}),
+  ),
+)
 
 // Transparently inject side-effects in a functional composition "chain".
 // Ex: const value = await somePromise.then(tap(x => console.log))
 // Ex: compose(fn1, fn2, fn3, tap(log), fn4)(value)
-export const tap = fn => arg => {
+export const tap = (fn) => (arg) => {
   fn(arg)
   return arg
 }
@@ -62,10 +67,10 @@ export const mergeKey = (srcObj, destObj = {}, key) => {
   return clonedObj
 }
 
-export const pickMultiple = (...keys) => obj =>
+export const pickMultiple = (...keys) => (obj) =>
   keys.reduce((accum, key) => mergeKey(obj, accum, key), {})
 
-export const filterFields = (...keys) => obj =>
+export const filterFields = (...keys) => (obj) =>
   Object.keys(obj).reduce(
     (accum, key) => (keys.includes(key) ? accum : mergeKey(obj, accum, key)),
     {},
@@ -75,7 +80,7 @@ export const filterFields = (...keys) => obj =>
 // Allows for setting of values in a deeply nested object using cloning.
 // We can extend with other functionality like arrays and using
 // functions as selectors in the future if it looks like it will be useful.
-export function setObjLens (obj, value, paths) {
+export function setObjLens(obj, value, paths) {
   const [head, ...tail] = paths
   if (tail.length === 0) {
     return { ...obj, [head]: value }
@@ -86,7 +91,7 @@ export function setObjLens (obj, value, paths) {
   }
 }
 
-export const setStateLens = (value, paths) => state => {
+export const setStateLens = (value, paths) => (state) => {
   return setObjLens(state, value, paths)
 }
 
@@ -116,7 +121,9 @@ export const keyValueArrToObj = (arr = []) =>
 
 export const hasPathStr = curry((str, obj) => hasPath(str.split('.'), obj))
 export const pathStr = curry((str, obj) => path(str.split('.'), obj))
-export const pathStrOr = curry((defaultValue, str, obj) => pathOr(defaultValue, str.split('.'), obj))
+export const pathStrOr = curry((defaultValue, str, obj) =>
+  pathOr(defaultValue, str.split('.'), obj),
+)
 export const pathStrOrNull = curry((str, obj) => pathOr(null, str.split('.'), obj))
 export const pathEqStr = curry((str, val, obj) => pathEq(str.split('.'), val, obj))
 
@@ -125,13 +132,19 @@ export const pathEqStr = curry((str, val, obj) => pathEq(str.split('.'), val, ob
 // With long chains of functions it can get annoying to make sure each one
 // contains a valid value before continuing.  This HOF performs a pipe but
 // only when each function returns something truthy.
-export const pipeWhenTruthy = (...fns) => arg => {
-  if (!isTruthy(arg)) { return null }
+export const pipeWhenTruthy = (...fns) => (arg) => {
+  if (!isTruthy(arg)) {
+    return null
+  }
   const [head, ...tail] = fns
-  if (!head) { return arg }
+  if (!head) {
+    return arg
+  }
   const result = head(arg)
   if (tail.length > 0) {
-    if (!isTruthy(result)) { return null }
+    if (!isTruthy(result)) {
+      return null
+    }
     return pipeWhenTruthy(...tail)(result)
   }
   return result
@@ -140,35 +153,34 @@ export const pipeWhenTruthy = (...fns) => arg => {
 // Converts an array of items to a map/dictionary/assocArray form.
 // Useful when an array needs to be indexed by a key from each of the itmes.
 export const arrToObjByKey = curry((key, arr) =>
-  arr.reduce(
-    (accum, item) => {
-      accum[item[key]] = item
-      return accum
-    },
-    {},
-  ),
+  arr.reduce((accum, item) => {
+    accum[item[key]] = item
+    return accum
+  }, {}),
 )
 
-export const ensureArray = maybeArr =>
-  (maybeArr && maybeArr instanceof Array) ? maybeArr : [maybeArr]
+export const ensureArray = (maybeArr) =>
+  maybeArr && maybeArr instanceof Array ? maybeArr : [maybeArr]
 
-export const ensureFunction = moize(maybeFunc => (...args) => {
+export const ensureFunction = moize((maybeFunc) => (...args) => {
   if (typeof maybeFunc === 'function') {
     return maybeFunc(...args)
   }
   return maybeFunc
 })
 
-export const maybeFnOrNull = fn => value => value ? fn(value) : null
+export const maybeFnOrNull = (fn) => (value) => (value ? fn(value) : null)
 
 // Create a function that compares a value against multiple predicate functions,
 // returning the first 'literal' from the matching predicate pair.
 // If none match, then undefined is returned.
 // (...[predicateFn, literal]) -> value -> literal
-export const condLiteral = (...conds) => value => {
+export const condLiteral = (...conds) => (value) => {
   for (let i = 0; i < conds.length; i++) {
     const [pred, literal] = conds[i]
-    if (pred(value)) { return literal }
+    if (pred(value)) {
+      return literal
+    }
   }
 }
 
@@ -182,13 +194,13 @@ export const condLiteral = (...conds) => value => {
 //   arr
 // )
 export const updateInArray = curry((predicateFn, updateFn, arr) =>
-  arr.map(item => predicateFn(item) ? updateFn(item) : item),
+  arr.map((item) => (predicateFn(item) ? updateFn(item) : item)),
 )
 
 // Like `updateInArray` but stops after finding the element to update
 // Also like ramda `adjust` but using a predicateFn
 export const adjustWith = curry((predicateFn, updateFn, arr) =>
-  adjust(findIndex(predicateFn, arr), updateFn, arr)
+  adjust(findIndex(predicateFn, arr), updateFn, arr),
 )
 
 // Like ramda `update` but using a predicateFn
@@ -197,9 +209,7 @@ export const updateWith = curry((predicateFn, newValue, arr) =>
 )
 
 // Remove an item from an array using a predicateFn
-export const removeWith = curry((predicateFn, arr) =>
-  remove(findIndex(predicateFn, arr), 1, arr),
-)
+export const removeWith = curry((predicateFn, arr) => remove(findIndex(predicateFn, arr), 1, arr))
 
 /**
  * Insert a set of items in an array updating those that match the predicateFn, and adding the ones who doesn't
@@ -213,10 +223,7 @@ export const removeWith = curry((predicateFn, arr) =>
  */
 export const upsertAllBy = curry((predicateFn, newItems, targetArr) => {
   const groupedValues = values(groupBy(predicateFn, [...targetArr, ...newItems]))
-  return groupedValues.map(
-    ([oldVal, newVal]) => newVal
-      ? { ...oldVal, ...newVal }
-      : oldVal)
+  return groupedValues.map(([oldVal, newVal]) => (newVal ? { ...oldVal, ...newVal } : oldVal))
 })
 
 // applyJsonPatch :: oldObject -> patch -> newObject
@@ -224,18 +231,19 @@ export const applyJsonPatch = curry((patch, obj) => {
   const { op, path, value } = patch
 
   // assocPath requires array indexes to be integer not string
-  const convertIntsToInts = n => !isNaN(n) ? parseInt(n, 10) : n
+  const convertIntsToInts = (n) => (!isNaN(n) ? parseInt(n, 10) : n)
 
-  const pathParts = path.split('/').slice(1).map(convertIntsToInts)
+  const pathParts = path
+    .split('/')
+    .slice(1)
+    .map(convertIntsToInts)
   if (op === 'replace') {
     return assocPath(pathParts, value, obj)
   }
 })
 
 // Perform a filter on the provided array if the passed boolean is truthy
-export const filterIf = curry(
-  (cond, fn, items) => cond ? filter(fn, items) : items,
-)
+export const filterIf = curry((cond, fn, items) => (cond ? filter(fn, items) : items))
 
 /**
  * Returns a functional switch statement
@@ -254,7 +262,7 @@ export const filterIf = curry(
  * numbersSwitch(2) // "two"
  * numbersSwitch(5) // "defaultValue"
  */
-export const switchCase = (defaultValue, ...cases) => input =>
+export const switchCase = (defaultValue, ...cases) => (input) =>
   cond([
     ...cases.map(([caseCond, caseVal]) => [equals(caseCond), always(caseVal)]),
     [T, always(defaultValue)],
@@ -277,5 +285,5 @@ export const switchCase = (defaultValue, ...cases) => input =>
  * stringsSwitch("foo")  // "value foo"
  * stringsSwitch("test") // "defaultValue"
  */
-export const objSwitchCase = (casesObj, defaultValue) => input =>
+export const objSwitchCase = (casesObj, defaultValue) => (input) =>
   casesObj.hasOwnProperty(input) ? casesObj[input] : defaultValue

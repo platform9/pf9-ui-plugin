@@ -1,11 +1,5 @@
 import React, { useCallback, useState } from 'react'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-  Typography,
-} from '@material-ui/core'
+import { Table, TableBody, TableCell, TableRow, Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import ExpansionPanel from 'core/components/expansionPanel/ExpansionPanel'
 import Theme from 'core/themes/model'
@@ -29,14 +23,14 @@ const useStyles = makeStyles<Theme>((theme) => ({
       border: 'none',
       '& td': {
         border: 'none',
-      }
+      },
     },
     marginTop: theme.spacing(2),
   },
   centerContent: {
     display: 'flex',
-    alignItems: 'center'
-  }
+    alignItems: 'center',
+  },
 }))
 
 export const clustersHaveMonitoring = (clusters: any[]) =>
@@ -158,7 +152,9 @@ const ClusterSetup = ({ onComplete, initialPanel = Panels.Cluster }: Props) => {
             Now that your cluster is created, enable monitoring to view the cluster’s health stats
             realtime in a dashboard
           </Typography>
-          {clusters.length > 0 && <MonitoringPrompt clusters={clusters} onComplete={handleSkipMonitoring} />}
+          {clusters.length > 0 && (
+            <MonitoringPrompt clusters={clusters} onComplete={handleSkipMonitoring} />
+          )}
         </ExpansionPanel>
       </OnboardWizard>
     </div>
@@ -194,7 +190,9 @@ const MonitoringPrompt = ({ clusters, onComplete }: IMonitoringPromptProps) => {
         <TableBody>
           {clusters.map((cluster: any = {}) => (
             <TableRow key={cluster.uuid}>
-              <TableCell><Typography variant="subtitle2">{cluster.name}</Typography></TableCell>
+              <TableCell>
+                <Typography variant="subtitle2">{cluster.name}</Typography>
+              </TableCell>
               <TableCell>
                 <NextButton showForward={false} onClick={toggleDialog(cluster)}>
                   Enable

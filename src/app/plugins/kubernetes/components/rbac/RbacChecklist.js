@@ -14,7 +14,7 @@ import { emptyObj } from 'utils/fp'
 import Progress from 'core/components/progress/Progress'
 import setRbacObject from './setRbacObject'
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   container: {
     maxHeight: '500px',
     overflow: 'scroll',
@@ -47,21 +47,27 @@ const useStyles = makeStyles(theme => ({
 
 const RbacChecklist = ({ clusterId, onChange, value, initialRules, ...rest }) => {
   const [checkedItems, setCheckedItems] = useState(emptyObj)
-  const [apiGroups, loadingApiGroups] = useDataLoader(apiGroupsLoader, { clusterId, orderBy: 'name' })
+  const [apiGroups, loadingApiGroups] = useDataLoader(apiGroupsLoader, {
+    clusterId,
+    orderBy: 'name',
+  })
 
   const classes = useStyles()
 
   // Todo: how to reset checkedItems upon clusterId update?
-  const handleCheck = useCallback((group, resource, verb) => {
-    const path = [group, resource, verb]
-    const newCheckedItems = ifElse(
-      hasPath(path),
-      dissocPath(path),
-      assocPath(path, true)
-    )(checkedItems)
-    setCheckedItems(newCheckedItems)
-    onChange(newCheckedItems)
-  }, [checkedItems])
+  const handleCheck = useCallback(
+    (group, resource, verb) => {
+      const path = [group, resource, verb]
+      const newCheckedItems = ifElse(
+        hasPath(path),
+        dissocPath(path),
+        assocPath(path, true),
+      )(checkedItems)
+      setCheckedItems(newCheckedItems)
+      onChange(newCheckedItems)
+    },
+    [checkedItems],
+  )
 
   useEffect(() => {
     if (!initialRules || !apiGroups || !apiGroups.length) {
@@ -72,17 +78,21 @@ const RbacChecklist = ({ clusterId, onChange, value, initialRules, ...rest }) =>
     onChange(rules)
   }, [initialRules, apiGroups])
 
-  const renderVerb = useCallback(curry((groupName, resourceName, verb) =>
-    <FormControlLabel
-      key={verb}
-      control={
-        <Checkbox
-          checked={hasPath([groupName, resourceName, verb], checkedItems)}
-          onChange={(e) => handleCheck(groupName, resourceName, verb)}
-        />
-      }
-      label={verb}
-    />), [handleCheck, checkedItems])
+  const renderVerb = useCallback(
+    curry((groupName, resourceName, verb) => (
+      <FormControlLabel
+        key={verb}
+        control={
+          <Checkbox
+            checked={hasPath([groupName, resourceName, verb], checkedItems)}
+            onChange={(e) => handleCheck(groupName, resourceName, verb)}
+          />
+        }
+        label={verb}
+      />
+    )),
+    [handleCheck, checkedItems],
+  )
 
   // Tried to separate out each map into its own function, but it
   // does not work for some reason... had to put it all into
@@ -93,14 +103,14 @@ const RbacChecklist = ({ clusterId, onChange, value, initialRules, ...rest }) =>
       <div key={group.name} className={classes.group}>
         <div className={classes.groupColumn}>{group.name}</div>
         <div className={classes.resources}>
-          {group.resources.map(resource => {
+          {group.resources.map((resource) => {
             const renderResourceVerbs = renderGroupVerbs(resource.name)
-            return <div key={resource.name} className={classes.resource}>
-              <div className={classes.resourceName}>{resource.name}</div>
-              <FormGroup row>
-                {resource.verbs.map(renderResourceVerbs)}
-              </FormGroup>
-            </div>
+            return (
+              <div key={resource.name} className={classes.resource}>
+                <div className={classes.resourceName}>{resource.name}</div>
+                <FormGroup row>{resource.verbs.map(renderResourceVerbs)}</FormGroup>
+              </div>
+            )
           })}
         </div>
       </div>
@@ -124,6 +134,4 @@ RbacChecklist.propTypes = {
   clusterId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 }
 
-export default compose(
-  withFormContext,
-)(RbacChecklist)
+export default compose(withFormContext)(RbacChecklist)

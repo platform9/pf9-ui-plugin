@@ -7,7 +7,7 @@ import PropTypes from 'prop-types'
 import { projectAs } from 'utils/fp'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     paddingRight: theme.spacing(1),
     marginBottom: theme.spacing(1),
@@ -58,14 +58,7 @@ const useStyles = makeStyles(theme => ({
   },
 }))
 
-const FilterDropdown = ({
-  field,
-  type,
-  label,
-  onChange,
-  value,
-  items,
-}) => {
+const FilterDropdown = ({ field, type, label, onChange, value, items }) => {
   switch (type) {
     case 'select':
       return (
@@ -97,78 +90,93 @@ const CardTableToolbar = ({
   searchTerm,
 }) => {
   const classes = useStyles()
-  const sortDirection = useMemo(() =>
-    onDirectionSwitch && <Tooltip title={orderDirection === 'asc' ? 'Asc' : 'Desc'}>
-      <FontAwesomeIcon
-        className={classes.button}
-        solid
-        size="lg"
-        aria-label="Change direction"
-        onClick={onDirectionSwitch}>
-        {orderDirection === 'asc' ? 'arrow-down' : 'arrow-up'}
-      </FontAwesomeIcon>
-    </Tooltip>, [orderDirection, onDirectionSwitch])
-  const refreshButton = useMemo(() =>
-    onRefresh && <Tooltip title="Refresh list">
-      <FontAwesomeIcon
-        className={classes.button}
-        solid
-        size="lg"
-        aria-label="Refresh list"
-        onClick={onRefresh}>
-        {'sync'}
-      </FontAwesomeIcon>
-    </Tooltip>, [onRefresh])
+  const sortDirection = useMemo(
+    () =>
+      onDirectionSwitch && (
+        <Tooltip title={orderDirection === 'asc' ? 'Asc' : 'Desc'}>
+          <FontAwesomeIcon
+            className={classes.button}
+            solid
+            size="lg"
+            aria-label="Change direction"
+            onClick={onDirectionSwitch}
+          >
+            {orderDirection === 'asc' ? 'arrow-down' : 'arrow-up'}
+          </FontAwesomeIcon>
+        </Tooltip>
+      ),
+    [orderDirection, onDirectionSwitch],
+  )
+  const refreshButton = useMemo(
+    () =>
+      onRefresh && (
+        <Tooltip title="Refresh list">
+          <FontAwesomeIcon
+            className={classes.button}
+            solid
+            size="lg"
+            aria-label="Refresh list"
+            onClick={onRefresh}
+          >
+            {'sync'}
+          </FontAwesomeIcon>
+        </Tooltip>
+      ),
+    [onRefresh],
+  )
 
-  return <Toolbar className={classes.root}>
-    {title && (
-      <div>
-        <div className={classes.title}>
-          <Typography variant="h6">{title}</Typography>
+  return (
+    <Toolbar className={classes.root}>
+      {title && (
+        <div>
+          <div className={classes.title}>
+            <Typography variant="h6">{title}</Typography>
+          </div>
+          <div className={classes.spacer} />
         </div>
-        <div className={classes.spacer} />
-      </div>
-    )}
-    <div className={classes.actions}>
-      <div className={classes.filters}>
-        {Array.isArray(filters)
-          ? filters.map(({ field, value, ...filterProps }) => (
-            <FilterDropdown
-              key={field}
-              classes={classes}
-              onChange={onFilterUpdate(field)}
-              field={field}
-              value={value !== undefined ? value : filterValues[field]}
+      )}
+      <div className={classes.actions}>
+        <div className={classes.filters}>
+          {Array.isArray(filters)
+            ? filters.map(({ field, value, ...filterProps }) => (
+              <FilterDropdown
+                key={field}
+                classes={classes}
+                onChange={onFilterUpdate(field)}
+                field={field}
+                value={value !== undefined ? value : filterValues[field]}
+              />
+            ))
+            : filters}
+        </div>
+        <div className={classes.controls}>
+          {sorting.length && (
+            <>
+              <Picklist
+                className={classes.sortBy}
+                disabled={false}
+                showAll={false}
+                name={'sort'}
+                label={'Sort By'}
+                options={projectAs({ label: 'label', value: 'field' }, sorting)}
+                value={orderBy || ''}
+                onChange={onSortChange}
+              />
+              {sortDirection}
+            </>
+          )}
+          {onSearchChange && (
+            <SearchBar
+              className={classes.search}
+              onSearchChange={onSearchChange}
+              searchTerm={searchTerm}
             />
-          ))
-          : filters}
+          )}
+          {refreshButton}
+        </div>
       </div>
-      <div className={classes.controls}>
-        {sorting.length && (
-          <>
-            <Picklist
-              className={classes.sortBy}
-              disabled={false}
-              showAll={false}
-              name={'sort'}
-              label={'Sort By'}
-              options={projectAs({ label: 'label', value: 'field' }, sorting)}
-              value={orderBy || ''}
-              onChange={onSortChange}
-            />
-            {sortDirection}
-          </>
-        )}
-        {onSearchChange && (
-          <SearchBar
-            className={classes.search}
-            onSearchChange={onSearchChange}
-            searchTerm={searchTerm} />
-        )}
-        {refreshButton}
-      </div>
-    </div>
-  </Toolbar>
+    </Toolbar>
+  )
 }
 
 export const filterSpecPropType = PropTypes.shape({

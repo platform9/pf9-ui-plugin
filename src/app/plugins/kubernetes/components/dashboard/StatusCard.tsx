@@ -24,15 +24,16 @@ const useStyles = makeStyles((theme: any) => ({
   contentContainer: {
     backgroundColor: theme.palette.dashboardCard.background,
     width: '280px',
-    height: ({ pieData }: any) => pieData ? '360px' : '170px',
+    height: ({ pieData }: any) => (pieData ? '360px' : '170px'),
     margin: theme.spacing(1.25),
     padding: theme.spacing(2.5, 1, 0.5, 1),
     borderRadius: '5px',
     transition: 'transform .1s ease',
-    boxShadow: '0 2.5px 1.5px -3.5px rgba(0, 0, 0, 0.2), 0 1.5px 7px 1px rgba(0, 0, 0, 0.12), 0 1px 3px -1.5px rgba(0, 0, 0, 0.14)',
+    boxShadow:
+      '0 2.5px 1.5px -3.5px rgba(0, 0, 0, 0.2), 0 1.5px 7px 1px rgba(0, 0, 0, 0.12), 0 1px 3px -1.5px rgba(0, 0, 0, 0.14)',
     '&:hover': {
       backgroundColor: hexToRGBA(theme.palette.dashboardCard.background, 0.95),
-      transform: 'scale(1.025)'
+      transform: 'scale(1.025)',
     },
     overflowX: 'hidden',
   },
@@ -46,15 +47,15 @@ const useStyles = makeStyles((theme: any) => ({
     alignItems: 'flex-start',
     '&:first-of-type': {
       borderBottom: `1px solid ${theme.palette.dashboardCard.divider}`,
-    }
+    },
   },
   rowColumn: {
-    padding: theme.spacing(0, 1)
+    padding: theme.spacing(0, 1),
   },
   text: {
     color: theme.palette.dashboardCard.primary,
     marginLeft: theme.spacing(1),
-    fontSize: '40px'
+    fontSize: '40px',
   },
   cardTitle: {
     marginLeft: theme.spacing(1),
@@ -104,15 +105,34 @@ interface StatusCardProps {
   icon: string | PropertyFunction<JSX.Element>
   quantity: number
   dataLoader: [() => any, {}] // todo figure out typings here.
-  quantityFn(data: any[]): { quantity: number, pieData: PieDataEntry[], piePrimary: string }
+  quantityFn(data: any[]): { quantity: number; pieData: PieDataEntry[]; piePrimary: string }
 }
 
-const StatusCard: FunctionComponent<StatusCardProps> = ({ entity, route, addRoute, title, icon, dataLoader, quantityFn }) => {
+const StatusCard: FunctionComponent<StatusCardProps> = ({
+  entity,
+  route,
+  addRoute,
+  title,
+  icon,
+  dataLoader,
+  quantityFn,
+}) => {
   const [data, loading] = useDataLoader(...dataLoader)
   const { quantity, pieData, piePrimary } = quantityFn(data)
   const {
-    row, rowColumn, contentContainer, headerIcon, spinner, cardTitle, text, arrowIcon,
-    verticalCenter, horizontalCenter, header, links, chart
+    row,
+    rowColumn,
+    contentContainer,
+    headerIcon,
+    spinner,
+    cardTitle,
+    text,
+    arrowIcon,
+    verticalCenter,
+    horizontalCenter,
+    header,
+    links,
+    chart,
   } = useStyles({ pieData: !!pieData })
 
   return (
@@ -129,7 +149,7 @@ const StatusCard: FunctionComponent<StatusCardProps> = ({ entity, route, addRout
           <FontAwesomeIcon className={headerIcon}>{icon}</FontAwesomeIcon>
           {loading ? (
             <CircularProgress className={spinner} size={32} />
-          ): (
+          ) : (
             <span className={text}>{quantity}</span>
           )}
         </div>
@@ -142,19 +162,23 @@ const StatusCard: FunctionComponent<StatusCardProps> = ({ entity, route, addRout
         </div>
         <div className={rowColumn}>
           <Link to={route}>
-            <FontAwesomeIcon size="2x" className={arrowIcon}>arrow-right</FontAwesomeIcon>
+            <FontAwesomeIcon size="2x" className={arrowIcon}>
+              arrow-right
+            </FontAwesomeIcon>
           </Link>
         </div>
       </div>
-      {pieData && <div className={clsx(row, chart, verticalCenter)}>
-        {loading ? (
-          <div className={horizontalCenter}>
-            <CircularProgress className={spinner} size={64} />
-          </div>
-        ) : (
-          <PieUsageWidget sideLength={110} arcWidth={12} primary={piePrimary} data={pieData} />
-        )}
-      </div>}
+      {pieData && (
+        <div className={clsx(row, chart, verticalCenter)}>
+          {loading ? (
+            <div className={horizontalCenter}>
+              <CircularProgress className={spinner} size={64} />
+            </div>
+          ) : (
+            <PieUsageWidget sideLength={110} arcWidth={12} primary={piePrimary} data={pieData} />
+          )}
+        </div>
+      )}
     </div>
   )
 }

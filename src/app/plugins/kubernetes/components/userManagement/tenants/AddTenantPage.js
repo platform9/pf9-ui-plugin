@@ -27,36 +27,50 @@ const userParams = { systemUsers: true }
 
 const AddTenantPage = () => {
   const { history } = useReactRouter()
-  const onComplete = useCallback(success => success && history.push(listUrl), [history])
+  const onComplete = useCallback((success) => success && history.push(listUrl), [history])
   const [handleAdd, submitting] = useDataUpdater(mngmTenantActions.create, onComplete)
   const [users, loadingUsers] = useDataLoader(mngmUserActions.list, userParams)
 
-  return <FormWrapper
-    title="New Tenant"
-    loading={submitting}
-    backUrl={listUrl}>
-    <Wizard onComplete={handleAdd} context={initialContext}>
-      {({ wizardContext, setWizardContext, onNext }) => <>
-        <WizardStep stepId="basic" label="Basic Info">
-          <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
-            <TextField id="name" label="Name" required />
-            <TextField id="description" label="Description" />
-          </ValidatedForm>
-        </WizardStep>
-        <WizardStep stepId="users" label="Users and Roles">
-          <Typography variant="body1" component="p">
-            Select one or more users that should map to this Tenant. These are the only users that
-            can access this Tenant, and hence the clusters that map to this Tenant.
-          </Typography>
-          <ValidatedForm fullWidth initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
-            <Progress renderContentOnMount={!loadingUsers} loading={loadingUsers} message={'Loading Users...'}>
-              <UserRolesTableField required id="roleAssignments" users={users} />
-            </Progress>
-          </ValidatedForm>
-        </WizardStep>
-      </>}
-    </Wizard>
-  </FormWrapper>
+  return (
+    <FormWrapper title="New Tenant" loading={submitting} backUrl={listUrl}>
+      <Wizard onComplete={handleAdd} context={initialContext}>
+        {({ wizardContext, setWizardContext, onNext }) => (
+          <>
+            <WizardStep stepId="basic" label="Basic Info">
+              <ValidatedForm
+                initialValues={wizardContext}
+                onSubmit={setWizardContext}
+                triggerSubmit={onNext}
+              >
+                <TextField id="name" label="Name" required />
+                <TextField id="description" label="Description" />
+              </ValidatedForm>
+            </WizardStep>
+            <WizardStep stepId="users" label="Users and Roles">
+              <Typography variant="body1" component="p">
+                Select one or more users that should map to this Tenant. These are the only users
+                that can access this Tenant, and hence the clusters that map to this Tenant.
+              </Typography>
+              <ValidatedForm
+                fullWidth
+                initialValues={wizardContext}
+                onSubmit={setWizardContext}
+                triggerSubmit={onNext}
+              >
+                <Progress
+                  renderContentOnMount={!loadingUsers}
+                  loading={loadingUsers}
+                  message={'Loading Users...'}
+                >
+                  <UserRolesTableField required id="roleAssignments" users={users} />
+                </Progress>
+              </ValidatedForm>
+            </WizardStep>
+          </>
+        )}
+      </Wizard>
+    </FormWrapper>
+  )
 }
 
 export default AddTenantPage

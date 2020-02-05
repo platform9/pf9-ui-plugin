@@ -23,8 +23,17 @@ const AzureFields = () => (
   <>
     <TextField id="tenantId" label="Tenant ID" info="The tenant ID of the service principal" />
     <TextField id="clientId" label="Client ID" info="The client ID of the service principal" />
-    <TextField id="clientSecret" type="password" label="Client Secret" info="The client secret of the service principal" />
-    <TextField id="subscriptionId" label="Subscription ID" info="The ID of the subscription that correlates to the service principal." />
+    <TextField
+      id="clientSecret"
+      type="password"
+      label="Client Secret"
+      info="The client secret of the service principal"
+    />
+    <TextField
+      id="subscriptionId"
+      label="Subscription ID"
+      info="The ID of the subscription that correlates to the service principal."
+    />
   </>
 )
 

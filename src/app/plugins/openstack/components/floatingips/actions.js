@@ -7,15 +7,15 @@ const floatingIpActions = createCRUDActions('floatingIps', {
   listFn: async () => {
     return neutron.getFloatingIps()
   },
-  createFn: async data => {
+  createFn: async (data) => {
     return neutron.createFloatingIp(data)
   },
   deleteFn: async ({ id }) => {
     await neutron.deleteFloatingIp(id)
   },
-  updateFn: async data => {
+  updateFn: async (data) => {
     throw new Error('Update Floating IP not yet implemented')
-  }
+  },
 })
 
 export default floatingIpActions

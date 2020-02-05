@@ -17,20 +17,22 @@ import { hasPathStr, pathStr } from 'utils/fp'
 import { prop, has, cond, T, identity } from 'ramda'
 
 class ApiClient {
-  static init (options = {}) {
+  static init(options = {}) {
     this.instance = new this(options)
     return this.instance
   }
 
-  static getInstance () {
+  static getInstance() {
     const { instance } = this
     if (!instance) {
-      throw new Error('ApiClient instance has not been initialized, please call ApiClient.init to instantiate it')
+      throw new Error(
+        'ApiClient instance has not been initialized, please call ApiClient.init to instantiate it',
+      )
     }
     return instance
   }
 
-  static hydrate (state) {
+  static hydrate(state) {
     const options = {
       keystoneEndpoint: state.keystoneEndpoint,
     }
@@ -46,7 +48,7 @@ class ApiClient {
   serviceCatalog = null
   endpoints = null
 
-  constructor (options = {}) {
+  constructor(options = {}) {
     this.options = options
     if (!options.keystoneEndpoint) {
       throw new Error('keystoneEndpoint required')
@@ -74,8 +76,8 @@ class ApiClient {
 
     this.axiosInstance = axios.create({ ...defaultAxiosConfig, ...(options.axios || {}) })
     this.axiosInstance.interceptors.response.use(
-      response => response,
-      error => Promise.reject(getResponseError(error)),
+      (response) => response,
+      (error) => Promise.reject(getResponseError(error)),
     )
   }
 
@@ -89,7 +91,7 @@ class ApiClient {
     }
   }
 
-  setActiveRegion = regionId => {
+  setActiveRegion = (regionId) => {
     this.activeRegion = regionId
   }
 
@@ -138,7 +140,7 @@ class ApiClient {
     return normalizeResponse(response)
   }
 
-  basicDelete = async url => {
+  basicDelete = async (url) => {
     const response = await this.axiosInstance.delete(url, this.getAuthHeaders())
     return normalizeResponse(response)
   }

@@ -6,21 +6,19 @@ import requiresAuthentication from '../../util/requiresAuthentication'
 import { loadVolumeSnapshots, updateVolumeSnapshot } from './actions'
 import UpdateVolumeSnapshotForm from './UpdateVolumeSnapshotForm'
 
-const UpdateVolumeSnapshotPage = props => (
+const UpdateVolumeSnapshotPage = (props) => (
   <DataUpdater
     loaderFn={loadVolumeSnapshots}
     updateFn={updateVolumeSnapshot}
     objId={props.match.params.volumeSnapshotId}
     backUrl="/ui/openstack/storage#volumeSnapshots"
   >
-    {({ data, onSubmit }) =>
+    {({ data, onSubmit }) => (
       <FormWrapper title="Update Volume Snapshot" backUrl="/ui/openstack/storage#volumeSnapshots">
         <UpdateVolumeSnapshotForm volumeSnapshot={data} onSubmit={onSubmit} />
       </FormWrapper>
-    }
+    )}
   </DataUpdater>
 )
 
-export default compose(
-  requiresAuthentication,
-)(UpdateVolumeSnapshotPage)
+export default compose(requiresAuthentication)(UpdateVolumeSnapshotPage)

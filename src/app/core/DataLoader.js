@@ -15,25 +15,27 @@ class DataLoader extends PureComponent {
     error: null,
   }
 
-  async componentDidMount () {
-    console.warn('DataLoader component is deprecated, please use `useDataLoader` hook or `withDataLoader` HoC instead')
+  async componentDidMount() {
+    console.warn(
+      'DataLoader component is deprecated, please use `useDataLoader` hook or `withDataLoader` HoC instead',
+    )
     await this.loadAll(this.props.options.refetchOnMount)
   }
 
-  async componentDidUpdate (prevProps) {
+  async componentDidUpdate(prevProps) {
     // Data will be reloaded only if the "params" prop has changed
     if (!equals(prevProps.params, this.props.params)) {
       await this.loadAll()
     }
   }
 
-  loadAll = async refetch => {
+  loadAll = async (refetch) => {
     this.setState({ loading: true }, async () => {
       const { loaders, getContext, setContext } = this.props
       try {
-        await propsAsync(mapObjIndexed(loaderFn =>
-          loaderFn({ getContext, setContext, refetch }), loaders,
-        ))
+        await propsAsync(
+          mapObjIndexed((loaderFn) => loaderFn({ getContext, setContext, refetch }), loaders),
+        )
         this.setState({ loading: false, error: null })
       } catch (err) {
         console.log(err)
@@ -42,16 +44,18 @@ class DataLoader extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { loading, error } = this.state
     if (error) {
       return <DisplayError error={error} />
     }
     const { children, options, loaders, ...props } = this.props
     const reload = this.loadAll
-    return <Progress inline={options.inlineProgress} overlay loading={loading}>
-      {children({ ...props, loading, error, reload })}
-    </Progress>
+    return (
+      <Progress inline={options.inlineProgress} overlay loading={loading}>
+        {children({ ...props, loading, error, reload })}
+      </Progress>
+    )
   }
 }
 

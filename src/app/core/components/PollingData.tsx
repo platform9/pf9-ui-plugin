@@ -3,7 +3,6 @@ import React, { useState, useCallback } from 'react'
 import moment from 'moment'
 import { Typography } from '@material-ui/core'
 import { TypographyProps } from '@material-ui/core/Typography'
-
 // Components
 import Loading from 'core/components/Loading'
 import useInterval from 'core/hooks/useInterval'
@@ -20,7 +19,7 @@ interface Props<T> {
 
 const defaultRefreshDuration = 1000 * 60 * 5
 
-function PollingData<T> ({
+function PollingData<T>({
   loading,
   onReload,
   hidden = false,
@@ -45,7 +44,7 @@ function PollingData<T> ({
       }
     }, pollIntervalMs)
     const currentTs = new Date().valueOf()
-    if ((currentTs - lastFetchTs) > refreshDuration) {
+    if (currentTs - lastFetchTs > refreshDuration) {
       reload()
     }
   }

@@ -18,7 +18,7 @@ const rbacApiGroupsToRules = (apiGroups) => {
       const rule = {
         apiGroups: apiGroupName === 'core' ? [''] : [apiGroupName],
         resources: [resourceName],
-        verbs: Object.keys(apiGroups[apiGroupName][resourceName])
+        verbs: Object.keys(apiGroups[apiGroupName][resourceName]),
       }
       rules.push(rule)
     })
@@ -27,71 +27,82 @@ const rbacApiGroupsToRules = (apiGroups) => {
 }
 
 // Can be either 'User' or 'Group'
-const getSubjectsOfKind = (subjects, kind) => (
-  subjects.filter(subject => subject.kind === kind).map(user => user.name)
+const getSubjectsOfKind = (subjects, kind) =>
+  subjects.filter((subject) => subject.kind === kind).map((user) => user.name)
+
+createContextLoader(
+  'coreApiResources',
+  async ({ clusterId }) => {
+    const response = await qbert.getCoreApiResourcesList(clusterId)
+    const apiResources = response.resources.map((item) => {
+      return {
+        ...item,
+        id: `${item.name}-${clusterId}`,
+      }
+    })
+    return apiResources
+  },
+  {
+    indexBy: 'clusterId',
+    uniqueIdentifier: 'id',
+  },
 )
 
-createContextLoader('coreApiResources', async ({ clusterId }) => {
-  const response = await qbert.getCoreApiResourcesList(clusterId)
-  const apiResources = response.resources.map((item) => {
-    return {
-      ...item,
-      id: `${item.name}-${clusterId}`
-    }
-  })
-  return apiResources
-}, {
-  indexBy: 'clusterId',
-  uniqueIdentifier: 'id',
-})
-
-createContextLoader('apiResources', async ({ clusterId, apiGroup }) => {
-  const response = await qbert.getApiResourcesList({ clusterId, apiGroup })
-  const apiResources = response.resources.map((item) => {
-    item.id = `${item.name}-${clusterId}`
-    return item
-  })
-  return apiResources
-}, {
-  indexBy: ['clusterId', 'apiGroup'],
-  uniqueIdentifier: 'id',
-})
+createContextLoader(
+  'apiResources',
+  async ({ clusterId, apiGroup }) => {
+    const response = await qbert.getApiResourcesList({ clusterId, apiGroup })
+    const apiResources = response.resources.map((item) => {
+      item.id = `${item.name}-${clusterId}`
+      return item
+    })
+    return apiResources
+  },
+  {
+    indexBy: ['clusterId', 'apiGroup'],
+    uniqueIdentifier: 'id',
+  },
+)
 
 const clusterApiGroupsCacheKey = 'apiGroups'
-export const apiGroupsLoader = createContextLoader(clusterApiGroupsCacheKey, async ({ clusterId }) => {
-  const response = await qbert.getApiGroupList(clusterId)
-  const apiGroups = response.groups.map((item) => {
-    item.id = `${item.name}-${clusterId}`
-    return item
-  })
-  return apiGroups
-}, {
-  dataMapper: async (apiGroups, { clusterId }, loadFromContext) => {
-    const coreResourcesResponse = await loadFromContext('coreApiResources', { clusterId })
-    const coreApiGroupWithResources = {
-      name: 'core',
-      groupVersion: 'core',
-      resources: coreResourcesResponse,
-    }
-    const apiGroupsWithResources = await mapAsync(async apiGroup => {
-      const groupVersion = apiGroup.preferredVersion.groupVersion
-      const resources = await loadFromContext('apiResources', {
-        clusterId,
-        apiGroup: groupVersion,
-      })
-      return {
-        name: apiGroup.name,
-        resources,
-        groupVersion
-      }
-    }, apiGroups)
-    return [coreApiGroupWithResources, ...apiGroupsWithResources]
+export const apiGroupsLoader = createContextLoader(
+  clusterApiGroupsCacheKey,
+  async ({ clusterId }) => {
+    const response = await qbert.getApiGroupList(clusterId)
+    const apiGroups = response.groups.map((item) => {
+      item.id = `${item.name}-${clusterId}`
+      return item
+    })
+    return apiGroups
   },
-  defaultOrderBy: 'groupName',
-  defaultOrderDirection: 'asc',
-  uniqueIdentifier: 'id',
-  indexBy: 'clusterId',
-})
+  {
+    dataMapper: async (apiGroups, { clusterId }, loadFromContext) => {
+      const coreResourcesResponse = await loadFromContext('coreApiResources', { clusterId })
+      const coreApiGroupWithResources = {
+        name: 'core',
+        groupVersion: 'core',
+        resources: coreResourcesResponse,
+      }
+      const apiGroupsWithResources = await mapAsync(async (apiGroup) => {
+        const groupVersion = apiGroup.preferredVersion.groupVersion
+        const resources = await loadFromContext('apiResources', {
+          clusterId,
+          apiGroup: groupVersion,
+        })
+        return {
+          name: apiGroup.name,
+          resources,
+          groupVersion,
+        }
+      }, apiGroups)
+      return [coreApiGroupWithResources, ...apiGroupsWithResources]
+    },
+    defaultOrderBy: 'groupName',
+    defaultOrderDirection: 'asc',
+    uniqueIdentifier: 'id',
+    indexBy: 'clusterId',
+  },
+)
 
 export const rolesCacheKey = 'kubeRoles'
 export const roleActions = createCRUDActions(rolesCacheKey, {
@@ -103,26 +114,26 @@ export const roleActions = createCRUDActions(rolesCacheKey, {
     }
     return qbert.getClusterRoles(clusterId)
   },
-  createFn: async data => {
+  createFn: async (data) => {
     const rules = rbacApiGroupsToRules(data.rbac)
     const body = {
       apiVersion: 'rbac.authorization.k8s.io/v1',
       kind: 'Role',
       metadata: {
         name: data.name,
-        namespace: data.namespace
+        namespace: data.namespace,
       },
       rules,
     }
     return qbert.createClusterRole(data.clusterId, data.namespace, body)
   },
-  updateFn: async data => {
+  updateFn: async (data) => {
     const rules = rbacApiGroupsToRules(data.rbac)
     const body = {
       apiVersion: 'rbac.authorization.k8s.io/v1',
       kind: 'Role',
       metadata: {
-        name: data.name
+        name: data.name,
       },
       rules,
     }
@@ -139,7 +150,7 @@ export const roleActions = createCRUDActions(rolesCacheKey, {
   },
   dataMapper: async (items, params, loadFromContext) => {
     const clusters = await loadFromContext(clustersCacheKey, { healthyClusters: true })
-    return items.map(item => ({
+    return items.map((item) => ({
       ...item,
       id: pathStr('metadata.uid', item),
       name: pathStr('metadata.name', item),
@@ -165,7 +176,7 @@ export const clusterRoleActions = createCRUDActions(clusterRolesCacheKey, {
     }
     return qbert.getClusterClusterRoles(clusterId)
   },
-  createFn: async data => {
+  createFn: async (data) => {
     const rules = rbacApiGroupsToRules(data.rbac)
     const body = {
       apiVersion: 'rbac.authorization.k8s.io/v1',
@@ -177,13 +188,13 @@ export const clusterRoleActions = createCRUDActions(clusterRolesCacheKey, {
     }
     return qbert.createClusterClusterRole(data.clusterId, body)
   },
-  updateFn: async data => {
+  updateFn: async (data) => {
     const rules = rbacApiGroupsToRules(data.rbac)
     const body = {
       apiVersion: 'rbac.authorization.k8s.io/v1',
       kind: 'ClusterRole',
       metadata: {
-        name: data.name
+        name: data.name,
       },
       rules,
     }
@@ -200,14 +211,14 @@ export const clusterRoleActions = createCRUDActions(clusterRolesCacheKey, {
   },
   dataMapper: async (items, params, loadFromContext) => {
     const clusters = await loadFromContext(clustersCacheKey, { healthyClusters: true })
-    return items.map(item => ({
+    return items.map((item) => ({
       ...item,
       id: pathStr('metadata.uid', item),
       name: pathStr('metadata.name', item),
       clusterName: pipe(find(propEq('uuid', item.clusterId)), prop('name'))(clusters),
       created: pathStr('metadata.creationTimestamp', item),
       pickerLabel: `Cluster Role: ${item.metadata.name}`,
-      pickerValue: `ClusterRole:${item.metadata.name}`
+      pickerValue: `ClusterRole:${item.metadata.name}`,
     }))
   },
   uniqueIdentifier,
@@ -225,22 +236,18 @@ export const roleBindingActions = createCRUDActions(roleBindingsCacheKey, {
     }
     return qbert.getClusterRoleBindings(clusterId)
   },
-  createFn: async data => {
-    const users = data.users.map((user) => (
-      {
-        kind: 'User',
-        name: user,
-        apiGroup: 'rbac.authorization.k8s.io'
-      }
-    ))
+  createFn: async (data) => {
+    const users = data.users.map((user) => ({
+      kind: 'User',
+      name: user,
+      apiGroup: 'rbac.authorization.k8s.io',
+    }))
 
-    const groups = data.groups.map((group) => (
-      {
-        kind: 'Group',
-        name: group,
-        apiGroup: 'rbac.authorization.k8s.io'
-      }
-    ))
+    const groups = data.groups.map((group) => ({
+      kind: 'Group',
+      name: group,
+      apiGroup: 'rbac.authorization.k8s.io',
+    }))
 
     const subjects = [...users, ...groups]
 
@@ -250,34 +257,30 @@ export const roleBindingActions = createCRUDActions(roleBindingsCacheKey, {
       kind: 'RoleBinding',
       metadata: {
         name: data.name,
-        namespace: data.namespace
+        namespace: data.namespace,
       },
       subjects,
       roleRef: {
         kind: roleType,
         name: roleName,
-        apiGroup: 'rbac.authorization.k8s.io'
-      }
+        apiGroup: 'rbac.authorization.k8s.io',
+      },
     }
 
     return qbert.createClusterRoleBinding(data.clusterId, data.namespace, body)
   },
-  updateFn: async data => {
-    const users = data.users.map((user) => (
-      {
-        kind: 'User',
-        name: user,
-        apiGroup: 'rbac.authorization.k8s.io'
-      }
-    ))
+  updateFn: async (data) => {
+    const users = data.users.map((user) => ({
+      kind: 'User',
+      name: user,
+      apiGroup: 'rbac.authorization.k8s.io',
+    }))
 
-    const groups = data.groups.map((group) => (
-      {
-        kind: 'Group',
-        name: group,
-        apiGroup: 'rbac.authorization.k8s.io'
-      }
-    ))
+    const groups = data.groups.map((group) => ({
+      kind: 'Group',
+      name: group,
+      apiGroup: 'rbac.authorization.k8s.io',
+    }))
 
     const subjects = [...users, ...groups]
 
@@ -287,7 +290,7 @@ export const roleBindingActions = createCRUDActions(roleBindingsCacheKey, {
         name: data.name,
       },
       subjects,
-      roleRef: data.roleRef
+      roleRef: data.roleRef,
     }
     return qbert.updateClusterRoleBinding(data.clusterId, data.namespace, data.name, body)
   },
@@ -302,7 +305,7 @@ export const roleBindingActions = createCRUDActions(roleBindingsCacheKey, {
   },
   dataMapper: async (items, params, loadFromContext) => {
     const clusters = await loadFromContext(clustersCacheKey, { healthyClusters: true })
-    return items.map(item => ({
+    return items.map((item) => ({
       ...item,
       id: pathStr('metadata.uid', item),
       name: pathStr('metadata.name', item),
@@ -324,26 +327,24 @@ export const clusterRoleBindingActions = createCRUDActions(clusterRoleBindingsCa
     const { clusterId } = params
     const clusters = await loadFromContext(clustersCacheKey, { healthyClusters: true })
     if (clusterId === allKey) {
-      return someAsync(pluck('uuid', clusters).map(qbert.getClusterClusterRoleBindings)).then(flatten)
+      return someAsync(pluck('uuid', clusters).map(qbert.getClusterClusterRoleBindings)).then(
+        flatten,
+      )
     }
     return qbert.getClusterClusterRoleBindings(clusterId)
   },
-  createFn: async data => {
-    const users = data.users.map((user) => (
-      {
-        kind: 'User',
-        name: user,
-        apiGroup: 'rbac.authorization.k8s.io'
-      }
-    ))
+  createFn: async (data) => {
+    const users = data.users.map((user) => ({
+      kind: 'User',
+      name: user,
+      apiGroup: 'rbac.authorization.k8s.io',
+    }))
 
-    const groups = data.groups.map((group) => (
-      {
-        kind: 'Group',
-        name: group,
-        apiGroup: 'rbac.authorization.k8s.io'
-      }
-    ))
+    const groups = data.groups.map((group) => ({
+      kind: 'Group',
+      name: group,
+      apiGroup: 'rbac.authorization.k8s.io',
+    }))
 
     const subjects = [...users, ...groups]
 
@@ -358,28 +359,24 @@ export const clusterRoleBindingActions = createCRUDActions(clusterRoleBindingsCa
       roleRef: {
         kind: roleType,
         name: roleName,
-        apiGroup: 'rbac.authorization.k8s.io'
-      }
+        apiGroup: 'rbac.authorization.k8s.io',
+      },
     }
 
     return qbert.createClusterClusterRoleBinding(data.clusterId, body)
   },
-  updateFn: async data => {
-    const users = data.users.map((user) => (
-      {
-        kind: 'User',
-        name: user,
-        apiGroup: 'rbac.authorization.k8s.io'
-      }
-    ))
+  updateFn: async (data) => {
+    const users = data.users.map((user) => ({
+      kind: 'User',
+      name: user,
+      apiGroup: 'rbac.authorization.k8s.io',
+    }))
 
-    const groups = data.groups.map((group) => (
-      {
-        kind: 'Group',
-        name: group,
-        apiGroup: 'rbac.authorization.k8s.io'
-      }
-    ))
+    const groups = data.groups.map((group) => ({
+      kind: 'Group',
+      name: group,
+      apiGroup: 'rbac.authorization.k8s.io',
+    }))
 
     const subjects = [...users, ...groups]
 
@@ -389,7 +386,7 @@ export const clusterRoleBindingActions = createCRUDActions(clusterRoleBindingsCa
         name: data.name,
       },
       subjects,
-      roleRef: data.roleRef
+      roleRef: data.roleRef,
     }
     return qbert.updateClusterClusterRoleBinding(data.clusterId, data.name, body)
   },
@@ -404,7 +401,7 @@ export const clusterRoleBindingActions = createCRUDActions(clusterRoleBindingsCa
   },
   dataMapper: async (items, params, loadFromContext) => {
     const clusters = await loadFromContext(clustersCacheKey, { healthyClusters: true })
-    return items.map(item => ({
+    return items.map((item) => ({
       ...item,
       id: pathStr('metadata.uid', item),
       name: pathStr('metadata.name', item),

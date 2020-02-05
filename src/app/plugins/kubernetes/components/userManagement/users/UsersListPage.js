@@ -20,17 +20,21 @@ const ListPage = ({ ListContainer }) => {
     const { params, getParamsUpdater } = usePrefParams(defaultParams)
     const [data, loading, reload] = useDataLoader(mngmUserActions.list, params)
     const filteredRows = useMemo(
-      () => data.filter(user => showingSystemUsers || !isSystemUser(user)),
-      [data, showingSystemUsers])
-    return <ListContainer
-      loading={loading}
-      reload={reload}
-      data={filteredRows}
-      getParamsUpdater={getParamsUpdater}
-      extraToolbarContent={
-        <SystemUsersToggle checked={showingSystemUsers} toggle={toggleSystemUsers} />}
-      {...pick(listTablePrefs, params)}
-    />
+      () => data.filter((user) => showingSystemUsers || !isSystemUser(user)),
+      [data, showingSystemUsers],
+    )
+    return (
+      <ListContainer
+        loading={loading}
+        reload={reload}
+        data={filteredRows}
+        getParamsUpdater={getParamsUpdater}
+        extraToolbarContent={
+          <SystemUsersToggle checked={showingSystemUsers} toggle={toggleSystemUsers} />
+        }
+        {...pick(listTablePrefs, params)}
+      />
+    )
   }
 }
 

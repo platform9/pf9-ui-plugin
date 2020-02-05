@@ -2,7 +2,7 @@ import React from 'react'
 import { FormControl, MenuItem, Select, Tooltip } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     maxWidth: 50,
     margin: theme.spacing(1),
@@ -17,7 +17,7 @@ const styles = theme => ({
 
 const PerPageControl = ({ classes, value, onChangeRowsPerPage, rowsPerPageOptions }) => {
   const [open, setOpen] = React.useState(false)
-  const options = rowsPerPageOptions.map(x => ({ label: x, value: x }))
+  const options = rowsPerPageOptions.map((x) => ({ label: x, value: x }))
   return (
     <FormControl className={classes.root}>
       <Tooltip title={'Rows per page'} open={open}>
@@ -31,7 +31,11 @@ const PerPageControl = ({ classes, value, onChangeRowsPerPage, rowsPerPageOption
           onChange={onChangeRowsPerPage}
           disableUnderline
         >
-          {rowsPerPageOptions.map(pp => <MenuItem value={pp} key={pp}>{pp}</MenuItem>)}
+          {rowsPerPageOptions.map((pp) => (
+            <MenuItem value={pp} key={pp}>
+              {pp}
+            </MenuItem>
+          ))}
         </Select>
       </Tooltip>
     </FormControl>

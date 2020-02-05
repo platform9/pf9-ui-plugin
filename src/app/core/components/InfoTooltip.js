@@ -5,7 +5,7 @@ import { Tooltip } from '@material-ui/core'
 import Icon from '@material-ui/core/Icon/Icon'
 import moize from 'moize'
 
-const styles = theme => ({
+const styles = (theme) => ({
   infoTooltip: {
     background: theme.palette.common.white,
     color: theme.palette.text.primary,
@@ -26,24 +26,30 @@ const styles = theme => ({
 
 @withStyles(styles)
 class InfoTooltip extends PureComponent {
-  renderTitle = moize(info => <React.Fragment>
-    <Icon className={this.props.classes.infoIcon} color="primary">
-      <span>info</span>
-    </Icon>
-    <span>{info}</span>
-  </React.Fragment>)
+  renderTitle = moize((info) => (
+    <React.Fragment>
+      <Icon className={this.props.classes.infoIcon} color="primary">
+        <span>info</span>
+      </Icon>
+      <span>{info}</span>
+    </React.Fragment>
+  ))
 
-  render () {
+  render() {
     const { info, classes = {}, placement, open, children } = this.props
 
-    return (
-      info ? <Tooltip
+    return info ? (
+      <Tooltip
         interactive
         open={open}
         placement={placement}
         classes={{ tooltip: classes.infoTooltip }}
         title={this.renderTitle(info)}
-      >{children}</Tooltip> : children
+      >
+        {children}
+      </Tooltip>
+    ) : (
+      children
     )
   }
 }
@@ -60,11 +66,12 @@ InfoTooltip.propTypes = {
 }
 
 // We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
-const withInfoTooltip = Component => React.forwardRef(({ info, ...props }, ref) =>
-  <InfoTooltip info={info}>
-    <Component {...props} ref={ref} />
-  </InfoTooltip>,
-)
+const withInfoTooltip = (Component) =>
+  React.forwardRef(({ info, ...props }, ref) => (
+    <InfoTooltip info={info}>
+      <Component {...props} ref={ref} />
+    </InfoTooltip>
+  ))
 
 export { withInfoTooltip }
 

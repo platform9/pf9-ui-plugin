@@ -9,10 +9,9 @@ import { listTablePrefs } from 'app/constants'
 import { createUsePrefParamsHook } from 'core/hooks/useParams'
 
 const nop = () => {}
-export const randomInt = (min, max) =>
-  Math.floor(Math.random() * (max - min + 1) + min)
+export const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1) + min)
 
-const data = range(1, randomInt(20, 30)).map(id => ({
+const data = range(1, randomInt(20, 30)).map((id) => ({
   id,
   uuid: faker.random.uuid(),
   name: faker.name.findName(),
@@ -33,16 +32,14 @@ const columns = [
   {
     id: 'date',
     label: 'Date',
-    render: value => moment(value).format('LL'),
-    sortWith: (prevDate, nextDate) =>
-      moment(prevDate).isBefore(nextDate) ? 1 : -1,
+    render: (value) => moment(value).format('LL'),
+    sortWith: (prevDate, nextDate) => (moment(prevDate).isBefore(nextDate) ? 1 : -1),
   },
   {
     id: 'storage',
     label: 'Storage',
-    render: value => formattedValue(value),
-    sortWith: (prevValue, nextValue) =>
-      +prevValue > +nextValue ? 1 : -1,
+    render: (value) => formattedValue(value),
+    sortWith: (prevValue, nextValue) => (+prevValue > +nextValue ? 1 : -1),
   },
   { id: 'description', label: 'Description', sort: false, display: false },
   { id: 'active', label: 'Active', sort: false, display: false },
@@ -51,12 +48,14 @@ const usePrefParams = createUsePrefParamsHook('ThemeTableExample', listTablePref
 const ListPage = ({ ListContainer }) => {
   return () => {
     const { params, getParamsUpdater } = usePrefParams()
-    return <ListContainer
-      getParamsUpdater={getParamsUpdater}
-      data={data}
-      columns={columns}
-      {...pick(listTablePrefs, params)}
-    />
+    return (
+      <ListContainer
+        getParamsUpdater={getParamsUpdater}
+        data={data}
+        columns={columns}
+        {...pick(listTablePrefs, params)}
+      />
+    )
   }
 }
 

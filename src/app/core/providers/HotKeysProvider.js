@@ -2,21 +2,20 @@ import React, { Component } from 'react'
 import { isEmpty, lensProp, over, pluck, view } from 'ramda'
 
 const HotKeysContext = React.createContext({
-  setHotKeyHandler: function () {
+  setHotKeyHandler: function() {
     throw new Error('HotKeysProvider not found')
   },
-  unsetHotKeyHandlers: function () {
+  unsetHotKeyHandlers: function() {
     throw new Error('HotKeysProvider not found')
   },
 })
 const keyHandlersLens = lensProp('hotKeyHandlers')
 const editableInputs = ['INPUT', 'SELECT', 'TEXTAREA']
-const pressingSpecialKey = e => e.metaKey || e.altKey || e.shiftKey
-const isEditableInput = e => {
+const pressingSpecialKey = (e) => e.metaKey || e.altKey || e.shiftKey
+const isEditableInput = (e) => {
   const target = e.target || e.srcElement
   // input, select, and textarea are always considered editable inputs
-  return editableInputs.includes(target.tagName) ||
-    target.isContentEditable
+  return editableInputs.includes(target.tagName) || target.isContentEditable
 }
 
 export default class HotKeysProvider extends Component {
@@ -30,39 +29,40 @@ export default class HotKeysProvider extends Component {
      * @param options { whileEditing, ctrlKey }
      */
     setHotKeyHandler: (key, fn, options) => {
-      this.setState(over(keyHandlersLens,
-        handlers => ({
+      this.setState(
+        over(keyHandlersLens, (handlers) => ({
           ...handlers,
-          [key]: [...(handlers[key] || []), { fn, options }]
-        })
-      ))
+          [key]: [...(handlers[key] || []), { fn, options }],
+        })),
+      )
     },
 
     unsetHotKeyHandlers: (key, handlerFunctions) => {
-      this.setState(over(keyHandlersLens,
-        handlers => ({
+      this.setState(
+        over(keyHandlersLens, (handlers) => ({
           ...handlers,
-          [key]: handlers[key].filter(handler =>
-            !handlerFunctions.includes(handler.fn))
-        })
-      ))
-    }
+          [key]: handlers[key].filter((handler) => !handlerFunctions.includes(handler.fn)),
+        })),
+      )
+    },
   }
 
-  componentDidMount () {
+  componentDidMount() {
     document.addEventListener('keydown', this.handleKeyDown)
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     document.removeEventListener('keydown', this.handleKeyDown)
   }
 
-  handleKeyDown = e => {
+  handleKeyDown = (e) => {
     const hotkeyHandlers = this.state.hotKeyHandlers[e.key]
     if (hotkeyHandlers && !isEmpty(hotkeyHandlers) && !pressingSpecialKey(e)) {
       hotkeyHandlers.forEach(({ fn, options }) => {
-        if ((!options.ctrlKey || options.ctrlKey === e.ctrlKey) &&
-          (options.whileEditing || !isEditableInput(e))) {
+        if (
+          (!options.ctrlKey || options.ctrlKey === e.ctrlKey) &&
+          (options.whileEditing || !isEditableInput(e))
+        ) {
           e.preventDefault()
           fn(e)
         }
@@ -70,12 +70,11 @@ export default class HotKeysProvider extends Component {
     }
   }
 
-  render () {
+  render() {
     const { children } = this.props
     const { setHotKeyHandler, unsetHotKeyHandlers } = this.state
     return (
-      <HotKeysContext.Provider
-        value={{ setHotKeyHandler, unsetHotKeyHandlers }}>
+      <HotKeysContext.Provider value={{ setHotKeyHandler, unsetHotKeyHandlers }}>
         {children}
       </HotKeysContext.Provider>
     )
@@ -89,11 +88,11 @@ class HotKeysConsumerWrapper extends Component {
     hotKeyHandlers: {},
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.unsetHotKeysHandlers()
   }
 
-  unsetHotKeysHandlers () {
+  unsetHotKeysHandlers() {
     const handlers = view(keyHandlersLens, this.state) || {}
 
     Object.entries(handlers).forEach(([key, handlers]) => {
@@ -104,24 +103,22 @@ class HotKeysConsumerWrapper extends Component {
   setHotKeyHandler = (key, fn, options = {}) => {
     // Keep a reference of the key handlers to be able to remove them
     // when the components unmounts
-    this.setState(over(keyHandlersLens,
-      handlers => ({
+    this.setState(
+      over(keyHandlersLens, (handlers) => ({
         ...handlers,
-        [key]: [...(handlers[key] || []), { fn, options }]
-      })
-    ))
+        [key]: [...(handlers[key] || []), { fn, options }],
+      })),
+    )
     this.context.setHotKeyHandler(key, fn, options)
   }
 
-  render () {
+  render() {
     return this.props.children(this.setHotKeyHandler)
   }
 }
 
-export const withHotKeys = Component => props =>
+export const withHotKeys = (Component) => (props) => (
   <HotKeysConsumerWrapper>
-    {
-      (setHotKeyHandler) =>
-        <Component {...props} setHotKeyHandler={setHotKeyHandler} />
-    }
+    {(setHotKeyHandler) => <Component {...props} setHotKeyHandler={setHotKeyHandler} />}
   </HotKeysConsumerWrapper>
+)

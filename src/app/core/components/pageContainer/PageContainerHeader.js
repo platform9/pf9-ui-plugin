@@ -7,10 +7,7 @@ const PageContainerHeader = ({ children }) => {
   if (!extraHeaderContainer) {
     return null
   }
-  return ReactDOM.createPortal(
-    children,
-    extraHeaderContainer,
-  )
+  return ReactDOM.createPortal(children, extraHeaderContainer)
 }
 
 export default PageContainerHeader

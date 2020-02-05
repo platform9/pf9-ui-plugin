@@ -7,10 +7,7 @@ const BannerContent: FC = ({ children }) => {
   if (!bannerContainer) {
     return null
   }
-  return ReactDOM.createPortal(
-    children,
-    bannerContainer,
-  )
+  return ReactDOM.createPortal(children, bannerContainer)
 }
 
 export default BannerContent

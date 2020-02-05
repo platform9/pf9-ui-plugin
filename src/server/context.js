@@ -4,9 +4,8 @@ const config = require('../../config')
 // use a simulated route or proxy it to the REST APIs of a real DU.
 // The bulk of the server should have no knowledge of where the data is
 // coming from.
-const context =
-  config.simulator
-    ? require('./context/simulator').default
-    : require('./context/rest').default
+const context = config.simulator
+  ? require('./context/simulator').default
+  : require('./context/rest').default
 
 export default context

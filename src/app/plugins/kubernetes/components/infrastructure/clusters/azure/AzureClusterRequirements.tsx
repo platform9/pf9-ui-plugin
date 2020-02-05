@@ -6,8 +6,7 @@ import SubmitButton from 'core/components/buttons/SubmitButton'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import ExternalLink from 'core/components/ExternalLink'
 import {
-  azureCreateANewApplicationSecretLink,
-  azureGetValuesForSigninginLink,
+  azureCreateANewApplicationSecretLink, azureGetValuesForSigninginLink,
   azureServicePrincipalPortalLink,
 } from 'k8s/links'
 import { routes } from 'core/utils/routes'
@@ -57,16 +56,12 @@ const AzureClusterRequirements = ({ onComplete }) => {
           In order to be able to perform the necessary operations on Managed Kubernetes clusters,
           your credentials must have a ‘contributor’ role assigned, or a similar read/write role
           where the user is able to access subscriptions, and create/update/delete Azure resources.
-          <ExternalLink url={azureServicePrincipalPortalLink}>
-            See this article
-          </ExternalLink>{' '}
-          for detailed steps.
+          <ExternalLink url={azureServicePrincipalPortalLink}>See this article</ExternalLink> for
+          detailed steps.
         </Typography>
         <Typography className={classes.alertTitle} variant="body1">
           See the{' '}
-          <ExternalLink url={azureGetValuesForSigninginLink}>
-            section under get values
-          </ExternalLink>{' '}
+          <ExternalLink url={azureGetValuesForSigninginLink}>section under get values</ExternalLink>{' '}
           for signing in to find the tenant and client IDs.
         </Typography>
         <Typography className={classes.alertTitle} variant="body1">

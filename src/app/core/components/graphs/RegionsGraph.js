@@ -2,16 +2,16 @@ import React from 'react'
 import { withStyles } from '@material-ui/styles'
 import SvgCloud from './SvgCloud'
 
-const styles = theme => ({
+const styles = (theme) => ({
   svg: {
     'max-height': '100%',
-    position: 'absolute'
-  }
+    position: 'absolute',
+  },
 })
 
 @withStyles(styles)
 class RegionsGraph extends React.PureComponent {
-  render () {
+  render() {
     const { classes } = this.props
 
     return (

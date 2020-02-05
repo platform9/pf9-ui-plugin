@@ -9,9 +9,15 @@ import PageContainer from 'core/components/pageContainer/PageContainer'
 const StorageIndex = () => (
   <PageContainer>
     <Tabs>
-      <Tab value="volumes" label="Volumes"><VolumesListPage /></Tab>
-      <Tab value="volumeTypes" label="Volume Types"><VolumeTypesListPage /></Tab>
-      <Tab value="volumeSnapshots" label="Volume Snapshots"><VolumeSnapshotsListPage /></Tab>
+      <Tab value="volumes" label="Volumes">
+        <VolumesListPage />
+      </Tab>
+      <Tab value="volumeTypes" label="Volume Types">
+        <VolumeTypesListPage />
+      </Tab>
+      <Tab value="volumeSnapshots" label="Volume Snapshots">
+        <VolumeSnapshotsListPage />
+      </Tab>
     </Tabs>
   </PageContainer>
 )

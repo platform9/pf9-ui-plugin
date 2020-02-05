@@ -23,46 +23,50 @@ const UpdateRoleBindingPage = () => {
   const roleBindingId = match.params.id
   const clusterId = match.params.clusterId
   const onComplete = useCallback(
-    success => success && history.push('/ui/kubernetes/rbac#roleBindings'),
-    [history])
+    (success) => success && history.push('/ui/kubernetes/rbac#roleBindings'),
+    [history],
+  )
   const [roleBindings, loading] = useDataLoader(roleBindingActions.list, { clusterId })
-  const roleBinding = useMemo(
-    () => roleBindings.find(propEq('id', roleBindingId)) || emptyObj,
-    [roleBindings, roleBindingId])
+  const roleBinding = useMemo(() => roleBindings.find(propEq('id', roleBindingId)) || emptyObj, [
+    roleBindings,
+    roleBindingId,
+  ])
 
   const { getParamsUpdater } = useParams(defaultParams)
 
   const [updateRoleBindingAction, updating] = useDataUpdater(roleBindingActions.update, onComplete)
-  const handleSubmit = useCallback(
-    data => updateRoleBindingAction(({ ...roleBinding, ...data })),
-    [roleBinding])
+  const handleSubmit = useCallback((data) => updateRoleBindingAction({ ...roleBinding, ...data }), [
+    roleBinding,
+  ])
 
   return (
     <FormWrapper
       title="Edit Role Binding"
-      backUrl='/ui/kubernetes/rbac#roleBindings'
+      backUrl="/ui/kubernetes/rbac#roleBindings"
       loading={loading || updating}
       message={loading ? 'Loading role binding...' : 'Submitting form...'}
     >
       <ValidatedForm onSubmit={handleSubmit}>
-        <PresetField label='Name' value={roleBinding.name} />
-        <PresetField label='Cluster' value={roleBinding.clusterName} />
-        <PresetField label='Namespace' value={roleBinding.namespace} />
-        { roleBinding.roleRef &&
-          <PresetField label='Role' value={roleBinding.roleRef.name} />
-        }
-        { roleBinding.users && <UserMultiSelect
-          id="users"
-          info="Select users to assign this role"
-          onChange={getParamsUpdater('users')}
-          initialValue={roleBinding.users}
-        />}
-        { roleBinding.groups && <GroupMultiSelect
-          id="groups"
-          info="Select groups to assign this role"
-          onChange={getParamsUpdater('groups')}
-          initialValue={roleBinding.groups}
-        />}
+        <PresetField label="Name" value={roleBinding.name} />
+        <PresetField label="Cluster" value={roleBinding.clusterName} />
+        <PresetField label="Namespace" value={roleBinding.namespace} />
+        {roleBinding.roleRef && <PresetField label="Role" value={roleBinding.roleRef.name} />}
+        {roleBinding.users && (
+          <UserMultiSelect
+            id="users"
+            info="Select users to assign this role"
+            onChange={getParamsUpdater('users')}
+            initialValue={roleBinding.users}
+          />
+        )}
+        {roleBinding.groups && (
+          <GroupMultiSelect
+            id="groups"
+            info="Select groups to assign this role"
+            onChange={getParamsUpdater('groups')}
+            initialValue={roleBinding.groups}
+          />
+        )}
         <SubmitButton>Update Role Binding</SubmitButton>
       </ValidatedForm>
     </FormWrapper>

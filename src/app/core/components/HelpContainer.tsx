@@ -15,7 +15,7 @@ interface Props {
 }
 type IIconColor = Props['color']
 
-const useStyles = makeStyles<Theme, { color: IIconColor, isLink: boolean }>((theme: Theme) => ({
+const useStyles = makeStyles<Theme, { color: IIconColor; isLink: boolean }>((theme: Theme) => ({
   icon: {
     cursor: ({ isLink }) => (isLink ? 'pointer' : 'default'),
     fontWeight: 900,

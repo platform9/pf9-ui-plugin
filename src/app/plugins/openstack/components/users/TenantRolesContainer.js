@@ -32,33 +32,35 @@ const TenantRolesContainer = ({ value, setFieldValue, id, roles }) => {
     }, {})
   }, [value])
 
-  const handleChange = curTenant => event => {
+  const handleChange = (curTenant) => (event) => {
     setFieldValue(combineRoles(curTenant, event.target.value))
   }
   if (!value) {
     return null
   }
-  return (<Progress loading={loadingTenants} overlay>
-    <Table id={id}>
-      <TableHead>
-        <TableRow>
-          <TableCell>Tenants</TableCell>
-          <TableCell>Roles</TableCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {tenants.map(tenant =>
-          <TenantRoleSelector
-            key={tenant.id}
-            tenant={tenant}
-            roles={roles}
-            status={inputTenants}
-            handleChange={handleChange(tenant)}
-          />)
-        }
-      </TableBody>
-    </Table>
-  </Progress>)
+  return (
+    <Progress loading={loadingTenants} overlay>
+      <Table id={id}>
+        <TableHead>
+          <TableRow>
+            <TableCell>Tenants</TableCell>
+            <TableCell>Roles</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {tenants.map((tenant) => (
+            <TenantRoleSelector
+              key={tenant.id}
+              tenant={tenant}
+              roles={roles}
+              status={inputTenants}
+              handleChange={handleChange(tenant)}
+            />
+          ))}
+        </TableBody>
+      </Table>
+    </Progress>
+  )
 }
 
 TenantRolesContainer.propTypes = {

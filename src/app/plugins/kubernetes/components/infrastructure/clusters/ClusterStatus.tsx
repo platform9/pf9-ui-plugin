@@ -4,10 +4,7 @@ import { makeStyles } from '@material-ui/styles'
 import SimpleLink from 'core/components/SimpleLink'
 
 import {
-  isTransientStatus,
-  getClusterHealthStatus,
-  getClusterConnectionStatus,
-  IClusterStatus,
+  isTransientStatus, getClusterHealthStatus, getClusterConnectionStatus, IClusterStatus,
 } from './ClusterStatusUtils'
 import { ICluster } from './model'
 import ProgressBar from 'core/components/progress/ProgressBar'
@@ -49,12 +46,12 @@ const useStyles = makeStyles<Theme, Props>((theme: Theme) => ({
       width: ({ variant }) =>
         variant === 'header' ? theme.typography.body1.fontSize : theme.typography.body2.fontSize,
       borderRadius: '50%',
-      backgroundColor: ({ status }) => getIconOrBubbleColor(status, theme)
+      backgroundColor: ({ status }) => getIconOrBubbleColor(status, theme),
     },
   },
   iconColor: {
     fontSize: ({ variant }) => (variant === 'header' ? '1rem' : theme.typography.body1.fontSize),
-    color: ({ status }) => getIconOrBubbleColor(status, theme)
+    color: ({ status }) => getIconOrBubbleColor(status, theme),
   },
 }))
 
@@ -99,13 +96,10 @@ const ClusterStatusSpan: FC<Props> = (props) => {
 export default ClusterStatusSpan
 
 const renderErrorStatus = (taskError, nodesDetailsUrl, variant) => (
-  <ClusterStatusSpan
-    iconStatus
-    title={taskError}
-    status='error'
-    variant={variant}
-  >
-    <SimpleLink variant="error" src={nodesDetailsUrl}>Error</SimpleLink>
+  <ClusterStatusSpan iconStatus title={taskError} status="error" variant={variant}>
+    <SimpleLink variant="error" src={nodesDetailsUrl}>
+      Error
+    </SimpleLink>
   </ClusterStatusSpan>
 )
 

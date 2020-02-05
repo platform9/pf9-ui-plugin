@@ -5,7 +5,7 @@ import Tooltip from '@material-ui/core/Tooltip'
 import ExternalLink from 'core/components/ExternalLink'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
     flexFlow: 'row nowrap',

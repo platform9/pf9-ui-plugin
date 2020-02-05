@@ -5,12 +5,9 @@ import { makeStyles } from '@material-ui/styles'
 import ClusterStatusSpan from 'k8s/components/infrastructure/clusters/ClusterStatus'
 import useToggler from 'core/hooks/useToggler'
 import ResourceUsageTable from 'k8s/components/infrastructure/common/ResourceUsageTable'
-import {
-  connectionStatusFieldsTable,
-  clusterHealthStatusFields,
-} from './ClusterStatusUtils'
+import { connectionStatusFieldsTable, clusterHealthStatusFields } from './ClusterStatusUtils'
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   container: {
     marginTop: theme.spacing(4),
     marginBottom: theme.spacing(4),
@@ -19,21 +16,21 @@ const useStyles = makeStyles(theme => ({
     fontSize: 16,
   },
   shiftRight: {
-    marginLeft: theme.spacing(3)
+    marginLeft: theme.spacing(3),
   },
   statusLabel: {
     fontSize: 14,
   },
   message: {
     fontSize: 12,
-    marginLeft: theme.spacing(1)
+    marginLeft: theme.spacing(1),
   },
   error: {
     cursor: 'pointer',
     marginTop: theme.spacing(2),
     '&:hover': {
       textDecoration: 'underline',
-    }
+    },
   },
   resources: {
     marginTop: theme.spacing(2),
@@ -50,7 +47,11 @@ const clusterConnectionMessages = {
   partially_connected: 'Some nodes in the cluster are not connected',
 }
 
-const masterNodesHealthMessages = ({ masterNodesHealthStatus, healthyMasterNodes, masterNodes }) => {
+const masterNodesHealthMessages = ({
+  masterNodesHealthStatus,
+  healthyMasterNodes,
+  masterNodes,
+}) => {
   switch (masterNodesHealthStatus) {
     case 'healthy':
       return 'All masters are healthy'
@@ -91,21 +92,21 @@ const ClusterNodesOverview = ({ cluster }) => {
       <Grid item xs={6}>
         <Status
           classes={classes}
-          title='Cluster Connection Status:'
+          title="Cluster Connection Status:"
           status={connectionFields.clusterStatus}
           statusLabel={connectionFields.label}
           message={clusterConnectionMessage}
         />
         <Status
           classes={classes}
-          title='Master Nodes Health Status:'
+          title="Master Nodes Health Status:"
           status={masterNodesFields.status}
           statusLabel={masterNodesFields.label}
           message={masterNodesMessage}
         />
         <Status
           classes={classes}
-          title='Worker Nodes Health Status:'
+          title="Worker Nodes Health Status:"
           status={workerNodesFields.status}
           statusLabel={workerNodesFields.label}
           message={workerNodesMessage}
@@ -115,9 +116,7 @@ const ClusterNodesOverview = ({ cluster }) => {
           <DialogTitle>
             <CloseIcon className={classes.closeIcon} onClick={toggleDialog} />
           </DialogTitle>
-          <DialogContent>
-            {cluster.taskError}
-          </DialogContent>
+          <DialogContent>{cluster.taskError}</DialogContent>
         </Dialog>
       </Grid>
       <Grid container item xs={6}>
@@ -127,7 +126,7 @@ const ClusterNodesOverview = ({ cluster }) => {
   )
 }
 
-const Status = ({ classes, status, statusLabel, title, message }) =>
+const Status = ({ classes, status, statusLabel, title, message }) => (
   <div>
     <div className={classes.title}>{title}</div>
     <div className={classes.shiftRight}>
@@ -137,15 +136,19 @@ const Status = ({ classes, status, statusLabel, title, message }) =>
       </ClusterStatusSpan>
     </div>
   </div>
+)
 
-const Error = ({ classes, onClick }) =>
+const Error = ({ classes, onClick }) => (
   <div className={classes.error}>
-    <ClusterStatusSpan status='error'>
-      <span onClick={onClick} className={classes.title}>The last cluster operation failed (see error)</span>
+    <ClusterStatusSpan status="error">
+      <span onClick={onClick} className={classes.title}>
+        The last cluster operation failed (see error)
+      </span>
     </ClusterStatusSpan>
   </div>
+)
 
-const toMHz = value => value * 1024
+const toMHz = (value) => value * 1024
 
 const ResourceUtilization = ({ classes, usage }) => {
   if (!usage) {

@@ -8,7 +8,10 @@ import { trackEvent } from 'utils/tracking'
 // nothing but an action but I didn't want to clutter the Navbar component with
 // more code.  This gives us a nice clean separation.
 const LogoutPage = () => {
-  const { destroySession, session: { username } } = useContext(AppContext)
+  const {
+    destroySession,
+    session: { username },
+  } = useContext(AppContext)
 
   useEffect(() => {
     trackEvent('PF9 Logged Out', {

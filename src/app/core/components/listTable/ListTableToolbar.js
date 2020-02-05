@@ -13,7 +13,7 @@ import Picklist from 'core/components/Picklist'
 import { emptyArr } from 'utils/fp'
 import { both, T } from 'ramda'
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
     flexFlow: 'row nowrap',
@@ -47,14 +47,7 @@ const useStyles = makeStyles(theme => ({
   },
 }))
 
-const FilterDropdown = ({
-  field,
-  type,
-  label,
-  onChange,
-  value,
-  items,
-}) => {
+const FilterDropdown = ({ field, type, label, onChange, value, items }) => {
   switch (type) {
     case 'select':
       return (
@@ -72,43 +65,79 @@ const FilterDropdown = ({
 }
 
 const ListTableToolbar = ({
-  columns, filterValues, filters, extraToolbarContent,
-  onAdd, onColumnToggle, onDelete, onEdit, onFilterUpdate,
-  onFiltersReset, onSearchChange, onReload, onRefresh,
-  batchActions = emptyArr, searchTerm, selected, visibleColumns,
-  rowsPerPage, onChangeRowsPerPage, rowsPerPageOptions,
-  editCond, editDisabledInfo, deleteCond, deleteDisabledInfo,
+  columns,
+  filterValues,
+  filters,
+  extraToolbarContent,
+  onAdd,
+  onColumnToggle,
+  onDelete,
+  onEdit,
+  onFilterUpdate,
+  onFiltersReset,
+  onSearchChange,
+  onReload,
+  onRefresh,
+  batchActions = emptyArr,
+  searchTerm,
+  selected,
+  visibleColumns,
+  rowsPerPage,
+  onChangeRowsPerPage,
+  rowsPerPageOptions,
+  editCond,
+  editDisabledInfo,
+  deleteCond,
+  deleteDisabledInfo,
 }) => {
   const classes = useStyles()
   const numSelected = (selected || []).length
-  const reloadButton = useMemo(() =>
-    onReload && <Tooltip title="Refresh list">
-      <FontAwesomeIcon
-        className={classes.button}
-        solid
-        size="lg"
-        aria-label="Refresh list"
-        onClick={onReload}>
-        sync
-      </FontAwesomeIcon>
-    </Tooltip>, [onReload])
+  const reloadButton = useMemo(
+    () =>
+      onReload && (
+        <Tooltip title="Refresh list">
+          <FontAwesomeIcon
+            className={classes.button}
+            solid
+            size="lg"
+            aria-label="Refresh list"
+            onClick={onReload}
+          >
+            sync
+          </FontAwesomeIcon>
+        </Tooltip>
+      ),
+    [onReload],
+  )
 
-  const allActions = useMemo(() => [...batchActions,
-    ...(onEdit ? [{
-      label: 'Edit',
-      action: onEdit,
-      icon: 'edit',
-      cond: both(() => numSelected === 1, editCond || T),
-      disabledInfo: editDisabledInfo,
-    }] : emptyArr),
-    ...(onDelete ? [{
-      label: 'Delete',
-      action: onDelete,
-      icon: 'trash-alt',
-      cond: deleteCond,
-      disabledInfo: deleteDisabledInfo,
-    }] : emptyArr),
-  ], [numSelected, batchActions, onEdit, onDelete])
+  const allActions = useMemo(
+    () => [
+      ...batchActions,
+      ...(onEdit
+        ? [
+          {
+            label: 'Edit',
+            action: onEdit,
+            icon: 'edit',
+            cond: both(() => numSelected === 1, editCond || T),
+            disabledInfo: editDisabledInfo,
+          },
+        ]
+        : emptyArr),
+      ...(onDelete
+        ? [
+          {
+            label: 'Delete',
+            action: onDelete,
+            icon: 'trash-alt',
+            cond: deleteCond,
+            disabledInfo: deleteDisabledInfo,
+          },
+        ]
+        : emptyArr),
+    ],
+    [numSelected, batchActions, onEdit, onDelete],
+  )
 
   return (
     <Toolbar
@@ -133,7 +162,11 @@ const ListTableToolbar = ({
             : filters}
           {extraToolbarContent}
           {onSearchChange && (
-            <SearchBar className={classes.search} onSearchChange={onSearchChange} searchTerm={searchTerm} />
+            <SearchBar
+              className={classes.search}
+              onSearchChange={onSearchChange}
+              searchTerm={searchTerm}
+            />
           )}
           {columns && onColumnToggle && (
             <ListTableColumnButton
@@ -171,14 +204,16 @@ export const filterSpecPropType = PropTypes.shape({
 })
 
 ListTableToolbar.propTypes = {
-  columns: PropTypes.arrayOf(PropTypes.shape({
-    id: PropTypes.string,
-    label: PropTypes.string,
-    render: PropTypes.func,
-    sortWith: PropTypes.func,
-    display: PropTypes.bool,
-    excluded: PropTypes.bool,
-  })).isRequired,
+  columns: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string,
+      label: PropTypes.string,
+      render: PropTypes.func,
+      sortWith: PropTypes.func,
+      display: PropTypes.bool,
+      excluded: PropTypes.bool,
+    }),
+  ).isRequired,
   filters: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(filterSpecPropType)]),
   filterValues: PropTypes.object,
   onAdd: PropTypes.func,

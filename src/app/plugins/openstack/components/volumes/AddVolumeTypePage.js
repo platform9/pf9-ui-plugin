@@ -11,7 +11,7 @@ import { dataCacheKey } from 'core/helpers/createContextLoader'
 import { assocPath } from 'ramda'
 
 class AddVolumeTypePage extends React.PureComponent {
-  handleAdd = async data => {
+  handleAdd = async (data) => {
     const { setContext, getContext, history } = this.props
     try {
       const volumeType = {
@@ -21,14 +21,16 @@ class AddVolumeTypePage extends React.PureComponent {
       const existingVolumeTypes = await loadVolumeTypes({ setContext, getContext })
       // TODO: use createContextUpdater
       const createdVolumeType = await ApiClient.getInstance().cinder.createVolumeType(volumeType)
-      setContext(assocPath([dataCacheKey, 'volumeTypes'], [...existingVolumeTypes, createdVolumeType]))
+      setContext(
+        assocPath([dataCacheKey, 'volumeTypes'], [...existingVolumeTypes, createdVolumeType]),
+      )
       history.push('/ui/openstack/storage#volumeTypes')
     } catch (err) {
       console.error(err)
     }
   }
 
-  render () {
+  render() {
     return (
       <FormWrapper title="Add Volume Type" backUrl="/ui/openstack/storage#volumeTypes">
         <AddVolumeTypeForm onComplete={this.handleAdd} />
@@ -37,8 +39,4 @@ class AddVolumeTypePage extends React.PureComponent {
   }
 }
 
-export default compose(
-  withAppContext,
-  withRouter,
-  requiresAuthentication
-)(AddVolumeTypePage)
+export default compose(withAppContext, withRouter, requiresAuthentication)(AddVolumeTypePage)

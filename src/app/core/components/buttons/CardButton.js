@@ -2,7 +2,7 @@ import React from 'react'
 import Button from '@material-ui/core/Button'
 import { withStyles } from '@material-ui/styles'
 
-const styles = theme => ({
+const styles = (theme) => ({
   cardButton: {
     margin: 0,
     borderRadius: 2,
@@ -13,15 +13,11 @@ const styles = theme => ({
     border: `1px solid ${theme.palette.dashboardCard.primary}`,
     background: theme.palette.dashboardCard.button,
     whiteSpace: 'nowrap',
-  }
+  },
 })
 
 const CardButton = ({ children, classes, ...rest }) => (
-  <Button
-    className={classes.cardButton}
-    variant="contained"
-    {...rest}
-  >
+  <Button className={classes.cardButton} variant="contained" {...rest}>
     + {children}
   </Button>
 )
