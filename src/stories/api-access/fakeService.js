@@ -9,7 +9,7 @@ const fakeService = () => {
       interface: iface,
       region: faker.random.word(),
       region_id: faker.random.word(),
-      url: faker.internet.url()
+      url: faker.internet.url(),
     }
   })
 
@@ -17,7 +17,7 @@ const fakeService = () => {
     id: faker.random.uuid(),
     name: faker.random.word(),
     type: faker.random.number(),
-    endpoints
+    endpoints,
   }
 }
 

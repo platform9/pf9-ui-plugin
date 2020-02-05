@@ -1,6 +1,13 @@
 import React, { useCallback, useState } from 'react'
 import {
-  Dialog, DialogTitle, DialogContent, Table, TableBody, TableRow, TableCell, Checkbox,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Table,
+  TableBody,
+  TableRow,
+  TableCell,
+  Checkbox,
 } from '@material-ui/core'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { except, emptyArr } from 'utils/fp'

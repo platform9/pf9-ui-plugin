@@ -1,7 +1,18 @@
 import { propEq, T } from 'ramda'
 import {
-  applyJsonPatch, compose, condLiteral, filterFields, mergeKey, notEmpty, pick, pickMultiple, pipe,
-  pipeWhenTruthy, projectAs, pluck, updateInArray,
+  applyJsonPatch,
+  compose,
+  condLiteral,
+  filterFields,
+  mergeKey,
+  notEmpty,
+  pick,
+  pickMultiple,
+  pipe,
+  pipeWhenTruthy,
+  projectAs,
+  pluck,
+  updateInArray,
 } from 'utils/fp'
 import { pluckAsync, propsAsync } from 'utils/async'
 

@@ -12,9 +12,7 @@ const someNetworks = range(3).map(fakeNetwork)
 const deleteAction = action('Delete network')
 
 addStories('Network Management/Listing networks', {
-  'With no networks': () => (
-    <NetworksList data={[]} onAdd={addAction} onDelete={deleteAction} />
-  ),
+  'With no networks': () => <NetworksList data={[]} onAdd={addAction} onDelete={deleteAction} />,
 
   'With some networks': () => (
     <NetworksList data={someNetworks} onAdd={addAction} onDelete={deleteAction} />
@@ -23,8 +21,6 @@ addStories('Network Management/Listing networks', {
   'With pagination': () => {
     const numNetworks = number('numNetworks', 7, { range: true, min: 0, max: 15, step: 1 })
     const networks = range(numNetworks).map(fakeNetwork)
-    return (
-      <NetworksList data={networks} onAdd={addAction} onDelete={deleteAction} />
-    )
+    return <NetworksList data={networks} onAdd={addAction} onDelete={deleteAction} />
   },
 })

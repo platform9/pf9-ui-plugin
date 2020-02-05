@@ -1,7 +1,7 @@
 import context from '../../context'
 import Cluster from '../../models/qbert/Cluster'
 
-const mapCluster = cluster => ({
+const mapCluster = (cluster) => ({
   name: cluster.name,
   projectId: cluster.projectId,
   tags: Object.keys(cluster.tags),

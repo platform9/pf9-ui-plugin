@@ -5,7 +5,7 @@ const coll = () => context.sshKeys
 
 // SSH keys do not have an id property, but frontend is reliant on it, so using name as id
 class SshKey extends ActiveModel {
-  constructor (params = {}) {
+  constructor(params = {}) {
     super(params)
     this.fingerprint = params.fingerprint || ''
     this.name = params.name || ''
@@ -15,15 +15,15 @@ class SshKey extends ActiveModel {
   static getCollection = coll
   static clearCollection = () => coll().splice(0, coll().length)
 
-  static findByName = name => SshKey.getCollection().find(x => x.name === name)
+  static findByName = (name) => SshKey.getCollection().find((x) => x.name === name)
 
   asJson = () => {
     return {
       keypair: {
         fingerprint: this.fingerprint,
         name: this.name,
-        public_key: this.public_key
-      }
+        public_key: this.public_key,
+      },
     }
   }
 }

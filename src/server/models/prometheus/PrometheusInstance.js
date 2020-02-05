@@ -35,7 +35,7 @@ const create = (params) => {
     metadata: {
       annotations: {
         service,
-        service_path: `/api/v1/namespaces/default/services/${service}:web/proxy`
+        service_path: `/api/v1/namespaces/default/services/${service}:web/proxy`,
       },
       creationTimestamp: '2019-06-21T21:26:02Z',
       generation: 1,
@@ -51,26 +51,26 @@ const create = (params) => {
         requests: {
           cpu,
           memory,
-        }
+        },
       },
       retention,
       ruleSelector: {
         matchLabels: {
           prometheus: name,
-          role: 'alert-rules'
-        }
+          role: 'alert-rules',
+        },
       },
       rules: {
-        alert: {}
+        alert: {},
       },
       serviceAccountName: 'default',
       serviceMonitorSelector: {
         matchLabels: {
           prometheus: name,
-          role: 'service-monitor'
-        }
-      }
-    }
+          role: 'service-monitor',
+        },
+      },
+    },
   }
 
   context.prometheusInstances.push(instance)
@@ -85,20 +85,18 @@ const PrometheusInstance = {
 
   // `data` contains an array of JSON patches (https://tools.ietf.org/html/rfc6902)
   update: ({ clusterId, name, data }) => {
-    const findInstance = obj => obj.clusterId === clusterId && obj.metadata.name === name
-    const updateFn = original => data.reduce(
-      (accum, patch) => applyJsonPatch(patch, accum),
-      original
-    )
+    const findInstance = (obj) => obj.clusterId === clusterId && obj.metadata.name === name
+    const updateFn = (original) =>
+      data.reduce((accum, patch) => applyJsonPatch(patch, accum), original)
     context.prometheusInstances = updateInArray(findInstance, updateFn, context.prometheusInstances)
     return context.prometheusInstances.find(findInstance)
   },
 
   delete: ({ clusterId, name }) => {
-    const findInstance = obj => obj.clusterId === clusterId && obj.metadata.name === name
-    const instances = context.prometheusInstances.filter(cluster => !findInstance(cluster))
+    const findInstance = (obj) => obj.clusterId === clusterId && obj.metadata.name === name
+    const instances = context.prometheusInstances.filter((cluster) => !findInstance(cluster))
     context.prometheusInstances = instances
-  }
+  },
 }
 
 export default PrometheusInstance

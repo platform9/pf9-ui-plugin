@@ -75,8 +75,8 @@ const Picklist = React.forwardRef((props, ref) => {
     ? showNone
       ? noneKey
       : showAll
-        ? allKey
-        : value
+      ? allKey
+      : value
     : value
 
   // If loading is undefined, it means we are not performing any async

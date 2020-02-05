@@ -2,11 +2,31 @@ import ApiClient from 'api-client/ApiClient'
 import createContextLoader from 'core/helpers/createContextLoader'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import {
-  filterValidTenants, mngmTenantActions, mngmTenantsCacheKey,
+  filterValidTenants,
+  mngmTenantActions,
+  mngmTenantsCacheKey,
 } from 'k8s/components/userManagement/tenants/actions'
 import {
-  always, filter, find, flatten, groupBy, head, innerJoin, isNil, keys, map, omit, partition, pipe,
-  pluck, prop, propEq, reject, uniq, values, when,
+  always,
+  filter,
+  find,
+  flatten,
+  groupBy,
+  head,
+  innerJoin,
+  isNil,
+  keys,
+  map,
+  omit,
+  partition,
+  pipe,
+  pluck,
+  prop,
+  propEq,
+  reject,
+  uniq,
+  values,
+  when,
 } from 'ramda'
 import { tryCatchAsync } from 'utils/async'
 import { emptyArr, emptyObj, objSwitchCase, pathStr, upsertAllBy } from 'utils/fp'
@@ -43,18 +63,18 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
     const defaultTenantId = pipe(keys, head)(roleAssignments)
     const createdUser = password
       ? await keystone.createUser({
-        email: username,
-        name: username,
-        username,
-        displayname,
-        password: password || undefined,
-        default_project_id: defaultTenantId,
-      })
+          email: username,
+          name: username,
+          username,
+          displayname,
+          password: password || undefined,
+          default_project_id: defaultTenantId,
+        })
       : await clemency.createUser({
-        username,
-        displayname,
-        tenants: defaultTenantId,
-      })
+          username,
+          displayname,
+          tenants: defaultTenantId,
+        })
     if (createdUser.role === '_member_') {
       return createdUser
     }

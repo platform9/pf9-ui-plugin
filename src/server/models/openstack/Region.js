@@ -6,7 +6,7 @@ import { findById } from '../../helpers'
 const coll = () => context.regions
 
 class Region extends ActiveModel {
-  constructor (params = {}) {
+  constructor(params = {}) {
     super(params)
     this.id = params.id
     this.description = params.description || ''

@@ -15,7 +15,7 @@ const calcStyle = ({ width }) => ({
 addStories('Common Components/AnimateValues', {
   'Animate a bar': () => (
     <AnimateValues values={{ width: [0, 500] }} duration={3000}>
-      {values => (
+      {(values) => (
         <div style={calcStyle(values)}>
           <pre>{JSON.stringify(values, null, 4)}</pre>
         </div>

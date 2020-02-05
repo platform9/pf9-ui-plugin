@@ -18,18 +18,15 @@ export const getChartVersions = (req, res) => {
   const { releaseName, chartName } = req.params
   const versions = Chart.getVersions(chartName, context)
   const id = `${releaseName}/${chartName}`
-  return res.send(versions.filter(
-    propEq('id', id),
-  ))
+  return res.send(versions.filter(propEq('id', id)))
 }
 
 export const getChartVersion = (req, res) => {
   const { releaseName, chartName, version } = req.params
   const id = `${releaseName}/${chartName}`
   const versions = Chart.getVersions(chartName, context)
-  const chartVersion = versions.find(allPass([
-    propEq('id', id),
-    pathEq(['attributes', 'version'], version),
-  ]))
+  const chartVersion = versions.find(
+    allPass([propEq('id', id), pathEq(['attributes', 'version'], version)]),
+  )
   return res.send(chartVersion)
 }

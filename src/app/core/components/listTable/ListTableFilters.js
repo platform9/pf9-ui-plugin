@@ -1,7 +1,14 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {
-  Checkbox, FormControl, FormControlLabel, FormGroup, InputLabel, MenuItem, Select, Typography,
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  FormGroup,
+  InputLabel,
+  MenuItem,
+  Select,
+  Typography,
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import { compose, prop, propEq } from 'ramda'

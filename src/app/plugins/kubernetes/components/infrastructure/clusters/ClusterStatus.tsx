@@ -4,7 +4,10 @@ import { makeStyles } from '@material-ui/styles'
 import SimpleLink from 'core/components/SimpleLink'
 
 import {
-  isTransientStatus, getClusterHealthStatus, getClusterConnectionStatus, IClusterStatus,
+  isTransientStatus,
+  getClusterHealthStatus,
+  getClusterConnectionStatus,
+  IClusterStatus,
 } from './ClusterStatusUtils'
 import { ICluster } from './model'
 import ProgressBar from 'core/components/progress/ProgressBar'

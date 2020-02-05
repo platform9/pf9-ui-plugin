@@ -4,10 +4,12 @@ import { both, propEq, T, clone } from 'ramda'
 
 // Filter list by cluster and namespace if necessary
 const filterListByConfig = (list, { clusterId, namespace }) =>
-  list.filter(both(
-    clusterId ? propEq('clusterId', clusterId) : T,
-    namespace ? propEq('namespace', namespace) : T,
-  ))
+  list.filter(
+    both(
+      clusterId ? propEq('clusterId', clusterId) : T,
+      namespace ? propEq('namespace', namespace) : T,
+    ),
+  )
 
 const createModel = (options = {}) => {
   const {
@@ -44,35 +46,37 @@ const createModel = (options = {}) => {
         ...mappedData,
       }
       context[dataKey].push(newObject)
-      return (!raw && loaderFn) ? loaderFn([newObject])[0] : newObject
+      return !raw && loaderFn ? loaderFn([newObject])[0] : newObject
     },
 
     list: ({ context, raw = false, config = {} }) => {
       const list = filterListByConfig(context[dataKey], config)
-      return (!raw && loaderFn) ? loaderFn(list) : list
+      return !raw && loaderFn ? loaderFn(list) : list
     },
 
     update: ({ id, data, context }) => {
       const mappedData = mappingFn ? mappingFn(data, context) : data
-      context[dataKey] = context[dataKey].map(x => x[uniqueIdentifier] === id
-        ? { ...x, ...mappedData }
-        : x)
+      context[dataKey] = context[dataKey].map((x) =>
+        x[uniqueIdentifier] === id ? { ...x, ...mappedData } : x,
+      )
       return context[dataKey].find(propEq(uniqueIdentifier, id))
     },
 
     delete: ({ id, context }) => {
-      const obj = context[dataKey].find(x => x[uniqueIdentifier] === id)
-      if (onDeleteFn) { onDeleteFn(id, context, obj) }
-      context[dataKey] = context[dataKey].filter(x => x[uniqueIdentifier] !== id)
+      const obj = context[dataKey].find((x) => x[uniqueIdentifier] === id)
+      if (onDeleteFn) {
+        onDeleteFn(id, context, obj)
+      }
+      context[dataKey] = context[dataKey].filter((x) => x[uniqueIdentifier] !== id)
     },
 
     deleteAllInCluster: ({ clusterId, context }) => {
-      context[dataKey] = context[dataKey].filter(x => x.clusterId !== clusterId)
+      context[dataKey] = context[dataKey].filter((x) => x.clusterId !== clusterId)
     },
 
     findById: ({ id, context, raw = false }) => {
-      const obj = context[dataKey].find(x => x[uniqueIdentifier] === id)
-      return (!raw && loaderFn) ? loaderFn([obj])[0] : obj
+      const obj = context[dataKey].find((x) => x[uniqueIdentifier] === id)
+      return !raw && loaderFn ? loaderFn([obj])[0] : obj
     },
 
     findByName: ({ name, context, raw = false, config = {} }) => {
@@ -80,7 +84,7 @@ const createModel = (options = {}) => {
       const obj = list.find((x) => {
         return x.name === name
       })
-      return (!raw && loaderFn && obj) ? loaderFn([obj])[0] : obj
+      return !raw && loaderFn && obj ? loaderFn([obj])[0] : obj
     },
   }
 }

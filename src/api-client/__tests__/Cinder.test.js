@@ -29,7 +29,7 @@ describe('Volumes', async () => {
   it('create, get and delete a volume placeholder', async () => {
     const volume = await client.cinder.createVolume({
       name: 'UITEST_TestVolume',
-      size: 1
+      size: 1,
     })
     expect(volume.id).toBeDefined()
 
@@ -43,29 +43,37 @@ describe('Volumes', async () => {
     // Wait for new volume is fully deleted
     await waitUntil({ condition: waitForVolumeDelete(newVolume.id), delay: 1000, maxRetries: 20 })
     const newVolumes = await client.cinder.getVolumes()
-    expect(newVolumes.find(x => x.id === newVolume.id)).not.toBeDefined()
+    expect(newVolumes.find((x) => x.id === newVolume.id)).not.toBeDefined()
   })
 
   it('create and update a volume, then delete it', async () => {
     const volume = await client.cinder.createVolume({
       name: 'UITEST_TestVolume',
-      size: 1
+      size: 1,
     })
     expect(volume.id).toBeDefined()
 
     const updatedVolume = await client.cinder.updateVolume(volume.id, {
-      name: 'UITEST_UpdatedVolume'
+      name: 'UITEST_UpdatedVolume',
     })
     expect(updatedVolume.name).toBe('UITEST_UpdatedVolume')
 
     // Wait for new volume's status changing to 'available'
-    await waitUntil({ condition: waitForVolumeCreate(updatedVolume.id), delay: 1000, maxRetries: 20 })
+    await waitUntil({
+      condition: waitForVolumeCreate(updatedVolume.id),
+      delay: 1000,
+      maxRetries: 20,
+    })
     await client.cinder.deleteVolume(updatedVolume.id)
 
     // Wait for new volume is fully deleted
-    await waitUntil({ condition: waitForVolumeDelete(updatedVolume.id), delay: 1000, maxRetries: 20 })
+    await waitUntil({
+      condition: waitForVolumeDelete(updatedVolume.id),
+      delay: 1000,
+      maxRetries: 20,
+    })
     const newVolumes = await client.cinder.getVolumes()
-    expect(newVolumes.find(x => x.id === updatedVolume.id)).not.toBeDefined()
+    expect(newVolumes.find((x) => x.id === updatedVolume.id)).not.toBeDefined()
   })
 
   it('get volumetypes', async () => {
@@ -76,23 +84,25 @@ describe('Volumes', async () => {
   it('create a volumetype placeholder and delete it', async () => {
     const numBefore = (await client.cinder.getVolumeTypes()).length
     await client.cinder.createVolumeType({
-      name: 'UITEST_TestVolumeType'
+      name: 'UITEST_TestVolumeType',
     })
     let numAfter = (await client.cinder.getVolumeTypes()).length
     expect(numAfter).toBe(numBefore + 1)
 
-    await client.cinder.deleteVolumeType((await client.cinder.getVolumeType('UITEST_TestVolumeType')).id)
+    await client.cinder.deleteVolumeType(
+      (await client.cinder.getVolumeType('UITEST_TestVolumeType')).id,
+    )
     numAfter = (await client.cinder.getVolumeTypes()).length
     expect(numAfter).toBe(numBefore)
   })
 
   it('create, update and delete a volumetype placeholder', async () => {
     await client.cinder.createVolumeType({
-      name: 'UITEST_TestVolumeType'
+      name: 'UITEST_TestVolumeType',
     })
     const id = (await client.cinder.getVolumeType('UITEST_TestVolumeType')).id
     const response = await client.cinder.updateVolumeType(id, {
-      TestKey: 'UITEST_TestValue'
+      TestKey: 'UITEST_TestValue',
     })
     expect(response.TestKey).toBe('UITEST_TestValue')
 
@@ -103,8 +113,8 @@ describe('Volumes', async () => {
     await client.cinder.createVolumeType({
       name: 'UITEST_TestVolumeType',
       extra_specs: {
-        TestKey: 'UITEST_TestValue'
-      }
+        TestKey: 'UITEST_TestValue',
+      },
     })
     const id = (await client.cinder.getVolumeType('UITEST_TestVolumeType')).id
     await client.cinder.unsetVolumeTypeTag(id, 'TestKey')
@@ -127,13 +137,13 @@ describe('Volumes', async () => {
   it('Create a volume placeholder, snapshot it and delete both', async () => {
     const volume = await client.cinder.createVolume({
       name: 'UITEST_TestSnapshot',
-      size: 1
+      size: 1,
     })
 
     await waitUntil({ condition: waitForVolumeCreate(volume.id), delay: 1000, maxRetries: 20 })
     const snapshot = await client.cinder.snapshotVolume({
       volume_id: volume.id,
-      name: 'UITEST_TestSnapshot'
+      name: 'UITEST_TestSnapshot',
     })
     expect(snapshot.id).toBeDefined()
 
@@ -144,16 +154,16 @@ describe('Volumes', async () => {
     await client.cinder.deleteVolume(volume.id)
     await waitUntil({ condition: waitForVolumeDelete(volume.id), delay: 1000, maxRetries: 20 })
     const volumes = await client.cinder.getAllVolumes()
-    expect(volumes.find(x => x.id === volume.id)).not.toBeDefined()
+    expect(volumes.find((x) => x.id === volume.id)).not.toBeDefined()
     const snapshots = await client.cinder.getAllSnapshots()
-    expect(snapshots.find(x => x.id === snapshot.id)).not.toBeDefined()
+    expect(snapshots.find((x) => x.id === snapshot.id)).not.toBeDefined()
   })
 
   it('change bootable status of a volume placeholder', async () => {
     const volume = await client.cinder.createVolume({
       name: 'UITEST_TestVolume',
       size: 1,
-      bootable: false
+      bootable: false,
     })
     await client.cinder.setBootable(volume.id, true)
     const newVolume = await client.cinder.getVolume(volume.id)
@@ -167,48 +177,56 @@ describe('Volumes', async () => {
   it('Create a volume placeholder, snapshot and update the snapshot, then delete both', async () => {
     const volume = await client.cinder.createVolume({
       name: 'UITEST_TestVolume',
-      size: 1
+      size: 1,
     })
 
     await waitUntil({ condition: waitForVolumeCreate(volume.id), delay: 1000, maxRetries: 20 })
     const snapshot = await client.cinder.snapshotVolume({
       volume_id: volume.id,
-      name: 'UITEST_TestSnapshot'
+      name: 'UITEST_TestSnapshot',
     })
 
     await waitUntil({ condition: waitForSnapshotCreate(snapshot.id), delay: 1000, maxRetries: 20 })
     const updatedSnapshot = await client.cinder.updateSnapshot(snapshot.id, {
-      name: 'UITEST_UpdatedSnapshot'
+      name: 'UITEST_UpdatedSnapshot',
     })
 
-    await waitUntil({ condition: waitForSnapshotCreate(updatedSnapshot.id), delay: 1000, maxRetries: 20 })
+    await waitUntil({
+      condition: waitForSnapshotCreate(updatedSnapshot.id),
+      delay: 1000,
+      maxRetries: 20,
+    })
     expect(updatedSnapshot.name).toEqual('UITEST_UpdatedSnapshot')
 
     await client.cinder.deleteSnapshot(updatedSnapshot.id)
-    await waitUntil({ condition: waitForSnapshotDelete(updatedSnapshot.id), delay: 1000, maxRetries: 20 })
+    await waitUntil({
+      condition: waitForSnapshotDelete(updatedSnapshot.id),
+      delay: 1000,
+      maxRetries: 20,
+    })
     await client.cinder.deleteVolume(volume.id)
     await waitUntil({ condition: waitForVolumeDelete(volume.id), delay: 1000, maxRetries: 20 })
     const volumes = await client.cinder.getAllVolumes()
-    expect(volumes.find(x => x.id === volume.id)).not.toBeDefined()
+    expect(volumes.find((x) => x.id === volume.id)).not.toBeDefined()
     const snapshots = await client.cinder.getAllSnapshots()
-    expect(snapshots.find(x => x.id === updatedSnapshot.id)).not.toBeDefined()
+    expect(snapshots.find((x) => x.id === updatedSnapshot.id)).not.toBeDefined()
   })
 
   it('Create a volume placeholder, snapshot and update metadata, then delete both', async () => {
     const volume = await client.cinder.createVolume({
       name: 'UITEST_TestVolume',
-      size: 1
+      size: 1,
     })
 
     await waitUntil({ condition: waitForVolumeCreate(volume.id), delay: 1000, maxRetries: 20 })
     const snapshot = await client.cinder.snapshotVolume({
       volume_id: volume.id,
-      name: 'UITEST_TestSnapShot'
+      name: 'UITEST_TestSnapShot',
     })
 
     await waitUntil({ condition: waitForSnapshotCreate(snapshot.id), delay: 1000, maxRetries: 20 })
     const updatedSnapshotMetadata = await client.cinder.updateSnapshotMetadata(snapshot.id, {
-      TestKey: 'UITEST_TestValue'
+      TestKey: 'UITEST_TestValue',
     })
     expect(updatedSnapshotMetadata.TestKey).toEqual('UITEST_TestValue')
 
@@ -217,9 +235,9 @@ describe('Volumes', async () => {
     await client.cinder.deleteVolume(volume.id)
     await waitUntil({ condition: waitForVolumeDelete(volume.id), delay: 1000, maxRetries: 20 })
     const volumes = await client.cinder.getAllVolumes()
-    expect(volumes.find(x => x.id === volume.id)).not.toBeDefined()
+    expect(volumes.find((x) => x.id === volume.id)).not.toBeDefined()
     const snapshots = await client.cinder.getAllSnapshots()
-    expect(snapshots.find(x => x.id === snapshot.id)).not.toBeDefined()
+    expect(snapshots.find((x) => x.id === snapshot.id)).not.toBeDefined()
   })
 
   it('get region urls', async () => {
@@ -252,65 +270,80 @@ describe('Volumes', async () => {
   it('set quotas', async () => {
     const projectId = (await client.keystone.getProjects())[0].id
     const oldValue = (await client.cinder.getQuotas(projectId)).groups.limit
-    await client.cinder.setQuotas({
-      groups: 10
-    }, projectId)
+    await client.cinder.setQuotas(
+      {
+        groups: 10,
+      },
+      projectId,
+    )
     const newQuota = await client.cinder.getQuotas(projectId)
     expect(newQuota.groups.limit).toBe(10)
-    await client.cinder.setQuotas({
-      groups: oldValue
-    }, projectId)
+    await client.cinder.setQuotas(
+      {
+        groups: oldValue,
+      },
+      projectId,
+    )
   })
 
   it('set quotas for region', async () => {
     const projectId = (await client.keystone.getProjects())[0].id
-    const oldValue = (await client.cinder.getQuotasForRegion(projectId, client.activeRegion)).groups.limit
-    await client.cinder.setQuotasForRegion({
-      groups: 10
-    }, projectId, client.activeRegion)
+    const oldValue = (await client.cinder.getQuotasForRegion(projectId, client.activeRegion)).groups
+      .limit
+    await client.cinder.setQuotasForRegion(
+      {
+        groups: 10,
+      },
+      projectId,
+      client.activeRegion,
+    )
     const newQuota = await client.cinder.getQuotasForRegion(projectId, client.activeRegion)
     expect(newQuota.groups.limit).toBe(10)
-    await client.cinder.setQuotasForRegion({
-      groups: oldValue
-    }, projectId, client.activeRegion)
+    await client.cinder.setQuotasForRegion(
+      {
+        groups: oldValue,
+      },
+      projectId,
+      client.activeRegion,
+    )
   })
 })
 
-const waitForVolumeCreate = params => async () => {
+const waitForVolumeCreate = (params) => async () => {
   const client = await makeRegionedClient()
   const services = await client.keystone.getServicesForActiveRegion()
   const url = `${services.cinderv3.admin.url}/volumes/${params}`
   const response = await axios.get(url, client.getAuthHeaders())
-  const flag = (response.data.volume.status === 'available')
+  const flag = response.data.volume.status === 'available'
   return flag
 }
 
-const waitForVolumeDelete = params => async () => {
+const waitForVolumeDelete = (params) => async () => {
   const client = await makeRegionedClient()
   const services = await client.keystone.getServicesForActiveRegion()
   let flag = false
   const url = `${services.cinderv3.admin.url}/volumes/${params}`
-  await axios.get(url, client.getAuthHeaders()).catch(function (error) {
+  await axios.get(url, client.getAuthHeaders()).catch(function(error) {
     flag = error.response.status === 404
   })
   return flag
 }
 
-const waitForSnapshotCreate = params => async () => {
+const waitForSnapshotCreate = (params) => async () => {
   const client = await makeRegionedClient()
   const services = await client.keystone.getServicesForActiveRegion()
   const url = `${services.cinderv3.admin.url}/snapshots/${params}`
   const response = await axios.get(url, client.getAuthHeaders())
-  const flag = (response.data.snapshot.status === 'available')
+  const flag = response.data.snapshot.status === 'available'
   return flag
 }
 
-const waitForSnapshotDelete = params => async () => {
+const waitForSnapshotDelete = (params) => async () => {
   const client = await makeRegionedClient()
   const services = await client.keystone.getServicesForActiveRegion()
   let flag = false
   const url = `${services.cinderv3.admin.url}/snapshots/${params}`
-  await axios.get(url, client.getAuthHeaders()).catch(function (error) {
+  await axios.get(url, client.getAuthHeaders()).catch(function(error) {
     flag = error.response.status === 404
   })
   return flag

@@ -1,7 +1,26 @@
 import moize from 'moize'
 import {
-  adjust, always, assocPath, cond, curry, either, equals, filter, findIndex, groupBy, hasPath,
-  isEmpty, isNil, path, pathEq, pathOr, remove, T, update, values, when,
+  adjust,
+  always,
+  assocPath,
+  cond,
+  curry,
+  either,
+  equals,
+  filter,
+  findIndex,
+  groupBy,
+  hasPath,
+  isEmpty,
+  isNil,
+  path,
+  pathEq,
+  pathOr,
+  remove,
+  T,
+  update,
+  values,
+  when,
 } from 'ramda'
 
 // State hook initializers

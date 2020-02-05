@@ -18,7 +18,13 @@
     "cypress",
     "@typescript-eslint/eslint-plugin"
   ],
-  "extends": ["standard", "standard-with-typescript", "standard-react"],
+  "extends": [
+    "standard",
+    "standard-with-typescript",
+    "standard-react",
+    "prettier",
+    "prettier/react"
+  ],
 
   "rules": {
     "max-len": [

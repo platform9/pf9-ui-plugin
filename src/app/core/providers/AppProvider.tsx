@@ -1,6 +1,15 @@
 import React, { PureComponent, SetStateAction } from 'react'
 import {
-  always, assoc, assocPath, Dictionary, flatten, lensProp, mergeLeft, over, prepend, take,
+  always,
+  assoc,
+  assocPath,
+  Dictionary,
+  flatten,
+  lensProp,
+  mergeLeft,
+  over,
+  prepend,
+  take,
 } from 'ramda'
 import { dataCacheKey, paramsCacheKey } from 'core/helpers/createContextLoader'
 import { emptyArr, pipe } from 'utils/fp'
@@ -92,7 +101,7 @@ class AppProvider extends PureComponent {
   }
 
   // We must add a trailing comma to the generic (<T, >) to sidestep the JSX ambiguity
-  setContext = async <T, >(setterFn) => {
+  setContext = async <T,>(setterFn) => {
     return new Promise<T>((resolve) => {
       this.setState(setterFn, resolve)
     })

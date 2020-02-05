@@ -102,7 +102,9 @@ describe('Keystone', () => {
       const client = await makeScopedClient()
       const endpoints = await client.keystone.getEndpoints()
       const endpoint = endpoints[0]
-      expect(Object.keys(endpoint).includes('region_id', 'region', 'interface', 'service_id')).toBe(true)
+      expect(Object.keys(endpoint).includes('region_id', 'region', 'interface', 'service_id')).toBe(
+        true,
+      )
     })
   })
 
@@ -122,13 +124,13 @@ describe('Keystone', () => {
         email: 'newUser@domain.com',
         username: 'newUser@domain.com',
         password: 'secret',
-        displayname: 'New User' // yes, it's lowercase in keystone
+        displayname: 'New User', // yes, it's lowercase in keystone
       })
       expect(newUser).toBeDefined()
       expect(newUser.id).toBeDefined()
       const newUsers = await client.keystone.getUsers()
       expect(newUsers.length - 1).toEqual(users.length)
-      const fetchedUser = newUsers.find(x => x.name === 'newUser@domain.com')
+      const fetchedUser = newUsers.find((x) => x.name === 'newUser@domain.com')
       expect(fetchedUser.email).toEqual('newUser@domain.com')
       expect(fetchedUser.displayname).toEqual('New User')
       expect(fetchedUser.id).toEqual(newUser.id)
@@ -142,7 +144,7 @@ describe('Keystone', () => {
         email: 'deleteMe@domain.com',
         username: 'deleteMe@domain.com',
         password: 'secret',
-        displayname: 'Delete me' // yes, it's lowercase in keystone
+        displayname: 'Delete me', // yes, it's lowercase in keystone
       })
       const users = await client.keystone.getUsers()
       await client.keystone.deleteUser(userToDelete.id)

@@ -16,8 +16,15 @@ import ApiClient from 'api-client/ApiClient'
 import { IApiData } from 'api-client/Clemency'
 
 import {
-  hasOneSpecialChar, hasOneNumber, hasOneUpperChar, hasOneLowerChar, hasMinLength,
-  requiredValidator, passwordValidator, emailValidator, matchFieldValidator,
+  hasOneSpecialChar,
+  hasOneNumber,
+  hasOneUpperChar,
+  hasOneLowerChar,
+  hasMinLength,
+  requiredValidator,
+  passwordValidator,
+  emailValidator,
+  matchFieldValidator,
 } from 'core/utils/fieldValidators'
 import Progress from 'core/components/progress/Progress'
 import TextField from 'core/components/validatedForm/TextField'

@@ -5,7 +5,7 @@ const config = require('../../../../config')
 const fakeTenantId = uuid.v4()
 
 const createService = ({ name, type, url }) => {
-  const createEndpoint = _interface => ({
+  const createEndpoint = (_interface) => ({
     id: uuid.v4(),
     interface: _interface,
     region: config.region,

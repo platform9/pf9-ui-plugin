@@ -1,9 +1,33 @@
 import {
-  hasPath, path, assocPath, pathEq, always, over, append, lensPath, identity, isNil, pipe, pickAll,
-  reject, either, equals, mergeLeft, allPass, map, head, split,
+  hasPath,
+  path,
+  assocPath,
+  pathEq,
+  always,
+  over,
+  append,
+  lensPath,
+  identity,
+  isNil,
+  pipe,
+  pickAll,
+  reject,
+  either,
+  equals,
+  mergeLeft,
+  allPass,
+  map,
+  head,
+  split,
 } from 'ramda'
 import {
-  emptyObj, ensureFunction, removeWith, switchCase, emptyArr, ensureArray, adjustWith,
+  emptyObj,
+  ensureFunction,
+  removeWith,
+  switchCase,
+  emptyArr,
+  ensureArray,
+  adjustWith,
 } from 'utils/fp'
 import { dataCacheKey, getContextLoader } from 'core/helpers/createContextLoader'
 import { memoizePromise, uncamelizeString } from 'utils/misc'

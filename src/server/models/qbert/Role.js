@@ -10,7 +10,7 @@ const options = {
   defaults: {
     metadata: {
       annotations: {
-        'rbac.authorization.kubernetes.io/autoupdate': 'true'
+        'rbac.authorization.kubernetes.io/autoupdate': 'true',
       },
       creationTimestamp: '',
       labels: {},
@@ -24,14 +24,18 @@ const options = {
   },
   createFn: (input, context) => {
     const _input = omit(['apiVersion', 'kind'], input)
-    return { ..._input, name: _input.metadata.name, metadata: { ..._input.metadata, creationTimestamp: getCurrentTime() } }
+    return {
+      ..._input,
+      name: _input.metadata.name,
+      metadata: { ..._input.metadata, creationTimestamp: getCurrentTime() },
+    }
   },
   loaderFn: (roles) => {
     return roles.map((role) => {
       const newRole = { ...role, metadata: { ...role.metadata, uid: role.uuid } }
       return omit(['name', 'uuid', 'namespace', 'clusterId'], newRole)
     })
-  }
+  },
 }
 
 const Role = createModel(options)

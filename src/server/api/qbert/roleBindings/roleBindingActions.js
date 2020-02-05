@@ -10,8 +10,8 @@ export const getRoleBindings = (req, res) => {
     kind: 'RoleBindingList',
     metadata: {
       resourceVersion: '219042',
-      selfLink: '/apis/rbac.authorization.k8s.io/v1/rolebindings'
-    }
+      selfLink: '/apis/rbac.authorization.k8s.io/v1/rolebindings',
+    },
   }
   return res.send(response)
 }
@@ -23,11 +23,23 @@ export const postRoleBinding = (req, res) => {
   if (roleBinding.kind !== 'RoleBinding') {
     return res.status(400).send({ code: 400, message: 'Must be of kind "RoleBinding"' })
   }
-  if (RoleBinding.findByName({ name: roleBinding.metadata.name, context, config: { clusterId, namespace } })) {
-    return res.status(409).send({ code: 409, message: `roleBinding ${roleBinding.metadata.name} already exists` })
+  if (
+    RoleBinding.findByName({
+      name: roleBinding.metadata.name,
+      context,
+      config: { clusterId, namespace },
+    })
+  ) {
+    return res
+      .status(409)
+      .send({ code: 409, message: `roleBinding ${roleBinding.metadata.name} already exists` })
   }
 
-  const newRoleBinding = RoleBinding.create({ data: roleBinding, context, config: { clusterId, namespace } })
+  const newRoleBinding = RoleBinding.create({
+    data: roleBinding,
+    context,
+    config: { clusterId, namespace },
+  })
   res.status(201).send(newRoleBinding)
 }
 
@@ -49,7 +61,11 @@ export const deleteRoleBinding = (req, res) => {
   // TODO: account for tenancy
   const { roleBindingName, clusterId, namespace } = req.params
   console.log('Attempting to delete roleBindingName: ', roleBindingName)
-  const roleBinding = RoleBinding.findByName({ name: roleBindingName, context, config: { clusterId, namespace } })
+  const roleBinding = RoleBinding.findByName({
+    name: roleBindingName,
+    context,
+    config: { clusterId, namespace },
+  })
   // this should throw an error if it doesn't exist
   if (!roleBinding) {
     return res.status(404).send({ code: 404, message: 'roleBinding not found' })

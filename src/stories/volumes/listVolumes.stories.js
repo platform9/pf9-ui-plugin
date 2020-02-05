@@ -20,30 +20,20 @@ const actions = {
 }
 
 addStories('Volume management/Listing volumes', {
-  'With no volumes': () => (
-    <VolumesList data={[]} {...actions} />
-  ),
+  'With no volumes': () => <VolumesList data={[]} {...actions} />,
 
-  'With some volumes': () => (
-    <VolumesList data={someVolumes} {...actions} />
-  ),
+  'With some volumes': () => <VolumesList data={someVolumes} {...actions} />,
 
   'With pagination': () => {
     const numVolumes = number('numVolumes', 7, { range: true, min: 0, max: 15, step: 1 })
     const volumes = range(numVolumes).map(fakeVolume)
-    return (
-      <VolumesList data={volumes} {...actions} />
-    )
+    return <VolumesList data={volumes} {...actions} />
   },
 
   'With snapshotting': () => {
     const handleSnapshot = action('Snapshot Volume')
 
-    const rowActions = [
-      { icon: <PhotoCameraIcon />, label: 'Snapshot', action: handleSnapshot }
-    ]
-    return (
-      <VolumesList data={someVolumes} rowActions={rowActions} {...actions} />
-    )
-  }
+    const rowActions = [{ icon: <PhotoCameraIcon />, label: 'Snapshot', action: handleSnapshot }]
+    return <VolumesList data={someVolumes} rowActions={rowActions} {...actions} />
+  },
 })

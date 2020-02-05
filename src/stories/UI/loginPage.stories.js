@@ -5,7 +5,5 @@ import LoginPage from './loginPage'
 const addStories = addStoriesFromModule(module)
 
 addStories('UI', {
-  'Login Page with new style': () => (
-    <LoginPage />
-  )
+  'Login Page with new style': () => <LoginPage />,
 })

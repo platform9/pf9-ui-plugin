@@ -1,13 +1,6 @@
 import Tenant from '../models/openstack/Tenant'
 
-import {
-  ensureArray,
-  findById,
-  jsonOrNull,
-  mapAsJson,
-  pluck,
-  whitelistKeys,
-} from '../helpers'
+import { ensureArray, findById, jsonOrNull, mapAsJson, pluck, whitelistKeys } from '../helpers'
 
 describe('helpers', () => {
   describe('whitelistKeys', () => {
@@ -22,12 +15,18 @@ describe('helpers', () => {
 
   describe('findById', () => {
     it('finds the object with the id in the array', () => {
-      const arr = [{ id: 1, name: 'foo' }, { id: 2, name: 'bar' }]
+      const arr = [
+        { id: 1, name: 'foo' },
+        { id: 2, name: 'bar' },
+      ]
       expect(findById(arr)(1).name).toEqual('foo')
     })
 
     it('can retrieve the array from a getter function as well', () => {
-      const arr = () => [{ id: 1, name: 'foo' }, { id: 2, name: 'bar' }]
+      const arr = () => [
+        { id: 1, name: 'foo' },
+        { id: 2, name: 'bar' },
+      ]
       expect(findById(arr)(2).name).toEqual('bar')
     })
   })
@@ -41,10 +40,7 @@ describe('helpers', () => {
 
   describe('mapAsJson', () => {
     it('converts an array of objects to their JSON form', () => {
-      const arr = [
-        new Tenant({ name: 'first' }),
-        new Tenant({ name: 'second' }),
-      ]
+      const arr = [new Tenant({ name: 'first' }), new Tenant({ name: 'second' })]
       const jsonOutput = mapAsJson(arr)
       expect(jsonOutput.length).toBe(2)
       expect(jsonOutput[0]).toMatchObject({ name: 'first' })

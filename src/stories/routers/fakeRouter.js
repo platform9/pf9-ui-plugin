@@ -5,7 +5,7 @@ const fakeRouter = () => ({
   name: faker.random.word(),
   status: faker.random.word(),
   tenant_id: faker.random.uuid(),
-  admin_state_up: faker.random.boolean()
+  admin_state_up: faker.random.boolean(),
 })
 
 export default fakeRouter

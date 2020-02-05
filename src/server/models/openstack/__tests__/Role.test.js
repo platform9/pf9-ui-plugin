@@ -7,7 +7,11 @@ describe('Role', () => {
 
   describe('constructor', () => {
     it('creates a role', () => {
-      const role = new Role({ name: 'admin', description: 'An admin user', displayName: 'Admin User' })
+      const role = new Role({
+        name: 'admin',
+        description: 'An admin user',
+        displayName: 'Admin User',
+      })
       expect(role).toBeDefined()
       expect(role instanceof Role).toBe(true)
     })
@@ -15,7 +19,11 @@ describe('Role', () => {
 
   describe('asJson', () => {
     it('creates a JSON version of the Role', () => {
-      const role = new Role({ name: 'admin', description: 'An admin user', displayName: 'Admin User' })
+      const role = new Role({
+        name: 'admin',
+        description: 'An admin user',
+        displayName: 'Admin User',
+      })
       const json = role.asJson()
       expect(Object.keys(json)).toEqual(['id', 'name', 'description', 'displayName'])
     })

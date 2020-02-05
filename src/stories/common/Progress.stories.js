@@ -6,11 +6,7 @@ import Progress from 'core/components/progress/Progress'
 const addStories = addStoriesFromModule(module)
 
 addStories('Common Components/Progress', {
-  'Default settings': () => (
-    <Progress />
-  ),
+  'Default settings': () => <Progress />,
 
-  'Custom message': () => (
-    <Progress message="Fetching data..." />
-  ),
+  'Custom message': () => <Progress message="Fetching data..." />,
 })

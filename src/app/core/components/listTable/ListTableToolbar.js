@@ -115,25 +115,25 @@ const ListTableToolbar = ({
       ...batchActions,
       ...(onEdit
         ? [
-          {
-            label: 'Edit',
-            action: onEdit,
-            icon: 'edit',
-            cond: both(() => numSelected === 1, editCond || T),
-            disabledInfo: editDisabledInfo,
-          },
-        ]
+            {
+              label: 'Edit',
+              action: onEdit,
+              icon: 'edit',
+              cond: both(() => numSelected === 1, editCond || T),
+              disabledInfo: editDisabledInfo,
+            },
+          ]
         : emptyArr),
       ...(onDelete
         ? [
-          {
-            label: 'Delete',
-            action: onDelete,
-            icon: 'trash-alt',
-            cond: deleteCond,
-            disabledInfo: deleteDisabledInfo,
-          },
-        ]
+            {
+              label: 'Delete',
+              action: onDelete,
+              icon: 'trash-alt',
+              cond: deleteCond,
+              disabledInfo: deleteDisabledInfo,
+            },
+          ]
         : emptyArr),
     ],
     [numSelected, batchActions, onEdit, onDelete],
@@ -150,15 +150,15 @@ const ListTableToolbar = ({
         <Toolbar className={classes.toolbar}>
           {Array.isArray(filters)
             ? filters.map(({ field, value, ...filterProps }) => (
-              <FilterDropdown
-                key={field}
-                {...filterProps}
-                classes={classes}
-                onChange={onFilterUpdate(field)}
-                field={field}
-                value={value !== undefined ? value : filterValues[field]}
-              />
-            ))
+                <FilterDropdown
+                  key={field}
+                  {...filterProps}
+                  classes={classes}
+                  onChange={onFilterUpdate(field)}
+                  field={field}
+                  value={value !== undefined ? value : filterValues[field]}
+                />
+              ))
             : filters}
           {extraToolbarContent}
           {onSearchChange && (
