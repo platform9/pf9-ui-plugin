@@ -55,12 +55,32 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }))
 
+const getBackUrl = (searchQuery) => {
+  const searchParams = new URLSearchParams(searchQuery)
+
+  if (searchParams.has('clusterDetailsNode')) {
+    return routes.cluster.nodes.path({ id: searchParams.get('clusterDetailsNode') })
+  }
+
+  if (searchParams.has('clusterList')) {
+    return routes.cluster.list.path()
+  }
+
+  if (searchParams.has('cloudProviderList')) {
+    return routes.cloudProviders.list.path()
+  }
+
+  return routes.nodes.list.path()
+}
+
 const ClusterDetailsPage: FC = () => {
-  const { match } = useReactRouter()
+  const { match, history } = useReactRouter()
   const classes = useStyles({})
   const [nodes, loading] = useDataLoader(loadNodes)
-  const selectedNode: ICombinedNode =
-    nodes.find((x: ICombinedNode) => x.uuid === match.params.id) || {}
+  const backUrl = getBackUrl(history?.location?.search)
+  const selectedNode: ICombinedNode = nodes.find(
+    (x: ICombinedNode) => x.uuid === match.params.id
+  ) || {}
 
   const totals = useMemo(
     () => ({
@@ -88,7 +108,7 @@ const ClusterDetailsPage: FC = () => {
       header={
         <>
           <Typography variant="h5">Node {selectedNode.name}</Typography>
-          <SimpleLink src={routes.nodes.list.path()} className={classes.backLink}>
+          <SimpleLink src={backUrl} className={classes.backLink}>
             « Back to Node List
           </SimpleLink>
         </>

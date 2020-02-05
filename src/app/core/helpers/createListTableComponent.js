@@ -24,6 +24,7 @@ const createListTableComponent = ({
     onDelete,
     onEdit,
     rowActions,
+    source,
     preferences: { visibleColumns, columnsOrder, rowsPerPage },
     updatePreferences,
     loading,
@@ -43,6 +44,7 @@ const createListTableComponent = ({
         onAdd={onAdd}
         onDelete={onDelete}
         onEdit={onEdit}
+        source={source}
         rowActions={rowActions}
         paginate={paginate}
         showCheckboxes={showCheckboxes}

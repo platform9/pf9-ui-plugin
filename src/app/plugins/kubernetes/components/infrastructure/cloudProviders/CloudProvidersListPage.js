@@ -63,7 +63,9 @@ const ClustersCell = ({ clusters }) => {
 }
 const renderNodeLink = ({ uuid, name }) => (
   <div key={uuid}>
-    <SimpleLink src={`/ui/kubernetes/infrastructure/nodes/${uuid}`}>{name}</SimpleLink>
+    <SimpleLink src={`/ui/kubernetes/infrastructure/nodes/${uuid}?cloudProviderList`}>
+      {name}
+    </SimpleLink>
   </div>
 )
 const NodesCell = ({ nodes }) => {

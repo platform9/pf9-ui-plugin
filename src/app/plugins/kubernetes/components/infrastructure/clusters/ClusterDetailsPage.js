@@ -136,7 +136,7 @@ const ClusterDetailsPage = () => {
         <ClusterStatusAndUsage cluster={cluster} loading={loading} />
         <Tabs>
           <Tab value="nodes" label="Nodes">
-            <ClusterNodes />
+            <ClusterNodes source="clusterDetailsNode" />
           </Tab>
           <Tab value="convergingNodes" label="Converging Nodes">
             <ConvergingNodesWithTasksToggler />

@@ -360,7 +360,7 @@ class ListTable extends PureComponent {
   }
 
   renderCell = moize(
-    (columnDef, contents, row, isSelected, cellClass) => {
+    (columnDef, contents, row, isSelected, cellClass, source) => {
       const { cellProps = emptyObj, id, render, Component: CellComponent } = columnDef
       let renderedCell = contents
 
@@ -371,7 +371,7 @@ class ListTable extends PureComponent {
       // Allow for customized rendering in the columnDef.  The render function might need
       // to know more about the entire object (row) being rendered and in some cases the
       if (render) {
-        renderedCell = render(contents, row)
+        renderedCell = render(contents, row, source)
       } else if (CellComponent) {
         renderedCell = <CellComponent key={id} row={row} data={contents} isSelected={isSelected} />
       }
@@ -408,7 +408,7 @@ class ListTable extends PureComponent {
   }
 
   renderRow = (row) => {
-    const { multiSelection, showCheckboxes, uniqueIdentifier, classes } = this.props
+    const { multiSelection, showCheckboxes, uniqueIdentifier, classes, source } = this.props
     const isSelected = this.isSelected(row)
 
     const checkboxProps = showCheckboxes
@@ -434,7 +434,14 @@ class ListTable extends PureComponent {
           </TableCell>
         )}
         {this.getSortedVisibleColumns().map((columnDef) =>
-          this.renderCell(columnDef, pathStr(columnDef.id, row), row, isSelected, classes.cell),
+          this.renderCell(
+            columnDef,
+            pathStr(columnDef.id, row),
+            row,
+            isSelected,
+            classes.cell,
+            source,
+          ),
         )}
         {this.renderRowActions(row)}
       </TableRow>
@@ -662,6 +669,7 @@ ListTable.propTypes = {
   canDragColumns: PropTypes.bool,
 
   loading: PropTypes.bool,
+  source: PropTypes.string,
 
   /**
    * Wether or not to allow selecting multiple rows (checkboxes) or just one at a time (radio boxes)

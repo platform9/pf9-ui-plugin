@@ -16,7 +16,7 @@ const tableColumns = columns.filter(
   (column) => !['clusterName', 'isSpotInstance'].includes(column.id),
 )
 
-const ClusterNodes = () => {
+const ClusterNodes = (props) => {
   const { history, match } = useReactRouter()
   const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
   const [nodes, loadingNodes, reload] = useDataLoader(loadNodes)
@@ -61,7 +61,7 @@ const ClusterNodes = () => {
 
   return (
     <Progress loading={loadingClusters || loadingNodes}>
-      <NodesTable data={nodesInCluster} />
+      <NodesTable data={nodesInCluster} source={props.source} />
     </Progress>
   )
 }
