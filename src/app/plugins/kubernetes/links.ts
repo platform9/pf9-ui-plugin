@@ -1,7 +1,8 @@
 // Documentation links
 export const gettingStartedLink =
   'https://docs.platform9.com/kubernetes/getting-started/bare-metal-preinstall-checklist/'
-export const qbertApiLink = 'https://docs.platform9.com/kubernetes/Qbert-API-Reference'
+export const qbertApiLink =
+  'https://docs.platform9.com/kubernetes/API-Reference/Qbert-API-Reference/'
 export const whatIsBareOSLink =
   'https://docs.platform9.com/kubernetes/on-premise-kubernetes/what-is-bareos'
 export const bareOSSetupDocumentationLink =
@@ -38,7 +39,8 @@ export const persistVolumesStorageClassesLink =
   'https://kubernetes.io/docs/concepts/storage/persistent-volumes/#storageclasses'
 
 // Api Access
-export const kubeconfigFileLink = 'https://kubernetes.io/docs/user-guide/kubeconfig-file/'
+export const kubeconfigFileLink =
+  'https://docs.platform9.com/kubernetes/kubeconfig-and-clients/introduction-to-kubeconfig/'
 export const kubectlOverviewLink = 'https://kubernetes.io/docs/user-guide/kubectl-overview/'
 
 // Help page
