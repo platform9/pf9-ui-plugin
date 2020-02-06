@@ -4,7 +4,6 @@ import React, { useMemo, useCallback } from 'react'
 import clsx from 'clsx'
 import TenantRolesTableField from 'k8s/components/userManagement/users/TenantRolesTableField'
 import useDataUpdater from 'core/hooks/useDataUpdater'
-import { mngmTenantActions } from 'k8s/components/userManagement/tenants/actions'
 import useDataLoader from 'core/hooks/useDataLoader'
 import {
   mngmUserActions,
@@ -72,7 +71,6 @@ const EditUserPage = () => {
   const onComplete = useCallback((success) => success && history.push(listUrl), [history])
   const [users, loadingUsers] = useDataLoader(mngmUserActions.list)
   const user = useMemo(() => users.find(propEq('id', userId)) || emptyObj, [users, userId])
-  const [tenants, loadingTenants] = useDataLoader(mngmTenantActions.list)
   const [update, updating] = useDataUpdater(mngmUserActions.update, onComplete)
   const [roleAssignments, loadingRoleAssignments] = useDataLoader(mngmUserRoleAssignmentsLoader, {
     userId,
@@ -82,13 +80,14 @@ const EditUserPage = () => {
       id: userId,
       username: user.username || user.email,
       displayname: user.displayname || '',
-      roleAssignments: roleAssignments.reduce(
-        (acc, roleAssignment) => ({
+      roleAssignments: roleAssignments.reduce((acc, roleAssignment) => {
+        const roleId = pathStr('role.id', roleAssignment)
+        const tenantId = pathStr('scope.project.id', roleAssignment)
+        return {
           ...acc,
-          [pathStr('scope.project.id', roleAssignment)]: pathStr('role.id', roleAssignment),
-        }),
-        {},
-      ),
+          [roleId]: acc[roleId] ? [...acc[roleId], tenantId] : [tenantId],
+        }
+      }, {}),
     }),
     [user, roleAssignments],
   )
@@ -96,7 +95,7 @@ const EditUserPage = () => {
   return (
     <FormWrapper
       title={`Edit User ${user.displayname || user.username || ''}`}
-      loading={loadingUsers || loadingTenants || loadingRoleAssignments || updating}
+      loading={loadingUsers || loadingRoleAssignments || updating}
       renderContentOnMount={false}
       message={updating ? 'Submitting form...' : 'Loading User...'}
       backUrl={listUrl}
@@ -144,7 +143,7 @@ const EditUserPage = () => {
                 onSubmit={setWizardContext}
                 triggerSubmit={onNext}
               >
-                <TenantRolesTableField required id="roleAssignments" tenants={tenants} />
+                <TenantRolesTableField required id="roleAssignments" />
               </ValidatedForm>
             </WizardStep>
           </>
