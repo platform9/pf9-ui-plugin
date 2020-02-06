@@ -20,7 +20,7 @@ const useStyles = makeStyles<Theme, { height: number }>((theme) => ({
     justifyContent: 'center',
     fontWeight: 'bold',
     fontSize: '1.25rem',
-    border: `1px solid ${theme.palette.primary.main}`,
+    border: `1px solid ${hexToRGBA(theme.palette.primary.main, 0.5)}`,
     borderRadius: '5px',
   },
   messageTitle: {

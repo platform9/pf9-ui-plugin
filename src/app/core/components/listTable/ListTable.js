@@ -5,7 +5,6 @@ import PropTypes from 'prop-types'
 import Checkbox from 'core/components/Checkbox'
 import {
   Radio,
-  Typography,
   Grid,
   Table,
   TableBody,
