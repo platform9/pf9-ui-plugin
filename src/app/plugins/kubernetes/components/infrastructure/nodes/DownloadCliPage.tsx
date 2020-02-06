@@ -12,7 +12,7 @@ import SimpleLink from 'core/components/SimpleLink'
 import { routes } from 'core/utils/routes'
 
 const useStyles = makeStyles((theme: Theme) => ({
-  root: {
+  onBoardNodeContainer: {
     maxWidth: '850px',
   },
   spacer: {
@@ -26,9 +26,9 @@ const useStyles = makeStyles((theme: Theme) => ({
 }))
 
 const DownloadCliPage: FunctionComponent = () => {
-  const { spacer, backLink, root } = useStyles({})
+  const { spacer, backLink, onBoardNodeContainer } = useStyles({})
   return (
-    <div className={root}>
+    <div className={onBoardNodeContainer}>
       <PageContainer
         header={
           <SimpleLink src={routes.nodes.list.path()} className={backLink}>
