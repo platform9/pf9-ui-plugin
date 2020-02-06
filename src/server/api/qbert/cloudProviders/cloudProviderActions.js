@@ -14,7 +14,11 @@ export const postCloudProvider = (req, res) => {
 
 export const putCloudProvider = (req, res) => {
   const { cloudProviderId } = req.params
-  const updatedCloudProvider = CloudProvider.update({ id: cloudProviderId, data: req.body, context })
+  const updatedCloudProvider = CloudProvider.update({
+    id: cloudProviderId,
+    data: req.body,
+    context,
+  })
   res.status(200).send(updatedCloudProvider)
 }
 

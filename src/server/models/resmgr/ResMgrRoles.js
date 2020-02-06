@@ -18,7 +18,7 @@ class ResMgrRoles {
   static updateHostRole = (id, role, input) => {
     context.resMgrRoles[id][role] = {
       ...context.resMgrRoles[id][role],
-      ...input
+      ...input,
     }
     return context.resMgrRoles[id][role]
   }

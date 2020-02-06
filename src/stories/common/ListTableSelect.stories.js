@@ -18,11 +18,9 @@ const data = [
 ]
 
 addStories('Common Components/ListTableSelect', {
-  'Minimal use case': () => (
-    <ListTableSelect columns={columns} data={data} onChange={onChange} />
-  ),
+  'Minimal use case': () => <ListTableSelect columns={columns} data={data} onChange={onChange} />,
 
   'w/ initialValue set': () => (
     <ListTableSelect columns={columns} data={data} onChange={onChange} initialValue={data[1]} />
-  )
+  ),
 })

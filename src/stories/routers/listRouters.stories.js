@@ -12,9 +12,7 @@ const someRouters = range(3).map(fakeRouter)
 const deleteAction = action('Delete router')
 
 addStories('Router Management/Listing routers', {
-  'With no routers': () => (
-    <RoutersList data={[]} onAdd={addAction} onDelete={deleteAction} />
-  ),
+  'With no routers': () => <RoutersList data={[]} onAdd={addAction} onDelete={deleteAction} />,
 
   'With some routers': () => (
     <RoutersList data={someRouters} onAdd={addAction} onDelete={deleteAction} />
@@ -23,8 +21,6 @@ addStories('Router Management/Listing routers', {
   'With pagination': () => {
     const numRouters = number('numRouters', 7, { range: true, min: 0, max: 15, step: 1 })
     const routers = range(numRouters).map(fakeRouter)
-    return (
-      <RoutersList data={routers} onAdd={addAction} onDelete={deleteAction} />
-    )
+    return <RoutersList data={routers} onAdd={addAction} onDelete={deleteAction} />
   },
 })

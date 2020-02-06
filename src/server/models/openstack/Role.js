@@ -6,7 +6,7 @@ import { findById } from '../../helpers'
 const coll = () => context.roles
 
 class Role extends ActiveModel {
-  constructor (params = {}) {
+  constructor(params = {}) {
     super(params)
     this.name = params.name || ''
     this.description = params.description || ''

@@ -2,7 +2,13 @@ import React, { useContext } from 'react'
 import useReactRouter from 'use-react-router'
 import { makeStyles } from '@material-ui/styles'
 import {
-  Typography, List, Dialog, DialogTitle, DialogContent, Grid, InputAdornment,
+  Typography,
+  List,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Grid,
+  InputAdornment,
 } from '@material-ui/core'
 import ListItem from '@material-ui/core/ListItem'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
@@ -24,8 +30,14 @@ import Visibility from '@material-ui/icons/Visibility'
 import VisibilityOff from '@material-ui/icons/VisibilityOff'
 import IconButton from '@material-ui/core/IconButton'
 import {
-  hasOneSpecialChar, hasOneNumber, hasOneUpperChar, hasOneLowerChar, hasMinLength,
-  requiredValidator, passwordValidator, matchFieldValidator,
+  hasOneSpecialChar,
+  hasOneNumber,
+  hasOneUpperChar,
+  hasOneLowerChar,
+  hasMinLength,
+  requiredValidator,
+  passwordValidator,
+  matchFieldValidator,
 } from 'core/utils/fieldValidators'
 import actions from './actions'
 

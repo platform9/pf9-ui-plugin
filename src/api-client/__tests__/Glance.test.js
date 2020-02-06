@@ -1,6 +1,4 @@
-import {
-  makeRegionedClient,
-} from '../helpers'
+import { makeRegionedClient } from '../helpers'
 
 describe('Glance', () => {
   it('list images', async () => {
@@ -19,12 +17,12 @@ describe('Glance', () => {
     expect(image.id).toBeDefined()
 
     const images = await client.glance.getImages()
-    expect(images.find(x => x.id === image.id)).toBeDefined()
+    expect(images.find((x) => x.id === image.id)).toBeDefined()
 
     await client.glance.deleteImage(image.id)
 
     const images2 = await client.glance.getImages()
-    expect(images2.find(x => x.id === image.id)).not.toBeDefined()
+    expect(images2.find((x) => x.id === image.id)).not.toBeDefined()
   })
 
   it('get image schema', async () => {

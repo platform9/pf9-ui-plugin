@@ -1,7 +1,10 @@
 import React from 'react'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import {
-  ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, Typography,
+  ExpansionPanel,
+  ExpansionPanelDetails,
+  ExpansionPanelSummary,
+  Typography,
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 

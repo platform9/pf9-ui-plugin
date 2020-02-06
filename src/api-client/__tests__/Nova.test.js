@@ -1,6 +1,4 @@
-import {
-  makeRegionedClient,
-} from '../helpers'
+import { makeRegionedClient } from '../helpers'
 
 describe('Nova', () => {
   let client
@@ -20,7 +18,7 @@ describe('Nova', () => {
       name: 'test.deleteMe',
       ram: 512,
       disk: 1,
-      vcpus: 1
+      vcpus: 1,
     }
     const flavor = await client.nova.createFlavor(testFlavor)
     expect(flavor.id).toBeDefined()
@@ -28,7 +26,7 @@ describe('Nova', () => {
 
   it('delete flavor', async () => {
     const flavors = await client.nova.getFlavors()
-    const toDelete = flavors.find(x => x.name === 'test.deleteMe')
+    const toDelete = flavors.find((x) => x.name === 'test.deleteMe')
     if (!toDelete || !toDelete.id) {
       throw new Error('Prior test flavor not found.  Unable to delete the test flavor.')
     }

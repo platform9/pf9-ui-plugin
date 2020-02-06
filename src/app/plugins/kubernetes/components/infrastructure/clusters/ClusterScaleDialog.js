@@ -4,7 +4,12 @@ import Checkbox from 'core/components/validatedForm/CheckboxField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import { pick } from 'ramda'
 import {
-  Slider, Button, Dialog, DialogActions, DialogContent, DialogTitle,
+  Slider,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
 } from '@material-ui/core'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import Progress from 'core/components/progress/Progress'

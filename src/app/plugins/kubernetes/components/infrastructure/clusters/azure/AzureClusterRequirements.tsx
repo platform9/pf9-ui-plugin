@@ -6,7 +6,8 @@ import SubmitButton from 'core/components/buttons/SubmitButton'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import ExternalLink from 'core/components/ExternalLink'
 import {
-  azureCreateANewApplicationSecretLink, azureGetValuesForSigninginLink,
+  azureCreateANewApplicationSecretLink,
+  azureGetValuesForSigninginLink,
   azureServicePrincipalPortalLink,
 } from 'k8s/links'
 import { routes } from 'core/utils/routes'

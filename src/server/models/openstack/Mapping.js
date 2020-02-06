@@ -6,7 +6,7 @@ import { findById } from '../../helpers'
 const coll = () => context.mappings
 
 class Mapping extends ActiveModel {
-  constructor (params = {}) {
+  constructor(params = {}) {
     super(params)
     this.links = params.links || {}
     this.rules = params.rules || []

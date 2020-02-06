@@ -8,7 +8,7 @@ import ActiveModel from '../ActiveModel'
 const coll = () => context.users
 
 class User extends ActiveModel {
-  constructor (params = {}) {
+  constructor(params = {}) {
     super(params)
     // These fields have a lot of overlap and it's a bit unclear what is needed and what is not.
     // We should clean this up once we can figure out more specifically what fields should be used.
@@ -30,7 +30,7 @@ class User extends ActiveModel {
   static findById = findById(coll)
   static updateById = updateById(coll)
 
-  static findByUsername = username => User.getCollection().find(x => x.username === username)
+  static findByUsername = (username) => User.getCollection().find((x) => x.username === username)
 
   static getAuthenticatedUser = (username, password) => {
     const user = User.findByUsername(username)
@@ -41,7 +41,7 @@ class User extends ActiveModel {
     return user.password === attemptedPassword ? user : null
   }
 
-  update (params = {}) {
+  update(params = {}) {
     Object.assign(this, params)
     return this
   }
@@ -51,8 +51,9 @@ class User extends ActiveModel {
 
   addRole = (tenant, role) => this.roles.push({ tenant, role })
   removeRole = (tenantId, roleId) => {
-    const idx = this.roles.findIndex(({ tenant, role }) =>
-      tenant.id === tenantId && role.id === roleId)
+    const idx = this.roles.findIndex(
+      ({ tenant, role }) => tenant.id === tenantId && role.id === roleId,
+    )
     if (idx == null) {
       throw new Error('User role not found')
     }
@@ -60,11 +61,13 @@ class User extends ActiveModel {
     return this.roles
   }
 
-  get rolePair () {
-    return this.roles.map(({ tenant, role }) => (JSON.stringify({
-      tenant: Tenant.findById(tenant.id).name,
-      role: Role.findById(role.id).name,
-    })))
+  get rolePair() {
+    return this.roles.map(({ tenant, role }) =>
+      JSON.stringify({
+        tenant: Tenant.findById(tenant.id).name,
+        role: Role.findById(role.id).name,
+      }),
+    )
   }
 
   asJson = () => {

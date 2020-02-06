@@ -2,7 +2,15 @@ import React, { forwardRef } from 'react'
 import useDataLoader from 'core/hooks/useDataLoader'
 import withFormContext from 'core/components/validatedForm/withFormContext'
 import {
-  Checkbox, Radio, Table, TableHead, TableCell, TableRow, TableBody, Typography, Theme,
+  Checkbox,
+  Radio,
+  Table,
+  TableHead,
+  TableCell,
+  TableRow,
+  TableBody,
+  Typography,
+  Theme,
 } from '@material-ui/core'
 import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
 import { makeStyles } from '@material-ui/styles'
@@ -10,7 +18,8 @@ import { identity } from 'ramda'
 import { ICombinedNode, IUseDataLoader } from '../../nodes/model'
 import PollingData from 'core/components/PollingData'
 import {
-  UsageBar, renderNetworkInterfaces,
+  UsageBar,
+  renderNetworkInterfaces,
 } from 'k8s/components/infrastructure/nodes/NodesListPage'
 
 interface Props extends IValidatedForm {

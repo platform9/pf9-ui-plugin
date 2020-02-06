@@ -15,7 +15,8 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import useReactRouter from 'use-react-router'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import {
-  ClusterConnectionStatus, ClusterHealthStatus,
+  ClusterConnectionStatus,
+  ClusterHealthStatus,
 } from 'k8s/components/infrastructure/clusters/ClusterStatus'
 import { ConvergingNodesWithTasksToggler } from '../nodes/ConvergingNodeBreakdown'
 import { routes } from 'core/utils/routes'

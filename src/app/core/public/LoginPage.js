@@ -2,7 +2,13 @@ import React, { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import ApiClient from 'api-client/ApiClient'
 import {
-  Button, Checkbox, FormControlLabel, Grid, Paper, TextField, Typography,
+  Button,
+  Checkbox,
+  FormControlLabel,
+  Grid,
+  Paper,
+  TextField,
+  Typography,
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import { compose } from 'utils/fp'

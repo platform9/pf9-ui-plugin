@@ -1,4 +1,3 @@
-
 const getCredentials = (req, res) => {
   // TODO
   const credentials = []

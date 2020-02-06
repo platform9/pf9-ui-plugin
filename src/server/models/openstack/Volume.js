@@ -5,7 +5,7 @@ import { findById, updateById } from '../../helpers'
 const coll = () => context.volumes
 
 class Volume extends ActiveModel {
-  constructor (params = {}) {
+  constructor(params = {}) {
     super(params)
     this.name = params.name || ''
     this.description = params.description || ''
@@ -28,7 +28,7 @@ class Volume extends ActiveModel {
   static findById = findById(coll)
   static updateById = updateById(coll)
 
-  static findByName = name => Volume.getCollection().find(x => x.name === name)
+  static findByName = (name) => Volume.getCollection().find((x) => x.name === name)
 
   asJson = () => {
     return {
@@ -47,7 +47,7 @@ class Volume extends ActiveModel {
       device: this.device,
       attachedMode: this.attachedMode,
       readonly: this.readonly,
-      created_at: this.created_at
+      created_at: this.created_at,
     }
   }
 }

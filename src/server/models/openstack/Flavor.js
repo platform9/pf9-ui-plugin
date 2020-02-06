@@ -5,7 +5,7 @@ import { findById, updateById } from '../../helpers'
 const coll = () => context.flavors
 
 class Flavor extends ActiveModel {
-  constructor (params = {}) {
+  constructor(params = {}) {
     super(params)
     this.name = params.name || ''
     this.disk = params.disk || 1
@@ -20,7 +20,7 @@ class Flavor extends ActiveModel {
   static findById = findById(coll)
   static updateById = updateById(coll)
 
-  static findByName = name => Flavor.getCollection().find(x => x.name === name)
+  static findByName = (name) => Flavor.getCollection().find((x) => x.name === name)
 
   asJson = () => {
     return {
@@ -30,7 +30,7 @@ class Flavor extends ActiveModel {
       ram: this.ram,
       vcpus: this.vcpus,
       public: this.public,
-      tags: this.tags
+      tags: this.tags,
     }
   }
 }

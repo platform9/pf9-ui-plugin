@@ -1,7 +1,10 @@
 import React from 'react'
 import ApiClient from 'api-client/ApiClient'
 import {
-  Checkbox, FormControlLabel, TextField as BaseTextField, Typography,
+  Checkbox,
+  FormControlLabel,
+  TextField as BaseTextField,
+  Typography,
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import { compose } from 'app/utils/fp'

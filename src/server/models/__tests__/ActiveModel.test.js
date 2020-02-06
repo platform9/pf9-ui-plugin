@@ -51,8 +51,7 @@ describe('ActiveModel', () => {
   })
 
   it('warns when a subclass does not implement getCollection', () => {
-    class BadModel extends ActiveModel {
-    }
+    class BadModel extends ActiveModel {}
 
     const thrower = () => new BadModel()
     expect(thrower).toThrowError()

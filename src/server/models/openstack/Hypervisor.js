@@ -7,12 +7,12 @@ const coll = () => context.hypervisors
 
 // TODO: take a ResMgrHost object as a parameter?
 class Hypervisor extends ActiveModel {
-  constructor (params = {}) {
+  constructor(params = {}) {
     super(params)
     this.service = {
       host: params.resMgrId || '',
       id: uuid.v4(),
-      disabled_reason: null
+      disabled_reason: null,
     }
     this.status = params.status || ''
     this['OS-EXT-PF9-HYP-ATTR:networks'] = params.networks || []
@@ -35,7 +35,7 @@ class Hypervisor extends ActiveModel {
       'OS-EXT-PF9-HYP-ATTR:host_id': this['OS-EXT-PF9-HYP-ATTR:host_id'],
       'OS-EXT-PF9-HYP-ATTR:ip_info': this['OS-EXT-PF9-HYP-ATTR:ip_info'],
       host_ip: this.host_ip,
-      hypervisor_hostname: this.hypervisor_hostname
+      hypervisor_hostname: this.hypervisor_hostname,
     }
   }
 }

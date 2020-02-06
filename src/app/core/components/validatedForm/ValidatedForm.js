@@ -124,8 +124,8 @@ class ValidatedForm extends PureComponent {
     const validationsArray = Array.isArray(validations)
       ? validations
       : toPairs(validations).map(([validationKey, validationSpec]) =>
-        parseValidator(validationKey, validationSpec),
-      )
+          parseValidator(validationKey, validationSpec),
+        )
     const failedValidation = validationsArray.find(
       (validator) => !validator.validate(fieldValue, values, field),
     )

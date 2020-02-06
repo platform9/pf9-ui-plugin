@@ -19,7 +19,7 @@ const namespacesMapper = async (items, params, loadFromContext) => {
   return items.map((ns) => ({
     ...ns,
     clusterName: findClusterName(clusters, ns.clusterId),
-    status: pathOr('N/A', ['status', 'phase'], ns)
+    status: pathOr('N/A', ['status', 'phase'], ns),
   }))
 }
 

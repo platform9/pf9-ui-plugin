@@ -22,9 +22,7 @@ const createFn = (_params = {}, context) => {
       description: faker.company.catchPhrase(),
       home: faker.internet.url(),
       keywords: times(faker.hacker.noun, 4),
-      maintainers: times(
-        () => pick(['name', 'email'], faker.helpers.createCard()),
-        2),
+      maintainers: times(() => pick(['name', 'email'], faker.helpers.createCard()), 2),
       name: faker.company.companyName(),
       sources: [faker.internet.url()],
       ...params.attributes,
@@ -39,16 +37,13 @@ const createFn = (_params = {}, context) => {
       chart: {
         data: {
           home: faker.internet.url(),
-          sources: [
-            faker.internet.url(),
-            faker.internet.url(),
-            faker.internet.url(),
-          ],
+          sources: [faker.internet.url(), faker.internet.url(), faker.internet.url()],
           maintainers: [
             {
               email: faker.internet.email(),
               name: faker.name.firstName,
-            }, {
+            },
+            {
               email: faker.internet.email(),
               name: faker.name.firstName,
             },

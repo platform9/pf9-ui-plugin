@@ -8,5 +8,5 @@ const addStories = addStoriesFromModule(module)
 addStories('Floating IP Management/Adding a floating IP', {
   'Add a floating IP': () => (
     <AddFloatingIpForm onSubmit={jsonDetailLogger('AddFloatingIpForm#submit')} />
-  )
+  ),
 })

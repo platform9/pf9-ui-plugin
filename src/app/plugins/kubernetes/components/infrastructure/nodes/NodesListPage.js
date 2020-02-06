@@ -10,7 +10,8 @@ import SimpleLink from 'core/components/SimpleLink'
 import { loadNodes, nodesCacheKey } from 'k8s/components/infrastructure/nodes/actions'
 import ClusterStatusSpan from 'k8s/components/infrastructure/clusters/ClusterStatus'
 import {
-  connectionStatusFieldsTable, clusterHealthStatusFields,
+  connectionStatusFieldsTable,
+  clusterHealthStatusFields,
 } from '../clusters/ClusterStatusUtils'
 import DeAuthIcon from '@material-ui/icons/DeleteForever'
 import NodeDeAuthDialog from './NodeDeAuthDialog'

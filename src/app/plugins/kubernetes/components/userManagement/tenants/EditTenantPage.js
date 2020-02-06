@@ -5,7 +5,8 @@ import { Typography } from '@material-ui/core'
 import UserRolesTableField from 'k8s/components/userManagement/tenants/UserRolesTableField'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import {
-  mngmTenantActions, mngmTenantRoleAssignmentsLoader,
+  mngmTenantActions,
+  mngmTenantRoleAssignmentsLoader,
 } from 'k8s/components/userManagement/tenants/actions'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { mngmUserActions } from 'k8s/components/userManagement/users/actions'

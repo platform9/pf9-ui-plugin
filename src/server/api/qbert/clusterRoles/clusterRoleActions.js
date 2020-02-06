@@ -10,8 +10,8 @@ export const getClusterRoles = (req, res) => {
     kind: 'ClusterRoleList',
     metadata: {
       resourceVersion: '223011',
-      selfLink: '/apis/rbac.authorization.k8s.io/v1/clusterroles'
-    }
+      selfLink: '/apis/rbac.authorization.k8s.io/v1/clusterroles',
+    },
   }
   return res.send(response)
 }
@@ -24,7 +24,9 @@ export const postClusterRole = (req, res) => {
     return res.status(400).send({ code: 400, message: 'Must be of kind "ClusterRole"' })
   }
   if (ClusterRole.findByName({ name: clusterRole.metadata.name, context, config: { clusterId } })) {
-    return res.status(409).send({ code: 409, message: `clusterRole ${clusterRole.metadata.name} already exists` })
+    return res
+      .status(409)
+      .send({ code: 409, message: `clusterRole ${clusterRole.metadata.name} already exists` })
   }
 
   const newClusterRole = ClusterRole.create({ data: clusterRole, context, config: { clusterId } })
@@ -48,7 +50,11 @@ export const postClusterRole = (req, res) => {
 export const deleteClusterRole = (req, res) => {
   const { clusterRoleName, clusterId } = req.params
   console.log('Attempting to delete clusterRole: ', clusterRoleName)
-  const clusterRole = ClusterRole.findByName({ name: clusterRoleName, context, config: { clusterId } })
+  const clusterRole = ClusterRole.findByName({
+    name: clusterRoleName,
+    context,
+    config: { clusterId },
+  })
   // this should throw an error if it doesn't exist
   if (!clusterRole) {
     res.status(404).send({ code: 404, message: 'clusterRole not found' })

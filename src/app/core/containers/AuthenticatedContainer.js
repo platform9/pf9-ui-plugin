@@ -1,7 +1,11 @@
 import { makeStyles } from '@material-ui/styles'
 import ApiClient from 'api-client/ApiClient'
 import {
-  clarityDashboardUrl, dashboardUrl, helpUrl, ironicWizardUrl, logoutUrl,
+  clarityDashboardUrl,
+  dashboardUrl,
+  helpUrl,
+  ironicWizardUrl,
+  logoutUrl,
 } from 'app/constants'
 import HelpPage from 'app/plugins/kubernetes/components/common/HelpPage'
 import clsx from 'clsx'

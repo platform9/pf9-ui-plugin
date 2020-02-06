@@ -10,8 +10,8 @@ export const getRoles = (req, res) => {
     kind: 'RoleList',
     metadata: {
       resourceVersion: '219042',
-      selfLink: '/apis/rbac.authorization.k8s.io/v1/roles'
-    }
+      selfLink: '/apis/rbac.authorization.k8s.io/v1/roles',
+    },
   }
   return res.send(response)
 }

@@ -28,14 +28,22 @@ const options = {
   },
   createFn: (input, context) => {
     const _input = omit(['apiVersion', 'kind'], input)
-    return { ..._input, name: _input.metadata.name, metadata: { ..._input.metadata, namespace: _input.namespace, creationTimestamp: getCurrentTime() } }
+    return {
+      ..._input,
+      name: _input.metadata.name,
+      metadata: {
+        ..._input.metadata,
+        namespace: _input.namespace,
+        creationTimestamp: getCurrentTime(),
+      },
+    }
   },
   loaderFn: (services) => {
     return services.map((service) => {
       const newService = { ...service, metadata: { ...service.metadata, uid: service.uuid } }
       return omit(['name', 'uuid', 'namespace', 'clusterId'], newService)
     })
-  }
+  },
 }
 
 const Service = createModel(options)

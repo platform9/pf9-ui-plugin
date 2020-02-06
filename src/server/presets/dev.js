@@ -41,8 +41,8 @@ import Token from '../models/openstack/Token'
 import { range } from '../util'
 import { strict as assert } from 'assert'
 
-function loadPreset () {
-  console.log('Loading \'dev\' preset.')
+function loadPreset() {
+  console.log("Loading 'dev' preset.")
 
   // Hard-coding a few of the id's directly instead of randomly generating UUID's so we can stub them
   // out for tests.
@@ -54,12 +54,15 @@ function loadPreset () {
     description: 'Service tenant',
   })
   // Create a bunch of tenants
-  range(3).map(i => new Tenant({
-    description: `Test tenant #${i} description`,
-    enabled: true,
-    id: (i + 1).toString(),
-    name: `Tenant #${i}`,
-  }))
+  range(3).map(
+    (i) =>
+      new Tenant({
+        description: `Test tenant #${i} description`,
+        enabled: true,
+        id: (i + 1).toString(),
+        name: `Tenant #${i}`,
+      }),
+  )
   const tenants = Tenant.getCollection()
 
   // Regions
@@ -91,7 +94,7 @@ function loadPreset () {
 
   let i = 0
   // Tenants & users
-  tenants.forEach(tenant => {
+  tenants.forEach((tenant) => {
     // Add a bunch of users for the current Tenant
     const users = range(2).map(() => {
       const userId = ++i
@@ -316,7 +319,8 @@ function loadPreset () {
     author: 'admin',
     public: true,
     tenant: 'Development Team Tenant',
-    description: 'The Apache HTTP Server Project is a collaborative software development effort aimed at creating a robust, commercial-grade, featureful, and freely-available source code implementation of an HTTP (Web) server.',
+    description:
+      'The Apache HTTP Server Project is a collaborative software development effort aimed at creating a robust, commercial-grade, featureful, and freely-available source code implementation of an HTTP (Web) server.',
     categories: 'Web',
   })
   new Application({
@@ -324,7 +328,8 @@ function loadPreset () {
     author: 'admin',
     public: true,
     tenant: 'Development Team Tenant',
-    description: 'WordPress is a free and open-source content management system (CMS) based on PHP and MySQL.',
+    description:
+      'WordPress is a free and open-source content management system (CMS) based on PHP and MySQL.',
     categories: 'SAP',
   })
   new Application({
@@ -332,7 +337,8 @@ function loadPreset () {
     author: 'user',
     public: true,
     tenant: 'Test Tenant',
-    description: 'MongoDB is a cross-platform document-oriented database. Classified as a NoSQL database, MongoDB eschews the traditional table-based relational database structure in favor of JSON-like documents with dynamic schemas.',
+    description:
+      'MongoDB is a cross-platform document-oriented database. Classified as a NoSQL database, MongoDB eschews the traditional table-based relational database structure in favor of JSON-like documents with dynamic schemas.',
     categories: 'Databases',
   })
 
@@ -602,40 +608,48 @@ function loadPreset () {
   })
 
   // Monocular Charts
-  range(3).forEach(i => {
+  range(3).forEach((i) => {
     const chart = Chart.create({
       data: {},
       context,
       config: { clusterId: cluster.uuid, namespace: defaultNamespace.name },
     })
-    range(3).forEach(i => ChartVersion.create({
-      data: {
-        id: chart.id,
-      },
-      context,
-    }))
+    range(3).forEach((i) =>
+      ChartVersion.create({
+        data: {
+          id: chart.id,
+        },
+        context,
+      }),
+    )
   })
 
   // Monocular releases
-  range(3).forEach(i => Release.create({
-    data: {},
-    context,
-    config: { clusterId: cluster.uuid, namespace: defaultNamespace.name },
-  }))
+  range(3).forEach((i) =>
+    Release.create({
+      data: {},
+      context,
+      config: { clusterId: cluster.uuid, namespace: defaultNamespace.name },
+    }),
+  )
 
   // Monocular repositories
-  range(3).forEach(i => Repository.create({
-    data: {},
-    context,
-    config: { clusterId: cluster.uuid, namespace: defaultNamespace.name },
-  }))
+  range(3).forEach((i) =>
+    Repository.create({
+      data: {},
+      context,
+      config: { clusterId: cluster.uuid, namespace: defaultNamespace.name },
+    }),
+  )
 
   // Qbert repositories
-  range(3).forEach(i => ClusterRepository.create({
-    data: {},
-    context,
-    config: { clusterId: cluster.uuid, namespace: defaultNamespace.name },
-  }))
+  range(3).forEach((i) =>
+    ClusterRepository.create({
+      data: {},
+      context,
+      config: { clusterId: cluster.uuid, namespace: defaultNamespace.name },
+    }),
+  )
 
   // Logging
   const loggingsForAllClusters = LoggingStub.loggingsForAllClusters

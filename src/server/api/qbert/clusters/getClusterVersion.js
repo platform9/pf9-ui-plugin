@@ -12,7 +12,7 @@ const getClusterVersion = (req, res) => {
     goVersion: 'go1.9.3',
     major: '1',
     minor: '10',
-    platform: 'linux/amd64'
+    platform: 'linux/amd64',
   }
   return res.send(response)
 }

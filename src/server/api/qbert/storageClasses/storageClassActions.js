@@ -10,8 +10,8 @@ export const getStorageClasses = (req, res) => {
     kind: 'StorageClassList',
     metadata: {
       resourceVersion: '5201088',
-      selfLink: '/api/v1/storageclasses'
-    }
+      selfLink: '/api/v1/storageclasses',
+    },
   }
   return res.send(response)
 }
@@ -23,18 +23,30 @@ export const postStorageClass = (req, res) => {
   if (storageClass.kind !== 'StorageClass') {
     return res.status(400).send({ code: 400, message: 'Must be of kind "StorageClass"' })
   }
-  if (StorageClass.findByName({ name: storageClass.metadata.name, context, config: { clusterId } })) {
-    return res.status(409).send({ code: 409, message: `storageClass ${storageClass.metadata.name} already exists` })
+  if (
+    StorageClass.findByName({ name: storageClass.metadata.name, context, config: { clusterId } })
+  ) {
+    return res
+      .status(409)
+      .send({ code: 409, message: `storageClass ${storageClass.metadata.name} already exists` })
   }
 
-  const newStorageClass = StorageClass.create({ data: storageClass, context, config: { clusterId } })
+  const newStorageClass = StorageClass.create({
+    data: storageClass,
+    context,
+    config: { clusterId },
+  })
   res.status(201).send(newStorageClass)
 }
 
 export const deleteStorageClass = (req, res) => {
   const { storageClassName, clusterId } = req.params
   console.log('Attempting to delete storageClass: ', storageClassName)
-  const storageClass = StorageClass.findByName({ name: storageClassName, context, config: { clusterId } })
+  const storageClass = StorageClass.findByName({
+    name: storageClassName,
+    context,
+    config: { clusterId },
+  })
   // this should throw an error if it doesn't exist
   if (!storageClass) {
     res.status(404).send({ code: 404, message: 'storageClass not found' })

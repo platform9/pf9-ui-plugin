@@ -3,7 +3,15 @@ import { compose, propOr } from 'ramda'
 import { withAppContext } from 'core/providers/AppProvider'
 import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab'
 import {
-  Button, Dialog, DialogActions, DialogContent, DialogTitle, Table, TableBody, TableRow, TableCell,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Table,
+  TableBody,
+  TableRow,
+  TableCell,
   Typography,
 } from '@material-ui/core'
 import withDataLoader from 'core/hocs/withDataLoader'

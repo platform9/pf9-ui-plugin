@@ -10,7 +10,7 @@ const options = {
   },
   mappingFn: (input, context) => {
     return { nodePoolUuid: uuid.v4(), ...input }
-  }
+  },
 }
 
 const CloudProvider = createModel(options)

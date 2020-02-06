@@ -7,7 +7,11 @@ import SimpleLink from 'core/components/SimpleLink'
 import { compose } from 'app/utils/fp'
 import { withStyles } from '@material-ui/styles'
 import {
-  Button, ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, Typography,
+  Button,
+  ExpansionPanel,
+  ExpansionPanelDetails,
+  ExpansionPanelSummary,
+  Typography,
 } from '@material-ui/core'
 
 const styles = (theme) => ({

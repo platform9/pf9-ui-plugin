@@ -36,19 +36,29 @@ const options = {
       // If the context is reset on the server this callback will crash the server.
       // Unforunately we do not have any kind of destructor when resetting the context.
       // Instead we can workaround this by not accessing the pod if it doesn't exist.
-      const pod = context.pods.find(x => x.name === _input.metadata.name)
-      if (!pod) { return }
+      const pod = context.pods.find((x) => x.name === _input.metadata.name)
+      if (!pod) {
+        return
+      }
       pod.status.phase = 'Running'
     }, 5000)
 
-    return { ..._input, name: _input.metadata.name, metadata: { ..._input.metadata, namespace: _input.namespace, creationTimestamp: getCurrentTime() } }
+    return {
+      ..._input,
+      name: _input.metadata.name,
+      metadata: {
+        ..._input.metadata,
+        namespace: _input.namespace,
+        creationTimestamp: getCurrentTime(),
+      },
+    }
   },
   loaderFn: (pods) => {
     return pods.map((pod) => {
       const newPod = { ...pod, metadata: { ...pod.metadata, uid: pod.uuid } }
       return omit(['name', 'uuid', 'namespace', 'clusterId'], newPod)
     })
-  }
+  },
 }
 
 const Pod = createModel(options)

@@ -5,7 +5,7 @@ import { findById, updateById } from '../../helpers'
 const coll = () => context.floatingIps
 
 class FloatingIp extends ActiveModel {
-  constructor (params = {}) {
+  constructor(params = {}) {
     super(params)
     this.floating_ip_address = params.floating_ip_address
     this.subnet_id = params.subnet_id
@@ -24,7 +24,8 @@ class FloatingIp extends ActiveModel {
   static findById = findById(coll)
   static updateById = updateById(coll)
 
-  static findByFloatingIp = ip => FloatingIp.getCollection().find(x => x.floating_ip_address === ip)
+  static findByFloatingIp = (ip) =>
+    FloatingIp.getCollection().find((x) => x.floating_ip_address === ip)
 
   asJson = () => {
     return {
@@ -38,7 +39,7 @@ class FloatingIp extends ActiveModel {
       description: this.description,
       floating_network_id: this.floating_network_id,
       status: this.status,
-      router_id: this.router_id
+      router_id: this.router_id,
     }
   }
 }
