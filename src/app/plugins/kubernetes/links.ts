@@ -10,7 +10,7 @@ export const remoteMonitoringDocsLink =
   'https://docs.platform9.com/kubernetes/enable-remote-monitoring/'
 export const managedContainerChecklistLink =
   'https://docs.platform9.com/getting-started/managed-container-cloud-requirements-checklist'
-export const pmkCliOverviewLink = 'https://docs.platform9.com/kubernetes/PMK-CLI/overview/'
+export const pmkCliOverviewLink = 'https://docs.platform9.com/kubernetes/PMK-CLI/'
 export const pmkCliCreateLink = 'https://docs.platform9.com/kubernetes/PMK-CLI/create/'
 export const runtimePrivilegedLink =
   'https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities'
