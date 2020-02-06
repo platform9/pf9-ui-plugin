@@ -1,3 +1,10 @@
+// Help Links
+export const gettingStartedHelpLink = 'https://docs.platform9.com/kubernetes/qucickstart/'
+export const tutorialsHelpLink = 'https://docs.platform9.com/kubernetes/tutorials/virtualbox-mac/'
+export const slackLink = 'https://kplane.slack.com/'
+export const emailSupportLink = 'mailto:support-ft@platform9.com'
+export const forumHelpLink = 'https://support.platform9.com/hc/en-us/community/topics'
+
 // Documentation links
 export const gettingStartedLink =
   'https://docs.platform9.com/kubernetes/getting-started/bare-metal-preinstall-checklist/'
