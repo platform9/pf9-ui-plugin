@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { makeStyles } from '@material-ui/styles'
+import clsx from 'clsx'
 
 const extraHeaderRef = React.createRef()
 
@@ -47,7 +48,7 @@ const useStyles = makeStyles((theme) => ({
  * PageContainerHeader to render extra header contents dynamically within any children and also
  * exposes a "header" prop to render any arbitrary fixed header content
  */
-const PageContainer = ({ children, header = undefined, ...rest }) => {
+const PageContainer = ({ children, header = undefined, className = '', ...rest }) => {
   const classes = useStyles(rest)
   const [extraHeaderContainer, setExtraHeaderContainer] = useState(null)
 
@@ -58,7 +59,7 @@ const PageContainer = ({ children, header = undefined, ...rest }) => {
   }, [])
 
   return (
-    <div className={classes.root}>
+    <div className={clsx(classes.root, className)}>
       <div className={classes.header}>
         {header && <div className={classes.headerContents}>{header}</div>}
         <div className={classes.extraHeader} ref={extraHeaderRef} />
