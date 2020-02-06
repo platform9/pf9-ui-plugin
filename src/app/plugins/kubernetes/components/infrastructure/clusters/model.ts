@@ -87,6 +87,7 @@ export enum CloudProviders {
   Azure = 'azure',
   BareOS = 'local',
 }
+
 export enum CloudProvidersFriendlyName {
   aws = 'AWS',
   azure = 'Azure',
@@ -131,9 +132,11 @@ interface EtcdBackup {
   storageProperties: EtcdBackupStorageProperties
   intervalInMins: string
 }
+
 interface EtcdBackupStorageProperties {
   localPath: string
 }
+
 interface Links {
   dashboard: null
   kubeconfig: null

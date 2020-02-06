@@ -3,7 +3,7 @@ import { Table, TableBody, TableCell, TableRow, Typography } from '@material-ui/
 import { makeStyles } from '@material-ui/styles'
 import ExpansionPanel from 'core/components/expansionPanel/ExpansionPanel'
 import Theme from 'core/themes/model'
-import OnboardWizard from './onboard-wizard'
+import OnboardWizard from 'k8s/components/onboarding/OnboardWizard'
 import NextButton from 'core/components/buttons/NextButton'
 import useReactRouter from 'use-react-router'
 import CodeBlock from 'core/components/CodeBlock'
@@ -165,6 +165,7 @@ interface IMonitoringPromptProps {
   clusters: ICluster[]
   onComplete: () => void
 }
+
 const MonitoringPrompt = ({ clusters, onComplete }: IMonitoringPromptProps) => {
   const { table } = useStyles({})
   const [activeCluster, setActiveCluster] = useState<ICluster>()

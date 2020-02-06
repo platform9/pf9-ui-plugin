@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import ExpansionPanel from 'core/components/expansionPanel/ExpansionPanel'
-import OnboardWizard from './onboard-wizard'
+import OnboardWizard from 'k8s/components/onboarding/OnboardWizard'
 import NextButton from 'core/components/buttons/NextButton'
 import useReactRouter from 'use-react-router'
 import { onboardingPodSetup } from 'app/constants'
@@ -16,6 +16,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
     maxWidth: 800,
   },
 }))
+
 interface Props {
   onComplete: () => void
   initialPanel?: number

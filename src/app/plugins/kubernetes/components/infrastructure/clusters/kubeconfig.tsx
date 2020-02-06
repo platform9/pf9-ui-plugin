@@ -1,6 +1,7 @@
 import ApiClient from 'api-client/ApiClient'
 
 type AuthMethod = 'token' | 'password'
+
 interface UserCreds {
   username: string
   password: string
@@ -9,9 +10,11 @@ interface UserCreds {
 interface KubeConfigError {
   error: string
 }
+
 interface KubeConfigSuccess {
   kubeconfig: string
 }
+
 type KubeConfigResponse = KubeConfigError | KubeConfigSuccess
 
 const { keystone } = ApiClient.getInstance()

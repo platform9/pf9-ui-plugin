@@ -30,7 +30,7 @@ const defaultOptions = {
 const useStyles = makeStyles((theme) => ({
   coderMirrorHeader: {
     position: 'relative',
-    background: '#f3f3f3',
+    background: '#F3F3F3',
     padding: '16px 0 5px 16px',
     color: '#303030',
     fontSize: 16,

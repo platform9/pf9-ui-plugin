@@ -5,6 +5,7 @@ export enum UserRoles {
   Member = '_member_',
   // TODO figure out what other roles we have for users
 }
+
 export const isAdminRole = (getContext) => {
   const ctx = getContext(prop('userDetails'))
   if (!ctx) {

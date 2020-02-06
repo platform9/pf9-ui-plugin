@@ -2,6 +2,7 @@ import React, { FunctionComponent } from 'react'
 import { makeStyles } from '@material-ui/styles'
 
 import Theme from 'core/themes/model'
+
 interface Props {
   children: any
 }

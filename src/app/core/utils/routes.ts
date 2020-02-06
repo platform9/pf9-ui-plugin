@@ -4,6 +4,7 @@ import { CloudProviders } from 'k8s/components/infrastructure/clusters/model'
 interface GenericKVP {
   [key: string]: string
 }
+
 type OptionalGenericKVP = GenericKVP | null | void
 
 // This will make a parameter optional if no type definition is passed
