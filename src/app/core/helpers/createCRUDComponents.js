@@ -58,6 +58,7 @@ const createCRUDComponents = (options) => {
     searchTarget = 'name',
     multiSelection = true,
     showCheckboxes,
+    headlessTable,
     compactTable,
     blankFirstColumn,
     onSelect,
@@ -98,6 +99,7 @@ const createCRUDComponents = (options) => {
         uniqueIdentifier={uniqueIdentifier}
         showCheckboxes={showCheckboxes}
         compactTable={compactTable}
+        headless={headlessTable}
         blankFirstColumn={blankFirstColumn}
         loading={loading}
         onReload={onReload}
