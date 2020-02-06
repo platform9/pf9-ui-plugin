@@ -4,12 +4,18 @@ import moment from 'moment'
 
 // Date formatter
 export const defaultDateFormat = 'MMM Do YYYY, hh:mm A'
-export const formatDate = ({ ts, format = defaultDateFormat }) => moment(ts).format(format)
+export const formatDate = (ts, format = defaultDateFormat) => moment(ts).format(format)
 
-export const durationBetweenDates = ({ ts, start = new Date().valueOf() }) => {
-  const duration = moment.duration(moment(start).diff(moment(ts)))
-  console.log(`${duration.months()} months, ${duration.days()} days, ${duration.hours()} hours,
-   ${duration.minutes()} minutes`)
+/**
+ * DurationBetweenDates utility function that returns difference between give start and end date
+ * into format 'n day(s) n hour(s) n minute(s) depending on respective values.
+ * @example ('2020-01-28T00:44:35.000Z', '2020-01-29T01:45:36.000Z') -> '1 day, 1 hour, 1 minute'
+ * @param {string} startDateTime
+ * @param {string} [endDateTime]
+ * @returns {string}
+ */
+export const durationBetweenDates = (startDateTime, endDateTime = new Date().valueOf()) => {
+  const duration = moment.duration(moment(endDateTime).diff(moment(startDateTime)))
   return [
     { fnName: 'months', label: 'month' },
     { fnName: 'days', label: 'day' },
@@ -17,11 +23,17 @@ export const durationBetweenDates = ({ ts, start = new Date().valueOf() }) => {
     { fnName: 'minutes', label: 'minute' },
   ].reduce((displayStr, curr) => {
     const value = duration[curr.fnName]()
-    if (value > 0) {
-      displayStr += `${displayStr === '' ? '' : ', '}${value} ${curr.label}${value > 1 ? 's' : ''}`
+    if (value < 1 && !displayStr) {
+      return displayStr
     }
 
-    return displayStr
+    if (displayStr) {
+      displayStr += ', '
+    }
+
+    const pluralLabel = value > 1 ? 's' : ''
+
+    return `${displayStr}${value} ${curr.label}${pluralLabel}`
   }, '')
 }
 

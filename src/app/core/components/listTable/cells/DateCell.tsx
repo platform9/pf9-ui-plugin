@@ -1,5 +1,5 @@
 import React from 'react'
-import { formatDate, durationBetweenDates, defaultDateFormat } from 'utils/misc'
+import { formatDate, durationBetweenDates } from 'utils/misc'
 import { Tooltip } from '@material-ui/core'
 
 interface DateCellProps {
@@ -10,18 +10,18 @@ interface DateCellProps {
 
 const DateCell: React.FC<DateCellProps> = ({
   value,
-  format = defaultDateFormat,
+  format,
   showToolTip = false,
 }) => {
   if (showToolTip) {
     return (
-      <Tooltip title={durationBetweenDates({ ts: value })}>
-        <span>{formatDate({ ts: value, format })}</span>
+      <Tooltip title={durationBetweenDates(value)}>
+        <span>{formatDate(value, format)}</span>
       </Tooltip>
     )
   }
 
-  return <span>{formatDate({ ts: value, format })}</span>
+  return <span>{formatDate(value, format)}</span>
 }
 
 export default DateCell

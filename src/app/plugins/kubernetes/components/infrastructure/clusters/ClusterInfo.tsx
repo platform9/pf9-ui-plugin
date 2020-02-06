@@ -39,7 +39,7 @@ const clusterOverviewFields: IClusterDetailFields[] = [
     id: 'created_at',
     title: 'Cluster Created',
     required: true,
-    render: (ts: string) => formatDate({ ts }),
+    render: (ts: string) => formatDate(ts),
   },
   {
     id: 'cloudProviderName',

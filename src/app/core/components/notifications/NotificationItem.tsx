@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
 
 const NotificationItem: FC<{ notification: Notification }> = ({ notification }) => {
   const classes = useStyles({})
-  const timePassed = durationBetweenDates({ ts: notification.date })
+  const timePassed = durationBetweenDates(notification.date)
   return (
     <div className={classes.root}>
       <FontAwesomeIcon className={classes.icon}>times-circle</FontAwesomeIcon>
