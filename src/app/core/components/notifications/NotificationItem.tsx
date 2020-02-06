@@ -3,8 +3,7 @@ import { Notification } from 'core/providers/AppProvider'
 import { makeStyles } from '@material-ui/core/styles'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { Typography } from '@material-ui/core'
-import { secondsToString } from 'utils/misc'
-import moment from 'moment'
+import { durationBetweenDates } from 'utils/misc'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -27,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
 
 const NotificationItem: FC<{ notification: Notification }> = ({ notification }) => {
   const classes = useStyles({})
-  const timePassed = secondsToString(moment().diff(notification.date, 's'))
+  const timePassed = durationBetweenDates({ ts: notification.date })
   return (
     <div className={classes.root}>
       <FontAwesomeIcon className={classes.icon}>times-circle</FontAwesomeIcon>

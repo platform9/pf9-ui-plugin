@@ -11,9 +11,8 @@ import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import NamespacePicklist from 'k8s/components/common/NamespacePicklist'
 import { makeStyles } from '@material-ui/styles'
 import { objSwitchCase } from 'utils/fp'
-import moment from 'moment'
-import { secondsToString } from 'utils/misc'
 import renderLabels from 'k8s/components/pods/renderLabels'
+import DateCell from 'core/components/listTable/cells/DateCell'
 
 const useStyles = makeStyles((theme) => ({
   status: {
@@ -119,10 +118,6 @@ const renderStatus = (phase) => {
   }
 }
 
-const renderAge = (created) => {
-  return secondsToString(moment().diff(created, 's'))
-}
-
 export const options = {
   addUrl: '/ui/kubernetes/pods/add',
   addText: 'Create New Pod',
@@ -133,7 +128,7 @@ export const options = {
     { id: 'labels', label: 'Labels', render: renderLabels('label') },
     { id: 'status.phase', label: 'Status', render: renderStatus },
     { id: 'status.hostIP', label: 'Node IP' },
-    { id: 'created', label: 'Age', render: renderAge },
+    { id: 'created', label: 'Age', render: (value) => <DateCell value={value} showToolTip /> },
   ],
   name: 'Pods',
   title: 'Pods',

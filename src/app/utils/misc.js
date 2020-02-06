@@ -1,5 +1,29 @@
 import { path, equals } from 'ramda'
 import moize from 'moize'
+import moment from 'moment'
+
+// Date formatter
+export const defaultDateFormat = 'MMM Do YYYY, hh:mm A'
+export const formatDate = ({ ts, format = defaultDateFormat }) => moment(ts).format(format)
+
+export const durationBetweenDates = ({ ts, start = new Date().valueOf() }) => {
+  const duration = moment.duration(moment(start).diff(moment(ts)))
+  console.log(`${duration.months()} months, ${duration.days()} days, ${duration.hours()} hours,
+   ${duration.minutes()} minutes`)
+  return [
+    { fnName: 'months', label: 'month' },
+    { fnName: 'days', label: 'day' },
+    { fnName: 'hours', label: 'hour' },
+    { fnName: 'minutes', label: 'minute' },
+  ].reduce((displayStr, curr) => {
+    const value = duration[curr.fnName]()
+    if (value > 0) {
+      displayStr += `${displayStr === '' ? '' : ', '}${value} ${curr.label}${value > 1 ? 's' : ''}`
+    }
+
+    return displayStr
+  }, '')
+}
 
 // A more resilient JSON parsing that should always return {}
 // in error conditions.
@@ -14,31 +38,6 @@ export const parseJSON = (str) => {
     console.error('Error parsing JSON', str)
     return {}
   }
-}
-
-/**
- * Given a number of seconds returns the number of
- * years, months, days, hours and minutes in a human readable format
- * @param seconds
- * @returns {string}
- */
-export const secondsToString = (seconds) => {
-  const min = 60
-  const hour = min * 60
-  const day = hour * 24
-  const month = day * 30
-  const year = day * 365
-  const units = { year, month, day, hour, min }
-  let remainingSeconds = seconds
-  const results = Object.entries(units).reduce((acc, [unitName, unitSeconds]) => {
-    const amount = Math.floor(remainingSeconds / unitSeconds)
-    remainingSeconds %= units[unitName]
-    if (amount >= 1) {
-      return [...acc, `${amount} ${unitName}${amount >= 2 ? 's' : ''}`]
-    }
-    return acc
-  }, [])
-  return results.join(', ')
 }
 
 export const isNumeric = (n) => !Number.isNaN(parseFloat(n)) && Number.isFinite(+n)

@@ -26,6 +26,7 @@ import { makeStyles } from '@material-ui/styles'
 import { isAdminRole } from 'k8s/util/helpers'
 import { routes } from 'core/utils/routes'
 import CodeBlock from 'core/components/CodeBlock'
+import DateCell from 'core/components/listTable/cells/DateCell'
 
 const useStyles = makeStyles((theme) => ({
   links: {
@@ -165,7 +166,7 @@ export const options = {
     { id: 'cloudProviderType', label: 'Deployment Type', render: renderCloudProviderType },
     { id: 'resource_utilization', label: 'Resource Utilization', render: renderStats },
     { id: 'version', label: 'Kubernetes Version' },
-    { id: 'created_at', label: 'Created at' },
+    { id: 'created_at', label: 'Created at', render: (value) => <DateCell value={value} /> },
     { id: 'nodes', label: 'Nodes', render: renderNodeLink },
     { id: 'networkPlugin', label: 'Network Backend' },
     { id: 'containersCidr', label: 'Containers CIDR' },

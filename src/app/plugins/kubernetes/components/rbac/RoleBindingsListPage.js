@@ -6,6 +6,7 @@ import { roleBindingsCacheKey, roleBindingActions } from './actions'
 import { createUsePrefParamsHook } from 'core/hooks/useParams'
 import { listTablePrefs, allKey } from 'app/constants'
 import { pick } from 'ramda'
+import DateCell from 'core/components/listTable/cells/DateCell'
 
 const defaultParams = {
   clusterId: allKey,
@@ -42,7 +43,7 @@ export const options = {
   columns: [
     { id: 'name', label: 'Name' },
     { id: 'clusterName', label: 'Cluster' },
-    { id: 'created', label: 'Created' },
+    { id: 'created', label: 'Created', render: (value) => <DateCell value={value} /> },
   ],
   cacheKey: roleBindingsCacheKey,
   deleteFn: roleBindingActions.delete,

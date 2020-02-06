@@ -9,6 +9,7 @@ import { pick } from 'ramda'
 import PageContainer from 'core/components/pageContainer/PageContainer'
 import Tabs from 'core/components/tabs/Tabs'
 import Tab from 'core/components/tabs/Tab'
+import DateCell from 'core/components/listTable/cells/DateCell'
 
 const defaultParams = {
   masterNodeClusters: true,
@@ -55,7 +56,7 @@ export const options = {
     { id: 'name', label: 'Name' },
     { id: 'status', label: 'Status' },
     { id: 'clusterName', label: 'Cluster' },
-    { id: 'created', label: 'Created' },
+    { id: 'created', label: 'Created', render: (value) => <DateCell value={value} /> },
   ],
   loaderFn: namespaceActions.list,
   deleteFn: namespaceActions.delete,
