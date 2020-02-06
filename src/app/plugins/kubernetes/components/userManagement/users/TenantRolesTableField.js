@@ -1,11 +1,13 @@
 import withFormContext from 'core/components/validatedForm/withFormContext'
 import React, { useState, useCallback, useMemo } from 'react'
-import { noop, emptyArr } from 'utils/fp'
-import { pluck, pickAll, prop, assoc, partition } from 'ramda'
-import RolesPicklist from 'k8s/components/userManagement/common/RolesPicklist'
+import { noop, emptyObj, emptyArr } from 'utils/fp'
+import { pluck, pickAll, prop, assoc, partition, uniq } from 'ramda'
 import { FormControl, FormHelperText } from '@material-ui/core'
 import ListTable from 'core/components/listTable/ListTable'
 import { makeStyles } from '@material-ui/styles'
+import useDataLoader from 'core/hooks/useDataLoader'
+import { mngmRoleActions } from 'k8s/components/userManagement/roles/actions'
+import TenantsPicklist from 'k8s/components/userManagement/common/TenantsPicklist'
 
 const useStyles = makeStyles((theme) => ({
   rolesPicklist: {
@@ -23,30 +25,30 @@ const stopPropagation = (e) => {
 }
 const TenantRolesTableField = withFormContext(
   ({
-    value = emptyArr,
+    value = emptyObj,
     id,
-    tenants,
     onChange,
     updateFieldValue,
     getCurrentValue,
     hasError,
     errorMessage,
   }) => {
+    const [roles, rolesLoading] = useDataLoader(mngmRoleActions.list, { allRoles: true })
     const classes = useStyles()
-    const tenantIds = Object.keys(value)
+    const rolesIds = uniq(Object.keys(value))
     // Split between selected and unselected tenants
     const [initialSelectedRows, unselectedRows] = useMemo(
-      () => partition(({ id }) => tenantIds.includes(id), tenants),
-      [],
+      () => partition(({ id }) => rolesIds.includes(id), roles),
+      [roles],
     )
-    // Put the selected tenants first
+    // Put the selected roles first
     const rows = useMemo(() => [...initialSelectedRows, ...unselectedRows], [initialSelectedRows])
     const [selectedRows, setSelectedRows] = useState(initialSelectedRows)
     const handleSelectedRowsChange = useCallback(
       (selectedRows) => {
-        const selectedTenantIds = pluck('id', selectedRows)
-        const tenantsObj = getCurrentValue(pickAll(selectedTenantIds))
-        onChange(tenantsObj)
+        const selectedRolesIds = pluck('id', selectedRows)
+        const rolesObj = getCurrentValue(pickAll(selectedRolesIds))
+        onChange(rolesObj)
         setSelectedRows(selectedRows)
       },
       [getCurrentValue, onChange],
@@ -55,30 +57,29 @@ const TenantRolesTableField = withFormContext(
     const columns = useMemo(
       () => [
         { id: 'id', label: 'OpenStack ID', display: false, disableSorting: true },
-        { id: 'name', label: 'Tenant', disableSorting: true },
+        { id: 'name', label: 'Role', disableSorting: true },
         { id: 'description', label: 'Description', display: false, disableSorting: true },
         {
-          id: 'role',
-          label: 'Roles',
+          id: 'tenants',
+          label: 'Tenants',
           disableSorting: true,
           // Create the roles cell component on the-fly to allow access to the
           // current function scope "getCurrentValue" and "updateFieldValue" functions
           Component: ({ row, isSelected }) => {
-            const [currentRole, setCurrentRole] = useState(getCurrentValue(prop(row.id)))
+            const [selectedTenants, setSelectedTenants] = useState(getCurrentValue(prop(row.id)))
             const handleChange = useCallback(
-              (role) => {
-                updateFieldValue(assoc(row.id, role))
-                setCurrentRole(role)
+              (tenants) => {
+                updateFieldValue(assoc(row.id, tenants))
+                setSelectedTenants(tenants)
               },
               [row],
             )
             return (
               <div className={classes.rolesPicklist}>
-                <RolesPicklist
-                  name={`tenant-${row.id}-roleId`}
+                <TenantsPicklist
+                  name={`role-${row.id}-tenants`}
                   onClick={isSelected ? stopPropagation : noop}
-                  selectFirst={isSelected}
-                  value={isSelected ? currentRole : null}
+                  value={isSelected ? selectedTenants : emptyArr}
                   onChange={handleChange}
                 />
               </div>
@@ -88,10 +89,10 @@ const TenantRolesTableField = withFormContext(
       ],
       [getCurrentValue, updateFieldValue],
     )
-
     return (
       <FormControl id={id} error={hasError}>
         <ListTable
+          rolesLoading={rolesLoading}
           onSortChange={noop}
           searchTarget="name"
           columns={columns}
