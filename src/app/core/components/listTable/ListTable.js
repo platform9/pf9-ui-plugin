@@ -5,7 +5,6 @@ import PropTypes from 'prop-types'
 import Checkbox from 'core/components/Checkbox'
 import {
   Radio,
-  Typography,
   Grid,
   Table,
   TableBody,
@@ -39,6 +38,7 @@ import { isNilOrEmpty, emptyArr, pathStr, emptyObj } from 'utils/fp'
 import { listTableActionPropType } from 'core/components/listTable/ListTableBatchActions'
 import moize from 'moize'
 import clsx from 'clsx'
+import NoContentMessage from '../NoContentMessage'
 
 const styles = (theme) => ({
   root: {
@@ -468,11 +468,7 @@ class ListTable extends PureComponent {
     if (this.props.loading) {
       return null
     }
-    return (
-      <Typography className={this.props.classes.emptyList} variant="h6">
-        {this.props.emptyText}
-      </Typography>
-    )
+    return <NoContentMessage message={this.props.emptyText} />
   }
 
   render() {
