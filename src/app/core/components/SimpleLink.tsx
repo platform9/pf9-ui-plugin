@@ -7,6 +7,7 @@ import FontAwesomeIcon from './FontAwesomeIcon'
 import Theme from 'core/themes/model'
 
 type ISimpleLinkVariant = 'error' | 'primary'
+
 interface Props {
   src: string
   staticContext?: any

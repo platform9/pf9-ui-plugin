@@ -19,8 +19,8 @@ import { capitalizeString, normalizeUsername } from 'utils/misc'
 import ClusterSetup, {
   clustersHaveMonitoring,
   clustersHaveAccess,
-} from '../onboarding/cluster-setup'
-import PodSetup, { podSetupComplete } from '../onboarding/pod-setup'
+} from 'k8s/components/onboarding/ClusterSetup'
+import PodSetup, { podSetupComplete } from 'k8s/components/onboarding/PodSetup'
 import useDataLoader from 'core/hooks/useDataLoader'
 import Progress from 'core/components/progress/Progress'
 import identity from 'ramda/es/identity'

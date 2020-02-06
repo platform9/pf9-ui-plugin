@@ -13,10 +13,10 @@ export const options = {
   formSpec: {
     initialValue,
     fields: [
-      { id: 'name',  label: 'Name' },
+      { id: 'name', label: 'Name' },
       { id: 'vcpus', label: 'VCPUs', type: 'number' },
-      { id: 'ram',   label: 'RAM',   type: 'number' },
-      { id: 'disk',  label: 'Disk',  type: 'number' },
+      { id: 'ram', label: 'RAM', type: 'number' },
+      { id: 'disk', label: 'Disk', type: 'number' },
     ],
     submitLabel: 'Add Flavor',
   },

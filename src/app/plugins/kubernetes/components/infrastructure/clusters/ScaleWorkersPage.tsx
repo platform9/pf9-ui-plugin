@@ -59,8 +59,11 @@ const clusterTypeDisplay = {
 
 interface ScaleWorkersProps {
   cluster: ICluster
+
   onSubmit(data): Promise<void> | void
+
   onAttach(data): Promise<void> | void
+
   onDetach(data): Promise<void> | void
 }
 

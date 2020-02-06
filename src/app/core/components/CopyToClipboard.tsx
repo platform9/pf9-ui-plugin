@@ -19,10 +19,12 @@ interface State {
 const defaultParams: State = {
   isCopySuccessful: false,
 }
+
 interface StyleProps {
   codeBlock?: boolean
   inline?: boolean
 }
+
 const useStyles = makeStyles<Theme, StyleProps>((theme: Theme) => ({
   textArea: {
     position: 'absolute',

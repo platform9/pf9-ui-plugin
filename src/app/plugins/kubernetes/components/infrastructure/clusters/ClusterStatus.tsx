@@ -76,6 +76,7 @@ interface Props {
   variant: StatusVariant
   iconStatus?: boolean
 }
+
 const ClusterStatusSpan: FC<Props> = (props) => {
   const { label, title, children, status, variant, iconStatus } = props
   const { circle, label: labelCls, root, iconColor } = useStyles(props)
@@ -131,6 +132,7 @@ interface IClusterStatusProps {
   variant: StatusVariant
   message?: string
 }
+
 export const ClusterHealthStatus: FC<IClusterStatusProps> = ({
   cluster,
   variant = 'table',

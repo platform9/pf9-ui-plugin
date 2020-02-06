@@ -12,32 +12,29 @@
   "parserOptions": {
     "parser": "babel-eslint"
   },
-  "plugins": [
-    "import",
-    "react",
-    "cypress",
-    "@typescript-eslint/eslint-plugin"
-  ],
+  "plugins": ["import", "react", "cypress", "@typescript-eslint/eslint-plugin"],
   "extends": [
     "standard",
     "standard-with-typescript",
     "standard-react",
     "prettier",
-    "prettier/react"
+    "prettier/react",
+    "prettier/@typescript-eslint"
   ],
 
   "rules": {
-    "max-len": [
-      "warn", { "code": 100, "tabWidth": 2 }
+    "max-len": ["warn", { "code": 100, "tabWidth": 2 }],
+    "semi": ["error", "never"],
+    "comma-dangle": [
+      "error",
+      {
+        "arrays": "only-multiline",
+        "objects": "only-multiline",
+        "imports": "only-multiline",
+        "exports": "only-multiline",
+        "functions": "only-multiline"
+      }
     ],
-    "semi": ["error","never"],
-    "comma-dangle": ["error", {
-      "arrays": "only-multiline",
-      "objects": "only-multiline",
-      "imports": "only-multiline",
-      "exports": "only-multiline",
-      "functions": "only-multiline"
-    }],
     "jsx-quotes": 0,
     "react/prop-types": 0,
     "react/no-unused-prop-types": "warn",
@@ -49,22 +46,25 @@
     // Allow for "table" alignment, ex:
     // { id: 'name',       type: 'string' }
     // { id: 'longerName', type: 'string' }
-    "no-multi-spaces": [2, { "exceptions": { "ObjectExpression": true } } ],
+    "no-multi-spaces": [2, { "exceptions": { "ObjectExpression": true } }],
     "key-spacing": [2, { "mode": "minimum" }],
     "standard/no-callback-literal": 0,
     "@typescript-eslint/strict-boolean-expressions": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/no-floating-promises": "off",
-    "@typescript-eslint/member-delimiter-style": ["error", {
-      "multiline": {
-        "delimiter": "none",
-        "requireLast": true
-      },
-      "singleline": {
-        "delimiter": "semi",
-        "requireLast": false
+    "@typescript-eslint/member-delimiter-style": [
+      "error",
+      {
+        "multiline": {
+          "delimiter": "none",
+          "requireLast": true
+        },
+        "singleline": {
+          "delimiter": "semi",
+          "requireLast": false
+        }
       }
-    }]
+    ]
   },
 
   "settings": {
@@ -76,7 +76,7 @@
 
   "overrides": [
     {
-      "files": ["*.ts","*.tsx"],
+      "files": ["*.ts", "*.tsx"],
       "parser": "@typescript-eslint/parser",
       "parserOptions": {
         "sourceType": "module",

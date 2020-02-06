@@ -39,6 +39,7 @@ const textTheme = createMuiTheme({
 
 // Fake data. Should fetch data from host
 let id = 0
+
 function createData(name, ip, path) {
   id++
   return { id, name, ip, path }
