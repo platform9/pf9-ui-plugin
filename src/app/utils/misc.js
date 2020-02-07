@@ -1,19 +1,40 @@
 import { path, equals } from 'ramda'
 import moize from 'moize'
+import moment from 'moment'
 
-// A more resilient JSON parsing that should always return {}
-// in error conditions.
-export const parseJSON = (str) => {
-  if (typeof str !== 'string') {
-    return {}
-  }
-  try {
-    const data = JSON.parse(str)
-    return data
-  } catch (e) {
-    console.error('Error parsing JSON', str)
-    return {}
-  }
+// Date formatter
+export const defaultDateFormat = 'MMM Do YYYY, hh:mm A'
+export const formatDate = (ts, format = defaultDateFormat) => moment(ts).format(format)
+
+/**
+ * DurationBetweenDates utility function that returns difference between give start and end date
+ * into format 'n day(s) n hour(s) n minute(s) depending on respective values.
+ * @example ('2020-01-28T00:44:35.000Z', '2020-01-29T01:45:36.000Z') -> '1 day, 1 hour, 1 minute'
+ * @param {string} startDateTime
+ * @param {string} [endDateTime]
+ * @returns {string}
+ */
+export const durationBetweenDates = (startDateTime, endDateTime = new Date().valueOf()) => {
+  const duration = moment.duration(moment(endDateTime).diff(moment(startDateTime)))
+  return [
+    { fnName: 'months', label: 'month' },
+    { fnName: 'days', label: 'day' },
+    { fnName: 'hours', label: 'hour' },
+    { fnName: 'minutes', label: 'minute' },
+  ].reduce((displayStr, curr) => {
+    const value = duration[curr.fnName]()
+    if (value < 1) {
+      return displayStr
+    }
+
+    if (displayStr) {
+      displayStr += ', '
+    }
+
+    const pluralLabel = value > 1 ? 's' : ''
+
+    return `${displayStr}${value} ${curr.label}${pluralLabel}`
+  }, '')
 }
 
 /**
@@ -39,6 +60,21 @@ export const secondsToString = (seconds) => {
     return acc
   }, [])
   return results.join(', ')
+}
+
+// A more resilient JSON parsing that should always return {}
+// in error conditions.
+export const parseJSON = (str) => {
+  if (typeof str !== 'string') {
+    return {}
+  }
+  try {
+    const data = JSON.parse(str)
+    return data
+  } catch (e) {
+    console.error('Error parsing JSON', str)
+    return {}
+  }
 }
 
 export const isNumeric = (n) => !Number.isNaN(parseFloat(n)) && Number.isFinite(+n)

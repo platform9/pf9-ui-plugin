@@ -10,8 +10,7 @@ import { path } from 'ramda'
 import { ICluster } from './model'
 import { CloudProviders, CloudProvidersFriendlyName } from '../cloudProviders/model'
 import Theme from 'core/themes/model'
-import moment from 'moment'
-import { castBoolToStr } from 'utils/misc'
+import { castBoolToStr, formatDate } from 'utils/misc'
 
 interface IClusterDetailFields {
   id: string
@@ -40,7 +39,7 @@ const clusterOverviewFields: IClusterDetailFields[] = [
     id: 'created_at',
     title: 'Cluster Created',
     required: true,
-    render: (ts: string) => moment(ts).format('MMM Do YYYY, hh:mm a'),
+    render: (ts: string) => formatDate(ts),
   },
   {
     id: 'cloudProviderName',
