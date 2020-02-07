@@ -1,5 +1,5 @@
 import { k8sPrefix, appUrlRoot } from 'app/constants'
-import { CloudProviders } from 'k8s/components/infrastructure/clusters/model'
+import { CloudProviders } from 'k8s/components/infrastructure/cloudProviders/model'
 
 interface GenericKVP {
   [key: string]: string

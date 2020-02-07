@@ -11,9 +11,21 @@ import { hexToRGBA } from 'core/utils/colorHelpers'
 import CardButton from 'core/components/buttons/CardButton'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import PieUsageWidget from 'core/components/widgets/PieUsageWidget'
+import DonutWidget from 'core/components/widgets/DonutWidget'
 import { PieDataEntry } from 'core/components/graphs/PieGraph'
+import Theme from 'core/themes/model'
 
-const useStyles = makeStyles((theme: any) => ({
+const chartHeight = 150
+const actionHeight = 76
+
+const getCardHeight = ({ actionRow, chartRow }) => {
+  let height = 80
+  if (chartRow) height += chartHeight
+  if (actionRow) height += actionHeight
+  return height
+}
+
+const useStyles = makeStyles<Theme, { actionRow: boolean; chartRow: boolean }>((theme) => ({
   headerIcon: {
     fontSize: '36px',
     color: theme.palette.dashboardCard.icon,
@@ -23,9 +35,8 @@ const useStyles = makeStyles((theme: any) => ({
   },
   contentContainer: {
     backgroundColor: theme.palette.dashboardCard.background,
-    width: '280px',
-    height: ({ pieData }: any) => (pieData ? '360px' : '170px'),
-    margin: theme.spacing(1.25),
+    minWidth: '270px',
+    minHeight: getCardHeight,
     padding: theme.spacing(2.5, 1, 0.5, 1),
     borderRadius: '5px',
     transition: 'transform .1s ease',
@@ -41,7 +52,6 @@ const useStyles = makeStyles((theme: any) => ({
     display: 'flex',
     flexDirection: 'row',
     flexWrap: 'nowrap',
-    marginBottom: theme.spacing(1),
     flex: 1,
     justifyContent: 'space-between',
     alignItems: 'flex-start',
@@ -59,9 +69,7 @@ const useStyles = makeStyles((theme: any) => ({
   },
   cardTitle: {
     marginLeft: theme.spacing(1),
-    fontWeight: 800,
     color: theme.palette.dashboardCard.text,
-    fontSize: '14px',
   },
   arrowIcon: {
     background: theme.palette.dashboardCard.primary,
@@ -84,28 +92,35 @@ const useStyles = makeStyles((theme: any) => ({
     textAlign: 'center',
   },
   header: {
-    height: '76px',
+    minHeight: actionHeight,
   },
   links: {
-    height: '76px',
+    minHeight: actionHeight,
+    borderBottom: `1px solid ${theme.palette.dashboardCard.divider}`,
   },
   chart: {
-    borderTop: `1px solid ${theme.palette.dashboardCard.divider}`,
-    height: '180px',
+    minHeight: chartHeight,
   },
 }))
 
 type PropertyFunction<T> = (p: any) => T
 
-interface StatusCardProps {
+export interface IStatusCardQuantity {
+  quantity: number
+  pieData?: PieDataEntry[]
+  piePrimary?: string
+  graphType?: 'usage' | 'donut'
+}
+export interface StatusCardProps {
   entity: string
   route: string
   addRoute: string
   title: string
   icon: string | PropertyFunction<JSX.Element>
-  quantity: number
-  dataLoader: [() => any, {}] // todo figure out typings here.
-  quantityFn(data: any[]): { quantity: number; pieData: PieDataEntry[]; piePrimary: string }
+  dataLoader: [Function, {}] // todo figure out typings here.
+  quantityFn(data: any[]): IStatusCardQuantity
+  actionRow?: boolean
+  className?: string
 }
 
 const StatusCard: FunctionComponent<StatusCardProps> = ({
@@ -116,9 +131,11 @@ const StatusCard: FunctionComponent<StatusCardProps> = ({
   icon,
   dataLoader,
   quantityFn,
+  actionRow = true,
+  className,
 }) => {
   const [data, loading] = useDataLoader(...dataLoader)
-  const { quantity, pieData, piePrimary } = quantityFn(data)
+  const { quantity, pieData, piePrimary, graphType = 'usage' } = quantityFn(data)
   const {
     row,
     rowColumn,
@@ -133,10 +150,12 @@ const StatusCard: FunctionComponent<StatusCardProps> = ({
     header,
     links,
     chart,
-  } = useStyles({ pieData: !!pieData })
+  } = useStyles({ chartRow: !!pieData, actionRow })
+
+  const GraphComponent = graphType === 'donut' ? DonutWidget : PieUsageWidget
 
   return (
-    <div className={contentContainer}>
+    <div className={clsx(contentContainer, className)}>
       <div className={clsx(row, header)}>
         <div className={rowColumn}>
           <Link to={route}>
@@ -154,20 +173,22 @@ const StatusCard: FunctionComponent<StatusCardProps> = ({
           )}
         </div>
       </div>
-      <div className={clsx(row, links, verticalCenter)}>
-        <div className={rowColumn}>
-          <Link to={addRoute}>
-            <CardButton>Add {entity}</CardButton>
-          </Link>
+      {actionRow && (
+        <div className={clsx(row, links, verticalCenter)}>
+          <div className={rowColumn}>
+            <Link to={addRoute}>
+              <CardButton>Add {entity}</CardButton>
+            </Link>
+          </div>
+          <div className={rowColumn}>
+            <Link to={route}>
+              <FontAwesomeIcon size="2x" className={arrowIcon}>
+                arrow-right
+              </FontAwesomeIcon>
+            </Link>
+          </div>
         </div>
-        <div className={rowColumn}>
-          <Link to={route}>
-            <FontAwesomeIcon size="2x" className={arrowIcon}>
-              arrow-right
-            </FontAwesomeIcon>
-          </Link>
-        </div>
-      </div>
+      )}
       {pieData && (
         <div className={clsx(row, chart, verticalCenter)}>
           {loading ? (
@@ -175,7 +196,7 @@ const StatusCard: FunctionComponent<StatusCardProps> = ({
               <CircularProgress className={spinner} size={64} />
             </div>
           ) : (
-            <PieUsageWidget sideLength={110} arcWidth={12} primary={piePrimary} data={pieData} />
+            <GraphComponent sideLength={110} arcWidth={12} primary={piePrimary} data={pieData} />
           )}
         </div>
       )}

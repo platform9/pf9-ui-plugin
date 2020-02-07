@@ -2,7 +2,7 @@ import createContextLoader from 'core/helpers/createContextLoader'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { pluck, propSatisfies, propEq, pick } from 'ramda'
 import { capitalizeString } from 'utils/misc'
-import calcUsageTotals from 'k8s/util/calcUsageTotals'
+import calcUsageTotalByPath from 'k8s/util/calcUsageTotals'
 import { pathStrOr } from 'utils/fp'
 import {
   clustersCacheKey,
@@ -68,7 +68,7 @@ export const cloudProviderActions = createCRUDActions(cloudProvidersCacheKey, {
         const cpClusters = clusters.filter(filterCpClusters)
         const cpNodes = pluck('nodes', cpClusters).flat()
         const cpHosts = getNodesHosts(pluck('uuid', cpNodes))
-        const calcDeployedCapacity = calcUsageTotals(cpHosts)
+        const calcDeployedCapacity = calcUsageTotalByPath(cpHosts)
         const deployedCapacity = {
           compute: calcDeployedCapacity(`${usagePathStr}.cpu.used`, `${usagePathStr}.cpu.total`),
           memory: calcDeployedCapacity(

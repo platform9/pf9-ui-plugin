@@ -6,7 +6,7 @@ import FormWrapper from 'core/components/FormWrapper'
 import { pathJoin } from 'utils/misc'
 
 import useReactRouter from 'use-react-router'
-import { CloudProviders } from './model'
+import { CloudProviders } from '../cloudProviders/model'
 import { objSwitchCase } from 'utils/fp'
 import BareosClusterRequirements from './bareos/BareosClusterRequirements'
 import AwsClusterRequirements from './aws/AwsClusterRequirements'

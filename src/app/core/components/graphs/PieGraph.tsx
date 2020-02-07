@@ -12,14 +12,22 @@ interface Props {
   data: PieDataEntry[]
   sideLength: number
   arcWidth: number
-  percent: number
-  primary: string
+  percent?: number
+  primary?: string
   empty: boolean
 }
 
 const emptyData = [{ name: 'empty', value: 1, color: 'empty' }]
 
-const PieGraph = ({ data, sideLength, arcWidth, percent, primary, empty, ...rest }: Props) => {
+const PieGraph = ({
+  data,
+  sideLength,
+  arcWidth,
+  percent = undefined,
+  primary,
+  empty,
+  ...rest
+}: Props) => {
   const theme: any = useTheme()
   const radius = Math.floor(sideLength / 2)
   const items = empty ? emptyData : data
