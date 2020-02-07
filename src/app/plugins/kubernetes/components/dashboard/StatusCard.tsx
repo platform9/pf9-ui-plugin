@@ -36,7 +36,7 @@ const useStyles = makeStyles<Theme, { actionRow: boolean; chartRow: boolean }>((
   contentContainer: {
     backgroundColor: theme.palette.dashboardCard.background,
     minWidth: '270px',
-    height: getCardHeight,
+    minHeight: getCardHeight,
     padding: theme.spacing(2.5, 1, 0.5, 1),
     borderRadius: '5px',
     transition: 'transform .1s ease',
