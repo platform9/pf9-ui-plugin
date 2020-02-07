@@ -3,7 +3,7 @@ import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import storageClassActions, { storageClassesCacheKey } from 'k8s/components/storage/actions'
 import PageContainer from 'core/components/pageContainer/PageContainer'
 import useDataLoader from 'core/hooks/useDataLoader'
-import { listTablePrefs } from 'app/constants'
+import { listTablePrefs, allKey } from 'app/constants'
 import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
 import { pick } from 'ramda'
 import { createUsePrefParamsHook } from 'core/hooks/useParams'
@@ -12,6 +12,7 @@ import Tab from 'core/components/tabs/Tab'
 
 const defaultParams = {
   healthyClusters: true,
+  clusterId: allKey,
 }
 const usePrefParams = createUsePrefParamsHook('StorageClasses', listTablePrefs)
 
@@ -27,6 +28,7 @@ const ListPage = ({ ListContainer }) => {
         getParamsUpdater={getParamsUpdater}
         filters={
           <ClusterPicklist
+            selectFirst={false}
             onChange={getParamsUpdater('clusterId')}
             value={params.clusterId}
             onlyHealthyClusters
