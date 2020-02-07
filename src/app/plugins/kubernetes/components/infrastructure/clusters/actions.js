@@ -1,5 +1,5 @@
 import ApiClient from 'api-client/ApiClient'
-import calcUsageTotals from 'k8s/util/calcUsageTotals'
+import calcUsageTotalByPath from 'k8s/util/calcUsageTotals'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { allKey, defaultMonitoringTag } from 'app/constants'
 import { castFuzzyBool, sanitizeUrl } from 'utils/misc'
@@ -265,7 +265,7 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
       const nodesInCluster = rawNodes.filter((node) => node.clusterUuid === cluster.uuid)
       const nodeIds = pluck('uuid', nodesInCluster)
       const combinedNodes = combinedHosts.filter((x) => nodeIds.includes(x.resmgr.id))
-      const calcNodesTotals = calcUsageTotals(combinedNodes)
+      const calcNodesTotals = calcUsageTotalByPath(combinedNodes)
       const dashboardLink = `${qbertEndpoint}/clusters/${cluster.uuid}/k8sapi/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:443/proxy/`
       const host = qbertEndpoint.match(/(.*?)\/qbert/)[1]
       const grafanaLink = `${host}/k8s/v1/clusters/${cluster.uuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:grafana-ui:80/proxy/`

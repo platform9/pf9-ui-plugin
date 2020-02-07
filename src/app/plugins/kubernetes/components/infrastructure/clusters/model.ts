@@ -1,4 +1,5 @@
 import { ICombinedNode } from '../nodes/model'
+import { CloudProviders } from '../cloudProviders/model'
 
 export type HealthStatus = 'healthy' | 'partially_healthy' | 'unhealthy' | 'unknown'
 
@@ -80,18 +81,6 @@ export interface ICluster {
   hasVpn: boolean
   hasLoadBalancer: boolean
   etcdBackupEnabled: boolean
-}
-
-export enum CloudProviders {
-  Aws = 'aws',
-  Azure = 'azure',
-  BareOS = 'local',
-}
-
-export enum CloudProvidersFriendlyName {
-  aws = 'AWS',
-  azure = 'Azure',
-  local = 'BareOS',
 }
 
 type CloudProperties = AzureCloudProperties | AwsCloudProperties | BareOSCloudProperties

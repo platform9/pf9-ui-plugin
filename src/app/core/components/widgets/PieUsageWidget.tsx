@@ -28,14 +28,14 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }))
 
-interface PieUsageWidgetProps {
+export interface PieUsageWidgetProps {
   primary: string
   sideLength: number
   arcWidth: number
   data: PieDataEntry[]
 }
 
-const PieLegend = ({ data }) => {
+export const PieLegend = ({ data }) => {
   const theme: any = useTheme()
   const { pieLegend, legendCircle, legendValue, legendName } = useStyles({})
 

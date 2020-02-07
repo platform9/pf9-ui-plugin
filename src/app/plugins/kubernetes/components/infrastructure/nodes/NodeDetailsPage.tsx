@@ -13,7 +13,7 @@ import { ICombinedNode } from './model'
 import SimpleLink from 'core/components/SimpleLink'
 import Progress from 'core/components/progress/Progress'
 import UsageWidget from 'core/components/widgets/UsageWidget'
-import calcUsageTotals from 'k8s/util/calcUsageTotals'
+import calcUsageTotalByPath from 'k8s/util/calcUsageTotals'
 import ExternalLink from 'core/components/ExternalLink'
 import HelpContainer from 'core/components/HelpContainer'
 import { routes } from 'core/utils/routes'
@@ -64,17 +64,17 @@ const ClusterDetailsPage: FC = () => {
 
   const totals = useMemo(
     () => ({
-      compute: calcUsageTotals(
+      compute: calcUsageTotalByPath(
         [selectedNode],
         'combined.usage.compute.current',
         'combined.usage.compute.max',
       ),
-      memory: calcUsageTotals(
+      memory: calcUsageTotalByPath(
         [selectedNode],
         'combined.usage.memory.current',
         'combined.usage.memory.max',
       ),
-      disk: calcUsageTotals(
+      disk: calcUsageTotalByPath(
         [selectedNode],
         'combined.usage.disk.current',
         'combined.usage.disk.max',

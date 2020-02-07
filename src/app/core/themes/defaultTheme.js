@@ -225,6 +225,8 @@ const theme = {
       error: '#E44C34',
       unknown: '#F5A623',
       empty: '#EDEFF1',
+      aws: '#FF9800',
+      azure: '#4AA3DF',
     },
   },
   props: {},

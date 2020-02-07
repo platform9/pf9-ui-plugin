@@ -79,6 +79,9 @@ class Tabs extends PureComponent {
   }
 
   handleChange = (e, value) => {
+    if (this.props.onChange) {
+      this.props.onChange(value)
+    }
     this.setState({ value })
   }
 

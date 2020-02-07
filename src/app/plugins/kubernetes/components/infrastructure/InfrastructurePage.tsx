@@ -5,7 +5,7 @@ import Tab from 'core/components/tabs/Tab'
 import ClustersListPage from './clusters/ClustersListPage'
 import NodesListPage from './nodes/NodesListPage'
 import CloudProvidersListPage from './cloudProviders/CloudProvidersListPage'
-import InfrastructureStats from './InfrastructureStats'
+import InfrastructureStats, { InfrastructureTabs } from './InfrastructureStats'
 import PageContainer from 'core/components/pageContainer/PageContainer'
 import { FormControlLabel, Switch } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
@@ -39,26 +39,33 @@ const InfrastructurePage = () => {
     userDetails: { role },
   } = useContext(AppContext)
 
+  const hash = window.location.hash.substr(1) as InfrastructureTabs
+  const [activeTab, setActiveTab] = React.useState(hash || InfrastructureTabs.Clusters)
+
+  const handleChange = (value) => {
+    setActiveTab(value)
+  }
+
   return (
     <PageContainer
       header={
         <div className={classes.infrastructureHeader}>
           <StatsToggle statsVisible={statsVisible} toggleStats={toggleStats} />
-          <InfrastructureStats visible={statsVisible} />
+          <InfrastructureStats visible={statsVisible} tab={activeTab} />
         </div>
       }
     >
-      <Tabs>
-        <Tab value="clusters" label="Clusters">
+      <Tabs onChange={handleChange}>
+        <Tab value={InfrastructureTabs.Clusters} label="Clusters">
           <ClustersListPage />
         </Tab>
         {role === 'admin' && (
-          <Tab value="nodes" label="Nodes">
+          <Tab value={InfrastructureTabs.Nodes} label="Nodes">
             <NodesListPage />
           </Tab>
         )}
         {role === 'admin' && (
-          <Tab value="cloudProviders" label="Cloud Providers">
+          <Tab value={InfrastructureTabs.CloudProviders} label="Cloud Providers">
             <CloudProvidersListPage />
           </Tab>
         )}

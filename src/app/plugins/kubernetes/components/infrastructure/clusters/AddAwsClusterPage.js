@@ -25,7 +25,7 @@ import { awsNetworkingConfigurationsLink, runtimePrivilegedLink } from 'k8s/link
 import { defaultEtcBackupPath, k8sPrefix } from 'app/constants'
 import ExternalLink from 'core/components/ExternalLink'
 import Code from 'core/components/CodeBlock'
-import { CloudProviders } from './model'
+import { CloudProviders } from '../cloudProviders/model'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { cloudProviderActions } from '../cloudProviders/actions'
 import { PromptToAddProvider } from '../cloudProviders/PromptToAddProvider'
