@@ -6,7 +6,7 @@ import Alert from 'core/components/Alert'
 import SubmitButton from 'core/components/buttons/SubmitButton'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import ExternalLink from 'core/components/ExternalLink'
-import { bareOSSetupDocumentationLink } from 'k8s/links'
+import { gettingStartedHelpLink } from 'k8s/links'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import { routes } from 'core/utils/routes'
 
@@ -79,8 +79,8 @@ const BareOSClusterRequirements = ({ onComplete }) => {
         <div>
           <FontAwesomeIcon className={classes.blueIcon} size="md">
             file-alt
-          </FontAwesomeIcon>{' '}
-          <ExternalLink url={bareOSSetupDocumentationLink}>BareOS Setup Documentation</ExternalLink>
+          </FontAwesomeIcon>
+          <ExternalLink url={gettingStartedHelpLink}>BareOS Setup Documentation</ExternalLink>
         </div>
       }
     >
