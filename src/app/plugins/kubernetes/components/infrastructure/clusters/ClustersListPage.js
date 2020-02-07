@@ -17,7 +17,7 @@ import {
 import ResourceUsageTable from 'k8s/components/infrastructure/common/ResourceUsageTable'
 import CreateButton from 'core/components/buttons/CreateButton'
 import { AppContext } from 'core/providers/AppProvider'
-import { both } from 'ramda'
+import { both, path } from 'ramda'
 import PrometheusAddonDialog from 'k8s/components/prometheus/PrometheusAddonDialog'
 import ClusterUpgradeDialog from 'k8s/components/infrastructure/clusters/ClusterUpgradeDialog'
 import ClusterDeleteDialog from './ClusterDeleteDialog'
@@ -78,17 +78,13 @@ const renderNodeLink = (_, { uuid, nodes }) => {
   if (!nodes || !nodes.length) {
     return <div>0</div>
   }
-  return (
-    <div key={uuid}>
-      <SimpleLink src={routes.cluster.nodes.path({ id: uuid })}>View {nodes.length}</SimpleLink>
-    </div>
-  )
+  return <SimpleLink src={routes.cluster.nodes.path({ id: uuid })}>View {nodes.length}</SimpleLink>
 }
 
 const toMHz = (value) => value * 1024
 
 const renderStats = (_, { usage }) => {
-  const hasValidStats = usage && usage.compute && usage.compute.current
+  const hasValidStats = !!path(['compute', 'current'], usage)
   if (!hasValidStats) {
     return null
   }

@@ -4,7 +4,7 @@ import { pathStrOr } from 'utils/fp'
 import ExternalLink from 'core/components/ExternalLink'
 import ProgressBar from 'core/components/progress/ProgressBar'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { pathOr, pipe, pick } from 'ramda'
+import { pathOr, pipe, pick, path } from 'ramda'
 import { castBoolToStr, castFuzzyBool, columnPathLookup } from 'utils/misc'
 import SimpleLink from 'core/components/SimpleLink'
 import { loadNodes, nodesCacheKey } from 'k8s/components/infrastructure/nodes/actions'
@@ -141,9 +141,10 @@ const getSpotInstance = pipe(
 )
 const NodeDetailLinkComponent = ({ name, node }) => {
   const classes = useStyles()
+  const hasSupportRole = !!path(['combined', 'supportRole'], node)
   return (
     <div className={classes.title}>
-      <span className={classes.link}>{node.combined.supportRole && renderRemoteSupport()}</span>
+      <span className={classes.link}>{hasSupportRole && renderRemoteSupport()}</span>
       <SimpleLink src={routes.nodes.detail.path({ id: node.uuid })}>{name}</SimpleLink>
     </div>
   )
