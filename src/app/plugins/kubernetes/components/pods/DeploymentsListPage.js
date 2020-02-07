@@ -7,11 +7,10 @@ import { listTablePrefs, allKey } from 'app/constants'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { pick } from 'ramda'
 import NamespacePicklist from 'k8s/components/common/NamespacePicklist'
-import { secondsToString } from 'utils/misc'
-import moment from 'moment'
 import renderLabels from 'k8s/components/pods/renderLabels'
 import ExternalLink from 'core/components/ExternalLink'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
+import DateCell from 'core/components/listTable/cells/DateCell'
 
 const defaultParams = {
   masterNodeClusters: true,
@@ -69,10 +68,6 @@ const renderName = (name, { dashboardUrl }) => {
   )
 }
 
-const renderAge = (created) => {
-  return secondsToString(moment().diff(created, 's'))
-}
-
 export const options = {
   loaderFn: deploymentActions.list,
   deleteFn: deploymentActions.delete,
@@ -87,7 +82,7 @@ export const options = {
     { id: 'labels', label: 'Labels', render: renderLabels('label') },
     { id: 'selectors', label: 'Selectors', render: renderLabels('selector') },
     { id: 'pods', label: 'Pods' },
-    { id: 'created', label: 'Age', render: renderAge },
+    { id: 'created', label: 'Age', render: (value) => <DateCell value={value} showToolTip /> },
   ],
   name: 'Deployments',
   title: 'Deployments',

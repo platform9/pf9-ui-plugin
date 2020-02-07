@@ -20,6 +20,7 @@ import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import ExternalLink from 'core/components/ExternalLink'
 import { clusterActions } from '../infrastructure/clusters/actions'
+import { CloudProvidersFriendlyName } from './../infrastructure/clusters/model'
 import { propEq } from 'ramda'
 
 const initialContext = {
@@ -104,6 +105,13 @@ const BasicStep = ({ onSubmit, triggerSubmit, wizardContext }) => {
                 value={params.clusterId}
                 onlyHealthyClusters
                 required
+              />
+              <TextField
+                id="cloudProvider"
+                label="Cloud provider"
+                info="Cloud provider."
+                disabled
+                value={CloudProvidersFriendlyName[wizardContext.clusterType]}
               />
               {wizardContext.clusterType === 'aws' && (
                 <PicklistField
