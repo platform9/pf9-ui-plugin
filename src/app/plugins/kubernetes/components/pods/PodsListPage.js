@@ -43,6 +43,7 @@ const useStyles = makeStyles((theme) => ({
 
 const defaultParams = {
   masterNodeClusters: true,
+  clusterId: allKey,
 }
 const usePrefParams = createUsePrefParamsHook('Pods', listTablePrefs)
 
@@ -65,6 +66,7 @@ const ListPage = ({ ListContainer }) => {
         filters={
           <>
             <ClusterPicklist
+              selectFirst={false}
               onChange={updateClusterId}
               value={params.clusterId}
               onlyMasterNodeClusters
@@ -89,14 +91,14 @@ const renderName = (name, { dashboardUrl }) => {
       {name}
       <br />
       <ExternalLink url={dashboardUrl}>
+        <FontAwesomeIcon size="md">file-alt</FontAwesomeIcon>
         dashboard
-        <FontAwesomeIcon size="sm">file-alt</FontAwesomeIcon>
       </ExternalLink>
     </span>
   )
 }
 
-const PodsStatusSpan = (props) => {
+export const PodsStatusSpan = (props) => {
   const { children } = props
   const { status } = useStyles(props)
   return <div className={status}>{children}</div>
@@ -119,6 +121,7 @@ const renderStatus = (phase) => {
 }
 
 export const options = {
+  showCheckboxes: false, // until we have actions to perform, disable this
   addUrl: '/ui/kubernetes/pods/add',
   addText: 'Create New Pod',
   columns: [

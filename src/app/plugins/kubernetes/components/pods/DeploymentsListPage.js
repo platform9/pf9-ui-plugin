@@ -14,6 +14,7 @@ import DateCell from 'core/components/listTable/cells/DateCell'
 
 const defaultParams = {
   masterNodeClusters: true,
+  clusterId: allKey,
 }
 const usePrefParams = createUsePrefParamsHook('Deployments', listTablePrefs)
 
@@ -36,6 +37,7 @@ const ListPage = ({ ListContainer }) => {
         filters={
           <>
             <ClusterPicklist
+              selectFirst={false}
               onChange={updateClusterId}
               value={params.clusterId}
               onlyMasterNodeClusters
@@ -61,14 +63,15 @@ const renderName = (name, { dashboardUrl }) => {
       {name}
       <br />
       <ExternalLink url={dashboardUrl}>
+        <FontAwesomeIcon size="md">file-alt</FontAwesomeIcon>
         dashboard
-        <FontAwesomeIcon size="sm">file-alt</FontAwesomeIcon>
       </ExternalLink>
     </span>
   )
 }
 
 export const options = {
+  showCheckboxes: false, // until we have actions to perform, disable this
   loaderFn: deploymentActions.list,
   deleteFn: deploymentActions.delete,
   deleteCond: () => false,

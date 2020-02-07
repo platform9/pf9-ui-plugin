@@ -10,9 +10,11 @@ import NamespacePicklist from 'k8s/components/common/NamespacePicklist'
 import ExternalLink from 'core/components/ExternalLink'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import renderLabels from 'k8s/components/pods/renderLabels'
+import { PodsStatusSpan } from 'k8s/components/pods/PodsListPage'
 
 const defaultParams = {
   masterNodeClusters: true,
+  clusterId: allKey,
 }
 const usePrefParams = createUsePrefParamsHook('Services', listTablePrefs)
 
@@ -35,6 +37,7 @@ const ListPage = ({ ListContainer }) => {
         filters={
           <>
             <ClusterPicklist
+              selectFirst={false}
               onChange={updateClusterId}
               value={params.clusterId}
               onlyMasterNodeClusters
@@ -60,27 +63,19 @@ const renderName = (name, { dashboardUrl }) => {
       {name}
       <br />
       <ExternalLink url={dashboardUrl}>
+        <FontAwesomeIcon size="md">file-alt</FontAwesomeIcon>
         dashboard
-        <FontAwesomeIcon size="sm">file-alt</FontAwesomeIcon>
       </ExternalLink>
     </span>
   )
 }
-const successColor = {
-  color: '#4ADF74',
-}
+
 const renderStatus = (status) => {
-  return status === 'OK' ? (
-    <span>
-      <i style={successColor} className="fa-fw fa-lg fa-sm fa-check fal" />
-      &nbsp;OK
-    </span>
-  ) : (
-    <span>
-      <i className="fa-fw fa-lg fa-sm fa-spin fa-spinner fal" />
-      &nbsp;Pending
-    </span>
-  )
+  const serviceStatus = {
+    status: status === 'OK' ? 'ok' : 'pending',
+    label: status === 'OK' ? 'Connected' : 'Connecting',
+  }
+  return <PodsStatusSpan status={serviceStatus.status}>{serviceStatus.label}</PodsStatusSpan>
 }
 
 const renderEndpoints = (endpoints) => {
