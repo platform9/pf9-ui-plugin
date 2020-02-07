@@ -244,7 +244,7 @@ const createGenericCluster = async (body, data, loadFromContext) => {
   body.etcdBackup = getEtcdBackupPayload(data)
 
   const tags = data.prometheusMonitoringEnabled ? [defaultMonitoringTag] : []
-  body.tags = keyValueArrToObj([tags].concat(data.tags))
+  body.tags = keyValueArrToObj(tags.concat(data.tags))
 
   const createResponse = await qbert.createCluster(body)
   const uuid = createResponse.uuid

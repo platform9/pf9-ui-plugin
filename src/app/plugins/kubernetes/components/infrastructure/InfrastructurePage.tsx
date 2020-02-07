@@ -32,7 +32,7 @@ const StatsToggle = ({ statsVisible, toggleStats }) => {
 }
 
 const InfrastructurePage = () => {
-  const classes = useStyles()
+  const classes = useStyles({})
   const [statsVisible, setStatsVisble] = useState(true)
   const toggleStats = useCallback(() => setStatsVisble(!statsVisible), [statsVisible])
   const {
