@@ -35,6 +35,7 @@ const PieGraph = ({
   return (
     <PieChart width={sideLength + 10} height={sideLength + 10}>
       <Pie
+        dataKey="value"
         data={items}
         cx={radius}
         cy={radius}
