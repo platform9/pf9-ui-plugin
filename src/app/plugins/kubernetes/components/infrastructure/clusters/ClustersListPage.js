@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext } from 'react'
 import DownloadKubeConfigLink from './DownloadKubeConfigLink'
 // import KubeCLI from './KubeCLI' // commented out till we support cli links
 import ExternalLink from 'core/components/ExternalLink'
@@ -15,7 +15,6 @@ import {
   ClusterHealthStatus,
 } from 'k8s/components/infrastructure/clusters/ClusterStatus'
 import ResourceUsageTable from 'k8s/components/infrastructure/common/ResourceUsageTable'
-import DashboardLink from './DashboardLink'
 import CreateButton from 'core/components/buttons/CreateButton'
 import { AppContext } from 'core/providers/AppProvider'
 import { both } from 'ramda'
@@ -29,12 +28,9 @@ import { routes } from 'core/utils/routes'
 import CodeBlock from 'core/components/CodeBlock'
 
 const useStyles = makeStyles((theme) => ({
-  link: {
-    cursor: 'pointer',
-    color: theme.palette.primary.main,
-    '&:hover': {
-      textDecoration: 'underline',
-    },
+  links: {
+    display: 'grid',
+    gridGap: '6px',
   },
 }))
 
@@ -47,50 +43,44 @@ const renderCloudProviderType = (type, cluster) => {
 
 const renderConnectionStatus = (_, cluster) => <ClusterConnectionStatus cluster={cluster} />
 const renderHealthStatus = (_, cluster) => <ClusterHealthStatus cluster={cluster} />
+const renderClusterLink = (links, { usage }) => <ClusterLinks links={links} usage={usage} />
 
-const renderLinks = (links) => {
+const ClusterLinks = ({ links, usage }) => {
+  const classes = useStyles()
+
   if (!links) {
     return null
   }
   return (
-    <div>
-      {links.dashboard && <ExternalLink url={links.dashboard}>Dashboard</ExternalLink>}
-      {links.kubeconfig && <DownloadKubeConfigLink cluster={links.kubeconfig.cluster} />}
-      {/* {links.cli && <KubeCLI {...links.cli} />} */}
+    <div className={classes.links}>
+      {links.dashboard && (
+        <ExternalLink className="no-wrap-text" icon="tachometer" url={links.dashboard}>
+          Dashboard
+        </ExternalLink>
+      )}
+      {links.kubeconfig && (
+        <DownloadKubeConfigLink
+          className="no-wrap-text"
+          icon="lock"
+          cluster={links.kubeconfig.cluster}
+        />
+      )}
+      {usage && usage.grafanaLink && (
+        <ExternalLink className="no-wrap-text" icon="chart-line" url={usage.grafanaLink}>
+          Grafana
+        </ExternalLink>
+      )}
     </div>
   )
 }
 
-const renderNodeLink = ({ uuid, name }) => (
-  <div key={uuid}>
-    <SimpleLink src={`/ui/kubernetes/infrastructure/nodes/${uuid}`}>{name}</SimpleLink>
-  </div>
-)
-
-const NodesCell = ({ nodes }) => {
-  const classes = useStyles()
-  const [expanded, setExpanded] = useState(false)
-
+const renderNodeLink = (_, { uuid, nodes }) => {
   if (!nodes || !nodes.length) {
     return <div>0</div>
   }
   return (
-    <div>
-      {expanded ? (
-        <div>
-          {nodes.map(renderNodeLink)}
-          <Typography onClick={() => setExpanded(!expanded)} className={classes.link} component="a">
-            (less details)
-          </Typography>
-        </div>
-      ) : (
-        <div>
-          {nodes.length}&nbsp;
-          <Typography onClick={() => setExpanded(!expanded)} className={classes.link} component="a">
-            (more details)
-          </Typography>
-        </div>
-      )}
+    <div key={uuid}>
+      <SimpleLink src={routes.cluster.nodes.path({ id: uuid })}>View {nodes.length}</SimpleLink>
     </div>
   )
 }
@@ -107,13 +97,12 @@ const renderStats = (_, { usage }) => {
       <ResourceUsageTable valueConverter={toMHz} units="MHz" label="CPU" stats={usage.compute} />
       <ResourceUsageTable units="GiB" label="Memory" stats={usage.memory} />
       <ResourceUsageTable units="GiB" label="Storage" stats={usage.disk} />
-      {usage.grafanaLink && <DashboardLink label="Grafana" link={usage.grafanaLink} />}
     </>
   )
 }
 
 const renderClusterDetailLink = (name, cluster) => (
-  <SimpleLink src={`/ui/kubernetes/infrastructure/clusters/${cluster.uuid}`}>{name}</SimpleLink>
+  <SimpleLink src={routes.cluster.nodes.path({ id: cluster.uuid })}>{name}</SimpleLink>
 )
 
 const renderBooleanField = (key) => (_, cluster) => (
@@ -172,12 +161,16 @@ export const options = {
       render: renderHealthStatus,
       tooltip: 'Cluster health',
     },
-    { id: 'links', label: 'Links', render: renderLinks },
+    {
+      id: 'links',
+      label: 'Links',
+      render: renderClusterLink,
+    },
     { id: 'cloudProviderType', label: 'Deployment Type', render: renderCloudProviderType },
     { id: 'resource_utilization', label: 'Resource Utilization', render: renderStats },
     { id: 'version', label: 'Kubernetes Version' },
     { id: 'created_at', label: 'Created at' },
-    { id: 'nodes', label: 'Nodes', render: (nodes) => <NodesCell nodes={nodes} /> },
+    { id: 'nodes', label: 'Nodes', render: renderNodeLink },
     { id: 'networkPlugin', label: 'Network Backend' },
     { id: 'containersCidr', label: 'Containers CIDR' },
     { id: 'servicesCidr', label: 'Services CIDR' },

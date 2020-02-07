@@ -28,7 +28,8 @@ const useStyles = makeStyles((theme) => ({
 
 const ResourceUsageTable = ({ label, valueConverter, usedText, units, stats, precision }) => {
   const classes = useStyles()
-  const { current, max, percent } = stats
+  const { current, max, percent = (current / max) * 100 } = stats
+
   const curStr = valueConverter(current).toFixed(precision)
   const maxStr = valueConverter(max).toFixed(precision)
   const percentStr = `${Math.round(percent)}% ${usedText}`
