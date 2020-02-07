@@ -56,7 +56,6 @@ const ClusterNodes = () => {
     uniqueIdentifier: 'uuid',
     onReload: handleRefresh,
     showCheckboxes: false,
-    compactTable: true,
   })
 
   return (
