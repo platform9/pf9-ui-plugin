@@ -8,16 +8,6 @@ import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 
 const useStyles = makeStyles((theme) => ({
-  formWidth: {
-    width: 715,
-  },
-  inputWidth: {
-    maxWidth: 350,
-  },
-  submit: {
-    display: 'flex',
-    marginLeft: theme.spacing(2),
-  },
   blueIcon: {
     color: theme.palette.primary.main,
   },
@@ -39,7 +29,6 @@ const EndpointsListPage = () => {
   const { ListPage } = createCRUDComponents(options)
 
   return (
-    <div className={classes.formWidth}>
       <FormFieldCard
         title="API Endpoints"
         link={
@@ -53,7 +42,6 @@ const EndpointsListPage = () => {
       >
         <ListPage />
       </FormFieldCard>
-    </div>
   )
 }
 

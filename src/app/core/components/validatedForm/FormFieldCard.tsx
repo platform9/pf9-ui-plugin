@@ -4,17 +4,35 @@ import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
 import clsx from 'clsx'
 
-export const useStyles = makeStyles<Theme>((theme) => ({
+interface ContainerProps {
+  title: string
+  link?: JSX.Element
+  topContent?: JSX.Element
+  className?: string
+  maxWidth?: number
+  inputsWidth?: number
+  limitInputsWidth?: boolean
+}
+const defaultMaxWidth = 715
+
+export const useStyles = makeStyles<Theme, ContainerProps>((theme) => ({
   root: {
+    maxWidth: ({ maxWidth = defaultMaxWidth }) => maxWidth,
     borderRadius: 4,
     boxShadow:
-      '0 2.5px 2.5px -1.5px rgba(0, 0, 0, 0.2), 0 1.5px 7px 1px rgba(0, 0, 0, 0.12), 0 4px 5px 0.5px rgba(0, 0, 0, 0.14)',
+      '0 2.5px 2.5px -1.5px rgba(0, 0, 0, 0.2), ' +
+      '0 1.5px 7px 1px rgba(0, 0, 0, 0.12), ' +
+      '0 4px 5px 0.5px rgba(0, 0, 0, 0.14)',
     padding: theme.spacing(3, 2),
     marginTop: theme.spacing(4),
     display: 'flex',
     flexFlow: 'column nowrap',
     justifyContent: 'space-between',
     alignItems: 'stretch',
+  },
+  inputWidth: {
+    maxWidth: ({ maxWidth = defaultMaxWidth, inputsWidth = maxWidth / 2 }) => inputsWidth,
+    marginBottom: theme.spacing(3),
   },
   requirementsTitle: {
     display: 'flex',
@@ -28,21 +46,19 @@ export const useStyles = makeStyles<Theme>((theme) => ({
   },
 }))
 
-interface ContainerProps {
-  title: string
-  link?: JSX.Element
-  className?: string
-}
-
-export const FormFieldCard: React.FC<ContainerProps> = ({ title, link, className, children }) => {
-  const classes = useStyles({})
+export const FormFieldCard: React.FC<ContainerProps> = (props) => {
+  const { title, topContent, link, className, children, limitInputsWidth = true } = props
+  const classes = useStyles(props)
   return (
     <div className={clsx(classes.root, className)}>
-      <header className={classes.requirementsTitle}>
-        <Typography variant="subtitle1">{title}</Typography>
-        {!!link && link}
-      </header>
-      {children}
+      {(title || link) && (
+        <header className={classes.requirementsTitle}>
+          {!!title && <Typography variant="subtitle1">{title}</Typography>}
+          {!!link && link}
+        </header>
+      )}
+      {topContent}
+      {limitInputsWidth ? <div className={classes.inputWidth}>{children}</div> : children}
     </div>
   )
 }

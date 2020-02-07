@@ -105,6 +105,8 @@ const EditUserPage = () => {
           <>
             <WizardStep stepId="basic" label="Basic Info">
               <ValidatedForm
+                title="Basic Info"
+                limitInputsWidth={false}
                 initialValues={wizardContext}
                 onSubmit={setWizardContext}
                 triggerSubmit={onNext}
@@ -138,7 +140,9 @@ const EditUserPage = () => {
                 Select one or more tenants that should map to this user.
               </Typography>
               <ValidatedForm
+                title="Tenants and Roles"
                 fullWidth
+                limitInputsWidth={false}
                 initialValues={wizardContext}
                 onSubmit={setWizardContext}
                 triggerSubmit={onNext}
