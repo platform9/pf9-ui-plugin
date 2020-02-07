@@ -34,9 +34,15 @@ export interface IStatusCardWithFilterProps extends StatusCardProps {
 }
 
 const useStyles = makeStyles<Theme>((theme) => ({
-  cardRow: {
+  dashboardMosaic: {
     display: 'grid',
     gridTemplateColumns: 'repeat(4, 290px)',
+    gridTemplateAreas: `
+      'user cluster node pod'
+      'tenant cluster node pod'
+      'cloud deployment service empty'
+      'cloud blank blank empty'
+    `,
     gridGap: theme.spacing(2),
     marginTop: theme.spacing(2),
   },
@@ -44,6 +50,30 @@ const useStyles = makeStyles<Theme>((theme) => ({
     display: 'flex',
     flexDirection: 'column',
     flexWrap: 'nowrap',
+  },
+  cluster: {
+    gridArea: 'cluster',
+  },
+  node: {
+    gridArea: 'node',
+  },
+  cloud: {
+    gridArea: 'cloud',
+  },
+  user: {
+    gridArea: 'user',
+  },
+  tenant: {
+    gridArea: 'tenant',
+  },
+  deployment: {
+    gridArea: 'deployment',
+  },
+  service: {
+    gridArea: 'service',
+  },
+  pod: {
+    gridArea: 'pod',
   },
 }))
 
@@ -143,7 +173,7 @@ export const cloudStatusCardProps: IStatusCardWithFilterProps = {
   }),
 }
 
-const topReports = [
+const reports = [
   {
     entity: 'user',
     permissions: ['admin'],
@@ -190,8 +220,6 @@ const topReports = [
       quantity: services.length,
     }),
   },
-]
-const bottomReports = [
   cloudStatusCardProps,
   {
     entity: 'pod',
@@ -260,7 +288,7 @@ const DashboardPage = () => {
   const [, updateState] = React.useState()
   const forceUpdate = useCallback(() => updateState({}), [])
 
-  const { cardColumn, cardRow } = useStyles({})
+  const classes = useStyles({})
   const { getContext, session } = useContext(AppContext)
   const isAdmin = isAdminRole(getContext)
   const username = capitalizeString(normalizeUsername(session.username))
@@ -284,7 +312,7 @@ const DashboardPage = () => {
   }, [hasClusters, hasMonitoring, hasAccess])
 
   return (
-    <section className={cardColumn}>
+    <section className={classes.cardColumn}>
       <Typography variant="h5">Welcome {username}!</Typography>
       {isLoading ? (
         <Progress loading={isLoading} overlay renderContentOnMount />
@@ -301,18 +329,11 @@ const DashboardPage = () => {
           )}
 
           {!showOnboarding && (
-            <>
-              <div className={cardRow}>
-                {reportsWithPerms(topReports).map((report) => (
-                  <StatusCard key={report.route} {...report} />
-                ))}
-              </div>
-              <div className={cardRow}>
-                {reportsWithPerms(bottomReports).map((report) => (
-                  <StatusCard key={report.route} {...report} />
-                ))}
-              </div>
-            </>
+            <div className={classes.dashboardMosaic}>
+              {reportsWithPerms(reports).map((report) => (
+                <StatusCard key={report.route} {...report} className={classes[report.entity]} />
+              ))}
+            </div>
           )}
         </>
       )}
