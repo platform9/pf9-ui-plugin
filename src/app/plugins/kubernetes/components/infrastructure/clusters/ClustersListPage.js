@@ -47,8 +47,8 @@ const renderClusterLink = (links, { usage }) => <ClusterLinks links={links} usag
 
 const ClusterLinks = ({ links, usage }) => {
   const classes = useStyles()
-
-  if (!links) {
+  const hasGrafanaLink = !!usage && usage.grafanaLink
+  if (!links && !hasGrafanaLink) {
     return null
   }
   return (
@@ -65,7 +65,7 @@ const ClusterLinks = ({ links, usage }) => {
           cluster={links.kubeconfig.cluster}
         />
       )}
-      {usage && usage.grafanaLink && (
+      {hasGrafanaLink && (
         <ExternalLink className="no-wrap-text" icon="chart-line" url={usage.grafanaLink}>
           Grafana
         </ExternalLink>
