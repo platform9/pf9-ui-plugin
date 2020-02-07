@@ -9,8 +9,10 @@ import {
   azureCreateANewApplicationSecretLink,
   azureGetValuesForSigninginLink,
   azureServicePrincipalPortalLink,
+  gettingStartedHelpLink,
 } from 'k8s/links'
 import { routes } from 'core/utils/routes'
+import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 
 const useStyles = makeStyles((theme: Theme) => ({
   requirements: {
@@ -27,6 +29,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginTop: theme.spacing(1),
     marginLeft: theme.spacing(1),
   },
+  blueIcon: {
+    color: theme.palette.primary.main,
+  },
   bulletList: {
     marginLeft: theme.spacing(2),
     flex: 1,
@@ -39,7 +44,17 @@ const AzureClusterRequirements = ({ onComplete }) => {
     onComplete(routes.cluster.addAzure.path())
   }, [onComplete])
   return (
-    <FormFieldCard title="Amazon AWS Deployment">
+    <FormFieldCard
+      title="Microsoft Azure Deployment"
+      link={
+        <div>
+          <FontAwesomeIcon className={classes.blueIcon} size="md">
+            file-alt
+          </FontAwesomeIcon>
+          <ExternalLink url={gettingStartedHelpLink}>Azure Setup Documentation</ExternalLink>
+        </div>
+      }
+    >
       <Typography className={classes.text}>
         Use your existing Azure credentials to create and manage Kubernetes clusters and associated
         resources within your Azure public cloud environment.

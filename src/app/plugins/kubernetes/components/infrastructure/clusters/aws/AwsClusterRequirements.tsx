@@ -52,10 +52,11 @@ const AwsClusterRequirements = ({ onComplete }) => {
         <div>
           <FontAwesomeIcon className={classes.blueIcon} size="md">
             file-alt
-        </FontAwesomeIcon>
+          </FontAwesomeIcon>
           <ExternalLink url={gettingStartedHelpLink}>AWS Setup Documentation</ExternalLink>
         </div>
-      }>
+      }
+    >
       <Typography className={classes.text}>
         Build a Kubernetes Cluster using AWS EC2 Instances
       </Typography>
