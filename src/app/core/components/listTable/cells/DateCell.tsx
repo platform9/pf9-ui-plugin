@@ -1,6 +1,7 @@
 import React from 'react'
-import { formatDate, durationBetweenDates } from 'utils/misc'
+import { formatDate, secondsToString } from 'utils/misc'
 import { Tooltip } from '@material-ui/core'
+import moment from 'moment'
 
 interface DateCellProps {
   value: string
@@ -15,7 +16,7 @@ const DateCell: React.FC<DateCellProps> = ({
 }) => {
   if (showToolTip) {
     return (
-      <Tooltip title={durationBetweenDates(value)}>
+      <Tooltip title={secondsToString(moment().diff(value, 's'))}>
         <span>{formatDate(value, format)}</span>
       </Tooltip>
     )
