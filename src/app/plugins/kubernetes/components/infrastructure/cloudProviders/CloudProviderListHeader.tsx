@@ -1,5 +1,6 @@
 // Libs
 import React, { useCallback } from 'react'
+import { flatten, pluck } from 'ramda'
 
 // Actions
 import { cloudProviderActions } from './actions'
@@ -12,7 +13,6 @@ import { getUsageTotals } from 'k8s/util/calcUsageTotals'
 
 // Types
 import { cloudStatusCardProps } from 'k8s/components/dashboard/DashboardPage'
-import { flatten, pluck } from 'ramda'
 import { ICloudProvider } from './model'
 
 const maxUsagePaths = {
