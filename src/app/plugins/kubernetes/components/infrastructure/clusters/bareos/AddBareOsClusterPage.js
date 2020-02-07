@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import FormWrapper from 'core/components/FormWrapper'
 import BareOsClusterReviewTable from './BareOsClusterReviewTable'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
@@ -37,6 +37,8 @@ import {
   pmkCliPrepNodeLink,
   pf9PmkArchitectureDigLink,
 } from 'k8s/links'
+import { pmkCliOverviewLink, runtimePrivilegedLink } from 'k8s/links'
+import { trackEvent } from 'utils/tracking'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
@@ -83,6 +85,59 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
+// Segment tracking for wizard steps
+const basicOnNext = (context) => {
+  trackEvent('WZ New BareOS Cluster 1 Master Nodes', {
+    wizard_step: 'Select Master Nodes',
+    wizard_state: 'In-Progress',
+    wizard_progress: '1 of 5',
+    wizard_name: 'Add New BareOS Cluster',
+    cluster_name: context.name,
+    master_nodes: context.masterNodes,
+    allow_workloads_on_master: context.allowWorkloadsOnMaster,
+  })
+}
+
+const workersOnNext = (context) => {
+  trackEvent('WZ New BareOS Cluster 2 Worker Nodes', {
+    wizard_step: 'Select Worker Nodes',
+    wizard_state: 'In-Progress',
+    wizard_progress: '2 of 5',
+    wizard_name: 'Add New BareOS Cluster',
+    worker_nodes: context.workerNodes,
+  })
+}
+
+const networkOnNext = (context) => {
+  trackEvent('WZ New BareOS Cluster 3 Networking Details', {
+    wizard_step: 'Configure Network',
+    wizard_state: 'In-Progress',
+    wizard_progress: '3 of 5',
+    wizard_name: 'Add New BareOS Cluster',
+    network_backend: context.networkPlugin,
+  })
+}
+
+const advancedOnNext = (context) => {
+  trackEvent('WZ New BareOS Cluster 4 Advanced Configuration', {
+    wizard_step: 'Advanced Configuration',
+    wizard_state: 'In-Progress',
+    wizard_progress: '4 of 5',
+    wizard_name: 'Add New BareOS Cluster',
+    enable_etcd_backup: !!context.enableEtcdBackup,
+    enable_monitoring: !!context.prometheusMonitoringEnabled,
+  })
+}
+
+const reviewOnNext = (context) => {
+  trackEvent('WZ New BareOS Cluster 5 Review', {
+    wizard_step: 'Review',
+    wizard_state: 'Finished',
+    wizard_progress: '5 of 5',
+    wizard_name: 'Add New BareOS Cluster',
+  })
+}
+
 const canFinishAndReview = ({ masterNodes, workerNodes, allowWorkloadsOnMaster }) => {
   const hasMasters = !!masterNodes && masterNodes.length > 0
   const hasWorkers = !!workerNodes && workerNodes.length > 0
@@ -92,7 +147,18 @@ const canFinishAndReview = ({ masterNodes, workerNodes, allowWorkloadsOnMaster }
 const AddBareOsClusterPage = () => {
   const classes = useStyles()
   const { history } = useReactRouter()
+
+  useEffect(() => {
+    trackEvent('WZ New BareOS Cluster 0 Started', {
+      wizard_step: 'Start',
+      wizard_state: 'Started',
+      wizard_progress: '0 of 5',
+      wizard_name: 'Add New BareOS Cluster',
+    })
+  }, [])
+
   const onComplete = (_, { uuid }) => history.push(routes.cluster.nodeHealth.path({ id: uuid }))
+
   const [createBareOSClusterAction, creatingBareOSCluster] = useDataUpdater(
     clusterActions.create,
     onComplete,
@@ -114,7 +180,7 @@ const AddBareOsClusterPage = () => {
       >
         {({ wizardContext, setWizardContext, onNext }) => (
           <>
-            <WizardStep stepId="basic" label="Select Master Nodes">
+            <WizardStep stepId="basic" label="Select Master Nodes" onNext={basicOnNext}>
               <ValidatedForm
                 fullWidth
                 initialValues={wizardContext}
@@ -200,7 +266,7 @@ const AddBareOsClusterPage = () => {
               </ValidatedForm>
             </WizardStep>
 
-            <WizardStep stepId="workers" label="Select Worker Nodes">
+            <WizardStep stepId="workers" label="Select Worker Nodes" onNext={workersOnNext}>
               <ValidatedForm
                 fullWidth
                 initialValues={wizardContext}
@@ -265,7 +331,7 @@ const AddBareOsClusterPage = () => {
               </ValidatedForm>
             </WizardStep>
 
-            <WizardStep stepId="network" label="Configure Network">
+            <WizardStep stepId="network" label="Configure Network" onNext={networkOnNext}>
               <ValidatedForm
                 initialValues={wizardContext}
                 onSubmit={setWizardContext}
@@ -378,7 +444,7 @@ const AddBareOsClusterPage = () => {
               </ValidatedForm>
             </WizardStep>
 
-            <WizardStep stepId="advanced" label="Advanced Configuration">
+            <WizardStep stepId="advanced" label="Advanced Configuration" onNext={advancedOnNext}>
               <ValidatedForm
                 initialValues={wizardContext}
                 onSubmit={setWizardContext}
@@ -469,7 +535,7 @@ const AddBareOsClusterPage = () => {
               </ValidatedForm>
             </WizardStep>
 
-            <WizardStep stepId="review" label="Review">
+            <WizardStep stepId="review" label="Review" onNext={reviewOnNext}>
               <ValidatedForm
                 initialValues={wizardContext}
                 onSubmit={setWizardContext}

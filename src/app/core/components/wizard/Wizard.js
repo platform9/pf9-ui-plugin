@@ -60,11 +60,13 @@ class Wizard extends PureComponent {
 
   handleNext = () => {
     const { onComplete } = this.props
-    const { activeStep } = this.state
+    const { steps, activeStep, wizardContext } = this.state
 
     if (this.nextCb[activeStep] && this.nextCb[activeStep]() === false) {
       return
     }
+
+    if (steps[activeStep].onNext) { steps[activeStep].onNext(wizardContext) }
 
     this.setState(
       (state) => ({

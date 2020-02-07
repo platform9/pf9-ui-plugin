@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import FormWrapper from 'core/components/FormWrapper'
 import AwsAvailabilityZoneChooser from '../cloudProviders/AwsAvailabilityZoneChooser'
 import AwsClusterReviewTable from './AwsClusterReviewTable'
@@ -34,6 +34,7 @@ import { makeStyles } from '@material-ui/styles'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import { routes } from 'core/utils/routes'
 import Alert from 'core/components/Alert'
+import { trackEvent } from 'utils/tracking'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
@@ -52,6 +53,51 @@ const useStyles = makeStyles((theme) => ({
     display: 'grid',
   },
 }))
+
+// Segment tracking for wizard steps
+const configOnNext = (context) => {
+  trackEvent('WZ New AWS Cluster 1 Master Nodes', {
+    wizard_step: 'Cluster Configuration',
+    wizard_state: 'In-Progress',
+    wizard_progress: '1 of 4',
+    wizard_name: 'Add New AWS Cluster',
+    cluster_name: context.name,
+    cluster_region: context.region,
+    cluster_azs: context.azs,
+    cluster_template: context.template,
+  })
+}
+
+const networkOnNext = (context) => {
+  trackEvent('WZ New AWS Cluster 2 Networking Details', {
+    wizard_step: 'Network Info',
+    wizard_state: 'In-Progress',
+    wizard_progress: '2 of 4',
+    wizard_name: 'Add New AWS Cluster',
+    network_configuration: context.network,
+    network_backend: context.networkPlugin,
+  })
+}
+
+const advancedOnNext = (context) => {
+  trackEvent('WZ New AWS Cluster 3 Advanced Configuration', {
+    wizard_step: 'Advanced Configuration',
+    wizard_state: 'In-Progress',
+    wizard_progress: '3 of 4',
+    wizard_name: 'Add New AWS Cluster',
+    enable_etcd_backup: !!context.enableEtcdBackup,
+    enable_monitoring: !!context.prometheusMonitoringEnabled,
+  })
+}
+
+const reviewOnNext = (context) => {
+  trackEvent('WZ New AWS Cluster 4 Review', {
+    wizard_step: 'Review',
+    wizard_state: 'Finished',
+    wizard_progress: '4 of 4',
+    wizard_name: 'Add New AWS Cluster',
+  })
+}
 
 const initialContext = {
   template: 'small',
@@ -326,6 +372,16 @@ const AddAwsClusterPage = () => {
   const classes = useStyles()
   const { params, getParamsUpdater } = useParams()
   const { history } = useReactRouter()
+
+  useEffect(() => {
+    trackEvent('WZ New AWS Cluster 0 Started', {
+      wizard_step: 'Start',
+      wizard_state: 'Started',
+      wizard_progress: '0 of 4',
+      wizard_name: 'Add New AWS Cluster',
+    })
+  }, [])
+
   const onComplete = () => history.push(routes.cluster.list.path())
   const [createAwsClusterAction, creatingAwsCluster] = useDataUpdater(
     clusterActions.create,
@@ -353,7 +409,7 @@ const AddAwsClusterPage = () => {
         {({ wizardContext, setWizardContext, onNext }) => {
           return (
             <>
-              <WizardStep stepId="config" label="Cluster Configuration">
+              <WizardStep stepId="config" label="Cluster Configuration" onNext={configOnNext}>
                 {loading ? null : hasAwsProvider ? (
                   <ValidatedForm
                     initialValues={wizardContext}
@@ -531,7 +587,7 @@ const AddAwsClusterPage = () => {
                 )}
               </WizardStep>
 
-              <WizardStep stepId="network" label="Network Info">
+              <WizardStep stepId="network" label="Network Info" onNext={networkOnNext}>
                 <ValidatedForm
                   initialValues={wizardContext}
                   onSubmit={setWizardContext}
@@ -633,7 +689,7 @@ const AddAwsClusterPage = () => {
                 </ValidatedForm>
               </WizardStep>
 
-              <WizardStep stepId="advanced" label="Advanced Configuration">
+              <WizardStep stepId="advanced" label="Advanced Configuration" onNext={advancedOnNext}>
                 <ValidatedForm
                   initialValues={wizardContext}
                   onSubmit={setWizardContext}
@@ -727,7 +783,7 @@ const AddAwsClusterPage = () => {
                 </ValidatedForm>
               </WizardStep>
 
-              <WizardStep stepId="review" label="Review">
+              <WizardStep stepId="review" label="Review" onNext={reviewOnNext}>
                 <ValidatedForm
                   initialValues={wizardContext}
                   onSubmit={setWizardContext}
