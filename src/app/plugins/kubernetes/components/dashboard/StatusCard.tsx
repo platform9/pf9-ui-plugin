@@ -15,29 +15,24 @@ import DonutWidget from 'core/components/widgets/DonutWidget'
 import { PieDataEntry } from 'core/components/graphs/PieGraph'
 import Theme from 'core/themes/model'
 
-const chartHeight = 150
-const actionHeight = 76
-
-const getCardHeight = ({ actionRow, chartRow }) => {
-  let height = 80
-  if (chartRow) height += chartHeight
-  if (actionRow) height += actionHeight
-  return height
-}
-
 const useStyles = makeStyles<Theme, { actionRow: boolean; chartRow: boolean }>((theme) => ({
   headerIcon: {
     fontSize: '36px',
     color: theme.palette.dashboardCard.icon,
+    height: '32px',
+    marginTop: '6px',
   },
   spinner: {
     marginLeft: theme.spacing(1),
   },
   contentContainer: {
+    display: 'grid',
+    gridTemplateRows: ({ actionRow, chartRow }) =>
+      `85px${actionRow ? ' 76px' : ''}${chartRow ? ' 1fr' : ''}`,
     backgroundColor: theme.palette.dashboardCard.background,
     minWidth: '270px',
-    minHeight: getCardHeight,
-    padding: theme.spacing(2.5, 1, 0.5, 1),
+    minHeight: '165px',
+    padding: theme.spacing(2, 1, 1, 1),
     borderRadius: '5px',
     transition: 'transform .1s ease',
     boxShadow:
@@ -48,27 +43,11 @@ const useStyles = makeStyles<Theme, { actionRow: boolean; chartRow: boolean }>((
     },
     overflowX: 'hidden',
   },
-  row: {
-    display: 'flex',
-    flexDirection: 'row',
-    flexWrap: 'nowrap',
-    flex: 1,
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    '&:first-of-type': {
-      borderBottom: `1px solid ${theme.palette.dashboardCard.divider}`,
-    },
-  },
-  rowColumn: {
-    padding: theme.spacing(0, 1),
-  },
   text: {
     color: theme.palette.dashboardCard.primary,
-    marginLeft: theme.spacing(1),
     fontSize: '40px',
   },
   cardTitle: {
-    marginLeft: theme.spacing(1),
     color: theme.palette.dashboardCard.text,
   },
   arrowIcon: {
@@ -83,23 +62,25 @@ const useStyles = makeStyles<Theme, { actionRow: boolean; chartRow: boolean }>((
       top: '7px',
     },
   },
-  verticalCenter: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-  horizontalCenter: {
-    flexGrow: 1,
-    textAlign: 'center',
-  },
   header: {
-    minHeight: actionHeight,
-  },
-  links: {
-    minHeight: actionHeight,
+    display: 'grid',
+    gridTemplateColumns: '1fr 45px',
+    alignItems: 'center',
+    padding: theme.spacing(0, 1),
     borderBottom: `1px solid ${theme.palette.dashboardCard.divider}`,
   },
+  links: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 35px',
+    alignContent: 'center',
+    padding: theme.spacing(0, 1),
+  },
   chart: {
-    minHeight: chartHeight,
+    minHeight: 150,
+    display: 'grid',
+    alignContent: 'center',
+    borderTop: ({ actionRow }) =>
+      `${actionRow ? 1 : 0}px solid ${theme.palette.dashboardCard.divider}`,
   },
 }))
 
@@ -137,64 +118,46 @@ const StatusCard: FunctionComponent<StatusCardProps> = ({
   const [data, loading] = useDataLoader(...dataLoader)
   const { quantity, pieData, piePrimary, graphType = 'usage' } = quantityFn(data)
   const {
-    row,
-    rowColumn,
     contentContainer,
     headerIcon,
-    spinner,
     cardTitle,
     text,
     arrowIcon,
-    verticalCenter,
-    horizontalCenter,
     header,
     links,
     chart,
+    spinner,
   } = useStyles({ chartRow: !!pieData, actionRow })
 
   const GraphComponent = graphType === 'donut' ? DonutWidget : PieUsageWidget
 
   return (
     <div className={clsx(contentContainer, className)}>
-      <div className={clsx(row, header)}>
-        <div className={rowColumn}>
-          <Link to={route}>
-            <Typography variant="h6" className={cardTitle}>
-              {title}
-            </Typography>
-          </Link>
-        </div>
-        <div className={clsx(rowColumn, verticalCenter)}>
-          <FontAwesomeIcon className={headerIcon}>{icon}</FontAwesomeIcon>
-          {loading ? (
-            <CircularProgress className={spinner} size={32} />
-          ) : (
-            <span className={text}>{quantity}</span>
-          )}
-        </div>
-      </div>
+      <header className={header}>
+        <Link to={route}>
+          <Typography variant="h6" className={cardTitle}>
+            {title}
+          </Typography>
+        </Link>
+        <FontAwesomeIcon className={headerIcon}>{icon}</FontAwesomeIcon>
+        {loading ? <CircularProgress size={32} /> : <span className={text}>{quantity}</span>}
+      </header>
       {actionRow && (
-        <div className={clsx(row, links, verticalCenter)}>
-          <div className={rowColumn}>
-            <Link to={addRoute}>
-              <CardButton>Add {entity}</CardButton>
-            </Link>
-          </div>
-          <div className={rowColumn}>
-            <Link to={route}>
-              <FontAwesomeIcon size="2x" className={arrowIcon}>
-                arrow-right
-              </FontAwesomeIcon>
-            </Link>
-          </div>
+        <div className={links}>
+          <Link to={addRoute}>
+            <CardButton>Add {entity}</CardButton>
+          </Link>
+          <Link to={route}>
+            <FontAwesomeIcon size="2x" className={arrowIcon}>
+              arrow-right
+            </FontAwesomeIcon>
+          </Link>
         </div>
       )}
       {pieData && (
-        <div className={clsx(row, chart, verticalCenter)}>
+        <div className={chart}>
           {loading ? (
-            <div className={horizontalCenter}>
-              <CircularProgress className={spinner} size={64} />
-            </div>
+            <CircularProgress className={spinner} size={64} />
           ) : (
             <GraphComponent sideLength={110} arcWidth={12} primary={piePrimary} data={pieData} />
           )}
