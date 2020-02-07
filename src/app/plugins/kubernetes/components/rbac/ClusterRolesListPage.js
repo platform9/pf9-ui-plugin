@@ -4,12 +4,12 @@ import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { clusterRolesCacheKey, clusterRoleActions } from './actions'
 import { createUsePrefParamsHook } from 'core/hooks/useParams'
-import { listTablePrefs } from 'app/constants'
+import { listTablePrefs, allKey } from 'app/constants'
 import { pick } from 'ramda'
 
 const defaultParams = {
   masterNodeClusters: true,
-  clusterId: null,
+  clusterId: allKey,
 }
 const usePrefParams = createUsePrefParamsHook('ClusterRoles', listTablePrefs)
 
@@ -25,6 +25,7 @@ const ListPage = ({ ListContainer }) => {
         getParamsUpdater={getParamsUpdater}
         filters={
           <ClusterPicklist
+            selectFirst={false}
             onChange={getParamsUpdater('clusterId')}
             value={params.clusterId}
             onlyMasterNodeClusters
