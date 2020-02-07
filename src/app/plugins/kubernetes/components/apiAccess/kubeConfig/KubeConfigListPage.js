@@ -24,15 +24,12 @@ import PollingData from 'core/components/PollingData'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 
 const useStyles = makeStyles((theme) => ({
-  formCard: {
-    marginTop: theme.spacing(0.5),
-  },
-  formWidth: {
+  root: {
     width: 715,
     marginTop: theme.spacing(4),
   },
-  inputWidth: {
-    maxWidth: 350,
+  formCard: {
+    marginTop: theme.spacing(0.5),
   },
   submit: {
     display: 'flex',
@@ -91,7 +88,7 @@ const KubeConfigListPage = () => {
     localStorage.setItem(onboardingAccessSetup, 'true')
   }
   return (
-    <section className={classes.formWidth}>
+    <section className={classes.root}>
       <PollingData
         loading={loadingClusters}
         onReload={reloadClusters}
