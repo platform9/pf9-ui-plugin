@@ -66,14 +66,13 @@ class Wizard extends PureComponent {
       return
     }
 
-    if (steps[activeStep].onNext) { steps[activeStep].onNext(wizardContext) }
-
     this.setState(
       (state) => ({
         activeStep: state.activeStep + 1,
         ...this.getActiveStepId(state, state.activeStep + 1),
       }),
       () => {
+        if (steps[activeStep].onNext) { steps[activeStep].onNext(wizardContext) }
         if (this.isComplete()) {
           onComplete(this.state.wizardContext)
         }
