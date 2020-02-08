@@ -34,11 +34,15 @@ export const azureCreateANewApplicationSecretLink = `${microsoftDocBaseUrl}/azur
 
 // BareOS
 export const gettingStartedLink = `${k8sBaseUrl}/getting-started/bare-metal-preinstall-checklist/`
-
 export const whatIsBareOSLink = `${k8sBaseUrl}/on-premise-kubernetes/what-is-bareos`
 export const bareOSSetupDocumentationLink = `${k8sBaseUrl}/create-multimaster-bareos-cluster/`
+
+// Clusters
 export const remoteMonitoringDocsLink = `${k8sBaseUrl}/enable-remote-monitoring/`
 export const managedContainerChecklistLink = `${pf9DocOrigin}/getting-started/managed-container-cloud-requirements-checklist`
+
+// Nodes
+export const nodeInstallTroubleshooting = `${k8sBaseUrl}/troubleshooting/node-install-status-check/`
 
 // CLI
 export const pmkCliOverviewLink = `${k8sBaseUrl}/PMK-CLI/`
