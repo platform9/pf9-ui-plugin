@@ -37,7 +37,6 @@ import {
   pmkCliPrepNodeLink,
   pf9PmkArchitectureDigLink,
 } from 'k8s/links'
-import { pmkCliOverviewLink, runtimePrivilegedLink } from 'k8s/links'
 import { trackEvent } from 'utils/tracking'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
