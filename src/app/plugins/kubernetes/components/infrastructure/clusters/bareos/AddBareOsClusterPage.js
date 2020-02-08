@@ -26,8 +26,6 @@ import { defaultEtcBackupPath, k8sPrefix } from 'app/constants'
 import { makeStyles } from '@material-ui/styles'
 import { masterNodeLengthValidator, requiredValidator } from 'core/utils/fieldValidators'
 import { allPass } from 'ramda'
-import useDataLoader from 'core/hooks/useDataLoader'
-import { loadNodes } from '../../nodes/actions'
 import EtcdBackupFields from '../EtcdBackupFields'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import { routes } from 'core/utils/routes'
@@ -89,8 +87,7 @@ const canFinishAndReview = ({ masterNodes, workerNodes, allowWorkloadsOnMaster }
 const AddBareOsClusterPage = () => {
   const classes = useStyles()
   const { history } = useReactRouter()
-  const onComplete = (_, { uuid }) =>
-    history.push(routes.cluster.convergingNodes.path({ id: uuid }))
+  const onComplete = (_, { uuid }) => history.push(routes.cluster.nodeHealth.path({ id: uuid }))
   const [createBareOSClusterAction, creatingBareOSCluster] = useDataUpdater(
     clusterActions.create,
     onComplete,
@@ -101,21 +98,13 @@ const AddBareOsClusterPage = () => {
       ...data,
       clusterType: 'local',
     })
-  const [nodes, loading] = useDataLoader(loadNodes)
 
-  const hasFreeNodes = nodes.filter(isUnassignedNode).length > 0
   return (
-    <FormWrapper
-      title="Add Bare OS Cluster"
-      backUrl={listUrl}
-      loading={creatingBareOSCluster || loading}
-      message={loading ? 'loading...' : 'Submitting form...'}
-    >
+    <FormWrapper title="Add Bare OS Cluster" backUrl={listUrl} loading={creatingBareOSCluster}>
       <Wizard
         onComplete={handleSubmit}
         context={initialContext}
         originPath={routes.cluster.add.path()}
-        disableNext={!hasFreeNodes}
         showFinishAndReviewButton={canFinishAndReview}
       >
         {({ wizardContext, setWizardContext, onNext }) => (

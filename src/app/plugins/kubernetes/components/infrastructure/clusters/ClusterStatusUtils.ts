@@ -266,7 +266,7 @@ export const getClusterHealthStatus = (cluster: ICluster) => {
     cluster.masterNodesHealthStatus,
     cluster.workerNodesHealthStatus,
   )
-  fields.nodesDetailsUrl = routes.cluster.nodes.path({ id: cluster.uuid })
+  fields.nodesDetailsUrl = routes.cluster.nodeHealth.path({ id: cluster.uuid })
   return fields
 }
 
@@ -276,6 +276,6 @@ export const getClusterConnectionStatus = (cluster: ICluster) => {
   }
   const fields: ConnectionStatusFields & { nodesDetailsUrl: string } =
     connectionStatusFieldsTable[cluster.connectionStatus]
-  fields.nodesDetailsUrl = routes.cluster.nodes.path({ id: cluster.uuid })
+  fields.nodesDetailsUrl = routes.cluster.nodeHealth.path({ id: cluster.uuid })
   return fields
 }

@@ -18,7 +18,7 @@ import {
   ClusterConnectionStatus,
   ClusterHealthStatus,
 } from 'k8s/components/infrastructure/clusters/ClusterStatus'
-import { ConvergingNodesWithTasksToggler } from '../nodes/ConvergingNodeBreakdown'
+import { NodeHealthWithTasksToggler } from '../nodes/ConvergingNodeBreakdown'
 import { routes } from 'core/utils/routes'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import PollingData from 'core/components/PollingData'
@@ -138,8 +138,8 @@ const ClusterDetailsPage = () => {
           <Tab value="nodes" label="Nodes">
             <ClusterNodes />
           </Tab>
-          <Tab value="convergingNodes" label="Converging Nodes">
-            <ConvergingNodesWithTasksToggler />
+          <Tab value="nodeHealth" label="Node Health">
+            <NodeHealthWithTasksToggler />
           </Tab>
           <Tab value="clusterDetails" label="Cluster Details">
             <ClusterInfo />
