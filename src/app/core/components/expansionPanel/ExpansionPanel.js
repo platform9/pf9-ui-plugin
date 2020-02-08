@@ -119,7 +119,9 @@ const ExpansionPanel = ({
           )}
           <span>{summary}</span>
         </div>
-        {!!onSkip && !completed && <CloseButton onClick={handleToggleOverlay} />}
+        {!!onSkip && !completed && (
+          <CloseButton tooltip="Skip Step" onClick={handleToggleOverlay} />
+        )}
       </ExpansionPanelSummary>
       <ExpansionPanelDetails className={classes.panelDetails}>
         {children}

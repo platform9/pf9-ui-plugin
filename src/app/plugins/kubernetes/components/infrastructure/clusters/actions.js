@@ -1,7 +1,7 @@
 import ApiClient from 'api-client/ApiClient'
 import calcUsageTotalByPath from 'k8s/util/calcUsageTotals'
 import createCRUDActions from 'core/helpers/createCRUDActions'
-import { allKey, defaultMonitoringTag } from 'app/constants'
+import { allKey, defaultMonitoringTag, onboardingMonitoringSetup } from 'app/constants'
 import { castFuzzyBool, sanitizeUrl } from 'utils/misc'
 import {
   clustersCacheKey,
@@ -241,6 +241,10 @@ const createGenericCluster = async (body, data, loadFromContext) => {
 
   const createResponse = await qbert.createCluster(body)
   const uuid = createResponse.uuid
+
+  if (data.prometheusMonitoringEnabled) {
+    localStorage.setItem(onboardingMonitoringSetup, true)
+  }
 
   // The POST call only returns the `uuid` and that's it.  We need to perform a GET afterwards and return that to add to the cache.
   return qbert.getClusterDetails(uuid)
