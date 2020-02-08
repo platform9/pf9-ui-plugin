@@ -82,10 +82,12 @@ export interface Pf9KubeStatusData {
   pf9_kube_service_state: boolean
   all_status_checks: string[]
   last_failed_status_time: string
-  pf9_kube_node_state: string
+  pf9_kube_node_state: IKubeNodeState
   total_task_count: number
   status_check_timestamp: string
 }
+
+export type IKubeNodeState = 'failed' | 'ok' | 'converging' | 'retrying'
 
 export interface CloudMetadata {
   status: string

@@ -53,6 +53,11 @@ const useStyles = makeStyles((theme) => ({
   message: {
     fontSize: 12,
   },
+  statusRow: {
+    display: 'grid',
+    gridTemplateColumns: '75px 1fr',
+    alignItems: 'center',
+  },
 }))
 
 const TaskStatusDialog = ({ isOpen, toggleOpen, node }) => {
@@ -99,6 +104,7 @@ const TaskStatusDialog = ({ isOpen, toggleOpen, node }) => {
           allTasks={allTasks}
           lastFailedTask={lastFailedTask}
           completedTasks={completedTasks}
+          logs={node.logs}
         />
       </DialogContent>
     </Dialog>
@@ -109,17 +115,30 @@ const statusMap = new Map([
   ['fail', 'Failed'],
   ['ok', 'Completed'],
   ['loading', 'In Progress'],
+  ['retrying', 'Retrying'],
+  ['failed', 'Failed'],
+  ['disconnected', 'Unknown'],
 ])
 
-const renderStatus = (_, { status }) => {
+const renderStatus = (_, { status, logs }) => (
+  <NodeTaskStatus status={status} iconStatus>
+    {status.includes('fail') && <ExternalLink url={logs || ''}>View Logs</ExternalLink>}
+  </NodeTaskStatus>
+)
+
+export const NodeTaskStatus = ({ status, iconStatus = false, children }) => {
+  const classes = useStyles()
   if (status === 'none') {
     return <EmptyStatus />
   }
 
   return (
-    <ClusterStatusSpan iconStatus status={status} title={statusMap.get(status)}>
-      {statusMap.get(status)}
-    </ClusterStatusSpan>
+    <div className={classes.statusRow}>
+      <ClusterStatusSpan iconStatus={iconStatus} status={status} title={statusMap.get(status)}>
+        {statusMap.get(status)}
+      </ClusterStatusSpan>
+      {children}
+    </div>
   )
 }
 
@@ -137,7 +156,7 @@ const TasksTable = createListTableComponent({
   emptyText: <Typography variant="body1">No status information currently available.</Typography>,
 })
 
-export const Tasks = ({ allTasks, completedTasks = [], lastFailedTask }) => {
+export const Tasks = ({ allTasks, completedTasks = [], lastFailedTask, logs }) => {
   const classes = useStyles()
   const failedTaskIndex = allTasks.indexOf(lastFailedTask)
   const completedTaskCount = failedTaskIndex >= 0 ? failedTaskIndex : completedTasks.length
@@ -157,6 +176,7 @@ export const Tasks = ({ allTasks, completedTasks = [], lastFailedTask }) => {
   const tasksWithStatus = allTasks.map((value, index) => ({
     task: getTaskName(value, index),
     status: getStatus(index),
+    logs,
   }))
 
   return (

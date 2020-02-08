@@ -38,10 +38,8 @@ const useStyles = makeStyles<Theme>((theme) => ({
     display: 'grid',
     gridTemplateColumns: 'repeat(4, 290px)',
     gridTemplateAreas: `
-      'user cluster node pod'
-      'tenant cluster node pod'
-      'cloud deployment service empty'
-      'cloud blank blank empty'
+      'cluster node pod cloud'
+      'user tenant deployment service'
     `,
     gridGap: theme.spacing(2),
     marginTop: theme.spacing(2),
