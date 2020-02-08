@@ -92,7 +92,7 @@ const basicOnNext = (context) => {
     wizard_progress: '1 of 5',
     wizard_name: 'Add New BareOS Cluster',
     cluster_name: context.name,
-    master_nodes: context.masterNodes,
+    master_nodes: context.masterNodes.length,
     allow_workloads_on_master: context.allowWorkloadsOnMaster,
   })
 }
@@ -103,7 +103,7 @@ const workersOnNext = (context) => {
     wizard_state: 'In-Progress',
     wizard_progress: '2 of 5',
     wizard_name: 'Add New BareOS Cluster',
-    worker_nodes: context.workerNodes,
+    worker_nodes: (context.workerNodes && context.workerNodes.length) || 0,
   })
 }
 

@@ -65,6 +65,10 @@ const configOnNext = (context) => {
     cluster_region: context.region,
     cluster_azs: context.azs,
     cluster_template: context.template,
+    master_nodes: context.numMasters,
+    worker_nodes: context.numWorkers,
+    master_flavor: context.masterFlavor,
+    worker_flavor: context.workerFlavor,
   })
 }
 
