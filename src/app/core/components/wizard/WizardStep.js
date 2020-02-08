@@ -9,12 +9,12 @@ const wizardStepStyles = makeStyles((theme) => ({
   },
 }))
 
-const WizardStep = ({ label, stepId, children, keepContentMounted }) => {
+const WizardStep = ({ label, stepId, onNext, children, keepContentMounted }) => {
   const { activeStepId, addStep } = useContext(WizardContext)
   const classes = wizardStepStyles({ stepId, activeStepId })
   const [rendered, setIsRendered] = useState(false)
   useEffect(() => {
-    addStep({ stepId, label })
+    addStep({ stepId, label, onNext })
   }, [])
   useEffect(() => {
     // After we render the step contents for the first time we will keep it mounted
@@ -33,6 +33,7 @@ const WizardStep = ({ label, stepId, children, keepContentMounted }) => {
 WizardStep.propTypes = {
   stepId: PropTypes.string.isRequired,
   label: PropTypes.string,
+  onNext: PropTypes.func,
   keepContentMounted: PropTypes.bool,
 }
 

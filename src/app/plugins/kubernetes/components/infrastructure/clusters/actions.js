@@ -34,10 +34,6 @@ import { trackEvent } from 'utils/tracking'
 
 const { qbert } = ApiClient.getInstance()
 
-const trackClusterCreation = (params) => {
-  trackEvent('WZ New Cluster Finished', params)
-}
-
 const getProgressPercent = async (clusterId) => {
   try {
     const { progressPercent } = await qbert.getClusterDetails(clusterId)
@@ -127,9 +123,8 @@ const createAwsCluster = async (data, loadFromContext) => {
   const cluster = createGenericCluster(body, data, loadFromContext)
 
   // Placed beneath API call -- send the tracking when the request is successful
-  trackClusterCreation({
-    clusterType: 'aws',
-    clusterName: data.name,
+  trackEvent('WZ New AWS Cluster Finished', {
+    cluster_name: data.name,
   })
 
   return cluster
@@ -162,9 +157,8 @@ const createAzureCluster = async (data, loadFromContext) => {
   const cluster = createGenericCluster(body, data, loadFromContext)
 
   // Placed beneath API call -- send the tracking when the request is successful
-  trackClusterCreation({
-    clusterType: 'aws',
-    clusterName: data.name,
+  trackEvent('WZ New Azure Cluster Finished', {
+    cluster_name: data.name,
   })
 
   return cluster
@@ -200,9 +194,8 @@ const createBareOSCluster = async (data = {}, loadFromContext) => {
   const cluster = await createGenericCluster(body, data, loadFromContext)
 
   // Placed beneath API call -- send the tracking when the request is successful
-  trackClusterCreation({
-    clusterType: 'local',
-    clusterName: data.name,
+  trackEvent('WZ New BareOS Cluster Finished', {
+    cluster_name: data.name,
   })
 
   // 3. Attach the nodes
