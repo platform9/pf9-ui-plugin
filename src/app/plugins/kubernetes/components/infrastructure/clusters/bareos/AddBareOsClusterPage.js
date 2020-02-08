@@ -33,12 +33,7 @@ import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import { routes } from 'core/utils/routes'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import Alert from 'core/components/Alert'
-import {
-  pmkCliOverviewLink,
-  runtimePrivilegedLink,
-  pmkCliPrepNodeLink,
-  pf9PmkArchitectureDigLink,
-} from 'k8s/links'
+import { pmkCliOverviewLink, runtimePrivilegedLink } from 'k8s/links'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
@@ -198,7 +193,7 @@ const AddBareOsClusterPage = () => {
                               <FontAwesomeIcon className={classes.blueIcon} size="md">
                                 code
                               </FontAwesomeIcon>{' '}
-                              <ExternalLink url={pmkCliPrepNodeLink}>See all Options</ExternalLink>
+                              <ExternalLink url={pmkCliOverviewLink}>See all Options</ExternalLink>
                             </div>
                           }
                         >
@@ -264,7 +259,7 @@ const AddBareOsClusterPage = () => {
                             <FontAwesomeIcon className={classes.blueIcon} size="md">
                               code
                             </FontAwesomeIcon>{' '}
-                            <ExternalLink url={pmkCliPrepNodeLink}>See all Options</ExternalLink>
+                            <ExternalLink url={pmkCliOverviewLink}>See all Options</ExternalLink>
                           </div>
                         }
                       >
@@ -295,7 +290,10 @@ const AddBareOsClusterPage = () => {
                               the API server endpoint for this cluster. A virtual IP must be
                               specified if you want to grow the number of masters in the future.
                               Refer to{' '}
-                              <a href={pf9PmkArchitectureDigLink} target="_blank">
+                              <a
+                                href="https://docs.platform9.com/support/ha-for-baremetal-multimaster-kubernetes-cluster-service-type-load-balancer/"
+                                target="_blank"
+                              >
                                 this article
                               </a>{' '}
                               for more information re how the VIP service operates, VIP
