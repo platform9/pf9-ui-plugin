@@ -37,7 +37,8 @@ export class Route<T extends OptionalGenericKVP = null> {
     // nice utility to reconstruct urls from objects / models
     // replace pathname variables (e.g. '/:id') with params when applicable
     if (url.pathname.includes(':')) {
-      ;(url.pathname.match(/:([0-9_a-z]+)/gi) || []).forEach((match) => {
+      const matches = url.pathname.match(/:([0-9_a-z]+)/gi) || []
+      matches.forEach((match) => {
         const key = match.replace(':', '')
         url.pathname = url.pathname.replace(match, fields[key])
         delete fields[key]
@@ -60,9 +61,7 @@ export const routes = {
     edit: new Route<{ id: string }>(`${k8sPrefix}/infrastructure/clusters/edit/:id`),
     detail: new Route<{ id: string }>(`${k8sPrefix}/infrastructure/clusters/:id#clusterDetails`),
     nodes: new Route<{ id: string }>(`${k8sPrefix}/infrastructure/clusters/:id#nodes`),
-    convergingNodes: new Route<{ id: string }>(
-      `${k8sPrefix}/infrastructure/clusters/:id#convergingNodes`,
-    ),
+    nodeHealth: new Route<{ id: string }>(`${k8sPrefix}/infrastructure/clusters/:id#nodeHealth`),
     add: new Route(`${k8sPrefix}/infrastructure/clusters/add`),
     addAws: new Route(`${k8sPrefix}/infrastructure/clusters/addAws`),
     addAzure: new Route(`${k8sPrefix}/infrastructure/clusters/addAzure`),

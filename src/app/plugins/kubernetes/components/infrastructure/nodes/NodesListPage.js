@@ -17,7 +17,6 @@ import DeAuthIcon from '@material-ui/icons/DeleteForever'
 import NodeDeAuthDialog from './NodeDeAuthDialog'
 import SettingsPhoneIcon from '@material-ui/icons/SettingsPhone'
 import RemoteSupportDialog from './RemoteSupportDialog'
-// import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { Tooltip, Typography } from '@material-ui/core'
 import { isAdminRole } from 'k8s/util/helpers'
 import { listTablePrefs, allKey } from 'app/constants'
@@ -156,9 +155,13 @@ const renderClusterLink = (clusterName, { clusterUuid }) =>
     <SimpleLink src={routes.cluster.nodes.path({ id: clusterUuid })}>{clusterName}</SimpleLink>
   )
 
-const renderConverging = () => (
+const renderConverging = (clusterUuid) => (
   <ClusterStatusSpan status="loading" iconStatus>
-    Converging
+    {clusterUuid ? (
+      <SimpleLink src={routes.cluster.nodeHealth.path({ id: clusterUuid })}>Converging</SimpleLink>
+    ) : (
+      'Converging'
+    )}
   </ClusterStatusSpan>
 )
 
@@ -172,9 +175,9 @@ const renderRemoteSupport = () => (
   </Tooltip>
 )
 
-const renderConnectionStatus = (_, { status, combined }) => {
+const renderConnectionStatus = (_, { clusterUuid, status, combined }) => {
   if (status === 'converging') {
-    return renderConverging()
+    return renderConverging(clusterUuid)
   }
 
   const connectionStatus = status === 'disconnected' ? 'disconnected' : 'connected'
@@ -191,22 +194,25 @@ const renderConnectionStatus = (_, { status, combined }) => {
 }
 
 export const renderNodeHealthStatus = (_, node, onClick = undefined) => {
-  const { status } = node
+  const { status, clusterUuid } = node
   if (status === 'converging') {
-    return renderConverging()
+    return renderConverging(clusterUuid)
   }
 
   const healthStatus =
     status === 'disconnected' ? 'unknown' : status === 'ok' ? 'healthy' : 'unhealthy'
   const fields = clusterHealthStatusFields[healthStatus]
 
+  const content = node.clusterUuid ? (
+    <SimpleLink src={routes.cluster.nodeHealth.path({ id: node.clusterUuid })}>
+      {fields.label}
+    </SimpleLink>
+  ) : (
+    fields.label
+  )
   return (
     <ClusterStatusSpan title={fields.label} status={fields.status}>
-      {onClick ? (
-        <SimpleLink onClick={() => onClick(node)}>{fields.label}</SimpleLink>
-      ) : (
-        fields.label
-      )}
+      {onClick ? <SimpleLink onClick={() => onClick(node)}>{fields.label}</SimpleLink> : content}
     </ClusterStatusSpan>
   )
 }
@@ -214,7 +220,7 @@ export const renderNodeHealthStatus = (_, node, onClick = undefined) => {
 const renderRole = (_, { isMaster }) => (isMaster ? 'Master' : 'Worker')
 
 const renderApiServer = (_, { isMaster, api_responding: apiResponding }) =>
-  !!isMaster && (!!apiResponding).toString()
+  castBoolToStr()(!!isMaster && !!apiResponding)
 
 export const renderNetworkInterfaces = (_, node, options = {}) => {
   const { wrapText = false } = options

@@ -119,7 +119,7 @@ const sortNodesByTasks = (prevNode: ICombinedNode, currNode: ICombinedNode) => {
   return prevName.toLowerCase().localeCompare(currName.toLowerCase())
 }
 
-export const ConvergingNodesWithTasksToggler: FC = () => {
+export const NodeHealthWithTasksToggler: FC = () => {
   const { match, location } = useReactRouter()
   const searchParams = new URLSearchParams(location.search)
   const linkedNodeUUID = searchParams.get('node') || null
@@ -167,12 +167,10 @@ export const ConvergingNodesWithTasksToggler: FC = () => {
     tableChooser,
     tablePolling,
   } = useStyles({})
-  const selectedNodeAllTasks =
-    selectedNode?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.all_tasks || []
-  const selectedNodeCompletedTasks =
-    selectedNode?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.completed_tasks || []
-  const lastSelectedNodesFailedTask =
-    selectedNode?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.last_failed_task || []
+  const kubeStatusData = selectedNode?.combined?.resmgr?.extensions?.pf9_kube_status?.data || {}
+  const selectedNodeAllTasks = kubeStatusData.all_tasks || []
+  const selectedNodeCompletedTasks = kubeStatusData.completed_tasks || []
+  const lastSelectedNodesFailedTask = kubeStatusData.last_failed_task || []
   const selectedNodeTitle = `${selectedNode?.name || 'Choose a node to continue'}${
     selectedNode?.isMaster ? ' (master)' : ''
   }`
@@ -197,12 +195,11 @@ export const ConvergingNodesWithTasksToggler: FC = () => {
         <TableBody>
           {nodesInCluster &&
             nodesInCluster.map((node) => {
-              const lastFailedTask =
-                node?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.last_failed_task || null
-              const allTasks =
-                node?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.all_tasks || []
-              const completedTasks =
-                node?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.completed_tasks || []
+              const currNodeKubeStatusData =
+                node?.combined?.resmgr?.extensions?.pf9_kube_status?.data || {}
+              const lastFailedTask = currNodeKubeStatusData.last_failed_task || null
+              const allTasks = currNodeKubeStatusData.all_tasks || []
+              const completedTasks = currNodeKubeStatusData.completed_tasks || []
               const percentComplete = (completedTasks.length / allTasks.length) * 100
               const lastCompletedStep = allTasks[completedTasks.length - 1]
               const { color: progressColor, message: progressLabel } = getTaskContent(
