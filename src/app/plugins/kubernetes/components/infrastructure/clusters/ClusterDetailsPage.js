@@ -213,7 +213,7 @@ const HeaderCard = ({ title, subtitle, icon, loading = false, links, children })
         )}
         {!!links.kubeconfig && (
           <DownloadKubeConfigLink
-            icon="cogs"
+            icon="lock"
             className={classes.verticalLink}
             cluster={links.kubeconfig.cluster}
           />

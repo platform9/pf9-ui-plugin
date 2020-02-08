@@ -15,16 +15,17 @@ import ProgressBar from 'core/components/progress/ProgressBar'
 import Theme from 'core/themes/model'
 import { makeStyles } from '@material-ui/styles'
 import ExternalLink from 'core/components/ExternalLink'
-import { Tasks } from '../clusters/TaskStatusDialog'
+import { Tasks, NodeTaskStatus } from '../clusters/TaskStatusDialog'
 import pluck from 'ramda/es/pluck'
 import { emptyArr } from 'utils/fp'
 import { clusterActions } from '../clusters/actions'
 import { loadNodes } from './actions'
 import useDataLoader from 'core/hooks/useDataLoader'
 import PollingData from 'core/components/PollingData'
-import { IUseDataLoader, ICombinedNode } from './model'
+import { IUseDataLoader, ICombinedNode, IKubeNodeState } from './model'
 import { ICluster } from '../clusters/model'
 import { renderNodeHealthStatus } from './NodesListPage'
+import { nodeInstallTroubleshooting } from 'k8s/links'
 
 const useStyles = makeStyles<Theme, {}>((theme) => ({
   gridContainer: {
@@ -171,9 +172,20 @@ export const NodeHealthWithTasksToggler: FC = () => {
   const selectedNodeAllTasks = kubeStatusData.all_tasks || []
   const selectedNodeCompletedTasks = kubeStatusData.completed_tasks || []
   const lastSelectedNodesFailedTask = kubeStatusData.last_failed_task || []
+  const nodeState = kubeStatusData.pf9_kube_node_state as IKubeNodeState
   const selectedNodeTitle = `${selectedNode?.name || 'Choose a node to continue'}${
     selectedNode?.isMaster ? ' (master)' : ''
   }`
+  const shouldShowStateStatus = !!nodeState && nodeState !== 'ok'
+  const selectedNodeStatus = shouldShowStateStatus ? (
+    <NodeTaskStatus status={nodeState}>
+      {nodeState.includes('fail') && (
+        <ExternalLink url={nodeInstallTroubleshooting}>Troubleshooting Help</ExternalLink>
+      )}
+    </NodeTaskStatus>
+  ) : (
+    renderNodeHealthStatus(null, selectedNode || {})
+  )
 
   return (
     <div className={tableChooser}>
@@ -245,14 +257,12 @@ export const NodeHealthWithTasksToggler: FC = () => {
               <Typography variant="h6">{selectedNodeTitle}</Typography>
             </Tooltip>
             {!!selectedNode && (
-              <ExternalLink url={selectedNode?.logs} icon="clipboard-list">
+              <ExternalLink url={selectedNode?.logs || ''} icon="clipboard-list">
                 View Logs
               </ExternalLink>
             )}
           </div>
-          <div className={paneHeaderStatus}>
-            {!!selectedNode && renderNodeHealthStatus(null, selectedNode)}
-          </div>
+          <div className={paneHeaderStatus}>{!!selectedNode && selectedNodeStatus}</div>
         </header>
         <article className={paneBody}>
           {selectedNode && (
@@ -260,6 +270,7 @@ export const NodeHealthWithTasksToggler: FC = () => {
               allTasks={selectedNodeAllTasks}
               lastFailedTask={lastSelectedNodesFailedTask}
               completedTasks={selectedNodeCompletedTasks}
+              logs={selectedNode?.logs}
             />
           )}
         </article>

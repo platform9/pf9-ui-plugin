@@ -103,9 +103,9 @@ const KubeConfigListPage = () => {
         link={
           <div>
             <FontAwesomeIcon className={classes.blueIcon} size="md">
-              cogs
+              lock
             </FontAwesomeIcon>{' '}
-            <ExternalLink url={kubeconfigFileLink}>What is KubeConfig?</ExternalLink>
+            <ExternalLink url={kubeconfigFileLink}>KubeConfig & Client Help</ExternalLink>
           </div>
         }
       >
