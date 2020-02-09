@@ -31,11 +31,17 @@ import {
 import { tryCatchAsync } from 'utils/async'
 import { emptyArr, emptyObj, objSwitchCase, pathStr, upsertAllBy } from 'utils/fp'
 import { castBoolToStr } from 'utils/misc'
+import { uuidRegex, originUsernameRegex } from 'app/constants'
 
 const { keystone, clemency } = ApiClient.getInstance()
 
 export const isSystemUser = ({ username }) => {
-  return username === 'kplane-clustmgr'
+  const { groups = {} } = originUsernameRegex.exec(window.location.origin) || {}
+  const { originUsername = null } = groups
+  const isOriginUsername = username.includes(originUsername)
+
+  const isUuid = uuidRegex.test(username)
+  return isOriginUsername || isUuid || username === 'kplane-clustmgr'
 }
 export const mngmCredentialsCacheKey = 'managementCredentials'
 createContextLoader(

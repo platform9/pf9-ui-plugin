@@ -12,7 +12,6 @@ import {
   forumHelpLink,
 } from 'k8s/links'
 import ExternalLink from 'core/components/ExternalLink'
-import clsx from 'clsx'
 import { hexToRGBA } from 'core/utils/colorHelpers'
 
 const useStyles = makeStyles((theme) => ({
@@ -71,27 +70,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const SlackSVG = () => {
-  const classes = useStyles()
-  return (
-    <svg
-      aria-hidden="true"
-      focusable="false"
-      data-prefix="fab"
-      data-icon="slack-hash"
-      role="img"
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 448 512"
-      className={clsx(classes.svgIcon, 'svg-inline--fa fa-slack-hash fa-w-14 fa-3x')}
-    >
-      <path
-        fill="currentColor"
-        d="M446.2 270.4c-6.2-19-26.9-29.1-46-22.9l-45.4 15.1-30.3-90 45.4-15.1c19.1-6.2 29.1-26.8 23-45.9-6.2-19-26.9-29.1-46-22.9l-45.4 15.1-15.7-47c-6.2-19-26.9-29.1-46-22.9-19.1 6.2-29.1 26.8-23 45.9l15.7 47-93.4 31.2-15.7-47c-6.2-19-26.9-29.1-46-22.9-19.1 6.2-29.1 26.8-23 45.9l15.7 47-45.3 15c-19.1 6.2-29.1 26.8-23 45.9 5 14.5 19.1 24 33.6 24.6 6.8 1 12-1.6 57.7-16.8l30.3 90L78 354.8c-19 6.2-29.1 26.9-23 45.9 5 14.5 19.1 24 33.6 24.6 6.8 1 12-1.6 57.7-16.8l15.7 47c5.9 16.9 24.7 29 46 22.9 19.1-6.2 29.1-26.8 23-45.9l-15.7-47 93.6-31.3 15.7 47c5.9 16.9 24.7 29 46 22.9 19.1-6.2 29.1-26.8 23-45.9l-15.7-47 45.4-15.1c19-6 29.1-26.7 22.9-45.7zm-254.1 47.2l-30.3-90.2 93.5-31.3 30.3 90.2-93.5 31.3z"
-        className=""
-      />
-    </svg>
-  )
-}
+const brandIcons = ['slack-hash']
 
 const SupportCard = ({ title, icon, body = '', src, action }) => {
   const classes = useStyles()
@@ -101,11 +80,9 @@ const SupportCard = ({ title, icon, body = '', src, action }) => {
         <Typography variant="subtitle2" className={classes.title}>
           {title}
         </Typography>
-        {icon === 'slack-hash' ? (
-          <SlackSVG />
-        ) : (
-          <FontAwesomeIcon className={classes.icon}>{icon}</FontAwesomeIcon>
-        )}
+        <FontAwesomeIcon brand={brandIcons.includes(icon)} className={classes.icon}>
+          {icon}
+        </FontAwesomeIcon>
       </header>
       <article className={classes.cardBody}>
         <Typography variant="body1">{body}</Typography>
@@ -161,10 +138,10 @@ const HelpPage = () => {
       <Divider />
       <div className={classes.cardRow}>
         <SupportCard
-          title="Reach out on Slack"
-          icon="slack-hash"
-          src={slackLink}
-          action="Open Slack"
+          title="Join our Forums"
+          icon="comments"
+          src={forumHelpLink}
+          action="Go to forum"
         />
         <SupportCard
           title="Send us an Email"
@@ -173,10 +150,10 @@ const HelpPage = () => {
           action="Send Email"
         />
         <SupportCard
-          title="Join our Forums"
-          icon="comments"
-          src={forumHelpLink}
-          action="Go to forum"
+          title="Reach out on Slack"
+          icon="slack-hash"
+          src={slackLink}
+          action="Open Slack"
         />
       </div>
     </>

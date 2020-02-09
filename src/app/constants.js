@@ -27,6 +27,7 @@ export const uuidRegex = new RegExp(
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/,
   'i',
 )
+export const originUsernameRegex = new RegExp(/:\/\/(?<originUsername>(.+?)).platform9./, 'i')
 
 export const k8sPrefix = `${appUrlRoot}/kubernetes`
 
