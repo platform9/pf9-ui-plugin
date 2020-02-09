@@ -20,8 +20,8 @@ import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import ExternalLink from 'core/components/ExternalLink'
 import { clusterActions } from '../infrastructure/clusters/actions'
-import { CloudProvidersFriendlyName } from './../infrastructure/clusters/model'
 import { propEq } from 'ramda'
+import { CloudProvidersFriendlyName } from '../infrastructure/cloudProviders/model'
 
 const initialContext = {
   isDefault: false,
@@ -89,6 +89,10 @@ const BasicStep = ({ onSubmit, triggerSubmit, wizardContext }) => {
     onSubmit({ clusterType })
   }, [params.clusterId])
 
+  const cloudProviderName = wizardContext.clusterType
+    ? CloudProvidersFriendlyName[wizardContext.clusterType]
+    : ''
+
   return (
     <WizardStep stepId="basic" label="Basic">
       <ValidatedForm onSubmit={onSubmit} triggerSubmit={triggerSubmit}>
@@ -111,7 +115,7 @@ const BasicStep = ({ onSubmit, triggerSubmit, wizardContext }) => {
                 label="Cloud provider"
                 info="Cloud provider."
                 disabled
-                value={CloudProvidersFriendlyName[wizardContext.clusterType]}
+                value={cloudProviderName}
               />
               {wizardContext.clusterType === 'aws' && (
                 <PicklistField
