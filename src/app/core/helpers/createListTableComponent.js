@@ -3,6 +3,7 @@ import { withRouter } from 'react-router-dom'
 import ListTable from 'core/components/listTable/ListTable'
 import { withScopedPreferences } from 'core/providers/PreferencesProvider'
 import { compose } from 'ramda'
+import NoContentMessage from 'core/components/NoContentMessage'
 
 const createListTableComponent = ({
   title,
@@ -31,9 +32,9 @@ const createListTableComponent = ({
   }) =>
     !data || data.length === 0 ? (
       typeof emptyText === 'string' ? (
-        <h1>{emptyText}</h1>
+        <NoContentMessage message={emptyText} />
       ) : (
-        emptyText
+        <NoContentMessage>{emptyText}</NoContentMessage>
       )
     ) : (
       <ListTable

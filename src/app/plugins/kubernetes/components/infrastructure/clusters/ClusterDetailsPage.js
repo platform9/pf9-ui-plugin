@@ -116,6 +116,9 @@ const useStyles = makeStyles((theme) => ({
       fontSize: theme.spacing(3),
     },
   },
+  tabContainer: {
+    paddingTop: theme.spacing(2),
+  },
 }))
 
 const ClusterDetailsPage = () => {
@@ -136,13 +139,19 @@ const ClusterDetailsPage = () => {
         <ClusterStatusAndUsage cluster={cluster} loading={loading} />
         <Tabs>
           <Tab value="nodes" label="Nodes">
-            <ClusterNodes />
+            <div className={classes.tabContainer}>
+              <ClusterNodes />
+            </div>
           </Tab>
           <Tab value="nodeHealth" label="Node Health">
-            <NodeHealthWithTasksToggler />
+            <div className={classes.tabContainer}>
+              <NodeHealthWithTasksToggler />
+            </div>
           </Tab>
           <Tab value="clusterDetails" label="Cluster Details">
-            <ClusterInfo />
+            <div className={classes.tabContainer}>
+              <ClusterInfo />
+            </div>
           </Tab>
         </Tabs>
       </>
