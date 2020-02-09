@@ -35,16 +35,17 @@ const AddPrometheusInstanceForm = ({ onComplete }) => {
   const { params, getParamsUpdater } = useParams(defaultParams)
   const [rules, setRules] = useState(emptyArr)
   const handleAddRule = useCallback(
-    rule => {
+    (rule) => {
       const withId = { id: uuid.v4(), ...rule }
       setRules([...rules, withId])
-    }, [rules])
+    },
+    [rules],
+  )
   const handleDeleteRule = useCallback(
-    id => setRules(removeWith(rule => rule.id === id, rules)),
-    [rules])
-  const handleSubmit = useCallback(
-    data => onComplete({ ...data, rules }),
-    [rules])
+    (id) => setRules(removeWith((rule) => rule.id === id, rules)),
+    [rules],
+  )
+  const handleSubmit = useCallback((data) => onComplete({ ...data, rules }), [rules])
 
   return (
     <Wizard onComplete={handleSubmit} context={initialContext}>
@@ -52,13 +53,31 @@ const AddPrometheusInstanceForm = ({ onComplete }) => {
         return (
           <React.Fragment>
             <WizardStep stepId="instance" label="Prometheus Instance">
-              <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
+              <ValidatedForm
+                initialValues={wizardContext}
+                onSubmit={setWizardContext}
+                triggerSubmit={onNext}
+              >
                 <TextField id="name" label="Name" info="Name of the Prometheus instance" />
-                <TextField id="replicas" label="Replicas" info="Number of Prometheus replicas" type="number" />
-                <TextField id="cpu" label="CPU" info="Expressed in millicores (1m = 1/1000th of a core)" />
+                <TextField
+                  id="replicas"
+                  label="Replicas"
+                  info="Number of Prometheus replicas"
+                  type="number"
+                />
+                <TextField
+                  id="cpu"
+                  label="CPU"
+                  info="Expressed in millicores (1m = 1/1000th of a core)"
+                />
                 <TextField id="memory" label="Memory" info="MiB of memory to allocate" />
-                {enableStorage &&
-                <TextField id="storage" label="Storage" info="The storage allocation.  Default is 8 GiB" />}
+                {enableStorage && (
+                  <TextField
+                    id="storage"
+                    label="Storage"
+                    info="The storage allocation.  Default is 8 GiB"
+                  />
+                )}
                 <PicklistField
                   DropdownComponent={ClusterPicklist}
                   id="cluster"
@@ -93,16 +112,30 @@ const AddPrometheusInstanceForm = ({ onComplete }) => {
                   value={params.serviceId}
                   info="Prometheus will use this to query metrics endpoints"
                 />
-                {enableStorage &&
-                <CheckboxField id="enablePersistentStorage" label="Enable persistent storage" />}
-                <TextField id="retention" label="Storage Retention (days)" info="Defaults to 15 days if nothing is set" />
-                <TextField id="port" label="Metrics Exporter Port" info="Name of Prometheus Exporter Port for fetching application merices" />
-                <KeyValuesField id="appLabels" label="App Labels" info="Key/value pairs for app that Prometheus will monitor" />
+                {enableStorage && (
+                  <CheckboxField id="enablePersistentStorage" label="Enable persistent storage" />
+                )}
+                <TextField
+                  id="retention"
+                  label="Storage Retention (days)"
+                  info="Defaults to 15 days if nothing is set"
+                />
+                <TextField
+                  id="port"
+                  label="Metrics Exporter Port"
+                  info="Name of Prometheus Exporter Port for fetching application merices"
+                />
+                <KeyValuesField
+                  id="appLabels"
+                  label="App Labels"
+                  info="Key/value pairs for app that Prometheus will monitor"
+                />
               </ValidatedForm>
             </WizardStep>
             <WizardStep stepId="config" label="Configure Alerting">
-              {rules.length > 0 &&
-              <PrometheusRulesTable rules={rules} onDelete={handleDeleteRule} />}
+              {rules.length > 0 && (
+                <PrometheusRulesTable rules={rules} onDelete={handleDeleteRule} />
+              )}
               <PrometheusRuleForm onSubmit={handleAddRule} />
             </WizardStep>
           </React.Fragment>

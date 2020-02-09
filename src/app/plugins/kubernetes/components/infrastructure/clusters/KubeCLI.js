@@ -10,7 +10,7 @@ import SimpleLink from 'core/components/SimpleLink'
 
 const styles = {
   appBar: {
-    position: 'relative'
+    position: 'relative',
   },
   flex: {
     flex: 1,
@@ -18,7 +18,7 @@ const styles = {
   iframe: {
     width: '95%',
     height: '95%',
-  }
+  },
 }
 
 const Transition = forwardRef((props, ref) => <Slide direction="up" {...props} ref={ref} />)
@@ -33,14 +33,14 @@ class KubeCLI extends React.PureComponent {
     this.setState({ url, open: true })
   }
 
-  handleClose = e => {
+  handleClose = (e) => {
     // Need to stop the bubbling so the row does not get selected in the table
     e.preventDefault()
     e.stopPropagation()
     this.setState({ open: false })
   }
 
-  render () {
+  render() {
     const { classes } = this.props
     return (
       <div>
@@ -56,7 +56,9 @@ class KubeCLI extends React.PureComponent {
               <IconButton color="inherit" onClick={this.handleClose}>
                 <CloseIcon />
               </IconButton>
-              <Typography variant="h6" color="inherit" className={classes.flex}>KubeCLI</Typography>
+              <Typography variant="h6" color="inherit" className={classes.flex}>
+                KubeCLI
+              </Typography>
             </Toolbar>
           </AppBar>
           <iframe className={classes.iframe} src={this.state.url} />
@@ -71,7 +73,4 @@ KubeCLI.propTypes = {
   cluster: PropTypes.object.isRequired,
 }
 
-export default compose(
-  withAppContext,
-  withStyles(styles),
-)(KubeCLI)
+export default compose(withAppContext, withStyles(styles))(KubeCLI)

@@ -29,7 +29,7 @@ interface ToastItemProps {
   [key: string]: any // ...rest props
 }
 
-const useStyles = makeStyles<Theme>(theme => ({
+const useStyles = makeStyles<Theme>((theme) => ({
   content: {
     display: 'flex',
     flexFlow: 'row nowrap',
@@ -60,7 +60,7 @@ const useStyles = makeStyles<Theme>(theme => ({
   text: {
     display: 'inline-block',
   },
-  close: {}
+  close: {},
 }))
 
 const renderMessages = pipe(
@@ -70,7 +70,14 @@ const renderMessages = pipe(
   map(([key, msg]) => <div key={key}>{msg}</div>),
 )
 
-const ToastItem: FunctionComponent<ToastItemProps> = ({ message, variant, toastsTimeout, onClose, className, ...rest }) => {
+const ToastItem: FunctionComponent<ToastItemProps> = ({
+  message,
+  variant,
+  toastsTimeout,
+  onClose,
+  className,
+  ...rest
+}) => {
   const classes = useStyles({})
   const Icon = variantIcon[variant]
   useEffect(() => {
@@ -78,29 +85,30 @@ const ToastItem: FunctionComponent<ToastItemProps> = ({ message, variant, toasts
     return () => clearTimeout(timeoutId)
   }, [])
 
-  return <SnackbarContent
-    className={clsx(classes.content, classes[variant], className)}
-    message={
-      <span className={classes.message}>
-        <Icon className={clsx(classes.icon, classes.iconVariant)} />
-        <div className={classes.text}>
-          {renderMessages(message)}
-        </div>
-      </span>
-    }
-    action={
-      <IconButton
-        key="close"
-        aria-label="Close"
-        color="inherit"
-        size="small"
-        className={classes.close}
-        onClick={onClose}
-      >
-        <CloseIcon className={classes.icon} />
-      </IconButton>}
-    {...rest}
-  />
+  return (
+    <SnackbarContent
+      className={clsx(classes.content, classes[variant], className)}
+      message={
+        <span className={classes.message}>
+          <Icon className={clsx(classes.icon, classes.iconVariant)} />
+          <div className={classes.text}>{renderMessages(message)}</div>
+        </span>
+      }
+      action={
+        <IconButton
+          key="close"
+          aria-label="Close"
+          color="inherit"
+          size="small"
+          className={classes.close}
+          onClick={onClose}
+        >
+          <CloseIcon className={classes.icon} />
+        </IconButton>
+      }
+      {...rest}
+    />
+  )
 }
 
 export default ToastItem

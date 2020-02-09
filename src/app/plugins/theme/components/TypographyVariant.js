@@ -7,11 +7,12 @@ import { withAppContext } from 'core/providers/AppProvider'
 class TypographyVariant extends React.PureComponent {
   lens = () => lensPath(this.props.path.split('.'))
 
-  handleChange = color => this.props.setContext({
-    theme: set(this.lens(), color.hex, this.props.theme)
-  })
+  handleChange = (color) =>
+    this.props.setContext({
+      theme: set(this.lens(), color.hex, this.props.theme),
+    })
 
-  render () {
+  render() {
     const { variant } = this.props
     return (
       <div>
@@ -25,6 +26,4 @@ TypographyVariant.propTypes = {
   variant: PropTypes.string.isRequired,
 }
 
-export default compose(
-  withAppContext,
-)(TypographyVariant)
+export default compose(withAppContext)(TypographyVariant)

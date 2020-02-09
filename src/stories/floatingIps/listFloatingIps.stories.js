@@ -23,8 +23,6 @@ addStories('Floating IP Management/Listing floating IPs', {
   'With pagination': () => {
     const numFloatingIps = number('numFloatingIps', 7, { range: true, min: 0, max: 15, step: 1 })
     const floatingIps = range(numFloatingIps).map(fakeFloatingIp)
-    return (
-      <FloatingIpsList data={floatingIps} onAdd={addAction} onDelete={deleteAction} />
-    )
+    return <FloatingIpsList data={floatingIps} onAdd={addAction} onDelete={deleteAction} />
   },
 })

@@ -7,14 +7,14 @@ import { listTablePrefs, allKey } from 'app/constants'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { pick } from 'ramda'
 import NamespacePicklist from 'k8s/components/common/NamespacePicklist'
-import { secondsToString } from 'utils/misc'
-import moment from 'moment'
 import renderLabels from 'k8s/components/pods/renderLabels'
 import ExternalLink from 'core/components/ExternalLink'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
+import DateCell from 'core/components/listTable/cells/DateCell'
 
 const defaultParams = {
   masterNodeClusters: true,
+  clusterId: allKey,
 }
 const usePrefParams = createUsePrefParamsHook('Deployments', listTablePrefs)
 
@@ -22,49 +22,56 @@ const ListPage = ({ ListContainer }) => {
   return () => {
     const { params, updateParams, getParamsUpdater } = usePrefParams(defaultParams)
     const [data, loading, reload] = useDataLoader(deploymentActions.list, params)
-    const updateClusterId = useCallback(clusterId => {
+    const updateClusterId = useCallback((clusterId) => {
       updateParams({
         clusterId,
-        namespace: allKey
+        namespace: allKey,
       })
     }, [])
-    return <ListContainer
-      loading={loading}
-      reload={reload}
-      data={data}
-      getParamsUpdater={getParamsUpdater}
-      filters={<>
-        <ClusterPicklist
-          onChange={updateClusterId}
-          value={params.clusterId}
-          onlyMasterNodeClusters
-        />
-        <NamespacePicklist
-          selectFirst={false}
-          onChange={getParamsUpdater('namespace')}
-          value={params.namespace}
-          clusterId={params.clusterId}
-          disabled={!params.clusterId}
-        />
-      </>}
-      {...pick(listTablePrefs, params)}
-    />
+    return (
+      <ListContainer
+        loading={loading}
+        reload={reload}
+        data={data}
+        getParamsUpdater={getParamsUpdater}
+        filters={
+          <>
+            <ClusterPicklist
+              selectFirst={false}
+              onChange={updateClusterId}
+              value={params.clusterId}
+              onlyMasterNodeClusters
+            />
+            <NamespacePicklist
+              selectFirst={false}
+              onChange={getParamsUpdater('namespace')}
+              value={params.namespace}
+              clusterId={params.clusterId}
+              disabled={!params.clusterId}
+            />
+          </>
+        }
+        {...pick(listTablePrefs, params)}
+      />
+    )
   }
 }
 
 const renderName = (name, { dashboardUrl }) => {
-  return <span>
-    {name}<br />
-    <ExternalLink url={dashboardUrl}>dashboard
-      <FontAwesomeIcon size="sm">file-alt</FontAwesomeIcon></ExternalLink>
-  </span>
-}
-
-const renderAge = created => {
-  return secondsToString(moment().diff(created, 's'))
+  return (
+    <span>
+      {name}
+      <br />
+      <ExternalLink url={dashboardUrl}>
+        <FontAwesomeIcon size="md">file-alt</FontAwesomeIcon>
+        dashboard
+      </ExternalLink>
+    </span>
+  )
 }
 
 export const options = {
+  showCheckboxes: false, // until we have actions to perform, disable this
   loaderFn: deploymentActions.list,
   deleteFn: deploymentActions.delete,
   deleteCond: () => false,
@@ -78,7 +85,7 @@ export const options = {
     { id: 'labels', label: 'Labels', render: renderLabels('label') },
     { id: 'selectors', label: 'Selectors', render: renderLabels('selector') },
     { id: 'pods', label: 'Pods' },
-    { id: 'created', label: 'Age', render: renderAge },
+    { id: 'created', label: 'Age', render: (value) => <DateCell value={value} showToolTip /> },
   ],
   name: 'Deployments',
   title: 'Deployments',

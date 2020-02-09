@@ -10,8 +10,8 @@ const getNamespaces = (req, res) => {
     kind: 'NamespaceList',
     metadata: {
       resourceVersion: '5201088',
-      selfLink: '/api/v1/namespaces'
-    }
+      selfLink: '/api/v1/namespaces',
+    },
   }
   return res.send(response)
 }

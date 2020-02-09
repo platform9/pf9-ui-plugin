@@ -2,11 +2,11 @@ import React from 'react'
 import Button from '@material-ui/core/Button'
 import { withStyles } from '@material-ui/styles'
 
-const styles = theme => ({
+const styles = (theme) => ({
   baseButton: {
     margin: theme.spacing(1),
     borderRadius: 2,
-  }
+  },
 })
 
 const SubmitButton = ({ children, classes, disabled, ...rest }) => {
@@ -18,7 +18,11 @@ const SubmitButton = ({ children, classes, disabled, ...rest }) => {
     ...rest,
   }
 
-  return <Button type="submit" {...params}>{children || 'Submit'}</Button>
+  return (
+    <Button type="submit" {...params}>
+      {children || 'Submit'}
+    </Button>
+  )
 }
 
 export default withStyles(styles)(SubmitButton)

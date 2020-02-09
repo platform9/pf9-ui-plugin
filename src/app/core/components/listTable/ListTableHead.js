@@ -8,7 +8,7 @@ import { compose } from 'utils/fp'
 import { withStyles } from '@material-ui/styles'
 import clsx from 'clsx'
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     // backgroundColor: theme.palette.grey[50],
     fontWeight: 'bold',
@@ -40,26 +40,26 @@ const styles = theme => ({
 })
 
 class ListTableHead extends React.PureComponent {
-  createSortHandler = moize(id => event => {
+  createSortHandler = moize((id) => (event) => {
     const { onRequestSort } = this.props
     if (onRequestSort) {
       onRequestSort(event, id)
     }
   })
 
-  createDragHandler = moize(id => e => {
+  createDragHandler = moize((id) => (e) => {
     e.dataTransfer.setData('columnId', id)
     this.setState(assoc('dragging', true))
   })
 
-  createDropHandler = moize(id => e => {
+  createDropHandler = moize((id) => (e) => {
     const sourceColumnId = e.dataTransfer.getData('columnId')
     this.props.onColumnsSwitch(sourceColumnId, id)
   })
 
-  handleDragOver = e => e.preventDefault()
+  handleDragOver = (e) => e.preventDefault()
 
-  render () {
+  render() {
     const {
       classes,
       canDragColumns,
@@ -76,35 +76,37 @@ class ListTableHead extends React.PureComponent {
     } = this.props
 
     const renderHeaderCheckbox = !blankFirstColumn && showCheckboxes
-    const headerCheckbox = !renderHeaderCheckbox
-      ? null
-      : <TableCell padding="checkbox" key="_checkAll" className={clsx(classes.cellLabel,
-        classes.checkAllCell)}>
-        {multiSelection &&
+    const headerCheckbox = !renderHeaderCheckbox ? null : (
+      <TableCell
+        padding="checkbox"
+        key="_checkAll"
+        className={clsx(classes.cellLabel, classes.checkAllCell)}
+      >
+        {multiSelection && (
           <label className={classes.checkboxCell}>
             <Checkbox
               className={classes.checkbox}
               indeterminate={!checked && numSelected > 0 && numSelected < rowCount}
               checked={checked}
               onChange={onSelectAllClick}
-              color='primary'
+              color="primary"
             />
             {numSelected > 0 ? <span>({numSelected})</span> : null}
           </label>
-        }
+        )}
       </TableCell>
+    )
 
-    const firstBlank = blankFirstColumn ? <TableCell
-      padding="checkbox"
-      key="_checkAll"
-      className={classes.cellLabel} /> : null
+    const firstBlank = blankFirstColumn ? (
+      <TableCell padding="checkbox" key="_checkAll" className={classes.cellLabel} />
+    ) : null
 
     return (
       <TableHead className={classes.root}>
         <TableRow>
           {headerCheckbox}
           {firstBlank}
-          {columns.map((column, idx) =>
+          {columns.map((column, idx) => (
             <TableCell
               className={classes.cellLabel}
               draggable={canDragColumns}
@@ -121,8 +123,8 @@ class ListTableHead extends React.PureComponent {
                 placement={column.numeric ? 'bottom-end' : 'bottom-start'}
                 enterDelay={300}
               >
-                {!column.disableSorting
-                  ? <TableSortLabel
+                {!column.disableSorting ? (
+                  <TableSortLabel
                     className={classes.headLabel}
                     active={orderBy === column.id}
                     direction={order}
@@ -130,9 +132,14 @@ class ListTableHead extends React.PureComponent {
                   >
                     {column.label} {idx === 0 ? `(${rowCount})` : ''}
                   </TableSortLabel>
-                  : <span>{column.label} {idx === 0 ? `(${rowCount})` : ''}</span>}
+                ) : (
+                  <span>
+                    {column.label} {idx === 0 ? `(${rowCount})` : ''}
+                  </span>
+                )}
               </Tooltip>
-            </TableCell>)}
+            </TableCell>
+          ))}
         </TableRow>
       </TableHead>
     )
@@ -140,14 +147,16 @@ class ListTableHead extends React.PureComponent {
 }
 
 ListTableHead.propTypes = {
-  columns: PropTypes.arrayOf(PropTypes.shape({
-    id: PropTypes.string,
-    label: PropTypes.string,
-    tooltip: PropTypes.string,
-    display: PropTypes.bool,
-    excluded: PropTypes.bool,
-    disableSorting: PropTypes.bool,
-  })).isRequired,
+  columns: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string,
+      label: PropTypes.string,
+      tooltip: PropTypes.string,
+      display: PropTypes.bool,
+      excluded: PropTypes.bool,
+      disableSorting: PropTypes.bool,
+    }),
+  ).isRequired,
   canDragColumns: PropTypes.bool,
   onColumnsSwitch: PropTypes.func,
   numSelected: PropTypes.number,
@@ -164,6 +173,4 @@ ListTableHead.defaultProps = {
   numSelected: 0,
 }
 
-export default compose(
-  withStyles(styles),
-)(ListTableHead)
+export default compose(withStyles(styles))(ListTableHead)

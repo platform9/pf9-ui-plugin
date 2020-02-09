@@ -5,8 +5,5 @@ import { addStoriesFromModule } from '../helpers'
 const addStories = addStoriesFromModule(module)
 
 addStories('Charts', {
-  Squares: () => (
-    <SquaresGraph
-      num={13} label={'13 active networks'} />
-  )
+  Squares: () => <SquaresGraph num={13} label={'13 active networks'} />,
 })

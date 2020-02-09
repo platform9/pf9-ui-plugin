@@ -10,10 +10,18 @@ import PageContainer from 'core/components/pageContainer/PageContainer'
 const RbacIndexPage = () => (
   <PageContainer>
     <Tabs>
-      <Tab value="roles" label="Roles"><RolesListPage /></Tab>
-      <Tab value="clusterRoles" label="Cluster Roles"><ClusterRolesListPage /></Tab>
-      <Tab value="roleBindings" label="Role Bindings"><RoleBindingsListPage /></Tab>
-      <Tab value="clusterRoleBindings" label="Cluster Role Bindings"><ClusterRoleBindingsListPage /></Tab>
+      <Tab value="roles" label="Roles">
+        <RolesListPage />
+      </Tab>
+      <Tab value="clusterRoles" label="Cluster Roles">
+        <ClusterRolesListPage />
+      </Tab>
+      <Tab value="roleBindings" label="Role Bindings">
+        <RoleBindingsListPage />
+      </Tab>
+      <Tab value="clusterRoleBindings" label="Cluster Role Bindings">
+        <ClusterRoleBindingsListPage />
+      </Tab>
     </Tabs>
   </PageContainer>
 )

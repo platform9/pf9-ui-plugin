@@ -19,14 +19,15 @@ import useDataUpdater from 'core/hooks/useDataUpdater'
 import useParams from 'core/hooks/useParams'
 import useReactRouter from 'use-react-router'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
+import { runtimePrivilegedLink } from 'k8s/links'
 import { pathJoin } from 'utils/misc'
-import { k8sPrefix, runtimePrivileged, defaultEtcBackupPath } from 'app/constants'
+import { defaultEtcBackupPath, k8sPrefix } from 'app/constants'
 import ExternalLink from 'core/components/ExternalLink'
 import Code from 'core/components/CodeBlock'
 import { cloudProviderActions } from '../cloudProviders/actions'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { PromptToAddProvider } from '../cloudProviders/PromptToAddProvider'
-import { CloudProviders } from './model'
+import { CloudProviders } from '../cloudProviders/model'
 import EtcdBackupFields from './EtcdBackupFields'
 import { makeStyles } from '@material-ui/styles'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
@@ -35,7 +36,7 @@ import Alert from 'core/components/Alert'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   formWidth: {
     width: 715,
   },
@@ -44,11 +45,11 @@ const useStyles = makeStyles(theme => ({
   },
   inputWidth: {
     maxWidth: 350,
-    marginBottom: theme.spacing(3)
+    marginBottom: theme.spacing(3),
   },
   inline: {
     display: 'grid',
-  }
+  },
 }))
 
 const initialContext = {
@@ -96,7 +97,7 @@ const runtimeConfigOptions = [
 // small (single dev) - 1 node master + worker - select instance type (default t2.small)
 // medium (internal team) - 1 master + 3 workers - select instance (default t2.medium)
 // large (production) - 3 master + 5 workers - no workload on masters (default t2.large)
-const handleTemplateChoice = ({ setWizardContext, setFieldValue, paramUpdater }) => option => {
+const handleTemplateChoice = ({ setWizardContext, setFieldValue, paramUpdater }) => (option) => {
   const options = {
     small: {
       numMasters: 1,
@@ -149,31 +150,47 @@ const AddAzureClusterPage = () => {
   const { params, getParamsUpdater } = useParams()
   const { history } = useReactRouter()
   const onComplete = () => history.push(routes.cluster.list.path())
-  const [createAzureClusterAction, creatingAzureCluster] = useDataUpdater(clusterActions.create, onComplete)
-  const handleSubmit = params => data => createAzureClusterAction({ ...data, ...params, clusterType: CloudProviders.Azure })
+  const [createAzureClusterAction, creatingAzureCluster] = useDataUpdater(
+    clusterActions.create,
+    onComplete,
+  )
+  const handleSubmit = (params) => (data) =>
+    createAzureClusterAction({ ...data, ...params, clusterType: CloudProviders.Azure })
 
   const [cloudProviders, loading] = useDataLoader(cloudProviderActions.list)
-  const hasAzureProvider = !!cloudProviders.some(provider => provider.type === CloudProviders.Azure)
+  const hasAzureProvider = !!cloudProviders.some(
+    (provider) => provider.type === CloudProviders.Azure,
+  )
   return (
-    <FormWrapper title="Add Azure Cluster" backUrl={listUrl} loading={creatingAzureCluster || loading} message={loading ? 'loading...' : 'Submitting form...'}>
-      <Wizard disableNext={!hasAzureProvider} onComplete={handleSubmit(params)} context={initialContext} originPath={routes.cluster.add.path()} showFinishAndReviewButton>
+    <FormWrapper
+      title="Add Azure Cluster"
+      backUrl={listUrl}
+      loading={creatingAzureCluster || loading}
+      message={loading ? 'loading...' : 'Submitting form...'}
+    >
+      <Wizard
+        disableNext={!hasAzureProvider}
+        onComplete={handleSubmit(params)}
+        context={initialContext}
+        originPath={routes.cluster.add.path()}
+        showFinishAndReviewButton
+      >
         {({ wizardContext, setWizardContext, onNext }) => {
           return (
             <>
               <WizardStep stepId="config" label="Cluster Configuration">
-                { loading ? null : hasAzureProvider
-                  ? <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
+                {loading ? null : hasAzureProvider ? (
+                  <ValidatedForm
+                    initialValues={wizardContext}
+                    onSubmit={setWizardContext}
+                    triggerSubmit={onNext}
+                  >
                     {({ setFieldValue, values }) => (
                       <div className={classes.formWidth}>
                         <FormFieldCard title="Configure Your Cluster">
                           <div className={classes.inputWidth}>
                             {/* Cluster Name */}
-                            <TextField
-                              id="name"
-                              label="Name"
-                              info="Name of the cluster"
-                              required
-                            />
+                            <TextField id="name" label="Name" info="Name of the cluster" required />
 
                             {/* Cloud Provider */}
                             <PicklistField
@@ -216,33 +233,39 @@ const AddAzureClusterPage = () => {
                               id="template"
                               label="Cluster Template"
                               options={templateOptions}
-                              onChange={handleTemplateChoice({ setWizardContext, setFieldValue, paramUpdater: getParamsUpdater('template') })}
+                              onChange={handleTemplateChoice({
+                                setWizardContext,
+                                setFieldValue,
+                                paramUpdater: getParamsUpdater('template'),
+                              })}
                               info="Set common options from one of the available templates"
                             />
 
-                            {params.template === 'custom' &&
+                            {params.template === 'custom' && (
                               <>
                                 <CheckboxField
                                   id="useAllAvailabilityZones"
                                   label="Use all availability zones"
-                                  onChange={checked => checked || getParamsUpdater('zones')([])}
+                                  onChange={(checked) => checked || getParamsUpdater('zones')([])}
                                   info=""
                                 />
 
                                 {/* Azure Availability Zone */}
-                                {values.useAllAvailabilityZones ||
-                                <AzureAvailabilityZoneChooser
-                                  id="zones"
-                                  info="Select from the Availability Zones for the specified region"
-                                  onChange={getParamsUpdater('zones')}
-                                  required
-                                />
-                                }
+                                {values.useAllAvailabilityZones || (
+                                  <AzureAvailabilityZoneChooser
+                                    id="zones"
+                                    info="Select from the Availability Zones for the specified region"
+                                    onChange={getParamsUpdater('zones')}
+                                    required
+                                  />
+                                )}
 
                                 {/* Master node SKU */}
                                 <PicklistField
                                   DropdownComponent={AzureSkuPicklist}
-                                  disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
+                                  disabled={
+                                    !(params.cloudProviderId && params.cloudProviderRegionId)
+                                  }
                                   id="masterSku"
                                   label="Master Node SKU"
                                   cloudProviderId={params.cloudProviderId}
@@ -265,7 +288,9 @@ const AddAzureClusterPage = () => {
                                 {/* Worker node SKU */}
                                 <PicklistField
                                   DropdownComponent={AzureSkuPicklist}
-                                  disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
+                                  disabled={
+                                    !(params.cloudProviderId && params.cloudProviderRegionId)
+                                  }
                                   id="workerSku"
                                   label="Worker Node SKU"
                                   cloudProviderId={params.cloudProviderId}
@@ -292,26 +317,32 @@ const AddAzureClusterPage = () => {
                                   info="It is highly recommended to not enable workloads on master nodes for production or critical workload clusters."
                                 />
                               </>
-                            }
+                            )}
                           </div>
                         </FormFieldCard>
                       </div>
                     )}
                   </ValidatedForm>
-                  : (
-                    <div className={classes.formWidth}>
-                      <FormFieldCard title="Configure Your Cluster">
-                        <div className={classes.inputWidth}>
-                          <PromptToAddProvider type={CloudProviders.Azure} src={routes.cloudProviders.add.path({ type: CloudProviders.Azure })} />
-                        </div>
-                      </FormFieldCard>
-                    </div>
-                  )
-                }
+                ) : (
+                  <div className={classes.formWidth}>
+                    <FormFieldCard title="Configure Your Cluster">
+                      <div className={classes.inputWidth}>
+                        <PromptToAddProvider
+                          type={CloudProviders.Azure}
+                          src={routes.cloudProviders.add.path({ type: CloudProviders.Azure })}
+                        />
+                      </div>
+                    </FormFieldCard>
+                  </div>
+                )}
               </WizardStep>
 
               <WizardStep stepId="network" label="Network Info">
-                <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
+                <ValidatedForm
+                  initialValues={wizardContext}
+                  onSubmit={setWizardContext}
+                  triggerSubmit={onNext}
+                >
                   {({ setFieldValue, values }) => (
                     <div className={classes.formWidth}>
                       <FormFieldCard title="Networking Details">
@@ -332,61 +363,61 @@ const AddAzureClusterPage = () => {
                             required
                           />
 
-                          {values.network === 'existing' &&
-                          <>
-                            {/* Resource group */}
-                            <PicklistField
-                              DropdownComponent={AzureResourceGroupPicklist}
-                              disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
-                              id="vnetResourceGroup"
-                              label="Resource group"
-                              cloudProviderId={params.cloudProviderId}
-                              cloudProviderRegionId={params.cloudProviderRegionId}
-                              onChange={getParamsUpdater('resourceGroup')}
-                              info="Select the resource group that your networking resources belong to."
-                              required
-                            />
+                          {values.network === 'existing' && (
+                            <>
+                              {/* Resource group */}
+                              <PicklistField
+                                DropdownComponent={AzureResourceGroupPicklist}
+                                disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
+                                id="vnetResourceGroup"
+                                label="Resource group"
+                                cloudProviderId={params.cloudProviderId}
+                                cloudProviderRegionId={params.cloudProviderRegionId}
+                                onChange={getParamsUpdater('resourceGroup')}
+                                info="Select the resource group that your networking resources belong to."
+                                required
+                              />
 
-                            {/* Existing network.  I don't get the point of this field. */}
-                            <PicklistField
-                              DropdownComponent={AzureVnetPicklist}
-                              disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
-                              id="vnetName"
-                              label="Select existing network"
-                              cloudProviderId={params.cloudProviderId}
-                              cloudProviderRegionId={params.cloudProviderRegionId}
-                              resourceGroup={params.resourceGroup}
-                              info="Select the network for your cluster."
-                              required
-                            />
+                              {/* Existing network.  I don't get the point of this field. */}
+                              <PicklistField
+                                DropdownComponent={AzureVnetPicklist}
+                                disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
+                                id="vnetName"
+                                label="Select existing network"
+                                cloudProviderId={params.cloudProviderId}
+                                cloudProviderRegionId={params.cloudProviderRegionId}
+                                resourceGroup={params.resourceGroup}
+                                info="Select the network for your cluster."
+                                required
+                              />
 
-                            {/* Master node subnet */}
-                            <PicklistField
-                              DropdownComponent={AzureSubnetPicklist}
-                              disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
-                              id="masterSubnetName"
-                              label="Master node subnet"
-                              cloudProviderId={params.cloudProviderId}
-                              cloudProviderRegionId={params.cloudProviderRegionId}
-                              resourceGroup={params.resourceGroup}
-                              info="Select the subnet for your master nodes. Can be the same as worker node subnet."
-                              required
-                            />
+                              {/* Master node subnet */}
+                              <PicklistField
+                                DropdownComponent={AzureSubnetPicklist}
+                                disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
+                                id="masterSubnetName"
+                                label="Master node subnet"
+                                cloudProviderId={params.cloudProviderId}
+                                cloudProviderRegionId={params.cloudProviderRegionId}
+                                resourceGroup={params.resourceGroup}
+                                info="Select the subnet for your master nodes. Can be the same as worker node subnet."
+                                required
+                              />
 
-                            {/* Worker node subnet */}
-                            <PicklistField
-                              DropdownComponent={AzureSubnetPicklist}
-                              disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
-                              id="workerSubnetName"
-                              label="Worker node subnet"
-                              cloudProviderId={params.cloudProviderId}
-                              cloudProviderRegionId={params.cloudProviderRegionId}
-                              resourceGroup={params.resourceGroup}
-                              info="Select the subnet for your worker nodes. Can be the same as master node subnet."
-                              required
-                            />
-                          </>
-                          }
+                              {/* Worker node subnet */}
+                              <PicklistField
+                                DropdownComponent={AzureSubnetPicklist}
+                                disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
+                                id="workerSubnetName"
+                                label="Worker node subnet"
+                                cloudProviderId={params.cloudProviderId}
+                                cloudProviderRegionId={params.cloudProviderRegionId}
+                                resourceGroup={params.resourceGroup}
+                                info="Select the subnet for your worker nodes. Can be the same as master node subnet."
+                                required
+                              />
+                            </>
+                          )}
 
                           {/* API FQDN */}
                           <TextField
@@ -415,7 +446,15 @@ const AddAzureClusterPage = () => {
                           <TextField
                             id="httpProxy"
                             label="HTTP Proxy"
-                            info={<div className={classes.inline}>(Optional) Specify the HTTP proxy for this cluster. Uses format of <Code><span>{'<scheme>://<username>:<password>@<host>:<port>'}</span></Code> where username and password are optional.</div>}
+                            info={
+                              <div className={classes.inline}>
+                                (Optional) Specify the HTTP proxy for this cluster. Uses format of{' '}
+                                <Code>
+                                  <span>{'<scheme>://<username>:<password>@<host>:<port>'}</span>
+                                </Code>{' '}
+                                where username and password are optional.
+                              </div>
+                            }
                           />
                         </div>
                       </FormFieldCard>
@@ -425,7 +464,11 @@ const AddAzureClusterPage = () => {
               </WizardStep>
 
               <WizardStep stepId="advanced" label="Advanced Configuration">
-                <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
+                <ValidatedForm
+                  initialValues={wizardContext}
+                  onSubmit={setWizardContext}
+                  triggerSubmit={onNext}
+                >
                   {({ setFieldValue, values }) => (
                     <div className={classes.formWidth}>
                       <FormFieldCard title="Final Tweaks">
@@ -435,7 +478,15 @@ const AddAzureClusterPage = () => {
                             id="privileged"
                             label="Privileged"
                             disabled={['calico', 'canal', 'weave'].includes(values.networkPlugin)}
-                            info={<div>Allows this cluster to run privileged containers. Read <ExternalLink url={runtimePrivileged}>this article</ExternalLink> for more information.</div>}
+                            info={
+                              <div>
+                                Allows this cluster to run privileged containers. Read{' '}
+                                <ExternalLink url={runtimePrivilegedLink}>
+                                  this article
+                                </ExternalLink>{' '}
+                                for more information.
+                              </div>
+                            }
                           />
 
                           {/* Etcd Backup */}
@@ -454,7 +505,13 @@ const AddAzureClusterPage = () => {
                             info="This deploys an instance of prometheus on the cluster."
                           />
 
-                          { !values.prometheusMonitoringEnabled && <Alert small variant="error" message="The PMK management plane is not able to monitor the cluster health." /> }
+                          {!values.prometheusMonitoringEnabled && (
+                            <Alert
+                              small
+                              variant="error"
+                              message="The PMK management plane is not able to monitor the cluster health."
+                            />
+                          )}
 
                           {/* Advanced API Configuration */}
                           <PicklistField
@@ -465,13 +522,13 @@ const AddAzureClusterPage = () => {
                             required
                           />
 
-                          {values.runtimeConfigOption === 'custom' &&
-                          <TextField
-                            id="customRuntimeConfig"
-                            label="Custom API Configuration"
-                            info=""
-                          />
-                          }
+                          {values.runtimeConfigOption === 'custom' && (
+                            <TextField
+                              id="customRuntimeConfig"
+                              label="Custom API Configuration"
+                              info=""
+                            />
+                          )}
 
                           {/* Enable Application Catalog */}
                           <CheckboxField
@@ -494,7 +551,11 @@ const AddAzureClusterPage = () => {
               </WizardStep>
 
               <WizardStep stepId="review" label="Review">
-                <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
+                <ValidatedForm
+                  initialValues={wizardContext}
+                  onSubmit={setWizardContext}
+                  triggerSubmit={onNext}
+                >
                   <div className={classes.formWidth}>
                     <FormFieldCard title="Finish and Review">
                       <div className={classes.tableWidth}>

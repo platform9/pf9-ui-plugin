@@ -9,48 +9,24 @@ const storageType = {
 
 const allLoggings = [
   {
-    logStorage: [
-      storageType.S3,
-      storageType.ELASTIC_SEARCH
-    ],
-    logDestination: [
-      'bucket123/regionnameABC',
-      'http://mybucket.s3.johnsmith',
-    ],
+    logStorage: [storageType.S3, storageType.ELASTIC_SEARCH],
+    logDestination: ['bucket123/regionnameABC', 'http://mybucket.s3.johnsmith'],
   },
   {
-    logStorage: [
-      storageType.S3,
-    ],
-    logDestination: [
-      'bucket123/regionnameABC',
-    ],
+    logStorage: [storageType.S3],
+    logDestination: ['bucket123/regionnameABC'],
   },
   {
-    logStorage: [
-      storageType.ELASTIC_SEARCH
-    ],
-    logDestination: [
-      'http://mybucket.s3.johnsmith',
-    ],
+    logStorage: [storageType.ELASTIC_SEARCH],
+    logDestination: ['http://mybucket.s3.johnsmith'],
   },
   {
-    logStorage: [
-      storageType.S3,
-      storageType.ELASTIC_SEARCH
-    ],
-    logDestination: [
-      'bucket123/regionnameABC',
-      'http://mybucket.s3.johnsmith',
-    ],
+    logStorage: [storageType.S3, storageType.ELASTIC_SEARCH],
+    logDestination: ['bucket123/regionnameABC', 'http://mybucket.s3.johnsmith'],
   },
   {
-    logStorage: [
-      storageType.ELASTIC_SEARCH
-    ],
-    logDestination: [
-      'http://mybucket.s3.johnsmith',
-    ],
+    logStorage: [storageType.ELASTIC_SEARCH],
+    logDestination: ['http://mybucket.s3.johnsmith'],
   },
 ]
 
@@ -60,8 +36,8 @@ const outputListData = {
   metadata: {
     continue: '',
     selfLink: '/apis/logging.pf9.io/v1alpha1/outputs',
-    resourceVersion: `${faker.random.number()}`
-  }
+    resourceVersion: `${faker.random.number()}`,
+  },
 }
 
 const elasticSearchItem = (url) => ({
@@ -71,7 +47,7 @@ const elasticSearchItem = (url) => ({
     params: [
       {
         name: 'url',
-        value: url
+        value: url,
       },
       {
         name: 'user',
@@ -84,8 +60,8 @@ const elasticSearchItem = (url) => ({
       {
         name: 'index_name',
         value: `${faker.random.number()}`,
-      }
-    ]
+      },
+    ],
   },
   apiVersion: 'logging.pf9.io/v1alpha1',
   metadata: {
@@ -95,7 +71,7 @@ const elasticSearchItem = (url) => ({
     creationTimestamp: faker.date.past(),
     selfLink: '/apis/logging.pf9.io/v1alpha1/outputs/es-object',
     uid: uuid.v4(),
-  }
+  },
 })
 
 const s3Item = (bucket) => ({
@@ -109,7 +85,7 @@ const s3Item = (bucket) => ({
           name: 's3',
           key: faker.internet.password(),
         },
-        name: 'aws_key_id'
+        name: 'aws_key_id',
       },
       {
         valueFrom: {
@@ -117,7 +93,7 @@ const s3Item = (bucket) => ({
           name: 's3',
           key: faker.internet.password(),
         },
-        name: 'aws_sec_key'
+        name: 'aws_sec_key',
       },
       {
         name: 's3_region',
@@ -125,9 +101,9 @@ const s3Item = (bucket) => ({
       },
       {
         name: 's3_bucket',
-        value: bucket
-      }
-    ]
+        value: bucket,
+      },
+    ],
   },
   apiVersion: 'logging.pf9.io/v1alpha1',
   metadata: {
@@ -137,7 +113,7 @@ const s3Item = (bucket) => ({
     creationTimestamp: faker.date.past(),
     selfLink: '/apis/logging.pf9.io/v1alpha1/outputs/objstore',
     uid: uuid.v4(),
-  }
+  },
 })
 
 const mapStorage = {
@@ -160,7 +136,9 @@ const createLoggingsJSON = (loggingsOfOneCluster) => {
   }
 }
 
-const loggingsForAllClusters = allLoggings.map(loggingsForOneCluster => createLoggingsJSON(loggingsForOneCluster))
+const loggingsForAllClusters = allLoggings.map((loggingsForOneCluster) =>
+  createLoggingsJSON(loggingsForOneCluster),
+)
 
 const LoggingStub = {
   loggingsForAllClusters,

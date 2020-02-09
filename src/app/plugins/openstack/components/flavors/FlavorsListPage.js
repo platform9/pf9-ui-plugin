@@ -9,7 +9,7 @@ export const options = {
     { id: 'vcpus', label: 'VCPUs' },
     { id: 'ram', label: 'RAM' },
     { id: 'disk', label: 'Disk' },
-    { id: 'tags', label: 'tags' }
+    { id: 'tags', label: 'tags' },
   ],
   loaderFn: flavorActions.list,
   updateFn: flavorActions.update,

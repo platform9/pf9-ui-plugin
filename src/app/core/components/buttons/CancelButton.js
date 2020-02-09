@@ -2,12 +2,12 @@ import React from 'react'
 import Button from '@material-ui/core/Button'
 import { withStyles } from '@material-ui/styles'
 
-const styles = theme => ({
+const styles = (theme) => ({
   baseButton: {
     margin: theme.spacing(1),
     borderRadius: 2,
     textTransform: 'none',
-  }
+  },
 })
 
 const CancelButton = ({ children, classes, disabled, ...rest }) => {

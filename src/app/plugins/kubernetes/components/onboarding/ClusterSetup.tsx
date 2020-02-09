@@ -1,13 +1,13 @@
 import React, { useCallback, useState } from 'react'
-import { Table, TableCell, TableRow, TableBody, Typography } from '@material-ui/core'
+import { Table, TableBody, TableCell, TableRow, Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import ExpansionPanel from 'core/components/expansionPanel/ExpansionPanel'
 import Theme from 'core/themes/model'
-import OnboardWizard from './onboard-wizard'
+import OnboardWizard from 'k8s/components/onboarding/OnboardWizard'
 import NextButton from 'core/components/buttons/NextButton'
 import useReactRouter from 'use-react-router'
 import CodeBlock from 'core/components/CodeBlock'
-import { OnboardingAccessSetup, OnboardingMonitoringSetup } from 'app/constants'
+import { onboardingAccessSetup, onboardingMonitoringSetup } from 'app/constants'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { clusterActions } from '../infrastructure/clusters/actions'
 import PrometheusAddonDialog from '../prometheus/PrometheusAddonDialog'
@@ -23,21 +23,21 @@ const useStyles = makeStyles<Theme>((theme) => ({
       border: 'none',
       '& td': {
         border: 'none',
-      }
+      },
     },
     marginTop: theme.spacing(2),
   },
   centerContent: {
     display: 'flex',
-    alignItems: 'center'
-  }
+    alignItems: 'center',
+  },
 }))
 
 export const clustersHaveMonitoring = (clusters: any[]) =>
   !!clusters.find((cluster) => !!cluster?.combined?.usage?.grafanaLink) ||
-  !!localStorage.getItem(OnboardingMonitoringSetup)
+  !!localStorage.getItem(onboardingMonitoringSetup)
 
-export const clustersHaveAccess = () => !!localStorage.getItem(OnboardingAccessSetup)
+export const clustersHaveAccess = () => !!localStorage.getItem(onboardingAccessSetup)
 
 interface Props {
   onComplete: () => void
@@ -78,7 +78,7 @@ const ClusterSetup = ({ onComplete, initialPanel = Panels.Cluster }: Props) => {
     [activePanels],
   )
   const handleSkipAccess = useCallback(() => {
-    localStorage.setItem(OnboardingAccessSetup, 'true')
+    localStorage.setItem(onboardingAccessSetup, 'true')
     const panelsToKeep = new Set(activePanels)
     panelsToKeep.delete(Panels.Access)
     if (!hasMonitoring) {
@@ -91,7 +91,7 @@ const ClusterSetup = ({ onComplete, initialPanel = Panels.Cluster }: Props) => {
   }, [activePanels])
 
   const handleSkipMonitoring = useCallback(() => {
-    localStorage.setItem(OnboardingMonitoringSetup, 'true')
+    localStorage.setItem(onboardingMonitoringSetup, 'true')
     const panelsToKeep = new Set(activePanels)
     panelsToKeep.delete(Panels.Monitoring)
     setActivePanels(panelsToKeep)
@@ -152,7 +152,9 @@ const ClusterSetup = ({ onComplete, initialPanel = Panels.Cluster }: Props) => {
             Now that your cluster is created, enable monitoring to view the cluster’s health stats
             realtime in a dashboard
           </Typography>
-          {clusters.length > 0 && <MonitoringPrompt clusters={clusters} onComplete={handleSkipMonitoring} />}
+          {clusters.length > 0 && (
+            <MonitoringPrompt clusters={clusters} onComplete={handleSkipMonitoring} />
+          )}
         </ExpansionPanel>
       </OnboardWizard>
     </div>
@@ -163,6 +165,7 @@ interface IMonitoringPromptProps {
   clusters: ICluster[]
   onComplete: () => void
 }
+
 const MonitoringPrompt = ({ clusters, onComplete }: IMonitoringPromptProps) => {
   const { table } = useStyles({})
   const [activeCluster, setActiveCluster] = useState<ICluster>()
@@ -188,7 +191,9 @@ const MonitoringPrompt = ({ clusters, onComplete }: IMonitoringPromptProps) => {
         <TableBody>
           {clusters.map((cluster: any = {}) => (
             <TableRow key={cluster.uuid}>
-              <TableCell><Typography variant="subtitle2">{cluster.name}</Typography></TableCell>
+              <TableCell>
+                <Typography variant="subtitle2">{cluster.name}</Typography>
+              </TableCell>
               <TableCell>
                 <NextButton showForward={false} onClick={toggleDialog(cluster)}>
                   Enable

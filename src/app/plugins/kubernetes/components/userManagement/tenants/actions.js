@@ -12,7 +12,7 @@ const { keystone } = ApiClient.getInstance()
 export const mngmTenantsCacheKey = 'managementTenants'
 
 const reservedTenantNames = ['admin', 'services', 'Default', 'heat']
-export const filterValidTenants = tenant => !reservedTenantNames.includes(tenant.name)
+export const filterValidTenants = (tenant) => !reservedTenantNames.includes(tenant.name)
 export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
   listFn: () => {
     return keystone.getAllTenantsAllUsers()
@@ -31,17 +31,20 @@ export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
     const users = await loadFromContext(mngmUsersCacheKey)
     await tryCatchAsync(
       () =>
-        Promise.all(Object.entries(roleAssignments).map(([userId, roleId]) =>
-          keystone.addUserRole({ tenantId: createdTenant.id, userId, roleId }),
-        )),
-      err => {
+        Promise.all(
+          Object.entries(roleAssignments).map(([userId, roleId]) =>
+            keystone.addUserRole({ tenantId: createdTenant.id, userId, roleId }),
+          ),
+        ),
+      (err) => {
         console.warn(err.message)
         return emptyArr
-      })(null)
+      },
+    )(null)
     const userKeys = Object.keys(roleAssignments)
     return {
       ...createdTenant,
-      users: users.filter(user => userKeys.includes(user.id)),
+      users: users.filter((user) => userKeys.includes(user.id)),
     }
   },
   updateFn: async (
@@ -55,10 +58,13 @@ export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
         tenantId,
       }),
     ])
-    const prevRoleAssignments = prevRoleAssignmentsArr.reduce((acc, roleAssignment) => ({
-      ...acc,
-      [pathStr('user.id', roleAssignment)]: pathStr('role.id', roleAssignment),
-    }), {})
+    const prevRoleAssignments = prevRoleAssignmentsArr.reduce(
+      (acc, roleAssignment) => ({
+        ...acc,
+        [pathStr('user.id', roleAssignment)]: pathStr('role.id', roleAssignment),
+      }),
+      {},
+    )
     const mergedUserIds = keys({ ...prevRoleAssignments, ...roleAssignments })
 
     // Perform the api calls to update the tenant and the user/role assignments
@@ -66,19 +72,19 @@ export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
       name,
       description,
     })
-    const updateUserRolesPromises = mergedUserIds.map(userId => {
+    const updateUserRolesPromises = mergedUserIds.map((userId) => {
       const prevRoleId = prevRoleAssignments[userId]
       const currRoleId = roleAssignments[userId]
       if (prevRoleId && !currRoleId) {
         // Remove unselected user/role pair
-        return keystone.deleteUserRole({ tenantId, userId, roleId: prevRoleId })
-          .then(always(null))
+        return keystone.deleteUserRole({ tenantId, userId, roleId: prevRoleId }).then(always(null))
       } else if (!prevRoleId && currRoleId) {
         // Add new user and role
         return keystone.addUserRole({ tenantId, userId, roleId: currRoleId })
       } else if (prevRoleId && currRoleId && prevRoleId !== currRoleId) {
         // Update changed role (delete current and add new)
-        return keystone.deleteUserRole({ tenantId, userId, roleId: prevRoleId })
+        return keystone
+          .deleteUserRole({ tenantId, userId, roleId: prevRoleId })
           .then(() => keystone.addUserRole({ tenantId, userId, roleId: currRoleId }))
       }
       return Promise.resolve(null)
@@ -88,53 +94,57 @@ export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
       updateTenantPromise,
       tryCatchAsync(
         () => Promise.all(updateUserRolesPromises).then(reject(isNil)),
-        err => {
+        (err) => {
           console.warn(err.message)
           return emptyArr
-        })(null),
+        },
+      )(null),
     ])
     const userKeys = Object.keys(roleAssignments)
     return {
       ...updatedTenant,
-      users: users.filter(user => userKeys.includes(user.id)),
+      users: users.filter((user) => userKeys.includes(user.id)),
     }
   },
   dataMapper: async (allTenantsAllUsers, params, loadFromContext) => {
     const namespaces = await loadFromContext(namespacesCacheKey)
-    const heatTenantId = pipe(
-      find(propEq('name', 'heat')),
-      prop('id'),
-    )(allTenantsAllUsers)
+    const heatTenantId = pipe(find(propEq('name', 'heat')), prop('id'))(allTenantsAllUsers)
     return pipe(
       filterIf(!params.includeBlacklisted, filterValidTenants),
-      filter(tenant => tenant.domain_id !== heatTenantId),
-      map(tenant => ({
+      filter((tenant) => tenant.domain_id !== heatTenantId),
+      map((tenant) => ({
         ...tenant,
-        users: tenant.users.filter(user => user.username !== 'admin@platform9.net'),
-        clusters: pluck('clusterName', namespaces
-          .filter(namespace => namespace.metadata.name === tenant.name)),
+        users: tenant.users.filter((user) => user.username !== 'admin@platform9.net'),
+        clusters: pluck(
+          'clusterName',
+          namespaces.filter((namespace) => namespace.metadata.name === tenant.name),
+        ),
       })),
     )(allTenantsAllUsers)
   },
   refetchCascade: true,
   requiredRoles: 'admin',
   entityName: 'Tenant',
-  successMessage: (updatedItems, prevItems, { id, name }, operation) => objSwitchCase({
-    create: `Tenant ${name} created successfully`,
-    update: `Tenant ${pipe(
-      find(propEq('id', id)),
-      prop('name'),
-    )(prevItems)} updated successfully`,
-    delete: `Tenant ${pipe(
-      find(propEq('id', id)),
-      prop('name'),
-    )(prevItems)} deleted successfully`,
-  })(operation),
+  successMessage: (updatedItems, prevItems, { id, name }, operation) =>
+    objSwitchCase({
+      create: `Tenant ${name} created successfully`,
+      update: `Tenant ${pipe(
+        find(propEq('id', id)),
+        prop('name'),
+      )(prevItems)} updated successfully`,
+      delete: `Tenant ${pipe(
+        find(propEq('id', id)),
+        prop('name'),
+      )(prevItems)} deleted successfully`,
+    })(operation),
 })
 
 export const mngmTenantRoleAssignmentsCacheKey = 'managementTenantRoleAssignments'
-export const mngmTenantRoleAssignmentsLoader = createContextLoader(mngmTenantRoleAssignmentsCacheKey,
-  async ({ tenantId }) => (await keystone.getTenantRoleAssignments(tenantId) || emptyArr), {
+export const mngmTenantRoleAssignmentsLoader = createContextLoader(
+  mngmTenantRoleAssignmentsCacheKey,
+  async ({ tenantId }) => (await keystone.getTenantRoleAssignments(tenantId)) || emptyArr,
+  {
     uniqueIdentifier: ['user.id', 'role.id'],
     indexBy: 'tenantId',
-  })
+  },
+)

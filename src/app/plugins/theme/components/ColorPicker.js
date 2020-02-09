@@ -7,12 +7,12 @@ import { withStyles } from '@material-ui/styles'
 import { withAppContext } from 'core/providers/AppProvider'
 import debounce from 'core/utils/debounce'
 
-const styles = theme => ({
+const styles = (theme) => ({
   paletteSection: {
     display: 'grid',
     gridTemplateColumns: '1fr 1fr',
     alignItems: 'center',
-    padding: theme.spacing(0.5)
+    padding: theme.spacing(0.5),
   },
   color: {
     width: '36px',
@@ -50,13 +50,13 @@ class ColorPicker extends React.PureComponent {
 
   getColor = () => view(this.lens(), this.props.theme)
 
-  handleChange = debounce(color => {
+  handleChange = debounce((color) => {
     this.props.setContext({
-      theme: set(this.lens(), color.hex, this.props.theme)
+      theme: set(this.lens(), color.hex, this.props.theme),
     })
   })
 
-  render () {
+  render() {
     const { open } = this.state
     const { classes } = this.props
 
@@ -96,7 +96,4 @@ ColorPicker.propTypes = {
   path: PropTypes.string.isRequired,
 }
 
-export default compose(
-  withAppContext,
-  withStyles(styles),
-)(ColorPicker)
+export default compose(withAppContext, withStyles(styles))(ColorPicker)

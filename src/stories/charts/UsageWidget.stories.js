@@ -17,5 +17,5 @@ addStories('Charts', {
         units: 'Ghz',
       }}
     />
-  )
+  ),
 })

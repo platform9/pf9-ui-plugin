@@ -7,9 +7,9 @@ interface BannerContextType {
 
 export const BannerContext = createContext<BannerContextType>({
   bannerContainer: null,
-  setBannerContainer: container => {
+  setBannerContainer: (container) => {
     console.error('BannerContainer not found')
-  }
+  },
 })
 
 const BannerProvider: FC = ({ children }) => {
@@ -24,7 +24,8 @@ const BannerProvider: FC = ({ children }) => {
 
 export default BannerProvider
 
-export const withBanner = Component => props =>
+export const withBanner = (Component) => (props) => (
   <BannerContext.Consumer>
-    {bannerContainer => <Component {...props} bannerContainer={bannerContainer} />}
+    {(bannerContainer) => <Component {...props} bannerContainer={bannerContainer} />}
   </BannerContext.Consumer>
+)

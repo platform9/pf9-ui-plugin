@@ -5,11 +5,13 @@ import { path } from 'ramda'
 import { withAppContext } from 'core/providers/AppProvider'
 
 const TypographyPanel = ({ theme }) => {
-  const isVariant = x => !!path([x, 'fontSize'], theme.typography)
+  const isVariant = (x) => !!path([x, 'fontSize'], theme.typography)
   const variantKeys = Object.keys(theme.typography).filter(isVariant)
   return (
     <Panel title="Typography">
-      {variantKeys.map(key => <TypographyVariant key={key} variant={key} />)}
+      {variantKeys.map((key) => (
+        <TypographyVariant key={key} variant={key} />
+      ))}
     </Panel>
   )
 }

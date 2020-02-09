@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
 import SimpleLink from 'core/components/SimpleLink'
 import ExternalLink from 'core/components/ExternalLink'
-import { BareOSSetupDocumentation } from 'app/constants'
+import { gettingStartedHelpLink } from 'k8s/links'
 import { routes } from 'core/utils/routes'
 
 const useStyles = makeStyles<Theme>((theme) => ({
@@ -44,10 +44,7 @@ const OnboardWizard: FC<Props> = ({ title, body, children, renderLinks = true })
           <SimpleLink src={routes.userManagement.users.path()} icon="user-plus">
             Invite Team Member
           </SimpleLink>
-          <ExternalLink
-            url={BareOSSetupDocumentation}
-            icon="file-alt"
-          >
+          <ExternalLink url={gettingStartedHelpLink} icon="file-alt">
             Setup Documentation
           </ExternalLink>
         </div>

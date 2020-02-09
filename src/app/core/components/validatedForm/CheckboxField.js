@@ -5,32 +5,49 @@ import { FormControl, FormControlLabel, FormHelperText } from '@material-ui/core
 import { withStyles } from '@material-ui/styles'
 import { withInfoTooltip } from 'app/core/components/InfoTooltip'
 import { compose } from 'app/utils/fp'
-import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
+import withFormContext, {
+  ValidatedFormInputPropTypes,
+} from 'core/components/validatedForm/withFormContext'
 
-const styles = theme => ({
+const styles = (theme) => ({
   formControl: {
     marginTop: theme.spacing(1),
   },
 })
 
 class CheckboxField extends PureComponent {
-  handleChange = e => {
+  handleChange = (e) => {
     const { onChange } = this.props
     if (onChange) {
       onChange(e.target.checked)
     }
   }
 
-  render () {
+  render() {
     const {
-      id, label, classes,
-      required, value, getCurrentValue, updateFieldValue, hasError, errorMessage,
-      onClick, onChange, onMouseEnter, ...restProps
+      id,
+      label,
+      classes,
+      required,
+      value,
+      getCurrentValue,
+      updateFieldValue,
+      hasError,
+      errorMessage,
+      onClick,
+      onChange,
+      onMouseEnter,
+      ...restProps
     } = this.props
 
     return (
       <div {...restProps}>
-        <FormControl id={id} onMouseEnter={onMouseEnter} className={classes.formControl} error={hasError}>
+        <FormControl
+          id={id}
+          onMouseEnter={onMouseEnter}
+          className={classes.formControl}
+          error={hasError}
+        >
           <FormControlLabel
             label={required ? `${label} *` : label}
             control={

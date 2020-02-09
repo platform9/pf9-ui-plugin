@@ -7,7 +7,7 @@ import CodeBlock from 'core/components/CodeBlock'
 import { makeStyles } from '@material-ui/styles'
 import { castBoolToStr } from 'utils/misc'
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   cell: {
     paddingRight: [theme.spacing(0.5), '!important'],
   },
@@ -20,7 +20,11 @@ const DataRow = ({ label, value }) => {
       <TableCell>{label}</TableCell>
       <TableCell className={classes.cell}>
         {Array.isArray(value)
-          ? value.map((val, idx) => <Typography key={idx} variant="body2">{val}</Typography>)
+          ? value.map((val, idx) => (
+              <Typography key={idx} variant="body2">
+                {val}
+              </Typography>
+            ))
           : value}
       </TableCell>
     </TableRow>
@@ -42,7 +46,10 @@ const BareOsClusterReviewTable = ({ data }) => {
     <Table>
       <TableBody>
         <DataRow label="Name" value={data.name} />
-        <DataRow label={`Master${data.allowWorkloadsOnMaster ? ' + Worker' : ''} nodes`} value={masterNodes} />
+        <DataRow
+          label={`Master${data.allowWorkloadsOnMaster ? ' + Worker' : ''} nodes`}
+          value={masterNodes}
+        />
         <DataRow label="Worker nodes" value={workerNodes} />
         <DataRow label="Virtual IP address for cluster" value={data.masterVipIpv4} />
         <DataRow
@@ -56,8 +63,14 @@ const BareOsClusterReviewTable = ({ data }) => {
         <DataRow label="Services CIDR" value={data.servicesCidr} />
         <DataRow label="Privileged" value={castBoolToStr()(data.privileged)} />
         <DataRow label="Application catalog" value={castBoolToStr()(data.appCatalogEnabled)} />
-        <DataRow label="Prometheus monitoring" value={castBoolToStr()(data.prometheusMonitoringEnabled)} />
-        <DataRow label="Tags" value={<CodeBlock>{JSON.stringify(data.tags || [], null, 2)}</CodeBlock>} />
+        <DataRow
+          label="Prometheus monitoring"
+          value={castBoolToStr()(data.prometheusMonitoringEnabled)}
+        />
+        <DataRow
+          label="Tags"
+          value={<CodeBlock>{JSON.stringify(data.tags || [], null, 2)}</CodeBlock>}
+        />
       </TableBody>
     </Table>
   )

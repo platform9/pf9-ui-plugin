@@ -10,14 +10,13 @@ import useReactRouter from 'use-react-router'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
 import Progress from 'core/components/progress/Progress'
-import { routes } from 'core/utils/routes'
 
 const tableColumns = columns.filter(
   (column) => !['clusterName', 'isSpotInstance'].includes(column.id),
 )
 
 const ClusterNodes = () => {
-  const { history, match } = useReactRouter()
+  const { match } = useReactRouter()
   const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
   const [nodes, loadingNodes, reload] = useDataLoader(loadNodes)
   const handleRefresh = useCallback(() => reload(true), [reload])
@@ -30,33 +29,14 @@ const ClusterNodes = () => {
     return emptyArr
   }, [cluster, nodes])
 
-  const handleViewNodeHealth = (node) => {
-    history.push(routes.cluster.convergingNodes.path({ id: cluster.uuid, node: node.uuid }))
-  }
-
-  const addLinkToNodeHealth = (columns) => {
-    const healthStatusColumn = columns.find((column) => column.id === 'healthStatus')
-    const originalRender = healthStatusColumn.render
-    const updatedRender = (_, node) => {
-      return originalRender(_, node, handleViewNodeHealth)
-    }
-
-    return columns.map((column) =>
-      column.id === 'healthStatus' ? { ...column, render: updatedRender } : column,
-    )
-  }
-
-  const nodeColumns = addLinkToNodeHealth(tableColumns)
-
   const NodesTable = createListTableComponent({
     title: 'Nodes',
     name: 'nodes',
-    columns: nodeColumns,
+    columns: tableColumns,
     emptyText: 'No instances found.',
     uniqueIdentifier: 'uuid',
     onReload: handleRefresh,
     showCheckboxes: false,
-    compactTable: true,
   })
 
   return (

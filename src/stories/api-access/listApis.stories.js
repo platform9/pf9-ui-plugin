@@ -7,7 +7,5 @@ const addStories = addStoriesFromModule(module)
 const someServices = range(15).map(fakeService)
 
 addStories('Service Catalog/Listing services', {
-  'With some services': () => (
-    <ApiAccessListPage services={someServices} />
-  ),
+  'With some services': () => <ApiAccessListPage services={someServices} />,
 })

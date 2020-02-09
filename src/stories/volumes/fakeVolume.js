@@ -19,7 +19,7 @@ const fakeVolume = () => ({
   device: faker.system.mimeType(),
   created: faker.date.past().toString(),
   attachedMode: faker.random.arrayElement(['rw', '']),
-  readonly: faker.random.boolean().toString()
+  readonly: faker.random.boolean().toString(),
 })
 
 export default fakeVolume

@@ -4,7 +4,7 @@ import { withStyles } from '@material-ui/core/styles'
 import Typography from '@material-ui/core/Typography'
 import Link from '@material-ui/core/Link'
 
-const styles = theme => ({
+const styles = (theme) => ({
   listItem: {
     marginTop: theme.spacing(1),
   },
@@ -38,6 +38,6 @@ const options = {
   },
 }
 
-export default function Markdown (props) {
+export default function Markdown(props) {
   return <ReactMarkdown options={options} {...props} />
 }

@@ -1,6 +1,12 @@
 import { makeStyles } from '@material-ui/styles'
 import ApiClient from 'api-client/ApiClient'
-import { clarityDashboardUrl, dashboardUrl, helpUrl, ironicWizardUrl, logoutUrl } from 'app/constants'
+import {
+  clarityDashboardUrl,
+  dashboardUrl,
+  helpUrl,
+  ironicWizardUrl,
+  logoutUrl,
+} from 'app/constants'
 import HelpPage from 'app/plugins/kubernetes/components/common/HelpPage'
 import clsx from 'clsx'
 import Intercom from 'core/components/integrations/Intercom'
@@ -21,7 +27,7 @@ import { pathJoin } from 'utils/misc'
 
 const { keystone } = ApiClient.getInstance()
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   appFrame: {
     zIndex: 1,
     overflow: 'hidden',
@@ -64,7 +70,7 @@ const useStyles = makeStyles(theme => ({
   },
 }))
 
-const renderPluginRoutes = role => (id, plugin) => {
+const renderPluginRoutes = (role) => (id, plugin) => {
   const defaultRoute = plugin.getDefaultRoute()
   const genericRoutes = [
     {
@@ -73,49 +79,64 @@ const renderPluginRoutes = role => (id, plugin) => {
       render: () => <Redirect to={defaultRoute || '/ui/404'} />,
     },
   ]
-  const filteredRoutes = plugin.getRoutes()
-    .filter(({ requiredRoles }) =>
-      isNilOrEmpty(requiredRoles) || ensureArray(requiredRoles).includes(role))
+  const filteredRoutes = plugin
+    .getRoutes()
+    .filter(
+      ({ requiredRoles }) =>
+        isNilOrEmpty(requiredRoles) || ensureArray(requiredRoles).includes(role),
+    )
 
-  return [...filteredRoutes, ...genericRoutes].map(route => {
+  return [...filteredRoutes, ...genericRoutes].map((route) => {
     const { component: Component, render, link } = route
-    return <Route
-      key={link.path}
-      path={link.path}
-      exact={link.exact || false}
-      render={render}
-      component={Component} />
+    return (
+      <Route
+        key={link.path}
+        path={link.path}
+        exact={link.exact || false}
+        render={render}
+        component={Component}
+      />
+    )
   })
 }
 
 const getSections = moize((plugins, role) =>
-  toPairs(plugins)
-    .map(([id, plugin]) => ({
-      id,
-      name: plugin.name,
-      links: plugin.getNavItems()
-        .filter(({ requiredRoles }) =>
-          isNilOrEmpty(requiredRoles) || ensureArray(requiredRoles).includes(role)),
-    })))
+  toPairs(plugins).map(([id, plugin]) => ({
+    id,
+    name: plugin.name,
+    links: plugin
+      .getNavItems()
+      .filter(
+        ({ requiredRoles }) =>
+          isNilOrEmpty(requiredRoles) || ensureArray(requiredRoles).includes(role),
+      ),
+  })),
+)
 
 const renderPlugins = moize((plugins, role) =>
-  toPairs(plugins).map(apply(renderPluginRoutes(role))).flat(),
+  toPairs(plugins)
+    .map(apply(renderPluginRoutes(role)))
+    .flat(),
 )
 
 const renderPluginComponents = (id, plugin) => {
   const pluginComponents = plugin.getComponents()
 
-  return <Route key={plugin.basePath} path={plugin.basePath} exact={false}>
-    {pluginComponents.map((PluginComponent, idx) =>
-      <PluginComponent key={idx} />)}
-  </Route>
+  return (
+    <Route key={plugin.basePath} path={plugin.basePath} exact={false}>
+      {pluginComponents.map((PluginComponent, idx) => (
+        <PluginComponent key={idx} />
+      ))}
+    </Route>
+  )
 }
-const renderRawComponents = moize(plugins =>
-  toPairs(plugins).map(apply(renderPluginComponents)).flat(),
+const renderRawComponents = moize((plugins) =>
+  toPairs(plugins)
+    .map(apply(renderPluginComponents))
+    .flat(),
 )
 
-const redirectToAppropriateStack = (ironicEnabled, kubernetesEnabled,
-  history) => {
+const redirectToAppropriateStack = (ironicEnabled, kubernetesEnabled, history) => {
   // If it is neither ironic nor kubernetes, bump user to old UI
   // TODO: For production, I need to always bump user to old UI in both ironic
   // and standard openstack cases, but I don't want to do that yet for development.
@@ -135,12 +156,18 @@ const loadRegionFeatures = async (setRegionFeatures, history) => {
 
     setRegionFeatures({
       kubernetes: features.experimental.containervisor,
-      ironic: features.experimental.ironic,
+      ironic: false, // Keep this false until ironic supported by the new UI
+      // ironic: features.experimental.ironic,
       openstack: features.experimental.openstackEnabled,
       intercom: features.experimental.intercom,
     })
 
-    redirectToAppropriateStack(features.experimental.ironic, features.experimental.containervisor, history)
+    redirectToAppropriateStack(
+      false, // Keep this false until ironic supported by the new UI
+      // features.experimental.ironic,
+      features.experimental.containervisor,
+      history,
+    )
   } catch (err) {
     console.error(err)
   }
@@ -149,7 +176,10 @@ const loadRegionFeatures = async (setRegionFeatures, history) => {
 const AuthenticatedContainer = () => {
   const [drawerOpen, toggleDrawer] = useToggler(true)
   const [regionFeatures, setRegionFeatures] = useState(emptyObj)
-  const { userDetails: { role }, currentRegion } = useContext(AppContext)
+  const {
+    userDetails: { role },
+    currentRegion,
+  } = useContext(AppContext)
   const { history } = useReactRouter()
   const classes = useStyles({ path: history.location.pathname })
 
@@ -176,11 +206,14 @@ const AuthenticatedContainer = () => {
           sections={sections}
           open={drawerOpen}
           stack={stack}
-          handleDrawerToggle={toggleDrawer} />
-        <main className={clsx(classes.content, classes['content-left'], {
-          [classes.contentShift]: drawerOpen,
-          [classes['contentShift-left']]: drawerOpen,
-        })}>
+          handleDrawerToggle={toggleDrawer}
+        />
+        <main
+          className={clsx(classes.content, classes['content-left'], {
+            [classes.contentShift]: drawerOpen,
+            [classes['contentShift-left']]: drawerOpen,
+          })}
+        >
           {/* <BannerContainer /> */}
           <div className={classes.contentMain}>
             {renderRawComponents(plugins)}

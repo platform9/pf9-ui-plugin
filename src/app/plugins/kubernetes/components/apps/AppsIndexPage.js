@@ -9,9 +9,15 @@ import PageContainer from 'core/components/pageContainer/PageContainer'
 const InfrastructurePage = () => (
   <PageContainer>
     <Tabs>
-      <Tab value="appCatalog" label="App Catalog"><AppCatalogPage /></Tab>
-      <Tab value="deployedApps" label="Deployed Apps"><DeployedAppsListPage /></Tab>
-      <Tab value="repositories" label="Repositories"><RepositoriesListPage /></Tab>
+      <Tab value="appCatalog" label="App Catalog">
+        <AppCatalogPage />
+      </Tab>
+      <Tab value="deployedApps" label="Deployed Apps">
+        <DeployedAppsListPage />
+      </Tab>
+      <Tab value="repositories" label="Repositories">
+        <RepositoriesListPage />
+      </Tab>
     </Tabs>
   </PageContainer>
 )

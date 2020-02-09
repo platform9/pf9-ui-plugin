@@ -6,7 +6,7 @@ import { Divider, Grid, Typography } from '@material-ui/core'
 import Progress from 'core/components/progress/Progress'
 import { pick, keys } from 'ramda'
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     marginTop: theme.spacing(5),
     marginBottom: theme.spacing(5),
@@ -23,13 +23,7 @@ const useStyles = makeStyles(theme => ({
   },
 }))
 
-const FormWrapper = ({
-  backUrl = undefined,
-  children,
-  title,
-  className,
-  ...rest
-}) => {
+const FormWrapper = ({ backUrl = undefined, children, title, className, ...rest }) => {
   const classes = useStyles()
   const progressProps = pick(keys(Progress.propTypes), rest)
   return (
@@ -37,24 +31,19 @@ const FormWrapper = ({
       <Grid item xs={11}>
         <Grid container justify="space-between">
           <Grid item>
-            <Typography
-              variant="h5"
-              className={classes.title}
-            >
+            <Typography variant="h5" className={classes.title}>
               {title}
             </Typography>
           </Grid>
-          {backUrl &&
-          <Grid item>
-            <CloseButton to={backUrl} />
-          </Grid>
-          }
+          {backUrl && (
+            <Grid item>
+              <CloseButton to={backUrl} />
+            </Grid>
+          )}
         </Grid>
         <Divider className={classes.divider} />
         <Progress {...progressProps}>
-          <div className={className}>
-            {children}
-          </div>
+          <div className={className}>{children}</div>
         </Progress>
       </Grid>
     </Grid>

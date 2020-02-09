@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   column: {
     margin: theme.spacing(2, 0),
     display: 'flex',
-    flexDirection: 'column'
+    flexDirection: 'column',
   },
   row: {
     display: 'flex',
@@ -45,7 +45,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     color: theme.palette.primary.main,
   },
 }))
-const installCommand = 'curl -O https://raw.githubusercontent.com/platform9/express-cli/master/cli-setup.sh'
+
+const downloadAndInstallCommand = 'bash <(curl -sL http://pf9.io/get_cli)'
 
 // Not super enthused about this. Need to have different content for bareos flow vs landing page.
 export const DownloadCliOnboardNodeWalkthrough = (): JSX.Element => (
@@ -53,8 +54,8 @@ export const DownloadCliOnboardNodeWalkthrough = (): JSX.Element => (
     <Typography variant="h6">Pre-requisites</Typography>
     <p>
       <Typography component="span">
-        You will need a physical or virtual machine with Ubuntu 16.04 installed. (Support for
-        CentOS is coming soon!)
+        You will need a physical or virtual machine with Ubuntu 16.04 installed. (Support for CentOS
+        is coming soon!)
       </Typography>
     </p>
     <DownloadCliWalkthrough />
@@ -66,22 +67,15 @@ const DownloadCliWalkthrough = (): JSX.Element => {
   const { session } = useContext(AppContext)
   return (
     <Paper className={classes.paper} elevation={0}>
-      <Typography variant="h6">Use the PF9 CLI to connect nodes to the Platform9 Management Plane</Typography>
+      <Typography variant="h6">
+        Use the PF9 CLI to connect nodes to the Platform9 Management Plane
+      </Typography>
       <NumberedSteps
         step={1}
-        title="Download the CLI"
+        title="Download and install the CLI"
         description={
-          <CopyToClipboard copyText={installCommand}>
-            <CodeBlock>{installCommand}</CodeBlock>
-          </CopyToClipboard>
-        }
-      />
-      <NumberedSteps
-        step={2}
-        title="Install the CLI"
-        description={
-          <CopyToClipboard copyText="bash ./cli-setup.sh">
-            <CodeBlock>bash ./cli-setup.sh</CodeBlock>
+          <CopyToClipboard copyText={downloadAndInstallCommand}>
+            <CodeBlock>{downloadAndInstallCommand}</CodeBlock>
           </CopyToClipboard>
         }
       />
@@ -99,7 +93,7 @@ const DownloadCliWalkthrough = (): JSX.Element => {
         </CopyToClipboard>
       </Typography>
       <NumberedSteps
-        step={3}
+        step={2}
         title="Run the PF9 CLI using ‘prep-node’ to attach the Node to the Platform9 Management plane"
         description={
           <CopyToClipboard copyText="pf9ctl cluster prep-node">
@@ -134,8 +128,8 @@ const NumberedSteps: FC<NumberedStepProps> = ({
         {typeof description === 'string' ? (
           <Typography variant="body1">{description}</Typography>
         ) : (
-          description
-        )}
+            description
+          )}
         {children}
       </div>
     </div>

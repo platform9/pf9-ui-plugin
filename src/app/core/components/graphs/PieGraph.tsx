@@ -12,16 +12,22 @@ interface Props {
   data: PieDataEntry[]
   sideLength: number
   arcWidth: number
-  percent: number
-  primary: string
+  percent?: number
+  primary?: string
   empty: boolean
 }
 
-const emptyData = [
-  { name: 'empty', value: 1, color: 'empty' }
-]
+const emptyData = [{ name: 'empty', value: 1, color: 'empty' }]
 
-const PieGraph = ({ data, sideLength, arcWidth, percent, primary, empty, ...rest }: Props) => {
+const PieGraph = ({
+  data,
+  sideLength,
+  arcWidth,
+  percent = undefined,
+  primary,
+  empty,
+  ...rest
+}: Props) => {
   const theme: any = useTheme()
   const radius = Math.floor(sideLength / 2)
   const items = empty ? emptyData : data
@@ -29,6 +35,7 @@ const PieGraph = ({ data, sideLength, arcWidth, percent, primary, empty, ...rest
   return (
     <PieChart width={sideLength + 10} height={sideLength + 10}>
       <Pie
+        dataKey="value"
         data={items}
         cx={radius}
         cy={radius}
@@ -37,30 +44,34 @@ const PieGraph = ({ data, sideLength, arcWidth, percent, primary, empty, ...rest
         paddingAngle={0}
         {...rest}
       >
-        { items.map(
-          (entry, index) => <Cell key={entry.name} fill={theme.palette.pieChart[entry.color]} />)
-        }
+        {items.map((entry, index) => (
+          <Cell key={entry.name} fill={theme.palette.pieChart[entry.color]} />
+        ))}
       </Pie>
-      { percent !== undefined && <text
-        x={radius + 5}
-        y={radius + 5}
-        fill={theme.palette.dashboardCard.text}
-        fontSize="24px"
-        textAnchor="middle"
-        dominantBaseline="middle"
-      >
-        {`${(percent * 100).toFixed(0)}%`}
-      </text> }
-      { primary && <text
-        x={radius + 5}
-        y={radius + 20}
-        fill={theme.palette.dashboardCard.text}
-        fontSize="9px"
-        textAnchor="middle"
-        dominantBaseline="middle"
-      >
-        {primary}
-      </text> }
+      {percent !== undefined && (
+        <text
+          x={radius + 5}
+          y={radius + 5}
+          fill={theme.palette.dashboardCard.text}
+          fontSize="24px"
+          textAnchor="middle"
+          dominantBaseline="middle"
+        >
+          {`${(percent * 100).toFixed(0)}%`}
+        </text>
+      )}
+      {primary && (
+        <text
+          x={radius + 5}
+          y={radius + 20}
+          fill={theme.palette.dashboardCard.text}
+          fontSize="9px"
+          textAnchor="middle"
+          dominantBaseline="middle"
+        >
+          {primary}
+        </text>
+      )}
     </PieChart>
   )
 }

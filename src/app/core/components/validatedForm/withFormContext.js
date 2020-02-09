@@ -17,7 +17,16 @@ export const ValidatedFormInputPropTypes = {
  * the ValidatedForm such as validations and text hints on hover
  */
 const ValidatedFormInput = ({
-  id, initialValue, validateFormOnChange, value, required, validations, onBlur, onChange, children, ...rest
+  id,
+  initialValue,
+  validateFormOnChange,
+  value,
+  required,
+  validations,
+  onBlur,
+  onChange,
+  children,
+  ...rest
 }) => {
   const {
     initialValues,
@@ -37,17 +46,17 @@ const ValidatedFormInput = ({
   const updateCurrentFieldValue = updateFieldValue(id)
   const getCurrentFieldValue = getFieldValue(id)
   const validateCurrentField = validateField(id)
-  const currentInitialValue = initialValue !== undefined
-    ? initialValue : initialValues[id]
+  const currentInitialValue = initialValue !== undefined ? initialValue : initialValues[id]
   const currentValue = isNil(value) ? values[id] : value
   const hasError = pathOr(null, [id, 'hasError'], errors)
   const errorMessage = pathOr(null, [id, 'errorMessage'], errors)
 
   useEffect(() => {
     defineCurrentField({
-      validations: required ? Array.isArray(validations)
-        ? [requiredValidator, ...validations]
-        : { required: true, ...validations }
+      validations: required
+        ? Array.isArray(validations)
+          ? [requiredValidator, ...validations]
+          : { required: true, ...validations }
         : validations,
     })
     if (currentInitialValue !== undefined) {
@@ -66,7 +75,7 @@ const ValidatedFormInput = ({
   }, [value])
 
   const handleBlur = useCallback(
-    e => {
+    (e) => {
       if (showErrorsOnBlur) {
         validateCurrentField()
       }
@@ -118,10 +127,10 @@ ValidatedFormInput.defaultProps = {
  *
  * @param {Inject the form context into this Component through props.} Input
  */
-const withFormContext = Input =>
+const withFormContext = (Input) =>
   React.forwardRef((props, ref) => (
     <ValidatedFormInput {...props}>
-      {(inputProps => <Input {...inputProps} ref={ref} />)}
+      {(inputProps) => <Input {...inputProps} ref={ref} />}
     </ValidatedFormInput>
   ))
 

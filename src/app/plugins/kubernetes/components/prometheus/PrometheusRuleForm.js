@@ -7,14 +7,13 @@ import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import { Card, CardContent, Typography } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 
-const styles = theme => ({
-  root: {
-  }
+const styles = (theme) => ({
+  root: {},
 })
 const initialValues = {
   severity: 'warning',
 }
-const severityOptions = 'critical warning info'.split(' ').map(x => ({ value: x, label: x }))
+const severityOptions = 'critical warning info'.split(' ').map((x) => ({ value: x, label: x }))
 
 // TODO: Need some UI mechanism to delete a rule.
 const PrometheusRuleForm = ({ onDelete, onSubmit, classes }) => {
@@ -25,9 +24,22 @@ const PrometheusRuleForm = ({ onDelete, onSubmit, classes }) => {
         <ValidatedForm initialValues={initialValues} onSubmit={onSubmit} clearOnSubmit>
           <TextField id="alert" label="Alert Name" info="Name of the alert " />
           <TextField id="expr" label="Rule" info="Prometheus Rule Expression" />
-          <PicklistField id="severity" options={severityOptions} label="Severity" info="Severity of the alert" />
-          <TextField id="period" label="Period" info="How long rule needs to be true before triggering an alert (Ex: 5m)" />
-          <TextField id="description" label="Description" info="Optional description for this rule" />
+          <PicklistField
+            id="severity"
+            options={severityOptions}
+            label="Severity"
+            info="Severity of the alert"
+          />
+          <TextField
+            id="period"
+            label="Period"
+            info="How long rule needs to be true before triggering an alert (Ex: 5m)"
+          />
+          <TextField
+            id="description"
+            label="Description"
+            info="Optional description for this rule"
+          />
           <SubmitButton>Add Rule</SubmitButton>
         </ValidatedForm>
       </CardContent>

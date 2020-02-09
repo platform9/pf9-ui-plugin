@@ -16,8 +16,8 @@ describe('Route', () => {
   //   expect(route.path({ id: 'cluster-uuid', name: 'My Awesome Cluster' })).toBe('/ui/kubernetes/infrastructure/clusters/cluster-uuid/edit?name=My+Awesome+Cluster')
   // })
   // test('hash', () => {
-  //   const route = new Route<{ id: string }>('/ui/kubernetes/infrastructure/clusters/:id#convergingNodes')
-  //   expect(route.path({ id: 'cluster-uuid' })).toBe('/ui/kubernetes/infrastructure/clusters/cluster-uuid#convergingNodes')
-  //   expect(route.path({ id: 'cluster-uuid', name: 'My Awesome Cluster' })).toBe('/ui/kubernetes/infrastructure/clusters/cluster-uuid?name=My+Awesome+Cluster#convergingNodes')
+  //   const route = new Route<{ id: string }>('/ui/kubernetes/infrastructure/clusters/:id#nodeHealth')
+  //   expect(route.path({ id: 'cluster-uuid' })).toBe('/ui/kubernetes/infrastructure/clusters/cluster-uuid#nodeHealth')
+  //   expect(route.path({ id: 'cluster-uuid', name: 'My Awesome Cluster' })).toBe('/ui/kubernetes/infrastructure/clusters/cluster-uuid?name=My+Awesome+Cluster#nodeHealth')
   // })
 })

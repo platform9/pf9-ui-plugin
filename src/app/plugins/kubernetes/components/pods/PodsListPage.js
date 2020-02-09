@@ -11,26 +11,29 @@ import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import NamespacePicklist from 'k8s/components/common/NamespacePicklist'
 import { makeStyles } from '@material-ui/styles'
 import { objSwitchCase } from 'utils/fp'
-import moment from 'moment'
-import { secondsToString } from 'utils/misc'
 import renderLabels from 'k8s/components/pods/renderLabels'
+import DateCell from 'core/components/listTable/cells/DateCell'
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   status: {
     display: 'inline-flex',
     alignItems: 'end',
     '&:before': {
-      content: '\' \'',
+      content: "' '",
       height: 14,
       width: 14,
       marginRight: 3,
       borderRadius: '50%',
-      display: ({ status }) => !status || status === 'loading' ? 'none' : 'inline-block',
-      backgroundColor: ({ status }) => objSwitchCase({
-        ok: '#31DA6D',
-        pending: '#FEC35D',
-        fail: '#F16E3F',
-      }, '#F16E3F')(status),
+      display: ({ status }) => (!status || status === 'loading' ? 'none' : 'inline-block'),
+      backgroundColor: ({ status }) =>
+        objSwitchCase(
+          {
+            ok: '#31DA6D',
+            pending: '#FEC35D',
+            fail: '#F16E3F',
+          },
+          '#F16E3F',
+        )(status),
     },
   },
   labels: {
@@ -40,6 +43,7 @@ const useStyles = makeStyles(theme => ({
 
 const defaultParams = {
   masterNodeClusters: true,
+  clusterId: allKey,
 }
 const usePrefParams = createUsePrefParamsHook('Pods', listTablePrefs)
 
@@ -47,76 +51,77 @@ const ListPage = ({ ListContainer }) => {
   return () => {
     const { params, updateParams, getParamsUpdater } = usePrefParams(defaultParams)
     const [data, loading, reload] = useDataLoader(podActions.list, params)
-    const updateClusterId = useCallback(clusterId => {
+    const updateClusterId = useCallback((clusterId) => {
       updateParams({
         clusterId,
-        namespace: allKey
+        namespace: allKey,
       })
     }, [])
-    return <ListContainer
-      loading={loading}
-      reload={reload}
-      data={data}
-      getParamsUpdater={getParamsUpdater}
-      filters={<>
-        <ClusterPicklist
-          onChange={updateClusterId}
-          value={params.clusterId}
-          onlyMasterNodeClusters
-        />
-        <NamespacePicklist
-          selectFirst={false}
-          onChange={getParamsUpdater('namespace')}
-          value={params.namespace}
-          clusterId={params.clusterId}
-          disabled={!params.clusterId}
-        />
-      </>}
-      {...pick(listTablePrefs, params)}
-    />
+    return (
+      <ListContainer
+        loading={loading}
+        reload={reload}
+        data={data}
+        getParamsUpdater={getParamsUpdater}
+        filters={
+          <>
+            <ClusterPicklist
+              selectFirst={false}
+              onChange={updateClusterId}
+              value={params.clusterId}
+              onlyMasterNodeClusters
+            />
+            <NamespacePicklist
+              selectFirst={false}
+              onChange={getParamsUpdater('namespace')}
+              value={params.namespace}
+              clusterId={params.clusterId}
+              disabled={!params.clusterId}
+            />
+          </>
+        }
+        {...pick(listTablePrefs, params)}
+      />
+    )
   }
 }
 const renderName = (name, { dashboardUrl }) => {
-  return <span>
-    {name}<br />
-    <ExternalLink url={dashboardUrl}>dashboard
-      <FontAwesomeIcon size="sm">file-alt</FontAwesomeIcon></ExternalLink>
-  </span>
+  return (
+    <span>
+      {name}
+      <br />
+      <ExternalLink url={dashboardUrl}>
+        <FontAwesomeIcon size="md">file-alt</FontAwesomeIcon>
+        dashboard
+      </ExternalLink>
+    </span>
+  )
 }
 
-const PodsStatusSpan = props => {
+export const PodsStatusSpan = (props) => {
   const { children } = props
   const { status } = useStyles(props)
   return <div className={status}>{children}</div>
 }
 
-const renderStatus = phase => {
+const renderStatus = (phase) => {
   switch (phase) {
     case 'Running':
     case 'Succeeded':
-      return <PodsStatusSpan status="ok">
-        {phase}
-      </PodsStatusSpan>
+      return <PodsStatusSpan status="ok">{phase}</PodsStatusSpan>
 
     case 'Failed':
-      return <PodsStatusSpan status="fail">
-        {phase}
-      </PodsStatusSpan>
+      return <PodsStatusSpan status="fail">{phase}</PodsStatusSpan>
 
     case 'Pending':
     case 'Unknown':
     default:
-      return <PodsStatusSpan status="pending">
-        {phase}
-      </PodsStatusSpan>
+      return <PodsStatusSpan status="pending">{phase}</PodsStatusSpan>
   }
 }
 
-const renderAge = created => {
-  return secondsToString(moment().diff(created, 's'))
-}
-
 export const options = {
+  showCheckboxes: false, // until we have actions to perform, disable this
   addUrl: '/ui/kubernetes/pods/add',
   addText: 'Create New Pod',
   columns: [
@@ -126,7 +131,7 @@ export const options = {
     { id: 'labels', label: 'Labels', render: renderLabels('label') },
     { id: 'status.phase', label: 'Status', render: renderStatus },
     { id: 'status.hostIP', label: 'Node IP' },
-    { id: 'created', label: 'Age', render: renderAge },
+    { id: 'created', label: 'Age', render: (value) => <DateCell value={value} showToolTip /> },
   ],
   name: 'Pods',
   title: 'Pods',

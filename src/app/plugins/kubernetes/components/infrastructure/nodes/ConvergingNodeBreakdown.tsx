@@ -15,16 +15,18 @@ import ProgressBar from 'core/components/progress/ProgressBar'
 import Theme from 'core/themes/model'
 import { makeStyles } from '@material-ui/styles'
 import ExternalLink from 'core/components/ExternalLink'
-import { Tasks } from '../clusters/TaskStatusDialog'
+import { Tasks, NodeTaskStatus } from '../clusters/TaskStatusDialog'
 import pluck from 'ramda/es/pluck'
 import { emptyArr } from 'utils/fp'
 import { clusterActions } from '../clusters/actions'
 import { loadNodes } from './actions'
 import useDataLoader from 'core/hooks/useDataLoader'
 import PollingData from 'core/components/PollingData'
-import { IUseDataLoader, ICombinedNode } from './model'
+import { IUseDataLoader, ICombinedNode, IKubeNodeState } from './model'
 import { ICluster } from '../clusters/model'
 import { renderNodeHealthStatus } from './NodesListPage'
+import { nodeInstallTroubleshooting } from 'k8s/links'
+import NoContentMessage from 'core/components/NoContentMessage'
 
 const useStyles = makeStyles<Theme, {}>((theme) => ({
   gridContainer: {
@@ -76,7 +78,6 @@ const useStyles = makeStyles<Theme, {}>((theme) => ({
     gridColumn: 3,
   },
   tableChooser: {
-    marginTop: theme.spacing(2),
     display: 'grid',
     gridTemplateRows: `
       22px 1fr
@@ -87,7 +88,7 @@ const useStyles = makeStyles<Theme, {}>((theme) => ({
       minmax(400px, 600px)
     `,
     gridGap: theme.spacing(2),
-  }
+  },
 }))
 
 const getTaskContent = (
@@ -95,7 +96,7 @@ const getTaskContent = (
   completed: string[],
   failed: string,
   message: string,
-): { message: string, color: 'success' | 'primary' | 'error' } => {
+): { message: string; color: 'success' | 'primary' | 'error' } => {
   // TODO get backend to update the last_failed_task to be null rather than 'None'
 
   const failedIdx = all.indexOf(failed)
@@ -119,22 +120,28 @@ const sortNodesByTasks = (prevNode: ICombinedNode, currNode: ICombinedNode) => {
   return prevName.toLowerCase().localeCompare(currName.toLowerCase())
 }
 
-export const ConvergingNodesWithTasksToggler: FC = () => {
+export const NodeHealthWithTasksToggler: FC = () => {
   const { match, location } = useReactRouter()
   const searchParams = new URLSearchParams(location.search)
   const linkedNodeUUID = searchParams.get('node') || null
 
   const [selectedNode, setSelectedNode] = useState(null)
-  const [clusters, loadingClusters, reloadClusters]: IUseDataLoader<ICluster> = useDataLoader(clusterActions.list) as any
-  const [nodes, loadingNodes, reloadNodes]: IUseDataLoader<ICombinedNode> = useDataLoader(loadNodes) as any
+  const [clusters, loadingClusters, reloadClusters]: IUseDataLoader<ICluster> = useDataLoader(
+    clusterActions.list,
+  ) as any
+  const [nodes, loadingNodes, reloadNodes]: IUseDataLoader<ICombinedNode> = useDataLoader(
+    loadNodes,
+  ) as any
   const cluster = clusters.find((cluster) => cluster.uuid === match.params.id)
   const nodesInCluster = useMemo(() => {
     if (cluster) {
       const clusterNodesUids = pluck<'uuid', ICombinedNode>('uuid', cluster.nodes)
-      const filteredNodes = nodes.filter((node) => clusterNodesUids.includes(node.uuid)).sort(sortNodesByTasks)
+      const filteredNodes = nodes
+        .filter((node) => clusterNodesUids.includes(node.uuid))
+        .sort(sortNodesByTasks)
 
-      const uuid = selectedNode ? selectedNode.uuid : (linkedNodeUUID || filteredNodes[0]?.uuid)
-      const nodeToSelect = filteredNodes.find(node => node.uuid === uuid)
+      const uuid = selectedNode ? selectedNode.uuid : linkedNodeUUID || filteredNodes[0]?.uuid
+      const nodeToSelect = filteredNodes.find((node) => node.uuid === uuid)
       setSelectedNode(nodeToSelect || null) // always update as node data refreshes
 
       return filteredNodes
@@ -142,21 +149,56 @@ export const ConvergingNodesWithTasksToggler: FC = () => {
     return emptyArr
   }, [cluster, nodes, selectedNode])
 
-  const handleReload = useCallback((ignoreCache) => {
-    reloadClusters(ignoreCache)
-    return reloadNodes(ignoreCache)
-  }, [reloadClusters, reloadNodes])
+  const handleReload = useCallback(
+    (ignoreCache) => {
+      reloadClusters(ignoreCache)
+      return reloadNodes(ignoreCache)
+    },
+    [reloadClusters, reloadNodes],
+  )
 
-  const { ellipsis, renderPane, divider, paneHeader, paneHeaderTitle, paneHeaderStatus, paneBody, tableChooser, tablePolling } = useStyles({})
-  const selectedNodeAllTasks = selectedNode?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.all_tasks || []
-  const selectedNodeCompletedTasks = selectedNode?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.completed_tasks || []
-  const lastSelectedNodesFailedTask = selectedNode?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.last_failed_task || []
-  const selectedNodeTitle = `${selectedNode?.name || 'Choose a node to continue'}${selectedNode?.isMaster ? ' (master)' : ''}`
+  const {
+    ellipsis,
+    renderPane,
+    divider,
+    paneHeader,
+    paneHeaderTitle,
+    paneHeaderStatus,
+    paneBody,
+    tableChooser,
+    tablePolling,
+  } = useStyles({})
+  const kubeStatusData = selectedNode?.combined?.resmgr?.extensions?.pf9_kube_status?.data || {}
+  const selectedNodeAllTasks = kubeStatusData.all_tasks || []
+  const selectedNodeCompletedTasks = kubeStatusData.completed_tasks || []
+  const lastSelectedNodesFailedTask = kubeStatusData.last_failed_task || []
+  const nodeState = kubeStatusData.pf9_kube_node_state as IKubeNodeState
+  const selectedNodeTitle = `${selectedNode?.name || 'Choose a node to continue'}${
+    selectedNode?.isMaster ? ' (master)' : ''
+  }`
+  const shouldShowStateStatus = !!nodeState && nodeState !== 'ok'
+  const selectedNodeStatus = shouldShowStateStatus ? (
+    <NodeTaskStatus status={nodeState}>
+      {nodeState.includes('fail') && (
+        <ExternalLink url={nodeInstallTroubleshooting}>Troubleshooting Help</ExternalLink>
+      )}
+    </NodeTaskStatus>
+  ) : (
+    renderNodeHealthStatus(null, selectedNode || {})
+  )
+
+  if (!selectedNode) {
+    return <NoContentMessage message="No instances found." />
+  }
 
   return (
     <div className={tableChooser}>
       <div className={tablePolling}>
-        <PollingData loading={loadingNodes || loadingClusters} onReload={handleReload} refreshDuration={oneSecond * 10} />
+        <PollingData
+          loading={loadingNodes || loadingClusters}
+          onReload={handleReload}
+          refreshDuration={oneSecond * 10}
+        />
       </div>
       <Table>
         <TableHead>
@@ -167,40 +209,48 @@ export const ConvergingNodesWithTasksToggler: FC = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {nodesInCluster && nodesInCluster.map((node) => {
-            const lastFailedTask = node?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.last_failed_task || null
-            const allTasks = node?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.all_tasks || []
-            const completedTasks = node?.combined?.resmgr?.extensions?.pf9_kube_status?.data?.completed_tasks || []
-            const percentComplete = (completedTasks.length / allTasks.length) * 100
-            const lastCompletedStep = allTasks[completedTasks.length - 1]
-            const { color: progressColor, message: progressLabel } = getTaskContent(allTasks, completedTasks, lastFailedTask, lastCompletedStep)
-            return (
-              <TableRow key={node.uuid} onClick={() => setSelectedNode(node)}>
-                <TableCell padding="checkbox">
-                  <Radio checked={selectedNode && selectedNode.uuid === node.uuid} />
-                </TableCell>
-                <TableCell>
-                  <Tooltip title={node.name}>
-                    <span className={ellipsis}>{node.name}</span>
-                  </Tooltip>
-                  <span>({node.primaryIp})</span>
-                </TableCell>
-                <TableCell>
-                  <ProgressBar
-                    compact
-                    width={'100%'}
-                    percent={percentComplete}
-                    color={progressColor}
-                    label={
-                      <Tooltip title={progressLabel}>
-                        <span className={ellipsis}>{progressLabel}</span>
-                      </Tooltip>
-                    }
-                  />
-                </TableCell>
-              </TableRow>
-            )
-          })}
+          {nodesInCluster &&
+            nodesInCluster.map((node) => {
+              const currNodeKubeStatusData =
+                node?.combined?.resmgr?.extensions?.pf9_kube_status?.data || {}
+              const lastFailedTask = currNodeKubeStatusData.last_failed_task || null
+              const allTasks = currNodeKubeStatusData.all_tasks || []
+              const completedTasks = currNodeKubeStatusData.completed_tasks || []
+              const percentComplete = (completedTasks.length / allTasks.length) * 100
+              const lastCompletedStep = allTasks[completedTasks.length - 1]
+              const { color: progressColor, message: progressLabel } = getTaskContent(
+                allTasks,
+                completedTasks,
+                lastFailedTask,
+                lastCompletedStep,
+              )
+              return (
+                <TableRow key={node.uuid} onClick={() => setSelectedNode(node)}>
+                  <TableCell padding="checkbox">
+                    <Radio checked={selectedNode && selectedNode.uuid === node.uuid} />
+                  </TableCell>
+                  <TableCell>
+                    <Tooltip title={node.name}>
+                      <span className={ellipsis}>{node.name}</span>
+                    </Tooltip>
+                    <span>({node.primaryIp})</span>
+                  </TableCell>
+                  <TableCell>
+                    <ProgressBar
+                      compact
+                      width={'100%'}
+                      percent={percentComplete}
+                      color={progressColor}
+                      label={
+                        <Tooltip title={progressLabel}>
+                          <span className={ellipsis}>{progressLabel}</span>
+                        </Tooltip>
+                      }
+                    />
+                  </TableCell>
+                </TableRow>
+              )
+            })}
         </TableBody>
       </Table>
       <div className={divider} />
@@ -208,23 +258,24 @@ export const ConvergingNodesWithTasksToggler: FC = () => {
         <header className={paneHeader}>
           <div className={paneHeaderTitle}>
             <Tooltip title={selectedNodeTitle || ''}>
-              <Typography variant="h6">
-                {selectedNodeTitle}
-              </Typography>
+              <Typography variant="h6">{selectedNodeTitle}</Typography>
             </Tooltip>
-            { !!selectedNode && (
-              <ExternalLink url={selectedNode?.logs} icon="clipboard-list">
+            {!!selectedNode && (
+              <ExternalLink url={selectedNode?.logs || ''} icon="clipboard-list">
                 View Logs
               </ExternalLink>
             )}
           </div>
-          <div className={paneHeaderStatus}>
-            { !!selectedNode && renderNodeHealthStatus(null, selectedNode) }
-          </div>
+          <div className={paneHeaderStatus}>{!!selectedNode && selectedNodeStatus}</div>
         </header>
         <article className={paneBody}>
           {selectedNode && (
-            <Tasks allTasks={selectedNodeAllTasks} lastFailedTask={lastSelectedNodesFailedTask} completedTasks={selectedNodeCompletedTasks} />
+            <Tasks
+              allTasks={selectedNodeAllTasks}
+              lastFailedTask={lastSelectedNodesFailedTask}
+              completedTasks={selectedNodeCompletedTasks}
+              logs={selectedNode?.logs}
+            />
           )}
         </article>
       </Card>

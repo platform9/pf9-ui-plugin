@@ -11,16 +11,9 @@ const ServiceAccountPicklist = forwardRef(({ loading, clusterId, namespace, ...r
     clusterId,
     namespace,
   })
-  const options = useMemo(() =>
-    projectAs({ label: 'name', value: 'name' }, services),
-  [services])
+  const options = useMemo(() => projectAs({ label: 'name', value: 'name' }, services), [services])
 
-  return <Picklist
-    {...rest}
-    ref={ref}
-    loading={loading || servicesLoading}
-    options={options}
-  />
+  return <Picklist {...rest} ref={ref} loading={loading || servicesLoading} options={options} />
 })
 
 ServiceAccountPicklist.propTypes = {

@@ -1,11 +1,4 @@
-import React, {
-  FC,
-  useReducer,
-  useCallback,
-  Reducer,
-  useContext,
-  createContext
-} from 'react'
+import React, { FC, useReducer, useCallback, Reducer, useContext, createContext } from 'react'
 import uuid from 'uuid'
 import { append, takeLast, reject, whereEq } from 'ramda'
 import ToastContainer, { ToastOptions } from 'core/components/notifications/ToastContainer'
@@ -26,11 +19,13 @@ const toastReducer: Reducer<ToastOptions[], ToastReducerAction> = (state, { type
       return pipe(
         takeLast(concurrentToasts - 1),
         // Remove previous duplicated messages to prevent flooding the screen
-        reject(whereEq({
-          text: payload.text,
-          variant: payload.variant,
-        })),
-        append(payload)
+        reject(
+          whereEq({
+            text: payload.text,
+            variant: payload.variant,
+          }),
+        ),
+        append(payload),
       )(state)
     case 'remove':
       return except(payload, state)
@@ -51,7 +46,7 @@ const ToastProvider: FC = ({ children }) => {
       text,
       variant,
       isOpen: true,
-      onClose: () => dispatch({ type: 'remove', payload })
+      onClose: () => dispatch({ type: 'remove', payload }),
     }
     dispatch({ type: 'add', payload })
   }, [])
@@ -66,10 +61,11 @@ const ToastProvider: FC = ({ children }) => {
 
 export default ToastProvider
 
-export const withToast = Component => props =>
+export const withToast = (Component) => (props) => (
   <ToastContext.Consumer>
-    {showToast => <Component {...props} showToast={showToast} />}
+    {(showToast) => <Component {...props} showToast={showToast} />}
   </ToastContext.Consumer>
+)
 
 export const useToast: () => ShowToastFn = () => {
   return useContext(ToastContext)

@@ -1,7 +1,7 @@
 import React from 'react'
 import { withStyles } from '@material-ui/styles'
 
-const styles = theme => ({
+const styles = (theme) => ({
   dashboardCard: {
     flexGrow: '1',
     width: '100%',
@@ -30,7 +30,7 @@ const styles = theme => ({
 
 @withStyles(styles)
 class DashboardCard extends React.PureComponent {
-  render () {
+  render() {
     const { classes, children, title } = this.props
 
     return (
@@ -38,9 +38,7 @@ class DashboardCard extends React.PureComponent {
         <div className={classes.dashboardCardTitle}>
           <h2 className={classes.dashboardCardTitleText}>{title}</h2>
         </div>
-        <div className={classes.dashboardCardContents}>
-          {children}
-        </div>
+        <div className={classes.dashboardCardContents}>{children}</div>
       </div>
     )
   }

@@ -7,7 +7,7 @@ import MiscPanel from './MiscPanel'
 import { Grid, Typography } from '@material-ui/core'
 
 class ConfigureThemePage extends React.PureComponent {
-  render () {
+  render() {
     return (
       <div>
         <Typography variant="h5">Configure Theme</Typography>

@@ -1,4 +1,5 @@
 import { ICombinedNode } from '../nodes/model'
+import { CloudProviders } from '../cloudProviders/model'
 
 export type HealthStatus = 'healthy' | 'partially_healthy' | 'unhealthy' | 'unknown'
 
@@ -82,17 +83,6 @@ export interface ICluster {
   etcdBackupEnabled: boolean
 }
 
-export enum CloudProviders {
-  Aws = 'aws',
-  Azure = 'azure',
-  BareOS = 'local',
-}
-export enum CloudProvidersFriendlyName {
-  aws = 'AWS',
-  azure = 'Azure',
-  local = 'BareOS',
-}
-
 type CloudProperties = AzureCloudProperties | AwsCloudProperties | BareOSCloudProperties
 
 interface AzureCloudProperties {
@@ -131,9 +121,11 @@ interface EtcdBackup {
   storageProperties: EtcdBackupStorageProperties
   intervalInMins: string
 }
+
 interface EtcdBackupStorageProperties {
   localPath: string
 }
+
 interface Links {
   dashboard: null
   kubeconfig: null

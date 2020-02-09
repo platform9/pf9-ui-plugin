@@ -10,14 +10,17 @@ const NodeDeAuthDialog = ({ rows: [node], onClose }) => {
   return (
     <ConfirmationDialog
       title="De-authorize node"
-      text={<>
+      text={
+        <>
           You are about to de-authorize the node {node.name} ({node.primaryIp})
-        <br />
-        Are you sure?
-      </>}
+          <br />
+          Are you sure?
+        </>
+      }
       open
       onCancel={onClose}
-      onConfirm={handeSubmit} />
+      onConfirm={handeSubmit}
+    />
   )
 }
 

@@ -9,7 +9,7 @@ import useDataUpdater from 'core/hooks/useDataUpdater'
 import { pathEq, assocPath, isEmpty } from 'ramda'
 import { emptyObj } from 'utils/fp'
 
-const createUpdateComponents = options => {
+const createUpdateComponents = (options) => {
   const {
     cacheKey,
     loaderFn = cacheKey ? getContextLoader(cacheKey) : null,
@@ -28,11 +28,11 @@ const createUpdateComponents = options => {
   } = options
   const uniqueIdentifierPath = uniqueIdentifier.split('.')
 
-  const UpdatePage = props => {
+  const UpdatePage = (props) => {
     const { match, history } = useReactRouter()
     const [initialValues, setInitialValues] = useState(emptyObj)
     const [data, loading] = useDataLoader(loaderFn)
-    const [update, updating] = useDataUpdater(updateFn, successfulUpdate => {
+    const [update, updating] = useDataUpdater(updateFn, (successfulUpdate) => {
       if (successfulUpdate) {
         history.push(listUrl)
       }
@@ -50,25 +50,28 @@ const createUpdateComponents = options => {
       }
     }, [data])
 
-    const handleComplete = useCallback(async data => {
-      if (initFn) {
-        // Sometimes a component needs more than just a single GET API call.
-        // This function allows for any amount of arbitrary initialization.
-        await initFn(props)
-      }
-      update(assocPath(uniqueIdentifierPath, id, data))
-    }, [id])
+    const handleComplete = useCallback(
+      async (data) => {
+        if (initFn) {
+          // Sometimes a component needs more than just a single GET API call.
+          // This function allows for any amount of arbitrary initialization.
+          await initFn(props)
+        }
+        update(assocPath(uniqueIdentifierPath, id, data))
+      },
+      [id],
+    )
 
-    return <FormWrapper title={title} backUrl={listUrl}>
-      <Progress message={`${updating
-        ? 'Updating data...'
-        : 'Loading data...'}`} loading={isEmpty(initialValues) || loading || updating}>
-        <FormComponent
-          {...props}
-          onComplete={handleComplete}
-          initialValues={initialValues} />
-      </Progress>
-    </FormWrapper>
+    return (
+      <FormWrapper title={title} backUrl={listUrl}>
+        <Progress
+          message={`${updating ? 'Updating data...' : 'Loading data...'}`}
+          loading={isEmpty(initialValues) || loading || updating}
+        >
+          <FormComponent {...props} onComplete={handleComplete} initialValues={initialValues} />
+        </Progress>
+      </FormWrapper>
+    )
   }
 
   UpdatePage.displayName = `Update${name}Page`

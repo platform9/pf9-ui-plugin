@@ -1,8 +1,16 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import {
-  Collapse, Drawer, ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary,
-  IconButton, ListItemText, MenuItem, MenuList, Typography,
+  Collapse,
+  Drawer,
+  ExpansionPanel,
+  ExpansionPanelDetails,
+  ExpansionPanelSummary,
+  IconButton,
+  ListItemText,
+  MenuItem,
+  MenuList,
+  Typography,
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
@@ -21,7 +29,7 @@ import { routes } from 'core/utils/routes'
 
 export const drawerWidth = 180
 
-const styles = theme => ({
+const styles = (theme) => ({
   logoTitle: {
     backgroundImage: `url(${imageUrls.logo})`,
     backgroundRepeat: 'no-repeat',
@@ -68,7 +76,7 @@ const styles = theme => ({
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    width: (theme.spacing(6)) + 2,
+    width: theme.spacing(6) + 2,
     // [theme.breakpoints.up('sm')]: {
     //   width: theme.spacing(5.5),
     // },
@@ -138,7 +146,7 @@ const styles = theme => ({
     '& > i': {
       maxHeight: 28,
       maxWidth: 28,
-    }
+    },
   },
   navMenu: {
     padding: 0,
@@ -223,9 +231,10 @@ const styles = theme => ({
     borderRadius: theme.shape.borderRadius,
     boxSizing: 'border-box',
     backgroundRepeat: 'no-repeat',
-    backgroundImage: ({ stack }) => stack === 'openstack'
-      ? 'url(/ui/images/logo-sidenav-os.svg)'
-      : 'url(/ui/images/logo-kubernetes-h.png)',
+    backgroundImage: ({ stack }) =>
+      stack === 'openstack'
+        ? 'url(/ui/images/logo-sidenav-os.svg)'
+        : 'url(/ui/images/logo-kubernetes-h.png)',
     backgroundSize: ({ open, stack }) => {
       if (stack === 'kubernetes') {
         return open ? '120px' : '130px'
@@ -255,7 +264,7 @@ const styles = theme => ({
 @withHotKeys
 @withRouter
 class Navbar extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
     // The following events will be triggered even when focusing an editable input
     props.setHotKeyHandler('Enter', this.handleEnterKey, { whileEditing: true })
@@ -277,14 +286,14 @@ class Navbar extends PureComponent {
   }
 
   handleEscKey = () => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       ...prevState,
       activeNavItem: null,
       filterText: '',
     }))
   }
 
-  handleArrowKeys = direction => () => {
+  handleArrowKeys = (direction) => () => {
     const { filterText, activeNavItem } = this.state
     if (filterText && activeNavItem) {
       // Highlight next nav item
@@ -303,18 +312,20 @@ class Navbar extends PureComponent {
     if (filterText && activeNavItem) {
       const sectionLinks = this.getSectionLinks()
       const { link: activeNavLink } = sectionLinks.find(propEq('name', activeNavItem))
-      this.setState(prevState => ({
-        ...prevState,
-        activeNavItem: null,
-        filterText: '',
-      }), () => this.props.history.push(activeNavLink.path))
+      this.setState(
+        (prevState) => ({
+          ...prevState,
+          activeNavItem: null,
+          filterText: '',
+        }),
+        () => this.props.history.push(activeNavLink.path),
+      )
     }
   }
 
-  handleExpand = moize(sectionName =>
-    () => this.setState(assoc('expandedSection', sectionName)))
+  handleExpand = moize((sectionName) => () => this.setState(assoc('expandedSection', sectionName)))
 
-  handleFilterChange = e => {
+  handleFilterChange = (e) => {
     const { value } = e.target
     this.setState(assoc('filterText', value), () => {
       if (value) {
@@ -327,14 +338,11 @@ class Navbar extends PureComponent {
     })
   }
 
-  flattenLinks = moize(links =>
-    flatten(
-      links.map(link => link.nestedLinks
-        ? this.flattenLinks(link.nestedLinks)
-        : [link])),
+  flattenLinks = moize((links) =>
+    flatten(links.map((link) => (link.nestedLinks ? this.flattenLinks(link.nestedLinks) : [link]))),
   )
 
-  getFilteredLinks = links => {
+  getFilteredLinks = (links) => {
     const { filterText } = this.state
     return this.flattenLinks(links).filter(({ name }) =>
       name.toLocaleLowerCase().includes(filterText.toLocaleLowerCase()),
@@ -346,7 +354,7 @@ class Navbar extends PureComponent {
     return this.getFilteredLinks(sectionLinks)
   }
 
-  getNavToFn = moize(link => () => {
+  getNavToFn = moize((link) => () => {
     this.props.history.push(link)
   })
 
@@ -357,7 +365,8 @@ class Navbar extends PureComponent {
         expandedItems: expandedItems.includes(name)
           ? except(name, expandedItems)
           : [name, ...expandedItems],
-      }), () => {
+      }),
+      () => {
         if (path) {
           this.props.history.push(path)
         }
@@ -366,40 +375,55 @@ class Navbar extends PureComponent {
   })
 
   renderNavFolder = (name, link, subLinks, icon) => {
-    const { classes, location: { pathname, hash }, open } = this.props
-    const matchesCurrentPath = link => link && matchPath(`${pathname}${hash}`, {
-      path: link.path,
-      exact: true,
-      strict: false,
-    })
-    const redirect = () => { window.location = link.path }
+    const {
+      classes,
+      location: { pathname, hash },
+      open,
+    } = this.props
+    const matchesCurrentPath = (link) =>
+      link &&
+      matchPath(`${pathname}${hash}`, {
+        path: link.path,
+        exact: true,
+        strict: false,
+      })
+    const redirect = () => {
+      window.location = link.path
+    }
     const handleClick = link.external
       ? redirect
       : this.toggleFoldingAndNavTo(name, prop('path', link))
     const isCurrentNavLink = matchesCurrentPath(link)
-    const expanded = open && (subLinks.some(({ link }) => matchesCurrentPath(link)) ||
-      this.state.expandedItems.includes(name))
+    const expanded =
+      open &&
+      (subLinks.some(({ link }) => matchesCurrentPath(link)) ||
+        this.state.expandedItems.includes(name))
     return [
       <MenuItem
         key={`menuItem-${name}`}
         onClick={handleClick}
         className={clsx(classes.navMenuItem, {
           [classes.currentNavLink]: !!isCurrentNavLink,
-        })}>
-        {icon && <div className={classes.navIcon}>
-          <FontAwesomeIcon size="xl">{icon}</FontAwesomeIcon>
-        </div>}
-        {open && <ListItemText
-          classes={{
-            root: classes.navMenuTextRoot,
-            primary: isCurrentNavLink ? classes.currentNavMenuText : classes.navMenuText,
-          }}
-          primary={name} />}
-        {open ? (expanded ? <ExpandLess /> : <ExpandMore />) : null}
+        })}
+      >
+        {icon && (
+          <div className={classes.navIcon}>
+            <FontAwesomeIcon size="xl">{icon}</FontAwesomeIcon>
+          </div>
+        )}
+        {open && (
+          <ListItemText
+            classes={{
+              root: classes.navMenuTextRoot,
+              primary: isCurrentNavLink ? classes.currentNavMenuText : classes.navMenuText,
+            }}
+            primary={name}
+          />
+        )}
+        {open ? expanded ? <ExpandLess /> : <ExpandMore /> : null}
       </MenuItem>,
       <Collapse key={`collapse-${name}`} in={expanded} timeout="auto" unmountOnExit>
-        <MenuList component="div" className={classes.navMenuList}
-          disablePadding>
+        <MenuList component="div" className={classes.navMenuList} disablePadding>
           {subLinks.map(this.renderNavLink)}
         </MenuList>
       </Collapse>,
@@ -407,123 +431,154 @@ class Navbar extends PureComponent {
   }
 
   renderNavLink = ({ nestedLinks, link, name, icon }, idx) => {
-    const { open, classes, location: { pathname } } = this.props
+    const {
+      open,
+      classes,
+      location: { pathname },
+    } = this.props
     const { activeNavItem } = this.state
     const isActiveNavLink = activeNavItem === name
-    const isCurrentNavLink = link && matchPath(pathname, {
-      path: link.path,
-      exact: false,
-      strict: false,
-    })
+    const isCurrentNavLink =
+      link &&
+      matchPath(pathname, {
+        path: link.path,
+        exact: false,
+        strict: false,
+      })
 
-    const redirect = () => { window.location = link.path }
+    const redirect = () => {
+      window.location = link.path
+    }
     const handleClick = link.external ? redirect : this.getNavToFn(link.path)
 
     // if (nestedLinks) {
     //   this.renderNavFolder(name, link, nestedLinks, icon)
     // }
-    return <MenuItem tabIndex={idx}
-      className={clsx(classes.navMenuItem, {
-        [classes.activeNavItem]: isActiveNavLink,
-        [classes.currentNavLink]: !!isCurrentNavLink && !isActiveNavLink,
-      })}
-      onClick={handleClick}
-      key={link.path}>
-      {icon && <div className={classes.navIcon}>
-        <FontAwesomeIcon title={name} size="xl">{icon}</FontAwesomeIcon>
-      </div>}
-      {open && <ListItemText
-        classes={{
-          root: classes.navMenuTextRoot,
-          primary: isCurrentNavLink ? classes.currentNavMenuText : classes.navMenuText,
-        }}
-        primary={name} />}
-    </MenuItem>
+    return (
+      <MenuItem
+        tabIndex={idx}
+        className={clsx(classes.navMenuItem, {
+          [classes.activeNavItem]: isActiveNavLink,
+          [classes.currentNavLink]: !!isCurrentNavLink && !isActiveNavLink,
+        })}
+        onClick={handleClick}
+        key={link.path}
+      >
+        {icon && (
+          <div className={classes.navIcon}>
+            <FontAwesomeIcon title={name} size="xl">
+              {icon}
+            </FontAwesomeIcon>
+          </div>
+        )}
+        {open && (
+          <ListItemText
+            classes={{
+              root: classes.navMenuTextRoot,
+              primary: isCurrentNavLink ? classes.currentNavMenuText : classes.navMenuText,
+            }}
+            primary={name}
+          />
+        )}
+      </MenuItem>
+    )
   }
 
-  renderSections = sections => {
+  renderSections = (sections) => {
     const { classes } = this.props
     const { expandedSection } = this.state
-    return sections.map(section =>
+    return sections.map((section) => (
       <ExpansionPanel
         key={section.id}
         className={classes.nav}
         expanded={expandedSection === section.id}
-        onChange={this.handleExpand(section.id)}>
-        <ExpansionPanelSummary
-          className={classes.navHeading}
-          expandIcon={<ExpandMore />}>
-          <Typography
-            className={classes.navHeadingText}>{section.name}</Typography>
+        onChange={this.handleExpand(section.id)}
+      >
+        <ExpansionPanelSummary className={classes.navHeading} expandIcon={<ExpandMore />}>
+          <Typography className={classes.navHeadingText}>{section.name}</Typography>
         </ExpansionPanelSummary>
         <ExpansionPanelDetails className={classes.navBody}>
           {this.renderSectionLinks(section.links)}
         </ExpansionPanelDetails>
-      </ExpansionPanel>)
+      </ExpansionPanel>
+    ))
   }
 
-  renderSectionLinks = sectionLinks => {
+  renderSectionLinks = (sectionLinks) => {
     const { classes } = this.props
     const { filterText } = this.state
     const filteredLinks = filterText ? this.getFilteredLinks(sectionLinks) : sectionLinks
-    return <MenuList component="nav" className={classes.navMenu}>
-      {filteredLinks.map(this.renderNavLink)}
-    </MenuList>
+    return (
+      <MenuList component="nav" className={classes.navMenu}>
+        {filteredLinks.map(this.renderNavLink)}
+      </MenuList>
+    )
   }
 
   renderStackSlider = () => {
     const { classes, open } = this.props
-    return <div className={classes.sliderContainer}>
-      {open && <a href={clarityDashboardUrl}>
-        <ChevronLeftIcon className={classes.sliderArrow} />
-      </a>}
-      <div className={classes.sliderLogo} />
-      {open && <a href={clarityDashboardUrl}>
-        <ChevronRightIcon className={classes.sliderArrow} />
-      </a>}
-    </div>
+    return (
+      <div className={classes.sliderContainer}>
+        {open && (
+          <a href={clarityDashboardUrl}>
+            <ChevronLeftIcon className={classes.sliderArrow} />
+          </a>
+        )}
+        <div className={classes.sliderLogo} />
+        {open && (
+          <a href={clarityDashboardUrl}>
+            <ChevronRightIcon className={classes.sliderArrow} />
+          </a>
+        )}
+      </div>
+    )
   }
 
-  render () {
+  render() {
     const { classes, withStackSlider, sections, open, handleDrawerToggle, stack } = this.props
     // const filteredSections = sections.filter(where({ links: notEmpty }))
     // Because ironic regions will not currently support kubernetes, assume always
     // one filtered section, either openstack (ironic) or kubernetes
     const filteredSections = sections.filter(where({ id: equals(stack) }))
 
-    return <div
-      className={clsx(classes.drawer, {
-        [classes.drawerOpen]: open,
-        [classes.drawerClose]: !open,
-      })}>
-      <IconButton className={classes.toggleButton} onClick={handleDrawerToggle}>
-        <FontAwesomeIcon size="xl">{open ? 'angle-double-left' : 'angle-double-right'}</FontAwesomeIcon>
-      </IconButton>
-      <Drawer
-        variant="permanent"
+    return (
+      <div
         className={clsx(classes.drawer, {
           [classes.drawerOpen]: open,
           [classes.drawerClose]: !open,
         })}
-        classes={{
-          paper: clsx(classes.paper, {
+      >
+        <IconButton className={classes.toggleButton} onClick={handleDrawerToggle}>
+          <FontAwesomeIcon size="xl">
+            {open ? 'angle-double-left' : 'angle-double-right'}
+          </FontAwesomeIcon>
+        </IconButton>
+        <Drawer
+          variant="permanent"
+          className={clsx(classes.drawer, {
             [classes.drawerOpen]: open,
             [classes.drawerClose]: !open,
-          }),
-        }}
-        anchor="left"
-        open={open}
-      >
-        <div className={classes.drawerHeader} onClick={this.handleLogoClick}>
-          <div className={classes.logo} />
-          <div className={classes.logoTitle} />
-        </div>
-        {withStackSlider ? this.renderStackSlider() : null}
-        {filteredSections.length > 1
-          ? this.renderSections(filteredSections)
-          : this.renderSectionLinks(propOr([], 'links', filteredSections[0]))}
-      </Drawer>
-    </div>
+          })}
+          classes={{
+            paper: clsx(classes.paper, {
+              [classes.drawerOpen]: open,
+              [classes.drawerClose]: !open,
+            }),
+          }}
+          anchor="left"
+          open={open}
+        >
+          <div className={classes.drawerHeader} onClick={this.handleLogoClick}>
+            <div className={classes.logo} />
+            <div className={classes.logoTitle} />
+          </div>
+          {withStackSlider ? this.renderStackSlider() : null}
+          {filteredSections.length > 1
+            ? this.renderSections(filteredSections)
+            : this.renderSectionLinks(propOr([], 'links', filteredSections[0]))}
+        </Drawer>
+      </div>
+    )
   }
 }
 
@@ -550,9 +605,7 @@ Navbar.propTypes = {
   withStackSlider: PropTypes.bool,
   open: PropTypes.bool,
   handleDrawerToggle: PropTypes.func,
-  sections: PropTypes.arrayOf(
-    PropTypes.shape(sectionPropType),
-  ).isRequired,
+  sections: PropTypes.arrayOf(PropTypes.shape(sectionPropType)).isRequired,
   stack: PropTypes.string,
 }
 

@@ -32,67 +32,97 @@ const initialContext = {
 
 const AddUserPage = () => {
   const { history } = useReactRouter()
-  const onComplete = useCallback(success => success && history.push(listUrl), [history])
+  const onComplete = useCallback((success) => success && history.push(listUrl), [history])
   const [handleAdd, submitting] = useDataUpdater(mngmUserActions.create, onComplete)
   const [tenants, loadingTenants] = useDataLoader(mngmTenantActions.list)
   const [activationType, setActivationType] = useState('createPassword')
 
-  const activationByEmailLabel = <>
-    <div>Send activation email to the user.</div>
-    <Typography variant="body2" component="p" color="textSecondary">
-      Instructions to create a new password and to activate account will be sent to
-      the email provided.
-    </Typography>
-  </>
-  const createUserPasswordLabel = <>
-    <div>Set password for new user now.</div>
-    <Typography variant="body2" component="p" color="textSecondary">
-      Create password for the new user now and activate the account immediately.
-    </Typography>
-  </>
-  return <FormWrapper
-    title="New User"
-    loading={submitting}
-    backUrl={listUrl}>
-    <Wizard onComplete={handleAdd} context={initialContext}>
-      {({ wizardContext, setWizardContext, onNext }) => <>
-        <WizardStep stepId="basic" label="Basic Info">
-          <ValidatedForm initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
-            {({ values }) => <>
-              <TextField id="username" label="Username or Email" required />
-              <TextField id="displayname" label="Display Name" />
-              <FormControl component="fieldset">
-                <FormLabel component="legend"><p>Activate User Account</p></FormLabel>
-                <RadioGroup value={activationType} onChange={
-                  e => setActivationType(e.target.value)}>
-                  { <FormControlLabel
-                    value="activationByEmail"
-                    control={<Radio color="primary" />}
-                    label={activationByEmailLabel} />}
-                  <br />
-                  <FormControlLabel
-                    value="createPassword"
-                    control={<Radio color="primary" />}
-                    label={createUserPasswordLabel} />
-                </RadioGroup>
-              </FormControl>
-              {activationType === 'createPassword' && <UserPasswordField value={values.password} />}
-            </>}
-          </ValidatedForm>
-        </WizardStep>
-        <WizardStep stepId="tenants" label="Tenants and Roles">
-          <Typography variant="body1" component="p">
-            Select one or more tenants that should map to this user.
-          </Typography>
-          <ValidatedForm fullWidth initialValues={wizardContext} onSubmit={setWizardContext} triggerSubmit={onNext}>
-            <Progress renderContentOnMount={!loadingTenants} loading={loadingTenants} message={'Loading Tenants...'}>
-              <TenantRolesTableField required id="roleAssignments" tenants={tenants} />
-            </Progress>
-          </ValidatedForm>
-        </WizardStep>
-      </>}
-    </Wizard>
-  </FormWrapper>
+  const activationByEmailLabel = (
+    <>
+      <div>Send activation email to the user.</div>
+      <Typography variant="body2" component="p" color="textSecondary">
+        Instructions to create a new password and to activate account will be sent to the email
+        provided.
+      </Typography>
+    </>
+  )
+  const createUserPasswordLabel = (
+    <>
+      <div>Set password for new user now.</div>
+      <Typography variant="body2" component="p" color="textSecondary">
+        Create password for the new user now and activate the account immediately.
+      </Typography>
+    </>
+  )
+  return (
+    <FormWrapper title="New User" loading={submitting} backUrl={listUrl}>
+      <Wizard onComplete={handleAdd} context={initialContext}>
+        {({ wizardContext, setWizardContext, onNext }) => (
+          <>
+            <WizardStep stepId="basic" label="Basic Info">
+              <ValidatedForm
+                initialValues={wizardContext}
+                onSubmit={setWizardContext}
+                triggerSubmit={onNext}
+              >
+                {({ values }) => (
+                  <>
+                    <TextField id="username" label="Username or Email" required />
+                    <TextField id="displayname" label="Display Name" />
+                    <FormControl component="fieldset">
+                      <FormLabel component="legend">
+                        <p>Activate User Account</p>
+                      </FormLabel>
+                      <RadioGroup
+                        value={activationType}
+                        onChange={(e) => setActivationType(e.target.value)}
+                      >
+                        {
+                          <FormControlLabel
+                            value="activationByEmail"
+                            control={<Radio color="primary" />}
+                            label={activationByEmailLabel}
+                          />
+                        }
+                        <br />
+                        <FormControlLabel
+                          value="createPassword"
+                          control={<Radio color="primary" />}
+                          label={createUserPasswordLabel}
+                        />
+                      </RadioGroup>
+                    </FormControl>
+                    {activationType === 'createPassword' && (
+                      <UserPasswordField value={values.password} />
+                    )}
+                  </>
+                )}
+              </ValidatedForm>
+            </WizardStep>
+            <WizardStep stepId="tenants" label="Tenants and Roles">
+              <Typography variant="body1" component="p">
+                Select one or more tenants that should map to this user.
+              </Typography>
+              <ValidatedForm
+                fullWidth
+                initialValues={wizardContext}
+                onSubmit={setWizardContext}
+                triggerSubmit={onNext}
+              >
+                <Progress
+                  renderContentOnMount={!loadingTenants}
+                  loading={loadingTenants}
+                  message={'Loading Tenants...'}
+                >
+                  <TenantRolesTableField required id="roleAssignments" tenants={tenants} />
+                </Progress>
+              </ValidatedForm>
+            </WizardStep>
+          </>
+        )}
+      </Wizard>
+    </FormWrapper>
+  )
 }
 
 export default AddUserPage

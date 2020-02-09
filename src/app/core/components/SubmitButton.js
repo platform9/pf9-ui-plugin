@@ -4,10 +4,10 @@ import Button from '@material-ui/core/Button'
 import { withStyles } from '@material-ui/styles'
 import clsx from 'clsx'
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     marginTop: theme.spacing(3),
-  }
+  },
 })
 
 const SubmitButton = ({ className, classes, children, form }) => (

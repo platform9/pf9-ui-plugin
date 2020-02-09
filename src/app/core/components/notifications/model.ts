@@ -4,7 +4,7 @@ export enum MessageTypes {
   success = 'success',
   warning = 'warning',
   error = 'error',
-  info = 'info'
+  info = 'info',
 }
 
 export interface MessageOptions {

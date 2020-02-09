@@ -53,14 +53,14 @@ const storybookTheme = create({
 
 addParameters({
   options: {
-    theme: storybookTheme
-  }
+    theme: storybookTheme,
+  },
 })
 
 const req = require.context('.', true, /\.stories\.js$/)
 
-function loadStories () {
-  req.keys().forEach(filename => req(filename))
+function loadStories() {
+  req.keys().forEach((filename) => req(filename))
 }
 
 configure(loadStories, module)

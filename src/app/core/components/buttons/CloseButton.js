@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 import { makeStyles } from '@material-ui/styles'
 import { Tooltip } from '@material-ui/core'
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   icon: {
     color: theme.palette.primary.main,
     '&:hover': {
@@ -14,17 +14,17 @@ const useStyles = makeStyles(theme => ({
   },
 }))
 
-const CloseButton = props => {
+const CloseButton = ({ tooltip = 'Cancel', ...props }) => {
   const classes = useStyles()
-  const icon = <FontAwesomeIcon className={classes.icon} solid size="2x" {...props}>
-    times-circle
-  </FontAwesomeIcon>
+  const icon = (
+    <FontAwesomeIcon className={classes.icon} size="2x" {...props}>
+      times-circle
+    </FontAwesomeIcon>
+  )
 
   return (
-    <Tooltip title="Cancel" placement="bottom">
-      {props.to
-        ? <Link to={props.to}>{icon}</Link>
-        : icon}
+    <Tooltip title={tooltip} placement="bottom">
+      {props.to ? <Link to={props.to}>{icon}</Link> : icon}
     </Tooltip>
   )
 }

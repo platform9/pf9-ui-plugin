@@ -9,21 +9,22 @@ import Navbar from 'core/components/Navbar'
 
 const addStories = addStoriesFromModule(module)
 
-const getSomeNavbarItems = (withIcons, count = 5) =>
-  range(count).map(fakeNavbarItem(withIcons))
+const getSomeNavbarItems = (withIcons, count = 5) => range(count).map(fakeNavbarItem(withIcons))
 
 const categories = ['Infrastructure', 'Clusters', 'Nodes', 'Providers']
-const getCategorizedItems = withIcons => categories.map(category => ({
-  ...fakeNavbarItem(withIcons)(),
-  name: category,
-  nestedLinks: getSomeNavbarItems(withIcons, randomInt(1, 5)),
-}))
+const getCategorizedItems = (withIcons) =>
+  categories.map((category) => ({
+    ...fakeNavbarItem(withIcons)(),
+    name: category,
+    nestedLinks: getSomeNavbarItems(withIcons, randomInt(1, 5)),
+  }))
 
-const getSections = withIcons => range(4).map(() => ({
-  id: faker.random.uuid(),
-  name: faker.random.word(),
-  links: getCategorizedItems().map(omit(['icon'])),
-}))
+const getSections = (withIcons) =>
+  range(4).map(() => ({
+    id: faker.random.uuid(),
+    name: faker.random.word(),
+    links: getCategorizedItems().map(omit(['icon'])),
+  }))
 
 addStories('Common Components/Navbar', {
   'Random links': () => (
@@ -55,5 +56,5 @@ addStories('Common Components/Navbar', {
     <Router>
       <Navbar sections={getSections(true)} />
     </Router>
-  )
+  ),
 })

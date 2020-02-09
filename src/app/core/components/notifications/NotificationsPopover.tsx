@@ -3,10 +3,9 @@ import { Popover, Typography, Tooltip, Button } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { AppContext } from 'core/providers/AppProvider'
-import NotificationItem
-  from 'core/components/notifications/NotificationItem'
+import NotificationItem from 'core/components/notifications/NotificationItem'
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   title: {
     fontSize: theme.typography.pxToRem(15),
     fontWeight: theme.typography.fontWeightBold,
@@ -18,11 +17,11 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexFlow: 'column nowrap',
     padding: theme.spacing(1, 0),
-    overflowY: 'auto'
+    overflowY: 'auto',
   },
   icon: {
     cursor: 'pointer',
-    fontWeight: 900
+    fontWeight: 900,
   },
   clearButton: {
     fontSize: theme.typography.pxToRem(12),
@@ -30,10 +29,10 @@ const useStyles = makeStyles(theme => ({
   empty: {
     margin: theme.spacing(3, 0),
     textAlign: 'center',
-  }
+  },
 }))
 
-const usePopoverStyles = makeStyles(theme => ({
+const usePopoverStyles = makeStyles((theme) => ({
   paper: {
     overflow: 'visible',
     display: 'flex',
@@ -46,7 +45,7 @@ const usePopoverStyles = makeStyles(theme => ({
     border: 0,
     borderRadius: 3,
     '&:before': {
-      content: '\' \'',
+      content: "' '",
       position: 'absolute',
       top: -20,
       right: 10,
@@ -55,7 +54,7 @@ const usePopoverStyles = makeStyles(theme => ({
       borderLeft: '10px solid transparent',
       borderTop: '10px solid transparent',
       zIndex: 10,
-    }
+    },
   },
 }))
 
@@ -65,7 +64,7 @@ const NotificationsPopover = ({ className }) => {
   const popoverClasses = usePopoverStyles({})
   const [anchorEl, setAnchorEl] = React.useState(null)
 
-  const handleClick = event => {
+  const handleClick = (event) => {
     setAnchorEl(event.currentTarget)
   }
 
@@ -76,49 +75,51 @@ const NotificationsPopover = ({ className }) => {
   const open = Boolean(anchorEl)
   const id = open ? 'simple-popover' : undefined
 
-  return <div className={className}>
-    <Tooltip
-      title="Notifications"
-      placement="bottom"
-    >
-      <FontAwesomeIcon className={classes.icon} aria-describedby={id} onClick={handleClick}>
-        exclamation-circle
-      </FontAwesomeIcon>
-    </Tooltip>
-    <Popover
-      id={id}
-      anchorReference="anchorEl"
-      anchorEl={anchorEl}
-      classes={popoverClasses}
-      open={open}
-      onClose={handleClose}
-      anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
-      }}
-      transformOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
-      }}
-    >
-      <Typography component="div" className={classes.title} variant="caption">
-        Error Notifications
-      </Typography>
-      <div className={classes.notifications}>
-        {notifications.length
-          ? notifications.map(notification =>
-            <NotificationItem key={notification.id} notification={notification} />)
-          : <Typography className={classes.empty} variant="subtitle2">
-            There are no errors
-          </Typography>}
-      </div>
-      {notifications.length
-        ? <Button onClick={clearNotifications} className={classes.clearButton}>
-          Clear List
-        </Button>
-        : null}
-    </Popover>
-  </div>
+  return (
+    <div className={className}>
+      <Tooltip title="Notifications" placement="bottom">
+        <FontAwesomeIcon className={classes.icon} aria-describedby={id} onClick={handleClick}>
+          exclamation-circle
+        </FontAwesomeIcon>
+      </Tooltip>
+      <Popover
+        id={id}
+        anchorReference="anchorEl"
+        anchorEl={anchorEl}
+        classes={popoverClasses}
+        open={open}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+      >
+        <Typography component="div" className={classes.title} variant="caption">
+          Error Notifications
+        </Typography>
+        <div className={classes.notifications}>
+          {notifications.length ? (
+            notifications.map((notification) => (
+              <NotificationItem key={notification.id} notification={notification} />
+            ))
+          ) : (
+            <Typography className={classes.empty} variant="subtitle2">
+              There are no errors
+            </Typography>
+          )}
+        </div>
+        {notifications.length ? (
+          <Button onClick={clearNotifications} className={classes.clearButton}>
+            Clear List
+          </Button>
+        ) : null}
+      </Popover>
+    </div>
+  )
 }
 
 export default NotificationsPopover

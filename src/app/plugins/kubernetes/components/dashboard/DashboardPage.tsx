@@ -12,36 +12,166 @@ import { mngmUserActions } from '../userManagement/users/actions'
 import { mngmTenantActions } from '../userManagement/tenants/actions'
 import { cloudProviderActions } from '../infrastructure/cloudProviders/actions'
 // Components
-import StatusCard from './StatusCard'
+import StatusCard, { StatusCardProps } from './StatusCard'
 import { Typography } from '@material-ui/core'
 import { capitalizeString, normalizeUsername } from 'utils/misc'
 
 import ClusterSetup, {
   clustersHaveMonitoring,
   clustersHaveAccess,
-} from '../onboarding/cluster-setup'
-import PodSetup, { podSetupComplete } from '../onboarding/pod-setup'
+} from 'k8s/components/onboarding/ClusterSetup'
+import PodSetup, { podSetupComplete } from 'k8s/components/onboarding/PodSetup'
 import useDataLoader from 'core/hooks/useDataLoader'
 import Progress from 'core/components/progress/Progress'
 import identity from 'ramda/es/identity'
 import { isAdminRole } from 'k8s/util/helpers'
 import { routes } from 'core/utils/routes'
-import { CloudProviders } from '../infrastructure/clusters/model'
+import { CloudProviders } from '../infrastructure/cloudProviders/model'
+import Theme from 'core/themes/model'
 
-const useStyles = makeStyles((theme) => ({
-  cardRow: {
-    display: 'flex',
-    flexDirection: 'row',
-    flexWrap: 'nowrap',
+export interface IStatusCardWithFilterProps extends StatusCardProps {
+  permissions: string[]
+}
+
+const useStyles = makeStyles<Theme>((theme) => ({
+  dashboardMosaic: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(4, 290px)',
+    gridTemplateAreas: `
+      'cluster node pod cloud'
+      'user tenant deployment service'
+    `,
+    gridGap: theme.spacing(2),
+    marginTop: theme.spacing(2),
   },
   cardColumn: {
     display: 'flex',
     flexDirection: 'column',
     flexWrap: 'nowrap',
   },
+  cluster: {
+    gridArea: 'cluster',
+  },
+  node: {
+    gridArea: 'node',
+  },
+  cloud: {
+    gridArea: 'cloud',
+  },
+  user: {
+    gridArea: 'user',
+  },
+  tenant: {
+    gridArea: 'tenant',
+  },
+  deployment: {
+    gridArea: 'deployment',
+  },
+  service: {
+    gridArea: 'service',
+  },
+  pod: {
+    gridArea: 'pod',
+  },
 }))
 
-const topReports = [
+export const clusterStatusCardProps: IStatusCardWithFilterProps = {
+  entity: 'cluster',
+  permissions: ['admin'], // Technically non-admins have read-only access
+  route: routes.cluster.list.path(),
+  addRoute: routes.cluster.add.path(),
+  title: 'Clusters',
+  icon: 'project-diagram',
+  dataLoader: [clusterActions.list, {}],
+  quantityFn: (clusters) => ({
+    quantity: clusters.length,
+    pieData: [
+      {
+        name: 'healthy',
+        value: clusters.filter((cluster) => cluster.healthStatus === 'healthy').length,
+        color: 'success',
+      },
+      {
+        name: 'partially_healthy',
+        value: clusters.filter((cluster) => cluster.healthStatus === 'partially_healthy').length,
+        color: 'warning',
+      },
+      {
+        name: 'converging',
+        value: clusters.filter((cluster) => cluster.healthStatus === 'converging').length,
+        color: 'unknown',
+      },
+      {
+        name: 'unhealthy',
+        value: clusters.filter((cluster) => cluster.healthStatus === 'unhealthy').length,
+        color: 'error',
+      },
+    ],
+    piePrimary: 'healthy',
+  }),
+}
+export const nodeStatusCardProps: IStatusCardWithFilterProps = {
+  entity: 'node',
+  permissions: ['admin'],
+  route: routes.nodes.list.path(),
+  addRoute: routes.nodes.download.path(),
+  title: 'Nodes',
+  icon: 'ball-pile',
+  dataLoader: [loadNodes, {}],
+  quantityFn: (nodes) => ({
+    quantity: nodes.length,
+    pieData: [
+      {
+        name: 'healthy',
+        value: nodes.filter((node) => nodeHealthStatus(node) === 'healthy').length,
+        color: 'success',
+      },
+      {
+        name: 'unknown',
+        value: nodes.filter((node) => nodeHealthStatus(node) === 'unknown').length,
+        color: 'unknown',
+      },
+      {
+        name: 'converging',
+        value: nodes.filter((node) => nodeHealthStatus(node) === 'converging').length,
+        color: 'warning',
+      },
+      {
+        name: 'unhealthy',
+        value: nodes.filter((node) => nodeHealthStatus(node) === 'unhealthy').length,
+        color: 'error',
+      },
+    ],
+    piePrimary: 'healthy',
+  }),
+}
+export const cloudStatusCardProps: IStatusCardWithFilterProps = {
+  entity: 'cloud',
+  permissions: ['admin'],
+  route: routes.cloudProviders.list.path(),
+  addRoute: routes.cloudProviders.add.path({ type: CloudProviders.Aws }),
+  title: 'Cloud Accounts',
+  icon: 'cloud',
+  dataLoader: [cloudProviderActions.list, {}],
+  quantityFn: (clouds) => ({
+    quantity: clouds.length,
+    pieData: [
+      {
+        name: 'AWS',
+        value: clouds.filter((cloud) => cloud.type === CloudProviders.Aws).length,
+        color: 'aws',
+      },
+      {
+        name: 'Azure',
+        value: clouds.filter((cloud) => cloud.type === CloudProviders.Azure).length,
+        color: 'azure',
+      },
+    ],
+    graphType: 'donut',
+  }),
+}
+
+const reports = [
   {
     entity: 'user',
     permissions: ['admin'],
@@ -88,20 +218,7 @@ const topReports = [
       quantity: services.length,
     }),
   },
-]
-const bottomReports = [
-  {
-    entity: 'cloud',
-    permissions: ['admin'],
-    route: routes.cloudProviders.list.path(),
-    addRoute: routes.cloudProviders.add.path({ type: CloudProviders.Aws }),
-    title: 'Cloud Accounts',
-    icon: 'cloud',
-    dataLoader: [cloudProviderActions.list],
-    quantityFn: (clouds) => ({
-      quantity: clouds.length,
-    }),
-  },
+  cloudStatusCardProps,
   {
     entity: 'pod',
     route: routes.pods.list.path(),
@@ -136,76 +253,8 @@ const bottomReports = [
       piePrimary: 'running',
     }),
   },
-  {
-    entity: 'cluster',
-    permissions: ['admin'], // Technically non-admins have read-only access
-    route: routes.cluster.list.path(),
-    addRoute: routes.cluster.add.path(),
-    title: 'Clusters',
-    icon: 'project-diagram',
-    dataLoader: [clusterActions.list],
-    quantityFn: (clusters) => ({
-      quantity: clusters.length,
-      pieData: [
-        {
-          name: 'healthy',
-          value: clusters.filter((cluster) => cluster.healthStatus === 'healthy').length,
-          color: 'success',
-        },
-        {
-          name: 'partially_healthy',
-          value: clusters.filter((cluster) => cluster.healthStatus === 'partially_healthy').length,
-          color: 'warning',
-        },
-        {
-          name: 'converging',
-          value: clusters.filter((cluster) => cluster.healthStatus === 'converging').length,
-          color: 'unknown',
-        },
-        {
-          name: 'unhealthy',
-          value: clusters.filter((cluster) => cluster.healthStatus === 'unhealthy').length,
-          color: 'error',
-        },
-      ],
-      piePrimary: 'healthy',
-    }),
-  },
-  {
-    entity: 'node',
-    permissions: ['admin'],
-    route: routes.nodes.list.path(),
-    addRoute: routes.nodes.download.path(),
-    title: 'Nodes',
-    icon: 'ball-pile',
-    dataLoader: [loadNodes],
-    quantityFn: (nodes) => ({
-      quantity: nodes.length,
-      pieData: [
-        {
-          name: 'healthy',
-          value: nodes.filter((node) => nodeHealthStatus(node) === 'healthy').length,
-          color: 'success',
-        },
-        {
-          name: 'unknown',
-          value: nodes.filter((node) => nodeHealthStatus(node) === 'unknown').length,
-          color: 'unknown',
-        },
-        {
-          name: 'converging',
-          value: nodes.filter((node) => nodeHealthStatus(node) === 'converging').length,
-          color: 'warning',
-        },
-        {
-          name: 'unhealthy',
-          value: nodes.filter((node) => nodeHealthStatus(node) === 'unhealthy').length,
-          color: 'error',
-        },
-      ],
-      piePrimary: 'healthy',
-    }),
-  },
+  clusterStatusCardProps,
+  nodeStatusCardProps,
 ]
 
 const reportsWithPerms = (reports) => {
@@ -237,7 +286,7 @@ const DashboardPage = () => {
   const [, updateState] = React.useState()
   const forceUpdate = useCallback(() => updateState({}), [])
 
-  const { cardColumn, cardRow } = useStyles({})
+  const classes = useStyles({})
   const { getContext, session } = useContext(AppContext)
   const isAdmin = isAdminRole(getContext)
   const username = capitalizeString(normalizeUsername(session.username))
@@ -261,7 +310,7 @@ const DashboardPage = () => {
   }, [hasClusters, hasMonitoring, hasAccess])
 
   return (
-    <section className={cardColumn}>
+    <section className={classes.cardColumn}>
       <Typography variant="h5">Welcome {username}!</Typography>
       {isLoading ? (
         <Progress loading={isLoading} overlay renderContentOnMount />
@@ -278,18 +327,11 @@ const DashboardPage = () => {
           )}
 
           {!showOnboarding && (
-            <>
-              <div className={cardRow}>
-                {reportsWithPerms(topReports).map((report) => (
-                  <StatusCard key={report.route} {...report} />
-                ))}
-              </div>
-              <div className={cardRow}>
-                {reportsWithPerms(bottomReports).map((report) => (
-                  <StatusCard key={report.route} {...report} />
-                ))}
-              </div>
-            </>
+            <div className={classes.dashboardMosaic}>
+              {reportsWithPerms(reports).map((report) => (
+                <StatusCard key={report.route} {...report} className={classes[report.entity]} />
+              ))}
+            </div>
           )}
         </>
       )}

@@ -7,7 +7,7 @@ import createListTableComponent from 'core/helpers/createListTableComponent'
 const columns = [
   { id: 'hypervisor_hostname', label: 'Hostname' },
   { id: 'status', label: 'Status' },
-  { id: 'host_ip', label: 'Host IP' }
+  { id: 'host_ip', label: 'Host IP' },
 ]
 
 export const HostsList = createListTableComponent({
@@ -19,7 +19,7 @@ export const HostsList = createListTableComponent({
 })
 
 class HostsListContainer extends React.PureComponent {
-  render () {
+  render() {
     const hosts = this.props.hosts || []
     return (
       <CRUDListContainer
@@ -28,12 +28,7 @@ class HostsListContainer extends React.PureComponent {
         editUrl="/ui/openstack/hosts/edit"
       >
         {({ onDelete, onAdd, onEdit }) => (
-          <HostsList
-            hosts={hosts}
-            onAdd={onAdd}
-            onDelete={onDelete}
-            onEdit={onEdit}
-          />
+          <HostsList hosts={hosts} onAdd={onAdd} onDelete={onDelete} onEdit={onEdit} />
         )}
       </CRUDListContainer>
     )
@@ -41,7 +36,7 @@ class HostsListContainer extends React.PureComponent {
 }
 
 HostsListContainer.propTypes = {
-  hosts: PropTypes.arrayOf(PropTypes.object)
+  hosts: PropTypes.arrayOf(PropTypes.object),
 }
 
 export default HostsListContainer

@@ -13,7 +13,7 @@ import { ICombinedNode } from './model'
 import SimpleLink from 'core/components/SimpleLink'
 import Progress from 'core/components/progress/Progress'
 import UsageWidget from 'core/components/widgets/UsageWidget'
-import calcUsageTotals from 'k8s/util/calcUsageTotals'
+import calcUsageTotalByPath from 'k8s/util/calcUsageTotals'
 import ExternalLink from 'core/components/ExternalLink'
 import HelpContainer from 'core/components/HelpContainer'
 import { routes } from 'core/utils/routes'
@@ -59,23 +59,22 @@ const ClusterDetailsPage: FC = () => {
   const { match } = useReactRouter()
   const classes = useStyles({})
   const [nodes, loading] = useDataLoader(loadNodes)
-  const selectedNode: ICombinedNode = nodes.find(
-    (x: ICombinedNode) => x.uuid === match.params.id
-  ) || {}
+  const selectedNode: ICombinedNode =
+    nodes.find((x: ICombinedNode) => x.uuid === match.params.id) || {}
 
   const totals = useMemo(
     () => ({
-      compute: calcUsageTotals(
+      compute: calcUsageTotalByPath(
         [selectedNode],
         'combined.usage.compute.current',
         'combined.usage.compute.max',
       ),
-      memory: calcUsageTotals(
+      memory: calcUsageTotalByPath(
         [selectedNode],
         'combined.usage.memory.current',
         'combined.usage.memory.max',
       ),
-      disk: calcUsageTotals(
+      disk: calcUsageTotalByPath(
         [selectedNode],
         'combined.usage.disk.current',
         'combined.usage.disk.max',
@@ -154,7 +153,16 @@ const NodeDetail: FC<ICombinedNode> = (node) => {
               />
               <DetailRow label="CPU Architecture" value={CPUArchitecture} />
               <DetailRow label="Operating System" value={operatingSystem} />
-              {!!clusterName && <DetailRow label="Cluster info" value={<SimpleLink src={routes.cluster.detail.path({ id: clusterUuid })}>{clusterName}</SimpleLink>} />}
+              {!!clusterName && (
+                <DetailRow
+                  label="Cluster info"
+                  value={
+                    <SimpleLink src={routes.cluster.detail.path({ id: clusterUuid })}>
+                      {clusterName}
+                    </SimpleLink>
+                  }
+                />
+              )}
               <DetailRow label="Roles" value={roles} />
               <DetailRow label="Logs" value={<ExternalLink url={logs}>View Logs</ExternalLink>} />
             </tbody>
@@ -183,7 +191,7 @@ const NodeDetail: FC<ICombinedNode> = (node) => {
   )
 }
 
-const DetailRow: FC<{ label: string, value: string | React.ReactNode, helpMessage?: string }> = ({
+const DetailRow: FC<{ label: string; value: string | React.ReactNode; helpMessage?: string }> = ({
   label,
   value,
   helpMessage,
@@ -197,7 +205,7 @@ const DetailRow: FC<{ label: string, value: string | React.ReactNode, helpMessag
         </Typography>
       </td>
       <td>
-        { typeof value === 'string' ? <Typography className={rowValue}>{value}</Typography> : value }
+        {typeof value === 'string' ? <Typography className={rowValue}>{value}</Typography> : value}
       </td>
       <td className={rowHelp}>
         {!!helpMessage && <HelpContainer title={helpMessage} color="black" />}

@@ -10,11 +10,11 @@ import {
   IClusterStatus,
 } from './ClusterStatusUtils'
 import { ICluster } from './model'
-import ProgressBar from 'core/components/progress/ProgressBar'
 import { capitalizeString } from 'utils/misc'
 import Theme from 'core/themes/model'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import clsx from 'clsx'
+import { routes } from 'core/utils/routes'
 
 const getIconOrBubbleColor = (status: IClusterStatus, theme: Theme) =>
   ({
@@ -22,7 +22,7 @@ const getIconOrBubbleColor = (status: IClusterStatus, theme: Theme) =>
     pause: theme.palette.pieChart.warning,
     fail: theme.palette.pieChart.error,
     error: theme.palette.pieChart.error,
-    loading: theme.palette.primary.main,
+    loading: theme.palette.sidebar.text,
     unknown: theme.palette.primary.main,
   }[status] || theme.palette.pieChart.error)
 
@@ -49,12 +49,12 @@ const useStyles = makeStyles<Theme, Props>((theme: Theme) => ({
       width: ({ variant }) =>
         variant === 'header' ? theme.typography.body1.fontSize : theme.typography.body2.fontSize,
       borderRadius: '50%',
-      backgroundColor: ({ status }) => getIconOrBubbleColor(status, theme)
+      backgroundColor: ({ status }) => getIconOrBubbleColor(status, theme),
     },
   },
   iconColor: {
     fontSize: ({ variant }) => (variant === 'header' ? '1rem' : theme.typography.body1.fontSize),
-    color: ({ status }) => getIconOrBubbleColor(status, theme)
+    color: ({ status }) => getIconOrBubbleColor(status, theme),
   },
 }))
 
@@ -76,6 +76,7 @@ interface Props {
   variant: StatusVariant
   iconStatus?: boolean
 }
+
 const ClusterStatusSpan: FC<Props> = (props) => {
   const { label, title, children, status, variant, iconStatus } = props
   const { circle, label: labelCls, root, iconColor } = useStyles(props)
@@ -99,33 +100,22 @@ const ClusterStatusSpan: FC<Props> = (props) => {
 export default ClusterStatusSpan
 
 const renderErrorStatus = (taskError, nodesDetailsUrl, variant) => (
-  <ClusterStatusSpan
-    iconStatus
-    title={taskError}
-    status='error'
-    variant={variant}
-  >
-    <SimpleLink variant="error" src={nodesDetailsUrl}>Error</SimpleLink>
+  <ClusterStatusSpan iconStatus title={taskError} status="error" variant={variant}>
+    <SimpleLink variant="error" src={nodesDetailsUrl}>
+      Error
+    </SimpleLink>
   </ClusterStatusSpan>
 )
 
-const renderTransientStatus = (connectionStatus, progressPercent, variant) => {
+const renderTransientStatus = ({ uuid, connectionStatus }, variant) => {
   const spanContent = `The cluster is ${connectionStatus}.`
 
   return (
-    <div>
-      {progressPercent && (
-        <ProgressBar
-          height={20}
-          animated
-          containedPercent
-          percent={progressPercent ? (+progressPercent).toFixed(0) : 0}
-        />
-      )}
-      <ClusterStatusSpan title={spanContent} variant={variant} status="loading" iconStatus>
+    <ClusterStatusSpan title={spanContent} variant={variant} status="loading" iconStatus>
+      <SimpleLink src={routes.cluster.nodeHealth.path({ id: uuid })}>
         {capitalizeString(connectionStatus)}
-      </ClusterStatusSpan>
-    </div>
+      </SimpleLink>
+    </ClusterStatusSpan>
   )
 }
 
@@ -134,21 +124,22 @@ interface IClusterStatusProps {
   variant: StatusVariant
   message?: string
 }
+
 export const ClusterHealthStatus: FC<IClusterStatusProps> = ({
   cluster,
   variant = 'table',
   message = undefined,
 }) => {
   if (isTransientStatus(cluster.healthStatus)) {
-    return renderTransientStatus(cluster.healthStatus, cluster.progressPercent, variant)
+    return renderTransientStatus(cluster, variant)
   }
 
   const fields = getClusterHealthStatus(cluster)
 
-  if (!fields) {
+  if (!fields || !cluster?.nodes?.length) {
     return (
-      <ClusterStatusSpan title={message || 'unknown'} status="unknown" variant={variant}>
-        {message || 'unknown'}
+      <ClusterStatusSpan title={message || 'Unknown'} status="unknown" variant={variant}>
+        {message || 'Unknown'}
       </ClusterStatusSpan>
     )
   }
@@ -173,14 +164,14 @@ export const ClusterConnectionStatus: FC<IClusterStatusProps> = ({
   message = undefined,
 }) => {
   if (isTransientStatus(cluster.connectionStatus)) {
-    return renderTransientStatus(cluster.connectionStatus, cluster.progressPercent, variant)
+    return renderTransientStatus(cluster, variant)
   }
   const fields = getClusterConnectionStatus(cluster)
 
-  if (!fields) {
+  if (!fields || !cluster?.nodes?.length) {
     return (
-      <ClusterStatusSpan title={message || 'unknown'} status="unknown" variant={variant}>
-        {message || 'unknown'}
+      <ClusterStatusSpan title={message || 'Unknown'} status="unknown" variant={variant}>
+        {message || 'Unknown'}
       </ClusterStatusSpan>
     )
   }

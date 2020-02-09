@@ -9,11 +9,7 @@ const iconColors = new Map<string, 'primary' | 'secondary' | 'disabled'>([
 ])
 
 const ClusterSync: FunctionComponent<{ taskStatus: string }> = ({ children, taskStatus }) => {
-  return (
-    <Loading color={iconColors.get(taskStatus)}>
-      {children}
-    </Loading>
-  )
+  return <Loading color={iconColors.get(taskStatus)}>{children}</Loading>
 }
 
 export default ClusterSync

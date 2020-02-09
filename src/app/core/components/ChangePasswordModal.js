@@ -1,7 +1,15 @@
 import React, { useContext } from 'react'
 import useReactRouter from 'use-react-router'
 import { makeStyles } from '@material-ui/styles'
-import { Typography, List, Dialog, DialogTitle, DialogContent, Grid, InputAdornment } from '@material-ui/core'
+import {
+  Typography,
+  List,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Grid,
+  InputAdornment,
+} from '@material-ui/core'
 import ListItem from '@material-ui/core/ListItem'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
 import CheckIcon from '@material-ui/icons/Check'
@@ -109,7 +117,9 @@ const ChangePasswordModal = (props) => {
   const { params, updateParams, getParamsUpdater } = useParams(initialState)
   const classes = useStyles()
   const { history } = useReactRouter()
-  const { userDetails: { userId } } = useContext(AppContext)
+  const {
+    userDetails: { userId },
+  } = useContext(AppContext)
   const showToast = useToast()
 
   const togglePasswordMask = (key) => () => {

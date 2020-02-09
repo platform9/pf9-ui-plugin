@@ -1,17 +1,40 @@
 import { path, equals } from 'ramda'
 import moize from 'moize'
+import moment from 'moment'
 
-// A more resilient JSON parsing that should always return {}
-// in error conditions.
-export const parseJSON = str => {
-  if (typeof str !== 'string') { return {} }
-  try {
-    const data = JSON.parse(str)
-    return data
-  } catch (e) {
-    console.error('Error parsing JSON', str)
-    return {}
-  }
+// Date formatter
+export const defaultDateFormat = 'MMM Do YYYY, hh:mm A'
+export const formatDate = (ts, format = defaultDateFormat) => moment(ts).format(format)
+
+/**
+ * DurationBetweenDates utility function that returns difference between give start and end date
+ * into format 'n day(s) n hour(s) n minute(s) depending on respective values.
+ * @example ('2020-01-28T00:44:35.000Z', '2020-01-29T01:45:36.000Z') -> '1 day, 1 hour, 1 minute'
+ * @param {string} startDateTime
+ * @param {string} [endDateTime]
+ * @returns {string}
+ */
+export const durationBetweenDates = (startDateTime, endDateTime = new Date().valueOf()) => {
+  const duration = moment.duration(moment(endDateTime).diff(moment(startDateTime)))
+  return [
+    { fnName: 'months', label: 'month' },
+    { fnName: 'days', label: 'day' },
+    { fnName: 'hours', label: 'hour' },
+    { fnName: 'minutes', label: 'minute' },
+  ].reduce((displayStr, curr) => {
+    const value = duration[curr.fnName]()
+    if (value < 1) {
+      return displayStr
+    }
+
+    if (displayStr) {
+      displayStr += ', '
+    }
+
+    const pluralLabel = value > 1 ? 's' : ''
+
+    return `${displayStr}${value} ${curr.label}${pluralLabel}`
+  }, '')
 }
 
 /**
@@ -20,7 +43,7 @@ export const parseJSON = str => {
  * @param seconds
  * @returns {string}
  */
-export const secondsToString = seconds => {
+export const secondsToString = (seconds) => {
   const min = 60
   const hour = min * 60
   const day = hour * 24
@@ -39,10 +62,24 @@ export const secondsToString = seconds => {
   return results.join(', ')
 }
 
-export const isNumeric = n =>
-  !Number.isNaN(parseFloat(n)) && Number.isFinite(+n)
+// A more resilient JSON parsing that should always return {}
+// in error conditions.
+export const parseJSON = (str) => {
+  if (typeof str !== 'string') {
+    return {}
+  }
+  try {
+    const data = JSON.parse(str)
+    return data
+  } catch (e) {
+    console.error('Error parsing JSON', str)
+    return {}
+  }
+}
 
-export const isPlainObject = obj =>
+export const isNumeric = (n) => !Number.isNaN(parseFloat(n)) && Number.isFinite(+n)
+
+export const isPlainObject = (obj) =>
   Object(obj) === obj && Object.getPrototypeOf(obj) === Object.prototype
 
 const duplicatedSlashesRegexp = new RegExp('(^\\/|[^:\\/]+\\/)\\/+', 'g')
@@ -51,11 +88,12 @@ const duplicatedSlashesRegexp = new RegExp('(^\\/|[^:\\/]+\\/)\\/+', 'g')
 // Remove duplicated slashes
 // Does not remove leading/trailing slashes and adds a slash between segments
 export const pathJoin = (...pathParts) =>
-  [].concat(...pathParts) // Flatten
+  []
+    .concat(...pathParts) // Flatten
     .join('/')
     .replace(duplicatedSlashesRegexp, '$1')
 
-export const castFuzzyBool = value => {
+export const castFuzzyBool = (value) => {
   const mappings = {
     // JS performs a narrowing cast of ints, bools, and strings to the same key.
     false: false,
@@ -66,15 +104,17 @@ export const castFuzzyBool = value => {
     True: true,
   }
 
-  if (mappings[value] !== undefined) { return mappings[value] }
+  if (mappings[value] !== undefined) {
+    return mappings[value]
+  }
   return false
 }
 
-export const columnPathLookup = _path => (_, row) => path(_path.split('.'), row)
+export const columnPathLookup = (_path) => (_, row) => path(_path.split('.'), row)
 
-export const castBoolToStr = (t = 'Enabled', f = 'Not Enabled') => value => value ? t : f
+export const castBoolToStr = (t = 'Enabled', f = 'Not Enabled') => (value) => (value ? t : f)
 
-export const tryJsonParse = moize(val => typeof val === 'string' ? JSON.parse(val) : val)
+export const tryJsonParse = moize((val) => (typeof val === 'string' ? JSON.parse(val) : val))
 
 /**
  * Memoizes an async function to prevent the thundering herd problem.
@@ -82,7 +122,7 @@ export const tryJsonParse = moize(val => typeof val === 'string' ? JSON.parse(va
  * @param {function} asyncFn Function that will be memoized until it gets resolved
  * @returns {function}
  */
-export const memoizePromise = asyncFn => {
+export const memoizePromise = (asyncFn) => {
   const memoizedCb = moize(asyncFn, {
     equals, // Use ramda "equals" instead of moize SameValueZero comparisons
     isPromise: true,
@@ -107,7 +147,7 @@ export const memoizePromise = asyncFn => {
  * https://ramdajs.com/docs/#equals
  * @type {function(*): any}
  */
-export const memoizedDep = moize(dep => dep, {
+export const memoizedDep = moize((dep) => dep, {
   equals,
 })
 
@@ -117,27 +157,29 @@ export const memoizedDep = moize(dep => dep, {
  * @param inputStr
  * @returns {string}
  */
-export const uncamelizeString = inputStr => inputStr
-// insert a space before all caps
-  .replace(/([A-Z])/g, ' $1')
-  // uppercase the first character
-  .replace(/^./, str => str.toUpperCase())
+export const uncamelizeString = (inputStr) =>
+  inputStr
+    // insert a space before all caps
+    .replace(/([A-Z])/g, ' $1')
+    // uppercase the first character
+    .replace(/^./, (str) => str.toUpperCase())
 
 /**
  * Capitalize the first letter of the given string
  * @param inputStr
  * @returns {*}
  */
-export const capitalizeString = inputStr => inputStr
-// uppercase the first character
-  .replace(/^./, str => str.toUpperCase())
+export const capitalizeString = (inputStr) =>
+  inputStr
+    // uppercase the first character
+    .replace(/^./, (str) => str.toUpperCase())
 
 /**
  * Transform a string so that it only has alpha-numeric and hypens.  Useful for FQDN's.
  * @param {string} str
  * @returns {string}
  */
-export const sanitizeUrl = str =>
+export const sanitizeUrl = (str) =>
   str
     .replace(/[^a-zA-Z0-9-_.]/g, '-') // replace non-valid url characters with hyphen
     .replace(/^-+/, '') // eliminate leading hyphens

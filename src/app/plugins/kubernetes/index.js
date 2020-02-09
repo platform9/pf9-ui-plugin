@@ -17,8 +17,7 @@ import NamespacesListPage from './components/namespaces/NamespacesListPage'
 import OnboardingPage from './components/onboarding/OnboardingPage'
 import PodsIndexPage from './components/pods/PodsIndexPage'
 import StorageClassesPage from './components/storage/StorageClassesPage'
-import UpdateCloudProviderPage
-  from './components/infrastructure/cloudProviders/UpdateCloudProviderPage'
+import UpdateCloudProviderPage from './components/infrastructure/cloudProviders/UpdateCloudProviderPage'
 import StorageClassesAddPage from './components/storage/AddStorageClassPage'
 import UserManagementIndexPage from './components/userManagement/UserManagementIndexPage'
 import AppDetailsPage from 'k8s/components/apps/AppDetailsPage'
@@ -27,8 +26,7 @@ import PrometheusMonitoringPage from './components/prometheus/PrometheusMonitori
 import UpdatePrometheusInstancePage from './components/prometheus/UpdatePrometheusInstancePage'
 import UpdatePrometheusRulePage from './components/prometheus/UpdatePrometheusRulePage'
 import UpdatePrometheusServiceMonitorPage from './components/prometheus/UpdateServiceMonitorPage'
-import UpdatePrometheusAlertManagerPage
-  from './components/prometheus/UpdatePrometheusAlertManagerPage'
+import UpdatePrometheusAlertManagerPage from './components/prometheus/UpdatePrometheusAlertManagerPage'
 import LoggingIndexPage from './components/logging/LoggingIndexPage'
 import LoggingAddPage from './components/logging/LoggingAddPage'
 import LoggingEditPage from './components/logging/LoggingEditPage'
@@ -52,296 +50,290 @@ import UpdateClusterRoleBindingPage from './components/rbac/UpdateClusterRoleBin
 import OnboardingBanner from './components/onboarding/OnboardingBanner'
 
 class Kubernetes extends React.PureComponent {
-  render () {
-    return (
-      <h1>Kubernetes Plugin</h1>
-    )
+  render() {
+    return <h1>Kubernetes Plugin</h1>
   }
 }
 
 Kubernetes.__name__ = 'kubernetes'
 
-Kubernetes.registerPlugin = pluginManager => {
-  const plugin = pluginManager.registerPlugin(
-    'kubernetes', 'Kubernetes', '/ui/kubernetes',
-  )
+Kubernetes.registerPlugin = (pluginManager) => {
+  const plugin = pluginManager.registerPlugin('kubernetes', 'Kubernetes', '/ui/kubernetes')
   plugin.registerComponent(OnboardingBanner)
 
-  plugin.registerRoutes(
-    [
-      {
-        name: 'Dashboard',
-        link: { path: '/dashboard', exact: true, default: true },
-        component: DashboardPage,
-      },
-      {
-        name: 'Infrastructure',
-        link: { path: '/infrastructure', exact: true },
-        component: InfrastructurePage,
-      },
-      {
-        name: 'Create Cluster',
-        link: { path: '/infrastructure/clusters/add', exact: true },
-        requiredRoles: 'admin',
-        component: AddClusterPage,
-      },
-      {
-        name: 'Create AWS Cluster',
-        link: { path: '/infrastructure/clusters/addAws', exact: true },
-        requiredRoles: 'admin',
-        component: AddAwsClusterPage,
-      },
-      {
-        name: 'Create Azure Cluster',
-        link: { path: '/infrastructure/clusters/addAzure', exact: true },
-        requiredRoles: 'admin',
-        component: AddAzureClusterPage,
-      },
-      {
-        name: 'Create Bare OS Cluster',
-        link: { path: '/infrastructure/clusters/addBareOs', exact: true },
-        requiredRoles: 'admin',
-        component: AddBareOsClusterPage,
-      },
-      {
-        name: 'Edit Cluster',
-        link: { path: '/infrastructure/clusters/edit/:id', exact: true },
-        component: EditClusterPage,
-      },
-      {
-        name: 'Scale Masters',
-        link: { path: '/infrastructure/clusters/scaleMasters/:id', exact: true },
-        requiredRoles: 'admin',
-        component: ScaleMastersPage,
-      },
-      {
-        name: 'Scale Workers',
-        link: { path: '/infrastructure/clusters/scaleWorkers/:id', exact: true },
-        requiredRoles: 'admin',
-        component: ScaleWorkersPage,
-      },
-      {
-        name: 'Cluster Details',
-        link: { path: '/infrastructure/clusters/:id', exact: true },
-        component: ClusterDetailsPage,
-      },
-      {
-        name: 'Onboard a Node',
-        link: { path: '/infrastructure/nodes/cli/download', exact: true },
-        component: DownloadCliPage,
-      },
-      {
-        name: 'Node Details',
-        link: { path: '/infrastructure/nodes/:id', exact: true },
-        component: NodeDetailsPage,
-      },
-      {
-        name: 'Create Cloud Provider',
-        link: { path: '/infrastructure/cloudProviders/add', exact: true },
-        requiredRoles: 'admin',
-        component: AddCloudProviderPage,
-      },
-      {
-        name: 'Update Cloud Provider',
-        link: { path: '/infrastructure/cloudProviders/edit/:id', exact: true },
-        requiredRoles: 'admin',
-        component: UpdateCloudProviderPage,
-      },
-      {
-        name: 'App Catalog',
-        link: { path: '/apps', exact: true },
-        component: AppsIndexPage,
-      },
-      {
-        name: 'Deployed App Details',
-        link: { path: '/apps/deployed/:clusterId/:release', exact: true },
-        component: DeployedAppDetailsPage,
-      },
-      {
-        name: 'App Details',
-        link: { path: '/apps/:clusterId/:release/:id', exact: true },
-        component: AppDetailsPage,
-      },
-      {
-        name: 'Pods, Deployments, Services',
-        link: { path: '/pods', exact: true },
-        component: PodsIndexPage,
-      },
-      {
-        name: 'Add Pod',
-        link: { path: '/pods/add', exact: true },
-        component: () => <AddResourcePage resourceType="pod" />,
-      },
-      {
-        name: 'Add Deployment',
-        link: { path: '/pods/deployments/add', exact: true },
-        component: () => <AddResourcePage resourceType="deployment" />,
-      },
-      {
-        name: 'Add Service',
-        link: { path: '/pods/services/add', exact: true },
-        component: () => <AddResourcePage resourceType="service" />,
-      },
-      {
-        name: 'Storage Classes',
-        link: { path: '/storage_classes', exact: true },
-        component: StorageClassesPage,
-      },
-      {
-        name: 'Add Storage Class',
-        link: { path: '/storage_classes/add', exact: true },
-        component: StorageClassesAddPage,
-      },
-      {
-        name: 'Namespaces',
-        link: { path: '/namespaces', exact: true },
-        component: NamespacesListPage,
-      },
-      {
-        name: 'Monitoring (beta)',
-        link: { path: '/prometheus', exact: true },
-        component: PrometheusMonitoringPage,
-      },
-      {
-        name: 'Logging (beta)',
-        link: { path: '/logging', exact: true },
-        component: LoggingIndexPage,
-      },
-      {
-        name: 'Add Logging',
-        link: { path: '/logging/add', exact: true },
-        component: LoggingAddPage,
-      },
-      {
-        name: 'Edit Logging',
-        link: { path: '/logging/edit/:id', exact: true },
-        component: LoggingEditPage,
-      },
-      {
-        name: 'Add Namespace',
-        link: { path: '/namespaces/add', exact: true },
-        component: AddNamespacePage,
-      },
-      {
-        name: 'API Access',
-        link: { path: '/api_access', exact: true },
-        component: ApiAccessPage,
-      },
-      {
-        name: 'Tenants & Users',
-        requiredRoles: 'admin',
-        link: { path: '/user_management', exact: true },
-        component: UserManagementIndexPage,
-      },
-      {
-        name: 'Add Tenant',
-        requiredRoles: 'admin',
-        link: { path: '/user_management/tenants/add', exact: true },
-        component: AddTenantPage,
-      },
-      {
-        name: 'Edit Tenant',
-        requiredRoles: 'admin',
-        link: { path: '/user_management/tenants/edit/:id', exact: true },
-        component: EditTenantPage,
-      },
-      {
-        name: 'Add User',
-        requiredRoles: 'admin',
-        link: { path: '/user_management/users/add', exact: true },
-        component: AddUserPage,
-      },
-      {
-        name: 'Edit User',
-        requiredRoles: 'admin',
-        link: { path: '/user_management/users/edit/:id', exact: true },
-        component: EditUserPage,
-      },
-      {
-        name: 'Create Prometheus Instance',
-        link: { path: '/prometheus/instances/add', exact: true },
-        component: AddPrometheusInstancePage,
-      },
-      {
-        name: 'Edit Prometheus Instance',
-        link: { path: '/prometheus/instances/edit/:id', exact: true },
-        component: UpdatePrometheusInstancePage,
-      },
-      {
-        name: 'Edit Prometheus Rule',
-        link: { path: '/prometheus/rules/edit/:id', exact: true },
-        component: UpdatePrometheusRulePage,
-      },
-      {
-        name: 'Edit Prometheus Service Monitor',
-        link: { path: '/prometheus/serviceMonitors/edit/:id', exact: true },
-        component: UpdatePrometheusServiceMonitorPage,
-      },
-      {
-        name: 'Edit Prometheus Alert Manager',
-        link: { path: '/prometheus/alertManagers/edit/:id', exact: true },
-        component: UpdatePrometheusAlertManagerPage,
-      },
-      {
-        name: 'Guided Onboarding',
-        link: { path: '/onboarding', exact: true },
-        component: OnboardingPage,
-      },
-      {
-        name: 'RBAC',
-        requiredRoles: 'admin',
-        link: { path: '/rbac', exact: true },
-        component: RbacIndexPage,
-      },
-      {
-        name: 'Add Role',
-        requiredRoles: 'admin',
-        link: { path: '/rbac/roles/add', exact: true },
-        component: AddRolePage,
-      },
-      {
-        name: 'Add Cluster Role',
-        requiredRoles: 'admin',
-        link: { path: '/rbac/clusterroles/add', exact: true },
-        component: AddClusterRolePage,
-      },
-      {
-        name: 'Add Role Binding',
-        requiredRoles: 'admin',
-        link: { path: '/rbac/rolebindings/add', exact: true },
-        component: AddRoleBindingPage,
-      },
-      {
-        name: 'Add Cluster Role Binding',
-        link: { path: '/rbac/clusterrolebindings/add', exact: true },
-        component: AddClusterRoleBindingPage,
-      },
-      {
-        name: 'Update Role',
-        link: { path: '/rbac/roles/edit/:id/cluster/:clusterId', exact: true },
-        component: UpdateRolePage,
-      },
-      {
-        name: 'Update Cluster Role',
-        link: { path: '/rbac/clusterroles/edit/:id/cluster/:clusterId', exact: true },
-        component: UpdateClusterRolePage,
-      },
-      {
-        name: 'Update Role Binding',
-        link: { path: '/rbac/rolebindings/edit/:id/cluster/:clusterId', exact: true },
-        component: UpdateRoleBindingPage,
-      },
-      {
-        name: 'Update Cluster Role Binding',
-        link: { path: '/rbac/clusterrolebindings/edit/:id/cluster/:clusterId', exact: true },
-        component: UpdateClusterRoleBindingPage,
-      },
-    ],
-  )
+  plugin.registerRoutes([
+    {
+      name: 'Dashboard',
+      link: { path: '/dashboard', exact: true, default: true },
+      component: DashboardPage,
+    },
+    {
+      name: 'Infrastructure',
+      link: { path: '/infrastructure', exact: true },
+      component: InfrastructurePage,
+    },
+    {
+      name: 'Create Cluster',
+      link: { path: '/infrastructure/clusters/add', exact: true },
+      requiredRoles: 'admin',
+      component: AddClusterPage,
+    },
+    {
+      name: 'Create AWS Cluster',
+      link: { path: '/infrastructure/clusters/addAws', exact: true },
+      requiredRoles: 'admin',
+      component: AddAwsClusterPage,
+    },
+    {
+      name: 'Create Azure Cluster',
+      link: { path: '/infrastructure/clusters/addAzure', exact: true },
+      requiredRoles: 'admin',
+      component: AddAzureClusterPage,
+    },
+    {
+      name: 'Create Bare OS Cluster',
+      link: { path: '/infrastructure/clusters/addBareOs', exact: true },
+      requiredRoles: 'admin',
+      component: AddBareOsClusterPage,
+    },
+    {
+      name: 'Edit Cluster',
+      link: { path: '/infrastructure/clusters/edit/:id', exact: true },
+      component: EditClusterPage,
+    },
+    {
+      name: 'Scale Masters',
+      link: { path: '/infrastructure/clusters/scaleMasters/:id', exact: true },
+      requiredRoles: 'admin',
+      component: ScaleMastersPage,
+    },
+    {
+      name: 'Scale Workers',
+      link: { path: '/infrastructure/clusters/scaleWorkers/:id', exact: true },
+      requiredRoles: 'admin',
+      component: ScaleWorkersPage,
+    },
+    {
+      name: 'Cluster Details',
+      link: { path: '/infrastructure/clusters/:id', exact: true },
+      component: ClusterDetailsPage,
+    },
+    {
+      name: 'Onboard a Node',
+      link: { path: '/infrastructure/nodes/cli/download', exact: true },
+      component: DownloadCliPage,
+    },
+    {
+      name: 'Node Details',
+      link: { path: '/infrastructure/nodes/:id', exact: true },
+      component: NodeDetailsPage,
+    },
+    {
+      name: 'Create Cloud Provider',
+      link: { path: '/infrastructure/cloudProviders/add', exact: true },
+      requiredRoles: 'admin',
+      component: AddCloudProviderPage,
+    },
+    {
+      name: 'Update Cloud Provider',
+      link: { path: '/infrastructure/cloudProviders/edit/:id', exact: true },
+      requiredRoles: 'admin',
+      component: UpdateCloudProviderPage,
+    },
+    {
+      name: 'App Catalog',
+      link: { path: '/apps', exact: true },
+      component: AppsIndexPage,
+    },
+    {
+      name: 'Deployed App Details',
+      link: { path: '/apps/deployed/:clusterId/:release', exact: true },
+      component: DeployedAppDetailsPage,
+    },
+    {
+      name: 'App Details',
+      link: { path: '/apps/:clusterId/:release/:id', exact: true },
+      component: AppDetailsPage,
+    },
+    {
+      name: 'Pods, Deployments, Services',
+      link: { path: '/pods', exact: true },
+      component: PodsIndexPage,
+    },
+    {
+      name: 'Add Pod',
+      link: { path: '/pods/add', exact: true },
+      component: () => <AddResourcePage resourceType="pod" />,
+    },
+    {
+      name: 'Add Deployment',
+      link: { path: '/pods/deployments/add', exact: true },
+      component: () => <AddResourcePage resourceType="deployment" />,
+    },
+    {
+      name: 'Add Service',
+      link: { path: '/pods/services/add', exact: true },
+      component: () => <AddResourcePage resourceType="service" />,
+    },
+    {
+      name: 'Storage Classes',
+      link: { path: '/storage_classes', exact: true },
+      component: StorageClassesPage,
+    },
+    {
+      name: 'Add Storage Class',
+      link: { path: '/storage_classes/add', exact: true },
+      component: StorageClassesAddPage,
+    },
+    {
+      name: 'Namespaces',
+      link: { path: '/namespaces', exact: true },
+      component: NamespacesListPage,
+    },
+    {
+      name: 'Monitoring (beta)',
+      link: { path: '/prometheus', exact: true },
+      component: PrometheusMonitoringPage,
+    },
+    {
+      name: 'Logging (beta)',
+      link: { path: '/logging', exact: true },
+      component: LoggingIndexPage,
+    },
+    {
+      name: 'Add Logging',
+      link: { path: '/logging/add', exact: true },
+      component: LoggingAddPage,
+    },
+    {
+      name: 'Edit Logging',
+      link: { path: '/logging/edit/:id', exact: true },
+      component: LoggingEditPage,
+    },
+    {
+      name: 'Add Namespace',
+      link: { path: '/namespaces/add', exact: true },
+      component: AddNamespacePage,
+    },
+    {
+      name: 'API Access',
+      link: { path: '/api_access', exact: true },
+      component: ApiAccessPage,
+    },
+    {
+      name: 'Tenants & Users',
+      requiredRoles: 'admin',
+      link: { path: '/user_management', exact: true },
+      component: UserManagementIndexPage,
+    },
+    {
+      name: 'Add Tenant',
+      requiredRoles: 'admin',
+      link: { path: '/user_management/tenants/add', exact: true },
+      component: AddTenantPage,
+    },
+    {
+      name: 'Edit Tenant',
+      requiredRoles: 'admin',
+      link: { path: '/user_management/tenants/edit/:id', exact: true },
+      component: EditTenantPage,
+    },
+    {
+      name: 'Add User',
+      requiredRoles: 'admin',
+      link: { path: '/user_management/users/add', exact: true },
+      component: AddUserPage,
+    },
+    {
+      name: 'Edit User',
+      requiredRoles: 'admin',
+      link: { path: '/user_management/users/edit/:id', exact: true },
+      component: EditUserPage,
+    },
+    {
+      name: 'Create Prometheus Instance',
+      link: { path: '/prometheus/instances/add', exact: true },
+      component: AddPrometheusInstancePage,
+    },
+    {
+      name: 'Edit Prometheus Instance',
+      link: { path: '/prometheus/instances/edit/:id', exact: true },
+      component: UpdatePrometheusInstancePage,
+    },
+    {
+      name: 'Edit Prometheus Rule',
+      link: { path: '/prometheus/rules/edit/:id', exact: true },
+      component: UpdatePrometheusRulePage,
+    },
+    {
+      name: 'Edit Prometheus Service Monitor',
+      link: { path: '/prometheus/serviceMonitors/edit/:id', exact: true },
+      component: UpdatePrometheusServiceMonitorPage,
+    },
+    {
+      name: 'Edit Prometheus Alert Manager',
+      link: { path: '/prometheus/alertManagers/edit/:id', exact: true },
+      component: UpdatePrometheusAlertManagerPage,
+    },
+    {
+      name: 'Guided Onboarding',
+      link: { path: '/onboarding', exact: true },
+      component: OnboardingPage,
+    },
+    {
+      name: 'RBAC',
+      requiredRoles: 'admin',
+      link: { path: '/rbac', exact: true },
+      component: RbacIndexPage,
+    },
+    {
+      name: 'Add Role',
+      requiredRoles: 'admin',
+      link: { path: '/rbac/roles/add', exact: true },
+      component: AddRolePage,
+    },
+    {
+      name: 'Add Cluster Role',
+      requiredRoles: 'admin',
+      link: { path: '/rbac/clusterroles/add', exact: true },
+      component: AddClusterRolePage,
+    },
+    {
+      name: 'Add Role Binding',
+      requiredRoles: 'admin',
+      link: { path: '/rbac/rolebindings/add', exact: true },
+      component: AddRoleBindingPage,
+    },
+    {
+      name: 'Add Cluster Role Binding',
+      link: { path: '/rbac/clusterrolebindings/add', exact: true },
+      component: AddClusterRoleBindingPage,
+    },
+    {
+      name: 'Update Role',
+      link: { path: '/rbac/roles/edit/:id/cluster/:clusterId', exact: true },
+      component: UpdateRolePage,
+    },
+    {
+      name: 'Update Cluster Role',
+      link: { path: '/rbac/clusterroles/edit/:id/cluster/:clusterId', exact: true },
+      component: UpdateClusterRolePage,
+    },
+    {
+      name: 'Update Role Binding',
+      link: { path: '/rbac/rolebindings/edit/:id/cluster/:clusterId', exact: true },
+      component: UpdateRoleBindingPage,
+    },
+    {
+      name: 'Update Cluster Role Binding',
+      link: { path: '/rbac/clusterrolebindings/edit/:id/cluster/:clusterId', exact: true },
+      component: UpdateClusterRoleBindingPage,
+    },
+  ])
 
   const hostPrefix = '' // set to another host during development
-  const clarityBase = path => `${hostPrefix}/clarity/index.html#${path}`
-  const clarityLink = path => ({ link: { path: clarityBase(path), external: true } })
+  const clarityBase = (path) => `${hostPrefix}/clarity/index.html#${path}`
+  const clarityLink = (path) => ({ link: { path: clarityBase(path), external: true } })
 
   // const useClarityLinks = !(window.localStorage.disableClarityLinks === 'true' || config.developer)
 

@@ -15,7 +15,11 @@ describe('Instance', () => {
   describe('asJson', () => {
     it('creates a JSON version of the instance', () => {
       const instance = new Instance({ name: 'Test Instance 2', status: 'ACTIVE', state: 'active' })
-      expect(instance.asJson()).toMatchObject({ name: 'Test Instance 2', status: 'ACTIVE', 'OS-EXT-STS:vm_state': 'active' })
+      expect(instance.asJson()).toMatchObject({
+        name: 'Test Instance 2',
+        status: 'ACTIVE',
+        'OS-EXT-STS:vm_state': 'active',
+      })
     })
   })
 })

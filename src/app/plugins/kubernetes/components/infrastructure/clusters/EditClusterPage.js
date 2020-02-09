@@ -21,76 +21,77 @@ const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 const EditClusterPage = () => {
   const { match, history } = useReactRouter()
   const clusterId = match.params.id
-  const onComplete = useCallback(
-    success => success && history.push(listUrl),
-    [history])
+  const onComplete = useCallback((success) => success && history.push(listUrl), [history])
   const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
   const { params, updateParams, getParamsUpdater } = useParams({})
 
   const initialValues = useMemo(
-    () => pipe(
-      find(propEq('uuid', clusterId)),
-      when(isNil, always(emptyObj)),
-      ({ tags = {}, etcdBackup = {}, ...cluster }) => ({
-        ...cluster,
-        tags: objToKeyValueArr(tags),
-        etcdBackup: !!etcdBackup.isEtcdBackupEnabled,
-        etcdStoragePath: path(['storageProperties, localStorage'], etcdBackup) || defaultEtcBackupPath,
-        etcdBackupInterval: etcdBackup.intervalInMins || 1,
-      }),
-    )(clusters),
-    [clusters, clusterId])
+    () =>
+      pipe(
+        find(propEq('uuid', clusterId)),
+        when(isNil, always(emptyObj)),
+        ({ tags = {}, etcdBackup = {}, ...cluster }) => ({
+          ...cluster,
+          tags: objToKeyValueArr(tags),
+          etcdBackup: !!etcdBackup.isEtcdBackupEnabled,
+          etcdStoragePath:
+            path(['storageProperties, localStorage'], etcdBackup) || defaultEtcBackupPath,
+          etcdBackupInterval: etcdBackup.intervalInMins || 1,
+        }),
+      )(clusters),
+    [clusters, clusterId],
+  )
 
   useEffect(() => {
     const { etcdBackup } = find(propEq('uuid', clusterId))(clusters) || {}
-    if (!etcdBackup) { return }
+    if (!etcdBackup) {
+      return
+    }
     updateParams({ etcdBackup: !!etcdBackup.isEtcdBackupEnabled })
   }, [clusters, clusterId])
 
   // Need to add etcdBackup stuff to here
   const [update, updating] = useDataUpdater(clusterActions.update, onComplete)
-  const handleSubmit = useCallback(({ tags, ...cluster }) => update({
-    ...cluster,
-    // The cluster ID is not present in the form as a field so it won't be passed as a value to the submit function
-    uuid: initialValues.uuid,
-    tags: keyValueArrToObj(tags),
-  }), [update, initialValues])
+  const handleSubmit = useCallback(
+    ({ tags, ...cluster }) =>
+      update({
+        ...cluster,
+        // The cluster ID is not present in the form as a field so it won't be passed as a value to the submit function
+        uuid: initialValues.uuid,
+        tags: keyValueArrToObj(tags),
+      }),
+    [update, initialValues],
+  )
 
-  return <FormWrapper
-    title={`Edit Cluster ${initialValues.name || ''}`}
-    loading={loadingClusters || updating}
-    renderContentOnMount={false}
-    message={updating ? 'Submitting form...' : 'Loading Cluster...'}
-    backUrl={listUrl}>
-    <ValidatedForm initialValues={initialValues} onSubmit={handleSubmit}>
-      {/* Cluster Name */}
-      <TextField
-        id="name"
-        label="Name"
-        info="Name of the cluster"
-        required
-      />
+  return (
+    <FormWrapper
+      title={`Edit Cluster ${initialValues.name || ''}`}
+      loading={loadingClusters || updating}
+      renderContentOnMount={false}
+      message={updating ? 'Submitting form...' : 'Loading Cluster...'}
+      backUrl={listUrl}
+    >
+      <ValidatedForm initialValues={initialValues} onSubmit={handleSubmit}>
+        {/* Cluster Name */}
+        <TextField id="name" label="Name" info="Name of the cluster" required />
 
-      {/* Etcd Backup */}
-      <CheckboxField
-        id="etcdBackup"
-        label="Enable Etcd Backup"
-        info="Enable automated etcd backups on this cluster"
-        onChange={getParamsUpdater('etcdBackup')}
-        value={params.etcdBackup}
-      />
+        {/* Etcd Backup */}
+        <CheckboxField
+          id="etcdBackup"
+          label="Enable Etcd Backup"
+          info="Enable automated etcd backups on this cluster"
+          onChange={getParamsUpdater('etcdBackup')}
+          value={params.etcdBackup}
+        />
 
-      {params.etcdBackup && <EtcdBackupFields />}
+        {params.etcdBackup && <EtcdBackupFields />}
 
-      {/* Tags */}
-      <KeyValuesField
-        id="tags"
-        label="Tags"
-        info="Edit tag metadata on this cluster"
-      />
-      <SubmitButton>Update Cluster</SubmitButton>
-    </ValidatedForm>
-  </FormWrapper>
+        {/* Tags */}
+        <KeyValuesField id="tags" label="Tags" info="Edit tag metadata on this cluster" />
+        <SubmitButton>Update Cluster</SubmitButton>
+      </ValidatedForm>
+    </FormWrapper>
+  )
 }
 
 export default EditClusterPage

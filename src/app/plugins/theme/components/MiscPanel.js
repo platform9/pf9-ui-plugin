@@ -6,7 +6,7 @@ import { AppContext } from 'core/providers/AppProvider'
 
 const MiscPanel = () => {
   const { theme, setContext } = useContext(AppContext)
-  const handleChange = path => e => {
+  const handleChange = (path) => (e) => {
     const lens = lensPath(path.split('.'))
     const { value } = e.target
     setContext({ theme: set(lens, value, theme) })

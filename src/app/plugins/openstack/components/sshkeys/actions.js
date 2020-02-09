@@ -6,18 +6,18 @@ export const sshCacheKey = 'sshKeys'
 
 const { nova } = ApiClient.getInstance()
 
-const injectIds = x => ({ ...x, id: x.id || uuid.v4() })
+const injectIds = (x) => ({ ...x, id: x.id || uuid.v4() })
 
 const sshKeyActions = createCRUDActions(sshCacheKey, {
   listFn: async () => {
     return (await nova.getSshKeys()).map(injectIds)
   },
-  createFn: async data => {
+  createFn: async (data) => {
     return nova.createSshKey(data)
   },
   deleteFn: async ({ id }) => {
     await nova.deleteSshKey(id)
-  }
+  },
 })
 
 export default sshKeyActions

@@ -7,7 +7,7 @@ const defaultStats = { current: 0, max: 0, percent: 0 }
 
 const UsageWidget = ({
   title,
-  headerImg,
+  headerImg = undefined,
   precision = 1,
   units = '',
   usedText = 'used',

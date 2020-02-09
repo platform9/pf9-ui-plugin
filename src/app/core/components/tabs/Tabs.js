@@ -9,7 +9,7 @@ const TabContext = React.createContext({})
 export const Consumer = TabContext.Consumer
 export const Provider = TabContext.Provider
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     flexGrow: 1,
     width: '100%',
@@ -21,16 +21,16 @@ const styles = theme => ({
   },
 })
 
-const tabStyles = theme => ({
+const tabStyles = (theme) => ({
   root: {
     textTransform: 'none',
-    fontSize: ({ compact }) => compact ? 14 : 21,
+    fontSize: ({ compact }) => (compact ? 14 : 21),
     minWidth: 100,
     padding: 0,
-    marginRight: ({ compact }) => compact ? 10 : 15,
+    marginRight: ({ compact }) => (compact ? 10 : 15),
     margin: '0 0 -1px',
     cursor: 'default',
-    minHeight: ({ compact }) => compact ? 34 : 48,
+    minHeight: ({ compact }) => (compact ? 34 : 48),
     color: theme.palette.text.secondary,
     '&.Mui-selected': {
       color: theme.palette.text.primary,
@@ -42,8 +42,8 @@ const tabStyles = theme => ({
     },
   },
   wrapper: {
-    padding: ({ compact }) => compact ? theme.spacing(0.5, 1, 1) : theme.spacing(0.5, 2, 1),
-    marginBottom: ({ compact }) => compact ? 0 : theme.spacing(1),
+    padding: ({ compact }) => (compact ? theme.spacing(0.5, 1, 1) : theme.spacing(0.5, 2, 1)),
+    marginBottom: ({ compact }) => (compact ? 0 : theme.spacing(1)),
     transition: 'all .2s',
     lineHeight: 1,
   },
@@ -52,9 +52,8 @@ const tabStyles = theme => ({
 const CustomTab = withStyles(tabStyles)(({ compact, ...rest }) => <MDTab {...rest} />)
 
 class Tabs extends PureComponent {
-  addTab = tab => {
-    this.setState(
-      state => ({ tabs: [...state.tabs, tab] }), this.activateDefaultTab)
+  addTab = (tab) => {
+    this.setState((state) => ({ tabs: [...state.tabs, tab] }), this.activateDefaultTab)
   }
 
   state = {
@@ -63,9 +62,8 @@ class Tabs extends PureComponent {
     addTab: this.addTab,
   }
 
-  static getDerivedStateFromProps (props, state) {
-    if (props.useUrlHashes &&
-      props.location.hash && props.location.hash !== state.value) {
+  static getDerivedStateFromProps(props, state) {
+    if (props.useUrlHashes && props.location.hash && props.location.hash !== state.value) {
       return {
         value: props.location.hash.substr(1) || false,
       }
@@ -81,10 +79,13 @@ class Tabs extends PureComponent {
   }
 
   handleChange = (e, value) => {
+    if (this.props.onChange) {
+      this.props.onChange(value)
+    }
     this.setState({ value })
   }
 
-  render () {
+  render() {
     const { tabs, value } = this.state
     const { children, classes, useUrlHashes, compact } = this.props
     return (
@@ -98,18 +99,17 @@ class Tabs extends PureComponent {
                 indicatorColor="primary"
                 textColor="inherit"
               >
-                {tabs.map(tab =>
+                {tabs.map((tab) => (
                   <CustomTab
                     compact={compact}
                     key={tab.value}
                     value={tab.value}
                     label={tab.label}
-                    href={useUrlHashes ? `#${tab.value}` : null} />,
-                )}
+                    href={useUrlHashes ? `#${tab.value}` : null}
+                  />
+                ))}
               </MDTabs>
-              <Provider value={this.state}>
-                {children}
-              </Provider>
+              <Provider value={this.state}>{children}</Provider>
             </div>
           </Paper>
         </Grid>
@@ -118,15 +118,10 @@ class Tabs extends PureComponent {
   }
 }
 
-export const withTabContext = Component => props => {
+export const withTabContext = (Component) => (props) => {
   return (
     <Consumer>
-      {({ value, addTab }) =>
-        <Component
-          {...props}
-          activeTab={value}
-          addTab={addTab}
-        />}
+      {({ value, addTab }) => <Component {...props} activeTab={value} addTab={addTab} />}
     </Consumer>
   )
 }
@@ -141,7 +136,4 @@ Tabs.defaultProps = {
   useUrlHashes: true,
 }
 
-export default compose(
-  withStyles(styles),
-  withRouter,
-)(Tabs)
+export default compose(withStyles(styles), withRouter)(Tabs)

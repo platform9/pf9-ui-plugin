@@ -2,7 +2,13 @@ import React, { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import ApiClient from 'api-client/ApiClient'
 import {
-  Button, Checkbox, FormControlLabel, Grid, Paper, TextField, Typography,
+  Button,
+  Checkbox,
+  FormControlLabel,
+  Grid,
+  Paper,
+  TextField,
+  Typography,
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import { compose } from 'utils/fp'
@@ -17,7 +23,7 @@ import { imageUrlRoot, dashboardUrl } from 'app/constants'
 import moment from 'moment'
 import { trackEvent } from 'utils/tracking'
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     padding: theme.spacing(8),
     overflow: 'auto',
@@ -78,7 +84,7 @@ export class LoginPage extends React.PureComponent {
     loading: false,
   }
 
-  updateValue = key => event => {
+  updateValue = (key) => (event) => {
     this.setState({ [key]: event.target.value })
   }
 
@@ -107,75 +113,100 @@ export class LoginPage extends React.PureComponent {
     return this.setState({ loginFailed: true, loading: false })
   }
 
-  handleChangeBox = name => event => {
+  handleChangeBox = (name) => (event) => {
     this.setState({ [name]: event.target.checked })
   }
 
-  handleForgotPassword = () => e => {
+  handleForgotPassword = () => (e) => {
     this.props.history.push(forgotPasswordUrl)
   }
 
   renderInputfield = () => {
     const { classes } = this.props
-    return <Fragment>
-      <TextField required id="email" label="Email" placeholder="Email" className={classes.textField} onChange={this.updateValue('username')} />
-      <TextField required id="password" label="Password" className={classes.textField} type="password" onChange={this.updateValue('password')} />
-    </Fragment>
+    return (
+      <Fragment>
+        <TextField
+          required
+          id="email"
+          label="Email"
+          placeholder="Email"
+          className={classes.textField}
+          onChange={this.updateValue('username')}
+        />
+        <TextField
+          required
+          id="password"
+          label="Password"
+          className={classes.textField}
+          type="password"
+          onChange={this.updateValue('password')}
+        />
+      </Fragment>
+    )
   }
 
   renderMFACheckbox = () => {
     const { classes } = this.props
-    return <Fragment>
-      <FormControlLabel
-        value="MFAcheckbox"
-        className={classes.checkbox}
-        control={
-          <Checkbox
-            checked={this.state.MFAcheckbox}
-            onChange={this.handleChangeBox('MFAcheckbox')}
-            value="MFAcheckbox"
-            color="primary"
-          />
-        }
-        label={
-          <div>
-            <span>I have a Multi-Factor Authentication (MFA) token. (</span>
-            <ExternalLink
-              url='https://platform9.com/support/setup-multi-factor-authentication-with-platform9/'
-            >more info</ExternalLink>
-            <span>)</span>
-          </div>
-        }
-      />
-    </Fragment>
+    return (
+      <Fragment>
+        <FormControlLabel
+          value="MFAcheckbox"
+          className={classes.checkbox}
+          control={
+            <Checkbox
+              checked={this.state.MFAcheckbox}
+              onChange={this.handleChangeBox('MFAcheckbox')}
+              value="MFAcheckbox"
+              color="primary"
+            />
+          }
+          label={
+            <div>
+              <span>I have a Multi-Factor Authentication (MFA) token. (</span>
+              <ExternalLink url="https://platform9.com/support/setup-multi-factor-authentication-with-platform9/">
+                more info
+              </ExternalLink>
+              <span>)</span>
+            </div>
+          }
+        />
+      </Fragment>
+    )
   }
 
   renderMFAInput = () => {
     const { classes } = this.props
-    return <TextField
-      required={this.state.MFAcheckbox}
-      id="MFA"
-      label="MFA Code"
-      className={classes.textField}
-      placeholder="MFA Code"
-      margin="normal"
-    />
+    return (
+      <TextField
+        required={this.state.MFAcheckbox}
+        id="MFA"
+        label="MFA Code"
+        className={classes.textField}
+        placeholder="MFA Code"
+        margin="normal"
+      />
+    )
   }
 
   renderFooter = () => {
     const { classes } = this.props
-    return <Fragment>
-      <Typography className={classes.paragraph} variant="caption" color="textSecondary">
-        By signing in, you agree to our <ExternalLink url="https://platform9.com/terms-conditions/">Terms
-        of Service</ExternalLink>.
-      </Typography>
-      <Typography className={classes.paragraph} variant="caption" color="textSecondary">
-        © 2014-{moment().year()} Platform9 Systems, Inc.
-      </Typography>
-    </Fragment>
+    return (
+      <Fragment>
+        <Typography className={classes.paragraph} variant="caption" color="textSecondary">
+          By signing in, you agree to our{' '}
+          <ExternalLink url="https://platform9.com/terms-conditions/">
+            Terms of Service
+          </ExternalLink>
+          .
+        </Typography>
+        <Typography className={classes.paragraph} variant="caption" color="textSecondary">
+          © 2014-{moment().year()} Platform9 Systems, Inc.
+        </Typography>
+      </Fragment>
+    )
   }
 
-  render () {
+  render() {
     const { classes } = this.props
     const { loginFailed, loading } = this.state
 
@@ -228,8 +259,4 @@ LoginPage.propTypes = {
   onAuthSuccess: PropTypes.func,
 }
 
-export default compose(
-  withAppContext,
-  withRouter,
-  withStyles(styles),
-)(LoginPage)
+export default compose(withAppContext, withRouter, withStyles(styles))(LoginPage)

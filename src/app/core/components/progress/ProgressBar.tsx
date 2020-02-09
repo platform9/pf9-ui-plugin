@@ -18,27 +18,27 @@ interface Props {
   color?: 'error' | 'success' | 'primary'
 }
 
-const useStyles = makeStyles<Theme, Props>(theme => ({
+const useStyles = makeStyles<Theme, Props>((theme) => ({
   root: {
     height: ({ height }) => height,
     display: 'flex',
     width: ({ width }) => width,
-    flexFlow: ({ compact }) => compact ? 'column-reverse nowrap' : 'row nowrap',
-    alignItems: ({ compact }) => compact ? 'normal' : 'center',
+    flexFlow: ({ compact }) => (compact ? 'column-reverse nowrap' : 'row nowrap'),
+    alignItems: ({ compact }) => (compact ? 'normal' : 'center'),
   },
   label: {
     whiteSpace: 'nowrap',
     height: '100%',
-    width: ({ compact }) => compact ? '100%' : 40,
-    paddingLeft: ({ compact }) => compact ? null : theme.spacing(1),
+    width: ({ compact }) => (compact ? '100%' : 40),
+    paddingLeft: ({ compact }) => (compact ? null : theme.spacing(1)),
     color: 'rgba(0, 0, 0, 0.87)',
     fontSize: '12px',
     letterSpacing: 0.1,
   },
   progressContainer: {
     flexGrow: 1,
-    height: ({ compact }) => compact ? 3 : '100%',
-    minHeight: ({ compact }) => compact ? 3 : '100%',
+    height: ({ compact }) => (compact ? 3 : '100%'),
+    minHeight: ({ compact }) => (compact ? 3 : '100%'),
     backgroundColor: '#D2E1EB',
   },
   '@keyframes stripes': {
@@ -59,9 +59,10 @@ const useStyles = makeStyles<Theme, Props>(theme => ({
     textAlign: 'center',
     textOverflow: 'visible',
     height: '100%',
-    backgroundImage: ({ animated }) => animated
-      ? 'linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent)'
-      : null,
+    backgroundImage: ({ animated }) =>
+      animated
+        ? 'linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent)'
+        : null,
     backgroundSize: '40px 40px',
     backgroundColor: ({ animated, percent, variant, color }) => {
       if (color) {
@@ -86,23 +87,25 @@ const ProgressBar: FC<Props> = ({
   compact = false,
   width = 145,
   height = 15,
-  label = progress => `${progress}%`,
+  label = (progress) => `${progress}%`,
   variant = 'progress',
-  color = undefined
+  color = undefined,
 }) => {
   const classes = useStyles({ percent, animated, compact, width, height, variant, color })
   return (
     <div className={classes.root}>
       <div className={classes.progressContainer}>
-        <div
-          className={classes.progress}
-        >
-          <Typography variant="body2">{containedPercent ? ensureFunction(label)(percent) : null}</Typography>
+        <div className={classes.progress}>
+          <Typography variant="body2">
+            {containedPercent ? ensureFunction(label)(percent) : null}
+          </Typography>
         </div>
       </div>
-      {!containedPercent && <div className={classes.label}>
-        <Typography variant="body2">{ensureFunction(label)(percent)}</Typography>
-      </div>}
+      {!containedPercent && (
+        <div className={classes.label}>
+          <Typography variant="body2">{ensureFunction(label)(percent)}</Typography>
+        </div>
+      )}
     </div>
   )
 }

@@ -11,8 +11,12 @@ import useReactRouter from 'use-react-router'
 import { makeStyles } from '@material-ui/styles'
 import { Route, Redirect, Switch } from 'react-router'
 import {
-  activateUserUrl, dashboardUrl, resetPasswordUrl, resetPasswordThroughEmailUrl,
-  forgotPasswordUrl, loginUrl,
+  activateUserUrl,
+  dashboardUrl,
+  resetPasswordUrl,
+  resetPasswordThroughEmailUrl,
+  forgotPasswordUrl,
+  loginUrl,
 } from 'app/constants'
 import ResetPasswordPage from 'core/public/ResetPasswordPage'
 import ForgotPasswordPage from 'core/public/ForgotPasswordPage'
@@ -24,7 +28,7 @@ import { getCookieValue } from 'utils/misc'
 import moment from 'moment'
 import { useToast } from 'core/providers/ToastProvider'
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
   },
@@ -42,7 +46,15 @@ const AppContainer = () => {
   const showToast = useToast()
   const [, initUserPreferences] = usePreferences()
   const { updatePrefs } = useScopedPreferences('Tenants')
-  const { initialized, initSession, session, appLoaded, destroySession, getContext, setContext } = useContext(AppContext)
+  const {
+    initialized,
+    initSession,
+    session,
+    appLoaded,
+    destroySession,
+    getContext,
+    setContext,
+  } = useContext(AppContext)
 
   useEffect(() => {
     const unlisten = history.listen((location, action) => {
@@ -81,7 +93,12 @@ const AppContainer = () => {
 
       // Start from scratch to make use of prebuilt functions
       // for standard login page
-      const { unscopedToken, username, expiresAt, issuedAt } = await keystone.getUnscopedTokenWithToken(scopedToken)
+      const {
+        unscopedToken,
+        username,
+        expiresAt,
+        issuedAt,
+      } = await keystone.getUnscopedTokenWithToken(scopedToken)
       if (!unscopedToken) {
         history.push(loginUrl)
         return
@@ -119,7 +136,9 @@ const AppContainer = () => {
     if (history.location.pathname.includes(activateUserUrl)) return
 
     // TODO: Need to fix this code after synching up with backend.
-    if (history.location.hash.includes(resetPasswordThroughEmailUrl)) return history.push(history.location.hash.slice().replace('#', '/ui'))
+    if (history.location.hash.includes(resetPasswordThroughEmailUrl)) {
+      return history.push(history.location.hash.slice().replace('#', '/ui'))
+    }
 
     if (history.location.pathname.includes(resetPasswordThroughEmailUrl)) return
 
@@ -134,7 +153,9 @@ const AppContainer = () => {
     })
 
     const timeDiff = moment(expiresAt).diff(issuedAt)
-    const localExpiresAt = moment().add(timeDiff).format()
+    const localExpiresAt = moment()
+      .add(timeDiff)
+      .format()
 
     try {
       // Set up the scopedToken
@@ -150,7 +171,9 @@ const AppContainer = () => {
         throw new Error('No tenants found, please contact support')
       }
       const activeTenant = tenants.find(propEq('name', lastTenant)) || head(tenants)
-      if (lastRegion) { setActiveRegion(lastRegion) }
+      if (lastRegion) {
+        setActiveRegion(lastRegion)
+      }
 
       const { scopedToken, user, role } = await keystone.changeProjectScope(activeTenant.id)
       await keystone.resetCookie()
@@ -184,30 +207,34 @@ const AppContainer = () => {
     return true
   }
 
-  const loadingMessage = appLoaded
-    ? 'Initializing session...'
-    : 'Loading app...'
+  const loadingMessage = appLoaded ? 'Initializing session...' : 'Loading app...'
 
-  const authContent = isNilOrEmpty(session)
-    ? <Redirect to={loginUrl} />
-    : <AuthenticatedContainer />
+  const authContent = isNilOrEmpty(session) ? (
+    <Redirect to={loginUrl} />
+  ) : (
+    <AuthenticatedContainer />
+  )
 
   // Do not let the rest of the UI load until we have a working session.
-  return <div className={classes.root} id="_main-container">
-    <Switch>
-      <Route path={resetPasswordUrl} component={ResetPasswordPage} />
-      <Route path={forgotPasswordUrl} component={ForgotPasswordPage} />
-      <Route path={activateUserUrl} component={ActivateUserPage} />
-      <Route path={loginUrl}>
-        <LoginPage onAuthSuccess={setupSession} />
-      </Route>
-      <Route>
-        {appLoaded && initialized
-          ? authContent
-          : <Progress renderLoadingImage={false} loading message={loadingMessage} />}
-      </Route>
-    </Switch>
-  </div>
+  return (
+    <div className={classes.root} id="_main-container">
+      <Switch>
+        <Route path={resetPasswordUrl} component={ResetPasswordPage} />
+        <Route path={forgotPasswordUrl} component={ForgotPasswordPage} />
+        <Route path={activateUserUrl} component={ActivateUserPage} />
+        <Route path={loginUrl}>
+          <LoginPage onAuthSuccess={setupSession} />
+        </Route>
+        <Route>
+          {appLoaded && initialized ? (
+            authContent
+          ) : (
+            <Progress renderLoadingImage={false} loading message={loadingMessage} />
+          )}
+        </Route>
+      </Switch>
+    </div>
+  )
 }
 
 export default AppContainer

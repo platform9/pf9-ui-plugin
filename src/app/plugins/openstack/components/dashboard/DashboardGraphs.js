@@ -6,25 +6,25 @@ import RegionsGraph from 'core/components/graphs/RegionsGraph'
 import StorageGraph from 'core/components/graphs/StorageGraph'
 import ServersGraph from 'core/components/graphs/ServersGraph'
 
-const styles = theme => ({
+const styles = (theme) => ({
   dashboardGraphs: {
     display: 'flex',
-    marginTop: theme.spacing(1)
-  }
+    marginTop: theme.spacing(1),
+  },
 })
 
 const data = {
   servers: {
-    numServers: 6
+    numServers: 6,
   },
   storage: {
-    capacity: 15
-  }
+    capacity: 15,
+  },
 }
 
 @withStyles(styles)
 class DashboardGraphs extends React.PureComponent {
-  render () {
+  render() {
     const { classes } = this.props
 
     return (
@@ -44,6 +44,6 @@ class DashboardGraphs extends React.PureComponent {
       </div>
     )
   }
-};
+}
 
 export default DashboardGraphs

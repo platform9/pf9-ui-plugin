@@ -46,26 +46,70 @@ interface IConstraint {
 // To eliminate excessive branching logic, an explicit state transition table is used.
 export const scaleConstraints: IConstraint[] = [
   // shrink
-  { startNum: 1, desiredNum: 0, relation: 'deny', message: 'You cannot remove master node from a single master cluster.  If you wish to delete the cluster, please choose the ‘delete’ operation on the cluster on the infrastructure page instead.' },
-  { startNum: 2, desiredNum: 1, relation: 'warn', message: 'Removing this master node will reduce the total number of masters in this cluster down to 1.  For cluster high availability we recommend always having 3 masters nodes in a cluster.' },
-  { startNum: 3, desiredNum: 2, relation: 'warn', message: 'For high availability, we recommend having at least 3 masters in a cluster at any time. Removing this master will result in an even number of masters for this cluster (2 master nodes after removal of this node).  We recommend having an odd number of masters for your cluster at any time.' },
+  {
+    startNum: 1,
+    desiredNum: 0,
+    relation: 'deny',
+    message:
+      'You cannot remove master node from a single master cluster.  If you wish to delete the cluster, please choose the ‘delete’ operation on the cluster on the infrastructure page instead.',
+  },
+  {
+    startNum: 2,
+    desiredNum: 1,
+    relation: 'warn',
+    message:
+      'Removing this master node will reduce the total number of masters in this cluster down to 1.  For cluster high availability we recommend always having 3 masters nodes in a cluster.',
+  },
+  {
+    startNum: 3,
+    desiredNum: 2,
+    relation: 'warn',
+    message:
+      'For high availability, we recommend having at least 3 masters in a cluster at any time. Removing this master will result in an even number of masters for this cluster (2 master nodes after removal of this node).  We recommend having an odd number of masters for your cluster at any time.',
+  },
   { startNum: 4, desiredNum: 3, relation: 'allow', message: '' },
-  { startNum: 5, desiredNum: 4, relation: 'warn', message: 'Removing this master node will result in an even number of master nodes for this cluster (4 master nodes after removal of this node).  We recommend having an odd number of masters for your cluster at any time.' },
+  {
+    startNum: 5,
+    desiredNum: 4,
+    relation: 'warn',
+    message:
+      'Removing this master node will result in an even number of master nodes for this cluster (4 master nodes after removal of this node).  We recommend having an odd number of masters for your cluster at any time.',
+  },
 
   // grow
-  { startNum: 1, desiredNum: 2, relation: 'deny', message: 'You cannot add master nodes to a single master cluster.  You need to create a multi-master cluster with at least 2 masters before you can add more masters to the cluster.' },
+  {
+    startNum: 1,
+    desiredNum: 2,
+    relation: 'deny',
+    message:
+      'You cannot add master nodes to a single master cluster.  You need to create a multi-master cluster with at least 2 masters before you can add more masters to the cluster.',
+  },
   { startNum: 2, desiredNum: 3, relation: 'allow', message: '' },
-  { startNum: 3, desiredNum: 4, relation: 'warn', message: 'Adding this master node will result in an even number of master nodes for this cluster (4 master nodes after adding of this node).  We recommend having an odd number of masters for your cluster at any time.' },
+  {
+    startNum: 3,
+    desiredNum: 4,
+    relation: 'warn',
+    message:
+      'Adding this master node will result in an even number of master nodes for this cluster (4 master nodes after adding of this node).  We recommend having an odd number of masters for your cluster at any time.',
+  },
   { startNum: 4, desiredNum: 5, relation: 'allow', message: '' },
-  { startNum: 5, desiredNum: 6, relation: 'deny', message: '5 master nodes is the max.  You cannot add more.' },
+  {
+    startNum: 5,
+    desiredNum: 6,
+    relation: 'deny',
+    message: '5 master nodes is the max.  You cannot add more.',
+  },
 ]
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
 interface ScaleMasterProps {
   cluster: ICluster
+
   onSubmit(data): Promise<void> | void
+
   onAttach(data): Promise<void> | void
+
   onDetach(data): Promise<void> | void
 }
 
@@ -78,11 +122,13 @@ const ScaleMasters: FunctionComponent<ScaleMasterProps> = ({
   const { params, getParamsUpdater } = useParams()
 
   // Look up the transition in the state transition table.
-  const isMaster = node => node.isMaster === 1 // Backend returns integer 0 and 1 instead of true and false
+  const isMaster = (node) => node.isMaster === 1 // Backend returns integer 0 and 1 instead of true and false
   const numMasters = (cluster.nodes || []).filter(isMaster).length
   const delta = params.scaleType === 'add' ? 1 : -1
   const desiredMasters = numMasters + delta
-  const transition = scaleConstraints.find(t => t.startNum === numMasters && t.desiredNum === desiredMasters)
+  const transition = scaleConstraints.find(
+    (t) => t.startNum === numMasters && t.desiredNum === desiredMasters,
+  )
 
   const addBareOsMasterNodes = () => {
     const { message, relation } = transition
@@ -90,7 +136,12 @@ const ScaleMasters: FunctionComponent<ScaleMasterProps> = ({
     return (
       <ValidatedForm onSubmit={params.scaleType === 'add' ? onAttach : onDetach}>
         {relation === 'warn' && <Alert message={message} variant="warning" />}
-        <ClusterHostChooser id="mastersToAdd" filterFn={isUnassignedNode} validations={[]} required />
+        <ClusterHostChooser
+          id="mastersToAdd"
+          filterFn={isUnassignedNode}
+          validations={[]}
+          required
+        />
         <SubmitButton>{params.scaleType === 'add' ? 'Add' : 'Remove'} masters</SubmitButton>
       </ValidatedForm>
     )

@@ -12,14 +12,19 @@ const ClusterUpgradeDialog = ({ rows: [cluster], onClose }) => {
     <ConfirmationDialog
       loading={upgradingCluster}
       title="Upgrade Cluster"
-      text={<>
-        <Typography variant="body1">
-          You are about to upgrade the cluster named {cluster.name}</Typography><br />
-        <Typography variant="body1">Are you sure?</Typography>
-      </>}
+      text={
+        <>
+          <Typography variant="body1">
+            You are about to upgrade the cluster named {cluster.name}
+          </Typography>
+          <br />
+          <Typography variant="body1">Are you sure?</Typography>
+        </>
+      }
       open
       onCancel={onClose}
-      onConfirm={handeSubmit} />
+      onConfirm={handeSubmit}
+    />
   )
 }
 

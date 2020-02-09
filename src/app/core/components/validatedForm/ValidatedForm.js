@@ -13,12 +13,12 @@ export const ValidatedFormContext = React.createContext({})
 export const ValidatedFormConsumer = ValidatedFormContext.Consumer
 export const ValidatedFormProvider = ValidatedFormContext.Provider
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     display: 'flex',
     flexFlow: 'column wrap',
-    width: ({ fullWidth }) => fullWidth ? '100%' : '50%',
-    maxWidth: ({ fullWidth }) => fullWidth ? null : 600,
+    width: ({ fullWidth }) => (fullWidth ? '100%' : '50%'),
+    maxWidth: ({ fullWidth }) => (fullWidth ? null : 600),
     minWidth: 300,
     marginBottom: theme.spacing(1),
     '& .MuiFormControl-root': {
@@ -36,7 +36,7 @@ const styles = theme => ({
 @withRouter
 @withStyles(styles, { withTheme: true })
 class ValidatedForm extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
     if (props.triggerSubmit) {
       props.triggerSubmit(this.handleSubmit)
@@ -47,7 +47,7 @@ class ValidatedForm extends PureComponent {
    * This stores the specification of the field, to be used for validation down the line.
    * This function will be called by the child components when they are initialized.
    */
-  defineField = moize(field => spec => {
+  defineField = moize((field) => (spec) => {
     this.setState(setStateLens(spec, ['fields', field]), () => {
       if (this.state.showingErrors) {
         this.validateField(field)(null)
@@ -55,7 +55,7 @@ class ValidatedForm extends PureComponent {
     })
   })
 
-  removeField = field => {
+  removeField = (field) => {
     this.setState(dissocPath(['fields', field]))
   }
 
@@ -64,12 +64,13 @@ class ValidatedForm extends PureComponent {
    * Note: many components use event.target.value but we only need value here.
    * Note: values can be passed up to parent component by supplying a setContext function prop
    */
-  setFieldValue = moize(field => {
+  setFieldValue = moize((field) => {
     const fieldLens = lensPath(['values', field])
     const hasErrPath = ['errors', field, 'hasError']
     return (value, validateAll) => {
       this.setState(set(fieldLens, value), () => {
-        if (this.state.showingErrors ||
+        if (
+          this.state.showingErrors ||
           (this.props.showErrorsOnBlur && pathEq(hasErrPath, true, this.state))
         ) {
           if (validateAll) {
@@ -85,12 +86,13 @@ class ValidatedForm extends PureComponent {
   /**
    * This can be used to update a field value using an updaterFn instead of assigning a value directly
    */
-  updateFieldValue = moize(field => {
+  updateFieldValue = moize((field) => {
     const fieldLens = lensPath(['values', field])
     const hasErrPath = ['errors', field, 'hasError']
     return (updaterFn, validateAll) => {
       this.setState(over(fieldLens, updaterFn), () => {
-        if (this.state.showingErrors ||
+        if (
+          this.state.showingErrors ||
           (this.props.showErrorsOnBlur && pathEq(hasErrPath, true, this.state))
         ) {
           if (validateAll) {
@@ -103,14 +105,14 @@ class ValidatedForm extends PureComponent {
     }
   })
 
-  getFieldValue = moize(field => (getterFn = identity) => {
+  getFieldValue = moize((field) => (getterFn = identity) => {
     return getterFn(path(['values', field], this.state))
   })
 
   /**
    *  Validate the field and return false on error, true otherwise
    */
-  validateField = moize(field => () => {
+  validateField = moize((field) => () => {
     const { fields, values } = this.state
     // Skip validation if the field has not been defined yet
     if (!fields.hasOwnProperty(field)) {
@@ -122,10 +124,10 @@ class ValidatedForm extends PureComponent {
     const validationsArray = Array.isArray(validations)
       ? validations
       : toPairs(validations).map(([validationKey, validationSpec]) =>
-        parseValidator(validationKey, validationSpec),
-      )
+          parseValidator(validationKey, validationSpec),
+        )
     const failedValidation = validationsArray.find(
-      validator => !validator.validate(fieldValue, values, field),
+      (validator) => !validator.validate(fieldValue, values, field),
     )
     if (failedValidation) {
       this.showFieldErrors(
@@ -144,12 +146,10 @@ class ValidatedForm extends PureComponent {
    * Store the error state of the field, which will be accessed by child components
    */
   showFieldErrors = (field, errorMessage) => {
-    this.setState(
-      setStateLens({ errorMessage, hasError: true }, ['errors', field]),
-    )
+    this.setState(setStateLens({ errorMessage, hasError: true }, ['errors', field]))
   }
 
-  clearFieldErrors = field => {
+  clearFieldErrors = (field) => {
     this.setState(setStateLens({ hasError: false }, ['errors', field]))
   }
 
@@ -173,13 +173,11 @@ class ValidatedForm extends PureComponent {
    */
   validateForm = () => {
     const { fields } = this.state
-    const results = Object.keys(fields).map(field =>
-      this.validateField(field)(null),
-    )
+    const results = Object.keys(fields).map((field) => this.validateField(field)(null))
     return !results.includes(false)
   }
 
-  handleSubmit = event => {
+  handleSubmit = (event) => {
     const { clearOnSubmit, onSubmit } = this.props
     const { initialValues, values, fields, showingErrors } = this.state
     if (event) {
@@ -187,7 +185,7 @@ class ValidatedForm extends PureComponent {
     }
     if (!this.validateForm()) {
       if (!showingErrors) {
-        this.setState(prevState => ({ ...prevState, showingErrors: true }))
+        this.setState((prevState) => ({ ...prevState, showingErrors: true }))
       }
       return false
     }
@@ -203,7 +201,7 @@ class ValidatedForm extends PureComponent {
     return true
   }
 
-  render () {
+  render() {
     const { children, classes, debug, id } = this.props
     return (
       <form onSubmit={this.handleSubmit} className={classes.root} id={id}>

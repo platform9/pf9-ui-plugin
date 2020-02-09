@@ -20,8 +20,8 @@ describe('http', () => {
           body: JSON.stringify(body),
           headers: {
             Accept: 'application/json',
-            'Content-Type': 'application/json'
-          }
+            'Content-Type': 'application/json',
+          },
         }
         expect(mockedFetch).toHaveBeenCalledWith('http://somewhere.com', expectedBody)
       })
@@ -46,8 +46,8 @@ describe('http', () => {
         const expectedBody = {
           method: 'GET',
           headers: {
-            'X-Auth-Token': 'secretToken'
-          }
+            'X-Auth-Token': 'secretToken',
+          },
         }
         expect(mockedFetch).toHaveBeenCalledWith('http://somewhere.com', expectedBody)
       })
@@ -66,14 +66,16 @@ describe('http', () => {
             Accept: 'application/json',
             'Content-Type': 'application/json',
             'X-Auth-Token': 'secretToken',
-          }
+          },
         }
         expect(mockedFetch).toHaveBeenCalledWith('http://somewhere.com', expectedResponse)
       })
 
       it('should return the JSON body directly', async () => {
         fetch.mockResponseOnce(JSON.stringify({ foo: 'bar' }))
-        const response = await http.authenticated.openstack.post('http://somewhere.com', { foo: 'ignore-me' })
+        const response = await http.authenticated.openstack.post('http://somewhere.com', {
+          foo: 'ignore-me',
+        })
         expect(response).toEqual({ foo: 'bar' })
       })
     })

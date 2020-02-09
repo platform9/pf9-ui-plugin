@@ -5,7 +5,7 @@ import useDataUpdater from 'core/hooks/useDataUpdater'
 import useReactRouter from 'use-react-router'
 import { getContextUpdater } from 'core/helpers/createContextUpdater'
 
-const createAddComponents = options => {
+const createAddComponents = (options) => {
   const {
     cacheKey,
     createFn = cacheKey ? getContextUpdater(cacheKey, 'create') : null,
@@ -21,7 +21,7 @@ const createAddComponents = options => {
     throw new Error('Unable to display form, No FormComponent or formSpec specified')
   }
 
-  const AddPage = props => {
+  const AddPage = (props) => {
     const { history } = useReactRouter()
     const onComplete = useCallback(() => history.push(listUrl), [history])
     const [handleAdd, loading] = useDataUpdater(createFn, onComplete)

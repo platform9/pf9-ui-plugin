@@ -7,10 +7,14 @@ import SimpleLink from 'core/components/SimpleLink'
 import { compose } from 'app/utils/fp'
 import { withStyles } from '@material-ui/styles'
 import {
-  Button, ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, Typography,
+  Button,
+  ExpansionPanel,
+  ExpansionPanelDetails,
+  ExpansionPanelSummary,
+  Typography,
 } from '@material-ui/core'
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     marginTop: theme.spacing(4),
     width: '100%',
@@ -45,18 +49,22 @@ class DeveloperToolsEmbed extends React.PureComponent {
       <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
         <Typography className={this.props.classes.heading}>{title}</Typography>
       </ExpansionPanelSummary>
-      <ExpansionPanelDetails className={this.props.classes.details}>{children}</ExpansionPanelDetails>
+      <ExpansionPanelDetails className={this.props.classes.details}>
+        {children}
+      </ExpansionPanelDetails>
     </ExpansionPanel>
   )
 
-  render () {
+  render() {
     const {
       props: { enabled, classes },
       state: { expanded },
       Panel,
     } = this
 
-    if (!enabled) { return null }
+    if (!enabled) {
+      return null
+    }
     if (!expanded) {
       return (
         <div className={classes.root}>
@@ -69,7 +77,9 @@ class DeveloperToolsEmbed extends React.PureComponent {
     return (
       <div className={classes.root}>
         {/* {<Button onClick={this.collapse}>collapse devtools</Button>} */}
-        <Typography className={classes.title} variant="subtitle1">Developer Tools</Typography>
+        <Typography className={classes.title} variant="subtitle1">
+          Developer Tools
+        </Typography>
         <Panel title="Context Viewer">
           <ContextViewer />
         </Panel>
@@ -92,6 +102,4 @@ DeveloperToolsEmbed.defaultProps = {
   enabled: true,
 }
 
-export default compose(
-  withStyles(styles),
-)(DeveloperToolsEmbed)
+export default compose(withStyles(styles))(DeveloperToolsEmbed)

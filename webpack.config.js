@@ -73,7 +73,7 @@ module.exports = {
         enforce: 'pre',
         exclude: /node_modules/,
         test: /\.js$/,
-        loader: 'source-map-loader'
+        loader: 'source-map-loader',
       },
     ],
   },
@@ -100,12 +100,12 @@ module.exports = {
     },
   },
   plugins: [
-    ...(!isProd ? [new HardSourceWebpackPlugin({
-      info: {
-        mode: 'none',
-        level: 'info',
-      },
-    })] : []),
+    // ...(!isProd ? [new HardSourceWebpackPlugin({
+    //   info: {
+    //     mode: 'none',
+    //     level: 'info',
+    //   },
+    // })] : []),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(env),
     }),

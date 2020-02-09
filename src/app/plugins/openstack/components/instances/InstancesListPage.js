@@ -11,11 +11,10 @@ const loadInstances = createContextLoader('instances', async () => {
   return nova.getInstances()
 })
 
-const InstancesListPage = () =>
+const InstancesListPage = () => (
   <DataLoader loaders={{ instances: loadInstances }}>
     {({ data }) => <InstancesListContainer instances={data.instances} />}
   </DataLoader>
+)
 
-export default compose(
-  requiresAuthentication,
-)(InstancesListPage)
+export default compose(requiresAuthentication)(InstancesListPage)

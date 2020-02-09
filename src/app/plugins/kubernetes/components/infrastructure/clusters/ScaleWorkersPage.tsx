@@ -15,7 +15,11 @@ import { validators, customValidator } from 'core/utils/fieldValidators'
 import SubmitButton from 'core/components/buttons/SubmitButton'
 import useParams from 'core/hooks/useParams'
 import useDataUpdater from 'core/hooks/useDataUpdater'
-import ClusterHostChooser, { isUnassignedNode, inCluster, isNotMaster } from './bareos/ClusterHostChooser'
+import ClusterHostChooser, {
+  isUnassignedNode,
+  inCluster,
+  isNotMaster,
+} from './bareos/ClusterHostChooser'
 import { ICluster } from './model'
 import { allPass } from 'ramda'
 
@@ -24,12 +28,12 @@ const MAX_SCALE_AT_A_TIME = 15
 
 const maxScaleValidator = customValidator(
   (selections) => selections.length <= MAX_SCALE_AT_A_TIME,
-  `Clusters can only be scaled up to ${MAX_SCALE_AT_A_TIME} nodes at a time.`
+  `Clusters can only be scaled up to ${MAX_SCALE_AT_A_TIME} nodes at a time.`,
 )
 
 const minScaleValidator = customValidator(
   (selections) => selections.length > 0,
-  'You must select at least 1 node.'
+  'You must select at least 1 node.',
 )
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -55,12 +59,20 @@ const clusterTypeDisplay = {
 
 interface ScaleWorkersProps {
   cluster: ICluster
+
   onSubmit(data): Promise<void> | void
+
   onAttach(data): Promise<void> | void
+
   onDetach(data): Promise<void> | void
 }
 
-const ScaleWorkers: FunctionComponent<ScaleWorkersProps> = ({ cluster, onSubmit, onAttach, onDetach }) => {
+const ScaleWorkers: FunctionComponent<ScaleWorkersProps> = ({
+  cluster,
+  onSubmit,
+  onAttach,
+  onDetach,
+}) => {
   const classes = useStyles({})
   const { params, getParamsUpdater } = useParams()
   const { name, cloudProviderType } = cluster
@@ -136,10 +148,7 @@ const ScaleWorkers: FunctionComponent<ScaleWorkersProps> = ({ cluster, onSubmit,
       <ClusterHostChooser
         multiple
         id="workersToRemove"
-        filterFn={allPass([
-          isNotMaster,
-          inCluster(cluster.uuid)
-        ])}
+        filterFn={allPass([isNotMaster, inCluster(cluster.uuid)])}
         validations={[minScaleValidator, maxScaleValidator]}
         required
       />
@@ -213,7 +222,7 @@ const ScaleWorkersPage: FunctionComponent = () => {
 
   const handleAttach = (data: { workersToAdd: string[] }) => {
     const uuids = data.workersToAdd
-    const nodes = uuids.map(uuid => ({ uuid, isMaster: false }))
+    const nodes = uuids.map((uuid) => ({ uuid, isMaster: false }))
     return attach({ cluster, nodes })
   }
 
@@ -231,7 +240,12 @@ const ScaleWorkersPage: FunctionComponent = () => {
       renderContentOnMount={false}
       message={isUpdating ? 'Scaling cluster...' : 'Loading cluster...'}
     >
-      <ScaleWorkers cluster={cluster} onSubmit={handleSubmit} onAttach={handleAttach} onDetach={handleDetach} />
+      <ScaleWorkers
+        cluster={cluster}
+        onSubmit={handleSubmit}
+        onAttach={handleAttach}
+        onDetach={handleDetach}
+      />
     </FormWrapper>
   )
 }

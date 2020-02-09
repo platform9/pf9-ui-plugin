@@ -1,6 +1,11 @@
 import React from 'react'
 import {
-  Dialog, DialogTitle, DialogContent, Typography, DialogActions, Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Typography,
+  DialogActions,
+  Button,
 } from '@material-ui/core'
 import useDataLoader from 'core/hooks/useDataLoader'
 import Progress from 'core/components/progress/Progress'
@@ -30,15 +35,17 @@ export default ({ onClose, app }) => {
       <DialogTitle>Download {app.name}</DialogTitle>
       <Progress message="Loading versions..." loading={loadingVersions} inline>
         <DialogContent className={classes.root}>
-          {appVersions.length === 0 &&
-          <Typography variant="h5">No versions available to download</Typography>}
+          {appVersions.length === 0 && (
+            <Typography variant="h5">No versions available to download</Typography>
+          )}
           <ul>
-            {appVersions.map(({ version, appVersion, downloadLink }) => <li key={version}>
-              <SimpleLink src={downloadLink}>
-                <strong>{version}</strong>&nbsp;
-                (App v{appVersion})
-              </SimpleLink>
-            </li>)}
+            {appVersions.map(({ version, appVersion, downloadLink }) => (
+              <li key={version}>
+                <SimpleLink src={downloadLink}>
+                  <strong>{version}</strong>&nbsp; (App v{appVersion})
+                </SimpleLink>
+              </li>
+            ))}
           </ul>
         </DialogContent>
       </Progress>

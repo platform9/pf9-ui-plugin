@@ -1,12 +1,6 @@
 const theme = {
   breakpoints: {
-    keys: [
-      'xs',
-      'sm',
-      'md',
-      'lg',
-      'xl',
-    ],
+    keys: ['xs', 'sm', 'md', 'lg', 'xl'],
     values: {
       xs: 0,
       sm: 600,
@@ -122,23 +116,9 @@ const theme = {
       contrastText: '#FFF',
     },
     secondary: {
-      50: '#FBE9E7',
-      100: '#FFCCBC',
-      200: '#FFAB91',
-      300: '#FF8A65',
-      400: '#FF7043',
-      500: '#FF5722',
-      600: '#F4511E',
-      700: '#E64A19',
-      800: '#D84315',
-      900: '#BF360C',
-      A100: '#FF9E80',
-      A200: '#FF6E40',
-      A400: '#FF3D00',
-      A700: '#DD2C00',
-      main: '#FF3D00',
-      light: '#FF6E40',
-      dark: '#DD2C00',
+      main: '#587583',
+      light: '#94B8C9',
+      dark: '#2E5263',
       contrastText: '#FFF',
     },
     error: {
@@ -185,7 +165,7 @@ const theme = {
     background: {
       paper: '#FFF',
       default: '#FFF',
-      dashboard: '#edeff1'
+      dashboard: '#EDEFF1',
     },
     action: {
       active: 'rgba(0, 0, 0, 0.54)',
@@ -199,25 +179,25 @@ const theme = {
       background: '#606060',
     },
     sidebar: {
-      background: '#f3f3f3',
+      background: '#F3F3F3',
       text: '#646464',
-      activeText: '#1c1c1c',
-      hoverText: '#1c1c1c',
+      activeText: '#1C1C1C',
+      hoverText: '#1C1C1C',
     },
     dashboardCard: {
       background: '#FFF',
-      primary: '#4aa3df',
+      primary: '#4AA3DF',
       text: '#606060',
-      icon: '#b7b7b7',
+      icon: '#B7B7B7',
       button: '#FFF',
-      divider: '#dddddd',
+      divider: '#DDDDDD',
     },
     card: {
       background: 'rgba(2, 194, 172, 0.1)',
-      status: '#f3f3f3',
+      status: '#F3F3F3',
     },
     wizard: {
-      dark: '#02c2ac',
+      dark: '#02C2AC',
       light: 'rgba(2, 194, 172, 0.2)',
       medium: 'rgba(2, 194, 172, 0.4)',
     },
@@ -226,12 +206,14 @@ const theme = {
       text: '#E5513A',
     },
     pieChart: {
-      success: '#4adf74',
-      warning: '#fed16c',
-      error: '#e44c34',
-      unknown: '#f5a623',
-      empty: '#edeff1',
-    }
+      success: '#4ADF74',
+      warning: '#FED16C',
+      error: '#E44C34',
+      unknown: '#F5A623',
+      empty: '#EDEFF1',
+      aws: '#FF9800',
+      azure: '#4AA3DF',
+    },
   },
   props: {},
   shadows: [

@@ -15,7 +15,7 @@ import { Stepper, Step, StepLabel } from '@material-ui/core'
   Potentially add handlers that call a function when clicking on a step, ex.
   go back to step 1 when step 1 is clicked
 */
-const ProgressCard = ({ steps, activeStep }) =>
+const ProgressCard = ({ steps, activeStep }) => (
   <Stepper activeStep={activeStep}>
     {steps.map((step, index) => {
       return (
@@ -25,6 +25,7 @@ const ProgressCard = ({ steps, activeStep }) =>
       )
     })}
   </Stepper>
+)
 
 ProgressCard.propTypes = {
   activeStep: PropTypes.number,

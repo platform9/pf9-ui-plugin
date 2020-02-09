@@ -18,9 +18,7 @@ const createFn = (_params = {}, context) => {
         },
       ],
       readme: '/assets/stable/aerospike/0.2.9/README.md',
-      urls: [
-        faker.internet.url(),
-      ],
+      urls: [faker.internet.url()],
       version: faker.system.semver(),
     },
   }

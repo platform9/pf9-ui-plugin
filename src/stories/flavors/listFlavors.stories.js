@@ -12,9 +12,7 @@ const someFlavors = range(3).map(fakeFlavor)
 const deleteAction = action('Delete flavor')
 
 addStories('Flavor Management/Listing flavors', {
-  'With no flavors': () => (
-    <FlavorsList data={[]} onAdd={addAction} onDelete={deleteAction} />
-  ),
+  'With no flavors': () => <FlavorsList data={[]} onAdd={addAction} onDelete={deleteAction} />,
 
   'With some flavors': () => (
     <FlavorsList data={someFlavors} onAdd={addAction} onDelete={deleteAction} />
@@ -23,8 +21,6 @@ addStories('Flavor Management/Listing flavors', {
   'With pagination': () => {
     const numFlavors = number('numFlavors', 7, { range: true, min: 0, max: 15, step: 1 })
     const flavors = range(numFlavors).map(fakeFlavor)
-    return (
-      <FlavorsList data={flavors} onAdd={addAction} onDelete={deleteAction} />
-    )
+    return <FlavorsList data={flavors} onAdd={addAction} onDelete={deleteAction} />
   },
 })

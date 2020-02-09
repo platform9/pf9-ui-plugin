@@ -7,20 +7,21 @@ class FieldValidator {
    * @param validationFn Function
    * @param errorMessage String
    */
-  constructor (validationFn, errorMessage) {
+  constructor(validationFn, errorMessage) {
     this.validate = validationFn
     this.errorMessage = errorMessage
   }
 
-  withMessage = moize(message => new FieldValidator(this.validate, message))
+  withMessage = moize((message) => new FieldValidator(this.validate, message))
 }
 
 // Create a custom inline validator
 export const customValidator = (validator, errorMessage) =>
   new FieldValidator(validator, errorMessage)
 
-const fieldIsUnset = value => isNil(value) || isEmpty(value) || value === false
-export const hasMinLength = minLen => value => both(is(String), val => val.length >= minLen)(value)
+const fieldIsUnset = (value) => isNil(value) || isEmpty(value) || value === false
+export const hasMinLength = (minLen) => (value) =>
+  both(is(String), (val) => val.length >= minLen)(value)
 export const hasOneLowerChar = both(is(String), test(/[a-z]/))
 export const hasOneUpperChar = both(is(String), test(/[A-Z]/))
 export const hasOneNumber = both(is(String), test(/[0-9]/))
@@ -29,21 +30,17 @@ export const specialChars = '-+!@#$%^&*()?'
 export const hasOneSpecialChar = both(is(String), test(new RegExp(`[${specialChars}]`)))
 
 export const masterNodeLengthValidator = new FieldValidator(
-  nodes => (fieldIsUnset(nodes) || [1, 3, 5].includes(nodes.length)),
+  (nodes) => fieldIsUnset(nodes) || [1, 3, 5].includes(nodes.length),
   'You can only have 1, 3 or 5 master nodes',
 )
 
 export const namespaceValidator = new FieldValidator(
-  namespace =>
-    fieldIsUnset(namespace) ||
-    /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/gi.test(
-      namespace,
-    ),
+  (namespace) => fieldIsUnset(namespace) || /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/gi.test(namespace),
   "Namespace is invalid, alphanumeric characters and '-' only",
 )
 
 export const emailValidator = new FieldValidator(
-  email =>
+  (email) =>
     fieldIsUnset(email) ||
     /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/i.test(
       email,
@@ -52,83 +49,83 @@ export const emailValidator = new FieldValidator(
 )
 
 export const requiredValidator = new FieldValidator(
-  value => !fieldIsUnset(value),
+  (value) => !fieldIsUnset(value),
   'Field is required',
 )
 
 export const matchFieldValidator = moize(
-  id =>
-    new FieldValidator(
-      (value, formFields) => value === formFields[id],
-      'Fields do not match',
-    ),
+  (id) =>
+    new FieldValidator((value, formFields) => value === formFields[id], 'Fields do not match'),
 )
 
 export const lengthValidator = (minLength, maxLength) =>
   new FieldValidator(
-    value =>
+    (value) =>
       fieldIsUnset(value) ||
-      (value.toString().length >= minLength &&
-        value.toString().length <= maxLength),
+      (value.toString().length >= minLength && value.toString().length <= maxLength),
     `Length must be between ${minLength} and ${maxLength}`,
   )
 
 export const minLengthValidator = moize(
-  minLength =>
+  (minLength) =>
     new FieldValidator(
-      value => fieldIsUnset(value) || value.toString().length >= minLength,
+      (value) => fieldIsUnset(value) || value.toString().length >= minLength,
       `Length must be greater than ${minLength}`,
-    )
+    ),
 )
 
 export const maxLengthValidator = moize(
-  maxLength =>
+  (maxLength) =>
     new FieldValidator(
-      value => fieldIsUnset(value) || value.toString().length <= maxLength,
+      (value) => fieldIsUnset(value) || value.toString().length <= maxLength,
       `Length must be less than ${maxLength}`,
-    )
+    ),
 )
 
 export const minValueValidator = moize(
-  min =>
+  (min) =>
     new FieldValidator(
-      value => fieldIsUnset(value) || Number(value) >= min,
+      (value) => fieldIsUnset(value) || Number(value) >= min,
       `Value must be greater than or equal to ${min}`,
-    )
+    ),
 )
 
 export const rangeValueValidator = moize(
   (min, max) =>
     new FieldValidator(
-      value => fieldIsUnset(value) || (Number(value) >= min && Number(value) <= max),
-      `Value must be between ${min} and ${max}`
-    )
+      (value) => fieldIsUnset(value) || (Number(value) >= min && Number(value) <= max),
+      `Value must be between ${min} and ${max}`,
+    ),
 )
 
 export const maxValueValidator = moize(
-  max =>
+  (max) =>
     new FieldValidator(
-      value => fieldIsUnset(value) || Number(value) <= max,
+      (value) => fieldIsUnset(value) || Number(value) <= max,
       `Value must be less than or equal to ${max}`,
-    )
+    ),
 )
 
 export const passwordValidator = new FieldValidator(
-  value => fieldIsUnset(value) || allPass([
-    hasMinLength(8),
-    hasOneLowerChar,
-    hasOneUpperChar,
-    hasOneNumber,
-    hasOneSpecialChar,
-  ])(value),
+  (value) =>
+    fieldIsUnset(value) ||
+    allPass([hasMinLength(8), hasOneLowerChar, hasOneUpperChar, hasOneNumber, hasOneSpecialChar])(
+      value,
+    ),
   // Show a different error message depending on the validation error
-  value => cond([
-    [complement(hasMinLength(8)), always('Password must be at least 8 characters long')],
-    [complement(hasOneLowerChar), always('Password must contain at least one lowercase letter')],
-    [complement(hasOneUpperChar), always('Password must contain at least one uppercase letter')],
-    [complement(hasOneNumber), always('Password must contain at least one number')],
-    [complement(hasOneSpecialChar), always(`Password must contain at least one special character, valid characters: "${specialChars}"`)],
-  ])(value),
+  (value) =>
+    cond([
+      [complement(hasMinLength(8)), always('Password must be at least 8 characters long')],
+      [complement(hasOneLowerChar), always('Password must contain at least one lowercase letter')],
+      [complement(hasOneUpperChar), always('Password must contain at least one uppercase letter')],
+      [complement(hasOneNumber), always('Password must contain at least one number')],
+      [
+        complement(hasOneSpecialChar),
+        always(
+          `Password must contain at least one special character, valid characters: "${specialChars}"`,
+        ),
+      ],
+    ])(value),
 )
 
 export const validators = {
@@ -168,6 +165,6 @@ export const parseValidator = (key, spec) => {
     return validatorWithParams
   }
   if (typeof validator === 'function') {
-    return validator(...Array.isArray(spec) ? spec : [spec])
+    return validator(...(Array.isArray(spec) ? spec : [spec]))
   }
 }

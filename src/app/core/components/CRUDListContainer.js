@@ -47,12 +47,14 @@ const CRUDListContainer = ({
     return `This will permanently delete the following: ${selectedNames}`
   }, [selectedItems])
 
-  const handleDelete = selected => {
+  const handleDelete = (selected) => {
     setSelectedItems(selected)
     toggleConfirmDialog()
     // Stash the promise resolver so it can used to resolve later on in
     // response to user interaction (delete confirmation).
-    return new Promise(resolve => { deletePromise.current = resolve })
+    return new Promise((resolve) => {
+      deletePromise.current = resolve
+    })
   }
 
   const handleDeleteConfirm = useCallback(async () => {
@@ -76,11 +78,15 @@ const CRUDListContainer = ({
       const [selectedRow = emptyObj] = selected
       const selectedId = path(uniqueIdentifierPath, selectedRow)
       if (!selectedId) {
-        console.error(`Unable to redirect to edit page, the current id (${uniqueIdentifier}) is not defined for the selected items`, selected)
+        console.error(
+          `Unable to redirect to edit page, the current id (${uniqueIdentifier}) is not defined for the selected items`,
+          selected,
+        )
         return
       }
-      history.push(customEditUrlFn ? customEditUrlFn(selectedRow, selectedId)
-        : pathJoin(editUrl, selectedId))
+      history.push(
+        customEditUrlFn ? customEditUrlFn(selectedRow, selectedId) : pathJoin(editUrl, selectedId),
+      )
     } else if (EditDialog) {
       setSelectedItems(selected)
       toggleEditDialog()
@@ -88,40 +94,45 @@ const CRUDListContainer = ({
     }
   }
 
-  const handleClose = toggleDialog => () => {
+  const handleClose = (toggleDialog) => () => {
     toggleDialog()
     reload()
   }
 
-  return <>
-    {AddDialog && showingAddDialog && <AddDialog
-      onClose={handleClose(toggleAddDialog)}
-    />}
-    {EditDialog && showingEditDialog && <EditDialog
-      rows={selectedItems}
-      onClose={handleClose(toggleEditDialog)}
-    />}
-    {DeleteDialog && showingConfirmDialog && <DeleteDialog
-      onClose={toggleConfirmDialog}
-      rows={selectedItems} />}
-    {!DeleteDialog && handleRemove && showingConfirmDialog && <ConfirmationDialog
-      open={showingConfirmDialog}
-      text={deleteConfirmText}
-      onCancel={toggleConfirmDialog}
-      onConfirm={handleDeleteConfirm}
-    />}
-    {addEnabled && <PageContainerHeader>
-      {AddButton
-        ? <AddButton onClick={handleAdd} />
-        : <CreateButton onClick={handleAdd}>{addText}</CreateButton>}
-    </PageContainerHeader>}
-    {children({
-      onDelete: deleteEnabled ? handleDelete : null,
-      onAdd: addEnabled ? handleAdd : null,
-      onEdit: editEnabled ? handleEdit : null,
-      deleting,
-    })}
-  </>
+  return (
+    <>
+      {AddDialog && showingAddDialog && <AddDialog onClose={handleClose(toggleAddDialog)} />}
+      {EditDialog && showingEditDialog && (
+        <EditDialog rows={selectedItems} onClose={handleClose(toggleEditDialog)} />
+      )}
+      {DeleteDialog && showingConfirmDialog && (
+        <DeleteDialog onClose={toggleConfirmDialog} rows={selectedItems} />
+      )}
+      {!DeleteDialog && handleRemove && showingConfirmDialog && (
+        <ConfirmationDialog
+          open={showingConfirmDialog}
+          text={deleteConfirmText}
+          onCancel={toggleConfirmDialog}
+          onConfirm={handleDeleteConfirm}
+        />
+      )}
+      {addEnabled && (
+        <PageContainerHeader>
+          {AddButton ? (
+            <AddButton onClick={handleAdd} />
+          ) : (
+            <CreateButton onClick={handleAdd}>{addText}</CreateButton>
+          )}
+        </PageContainerHeader>
+      )}
+      {children({
+        onDelete: deleteEnabled ? handleDelete : null,
+        onAdd: addEnabled ? handleAdd : null,
+        onEdit: editEnabled ? handleEdit : null,
+        deleting,
+      })}
+    </>
+  )
 }
 
 CRUDListContainer.propTypes = {
@@ -149,10 +160,7 @@ CRUDListContainer.propTypes = {
     It has the following type signature:
       uniqueIdentifier :: RowData -> String
   */
-  uniqueIdentifier: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.func,
-  ]),
+  uniqueIdentifier: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
 }
 
 CRUDListContainer.defaultProps = {

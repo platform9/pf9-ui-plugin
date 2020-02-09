@@ -5,7 +5,7 @@ import { Button } from '@material-ui/core'
 const ExportDataButton = ({ children, color, data, filename, variant }) => {
   const exportData = () => {
     const dataStr = JSON.stringify(data, null, 4)
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr)
+    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr)
     const exportFileDefaultName = filename
     const linkElement = document.createElement('a')
     linkElement.setAttribute('href', dataUri)
@@ -14,7 +14,9 @@ const ExportDataButton = ({ children, color, data, filename, variant }) => {
   }
 
   return (
-    <Button variant={variant} color={color} onClick={exportData}>{children}</Button>
+    <Button variant={variant} color={color} onClick={exportData}>
+      {children}
+    </Button>
   )
 }
 

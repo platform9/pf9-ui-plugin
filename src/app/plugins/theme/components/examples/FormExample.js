@@ -15,7 +15,7 @@ const nop = () => {}
 
 const FormExample = ({ expanded = false }) => (
   <Panel title="Form" defaultExpanded={expanded}>
-    <FormWrapper title="Add Entity" backUrl=''>
+    <FormWrapper title="Add Entity" backUrl="">
       <ValidatedForm onSubmit={nop}>
         <TextField
           id="name"
@@ -26,8 +26,8 @@ const FormExample = ({ expanded = false }) => (
             required: true,
             length: {
               params: [3, 10],
-              message: 'Name must contain between 3 and 10 characters'
-            }
+              message: 'Name must contain between 3 and 10 characters',
+            },
           }}
         />
         <TextField
@@ -38,22 +38,26 @@ const FormExample = ({ expanded = false }) => (
           type="password"
           validations={{
             required: true,
-            minLength: [4]
+            minLength: [4],
           }}
         />
         <PicklistField
           id="items"
           label="List of items"
-          options={[{
-            label: 'Item 1',
-            value: 'item_1',
-          }, {
-            label: 'Item 2',
-            value: 'item_2',
-          }, {
-            label: 'Item 3',
-            value: 'item_3',
-          }]}
+          options={[
+            {
+              label: 'Item 1',
+              value: 'item_1',
+            },
+            {
+              label: 'Item 2',
+              value: 'item_2',
+            },
+            {
+              label: 'Item 3',
+              value: 'item_3',
+            },
+          ]}
           info="List of items"
         />
         <KeyValuesField
@@ -67,14 +71,12 @@ const FormExample = ({ expanded = false }) => (
           placeholder="Description"
           validations={[
             customValidator(
-              value => /[0-9]+/.test(value),
+              (value) => /[0-9]+/.test(value),
               (value, formFields, fieldKey) =>
                 'This is a custom validator that fails when text does not contain a number.' +
                 `The current value of field '${fieldKey}' is ${value}.` +
-                `From here we have access to other form fields as well, like 'name' with value ${
-                  formFields.name
-                }`
-            )
+                `From here we have access to other form fields as well, like 'name' with value ${formFields.name}`,
+            ),
           ]}
         />
         <Checkbox

@@ -8,7 +8,7 @@ import { Theme, Typography } from '@material-ui/core'
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
     position: 'relative',
-    display: 'flex'
+    display: 'flex',
   },
   pieLegend: {
     display: 'flex',
@@ -25,17 +25,17 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   legendName: {
     padding: '6px',
-  }
+  },
 }))
 
-interface PieUsageWidgetProps {
+export interface PieUsageWidgetProps {
   primary: string
   sideLength: number
   arcWidth: number
   data: PieDataEntry[]
 }
 
-const PieLegend = ({ data }) => {
+export const PieLegend = ({ data }) => {
   const theme: any = useTheme()
   const { pieLegend, legendCircle, legendValue, legendName } = useStyles({})
 
@@ -43,33 +43,44 @@ const PieLegend = ({ data }) => {
     <div className={pieLegend}>
       <table>
         <tbody>
-          { data && data.map((entry) => (
-            <tr key={entry.name}>
-              <td>
-                <FontAwesomeIcon
-                  solid
-                  style={{ color: theme.palette.pieChart[entry.color] }}
-                  size="1x"
-                  className={legendCircle}
-                >circle</FontAwesomeIcon>
-              </td>
-              <td className={legendValue}><Typography variant="body2">{entry.value}</Typography></td>
-              <td className={legendName}><Typography variant="body2">{entry.name}</Typography></td>
-            </tr>
-          )) }
+          {data &&
+            data.map((entry) => (
+              <tr key={entry.name}>
+                <td>
+                  <FontAwesomeIcon
+                    solid
+                    style={{ color: theme.palette.pieChart[entry.color] }}
+                    size="1x"
+                    className={legendCircle}
+                  >
+                    circle
+                  </FontAwesomeIcon>
+                </td>
+                <td className={legendValue}>
+                  <Typography variant="body2">{entry.value}</Typography>
+                </td>
+                <td className={legendName}>
+                  <Typography variant="body2">{entry.name}</Typography>
+                </td>
+              </tr>
+            ))}
         </tbody>
       </table>
     </div>
   )
 }
 
-const PieUsageWidget = ({ primary, data, sideLength = 110, arcWidth = 12, ...rest }: PieUsageWidgetProps) => {
+const PieUsageWidget = ({
+  primary,
+  data,
+  sideLength = 110,
+  arcWidth = 12,
+  ...rest
+}: PieUsageWidgetProps) => {
   const { container } = useStyles({})
 
-  const total = data.reduce((acc, cur) => (
-    acc + cur.value
-  ), 0)
-  const primaryObj = data.find(x => x.name === primary)
+  const total = data.reduce((acc, cur) => acc + cur.value, 0)
+  const primaryObj = data.find((x) => x.name === primary)
   const primaryNum = primaryObj.value
   const percent = primaryNum / total || 0
 

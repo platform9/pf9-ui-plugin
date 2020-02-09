@@ -19,7 +19,12 @@ interface State {
 const defaultParams: State = {
   isCopySuccessful: false,
 }
-interface StyleProps { codeBlock?: boolean, inline?: boolean }
+
+interface StyleProps {
+  codeBlock?: boolean
+  inline?: boolean
+}
+
 const useStyles = makeStyles<Theme, StyleProps>((theme: Theme) => ({
   textArea: {
     position: 'absolute',
@@ -30,8 +35,8 @@ const useStyles = makeStyles<Theme, StyleProps>((theme: Theme) => ({
     padding: '0 0 0 2px',
   },
   copyContainer: {
-    display: ({ inline }) => inline ? 'inline-flex' : 'flex',
-    flexDirection: ({ inline }) => inline ? 'row' : 'column',
+    display: ({ inline }) => (inline ? 'inline-flex' : 'flex'),
+    flexDirection: ({ inline }) => (inline ? 'row' : 'column'),
     background: ({ codeBlock }) => (codeBlock ? theme.palette.code.background : 'transparent'),
   },
   copyIconContainer: {
@@ -41,7 +46,7 @@ const useStyles = makeStyles<Theme, StyleProps>((theme: Theme) => ({
     padding: theme.spacing(0, 1),
     position: 'relative',
     '&:before': {
-      content: ({ inline }) => inline ? '""' : '',
+      content: ({ inline }) => (inline ? '""' : ''),
       position: 'absolute',
       top: theme.spacing(),
       bottom: theme.spacing(),
@@ -74,7 +79,7 @@ const useStyles = makeStyles<Theme, StyleProps>((theme: Theme) => ({
     '& > p': {
       paddingLeft: 20,
       fontWeight: 'bold',
-      fontSize: theme.typography.subtitle1.fontSize
+      fontSize: theme.typography.subtitle1.fontSize,
     },
     '&:before': {
       content: '""',
@@ -85,7 +90,7 @@ const useStyles = makeStyles<Theme, StyleProps>((theme: Theme) => ({
       height: 1,
       background: ({ codeBlock }) => (codeBlock ? theme.palette.code.text : 'transparent'),
     },
-  }
+  },
 }))
 
 const CopyToClipboard: FunctionComponent<Props> = ({

@@ -1,5 +1,12 @@
 import React from 'react'
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core'
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from '@material-ui/core'
 import { withProgress } from 'core/components/progress/Progress'
 
 interface IConfirmationDialog {
@@ -21,7 +28,7 @@ class ConfirmationDialog extends React.PureComponent<IConfirmationDialog> {
     this.props.onConfirm && this.props.onConfirm()
   }
 
-  render () {
+  render() {
     const {
       open,
       title = 'Are you sure?',
@@ -39,9 +46,7 @@ class ConfirmationDialog extends React.PureComponent<IConfirmationDialog> {
       >
         <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            {text}
-          </DialogContentText>
+          <DialogContentText id="alert-dialog-description">{text}</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={this.handleCancel} color="primary">
@@ -58,5 +63,5 @@ class ConfirmationDialog extends React.PureComponent<IConfirmationDialog> {
 
 export default withProgress(ConfirmationDialog, {
   renderContentOnMount: true,
-  message: 'Please wait...'
+  message: 'Please wait...',
 }) as React.ComponentType<IConfirmationDialog>

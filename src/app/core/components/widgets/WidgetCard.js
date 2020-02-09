@@ -3,7 +3,7 @@ import { Card, CardHeader, CardContent, Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import PropTypes from 'prop-types'
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     boxShadow: 'none',
   },
@@ -19,12 +19,12 @@ const useStyles = makeStyles(theme => ({
     paddingBottom: theme.spacing(1.5),
     '&:last-child': {
       paddingBottom: theme.spacing(1.5),
-    }
+    },
   },
   headerContent: {
     display: 'flex',
     flexFlow: 'row nowrap',
-    justifyContent: ({ image }) => image ? 'space-between' : 'center',
+    justifyContent: ({ image }) => (image ? 'space-between' : 'center'),
     alignItems: 'center',
     padding: theme.spacing(0, 1),
   },
@@ -38,25 +38,29 @@ const useStyles = makeStyles(theme => ({
 
 const HeaderContent = ({ title, image }) => {
   const { headerContent, headerImg } = useStyles({ image })
-  return <div className={headerContent}>
-    <Typography variant="h6">
-      {title}
-    </Typography>
-    {image && <div className={headerImg}>
-      {typeof image === 'string' ? <img alt="" src={image} /> : image}
-    </div>}
-  </div>
+  return (
+    <div className={headerContent}>
+      <Typography variant="h6">{title}</Typography>
+      {image && (
+        <div className={headerImg}>
+          {typeof image === 'string' ? <img alt="" src={image} /> : image}
+        </div>
+      )}
+    </div>
+  )
 }
 
 const WidgetCard = ({ title, headerImg, children }) => {
   const classes = useStyles()
-  return <Card className={classes.root}>
-    <CardHeader className={classes.header} title={
-      <HeaderContent title={title} image={headerImg} />} />
-    <CardContent className={classes.content}>
-      {children}
-    </CardContent>
-  </Card>
+  return (
+    <Card className={classes.root}>
+      <CardHeader
+        className={classes.header}
+        title={<HeaderContent title={title} image={headerImg} />}
+      />
+      <CardContent className={classes.content}>{children}</CardContent>
+    </Card>
+  )
 }
 
 WidgetCard.propTypes = {

@@ -2,7 +2,7 @@ require('isomorphic-fetch')
 
 const registry = require('./registry')
 
-const urlWithHost = url => {
+const urlWithHost = (url) => {
   const host = registry.getItem('apiHost') || ''
   return `${host}${url}`
 }
@@ -17,32 +17,32 @@ const http = {
   bare: {},
 
   json: {
-    post (url, body, additionalHeaders = {}) {
+    post(url, body, additionalHeaders = {}) {
       const params = {
         method: 'POST',
         body: JSON.stringify(body),
         headers: {
           ...jsonHeaders(),
           ...additionalHeaders,
-        }
+        },
       }
       return fetch(urlWithHost(url), params)
-    }
+    },
   },
 
   authenticated: {
     openstack: {
-      get (url) {
+      get(url) {
         const params = {
           method: 'GET',
           headers: {
-            ...authTokenHeader()
-          }
+            ...authTokenHeader(),
+          },
         }
-        return fetch(urlWithHost(url), params).then(x => x.json())
+        return fetch(urlWithHost(url), params).then((x) => x.json())
       },
 
-      post (url, body) {
+      post(url, body) {
         const params = {
           method: 'POST',
           headers: {
@@ -51,10 +51,10 @@ const http = {
           },
           body: JSON.stringify(body),
         }
-        return fetch(urlWithHost(url), params).then(x => x.json())
+        return fetch(urlWithHost(url), params).then((x) => x.json())
       },
 
-      delete (url) {
+      delete(url) {
         const params = {
           method: 'DELETE',
           headers: {
@@ -62,9 +62,9 @@ const http = {
           },
         }
         return fetch(urlWithHost(url), params)
-      }
-    }
-  }
+      },
+    },
+  },
 }
 
 export default http

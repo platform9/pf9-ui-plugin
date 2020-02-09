@@ -1,20 +1,20 @@
 import React, { useCallback, useState } from 'react'
-import { makeStyles, createStyles } from '@material-ui/styles'
+import { createStyles, makeStyles } from '@material-ui/styles'
 import {
-  ExpansionPanel as MDExpansionPanel,
-  ExpansionPanelSummary,
-  ExpansionPanelDetails,
   Dialog,
-  DialogTitle,
   DialogContent,
+  DialogTitle,
+  ExpansionPanel as MDExpansionPanel,
+  ExpansionPanelDetails,
+  ExpansionPanelSummary,
   Typography,
 } from '@material-ui/core'
-import { ExpandMore, ChevronRight } from '@material-ui/icons'
+import { ChevronRight, ExpandMore } from '@material-ui/icons'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import CancelButton from '../buttons/CancelButton'
 import NextButton from '../buttons/NextButton'
 import ExternalLink from '../ExternalLink'
-import { gettingStartedLink } from 'app/constants'
+import { gettingStartedLink } from 'k8s/links'
 import CloseButton from '../buttons/CloseButton'
 
 const useStyles = makeStyles((theme) =>
@@ -119,7 +119,9 @@ const ExpansionPanel = ({
           )}
           <span>{summary}</span>
         </div>
-        {!!onSkip && !completed && <CloseButton onClick={handleToggleOverlay} />}
+        {!!onSkip && !completed && (
+          <CloseButton tooltip="Skip Step" onClick={handleToggleOverlay} />
+        )}
       </ExpansionPanelSummary>
       <ExpansionPanelDetails className={classes.panelDetails}>
         {children}
@@ -129,7 +131,8 @@ const ExpansionPanel = ({
             <Typography>
               If you are all set, you can remove this step from your getting started wizard. You can
               always visit the “getting started” section in our support documentation{' '}
-              <ExternalLink url={gettingStartedLink}>here</ExternalLink> if you need help in the future.
+              <ExternalLink url={gettingStartedLink}>here</ExternalLink> if you need help in the
+              future.
             </Typography>
             <div className={classes.actionRow}>
               <CancelButton onClick={handleToggleOverlay} />

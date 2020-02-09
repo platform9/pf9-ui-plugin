@@ -6,7 +6,7 @@ import { imageUrls } from 'app/constants'
 import Typography from '@material-ui/core/Typography'
 import { pick, omit, keys } from 'ramda'
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     display: 'flex',
     flexFlow: 'column nowrap',
@@ -31,20 +31,19 @@ const styles = theme => ({
     color: 'inherit',
   },
   img: {
-    maxHeight: ({ inline }) => inline ? 25 : '80%',
-    opacity: ({ inline }) => inline ? 0.7 : 1,
+    maxHeight: ({ inline }) => (inline ? 25 : '80%'),
+    opacity: ({ inline }) => (inline ? 0.7 : 1),
   },
   status: {
     display: 'flex',
     justifyContent: 'flex-start',
     flexWrap: 'nowrap',
     alignItems: 'center',
-    flexFlow: ({ inline }) => inline ? 'row' : 'column',
-    padding: ({ inline, minHeight, maxHeight }) => inline
-      ? '0 1rem'
-      : `${(maxHeight < minHeight ? maxHeight : minHeight) / 4}px 0`,
+    flexFlow: ({ inline }) => (inline ? 'row' : 'column'),
+    padding: ({ inline, minHeight, maxHeight }) =>
+      inline ? '0 1rem' : `${(maxHeight < minHeight ? maxHeight : minHeight) / 4}px 0`,
     maxHeight: ({ maxHeight }) => maxHeight,
-    minHeight: ({ inline, minHeight }) => inline ? 'unset' : minHeight / 2,
+    minHeight: ({ inline, minHeight }) => (inline ? 'unset' : minHeight / 2),
   },
   statusOverlayed: {
     position: 'absolute',
@@ -53,7 +52,7 @@ const styles = theme => ({
     left: '0',
     bottom: '0',
     top: '0',
-    minWidth: ({ inline }) => inline ? 150 : 'unset',
+    minWidth: ({ inline }) => (inline ? 150 : 'unset'),
   },
   content: {
     width: '100%',
@@ -62,8 +61,8 @@ const styles = theme => ({
     opacity: 0.3,
   },
   hiddenContent: {
-    visibility: ({ inline }) => inline ? 'visible' : 'hidden',
-    display: ({ inline }) => inline ? 'none' : 'inherit',
+    visibility: ({ inline }) => (inline ? 'visible' : 'hidden'),
+    display: ({ inline }) => (inline ? 'none' : 'inherit'),
   },
 })
 
@@ -74,7 +73,7 @@ class Progress extends PureComponent {
     loadedOnce: false,
   }
 
-  static getDerivedStateFromProps (props, state) {
+  static getDerivedStateFromProps(props, state) {
     // If finished loading for the first time
     if (props.loading !== state.loading) {
       if (!props.loading && !state.loadedOnce) {
@@ -105,53 +104,63 @@ class Progress extends PureComponent {
     }
     const { loadedOnce } = this.state
 
-    return <div className={clsx(classes.status, {
-      [classes.statusOverlayed]: overlay && loading && (renderContentOnMount || loadedOnce),
-    })}>
-      {renderLoadingImage &&
-      <img alt="Loading..." src={imageUrls.loading} className={classes.img} />}
-      {message && <Typography className={clsx(classes.message, {
-        [classes.messageInline]: inline,
-      })} variant="caption" color="textSecondary">
-        {message}
-      </Typography>}
-    </div>
+    return (
+      <div
+        className={clsx(classes.status, {
+          [classes.statusOverlayed]: overlay && loading && (renderContentOnMount || loadedOnce),
+        })}
+      >
+        {renderLoadingImage && (
+          <img alt="Loading..." src={imageUrls.loading} className={classes.img} />
+        )}
+        {message && (
+          <Typography
+            className={clsx(classes.message, {
+              [classes.messageInline]: inline,
+            })}
+            variant="caption"
+            color="textSecondary"
+          >
+            {message}
+          </Typography>
+        )}
+      </div>
+    )
   }
 
   renderContent = () => {
-    const {
-      classes,
-      renderContentOnMount,
-      loading = true,
-      overlay = false,
-      children,
-    } = this.props
+    const { classes, renderContentOnMount, loading = true, overlay = false, children } = this.props
     const { loadedOnce } = this.state
 
     if (!children || (!renderContentOnMount && !loadedOnce)) {
       return null
     }
-    return <div className={clsx(classes.content, {
-      [classes.hiddenContent]: loading && !overlay,
-      [classes.contentLoading]: loading,
-    })}>{children}</div>
+    return (
+      <div
+        className={clsx(classes.content, {
+          [classes.hiddenContent]: loading && !overlay,
+          [classes.contentLoading]: loading,
+        })}
+      >
+        {children}
+      </div>
+    )
   }
 
-  render () {
-    const {
-      classes,
-      inline = false,
-      fixed = false,
-    } = this.props
+  render() {
+    const { classes, inline = false, fixed = false } = this.props
 
-    return <div
-      className={clsx(classes.root, {
-        [classes.fixed]: fixed,
-        [classes.rootInline]: inline,
-      })}>
-      {this.renderStatus()}
-      {this.renderContent()}
-    </div>
+    return (
+      <div
+        className={clsx(classes.root, {
+          [classes.fixed]: fixed,
+          [classes.rootInline]: inline,
+        })}
+      >
+        {this.renderStatus()}
+        {this.renderContent()}
+      </div>
+    )
   }
 }
 
@@ -184,9 +193,11 @@ export const withProgress = (Component, defaultProps = {}) => {
   return forwardRef((props, ref) => {
     const progressProps = pick(propKeys, { ...defaultProps, ...props })
     const rest = omit(propKeys, props)
-    return <Progress {...progressProps}>
-      <Component {...rest} ref={ref} />
-    </Progress>
+    return (
+      <Progress {...progressProps}>
+        <Component {...rest} ref={ref} />
+      </Progress>
+    )
   })
 }
 

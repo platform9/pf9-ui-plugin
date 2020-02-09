@@ -16,24 +16,21 @@ const initData = () => ({
 
 const pluginList = {}
 
-const parseNavItem = basePath => navItem => ({
+const parseNavItem = (basePath) => (navItem) => ({
   ...navItem,
   link: {
     ...navItem.link,
-    path: navItem.link.external ? navItem.link.path : pathJoin(basePath, navItem.link.path)
+    path: navItem.link.external ? navItem.link.path : pathJoin(basePath, navItem.link.path),
   },
-  nestedLinks: navItem.nestedLinks
-    ? navItem.nestedLinks.map(parseNavItem(basePath))
-    : null
+  nestedLinks: navItem.nestedLinks ? navItem.nestedLinks.map(parseNavItem(basePath)) : null,
 })
 
 const pluginManager = {
-
-  getPlugins () {
+  getPlugins() {
     return pluginList
   },
 
-  getPlugin (pluginId) {
+  getPlugin(pluginId) {
     return pluginList[pluginId]
   },
 
@@ -56,17 +53,11 @@ const pluginManager = {
       },
 
       registerRoutes: (components = []) => {
-        data.routes = [
-          ...data.routes,
-          ...components.map(prependBasePath)
-        ]
+        data.routes = [...data.routes, ...components.map(prependBasePath)]
       },
 
       registerNavItems: (items = []) => {
-        data.navItems = [
-          ...data.navItems,
-          ...items.map(prependBasePath)
-        ]
+        data.navItems = [...data.navItems, ...items.map(prependBasePath)]
       },
 
       getComponents: () => {
@@ -94,13 +85,15 @@ const pluginManager = {
       },
 
       getDefaultRoute: () => {
-        return path(['link', 'path'],
-          data.routes.find(r => r.link && r.link.default))
-      }
+        return path(
+          ['link', 'path'],
+          data.routes.find((r) => r.link && r.link.default),
+        )
+      },
     }
 
     return pluginList[pluginId]
-  }
+  },
 }
 
 export default pluginManager

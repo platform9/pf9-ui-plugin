@@ -1,10 +1,20 @@
 import ApiClient from 'api-client/ApiClient'
 
 type AuthMethod = 'token' | 'password'
-interface UserCreds { username: string, password: string }
 
-interface KubeConfigError { error: string }
-interface KubeConfigSuccess { kubeconfig: string }
+interface UserCreds {
+  username: string
+  password: string
+}
+
+interface KubeConfigError {
+  error: string
+}
+
+interface KubeConfigSuccess {
+  kubeconfig: string
+}
+
 type KubeConfigResponse = KubeConfigError | KubeConfigSuccess
 
 const { keystone } = ApiClient.getInstance()
@@ -34,9 +44,10 @@ export const generateKubeConfig = async (
   userCreds?: UserCreds,
 ): Promise<KubeConfigResponse> => {
   try {
-    const token = authMethod === 'token'
-      ? await tokenAuth()
-      : await passwordAuth(userCreds.username, userCreds.password)
+    const token =
+      authMethod === 'token'
+        ? await tokenAuth()
+        : await passwordAuth(userCreds.username, userCreds.password)
 
     if (!token) return { error: 'Invalid Credentials' }
 

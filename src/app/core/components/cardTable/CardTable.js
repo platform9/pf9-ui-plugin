@@ -9,7 +9,7 @@ import moize from 'moize'
 import Progress from 'core/components/progress/Progress'
 import { filterSpecPropType } from 'core/components/cardTable/CardTableToolbar'
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     width: '100%',
     marginTop: theme.spacing(2),
@@ -38,7 +38,7 @@ class CardTable extends PureComponent {
     filterValues: {},
   }
 
-  handleSearch = value => {
+  handleSearch = (value) => {
     if (this.props.searchTarget) {
       this.setState({
         searchTerm: value,
@@ -46,7 +46,7 @@ class CardTable extends PureComponent {
     }
   }
 
-  sortData = data => {
+  sortData = (data) => {
     const { sorting } = this.props
     const orderBy = this.state.orderBy || sorting[0].id
     const sortWith = propOr(
@@ -54,28 +54,23 @@ class CardTable extends PureComponent {
       'sortWith',
       sorting.find(propEq('id', orderBy)),
     )
-    const sortedRows = [...data].sort((a, b) =>
-      sortWith(b[orderBy], a[orderBy]),
-    )
+    const sortedRows = [...data].sort((a, b) => sortWith(b[orderBy], a[orderBy]))
     return this.state.orderDirection === 'desc' ? sortedRows : sortedRows.reverse()
   }
 
-  paginate = data => {
+  paginate = (data) => {
     const { page, rowsPerPage } = this.state
     const startIdx = page * rowsPerPage
     const endIdx = startIdx + rowsPerPage
     return data.slice(startIdx, endIdx)
   }
 
-  handleFilterUpdate = moize(columnId => {
+  handleFilterUpdate = moize((columnId) => {
     const filter = this.props.filters.find(propEq('field', columnId))
-    return selectedValue => {
-      this.setState(
-        assocPath(['filterValues', columnId], selectedValue),
-        () => {
-          filter.onChange && filter.onChange(selectedValue)
-        },
-      )
+    return (selectedValue) => {
+      this.setState(assocPath(['filterValues', columnId], selectedValue), () => {
+        filter.onChange && filter.onChange(selectedValue)
+      })
     }
   })
 
@@ -85,7 +80,7 @@ class CardTable extends PureComponent {
 
   handleChangePage = (event, page) => this.setState({ page })
 
-  handleChangeRowsPerPage = event => {
+  handleChangeRowsPerPage = (event) => {
     const { value: rowsPerPage } = event.target
     this.setState({ rowsPerPage }, () =>
       ensureFunction(this.props.onRowsPerPageChange)(rowsPerPage),
@@ -95,14 +90,11 @@ class CardTable extends PureComponent {
   filterBySearch = (data, target) => {
     const { searchTerm } = this.state
     return data.filter(
-      ele =>
-        pathOr('', target.split('.'), ele).match(
-          new RegExp(searchTerm, 'i'),
-        ) !== null,
+      (ele) => pathOr('', target.split('.'), ele).match(new RegExp(searchTerm, 'i')) !== null,
     )
   }
 
-  renderPaginationControls = count => {
+  renderPaginationControls = (count) => {
     const { page, rowsPerPage } = this.state
     return (
       <TablePagination
@@ -120,14 +112,14 @@ class CardTable extends PureComponent {
     )
   }
 
-  handleRequestSort = orderBy => {
+  handleRequestSort = (orderBy) => {
     const { onSortChange } = this.props
     this.setState({ orderBy }, () => {
       ensureFunction(onSortChange)(orderBy, 'asc')
     })
   }
 
-  handleDirectionSwitch = e => {
+  handleDirectionSwitch = (e) => {
     const { onSortChange } = this.props
     const { orderBy, orderDirection: prevDirection } = this.state
     const orderDirection = prevDirection === 'asc' ? 'desc' : 'asc'
@@ -137,32 +129,26 @@ class CardTable extends PureComponent {
     })
   }
 
-  applyFilters = data => {
+  applyFilters = (data) => {
     const { filters } = this.props
     const { filterValues } = this.state
-    const filterParams = Object.entries(filterValues).map(
-      ([columnId, filterValue]) => ({
-        columnId,
-        filterValue,
-        filter: filters.find(propEq('field', columnId)),
-      }),
-    )
+    const filterParams = Object.entries(filterValues).map(([columnId, filterValue]) => ({
+      columnId,
+      filterValue,
+      filter: filters.find(propEq('field', columnId)),
+    }))
 
-    return filterParams.reduce(
-      (filteredData, { columnId, filterValue, filter }) => {
-        if (filter.onChange) {
-          // If a custom handler is provided, don't filter the data locally
-          return filteredData
-        }
-        const filterWith =
-          filter.filterWith || this.getFilterFunction(filter.type)
+    return filterParams.reduce((filteredData, { columnId, filterValue, filter }) => {
+      if (filter.onChange) {
+        // If a custom handler is provided, don't filter the data locally
+        return filteredData
+      }
+      const filterWith = filter.filterWith || this.getFilterFunction(filter.type)
 
-        return filteredData.filter(row => {
-          return filterWith(filterValue, row[columnId])
-        })
-      },
-      data,
-    )
+      return filteredData.filter((row) => {
+        return filterWith(filterValue, row[columnId])
+      })
+    }, data)
   }
 
   getFilteredItems = () => {
@@ -170,9 +156,7 @@ class CardTable extends PureComponent {
     const { searchTerm } = this.state
     const sortedData = onSortChange ? data : this.sortData(data)
     const searchData =
-      searchTerm === ''
-        ? sortedData
-        : this.filterBySearch(sortedData, searchTarget)
+      searchTerm === '' ? sortedData : this.filterBySearch(sortedData, searchTarget)
     return filters ? this.applyFilters(searchData) : searchData
   }
 
@@ -180,22 +164,16 @@ class CardTable extends PureComponent {
     if (this.props.loading) {
       return null
     }
-    return <Typography className={this.props.classes.emptyList} variant="h6">{this.props.emptyText}</Typography>
+    return (
+      <Typography className={this.props.classes.emptyList} variant="h6">
+        {this.props.emptyText}
+      </Typography>
+    )
   }
 
-  render () {
-    const {
-      title,
-      orderDirection,
-      orderBy,
-      filterValues,
-      searchTerm,
-    } = this.state
-    const {
-      classes, paginate,
-      data, sorting, filters, children,
-      onRefresh, loading,
-    } = this.props
+  render() {
+    const { title, orderDirection, orderBy, filterValues, searchTerm } = this.state
+    const { classes, paginate, data, sorting, filters, children, onRefresh, loading } = this.props
 
     if (!data) {
       return null
@@ -203,9 +181,8 @@ class CardTable extends PureComponent {
 
     const filteredData = this.getFilteredItems()
     const paginatedData = paginate ? this.paginate(filteredData) : filteredData
-    const gridContent = paginatedData && paginatedData.length
-      ? paginatedData.map(children)
-      : this.renderEmptyList()
+    const gridContent =
+      paginatedData && paginatedData.length ? paginatedData.map(children) : this.renderEmptyList()
 
     return (
       <Progress loading={loading} overlay renderContentOnMount>
@@ -266,6 +243,4 @@ CardTable.defaultProps = {
   loading: false,
 }
 
-export default compose(
-  withStyles(styles),
-)(CardTable)
+export default compose(withStyles(styles))(CardTable)

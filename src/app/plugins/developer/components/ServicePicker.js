@@ -13,7 +13,7 @@ class ServicePicker extends React.PureComponent {
     isMounted: false,
   }
 
-  async componentDidMount () {
+  async componentDidMount() {
     this.setState(
       // For some strange reason the component is being unmounted before
       // loadServiceCatalog completes.  Need this hack to work around it.
@@ -25,18 +25,18 @@ class ServicePicker extends React.PureComponent {
         if (this.state.isMounted) {
           this.setState({
             catalog: catalogMap,
-            services: catalog.map(prop('name')).sort()
+            services: catalog.map(prop('name')).sort(),
           })
         }
-      }
+      },
     )
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.setState({ isMounted: false })
   }
 
-  handleChange = service => {
+  handleChange = (service) => {
     const { onChange } = this.props
     const { catalog } = this.state
 
@@ -55,7 +55,7 @@ class ServicePicker extends React.PureComponent {
     }
   }
 
-  render () {
+  render() {
     return (
       <Picklist
         name="service"
@@ -80,6 +80,4 @@ ServicePicker.propTypes = {
   value: PropTypes.string.isRequired,
 }
 
-export default compose(
-  withAppContext,
-)(ServicePicker)
+export default compose(withAppContext)(ServicePicker)

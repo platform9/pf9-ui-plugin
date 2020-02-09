@@ -2,7 +2,7 @@ import React, { FC, useEffect } from 'react'
 import { makeStyles, Theme } from '@material-ui/core'
 import { BannerContext } from 'core/providers/BannerProvider'
 
-const useStyles = makeStyles<Theme>(theme => ({
+const useStyles = makeStyles<Theme>((theme) => ({
   root: {
     // Intercom uses a ridiculously high zIndex so we have to be even more ridiculous
     zIndex: 9999999998,
@@ -21,7 +21,7 @@ const useStyles = makeStyles<Theme>(theme => ({
 
 const bannerContainerRef = React.createRef<HTMLDivElement>()
 
-const BannerContainer: FC = props => {
+const BannerContainer: FC = (props) => {
   const classes = useStyles(props)
   const { setBannerContainer } = React.useContext(BannerContext)
 

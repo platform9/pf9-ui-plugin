@@ -19,19 +19,13 @@ const UpdateRolePage = () => {
   const { match, history } = useReactRouter()
   const roleId = match.params.id
   const clusterId = match.params.clusterId
-  const onComplete = useCallback(
-    success => success && history.push(backUrl),
-    [history])
+  const onComplete = useCallback((success) => success && history.push(backUrl), [history])
   const [roles, loading] = useDataLoader(roleActions.list, { clusterId })
-  const role = useMemo(
-    () => roles.find(propEq('id', roleId)) || emptyObj,
-    [roles, roleId])
+  const role = useMemo(() => roles.find(propEq('id', roleId)) || emptyObj, [roles, roleId])
   const [updateRoleAction, updating] = useDataUpdater(roleActions.update, onComplete)
   // I have to look into why this update action does not work
   // with the new architecture suggested in the role update pages
-  const handleSubmit = useCallback(
-    data => updateRoleAction(({ ...role, ...data })),
-    [role])
+  const handleSubmit = useCallback((data) => updateRoleAction({ ...role, ...data }), [role])
 
   return (
     <FormWrapper
@@ -41,14 +35,12 @@ const UpdateRolePage = () => {
       message={loading ? 'Loading role...' : 'Submitting form...'}
     >
       <ValidatedForm onSubmit={handleSubmit}>
-        <PresetField label='Name' value={role.name} />
-        <PresetField label='Cluster' value={role.clusterName} />
-        <PresetField label='Namespace' value={role.namespace} />
-        {role.clusterId && <RbacChecklist
-          id="rbac"
-          clusterId={role.clusterId}
-          initialRules={role.rules}
-        />}
+        <PresetField label="Name" value={role.name} />
+        <PresetField label="Cluster" value={role.clusterName} />
+        <PresetField label="Namespace" value={role.namespace} />
+        {role.clusterId && (
+          <RbacChecklist id="rbac" clusterId={role.clusterId} initialRules={role.rules} />
+        )}
         <SubmitButton>Update Role</SubmitButton>
       </ValidatedForm>
     </FormWrapper>

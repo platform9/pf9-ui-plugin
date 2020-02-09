@@ -5,7 +5,7 @@ import { findById, updateById } from '../../helpers'
 const coll = () => context.applications
 
 class Application extends ActiveModel {
-  constructor (params = {}) {
+  constructor(params = {}) {
     super(params)
     this.name = params.name || ''
     this.author = params.author || ''
@@ -21,7 +21,7 @@ class Application extends ActiveModel {
   static findById = findById(coll)
   static updateById = updateById(coll)
 
-  static findByName = name => Application.getCollection().find(x => x.name === name)
+  static findByName = (name) => Application.getCollection().find((x) => x.name === name)
 
   asJson = () => {
     return {
@@ -32,7 +32,7 @@ class Application extends ActiveModel {
       tags: this.tags,
       tenant: this.tenant,
       description: this.description,
-      categories: this.categories
+      categories: this.categories,
     }
   }
 }

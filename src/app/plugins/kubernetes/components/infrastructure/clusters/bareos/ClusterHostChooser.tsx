@@ -17,7 +17,10 @@ import { makeStyles } from '@material-ui/styles'
 import { identity } from 'ramda'
 import { ICombinedNode, IUseDataLoader } from '../../nodes/model'
 import PollingData from 'core/components/PollingData'
-import { UsageBar, renderNetworkInterfaces } from 'k8s/components/infrastructure/nodes/NodesListPage'
+import {
+  UsageBar,
+  renderNetworkInterfaces,
+} from 'k8s/components/infrastructure/nodes/NodesListPage'
 
 interface Props extends IValidatedForm {
   value?: string[]
@@ -56,7 +59,7 @@ const useStyles = makeStyles<Theme, Partial<Props>>((theme) => ({
     minHeight: '70px',
     gridTemplateRows: 'repeat(3, 1fr)',
     alignItems: 'center',
-  }
+  },
 }))
 
 export const isConnected = (node: ICombinedNode) => node.status === 'ok'
@@ -73,9 +76,9 @@ const emptyNode: ICombinedNode = {} as any
 const renderStats = (usage, className) => {
   return (
     <div className={className}>
-      { usage.compute && <UsageBar stat={usage.compute} /> }
-      { usage.memory && <UsageBar stat={usage.memory} /> }
-      { usage.disk && <UsageBar stat={usage.disk} /> }
+      {usage.compute && <UsageBar stat={usage.compute} />}
+      {usage.memory && <UsageBar stat={usage.memory} />}
+      {usage.disk && <UsageBar stat={usage.disk} />}
     </div>
   )
 }
@@ -113,8 +116,8 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef<HTMLElement, P
       const newHosts = isSelected(uuid)
         ? value.filter((x) => x !== uuid)
         : multiple
-          ? [...value, uuid]
-          : [uuid]
+        ? [...value, uuid]
+        : [uuid]
       onChange(newHosts)
     }
 
@@ -140,7 +143,9 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef<HTMLElement, P
             {selectableNodes.length === 0 && (
               <TableRow>
                 <TableCell colSpan={5} align="center">
-                  <Typography variant="body1">Waiting... Connect Nodes Using the PF9 CLI</Typography>
+                  <Typography variant="body1">
+                    Waiting... Connect Nodes Using the PF9 CLI
+                  </Typography>
                 </TableCell>
               </TableRow>
             )}
@@ -156,7 +161,9 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef<HTMLElement, P
                 <TableCell>{node.name}</TableCell>
                 <TableCell>{renderNetworkInterfaces(null, node, { wrapText: true })}</TableCell>
                 <TableCell>{node.combined?.osInfo}</TableCell>
-                <TableCell>{renderStats(node.combined?.usage || {}, usageContainerClass)}</TableCell>
+                <TableCell>
+                  {renderStats(node.combined?.usage || {}, usageContainerClass)}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

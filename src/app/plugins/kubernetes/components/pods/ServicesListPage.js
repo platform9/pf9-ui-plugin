@@ -10,9 +10,11 @@ import NamespacePicklist from 'k8s/components/common/NamespacePicklist'
 import ExternalLink from 'core/components/ExternalLink'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import renderLabels from 'k8s/components/pods/renderLabels'
+import { PodsStatusSpan } from 'k8s/components/pods/PodsListPage'
 
 const defaultParams = {
   masterNodeClusters: true,
+  clusterId: allKey,
 }
 const usePrefParams = createUsePrefParamsHook('Services', listTablePrefs)
 
@@ -20,56 +22,70 @@ const ListPage = ({ ListContainer }) => {
   return () => {
     const { params, updateParams, getParamsUpdater } = usePrefParams(defaultParams)
     const [data, loading, reload] = useDataLoader(serviceActions.list, params)
-    const updateClusterId = useCallback(clusterId => {
+    const updateClusterId = useCallback((clusterId) => {
       updateParams({
         clusterId,
         namespace: allKey,
       })
     }, [])
-    return <ListContainer
-      loading={loading}
-      reload={reload}
-      data={data}
-      getParamsUpdater={getParamsUpdater}
-      filters={<>
-        <ClusterPicklist
-          onChange={updateClusterId}
-          value={params.clusterId}
-          onlyMasterNodeClusters
-        />
-        <NamespacePicklist
-          selectFirst={false}
-          onChange={getParamsUpdater('namespace')}
-          value={params.namespace}
-          clusterId={params.clusterId}
-          disabled={!params.clusterId}
-        />
-      </>}
-      {...pick(listTablePrefs, params)}
-    />
+    return (
+      <ListContainer
+        loading={loading}
+        reload={reload}
+        data={data}
+        getParamsUpdater={getParamsUpdater}
+        filters={
+          <>
+            <ClusterPicklist
+              selectFirst={false}
+              onChange={updateClusterId}
+              value={params.clusterId}
+              onlyMasterNodeClusters
+            />
+            <NamespacePicklist
+              selectFirst={false}
+              onChange={getParamsUpdater('namespace')}
+              value={params.namespace}
+              clusterId={params.clusterId}
+              disabled={!params.clusterId}
+            />
+          </>
+        }
+        {...pick(listTablePrefs, params)}
+      />
+    )
   }
 }
 
 const renderName = (name, { dashboardUrl }) => {
-  return <span>
-    {name}<br />
-    <ExternalLink url={dashboardUrl}>dashboard
-      <FontAwesomeIcon size="sm">file-alt</FontAwesomeIcon></ExternalLink>
-  </span>
-}
-const successColor = {
-  color: '#4ADF74',
-}
-const renderStatus = status => {
-  return status === 'OK'
-    ? <span><i style={successColor} className="fa-fw fa-lg fa-sm fa-check fal" />&nbsp;OK</span>
-    : <span><i className="fa-fw fa-lg fa-sm fa-spin fa-spinner fal" />&nbsp;Pending</span>
+  return (
+    <span>
+      {name}
+      <br />
+      <ExternalLink url={dashboardUrl}>
+        <FontAwesomeIcon size="md">file-alt</FontAwesomeIcon>
+        dashboard
+      </ExternalLink>
+    </span>
+  )
 }
 
-const renderEndpoints = endpoints => {
-  return <>
-    {endpoints.map((endpoint, i) => <div key={i}>{endpoint}</div>)}
-  </>
+const renderStatus = (status) => {
+  const serviceStatus = {
+    status: status === 'OK' ? 'ok' : 'pending',
+    label: status === 'OK' ? 'Connected' : 'Connecting',
+  }
+  return <PodsStatusSpan status={serviceStatus.status}>{serviceStatus.label}</PodsStatusSpan>
+}
+
+const renderEndpoints = (endpoints) => {
+  return (
+    <>
+      {endpoints.map((endpoint, i) => (
+        <div key={i}>{endpoint}</div>
+      ))}
+    </>
+  )
 }
 
 export const options = {

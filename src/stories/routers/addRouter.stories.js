@@ -6,7 +6,5 @@ import { AddRouterForm } from 'openstack/components/routers/AddRouterPage'
 const addStories = addStoriesFromModule(module)
 
 addStories('Router Management/Adding a router', {
-  'Add a router': () => (
-    <AddRouterForm onSubmit={jsonDetailLogger('AddRouterForm#submit')} />
-  )
+  'Add a router': () => <AddRouterForm onSubmit={jsonDetailLogger('AddRouterForm#submit')} />,
 })

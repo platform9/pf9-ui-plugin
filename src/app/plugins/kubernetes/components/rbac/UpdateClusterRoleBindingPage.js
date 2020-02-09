@@ -23,44 +23,56 @@ const UpdateClusterRoleBindingPage = () => {
   const clusterRoleBindingId = match.params.id
   const clusterId = match.params.clusterId
   const onComplete = useCallback(
-    success => success && history.push('/ui/kubernetes/rbac#clusterRoleBindings'),
-    [history])
-  const [clusterRoleBindings, loading] = useDataLoader(clusterRoleBindingActions.list, { clusterId })
+    (success) => success && history.push('/ui/kubernetes/rbac#clusterRoleBindings'),
+    [history],
+  )
+  const [clusterRoleBindings, loading] = useDataLoader(clusterRoleBindingActions.list, {
+    clusterId,
+  })
   const clusterRoleBinding = useMemo(
     () => clusterRoleBindings.find(propEq('id', clusterRoleBindingId)) || emptyObj,
-    [clusterRoleBindings, clusterRoleBindingId])
+    [clusterRoleBindings, clusterRoleBindingId],
+  )
   const { getParamsUpdater } = useParams(defaultParams)
 
-  const [updateClusterRoleBindingAction, updating] = useDataUpdater(clusterRoleBindingActions.update, onComplete)
+  const [updateClusterRoleBindingAction, updating] = useDataUpdater(
+    clusterRoleBindingActions.update,
+    onComplete,
+  )
   const handleSubmit = useCallback(
-    data => updateClusterRoleBindingAction(({ ...clusterRoleBinding, ...data })),
-    [clusterRoleBinding])
+    (data) => updateClusterRoleBindingAction({ ...clusterRoleBinding, ...data }),
+    [clusterRoleBinding],
+  )
 
   return (
     <FormWrapper
       title="Edit Cluster Role Binding"
-      backUrl='/ui/kubernetes/rbac#clusterRoleBindings'
+      backUrl="/ui/kubernetes/rbac#clusterRoleBindings"
       loading={loading || updating}
       message={loading ? 'Loading cluster role...' : 'Submitting form...'}
     >
       <ValidatedForm onSubmit={handleSubmit}>
-        <PresetField label='Name' value={clusterRoleBinding.name} />
-        <PresetField label='Cluster' value={clusterRoleBinding.clusterName} />
-        { clusterRoleBinding.roleRef &&
-          <PresetField label='Role' value={clusterRoleBinding.roleRef.name} />
-        }
-        { clusterRoleBinding.users && <UserMultiSelect
-          id="users"
-          info="Select users to assign this role"
-          onChange={getParamsUpdater('users')}
-          initialValue={clusterRoleBinding.users}
-        />}
-        { clusterRoleBinding.groups && <GroupMultiSelect
-          id="groups"
-          info="Select groups to assign this role"
-          onChange={getParamsUpdater('groups')}
-          initialValue={clusterRoleBinding.groups}
-        />}
+        <PresetField label="Name" value={clusterRoleBinding.name} />
+        <PresetField label="Cluster" value={clusterRoleBinding.clusterName} />
+        {clusterRoleBinding.roleRef && (
+          <PresetField label="Role" value={clusterRoleBinding.roleRef.name} />
+        )}
+        {clusterRoleBinding.users && (
+          <UserMultiSelect
+            id="users"
+            info="Select users to assign this role"
+            onChange={getParamsUpdater('users')}
+            initialValue={clusterRoleBinding.users}
+          />
+        )}
+        {clusterRoleBinding.groups && (
+          <GroupMultiSelect
+            id="groups"
+            info="Select groups to assign this role"
+            onChange={getParamsUpdater('groups')}
+            initialValue={clusterRoleBinding.groups}
+          />
+        )}
         <SubmitButton>Update Cluster Role Binding</SubmitButton>
       </ValidatedForm>
     </FormWrapper>

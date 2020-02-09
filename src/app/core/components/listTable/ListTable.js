@@ -4,13 +4,31 @@ import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import Checkbox from 'core/components/Checkbox'
 import {
-  Radio, Typography, Grid, Table, TableBody, TableCell, TablePagination, TableRow,
+  Radio,
+  Grid,
+  Table,
+  TableBody,
+  TableCell,
+  TablePagination,
+  TableRow,
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import { compose, ensureFunction, except } from 'app/utils/fp'
 import MoreMenu from 'core/components/MoreMenu'
 import {
-  max, any, assoc, assocPath, equals, pipe, pluck, prop, propEq, propOr, uniq, update, includes,
+  max,
+  any,
+  assoc,
+  assocPath,
+  equals,
+  pipe,
+  pluck,
+  prop,
+  propEq,
+  propOr,
+  uniq,
+  update,
+  includes,
 } from 'ramda'
 import ListTableHead from './ListTableHead'
 import ListTableToolbar from './ListTableToolbar'
@@ -20,8 +38,9 @@ import { isNilOrEmpty, emptyArr, pathStr, emptyObj } from 'utils/fp'
 import { listTableActionPropType } from 'core/components/listTable/ListTableBatchActions'
 import moize from 'moize'
 import clsx from 'clsx'
+import NoContentMessage from '../NoContentMessage'
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     width: '100%',
     marginTop: theme.spacing(2),
@@ -45,15 +64,21 @@ const styles = theme => ({
 const minSearchLength = 3
 
 // Reject all columns that are not visible or excluded
-export const pluckVisibleColumnIds = columns =>
-  columns
-    .filter(column => column.display !== false && column.excluded !== true)
-    .map(prop('id'))
+export const pluckVisibleColumnIds = (columns) =>
+  columns.filter((column) => column.display !== false && column.excluded !== true).map(prop('id'))
 
 class ListTable extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
-    const { columns, selectedRows, visibleColumns, columnsOrder, rowsPerPage, orderBy, orderDirection } = props
+    const {
+      columns,
+      selectedRows,
+      visibleColumns,
+      columnsOrder,
+      rowsPerPage,
+      orderBy,
+      orderDirection,
+    } = props
     this.state = {
       columns,
       visibleColumns: visibleColumns || pluckVisibleColumnIds(columns),
@@ -81,7 +106,7 @@ class ListTable extends PureComponent {
     })
   }
 
-  sortData = data => {
+  sortData = (data) => {
     const { columns } = this.props
     const orderBy = this.state.orderBy || columns[0].id
     const sortWith = propOr(
@@ -94,10 +119,10 @@ class ListTable extends PureComponent {
     return this.state.orderDirection === 'desc' ? sortedRows : sortedRows.reverse()
   }
 
-  areAllSelected = data => {
+  areAllSelected = (data) => {
     const { selected } = this.state
     const { selectedRows = selected } = this.props
-    return data.every(row => includes(row, selectedRows))
+    return data.every((row) => includes(row, selectedRows))
   }
 
   handleSelectAllClick = (event, checked) => {
@@ -112,7 +137,7 @@ class ListTable extends PureComponent {
       newSelected = uniq([...selectedRows, ...paginatedData])
     } else {
       // Remove active paginated rows from selected
-      newSelected = selectedRows.filter(row => !paginatedData.includes(row))
+      newSelected = selectedRows.filter((row) => !paginatedData.includes(row))
     }
     if (onSelectedRowsChange) {
       // Controlled mode
@@ -126,58 +151,61 @@ class ListTable extends PureComponent {
     onSelectAll && onSelectAll(newSelected, checked)
   }
 
-  handleClick = moize(row => event => {
-    const { selected } = this.state
-    const isSelected = this.isSelected(row)
-    const { multiSelection, onSelectedRowsChange, onSelect, selectedRows = selected } = this.props
-    if (!multiSelection) {
+  handleClick = moize(
+    (row) => (event) => {
+      const { selected } = this.state
+      const isSelected = this.isSelected(row)
+      const { multiSelection, onSelectedRowsChange, onSelect, selectedRows = selected } = this.props
+      if (!multiSelection) {
+        if (onSelectedRowsChange) {
+          // Controlled mode
+          onSelectedRowsChange([row])
+        } else {
+          this.setState({
+            selected: [row],
+          })
+
+          onSelect && onSelect(row)
+        }
+        return
+      }
+      const selectedIndex = selectedRows.indexOf(row)
+      let newSelected = []
+
+      if (selectedIndex === -1) {
+        // not found
+        newSelected = newSelected.concat(selectedRows, row)
+      } else if (selectedIndex === 0) {
+        // first
+        newSelected = newSelected.concat(selectedRows.slice(1))
+      } else if (selectedIndex === selectedRows.length - 1) {
+        // last
+        newSelected = newSelected.concat(selectedRows.slice(0, -1))
+      } else if (selectedIndex > 0) {
+        // somewhere inbetween
+        newSelected = newSelected.concat(
+          selectedRows.slice(0, selectedIndex),
+          selectedRows.slice(selectedIndex + 1),
+        )
+      }
+
       if (onSelectedRowsChange) {
         // Controlled mode
-        onSelectedRowsChange([row])
+        onSelectedRowsChange(newSelected)
       } else {
         this.setState({
-          selected: [row],
+          selected: newSelected,
         })
 
-        onSelect && onSelect(row)
+        onSelect && onSelect(row, isSelected)
       }
-      return
-    }
-    const selectedIndex = selectedRows.indexOf(row)
-    let newSelected = []
-
-    if (selectedIndex === -1) {
-      // not found
-      newSelected = newSelected.concat(selectedRows, row)
-    } else if (selectedIndex === 0) {
-      // first
-      newSelected = newSelected.concat(selectedRows.slice(1))
-    } else if (selectedIndex === selectedRows.length - 1) {
-      // last
-      newSelected = newSelected.concat(selectedRows.slice(0, -1))
-    } else if (selectedIndex > 0) {
-      // somewhere inbetween
-      newSelected = newSelected.concat(
-        selectedRows.slice(0, selectedIndex),
-        selectedRows.slice(selectedIndex + 1),
-      )
-    }
-
-    if (onSelectedRowsChange) {
-      // Controlled mode
-      onSelectedRowsChange(newSelected)
-    } else {
-      this.setState({
-        selected: newSelected,
-      })
-
-      onSelect && onSelect(row, isSelected)
-    }
-  }, { maxSize: 100 })
+    },
+    { maxSize: 100 },
+  )
 
   handleChangePage = (event, page) => this.setState({ page })
 
-  handleChangeRowsPerPage = e => {
+  handleChangeRowsPerPage = (e) => {
     const { value: rowsPerPage } = e.target
     this.setState({ rowsPerPage }, () =>
       ensureFunction(this.props.onRowsPerPageChange)(rowsPerPage),
@@ -192,25 +220,28 @@ class ListTable extends PureComponent {
     const { selected } = this.state
     const { onDelete, data, selectedRows = selected, onSelectedRowsChange } = this.props
     await onDelete(selectedRows)
-    this.setState({
-      page: this.getCurrentPage(data.length),
-    }, () => {
-      if (onSelectedRowsChange) {
-        // Controlled mode
-        onSelectedRowsChange(emptyArr)
-      } else {
-        this.setState({
-          selected: emptyArr,
-        })
-      }
-    })
+    this.setState(
+      {
+        page: this.getCurrentPage(data.length),
+      },
+      () => {
+        if (onSelectedRowsChange) {
+          // Controlled mode
+          onSelectedRowsChange(emptyArr)
+        } else {
+          this.setState({
+            selected: emptyArr,
+          })
+        }
+      },
+    )
   }
 
   handleEdit = () => {
     ensureFunction(this.props.onEdit)(this.state.selected)
   }
 
-  handleSearch = value => {
+  handleSearch = (value) => {
     if (this.props.searchTarget) {
       this.setState({
         searchTerm: value,
@@ -218,7 +249,7 @@ class ListTable extends PureComponent {
     }
   }
 
-  handleColumnToggle = columnId => {
+  handleColumnToggle = (columnId) => {
     if (this.props.canEditColumns) {
       this.setState(
         ({ visibleColumns }) => ({
@@ -226,10 +257,11 @@ class ListTable extends PureComponent {
             ? except(columnId, visibleColumns)
             : [...visibleColumns, columnId],
         }),
-        () => ensureFunction(this.props.onColumnsChange)(
-          this.state.visibleColumns,
-          this.state.columnsOrder,
-        ),
+        () =>
+          ensureFunction(this.props.onColumnsChange)(
+            this.state.visibleColumns,
+            this.state.columnsOrder,
+          ),
       )
     }
   }
@@ -245,10 +277,11 @@ class ListTable extends PureComponent {
           update(tarColumnIdx, srcColumnId),
         )(columnsOrder),
       }),
-      () => ensureFunction(this.props.onColumnsChange)(
-        this.state.visibleColumns,
-        this.state.columnsOrder,
-      ),
+      () =>
+        ensureFunction(this.props.onColumnsChange)(
+          this.state.visibleColumns,
+          this.state.columnsOrder,
+        ),
     )
   }
 
@@ -260,7 +293,7 @@ class ListTable extends PureComponent {
     this.setState(assoc('filterValues', {}))
   }
 
-  getFilterFunction = type => {
+  getFilterFunction = (type) => {
     switch (type) {
       case 'select':
         return equals
@@ -273,25 +306,23 @@ class ListTable extends PureComponent {
     }
   }
 
-  applyFilters = data => {
+  applyFilters = (data) => {
     const { filters } = this.props
     const { filterValues } = this.state
-    const filterParams = Object.entries(filterValues)
-      .map(([columnId, filterValue]) => ({
-        columnId,
-        filterValue,
-        filter: filters.find(propEq('columnId', columnId)),
-      }))
+    const filterParams = Object.entries(filterValues).map(([columnId, filterValue]) => ({
+      columnId,
+      filterValue,
+      filter: filters.find(propEq('columnId', columnId)),
+    }))
 
-    return filterParams.reduce((filteredData,
-      { columnId, filterValue, filter }) => {
+    return filterParams.reduce((filteredData, { columnId, filterValue, filter }) => {
       if (filter.onChange) {
         // If a custom handler is provided, don't filter the data locally
         return filteredData
       }
       const filterWith = filter.filterWith || this.getFilterFunction(filter.type)
 
-      return filteredData.filter(row => {
+      return filteredData.filter((row) => {
         return filterWith(filterValue, row[columnId])
       })
     }, data)
@@ -299,23 +330,21 @@ class ListTable extends PureComponent {
 
   filterBySearch = (data, target) => {
     const { searchTerm } = this.state
-    return data.filter(ele => ele[target].match(new RegExp(searchTerm, 'i')) !== null)
+    return data.filter((ele) => ele[target].match(new RegExp(searchTerm, 'i')) !== null)
   }
 
-  isSelected = row => {
+  isSelected = (row) => {
     const { selected } = this.state
     const { selectedRows = selected } = this.props
     return includes(row, selectedRows)
   }
 
-  paginate = data => {
+  paginate = (data) => {
     const { rowsPerPage, searchTerm } = this.state
 
     const startIdx = this.getCurrentPage(data.length) * rowsPerPage
     const endIdx = startIdx + rowsPerPage
-    return !searchTerm || searchTerm.length < minSearchLength
-      ? data.slice(startIdx, endIdx)
-      : data
+    return !searchTerm || searchTerm.length < minSearchLength ? data.slice(startIdx, endIdx) : data
   }
 
   getFilteredRows = () => {
@@ -323,36 +352,46 @@ class ListTable extends PureComponent {
     const { searchTerm } = this.state
 
     const sortedData = onSortChange ? data : this.sortData(data)
-    const searchData = !searchTerm || searchTerm.length < minSearchLength
-      ? sortedData
-      : this.filterBySearch(sortedData, searchTarget)
+    const searchData =
+      !searchTerm || searchTerm.length < minSearchLength
+        ? sortedData
+        : this.filterBySearch(sortedData, searchTarget)
     return filters ? this.applyFilters(searchData) : searchData
   }
 
-  renderCell = moize((columnDef, contents, row, isSelected, cellClass) => {
-    const { cellProps = emptyObj, id, render, Component: CellComponent } = columnDef
-    let renderedCell = contents
+  renderCell = moize(
+    (columnDef, contents, row, isSelected, cellClass) => {
+      const { cellProps = emptyObj, id, render, Component: CellComponent } = columnDef
+      let renderedCell = contents
 
-    if (typeof contents === 'boolean') { renderedCell = String(renderedCell) }
+      if (typeof contents === 'boolean') {
+        renderedCell = String(renderedCell)
+      }
 
-    // Allow for customized rendering in the columnDef.  The render function might need
-    // to know more about the entire object (row) being rendered and in some cases the
-    if (render) {
-      renderedCell = render(contents, row)
-    } else if (CellComponent) {
-      renderedCell = <CellComponent key={id} row={row} data={contents} isSelected={isSelected} />
-    }
+      // Allow for customized rendering in the columnDef.  The render function might need
+      // to know more about the entire object (row) being rendered and in some cases the
+      if (render) {
+        renderedCell = render(contents, row)
+      } else if (CellComponent) {
+        renderedCell = <CellComponent key={id} row={row} data={contents} isSelected={isSelected} />
+      }
 
-    return (
-      <TableCell className={cellClass} key={id} {...cellProps}>{renderedCell}</TableCell>
-    )
-  }, {
-    maxSize: 1000,
-  })
+      return (
+        <TableCell className={cellClass} key={id} {...cellProps}>
+          {renderedCell}
+        </TableCell>
+      )
+    },
+    {
+      maxSize: 1000,
+    },
+  )
 
-  renderRowActions = row => {
+  renderRowActions = (row) => {
     const { rowActions, onRefresh, onActionComplete = onRefresh } = this.props
-    if (isNilOrEmpty(rowActions)) { return null }
+    if (isNilOrEmpty(rowActions)) {
+      return null
+    }
     return (
       <TableCell>
         <MoreMenu items={rowActions} onComplete={onActionComplete} data={row} />
@@ -364,33 +403,37 @@ class ListTable extends PureComponent {
     const { columns } = this.props
     const { columnsOrder, visibleColumns } = this.state
     return columnsOrder
-      .map(columnId => columns.find(column => column.id === columnId))
-      .filter(column => column && column.id && visibleColumns.includes(column.id))
+      .map((columnId) => columns.find((column) => column.id === columnId))
+      .filter((column) => column && column.id && visibleColumns.includes(column.id))
   }
 
-  renderRow = row => {
+  renderRow = (row) => {
     const { multiSelection, showCheckboxes, uniqueIdentifier, classes } = this.props
     const isSelected = this.isSelected(row)
 
-    const checkboxProps = showCheckboxes ? {
-      onClick: this.handleClick(row),
-      role: 'checkbox',
-      tabIndex: -1,
-      selected: isSelected,
-    } : {}
+    const checkboxProps = showCheckboxes
+      ? {
+          onClick: this.handleClick(row),
+          role: 'checkbox',
+          tabIndex: -1,
+          selected: isSelected,
+        }
+      : {}
 
-    const uid = uniqueIdentifier instanceof Function
-      ? uniqueIdentifier(row)
-      : row[uniqueIdentifier]
+    const uid = uniqueIdentifier instanceof Function ? uniqueIdentifier(row) : row[uniqueIdentifier]
 
     return (
       <TableRow hover key={uid} {...checkboxProps}>
-        {showCheckboxes && (<TableCell padding="checkbox">
-          {multiSelection
-            ? <Checkbox checked={isSelected} color="primary" />
-            : <Radio checked={isSelected} color="primary" />}
-        </TableCell>)}
-        {this.getSortedVisibleColumns().map(columnDef =>
+        {showCheckboxes && (
+          <TableCell padding="checkbox">
+            {multiSelection ? (
+              <Checkbox checked={isSelected} color="primary" />
+            ) : (
+              <Radio checked={isSelected} color="primary" />
+            )}
+          </TableCell>
+        )}
+        {this.getSortedVisibleColumns().map((columnDef) =>
           this.renderCell(columnDef, pathStr(columnDef.id, row), row, isSelected, classes.cell),
         )}
         {this.renderRowActions(row)}
@@ -398,13 +441,13 @@ class ListTable extends PureComponent {
     )
   }
 
-  getCurrentPage = count => {
+  getCurrentPage = (count) => {
     const { page, rowsPerPage } = this.state
     const lastPage = max(Math.ceil(count / rowsPerPage) - 1, 0)
     return page > lastPage ? lastPage : page
   }
 
-  renderPaginationControls = count => {
+  renderPaginationControls = (count) => {
     const { rowsPerPage } = this.state
     return (
       <TablePagination
@@ -425,12 +468,10 @@ class ListTable extends PureComponent {
     if (this.props.loading) {
       return null
     }
-    return <Typography className={this.props.classes.emptyList} variant="h6">
-      {this.props.emptyText}
-    </Typography>
+    return <NoContentMessage message={this.props.emptyText} />
   }
 
-  render () {
+  render() {
     const {
       orderDirection,
       orderBy,
@@ -477,35 +518,36 @@ class ListTable extends PureComponent {
     // Always show pagination control bar to make sure the height doesn't change frequently.
     // const shouldShowPagination = paginate && sortedData.length > this.state.rowsPerPage
 
-    const tableContent = paginatedData && paginatedData.length
-      ? <Table className={classes.table} size={size}>
-        <ListTableHead
-          canDragColumns={canDragColumns}
-          columns={this.getSortedVisibleColumns()}
-          onColumnsSwitch={this.handleColumnsSwitch}
-          numSelected={selectedRows.length}
-          order={orderDirection}
-          orderBy={orderBy}
-          onSelectAllClick={this.handleSelectAllClick}
-          onRequestSort={this.handleRequestSort}
-          checked={selectedAll}
-          rowCount={filteredData.length}
-          showCheckboxes={showCheckboxes}
-          blankFirstColumn={blankFirstColumn}
-          multiSelection={multiSelection}
-        />
-        <TableBody>
-          {paginatedData.map(this.renderRow)}
-        </TableBody>
-      </Table>
-      : this.renderEmptyList()
+    const tableContent =
+      paginatedData && paginatedData.length ? (
+        <Table className={classes.table} size={size}>
+          <ListTableHead
+            canDragColumns={canDragColumns}
+            columns={this.getSortedVisibleColumns()}
+            onColumnsSwitch={this.handleColumnsSwitch}
+            numSelected={selectedRows.length}
+            order={orderDirection}
+            orderBy={orderBy}
+            onSelectAllClick={this.handleSelectAllClick}
+            onRequestSort={this.handleRequestSort}
+            checked={selectedAll}
+            rowCount={filteredData.length}
+            showCheckboxes={showCheckboxes}
+            blankFirstColumn={blankFirstColumn}
+            multiSelection={multiSelection}
+          />
+          <TableBody>{paginatedData.map(this.renderRow)}</TableBody>
+        </Table>
+      ) : (
+        this.renderEmptyList()
+      )
 
     return (
       <Progress loading={loading} overlay renderContentOnMount>
         <Grid container justify="center">
           <Grid item xs={12} zeroMinWidth>
             <div className={clsx(classes.root, compactTable && classes.compactTableHeight)}>
-              {!compactTable &&
+              {!compactTable && (
                 <ListTableToolbar
                   extraToolbarContent={extraToolbarContent}
                   selected={selectedRows}
@@ -532,10 +574,8 @@ class ListTable extends PureComponent {
                   onChangeRowsPerPage={this.handleChangeRowsPerPage}
                   rowsPerPageOptions={[5, 10, 25, 50, 100]}
                 />
-              }
-              <div className={classes.tableWrapper}>
-                {tableContent}
-              </div>
+              )}
+              <div className={classes.tableWrapper}>{tableContent}</div>
               {!compactTable && this.renderPaginationControls(filteredData.length)}
             </div>
           </Grid>
@@ -546,17 +586,19 @@ class ListTable extends PureComponent {
 }
 
 ListTable.propTypes = {
-  columns: PropTypes.arrayOf(PropTypes.shape({
-    id: PropTypes.string,
-    label: PropTypes.string,
-    render: PropTypes.func,
-    sortWith: PropTypes.func,
-    disableSorting: PropTypes.bool,
-    /* Not displayed columns will only appear in the columns selector */
-    display: PropTypes.bool,
-    /* Excluded columns will neither appear in the grid nor in the columns selector */
-    excluded: PropTypes.bool,
-  })).isRequired,
+  columns: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string,
+      label: PropTypes.string,
+      render: PropTypes.func,
+      sortWith: PropTypes.func,
+      disableSorting: PropTypes.bool,
+      /* Not displayed columns will only appear in the columns selector */
+      display: PropTypes.bool,
+      /* Excluded columns will neither appear in the grid nor in the columns selector */
+      excluded: PropTypes.bool,
+    }),
+  ).isRequired,
   data: PropTypes.arrayOf(PropTypes.object).isRequired,
   options: PropTypes.object,
   onAdd: PropTypes.func,
@@ -593,10 +635,7 @@ ListTable.propTypes = {
    It has the following type signature:
      uniqueIdentifier :: RowData -> String
    */
-  uniqueIdentifier: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.func,
-  ]),
+  uniqueIdentifier: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
 
   /**
    * List of batch actions that can be performed
@@ -648,6 +687,4 @@ ListTable.defaultProps = {
   compactTable: false,
 }
 
-export default compose(
-  withStyles(styles),
-)(ListTable)
+export default compose(withStyles(styles))(ListTable)

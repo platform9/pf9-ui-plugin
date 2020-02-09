@@ -41,11 +41,11 @@ const styles = {
 }
 
 class ListTableColumnPopover extends React.PureComponent {
-  handleColChange = moize(columnId => e => {
+  handleColChange = moize((columnId) => (e) => {
     ensureFunction(this.props.onColumnToggle)(columnId)
   })
 
-  render () {
+  render() {
     const { classes, columns, visibleColumns } = this.props
     return (
       <FormControl component="fieldset" className={classes.root} aria-label="Columns">
@@ -53,28 +53,30 @@ class ListTableColumnPopover extends React.PureComponent {
           Columns
         </Typography>
         <FormGroup className={classes.formGroup}>
-          {columns.filter(column => column.excluded !== true).map(column =>
-            <FormControlLabel
-              key={column.id}
-              classes={{
-                root: classes.formControl,
-                label: classes.label,
-              }}
-              label={column.label}
-              control={
-                <Checkbox
-                  className={classes.checkbox}
-                  classes={{
-                    root: classes.checkboxRoot,
-                    checked: classes.checked,
-                  }}
-                  onChange={this.handleColChange(column.id)}
-                  checked={visibleColumns.includes(column.id)}
-                  value={column.label}
-                />
-              }
-            />
-          )}
+          {columns
+            .filter((column) => column.excluded !== true)
+            .map((column) => (
+              <FormControlLabel
+                key={column.id}
+                classes={{
+                  root: classes.formControl,
+                  label: classes.label,
+                }}
+                label={column.label}
+                control={
+                  <Checkbox
+                    className={classes.checkbox}
+                    classes={{
+                      root: classes.checkboxRoot,
+                      checked: classes.checked,
+                    }}
+                    onChange={this.handleColChange(column.id)}
+                    checked={visibleColumns.includes(column.id)}
+                    value={column.label}
+                  />
+                }
+              />
+            ))}
         </FormGroup>
       </FormControl>
     )
@@ -82,17 +84,17 @@ class ListTableColumnPopover extends React.PureComponent {
 }
 
 ListTableColumnPopover.propTypes = {
-  columns: PropTypes.arrayOf(PropTypes.shape({
-    id: PropTypes.string,
-    label: PropTypes.string,
-    display: PropTypes.bool,
-    excluded: PropTypes.bool,
-  })).isRequired,
+  columns: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string,
+      label: PropTypes.string,
+      display: PropTypes.bool,
+      excluded: PropTypes.bool,
+    }),
+  ).isRequired,
   visibleColumns: PropTypes.array,
   onColumnToggle: PropTypes.func,
   classes: PropTypes.object,
 }
 
-export default compose(
-  withStyles(styles)
-)(ListTableColumnPopover)
+export default compose(withStyles(styles))(ListTableColumnPopover)

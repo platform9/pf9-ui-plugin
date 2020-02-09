@@ -5,11 +5,10 @@ import requiresAuthentication from '../../util/requiresAuthentication'
 import { loadVolumes } from './actions'
 import VolumesListContainer from './VolumesListContainer'
 
-const VolumesListPage = () =>
+const VolumesListPage = () => (
   <DataLoader loaders={{ volumes: loadVolumes }}>
     {({ data }) => <VolumesListContainer volumes={data.volumes} />}
   </DataLoader>
+)
 
-export default compose(
-  requiresAuthentication,
-)(VolumesListPage)
+export default compose(requiresAuthentication)(VolumesListPage)

@@ -30,7 +30,7 @@ const columns = [
 
   // TODO: We probably want to write a metadata renderer for this kind of format
   // since we use it in a few places for tags / metadata.
-  { id: 'metadata', label: 'Metadata', render: data => JSON.stringify(data) },
+  { id: 'metadata', label: 'Metadata', render: (data) => JSON.stringify(data) },
 ]
 
 export const VolumesList = createListTableComponent({
@@ -41,20 +41,19 @@ export const VolumesList = createListTableComponent({
 })
 
 class VolumesListContainer extends React.PureComponent {
-  handleRemove = async id => {
+  handleRemove = async (id) => {
     const { getContext, setContext } = this.props
     // TODO: use createContextUpdater
     await ApiClient.getInstance().cinder.deleteVolume(id)
-    const newVolumes = (await getVolumes({ getContext, setContext }))
-      .filter(x => x.id !== id)
+    const newVolumes = (await getVolumes({ getContext, setContext })).filter((x) => x.id !== id)
     setContext(assocPath([dataCacheKey, 'volumes'], newVolumes))
   }
 
-  handleSnapshot = async volume => {
+  handleSnapshot = async (volume) => {
     this.props.history.push(`/ui/openstack/storage/volumes/snapshot/${volume.id}`)
   }
 
-  render () {
+  render() {
     const rowActions = [
       { icon: <PhotoCameraIcon />, label: 'Snapshot', action: this.handleSnapshot },
     ]
@@ -66,8 +65,9 @@ class VolumesListContainer extends React.PureComponent {
         editUrl="/ui/openstack/storage/volumes/edit"
         onRemove={this.handleRemove}
       >
-        {handlers =>
-          <VolumesList data={this.props.volumes} {...handlers} rowActions={rowActions} />}
+        {(handlers) => (
+          <VolumesList data={this.props.volumes} {...handlers} rowActions={rowActions} />
+        )}
       </CRUDListContainer>
     )
   }
@@ -77,7 +77,4 @@ VolumesListContainer.propTypes = {
   volumes: PropTypes.arrayOf(PropTypes.object),
 }
 
-export default compose(
-  withAppContext,
-  withRouter,
-)(VolumesListContainer)
+export default compose(withAppContext, withRouter)(VolumesListContainer)

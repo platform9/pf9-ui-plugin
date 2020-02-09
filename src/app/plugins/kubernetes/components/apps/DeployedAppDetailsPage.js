@@ -11,7 +11,7 @@ import SimpleLink from 'core/components/SimpleLink'
 import PageContainer from 'core/components/pageContainer/PageContainer'
 import ConfirmationDialog from 'core/components/ConfirmationDialog'
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   backLink: {
     marginBottom: theme.spacing(2),
     marginLeft: 'auto',
@@ -29,7 +29,7 @@ const useStyles = makeStyles(theme => ({
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     overflowWrap: 'break-word',
-    backgroundColor: '#e2f4ff'
+    backgroundColor: '#e2f4ff',
   },
   icon: {
     width: '100%',
@@ -51,11 +51,13 @@ const backUrl = '/ui/kubernetes/apps#deployedApps'
 
 const DeployedAppDetailsPage = () => {
   const classes = useStyles()
-  const { match: { params } } = useReactRouter()
+  const {
+    match: { params },
+  } = useReactRouter()
   const [showingDeleteDialog, setShowingDeleteDialog] = useState(false)
   // We are just interested in the first (and only) item
   const [[release = emptyObj], loading] = useDataLoader(deploymentDetailLoader, params)
-  const [remove, removing] = useDataUpdater(releaseActions.delete, success => {
+  const [remove, removing] = useDataUpdater(releaseActions.delete, (success) => {
     if (success) {
       history.push(backUrl)
     }
@@ -64,81 +66,83 @@ const DeployedAppDetailsPage = () => {
     remove(release)
   }, [release])
 
-  return <PageContainer header={
-    <SimpleLink src={backUrl} className={classes.backLink}>
-      « Back to Deployed Applications
-    </SimpleLink>}>
-    <ConfirmationDialog
-      open={showingDeleteDialog}
-      title="Delete Application"
-      text={<>
-        You are about to delete the application <strong>{release.name}</strong>.<br /><br />
-        This operation cannot be undone. Are you sure?
-      </>}
-      onCancel={() => setShowingDeleteDialog(false)}
-      onConfirm={handleDelete}
-    />
-    <Progress loading={loading || removing} overlay renderContentOnMount>
-      <Grid container justify="center" spacing={3}>
-        <Grid item xs={3} lg={2}>
-          {release.logoUrl && <Card className={classes.card}>
-            <CardMedia className={classes.icon} image={release.logoUrl} title={release.name} />
-            <Button
-              variant="outlined"
-              color="primary"
-              onClick={() => setShowingDeleteDialog(true)}
-            >
-              Delete
-            </Button>
-          </Card>}
-          <Paper className={classes.paper}>
-            <Typography
-              variant="subtitle2">
-              Application
-            </Typography>
-            <Typography variant="body2" component="div">
-              {release.chartName} {release.version}
+  return (
+    <PageContainer
+      header={
+        <SimpleLink src={backUrl} className={classes.backLink}>
+          « Back to Deployed Applications
+        </SimpleLink>
+      }
+    >
+      <ConfirmationDialog
+        open={showingDeleteDialog}
+        title="Delete Application"
+        text={
+          <>
+            You are about to delete the application <strong>{release.name}</strong>.<br />
+            <br />
+            This operation cannot be undone. Are you sure?
+          </>
+        }
+        onCancel={() => setShowingDeleteDialog(false)}
+        onConfirm={handleDelete}
+      />
+      <Progress loading={loading || removing} overlay renderContentOnMount>
+        <Grid container justify="center" spacing={3}>
+          <Grid item xs={3} lg={2}>
+            {release.logoUrl && (
+              <Card className={classes.card}>
+                <CardMedia className={classes.icon} image={release.logoUrl} title={release.name} />
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  onClick={() => setShowingDeleteDialog(true)}
+                >
+                  Delete
+                </Button>
+              </Card>
+            )}
+            <Paper className={classes.paper}>
+              <Typography variant="subtitle2">Application</Typography>
+              <Typography variant="body2" component="div">
+                {release.chartName} {release.version}
+              </Typography>
+              <br />
+              <Typography variant="subtitle2">Namespace</Typography>
+              <Typography variant="body2" component="div">
+                {release.namespace}
+              </Typography>
+              <br />
+              <Typography variant="subtitle2">Status</Typography>
+              <Typography variant="body2" component="div">
+                {release.status}
+              </Typography>
+              <br />
+              <Typography variant="subtitle2">Last Updated</Typography>
+              <Typography variant="body2" component="div">
+                {release.lastUpdated}
+              </Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={9} lg={10} zeroMinWidth>
+            <Typography variant="h4" component="h4">
+              {release.name}
             </Typography>
             <br />
-            <Typography
-              variant="subtitle2">
-              Namespace
-            </Typography>
-            <Typography variant="body2" component="div">
-              {release.namespace}
+            <Typography variant="subtitle1">Resources</Typography>
+            <Typography variant="body1" component="pre" className={classes.text}>
+              {release.resourcesText || ''}
             </Typography>
             <br />
-            <Typography
-              variant="subtitle2">
-              Status
+            <Typography variant="subtitle1">Notes</Typography>
+            <Typography variant="body1" component="pre" className={classes.text}>
+              {release.notesText || ''}
             </Typography>
-            <Typography variant="body2" component="div">
-              {release.status}
-            </Typography>
-            <br />
-            <Typography
-              variant="subtitle2">
-              Last Updated
-            </Typography>
-            <Typography variant="body2" component="div">
-              {release.lastUpdated}
-            </Typography>
-          </Paper>
+          </Grid>
         </Grid>
-        <Grid item xs={9} lg={10} zeroMinWidth>
-          <Typography variant="h4" component="h4">
-            {release.name}
-          </Typography>
-          <br />
-          <Typography variant="subtitle1">Resources</Typography>
-          <Typography variant="body1" component="pre" className={classes.text}>{release.resourcesText || ''}</Typography>
-          <br />
-          <Typography variant="subtitle1">Notes</Typography>
-          <Typography variant="body1" component="pre" className={classes.text}>{release.notesText || ''}</Typography>
-        </Grid>
-      </Grid>
-    </Progress>
-  </PageContainer>
+      </Progress>
+    </PageContainer>
+  )
 }
 
 export default DeployedAppDetailsPage

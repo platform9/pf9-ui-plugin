@@ -10,8 +10,8 @@ export const getDeployments = (req, res) => {
     kind: 'deploymentList',
     metadata: {
       resourceVersion: '5201088',
-      selfLink: '/api/v1/deployments'
-    }
+      selfLink: '/api/v1/deployments',
+    },
   }
   return res.send(response)
 }
@@ -23,11 +23,23 @@ export const postDeployment = (req, res) => {
   if (deployment.kind !== 'Deployment') {
     return res.status(400).send({ code: 400, message: 'Must be of kind "Deployment"' })
   }
-  if (Deployment.findByName({ name: deployment.metadata.name, context, config: { namespace, clusterId } })) {
-    return res.status(409).send({ code: 409, message: `deployments ${deployment.metadata.name} already exists` })
+  if (
+    Deployment.findByName({
+      name: deployment.metadata.name,
+      context,
+      config: { namespace, clusterId },
+    })
+  ) {
+    return res
+      .status(409)
+      .send({ code: 409, message: `deployments ${deployment.metadata.name} already exists` })
   }
 
-  const newDeployment = Deployment.create({ data: deployment, context, config: { clusterId, namespace } })
+  const newDeployment = Deployment.create({
+    data: deployment,
+    context,
+    config: { clusterId, namespace },
+  })
   res.status(201).send(newDeployment)
 }
 

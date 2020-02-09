@@ -1,15 +1,16 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { prometheusRulesCacheKey } from './actions'
 
-const renderKeyValues = obj => Object.entries(obj)
-  .map(([key, value]) => `${key}: ${value}`)
-  .join(', ')
+const renderKeyValues = (obj) =>
+  Object.entries(obj)
+    .map(([key, value]) => `${key}: ${value}`)
+    .join(', ')
 
 export const columns = [
   { id: 'name', label: 'Name' },
   { id: 'clusterName', label: 'Cluster' },
   { id: 'namespace', label: 'Namespace' },
-  { id: 'labels',  label: 'Labels', render: renderKeyValues }
+  { id: 'labels', label: 'Labels', render: renderKeyValues },
 ]
 
 export const options = {

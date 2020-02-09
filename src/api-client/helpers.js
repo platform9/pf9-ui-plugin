@@ -28,7 +28,7 @@ export const makeUnscopedClient = async () => {
 export const makeScopedClient = async (tenantName = defaultTestTenant) => {
   const client = await makeUnscopedClient()
   const projects = await client.keystone.getProjects()
-  const project = projects.find(x => x.name === tenantName) || projects[0]
+  const project = projects.find((x) => x.name === tenantName) || projects[0]
   await client.keystone.changeProjectScope(project.id)
   return client
 }
@@ -37,7 +37,7 @@ export const makeRegionedClient = async (tenantName = defaultTestTenant) => {
   const client = await makeScopedClient(tenantName)
   const regions = await client.keystone.getRegions()
   // currently set KVM-Neutron as default test environment
-  client.setActiveRegion(regions.find(x => x.id === 'KVM-Neutron').id || regions[0].id)
+  client.setActiveRegion(regions.find((x) => x.id === 'KVM-Neutron').id || regions[0].id)
   await client.keystone.getServicesForActiveRegion()
   return client
 }
@@ -54,8 +54,7 @@ export const waitUntil = async ({ condition, delay, maxRetries }) => {
   }
 }
 
-export const sleep = (delay) =>
-  new Promise(resolve => setTimeout(resolve, delay))
+export const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
 
 export const getHighestRole = (roleNames) => {
   if (roleNames.includes('admin')) {
@@ -67,8 +66,8 @@ export const getHighestRole = (roleNames) => {
   }
 }
 
-export const normalizeResponse = response => {
-  const data = (response && response.hasOwnProperty('data') ? response.data : response)
+export const normalizeResponse = (response) => {
+  const data = response && response.hasOwnProperty('data') ? response.data : response
   // Fix nested data.data issue
   return (data && data.hasOwnProperty('data') ? data.data : data) || emptyArr
 }

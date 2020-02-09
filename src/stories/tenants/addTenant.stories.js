@@ -6,7 +6,5 @@ import { AddTenantForm } from 'openstack/components/tenants/AddTenantPage'
 const addStories = addStoriesFromModule(module)
 
 addStories('Tenants/Adding a tenant', {
-  'Add a tenant': () => (
-    <AddTenantForm onSubmit={jsonDetailLogger('AddTenantForm#submit')} />
-  )
+  'Add a tenant': () => <AddTenantForm onSubmit={jsonDetailLogger('AddTenantForm#submit')} />,
 })

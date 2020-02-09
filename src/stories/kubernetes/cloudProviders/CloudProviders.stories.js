@@ -7,7 +7,5 @@ const addStories = addStoriesFromModule(module)
 const onComplete = action('complete')
 
 addStories('Kubernetes/Infrastructure/Cloud Providers', {
-  'Adding a cloud provider': () => (
-    <AddCloudProviderPage onComplete={onComplete} />
-  ),
+  'Adding a cloud provider': () => <AddCloudProviderPage onComplete={onComplete} />,
 })

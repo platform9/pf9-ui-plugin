@@ -10,7 +10,7 @@ import NotificationsPopover from 'core/components/notifications/NotificationsPop
 import HelpContainer from 'core/components/HelpContainer'
 import { helpUrl } from 'app/constants'
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   appBar: {
     position: 'fixed',
     boxShadow: 'none',
@@ -38,17 +38,19 @@ const useStyles = makeStyles(theme => ({
 
 const Toolbar = ({ open }) => {
   const classes = useStyles()
-  return <AppBar className={classes.appBar}>
-    <MaterialToolbar variant="dense" disableGutters={!open}>
-      <div className={classes.rightTools}>
-        <HelpContainer link={helpUrl} />
-        <RegionChooser className={classes.leftMargin} />
-        <TenantChooser className={classes.leftMargin} />
-        <NotificationsPopover className={classes.leftMargin} />
-        <UserMenu className={classes.leftMargin} />
-      </div>
-    </MaterialToolbar>
-  </AppBar>
+  return (
+    <AppBar className={classes.appBar}>
+      <MaterialToolbar variant="dense" disableGutters={!open}>
+        <div className={classes.rightTools}>
+          <HelpContainer link={helpUrl} />
+          <RegionChooser className={classes.leftMargin} />
+          <TenantChooser className={classes.leftMargin} />
+          <NotificationsPopover className={classes.leftMargin} />
+          <UserMenu className={classes.leftMargin} />
+        </div>
+      </MaterialToolbar>
+    </AppBar>
+  )
 }
 
 Toolbar.propTypes = {

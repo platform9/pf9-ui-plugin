@@ -8,7 +8,7 @@ Here is an example of how it can be used:
 ```javascript
 // Create the client and authenticate
 const keystoneEndpoint = 'http://FQDN.com/keystone'
-const client = new ApiClient({ keystoneEndpoint})
+const client = new ApiClient({ keystoneEndpoint })
 await client.keystone.authenticate('username', 'password')
 
 // Scope the client to a project
@@ -21,7 +21,7 @@ const newUser = await client.keystone.createUser({
   email: 'newUser@domain.com',
   username: 'newUser@domain.com',
   password: 'secret',
-  displayname: 'New User' // yes, it's lowercase in keystone
+  displayname: 'New User', // yes, it's lowercase in keystone
 })
 const users = await client.keystone.getUsers()
 await client.keystone.deleteUser(newUser.id)

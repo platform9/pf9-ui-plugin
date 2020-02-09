@@ -29,7 +29,7 @@ export const podActions = createCRUDActions(podsCacheKey, {
     return qbert.createPod(clusterId, namespace, body)
   },
   deleteFn: async ({ id }, currentItems) => {
-    const { clusterId, namespace, name } = await currentItems.find(x => x.id === id)
+    const { clusterId, namespace, name } = await currentItems.find((x) => x.id === id)
     await qbert.deletePod(clusterId, namespace, name)
   },
   dataMapper: async (items, { clusterId, namespace }, loadFromContext) => {
@@ -37,9 +37,10 @@ export const podActions = createCRUDActions(podsCacheKey, {
     return pipeAsync(
       // Filter by namespace
       filterIf(namespace && namespace !== allKey, pathEq(['metadata', 'namespace'], namespace)),
-      mapAsync(async pod => {
+      mapAsync(async (pod) => {
         const clusterId = prop('clusterId', pod)
-        const dashboardUrl = pathJoin(await qbert.clusterBaseUrl(pod.clusterId),
+        const dashboardUrl = pathJoin(
+          await qbert.clusterBaseUrl(pod.clusterId),
           k8sDocUrl,
           'pod',
           pathStr('metadata.namespace', pod),
@@ -83,8 +84,9 @@ export const deploymentActions = createCRUDActions(deploymentsCacheKey, {
     return pipeAsync(
       // Filter by namespace
       filterIf(namespace && namespace !== allKey, pathEq(['metadata', 'namespace'], namespace)),
-      mapAsync(async deployment => {
-        const dashboardUrl = pathJoin(await qbert.clusterBaseUrl(deployment.clusterId),
+      mapAsync(async (deployment) => {
+        const dashboardUrl = pathJoin(
+          await qbert.clusterBaseUrl(deployment.clusterId),
           k8sDocUrl,
           'deployment',
           pathStr('metadata.namespace', deployment),
@@ -97,14 +99,12 @@ export const deploymentActions = createCRUDActions(deploymentsCacheKey, {
 
         // Check if any pod label matches the first deployment match label key
         // Note: this logic should probably be revised (copied from Clarity UI)
-        const deploymentPods = pods.filter(pod => {
+        const deploymentPods = pods.filter((pod) => {
           if (pod.namespace !== namespace || pod.clusterId !== clusterId) {
             return false
           }
           const podLabels = pathStr('metadata.labels', pod)
-          return any(
-            ([key, value]) => key === labelKey && value === labelValue,
-            toPairs(podLabels))
+          return any(([key, value]) => key === labelKey && value === labelValue, toPairs(podLabels))
         })
         return {
           ...deployment,
@@ -147,7 +147,7 @@ export const serviceActions = createCRUDActions(kubeServicesCacheKey, {
     }
   },
   deleteFn: async ({ id }, currentItems) => {
-    const { clusterId, namespace, name } = await currentItems.find(x => x.id === id)
+    const { clusterId, namespace, name } = await currentItems.find((x) => x.id === id)
     await qbert.deleteService(clusterId, namespace, name)
   },
   dataMapper: async (items, { clusterId, namespace }, loadFromContext) => {
@@ -155,8 +155,9 @@ export const serviceActions = createCRUDActions(kubeServicesCacheKey, {
     return pipeAsync(
       // Filter by namespace
       filterIf(namespace && namespace !== allKey, pathEq(['metadata', 'namespace'], namespace)),
-      mapAsync(async service => {
-        const dashboardUrl = pathJoin(await qbert.clusterBaseUrl(service.clusterId),
+      mapAsync(async (service) => {
+        const dashboardUrl = pathJoin(
+          await qbert.clusterBaseUrl(service.clusterId),
           k8sDocUrl,
           'service',
           pathStr('metadata.namespace', service),
@@ -168,19 +169,20 @@ export const serviceActions = createCRUDActions(kubeServicesCacheKey, {
         const name = pathStr('metadata.name', service)
         const ports = pathStrOr(emptyArr, 'spec.ports', service)
         const loadBalancerEndpoints = pathStrOr(emptyArr, 'status.loadBalancer.ingress', service)
-        const internalEndpoints = ports.map(port => [
-          `${name}:${port.port} ${port.protocol}`,
-          `${name}:${port.nodePort || 0} ${port.protocol}`,
-        ]).flat()
+        const internalEndpoints = ports
+          .map((port) => [
+            `${name}:${port.port} ${port.protocol}`,
+            `${name}:${port.nodePort || 0} ${port.protocol}`,
+          ])
+          .flat()
         const externalEndpoints = [
           ...(externalName ? [externalName] : []),
           ...pluck('hostname', loadBalancerEndpoints),
           ...(type === 'NodePort' ? ['&lt;nodes&gt;'] : []),
         ]
         const clusterIp = pathStr('spec.clusterIP', service)
-        const status = clusterIp && (type !== 'LoadBalancer' || externalEndpoints.length > 0)
-          ? 'OK'
-          : 'Pending'
+        const status =
+          clusterIp && (type !== 'LoadBalancer' || externalEndpoints.length > 0) ? 'OK' : 'Pending'
         return {
           ...service,
           dashboardUrl,

@@ -1,4 +1,3 @@
-
 import React, { useCallback } from 'react'
 import { castFuzzyBool } from 'utils/misc'
 import { compose, path } from 'ramda'
@@ -6,7 +5,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mate
 import ApiClient from 'api-client/ApiClient'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import { clusterActions } from '../infrastructure/clusters/actions'
-import { OnboardingMonitoringSetup } from 'app/constants'
+import { onboardingMonitoringSetup } from 'app/constants'
 import { useToast } from 'core/providers/ToastProvider'
 
 export const hasPrometheusEnabled = compose(castFuzzyBool, path(['tags', 'pf9-system:monitoring']))
@@ -16,7 +15,7 @@ const { appbert } = ApiClient.getInstance()
 const PrometheusAddonDialog = ({ rows: [cluster], onClose }) => {
   const enabled = hasPrometheusEnabled(cluster)
   const showToast = useToast()
-  const [tagUpdater] = useDataUpdater(clusterActions.updateTag, success => {
+  const [tagUpdater] = useDataUpdater(clusterActions.updateTag, (success) => {
     if (success) {
       onClose(success)
     }
@@ -25,9 +24,7 @@ const PrometheusAddonDialog = ({ rows: [cluster], onClose }) => {
   const toggleMonitoring = useCallback(async () => {
     try {
       const pkgs = await appbert.getPackages()
-      const monPkg = pkgs.find(pkg => (
-        pkg.name === 'pf9-mon'
-      ))
+      const monPkg = pkgs.find((pkg) => pkg.name === 'pf9-mon')
 
       if (!monPkg) {
         showToast('No monitoring package found', 'error')
@@ -37,7 +34,7 @@ const PrometheusAddonDialog = ({ rows: [cluster], onClose }) => {
       const monId = monPkg.ID
       await appbert.toggleAddon(cluster.uuid, monId, !enabled)
       if (!enabled) {
-        localStorage.setItem(OnboardingMonitoringSetup, 'true')
+        localStorage.setItem(onboardingMonitoringSetup, 'true')
       }
     } catch (e) {
       showToast('Failed to update monitoring status', 'error')
@@ -57,8 +54,9 @@ const PrometheusAddonDialog = ({ rows: [cluster], onClose }) => {
           <b>Note:</b> Monitoring is a Beta feature
         </p>
         <p>
-          After enabling the monitoring add-on, you will be able to access Prometheus metrics and Grafana
-          dashboards for Kubernetes. In addition, users will be able to spin up their own Prometheus instances for application monitoring.
+          After enabling the monitoring add-on, you will be able to access Prometheus metrics and
+          Grafana dashboards for Kubernetes. In addition, users will be able to spin up their own
+          Prometheus instances for application monitoring.
         </p>
       </DialogContent>
       <DialogActions>

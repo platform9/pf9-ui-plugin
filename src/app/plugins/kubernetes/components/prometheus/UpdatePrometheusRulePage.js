@@ -7,33 +7,35 @@ import uuid from 'uuid'
 import { prometheusRulesCacheKey } from './actions'
 import { withStyles } from '@material-ui/styles'
 
-@withStyles(theme => ({
+@withStyles((theme) => ({
   submit: { marginTop: theme.spacing(3) },
 }))
 class UpdatePrometheusRuleForm extends React.PureComponent {
   state = this.props.initialValues
 
-  handleAddRule = rule => {
+  handleAddRule = (rule) => {
     const withId = { id: uuid.v4(), ...rule }
     this.setState({ rules: [...this.state.rules, withId] })
   }
 
-  handleDeleteRule = id => () => {
-    this.setState(state => ({ rules: state.rules.filter(rule => rule.id !== id) }))
+  handleDeleteRule = (id) => () => {
+    this.setState((state) => ({ rules: state.rules.filter((rule) => rule.id !== id) }))
   }
 
   handleUpdate = () => {
     this.props.onComplete(this.state)
   }
 
-  render () {
+  render() {
     const { classes } = this.props
     const { rules } = this.state
     return (
       <div>
         <PrometheusRulesTable rules={rules} onDelete={this.handleDeleteRule} />
         <PrometheusRuleForm onSubmit={this.handleAddRule} />
-        <Button className={classes.submit} variant="contained" onClick={this.handleUpdate}>Update rules</Button>
+        <Button className={classes.submit} variant="contained" onClick={this.handleUpdate}>
+          Update rules
+        </Button>
       </div>
     )
   }

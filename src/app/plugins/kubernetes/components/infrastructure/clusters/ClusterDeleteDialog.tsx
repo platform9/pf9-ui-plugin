@@ -28,7 +28,7 @@ const ClusterDeleteDialog: React.FC<IClusterDeleteDialog> = ({ rows: [cluster], 
   const [deleteCluster, deletingCluster] = useDataUpdater(clusterActions.delete, (success) =>
     // TODO: If deauth node feature is supported after cluster delete then enable this feature
     // eslint-disable-next-line no-constant-condition
-    false && success && cluster?.nodes?.length > 0 ? setShowDeauthNodeDialog(true) : onClose()
+    false && success && cluster?.nodes?.length > 0 ? setShowDeauthNodeDialog(true) : onClose(),
   )
   const title = `Confirm delete cluster "${cluster?.name}"?`
   const handleDelete = useCallback(async () => {
@@ -47,7 +47,10 @@ const ClusterDeleteDialog: React.FC<IClusterDeleteDialog> = ({ rows: [cluster], 
               <Typography variant="body1" component="div">
                 This will permanently delete the cluster
               </Typography>
-              <Alert variant="warning" message="When deleting a cluster all nodes will remain connected to Platform9" />
+              <Alert
+                variant="warning"
+                message="When deleting a cluster all nodes will remain connected to Platform9"
+              />
               <TextField id="clusterName" type="text" label="Cluster name" />
             </DialogContent>
             <DialogActions>

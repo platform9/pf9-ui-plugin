@@ -6,7 +6,5 @@ import { AddNetworkForm } from 'openstack/components/networks/AddNetworkPage'
 const addStories = addStoriesFromModule(module)
 
 addStories('Network Management/Adding a network', {
-  'Add a network': () => (
-    <AddNetworkForm onSubmit={jsonDetailLogger('AddNetworkForm#submit')} />
-  )
+  'Add a network': () => <AddNetworkForm onSubmit={jsonDetailLogger('AddNetworkForm#submit')} />,
 })

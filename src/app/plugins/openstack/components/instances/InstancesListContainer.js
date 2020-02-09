@@ -7,7 +7,7 @@ import createListTableComponent from 'core/helpers/createListTableComponent'
 const columns = [
   { id: 'name', label: 'Name' },
   { id: 'status', label: 'Status' },
-  { id: 'state', label: 'State' }
+  { id: 'state', label: 'State' },
 ]
 
 export const InstancesList = createListTableComponent({
@@ -18,7 +18,7 @@ export const InstancesList = createListTableComponent({
 })
 
 class InstancesListContainer extends React.PureComponent {
-  render () {
+  render() {
     const instances = this.props.instances || []
     return (
       <CRUDListContainer
@@ -27,11 +27,7 @@ class InstancesListContainer extends React.PureComponent {
         editUrl="/ui/openstack/instances/edit"
       >
         {({ onDelete, onAdd, onEdit }) => (
-          <InstancesList
-            data={instances}
-            onAdd={onAdd}
-            onDelete={onDelete}
-            onEdit={onEdit} />
+          <InstancesList data={instances} onAdd={onAdd} onDelete={onDelete} onEdit={onEdit} />
         )}
       </CRUDListContainer>
     )
@@ -39,7 +35,7 @@ class InstancesListContainer extends React.PureComponent {
 }
 
 InstancesListContainer.propTypes = {
-  instances: PropTypes.arrayOf(PropTypes.object)
+  instances: PropTypes.arrayOf(PropTypes.object),
 }
 
 export default InstancesListContainer

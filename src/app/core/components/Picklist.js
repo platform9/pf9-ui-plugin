@@ -12,9 +12,9 @@ import { isNilOrEmpty } from 'utils/fp'
  * Picklist is a bare-bones widget-only implmentation.
  * See PicklistField if you need ValidatedForm integration.
  */
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
-    display: ({ formField }) => formField ? 'flex' : 'block',
+    display: ({ formField }) => (formField ? 'flex' : 'block'),
     flexWrap: 'wrap',
     minWidth: 120,
     marginTop: theme.spacing(1),
@@ -25,54 +25,80 @@ const selectProps = { displayEmpty: true }
 // We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
 const Picklist = React.forwardRef((props, ref) => {
   const {
-    disabled, showAll, showNone, noneLabel, label, name, value, options, onChange, loading, formField, ...restProps
+    disabled,
+    showAll,
+    showNone,
+    noneLabel,
+    label,
+    name,
+    value,
+    options,
+    onChange,
+    loading,
+    formField,
+    ...restProps
   } = props
   const classes = useStyles(props)
   const inputProps = useMemo(() => ({ name: label, id: name }), [label, name])
-  const items = useMemo(() => pipe(
-    map(option => typeof option === 'string' ? ({ value: option, label: option }) : option),
-    map(option => ({
-      label: option.label,
-      // Hack to work around Material UI's Select ignoring empty string as a value
-      value: option.value === '' ? noneKey : option.value,
-    })),
-    showNone ? prepend({ label: noneLabel || 'None', value: noneKey }) : identity,
-    showAll ? prepend({ label: 'All', value: allKey }) : identity,
-    map(option => <MenuItem value={option.value} key={option.value}>{option.label}</MenuItem>),
-  )(options), [options])
+  const items = useMemo(
+    () =>
+      pipe(
+        map((option) => (typeof option === 'string' ? { value: option, label: option } : option)),
+        map((option) => ({
+          label: option.label,
+          // Hack to work around Material UI's Select ignoring empty string as a value
+          value: option.value === '' ? noneKey : option.value,
+        })),
+        showNone ? prepend({ label: noneLabel || 'None', value: noneKey }) : identity,
+        showAll ? prepend({ label: 'All', value: allKey }) : identity,
+        map((option) => (
+          <MenuItem value={option.value} key={option.value}>
+            {option.label}
+          </MenuItem>
+        )),
+      )(options),
+    [options],
+  )
 
-  const handleChange = useCallback(e => {
-    // Hack to work around the fact that Material UI's "Select" will ignore
-    // an options with value of '' (empty string).
-    const value = e.target.value === noneKey ? '' : e.target.value
-    onChange && onChange(value)
-  }, [onChange])
+  const handleChange = useCallback(
+    (e) => {
+      // Hack to work around the fact that Material UI's "Select" will ignore
+      // an options with value of '' (empty string).
+      const value = e.target.value === noneKey ? '' : e.target.value
+      onChange && onChange(value)
+    },
+    [onChange],
+  )
 
   // Hack to work around Material UI's Select ignoring empty string as a value
   const nonEmptyValue = isNilOrEmpty(value)
-    ? (showNone
+    ? showNone
       ? noneKey
-      : (showAll ? allKey : value))
+      : showAll
+      ? allKey
+      : value
     : value
 
   // If loading is undefined, it means we are not performing any async
   // operation to load the options, hence we can render the contents on mount
-  return <Progress inline overlay loading={loading} renderContentOnMount={loading === undefined}>
-    <TextField
-      {...restProps}
-      ref={ref}
-      disabled={disabled || (isEmpty(options) && !showNone)}
-      select
-      classes={classes}
-      label={label}
-      value={nonEmptyValue || ''}
-      SelectProps={selectProps}
-      onChange={handleChange}
-      inputProps={inputProps}
-    >
-      {items}
-    </TextField>
-  </Progress>
+  return (
+    <Progress inline overlay loading={loading} renderContentOnMount={loading === undefined}>
+      <TextField
+        {...restProps}
+        ref={ref}
+        disabled={disabled || (isEmpty(options) && !showNone)}
+        select
+        classes={classes}
+        label={label}
+        value={nonEmptyValue || ''}
+        SelectProps={selectProps}
+        onChange={handleChange}
+        inputProps={inputProps}
+      >
+        {items}
+      </TextField>
+    </Progress>
+  )
 })
 
 const numOrString = PropTypes.oneOfType([PropTypes.number, PropTypes.string])

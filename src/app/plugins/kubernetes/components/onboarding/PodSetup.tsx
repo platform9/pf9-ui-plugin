@@ -1,9 +1,9 @@
-import React, { useCallback, useState, useEffect } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import ExpansionPanel from 'core/components/expansionPanel/ExpansionPanel'
-import OnboardWizard from './onboard-wizard'
+import OnboardWizard from 'k8s/components/onboarding/OnboardWizard'
 import NextButton from 'core/components/buttons/NextButton'
 import useReactRouter from 'use-react-router'
-import { OnboardingPodSetup } from 'app/constants'
+import { onboardingPodSetup } from 'app/constants'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { podActions } from '../pods/actions'
 import { Typography } from '@material-ui/core'
@@ -14,17 +14,19 @@ import { routes } from 'core/utils/routes'
 const useStyles = makeStyles<Theme>((theme) => ({
   container: {
     maxWidth: 800,
-  }
+  },
 }))
+
 interface Props {
   onComplete: () => void
   initialPanel?: number
 }
 
-export const podSetupComplete = (pods: any[]) => !!pods.length || !!localStorage.getItem(OnboardingPodSetup)
+export const podSetupComplete = (pods: any[]) =>
+  !!pods.length || !!localStorage.getItem(onboardingPodSetup)
 
 enum Panels {
-  CreatePod = 0
+  CreatePod = 0,
 }
 
 const PodSetup = ({ onComplete, initialPanel }: Props) => {
@@ -36,11 +38,13 @@ const PodSetup = ({ onComplete, initialPanel }: Props) => {
   }, [])
 
   const handleSkipPods = useCallback(() => {
-    localStorage.setItem(OnboardingPodSetup, 'true')
+    localStorage.setItem(onboardingPodSetup, 'true')
     onComplete()
   }, [])
 
-  const [activePanels, setActivePanels] = useState(new Set(initialPanel !== undefined ? [initialPanel] : []))
+  const [activePanels, setActivePanels] = useState(
+    new Set(initialPanel !== undefined ? [initialPanel] : []),
+  )
   const [pods, loadingPods] = useDataLoader(podActions.list)
   const hasPods = podSetupComplete(pods)
 

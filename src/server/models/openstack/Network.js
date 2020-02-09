@@ -5,7 +5,7 @@ import { findById, updateById } from '../../helpers'
 const coll = () => context.networks
 
 class Network extends ActiveModel {
-  constructor (params = {}) {
+  constructor(params = {}) {
     super(params)
     this.name = params.name || ''
     this.subnets = params.subnets || ''
@@ -22,7 +22,7 @@ class Network extends ActiveModel {
   static findById = findById(coll)
   static updateById = updateById(coll)
 
-  static findByName = name => Network.getCollection().find(x => x.name === name)
+  static findByName = (name) => Network.getCollection().find((x) => x.name === name)
 
   asJson = () => {
     return {
@@ -34,7 +34,7 @@ class Network extends ActiveModel {
       port_security_enabled: this.port_security_enabled,
       external: this.external,
       admin_state_up: this.admin_state_up,
-      status: this.status
+      status: this.status,
     }
   }
 }
