@@ -12,7 +12,6 @@ import {
   forumHelpLink,
 } from 'k8s/links'
 import ExternalLink from 'core/components/ExternalLink'
-import clsx from 'clsx'
 import { hexToRGBA } from 'core/utils/colorHelpers'
 
 const useStyles = makeStyles((theme) => ({
