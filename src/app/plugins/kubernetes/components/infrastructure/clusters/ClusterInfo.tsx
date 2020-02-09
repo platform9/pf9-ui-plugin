@@ -166,7 +166,6 @@ const renderCloudInfo = (cluster) => {
 const useStyles = makeStyles<Theme>((theme) => ({
   root: {
     flexGrow: 1,
-    marginTop: theme.spacing(1),
   },
 }))
 

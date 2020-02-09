@@ -26,6 +26,7 @@ import { IUseDataLoader, ICombinedNode, IKubeNodeState } from './model'
 import { ICluster } from '../clusters/model'
 import { renderNodeHealthStatus } from './NodesListPage'
 import { nodeInstallTroubleshooting } from 'k8s/links'
+import NoContentMessage from 'core/components/NoContentMessage'
 
 const useStyles = makeStyles<Theme, {}>((theme) => ({
   gridContainer: {
@@ -77,7 +78,6 @@ const useStyles = makeStyles<Theme, {}>((theme) => ({
     gridColumn: 3,
   },
   tableChooser: {
-    marginTop: theme.spacing(2),
     display: 'grid',
     gridTemplateRows: `
       22px 1fr
@@ -186,6 +186,10 @@ export const NodeHealthWithTasksToggler: FC = () => {
   ) : (
     renderNodeHealthStatus(null, selectedNode || {})
   )
+
+  if (!selectedNode) {
+    return <NoContentMessage message="No instances found." />
+  }
 
   return (
     <div className={tableChooser}>
