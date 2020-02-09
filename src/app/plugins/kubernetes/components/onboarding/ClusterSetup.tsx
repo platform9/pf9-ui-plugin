@@ -106,7 +106,7 @@ const ClusterSetup = ({ onComplete, initialPanel = Panels.Cluster }: Props) => {
     <div className={classes.container}>
       <OnboardWizard
         title="Create your first Kubernetes cluster"
-        body="Create your first Kubernetes cluster so you can start running some appications on it."
+        body="Create your first Kubernetes cluster so you can start running some applications on it."
       >
         <ExpansionPanel
           expanded={activePanels.has(Panels.Cluster)}
