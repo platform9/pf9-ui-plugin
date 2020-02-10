@@ -11,7 +11,6 @@ interface ContainerProps {
   className?: string
   maxWidth?: number
   inputsWidth?: number
-  limitInputsWidth?: boolean
 }
 const defaultMaxWidth = 715
 
@@ -47,7 +46,7 @@ export const useStyles = makeStyles<Theme, ContainerProps>((theme) => ({
 }))
 
 export const FormFieldCard: React.FC<ContainerProps> = (props) => {
-  const { title, topContent, link, className, children, limitInputsWidth = true } = props
+  const { title, topContent, link, className, children } = props
   const classes = useStyles(props)
   return (
     <div className={clsx(classes.root, className)}>
@@ -58,7 +57,7 @@ export const FormFieldCard: React.FC<ContainerProps> = (props) => {
         </header>
       )}
       {topContent}
-      {limitInputsWidth ? <div className={classes.inputWidth}>{children}</div> : children}
+      {children}
     </div>
   )
 }

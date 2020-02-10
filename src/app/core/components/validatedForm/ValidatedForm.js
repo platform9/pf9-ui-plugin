@@ -22,8 +22,9 @@ const styles = (theme) => ({
     maxWidth: ({ fullWidth, maxWidth }) => (fullWidth ? null : maxWidth),
     minWidth: 300,
     marginBottom: theme.spacing(1),
-    '& .MuiFormControl-root': {
-      width: '100%',
+    '& .MuiFormControl-root.validatedFormInput': {
+      width: 'fit-content',
+      minWidth: '50%',
       marginTop: theme.spacing(1.5),
       marginBottom: theme.spacing(1.5),
     },
@@ -219,7 +220,6 @@ class ValidatedForm extends PureComponent {
       formActions,
       maxWidth,
       inputsWidth,
-      limitInputsWidth,
       nowrap,
     } = this.props
     const inputs = children instanceof Function ? children(this.state) : children
@@ -237,7 +237,6 @@ class ValidatedForm extends PureComponent {
               className={className}
               maxWidth={maxWidth}
               inputsWidth={inputsWidth}
-              limitInputsWidth={limitInputsWidth}
             >
               {inputs}
             </FormFieldCard>
@@ -280,8 +279,6 @@ ValidatedForm.propTypes = {
 
   formActions: PropTypes.node,
 
-  limitInputsWidth: PropTypes.bool,
-
   inputsWidth: PropTypes.number,
 
   // Don't wrap the children within a FormFieldCard
@@ -290,7 +287,6 @@ ValidatedForm.propTypes = {
 
 ValidatedForm.defaultProps = {
   fullWidth: true,
-  limitInputsWidth: true,
   clearOnSubmit: false,
   debug: false,
   maxWidth: 715,

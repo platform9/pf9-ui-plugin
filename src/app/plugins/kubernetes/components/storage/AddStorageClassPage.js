@@ -153,7 +153,6 @@ const CustomizeStep = ({ wizardContext, onSubmit, triggerSubmit }) => {
   return (
     <WizardStep stepId="customize" label="Customize" key={wizardContext}>
       <ValidatedForm
-        limitInputsWidth={false}
         onSubmit={onSubmit}
         triggerSubmit={triggerSubmit}
         title="Advanced Usage"

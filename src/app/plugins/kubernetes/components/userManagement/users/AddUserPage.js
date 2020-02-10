@@ -58,7 +58,6 @@ const AddUserPage = () => {
             <WizardStep stepId="basic" label="Basic Info">
               <ValidatedForm
                 title="Basic Info"
-                limitInputsWidth={false}
                 initialValues={wizardContext}
                 onSubmit={setWizardContext}
                 triggerSubmit={onNext}
@@ -103,7 +102,6 @@ const AddUserPage = () => {
               </Typography>
               <ValidatedForm
                 title="Tenants and Roles"
-                limitInputsWidth={false}
                 fullWidth
                 initialValues={wizardContext}
                 onSubmit={setWizardContext}

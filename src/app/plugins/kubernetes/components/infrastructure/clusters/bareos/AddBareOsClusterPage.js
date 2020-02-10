@@ -69,6 +69,9 @@ const useStyles = makeStyles((theme) => ({
   inline: {
     display: 'grid',
   },
+  innerWrapper: {
+    marginBottom: theme.spacing(2)
+  },
   blueIcon: {
     color: theme.palette.primary.main,
   },
@@ -188,7 +191,6 @@ const AddBareOsClusterPage = () => {
                   />
                 </FormFieldCard>
                 <FormFieldCard
-                  limitInputsWidth={false}
                   title={
                     <span>
                       Select nodes to add as <u>Master</u> nodes
@@ -203,7 +205,7 @@ const AddBareOsClusterPage = () => {
                     </div>
                   }
                 >
-                  <div>
+                  <div className={classes.innerWrapper}>
                     {/* Master nodes */}
                     {/* <Typography>Select one or more nodes to add to the cluster as <strong>master</strong> nodes</Typography> */}
                     <ClusterHostChooser
@@ -217,14 +219,12 @@ const AddBareOsClusterPage = () => {
                     />
 
                     {/* Workloads on masters */}
-                    <div>
-                      <CheckboxField
-                        id="allowWorkloadsOnMaster"
-                        onChange={(value) => setWizardContext({ allowWorkloadsOnMaster: value })}
-                        label="Make all Master nodes Master + Worker"
-                        info="It is highly recommended to not enable workloads on master nodes for production or critical workload clusters."
-                      />
-                    </div>
+                    <CheckboxField
+                      id="allowWorkloadsOnMaster"
+                      onChange={(value) => setWizardContext({ allowWorkloadsOnMaster: value })}
+                      label="Make all Master nodes Master + Worker"
+                      info="It is highly recommended to not enable workloads on master nodes for production or critical workload clusters."
+                    />
                   </div>
                   <Panel
                     titleVariant="subtitle2"
@@ -252,7 +252,6 @@ const AddBareOsClusterPage = () => {
                 onSubmit={setWizardContext}
                 triggerSubmit={onNext}
                 nowrap
-                limitInputsWidth={false}
               >
                 {/* Worker nodes */}
                 <FormFieldCard
@@ -271,8 +270,9 @@ const AddBareOsClusterPage = () => {
                   }
                 >
                   {/* <Typography>Select one or more nodes to add to the cluster as <strong>worker</strong> nodes</Typography> */}
-                  <div>
+                  <div className={classes.innerWrapper}>
                     <ClusterHostChooser
+                      className={classes.hostChooser}
                       multiple
                       id="workerNodes"
                       filterFn={allPass([
@@ -508,7 +508,6 @@ const AddBareOsClusterPage = () => {
                 onSubmit={setWizardContext}
                 triggerSubmit={onNext}
                 title="Finish and Review"
-                limitInputsWidth={false}
               >
                 <BareOsClusterReviewTable data={wizardContext} />
               </ValidatedForm>
