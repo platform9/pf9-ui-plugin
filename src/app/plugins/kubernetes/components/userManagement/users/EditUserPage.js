@@ -27,6 +27,7 @@ const listUrl = pathJoin(k8sPrefix, 'user_management#users')
 
 const useStyles = makeStyles((theme) => ({
   togglableField: {
+    width: 'fit-content',
     position: 'relative',
     '& .Mui-disabled': {
       color: theme.palette.text.primary,
@@ -74,6 +75,8 @@ const EditUserPage = () => {
   const [update, updating] = useDataUpdater(mngmUserActions.update, onComplete)
   const [roleAssignments, loadingRoleAssignments] = useDataLoader(mngmUserRoleAssignmentsLoader, {
     userId,
+  }, {
+    invalidateCache: true
   })
   const initialContext = useMemo(
     () => ({
@@ -106,7 +109,6 @@ const EditUserPage = () => {
             <WizardStep stepId="basic" label="Basic Info">
               <ValidatedForm
                 title="Basic Info"
-                limitInputsWidth={false}
                 initialValues={wizardContext}
                 onSubmit={setWizardContext}
                 triggerSubmit={onNext}
@@ -142,7 +144,6 @@ const EditUserPage = () => {
               <ValidatedForm
                 title="Tenants and Roles"
                 fullWidth
-                limitInputsWidth={false}
                 initialValues={wizardContext}
                 onSubmit={setWizardContext}
                 triggerSubmit={onNext}

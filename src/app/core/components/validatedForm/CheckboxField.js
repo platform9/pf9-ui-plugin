@@ -5,11 +5,13 @@ import { FormControl, FormControlLabel, FormHelperText } from '@material-ui/core
 import { withStyles } from '@material-ui/styles'
 import { withInfoTooltip } from 'app/core/components/InfoTooltip'
 import { compose } from 'app/utils/fp'
-import withFormContext, {
-  ValidatedFormInputPropTypes,
-} from 'core/components/validatedForm/withFormContext'
+import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
 
 const styles = (theme) => ({
+  root: {
+    minWidth: '50%',
+    width: 'fit-content',
+  },
   formControl: {
     marginTop: theme.spacing(1),
   },
@@ -41,7 +43,7 @@ class CheckboxField extends PureComponent {
     } = this.props
 
     return (
-      <div {...restProps}>
+      <div {...restProps} className={classes.root}>
         <FormControl
           id={id}
           onMouseEnter={onMouseEnter}

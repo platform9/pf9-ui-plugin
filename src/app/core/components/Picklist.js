@@ -35,7 +35,7 @@ const Picklist = React.forwardRef((props, ref) => {
     onChange,
     loading,
     formField,
-    multiple,
+    multiple = false,
     ...restProps
   } = props
   const classes = useStyles(props)
@@ -60,7 +60,6 @@ const Picklist = React.forwardRef((props, ref) => {
     [options],
   )
   const selectProps = useMemo(() => ({ displayEmpty: true, multiple }), [])
-
   const handleChange = useCallback(
     (e) => {
       // Hack to work around the fact that Material UI's "Select" will ignore
@@ -124,7 +123,7 @@ Picklist.propTypes = {
   showNone: PropTypes.bool,
   value: valuePropType,
   variant: PropTypes.string,
-  multiple: Progress.bool,
+  multiple: PropTypes.bool,
 }
 
 Picklist.defaultProps = {

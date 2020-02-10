@@ -67,7 +67,6 @@ const EditTenantPage = () => {
             <WizardStep stepId="basic" label="Basic Info">
               <ValidatedForm
                 title="Basic Info"
-                limitInputsWidth={false}
                 initialValues={wizardContext}
                 onSubmit={setWizardContext}
                 triggerSubmit={onNext}
@@ -82,7 +81,6 @@ const EditTenantPage = () => {
               </Typography>
               <ValidatedForm
                 title="Users and Roles"
-                limitInputsWidth={false}
                 fullWidth
                 initialValues={wizardContext}
                 onSubmit={setWizardContext}
