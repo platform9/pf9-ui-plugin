@@ -144,7 +144,7 @@ export const mngmTenantRoleAssignmentsLoader = createContextLoader(
   mngmTenantRoleAssignmentsCacheKey,
   async ({ tenantId }) => (await keystone.getTenantRoleAssignments(tenantId)) || emptyArr,
   {
-    uniqueIdentifier: ['user.id', 'role.id'],
+    uniqueIdentifier: ['user.id', 'role.id', 'scope.project.id'],
     indexBy: 'tenantId',
   },
 )

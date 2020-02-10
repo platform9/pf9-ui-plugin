@@ -1,5 +1,5 @@
 import withFormContext from 'core/components/validatedForm/withFormContext'
-import React, { useState, useCallback, useMemo } from 'react'
+import React, { useState, useCallback, useMemo, useEffect } from 'react'
 import { noop, emptyObj, emptyArr } from 'utils/fp'
 import { pluck, pickAll, prop, assoc, partition, uniq } from 'ramda'
 import { FormControl, FormHelperText } from '@material-ui/core'
@@ -44,6 +44,10 @@ const TenantRolesTableField = withFormContext(
     // Put the selected roles first
     const rows = useMemo(() => [...initialSelectedRows, ...unselectedRows], [initialSelectedRows])
     const [selectedRows, setSelectedRows] = useState(initialSelectedRows)
+    useEffect(() => {
+      setSelectedRows(initialSelectedRows)
+    }, [initialSelectedRows])
+
     const handleSelectedRowsChange = useCallback(
       (selectedRows) => {
         const selectedRolesIds = pluck('id', selectedRows)
@@ -92,7 +96,7 @@ const TenantRolesTableField = withFormContext(
     return (
       <FormControl id={id} error={hasError}>
         <ListTable
-          rolesLoading={rolesLoading}
+          loading={rolesLoading}
           onSortChange={noop}
           searchTarget="name"
           columns={columns}
