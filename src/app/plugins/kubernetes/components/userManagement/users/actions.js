@@ -120,6 +120,7 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
         [roleId]: acc[roleId] ? [...acc[roleId], tenantId] : [tenantId],
       }
     }, {})
+
     const mergedRolesIds = uniq([...keys(prevRoleAssignments), ...keys(roleAssignments)])
 
     // Perform the api calls to update the user and the tenant/role assignments
@@ -137,6 +138,7 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
         return mergedTenantsIds.map((tenantId) => {
           const previouslyHadRoleTenantPair = prevRoleTenants.includes(tenantId)
           const currentlyHasRoleTenantPair = currRoleTenants.includes(tenantId)
+
           if (previouslyHadRoleTenantPair && !currentlyHasRoleTenantPair) {
             // Remove unselected user/role pair
             return keystone.deleteUserRole({ userId, tenantId, roleId }).then(always(null))
@@ -160,6 +162,7 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
         },
       )(null),
     ])
+    mngmTenantActions.invalidateCache()
     return updatedUser
   },
   dataMapper: async (users, { systemUsers }, loadFromContext) => {
@@ -242,7 +245,7 @@ export const mngmUserRoleAssignmentsLoader = createContextLoader(
   mngmUserRoleAssignmentsCacheKey,
   async ({ userId }) => (await keystone.getUserRoleAssignments(userId)) || emptyArr,
   {
-    uniqueIdentifier: ['user.id', 'role.id'],
+    uniqueIdentifier: ['user.id', 'role.id', 'scope.project.id'],
     indexBy: 'userId',
   },
 )
