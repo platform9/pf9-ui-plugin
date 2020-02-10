@@ -85,7 +85,7 @@ const PodSetup = ({ onComplete, initialPanel }: Props) => {
           skipConfirmTitle="Skip the pod creation step in your getting started wizard?"
         >
           <Typography variant="body1">
-            Try out your fist Kubernetes app by launching a sample pod on your cluster
+            Try out your first Kubernetes app by launching a sample pod on your cluster
           </Typography>
           <NextButton showForward={false} onClick={handleCreatePod}>
             Create Pod
