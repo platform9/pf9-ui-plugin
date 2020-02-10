@@ -214,6 +214,11 @@ const theme = {
       aws: '#FF9800',
       azure: '#4AA3DF',
     },
+    stackedAreaChart: {
+      warning: '#FED16C',
+      critical: '#F5A623',
+      fatal: '#E44C34',
+    },
   },
   props: {},
   shadows: [
