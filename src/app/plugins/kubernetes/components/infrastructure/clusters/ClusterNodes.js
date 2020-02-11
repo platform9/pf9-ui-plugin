@@ -33,7 +33,7 @@ const ClusterNodes = () => {
     title: 'Nodes',
     name: 'nodes',
     columns: tableColumns,
-    emptyText: 'No instances found.',
+    emptyText: 'Nothing yet, waiting for nodes...',
     uniqueIdentifier: 'uuid',
     onReload: handleRefresh,
     showCheckboxes: false,
