@@ -188,7 +188,17 @@ export const NodeHealthWithTasksToggler: FC = () => {
   )
 
   if (!selectedNode) {
-    return <NoContentMessage message="No instances found." />
+    return (
+      <>
+        <PollingData
+          hidden
+          loading={loadingNodes || loadingClusters}
+          onReload={handleReload}
+          refreshDuration={oneSecond * 5}
+        />
+        <NoContentMessage message="Nothing yet, waiting for nodes..." />
+      </>
+    )
   }
 
   return (
