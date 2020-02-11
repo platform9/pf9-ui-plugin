@@ -220,14 +220,14 @@ class ValidatedForm extends PureComponent {
       formActions,
       maxWidth,
       inputsWidth,
-      nowrap,
+      elevated,
     } = this.props
     const inputs = children instanceof Function ? children(this.state) : children
     return (
       <form onSubmit={this.handleSubmit} className={classes.root} id={id}>
         <ValidatedFormProvider value={this.state}>
           {debug && <ValidatedFormDebug />}
-          {nowrap ? (
+          {!elevated ? (
             inputs
           ) : (
             <FormFieldCard
@@ -281,8 +281,8 @@ ValidatedForm.propTypes = {
 
   inputsWidth: PropTypes.number,
 
-  // Don't wrap the children within a FormFieldCard
-  nowrap: PropTypes.bool,
+  // Wrap the children within a FormFieldCard
+  elevated: PropTypes.bool,
 }
 
 ValidatedForm.defaultProps = {
@@ -290,6 +290,7 @@ ValidatedForm.defaultProps = {
   clearOnSubmit: false,
   debug: false,
   maxWidth: 715,
+  elevated: true,
 }
 
 export default ValidatedForm
