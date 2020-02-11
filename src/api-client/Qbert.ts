@@ -721,6 +721,11 @@ class Qbert extends ApiService {
     )
   }
 
+  getPrometheusAlerts = async (clusterUuid) => {
+    const response = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/alerts`)
+    return normalizeClusterizedResponse(clusterUuid, response)
+  }
+
   getPrometheusAlertManagers = async (clusterUuid) => {
     const response = await this.client.basicGet(
       `${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/alertmanagers`,

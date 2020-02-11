@@ -13,7 +13,7 @@ import {
   TableRow,
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
-import { compose, ensureFunction, except } from 'app/utils/fp'
+import { compose, ensureFunction, except, matchArrayProperties } from 'app/utils/fp'
 import MoreMenu from 'core/components/MoreMenu'
 import {
   max,
@@ -91,6 +91,16 @@ class ListTable extends PureComponent {
       searchTerm: '',
       filterValues: {},
     }
+  }
+
+  componentDidUpdate(prevProps) {
+    const { data, uniqueIdentifier } = this.props
+    if (equals(prevProps.data, data)) { return }
+    const { selected } = this.state
+    const carriedOver = matchArrayProperties(data, selected, uniqueIdentifier)
+    this.setState({
+      selected: carriedOver,
+    })
   }
 
   handleRequestSort = (event, property) => {

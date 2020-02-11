@@ -306,3 +306,11 @@ export const switchCase = (defaultValue, ...cases) => (input) =>
  */
 export const objSwitchCase = (casesObj, defaultValue) => (input) =>
   casesObj.hasOwnProperty(input) ? casesObj[input] : defaultValue
+
+export const matchArrayProperties = (originalArray, comparisonArray, property) => (
+  originalArray.filter((instance) => (
+    comparisonArray.find((_instance) => (
+      equals(instance[property], _instance[property])
+    ))
+  ))
+)
