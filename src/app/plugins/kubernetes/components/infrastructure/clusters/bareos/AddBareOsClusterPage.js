@@ -178,7 +178,7 @@ const AddBareOsClusterPage = () => {
                 initialValues={wizardContext}
                 onSubmit={setWizardContext}
                 triggerSubmit={onNext}
-                nowrap
+                elevated={false}
               >
                 {/* Cluster Name */}
                 <FormFieldCard title="Name your Kubernetes Cluster">
@@ -251,7 +251,7 @@ const AddBareOsClusterPage = () => {
                 initialValues={wizardContext}
                 onSubmit={setWizardContext}
                 triggerSubmit={onNext}
-                nowrap
+                elevated={false}
               >
                 {/* Worker nodes */}
                 <FormFieldCard
