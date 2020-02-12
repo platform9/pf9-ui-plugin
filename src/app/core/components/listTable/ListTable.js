@@ -13,7 +13,7 @@ import {
   TableRow,
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
-import { compose, ensureFunction, except, matchArrayProperties } from 'app/utils/fp'
+import { compose, ensureFunction, except } from 'app/utils/fp'
 import MoreMenu from 'core/components/MoreMenu'
 import {
   max,
@@ -93,13 +93,18 @@ class ListTable extends PureComponent {
     }
   }
 
+  // Reset selected when the list of items is updated
+  // This will be the case upon updating the cluster dropdown,
+  // refreshing the list, or if there is any other reason
+  // that the list changes.
+  // In the future we may want to look into triggering this
+  // only for a subset of above reasons.
   componentDidUpdate(prevProps) {
-    const { data, uniqueIdentifier } = this.props
+    const { data } = this.props
     if (equals(prevProps.data, data)) { return }
-    const { selected } = this.state
-    const carriedOver = matchArrayProperties(data, selected, uniqueIdentifier)
+
     this.setState({
-      selected: carriedOver,
+      selected: [],
     })
   }
 
