@@ -1,7 +1,7 @@
 import React from 'react'
 import { PieChart, Pie, Cell } from 'recharts'
 import { useTheme } from '@material-ui/core/styles'
-import { path } from 'ramda'
+import { pathStr } from 'utils/fp'
 
 export interface PieDataEntry {
   value: number
@@ -46,7 +46,7 @@ const PieGraph = ({
         {...rest}
       >
         {items.map((entry, index) => (
-          <Cell key={entry.name} fill={path(entry.color.split('.'), theme.palette)} />
+          <Cell key={entry.name} fill={pathStr(entry.color, theme.palette)} />
         ))}
       </Pie>
       {percent !== undefined && (
