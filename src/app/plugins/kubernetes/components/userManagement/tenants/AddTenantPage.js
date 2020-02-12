@@ -38,6 +38,7 @@ const AddTenantPage = () => {
           <>
             <WizardStep stepId="basic" label="Basic Info">
               <ValidatedForm
+                title="Basic Info"
                 initialValues={wizardContext}
                 onSubmit={setWizardContext}
                 triggerSubmit={onNext}
@@ -52,6 +53,7 @@ const AddTenantPage = () => {
                 that can access this Tenant, and hence the clusters that map to this Tenant.
               </Typography>
               <ValidatedForm
+                title="Users and Roles"
                 fullWidth
                 initialValues={wizardContext}
                 onSubmit={setWizardContext}

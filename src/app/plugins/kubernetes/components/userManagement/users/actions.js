@@ -66,7 +66,7 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
     mngmTenantActions.invalidateCache()
   },
   createFn: async ({ username, displayname, password, roleAssignments }) => {
-    const defaultTenantId = pipe(keys, head)(roleAssignments)
+    const defaultTenantId = pipe(values, head, head)(roleAssignments)
     const createdUser = password
       ? await keystone.createUser({
           email: username,
@@ -87,9 +87,13 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
     await tryCatchAsync(
       () =>
         Promise.all(
-          Object.entries(roleAssignments).map(([tenantId, roleId]) =>
-            keystone.addUserRole({ userId: createdUser.id, tenantId, roleId }),
-          ),
+          Object.entries(roleAssignments)
+            .map(([roleId, tenants]) =>
+              tenants.map((tenantId) =>
+                keystone.addUserRole({ userId: createdUser.id, tenantId, roleId }),
+              ),
+            )
+            .flat(),
         ),
       (err) => {
         console.warn(err.message)
@@ -108,14 +112,16 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
     const prevRoleAssignmentsArr = await loadFromContext(mngmUserRoleAssignmentsCacheKey, {
       userId,
     })
-    const prevRoleAssignments = prevRoleAssignmentsArr.reduce(
-      (acc, roleAssignment) => ({
+    const prevRoleAssignments = prevRoleAssignmentsArr.reduce((acc, roleAssignment) => {
+      const roleId = pathStr('role.id', roleAssignment)
+      const tenantId = pathStr('scope.project.id', roleAssignment)
+      return {
         ...acc,
-        [pathStr('scope.project.id', roleAssignment)]: pathStr('role.id', roleAssignment),
-      }),
-      {},
-    )
-    const mergedTenantIds = keys({ ...prevRoleAssignments, ...roleAssignments })
+        [roleId]: acc[roleId] ? [...acc[roleId], tenantId] : [tenantId],
+      }
+    }, {})
+
+    const mergedRolesIds = uniq([...keys(prevRoleAssignments), ...keys(roleAssignments)])
 
     // Perform the api calls to update the user and the tenant/role assignments
     const updatedUserPromise = keystone.updateUser(userId, {
@@ -124,23 +130,26 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
       displayname,
       password: password || undefined,
     })
-    const updateTenantRolesPromises = mergedTenantIds.map((tenantId) => {
-      const prevRoleId = prevRoleAssignments[tenantId]
-      const currRoleId = roleAssignments[tenantId]
-      if (prevRoleId && !currRoleId) {
-        // Remove unselected user/role pair
-        return keystone.deleteUserRole({ userId, tenantId, roleId: prevRoleId }).then(always(null))
-      } else if (!prevRoleId && currRoleId) {
-        // Add new user and role
-        return keystone.addUserRole({ userId, tenantId, roleId: currRoleId })
-      } else if (prevRoleId && currRoleId && prevRoleId !== currRoleId) {
-        // Update changed role (delete current and add new)
-        return keystone
-          .deleteUserRole({ userId, tenantId, roleId: prevRoleId })
-          .then(() => keystone.addUserRole({ userId, tenantId, roleId: currRoleId }))
-      }
-      return Promise.resolve(null)
-    }, [])
+    const updateTenantRolesPromises = mergedRolesIds
+      .map((roleId) => {
+        const prevRoleTenants = prevRoleAssignments[roleId] || emptyArr
+        const currRoleTenants = roleAssignments[roleId] || emptyArr
+        const mergedTenantsIds = uniq([...prevRoleTenants, ...currRoleTenants])
+        return mergedTenantsIds.map((tenantId) => {
+          const previouslyHadRoleTenantPair = prevRoleTenants.includes(tenantId)
+          const currentlyHasRoleTenantPair = currRoleTenants.includes(tenantId)
+
+          if (previouslyHadRoleTenantPair && !currentlyHasRoleTenantPair) {
+            // Remove unselected user/role pair
+            return keystone.deleteUserRole({ userId, tenantId, roleId }).then(always(null))
+          } else if (!previouslyHadRoleTenantPair && currentlyHasRoleTenantPair) {
+            // Add new user and role
+            return keystone.addUserRole({ userId, tenantId, roleId })
+          }
+          return Promise.resolve(null)
+        })
+      }, [])
+      .flat()
 
     // Resolve tenant and user/roles operation promises and filter out null responses
     const [updatedUser] = await Promise.all([
@@ -153,6 +162,7 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
         },
       )(null),
     ])
+    mngmTenantActions.invalidateCache()
     return updatedUser
   },
   dataMapper: async (users, { systemUsers }, loadFromContext) => {
@@ -235,7 +245,7 @@ export const mngmUserRoleAssignmentsLoader = createContextLoader(
   mngmUserRoleAssignmentsCacheKey,
   async ({ userId }) => (await keystone.getUserRoleAssignments(userId)) || emptyArr,
   {
-    uniqueIdentifier: ['user.id', 'role.id'],
+    uniqueIdentifier: ['user.id', 'role.id', 'scope.project.id'],
     indexBy: 'userId',
   },
 )

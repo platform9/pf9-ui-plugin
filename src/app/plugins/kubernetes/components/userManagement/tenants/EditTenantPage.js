@@ -66,6 +66,7 @@ const EditTenantPage = () => {
           <>
             <WizardStep stepId="basic" label="Basic Info">
               <ValidatedForm
+                title="Basic Info"
                 initialValues={wizardContext}
                 onSubmit={setWizardContext}
                 triggerSubmit={onNext}
@@ -79,6 +80,7 @@ const EditTenantPage = () => {
                 Which users can access this tenant?
               </Typography>
               <ValidatedForm
+                title="Users and Roles"
                 fullWidth
                 initialValues={wizardContext}
                 onSubmit={setWizardContext}

@@ -12,12 +12,12 @@ const dockerDocBaseUrl = 'https://docs.docker.com'
 export const qbertApiLink = `${k8sBaseUrl}/API-Reference/Qbert-API-Reference/`
 
 // Help
-export const gettingStartedHelpLink = `${k8sBaseUrl}/qucickstart/`
+export const gettingStartedHelpLink = `${k8sBaseUrl}/quickstart/`
 export const tutorialsHelpLink = `${k8sBaseUrl}/tutorials/virtualbox-mac/`
 export const slackLink = 'https://kplane.slack.com/'
 export const emailSupportLink = 'mailto:support-ft@platform9.com'
 export const forumHelpLink = `${pf9SupportBaseUrl}/hc/en-us/community/topics`
-export const pf9PmkArchitectureDigLink = `${pf9DocOrigin}/support/ha-for-baremetal-multimaster-kubernetes-cluster-service-type-load-balancer/`
+export const pf9PmkArchitectureDigLink = `${k8sBaseUrl}/multimaster-architecture-platform9-managed-kubernetes/`
 export const pmkDocumentationLink = `${k8sBaseUrl}/introduction/overview`
 
 // Aws
@@ -39,7 +39,6 @@ export const bareOSSetupDocumentationLink = `${k8sBaseUrl}/create-multimaster-ba
 
 // Clusters
 export const remoteMonitoringDocsLink = `${k8sBaseUrl}/enable-remote-monitoring/`
-export const managedContainerChecklistLink = `${pf9DocOrigin}/getting-started/managed-container-cloud-requirements-checklist`
 
 // Nodes
 export const nodeInstallTroubleshooting = `${k8sBaseUrl}/troubleshooting/node-install-status-check/`

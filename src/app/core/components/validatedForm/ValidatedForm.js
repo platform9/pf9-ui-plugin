@@ -7,6 +7,7 @@ import { parseValidator } from 'core/utils/fieldValidators'
 import { pathEq, toPairs, path, lensPath, over, set, identity, dissocPath, pick } from 'ramda'
 import { withRouter } from 'react-router-dom'
 import moize from 'moize'
+import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 
 export const ValidatedFormContext = React.createContext({})
 
@@ -18,14 +19,19 @@ const styles = (theme) => ({
     display: 'flex',
     flexFlow: 'column wrap',
     width: ({ fullWidth }) => (fullWidth ? '100%' : '50%'),
-    maxWidth: ({ fullWidth }) => (fullWidth ? null : 600),
+    maxWidth: ({ fullWidth, maxWidth }) => (fullWidth ? null : maxWidth),
     minWidth: 300,
     marginBottom: theme.spacing(1),
-    '& .MuiFormControl-root': {
-      width: '100%',
+    '& .MuiFormControl-root.validatedFormInput': {
+      width: 'fit-content',
+      minWidth: '50%',
       marginTop: theme.spacing(1.5),
       marginBottom: theme.spacing(1.5),
     },
+  },
+  formActions: {
+    display: 'flex',
+    marginLeft: theme.spacing(2),
   },
 })
 
@@ -202,13 +208,41 @@ class ValidatedForm extends PureComponent {
   }
 
   render() {
-    const { children, classes, debug, id } = this.props
+    const {
+      children,
+      classes,
+      debug,
+      id,
+      title,
+      link,
+      className,
+      topContent,
+      formActions,
+      maxWidth,
+      inputsWidth,
+      elevated,
+    } = this.props
+    const inputs = children instanceof Function ? children(this.state) : children
     return (
       <form onSubmit={this.handleSubmit} className={classes.root} id={id}>
         <ValidatedFormProvider value={this.state}>
           {debug && <ValidatedFormDebug />}
-          {children instanceof Function ? children(this.state) : children}
+          {!elevated ? (
+            inputs
+          ) : (
+            <FormFieldCard
+              title={title}
+              link={link}
+              topContent={topContent}
+              className={className}
+              maxWidth={maxWidth}
+              inputsWidth={inputsWidth}
+            >
+              {inputs}
+            </FormFieldCard>
+          )}
         </ValidatedFormProvider>
+        {formActions ? <div className={classes.formActions}>{formActions}</div> : null}
       </form>
     )
   }
@@ -234,11 +268,29 @@ ValidatedForm.propTypes = {
 
   // eslint-disable-next-line react/no-unused-prop-types
   fullWidth: PropTypes.bool,
+
+  maxWidth: PropTypes.number,
+
+  title: PropTypes.string,
+
+  link: PropTypes.node,
+
+  topContent: PropTypes.node,
+
+  formActions: PropTypes.node,
+
+  inputsWidth: PropTypes.number,
+
+  // Wrap the children within a FormFieldCard
+  elevated: PropTypes.bool,
 }
 
 ValidatedForm.defaultProps = {
+  fullWidth: true,
   clearOnSubmit: false,
   debug: false,
+  maxWidth: 715,
+  elevated: true,
 }
 
 export default ValidatedForm

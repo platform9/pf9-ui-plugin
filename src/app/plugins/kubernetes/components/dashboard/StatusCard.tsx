@@ -17,9 +17,9 @@ import Theme from 'core/themes/model'
 
 const useStyles = makeStyles<Theme, { actionRow: boolean; chartRow: boolean }>((theme) => ({
   headerIcon: {
-    fontSize: '36px',
-    color: theme.palette.dashboardCard.icon,
-    height: '32px',
+    fontSize: '30px',
+    color: theme.palette.text.secondary,
+    height: '26px',
     marginTop: '6px',
   },
   spinner: {
@@ -32,7 +32,7 @@ const useStyles = makeStyles<Theme, { actionRow: boolean; chartRow: boolean }>((
     backgroundColor: theme.palette.dashboardCard.background,
     minWidth: '270px',
     minHeight: '165px',
-    padding: theme.spacing(2, 1, 1, 1),
+    padding: theme.spacing(),
     borderRadius: '5px',
     transition: 'transform .1s ease',
     boxShadow:
@@ -64,7 +64,7 @@ const useStyles = makeStyles<Theme, { actionRow: boolean; chartRow: boolean }>((
   },
   header: {
     display: 'grid',
-    gridTemplateColumns: '1fr 45px',
+    gridTemplateColumns: '1fr 35px',
     alignItems: 'center',
     padding: theme.spacing(0, 1),
     borderBottom: `1px solid ${theme.palette.dashboardCard.divider}`,
