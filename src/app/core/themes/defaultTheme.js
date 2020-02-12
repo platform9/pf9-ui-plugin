@@ -128,6 +128,7 @@ const theme = {
       contrastText: '#FFF',
     },
     warning: {
+      lighter: '#FED16C',
       light: '#FFB74D',
       main: '#FF9800',
       dark: '#F57C00',
@@ -136,6 +137,15 @@ const theme = {
       light: '#81C784',
       main: '#4ADF74',
       dark: '#388E3C',
+    },
+    empty: {
+      main: '#EDEFF1',
+    },
+    aws: {
+      main: '#FF9800',
+    },
+    azure: {
+      main: '#4AA3DF',
     },
     grey: {
       50: '#FAFAFA',
@@ -204,20 +214,6 @@ const theme = {
     code: {
       background: '#FDF6F5',
       text: '#E5513A',
-    },
-    pieChart: {
-      success: '#4ADF74',
-      warning: '#FED16C',
-      error: '#E44C34',
-      unknown: '#F5A623',
-      empty: '#EDEFF1',
-      aws: '#FF9800',
-      azure: '#4AA3DF',
-    },
-    stackedAreaChart: {
-      warning: '#FED16C',
-      critical: '#F5A623',
-      fatal: '#E44C34',
     },
   },
   props: {},

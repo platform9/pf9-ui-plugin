@@ -1,6 +1,7 @@
 import React from 'react'
-import {AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip} from 'recharts'
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts'
 import { useTheme } from '@material-ui/core/styles'
+import { path } from 'ramda'
 
 // Usage:
 // const exampleData = [
@@ -52,7 +53,14 @@ const StackedAreaChart = ({ data, width=600, height=400, types, xAxis, ...rest }
       <YAxis/>
       <Tooltip/>
       {types.map(({ name, color }) => (
-        <Area type="monotone" dataKey={name} stackId="1" stroke={theme.palette.stackedAreaChart[color]} fill={theme.palette.stackedAreaChart[color]} />
+        <Area
+          key={name}
+          type="monotone"
+          dataKey={name}
+          stackId="1"
+          stroke={path(color.split('.'), theme.palette)}
+          fill={path(color.split('.'), theme.palette)}
+        />
       ))}
     </AreaChart>
   )
