@@ -93,6 +93,23 @@ class ListTable extends PureComponent {
     }
   }
 
+  // Reset selected when the list of items is updated
+  // This will be the case upon updating the cluster dropdown,
+  // refreshing the list, or if there is any other reason
+  // that the list changes.
+  // In the future we may want to look into triggering this
+  // only for a subset of above reasons.
+  componentDidUpdate(prevProps) {
+    const { data } = this.props
+    if (prevProps.data.length === data.length
+      && equals(prevProps.data, data)
+    ) { return }
+
+    this.setState({
+      selected: [],
+    })
+  }
+
   handleRequestSort = (event, property) => {
     const { onSortChange } = this.props
     const orderBy = property
