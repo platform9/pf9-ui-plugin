@@ -14,14 +14,6 @@ import clsx from 'clsx'
 @withStyles((theme) => ({
   dropdownButton: { cursor: 'pointer' },
 
-  // Unfortunately the `anchorEl` system in Material-UI is extremely
-  // buggy.  The suggestions need to have a reference to the textfield
-  // to figure out what width to set itself to.  I wasted a lot of
-  // time and things still don't work.  For now I'm just hard-coding
-  // the width.  The fixed width allows us to make the textfield and
-  // the suggestions the same width.
-  container: { width: '350px' },
-
   absolute: { position: 'absolute', zIndex: '9999' },
   relative: { position: 'relative' },
 }))

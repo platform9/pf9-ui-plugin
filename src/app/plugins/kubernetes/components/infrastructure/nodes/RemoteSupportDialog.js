@@ -30,7 +30,7 @@ const RemoteSupportDialog = ({ rows: [node], onClose }) => {
   return (
     <Dialog open onClose={onClose} onClick={stopPropagation}>
       <DialogTitle>Configure Advanced Remote Support</DialogTitle>
-      <ValidatedForm initialValues={initialValues} fullWidth onSubmit={handleSubmit}>
+      <ValidatedForm elevated={false} initialValues={initialValues} fullWidth onSubmit={handleSubmit}>
         <Progress loading={updatingNode} renderContentOnMount maxHeight={60}>
           <DialogContent>
             <p>
