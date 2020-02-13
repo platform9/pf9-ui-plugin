@@ -55,7 +55,8 @@ const CodeMirror = ({
   onChange,
   options,
   info,
-  placement = 'top-end',
+  placement,
+  className,
   ...restProps
 }) => {
   const codeMirrorInput = createRef()
@@ -89,7 +90,7 @@ const CodeMirror = ({
 
   return (
     <InfoTooltip open={open} info={info} placement={placement}>
-      <FormControl id={id} error={hasError} fullWidth>
+      <FormControl id={id} error={hasError} className={className}>
         <FormLabel>
           <Typography className={coderMirrorHeader} variant="body1">
             {label}
