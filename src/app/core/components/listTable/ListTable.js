@@ -101,7 +101,9 @@ class ListTable extends PureComponent {
   // only for a subset of above reasons.
   componentDidUpdate(prevProps) {
     const { data } = this.props
-    if (equals(prevProps.data, data)) { return }
+    if (prevProps.data.length === data.length
+      && equals(prevProps.data, data)
+    ) { return }
 
     this.setState({
       selected: [],
