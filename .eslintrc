@@ -23,7 +23,7 @@
   ],
 
   "rules": {
-    "max-len": ["warn", { "code": 100, "tabWidth": 2 }],
+    "max-len": 0,
     "semi": ["error", "never"],
     "comma-dangle": [
       "error",
