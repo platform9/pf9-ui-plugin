@@ -4,6 +4,7 @@ import { makeStyles } from '@material-ui/styles'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { useTheme } from '@material-ui/core/styles'
 import { Theme, Typography } from '@material-ui/core'
+import { pathStr } from 'utils/fp'
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -49,7 +50,7 @@ export const PieLegend = ({ data }) => {
                 <td>
                   <FontAwesomeIcon
                     solid
-                    style={{ color: theme.palette.pieChart[entry.color] }}
+                    style={{ color: pathStr(entry.color, theme.palette) }}
                     size="1x"
                     className={legendCircle}
                   >
