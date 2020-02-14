@@ -172,7 +172,6 @@ const createBareOSCluster = async (data = {}, loadFromContext) => {
     'workerNodes',
     'masterVipIpv4',
     'masterVipIface',
-    'metallbCidr',
     'externalDnsName',
     'containersCidr',
     'servicesCidr',
@@ -183,6 +182,7 @@ const createBareOSCluster = async (data = {}, loadFromContext) => {
   const body = pick(keysToPluck, data)
 
   if (data.enableMetallb) {
+    body.enableMetallb = data.enableMetallb
     body.metallbCidr = data.metallbCidr
   }
 
