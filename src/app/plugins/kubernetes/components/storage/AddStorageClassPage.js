@@ -173,7 +173,6 @@ const CustomizeStep = ({ wizardContext, onSubmit, triggerSubmit }) => {
           options={codeMirrorOptions}
           onChange={getParamsUpdater('storageClassYaml')}
           value={params.storageClassYaml}
-          info="In case of a conflict with options selected on the previous page, changes you make here will override them."
           required
         />
       </ValidatedForm>

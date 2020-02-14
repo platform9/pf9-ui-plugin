@@ -13,6 +13,7 @@ import SearchIcon from '@material-ui/icons/Search'
 import * as Fuse from 'fuse.js'
 import { Typography, FormHelperText } from '@material-ui/core'
 import { emptyArr } from 'utils/fp'
+import clsx from 'clsx'
 
 const FUSE_OPTIONS = {
   keys: ['value', 'label'],
@@ -90,6 +91,7 @@ const MultiSelect = React.forwardRef(
       onChange,
       maxOptions,
       sortSelectedFirst,
+      className,
     },
     ref,
   ) => {
@@ -121,7 +123,7 @@ const MultiSelect = React.forwardRef(
     }
 
     return (
-      <FormControl className={classes.container} id={id} error={hasError} ref={ref}>
+      <FormControl className={clsx(classes.container, className)} id={id} error={hasError} ref={ref}>
         <Typography className={classes.label} variant="caption">
           {required ? `${label} *` : label}
         </Typography>

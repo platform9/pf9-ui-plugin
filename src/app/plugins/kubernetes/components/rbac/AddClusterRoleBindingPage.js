@@ -12,37 +12,13 @@ import useParams from 'core/hooks/useParams'
 import useReactRouter from 'use-react-router'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import FormWrapper from 'core/components/FormWrapper'
-import { makeStyles } from '@material-ui/styles'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
-
-const useStyles = makeStyles((theme) => ({
-  formWidth: {
-    width: 715,
-  },
-  tableWidth: {
-    width: 650, // MultiSelect has a width: 100%; this is so it doesn't overlay on the card
-    marginBottom: theme.spacing(),
-    paddingLeft: theme.spacing(),
-  },
-  inputWidth: {
-    maxWidth: 350,
-    paddingLeft: theme.spacing(),
-  },
-  blueIcon: {
-    color: theme.palette.primary.main,
-  },
-  submit: {
-    display: 'flex',
-    marginLeft: theme.spacing(2),
-  },
-}))
 
 const defaultParams = {
   users: [],
   groups: [],
 }
 export const AddClusterRoleBindingForm = () => {
-  const classes = useStyles()
   const { params, getParamsUpdater } = useParams(defaultParams)
   const { history } = useReactRouter()
   const onComplete = (success) => success && history.push('/ui/kubernetes/rbac#clusterRoleBindings')
@@ -54,49 +30,44 @@ export const AddClusterRoleBindingForm = () => {
 
   return (
     <FormWrapper title="Add Cluster Role Binding" backUrl="/ui/kubernetes/rbac#clusterRoleBindings">
-      <ValidatedForm onSubmit={handleSubmit(params)}>
-        <div className={classes.formWidth}>
-          <FormFieldCard title="Basic Details">
-            <div className={classes.inputWidth}>
-              <TextField id="name" label="Name" required />
-              <PicklistField
-                DropdownComponent={ClusterPicklist}
-                id="clusterId"
-                label="Cluster"
-                onChange={getParamsUpdater('clusterId')}
-                value={params.clusterId}
-                required
-              />
-              <PicklistField
-                DropdownComponent={RolePicklist}
-                disabled={!params.clusterId}
-                id="clusterRole"
-                label="Cluster Role"
-                clusterId={params.clusterId}
-                onChange={getParamsUpdater('clusterRole')}
-                value={params.clusterRole}
-                required
-              />
-            </div>
-          </FormFieldCard>
-          <FormFieldCard title="Assign Users / Groups To This Binding">
-            <div className={classes.tableWidth}>
-              <UserMultiSelect
-                id="users"
-                info="Select users to assign this role"
-                onChange={getParamsUpdater('users')}
-              />
-              <GroupMultiSelect
-                id="groups"
-                info="Select groups to assign this role"
-                onChange={getParamsUpdater('groups')}
-              />
-            </div>
-          </FormFieldCard>
-        </div>
-        <div className={classes.submit}>
-          <SubmitButton>Add Cluster Role Binding</SubmitButton>
-        </div>
+      <ValidatedForm
+        elevated={false}
+        formActions={<SubmitButton>Add Cluster Role Binding</SubmitButton>}
+        onSubmit={handleSubmit(params)}
+      >
+        <FormFieldCard title="Basic Details">
+          <TextField id="name" label="Name" required />
+          <PicklistField
+            DropdownComponent={ClusterPicklist}
+            id="clusterId"
+            label="Cluster"
+            onChange={getParamsUpdater('clusterId')}
+            value={params.clusterId}
+            required
+          />
+          <PicklistField
+            DropdownComponent={RolePicklist}
+            disabled={!params.clusterId}
+            id="clusterRole"
+            label="Cluster Role"
+            clusterId={params.clusterId}
+            onChange={getParamsUpdater('clusterRole')}
+            value={params.clusterRole}
+            required
+          />
+        </FormFieldCard>
+        <FormFieldCard title="Assign Users / Groups To This Binding">
+          <UserMultiSelect
+            id="users"
+            info="Select users to assign this role"
+            onChange={getParamsUpdater('users')}
+          />
+          <GroupMultiSelect
+            id="groups"
+            info="Select groups to assign this role"
+            onChange={getParamsUpdater('groups')}
+          />
+        </FormFieldCard>
       </ValidatedForm>
     </FormWrapper>
   )
