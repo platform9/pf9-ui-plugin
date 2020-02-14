@@ -18,15 +18,15 @@ const styles = (theme) => ({
   root: {
     display: 'flex',
     flexFlow: 'column wrap',
-    width: ({ fullWidth }) => (fullWidth ? '100%' : '50%'),
-    maxWidth: ({ fullWidth, maxWidth }) => (fullWidth ? null : maxWidth),
-    minWidth: 300,
+    minWidth: 350,
     marginBottom: theme.spacing(1),
     '& .MuiFormControl-root.validatedFormInput': {
-      width: 'fit-content',
-      minWidth: '50%',
+      width: '50%',
       marginTop: theme.spacing(1.5),
       marginBottom: theme.spacing(1.5),
+    },
+    '& .MuiButtonBase-root ': {
+      alignSelf: 'flex-start',
     },
   },
   formActions: {
@@ -266,9 +266,6 @@ ValidatedForm.propTypes = {
 
   showErrorsOnBlur: PropTypes.bool,
 
-  // eslint-disable-next-line react/no-unused-prop-types
-  fullWidth: PropTypes.bool,
-
   maxWidth: PropTypes.number,
 
   title: PropTypes.string,
@@ -286,7 +283,6 @@ ValidatedForm.propTypes = {
 }
 
 ValidatedForm.defaultProps = {
-  fullWidth: true,
   clearOnSubmit: false,
   debug: false,
   maxWidth: 715,

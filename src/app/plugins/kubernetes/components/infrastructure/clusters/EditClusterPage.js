@@ -71,7 +71,11 @@ const EditClusterPage = () => {
       message={updating ? 'Submitting form...' : 'Loading Cluster...'}
       backUrl={listUrl}
     >
-      <ValidatedForm initialValues={initialValues} onSubmit={handleSubmit}>
+      <ValidatedForm
+        formActions={<SubmitButton>Update Cluster</SubmitButton>}
+        initialValues={initialValues}
+        onSubmit={handleSubmit}
+      >
         {/* Cluster Name */}
         <TextField id="name" label="Name" info="Name of the cluster" required />
 
@@ -88,7 +92,6 @@ const EditClusterPage = () => {
 
         {/* Tags */}
         <KeyValuesField id="tags" label="Tags" info="Edit tag metadata on this cluster" />
-        <SubmitButton>Update Cluster</SubmitButton>
       </ValidatedForm>
     </FormWrapper>
   )
