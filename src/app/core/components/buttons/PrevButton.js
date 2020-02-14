@@ -17,7 +17,7 @@ const styles = (theme) => ({
 const PrevButton = ({ children, classes, disabled, ...rest }) => {
   const params = {
     className: classes.baseButton,
-    color: disabled ? 'primary' : 'primary',
+    color: disabled ? 'secondary' : 'primary',
     variant: 'outlined',
     disabled,
     ...rest,
