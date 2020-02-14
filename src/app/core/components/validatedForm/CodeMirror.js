@@ -26,6 +26,9 @@ const defaultOptions = {
 // These styles are to match CodeMirrors. We need to find a good way
 // to re-define their styles so we can use common variables
 const useStyles = makeStyles((theme) => ({
+  root: {
+    margin: theme.spacing(1.5, 0)
+  },
   coderMirrorHeader: {
     position: 'relative',
     background: '#F3F3F3',
@@ -49,18 +52,16 @@ const CodeMirror = ({
   label,
   value,
   getCurrentValue,
-  classes,
   hasError,
   errorMessage,
   onChange,
   options,
   info,
-  placement,
-  className,
+  placement = 'top-end',
   ...restProps
 }) => {
   const codeMirrorInput = createRef()
-  const { coderMirrorHeader } = useStyles()
+  const classes = useStyles()
   const [open, setOpen] = React.useState(false)
   const openTooltip = useCallback(() => setOpen(true), [])
   const closeTooltip = useCallback(() => setOpen(false), [])
@@ -90,9 +91,9 @@ const CodeMirror = ({
 
   return (
     <InfoTooltip open={open} info={info} placement={placement}>
-      <FormControl id={id} error={hasError} className={className}>
+      <FormControl id={id} error={hasError} className={classes.root}>
         <FormLabel>
-          <Typography className={coderMirrorHeader} variant="body1">
+          <Typography className={classes.coderMirrorHeader} variant="body1">
             {label}
           </Typography>
         </FormLabel>

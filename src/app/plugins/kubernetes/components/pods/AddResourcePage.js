@@ -182,7 +182,6 @@ export const AddResourceForm = ({ resourceType = 'pod' }) => {
             validations={codeMirrorValidations}
             onChange={getParamsUpdater('yaml')}
             value={params.yaml}
-            info="Manually input the resource YAML. For more information, see the articles linked at the top of this form"
             options={codeMirrorOptions}
           />
           <Button color="secondary" variant="contained" onClick={insertYamlTemplate}>
