@@ -45,7 +45,7 @@ const UpdateRoleBindingPage = () => {
       loading={loading || updating}
       message={loading ? 'Loading role binding...' : 'Submitting form...'}
     >
-      <ValidatedForm onSubmit={handleSubmit} title="Assign Users To This Binding">
+      <ValidatedForm onSubmit={handleSubmit} title="Assign Users to this Binding">
         <PresetField label="Name" value={roleBinding.name} />
         <PresetField label="Cluster" value={roleBinding.clusterName} />
         <PresetField label="Namespace" value={roleBinding.namespace} />

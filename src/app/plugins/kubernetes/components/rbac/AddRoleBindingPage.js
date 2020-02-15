@@ -64,7 +64,7 @@ export const AddRoleBindingForm = () => {
             required
           />
         </FormFieldCard>
-        <FormFieldCard title="Assign Users To This Binding">
+        <FormFieldCard title="Assign Users to this Binding">
           <UserMultiSelect
             id="users"
             info="Select users to assign this role"

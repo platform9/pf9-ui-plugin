@@ -55,7 +55,7 @@ export const AddClusterRoleBindingForm = () => {
             required
           />
         </FormFieldCard>
-        <FormFieldCard title="Assign Users To This Cluster Binding">
+        <FormFieldCard title="Assign Users to this Cluster Binding">
           <UserMultiSelect
             id="users"
             info="Select users to assign this role"

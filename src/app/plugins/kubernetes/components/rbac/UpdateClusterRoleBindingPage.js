@@ -50,7 +50,7 @@ const UpdateClusterRoleBindingPage = () => {
       loading={loading || updating}
       message={loading ? 'Loading cluster role...' : 'Submitting form...'}
     >
-      <ValidatedForm onSubmit={handleSubmit} title="Assign Users To This Cluster Binding">
+      <ValidatedForm onSubmit={handleSubmit} title="Assign Users to this Cluster Binding">
         <PresetField label="Name" value={clusterRoleBinding.name} />
         <PresetField label="Cluster" value={clusterRoleBinding.clusterName} />
         {clusterRoleBinding.roleRef && (
