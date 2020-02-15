@@ -9,7 +9,6 @@ import useReactRouter from 'use-react-router'
 import { propEq } from 'ramda'
 import useParams from 'core/hooks/useParams'
 import UserMultiSelect from 'k8s/components/common/UserMultiSelect'
-import GroupMultiSelect from 'k8s/components/common/GroupMultiSelect'
 import FormWrapper from 'core/components/FormWrapper'
 import PresetField from 'core/components/PresetField'
 
@@ -46,7 +45,7 @@ const UpdateRoleBindingPage = () => {
       loading={loading || updating}
       message={loading ? 'Loading role binding...' : 'Submitting form...'}
     >
-      <ValidatedForm onSubmit={handleSubmit}>
+      <ValidatedForm onSubmit={handleSubmit} title="Assign Users to this Binding">
         <PresetField label="Name" value={roleBinding.name} />
         <PresetField label="Cluster" value={roleBinding.clusterName} />
         <PresetField label="Namespace" value={roleBinding.namespace} />
@@ -57,14 +56,6 @@ const UpdateRoleBindingPage = () => {
             info="Select users to assign this role"
             onChange={getParamsUpdater('users')}
             initialValue={roleBinding.users}
-          />
-        )}
-        {roleBinding.groups && (
-          <GroupMultiSelect
-            id="groups"
-            info="Select groups to assign this role"
-            onChange={getParamsUpdater('groups')}
-            initialValue={roleBinding.groups}
           />
         )}
         <SubmitButton>Update Role Binding</SubmitButton>

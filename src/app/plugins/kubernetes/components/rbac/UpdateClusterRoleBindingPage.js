@@ -9,7 +9,6 @@ import useReactRouter from 'use-react-router'
 import { propEq } from 'ramda'
 import useParams from 'core/hooks/useParams'
 import UserMultiSelect from 'k8s/components/common/UserMultiSelect'
-import GroupMultiSelect from 'k8s/components/common/GroupMultiSelect'
 import FormWrapper from 'core/components/FormWrapper'
 import PresetField from 'core/components/PresetField'
 
@@ -51,7 +50,7 @@ const UpdateClusterRoleBindingPage = () => {
       loading={loading || updating}
       message={loading ? 'Loading cluster role...' : 'Submitting form...'}
     >
-      <ValidatedForm onSubmit={handleSubmit}>
+      <ValidatedForm onSubmit={handleSubmit} title="Assign Users to this Cluster Binding">
         <PresetField label="Name" value={clusterRoleBinding.name} />
         <PresetField label="Cluster" value={clusterRoleBinding.clusterName} />
         {clusterRoleBinding.roleRef && (
@@ -65,14 +64,7 @@ const UpdateClusterRoleBindingPage = () => {
             initialValue={clusterRoleBinding.users}
           />
         )}
-        {clusterRoleBinding.groups && (
-          <GroupMultiSelect
-            id="groups"
-            info="Select groups to assign this role"
-            onChange={getParamsUpdater('groups')}
-            initialValue={clusterRoleBinding.groups}
-          />
-        )}
+
         <SubmitButton>Update Cluster Role Binding</SubmitButton>
       </ValidatedForm>
     </FormWrapper>

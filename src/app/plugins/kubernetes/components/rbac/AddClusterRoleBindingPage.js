@@ -4,7 +4,6 @@ import PicklistField from 'core/components/validatedForm/PicklistField'
 import SubmitButton from 'core/components/SubmitButton'
 import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
 import UserMultiSelect from 'k8s/components/common/UserMultiSelect'
-import GroupMultiSelect from 'k8s/components/common/GroupMultiSelect'
 import RolePicklist from './RolePicklist'
 import TextField from 'core/components/validatedForm/TextField'
 import { clusterRoleBindingActions } from './actions'
@@ -56,16 +55,11 @@ export const AddClusterRoleBindingForm = () => {
             required
           />
         </FormFieldCard>
-        <FormFieldCard title="Assign Users / Groups To This Binding">
+        <FormFieldCard title="Assign Users to this Cluster Binding">
           <UserMultiSelect
             id="users"
             info="Select users to assign this role"
             onChange={getParamsUpdater('users')}
-          />
-          <GroupMultiSelect
-            id="groups"
-            info="Select groups to assign this role"
-            onChange={getParamsUpdater('groups')}
           />
         </FormFieldCard>
       </ValidatedForm>

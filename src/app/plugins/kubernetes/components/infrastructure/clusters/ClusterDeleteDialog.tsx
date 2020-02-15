@@ -30,7 +30,7 @@ const ClusterDeleteDialog: React.FC<IClusterDeleteDialog> = ({ rows: [cluster], 
     // eslint-disable-next-line no-constant-condition
     false && success && cluster?.nodes?.length > 0 ? setShowDeauthNodeDialog(true) : onClose(),
   )
-  const title = `Confirm delete cluster "${cluster?.name}"?`
+  const title = `Permanently delete cluster "${cluster?.name}"?`
   const handleDelete = useCallback(async () => {
     await deleteCluster(cluster)
   }, [cluster])
@@ -39,23 +39,26 @@ const ClusterDeleteDialog: React.FC<IClusterDeleteDialog> = ({ rows: [cluster], 
 
   return (
     <Dialog open onClose={onClose} onClick={stopPropagation}>
-      <DialogTitle>{title}</DialogTitle>
-      <ValidatedForm initialValues={cluster} fullWidth onSubmit={handleDelete}>
+      <DialogTitle>
+        <Typography variant="subtitle1">{title}</Typography>
+      </DialogTitle>
+      <ValidatedForm initialValues={cluster} fullWidth onSubmit={handleDelete} elevated={false}>
         {({ values }) => (
           <Progress loading={deletingCluster} renderContentOnMount maxHeight={60}>
             <DialogContent>
               <Typography variant="body1" component="div">
-                This will permanently delete the cluster
+                Please type "<b>{cluster?.name}</b>" to confirm.
               </Typography>
+              <TextField id="clusterName" type="text" label="Cluster name" />
               <Alert
+                small
                 variant="warning"
                 message="When deleting a cluster all nodes will remain connected to Platform9"
               />
-              <TextField id="clusterName" type="text" label="Cluster name" />
             </DialogContent>
             <DialogActions>
-              <Button variant="contained" onClick={onClose}>
-                Cancel
+              <Button variant="outlined" color="secondary" onClick={onClose}>
+                Don't Delete
               </Button>
               <Button
                 type="submit"
@@ -64,7 +67,7 @@ const ClusterDeleteDialog: React.FC<IClusterDeleteDialog> = ({ rows: [cluster], 
                 disabled={values?.clusterName !== cluster?.name}
                 onClick={handleDelete}
               >
-                Confirm
+                Delete this cluster
               </Button>
             </DialogActions>
           </Progress>

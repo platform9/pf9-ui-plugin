@@ -4,7 +4,6 @@ import TextField from 'core/components/validatedForm/TextField'
 import Wizard from 'core/components/wizard/Wizard'
 import WizardStep from 'core/components/wizard/WizardStep'
 import FormWrapper from 'core/components/FormWrapper'
-import { Typography } from '@material-ui/core'
 import useReactRouter from 'use-react-router'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import { k8sPrefix } from 'app/constants'
@@ -48,10 +47,6 @@ const AddTenantPage = () => {
               </ValidatedForm>
             </WizardStep>
             <WizardStep stepId="users" label="Users and Roles">
-              <Typography variant="body1" component="p">
-                Select one or more users that should map to this Tenant. These are the only users
-                that can access this Tenant, and hence the clusters that map to this Tenant.
-              </Typography>
               <ValidatedForm
                 title="Users and Roles"
                 fullWidth
