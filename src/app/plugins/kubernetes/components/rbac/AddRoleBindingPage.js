@@ -5,7 +5,6 @@ import SubmitButton from 'core/components/SubmitButton'
 import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
 import NamespacePicklist from 'k8s/components/common/NamespacePicklist'
 import UserMultiSelect from 'k8s/components/common/UserMultiSelect'
-import GroupMultiSelect from 'k8s/components/common/GroupMultiSelect'
 import RolePicklist from './RolePicklist'
 import TextField from 'core/components/validatedForm/TextField'
 import { roleBindingActions } from './actions'
@@ -65,18 +64,12 @@ export const AddRoleBindingForm = () => {
             required
           />
         </FormFieldCard>
-        <FormFieldCard title="Assign Users / Groups To This Binding">
+        <FormFieldCard title="Assign Users To This Binding">
           <UserMultiSelect
             id="users"
             info="Select users to assign this role"
             onChange={getParamsUpdater('users')}
             value={params.users}
-          />
-          <GroupMultiSelect
-            id="groups"
-            info="Select groups to assign this role"
-            onChange={getParamsUpdater('groups')}
-            value={params.groups}
           />
         </FormFieldCard>
       </ValidatedForm>

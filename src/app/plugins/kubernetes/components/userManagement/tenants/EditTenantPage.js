@@ -1,7 +1,6 @@
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import TextField from 'core/components/validatedForm/TextField'
 import React, { useMemo, useCallback } from 'react'
-import { Typography } from '@material-ui/core'
 import UserRolesTableField from 'k8s/components/userManagement/tenants/UserRolesTableField'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import {
@@ -76,9 +75,6 @@ const EditTenantPage = () => {
               </ValidatedForm>
             </WizardStep>
             <WizardStep stepId="users" label="Users and Roles">
-              <Typography variant="body1" component="p">
-                Which users can access this tenant?
-              </Typography>
               <ValidatedForm
                 title="Users and Roles"
                 fullWidth

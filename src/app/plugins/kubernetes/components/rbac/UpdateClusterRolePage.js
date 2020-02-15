@@ -36,7 +36,7 @@ const UpdateClusterRolePage = () => {
       loading={loading || updating}
       message={loading ? 'Loading cluster role...' : 'Submitting form...'}
     >
-      <ValidatedForm onSubmit={handleSubmit}>
+      <ValidatedForm onSubmit={handleSubmit} title="API Permissions">
         <PresetField label="Name" value={clusterRole.name} />
         <PresetField label="Cluster" value={clusterRole.clusterName} />
         {clusterRole.clusterId && (

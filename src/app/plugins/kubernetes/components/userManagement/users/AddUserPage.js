@@ -97,9 +97,6 @@ const AddUserPage = () => {
               </ValidatedForm>
             </WizardStep>
             <WizardStep stepId="tenants" label="Tenants and Roles">
-              <Typography variant="body1" component="p">
-                Select one or more tenants that should map to this user.
-              </Typography>
               <ValidatedForm
                 title="Tenants and Roles"
                 fullWidth

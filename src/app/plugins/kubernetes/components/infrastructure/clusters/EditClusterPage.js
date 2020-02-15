@@ -72,6 +72,7 @@ const EditClusterPage = () => {
       backUrl={listUrl}
     >
       <ValidatedForm
+        title="Basic Details"
         formActions={<SubmitButton>Update Cluster</SubmitButton>}
         initialValues={initialValues}
         onSubmit={handleSubmit}
