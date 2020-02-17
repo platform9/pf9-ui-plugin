@@ -32,7 +32,7 @@ export const annotateCloudStack = (host) => {
 }
 
 export const annotateResmgrFields = (host) => {
-  const { resmgr } = host
+  const { resmgr = {} } = host
   return {
     ...host,
     id: resmgr.id,
@@ -51,7 +51,7 @@ export const annotateResmgrFields = (host) => {
 }
 
 export const annotateUiState = (host) => {
-  const { resmgr } = host
+  const { resmgr = {} } = host
 
   /* TODO:
    * This code is very confusing and has too much complected state.  These
@@ -90,7 +90,7 @@ export const annotateUiState = (host) => {
 
   if (!host.uiState && !responding) {
     host.uiState = 'offline'
-    const lastResponseTime = resmgr.info.last_response_time
+    const lastResponseTime = pathStrOrNull('info.last_response_time', resmgr)
     host.lastResponse = moment.utc(lastResponseTime).fromNow(true)
     host.lastResponseData =
       lastResponseTime &&
