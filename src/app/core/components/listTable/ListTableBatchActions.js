@@ -45,7 +45,7 @@ const ListTableAction = withRouter(
     const { root, actionLabel, actionIcon, disabledAction } = useStyles()
     const [dialogOpened, setDialogOpened] = useState(false)
     const { getContext } = useContext(AppContext)
-    const isActionEnabled = !cond || cond(selected, getContext)
+    const isActionEnabled = selected.length && (!cond || cond(selected, getContext))
     const info = isActionEnabled || !disabledInfo ? label : ensureFunction(disabledInfo)(selected)
     const DialogComponent = dialog
     return (
@@ -62,7 +62,7 @@ const ListTableAction = withRouter(
             }}
           />
         ) : null}
-        <Tooltip key={label} title={info}>
+        <Tooltip key={label} title={selected.length ? info : ''}>
           <div
             className={clsx(root, {
               [disabledAction]: !isActionEnabled,
@@ -97,9 +97,6 @@ const ListTableAction = withRouter(
 )
 
 const ListTableBatchActions = ({ batchActions = [], selected = [], onRefresh }) => {
-  if (selected.length === 0 || batchActions.length === 0) {
-    return null
-  }
   return batchActions.map((action) => (
     <ListTableAction key={action.label} {...action} onRefresh={onRefresh} selected={selected} />
   ))
