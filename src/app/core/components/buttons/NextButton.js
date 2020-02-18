@@ -2,6 +2,7 @@ import React from 'react'
 import Button from '@material-ui/core/Button'
 import Icon from '@material-ui/core/Icon'
 import { withStyles } from '@material-ui/styles'
+import { TestId } from 'utils/testId'
 
 const styles = (theme) => ({
   baseButton: {
@@ -24,9 +25,13 @@ const NextButton = ({ children, classes, disabled, showForward = true, ...rest }
   }
 
   return (
-    <Button {...params}>
+    <Button data-testid={TestId.TEST_NEXT_BUTTON} {...params}>
       {children || 'Next'}
-      {showForward && <Icon className={classes.rightIcon}>arrow_forward</Icon>}
+      {showForward && (
+        <Icon data-testid={TestId.TEST_NEXT_BUTTON_ICON} className={classes.rightIcon}>
+          arrow_forward
+        </Icon>
+      )}
     </Button>
   )
 }

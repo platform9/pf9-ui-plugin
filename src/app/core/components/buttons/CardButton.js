@@ -2,6 +2,7 @@ import React from 'react'
 import Button from '@material-ui/core/Button'
 import { withStyles } from '@material-ui/styles'
 import { hexToRGBA } from 'core/utils/colorHelpers'
+import { TestId } from 'utils/testId'
 
 const styles = (theme) => ({
   cardButton: {
@@ -23,8 +24,13 @@ const styles = (theme) => ({
 })
 
 const CardButton = ({ children, classes, showPlus = true, ...rest }) => (
-  <Button className={classes.cardButton} variant="contained" {...rest}>
-    {showPlus ? '+' : ''}
+  <Button
+    data-testid={TestId.TEST_CARD_BUTTON}
+    className={classes.cardButton}
+    variant="contained"
+    {...rest}
+  >
+    {showPlus && '+'}
     {children}
   </Button>
 )

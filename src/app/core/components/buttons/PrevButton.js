@@ -2,6 +2,7 @@ import React from 'react'
 import Button from '@material-ui/core/Button'
 import Icon from '@material-ui/core/Icon'
 import { withStyles } from '@material-ui/styles'
+import { TestId } from 'utils/testId'
 
 const styles = (theme) => ({
   baseButton: {
@@ -24,8 +25,10 @@ const PrevButton = ({ children, classes, disabled, ...rest }) => {
   }
 
   return (
-    <Button {...params}>
-      <Icon className={classes.leftIcon}>arrow_back</Icon>
+    <Button {...params} data-testid={TestId.TEST_PREVIOUS_BUTTON}>
+      <Icon className={classes.leftIcon} data-testid={TestId.TEST_PREVIOUS_BUTTON_ICON}>
+        arrow_back
+      </Icon>
       {children || 'Back'}
     </Button>
   )

@@ -1,6 +1,7 @@
 import React from 'react'
 import Button from '@material-ui/core/Button'
 import { withStyles } from '@material-ui/styles'
+import { TestId } from 'utils/testId'
 
 const styles = (theme) => ({
   baseButton: {
@@ -19,7 +20,7 @@ const SubmitButton = ({ children, classes, disabled, ...rest }) => {
   }
 
   return (
-    <Button type="submit" {...params}>
+    <Button type="submit" {...params} data-testid={TestId.TEST_SUBMIT_BUTTON}>
       {children || 'Submit'}
     </Button>
   )

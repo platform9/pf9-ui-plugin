@@ -1,6 +1,7 @@
 import React from 'react'
 import Button from '@material-ui/core/Button'
 import { withStyles } from '@material-ui/styles'
+import { TestId } from 'utils/testId'
 
 const styles = (theme) => ({
   baseButton: {
@@ -19,7 +20,11 @@ const CancelButton = ({ children, classes, disabled, ...rest }) => {
     ...rest,
   }
 
-  return <Button {...params}>{children || 'Cancel'}</Button>
+  return (
+    <Button {...params} data-testid={TestId.TEST_CANCEL_BUTTON}>
+      {children || 'Cancel'}
+    </Button>
+  )
 }
 
 export default withStyles(styles)(CancelButton)
