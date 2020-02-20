@@ -59,7 +59,7 @@ const clusterOverviewFields: IClusterDetailFields[] = [
   { id: 'endpoint', title: 'API Endpoint', required: true },
   {
     id: 'allowWorkloadsOnMaster',
-    title: 'Master + Worker',
+    title: 'Run workloads on masters',
     required: true,
     render: castBoolToStr(),
   },

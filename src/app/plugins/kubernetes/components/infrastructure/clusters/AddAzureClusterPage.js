@@ -301,7 +301,7 @@ const AddAzureClusterPage = () => {
                             {/* Allow workloads on masters */}
                             <CheckboxField
                               id="allowWorkloadsOnMaster"
-                              label="Make all Master nodes Master + Worker"
+                              label="Enable workloads on all master nodes"
                               info="It is highly recommended to not enable workloads on master nodes for production or critical workload clusters."
                             />
                           </>
@@ -485,7 +485,7 @@ const AddAzureClusterPage = () => {
                         <Alert
                           small
                           variant="error"
-                          message="The PMK management plane is not able to monitor the cluster health."
+                          message="The PMK management plane will not be able to monitor the cluster health."
                         />
                       )}
 

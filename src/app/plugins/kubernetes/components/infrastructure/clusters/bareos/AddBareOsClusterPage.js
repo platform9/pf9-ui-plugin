@@ -70,10 +70,13 @@ const useStyles = makeStyles((theme) => ({
     display: 'grid',
   },
   innerWrapper: {
-    marginBottom: theme.spacing(2)
+    marginBottom: theme.spacing(2),
   },
   blueIcon: {
     color: theme.palette.primary.main,
+  },
+  paddBottom: {
+    paddingBottom: theme.spacing(4),
   },
 }))
 
@@ -222,7 +225,7 @@ const AddBareOsClusterPage = () => {
                     <CheckboxField
                       id="allowWorkloadsOnMaster"
                       onChange={(value) => setWizardContext({ allowWorkloadsOnMaster: value })}
-                      label="Make all Master nodes Master + Worker"
+                      label="Enable workloads on all master nodes"
                       info="It is highly recommended to not enable workloads on master nodes for production or critical workload clusters."
                     />
                   </div>
@@ -312,6 +315,7 @@ const AddBareOsClusterPage = () => {
                 onSubmit={setWizardContext}
                 triggerSubmit={onNext}
                 title="Networking Details"
+                className={classes.paddBottom}
               >
                 {({ values }) => (
                   <>
@@ -320,15 +324,14 @@ const AddBareOsClusterPage = () => {
                       label="Virtual IP address for cluster"
                       info={
                         <div>
-                          Specify the virtual IP address that will be used to provide access to
-                          the API server endpoint for this cluster. A virtual IP must be
-                          specified if you want to grow the number of masters in the future.
-                          Refer to{' '}
+                          Specify the virtual IP address that will be used to provide access to the
+                          API server endpoint for this cluster. A virtual IP must be specified if
+                          you want to grow the number of masters in the future. Refer to{' '}
                           <a href={pf9PmkArchitectureDigLink} target="_blank">
                             this article
                           </a>{' '}
-                          for more information re how the VIP service operates, VIP
-                          configuration, etc.
+                          for more information re how the VIP service operates, VIP configuration,
+                          etc.
                         </div>
                       }
                       required={(wizardContext.masterNodes || []).length > 1}
@@ -463,7 +466,7 @@ const AddBareOsClusterPage = () => {
                       <Alert
                         small
                         variant="error"
-                        message="The PMK management plane is not able to monitor the cluster health."
+                        message="The PMK management plane will not be able to monitor the cluster health."
                       />
                     )}
 
