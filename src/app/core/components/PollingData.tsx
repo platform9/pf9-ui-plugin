@@ -28,6 +28,7 @@ function PollingData<T>({
   refreshDuration = defaultRefreshDuration,
   textColor = 'textSecondary',
 }: Props<T>) {
+  return null
   const [lastIntervalTs, setLastIntervalTs] = useState(new Date().valueOf())
   const [lastFetchTs, setLastFetchTs] = useState(new Date().valueOf())
   const reload = useCallback(() => {
