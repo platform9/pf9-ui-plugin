@@ -19,7 +19,7 @@ const EtcdBackupFields = () => {
         label="Backup Interval (minutes)"
         type="number"
         step="1"
-        InputProps={{ inputProps: { min: 1 } }}
+        InputProps={{ inputProps: { min: 30 } }}
         info="Specify how often the backup should be taken."
         required
       />
