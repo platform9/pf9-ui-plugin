@@ -340,9 +340,8 @@ const renderCustomNetworkingFields = ({
         cloudProviderId={params.cloudProviderId}
         cloudProviderRegionId={params.cloudProviderRegionId}
         info="Select the base domain name to be used for the API and service FQDNs"
-        required
-        // required={!values.usePf9Domain}
-        // disabled={values.usePf9Domain}
+        required={!values.usePf9Domain}
+        disabled={values.usePf9Domain}
       />
 
       <PicklistField
