@@ -48,7 +48,7 @@ const initialContext = {
   runtimeConfigOption: 'default',
   mtuSize: 1440,
   etcdStoragePath: defaultEtcBackupPath,
-  etcdBackupInterval: 1,
+  etcdBackupInterval: 60 * 24,
   prometheusMonitoringEnabled: true,
   tags: [],
 }
@@ -70,7 +70,7 @@ const useStyles = makeStyles((theme) => ({
     display: 'grid',
   },
   innerWrapper: {
-    marginBottom: theme.spacing(2)
+    marginBottom: theme.spacing(2),
   },
   blueIcon: {
     color: theme.palette.primary.main,
@@ -320,15 +320,14 @@ const AddBareOsClusterPage = () => {
                       label="Virtual IP address for cluster"
                       info={
                         <div>
-                          Specify the virtual IP address that will be used to provide access to
-                          the API server endpoint for this cluster. A virtual IP must be
-                          specified if you want to grow the number of masters in the future.
-                          Refer to{' '}
+                          Specify the virtual IP address that will be used to provide access to the
+                          API server endpoint for this cluster. A virtual IP must be specified if
+                          you want to grow the number of masters in the future. Refer to{' '}
                           <a href={pf9PmkArchitectureDigLink} target="_blank">
                             this article
                           </a>{' '}
-                          for more information re how the VIP service operates, VIP
-                          configuration, etc.
+                          for more information re how the VIP service operates, VIP configuration,
+                          etc.
                         </div>
                       }
                       required={(wizardContext.masterNodes || []).length > 1}
