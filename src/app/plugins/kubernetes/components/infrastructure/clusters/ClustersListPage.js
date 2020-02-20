@@ -99,7 +99,7 @@ const renderStats = (_, { usage }) => {
 }
 
 const renderClusterDetailLink = (name, cluster) => (
-  <SimpleLink src={routes.cluster.nodes.path({ id: cluster.uuid })}>{name}</SimpleLink>
+  <SimpleLink src={routes.cluster.detail.path({ id: cluster.uuid })}>{name}</SimpleLink>
 )
 
 const renderBooleanField = (key) => (_, cluster) => (

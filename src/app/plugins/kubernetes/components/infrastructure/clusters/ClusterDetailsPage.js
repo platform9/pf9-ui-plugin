@@ -138,6 +138,11 @@ const ClusterDetailsPage = () => {
         <PollingData hidden loading={loading} onReload={reload} refreshDuration={oneSecond * 10} />
         <ClusterStatusAndUsage cluster={cluster} loading={loading} />
         <Tabs>
+          <Tab value="clusterDetails" label="Cluster Details">
+            <div className={classes.tabContainer}>
+              <ClusterInfo />
+            </div>
+          </Tab>
           <Tab value="nodes" label="Nodes">
             <div className={classes.tabContainer}>
               <ClusterNodes />
@@ -146,11 +151,6 @@ const ClusterDetailsPage = () => {
           <Tab value="nodeHealth" label="Node Health">
             <div className={classes.tabContainer}>
               <NodeHealthWithTasksToggler />
-            </div>
-          </Tab>
-          <Tab value="clusterDetails" label="Cluster Details">
-            <div className={classes.tabContainer}>
-              <ClusterInfo />
             </div>
           </Tab>
         </Tabs>
