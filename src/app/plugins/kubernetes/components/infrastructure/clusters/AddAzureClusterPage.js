@@ -60,7 +60,7 @@ const initialContext = {
   useAllAvailabilityZones: true,
   assignPublicIps: false,
   etcdStoragePath: defaultEtcBackupPath,
-  etcdBackupInterval: 1,
+  etcdBackupInterval: 60 * 24,
   prometheusMonitoringEnabled: true,
   tags: [],
 }

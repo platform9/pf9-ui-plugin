@@ -48,7 +48,7 @@ const initialContext = {
   runtimeConfigOption: 'default',
   mtuSize: 1440,
   etcdStoragePath: defaultEtcBackupPath,
-  etcdBackupInterval: 1,
+  etcdBackupInterval: 60 * 24,
   prometheusMonitoringEnabled: true,
   tags: [],
 }

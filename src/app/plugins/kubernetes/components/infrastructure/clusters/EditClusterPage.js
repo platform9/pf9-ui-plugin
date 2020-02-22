@@ -36,7 +36,7 @@ const EditClusterPage = () => {
           etcdBackup: !!etcdBackup.isEtcdBackupEnabled,
           etcdStoragePath:
             path(['storageProperties, localStorage'], etcdBackup) || defaultEtcBackupPath,
-          etcdBackupInterval: etcdBackup.intervalInMins || 1,
+          etcdBackupInterval: etcdBackup.intervalInMins || 60 * 24,
         }),
       )(clusters),
     [clusters, clusterId],

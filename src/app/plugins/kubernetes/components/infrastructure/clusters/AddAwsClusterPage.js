@@ -111,7 +111,7 @@ const initialContext = {
   isPrivate: false,
   internalElb: false,
   etcdStoragePath: defaultEtcBackupPath,
-  etcdBackupInterval: 1, // in minutes
+  etcdBackupInterval: 60 * 24, // in minutes
   prometheusMonitoringEnabled: true,
   tags: [],
 }
