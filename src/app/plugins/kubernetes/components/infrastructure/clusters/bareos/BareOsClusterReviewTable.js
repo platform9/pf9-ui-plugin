@@ -47,10 +47,12 @@ const BareOsClusterReviewTable = ({ data }) => {
       <TableBody>
         <DataRow label="Name" value={data.name} />
         <DataRow
-          label={`Master${data.allowWorkloadsOnMaster ? ' + Worker' : ''} nodes`}
+          label={`Master${data.allowWorkloadsOnMaster ? ' nodes with workloads' : 'nodes'}`}
           value={masterNodes}
         />
-        <DataRow label="Worker nodes" value={workerNodes} />
+        {data.allowWorkloadsOnMaster && workerNodes.length > 0 && (
+          <DataRow label="Worker nodes" value={workerNodes} />
+        )}
         <DataRow label="Virtual IP address for cluster" value={data.masterVipIpv4} />
         <DataRow
           label="Physical interface for virtual IP association"

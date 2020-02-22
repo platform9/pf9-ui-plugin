@@ -7,7 +7,7 @@ import Picklist from 'core/components/Picklist'
 import { loadCloudProviderRegionDetails } from 'k8s/components/infrastructure/cloudProviders/actions'
 
 const AwsClusterVpcPicklist = forwardRef(
-  ({ azs, cloudProviderId, cloudProviderRegionId, hasError, errorMessage, ...rest }, ref) => {
+  ({ azs, cloudProviderId, cloudProviderRegionId, ...rest }, ref) => {
     const [details, loading] = useDataLoader(loadCloudProviderRegionDetails, {
       cloudProviderId,
       cloudProviderRegionId,
@@ -25,16 +25,7 @@ const AwsClusterVpcPicklist = forwardRef(
 
     const options = vpcs.filter(hasAllAzs).map(toOption)
 
-    return (
-      <Picklist
-        {...rest}
-        ref={ref}
-        loading={loading}
-        options={options}
-        error={hasError}
-        helperText={errorMessage}
-      />
-    )
+    return <Picklist {...rest} ref={ref} loading={loading} options={options} />
   },
 )
 

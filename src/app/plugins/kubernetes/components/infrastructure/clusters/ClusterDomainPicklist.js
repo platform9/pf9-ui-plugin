@@ -7,7 +7,7 @@ import Picklist from 'core/components/Picklist'
 import { loadCloudProviderRegionDetails } from 'k8s/components/infrastructure/cloudProviders/actions'
 
 const ClusterDomainPicklist = forwardRef(
-  ({ cloudProviderId, cloudProviderRegionId, hasError, errorMessage, onChange, ...rest }, ref) => {
+  ({ cloudProviderId, cloudProviderRegionId, onChange, ...rest }, ref) => {
     const [details, loading] = useDataLoader(loadCloudProviderRegionDetails, {
       cloudProviderId,
       cloudProviderRegionId,
@@ -22,15 +22,7 @@ const ClusterDomainPicklist = forwardRef(
     }
 
     return (
-      <Picklist
-        {...rest}
-        onChange={handleChange}
-        ref={ref}
-        loading={loading}
-        options={options}
-        error={hasError}
-        helperText={errorMessage}
-      />
+      <Picklist {...rest} onChange={handleChange} ref={ref} loading={loading} options={options} />
     )
   },
 )
