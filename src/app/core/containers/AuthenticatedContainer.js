@@ -24,7 +24,7 @@ import { Redirect, Route, Switch } from 'react-router'
 import useReactRouter from 'use-react-router'
 import { emptyObj, ensureArray, isNilOrEmpty } from 'utils/fp'
 import { pathJoin } from 'utils/misc'
-import NotificationsProvider from '../providers/NotificationsProvider'
+import PushEventsProvider from '../providers/PushEventsProvider'
 
 const { keystone } = ApiClient.getInstance()
 
@@ -209,7 +209,7 @@ const AuthenticatedContainer = () => {
           stack={stack}
           handleDrawerToggle={toggleDrawer}
         />
-        <NotificationsProvider>
+        <PushEventsProvider>
           <main
             className={clsx(classes.content, classes['content-left'], {
               [classes.contentShift]: drawerOpen,
@@ -228,7 +228,7 @@ const AuthenticatedContainer = () => {
               {devEnabled && <DeveloperToolsEmbed />}
             </div>
           </main>
-        </NotificationsProvider>
+        </PushEventsProvider>
       </div>
       {regionFeatures.intercom && <Intercom />}
     </>
