@@ -9,8 +9,9 @@ const getWebSocketUrl = () => {
 
   if (!catalog) return console.error('Error loading serviceCatalog from ApiClient')
 
-  const notificationService = catalog.find(x => x.type === 'notifications')
-  if (!notificationService) return console.error('notification service not found in keystone service catalog')
+  const notificationService = catalog.find((x) => x.type === 'notifications')
+  if (!notificationService)
+    return console.error('notification service not found in keystone service catalog')
 
   let url = notificationService.endpoints[0].url
   url = url.replace(/^https/, 'wss')
@@ -23,35 +24,35 @@ const getWebSocketUrl = () => {
 }
 
 class PushEventManager {
-  private static instance : PushEventManager
-  private socket
-  private subscribers = []
+  private static instance: PushEventManager
+  private socket: WebSocket
+  private subscribers: SubscriberFnType[] = []
 
-  constructor () {
+  constructor() {
     this.subscribers = []
   }
 
-  public static getInstance () {
+  public static getInstance() {
     if (!PushEventManager.instance) {
       PushEventManager.instance = new PushEventManager()
     }
     return PushEventManager.instance
   }
 
-  handleOpen () {
+  handleOpen() {
     console.info('Websocket connection opened')
   }
 
-  handleClose () {
+  handleClose() {
     console.info('Websocket connection closed')
   }
 
-  handleMessage (event: any) {
+  handleMessage(event: MessageEvent) {
     const message = event.data
     this.subscribers.forEach(message)
   }
 
-  public connect () {
+  public connect() {
     const wsUrl = getWebSocketUrl()
     this.socket = new WebSocket(wsUrl)
     this.socket.addEventListener('open', this.handleOpen)
@@ -60,15 +61,17 @@ class PushEventManager {
     return this
   }
 
-  public disconnect () {
+  public disconnect() {
     this.socket.removeEventListener('open', this.handleOpen)
     this.socket.removeEventListener('close', this.handleClose)
     this.socket.removeEventListener('message', this.handleMessage)
   }
 
-  public subscribe (listener: SubscriberFnType) {
+  public subscribe(listener: SubscriberFnType) {
     this.subscribers.push(listener)
-    return () => { this.subscribers = except(listener, this.subscribers) }
+    return () => {
+      this.subscribers = except(listener, this.subscribers)
+    }
   }
 }
 
