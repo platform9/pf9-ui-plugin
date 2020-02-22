@@ -7,7 +7,7 @@ import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
 import { pathStrOr } from 'utils/fp'
 import { uniq } from 'ramda'
 
-const VipInterfaceChooser = forwardRef(({ masterNodes, hasError, errorMessage, ...rest }, ref) => {
+const VipInterfaceChooser = forwardRef(({ masterNodes, ...rest }, ref) => {
   const [nodes, loading] = useDataLoader(loadNodes)
   const masters = nodes.filter((node) => masterNodes && masterNodes.includes(node.uuid))
 
@@ -20,16 +20,7 @@ const VipInterfaceChooser = forwardRef(({ masterNodes, hasError, errorMessage, .
       .flat(),
   )
 
-  return (
-    <Picklist
-      {...rest}
-      ref={ref}
-      loading={loading}
-      options={options}
-      error={hasError}
-      helperText={errorMessage}
-    />
-  )
+  return <Picklist {...rest} ref={ref} loading={loading} options={options} />
 })
 
 VipInterfaceChooser.propTypes = {

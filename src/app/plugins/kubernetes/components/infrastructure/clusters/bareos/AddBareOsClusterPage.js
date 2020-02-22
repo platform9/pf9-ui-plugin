@@ -75,6 +75,9 @@ const useStyles = makeStyles((theme) => ({
   blueIcon: {
     color: theme.palette.primary.main,
   },
+  paddBottom: {
+    paddingBottom: theme.spacing(4),
+  },
 }))
 
 // Segment tracking for wizard steps
@@ -222,7 +225,7 @@ const AddBareOsClusterPage = () => {
                     <CheckboxField
                       id="allowWorkloadsOnMaster"
                       onChange={(value) => setWizardContext({ allowWorkloadsOnMaster: value })}
-                      label="Make all Master nodes Master + Worker"
+                      label="Enable workloads on all master nodes"
                       info="It is highly recommended to not enable workloads on master nodes for production or critical workload clusters."
                     />
                   </div>
@@ -312,6 +315,7 @@ const AddBareOsClusterPage = () => {
                 onSubmit={setWizardContext}
                 triggerSubmit={onNext}
                 title="Networking Details"
+                className={classes.paddBottom}
               >
                 {({ values }) => (
                   <>
@@ -462,7 +466,7 @@ const AddBareOsClusterPage = () => {
                       <Alert
                         small
                         variant="error"
-                        message="The PMK management plane is not able to monitor the cluster health."
+                        message="The PMK management plane will not be able to monitor the cluster health."
                       />
                     )}
 

@@ -8,18 +8,7 @@ import Picklist from 'core/components/Picklist'
 import { loadCloudProviderRegionDetails } from 'k8s/components/infrastructure/cloudProviders/actions'
 
 const AzureSkuPicklist = forwardRef(
-  (
-    {
-      cloudProviderId,
-      cloudProviderRegionId,
-      selectedZones,
-      filterByZones,
-      hasError,
-      errorMessage,
-      ...rest
-    },
-    ref,
-  ) => {
+  ({ cloudProviderId, cloudProviderRegionId, selectedZones, filterByZones, ...rest }, ref) => {
     const [details, loading] = useDataLoader(loadCloudProviderRegionDetails, {
       cloudProviderId,
       cloudProviderRegionId,
@@ -32,16 +21,7 @@ const AzureSkuPicklist = forwardRef(
       .filter(filterByZones ? zonesFilter : identity)
       .map((x) => ({ label: x.name, value: x.name }))
 
-    return (
-      <Picklist
-        {...rest}
-        ref={ref}
-        loading={loading}
-        options={options}
-        error={hasError}
-        helperText={errorMessage}
-      />
-    )
+    return <Picklist {...rest} ref={ref} loading={loading} options={options} />
   },
 )
 
