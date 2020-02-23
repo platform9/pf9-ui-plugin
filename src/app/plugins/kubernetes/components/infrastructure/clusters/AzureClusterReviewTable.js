@@ -1,6 +1,7 @@
 import React from 'react'
 import { Table, TableBody, TableCell, TableRow } from '@material-ui/core'
 import { castBoolToStr } from 'utils/misc'
+import CodeBlock from 'core/components/CodeBlock'
 
 const DataRow = ({ label, value }) => (
   <TableRow>
@@ -35,7 +36,10 @@ const AzureClusterReviewTable = ({ data }) => {
             label="Prometheus monitoring"
             value={castBoolToStr()(data.prometheusMonitoringEnabled)}
           />
-          <DataRow label="Tags" value={JSON.stringify(data.tags || [])} />
+          <DataRow
+            label="Tags"
+            value={<CodeBlock>{JSON.stringify(data.tags || [], null, 2)}</CodeBlock>}
+          />
         </TableBody>
       </Table>
     </React.Fragment>
