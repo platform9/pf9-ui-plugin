@@ -54,7 +54,6 @@ export const AddCloudProviderForm = ({ loading, onComplete, ...rest }) => {
           type="aws"
         />
         <CloudProviderCard
-          disabled
           active={activeProvider === 'azure'}
           onClick={setActiveProvider}
           type="azure"

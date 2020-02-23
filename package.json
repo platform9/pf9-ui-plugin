@@ -131,7 +131,7 @@
     "docker:push": " docker push platform9/ui-dev",
     "docker:run": "docker run -p 3000:3000 -p 4444:4444 ui-dev",
     "storybook": "start-storybook -s src/app/static -p 9001 -c src/stories",
-    "test": "yarn lint && yarn test:unit",
+    "test": "yarn test:unit",
     "test:client": "cross-env NODE_ENV=test jest src/api-client",
     "test:client:watch": "cross-env NODE_ENV=test jest --watch src/api-client",
     "test:e2e": "cross-env NODE_ENV=test jest -i e2e-tests/",
