@@ -13,6 +13,7 @@ import UserRolesTableField from 'k8s/components/userManagement/tenants/UserRoles
 import { mngmTenantActions } from 'k8s/components/userManagement/tenants/actions'
 import { mngmUserActions } from 'k8s/components/userManagement/users/actions'
 import Progress from 'core/components/progress/Progress'
+import { requiredValidator } from 'core/utils/fieldValidators'
 
 const listUrl = pathJoin(k8sPrefix, 'user_management')
 
@@ -23,6 +24,8 @@ const initialContext = {
 }
 
 const userParams = { systemUsers: true }
+
+const userRolesValidations = [requiredValidator.withMessage('Must select at least one user')]
 
 const AddTenantPage = () => {
   const { history } = useReactRouter()
@@ -59,7 +62,11 @@ const AddTenantPage = () => {
                   loading={loadingUsers}
                   message={'Loading Users...'}
                 >
-                  <UserRolesTableField required id="roleAssignments" users={users} />
+                  <UserRolesTableField
+                    validations={userRolesValidations}
+                    id="roleAssignments"
+                    users={users}
+                  />
                 </Progress>
               </ValidatedForm>
             </WizardStep>

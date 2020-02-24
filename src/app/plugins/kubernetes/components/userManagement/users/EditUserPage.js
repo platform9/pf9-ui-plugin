@@ -23,6 +23,7 @@ import UserPasswordField from 'k8s/components/userManagement/users/UserPasswordF
 import useToggler from 'core/hooks/useToggler'
 import SimpleLink from 'core/components/SimpleLink'
 import makeStyles from '@material-ui/styles/makeStyles'
+import { requiredValidator } from 'core/utils/fieldValidators'
 
 const listUrl = pathJoin(k8sPrefix, 'user_management#users')
 
@@ -71,6 +72,8 @@ const TogglableTextField = ({
     </div>
   )
 }
+
+const tenantRolesValidations = [requiredValidator.withMessage('Must select at least one tenant')]
 
 const EditUserPage = () => {
   const { match, history } = useReactRouter()
@@ -147,7 +150,11 @@ const EditUserPage = () => {
                 onSubmit={setWizardContext}
                 triggerSubmit={onNext}
               >
-                <TenantRolesTableField required id="roleAssignments" tenants={tenants} />
+                <TenantRolesTableField
+                  validations={tenantRolesValidations}
+                  id="roleAssignments"
+                  tenants={tenants}
+                />
               </ValidatedForm>
             </WizardStep>
           </>
