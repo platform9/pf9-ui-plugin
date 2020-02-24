@@ -261,12 +261,13 @@ const reportsWithPerms = (reports) => {
   const {
     userDetails: { role },
   } = useContext(AppContext)
-  return reports.filter((report) => {
+  return reports.map((report) => {
     // No permissions property means no restrictions
     if (!report.permissions) {
-      return true
+      return report
     }
-    return report.permissions.includes(role)
+    // remove the add action when not permitted to
+    return report.permissions.includes(role) ? report : { ...report, addRoute: '' }
   })
 }
 const promptOnboardingSetup = (items: boolean[]) => {

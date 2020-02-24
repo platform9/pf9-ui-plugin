@@ -72,6 +72,7 @@ const useStyles = makeStyles<Theme, { actionRow: boolean; chartRow: boolean }>((
   links: {
     display: 'grid',
     gridTemplateColumns: '1fr 35px',
+    gridTemplateAreas: '"add-action list-action"',
     alignContent: 'center',
     padding: theme.spacing(0, 1),
   },
@@ -81,6 +82,12 @@ const useStyles = makeStyles<Theme, { actionRow: boolean; chartRow: boolean }>((
     alignContent: 'center',
     borderTop: ({ actionRow }) =>
       `${actionRow ? 1 : 0}px solid ${theme.palette.dashboardCard.divider}`,
+  },
+  addAction: {
+    gridArea: 'add-action',
+  },
+  listAction: {
+    gridArea: 'list-action',
   },
 }))
 
@@ -127,6 +134,8 @@ const StatusCard: FunctionComponent<StatusCardProps> = ({
     links,
     chart,
     spinner,
+    addAction,
+    listAction,
   } = useStyles({ chartRow: !!pieData, actionRow })
 
   const GraphComponent = graphType === 'donut' ? DonutWidget : PieUsageWidget
@@ -144,10 +153,12 @@ const StatusCard: FunctionComponent<StatusCardProps> = ({
       </header>
       {actionRow && (
         <div className={links}>
-          <Link to={addRoute}>
-            <CardButton>Add {entity}</CardButton>
-          </Link>
-          <Link to={route}>
+          {addRoute && (
+            <Link to={addRoute} className={addAction}>
+              <CardButton>Add {entity}</CardButton>
+            </Link>
+          )}
+          <Link to={route} className={listAction}>
             <FontAwesomeIcon size="2x" className={arrowIcon}>
               arrow-right
             </FontAwesomeIcon>
