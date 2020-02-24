@@ -172,6 +172,18 @@ const getFormattedCounts = (masterNodes, workerNodes) => ({
   ),
 })
 
+function getUnhealthyWorkerMessage(masterNodes, workerNodes) {
+  const { unhealthyWorkers, percentUnhealthyWorkers } = getFormattedCounts(masterNodes, workerNodes)
+  return workerNodes.total > 0
+    ? `${unhealthyWorkers} out of ${workerNodes.total} (${percentUnhealthyWorkers}%) workers are unhealthy`
+    : `cluster has no worker nodes`
+}
+function getHealthyWorkerMessage(masterNodes, workerNodes) {
+  return workerNodes.total > 0
+    ? `all ${workerNodes.total} workers are healthy`
+    : `cluster has no worker nodes`
+}
+
 const clusterHealthStatusAndMessageTable: HealthStatusAndMessage[] = [
   {
     mastersHealthStatus: 'healthy',
@@ -179,10 +191,7 @@ const clusterHealthStatusAndMessageTable: HealthStatusAndMessage[] = [
     healthStatus: 'healthy',
     getMessage: (masterNodes, workerNodes) => {
       const masterCount = masterNodes.total || ''
-      const workerMessage =
-        workerNodes.total > 0
-          ? `all ${workerNodes.total} workers are healthy`
-          : `cluster has no worker nodes`
+      const workerMessage = getHealthyWorkerMessage(masterNodes, workerNodes)
       return `All ${masterCount} masters are healthy, ${workerMessage}`.replace(/\s+/g, ' ')
     },
   },
@@ -191,14 +200,8 @@ const clusterHealthStatusAndMessageTable: HealthStatusAndMessage[] = [
     workersHealthStatus: 'partially_healthy',
     healthStatus: 'healthy',
     getMessage: (masterNodes, workerNodes) => {
-      const { masterCount, unhealthyWorkers, percentUnhealthyWorkers } = getFormattedCounts(
-        masterNodes,
-        workerNodes,
-      )
-      const workerMessage =
-        workerNodes.total > 0
-          ? `${unhealthyWorkers} out of ${workerNodes.total} (${percentUnhealthyWorkers}%) workers are unhealthy`
-          : `cluster has no worker nodes`
+      const { masterCount } = getFormattedCounts(masterNodes, workerNodes)
+      const workerMessage = getUnhealthyWorkerMessage(masterNodes, workerNodes)
       return `All ${masterCount} masters are healthy, ${workerMessage}`
     },
   },
@@ -207,14 +210,8 @@ const clusterHealthStatusAndMessageTable: HealthStatusAndMessage[] = [
     workersHealthStatus: 'unhealthy',
     healthStatus: 'unhealthy',
     getMessage: (masterNodes, workerNodes) => {
-      const { masterCount, unhealthyWorkers, percentUnhealthyWorkers } = getFormattedCounts(
-        masterNodes,
-        workerNodes,
-      )
-      const workerMessage =
-        workerNodes.total > 0
-          ? `${unhealthyWorkers} out of ${workerNodes.total} (${percentUnhealthyWorkers}%) workers are unhealthy`
-          : `cluster has no worker nodes`
+      const { masterCount } = getFormattedCounts(masterNodes, workerNodes)
+      const workerMessage = getUnhealthyWorkerMessage(masterNodes, workerNodes)
       return `All ${masterCount} masters are healthy, ${workerMessage}`
     },
   },
@@ -225,10 +222,7 @@ const clusterHealthStatusAndMessageTable: HealthStatusAndMessage[] = [
     getMessage: (masterNodes, workerNodes) => {
       const { masterCount, unhealthyMasters } = getFormattedCounts(masterNodes, workerNodes)
       const masterMessage = `${unhealthyMasters} out of ${masterCount} masters are unhealthy (Quorum still established)`
-      const workerMessage =
-        workerNodes.total > 0
-          ? `all ${workerNodes.total} workers are healthy`
-          : `cluster has no worker nodes`
+      const workerMessage = getHealthyWorkerMessage(masterNodes, workerNodes)
       return `${masterMessage}, ${workerMessage}`
     },
   },
@@ -237,17 +231,9 @@ const clusterHealthStatusAndMessageTable: HealthStatusAndMessage[] = [
     workersHealthStatus: 'partially_healthy',
     healthStatus: 'partially_healthy',
     getMessage: (masterNodes, workerNodes) => {
-      const {
-        masterCount,
-        unhealthyMasters,
-        unhealthyWorkers,
-        percentUnhealthyWorkers,
-      } = getFormattedCounts(masterNodes, workerNodes)
+      const { masterCount, unhealthyMasters } = getFormattedCounts(masterNodes, workerNodes)
       const masterMessage = `${unhealthyMasters} out of ${masterCount} masters are unhealthy (Quorum still established)`
-      const workerMessage =
-        workerNodes.total > 0
-          ? `${unhealthyWorkers} out of ${workerNodes.total} (${percentUnhealthyWorkers}%) workers are unhealthy`
-          : `cluster has no worker nodes`
+      const workerMessage = getUnhealthyWorkerMessage(masterNodes, workerNodes)
       return `${masterMessage}, ${workerMessage}`
     },
   },
@@ -256,17 +242,9 @@ const clusterHealthStatusAndMessageTable: HealthStatusAndMessage[] = [
     workersHealthStatus: 'unhealthy',
     healthStatus: 'unhealthy',
     getMessage: (masterNodes, workerNodes) => {
-      const {
-        masterCount,
-        unhealthyMasters,
-        unhealthyWorkers,
-        percentUnhealthyWorkers,
-      } = getFormattedCounts(masterNodes, workerNodes)
+      const { masterCount, unhealthyMasters } = getFormattedCounts(masterNodes, workerNodes)
       const masterMessage = `${unhealthyMasters} out of ${masterCount} masters are unhealthy (Quorum still established)`
-      const workerMessage =
-        workerNodes.total > 0
-          ? `${unhealthyWorkers} out of ${workerNodes.total} (${percentUnhealthyWorkers}%) workers are unhealthy`
-          : `cluster has no worker nodes`
+      const workerMessage = getUnhealthyWorkerMessage(masterNodes, workerNodes)
       return `${masterMessage}, ${workerMessage}`
     },
   },
@@ -277,10 +255,7 @@ const clusterHealthStatusAndMessageTable: HealthStatusAndMessage[] = [
     getMessage: (masterNodes, workerNodes) => {
       const { masterCount, unhealthyMasters } = getFormattedCounts(masterNodes, workerNodes)
       const masterMessage = `${unhealthyMasters} out of ${masterCount} masters are unhealthy (Quorum still established)`
-      const workerMessage =
-        workerNodes.total > 0
-          ? `all ${workerNodes.total} workers are healthy`
-          : `cluster has no worker nodes`
+      const workerMessage = getHealthyWorkerMessage(masterNodes, workerNodes)
       return `${masterMessage}, ${workerMessage}`
     },
   },
@@ -289,17 +264,9 @@ const clusterHealthStatusAndMessageTable: HealthStatusAndMessage[] = [
     workersHealthStatus: 'partially_healthy',
     healthStatus: 'unhealthy',
     getMessage: (masterNodes, workerNodes) => {
-      const {
-        masterCount,
-        unhealthyMasters,
-        unhealthyWorkers,
-        percentUnhealthyWorkers,
-      } = getFormattedCounts(masterNodes, workerNodes)
+      const { masterCount, unhealthyMasters } = getFormattedCounts(masterNodes, workerNodes)
       const masterMessage = `${unhealthyMasters} out of ${masterCount} masters are unhealthy (Quorum failed)`
-      const workerMessage =
-        workerNodes.total > 0
-          ? `${unhealthyWorkers} out of ${workerNodes.total} (${percentUnhealthyWorkers}%) workers are unhealthy`
-          : `cluster has no worker nodes`
+      const workerMessage = getUnhealthyWorkerMessage(masterNodes, workerNodes)
       return `${masterMessage}, ${workerMessage}`
     },
   },
@@ -308,17 +275,9 @@ const clusterHealthStatusAndMessageTable: HealthStatusAndMessage[] = [
     workersHealthStatus: 'unhealthy',
     healthStatus: 'unhealthy',
     getMessage: (masterNodes, workerNodes) => {
-      const {
-        masterCount,
-        unhealthyMasters,
-        unhealthyWorkers,
-        percentUnhealthyWorkers,
-      } = getFormattedCounts(masterNodes, workerNodes)
+      const { masterCount, unhealthyMasters } = getFormattedCounts(masterNodes, workerNodes)
       const masterMessage = `${unhealthyMasters} out of ${masterCount} masters are unhealthy (Quorum failed)`
-      const workerMessage =
-        workerNodes.total > 0
-          ? `${unhealthyWorkers} out of ${workerNodes.total} (${percentUnhealthyWorkers}%) workers are unhealthy`
-          : `cluster has no worker nodes`
+      const workerMessage = getUnhealthyWorkerMessage(masterNodes, workerNodes)
       return `${masterMessage}, ${workerMessage}`
     },
   },
