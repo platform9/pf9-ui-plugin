@@ -15,18 +15,14 @@ const getWebSocketUrl = () => {
 
   let url = notificationService.endpoints[0].url
   url = url.replace(/^https/, 'wss')
-
-  // get the token
-  console.log(client.scopedToken)
   url = `${url}?token=${client.scopedToken}`
-
   return url
 }
 
 class PushEventManager {
   private static instance: PushEventManager
   private socket: WebSocket
-  private subscribers: SubscriberFnType[] = []
+  public subscribers: SubscriberFnType[] = []
 
   constructor() {
     this.subscribers = []
@@ -47,9 +43,18 @@ class PushEventManager {
     console.info('Websocket connection closed')
   }
 
-  handleMessage(event: MessageEvent) {
+  handleMessage = (event: MessageEvent) => {
     const message = event.data
-    this.subscribers.forEach(message)
+    try {
+      const data = JSON.parse(message)
+      if (!data.type) {
+        // ignore anything that doesn't follow the spec like `heartbeat` events
+        return
+      }
+      this.subscribers.forEach(fn => fn(data))
+    } catch (e) {
+      console.error('Error parsing JSON from websocket.', message, e)
+    }
   }
 
   public connect() {
