@@ -4,6 +4,7 @@ import React, { useMemo, useCallback } from 'react'
 import clsx from 'clsx'
 import TenantRolesTableField from 'k8s/components/userManagement/users/TenantRolesTableField'
 import useDataUpdater from 'core/hooks/useDataUpdater'
+import { mngmTenantActions } from 'k8s/components/userManagement/tenants/actions'
 import useDataLoader from 'core/hooks/useDataLoader'
 import {
   mngmUserActions,
@@ -77,29 +78,23 @@ const EditUserPage = () => {
   const onComplete = useCallback((success) => success && history.push(listUrl), [history])
   const [users, loadingUsers] = useDataLoader(mngmUserActions.list)
   const user = useMemo(() => users.find(propEq('id', userId)) || emptyObj, [users, userId])
+  const [tenants, loadingTenants] = useDataLoader(mngmTenantActions.list)
   const [update, updating] = useDataUpdater(mngmUserActions.update, onComplete)
-  const [roleAssignments, loadingRoleAssignments] = useDataLoader(
-    mngmUserRoleAssignmentsLoader,
-    {
-      userId,
-    },
-    {
-      invalidateCache: true,
-    },
-  )
+  const [roleAssignments, loadingRoleAssignments] = useDataLoader(mngmUserRoleAssignmentsLoader, {
+    userId,
+  })
   const initialContext = useMemo(
     () => ({
       id: userId,
       username: user.username || user.email,
       displayname: user.displayname || '',
-      roleAssignments: roleAssignments.reduce((acc, roleAssignment) => {
-        const roleId = pathStr('role.id', roleAssignment)
-        const tenantId = pathStr('scope.project.id', roleAssignment)
-        return {
+      roleAssignments: roleAssignments.reduce(
+        (acc, roleAssignment) => ({
           ...acc,
-          [roleId]: acc[roleId] ? [...acc[roleId], tenantId] : [tenantId],
-        }
-      }, {}),
+          [pathStr('scope.project.id', roleAssignment)]: pathStr('role.id', roleAssignment),
+        }),
+        {},
+      ),
     }),
     [user, roleAssignments],
   )
@@ -107,7 +102,7 @@ const EditUserPage = () => {
   return (
     <FormWrapper
       title={`Edit User ${user.displayname || user.username || ''}`}
-      loading={loadingUsers || loadingRoleAssignments || updating}
+      loading={loadingUsers || loadingTenants || loadingRoleAssignments || updating}
       renderContentOnMount={false}
       message={updating ? 'Submitting form...' : 'Loading User...'}
       backUrl={listUrl}
@@ -117,7 +112,6 @@ const EditUserPage = () => {
           <>
             <WizardStep stepId="basic" label="Basic Info">
               <ValidatedForm
-                title="Basic Info"
                 initialValues={wizardContext}
                 onSubmit={setWizardContext}
                 triggerSubmit={onNext}
@@ -148,13 +142,12 @@ const EditUserPage = () => {
             </WizardStep>
             <WizardStep stepId="tenants" label="Tenants and Roles">
               <ValidatedForm
-                title="Tenants and Roles"
                 fullWidth
                 initialValues={wizardContext}
                 onSubmit={setWizardContext}
                 triggerSubmit={onNext}
               >
-                <TenantRolesTableField required id="roleAssignments" />
+                <TenantRolesTableField required id="roleAssignments" tenants={tenants} />
               </ValidatedForm>
             </WizardStep>
           </>
