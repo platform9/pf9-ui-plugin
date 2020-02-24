@@ -17,10 +17,13 @@ import { pathJoin } from 'utils/misc'
 import { k8sPrefix } from 'app/constants'
 import Wizard from 'core/components/wizard/Wizard'
 import WizardStep from 'core/components/wizard/WizardStep'
+import { requiredValidator } from 'core/utils/fieldValidators'
 
 const listUrl = pathJoin(k8sPrefix, 'user_management')
 
 const userParams = { systemUsers: true }
+
+const userRolesValidations = [requiredValidator.withMessage('Must select at least one user')]
 
 const EditTenantPage = () => {
   const { match, history } = useReactRouter()
@@ -82,7 +85,11 @@ const EditTenantPage = () => {
                 onSubmit={setWizardContext}
                 triggerSubmit={onNext}
               >
-                <UserRolesTableField required id="roleAssignments" users={users} />
+                <UserRolesTableField
+                  validations={userRolesValidations}
+                  id="roleAssignments"
+                  users={users}
+                />
               </ValidatedForm>
             </WizardStep>
           </>

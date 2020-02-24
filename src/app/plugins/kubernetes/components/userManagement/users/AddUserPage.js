@@ -20,6 +20,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel'
 import Radio from '@material-ui/core/Radio'
 import { mngmTenantActions } from 'k8s/components/userManagement/tenants/actions'
 import UserPasswordField from 'k8s/components/userManagement/users/UserPasswordField'
+import { requiredValidator } from 'core/utils/fieldValidators'
 
 const listUrl = pathJoin(k8sPrefix, 'user_management#users')
 
@@ -29,6 +30,7 @@ const initialContext = {
   password: '',
   roleAssignments: {},
 }
+const tenantRolesValidations = [requiredValidator.withMessage('Must select at least one tenant')]
 
 const AddUserPage = () => {
   const { history } = useReactRouter()
@@ -113,7 +115,11 @@ const AddUserPage = () => {
                   loading={loadingTenants}
                   message={'Loading Tenants...'}
                 >
-                  <TenantRolesTableField required id="roleAssignments" tenants={tenants} />
+                  <TenantRolesTableField
+                    validations={tenantRolesValidations}
+                    id="roleAssignments"
+                    tenants={tenants}
+                  />
                 </Progress>
               </ValidatedForm>
             </WizardStep>
