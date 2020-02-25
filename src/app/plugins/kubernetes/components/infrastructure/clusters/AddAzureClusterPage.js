@@ -238,7 +238,7 @@ const AddAzureClusterPage = () => {
                             <CheckboxField
                               id="useAllAvailabilityZones"
                               label="Use all availability zones"
-                              onChange={(checked) => checked || getParamsUpdater('zones')([])}
+                              onChange={(checked) => checked || setWizardContext({ zones: [] })}
                               info=""
                             />
 
@@ -247,7 +247,7 @@ const AddAzureClusterPage = () => {
                               <AzureAvailabilityZoneChooser
                                 id="zones"
                                 info="Select from the Availability Zones for the specified region"
-                                onChange={getParamsUpdater('zones')}
+                                onChange={(value) => setWizardContext({ zones: value })}
                                 required
                               />
                             )}
@@ -260,8 +260,8 @@ const AddAzureClusterPage = () => {
                               label="Master Node SKU"
                               cloudProviderId={params.cloudProviderId}
                               cloudProviderRegionId={params.cloudProviderRegionId}
-                              filterByZones={!values.useAllAvailabilityZones}
-                              selectedZones={params.zones}
+                              filterByZones={!wizardContext.useAllAvailabilityZones}
+                              selectedZones={wizardContext.zones}
                               info="Choose an instance type used by master nodes."
                               required
                             />

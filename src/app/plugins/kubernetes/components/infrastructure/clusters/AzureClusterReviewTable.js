@@ -2,13 +2,24 @@ import React from 'react'
 import { Table, TableBody, TableCell, TableRow } from '@material-ui/core'
 import { castBoolToStr } from 'utils/misc'
 import CodeBlock from 'core/components/CodeBlock'
+import { makeStyles } from '@material-ui/styles'
 
-const DataRow = ({ label, value }) => (
-  <TableRow>
-    <TableCell>{label}</TableCell>
-    <TableCell>{value}</TableCell>
-  </TableRow>
-)
+const useStyles = makeStyles((theme) => ({
+  tableCell: {
+    width: '50%',
+    wordBreak: 'break-all',
+  },
+}))
+
+const DataRow = ({ label, value }) => {
+  const styles = useStyles()
+  return (
+    <TableRow>
+      <TableCell>{label}</TableCell>
+      <TableCell className={styles.tableCell}>{value}</TableCell>
+    </TableRow>
+  )
+}
 
 // TODO: azs, networking info, services/api FQDN auto-generate, MTU size
 const AzureClusterReviewTable = ({ data }) => {
