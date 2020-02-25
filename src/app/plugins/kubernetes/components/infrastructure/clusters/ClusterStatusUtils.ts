@@ -37,11 +37,11 @@ export function getConnectionStatus(
   taskStatus: string,
   nodes: ICombinedNode[],
 ): ConnectionStatus | TransientStatus {
-  if (!nodes.length) return 'disconnected'
-
   if (isTransientStatus(taskStatus)) {
     return taskStatus as TransientStatus
   }
+
+  if (!nodes.length) return 'disconnected'
 
   if (hasConvergingNodes(nodes)) {
     return 'converging'

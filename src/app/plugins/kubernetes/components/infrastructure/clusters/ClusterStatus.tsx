@@ -130,13 +130,13 @@ export const ClusterHealthStatus: FC<IClusterStatusProps> = ({
   variant = 'table',
   message = undefined,
 }) => {
-  if (isTransientStatus(cluster.healthStatus)) {
+  if (isTransientStatus(cluster.taskStatus)) {
     return renderTransientStatus(cluster, variant)
   }
 
   const fields = getClusterHealthStatus(cluster)
 
-  if (!fields || !cluster?.nodes?.length) {
+  if (!fields) {
     return (
       <ClusterStatusSpan title={message || 'Unknown'} status="unknown" variant={variant}>
         {message || 'Unknown'}
@@ -163,12 +163,12 @@ export const ClusterConnectionStatus: FC<IClusterStatusProps> = ({
   variant = 'table',
   message = undefined,
 }) => {
-  if (isTransientStatus(cluster.connectionStatus)) {
+  if (isTransientStatus(cluster.taskStatus)) {
     return renderTransientStatus(cluster, variant)
   }
   const fields = getClusterConnectionStatus(cluster)
 
-  if (!fields || !cluster?.nodes?.length) {
+  if (!fields) {
     return (
       <ClusterStatusSpan title={message || 'Unknown'} status="unknown" variant={variant}>
         {message || 'Unknown'}
