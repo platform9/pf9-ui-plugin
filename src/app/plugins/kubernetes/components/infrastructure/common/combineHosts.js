@@ -39,14 +39,14 @@ export const annotateResmgrFields = (host) => {
     roles: resmgr.roles || [],
     roleStatus: resmgr.role_status,
     roleData: {},
-    responding: resmgr.info.responding,
-    hostname: resmgr.info.hostname,
-    osInfo: resmgr.info.os_info,
+    responding: pathStrOrNull('info.responding', resmgr),
+    hostname: pathStrOrNull('info.hostname', resmgr),
+    osInfo: pathStrOrNull('info.os_info', resmgr),
     networks: [],
     vCenterIP: pathStrOrNull('extensions.hypervisor_details.data.vcenter_ip', resmgr),
     supportRole: resmgr.roles.includes('pf9-support'),
     networkInterfaces: pathStrOrNull('extensions.interfaces.data.iface_ip', resmgr),
-    warnings: resmgr.message && resmgr.message.warn,
+    warnings: pathStrOrNull('message.warn', resmgr),
   }
 }
 
