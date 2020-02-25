@@ -144,6 +144,10 @@ export function getHealthStatusMessage(cluster: ICluster): string {
   )
   const masterCounts = { total: masterNodes.length, healthy: healthyMasterNodes.length }
   const workerCounts = { total: workerNodes.length, healthy: healthyWorkerNodes.length }
+
+  if (!healthStatusAndMessage) {
+    return ''
+  }
   return healthStatusAndMessage.getMessage(masterCounts, workerCounts)
 }
 

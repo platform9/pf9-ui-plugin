@@ -7,7 +7,8 @@ import ExternalLink from 'core/components/ExternalLink'
 import ClusterStatusSpan from 'k8s/components/infrastructure/clusters/ClusterStatus'
 import createListTableComponent from 'core/helpers/createListTableComponent'
 import { noop, pathStrOr } from 'utils/fp'
-import { clusterHealthStatusFields } from '../clusters/ClusterStatusUtils'
+import { clusterHealthStatusFields, isTransientStatus } from '../clusters/ClusterStatusUtils'
+import { capitalizeString } from 'utils/misc'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -131,11 +132,19 @@ export const NodeTaskStatus = ({ status, iconStatus = false, children }) => {
   if (status === 'none') {
     return <EmptyStatus />
   }
+  const statusInTransientState = isTransientStatus(status)
+  const renderValue = statusMap.get(status) || capitalizeString(status)
+  const renderStatus = statusInTransientState ? 'loading' : status
+  const showIconStatusAlways = statusInTransientState ? true : iconStatus
 
   return (
     <div className={classes.statusRow}>
-      <ClusterStatusSpan iconStatus={iconStatus} status={status} title={statusMap.get(status)}>
-        {statusMap.get(status)}
+      <ClusterStatusSpan
+        iconStatus={showIconStatusAlways}
+        status={renderStatus}
+        title={renderValue}
+      >
+        {renderValue}
       </ClusterStatusSpan>
       {children}
     </div>

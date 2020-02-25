@@ -108,6 +108,9 @@ const renderErrorStatus = (taskError, nodesDetailsUrl, variant) => (
 )
 
 const renderTransientStatus = ({ uuid, connectionStatus }, variant) => {
+  if (!connectionStatus) {
+    return null
+  }
   const spanContent = `The cluster is ${connectionStatus}.`
 
   return (
@@ -136,23 +139,28 @@ export const ClusterHealthStatus: FC<IClusterStatusProps> = ({
 
   const fields = getClusterHealthStatus(cluster)
 
-  if (!fields) {
+  if (cluster.connectionStatus === 'disconnected') {
     return (
-      <ClusterStatusSpan title={message || 'Unknown'} status="unknown" variant={variant}>
-        {message || 'Unknown'}
-      </ClusterStatusSpan>
+      <div>
+        <ClusterStatusSpan title={message || 'Unknown'} status="unknown" variant={variant}>
+          {message || 'Unknown'}
+        </ClusterStatusSpan>
+        {cluster.taskError && renderErrorStatus(cluster.taskError, fields.nodesDetailsUrl, variant)}
+      </div>
     )
   }
 
   return (
     <div>
-      <ClusterStatusSpan title={fields.message} status={fields.status} variant={variant}>
-        {variant === 'header' ? (
-          fields.label
-        ) : (
-          <SimpleLink src={fields.nodesDetailsUrl}>{fields.label}</SimpleLink>
-        )}
-      </ClusterStatusSpan>
+      {fields && (
+        <ClusterStatusSpan title={fields.message} status={fields.status} variant={variant}>
+          {variant === 'header' ? (
+            fields.label
+          ) : (
+            <SimpleLink src={fields.nodesDetailsUrl}>{fields.label}</SimpleLink>
+          )}
+        </ClusterStatusSpan>
+      )}
       {cluster.taskError && renderErrorStatus(cluster.taskError, fields.nodesDetailsUrl, variant)}
     </div>
   )
