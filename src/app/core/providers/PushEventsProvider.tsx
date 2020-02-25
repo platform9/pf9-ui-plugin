@@ -43,13 +43,13 @@ const PushEventsProvider: FC<Props> = ({ children }) => {
   }
 
   const handleClusterStatusCreate = (payload) => {
-    const clusterUuid = payload[0].source
+    const clusterUuid = payload[0]?.source?.clusterUuid
     console.log(`Cluster created with uuid: ${clusterUuid}`)
     reloadClusters(true)
   }
 
   const handleClusterStatusDelete = (payload) => {
-    const clusterUuid = payload.source
+    const clusterUuid = payload[0]?.source?.clusterUuid
     console.log(`Cluster deleted with uuid: ${clusterUuid}`)
     reloadClusters(true)
   }
@@ -77,6 +77,7 @@ const PushEventsProvider: FC<Props> = ({ children }) => {
 
     typeHandler(payload)
   }
+
   useEffect(() => {
     const pushInstance = PushEventManager.getInstance()
     pushInstance.connect()
