@@ -142,7 +142,7 @@ const AddAzureClusterPage = () => {
   const classes = useStyles()
   const { params, getParamsUpdater } = useParams()
   const { history } = useReactRouter()
-  const onComplete = () => history.push(routes.cluster.list.path())
+  const onComplete = (_, { uuid }) => history.push(routes.cluster.nodeHealth.path({ id: uuid }))
   const [createAzureClusterAction, creatingAzureCluster] = useDataUpdater(
     clusterActions.create,
     onComplete,
