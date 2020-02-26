@@ -23,6 +23,7 @@ class PushEventManager {
   private static instance: PushEventManager
   private socket: WebSocket
   public subscribers: SubscriberFnType[] = []
+  private clearIntervalId = null
 
   constructor() {
     this.subscribers = []
@@ -37,9 +38,20 @@ class PushEventManager {
 
   handleOpen() {
     console.info('Websocket connection opened')
+    if (this.clearIntervalId) {
+      clearInterval(this.clearIntervalId)
+      this.clearIntervalId = null
+    }
   }
 
   handleClose() {
+    const RETRY_INTERVAL_SECONDS = 10
+
+    this.clearIntervalId = setInterval(() => {
+      console.info(`PushEvent websocket closed, retrying in ${RETRY_INTERVAL_SECONDS} seconds.`)
+      this.disconnect() // needed to remove the eventListeners
+      this.connect()
+    }, RETRY_INTERVAL_SECONDS * 1000)
     console.info('Websocket connection closed')
   }
 
