@@ -89,6 +89,9 @@ const useStyles = makeStyles<Theme, {}>((theme) => ({
     `,
     gridGap: theme.spacing(2),
   },
+  linkSpacer: {
+    paddingLeft: theme.spacing(),
+  },
 }))
 
 const getTaskContent = (
@@ -96,6 +99,7 @@ const getTaskContent = (
   completed: string[],
   failed: string,
   message: string,
+  nodeState: string,
 ): { message: string; color: 'success' | 'primary' | 'error' } => {
   // TODO get backend to update the last_failed_task to be null rather than 'None'
 
@@ -110,7 +114,11 @@ const getTaskContent = (
   if (completed.length < all.length && !hasFailed) {
     return { color: 'primary', message: `Steps ${completed.length} of ${all.length}: ${message}` }
   }
-  return { color: 'error', message: `failed at step ${failedIdx + 1} (out of ${all.length})` }
+  return {
+    color: 'error',
+    message: `${nodeState === 'retrying' ? 'Retrying' : 'Failed'} at step ${failedIdx +
+      1} (out of ${all.length})`,
+  }
 }
 const oneSecond = 1000
 
@@ -167,6 +175,7 @@ export const NodeHealthWithTasksToggler: FC = () => {
     paneBody,
     tableChooser,
     tablePolling,
+    linkSpacer,
   } = useStyles({})
   const kubeStatusData = selectedNode?.combined?.resmgr?.extensions?.pf9_kube_status?.data || {}
   const selectedNodeAllTasks = kubeStatusData.all_tasks || []
@@ -179,8 +188,10 @@ export const NodeHealthWithTasksToggler: FC = () => {
   const shouldShowStateStatus = !!nodeState && nodeState !== 'ok'
   const selectedNodeStatus = shouldShowStateStatus ? (
     <NodeTaskStatus status={nodeState}>
-      {nodeState.includes('fail') && (
-        <ExternalLink url={nodeInstallTroubleshooting}>Troubleshooting Help</ExternalLink>
+      {(nodeState.includes('fail') || nodeState === 'retrying') && (
+        <ExternalLink className={linkSpacer} url={nodeInstallTroubleshooting}>
+          Troubleshooting Help
+        </ExternalLink>
       )}
     </NodeTaskStatus>
   ) : (
@@ -233,6 +244,7 @@ export const NodeHealthWithTasksToggler: FC = () => {
                 completedTasks,
                 lastFailedTask,
                 lastCompletedStep,
+                nodeState,
               )
               return (
                 <TableRow key={node.uuid} onClick={() => setSelectedNode(node)}>
@@ -285,6 +297,7 @@ export const NodeHealthWithTasksToggler: FC = () => {
               lastFailedTask={lastSelectedNodesFailedTask}
               completedTasks={selectedNodeCompletedTasks}
               logs={selectedNode?.logs}
+              nodeState={nodeState}
             />
           )}
         </article>

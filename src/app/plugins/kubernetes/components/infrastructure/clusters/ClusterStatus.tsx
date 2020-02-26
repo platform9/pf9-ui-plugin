@@ -39,6 +39,7 @@ const useStyles = makeStyles<Theme, Props>((theme: Theme) => ({
     display: 'grid',
     alignItems: 'center',
     gridTemplateColumns: '20px 1fr',
+    whiteSpace: 'nowrap',
     gridGap: theme.spacing(),
     justifyItems: 'center',
     '&:before': {
