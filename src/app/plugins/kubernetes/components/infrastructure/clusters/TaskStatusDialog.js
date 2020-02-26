@@ -56,7 +56,7 @@ const useStyles = makeStyles((theme) => ({
   },
   statusRow: {
     display: 'grid',
-    gridTemplateColumns: '75px 1fr',
+    gridTemplateColumns: 'minmax(75px, 130px) 1fr',
     alignItems: 'center',
   },
 }))
@@ -73,6 +73,7 @@ const TaskStatusDialog = ({ isOpen, toggleOpen, node }) => {
     all_tasks: allTasks = [],
     last_failed_task: lastFailedTask,
     completed_tasks: completedTasks,
+    pf9_kube_node_state: nodeState,
   } = pathStrOr({}, 'combined.resmgr.extensions.pf9_kube_status.data', node)
   const healthStatus =
     status === 'disconnected' ? 'unknown' : status === 'ok' ? 'healthy' : 'unhealthy'
@@ -106,6 +107,7 @@ const TaskStatusDialog = ({ isOpen, toggleOpen, node }) => {
           lastFailedTask={lastFailedTask}
           completedTasks={completedTasks}
           logs={node.logs}
+          nodeState={nodeState}
         />
       </DialogContent>
     </Dialog>
@@ -116,14 +118,16 @@ const statusMap = new Map([
   ['fail', 'Failed'],
   ['ok', 'Completed'],
   ['loading', 'In Progress'],
-  ['retrying', 'Retrying'],
+  ['retrying', 'Failed... Retrying'],
   ['failed', 'Failed'],
   ['disconnected', 'Unknown'],
 ])
 
 const renderStatus = (_, { status, logs }) => (
   <NodeTaskStatus status={status} iconStatus>
-    {status.includes('fail') && <ExternalLink url={logs || ''}>View Logs</ExternalLink>}
+    {(status.includes('fail') || status === 'retrying') && (
+      <ExternalLink url={logs || ''}>View Logs</ExternalLink>
+    )}
   </NodeTaskStatus>
 )
 
@@ -132,7 +136,7 @@ export const NodeTaskStatus = ({ status, iconStatus = false, children }) => {
   if (status === 'none') {
     return <EmptyStatus />
   }
-  const statusInTransientState = isTransientStatus(status)
+  const statusInTransientState = isTransientStatus(status) || status === 'retrying'
   const renderValue = statusMap.get(status) || capitalizeString(status)
   const renderStatus = statusInTransientState ? 'loading' : status
   const showIconStatusAlways = statusInTransientState ? true : iconStatus
@@ -165,13 +169,16 @@ const TasksTable = createListTableComponent({
   emptyText: <Typography variant="body1">No status information currently available.</Typography>,
 })
 
-export const Tasks = ({ allTasks, completedTasks = [], lastFailedTask, logs }) => {
+export const Tasks = ({ allTasks, completedTasks = [], lastFailedTask, logs, nodeState }) => {
   const classes = useStyles()
   const failedTaskIndex = allTasks.indexOf(lastFailedTask)
   const completedTaskCount = failedTaskIndex >= 0 ? failedTaskIndex : completedTasks.length
   const getStatus = (index) => {
-    if (index === failedTaskIndex) {
+    if (index === failedTaskIndex && nodeState !== 'retrying') {
       return 'fail'
+    }
+    if (index === failedTaskIndex && nodeState === 'retrying') {
+      return 'retrying'
     }
     if (index < completedTasks.length || index <= failedTaskIndex) {
       return 'ok'
