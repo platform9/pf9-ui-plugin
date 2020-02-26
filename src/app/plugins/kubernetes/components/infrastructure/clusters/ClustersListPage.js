@@ -124,8 +124,7 @@ const canScaleMasters = ([cluster]) =>
   cluster.taskStatus === 'success' &&
   cluster.cloudProviderType === 'local' &&
   (cluster.nodes || []).length > 1
-const canScaleWorkers = ([cluster]) =>
-  cluster.taskStatus === 'success' && cluster.cloudProviderType !== 'azure'
+const canScaleWorkers = ([cluster]) => cluster.taskStatus === 'success'
 const canUpgradeCluster = (selected) => false
 const canDeleteCluster = ([row]) => !['creating', 'deleting'].includes(row.taskStatus)
 

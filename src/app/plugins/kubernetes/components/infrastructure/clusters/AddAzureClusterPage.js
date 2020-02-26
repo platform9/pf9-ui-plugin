@@ -238,7 +238,9 @@ const AddAzureClusterPage = () => {
                             <CheckboxField
                               id="useAllAvailabilityZones"
                               label="Use all availability zones"
-                              onChange={(checked) => checked || setWizardContext({ zones: [] })}
+                              onChange={(value) =>
+                                setWizardContext({ useAllAvailabilityZones: value, zones: [] })
+                              }
                               info=""
                             />
 
