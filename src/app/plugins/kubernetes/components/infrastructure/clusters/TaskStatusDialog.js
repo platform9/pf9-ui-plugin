@@ -56,8 +56,11 @@ const useStyles = makeStyles((theme) => ({
   },
   statusRow: {
     display: 'grid',
-    gridTemplateColumns: 'minmax(75px, 130px) 1fr',
+    gridTemplateColumns: 'minmax(75px, min-content) 1fr',
     alignItems: 'center',
+  },
+  linkSpacer: {
+    paddingLeft: theme.spacing(),
   },
 }))
 
@@ -123,13 +126,22 @@ const statusMap = new Map([
   ['disconnected', 'Unknown'],
 ])
 
-const renderStatus = (_, { status, logs }) => (
-  <NodeTaskStatus status={status} iconStatus>
-    {(status.includes('fail') || status === 'retrying') && (
-      <ExternalLink url={logs || ''}>View Logs</ExternalLink>
-    )}
-  </NodeTaskStatus>
-)
+const renderStatus = (_, { status, logs }) => <RenderNodeStatus status={status} logs={logs} />
+
+const RenderNodeStatus = ({ status, logs }) => {
+  // TODO fix this stupid styling dependency so I dont
+  // have to make a component anytime i want styles.
+  const classes = useStyles()
+  return (
+    <NodeTaskStatus status={status} iconStatus>
+      {(status.includes('fail') || status === 'retrying') && (
+        <ExternalLink className={classes.linkSpacer} url={logs || ''}>
+          View Logs
+        </ExternalLink>
+      )}
+    </NodeTaskStatus>
+  )
+}
 
 export const NodeTaskStatus = ({ status, iconStatus = false, children }) => {
   const classes = useStyles()

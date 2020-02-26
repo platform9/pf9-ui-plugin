@@ -89,6 +89,9 @@ const useStyles = makeStyles<Theme, {}>((theme) => ({
     `,
     gridGap: theme.spacing(2),
   },
+  linkSpacer: {
+    paddingLeft: theme.spacing(),
+  },
 }))
 
 const getTaskContent = (
@@ -172,6 +175,7 @@ export const NodeHealthWithTasksToggler: FC = () => {
     paneBody,
     tableChooser,
     tablePolling,
+    linkSpacer,
   } = useStyles({})
   const kubeStatusData = selectedNode?.combined?.resmgr?.extensions?.pf9_kube_status?.data || {}
   const selectedNodeAllTasks = kubeStatusData.all_tasks || []
@@ -184,8 +188,10 @@ export const NodeHealthWithTasksToggler: FC = () => {
   const shouldShowStateStatus = !!nodeState && nodeState !== 'ok'
   const selectedNodeStatus = shouldShowStateStatus ? (
     <NodeTaskStatus status={nodeState}>
-      {nodeState.includes('fail') && (
-        <ExternalLink url={nodeInstallTroubleshooting}>Troubleshooting Help</ExternalLink>
+      {(nodeState.includes('fail') || nodeState === 'retrying') && (
+        <ExternalLink className={linkSpacer} url={nodeInstallTroubleshooting}>
+          Troubleshooting Help
+        </ExternalLink>
       )}
     </NodeTaskStatus>
   ) : (
