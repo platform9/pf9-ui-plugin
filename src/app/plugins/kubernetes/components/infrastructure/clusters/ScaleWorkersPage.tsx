@@ -87,7 +87,7 @@ const ScaleWorkers: FunctionComponent<ScaleWorkersProps> = ({
     params.scaleType === 'add' ? value + MAX_SCALE_AT_A_TIME : value
 
   const chooseScaleNum = (
-    <ValidatedForm initialValues={cluster} onSubmit={onSubmit}>
+    <ValidatedForm initialValues={cluster} onSubmit={onSubmit} elevated={false}>
       {!cluster.enableCAS && (
         <TextField
           id="numWorkers"
