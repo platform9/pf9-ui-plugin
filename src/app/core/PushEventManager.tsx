@@ -40,6 +40,13 @@ class PushEventManager {
   }
 
   handleClose() {
+    const RETRY_INTERVAL_SECONDS = 10
+
+    setTimeout(() => {
+      console.info(`PushEvent websocket closed, retrying in ${RETRY_INTERVAL_SECONDS} seconds.`)
+      this.disconnect()
+      this.connect()
+    }, RETRY_INTERVAL_SECONDS * 1000)
     console.info('Websocket connection closed')
   }
 

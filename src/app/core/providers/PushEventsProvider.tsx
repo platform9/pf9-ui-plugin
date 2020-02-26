@@ -29,28 +29,33 @@ const PushEventsProvider: FC<Props> = ({ children }) => {
     // console.log('qbert::cluster_update', payload)
   }
 
-  const handleClusterStatus = (payload) => {
-    const { action } = payload
-    const actionHandlers = {
-      create: handleClusterStatusCreate(payload),
-      delete: handleClusterStatusDelete(payload),
-    }
-    const catchAll = (payload) => {
-      console.info(`No push event handler found for qbert::cluster_status with action: ${action}`)
-    }
-    const handler = actionHandlers[action] || catchAll
-    handler(payload)
+  const handleClusterStatus = (items) => {
+    items.forEach((item) => {
+      const { action } = item
+      const actionHandlers = {
+        create: handleClusterStatusCreate,
+        delete: handleClusterStatusDelete,
+      }
+      const catchAll = (_item) => {
+        console.warn(
+          `No push event handler found for qbert::cluster_status with action: ${_item?.action}`,
+          _item,
+        )
+      }
+      const handler = actionHandlers[action] || catchAll
+      handler(item)
+    })
   }
 
   const handleClusterStatusCreate = (payload) => {
-    const clusterUuid = payload[0]?.source?.clusterUuid
-    console.log(`Cluster created with uuid: ${clusterUuid}`)
+    const clusterUuid = payload?.source?.clusterUuid
+    console.info(`Cluster created with uuid: ${clusterUuid}`)
     reloadClusters(true)
   }
 
   const handleClusterStatusDelete = (payload) => {
-    const clusterUuid = payload[0]?.source?.clusterUuid
-    console.log(`Cluster deleted with uuid: ${clusterUuid}`)
+    const clusterUuid = payload?.source?.clusterUuid
+    console.info(`Cluster deleted with uuid: ${clusterUuid}`)
     reloadClusters(true)
   }
 
@@ -67,12 +72,12 @@ const PushEventsProvider: FC<Props> = ({ children }) => {
 
     const sourceHandler = handlers[source]
     if (!sourceHandler) {
-      return console.error(`No push event handlers implemented for source ${source}`)
+      return console.warn(`No push event handlers implemented for source ${source}`)
     }
 
     const typeHandler = sourceHandler[type]
     if (!typeHandler) {
-      return console.error(`No push event handlers implemented for source ${source} type ${type}`)
+      return console.warn(`No push event handlers implemented for source ${source} type ${type}`)
     }
 
     typeHandler(payload)
