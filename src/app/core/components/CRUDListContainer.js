@@ -119,9 +119,11 @@ const CRUDListContainer = ({
       {addEnabled && (
         <PageContainerHeader>
           {AddButton ? (
-            <AddButton onClick={handleAdd} />
+            <AddButton data-testid="list-container-add-btn" onClick={handleAdd} />
           ) : (
-            <CreateButton onClick={handleAdd}>{addText}</CreateButton>
+            <CreateButton data-testid="list-container-create-btn" onClick={handleAdd}>
+              {addText}
+            </CreateButton>
           )}
         </PageContainerHeader>
       )}

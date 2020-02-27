@@ -1,43 +1,11 @@
-import config from '../../config'
-
-const signInText = 'Sign In'
-const username = 'admin@platform9.com'
-const password = 'secret'
-
-describe('login', () => {
-  it('reports failed logins', () => {
+describe('Login', () => {
+  it('login into application', () => {
     cy.visit('/')
-
-    cy.get('#email')
-      .type(username)
-
-    cy.get('#password')
-      .type('badpassword')
-
-    cy.contains(signInText)
-      .click()
-
-    cy.contains('Login failed')
-  })
-
-  it('logs in successfully', () => {
-    cy.get('#email')
-      .clear()
-      .type(username)
-
-    cy.get('#password')
-      .clear()
-      .type(password)
-
-    cy.contains(signInText)
-      .click()
-
-    cy.contains(config.region)
-  })
-
-  it('remembers the login state on refresh', () => {
-    cy.login()
-    cy.visit('/')
-    cy.contains(config.region)
+    cy.get('[data-testid=login-email]').type(Cypress.env('userName'))
+    cy.get('[data-testid=login-password]').type(Cypress.env('password'))
+    cy.get('[data-testid=login-submit-btn]').click()
+    // For dev testing it is taking time to login
+    cy.wait(5000)
+    cy.url().should('include', 'ui/kubernetes/dashboard')
   })
 })

@@ -88,7 +88,9 @@ const ListTableAction = withRouter(
             ) : (
               icon
             )}
-            <div className={actionLabel}>{label}</div>
+            <div data-testid={`list-table-batch-action-${label}`} className={actionLabel}>
+              {label}
+            </div>
           </div>
         </Tooltip>
       </Fragment>

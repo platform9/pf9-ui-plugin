@@ -2,5 +2,13 @@
   "baseUrl": "http://localhost:3000",
   "viewportWidth": 1920,
   "viewportHeight": 1080,
-  "projectId": "k5ua2x"
+  "projectId": "k5ua2x",
+  "env": {
+    "userName": "test-user@platform9.com",
+    "password": "TestPassword@123",
+    "users": {
+      "userName": "__TestUser__",
+      "password": "Test@123"
+    }
+  }
 }

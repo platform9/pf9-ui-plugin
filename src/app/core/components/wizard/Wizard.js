@@ -72,7 +72,9 @@ class Wizard extends PureComponent {
         ...this.getActiveStepId(state, state.activeStep + 1),
       }),
       () => {
-        if (steps[activeStep].onNext) { steps[activeStep].onNext(wizardContext) }
+        if (steps[activeStep].onNext) {
+          steps[activeStep].onNext(wizardContext)
+        }
         if (this.isComplete()) {
           onComplete(this.state.wizardContext)
         }
@@ -137,13 +139,27 @@ class Wizard extends PureComponent {
         {showSteps && <WizzardStepper steps={steps} activeStep={activeStep} />}
         {renderStepsContent({ wizardContext, setWizardContext, onNext: this.onNext })}
         <WizardButtons>
-          {onCancel && <CancelButton onClick={onCancel} />}
-          {this.hasBack() && <PrevButton onClick={this.handleBack} />}
-          {this.canBackAtFirstStep() && <PrevButton onClick={this.handleOriginBack} />}
-          {this.hasNext() && <NextButton onClick={this.handleNext}>Next</NextButton>}
-          {this.isLastStep() && <NextButton onClick={this.handleNext}>{submitLabel}</NextButton>}
+          {onCancel && <CancelButton data-testid="wizard-cancel-btn" onClick={onCancel} />}
+          {this.hasBack() && <PrevButton data-testid="wizard-prev-btn" onClick={this.handleBack} />}
+          {this.canBackAtFirstStep() && (
+            <PrevButton data-testid="wizard-back-first-step-btn" onClick={this.handleOriginBack} />
+          )}
+          {this.hasNext() && (
+            <NextButton data-testid="wizard-next-btn" onClick={this.handleNext}>
+              Next
+            </NextButton>
+          )}
+          {this.isLastStep() && (
+            <NextButton data-testid="wizard-submit-btn" onClick={this.handleNext}>
+              {submitLabel}
+            </NextButton>
+          )}
           {shouldShowFinishAndReview && this.isFinishAndReviewVisible() && (
-            <NextButton onClick={this.onFinishAndReview} showForward={false}>
+            <NextButton
+              data-testid="wizard-finish-review-btn"
+              onClick={this.onFinishAndReview}
+              showForward={false}
+            >
               {finishAndReviewLabel}
             </NextButton>
           )}

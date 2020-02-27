@@ -21,7 +21,13 @@ const passwordValidators = [requiredValidator, passwordValidator]
 
 const CheckListItem = ({ children, checked }) => (
   <ListItem>
-    <ListItemIcon>{checked ? <CheckIcon /> : <ClearIcon color="error" />}</ListItemIcon>
+    <ListItemIcon>
+      {checked ? (
+        <CheckIcon />
+      ) : (
+        <ClearIcon data-testid="user-password-field-error" color="error" />
+      )}
+    </ListItemIcon>
     <ListItemText primary={children} />
   </ListItem>
 )
@@ -29,6 +35,7 @@ const CheckListItem = ({ children, checked }) => (
 const UserPasswordField = ({ value }) => (
   <>
     <TextField
+      data-testid="user-password-field"
       id="password"
       label="Password"
       value={value}
@@ -38,11 +45,31 @@ const UserPasswordField = ({ value }) => (
     <Typography variant="body1" component="div">
       Password must contain the following:
       <List dense>
-        <CheckListItem checked={hasMinLength(8)(value)}>At least 8 characters long</CheckListItem>
-        <CheckListItem checked={hasOneLowerChar(value)}>1 Lowercase letter</CheckListItem>
-        <CheckListItem checked={hasOneUpperChar(value)}>1 Uppercase letter</CheckListItem>
-        <CheckListItem checked={hasOneNumber(value)}>1 Number</CheckListItem>
-        <CheckListItem checked={hasOneSpecialChar(value)}>
+        <CheckListItem
+          data-testid="user-password-field-char-length"
+          checked={hasMinLength(8)(value)}
+        >
+          At least 8 characters long
+        </CheckListItem>
+        <CheckListItem
+          data-testid="user-password-field-lower-case-char"
+          checked={hasOneLowerChar(value)}
+        >
+          1 Lowercase letter
+        </CheckListItem>
+        <CheckListItem
+          data-testid="user-password-field-upper-case-char"
+          checked={hasOneUpperChar(value)}
+        >
+          1 Uppercase letter
+        </CheckListItem>
+        <CheckListItem data-testid="user-password-field-number" checked={hasOneNumber(value)}>
+          1 Number
+        </CheckListItem>
+        <CheckListItem
+          data-testid="user-password-field-special-char"
+          checked={hasOneSpecialChar(value)}
+        >
           1 Special character - {specialChars}
         </CheckListItem>
       </List>

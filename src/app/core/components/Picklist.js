@@ -52,7 +52,7 @@ const Picklist = React.forwardRef((props, ref) => {
         showNone ? prepend({ label: noneLabel || 'None', value: noneKey }) : identity,
         showAll ? prepend({ label: 'All', value: allKey }) : identity,
         map((option) => (
-          <MenuItem value={option.value} key={option.value}>
+          <MenuItem data-testid="pick-list-menu-item" value={option.value} key={option.value}>
             {option.label}
           </MenuItem>
         )),
@@ -84,6 +84,7 @@ const Picklist = React.forwardRef((props, ref) => {
   return (
     <Progress inline overlay loading={loading} renderContentOnMount={loading === undefined}>
       <TextField
+        data-testid="pick-list-text-field"
         {...restProps}
         ref={ref}
         disabled={disabled || (isEmpty(options) && !showNone)}

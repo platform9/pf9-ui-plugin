@@ -44,7 +44,7 @@ class UserMenu extends React.PureComponent {
     }
 
     return (
-      <div className={`${classes.avatar} ${className}`}>
+      <div data-testid="user-menu" className={`${classes.avatar} ${className}`}>
         <Typography color="inherit" variant="subtitle2" onClick={this.handleClick}>
           {username} &#9662;
         </Typography>
@@ -57,7 +57,9 @@ class UserMenu extends React.PureComponent {
           anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
         >
           {false && <MenuItem onClick={this.handleChangePassword}>Change Password</MenuItem>}
-          <MenuItem onClick={this.logout}>Sign Out</MenuItem>
+          <MenuItem data-testid="user-menu-sign-out" onClick={this.logout}>
+            Sign Out
+          </MenuItem>
         </Menu>
       </div>
     )

@@ -1,83 +1,69 @@
 describe('users', () => {
   before(() => {
-    cy.resetServerContext('dev')
     cy.login()
     cy.visit('/ui/kubernetes/user_management#users')
   })
 
-  context('list users', () => {
-    it('lists users', () => {
-      cy.contains('tr', 'Test user 5')
-      cy.contains('tr', 'admin@platform9.com')
-    })
-  })
-
   context('create user', () => {
     it('shows the create user dialog', () => {
-      cy.contains('button', 'Create a new User').click()
-      cy.contains('New User')
+      cy.get('[data-testid=list-container-create-btn]')
+        .should('exist', 'contains', 'Create a new User')
+        .click()
+      cy.get('[data-testid=form-wrapper-container]').should('exist')
     })
 
     it('fills the name and description fields and move to next step', () => {
-      cy.get('input#username').clear().type('User#Test')
-      cy.get('input#displayname').clear().type('User#Test')
-      cy.get('input#password').clear().type('Secret-123')
-
-      cy.contains('button', 'Next').click()
-      cy.contains('Select one or more tenants that should map to this user')
+      cy.get('[data-testid=add-user-page-basic-info-user-name]').type(Cypress.env('users').userName)
+      cy.get('[data-testid=add-user-page-basic-info-display-name]').type(
+        Cypress.env('users').userName,
+      )
+      cy.get('[data-testid=add-user-page-basic-info-activation-by-password]').click()
+      cy.get('[data-testid=user-password-field]').type(Cypress.env('users').password)
+      cy.get('[data-testid=wizard-next-btn]').click()
     })
 
     it('select the users and roles and submit', () => {
-      cy.contains('tr', 'Tenant #0').find('.MuiCheckbox-root').click()
-      cy.contains('button', 'Complete').click()
-      cy.contains('User User#Test created successfully')
-      cy.contains('tr', 'User#Test')
+      cy.get('[data-testid=list-table-checkbox]')
+        .first()
+        .click()
+      cy.get('[data-testid=pick-list-text-field]>div')
+        .first()
+        .click()
+      cy.get('[data-testid=pick-list-menu-item]')
+        .first()
+        .click()
+      cy.get('[data-testid=wizard-submit-btn]').click({ force: true })
+      cy.get('[data-testid=toast-container]').should('exist')
+      cy.get('[data-testid=toast-container]').should(
+        'exist',
+        'contains',
+        Cypress.env('users').userName,
+      )
+      cy.wait(3000)
     })
 
-    // TODO We should try to login with the newly created user
-  })
-
-  context('edit user', () => {
-    it('shows the edit user dialog', () => {
-      cy.contains('tr', 'User#Test').click()
-      cy.contains('div', 'Edit').click()
-      cy.contains('Edit User User#Test')
+    it('confirm newly created user', () => {
+      cy.get('[data-testid=search-bar-text-field] input').type(Cypress.env('users').userName)
+      cy.get('[data-testid=list-table-row]').should('have.length', 1)
+      cy.get('[data-testid=search-bar-text-field] input').clear()
     })
 
-    it('updates the user name and passsword and move to next step', () => {
-      cy.contains('.togglableField', 'Username or Email').find('a').click()
-      cy.contains('.togglableField', 'Display Name').find('a').click()
-      cy.contains('.togglableField', 'Password').find('a').click()
-
-      cy.get('input#username').clear().type('User#Test *EDITED*')
-      cy.get('input#displayname').clear().type('User#Test *EDITED*')
-      cy.get('input#password').clear().type('Secret-321')
-
-      cy.contains('button', 'Next').click()
-      cy.contains('Select one or more tenants that should map to this user')
-    })
-
-    it('change selected tenants and roles and submit', () => {
-      cy.contains('tr', 'Tenant #0')
-        .find('.MuiCheckbox-root').click()
-
-      cy.contains('tr', 'Tenant #2').find('.MuiSelect-root').click()
-      cy.contains('li', 'admin').click()
-
-      cy.contains('button', 'Complete').click()
-      cy.contains('User User#Test updated successfully')
-      cy.contains('User#Test *EDITED*')
-    })
-  })
-
-  context('remove user', () => {
     it('delete the newly created user', () => {
-      cy.contains('tr', 'User#Test *EDITED*').click()
-      cy.contains('Delete').click()
-      cy.contains('Are you sure?')
-      cy.contains('Confirm').click()
-      cy.contains('User User#Test *EDITED* deleted successfully')
-      cy.contains('tr', 'User#Test *EDITED*').should('not.exist')
+      cy.get('[data-testid=search-bar-text-field] input').type(Cypress.env('users').userName)
+      cy.get('[data-testid=list-table-row]').should('have.length', 1)
+      cy.get('[data-testid=list-table-radio]').click()
+      cy.get('[data-testid=list-table-batch-action-Delete]').click()
+      cy.get('[data-testid=confirmation-dialog-display-text]').should(
+        'contain',
+        Cypress.env('users').userName,
+      )
+      cy.get('[data-testid=confirmation-dialog-confirm-btn]').click()
+      cy.get('[data-testid=search-bar-text-field] input').clear()
+    })
+
+    it('confirm the deleted entry is not present is list', () => {
+      cy.get('[data-testid=search-bar-text-field] input').type(Cypress.env('users').userName)
+      cy.get('[data-testid=list-table-row]').should('not.exist')
     })
   })
 })

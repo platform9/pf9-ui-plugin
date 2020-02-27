@@ -127,6 +127,7 @@ export class LoginPage extends React.PureComponent {
       <Fragment>
         <TextField
           required
+          data-testid="login-email"
           id="email"
           label="Email"
           placeholder="Email"
@@ -135,6 +136,7 @@ export class LoginPage extends React.PureComponent {
         />
         <TextField
           required
+          data-testid="login-password"
           id="password"
           label="Password"
           className={classes.textField}
@@ -150,6 +152,7 @@ export class LoginPage extends React.PureComponent {
     return (
       <Fragment>
         <FormControlLabel
+          data-testid="login-mfa-checkbox"
           value="MFAcheckbox"
           className={classes.checkbox}
           control={
@@ -161,9 +164,12 @@ export class LoginPage extends React.PureComponent {
             />
           }
           label={
-            <div>
+            <div data-testid="login-mfa-info">
               <span>I have a Multi-Factor Authentication (MFA) token. (</span>
-              <ExternalLink url="https://platform9.com/support/setup-multi-factor-authentication-with-platform9/">
+              <ExternalLink
+                data-testid="login-mfa-info-url"
+                url="https://platform9.com/support/setup-multi-factor-authentication-with-platform9/"
+              >
                 more info
               </ExternalLink>
               <span>)</span>
@@ -179,6 +185,7 @@ export class LoginPage extends React.PureComponent {
     return (
       <TextField
         required={this.state.MFAcheckbox}
+        data-testid="login-mfa-checkbox"
         id="MFA"
         label="MFA Code"
         className={classes.textField}
@@ -192,14 +199,27 @@ export class LoginPage extends React.PureComponent {
     const { classes } = this.props
     return (
       <Fragment>
-        <Typography className={classes.paragraph} variant="caption" color="textSecondary">
+        <Typography
+          datat-testid="login-terms-cond"
+          className={classes.paragraph}
+          variant="caption"
+          color="textSecondary"
+        >
           By signing in, you agree to our{' '}
-          <ExternalLink url="https://platform9.com/terms-conditions/">
+          <ExternalLink
+            data-testid="login-terms-cond-url"
+            url="https://platform9.com/terms-conditions/"
+          >
             Terms of Service
           </ExternalLink>
           .
         </Typography>
-        <Typography className={classes.paragraph} variant="caption" color="textSecondary">
+        <Typography
+          data-testid="login-copyright"
+          className={classes.paragraph}
+          variant="caption"
+          color="textSecondary"
+        >
           © 2014-{moment().year()} Platform9 Systems, Inc.
         </Typography>
       </Fragment>
@@ -216,6 +236,7 @@ export class LoginPage extends React.PureComponent {
           <Grid item md={4} lg={3}>
             <Paper className={classes.paper}>
               <img
+                data-testid="login-logo-img"
                 alt="Platform9"
                 src={pathJoin(imageUrlRoot, 'logo-color.png')}
                 className={classes.img}
@@ -229,6 +250,7 @@ export class LoginPage extends React.PureComponent {
                 {this.state.MFAcheckbox && this.renderMFAInput()}
                 {loginFailed && <Alert small variant="error" message="Login failed" />}
                 <Button
+                  data-testid="login-submit-btn"
                   type="submit"
                   disabled={loading}
                   className={classes.signinButton}
@@ -238,7 +260,11 @@ export class LoginPage extends React.PureComponent {
                   {loading ? 'Attempting login...' : 'Sign In'}
                 </Button>
                 <Typography className={classes.forgotPwd} gutterBottom>
-                  <SimpleLink onClick={this.handleForgotPassword()} src={forgotPasswordUrl}>
+                  <SimpleLink
+                    data-testid="login-forgot-password"
+                    onClick={this.handleForgotPassword()}
+                    src={forgotPasswordUrl}
+                  >
                     Forgot password?
                   </SimpleLink>
                 </Typography>

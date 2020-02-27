@@ -46,13 +46,27 @@ class ConfirmationDialog extends React.PureComponent<IConfirmationDialog> {
       >
         <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">{text}</DialogContentText>
+          <DialogContentText
+            data-testid="confirmation-dialog-display-text"
+            id="alert-dialog-description"
+          >
+            {text}
+          </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={this.handleCancel} color="primary">
+          <Button
+            data-testid="confirmation-dialog-cancel-btn"
+            onClick={this.handleCancel}
+            color="primary"
+          >
             {cancelText}
           </Button>
-          <Button onClick={this.handleConfirm} color="primary" autoFocus>
+          <Button
+            data-testid="confirmation-dialog-confirm-btn"
+            onClick={this.handleConfirm}
+            color="primary"
+            autoFocus
+          >
             {confirmText}
           </Button>
         </DialogActions>

@@ -57,6 +57,7 @@ class SearchBar extends PureComponent {
     return (
       searchTerm !== undefined && (
         <TextField
+          data-testid="search-bar-text-field"
           variant="outlined"
           placeholder="Search"
           className={clsx(classes.SearchBar, className)}

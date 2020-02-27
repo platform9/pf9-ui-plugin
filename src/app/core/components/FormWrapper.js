@@ -27,7 +27,7 @@ const FormWrapper = ({ backUrl = undefined, children, title, className, ...rest 
   const classes = useStyles()
   const progressProps = pick(keys(Progress.propTypes), rest)
   return (
-    <Grid container>
+    <Grid data-testid="form-wrapper-container" container>
       <Grid item xs={11}>
         <Grid container justify="space-between">
           <Grid item>
