@@ -24,11 +24,12 @@ export const cloudProviderActions = createCRUDActions(cloudProvidersCacheKey, {
   listFn: () => qbert.getCloudProviders(),
   createFn: async (params) => {
     const result = await qbert.createCloudProvider(params)
-    return {
-      // TODO we need "nodePoolUuid"
-      ...pick(['name', 'type'], params),
-      ...result,
-    }
+    const { uuid } = result || {}
+
+    // TODO why does the detail request not return the nodepooluuid?
+    const data = await qbert.getCloudProviders()
+    const cloudProvider = data.find((cp) => cp.uuid === uuid) || {}
+    return { ...cloudProvider }
   },
   updateFn: ({ uuid, ...data }) => qbert.updateCloudProvider(uuid, data),
   deleteFn: ({ uuid }) => qbert.deleteCloudProvider(uuid),

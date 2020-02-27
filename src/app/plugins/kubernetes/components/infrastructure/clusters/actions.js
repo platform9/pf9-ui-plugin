@@ -8,7 +8,7 @@ import {
   combinedHostsCacheKey,
   loadCombinedHosts,
 } from 'k8s/components/infrastructure/common/actions'
-import { filterIf, isTruthy, updateWith, adjustWith, keyValueArrToObj } from 'utils/fp'
+import { filterIf, isTruthy, updateWith, adjustWith, keyValueArrToObj, pathStrOr } from 'utils/fp'
 import { mapAsync } from 'utils/async'
 import {
   pluck,
@@ -54,10 +54,10 @@ const getKubernetesVersion = async (clusterId) => {
 }
 
 const getEtcdBackupPayload = (data) =>
-  data.etcdBackup
+  pathStrOr(0, 'etcdBackup.isEtcdBackupEnabled', data)
     ? {
+        ...data.etcdBackup,
         isEtcdBackupEnabled: 1,
-        storageType: 'local',
         storageProperties: {
           localPath: data.etcdStoragePath,
         },
