@@ -33,10 +33,11 @@ export const annotateCloudStack = (host) => {
 
 export const annotateResmgrFields = (host) => {
   const { resmgr = {} } = host
+  const resmgrRoles = resmgr.roles || []
   return {
     ...host,
     id: resmgr.id,
-    roles: resmgr.roles || [],
+    roles: resmgrRoles,
     roleStatus: resmgr.role_status,
     roleData: {},
     responding: pathStrOrNull('info.responding', resmgr),
@@ -44,7 +45,7 @@ export const annotateResmgrFields = (host) => {
     osInfo: pathStrOrNull('info.os_info', resmgr),
     networks: [],
     vCenterIP: pathStrOrNull('extensions.hypervisor_details.data.vcenter_ip', resmgr),
-    supportRole: resmgr.roles.includes('pf9-support'),
+    supportRole: resmgrRoles.includes('pf9-support'),
     networkInterfaces: pathStrOrNull('extensions.interfaces.data.iface_ip', resmgr),
     warnings: pathStrOrNull('message.warn', resmgr),
   }
@@ -52,7 +53,6 @@ export const annotateResmgrFields = (host) => {
 
 export const annotateUiState = (host) => {
   const { resmgr = {} } = host
-
   /* TODO:
    * This code is very confusing and has too much complected state.  These
    * rules have been added over the years but nobody really understands
