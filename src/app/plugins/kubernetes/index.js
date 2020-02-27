@@ -48,7 +48,7 @@ import UpdateClusterRolePage from './components/rbac/UpdateClusterRolePage'
 import UpdateRoleBindingPage from './components/rbac/UpdateRoleBindingPage'
 import UpdateClusterRoleBindingPage from './components/rbac/UpdateClusterRoleBindingPage'
 import OnboardingBanner from './components/onboarding/OnboardingBanner'
-import AlarmsListPage from './components/alerts/AlarmsListPage'
+import AlarmsListPage from './components/alarms/AlarmsListPage'
 
 class Kubernetes extends React.PureComponent {
   render() {
@@ -398,7 +398,7 @@ Kubernetes.registerPlugin = (pluginManager) => {
     { name: 'Storage Classes', icon: 'hdd', ...clarityLink('/kubernetes/storage_classes') },
     { name: 'Namespaces', icon: 'object-group', ...clarityLink('/kubernetes/namespaces') },
     { name: 'Prometheus Monitoring (BETA)', icon: 'chart-area', link: { path: '/prometheus' } },
-    { name: 'Monitoring', icon: 'chart-area', link: { path: '/alarms' } },
+    { name: 'Monitoring', icon: 'analytics', link: { path: '/alarms' } },
     { name: 'API Access', icon: 'key', ...clarityLink('/kubernetes/api_access') },
     {
       name: 'Tenants & Users',
@@ -461,7 +461,7 @@ Kubernetes.registerPlugin = (pluginManager) => {
     // TODO: Disabled till all CRUD operations are implemented
     // { name: 'Monitoring (beta)', icon: 'chart-area', link: { path: '/prometheus' } },
     // { name: 'Logging (beta)', icon: 'clipboard-list', link: { path: '/logging' } },
-    { name: 'Monitoring', icon: 'chart-area', link: { path: '/alarms' } },
+    { name: 'Monitoring', icon: 'analytics', link: { path: '/alarms' } },
     {
       name: 'RBAC',
       icon: 'user-shield',
