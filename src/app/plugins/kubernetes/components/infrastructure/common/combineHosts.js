@@ -53,7 +53,6 @@ export const annotateResmgrFields = (host) => {
 
 export const annotateUiState = (host) => {
   const { resmgr = {} } = host
-
   /* TODO:
    * This code is very confusing and has too much complected state.  These
    * rules have been added over the years but nobody really understands
