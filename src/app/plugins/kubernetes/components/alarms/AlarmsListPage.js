@@ -16,6 +16,7 @@ import StackedAreaChart from 'core/components/graphs/StackedAreaChart'
 import moment from 'moment'
 import { makeStyles } from '@material-ui/styles'
 import DateCell from 'core/components/listTable/cells/DateCell'
+import Loading from 'core/components/Loading'
 
 const useStyles = makeStyles((theme) => ({
   header: {
@@ -34,6 +35,11 @@ const useStyles = makeStyles((theme) => ({
   chartFilters: {
     display: 'flex',
     flexGrow: 0,
+  },
+  chartRefresh: {
+    fontSize: '18px',
+    display: 'flex',
+    marginRight: '15px',
   },
   clusterPicker: {
     flexGrow: 0,
@@ -98,11 +104,17 @@ const ListPage = ({ ListContainer }) => {
               <div className={classes.chartHeader}>
                 <div className={classes.chartLabel}>Alarms Past {chartTimeDisplay[params.chartTime]}</div>
                 <div className={classes.chartFilters}>
+                  <div className={classes.chartRefresh}>
+                    <Loading
+                      loading={timeSeriesLoading}
+                      onClick={timeSeriesReload}
+                    />
+                  </div>
                   <div className={classes.clusterPicker}>
                     <ClusterPicklist
                       onChange={getParamsUpdater('chartClusterId')}
                       value={params.chartClusterId}
-                      onlyMasterNodeClusters
+                      onlyPrometheusEnabled
                     />
                   </div>
                   <div className={classes.timePicker}>

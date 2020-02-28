@@ -135,9 +135,14 @@ const getSeverityCounts = (alertData, timestamps) => {
 export const loadTimeSeriesAlerts = createContextLoader(
   alertsTimeSeriesCacheKey,
   async ({ chartClusterId, chartTime }, loadFromContext) => {
+    // Invalidate cache -- can't get cache working properly for this
+    // collection. Collection is somewhat different from all other
+    // types of collections.
+    loadTimeSeriesAlerts.invalidateCache()
+
     const timeNow = moment().unix()
     const [number, period] = chartTime.split('.')
-    const timePast = moment().subtract(number, period).unix()
+    const timePast = moment.unix(timeNow).subtract(number, period).unix()
     const step = stepTime[chartTime]
 
     // Still need to calculate this manually as well because there
@@ -146,17 +151,16 @@ export const loadTimeSeriesAlerts = createContextLoader(
     // Use unix timestamp to match the prometheus API
     const timestamps = getTimestamps(timePast, chartTime)
 
-    const clusters = await loadFromContext(clustersCacheKey, { healthyClusters: true })
+    const clusters = await loadFromContext(clustersCacheKey, { prometheusClusters: true })
     if (chartClusterId === allKey) {
-      const all = await someAsync(pluck('uuid', clusters).map((cluster) => {
-        console.log(cluster)
-        return qbert.getPrometheusAlertsOverTime(cluster, timePast, timeNow, step)
-      })).then(flatten)
+      const all = await someAsync(pluck('uuid', clusters).map((cluster) => (
+        qbert.getPrometheusAlertsOverTime(cluster, timePast, timeNow, step)
+      ))).then(flatten)
       const severityCounts = getSeverityCounts(all, timestamps)
       return timestamps.map((timestamp) => (
         {
           time: moment.unix(timestamp).format('h:mm A'),
-          ...severityCounts[timestamp]
+          ...severityCounts[timestamp],
         }
       ))
     }
@@ -167,14 +171,17 @@ export const loadTimeSeriesAlerts = createContextLoader(
       {
         timestamp,
         time: moment.unix(timestamp).format('h:mm A'),
-        ...severityCounts[timestamp]
+        ...severityCounts[timestamp],
       }
     ))
   },
   {
     entityName: 'AlertTimeSeries',
-    // uniqueIdentifier must be timestamp bc of autosort
+    // make uniqueIdentifier timestamp bc of autosort
+    // not sure if this has to do with the reason why the
+    // cache does not work properly
     uniqueIdentifier: 'timestamp',
     indexBy: ['chartClusterId', 'chartTime'],
+
   },
 )
