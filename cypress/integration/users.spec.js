@@ -34,7 +34,7 @@ describe('users', () => {
         .click()
       cy.get('[data-testid=wizard-submit-btn]').click({ force: true })
       cy.get('[data-testid=toast-container]').should('exist')
-      cy.get('[data-testid=toast-container]').should(
+      cy.get('[data-testid=toast-container]', { timeout: 3000 }).should(
         'exist',
         'contains',
         Cypress.env('users').userName,

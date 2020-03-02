@@ -5,7 +5,7 @@ describe('Logout user', () => {
 
   it('logout user from application', () => {
     cy.get('[data-testid=user-menu]')
-      .should('contain', Cypress.env('userName'))
+      .contains(Cypress.env('userName'))
       .click()
     cy.get('[data-testid=user-menu-sign-out]')
       .should('exist')
