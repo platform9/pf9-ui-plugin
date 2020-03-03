@@ -36,7 +36,7 @@ class PushEventManager {
     return PushEventManager.instance
   }
 
-  handleOpen() {
+  private readonly handleOpen = () => {
     console.info('Websocket connection opened')
     if (this.clearIntervalId) {
       clearInterval(this.clearIntervalId)
@@ -44,7 +44,7 @@ class PushEventManager {
     }
   }
 
-  handleClose() {
+  private readonly handleClose = () => {
     const RETRY_INTERVAL_SECONDS = 10
 
     this.clearIntervalId = setInterval(() => {
@@ -55,7 +55,7 @@ class PushEventManager {
     console.info('Websocket connection closed')
   }
 
-  handleMessage = (event: MessageEvent) => {
+  private readonly handleMessage = (event: MessageEvent) => {
     const message = event.data
     try {
       const data = JSON.parse(message)
@@ -69,7 +69,7 @@ class PushEventManager {
     }
   }
 
-  public connect() {
+  public readonly connect = () => {
     const wsUrl = getWebSocketUrl()
     this.socket = new WebSocket(wsUrl)
     this.socket.addEventListener('open', this.handleOpen)
@@ -78,13 +78,13 @@ class PushEventManager {
     return this
   }
 
-  public disconnect() {
+  public readonly disconnect = () => {
     this.socket.removeEventListener('open', this.handleOpen)
     this.socket.removeEventListener('close', this.handleClose)
     this.socket.removeEventListener('message', this.handleMessage)
   }
 
-  public subscribe(listener: SubscriberFnType) {
+  public readonly subscribe = (listener: SubscriberFnType) => {
     this.subscribers.push(listener)
     return () => {
       this.subscribers = except(listener, this.subscribers)
