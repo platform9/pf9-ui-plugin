@@ -12,6 +12,12 @@ const { qbert } = ApiClient.getInstance()
 export const alertsCacheKey = 'alerts'
 export const alertsTimeSeriesCacheKey = 'alertsTimeSeries'
 
+const composeGrafanaLink = async (clusterId) => {
+  const qbertEndpoint = await qbert.baseUrl()
+  const host = qbertEndpoint.match(/(.*?)\/qbert/)[1]
+  return `${host}/k8s/v1/clusters/${clusterId}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:grafana-ui:80/proxy/`
+}
+
 export const loadAlerts = createContextLoader(
   alertsCacheKey,
   async ({ clusterId }, loadFromContext) => {
@@ -32,6 +38,7 @@ export const loadAlerts = createContextLoader(
         severity: pathStr('labels.severity', item),
         summary: pathStr('annotations.message', item),
         clusterName: pipe(find(propEq('uuid', item.clusterId)), prop('name'))(clusters),
+        grafanaLink: composeGrafanaLink(item.clusterId),
       }))
     },
     entityName: 'Alert',
@@ -132,6 +139,7 @@ export const loadTimeSeriesAlerts = createContextLoader(
     // not sure if this has to do with the reason why the
     // cache does not work properly
     uniqueIdentifier: 'timestamp',
-    indexBy: ['chartClusterId', 'chartTime'],
+    // Have to add clusterId and severity here too to trigger the invalidate cache
+    indexBy: ['chartClusterId', 'chartTime', 'clusterId', 'severity'],
   },
 )

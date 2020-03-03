@@ -17,6 +17,7 @@ import moment from 'moment'
 import { makeStyles } from '@material-ui/styles'
 import DateCell from 'core/components/listTable/cells/DateCell'
 import Loading from 'core/components/Loading'
+import ExternalLink from 'core/components/ExternalLink'
 
 const useStyles = makeStyles((theme) => ({
   header: {
@@ -165,18 +166,19 @@ const ListPage = ({ ListContainer }) => {
 }
 
 export const options = {
-  // addUrl: '/ui/kubernetes/rbac/roles/add',
-  // addText: 'Add Role',
   columns: [
     { id: 'name', label: 'Name' },
     { id: 'severity', label: 'Severity' },
     { id: 'activeAt', label: 'Time', render: (value) => <DateCell value={value} /> },
     { id: 'summary', label: 'Rule Summary' },
+    {
+      id: 'grafanaLink',
+      label: 'Open in Grafana',
+      render: (link) => <ExternalLink className="no-wrap-text" icon="chart-line" url={link}>Grafana</ExternalLink>
+    },
     { id: 'clusterName', label: 'Cluster' },
   ],
   cacheKey: alertsCacheKey,
-  // deleteFn: roleActions.delete,
-  // editUrl: '/ui/kubernetes/rbac/roles/edit',
   name: 'Alarms',
   title: 'Alarms',
   showCheckboxes: false,
