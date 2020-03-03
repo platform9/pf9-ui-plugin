@@ -40,71 +40,22 @@ export const loadAlerts = createContextLoader(
   },
 )
 
+const timestampSteps = {
+  // for use in moment.add
+  '24.h': [4, 'h'],
+  '12.h': [2, 'h'],
+  '6.h': [1, 'h'],
+  '3.h': [30, 'm'],
+  '1.h': [10, 'm'],
+}
+
 // Maybe in the future we can add interval variable and make the
-// period & intervals dynamic, but for now just preset periods
+// period & intervals dynamic, but for now just use preset periods
 // and 7 intervals.
 const getTimestamps = (startTime, period) => {
   const momentObj = moment.unix(startTime)
-
-  if (period === '24.h') {
-    return [
-      momentObj.unix(),
-      momentObj.add(4, 'hours').unix(),
-      momentObj.add(4, 'hours').unix(),
-      momentObj.add(4, 'hours').unix(),
-      momentObj.add(4, 'hours').unix(),
-      momentObj.add(4, 'hours').unix(),
-      momentObj.add(4, 'hours').unix(),
-    ]
-  } else if (period === '12.h') {
-    return [
-      momentObj.unix(),
-      momentObj.add(2, 'hours').unix(),
-      momentObj.add(2, 'hours').unix(),
-      momentObj.add(2, 'hours').unix(),
-      momentObj.add(2, 'hours').unix(),
-      momentObj.add(2, 'hours').unix(),
-      momentObj.add(2, 'hours').unix(),
-    ]
-  } else if (period === '6.h') {
-    return [
-      momentObj.unix(),
-      momentObj.add(1, 'hours').unix(),
-      momentObj.add(1, 'hours').unix(),
-      momentObj.add(1, 'hours').unix(),
-      momentObj.add(1, 'hours').unix(),
-      momentObj.add(1, 'hours').unix(),
-      momentObj.add(1, 'hours').unix(),
-    ]
-  } else if (period === '3.h') {
-    return [
-      momentObj.unix(),
-      momentObj.add(30, 'minutes').unix(),
-      momentObj.add(30, 'minutes').unix(),
-      momentObj.add(30, 'minutes').unix(),
-      momentObj.add(30, 'minutes').unix(),
-      momentObj.add(30, 'minutes').unix(),
-      momentObj.add(30, 'minutes').unix(),
-    ]
-  } else if (period === '1.h') {
-    return [
-      momentObj.unix(),
-      momentObj.add(10, 'minutes').unix(),
-      momentObj.add(10, 'minutes').unix(),
-      momentObj.add(10, 'minutes').unix(),
-      momentObj.add(10, 'minutes').unix(),
-      momentObj.add(10, 'minutes').unix(),
-      momentObj.add(10, 'minutes').unix(),
-    ]
-  }
-}
-
-const stepTime = {
-  '24.h': '4h',
-  '12.h': '2h',
-  '6.h': '1h',
-  '3.h': '30m',
-  '1.h': '10m',
+  const momentArgs = timestampSteps[period]
+  return [momentObj.unix(), ...Array(6).fill().map(() => momentObj.add(...momentArgs).unix())]
 }
 
 const getSeverityCounts = (alertData, timestamps) => {
@@ -143,7 +94,7 @@ export const loadTimeSeriesAlerts = createContextLoader(
     const timeNow = moment().unix()
     const [number, period] = chartTime.split('.')
     const timePast = moment.unix(timeNow).subtract(number, period).unix()
-    const step = stepTime[chartTime]
+    const step = timestampSteps[chartTime].join('')
 
     // Still need to calculate this manually as well because there
     // is a chance that if no alerts were firing during that time,
@@ -182,6 +133,5 @@ export const loadTimeSeriesAlerts = createContextLoader(
     // cache does not work properly
     uniqueIdentifier: 'timestamp',
     indexBy: ['chartClusterId', 'chartTime'],
-
   },
 )
