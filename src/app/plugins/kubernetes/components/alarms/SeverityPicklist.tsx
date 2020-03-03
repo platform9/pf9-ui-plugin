@@ -1,8 +1,8 @@
 import React, { forwardRef, useEffect } from 'react'
-import Picklist from 'core/components/Picklist'
 import { propOr, head } from 'ramda'
 import { allKey } from 'app/constants'
-// import PropTypes from 'prop-types'
+import PicklistDefault from 'core/components/Picklist'
+const Picklist: any = PicklistDefault // types on forward ref .js file dont work well.
 
 const options = [
   { label: 'warning', value: 'warning' },
