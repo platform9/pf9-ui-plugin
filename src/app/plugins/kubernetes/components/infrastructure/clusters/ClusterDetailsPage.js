@@ -127,17 +127,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-// const useStyles = makeStyles<Theme>((theme) => ({
-//   detailsHeader: {
-//     display: 'grid',
-//     gridTemplateColumns: '300px repeat(3, 250px)',
-//     gridGap: theme.spacing(2),
-//   },
-//   card: {
-//     marginRight: theme.spacing(),
-//   },
-// }))
-
 const ClusterDetailsPage = () => {
   const { match } = useReactRouter()
   const classes = useStyles()

@@ -23,7 +23,6 @@ import { isAdminRole } from 'k8s/util/helpers'
 import { routes } from 'core/utils/routes'
 import CodeBlock from 'core/components/CodeBlock'
 import DateCell from 'core/components/listTable/cells/DateCell'
-// import { ToolbarActionIcon } from 'core/components/listTable/ListTableBatchActions'
 
 const useStyles = makeStyles((theme) => ({
   links: {
