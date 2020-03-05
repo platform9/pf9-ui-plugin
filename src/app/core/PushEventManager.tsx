@@ -63,7 +63,7 @@ class PushEventManager {
         // ignore anything that doesn't follow the spec like `heartbeat` events
         return
       }
-      this.subscribers.forEach(fn => fn(data))
+      this.subscribers.forEach((fn) => fn(data))
     } catch (e) {
       console.error('Error parsing JSON from websocket.', message, e)
     }

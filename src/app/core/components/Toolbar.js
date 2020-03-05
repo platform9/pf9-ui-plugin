@@ -7,8 +7,6 @@ import MaterialToolbar from '@material-ui/core/Toolbar/Toolbar'
 import { AppBar } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import NotificationsPopover from 'core/components/notifications/NotificationsPopover'
-import HelpContainer from 'core/components/HelpContainer'
-import { helpUrl } from 'app/constants'
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
@@ -32,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
     width: '700px',
   },
   leftMargin: {
-    marginLeft: theme.spacing(2),
+    marginLeft: 28,
   },
 }))
 
@@ -42,7 +40,6 @@ const Toolbar = ({ open }) => {
     <AppBar className={classes.appBar}>
       <MaterialToolbar variant="dense" disableGutters={!open}>
         <div className={classes.rightTools}>
-          <HelpContainer link={helpUrl} />
           <RegionChooser className={classes.leftMargin} />
           <TenantChooser className={classes.leftMargin} />
           <NotificationsPopover className={classes.leftMargin} />

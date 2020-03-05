@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import AddIcon from '@material-ui/icons/Add'
 import ListTableColumnButton from 'core/components/listTable/ListTableColumnSelector'
 import ListTableBatchActions, { listTableActionPropType } from './ListTableBatchActions'
-import PerPageControl from './PerPageControl'
 import SearchBar from 'core/components/SearchBar'
 import clsx from 'clsx'
 import { Button, Toolbar, Tooltip } from '@material-ui/core'
@@ -32,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
   button: {
     cursor: 'pointer',
     fontWeight: 300,
-    margin: theme.spacing(0, 1),
+    marginLeft: 25,
   },
   toolbar: {
     justifyContent: 'flex-end',
@@ -183,11 +182,6 @@ const ListTableToolbar = ({
             </Tooltip>
           )}
           {reloadButton}
-          <PerPageControl
-            value={rowsPerPage}
-            onChangeRowsPerPage={onChangeRowsPerPage}
-            rowsPerPageOptions={rowsPerPageOptions}
-          />
         </Toolbar>
       </div>
     </Toolbar>

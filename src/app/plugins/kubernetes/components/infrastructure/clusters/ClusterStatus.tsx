@@ -72,7 +72,7 @@ const iconMap = new Map([
 
 interface Props {
   label?: string
-  title: string
+  title: string | JSX.Element
   status?: IClusterStatus
   variant: StatusVariant
   iconStatus?: boolean

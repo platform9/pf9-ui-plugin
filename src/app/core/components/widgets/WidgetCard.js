@@ -5,16 +5,22 @@ import PropTypes from 'prop-types'
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    boxShadow: 'none',
+    boxShadow: '0 1px 6px 1px rgba(0, 0, 0, 0.12)',
+    minWidth: 250,
+    display: 'flex',
+    flexDirection: 'column',
   },
   header: {
     padding: theme.spacing(1.5, 2),
-    backgroundColor: theme.palette.card.background,
+    backgroundColor: theme.palette.common.white,
   },
   content: {
     display: 'flex',
     justifyContent: 'center',
-    backgroundColor: theme.palette.card.background,
+    alignItems: 'center',
+    flexDirection: 'column',
+    flex: 1,
+    backgroundColor: theme.palette.common.white,
     paddingTop: 0,
     paddingBottom: theme.spacing(1.5),
     '&:last-child': {
@@ -24,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
   headerContent: {
     display: 'flex',
     flexFlow: 'row nowrap',
-    justifyContent: ({ image }) => (image ? 'space-between' : 'center'),
+    justifyContent: ({ image }) => (image ? 'space-between' : 'flex-start'),
     alignItems: 'center',
     padding: theme.spacing(0, 1),
   },
