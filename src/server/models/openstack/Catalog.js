@@ -32,6 +32,11 @@ const Catalog = {
       { name: 'monocular', type: 'monocular', url: `${config.apiHost}/monocular/v1` },
       { name: 'resmgr', type: 'resmgr', url: `${config.apiHost}/resmgr` },
       { name: 'appbert', type: 'Kubernetes App Management', url: `${config.apiHost}/appbert/v1` },
+      {
+        name: 'notifications',
+        type: 'notifications',
+        url: `${config.apiHost.replace('http', 'ws')}/notifications`,
+      },
     ]
     return services.map(createService)
   },
