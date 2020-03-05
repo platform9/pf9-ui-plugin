@@ -664,8 +664,11 @@ class Qbert extends ApiService {
   }
 
   getPrometheusAlerts = async (clusterUuid) => {
-    const response = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/alerts`)
-    return response.alerts.map(alert => ({ ...alert, clusterId: clusterUuid, id: `${alert.labels.alertname}${clusterUuid}` }))
+    const response = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/rules`)
+    const alerts = response.groups.flatMap((group) => {
+      return group.rules
+    }).filter(rule => rule.type === 'alerting')
+    return alerts.map(alert => ({ ...alert, clusterId: clusterUuid, id: `${alert.name}${clusterUuid}` }))
   }
 
   getPrometheusAlertsOverTime = async (clusterUuid, startTime, endTime, step) => {

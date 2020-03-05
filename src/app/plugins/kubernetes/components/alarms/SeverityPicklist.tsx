@@ -27,7 +27,7 @@ const SeverityPicklist: React.ComponentType<Props> = forwardRef<HTMLElement, Pro
       value,
       name = 'severity',
       label = 'Severity',
-      selectFirst = true,
+      selectFirst = false,
     } = props
 
     // Select the first item as soon as data is loaded

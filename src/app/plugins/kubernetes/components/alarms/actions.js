@@ -1,6 +1,6 @@
 import createContextLoader from 'core/helpers/createContextLoader'
 import ApiClient from 'api-client/ApiClient'
-import { propEq, pluck, pipe, find, prop, flatten } from 'ramda'
+import { path, propEq, pluck, pipe, find, prop, flatten } from 'ramda'
 import { someAsync } from 'utils/async'
 import { clustersCacheKey } from '../infrastructure/common/actions'
 import moment from 'moment'
@@ -12,10 +12,9 @@ const { qbert } = ApiClient.getInstance()
 export const alertsCacheKey = 'alerts'
 export const alertsTimeSeriesCacheKey = 'alertsTimeSeries'
 
-const composeGrafanaLink = async (clusterId) => {
+const getQbertEndpoint = async () => {
   const qbertEndpoint = await qbert.baseUrl()
-  const host = qbertEndpoint.match(/(.*?)\/qbert/)[1]
-  return `${host}/k8s/v1/clusters/${clusterId}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:grafana-ui:80/proxy/`
+  return qbertEndpoint.match(/(.*?)\/qbert/)[1]
 }
 
 export const loadAlerts = createContextLoader(
@@ -32,13 +31,15 @@ export const loadAlerts = createContextLoader(
   {
     dataMapper: async (items, params, loadFromContext) => {
       const clusters = await loadFromContext(clustersCacheKey, { healthyClusters: true })
+      const host = await getQbertEndpoint()
       return items.map((item) => ({
         ...item,
-        name: pathStr('labels.alertname', item),
         severity: pathStr('labels.severity', item),
         summary: pathStr('annotations.message', item),
+        activeAt: path(['alerts', 0, 'activeAt'], item),
+        status: item.alerts.length ? 'Active' : 'Closed',
         clusterName: pipe(find(propEq('uuid', item.clusterId)), prop('name'))(clusters),
-        grafanaLink: composeGrafanaLink(item.clusterId),
+        grafanaLink: `${host}/k8s/v1/clusters/${item.clusterId}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:grafana-ui:80/proxy/`,
       }))
     },
     entityName: 'Alert',
@@ -140,6 +141,6 @@ export const loadTimeSeriesAlerts = createContextLoader(
     // cache does not work properly
     uniqueIdentifier: 'timestamp',
     // Have to add clusterId and severity here too to trigger the invalidate cache
-    indexBy: ['chartClusterId', 'chartTime', 'clusterId', 'severity'],
+    indexBy: ['chartClusterId', 'chartTime', 'clusterId', 'severity', 'orderBy', 'orderDirection'],
   },
 )

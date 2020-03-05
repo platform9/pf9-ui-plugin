@@ -81,6 +81,10 @@ const chartTimeDisplay = {
 const defaultParams = {
   severity: allKey,
   chartTime: '24.h',
+  chartClusterId: allKey,
+  clusterId: allKey,
+  orderBy: 'name',
+  orderDirection: 'asc',
 }
 const usePrefParams = createUsePrefParamsHook('Alerts', listTablePrefs)
 
@@ -116,6 +120,7 @@ const ListPage = ({ ListContainer }) => {
                       onChange={getParamsUpdater('chartClusterId')}
                       value={params.chartClusterId}
                       onlyPrometheusEnabled
+                      selectFirst={false}
                     />
                   </div>
                   <div className={classes.timePicker}>
@@ -146,6 +151,7 @@ const ListPage = ({ ListContainer }) => {
                     onChange={getParamsUpdater('clusterId')}
                     value={params.clusterId}
                     onlyMasterNodeClusters
+                    selectFirst={false}
                   />
                   <SeverityPicklist
                     name="severity"
@@ -169,8 +175,16 @@ export const options = {
   columns: [
     { id: 'name', label: 'Name' },
     { id: 'severity', label: 'Severity' },
-    { id: 'activeAt', label: 'Time', render: (value) => <DateCell value={value} /> },
+    { id: 'activeAt', label: 'Time', render: (value) => {
+        return value ? (
+          <DateCell value={value} />
+        ) : (
+          <div>N/A</div>
+        )
+      }
+    },
     { id: 'summary', label: 'Rule Summary' },
+    { id: 'status', label: 'Status' },
     {
       id: 'grafanaLink',
       label: 'Open in Grafana',
