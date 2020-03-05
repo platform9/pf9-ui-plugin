@@ -114,6 +114,7 @@ const initialContext = {
   etcdBackupInterval: 60 * 24, // in minutes
   prometheusMonitoringEnabled: true,
   tags: [],
+  appCatalogEnabled: false,
 }
 
 const templateOptions = [
@@ -734,11 +735,11 @@ const AddAwsClusterPage = () => {
                       )}
 
                       {/* Enable Application Catalog */}
-                      <CheckboxField
+                      {/* <CheckboxField
                         id="appCatalogEnabled"
                         label="Enable Application Catalog"
                         info="Enable the Helm Application Catalog on this cluster"
-                      />
+                      /> */}
 
                       {/* Custom AMI */}
                       <TextField
