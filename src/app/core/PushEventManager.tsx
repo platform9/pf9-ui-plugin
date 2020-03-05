@@ -36,7 +36,7 @@ class PushEventManager {
     return PushEventManager.instance
   }
 
-  handleOpen() {
+  handleOpen = () => {
     console.info('Websocket connection opened')
     if (this.clearIntervalId) {
       clearInterval(this.clearIntervalId)
@@ -44,7 +44,7 @@ class PushEventManager {
     }
   }
 
-  handleClose() {
+  handleClose = () => {
     const RETRY_INTERVAL_SECONDS = 10
 
     this.clearIntervalId = setInterval(() => {
@@ -63,7 +63,7 @@ class PushEventManager {
         // ignore anything that doesn't follow the spec like `heartbeat` events
         return
       }
-      this.subscribers.forEach(fn => fn(data))
+      this.subscribers.forEach((fn) => fn(data))
     } catch (e) {
       console.error('Error parsing JSON from websocket.', message, e)
     }

@@ -10,7 +10,7 @@ import ClusterNodes from './ClusterNodes'
 import PageContainer from 'core/components/pageContainer/PageContainer'
 import SimpleLink from 'core/components/SimpleLink'
 import { makeStyles } from '@material-ui/styles'
-import { Grid, Card, Typography } from '@material-ui/core'
+import { Card, Typography } from '@material-ui/core'
 import useDataLoader from 'core/hooks/useDataLoader'
 import useReactRouter from 'use-react-router'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
@@ -61,7 +61,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   headerCardContainer: {
-    minWidth: 320,
+    width: 320,
     minHeight: 175,
     display: 'grid',
     gridTemplateRows: ({ hasLinks }) => `58px 1fr 2px ${hasLinks ? 46 : 12}px`,
@@ -119,7 +119,24 @@ const useStyles = makeStyles((theme) => ({
   tabContainer: {
     paddingTop: theme.spacing(2),
   },
+  detailsHeader: {
+    display: 'grid',
+    gridTemplateColumns: '330px repeat(3, 250px)',
+    gridGap: theme.spacing(2),
+    paddingBottom: 20,
+  },
 }))
+
+// const useStyles = makeStyles<Theme>((theme) => ({
+//   detailsHeader: {
+//     display: 'grid',
+//     gridTemplateColumns: '300px repeat(3, 250px)',
+//     gridGap: theme.spacing(2),
+//   },
+//   card: {
+//     marginRight: theme.spacing(),
+//   },
+// }))
 
 const ClusterDetailsPage = () => {
   const { match } = useReactRouter()
@@ -169,27 +186,23 @@ const ClusterStatusAndUsage = ({ cluster, loading }) => {
     ...links,
   }
   return (
-    <Grid container className={classes.statsContainer}>
-      <Grid item lg={4} className={classes.statusItems}>
-        <HeaderCard title="Cluster" subtitle={name} icon="project-diagram" links={clusterLinks}>
-          <ClusterConnectionStatus
-            cluster={cluster}
-            variant="header"
-            message={loading ? 'loading' : undefined}
-          />
-          <ClusterHealthStatus
-            cluster={cluster}
-            variant="header"
-            message={loading ? 'loading' : undefined}
-          />
-        </HeaderCard>
-      </Grid>
-      <Grid item lg={8} className={classes.row}>
-        <UsageWidget units="GHz" title="Compute" stats={usage.compute} />
-        <UsageWidget units="GiB" title="Memory" stats={usage.memory} />
-        <UsageWidget units="GiB" title="Storage" stats={usage.disk} />
-      </Grid>
-    </Grid>
+    <div className={classes.detailsHeader}>
+      <HeaderCard title="Cluster" subtitle={name} icon="project-diagram" links={clusterLinks}>
+        <ClusterConnectionStatus
+          cluster={cluster}
+          variant="header"
+          message={loading ? 'loading' : undefined}
+        />
+        <ClusterHealthStatus
+          cluster={cluster}
+          variant="header"
+          message={loading ? 'loading' : undefined}
+        />
+      </HeaderCard>
+      <UsageWidget units="GHz" title="Compute" stats={usage.compute} />
+      <UsageWidget units="GiB" title="Memory" stats={usage.memory} />
+      <UsageWidget units="GiB" title="Storage" stats={usage.disk} />
+    </div>
   )
 }
 

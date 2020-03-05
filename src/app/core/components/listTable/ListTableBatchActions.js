@@ -22,9 +22,11 @@ const useStyles = makeStyles((theme) => ({
     fontSize: theme.typography.fontSize * 0.8,
   },
   actionIcon: {
-    fontWeight: 400,
-    minHeight: 20,
-    fontSize: '1.7em',
+    width: 22,
+    height: 22,
+    '& i': {
+      fontSize: 18,
+    },
   },
   actionLabel: {
     whiteSpace: 'nowrap',
@@ -40,9 +42,18 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
+export const ToolbarActionIcon = ({ icon }) => {
+  const classes = useStyles()
+  return (
+    <div className={classes.actionIcon}>
+      <FontAwesomeIcon>{icon}</FontAwesomeIcon>
+    </div>
+  )
+}
+
 const ListTableAction = withRouter(
   ({ cond, action, label, disabledInfo, dialog, icon, selected, onRefresh, routeTo, history }) => {
-    const { root, actionLabel, actionIcon, disabledAction } = useStyles()
+    const { root, actionLabel, disabledAction } = useStyles()
     const [dialogOpened, setDialogOpened] = useState(false)
     const { getContext } = useContext(AppContext)
     const isActionEnabled = selected.length && (!cond || cond(selected, getContext))
@@ -83,11 +94,7 @@ const ListTableAction = withRouter(
                 : null
             }
           >
-            {typeof icon === 'string' ? (
-              <FontAwesomeIcon className={actionIcon}>{icon}</FontAwesomeIcon>
-            ) : (
-              icon
-            )}
+            {typeof icon === 'string' ? <ToolbarActionIcon icon={icon} /> : icon}
             <div className={actionLabel}>{label}</div>
           </div>
         </Tooltip>

@@ -3,10 +3,6 @@ import DownloadKubeConfigLink from './DownloadKubeConfigLink'
 // import KubeCLI from './KubeCLI' // commented out till we support cli links
 import ExternalLink from 'core/components/ExternalLink'
 import SimpleLink from 'core/components/SimpleLink'
-import ScaleIcon from '@material-ui/icons/TrendingUp'
-import UpgradeIcon from '@material-ui/icons/PresentToAll'
-import SeeDetailsIcon from '@material-ui/icons/Subject'
-import InsertChartIcon from '@material-ui/icons/InsertChart'
 import { clustersCacheKey } from '../common/actions'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { capitalizeString, castBoolToStr } from 'utils/misc'
@@ -27,6 +23,7 @@ import { isAdminRole } from 'k8s/util/helpers'
 import { routes } from 'core/utils/routes'
 import CodeBlock from 'core/components/CodeBlock'
 import DateCell from 'core/components/listTable/cells/DateCell'
+// import { ToolbarActionIcon } from 'core/components/listTable/ListTableBatchActions'
 
 const useStyles = makeStyles((theme) => ({
   links: {
@@ -217,31 +214,31 @@ export const options = {
   DeleteDialog: ClusterDeleteDialog,
   batchActions: [
     {
-      icon: <SeeDetailsIcon />,
-      label: 'See details',
+      icon: 'info-square',
+      label: 'Details',
       routeTo: (rows) => `/ui/kubernetes/infrastructure/clusters/${rows[0].uuid}`,
     },
     {
       cond: both(isAdmin, canScaleMasters),
-      icon: <ScaleIcon />,
-      label: 'Scale masters',
+      icon: 'expand-alt',
+      label: 'Scale Masters',
       routeTo: (rows) => `/ui/kubernetes/infrastructure/clusters/scaleMasters/${rows[0].uuid}`,
     },
     {
       cond: both(isAdmin, canScaleWorkers),
-      icon: <ScaleIcon />,
-      label: 'Scale workers',
+      icon: 'expand-alt',
+      label: 'Scale Workers',
       routeTo: (rows) => `/ui/kubernetes/infrastructure/clusters/scaleWorkers/${rows[0].uuid}`,
     },
     {
       cond: both(isAdmin, canUpgradeCluster),
-      icon: <UpgradeIcon />,
-      label: 'Upgrade cluster',
+      icon: 'level-up',
+      label: 'Upgrade Cluster',
       dialog: ClusterUpgradeDialog,
     },
     {
       cond: isAdmin,
-      icon: <InsertChartIcon />,
+      icon: 'chart-bar',
       label: 'Monitoring',
       dialog: PrometheusAddonDialog,
     },

@@ -51,7 +51,7 @@ export default ListPageHeader
 const useStyles = makeStyles<Theme>((theme) => ({
   container: {
     display: 'grid',
-    gridTemplateColumns: '300px repeat(3, 200px)',
+    gridTemplateColumns: '300px repeat(3, 250px)',
     gridGap: theme.spacing(2),
   },
   card: {

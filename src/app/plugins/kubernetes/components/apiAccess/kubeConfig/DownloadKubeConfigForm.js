@@ -58,7 +58,7 @@ const DownloadKubeConfigForm = ({ cluster, onSubmit, autoDownload = true }) => {
   }
 
   return (
-    <ValidatedForm onSubmit={handleSubmit} fullWidth>
+    <ValidatedForm onSubmit={handleSubmit} fullWidth elevated={false}>
       <Grid container spacing={3}>
         <Grid item xs={4} zeroMinWidth>
           <h4>Authentication Method</h4>
