@@ -17,7 +17,7 @@ import { applicationLoadBalancer } from 'k8s/links'
 interface IClusterDetailFields {
   id: string
   title: string
-  required: boolean
+  required?: boolean
   helpMessage?: string | React.ReactNode
   condition?: (cluster: ICluster) => boolean
   render?: (value: string | boolean) => string
@@ -30,7 +30,10 @@ const getFieldsForCard = (fields: IClusterDetailFields[], cluster: ICluster) => 
     const shouldRender = condition ? condition(cluster) : true
     const value = path<string | boolean>(id.split('.'), cluster)
     if (shouldRender && (required || !!value || value === false)) {
-      fieldsToDisplay[title] = { value: render ? render(value) : value, helpMessage }
+      fieldsToDisplay[title] = {
+        value: render ? render(value) : value,
+        helpMessage,
+      }
     }
   })
   return fieldsToDisplay
@@ -73,13 +76,11 @@ const clusterOverviewFields: IClusterDetailFields[] = [
   {
     id: 'etcdBackup.storageProperties.localPath',
     title: 'ETCD Backup Storage Path',
-    required: false,
     condition: (cluster) => !!cluster.etcdBackupEnabled,
   },
   {
     id: 'etcdBackup.intervalInMins',
     title: 'ETCD Backup Interval',
-    required: false,
     condition: (cluster) => !!cluster.etcdBackupEnabled,
   },
   { id: 'etcdDataDir', title: 'ETCD Data Directory', required: true },
@@ -91,8 +92,8 @@ const clusterOverviewFields: IClusterDetailFields[] = [
   },
   { id: 'k8sApiPort', title: 'K8S API Server port', required: true },
   { id: 'mtuSize', title: 'MTU size', required: true },
-  { id: 'flannelIfaceLabel', title: 'Flannel interface', required: false },
-  { id: 'flannelPublicIfaceLabel', title: 'Flannel Public IP', required: false },
+  { id: 'flannelIfaceLabel', title: 'Flannel interface' },
+  { id: 'flannelPublicIfaceLabel', title: 'Flannel Public IP' },
 ]
 
 // BareOS
@@ -112,13 +113,12 @@ const bareOsNetworkingFields = [
   {
     id: 'hasLoadBalancer',
     title: 'Application load-balancer',
-    required: false,
     render: castBoolToStr(),
     helpMessage: <LoadbalancerHelp />,
   },
-  { id: 'masterVipIface', title: 'Physical Network Interface', required: false },
-  { id: 'masterVipIpv4', title: 'Virtual IP Address', required: false },
-  { id: 'metallbCidr', title: 'MetalLB CIDR', required: false },
+  { id: 'masterVipIface', title: 'Physical Network Interface' },
+  { id: 'masterVipIpv4', title: 'Virtual IP Address' },
+  { id: 'metallbCidr', title: 'MetalLB CIDR' },
 ]
 
 // AWS
