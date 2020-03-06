@@ -42,7 +42,7 @@ const HelpContainer: FC<Props> = ({
   )
 
   return (
-    <Tooltip title={title} placement={placement}>
+    <Tooltip title={title} placement={placement} interactive>
       {content}
     </Tooltip>
   )
