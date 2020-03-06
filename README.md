@@ -137,7 +137,7 @@ a more sequential manner.
 
 ## Special Flags
 
-To enable the develeper plugin, open the browser JavaScript console and run:
+To enable the developer plugin, open the browser JavaScript console and run:
 
 `window.localStorage.setItem('enableDevPlugin', true)`
 

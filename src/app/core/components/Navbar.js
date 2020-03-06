@@ -144,8 +144,8 @@ const styles = (theme) => ({
     alignItems: 'center',
     justifyContent: 'center',
     '& > i': {
-      width: '30px',
-      height: '26px',
+      width: '23px',
+      height: '18.5px',
       position: 'relative',
       display: 'flex',
       alignItems: 'center',
@@ -419,7 +419,7 @@ class Navbar extends PureComponent {
       >
         {icon && (
           <div className={classes.navIcon}>
-            <FontAwesomeIcon size="xl">{icon}</FontAwesomeIcon>
+            <FontAwesomeIcon size="lg">{icon}</FontAwesomeIcon>
           </div>
         )}
         {open && (
@@ -478,7 +478,7 @@ class Navbar extends PureComponent {
         {icon && (
           // TODO: come up with a better way to conditionally make an icon a heavier weight
           <div className={clsx(classes.navIcon, icon === 'cubes' && classes.heavyWeight)}>
-            <FontAwesomeIcon title={name} size="xl">
+            <FontAwesomeIcon title={name} size="lg">
               {icon}
             </FontAwesomeIcon>
           </div>
