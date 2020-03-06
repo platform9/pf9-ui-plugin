@@ -31,8 +31,9 @@ import {
   getHealthStatus,
 } from './ClusterStatusUtils'
 import { trackEvent } from 'utils/tracking'
+import { hasPrometheusEnabled, clusterTagActions } from 'k8s/components/prometheus/actions'
 
-const { qbert } = ApiClient.getInstance()
+const { qbert, appbert } = ApiClient.getInstance()
 
 const getProgressPercent = async (clusterId) => {
   try {
@@ -73,7 +74,7 @@ export const hasHealthyMasterNodes = propSatisfies(
   'healthyMasterNodes',
 )
 export const masterlessCluster = propSatisfies(isTruthy, 'masterless')
-export const hasPrometheusEnabled = compose(castFuzzyBool, path(['tags', 'pf9-system:monitoring']))
+export const hasPrometheusTag = compose(castFuzzyBool, path(['tags', 'pf9-system:monitoring']))
 export const hasAppCatalogEnabled = propSatisfies(isTruthy, 'appCatalogEnabled')
 
 const createAwsCluster = async (data, loadFromContext) => {
@@ -252,13 +253,22 @@ const createGenericCluster = async (body, data, loadFromContext) => {
 
 export const clusterActions = createCRUDActions(clustersCacheKey, {
   listFn: async (params, loadFromContext) => {
-    const [rawNodes, combinedHosts, rawClusters, qbertEndpoint] = await Promise.all([
+    const [
+      clustersWithTasks = [],
+      rawNodes,
+      combinedHosts,
+      rawClusters,
+      qbertEndpoint,
+    ] = await Promise.all([
+      appbert.getClusterTags(),
       loadFromContext(rawNodesCacheKey),
       loadFromContext(combinedHostsCacheKey),
       qbert.getClusters(),
       qbert.baseUrl(),
     ])
+
     return mapAsync(async (cluster) => {
+      const clusterWithTasks = clustersWithTasks.find(({ uuid }) => cluster.uuid === uuid)
       const nodesInCluster = rawNodes.filter((node) => node.clusterUuid === cluster.uuid)
       const nodeIds = pluck('uuid', nodesInCluster)
       const combinedNodes = combinedHosts.filter((x) => nodeIds.includes(x.resmgr.id))
@@ -266,11 +276,12 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
       const dashboardLink = `${qbertEndpoint}/clusters/${cluster.uuid}/k8sapi/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:443/proxy/`
       const host = qbertEndpoint.match(/(.*?)\/qbert/)[1]
       const grafanaLink = `${host}/k8s/v1/clusters/${cluster.uuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:grafana-ui:80/proxy/`
+      const isPrometheusEnabled = hasPrometheusEnabled(clusterWithTasks)
       const usage = {
         compute: calcNodesTotals('usage.compute.current', 'usage.compute.max'),
         memory: calcNodesTotals('usage.memory.current', 'usage.memory.max'),
         disk: calcNodesTotals('usage.disk.current', 'usage.disk.max'),
-        grafanaLink: hasPrometheusEnabled(cluster) ? grafanaLink : null,
+        grafanaLink: isPrometheusEnabled ? grafanaLink : null,
       }
       const isMasterNode = (node) => node.isMaster === 1
       const [masterNodes, workerNodes] = partition(isMasterNode, nodesInCluster)
@@ -299,6 +310,7 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
 
       return {
         ...cluster,
+        tasks: clusterWithTasks ? clusterWithTasks.tasks : [],
         usage,
         version: version || 'N/A',
         nodes: nodesInCluster,
@@ -332,6 +344,7 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
     }, rawClusters)
   },
   createFn: (params, _, loadFromContext) => {
+    clusterTagActions.invalidateCache()
     if (params.clusterType === 'aws') {
       return createAwsCluster(params, loadFromContext)
     }
@@ -437,7 +450,7 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
     pipe(
       filterIf(masterNodeClusters, hasMasterNode),
       filterIf(masterlessClusters, masterlessCluster),
-      filterIf(prometheusClusters, hasPrometheusEnabled),
+      filterIf(prometheusClusters, hasPrometheusTag),
       filterIf(appCatalogClusters, hasAppCatalogEnabled),
       filterIf(hasControlPanel, either(hasMasterNode, masterlessCluster)),
       filterIf(healthyClusters, hasHealthyMasterNodes),
