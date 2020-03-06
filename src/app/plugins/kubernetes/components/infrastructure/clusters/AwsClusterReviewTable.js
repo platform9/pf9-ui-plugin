@@ -34,7 +34,7 @@ const AwsClusterReviewTable = ({ data }) => {
           <DataRow label="Services CIDR" value={data.servicesCidr} />
           <DataRow label="Network backend" value={data.networkPlugin} />
           <DataRow label="Privileged" value={castBoolToStr()(data.privileged)} />
-          <DataRow label="Application catalog" value={castBoolToStr()(data.appCatalogEnabled)} />
+          {/* <DataRow label="Application catalog" value={castBoolToStr()(data.appCatalogEnabled)} /> */}
           <DataRow
             label="Prometheus monitoring"
             value={castBoolToStr()(data.prometheusMonitoringEnabled)}

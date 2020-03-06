@@ -63,6 +63,7 @@ const initialContext = {
   etcdBackupInterval: 60 * 24,
   prometheusMonitoringEnabled: true,
   tags: [],
+  appCatalogEnabled: false,
 }
 
 const templateOptions = [
@@ -509,11 +510,11 @@ const AddAzureClusterPage = () => {
                       )}
 
                       {/* Enable Application Catalog */}
-                      <CheckboxField
+                      {/* <CheckboxField
                         id="appCatalogEnabled"
                         label="Enable Application Catalog"
                         info="Enable the Helm Application Catalog on this cluster"
-                      />
+                      /> */}
 
                       {/* Tags */}
                       <KeyValuesField

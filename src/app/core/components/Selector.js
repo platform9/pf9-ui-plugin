@@ -16,6 +16,9 @@ const styles = (theme) => ({
     float: 'right',
     cursor: 'pointer',
   },
+  title: {
+    fontWeight: 300,
+  },
 })
 
 @withStyles(styles)
@@ -56,9 +59,14 @@ class Selector extends PureComponent {
     const filteredList = searchTerm === '' ? sortedList : this.filterBySearch(sortedList)
     return (
       <div {...mouseEventHandlers} className={clsx(className, classes.selector)}>
-        <Typography color="inherit" variant="subtitle2" onClick={this.handleClick}>
+        <Typography
+          color="inherit"
+          variant="subtitle2"
+          className={classes.title}
+          onClick={this.handleClick}
+        >
           {type && `${type}: `}
-          {name} &#9662;
+          <b>{name}</b> &#9662;
         </Typography>
         <Menu
           id={selectorName}
