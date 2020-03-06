@@ -104,10 +104,7 @@ const ListPage = ({ ListContainer }) => {
       }
     )
     const filteredAlerts = data.filter((alert) => {
-      if (params.severity === allKey) {
-        return true
-      }
-      return params.severity === alert.severity
+      return [allKey, alert.severity].includes(params.severity)
     })
 
     return (

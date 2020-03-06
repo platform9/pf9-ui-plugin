@@ -48,6 +48,10 @@ export const loadAlerts = createContextLoader(
   },
 )
 
+// Used to calculate the timestamps on the chart
+// Each period (represented by key name) is split into
+// 6 equal intervals (represented by the value)
+// h is hours, m is minutes
 const timestampSteps = {
   // for use in moment.add
   '24.h': [4, 'h'],
@@ -59,7 +63,10 @@ const timestampSteps = {
 
 // Maybe in the future we can add interval variable and make the
 // period & intervals dynamic, but for now just use preset periods
-// and 7 intervals.
+// and 6 intervals (represented by 7 timestamps).
+// Example result passing in startTime = 1583458852 and period = '12.h':
+// [1583458852, 1583466052, 1583473252, 1583480452, 1583487652, 1583494852, 1583502052]
+// Gives unix timestamps for startTime and for every 2 hours until 12 hours
 const getTimestamps = (startTime, period) => {
   const momentObj = moment.unix(startTime)
   const momentArgs = timestampSteps[period]
@@ -67,6 +74,8 @@ const getTimestamps = (startTime, period) => {
 }
 
 const getSeverityCounts = (alertData, timestamps) => {
+  // Use timestamps to create starting template bc not certain if
+  // alertData results will contain all timestamps
   const startingTemplate = timestamps.reduce((accum, current) => {
     accum[current] = {
       warning: 0,
@@ -76,13 +85,17 @@ const getSeverityCounts = (alertData, timestamps) => {
     return accum
   }, {})
 
-  const severityCountsByTimestamp = alertData.reduce((accum, current) => {
+  // Strip out warning, critical, and fatal alerts for chart
+  const importantAlerts = alertData.filter((alert) => (
+    ['warning', 'critical', 'fatal'].includes(alert.metric.severity)
+  ))
+
+  // Add count to template
+  const severityCountsByTimestamp = importantAlerts.reduce((accum, current) => {
     const severity = current.metric.severity
-    if (['warning', 'critical', 'fatal'].includes(severity)) {
-      for (const dataPoint of current.values) {
-        if (dataPoint[1] === '1') {
-          accum[dataPoint[0]][severity] += 1
-        }
+    for (const dataPoint of current.values) {
+      if (dataPoint[1] === '1') {
+        accum[dataPoint[0]][severity] += 1
       }
     }
     return accum
