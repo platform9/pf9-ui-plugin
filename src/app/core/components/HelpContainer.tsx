@@ -1,10 +1,10 @@
 import React, { FC } from 'react'
+import { Tooltip } from '@material-ui/core'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { makeStyles } from '@material-ui/styles'
+import SimpleLink from './SimpleLink'
 import Theme from 'core/themes/model'
 import { TooltipProps } from '@material-ui/core/Tooltip'
-import { Tooltip } from './Tooltip'
-import ExternalLink from './ExternalLink'
 
 interface Props {
   title?: string
@@ -26,6 +26,7 @@ const useStyles = makeStyles<Theme, { color: IIconColor; isLink: boolean }>((the
 
 const HelpContainer: FC<Props> = ({
   title = 'Help',
+  placement = 'bottom',
   icon = 'question-circle',
   color = 'white',
   link = undefined,
@@ -33,14 +34,18 @@ const HelpContainer: FC<Props> = ({
   const classes = useStyles({ color, isLink: !!link })
 
   const content = link ? (
-    <ExternalLink url={link}>
+    <SimpleLink src={link}>
       <FontAwesomeIcon className={classes.icon}>{icon}</FontAwesomeIcon>
-    </ExternalLink>
+    </SimpleLink>
   ) : (
     <FontAwesomeIcon className={classes.icon}>{icon}</FontAwesomeIcon>
   )
 
-  return <Tooltip message={title}>{content}</Tooltip>
+  return (
+    <Tooltip title={title} placement={placement} interactive>
+      {content}
+    </Tooltip>
+  )
 }
 
 export default HelpContainer

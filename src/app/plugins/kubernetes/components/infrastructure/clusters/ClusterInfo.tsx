@@ -96,6 +96,17 @@ const clusterOverviewFields: IClusterDetailFields[] = [
 ]
 
 // BareOS
+const LoadbalancerHelp = () => {
+  const classes = useStyles()
+  return (
+    <Typography className={classes.text} variant="body2">
+      More about PMK application load balancer{' '}
+      <ExternalLink className={classes.link} url={applicationLoadBalancer}>
+        here
+      </ExternalLink>
+    </Typography>
+  )
+}
 const bareOsNetworkingFields = [
   { id: 'networkPlugin', title: 'Network Backend', required: true },
   {
@@ -103,12 +114,7 @@ const bareOsNetworkingFields = [
     title: 'Application load-balancer',
     required: false,
     render: castBoolToStr(),
-    helpMessage: (
-      <Typography variant="body2">
-        More about PMK application load balancer{' '}
-        <ExternalLink url={applicationLoadBalancer}>here</ExternalLink>
-      </Typography>
-    ),
+    helpMessage: <LoadbalancerHelp />,
   },
   { id: 'masterVipIface', title: 'Physical Network Interface', required: false },
   { id: 'masterVipIpv4', title: 'Virtual IP Address', required: false },
@@ -180,6 +186,12 @@ const renderCloudInfo = (cluster) => {
 const useStyles = makeStyles<Theme>((theme) => ({
   root: {
     flexGrow: 1,
+  },
+  text: {
+    color: theme.palette.common.white,
+  },
+  link: {
+    color: theme.palette.primary.light,
   },
 }))
 
