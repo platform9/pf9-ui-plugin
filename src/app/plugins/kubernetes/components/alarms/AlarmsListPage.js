@@ -83,8 +83,6 @@ const defaultParams = {
   chartTime: '24.h',
   chartClusterId: allKey,
   clusterId: allKey,
-  orderBy: 'name',
-  orderDirection: 'asc',
 }
 const usePrefParams = createUsePrefParamsHook('Alerts', listTablePrefs)
 
@@ -93,7 +91,18 @@ const ListPage = ({ ListContainer }) => {
     const classes = useStyles({})
     const { params, getParamsUpdater } = usePrefParams(defaultParams)
     const [data, loading, reload] = useDataLoader(loadAlerts, params)
-    const [timeSeriesData, timeSeriesLoading, timeSeriesReload] = useDataLoader(loadTimeSeriesAlerts, params)
+    // Provide specific param properties to timeSeries data loader
+    // so that it doesn't reload unless those props are changed
+    const [
+      timeSeriesData,
+      timeSeriesLoading,
+      timeSeriesReload
+    ] = useDataLoader(loadTimeSeriesAlerts,
+      {
+        chartTime: params.chartTime,
+        chartClusterId: params.chartClusterId
+      }
+    )
     const filteredAlerts = data.filter((alert) => {
       if (params.severity === allKey) {
         return true

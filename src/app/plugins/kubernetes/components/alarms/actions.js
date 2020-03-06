@@ -140,7 +140,6 @@ export const loadTimeSeriesAlerts = createContextLoader(
     // not sure if this has to do with the reason why the
     // cache does not work properly
     uniqueIdentifier: 'timestamp',
-    // Have to add clusterId and severity here too to trigger the invalidate cache
-    indexBy: ['chartClusterId', 'chartTime', 'clusterId', 'severity', 'orderBy', 'orderDirection'],
+    indexBy: ['chartClusterId', 'chartTime'],
   },
 )
