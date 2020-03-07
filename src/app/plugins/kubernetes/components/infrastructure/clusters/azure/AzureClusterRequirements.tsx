@@ -5,22 +5,12 @@ import Alert from 'core/components/Alert'
 import SubmitButton from 'core/components/buttons/SubmitButton'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import ExternalLink from 'core/components/ExternalLink'
-import {
-  azureCreateANewApplicationSecretLink,
-  azureGetValuesForSigninginLink,
-  azureServicePrincipalPortalLink,
-  gettingStartedHelpLink,
-} from 'k8s/links'
+import { gettingStartedHelpLink } from 'k8s/links'
 import { routes } from 'core/utils/routes'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
+import BulletList from 'core/components/BulletList'
 
 const useStyles = makeStyles((theme: Theme) => ({
-  requirements: {
-    display: 'flex',
-    flexFlow: 'row nowrap',
-    justifyContent: 'space-between',
-    margin: theme.spacing(4),
-  },
   alertTitle: {
     marginLeft: theme.spacing(2),
     marginTop: theme.spacing(1),
@@ -33,10 +23,17 @@ const useStyles = makeStyles((theme: Theme) => ({
     color: theme.palette.primary.main,
   },
   bulletList: {
-    marginLeft: theme.spacing(2),
+    margin: theme.spacing(4),
     flex: 1,
   },
 }))
+
+const azureReqs = [
+  'Azure VM Instance managment',
+  'Azure Traffic Manager managment',
+  'Azure Application Gateway mangement',
+  'Azure Managed Disks management',
+]
 
 const AzureClusterRequirements = ({ onComplete }) => {
   const classes = useStyles({})
@@ -56,38 +53,15 @@ const AzureClusterRequirements = ({ onComplete }) => {
       }
     >
       <Typography className={classes.text}>
-        Use your existing Azure credentials to create and manage Kubernetes clusters and associated
-        resources within your Azure public cloud environment.
-      </Typography>
-      <Typography className={classes.text}>
-        You can create multiple Azure cloud providers - each Azure cloud provider should be
-        associated with a unique set of Azure credentials.
+        Build a Kubernetes Cluster using Azure VMs Instances
       </Typography>
 
       <Alert variant="info">
-        <Typography className={classes.alertTitle} variant="body1">
-          To access resources that are secured by an Azure AD tenant, the entity that requires
-          access must be represented by a new or existing security principal. The security principal
-          defines the access policy and permissions for the user/application in the Azure AD tenant.
-          In order to be able to perform the necessary operations on Managed Kubernetes clusters,
-          your credentials must have a ‘contributor’ role assigned, or a similar read/write role
-          where the user is able to access subscriptions, and create/update/delete Azure resources.
-          <ExternalLink url={azureServicePrincipalPortalLink}>See this article</ExternalLink> for
-          detailed steps.
+        <Typography className={classes.alertTitle} variant="subtitle2">
+          The following permissions are required on your Azure account in order to deploy fully
+          automated Managed Kubernetes clusters:
         </Typography>
-        <Typography className={classes.alertTitle} variant="body1">
-          See the{' '}
-          <ExternalLink url={azureGetValuesForSigninginLink}>section under get values</ExternalLink>{' '}
-          for signing in to find the tenant and client IDs.
-        </Typography>
-        <Typography className={classes.alertTitle} variant="body1">
-          A client secret must be present before creating an Azure cloud provider. To learn more
-          about creating a client secret, see{' '}
-          <ExternalLink url={azureCreateANewApplicationSecretLink}>
-            create a new application secret
-          </ExternalLink>
-          .
-        </Typography>
+        <BulletList className={classes.bulletList} items={azureReqs} />
       </Alert>
       <div>
         <SubmitButton onClick={handleClick}>Deploy With Azure</SubmitButton>

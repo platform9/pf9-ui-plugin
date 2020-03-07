@@ -234,6 +234,16 @@ const AddAzureClusterPage = () => {
                           info="Set common options from one of the available templates"
                         />
 
+                        {params.template !== 'custom' && (
+                          <CheckboxField
+                            id="allowWorkloadsOnMaster"
+                            value={wizardContext.allowWorkloadsOnMaster}
+                            label="Enable workloads on all master nodes"
+                            info="It is highly recommended to not enable workloads on master nodes for production or critical workload clusters."
+                            disabled
+                          />
+                        )}
+
                         {params.template === 'custom' && (
                           <>
                             <CheckboxField
@@ -242,11 +252,17 @@ const AddAzureClusterPage = () => {
                               onChange={(value) =>
                                 setWizardContext({ useAllAvailabilityZones: value, zones: [] })
                               }
+                              value={
+                                !params.cloudProviderRegionId
+                                  ? false
+                                  : wizardContext.useAllAvailabilityZones
+                              }
                               info=""
+                              disabled={!params.cloudProviderRegionId}
                             />
 
                             {/* Azure Availability Zone */}
-                            {values.useAllAvailabilityZones || (
+                            {!params.cloudProviderRegionId || values.useAllAvailabilityZones || (
                               <AzureAvailabilityZoneChooser
                                 id="zones"
                                 info="Select from the Availability Zones for the specified region"
@@ -255,6 +271,14 @@ const AddAzureClusterPage = () => {
                               />
                             )}
 
+                            {/* Num master nodes */}
+                            <PicklistField
+                              id="numMasters"
+                              options={numMasterOptions}
+                              label="Master nodes"
+                              info="Number of master nodes to deploy.  3 nodes are required for an High Availability (HA) cluster."
+                              required
+                            />
                             {/* Master node SKU */}
                             <PicklistField
                               DropdownComponent={AzureSkuPicklist}
@@ -269,12 +293,12 @@ const AddAzureClusterPage = () => {
                               required
                             />
 
-                            {/* Num master nodes */}
-                            <PicklistField
-                              id="numMasters"
-                              options={numMasterOptions}
-                              label="Number of master nodes"
-                              info="Number of master nodes to deploy.  3 nodes are required for an High Availability (HA) cluster."
+                            {/* Num worker nodes */}
+                            <TextField
+                              id="numWorkers"
+                              type="number"
+                              label="Worker nodes"
+                              info="Number of worker nodes to deploy."
                               required
                             />
 
@@ -292,15 +316,6 @@ const AddAzureClusterPage = () => {
                               required
                             />
 
-                            {/* Num worker nodes */}
-                            <TextField
-                              id="numWorkers"
-                              type="number"
-                              label="Number of worker nodes"
-                              info="Number of worker nodes to deploy."
-                              required
-                            />
-
                             {/* Allow workloads on masters */}
                             <CheckboxField
                               id="allowWorkloadsOnMaster"
@@ -313,7 +328,7 @@ const AddAzureClusterPage = () => {
                     )}
                   </ValidatedForm>
                 ) : (
-                  <FormFieldCard title="Configure Your Cluster">
+                  <FormFieldCard title="Create Azure Cloud Provider">
                     <PromptToAddProvider
                       type={CloudProviders.Azure}
                       src={routes.cloudProviders.add.path({ type: CloudProviders.Azure })}
