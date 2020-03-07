@@ -33,6 +33,9 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: ({ image }) => (image ? 'space-between' : 'flex-start'),
     alignItems: 'center',
     padding: theme.spacing(0, 1),
+    '& h6': {
+      color: theme.palette.dashboardCard.text,
+    },
   },
   headerImg: {
     maxHeight: 40,

@@ -36,6 +36,7 @@ const styles = (theme) => ({
     position: 'absolute',
     fontWeight: 'bold',
     fill: 'red',
+    color: theme.palette.dashboardCard.text,
   },
   label: {
     paddingTop: 5,

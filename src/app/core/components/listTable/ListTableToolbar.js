@@ -36,6 +36,10 @@ const useStyles = makeStyles((theme) => ({
   toolbar: {
     justifyContent: 'flex-end',
     paddingRight: 0,
+    '& .MuiSelect-root': {
+      paddingTop: theme.spacing(),
+      paddingBottom: theme.spacing(),
+    },
   },
   search: {
     margin: theme.spacing(1, 2, 0, 2),

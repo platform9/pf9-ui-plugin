@@ -31,8 +31,8 @@ const AzureClusterReviewTable = ({ data }) => {
           <DataRow label="Region" value={data.location} />
           <DataRow label="Master node SKU" value={data.masterSku} />
           <DataRow label="Worker node SKU" value={data.workerSku} />
-          <DataRow label="Num master nodes" value={data.numMasters} />
-          <DataRow label="Num worker nodes" value={data.numWorkers} />
+          <DataRow label="Number of master nodes" value={data.numMasters} />
+          <DataRow label="Number of worker nodes" value={data.numWorkers} />
           <DataRow label="SSH key" value={data.sshKey} />
           <DataRow
             label="Enable workloads on all master nodes"

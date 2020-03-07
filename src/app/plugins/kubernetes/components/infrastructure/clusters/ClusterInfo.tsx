@@ -2,7 +2,7 @@ import React from 'react'
 import InfoPanel from 'core/components/InfoPanel'
 
 import useReactRouter from 'use-react-router'
-import { Grid } from '@material-ui/core'
+import { Grid, Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
@@ -11,11 +11,14 @@ import { ICluster } from './model'
 import { CloudProviders, CloudProvidersFriendlyName } from '../cloudProviders/model'
 import Theme from 'core/themes/model'
 import { castBoolToStr, formatDate } from 'utils/misc'
+import ExternalLink from 'core/components/ExternalLink'
+import { applicationLoadBalancer } from 'k8s/links'
 
 interface IClusterDetailFields {
   id: string
   title: string
-  required: boolean
+  required?: boolean
+  helpMessage?: string | React.ReactNode
   condition?: (cluster: ICluster) => boolean
   render?: (value: string | boolean) => string
 }
@@ -23,11 +26,14 @@ interface IClusterDetailFields {
 const getFieldsForCard = (fields: IClusterDetailFields[], cluster: ICluster) => {
   const fieldsToDisplay = {}
   fields.forEach((field) => {
-    const { id, title, required = false, condition, render } = field
+    const { id, title, required = false, condition, render, helpMessage } = field
     const shouldRender = condition ? condition(cluster) : true
     const value = path<string | boolean>(id.split('.'), cluster)
     if (shouldRender && (required || !!value || value === false)) {
-      fieldsToDisplay[title] = render ? render(value) : value
+      fieldsToDisplay[title] = {
+        value: render ? render(value) : value,
+        helpMessage,
+      }
     }
   })
   return fieldsToDisplay
@@ -70,13 +76,11 @@ const clusterOverviewFields: IClusterDetailFields[] = [
   {
     id: 'etcdBackup.storageProperties.localPath',
     title: 'ETCD Backup Storage Path',
-    required: false,
     condition: (cluster) => !!cluster.etcdBackupEnabled,
   },
   {
     id: 'etcdBackup.intervalInMins',
     title: 'ETCD Backup Interval',
-    required: false,
     condition: (cluster) => !!cluster.etcdBackupEnabled,
   },
   { id: 'etcdDataDir', title: 'ETCD Data Directory', required: true },
@@ -88,17 +92,33 @@ const clusterOverviewFields: IClusterDetailFields[] = [
   },
   { id: 'k8sApiPort', title: 'K8S API Server port', required: true },
   { id: 'mtuSize', title: 'MTU size', required: true },
-  { id: 'flannelIfaceLabel', title: 'Flannel interface', required: false },
-  { id: 'flannelPublicIfaceLabel', title: 'Flannel Public IP', required: false },
+  { id: 'flannelIfaceLabel', title: 'Flannel interface' },
+  { id: 'flannelPublicIfaceLabel', title: 'Flannel Public IP' },
 ]
 
 // BareOS
+const LoadbalancerHelp = () => {
+  const classes = useStyles()
+  return (
+    <Typography className={classes.text} variant="body2">
+      More about PMK application load balancer{' '}
+      <ExternalLink className={classes.link} url={applicationLoadBalancer}>
+        here
+      </ExternalLink>
+    </Typography>
+  )
+}
 const bareOsNetworkingFields = [
   { id: 'networkPlugin', title: 'Network Backend', required: true },
-  { id: 'hasLoadBalancer', title: 'Load Balancer', required: false, render: castBoolToStr() },
-  { id: 'masterVipIface', title: 'Physical Network Interface', required: false },
-  { id: 'masterVipIpv4', title: 'Virtual IP Address', required: false },
-  { id: 'metallbCidr', title: 'MetalLB CIDR', required: false },
+  {
+    id: 'hasLoadBalancer',
+    title: 'Application load-balancer',
+    render: castBoolToStr(),
+    helpMessage: <LoadbalancerHelp />,
+  },
+  { id: 'masterVipIface', title: 'Physical Network Interface' },
+  { id: 'masterVipIpv4', title: 'Virtual IP Address' },
+  { id: 'metallbCidr', title: 'MetalLB CIDR' },
 ]
 
 // AWS
@@ -142,7 +162,7 @@ const azureCloudFields = [
   { id: 'cloudProperties.subnetName', title: 'Subnet Name', required: true },
   { id: 'cloudProperties.vnetName', title: 'VNet Name', required: true },
   { id: 'cloudProperties.vnetResourceGroup', title: 'VNet Resource Name', required: true },
-  { id: 'cloudProperties.loadbalancerIP', title: 'Load Balance IP', required: true },
+  { id: 'cloudProperties.loadbalancerIP', title: 'Load Balancer IP', required: true },
 ]
 
 const overviewStats = (cluster) => getFieldsForCard(clusterOverviewFields, cluster)
@@ -166,6 +186,12 @@ const renderCloudInfo = (cluster) => {
 const useStyles = makeStyles<Theme>((theme) => ({
   root: {
     flexGrow: 1,
+  },
+  text: {
+    color: theme.palette.common.white,
+  },
+  link: {
+    color: theme.palette.primary.light,
   },
 }))
 
