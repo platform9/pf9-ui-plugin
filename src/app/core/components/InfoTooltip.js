@@ -67,8 +67,8 @@ InfoTooltip.propTypes = {
 
 // We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
 const withInfoTooltip = (Component) =>
-  React.forwardRef(({ info, ...props }, ref) => (
-    <InfoTooltip info={info}>
+  React.forwardRef(({ info, infoPlacement, ...props }, ref) => (
+    <InfoTooltip info={info} placement={infoPlacement}>
       <Component {...props} ref={ref} />
     </InfoTooltip>
   ))
