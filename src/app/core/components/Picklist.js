@@ -19,6 +19,9 @@ const useStyles = makeStyles((theme) => ({
     minWidth: 120,
     marginTop: theme.spacing(1),
   },
+  list: {
+    maxHeight: 400,
+  },
 }))
 
 // We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
@@ -59,7 +62,10 @@ const Picklist = React.forwardRef((props, ref) => {
       )(options),
     [options],
   )
-  const selectProps = useMemo(() => ({ displayEmpty: true, multiple }), [])
+  const selectProps = useMemo(
+    () => ({ displayEmpty: true, multiple, MenuProps: { classes: { list: classes.list } } }),
+    [],
+  )
   const handleChange = useCallback(
     (e) => {
       // Hack to work around the fact that Material UI's "Select" will ignore
@@ -88,7 +94,7 @@ const Picklist = React.forwardRef((props, ref) => {
         ref={ref}
         disabled={disabled || (isEmpty(options) && !showNone)}
         select
-        classes={classes}
+        classes={{ root: classes.root }}
         label={label}
         value={nonEmptyValue || (multiple ? emptyArr : '')}
         SelectProps={selectProps}
