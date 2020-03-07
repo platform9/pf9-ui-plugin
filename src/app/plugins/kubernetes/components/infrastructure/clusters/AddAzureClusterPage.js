@@ -445,6 +445,7 @@ const AddAzureClusterPage = () => {
                       <TextField
                         id="httpProxy"
                         label="HTTP Proxy"
+                        infoPlacement="right-end"
                         info={
                           <div className={classes.inline}>
                             (Optional) Specify the HTTP proxy for this cluster. Uses format of{' '}
