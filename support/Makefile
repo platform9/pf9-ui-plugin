@@ -22,6 +22,8 @@ NPM_BIN := $(NODE_BIN) $(NODEJS_DIR)/bin/npm --scripts-prepend-node-path=true
 YARN_DIR := $(TOP_DIR)/yarn
 YARN_BIN := $(YARN_DIR)/bin/yarn
 
+SHELL := /bin/bash
+
 # example usage: $(call download_nodejs,"linux","/path/to/node")
 define download_nodejs
 tar xz --strip-components=1 -C $2 --file $(shell ${NODEJS_DOWNLOAD_SCRIPT} $1 $(TOP_DIR))

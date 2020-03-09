@@ -663,6 +663,19 @@ class Qbert extends ApiService {
     return response
   }
 
+  getPrometheusAlerts = async (clusterUuid) => {
+    const response = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/rules`)
+    const alerts = response.groups.flatMap((group) => {
+      return group.rules
+    }).filter(rule => rule.type === 'alerting')
+    return alerts.map(alert => ({ ...alert, clusterId: clusterUuid, id: `${alert.name}${clusterUuid}` }))
+  }
+
+  getPrometheusAlertsOverTime = async (clusterUuid, startTime, endTime, step) => {
+    const response = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/query_range?query=ALERTS&start=${startTime}&end=${endTime}&step=${step}`)
+    return response.result.map(alert => ({ ...alert, clusterId: clusterUuid, id: `${alert.metric.alertname}${clusterUuid}` }))
+  }
+
   getPrometheusServiceMonitors = async (clusterUuid) => {
     const response = await this.client.basicGet(
       `${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/servicemonitors`,
@@ -719,11 +732,6 @@ class Qbert extends ApiService {
     await this.client.basicDelete(
       `${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${namespace}/prometheusrules/${name}`,
     )
-  }
-
-  getPrometheusAlerts = async (clusterUuid) => {
-    const response = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/alerts`)
-    return normalizeClusterizedResponse(clusterUuid, response)
   }
 
   getPrometheusAlertManagers = async (clusterUuid) => {
