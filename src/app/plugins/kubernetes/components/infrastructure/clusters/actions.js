@@ -31,9 +31,13 @@ import {
   getHealthStatus,
 } from './ClusterStatusUtils'
 import { trackEvent } from 'utils/tracking'
-import { hasPrometheusEnabled, clusterTagActions } from 'k8s/components/prometheus/actions'
+import {
+  hasPrometheusEnabled,
+  clusterTagActions,
+  clusterTagsCacheKey,
+} from 'k8s/components/prometheus/actions'
 
-const { qbert, appbert } = ApiClient.getInstance()
+const { qbert } = ApiClient.getInstance()
 
 const getProgressPercent = async (clusterId) => {
   try {
@@ -260,7 +264,7 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
       rawClusters,
       qbertEndpoint,
     ] = await Promise.all([
-      appbert.getClusterTags(),
+      loadFromContext(clusterTagsCacheKey, undefined, true), // tell the loader to refetch the data
       loadFromContext(rawNodesCacheKey),
       loadFromContext(combinedHostsCacheKey),
       qbert.getClusters(),
