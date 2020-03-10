@@ -60,7 +60,6 @@ const styles = (theme) => ({
     margin: theme.spacing(1, 3),
   },
 })
-
 const minSearchLength = 3
 
 // Reject all columns that are not visible or excluded
@@ -101,9 +100,9 @@ class ListTable extends PureComponent {
   // only for a subset of above reasons.
   componentDidUpdate(prevProps) {
     const { data } = this.props
-    if (prevProps.data.length === data.length
-      && equals(prevProps.data, data)
-    ) { return }
+    if (prevProps.data.length === data.length && equals(prevProps.data, data)) {
+      return
+    }
 
     this.setState({
       selected: [],
@@ -523,7 +522,7 @@ class ListTable extends PureComponent {
       blankFirstColumn,
       extraToolbarContent,
       multiSelection,
-      headless
+      headless,
     } = this.props
 
     if (!data) {
@@ -539,21 +538,23 @@ class ListTable extends PureComponent {
     const tableContent =
       paginatedData && paginatedData.length ? (
         <Table className={classes.table} size={size}>
-          {!headless && <ListTableHead
-            canDragColumns={canDragColumns}
-            columns={this.getSortedVisibleColumns()}
-            onColumnsSwitch={this.handleColumnsSwitch}
-            numSelected={selectedRows.length}
-            order={orderDirection}
-            orderBy={orderBy}
-            onSelectAllClick={this.handleSelectAllClick}
-            onRequestSort={this.handleRequestSort}
-            checked={selectedAll}
-            rowCount={filteredData.length}
-            showCheckboxes={showCheckboxes}
-            blankFirstColumn={blankFirstColumn}
-            multiSelection={multiSelection}
-          />}
+          {!headless && (
+            <ListTableHead
+              canDragColumns={canDragColumns}
+              columns={this.getSortedVisibleColumns()}
+              onColumnsSwitch={this.handleColumnsSwitch}
+              numSelected={selectedRows.length}
+              order={orderDirection}
+              orderBy={orderBy}
+              onSelectAllClick={this.handleSelectAllClick}
+              onRequestSort={this.handleRequestSort}
+              checked={selectedAll}
+              rowCount={filteredData.length}
+              showCheckboxes={showCheckboxes}
+              blankFirstColumn={blankFirstColumn}
+              multiSelection={multiSelection}
+            />
+          )}
           <TableBody>{paginatedData.map(this.renderRow)}</TableBody>
         </Table>
       ) : (
