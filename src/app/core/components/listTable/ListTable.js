@@ -62,7 +62,6 @@ const styles = (theme) => ({
 })
 
 const minSearchLength = 3
-
 // Reject all columns that are not visible or excluded
 export const pluckVisibleColumnIds = (columns) =>
   columns.filter((column) => column.display !== false && column.excluded !== true).map(prop('id'))
