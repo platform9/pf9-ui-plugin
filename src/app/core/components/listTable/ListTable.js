@@ -60,6 +60,7 @@ const styles = (theme) => ({
     margin: theme.spacing(1, 3),
   },
 })
+
 const minSearchLength = 3
 
 // Reject all columns that are not visible or excluded
