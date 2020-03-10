@@ -1,5 +1,5 @@
 ---
-name: 'Bug: '
+name: But Report
 about: Report a reproducible bug or regression.
 title: ''
 labels: ''
