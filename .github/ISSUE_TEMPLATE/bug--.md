@@ -1,6 +1,6 @@
 ---
 name: 'Bug: '
-about: Create a report to help us improve
+about: Report a reproducible bug or regression.
 title: ''
 labels: ''
 assignees: ''
