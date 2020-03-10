@@ -28,6 +28,7 @@ import { imageUrls, clarityDashboardUrl } from 'app/constants'
 import { routes } from 'core/utils/routes'
 
 export const drawerWidth = 180
+
 const styles = (theme) => ({
   logoTitle: {
     backgroundImage: `url(${imageUrls.logo})`,
