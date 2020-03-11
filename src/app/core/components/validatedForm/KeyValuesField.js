@@ -21,7 +21,7 @@ const KeyValuesField = React.forwardRef(
       onChange,
       keySuggestions,
       valueSuggestions,
-      hideMonitoringTags,
+      blacklistedTags,
       ...restProps
     },
     ref,
@@ -33,7 +33,7 @@ const KeyValuesField = React.forwardRef(
         onChange={onChange}
         keySuggestions={keySuggestions}
         valueSuggestions={valueSuggestions}
-        hideMonitoringTags={hideMonitoringTags}
+        blacklistedTags={blacklistedTags}
       />
       {errorMessage && <FormHelperText>{errorMessage}</FormHelperText>}
     </FormControl>
@@ -45,9 +45,7 @@ KeyValuesField.propTypes = {
   label: PropTypes.string,
   onChange: PropTypes.func,
   initialValue: PropTypes.arrayOf(EntryShape),
-  // Hide pf9-system:monitoring tag from the display
-  // because that tag should be handled completely by appbert
-  hideMonitoringTags: PropTypes.bool,
+  blacklistedTags: PropTypes.arrayOf(PropTypes.string),
 }
 
 export default compose(

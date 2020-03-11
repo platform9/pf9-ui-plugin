@@ -18,6 +18,12 @@ import EtcdBackupFields from './EtcdBackupFields'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
+// Hide pf9-system:monitoring tag from the display
+// bc that tag should be handled completely by appbert.
+// If the tag exists, we do not want to remove it
+// so just hide it from view.
+const tagsToOmit = ['pf9-system:monitoring']
+
 const EditClusterPage = () => {
   const { match, history } = useReactRouter()
   const clusterId = match.params.id
@@ -96,7 +102,7 @@ const EditClusterPage = () => {
           id="tags"
           label="Tags"
           info="Edit tag metadata on this cluster"
-          hideMonitoringTags
+          blacklistedTags={tagsToOmit}
         />
       </ValidatedForm>
     </FormWrapper>
