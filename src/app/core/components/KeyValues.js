@@ -7,6 +7,7 @@ import uuid from 'uuid'
 import { assoc } from 'ramda'
 import { makeStyles } from '@material-ui/styles'
 import { Button } from '@material-ui/core'
+import clsx from 'clsx'
 
 const useKeyValueStyles = makeStyles((theme) => ({
   root: {
@@ -28,9 +29,12 @@ const useKeyValueStyles = makeStyles((theme) => ({
     flexGrow: 0,
     padding: 0,
   },
+  hidden: {
+    display: 'none',
+  },
 }))
 
-const KeyValue = ({ entry = {}, onChange, onDelete, keySuggestions, valueSuggestions }) => {
+const KeyValue = ({ entry = {}, onChange, onDelete, keySuggestions, valueSuggestions, hideMonitoringTags }) => {
   const classes = useKeyValueStyles()
   const [state, setState] = useState({
     id: entry.id || uuid.v4(),
@@ -45,7 +49,9 @@ const KeyValue = ({ entry = {}, onChange, onDelete, keySuggestions, valueSuggest
   const handleChange = (field) => (value) => setState(assoc(field, value, state))
 
   return (
-    <div className={classes.root}>
+    <div className={clsx(classes.root, {
+      [classes.hidden]: hideMonitoringTags && state.key === 'pf9-system:monitoring'
+    })}>
       <AutocompleteBase
         inputProps={{ size: 14 }}
         fullWidth
@@ -93,7 +99,7 @@ const newEntry = () => ({ id: uuid.v4(), key: '', value: '' })
 // filter it out before submitting. :(
 const addId = (entry) => ({ ...entry, id: uuid.v4() })
 
-const KeyValues = ({ entries: _entries, onChange, keySuggestions, valueSuggestions }) => {
+const KeyValues = ({ entries: _entries, onChange, keySuggestions, valueSuggestions, hideMonitoringTags }) => {
   const classes = useStyles()
   const entriesWithId = [...(_entries || []).map(addId), newEntry()]
   const [entries, setEntries] = useState(entriesWithId)
@@ -120,6 +126,7 @@ const KeyValues = ({ entries: _entries, onChange, keySuggestions, valueSuggestio
           entry={entry}
           onChange={handleChange}
           onDelete={deleteEntry(entry.id)}
+          hideMonitoringTags={hideMonitoringTags}
         />
       ))}
       <Button className={classes.addButton} variant="text" onClick={addBlankEntry}>
@@ -139,6 +146,7 @@ KeyValues.propTypes = {
   valueSuggestions: PropTypes.arrayOf(PropTypes.string),
   entries: PropTypes.arrayOf(EntryShape),
   onChange: PropTypes.func,
+  hideMonitoringTags: PropTypes.bool,
 }
 
 export default KeyValues

@@ -92,7 +92,12 @@ const EditClusterPage = () => {
         {params.etcdBackup && <EtcdBackupFields />}
 
         {/* Tags */}
-        <KeyValuesField id="tags" label="Tags" info="Edit tag metadata on this cluster" />
+        <KeyValuesField
+          id="tags"
+          label="Tags"
+          info="Edit tag metadata on this cluster"
+          hideMonitoringTags
+        />
       </ValidatedForm>
     </FormWrapper>
   )

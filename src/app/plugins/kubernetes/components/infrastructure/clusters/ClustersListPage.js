@@ -13,7 +13,7 @@ import {
 import ResourceUsageTable from 'k8s/components/infrastructure/common/ResourceUsageTable'
 import CreateButton from 'core/components/buttons/CreateButton'
 import { AppContext } from 'core/providers/AppProvider'
-import { both, path } from 'ramda'
+import { both, path, omit } from 'ramda'
 import PrometheusAddonDialog from 'k8s/components/prometheus/PrometheusAddonDialog'
 import ClusterUpgradeDialog from 'k8s/components/infrastructure/clusters/ClusterUpgradeDialog'
 import ClusterDeleteDialog from './ClusterDeleteDialog'
@@ -107,7 +107,10 @@ const renderCloudProvider = (_, { cloudProviderType, cloudProviderName }) => (
 )
 
 const renderMetaData = (_, { tags }) => {
-  const content = JSON.stringify(tags, null, 2)
+  // Hide pf9-system:monitoring tag from the display
+  // because that tag should be handled completely by appbert
+  const _tags = omit(['pf9-system:monitoring'], tags)
+  const content = JSON.stringify(_tags, null, 2)
 
   return (
     <Tooltip title={<CodeBlock>{content}</CodeBlock>}>
