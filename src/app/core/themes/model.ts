@@ -180,7 +180,6 @@ export interface Palette {
   code: Code
   warning: DefaultColorSwatch
   success: DefaultColorSwatch
-  pieChart: PieChart
 }
 
 export interface Action {

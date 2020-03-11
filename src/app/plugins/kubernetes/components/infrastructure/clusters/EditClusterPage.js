@@ -36,7 +36,7 @@ const EditClusterPage = () => {
           etcdBackup: !!etcdBackup.isEtcdBackupEnabled,
           etcdStoragePath:
             path(['storageProperties, localStorage'], etcdBackup) || defaultEtcBackupPath,
-          etcdBackupInterval: etcdBackup.intervalInMins || 1,
+          etcdBackupInterval: etcdBackup.intervalInMins || 60 * 24,
         }),
       )(clusters),
     [clusters, clusterId],
@@ -71,7 +71,12 @@ const EditClusterPage = () => {
       message={updating ? 'Submitting form...' : 'Loading Cluster...'}
       backUrl={listUrl}
     >
-      <ValidatedForm initialValues={initialValues} onSubmit={handleSubmit}>
+      <ValidatedForm
+        title="Basic Details"
+        formActions={<SubmitButton>Update Cluster</SubmitButton>}
+        initialValues={initialValues}
+        onSubmit={handleSubmit}
+      >
         {/* Cluster Name */}
         <TextField id="name" label="Name" info="Name of the cluster" required />
 
@@ -88,7 +93,6 @@ const EditClusterPage = () => {
 
         {/* Tags */}
         <KeyValuesField id="tags" label="Tags" info="Edit tag metadata on this cluster" />
-        <SubmitButton>Update Cluster</SubmitButton>
       </ValidatedForm>
     </FormWrapper>
   )

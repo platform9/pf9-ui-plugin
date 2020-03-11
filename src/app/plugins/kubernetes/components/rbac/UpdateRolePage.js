@@ -34,7 +34,7 @@ const UpdateRolePage = () => {
       loading={loading || updating}
       message={loading ? 'Loading role...' : 'Submitting form...'}
     >
-      <ValidatedForm onSubmit={handleSubmit}>
+      <ValidatedForm onSubmit={handleSubmit} title="API Permissions">
         <PresetField label="Name" value={role.name} />
         <PresetField label="Cluster" value={role.clusterName} />
         <PresetField label="Namespace" value={role.namespace} />

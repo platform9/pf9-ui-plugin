@@ -1,6 +1,7 @@
 import React from 'react'
 import { Table, TableBody, TableCell, TableRow } from '@material-ui/core'
 import { castBoolToStr } from 'utils/misc'
+import CodeBlock from 'core/components/CodeBlock'
 
 const DataRow = ({ label, value }) => (
   <TableRow>
@@ -26,19 +27,22 @@ const AwsClusterReviewTable = ({ data }) => {
           <DataRow label="Num worker nodes" value={numWorkers} />
           <DataRow label="SSH key" value={data.sshKey} />
           <DataRow
-            label="Make all Master nodes Master + Worker"
+            label="Enable workloads on all master nodes"
             value={castBoolToStr()(data.allowWorkloadsOnMaster)}
           />
           <DataRow label="Containers CIDR" value={data.containersCidr} />
           <DataRow label="Services CIDR" value={data.servicesCidr} />
           <DataRow label="Network backend" value={data.networkPlugin} />
           <DataRow label="Privileged" value={castBoolToStr()(data.privileged)} />
-          <DataRow label="Application catalog" value={castBoolToStr()(data.appCatalogEnabled)} />
+          {/* <DataRow label="Application catalog" value={castBoolToStr()(data.appCatalogEnabled)} /> */}
           <DataRow
             label="Prometheus monitoring"
             value={castBoolToStr()(data.prometheusMonitoringEnabled)}
           />
-          <DataRow label="Tags" value={JSON.stringify(data.tags || [])} />
+          <DataRow
+            label="Tags"
+            value={<CodeBlock>{JSON.stringify(data.tags || [], null, 2)}</CodeBlock>}
+          />
         </TableBody>
       </Table>
     </React.Fragment>

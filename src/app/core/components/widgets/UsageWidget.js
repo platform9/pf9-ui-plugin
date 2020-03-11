@@ -2,8 +2,29 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import SemiCircleGraph from 'core/components/graphs/SemiCircleGraph'
 import WidgetCard from 'core/components/widgets/WidgetCard'
+import { Typography } from '@material-ui/core'
+import { makeStyles } from '@material-ui/styles'
 
 const defaultStats = { current: 0, max: 0, percent: 0 }
+
+const useStyles = makeStyles((theme) => ({
+  title: {
+    fontWeight: 300,
+    textAlign: 'right',
+    color: theme.palette.dashboardCard.text,
+  },
+  modifier: {
+    fontWeight: 300,
+    textAlign: 'left',
+    color: theme.palette.dashboardCard.text,
+  },
+  container: {
+    marginTop: 20,
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    gridColumnGap: theme.spacing(),
+  },
+}))
 
 const UsageWidget = ({
   title,
@@ -14,6 +35,7 @@ const UsageWidget = ({
   stats = defaultStats,
   ...rest
 }) => {
+  const classes = useStyles()
   const { current, max, percent } = stats
 
   const curStr = current.toFixed(precision) + units
@@ -23,7 +45,22 @@ const UsageWidget = ({
     <WidgetCard title={title} headerImg={headerImg}>
       <SemiCircleGraph
         percentage={percentStr}
-        label={`${curStr} ${usedText} of ${maxStr}`}
+        label={
+          <div className={classes.container}>
+            <Typography variant="subtitle2" className={classes.title}>
+              <b>{curStr}</b>
+            </Typography>
+            <Typography variant="subtitle2" className={classes.modifier}>
+              {usedText}
+            </Typography>
+            <Typography variant="subtitle2" className={classes.title}>
+              <b>{maxStr}</b>
+            </Typography>
+            <Typography variant="subtitle2" className={classes.modifier}>
+              available
+            </Typography>
+          </div>
+        }
         {...rest}
       />
     </WidgetCard>

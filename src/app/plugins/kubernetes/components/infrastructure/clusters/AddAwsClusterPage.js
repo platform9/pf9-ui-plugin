@@ -39,16 +39,6 @@ import { trackEvent } from 'utils/tracking'
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
 const useStyles = makeStyles((theme) => ({
-  formWidth: {
-    width: 715,
-  },
-  tableWidth: {
-    maxWidth: 560,
-  },
-  inputWidth: {
-    maxWidth: 350,
-    marginBottom: theme.spacing(3),
-  },
   inline: {
     display: 'grid',
   },
@@ -121,9 +111,10 @@ const initialContext = {
   isPrivate: false,
   internalElb: false,
   etcdStoragePath: defaultEtcBackupPath,
-  etcdBackupInterval: 1, // in minutes
+  etcdBackupInterval: 60 * 24, // in minutes
   prometheusMonitoringEnabled: true,
   tags: [],
+  appCatalogEnabled: false,
 }
 
 const templateOptions = [
@@ -386,7 +377,7 @@ const AddAwsClusterPage = () => {
     })
   }, [])
 
-  const onComplete = () => history.push(routes.cluster.list.path())
+  const onComplete = (_, { uuid }) => history.push(routes.cluster.nodeHealth.path({ id: uuid }))
   const [createAwsClusterAction, creatingAwsCluster] = useDataUpdater(
     clusterActions.create,
     onComplete,
@@ -419,175 +410,164 @@ const AddAwsClusterPage = () => {
                     initialValues={wizardContext}
                     onSubmit={setWizardContext}
                     triggerSubmit={onNext}
+                    title="Configure Your Cluster"
                   >
                     {({ setFieldValue, values }) => (
-                      <div className={classes.formWidth}>
-                        <FormFieldCard title="Configure Your Cluster">
-                          <div className={classes.inputWidth}>
-                            {/* Cluster Name */}
-                            <TextField id="name" label="Name" info="Name of the cluster" required />
+                      <>
+                        {/* Cluster Name */}
+                        <TextField id="name" label="Name" info="Name of the cluster" required />
 
-                            {/* Cloud Provider */}
+                        {/* Cloud Provider */}
+                        <PicklistField
+                          DropdownComponent={CloudProviderPicklist}
+                          id="cloudProviderId"
+                          label="Cloud Provider"
+                          onChange={getParamsUpdater('cloudProviderId')}
+                          info="Nodes will be provisioned using this cloud provider."
+                          type="aws"
+                          required
+                        />
+
+                        {/* AWS Region */}
+                        <PicklistField
+                          DropdownComponent={CloudProviderRegionPicklist}
+                          disabled={!params.cloudProviderId}
+                          id="region"
+                          label="Region"
+                          cloudProviderId={params.cloudProviderId}
+                          onChange={getParamsUpdater('cloudProviderRegionId')}
+                          info="Region "
+                          value={params.cloudProviderRegionId}
+                          type="aws"
+                          required
+                        />
+
+                        {/* AWS Availability Zone */}
+                        {values.region && (
+                          <AwsAvailabilityZoneChooser
+                            id="azs"
+                            info="Select from the Availability Zones for the specified region"
+                            cloudProviderId={params.cloudProviderId}
+                            cloudProviderRegionId={params.cloudProviderRegionId}
+                            onChange={getParamsUpdater('azs')}
+                            required
+                          />
+                        )}
+
+                        {/* SSH Key */}
+                        <PicklistField
+                          DropdownComponent={AwsClusterSshKeyPicklist}
+                          disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
+                          id="sshKey"
+                          label="SSH Key"
+                          cloudProviderId={params.cloudProviderId}
+                          cloudProviderRegionId={params.cloudProviderRegionId}
+                          info="Select an AWS SSH key to be associated with the nodes. This key can be used to access the nodes for debugging or other purposes."
+                          required
+                        />
+
+                        {/* Template Chooser */}
+                        <PicklistField
+                          id="template"
+                          label="Cluster Template"
+                          options={templateOptions}
+                          onChange={handleTemplateChoice({
+                            setWizardContext,
+                            setFieldValue,
+                            paramUpdater: getParamsUpdater('template'),
+                          })}
+                          info="Set common options from one of the available templates"
+                        />
+
+                        {params.template === 'custom' && (
+                          <>
+                            {/* Operating System */}
                             <PicklistField
-                              DropdownComponent={CloudProviderPicklist}
-                              id="cloudProviderId"
-                              label="Cloud Provider"
-                              onChange={getParamsUpdater('cloudProviderId')}
-                              info="Nodes will be provisioned using this cloud provider."
-                              type="aws"
+                              id="ami"
+                              label="Operating System"
+                              options={operatingSystemOptions}
+                              info="Operating System / AMI"
                               required
                             />
 
-                            {/* AWS Region */}
+                            {/* Master node instance type */}
                             <PicklistField
-                              DropdownComponent={CloudProviderRegionPicklist}
-                              disabled={!params.cloudProviderId}
-                              id="region"
-                              label="Region"
-                              cloudProviderId={params.cloudProviderId}
-                              onChange={getParamsUpdater('cloudProviderRegionId')}
-                              info="Region "
-                              value={params.cloudProviderRegionId}
-                              type="aws"
-                              required
-                            />
-
-                            {/* AWS Availability Zone */}
-                            {values.region && (
-                              <AwsAvailabilityZoneChooser
-                                id="azs"
-                                info="Select from the Availability Zones for the specified region"
-                                cloudProviderId={params.cloudProviderId}
-                                cloudProviderRegionId={params.cloudProviderRegionId}
-                                onChange={getParamsUpdater('azs')}
-                                required
-                              />
-                            )}
-
-                            {/* SSH Key */}
-                            <PicklistField
-                              DropdownComponent={AwsClusterSshKeyPicklist}
+                              DropdownComponent={AwsRegionFlavorPicklist}
                               disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
-                              id="sshKey"
-                              label="SSH Key"
+                              id="masterFlavor"
+                              label="Master Node Instance Type"
                               cloudProviderId={params.cloudProviderId}
                               cloudProviderRegionId={params.cloudProviderRegionId}
-                              info="Select an AWS SSH key to be associated with the nodes. This key can be used to access the nodes for debugging or other purposes."
+                              info="Choose an instance type used by master nodes."
                               required
                             />
 
-                            {/* Template Chooser */}
+                            {/* Num master nodes */}
                             <PicklistField
-                              id="template"
-                              label="Cluster Template"
-                              options={templateOptions}
-                              onChange={handleTemplateChoice({
-                                setWizardContext,
-                                setFieldValue,
-                                paramUpdater: getParamsUpdater('template'),
-                              })}
-                              info="Set common options from one of the available templates"
+                              id="numMasters"
+                              options={numMasterOptions}
+                              label="Number of master nodes"
+                              info="Number of master nodes to deploy.  3 nodes are required for an High Availability (HA) cluster."
+                              required
                             />
 
-                            {params.template === 'custom' && (
-                              <>
-                                {/* Operating System */}
-                                <PicklistField
-                                  id="ami"
-                                  label="Operating System"
-                                  options={operatingSystemOptions}
-                                  info="Operating System / AMI"
-                                  required
-                                />
+                            {/* Worker node instance type */}
+                            <PicklistField
+                              DropdownComponent={AwsRegionFlavorPicklist}
+                              disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
+                              id="workerFlavor"
+                              label="Worker Node Instance Type"
+                              cloudProviderId={params.cloudProviderId}
+                              cloudProviderRegionId={params.cloudProviderRegionId}
+                              info="Choose an instance type used by worker nodes."
+                              required
+                            />
 
-                                {/* Master node instance type */}
-                                <PicklistField
-                                  DropdownComponent={AwsRegionFlavorPicklist}
-                                  disabled={
-                                    !(params.cloudProviderId && params.cloudProviderRegionId)
-                                  }
-                                  id="masterFlavor"
-                                  label="Master Node Instance Type"
-                                  cloudProviderId={params.cloudProviderId}
-                                  cloudProviderRegionId={params.cloudProviderRegionId}
-                                  info="Choose an instance type used by master nodes."
-                                  required
-                                />
+                            {/* Num worker nodes */}
+                            <TextField
+                              id="numWorkers"
+                              type="number"
+                              label="Number of worker nodes"
+                              info="Number of worker nodes to deploy."
+                              required
+                            />
 
-                                {/* Num master nodes */}
-                                <PicklistField
-                                  id="numMasters"
-                                  options={numMasterOptions}
-                                  label="Number of master nodes"
-                                  info="Number of master nodes to deploy.  3 nodes are required for an High Availability (HA) cluster."
-                                  required
-                                />
+                            {/* Workloads on masters */}
+                            <CheckboxField
+                              id="allowWorkloadsOnMaster"
+                              label="Enable workloads on all master nodes"
+                              info="It is highly recommended to not enable workloads on master nodes for production or critical workload clusters."
+                            />
 
-                                {/* Worker node instance type */}
-                                <PicklistField
-                                  DropdownComponent={AwsRegionFlavorPicklist}
-                                  disabled={
-                                    !(params.cloudProviderId && params.cloudProviderRegionId)
-                                  }
-                                  id="workerFlavor"
-                                  label="Worker Node Instance Type"
-                                  cloudProviderId={params.cloudProviderId}
-                                  cloudProviderRegionId={params.cloudProviderRegionId}
-                                  info="Choose an instance type used by worker nodes."
-                                  required
-                                />
+                            {/* Enable Auto Scaling */}
+                            <CheckboxField
+                              id="enableCAS"
+                              label="Enable Auto Scaling"
+                              info="The cluster may scale up to the max worker nodes specified. Auto scaling may not be used with spot instances."
+                            />
 
-                                {/* Num worker nodes */}
-                                <TextField
-                                  id="numWorkers"
-                                  type="number"
-                                  label="Number of worker nodes"
-                                  info="Number of worker nodes to deploy."
-                                  required
-                                />
-
-                                {/* Workloads on masters */}
-                                <CheckboxField
-                                  id="allowWorkloadsOnMaster"
-                                  label="Make all Master nodes Master + Worker"
-                                  info="It is highly recommended to not enable workloads on master nodes for production or critical workload clusters."
-                                />
-
-                                {/* Enable Auto Scaling */}
-                                <CheckboxField
-                                  id="enableCAS"
-                                  label="Enable Auto Scaling"
-                                  info="The cluster may scale up to the max worker nodes specified. Auto scaling may not be used with spot instances."
-                                />
-
-                                {/* Max num worker nodes (autoscaling) */}
-                                {values.enableCAS && (
-                                  <TextField
-                                    id="numMaxWorkers"
-                                    type="number"
-                                    label="Maximum number of worker nodes"
-                                    info="Maximum number of worker nodes this cluster may be scaled up to."
-                                    required={values.enableCAS}
-                                  />
-                                )}
-                              </>
+                            {/* Max num worker nodes (autoscaling) */}
+                            {values.enableCAS && (
+                              <TextField
+                                id="numMaxWorkers"
+                                type="number"
+                                label="Maximum number of worker nodes"
+                                info="Maximum number of worker nodes this cluster may be scaled up to."
+                                required={values.enableCAS}
+                              />
                             )}
-                          </div>
-                        </FormFieldCard>
-                      </div>
+                          </>
+                        )}
+                      </>
                     )}
                   </ValidatedForm>
                 ) : (
-                  <div className={classes.formWidth}>
-                    <FormFieldCard title="Configure Your Cluster">
-                      <div className={classes.inputWidth}>
-                        <PromptToAddProvider
-                          type={CloudProviders.Aws}
-                          src={routes.cloudProviders.add.path({ type: CloudProviders.Aws })}
-                        />
-                      </div>
-                    </FormFieldCard>
-                  </div>
+                  <FormFieldCard title="Configure Your Cluster">
+                    <PromptToAddProvider
+                      type={CloudProviders.Aws}
+                      src={routes.cloudProviders.add.path({ type: CloudProviders.Aws })}
+                    />
+                  </FormFieldCard>
                 )}
               </WizardStep>
 
@@ -596,99 +576,96 @@ const AddAwsClusterPage = () => {
                   initialValues={wizardContext}
                   onSubmit={setWizardContext}
                   triggerSubmit={onNext}
+                  title="Networking Details"
                 >
                   {({ setFieldValue, values }) => (
-                    <div className={classes.formWidth}>
-                      <FormFieldCard title="Networking Details">
-                        <div className={classes.inputWidth}>
-                          {/* Use PF9 domain */}
-                          {/* <CheckboxField
+                    <>
+                      {/* Use PF9 domain */}
+                      {/* <CheckboxField
                             id="usePf9Domain"
                             label="Use the platform9.net domain"
                             info="Select this option if you want Platform9 to automatically generate the endpoints or if you do not have access to Route 53."
                           /> */}
-                          {renderCustomNetworkingFields({
-                            params,
-                            getParamsUpdater,
-                            values,
-                            setFieldValue,
-                            setWizardContext,
-                            wizardContext,
-                          })}
+                      {renderCustomNetworkingFields({
+                        params,
+                        getParamsUpdater,
+                        values,
+                        setFieldValue,
+                        setWizardContext,
+                        wizardContext,
+                      })}
 
-                          {/* API FQDN */}
-                          <TextField
-                            id="externalDnsName"
-                            label="API FQDN"
-                            info="FQDN (Fully Qualified Domain Name) is used to reference cluster API. To ensure the API can be accessed securely at the FQDN, the FQDN will be included in the API server certificate's Subject Alt Names. If deploying onto a cloud provider, we will automatically create the DNS records for this FQDN using the cloud provider’s DNS service."
-                            required={!values.usePf9Domain}
-                            disabled={values.usePf9Domain}
-                          />
-                          {/* Services FQDN */}
-                          <TextField
-                            id="serviceFqdn"
-                            label="Services FQDN"
-                            info="FQDN used to reference cluster services. If deploying onto AWS, we will automatically create the DNS records for this FQDN into AWS Route 53."
-                            required={!values.usePf9Domain}
-                            disabled={values.usePf9Domain}
-                          />
+                      {/* API FQDN */}
+                      <TextField
+                        id="externalDnsName"
+                        label="API FQDN"
+                        info="FQDN (Fully Qualified Domain Name) is used to reference cluster API. To ensure the API can be accessed securely at the FQDN, the FQDN will be included in the API server certificate's Subject Alt Names. If deploying onto a cloud provider, we will automatically create the DNS records for this FQDN using the cloud provider’s DNS service."
+                        required={!values.usePf9Domain}
+                        disabled={values.usePf9Domain}
+                      />
+                      {/* Services FQDN */}
+                      <TextField
+                        id="serviceFqdn"
+                        label="Services FQDN"
+                        info="FQDN used to reference cluster services. If deploying onto AWS, we will automatically create the DNS records for this FQDN into AWS Route 53."
+                        required={!values.usePf9Domain}
+                        disabled={values.usePf9Domain}
+                      />
 
-                          {/* Containers CIDR */}
-                          <TextField
-                            id="containersCidr"
-                            label="Containers CIDR"
-                            info="Defines the network CIDR from which the flannel networking layer allocates IP addresses to Docker containers. This CIDR should not overlap with the VPC CIDR. Each node gets a /24 subnet. Choose a CIDR bigger than /23 depending on the number of nodes in your cluster. A /16 CIDR gives you 256 nodes."
-                            required
-                          />
+                      {/* Containers CIDR */}
+                      <TextField
+                        id="containersCidr"
+                        label="Containers CIDR"
+                        info="Defines the network CIDR from which the flannel networking layer allocates IP addresses to Docker containers. This CIDR should not overlap with the VPC CIDR. Each node gets a /24 subnet. Choose a CIDR bigger than /23 depending on the number of nodes in your cluster. A /16 CIDR gives you 256 nodes."
+                        required
+                      />
 
-                          {/* Services CIDR */}
-                          <TextField
-                            id="servicesCidr"
-                            label="Services CIDR"
-                            info="Defines the network CIDR from which Kubernetes allocates virtual IP addresses to Services.  This CIDR should not overlap with the VPC CIDR."
-                            required
-                          />
+                      {/* Services CIDR */}
+                      <TextField
+                        id="servicesCidr"
+                        label="Services CIDR"
+                        info="Defines the network CIDR from which Kubernetes allocates virtual IP addresses to Services.  This CIDR should not overlap with the VPC CIDR."
+                        required
+                      />
 
-                          {/* HTTP proxy */}
-                          <TextField
-                            id="httpProxy"
-                            label="HTTP Proxy"
-                            info={
-                              <div className={classes.inline}>
-                                (Optional) Specify the HTTP proxy for this cluster. Uses format of{' '}
-                                <Code>
-                                  <span>{'<scheme>://<username>:<password>@<host>:<port>'}</span>
-                                </Code>{' '}
-                                where username and password are optional.
-                              </div>
-                            }
-                          />
+                      {/* HTTP proxy */}
+                      <TextField
+                        id="httpProxy"
+                        label="HTTP Proxy"
+                        info={
+                          <div className={classes.inline}>
+                            (Optional) Specify the HTTP proxy for this cluster. Uses format of{' '}
+                            <Code>
+                              <span>{'<scheme>://<username>:<password>@<host>:<port>'}</span>
+                            </Code>{' '}
+                            where username and password are optional.
+                          </div>
+                        }
+                      />
 
-                          {/* Network plugin */}
-                          <PicklistField
-                            id="networkPlugin"
-                            label="Network backend"
-                            options={networkPluginOptions}
-                            info=""
-                            onChange={handleNetworkPluginChange({
-                              setWizardContext,
-                              setFieldValue,
-                            })}
-                            required
-                          />
+                      {/* Network plugin */}
+                      <PicklistField
+                        id="networkPlugin"
+                        label="Network backend"
+                        options={networkPluginOptions}
+                        info=""
+                        onChange={handleNetworkPluginChange({
+                          setWizardContext,
+                          setFieldValue,
+                        })}
+                        required
+                      />
 
-                          {/* HTTP proxy */}
-                          {values.networkPlugin === 'calico' && (
-                            <TextField
-                              id="mtuSize"
-                              label="MTU Size"
-                              info="Maximum Transmission Unit (MTU) for the interface (in bytes)"
-                              required
-                            />
-                          )}
-                        </div>
-                      </FormFieldCard>
-                    </div>
+                      {/* HTTP proxy */}
+                      {values.networkPlugin === 'calico' && (
+                        <TextField
+                          id="mtuSize"
+                          label="MTU Size"
+                          info="Maximum Transmission Unit (MTU) for the interface (in bytes)"
+                          required
+                        />
+                      )}
+                    </>
                   )}
                 </ValidatedForm>
               </WizardStep>
@@ -698,91 +675,86 @@ const AddAwsClusterPage = () => {
                   initialValues={wizardContext}
                   onSubmit={setWizardContext}
                   triggerSubmit={onNext}
+                  title="Final Tweaks"
                 >
                   {({ setFieldValue, values }) => (
-                    <div className={classes.formWidth}>
-                      <FormFieldCard title="Final Tweaks">
-                        <div className={classes.inputWidth}>
-                          {/* Privileged */}
-                          <CheckboxField
-                            id="privileged"
-                            label="Privileged"
-                            disabled={['calico', 'canal', 'weave'].includes(values.networkPlugin)}
-                            info={
-                              <div>
-                                Allows this cluster to run privileged containers. Read{' '}
-                                <ExternalLink url={runtimePrivilegedLink}>
-                                  this article
-                                </ExternalLink>{' '}
-                                for more information.
-                              </div>
-                            }
-                          />
+                    <>
+                      {/* Privileged */}
+                      <CheckboxField
+                        id="privileged"
+                        label="Privileged"
+                        disabled={['calico', 'canal', 'weave'].includes(values.networkPlugin)}
+                        info={
+                          <div>
+                            Allows this cluster to run privileged containers. Read{' '}
+                            <ExternalLink url={runtimePrivilegedLink}>this article</ExternalLink>{' '}
+                            for more information.
+                          </div>
+                        }
+                      />
 
-                          {/* Etcd Backup */}
-                          <CheckboxField
-                            id="etcdBackup"
-                            label="Enable etcd Backup"
-                            info="Enable automated etcd backups on this cluster"
-                          />
+                      {/* Etcd Backup */}
+                      <CheckboxField
+                        id="etcdBackup"
+                        label="Enable etcd Backup"
+                        info="Enable automated etcd backups on this cluster"
+                      />
 
-                          {values.etcdBackup && <EtcdBackupFields />}
+                      {values.etcdBackup && <EtcdBackupFields />}
 
-                          {/* Prometheus monitoring */}
-                          <CheckboxField
-                            id="prometheusMonitoringEnabled"
-                            label="Enable monitoring with prometheus"
-                            info="This deploys an instance of prometheus on the cluster."
-                          />
+                      {/* Prometheus monitoring */}
+                      <CheckboxField
+                        id="prometheusMonitoringEnabled"
+                        label="Enable monitoring with prometheus"
+                        info="This deploys an instance of prometheus on the cluster."
+                      />
 
-                          {!values.prometheusMonitoringEnabled && (
-                            <Alert
-                              small
-                              variant="error"
-                              message="The PMK management plane is not able to monitor the cluster health."
-                            />
-                          )}
+                      {!values.prometheusMonitoringEnabled && (
+                        <Alert
+                          small
+                          variant="error"
+                          message="The PMK management plane will not be able to monitor the cluster health."
+                        />
+                      )}
 
-                          {/* Advanced API Configuration */}
-                          <PicklistField
-                            id="runtimeConfigOption"
-                            label="Advanced API Configuration"
-                            options={runtimeConfigOptions}
-                            info="Make sure you are familiar with the Kubernetes API configuration documentation before enabling this option."
-                            required
-                          />
+                      {/* Advanced API Configuration */}
+                      <PicklistField
+                        id="runtimeConfigOption"
+                        label="Advanced API Configuration"
+                        options={runtimeConfigOptions}
+                        info="Make sure you are familiar with the Kubernetes API configuration documentation before enabling this option."
+                        required
+                      />
 
-                          {values.runtimeConfigOption === 'custom' && (
-                            <TextField
-                              id="customRuntimeConfig"
-                              label="Custom API Configuration"
-                              info=""
-                            />
-                          )}
+                      {values.runtimeConfigOption === 'custom' && (
+                        <TextField
+                          id="customRuntimeConfig"
+                          label="Custom API Configuration"
+                          info=""
+                        />
+                      )}
 
-                          {/* Enable Application Catalog */}
-                          <CheckboxField
-                            id="appCatalogEnabled"
-                            label="Enable Application Catalog"
-                            info="Enable the Helm Application Catalog on this cluster"
-                          />
+                      {/* Enable Application Catalog */}
+                      {/* <CheckboxField
+                        id="appCatalogEnabled"
+                        label="Enable Application Catalog"
+                        info="Enable the Helm Application Catalog on this cluster"
+                      /> */}
 
-                          {/* Custom AMI */}
-                          <TextField
-                            id="customAmi"
-                            label="Custom AMI ID"
-                            info="Use a custom AMI (leave blank for none) to create cluster nodes with, in case our AMI defaults are not available for you."
-                          />
+                      {/* Custom AMI */}
+                      <TextField
+                        id="customAmi"
+                        label="Custom AMI ID"
+                        info="Use a custom AMI (leave blank for none) to create cluster nodes with, in case our AMI defaults are not available for you."
+                      />
 
-                          {/* Tags */}
-                          <KeyValuesField
-                            id="tags"
-                            label="Tags"
-                            info="Add tag metadata to this cluster"
-                          />
-                        </div>
-                      </FormFieldCard>
-                    </div>
+                      {/* Tags */}
+                      <KeyValuesField
+                        id="tags"
+                        label="Tags"
+                        info="Add tag metadata to this cluster"
+                      />
+                    </>
                   )}
                 </ValidatedForm>
               </WizardStep>
@@ -792,14 +764,10 @@ const AddAwsClusterPage = () => {
                   initialValues={wizardContext}
                   onSubmit={setWizardContext}
                   triggerSubmit={onNext}
+                  title="Finish and Review"
+                  maxWidth={560}
                 >
-                  <div className={classes.formWidth}>
-                    <FormFieldCard title="Finish and Review">
-                      <div className={classes.tableWidth}>
-                        <AwsClusterReviewTable data={wizardContext} />
-                      </div>
-                    </FormFieldCard>
-                  </div>
+                  <AwsClusterReviewTable data={wizardContext} />
                 </ValidatedForm>
               </WizardStep>
             </>

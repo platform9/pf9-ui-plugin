@@ -70,7 +70,7 @@ export const updateRemoteSupport = createContextUpdater(
     // These returned combinedHost objects actually will not be used at all
     // due to invalidating the combinedHosts cache in the nodes loader.
     if (enableSupport) {
-      await resmgr.pushRole(id, supportRoleName)
+      await resmgr.addRole(id, supportRoleName)
       return {
         roles: uniq([...host.roles, supportRoleName]),
         roleStatus: 'converging',

@@ -191,11 +191,11 @@ const NodeDetail: FC<ICombinedNode> = (node) => {
   )
 }
 
-const DetailRow: FC<{ label: string; value: string | React.ReactNode; helpMessage?: string }> = ({
-  label,
-  value,
-  helpMessage,
-}) => {
+export const DetailRow: FC<{
+  label: string
+  value: string | React.ReactNode
+  helpMessage?: string
+}> = ({ label, value, helpMessage }) => {
   const { rowHeader, rowValue, rowHelp } = useStyles({})
   return (
     <tr>

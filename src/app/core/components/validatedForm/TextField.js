@@ -2,9 +2,7 @@ import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { TextField as BaseTextField } from '@material-ui/core'
 import { compose } from 'app/utils/fp'
-import withFormContext, {
-  ValidatedFormInputPropTypes,
-} from 'core/components/validatedForm/withFormContext'
+import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
 import { withInfoTooltip } from 'core/components/InfoTooltip'
 import { withStyles } from '@material-ui/styles'
 

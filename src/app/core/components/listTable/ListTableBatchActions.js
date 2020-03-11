@@ -22,9 +22,11 @@ const useStyles = makeStyles((theme) => ({
     fontSize: theme.typography.fontSize * 0.8,
   },
   actionIcon: {
-    fontWeight: 400,
-    minHeight: 20,
-    fontSize: '1.7em',
+    width: 22,
+    height: 22,
+    '& i': {
+      fontSize: 18,
+    },
   },
   actionLabel: {
     whiteSpace: 'nowrap',
@@ -40,12 +42,21 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
+export const ToolbarActionIcon = ({ icon }) => {
+  const classes = useStyles()
+  return (
+    <div className={classes.actionIcon}>
+      <FontAwesomeIcon>{icon}</FontAwesomeIcon>
+    </div>
+  )
+}
+
 const ListTableAction = withRouter(
   ({ cond, action, label, disabledInfo, dialog, icon, selected, onRefresh, routeTo, history }) => {
-    const { root, actionLabel, actionIcon, disabledAction } = useStyles()
+    const { root, actionLabel, disabledAction } = useStyles()
     const [dialogOpened, setDialogOpened] = useState(false)
     const { getContext } = useContext(AppContext)
-    const isActionEnabled = !cond || cond(selected, getContext)
+    const isActionEnabled = selected.length && (!cond || cond(selected, getContext))
     const info = isActionEnabled || !disabledInfo ? label : ensureFunction(disabledInfo)(selected)
     const DialogComponent = dialog
     return (
@@ -62,7 +73,7 @@ const ListTableAction = withRouter(
             }}
           />
         ) : null}
-        <Tooltip key={label} title={info}>
+        <Tooltip key={label} title={selected.length ? info : ''}>
           <div
             className={clsx(root, {
               [disabledAction]: !isActionEnabled,
@@ -83,11 +94,7 @@ const ListTableAction = withRouter(
                 : null
             }
           >
-            {typeof icon === 'string' ? (
-              <FontAwesomeIcon className={actionIcon}>{icon}</FontAwesomeIcon>
-            ) : (
-              icon
-            )}
+            {typeof icon === 'string' ? <ToolbarActionIcon icon={icon} /> : icon}
             <div className={actionLabel}>{label}</div>
           </div>
         </Tooltip>
@@ -97,9 +104,6 @@ const ListTableAction = withRouter(
 )
 
 const ListTableBatchActions = ({ batchActions = [], selected = [], onRefresh }) => {
-  if (selected.length === 0 || batchActions.length === 0) {
-    return null
-  }
   return batchActions.map((action) => (
     <ListTableAction key={action.label} {...action} onRefresh={onRefresh} selected={selected} />
   ))

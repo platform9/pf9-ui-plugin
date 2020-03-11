@@ -8,13 +8,31 @@ import { someAsync } from 'utils/async'
 
 const { appbert, qbert } = ApiClient.getInstance()
 const uniqueIdentifier = 'metadata.uid'
+const monitoringTask = 'pf9-mon'
 const getName = (id, items) => pipe(find(propEq('uid', id)), prop('name'))(items)
-const hasMonitoring = (cluster) => cluster.tags.includes('pf9-system:monitoring')
 
+// TODO convert to typescript
+// interface IClusterTask {
+//   task_id: number
+//   type: 'Install' | 'Delete'
+//   pkg_id: string
+//   cluster: string
+//   status: 'Pending' | 'Complete' | 'InProgress' | 'Failed'
+// }
+
+const isMonitoringTask = (task = {}) => task.pkg_id === monitoringTask && task.type === 'Install'
+const getMostRecentTask = (prev, curr) => (prev.task_id > curr.task_id ? prev : curr)
+export const hasPrometheusEnabled = (cluster) => {
+  if (!cluster) return false
+  const installedMonitoringTask = cluster.tasks
+    .filter(isMonitoringTask)
+    .reduce(getMostRecentTask, {})
+
+  return installedMonitoringTask.status === 'Complete'
+}
 export const clusterTagsCacheKey = 'clusterTags'
 export const clusterTagActions = createCRUDActions(clusterTagsCacheKey, {
   listFn: async (params, loadFromContext) => {
-    await loadFromContext(clustersCacheKey)
     return appbert.getClusterTags()
   },
   uniqueIdentifier: 'uuid',
@@ -45,8 +63,9 @@ export const mapPrometheusInstance = curry((clusters, { clusterId, metadata, spe
 export const prometheusInstancesCacheKey = 'prometheusInstances'
 export const prometheusInstanceActions = createCRUDActions(prometheusInstancesCacheKey, {
   listFn: async (params, loadFromContext) => {
+    await loadFromContext(clustersCacheKey)
     const clusterTags = await loadFromContext(clusterTagsCacheKey)
-    const clusterUuids = pluck('uuid', clusterTags.filter(hasMonitoring))
+    const clusterUuids = pluck('uuid', clusterTags.filter(hasPrometheusEnabled))
     return someAsync(clusterUuids.map(qbert.getPrometheusInstances)).then(flatten)
   },
   createFn: async (data) => {
@@ -98,8 +117,9 @@ export const serviceAccountActions = createCRUDActions(serviceAccountsCacheKey, 
 export const prometheusRulesCacheKey = 'prometheusRules'
 export const prometheusRuleActions = createCRUDActions(prometheusRulesCacheKey, {
   listFn: async (params, loadFromContext) => {
+    await loadFromContext(clustersCacheKey)
     const clusterTags = await loadFromContext(clusterTagsCacheKey)
-    const clusterUuids = pluck('uuid', clusterTags.filter(hasMonitoring))
+    const clusterUuids = pluck('uuid', clusterTags.filter(hasPrometheusEnabled))
     return someAsync(clusterUuids.map(qbert.getPrometheusRules)).then(flatten)
   },
   updateFn: async (data) => {
@@ -138,8 +158,9 @@ export const prometheusServiceMonitorActions = createCRUDActions(
   prometheusServiceMonitorsCacheKey,
   {
     listFn: async (params, loadFromContext) => {
+      await loadFromContext(clustersCacheKey)
       const clusterTags = await loadFromContext(clusterTagsCacheKey)
-      const clusterUuids = pluck('uuid', clusterTags.filter(hasMonitoring))
+      const clusterUuids = pluck('uuid', clusterTags.filter(hasPrometheusEnabled))
       return someAsync(clusterUuids.map(qbert.getPrometheusServiceMonitors)).then(flatten)
     },
     updateFn: async (data) => {
@@ -187,8 +208,9 @@ export const prometheusServiceMonitorActions = createCRUDActions(
 export const prometheusAlertManagersCacheKey = 'prometheusAlertManagers'
 export const prometheusAlertManagerActions = createCRUDActions(prometheusAlertManagersCacheKey, {
   listFn: async (params, loadFromContext) => {
+    await loadFromContext(clustersCacheKey)
     const clusterTags = await loadFromContext(clusterTagsCacheKey)
-    const clusterUuids = pluck('uuid', clusterTags.filter(hasMonitoring))
+    const clusterUuids = pluck('uuid', clusterTags.filter(hasPrometheusEnabled))
     return someAsync(clusterUuids.map(qbert.getPrometheusAlertManagers)).then(flatten)
   },
   updateFn: async (data) => {

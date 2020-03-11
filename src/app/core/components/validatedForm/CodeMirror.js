@@ -2,9 +2,7 @@ import React, { useCallback, useEffect, createRef } from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import { FormControl, FormHelperText, FormLabel, Typography } from '@material-ui/core'
-import withFormContext, {
-  ValidatedFormInputPropTypes,
-} from 'core/components/validatedForm/withFormContext'
+import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
 import { compose } from 'app/utils/fp'
 import InfoTooltip from 'app/core/components/InfoTooltip'
 import { Controlled as BaseCodeMirror } from 'react-codemirror2'
@@ -28,6 +26,9 @@ const defaultOptions = {
 // These styles are to match CodeMirrors. We need to find a good way
 // to re-define their styles so we can use common variables
 const useStyles = makeStyles((theme) => ({
+  root: {
+    margin: theme.spacing(1.5, 0)
+  },
   coderMirrorHeader: {
     position: 'relative',
     background: '#F3F3F3',
@@ -51,17 +52,16 @@ const CodeMirror = ({
   label,
   value,
   getCurrentValue,
-  classes,
   hasError,
   errorMessage,
   onChange,
   options,
   info,
-  placement,
+  placement = 'top-end',
   ...restProps
 }) => {
   const codeMirrorInput = createRef()
-  const { coderMirrorHeader } = useStyles()
+  const classes = useStyles()
   const [open, setOpen] = React.useState(false)
   const openTooltip = useCallback(() => setOpen(true), [])
   const closeTooltip = useCallback(() => setOpen(false), [])
@@ -91,9 +91,9 @@ const CodeMirror = ({
 
   return (
     <InfoTooltip open={open} info={info} placement={placement}>
-      <FormControl id={id} error={hasError} fullWidth>
+      <FormControl id={id} error={hasError} className={classes.root}>
         <FormLabel>
-          <Typography className={coderMirrorHeader} variant="body1">
+          <Typography className={classes.coderMirrorHeader} variant="body1">
             {label}
           </Typography>
         </FormLabel>

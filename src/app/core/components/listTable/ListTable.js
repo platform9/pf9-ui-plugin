@@ -93,6 +93,23 @@ class ListTable extends PureComponent {
     }
   }
 
+  // Reset selected when the list of items is updated
+  // This will be the case upon updating the cluster dropdown,
+  // refreshing the list, or if there is any other reason
+  // that the list changes.
+  // In the future we may want to look into triggering this
+  // only for a subset of above reasons.
+  componentDidUpdate(prevProps) {
+    const { data } = this.props
+    if (prevProps.data.length === data.length
+      && equals(prevProps.data, data)
+    ) { return }
+
+    this.setState({
+      selected: [],
+    })
+  }
+
   handleRequestSort = (event, property) => {
     const { onSortChange } = this.props
     const orderBy = property
@@ -506,6 +523,7 @@ class ListTable extends PureComponent {
       blankFirstColumn,
       extraToolbarContent,
       multiSelection,
+      headless
     } = this.props
 
     if (!data) {
@@ -521,7 +539,7 @@ class ListTable extends PureComponent {
     const tableContent =
       paginatedData && paginatedData.length ? (
         <Table className={classes.table} size={size}>
-          <ListTableHead
+          {!headless && <ListTableHead
             canDragColumns={canDragColumns}
             columns={this.getSortedVisibleColumns()}
             onColumnsSwitch={this.handleColumnsSwitch}
@@ -535,7 +553,7 @@ class ListTable extends PureComponent {
             showCheckboxes={showCheckboxes}
             blankFirstColumn={blankFirstColumn}
             multiSelection={multiSelection}
-          />
+          />}
           <TableBody>{paginatedData.map(this.renderRow)}</TableBody>
         </Table>
       ) : (
@@ -669,6 +687,7 @@ ListTable.propTypes = {
   onSelect: PropTypes.func,
   size: PropTypes.oneOf(['small', 'medium']),
   compactTable: PropTypes.bool,
+  headless: PropTypes.bool,
 
   extraToolbarContent: PropTypes.node,
 }

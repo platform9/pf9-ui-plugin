@@ -47,10 +47,12 @@ const BareOsClusterReviewTable = ({ data }) => {
       <TableBody>
         <DataRow label="Name" value={data.name} />
         <DataRow
-          label={`Master${data.allowWorkloadsOnMaster ? ' + Worker' : ''} nodes`}
+          label={`Master${data.allowWorkloadsOnMaster ? ' nodes with workloads' : 'nodes'}`}
           value={masterNodes}
         />
-        <DataRow label="Worker nodes" value={workerNodes} />
+        {data.allowWorkloadsOnMaster && workerNodes.length > 0 && (
+          <DataRow label="Worker nodes" value={workerNodes} />
+        )}
         <DataRow label="Virtual IP address for cluster" value={data.masterVipIpv4} />
         <DataRow
           label="Physical interface for virtual IP association"
@@ -62,7 +64,7 @@ const BareOsClusterReviewTable = ({ data }) => {
         <DataRow label="Containers CIDR" value={data.containersCidr} />
         <DataRow label="Services CIDR" value={data.servicesCidr} />
         <DataRow label="Privileged" value={castBoolToStr()(data.privileged)} />
-        <DataRow label="Application catalog" value={castBoolToStr()(data.appCatalogEnabled)} />
+        {/* <DataRow label="Application catalog" value={castBoolToStr()(data.appCatalogEnabled)} /> */}
         <DataRow
           label="Prometheus monitoring"
           value={castBoolToStr()(data.prometheusMonitoringEnabled)}

@@ -66,3 +66,4 @@ export const kubectlOverviewLink = `${k8sDocBaselUrl}/user-guide/kubectl-overvie
 
 // Misc
 export const runtimePrivilegedLink = `${dockerDocBaseUrl}/engine/reference/run/#runtime-privilege-and-linux-capabilities`
+export const applicationLoadBalancer = `${k8sBaseUrl}/pmk-load-balancing-with-metallb/`

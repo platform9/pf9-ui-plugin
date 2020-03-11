@@ -47,6 +47,8 @@ const KeyValue = ({ entry = {}, onChange, onDelete, keySuggestions, valueSuggest
   return (
     <div className={classes.root}>
       <AutocompleteBase
+        inputProps={{ size: 14 }}
+        fullWidth
         label="Key"
         value={state.key}
         onChange={handleChange('key')}
@@ -55,6 +57,8 @@ const KeyValue = ({ entry = {}, onChange, onDelete, keySuggestions, valueSuggest
       />
       &nbsp;
       <AutocompleteBase
+        inputProps={{ size: 14 }}
+        fullWidth
         label="Value"
         value={state.value}
         onChange={handleChange('value')}

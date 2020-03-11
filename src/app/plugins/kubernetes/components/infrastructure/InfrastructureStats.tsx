@@ -23,11 +23,6 @@ const useStyles = makeStyles<Theme>((theme) => ({
     alignSelf: 'normal',
     margin: theme.spacing(1, 0),
   },
-  container: {
-    display: 'grid',
-    gridTemplateColumns: '300px repeat(3, 200px)',
-    gridGap: theme.spacing(2),
-  },
   card: {
     marginRight: theme.spacing(),
   },

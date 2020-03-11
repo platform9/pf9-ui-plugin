@@ -4,7 +4,6 @@ import TextField from 'core/components/validatedForm/TextField'
 import Wizard from 'core/components/wizard/Wizard'
 import WizardStep from 'core/components/wizard/WizardStep'
 import FormWrapper from 'core/components/FormWrapper'
-import { Typography } from '@material-ui/core'
 import useReactRouter from 'use-react-router'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import { k8sPrefix } from 'app/constants'
@@ -14,6 +13,7 @@ import UserRolesTableField from 'k8s/components/userManagement/tenants/UserRoles
 import { mngmTenantActions } from 'k8s/components/userManagement/tenants/actions'
 import { mngmUserActions } from 'k8s/components/userManagement/users/actions'
 import Progress from 'core/components/progress/Progress'
+import { requiredValidator } from 'core/utils/fieldValidators'
 
 const listUrl = pathJoin(k8sPrefix, 'user_management')
 
@@ -24,6 +24,8 @@ const initialContext = {
 }
 
 const userParams = { systemUsers: true }
+
+const userRolesValidations = [requiredValidator.withMessage('Must select at least one user')]
 
 const AddTenantPage = () => {
   const { history } = useReactRouter()
@@ -38,6 +40,7 @@ const AddTenantPage = () => {
           <>
             <WizardStep stepId="basic" label="Basic Info">
               <ValidatedForm
+                title="Basic Info"
                 initialValues={wizardContext}
                 onSubmit={setWizardContext}
                 triggerSubmit={onNext}
@@ -47,11 +50,8 @@ const AddTenantPage = () => {
               </ValidatedForm>
             </WizardStep>
             <WizardStep stepId="users" label="Users and Roles">
-              <Typography variant="body1" component="p">
-                Select one or more users that should map to this Tenant. These are the only users
-                that can access this Tenant, and hence the clusters that map to this Tenant.
-              </Typography>
               <ValidatedForm
+                title="Users and Roles"
                 fullWidth
                 initialValues={wizardContext}
                 onSubmit={setWizardContext}
@@ -62,7 +62,11 @@ const AddTenantPage = () => {
                   loading={loadingUsers}
                   message={'Loading Users...'}
                 >
-                  <UserRolesTableField required id="roleAssignments" users={users} />
+                  <UserRolesTableField
+                    validations={userRolesValidations}
+                    id="roleAssignments"
+                    users={users}
+                  />
                 </Progress>
               </ValidatedForm>
             </WizardStep>

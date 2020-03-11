@@ -6,7 +6,7 @@ import TextField from '@material-ui/core/TextField'
 import { prepend, identity, pipe, map, isEmpty } from 'ramda'
 import Progress from 'core/components/progress/Progress'
 import { allKey, noneKey } from 'app/constants'
-import { isNilOrEmpty } from 'utils/fp'
+import { isNilOrEmpty, emptyArr, ensureArray } from 'utils/fp'
 
 /**
  * Picklist is a bare-bones widget-only implmentation.
@@ -19,8 +19,10 @@ const useStyles = makeStyles((theme) => ({
     minWidth: 120,
     marginTop: theme.spacing(1),
   },
+  list: {
+    maxHeight: 400,
+  },
 }))
-const selectProps = { displayEmpty: true }
 
 // We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
 const Picklist = React.forwardRef((props, ref) => {
@@ -36,6 +38,7 @@ const Picklist = React.forwardRef((props, ref) => {
     onChange,
     loading,
     formField,
+    multiple = false,
     ...restProps
   } = props
   const classes = useStyles(props)
@@ -59,13 +62,16 @@ const Picklist = React.forwardRef((props, ref) => {
       )(options),
     [options],
   )
-
+  const selectProps = useMemo(
+    () => ({ displayEmpty: true, multiple, MenuProps: { classes: { list: classes.list } } }),
+    [],
+  )
   const handleChange = useCallback(
     (e) => {
       // Hack to work around the fact that Material UI's "Select" will ignore
       // an options with value of '' (empty string).
       const value = e.target.value === noneKey ? '' : e.target.value
-      onChange && onChange(value)
+      onChange && onChange(multiple ? ensureArray(value) : value)
     },
     [onChange],
   )
@@ -88,9 +94,9 @@ const Picklist = React.forwardRef((props, ref) => {
         ref={ref}
         disabled={disabled || (isEmpty(options) && !showNone)}
         select
-        classes={classes}
+        classes={{ root: classes.root }}
         label={label}
-        value={nonEmptyValue || ''}
+        value={nonEmptyValue || (multiple ? emptyArr : '')}
         SelectProps={selectProps}
         onChange={handleChange}
         inputProps={inputProps}
@@ -101,13 +107,13 @@ const Picklist = React.forwardRef((props, ref) => {
   )
 })
 
-const numOrString = PropTypes.oneOfType([PropTypes.number, PropTypes.string])
+const valuePropType = PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array])
 const optionPropType = PropTypes.oneOfType([
   PropTypes.string,
   PropTypes.number,
   PropTypes.shape({
-    value: numOrString,
-    label: numOrString,
+    value: valuePropType,
+    label: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   }),
 ])
 
@@ -121,8 +127,9 @@ Picklist.propTypes = {
   options: PropTypes.arrayOf(optionPropType),
   showAll: PropTypes.bool,
   showNone: PropTypes.bool,
-  value: numOrString,
+  value: valuePropType,
   variant: PropTypes.string,
+  multiple: PropTypes.bool,
 }
 
 Picklist.defaultProps = {
@@ -132,6 +139,7 @@ Picklist.defaultProps = {
   showNone: false,
   value: '',
   variant: 'outlined',
+  multiple: false,
 }
 
 export default Picklist

@@ -153,6 +153,7 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
         },
       )(null),
     ])
+    mngmTenantActions.invalidateCache()
     return updatedUser
   },
   dataMapper: async (users, { systemUsers }, loadFromContext) => {

@@ -2,6 +2,8 @@ import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { mngmRolesCacheKey } from 'k8s/components/userManagement/roles/actions'
 
 export const options = {
+  headlessTable: true,
+  compactTable: true,
   columns: [
     { id: 'name', label: 'Role' },
     { id: 'description', label: 'Description' },

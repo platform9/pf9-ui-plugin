@@ -4,8 +4,10 @@ import { Menu, MenuItem, Typography } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import { withRouter } from 'react-router'
 import { withAppContext } from 'core/providers/AppProvider'
-import { logoutUrl } from 'app/constants'
+import { logoutUrl, helpUrl } from 'app/constants'
 import ChangePasswordModal from './ChangePasswordModal'
+import FontAwesomeIcon from './FontAwesomeIcon'
+import SimpleLink from './SimpleLink'
 
 const styles = (theme) => ({
   avatar: {
@@ -20,7 +22,31 @@ const styles = (theme) => ({
     height: theme.spacing(3),
     width: theme.spacing(3),
   },
+  menuItem: {
+    display: 'grid',
+    minWidth: 150,
+    gridTemplateColumns: '30px 1fr',
+    gridTemplateRows: 'minmax(35px, min-content)',
+    gridColumnGap: theme.spacing(),
+    padding: theme.spacing(0, 1),
+  },
+  link: {
+    textDecoration: 'none !important',
+  },
 })
+
+@withStyles(styles)
+class MenuListItem extends React.PureComponent {
+  render() {
+    const { classes, title, children, icon, ...props } = this.props
+    return (
+      <MenuItem {...props} className={classes.menuItem}>
+        <FontAwesomeIcon>{icon}</FontAwesomeIcon>
+        <Typography variant="subtitle2">{title || children}</Typography>
+      </MenuItem>
+    )
+  }
+}
 
 @withStyles(styles)
 @withRouter
@@ -57,7 +83,12 @@ class UserMenu extends React.PureComponent {
           anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
         >
           {false && <MenuItem onClick={this.handleChangePassword}>Change Password</MenuItem>}
-          <MenuItem onClick={this.logout}>Sign Out</MenuItem>
+          <SimpleLink src={helpUrl} className={classes.link}>
+            <MenuListItem icon="question-circle">Help</MenuListItem>
+          </SimpleLink>
+          <MenuListItem icon="sign-out" onClick={this.logout}>
+            Sign Out
+          </MenuListItem>
         </Menu>
       </div>
     )

@@ -4,6 +4,7 @@ import { ValidatedFormContext } from 'core/components/validatedForm/ValidatedFor
 import { requiredValidator } from 'core/utils/fieldValidators'
 import { pathOr, isNil } from 'ramda'
 import { memoizedDep } from 'utils/misc'
+import clsx from 'clsx'
 
 export const ValidatedFormInputPropTypes = {
   required: PropTypes.bool,
@@ -18,6 +19,7 @@ export const ValidatedFormInputPropTypes = {
  */
 const ValidatedFormInput = ({
   id,
+  className,
   initialValue,
   validateFormOnChange,
   value,
@@ -101,6 +103,7 @@ const ValidatedFormInput = ({
   return children({
     ...rest,
     id,
+    className: clsx(className, 'validatedFormInput'),
     onChange: handleChange,
     onBlur: handleBlur,
     value: currentValue,

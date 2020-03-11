@@ -18,7 +18,6 @@ import { deploymentActions, podActions, serviceActions } from 'k8s/components/po
 import Progress from 'core/components/progress/Progress'
 import Button from '@material-ui/core/Button'
 import { customValidator, requiredValidator } from 'core/utils/fieldValidators'
-import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import { makeStyles } from '@material-ui/styles'
 import { createDeploymentLink, createPodLink, createServiceLink } from 'k8s/links'
 import { capitalizeString } from 'utils/misc'
@@ -26,20 +25,6 @@ import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { routes } from 'core/utils/routes'
 
 const useStyles = makeStyles((theme) => ({
-  formWidth: {
-    width: 715,
-  },
-  tableWidth: {
-    width: 687, // oddly specific, this is so the tooltip doesn't overlay on the card
-    marginBottom: theme.spacing(),
-  },
-  inputWidth: {
-    maxWidth: 350,
-  },
-  submit: {
-    display: 'flex',
-    marginLeft: theme.spacing(2),
-  },
   blueIcon: {
     color: theme.palette.primary.main,
   },
@@ -161,59 +146,47 @@ export const AddResourceForm = ({ resourceType = 'pod' }) => {
   return (
     <FormWrapper title="New Resource" backUrl={listRoutes[params.resourceType].toString()}>
       <Progress overlay loading={adding} renderContentOnMount>
-        <ValidatedForm onSubmit={handleAdd}>
-          <div className={classes.formWidth}>
-            <FormFieldCard
-              title={`Add a ${formattedResourceName}`}
-              link={
-                <div>
-                  <FontAwesomeIcon className={classes.blueIcon} size="md">
-                    {icon}
-                  </FontAwesomeIcon>{' '}
-                  <ExternalLink url={url}>{label}</ExternalLink>
-                </div>
-              }
-            >
-              <div className={classes.inputWidth}>
-                <PicklistField
-                  DropdownComponent={ClusterPicklist}
-                  id="clusterId"
-                  label="Cluster"
-                  info="The cluster to deploy this resource on"
-                  onChange={getParamsUpdater('clusterId')}
-                  required
-                />
-                <PicklistField
-                  DropdownComponent={NamespacePicklist}
-                  disabled={!params.clusterId}
-                  id="namespace"
-                  label="Namespace"
-                  info="The namespace to deploy this resource on"
-                  clusterId={params.clusterId}
-                  required
-                />
-              </div>
-              <div className={classes.tableWidth}>
-                <CodeMirror
-                  id="yaml"
-                  label="Resource YAML"
-                  validations={codeMirrorValidations}
-                  onChange={getParamsUpdater('yaml')}
-                  value={params.yaml}
-                  info="Manually input the resource YAML. For more information, see the articles linked at the top of this form"
-                  options={codeMirrorOptions}
-                />
-              </div>
-              <div className={classes.inputWidth}>
-                <Button color="secondary" variant="contained" onClick={insertYamlTemplate}>
-                  View {formattedResourceName} Template
-                </Button>
-              </div>
-            </FormFieldCard>
-            <div className={classes.submit}>
-              <SubmitButton>Create {formattedResourceName}</SubmitButton>
+        <ValidatedForm
+          onSubmit={handleAdd}
+          title={`Add a ${formattedResourceName}`}
+          link={
+            <div>
+              <FontAwesomeIcon className={classes.blueIcon} size="md">
+                {icon}
+              </FontAwesomeIcon>{' '}
+              <ExternalLink url={url}>{label}</ExternalLink>
             </div>
-          </div>
+          }
+          formActions={<SubmitButton>Create {formattedResourceName}</SubmitButton>}
+        >
+          <PicklistField
+            DropdownComponent={ClusterPicklist}
+            id="clusterId"
+            label="Cluster"
+            info="The cluster to deploy this resource on"
+            onChange={getParamsUpdater('clusterId')}
+            required
+          />
+          <PicklistField
+            DropdownComponent={NamespacePicklist}
+            disabled={!params.clusterId}
+            id="namespace"
+            label="Namespace"
+            info="The namespace to deploy this resource on"
+            clusterId={params.clusterId}
+            required
+          />
+          <CodeMirror
+            id="yaml"
+            label="Resource YAML"
+            validations={codeMirrorValidations}
+            onChange={getParamsUpdater('yaml')}
+            value={params.yaml}
+            options={codeMirrorOptions}
+          />
+          <Button color="secondary" variant="contained" onClick={insertYamlTemplate}>
+            View {formattedResourceName} Template
+          </Button>
         </ValidatedForm>
       </Progress>
     </FormWrapper>

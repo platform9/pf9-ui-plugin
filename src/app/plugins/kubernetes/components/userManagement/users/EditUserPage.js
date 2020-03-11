@@ -10,7 +10,7 @@ import {
   mngmUserActions,
   mngmUserRoleAssignmentsLoader,
 } from 'k8s/components/userManagement/users/actions'
-import { TextField as BaseTextField, Typography } from '@material-ui/core'
+import { TextField as BaseTextField } from '@material-ui/core'
 import { emptyObj, pathStr } from 'utils/fp'
 import useReactRouter from 'use-react-router'
 import FormWrapper from 'core/components/FormWrapper'
@@ -23,22 +23,24 @@ import UserPasswordField from 'k8s/components/userManagement/users/UserPasswordF
 import useToggler from 'core/hooks/useToggler'
 import SimpleLink from 'core/components/SimpleLink'
 import makeStyles from '@material-ui/styles/makeStyles'
+import { requiredValidator } from 'core/utils/fieldValidators'
 
 const listUrl = pathJoin(k8sPrefix, 'user_management#users')
 
 const useStyles = makeStyles((theme) => ({
-  togglableField: {
-    position: 'relative',
+  togglableFieldContainer: {
+    display: 'flex',
+    flex: 1,
+    alignItems: 'center',
     '& .Mui-disabled': {
       color: theme.palette.text.primary,
     },
   },
+  togglableField: {
+    width: '50%',
+  },
   togglableFieldBtn: {
-    position: 'absolute',
-    top: 14,
-    right: 0,
-    width: 80,
-    marginRight: -100,
+    marginLeft: theme.spacing(2),
   },
 }))
 
@@ -53,11 +55,16 @@ const TogglableTextField = ({
   const classes = useStyles()
   const [showingField, toggleField] = useToggler()
   return (
-    <div className={clsx('togglableField', classes.togglableField)}>
+    <div className={clsx('togglableFieldContainer', classes.togglableFieldContainer)}>
       {showingField ? (
         <TextFieldComponent id={id} label={label} value={value} required={required} />
       ) : (
-        <BaseTextField label={label} value={initialValue} disabled />
+        <BaseTextField
+          className={classes.togglableField}
+          label={label}
+          value={initialValue}
+          disabled
+        />
       )}
       <SimpleLink className={classes.togglableFieldBtn} onClick={toggleField}>
         {showingField ? 'Cancel' : 'Change'}
@@ -65,6 +72,8 @@ const TogglableTextField = ({
     </div>
   )
 }
+
+const tenantRolesValidations = [requiredValidator.withMessage('Must select at least one tenant')]
 
 const EditUserPage = () => {
   const { match, history } = useReactRouter()
@@ -135,16 +144,17 @@ const EditUserPage = () => {
               </ValidatedForm>
             </WizardStep>
             <WizardStep stepId="tenants" label="Tenants and Roles">
-              <Typography variant="body1" component="p">
-                Select one or more tenants that should map to this user.
-              </Typography>
               <ValidatedForm
                 fullWidth
                 initialValues={wizardContext}
                 onSubmit={setWizardContext}
                 triggerSubmit={onNext}
               >
-                <TenantRolesTableField required id="roleAssignments" tenants={tenants} />
+                <TenantRolesTableField
+                  validations={tenantRolesValidations}
+                  id="roleAssignments"
+                  tenants={tenants}
+                />
               </ValidatedForm>
             </WizardStep>
           </>

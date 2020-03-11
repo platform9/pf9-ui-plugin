@@ -32,27 +32,27 @@ export const annotateCloudStack = (host) => {
 }
 
 export const annotateResmgrFields = (host) => {
-  const { resmgr } = host
+  const { resmgr = {} } = host
+  const resmgrRoles = resmgr.roles || []
   return {
     ...host,
     id: resmgr.id,
-    roles: resmgr.roles || [],
+    roles: resmgrRoles,
     roleStatus: resmgr.role_status,
     roleData: {},
-    responding: resmgr.info.responding,
-    hostname: resmgr.info.hostname,
-    osInfo: resmgr.info.os_info,
+    responding: pathStrOrNull('info.responding', resmgr),
+    hostname: pathStrOrNull('info.hostname', resmgr),
+    osInfo: pathStrOrNull('info.os_info', resmgr),
     networks: [],
     vCenterIP: pathStrOrNull('extensions.hypervisor_details.data.vcenter_ip', resmgr),
-    supportRole: resmgr.roles.includes('pf9-support'),
+    supportRole: resmgrRoles.includes('pf9-support'),
     networkInterfaces: pathStrOrNull('extensions.interfaces.data.iface_ip', resmgr),
-    warnings: resmgr.message && resmgr.message.warn,
+    warnings: pathStrOrNull('message.warn', resmgr),
   }
 }
 
 export const annotateUiState = (host) => {
-  const { resmgr } = host
-
+  const { resmgr = {} } = host
   /* TODO:
    * This code is very confusing and has too much complected state.  These
    * rules have been added over the years but nobody really understands
@@ -90,7 +90,7 @@ export const annotateUiState = (host) => {
 
   if (!host.uiState && !responding) {
     host.uiState = 'offline'
-    const lastResponseTime = resmgr.info.last_response_time
+    const lastResponseTime = pathStrOrNull('info.last_response_time', resmgr)
     host.lastResponse = moment.utc(lastResponseTime).fromNow(true)
     host.lastResponseData =
       lastResponseTime &&

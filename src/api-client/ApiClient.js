@@ -14,7 +14,8 @@ import Clemency from 'api-client/Clemency'
 
 import { normalizeResponse } from 'api-client/helpers'
 import { hasPathStr, pathStr } from 'utils/fp'
-import { prop, has, cond, T, identity } from 'ramda'
+import { prop, has, cond, T, identity, when } from 'ramda'
+import { isPlainObject } from 'utils/misc'
 
 class ApiClient {
   static init(options = {}) {
@@ -70,7 +71,7 @@ class ApiClient {
     const getResponseError = cond([
       [hasPathStr('response.data.error'), pathStr('response.data.error')],
       [hasPathStr('response.data.message'), pathStr('response.data.message')],
-      [has('error'), prop('error')],
+      [has('error'), when(isPlainObject, prop('error'))],
       [T, identity],
     ])
 

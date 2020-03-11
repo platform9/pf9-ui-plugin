@@ -18,13 +18,13 @@ import { routes } from 'core/utils/routes'
 
 const getIconOrBubbleColor = (status: IClusterStatus, theme: Theme) =>
   ({
-    ok: theme.palette.pieChart.success,
-    pause: theme.palette.pieChart.warning,
-    fail: theme.palette.pieChart.error,
-    error: theme.palette.pieChart.error,
+    ok: theme.palette.success.main,
+    pause: theme.palette.warning.main,
+    fail: theme.palette.error.main,
+    error: theme.palette.error.main,
     loading: theme.palette.sidebar.text,
-    unknown: theme.palette.primary.main,
-  }[status] || theme.palette.pieChart.error)
+    unknown: theme.palette.info.main,
+  }[status] || theme.palette.error.main)
 
 const useStyles = makeStyles<Theme, Props>((theme: Theme) => ({
   root: {
@@ -39,6 +39,7 @@ const useStyles = makeStyles<Theme, Props>((theme: Theme) => ({
     display: 'grid',
     alignItems: 'center',
     gridTemplateColumns: '20px 1fr',
+    whiteSpace: 'nowrap',
     gridGap: theme.spacing(),
     justifyItems: 'center',
     '&:before': {
@@ -71,7 +72,7 @@ const iconMap = new Map([
 
 interface Props {
   label?: string
-  title: string
+  title: string | JSX.Element
   status?: IClusterStatus
   variant: StatusVariant
   iconStatus?: boolean
@@ -108,6 +109,9 @@ const renderErrorStatus = (taskError, nodesDetailsUrl, variant) => (
 )
 
 const renderTransientStatus = ({ uuid, connectionStatus }, variant) => {
+  if (!connectionStatus) {
+    return null
+  }
   const spanContent = `The cluster is ${connectionStatus}.`
 
   return (
@@ -130,29 +134,34 @@ export const ClusterHealthStatus: FC<IClusterStatusProps> = ({
   variant = 'table',
   message = undefined,
 }) => {
-  if (isTransientStatus(cluster.healthStatus)) {
+  if (isTransientStatus(cluster.taskStatus)) {
     return renderTransientStatus(cluster, variant)
   }
 
   const fields = getClusterHealthStatus(cluster)
 
-  if (!fields || !cluster?.nodes?.length) {
+  if (cluster.connectionStatus === 'disconnected') {
     return (
-      <ClusterStatusSpan title={message || 'Unknown'} status="unknown" variant={variant}>
-        {message || 'Unknown'}
-      </ClusterStatusSpan>
+      <div>
+        <ClusterStatusSpan title={message || 'Unknown'} status="unknown" variant={variant}>
+          {message || 'Unknown'}
+        </ClusterStatusSpan>
+        {cluster.taskError && renderErrorStatus(cluster.taskError, fields.nodesDetailsUrl, variant)}
+      </div>
     )
   }
 
   return (
     <div>
-      <ClusterStatusSpan title={fields.message} status={fields.status} variant={variant}>
-        {variant === 'header' ? (
-          fields.label
-        ) : (
-          <SimpleLink src={fields.nodesDetailsUrl}>{fields.label}</SimpleLink>
-        )}
-      </ClusterStatusSpan>
+      {fields && (
+        <ClusterStatusSpan title={fields.message} status={fields.status} variant={variant}>
+          {variant === 'header' ? (
+            fields.label
+          ) : (
+            <SimpleLink src={fields.nodesDetailsUrl}>{fields.label}</SimpleLink>
+          )}
+        </ClusterStatusSpan>
+      )}
       {cluster.taskError && renderErrorStatus(cluster.taskError, fields.nodesDetailsUrl, variant)}
     </div>
   )
@@ -163,12 +172,12 @@ export const ClusterConnectionStatus: FC<IClusterStatusProps> = ({
   variant = 'table',
   message = undefined,
 }) => {
-  if (isTransientStatus(cluster.connectionStatus)) {
+  if (isTransientStatus(cluster.taskStatus)) {
     return renderTransientStatus(cluster, variant)
   }
   const fields = getClusterConnectionStatus(cluster)
 
-  if (!fields || !cluster?.nodes?.length) {
+  if (!fields) {
     return (
       <ClusterStatusSpan title={message || 'Unknown'} status="unknown" variant={variant}>
         {message || 'Unknown'}

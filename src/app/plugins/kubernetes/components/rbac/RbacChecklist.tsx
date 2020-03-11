@@ -279,8 +279,8 @@ const SelectedRbacApiGroups: FC<ISelectedRbacApiGroupProps> = ({ groups, onEdit,
         <div key={group}>
           {Object.entries(resources).map(([resource, verbs = {}]) => {
             return (
-              <div className={classes.selectedGroup}>
-                <div key={`${group}-${resource}`} className={classes.resource}>
+              <div key={`${group}-${resource}`} className={classes.selectedGroup}>
+                <div className={classes.resource}>
                   <div className={classes.resourceGroup}>
                     <Typography variant="body1" className={classes.groupHeader}>
                       {group}

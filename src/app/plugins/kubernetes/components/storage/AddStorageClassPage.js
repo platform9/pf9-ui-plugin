@@ -16,7 +16,6 @@ import storageClassesActions, { storageClassesCacheKey } from './actions'
 import useParams from 'core/hooks/useParams'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { makeStyles } from '@material-ui/styles'
-import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import ExternalLink from 'core/components/ExternalLink'
 import { clusterActions } from '../infrastructure/clusters/actions'
@@ -28,16 +27,6 @@ const initialContext = {
 }
 
 const useStyles = makeStyles((theme) => ({
-  formWidth: {
-    width: 715,
-  },
-  tableWidth: {
-    width: 687, // oddly specific, this is so the tooltip doesn't overlay on the card
-    marginBottom: theme.spacing(),
-  },
-  inputWidth: {
-    maxWidth: 350,
-  },
   blueIcon: {
     color: theme.palette.primary.main,
   },
@@ -63,7 +52,6 @@ export const AddStorageClassForm = ({ onComplete }) => (
 )
 
 const BasicStep = ({ onSubmit, triggerSubmit, wizardContext }) => {
-  const classes = useStyles()
   const listStorageClassesParams = {
     clusterId: allKey,
     healthyClusters: true,
@@ -95,54 +83,52 @@ const BasicStep = ({ onSubmit, triggerSubmit, wizardContext }) => {
 
   return (
     <WizardStep stepId="basic" label="Basic">
-      <ValidatedForm onSubmit={onSubmit} triggerSubmit={triggerSubmit}>
-        <div className={classes.formWidth}>
-          <FormFieldCard title="Name Your Storage Class">
-            <div className={classes.inputWidth}>
-              <TextField id="name" label="Name" info="Name for this storage class." required />
-              <PicklistField
-                DropdownComponent={ClusterPicklist}
-                id="clusterId"
-                label="Cluster"
-                info="The cluster to deploy this storage class on."
-                onChange={getParamsUpdater('clusterId')}
-                value={params.clusterId}
-                onlyHealthyClusters
-                required
-              />
-              <TextField
-                id="cloudProvider"
-                label="Cloud provider"
-                info="Cloud provider."
-                disabled
-                value={cloudProviderName}
-              />
-              {wizardContext.clusterType === 'aws' && (
-                <PicklistField
-                  DropdownComponent={StorageTypePicklist}
-                  id="storageType"
-                  label="Storage Type"
-                  info="Select the storage type for this storage class. The list of available storage types is specific to the cloud provider that the cluster belongs to."
-                  required
-                />
-              )}
-              {wizardContext.clusterType === 'local' && (
-                <TextField
-                  id="provisioner"
-                  label="Provisioner"
-                  info="Name of provisioner to use"
-                  required
-                />
-              )}
-              <CheckboxField
-                id="isDefault"
-                label="Use as Default Storage Class"
-                info={defaultExists && 'A default storage class already exists on this cluster.'}
-                disabled={defaultExists}
-              />
-            </div>
-          </FormFieldCard>
-        </div>
+      <ValidatedForm
+        onSubmit={onSubmit}
+        triggerSubmit={triggerSubmit}
+        title="Name Your Storage Class"
+      >
+        <TextField id="name" label="Name" info="Name for this storage class." required />
+        <PicklistField
+          DropdownComponent={ClusterPicklist}
+          id="clusterId"
+          label="Cluster"
+          info="The cluster to deploy this storage class on."
+          onChange={getParamsUpdater('clusterId')}
+          value={params.clusterId}
+          onlyHealthyClusters
+          required
+        />
+        <TextField
+          id="cloudProvider"
+          label="Cloud provider"
+          info="Cloud provider."
+          disabled
+          value={cloudProviderName}
+        />
+        {wizardContext.clusterType === 'aws' && (
+          <PicklistField
+            DropdownComponent={StorageTypePicklist}
+            id="storageType"
+            label="Storage Type"
+            info="Select the storage type for this storage class. The list of available storage types is specific to the cloud provider that the cluster belongs to."
+            required
+          />
+        )}
+        {wizardContext.clusterType === 'local' && (
+          <TextField
+            id="provisioner"
+            label="Provisioner"
+            info="Name of provisioner to use"
+            required
+          />
+        )}
+        <CheckboxField
+          id="isDefault"
+          label="Use as Default Storage Class"
+          info={defaultExists && 'A default storage class already exists on this cluster.'}
+          disabled={defaultExists}
+        />
       </ValidatedForm>
     </WizardStep>
   )
@@ -166,34 +152,29 @@ const CustomizeStep = ({ wizardContext, onSubmit, triggerSubmit }) => {
 
   return (
     <WizardStep stepId="customize" label="Customize" key={wizardContext}>
-      <ValidatedForm onSubmit={onSubmit} triggerSubmit={triggerSubmit}>
-        <div className={classes.formWidth}>
-          <FormFieldCard
-            title="Advanced Usage"
-            link={
-              <div>
-                <FontAwesomeIcon className={classes.blueIcon} size="md">
-                  hdd
-                </FontAwesomeIcon>{' '}
-                <ExternalLink url={persistVolumesStorageClassesLink}>
-                  How do I configure a storage class?
-                </ExternalLink>
-              </div>
-            }
-          >
-            <div className={classes.tableWidth}>
-              <CodeMirror
-                id="storageClassYaml"
-                label="Storage Class YAML"
-                options={codeMirrorOptions}
-                onChange={getParamsUpdater('storageClassYaml')}
-                value={params.storageClassYaml}
-                info="In case of a conflict with options selected on the previous page, changes you make here will override them."
-                required
-              />
-            </div>
-          </FormFieldCard>
-        </div>
+      <ValidatedForm
+        onSubmit={onSubmit}
+        triggerSubmit={triggerSubmit}
+        title="Advanced Usage"
+        link={
+          <div>
+            <FontAwesomeIcon className={classes.blueIcon} size="md">
+              hdd
+            </FontAwesomeIcon>{' '}
+            <ExternalLink url={persistVolumesStorageClassesLink}>
+              How do I configure a storage class?
+            </ExternalLink>
+          </div>
+        }
+      >
+        <CodeMirror
+          id="storageClassYaml"
+          label="Storage Class YAML"
+          options={codeMirrorOptions}
+          onChange={getParamsUpdater('storageClassYaml')}
+          value={params.storageClassYaml}
+          required
+        />
       </ValidatedForm>
     </WizardStep>
   )

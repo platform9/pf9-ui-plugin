@@ -13,9 +13,7 @@ import {
   connectionStatusFieldsTable,
   clusterHealthStatusFields,
 } from '../clusters/ClusterStatusUtils'
-import DeAuthIcon from '@material-ui/icons/DeleteForever'
 import NodeDeAuthDialog from './NodeDeAuthDialog'
-import SettingsPhoneIcon from '@material-ui/icons/SettingsPhone'
 import RemoteSupportDialog from './RemoteSupportDialog'
 import { Tooltip, Typography } from '@material-ui/core'
 import { isAdminRole } from 'k8s/util/helpers'
@@ -27,6 +25,7 @@ import { orderInterfaces } from './NodeDetailsPage'
 import ResourceUsageTable from '../common/ResourceUsageTable'
 import { makeStyles } from '@material-ui/styles'
 import { routes } from 'core/utils/routes'
+import { ToolbarActionIcon } from 'core/components/listTable/ListTableBatchActions'
 
 const useStyles = makeStyles((theme) => ({
   title: {
@@ -171,7 +170,7 @@ const renderRemoteSupport = () => (
       "Advanced Remote Support is currently enabled on this node. To disable it, select the 'Configure Remote Support' action from the actions bar."
     }
   >
-    <SettingsPhoneIcon />
+    <ToolbarActionIcon icon="headset" />
   </Tooltip>
 )
 
@@ -284,18 +283,18 @@ export const options = {
   multiSelection: false,
   batchActions: [
     {
+      cond: isAdmin,
+      icon: 'headset',
+      label: 'Remote Support',
+      dialog: RemoteSupportDialog,
+    },
+    {
       cond: ([node]) => !node.clusterUuid,
-      icon: <DeAuthIcon />,
-      label: 'Deauthorize node',
+      icon: 'trash-alt',
+      label: 'Deauthorize',
       dialog: NodeDeAuthDialog,
       disabledInfo:
         "You can only de-authorize a node when it's not associated with any cluster. Detach the node from the cluster first.",
-    },
-    {
-      cond: isAdmin,
-      icon: <SettingsPhoneIcon />,
-      label: 'Configure Remote Support',
-      dialog: RemoteSupportDialog,
     },
   ],
   ListPage,

@@ -5,7 +5,7 @@ import { withStyles } from '@material-ui/styles'
 import AnimateValues from 'core/components/AnimateValues'
 import { describeArc } from 'core/utils/svgHelpers'
 
-const strokeWidth = 8
+const strokeWidth = 12
 
 const styles = (theme) => ({
   root: {
@@ -18,30 +18,34 @@ const styles = (theme) => ({
     fill: 'none',
     stroke: '#31DA6D',
     strokeWidth,
-    strokeLinecap: 'round',
-    strokeLinejoin: 'round',
+    strokeLinecap: 'square',
+    strokeLinejoin: 'square',
   },
   barBackground: {
     fill: 'none',
     stroke: '#D0E7F6',
     strokeWidth: strokeWidth - 1,
-    strokeLinecap: 'round',
-    strokeLinejoin: 'round',
+    strokeLinecap: 'square',
+    strokeLinejoin: 'square',
   },
   percent: {
     left: 0,
     right: 0,
-    bottom: 40,
+    bottom: 0,
     textAlign: 'center',
     position: 'absolute',
     fontWeight: 'bold',
     fill: 'red',
+    color: theme.palette.dashboardCard.text,
   },
   label: {
     paddingTop: 5,
     textAlign: 'center',
     width: '100%',
     whiteSpace: 'nowrap',
+  },
+  graph: {
+    position: 'relative',
   },
 })
 
@@ -59,21 +63,23 @@ class SemiCircleGraph extends React.PureComponent {
       <AnimateValues values={{ angle: [0, completedArc] }} duration={duration}>
         {({ angle }) => (
           <div className={classes.root}>
-            <svg width={width} height={width / 2} viewBox={viewBox}>
-              <path
-                className={classes.barBackground}
-                fill="none"
-                d={describeArc(arcSize, arcSize, arcSize, 0, 180)}
-              />
-              <path
-                className={classes.barProgress}
-                fill="none"
-                d={describeArc(arcSize, arcSize, arcSize, 0, angle)}
-              />
-            </svg>
-            <Typography variant="h6" className={classes.percent}>
-              {percentage}%
-            </Typography>
+            <div className={classes.graph}>
+              <svg width={width} height={width / 2} viewBox={viewBox}>
+                <path
+                  className={classes.barBackground}
+                  fill="none"
+                  d={describeArc(arcSize, arcSize, arcSize, 0, 180)}
+                />
+                <path
+                  className={classes.barProgress}
+                  fill="none"
+                  d={describeArc(arcSize, arcSize, arcSize, 0, angle)}
+                />
+              </svg>
+              <Typography variant="h6" className={classes.percent}>
+                {percentage}%
+              </Typography>
+            </div>
             <Typography variant="caption" className={classes.label}>
               {label}
             </Typography>

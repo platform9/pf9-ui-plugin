@@ -144,8 +144,12 @@ const styles = (theme) => ({
     alignItems: 'center',
     justifyContent: 'center',
     '& > i': {
-      maxHeight: 28,
-      maxWidth: 28,
+      width: '23px',
+      height: '18.5px',
+      position: 'relative',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
     },
   },
   navMenu: {
@@ -156,7 +160,7 @@ const styles = (theme) => ({
     display: 'grid',
     gridTemplateColumns: '50px 1fr',
     padding: 0,
-    minHeight: theme.spacing(6),
+    minHeight: 45,
     backgroundColor: theme.palette.sidebar.background,
     color: theme.palette.sidebar.text,
 
@@ -176,9 +180,11 @@ const styles = (theme) => ({
   },
   navMenuTextRoot: {
     flexGrow: 1,
-    padding: theme.spacing(0, 0.5, 0, 1),
+    padding: theme.spacing(0, 0.5),
     whiteSpace: 'normal',
     margin: 0,
+    display: 'block',
+    lineHeight: '14px',
   },
   navMenuText: {
     fontSize: 12,
@@ -257,6 +263,11 @@ const styles = (theme) => ({
   sliderArrow: {
     width: '0.8em',
     color: theme.palette.sidebar.text,
+  },
+  heavyWeight: {
+    '& i': {
+      fontWeight: 500,
+    },
   },
 })
 
@@ -408,7 +419,7 @@ class Navbar extends PureComponent {
       >
         {icon && (
           <div className={classes.navIcon}>
-            <FontAwesomeIcon size="xl">{icon}</FontAwesomeIcon>
+            <FontAwesomeIcon size="lg">{icon}</FontAwesomeIcon>
           </div>
         )}
         {open && (
@@ -465,8 +476,9 @@ class Navbar extends PureComponent {
         key={link.path}
       >
         {icon && (
-          <div className={classes.navIcon}>
-            <FontAwesomeIcon title={name} size="xl">
+          // TODO: come up with a better way to conditionally make an icon a heavier weight
+          <div className={clsx(classes.navIcon, icon === 'cubes' && classes.heavyWeight)}>
+            <FontAwesomeIcon title={name} size="lg">
               {icon}
             </FontAwesomeIcon>
           </div>

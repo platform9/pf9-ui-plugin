@@ -5,9 +5,16 @@ This is the new home for all things Platform9 UI related.
 
 # Getting started
 
+**Dependencies**
+
+- Node v8+ (12 recommendended)
+- yarn should be installed
+- A provisioned DU if you don't want to use the simulator.
+
+
 **Initializing the App**
 
-`npm install`
+`yarn`
 
 **Create a custom config**
 
@@ -18,15 +25,22 @@ edit the username / password to be whatever you'd like (usually your pf9 email)
 `config.js` is already specified in the .gitignore.
 
 
+**Targeting a remote DU**
+
+To have the API calls go to a remote DU you can edit the `apiHost` property in `config.js`.
+
+Unless you override the `NODE_ENV` environment variable it will look under the `development` section of `config.js`.
+
+
 **Starting the Simulator Server
 
-`npm run server`
+`yarn server`
 
 The simulator will create an admin user as specified in your `config.js`
 
 **Hosting the App**
 
-`npm run dev`
+`yarn dev`
 
 Load the UI in your browser at `localhost:3000?dev=true` as the browser URL.
 
@@ -55,7 +69,7 @@ that are feed into the component.
 
 To see the Storybook just run:
 
-`npm run storybook`
+`yarn storybook`
 
 
 # Running tests
@@ -74,7 +88,7 @@ End to end tests are not yet implemented.
 
 To run them:
 
-`npm run lint`
+`yarn lint`
 
 We currently use `StandardJS` as our linting standard.
 
@@ -85,7 +99,7 @@ CI will run linting after every commit in a PR.
 
 To run them:
 
-`npm run test:unit`
+`yarn test:unit`
 
 Unit tests are designed to run very fast.  Anything that can have an external
 side effect is mocked out. Jest will run the tests in parallel threads.
@@ -103,7 +117,7 @@ CI will run unit tests after every commit in a PR.
 
 To run them:
 
-`npm run test:integration`
+`yarn test:integration`
 
 Integration tests are designed to test larger swaths of the codebase. They should
 catch things that are missed by unit tests alone.
@@ -123,7 +137,7 @@ a more sequential manner.
 
 ## Special Flags
 
-To enable the develeper plugin use:
+To enable the developer plugin, open the browser JavaScript console and run:
 
 `window.localStorage.setItem('enableDevPlugin', true)`
 

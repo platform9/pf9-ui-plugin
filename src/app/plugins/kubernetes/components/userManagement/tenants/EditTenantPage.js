@@ -1,7 +1,6 @@
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import TextField from 'core/components/validatedForm/TextField'
 import React, { useMemo, useCallback } from 'react'
-import { Typography } from '@material-ui/core'
 import UserRolesTableField from 'k8s/components/userManagement/tenants/UserRolesTableField'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import {
@@ -18,10 +17,13 @@ import { pathJoin } from 'utils/misc'
 import { k8sPrefix } from 'app/constants'
 import Wizard from 'core/components/wizard/Wizard'
 import WizardStep from 'core/components/wizard/WizardStep'
+import { requiredValidator } from 'core/utils/fieldValidators'
 
 const listUrl = pathJoin(k8sPrefix, 'user_management')
 
 const userParams = { systemUsers: true }
+
+const userRolesValidations = [requiredValidator.withMessage('Must select at least one user')]
 
 const EditTenantPage = () => {
   const { match, history } = useReactRouter()
@@ -66,6 +68,7 @@ const EditTenantPage = () => {
           <>
             <WizardStep stepId="basic" label="Basic Info">
               <ValidatedForm
+                title="Basic Info"
                 initialValues={wizardContext}
                 onSubmit={setWizardContext}
                 triggerSubmit={onNext}
@@ -75,16 +78,18 @@ const EditTenantPage = () => {
               </ValidatedForm>
             </WizardStep>
             <WizardStep stepId="users" label="Users and Roles">
-              <Typography variant="body1" component="p">
-                Which users can access this tenant?
-              </Typography>
               <ValidatedForm
+                title="Users and Roles"
                 fullWidth
                 initialValues={wizardContext}
                 onSubmit={setWizardContext}
                 triggerSubmit={onNext}
               >
-                <UserRolesTableField required id="roleAssignments" users={users} />
+                <UserRolesTableField
+                  validations={userRolesValidations}
+                  id="roleAssignments"
+                  users={users}
+                />
               </ValidatedForm>
             </WizardStep>
           </>

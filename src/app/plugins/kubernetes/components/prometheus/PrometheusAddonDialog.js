@@ -7,6 +7,7 @@ import useDataUpdater from 'core/hooks/useDataUpdater'
 import { clusterActions } from '../infrastructure/clusters/actions'
 import { onboardingMonitoringSetup } from 'app/constants'
 import { useToast } from 'core/providers/ToastProvider'
+import Alert from 'core/components/Alert'
 
 export const hasPrometheusEnabled = compose(castFuzzyBool, path(['tags', 'pf9-system:monitoring']))
 
@@ -51,13 +52,11 @@ const PrometheusAddonDialog = ({ rows: [cluster], onClose }) => {
       <DialogTitle>Monitoring Add-On (Beta)</DialogTitle>
       <DialogContent>
         <p>
-          <b>Note:</b> Monitoring is a Beta feature
-        </p>
-        <p>
           After enabling the monitoring add-on, you will be able to access Prometheus metrics and
           Grafana dashboards for Kubernetes. In addition, users will be able to spin up their own
           Prometheus instances for application monitoring.
         </p>
+        <Alert small variant="warning" message="Monitoring is currently a Beta feature" />
       </DialogContent>
       <DialogActions>
         <Button color="primary" type="submit" variant="contained" onClick={toggleMonitoring}>

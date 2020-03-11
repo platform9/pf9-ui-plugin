@@ -24,6 +24,7 @@ import { Redirect, Route, Switch } from 'react-router'
 import useReactRouter from 'use-react-router'
 import { emptyObj, ensureArray, isNilOrEmpty } from 'utils/fp'
 import { pathJoin } from 'utils/misc'
+import PushEventsProvider from '../providers/PushEventsProvider'
 
 const { keystone } = ApiClient.getInstance()
 
@@ -208,24 +209,26 @@ const AuthenticatedContainer = () => {
           stack={stack}
           handleDrawerToggle={toggleDrawer}
         />
-        <main
-          className={clsx(classes.content, classes['content-left'], {
-            [classes.contentShift]: drawerOpen,
-            [classes['contentShift-left']]: drawerOpen,
-          })}
-        >
-          {/* <BannerContainer /> */}
-          <div className={classes.contentMain}>
-            {renderRawComponents(plugins)}
-            <Switch>
-              {renderPlugins(plugins, role)}
-              <Route path={helpUrl} component={HelpPage} />
-              <Route path={logoutUrl} component={LogoutPage} />
-              <Redirect to={dashboardUrl} />
-            </Switch>
-            {devEnabled && <DeveloperToolsEmbed />}
-          </div>
-        </main>
+        <PushEventsProvider>
+          <main
+            className={clsx(classes.content, classes['content-left'], {
+              [classes.contentShift]: drawerOpen,
+              [classes['contentShift-left']]: drawerOpen,
+            })}
+          >
+            {/* <BannerContainer /> */}
+            <div className={classes.contentMain}>
+              {renderRawComponents(plugins)}
+              <Switch>
+                {renderPlugins(plugins, role)}
+                <Route path={helpUrl} component={HelpPage} />
+                <Route path={logoutUrl} component={LogoutPage} />
+                <Redirect to={dashboardUrl} />
+              </Switch>
+              {devEnabled && <DeveloperToolsEmbed />}
+            </div>
+          </main>
+        </PushEventsProvider>
       </div>
       {regionFeatures.intercom && <Intercom />}
     </>

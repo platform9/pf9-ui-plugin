@@ -38,12 +38,16 @@ const AzureFields = () => (
 )
 
 export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => (
-  <ValidatedForm onSubmit={onComplete} initialValues={initialValues}>
+  <ValidatedForm
+    formActions={<SubmitButton>Update Cloud Provider</SubmitButton>}
+    title={`Edit "${initialValues.name}"`}
+    onSubmit={onComplete}
+    initialValues={initialValues}
+  >
     <TextField id="name" label="Name" />
     {initialValues.type === 'aws' && <AWSFields />}
     {initialValues.type === 'azure' && <AzureFields />}
     {initialValues.type === 'openstack' && <OpenstackFields />}
-    <SubmitButton>Update Cloud Provider</SubmitButton>
   </ValidatedForm>
 )
 

@@ -1,14 +1,15 @@
 import { ICluster, HealthStatus } from './model'
 import { routes } from 'core/utils/routes'
+import { ICombinedNode } from '../nodes/model'
 
 type TransientStatus = 'creating' | 'deleting' | 'updating' | 'upgrading' | 'converging'
 type ConnectionStatus = 'connected' | 'partially_connected' | 'disconnected'
 
 export type IClusterStatus = 'ok' | 'pause' | 'fail' | 'unknown' | 'error' | 'loading'
 
-interface Node {
-  status: 'ok' | 'failed' | 'converging'
-  isMaster: boolean
+interface INodeCount {
+  total: number
+  healthy: number
 }
 
 interface ConnectionStatusFields {
@@ -26,21 +27,21 @@ interface HealthStatusAndMessage {
   mastersHealthStatus: HealthStatus
   workersHealthStatus: HealthStatus
   healthStatus: HealthStatus
-  message: string
+  getMessage: (masters: INodeCount, workers: INodeCount) => string
 }
 
-const nodeStatusOkOrFailed = (node: Node): boolean =>
+const nodeStatusOkOrFailed = (node: ICombinedNode): boolean =>
   node.status === 'ok' || node.status === 'failed'
 
 export function getConnectionStatus(
   taskStatus: string,
-  nodes: Node[],
+  nodes: ICombinedNode[],
 ): ConnectionStatus | TransientStatus {
-  if (!nodes.length) return 'disconnected'
-
   if (isTransientStatus(taskStatus)) {
     return taskStatus as TransientStatus
   }
+
+  if (!nodes.length) return 'disconnected'
 
   if (hasConvergingNodes(nodes)) {
     return 'converging'
@@ -83,8 +84,8 @@ export const connectionStatusFieldsTable: {
 }
 
 export function getMasterNodesHealthStatus(
-  masterNodes: Node[] = [],
-  healthyMasterNodes: Node[] = [],
+  masterNodes: ICombinedNode[] = [],
+  healthyMasterNodes: ICombinedNode[] = [],
 ): HealthStatus | TransientStatus {
   if (hasConvergingNodes(masterNodes)) {
     return 'converging'
@@ -96,8 +97,8 @@ export function getMasterNodesHealthStatus(
 }
 
 export function getWorkerNodesHealthStatus(
-  workerNodes: Node[] = [],
-  healthyWorkerNodes: Node[] = [],
+  workerNodes: ICombinedNode[] = [],
+  healthyWorkerNodes: ICombinedNode[] = [],
 ): HealthStatus | TransientStatus {
   if (hasConvergingNodes(workerNodes)) {
     return 'converging'
@@ -108,35 +109,46 @@ export function getWorkerNodesHealthStatus(
   return getNodesHealthStatus(healthyWorkersNodesCount, workerNodes.length, workersQuorumNumber)
 }
 
+const findClusterHealthValues = (masterStatus, workerStatus) =>
+  clusterHealthStatusAndMessageTable.find(
+    (item) =>
+      item.mastersHealthStatus === masterStatus && item.workersHealthStatus === workerStatus,
+  )
+
 export function getHealthStatus(
   connectionStatus: ConnectionStatus | TransientStatus,
-  masterNodesHealthStatus: HealthStatus,
-  workerNodesHealthStatus: HealthStatus,
+  masterStatus: HealthStatus,
+  workerStatus: HealthStatus,
 ) {
   if (isTransientStatus(connectionStatus)) {
     return connectionStatus
   }
 
-  const healthStatusAndMessage = clusterHealthStatusAndMessageTable.find(
-    (item) =>
-      item.mastersHealthStatus === masterNodesHealthStatus &&
-      item.workersHealthStatus === workerNodesHealthStatus,
-  )
+  const healthStatusAndMessage = findClusterHealthValues(masterStatus, workerStatus)
 
   return healthStatusAndMessage.healthStatus
 }
 
-export function getHealthStatusMessage(
-  masterNodesHealthStatus: HealthStatus,
-  workerNodesHealthStatus: HealthStatus,
-): string {
-  const healthStatusAndMessage = clusterHealthStatusAndMessageTable.find(
-    (item) =>
-      item.mastersHealthStatus === masterNodesHealthStatus &&
-      item.workersHealthStatus === workerNodesHealthStatus,
+export function getHealthStatusMessage(cluster: ICluster): string {
+  const {
+    masterNodesHealthStatus,
+    workerNodesHealthStatus,
+    workerNodes,
+    masterNodes,
+    healthyMasterNodes,
+    healthyWorkerNodes,
+  } = cluster
+  const healthStatusAndMessage = findClusterHealthValues(
+    masterNodesHealthStatus,
+    workerNodesHealthStatus,
   )
+  const masterCounts = { total: masterNodes.length, healthy: healthyMasterNodes.length }
+  const workerCounts = { total: workerNodes.length, healthy: healthyWorkerNodes.length }
 
-  return healthStatusAndMessage.message
+  if (!healthStatusAndMessage) {
+    return ''
+  }
+  return healthStatusAndMessage.getMessage(masterCounts, workerCounts)
 }
 
 function getNodesHealthStatus(
@@ -155,69 +167,130 @@ function getNodesHealthStatus(
   return 'unhealthy'
 }
 
+const getFormattedCounts = (masterNodes, workerNodes) => ({
+  masterCount: masterNodes.total || '',
+  unhealthyWorkers: workerNodes.total - workerNodes.healthy,
+  unhealthyMasters: masterNodes.total - masterNodes.healthy,
+  percentUnhealthyWorkers: Math.floor(
+    (workerNodes.total / (workerNodes.total - workerNodes.healthy)) * 100,
+  ),
+})
+
+function getUnhealthyWorkerMessage(masterNodes, workerNodes) {
+  const { unhealthyWorkers, percentUnhealthyWorkers } = getFormattedCounts(masterNodes, workerNodes)
+  return workerNodes.total > 0
+    ? `${unhealthyWorkers} out of ${workerNodes.total} (${percentUnhealthyWorkers}%) workers are unhealthy`
+    : `cluster has no worker nodes`
+}
+function getHealthyWorkerMessage(masterNodes, workerNodes) {
+  return workerNodes.total > 0
+    ? `all ${workerNodes.total} workers are healthy`
+    : `cluster has no worker nodes`
+}
+
 const clusterHealthStatusAndMessageTable: HealthStatusAndMessage[] = [
   {
     mastersHealthStatus: 'healthy',
     workersHealthStatus: 'healthy',
     healthStatus: 'healthy',
-    message: 'All masters and all workers are healthy',
+    getMessage: (masterNodes, workerNodes) => {
+      const masterCount = masterNodes.total || ''
+      const workerMessage = getHealthyWorkerMessage(masterNodes, workerNodes)
+      return `All ${masterCount} masters are healthy, ${workerMessage}`.replace(/\s+/g, ' ')
+    },
   },
   {
     mastersHealthStatus: 'healthy',
     workersHealthStatus: 'partially_healthy',
     healthStatus: 'healthy',
-    message: 'All masters are healthy, majority of workers (> 50%) are healthy',
+    getMessage: (masterNodes, workerNodes) => {
+      const { masterCount } = getFormattedCounts(masterNodes, workerNodes)
+      const workerMessage = getUnhealthyWorkerMessage(masterNodes, workerNodes)
+      return `All ${masterCount} masters are healthy, ${workerMessage}`
+    },
   },
   {
     mastersHealthStatus: 'healthy',
     workersHealthStatus: 'unhealthy',
     healthStatus: 'unhealthy',
-    message: 'All masters are healthy but majority of workers (> 50%) are unhealthy',
+    getMessage: (masterNodes, workerNodes) => {
+      const { masterCount } = getFormattedCounts(masterNodes, workerNodes)
+      const workerMessage = getUnhealthyWorkerMessage(masterNodes, workerNodes)
+      return `All ${masterCount} masters are healthy, ${workerMessage}`
+    },
   },
   {
     mastersHealthStatus: 'partially_healthy',
     workersHealthStatus: 'healthy',
     healthStatus: 'partially_healthy',
-    message: 'Quorum number of masters are healthy, all workers are healthy',
+    getMessage: (masterNodes, workerNodes) => {
+      const { masterCount, unhealthyMasters } = getFormattedCounts(masterNodes, workerNodes)
+      const masterMessage = `${unhealthyMasters} out of ${masterCount} masters are unhealthy (Quorum still established)`
+      const workerMessage = getHealthyWorkerMessage(masterNodes, workerNodes)
+      return `${masterMessage}, ${workerMessage}`
+    },
   },
   {
     mastersHealthStatus: 'partially_healthy',
     workersHealthStatus: 'partially_healthy',
     healthStatus: 'partially_healthy',
-    message: 'Quorum number of masters are healthy, majority of workers (>50%) are healthy',
+    getMessage: (masterNodes, workerNodes) => {
+      const { masterCount, unhealthyMasters } = getFormattedCounts(masterNodes, workerNodes)
+      const masterMessage = `${unhealthyMasters} out of ${masterCount} masters are unhealthy (Quorum still established)`
+      const workerMessage = getUnhealthyWorkerMessage(masterNodes, workerNodes)
+      return `${masterMessage}, ${workerMessage}`
+    },
   },
   {
     mastersHealthStatus: 'partially_healthy',
     workersHealthStatus: 'unhealthy',
     healthStatus: 'unhealthy',
-    message: 'Quorum number of masters are healthy but majority of workers (> 50%) are unhealthy',
+    getMessage: (masterNodes, workerNodes) => {
+      const { masterCount, unhealthyMasters } = getFormattedCounts(masterNodes, workerNodes)
+      const masterMessage = `${unhealthyMasters} out of ${masterCount} masters are unhealthy (Quorum still established)`
+      const workerMessage = getUnhealthyWorkerMessage(masterNodes, workerNodes)
+      return `${masterMessage}, ${workerMessage}`
+    },
   },
   {
     mastersHealthStatus: 'unhealthy',
     workersHealthStatus: 'healthy',
     healthStatus: 'unhealthy',
-    message: 'Less than quorum number of masters are healthy, all workers are healthy',
+    getMessage: (masterNodes, workerNodes) => {
+      const { masterCount, unhealthyMasters } = getFormattedCounts(masterNodes, workerNodes)
+      const masterMessage = `${unhealthyMasters} out of ${masterCount} masters are unhealthy (Quorum still established)`
+      const workerMessage = getHealthyWorkerMessage(masterNodes, workerNodes)
+      return `${masterMessage}, ${workerMessage}`
+    },
   },
   {
     mastersHealthStatus: 'unhealthy',
     workersHealthStatus: 'partially_healthy',
     healthStatus: 'unhealthy',
-    message:
-      'Less than quorum number of masters are healthy, majority of workers (>50%) are healthy',
+    getMessage: (masterNodes, workerNodes) => {
+      const { masterCount, unhealthyMasters } = getFormattedCounts(masterNodes, workerNodes)
+      const masterMessage = `${unhealthyMasters} out of ${masterCount} masters are unhealthy (Quorum failed)`
+      const workerMessage = getUnhealthyWorkerMessage(masterNodes, workerNodes)
+      return `${masterMessage}, ${workerMessage}`
+    },
   },
   {
     mastersHealthStatus: 'unhealthy',
     workersHealthStatus: 'unhealthy',
     healthStatus: 'unhealthy',
-    message:
-      'Less than quorum number of masters are healthy, and majority of workers (>50%) are unhealthy',
+    getMessage: (masterNodes, workerNodes) => {
+      const { masterCount, unhealthyMasters } = getFormattedCounts(masterNodes, workerNodes)
+      const masterMessage = `${unhealthyMasters} out of ${masterCount} masters are unhealthy (Quorum failed)`
+      const workerMessage = getUnhealthyWorkerMessage(masterNodes, workerNodes)
+      return `${masterMessage}, ${workerMessage}`
+    },
   },
 ]
 
-export const hasConvergingNodes = (nodes: Node[]): boolean =>
+export const hasConvergingNodes = (nodes: ICombinedNode[]): boolean =>
   !!nodes.find((node) => node.status === 'converging')
 
-export const isSteadyState = (taskStatus: string, nodes: Node[]): boolean =>
+export const isSteadyState = (taskStatus: string, nodes: ICombinedNode[]): boolean =>
   !hasConvergingNodes(nodes) && ['success', 'error'].includes(taskStatus)
 
 export const isTransientStatus = (status: string): boolean =>
@@ -262,10 +335,7 @@ export const getClusterHealthStatus = (cluster: ICluster) => {
     return null
   }
   const fields: ClusterHealthStatusFields = clusterHealthStatusFields[cluster.healthStatus]
-  fields.message = getHealthStatusMessage(
-    cluster.masterNodesHealthStatus,
-    cluster.workerNodesHealthStatus,
-  )
+  fields.message = getHealthStatusMessage(cluster)
   fields.nodesDetailsUrl = routes.cluster.nodeHealth.path({ id: cluster.uuid })
   return fields
 }
