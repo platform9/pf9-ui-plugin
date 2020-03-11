@@ -125,6 +125,7 @@ const ListPage = ({ ListContainer }) => {
                     <ClusterPicklist
                       onChange={getParamsUpdater('chartClusterId')}
                       value={params.chartClusterId}
+                      onlyMasterNodeClusters
                       onlyPrometheusEnabled
                       selectFirst={false}
                     />
@@ -157,6 +158,7 @@ const ListPage = ({ ListContainer }) => {
                     onChange={getParamsUpdater('clusterId')}
                     value={params.clusterId}
                     onlyMasterNodeClusters
+                    onlyPrometheusEnabled
                     selectFirst={false}
                   />
                   <SeverityPicklist

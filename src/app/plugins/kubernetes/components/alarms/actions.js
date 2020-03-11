@@ -20,7 +20,7 @@ const getQbertEndpoint = async () => {
 export const loadAlerts = createContextLoader(
   alertsCacheKey,
   async ({ clusterId }, loadFromContext) => {
-    const clusters = await loadFromContext(clustersCacheKey, { healthyClusters: true })
+    const clusters = await loadFromContext(clustersCacheKey, { healthyClusters: true, prometheusClusters: true })
     if (clusterId === allKey) {
       const all = await someAsync(pluck('uuid', clusters).map(qbert.getPrometheusAlerts)).then(flatten)
       return all
@@ -30,7 +30,7 @@ export const loadAlerts = createContextLoader(
   },
   {
     dataMapper: async (items, params, loadFromContext) => {
-      const clusters = await loadFromContext(clustersCacheKey, { healthyClusters: true })
+      const clusters = await loadFromContext(clustersCacheKey, { healthyClusters: true, prometheusClusters: true })
       const host = await getQbertEndpoint()
       return items.map((item) => ({
         ...item,
@@ -123,7 +123,7 @@ export const loadTimeSeriesAlerts = createContextLoader(
     // Use unix timestamp to match the prometheus API
     const timestamps = getTimestamps(timePast, chartTime)
 
-    const clusters = await loadFromContext(clustersCacheKey, { prometheusClusters: true })
+    const clusters = await loadFromContext(clustersCacheKey, { healthyClusters: true, prometheusClusters: true })
     if (chartClusterId === allKey) {
       const all = await someAsync(pluck('uuid', clusters).map((cluster) => (
         qbert.getPrometheusAlertsOverTime(cluster, timePast, timeNow, step)
