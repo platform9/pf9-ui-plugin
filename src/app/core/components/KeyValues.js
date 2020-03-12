@@ -34,7 +34,7 @@ const useKeyValueStyles = makeStyles((theme) => ({
   },
 }))
 
-const KeyValue = ({ entry = {}, onChange, onDelete, keySuggestions, valueSuggestions, blacklistedTags }) => {
+const KeyValue = ({ entry = {}, onChange, onDelete, keySuggestions, valueSuggestions }) => {
   const classes = useKeyValueStyles()
   const [state, setState] = useState({
     id: entry.id || uuid.v4(),
@@ -49,9 +49,7 @@ const KeyValue = ({ entry = {}, onChange, onDelete, keySuggestions, valueSuggest
   const handleChange = (field) => (value) => setState(assoc(field, value, state))
 
   return (
-    <div className={clsx(classes.root, {
-      [classes.hidden]: blacklistedTags.includes(state.key)
-    })}>
+    <div className={classes.root}>
       <AutocompleteBase
         inputProps={{ size: 14 }}
         fullWidth
@@ -116,9 +114,11 @@ const KeyValues = ({ entries: _entries, onChange, keySuggestions, valueSuggestio
     onChange && onChange(sanitized)
   }, [entries])
 
+  const filteredEntries = entries.filter(entry => !blacklistedTags.includes(entry.key))
+
   return (
     <div className={classes.root}>
-      {entries.map((entry) => (
+      {filteredEntries.map((entry) => (
         <KeyValue
           key={entry.id}
           keySuggestions={keySuggestions}
@@ -126,7 +126,6 @@ const KeyValues = ({ entries: _entries, onChange, keySuggestions, valueSuggestio
           entry={entry}
           onChange={handleChange}
           onDelete={deleteEntry(entry.id)}
-          blacklistedTags={blacklistedTags}
         />
       ))}
       <Button className={classes.addButton} variant="text" onClick={addBlankEntry}>
