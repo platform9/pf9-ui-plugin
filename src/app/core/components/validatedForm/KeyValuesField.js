@@ -21,6 +21,7 @@ const KeyValuesField = React.forwardRef(
       onChange,
       keySuggestions,
       valueSuggestions,
+      blacklistedTags,
       ...restProps
     },
     ref,
@@ -32,6 +33,7 @@ const KeyValuesField = React.forwardRef(
         onChange={onChange}
         keySuggestions={keySuggestions}
         valueSuggestions={valueSuggestions}
+        blacklistedTags={blacklistedTags}
       />
       {errorMessage && <FormHelperText>{errorMessage}</FormHelperText>}
     </FormControl>
@@ -43,6 +45,7 @@ KeyValuesField.propTypes = {
   label: PropTypes.string,
   onChange: PropTypes.func,
   initialValue: PropTypes.arrayOf(EntryShape),
+  blacklistedTags: PropTypes.arrayOf(PropTypes.string),
 }
 
 export default compose(

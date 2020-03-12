@@ -93,7 +93,7 @@ const newEntry = () => ({ id: uuid.v4(), key: '', value: '' })
 // filter it out before submitting. :(
 const addId = (entry) => ({ ...entry, id: uuid.v4() })
 
-const KeyValues = ({ entries: _entries, onChange, keySuggestions, valueSuggestions }) => {
+const KeyValues = ({ entries: _entries, onChange, keySuggestions, valueSuggestions, blacklistedTags }) => {
   const classes = useStyles()
   const entriesWithId = [...(_entries || []).map(addId), newEntry()]
   const [entries, setEntries] = useState(entriesWithId)
@@ -110,9 +110,11 @@ const KeyValues = ({ entries: _entries, onChange, keySuggestions, valueSuggestio
     onChange && onChange(sanitized)
   }, [entries])
 
+  const filteredEntries = entries.filter(entry => !blacklistedTags.includes(entry.key))
+
   return (
     <div className={classes.root}>
-      {entries.map((entry) => (
+      {filteredEntries.map((entry) => (
         <KeyValue
           key={entry.id}
           keySuggestions={keySuggestions}
@@ -139,6 +141,7 @@ KeyValues.propTypes = {
   valueSuggestions: PropTypes.arrayOf(PropTypes.string),
   entries: PropTypes.arrayOf(EntryShape),
   onChange: PropTypes.func,
+  blacklistedTags: PropTypes.arrayOf(PropTypes.string),
 }
 
 export default KeyValues
