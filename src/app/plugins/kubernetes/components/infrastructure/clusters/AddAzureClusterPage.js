@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import FormWrapper from 'core/components/FormWrapper'
 import AzureAvailabilityZoneChooser from './AzureAvailabilityZoneChooser'
 import AzureClusterReviewTable from './AzureClusterReviewTable'
@@ -33,6 +33,7 @@ import { makeStyles } from '@material-ui/styles'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import { routes } from 'core/utils/routes'
 import Alert from 'core/components/Alert'
+import { trackEvent } from 'utils/tracking'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
@@ -44,6 +45,54 @@ const useStyles = makeStyles((theme) => ({
     display: 'grid',
   },
 }))
+
+const configOnNext = (context) => {
+  trackEvent('WZ New Azure Cluster 1 Master Nodes', {
+    wizard_step: 'Cluster Configuration',
+    wizard_state: 'In-Progress',
+    wizard_progress: '1 of 4',
+    wizard_name: 'Add New Azure Cluster',
+    cluster_name: context.name,
+    cluster_region: context.location,
+    cluster_template: context.template,
+    allow_workloads_on_master: context.allowWorkloadsOnMaster,
+    master_nodes: context.numMasters,
+    worker_nodes: context.numWorkers,
+    master_sku: context.masterSku,
+    worker_sku: context.workerSku,
+  })
+}
+
+const networkOnNext = (context) => {
+  trackEvent('WZ New Azure Cluster 2 Networking Details', {
+    wizard_step: 'Network Info',
+    wizard_state: 'In-Progress',
+    wizard_progress: '2 of 4',
+    wizard_name: 'Add New Azure Cluster',
+    network_configuration: context.network,
+    network_backend: context.networkPlugin,
+  })
+}
+
+const advancedOnNext = (context) => {
+  trackEvent('WZ New Azure Cluster 3 Advanced Configuration', {
+    wizard_step: 'Advanced Configuration',
+    wizard_state: 'In-Progress',
+    wizard_progress: '3 of 4',
+    wizard_name: 'Add New Azure Cluster',
+    enable_etcd_backup: !!context.enableEtcdBackup,
+    enable_monitoring: !!context.prometheusMonitoringEnabled,
+  })
+}
+
+const reviewOnNext = (context) => {
+  trackEvent('WZ New Azure Cluster 4 Review', {
+    wizard_step: 'Review',
+    wizard_state: 'Finished',
+    wizard_progress: '4 of 4',
+    wizard_name: 'Add New Azure Cluster',
+  })
+}
 
 const initialContext = {
   template: 'small',
@@ -143,6 +192,16 @@ const AddAzureClusterPage = () => {
   const classes = useStyles()
   const { params, getParamsUpdater } = useParams()
   const { history } = useReactRouter()
+
+  useEffect(() => {
+    trackEvent('WZ New Azure Cluster 0 Started', {
+      wizard_step: 'Start',
+      wizard_state: 'Started',
+      wizard_progress: '0 of 4',
+      wizard_name: 'Add New Azure Cluster',
+    })
+  }, [])
+
   const onComplete = (_, { uuid }) => history.push(routes.cluster.nodeHealth.path({ id: uuid }))
   const [createAzureClusterAction, creatingAzureCluster] = useDataUpdater(
     clusterActions.create,
@@ -172,7 +231,7 @@ const AddAzureClusterPage = () => {
         {({ wizardContext, setWizardContext, onNext }) => {
           return (
             <>
-              <WizardStep stepId="config" label="Cluster Configuration">
+              <WizardStep stepId="config" label="Cluster Configuration" onNext={configOnNext}>
                 {loading ? null : hasAzureProvider ? (
                   <ValidatedForm
                     initialValues={wizardContext}
@@ -197,7 +256,7 @@ const AddAzureClusterPage = () => {
                           required
                         />
 
-                        {/* AWS Region */}
+                        {/* Azure Region */}
                         <PicklistField
                           DropdownComponent={CloudProviderRegionPicklist}
                           disabled={!params.cloudProviderId}
@@ -207,7 +266,7 @@ const AddAzureClusterPage = () => {
                           onChange={getParamsUpdater('cloudProviderRegionId')}
                           info="Region "
                           value={params.cloudProviderRegionId}
-                          type="aws"
+                          type="azure"
                           required
                         />
 
@@ -231,7 +290,6 @@ const AddAzureClusterPage = () => {
                             setFieldValue,
                             paramUpdater: getParamsUpdater('template'),
                           })}
-                          info="Set common options from one of the available templates"
                         />
 
                         {params.template !== 'custom' && (
@@ -337,7 +395,7 @@ const AddAzureClusterPage = () => {
                 )}
               </WizardStep>
 
-              <WizardStep stepId="network" label="Network Info">
+              <WizardStep stepId="network" label="Network Info" onNext={networkOnNext}>
                 <ValidatedForm
                   initialValues={wizardContext}
                   onSubmit={setWizardContext}
@@ -461,7 +519,7 @@ const AddAzureClusterPage = () => {
                 </ValidatedForm>
               </WizardStep>
 
-              <WizardStep stepId="advanced" label="Advanced Configuration">
+              <WizardStep stepId="advanced" label="Advanced Configuration" onNext={advancedOnNext}>
                 <ValidatedForm
                   initialValues={wizardContext}
                   onSubmit={setWizardContext}
@@ -543,7 +601,7 @@ const AddAzureClusterPage = () => {
                 </ValidatedForm>
               </WizardStep>
 
-              <WizardStep stepId="review" label="Review">
+              <WizardStep stepId="review" label="Review" onNext={reviewOnNext}>
                 <ValidatedForm
                   initialValues={wizardContext}
                   onSubmit={setWizardContext}
