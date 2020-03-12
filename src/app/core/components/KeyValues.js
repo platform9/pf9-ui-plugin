@@ -7,7 +7,6 @@ import uuid from 'uuid'
 import { assoc } from 'ramda'
 import { makeStyles } from '@material-ui/styles'
 import { Button } from '@material-ui/core'
-import clsx from 'clsx'
 
 const useKeyValueStyles = makeStyles((theme) => ({
   root: {
@@ -28,9 +27,6 @@ const useKeyValueStyles = makeStyles((theme) => ({
   deleteButton: {
     flexGrow: 0,
     padding: 0,
-  },
-  hidden: {
-    display: 'none',
   },
 }))
 
