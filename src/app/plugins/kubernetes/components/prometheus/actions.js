@@ -24,7 +24,7 @@ const isMonitoringTask = (task = {}) => task.pkg_id === monitoringTask && task.t
 const getMostRecentTask = (prev, curr) => (prev.task_id > curr.task_id ? prev : curr)
 export const hasPrometheusEnabled = (cluster) => {
   if (!cluster) return false
-  const installedMonitoringTask = cluster.tasks
+  const installedMonitoringTask = (cluster.tasks || [])
     .filter(isMonitoringTask)
     .reduce(getMostRecentTask, {})
 
