@@ -55,6 +55,7 @@ const configOnNext = (context) => {
     cluster_region: context.region,
     cluster_azs: context.azs,
     cluster_template: context.template,
+    allow_workloads_on_master: context.allowWorkloadsOnMaster,
     master_nodes: context.numMasters,
     worker_nodes: context.numWorkers,
     master_flavor: context.masterFlavor,
@@ -476,7 +477,6 @@ const AddAwsClusterPage = () => {
                             setFieldValue,
                             paramUpdater: getParamsUpdater('template'),
                           })}
-                          info="Set common options from one of the available templates"
                         />
 
                         {params.template === 'custom' && (
