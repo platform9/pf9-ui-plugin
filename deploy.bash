@@ -2,7 +2,7 @@
 
 set -eo pipefail
 
-if [ "${TEAMCITY_BUILD_BRANCH}" != "master" ]; then
+if [ "${TEAMCITY_BUILD_BRANCH}" != "<default>" ]; then
     echo "INFO: Skipping $(basename $0) for branch ${TEAMCITY_BUILD_BRANCH}"
     exit 0
 fi
