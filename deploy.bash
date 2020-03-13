@@ -2,6 +2,11 @@
 
 set -eo pipefail
 
+if [ "${TEAMCITY_BUILD_BRANCH}" != "<default>" ]; then
+    echo "INFO: Skipping $(basename $0) for branch ${TEAMCITY_BUILD_BRANCH}"
+    exit 0
+fi
+
 if [ -z "${TARGET_DUS}" ]; then
     echo "ERROR: Please set env var TARGET_DUS where UI app contents should be deployed. Example: 'ui-dev.platform9.horse,ui-stage.pf9.io'" >&2
     exit 1
@@ -23,10 +28,9 @@ pushd ${WORKSPACE}/pf9-ui-plugin/build
     IFS=,
     for du in ${TARGET_DUS}; do
         echo "INFO: Starting to update DU ${du}"
-        grep ${du} ~/.ssh/known_hosts > /dev/null || ssh-keyscan -t rsa ${du} >> ~/.ssh/known_hosts
         # TODO: Need a dedicated login to target DU that can modify files owned by root
-        scp /tmp/ui.tgz centos@${du}:/tmp/ui.tgz
-        ssh -t centos@${du} "cd /opt/pf9/www/public; sudo tar xvzpf /tmp/ui.tgz && \rm /tmp/ui.tgz"
+        scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no /tmp/ui.tgz centos@${du}:/tmp/ui.tgz
+        ssh -t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no centos@${du} "cd /opt/pf9/www/public; sudo tar xvzpf /tmp/ui.tgz && \rm /tmp/ui.tgz"
         echo "INFO: Update completed for DU ${du}"
     done
     IFS=${OLD_IFS}
