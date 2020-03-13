@@ -44,6 +44,13 @@ const useStyles = makeStyles((theme) => ({
   inline: {
     display: 'grid',
   },
+  availability: {
+    maxWidth: '50%',
+    margin: theme.spacing(1.5, 0),
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'stretch',
+  },
 }))
 
 const configOnNext = (context) => {
@@ -321,12 +328,14 @@ const AddAzureClusterPage = () => {
 
                             {/* Azure Availability Zone */}
                             {!params.cloudProviderRegionId || values.useAllAvailabilityZones || (
-                              <AzureAvailabilityZoneChooser
-                                id="zones"
-                                info="Select from the Availability Zones for the specified region"
-                                onChange={(value) => setWizardContext({ zones: value })}
-                                required
-                              />
+                              <div className={classes.availability}>
+                                <AzureAvailabilityZoneChooser
+                                  id="zones"
+                                  info="Select from the Availability Zones for the specified region"
+                                  onChange={(value) => setWizardContext({ zones: value })}
+                                  required
+                                />
+                              </div>
                             )}
 
                             {/* Num master nodes */}
