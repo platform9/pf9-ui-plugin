@@ -124,7 +124,7 @@ const canScaleMasters = ([cluster]) =>
   cluster.cloudProviderType === 'local' &&
   (cluster.nodes || []).length > 1
 const canScaleWorkers = ([cluster]) => cluster.taskStatus === 'success'
-const canUpgradeCluster = (selected) => false
+const canUpgradeCluster = ([cluster]) => !!(cluster && cluster.canUpgrade)
 const canDeleteCluster = ([row]) => !['creating', 'deleting'].includes(row.taskStatus)
 
 const isAdmin = (selected, getContext) => {
