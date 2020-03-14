@@ -2,7 +2,7 @@ import React from 'react'
 import InfoPanel from 'core/components/InfoPanel'
 
 import useReactRouter from 'use-react-router'
-import { Grid, Typography } from '@material-ui/core'
+import { Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
@@ -193,6 +193,11 @@ const useStyles = makeStyles<Theme>((theme) => ({
   link: {
     color: theme.palette.primary.light,
   },
+  detailContainer: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, minmax(300px, max-content))',
+    gridGap: theme.spacing(2),
+  },
 }))
 
 const ClusterInfo = () => {
@@ -204,14 +209,10 @@ const ClusterInfo = () => {
   const overview = overviewStats(cluster)
 
   return (
-    <Grid container spacing={4} className={classes.root}>
-      <Grid item xs={6}>
-        <InfoPanel title="Overview" items={overview} />
-      </Grid>
-      <Grid item xs={6}>
-        {renderCloudInfo(cluster)}
-      </Grid>
-    </Grid>
+    <div className={classes.detailContainer}>
+      <InfoPanel title="Overview" items={overview} />
+      {renderCloudInfo(cluster)}
+    </div>
   )
 }
 

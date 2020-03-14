@@ -46,9 +46,12 @@ const useStyles = makeStyles((theme: Theme) => ({
   rowHeader: {
     display: 'flex',
     justifyContent: 'flex-end',
+    whiteSpace: 'nowrap',
   },
   rowValue: {
     marginLeft: theme.spacing(0.5),
+    wordBreak: 'break-all',
+    maxWidth: 400,
   },
   card: {
     marginRight: theme.spacing(2),
