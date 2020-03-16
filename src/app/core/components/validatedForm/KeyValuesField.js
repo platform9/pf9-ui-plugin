@@ -21,7 +21,7 @@ const KeyValuesField = React.forwardRef(
       onChange,
       keySuggestions,
       valueSuggestions,
-      blacklistedTags,
+      blacklistedTags = [],
       ...restProps
     },
     ref,
