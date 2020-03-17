@@ -58,10 +58,10 @@ const getKubernetesVersion = async (clusterId) => {
   }
 }
 
-const getEtcdBackupPayload = (data) =>
-  pathStrOr(0, 'etcdBackup.isEtcdBackupEnabled', data)
+const getEtcdBackupPayload = (path, data) =>
+  pathStrOr(0, path, data)
     ? {
-        ...data.etcdBackup,
+        storageType: 'local',
         isEtcdBackupEnabled: 1,
         storageProperties: {
           localPath: data.etcdStoragePath,
@@ -239,7 +239,7 @@ const createGenericCluster = async (body, data, loadFromContext) => {
 
   // This is currently supported by all cloud providers except GCP (which we
   // don't have yet anyways)
-  body.etcdBackup = getEtcdBackupPayload(data)
+  body.etcdBackup = getEtcdBackupPayload('etcdBackup', data)
 
   const tags = data.prometheusMonitoringEnabled ? [defaultMonitoringTag] : []
   body.tags = keyValueArrToObj(tags.concat(data.tags))
@@ -365,7 +365,7 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
 
     // This is currently supported by all cloud providers except GCP (which we
     // don't have yet anyways)
-    body.etcdBackup = getEtcdBackupPayload(params)
+    body.etcdBackup = getEtcdBackupPayload('etcdBackup', params)
 
     await qbert.updateCluster(uuid, body)
     // Doing this will help update the table, but the cache remains incorrect...
