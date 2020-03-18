@@ -74,6 +74,9 @@ const useStyles = makeStyles<Theme, {}>((theme) => ({
   paneBody: {
     padding: theme.spacing(2),
   },
+  table: {
+    height: 'min-content',
+  },
   tablePolling: {
     gridColumn: 3,
   },
@@ -173,6 +176,7 @@ export const NodeHealthWithTasksToggler: FC = () => {
     paneHeaderTitle,
     paneHeaderStatus,
     paneBody,
+    table,
     tableChooser,
     tablePolling,
     linkSpacer,
@@ -221,7 +225,7 @@ export const NodeHealthWithTasksToggler: FC = () => {
           refreshDuration={oneSecond * 10}
         />
       </div>
-      <Table>
+      <Table className={table}>
         <TableHead>
           <TableRow>
             <TableCell padding="checkbox" />
