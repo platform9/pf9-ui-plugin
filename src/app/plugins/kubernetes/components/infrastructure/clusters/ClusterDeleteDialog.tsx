@@ -31,9 +31,13 @@ const ClusterDeleteDialog: React.FC<IClusterDeleteDialog> = ({ rows: [cluster], 
     false && success && cluster?.nodes?.length > 0 ? setShowDeauthNodeDialog(true) : onClose(),
   )
   const title = `Permanently delete cluster "${cluster?.name}"?`
-  const handleDelete = useCallback(async () => {
-    await deleteCluster(cluster)
-  }, [cluster])
+  const handleDelete = useCallback(
+    (e) => {
+      e && e.preventDefault()
+      deleteCluster(cluster)
+    },
+    [cluster],
+  )
 
   if (showDeauthNodeDialog) return <DeauthNodeDialog nodeList={cluster.nodes} onClose={onClose} />
 
