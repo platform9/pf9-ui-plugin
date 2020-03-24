@@ -1,10 +1,9 @@
-import React, { useEffect, useContext } from 'react'
+import React, { useEffect, useState } from 'react'
 import ApiClient from 'api-client/ApiClient'
-import { AppContext } from 'core/providers/AppProvider'
-import { usePreferences, useScopedPreferences } from 'core/providers/PreferencesProvider'
+import { useScopedPreferences } from 'core/providers/PreferencesProvider'
 import { setStorage, getStorage } from 'core/utils/pf9Storage'
 import { loadUserTenants } from 'openstack/components/tenants/actions'
-import { head, path, pathOr, propEq, isEmpty, isNil } from 'ramda'
+import { head, path, pathOr, propEq, isEmpty, prop } from 'ramda'
 import AuthenticatedContainer from 'core/containers/AuthenticatedContainer'
 import { trackPage } from 'utils/tracking'
 import useReactRouter from 'use-react-router'
@@ -27,6 +26,12 @@ import Progress from 'core/components/progress/Progress'
 import { getCookieValue } from 'utils/misc'
 import moment from 'moment'
 import { useToast } from 'core/providers/ToastProvider'
+import { useSelector, useDispatch } from 'react-redux'
+import { sessionStoreKey, sessionActions } from 'core/session/sessionReducers'
+import { CustomWindow } from 'app/polyfills/window'
+import { MessageTypes } from 'core/components/notifications/model'
+
+declare let window: CustomWindow
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -40,21 +45,15 @@ const useStyles = makeStyles((theme) => ({
  * Otherwise shows the <LoginPage>
  */
 const AppContainer = () => {
-  const classes = useStyles()
+  const classes = useStyles({})
   const { keystone, setActiveRegion } = ApiClient.getInstance()
   const { history } = useReactRouter()
   const showToast = useToast()
-  const [, initUserPreferences] = usePreferences()
-  const { updatePrefs } = useScopedPreferences('Tenants')
-  const {
-    initialized,
-    initSession,
-    session,
-    appLoaded,
-    destroySession,
-    getContext,
-    setContext,
-  } = useContext(AppContext)
+  const { prefs, updatePrefs } = useScopedPreferences('Tenants')
+  const [sessionChecked, setSessionChecked] = useState(false)
+  const [appInitialized, setAppInitialized] = useState(false)
+  const session = useSelector(prop(sessionStoreKey))
+  const dispatch = useDispatch()
 
   useEffect(() => {
     const unlisten = history.listen((location, action) => {
@@ -65,7 +64,6 @@ const AppContainer = () => {
     trackPage(`${history.location.pathname}${history.location.hash}`)
 
     restoreSession()
-
     return unlisten
   }, [])
 
@@ -76,14 +74,15 @@ const AppContainer = () => {
         const { expiresAt } = session
         const sessionExpired = moment().isAfter(expiresAt)
         if (sessionExpired) {
-          destroySession()
-          showToast('The session has expired, please log in again', 'warning')
+          dispatch(sessionActions.destroySession())
+          showToast('The session has expired, please log in again', MessageTypes.warning)
           clearInterval(id)
         }
       }, 1000)
       // Reset the interval if the session changes
       return () => clearInterval(id)
     }
+    return null
   }, [session])
 
   const restoreSession = async () => {
@@ -103,10 +102,8 @@ const AppContainer = () => {
         history.push(loginUrl)
         return
       }
-      const success = await setupSession({ username, unscopedToken, expiresAt, issuedAt })
-      if (success) {
-        history.push(dashboardUrl)
-      }
+      await setupSession({ username, unscopedToken, expiresAt, issuedAt })
+      history.push(dashboardUrl)
       return
     }
     // Attempt to restore the session
@@ -116,19 +113,12 @@ const AppContainer = () => {
     const currUnscopedToken = tokens && tokens.unscopedToken
     if (username && currUnscopedToken) {
       // We need to make sure the token has not expired.
-      const response = await keystone.renewToken(currUnscopedToken)
-
-      if (isNil(response)) {
-        return history.push(loginUrl)
-      }
-
-      const { unscopedToken, expiresAt, issuedAt } = response
-
+      const { unscopedToken, expiresAt, issuedAt } = await keystone.renewToken(currUnscopedToken)
       if (unscopedToken && user) {
         return setupSession({ username, unscopedToken, expiresAt, issuedAt })
       }
     }
-    await setContext({ appLoaded: true })
+    setSessionChecked(true)
 
     // Allow the following paths to load as entry point when user is not logged in
     if (history.location.pathname === forgotPasswordUrl) return
@@ -147,10 +137,9 @@ const AppContainer = () => {
 
   // Handler that gets invoked on successful authentication
   const setupSession = async ({ username, unscopedToken, expiresAt, issuedAt }) => {
-    await setContext({
-      appLoaded: true,
-      initialized: false,
-    })
+    if (!sessionChecked) {
+      setSessionChecked(true)
+    }
 
     const timeDiff = moment(expiresAt).diff(issuedAt)
     const localExpiresAt = moment()
@@ -158,29 +147,24 @@ const AppContainer = () => {
       .format()
 
     try {
-      // Set up the scopedToken
-      await initSession(unscopedToken, username, localExpiresAt)
-      // The order matters, we need the session to be able to init the user preferences
-      const userPreferences = await initUserPreferences(username)
+      const lastTenant = pathOr('service', ['Tenants', 'lastTenant', 'name'], prefs)
+      const lastRegion = path(['RegionChooser', 'lastRegion', 'id'], prefs)
 
-      const lastTenant = pathOr('service', ['Tenants', 'lastTenant', 'name'], userPreferences)
-      const lastRegion = path(['RegionChooser', 'lastRegion', 'id'], userPreferences)
-
-      const tenants = await loadUserTenants({ getContext, setContext })
+      const tenants = await loadUserTenants()
       if (isNilOrEmpty(tenants)) {
         throw new Error('No tenants found, please contact support')
       }
       const activeTenant = tenants.find(propEq('name', lastTenant)) || head(tenants)
+
       if (lastRegion) {
         setActiveRegion(lastRegion)
       }
-
       const { scopedToken, user, role } = await keystone.changeProjectScope(activeTenant.id)
       await keystone.resetCookie()
-      /* eslint-disable */
+
       // Identify the user in Segment using Keystone ID
-      if (typeof analytics !== 'undefined') {
-        analytics.identify(user.id, {
+      if (typeof window.analytics !== 'undefined') {
+        window.analytics.identify(user.id, {
           email: user.name,
         })
       }
@@ -191,23 +175,31 @@ const AppContainer = () => {
       setStorage('user', user)
       setStorage('tokens', { unscopedToken, currentToken: scopedToken })
 
-      await setContext({
-        initialized: true,
-        currentTenant: activeTenant,
-        userDetails: { ...user, role },
-      })
+      dispatch(
+        sessionActions.initSession({
+          unscopedToken,
+          username,
+          expiresAt: localExpiresAt,
+          currentTenant: activeTenant,
+          userDetails: { ...user, role },
+        }),
+      )
+
+      if (!appInitialized) {
+        setAppInitialized(true)
+      }
     } catch (err) {
-      await setContext({
-        appLoaded: false,
-        initialized: false,
-      })
-      showToast(`There has been an error initializing the session.\n${err.message}`, 'error')
+      setAppInitialized(false)
+      showToast(
+        `There has been an error initializing the session.\n${err.message}`,
+        MessageTypes.error,
+      )
       return false
     }
     return true
   }
 
-  const loadingMessage = appLoaded ? 'Initializing session...' : 'Loading app...'
+  const loadingMessage = sessionChecked ? 'Initializing session...' : 'Loading app...'
 
   const authContent = isNilOrEmpty(session) ? (
     <Redirect to={loginUrl} />
@@ -226,7 +218,7 @@ const AppContainer = () => {
           <LoginPage onAuthSuccess={setupSession} />
         </Route>
         <Route>
-          {appLoaded && initialized ? (
+          {sessionChecked && appInitialized ? (
             authContent
           ) : (
             <Progress renderLoadingImage={false} loading message={loadingMessage} />

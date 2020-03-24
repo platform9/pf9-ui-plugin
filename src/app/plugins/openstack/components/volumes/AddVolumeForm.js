@@ -12,7 +12,7 @@ import DataLoader from 'core/DataLoader'
 import React from 'react'
 import { loadImages } from '../images/actions'
 import ImageChooser from '../images/ImageChooser.js'
-import { loadVolumes, loadVolumeSnapshots, loadVolumeTypes } from './actions'
+import { volumeActions, volumeTypeActions, volumeSnapshotActions } from './actions'
 import VolumeChooser from './VolumeChooser'
 import VolumeSnapshotChooser from './VolumeSnapshotChooser'
 
@@ -82,7 +82,7 @@ class AddVolumeForm extends React.PureComponent {
                     onSubmit={setWizardContext}
                     triggerSubmit={onNext}
                   >
-                    <DataLoader loaders={{ volumeSnapshots: loadVolumeSnapshots }}>
+                    <DataLoader loaders={{ volumeSnapshots: volumeSnapshotActions.list }}>
                       {({ data }) => (
                         <VolumeSnapshotChooser
                           data={data.volumeSnapshots}
@@ -99,7 +99,7 @@ class AddVolumeForm extends React.PureComponent {
                     onSubmit={setWizardContext}
                     triggerSubmit={onNext}
                   >
-                    <DataLoader loaders={{ volumes: loadVolumes }}>
+                    <DataLoader loaders={{ volumes: volumeActions.list }}>
                       {({ data }) => (
                         <VolumeChooser
                           data={data.volumes}
@@ -130,7 +130,7 @@ class AddVolumeForm extends React.PureComponent {
               </WizardStep>
 
               <WizardStep stepId="basic" label="Basic">
-                <DataLoader loaders={{ volumeTypes: loadVolumeTypes }}>
+                <DataLoader loaders={{ volumeTypes: volumeTypeActions.list }}>
                   {({ data }) => (
                     <ValidatedForm
                       initialValues={wizardContext}

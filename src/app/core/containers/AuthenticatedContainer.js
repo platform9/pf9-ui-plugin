@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import ApiClient from 'api-client/ApiClient'
 import {
@@ -13,17 +14,17 @@ import Intercom from 'core/components/integrations/Intercom'
 import Navbar, { drawerWidth } from 'core/components/Navbar'
 import Toolbar from 'core/components/Toolbar'
 import useToggler from 'core/hooks/useToggler'
-import { AppContext } from 'core/providers/AppProvider'
 import LogoutPage from 'core/public/LogoutPage'
 import pluginManager from 'core/utils/pluginManager'
 import DeveloperToolsEmbed from 'developer/components/DeveloperToolsEmbed'
 import moize from 'moize'
-import { apply, toPairs } from 'ramda'
-import React, { useContext, useEffect, useState } from 'react'
+import { toPairs, apply, prop } from 'ramda'
 import { Redirect, Route, Switch } from 'react-router'
 import useReactRouter from 'use-react-router'
 import { emptyObj, ensureArray, isNilOrEmpty } from 'utils/fp'
 import { pathJoin } from 'utils/misc'
+import { sessionStoreKey } from 'core/session/sessionReducers'
+import { useSelector } from 'react-redux'
 import PushEventsProvider from '../providers/PushEventsProvider'
 
 const { keystone } = ApiClient.getInstance()
@@ -177,10 +178,7 @@ const loadRegionFeatures = async (setRegionFeatures, history) => {
 const AuthenticatedContainer = () => {
   const [drawerOpen, toggleDrawer] = useToggler(true)
   const [regionFeatures, setRegionFeatures] = useState(emptyObj)
-  const {
-    userDetails: { role },
-    currentRegion,
-  } = useContext(AppContext)
+  const { userDetails: { role }, currentRegion } = useSelector(prop(sessionStoreKey))
   const { history } = useReactRouter()
   const classes = useStyles({ path: history.location.pathname })
 

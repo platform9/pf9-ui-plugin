@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import DownloadKubeConfigLink from './DownloadKubeConfigLink'
 // import KubeCLI from './KubeCLI' // commented out till we support cli links
 import ExternalLink from 'core/components/ExternalLink'
@@ -12,8 +12,7 @@ import {
 } from 'k8s/components/infrastructure/clusters/ClusterStatus'
 import ResourceUsageTable from 'k8s/components/infrastructure/common/ResourceUsageTable'
 import CreateButton from 'core/components/buttons/CreateButton'
-import { AppContext } from 'core/providers/AppProvider'
-import { both, path, omit } from 'ramda'
+import { both, path, omit, prop } from 'ramda'
 import PrometheusAddonDialog from 'k8s/components/prometheus/PrometheusAddonDialog'
 import ClusterUpgradeDialog from 'k8s/components/infrastructure/clusters/ClusterUpgradeDialog'
 import ClusterDeleteDialog from './ClusterDeleteDialog'
@@ -23,6 +22,8 @@ import { isAdminRole } from 'k8s/util/helpers'
 import { routes } from 'core/utils/routes'
 import CodeBlock from 'core/components/CodeBlock'
 import DateCell from 'core/components/listTable/cells/DateCell'
+import { sessionStoreKey } from 'core/session/sessionReducers'
+import { useSelector } from 'react-redux'
 
 const useStyles = makeStyles((theme) => ({
   links: {
@@ -127,16 +128,17 @@ const canScaleWorkers = ([cluster]) => cluster.taskStatus === 'success'
 const canUpgradeCluster = ([cluster]) => !!(cluster && cluster.canUpgrade)
 const canDeleteCluster = ([row]) => !['creating', 'deleting'].includes(row.taskStatus)
 
-const isAdmin = (selected, getContext) => {
-  return isAdminRole(getContext)
+const isAdmin = (selected, store) => {
+  return isAdminRole(prop('session', store))
 }
 
 export const options = {
   addUrl: routes.cluster.add.path(),
   addButton: ({ onClick }) => {
+    const session = useSelector(prop(sessionStoreKey))
     const {
       userDetails: { role },
-    } = useContext(AppContext)
+    } = session
     if (role !== 'admin') {
       return null
     }

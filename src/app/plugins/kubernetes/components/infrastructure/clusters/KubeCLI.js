@@ -2,7 +2,6 @@ import React, { forwardRef } from 'react'
 import PropTypes from 'prop-types'
 import ApiClient from 'api-client/ApiClient'
 import { compose } from 'ramda'
-import { withAppContext } from 'core/providers/AppProvider'
 import { AppBar, Dialog, IconButton, Slide, Toolbar, Typography } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import CloseIcon from '@material-ui/icons/Close'
@@ -73,4 +72,6 @@ KubeCLI.propTypes = {
   cluster: PropTypes.object.isRequired,
 }
 
-export default compose(withAppContext, withStyles(styles))(KubeCLI)
+export default compose(
+  withStyles(styles),
+)(KubeCLI)

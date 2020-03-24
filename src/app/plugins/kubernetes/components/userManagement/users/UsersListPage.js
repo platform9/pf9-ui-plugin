@@ -19,6 +19,7 @@ const ListPage = ({ ListContainer }) => {
     const [showingSystemUsers, toggleSystemUsers] = useToggler()
     const { params, getParamsUpdater } = usePrefParams(defaultParams)
     const [data, loading, reload] = useDataLoader(mngmUserActions.list, params)
+
     const filteredRows = useMemo(
       () => data.filter((user) => showingSystemUsers || !isSystemUser(user)),
       [data, showingSystemUsers],

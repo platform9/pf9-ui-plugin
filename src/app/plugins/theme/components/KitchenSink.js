@@ -6,7 +6,6 @@ import TabsExample from './examples/TabsExample'
 import TablesExample from './examples/TablesExample'
 import WizardExample from './examples/WizardExample'
 import TypographyExample from './examples/TypographyExample'
-import { withAppContext } from 'core/providers/AppProvider'
 
 const KitchenSink = ({ theme }) => (
   <div>
@@ -23,4 +22,4 @@ const KitchenSink = ({ theme }) => (
   </div>
 )
 
-export default withAppContext(KitchenSink)
+export default KitchenSink

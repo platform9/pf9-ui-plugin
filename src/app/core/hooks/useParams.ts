@@ -1,10 +1,11 @@
-import { useMemo, useCallback, useReducer, useEffect, useContext, Reducer } from 'react'
+import { useMemo, useCallback, useReducer, useEffect, Reducer } from 'react'
 import moize from 'moize'
-import { isEmpty, pick, zipObj, Dictionary } from 'ramda'
+import { useSelector } from 'react-redux'
+import { prop, isEmpty, pick, zipObj, Dictionary } from 'ramda'
 import { useScopedPreferences } from 'core/providers/PreferencesProvider'
-import { AppContext } from 'core/providers/AppProvider'
+import { sessionStoreKey } from 'core/session/sessionReducers'
 
-type ValueOf<T> = T[keyof T]
+type ValueOf<T> = T[keyof T];
 
 interface ParamsReducerAction<T> {
   type: 'merge' | 'replace'
@@ -13,18 +14,16 @@ interface ParamsReducerAction<T> {
 
 type ParamsReducer<T> = Reducer<T, ParamsReducerAction<T>>
 
-const paramsReducer: <T>(state: T, { type, payload }: ParamsReducerAction<T>) => T = <T>(
-  state: T,
-  { type, payload },
-) => {
-  switch (type) {
-    case 'merge':
-      return { ...state, ...payload }
-    case 'replace':
-    default:
-      return payload
+const paramsReducer: <T>(state: T, { type, payload }: ParamsReducerAction<T>) => T =
+  <T>(state: T, { type, payload }) => {
+    switch (type) {
+      case 'merge':
+        return { ...state, ...payload }
+      case 'replace':
+      default:
+        return payload
+    }
   }
-}
 
 interface UseParamsReturnType<T> {
   params: Partial<T>
@@ -46,35 +45,29 @@ interface UseParamsReturnType<T> {
  *   return <Picklist onChange={clusterId => updateParams({ clusterId })}
  */
 const useParams = <T extends Dictionary<any>>(defaultParams?: T): UseParamsReturnType<T> => {
-  const [params, dispatch] = useReducer<ParamsReducer<Partial<T>>>(
-    paramsReducer,
-    defaultParams || {},
-  )
+  const [params, dispatch] = useReducer<ParamsReducer<Partial<T>>>(paramsReducer, defaultParams || {})
   const getParamsUpdater = useMemo(() => {
-    return moize((...keys: Array<Extract<keyof T, string>>) => (...values: Array<ValueOf<T>>) =>
-      dispatch({
+    return moize((...keys: Array<Extract<keyof T, string>>) =>
+      (...values: Array<ValueOf<T>>) => dispatch({
         // FIXME: zipObj return types are too loose so we are forced to use a type cast here
-        type: 'merge',
-        payload: zipObj<ValueOf<T>>(keys, values) as Partial<T>,
+        type: 'merge', payload: zipObj<ValueOf<T>>(keys, values) as Partial<T>
       }),
     )
   }, [])
 
   const updateParams = useCallback((value: Partial<T>): void => {
     dispatch({
-      type: 'merge',
-      payload: value,
+      type: 'merge', payload: value
     })
   }, [])
 
   const setParams = useCallback((value: T) => {
     dispatch({
-      type: 'replace',
-      payload: value,
+      type: 'replace', payload: value
     })
   }, [])
 
-  const { currentTenant, currentRegion } = useContext(AppContext)
+  const { currentTenant, currentRegion } = useSelector(prop(sessionStoreKey))
   // Reset the params when the tenant or the region are changed
   useEffect(() => {
     dispatch({ type: 'replace', payload: defaultParams || {} })
@@ -92,37 +85,31 @@ export const createUsePrefParamsHook = (storeKey: string, userPrefKeys: string[]
   return <T extends Dictionary<any>>(defaultParams?: T): UseParamsReturnType<T> => {
     const defaultPrefs = pick(userPrefKeys, defaultParams || {})
     const { prefs, updatePrefs } = useScopedPreferences(storeKey, defaultPrefs)
-    const { params, setParams: setParamsBase, updateParams: updateParamsBase } = useParams<T>({
-      ...(defaultParams || {}),
-      ...prefs,
-    })
+    const { params, setParams: setParamsBase, updateParams: updateParamsBase } = useParams<T>({ ...defaultParams || {}, ...prefs })
     const updateParams = useCallback(
-      async (newParams) => {
+      async newParams => {
         const newPrefs = pick(userPrefKeys, newParams)
         if (!isEmpty(newPrefs)) {
           await updatePrefs(newPrefs)
         }
         updateParamsBase(newParams)
       },
-      [params],
-    )
+      [params])
 
     const setParams = useCallback(
-      async (newParams) => {
+      async newParams => {
         const newPrefs = pick(userPrefKeys, newParams)
         if (!isEmpty(newPrefs)) {
           await updatePrefs(newPrefs)
         }
         setParamsBase(newParams)
       },
-      [params],
-    )
+      [params])
 
     const getParamsUpdater = useMemo(() => {
       return moize((...keys: Array<Extract<keyof T, string>>) =>
         // FIXME: zipObj return types are too loose so we are forced to use a type cast here
-        (...values: Array<ValueOf<T>>) =>
-          updateParamsBase(zipObj<ValueOf<T>>(keys, values) as Partial<T>),
+        (...values: Array<ValueOf<T>>) => updateParamsBase(zipObj<ValueOf<T>>(keys, values) as Partial<T>),
       )
     }, [updateParamsBase])
 
