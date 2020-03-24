@@ -20,17 +20,22 @@ const getQbertEndpoint = async () => {
 export const loadAlerts = createContextLoader(
   alertsCacheKey,
   async ({ clusterId }, loadFromContext) => {
-    const clusters = await loadFromContext(clustersCacheKey, { healthyClusters: true, prometheusClusters: true })
+    const clusters = await loadFromContext(clustersCacheKey, {
+      healthyClusters: true,
+      prometheusClusters: true,
+    })
     if (clusterId === allKey) {
-      const all = await someAsync(pluck('uuid', clusters).map(qbert.getPrometheusAlerts)).then(flatten)
-      return all
+      return someAsync(pluck('uuid', clusters).map(qbert.getPrometheusAlerts)).then(flatten)
     }
 
-    return await qbert.getPrometheusAlerts(clusterId)
+    return qbert.getPrometheusAlerts(clusterId)
   },
   {
     dataMapper: async (items, params, loadFromContext) => {
-      const clusters = await loadFromContext(clustersCacheKey, { healthyClusters: true, prometheusClusters: true })
+      const clusters = await loadFromContext(clustersCacheKey, {
+        healthyClusters: true,
+        prometheusClusters: true,
+      })
       const host = await getQbertEndpoint()
       return items.map((item) => ({
         ...item,
@@ -70,7 +75,12 @@ const timestampSteps = {
 const getTimestamps = (startTime, period) => {
   const momentObj = moment.unix(startTime)
   const momentArgs = timestampSteps[period]
-  return [momentObj.unix(), ...Array(6).fill().map(() => momentObj.add(...momentArgs).unix())]
+  return [
+    momentObj.unix(),
+    ...Array(6)
+      .fill()
+      .map(() => momentObj.add(...momentArgs).unix()),
+  ]
 }
 
 const getSeverityCounts = (alertData, timestamps) => {
@@ -86,9 +96,9 @@ const getSeverityCounts = (alertData, timestamps) => {
   }, {})
 
   // Strip out warning, critical, and fatal alerts for chart
-  const importantAlerts = alertData.filter((alert) => (
-    ['warning', 'critical', 'fatal'].includes(alert.metric.severity)
-  ))
+  const importantAlerts = alertData.filter((alert) =>
+    ['warning', 'critical', 'fatal'].includes(alert.metric.severity),
+  )
 
   // Add count to template
   const severityCountsByTimestamp = importantAlerts.reduce((accum, current) => {
@@ -114,7 +124,10 @@ export const loadTimeSeriesAlerts = createContextLoader(
 
     const timeNow = moment().unix()
     const [number, period] = chartTime.split('.')
-    const timePast = moment.unix(timeNow).subtract(number, period).unix()
+    const timePast = moment
+      .unix(timeNow)
+      .subtract(number, period)
+      .unix()
     const step = timestampSteps[chartTime].join('')
 
     // Still need to calculate this manually as well because there
@@ -123,29 +136,35 @@ export const loadTimeSeriesAlerts = createContextLoader(
     // Use unix timestamp to match the prometheus API
     const timestamps = getTimestamps(timePast, chartTime)
 
-    const clusters = await loadFromContext(clustersCacheKey, { healthyClusters: true, prometheusClusters: true })
+    const clusters = await loadFromContext(clustersCacheKey, {
+      healthyClusters: true,
+      prometheusClusters: true,
+    })
     if (chartClusterId === allKey) {
-      const all = await someAsync(pluck('uuid', clusters).map((cluster) => (
-        qbert.getPrometheusAlertsOverTime(cluster, timePast, timeNow, step)
-      ))).then(flatten)
+      const all = await someAsync(
+        pluck('uuid', clusters).map((cluster) =>
+          qbert.getPrometheusAlertsOverTime(cluster, timePast, timeNow, step),
+        ),
+      ).then(flatten)
       const severityCounts = getSeverityCounts(all, timestamps)
-      return timestamps.map((timestamp) => (
-        {
-          time: moment.unix(timestamp).format('h:mm A'),
-          ...severityCounts[timestamp],
-        }
-      ))
-    }
-
-    const response = await qbert.getPrometheusAlertsOverTime(chartClusterId, timePast, timeNow, step)
-    const severityCounts = getSeverityCounts(response, timestamps)
-    return timestamps.map((timestamp) => (
-      {
-        timestamp,
+      return timestamps.map((timestamp) => ({
         time: moment.unix(timestamp).format('h:mm A'),
         ...severityCounts[timestamp],
-      }
-    ))
+      }))
+    }
+
+    const response = await qbert.getPrometheusAlertsOverTime(
+      chartClusterId,
+      timePast,
+      timeNow,
+      step,
+    )
+    const severityCounts = getSeverityCounts(response, timestamps)
+    return timestamps.map((timestamp) => ({
+      timestamp,
+      time: moment.unix(timestamp).format('h:mm A'),
+      ...severityCounts[timestamp],
+    }))
   },
   {
     entityName: 'AlertTimeSeries',

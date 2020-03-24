@@ -1,11 +1,13 @@
-import React, { FC, useContext } from 'react'
+import React, { FC } from 'react'
 import { Typography, Paper } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import CodeBlock from 'core/components/CodeBlock'
 import Theme from 'core/themes/model'
 import CopyToClipboard from 'core/components/CopyToClipboard'
-import { AppContext } from 'core/providers/AppProvider'
 import { hexToRGBA } from 'core/utils/colorHelpers'
+import { sessionStoreKey } from 'core/session/sessionReducers'
+import { prop } from 'ramda'
+import { useSelector } from 'react-redux'
 
 const useStyles = makeStyles((theme: Theme) => ({
   paper: {
@@ -64,7 +66,7 @@ export const DownloadCliOnboardNodeWalkthrough = (): JSX.Element => (
 
 const DownloadCliWalkthrough = (): JSX.Element => {
   const classes = useStyles({})
-  const { session } = useContext(AppContext)
+  const session = useSelector(prop(sessionStoreKey))
   return (
     <Paper className={classes.paper} elevation={0}>
       <Typography variant="h6">

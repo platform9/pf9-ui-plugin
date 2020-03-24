@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import useReactRouter from 'use-react-router'
 import { makeStyles } from '@material-ui/styles'
 import {
@@ -15,7 +15,7 @@ import ListItemIcon from '@material-ui/core/ListItemIcon'
 import CheckIcon from '@material-ui/icons/Check'
 import ClearIcon from '@material-ui/icons/Clear'
 import ListItemText from '@material-ui/core/ListItemText'
-import { propSatisfies, isNil } from 'ramda'
+import { propSatisfies, isNil, prop } from 'ramda'
 import useParams from 'core/hooks/useParams'
 import Progress from 'core/components/progress/Progress'
 import TextField from 'core/components/validatedForm/TextField'
@@ -23,7 +23,6 @@ import Alert from 'core/components/Alert'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import CancelButton from 'core/components/buttons/CancelButton'
 import SubmitButton from 'core/components/buttons/SubmitButton'
-import { AppContext } from 'core/providers/AppProvider'
 import { logoutUrl } from 'app/constants.js'
 import { useToast } from 'core/providers/ToastProvider'
 import Visibility from '@material-ui/icons/Visibility'
@@ -40,6 +39,8 @@ import {
   matchFieldValidator,
 } from 'core/utils/fieldValidators'
 import actions from './actions'
+import { sessionStoreKey } from 'core/session/sessionReducers'
+import { useSelector } from 'react-redux'
 
 const useStyles = makeStyles((theme) => ({
   alertContainer: {
@@ -119,7 +120,7 @@ const ChangePasswordModal = (props) => {
   const { history } = useReactRouter()
   const {
     userDetails: { userId },
-  } = useContext(AppContext)
+  } = useSelector(prop(sessionStoreKey))
   const showToast = useToast()
 
   const togglePasswordMask = (key) => () => {

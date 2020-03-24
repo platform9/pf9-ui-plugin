@@ -1,6 +1,6 @@
 import createContextLoader from 'core/helpers/createContextLoader'
 import createCRUDActions from 'core/helpers/createCRUDActions'
-import { pluck, propSatisfies, propEq, pick } from 'ramda'
+import { pluck, propSatisfies, propEq } from 'ramda'
 import { capitalizeString } from 'utils/misc'
 import calcUsageTotalByPath from 'k8s/util/calcUsageTotals'
 import { pathStrOr } from 'utils/fp'

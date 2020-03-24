@@ -4,7 +4,7 @@ import { pathStrOr } from 'utils/fp'
 import ExternalLink from 'core/components/ExternalLink'
 import ProgressBar from 'core/components/progress/ProgressBar'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { pathOr, pipe, pick, path } from 'ramda'
+import { pathOr, pipe, pick, path, prop } from 'ramda'
 import { castBoolToStr, castFuzzyBool, columnPathLookup } from 'utils/misc'
 import SimpleLink from 'core/components/SimpleLink'
 import { loadNodes, nodesCacheKey } from 'k8s/components/infrastructure/nodes/actions'
@@ -268,8 +268,8 @@ export const columns = [
   { id: 'assignedRoles', label: 'Assigned Roles', render: renderRoles },
 ]
 
-const isAdmin = (selected, getContext) => {
-  return isAdminRole(getContext)
+const isAdmin = (selected, store) => {
+  return isAdminRole(prop('session', store))
 }
 
 export const options = {

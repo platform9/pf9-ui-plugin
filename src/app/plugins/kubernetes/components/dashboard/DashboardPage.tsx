@@ -1,7 +1,6 @@
 // libs
-import React, { useContext, useMemo, useCallback } from 'react'
+import React, { useMemo, useCallback } from 'react'
 import { makeStyles } from '@material-ui/styles'
-import { AppContext } from 'core/providers/AppProvider'
 // Constants
 import { allKey } from 'app/constants'
 // Actions
@@ -28,6 +27,9 @@ import { isAdminRole } from 'k8s/util/helpers'
 import { routes } from 'core/utils/routes'
 import { CloudProviders } from '../infrastructure/cloudProviders/model'
 import Theme from 'core/themes/model'
+import { prop } from 'ramda'
+import { sessionStoreKey } from 'core/session/sessionReducers'
+import { useSelector } from 'react-redux'
 
 export interface IStatusCardWithFilterProps extends StatusCardProps {
   permissions: string[]
@@ -258,9 +260,7 @@ const reports = [
 ]
 
 const reportsWithPerms = (reports) => {
-  const {
-    userDetails: { role },
-  } = useContext(AppContext)
+  const { userDetails: { role } } = useSelector(prop(sessionStoreKey))
   return reports.map((report) => {
     // No permissions property means no restrictions
     if (!report.permissions) {
@@ -288,8 +288,8 @@ const DashboardPage = () => {
   const forceUpdate = useCallback(() => updateState({}), [])
 
   const classes = useStyles({})
-  const { getContext, session } = useContext(AppContext)
-  const isAdmin = isAdminRole(getContext)
+  const session = useSelector(prop(sessionStoreKey))
+  const isAdmin = isAdminRole(session)
   const username = capitalizeString(normalizeUsername(session.username))
   const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
   const [pods, loadingPods] = useDataLoader(podActions.list)

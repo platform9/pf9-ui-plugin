@@ -6,14 +6,12 @@ import TimePicklist from './TimePicklist'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { loadAlerts, loadTimeSeriesAlerts, alertsCacheKey } from './actions'
 import { createUsePrefParamsHook } from 'core/hooks/useParams'
-import { listTablePrefs } from 'app/constants'
+import { listTablePrefs, allKey } from 'app/constants'
 import { pick } from 'ramda'
-import { allKey } from 'app/constants'
 import PageContainer from 'core/components/pageContainer/PageContainer'
 import Tabs from 'core/components/tabs/Tabs'
 import Tab from 'core/components/tabs/Tab'
 import StackedAreaChart from 'core/components/graphs/StackedAreaChart'
-import moment from 'moment'
 import { makeStyles } from '@material-ui/styles'
 import DateCell from 'core/components/listTable/cells/DateCell'
 import Loading from 'core/components/Loading'
@@ -52,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
   moveLeft: {
     position: 'relative',
     right: '15px',
-  }
+  },
 }))
 
 const chartKeys = [
@@ -62,12 +60,12 @@ const chartKeys = [
   },
   {
     name: 'critical',
-    color: 'warning.main'
+    color: 'warning.main',
   },
   {
     name: 'fatal',
-    color: 'error.main'
-  }
+    color: 'error.main',
+  },
 ]
 
 const chartTimeDisplay = {
@@ -93,15 +91,12 @@ const ListPage = ({ ListContainer }) => {
     const [data, loading, reload] = useDataLoader(loadAlerts, params)
     // Provide specific param properties to timeSeries data loader
     // so that it doesn't reload unless those props are changed
-    const [
-      timeSeriesData,
-      timeSeriesLoading,
-      timeSeriesReload
-    ] = useDataLoader(loadTimeSeriesAlerts,
+    const [timeSeriesData, timeSeriesLoading, timeSeriesReload] = useDataLoader(
+      loadTimeSeriesAlerts,
       {
         chartTime: params.chartTime,
-        chartClusterId: params.chartClusterId
-      }
+        chartClusterId: params.chartClusterId,
+      },
     )
     const filteredAlerts = data.filter((alert) => {
       return [allKey, alert.severity].includes(params.severity)
@@ -113,13 +108,12 @@ const ListPage = ({ ListContainer }) => {
           <Tab value="alert" label="Alarm Overview">
             <div className={classes.header}>
               <div className={classes.chartHeader}>
-                <div className={classes.chartLabel}>Alarms Past {chartTimeDisplay[params.chartTime]}</div>
+                <div className={classes.chartLabel}>
+                  Alarms Past {chartTimeDisplay[params.chartTime]}
+                </div>
                 <div className={classes.chartFilters}>
                   <div className={classes.chartRefresh}>
-                    <Loading
-                      loading={timeSeriesLoading}
-                      onClick={timeSeriesReload}
-                    />
+                    <Loading loading={timeSeriesLoading} onClick={timeSeriesReload} />
                   </div>
                   <div className={classes.clusterPicker}>
                     <ClusterPicklist
@@ -143,7 +137,7 @@ const ListPage = ({ ListContainer }) => {
                   values={timeSeriesData}
                   keys={chartKeys}
                   xAxis="time"
-                  responsive={true}
+                  responsive
                 />
               </div>
             </div>
@@ -183,20 +177,23 @@ export const options = {
   columns: [
     { id: 'name', label: 'Name' },
     { id: 'severity', label: 'Severity' },
-    { id: 'activeAt', label: 'Time', render: (value) => {
-        return value ? (
-          <DateCell value={value} />
-        ) : (
-          <div>N/A</div>
-        )
-      }
+    {
+      id: 'activeAt',
+      label: 'Time',
+      render: (value) => {
+        return value ? <DateCell value={value} /> : <div>N/A</div>
+      },
     },
     { id: 'summary', label: 'Rule Summary' },
     { id: 'status', label: 'Status' },
     {
       id: 'grafanaLink',
       label: 'Open in Grafana',
-      render: (link) => <ExternalLink className="no-wrap-text" icon="chart-line" url={link}>Grafana</ExternalLink>
+      render: (link) => (
+        <ExternalLink className="no-wrap-text" icon="chart-line" url={link}>
+          Grafana
+        </ExternalLink>
+      ),
     },
     { id: 'clusterName', label: 'Cluster' },
   ],

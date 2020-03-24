@@ -1,7 +1,6 @@
 import React, { PureComponent } from 'react'
 import ExternalLink from 'core/components/ExternalLink'
 import { compose, propOr } from 'ramda'
-import { withAppContext } from 'core/providers/AppProvider'
 import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab'
 import {
   Button,
@@ -19,6 +18,8 @@ import withDataLoader from 'core/hocs/withDataLoader'
 import withDataMapper from 'core/hocs/withDataMapper'
 import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
 import { cloudProviderActions } from 'k8s/components/infrastructure/cloudProviders/actions'
+import { cacheStoreKey } from 'core/caching/cacheReducers'
+import { connect } from 'react-redux'
 import { gettingStartedHelpLink } from 'k8s/links'
 
 // The modal is technically inside the row, so clicking anything inside
@@ -32,6 +33,7 @@ const stopPropagation = (e) => {
   e.stopPropagation()
 }
 
+@connect(store => ({ cache: store[cacheStoreKey] }))
 class ClusterAttachNodeDialog extends PureComponent {
   state = {}
 
@@ -40,18 +42,14 @@ class ClusterAttachNodeDialog extends PureComponent {
   }
 
   handleSubmit = async () => {
-    const { row, getContext, setContext } = this.props
+    const { row } = this.props
 
     const nodes = Object.keys(this.state)
       .filter((uuid) => this.state[uuid] !== 'unassigned')
       .map((uuid) => ({ uuid, isMaster: this.state[uuid] === 'master' }))
 
     const clusterUuid = row.uuid
-    await cloudProviderActions.attachNodesToCluster({
-      getContext,
-      setContext,
-      params: { clusterUuid, nodes },
-    })
+    await cloudProviderActions.attachNodesToCluster({ clusterUuid, nodes })
     this.handleClose()
   }
 
@@ -118,7 +116,6 @@ class ClusterAttachNodeDialog extends PureComponent {
 }
 
 export default compose(
-  withAppContext,
   withDataLoader({ nodes: loadNodes }),
   withDataMapper({ nodes: propOr([], 'nodes') }),
 )(ClusterAttachNodeDialog)

@@ -1,25 +1,27 @@
-import React, { useState, useContext, useCallback, useMemo } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
 import ApiClient from 'api-client/ApiClient'
-import { AppContext } from 'core/providers/AppProvider'
-import { emptyArr } from 'app/utils/fp'
 import Selector from 'core/components/Selector'
 import { useScopedPreferences } from 'core/providers/PreferencesProvider'
-import { propEq, pipe, assoc, propOr } from 'ramda'
+import { propEq, propOr, prop } from 'ramda'
 import { Tooltip } from '@material-ui/core'
 import useDataLoader from 'core/hooks/useDataLoader'
-import { dataCacheKey, paramsCacheKey } from 'core/helpers/createContextLoader'
 import { loadUserTenants } from 'openstack/components/tenants/actions'
 import { getStorage, setStorage } from 'core/utils/pf9Storage'
+import { useSelector, useDispatch } from 'react-redux'
+import { cacheActions } from 'core/caching/cacheReducers'
+import { sessionActions, sessionStoreKey } from 'core/session/sessionReducers'
 
 const TenantChooser = (props) => {
   const { keystone } = ApiClient.getInstance()
   const { updatePrefs } = useScopedPreferences('Tenants')
   const [tenantSearch, setTenantSearch] = useState('')
   const [loading, setLoading] = useState(false)
-  const { setContext, currentTenant } = useContext(AppContext)
+  const session = useSelector(prop(sessionStoreKey))
+  const { currentTenant } = session
   const [currentTenantName, setCurrentTenantName] = useState(propOr('', 'name', currentTenant))
   const [tooltipOpen, setTooltipOpen] = useState(false)
   const [tenants, loadingTenants] = useDataLoader(loadUserTenants)
+  const dispatch = useDispatch()
 
   const updateCurrentTenant = async (tenantName) => {
     setLoading(true)
@@ -34,20 +36,13 @@ const TenantChooser = (props) => {
     // Update localStorage scopedToken upon changing project scope
     const existingTokens = getStorage('tokens')
     setStorage('tokens', { ...existingTokens, currentToken: scopedToken })
+    dispatch(sessionActions.updateSession({
+      currentTenant: tenant,
+      userDetails: { ...user, role },
+    }))
+    // Clearing the cache will cause all the current loaders to reload its data
+    dispatch(cacheActions.clearCache())
 
-    // Clear any data that should change when the user changes tenant.
-    // The data will then be reloaded when it is needed.
-    await setContext(
-      pipe(
-        // Reset all the data cache
-        assoc(dataCacheKey, emptyArr),
-        assoc(paramsCacheKey, emptyArr),
-        // Changing the currentTenant will cause all the current active `useDataLoader`
-        // hooks to reload its data
-        assoc('currentTenant', tenant),
-        assoc('userDetails', { ...user, role }),
-      ),
-    )
     setLoading(false)
   }
 
