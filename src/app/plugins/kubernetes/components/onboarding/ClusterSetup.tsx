@@ -57,7 +57,6 @@ const ClusterSetup = ({ onComplete, initialPanel = Panels.Cluster }: Props) => {
   const [clusters, loading] = useDataLoader(clusterActions.list)
   const hasMonitoring = clustersHaveMonitoring(clusters)
   const hasAccess = clustersHaveAccess()
-
   const [activePanels, setActivePanels] = useState(new Set([initialPanel]))
 
   const handleCreateCluster = useCallback(() => {
