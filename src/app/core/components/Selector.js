@@ -100,6 +100,7 @@ Selector.propTypes = {
   list: PropTypes.array.isRequired,
   classes: PropTypes.object,
   onChoose: PropTypes.func.isRequired,
+  onSearchChange: PropTypes.func.isRequired,
 }
 
 export default withProgress(Selector, {

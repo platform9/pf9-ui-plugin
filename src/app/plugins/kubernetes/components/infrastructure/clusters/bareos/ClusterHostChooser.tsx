@@ -85,7 +85,7 @@ const renderStats = (usage, className) => {
 
 // TODO: is forwardRef actually needed here?
 const ClusterHostChooser: React.ComponentType<Props> = forwardRef<HTMLElement, Props>(
-  (props, ref) => {
+  (props, ref: React.Ref<HTMLDivElement>) => {
     const {
       filterFn = identity,
       onChange,
@@ -123,11 +123,11 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef<HTMLElement, P
 
     // TODO: The <Table> logic should be abstracted in a <TableChooser> that supports both multiple and single.
     return (
-      <div className={tableContainer}>
+      <div ref={ref} className={tableContainer}>
         {pollForNodes && (
           <PollingData loading={loading} onReload={loadMore} pause={!pollForNodes} />
         )}
-        <Table ref={ref} className={table}>
+        <Table className={table}>
           <TableHead>
             <TableRow>
               <TableCell>

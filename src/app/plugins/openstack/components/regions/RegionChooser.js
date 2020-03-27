@@ -36,20 +36,22 @@ const RegionChooser = (props) => {
       return lastRegion.id
     }
     return pipe(head, prop('id'))(regions)
-  }, [regions, lastRegion, selectedRegion])
+  }, [regions, lastRegion, selectedRegion, regions])
+  const handleRegionSelect = useCallback(
+    async (region) => {
+      const [currentSection = appUrlRoot] = currentSectionRegex.exec(pathname + hash) || []
+      setLoading(true)
+      setRegion(region)
+      setActiveRegion(region)
+      await keystone.resetCookie()
 
-  const handleRegionSelect = useCallback(async region => {
-    const [currentSection = appUrlRoot] = currentSectionRegex.exec(pathname + hash) || []
-    setLoading(true)
-    setRegion(region)
-    setActiveRegion(region)
-    await keystone.resetCookie()
-
-    dispatch(sessionActions.updateSession({
-      currentRegion: region,
-    }))
-    // Clearing the cache will cause all the current loaders to reload its data
-    dispatch(cacheActions.clearCache())
+      dispatch(
+        sessionActions.updateSession({
+          currentRegion: region,
+        }),
+      )
+      // Clearing the cache will cause all the current loaders to reload its data
+      dispatch(cacheActions.clearCache())
 
       // Redirect to the root of the current section (there's no need to reload all the app)
       history.push(currentSection)
@@ -70,6 +72,7 @@ const RegionChooser = (props) => {
     }
     const lastRegion = regions.find(propEq('id', curRegionId))
     updatePrefs({ lastRegion })
+    setActiveRegion(curRegionId)
   }, [curRegionId, regions])
 
   return (

@@ -1,23 +1,23 @@
-import React, { useContext, useCallback, PureComponent, useMemo } from 'react'
+import React, { useContext, PureComponent, useMemo } from 'react'
 import { connect } from 'react-redux'
 import moize from 'moize'
-import { curry, zipObj, mergeLeft } from 'ramda'
+import { curry, zipObj, assocPath } from 'ramda'
 import { getStorage, setStorage } from '../utils/pf9Storage'
 import { emptyObj } from 'utils/fp'
 import { sessionStoreKey, sessionActions } from 'core/session/sessionReducers'
 import { bindActionCreators } from 'redux'
 
-const userPreferencesKey = username => `user-preferences-${username}`
+const userPreferencesKey = (username) => `user-preferences-${username}`
 const setUserPrefs = (username, prefs) => setStorage(userPreferencesKey(username), prefs)
-const getStorageUserPrefs = username => getStorage(userPreferencesKey(username)) || emptyObj
+const getStorageUserPrefs = (username) => getStorage(userPreferencesKey(username)) || emptyObj
 
 export const PreferencesContext = React.createContext({})
 export const { Consumer: PreferencesConsumer } = PreferencesContext
 export const { Provider: PreferencesProvider } = PreferencesContext
 
 @connect(
-  store => ({ session: store[sessionStoreKey] }),
-  dispatch => ({ actions: bindActionCreators(sessionActions, dispatch) }),
+  (store) => ({ session: store[sessionStoreKey] }),
+  (dispatch) => ({ actions: bindActionCreators(sessionActions, dispatch) }),
 )
 class PreferencesComponent extends PureComponent {
   state = {
@@ -38,14 +38,13 @@ class PreferencesComponent extends PureComponent {
         ...prefs,
         [scopeKey]: newPrefs,
       })
+      console.log(newPrefs)
       // Update state
-      this.setState(mergeLeft({
-        userPreferences: newPrefs,
-      }))
+      this.setState(assocPath(['userPreferences', scopeKey], newPrefs))
     }),
   }
 
-  static getDerivedStateFromProps (nextProps, prevState) {
+  static getDerivedStateFromProps(nextProps, prevState) {
     const { username } = nextProps.session
     if (username && username !== prevState.username) {
       return {
@@ -56,12 +55,8 @@ class PreferencesComponent extends PureComponent {
     return prevState
   }
 
-  render () {
-    return (
-      <PreferencesProvider value={this.state}>
-        {this.props.children}
-      </PreferencesProvider>
-    )
+  render() {
+    return <PreferencesProvider value={this.state}>{this.props.children}</PreferencesProvider>
   }
 }
 
@@ -78,14 +73,9 @@ export const usePreferences = () => {
  */
 export const useScopedPreferences = (storeKey, defaultPrefs = emptyObj) => {
   const { updateScopedPreferences, userPreferences } = useContext(PreferencesContext)
-  const updatePreferences = useCallback(async values => {
-    return updateScopedPreferences(storeKey, values)
-  }, [storeKey])
+  const updatePreferences = updateScopedPreferences(storeKey)
   const getPrefsUpdater = useMemo(() => {
-    return moize((...keys) =>
-      (...values) =>
-        updatePreferences(zipObj(keys, values)),
-    )
+    return moize((...keys) => (...values) => updatePreferences(zipObj(keys, values)))
   }, [updatePreferences])
 
   return {
@@ -95,26 +85,24 @@ export const useScopedPreferences = (storeKey, defaultPrefs = emptyObj) => {
   }
 }
 
-export const withPreferences = Component => props =>
+export const withPreferences = (Component) => (props) => (
   <PreferencesConsumer>
-    {
-      ({ userPreferences }) =>
-        <Component {...props} preferences={userPreferences} />
-    }
+    {({ userPreferences }) => <Component {...props} preferences={userPreferences} />}
   </PreferencesConsumer>
+)
 
-export const withScopedPreferences = storeKey => Component => {
-  return props =>
+export const withScopedPreferences = (storeKey) => (Component) => {
+  return (props) => (
     <PreferencesConsumer>
-      {
-        ({ updateScopedPreferences, userPreferences }) =>
-          <Component
-            {...props}
-            preferences={userPreferences[storeKey] || emptyObj}
-            updatePreferences={updateScopedPreferences(storeKey)}
-          />
-      }
+      {({ updateScopedPreferences, userPreferences }) => (
+        <Component
+          {...props}
+          preferences={userPreferences[storeKey] || emptyObj}
+          updatePreferences={updateScopedPreferences(storeKey)}
+        />
+      )}
     </PreferencesConsumer>
+  )
 }
 
 export default PreferencesComponent
