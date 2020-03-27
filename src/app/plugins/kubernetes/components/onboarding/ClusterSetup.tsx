@@ -116,7 +116,8 @@ const ClusterSetup = ({ onComplete, initialPanel = Panels.Cluster }: Props) => {
           summary="Create Your Cluster"
         >
           <Typography variant="body1">
-            Create your cluster on a laptop, virtual machine or a physical server
+            Create your first Kubernetes cluster on AWS, Azure or BareOS (Physical or Virtual
+            Machines)
           </Typography>
           <NextButton showForward={false} onClick={handleCreateCluster}>
             Create Cluster
