@@ -77,6 +77,7 @@ const ClusterSetup = ({ onComplete, initialPanel = Panels.Cluster }: Props) => {
     },
     [activePanels],
   )
+
   const handleSkipAccess = useCallback(() => {
     localStorage.setItem(onboardingAccessSetup, 'true')
     const panelsToKeep = new Set(activePanels)
