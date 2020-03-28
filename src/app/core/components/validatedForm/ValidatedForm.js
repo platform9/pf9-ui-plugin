@@ -8,6 +8,7 @@ import { pathEq, toPairs, path, lensPath, over, set, identity, dissocPath, pick 
 import { withRouter } from 'react-router-dom'
 import moize from 'moize'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
+import { withToast } from 'core/providers/ToastProvider'
 
 export const ValidatedFormContext = React.createContext({})
 
@@ -39,6 +40,7 @@ const styles = (theme) => ({
  * ValidatedForm is a HOC wrapper for forms.  The child components define the
  * data value schema and the validations.
  */
+@withToast
 @withRouter
 @withStyles(styles, { withTheme: true })
 class ValidatedForm extends PureComponent {
@@ -183,9 +185,10 @@ class ValidatedForm extends PureComponent {
     return !results.includes(false)
   }
 
-  handleSubmit = (event) => {
-    const { clearOnSubmit, onSubmit } = this.props
+  handleSubmit = async (event) => {
+    const { clearOnSubmit, onSubmit, afterSubmit, apiCalls, showToast } = this.props
     const { initialValues, values, fields, showingErrors } = this.state
+
     if (event) {
       event.preventDefault()
     }
@@ -196,9 +199,16 @@ class ValidatedForm extends PureComponent {
       return false
     }
 
+    if (apiCalls) {
+      const apiResponse = await apiCalls(values)
+      if (apiResponse !== true) {
+        return false
+      }
+    }
+
     if (onSubmit) {
       // Only send the values from the fields defined in the form
-      onSubmit(pick(Object.keys(fields), values))
+      onSubmit(pick(Object.keys(fields), values), afterSubmit)
     }
 
     if (clearOnSubmit) {
@@ -280,6 +290,10 @@ ValidatedForm.propTypes = {
 
   // Wrap the children within a FormFieldCard
   elevated: PropTypes.bool,
+
+  // This function will get called with context passed
+  // through as argument after onSubmit is called
+  afterSubmit: PropTypes.func,
 }
 
 ValidatedForm.defaultProps = {

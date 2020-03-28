@@ -187,15 +187,14 @@ const loadRegionFeatures = async (setRegionFeatures, setContext, history) => {
 
     setRegionFeatures({
       kubernetes: features.experimental.containervisor,
-      ironic: false, // Keep this false until ironic supported by the new UI
-      // ironic: features.experimental.ironic,
+      ironic: features.experimental.ironic,
       openstack: features.experimental.openstackEnabled,
       intercom: features.experimental.intercom,
     })
 
     redirectToAppropriateStack(
-      false, // Keep this false until ironic supported by the new UI
-      // features.experimental.ironic,
+      // false, // Keep this false until ironic supported by the new UI
+      features.experimental.ironic,
       features.experimental.containervisor,
       history,
     )

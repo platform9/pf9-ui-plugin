@@ -6,7 +6,7 @@ import Theme from 'core/themes/model'
 
 interface Props {
   copyText: string
-  children: any
+  children?: any
   inline?: boolean
   codeBlock?: boolean
   header?: string

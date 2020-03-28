@@ -5,6 +5,14 @@ export const networksCacheKey = 'networks'
 
 const { neutron } = ApiClient.getInstance()
 
+export const createNetwork = (body) => (
+  neutron.createNetwork(body)
+)
+
+export const deleteNetwork = (id) => (
+  neutron.deleteNetwork(id)
+)
+
 const networkActions = createCRUDActions(networksCacheKey, {
   listFn: async () => {
     return neutron.getNetworks()

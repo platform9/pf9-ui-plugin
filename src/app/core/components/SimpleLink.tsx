@@ -15,6 +15,7 @@ interface Props {
   icon?: string
   variant?: ISimpleLinkVariant
   onClick?: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void
+  download?: boolean
 }
 
 const useStyles = makeStyles<Theme, { variant: ISimpleLinkVariant }>((theme) => ({
@@ -32,7 +33,7 @@ const useStyles = makeStyles<Theme, { variant: ISimpleLinkVariant }>((theme) => 
 // work around this issue: https://github.com/ReactTraining/react-router/issues/4683
 // We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
 const SimpleLink: ComponentType<Props> = forwardRef<HTMLElement, Props>(
-  ({ onClick, src, children, staticContext, className, icon, variant, ...rest }, ref) => {
+  ({ onClick, src, children, staticContext, className, icon, variant, download, ...rest }, ref) => {
     const classes = useStyles({ variant })
     const { history } = useReactRouter()
     const handleClick = useCallback(
@@ -60,6 +61,7 @@ const SimpleLink: ComponentType<Props> = forwardRef<HTMLElement, Props>(
         ref={ref}
         href={src || null}
         onClick={handleClick}
+        download={download}
         {...rest}
       >
         {!!icon && <FontAwesomeIcon className={classes.icon}>{icon}</FontAwesomeIcon>}
