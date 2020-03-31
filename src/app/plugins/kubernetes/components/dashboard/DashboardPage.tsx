@@ -259,8 +259,7 @@ const reports = [
   nodeStatusCardProps,
 ]
 
-const reportsWithPerms = (reports) => {
-  const { userDetails: { role } } = useSelector(prop(sessionStoreKey))
+const reportsWithPerms = (reports, role) => {
   return reports.map((report) => {
     // No permissions property means no restrictions
     if (!report.permissions) {
@@ -286,7 +285,6 @@ const DashboardPage = () => {
   // need to be able to force update because states are captured in local storage :(
   const [, updateState] = React.useState()
   const forceUpdate = useCallback(() => updateState({}), [])
-
   const classes = useStyles({})
   const session = useSelector(prop(sessionStoreKey))
   const isAdmin = isAdminRole(session)
@@ -329,7 +327,7 @@ const DashboardPage = () => {
 
           {!showOnboarding && (
             <div className={classes.dashboardMosaic}>
-              {reportsWithPerms(reports).map((report) => (
+              {reportsWithPerms(reports, session.userDetails.role).map((report) => (
                 <StatusCard key={report.route} {...report} className={classes[report.entity]} />
               ))}
             </div>

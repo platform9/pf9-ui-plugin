@@ -1,8 +1,18 @@
 import React from 'react'
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from 'recharts'
+import {
+  AreaChart,
+  Area,
+  XAxis as XAxisT,
+  YAxis as YAxisT,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip as TooltipT,
+} from 'recharts'
 import { useTheme } from '@material-ui/core/styles'
 import { pathStr } from 'utils/fp'
-
+const XAxis: any = XAxisT
+const YAxis: any = YAxisT
+const Tooltip: any = TooltipT
 /*
   Usage:
   type IRequiredAreaChartTypes = 'warning' | 'critical' | 'fatal'
@@ -65,10 +75,7 @@ function StackedAreaChart<Axis extends string, Types extends string>({
 
   return responsive ? (
     <ResponsiveContainer width="100%" height={250}>
-      <AreaChart
-        data={values}
-        margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-      >
+      <AreaChart data={values} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey={xAxis} />
         <YAxis />

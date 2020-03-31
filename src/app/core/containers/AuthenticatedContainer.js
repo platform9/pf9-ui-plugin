@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import ApiClient from 'api-client/ApiClient'
 import {
-  clarityDashboardUrl,
+  // clarityDashboardUrl,
   dashboardUrl,
   helpUrl,
   ironicWizardUrl,
@@ -144,7 +144,7 @@ const redirectToAppropriateStack = (ironicEnabled, kubernetesEnabled, history) =
   // and standard openstack cases, but I don't want to do that yet for development.
   // In fact maybe just never do that for development build since old ui is not running.
   if (!ironicEnabled && !kubernetesEnabled) {
-    window.location = clarityDashboardUrl
+    // window.location = clarityDashboardUrl
   } else if (ironicEnabled && history.location.pathname.includes('kubernetes')) {
     history.push(ironicWizardUrl)
   } else if (!ironicEnabled && history.location.pathname.includes('ironic')) {
@@ -178,7 +178,10 @@ const loadRegionFeatures = async (setRegionFeatures, history) => {
 const AuthenticatedContainer = () => {
   const [drawerOpen, toggleDrawer] = useToggler(true)
   const [regionFeatures, setRegionFeatures] = useState(emptyObj)
-  const { userDetails: { role }, currentRegion } = useSelector(prop(sessionStoreKey))
+  const {
+    userDetails: { role },
+    currentRegion,
+  } = useSelector(prop(sessionStoreKey))
   const { history } = useReactRouter()
   const classes = useStyles({ path: history.location.pathname })
 
