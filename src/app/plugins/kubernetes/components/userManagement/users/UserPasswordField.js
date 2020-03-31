@@ -25,7 +25,7 @@ const CheckListItem = ({ children, checked }) => (
       {checked ? (
         <CheckIcon />
       ) : (
-        <ClearIcon data-testid="user-password-field-error" color="error" />
+        <ClearIcon data-test-id="user-password-field-error" color="error" />
       )}
     </ListItemIcon>
     <ListItemText primary={children} />
@@ -35,7 +35,7 @@ const CheckListItem = ({ children, checked }) => (
 const UserPasswordField = ({ value }) => (
   <>
     <TextField
-      data-testid="user-password-field"
+      data-test-id="user-password-field"
       id="password"
       label="Password"
       value={value}
@@ -46,28 +46,28 @@ const UserPasswordField = ({ value }) => (
       Password must contain the following:
       <List dense>
         <CheckListItem
-          data-testid="user-password-field-char-length"
+          data-test-id="user-password-field-char-length"
           checked={hasMinLength(8)(value)}
         >
           At least 8 characters long
         </CheckListItem>
         <CheckListItem
-          data-testid="user-password-field-lower-case-char"
+          data-test-id="user-password-field-lower-case-char"
           checked={hasOneLowerChar(value)}
         >
           1 Lowercase letter
         </CheckListItem>
         <CheckListItem
-          data-testid="user-password-field-upper-case-char"
+          data-test-id="user-password-field-upper-case-char"
           checked={hasOneUpperChar(value)}
         >
           1 Uppercase letter
         </CheckListItem>
-        <CheckListItem data-testid="user-password-field-number" checked={hasOneNumber(value)}>
+        <CheckListItem data-test-id="user-password-field-number" checked={hasOneNumber(value)}>
           1 Number
         </CheckListItem>
         <CheckListItem
-          data-testid="user-password-field-special-char"
+          data-test-id="user-password-field-special-char"
           checked={hasOneSpecialChar(value)}
         >
           1 Special character - {specialChars}

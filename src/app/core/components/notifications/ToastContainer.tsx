@@ -35,7 +35,7 @@ interface ToastContainerProps {
 const ToastContainer: FunctionComponent<ToastContainerProps> = ({ toasts, toastsTimeout }) => {
   const classes = useStyles({})
   return (
-    <div data-testid="toast-container" className={classes.root}>
+    <div data-test-id="toast-container" className={classes.root}>
       {toasts.map(({ id, isOpen, text, onClose, variant }) => (
         <Snackbar
           className={classes.toastItem}
@@ -48,7 +48,7 @@ const ToastContainer: FunctionComponent<ToastContainerProps> = ({ toasts, toasts
           autoHideDuration={toastsTimeout}
         >
           <ToastItem
-            data-testid="toast-item"
+            data-test-id="toast-item"
             onClose={onClose}
             variant={variant}
             message={text}

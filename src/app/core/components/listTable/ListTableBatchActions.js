@@ -88,7 +88,7 @@ const ListTableAction = withRouter(
             ) : (
               icon
             )}
-            <div data-testid={`list-table-batch-action-${label}`} className={actionLabel}>
+            <div data-test-id={`list-table-batch-action-${label}`} className={actionLabel}>
               {label}
             </div>
           </div>

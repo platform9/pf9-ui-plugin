@@ -127,7 +127,7 @@ export class LoginPage extends React.PureComponent {
       <Fragment>
         <TextField
           required
-          data-testid="login-email"
+          data-test-id="login-email"
           id="email"
           label="Email"
           placeholder="Email"
@@ -136,7 +136,7 @@ export class LoginPage extends React.PureComponent {
         />
         <TextField
           required
-          data-testid="login-password"
+          data-test-id="login-password"
           id="password"
           label="Password"
           className={classes.textField}
@@ -152,7 +152,7 @@ export class LoginPage extends React.PureComponent {
     return (
       <Fragment>
         <FormControlLabel
-          data-testid="login-mfa-checkbox"
+          data-test-id="login-mfa-checkbox"
           value="MFAcheckbox"
           className={classes.checkbox}
           control={
@@ -164,10 +164,10 @@ export class LoginPage extends React.PureComponent {
             />
           }
           label={
-            <div data-testid="login-mfa-info">
+            <div data-test-id="login-mfa-info">
               <span>I have a Multi-Factor Authentication (MFA) token. (</span>
               <ExternalLink
-                data-testid="login-mfa-info-url"
+                data-test-id="login-mfa-info-url"
                 url="https://platform9.com/support/setup-multi-factor-authentication-with-platform9/"
               >
                 more info
@@ -185,7 +185,7 @@ export class LoginPage extends React.PureComponent {
     return (
       <TextField
         required={this.state.MFAcheckbox}
-        data-testid="login-mfa-checkbox"
+        data-test-id="login-mfa-checkbox"
         id="MFA"
         label="MFA Code"
         className={classes.textField}
@@ -207,7 +207,7 @@ export class LoginPage extends React.PureComponent {
         >
           By signing in, you agree to our{' '}
           <ExternalLink
-            data-testid="login-terms-cond-url"
+            data-test-id="login-terms-cond-url"
             url="https://platform9.com/terms-conditions/"
           >
             Terms of Service
@@ -215,7 +215,7 @@ export class LoginPage extends React.PureComponent {
           .
         </Typography>
         <Typography
-          data-testid="login-copyright"
+          data-test-id="login-copyright"
           className={classes.paragraph}
           variant="caption"
           color="textSecondary"
@@ -236,7 +236,7 @@ export class LoginPage extends React.PureComponent {
           <Grid item md={4} lg={3}>
             <Paper className={classes.paper}>
               <img
-                data-testid="login-logo-img"
+                data-test-id="login-logo-img"
                 alt="Platform9"
                 src={pathJoin(imageUrlRoot, 'logo-color.png')}
                 className={classes.img}
@@ -250,7 +250,7 @@ export class LoginPage extends React.PureComponent {
                 {this.state.MFAcheckbox && this.renderMFAInput()}
                 {loginFailed && <Alert small variant="error" message="Login failed" />}
                 <Button
-                  data-testid="login-submit-btn"
+                  data-test-id="login-submit-btn"
                   type="submit"
                   disabled={loading}
                   className={classes.signinButton}
@@ -261,7 +261,7 @@ export class LoginPage extends React.PureComponent {
                 </Button>
                 <Typography className={classes.forgotPwd} gutterBottom>
                   <SimpleLink
-                    data-testid="login-forgot-password"
+                    data-test-id="login-forgot-password"
                     onClick={this.handleForgotPassword()}
                     src={forgotPasswordUrl}
                   >

@@ -19,8 +19,12 @@ describe('tenants', () => {
     })
 
     it('fills the name and description fields and move to next step', () => {
-      cy.get('input#name').clear().type('Tenant#Test')
-      cy.get('input#description').clear().type('Tenant#Test Description')
+      cy.get('input#name')
+        .clear()
+        .type('Tenant#Test')
+      cy.get('input#description')
+        .clear()
+        .type('Tenant#Test Description')
       cy.contains('button', 'Next').click()
       cy.contains('Select one or more users that should map to this Tenant')
     })
@@ -41,17 +45,24 @@ describe('tenants', () => {
     })
 
     it('updates the tenant name and description and move to next step', () => {
-      cy.get('input#name').clear().type('Tenant#Test *EDITED*')
-      cy.get('input#description').clear().type('Tenant#Test Description edited')
+      cy.get('input#name')
+        .clear()
+        .type('Tenant#Test *EDITED*')
+      cy.get('input#description')
+        .clear()
+        .type('Tenant#Test Description edited')
       cy.contains('button', 'Next').click()
       cy.contains('Which users can access this tenant?')
     })
 
     it('change selected users and roles and submit', () => {
       cy.contains('tr', 'Test user 5')
-        .find('.MuiCheckbox-root').click()
+        .find('.MuiCheckbox-root')
+        .click()
 
-      cy.contains('tr', 'Test user 7').find('.MuiSelect-root').click()
+      cy.contains('tr', 'Test user 7')
+        .find('.MuiSelect-root')
+        .click()
       cy.contains('li', 'admin').click()
 
       cy.contains('button', 'Complete').click()

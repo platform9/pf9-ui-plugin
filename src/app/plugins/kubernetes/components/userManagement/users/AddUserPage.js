@@ -57,18 +57,13 @@ const AddUserPage = () => {
     </>
   )
   return (
-    <FormWrapper
-      data-testid="add-user-page-container"
-      title="New User"
-      loading={submitting}
-      backUrl={listUrl}
-    >
+    <FormWrapper data-test-id="container" title="New User" loading={submitting} backUrl={listUrl}>
       <Wizard onComplete={handleAdd} context={initialContext}>
         {({ wizardContext, setWizardContext, onNext }) => (
           <>
             <WizardStep stepId="basic" label="Basic Info">
               <ValidatedForm
-                data-testid="add-user-page-basic-info-form"
+                data-test-id="basic-info-form"
                 title="Basic Info"
                 initialValues={wizardContext}
                 onSubmit={setWizardContext}
@@ -77,16 +72,12 @@ const AddUserPage = () => {
                 {({ values }) => (
                   <>
                     <TextField
-                      data-testid="add-user-page-basic-info-user-name"
+                      data-test-id="user-name"
                       id="username"
                       label="Username or Email"
                       required
                     />
-                    <TextField
-                      data-testid="add-user-page-basic-info-display-name"
-                      id="displayname"
-                      label="Display Name"
-                    />
+                    <TextField data-test-id="display-name" id="displayname" label="Display Name" />
                     <FormControl component="fieldset">
                       <FormLabel component="legend">
                         <p>Activate User Account</p>
@@ -98,24 +89,14 @@ const AddUserPage = () => {
                         {
                           <FormControlLabel
                             value="activationByEmail"
-                            control={
-                              <Radio
-                                data-testid="add-user-page-basic-info-activation-by-email"
-                                color="primary"
-                              />
-                            }
+                            control={<Radio data-test-id="activation-by-email" color="primary" />}
                             label={activationByEmailLabel}
                           />
                         }
                         <br />
                         <FormControlLabel
                           value="createPassword"
-                          control={
-                            <Radio
-                              data-testid="add-user-page-basic-info-activation-by-password"
-                              color="primary"
-                            />
-                          }
+                          control={<Radio data-test-id="activation-by-password" color="primary" />}
                           label={createUserPasswordLabel}
                         />
                       </RadioGroup>

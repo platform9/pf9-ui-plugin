@@ -69,11 +69,20 @@ describe('clusters', () => {
       })
 
       it('only allows attaching for "local" cloudProviders', () => {
-        cy.row('mockOpenStackCluster').rowAction().contains('Attach node').isDisabled()
+        cy.row('mockOpenStackCluster')
+          .rowAction()
+          .contains('Attach node')
+          .isDisabled()
         cy.closeModal()
-        cy.row('mockAwsCluster').rowAction().contains('Attach node').isDisabled()
+        cy.row('mockAwsCluster')
+          .rowAction()
+          .contains('Attach node')
+          .isDisabled()
         cy.closeModal()
-        cy.row('fakeCluster1').rowAction().contains('Attach node').isEnabled()
+        cy.row('fakeCluster1')
+          .rowAction()
+          .contains('Attach node')
+          .isEnabled()
         cy.closeModal()
       })
     })
@@ -81,23 +90,34 @@ describe('clusters', () => {
     context('detach node', () => {
       it('only allows detaching for "local" cloudProviders', () => {
         cy.visit('/ui/kubernetes/infrastructure')
-        cy.row('mockOpenStackCluster').rowAction().contains('Detach node').isDisabled()
+        cy.row('mockOpenStackCluster')
+          .rowAction()
+          .contains('Detach node')
+          .isDisabled()
         cy.closeModal()
-        cy.row('mockAwsCluster').rowAction().contains('Detach node').isDisabled()
+        cy.row('mockAwsCluster')
+          .rowAction()
+          .contains('Detach node')
+          .isDisabled()
         cy.closeModal()
-        cy.row('fakeCluster1').rowAction().contains('Detach node').isEnabled()
+        cy.row('fakeCluster1')
+          .rowAction()
+          .contains('Detach node')
+          .isEnabled()
         cy.closeModal()
       })
 
       it('show the modal for detaching nodes from the cluster', () => {
         cy.visit('/ui/kubernetes/infrastructure')
-        cy.row('fakeCluster1')
-          .rowAction('Detach node')
+        cy.row('fakeCluster1').rowAction('Detach node')
         cy.contains('Detach node from cluster')
       })
 
       it('detaches a node', () => {
-        cy.get('div[role=dialog]').contains('tr', 'fakeNode1').contains('Detach').click()
+        cy.get('div[role=dialog]')
+          .contains('tr', 'fakeNode1')
+          .contains('Detach')
+          .click()
       })
 
       it('closes the modal on detach', () => {
@@ -106,15 +126,13 @@ describe('clusters', () => {
       })
 
       it('should show "No nodes available to detach" (context updated)', () => {
-        cy.row('fakeCluster1')
-          .rowAction('Detach node')
+        cy.row('fakeCluster1').rowAction('Detach node')
         cy.contains('No nodes available to detach')
       })
 
       it('still shows the node as detached after a page reload (backend data updated)', () => {
         cy.visit('/ui/kubernetes/infrastructure')
-        cy.row('fakeCluster1')
-          .rowAction('Detach node')
+        cy.row('fakeCluster1').rowAction('Detach node')
         cy.contains('No nodes available to detach')
       })
 
@@ -127,22 +145,32 @@ describe('clusters', () => {
     context('scale cluster', () => {
       it('only allows scaling for "AWS" cloudProviders', () => {
         cy.visit('/ui/kubernetes/infrastructure')
-        cy.row('mockOpenStackCluster').rowAction().contains('Scale cluster').isDisabled()
+        cy.row('mockOpenStackCluster')
+          .rowAction()
+          .contains('Scale cluster')
+          .isDisabled()
         cy.closeModal()
-        cy.row('mockAwsCluster').rowAction().contains('Scale cluster').isEnabled()
+        cy.row('mockAwsCluster')
+          .rowAction()
+          .contains('Scale cluster')
+          .isEnabled()
         cy.closeModal()
-        cy.row('fakeCluster1').rowAction().contains('Scale cluster').isDisabled()
+        cy.row('fakeCluster1')
+          .rowAction()
+          .contains('Scale cluster')
+          .isDisabled()
         cy.closeModal()
       })
 
       it('show the modal for scaling the cluster', () => {
-        cy.row('mockAwsCluster')
-          .rowAction('Scale cluster')
+        cy.row('mockAwsCluster').rowAction('Scale cluster')
         cy.contains('Scale Cluster') // Note we capitalize 'Cluster' to differentiate and have text on the modal
       })
 
       it('scales a cluster', () => {
-        cy.get('#numWorkers input').clear().type('3')
+        cy.get('#numWorkers input')
+          .clear()
+          .type('3')
         // cy.get('#enableSpotWorkers input').click()
       })
 
@@ -153,8 +181,7 @@ describe('clusters', () => {
 
       it('should show the cluster with the new number of worker nodes', () => {
         cy.visit('/ui/kubernetes/infrastructure')
-        cy.row('mockAwsCluster')
-          .rowAction('Scale cluster')
+        cy.row('mockAwsCluster').rowAction('Scale cluster')
         cy.get('#numWorkers input').should('have.value', '3')
       })
 

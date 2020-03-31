@@ -139,24 +139,26 @@ class Wizard extends PureComponent {
         {showSteps && <WizzardStepper steps={steps} activeStep={activeStep} />}
         {renderStepsContent({ wizardContext, setWizardContext, onNext: this.onNext })}
         <WizardButtons>
-          {onCancel && <CancelButton data-testid="wizard-cancel-btn" onClick={onCancel} />}
-          {this.hasBack() && <PrevButton data-testid="wizard-prev-btn" onClick={this.handleBack} />}
+          {onCancel && <CancelButton data-test-id="wizard-cancel-btn" onClick={onCancel} />}
+          {this.hasBack() && (
+            <PrevButton data-test-id="wizard-prev-btn" onClick={this.handleBack} />
+          )}
           {this.canBackAtFirstStep() && (
-            <PrevButton data-testid="wizard-back-first-step-btn" onClick={this.handleOriginBack} />
+            <PrevButton data-test-id="wizard-back-first-step-btn" onClick={this.handleOriginBack} />
           )}
           {this.hasNext() && (
-            <NextButton data-testid="wizard-next-btn" onClick={this.handleNext}>
+            <NextButton data-test-id="wizard-next-btn" onClick={this.handleNext}>
               Next
             </NextButton>
           )}
           {this.isLastStep() && (
-            <NextButton data-testid="wizard-submit-btn" onClick={this.handleNext}>
+            <NextButton data-test-id="wizard-submit-btn" onClick={this.handleNext}>
               {submitLabel}
             </NextButton>
           )}
           {shouldShowFinishAndReview && this.isFinishAndReviewVisible() && (
             <NextButton
-              data-testid="wizard-finish-review-btn"
+              data-test-id="wizard-finish-review-btn"
               onClick={this.onFinishAndReview}
               showForward={false}
             >

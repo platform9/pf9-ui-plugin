@@ -1,10 +1,15 @@
 const config = require('../../config')
 
+// ***********************************************
+// This example commands.js shows you how to
+// create various custom commands and overwrite
+// existing commands.
+
 Cypress.Commands.add('login', () => {
   cy.visit('/')
-  cy.get('[data-testid=login-email]').type(Cypress.env('userName'))
-  cy.get('[data-testid=login-password]').type(Cypress.env('password'))
-  cy.get('[data-testid=login-submit-btn]', { timeout: 5000 }).click()
+  cy.get('[data-test-id=login-email]').type(Cypress.env('userName'))
+  cy.get('[data-test-id=login-password]').type(Cypress.env('password'))
+  cy.get('[data-test-id=login-submit-btn]', { timeout: 5000 }).click()
   cy.url().should('include', 'ui/kubernetes/dashboard')
 })
 

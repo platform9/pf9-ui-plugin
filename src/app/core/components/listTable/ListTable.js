@@ -440,13 +440,13 @@ class ListTable extends PureComponent {
     const uid = uniqueIdentifier instanceof Function ? uniqueIdentifier(row) : row[uniqueIdentifier]
 
     return (
-      <TableRow hover data-testid="list-table-row" key={uid} {...checkboxProps}>
+      <TableRow hover data-test-id="list-table-row" key={uid} {...checkboxProps}>
         {showCheckboxes && (
           <TableCell padding="checkbox">
             {multiSelection ? (
-              <Checkbox data-testid="list-table-checkbox" checked={isSelected} color="primary" />
+              <Checkbox data-test-id="list-table-checkbox" checked={isSelected} color="primary" />
             ) : (
-              <Radio data-testid="list-table-radio" checked={isSelected} color="primary" />
+              <Radio data-test-id="list-table-radio" checked={isSelected} color="primary" />
             )}
           </TableCell>
         )}

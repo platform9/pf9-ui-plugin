@@ -177,7 +177,7 @@ const ListTableToolbar = ({
           )}
           {onAdd && (
             <Tooltip title="Add">
-              <Button data-testid="list-table-tool-bar-add" color="primary" onClick={onAdd}>
+              <Button data-test-id="list-table-tool-bar-add" color="primary" onClick={onAdd}>
                 <AddIcon /> Add
               </Button>
             </Tooltip>
