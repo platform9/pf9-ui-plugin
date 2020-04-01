@@ -12,6 +12,7 @@ import TenantPicklist from 'openstack/components/common/TenantPicklist'
 import { updateService } from 'openstack/components/resmgr/actions'
 import { useToast } from 'core/providers/ToastProvider'
 import { MessageTypes } from 'core/components/notifications/model'
+import { sleep } from 'utils/misc'
 
 const useStyles = makeStyles((theme: Theme) => ({
   text: {
@@ -30,6 +31,19 @@ interface Props {
   onNext: any
   title: string
   setSubmitting: any
+}
+
+// Keep trying to create network every 5 seconds, retry if failed
+const createNetworkLoop = async (body) => {
+  try {
+    await createNetwork(body)
+  } catch {
+    // Make this a util function
+    await sleep(5000)
+    await createNetworkLoop(body)
+    return
+  }
+  return
 }
 
 const BareMetalNetworkStep = ({ wizardContext, setWizardContext, onNext, title, setSubmitting }: Props) => {
@@ -70,7 +84,7 @@ const BareMetalNetworkStep = ({ wizardContext, setWizardContext, onNext, title, 
       }
 
       await updateService('neutron-server', neutronServerBody)
-      await createNetwork({
+      await createNetworkLoop({
         name: context.networkName,
         project_id: context.networkTenant,
         'provider:network_type': 'flat',
@@ -106,13 +120,15 @@ const BareMetalNetworkStep = ({ wizardContext, setWizardContext, onNext, title, 
             Physical Network Properties
           </Typography>
 
-          {/* Some Field */}
+          {/* DNS Domain */}
           <TextField
             id="dnsDomain"
             label="DNS Domain"
             info="some test description"
             required
           />
+
+          {/* DNS Forwarding Addresses */}
           <TextField
             id="dnsForwardingAddresses"
             label="DNS Forwarding Addresses"
@@ -124,12 +140,16 @@ const BareMetalNetworkStep = ({ wizardContext, setWizardContext, onNext, title, 
           <Typography className={clsx(text, bold)}>
             Bare Metal Network
           </Typography>
+
+          {/* Network Name */}
           <TextField
             id="networkName"
             label="Network Name"
             info="some test description"
             required
           />
+
+          {/* Network Tenant */}
           <PicklistField
             DropdownComponent={TenantPicklist}
             id="networkTenant"
