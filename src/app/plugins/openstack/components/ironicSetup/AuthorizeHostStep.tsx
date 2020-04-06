@@ -7,6 +7,9 @@ import useParams from 'core/hooks/useParams'
 import { loadResMgrHosts } from 'k8s/components/infrastructure/common/actions'
 import ListTableField from 'core/components/validatedForm/ListTableField'
 import useDataLoader from 'core/hooks/useDataLoader'
+import PollingData from 'core/components/PollingData'
+import { IUseDataLoader } from 'k8s/components/infrastructure/nodes/model'
+import { ResMgrHost } from 'k8s/components/infrastructure/common/model'
 
 // const useStyles = makeStyles((theme: Theme) => ({
 //   text: {
@@ -26,10 +29,10 @@ interface Props {
   title: string
 }
 
-const IronicSetupPage = ({ wizardContext, setWizardContext, onNext, title }: Props) => {
+const AuthorizeHostStep = ({ wizardContext, setWizardContext, onNext, title }: Props) => {
   const { getParamsUpdater } = useParams(wizardContext)
 
-  const [hosts, hostsLoading] = useDataLoader(loadResMgrHosts)
+  const [hosts, hostsLoading, reloadHosts]: IUseDataLoader<ResMgrHost> = useDataLoader(loadResMgrHosts) as any
 
   const columns = [
     { id: 'info.hostname', label: 'Hostname' },
@@ -37,6 +40,9 @@ const IronicSetupPage = ({ wizardContext, setWizardContext, onNext, title }: Pro
     { id: 'info.os_info', label: 'Operating System' },
   ]
 
+  // Minor bug: when the list of hosts is refreshed, prior selection
+  // is unselected (all objects are replaced, old selected is no
+  // longer there).
   return (
     <ValidatedForm
       initialValues={wizardContext}
@@ -46,12 +52,17 @@ const IronicSetupPage = ({ wizardContext, setWizardContext, onNext, title }: Pro
     >
       {({ setFieldValue, values }) => (
         <>
+          <PollingData
+            loading={hostsLoading}
+            onReload={reloadHosts}
+            refreshDuration={1000 * 60}
+          />
           <ListTableField
             id='selectedHost'
             data={hosts}
             onChange={getParamsUpdater('selectedHost')}
             columns={columns}
-            loading={hostsLoading}
+            loading={false}
           />
         </>
       )}
@@ -59,4 +70,4 @@ const IronicSetupPage = ({ wizardContext, setWizardContext, onNext, title }: Pro
   )
 }
 
-export default IronicSetupPage
+export default AuthorizeHostStep

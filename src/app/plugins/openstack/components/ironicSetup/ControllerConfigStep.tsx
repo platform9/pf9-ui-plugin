@@ -79,7 +79,7 @@ const ControllerConfigStep = ({ wizardContext, setWizardContext, onNext, title, 
         addRole(hostId, 'pf9-glance-role', {
           endpoint_address: context.dnsmasq[1],
           filesystem_store_datadir: context.imageStoragePath,
-          update_public_glance_endpoint: true,
+          update_public_glance_endpoint: 'true',
         })
       }
     } catch (err) {
