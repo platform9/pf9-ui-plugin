@@ -203,6 +203,13 @@ const loadRegionFeatures = async (setRegionFeatures, setContext, history) => {
   }
 }
 
+const determineStack = (history, features) => {
+  if (features.ironic) {
+    return 'metalstack'
+  }
+  return history.location.pathname.includes('openstack') ? 'openstack' : 'kubernetes'
+}
+
 const AuthenticatedContainer = () => {
   const [drawerOpen, toggleDrawer] = useToggler(true)
   const [regionFeatures, setRegionFeatures] = useState(emptyObj)
@@ -221,7 +228,8 @@ const AuthenticatedContainer = () => {
 
   const withStackSlider = regionFeatures.openstack && regionFeatures.kubernetes
   // stack is the name of the plugin (ex. openstack, kubernetes, developer, theme)
-  const stack = history.location.pathname.includes('openstack') ? 'openstack' : 'kubernetes'
+  const stack = determineStack(history, regionFeatures)
+
 
   const plugins = pluginManager.getPlugins()
   const sections = getSections(plugins, role)

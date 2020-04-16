@@ -1,4 +1,5 @@
 import openstack from './openstack'
+import metalstack from './metalstack'
 import kubernetes from './kubernetes'
 import developer from './developer'
 import theme from './theme'
@@ -10,6 +11,7 @@ const plugins = [
   // for fallback routes (when trying to reach the base url)
   kubernetes,
   openstack,
+  metalstack,
   theme,
   ...(devEnabled ? [developer] : []),
 ]
