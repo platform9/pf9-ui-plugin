@@ -14,7 +14,7 @@ export const qbertApiLink = `${k8sBaseUrl}/API-Reference/Qbert-API-Reference/`
 // Help
 export const gettingStartedHelpLink = `${k8sBaseUrl}/quickstart/`
 export const tutorialsHelpLink = `${k8sBaseUrl}/tutorials/virtualbox-mac/`
-export const slackLink = 'https://kplane.slack.com/'
+export const slackLink = 'https://slack.platform9.io'
 export const emailSupportLink = 'mailto:support-ft@platform9.com'
 export const forumHelpLink = `${pf9SupportBaseUrl}/hc/en-us/community/topics`
 export const pf9PmkArchitectureDigLink = `${k8sBaseUrl}/multimaster-architecture-platform9-managed-kubernetes/`

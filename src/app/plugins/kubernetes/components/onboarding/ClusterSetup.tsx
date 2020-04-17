@@ -57,7 +57,6 @@ const ClusterSetup = ({ onComplete, initialPanel = Panels.Cluster }: Props) => {
   const [clusters, loading] = useDataLoader(clusterActions.list)
   const hasMonitoring = clustersHaveMonitoring(clusters)
   const hasAccess = clustersHaveAccess()
-
   const [activePanels, setActivePanels] = useState(new Set([initialPanel]))
 
   const handleCreateCluster = useCallback(() => {
@@ -77,6 +76,7 @@ const ClusterSetup = ({ onComplete, initialPanel = Panels.Cluster }: Props) => {
     },
     [activePanels],
   )
+
   const handleSkipAccess = useCallback(() => {
     localStorage.setItem(onboardingAccessSetup, 'true')
     const panelsToKeep = new Set(activePanels)
@@ -116,7 +116,8 @@ const ClusterSetup = ({ onComplete, initialPanel = Panels.Cluster }: Props) => {
           summary="Create Your Cluster"
         >
           <Typography variant="body1">
-            Create your cluster on a laptop, virtual machine or a physical server
+            Create your first Kubernetes cluster on AWS, Azure or BareOS (Physical or Virtual
+            Machines)
           </Typography>
           <NextButton showForward={false} onClick={handleCreateCluster}>
             Create Cluster
