@@ -228,7 +228,7 @@ const AddBareOsClusterPage = () => {
         </DialogTitle>
         <DialogContent>
           <Typography variant="body1">
-            To build a BareOS cluster at least one node needs to be attached to the Managment Plane
+            To build a BareOS cluster at least one node needs to be attached to the Management Plane
             and not in use by an existing cluster.
           </Typography>
           <br />
