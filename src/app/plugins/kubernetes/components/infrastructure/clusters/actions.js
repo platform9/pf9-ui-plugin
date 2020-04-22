@@ -360,12 +360,10 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
     }
   },
   updateFn: async ({ uuid, ...params }) => {
-    const updateableParams = 'name tags numWorkers numMinWorkers numMaxWorkers'.split(' ')
+    const updateableParams = 'name tags numWorkers numMinWorkers numMaxWorkers etcdBackup'.split(
+      ' ',
+    )
     const body = pick(updateableParams, params)
-
-    // This is currently supported by all cloud providers except GCP (which we
-    // don't have yet anyways)
-    body.etcdBackup = getEtcdBackupPayload('etcdBackup', params)
 
     await qbert.updateCluster(uuid, body)
     // Doing this will help update the table, but the cache remains incorrect...

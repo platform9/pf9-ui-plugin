@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState, useCallback, useRef } from 'react'
 import FormWrapper from 'core/components/FormWrapper'
 import BareOsClusterReviewTable from './BareOsClusterReviewTable'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
@@ -38,6 +38,17 @@ import {
   pf9PmkArchitectureDigLink,
 } from 'k8s/links'
 import { trackEvent } from 'utils/tracking'
+import { loadNodes } from '../../nodes/actions'
+import useDataLoader from 'core/hooks/useDataLoader'
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Typography,
+  Button,
+} from '@material-ui/core'
+import { hexToRGBA } from 'core/utils/colorHelpers'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
@@ -79,46 +90,63 @@ const useStyles = makeStyles((theme) => ({
   paddBottom: {
     paddingBottom: theme.spacing(4),
   },
+  alert: {
+    padding: theme.spacing(2),
+    marginTop: theme.spacing(2),
+    backgroundColor: hexToRGBA(theme.palette.primary.main, 0.1),
+    display: 'grid',
+    gridGap: theme.spacing(),
+    gridTemplateColumns: 'min-content 1fr',
+  },
 }))
 
 // Segment tracking for wizard steps
 const basicOnNext = (context) => {
-  trackEvent('WZ New BareOS Cluster 1 Master Nodes', {
-    wizard_step: 'Select Master Nodes',
+  trackEvent('WZ New BareOS Cluster 1 Nodes Connected', {
+    wizard_step: 'Initial Setup',
     wizard_state: 'In-Progress',
-    wizard_progress: '1 of 5',
+    wizard_progress: '1 of 6',
     wizard_name: 'Add New BareOS Cluster',
     cluster_name: context.name,
-    master_nodes: context.masterNodes.length,
+  })
+}
+const mastersOnNext = (context) => {
+  trackEvent('WZ New BareOS Cluster 2 Master Nodes', {
+    wizard_step: 'Select Master Nodes',
+    wizard_state: 'In-Progress',
+    wizard_progress: '2 of 6',
+    wizard_name: 'Add New BareOS Cluster',
+    master_nodes: (context.masterNodes && context.masterNodes.length) || 0,
     allow_workloads_on_master: context.allowWorkloadsOnMaster,
+    privileged: context.privileged,
   })
 }
 
 const workersOnNext = (context) => {
-  trackEvent('WZ New BareOS Cluster 2 Worker Nodes', {
+  trackEvent('WZ New BareOS Cluster 3 Worker Nodes', {
     wizard_step: 'Select Worker Nodes',
     wizard_state: 'In-Progress',
-    wizard_progress: '2 of 5',
+    wizard_progress: '3 of 6',
     wizard_name: 'Add New BareOS Cluster',
     worker_nodes: (context.workerNodes && context.workerNodes.length) || 0,
   })
 }
 
 const networkOnNext = (context) => {
-  trackEvent('WZ New BareOS Cluster 3 Networking Details', {
+  trackEvent('WZ New BareOS Cluster 4 Networking Details', {
     wizard_step: 'Configure Network',
     wizard_state: 'In-Progress',
-    wizard_progress: '3 of 5',
+    wizard_progress: '4 of 6',
     wizard_name: 'Add New BareOS Cluster',
     network_backend: context.networkPlugin,
   })
 }
 
 const advancedOnNext = (context) => {
-  trackEvent('WZ New BareOS Cluster 4 Advanced Configuration', {
+  trackEvent('WZ New BareOS Cluster 5 Advanced Configuration', {
     wizard_step: 'Advanced Configuration',
     wizard_state: 'In-Progress',
-    wizard_progress: '4 of 5',
+    wizard_progress: '5 of 6',
     wizard_name: 'Add New BareOS Cluster',
     enable_etcd_backup: !!context.enableEtcdBackup,
     enable_monitoring: !!context.prometheusMonitoringEnabled,
@@ -126,10 +154,10 @@ const advancedOnNext = (context) => {
 }
 
 const reviewOnNext = (context) => {
-  trackEvent('WZ New BareOS Cluster 5 Review', {
+  trackEvent('WZ New BareOS Cluster 6 Review', {
     wizard_step: 'Review',
     wizard_state: 'Finished',
-    wizard_progress: '5 of 5',
+    wizard_progress: '6 of 6',
     wizard_name: 'Add New BareOS Cluster',
   })
 }
@@ -143,12 +171,16 @@ const canFinishAndReview = ({ masterNodes, workerNodes, allowWorkloadsOnMaster }
 const AddBareOsClusterPage = () => {
   const classes = useStyles()
   const { history } = useReactRouter()
+  const [nodes] = useDataLoader(loadNodes)
+  const [showDialog, setShowDialog] = useState(false)
+  const wizRef = useRef(null)
+  const validatorRef = useRef(null)
 
   useEffect(() => {
     trackEvent('WZ New BareOS Cluster 0 Started', {
       wizard_step: 'Start',
       wizard_state: 'Started',
-      wizard_progress: '0 of 5',
+      wizard_progress: '0 of 6',
       wizard_name: 'Add New BareOS Cluster',
     })
   }, [])
@@ -165,9 +197,60 @@ const AddBareOsClusterPage = () => {
       ...data,
       clusterType: 'local',
     })
+  useEffect(() => {
+    wizRef.current && wizRef.current.onNext(handleHasNodesNextCheck)
+  }, [nodes, wizRef])
 
+  const setupValidator = (onNext) => (validate) => {
+    wizRef.current = { onNext }
+    validatorRef.current = { validate }
+  }
+  const handleHasNodesNextCheck = useCallback(() => {
+    const isValid = validatorRef.current.validate()
+    if (!isValid) {
+      // if the form isn't filled out make sure they do that first.
+      return false
+    }
+    if (nodes.filter(allPass([isConnected, isUnassignedNode])).length === 0) {
+      // if they dont have any nodes then tell them to set that up first before moving forward
+      setShowDialog(true)
+      return false
+    }
+    return true
+  }, [nodes])
   return (
     <FormWrapper title="Add Bare OS Cluster" backUrl={listUrl} loading={creatingBareOSCluster}>
+      <Dialog open={showDialog}>
+        <DialogTitle>
+          <Typography variant="h5" component="span">
+            No Nodes Ready
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body1">
+            To build a BareOS cluster at least one node needs to be attached to the Managment Plane
+            and not in use by an existing cluster.
+          </Typography>
+          <br />
+          <Typography variant="subtitle2">How do I attach a node?</Typography>
+          <div className={classes.alert}>
+            <Typography variant="subtitle2" className="no-wrap-text">
+              The Platform9 CLI
+            </Typography>
+            <Typography variant="body1">
+              The Platform9 CLI is used to prepare and attach nodes to the Management Plane. The CLI
+              should be run on each node using the ‘prep-node’ command. ‘prep-node’ authenticates
+              the node to the Management Plane and installs all of the required Kubernetes
+              prerequisites.
+            </Typography>
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowDialog(false)} color="primary">
+            <Typography variant="body1">Close</Typography>
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Wizard
         onComplete={handleSubmit}
         context={initialContext}
@@ -176,12 +259,12 @@ const AddBareOsClusterPage = () => {
       >
         {({ wizardContext, setWizardContext, onNext }) => (
           <>
-            <WizardStep stepId="basic" label="Select Master Nodes" onNext={basicOnNext}>
+            <WizardStep stepId="basic" label="Initial Setup" onNext={basicOnNext}>
               <ValidatedForm
                 fullWidth
                 initialValues={wizardContext}
                 onSubmit={setWizardContext}
-                triggerSubmit={onNext}
+                triggerSubmit={setupValidator(onNext)}
                 elevated={false}
               >
                 {/* Cluster Name */}
@@ -195,15 +278,24 @@ const AddBareOsClusterPage = () => {
                   />
                 </FormFieldCard>
                 <FormFieldCard
-                  title={
-                    <span>
-                      Select nodes to add as <u>Master</u> nodes
-                    </span>
-                  }
+                  title="Connect BareOS Nodes"
                   link={
                     <div>
                       <FontAwesomeIcon className={classes.blueIcon} size="md">
                         file-alt
+                      </FontAwesomeIcon>{' '}
+                      <ExternalLink url={pmkCliPrepNodeLink}>See all PF9CTL options</ExternalLink>
+                    </div>
+                  }
+                >
+                  <DownloadCliWalkthrough />
+                </FormFieldCard>
+                <FormFieldCard
+                  title="Connected Nodes"
+                  link={
+                    <div>
+                      <FontAwesomeIcon className={classes.blueIcon} size="md">
+                        ball-pile
                       </FontAwesomeIcon>{' '}
                       <ExternalLink url={pmkCliOverviewLink}>Not Seeing Any Nodes?</ExternalLink>
                     </div>
@@ -213,39 +305,87 @@ const AddBareOsClusterPage = () => {
                     {/* Master nodes */}
                     {/* <Typography>Select one or more nodes to add to the cluster as <strong>master</strong> nodes</Typography> */}
                     <ClusterHostChooser
-                      multiple
-                      id="masterNodes"
+                      selection="none"
                       filterFn={allPass([isConnected, isUnassignedNode])}
-                      onChange={(value) => setWizardContext({ masterNodes: value })}
-                      validations={[masterNodeLengthValidator]}
                       pollForNodes
-                      required
-                    />
-
-                    {/* Workloads on masters */}
-                    <CheckboxField
-                      id="allowWorkloadsOnMaster"
-                      onChange={(value) => setWizardContext({ allowWorkloadsOnMaster: value })}
-                      label="Enable workloads on all master nodes"
-                      info="It is highly recommended to not enable workloads on master nodes for production or critical workload clusters."
                     />
                   </div>
-                  <Panel
-                    titleVariant="subtitle2"
-                    title="Get the PF9 CLI"
-                    defaultExpanded={false}
-                    link={
-                      <div>
-                        <FontAwesomeIcon className={classes.blueIcon} size="md">
-                          code
-                        </FontAwesomeIcon>{' '}
-                        <ExternalLink url={pmkCliPrepNodeLink}>See all Options</ExternalLink>
-                      </div>
-                    }
-                  >
-                    <DownloadCliWalkthrough />
-                  </Panel>
                 </FormFieldCard>
+              </ValidatedForm>
+            </WizardStep>
+
+            <WizardStep stepId="masters" label="Select Master Nodes" onNext={mastersOnNext}>
+              <ValidatedForm
+                fullWidth
+                initialValues={wizardContext}
+                onSubmit={setWizardContext}
+                triggerSubmit={onNext}
+                elevated={false}
+              >
+                {({ values }) => (
+                  <>
+                    {/* Worker nodes */}
+                    <FormFieldCard
+                      title={
+                        <span>
+                          Select nodes to add as <u>Master</u> nodes
+                        </span>
+                      }
+                      link={
+                        <div>
+                          <FontAwesomeIcon className={classes.blueIcon} size="md">
+                            file-alt
+                          </FontAwesomeIcon>{' '}
+                          <ExternalLink url={pmkCliOverviewLink}>
+                            Not Seeing Any Nodes?
+                          </ExternalLink>
+                        </div>
+                      }
+                    >
+                      <div className={classes.innerWrapper}>
+                        <ClusterHostChooser
+                          multiple
+                          id="masterNodes"
+                          filterFn={allPass([isConnected, isUnassignedNode])}
+                          onChange={(value) => setWizardContext({ masterNodes: value })}
+                          validations={[masterNodeLengthValidator]}
+                          pollForNodes
+                          required
+                        />
+                      </div>
+                    </FormFieldCard>
+                    <FormFieldCard title="Cluster Settings">
+                      {/* Workloads on masters */}
+                      <CheckboxField
+                        id="allowWorkloadsOnMaster"
+                        onChange={(value) => setWizardContext({ allowWorkloadsOnMaster: value })}
+                        label="Enable workloads on all master nodes"
+                        info="It is highly recommended to not enable workloads on master nodes for production or critical workload clusters."
+                      />
+
+                      {/* Privileged */}
+                      <CheckboxField
+                        id="privileged"
+                        label="Privileged"
+                        onChange={(value) => setWizardContext({ privileged: value })}
+                        value={
+                          wizardContext.privileged ||
+                          ['calico', 'canal', 'weave'].includes(wizardContext.networkPlugin)
+                        }
+                        disabled={['calico', 'canal', 'weave'].includes(
+                          wizardContext.networkPlugin,
+                        )}
+                        info={
+                          <div>
+                            Allows this cluster to run privileged containers. Read{' '}
+                            <ExternalLink url={runtimePrivilegedLink}>this article</ExternalLink>{' '}
+                            for more information.
+                          </div>
+                        }
+                      />
+                    </FormFieldCard>
+                  </>
+                )}
               </ValidatedForm>
             </WizardStep>
 
@@ -277,7 +417,7 @@ const AddBareOsClusterPage = () => {
                   <div className={classes.innerWrapper}>
                     <ClusterHostChooser
                       className={classes.hostChooser}
-                      multiple
+                      selection="multiple"
                       id="workerNodes"
                       filterFn={allPass([
                         isUnassignedNode,
@@ -291,21 +431,6 @@ const AddBareOsClusterPage = () => {
                       }
                     />
                   </div>
-                  <Panel
-                    titleVariant="subtitle2"
-                    title="Get the PF9 CLI"
-                    defaultExpanded={false}
-                    link={
-                      <div>
-                        <FontAwesomeIcon className={classes.blueIcon} size="md">
-                          code
-                        </FontAwesomeIcon>{' '}
-                        <ExternalLink url={pmkCliPrepNodeLink}>See all Options</ExternalLink>
-                      </div>
-                    }
-                  >
-                    <DownloadCliWalkthrough />
-                  </Panel>
                 </FormFieldCard>
               </ValidatedForm>
             </WizardStep>
@@ -403,6 +528,12 @@ const AddBareOsClusterPage = () => {
                     <PicklistField
                       id="networkPlugin"
                       label="Network backend"
+                      onChange={(value) =>
+                        setWizardContext({
+                          networkPlugin: value,
+                          privileged: value === 'calico' ? true : wizardContext.privileged,
+                        })
+                      }
                       options={networkPluginOptions}
                       info=""
                       required
@@ -429,24 +560,6 @@ const AddBareOsClusterPage = () => {
               >
                 {({ values }) => (
                   <>
-                    {/* Privileged */}
-                    <CheckboxField
-                      id="privileged"
-                      label="Privileged"
-                      value={
-                        values.privileged ||
-                        ['calico', 'canal', 'weave'].includes(wizardContext.networkPlugin)
-                      }
-                      disabled={['calico', 'canal', 'weave'].includes(wizardContext.networkPlugin)}
-                      info={
-                        <div>
-                          Allows this cluster to run privileged containers. Read{' '}
-                          <ExternalLink url={runtimePrivilegedLink}>this article</ExternalLink> for
-                          more information.
-                        </div>
-                      }
-                    />
-
                     {/* Etcd Backup */}
                     <CheckboxField
                       id="etcdBackup"
