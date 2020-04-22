@@ -1,25 +1,12 @@
-// libs
 import React from 'react'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import useParams from 'core/hooks/useParams'
-// import { makeStyles } from '@material-ui/styles'
-// import { Theme } from '@material-ui/core'
 import { loadResMgrHosts } from 'k8s/components/infrastructure/common/actions'
 import ListTableField from 'core/components/validatedForm/ListTableField'
 import useDataLoader from 'core/hooks/useDataLoader'
 import PollingData from 'core/components/PollingData'
 import { IUseDataLoader } from 'k8s/components/infrastructure/nodes/model'
 import { ResMgrHost } from 'k8s/components/infrastructure/common/model'
-
-// const useStyles = makeStyles((theme: Theme) => ({
-//   text: {
-//     marginTop: theme.spacing(1),
-//     marginLeft: theme.spacing(1),
-//   },
-//   bold: {
-//     fontWeight: 'bold',
-//   }
-// }))
 
 // Put any for now to let me proceed
 interface Props {
@@ -42,7 +29,7 @@ const AuthorizeHostStep = ({ wizardContext, setWizardContext, onNext, title }: P
 
   // Minor bug: when the list of hosts is refreshed, prior selection
   // is unselected (all objects are replaced, old selected is no
-  // longer there).
+  // longer there) but old selection is still valid in the wizard context.
   return (
     <>
       <div>Authorize the node to become the controller for MetalStack</div>

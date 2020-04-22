@@ -5,12 +5,18 @@ export const networksCacheKey = 'networks'
 
 const { neutron } = ApiClient.getInstance()
 
+// Don't bother with cache with ironic setup wizard
+// Wait until cache refactor before changing to proper architecture
 export const createNetwork = (body) => (
   neutron.createNetwork(body)
 )
 
 export const deleteNetwork = (id) => (
   neutron.deleteNetwork(id)
+)
+
+export const networkIpAvailability = (id) => (
+  neutron.networkIpAvailability(id)
 )
 
 const networkActions = createCRUDActions(networksCacheKey, {

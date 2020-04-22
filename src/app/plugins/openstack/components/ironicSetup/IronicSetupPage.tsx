@@ -1,4 +1,3 @@
-// libs
 import React, { useEffect, useState } from 'react'
 import Wizard from 'core/components/wizard/Wizard'
 import WizardStep from 'core/components/wizard/WizardStep'
@@ -45,6 +44,7 @@ const getProvisioningBridge = (bridgeMappings) => {
   return provisioningMapping.split(':')[1]
 }
 
+// Check for presence of provisioning network as well as neutron-server configured
 const networkConfigured = async (networks) => {
   const neutronServerResponse = await getService('neutron-server')
   const dnsDomain = path(['neutron', 'DEFAULT', 'dns_domain'], neutronServerResponse)
@@ -66,9 +66,7 @@ const networkConfigured = async (networks) => {
 
 const nodeAdded = hosts => hosts.length
 
-// no need to check for step 3 being completed
-
-// Check for presence of all roles other than glance
+// Check for presence of all roles other than glance (optional)
 const nodeAuthorized = async (hosts) => {
   const ironicController = hosts.find((host) => {
     return intersection(host.roles, ['pf9-neutron-base',
@@ -105,6 +103,7 @@ const nodeAuthorized = async (hosts) => {
   return false
 }
 
+// Check for a subnet in provisioning network
 const subnetExists = (networks, subnets) => {
   const provisioningNetwork = getProvisioningNetwork(networks)
   const provisioningSubnet = subnets.find((subnet) => (
@@ -150,20 +149,21 @@ const IronicSetupPage = () => {
           setLoading(false)
           return
         }
+        // No need to check step 3 because step 3 and 4 are connected
         const finishedStep4 = await nodeAuthorized(hosts)
         if (!finishedStep4) {
           setStartingStep(2)
           setLoading(false)
           return
         }
-
         const finishedStep5 = subnetExists(networks, subnets)
         if (!finishedStep5) {
           setStartingStep(4)
           setLoading(false)
           return
         }
-
+        // Backend needs to be in place to see whether the wizard is completed
+        // Currently the furthest the UI can track is to step 5
         setStartingStep(5)
         setLoading(false)
         return

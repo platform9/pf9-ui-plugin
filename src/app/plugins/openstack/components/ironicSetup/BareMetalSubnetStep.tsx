@@ -1,4 +1,3 @@
-// libs
 import React from 'react'
 import TextField from 'core/components/validatedForm/TextField'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
@@ -32,7 +31,7 @@ interface Props {
 }
 
 // Allocation pools string expected to be like
-// 1.1.1.1 - 1.1.1.100, 2.2.2.2 - 2.2.2.100
+// 1.1.1.1 - 1.1.1.100, 2.2.2.2 - 2.2.2.100 (comma separated)
 const allocationPoolsValue = (string) => {
   const parts = string.split(',')
   return parts.map((part) => {
@@ -44,7 +43,7 @@ const allocationPoolsValue = (string) => {
   })
 }
 
-// Split into an array
+// Split into an array, string expected to be comma separated
 const dnsNameServersValue = (string) => (
   string.split(',').map(ip => ip.trim())
 )

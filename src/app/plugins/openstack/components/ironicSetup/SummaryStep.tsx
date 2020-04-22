@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { Typography, Paper } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
 import { hexToRGBA } from 'core/utils/colorHelpers'
 import { mngmTenantActions } from 'k8s/components/userManagement/tenants/actions'
 import useDataLoader from 'core/hooks/useDataLoader'
+import networkActions, { networkIpAvailability } from 'openstack/components/networks/actions'
+import clsx from 'clsx'
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -21,6 +23,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   card: {
     padding: '20px',
+  },
+  header: {
+    marginBottom: theme.spacing(2),
   },
   subheader: {
     margin: theme.spacing(2, 0),
@@ -41,10 +46,32 @@ interface Props {
 }
 
 const OpenStackRcStep = ({ wizardContext }: Props): JSX.Element => {
-  const { container, field, light, subheader, paper, card } = useStyles({})
+  const { container, field, light, header, subheader, paper, card } = useStyles({})
   const [tenantName, setTenantName] = useState('')
+  const [availableIps, setAvailableIps] = useState('')
   const [tenants] = useDataLoader(mngmTenantActions.list)
+  const [networks] = useDataLoader(networkActions.list)
+  const provisioningNetwork = useMemo(() => (
+    networks.find((network) => (
+      network['provider:physical_network'] === 'provisioning'
+    ))
+  ),
+    [networks],
+  )
 
+  // Get provisioning network to check number of available IPs
+  useEffect(() => {
+    if (!provisioningNetwork) {
+      return
+    }
+
+    (async () => {
+      const ipInfo = await networkIpAvailability(provisioningNetwork.id)
+      setAvailableIps(ipInfo.total_ips)
+    })()
+  }, [provisioningNetwork])
+
+  // Get tenant name
   useEffect(() => {
     if (!tenants.length) {
       return
@@ -60,7 +87,9 @@ const OpenStackRcStep = ({ wizardContext }: Props): JSX.Element => {
     <div className={container}>
       <Paper className={paper} elevation={0}>
         <div className={card}>
-          <Typography variant="h6" className={light}>Network Summary</Typography>
+          <Typography variant="h6" className={clsx(light, header)}>
+            Network Summary
+          </Typography>
           <Typography className={subheader}>
             Bare Metal Cloud Network
           </Typography>
@@ -99,7 +128,9 @@ const OpenStackRcStep = ({ wizardContext }: Props): JSX.Element => {
       </Paper>
       <Paper className={paper} elevation={0}>
         <div className={card}>
-          <Typography variant="h6" className={light}>Controller Summary</Typography>
+          <Typography variant="h6" className={clsx(light, header)}>
+            Controller Summary
+          </Typography>
           <div className={field}>
             <span className={light}>Controller Host Name:</span>
             <span>{wizardContext.selectedHost[0].info.hostname}</span>
@@ -110,7 +141,7 @@ const OpenStackRcStep = ({ wizardContext }: Props): JSX.Element => {
           </div>
           <div className={field}>
             <span className={light}>Controller IP:</span>
-            <span>{wizardContext.dnsmasq[1]}</span>
+            <span>{wizardContext.dnsmasq.split(': ')[1]}</span>
           </div>
           <div className={field}>
             <span className={light}>Bare Metal Cloud Network:</span>
@@ -120,10 +151,12 @@ const OpenStackRcStep = ({ wizardContext }: Props): JSX.Element => {
       </Paper>
       <Paper className={paper} elevation={0}>
         <div className={card}>
-          <Typography variant="h6" className={light}>Bare Metal Cloud IP Range Summary</Typography>
+          <Typography variant="h6" className={clsx(light, header)}>
+            Bare Metal Cloud IP Range Summary
+          </Typography>
           <div className={field}>
             <span className={light}>Total Available IPs:</span>
-            <span>calculate from CIDR</span>
+            <span>{availableIps}</span>
           </div>
           <div className={field}>
             <span className={light}>Network CIDR:</span>

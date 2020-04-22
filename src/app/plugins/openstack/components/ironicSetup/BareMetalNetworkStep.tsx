@@ -38,7 +38,6 @@ const createNetworkLoop = async (body) => {
   try {
     await createNetwork(body)
   } catch {
-    // Make this a util function
     await sleep(5000)
     await createNetworkLoop(body)
     return

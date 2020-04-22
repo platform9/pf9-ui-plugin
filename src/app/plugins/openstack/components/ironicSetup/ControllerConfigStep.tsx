@@ -1,4 +1,3 @@
-// libs
 import React, { useMemo } from 'react'
 import TextField from 'core/components/validatedForm/TextField'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
@@ -56,7 +55,7 @@ const ControllerConfigStep = ({ wizardContext, setWizardContext, onNext, title, 
       // neutron-base role has to go first
       const hostId = context.selectedHost[0].id
       await addRole(hostId, 'pf9-neutron-base', {})
-      // I think the other ones can be done in the background
+      // I think the other ones can be done asynchronously in the background
       addRole(hostId, 'pf9-ostackhost-neutron-ironic', {})
       addRole(hostId, 'pf9-ironic-conductor', {
         cleaning_network_uuid: provisioningNetwork.id,
