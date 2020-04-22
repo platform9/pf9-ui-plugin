@@ -27,6 +27,7 @@ const DnsmasqPicklist: React.ComponentType<Props> = forwardRef<HTMLElement, Prop
       selectFirst = true,
       hostId,
       showAll = false,
+      ...rest
     } = props
 
     const [hosts, hostsLoading] = useDataLoader(loadResMgrHosts)
@@ -37,10 +38,10 @@ const DnsmasqPicklist: React.ComponentType<Props> = forwardRef<HTMLElement, Prop
       if (hosts.length < 1) { return [] }
       const host = hosts.find(host => host.id === hostId )
       const validNetworkInterfaces = host.networkInterfaces.filter(ifacePair => (
-        ifacePair[1] !== '192.168.122.1'
+        !ifacePair.includes('192.168.122.1')
       ))
       return validNetworkInterfaces.map(ifacePair => (
-        { label: `${ifacePair[0]} ${ifacePair[1]}`, value: ifacePair }
+        { label: ifacePair, value: ifacePair }
       ))
     },
       [hosts],
@@ -49,13 +50,13 @@ const DnsmasqPicklist: React.ComponentType<Props> = forwardRef<HTMLElement, Prop
     // Select the first item as soon as data is loaded
     useEffect(() => {
       if (selectFirst) {
-        console.log('selectFirst', selectFirst)
         onChange(propOr('', 'value', head(options)))
       }
     }, [])
 
     return (
       <Picklist
+        {...rest}
         name={name}
         label={label}
         value={value}

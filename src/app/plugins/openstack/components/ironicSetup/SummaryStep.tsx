@@ -99,17 +99,17 @@ const OpenStackRcStep = ({ wizardContext }: Props): JSX.Element => {
       </Paper>
       <Paper className={paper} elevation={0}>
         <div className={card}>
-          <Typography variant="h6" className={light}>Conductor Summary</Typography>
+          <Typography variant="h6" className={light}>Controller Summary</Typography>
           <div className={field}>
-            <span className={light}>Conductor Host Name:</span>
+            <span className={light}>Controller Host Name:</span>
             <span>{wizardContext.selectedHost[0].info.hostname}</span>
           </div>
           <div className={field}>
-            <span className={light}>Conductor OS:</span>
+            <span className={light}>Controller OS:</span>
             <span>{wizardContext.selectedHost[0].info.os_info}</span>
           </div>
           <div className={field}>
-            <span className={light}>Conductor IP:</span>
+            <span className={light}>Controller IP:</span>
             <span>{wizardContext.dnsmasq[1]}</span>
           </div>
           <div className={field}>

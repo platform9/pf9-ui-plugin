@@ -114,8 +114,15 @@ const BareMetalNetworkStep = ({ wizardContext, setWizardContext, onNext, title, 
       {({ setFieldValue, values }) => (
         <>
           <Typography className={text}>
-            Platform9 will deploy a flat, VLAN (untagged) network with a DHCP server.
+            Configure the provisioning network that will be used to allocate IP addresses to deployed bare metal nodes.
           </Typography>
+          <br />
+          <Typography className={text}>
+            Internally, Platform9 will deploy a flat, VLAN (untagged) virtual
+            network with a DHCP server, that will be connected to your specified
+            physical network.
+          </Typography>
+          <br />
           <Typography className={clsx(text, bold)}>
             Physical Network Properties
           </Typography>
@@ -124,7 +131,7 @@ const BareMetalNetworkStep = ({ wizardContext, setWizardContext, onNext, title, 
           <TextField
             id="dnsDomain"
             label="DNS Domain"
-            info="some test description"
+            info="This will be used by the DHCP server configured in the virtual network."
             required
           />
 
@@ -132,20 +139,19 @@ const BareMetalNetworkStep = ({ wizardContext, setWizardContext, onNext, title, 
           <TextField
             id="dnsForwardingAddresses"
             label="DNS Forwarding Addresses"
-            info="some test description"
             multiline
             rows="3"
             required
           />
           <Typography className={clsx(text, bold)}>
-            Bare Metal Network
+            Bare Metal Virtual Network
           </Typography>
 
           {/* Network Name */}
           <TextField
             id="networkName"
             label="Network Name"
-            info="some test description"
+            info="Name of the virtual network to be created."
             required
           />
 
@@ -155,7 +161,7 @@ const BareMetalNetworkStep = ({ wizardContext, setWizardContext, onNext, title, 
             id="networkTenant"
             label="Tenant"
             onChange={getParamsUpdater('networkTenant')}
-            info="tenant help"
+            info="Tenant that the virtual network should be created within."
             showAll={false}
             required
           />

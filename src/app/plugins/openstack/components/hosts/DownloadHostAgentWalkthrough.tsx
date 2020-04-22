@@ -76,7 +76,7 @@ const DownloadHostAgentWalkthrough = (): JSX.Element => {
   return (
     <Paper className={classes.paper} elevation={0}>
       <Typography variant="h6">
-        Adding Platform9 Host Agent
+        Install Platform9 Host Agent
       </Typography>
       <NumberedSteps
         step={1}

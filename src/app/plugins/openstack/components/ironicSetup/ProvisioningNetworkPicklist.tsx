@@ -26,6 +26,7 @@ const ProvisioningNetworkPicklist: React.ComponentType<Props> = forwardRef<HTMLE
       label = 'Provisioning Network',
       selectFirst = true,
       showAll = false,
+      ...rest
     } = props
 
     // const [networks, networksLoading] = useDataLoader(networkActions.list)
@@ -48,6 +49,7 @@ const ProvisioningNetworkPicklist: React.ComponentType<Props> = forwardRef<HTMLE
 
     return (
       <Picklist
+        {...rest}
         name={name}
         label={label}
         value={value}

@@ -32,7 +32,7 @@ MetalStack.registerPlugin = (pluginManager) => {
       icon: 'tachometer',
     },
     {
-      name: 'Tenants',
+      name: 'Bare Metal Setup',
       ...clarityLink('/infrastructure'),
       icon: 'building'
     },
@@ -42,7 +42,7 @@ MetalStack.registerPlugin = (pluginManager) => {
       icon: 'file-code'
     },
     {
-      name: 'Bare Metal Deploy',
+      name: 'Bare Metal Deployed',
       ...clarityLink('/instances'),
       icon: 'desktop',
     },

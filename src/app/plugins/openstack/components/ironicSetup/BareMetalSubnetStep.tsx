@@ -44,6 +44,11 @@ const allocationPoolsValue = (string) => {
   })
 }
 
+// Split into an array
+const dnsNameServersValue = (string) => (
+  string.split(',').map(ip => ip.trim())
+)
+
 const BareMetalSubnetStep = ({ wizardContext, setWizardContext, onNext, title, setSubmitting }: Props) => {
   const { text, bold } = useStyles({})
   const showToast = useToast()
@@ -65,7 +70,7 @@ const BareMetalSubnetStep = ({ wizardContext, setWizardContext, onNext, title, s
         enable_dhcp: true,
         gateway_ip: context.disableGateway ? null : context.gatewayIp,
         allocation_pools: allocationPoolsValue(context.allocationPools),
-        dns_nameservers: context.dnsNameServers,
+        dns_nameservers: dnsNameServersValue(context.dnsNameServers),
       })
     } catch (err) {
       setSubmitting(false)
@@ -88,6 +93,10 @@ const BareMetalSubnetStep = ({ wizardContext, setWizardContext, onNext, title, s
     >
       {({ setFieldValue, values }) => (
         <>
+          <Typography className={text}>
+            Configure the subnet to be created on the provisioning network.
+          </Typography>
+
           <Typography className={clsx(text, bold)}>
             Subnet Settings
           </Typography>
@@ -96,15 +105,14 @@ const BareMetalSubnetStep = ({ wizardContext, setWizardContext, onNext, title, s
           <TextField
             id="subnetName"
             label="Subnet Name"
-            info="some test description"
             required
           />
 
           {/* Network Address */}
           <TextField
             id="networkAddress"
-            label="Network Address"
-            info="some test description"
+            label="Network Address (CIDR)"
+            info="Specify your network CIDR used to designate your IP address pool (e.g., 192.0.2.0/24)."
             required
           />
 
@@ -112,28 +120,21 @@ const BareMetalSubnetStep = ({ wizardContext, setWizardContext, onNext, title, s
           {!values.disableGateway && <TextField
             id="gatewayIp"
             label="Gateway IP"
-            info="some test description"
+            info="Specify the IP address used for the network gateway. If left blank, the first available IP address within your network CIDR will be automatically chosen."
           />}
 
           {/* Disable Gateway */}
           <CheckboxField
             id="disableGateway"
             label="Disable Gateway"
-            info="gateway help"
+            info="By checking this option, no network gateway will be created. You may choose to add one later in the subnet edit form."
           />
-
-          {/* Bare Metal Controller IP (seems useless?) */}
-          {false && <TextField
-            id="baremetalControllerIp"
-            label="Bare Metal Controller IP"
-            info="some test description"
-          />}
 
           {/* Allocation Pools */}
           <TextField
             id="allocationPools"
             label="Allocation Pools"
-            info="some test description"
+            info="Specify the allocation pools that will be used to select new IP addresses from. These must be inside the range of the network's CIDR, and cannot conflict with the network's network address, broadcast address, or gateway IP. You may designate your allocation pools using the format allocation_pool_start - allocation_pool_end, with multiple entries separated by commas."
             multiline
             rows="3"
             required
@@ -143,7 +144,7 @@ const BareMetalSubnetStep = ({ wizardContext, setWizardContext, onNext, title, s
           <TextField
             id="dnsNameServers"
             label="DNS Name Servers"
-            info="some test description"
+            info="Specify the IP addresses that will be used as DNS name servers for this subnet, separated by commas."
             multiline
             rows="3"
           />

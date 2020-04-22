@@ -19,7 +19,11 @@ import { clarityDashboardUrl } from 'app/constants'
 import FormWrapperDefault from 'core/components/FormWrapper'
 const FormWrapper: any = FormWrapperDefault // types on forward ref .js file dont work well.
 
-const initialContext:any = {}
+// Wizard defaults (will be replaced with existing values from API later)
+const initialContext:any = {
+  imageStoragePath: '/var/opt/pf9/imagelibrary/data',
+  hostImages: true,
+}
 
 const submitLastStep = (params) => {
   // This function should route them back to the old UI
@@ -83,9 +87,19 @@ const nodeAuthorized = async (hosts) => {
     const { bridge_mappings } = await getRole(ironicController.id, 'pf9-neutron-ovs-agent')
     const provisioningBridge = getProvisioningBridge(bridge_mappings)
     initialContext.selectedHost = [ironicController]
-    initialContext.dnsmasq = [dnsmasq_interface, tftp_server_ip]
+    initialContext.dnsmasq = `${dnsmasq_interface}: ${tftp_server_ip}`
     initialContext.bridgeDevice = provisioningBridge
-    return true
+
+    // No guarantee that glance role was authorized
+    try {
+      const { filesystem_store_datadir } = await getRole(ironicController.id, 'pf9-glance-role')
+      initialContext.imageStoragePath = filesystem_store_datadir
+      initialContext.hostImages = true
+    } catch {
+      initialContext.hostImages = false
+    } finally {
+      return true
+    }
   }
 
   return false
@@ -102,8 +116,10 @@ const subnetExists = (networks, subnets) => {
       `${pool.start} - ${pool.end}`
     )).join(', ')
 
+    initialContext.subnetName = provisioningSubnet.name
     initialContext.networkAddress = provisioningSubnet.cidr
     initialContext.allocationPools = allocationPoolsString
+    initialContext.dnsNameServers = provisioningSubnet.dns_nameservers.join(', ')
     return true
   }
 
@@ -157,7 +173,7 @@ const IronicSetupPage = () => {
 
   return (
     <FormWrapper
-      title="Welcome to Platform9 Managed OpenStack"
+      title="Welcome to Platform9 Managed MetalStack"
       loading={submittingStep || loading }
       message={loading ? 'Loading...' : 'Submitting...'}
     >
@@ -170,16 +186,20 @@ const IronicSetupPage = () => {
         {({ wizardContext, setWizardContext, onNext }) => {
           return (
             <>
-              <WizardStep stepId="step1" label="Bare Metal Network">
+              <WizardStep stepId="step1" label="Configure Provisioning Network">
                 <BareMetalNetworkStep
                   wizardContext={wizardContext}
                   setWizardContext={setWizardContext}
                   onNext={onNext}
-                  title="Bare Metal Network"
+                  title="Configure Provisioning Network"
                   setSubmitting={setSubmittingStep}
                 />
               </WizardStep>
-              <WizardStep stepId="step2" label="Platform9 Host Agent">
+              <WizardStep stepId="step2" label="Install Host Agent">
+                <div>
+                  Install the Platform9 Host Agent on the node that will become the controller
+                  for MetalStack.
+                </div>
                 <DownloadHostAgentWalkthrough />
               </WizardStep>
               <WizardStep stepId="step3" label="Authorize Host Agent">
@@ -190,12 +210,12 @@ const IronicSetupPage = () => {
                   title="Authorize Host Agent"
                 />
               </WizardStep>
-              <WizardStep stepId="step4" label="Controller Config">
+              <WizardStep stepId="step4" label="Configure Controller">
                 <ControllerConfigStep
                   wizardContext={wizardContext}
                   setWizardContext={setWizardContext}
                   onNext={onNext}
-                  title="Controller Config"
+                  title="Configure Controller"
                   setSubmitting={setSubmittingStep}
                 />
               </WizardStep>
@@ -208,7 +228,7 @@ const IronicSetupPage = () => {
                   setSubmitting={setSubmittingStep}
                 />
               </WizardStep>
-              <WizardStep stepId="step6" label="OpenStack RC">
+              <WizardStep stepId="step6" label="Configure MetalStack">
                 <OpenStackRcStep />
               </WizardStep>
               <WizardStep stepId="step7" label="Summary">

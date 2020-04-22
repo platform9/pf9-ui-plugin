@@ -57,10 +57,10 @@ const OpenStackRcStep = (): JSX.Element => {
   return (
     <Paper className={paper} elevation={0}>
       <Typography className={clsx(text, bold)}>
-        OpenStack RC
+        Configure MetalStack
       </Typography>
       <Typography className={text}>
-        Step 1: Copy and paste the export commands below in an SSH session on the ironic conductor.
+        Step 1: Copy and paste the export commands below in an SSH session on the MetalStack controller node.
       </Typography>
       <CopyToClipboard copyText={openstackRc(username, projectName, region, keystoneLink)}>
         <CodeBlock>
@@ -68,7 +68,7 @@ const OpenStackRcStep = (): JSX.Element => {
         </CodeBlock>
       </CopyToClipboard>
       <Typography className={text}>
-        Step 2: Run setup-ironic to complete the Ironic Setup
+        Step 2: Run the following command on the controller node to complete the MetalStack Setup
       </Typography>
       <CopyToClipboard copyText='setup-ironic'>
         <CodeBlock>

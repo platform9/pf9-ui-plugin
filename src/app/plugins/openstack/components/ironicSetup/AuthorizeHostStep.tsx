@@ -44,29 +44,32 @@ const AuthorizeHostStep = ({ wizardContext, setWizardContext, onNext, title }: P
   // is unselected (all objects are replaced, old selected is no
   // longer there).
   return (
-    <ValidatedForm
-      initialValues={wizardContext}
-      onSubmit={setWizardContext}
-      triggerSubmit={onNext}
-      title={title}
-    >
-      {({ setFieldValue, values }) => (
-        <>
-          <PollingData
-            loading={hostsLoading}
-            onReload={reloadHosts}
-            refreshDuration={1000 * 60}
-          />
-          <ListTableField
-            id='selectedHost'
-            data={hosts}
-            onChange={getParamsUpdater('selectedHost')}
-            columns={columns}
-            loading={false}
-          />
-        </>
-      )}
-    </ValidatedForm>
+    <>
+      <div>Authorize the node to become the controller for MetalStack</div>
+      <ValidatedForm
+        initialValues={wizardContext}
+        onSubmit={setWizardContext}
+        triggerSubmit={onNext}
+        title={title}
+      >
+        {({ setFieldValue, values }) => (
+          <>
+            <PollingData
+              loading={hostsLoading}
+              onReload={reloadHosts}
+              refreshDuration={1000 * 60}
+            />
+            <ListTableField
+              id='selectedHost'
+              data={hosts}
+              onChange={getParamsUpdater('selectedHost')}
+              columns={columns}
+              loading={false}
+            />
+          </>
+        )}
+      </ValidatedForm>
+    </>
   )
 }
 

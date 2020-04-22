@@ -27,6 +27,7 @@ const TenantPicklist: React.ComponentType<Props> = forwardRef<HTMLElement, Props
       label = 'Tenant',
       selectFirst = false,
       showAll = false,
+      ...rest
     } = props
 
     const [tenants, tenantsLoading] = useDataLoader(mngmTenantActions.list)
@@ -45,6 +46,7 @@ const TenantPicklist: React.ComponentType<Props> = forwardRef<HTMLElement, Props
 
     return (
       <Picklist
+        {...rest}
         name={name}
         label={label}
         value={value}

@@ -27,6 +27,7 @@ const BridgeDevicePicklist: React.ComponentType<Props> = forwardRef<HTMLElement,
       selectFirst = true,
       hostId,
       showAll = false,
+      ...rest
     } = props
 
     // const [hosts, hostsLoading] = useDataLoader(loadResMgrHosts)
@@ -53,6 +54,7 @@ const BridgeDevicePicklist: React.ComponentType<Props> = forwardRef<HTMLElement,
 
     return (
       <Picklist
+        {...rest}
         name={name}
         label={label}
         value={value}

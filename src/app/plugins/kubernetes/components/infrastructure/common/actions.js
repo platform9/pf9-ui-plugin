@@ -4,7 +4,7 @@ import ApiClient from 'api-client/ApiClient'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { rawNodesCacheKey, loadNodes } from 'k8s/components/infrastructure/nodes/actions'
 import createContextUpdater from 'core/helpers/createContextUpdater'
-import { uniq, pathOr, toPairs } from 'ramda'
+import { uniq, pathOr, toPairs, flatten } from 'ramda'
 import { except } from 'utils/fp'
 
 export const clustersCacheKey = 'clusters'
@@ -21,8 +21,17 @@ const getIpPreview = (ips) => (
 )
 
 const getNetworkInterfaces = (node) => {
-  const ifaceMap = pathOr([], ['extensions', 'interfaces', 'data', 'iface_ip'], node)
-  return toPairs(ifaceMap) // [[interface, ip], [interface2, ip2], ...]
+  const ifaceMap = pathOr([], ['extensions', 'interfaces', 'data', 'iface_info'], node)
+  // Pair the interface name (obj key) to the data (obj value)
+  const pairedIfaces = toPairs(ifaceMap)
+  const ifaceList = pairedIfaces.map(pair => {
+    // Some interfaces have multiple IP addresses
+    const ifaces = pair[1].ifaces
+    return ifaces.map(iface => (
+      `${pair[0]}: ${iface.addr}`
+    ))
+  })
+  return ifaceList.flat() // [[interface, ip], [interface2, ip2], ...]
 }
 
 export const loadResMgrHosts = createContextLoader(
