@@ -29,7 +29,7 @@ interface Props extends IValidatedForm {
   pollForNodes?: boolean
   onChange?: (nodes: string[]) => void
   filterFn?: (node: ICombinedNode) => boolean
-  multiple?: boolean
+  selection?: 'none' | 'single' | 'multiple'
 }
 
 // TODO: all the ValidatedForm stuff is in JS and we need the props to be merged
@@ -93,7 +93,7 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef<HTMLElement, P
       hasError,
       errorMessage,
       pollForNodes = false,
-      multiple = false,
+      selection = 'single',
     } = props
     const { table, tableContainer, errorText, usageContainerClass } = useStyles(props)
     const [nodes, loading, loadMore]: IUseDataLoader<ICombinedNode> = useDataLoader(
@@ -115,7 +115,7 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef<HTMLElement, P
     const toggleHost = (uuid) => () => {
       const newHosts = isSelected(uuid)
         ? value.filter((x) => x !== uuid)
-        : multiple
+        : selection === 'multiple'
         ? [...value, uuid]
         : [uuid]
       onChange(newHosts)
@@ -131,7 +131,9 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef<HTMLElement, P
           <TableHead>
             <TableRow>
               <TableCell>
-                {multiple && <Checkbox checked={allSelected()} onChange={toggleAll} />}
+                {selection === 'multiple' && (
+                  <Checkbox checked={allSelected()} onChange={toggleAll} />
+                )}
               </TableCell>
               <TableCell>Hostname</TableCell>
               <TableCell>IP Address</TableCell>
@@ -152,11 +154,11 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef<HTMLElement, P
             {selectableNodes.map((node = emptyNode) => (
               <TableRow key={node.uuid} onClick={toggleHost(node.uuid)}>
                 <TableCell>
-                  {multiple ? (
+                  {selection === 'multiple' ? (
                     <Checkbox checked={isSelected(node.uuid)} />
-                  ) : (
+                  ) : selection === 'single' ? (
                     <Radio checked={isSelected(node.uuid)} />
-                  )}
+                  ) : null}
                 </TableCell>
                 <TableCell>{node.name}</TableCell>
                 <TableCell>{renderNetworkInterfaces(null, node, { wrapText: true })}</TableCell>
