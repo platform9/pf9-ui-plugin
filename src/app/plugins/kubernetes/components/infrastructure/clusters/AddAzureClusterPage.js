@@ -271,7 +271,6 @@ const AddAzureClusterPage = () => {
                           label="Region"
                           cloudProviderId={params.cloudProviderId}
                           onChange={getParamsUpdater('cloudProviderRegionId')}
-                          info="Region "
                           value={params.cloudProviderRegionId}
                           type="azure"
                           required
@@ -281,7 +280,7 @@ const AddAzureClusterPage = () => {
                         <TextField
                           id="sshKey"
                           label="Public SSH key"
-                          info="Copy/paste your public SSH key"
+                          info="Copy/paste your SSH public key"
                           multiline
                           rows={3}
                           required
