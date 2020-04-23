@@ -437,7 +437,6 @@ const AddAwsClusterPage = () => {
                           label="Region"
                           cloudProviderId={params.cloudProviderId}
                           onChange={getParamsUpdater('cloudProviderRegionId')}
-                          info="Region "
                           value={params.cloudProviderRegionId}
                           type="aws"
                           required
