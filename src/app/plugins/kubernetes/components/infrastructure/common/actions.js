@@ -13,7 +13,7 @@ export const combinedHostsCacheKey = 'combinedHosts'
 
 const { resmgr } = ApiClient.getInstance()
 
-const getIpPreview = (ips) => (
+const getIpPreview = (ips = []) => (
   // Get first IP that does not start with 192
   ips.find((ip) => (
     ip.substring(0, 3) !== '192'
@@ -43,9 +43,9 @@ export const loadResMgrHosts = createContextLoader(
     dataMapper: async (items, params, loadFromContext) => {
       return items.map((item) => ({
         ...item,
-        ipPreview: getIpPreview(item.extensions.ip_address.data),
+        ipPreview: getIpPreview(pathOr([], ['extensions', 'ip_address', 'data'], item)),
         networkInterfaces: getNetworkInterfaces(item),
-        ovsBridges: item.extensions.interfaces.data.ovs_bridges,
+        ovsBridges: pathOr([], ['extensions', 'interfaces', 'data', 'ovs_bridges'], item),
       }))
     },
     uniqueIdentifier: 'id',

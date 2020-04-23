@@ -173,7 +173,7 @@ const redirectToAppropriateStack = (ironicEnabled, kubernetesEnabled, history) =
     window.location = clarityDashboardUrl
   } else if (ironicEnabled && history.location.pathname.includes('kubernetes')) {
     history.push(ironicWizardUrl)
-  } else if (!ironicEnabled && history.location.pathname.includes('ironic')) {
+  } else if (!ironicEnabled && history.location.pathname.includes('metalstack')) {
     history.push(dashboardUrl)
   }
 }

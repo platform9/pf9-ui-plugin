@@ -16,16 +16,16 @@ interface Props {
   title: string
 }
 
+const columns = [
+  { id: 'info.hostname', label: 'Hostname' },
+  { id: 'ipPreview', label: 'IP Address' },
+  { id: 'info.os_info', label: 'Operating System' },
+]
+
 const AuthorizeHostStep = ({ wizardContext, setWizardContext, onNext, title }: Props) => {
   const { getParamsUpdater } = useParams(wizardContext)
 
   const [hosts, hostsLoading, reloadHosts]: IUseDataLoader<ResMgrHost> = useDataLoader(loadResMgrHosts) as any
-
-  const columns = [
-    { id: 'info.hostname', label: 'Hostname' },
-    { id: 'ipPreview', label: 'IP Address' },
-    { id: 'info.os_info', label: 'Operating System' },
-  ]
 
   // Minor bug: when the list of hosts is refreshed, prior selection
   // is unselected (all objects are replaced, old selected is no

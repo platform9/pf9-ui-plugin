@@ -169,7 +169,7 @@ const IronicSetupPage = () => {
         return
       })()
     }
-  }, [networks, hosts, subnets])
+  }, [networks, networksLoading, hosts, hostsLoading, subnets, subnetsLoading])
 
   return (
     <FormWrapper

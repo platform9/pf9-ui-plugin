@@ -119,7 +119,7 @@ class Wizard extends PureComponent {
     handleBack: this.handleBack,
     handleNext: this.handleNext,
     addStep: this.addStep,
-    activeStep: 0,
+    activeStep: this.props.startingStep || 0,
     steps: [],
     activeStepId: null,
     wizardContext: this.props.context || {},
