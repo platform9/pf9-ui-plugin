@@ -366,8 +366,14 @@ const renderCustomNetworkingFields = ({
 
 const AddAwsClusterPage = () => {
   const classes = useStyles()
-  const { params, getParamsUpdater } = useParams()
+  const { params, getParamsUpdater, updateParams } = useParams()
   const { history } = useReactRouter()
+
+  const changedRegion = ({ setWizardContext }) => (
+    (region) => {
+      setWizardContext({ azs: [], cloudProviderRegionId: region })
+    }
+  )
 
   useEffect(() => {
     trackEvent('WZ New AWS Cluster 0 Started', {
@@ -436,8 +442,8 @@ const AddAwsClusterPage = () => {
                           id="region"
                           label="Region"
                           cloudProviderId={params.cloudProviderId}
-                          onChange={getParamsUpdater('cloudProviderRegionId')}
-                          value={params.cloudProviderRegionId}
+                          onChange={changedRegion({ setWizardContext })}
+                          value={wizardContext.cloudProviderRegionId}
                           type="aws"
                           required
                         />
@@ -448,8 +454,9 @@ const AddAwsClusterPage = () => {
                             id="azs"
                             info="Select from the Availability Zones for the specified region"
                             cloudProviderId={params.cloudProviderId}
-                            cloudProviderRegionId={params.cloudProviderRegionId}
-                            onChange={getParamsUpdater('azs')}
+                            cloudProviderRegionId={wizardContext.cloudProviderRegionId}
+                            onChange={(value) => setWizardContext({ azs: value })}
+                            values={wizardContext.azs}
                             required
                           />
                         )}
