@@ -187,9 +187,6 @@ const getInitialStorageClassYaml = (wizardContext) => {
     storageType: '',
     ...wizardContext,
   }
-  const provisioner = `kubernetes.io/${
-    values.clusterType === 'aws' ? 'aws-ebs' : values.provisioner
-  }`
   const storageClass = {
     apiVersion: 'storage.k8s.io/v1',
     kind: 'StorageClass',
@@ -202,7 +199,6 @@ const getInitialStorageClassYaml = (wizardContext) => {
         'kubernetes.io/cluster-service': 'true',
       },
     },
-    provisioner,
   }
   if (values.clusterType === 'local') {
     storageClass.provisioner = `kubernetes.io/${values.provisioner}`
