@@ -96,6 +96,7 @@ const BasicStep = ({ onSubmit, triggerSubmit, wizardContext }) => {
           info="The cluster to deploy this storage class on."
           onChange={getParamsUpdater('clusterId')}
           value={params.clusterId}
+          onlyHealthyClusters
           required
         />
         <TextField
@@ -204,6 +205,7 @@ const getInitialStorageClassYaml = (wizardContext) => {
     storageClass.provisioner = `kubernetes.io/${values.provisioner}`
   }
   if (values.clusterType === 'aws') {
+    storageClass.provisioner = 'kubernetes.io/aws-ebs'
     storageClass.parameters = {
       type: values.storageType,
     }
