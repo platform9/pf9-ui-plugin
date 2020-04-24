@@ -49,6 +49,7 @@ import {
   Button,
 } from '@material-ui/core'
 import { hexToRGBA } from 'core/utils/colorHelpers'
+import PollingData from 'core/components/PollingData'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
@@ -171,7 +172,7 @@ const canFinishAndReview = ({ masterNodes, workerNodes, allowWorkloadsOnMaster }
 const AddBareOsClusterPage = () => {
   const classes = useStyles()
   const { history } = useReactRouter()
-  const [nodes] = useDataLoader(loadNodes)
+  const [nodes, loading, reload] = useDataLoader(loadNodes)
   const [showDialog, setShowDialog] = useState(false)
   const wizRef = useRef(null)
   const validatorRef = useRef(null)
@@ -267,6 +268,7 @@ const AddBareOsClusterPage = () => {
                 triggerSubmit={setupValidator(onNext)}
                 elevated={false}
               >
+                <PollingData loading={loading} onReload={reload} hidden />
                 {/* Cluster Name */}
                 <FormFieldCard title="Name your Kubernetes Cluster">
                   <TextField
