@@ -366,8 +366,15 @@ const renderCustomNetworkingFields = ({
 
 const AddAwsClusterPage = () => {
   const classes = useStyles()
-  const { params, getParamsUpdater } = useParams()
+  const { params, getParamsUpdater, updateParams } = useParams()
   const { history } = useReactRouter()
+
+  const changedRegion = ({ setWizardContext }) => (
+    (region) => {
+      updateParams({ cloudProviderRegionId: region })
+      updateParams({ azs: [] })
+    }
+  )
 
   useEffect(() => {
     trackEvent('WZ New AWS Cluster 0 Started', {
@@ -436,7 +443,7 @@ const AddAwsClusterPage = () => {
                           id="region"
                           label="Region"
                           cloudProviderId={params.cloudProviderId}
-                          onChange={getParamsUpdater('cloudProviderRegionId')}
+                          onChange={changedRegion({ setWizardContext })}
                           value={params.cloudProviderRegionId}
                           type="aws"
                           required
@@ -450,6 +457,7 @@ const AddAwsClusterPage = () => {
                             cloudProviderId={params.cloudProviderId}
                             cloudProviderRegionId={params.cloudProviderRegionId}
                             onChange={getParamsUpdater('azs')}
+                            values={params.azs}
                             required
                           />
                         )}
