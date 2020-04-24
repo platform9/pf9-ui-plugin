@@ -96,7 +96,6 @@ const BasicStep = ({ onSubmit, triggerSubmit, wizardContext }) => {
           info="The cluster to deploy this storage class on."
           onChange={getParamsUpdater('clusterId')}
           value={params.clusterId}
-          onlyHealthyClusters
           required
         />
         <TextField
@@ -188,6 +187,9 @@ const getInitialStorageClassYaml = (wizardContext) => {
     storageType: '',
     ...wizardContext,
   }
+  const provisioner = `kubernetes.io/${
+    values.clusterType === 'aws' ? 'aws-ebs' : values.provisioner
+  }`
   const storageClass = {
     apiVersion: 'storage.k8s.io/v1',
     kind: 'StorageClass',
@@ -200,12 +202,12 @@ const getInitialStorageClassYaml = (wizardContext) => {
         'kubernetes.io/cluster-service': 'true',
       },
     },
+    provisioner,
   }
   if (values.clusterType === 'local') {
     storageClass.provisioner = `kubernetes.io/${values.provisioner}`
   }
   if (values.clusterType === 'aws') {
-    storageClass.provisioner = 'kubernetes.io/aws-ebs'
     storageClass.parameters = {
       type: values.storageType,
     }
