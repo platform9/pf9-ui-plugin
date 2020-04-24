@@ -369,10 +369,12 @@ const AddAwsClusterPage = () => {
   const { params, getParamsUpdater, updateParams } = useParams()
   const { history } = useReactRouter()
 
-  const changedRegion = (region) => {
-    updateParams({ cloudProviderRegionId: region })
-    updateParams({ azs: [] })
-  }
+  const changedRegion = ({ setWizardContext }) => (
+    (region) => {
+      updateParams({ cloudProviderRegionId: region })
+      setWizardContext({ azs: [] })
+    }
+  )
 
   useEffect(() => {
     trackEvent('WZ New AWS Cluster 0 Started', {
@@ -441,7 +443,7 @@ const AddAwsClusterPage = () => {
                           id="region"
                           label="Region"
                           cloudProviderId={params.cloudProviderId}
-                          onChange={changedRegion}
+                          onChange={changedRegion({ setWizardContext })}
                           value={params.cloudProviderRegionId}
                           type="aws"
                           required
@@ -454,8 +456,8 @@ const AddAwsClusterPage = () => {
                             info="Select from the Availability Zones for the specified region"
                             cloudProviderId={params.cloudProviderId}
                             cloudProviderRegionId={params.cloudProviderRegionId}
-                            onChange={getParamsUpdater('azs')}
-                            values={params.azs}
+                            onChange={(value) => setWizardContext({ azs: value })}
+                            values={wizardContext.azs}
                             required
                           />
                         )}
