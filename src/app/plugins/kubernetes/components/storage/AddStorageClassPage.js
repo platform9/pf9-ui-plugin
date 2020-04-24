@@ -201,6 +201,9 @@ const getInitialStorageClassYaml = (wizardContext) => {
       },
     },
   }
+  if (values.clusterType === 'local') {
+    storageClass.provisioner = `kubernetes.io/${values.provisioner}`
+  }
   if (values.clusterType === 'aws') {
     storageClass.provisioner = 'kubernetes.io/aws-ebs'
     storageClass.parameters = {
