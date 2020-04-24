@@ -371,8 +371,7 @@ const AddAwsClusterPage = () => {
 
   const changedRegion = ({ setWizardContext }) => (
     (region) => {
-      updateParams({ cloudProviderRegionId: region })
-      setWizardContext({ azs: [] })
+      setWizardContext({ azs: [], cloudProviderRegionId: region })
     }
   )
 
@@ -444,7 +443,7 @@ const AddAwsClusterPage = () => {
                           label="Region"
                           cloudProviderId={params.cloudProviderId}
                           onChange={changedRegion({ setWizardContext })}
-                          value={params.cloudProviderRegionId}
+                          value={wizardContext.cloudProviderRegionId}
                           type="aws"
                           required
                         />
@@ -455,7 +454,7 @@ const AddAwsClusterPage = () => {
                             id="azs"
                             info="Select from the Availability Zones for the specified region"
                             cloudProviderId={params.cloudProviderId}
-                            cloudProviderRegionId={params.cloudProviderRegionId}
+                            cloudProviderRegionId={wizardContext.cloudProviderRegionId}
                             onChange={(value) => setWizardContext({ azs: value })}
                             values={wizardContext.azs}
                             required
