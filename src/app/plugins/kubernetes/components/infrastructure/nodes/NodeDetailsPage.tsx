@@ -56,7 +56,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 }))
 
 const ClusterDetailsPage: FC = () => {
-  const { match } = useReactRouter()
+  const { match, history } = useReactRouter()
   const classes = useStyles({})
   const [nodes, loading] = useDataLoader(loadNodes)
   const selectedNode: ICombinedNode =
@@ -88,7 +88,7 @@ const ClusterDetailsPage: FC = () => {
       header={
         <>
           <Typography variant="h5">Node {selectedNode.name}</Typography>
-          <SimpleLink src={routes.nodes.list.path()} className={classes.backLink}>
+          <SimpleLink onClick={history.goBack} src="" className={classes.backLink}>
             « Back to Node List
           </SimpleLink>
         </>
