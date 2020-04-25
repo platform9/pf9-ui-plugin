@@ -57,6 +57,17 @@ const getKubernetesVersion = async (clusterId) => {
     return null
   }
 }
+const getK8sDashboardLinkFromVersion = (version, qbertEndpoint, cluster) => {
+  const matches = /(?<major>\d+).(?<minor>\d+).(?<patch>\d+)/.exec(version)
+  if (!version || !matches) {
+    return null
+  }
+  const { major, minor } = matches.groups || {}
+  const isNewDashboardUrl = major >= 1 && minor >= 16
+  return `${qbertEndpoint}/clusters/${cluster.uuid}/k8sapi/api/v1/namespaces/${
+    isNewDashboardUrl ? 'kubernetes-dashboard' : 'kube-system'
+  }/services/https:kubernetes-dashboard:443/proxy/`
+}
 
 const getEtcdBackupPayload = (path, data) =>
   pathStrOr(0, path, data)
@@ -277,7 +288,6 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
       const nodeIds = pluck('uuid', nodesInCluster)
       const combinedNodes = combinedHosts.filter((x) => nodeIds.includes(x.resmgr.id))
       const calcNodesTotals = calcUsageTotalByPath(combinedNodes)
-      const dashboardLink = `${qbertEndpoint}/clusters/${cluster.uuid}/k8sapi/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:443/proxy/`
       const host = qbertEndpoint.match(/(.*?)\/qbert/)[1]
       const grafanaLink = `${host}/k8s/v1/clusters/${cluster.uuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:grafana-ui:80/proxy/`
       const isPrometheusEnabled = hasPrometheusEnabled(clusterWithTasks)
@@ -311,6 +321,7 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
       const progressPercent =
         cluster.taskStatus === 'converging' ? await getProgressPercent(cluster.uuid) : null
       const version = hasMasterNode ? await getKubernetesVersion(cluster.uuid) : null
+      const dashboardLink = getK8sDashboardLinkFromVersion(version, qbertEndpoint, cluster)
 
       return {
         ...cluster,
