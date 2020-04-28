@@ -248,7 +248,7 @@ const renderCustomNetworkingFields = ({
               azs={params.azs}
               onChange={getParamsUpdater('vpcId')}
               cloudProviderId={params.cloudProviderId}
-              cloudProviderRegionId={params.cloudProviderRegionId}
+              cloudProviderRegionId={wizardContext.cloudProviderRegionId}
               info=""
               required
               disabled={usePf9Domain}
@@ -257,7 +257,7 @@ const renderCustomNetworkingFields = ({
             <AwsZoneVpcMappings
               type="public"
               cloudProviderId={params.cloudProviderId}
-              cloudProviderRegionId={params.cloudProviderRegionId}
+              cloudProviderRegionId={wizardContext.cloudProviderRegionId}
               onChange={getParamsUpdater('subnets')}
               vpcId={params.vpcId}
               azs={params.azs}
@@ -275,7 +275,7 @@ const renderCustomNetworkingFields = ({
               azs={params.azs}
               onChange={getParamsUpdater('vpcId')}
               cloudProviderId={params.cloudProviderId}
-              cloudProviderRegionId={params.cloudProviderRegionId}
+              cloudProviderRegionId={wizardContext.cloudProviderRegionId}
               info=""
               required
               disabled={usePf9Domain}
@@ -284,7 +284,7 @@ const renderCustomNetworkingFields = ({
             <AwsZoneVpcMappings
               type="public"
               cloudProviderId={params.cloudProviderId}
-              cloudProviderRegionId={params.cloudProviderRegionId}
+              cloudProviderRegionId={wizardContext.cloudProviderRegionId}
               onChange={getParamsUpdater('subnets')}
               vpcId={params.vpcId}
               azs={params.azs}
@@ -294,7 +294,7 @@ const renderCustomNetworkingFields = ({
             <AwsZoneVpcMappings
               type="private"
               cloudProviderId={params.cloudProviderId}
-              cloudProviderRegionId={params.cloudProviderRegionId}
+              cloudProviderRegionId={wizardContext.cloudProviderRegionId}
               onChange={getParamsUpdater('privateSubnets')}
               vpcId={params.vpcId}
               azs={params.azs}
@@ -312,7 +312,7 @@ const renderCustomNetworkingFields = ({
               azs={params.azs}
               onChange={getParamsUpdater('vpcId')}
               cloudProviderId={params.cloudProviderId}
-              cloudProviderRegionId={params.cloudProviderRegionId}
+              cloudProviderRegionId={wizardContext.cloudProviderRegionId}
               info=""
               required
               disabled={usePf9Domain}
@@ -321,7 +321,7 @@ const renderCustomNetworkingFields = ({
             <AwsZoneVpcMappings
               type="private"
               cloudProviderId={params.cloudProviderId}
-              cloudProviderRegionId={params.cloudProviderRegionId}
+              cloudProviderRegionId={wizardContext.cloudProviderRegionId}
               onChange={getParamsUpdater('privateSubnets')}
               vpcId={params.vpcId}
               azs={params.azs}
@@ -340,7 +340,7 @@ const renderCustomNetworkingFields = ({
         label="Domain"
         onChange={updateFqdns}
         cloudProviderId={params.cloudProviderId}
-        cloudProviderRegionId={params.cloudProviderRegionId}
+        cloudProviderRegionId={wizardContext.cloudProviderRegionId}
         info="Select the base domain name to be used for the API and service FQDNs"
         required={!values.usePf9Domain}
         disabled={values.usePf9Domain}
@@ -366,14 +366,8 @@ const renderCustomNetworkingFields = ({
 
 const AddAwsClusterPage = () => {
   const classes = useStyles()
-  const { params, getParamsUpdater, updateParams } = useParams()
+  const { params, getParamsUpdater } = useParams()
   const { history } = useReactRouter()
-
-  const changedRegion = ({ setWizardContext }) => (
-    (region) => {
-      setWizardContext({ azs: [], cloudProviderRegionId: region })
-    }
-  )
 
   useEffect(() => {
     trackEvent('WZ New AWS Cluster 0 Started', {
@@ -442,7 +436,9 @@ const AddAwsClusterPage = () => {
                           id="region"
                           label="Region"
                           cloudProviderId={params.cloudProviderId}
-                          onChange={changedRegion({ setWizardContext })}
+                          onChange={(region) =>
+                            setWizardContext({ azs: [], cloudProviderRegionId: region })
+                          }
                           value={wizardContext.cloudProviderRegionId}
                           type="aws"
                           required
@@ -464,11 +460,13 @@ const AddAwsClusterPage = () => {
                         {/* SSH Key */}
                         <PicklistField
                           DropdownComponent={AwsClusterSshKeyPicklist}
-                          disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
+                          disabled={
+                            !(params.cloudProviderId && wizardContext.cloudProviderRegionId)
+                          }
                           id="sshKey"
                           label="SSH Key"
                           cloudProviderId={params.cloudProviderId}
-                          cloudProviderRegionId={params.cloudProviderRegionId}
+                          cloudProviderRegionId={wizardContext.cloudProviderRegionId}
                           info="Select an AWS SSH key to be associated with the nodes. This key can be used to access the nodes for debugging or other purposes."
                           required
                         />
@@ -499,11 +497,13 @@ const AddAwsClusterPage = () => {
                             {/* Master node instance type */}
                             <PicklistField
                               DropdownComponent={AwsRegionFlavorPicklist}
-                              disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
+                              disabled={
+                                !(params.cloudProviderId && wizardContext.cloudProviderRegionId)
+                              }
                               id="masterFlavor"
                               label="Master Node Instance Type"
                               cloudProviderId={params.cloudProviderId}
-                              cloudProviderRegionId={params.cloudProviderRegionId}
+                              cloudProviderRegionId={wizardContext.cloudProviderRegionId}
                               info="Choose an instance type used by master nodes."
                               required
                             />
@@ -520,11 +520,13 @@ const AddAwsClusterPage = () => {
                             {/* Worker node instance type */}
                             <PicklistField
                               DropdownComponent={AwsRegionFlavorPicklist}
-                              disabled={!(params.cloudProviderId && params.cloudProviderRegionId)}
+                              disabled={
+                                !(params.cloudProviderId && wizardContext.cloudProviderRegionId)
+                              }
                               id="workerFlavor"
                               label="Worker Node Instance Type"
                               cloudProviderId={params.cloudProviderId}
-                              cloudProviderRegionId={params.cloudProviderRegionId}
+                              cloudProviderRegionId={wizardContext.cloudProviderRegionId}
                               info="Choose an instance type used by worker nodes."
                               required
                             />
