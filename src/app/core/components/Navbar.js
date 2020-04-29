@@ -11,6 +11,7 @@ import {
   MenuItem,
   MenuList,
   Typography,
+  Button,
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
@@ -24,12 +25,41 @@ import moize from 'moize'
 import { assoc, flatten, pluck, prop, propEq, propOr, where, equals } from 'ramda'
 import { matchPath, withRouter } from 'react-router'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
-import { imageUrls, clarityDashboardUrl } from 'app/constants'
+import { imageUrls, clarityDashboardUrl, helpUrl } from 'app/constants'
 import { routes } from 'core/utils/routes'
+
+import { version } from '../../../../package.json'
+import SimpleLink from './SimpleLink'
 
 export const drawerWidth = 180
 
 const styles = (theme) => ({
+  bottomContent: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    padding: theme.spacing(2, 1, 1, 1),
+    backgroundColor: theme.palette.header.background,
+    '& a': {
+      margin: theme.spacing(2, 0),
+      textDecorationColor: '#e6e6e6 !important',
+    },
+    '& span, & i': {
+      color: '#e6e6e6',
+    },
+    '& button': {
+      backgroundColor: '#f3f3f4',
+      '&:hover': {
+        backgroundColor: '#FFFFFF',
+      },
+      '& *': {
+        color: theme.palette.header.background,
+      },
+      '& i': {
+        marginLeft: theme.spacing(),
+      },
+    },
+  },
   logoTitle: {
     backgroundImage: `url(${imageUrls.logo})`,
     backgroundRepeat: 'no-repeat',
@@ -155,6 +185,7 @@ const styles = (theme) => ({
   navMenu: {
     padding: 0,
     width: '100%',
+    flex: 1,
   },
   navMenuItem: {
     display: 'grid',
@@ -385,6 +416,10 @@ class Navbar extends PureComponent {
     )
   })
 
+  handleNavigateToClarity = () => {
+    window.location = clarityDashboardUrl
+  }
+
   renderNavFolder = (name, link, subLinks, icon) => {
     const {
       classes,
@@ -588,6 +623,19 @@ class Navbar extends PureComponent {
           {filteredSections.length > 1
             ? this.renderSections(filteredSections)
             : this.renderSectionLinks(propOr([], 'links', filteredSections[0]))}
+
+          <div className={classes.bottomContent}>
+            <Button onClick={this.handleNavigateToClarity}>
+              Back to Legacy UI
+              <FontAwesomeIcon size="md">undo</FontAwesomeIcon>
+            </Button>
+            <SimpleLink src={helpUrl} className={classes.helpLink}>
+              <FontAwesomeIcon>question-circle</FontAwesomeIcon> <span>Need Help?</span>
+            </SimpleLink>
+            <Typography variant="body2" component="span">
+              Version {version}
+            </Typography>
+          </div>
         </Drawer>
       </div>
     )
