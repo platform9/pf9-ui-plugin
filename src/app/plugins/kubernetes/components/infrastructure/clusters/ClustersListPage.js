@@ -23,6 +23,7 @@ import { isAdminRole } from 'k8s/util/helpers'
 import { routes } from 'core/utils/routes'
 import CodeBlock from 'core/components/CodeBlock'
 import DateCell from 'core/components/listTable/cells/DateCell'
+import CopyToClipboard from 'core/components/CopyToClipboard'
 
 const useStyles = makeStyles((theme) => ({
   links: {
@@ -30,6 +31,14 @@ const useStyles = makeStyles((theme) => ({
     gridGap: '6px',
   },
 }))
+
+const renderUUID = (_, { uuid }) => {
+  return (
+    <CopyToClipboard copyText={uuid} codeBlock={false}>
+      <span>{uuid}</span>
+    </CopyToClipboard>
+  )
+}
 
 const renderCloudProviderType = (type, cluster) => {
   if (type === 'local') {
@@ -143,6 +152,7 @@ export const options = {
     return <CreateButton onClick={onClick}>Add Cluster</CreateButton>
   },
   columns: [
+    { id: 'uuid', label: 'UUID', render: renderUUID, display: false },
     { id: 'name', label: 'Cluster name', render: renderClusterDetailLink },
     {
       id: 'connectionStatus',
