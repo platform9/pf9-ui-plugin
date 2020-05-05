@@ -12,7 +12,6 @@ import WizardStep from 'core/components/wizard/WizardStep'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import useReactRouter from 'use-react-router'
 import DownloadCliWalkthrough from '../../nodes/DownloadCliWalkthrough'
-import Panel from 'app/plugins/theme/components/Panel'
 import CodeBlock from 'core/components/CodeBlock'
 import ExternalLink from 'core/components/ExternalLink'
 import ClusterHostChooser, {
@@ -24,7 +23,11 @@ import { clusterActions } from '../actions'
 import { pathJoin } from 'utils/misc'
 import { defaultEtcBackupPath, k8sPrefix } from 'app/constants'
 import { makeStyles } from '@material-ui/styles'
-import { masterNodeLengthValidator, requiredValidator } from 'core/utils/fieldValidators'
+import {
+  masterNodeLengthValidator,
+  requiredValidator,
+  customValidator,
+} from 'core/utils/fieldValidators'
 import { allPass } from 'ramda'
 import EtcdBackupFields from '../EtcdBackupFields'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
@@ -65,6 +68,35 @@ const initialContext = {
   tags: [],
   appCatalogEnabled: false,
 }
+// IP and Block Size validator
+// /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\/(0?[1-9]|[12][0-9]|3[01])$/
+
+const calicoBlockSizeValidator = customValidator((value, formValues) => {
+  const blockSize = `${formValues.containersCidr}`.split('/')[1]
+  return value > 20 && value < 32 && value > blockSize
+}, 'Calico Block Size must be greater than 20, less than 32 and not conflict with the Container CIDR')
+
+const cidrBlockSizeValidator = customValidator((value) => {
+  const blockSize = `${value}`.split('/')[1]
+  return blockSize > 0 && blockSize < 32
+}, 'Block Size must be greater than 0 and less than 32')
+
+const IPValidator = customValidator((value, formValues) => {
+  // validates the octect ranges for an IP
+  const IP = `${value}`.split('/')[0]
+  if (IP === '0.0.0.0' || IP === '255.255.255.255') {
+    return false
+  }
+  return /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(
+    IP,
+  )
+}, 'IP invalid, must be between 0.0.0.0 and 255.255.255.255')
+
+const containerAndServicesIPEqualsValidator = customValidator((value, formValues) => {
+  const containersIP = `${formValues.containersCidr}`.split('/')[0]
+  const servicesIP = `${value}`.split('/')[0]
+  return containersIP !== servicesIP
+}, 'The services CIDR cannot have the same IP address as the containers CIDR')
 
 const runtimeConfigOptions = [
   { label: 'Default API groups and versions', value: 'default' },
@@ -75,8 +107,31 @@ const runtimeConfigOptions = [
 const networkPluginOptions = [
   { label: 'Flannel', value: 'flannel' },
   { label: 'Calico', value: 'calico' },
-  { label: 'Canal (experimental)', value: 'canal' },
+  // { label: 'Canal (experimental)', value: 'canal' },
 ]
+
+const calicoIpIpOptions = [
+  { label: 'Always', value: 'Always' },
+  { label: 'Cross Subnet', value: 'CrossSubnet' },
+  { label: 'Never', value: 'Never' },
+]
+const calicoIpIPHelpText = {
+  Always: 'Encapsulates POD traffic in IP-in-IP between nodes.',
+  CrossSubnet:
+    'Encapsulation when nodes span subnets and cross routers that may drop native POD traffic, this is not required between nodes with L2 connectivity.',
+  Never: 'Disables IP in IP Encapsulation.',
+}
+
+const handleNetworkPluginChange = (option, wizardContext) => {
+  const payload = {
+    networkPlugin: option,
+    privileged: option === 'calico' ? true : wizardContext.privileged,
+    calicoIpIpMode: option === 'calico' ? 'Always' : undefined,
+    calicoNatOutgoing: option === 'calico' ? true : undefined,
+    calicoV4BlockSize: option === 'calico' ? '24' : undefined,
+  }
+  return payload
+}
 
 const useStyles = makeStyles((theme) => ({
   inline: {
@@ -442,112 +497,154 @@ const AddBareOsClusterPage = () => {
                 initialValues={wizardContext}
                 onSubmit={setWizardContext}
                 triggerSubmit={onNext}
-                title="Networking Details"
                 className={classes.paddBottom}
+                elevated={false}
               >
                 {({ values }) => (
                   <>
-                    <TextField
-                      id="masterVipIpv4"
-                      label="Virtual IP address for cluster"
-                      info={
-                        <div>
-                          Specify the virtual IP address that will be used to provide access to the
-                          API server endpoint for this cluster. A virtual IP must be specified if
-                          you want to grow the number of masters in the future. Refer to{' '}
-                          <a href={pf9PmkArchitectureDigLink} target="_blank">
-                            this article
-                          </a>{' '}
-                          for more information re how the VIP service operates, VIP configuration,
-                          etc.
-                        </div>
-                      }
-                      required={(wizardContext.masterNodes || []).length > 1}
-                    />
-
-                    <PicklistField
-                      DropdownComponent={VipInterfaceChooser}
-                      id="masterVipIface"
-                      label="Physical interface for virtual IP association"
-                      info="Provide the name of the network interface that the virtual IP should be bound to. The virtual IP should be reachable from the network this interface connects to. Note: All master nodes should use the same interface (eg: ens3) that the virtual IP will be bound to."
-                      masterNodes={wizardContext.masterNodes}
-                      required={(wizardContext.masterNodes || []).length > 1}
-                    />
-
-                    {/* Assign public IP's */}
-                    <CheckboxField
-                      id="enableMetallb"
-                      label="Enable MetalLB"
-                      info="Select if MetalLB should load-balancer should be enabled for this cluster. Platform9 uses MetalLB - a load-balancer implementation for bare metal Kubernetes clusters that uses standard routing protocols - for service level load balancing. Enabling MetalLB on this cluster will provide the ability to create services of type load-balancer."
-                    />
-
-                    {values.enableMetallb && (
+                    <FormFieldCard title="Cluster Virtual IP Setup">
                       <TextField
-                        id="metallbCidr"
-                        label="Address pool range(s) for Metal LB"
-                        info="Provide the IP address pool that MetalLB load-balancer is allowed to allocate from. You need to specify an explicit start-end range of IPs for the pool.  It takes the following format: startIP1-endIP1,startIP2-endIP2"
+                        id="masterVipIpv4"
+                        label="Virtual IP address for cluster"
+                        info={
+                          <div>
+                            Specify the virtual IP address that will be used to provide access to
+                            the API server endpoint for this cluster. A virtual IP must be specified
+                            if you want to grow the number of masters in the future. Refer to{' '}
+                            <a href={pf9PmkArchitectureDigLink} target="_blank">
+                              this article
+                            </a>{' '}
+                            for more information re how the VIP service operates, VIP configuration,
+                            etc.
+                          </div>
+                        }
+                        required={(wizardContext.masterNodes || []).length > 1}
+                      />
+
+                      <PicklistField
+                        DropdownComponent={VipInterfaceChooser}
+                        id="masterVipIface"
+                        label="Physical interface for virtual IP association"
+                        infoPlacement="right-end"
+                        info="Provide the name of the network interface that the virtual IP should be bound to. The virtual IP should be reachable from the network this interface connects to. Note: All master nodes should use the same interface (eg: ens3) that the virtual IP will be bound to."
+                        masterNodes={wizardContext.masterNodes}
+                        required={(wizardContext.masterNodes || []).length > 1}
+                      />
+
+                      {/* API FQDN */}
+                      <TextField
+                        id="externalDnsName"
+                        label="API FQDN"
+                        infoPlacement="right-end"
+                        info="FQDN (Fully Qualified Domain Name) is used to reference cluster API. To ensure the API can be accessed securely at the FQDN, the FQDN will be included in the API server certificate's Subject Alt Names. If deploying onto a cloud provider, we will automatically create the DNS records for this FQDN using the cloud provider’s DNS service."
+                      />
+                    </FormFieldCard>
+
+                    <FormFieldCard title="Cluster Networking Range & HTTP Proxy">
+                      {/* Containers CIDR */}
+                      <TextField
+                        id="containersCidr"
+                        label="Containers CIDR"
+                        info="Defines the network CIDR from which the flannel networking layer allocates IP addresses to Docker containers. This CIDR should not overlap with the VPC CIDR. Each node gets a /24 subnet. Choose a CIDR bigger than /23 depending on the number of nodes in your cluster. A /16 CIDR gives you 256 nodes."
+                        required
+                        validations={[IPValidator, cidrBlockSizeValidator]}
+                      />
+
+                      {/* Services CIDR */}
+                      <TextField
+                        id="servicesCidr"
+                        label="Services CIDR"
+                        info="Defines the network CIDR from which Kubernetes allocates virtual IP addresses to Services.  This CIDR should not overlap with the VPC CIDR."
+                        required
+                        validations={[
+                          IPValidator,
+                          containerAndServicesIPEqualsValidator,
+                          cidrBlockSizeValidator,
+                        ]}
+                      />
+
+                      {/* HTTP proxy */}
+                      <TextField
+                        id="httpProxy"
+                        label="HTTP Proxy"
+                        infoPlacement="right-end"
+                        info={
+                          <div className={classes.inline}>
+                            (Optional) Specify the HTTP proxy for this cluster. Uses format of{' '}
+                            <CodeBlock>
+                              <span>{'<scheme>://<username>:<password>@<host>:<port>'}</span>
+                            </CodeBlock>{' '}
+                            where username and password are optional.
+                          </div>
+                        }
+                      />
+                    </FormFieldCard>
+
+                    <FormFieldCard title="Cluster CNI">
+                      <PicklistField
+                        id="networkPlugin"
+                        label="Network backend"
+                        onChange={(value) =>
+                          setWizardContext(handleNetworkPluginChange(value, wizardContext))
+                        }
+                        options={networkPluginOptions}
+                        info=""
                         required
                       />
-                    )}
+                      {values.networkPlugin === 'calico' && (
+                        <>
+                          <PicklistField
+                            id="calicoIpIpMode"
+                            value={wizardContext.calicoIpIpMode}
+                            label="IP in IP Encapsulation Mode"
+                            onChange={(value) => setWizardContext({ calicoIpIpMode: value })}
+                            options={calicoIpIpOptions}
+                            info={calicoIpIPHelpText[wizardContext.calicoIpIpMode] || ''}
+                            required
+                          />
+                          <CheckboxField
+                            id="calicoNatOutgoing"
+                            value={wizardContext.calicoNatOutgoing}
+                            onChange={(value) => setWizardContext({ calicoNatOutgoing: value })}
+                            label="NAT Outgoing"
+                            info="Packets destined outside the POD network will be SNAT'd using the node's IP."
+                          />
+                          <TextField
+                            id="calicoV4BlockSize"
+                            value={wizardContext.calicoV4BlockSize}
+                            label="Block Size"
+                            onChange={(value) => setWizardContext({ calicoV4BlockSize: value })}
+                            info="Block size determines how many Pod's can run per node vs total number of nodes per cluster. Example /22 enables 1024 IPs per node, and a maximum of 64 nodes. Block size must be greater than 20 and less than 32 and not conflict with the Contain CIDR"
+                            required
+                            validations={[calicoBlockSizeValidator]}
+                          />
+                          <TextField
+                            id="mtuSize"
+                            label="MTU Size"
+                            info="Maximum Transmission Unit (MTU) for the interface (in bytes)"
+                            required
+                          />
+                        </>
+                      )}
+                    </FormFieldCard>
 
-                    {/* API FQDN */}
-                    <TextField
-                      id="externalDnsName"
-                      label="API FQDN"
-                      info="FQDN (Fully Qualified Domain Name) is used to reference cluster API. To ensure the API can be accessed securely at the FQDN, the FQDN will be included in the API server certificate's Subject Alt Names. If deploying onto a cloud provider, we will automatically create the DNS records for this FQDN using the cloud provider’s DNS service."
-                    />
-
-                    {/* Containers CIDR */}
-                    <TextField
-                      id="containersCidr"
-                      label="Containers CIDR"
-                      info="Defines the network CIDR from which the flannel networking layer allocates IP addresses to Docker containers. This CIDR should not overlap with the VPC CIDR. Each node gets a /24 subnet. Choose a CIDR bigger than /23 depending on the number of nodes in your cluster. A /16 CIDR gives you 256 nodes."
-                      required
-                    />
-
-                    {/* Services CIDR */}
-                    <TextField
-                      id="servicesCidr"
-                      label="Services CIDR"
-                      info="Defines the network CIDR from which Kubernetes allocates virtual IP addresses to Services.  This CIDR should not overlap with the VPC CIDR."
-                      required
-                    />
-
-                    {/* HTTP proxy */}
-                    <TextField
-                      id="httpProxy"
-                      label="HTTP Proxy"
-                      info={
-                        <div className={classes.inline}>
-                          (Optional) Specify the HTTP proxy for this cluster. Uses format of{' '}
-                          <CodeBlock>
-                            <span>{'<scheme>://<username>:<password>@<host>:<port>'}</span>
-                          </CodeBlock>{' '}
-                          where username and password are optional.
-                        </div>
-                      }
-                    />
-                    <PicklistField
-                      id="networkPlugin"
-                      label="Network backend"
-                      onChange={(value) =>
-                        setWizardContext({
-                          networkPlugin: value,
-                          privileged: value === 'calico' ? true : wizardContext.privileged,
-                        })
-                      }
-                      options={networkPluginOptions}
-                      info=""
-                      required
-                    />
-                    {values.networkPlugin === 'calico' && (
-                      <TextField
-                        id="mtuSize"
-                        label="MTU Size"
-                        info="Maximum Transmission Unit (MTU) for the interface (in bytes)"
-                        required
+                    <FormFieldCard title="Cluster Load Balancer">
+                      {/* Assign public IP's */}
+                      <CheckboxField
+                        id="enableMetallb"
+                        label="Enable MetalLB"
+                        info="Select if MetalLB should load-balancer should be enabled for this cluster. Platform9 uses MetalLB - a load-balancer implementation for bare metal Kubernetes clusters that uses standard routing protocols - for service level load balancing. Enabling MetalLB on this cluster will provide the ability to create services of type load-balancer."
                       />
-                    )}
+
+                      {values.enableMetallb && (
+                        <TextField
+                          id="metallbCidr"
+                          label="Address pool range(s) for Metal LB"
+                          info="Provide the IP address pool that MetalLB load-balancer is allowed to allocate from. You need to specify an explicit start-end range of IPs for the pool.  It takes the following format: startIP1-endIP1,startIP2-endIP2"
+                          required
+                        />
+                      )}
+                    </FormFieldCard>
                   </>
                 )}
               </ValidatedForm>
