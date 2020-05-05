@@ -240,6 +240,9 @@ const createGenericCluster = async (body, data, loadFromContext) => {
   }
   if (data.networkPlugin === 'calico') {
     body.mtuSize = data.mtuSize
+    body.calicoIpIpMode = data.calicoIpIpMode
+    body.calicoNatOutgoing = data.calicoNatOutgoing
+    body.calicoV4BlockSize = data.calicoV4BlockSize
   }
   body.networkPlugin = data.networkPlugin
   body.runtimeConfig = {
