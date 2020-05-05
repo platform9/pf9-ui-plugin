@@ -34,6 +34,9 @@ import SimpleLink from './SimpleLink'
 export const drawerWidth = 180
 
 const styles = (theme) => ({
+  bottomContentClose: {
+    display: 'none !important',
+  },
   bottomContent: {
     display: 'flex',
     flexDirection: 'column',
@@ -624,7 +627,11 @@ class Navbar extends PureComponent {
             ? this.renderSections(filteredSections)
             : this.renderSectionLinks(propOr([], 'links', filteredSections[0]))}
 
-          <div className={classes.bottomContent}>
+          <div
+            className={clsx(classes.bottomContent, {
+              [classes.bottomContentClose]: !open,
+            })}
+          >
             <Button onClick={this.handleNavigateToClarity}>
               Back to Legacy UI
               <FontAwesomeIcon size="md">undo</FontAwesomeIcon>
