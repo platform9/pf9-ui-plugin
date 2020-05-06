@@ -4,6 +4,7 @@ import NextButton from 'core/components/buttons/NextButton'
 import useReactRouter from 'use-react-router'
 import { Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
+import { indefiniteArticle } from 'utils/misc'
 import Theme from 'core/themes/model'
 
 const useStyles = makeStyles<Theme>((theme) => ({
@@ -20,6 +21,7 @@ interface Props {
 export const PromptToAddProvider = ({ type, src }: Props) => {
   const classes = useStyles({})
   const humanReadableType = CloudProvidersFriendlyName[type]
+  const article = indefiniteArticle(humanReadableType)
   const { history } = useReactRouter()
   const handleClick = () => {
     history.push(src)
@@ -28,7 +30,7 @@ export const PromptToAddProvider = ({ type, src }: Props) => {
     <>
       <p className={classes.message}>
         <Typography component="span" variant="body1">
-          To create a {humanReadableType} cluster, you must first setup a cloud provider.
+          To create {article} {humanReadableType} cluster, you must first setup a cloud provider.
           Create at least one before continuing
         </Typography>
       </p>
