@@ -197,3 +197,9 @@ export const normalizeUsername = (name = '') => {
   const [username] = name.split('@')
   return username
 }
+
+// Really simple indefinite article function, does not account for special
+// cases such as 'a user'
+export const indefiniteArticle = (word = '') => (
+  /^([aeiou])/i.test(word) ? 'an' : 'a'
+)
