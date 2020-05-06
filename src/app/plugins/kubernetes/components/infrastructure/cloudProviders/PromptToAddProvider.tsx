@@ -1,6 +1,5 @@
 import React from 'react'
-import { CloudProviders } from './model'
-import { capitalizeString } from 'utils/misc'
+import { CloudProviders, CloudProvidersFriendlyName } from './model'
 import NextButton from 'core/components/buttons/NextButton'
 import useReactRouter from 'use-react-router'
 import { Typography } from '@material-ui/core'
@@ -20,7 +19,7 @@ interface Props {
 
 export const PromptToAddProvider = ({ type, src }: Props) => {
   const classes = useStyles({})
-  const humanReadableType = capitalizeString(type)
+  const humanReadableType = CloudProvidersFriendlyName[type]
   const { history } = useReactRouter()
   const handleClick = () => {
     history.push(src)
@@ -29,7 +28,7 @@ export const PromptToAddProvider = ({ type, src }: Props) => {
     <>
       <p className={classes.message}>
         <Typography component="span" variant="body1">
-          To create a cluster with {humanReadableType}, you must first setup a cloud provider.
+          To create a {humanReadableType} cluster, you must first setup a cloud provider.
           Create at least one before continuing
         </Typography>
       </p>
