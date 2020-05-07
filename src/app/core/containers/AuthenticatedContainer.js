@@ -151,9 +151,12 @@ const redirectToAppropriateStack = (ironicEnabled, kubernetesEnabled, history) =
   }
 }
 
-const loadRegionFeatures = async (setRegionFeatures, history) => {
+const loadRegionFeatures = async (setRegionFeatures, setContext, history) => {
   try {
     const features = await keystone.getFeatures()
+
+    // Store entirety of features json in context for global usage
+    await setContext({ features })
 
     setRegionFeatures({
       kubernetes: features.experimental.containervisor,
@@ -180,13 +183,14 @@ const AuthenticatedContainer = () => {
   const {
     userDetails: { role },
     currentRegion,
+    setContext,
   } = useContext(AppContext)
   const { history } = useReactRouter()
   const classes = useStyles({ path: history.location.pathname })
 
   useEffect(() => {
     // Pass the `setRegionFeatures` function to update the features as we can't use `await` inside of a `useEffect`
-    loadRegionFeatures(setRegionFeatures, history)
+    loadRegionFeatures(setRegionFeatures, setContext, history)
   }, [currentRegion])
 
   const withStackSlider = regionFeatures.openstack && regionFeatures.kubernetes
