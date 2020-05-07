@@ -7,6 +7,7 @@ import {
   ironicWizardUrl,
   logoutUrl,
 } from 'app/constants'
+import { Button } from '@material-ui/core'
 import HelpPage from 'app/plugins/kubernetes/components/common/HelpPage'
 import clsx from 'clsx'
 import Intercom from 'core/components/integrations/Intercom'
@@ -22,9 +23,11 @@ import { apply, toPairs } from 'ramda'
 import React, { useContext, useEffect, useState } from 'react'
 import { Redirect, Route, Switch } from 'react-router'
 import useReactRouter from 'use-react-router'
-import { emptyObj, ensureArray, isNilOrEmpty } from 'utils/fp'
+import { emptyObj, ensureArray, isNilOrEmpty, pathStrOr } from 'utils/fp'
 import { pathJoin } from 'utils/misc'
 import PushEventsProvider from '../providers/PushEventsProvider'
+import BannerContainer from 'core/components/notifications/BannerContainer'
+import BannerContent from 'core/components/notifications/BannerContent'
 
 const { keystone } = ApiClient.getInstance()
 
@@ -68,6 +71,28 @@ const useStyles = makeStyles((theme) => ({
   },
   contentMain: {
     padding: theme.spacing(3, 3, 3, 5),
+  },
+  sandboxBanner: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+
+    fontWeight: 'bold',
+    fontSize: 16,
+    '& a': {
+      backgroundColor: '#f3f3f4',
+      margin: theme.spacing(0, 1),
+      '&:hover': {
+        backgroundColor: '#FFFFFF',
+      },
+      '& *': {
+        color: theme.palette.header.background,
+      },
+      '& i': {
+        marginLeft: theme.spacing(),
+      },
+    },
   },
 }))
 
@@ -137,6 +162,8 @@ const renderRawComponents = moize((plugins) =>
     .flat(),
 )
 
+const getSandboxUrl = (pathPart) => `https://platform9.com/${pathPart}/`
+
 const redirectToAppropriateStack = (ironicEnabled, kubernetesEnabled, history) => {
   // If it is neither ironic nor kubernetes, bump user to old UI
   // TODO: For production, I need to always bump user to old UI in both ironic
@@ -184,10 +211,10 @@ const AuthenticatedContainer = () => {
     userDetails: { role },
     currentRegion,
     setContext,
+    features,
   } = useContext(AppContext)
   const { history } = useReactRouter()
   const classes = useStyles({ path: history.location.pathname })
-
   useEffect(() => {
     // Pass the `setRegionFeatures` function to update the features as we can't use `await` inside of a `useEffect`
     loadRegionFeatures(setRegionFeatures, setContext, history)
@@ -220,7 +247,23 @@ const AuthenticatedContainer = () => {
               [classes['contentShift-left']]: drawerOpen,
             })}
           >
-            {/* <BannerContainer /> */}
+            {pathStrOr(false, 'experimental.sandbox', features) && (
+              <>
+                <BannerContainer />
+                <BannerContent>
+                  <div className={classes.sandboxBanner}>
+                    Welcome! You are in the Platform9 live demo.{' '}
+                    <Button component="a" target="_blank" href={getSandboxUrl('signup')}>
+                      Deploy a Cluster Now
+                    </Button>{' '}
+                    or{' '}
+                    <Button component="a" target="_blank" href={getSandboxUrl('pricing')}>
+                      View Plans
+                    </Button>
+                  </div>
+                </BannerContent>
+              </>
+            )}
             <div className={classes.contentMain}>
               {renderRawComponents(plugins)}
               <Switch>

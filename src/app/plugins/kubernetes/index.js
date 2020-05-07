@@ -47,7 +47,7 @@ import UpdateRolePage from './components/rbac/UpdateRolePage'
 import UpdateClusterRolePage from './components/rbac/UpdateClusterRolePage'
 import UpdateRoleBindingPage from './components/rbac/UpdateRoleBindingPage'
 import UpdateClusterRoleBindingPage from './components/rbac/UpdateClusterRoleBindingPage'
-import OnboardingBanner from './components/onboarding/OnboardingBanner'
+// import OnboardingBanner from './components/onboarding/OnboardingBanner'
 import AlarmsListPage from './components/alarms/AlarmsListPage'
 
 class Kubernetes extends React.PureComponent {
@@ -60,7 +60,7 @@ Kubernetes.__name__ = 'kubernetes'
 
 Kubernetes.registerPlugin = (pluginManager) => {
   const plugin = pluginManager.registerPlugin('kubernetes', 'Kubernetes', '/ui/kubernetes')
-  plugin.registerComponent(OnboardingBanner)
+  // plugin.registerComponent(OnboardingBanner)
 
   plugin.registerRoutes([
     {
