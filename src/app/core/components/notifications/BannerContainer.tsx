@@ -13,9 +13,9 @@ const useStyles = makeStyles<Theme>((theme) => ({
     left: 0,
     right: 0,
     minHeight: 30,
-    padding: theme.spacing(2, 4),
+    padding: theme.spacing(1, 2),
     color: theme.palette.secondary.contrastText,
-    backgroundColor: '#F5A623',
+    backgroundColor: '#94B8C9',
   },
 }))
 
