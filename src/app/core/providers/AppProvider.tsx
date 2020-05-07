@@ -35,6 +35,7 @@ interface IAppContext {
   currentTenant?: string
   currentRegion?: string
   userDetails?: any
+  features?: any
 }
 
 interface IAppContextActions {
