@@ -16,6 +16,7 @@ import DeauthNodeDialog from '../nodes/DeauthNodeDialog'
 import { ICluster } from './model'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import Alert from 'core/components/Alert'
+import { CloudProviders } from '../cloudProviders/model'
 
 interface IClusterDeleteDialog {
   rows: ICluster[]
@@ -54,11 +55,13 @@ const ClusterDeleteDialog: React.FC<IClusterDeleteDialog> = ({ rows: [cluster], 
                 Please type "<b>{cluster?.name}</b>" to confirm.
               </Typography>
               <TextField id="clusterName" type="text" label="Cluster name" />
-              <Alert
-                small
-                variant="warning"
-                message="When deleting a cluster all nodes will remain connected to Platform9"
-              />
+              {cluster.cloudProviderType === CloudProviders.BareOS && (
+                <Alert
+                  small
+                  variant="warning"
+                  message="When deleting a BareOS cluster all nodes will remain connected to Platform9"
+                />
+              )}
             </DialogContent>
             <DialogActions>
               <Button variant="outlined" color="secondary" onClick={onClose}>

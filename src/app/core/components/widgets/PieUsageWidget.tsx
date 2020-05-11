@@ -5,6 +5,7 @@ import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { useTheme } from '@material-ui/core/styles'
 import { Theme, Typography } from '@material-ui/core'
 import { pathStr } from 'utils/fp'
+import { formattedName } from 'core/utils/formatters'
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -61,7 +62,7 @@ export const PieLegend = ({ data }) => {
                   <Typography variant="body2">{entry.value}</Typography>
                 </td>
                 <td className={legendName}>
-                  <Typography variant="body2">{entry.name}</Typography>
+                  <Typography variant="body2">{formattedName(entry.name)}</Typography>
                 </td>
               </tr>
             ))}
