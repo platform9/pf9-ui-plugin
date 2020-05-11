@@ -18,6 +18,7 @@ const AwsAvailabilityZoneChooser = forwardRef(
 
     return (
       <MultiSelect
+        className="validatedFormInput"
         label="Availability Zones"
         options={regions}
         {...rest}
