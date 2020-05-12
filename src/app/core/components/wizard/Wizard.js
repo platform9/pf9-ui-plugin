@@ -19,11 +19,11 @@ class Wizard extends PureComponent {
   isComplete = () => this.state.activeStep > this.state.steps.length - 1
   lastStep = () => this.state.steps.length - 1
   hasNext = () => this.state.activeStep < this.lastStep() && !this.props.disableNext
-  hasBack = () => this.state.activeStep > 0
+  hasBack = () => !this.props.hideBack && this.state.activeStep > 0
   isFinishAndReviewVisible = () =>
     this.state.activeStep < this.state.steps.length - 2 && !this.props.disableNext
 
-  canBackAtFirstStep = () => this.state.activeStep === 0 && !!this.props.originPath
+  canBackAtFirstStep = () => !this.props.hideBack && this.state.activeStep === 0 && !!this.props.originPath
 
   // Callbacks indexed by step ID to be called before navigating to the next step
   nextCb = {}
@@ -174,7 +174,8 @@ Wizard.propTypes = {
   finishAndReviewLabel: PropTypes.string,
   disableNext: PropTypes.bool,
   children: PropTypes.oneOfType([PropTypes.array, PropTypes.func]).isRequired,
-  startingStep: PropTypes.number
+  startingStep: PropTypes.number,
+  hideBack: PropTypes.bool,
 }
 
 Wizard.defaultProps = {
@@ -186,6 +187,7 @@ Wizard.defaultProps = {
     console.log(value)
   },
   startingStep: 0,
+  hideBack: false,
 }
 
 export default withRouter(Wizard)

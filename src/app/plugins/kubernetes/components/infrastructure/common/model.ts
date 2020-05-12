@@ -6,6 +6,7 @@ export interface ResMgrHost {
   hypervisor_info?: HypervisorInfo
   roles: string[]
   info: ResMgrInfo
+  ovsBridges: string[]
 }
 
 export interface HypervisorInfo {

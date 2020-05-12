@@ -36,8 +36,9 @@ const DnsmasqPicklist: React.ComponentType<Props> = forwardRef<HTMLElement, Prop
       // 192.168.122.1 is a libvirt virtual bridge (virbr0) IP
       // 198.51.100.1 is some private IP that WE assign to an interface for running dnsmasq on ironic host
       if (hosts.length < 1) { return [] }
-      const host = hosts.find(host => host.id === hostId )
-      const validNetworkInterfaces = host.networkInterfaces.filter(ifacePair => (
+      const host = hosts.find(host => host.id === hostId)
+      const ifacePairs = host.networkInterfaces.map(iface => iface.label)
+      const validNetworkInterfaces = ifacePairs.filter(ifacePair => (
         !ifacePair.includes('192.168.122.1')
       ))
       return validNetworkInterfaces.map(ifacePair => (

@@ -113,7 +113,7 @@ const ControllerConfigStep = ({ wizardContext, setWizardContext, onNext, title, 
       {({ setFieldValue, values }) => (
         <>
           <Typography className={subheader}>
-            MetalStack Controller Details
+            Bare Metal Controller Details
           </Typography>
 
           {/* Provisioning Network */}

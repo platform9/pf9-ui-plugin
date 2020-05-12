@@ -28,7 +28,13 @@ const getNetworkInterfaces = (node) => {
     // Some interfaces have multiple IP addresses
     const ifaces = pair[1].ifaces
     return ifaces.map(iface => (
-      `${pair[0]}: ${iface.addr}`
+      {
+        name: pair[0],
+        mac: pair[1].mac,
+        ip: iface.addr,
+        netmask: iface.netmask,
+        label: `${pair[0]}: ${iface.addr}`,
+      }
     ))
   })
   return ifaceList.flat() // [[interface, ip], [interface2, ip2], ...]

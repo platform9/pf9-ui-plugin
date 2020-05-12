@@ -1,13 +1,17 @@
 import React, { FunctionComponent } from 'react'
 import { makeStyles } from '@material-ui/styles'
-
 import Theme from 'core/themes/model'
 
 interface Props {
+  fill?: boolean
   children: any
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
+interface StyleProps {
+  fill?: boolean
+}
+
+const useStyles = makeStyles<Theme, StyleProps>((theme: Theme) => ({
   pre: {
     fontWeight: 600,
     fontFamily: 'monospace',
@@ -18,9 +22,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     margin: theme.spacing(0.5),
     wordBreak: 'break-all',
     whiteSpace: 'pre-wrap',
-
     maxHeight: 400,
     overflow: 'auto',
+    flexGrow: ({ fill }) => (fill ? 1 : 0),
 
     '& *': {
       fontFamily: 'Courier',
@@ -32,8 +36,8 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }))
 
-const CodeBlock: FunctionComponent<Props> = ({ children }) => {
-  const styles = useStyles({})
+const CodeBlock: FunctionComponent<Props> = ({ children, fill = false }) => {
+  const styles = useStyles({ fill })
 
   return (
     <pre className={styles.pre}>

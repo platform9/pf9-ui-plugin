@@ -57,10 +57,10 @@ const OpenStackRcStep = (): JSX.Element => {
   return (
     <Paper className={paper} elevation={0}>
       <Typography className={clsx(text, bold)}>
-        Configure MetalStack
+        Configure Bare Metal
       </Typography>
       <Typography className={text}>
-        Step 1: Copy and paste the export commands below in an SSH session on the MetalStack controller node.
+        Step 1: Copy and paste the export commands below in an SSH session on the Bare Metal controller node.
       </Typography>
       <CopyToClipboard copyText={openstackRc(username, projectName, region, keystoneLink)}>
         <CodeBlock>
@@ -68,7 +68,7 @@ const OpenStackRcStep = (): JSX.Element => {
         </CodeBlock>
       </CopyToClipboard>
       <Typography className={text}>
-        Step 2: Run the following command on the controller node to complete the MetalStack Setup
+        Step 2: Run the following command on the controller node to complete the Bare Metal Setup
       </Typography>
       <CopyToClipboard copyText='setup-ironic'>
         <CodeBlock>
