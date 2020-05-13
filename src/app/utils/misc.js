@@ -202,6 +202,7 @@ export const normalizeUsername = (name = '') => {
 // cases such as 'a user'
 export const indefiniteArticle = (word = '') => (
   /^([aeiou])/i.test(word) ? 'an' : 'a'
+)
 
 export const sleep = async (ms) => (
   await new Promise(resolve => setTimeout(resolve, ms))
