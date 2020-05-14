@@ -42,6 +42,8 @@ export const loadAlerts = createContextLoader(
         grafanaLink: `${host}/k8s/v1/clusters/${item.clusterId}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:grafana-ui:80/proxy/`,
       }))
     },
+    defaultOrderBy: 'activeAt',
+    defaultOrderDirection: 'desc',
     entityName: 'Alert',
     uniqueIdentifier: 'id',
     indexBy: 'clusterId',
