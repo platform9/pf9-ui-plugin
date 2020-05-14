@@ -125,7 +125,9 @@ export const AddResourceForm = ({ resourceType = 'pod' }) => {
   const classes = useStyles()
   const { history } = useReactRouter()
   const { params, getParamsUpdater, updateParams } = useParams({ resourceType })
-  const onComplete = useCallback(() => history.push(listRoutes[params.resourceType]), [history])
+  const onComplete = useCallback(() => history.push(listRoutes[params.resourceType].toString()), [
+    history,
+  ])
   const createFn = objSwitchCase({
     pod: podActions.create,
     deployment: deploymentActions.create,
