@@ -16,13 +16,26 @@ const useStyles = makeStyles((theme) => ({
     width: 58,
     fontWeight: 'bold',
   },
+  rightAlign: {
+    textAlign: 'right',
+  },
   value: {
     fontSize: 12,
     whiteSpace: 'nowrap',
-    width: 125,
+    width: 135,
+    paddingRight: 4,
+    display: 'grid',
+    gridTemplateColumns: '1fr 4px 1fr 25px',
+    gridGap: '4px',
   },
   percent: {
     width: 152,
+  },
+  percentGrid: {
+    display: 'grid',
+    justifyItems: 'end',
+    gridGap: 4,
+    gridTemplateColumns: '25px min-content',
   },
 }))
 
@@ -32,13 +45,21 @@ const ResourceUsageTable = ({ label, valueConverter, usedText, units, stats, pre
 
   const curStr = valueConverter(current).toFixed(precision)
   const maxStr = valueConverter(max).toFixed(precision)
-  const percentStr = `${Math.round(percent)}% ${usedText}`
+  const percentStr = (
+    <span className={classes.percentGrid}>
+      <span>{Math.round(percent)}%</span>
+      <span>{usedText}</span>
+    </span>
+  )
   return (
     <Tooltip title={`${curStr} ${units} of ${maxStr} ${units} ${usedText}`}>
       <div className={classes.root}>
         <span className={classes.label}>{label}:</span>
         <span className={classes.value}>
-          {curStr}/{maxStr} {units}
+          <span className={classes.rightAlign}>{curStr}</span>
+          <span>/</span>
+          <span>{maxStr}</span>
+          <span>{units}</span>
         </span>
         <span className={classes.percent}>
           <ProgressBar width={140} variant="health" percent={percent} label={percentStr} />
