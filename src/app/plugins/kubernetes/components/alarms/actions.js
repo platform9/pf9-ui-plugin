@@ -32,7 +32,7 @@ export const loadAlerts = createContextLoader(
     dataMapper: async (items, params, loadFromContext) => {
       const clusters = await loadFromContext(clustersCacheKey, { healthyClusters: true, prometheusClusters: true })
       const host = await getQbertEndpoint()
-      return items.map((item) => ({
+      const alerts = items.map((item) => ({
         ...item,
         severity: pathStr('labels.severity', item),
         summary: pathStr('annotations.message', item),
@@ -41,6 +41,7 @@ export const loadAlerts = createContextLoader(
         clusterName: pipe(find(propEq('uuid', item.clusterId)), prop('name'))(clusters),
         grafanaLink: `${host}/k8s/v1/clusters/${item.clusterId}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:grafana-ui:80/proxy/`,
       }))
+      return params.showNeverActive ? alerts : alerts.filter((alert) => alert.activeAt)
     },
     defaultOrderBy: 'activeAt',
     defaultOrderDirection: 'desc',
