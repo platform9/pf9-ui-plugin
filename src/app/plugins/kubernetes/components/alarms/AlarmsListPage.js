@@ -83,6 +83,7 @@ const defaultParams = {
   chartTime: '24.h',
   chartClusterId: allKey,
   clusterId: allKey,
+  showNeverActive: false,
 }
 const usePrefParams = createUsePrefParamsHook('Alerts', listTablePrefs)
 

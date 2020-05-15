@@ -668,7 +668,7 @@ class Qbert extends ApiService {
     const alerts = response.groups.flatMap((group) => {
       return group.rules
     }).filter(rule => rule.type === 'alerting')
-    return alerts.map(alert => ({ ...alert, clusterId: clusterUuid, id: `${alert.name}${clusterUuid}` }))
+    return alerts.map(alert => ({ ...alert, clusterId: clusterUuid, id: `${alert.name}${clusterUuid}${alert.labels.severity}` }))
   }
 
   getPrometheusAlertsOverTime = async (clusterUuid, startTime, endTime, step) => {
