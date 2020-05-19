@@ -119,7 +119,7 @@ router.get(`/${version}/:tenantId/kubeconfig/:clusterId`, tokenValidator, getKub
 
 const clusterK8sApiBase = `/${version}/:tenantId/clusters/:clusterId/k8sapi`
 const k8sapi = `${clusterK8sApiBase}/api/v1`
-const k8sBetaApi = `${clusterK8sApiBase}/apis/extensions/v1beta1`
+const k8sBetaApi = `${clusterK8sApiBase}/apis/apps/v1`
 
 router.get(`${k8sapi}/namespaces`, tokenValidator, getNamespaces)
 
@@ -261,11 +261,7 @@ router.delete(`${loggingBase}/:loggingId`, tokenValidator, deleteLogging)
 
 // API Resources
 router.get(`${clusterK8sApiBase}/apis`, tokenValidator, getApiGroupList)
-router.get(
-  `${clusterK8sApiBase}/apis/extensions/v1beta1`,
-  tokenValidator,
-  getExtensionsApiResources,
-)
+router.get(`${clusterK8sApiBase}/apis/apps/v1`, tokenValidator, getExtensionsApiResources)
 router.get(`${clusterK8sApiBase}/apis/apps/v1`, tokenValidator, getAppsApiResources)
 router.get(`${clusterK8sApiBase}/api/v1`, tokenValidator, getCoreApiResources)
 

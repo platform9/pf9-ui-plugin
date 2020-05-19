@@ -67,7 +67,7 @@ spec:
       ports:
         - containerPort: 8000
 `,
-  deployment: `apiVersion: extensions/v1beta1
+  deployment: `apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nginx-deployment

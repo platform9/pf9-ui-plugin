@@ -229,14 +229,14 @@ class Qbert extends ApiService {
 
   getClusterDeployments = async (clusterId) => {
     const data = await this.client.basicGet(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/extensions/v1beta1/deployments`,
+      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/apps/v1/deployments`,
     )
     return data.items.map(this.convertResource(clusterId))
   }
 
   deleteDeployment = async (clusterId, namespace, name) => {
     return this.client.basicDelete(
-      `${await this.baseUrl()}}/k8sapi/apis/extensions/v1beta1/namespaces/${namespace}/deployments/${name}`,
+      `${await this.baseUrl()}}/k8sapi/apis/apps/v1/namespaces/${namespace}/deployments/${name}`,
     )
   }
 
@@ -269,7 +269,7 @@ class Qbert extends ApiService {
 
   getReplicaSets = async (clusterId) => {
     return this.client.basicGet(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/extensions/v1beta1/replicasets`,
+      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/apps/v1/replicasets`,
     )
   }
 
@@ -294,7 +294,7 @@ class Qbert extends ApiService {
 
   createDeployment = async (clusterId, namespace, params) => {
     return this.client.basicPost(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/extensions/v1beta1/namespaces/${namespace}/deployments`,
+      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/apps/v1/namespaces/${namespace}/deployments`,
       params,
     )
   }
@@ -664,16 +664,30 @@ class Qbert extends ApiService {
   }
 
   getPrometheusAlerts = async (clusterUuid) => {
-    const response = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/rules`)
-    const alerts = response.groups.flatMap((group) => {
-      return group.rules
-    }).filter(rule => rule.type === 'alerting')
-    return alerts.map(alert => ({ ...alert, clusterId: clusterUuid, id: `${alert.name}${clusterUuid}${alert.labels.severity}` }))
+    const response = await this.client.basicGet(
+      `${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/rules`,
+    )
+    const alerts = response.groups
+      .flatMap((group) => {
+        return group.rules
+      })
+      .filter((rule) => rule.type === 'alerting')
+    return alerts.map((alert) => ({
+      ...alert,
+      clusterId: clusterUuid,
+      id: `${alert.name}${clusterUuid}${alert.labels.severity}`,
+    }))
   }
 
   getPrometheusAlertsOverTime = async (clusterUuid, startTime, endTime, step) => {
-    const response = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/query_range?query=ALERTS&start=${startTime}&end=${endTime}&step=${step}`)
-    return response.result.map(alert => ({ ...alert, clusterId: clusterUuid, id: `${alert.metric.alertname}${clusterUuid}` }))
+    const response = await this.client.basicGet(
+      `${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/query_range?query=ALERTS&start=${startTime}&end=${endTime}&step=${step}`,
+    )
+    return response.result.map((alert) => ({
+      ...alert,
+      clusterId: clusterUuid,
+      id: `${alert.metric.alertname}${clusterUuid}`,
+    }))
   }
 
   getPrometheusServiceMonitors = async (clusterUuid) => {
