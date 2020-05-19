@@ -1,9 +1,7 @@
-// libs
-import React from 'react'
+import React, { useEffect, useCallback, useRef } from 'react'
 import TextField from 'core/components/validatedForm/TextField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import PicklistField from 'core/components/validatedForm/PicklistField'
-import useParams from 'core/hooks/useParams'
 import { makeStyles } from '@material-ui/styles'
 import { Theme, Typography } from '@material-ui/core'
 import clsx from 'clsx'
@@ -45,12 +43,23 @@ const createNetworkLoop = async (body) => {
   return
 }
 
+
 const BareMetalNetworkStep = ({ wizardContext, setWizardContext, onNext, title, setSubmitting }: Props) => {
-  const { getParamsUpdater } = useParams(wizardContext)
   const { text, bold } = useStyles({})
   const showToast = useToast()
+  const validatorRef = useRef(null)
 
-  const submitStep = async (context) => {
+  const setupValidator = (validate) => {
+    validatorRef.current = { validate }
+  }
+
+  const submitStep = useCallback(async () => {
+    const isValid = validatorRef.current.validate()
+    if (!isValid) {
+      // don't let the user progress to next step
+      return false
+    }
+
     try {
       setSubmitting(true)
       const neutronServerBody = {
@@ -72,20 +81,20 @@ const BareMetalNetworkStep = ({ wizardContext, setWizardContext, onNext, title, 
         neutron: {
           'DEFAULT': {
             router_distributed: false,
-            dns_domain: context.dnsDomain,
+            dns_domain: wizardContext.dnsDomain,
             dhcp_agents_per_network: 1,
           },
         },
         extra: {
-          dnsmasq_dns_servers: context.dnsForwardingAddresses.replace(/ /g, ''),
+          dnsmasq_dns_servers: wizardContext.dnsForwardingAddresses.replace(/ /g, ''),
           configured: true,
         }
       }
 
       await updateService('neutron-server', neutronServerBody)
       await createNetworkLoop({
-        name: context.networkName,
-        project_id: context.networkTenant,
+        name: wizardContext.networkName,
+        project_id: wizardContext.networkTenant,
         'provider:network_type': 'flat',
         'provider:physical_network': 'provisioning',
         'router:external': false,
@@ -100,14 +109,17 @@ const BareMetalNetworkStep = ({ wizardContext, setWizardContext, onNext, title, 
     }
     setSubmitting(false)
     return true
-  }
+  }, [wizardContext])
+
+  useEffect(() => {
+    onNext(submitStep)
+  }, [submitStep])
 
   return (
     <ValidatedForm
       initialValues={wizardContext}
       onSubmit={setWizardContext}
-      triggerSubmit={onNext}
-      apiCalls={submitStep}
+      triggerSubmit={setupValidator}
       title={title}
     >
       {({ setFieldValue, values }) => (
@@ -130,6 +142,8 @@ const BareMetalNetworkStep = ({ wizardContext, setWizardContext, onNext, title, 
           <TextField
             id="dnsDomain"
             label="DNS Domain"
+            onChange={(value) => setWizardContext({ dnsDomain: value })}
+            value={wizardContext.dnsDomain}
             info="This will be used by the DHCP server configured in the virtual network."
             required
           />
@@ -138,6 +152,8 @@ const BareMetalNetworkStep = ({ wizardContext, setWizardContext, onNext, title, 
           <TextField
             id="dnsForwardingAddresses"
             label="DNS Forwarding Addresses"
+            onChange={(value) => setWizardContext({ dnsForwardingAddresses: value })}
+            value={wizardContext.dnsForwardingAddresses}
             multiline
             rows="3"
             required
@@ -150,6 +166,8 @@ const BareMetalNetworkStep = ({ wizardContext, setWizardContext, onNext, title, 
           <TextField
             id="networkName"
             label="Network Name"
+            onChange={(value) => setWizardContext({ networkName: value })}
+            value={wizardContext.networkName}
             info="Name of the virtual network to be created."
             required
           />
@@ -159,7 +177,8 @@ const BareMetalNetworkStep = ({ wizardContext, setWizardContext, onNext, title, 
             DropdownComponent={TenantPicklist}
             id="networkTenant"
             label="Tenant"
-            onChange={getParamsUpdater('networkTenant')}
+            onChange={(value) => setWizardContext({ networkTenant: value })}
+            value={wizardContext.networkTenant}
             info="Tenant that the virtual network should be created within."
             showAll={false}
             required

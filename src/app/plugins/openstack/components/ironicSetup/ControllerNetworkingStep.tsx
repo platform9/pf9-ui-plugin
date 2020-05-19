@@ -1,5 +1,4 @@
-import React from 'react'
-import { Typography } from '@material-ui/core'
+import React, { useCallback, useState } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import CodeBlock from 'core/components/CodeBlock'
 import Theme from 'core/themes/model'
@@ -9,15 +8,11 @@ import PicklistField from 'core/components/validatedForm/PicklistField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import { pathOr } from 'ramda'
 import InfoTooltipWrapper from 'app/core/components/InfoTooltipWrapper'
+import ExpansionPanel from 'core/components/expansionPanel/ExpansionPanel'
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
     display: 'inline-block',
-  },
-  text: {
-    marginTop: theme.spacing(1),
-    marginLeft: theme.spacing(1),
-    fontWeight: 'bold',
   },
   field: {
     width: '50%',
@@ -27,6 +22,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     alignItems: 'center',
     marginLeft: theme.spacing(1),
   },
+  insidePanelContainer: {
+    width: '100%',
+  },
 }))
 
 interface Props {
@@ -34,6 +32,14 @@ interface Props {
   setWizardContext: any
   onNext: any
   title: string
+}
+
+enum Panels {
+  NetworkInterface = 0,
+  OvsBridge = 1,
+  EthernetInterface = 2,
+  BridgeInterface = 3,
+  Restart = 4,
 }
 
 const step1CodeBlock = (iface) => {
@@ -69,7 +75,19 @@ NM_CONTROLLED=no
 }
 
 const ControllerNetworkingStep = ({ wizardContext, setWizardContext, onNext, title }: Props): JSX.Element => {
-  const { container, text, field, withCodeBlock } = useStyles({})
+  const { container, field, withCodeBlock, insidePanelContainer } = useStyles({})
+
+  const [activePanels, setActivePanels] = useState(new Set([Panels.NetworkInterface]))
+
+  const togglePanel = useCallback(
+    (panel) => () => {
+      const newPanels = new Set(activePanels)
+      const operation = activePanels.has(panel) ? 'delete' : 'add'
+      newPanels[operation](panel)
+      setActivePanels(newPanels)
+    },
+    [activePanels],
+  )
 
   return (
     <ValidatedForm
@@ -80,81 +98,108 @@ const ControllerNetworkingStep = ({ wizardContext, setWizardContext, onNext, tit
     >
       {({ setFieldValue, values }) => (
         <div className={container}>
-          <Typography className={text}>
-            Step 1: Select Network Interface
-          </Typography>
-          <PicklistField
-            DropdownComponent={InterfacePicklist}
-            id="networkInterface"
-            label="Network Interface"
-            onChange={(value) => setWizardContext({ networkInterface: value })}
-            info="Select an ethernet interface to use to communicate with baremetal nodes.
-            If you cannot find the interface you wish to use, you may skip this step and
-            fill in the appropriate information manually."
-            hostId={wizardContext.selectedHost[0].id}
-          />
-          <Typography className={text}>
-            Step 2: Configure OVS Bridge
-          </Typography>
-          <InfoTooltipWrapper
-            info="Copy and paste the export commands in an SSH session on the
-            Bare Metal controller node to create an OVS bridge and add the interface
-            as a port."
-            className={field}
+          <ExpansionPanel
+            expanded={activePanels.has(Panels.NetworkInterface)}
+            onClick={togglePanel(Panels.NetworkInterface)}
+            stepNumber={1}
+            completed={false}
+            summary="Select Network Interface"
           >
-            <CopyToClipboard fill copyText={step1CodeBlock(wizardContext.networkInterface)}>
+            <div className={insidePanelContainer}>
+              <PicklistField
+                DropdownComponent={InterfacePicklist}
+                id="networkInterface"
+                label="Network Interface"
+                onChange={(value) => setWizardContext({ networkInterface: value })}
+                info="Select an ethernet interface to use to communicate with baremetal nodes.
+                If you cannot find the interface you wish to use, you may skip this step and
+                fill in the appropriate information manually."
+                hostId={wizardContext.selectedHost[0].id}
+              />
+            </div>
+          </ExpansionPanel>
+          <ExpansionPanel
+            expanded={activePanels.has(Panels.OvsBridge)}
+            onClick={togglePanel(Panels.OvsBridge)}
+            stepNumber={2}
+            completed={false}
+            summary="Configure OVS Bridge"
+          >
+            <InfoTooltipWrapper
+              info="Copy and paste the export commands in an SSH session on the
+              Bare Metal controller node to create an OVS bridge and add the interface
+              as a port."
+              className={field}
+            >
+              <CopyToClipboard fill copyText={step1CodeBlock(wizardContext.networkInterface)}>
+                <CodeBlock>
+                  {step1CodeBlock(wizardContext.networkInterface)}
+                </CodeBlock>
+              </CopyToClipboard>
+            </InfoTooltipWrapper>
+          </ExpansionPanel>
+          <ExpansionPanel
+            expanded={activePanels.has(Panels.EthernetInterface)}
+            onClick={togglePanel(Panels.EthernetInterface)}
+            stepNumber={3}
+            completed={false}
+            summary="Configure Ethernet Interface"
+          >
+            <div className={withCodeBlock}>
+              Create a file with path
               <CodeBlock>
-                {step1CodeBlock(wizardContext.networkInterface)}
+                /etc/sysconfig/network-scripts/ifcfg-{pathOr("<ifacename>", ['networkInterface', 'name'], wizardContext)}
               </CodeBlock>
-            </CopyToClipboard>
-          </InfoTooltipWrapper>
-          <Typography className={text}>
-            Step 3: Configure Ethernet Interface
-          </Typography>
-          <div className={withCodeBlock}>
-            Create a file with path
-            <CodeBlock>
-              /etc/sysconfig/network-scripts/ifcfg-{pathOr("<ifacename>", ['networkInterface', 'name'], wizardContext)}
-            </CodeBlock>
-          </div>
-          <InfoTooltipWrapper
-            info="Configuration for the ethernet interface to be used
-            to communicate with Baremetal Nodes. Create a file with the specified path
-            and paste the contents provided in the code block."
-            className={field}
+            </div>
+            <InfoTooltipWrapper
+              info="Configuration for the ethernet interface to be used
+              to communicate with Baremetal Nodes. Create a file with the specified path
+              and paste the contents provided in the code block."
+              className={field}
+            >
+              <CopyToClipboard fill copyText={step2CodeBlock(wizardContext.networkInterface)}>
+                <CodeBlock fill>
+                  {step2CodeBlock(wizardContext.networkInterface)}
+                </CodeBlock>
+              </CopyToClipboard>
+            </InfoTooltipWrapper>
+          </ExpansionPanel>
+          <ExpansionPanel
+            expanded={activePanels.has(Panels.BridgeInterface)}
+            onClick={togglePanel(Panels.BridgeInterface)}
+            stepNumber={4}
+            completed={false}
+            summary="Configure Bridge Interface"
           >
-            <CopyToClipboard fill copyText={step2CodeBlock(wizardContext.networkInterface)}>
-              <CodeBlock fill>
-                {step2CodeBlock(wizardContext.networkInterface)}
-              </CodeBlock>
-            </CopyToClipboard>
-          </InfoTooltipWrapper>
-          <Typography className={text}>
-            Step 4: Configure Bridge Interface
-          </Typography>
-          <div className={withCodeBlock}>
-            Create a file with path
-            <CodeBlock>/etc/sysconfig/network-scripts/ifcfg-br-pf9</CodeBlock>
-          </div>
-          <InfoTooltipWrapper
-            info="Configuration for the bridge interface. Create a file with the
-            specified path and paste the contents provided in the code block."
-            className={field}
+            <div className={withCodeBlock}>
+              Create a file with path
+              <CodeBlock>/etc/sysconfig/network-scripts/ifcfg-br-pf9</CodeBlock>
+            </div>
+            <InfoTooltipWrapper
+              info="Configuration for the bridge interface. Create a file with the
+              specified path and paste the contents provided in the code block."
+              className={field}
+            >
+              <CopyToClipboard fill copyText={step3CodeBlock(wizardContext.networkInterface)}>
+                <CodeBlock fill>
+                  {step3CodeBlock(wizardContext.networkInterface)}
+                </CodeBlock>
+              </CopyToClipboard>
+            </InfoTooltipWrapper>
+          </ExpansionPanel>
+          <ExpansionPanel
+            expanded={activePanels.has(Panels.Restart)}
+            onClick={togglePanel(Panels.Restart)}
+            stepNumber={5}
+            completed={false}
+            summary="Restart Network Service"
           >
-            <CopyToClipboard fill copyText={step3CodeBlock(wizardContext.networkInterface)}>
-              <CodeBlock fill>
-                {step3CodeBlock(wizardContext.networkInterface)}
+            <CopyToClipboard copyText='service network restart'>
+              <CodeBlock>
+                service network restart
               </CodeBlock>
             </CopyToClipboard>
-          </InfoTooltipWrapper>
-          <Typography className={text}>
-            Step 5: Restart the network service
-          </Typography>
-          <CopyToClipboard copyText='service network restart'>
-            <CodeBlock>
-              service network restart
-            </CodeBlock>
-          </CopyToClipboard>
+          </ExpansionPanel>
         </div>
       )}
     </ValidatedForm>

@@ -1,6 +1,5 @@
-import React from 'react'
+import React, { useEffect, useCallback, useRef } from 'react'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
-import useParams from 'core/hooks/useParams'
 import { loadResMgrHosts } from 'k8s/components/infrastructure/common/actions'
 import ListTableField from 'core/components/validatedForm/ListTableField'
 import useDataLoader from 'core/hooks/useDataLoader'
@@ -27,15 +26,25 @@ const columns = [
 ]
 
 const AuthorizeHostStep = ({ wizardContext, setWizardContext, onNext, title, setSubmitting }: Props) => {
-  const { getParamsUpdater } = useParams(wizardContext)
   const showToast = useToast()
+  const validatorRef = useRef(null)
 
   const [hosts, hostsLoading, reloadHosts]: IUseDataLoader<ResMgrHost> = useDataLoader(loadResMgrHosts) as any
 
-  const submitStep = async (context) => {
+  const setupValidator = (validate) => {
+    validatorRef.current = { validate }
+  }
+
+  const submitStep = useCallback(async () => {
+    const isValid = validatorRef.current.validate()
+    if (!isValid) {
+      // don't let the user progress to next step
+      return false
+    }
+
     try {
       setSubmitting(true)
-      await addRole(context.selectedHost[0].id, 'pf9-onboarding', {})
+      await addRole(wizardContext.selectedHost[0].id, 'pf9-onboarding', {})
     } catch (err) {
       setSubmitting(false)
       showToast(err, MessageTypes.error)
@@ -44,7 +53,11 @@ const AuthorizeHostStep = ({ wizardContext, setWizardContext, onNext, title, set
 
     setSubmitting(false)
     return true
-  }
+  }, [wizardContext])
+
+  useEffect(() => {
+    onNext(submitStep)
+  }, [submitStep])
 
   // Minor bug: when the list of hosts is refreshed, prior selection
   // is unselected (all objects are replaced, old selected is no
@@ -55,8 +68,7 @@ const AuthorizeHostStep = ({ wizardContext, setWizardContext, onNext, title, set
       <ValidatedForm
         initialValues={wizardContext}
         onSubmit={setWizardContext}
-        triggerSubmit={onNext}
-        apiCalls={submitStep}
+        triggerSubmit={setupValidator}
         title={title}
       >
         {({ setFieldValue, values }) => (
@@ -69,7 +81,8 @@ const AuthorizeHostStep = ({ wizardContext, setWizardContext, onNext, title, set
             <ListTableField
               id='selectedHost'
               data={hosts}
-              onChange={getParamsUpdater('selectedHost')}
+              onChange={(value) => setWizardContext({ selectedHost: value })}
+              value={wizardContext.selectedHost}
               columns={columns}
               loading={false}
             />

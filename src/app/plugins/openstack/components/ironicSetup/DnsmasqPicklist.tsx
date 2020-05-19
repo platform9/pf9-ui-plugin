@@ -50,10 +50,12 @@ const DnsmasqPicklist: React.ComponentType<Props> = forwardRef<HTMLElement, Prop
 
     // Select the first item as soon as data is loaded
     useEffect(() => {
-      if (selectFirst) {
+      // if selectFirst is true and a value is provided initially,
+      // the value gets overwritten unless the && !value is added
+      if (selectFirst && !value) {
         onChange(propOr('', 'value', head(options)))
       }
-    }, [])
+    }, [options])
 
     return (
       <Picklist

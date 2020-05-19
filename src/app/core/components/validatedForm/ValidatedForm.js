@@ -185,8 +185,8 @@ class ValidatedForm extends PureComponent {
     return !results.includes(false)
   }
 
-  handleSubmit = async (event) => {
-    const { clearOnSubmit, onSubmit, afterSubmit, apiCalls, showToast } = this.props
+  handleSubmit = (event) => {
+    const { clearOnSubmit, onSubmit, afterSubmit } = this.props
     const { initialValues, values, fields, showingErrors } = this.state
 
     if (event) {
@@ -197,13 +197,6 @@ class ValidatedForm extends PureComponent {
         this.setState((prevState) => ({ ...prevState, showingErrors: true }))
       }
       return false
-    }
-
-    if (apiCalls) {
-      const apiResponse = await apiCalls(values)
-      if (apiResponse !== true) {
-        return false
-      }
     }
 
     if (onSubmit) {

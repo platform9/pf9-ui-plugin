@@ -18,6 +18,7 @@ const useStyles = makeStyles((theme) => ({
     flexWrap: 'wrap',
     minWidth: 120,
     marginTop: theme.spacing(1),
+    background: '#ffffff',
   },
   list: {
     maxHeight: 400,

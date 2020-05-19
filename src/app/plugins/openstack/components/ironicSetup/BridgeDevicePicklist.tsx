@@ -49,10 +49,10 @@ const BridgeDevicePicklist: React.ComponentType<Props> = forwardRef<HTMLElement,
 
     // Select the first item as soon as data is loaded
     useEffect(() => {
-      if (selectFirst) {
+      if (selectFirst && !value) {
         onChange(propOr('', 'value', head(options)))
       }
-    }, [])
+    }, [options])
 
     return (
       <div>

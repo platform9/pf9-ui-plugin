@@ -42,7 +42,7 @@ const TenantPicklist: React.ComponentType<Props> = forwardRef<HTMLElement, Props
       if (selectFirst) {
         onChange(propOr(allKey, 'value', head(options)))
       }
-    }, [])
+    }, [options])
 
     return (
       <Picklist

@@ -45,10 +45,10 @@ const InterfacePicklist: React.ComponentType<Props> = forwardRef<HTMLElement, Pr
 
     // Select the first item as soon as data is loaded
     useEffect(() => {
-      if (selectFirst) {
+      if (selectFirst && !value) {
         onChange(propOr('', 'value', head(options)))
       }
-    }, [])
+    }, [options])
 
     return (
       <Picklist

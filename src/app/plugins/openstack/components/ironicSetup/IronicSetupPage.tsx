@@ -209,16 +209,25 @@ const IronicSetupPage = () => {
       message={loading ? 'Loading...' : 'Submitting...'}
     >
       {/* Wrap this in loading, initialContext needs to be populated  */}
+      {/* Hide back button, currently not fully supported */}
       {!loading && <Wizard
         onComplete={submitLastStep}
         context={initialContext}
         startingStep={startingStep}
-        hideBack={true}
+        // hideBack={true}
       >
         {({ wizardContext, setWizardContext, onNext }) => {
           return (
             <>
-              <WizardStep stepId="step1" label="Configure Provisioning Network">
+
+              {/*
+                keepContentMounted={false} is required due to the useEffects
+                used in the step components that call onNext. If kept false,
+                the onEffect will trigger again on other steps and things
+                start breaking.
+              */}
+
+              <WizardStep stepId="step1" label="Configure Provisioning Network" keepContentMounted={false}>
                 <BareMetalNetworkStep
                   wizardContext={wizardContext}
                   setWizardContext={setWizardContext}
@@ -234,7 +243,7 @@ const IronicSetupPage = () => {
                 </div>
                 <DownloadHostAgentWalkthrough />
               </WizardStep>
-              <WizardStep stepId="step3" label="Authorize Host Agent">
+              <WizardStep stepId="step3" label="Authorize Host Agent" keepContentMounted={false}>
                 <AuthorizeHostStep
                   wizardContext={wizardContext}
                   setWizardContext={setWizardContext}
@@ -251,7 +260,8 @@ const IronicSetupPage = () => {
                   title="Controller Networking Configuration"
                 />
               </WizardStep>
-              <WizardStep stepId="step5" label="Configure Controller">
+
+              <WizardStep stepId="step5" label="Configure Controller" keepContentMounted={false}>
                 <ControllerConfigStep
                   wizardContext={wizardContext}
                   setWizardContext={setWizardContext}
@@ -260,7 +270,7 @@ const IronicSetupPage = () => {
                   setSubmitting={setSubmittingStep}
                 />
               </WizardStep>
-              <WizardStep stepId="step6" label="Bare Metal Subnet">
+              <WizardStep stepId="step6" label="Bare Metal Subnet" keepContentMounted={false}>
                 <BareMetalSubnetStep
                   wizardContext={wizardContext}
                   setWizardContext={setWizardContext}
