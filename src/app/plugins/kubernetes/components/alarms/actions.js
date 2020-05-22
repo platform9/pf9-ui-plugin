@@ -32,6 +32,7 @@ export const loadAlerts = createContextLoader(
     dataMapper: async (items, params, loadFromContext) => {
       const clusters = await loadFromContext(clustersCacheKey, { healthyClusters: true, prometheusClusters: true })
       const host = await getQbertEndpoint()
+      console.log(items, 'items')
       const alerts = items.map((item) => ({
         ...item,
         severity: pathStr('labels.severity', item),
@@ -109,7 +110,7 @@ const getSeverityCounts = (alertData, timestamps) => {
 
 export const loadTimeSeriesAlerts = createContextLoader(
   alertsTimeSeriesCacheKey,
-  async ({ chartClusterId, chartTime }, loadFromContext) => {
+  async ({ clusterId, chartTime, severity }, loadFromContext) => {
     // Invalidate cache -- can't get cache working properly for this
     // collection. Collection is somewhat different from all other
     // types of collections.
@@ -127,7 +128,7 @@ export const loadTimeSeriesAlerts = createContextLoader(
     const timestamps = getTimestamps(timePast, chartTime)
 
     const clusters = await loadFromContext(clustersCacheKey, { healthyClusters: true, prometheusClusters: true })
-    if (chartClusterId === allKey) {
+    if (clusterId === allKey) {
       const all = await someAsync(pluck('uuid', clusters).map((cluster) => (
         qbert.getPrometheusAlertsOverTime(cluster, timePast, timeNow, step)
       ))).then(flatten)
@@ -140,7 +141,7 @@ export const loadTimeSeriesAlerts = createContextLoader(
       ))
     }
 
-    const response = await qbert.getPrometheusAlertsOverTime(chartClusterId, timePast, timeNow, step)
+    const response = await qbert.getPrometheusAlertsOverTime(clusterId, timePast, timeNow, step)
     const severityCounts = getSeverityCounts(response, timestamps)
     return timestamps.map((timestamp) => (
       {
@@ -156,6 +157,6 @@ export const loadTimeSeriesAlerts = createContextLoader(
     // not sure if this has to do with the reason why the
     // cache does not work properly
     uniqueIdentifier: 'timestamp',
-    indexBy: ['chartClusterId', 'chartTime'],
+    indexBy: ['clusterId', 'chartTime'],
   },
 )
