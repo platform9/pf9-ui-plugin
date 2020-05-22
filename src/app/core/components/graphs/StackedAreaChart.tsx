@@ -150,10 +150,10 @@ function StackedAreaChart<Axis extends string, Types extends string>({
         data={values}
         margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
       >
-        <CartesianGrid vertical={verticalAxisLines} strokeDasharray="12 3" stroke="#e6e6e6" />
+        <CartesianGrid vertical={verticalAxisLines} strokeDasharray="12 3" stroke="#e6e6e6" dot={{strokeWidth: 4}} />
         <XAxis tick={{fontSize: 11}} dataKey={xAxis} />
         <YAxis tick={{fontSize: 11}} />
-        <Tooltip content={<CustomTooltip keys={keys} />} />
+        <Tooltip content={<CustomTooltip keys={keys} />} cursor={{stroke: 'rgba(96, 96, 96, 0.5)', strokeWidth: 6}} />
         {keys.map(({ name, color }) => (
           <Area
             key={name}
@@ -163,6 +163,7 @@ function StackedAreaChart<Axis extends string, Types extends string>({
             stroke={pathStr(color, theme.palette)}
             strokeWidth={2}
             fill={pathStr(color, theme.palette)}
+            activeDot={{strokeWidth: 4, r: 8, stroke: "rgba(96, 96, 96, 0.5)"}}
           />
         ))}
       </AreaChart>
