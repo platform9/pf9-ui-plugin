@@ -105,9 +105,10 @@ const ExpansionPanel = ({
     <MDExpansionPanel
       className={classes.root}
       expanded={expanded}
-      onClick={showOverlay ? undefined : onClick}
     >
-      <ExpansionPanelSummary>
+      <ExpansionPanelSummary
+        onClick={showOverlay ? undefined : onClick}
+      >
         {expanded ? <ExpandMore /> : <ChevronRight />}
         <div className={classes.summaryText}>
           {completed ? (
