@@ -170,8 +170,7 @@ const redirectToAppropriateStack = (ironicEnabled, kubernetesEnabled, history) =
   // and standard openstack cases, but I don't want to do that yet for development.
   // In fact maybe just never do that for development build since old ui is not running.
   if (!ironicEnabled && !kubernetesEnabled) {
-    // window.location = clarityDashboardUrl
-    history.push(dashboardUrl)
+    window.location = clarityDashboardUrl
   } else if (ironicEnabled && history.location.pathname.includes('kubernetes')) {
     history.push(ironicWizardUrl)
   } else if (!ironicEnabled && history.location.pathname.includes('ironic')) {
