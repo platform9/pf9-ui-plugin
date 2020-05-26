@@ -88,6 +88,7 @@ interface Props<T extends string, V extends string> {
   keys: Array<AreaChartType<V>>
   responsive?: boolean
   verticalAxisLines?: boolean
+  useCustomTooltip?: boolean
 }
 
 interface CustomTooltipProps {
@@ -141,6 +142,7 @@ function StackedAreaChart<Axis extends string, Types extends string>({
   xAxis,
   verticalAxisLines = false,
   responsive = false,
+  useCustomTooltip = false,
 }: Props<Axis, Types>) {
   const theme: any = useTheme()
 
@@ -153,7 +155,12 @@ function StackedAreaChart<Axis extends string, Types extends string>({
         <CartesianGrid vertical={verticalAxisLines} strokeDasharray="12 3" stroke="#e6e6e6" dot={{strokeWidth: 4}} />
         <XAxis tick={{fontSize: 11}} dataKey={xAxis} />
         <YAxis tick={{fontSize: 11}} />
-        <Tooltip content={<CustomTooltip keys={keys} />} cursor={{stroke: 'rgba(96, 96, 96, 0.5)', strokeWidth: 6}} />
+        <Tooltip
+          {...{
+            cursor: {stroke: 'rgba(96, 96, 96, 0.5)', strokeWidth: 6},
+            ...(useCustomTooltip && { content: <CustomTooltip keys={keys} />}),
+          }}
+        />
         {keys.map(({ name, color }) => (
           <Area
             key={name}

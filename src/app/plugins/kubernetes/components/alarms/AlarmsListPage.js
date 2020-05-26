@@ -177,6 +177,7 @@ const ListPage = ({ ListContainer }) => {
                   keys={filteredChartKeys}
                   xAxis="time"
                   responsive={true}
+                  useCustomTooltip
                 />
               </div>
             </div>
