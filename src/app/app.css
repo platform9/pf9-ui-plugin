@@ -47,15 +47,3 @@ input[type="search"]::-webkit-search-cancel-button {
 .no-wrap-text {
     white-space: nowrap;
 }
-
-.color-warning {
-    color: #FED16C;
-}
-
-.color-critical {
-    color: #FF9800;
-}
-
-.color-fatal {
-    color: #F44336;
-}

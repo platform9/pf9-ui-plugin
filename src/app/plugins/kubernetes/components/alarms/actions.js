@@ -32,7 +32,6 @@ export const loadAlerts = createContextLoader(
     dataMapper: async (items, params, loadFromContext) => {
       const clusters = await loadFromContext(clustersCacheKey, { healthyClusters: true, prometheusClusters: true })
       const host = await getQbertEndpoint()
-      console.log(items, 'items')
       const alerts = items.map((item) => ({
         ...item,
         severity: pathStr('labels.severity', item),

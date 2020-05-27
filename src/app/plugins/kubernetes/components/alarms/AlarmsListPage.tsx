@@ -1,9 +1,7 @@
 import React from 'react'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
 import StatusPicklist from './StatusPicklist'
 import SeverityPicklist from './SeverityPicklist'
-import TimePicklist from './TimePicklist'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { loadAlerts, loadTimeSeriesAlerts, alertsCacheKey } from './actions'
 import { createUsePrefParamsHook } from 'core/hooks/useParams'
@@ -14,15 +12,19 @@ import PageContainer from 'core/components/pageContainer/PageContainer'
 import Tabs from 'core/components/tabs/Tabs'
 import Tab from 'core/components/tabs/Tab'
 import StackedAreaChart from 'core/components/graphs/StackedAreaChart'
-import moment from 'moment'
 import { makeStyles } from '@material-ui/styles'
 import DateCell from 'core/components/listTable/cells/DateCell'
-import Loading from 'core/components/Loading'
 import ExternalLink from 'core/components/ExternalLink'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { pathStr } from 'utils/fp'
+import { Theme } from '@material-ui/core'
+import { useTheme } from '@material-ui/core/styles'
+import ClusterPicklistDefault from 'k8s/components/common/ClusterPicklist'
+import TimePicklistDefault from './TimePicklist'
+const ClusterPicklist: any = ClusterPicklistDefault
+const TimePicklist: any = TimePicklistDefault
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   header: {
     width: '100%',
     marginTop: theme.spacing(2),
@@ -66,6 +68,36 @@ const useStyles = makeStyles((theme) => ({
     position: 'relative',
     right: '15px',
   },
+  customTooltip: {
+    background: '#ffffff',
+    padding: theme.spacing(1),
+    fontSize: 13,
+    minWidth: 144,
+  },
+  customTooltipHeader: {
+    borderBottom: '1px solid #d8d8d8',
+    padding: theme.spacing(1),
+  },
+  customTooltipBody: {
+    paddingTop: theme.spacing(2),
+  },
+  customTooltipEntry: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    paddingLeft: theme.spacing(1),
+    paddingRight: theme.spacing(1),
+    paddingBottom: theme.spacing(1),
+  },
+  customTooltipLabel: {
+    flexGrow: 0,
+  },
+  customTooltipName: {
+    marginLeft: theme.spacing(1)
+  },
+  customTooltipCount: {
+    flexGrow: 0,
+    paddingRight: theme.spacing(1)
+  },
 }))
 
 const chartKeys = [
@@ -86,14 +118,6 @@ const chartKeys = [
   },
 ]
 
-const chartTimeDisplay = {
-  '24.h': '24 Hours',
-  '12.h': '12 Hours',
-  '6.h': '6 Hours',
-  '3.h': '3 Hours',
-  '1.h': '1 Hour',
-}
-
 const defaultParams = {
   severity: allKey,
   chartTime: '24.h',
@@ -102,6 +126,47 @@ const defaultParams = {
   showNeverActive: false,
 }
 const usePrefParams = createUsePrefParamsHook('Alerts', listTablePrefs)
+
+interface CustomTooltipProps {
+  active?: boolean
+  payload?: any
+  label?: string
+  keys: any[]
+}
+
+const CustomTooltip = ({ active, payload, label, keys }: CustomTooltipProps) => {
+  const classes = useStyles({})
+  const theme: any = useTheme()
+
+  if (active && payload) {
+    // Need data from both payload (count) & keys (icon, color)
+    const countByKey = payload.reduce((acc, value) => {
+      acc[value.name] = value.payload[value.name]
+      return acc
+    }, {})
+
+    return (
+      <div className={classes.customTooltip}>
+        <div className={classes.customTooltipHeader}>
+          Alarms @ {label}
+        </div>
+        <div className={classes.customTooltipBody}>
+          {keys.map(({ name, color, icon }) => (
+            <div key={name} className={classes.customTooltipEntry}>
+              <div className={classes.customTooltipLabel}>
+                <FontAwesomeIcon solid style={{color: pathStr(color, theme.palette)}}>{icon}</FontAwesomeIcon>
+                <span className={classes.customTooltipName}>{name}</span>
+              </div>
+              <div className={classes.customTooltipCount}>{countByKey[name]}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  return null
+}
 
 const ListPage = ({ ListContainer }) => {
   return () => {
@@ -112,8 +177,7 @@ const ListPage = ({ ListContainer }) => {
     // so that it doesn't reload unless those props are changed
     const [
       timeSeriesData,
-      timeSeriesLoading,
-      timeSeriesReload
+      // timeSeriesLoading,
     ] = useDataLoader(loadTimeSeriesAlerts,
       {
         chartTime: params.chartTime,
@@ -177,7 +241,7 @@ const ListPage = ({ ListContainer }) => {
                   keys={filteredChartKeys}
                   xAxis="time"
                   responsive={true}
-                  useCustomTooltip
+                  customTooltip={<CustomTooltip keys={filteredChartKeys} />}
                 />
               </div>
             </div>
@@ -195,20 +259,24 @@ const ListPage = ({ ListContainer }) => {
   }
 }
 
+const SeverityTableCell = ({ value }) => {
+  const theme: any = useTheme()
+  const key = chartKeys.find(key => key.name === value)
+  return key ? (
+    <div>
+      <FontAwesomeIcon solid style={{ color: pathStr(key.color, theme.palette) }}>{key.icon}</FontAwesomeIcon>
+      {' '}
+      {value}
+    </div>
+  ) : <div>{value}</div>  
+}
+
 export const options = {
   columns: [
     { id: 'name', label: 'Name', render: (value) => ( <b>{value}</b> )},
-    { id: 'severity', label: 'Severity', render: (value) => {
-        const key = chartKeys.find(key => key.name === value)
-        const classString = `color-${value}`
-        return key ? (
-          <div>
-            <FontAwesomeIcon solid className={classString}>{key.icon}</FontAwesomeIcon>
-            {' '}
-            {value}
-          </div>
-        ) : <div>{value}</div>
-      }
+    { id: 'severity', label: 'Severity', render: (value) => (
+        <SeverityTableCell value={value} />
+      )
     },
     { id: 'activeAt', label: 'Time', render: (value) => {
         return value ? (
