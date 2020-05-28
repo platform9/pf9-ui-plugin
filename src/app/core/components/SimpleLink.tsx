@@ -15,7 +15,6 @@ interface Props {
   icon?: string
   variant?: ISimpleLinkVariant
   onClick?: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void
-  download?: boolean
 }
 
 const useStyles = makeStyles<Theme, { variant: ISimpleLinkVariant }>((theme) => ({

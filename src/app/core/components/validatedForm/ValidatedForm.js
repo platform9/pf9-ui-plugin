@@ -8,7 +8,6 @@ import { pathEq, toPairs, path, lensPath, over, set, identity, dissocPath, pick 
 import { withRouter } from 'react-router-dom'
 import moize from 'moize'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
-import { withToast } from 'core/providers/ToastProvider'
 
 export const ValidatedFormContext = React.createContext({})
 
@@ -40,7 +39,6 @@ const styles = (theme) => ({
  * ValidatedForm is a HOC wrapper for forms.  The child components define the
  * data value schema and the validations.
  */
-@withToast
 @withRouter
 @withStyles(styles, { withTheme: true })
 class ValidatedForm extends PureComponent {
@@ -186,7 +184,7 @@ class ValidatedForm extends PureComponent {
   }
 
   handleSubmit = (event) => {
-    const { clearOnSubmit, onSubmit, afterSubmit } = this.props
+    const { clearOnSubmit, onSubmit } = this.props
     const { initialValues, values, fields, showingErrors } = this.state
 
     if (event) {
@@ -201,7 +199,7 @@ class ValidatedForm extends PureComponent {
 
     if (onSubmit) {
       // Only send the values from the fields defined in the form
-      onSubmit(pick(Object.keys(fields), values), afterSubmit)
+      onSubmit(pick(Object.keys(fields), values))
     }
 
     if (clearOnSubmit) {

@@ -20,17 +20,6 @@ import { clarityDashboardUrl } from 'app/constants'
 import FormWrapperDefault from 'core/components/FormWrapper'
 const FormWrapper: any = FormWrapperDefault // types on forward ref .js file dont work well.
 
-// Wizard defaults (will be replaced with existing values from API later)
-const initialContext:any = {
-  imageStoragePath: '/var/opt/pf9/imagelibrary/data',
-  hostImages: true,
-}
-
-const submitLastStep = (params) => {
-  // This function should route them back to the old UI
-  window.location.href = clarityDashboardUrl
-}
-
 const getProvisioningNetwork = (networks) => (
   networks.find(network => (
     network['provider:physical_network'] === 'provisioning'
@@ -54,25 +43,36 @@ const networkConfigured = async (networks) => {
   const alreadyConfigured = path(['extra', 'configured'], neutronServerResponse)
   const provisioningNetwork = getProvisioningNetwork(networks)
 
-  if (alreadyConfigured && provisioningNetwork) {
-    initialContext.provisioningNetwork = provisioningNetwork.id
-    initialContext.dnsDomain = dnsDomain
-    initialContext.dnsForwardingAddresses = dnsForwardingAddresses
-    initialContext.networkName = provisioningNetwork?.name
-    initialContext.networkTenant = provisioningNetwork?.project_id
-    return true
+  return {
+    finished: alreadyConfigured && provisioningNetwork,
+    step: 0,
+    data: {
+      provisioningNetwork: provisioningNetwork.id,
+      dnsDomain: dnsDomain,
+      dnsForwardingAddresses: dnsForwardingAddresses,
+      networkName: provisioningNetwork?.name,
+      networkTenant: provisioningNetwork?.project_id,
+    },
   }
-
-  return false
 }
 
-const nodeAdded = hosts => hosts.length
+const nodeAdded = (hosts) => (
+  {
+    finished: hosts.length,
+    step: 1,
+    data: {},
+  }
+)
 
 const onboardingRoleAdded = async (hosts) => {
   const onboardedHost = hosts.find((host) => (
     host.roles.includes('pf9-onboarding')
   ))
-  return !!onboardedHost
+  return {
+    finished: !!onboardedHost,
+    step: 2,
+    data: {},
+  }
 }
 
 // Check for presence of all roles other than glance (optional)
@@ -94,23 +94,40 @@ const nodeAuthorized = async (hosts) => {
     const { dnsmasq_interface, tftp_server_ip } = await getRole(ironicController.id, 'pf9-ironic-inspector')
     const { bridge_mappings } = await getRole(ironicController.id, 'pf9-neutron-ovs-agent')
     const provisioningBridge = getProvisioningBridge(bridge_mappings)
-    initialContext.selectedHost = [ironicController]
-    initialContext.dnsmasq = `${dnsmasq_interface}: ${tftp_server_ip}`
-    initialContext.bridgeDevice = provisioningBridge
 
     // No guarantee that glance role was authorized
     try {
       const { filesystem_store_datadir } = await getRole(ironicController.id, 'pf9-glance-role')
-      initialContext.imageStoragePath = filesystem_store_datadir
-      initialContext.hostImages = true
+      return {
+        finished: true,
+        step: 3,
+        data: {
+          selectedHost: [ironicController],
+          dnsmasq: `${dnsmasq_interface}: ${tftp_server_ip}`,
+          bridgeDevice: provisioningBridge,
+          imageStoragePath: filesystem_store_datadir,
+          hostImages: true,
+        },
+      }
     } catch {
-      initialContext.hostImages = false
-    } finally {
-      return true
+      return {
+        finished: true,
+        step: 3,
+        data: {
+          selectedHost: [ironicController],
+          dnsmasq: `${dnsmasq_interface}: ${tftp_server_ip}`,
+          bridgeDevice: provisioningBridge,
+          hostImages: false,
+        },
+      }
     }
   }
 
-  return false
+  return {
+    finished: false,
+    step: 3,
+    data: {},
+  }
 }
 
 // Check for a subnet in provisioning network
@@ -125,22 +142,125 @@ const subnetExists = (networks, subnets) => {
       `${pool.start} - ${pool.end}`
     )).join(', ')
 
-    initialContext.subnetName = provisioningSubnet.name
-    initialContext.networkAddress = provisioningSubnet.cidr
-    initialContext.allocationPools = allocationPoolsString
-    initialContext.dnsNameServers = provisioningSubnet.dns_nameservers.join(', ')
-    return true
+    return {
+      finished: true,
+      step: 5,
+      data: {
+        subnetName: provisioningSubnet.name,
+        networkAddress: provisioningSubnet.cidr,
+        allocationPools: allocationPoolsString,
+        dnsNameServers: provisioningSubnet.dns_nameservers.join(', '),
+      }
+    }
   }
 
-  return false
+  return {
+    finished: false,
+    step: 5,
+    data: {},
+  }
 }
 
 const ironicImagesExist = (images) => {
   const imageNames = images.map(image => image.name)
-  return intersection(imageNames, [
-    'tinyipa-deploy-initrd',
-    'tinyipa-deploy-vmlinuz',
-  ]).length === 2
+  return {
+    finished: intersection(imageNames, [
+      'tinyipa-deploy-initrd',
+      'tinyipa-deploy-vmlinuz',
+    ]).length === 2,
+    step: 6,
+    data: {},
+  }
+}
+
+const SetupWizard = ({ initialContext, startingStep, setSubmittingStep }) => {
+  const submitLastStep = (params) => {
+    // This function should route them back to the old UI
+    window.location.href = clarityDashboardUrl
+  }
+
+  return (
+    <Wizard
+      onComplete={submitLastStep}
+      context={initialContext}
+      startingStep={startingStep}
+      hideBack={true}
+    >
+      {/* Hide back button, currently not fully supported */}
+      {({ wizardContext, setWizardContext, onNext }) => {
+        return (
+          <>
+
+            {/*
+              keepContentMounted={false} is required due to the useEffects
+              used in the step components that call onNext. If kept false,
+              the onEffect will trigger again on other steps and things
+              start breaking.
+            */}
+
+            <WizardStep stepId="step1" label="Configure Provisioning Network" keepContentMounted={false}>
+              <BareMetalNetworkStep
+                wizardContext={wizardContext}
+                setWizardContext={setWizardContext}
+                onNext={onNext}
+                title="Configure Provisioning Network"
+                setSubmitting={setSubmittingStep}
+              />
+            </WizardStep>
+            <WizardStep stepId="step2" label="Install Host Agent">
+              <div>
+                Install the Platform9 Host Agent on the node that will become the controller
+                for Bare Metal.
+              </div>
+              <DownloadHostAgentWalkthrough />
+            </WizardStep>
+            <WizardStep stepId="step3" label="Authorize Host Agent" keepContentMounted={false}>
+              <AuthorizeHostStep
+                wizardContext={wizardContext}
+                setWizardContext={setWizardContext}
+                onNext={onNext}
+                title="Authorize Host Agent"
+                setSubmitting={setSubmittingStep}
+              />
+            </WizardStep>
+            <WizardStep stepId="step4" label="Controller Networking Configuration">
+              <ControllerNetworkingStep
+                wizardContext={wizardContext}
+                setWizardContext={setWizardContext}
+                onNext={onNext}
+                title="Controller Networking Configuration"
+              />
+            </WizardStep>
+
+            <WizardStep stepId="step5" label="Configure Controller" keepContentMounted={false}>
+              <ControllerConfigStep
+                wizardContext={wizardContext}
+                setWizardContext={setWizardContext}
+                onNext={onNext}
+                title="Configure Controller"
+                setSubmitting={setSubmittingStep}
+              />
+            </WizardStep>
+            <WizardStep stepId="step6" label="Bare Metal Subnet" keepContentMounted={false}>
+              <BareMetalSubnetStep
+                wizardContext={wizardContext}
+                setWizardContext={setWizardContext}
+                onNext={onNext}
+                title="Bare Metal Subnet"
+                setSubmitting={setSubmittingStep}
+              />
+            </WizardStep>
+            <WizardStep stepId="step7" label="Configure Bare Metal">
+              <OpenStackRcStep />
+            </WizardStep>
+            <WizardStep stepId="step8" label="Summary">
+              <SummaryStep wizardContext={wizardContext} />
+            </WizardStep>
+          </>
+        )
+      }}
+    </Wizard>
+  )
 }
 
 const IronicSetupPage = () => {
@@ -151,55 +271,72 @@ const IronicSetupPage = () => {
   const [startingStep, setStartingStep] = useState(0)
   const [loading, setLoading] = useState(true)
   const [submittingStep, setSubmittingStep] = useState(false)
+  const [initialContext, setInitialContext] = useState<any>({
+    imageStoragePath: '/var/opt/pf9/imagelibrary/data',
+    hostImages: true,
+  })
 
   // Determine current step
   useEffect(() => {
-    if (!networksLoading && !hostsLoading && !subnetsLoading && !imagesLoading) {
-      (async () => {
-        const finishedStep1 = await networkConfigured(networks)
-        if (!finishedStep1) {
-          setStartingStep(0)
-          setLoading(false)
-          return
-        }
-        const finishedStep2 = nodeAdded(hosts)
-        if (!finishedStep2) {
-          setStartingStep(1)
-          setLoading(false)
-          return
-        }
-
-        const finishedStep3 = await onboardingRoleAdded(hosts)
-        if (!finishedStep3) {
-          setStartingStep(2)
+    const determineStep = async () => {
+      if (!networksLoading && !hostsLoading && !subnetsLoading && !imagesLoading) {
+        // I think for this to work, I may need to implement it like before...
+        // talk to john about the problem with using setState inside of the loop
+        const { finished, step, data } = await networkConfigured(networks)
+        if (!finished) {
+          setStartingStep(step)
+          setInitialContext({ ...initialContext, ...data })
           setLoading(false)
           return
         }
 
-        // No need to check step 4, no way to check if completed
-        const finishedStep5 = await nodeAuthorized(hosts)
-        if (!finishedStep5) {
-          setStartingStep(3)
+        const { finished: finished2, step: step2 } = await nodeAdded(hosts)
+        if (!finished2) {
+          setStartingStep(step2)
+          setInitialContext({ ...initialContext, ...data })
           setLoading(false)
           return
         }
-        const finishedStep6 = subnetExists(networks, subnets)
-        if (!finishedStep6) {
-          setStartingStep(5)
+
+        const { finished: finished3, step: step3 } = await onboardingRoleAdded(hosts)
+        if (!finished3) {
+          setStartingStep(step3)
+          setInitialContext({ ...initialContext, ...data })
           setLoading(false)
           return
         }
-        const finishedStep7 = ironicImagesExist(images)
-        if (!finishedStep7) {
-          setStartingStep(6)
+
+        const { finished: finished4, step: step4, data: data4 } = await nodeAuthorized(hosts)
+        if (!finished4) {
+          setStartingStep(step4)
+          setInitialContext({ ...initialContext, ...data, ...data4 })
           setLoading(false)
           return
         }
+
+        const { finished: finished5, step: step5, data: data5 } = await subnetExists(networks, subnets)
+        if (!finished5) {
+          setStartingStep(step5)
+          setInitialContext({ ...initialContext, ...data, ...data4, ...data5 })
+          setLoading(false)
+          return
+        }
+
+        const { finished: finished6, step: step6 } = await ironicImagesExist(images)
+        if (!finished6) {
+          setStartingStep(step6)
+          setLoading(false)
+          setInitialContext({ ...initialContext, ...data, ...data4, ...data5 })
+          return
+        }
+
         setStartingStep(7)
+        setInitialContext({ ...initialContext, ...data, ...data4, ...data5 })
         setLoading(false)
         return
-      })()
+      }
     }
+    determineStep()
   }, [networks, networksLoading, hosts, hostsLoading, subnets, subnetsLoading, images, imagesLoading])
 
   return (
@@ -209,86 +346,12 @@ const IronicSetupPage = () => {
       message={loading ? 'Loading...' : 'Submitting...'}
     >
       {/* Wrap this in loading, initialContext needs to be populated  */}
-      {/* Hide back button, currently not fully supported */}
-      {!loading && <Wizard
-        onComplete={submitLastStep}
-        context={initialContext}
-        startingStep={startingStep}
-        // hideBack={true}
-      >
-        {({ wizardContext, setWizardContext, onNext }) => {
-          return (
-            <>
-
-              {/*
-                keepContentMounted={false} is required due to the useEffects
-                used in the step components that call onNext. If kept false,
-                the onEffect will trigger again on other steps and things
-                start breaking.
-              */}
-
-              <WizardStep stepId="step1" label="Configure Provisioning Network" keepContentMounted={false}>
-                <BareMetalNetworkStep
-                  wizardContext={wizardContext}
-                  setWizardContext={setWizardContext}
-                  onNext={onNext}
-                  title="Configure Provisioning Network"
-                  setSubmitting={setSubmittingStep}
-                />
-              </WizardStep>
-              <WizardStep stepId="step2" label="Install Host Agent">
-                <div>
-                  Install the Platform9 Host Agent on the node that will become the controller
-                  for Bare Metal.
-                </div>
-                <DownloadHostAgentWalkthrough />
-              </WizardStep>
-              <WizardStep stepId="step3" label="Authorize Host Agent" keepContentMounted={false}>
-                <AuthorizeHostStep
-                  wizardContext={wizardContext}
-                  setWizardContext={setWizardContext}
-                  onNext={onNext}
-                  title="Authorize Host Agent"
-                  setSubmitting={setSubmittingStep}
-                />
-              </WizardStep>
-              <WizardStep stepId="step4" label="Controller Networking Configuration">
-                <ControllerNetworkingStep
-                  wizardContext={wizardContext}
-                  setWizardContext={setWizardContext}
-                  onNext={onNext}
-                  title="Controller Networking Configuration"
-                />
-              </WizardStep>
-
-              <WizardStep stepId="step5" label="Configure Controller" keepContentMounted={false}>
-                <ControllerConfigStep
-                  wizardContext={wizardContext}
-                  setWizardContext={setWizardContext}
-                  onNext={onNext}
-                  title="Configure Controller"
-                  setSubmitting={setSubmittingStep}
-                />
-              </WizardStep>
-              <WizardStep stepId="step6" label="Bare Metal Subnet" keepContentMounted={false}>
-                <BareMetalSubnetStep
-                  wizardContext={wizardContext}
-                  setWizardContext={setWizardContext}
-                  onNext={onNext}
-                  title="Bare Metal Subnet"
-                  setSubmitting={setSubmittingStep}
-                />
-              </WizardStep>
-              <WizardStep stepId="step7" label="Configure Bare Metal">
-                <OpenStackRcStep />
-              </WizardStep>
-              <WizardStep stepId="step8" label="Summary">
-                <SummaryStep wizardContext={wizardContext} />
-              </WizardStep>
-            </>
-          )
-        }}
-      </Wizard>}
+      {!loading && <SetupWizard
+          initialContext={initialContext}
+          startingStep={startingStep}
+          setSubmittingStep={setSubmittingStep}
+        />
+      }
     </FormWrapper>
   )
 }

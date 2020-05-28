@@ -1,6 +1,7 @@
 import React, { forwardRef } from 'react'
 import withFormContext from 'core/components/validatedForm/withFormContext'
 import ListTable from 'core/components/listTable/ListTable'
+import { IValidatedForm } from './model'
 
 interface Props extends IValidatedForm {
   value?: string[]
@@ -12,16 +13,6 @@ interface Props extends IValidatedForm {
   data: any
   title?: string
   loading: boolean
-}
-
-// TODO: all the ValidatedForm stuff is in JS and we need the props to be merged
-// into this component.  Refactor this later on when we can convert
-// ValidatedForm.js to TypeScript.
-export interface IValidatedForm {
-  id: string
-  validations?: any[] // What's the best way to type this?
-  required?: boolean
-  initialValues?: any
 }
 
 // TODO: is forwardRef actually needed here?

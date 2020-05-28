@@ -10,7 +10,7 @@ import TenantPicklist from 'openstack/components/common/TenantPicklist'
 import { updateService } from 'openstack/components/resmgr/actions'
 import { useToast } from 'core/providers/ToastProvider'
 import { MessageTypes } from 'core/components/notifications/model'
-import { sleep } from 'utils/misc'
+import { sleep } from 'utils/async'
 
 const useStyles = makeStyles((theme: Theme) => ({
   text: {

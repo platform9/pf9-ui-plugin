@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import React, { FC, useEffect, useState } from 'react'
 import { Typography, Paper } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import CodeBlock from 'core/components/CodeBlock'
@@ -7,6 +7,7 @@ import { hexToRGBA } from 'core/utils/colorHelpers'
 import Button from '@material-ui/core/Button'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import SimpleLink from 'core/components/SimpleLink'
+import { getDownloadLinks } from './actions'
 import clsx from 'clsx'
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -72,6 +73,15 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const DownloadHostAgentWalkthrough = (): JSX.Element => {
   const classes = useStyles({})
+  const [downloadLink, setDownloadLink] = useState('')
+  useEffect(() => {
+    const loadDownloadLink = async () => {
+      const links = await getDownloadLinks()
+      // In the future when supporting openstack, will want to show all download links
+      setDownloadLink(links.rpm_install)
+    }
+    loadDownloadLink()
+  }, [])
 
   return (
     <Paper className={classes.paper} elevation={0}>
@@ -87,9 +97,8 @@ const DownloadHostAgentWalkthrough = (): JSX.Element => {
             </Typography>
             <SimpleLink
               className={clsx(classes.fullRow, classes.spaceAbove)}
-              src="/private/platform9-install-us-mpt1-ironic-redhat.sh"
+              src={downloadLink}
               variant="primary"
-              download
             >
               <Button className={classes.download}>
                 Download Installer
