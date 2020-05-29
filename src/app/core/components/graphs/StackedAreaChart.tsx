@@ -52,7 +52,7 @@ interface Props<T extends string, V extends string> {
   keys: Array<AreaChartType<V>>
   responsive?: boolean
   verticalAxisLines?: boolean
-  customTooltip?: ReactNode
+  CustomTooltip?: ReactNode
 }
 
 // Todo: Instead of a set width and height, also allow for percents
@@ -64,7 +64,7 @@ function StackedAreaChart<Axis extends string, Types extends string>({
   xAxis,
   verticalAxisLines = false,
   responsive = false,
-  customTooltip,
+  CustomTooltip,
 }: Props<Axis, Types>) {
   const theme: any = useTheme()
 
@@ -80,7 +80,7 @@ function StackedAreaChart<Axis extends string, Types extends string>({
         <Tooltip
           {...{
             cursor: {stroke: 'rgba(96, 96, 96, 0.5)', strokeWidth: 6},
-            ...(customTooltip && { content: customTooltip }),
+            ...(CustomTooltip && { content: CustomTooltip }),
           }}
         />
         {keys.map(({ name, color }) => (

@@ -19,6 +19,7 @@ import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { pathStr } from 'utils/fp'
 import { Theme } from '@material-ui/core'
 import { useTheme } from '@material-ui/core/styles'
+import AlarmsChartTooltip from './AlarmsChartTooltip'
 import ClusterPicklistDefault from 'k8s/components/common/ClusterPicklist'
 import TimePicklistDefault from './TimePicklist'
 const ClusterPicklist: any = ClusterPicklistDefault
@@ -68,36 +69,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     position: 'relative',
     right: '15px',
   },
-  customTooltip: {
-    background: '#ffffff',
-    padding: theme.spacing(1),
-    fontSize: 13,
-    minWidth: 144,
-  },
-  customTooltipHeader: {
-    borderBottom: '1px solid #d8d8d8',
-    padding: theme.spacing(1),
-  },
-  customTooltipBody: {
-    paddingTop: theme.spacing(2),
-  },
-  customTooltipEntry: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    paddingLeft: theme.spacing(1),
-    paddingRight: theme.spacing(1),
-    paddingBottom: theme.spacing(1),
-  },
-  customTooltipLabel: {
-    flexGrow: 0,
-  },
-  customTooltipName: {
-    marginLeft: theme.spacing(1)
-  },
-  customTooltipCount: {
-    flexGrow: 0,
-    paddingRight: theme.spacing(1)
-  },
 }))
 
 const chartKeys = [
@@ -126,47 +97,6 @@ const defaultParams = {
   showNeverActive: false,
 }
 const usePrefParams = createUsePrefParamsHook('Alerts', listTablePrefs)
-
-interface CustomTooltipProps {
-  active?: boolean
-  payload?: any
-  label?: string
-  keys: any[]
-}
-
-const CustomTooltip = ({ active, payload, label, keys }: CustomTooltipProps) => {
-  const classes = useStyles({})
-  const theme: any = useTheme()
-
-  if (active && payload) {
-    // Need data from both payload (count) & keys (icon, color)
-    const countByKey = payload.reduce((acc, value) => {
-      acc[value.name] = value.payload[value.name]
-      return acc
-    }, {})
-
-    return (
-      <div className={classes.customTooltip}>
-        <div className={classes.customTooltipHeader}>
-          Alarms @ {label}
-        </div>
-        <div className={classes.customTooltipBody}>
-          {keys.map(({ name, color, icon }) => (
-            <div key={name} className={classes.customTooltipEntry}>
-              <div className={classes.customTooltipLabel}>
-                <FontAwesomeIcon solid style={{color: pathStr(color, theme.palette)}}>{icon}</FontAwesomeIcon>
-                <span className={classes.customTooltipName}>{name}</span>
-              </div>
-              <div className={classes.customTooltipCount}>{countByKey[name]}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    )
-  }
-
-  return null
-}
 
 const ListPage = ({ ListContainer }) => {
   return () => {
@@ -241,7 +171,7 @@ const ListPage = ({ ListContainer }) => {
                   keys={filteredChartKeys}
                   xAxis="time"
                   responsive={true}
-                  customTooltip={<CustomTooltip keys={filteredChartKeys} />}
+                  CustomTooltip={<AlarmsChartTooltip keys={filteredChartKeys} />}
                 />
               </div>
             </div>
