@@ -280,8 +280,6 @@ const IronicSetupPage = () => {
   useEffect(() => {
     const determineStep = async () => {
       if (!networksLoading && !hostsLoading && !subnetsLoading && !imagesLoading) {
-        // I think for this to work, I may need to implement it like before...
-        // talk to john about the problem with using setState inside of the loop
         const { finished, step, data } = await networkConfigured(networks)
         if (!finished) {
           setStartingStep(step)
