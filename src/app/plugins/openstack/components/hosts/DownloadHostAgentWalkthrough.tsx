@@ -81,7 +81,7 @@ const DownloadHostAgentWalkthrough = (): JSX.Element => {
       setDownloadLink(links.rpm_install)
     }
     loadDownloadLink()
-  }, [])
+  }, [setDownloadLink])
 
   return (
     <Paper className={classes.paper} elevation={0}>

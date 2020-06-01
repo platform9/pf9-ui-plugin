@@ -280,56 +280,56 @@ const IronicSetupPage = () => {
   useEffect(() => {
     const determineStep = async () => {
       if (!networksLoading && !hostsLoading && !subnetsLoading && !imagesLoading) {
-        const { finished, step, data } = await networkConfigured(networks)
-        if (!finished) {
-          setStartingStep(step)
-          setInitialContext({ ...initialContext, ...data })
+        const netConfig = await networkConfigured(networks)
+        if (!netConfig.finished) {
+          setStartingStep(netConfig.step)
+          setInitialContext({ ...initialContext, ...netConfig.data })
           setLoading(false)
           return
         }
 
-        const { finished: finished2, step: step2 } = await nodeAdded(hosts)
-        if (!finished2) {
-          setStartingStep(step2)
-          setInitialContext({ ...initialContext, ...data })
+        const nodeAdd = await nodeAdded(hosts)
+        if (!nodeAdd.finished) {
+          setStartingStep(nodeAdd.step)
+          setInitialContext({ ...initialContext, ...netConfig.data })
           setLoading(false)
           return
         }
 
-        const { finished: finished3, step: step3 } = await onboardingRoleAdded(hosts)
-        if (!finished3) {
-          setStartingStep(step3)
-          setInitialContext({ ...initialContext, ...data })
+        const onboardingAdd = await onboardingRoleAdded(hosts)
+        if (!onboardingAdd.finished) {
+          setStartingStep(onboardingAdd.step)
+          setInitialContext({ ...initialContext, ...netConfig.data })
           setLoading(false)
           return
         }
 
-        const { finished: finished4, step: step4, data: data4 } = await nodeAuthorized(hosts)
-        if (!finished4) {
-          setStartingStep(step4)
-          setInitialContext({ ...initialContext, ...data, ...data4 })
+        const nodeAuthed = await nodeAuthorized(hosts)
+        if (!nodeAuthed.finished) {
+          setStartingStep(nodeAuthed.step)
+          setInitialContext({ ...initialContext, ...netConfig.data, ...nodeAuthed.data })
           setLoading(false)
           return
         }
 
-        const { finished: finished5, step: step5, data: data5 } = await subnetExists(networks, subnets)
-        if (!finished5) {
-          setStartingStep(step5)
-          setInitialContext({ ...initialContext, ...data, ...data4, ...data5 })
+        const hasSubnet = await subnetExists(networks, subnets)
+        if (!hasSubnet.finished) {
+          setStartingStep(hasSubnet.step)
+          setInitialContext({ ...initialContext, ...netConfig.data, ...nodeAuthed.data, ...hasSubnet.data })
           setLoading(false)
           return
         }
 
-        const { finished: finished6, step: step6 } = await ironicImagesExist(images)
-        if (!finished6) {
-          setStartingStep(step6)
+        const hasImages = await ironicImagesExist(images)
+        if (!hasImages.finished) {
+          setStartingStep(hasImages.step)
           setLoading(false)
-          setInitialContext({ ...initialContext, ...data, ...data4, ...data5 })
+          setInitialContext({ ...initialContext, ...netConfig.data, ...nodeAuthed.data, ...hasSubnet.data })
           return
         }
 
         setStartingStep(7)
-        setInitialContext({ ...initialContext, ...data, ...data4, ...data5 })
+        setInitialContext({ ...initialContext, ...netConfig.data, ...nodeAuthed.data, ...hasSubnet.data })
         setLoading(false)
         return
       }
