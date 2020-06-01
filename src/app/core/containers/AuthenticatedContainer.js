@@ -173,7 +173,7 @@ const redirectToAppropriateStack = (ironicEnabled, kubernetesEnabled, history) =
     window.location = clarityDashboardUrl
   } else if (ironicEnabled && history.location.pathname.includes('kubernetes')) {
     history.push(ironicWizardUrl)
-  } else if (!ironicEnabled && history.location.pathname.includes('ironic')) {
+  } else if (!ironicEnabled && history.location.pathname.includes('metalstack')) {
     history.push(dashboardUrl)
   }
 }
@@ -187,21 +187,27 @@ const loadRegionFeatures = async (setRegionFeatures, setContext, history) => {
 
     setRegionFeatures({
       kubernetes: features.experimental.containervisor,
-      ironic: false, // Keep this false until ironic supported by the new UI
-      // ironic: features.experimental.ironic,
+      ironic: features.experimental.ironic,
       openstack: features.experimental.openstackEnabled,
       intercom: features.experimental.intercom,
     })
 
     redirectToAppropriateStack(
-      false, // Keep this false until ironic supported by the new UI
-      // features.experimental.ironic,
+      // false, // Keep this false until ironic supported by the new UI
+      features.experimental.ironic,
       features.experimental.containervisor,
       history,
     )
   } catch (err) {
     console.error(err)
   }
+}
+
+const determineStack = (history, features) => {
+  if (features.ironic) {
+    return 'metalstack'
+  }
+  return history.location.pathname.includes('openstack') ? 'openstack' : 'kubernetes'
 }
 
 const AuthenticatedContainer = () => {
@@ -222,7 +228,8 @@ const AuthenticatedContainer = () => {
 
   const withStackSlider = regionFeatures.openstack && regionFeatures.kubernetes
   // stack is the name of the plugin (ex. openstack, kubernetes, developer, theme)
-  const stack = history.location.pathname.includes('openstack') ? 'openstack' : 'kubernetes'
+  const stack = determineStack(history, regionFeatures)
+
 
   const plugins = pluginManager.getPlugins()
   const sections = getSections(plugins, role)

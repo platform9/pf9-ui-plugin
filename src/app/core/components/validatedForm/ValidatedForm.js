@@ -186,6 +186,7 @@ class ValidatedForm extends PureComponent {
   handleSubmit = (event) => {
     const { clearOnSubmit, onSubmit } = this.props
     const { initialValues, values, fields, showingErrors } = this.state
+
     if (event) {
       event.preventDefault()
     }
@@ -280,6 +281,10 @@ ValidatedForm.propTypes = {
 
   // Wrap the children within a FormFieldCard
   elevated: PropTypes.bool,
+
+  // This function will get called with context passed
+  // through as argument after onSubmit is called
+  afterSubmit: PropTypes.func,
 }
 
 ValidatedForm.defaultProps = {

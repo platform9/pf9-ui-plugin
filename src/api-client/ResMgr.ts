@@ -56,9 +56,21 @@ class ResMgr extends ApiService {
     await this.client.basicDelete(`${await this.endpoint()}/hosts/${hostId}/roles/${role}`)
   }
 
+  async getRole(hostId, role) {
+    return await this.client.basicGet(`${await this.endpoint()}/hosts/${hostId}/roles/${role}`)
+  }
+
   async unauthorizeHost(id) {
     const url = `${await this.endpoint()}/hosts/${id}`
     return axios.delete(url, this.client.getAuthHeaders())
+  }
+
+  async getService(service) {
+    return await this.client.basicGet(`${await this.endpoint()}/services/${service}`)
+  }
+
+  async updateService(service, body) {
+    return await this.client.basicPut(`${await this.endpoint()}/services/${service}`, body)
   }
 }
 

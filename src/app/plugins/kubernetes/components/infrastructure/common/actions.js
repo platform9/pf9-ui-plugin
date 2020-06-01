@@ -4,7 +4,7 @@ import ApiClient from 'api-client/ApiClient'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { rawNodesCacheKey, loadNodes } from 'k8s/components/infrastructure/nodes/actions'
 import createContextUpdater from 'core/helpers/createContextUpdater'
-import { uniq } from 'ramda'
+import { uniq, pathOr, toPairs, flatten } from 'ramda'
 import { except } from 'utils/fp'
 
 export const clustersCacheKey = 'clusters'
@@ -13,12 +13,47 @@ export const combinedHostsCacheKey = 'combinedHosts'
 
 const { resmgr } = ApiClient.getInstance()
 
-const loadResMgrHosts = createContextLoader(
+const getIpPreview = (ips = []) => (
+  // Get first IP that does not start with 192
+  ips.find((ip) => (
+    ip.substring(0, 3) !== '192'
+  )) || ips[0]
+)
+
+const getNetworkInterfaces = (node) => {
+  const ifaceMap = pathOr([], ['extensions', 'interfaces', 'data', 'iface_info'], node)
+  // Pair the interface name (obj key) to the data (obj value)
+  const pairedIfaces = toPairs(ifaceMap)
+  const ifaceList = pairedIfaces.map(pair => {
+    // Some interfaces have multiple IP addresses
+    const ifaces = pair[1].ifaces
+    return ifaces.map(iface => (
+      {
+        name: pair[0],
+        mac: pair[1].mac,
+        ip: iface.addr,
+        netmask: iface.netmask,
+        label: `${pair[0]}: ${iface.addr}`,
+      }
+    ))
+  })
+  return ifaceList.flat() // [[interface, ip], [interface2, ip2], ...]
+}
+
+export const loadResMgrHosts = createContextLoader(
   resMgrHostsCacheKey,
   async () => {
     return resmgr.getHosts()
   },
   {
+    dataMapper: async (items, params, loadFromContext) => {
+      return items.map((item) => ({
+        ...item,
+        ipPreview: getIpPreview(pathOr([], ['extensions', 'ip_address', 'data'], item)),
+        networkInterfaces: getNetworkInterfaces(item),
+        ovsBridges: pathOr([], ['extensions', 'interfaces', 'data', 'ovs_bridges'], item),
+      }))
+    },
     uniqueIdentifier: 'id',
   },
 )

@@ -255,69 +255,68 @@ OpenStack.registerPlugin = (pluginManager) => {
   ])
 
   plugin.registerNavItems([
+    // {
+    //   name: 'Bare Metal Setup',
+    //   link: { path: '/ironic/setup' },
+    //   icon: 'cogs',
+    // },
+    // Comment out the nav items since first UI release will be K8s only
     {
-      name: 'Bare Metal Setup',
-      link: { path: '/ironic/setup' },
-      icon: 'cogs',
+      name: 'Dashboard',
+      link: { path: '/' }
     },
-    /* Comment out the nav items since first UI release will be K8s only
-      {
-        name: 'Dashboard',
-        link: { path: '/' }
-      },
-      {
-        name: 'Tenants',
-        link: { path: '/tenants' }
-      },
-      {
-        name: 'Users',
-        link: { path: '/users' }
-      },
-      {
-        name: 'Flavors',
-        link: { path: '/flavors' }
-      },
-      {
-        name: 'Instances',
-        link: { path: '/instances' }
-      },
-      {
-        name: 'Networks',
-        link: { path: '/networks' }
-      },
-      {
-        name: 'Routers',
-        link: { path: '/routers' }
-      },
-      {
-        name: 'Floating IPs',
-        link: { path: '/floatingips' }
-      },
-      {
-        name: 'API Access',
-        link: { path: '/apiaccess' },
-      },
-      {
-        name: 'Volumes',
-        link: { path: '/storage' },
-      },
-      {
-        name: 'Images',
-        link: { path: '/images' }
-      },
-      {
-        name: 'Applications',
-        link: { path: '/applications' }
-      },
-      {
-        name: 'SSH Keys',
-        link: { path: '/sshkeys' }
-      },
-      {
-        name: 'Hosts',
-        link: { path: '/hosts' }
-      }
-      /**/
+    {
+      name: 'Tenants',
+      link: { path: '/tenants' }
+    },
+    {
+      name: 'Users',
+      link: { path: '/users' }
+    },
+    {
+      name: 'Flavors',
+      link: { path: '/flavors' }
+    },
+    {
+      name: 'Instances',
+      link: { path: '/instances' }
+    },
+    {
+      name: 'Networks',
+      link: { path: '/networks' }
+    },
+    {
+      name: 'Routers',
+      link: { path: '/routers' }
+    },
+    {
+      name: 'Floating IPs',
+      link: { path: '/floatingips' }
+    },
+    {
+      name: 'API Access',
+      link: { path: '/apiaccess' },
+    },
+    {
+      name: 'Volumes',
+      link: { path: '/storage' },
+    },
+    {
+      name: 'Images',
+      link: { path: '/images' }
+    },
+    {
+      name: 'Applications',
+      link: { path: '/applications' }
+    },
+    {
+      name: 'SSH Keys',
+      link: { path: '/sshkeys' }
+    },
+    {
+      name: 'Hosts',
+      link: { path: '/hosts' }
+    }
   ])
 }
 

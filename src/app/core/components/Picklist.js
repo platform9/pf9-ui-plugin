@@ -18,6 +18,7 @@ const useStyles = makeStyles((theme) => ({
     flexWrap: 'wrap',
     minWidth: 120,
     marginTop: theme.spacing(1),
+    background: '#ffffff',
   },
   list: {
     maxHeight: 400,
@@ -55,7 +56,7 @@ const Picklist = React.forwardRef((props, ref) => {
         showNone ? prepend({ label: noneLabel || 'None', value: noneKey }) : identity,
         showAll ? prepend({ label: 'All', value: allKey }) : identity,
         map((option) => (
-          <MenuItem value={option.value} key={option.value}>
+          <MenuItem value={option.value} key={option.label}>
             {option.label}
           </MenuItem>
         )),
