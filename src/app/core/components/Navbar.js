@@ -18,7 +18,7 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
 import ChevronRightIcon from '@material-ui/icons/ChevronRight'
 import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'
-import { except } from 'app/utils/fp'
+import { except, pathStrOr } from 'app/utils/fp'
 import clsx from 'clsx'
 import { withHotKeys } from 'core/providers/HotKeysProvider'
 import moize from 'moize'
@@ -30,6 +30,7 @@ import { routes } from 'core/utils/routes'
 
 import { version } from '../../../../package.json'
 import SimpleLink from './SimpleLink'
+import { withAppContext } from 'core/providers/AppProvider'
 
 export const drawerWidth = 180
 
@@ -308,6 +309,7 @@ const styles = (theme) => ({
 @withStyles(styles, { withTheme: true })
 @withHotKeys
 @withRouter
+@withAppContext
 class Navbar extends PureComponent {
   constructor(props) {
     super(props)
@@ -585,11 +587,22 @@ class Navbar extends PureComponent {
   }
 
   render() {
-    const { classes, withStackSlider, sections, open, handleDrawerToggle, stack } = this.props
+    const {
+      classes,
+      withStackSlider,
+      sections,
+      open,
+      handleDrawerToggle,
+      stack,
+      getContext,
+    } = this.props
     // const filteredSections = sections.filter(where({ links: notEmpty }))
     // Because ironic regions will not currently support kubernetes, assume always
     // one filtered section, either openstack (ironic) or kubernetes
     const filteredSections = sections.filter(where({ id: equals(stack) }))
+
+    const { features } = getContext()
+    const isDecco = pathStrOr(false, 'experimental.kplane', features)
 
     return (
       <div
@@ -629,7 +642,7 @@ class Navbar extends PureComponent {
 
           <div
             className={clsx(classes.bottomContent, {
-              [classes.bottomContentClose]: !open,
+              [classes.bottomContentClose]: !open || isDecco,
             })}
           >
             <Button onClick={this.handleNavigateToClarity}>
