@@ -401,7 +401,7 @@ const AddBareOsClusterPage = () => {
                     >
                       <div className={classes.innerWrapper}>
                         <ClusterHostChooser
-                          multiple
+                          selection="multiple"
                           id="masterNodes"
                           filterFn={allPass([isConnected, isUnassignedNode])}
                           onChange={(value) => setWizardContext({ masterNodes: value })}
