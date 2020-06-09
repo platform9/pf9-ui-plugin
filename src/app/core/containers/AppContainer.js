@@ -21,12 +21,13 @@ import {
 import ResetPasswordPage from 'core/public/ResetPasswordPage'
 import ForgotPasswordPage from 'core/public/ForgotPasswordPage'
 import ActivateUserPage from 'core/public/ActivateUserPage'
-import { isNilOrEmpty } from 'utils/fp'
+import { isNilOrEmpty, pathStrOr } from 'utils/fp'
 import LoginPage from 'core/public/LoginPage'
 import Progress from 'core/components/progress/Progress'
 import { getCookieValue } from 'utils/misc'
 import moment from 'moment'
 import { useToast } from 'core/providers/ToastProvider'
+import axios from 'axios'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -178,8 +179,14 @@ const AppContainer = () => {
       const { scopedToken, user, role } = await keystone.changeProjectScope(activeTenant.id)
       await keystone.resetCookie()
       /* eslint-disable */
-      // Identify the user in Segment using Keystone ID
-      if (typeof analytics !== 'undefined') {
+      // Check for sandbox flag, if false identify the user in Segment using Keystone ID
+      // This needs to be done here bc this needs to be done before login.
+      // Features are requested again later for the specific logged-in region,
+      // whereas this one is done on the master DU from which the UI is served.
+      // Ignore exception if features.json not found (for local development)
+      const features = await axios.get('/clarity/features.json').catch(() => null)
+      const sandbox = pathStrOr(false, 'experimental.sandbox', features)
+      if (!sandbox && typeof analytics !== 'undefined') {
         analytics.identify(user.id, {
           email: user.name,
         })
