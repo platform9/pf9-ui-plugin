@@ -1,6 +1,7 @@
 import React from 'react'
 
 import IronicSetupPage from 'openstack/components/ironicSetup/IronicSetupPage'
+import { clarityUrlRoot } from 'app/constants'
 
 class MetalStack extends React.PureComponent {
   render() {
@@ -20,9 +21,8 @@ MetalStack.registerPlugin = (pluginManager) => {
       component: IronicSetupPage,
     },
   ])
-
-  const hostPrefix = 'https://ui-dev.platform9.horse' // set to another host during development
-  const clarityBase = (path) => `${hostPrefix}/clarity/index.html#${path}`
+  const hostPrefix = window.location.origin
+  const clarityBase = (path) => `${hostPrefix}${clarityUrlRoot}${path}`
   const clarityLink = (path) => ({ link: { path: clarityBase(path), external: true } })
 
   plugin.registerNavItems([
@@ -34,12 +34,12 @@ MetalStack.registerPlugin = (pluginManager) => {
     {
       name: 'Bare Metal Setup',
       ...clarityLink('/infrastructure'),
-      icon: 'building'
+      icon: 'building',
     },
     {
       name: 'Images',
       ...clarityLink('/images'),
-      icon: 'file-code'
+      icon: 'file-code',
     },
     {
       name: 'Bare Metal Deployed',
