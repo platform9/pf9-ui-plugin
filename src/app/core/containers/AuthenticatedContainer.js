@@ -28,6 +28,7 @@ import { pathJoin } from 'utils/misc'
 import PushEventsProvider from '../providers/PushEventsProvider'
 import BannerContainer from 'core/components/notifications/BannerContainer'
 import BannerContent from 'core/components/notifications/BannerContent'
+import { trackEvent } from 'utils/tracking'
 
 const { keystone } = ApiClient.getInstance()
 
@@ -260,11 +261,27 @@ const AuthenticatedContainer = () => {
                 <BannerContent>
                   <div className={classes.sandboxBanner}>
                     Welcome! You are in the Platform9 live demo.{' '}
-                    <Button component="a" target="_blank" href={getSandboxUrl('signup')}>
+                    <Button
+                      component="a"
+                      target="_blank"
+                      href={getSandboxUrl('signup')}
+                      onClick={() => trackEvent(
+                        'CTA Deploy a Cluster Now',
+                        { 'CTA-Page': 'PMK Live Demo' }
+                      )}
+                    >
                       Deploy a Cluster Now
                     </Button>{' '}
                     or{' '}
-                    <Button component="a" target="_blank" href={getSandboxUrl('pricing')}>
+                    <Button
+                      component="a"
+                      target="_blank"
+                      href={getSandboxUrl('pricing')}
+                      onClick={() => trackEvent(
+                        'CTA View Pricing Plans',
+                        { 'CTA-Page': 'PMK Live Demo' }
+                      )}
+                    >
                       View Plans
                     </Button>
                   </div>
