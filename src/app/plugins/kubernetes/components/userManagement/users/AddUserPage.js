@@ -20,7 +20,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel'
 import Radio from '@material-ui/core/Radio'
 import { mngmTenantActions } from 'k8s/components/userManagement/tenants/actions'
 import UserPasswordField from 'k8s/components/userManagement/users/UserPasswordField'
-import { requiredValidator } from 'core/utils/fieldValidators'
+import { requiredValidator, emailValidator } from 'core/utils/fieldValidators'
 
 const listUrl = pathJoin(k8sPrefix, 'user_management#users')
 
@@ -70,7 +70,12 @@ const AddUserPage = () => {
               >
                 {({ values }) => (
                   <>
-                    <TextField id="username" label="Username or Email" required />
+                    <TextField
+                      id="username"
+                      label="Email"
+                      validations={[emailValidator]}
+                      required
+                    />
                     <TextField id="displayname" label="Display Name" />
                     <FormControl component="fieldset">
                       <FormLabel component="legend">
