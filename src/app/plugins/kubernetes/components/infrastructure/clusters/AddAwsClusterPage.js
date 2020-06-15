@@ -159,9 +159,9 @@ const calicoIpIPHelpText = {
 }
 
 const templateOptions = [
-  { label: 'small - 1 node master + worker (t2.medium)', value: 'small' },
-  { label: 'medium - 1 master + 3 workers (t2.medium)', value: 'medium' },
-  { label: 'large - 3 masters + 5 workers (t2.large)', value: 'large' },
+  { label: 'Sm - Single Node Master & Worker (t2.medium)', value: 'small' },
+  { label: 'Md - 1 Master + 3 Workers (t2.medium)', value: 'medium' },
+  { label: 'Lg - 3 Masters + 5 Workers (t2.large)', value: 'large' },
   { label: 'custom', value: 'custom' },
 ]
 

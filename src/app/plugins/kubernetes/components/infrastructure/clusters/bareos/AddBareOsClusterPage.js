@@ -432,6 +432,7 @@ const AddBareOsClusterPage = () => {
                         disabled={['calico', 'canal', 'weave'].includes(
                           wizardContext.networkPlugin,
                         )}
+                        infoPlacement="right-end"
                         info={
                           <div>
                             Allows this cluster to run privileged containers. Read{' '}
@@ -632,6 +633,7 @@ const AddBareOsClusterPage = () => {
                       <CheckboxField
                         id="enableMetallb"
                         label="Enable MetalLB"
+                        infoPlacement="right-end"
                         info="Platform9 uses MetalLB for bare metal service level load balancing. Enabling MetalLB will provide the ability to create services of type load-balancer."
                       />
 
