@@ -38,7 +38,7 @@ export const azureGetValuesForSigninginLink = `${microsoftDocBaseUrl}/azure/acti
 export const azureCreateANewApplicationSecretLink = `${microsoftDocBaseUrl}/azure/active-directory/develop/howto-create-service-principal-portal#create-a-new-application-secret`
 
 // BareOS
-export const gettingStartedLink = `${k8sBaseUrl}/getting-started/bare-metal-preinstall-checklist/`
+export const gettingStartedLink = `${k8sBaseUrl}/quickstart/`
 export const whatIsBareOSLink = `${k8sBaseUrl}/on-premise-kubernetes/what-is-bareos`
 export const bareOSSetupDocumentationLink = `${k8sBaseUrl}/create-multimaster-bareos-cluster/`
 
