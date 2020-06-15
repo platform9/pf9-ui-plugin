@@ -76,7 +76,7 @@ const BareOSClusterRequirements = ({ onComplete }) => {
   }, [onComplete])
   return (
     <FormFieldCard
-      title="BareOS Ubuntu Cluster"
+      title="BareOS Cluster"
       link={
         <div>
           <FontAwesomeIcon className={classes.blueIcon} size="md">
@@ -87,7 +87,7 @@ const BareOSClusterRequirements = ({ onComplete }) => {
       }
     >
       <Typography className={classes.text}>
-        Create a BareOS cluster using Ubuntu physical or virtual machines
+        Create a BareOS cluster using Ubuntu or CentOS physical or virtual machines
       </Typography>
       <Typography className={classes.text}>Cluster comes built in with:</Typography>
       <BulletList className={classes.bulletList} items={nodeServices} />
