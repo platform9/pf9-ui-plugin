@@ -777,7 +777,7 @@ const AddAwsClusterPage = () => {
                           <div>
                             Allows this cluster to run privileged containers. Read{' '}
                             <ExternalLink url={runtimePrivilegedLink}>this article</ExternalLink>{' '}
-                            for more information.
+                            for more information. This is required for Calico CNI and CSI.
                           </div>
                         }
                       />
