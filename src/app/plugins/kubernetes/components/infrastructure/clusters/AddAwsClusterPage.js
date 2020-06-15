@@ -653,7 +653,7 @@ const AddAwsClusterPage = () => {
                           id="externalDnsName"
                           label="API FQDN"
                           infoPlacement="right-end"
-                          info="FQDN (Fully Qualified Domain Name) is used to reference cluster API. To ensure the API can be accessed securely at the FQDN, the FQDN will be included in the API server certificate's Subject Alt Names. If deploying onto a cloud provider, we will automatically create the DNS records for this FQDN using the cloud provider’s DNS service."
+                          info="Fully Qualified Domain Name used to reference the cluster API. The API will be secured by including the FQDN in the API server certificate’s Subject Alt Names. Clusters in Public Cloud will automatically have the DNS records created and registered for the FQDN."
                           required={!values.usePf9Domain}
                           disabled={values.usePf9Domain}
                         />
@@ -672,7 +672,7 @@ const AddAwsClusterPage = () => {
                         <TextField
                           id="containersCidr"
                           label="Containers CIDR"
-                          info="Defines the network CIDR from which the flannel networking layer allocates IP addresses to Docker containers. This CIDR should not overlap with the VPC CIDR. Each node gets a /24 subnet. Choose a CIDR bigger than /23 depending on the number of nodes in your cluster. A /16 CIDR gives you 256 nodes."
+                          info="Network CIDR from which Kubernetes allocates IP addresses to containers. This CIDR shouldn't overlap with the VPC CIDR. A /16 CIDR enables 256 nodes."
                           required
                           validations={[IPValidator, cidrBlockSizeValidator]}
                         />
@@ -681,7 +681,7 @@ const AddAwsClusterPage = () => {
                         <TextField
                           id="servicesCidr"
                           label="Services CIDR"
-                          info="Defines the network CIDR from which Kubernetes allocates virtual IP addresses to Services.  This CIDR should not overlap with the VPC CIDR."
+                          info="The network CIDR for Kubernetes virtual IP addresses for Services. This CIDR shouldn't overlap with the VPC CIDR."
                           required
                           validations={[
                             IPValidator,
@@ -697,11 +697,11 @@ const AddAwsClusterPage = () => {
                           infoPlacement="right-end"
                           info={
                             <div className={classes.inline}>
-                              (Optional) Specify the HTTP proxy for this cluster. Uses format of{' '}
+                              Specify the HTTP proxy for this cluster. Format{' '}
                               <CodeBlock>
                                 <span>{'<scheme>://<username>:<password>@<host>:<port>'}</span>
                               </CodeBlock>{' '}
-                              where username and password are optional.
+                              username and password are optional.
                             </div>
                           }
                         />

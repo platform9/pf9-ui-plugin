@@ -508,14 +508,13 @@ const AddBareOsClusterPage = () => {
                         label="Virtual IP address for cluster"
                         info={
                           <div>
-                            Specify the virtual IP address that will be used to provide access to
-                            the API server endpoint for this cluster. A virtual IP must be specified
-                            if you want to grow the number of masters in the future. Refer to{' '}
+                            The virtual IP address to provide access to the API server endpoint for
+                            this cluster. A virtual IP must be specified to grow the number of
+                            masters in the future. Refer to{' '}
                             <a href={pf9PmkArchitectureDigLink} target="_blank">
                               this article
                             </a>{' '}
-                            for more information re how the VIP service operates, VIP configuration,
-                            etc.
+                            for help on VIP operations and configuration
                           </div>
                         }
                         required={(wizardContext.masterNodes || []).length > 1}
@@ -526,7 +525,7 @@ const AddBareOsClusterPage = () => {
                         id="masterVipIface"
                         label="Physical interface for virtual IP association"
                         infoPlacement="right-end"
-                        info="Provide the name of the network interface that the virtual IP should be bound to. The virtual IP should be reachable from the network this interface connects to. Note: All master nodes should use the same interface (eg: ens3) that the virtual IP will be bound to."
+                        info="The name of the network interface that the virtual IP will be bound. The virtual IP must be reachable from the network the interface connects to. All master nodes must use the same interface (eg: ens3)."
                         masterNodes={wizardContext.masterNodes}
                         required={(wizardContext.masterNodes || []).length > 1}
                       />
@@ -536,7 +535,7 @@ const AddBareOsClusterPage = () => {
                         id="externalDnsName"
                         label="API FQDN"
                         infoPlacement="right-end"
-                        info="FQDN (Fully Qualified Domain Name) is used to reference cluster API. To ensure the API can be accessed securely at the FQDN, the FQDN will be included in the API server certificate's Subject Alt Names. If deploying onto a cloud provider, we will automatically create the DNS records for this FQDN using the cloud provider’s DNS service."
+                        info="Fully Qualified Domain Name used to reference the cluster API. The API will be secured by including the FQDN in the API server certificate’s Subject Alt Names. Clusters in Public Cloud will automatically have the DNS records created and registered for the FQDN."
                       />
                     </FormFieldCard>
 
@@ -545,7 +544,7 @@ const AddBareOsClusterPage = () => {
                       <TextField
                         id="containersCidr"
                         label="Containers CIDR"
-                        info="Defines the network CIDR from which the flannel networking layer allocates IP addresses to Docker containers. This CIDR should not overlap with the VPC CIDR. Each node gets a /24 subnet. Choose a CIDR bigger than /23 depending on the number of nodes in your cluster. A /16 CIDR gives you 256 nodes."
+                        info="Network CIDR from which Kubernetes allocates IP addresses to containers. This CIDR shouldn't overlap with the VPC CIDR. A /16 CIDR enables 256 nodes."
                         required
                         validations={[IPValidator, cidrBlockSizeValidator]}
                       />
@@ -554,7 +553,7 @@ const AddBareOsClusterPage = () => {
                       <TextField
                         id="servicesCidr"
                         label="Services CIDR"
-                        info="Defines the network CIDR from which Kubernetes allocates virtual IP addresses to Services.  This CIDR should not overlap with the VPC CIDR."
+                        info="The network CIDR for Kubernetes virtual IP addresses for Services. This CIDR shouldn't overlap with the VPC CIDR."
                         required
                         validations={[
                           IPValidator,
@@ -570,11 +569,11 @@ const AddBareOsClusterPage = () => {
                         infoPlacement="right-end"
                         info={
                           <div className={classes.inline}>
-                            (Optional) Specify the HTTP proxy for this cluster. Uses format of{' '}
+                            Specify the HTTP proxy for this cluster. Format{' '}
                             <CodeBlock>
                               <span>{'<scheme>://<username>:<password>@<host>:<port>'}</span>
                             </CodeBlock>{' '}
-                            where username and password are optional.
+                            username and password are optional.
                           </div>
                         }
                       />
@@ -633,14 +632,14 @@ const AddBareOsClusterPage = () => {
                       <CheckboxField
                         id="enableMetallb"
                         label="Enable MetalLB"
-                        info="Select if MetalLB should load-balancer should be enabled for this cluster. Platform9 uses MetalLB - a load-balancer implementation for bare metal Kubernetes clusters that uses standard routing protocols - for service level load balancing. Enabling MetalLB on this cluster will provide the ability to create services of type load-balancer."
+                        info="Platform9 uses MetalLB for bare metal service level load balancing. Enabling MetalLB will provide the ability to create services of type load-balancer."
                       />
 
                       {values.enableMetallb && (
                         <TextField
                           id="metallbCidr"
                           label="Address pool range(s) for Metal LB"
-                          info="Provide the IP address pool that MetalLB load-balancer is allowed to allocate from. You need to specify an explicit start-end range of IPs for the pool.  It takes the following format: startIP1-endIP1,startIP2-endIP2"
+                          info="Specify the MetalLB start-end IP pool. Format: startIP1-endIP1,startIP2-endIP2"
                           required
                         />
                       )}
