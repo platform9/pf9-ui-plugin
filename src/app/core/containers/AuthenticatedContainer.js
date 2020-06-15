@@ -270,7 +270,7 @@ const AuthenticatedContainer = () => {
                         { 'CTA-Page': 'PMK Live Demo' }
                       )}
                     >
-                      Deploy a Cluster Now
+                      Start your Free Plan Now
                     </Button>{' '}
                     or{' '}
                     <Button
