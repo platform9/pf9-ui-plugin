@@ -9,6 +9,10 @@ export const pf9SupportBaseUrl = 'https://support.platform9.com'
 const communityBaseUrl = 'https://community.platform9.com'
 const k8sDocBaselUrl = 'https://kubernetes.io/docs'
 const dockerDocBaseUrl = 'https://docs.docker.com'
+
+// MFA
+export const MFAHelpLink = `${pf9DocOrigin}/openstack/authentication/enable_mfa_for_user/`
+
 // Qbert
 export const qbertApiLink = `${k8sBaseUrl}/API-Reference/Qbert-API-Reference/`
 
