@@ -5,9 +5,14 @@ const k8sBaseUrl = `${pf9DocOrigin}/kubernetes`
 const microsoftDocBaseUrl = 'https://docs.microsoft.com/en-us'
 const amazonDocBaseUrl = 'http://docs.aws.amazon.com'
 const pf9GitHubRepoUrl = 'https://github.com/platform9'
-const pf9SupportBaseUrl = 'https://support.platform9.com'
+export const pf9SupportBaseUrl = 'https://support.platform9.com'
+const communityBaseUrl = 'https://community.platform9.com'
 const k8sDocBaselUrl = 'https://kubernetes.io/docs'
 const dockerDocBaseUrl = 'https://docs.docker.com'
+
+// MFA
+export const MFAHelpLink = `${pf9DocOrigin}/openstack/authentication/enable_mfa_for_user/`
+
 // Qbert
 export const qbertApiLink = `${k8sBaseUrl}/API-Reference/Qbert-API-Reference/`
 
@@ -16,7 +21,7 @@ export const gettingStartedHelpLink = `${k8sBaseUrl}/quickstart/`
 export const tutorialsHelpLink = `${k8sBaseUrl}/tutorials/virtualbox-mac/`
 export const slackLink = 'https://slack.platform9.io'
 export const emailSupportLink = 'mailto:support-ft@platform9.com'
-export const forumHelpLink = `${pf9SupportBaseUrl}/hc/en-us/community/topics`
+export const forumHelpLink = `${communityBaseUrl}/`
 export const pf9PmkArchitectureDigLink = `${k8sBaseUrl}/multimaster-architecture-platform9-managed-kubernetes/`
 export const pmkDocumentationLink = `${k8sBaseUrl}/introduction/overview`
 
@@ -33,7 +38,7 @@ export const azureGetValuesForSigninginLink = `${microsoftDocBaseUrl}/azure/acti
 export const azureCreateANewApplicationSecretLink = `${microsoftDocBaseUrl}/azure/active-directory/develop/howto-create-service-principal-portal#create-a-new-application-secret`
 
 // BareOS
-export const gettingStartedLink = `${k8sBaseUrl}/getting-started/bare-metal-preinstall-checklist/`
+export const gettingStartedLink = `${k8sBaseUrl}/quickstart/`
 export const whatIsBareOSLink = `${k8sBaseUrl}/on-premise-kubernetes/what-is-bareos`
 export const bareOSSetupDocumentationLink = `${k8sBaseUrl}/create-multimaster-bareos-cluster/`
 

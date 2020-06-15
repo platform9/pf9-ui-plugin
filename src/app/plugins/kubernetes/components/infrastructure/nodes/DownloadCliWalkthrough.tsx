@@ -54,8 +54,8 @@ export const DownloadCliOnboardNodeWalkthrough = (): JSX.Element => (
     <Typography variant="h6">Pre-requisites</Typography>
     <p>
       <Typography component="span">
-        You will need a physical or virtual machine with Ubuntu 16.04 installed. (Support for CentOS
-        is coming soon!)
+        You will need a physical or virtual machine with Ubuntu (16.04 / 18.04) or CentOS
+        (7.6/7.7/7.8) installed.
       </Typography>
     </p>
     <DownloadCliWalkthrough />
@@ -128,8 +128,8 @@ const NumberedSteps: FC<NumberedStepProps> = ({
         {typeof description === 'string' ? (
           <Typography variant="body1">{description}</Typography>
         ) : (
-            description
-          )}
+          description
+        )}
         {children}
       </div>
     </div>
