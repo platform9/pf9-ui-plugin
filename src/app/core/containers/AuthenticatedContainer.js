@@ -163,8 +163,6 @@ const renderRawComponents = moize((plugins) =>
     .flat(),
 )
 
-const getSandboxUrl = (pathPart) => `https://platform9.com/${pathPart}/`
-
 const redirectToAppropriateStack = (ironicEnabled, kubernetesEnabled, history) => {
   // If it is neither ironic nor kubernetes, bump user to old UI
   // TODO: For production, I need to always bump user to old UI in both ironic
@@ -210,6 +208,8 @@ const determineStack = (history, features) => {
   }
   return history.location.pathname.includes('openstack') ? 'openstack' : 'kubernetes'
 }
+
+const getSandboxUrl = (pathPart) => `https://platform9.com/${pathPart}/`
 
 const AuthenticatedContainer = () => {
   const [drawerOpen, toggleDrawer] = useToggler(true)
@@ -270,19 +270,19 @@ const AuthenticatedContainer = () => {
                         { 'CTA-Page': 'PMK Live Demo' }
                       )}
                     >
-                      Deploy a Cluster Now
+                      Start your Free Plan Now
                     </Button>{' '}
                     or{' '}
                     <Button
                       component="a"
                       target="_blank"
-                      href={getSandboxUrl('pricing')}
+                      href={getSandboxUrl('contact')}
                       onClick={() => trackEvent(
-                        'CTA View Pricing Plans',
+                        'CTA Contact Us',
                         { 'CTA-Page': 'PMK Live Demo' }
                       )}
                     >
-                      View Plans
+                      Contact Us
                     </Button>
                   </div>
                 </BannerContent>
