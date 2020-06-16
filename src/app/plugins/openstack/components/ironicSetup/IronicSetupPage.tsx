@@ -162,12 +162,12 @@ const subnetExists = (networks, subnets) => {
 }
 
 const ironicImagesExist = (images) => {
-  const imageNames = images.map(image => image.name)
+  const ironicImages = images.filter((image) => (
+    (image.name.includes('deploy-initrd') && image.disk_format === 'ari')
+    || (image.name.includes('deploy-vmlinuz') && image.disk_format === 'aki')
+  ))
   return {
-    finished: intersection(imageNames, [
-      'tinyipa-deploy-initrd',
-      'tinyipa-deploy-vmlinuz',
-    ]).length === 2,
+    finished: ironicImages.length >= 2,
     step: 6,
     data: {},
   }
