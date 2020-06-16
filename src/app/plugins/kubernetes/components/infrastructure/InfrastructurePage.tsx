@@ -10,7 +10,7 @@ import { FormControlLabel, Switch } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import { prop } from 'ramda'
 import { useSelector } from 'react-redux'
-import { sessionStoreKey } from 'core/session/sessionReducers'
+import { sessionStoreKey, SessionState } from 'core/session/sessionReducers'
 
 const useStyles = makeStyles((theme) => ({
   infrastructureHeader: {
@@ -36,8 +36,11 @@ const InfrastructurePage = () => {
   const classes = useStyles({})
   const [statsVisible, setStatsVisble] = useState(true)
   const toggleStats = useCallback(() => setStatsVisble(!statsVisible), [statsVisible])
-  const session = useSelector(prop(sessionStoreKey))
-  const { userDetails: { role } } = session
+  const selectSessionState = prop<string, SessionState>(sessionStoreKey)
+  const session = useSelector(selectSessionState)
+  const {
+    userDetails: { role },
+  } = session
 
   const hash = window.location.hash.substr(1) as InfrastructureTabs
   const [activeTab, setActiveTab] = React.useState(hash || InfrastructureTabs.Clusters)

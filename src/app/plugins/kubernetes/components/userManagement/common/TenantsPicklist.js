@@ -8,7 +8,7 @@ import { mngmTenantActions } from 'k8s/components/userManagement/tenants/actions
 // We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
 const TenantsPicklist = forwardRef(
   ({ allRoles, id, loading, onChange, value, disabled, ...rest }, ref) => {
-    const [tenants, tenantsLoading] = useDataLoader(mngmTenantActions.list )
+    const [tenants, tenantsLoading] = useDataLoader(mngmTenantActions.list)
     const options = useMemo(() => projectAs({ label: 'name', value: 'id' }, tenants), [tenants])
 
     return (

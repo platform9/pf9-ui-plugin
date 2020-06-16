@@ -20,7 +20,9 @@ import { forgotPasswordUrl } from 'app/constants.js'
 import { pathJoin } from 'utils/misc'
 import { imageUrlRoot, dashboardUrl } from 'app/constants'
 import moment from 'moment'
+import { connect } from 'react-redux'
 import { trackEvent } from 'utils/tracking'
+import { sessionActions } from 'core/session/sessionReducers'
 
 const styles = (theme) => ({
   root: {
@@ -74,7 +76,8 @@ const styles = (theme) => ({
   },
 })
 
-export class LoginPage extends React.PureComponent {
+@connect()
+class LoginPage extends React.PureComponent {
   state = {
     username: '',
     password: '',
@@ -100,16 +103,31 @@ export class LoginPage extends React.PureComponent {
       return this.setState({ loading: false, loginFailed: true })
     }
 
-    const authSuccess = await onAuthSuccess({ username, unscopedToken, expiresAt, issuedAt })
+    const timeDiff = moment(expiresAt).diff(issuedAt)
+    const localExpiresAt = moment()
+      .add(timeDiff)
+      .format()
 
-    if (authSuccess) {
-      trackEvent('PF9 Signed In', {
+    this.props.dispatch(
+      sessionActions.initSession({
         username,
-        duDomain: window.location.origin,
-      })
-      return this.props.history.push(dashboardUrl)
-    }
-    return this.setState({ loginFailed: true, loading: false })
+        unscopedToken,
+        expiresAt: localExpiresAt,
+      }),
+    )
+
+    trackEvent('PF9 Signed In', {
+      username,
+      duDomain: window.location.origin,
+    })
+
+    onAuthSuccess()
+    return this.setState(
+      {
+        loading: false,
+      },
+      () => this.props.history.push(dashboardUrl),
+    )
   }
 
   handleChangeBox = (name) => (event) => {
@@ -258,7 +276,4 @@ LoginPage.propTypes = {
   onAuthSuccess: PropTypes.func,
 }
 
-export default compose(
-  withRouter,
-  withStyles(styles),
-)(LoginPage)
+export default compose(withRouter, withStyles(styles))(LoginPage)

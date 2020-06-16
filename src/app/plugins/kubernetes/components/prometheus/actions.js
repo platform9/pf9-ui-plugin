@@ -32,7 +32,7 @@ export const hasPrometheusEnabled = (cluster) => {
 }
 export const clusterTagsCacheKey = 'clusterTags'
 export const clusterTagActions = createCRUDActions(clusterTagsCacheKey, {
-  listFn: async (params, loadFromContext) => {
+  listFn: async () => {
     return appbert.getClusterTags()
   },
   uniqueIdentifier: 'uuid',

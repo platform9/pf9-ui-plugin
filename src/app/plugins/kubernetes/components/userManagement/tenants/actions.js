@@ -1,26 +1,29 @@
 import ApiClient from 'api-client/ApiClient'
 import createContextLoader from 'core/helpers/createContextLoader'
 import createCRUDActions from 'core/helpers/createCRUDActions'
-import { namespacesCacheKey } from 'k8s/components/namespaces/actions'
-import { mngmUsersCacheKey } from 'k8s/components/userManagement/users/actions'
-import { always, filter, find, isNil, keys, map, pipe, pluck, prop, propEq, reject } from 'ramda'
+import namespaceActions from 'k8s/components/namespaces/actions'
+import { mngmUsersCacheKey, mngmUserActions } from 'k8s/components/userManagement/users/actions'
+import { always, find, isNil, keys, pipe, prop, propEq, reject } from 'ramda'
 import { tryCatchAsync } from 'utils/async'
-import { emptyArr, filterIf, objSwitchCase, pathStr } from 'utils/fp'
+import { emptyArr, objSwitchCase, pathStr } from 'utils/fp'
 
 const { keystone } = ApiClient.getInstance()
 
 export const mngmTenantsCacheKey = 'managementTenants'
 
-const reservedTenantNames = ['admin', 'services', 'Default', 'heat']
-export const filterValidTenants = (tenant) => !reservedTenantNames.includes(tenant.name)
 export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
-  listFn: () => {
-    return keystone.getAllTenantsAllUsers()
+  listFn: async () => {
+    const [allTenantsAllUsers] = await Promise.all([
+      keystone.getAllTenantsAllUsers(),
+      // Make sure the derived data gets loaded as well
+      namespaceActions.list()
+    ])
+    return allTenantsAllUsers
   },
   deleteFn: async ({ id }) => {
     await keystone.deleteProject(id)
   },
-  createFn: async ({ name, description, roleAssignments }, _, loadFromContext) => {
+  createFn: async ({ name, description, roleAssignments }) => {
     const createdTenant = await keystone.createProject({
       name,
       description,
@@ -28,7 +31,7 @@ export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
       domain_id: 'default',
       is_domain: false,
     })
-    const users = await loadFromContext(mngmUsersCacheKey)
+    const users = await mngmUserActions.list()
     await tryCatchAsync(
       () =>
         Promise.all(
@@ -47,14 +50,10 @@ export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
       users: users.filter((user) => userKeys.includes(user.id)),
     }
   },
-  updateFn: async (
-    { id: tenantId, name, description, roleAssignments },
-    prevItems,
-    loadFromContext,
-  ) => {
+  updateFn: async ({ id: tenantId, name, description, roleAssignments }) => {
     const [users, prevRoleAssignmentsArr] = await Promise.all([
-      loadFromContext(mngmUsersCacheKey),
-      loadFromContext(mngmTenantRoleAssignmentsCacheKey, {
+      mngmUserActions.list(mngmUsersCacheKey),
+      mngmTenantRoleAssignmentsLoader({
         tenantId,
       }),
     ])
@@ -105,22 +104,6 @@ export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
       ...updatedTenant,
       users: users.filter((user) => userKeys.includes(user.id)),
     }
-  },
-  dataMapper: async (allTenantsAllUsers, params, loadFromContext) => {
-    const namespaces = await loadFromContext(namespacesCacheKey)
-    const heatTenantId = pipe(find(propEq('name', 'heat')), prop('id'))(allTenantsAllUsers)
-    return pipe(
-      filterIf(!params.includeBlacklisted, filterValidTenants),
-      filter((tenant) => tenant.domain_id !== heatTenantId),
-      map((tenant) => ({
-        ...tenant,
-        users: tenant.users.filter((user) => user.username !== 'admin@platform9.net'),
-        clusters: pluck(
-          'clusterName',
-          namespaces.filter((namespace) => namespace.metadata.name === tenant.name),
-        ),
-      })),
-    )(allTenantsAllUsers)
   },
   refetchCascade: true,
   requiredRoles: 'admin',

@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react'
-import { clear } from 'core/utils/pf9Storage'
 import { useDispatch, useSelector } from 'react-redux'
-import { sessionActions, sessionStoreKey } from 'core/session/sessionReducers'
-import { cacheActions } from 'core/caching/cacheReducers'
 import { trackEvent } from 'utils/tracking'
 import { prop } from 'ramda'
+import { sessionActions, sessionStoreKey } from 'core/session/sessionReducers'
+import { cacheActions } from 'core/caching/cacheReducers'
+import { notificationActions } from 'core/notifications/notificationReducers'
 
 // We are abusing the React component system a little bit here.  This is really
 // nothing but an action but I didn't want to clutter the Navbar component with
@@ -20,11 +20,9 @@ const LogoutPage = () => {
       du_domain: window.location.origin,
     })
 
-    clear('user')
-    clear('tokens')
-
     dispatch(sessionActions.destroySession())
     dispatch(cacheActions.clearCache())
+    dispatch(notificationActions.clearNotifications())
   }, [])
 
   return <div />

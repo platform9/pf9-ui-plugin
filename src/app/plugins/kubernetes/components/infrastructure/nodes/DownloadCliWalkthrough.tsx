@@ -5,7 +5,7 @@ import CodeBlock from 'core/components/CodeBlock'
 import Theme from 'core/themes/model'
 import CopyToClipboard from 'core/components/CopyToClipboard'
 import { hexToRGBA } from 'core/utils/colorHelpers'
-import { sessionStoreKey } from 'core/session/sessionReducers'
+import { sessionStoreKey, SessionState } from 'core/session/sessionReducers'
 import { prop } from 'ramda'
 import { useSelector } from 'react-redux'
 
@@ -66,7 +66,8 @@ export const DownloadCliOnboardNodeWalkthrough = (): JSX.Element => (
 
 const DownloadCliWalkthrough = (): JSX.Element => {
   const classes = useStyles({})
-  const session = useSelector(prop(sessionStoreKey))
+  const selectSessionState = prop<string, SessionState>(sessionStoreKey)
+  const session = useSelector(selectSessionState)
   return (
     <Paper className={classes.paper} elevation={0}>
       <Typography variant="h6">
@@ -96,7 +97,9 @@ const DownloadCliWalkthrough = (): JSX.Element => {
       </Typography>
       <NumberedSteps
         step={2}
-        title="Run the PF9 CLI using ‘prep-node’ to attach the Node to the Platform9 Management plane"
+        title={
+          'Run the PF9 CLI using ‘prep-node’ to attach the Node to the Platform9 Management plane'
+        }
         description={
           <CopyToClipboard copyText="pf9ctl cluster prep-node">
             <CodeBlock>pf9ctl cluster prep-node</CodeBlock>
@@ -130,8 +133,8 @@ const NumberedSteps: FC<NumberedStepProps> = ({
         {typeof description === 'string' ? (
           <Typography variant="body1">{description}</Typography>
         ) : (
-            description
-          )}
+          description
+        )}
         {children}
       </div>
     </div>

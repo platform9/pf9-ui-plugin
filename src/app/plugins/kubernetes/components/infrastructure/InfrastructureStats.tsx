@@ -2,16 +2,14 @@
 import React, { FC } from 'react'
 import { Collapse } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
-// import calcUsageTotalByPath from 'k8s/util/calcUsageTotals'
-// import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
-
 // Components
 import { ClusterListHeader } from './clusters/ClustersListPageHeader'
 import { NodeListHeader } from './nodes/NodesListPageHeader'
 import { CloudProviderListHeader } from './cloudProviders/CloudProviderListHeader'
-
 // Types
 import Theme from 'core/themes/model'
+// import calcUsageTotalByPath from 'k8s/util/calcUsageTotals'
+// import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 
 interface Props {
   tab: InfrastructureTabs

@@ -1,9 +1,7 @@
 import React from 'react'
-import { withRouter } from 'react-router-dom'
 import ListTable from 'core/components/listTable/ListTable'
-import { withScopedPreferences } from 'core/providers/PreferencesProvider'
-import { compose } from 'ramda'
 import NoContentMessage from 'core/components/NoContentMessage'
+import useScopedPreferences from 'core/session/useScopedPreferences'
 
 const createListTableComponent = ({
   title,
@@ -25,12 +23,12 @@ const createListTableComponent = ({
     onDelete,
     onEdit,
     rowActions,
-    preferences: { visibleColumns, columnsOrder, rowsPerPage },
-    updatePreferences,
     loading,
     onSortChange,
-  }) =>
-    !data || data.length === 0 ? (
+  }) => {
+    const [{ visibleColumns, columnsOrder, rowsPerPage }, updatePrefs] = useScopedPreferences(name)
+
+    return !data || data.length === 0 ? (
       typeof emptyText === 'string' ? (
         <NoContentMessage message={emptyText} />
       ) : (
@@ -53,18 +51,19 @@ const createListTableComponent = ({
         rowsPerPage={rowsPerPage}
         onReload={onReload}
         onRefresh={onRefresh}
-        onRowsPerPageChange={(rowsPerPage) => updatePreferences({ rowsPerPage })}
-        onColumnsChange={updatePreferences}
+        onRowsPerPageChange={(rowsPerPage) => updatePrefs({ rowsPerPage })}
+        onColumnsChange={updatePrefs}
         onSortChange={onSortChange}
         uniqueIdentifier={uniqueIdentifier}
         loading={loading}
         compactTable={compactTable}
       />
     )
+  }
 
   CustomListTable.displayName = displayName
 
-  return compose(withRouter, withScopedPreferences(name))(CustomListTable)
+  return CustomListTable
 }
 
 export default createListTableComponent

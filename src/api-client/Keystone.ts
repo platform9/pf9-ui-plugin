@@ -306,7 +306,7 @@ class Keystone extends ApiService {
     } catch (err) {
       // authentication failed
       console.error(err)
-      return null
+      return {}
     }
   }
 
@@ -320,7 +320,7 @@ class Keystone extends ApiService {
       return features
     } catch (err) {
       console.error(err)
-      return null
+      return {}
     }
   }
 
@@ -363,7 +363,8 @@ class Keystone extends ApiService {
   }
 
   getServicesForActiveRegion = async () => {
-    const { activeRegion, serviceCatalog = await this.getServiceCatalog() } = this.client
+    const serviceCatalog = await this.getServiceCatalog()
+    const { activeRegion } = this.client
     const servicesByRegion = groupByRegion(serviceCatalog)
 
     if (!activeRegion || !servicesByRegion.hasOwnProperty(activeRegion)) {

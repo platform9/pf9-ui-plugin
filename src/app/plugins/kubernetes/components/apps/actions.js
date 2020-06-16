@@ -167,8 +167,8 @@ export const appActions = createCRUDActions(appsCacheKey, {
 })
 
 export const releaseActions = createCRUDActions(releasesCacheKey, {
-  listFn: async (params, loadFromContext) => {
-    const [clusterId, clusters] = await parseClusterParams(params, loadFromContext)
+  listFn: async (params) => {
+    const [clusterId, clusters] = await parseClusterParams(params)
     if (clusterId === allKey) {
       return someAsync(pluck('uuid', clusters).map(qbert.getReleases)).then(flatten)
     }

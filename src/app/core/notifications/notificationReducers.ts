@@ -11,7 +11,7 @@ export enum NotificationType {
   info = 'info',
 }
 
-export interface INotification {
+export interface Notification {
   id: string
   title: string
   message: string
@@ -19,7 +19,9 @@ export interface INotification {
   type: NotificationType
 }
 
-export const initialState: INotification[] = []
+export type NotificationState = Notification[]
+
+export const initialState: Notification[] = []
 
 const {
   name: notificationStoreKey,
@@ -31,16 +33,20 @@ const {
   reducers: {
     registerNotification: (
       state,
-      { payload: { title, message, type } }: PayloadAction<{ title: string; message: string; type: NotificationType }>) => {
-      return pipe<INotification[], INotification[], INotification[]>(
+      {
+        payload: { title, message, type },
+      }: PayloadAction<{ title: string; message: string; type: NotificationType }>,
+    ) => {
+      return pipe<Notification[], Notification[], Notification[]>(
         take(maxNotifications - 1),
         prepend({
           id: uuid.v4(),
           title,
           message,
           date: moment().format(),
-          type
-        }))(state)
+          type,
+        }),
+      )(state)
     },
     clearNotifications: () => {
       return initialState

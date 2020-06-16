@@ -1,56 +1,64 @@
 import React, { useState, useCallback, useMemo } from 'react'
 import ApiClient from 'api-client/ApiClient'
 import Selector from 'core/components/Selector'
-import { useScopedPreferences } from 'core/providers/PreferencesProvider'
-import { propEq, propOr, prop } from 'ramda'
+import { propEq, prop, pipe, head, find } from 'ramda'
 import { Tooltip } from '@material-ui/core'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { loadUserTenants } from 'openstack/components/tenants/actions'
-import { getStorage, setStorage } from 'core/utils/pf9Storage'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { cacheActions } from 'core/caching/cacheReducers'
-import { sessionActions, sessionStoreKey } from 'core/session/sessionReducers'
+import { sessionActions } from 'core/session/sessionReducers'
+import useScopedPreferences from 'core/session/useScopedPreferences'
 
 const TenantChooser = (props) => {
   const { keystone } = ApiClient.getInstance()
-  const { updatePrefs } = useScopedPreferences('Tenants')
   const [tenantSearch, setTenantSearch] = useState('')
   const [loading, setLoading] = useState(false)
-  const session = useSelector(prop(sessionStoreKey))
-  const { currentTenant } = session
-  const [currentTenantName, setCurrentTenantName] = useState(propOr('', 'name', currentTenant))
+  const [{ currentTenant }, updatePrefs] = useScopedPreferences()
+  const [selectedTenantName, setSelectedTenantName] = useState()
   const [tooltipOpen, setTooltipOpen] = useState(false)
   const [tenants, loadingTenants] = useDataLoader(loadUserTenants)
   const dispatch = useDispatch()
+  const curTenantName = useMemo(() => {
+    if (selectedTenantName) {
+      return selectedTenantName
+    }
+    if (currentTenant) {
+      return pipe(find(propEq('id', currentTenant)), prop('name'))(tenants)
+    }
+    return pipe(head, prop('name'))(tenants)
+  }, [tenants, currentTenant, selectedTenantName])
 
   const updateCurrentTenant = async (tenantName) => {
     setLoading(true)
-    setCurrentTenantName(tenantName)
+    setSelectedTenantName(tenantName)
 
-    const tenant = tenants.find((x) => x.name === tenantName)
+    const tenant = tenants.find(propEq('name', tenantName))
     if (!tenant) {
       return
     }
 
     const { user, role, scopedToken } = await keystone.changeProjectScope(tenant.id)
-    // Update localStorage scopedToken upon changing project scope
-    const existingTokens = getStorage('tokens')
-    setStorage('tokens', { ...existingTokens, currentToken: scopedToken })
-    dispatch(sessionActions.updateSession({
-      currentTenant: tenant,
-      userDetails: { ...user, role },
-    }))
+    dispatch(
+      sessionActions.updateSession({
+        userDetails: { ...user, role },
+        scopedToken,
+      }),
+    )
+    updatePrefs({
+      currentTenant: tenant.id,
+    })
     // Clearing the cache will cause all the current loaders to reload its data
     dispatch(cacheActions.clearCache())
 
     setLoading(false)
   }
 
-  const handleChoose = useCallback(
-    async (lastTenant) => {
-      const fullTenantObj = tenants.find(propEq('name', lastTenant))
-      updatePrefs({ lastTenant: fullTenantObj })
-      await updateCurrentTenant(lastTenant)
+  const handleTenantSelect = useCallback(
+    async (currentTenant) => {
+      const fullTenantObj = tenants.find(propEq('name', currentTenant))
+      updatePrefs({ currentTenant: fullTenantObj.id })
+      await updateCurrentTenant(currentTenant)
     },
     [tenants],
   )
@@ -71,9 +79,9 @@ const TenantChooser = (props) => {
         onMouseLeave={handleTooltipClose}
         onClick={handleTooltipClose}
         className={props.className}
-        name={currentTenantName}
+        name={curTenantName || 'Current Tenant'}
         list={tenantNames}
-        onChoose={handleChoose}
+        onChoose={handleTenantSelect}
         onSearchChange={setTenantSearch}
         searchTerm={tenantSearch}
         type="Tenant"

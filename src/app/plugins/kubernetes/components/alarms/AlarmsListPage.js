@@ -89,6 +89,7 @@ const ListPage = ({ ListContainer }) => {
     const classes = useStyles({})
     const { params, getParamsUpdater } = usePrefParams(defaultParams)
     const [data, loading, reload] = useDataLoader(loadAlerts, params)
+
     // Provide specific param properties to timeSeries data loader
     // so that it doesn't reload unless those props are changed
     const [timeSeriesData, timeSeriesLoading, timeSeriesReload] = useDataLoader(

@@ -1,13 +1,8 @@
-import React, { useEffect, useState } from 'react'
 import { makeStyles } from '@material-ui/styles'
+import { Theme } from '@material-ui/core'
 import ApiClient from 'api-client/ApiClient'
-import {
-  // clarityDashboardUrl,
-  dashboardUrl,
-  helpUrl,
-  ironicWizardUrl,
-  logoutUrl,
-} from 'app/constants'
+import { CustomWindow } from 'app/polyfills/window'
+import { dashboardUrl, helpUrl, logoutUrl, ironicWizardUrl } from 'app/constants'
 import HelpPage from 'app/plugins/kubernetes/components/common/HelpPage'
 import clsx from 'clsx'
 import Intercom from 'core/components/integrations/Intercom'
@@ -15,21 +10,28 @@ import Navbar, { drawerWidth } from 'core/components/Navbar'
 import Toolbar from 'core/components/Toolbar'
 import useToggler from 'core/hooks/useToggler'
 import LogoutPage from 'core/public/LogoutPage'
-import pluginManager from 'core/utils/pluginManager'
+import { sessionActions, sessionStoreKey, SessionState } from 'core/session/sessionReducers'
 import DeveloperToolsEmbed from 'developer/components/DeveloperToolsEmbed'
 import moize from 'moize'
-import { toPairs, apply, prop } from 'ramda'
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Redirect, Route, Switch } from 'react-router'
 import useReactRouter from 'use-react-router'
 import { emptyObj, ensureArray, isNilOrEmpty } from 'utils/fp'
 import { pathJoin } from 'utils/misc'
-import { sessionStoreKey } from 'core/session/sessionReducers'
-import { useSelector } from 'react-redux'
-import PushEventsProvider from '../providers/PushEventsProvider'
+import PushEventsProvider from 'core/providers/PushEventsProvider'
+import moment from 'moment'
+import { useToast } from 'core/providers/ToastProvider'
+import { MessageTypes } from 'core/components/notifications/model'
+import { RootState } from 'app/store'
+import { Dictionary, toPairs, prop, apply } from 'ramda'
+import pluginManager from 'core/utils/pluginManager'
+
+declare let window: CustomWindow
 
 const { keystone } = ApiClient.getInstance()
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   appFrame: {
     zIndex: 1,
     overflow: 'hidden',
@@ -102,7 +104,7 @@ const renderPluginRoutes = (role) => (id, plugin) => {
   })
 }
 
-const getSections = moize((plugins, role) =>
+const getSections = moize((plugins: Dictionary<any>, role) =>
   toPairs(plugins).map(([id, plugin]) => ({
     id,
     name: plugin.name,
@@ -132,6 +134,7 @@ const renderPluginComponents = (id, plugin) => {
     </Route>
   )
 }
+
 const renderRawComponents = moize((plugins) =>
   toPairs(plugins)
     .map(apply(renderPluginComponents))
@@ -152,43 +155,62 @@ const redirectToAppropriateStack = (ironicEnabled, kubernetesEnabled, history) =
   }
 }
 
-const loadRegionFeatures = async (setRegionFeatures, history) => {
-  try {
-    const features = await keystone.getFeatures()
-
-    setRegionFeatures({
-      kubernetes: features.experimental.containervisor,
-      ironic: false, // Keep this false until ironic supported by the new UI
-      // ironic: features.experimental.ironic,
-      openstack: features.experimental.openstackEnabled,
-      intercom: features.experimental.intercom,
-    })
-
-    redirectToAppropriateStack(
-      false, // Keep this false until ironic supported by the new UI
-      // features.experimental.ironic,
-      features.experimental.containervisor,
-      history,
-    )
-  } catch (err) {
-    console.error(err)
-  }
-}
-
 const AuthenticatedContainer = () => {
   const [drawerOpen, toggleDrawer] = useToggler(true)
-  const [regionFeatures, setRegionFeatures] = useState(emptyObj)
+  const [regionFeatures, setRegionFeatures] = useState<{
+    openstack?: boolean
+    kubernetes?: boolean
+    intercom?: boolean
+    ironic?: boolean
+  }>(emptyObj)
+  const selectSessionState = prop<string, SessionState>(sessionStoreKey)
   const {
     userDetails: { role },
-    currentRegion,
-  } = useSelector(prop(sessionStoreKey))
+  } = useSelector<RootState, SessionState>(selectSessionState)
+  const session = useSelector<RootState, SessionState>(selectSessionState)
+  const dispatch = useDispatch()
   const { history } = useReactRouter()
+  const showToast = useToast()
   const classes = useStyles({ path: history.location.pathname })
 
   useEffect(() => {
-    // Pass the `setRegionFeatures` function to update the features as we can't use `await` inside of a `useEffect`
-    loadRegionFeatures(setRegionFeatures, history)
-  }, [currentRegion])
+    const loadRegionFeatures = async () => {
+      try {
+        const features = await keystone.getFeatures()
+
+        setRegionFeatures({
+          kubernetes: features.experimental.containervisor,
+          ironic: false, // Keep this false until ironic supported by the new UI
+          // ironic: features.experimental.ironic,
+          openstack: features.experimental.openstackEnabled,
+          intercom: features.experimental.intercom,
+        })
+
+        redirectToAppropriateStack(
+          false, // Keep this false until ironic supported by the new UI
+          // features.experimental.ironic,
+          features.experimental.containervisor,
+          history,
+        )
+      } catch (err) {
+        console.error(err)
+      }
+    }
+    loadRegionFeatures()
+
+    const id = setInterval(() => {
+      // Check if session has expired
+      const { expiresAt } = session
+      const sessionExpired = moment().isAfter(expiresAt)
+      if (sessionExpired) {
+        dispatch(sessionActions.destroySession())
+        showToast('The session has expired, please log in again', MessageTypes.warning)
+        clearInterval(id)
+      }
+    }, 1000)
+    // Reset the interval if the session changes
+    return () => clearInterval(id)
+  }, [])
 
   const withStackSlider = regionFeatures.openstack && regionFeatures.kubernetes
   // stack is the name of the plugin (ex. openstack, kubernetes, developer, theme)

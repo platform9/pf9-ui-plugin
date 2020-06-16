@@ -13,6 +13,7 @@ import {
   split,
   of,
   identity,
+  Dictionary,
 } from 'ramda'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import {
@@ -26,26 +27,23 @@ import {
 } from 'utils/fp'
 import { defaultUniqueIdentifier } from 'app/constants'
 
-export const paramsCacheKey = 'cachedParams'
-export const dataCacheKey = 'cachedData'
+export const paramsStoreKey = 'cachedParams'
+export const dataStoreKey = 'cachedData'
+export const loadingStoreKey = 'loadingData'
 
 type ParamsType = Array<{ [key: string]: number | string }>
-type Optional<T> = T extends null
-  ? void
-  : T
+type Optional<T> = T extends null ? void : T
 
-export interface ICacheState {
-  [dataCacheKey]: any[]
-  [paramsCacheKey]: ParamsType
+export interface CacheState {
+  [dataStoreKey]: any[]
+  [paramsStoreKey]: ParamsType
+  [loadingStoreKey]: Dictionary<boolean>
 }
 
-export const initialState: ICacheState = {
-  [dataCacheKey]: [],
-  [paramsCacheKey]: [],
-}
-
-interface GenericObject {
-  [key: string]: any
+export const initialState: CacheState = {
+  [dataStoreKey]: [],
+  [paramsStoreKey]: [],
+  [loadingStoreKey]: {},
 }
 
 const getIdentifiersMatcher = (uniqueIdentifier: string | string[], params: ParamsType) => {
@@ -57,7 +55,17 @@ const getIdentifiersMatcher = (uniqueIdentifier: string | string[], params: Para
 }
 
 const reducers = {
-  addItem: <T extends GenericObject>(
+  setLoading: (
+    state,
+    {
+      payload: { cacheKey, loading },
+    }: PayloadAction<{
+      uniqueIdentifier: string | string[]
+      cacheKey: string
+      loading: boolean
+    }>,
+  ) => assocPath([loadingStoreKey, cacheKey], loading, state),
+  addItem: <T extends Dictionary<any>>(
     state,
     {
       payload: { cacheKey, params, item },
@@ -68,11 +76,11 @@ const reducers = {
       item: T
     }>,
   ) => {
-    const dataLens = lensPath([dataCacheKey, cacheKey])
+    const dataLens = lensPath([dataStoreKey, cacheKey])
 
     return over(dataLens, append(mergeLeft(params, item)))(state)
   },
-  updateItem: <T extends GenericObject>(
+  updateItem: <T extends Dictionary<any>>(
     state,
     {
       payload: { uniqueIdentifier = defaultUniqueIdentifier, cacheKey, params, item },
@@ -83,7 +91,7 @@ const reducers = {
       item: T
     }>,
   ) => {
-    const dataLens = lensPath([dataCacheKey, cacheKey])
+    const dataLens = lensPath([dataStoreKey, cacheKey])
     const matchIdentifiers = getIdentifiersMatcher(uniqueIdentifier, params)
 
     // TODO: fix adjustWith typings
@@ -99,7 +107,7 @@ const reducers = {
       payload: { uniqueIdentifier, cacheKey, params },
     }: PayloadAction<{ uniqueIdentifier: string | string[]; params: ParamsType; cacheKey: string }>,
   ) => {
-    const dataLens = lensPath([dataCacheKey, cacheKey])
+    const dataLens = lensPath([dataStoreKey, cacheKey])
     const matchIdentifiers = getIdentifiersMatcher(uniqueIdentifier, params)
 
     // TODO: fix removeWith typings
@@ -109,7 +117,7 @@ const reducers = {
       removeWith(matchIdentifiers),
     )(state)
   },
-  upsertAll: <T extends GenericObject>(
+  upsertAll: <T extends Dictionary<any>>(
     state,
     {
       payload: { uniqueIdentifier = defaultUniqueIdentifier, cacheKey, params, items },
@@ -120,8 +128,8 @@ const reducers = {
       items: T[]
     }>,
   ) => {
-    const dataLens = lensPath([dataCacheKey, cacheKey])
-    const paramsLens = lensPath([paramsCacheKey, cacheKey])
+    const dataLens = lensPath([dataStoreKey, cacheKey])
+    const paramsLens = lensPath([paramsStoreKey, cacheKey])
     const uniqueIdentifierStrPaths = uniqueIdentifier ? ensureArray(uniqueIdentifier) : emptyArr
 
     // Insert or update the existing items (using `uniqueIdentifier` to prevent duplicates)
@@ -132,34 +140,32 @@ const reducers = {
 
     return pipe(
       over(dataLens, upsertNewItems),
-      // I params are provided, add them to cachedParams so that we know this query has already been resolved
+      // I params are provided, add them to cachedParams so that
+      // we know this query has already been resolved
       over(paramsLens, params ? pipe(arrayIfNil, append(params)) : identity),
     )(state)
   },
-  replaceAll: <T extends GenericObject>(
+  replaceAll: <T extends Dictionary<any>>(
     state,
     {
       payload: { cacheKey, params, items },
     }: PayloadAction<{ cacheKey: string; params?: ParamsType; items: T[] }>,
   ) => {
-    const dataPath = [dataCacheKey, cacheKey]
-    const paramsPath = [paramsCacheKey, cacheKey]
+    const dataPath = [dataStoreKey, cacheKey]
+    const paramsPath = [paramsStoreKey, cacheKey]
 
-    return pipe<ICacheState, ICacheState, ICacheState>(
+    return pipe<CacheState, CacheState, CacheState>(
       assocPath(dataPath, items),
       // If params are provided, replace the cached params array with the new params
       params ? assocPath(paramsPath, of(params)) : identity,
     )(state)
   },
-  clearCache: (
-    state,
-    action?: PayloadAction<Optional<{ cacheKey: string }>>,
-  ) => {
+  clearCache: (state, action?: PayloadAction<Optional<{ cacheKey: string }>>) => {
     const cacheKey = action?.payload?.cacheKey
     return cacheKey
-      ? pipe<ICacheState, ICacheState, ICacheState>(
-          assocPath([dataCacheKey, cacheKey], emptyArr),
-          assocPath([paramsCacheKey, cacheKey], emptyArr),
+      ? pipe<CacheState, CacheState, CacheState>(
+          assocPath([dataStoreKey, cacheKey], emptyArr),
+          assocPath([paramsStoreKey, cacheKey], emptyArr),
         )(state)
       : initialState
   },

@@ -28,7 +28,7 @@ import { routes } from 'core/utils/routes'
 import { CloudProviders } from '../infrastructure/cloudProviders/model'
 import Theme from 'core/themes/model'
 import { prop } from 'ramda'
-import { sessionStoreKey } from 'core/session/sessionReducers'
+import { sessionStoreKey, SessionState } from 'core/session/sessionReducers'
 import { useSelector } from 'react-redux'
 
 export interface IStatusCardWithFilterProps extends StatusCardProps {
@@ -96,7 +96,7 @@ export const clusterStatusCardProps: IStatusCardWithFilterProps = {
       {
         name: 'partially_healthy',
         value: clusters.filter((cluster) => cluster.healthStatus === 'partially_healthy').length,
-        color: 'warning.lighter',
+        color: 'warning.light',
       },
       {
         name: 'converging',
@@ -136,7 +136,7 @@ export const nodeStatusCardProps: IStatusCardWithFilterProps = {
       {
         name: 'converging',
         value: nodes.filter((node) => nodeHealthStatus(node) === 'converging').length,
-        color: 'warning.lighter',
+        color: 'warning.light',
       },
       {
         name: 'unhealthy',
@@ -239,7 +239,7 @@ const reports = [
         {
           name: 'pending',
           value: pods.filter((pod) => pod.status.phase === 'Pending').length,
-          color: 'warning.lighter',
+          color: 'warning.light',
         },
         {
           name: 'unknown',
@@ -286,7 +286,8 @@ const DashboardPage = () => {
   const [, updateState] = React.useState()
   const forceUpdate = useCallback(() => updateState({}), [])
   const classes = useStyles({})
-  const session = useSelector(prop(sessionStoreKey))
+  const selectSessionState = prop<string, SessionState>(sessionStoreKey)
+  const session = useSelector(selectSessionState)
   const isAdmin = isAdminRole(session)
   const username = capitalizeString(normalizeUsername(session.username))
   const [clusters, loadingClusters] = useDataLoader(clusterActions.list)

@@ -1,36 +1,10 @@
 import ApiClient from 'api-client/ApiClient'
 import createContextLoader from 'core/helpers/createContextLoader'
 import createCRUDActions from 'core/helpers/createCRUDActions'
-import {
-  filterValidTenants,
-  mngmTenantActions,
-  mngmTenantsCacheKey,
-} from 'k8s/components/userManagement/tenants/actions'
-import {
-  always,
-  filter,
-  find,
-  flatten,
-  groupBy,
-  head,
-  innerJoin,
-  isNil,
-  keys,
-  map,
-  omit,
-  partition,
-  pipe,
-  pluck,
-  prop,
-  propEq,
-  reject,
-  uniq,
-  values,
-  when,
-} from 'ramda'
+import { mngmTenantActions } from 'k8s/components/userManagement/tenants/actions'
+import { always, find, head, isNil, keys, pipe, prop, propEq, reject } from 'ramda'
 import { tryCatchAsync } from 'utils/async'
-import { emptyArr, emptyObj, objSwitchCase, pathStr, upsertAllBy } from 'utils/fp'
-import { castBoolToStr } from 'utils/misc'
+import { emptyArr, objSwitchCase, pathStr } from 'utils/fp'
 import { uuidRegex, originUsernameRegex } from 'app/constants'
 
 const { keystone, clemency } = ApiClient.getInstance()
@@ -44,7 +18,7 @@ export const isSystemUser = ({ username }) => {
   return isOriginUsername || isUuid || username === 'kplane-clustmgr'
 }
 export const mngmCredentialsCacheKey = 'managementCredentials'
-createContextLoader(
+export const loadCredentials = createContextLoader(
   mngmCredentialsCacheKey,
   () => {
     return keystone.getCredentials()
@@ -54,11 +28,16 @@ createContextLoader(
   },
 )
 
-const adminUserNames = ['heatadmin', 'admin@platform9.net']
 export const mngmUsersCacheKey = 'managementUsers'
 export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
   listFn: async () => {
-    return keystone.getUsers()
+    const [users] = await Promise.all([
+      keystone.getUsers(),
+      // Make sure the derived data gets loaded as well
+      loadCredentials(true),
+      mngmTenantActions.list(),
+    ])
+    return users
   },
   deleteFn: async ({ id }) => {
     await keystone.deleteUser(id)
@@ -103,9 +82,8 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
   updateFn: async (
     { id: userId, username, displayname, password, roleAssignments },
     prevItems,
-    loadFromContext,
   ) => {
-    const prevRoleAssignmentsArr = await loadFromContext(mngmUserRoleAssignmentsCacheKey, {
+    const prevRoleAssignmentsArr = await mngmUserRoleAssignmentsLoader({
       userId,
     })
     const prevRoleAssignments = prevRoleAssignmentsArr.reduce(
@@ -156,66 +134,6 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
     mngmTenantActions.invalidateCache()
     return updatedUser
   },
-  dataMapper: async (users, { systemUsers }, loadFromContext) => {
-    const [credentials, allTenants] = await Promise.all([
-      loadFromContext(mngmCredentialsCacheKey, {}),
-      loadFromContext(mngmTenantsCacheKey, { includeBlacklisted: true }),
-    ])
-    const [validTenants, blacklistedTenants] = partition(filterValidTenants, allTenants)
-    const blacklistedTenantIds = pluck('id', blacklistedTenants)
-
-    // Get all tenant users and assign their corresponding tenant ID
-    const pluckUsers = map((tenant) =>
-      tenant.users.map((user) => ({
-        ...user,
-        tenantId: tenant.id,
-      })),
-    )
-
-    // Unify all users with the same ID and group the tenants
-    const unifyTenantUsers = map((groupedUsers) => ({
-      ...omit(['tenantId'], head(groupedUsers)),
-      tenants: innerJoin(
-        (tenant, id) => tenant.id === id,
-        validTenants,
-        uniq(pluck('tenantId', groupedUsers)),
-      ),
-    }))
-
-    const allUsers = users.map((user) => ({
-      id: user.id,
-      username: user.name,
-      displayname: user.displayname,
-      email: user.email,
-      defaultProject: user.default_project_id,
-      twoFactor: pipe(
-        find(propEq('user_id', user.id)),
-        when(isNil, always(emptyObj)),
-        propEq('type', 'totp'),
-        castBoolToStr('enabled', 'disabled'),
-      )(credentials),
-    }))
-
-    const filterUsers = filter((user) => {
-      return (
-        (systemUsers || !isSystemUser(user)) &&
-        user.username &&
-        !adminUserNames.includes(user.username) &&
-        !blacklistedTenantIds.includes(user.defaultProject)
-      )
-    })
-
-    return pipe(
-      pluckUsers,
-      flatten,
-      groupBy(prop('id')),
-      values,
-      unifyTenantUsers,
-      upsertAllBy(prop('id'), allUsers),
-      filterUsers,
-    )(validTenants)
-  },
-  refetchCascade: true,
   entityName: 'User',
   successMessage: (updatedItems, prevItems, { id, username, displayname }, operation) =>
     objSwitchCase({

@@ -1,55 +1,27 @@
 import createContextLoader from 'core/helpers/createContextLoader'
 import ApiClient from 'api-client/ApiClient'
-import { path, propEq, pluck, pipe, find, prop, flatten } from 'ramda'
+import { pluck, flatten } from 'ramda'
 import { someAsync } from 'utils/async'
 import { clustersCacheKey } from '../infrastructure/common/actions'
 import moment from 'moment'
-import { pathStr } from 'utils/fp'
 import { allKey } from 'app/constants'
+import { alertsSelector } from 'k8s/components/alarms/selectors'
 
 const { qbert } = ApiClient.getInstance()
 
 export const alertsCacheKey = 'alerts'
 export const alertsTimeSeriesCacheKey = 'alertsTimeSeries'
 
-const getQbertEndpoint = async () => {
-  const qbertEndpoint = await qbert.baseUrl()
-  return qbertEndpoint.match(/(.*?)\/qbert/)[1]
-}
-
 export const loadAlerts = createContextLoader(
   alertsCacheKey,
-  async ({ clusterId }, loadFromContext) => {
-    const clusters = await loadFromContext(clustersCacheKey, {
-      healthyClusters: true,
-      prometheusClusters: true,
-    })
-    if (clusterId === allKey) {
-      return someAsync(pluck('uuid', clusters).map(qbert.getPrometheusAlerts)).then(flatten)
-    }
-
+  async ({ clusterId }) => {
     return qbert.getPrometheusAlerts(clusterId)
   },
   {
-    dataMapper: async (items, params, loadFromContext) => {
-      const clusters = await loadFromContext(clustersCacheKey, {
-        healthyClusters: true,
-        prometheusClusters: true,
-      })
-      const host = await getQbertEndpoint()
-      return items.map((item) => ({
-        ...item,
-        severity: pathStr('labels.severity', item),
-        summary: pathStr('annotations.message', item),
-        activeAt: path(['alerts', 0, 'activeAt'], item),
-        status: item.alerts.length ? 'Active' : 'Closed',
-        clusterName: pipe(find(propEq('uuid', item.clusterId)), prop('name'))(clusters),
-        grafanaLink: `${host}/k8s/v1/clusters/${item.clusterId}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:grafana-ui:80/proxy/`,
-      }))
-    },
     entityName: 'Alert',
     uniqueIdentifier: 'id',
     indexBy: 'clusterId',
+    selector: alertsSelector
   },
 )
 

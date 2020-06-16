@@ -1,10 +1,8 @@
 import React from 'react'
 import ColorPicker from './ColorPicker'
 import Panel from './Panel'
-import { prop } from 'ramda'
 import { Typography } from '@material-ui/core'
-import { themeStoreKey } from 'core/themes/themeReducers'
-import { useSelector } from 'react-redux'
+import { useTheme } from '@material-ui/core/styles'
 
 const ColorGroup = ({ title, colors, parent = 'palette' }) => {
   return (
@@ -19,7 +17,7 @@ const ColorGroup = ({ title, colors, parent = 'palette' }) => {
 }
 
 const ColorsPanel = () => {
-  const theme = useSelector(prop(themeStoreKey))
+  const theme = useTheme()
   const paletteKeys = Object.keys(theme.palette).filter(
     (key) => typeof theme.palette[key] === 'object',
   )

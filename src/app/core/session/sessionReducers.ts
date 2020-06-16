@@ -1,42 +1,30 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { mergeLeft } from 'ramda'
 
-export interface ISessionState {
+export interface SessionState {
   unscopedToken: string
+  scopedToken: string
   username: string
   expiresAt: string
-  currentTenant: string
-  currentRegion: string
-  userDetails?: any
-  userPreferences: { [key: string]: any }
+  userDetails: { [key: string]: any }
 }
 
-export const initialState: ISessionState = {
+export const initialState: SessionState = {
   unscopedToken: null,
+  scopedToken: null,
   username: null,
   expiresAt: null,
-  currentTenant: null,
-  currentRegion: null,
-  userDetails: null,
-  userPreferences: {}
+  userDetails: {},
 }
 
-const {
-  name: sessionStoreKey,
-  reducer: sessionReducers,
-  actions: sessionActions,
-} = createSlice({
+const { name: sessionStoreKey, reducer: sessionReducers, actions: sessionActions } = createSlice({
   name: 'session',
   initialState,
   reducers: {
-    initSession: (
-      state,
-      { payload }: PayloadAction<Partial<ISessionState>>) => {
+    initSession: (state, { payload }: PayloadAction<Partial<SessionState>>) => {
       return mergeLeft(payload, initialState)
     },
-    updateSession: (
-      state,
-      { payload }: PayloadAction<Partial<ISessionState>>) => {
+    updateSession: (state, { payload }: PayloadAction<Partial<SessionState>>) => {
       return mergeLeft(payload, state)
     },
     destroySession: () => {
