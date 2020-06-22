@@ -83,7 +83,7 @@ export const clustersSelector = createSelector([
           ...cluster,
           tasks: clusterWithTasks ? clusterWithTasks.tasks : [],
           version: hasMasterNode && cluster.version || 'N/A',
-          baseUrl: qbert.clusterBaseUrl(clusterId),
+          baseUrl: qbert.clusterBaseUrl(cluster.uuid),
           usage,
           nodes: nodesInCluster,
           masterNodes,

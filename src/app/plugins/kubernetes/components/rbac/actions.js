@@ -2,10 +2,10 @@ import createCRUDActions from 'core/helpers/createCRUDActions'
 import ApiClient from 'api-client/ApiClient'
 import { propEq, pluck, pipe, find, prop, flatten } from 'ramda'
 import { mapAsync, someAsync } from 'utils/async'
-import { clustersCacheKey } from '../infrastructure/common/actions'
 import createContextLoader from 'core/helpers/createContextLoader'
 import { pathStr } from 'utils/fp'
 import { allKey } from 'app/constants'
+import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 
 const { qbert } = ApiClient.getInstance()
 
@@ -30,7 +30,7 @@ const rbacApiGroupsToRules = (apiGroups) => {
 const getSubjectsOfKind = (subjects, kind) =>
   subjects.filter((subject) => subject.kind === kind).map((user) => user.name)
 
-createContextLoader(
+const loadCoreApiResources = createContextLoader(
   'coreApiResources',
   async ({ clusterId }) => {
     const response = await qbert.getCoreApiResourcesList(clusterId)
@@ -48,7 +48,7 @@ createContextLoader(
   },
 )
 
-createContextLoader(
+const loadApiResources = createContextLoader(
   'apiResources',
   async ({ clusterId, apiGroup }) => {
     const response = await qbert.getApiResourcesList({ clusterId, apiGroup })
@@ -76,8 +76,8 @@ export const apiGroupsLoader = createContextLoader(
     return apiGroups
   },
   {
-    dataMapper: async (apiGroups, { clusterId }, loadFromContext) => {
-      const coreResourcesResponse = await loadFromContext('coreApiResources', { clusterId })
+    dataMapper: async (apiGroups, { clusterId }) => {
+      const coreResourcesResponse = await loadCoreApiResources({ clusterId })
       const coreApiGroupWithResources = {
         name: 'core',
         groupVersion: 'core',
@@ -85,7 +85,7 @@ export const apiGroupsLoader = createContextLoader(
       }
       const apiGroupsWithResources = await mapAsync(async (apiGroup) => {
         const groupVersion = apiGroup.preferredVersion.groupVersion
-        const resources = await loadFromContext('apiResources', {
+        const resources = await loadApiResources({
           clusterId,
           apiGroup: groupVersion,
         })
@@ -106,9 +106,9 @@ export const apiGroupsLoader = createContextLoader(
 
 export const rolesCacheKey = 'kubeRoles'
 export const roleActions = createCRUDActions(rolesCacheKey, {
-  listFn: async (params, loadFromContext) => {
+  listFn: async (params) => {
     const { clusterId } = params
-    const clusters = await loadFromContext(clustersCacheKey, { healthyClusters: true })
+    const clusters = await clusterActions.list({ healthyClusters: true })
     if (clusterId === allKey) {
       return someAsync(pluck('uuid', clusters).map(qbert.getClusterRoles)).then(flatten)
     }
@@ -148,8 +148,8 @@ export const roleActions = createCRUDActions(rolesCacheKey, {
     const { clusterId, namespace, name } = item
     await qbert.deleteClusterRole(clusterId, namespace, name)
   },
-  dataMapper: async (items, params, loadFromContext) => {
-    const clusters = await loadFromContext(clustersCacheKey, { healthyClusters: true })
+  dataMapper: async (items, params) => {
+    const clusters = await clusterActions.list({ healthyClusters: true })
     return items.map((item) => ({
       ...item,
       id: pathStr('metadata.uid', item),
@@ -168,9 +168,9 @@ export const roleActions = createCRUDActions(rolesCacheKey, {
 
 export const clusterRolesCacheKey = 'clusterRoles'
 export const clusterRoleActions = createCRUDActions(clusterRolesCacheKey, {
-  listFn: async (params, loadFromContext) => {
+  listFn: async (params) => {
     const { clusterId } = params
-    const clusters = await loadFromContext(clustersCacheKey, { healthyClusters: true })
+    const clusters = await clusterActions.list({ healthyClusters: true })
     if (clusterId === allKey) {
       return someAsync(pluck('uuid', clusters).map(qbert.getClusterClusterRoles)).then(flatten)
     }
@@ -209,8 +209,8 @@ export const clusterRoleActions = createCRUDActions(clusterRolesCacheKey, {
     const { clusterId, name } = item
     await qbert.deleteClusterClusterRole(clusterId, name)
   },
-  dataMapper: async (items, params, loadFromContext) => {
-    const clusters = await loadFromContext(clustersCacheKey, { healthyClusters: true })
+  dataMapper: async (items, params) => {
+    const clusters = await clusterActions.list({ healthyClusters: true })
     return items.map((item) => ({
       ...item,
       id: pathStr('metadata.uid', item),
@@ -228,9 +228,9 @@ export const clusterRoleActions = createCRUDActions(clusterRolesCacheKey, {
 
 export const roleBindingsCacheKey = 'roleBindings'
 export const roleBindingActions = createCRUDActions(roleBindingsCacheKey, {
-  listFn: async (params, loadFromContext) => {
+  listFn: async (params) => {
     const { clusterId } = params
-    const clusters = await loadFromContext(clustersCacheKey, { healthyClusters: true })
+    const clusters = await clusterActions.list({ healthyClusters: true })
     if (clusterId === allKey) {
       return someAsync(pluck('uuid', clusters).map(qbert.getClusterRoleBindings)).then(flatten)
     }
@@ -303,8 +303,8 @@ export const roleBindingActions = createCRUDActions(roleBindingsCacheKey, {
     const { clusterId, namespace, name } = item
     await qbert.deleteClusterRoleBinding(clusterId, namespace, name)
   },
-  dataMapper: async (items, params, loadFromContext) => {
-    const clusters = await loadFromContext(clustersCacheKey, { healthyClusters: true })
+  dataMapper: async (items, params) => {
+    const clusters = await clusterActions.list({ healthyClusters: true })
     return items.map((item) => ({
       ...item,
       id: pathStr('metadata.uid', item),
@@ -323,9 +323,9 @@ export const roleBindingActions = createCRUDActions(roleBindingsCacheKey, {
 
 export const clusterRoleBindingsCacheKey = 'clusterRoleBindings'
 export const clusterRoleBindingActions = createCRUDActions(clusterRoleBindingsCacheKey, {
-  listFn: async (params, loadFromContext) => {
+  listFn: async (params) => {
     const { clusterId } = params
-    const clusters = await loadFromContext(clustersCacheKey, { healthyClusters: true })
+    const clusters = await clusterActions.list({ healthyClusters: true })
     if (clusterId === allKey) {
       return someAsync(pluck('uuid', clusters).map(qbert.getClusterClusterRoleBindings)).then(
         flatten,
@@ -399,8 +399,8 @@ export const clusterRoleBindingActions = createCRUDActions(clusterRoleBindingsCa
     const { clusterId, name } = item
     await qbert.deleteClusterClusterRoleBinding(clusterId, name)
   },
-  dataMapper: async (items, params, loadFromContext) => {
-    const clusters = await loadFromContext(clustersCacheKey, { healthyClusters: true })
+  dataMapper: async (items, params) => {
+    const clusters = await clusterActions.list({ healthyClusters: true })
     return items.map((item) => ({
       ...item,
       id: pathStr('metadata.uid', item),

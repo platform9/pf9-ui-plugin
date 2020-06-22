@@ -15,7 +15,6 @@ import {
 import { createSelector } from 'reselect'
 import getParamsFilter from 'core/helpers/getParamsFilter'
 import createSorter from 'core/helpers/createSorter'
-import { mngmTenantsCacheKey } from 'k8s/components/userManagement/tenants/actions'
 import createParamsFilter from 'core/helpers/createParamsFilter'
 
 const onErrorHandler = moize(
@@ -30,7 +29,7 @@ const onErrorHandler = moize(
 const getDefaultSelector = moize(cacheKey => {
   return createSelector(
     [
-      pathOr(emptyArr, [cacheStoreKey, dataStoreKey, mngmTenantsCacheKey]),
+      pathOr(emptyArr, [cacheStoreKey, dataStoreKey, cacheKey]),
       getParamsFilter()
     ],
     (items, params) => {
@@ -50,7 +49,7 @@ const getDefaultSelector = moize(cacheKey => {
  */
 const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
   const { loadOnDemand = false } = options
-  const { cacheKey, selector = getDefaultSelector(cacheKey, indexBy), fetchErrorMessage } = loaderFn
+  const { cacheKey, indexBy, selector = getDefaultSelector(cacheKey, indexBy), fetchErrorMessage } = loaderFn
 
   // Memoize the params dependency as we want to make sure it really changed and not just got a new reference
   const memoizedParams = memoizedDep(params)
@@ -60,8 +59,13 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
   // const mappedData = await dataMapper(cachedItems, params)
   // return sortWith(mappedData, params)
 
+  const memoizedSelector = useMemo(
+    ensureFunction(selector),
+    []
+  )
+
   // Try to retrieve the data from the store with the provided parameters
-  const data = useSelector(selector)
+  const data = useSelector(state => memoizedSelector(state, params))
   const loading = useSelector(loadingSelector)
 
   // const cache = useSelector(prop(cacheStoreKey))

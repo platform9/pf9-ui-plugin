@@ -4,6 +4,7 @@ import { pluck } from 'ramda'
 import ApiClient from 'api-client/ApiClient'
 import { loadCombinedHosts } from ' k8s/components/infrastructure/common/actions'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
+import { makeCloudProvidersSelector } from 'k8s/components/infrastructure/cloudProviders/selectors'
 
 const { qbert } = ApiClient.getInstance()
 
@@ -48,6 +49,7 @@ export const cloudProviderActions = createCRUDActions(cloudProvidersCacheKey, {
     },
   },
   uniqueIdentifier: 'uuid',
+  selector: makeCloudProvidersSelector
 })
 
 export const loadCloudProviderDetails = createContextLoader(
