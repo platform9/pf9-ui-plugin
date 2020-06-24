@@ -20,15 +20,12 @@ const getName = (id, items) => pipe(find(propEq('uid', id)), prop('name'))(items
 //   status: 'Pending' | 'Complete' | 'InProgress' | 'Failed'
 // }
 
-const isMonitoringTask = (task = {}) => task.pkg_id === monitoringTask && task.type === 'Install'
-const getMostRecentTask = (prev, curr) => (prev.task_id > curr.task_id ? prev : curr)
+const isMonitoringPackage = (pkg = {}) => pkg.name === monitoringTask
 export const hasPrometheusEnabled = (cluster) => {
-  if (!cluster) return false
-  const installedMonitoringTask = (cluster.tasks || [])
-    .filter(isMonitoringTask)
-    .reduce(getMostRecentTask, {})
+  if (!cluster || !cluster.pkgs) return false
+  const installedMonitoringTask = cluster.pkgs.find(isMonitoringPackage)
 
-  return installedMonitoringTask.status === 'Complete'
+  return installedMonitoringTask.validate === true
 }
 export const clusterTagsCacheKey = 'clusterTags'
 export const clusterTagActions = createCRUDActions(clusterTagsCacheKey, {
