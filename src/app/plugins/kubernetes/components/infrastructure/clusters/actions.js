@@ -23,7 +23,7 @@ import {
   mergeLeft,
   partition,
 } from 'ramda'
-import { rawNodesCacheKey } from 'k8s/components/infrastructure/nodes/actions'
+import { nodesCacheKey } from 'k8s/components/infrastructure/nodes/actions'
 import {
   getMasterNodesHealthStatus,
   getWorkerNodesHealthStatus,
@@ -273,13 +273,13 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
   listFn: async (params, loadFromContext) => {
     const [
       clustersWithTasks = [],
-      rawNodes,
+      nodes,
       combinedHosts,
       rawClusters,
       qbertEndpoint,
     ] = await Promise.all([
       loadFromContext(clusterTagsCacheKey, undefined, true), // tell the loader to refetch the data
-      loadFromContext(rawNodesCacheKey),
+      loadFromContext(nodesCacheKey),
       loadFromContext(combinedHostsCacheKey),
       qbert.getClusters(),
       qbert.baseUrl(),
@@ -287,7 +287,7 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
 
     return mapAsync(async (cluster) => {
       const clusterWithTasks = clustersWithTasks.find(({ uuid }) => cluster.uuid === uuid)
-      const nodesInCluster = rawNodes.filter((node) => node.clusterUuid === cluster.uuid)
+      const nodesInCluster = nodes.filter((node) => node.clusterUuid === cluster.uuid)
       const nodeIds = pluck('uuid', nodesInCluster)
       const combinedNodes = combinedHosts.filter((x) => nodeIds.includes(x.resmgr.id))
       const calcNodesTotals = calcUsageTotalByPath(combinedNodes)
