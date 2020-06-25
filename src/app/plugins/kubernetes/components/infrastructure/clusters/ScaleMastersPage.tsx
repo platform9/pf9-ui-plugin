@@ -1,7 +1,7 @@
-import React, { FunctionComponent } from 'react'
+import React, { FunctionComponent, useCallback, useRef } from 'react'
 import { k8sPrefix } from 'app/constants'
 import { makeStyles } from '@material-ui/styles'
-import { Theme } from '@material-ui/core'
+import { Theme, Typography } from '@material-ui/core'
 import FormWrapper from 'core/components/FormWrapper'
 import { pathJoin } from 'utils/misc'
 import useReactRouter from 'use-react-router'
@@ -10,18 +10,17 @@ import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import BlockChooser from 'core/components/BlockChooser'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
-// import { validators, customValidator } from 'core/utils/fieldValidators'
 import SubmitButton from 'core/components/buttons/SubmitButton'
 import useParams from 'core/hooks/useParams'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import ClusterHostChooser, {
   isUnassignedNode,
   inCluster,
-  isNotMaster,
+  isMaster,
 } from './bareos/ClusterHostChooser'
 import { ICluster } from './model'
 import { allPass } from 'ramda'
-import Alert from 'core/components/Alert'
+import { customValidator, FieldValidator } from 'core/utils/fieldValidators'
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -54,51 +53,40 @@ export const scaleConstraints: IConstraint[] = [
       'You cannot remove master node from a single master cluster.  If you wish to delete the cluster, please choose the ‘delete’ operation on the cluster on the infrastructure page instead.',
   },
   {
-    startNum: 2,
-    desiredNum: 1,
-    relation: 'warn',
-    message:
-      'Removing this master node will reduce the total number of masters in this cluster down to 1.  For cluster high availability we recommend always having 3 masters nodes in a cluster.',
-  },
-  {
     startNum: 3,
-    desiredNum: 2,
-    relation: 'warn',
-    message:
-      'For high availability, we recommend having at least 3 masters in a cluster at any time. Removing this master will result in an even number of masters for this cluster (2 master nodes after removal of this node).  We recommend having an odd number of masters for your cluster at any time.',
+    desiredNum: 1,
+    relation: 'allow',
+    message: '',
   },
-  { startNum: 4, desiredNum: 3, relation: 'allow', message: '' },
   {
     startNum: 5,
-    desiredNum: 4,
-    relation: 'warn',
-    message:
-      'Removing this master node will result in an even number of master nodes for this cluster (4 master nodes after removal of this node).  We recommend having an odd number of masters for your cluster at any time.',
+    desiredNum: 3,
+    relation: 'allow',
+    message: '',
+  },
+  {
+    startNum: 5,
+    desiredNum: 1,
+    relation: 'allow',
+    message: '',
   },
 
   // grow
   {
     startNum: 1,
-    desiredNum: 2,
+    desiredNum: 3,
     relation: 'deny',
     message:
       'You cannot add master nodes to a single master cluster.  You need to create a multi-master cluster with at least 2 masters before you can add more masters to the cluster.',
   },
-  { startNum: 2, desiredNum: 3, relation: 'allow', message: '' },
   {
-    startNum: 3,
-    desiredNum: 4,
-    relation: 'warn',
-    message:
-      'Adding this master node will result in an even number of master nodes for this cluster (4 master nodes after adding of this node).  We recommend having an odd number of masters for your cluster at any time.',
-  },
-  { startNum: 4, desiredNum: 5, relation: 'allow', message: '' },
-  {
-    startNum: 5,
-    desiredNum: 6,
+    startNum: 1,
+    desiredNum: 5,
     relation: 'deny',
-    message: '5 master nodes is the max.  You cannot add more.',
+    message:
+      'You cannot add master nodes to a single master cluster.  You need to create a multi-master cluster with at least 2 masters before you can add more masters to the cluster.',
   },
+  { startNum: 3, desiredNum: 5, relation: 'allow', message: '' },
 ]
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
@@ -113,6 +101,8 @@ interface ScaleMasterProps {
   onDetach(data): Promise<void> | void
 }
 
+const defaultErrorMessage = 'You must have 1, 3 or 5 masters to hold quorum'
+
 const ScaleMasters: FunctionComponent<ScaleMasterProps> = ({
   cluster,
   onSubmit,
@@ -121,72 +111,71 @@ const ScaleMasters: FunctionComponent<ScaleMasterProps> = ({
 }) => {
   const { params, getParamsUpdater } = useParams()
 
-  // Look up the transition in the state transition table.
-  const isMaster = (node) => node.isMaster === 1 // Backend returns integer 0 and 1 instead of true and false
+  const validatorRef = useRef<FieldValidator>()
   const numMasters = (cluster.nodes || []).filter(isMaster).length
-  const delta = params.scaleType === 'add' ? 1 : -1
-  const desiredMasters = numMasters + delta
-  const transition = scaleConstraints.find(
-    (t) => t.startNum === numMasters && t.desiredNum === desiredMasters,
-  )
 
-  const addBareOsMasterNodes = () => {
-    const { message, relation } = transition
-    if (relation === 'deny') return <Alert message={message} variant="error" />
-    return (
-      <ValidatedForm onSubmit={params.scaleType === 'add' ? onAttach : onDetach}>
-        {relation === 'warn' && <Alert message={message} variant="warning" />}
-        <ClusterHostChooser
-          id="mastersToAdd"
-          filterFn={isUnassignedNode}
-          validations={[]}
-          required
-        />
-        <SubmitButton>{params.scaleType === 'add' ? 'Add' : 'Remove'} masters</SubmitButton>
-      </ValidatedForm>
-    )
-  }
+  const masterNodeLengthValidator = useCallback(() => {
+    return customValidator((value: string[], formValues) => {
+      const posNegSign = params.scaleType === 'add' ? 1 : -1
+      const numToChange = value.length * posNegSign
+      const totalMasters = numMasters + numToChange
 
-  const removeBareOsMasterNodes = () => {
-    const { message, relation } = transition
-    if (relation === 'deny') return <Alert message={message} variant="error" />
-    return (
-      <ValidatedForm onSubmit={params.scaleType === 'add' ? onAttach : onDetach}>
-        {relation === 'warn' && <Alert message={message} variant="warning" />}
-        <ClusterHostChooser
-          id="mastersToRemove"
-          filterFn={allPass([isNotMaster, inCluster(cluster.uuid)])}
-          validations={[]}
-          required
-        />
-        <SubmitButton>{params.scaleType === 'add' ? 'Add' : 'Remove'} masters</SubmitButton>
-      </ValidatedForm>
-    )
-  }
+      // Look up the transition in the state transition table.
+      const transitionConstraint =
+        scaleConstraints.find(
+          (t) => t.startNum === numMasters && t.desiredNum === totalMasters,
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        ) || ({} as IConstraint)
+      if (validatorRef.current) {
+        validatorRef.current.errorMessage = transitionConstraint.message || defaultErrorMessage
+      }
+      return transitionConstraint.relation === 'allow'
+    }, defaultErrorMessage)
+  }, [numMasters, params, validatorRef])()
+
+  validatorRef.current = masterNodeLengthValidator
 
   return (
     <div>
-      {!params.scaleType && (
-        <BlockChooser
-          onChange={getParamsUpdater('scaleType')}
-          options={[
-            {
-              id: 'add',
-              title: 'Add',
-              icon: <FontAwesomeIcon size="2x" name="layer-plus" />,
-              description: 'Add master nodes to the cluster',
-            },
-            {
-              id: 'remove',
-              icon: <FontAwesomeIcon size="2x" name="layer-minus" />,
-              title: 'Remove',
-              description: 'Remove master nodes from the cluster',
-            },
-          ]}
-        />
+      <Typography variant="subtitle1">Current Masters: {numMasters}</Typography>
+
+      <BlockChooser
+        onChange={getParamsUpdater('scaleType')}
+        options={[
+          {
+            id: 'add',
+            title: 'Add',
+            icon: <FontAwesomeIcon size="2x" name="layer-plus" />,
+            description: 'Add master nodes to the cluster',
+          },
+          {
+            id: 'remove',
+            icon: <FontAwesomeIcon size="2x" name="layer-minus" />,
+            title: 'Remove',
+            description: 'Remove master nodes from the cluster',
+          },
+        ]}
+      />
+
+      {!!params.scaleType && (
+        <ValidatedForm
+          onSubmit={params.scaleType === 'add' ? onAttach : onDetach}
+          title={`Choose nodes to ${params.scaleType}`}
+        >
+          <ClusterHostChooser
+            id={params.scaleType === 'add' ? 'mastersToAdd' : 'mastersToRemove'}
+            selection="multiple"
+            filterFn={
+              params.scaleType === 'add'
+                ? isUnassignedNode
+                : allPass([isMaster, inCluster(cluster.uuid)])
+            }
+            validations={[validatorRef.current]}
+            required
+          />
+          <SubmitButton>{params.scaleType === 'add' ? 'Add' : 'Remove'} masters</SubmitButton>
+        </ValidatedForm>
       )}
-      {!!params.scaleType &&
-        (params.scaleType === 'add' ? addBareOsMasterNodes() : removeBareOsMasterNodes())}
     </div>
   )
 }

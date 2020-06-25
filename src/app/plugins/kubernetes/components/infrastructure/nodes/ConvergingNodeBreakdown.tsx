@@ -111,7 +111,7 @@ const getTaskContent = (
   if (all.length === 0) {
     return { color: 'primary', message: 'Waiting for node...' }
   }
-  if (all.length === completed.length) {
+  if (failedIdx === -1 && all.length === completed.length) {
     return { color: 'success', message: `Completed all ${all.length} tasks successfully` }
   }
   if (completed.length < all.length && !hasFailed) {

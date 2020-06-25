@@ -2,7 +2,7 @@ import moize from 'moize'
 import { isEmpty, isNil, test, allPass, both, is, complement, cond, always } from 'ramda'
 import { isPlainObject } from '../../utils/misc'
 
-class FieldValidator {
+export class FieldValidator {
   /**
    * @param validationFn Function
    * @param errorMessage String

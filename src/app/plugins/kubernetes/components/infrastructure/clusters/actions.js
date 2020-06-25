@@ -328,7 +328,7 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
 
       return {
         ...cluster,
-        tasks: clusterWithTasks ? clusterWithTasks.tasks : [],
+        pkgs: clusterWithTasks ? clusterWithTasks.pkgs : [],
         usage,
         version: version || 'N/A',
         nodes: nodesInCluster,
