@@ -216,7 +216,7 @@ const ResetPasswordPage: React.FC = () => {
             <Typography variant="subtitle1" align="center">
               Password Reset
             </Typography>
-            <ValidatedForm onSubmit={handleFormSubmit}>
+            <ValidatedForm elevated={false} onSubmit={handleFormSubmit}>
               {({ values }) => (
                 <>
                   {!params.isResetPasswordSuccessful ? (
