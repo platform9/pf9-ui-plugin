@@ -25,9 +25,6 @@ const styles = (theme) => ({
       marginTop: theme.spacing(1.5),
       marginBottom: theme.spacing(1.5),
     },
-    '& .MuiButtonBase-root ': {
-      alignSelf: 'flex-start',
-    },
   },
   formActions: {
     display: 'flex',

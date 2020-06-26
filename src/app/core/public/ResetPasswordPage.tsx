@@ -48,7 +48,8 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   textField: {
     minWidth: '100%',
-    marginTop: theme.spacing(1),
+    marginTop: `${theme.spacing(1)}px !important`,
+    marginBottom: `${theme.spacing(0)} !important`,
   },
   resetPwdButton: {
     minWidth: '80%',
@@ -62,9 +63,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginTop: theme.spacing(1),
     textAlign: 'justify',
   },
-  formContainer: {
-    marginLeft: theme.spacing(5),
-  },
+  passwordValidation: {
+    marginTop: theme.spacing(1),
+  }
 }))
 
 interface IState {
@@ -215,59 +216,62 @@ const ResetPasswordPage: React.FC = () => {
             <Typography variant="subtitle1" align="center">
               Password Reset
             </Typography>
-            <div className={classes.formContainer}>
-              <ValidatedForm onSubmit={handleFormSubmit}>
-                {({ values }) => (
-                  <>
-                    {!params.isResetPasswordSuccessful ? (
-                      <>
-                        <TextField
-                          id="email"
-                          label="Email"
-                          placeholder="Email"
-                          type="email"
-                          value={params.emailId}
-                          validations={emailValidators}
-                          onChange={getParamsUpdater('emailId')}
-                        />
-                        <TextField
-                          variant="standard"
-                          required
-                          id="newPassword"
-                          label="New Password"
-                          type={params.isNewPasswordMasked ? 'text' : 'password'}
-                          validations={passwordValidators}
-                          onChange={getParamsUpdater('newPassword')}
-                          InputProps={renderPasswordMask('isNewPasswordMasked')}
-                        />
-                        <TextField
-                          variant="standard"
-                          required
-                          id="confirmPassword"
-                          label="Confirm Password"
-                          type={params.isConfirmPasswordMasked ? 'text' : 'password'}
-                          validations={confirmPasswordValidator}
-                          onChange={getParamsUpdater('confirmPassword')}
-                          InputProps={renderPasswordMask('isConfirmPasswordMasked')}
-                        />
+            <ValidatedForm onSubmit={handleFormSubmit}>
+              {({ values }) => (
+                <>
+                  {!params.isResetPasswordSuccessful ? (
+                    <>
+                      <TextField
+                        id="email"
+                        label="Email"
+                        placeholder="Email"
+                        type="email"
+                        value={params.emailId}
+                        validations={emailValidators}
+                        onChange={getParamsUpdater('emailId')}
+                        className={classes.textField}
+                      />
+                      <TextField
+                        variant="standard"
+                        required
+                        id="newPassword"
+                        label="New Password"
+                        type={params.isNewPasswordMasked ? 'text' : 'password'}
+                        validations={passwordValidators}
+                        onChange={getParamsUpdater('newPassword')}
+                        InputProps={renderPasswordMask('isNewPasswordMasked')}
+                        className={classes.textField}
+                      />
+                      <TextField
+                        variant="standard"
+                        required
+                        id="confirmPassword"
+                        label="Confirm Password"
+                        type={params.isConfirmPasswordMasked ? 'text' : 'password'}
+                        validations={confirmPasswordValidator}
+                        onChange={getParamsUpdater('confirmPassword')}
+                        InputProps={renderPasswordMask('isConfirmPasswordMasked')}
+                        className={classes.textField}
+                      />
+                      <div className={classes.passwordValidation}>
                         {renderPasswordValidationCheck(values)}
-                        {params.isError && (
-                          <Alert small variant="error" message={params.errorMessage} />
-                        )}
-                        <SubmitButton label="Reset my password" />
-                      </>
-                    ) : (
-                      <>
-                        <Typography className={classes.paragraph} component="p">
-                          Your password has been reset successfully.
-                        </Typography>
-                        <SubmitButton label="Return to login screen" />
-                      </>
-                    )}
-                  </>
-                )}
-              </ValidatedForm>
-            </div>
+                      </div>
+                      {params.isError && (
+                        <Alert small variant="error" message={params.errorMessage} />
+                      )}
+                      <SubmitButton label="Reset my password" />
+                    </>
+                  ) : (
+                    <>
+                      <Typography className={classes.paragraph} component="p">
+                        Your password has been reset successfully.
+                      </Typography>
+                      <SubmitButton label="Return to login screen" />
+                    </>
+                  )}
+                </>
+              )}
+            </ValidatedForm>
           </Paper>
         </Grid>
       </Grid>
