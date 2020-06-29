@@ -99,15 +99,14 @@ const IPValidator = customValidator((value, formValues) => {
 const IPValidatorRange = customValidator((value, formValues) => {
   const pairs = value.split(',')
   if (!pairs.length) return false
-  let isValid = true
 
-  pairs.forEach((pair = '') => {
+  for (const pair of pairs) {
     const [startIp, endIp] = pair.split('-')
     if (!isValidIpAddress(startIp) || !isValidIpAddress(endIp)) {
-      isValid = false
+      return false
     }
-  })
-  return isValid
+  }
+  return true
 }, 'Invalid format, must be valid IP addresses of the form: startIP1-endIP1,startIP2-endIP2')
 
 const containerAndServicesIPEqualsValidator = customValidator((value, formValues) => {
