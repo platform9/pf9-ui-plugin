@@ -81,16 +81,33 @@ const cidrBlockSizeValidator = customValidator((value) => {
   return blockSize > 0 && blockSize < 32
 }, 'Block Size must be greater than 0 and less than 32')
 
-const IPValidator = customValidator((value, formValues) => {
+const isValidIpAddress = (ip) => {
   // validates the octect ranges for an IP
-  const IP = `${value}`.split('/')[0]
-  if (IP === '0.0.0.0' || IP === '255.255.255.255') {
+  if (ip === '0.0.0.0' || ip === '255.255.255.255') {
     return false
   }
   return /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(
-    IP,
+    ip,
   )
+}
+
+const IPValidator = customValidator((value, formValues) => {
+  const IP = `${value}`.split('/')[0]
+  return isValidIpAddress(IP)
 }, 'IP invalid, must be between 0.0.0.0 and 255.255.255.255')
+
+const IPValidatorRange = customValidator((value, formValues) => {
+  const pairs = value.split(',')
+  if (!pairs.length) return false
+
+  for (const pair of pairs) {
+    const [startIp, endIp] = pair.split('-')
+    if (!isValidIpAddress(startIp) || !isValidIpAddress(endIp)) {
+      return false
+    }
+  }
+  return true
+}, 'Invalid format, must be valid IP addresses of the form: startIP1-endIP1,startIP2-endIP2')
 
 const containerAndServicesIPEqualsValidator = customValidator((value, formValues) => {
   const containersIP = `${formValues.containersCidr}`.split('/')[0]
@@ -642,6 +659,7 @@ const AddBareOsClusterPage = () => {
                           id="metallbCidr"
                           label="Address pool range(s) for Metal LB"
                           info="Specify the MetalLB start-end IP pool. Format: startIP1-endIP1,startIP2-endIP2"
+                          validations={[IPValidatorRange]}
                           required
                         />
                       )}

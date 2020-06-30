@@ -199,7 +199,7 @@ class Keystone extends ApiService {
   updateProject = async (id, params) => {
     const body = { project: params }
     const url = `${this.projectsUrl}/${id}`
-    const data = await this.client.basicPut(url, body)
+    const data = await this.client.basicPatch(url, body)
     return data.project
   }
 
