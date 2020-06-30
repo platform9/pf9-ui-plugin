@@ -19,6 +19,7 @@ import {
   groupBy,
   values,
   reject,
+  mergeLeft,
 } from 'ramda'
 import { emptyArr, emptyObj, upsertAllBy } from 'utils/fp'
 import { dataStoreKey, cacheStoreKey } from 'core/caching/cacheReducers'
@@ -31,7 +32,7 @@ import {
   mngmCredentialsCacheKey,
 } from 'k8s/components/userManagement/users/actions'
 import { tenantsSelector } from 'k8s/components/userManagement/tenants/selectors'
-import getParamsFilter from 'core/helpers/getParamsFilter'
+import createParamsFilter from 'core/helpers/createParamsFilter'
 
 const reservedTenantNames = ['admin', 'services', 'Default', 'heat']
 export const isValidTenant = (tenant) => !reservedTenantNames.includes(tenant.name)
@@ -87,12 +88,14 @@ export const usersSelector = createSelector<TenantWithUsers[], Namespace[], Tena
     }
 )
 
-export const makeFilteredTenantsSelector = () => {
+export const makeFilteredTenantsSelector = (defaultParams = {}) => {
   return createSelector(
-    [usersSelector, tenantsSelector, getParamsFilter()],
-    (clusters, allTenants, params) => {
+    [usersSelector, tenantsSelector, (_, params) => mergeLeft(params, defaultParams)],
+    (users, allTenants, params) => {
       const {
-        systemUsers
+        systemUsers,
+        orderBy,
+        orderDirection
       } = params
       const blacklistedTenants = reject(isValidTenant, allTenants)
       const blacklistedTenantIds = pluck('id', blacklistedTenants)
@@ -106,8 +109,9 @@ export const makeFilteredTenantsSelector = () => {
       })
       return pipe(
         filterUsers,
-        createSorter({ sortBy: params.sortBy })
-      )(clusters)
+        createParamsFilter(['tenantId'], params),
+        createSorter({ orderBy, orderDirection })
+      )(users)
     }
   )
 }

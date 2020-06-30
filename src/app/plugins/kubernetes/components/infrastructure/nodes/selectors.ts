@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect'
-import { pathOr, find, propEq, prop } from 'ramda'
+import { pathOr, find, propEq, prop, mergeLeft, pipe } from 'ramda'
 import { emptyArr, pathStrOrNull, pipeWhenTruthy } from 'utils/fp'
 import { dataStoreKey, cacheStoreKey } from 'core/caching/cacheReducers'
 import { nodesCacheKey } from 'k8s/components/infrastructure/nodes/actions'
@@ -27,5 +27,20 @@ export const nodesSelector = createSelector(
       // qbert v3 link fails authorization so we have to use v1 link for logs
       logs: `${qbertUrl}/logs/${node.uuid}`.replace(/v3/, 'v1'),
     }))
-  }
+  },
 )
+
+export const makeParamsNodesSelector = (
+  defaultParams = {
+    orderBy: 'created_at',
+    orderDirection: 'desc',
+  },
+) => {
+  return createSelector(
+    [nodesSelector, (_, params) => mergeLeft(params, defaultParams)],
+    (nodes, params) => {
+      const { orderBy, orderDirection } = params
+      return pipe(createSorter({ orderBy, orderDirection }))(nodes)
+    },
+  )
+}

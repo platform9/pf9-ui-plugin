@@ -13,7 +13,6 @@ import {
   dataStoreKey,
 } from 'core/caching/cacheReducers'
 import { createSelector } from 'reselect'
-import getParamsFilter from 'core/helpers/getParamsFilter'
 import createSorter from 'core/helpers/createSorter'
 import createParamsFilter from 'core/helpers/createParamsFilter'
 
@@ -26,19 +25,11 @@ const onErrorHandler = moize(
   },
 )
 
-const getDefaultSelector = moize(cacheKey => {
-  return createSelector(
-    [
-      pathOr(emptyArr, [cacheStoreKey, dataStoreKey, cacheKey]),
-      getParamsFilter()
-    ],
-    (items, params) => {
-      return pipe(
-        createParamsFilter(params),
-        createSorter(params)
-      )(items)
-    }
-  )
+const getDefaultSelectorCreator = moize((indexBy, cacheKey, selector) => {
+  return () =>
+    createSelector([selector, (_, params) => params], (items, params) => {
+      return pipe(createParamsFilter(indexBy, params), createSorter(params))(items)
+    })
 })
 
 /**
@@ -49,23 +40,21 @@ const getDefaultSelector = moize(cacheKey => {
  */
 const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
   const { loadOnDemand = false } = options
-  const { cacheKey, indexBy, selector = getDefaultSelector(cacheKey, indexBy), fetchErrorMessage } = loaderFn
+  const {
+    cacheKey,
+    indexBy,
+    fetchErrorMessage,
+    selector = pathOr(emptyArr, [cacheStoreKey, dataStoreKey, cacheKey]),
+    selectorCreator = getDefaultSelectorCreator(indexBy, cacheKey, selector),
+  } = loaderFn
 
   // Memoize the params dependency as we want to make sure it really changed and not just got a new reference
   const memoizedParams = memoizedDep(params)
 
   const loadingSelector = useMemo(() => pathOr(emptyArr, [loadingStoreKey, cacheKey]), [cacheKey])
 
-  // const mappedData = await dataMapper(cachedItems, params)
-  // return sortWith(mappedData, params)
-
-  const memoizedSelector = useMemo(
-    ensureFunction(selector),
-    []
-  )
-
   // Try to retrieve the data from the store with the provided parameters
-  const data = useSelector(state => memoizedSelector(state, params))
+  const data = useSelector((state) => selectorCreator(state, memoizedParams))
   const loading = useSelector(loadingSelector)
 
   // const cache = useSelector(prop(cacheStoreKey))
@@ -99,6 +88,7 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
           await loaderFn(memoizedParams, refetch)
         } catch (err) {
           const parsedErrorMesssage = ensureFunction(fetchErrorMessage)(err, params)
+          // TODO we should be putting these somewhere in the store to allow more control over the errors handling
           await onError(parsedErrorMesssage, err)
         }
         dispatch(cacheActions.setLoading(false))

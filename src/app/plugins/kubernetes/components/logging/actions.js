@@ -3,10 +3,9 @@ import createCRUDActions from 'core/helpers/createCRUDActions'
 import { clustersCacheKey } from 'k8s/components/infrastructure/common/actions'
 import { mapAsync } from 'utils/async'
 import { propOr } from 'ramda'
+import DataKeys from 'k8s/DataKeys'
 
 const { qbert } = ApiClient.getInstance()
-
-export const loggingsCacheKey = 'loggings'
 
 const mapLoggings = (cluster, loggings) => {
   const logStorage = []
@@ -33,7 +32,7 @@ const mapLoggings = (cluster, loggings) => {
   }
 }
 
-const loggingActions = createCRUDActions(loggingsCacheKey, {
+const loggingActions = createCRUDActions(DataKeys.Loggings, {
   listFn: async (params, loadFromContext) => {
     const clusters = await loadFromContext(clustersCacheKey)
 

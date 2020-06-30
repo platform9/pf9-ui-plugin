@@ -5,12 +5,11 @@ import ApiClient from 'api-client/ApiClient'
 import { loadCombinedHosts } from ' k8s/components/infrastructure/common/actions'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import { makeCloudProvidersSelector } from 'k8s/components/infrastructure/cloudProviders/selectors'
+import DataKeys from 'k8s/DataKeys'
 
 const { qbert } = ApiClient.getInstance()
 
-export const cloudProvidersCacheKey = 'cloudProviders'
-
-export const cloudProviderActions = createCRUDActions(cloudProvidersCacheKey, {
+export const cloudProviderActions = createCRUDActions(DataKeys.CloudProviders, {
   listFn: async () => {
     const [cloudProviders] = await Promise.all([
       qbert.getCloudProviders(),
@@ -49,11 +48,11 @@ export const cloudProviderActions = createCRUDActions(cloudProvidersCacheKey, {
     },
   },
   uniqueIdentifier: 'uuid',
-  selector: makeCloudProvidersSelector
+  selector: makeCloudProvidersSelector,
 })
 
 export const loadCloudProviderDetails = createContextLoader(
-  'cloudProviderDetails',
+  DataKeys.CloudProviderDetails,
   async ({ cloudProviderId }) => {
     const response = await qbert.getCloudProviderDetails(cloudProviderId)
     return response.Regions
@@ -65,7 +64,7 @@ export const loadCloudProviderDetails = createContextLoader(
 )
 
 export const loadCloudProviderRegionDetails = createContextLoader(
-  'cloudProviderRegionDetails',
+  DataKeys.CloudProviderRegionDetails,
   async ({ cloudProviderId, cloudProviderRegionId }) => {
     return qbert.getCloudProviderRegionDetails(cloudProviderId, cloudProviderRegionId)
   },

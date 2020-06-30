@@ -6,14 +6,12 @@ import { clustersCacheKey } from '../infrastructure/common/actions'
 import moment from 'moment'
 import { allKey } from 'app/constants'
 import { alertsSelector } from 'k8s/components/alarms/selectors'
+import DataKeys from 'k8s/DataKeys'
 
 const { qbert } = ApiClient.getInstance()
 
-export const alertsCacheKey = 'alerts'
-export const alertsTimeSeriesCacheKey = 'alertsTimeSeries'
-
 export const loadAlerts = createContextLoader(
-  alertsCacheKey,
+  DataKeys.Alerts,
   async ({ clusterId }) => {
     return qbert.getPrometheusAlerts(clusterId)
   },
@@ -21,7 +19,7 @@ export const loadAlerts = createContextLoader(
     entityName: 'Alert',
     uniqueIdentifier: 'id',
     indexBy: 'clusterId',
-    selector: alertsSelector
+    selector: alertsSelector,
   },
 )
 
@@ -87,7 +85,7 @@ const getSeverityCounts = (alertData, timestamps) => {
 }
 
 export const loadTimeSeriesAlerts = createContextLoader(
-  alertsTimeSeriesCacheKey,
+  DataKeys.AlertsTimeSeries,
   async ({ chartClusterId, chartTime }, loadFromContext) => {
     // Invalidate cache -- can't get cache working properly for this
     // collection. Collection is somewhat different from all other

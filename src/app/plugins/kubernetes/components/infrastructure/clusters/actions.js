@@ -1,7 +1,6 @@
 import ApiClient from 'api-client/ApiClient'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { allKey } from 'app/constants'
-import { clustersCacheKey } from 'k8s/components/infrastructure/common/actions'
 import { updateWith, adjustWith } from 'utils/fp'
 import { pathOr, pick, propEq, mergeLeft } from 'ramda'
 import {
@@ -15,28 +14,31 @@ import {
 import { mapAsync } from 'utils/async'
 import { clusterTagActions } from 'k8s/components/prometheus/actions'
 import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
+import { clustersSelector, makeParamsClustersSelector } from './selectors'
+import DataKeys from 'k8s/DataKeys'
 
 const { qbert } = ApiClient.getInstance()
 
-export const clusterActions = createCRUDActions(clustersCacheKey, {
+export const clusterActions = createCRUDActions(DataKeys.Clusters, {
   listFn: async () => {
-    const [
-      rawClusters,
-    ] = await Promise.all([
+    const [rawClusters] = await Promise.all([
       qbert.getClusters(),
-      qbert.baseUrl(),
+      // Fetch dependent caches
       clusterTagActions.list(),
       loadNodes(),
     ])
 
-    return mapAsync(async cluster => {
+    return mapAsync(async (cluster) => {
       const progressPercent =
         cluster.taskStatus === 'converging' ? await getProgressPercent(cluster.uuid) : null
       const version = await getKubernetesVersion(cluster.uuid)
+      const baseUrl = await qbert.clusterBaseUrl(cluster.uuid)
+
       return {
         ...cluster,
         progressPercent,
         version,
+        baseUrl,
       }
     }, rawClusters)
   },
@@ -127,6 +129,8 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
     },
   },
   uniqueIdentifier: 'uuid',
+  selector: clustersSelector,
+  selectorCreator: makeParamsClustersSelector,
 })
 
 // If params.clusterId is not assigned it fetches all clusters

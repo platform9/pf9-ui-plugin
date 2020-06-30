@@ -27,22 +27,15 @@ import moment from 'moment'
 import createContextLoader from 'core/helpers/createContextLoader'
 import { tryCatchAsync, someAsync, flatMapAsync, pipeAsync } from 'utils/async'
 import { parseClusterParams } from 'k8s/components/infrastructure/clusters/actions'
+import DataKeys from 'k8s/DataKeys'
 
 const { qbert } = ApiClient.getInstance()
 
 const uniqueIdentifier = 'id'
 const apiDateFormat = 'ddd MMM D HH:mm:ss YYYY'
 
-export const singleAppCacheKey = 'appDetails'
-export const appsCacheKey = 'apps'
-export const appVersionsCacheKey = 'appVersions'
-export const releasesCacheKey = 'releases'
-export const releaseDetailCacheKey = 'deployment'
-export const repositoriesWithClustersCacheKey = 'repositoriesWithClusters'
-export const repositoriesCacheKey = 'repositories'
-
 export const appDetailLoader = createContextLoader(
-  singleAppCacheKey,
+  DataKeys.AppDetail,
   async ({ clusterId, id, release, version }) => {
     const chart = await qbert.getChart(clusterId, id, release, version)
     return {
@@ -73,7 +66,7 @@ export const appDetailLoader = createContextLoader(
 )
 
 export const deploymentDetailLoader = createContextLoader(
-  releaseDetailCacheKey,
+  DataKeys.ReleaseDetail,
   async ({ clusterId, release }) => {
     return qbert.getRelease(clusterId, release)
   },
@@ -98,7 +91,7 @@ export const deploymentDetailLoader = createContextLoader(
 )
 
 export const appVersionLoader = createContextLoader(
-  appVersionsCacheKey,
+  DataKeys.AppVersions,
   async ({ clusterId, appId, release }) => {
     return qbert.getChartVersions(clusterId, appId, release)
   },
@@ -119,7 +112,7 @@ export const appVersionLoader = createContextLoader(
   },
 )
 
-export const appActions = createCRUDActions(appsCacheKey, {
+export const appActions = createCRUDActions(DataKeys.Apps, {
   listFn: async (params, loadFromContext) => {
     const [clusterId, clusters] = await parseClusterParams(params, loadFromContext)
     if (clusterId === allKey) {
@@ -166,7 +159,7 @@ export const appActions = createCRUDActions(appsCacheKey, {
   defaultOrderBy: 'name',
 })
 
-export const releaseActions = createCRUDActions(releasesCacheKey, {
+export const releaseActions = createCRUDActions(DataKeys.Releases, {
   listFn: async (params) => {
     const [clusterId, clusters] = await parseClusterParams(params)
     if (clusterId === allKey) {
@@ -192,7 +185,7 @@ export const releaseActions = createCRUDActions(releasesCacheKey, {
 })
 
 const reposWithClustersLoader = createContextLoader(
-  repositoriesWithClustersCacheKey,
+  DataKeys.RepositoriesWithClusters,
   async (params, loadFromContext) => {
     const monocularClusters = await loadFromContext(clustersCacheKey, {
       appCatalogClusters: true,
@@ -222,7 +215,7 @@ const reposWithClustersLoader = createContextLoader(
 const getRepoName = (id, repos) =>
   id ? pipe(find(propEq(uniqueIdentifier, id)), propOr(id, 'name'))(repos) : ''
 
-export const repositoryActions = createCRUDActions(repositoriesCacheKey, {
+export const repositoryActions = createCRUDActions(DataKeys.Repositories, {
   listFn: async () => {
     return qbert.getRepositories()
   },
@@ -326,7 +319,7 @@ export const repositoryActions = createCRUDActions(repositoriesCacheKey, {
       )(catchedErr.message),
     })(operation),
   dataMapper: async (items, params, loadFromContext) => {
-    const reposWithClusters = await loadFromContext(repositoriesWithClustersCacheKey)
+    const reposWithClusters = await loadFromContext(DataKeys.RepositoriesWithClusters)
     return map(({ id, type, attributes }) => ({
       id,
       type,

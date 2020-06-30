@@ -7,7 +7,7 @@ import { namespacesCacheKey } from 'k8s/components/namespaces/actions'
 import { TenantWithUsers, Tenant } from 'k8s/components/userManagement/tenants/model'
 import { mngmTenantsCacheKey } from 'k8s/components/userManagement/tenants/actions'
 import { Namespace } from 'k8s/components/namespaces/model'
-import getParamsFilter from 'core/helpers/getParamsFilter'
+import getParamsSelector from 'core/helpers/getParamsSelector'
 
 const reservedTenantNames = ['admin', 'services', 'Default', 'heat']
 export const filterValidTenants = (tenant) => !reservedTenantNames.includes(tenant.name)
@@ -37,7 +37,7 @@ export const tenantsSelector = createSelector<TenantWithUsers[], Namespace[], Te
 
 export const makeFilteredTenantsSelector = () => {
   return createSelector(
-    [tenantsSelector, getParamsFilter()],
+    [tenantsSelector, getParamsSelector()],
     (clusters, params) => {
       const {
         includeBlacklisted

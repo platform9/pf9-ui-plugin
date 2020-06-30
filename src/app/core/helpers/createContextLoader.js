@@ -79,8 +79,9 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
     entityName = uncamelizeString(cacheKey).replace(/s$/, ''), // Remove trailing "s"
     indexBy,
     requiredParams = indexBy,
-    fetchSuccessMessage = (params) => `Successfully fetched ${entityName} items`,
     fetchErrorMessage = (catchedErr, params) => `Unable to fetch ${entityName} items`,
+    selector,
+    selectorCreator,
   } = options
   const allIndexKeys = indexBy ? ensureArray(indexBy) : emptyArr
   const allRequiredParams = requiredParams ? ensureArray(requiredParams) : emptyArr
@@ -130,7 +131,6 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
     async (
       params = emptyObj,
       refetch = contextLoaderFn[invalidateCacheSymbol],
-      additionalOptions = emptyObj,
     ) => {
       const { dispatch, getState } = store
       const cache = prop(cacheStoreKey, getState())
@@ -138,10 +138,6 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
       const currentCachedParams = cachedParams[cacheKey] || emptyArr
       const filterData = getDataFilter(params)
       const invalidateCache = contextLoaderFn[invalidateCacheSymbol]
-      const {
-        onSuccess = (successMessage, params) => console.info(successMessage),
-        onError = (errorMessage, catchedErr, params) => console.error(errorMessage, catchedErr),
-      } = additionalOptions
 
       // Get the required values from the provided params
       const providedRequiredParams = pipe(pick(allRequiredParams), reject(isNil))(params)
@@ -161,55 +157,42 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
         reject(either(isNil, equals(allKey))),
       )(params)
 
-      try {
-        contextLoaderFn[invalidateCacheSymbol] = false
+      contextLoaderFn[invalidateCacheSymbol] = false
 
-        if (!refetch && !invalidateCache) {
-          // If the provided params are already cached
-          if (find(equals(providedIndexedParams), currentCachedParams)) {
-            // Return the cached data filtering by the provided params
-            return filterData(cachedData)
-          }
+      if (!refetch && !invalidateCache) {
+        // If the provided params are already cached
+        if (find(equals(providedIndexedParams), currentCachedParams)) {
+          // Return the cached data filtering by the provided params
+          return filterData(cachedData)
         }
-        // if refetch = true or no cached params have been found, fetch the items
-        const items = await dataFetchFn(params)
-
-        // We can't rely on the server to index the data, as sometimes it simply doesn't return the
-        // params used for the query, so we will add them to the items in order to be able to find them afterwards
-        const itemsWithParams = arrayIfEmpty(map(mergeLeft(params), ensureArray(items)))
-
-        // Perfom the cache update operations
-        if (invalidateCache || refetch) {
-          dispatch(
-            cacheActions.replaceAll({
-              cacheKey,
-              items: itemsWithParams,
-              params,
-            }),
-          )
-        } else {
-          dispatch(
-            cacheActions.upsertAll({
-              uniqueIdentifier,
-              cacheKey,
-              items: itemsWithParams,
-              params: providedIndexedParams,
-            }),
-          )
-        }
-
-        if (onSuccess) {
-          const parsedSuccessMesssage = ensureFunction(fetchSuccessMessage)(params)
-          await onSuccess(parsedSuccessMesssage, params)
-        }
-        return itemsWithParams
-      } catch (err) {
-        if (onError) {
-          const parsedErrorMesssage = ensureFunction(fetchErrorMessage)(err, params)
-          await onError(parsedErrorMesssage, err, params)
-        }
-        return emptyArr
       }
+      // if refetch = true or no cached params have been found, fetch the items
+      const items = await dataFetchFn(params, refetch)
+
+      // We can't rely on the server to index the data, as sometimes it simply doesn't return the
+      // params used for the query, so we will add them to the items in order to be able to find them afterwards
+      const itemsWithParams = arrayIfEmpty(map(mergeLeft(params), ensureArray(items)))
+
+      // Perfom the cache update operations
+      if (invalidateCache || refetch) {
+        dispatch(
+          cacheActions.replaceAll({
+            cacheKey,
+            items: itemsWithParams,
+            params,
+          }),
+        )
+      } else {
+        dispatch(
+          cacheActions.upsertAll({
+            uniqueIdentifier,
+            cacheKey,
+            items: itemsWithParams,
+            params: providedIndexedParams,
+          }),
+        )
+      }
+      return itemsWithParams
     },
   )
   contextLoaderFn._invalidatedCache = true
@@ -230,8 +213,10 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
   contextLoaderFn.cacheKey = cacheKey
   contextLoaderFn.indexBy = allIndexKeys
   contextLoaderFn.getDataFilter = getDataFilter
-  contextLoaderFn.fetchErrorMessage =
-
+  contextLoaderFn.fetchErrorMessage = fetchErrorMessage
+  contextLoaderFn.selector = selector
+  contextLoaderFn.selectorCreator = selectorCreator
+  
   if (has(cacheKey, loaders)) {
     console.warn(`Context Loader function with key ${cacheKey} already exists`)
   }

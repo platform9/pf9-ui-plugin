@@ -5,6 +5,7 @@ import { clustersCacheKey } from '../infrastructure/common/actions'
 import { notFoundErr } from 'app/constants'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { someAsync } from 'utils/async'
+import DataKeys from 'k8s/DataKeys'
 
 const { appbert, qbert } = ApiClient.getInstance()
 const uniqueIdentifier = 'metadata.uid'
@@ -30,8 +31,7 @@ export const hasPrometheusEnabled = (cluster) => {
 
   return installedMonitoringTask.status === 'Complete'
 }
-export const clusterTagsCacheKey = 'clusterTags'
-export const clusterTagActions = createCRUDActions(clusterTagsCacheKey, {
+export const clusterTagActions = createCRUDActions(DataKeys.ClusterTags, {
   listFn: async () => {
     return appbert.getClusterTags()
   },
@@ -60,8 +60,8 @@ export const mapPrometheusInstance = curry((clusters, { clusterId, metadata, spe
   metadata,
   spec,
 }))
-export const prometheusInstancesCacheKey = 'prometheusInstances'
-export const prometheusInstanceActions = createCRUDActions(prometheusInstancesCacheKey, {
+
+export const prometheusInstanceActions = createCRUDActions(DataKeys.PrometheusInstances, {
   listFn: async (params, loadFromContext) => {
     await loadFromContext(clustersCacheKey)
     const clusterTags = await loadFromContext(clusterTagsCacheKey)
@@ -92,8 +92,7 @@ export const prometheusInstanceActions = createCRUDActions(prometheusInstancesCa
 
 /* Service Accounts */
 
-export const serviceAccountsCacheKey = 'serviceAccounts'
-export const serviceAccountActions = createCRUDActions(serviceAccountsCacheKey, {
+export const serviceAccountActions = createCRUDActions(DataKeys.ServiceAccounts, {
   listFn: async (params) => {
     return qbert.getServiceAccounts(params.clusterId, params.namespace)
   },
@@ -114,8 +113,7 @@ export const serviceAccountActions = createCRUDActions(serviceAccountsCacheKey, 
 
 /* Rules */
 
-export const prometheusRulesCacheKey = 'prometheusRules'
-export const prometheusRuleActions = createCRUDActions(prometheusRulesCacheKey, {
+export const prometheusRuleActions = createCRUDActions(DataKeys.PrometheusRules, {
   listFn: async (params, loadFromContext) => {
     await loadFromContext(clustersCacheKey)
     const clusterTags = await loadFromContext(clusterTagsCacheKey)
@@ -153,9 +151,8 @@ export const prometheusRuleActions = createCRUDActions(prometheusRulesCacheKey, 
 })
 
 /* Service Monitors */
-export const prometheusServiceMonitorsCacheKey = 'prometheusServiceMonitors'
 export const prometheusServiceMonitorActions = createCRUDActions(
-  prometheusServiceMonitorsCacheKey,
+  DataKeys.PrometheusServiceMonitors,
   {
     listFn: async (params, loadFromContext) => {
       await loadFromContext(clustersCacheKey)
@@ -205,8 +202,7 @@ export const prometheusServiceMonitorActions = createCRUDActions(
 
 /* Alert Managers */
 
-export const prometheusAlertManagersCacheKey = 'prometheusAlertManagers'
-export const prometheusAlertManagerActions = createCRUDActions(prometheusAlertManagersCacheKey, {
+export const prometheusAlertManagerActions = createCRUDActions(DataKeys.PrometheusAlertManagers, {
   listFn: async (params, loadFromContext) => {
     await loadFromContext(clustersCacheKey)
     const clusterTags = await loadFromContext(clusterTagsCacheKey)

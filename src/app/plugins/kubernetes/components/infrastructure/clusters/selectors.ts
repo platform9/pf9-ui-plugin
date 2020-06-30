@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect'
-import { pathOr, pluck, partition, either, pipe, propSatisfies, compose, path } from 'ramda'
+import { pathOr, pluck, partition, either, pipe, propSatisfies, compose, path, mergeLeft } from 'ramda'
 import { emptyArr, filterIf, isTruthy } from 'utils/fp'
 import { dataStoreKey, cacheStoreKey } from 'core/caching/cacheReducers'
 import createSorter from 'core/helpers/createSorter'
@@ -17,7 +17,6 @@ import {
 } from 'k8s/components/infrastructure/clusters/ClusterStatusUtils'
 import { castFuzzyBool } from 'utils/misc'
 import { nodesCacheKey } from 'k8s/components/infrastructure/nodes/actions'
-import getParamsFilter from 'core/helpers/getParamsFilter'
 import ApiClient from 'api-client/ApiClient'
 
 const { qbert } = ApiClient.getInstance()
@@ -121,7 +120,7 @@ export const makeParamsClustersSelector = (defaultParams = {
   orderDirection: 'desc'
 }) => {
   return createSelector(
-    [clustersSelector, getParamsFilter(defaultParams)],
+    [clustersSelector, (_, params) => mergeLeft(params, defaultParams)],
     (clusters, params) => {
       const {
         masterNodeClusters,

@@ -19,6 +19,5 @@ export const namespacesSelector = createSelector(
       clusterName: findClusterName(rawClusters, ns.clusterId),
       status: pathOr('N/A', ['status', 'phase'], ns),
     }))
-  }
-
+  },
 )

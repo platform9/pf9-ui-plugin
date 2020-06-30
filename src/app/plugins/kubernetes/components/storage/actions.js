@@ -7,12 +7,11 @@ import { someAsync } from 'utils/async'
 import { parseClusterParams } from 'k8s/components/infrastructure/clusters/actions'
 import { allKey, notFoundErr } from 'app/constants'
 import { pathStr } from 'utils/fp'
+import DataKeys from 'k8s/DataKeys'
 
 const { qbert } = ApiClient.getInstance()
 
-export const storageClassesCacheKey = 'storageClasses'
-
-const storageClassActions = createCRUDActions(storageClassesCacheKey, {
+const storageClassActions = createCRUDActions(DataKeys.StorageClasses, {
   listFn: async (params, loadFromContext) => {
     const [clusterId, clusters] = await parseClusterParams(params, loadFromContext)
     if (clusterId === allKey) {

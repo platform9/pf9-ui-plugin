@@ -8,7 +8,7 @@ import calcUsageTotalByPath from 'k8s/util/calcUsageTotals'
 import { cloudProvidersCacheKey } from './actions'
 import { clustersSelector } from 'k8s/components/infrastructure/clusters/selectors'
 import { combinedHostsSelector } from 'k8s/components/infrastructure/common/selectors'
-import getParamsFilter from 'core/helpers/getParamsFilter'
+import getParamsSelector from 'core/helpers/getParamsSelector'
 
 const cloudProviderTypes = {
   aws: 'Amazon AWS Provider',
@@ -62,7 +62,7 @@ export const makeCloudProvidersSelector = (defaultParams = {
   orderDirection: 'desc'
 }) => {
   return createSelector(
-    [cloudProvidersSelector, getParamsFilter(defaultParams)],
+    [cloudProvidersSelector, getParamsSelector(defaultParams)],
     (cloudProviders, params) => {
       const {
         orderBy,

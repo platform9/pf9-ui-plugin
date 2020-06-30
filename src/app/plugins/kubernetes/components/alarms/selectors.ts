@@ -3,7 +3,7 @@ import { pathOr, path, pipe, find, propEq, prop } from 'ramda'
 import { emptyArr, pathStr } from 'utils/fp'
 import { cacheStoreKey, dataStoreKey } from 'core/caching/cacheReducers'
 import { alertsCacheKey } from 'k8s/components/alarms/actions'
-import { makeParamsClustersSelector } from 'k8s/components/infrastructure/clusters/selectors'
+import { clustersSelector } from 'k8s/components/infrastructure/clusters/selectors'
 
 const getQbertUrl = (qbertEndpoint) => {
   // Trim the uri after "/qbert" from the qbert endpoint
@@ -12,10 +12,7 @@ const getQbertUrl = (qbertEndpoint) => {
 
 export const alertsSelector = createSelector([
   pathOr(emptyArr, [cacheStoreKey, dataStoreKey, alertsCacheKey]),
-  makeParamsClustersSelector({
-    healthyClusters: true,
-    prometheusClusters: true,
-  }),
+  clustersSelector,
   pathOr(emptyArr, ['qbert', 'endpoint']),
 ], (alerts, clusters, qbertEndpoint) => {
   const qbertPath = getQbertUrl(qbertEndpoint)

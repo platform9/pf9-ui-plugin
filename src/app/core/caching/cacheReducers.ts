@@ -61,7 +61,7 @@ const reducers = {
       payload: { cacheKey, loading },
     }: PayloadAction<{
       uniqueIdentifier: string | string[]
-      cacheKey: string
+      cacheKey: DataKey
       loading: boolean
     }>,
   ) => assocPath([loadingStoreKey, cacheKey], loading, state),
@@ -71,7 +71,7 @@ const reducers = {
       payload: { cacheKey, params, item },
     }: PayloadAction<{
       uniqueIdentifier: string | string[]
-      cacheKey: string
+      cacheKey: DataKey
       params: ParamsType
       item: T
     }>,
@@ -87,7 +87,7 @@ const reducers = {
     }: PayloadAction<{
       uniqueIdentifier: string | string[]
       params: ParamsType
-      cacheKey: string
+      cacheKey: DataKey
       item: T
     }>,
   ) => {
@@ -123,7 +123,7 @@ const reducers = {
       payload: { uniqueIdentifier = defaultUniqueIdentifier, cacheKey, params, items },
     }: PayloadAction<{
       uniqueIdentifier: string | string[]
-      cacheKey: string
+      cacheKey: DataKey
       params?: ParamsType
       items: T[]
     }>,
@@ -160,7 +160,7 @@ const reducers = {
       params ? assocPath(paramsPath, of(params)) : identity,
     )(state)
   },
-  clearCache: (state, action?: PayloadAction<Optional<{ cacheKey: string }>>) => {
+  clearCache: (state, action?: PayloadAction<Optional<{ cacheKey: DataKey }>>) => {
     const cacheKey = action?.payload?.cacheKey
     return cacheKey
       ? pipe<CacheState, CacheState, CacheState>(
