@@ -25,7 +25,7 @@ export const hasPrometheusEnabled = (cluster) => {
   if (!cluster || !cluster.pkgs) return false
   const installedMonitoringTask = cluster.pkgs.find(isMonitoringPackage)
 
-  return installedMonitoringTask.validate === true
+  return (installedMonitoringTask || {}).validate === true
 }
 export const clusterTagsCacheKey = 'clusterTags'
 export const clusterTagActions = createCRUDActions(clusterTagsCacheKey, {
