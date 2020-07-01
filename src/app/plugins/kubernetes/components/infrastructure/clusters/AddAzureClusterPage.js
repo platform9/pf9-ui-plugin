@@ -34,8 +34,14 @@ import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import { routes } from 'core/utils/routes'
 import Alert from 'core/components/Alert'
 import { trackEvent } from 'utils/tracking'
+import { customValidator } from 'core/utils/fieldValidators'
+import { isKeyValid } from 'ssh-pub-key-validation'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
+
+const sshKeyValidator = customValidator((value, formValues) => {
+  return isKeyValid(value)
+}, 'You must enter a valid SSH key')
 
 const useStyles = makeStyles((theme) => ({
   tableWidth: {
@@ -281,6 +287,8 @@ const AddAzureClusterPage = () => {
                           id="sshKey"
                           label="Public SSH key"
                           info="Copy/paste your SSH public key"
+                          size="small"
+                          validations={[sshKeyValidator]}
                           multiline
                           rows={3}
                           required
