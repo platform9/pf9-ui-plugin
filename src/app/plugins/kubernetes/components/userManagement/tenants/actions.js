@@ -13,6 +13,7 @@ export const mngmTenantsCacheKey = 'managementTenants'
 
 const reservedTenantNames = ['admin', 'services', 'Default', 'heat']
 export const filterValidTenants = (tenant) => !reservedTenantNames.includes(tenant.name)
+export const filterOutDomains = (tenant) => !!tenant.domain_id
 export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
   listFn: () => {
     return keystone.getAllTenantsAllUsers()
@@ -112,6 +113,7 @@ export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
     return pipe(
       filterIf(!params.includeBlacklisted, filterValidTenants),
       filter((tenant) => tenant.domain_id !== heatTenantId),
+      filter(filterOutDomains),
       map((tenant) => ({
         ...tenant,
         users: tenant.users.filter((user) => user.username !== 'admin@platform9.net'),
