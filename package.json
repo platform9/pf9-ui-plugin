@@ -32,6 +32,7 @@
     "react-router": "^5.0.1",
     "react-router-dom": "^5.0.1",
     "recharts": "^2.0.0-beta.1",
+    "ssh-pub-key-validation": "^1.0.0",
     "use-react-router": "^1.0.7",
     "uuid": "^3.2.1"
   },
