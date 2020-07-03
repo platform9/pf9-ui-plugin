@@ -6,7 +6,7 @@ import { setStorage, getStorage } from 'core/utils/pf9Storage'
 import { loadUserTenants } from 'openstack/components/tenants/actions'
 import { head, path, pathOr, propEq, isEmpty, isNil } from 'ramda'
 import AuthenticatedContainer from 'core/containers/AuthenticatedContainer'
-import { trackPage } from 'utils/tracking'
+import { trackPage, injectDrift } from 'utils/tracking'
 import useReactRouter from 'use-react-router'
 import { makeStyles } from '@material-ui/styles'
 import { Route, Redirect, Switch } from 'react-router'
@@ -186,10 +186,16 @@ const AppContainer = () => {
       // Ignore exception if features.json not found (for local development)
       const features = await axios.get('/clarity/features.json').catch(() => null)
       const sandbox = pathStrOr(false, 'experimental.sandbox', features)
+
       if (!sandbox && typeof analytics !== 'undefined') {
         analytics.identify(user.id, {
           email: user.name,
         })
+      }
+
+      // Drift tracking code for live demo
+      if (sandbox) {
+        injectDrift()
       }
 
       /* eslint-enable */
