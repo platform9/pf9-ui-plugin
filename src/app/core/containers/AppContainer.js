@@ -185,7 +185,7 @@ const AppContainer = () => {
       // whereas this one is done on the master DU from which the UI is served.
       // Ignore exception if features.json not found (for local development)
       const features = await axios.get('/clarity/features.json').catch(() => null)
-      const sandbox = pathStrOr(false, 'experimental.sandbox', features)
+      const sandbox = pathStrOr(false, 'data.experimental.sandbox', features)
 
       if (!sandbox && typeof analytics !== 'undefined') {
         analytics.identify(user.id, {
