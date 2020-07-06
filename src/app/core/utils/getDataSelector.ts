@@ -1,6 +1,6 @@
 import moize from 'moize'
 import { pipe, equals, pickAll, reject, either, pathOr, filter, whereEq, isNil } from 'ramda'
-import { emptyArr, arrayIfNil, arrayIfEmpty } from 'app/utils/fp'
+import { emptyArr, arrayIfNil, arrayIfEmpty, ensureArray } from 'app/utils/fp'
 import { allKey } from 'app/constants'
 import { dataStoreKey } from 'core/caching/cacheReducers'
 

@@ -38,30 +38,17 @@ export const appDetailLoader = createContextLoader(
   DataKeys.AppDetail,
   async ({ clusterId, id, release, version }) => {
     const chart = await qbert.getChart(clusterId, id, release, version)
+    const monocularUrl = await qbert.clusterMonocularBaseUrl(clusterId, null)
+    const icon = pathStr('attributes.icons.0.path', chart)
     return {
       ...chart,
+      logoUrl: icon ? pathJoin(monocularUrl, icon) : `${imageUrlRoot}/default-app-logo.png`,
       readmeMarkdown: await qbert.getChartReadmeContents(clusterId, chart.attributes.readme),
     }
   },
   {
     uniqueIdentifier: ['id', 'clusterId'],
     indexBy: ['clusterId', 'id', 'release', 'version'],
-    dataMapper: async (items, { clusterId }) => {
-      const monocularUrl = await qbert.clusterMonocularBaseUrl(clusterId, null)
-      return map(({ id, ...item }) => {
-        const icon = pathStr('attributes.icons.0.path', item)
-        const chartId = id.substring(0, id.indexOf(':')) // Remove the version from the ID
-        return {
-          ...item,
-          id: chartId,
-          name: chartId.substring(chartId.indexOf('/') + 1),
-          logoUrl: icon ? pathJoin(monocularUrl, icon) : `${imageUrlRoot}/default-app-logo.png`,
-          home: pathStr('relationships.chart.data.home', item),
-          sources: pathStr('relationships.chart.data.sources', item),
-          maintainers: pathStr('relationships.chart.data.maintainers', item),
-        }
-      })(items)
-    },
   },
 )
 
@@ -71,20 +58,6 @@ export const deploymentDetailLoader = createContextLoader(
     return qbert.getRelease(clusterId, release)
   },
   {
-    dataMapper: async (items) => {
-      return map((item) => ({
-        ...item,
-        name: pathStr('attributes.name', item),
-        chartName: pathStr('attributes.chartName', item),
-        version: pathStr('attributes.chartVersion', item),
-        namespace: pathStr('attributes.namespace', item),
-        status: pathStr('attributes.status', item),
-        lastUpdated: moment(pathStr('attributes.updated', item), apiDateFormat).format('llll'),
-        logoUrl: pathStrOr(`${imageUrlRoot}/default-app-logo.png`, 'attributes.chartIcon', item),
-        resourcesText: pathStr('attributes.resources', item),
-        notesText: pathStr('attributes.notes', item),
-      }))(items)
-    },
     uniqueIdentifier,
     indexBy: ['clusterId', 'release'],
   },
@@ -97,16 +70,6 @@ export const appVersionLoader = createContextLoader(
   },
   {
     indexBy: ['clusterId', 'appId', 'release'],
-    dataMapper: map((item) => ({
-      ...item,
-      version: pathStr('attributes.version', item),
-      appVersion: pathStr('attributes.app_version', item),
-      versionLabel: [
-        pathStr('attributes.version', item),
-        moment(pathStr('attributes.created', item)).format('MMM DD, YYYY'),
-      ].join(' - '),
-      downloadLink: pathStr('attributes.urls.0', item),
-    })),
     defaultOrderBy: 'version',
     defaultOrderDirection: 'desc',
   },
