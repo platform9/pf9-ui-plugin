@@ -51,7 +51,7 @@ RolesPicklist.defaultProps = {
   ...Picklist.defaultProps,
   name: 'roleId',
   label: 'Role',
-  formField: false,
+  formField: true,
   showAll: false,
   showNone: false,
   selectFirst: false,
