@@ -7,6 +7,7 @@ import uuid from 'uuid'
 import { assoc } from 'ramda'
 import { makeStyles } from '@material-ui/styles'
 import { Button } from '@material-ui/core'
+import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 
 const useKeyValueStyles = makeStyles((theme) => ({
   root: {
@@ -81,6 +82,10 @@ const useStyles = makeStyles((theme) => ({
   },
   addButton: {
     marginTop: theme.spacing(0.5),
+    color: theme.palette.primary.main,
+  },
+  plus: {
+    marginRight: theme.spacing(.25),
   },
 }))
 
@@ -125,7 +130,8 @@ const KeyValues = ({ entries: _entries, onChange, keySuggestions, valueSuggestio
         />
       ))}
       <Button className={classes.addButton} variant="text" onClick={addBlankEntry}>
-        Add key / value pair
+        <FontAwesomeIcon className={classes.plus}>plus-circle</FontAwesomeIcon>
+        <span>Add key / value pair</span>
       </Button>
     </div>
   )
