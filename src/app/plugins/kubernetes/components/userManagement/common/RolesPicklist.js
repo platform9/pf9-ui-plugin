@@ -33,6 +33,7 @@ const RolesPicklist = forwardRef(
         onChange={onChange}
         loading={loading || rolesLoading}
         options={options}
+        inline
       />
     )
   },

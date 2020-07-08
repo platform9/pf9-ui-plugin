@@ -14,7 +14,7 @@ import { isNilOrEmpty, emptyArr, ensureArray } from 'utils/fp'
  */
 const useStyles = makeStyles((theme) => ({
   root: {
-    display: ({ formField }) => (formField ? 'flex' : 'block'),
+    display: ({ formField, inline }) => (formField ? 'flex' : inline ? 'inline-block' : 'block'),
     flexWrap: 'wrap',
     minWidth: 120,
     marginTop: theme.spacing(1),
@@ -131,6 +131,7 @@ Picklist.propTypes = {
   value: valuePropType,
   variant: PropTypes.string,
   multiple: PropTypes.bool,
+  inline: PropTypes.bool,
 }
 
 Picklist.defaultProps = {
@@ -141,6 +142,7 @@ Picklist.defaultProps = {
   value: '',
   variant: 'outlined',
   multiple: false,
+  inline: false,
 }
 
 export default Picklist

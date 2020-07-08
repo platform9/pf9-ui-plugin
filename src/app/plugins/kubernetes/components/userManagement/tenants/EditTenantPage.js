@@ -18,6 +18,7 @@ import { k8sPrefix } from 'app/constants'
 import Wizard from 'core/components/wizard/Wizard'
 import WizardStep from 'core/components/wizard/WizardStep'
 import { requiredValidator } from 'core/utils/fieldValidators'
+import Progress from 'core/components/progress/Progress'
 
 const listUrl = pathJoin(k8sPrefix, 'user_management')
 
