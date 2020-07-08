@@ -17,6 +17,9 @@ const useStyles = makeStyles((theme) => ({
       minWidth: 150,
     },
   },
+  root: {
+    display: 'block',
+  },
 }))
 const stopPropagation = (e) => {
   e.stopPropagation()
@@ -90,7 +93,7 @@ const TenantRolesTableField = withFormContext(
     )
 
     return (
-      <FormControl id={id} error={hasError}>
+      <FormControl id={id} error={hasError} className={classes.root}>
         <ListTable
           onSortChange={noop}
           searchTarget="name"

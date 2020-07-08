@@ -86,17 +86,11 @@ const EditTenantPage = () => {
                 onSubmit={setWizardContext}
                 triggerSubmit={onNext}
               >
-                <Progress
-                  renderContentOnMount={!loadingUsers}
-                  loading={loadingUsers}
-                  message={'Loading Users...'}
-                >
-                  <UserRolesTableField
-                    validations={userRolesValidations}
-                    id="roleAssignments"
-                    users={users}
-                  />
-                </Progress>
+                <UserRolesTableField
+                  validations={userRolesValidations}
+                  id="roleAssignments"
+                  users={users}
+                />
               </ValidatedForm>
             </WizardStep>
           </>

@@ -33,6 +33,7 @@ const RolesPicklist = forwardRef(
         onChange={onChange}
         loading={loading || rolesLoading}
         options={options}
+        inline
       />
     )
   },
@@ -51,7 +52,7 @@ RolesPicklist.defaultProps = {
   ...Picklist.defaultProps,
   name: 'roleId',
   label: 'Role',
-  formField: true,
+  formField: false,
   showAll: false,
   showNone: false,
   selectFirst: false,

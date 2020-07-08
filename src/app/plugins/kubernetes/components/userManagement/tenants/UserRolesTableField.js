@@ -20,6 +20,9 @@ const useStyles = makeStyles((theme) => ({
       minWidth: 150,
     },
   },
+  root: {
+    display: 'block',
+  },
 }))
 const stopPropagation = (e) => {
   e.stopPropagation()
@@ -97,7 +100,7 @@ const UserRolesTableField = withFormContext(
     )
 
     return (
-      <FormControl id={id} error={hasError}>
+      <FormControl id={id} error={hasError} className={classes.root}>
         <ListTable
           extraToolbarContent={
             <SystemUsersToggle checked={showingSystemUsers} toggle={toggleSystemUsers} />
