@@ -138,6 +138,9 @@ const theme = {
       main: '#4ADF74',
       dark: '#388E3C',
     },
+    upgrade: {
+      main: '#D82071',
+    },
     empty: {
       main: '#EDEFF1',
     },
