@@ -209,6 +209,8 @@ const AppContainer = () => {
         currentTenant: activeTenant,
         userDetails: { ...user, role },
       })
+
+      window.pendo.initialize({ visitor: { id: username }})
     } catch (err) {
       await setContext({
         appLoaded: false,
