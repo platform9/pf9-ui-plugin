@@ -29,7 +29,7 @@ const useStyles = makeStyles<any, Partial<Props>>((theme: Theme) => ({
     color: theme.palette.grey[700],
   },
   value: {
-    paddingLeft: 20,
+    paddingLeft: theme.spacing(2.5),
     width: '100%',
   },
 }))

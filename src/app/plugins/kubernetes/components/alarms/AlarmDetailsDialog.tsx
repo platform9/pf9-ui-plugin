@@ -19,7 +19,7 @@ interface Props {
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
-    padding: '20px 28px',
+    padding: `${theme.spacing(2.5)}px ${theme.spacing(3.5)}px`,
     width: '544px', // This interacts weirdly with mui dialog max width, just set the width
   },
   header: {
