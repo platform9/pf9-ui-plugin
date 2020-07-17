@@ -22,6 +22,7 @@ import { useTheme } from '@material-ui/core/styles'
 import AlarmsChartTooltip from './AlarmsChartTooltip'
 import ClusterPicklistDefault from 'k8s/components/common/ClusterPicklist'
 import TimePicklistDefault from './TimePicklist'
+import AlarmDetailsLink from './AlarmDetailsLink'
 const ClusterPicklist: any = ClusterPicklistDefault
 const TimePicklist: any = TimePicklistDefault
 
@@ -189,7 +190,7 @@ const ListPage = ({ ListContainer }) => {
   }
 }
 
-const SeverityTableCell = ({ value }) => {
+export const SeverityTableCell = ({ value }) => {
   const theme: any = useTheme()
   const key = chartKeys.find(key => key.name === value)
   return key ? (
@@ -203,7 +204,7 @@ const SeverityTableCell = ({ value }) => {
 
 export const options = {
   columns: [
-    { id: 'name', label: 'Name', render: (value) => ( <b>{value}</b> )},
+    { id: 'name', label: 'Name', render: (value, row) => ( <AlarmDetailsLink display={value} alarm={row} /> )},
     { id: 'severity', label: 'Severity', render: (value) => (
         <SeverityTableCell value={value} />
       )
