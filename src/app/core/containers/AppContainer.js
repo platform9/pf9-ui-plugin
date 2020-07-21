@@ -60,6 +60,7 @@ const AppContainer = () => {
   useEffect(() => {
     const unlisten = history.listen((location, action) => {
       trackPage(`${location.pathname}${location.hash}`)
+      window.Appcues && window.Appcues.page()
     })
 
     // This is to send page event for the first page the user lands on
@@ -191,6 +192,7 @@ const AppContainer = () => {
         analytics.identify(user.id, {
           email: user.name,
         })
+        window.Appcues && window.Appcues.identify(user.id, { email: user.name })
       }
 
       // Drift tracking code for live demo
