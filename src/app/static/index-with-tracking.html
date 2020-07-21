@@ -12,6 +12,7 @@
       rel="stylesheet"
       href="//s3-us-west-1.amazonaws.com/assets.platform9.net/ui/css/all.min.css"
     />
+    <script src="//fast.appcues.com/77718.js"></script>
   </head>
   <body>
     <div id="root"></div>
@@ -63,7 +64,13 @@
               analytics._loadOptions = e
             }
             analytics.SNIPPET_VERSION = '4.1.0'
-            analytics.load('CZyWxMIN8qYscIAIOEHJE1ZITYDAQIhU')
+
+            // Original Segment.io "source"
+            // analytics.load('CZyWxMIN8qYscIAIOEHJE1ZITYDAQIhU')
+
+            // "TEST - All Things PF9" source in Segment.io to be used for Pendo POC
+            analytics.load('42hGzY0OkHBSsLu73MCCKcixVUWhREKX')
+
           }
       })()
     </script>
