@@ -33,12 +33,13 @@ export const cloudProviderActions = createCRUDActions(cloudProvidersCacheKey, {
     return { ...cloudProvider }
   },
   updateFn: ({ uuid, ...data }) => qbert.updateCloudProvider(uuid, data),
-  deleteFn: ({ uuid, name, type }) => {
+  deleteFn: async ({ uuid, name, type }) => {
+    const result = await qbert.deleteCloudProvider(uuid)
     trackEvent('Delete Cloud Provider', {
       cloud_provider_name: name,
       cloud_provider_type: type,
     })
-    return qbert.deleteCloudProvider(uuid)
+    return result
   },
   customOperations: {
     attachNodesToCluster: async ({ clusterUuid, nodes }, currentItems) => {
