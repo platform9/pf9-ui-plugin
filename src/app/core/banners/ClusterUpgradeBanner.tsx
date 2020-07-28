@@ -6,6 +6,7 @@ import BannerContainer from 'core/components/notifications/BannerContainer'
 import BannerContent from 'core/components/notifications/BannerContent'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
+import { routes } from 'core/utils/routes'
 
 const useStyles = makeStyles<Theme>((theme: Theme) => ({
   root: {
@@ -25,7 +26,7 @@ const ClusterUpgradeBanner = () => {
   const upgradableClusters = clusters.filter(cluster => cluster.canUpgrade)
 
   const redirectToClusters = () => {
-    history.push('/ui/kubernetes/infrastructure')
+    history.push(routes.cluster.list.path())
   }
 
   return (!clustersLoading && upgradableClusters.length) ? (
