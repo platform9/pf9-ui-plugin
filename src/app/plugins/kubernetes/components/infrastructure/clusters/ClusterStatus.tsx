@@ -24,6 +24,7 @@ const getIconOrBubbleColor = (status: IClusterStatus, theme: Theme) =>
     error: theme.palette.error.main,
     loading: theme.palette.sidebar.text,
     unknown: theme.palette.info.main,
+    upgrade: theme.palette.upgrade.main,
   }[status] || theme.palette.error.main)
 
 const useStyles = makeStyles<Theme, Props>((theme: Theme) => ({

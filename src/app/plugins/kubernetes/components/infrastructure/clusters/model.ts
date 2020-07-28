@@ -1,7 +1,7 @@
 import { ICombinedNode } from '../nodes/model'
 import { CloudProviders } from '../cloudProviders/model'
 
-export type HealthStatus = 'healthy' | 'partially_healthy' | 'unhealthy' | 'unknown'
+export type HealthStatus = 'healthy' | 'partially_healthy' | 'unhealthy' | 'unknown' | 'needs_upgrade'
 
 export interface ICluster {
   name: string

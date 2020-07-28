@@ -29,6 +29,7 @@ import PushEventsProvider from '../providers/PushEventsProvider'
 import BannerContainer from 'core/components/notifications/BannerContainer'
 import BannerContent from 'core/components/notifications/BannerContent'
 import { trackEvent } from 'utils/tracking'
+import ClusterUpgradeBanner from 'core/banners/ClusterUpgradeBanner'
 
 const { keystone } = ApiClient.getInstance()
 
@@ -287,6 +288,9 @@ const AuthenticatedContainer = () => {
                   </div>
                 </BannerContent>
               </>
+            )}
+            {pathStrOr(false, 'experimental.containervisor', features) && (
+              <ClusterUpgradeBanner/>
             )}
             <div className={classes.contentMain}>
               {renderRawComponents(plugins)}

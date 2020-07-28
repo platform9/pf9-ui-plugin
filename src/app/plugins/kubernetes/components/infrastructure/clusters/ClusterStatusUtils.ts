@@ -5,7 +5,7 @@ import { ICombinedNode } from '../nodes/model'
 type TransientStatus = 'creating' | 'deleting' | 'updating' | 'upgrading' | 'converging'
 type ConnectionStatus = 'connected' | 'partially_connected' | 'disconnected'
 
-export type IClusterStatus = 'ok' | 'pause' | 'fail' | 'unknown' | 'error' | 'loading'
+export type IClusterStatus = 'ok' | 'pause' | 'fail' | 'unknown' | 'error' | 'loading' | 'upgrade'
 
 interface INodeCount {
   total: number
@@ -119,9 +119,14 @@ export function getHealthStatus(
   connectionStatus: ConnectionStatus | TransientStatus,
   masterStatus: HealthStatus,
   workerStatus: HealthStatus,
+  canUpgrade,
 ) {
   if (isTransientStatus(connectionStatus)) {
     return connectionStatus
+  }
+
+  if (canUpgrade) {
+    return 'needs_upgrade'
   }
 
   const healthStatusAndMessage = findClusterHealthValues(masterStatus, workerStatus)
@@ -318,6 +323,10 @@ export const clusterHealthStatusFields: {
   converging: {
     status: 'loading',
     label: 'Converging',
+  },
+  needs_upgrade: {
+    status: 'upgrade',
+    label: 'Upgrade Available'
   },
 }
 

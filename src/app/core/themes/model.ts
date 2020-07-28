@@ -180,6 +180,11 @@ export interface Palette {
   code: Code
   warning: DefaultColorSwatch
   success: DefaultColorSwatch
+  upgrade: Upgrade
+}
+
+export interface Upgrade {
+  main: string
 }
 
 export interface Action {
