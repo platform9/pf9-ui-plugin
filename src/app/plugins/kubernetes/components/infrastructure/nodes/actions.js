@@ -5,6 +5,7 @@ import { pathStrOrNull, pipeWhenTruthy } from 'utils/fp'
 import { find, propEq, prop } from 'ramda'
 import createContextUpdater from 'core/helpers/createContextUpdater'
 import { loadCombinedHosts } from 'k8s/components/infrastructure/common/actions'
+import { trackEvent } from 'utils/tracking'
 
 const { qbert, resmgr } = ApiClient.getInstance()
 
@@ -69,6 +70,9 @@ export const deAuthNode = createContextUpdater(
   'nodes',
   async (node, prevItems) => {
     await resmgr.unauthorizeHost(node.uuid)
+    trackEvent('Deauthorize Node', {
+      node_name: node.name,
+    })
     // Something in `createContextUpdater` is refreshing the API calls for nodes automagically.
     // This what I would be doing manually so it works out fine but I'm a bit concerned
     // that it is not being invoked explicitly from within this action.
