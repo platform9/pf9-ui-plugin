@@ -14,6 +14,7 @@ export interface Alarm {
   status: string
   summary: string
   type: string
+  for: string
 }
 
 export interface Annotations {
