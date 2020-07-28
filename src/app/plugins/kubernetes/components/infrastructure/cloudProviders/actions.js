@@ -8,6 +8,7 @@ import {
   clustersCacheKey,
   combinedHostsCacheKey,
 } from 'k8s/components/infrastructure/common/actions'
+import { trackEvent } from 'utils/tracking'
 import ApiClient from 'api-client/ApiClient'
 
 const { qbert } = ApiClient.getInstance()
@@ -32,7 +33,14 @@ export const cloudProviderActions = createCRUDActions(cloudProvidersCacheKey, {
     return { ...cloudProvider }
   },
   updateFn: ({ uuid, ...data }) => qbert.updateCloudProvider(uuid, data),
-  deleteFn: ({ uuid }) => qbert.deleteCloudProvider(uuid),
+  deleteFn: async ({ uuid, name, type }) => {
+    const result = await qbert.deleteCloudProvider(uuid)
+    trackEvent('Delete Cloud Provider', {
+      cloud_provider_name: name,
+      cloud_provider_type: type,
+    })
+    return result
+  },
   customOperations: {
     attachNodesToCluster: async ({ clusterUuid, nodes }, currentItems) => {
       const nodeUuids = pluck('uuid', nodes)

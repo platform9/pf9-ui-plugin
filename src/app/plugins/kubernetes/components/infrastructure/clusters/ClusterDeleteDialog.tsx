@@ -17,6 +17,7 @@ import { ICluster } from './model'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import Alert from 'core/components/Alert'
 import { CloudProviders } from '../cloudProviders/model'
+import { trackEvent } from 'utils/tracking'
 
 interface IClusterDeleteDialog {
   rows: ICluster[]
@@ -26,11 +27,16 @@ interface IClusterDeleteDialog {
 const stopPropagation = (e) => e.stopPropagation()
 const ClusterDeleteDialog: React.FC<IClusterDeleteDialog> = ({ rows: [cluster], onClose }) => {
   const [showDeauthNodeDialog, setShowDeauthNodeDialog] = useState(false)
-  const [deleteCluster, deletingCluster] = useDataUpdater(clusterActions.delete, (success) =>
+  const [deleteCluster, deletingCluster] = useDataUpdater(clusterActions.delete, (success) => {
+    trackEvent('Delete Cluster', {
+      cluster_name: cluster.name,
+      cluster_nodes: cluster.nodes.length,
+      cloud_provider_type: cluster.cloudProviderType,
+    })
     // TODO: If deauth node feature is supported after cluster delete then enable this feature
     // eslint-disable-next-line no-constant-condition
-    false && success && cluster?.nodes?.length > 0 ? setShowDeauthNodeDialog(true) : onClose(),
-  )
+    false && success && cluster?.nodes?.length > 0 ? setShowDeauthNodeDialog(true) : onClose()
+  })
   const title = `Permanently delete cluster "${cluster?.name}"?`
   const handleDelete = useCallback(
     (e) => {
