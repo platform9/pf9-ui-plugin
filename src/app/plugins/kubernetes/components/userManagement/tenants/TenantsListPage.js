@@ -4,6 +4,8 @@ import { mngmTenantActions } from 'k8s/components/userManagement/tenants/actions
 import { k8sPrefix } from 'app/constants'
 import { pathJoin } from 'utils/misc'
 
+const isNotServiceTenant = (tenants) => !tenants.find((t) => t.name === 'service')
+
 export const options = {
   addUrl: '/ui/kubernetes/user_management/tenants/add',
   addText: 'Create a New Tenant',
@@ -21,6 +23,8 @@ export const options = {
   ],
   editUrl: pathJoin(k8sPrefix, 'user_management/tenants/edit'),
   loaderFn: mngmTenantActions.list,
+  deleteCond: isNotServiceTenant,
+  editCond: isNotServiceTenant,
   deleteFn: mngmTenantActions.delete,
   name: 'Tenants',
   title: 'Tenants',
