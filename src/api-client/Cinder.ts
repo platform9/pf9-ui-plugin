@@ -3,7 +3,7 @@ import axios from 'axios'
 import ApiService from 'api-client/ApiService'
 
 class Cinder extends ApiService {
-  endpoint = () => {
+  endpoint = async () => {
     return this.client.keystone.getServiceEndpoint('cinderv3', 'admin')
   }
 

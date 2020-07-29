@@ -53,8 +53,8 @@ const groupByRegion = (catalog) => {
 }
 
 class Keystone extends ApiService {
-  endpoint = () => {
-    return this.client.options.keystoneEndpoint
+  endpoint = async () => {
+    return Promise.resolve(this.client.options.keystoneEndpoint)
   }
 
   get v3() {

@@ -2,7 +2,7 @@ import axios from 'axios'
 import ApiService from 'api-client/ApiService'
 
 class Neutron extends ApiService {
-  endpoint() {
+  async endpoint() {
     return this.client.keystone.getServiceEndpoint('neutron', 'admin')
   }
 

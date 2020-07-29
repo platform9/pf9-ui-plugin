@@ -10,7 +10,7 @@ const renameKey = (srcKey, destKey) => (obj) =>
   )
 
 class Nova extends ApiService {
-  endpoint() {
+  async endpoint() {
     return this.client.keystone.getServiceEndpoint('nova', 'internal')
   }
 

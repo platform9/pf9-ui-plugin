@@ -9,7 +9,7 @@ const replaceOp = op('replace')
 */
 
 class Glance extends ApiService {
-  endpoint() {
+  async endpoint() {
     return this.client.keystone.getServiceEndpoint('glance', 'admin')
   }
 

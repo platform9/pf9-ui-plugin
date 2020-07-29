@@ -231,7 +231,6 @@ const AuthenticatedContainer = () => {
   // stack is the name of the plugin (ex. openstack, kubernetes, developer, theme)
   const stack = determineStack(history, regionFeatures)
 
-
   const plugins = pluginManager.getPlugins()
   const sections = getSections(plugins, role)
   const devEnabled = window.localStorage.enableDevPlugin === 'true'
@@ -265,10 +264,9 @@ const AuthenticatedContainer = () => {
                       component="a"
                       target="_blank"
                       href={getSandboxUrl('signup')}
-                      onClick={() => trackEvent(
-                        'CTA Deploy a Cluster Now',
-                        { 'CTA-Page': 'PMK Live Demo' }
-                      )}
+                      onClick={() =>
+                        trackEvent('CTA Deploy a Cluster Now', { 'CTA-Page': 'PMK Live Demo' })
+                      }
                     >
                       Start your Free Plan Now
                     </Button>{' '}
@@ -277,10 +275,7 @@ const AuthenticatedContainer = () => {
                       component="a"
                       target="_blank"
                       href={getSandboxUrl('contact')}
-                      onClick={() => trackEvent(
-                        'CTA Contact Us',
-                        { 'CTA-Page': 'PMK Live Demo' }
-                      )}
+                      onClick={() => trackEvent('CTA Contact Us', { 'CTA-Page': 'PMK Live Demo' })}
                     >
                       Contact Us
                     </Button>

@@ -57,7 +57,7 @@ class ResMgr extends ApiService {
   }
 
   async getRole(hostId, role) {
-    return await this.client.basicGet(`${await this.endpoint()}/hosts/${hostId}/roles/${role}`)
+    return this.client.basicGet(`${await this.endpoint()}/hosts/${hostId}/roles/${role}`)
   }
 
   async unauthorizeHost(id) {
@@ -66,11 +66,11 @@ class ResMgr extends ApiService {
   }
 
   async getService(service) {
-    return await this.client.basicGet(`${await this.endpoint()}/services/${service}`)
+    return this.client.basicGet(`${await this.endpoint()}/services/${service}`)
   }
 
   async updateService(service, body) {
-    return await this.client.basicPut(`${await this.endpoint()}/services/${service}`, body)
+    return this.client.basicPut(`${await this.endpoint()}/services/${service}`, body)
   }
 }
 

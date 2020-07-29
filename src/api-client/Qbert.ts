@@ -44,7 +44,7 @@ class Qbert extends ApiService {
     return mappedEndpoint
   }
 
-  monocularBaseUrl = () => {
+  monocularBaseUrl = async () => {
     return this.client.keystone.getServiceEndpoint('monocular', 'public')
   }
 
