@@ -1,8 +1,9 @@
 import createContextLoader from 'core/helpers/createContextLoader'
 import ApiClient from 'api-client/ApiClient'
-import { path, propEq, pluck, pipe, find, prop, flatten } from 'ramda'
+import { path, propEq, pluck, pipe, find, prop, flatten, equals } from 'ramda'
 import { someAsync } from 'utils/async'
 import { clustersCacheKey } from '../infrastructure/common/actions'
+import { prometheusRulesCacheKey } from 'k8s/components/prometheus/actions'
 import moment from 'moment'
 import { pathStr } from 'utils/fp'
 import { allKey } from 'app/constants'
@@ -31,6 +32,18 @@ export const loadAlerts = createContextLoader(
   {
     dataMapper: async (items, params, loadFromContext) => {
       const clusters = await loadFromContext(clustersCacheKey, { healthyClusters: true, prometheusClusters: true })
+      const prometheusRules = await loadFromContext(prometheusRulesCacheKey, params)
+      // Need to dig into the coreos prometheus rules to fetch the 'for' property
+      const flattenedRules = flatten(prometheusRules.map((cluster) => (
+        flatten(cluster.rules.map((rules) => (
+          rules.rules.map((rule) => (
+            {
+              ...rule,
+              clusterUuid: cluster.clusterUuid,
+            }
+          ))
+        ))
+      ))))
       const host = await getQbertEndpoint()
       const alerts = items.map((item) => ({
         ...item,
@@ -39,6 +52,11 @@ export const loadAlerts = createContextLoader(
         activeAt: path(['alerts', 0, 'activeAt'], item),
         status: item.alerts.length ? 'Active' : 'Closed',
         clusterName: pipe(find(propEq('uuid', item.clusterId)), prop('name'))(clusters),
+        for: flattenedRules.find((rule) => {
+          return equals(rule.alert, item.name)
+            && equals(pathStr('labels.severity', rule), pathStr('labels.severity', item))
+            && equals(rule.clusterUuid, item.clusterId)
+        }).for,
         grafanaLink: `${host}/k8s/v1/clusters/${item.clusterId}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:grafana-ui:80/proxy/`,
       }))
       return params.showNeverActive ? alerts : alerts.filter((alert) => alert.activeAt)

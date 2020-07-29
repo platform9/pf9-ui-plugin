@@ -64,7 +64,7 @@ const AlarmDetailsDialog = ({ alarm, onClose }: Props) => {
   const lowerValues = [
     { key: 'Alarm Description', value: alarm.summary },
     { key: 'Conditions', value: alarm.query },
-    { key: 'Duration', value: `${alarm.duration}min` },
+    { key: 'Duration', value: alarm.for || 'N/A' },
   ]
 
   return (
