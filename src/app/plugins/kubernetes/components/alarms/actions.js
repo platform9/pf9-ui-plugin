@@ -152,6 +152,7 @@ export const loadTimeSeriesAlerts = createContextLoader(
       const severityCounts = getSeverityCounts(all, timestamps)
       return timestamps.map((timestamp) => (
         {
+          timestamp,
           time: moment.unix(timestamp).format('h:mm A'),
           ...severityCounts[timestamp],
         }
