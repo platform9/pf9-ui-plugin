@@ -1,8 +1,13 @@
 import { k8sPrefix, appUrlRoot } from 'app/constants'
-import { CloudProviders } from 'k8s/components/infrastructure/cloudProviders/model'
+import URLPattern from 'url-pattern'
 
 interface GenericKVP {
   [key: string]: string
+}
+
+interface IRouteOptions {
+  url: string
+  name: string
 }
 
 type OptionalGenericKVP = GenericKVP | null | void
@@ -14,7 +19,17 @@ type OptionalParamType<T extends OptionalGenericKVP> = T extends null
 type RouterPathFn<T extends OptionalGenericKVP> = (params: OptionalParamType<T>) => string
 
 export class Route<T extends OptionalGenericKVP = null> {
-  constructor(public url: string) {}
+  url: string
+  name: string
+  pattern: URLPattern
+
+  static routes: Route[] = []
+
+  constructor(options : IRouteOptions) {
+    this.url = options.url
+    this.name = options.name
+    this.pattern = new URLPattern(options.url)
+  }
 
   public path: RouterPathFn<T> = (params: OptionalParamType<T>) => {
     return this.createUrlWithQueryString(new URL(this.url, window.location.origin), params)
@@ -22,6 +37,28 @@ export class Route<T extends OptionalGenericKVP = null> {
 
   public toString(): string {
     return this.path(null)
+  }
+
+  /**
+   * Register a route for this application
+   * @param route route to register
+   */
+  static register(routeOptions: IRouteOptions): Route {
+    const route = new Route(routeOptions)
+    Route.routes.push(route)
+    return route
+  }
+
+  static getRoutes(): Route[] {
+    return Route.routes
+  }
+
+  static getCurrentRoute(): Route | null {
+    return Route.find()
+  }
+
+  static find(pathname: string = location.pathname): Route | null {
+    return Route.getRoutes().find((r) => !!r.pattern.match(pathname))
   }
 
   /*
@@ -32,6 +69,7 @@ export class Route<T extends OptionalGenericKVP = null> {
     if (!params || Object.keys(params || []).length === 0) {
       return this.url
     }
+
     const fields: GenericKVP = { ...(params as any) }
 
     // nice utility to reconstruct urls from objects / models
@@ -55,108 +93,92 @@ export class Route<T extends OptionalGenericKVP = null> {
   }
 }
 
+/* eslint-disable max-len */
 export const routes = {
   cluster: {
-    list: new Route(`${k8sPrefix}/infrastructure#clusters`),
-    edit: new Route<{ id: string }>(`${k8sPrefix}/infrastructure/clusters/edit/:id`),
-    detail: new Route<{ id: string }>(`${k8sPrefix}/infrastructure/clusters/:id#clusterDetails`),
-    nodes: new Route<{ id: string }>(`${k8sPrefix}/infrastructure/clusters/:id#nodes`),
-    nodeHealth: new Route<{ id: string }>(`${k8sPrefix}/infrastructure/clusters/:id#nodeHealth`),
-    add: new Route(`${k8sPrefix}/infrastructure/clusters/add`),
-    addAws: new Route(`${k8sPrefix}/infrastructure/clusters/addAws`),
-    addAzure: new Route(`${k8sPrefix}/infrastructure/clusters/addAzure`),
-    addBareOs: new Route(`${k8sPrefix}/infrastructure/clusters/addBareOs`),
-    scaleMasters: new Route<{ id: string }>(
-      `${k8sPrefix}/infrastructure/clusters/scaleMasters/:id`,
-    ),
-    scaleWorkers: new Route<{ id: string }>(
-      `${k8sPrefix}/infrastructure/clusters/scaleWorkers/:id`,
-    ),
+    list: Route.register({ url: `${k8sPrefix}/infrastructure#clusters`, name: 'Infrastructure:Clusters:List' }),
+    edit: Route.register({ url: `${k8sPrefix}/infrastructure/clusters/edit/:id`, name: 'Infrastructure:Clusters:Edit' }),
+    detail: Route.register({ url: `${k8sPrefix}/infrastructure/clusters/:id#clusterDetails`, name: 'Infrastructure:Clusters:Details' }),
+    nodes: Route.register({ url: `${k8sPrefix}/infrastructure/clusters/:id#nodes`, name: 'Infrastructure:Clusters:Nodes' }),
+    nodeHealth: Route.register({ url: `${k8sPrefix}/infrastructure/clusters/:id#nodeHealth`, name: 'Infrastructure:Clusters:NodeHealth' }),
+    add: Route.register({ url: `${k8sPrefix}/infrastructure/clusters/add`, name: 'Infrastructure:Clusters:Add' }),
+    addAws: Route.register({ url: `${k8sPrefix}/infrastructure/clusters/addAws`, name: 'Infrastructure:Clusters:AddAws' }),
+    addAzure: Route.register({ url: `${k8sPrefix}/infrastructure/clusters/addAzure`, name: 'Infrastructure:Clusters:AddAzure' }),
+    addBareOs: Route.register({ url: `${k8sPrefix}/infrastructure/clusters/addBareOs`, name: 'Infrastructure:Clusters:AddBareOs' }),
+    scaleMasters: Route.register({ url: `${k8sPrefix}/infrastructure/clusters/scaleMasters/:id`, name: 'Infrastructure:Clusters:ScaleMasters' } ),
+    scaleWorkers: Route.register({ url: `${k8sPrefix}/infrastructure/clusters/scaleWorkers/:id`, name: 'Infrastructure:Clusters:ScaleWorkers' }),
   },
-  dashboard: new Route(`${k8sPrefix}/dashboard`),
-  apiAccess: new Route(`${k8sPrefix}/api_access`),
+  dashboard: Route.register({ url: `${k8sPrefix}/dashboard`, name: 'Dashboard' }),
+  apiAccess: Route.register({ url: `${k8sPrefix}/api_access`, name: 'APIAccess' }),
   nodes: {
-    list: new Route(`${k8sPrefix}/infrastructure#nodes`),
-    detail: new Route<{ id: string }>(`${k8sPrefix}/infrastructure/nodes/:id`),
-    download: new Route(`${k8sPrefix}/infrastructure/nodes/cli/download`),
+    list: Route.register({ url: `${k8sPrefix}/infrastructure#nodes`, name: 'Nodes:List' }),
+    detail: Route.register({ url: `${k8sPrefix}/infrastructure/nodes/:id`, name: 'Nodes:Details' }),
+    download: Route.register({ url: `${k8sPrefix}/infrastructure/nodes/cli/download`, name: 'Nodes:Download' }),
   },
   cloudProviders: {
-    list: new Route(`${k8sPrefix}/infrastructure#cloudProviders`),
-    edit: new Route<{ id: string }>(`${k8sPrefix}/infrastructure/cloudProviders/edit/:id`),
-    add: new Route<{ type: CloudProviders }>(`${k8sPrefix}/infrastructure/cloudProviders/add`),
+    list: Route.register({ url: `${k8sPrefix}/infrastructure#cloudProviders`, name: 'CloudProviders:List' }),
+    edit: Route.register({ url: `${k8sPrefix}/infrastructure/cloudProviders/edit/:id`, name: 'CloudProviders:Edit' }),
+    add: Route.register({ url: `${k8sPrefix}/infrastructure/cloudProviders/add`, name: 'CloudProviders:Add' }),
   },
   apps: {
-    list: new Route(`${k8sPrefix}/apps`),
-    detail: new Route<{ clusterId: string; release: string; id: string }>(
-      `${k8sPrefix}/apps/:clusterId/:release/:id`,
-    ),
-    deployed: new Route<{ clusterId: string; release: string }>(
-      `${k8sPrefix}/apps/deployed/:clusterId/:release`,
-    ),
+    list: Route.register({ url: `${k8sPrefix}/apps`, name: 'Apps:List' }),
+    detail: Route.register({ url: `${k8sPrefix}/apps/:clusterId/:release/:id`, name: 'Apps:Details' }),
+    deployed: Route.register({ url: `${k8sPrefix}/apps/deployed/:clusterId/:release`, name: 'Apps:Deployed' }),
   },
   pods: {
-    list: new Route(`${k8sPrefix}/pods#pods`),
-    add: new Route(`${k8sPrefix}/pods/add`),
+    list: Route.register({ url: `${k8sPrefix}/pods#pods`, name: 'Pods:List' }),
+    add: Route.register({ url: `${k8sPrefix}/pods/add`, name: 'Pods:Add' }),
   },
   services: {
-    list: new Route(`${k8sPrefix}/pods#services`),
-    add: new Route(`${k8sPrefix}/pods/services/add`),
+    list: Route.register({ url: `${k8sPrefix}/pods#services`, name: 'Services:List' }),
+    add: Route.register({ url: `${k8sPrefix}/pods/services/add`, name: 'Services:Add' }),
   },
   deployments: {
-    list: new Route(`${k8sPrefix}/pods#deployments`),
-    add: new Route(`${k8sPrefix}/pods/deployments/add`),
+    list: Route.register({ url: `${k8sPrefix}/pods#deployments`, name: 'Deployments:List' }),
+    add: Route.register({ url: `${k8sPrefix}/pods/deployments/add`, name: 'Deployments:Add' }),
   },
   storage: {
-    list: new Route(`${k8sPrefix}/storage_classes`),
-    add: new Route(`${k8sPrefix}/storage_classes/add`),
+    list: Route.register({ url: `${k8sPrefix}/storage_classes`, name: 'Storage:List' }),
+    add: Route.register({ url: `${k8sPrefix}/storage_classes/add`, name: 'Storage:Add' }),
   },
   logging: {
-    list: new Route(`${k8sPrefix}/logging`),
-    add: new Route(`${k8sPrefix}/logging/add`),
-    edit: new Route<{ id: string }>(`${k8sPrefix}/logging/edit/:id`),
+    list: Route.register({ url: `${k8sPrefix}/logging`, name: 'Logging:List' }),
+    add: Route.register({ url: `${k8sPrefix}/logging/add`, name: 'Logging:Add' }),
+    edit: Route.register({ url: `${k8sPrefix}/logging/edit/:id`, name: 'Logging:Edit' }),
   },
   namespaces: {
-    list: new Route(`${k8sPrefix}/namespaces`),
-    add: new Route(`${k8sPrefix}/namespaces/add`),
+    list: Route.register({ url: `${k8sPrefix}/namespaces`, name: 'Namespaces:List' }),
+    add: Route.register({ url: `${k8sPrefix}/namespaces/add`, name: 'Namespaces:Add' }),
   },
   userManagement: {
-    users: new Route(`${k8sPrefix}/user_management#users`),
-    tenants: new Route(`${k8sPrefix}/user_management#tenants`),
-    addTenant: new Route(`${k8sPrefix}/user_management/tenants/add`),
-    editTenant: new Route<{ id: string }>(`${k8sPrefix}/user_management/tenants/edit/:id`),
-    addUser: new Route(`${k8sPrefix}/user_management/users/add`),
-    editUser: new Route<{ id: string }>(`${k8sPrefix}/user_management/users/edit/:id`),
+    users: Route.register({ url: `${k8sPrefix}/user_management#users`, name: 'UserManagement:Users:List' }),
+    tenants: Route.register({ url: `${k8sPrefix}/user_management#tenants`, name: 'UserManagement:Tenants:List' }),
+    addTenant: Route.register({ url: `${k8sPrefix}/user_management/tenants/add`, name: 'UserManagement:Tenants:Add' }),
+    editTenant: Route.register({ url: `${k8sPrefix}/user_management/tenants/edit/:id`, name: 'UserManagement:Tenants:Edit' }),
+    addUser: Route.register({ url: `${k8sPrefix}/user_management/users/add`, name: 'UserManagement:User:Add' }),
+    editUser: Route.register({ url: `${k8sPrefix}/user_management/users/edit/:id`, name: 'UserManagement:User:Edit' }),
   },
   prometheus: {
-    list: new Route(`${k8sPrefix}/prometheus`),
-    add: new Route(`${k8sPrefix}/prometheus/instances/add`),
-    edit: new Route<{ id: string }>(`${k8sPrefix}/prometheus/instances/edit/:id`),
-    editRules: new Route<{ id: string }>(`${k8sPrefix}/prometheus/rules/edit/:id`),
-    editServiceMonitors: new Route<{ id: string }>(
-      `${k8sPrefix}/prometheus/serviceMonitors/edit/:id`,
-    ),
-    editAlertManagers: new Route<{ id: string }>(`${k8sPrefix}/prometheus/alertManagers/edit/:id`),
+    list: Route.register({ url: `${k8sPrefix}/prometheus`, name: 'Prometheus:List' }),
+    add: Route.register({ url: `${k8sPrefix}/prometheus/instances/add`, name: 'Prometheus:Add' }),
+    edit: Route.register({ url: `${k8sPrefix}/prometheus/instances/edit/:id`, name: 'Prometheus:Edit' }),
+    editRules: Route.register({ url: `${k8sPrefix}/prometheus/rules/edit/:id`, name: 'Prometheus:Rules:Edit' }),
+    editServiceMonitors: Route.register({ url:  `${k8sPrefix}/prometheus/serviceMonitors/edit/:id`, name: 'Prometheus:ServiceMonitors:Edit' }),
+    editAlertManagers: Route.register({ url: `${k8sPrefix}/prometheus/alertManagers/edit/:id`, name: 'Promtheus:AltertManagers:Edit' }),
   },
   rbac: {
-    list: new Route(`${k8sPrefix}/rbac`),
-    addRoles: new Route(`${k8sPrefix}/rbac/roles/add`),
-    addClusterRoles: new Route(`${k8sPrefix}/rbac/clusterroles/add`),
-    addRoleBindings: new Route(`${k8sPrefix}/rbac/rolebindings/add`),
-    addClusterRoleBindings: new Route(`${k8sPrefix}/rbac/clusterrolebindings/add`),
-    editRoles: new Route<{ id: string; clusterId: string }>(
-      `${k8sPrefix}/rbac/roles/edit/:id/cluster/:clusterId`,
-    ),
-    editClusterRoles: new Route<{ id: string; clusterId: string }>(
-      `${k8sPrefix}/rbac/clusterroles/edit/:id/cluster/:clusterId`,
-    ),
-    editRoleBindings: new Route<{ id: string; clusterId: string }>(
-      `${k8sPrefix}/rbac/rolebindings/edit/:id/cluster/:clusterId`,
-    ),
-    editClusterRoleBindings: new Route<{ id: string; clusterId: string }>(
-      `${k8sPrefix}/rbac/clusterrolebindings/edit/:id/cluster/:clusterId`,
-    ),
+    list: Route.register({ url: `${k8sPrefix}/rbac`, name: 'RBAC:List' }),
+    addRoles: Route.register({ url: `${k8sPrefix}/rbac/roles/add`, name: 'RBAC:List' }),
+    addClusterRoles: Route.register({ url: `${k8sPrefix}/rbac/clusterroles/add`, name: 'RBAC:ClusterRoles:Add' }),
+    addRoleBindings: Route.register({ url: `${k8sPrefix}/rbac/rolebindings/add`, name: 'RBAC:RoleBindings:Add' }),
+    editRoleBindings: Route.register({ url: `${k8sPrefix}/rbac/rolebindings/edit/:id/cluster/:clusterId`, name: 'RBAC:RoleBindings:Edit' }),
+    addClusterRoleBindings: Route.register({ url: `${k8sPrefix}/rbac/clusterrolebindings/add`, name: 'RBAC:ClusterRolesBindings:Add' }),
+    editRoles: Route.register({ url: `${k8sPrefix}/rbac/roles/edit/:id/cluster/:clusterId`, name: 'RBAC:Roles:Edit' }),
+    editClusterRoles: Route.register({ url: `${k8sPrefix}/rbac/clusterroles/edit/:id/cluster/:clusterId`, name: 'RBAC:ClusterRoles:Edit' }),
+    editClusterRoleBindings: Route.register({ url: `${k8sPrefix}/rbac/clusterrolebindings/edit/:id/cluster/:clusterId`, name: 'RBAC:ClusterRoleBindings:Edit' }),
   },
   password: {
-    reset: new Route<{ id: string }>(`${appUrlRoot}/reset/password/:id`),
+    reset: Route.register({ url: `${appUrlRoot}/reset/password/:id`, name: 'Password:Reset' }),
   },
 }
+/* eslint-enable max-len */
