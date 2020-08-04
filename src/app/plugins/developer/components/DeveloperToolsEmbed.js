@@ -14,6 +14,8 @@ import {
   Typography,
 } from '@material-ui/core'
 
+import { version } from '../../../../../package.json'
+
 const styles = (theme) => ({
   root: {
     marginTop: theme.spacing(4),
@@ -78,7 +80,7 @@ class DeveloperToolsEmbed extends React.PureComponent {
       <div className={classes.root}>
         {/* {<Button onClick={this.collapse}>collapse devtools</Button>} */}
         <Typography className={classes.title} variant="subtitle1">
-          Developer Tools
+          Developer Tools. V{version}
         </Typography>
         <Panel title="Context Viewer">
           <ContextViewer />
