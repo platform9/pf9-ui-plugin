@@ -66,7 +66,7 @@ export const getHighestRole = (roleNames) => {
   }
 }
 
-export const normalizeResponse = (response) => {
+export const normalizeResponse = <T>(response): T => {
   const data = response && response.hasOwnProperty('data') ? response.data : response
   // Fix nested data.data issue
   return (data && data.hasOwnProperty('data') ? data.data : data) || emptyArr

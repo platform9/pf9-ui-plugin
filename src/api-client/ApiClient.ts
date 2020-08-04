@@ -176,37 +176,37 @@ class ApiClient implements IApiClient {
     return response
   }
 
-  basicGet = async <T>(clsName, mthdName, url, params = undefined) => {
+  basicGet = async <T extends any>(clsName, mthdName, url, params = undefined) => {
     const response = await this.axiosInstance.get<T>(url, {
       params,
       ...this.getAuthHeaders(),
     })
     ApiCache.instance.cacheItem(clsName, mthdName, response)
-    return normalizeResponse(response)
+    return normalizeResponse<T>(response)
   }
 
-  basicPost = async <T>(clsName, mthdName, url, body = undefined) => {
+  basicPost = async <T extends any>(clsName, mthdName, url, body = undefined) => {
     const response = await this.axiosInstance.post<T>(url, body, this.getAuthHeaders())
     ApiCache.instance.cacheItem(clsName, mthdName, response)
-    return normalizeResponse(response)
+    return normalizeResponse<T>(response)
   }
 
-  basicPatch = async <T>(clsName, mthdName, url, body = undefined) => {
+  basicPatch = async <T extends any>(clsName, mthdName, url, body = undefined) => {
     const response = await this.axiosInstance.patch<T>(url, body, this.getAuthHeaders())
     ApiCache.instance.cacheItem(clsName, mthdName, response)
-    return normalizeResponse(response)
+    return normalizeResponse<T>(response)
   }
 
-  basicPut = async <T>(clsName, mthdName, url, body = undefined) => {
+  basicPut = async <T extends any>(clsName, mthdName, url, body = undefined) => {
     const response = await this.axiosInstance.put<T>(url, body, this.getAuthHeaders())
     ApiCache.instance.cacheItem(clsName, mthdName, response)
-    return normalizeResponse(response)
+    return normalizeResponse<T>(response)
   }
 
-  basicDelete = async <T>(clsName, mthdName, url) => {
+  basicDelete = async <T extends any>(clsName, mthdName, url) => {
     const response = await this.axiosInstance.delete<T>(url, this.getAuthHeaders())
     ApiCache.instance.cacheItem(clsName, mthdName, response)
-    return normalizeResponse(response)
+    return normalizeResponse<T>(response)
   }
 }
 
