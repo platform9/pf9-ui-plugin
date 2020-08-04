@@ -791,7 +791,8 @@ class Qbert extends ApiService {
 
   updateLogging = async (clusterUuid, logging) => {
     const url = `${await this.getLoggingsBaseUrl(clusterUuid)}/${logging.uuid}`
-    return this.client.basicPut(url, logging)
+    return this.client.basicPut<{ id: string }>('', 'updateLogging', url, logging)
+    // TODO use models on basic methods
   }
 
   deleteLogging = async (clusterUuid, loggingUuid) => {

@@ -148,7 +148,7 @@ class Cinder extends ApiService {
   async updateVolumeType(id, params, keysToDelete = []) {
     const url = `${await this.endpoint()}/types/${id}`
     const { extra_specs: extraSpecs, ...rest } = params
-    const baseResponse = await axios.put(url, { volume_type: rest }, this.client.getAuthHeaders())
+    const baseResponse = await this.client.basicPut() axios.put(url, { volume_type: rest }, this.client.getAuthHeaders())
     await axios.post(
       `${url}/extra_specs`,
       { extra_specs: extraSpecs },
