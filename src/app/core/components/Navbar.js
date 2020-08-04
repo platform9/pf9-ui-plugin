@@ -28,7 +28,6 @@ import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { imageUrls, clarityDashboardUrl, helpUrl } from 'app/constants'
 import { routes } from 'core/utils/routes'
 
-import { version } from '../../../../package.json'
 import SimpleLink from './SimpleLink'
 import { withAppContext } from 'core/providers/AppProvider'
 
@@ -603,6 +602,7 @@ class Navbar extends PureComponent {
 
     const { features } = getContext()
     const isDecco = pathStrOr(false, 'experimental.kplane', features)
+    const version = pathStrOr('4', 'releaseVersion', features)
 
     return (
       <div
