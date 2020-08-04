@@ -602,7 +602,7 @@ class Navbar extends PureComponent {
 
     const { features } = getContext()
     const isDecco = pathStrOr(false, 'experimental.kplane', features)
-    const version = pathStrOr('N/A', 'releaseVersion', features)
+    const version = pathStrOr('4', 'releaseVersion', features)
 
     return (
       <div
