@@ -3,6 +3,7 @@ export interface Alarm {
   annotations: Annotations
   clusterId: string
   clusterName: string
+  description: string
   duration: number
   grafanaLink: string
   health: string

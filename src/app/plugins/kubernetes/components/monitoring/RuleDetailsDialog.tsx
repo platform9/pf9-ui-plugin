@@ -8,12 +8,12 @@ import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { Theme } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import DisplayKeyValues from 'core/components/DisplayKeyValues'
-import { formatDate } from 'utils/misc'
-import { SeverityTableCell } from './AlarmsListPage'
-import { Alarm } from './model'
+import { SeverityTableCell } from 'k8s/components/alarms/AlarmsListPage'
+import { Alarm } from 'k8s/components/alarms/model'
+import DisplayLabels from 'core/components/DisplayLabels'
 
 interface Props {
-  alarm: Alarm
+  rule: Alarm
   onClose: () => void
 }
 
@@ -53,29 +53,30 @@ const useStyles = makeStyles((theme: Theme) => ({
 // the modal window will cause the table row to be toggled.
 const stopPropagation = (e) => e.stopPropagation()
 
-const AlarmDetailsDialog = ({ alarm, onClose }: Props) => {
+const RuleDetailsDialog = ({ rule, onClose }: Props) => {
   const classes = useStyles({})
 
   const upperValues = [
-    { key: 'Event Time', value: formatDate(alarm.activeAt) },
-    { key: 'Alarm Severity', value: alarm.severity, render: (value) => <SeverityTableCell value={value} /> },
-    { key: 'Alarm Summary', value: alarm.summary },
+    { key: 'Alarm Severity', value: rule.severity, render: (value) => <SeverityTableCell value={value} /> },
+    { key: 'Alarm Summary', value: rule.summary },
   ]
   const lowerValues = [
-    { key: 'Alarm Description', value: alarm.description },
-    { key: 'Conditions', value: alarm.query },
-    { key: 'Duration', value: alarm.for || 'N/A' },
+    { key: 'Alarm Description', value: rule.description },
+    { key: 'Conditions', value: rule.query },
+    { key: 'Duration', value: rule.for || 'N/A' },
+    { key: 'Labels', value: rule.labels, render: (value) => <DisplayLabels labels={value} />},
+    { key: 'Annotations', value: rule.annotations, render: (value) => <DisplayLabels labels={value} />},
   ]
 
   return (
     <Dialog open onClose={onClose} onClick={stopPropagation}>
       <div className={classes.container}>
         <div className={classes.header}>
-          <div>Alarm Details</div>
+          <div>Rule Details</div>
           <FontAwesomeIcon className={classes.icon} onClick={onClose}>times</FontAwesomeIcon>
         </div>
         <div className={classes.upperBody}>
-          <div className={classes.name}>{alarm.name}</div>
+          <div className={classes.name}>{rule.name}</div>
           <DisplayKeyValues keyValuePairs={upperValues} />
         </div>
         <div className={classes.lowerBody}>
@@ -90,5 +91,4 @@ const AlarmDetailsDialog = ({ alarm, onClose }: Props) => {
     </Dialog>
   )
 }
-
-export default AlarmDetailsDialog
+export default RuleDetailsDialog
