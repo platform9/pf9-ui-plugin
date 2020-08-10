@@ -8,9 +8,6 @@ import { createUsePrefParamsHook } from 'core/hooks/useParams'
 import { listTablePrefs } from 'app/constants'
 import { pick } from 'ramda'
 import { allKey } from 'app/constants'
-import PageContainer from 'core/components/pageContainer/PageContainer'
-import Tabs from 'core/components/tabs/Tabs'
-import Tab from 'core/components/tabs/Tab'
 import StackedAreaChart from 'core/components/graphs/StackedAreaChart'
 import { makeStyles } from '@material-ui/styles'
 import DateCell from 'core/components/listTable/cells/DateCell'
@@ -126,66 +123,62 @@ const ListPage = ({ ListContainer }) => {
     })
 
     return (
-      <PageContainer>
-        <Tabs>
-          <Tab value="alert" label="Alarm Overview">
-            <div className={classes.header}>
-              <div className={classes.filters}>
-                <div className={classes.clusterPicker}>
-                  <ClusterPicklist
-                    onChange={getParamsUpdater('clusterId')}
-                    value={params.clusterId}
-                    onlyMasterNodeClusters
-                    onlyPrometheusEnabled
-                    selectFirst={false}
-                  />
-                </div>
-                <div className={classes.clusterPicker}>
-                  <StatusPicklist
-                    name="status"
-                    label="Status"
-                    selectFirst={false}
-                    onChange={getParamsUpdater('status')}
-                    value={params.status}
-                  />
-                </div>
-                <SeverityPicklist
-                  name="severity"
-                  label="Severity"
-                  selectFirst={false}
-                  onChange={getParamsUpdater('severity')}
-                  value={params.severity}
-                />
-              </div>
-              <div className={classes.timePicker}>
-                <TimePicklist
-                  onChange={getParamsUpdater('chartTime')}
-                  value={params.chartTime}
-                />                
-              </div>
+      <>
+        <div className={classes.header}>
+          <div className={classes.filters}>
+            <div className={classes.clusterPicker}>
+              <ClusterPicklist
+                onChange={getParamsUpdater('clusterId')}
+                value={params.clusterId}
+                onlyMasterNodeClusters
+                onlyPrometheusEnabled
+                selectFirst={false}
+              />
             </div>
-            <div className={classes.chartContainer}>
-              <div className={classes.chartContainerHeader}>Alarms</div>
-              <div className={classes.moveLeft}>
-                <StackedAreaChart
-                  values={timeSeriesData}
-                  keys={filteredChartKeys}
-                  xAxis="time"
-                  responsive={true}
-                  CustomTooltip={<AlarmsChartTooltip keys={filteredChartKeys} />}
-                />
-              </div>
+            <div className={classes.clusterPicker}>
+              <StatusPicklist
+                name="status"
+                label="Status"
+                selectFirst={false}
+                onChange={getParamsUpdater('status')}
+                value={params.status}
+              />
             </div>
-            <ListContainer
-              loading={loading}
-              reload={reload}
-              data={filteredAlerts}
-              getParamsUpdater={getParamsUpdater}
-              {...pick(listTablePrefs, params)}
+            <SeverityPicklist
+              name="severity"
+              label="Severity"
+              selectFirst={false}
+              onChange={getParamsUpdater('severity')}
+              value={params.severity}
             />
-          </Tab>
-        </Tabs>
-      </PageContainer>
+          </div>
+          <div className={classes.timePicker}>
+            <TimePicklist
+              onChange={getParamsUpdater('chartTime')}
+              value={params.chartTime}
+            />
+          </div>
+        </div>
+        <div className={classes.chartContainer}>
+          <div className={classes.chartContainerHeader}>Alarms</div>
+          <div className={classes.moveLeft}>
+            <StackedAreaChart
+              values={timeSeriesData}
+              keys={filteredChartKeys}
+              xAxis="time"
+              responsive={true}
+              CustomTooltip={<AlarmsChartTooltip keys={filteredChartKeys} />}
+            />
+          </div>
+        </div>
+        <ListContainer
+          loading={loading}
+          reload={reload}
+          data={filteredAlerts}
+          getParamsUpdater={getParamsUpdater}
+          {...pick(listTablePrefs, params)}
+        />
+      </>
     )
   }
 }
