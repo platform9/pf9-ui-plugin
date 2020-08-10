@@ -48,7 +48,8 @@ export const loadAlerts = createContextLoader(
       const alerts = items.map((item) => ({
         ...item,
         severity: pathStr('labels.severity', item),
-        summary: pathStr('annotations.message', item),
+        description: pathStr('annotations.message', item),
+        summary: pathStr('annotations.summary', item),
         activeAt: path(['alerts', 0, 'activeAt'], item),
         status: item.alerts.length ? 'Active' : 'Closed',
         clusterName: pipe(find(propEq('uuid', item.clusterId)), prop('name'))(clusters),

@@ -10,7 +10,7 @@ interface Props {
 
 interface KeyValuePair {
   key: string
-  value: string
+  value: any // Might be an object or a string
   render?: any // Having trouble debugging this
 }
 
