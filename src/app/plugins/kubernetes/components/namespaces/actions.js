@@ -5,6 +5,7 @@ import { clustersCacheKey } from 'k8s/components/infrastructure/common/actions'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { parseClusterParams } from 'k8s/components/infrastructure/clusters/actions'
 import { someAsync } from 'utils/async'
+import { trackEvent } from 'utils/tracking'
 
 const { qbert } = ApiClient.getInstance()
 
@@ -33,11 +34,25 @@ const namespaceActions = createCRUDActions(namespacesCacheKey, {
   },
   createFn: async ({ clusterId, name }) => {
     const body = { metadata: { name } }
-    return qbert.createNamespace(clusterId, body)
+    const response = await qbert.createNamespace(clusterId, body)
+    trackEvent('WZ Create New Namespace', {
+      wizard_step:'Create Namespace',
+      wizard_state:'Complete',
+      wizard_progress:'1 of 1',
+      wizard_name:'Create New Namespace',
+    })
+    return response
   },
   deleteFn: async ({ id }, currentItems) => {
     const { clusterId, name } = currentItems.find((ns) => ns.id === id)
-    await qbert.deleteNamespace(clusterId, name)
+    const response = await qbert.deleteNamespace(clusterId, name)
+    trackEvent('WZ Delete Namespace', {
+      wizard_step:'Delete Namespace',
+      wizard_state:'Complete',
+      wizard_progress:'1 of 1',
+      wizard_name:'Deleted Namespace',
+    })
+    return response
   },
   uniqueIdentifier: 'id',
   indexBy: 'clusterId',
