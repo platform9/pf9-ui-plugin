@@ -398,11 +398,7 @@ class Keystone extends ApiService {
   getDownloadLinks = async () => {
     try {
       const linksUrl = await this.getServiceEndpoint('regioninfo', 'internal')
-      const { links } = await this.client.basicGet<GetFeatureLinks>(
-        'Keystone',
-        'getDownloadLinks',
-        linksUrl,
-      )
+      const { links } = await this.client.basicGet('Keystone', 'getDownloadLinks', linksUrl)
       return links
     } catch (err) {
       console.error(err)
