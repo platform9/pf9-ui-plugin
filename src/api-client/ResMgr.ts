@@ -1,6 +1,6 @@
-import axios from 'axios'
 import { partition, uniq, includes } from 'ramda'
 import ApiService from 'api-client/ApiService'
+import { Host } from './resmgr.model'
 
 const roleNames = {
   'pf9-ostackhost-neutron': 'Hypervisor',
@@ -37,6 +37,7 @@ export const localizeRoles = (roles: string[] = []) => {
 }
 
 class ResMgr extends ApiService {
+  clsName = 'resmgr'
   async endpoint() {
     const endpoint = await this.client.keystone.getServiceEndpoint('resmgr', 'internal')
     return `${endpoint}/v1`
@@ -44,21 +45,55 @@ class ResMgr extends ApiService {
 
   async getHosts() {
     const url = `${await this.endpoint()}/hosts`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data
+    const response = await this.client.basicGet<Host[]>('ResMgr', 'getHosts', url)
+    return response
   }
 
   async addRole(hostId, role, body) {
-    return this.client.basicPut(`${await this.endpoint()}/hosts/${hostId}/roles/${role}`, body)
+    return this.client.basicPut(
+      'ResMgr',
+      'addRole',
+      `${await this.endpoint()}/hosts/${hostId}/roles/${role}`,
+      body,
+    )
   }
 
   async removeRole(hostId, role): Promise<void> {
-    await this.client.basicDelete(`${await this.endpoint()}/hosts/${hostId}/roles/${role}`)
+    await this.client.basicDelete(
+      'ResMgr',
+      'removeRole',
+      `${await this.endpoint()}/hosts/${hostId}/roles/${role}`,
+    )
+  }
+
+  async getRole(hostId, role) {
+    return this.client.basicGet(
+      'ResMgr',
+      'getRole',
+      `${await this.endpoint()}/hosts/${hostId}/roles/${role}`,
+    )
   }
 
   async unauthorizeHost(id) {
     const url = `${await this.endpoint()}/hosts/${id}`
-    return axios.delete(url, this.client.getAuthHeaders())
+    return this.client.basicDelete('ResMgr', 'unauthorizeHost', url)
+  }
+
+  async getService(service) {
+    return this.client.basicGet(
+      'ResMgr',
+      'getService',
+      `${await this.endpoint()}/services/${service}`,
+    )
+  }
+
+  async updateService(service, body) {
+    return this.client.basicPut(
+      'ResMgr',
+      'updateService',
+      `${await this.endpoint()}/services/${service}`,
+      body,
+    )
   }
 }
 

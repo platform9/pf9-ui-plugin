@@ -1,9 +1,9 @@
 /* eslint-disable camelcase */
-import axios from 'axios'
 import ApiService from 'api-client/ApiService'
 
 class Cinder extends ApiService {
-  endpoint = () => {
+  clsName = 'cinder'
+  endpoint = async () => {
     return this.client.keystone.getServiceEndpoint('cinderv3', 'admin')
   }
 
@@ -22,21 +22,21 @@ class Cinder extends ApiService {
 
   async getVolume(id) {
     const url = `${await this.volumesUrl()}/${id}`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.volume
+    const response = await this.client.basicGet('Cinder', 'getVolume', url)
+    return response.volume
   }
 
   // Get volumes with details
   async getVolumes() {
     const url = `${await this.volumesUrl()}/detail`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.volumes
+    const response = await this.client.basicGet('Cinder', 'getVolumes', url)
+    return response.volumes
   }
 
   async getAllVolumes() {
     const url = `${await this.volumesUrl()}/detail?all_tenants=1`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.volumes
+    const response = await this.client.basicGet('Cinder', 'getAllVolumes', url)
+    return response.volumes
   }
 
   async getAllVolumesCount(limit, allTenants, markerId) {
@@ -45,201 +45,203 @@ class Cinder extends ApiService {
     const projectUrl = allTenants ? '&all_tenants=1' : ''
     const markerUrl = markerId ? `&marker=${markerId}` : ''
     const url = baseUrl + limitUrl + projectUrl + markerUrl
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.volumes
+    const response = await this.client.basicGet('Cinder', 'getAllVolumesCount', url)
+    return response.volumes
   }
 
   async createVolume(params) {
     const url = await this.volumesUrl()
-    const response = await axios.post(url, { volume: params }, this.client.getAuthHeaders())
-    return response.data.volume
+    const response = await this.client.basicPost('Cinder', 'getAllVolumesCount', url, {
+      volume: params,
+    })
+    return response.volume
   }
 
   async deleteVolume(id) {
     const url = `${await this.volumesUrl()}/${id}`
-    return axios.delete(url, this.client.getAuthHeaders())
+    return this.client.basicDelete('Cinder', 'deleteVolume', url)
   }
 
   async updateVolume(id, params) {
     const url = `${await this.volumesUrl()}/${id}`
-    const response = await axios.put(url, { volume: params }, this.client.getAuthHeaders())
-    return response.data.volume
+    const response = await this.client.basicPut('Cinder', 'updateVolume', url, { volume: params })
+    return response.volume
   }
 
   async setBootable(id, bool) {
     const url = `${await this.volumesUrl()}/${id}/action`
-    const response = await axios.post(
-      url,
-      { 'os-set_bootable': { bootable: bool } },
-      this.client.getAuthHeaders(),
-    )
-    return response.data.volume
+    const response = await this.client.basicPost('Cinder', 'setBootable', url, {
+      'os-set_bootable': { bootable: bool },
+    })
+    return response.volume
   }
 
   // TODO: Test case for extend function
   // TODO: Current API doesn't work on AWS. Need to implement check logic in test.
   async extendVolume(id, size) {
     const url = `${await this.volumesUrl()}/${id}/action`
-    const response = await axios.post(
-      url,
-      { 'os-extend': { 'new-size': size } },
-      this.client.getAuthHeaders(),
-    )
-    return response.data.volume
+    const response = await this.client.basicPost('Cinder', 'extendVolume', url, {
+      'os-extend': { 'new-size': size },
+    })
+    return response.volume
   }
 
   // TODO: test case for reset function (Instance implement needed. Attach function needed?)
   async resetVolumeStatus(id) {
     const url = `${await this.volumesUrl()}/${id}/action`
-    const response = await axios.post(
-      url,
-      {
-        'os-reset_status': {
-          status: 'available',
-          attach_status: 'detached',
-        },
+    const response = await this.client.basicPost('Cinder', 'resetVolumeStatus', url, {
+      'os-reset_status': {
+        status: 'available',
+        attach_status: 'detached',
       },
-      this.client.getAuthHeaders(),
-    )
-    return response.data.volume
+    })
+    return response.volume
   }
 
   // TODO: test case for upload function (Image implement needed)
   async uploadVolumeAsImage(id, image) {
     const url = `${await this.volumesUrl()}/${id}/action`
-    const response = await axios.post(
-      url,
-      {
-        'os-volume_upload_image': {
-          container_format: 'bare',
-          force: image.force,
-          image_name: image.name,
-          disk_format: image.diskFormat || 'raw',
-        },
+    const response = await this.client.basicPost('Cinder', 'uploadVolumeAsImage', url, {
+      'os-volume_upload_image': {
+        container_format: 'bare',
+        force: image.force,
+        image_name: image.name,
+        disk_format: image.diskFormat || 'raw',
       },
-      this.client.getAuthHeaders(),
-    )
-    return response.data.volume
+    })
+    return response.volume
   }
 
   async getVolumeTypes() {
     const url = `${await this.endpoint()}/types`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.volume_types
+    const response = await this.client.basicGet('Cinder', 'getVolumeTypes', url)
+    return response.volume_types
   }
 
   async getVolumeType(name) {
     const url = `${await this.endpoint()}/types`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.volume_types.find((x) => x.name === name)
+    const response = await this.client.basicGet('Cinder', 'getVolumeType', url)
+    return response.volume_types.find((x) => x.name === name)
   }
 
   async createVolumeType(params) {
     const url = `${await this.endpoint()}/types`
-    await axios.post(url, { volume_type: params }, this.client.getAuthHeaders())
+    await this.client.basicPost('Cinder', 'createVolumeType', url, { volume_type: params })
     return this.getVolumeType(params.name)
   }
 
   async deleteVolumeType(id) {
     const url = `${await this.endpoint()}/types/${id}`
-    await axios.delete(url, this.client.getAuthHeaders())
+    await this.client.basicDelete('Cinder', 'deleteVolumeType', url)
   }
 
   async updateVolumeType(id, params, keysToDelete = []) {
     const url = `${await this.endpoint()}/types/${id}`
     const { extra_specs: extraSpecs, ...rest } = params
-    const baseResponse = await axios.put(url, { volume_type: rest }, this.client.getAuthHeaders())
-    await axios.post(
-      `${url}/extra_specs`,
-      { extra_specs: extraSpecs },
-      this.client.getAuthHeaders(),
-    )
+    const baseResponse = await this.client.basicPut('Cinder', 'updateVolumeType', url, {
+      volume_type: rest,
+    })
+    await this.client.basicPost('Cinder', 'updateVolumeType/extra_specs', `${url}/extra_specs`, {
+      extra_specs: extraSpecs,
+    })
     await Promise.all(
       keysToDelete.map(async (key) => {
-        return axios.delete(`${url}/extra_specs/${key}`, this.client.getAuthHeaders())
+        return this.client.basicDelete(
+          'Cinder',
+          `updateVolumeType/extra_specs/${key}`,
+          `${url}/extra_specs/${key}`,
+        )
       }),
     )
-    return baseResponse.data
+    return baseResponse
   }
 
   async unsetVolumeTypeTag(id, tag) {
     const url = `${await this.endpoint()}/types/${id}/extra_specs/${tag}`
-    await axios.delete(url, this.client.getAuthHeaders())
+    await this.client.basicDelete('Cinder', 'unsetVolumeTypeTag', url)
   }
 
   async getSnapshots() {
     const url = `${await this.endpoint()}/snapshots/detail`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.snapshots
+    const response = await this.client.basicGet('Cinder', 'getSnapshots', url)
+    return response.snapshots
   }
 
   async getAllSnapshots() {
     const url = `${await this.endpoint()}/snapshots/detail?all_tenants=1`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.snapshots
+    const response = await this.client.basicGet('Cinder', 'getAllSnapshots', url)
+    return response.snapshots
   }
 
   async snapshotVolume(params) {
     const url = `${await this.endpoint()}/snapshots`
-    const response = await axios.post(url, { snapshot: params }, this.client.getAuthHeaders())
-    return response.data.snapshot
+    const response = await this.client.basicPost('Cinder', 'snapshotVolume', url, {
+      snapshot: params,
+    })
+    return response.snapshot
   }
 
   async deleteSnapshot(id) {
     const url = `${await this.endpoint()}/snapshots/${id}`
-    await axios.delete(url, this.client.getAuthHeaders())
+    await this.client.basicDelete('Cinder', 'deleteSnapshot', url)
   }
 
   async updateSnapshot(id, params) {
     const url = `${await this.endpoint()}/snapshots/${id}`
-    const response = await axios.put(url, { snapshot: params }, this.client.getAuthHeaders())
-    return response.data.snapshot
+    const response = await this.client.basicPut('Cinder', 'updateSnapshot', url, {
+      snapshot: params,
+    })
+    return response.snapshot
   }
 
   async updateSnapshotMetadata(id, params) {
     const url = `${await this.endpoint()}/snapshots/${id}/metadata`
-    const response = await axios.put(url, { metadata: params }, this.client.getAuthHeaders())
-    return response.data.metadata
+    const response = await this.client.basicPut('Cinder', 'updateSnapshotMetadata', url, {
+      metadata: params,
+    })
+    return response.metadata
   }
 
   async getDefaultQuotas() {
     const url = `${await this.endpoint()}/os-quota-class-sets/defaults`
 
-    const quotas = await axios.get(url, this.client.getAuthHeaders())
-    return quotas.data.quota_class_set
+    const quotas = await this.client.basicGet('Cinder', 'getDefaultQuotas', url)
+    return quotas.quota_class_set
   }
 
   async getDefaultQuotasForRegion(region) {
     const urls = await this.getRegionUrls()
     const url = `${urls[region]}/os-quota-class-sets/defaults`
-    const quotas = await axios.get(url, this.client.getAuthHeaders())
-    return quotas.data.quota_class_set
+    const quotas = await this.client.basicGet('Cinder', 'getDefaultQuotasForRegion', url)
+    return quotas.quota_class_set
   }
 
   async getQuotas(projectId) {
     const url = `${await this.endpoint()}/os-quota-sets/${projectId}?usage=true`
-    const quota = await axios.get(url, this.client.getAuthHeaders())
-    return quota.data.quota_set
+    const quota = await this.client.basicGet('Cinder', 'getQuotas', url)
+    return quota.quota_set
   }
 
   async getQuotasForRegion(projectId, region) {
     const urls = await this.getRegionUrls()
     const url = `${urls[region]}/os-quota-sets/${projectId}?usage=true`
-    const quota = await axios.get(url, this.client.getAuthHeaders())
-    return quota.data.quota_set
+    const quota = await this.client.basicGet('Cinder', 'getQuotasForRegion', url)
+    return quota.quota_set
   }
 
   async setQuotas(params, projectId) {
     const url = `${await this.endpoint()}/os-quota-sets/${projectId}`
-    const quotas = await axios.put(url, { quota_set: params }, this.client.getAuthHeaders())
-    return quotas.data.quota_set
+    const quotas = await this.client.basicPut('Cinder', 'setQuotas', url, { quota_set: params })
+    return quotas.quota_set
   }
 
   async setQuotasForRegion(params, projectId, region) {
     const urls = await this.getRegionUrls()
     const url = `${urls[region]}/os-quota-sets/${projectId}`
-    const quotas = await axios.put(url, { quota_set: params }, this.client.getAuthHeaders())
-    return quotas.data.quota_set
+    const quotas = await this.client.basicPut('Cinder', 'setQuotasForRegion', url, {
+      quota_set: params,
+    })
+    return quotas.quota_set
   }
 
   // TODO: getStorageStats(need to implement host first)

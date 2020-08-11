@@ -1,4 +1,3 @@
-import axios from 'axios'
 import ApiService from 'api-client/ApiService'
 
 // Returns a transducer function instead being passed the obj directly
@@ -10,7 +9,8 @@ const renameKey = (srcKey, destKey) => (obj) =>
   )
 
 class Nova extends ApiService {
-  endpoint() {
+  clsName = 'nova'
+  async endpoint() {
     return this.client.keystone.getServiceEndpoint('nova', 'internal')
   }
 
@@ -21,8 +21,8 @@ class Nova extends ApiService {
 
   getFlavors = async () => {
     const url = `${await this.flavorsUrl()}/detail?is_public=no`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.flavors
+    const response = await this.client.basicGet('Nova', 'getFlavors', url)
+    return response.flavors
   }
 
   createFlavor = async (params) => {
@@ -30,13 +30,13 @@ class Nova extends ApiService {
     const converted = renameKey('public', 'os-flavor-access:is_public')(params)
     const body = { flavor: converted }
     const url = await this.flavorsUrl()
-    const response = await axios.post(url, body, this.client.getAuthHeaders())
-    return response.data.flavor
+    const response = await this.client.basicPost('Nova', 'createFlavor', url, body)
+    return response.flavor
   }
 
   deleteFlavor = async (id) => {
     const url = `${await this.flavorsUrl()}/${id}`
-    return axios.delete(url, this.client.getAuthHeaders())
+    return this.client.basicDelete('Nova', 'deleteFlavor', url)
   }
 
   // Allow these methods to be accessed programatically as well.
@@ -48,33 +48,31 @@ class Nova extends ApiService {
 
   async getInstances() {
     const url = `${await this.instancesUrl()}/detail`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.servers.map((instance) =>
-      renameKey('OS-EXT-STS:vm_state', 'state')(instance),
-    )
+    const response = await this.client.basicGet('Nova', 'getInstances', url)
+    return response.servers.map((instance) => renameKey('OS-EXT-STS:vm_state', 'state')(instance))
   }
 
   async getHypervisors() {
     const url = `${await this.hypervisorsUrl()}/detail`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.hypervisors
+    const response = await this.client.basicGet('Nova', 'getHypervisors', url)
+    return response.hypervisors
   }
 
   async getSshKeys() {
     const url = `${await this.sshKeysUrl()}`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.keypairs.map((x) => x.keypair)
+    const response = await this.client.basicGet('Nova', 'getSshKeys', url)
+    return response.keypairs.map((x) => x.keypair)
   }
 
   async createSshKey(params) {
     const url = await this.sshKeysUrl()
-    const response = await axios.post(url, { keypair: params }, this.client.getAuthHeaders())
-    return response.data.keypair
+    const response = await this.client.basicPost('Nova', 'createSshKey', url, { keypair: params })
+    return response.keypair
   }
 
   async deleteSshKey(id) {
     const url = `${await this.sshKeysUrl()}/${id}`
-    return axios.delete(url, this.client.getAuthHeaders())
+    return this.client.basicDelete('Nova', 'deleteSshKey', url)
   }
 }
 
