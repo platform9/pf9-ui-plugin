@@ -16,7 +16,7 @@ import { normalizeResponse } from 'api-client/helpers'
 import { hasPathStr, pathStr } from 'utils/fp'
 import { prop, has, cond, T, identity, when } from 'ramda'
 import { isPlainObject } from 'utils/misc'
-import { IApiClient } from './model'
+// import { IApiClient } from './model'
 import ApiCache from './cache-client'
 
 let _instance: ApiClient = null
@@ -26,7 +26,7 @@ interface ApiClientOptions {
   keystoneEndpoint: string
 }
 
-class ApiClient implements IApiClient {
+class ApiClient {
   public options: ApiClientOptions
 
   public instance: ApiClient
@@ -73,8 +73,7 @@ class ApiClient implements IApiClient {
     return client
   }
 
-  static refreshApiEndpoints() {
-    const instance = ApiClient.getInstance()
+  static refreshApiEndpoints(instance = ApiClient.getInstance()) {
     instance.appbert.initialize()
     instance.cinder.initialize()
     instance.glance.initialize()
@@ -106,10 +105,10 @@ class ApiClient implements IApiClient {
     this.catalog = {}
     this.activeRegion = null
 
-    const getResponseError: any = cond([
+    const getResponseError: any = (cond as any)([
       [hasPathStr('response.data.error'), pathStr('response.data.error')],
       [hasPathStr('response.data.message'), pathStr('response.data.message')],
-      [has('error'), when(isPlainObject, prop('error'))],
+      [has('error'), when<any, string>(isPlainObject, prop('error'))],
       [T, identity],
     ])
 
@@ -118,6 +117,8 @@ class ApiClient implements IApiClient {
       (response) => response,
       async (error) => Promise.reject(getResponseError(error)),
     )
+
+    // ApiClient.refreshApiEndpoints(this)
   }
 
   serialize = () => {
@@ -146,33 +147,33 @@ class ApiClient implements IApiClient {
     return { headers }
   }
 
-  rawGet = async <T>(clsName, mthdName, url, config = undefined) => {
+  rawGet = async <T extends any>(clsName, mthdName, url, config = undefined) => {
     const response = await this.axiosInstance.get<T>(url, config)
-    ApiCache.instance.cacheItem(clsName, mthdName, response)
+    ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return response
   }
 
-  rawPost = async <T>(clsName, mthdName, url, data, config = undefined) => {
+  rawPost = async <T extends any>(clsName, mthdName, url, data, config = undefined) => {
     const response = await this.axiosInstance.post<T>(url, data, config)
-    ApiCache.instance.cacheItem(clsName, mthdName, response)
+    ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return response
   }
 
-  rawPut = async <T>(clsName, mthdName, url, data, config = undefined) => {
+  rawPut = async <T extends any>(clsName, mthdName, url, data, config = undefined) => {
     const response = await this.axiosInstance.put<T>(url, data, config)
-    ApiCache.instance.cacheItem(clsName, mthdName, response)
+    ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return response
   }
 
-  rawPatch = async <T>(clsName, mthdName, url, data, config = undefined) => {
+  rawPatch = async <T extends any>(clsName, mthdName, url, data, config = undefined) => {
     const response = await this.axiosInstance.patch<T>(url, data, config)
-    ApiCache.instance.cacheItem(clsName, mthdName, response)
+    ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return response
   }
 
-  rawDelete = async <T>(clsName, mthdName, url, config = undefined) => {
+  rawDelete = async <T extends any>(clsName, mthdName, url, config = undefined) => {
     const response = await this.axiosInstance.delete<T>(url, config)
-    ApiCache.instance.cacheItem(clsName, mthdName, response)
+    ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return response
   }
 
@@ -181,31 +182,31 @@ class ApiClient implements IApiClient {
       params,
       ...this.getAuthHeaders(),
     })
-    ApiCache.instance.cacheItem(clsName, mthdName, response)
+    ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return normalizeResponse<T>(response)
   }
 
   basicPost = async <T extends any>(clsName, mthdName, url, body = undefined) => {
     const response = await this.axiosInstance.post<T>(url, body, this.getAuthHeaders())
-    ApiCache.instance.cacheItem(clsName, mthdName, response)
+    ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return normalizeResponse<T>(response)
   }
 
   basicPatch = async <T extends any>(clsName, mthdName, url, body = undefined) => {
     const response = await this.axiosInstance.patch<T>(url, body, this.getAuthHeaders())
-    ApiCache.instance.cacheItem(clsName, mthdName, response)
+    ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return normalizeResponse<T>(response)
   }
 
   basicPut = async <T extends any>(clsName, mthdName, url, body = undefined) => {
     const response = await this.axiosInstance.put<T>(url, body, this.getAuthHeaders())
-    ApiCache.instance.cacheItem(clsName, mthdName, response)
+    ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return normalizeResponse<T>(response)
   }
 
   basicDelete = async <T extends any>(clsName, mthdName, url) => {
     const response = await this.axiosInstance.delete<T>(url, this.getAuthHeaders())
-    ApiCache.instance.cacheItem(clsName, mthdName, response)
+    ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return normalizeResponse<T>(response)
   }
 }

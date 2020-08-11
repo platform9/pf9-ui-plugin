@@ -204,6 +204,8 @@ const AppContainer = () => {
       setStorage('user', user)
       setStorage('tokens', { unscopedToken, currentToken: scopedToken })
 
+      ApiClient.refreshApiEndpoints()
+
       await setContext({
         initialized: true,
         currentTenant: activeTenant,

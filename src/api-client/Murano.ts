@@ -1,7 +1,7 @@
-import axios from 'axios'
 import ApiService from 'api-client/ApiService'
 
 class Murano extends ApiService {
+  clsName = 'murano'
   async endpoint() {
     return this.client.keystone.getServiceEndpoint('murano', 'internal')
   }
@@ -14,15 +14,15 @@ class Murano extends ApiService {
 
   async getApplications() {
     const url = await this.applicationUrl()
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.packages
+    const response = await this.client.basicGet('Murano', 'getApplications', url)
+    return response.packages
   }
 
   async getApplication(id) {
     const url = `${await this.applicationUrl()}/${id}`
     try {
-      const response = await axios.get(url, this.client.getAuthHeaders())
-      return response.data.package
+      const response = await this.client.basicGet('Murano', 'getApplication', url)
+      return response.package
     } catch (err) {
       console.log(err)
     }
@@ -31,8 +31,8 @@ class Murano extends ApiService {
   async uploadApplications(params) {
     const url = await this.uploadUrl()
     try {
-      const response = await axios.post(url, params, this.client.getAuthHeaders())
-      return response.data
+      const response = await this.client.basicPost('Murano', 'uploadApplications', url, params)
+      return response
     } catch (err) {
       console.log(err)
     }
@@ -41,7 +41,7 @@ class Murano extends ApiService {
   async deleteApplication(id) {
     const url = `${await this.applicationUrl()}/${id}`
     try {
-      await axios.delete(url, this.client.getAuthHeaders())
+      return await this.client.basicDelete('Murano', 'deleteApplication', url)
     } catch (err) {
       console.log(err)
     }
@@ -50,8 +50,10 @@ class Murano extends ApiService {
   async updateApplication(id, params) {
     const url = `${await this.applicationUrl()}/${id}`
     try {
-      const response = await axios.put(url, { package: params }, this.client.getAuthHeaders())
-      return response.data.package
+      const response = await this.client.basicPut('Murano', 'updateApplication', url, {
+        package: params,
+      })
+      return response.package
     } catch (err) {
       console.log(err)
     }

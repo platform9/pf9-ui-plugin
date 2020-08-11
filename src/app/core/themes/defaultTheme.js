@@ -1,54 +1,54 @@
-const colors = {
-  gray: {
-    '000': '#ffffff',
-    '100': '#f5f5f9',
-    '200': '#e6e6ea',
-    '300': '#b6b6c0',
-    '500': '#868696',
-    '700': '#3d3d57',
-    '800': '#25253f',
-    '900': '#0d0d28',
-  }
-  black: '#000000',
-  blue
-  100: '#f3fbfe',
-  blue
-  200: '#cceffc',
-  blue
-  300: '#82d4f2',
-  blue
-  500: '#00abe8',
-  blue
-  700: '#0089c7',
-  blue
-  900: '#005992',
-  pink
-  300: '#f26aa6',
-  pink
-  500: '#d82071',
-  pink
-  700: '#8a003c',
-  pink
-  900: '#6d0030',
-  yellow
-  300: '#ffd7a2',
-  yellow
-  500: '#ffbf26',
-  yellow
-  700: '#f0aa00',
-  yellow
-  900: '#bf8700',
-  k-8-blue-300: '#9bacfd',
-  k-8-blue-500: '#3e5ff5',
-  k-8-blue-700: '#011ea4',
-  k-8-blue-900: '#001782',
-  os-red-300: '#ff9f8e',
-  os-red-500: '#ff4826',
-  os-red-700: '#f02500',
-  os-red-900: '#bf1e00',
-  green: '#0edf79',
-  red: '#fc4646',
-}
+// const colors = {
+//   gray: {
+//     '000': '#ffffff',
+//     '100': '#f5f5f9',
+//     '200': '#e6e6ea',
+//     '300': '#b6b6c0',
+//     '500': '#868696',
+//     '700': '#3d3d57',
+//     '800': '#25253f',
+//     '900': '#0d0d28',
+//   }
+//   black: '#000000',
+//   blue
+//   100: '#f3fbfe',
+//   blue
+//   200: '#cceffc',
+//   blue
+//   300: '#82d4f2',
+//   blue
+//   500: '#00abe8',
+//   blue
+//   700: '#0089c7',
+//   blue
+//   900: '#005992',
+//   pink
+//   300: '#f26aa6',
+//   pink
+//   500: '#d82071',
+//   pink
+//   700: '#8a003c',
+//   pink
+//   900: '#6d0030',
+//   yellow
+//   300: '#ffd7a2',
+//   yellow
+//   500: '#ffbf26',
+//   yellow
+//   700: '#f0aa00',
+//   yellow
+//   900: '#bf8700',
+//   k-8-blue-300: '#9bacfd',
+//   k-8-blue-500: '#3e5ff5',
+//   k-8-blue-700: '#011ea4',
+//   k-8-blue-900: '#001782',
+//   os-red-300: '#ff9f8e',
+//   os-red-500: '#ff4826',
+//   os-red-700: '#f02500',
+//   os-red-900: '#bf1e00',
+//   green: '#0edf79',
+//   red: '#fc4646',
+// }
 
 const theme = {
   breakpoints: {
@@ -241,7 +241,7 @@ const theme = {
       background: '#606060',
     },
     sidebar: {
-      background: colors.gray['800'],
+      background: '#25253f',
       text: '#646464',
       activeText: '#1C1C1C',
       hoverText: '#1C1C1C',

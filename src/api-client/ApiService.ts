@@ -1,13 +1,15 @@
 import ApiClient from 'api-client/ApiClient'
 
 abstract class ApiService {
-  protected apiEndpoint: string
+  protected apiEndpoint: string = ''
+  clsName = ''
   constructor(protected client: ApiClient) {
-    this.initialize()
+    // this.initialize()
   }
 
   async initialize() {
-    this.apiEndpoint = await this.endpoint()
+    const tmp = await this.endpoint()
+    this.apiEndpoint = tmp
   }
 
   abstract endpoint(): Promise<string>

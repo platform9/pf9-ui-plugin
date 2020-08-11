@@ -1,17 +1,20 @@
 // Appbert provides information about clusters and the managed apps (packages) installed on them.
 import ApiService from 'api-client/ApiService'
+import { ClusterTag } from './appbert.model'
 
 class Appbert extends ApiService {
+  clsName = 'appbert'
   endpoint = async () => {
-    return this.client.keystone.getServiceEndpoint('appbert', 'admin')
+    const tmp = await this.client.keystone.getServiceEndpoint('appbert', 'admin')
+    return tmp
   }
 
   getClusterTags = async () => {
     // return this.client.basicGet(`${this.apiEndpoint}/clusters`)
-    const data = await this.client.basicGet(
+    const data = await this.client.basicGet<ClusterTag[]>(
       'Appbert',
       'getClusterTags',
-      `${this.apiEndpoint}/clusters`,
+      `${await this.endpoint()}/clusters`,
     )
     // ApiCache.instance.cacheItem('Appbert', 'getClusterTags', data)
     return data
@@ -22,7 +25,7 @@ class Appbert extends ApiService {
     const data = await this.client.basicGet(
       'Appbert',
       'getPackages',
-      `${this.apiEndpoint}/packages`,
+      `${await this.endpoint()}/packages`,
     )
     // ApiCache.instance.cacheItem('Appbert', 'getPackages', data)
     return data
@@ -39,7 +42,7 @@ class Appbert extends ApiService {
     const data = await this.client.basicPut(
       'Appbert',
       'addPkg',
-      `${this.apiEndpoint}/clusters/${clusterUuid}/${pkgId}`,
+      `${await this.endpoint()}/clusters/${clusterUuid}/${pkgId}`,
     )
     // ApiCache.instance.cacheItem('Appbert', 'addPkg', data)
     return data
@@ -49,7 +52,7 @@ class Appbert extends ApiService {
     const data = await this.client.basicDelete(
       'Appbert',
       'addPkg',
-      `${this.apiEndpoint}/clusters/${clusterUuid}/${pkgId}`,
+      `${await this.endpoint()}/clusters/${clusterUuid}/${pkgId}`,
     )
     // ApiCache.instance.cacheItem('Appbert', 'addremovePkgPkg', data)
     return data

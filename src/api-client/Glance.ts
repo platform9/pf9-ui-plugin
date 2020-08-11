@@ -1,4 +1,3 @@
-import axios from 'axios'
 import ApiService from 'api-client/ApiService'
 
 /*
@@ -9,6 +8,7 @@ const replaceOp = op('replace')
 */
 
 class Glance extends ApiService {
+  clsName = 'glance'
   async endpoint() {
     return this.client.keystone.getServiceEndpoint('glance', 'admin')
   }
@@ -19,16 +19,16 @@ class Glance extends ApiService {
 
   async getImages() {
     const url = `${await this.imagesUrl()}?limit=1000`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.images
+    const response = await this.client.basicGet('Glance', 'getImages', url)
+    return response.images
   }
 
   async createImage(params) {
     const url = await this.imagesUrl()
     // TODO: support adding additional user properties
     try {
-      const response = await axios.post(url, params, this.client.getAuthHeaders())
-      return response.data
+      const response = await this.client.basicPost('Glance', 'createImage', url, params)
+      return response
     } catch (err) {
       console.log(err)
     }
@@ -36,13 +36,13 @@ class Glance extends ApiService {
 
   async deleteImage(id) {
     const url = `${await this.imagesUrl()}/${id}`
-    return axios.delete(url, this.client.getAuthHeaders())
+    return this.client.basicDelete('Glance', 'deleteImage', url)
   }
 
   async getImageSchema() {
     const url = `${await this.v2()}/schemas/images`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.properties.images
+    const response = await this.client.basicGet('Glance', 'getImageSchema', url)
+    return response.properties.images
   }
 
   async updateImage(image, imageId) {
@@ -51,7 +51,7 @@ class Glance extends ApiService {
       ...this.client.getAuthHeaders().headers,
       'Content-Type': 'application/openstack-images-v2.1-json-patch',
     }
-    const response = await axios.patch(url, image, { headers })
+    const response = await this.client.rawPatch('Glance', 'updateImage', url, image, { headers })
     return response.data
   }
 

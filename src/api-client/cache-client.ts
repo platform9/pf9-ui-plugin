@@ -19,6 +19,12 @@ export default class ApiCache {
     window.cacheClient = this
   }
 
+  public prettyPrint() {
+    Object.entries(this.cache).forEach(([cls, cache]) => {
+      console.log(`\n\n${cls}\n\n${JSON.stringify(cache)}`)
+    })
+  }
+
   public serialize() {
     return JSON.stringify(this.cache)
   }
