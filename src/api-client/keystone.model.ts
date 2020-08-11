@@ -22,6 +22,35 @@ export interface AuthToken {
   token: Token
 }
 
+export interface UpdateProject {
+  project: ProjectElement
+}
+
+export interface UpdateUser {
+  user: UpdateUserUser
+}
+
+export interface UpdateUserUser {
+  is_local: boolean
+  default_project: string
+  displayname: string
+  name: string
+  links: ProjectLinks
+  extra: Extra
+  enabled: boolean
+  id: string
+  email: string
+  options: CustomerMetadata
+  domain_id: ParentIDEnum
+  password_expires_at: null
+}
+export interface Extra {
+  is_local: boolean
+  default_project: string
+  displayname: string
+  email: string
+}
+
 export interface Token {
   is_domain: boolean
   methods: string[]

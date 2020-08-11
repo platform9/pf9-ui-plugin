@@ -15,6 +15,8 @@ import {
   GetCredentials,
   GetRoles,
   GetUserRoleAssignments,
+  UpdateProject,
+  UpdateUser,
 } from './keystone.model'
 
 const constructAuthFromToken = (token: string, projectId?: string) => {
@@ -166,7 +168,7 @@ class Keystone extends ApiService {
   }
 
   getTenantRoleAssignments = async (tenantId) => {
-    const data = await this.client.basicGet(
+    const data = await this.client.basicGet<GetUserRoleAssignments>(
       'Keystone',
       'getTenantRoleAssignments',
       this.roleAssignments,
@@ -192,7 +194,7 @@ class Keystone extends ApiService {
   }
 
   addUserRole = async ({ tenantId, userId, roleId }) => {
-    await this.client.basicPut(
+    await this.client.basicPut<string>(
       'Keystone',
       'addUserRole',
       pathJoin(this.projectsUrl, `${tenantId}/users/${userId}/roles/${roleId}`),
@@ -238,7 +240,7 @@ class Keystone extends ApiService {
   updateProject = async (id, params) => {
     const body = { project: params }
     const url = `${this.projectsUrl}/${id}`
-    const data = await this.client.basicPatch('Keystone', 'updateProject', url, body)
+    const data = await this.client.basicPatch<UpdateProject>('Keystone', 'updateProject', url, body)
     return data.project
   }
 
@@ -290,7 +292,12 @@ class Keystone extends ApiService {
   authenticate = async (username, password) => {
     const body = constructAuthFromCredentials(username, password)
     try {
-      const response = await this.client.rawPost('Keystone', 'authenticate', this.tokensUrl, body)
+      const response = await this.client.rawPost<AuthToken>(
+        'Keystone',
+        'authenticate',
+        this.tokensUrl,
+        body,
+      )
       const { expires_at: expiresAt, issued_at: issuedAt } = response.data.token
       const unscopedToken = response.headers['x-subject-token']
       this.client.unscopedToken = unscopedToken
@@ -311,7 +318,7 @@ class Keystone extends ApiService {
       },
     }
     try {
-      const response = await this.client.rawPost(
+      const response = await this.client.rawPost<AuthToken>(
         'Keystone',
         'getUnscopedTokenWithToken',
         this.tokensUrl,
@@ -391,7 +398,11 @@ class Keystone extends ApiService {
   getDownloadLinks = async () => {
     try {
       const linksUrl = await this.getServiceEndpoint('regioninfo', 'internal')
-      const { links } = await this.client.basicGet('Keystone', 'getDownloadLinks', linksUrl)
+      const { links } = await this.client.basicGet<GetFeatureLinks>(
+        'Keystone',
+        'getDownloadLinks',
+        linksUrl,
+      )
       return links
     } catch (err) {
       console.error(err)
@@ -403,7 +414,11 @@ class Keystone extends ApiService {
   resetCookie = async () => {
     try {
       const linksUrl = await this.getServiceEndpoint('regioninfo', 'public')
-      const { links } = await this.client.basicGet('Keystone', 'resetCookie/links', linksUrl)
+      const { links } = await this.client.basicGet<GetFeatureLinks>(
+        'Keystone',
+        'resetCookie/links',
+        linksUrl,
+      )
       const token2cookieUrl = links.token2cookie
       const authHeaders = this.client.getAuthHeaders()
       await this.client.rawGet<string>('Keystone', 'resetCookie', token2cookieUrl, {
@@ -490,7 +505,7 @@ class Keystone extends ApiService {
   updateUser = async (id, params) => {
     const body = { user: params }
     const url = `${this.usersUrl}/${id}`
-    const data = await this.client.basicPatch('Keystone', 'updateUser', url, body)
+    const data = await this.client.basicPatch<UpdateUser>('Keystone', 'updateUser', url, body)
     return data.user
   }
 
