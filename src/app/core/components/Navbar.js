@@ -25,7 +25,13 @@ import moize from 'moize'
 import { assoc, flatten, pluck, prop, propEq, propOr, where, equals } from 'ramda'
 import { matchPath, withRouter } from 'react-router'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
-import { imageUrls, clarityDashboardUrl, helpUrl } from 'app/constants'
+import {
+  imageUrls,
+  clarityDashboardUrl,
+  helpUrl,
+  ironicWizardUrl,
+  dashboardUrl
+} from 'app/constants'
 import { routes } from 'core/utils/routes'
 
 import SimpleLink from './SimpleLink'
@@ -272,20 +278,20 @@ const styles = (theme) => ({
     boxSizing: 'border-box',
     backgroundRepeat: 'no-repeat',
     backgroundImage: ({ stack }) =>
-      stack === 'openstack'
-        ? 'url(/ui/images/logo-sidenav-os.svg)'
-        : 'url(/ui/images/logo-kubernetes-h.png)',
+      stack === 'kubernetes'
+        ? 'url(/ui/images/logo-kubernetes-h.png)'
+        : 'url(/ui/images/logo-sidenav-os.svg)',
     backgroundSize: ({ open, stack }) => {
       if (stack === 'kubernetes') {
         return open ? '120px' : '130px'
-      } else if (stack === 'openstack') {
+      } else if (stack === 'openstack' || stack === 'metalstack') {
         return open ? '120px' : '175px'
       }
     },
     backgroundPosition: ({ open, stack }) => {
       if (stack === 'kubernetes') {
         return open ? '7px center' : '9px center'
-      } else if (stack === 'openstack') {
+      } else if (stack === 'openstack' || stack === 'metalstack') {
         return open ? '10px center' : '7px center'
       }
     },
@@ -297,6 +303,7 @@ const styles = (theme) => ({
   sliderArrow: {
     width: '0.8em',
     color: theme.palette.sidebar.text,
+    cursor: 'pointer',
   },
   heavyWeight: {
     '& i': {
@@ -566,19 +573,40 @@ class Navbar extends PureComponent {
     )
   }
 
+  switchStacks = () => {
+    const { stack, setStack, getContext, history } = this.props
+    const { features: { experimental: { ironic } } } = getContext()
+
+    // Until openstack is served in the new UI stack will only
+    // ever be metalstack or kubernetes
+    if (['metalstack', 'openstack'].includes(stack)) {
+      setStack('kubernetes')
+      return history.push(dashboardUrl)
+    }
+
+    if (ironic) {
+      setStack('metalstack')
+      return history.push(ironicWizardUrl)
+    }
+
+    // redirect to clarity for openstack
+    this.handleNavigateToClarity()
+  }
+
   renderStackSlider = () => {
+    // Todo: Animate the stack slider
     const { classes, open } = this.props
     return (
       <div className={classes.sliderContainer}>
         {open && (
-          <a href={clarityDashboardUrl}>
-            <ChevronLeftIcon className={classes.sliderArrow} />
+          <a>
+            <ChevronLeftIcon className={classes.sliderArrow} onClick={this.switchStacks} />
           </a>
         )}
         <div className={classes.sliderLogo} />
         {open && (
-          <a href={clarityDashboardUrl}>
-            <ChevronRightIcon className={classes.sliderArrow} />
+          <a>
+            <ChevronRightIcon className={classes.sliderArrow} onClick={this.switchStacks} />
           </a>
         )}
       </div>
@@ -687,6 +715,7 @@ Navbar.propTypes = {
   handleDrawerToggle: PropTypes.func,
   sections: PropTypes.arrayOf(PropTypes.shape(sectionPropType)).isRequired,
   stack: PropTypes.string,
+  setStack: PropTypes.func,
 }
 
 Navbar.defaultProps = {

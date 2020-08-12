@@ -177,18 +177,34 @@ const redirectToAppropriateStack = (ironicEnabled, kubernetesEnabled, history) =
   }
 }
 
-const loadRegionFeatures = async (setRegionFeatures, setContext, history) => {
+
+const determineStack = (history, features) => {
+  if (features.ironic) {
+    return 'metalstack'
+  }
+  return history.location.pathname.includes('openstack') ? 'openstack' : 'kubernetes'
+}
+
+const loadRegionFeatures = async (setRegionFeatures, setStack, setContext, history) => {
   try {
     const features = await keystone.getFeatures()
 
     // Store entirety of features json in context for global usage
     await setContext({ features })
 
-    setRegionFeatures({
+    const regionFeatures = {
       kubernetes: features.experimental.containervisor,
       ironic: features.experimental.ironic,
       openstack: features.experimental.openstackEnabled,
+<<<<<<< HEAD
     })
+=======
+      intercom: features.experimental.intercom,
+    }
+
+    setRegionFeatures(regionFeatures)
+    setStack(determineStack(history, regionFeatures))
+>>>>>>> UX-439/Add ability to switch between ironic and kubernetes stacks
 
     redirectToAppropriateStack(
       // false, // Keep this false until ironic supported by the new UI
@@ -201,35 +217,27 @@ const loadRegionFeatures = async (setRegionFeatures, setContext, history) => {
   }
 }
 
-const determineStack = (history, features) => {
-  if (features.ironic) {
-    return 'metalstack'
-  }
-  return history.location.pathname.includes('openstack') ? 'openstack' : 'kubernetes'
-}
-
 const getSandboxUrl = (pathPart) => `https://platform9.com/${pathPart}/`
 
 const AuthenticatedContainer = () => {
+  const { history } = useReactRouter()
   const [drawerOpen, toggleDrawer] = useToggler(true)
   const [regionFeatures, setRegionFeatures] = useState(emptyObj)
+  // stack is the name of the plugin (ex. openstack, kubernetes, developer, theme)
+  const [stack, setStack] = useState(determineStack(history, regionFeatures))
   const {
     userDetails: { role },
     currentRegion,
     setContext,
     features,
   } = useContext(AppContext)
-  const { history } = useReactRouter()
   const classes = useStyles({ path: history.location.pathname })
   useEffect(() => {
     // Pass the `setRegionFeatures` function to update the features as we can't use `await` inside of a `useEffect`
-    loadRegionFeatures(setRegionFeatures, setContext, history)
+    loadRegionFeatures(setRegionFeatures, setStack, setContext, history)
   }, [currentRegion])
 
   const withStackSlider = regionFeatures.openstack && regionFeatures.kubernetes
-  // stack is the name of the plugin (ex. openstack, kubernetes, developer, theme)
-  const stack = determineStack(history, regionFeatures)
-
 
   const plugins = pluginManager.getPlugins()
   const sections = getSections(plugins, role)
@@ -245,6 +253,7 @@ const AuthenticatedContainer = () => {
           sections={sections}
           open={drawerOpen}
           stack={stack}
+          setStack={setStack}
           handleDrawerToggle={toggleDrawer}
         />
         <PushEventsProvider>
@@ -287,7 +296,9 @@ const AuthenticatedContainer = () => {
                 </BannerContent>
               </>
             )}
-            {pathStrOr(false, 'experimental.containervisor', features) && (
+            {pathStrOr(false, 'experimental.containervisor', features)
+              && stack === 'kubernetes'
+              && (
               <ClusterUpgradeBanner/>
             )}
             <div className={classes.contentMain}>
