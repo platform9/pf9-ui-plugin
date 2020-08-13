@@ -18,7 +18,7 @@ import LogoutPage from 'core/public/LogoutPage'
 import pluginManager from 'core/utils/pluginManager'
 import DeveloperToolsEmbed from 'developer/components/DeveloperToolsEmbed'
 import moize from 'moize'
-import { apply, toPairs } from 'ramda'
+import { apply, toPairs, keys } from 'ramda'
 import React, { useContext, useEffect, useState } from 'react'
 import { Redirect, Route, Switch } from 'react-router'
 import useReactRouter from 'use-react-router'
@@ -178,14 +178,24 @@ const redirectToAppropriateStack = (ironicEnabled, kubernetesEnabled, history) =
 }
 
 
-const determineStack = (history, features) => {
-  if (features.ironic) {
+const determineCurrentStack = (history, features) => {
+  if (features.metalstack) {
     return 'metalstack'
   }
   return history.location.pathname.includes('openstack') ? 'openstack' : 'kubernetes'
 }
 
-const loadRegionFeatures = async (setRegionFeatures, setStack, setContext, history) => {
+const determineStacks = (features) => {
+  // Returns list of stacks, ensure metalstack and openstack do not show up together
+  const stacks = keys(features).filter(stack => features[stack])
+  if (stacks.includes('metalstack') && stacks.includes('openstack')) {
+    const filteredStacks = stacks.filter(stack => stack !== 'openstack')
+    return filteredStacks.sort()
+  }
+  return stacks.sort()
+}
+
+const loadRegionFeatures = async (setRegionFeatures, setStack, setStacks, setContext, history) => {
   try {
     const features = await keystone.getFeatures()
 
@@ -194,8 +204,9 @@ const loadRegionFeatures = async (setRegionFeatures, setStack, setContext, histo
 
     const regionFeatures = {
       kubernetes: features.experimental.containervisor,
-      ironic: features.experimental.ironic,
+      metalstack: features.experimental.ironic,
       openstack: features.experimental.openstackEnabled,
+<<<<<<< HEAD
 <<<<<<< HEAD
     })
 =======
@@ -205,6 +216,13 @@ const loadRegionFeatures = async (setRegionFeatures, setStack, setContext, histo
     setRegionFeatures(regionFeatures)
     setStack(determineStack(history, regionFeatures))
 >>>>>>> UX-439/Add ability to switch between ironic and kubernetes stacks
+=======
+    }
+
+    setRegionFeatures(regionFeatures)
+    setStack(determineCurrentStack(history, regionFeatures))
+    setStacks(determineStacks(regionFeatures))
+>>>>>>> PR comment edits
 
     redirectToAppropriateStack(
       // false, // Keep this false until ironic supported by the new UI
@@ -224,7 +242,8 @@ const AuthenticatedContainer = () => {
   const [drawerOpen, toggleDrawer] = useToggler(true)
   const [regionFeatures, setRegionFeatures] = useState(emptyObj)
   // stack is the name of the plugin (ex. openstack, kubernetes, developer, theme)
-  const [stack, setStack] = useState(determineStack(history, regionFeatures))
+  const [currentStack, setStack] = useState(determineCurrentStack(history, regionFeatures))
+  const [stacks, setStacks] = useState([])
   const {
     userDetails: { role },
     currentRegion,
@@ -234,7 +253,7 @@ const AuthenticatedContainer = () => {
   const classes = useStyles({ path: history.location.pathname })
   useEffect(() => {
     // Pass the `setRegionFeatures` function to update the features as we can't use `await` inside of a `useEffect`
-    loadRegionFeatures(setRegionFeatures, setStack, setContext, history)
+    loadRegionFeatures(setRegionFeatures, setStack, setStacks, setContext, history)
   }, [currentRegion])
 
   const withStackSlider = regionFeatures.openstack && regionFeatures.kubernetes
@@ -252,9 +271,10 @@ const AuthenticatedContainer = () => {
           drawerWidth={drawerWidth}
           sections={sections}
           open={drawerOpen}
-          stack={stack}
+          stack={currentStack}
           setStack={setStack}
           handleDrawerToggle={toggleDrawer}
+          stacks={stacks}
         />
         <PushEventsProvider>
           <main
@@ -297,7 +317,7 @@ const AuthenticatedContainer = () => {
               </>
             )}
             {pathStrOr(false, 'experimental.containervisor', features)
-              && stack === 'kubernetes'
+              && currentStack === 'kubernetes'
               && (
               <ClusterUpgradeBanner/>
             )}
