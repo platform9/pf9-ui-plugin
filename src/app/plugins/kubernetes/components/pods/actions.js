@@ -27,14 +27,18 @@ export const podActions = createCRUDActions(podsCacheKey, {
   },
   createFn: async ({ clusterId, namespace, yaml }) => {
     const body = jsYaml.safeLoad(yaml)
-    const response = await qbert.createPod(clusterId, namespace, body)
-    trackEvent('Create New Pod', {})
-    return response
+    const pod = await qbert.createPod(clusterId, namespace, body)
+    trackEvent('Create New Pod', {
+      clusterId,
+      namespace,
+      name: pathStr('metadata.name', pod),
+    })
+    return pod
   },
   deleteFn: async ({ id }, currentItems) => {
     const { clusterId, namespace, name } = await currentItems.find((x) => x.id === id)
     const result = await qbert.deletePod(clusterId, namespace, name)
-    trackEvent('Delete Pod', {})
+    trackEvent('Delete Pod', { clusterId, namespace, name, id })
     return result
   },
   dataMapper: async (items, { clusterId, namespace }, loadFromContext) => {
@@ -79,8 +83,13 @@ export const deploymentActions = createCRUDActions(deploymentsCacheKey, {
     const body = jsYaml.safeLoad(yaml)
     // Also need to refresh the list of pods
     podActions.invalidateCache()
-    const result = await qbert.createDeployment(clusterId, namespace, body)
-    trackEvent('Create New Deployment', {})
+    const created = await qbert.createDeployment(clusterId, namespace, body)
+    trackEvent('Create New Deployment', {
+      clusterId,
+      namespace,
+      name: pathStr('metadata.name', created),
+      id: pathStr('metadata.uid', created),
+    })
     return result
   },
   dataMapper: async (items, { clusterId, namespace }, loadFromContext) => {
@@ -144,10 +153,16 @@ export const serviceActions = createCRUDActions(kubeServicesCacheKey, {
   createFn: async ({ clusterId, namespace, yaml }) => {
     const body = jsYaml.safeLoad(yaml)
     const created = await qbert.createService(clusterId, namespace, body)
-    trackEvent('Create New Service', {})
+    trackEvent('Create New Service', {
+      clusterId,
+      namespace,
+      name: pathStr('metadata.name', created),
+      id: pathStr('metadata.uid', created),
+    })
     return {
       ...created,
       clusterId,
+      namespace,
       name: pathStr('metadata.name', created),
       created: pathStr('metadata.creationTimestamp', created),
       id: pathStr('metadata.uid', created),
@@ -157,7 +172,7 @@ export const serviceActions = createCRUDActions(kubeServicesCacheKey, {
   deleteFn: async ({ id }, currentItems) => {
     const { clusterId, namespace, name } = await currentItems.find((x) => x.id === id)
     const result = await qbert.deleteService(clusterId, namespace, name)
-    trackEvent('Delete Service', {})
+    trackEvent('Delete Service', { clusterId, namespace, name, id })
     return result
   },
   dataMapper: async (items, { clusterId, namespace }, loadFromContext) => {
