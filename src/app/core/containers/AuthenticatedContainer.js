@@ -10,7 +10,6 @@ import {
 import { Button } from '@material-ui/core'
 import HelpPage from 'app/plugins/kubernetes/components/common/HelpPage'
 import clsx from 'clsx'
-import Intercom from 'core/components/integrations/Intercom'
 import Navbar, { drawerWidth } from 'core/components/Navbar'
 import Toolbar from 'core/components/Toolbar'
 import useToggler from 'core/hooks/useToggler'
@@ -189,7 +188,6 @@ const loadRegionFeatures = async (setRegionFeatures, setContext, history) => {
       kubernetes: features.experimental.containervisor,
       ironic: features.experimental.ironic,
       openstack: features.experimental.openstackEnabled,
-      intercom: features.experimental.intercom,
     })
 
     redirectToAppropriateStack(
@@ -305,7 +303,6 @@ const AuthenticatedContainer = () => {
           </main>
         </PushEventsProvider>
       </div>
-      {regionFeatures.intercom && <Intercom />}
     </>
   )
 }
