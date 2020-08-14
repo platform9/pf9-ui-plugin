@@ -225,23 +225,11 @@ const loadRegionFeatures = async (setRegionFeatures, setStack, setStacks, setCon
       kubernetes: features.experimental.containervisor,
       metalstack: features.experimental.ironic,
       openstack: features.experimental.openstackEnabled,
-<<<<<<< HEAD
-<<<<<<< HEAD
-    })
-=======
-      intercom: features.experimental.intercom,
-    }
-
-    setRegionFeatures(regionFeatures)
-    setStack(determineStack(history, regionFeatures))
->>>>>>> UX-439/Add ability to switch between ironic and kubernetes stacks
-=======
     }
 
     setRegionFeatures(regionFeatures)
     setStack(determineCurrentStack(history, regionFeatures))
     setStacks(determineStacks(regionFeatures))
->>>>>>> PR comment edits
 
     redirectToAppropriateStack(
       // false, // Keep this false until ironic supported by the new UI
