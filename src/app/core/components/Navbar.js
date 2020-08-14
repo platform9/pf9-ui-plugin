@@ -22,10 +22,16 @@ import { except, pathStrOr } from 'app/utils/fp'
 import clsx from 'clsx'
 import { withHotKeys } from 'core/providers/HotKeysProvider'
 import moize from 'moize'
-import { assoc, flatten, pluck, prop, propEq, propOr, where, equals } from 'ramda'
+import { assoc, flatten, pluck, prop, propEq, propOr, where, equals, indexOf } from 'ramda'
 import { matchPath, withRouter } from 'react-router'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
-import { imageUrls, clarityDashboardUrl, helpUrl } from 'app/constants'
+import {
+  imageUrls,
+  clarityDashboardUrl,
+  helpUrl,
+  ironicWizardUrl,
+  dashboardUrl
+} from 'app/constants'
 import { routes } from 'core/utils/routes'
 
 import SimpleLink from './SimpleLink'
@@ -271,21 +277,24 @@ const styles = (theme) => ({
     borderRadius: theme.shape.borderRadius,
     boxSizing: 'border-box',
     backgroundRepeat: 'no-repeat',
-    backgroundImage: ({ stack }) =>
-      stack === 'openstack'
-        ? 'url(/ui/images/logo-sidenav-os.svg)'
-        : 'url(/ui/images/logo-kubernetes-h.png)',
+    backgroundImage: ({ stack }) => {
+      if (stack === 'kubernetes') {
+        return 'url(/ui/images/logo-kubernetes-h.png)'
+      } else if (['openstack', 'metalstack'].includes(stack)) {
+        return 'url(/ui/images/logo-sidenav-os.svg)'
+      }
+    },
     backgroundSize: ({ open, stack }) => {
       if (stack === 'kubernetes') {
         return open ? '120px' : '130px'
-      } else if (stack === 'openstack') {
+      } else if (['openstack', 'metalstack'].includes(stack)) {
         return open ? '120px' : '175px'
       }
     },
     backgroundPosition: ({ open, stack }) => {
       if (stack === 'kubernetes') {
         return open ? '7px center' : '9px center'
-      } else if (stack === 'openstack') {
+      } else if (['openstack', 'metalstack'].includes(stack)) {
         return open ? '10px center' : '7px center'
       }
     },
@@ -297,6 +306,7 @@ const styles = (theme) => ({
   sliderArrow: {
     width: '0.8em',
     color: theme.palette.sidebar.text,
+    cursor: 'pointer',
   },
   heavyWeight: {
     '& i': {
@@ -566,19 +576,35 @@ class Navbar extends PureComponent {
     )
   }
 
+  switchStacks = (direction) => {
+    const { stack, stacks, setStack, history } = this.props
+    const newStack = stacks[stack][direction]
+
+    if (newStack === 'metalstack') {
+      setStack('metalstack')
+      return history.push(ironicWizardUrl)
+    } else if (newStack === 'openstack') {
+      this.handleNavigateToClarity()
+    } else if (newStack === 'kubernetes') {
+      setStack('kubernetes')
+      return history.push(dashboardUrl)
+    }
+  }
+
   renderStackSlider = () => {
+    // Todo: Animate the stack slider
     const { classes, open } = this.props
     return (
       <div className={classes.sliderContainer}>
         {open && (
-          <a href={clarityDashboardUrl}>
-            <ChevronLeftIcon className={classes.sliderArrow} />
+          <a>
+            <ChevronLeftIcon className={classes.sliderArrow} onClick={() => this.switchStacks('left')} />
           </a>
         )}
         <div className={classes.sliderLogo} />
         {open && (
-          <a href={clarityDashboardUrl}>
-            <ChevronRightIcon className={classes.sliderArrow} />
+          <a>
+            <ChevronRightIcon className={classes.sliderArrow} onClick={() => this.switchStacks('right')} />
           </a>
         )}
       </div>
@@ -687,6 +713,7 @@ Navbar.propTypes = {
   handleDrawerToggle: PropTypes.func,
   sections: PropTypes.arrayOf(PropTypes.shape(sectionPropType)).isRequired,
   stack: PropTypes.string,
+  setStack: PropTypes.func,
 }
 
 Navbar.defaultProps = {

@@ -18,7 +18,7 @@ import LogoutPage from 'core/public/LogoutPage'
 import pluginManager from 'core/utils/pluginManager'
 import DeveloperToolsEmbed from 'developer/components/DeveloperToolsEmbed'
 import moize from 'moize'
-import { apply, toPairs } from 'ramda'
+import { apply, toPairs, keys, mergeAll } from 'ramda'
 import React, { useContext, useEffect, useState } from 'react'
 import { Redirect, Route, Switch } from 'react-router'
 import useReactRouter from 'use-react-router'
@@ -177,18 +177,59 @@ const redirectToAppropriateStack = (ironicEnabled, kubernetesEnabled, history) =
   }
 }
 
-const loadRegionFeatures = async (setRegionFeatures, setContext, history) => {
+
+const determineCurrentStack = (history, features) => {
+  if (features.metalstack) {
+    return 'metalstack'
+  }
+  return history.location.pathname.includes('openstack') ? 'openstack' : 'kubernetes'
+}
+
+const linkedStacks = (stacks) => (
+  // Creates object like
+  // {
+  //   openstack: {
+  //     left: 'kubernetes',
+  //     right: 'other stack',
+  //   },
+  //  ...
+  // }
+  mergeAll(stacks.sort().map((stack, index, collection) => (
+    {
+      [stack]: {
+        left: collection[index - 1] || collection.slice(-1)[0],
+        right: collection[index + 1] || collection[0],
+      }
+    }
+  )))
+)
+
+const determineStacks = (features) => {
+  // Returns list of stacks, ensure metalstack and openstack do not show up together
+  const stacks = keys(features).filter(stack => features[stack])
+  if (stacks.includes('metalstack') && stacks.includes('openstack')) {
+    const filteredStacks = stacks.filter(stack => stack !== 'openstack')
+    return linkedStacks(filteredStacks)
+  }
+  return linkedStacks(stacks)
+}
+
+const loadRegionFeatures = async (setRegionFeatures, setStack, setStacks, setContext, history) => {
   try {
     const features = await keystone.getFeatures()
 
     // Store entirety of features json in context for global usage
     await setContext({ features })
 
-    setRegionFeatures({
+    const regionFeatures = {
       kubernetes: features.experimental.containervisor,
-      ironic: features.experimental.ironic,
+      metalstack: features.experimental.ironic,
       openstack: features.experimental.openstackEnabled,
-    })
+    }
+
+    setRegionFeatures(regionFeatures)
+    setStack(determineCurrentStack(history, regionFeatures))
+    setStacks(determineStacks(regionFeatures))
 
     redirectToAppropriateStack(
       // false, // Keep this false until ironic supported by the new UI
@@ -201,35 +242,28 @@ const loadRegionFeatures = async (setRegionFeatures, setContext, history) => {
   }
 }
 
-const determineStack = (history, features) => {
-  if (features.ironic) {
-    return 'metalstack'
-  }
-  return history.location.pathname.includes('openstack') ? 'openstack' : 'kubernetes'
-}
-
 const getSandboxUrl = (pathPart) => `https://platform9.com/${pathPart}/`
 
 const AuthenticatedContainer = () => {
+  const { history } = useReactRouter()
   const [drawerOpen, toggleDrawer] = useToggler(true)
   const [regionFeatures, setRegionFeatures] = useState(emptyObj)
+  // stack is the name of the plugin (ex. openstack, kubernetes, developer, theme)
+  const [currentStack, setStack] = useState(determineCurrentStack(history, regionFeatures))
+  const [stacks, setStacks] = useState([])
   const {
     userDetails: { role },
     currentRegion,
     setContext,
     features,
   } = useContext(AppContext)
-  const { history } = useReactRouter()
   const classes = useStyles({ path: history.location.pathname })
   useEffect(() => {
     // Pass the `setRegionFeatures` function to update the features as we can't use `await` inside of a `useEffect`
-    loadRegionFeatures(setRegionFeatures, setContext, history)
+    loadRegionFeatures(setRegionFeatures, setStack, setStacks, setContext, history)
   }, [currentRegion])
 
   const withStackSlider = regionFeatures.openstack && regionFeatures.kubernetes
-  // stack is the name of the plugin (ex. openstack, kubernetes, developer, theme)
-  const stack = determineStack(history, regionFeatures)
-
 
   const plugins = pluginManager.getPlugins()
   const sections = getSections(plugins, role)
@@ -244,8 +278,10 @@ const AuthenticatedContainer = () => {
           drawerWidth={drawerWidth}
           sections={sections}
           open={drawerOpen}
-          stack={stack}
+          stack={currentStack}
+          setStack={setStack}
           handleDrawerToggle={toggleDrawer}
+          stacks={stacks}
         />
         <PushEventsProvider>
           <main
@@ -287,7 +323,9 @@ const AuthenticatedContainer = () => {
                 </BannerContent>
               </>
             )}
-            {pathStrOr(false, 'experimental.containervisor', features) && (
+            {pathStrOr(false, 'experimental.containervisor', features)
+              && currentStack === 'kubernetes'
+              && (
               <ClusterUpgradeBanner/>
             )}
             <div className={classes.contentMain}>
