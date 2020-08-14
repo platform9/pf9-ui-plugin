@@ -576,22 +576,9 @@ class Navbar extends PureComponent {
     )
   }
 
-  determineIndex = (currentIndex, direction, stacks) => {
-    const maxIndex = stacks.length - 1
-    if (direction === 'left') {
-      return currentIndex === 0 ? maxIndex : currentIndex - 1
-    } else if (direction === 'right') {
-      return maxIndex > currentIndex ? currentIndex + 1 : 0
-    }
-  }
-
   switchStacks = (direction) => {
-    const { stack, stacks, setStack, getContext, history } = this.props
-    const { features: { experimental: { ironic } } } = getContext()
-
-    const currentIndex = indexOf(stack, stacks)
-    const newIndex = this.determineIndex(currentIndex, direction, stacks)
-    const newStack = stacks[newIndex]
+    const { stack, stacks, setStack, history } = this.props
+    const newStack = stacks[stack][direction]
 
     if (newStack === 'metalstack') {
       setStack('metalstack')
@@ -606,7 +593,7 @@ class Navbar extends PureComponent {
 
   renderStackSlider = () => {
     // Todo: Animate the stack slider
-    const { classes, open, stacks } = this.props
+    const { classes, open } = this.props
     return (
       <div className={classes.sliderContainer}>
         {open && (
@@ -727,7 +714,6 @@ Navbar.propTypes = {
   sections: PropTypes.arrayOf(PropTypes.shape(sectionPropType)).isRequired,
   stack: PropTypes.string,
   setStack: PropTypes.func,
-  stacks: PropTypes.arrayOf(PropTypes.string),
 }
 
 Navbar.defaultProps = {

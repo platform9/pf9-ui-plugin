@@ -18,7 +18,7 @@ import LogoutPage from 'core/public/LogoutPage'
 import pluginManager from 'core/utils/pluginManager'
 import DeveloperToolsEmbed from 'developer/components/DeveloperToolsEmbed'
 import moize from 'moize'
-import { apply, toPairs, keys } from 'ramda'
+import { apply, toPairs, keys, mergeAll } from 'ramda'
 import React, { useContext, useEffect, useState } from 'react'
 import { Redirect, Route, Switch } from 'react-router'
 import useReactRouter from 'use-react-router'
@@ -185,14 +185,33 @@ const determineCurrentStack = (history, features) => {
   return history.location.pathname.includes('openstack') ? 'openstack' : 'kubernetes'
 }
 
+const linkedStacks = (stacks) => (
+  // Creates object like
+  // {
+  //   openstack: {
+  //     left: 'kubernetes',
+  //     right: 'other stack',
+  //   },
+  //  ...
+  // }
+  mergeAll(stacks.sort().map((stack, index, collection) => (
+    {
+      [stack]: {
+        left: collection[index - 1] || collection.slice(-1)[0],
+        right: collection[index + 1] || collection[0],
+      }
+    }
+  )))
+)
+
 const determineStacks = (features) => {
   // Returns list of stacks, ensure metalstack and openstack do not show up together
   const stacks = keys(features).filter(stack => features[stack])
   if (stacks.includes('metalstack') && stacks.includes('openstack')) {
     const filteredStacks = stacks.filter(stack => stack !== 'openstack')
-    return filteredStacks.sort()
+    return linkedStacks(filteredStacks)
   }
-  return stacks.sort()
+  return linkedStacks(stacks)
 }
 
 const loadRegionFeatures = async (setRegionFeatures, setStack, setStacks, setContext, history) => {
