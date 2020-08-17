@@ -29,6 +29,7 @@ const ClusterDeleteDialog: React.FC<IClusterDeleteDialog> = ({ rows: [cluster], 
   const [showDeauthNodeDialog, setShowDeauthNodeDialog] = useState(false)
   const [deleteCluster, deletingCluster] = useDataUpdater(clusterActions.delete, (success) => {
     trackEvent('Delete Cluster', {
+      cluster_uuid: cluster.uuid,
       cluster_name: cluster.name,
       cluster_nodes: cluster.nodes.length,
       cloud_provider_type: cluster.cloudProviderType,
