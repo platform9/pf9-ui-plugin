@@ -380,7 +380,7 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
     const body = pick(updateableParams, params)
 
     await qbert.updateCluster(uuid, body)
-    trackEvent('Update Cluster', {})
+    trackEvent('Update Cluster', { uuid })
 
     // Doing this will help update the table, but the cache remains incorrect...
     // Same issue regarding cache applies to anything else updated this function
@@ -406,7 +406,7 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
         spotWorkerFlavor: cluster.cloudProperties.workerFlavor,
       }
       await qbert.updateCluster(cluster.uuid, body)
-      trackEvent('Scale Cluster', { numSpotWorkers, numWorkers })
+      trackEvent('Scale Cluster', { clusterUuid: cluster.uuid, numSpotWorkers, numWorkers })
 
       // Update the cluster in the cache
       return updateWith(
@@ -420,7 +420,7 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
     },
     upgradeCluster: async ({ uuid }, prevItems) => {
       await qbert.upgradeCluster(uuid)
-      trackEvent('Upgrade Cluster', {})
+      trackEvent('Upgrade Cluster', { clusterUuid: uuid })
 
       // Update the cluster in the cache
       return adjustWith(
@@ -449,13 +449,19 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
     },
     attachNodes: async ({ cluster, nodes }, prevItems) => {
       await qbert.attach(cluster.uuid, nodes)
-      trackEvent('Cluster Attach Nodes', { numNodes: (nodes || []).length })
+      trackEvent('Cluster Attach Nodes', {
+        numNodes: (nodes || []).length,
+        clusterUuid: cluster.uuid,
+      })
       loadCombinedHosts.invalidateCache()
       return prevItems
     },
     detachNodes: async ({ cluster, nodes }, prevItems) => {
       await qbert.detach(cluster.uuid, nodes)
-      trackEvent('Cluster Detach Nodes', { numNodes: (nodes || []).length })
+      trackEvent('Cluster Detach Nodes', {
+        numNodes: (nodes || []).length,
+        clusterUuid: cluster.uuid,
+      })
       loadCombinedHosts.invalidateCache()
       return prevItems
     },

@@ -7,6 +7,7 @@ import { someAsync } from 'utils/async'
 import { parseClusterParams } from 'k8s/components/infrastructure/clusters/actions'
 import { allKey, notFoundErr } from 'app/constants'
 import { pathStr } from 'utils/fp'
+import { trackEvent } from 'utils/tracking'
 
 const { qbert } = ApiClient.getInstance()
 
@@ -26,11 +27,18 @@ const storageClassActions = createCRUDActions(storageClassesCacheKey, {
       throw new Error(notFoundErr)
     }
     const { clusterId, name } = item
-    await qbert.deleteStorageClass(clusterId, name)
+    const result = await qbert.deleteStorageClass(clusterId, name)
+    trackEvent('Delete Storage', { clusterId, name })
+    return result
   },
   createFn: async ({ clusterId, storageClassYaml }) => {
     const body = yaml.safeLoad(storageClassYaml)
-    return qbert.createStorageClass(clusterId, body)
+    const created = await qbert.createStorageClass(clusterId, body)
+    trackEvent('Create Storage Class', {
+        id: pathStr('metadata.uid', created),
+        name: pathStr('metadata.name', created),
+    })
+    return created
   },
   dataMapper: async (items, params, loadFromContext) => {
     const clusters = await loadFromContext(clustersCacheKey, params)
