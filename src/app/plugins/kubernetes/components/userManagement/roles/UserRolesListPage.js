@@ -1,5 +1,5 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { mngmRolesCacheKey } from 'k8s/components/userManagement/roles/actions'
+import DataKeys from 'k8s/DataKeys'
 
 export const options = {
   headlessTable: true,
@@ -8,7 +8,7 @@ export const options = {
     { id: 'name', label: 'Role' },
     { id: 'description', label: 'Description' },
   ],
-  cacheKey: mngmRolesCacheKey,
+  cacheKey: DataKeys.ManagementRoles,
   // editUrl: '/ui/kubernetes/infrastructure/roles/edit',
   name: 'Roles',
   title: 'Roles',

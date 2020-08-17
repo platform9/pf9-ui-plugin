@@ -1,12 +1,10 @@
 import {
   mergeLeft,
   filter,
-  identity,
   prop,
   pluck,
   map,
   pipe,
-  pathEq,
   head,
   values,
   groupBy,
@@ -18,21 +16,26 @@ import {
   flatten,
 } from 'ramda'
 import ApiClient from 'api-client/ApiClient'
-import { emptyArr, objSwitchCase, pathStr, filterIf, pathStrOr } from 'utils/fp'
+import { objSwitchCase, pathStr } from 'utils/fp'
 import { allKey, imageUrlRoot, addError, deleteError, updateError } from 'app/constants'
-import { clustersCacheKey } from 'k8s/components/infrastructure/common/actions'
+import {
+  makeParamsAppDetailsSelector,
+  makeParamsDeploymentDetailsSelector,
+  makeParamsAppVersionSelector,
+  makeParamsAppsSelector,
+  makeReleasesSelector,
+  makeRepositoriesSelector,
+} from 'k8s/components/infrastructure/common/actions'
 import createCRUDActions from 'core/helpers/createCRUDActions'
+import { clusterActions, parseClusterParams } from 'k8s/components/infrastructure/clusters/actions'
 import { pathJoin } from 'utils/misc'
-import moment from 'moment'
 import createContextLoader from 'core/helpers/createContextLoader'
-import { tryCatchAsync, someAsync, flatMapAsync, pipeAsync } from 'utils/async'
-import { parseClusterParams } from 'k8s/components/infrastructure/clusters/actions'
+import { tryCatchAsync, someAsync, flatMapAsync, pipeAsync, mapAsync } from 'utils/async'
 import DataKeys from 'k8s/DataKeys'
 
 const { qbert } = ApiClient.getInstance()
 
 const uniqueIdentifier = 'id'
-const apiDateFormat = 'ddd MMM D HH:mm:ss YYYY'
 
 export const appDetailLoader = createContextLoader(
   DataKeys.AppDetail,
@@ -49,6 +52,7 @@ export const appDetailLoader = createContextLoader(
   {
     uniqueIdentifier: ['id', 'clusterId'],
     indexBy: ['clusterId', 'id', 'release', 'version'],
+    selectorCreator: makeParamsAppDetailsSelector,
   },
 )
 
@@ -60,6 +64,7 @@ export const deploymentDetailLoader = createContextLoader(
   {
     uniqueIdentifier,
     indexBy: ['clusterId', 'release'],
+    selectorCreator: makeParamsDeploymentDetailsSelector,
   },
 )
 
@@ -72,16 +77,27 @@ export const appVersionLoader = createContextLoader(
     indexBy: ['clusterId', 'appId', 'release'],
     defaultOrderBy: 'version',
     defaultOrderDirection: 'desc',
+    selectorCreator: makeParamsAppVersionSelector,
   },
 )
 
 export const appActions = createCRUDActions(DataKeys.Apps, {
-  listFn: async (params, loadFromContext) => {
-    const [clusterId, clusters] = await parseClusterParams(params, loadFromContext)
-    if (clusterId === allKey) {
-      return someAsync(pluck('uuid', clusters).map(qbert.getCharts)).then(flatten)
-    }
-    return qbert.getCharts(clusterId)
+  listFn: async (params) => {
+    const [clusterId, clusters] = await parseClusterParams(params)
+    const apps =
+      clusterId === allKey
+        ? someAsync(pluck('uuid', clusters).map(qbert.getCharts)).then(flatten)
+        : qbert.getCharts(clusterId)
+
+    return mapAsync(async (chart) => {
+      const monocularUrl = await qbert.clusterMonocularBaseUrl(clusterId, null)
+      const icon = pathStr('attributes.icons.0.path', chart)
+      return {
+        ...chart,
+        logoUrl: icon ? pathJoin(monocularUrl, icon) : `${imageUrlRoot}/default-app-logo.png`,
+        readmeMarkdown: await qbert.getChartReadmeContents(clusterId, chart.attributes.readme),
+      }
+    }, apps)
   },
   customOperations: {
     deploy: async ({ clusterId, ...body }) => {
@@ -101,25 +117,8 @@ export const appActions = createCRUDActions(DataKeys.Apps, {
   entityName: 'App Catalog',
   uniqueIdentifier: ['id', 'clusterId'],
   indexBy: 'clusterId',
-  dataMapper: async (items, { clusterId, repositoryId }) => {
-    const monocularUrl = await qbert.clusterMonocularBaseUrl(clusterId, null)
-    const filterByRepo =
-      repositoryId && repositoryId !== allKey
-        ? filter(pathEq(['attributes', 'repo', 'name'], repositoryId))
-        : identity
-    const normalize = map((item) => {
-      const icon = pathStr('relationships.latestChartVersion.data.icons.0.path', item)
-      return {
-        ...item,
-        name: pathStr('attributes.name', item),
-        description: pathStr('attributes.description', item),
-        created: moment(pathStr('relationships.latestChartVersion.data.created', item)),
-        logoUrl: icon ? pathJoin(monocularUrl, icon) : `${imageUrlRoot}/default-app-logo.png`,
-      }
-    })
-    return pipe(filterByRepo, normalize)(items)
-  },
   defaultOrderBy: 'name',
+  selectorCreator: makeParamsAppsSelector,
 })
 
 export const releaseActions = createCRUDActions(DataKeys.Releases, {
@@ -133,24 +132,15 @@ export const releaseActions = createCRUDActions(DataKeys.Releases, {
   deleteFn: async (params) => {
     return qbert.deleteRelease(params.clusterId, params.id)
   },
-  dataMapper: (items, { namespace }) =>
-    pipe(
-      filterIf(namespace && namespace !== allKey, pathEq(['attributes', 'namespace'], namespace)),
-      map((item) => ({
-        ...item,
-        name: pathStr('attributes.name', item),
-        logoUrl: pathStrOr(`${imageUrlRoot}/default-app-logo.png`, 'attributes.chartIcon', item),
-        lastUpdated: moment(pathStr('attributes.updated', item), apiDateFormat).format('llll'),
-      })),
-    )(items),
   uniqueIdentifier,
   indexBy: 'clusterId',
+  selectorCreator: makeReleasesSelector,
 })
 
 const reposWithClustersLoader = createContextLoader(
   DataKeys.RepositoriesWithClusters,
-  async (params, loadFromContext) => {
-    const monocularClusters = await loadFromContext(clustersCacheKey, {
+  async (params) => {
+    const monocularClusters = await clusterActions.list({
       appCatalogClusters: true,
       hasControlPanel: true,
     })
@@ -281,19 +271,6 @@ export const repositoryActions = createCRUDActions(DataKeys.Repositories, {
         `Error when updating cluster access for repository ${getRepoName(id, prevItems)}`,
       )(catchedErr.message),
     })(operation),
-  dataMapper: async (items, params, loadFromContext) => {
-    const reposWithClusters = await loadFromContext(DataKeys.RepositoriesWithClusters)
-    return map(({ id, type, attributes }) => ({
-      id,
-      type,
-      name: attributes.name,
-      url: attributes.URL,
-      source: attributes.source,
-      clusters: pipe(
-        find(propEq(uniqueIdentifier, id)),
-        propOr(emptyArr, 'clusters'),
-      )(reposWithClusters),
-    }))(items)
-  },
   defaultOrderBy: 'name',
+  selectorCreator: makeRepositoriesSelector,
 })

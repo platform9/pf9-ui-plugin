@@ -6,6 +6,7 @@ import { always, find, head, isNil, keys, pipe, prop, propEq, reject } from 'ram
 import { tryCatchAsync } from 'utils/async'
 import { emptyArr, objSwitchCase, pathStr } from 'utils/fp'
 import { uuidRegex, originUsernameRegex } from 'app/constants'
+import DataKeys from 'k8s/DataKeys'
 
 const { keystone, clemency } = ApiClient.getInstance()
 
@@ -17,9 +18,8 @@ export const isSystemUser = ({ username }) => {
   const isUuid = uuidRegex.test(username)
   return isOriginUsername || isUuid || username === 'kplane-clustmgr'
 }
-export const mngmCredentialsCacheKey = 'managementCredentials'
 export const loadCredentials = createContextLoader(
-  mngmCredentialsCacheKey,
+  DataKeys.ManagementCredentials,
   () => {
     return keystone.getCredentials()
   },
@@ -28,8 +28,7 @@ export const loadCredentials = createContextLoader(
   },
 )
 
-export const mngmUsersCacheKey = 'managementUsers'
-export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
+export const mngmUserActions = createCRUDActions(DataKeys.ManagementUsers, {
   listFn: async () => {
     const [users] = await Promise.all([
       keystone.getUsers(),
@@ -79,10 +78,7 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
     mngmTenantActions.invalidateCache()
     return createdUser
   },
-  updateFn: async (
-    { id: userId, username, displayname, password, roleAssignments },
-    prevItems,
-  ) => {
+  updateFn: async ({ id: userId, username, displayname, password, roleAssignments }, prevItems) => {
     const prevRoleAssignmentsArr = await mngmUserRoleAssignmentsLoader({
       userId,
     })
@@ -149,9 +145,8 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
     })(operation),
 })
 
-export const mngmUserRoleAssignmentsCacheKey = 'managementUserRoleAssignments'
 export const mngmUserRoleAssignmentsLoader = createContextLoader(
-  mngmUserRoleAssignmentsCacheKey,
+  DataKeys.ManagementUserRoleAssignments,
   async ({ userId }) => (await keystone.getUserRoleAssignments(userId)) || emptyArr,
   {
     uniqueIdentifier: ['user.id', 'role.id'],

@@ -3,7 +3,6 @@ import DownloadKubeConfigLink from './DownloadKubeConfigLink'
 // import KubeCLI from './KubeCLI' // commented out till we support cli links
 import ExternalLink from 'core/components/ExternalLink'
 import SimpleLink from 'core/components/SimpleLink'
-import { clustersCacheKey } from '../common/actions'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { capitalizeString, castBoolToStr } from 'utils/misc'
 import {
@@ -24,6 +23,7 @@ import CodeBlock from 'core/components/CodeBlock'
 import DateCell from 'core/components/listTable/cells/DateCell'
 import { sessionStoreKey } from 'core/session/sessionReducers'
 import { useSelector } from 'react-redux'
+import DataKeys from 'k8s/DataKeys'
 
 const useStyles = makeStyles((theme) => ({
   links: {
@@ -208,7 +208,7 @@ export const options = {
     // since we use it in a few places for tags / metadata.
     { id: 'tags', label: 'Metadata', render: renderMetaData },
   ],
-  cacheKey: clustersCacheKey,
+  cacheKey: DataKeys.Clusters,
   editUrl: '/ui/kubernetes/infrastructure/clusters/edit',
   name: 'Clusters',
   title: 'Clusters',

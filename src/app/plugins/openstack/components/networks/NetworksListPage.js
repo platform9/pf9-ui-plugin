@@ -1,5 +1,5 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { networksCacheKey } from './actions'
+import DataKeys from 'k8s/DataKeys'
 
 export const options = {
   addUrl: '/ui/openstack/networks/add',
@@ -14,7 +14,7 @@ export const options = {
     { id: 'admin_state_up', label: 'Admin State' },
     { id: 'status', label: 'Status' },
   ],
-  cacheKey: networksCacheKey,
+  cacheKey: DataKeys.Networks,
   editUrl: '/ui/openstack/networks/edit',
   name: 'Networks',
   title: 'Networks',

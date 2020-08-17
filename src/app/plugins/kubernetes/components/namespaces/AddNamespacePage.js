@@ -8,6 +8,7 @@ import TextField from 'core/components/validatedForm/TextField'
 import { namespacesCacheKey } from './actions'
 import useParams from 'core/hooks/useParams'
 import { namespaceValidator } from 'core/utils/fieldValidators'
+import DataKeys from 'k8s/DataKeys'
 
 const defaultParams = {
   masterNodeClusters: true,
@@ -36,7 +37,7 @@ export const AddNamespaceForm = ({ onComplete }) => {
 }
 
 export const options = {
-  cacheKey: namespacesCacheKey,
+  cacheKey: DataKeys.DataKeys,
   FormComponent: AddNamespaceForm,
   listUrl: '/ui/kubernetes/namespaces',
   name: 'AddNamespace',

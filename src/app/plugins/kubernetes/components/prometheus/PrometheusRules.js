@@ -1,5 +1,5 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { prometheusRulesCacheKey } from './actions'
+import DataKeys from 'k8s/DataKeys'
 
 const renderKeyValues = (obj) =>
   Object.entries(obj)
@@ -15,7 +15,7 @@ export const columns = [
 
 export const options = {
   columns,
-  cacheKey: prometheusRulesCacheKey,
+  cacheKey: DataKeys.PrometheusRules,
   editUrl: '/ui/kubernetes/prometheus/rules/edit',
   name: 'PrometheusRules',
   title: 'Prometheus Rule Set',

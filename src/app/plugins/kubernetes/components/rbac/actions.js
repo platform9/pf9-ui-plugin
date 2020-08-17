@@ -1,7 +1,7 @@
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import ApiClient from 'api-client/ApiClient'
 import { uniq, propEq, pluck, pipe, find, prop, flatten } from 'ramda'
-import { mapAsync, someAsync } from 'utils/async'
+import { someAsync } from 'utils/async'
 import createContextLoader from 'core/helpers/createContextLoader'
 import { pathStr } from 'utils/fp'
 import { allKey } from 'app/constants'

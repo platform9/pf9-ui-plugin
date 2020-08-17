@@ -27,9 +27,7 @@ const { keystone } = ApiClient.getInstance()
 
 const whichInterface = (serviceName) => serviceMappings[serviceName] || 'internal'
 
-export const serviceCatalogContextKey = 'serviceCatalog'
-
-export const loadServiceCatalog = createContextLoader(serviceCatalogContextKey, async () => {
+export const loadServiceCatalog = createContextLoader(DataKeys.ServiceCatalog, async () => {
   const services = await keystone.getServicesForActiveRegion()
   return Object.entries(services || emptyObj).map(([name, service]) => {
     const iface = whichInterface(service)

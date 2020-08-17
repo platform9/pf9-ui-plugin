@@ -5,6 +5,7 @@ import { dataStoreKey, cacheStoreKey } from 'core/caching/cacheReducers'
 import { nodesCacheKey } from 'k8s/components/infrastructure/nodes/actions'
 import { combinedHostsSelector } from 'k8s/components/infrastructure/common/selectors'
 import { serviceCatalogContextKey } from 'openstack/components/api-access/actions'
+import createSorter from 'core/helpers/createSorter'
 
 export const nodesSelector = createSelector(
   pathOr(emptyArr, [cacheStoreKey, dataStoreKey, nodesCacheKey]),

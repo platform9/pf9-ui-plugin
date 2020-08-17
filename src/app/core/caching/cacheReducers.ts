@@ -26,6 +26,7 @@ import {
   removeWith,
 } from 'utils/fp'
 import { defaultUniqueIdentifier } from 'app/constants'
+import DataKeys from 'k8s/DataKeys'
 
 export const paramsStoreKey = 'cachedParams'
 export const dataStoreKey = 'cachedData'
@@ -61,7 +62,7 @@ const reducers = {
       payload: { cacheKey, loading },
     }: PayloadAction<{
       uniqueIdentifier: string | string[]
-      cacheKey: DataKey
+      cacheKey: DataKeys
       loading: boolean
     }>,
   ) => assocPath([loadingStoreKey, cacheKey], loading, state),
@@ -71,7 +72,7 @@ const reducers = {
       payload: { cacheKey, params, item },
     }: PayloadAction<{
       uniqueIdentifier: string | string[]
-      cacheKey: DataKey
+      cacheKey: DataKeys
       params: ParamsType
       item: T
     }>,
@@ -87,7 +88,7 @@ const reducers = {
     }: PayloadAction<{
       uniqueIdentifier: string | string[]
       params: ParamsType
-      cacheKey: DataKey
+      cacheKey: DataKeys
       item: T
     }>,
   ) => {
@@ -123,7 +124,7 @@ const reducers = {
       payload: { uniqueIdentifier = defaultUniqueIdentifier, cacheKey, params, items },
     }: PayloadAction<{
       uniqueIdentifier: string | string[]
-      cacheKey: DataKey
+      cacheKey: DataKeys
       params?: ParamsType
       items: T[]
     }>,
@@ -160,7 +161,7 @@ const reducers = {
       params ? assocPath(paramsPath, of(params)) : identity,
     )(state)
   },
-  clearCache: (state, action?: PayloadAction<Optional<{ cacheKey: DataKey }>>) => {
+  clearCache: (state, action?: PayloadAction<Optional<{ cacheKey: DataKeys }>>) => {
     const cacheKey = action?.payload?.cacheKey
     return cacheKey
       ? pipe<CacheState, CacheState, CacheState>(

@@ -2,21 +2,20 @@ import ApiClient from 'api-client/ApiClient'
 import createContextLoader from 'core/helpers/createContextLoader'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import namespaceActions from 'k8s/components/namespaces/actions'
-import { mngmUsersCacheKey, mngmUserActions } from 'k8s/components/userManagement/users/actions'
+import { mngmUserActions } from 'k8s/components/userManagement/users/actions'
 import { always, find, isNil, keys, pipe, prop, propEq, reject } from 'ramda'
 import { tryCatchAsync } from 'utils/async'
 import { emptyArr, objSwitchCase, pathStr } from 'utils/fp'
+import DataKeys from 'k8s/DataKeys'
 
 const { keystone } = ApiClient.getInstance()
 
-export const mngmTenantsCacheKey = 'managementTenants'
-
-export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
+export const mngmTenantActions = createCRUDActions(DataKeys.ManagementTenants, {
   listFn: async () => {
     const [allTenantsAllUsers] = await Promise.all([
       keystone.getAllTenantsAllUsers(),
       // Make sure the derived data gets loaded as well
-      namespaceActions.list()
+      namespaceActions.list(),
     ])
     return allTenantsAllUsers
   },
@@ -52,7 +51,7 @@ export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
   },
   updateFn: async ({ id: tenantId, name, description, roleAssignments }) => {
     const [users, prevRoleAssignmentsArr] = await Promise.all([
-      mngmUserActions.list(mngmUsersCacheKey),
+      mngmUserActions.list(DataKeys.ManagementUsers),
       mngmTenantRoleAssignmentsLoader({
         tenantId,
       }),
@@ -122,9 +121,8 @@ export const mngmTenantActions = createCRUDActions(mngmTenantsCacheKey, {
     })(operation),
 })
 
-export const mngmTenantRoleAssignmentsCacheKey = 'managementTenantRoleAssignments'
 export const mngmTenantRoleAssignmentsLoader = createContextLoader(
-  mngmTenantRoleAssignmentsCacheKey,
+  DataKeys.ManagementRoleAssignments,
   async ({ tenantId }) => (await keystone.getTenantRoleAssignments(tenantId)) || emptyArr,
   {
     uniqueIdentifier: ['user.id', 'role.id', 'scope.project.id'],

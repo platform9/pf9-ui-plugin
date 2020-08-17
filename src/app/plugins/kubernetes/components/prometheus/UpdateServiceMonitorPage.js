@@ -3,8 +3,8 @@ import KeyValuesField from 'core/components/validatedForm/KeyValuesField'
 import SubmitButton from 'core/components/SubmitButton'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import createUpdateComponents from 'core/helpers/createUpdateComponents'
-import { prometheusServiceMonitorsCacheKey } from './actions'
 import { keyValueArrToObj, objToKeyValueArr } from 'utils/fp'
+import DataKeys from 'k8s/DataKeys'
 
 class UpdateServiceMonitorForm extends React.PureComponent {
   handleUpdate = (data) => {
@@ -30,7 +30,7 @@ class UpdateServiceMonitorForm extends React.PureComponent {
 
 export const options = {
   FormComponent: UpdateServiceMonitorForm,
-  cacheKey: prometheusServiceMonitorsCacheKey,
+  cacheKey: DataKeys.PrometheusServiceMonitors,
   routeParamKey: 'id',
   uniqueIdentifier: 'uid',
   listUrl: '/ui/kubernetes/prometheus#serviceMonitors',

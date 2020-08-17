@@ -1,22 +1,16 @@
 import { createSelector } from 'reselect'
-import { pathOr, find, propEq, prop, pipe, pathEq, map } from 'ramda'
+import { pathOr, find, propEq, prop, pipe, pathEq, map, mergeLeft } from 'ramda'
 import { emptyArr, pathStrOrNull, pipeWhenTruthy, filterIf, pathStr, pathStrOr } from 'utils/fp';
-import { cacheStoreKey, dataStoreKey } from 'core/caching/cacheReducers'
-import { nodesCacheKey } from 'k8s/components/infrastructure/nodes/actions'
-import { combinedHostsSelector } from 'k8s/components/infrastructure/common/selectors'
-import { serviceCatalogContextKey } from 'openstack/components/api-access/actions'
-import { podsCacheKey } from 'k8s/components/pods/actions'
 import { allKey } from 'app/constants'
 import { pathJoin } from 'utils/misc'
-import { clustersCacheKey } from '../infrastructure/common/actions'
-import { clustersSelector } from 'k8s/components/infrastructure/clusters/selectors';
+import DataKeys from 'k8s/DataKeys'
 
 const k8sDocUrl = 'namespaces/kube-system/services/https:kubernetes-dashboard:443/proxy/#'
 
 export const nodesSelector = createSelector([
-  pathOr(emptyArr, [cacheStoreKey, dataStoreKey, nodesCacheKey]),
+  getDataSelector(DataKeys.Nodes),
   combinedHostsSelector,
-  pathOr(emptyArr, [cacheStoreKey, dataStoreKey, serviceCatalogContextKey]),
+  getDataSelector(DataKeys.ServiceCatalog),
 ], (rawNodes, combinedHosts, rawServiceCatalog) => {
     const combinedHostsObj = combinedHosts.reduce((accum, host) => {
       const id = pathStrOrNull('resmgr.id')(host) || pathStrOrNull('qbert.uuid')(host)
@@ -38,13 +32,13 @@ export const nodesSelector = createSelector([
 )
 
 export const podsSelector = createSelector([
-  pathOr(emptyArr, [cacheStoreKey, dataStoreKey, podsCacheKey]),
-  pathOr(emptyArr, [cacheStoreKey, dataStoreKey, clustersCacheKey]),
+  getDataSelector(DataKeys.Pods),
+  getDataSelector(DataKeys.Clusters),
 ], (rawPods, rawClusters) => {
     // associate nodes with the combinedHost entry
     return pipe(
       // Filter by namespace
-      map(async (pod) => {
+      map((pod) => {
         const {clusterId} = pod
         const dashboardUrl = pathJoin(
           await qbert.clusterBaseUrl(clusterId),
@@ -77,15 +71,15 @@ export const makeParamsPodsSelector = (
       return pipe(
         filterIf(namespace && namespace !== allKey, propEq('namespace', namespace)),
         createSorter({ orderBy, orderDirection })
-        )(pods)
+      )(pods)
     },
   )
 }
 
 export const deploymentsSelector = createSelector([
-  pathOr(emptyArr, [cacheStoreKey, dataStoreKey, deploymentsCacheKey]),
-  pathOr(emptyArr, [cacheStoreKey, dataStoreKey, podsCacheKey]),
-  pathOr(emptyArr, [cacheStoreKey, dataStoreKey, clustersCacheKey]),
+  getDataSelector(DataKeys.Deployments),
+  getDataSelector(DataKeys.Pods),
+  getDataSelector(DataKeys.Clusters),
 ], (rawDeployments, rawPods, rawClusters) => {
   return rawDeployments.map(deployment => {
     const dashboardUrl = pathJoin(
@@ -134,7 +128,7 @@ export const makeParamsDeploymentsSelector = (
       return pipe(
         filterIf(namespace && namespace !== allKey, propEq('namespace', namespace)),
         createSorter({ orderBy, orderDirection })
-        )(pods)
+      )(pods)
     },
   )
 }
@@ -142,10 +136,10 @@ export const makeParamsDeploymentsSelector = (
 export const serviceSelectors = createSelector(
   async (items, { clusterId, namespace }, loadFromContext) => {
     const clusters = await loadFromContext(clustersCacheKey)
-    return pipeAsync(
+    return pipe(
       // Filter by namespace
       filterIf(namespace && namespace !== allKey, pathEq(['metadata', 'namespace'], namespace)),
-      mapAsync(async (service) => {
+      map(async (service) => {
         const dashboardUrl = pathJoin(
           await qbert.clusterBaseUrl(service.clusterId),
           k8sDocUrl,

@@ -1,5 +1,5 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { usersCacheKey } from './actions'
+import DataKeys from 'k8s/DataKeys'
 
 export const options = {
   addUrl: '/ui/openstack/users/add',
@@ -9,7 +9,7 @@ export const options = {
     { id: 'mfa', label: 'Two-factor authentication' },
     { id: 'rolePair', label: 'Tenants & Roles' },
   ],
-  cacheKey: usersCacheKey,
+  cacheKey: DataKeys.Users,
   editUrl: '/ui/openstack/users/edit',
   name: 'Users',
   title: 'Users',

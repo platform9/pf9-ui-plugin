@@ -31,10 +31,21 @@ enum DataKeys {
   Loggings = 'loggings',
   Alerts = 'alerts',
   AlertsTimeSeries = 'alertsTimeSeries',
-  Endpoints = 'apiAccess-endpoints',
+  ApiEndpoints = 'apiAccess-endpoints',
+  Ssh = 'ssh',
+  ServiceCatalog = 'serviceCatalog',
+  Endpoints = 'endpoints',
   KubeRoles = 'kubeRoles',
   RoleBindings = 'roleBindings',
   ClusterRoleBindings = 'clusterRoleBindings',
+  ManagementUsers = 'managementUsers',
+  ManagementTenants = 'managementTenants',
+  ManagementRoles = 'managementRoles',
+  ManagementRoleAssignments = 'managementRoleAssignments',
+  ManagementGroups = 'managementGroups',
+  ManagementGroupsMappings = 'managementGroupMappings',
+  Tenants = 'tenants',
+  Users = 'users',
 }
 
 export default DataKeys

@@ -1,6 +1,6 @@
 import React from 'react'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import storageClassActions, { storageClassesCacheKey } from 'k8s/components/storage/actions'
+import storageClassActions from 'k8s/components/storage/actions'
 import PageContainer from 'core/components/pageContainer/PageContainer'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { listTablePrefs, allKey } from 'app/constants'
@@ -9,6 +9,7 @@ import { pick } from 'ramda'
 import { createUsePrefParamsHook } from 'core/hooks/useParams'
 import Tabs from 'core/components/tabs/Tabs'
 import Tab from 'core/components/tabs/Tab'
+import DataKeys from 'k8s/DataKeys'
 
 const defaultParams = {
   healthyClusters: true,
@@ -50,7 +51,7 @@ export const options = {
     { id: 'provisioner', label: 'Provisioner' },
     { id: 'created', label: 'Created' },
   ],
-  cacheKey: storageClassesCacheKey,
+  cacheKey: DataKeys.StorageClasses,
   name: 'StorageClasses',
   title: 'Storage Classes',
   ListPage,

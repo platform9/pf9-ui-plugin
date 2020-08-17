@@ -1,26 +1,19 @@
 import { createSelector } from 'reselect'
-import { pathOr, pipe, find, propEq, prop, filter, map, pluck } from 'ramda'
-import { emptyArr, filterIf } from 'utils/fp'
-import { dataStoreKey, cacheStoreKey } from 'core/caching/cacheReducers'
-import createSorter from 'core/helpers/createSorter'
-import { namespacesCacheKey } from 'k8s/components/namespaces/actions'
-import { TenantWithUsers, Tenant } from 'k8s/components/userManagement/tenants/model'
-import { mngmTenantsCacheKey } from 'k8s/components/userManagement/tenants/actions'
-import { Namespace } from 'k8s/components/namespaces/model'
-import getParamsSelector from 'core/helpers/getParamsSelector'
+import { pipe, find, propEq, prop, filter, map, pluck } from 'ramda'
+import { filterIf } from 'utils/fp'
+import getDataSelector from 'core/utils/getDataSelector'
+import DataKeys from 'k8s/DataKeys'
 
 const reservedTenantNames = ['admin', 'services', 'Default', 'heat']
 export const filterValidTenants = (tenant) => !reservedTenantNames.includes(tenant.name)
 
-export const tenantsSelector = createSelector<TenantWithUsers[], Namespace[], Tenant[]>([
-    pathOr(emptyArr, [cacheStoreKey, dataStoreKey, mngmTenantsCacheKey]),
-    pathOr(emptyArr, [cacheStoreKey, dataStoreKey, namespacesCacheKey])
+export const tenantsSelector = createSelector(
+  [
+    getDataSelector(DataKeys.ManagementTenants),
+    getDataSelector(DataKeys.Namespaces, ['clusterId']),
   ],
   (allTenantsAllUsers, namespaces) => {
-    const heatTenantId = pipe(
-      find(propEq('name', 'heat')),
-      prop('id')
-    )(allTenantsAllUsers)
+    const heatTenantId = pipe(find(propEq('name', 'heat')), prop('id'))(allTenantsAllUsers)
     return pipe(
       filter((tenant) => tenant.domain_id !== heatTenantId),
       map((tenant) => ({
@@ -37,15 +30,10 @@ export const tenantsSelector = createSelector<TenantWithUsers[], Namespace[], Te
 
 export const makeFilteredTenantsSelector = () => {
   return createSelector(
-    [tenantsSelector, getParamsSelector()],
+    [tenantsSelector, (_, params) => mergeLeft(params, defaultParams)],
     (clusters, params) => {
-      const {
-        includeBlacklisted
-      } = params
-      return pipe(
-        filterIf(!includeBlacklisted, filterValidTenants),
-        createSorter()
-      )(clusters)
-    }
+      const { includeBlacklisted } = params
+      return pipe(filterIf(!includeBlacklisted, filterValidTenants), createSorter())(clusters)
+    },
   )
 }

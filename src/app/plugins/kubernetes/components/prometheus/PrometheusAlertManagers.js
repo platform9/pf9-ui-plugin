@@ -1,5 +1,5 @@
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { prometheusAlertManagersCacheKey } from './actions'
+import DataKeys from 'k8s/DataKeys'
 
 export const columns = [
   { id: 'name', label: 'Name' },
@@ -10,7 +10,7 @@ export const columns = [
 
 export const options = {
   columns,
-  cacheKey: prometheusAlertManagersCacheKey,
+  cacheKey: DataKeys.PrometheusAlertManagers,
   editUrl: '/ui/kubernetes/prometheus/alertManagers/edit',
   name: 'PrometheusAlertManagers',
   title: 'Prometheus Alert Managers',

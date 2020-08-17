@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import ResourceUsageTable from 'k8s/components/infrastructure/common/ResourceUsageTable'
 import SimpleLink from 'core/components/SimpleLink'
-import { cloudProvidersCacheKey } from 'k8s/components/infrastructure/cloudProviders/actions'
+import DataKeys from 'k8s/DataKeys'
 
 const toMHz = (bytes) => bytes / Math.pow(1024, 2)
 const toGB = (bytes) => bytes / Math.pow(1024, 3)
@@ -103,7 +103,7 @@ export const options = {
     { id: 'nodes', label: 'Nodes', render: (nodes) => <NodesCell nodes={nodes} /> },
     { id: 'uuid', label: 'Unique ID' },
   ],
-  cacheKey: cloudProvidersCacheKey,
+  cacheKey: DataKeys.CloudProviders,
   editUrl: '/ui/kubernetes/infrastructure/cloudProviders/edit',
   editCond: ([selectedRow]) => selectedRow.type !== 'openstack',
   editDisabledInfo: () => 'Editing an Openstack cloud provider is not currently supported',

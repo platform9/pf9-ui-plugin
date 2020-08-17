@@ -3,15 +3,15 @@ import createCRUDActions from 'core/helpers/createCRUDActions'
 import { tryJsonParse } from 'utils/misc'
 import { pipe, pluck, flatten, find, pathEq, any } from 'ramda'
 import { emptyArr } from 'utils/fp'
+import DataKeys from 'k8s/DataKeys'
 
 const { keystone } = ApiClient.getInstance()
 
-export const mngmGroupsCacheKey = 'managementGroups'
-export const mngmGroupActions = createCRUDActions(mngmGroupsCacheKey, {
+export const mngmGroupActions = createCRUDActions(DataKeys.ManagementGroups, {
   listFn: async () => keystone.getGroups(),
   dataMapper: async (groups, params, loadFromContext) => {
     // Retrieve the group mappings from the cache
-    const mappings = await loadFromContext(mngmGroupMappingsCacheKey)
+    const mappings = await loadFromContext(DataKeys.ManagementGroupsMappings)
     return groups.map((group) => {
       // Find the mapping that contains a rule belonging to the current group
       const groupMapping = mappings.find((mapping) => {
@@ -47,7 +47,6 @@ export const mngmGroupActions = createCRUDActions(mngmGroupsCacheKey, {
   },
   entityName: 'Group',
 })
-export const mngmGroupMappingsCacheKey = 'managementGroupMappings'
-export const mngmGroupMappingActions = createCRUDActions(mngmGroupMappingsCacheKey, {
+export const mngmGroupMappingActions = createCRUDActions(DataKeys.ManagementGroupsMappings, {
   listFn: async () => keystone.getGroupMappings(),
 })

@@ -7,6 +7,7 @@ import { someAsync } from 'utils/async'
 import { parseClusterParams } from 'k8s/components/infrastructure/clusters/actions'
 import { allKey, notFoundErr } from 'app/constants'
 import { pathStr } from 'utils/fp'
+import { storageClassSelector } = './selectors'
 import DataKeys from 'k8s/DataKeys'
 
 const { qbert } = ApiClient.getInstance()
@@ -31,20 +32,7 @@ const storageClassActions = createCRUDActions(DataKeys.StorageClasses, {
     const body = yaml.safeLoad(storageClassYaml)
     return qbert.createStorageClass(clusterId, body)
   },
-  dataMapper: async (items, params, loadFromContext) => {
-    const clusters = await loadFromContext(clustersCacheKey, params)
-    return map(
-      (storageClass) => ({
-        ...storageClass,
-        id: pathStr('metadata.uid', storageClass),
-        name: pathStr('metadata.name', storageClass),
-        clusterName: pipe(find(propEq('uuid', storageClass.clusterId)), prop('name'))(clusters),
-        type: pathStr('parameters.type', storageClass),
-        created: pathStr('metadata.creationTimestamp', storageClass),
-      }),
-      items,
-    )
-  },
+  selector: storageClassSelector,
   uniqueIdentifier: 'metadata.uid',
   indexBy: 'clusterId',
   entityName: 'Storage Class',

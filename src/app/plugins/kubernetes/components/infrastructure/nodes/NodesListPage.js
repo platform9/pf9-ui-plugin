@@ -7,7 +7,7 @@ import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { pathOr, pipe, pick, path, prop } from 'ramda'
 import { castBoolToStr, castFuzzyBool, columnPathLookup } from 'utils/misc'
 import SimpleLink from 'core/components/SimpleLink'
-import { loadNodes, nodesCacheKey } from 'k8s/components/infrastructure/nodes/actions'
+import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
 import ClusterStatusSpan from 'k8s/components/infrastructure/clusters/ClusterStatus'
 import {
   connectionStatusFieldsTable,
@@ -26,6 +26,7 @@ import ResourceUsageTable from '../common/ResourceUsageTable'
 import { makeStyles } from '@material-ui/styles'
 import { routes } from 'core/utils/routes'
 import { ToolbarActionIcon } from 'core/components/listTable/ListTableBatchActions'
+import DataKeys from 'k8s/DataKeys'
 
 const useStyles = makeStyles((theme) => ({
   title: {
@@ -276,7 +277,7 @@ export const options = {
   addText: 'Onboard a Node',
   addUrl: '/ui/kubernetes/infrastructure/nodes/cli/download',
   columns,
-  cacheKey: nodesCacheKey,
+  cacheKey: DataKeys.Nodes,
   name: 'Nodes',
   title: 'Nodes',
   uniqueIdentifier: 'uuid',

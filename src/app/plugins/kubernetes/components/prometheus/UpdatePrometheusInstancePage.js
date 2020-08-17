@@ -3,7 +3,7 @@ import SubmitButton from 'core/components/SubmitButton'
 import TextField from 'core/components/validatedForm/TextField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import createUpdateComponents from 'core/helpers/createUpdateComponents'
-import { prometheusInstancesCacheKey } from 'k8s/components/prometheus/actions'
+import DataKeys from 'k8s/DataKeys'
 
 class UpdatePrometheusInstanceForm extends React.PureComponent {
   handleUpdate = (data) => {
@@ -36,7 +36,7 @@ export const options = {
   FormComponent: UpdatePrometheusInstanceForm,
   routeParamKey: 'id',
   uniqueIdentifier: 'uid',
-  cacheKey: prometheusInstancesCacheKey,
+  cacheKey: DataKeys.PrometheusInstances,
   listUrl: '/ui/kubernetes/prometheus#instances',
   name: 'UpdatePrometheusInstance',
   title: 'Update Prometheus Instance',
