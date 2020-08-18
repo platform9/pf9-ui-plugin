@@ -1,12 +1,16 @@
 import { createSelector } from 'reselect'
-import { find, propEq, prop, pipe, pathEq, map, mergeLeft } from 'ramda'
+import { find, propEq, prop, pipe, pathEq, map, mergeLeft, any } from 'ramda'
 import { emptyArr, pathStrOrNull, pipeWhenTruthy, filterIf, pathStr, pathStrOr } from 'utils/fp'
 import { allKey } from 'app/constants'
 import { pathJoin } from 'utils/misc'
 import DataKeys from 'k8s/DataKeys'
 import getDataSelector from 'core/utils/getDataSelector'
 import { combinedHostsSelector } from '../infrastructure/common/selectors'
-import { IDataKeys } from 'k8s/datakeys.model'
+import { GetClusterPodsItem, IGenericResource } from 'api-client/qbert.model'
+import ApiClient from 'api-client/'
+import createSorter from 'core/helpers/createSorter'
+
+const { qbert } = ApiClient.getInstance()
 
 const k8sDocUrl = 'namespaces/kube-system/services/https:kubernetes-dashboard:443/proxy/#'
 
@@ -45,7 +49,7 @@ export const podsSelector = createSelector(
     // associate nodes with the combinedHost entry
     return pipe(
       // Filter by namespace
-      map((pod: IDataKeys[DataKeys.Pods]) => {
+      map(async (pod: IGenericResource<GetClusterPodsItem>) => {
         const { clusterId } = pod
         const dashboardUrl = pathJoin(
           await qbert.clusterBaseUrl(clusterId),
@@ -103,7 +107,7 @@ export const deploymentsSelector = createSelector(
 
       // Check if any pod label matches the first deployment match label key
       // Note: this logic should probably be revised (copied from Clarity UI)
-      const deploymentPods = pods.filter((pod) => {
+      const deploymentPods = rawPods.filter((pod) => {
         if (pod.namespace !== namespace || pod.clusterId !== clusterId) {
           return false
         }

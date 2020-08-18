@@ -327,7 +327,7 @@ export interface ServicesByName {
   }
 }
 
-export interface ServicesByRegion {
+export type ServicesByRegion = {
   [key in ID]: ServicesByName
 }
 export interface GetUserRoleAssignments {

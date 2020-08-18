@@ -62,7 +62,7 @@ export const loadTimeSeriesAlerts = createContextLoader(
       const clusters = pipe(
         filter(hasPrometheusTag),
         filter(hasHealthyMasterNodes),
-      )(await await qbert.getClusters())
+      )(await qbert.getClusters())
 
       return someAsync(
         pluck('uuid', clusters).map((cluster) =>
