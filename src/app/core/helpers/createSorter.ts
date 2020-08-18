@@ -9,7 +9,7 @@ export enum OrderDirection {
 }
 type OrderDirectionString = keyof typeof OrderDirection
 
-interface SortConfig {
+export interface SortConfig {
   orderBy?: string
   orderDirection?: OrderDirection | OrderDirectionString
 }

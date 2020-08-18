@@ -3,11 +3,12 @@ import { emptyArr, arrayIfNil, arrayIfEmpty, ensureArray } from 'app/utils/fp'
 import { allKey } from 'app/constants'
 import { dataStoreKey } from 'core/caching/cacheReducers'
 import { IDataKeys } from 'k8s/datakeys.model'
+import { ParametricSelector } from 'reselect'
 
 const getDataSelector = <T extends keyof IDataKeys>(
   dataKey: T,
   indexBy = [],
-): ((store: any, params: any) => IDataKeys[T]) => {
+): ParametricSelector<IDataKeys, any, IDataKeys[T]> => {
   return (store, params) => {
     const providedIndexedParams = pipe(
       pickAll(ensureArray(indexBy)),

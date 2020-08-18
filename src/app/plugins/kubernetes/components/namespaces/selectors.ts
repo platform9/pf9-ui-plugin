@@ -1,18 +1,23 @@
 import { createSelector } from 'reselect'
 import { pathOr } from 'ramda'
-import { emptyArr } from 'utils/fp'
-import { cacheStoreKey, dataStoreKey } from 'core/caching/cacheReducers'
-import { namespacesCacheKey } from 'k8s/components/namespaces/actions'
-import { clustersCacheKey } from 'k8s/components/infrastructure/common/actions'
+import { IDataKeys } from 'k8s/datakeys.model'
+import DataKeys from 'k8s/DataKeys'
+import { INamespace } from './model'
+import getDataSelector from 'core/utils/getDataSelector'
 
 const findClusterName = (clusters, clusterId) => {
   const cluster = clusters.find((x) => x.uuid === clusterId)
   return (cluster && cluster.name) || ''
 }
 
-export const namespacesSelector = createSelector(
-  pathOr(emptyArr, [cacheStoreKey, dataStoreKey, namespacesCacheKey]),
-  pathOr(emptyArr, [cacheStoreKey, dataStoreKey, clustersCacheKey]),
+export const namespacesSelector = createSelector<
+  IDataKeys,
+  IDataKeys[DataKeys.Namespaces],
+  IDataKeys[DataKeys.Clusters],
+  INamespace[]
+>(
+  getDataSelector<DataKeys.Namespaces>(DataKeys.Namespaces, ['clusterId']),
+  getDataSelector<DataKeys.Clusters>(DataKeys.Clusters),
   (rawNamespaces, rawClusters) => {
     return rawNamespaces.map((ns) => ({
       ...ns,
