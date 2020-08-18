@@ -6,7 +6,12 @@ import { pluck, flatten } from 'ramda'
 import { someAsync } from 'utils/async'
 import { parseClusterParams, clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import { pathStr } from 'utils/fp'
-import { nodesSelector, deploymentsSelector, serviceSelectors } from './selectors'
+import {
+  nodesSelector,
+  deploymentsSelector,
+  serviceSelectors,
+  makeServiceSelector,
+} from './selectors'
 import DataKeys from 'k8s/DataKeys'
 
 const { qbert } = ApiClient.getInstance()
@@ -39,8 +44,8 @@ export const podActions = createCRUDActions(DataKeys.Pods, {
 })
 
 export const deploymentActions = createCRUDActions(DataKeys.Deployments, {
-  listFn: async (params, loadFromContext) => {
-    const [clusterId, clusters] = await parseClusterParams(params, loadFromContext)
+  listFn: async (params) => {
+    const [clusterId, clusters] = await parseClusterParams(params)
     if (clusterId === allKey) {
       return someAsync(pluck('uuid', clusters).map(qbert.getClusterDeployments)).then(flatten)
     }
@@ -85,4 +90,5 @@ export const serviceActions = createCRUDActions(DataKeys.KubeServices, {
   entity: 'services',
   indexBy: 'clusterId',
   selector: serviceSelectors,
+  selectorCreator: makeServiceSelector,
 })

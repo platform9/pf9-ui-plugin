@@ -65,8 +65,11 @@ export const makeCloudProvidersSelector = (
     orderDirection: 'desc',
   },
 ) => {
-  return createSelector([cloudProvidersSelector, defaultParams], (cloudProviders, params) => {
-    const { orderBy, orderDirection } = params
-    return pipe(createSorter({ orderBy, orderDirection }))(cloudProviders)
-  })
+  return createSelector(
+    [cloudProvidersSelector, (_, params) => mergeLeft(params, defaultParams)],
+    (cloudProviders, params) => {
+      const { orderBy, orderDirection } = params
+      return pipe(createSorter({ orderBy, orderDirection }))(cloudProviders)
+    },
+  )
 }

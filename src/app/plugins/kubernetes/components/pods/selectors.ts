@@ -10,9 +10,7 @@ import { GetClusterPodsItem, IGenericResource } from 'api-client/qbert.model'
 import ApiClient from 'api-client/'
 import createSorter from 'core/helpers/createSorter'
 
-const { qbert } = ApiClient.getInstance()
-
-const k8sDocUrl = 'namespaces/kube-system/services/https:kubernetes-dashboard:443/proxy/#'
+const k8sDocUrl = 'namespaces/kube-system/qbertservices/https:kubernetes-dashboard:443/proxy/#'
 
 export const nodesSelector = createSelector(
   [
@@ -40,19 +38,18 @@ export const nodesSelector = createSelector(
   },
 )
 
-export const podsSelector = createSelector(
-  [
+export const podsSelector = createSelector([
     getDataSelector<DataKeys.Pods>(DataKeys.Pods),
     getDataSelector<DataKeys.Clusters>(DataKeys.Clusters),
-  ],
-  (rawPods, rawClusters) => {
+], (rawPods, clusters) => {
     // associate nodes with the combinedHost entry
     return pipe(
       // Filter by namespace
       map(async (pod: IGenericResource<GetClusterPodsItem>) => {
         const { clusterId } = pod
+        const cluster = find(propEq('uuid', clusterId), clusters)
         const dashboardUrl = pathJoin(
-          await qbert.clusterBaseUrl(clusterId),
+          cluster.baseUrl,
           k8sDocUrl,
           'pod',
           pathStr('metadata.namespace', pod),
@@ -65,7 +62,7 @@ export const podsSelector = createSelector(
           name: pathStr('metadata.name', pod),
           namespace: pathStr('metadata.namespace', pod),
           labels: pathStr('metadata.labels', pod),
-          clusterName: pipe(find(propEq('uuid', clusterId)), prop('name'))(rawClusters),
+          clusterName: cluster.name,
         }
       }),
     )(rawPods)
@@ -91,10 +88,12 @@ export const deploymentsSelector = createSelector(
     getDataSelector<DataKeys.Pods>(DataKeys.Pods),
     getDataSelector<DataKeys.Clusters>(DataKeys.Clusters),
   ],
-  (rawDeployments, rawPods, rawClusters) => {
+  (rawDeployments, rawPods, clusters) => {
     return rawDeployments.map((deployment) => {
+      const { clusterId } = deployment
+      const cluster = find(propEq('uuid', clusterId), clusters)
       const dashboardUrl = pathJoin(
-        await qbert.clusterBaseUrl(deployment.clusterId),
+        cluster.baseUrl,
         k8sDocUrl,
         'deployment',
         pathStr('metadata.namespace', deployment),
@@ -107,7 +106,7 @@ export const deploymentsSelector = createSelector(
 
       // Check if any pod label matches the first deployment match label key
       // Note: this logic should probably be revised (copied from Clarity UI)
-      const deploymentPods = rawPods.filter((pod) => {
+      const deploymentPods = pods.filter((pod) => {
         if (pod.namespace !== namespace || pod.clusterId !== clusterId) {
           return false
         }
@@ -124,7 +123,7 @@ export const deploymentsSelector = createSelector(
         selectors,
         pods: deploymentPods.length,
         namespace,
-        clusterName: pipe(find(propEq('uuid', deployment.clusterId)), prop('name'))(clusters),
+        clusterName: cluster.name,
       }
     })
   },
@@ -144,53 +143,63 @@ export const makeParamsDeploymentsSelector = (defaultParams = {}) => {
 }
 
 export const serviceSelectors = createSelector(
-  async (items, { clusterId, namespace }, loadFromContext) => {
-    const clusters = await loadFromContext(clustersCacheKey)
-    return pipe(
-      // Filter by namespace
-      filterIf(namespace && namespace !== allKey, pathEq(['metadata', 'namespace'], namespace)),
-      map(async (service) => {
-        const dashboardUrl = pathJoin(
-          await qbert.clusterBaseUrl(service.clusterId),
-          k8sDocUrl,
-          'service',
-          pathStr('metadata.namespace', service),
-          pathStr('metadata.name', service),
-        )
-        const clusterId = prop('clusterId', service)
-        const type = pathStr('spec.type', service)
-        const externalName = pathStr('spec.externalName', service)
-        const name = pathStr('metadata.name', service)
-        const ports = pathStrOr(emptyArr, 'spec.ports', service)
-        const loadBalancerEndpoints = pathStrOr(emptyArr, 'status.loadBalancer.ingress', service)
-        const internalEndpoints = ports
-          .map((port) => [
-            `${name}:${port.port} ${port.protocol}`,
-            `${name}:${port.nodePort || 0} ${port.protocol}`,
-          ])
-          .flat()
-        const externalEndpoints = [
-          ...(externalName ? [externalName] : []),
-          ...pluck('hostname', loadBalancerEndpoints),
-          ...(type === 'NodePort' ? ['&lt;nodes&gt;'] : []),
-        ]
-        const clusterIp = pathStr('spec.clusterIP', service)
-        const status =
-          clusterIp && (type !== 'LoadBalancer' || externalEndpoints.length > 0) ? 'OK' : 'Pending'
-        return {
-          ...service,
-          dashboardUrl,
-          labels: pathStr('metadata.labels', service),
-          selectors: pathStrOr(emptyObj, 'spec.selector', service),
-          type,
-          status,
-          clusterIp,
-          internalEndpoints,
-          externalEndpoints,
-          namespace: pathStr('metadata.namespace', service),
-          clusterName: pipe(find(propEq('uuid', clusterId)), prop('name'))(clusters),
-        }
-      }),
-    )(items)
+  [getDataSelector<DataKeys.Services>(DataKeys.Services, 'clusterId'), clustersSelector],
+  (rawDeployments, clusters) => {
+    return map((service) => {
+      const { clusterId } = service
+      const cluster = find(propEq('uuid', clusterId), clusters)
+      const dashboardUrl = pathJoin(
+        cluster.baseUrl,
+        k8sDocUrl,
+        'service',
+        pathStr('metadata.namespace', service),
+        pathStr('metadata.name', service),
+      )
+      const type = pathStr('spec.type', service)
+      const externalName = pathStr('spec.externalName', service)
+      const name = pathStr('metadata.name', service)
+      const ports = pathStrOr(emptyArr, 'spec.ports', service)
+      const loadBalancerEndpoints = pathStrOr(emptyArr, 'status.loadBalancer.ingress', service)
+      const internalEndpoints = ports
+        .map((port) => [
+          `${name}:${port.port} ${port.protocol}`,
+          `${name}:${port.nodePort || 0} ${port.protocol}`,
+        ])
+        .flat()
+      const externalEndpoints = [
+        ...(externalName ? [externalName] : []),
+        ...pluck('hostname', loadBalancerEndpoints),
+        ...(type === 'NodePort' ? ['&lt;nodes&gt;'] : []),
+      ]
+      const clusterIp = pathStr('spec.clusterIP', service)
+      const status =
+        clusterIp && (type !== 'LoadBalancer' || externalEndpoints.length > 0) ? 'OK' : 'Pending'
+      return {
+        ...service,
+        dashboardUrl,
+        labels: pathStr('metadata.labels', service),
+        selectors: pathStrOr(emptyObj, 'spec.selector', service),
+        type,
+        status,
+        clusterIp,
+        internalEndpoints,
+        externalEndpoints,
+        namespace: pathStr('metadata.namespace', service),
+        clusterName: cluster.name,
+      }
+    })(rawDeployments)
   },
 )
+
+export const makeServiceSelector = (defaultParams = {}) => {
+  return createSelector(
+    [serviceSelectors, (_, params) => mergeLeft(params, defaultParams)],
+    (services, params) => {
+      const { namespace, orderBy, orderDirection } = params
+      return pipe(
+        filterIf(namespace && namespace !== allKey, pathEq(['metadata', 'namespace'], namespace)),
+        createSorter({ orderBy, orderDirection }),
+      )(services)
+    },
+  )
+}

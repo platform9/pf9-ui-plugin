@@ -1,12 +1,13 @@
 import { createSelector } from 'reselect'
-import { map, mergeLeft, pipe, filter, pathEq, identity, find, propOr } from 'ramda'
-import { pathStr, filterIf } from 'utils/fp'
+import { map, mergeLeft, pipe, filter, pathEq, identity, find, propOr, propEq } from 'ramda'
+import { emptyArr, pathStr, filterIf } from 'utils/fp'
 import DataKeys from 'k8s/DataKeys'
 import getDataSelector from 'core/utils/getDataSelector'
 import createSorter from 'core/helpers/createSorter'
 import { imageUrlRoot, allKey } from 'app/constants'
 import moment from 'moment'
 
+const uniqueIdentifier = 'id'
 const apiDateFormat = 'ddd MMM D HH:mm:ss YYYY'
 
 export const appDetailsSelector = createSelector(
