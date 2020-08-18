@@ -323,8 +323,8 @@ const IronicSetupPage = () => {
         const hasImages = await ironicImagesExist(images)
         if (!hasImages.finished) {
           setStartingStep(hasImages.step)
-          setLoading(false)
           setInitialContext({ ...initialContext, ...netConfig.data, ...nodeAuthed.data, ...hasSubnet.data })
+          setLoading(false)
           return
         }
 
