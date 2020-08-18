@@ -314,6 +314,22 @@ export enum Interface {
   Public = 'public',
 }
 
+export interface IFace {
+  id: Endpoint['id']
+  url: Endpoint['url']
+  type: Catalog['type']
+  iface: Interface
+}
+
+export interface ServicesByName {
+  [key: string]: {
+    [key in Interface]: IFace
+  }
+}
+
+export interface ServicesByRegion {
+  [key in ID]: ServicesByName
+}
 export interface GetUserRoleAssignments {
   role_assignments: RoleAssignment[]
   links: GetCredentialsLinks

@@ -1,0 +1,67 @@
+import { Host } from 'api-client/resmgr.model'
+import { Tenant, RoleAssignment, IFace, User, Role } from 'api-client/keystone.model'
+import {
+  IGenericResource,
+  GetClusterNamespacesItem,
+  GetClusterPodsItem,
+  Node,
+  GetClusterDeploymentsItem,
+  GetClusterKubeServicesItem,
+  GetCloudProvider,
+  IGenericClusterizedResponse,
+  GetClusterRolesItem,
+  GetClusterClusterRoleBindingsItem,
+} from 'api-client/qbert.model'
+import { IClusterAction } from './components/infrastructure/clusters/model'
+import { ClusterTag } from 'api-client/appbert.model'
+import { IAlert, IAlertOverTime } from './components/alarms/model'
+
+export interface IDataKeys {
+  Nodes: Node[]
+  Clusters: IClusterAction[]
+  Pods: Array<IGenericResource<GetClusterPodsItem>>
+  ResMgrHosts: Host[]
+  CombinedHosts: any // ? dont see where we load them
+  CoreApiResources: any // no model for this yet
+  ApiResources: any // no model for this yet
+  Deployments: Array<IGenericResource<GetClusterDeploymentsItem>>
+  KubeServices: Array<IGenericResource<GetClusterKubeServicesItem>>
+  Namespaces: Array<IGenericResource<GetClusterNamespacesItem>>
+  AppDetail: any // no model for this yet
+  Apps: any // no model for this yet
+  AppVersions: any // no model for this yet
+  ApiGroups: any // no model for this yet
+  Releases: any // no model for this yet
+  ReleaseDetail: any // no model for this yet
+  RepositoriesWithClusters: any // no model for this yet
+  Repositories: any // no model for this yet
+  CloudProviders: GetCloudProvider[]
+  CloudProviderDetails: any // no model for this yet
+  CloudProviderRegionDetails: any // no model for this yet
+  ClusterTags: ClusterTag[]
+  ClusterRoles: Array<IGenericClusterizedResponse<GetClusterRolesItem>>
+  PrometheusInstances: Array<IGenericClusterizedResponse<any>>
+  ServiceAccounts: any // no model for this yet
+  PrometheusRules: Array<IGenericClusterizedResponse<any>> // no model for this yet
+  PrometheusServiceMonitors: Array<IGenericClusterizedResponse<any>> // no model for this yet
+  PrometheusAlertManagers: Array<IGenericClusterizedResponse<any>> // no model for this yet
+  StorageClasses: Array<IGenericResource<GetClusterClusterRoleBindingsItem>>
+  Loggings: any // no model for this yet
+  Alerts: IAlert[]
+  AlertsTimeSeries: IAlertOverTime[]
+  ApiEndpoints: Array<IFace & { name: string }>
+  Ssh: any // ? dont see where we load them
+  ServiceCatalog: Array<IFace & { name: string }>
+  Endpoints: Array<IFace & { name: string }>
+  KubeRoles: Array<IGenericClusterizedResponse<GetClusterRolesItem>>
+  RoleBindings: Array<IGenericClusterizedResponse<GetClusterClusterRoleBindingsItem>>
+  ClusterRoleBindings: Array<IGenericClusterizedResponse<GetClusterClusterRoleBindingsItem>>
+  ManagementUsers: User[]
+  ManagementTenants: Tenant[]
+  ManagementRoles: Role[]
+  ManagementRoleAssignments: RoleAssignment[]
+  ManagementGroups: any // no model for this yet
+  ManagementGroupsMappings: any // no model for this yet
+  Tenants: any // is this needed? only in openstack
+  Users: any // is this needed? only in openstack
+}

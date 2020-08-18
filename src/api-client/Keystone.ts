@@ -17,6 +17,9 @@ import {
   GetUserRoleAssignments,
   UpdateProject,
   UpdateUser,
+  Catalog,
+  ServicesByRegion,
+  ServicesByName,
 } from './keystone.model'
 
 const constructAuthFromToken = (token: string, projectId?: string) => {
@@ -48,7 +51,7 @@ const constructAuthFromCredentials = (username, password) => {
   }
 }
 
-const groupByRegion = (catalog) => {
+const groupByRegion = (catalog: Catalog[]): ServicesByRegion => {
   const regions = {}
   catalog.forEach((service) => {
     const { name } = service
@@ -452,7 +455,7 @@ class Keystone extends ApiService {
     return data.endpoints
   }
 
-  getServicesForActiveRegion = async () => {
+  getServicesForActiveRegion = async (): Promise<ServicesByName> => {
     const catalog = await this.getServiceCatalog()
     const { activeRegion, serviceCatalog = catalog } = this.client
     const servicesByRegion = groupByRegion(serviceCatalog)

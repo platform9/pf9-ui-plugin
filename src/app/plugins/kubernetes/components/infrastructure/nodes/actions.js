@@ -4,6 +4,7 @@ import { loadServiceCatalog } from 'openstack/components/api-access/actions'
 import { loadResMgrHosts } from 'k8s/components/infrastructure/common/actions'
 import createContextUpdater from 'core/helpers/createContextUpdater'
 import { nodesSelector, makeParamsNodesSelector } from './selectors'
+import DataKeys from 'k8s/DataKeys'
 
 const { qbert, resmgr } = ApiClient.getInstance()
 

@@ -1,7 +1,10 @@
 import { ICombinedNode } from '../nodes/model'
 import { CloudProviders } from '../cloudProviders/model'
+import { ClusterElement, INormalizedCluster } from 'api-client/qbert.model'
 
 export type HealthStatus = 'healthy' | 'partially_healthy' | 'unhealthy' | 'unknown'
+
+export type IClusterAction = ClusterElement & INormalizedCluster
 
 export interface ICluster {
   name: string

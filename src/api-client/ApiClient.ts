@@ -12,6 +12,8 @@ import Qbert from './Qbert'
 import ResMgr from './ResMgr'
 import Clemency from 'api-client/Clemency'
 
+import { ID } from './keystone.model'
+
 import { normalizeResponse } from 'api-client/helpers'
 import { hasPathStr, pathStr } from 'utils/fp'
 import { prop, has, cond, T, identity, when } from 'ramda'
@@ -41,7 +43,7 @@ class ApiClient {
   public qbert: Qbert
   public clemency: Clemency
   public catalog = null
-  public activeRegion
+  public activeRegion: ID
   unscopedToken = null
   scopedToken = null
   activeProjectId = null

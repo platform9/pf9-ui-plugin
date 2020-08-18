@@ -19,6 +19,33 @@ import { CustomerMetadata } from './model'
 //   getClusterClusterRoleBindings: GetCluster
 //   getKubeConfig: string
 // }
+// type Merge<A, B> = { [K in keyof A]: K extends keyof B ? B[K] : A[K] } & B extends infer O
+//   ? { [K in keyof O]: O[K] }
+//   : never
+
+export interface IGenericPayloadWithMetadata {
+  metadata: any
+}
+
+export type IGenericClusterizedResponse<T> = T & { clusterId: string }
+export interface GCluster<T> {
+  items: T[]
+}
+
+export interface INormalizedCluster {
+  endpoint: string
+  kubeconfigUrl: string
+  isUpgrading: boolean
+  nodes: Node[]
+}
+
+export type IGenericResource<T> = T & {
+  clusterId: string
+  name: string
+  created: string
+  id: string
+  namespace: string
+}
 
 export interface GetCloudProvider {
   name: string

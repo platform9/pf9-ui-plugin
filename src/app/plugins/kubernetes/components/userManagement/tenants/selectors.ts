@@ -1,19 +1,27 @@
 import { createSelector } from 'reselect'
-import { pipe, find, propEq, prop, filter, map, pluck } from 'ramda'
+import { pipe, find, prop, filter, map, pluck } from 'ramda'
 import { filterIf } from 'utils/fp'
 import getDataSelector from 'core/utils/getDataSelector'
 import DataKeys from 'k8s/DataKeys'
+import { Tenant } from 'api-client/keystone.model'
 
 const reservedTenantNames = ['admin', 'services', 'Default', 'heat']
 export const filterValidTenants = (tenant) => !reservedTenantNames.includes(tenant.name)
 
+interface ITenantSelector extends Tenant {
+  clusters: any
+}
+
 export const tenantsSelector = createSelector(
   [
-    getDataSelector(DataKeys.ManagementTenants),
-    getDataSelector(DataKeys.Namespaces, ['clusterId']),
+    getDataSelector<DataKeys.ManagementTenants>(DataKeys.ManagementTenants),
+    getDataSelector<DataKeys.Namespaces>(DataKeys.Namespaces, ['clusterId']),
   ],
   (allTenantsAllUsers, namespaces) => {
-    const heatTenantId = pipe(find(propEq('name', 'heat')), prop('id'))(allTenantsAllUsers)
+    const heatTenantId = pipe(
+      find((tenant: Tenant) => tenant.name === 'heat'),
+      prop('id'),
+    )(allTenantsAllUsers)
     return pipe(
       filter((tenant) => tenant.domain_id !== heatTenantId),
       map((tenant) => ({

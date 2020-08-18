@@ -17,17 +17,26 @@ import {
   GetPrometheusAlertsOverTime,
   GetClusterRoles,
   GetClusterClusterRoles,
+  IGenericPayloadWithMetadata,
+  IGenericResource,
+  GetClusterNamespacesItem,
+  INormalizedCluster,
+  GetClusterKubeServicesItem,
+  GCluster,
+  GetClusterRolesItem,
+  IGenericClusterizedResponse,
 } from './qbert.model'
 
-interface GenericObject {
-  [key: string]: any
-}
-
 // TODO: Fix these typings
-const normalizeClusterizedResponse = (clusterId: string, response: GenericObject) =>
-  pipe<GenericObject, GenericObject[], Array<GenericObject & { clusterId: string }>>(
-    propOr<GenericObject[]>([], 'items'),
-    map(mergeLeft({ clusterId })),
+const normalizeClusterizedResponse = <T>(
+  clusterId: string,
+  response: GCluster<T>,
+): Array<IGenericClusterizedResponse<T>> =>
+  pipe(
+    propOr([], 'items'),
+    map<any, any>(
+      mergeLeft<any>({ clusterId }),
+    ),
   )(response)
 
 const normalizeClusterizedUpdate = (clusterId, response) => ({
@@ -35,7 +44,7 @@ const normalizeClusterizedUpdate = (clusterId, response) => ({
   clusterId,
 })
 
-const normalizeCluster = (baseUrl) => (cluster) => ({
+const normalizeCluster = <T>(baseUrl) => (cluster): T & INormalizedCluster => ({
   ...cluster,
   endpoint: cluster.externalDnsName || cluster.masterIp,
   kubeconfigUrl: `${baseUrl}/kubeconfig/${cluster.uuid}`,
@@ -190,7 +199,7 @@ class Qbert extends ApiService {
       `${await this.baseUrl()}/clusters`,
     )
     const baseUrl = await this.baseUrl()
-    return rawClusters.map(normalizeCluster(baseUrl))
+    return rawClusters.map(normalizeCluster<ClusterElement>(baseUrl))
   }
 
   getClusterDetails = async (clusterId) => {
@@ -295,7 +304,9 @@ class Qbert extends ApiService {
     )
   }
 
-  convertResource = (clusterId) => (item) => ({
+  convertResource = <T extends IGenericPayloadWithMetadata>(clusterId) => (
+    item: T,
+  ): IGenericResource<T> => ({
     ...item,
     clusterId,
     name: item.metadata.name,
@@ -310,7 +321,7 @@ class Qbert extends ApiService {
       'getClusterNamespaces',
       `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces`,
     )
-    return data.items.map(this.convertResource(clusterId))
+    return data.items.map(this.convertResource<GetClusterNamespacesItem>(clusterId))
   }
 
   createNamespace = async (clusterId, body) => {
@@ -363,7 +374,7 @@ class Qbert extends ApiService {
       'getClusterKubeServices',
       `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/services`,
     )
-    return data.items.map(this.convertResource(clusterId))
+    return data.items.map(this.convertResource<GetClusterKubeServicesItem>(clusterId))
   }
 
   getClusterStorageClasses = async (clusterId) => {
@@ -605,7 +616,7 @@ class Qbert extends ApiService {
       'getClusterRoles',
       `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/roles`,
     )
-    return normalizeClusterizedResponse(clusterId, response)
+    return normalizeClusterizedResponse<GetClusterRolesItem>(clusterId, response)
   }
 
   createClusterRole = async (clusterId, namespace, body) => {

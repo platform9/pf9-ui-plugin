@@ -1,17 +1,22 @@
 import { createSelector } from 'reselect'
-import { pathOr, find, propEq, prop, pipe, pathEq, map, mergeLeft } from 'ramda'
-import { emptyArr, pathStrOrNull, pipeWhenTruthy, filterIf, pathStr, pathStrOr } from 'utils/fp';
+import { find, propEq, prop, pipe, pathEq, map, mergeLeft } from 'ramda'
+import { emptyArr, pathStrOrNull, pipeWhenTruthy, filterIf, pathStr, pathStrOr } from 'utils/fp'
 import { allKey } from 'app/constants'
 import { pathJoin } from 'utils/misc'
 import DataKeys from 'k8s/DataKeys'
+import getDataSelector from 'core/utils/getDataSelector'
+import { combinedHostsSelector } from '../infrastructure/common/selectors'
+import { IDataKeys } from 'k8s/datakeys.model'
 
 const k8sDocUrl = 'namespaces/kube-system/services/https:kubernetes-dashboard:443/proxy/#'
 
-export const nodesSelector = createSelector([
-  getDataSelector(DataKeys.Nodes),
-  combinedHostsSelector,
-  getDataSelector(DataKeys.ServiceCatalog),
-], (rawNodes, combinedHosts, rawServiceCatalog) => {
+export const nodesSelector = createSelector(
+  [
+    getDataSelector<DataKeys.Nodes>(DataKeys.Nodes),
+    combinedHostsSelector,
+    getDataSelector<DataKeys.ServiceCatalog>(DataKeys.ServiceCatalog),
+  ],
+  (rawNodes, combinedHosts, rawServiceCatalog) => {
     const combinedHostsObj = combinedHosts.reduce((accum, host) => {
       const id = pathStrOrNull('resmgr.id')(host) || pathStrOrNull('qbert.uuid')(host)
       accum[id] = host
@@ -28,18 +33,20 @@ export const nodesSelector = createSelector([
       // qbert v3 link fails authorization so we have to use v1 link for logs
       logs: `${qbertUrl}/logs/${node.uuid}`.replace(/v3/, 'v1'),
     }))
-  }
+  },
 )
 
-export const podsSelector = createSelector([
-  getDataSelector(DataKeys.Pods),
-  getDataSelector(DataKeys.Clusters),
-], (rawPods, rawClusters) => {
+export const podsSelector = createSelector(
+  [
+    getDataSelector<DataKeys.Pods>(DataKeys.Pods),
+    getDataSelector<DataKeys.Clusters>(DataKeys.Clusters),
+  ],
+  (rawPods, rawClusters) => {
     // associate nodes with the combinedHost entry
     return pipe(
       // Filter by namespace
-      map((pod) => {
-        const {clusterId} = pod
+      map((pod: IDataKeys[DataKeys.Pods]) => {
+        const { clusterId } = pod
         const dashboardUrl = pathJoin(
           await qbert.clusterBaseUrl(clusterId),
           k8sDocUrl,
@@ -58,76 +65,75 @@ export const podsSelector = createSelector([
         }
       }),
     )(rawPods)
-  }
+  },
 )
 
-export const makeParamsPodsSelector = (
-  defaultParams = {}
-) => {
+export const makeParamsPodsSelector = (defaultParams = {}) => {
   return createSelector(
     [podsSelector, (_, params) => mergeLeft(params, defaultParams)],
     (pods, params) => {
       const { namespace, orderBy, orderDirection } = params
       return pipe(
         filterIf(namespace && namespace !== allKey, propEq('namespace', namespace)),
-        createSorter({ orderBy, orderDirection })
+        createSorter({ orderBy, orderDirection }),
       )(pods)
     },
   )
 }
 
-export const deploymentsSelector = createSelector([
-  getDataSelector(DataKeys.Deployments),
-  getDataSelector(DataKeys.Pods),
-  getDataSelector(DataKeys.Clusters),
-], (rawDeployments, rawPods, rawClusters) => {
-  return rawDeployments.map(deployment => {
-    const dashboardUrl = pathJoin(
-      await qbert.clusterBaseUrl(deployment.clusterId),
-      k8sDocUrl,
-      'deployment',
-      pathStr('metadata.namespace', deployment),
-      pathStr('metadata.name', deployment),
-    )
-    const selectors = pathStrOr(emptyObj, 'spec.selector.matchLabels', deployment)
-    const clusterId = prop('clusterId', deployment)
-    const namespace = pathStr('metadata.namespace', deployment)
-    const [labelKey, labelValue] = head(toPairs(selectors)) || emptyArr
+export const deploymentsSelector = createSelector(
+  [
+    getDataSelector<DataKeys.Deployments>(DataKeys.Deployments),
+    getDataSelector<DataKeys.Pods>(DataKeys.Pods),
+    getDataSelector<DataKeys.Clusters>(DataKeys.Clusters),
+  ],
+  (rawDeployments, rawPods, rawClusters) => {
+    return rawDeployments.map((deployment) => {
+      const dashboardUrl = pathJoin(
+        await qbert.clusterBaseUrl(deployment.clusterId),
+        k8sDocUrl,
+        'deployment',
+        pathStr('metadata.namespace', deployment),
+        pathStr('metadata.name', deployment),
+      )
+      const selectors = pathStrOr(emptyObj, 'spec.selector.matchLabels', deployment)
+      const clusterId = prop('clusterId', deployment)
+      const namespace = pathStr('metadata.namespace', deployment)
+      const [labelKey, labelValue] = head(toPairs(selectors)) || emptyArr
 
-    // Check if any pod label matches the first deployment match label key
-    // Note: this logic should probably be revised (copied from Clarity UI)
-    const deploymentPods = pods.filter((pod) => {
-      if (pod.namespace !== namespace || pod.clusterId !== clusterId) {
-        return false
+      // Check if any pod label matches the first deployment match label key
+      // Note: this logic should probably be revised (copied from Clarity UI)
+      const deploymentPods = pods.filter((pod) => {
+        if (pod.namespace !== namespace || pod.clusterId !== clusterId) {
+          return false
+        }
+        const podLabels = pathStr('metadata.labels', pod)
+        return any(([key, value]) => key === labelKey && value === labelValue, toPairs(podLabels))
+      })
+      return {
+        ...deployment,
+        dashboardUrl,
+        id: pathStr('metadata.uid', deployment),
+        name: pathStr('metadata.name', deployment),
+        created: pathStr('metadata.creationTimestamp', deployment),
+        labels: pathStr('metadata.labels', deployment),
+        selectors,
+        pods: deploymentPods.length,
+        namespace,
+        clusterName: pipe(find(propEq('uuid', deployment.clusterId)), prop('name'))(clusters),
       }
-      const podLabels = pathStr('metadata.labels', pod)
-      return any(([key, value]) => key === labelKey && value === labelValue, toPairs(podLabels))
     })
-    return {
-      ...deployment,
-      dashboardUrl,
-      id: pathStr('metadata.uid', deployment),
-      name: pathStr('metadata.name', deployment),
-      created: pathStr('metadata.creationTimestamp', deployment),
-      labels: pathStr('metadata.labels', deployment),
-      selectors,
-      pods: deploymentPods.length,
-      namespace,
-      clusterName: pipe(find(propEq('uuid', deployment.clusterId)), prop('name'))(clusters),
-    }
-  })
-})
+  },
+)
 
-export const makeParamsDeploymentsSelector = (
-  defaultParams = {}
-) => {
+export const makeParamsDeploymentsSelector = (defaultParams = {}) => {
   return createSelector(
     [podsSelector, (_, params) => mergeLeft(params, defaultParams)],
     (pods, params) => {
       const { namespace, orderBy, orderDirection } = params
       return pipe(
         filterIf(namespace && namespace !== allKey, propEq('namespace', namespace)),
-        createSorter({ orderBy, orderDirection })
+        createSorter({ orderBy, orderDirection }),
       )(pods)
     },
   )
@@ -182,4 +188,5 @@ export const serviceSelectors = createSelector(
         }
       }),
     )(items)
+  },
 )
