@@ -19,13 +19,13 @@ import ApiClient from 'api-client/ApiClient'
 import { objSwitchCase, pathStr } from 'utils/fp'
 import { allKey, imageUrlRoot, addError, deleteError, updateError } from 'app/constants'
 import {
-  makeParamsAppDetailsSelector,
-  makeParamsDeploymentDetailsSelector,
-  makeParamsAppVersionSelector,
-  makeParamsAppsSelector,
+  makeAppDetailsSelector,
+  makeDeploymentDetailsSelector,
+  makeAppVersionSelector,
+  makeAppsSelector,
   makeReleasesSelector,
-  makeRepositoriesSelector,
-} from 'k8s/components/infrastructure/common/actions'
+  repositoriesSelector,
+} from './selectors'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { clusterActions, parseClusterParams } from 'k8s/components/infrastructure/clusters/actions'
 import { pathJoin } from 'utils/misc'
@@ -52,7 +52,7 @@ export const appDetailLoader = createContextLoader(
   {
     uniqueIdentifier: ['id', 'clusterId'],
     indexBy: ['clusterId', 'id', 'release', 'version'],
-    selectorCreator: makeParamsAppDetailsSelector,
+    selectorCreator: makeAppDetailsSelector,
   },
 )
 
@@ -64,7 +64,7 @@ export const deploymentDetailLoader = createContextLoader(
   {
     uniqueIdentifier,
     indexBy: ['clusterId', 'release'],
-    selectorCreator: makeParamsDeploymentDetailsSelector,
+    selectorCreator: makeDeploymentDetailsSelector,
   },
 )
 
@@ -77,7 +77,7 @@ export const appVersionLoader = createContextLoader(
     indexBy: ['clusterId', 'appId', 'release'],
     defaultOrderBy: 'version',
     defaultOrderDirection: 'desc',
-    selectorCreator: makeParamsAppVersionSelector,
+    selectorCreator: makeAppVersionSelector,
   },
 )
 
@@ -86,8 +86,8 @@ export const appActions = createCRUDActions(DataKeys.Apps, {
     const [clusterId, clusters] = await parseClusterParams(params)
     const apps =
       clusterId === allKey
-        ? someAsync(pluck('uuid', clusters).map(qbert.getCharts)).then(flatten)
-        : qbert.getCharts(clusterId)
+        ? await someAsync(pluck('uuid', clusters).map(qbert.getCharts)).then(flatten)
+        : await qbert.getCharts(clusterId)
 
     return mapAsync(async (chart) => {
       const monocularUrl = await qbert.clusterMonocularBaseUrl(clusterId, null)
@@ -118,7 +118,7 @@ export const appActions = createCRUDActions(DataKeys.Apps, {
   uniqueIdentifier: ['id', 'clusterId'],
   indexBy: 'clusterId',
   defaultOrderBy: 'name',
-  selectorCreator: makeParamsAppsSelector,
+  selectorCreator: makeAppsSelector,
 })
 
 export const releaseActions = createCRUDActions(DataKeys.Releases, {
@@ -139,7 +139,7 @@ export const releaseActions = createCRUDActions(DataKeys.Releases, {
 
 const reposWithClustersLoader = createContextLoader(
   DataKeys.RepositoriesWithClusters,
-  async (params) => {
+  async () => {
     const monocularClusters = await clusterActions.list({
       appCatalogClusters: true,
       hasControlPanel: true,
@@ -272,5 +272,5 @@ export const repositoryActions = createCRUDActions(DataKeys.Repositories, {
       )(catchedErr.message),
     })(operation),
   defaultOrderBy: 'name',
-  selectorCreator: makeRepositoriesSelector,
+  selector: repositoriesSelector
 })

@@ -11,6 +11,19 @@ const getQbertUrl = (qbertEndpoint) => {
   return qbertEndpoint.match(/(.*?)\/qbert/)[1]
 }
 
+// Used to calculate the timestamps on the chart
+// Each period (represented by key name) is split into
+// 6 equal intervals (represented by the value)
+// h is hours, m is minutes
+const timestampSteps = {
+  // for use in moment.add
+  '24.h': [4, 'h'],
+  '12.h': [2, 'h'],
+  '6.h': [1, 'h'],
+  '3.h': [30, 'm'],
+  '1.h': [10, 'm'],
+}
+
 export const alertsSelector = createSelector(
   [
     pathOr(emptyArr, [cacheStoreKey, dataStoreKey, alertsCacheKey]),

@@ -1,12 +1,12 @@
 import ApiClient from 'api-client/ApiClient'
-import { propEq, pluck, pipe, find, prop, map, flatten } from 'ramda'
-import yaml from 'js-yaml'
-import createCRUDActions from 'core/helpers/createCRUDActions'
-import { someAsync } from 'utils/async'
-import { parseClusterParams } from 'k8s/components/infrastructure/clusters/actions'
 import { allKey, notFoundErr } from 'app/constants'
-import { storageClassSelector } from './selectors'
+import createCRUDActions from 'core/helpers/createCRUDActions'
+import yaml from 'js-yaml'
+import { parseClusterParams } from 'k8s/components/infrastructure/clusters/actions'
 import DataKeys from 'k8s/DataKeys'
+import { flatten, pluck, propEq } from 'ramda'
+import { someAsync } from 'utils/async'
+import { storageClassSelector } from './selectors'
 
 const { qbert } = ApiClient.getInstance()
 

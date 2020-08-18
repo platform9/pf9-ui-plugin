@@ -1,11 +1,10 @@
+import ApiClient from 'api-client/ApiClient'
 import createContextLoader from 'core/helpers/createContextLoader'
 import createCRUDActions from 'core/helpers/createCRUDActions'
-import { pluck } from 'ramda'
-import ApiClient from 'api-client/ApiClient'
-import { loadCombinedHosts } from ' k8s/components/infrastructure/clusters/actions'
-// import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import { makeCloudProvidersSelector } from 'k8s/components/infrastructure/cloudProviders/selectors'
+import { loadResMgrHosts } from 'k8s/components/infrastructure/common/actions'
 import DataKeys from 'k8s/DataKeys'
+import { pluck } from 'ramda'
 import { clusterActions } from '../clusters/actions'
 
 const { qbert } = ApiClient.getInstance()
@@ -16,7 +15,7 @@ export const cloudProviderActions = createCRUDActions(DataKeys.CloudProviders, {
       qbert.getCloudProviders(),
       // Make sure the derived data gets loaded as well
       clusterActions.list(),
-      loadCombinedHosts(),
+      loadResMgrHosts(),
     ])
     return cloudProviders
   },
