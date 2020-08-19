@@ -32,6 +32,7 @@ import { tryCatchAsync } from 'utils/async'
 import { emptyArr, emptyObj, objSwitchCase, pathStr, upsertAllBy } from 'utils/fp'
 import { castBoolToStr } from 'utils/misc'
 import { uuidRegex, originUsernameRegex } from 'app/constants'
+import { trackEvent } from 'utils/tracking'
 
 const { keystone, clemency } = ApiClient.getInstance()
 
@@ -67,8 +68,9 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
   },
   createFn: async ({ username, displayname, password, roleAssignments }) => {
     const defaultTenantId = pipe(keys, head)(roleAssignments)
-    const createdUser = password
-      ? await keystone.createUser({
+    let createdUser
+    if (password) {
+      createdUser = await keystone.createUser({
           email: username,
           name: username,
           username,
@@ -76,11 +78,14 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
           password: password || undefined,
           default_project_id: defaultTenantId,
         })
-      : await clemency.createUser({
-          username,
-          displayname,
-          tenants: defaultTenantId,
-        })
+    } else {
+      createdUser = await clemency.createUser({
+        username,
+        displayname,
+        tenants: defaultTenantId,
+      })
+      trackEvent('User Invited', { username, displayname })
+    }
     if (createdUser.role === '_member_') {
       return createdUser
     }
