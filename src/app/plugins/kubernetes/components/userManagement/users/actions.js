@@ -78,6 +78,7 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
           password: password || undefined,
           default_project_id: defaultTenantId,
         })
+      trackEvent('User Created', { username, displayname })
     } else {
       createdUser = await clemency.createUser({
         username,
