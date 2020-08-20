@@ -6,6 +6,8 @@ import Theme from 'core/themes/model'
 import CopyToClipboard from 'core/components/CopyToClipboard'
 import { AppContext } from 'core/providers/AppProvider'
 import { hexToRGBA } from 'core/utils/colorHelpers'
+import ExternalLink from 'core/components/ExternalLink'
+import { nodePrerequisitesDocumentationLink } from 'k8s/links'
 
 const useStyles = makeStyles((theme: Theme) => ({
   paper: {
@@ -52,6 +54,11 @@ const downloadAndInstallCommand = 'bash <(curl -sL http://pf9.io/get_cli)'
 export const DownloadCliOnboardNodeWalkthrough = (): JSX.Element => (
   <>
     <Typography variant="h6">Pre-requisites</Typography>
+    <div style={{ marginTop: '16px' }}>
+      <ExternalLink url={nodePrerequisitesDocumentationLink} icon="file-alt">
+        Pre-requisites Documentation
+      </ExternalLink>
+    </div>
     <p>
       <Typography component="span">
         You will need a physical or virtual machine with Ubuntu (16.04 / 18.04) or CentOS
