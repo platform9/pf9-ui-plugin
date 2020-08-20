@@ -1,25 +1,23 @@
-import { pathStrOrNull, objSwitchCase } from 'utils/fp'
-import { map, pathEq, find, pluck, curry, pipe, last, pathOr, prop, propEq, flatten } from 'ramda'
 import ApiClient from 'api-client/ApiClient'
-import { clustersCacheKey } from '../infrastructure/common/actions'
 import { notFoundErr } from 'app/constants'
 import createCRUDActions from 'core/helpers/createCRUDActions'
-import { someAsync } from 'utils/async'
+import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
+import {
+  prometheusAlertManagersSelector,
+  prometheusRuleSelector,
+  prometheusSelector,
+  prometheusServiceMonitorSelector,
+  serviceAccountSelector,
+} from 'k8s/components/prometheus/selectors'
 import DataKeys from 'k8s/DataKeys'
+import { find, flatten, last, pathEq, pipe, pluck, prop, propEq } from 'ramda'
+import { someAsync } from 'utils/async'
+import { objSwitchCase } from 'utils/fp'
 
 const { appbert, qbert } = ApiClient.getInstance()
 const uniqueIdentifier = 'metadata.uid'
 const monitoringTask = 'pf9-mon'
 const getName = (id, items) => pipe(find(propEq('uid', id)), prop('name'))(items)
-
-// TODO convert to typescript
-// interface IClusterTask {
-//   task_id: number
-//   type: 'Install' | 'Delete'
-//   pkg_id: string
-//   cluster: string
-//   status: 'Pending' | 'Complete' | 'InProgress' | 'Failed'
-// }
 
 const isMonitoringTask = (task = {}) => task.pkg_id === monitoringTask && task.type === 'Install'
 const getMostRecentTask = (prev, curr) => (prev.task_id > curr.task_id ? prev : curr)
@@ -33,38 +31,21 @@ export const hasPrometheusEnabled = (cluster) => {
 }
 export const clusterTagActions = createCRUDActions(DataKeys.ClusterTags, {
   listFn: async () => {
-    return appbert.getClusterTags()
+    const [clusterTags] = Promise.all([
+      appbert.getClusterTags(),
+      // Make sure the derived data gets loaded as well
+      clusterActions.list(),
+    ])
+    return clusterTags
   },
   uniqueIdentifier: 'uuid',
 })
 
 /* Prometheus Instances */
 
-export const mapPrometheusInstance = curry((clusters, { clusterId, metadata, spec }) => ({
-  clusterUuid: clusterId,
-  clusterName: pipe(find(propEq('uuid', clusterId)), prop('name'))(clusters),
-  name: metadata.name,
-  namespace: metadata.namespace,
-  uid: metadata.uid,
-  serviceMonitorSelector: pathStrOrNull('serviceMonitorSelector.matchLabels', spec),
-  alertManagersSelector: pathOr([], ['alerting', 'alertmanagers'], spec)
-    .map((x) => x.name)
-    .join(', '),
-  ruleSelector: pathStrOrNull('ruleSelector.matchLabels', spec),
-  cpu: pathStrOrNull('resources.requests.cpu', spec),
-  storage: pathStrOrNull('resources.requests.storage', spec),
-  memory: pathStrOrNull('resources.requests.memory', spec),
-  retention: spec.retention,
-  replicas: spec.replicas,
-  dashboard: pathOr('', ['annotations', 'service_path'], metadata),
-  metadata,
-  spec,
-}))
-
 export const prometheusInstanceActions = createCRUDActions(DataKeys.PrometheusInstances, {
-  listFn: async (params, loadFromContext) => {
-    await loadFromContext(clustersCacheKey)
-    const clusterTags = await loadFromContext(clusterTagsCacheKey)
+  listFn: async () => {
+    const clusterTags = await clusterTagActions.list()
     const clusterUuids = pluck('uuid', clusterTags.filter(hasPrometheusEnabled))
     return someAsync(clusterUuids.map(qbert.getPrometheusInstances)).then(flatten)
   },
@@ -78,10 +59,7 @@ export const prometheusInstanceActions = createCRUDActions(DataKeys.PrometheusIn
     }
     await qbert.deletePrometheusInstance(instance.clusterUuid, instance.namespace, instance.name)
   },
-  dataMapper: async (items, params, loadFromContext) => {
-    const clusters = await loadFromContext(clustersCacheKey)
-    return items.map(mapPrometheusInstance(clusters))
-  },
+  selector: prometheusSelector,
   successMessage: (updatedItems, prevItems, { uid }, operation) =>
     objSwitchCase({
       create: `Successfully created Prometheus instance ${prop('name', last(updatedItems))}`,
@@ -96,17 +74,7 @@ export const serviceAccountActions = createCRUDActions(DataKeys.ServiceAccounts,
   listFn: async (params) => {
     return qbert.getServiceAccounts(params.clusterId, params.namespace)
   },
-  dataMapper: async (items, params, loadFromContext) => {
-    const clusters = await loadFromContext(clustersCacheKey)
-    return map(({ clusterId, metadata, spec }) => ({
-      uid: metadata.uid,
-      clusterUuid: clusterId,
-      clusterName: pipe(find(propEq('uuid', clusterId)), prop('name'))(clusters),
-      name: metadata.name,
-      namespace: metadata.namespace,
-      labels: metadata.labels,
-    }))(items)
-  },
+  selector: serviceAccountSelector,
   indexBy: ['clusterId', 'namespace'],
   uniqueIdentifier,
 })
@@ -114,9 +82,8 @@ export const serviceAccountActions = createCRUDActions(DataKeys.ServiceAccounts,
 /* Rules */
 
 export const prometheusRuleActions = createCRUDActions(DataKeys.PrometheusRules, {
-  listFn: async (params, loadFromContext) => {
-    await loadFromContext(clustersCacheKey)
-    const clusterTags = await loadFromContext(clusterTagsCacheKey)
+  listFn: async () => {
+    const clusterTags = await clusterTagActions.list()
     const clusterUuids = pluck('uuid', clusterTags.filter(hasPrometheusEnabled))
     return someAsync(clusterUuids.map(qbert.getPrometheusRules)).then(flatten)
   },
@@ -135,18 +102,7 @@ export const prometheusRuleActions = createCRUDActions(DataKeys.PrometheusRules,
       create: `Successfully created Prometheus rule ${prop('name', last(updatedItems))}`,
       delete: `Successfully deleted Prometheus rule ${getName(uid, prevItems)}`,
     })(operation),
-  dataMapper: async (items, params, loadFromContext) => {
-    const clusters = await loadFromContext(clustersCacheKey)
-    return map(({ clusterId, metadata, spec }) => ({
-      uid: metadata.uid,
-      clusterUuid: clusterId,
-      clusterName: pipe(find(propEq('uuid', clusterId)), prop('name'))(clusters),
-      name: metadata.name,
-      namespace: metadata.namespace,
-      labels: metadata.labels,
-      rules: pathOr([], ['groups'], spec),
-    }))(items)
-  },
+  selector: prometheusRuleSelector,
   uniqueIdentifier,
 })
 
@@ -154,9 +110,8 @@ export const prometheusRuleActions = createCRUDActions(DataKeys.PrometheusRules,
 export const prometheusServiceMonitorActions = createCRUDActions(
   DataKeys.PrometheusServiceMonitors,
   {
-    listFn: async (params, loadFromContext) => {
-      await loadFromContext(clustersCacheKey)
-      const clusterTags = await loadFromContext(clusterTagsCacheKey)
+    listFn: async () => {
+      const clusterTags = await clusterTagActions.list()
       const clusterUuids = pluck('uuid', clusterTags.filter(hasPrometheusEnabled))
       return someAsync(clusterUuids.map(qbert.getPrometheusServiceMonitors)).then(flatten)
     },
@@ -178,24 +133,7 @@ export const prometheusServiceMonitorActions = createCRUDActions(
         )}`,
         delete: `Successfully deleted Prometheus Service Monitor ${getName(uid, prevItems)}`,
       })(operation),
-    dataMapper: async (items, params, loadFromContext) => {
-      const clusters = await loadFromContext(clustersCacheKey)
-      return map(({ clusterId, metadata, spec }) => ({
-        uid: metadata.uid,
-        clusterUuid: clusterId,
-        clusterName: pipe(find(propEq('uuid', clusterId)), prop('name'))(clusters),
-        name: metadata.name,
-        namespace: metadata.namespace,
-        labels: metadata.labels,
-        port: spec.endpoints.map(prop('port')).join(', '),
-        namespaceSelector:
-          (spec.namespaceSelector &&
-            spec.namespaceSelector.matchNames &&
-            spec.namespaceSelector.matchNames.join(', ')) ||
-          '-',
-        selector: spec.selector,
-      }))(items)
-    },
+    selector: prometheusServiceMonitorSelector,
     uniqueIdentifier,
   },
 )
@@ -203,9 +141,8 @@ export const prometheusServiceMonitorActions = createCRUDActions(
 /* Alert Managers */
 
 export const prometheusAlertManagerActions = createCRUDActions(DataKeys.PrometheusAlertManagers, {
-  listFn: async (params, loadFromContext) => {
-    await loadFromContext(clustersCacheKey)
-    const clusterTags = await loadFromContext(clusterTagsCacheKey)
+  listFn: async () => {
+    const clusterTags = await clusterTagActions.list()
     const clusterUuids = pluck('uuid', clusterTags.filter(hasPrometheusEnabled))
     return someAsync(clusterUuids.map(qbert.getPrometheusAlertManagers)).then(flatten)
   },
@@ -224,17 +161,6 @@ export const prometheusAlertManagerActions = createCRUDActions(DataKeys.Promethe
       create: `Successfully created Prometheus Alert Manager ${prop('name', last(updatedItems))}`,
       delete: `Successfully deleted Prometheus Alert Manager ${getName(uid, prevItems)}`,
     })(operation),
-  dataMapper: async (items, params, loadFromContext) => {
-    const clusters = await loadFromContext(clustersCacheKey)
-    return map(({ clusterId, metadata, spec }) => ({
-      uid: metadata.uid,
-      clusterUuid: clusterId,
-      clusterName: pipe(find(propEq('uuid', clusterId)), prop('name'))(clusters),
-      name: metadata.name,
-      namespace: metadata.namespace,
-      replicas: spec.replicas,
-      labels: metadata.labels,
-    }))(items)
-  },
+  selector: prometheusAlertManagersSelector,
   uniqueIdentifier,
 })
