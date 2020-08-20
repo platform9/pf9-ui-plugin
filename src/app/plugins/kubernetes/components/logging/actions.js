@@ -1,47 +1,20 @@
 import ApiClient from 'api-client/ApiClient'
 import createCRUDActions from 'core/helpers/createCRUDActions'
-import { clustersCacheKey } from 'k8s/components/infrastructure/common/actions'
-import { mapAsync } from 'utils/async'
-import { propOr } from 'ramda'
+import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import DataKeys from 'k8s/DataKeys'
+import { mapAsync } from 'utils/async'
 
 const { qbert } = ApiClient.getInstance()
 
-const mapLoggings = (cluster, loggings) => {
-  const logStorage = []
-  const logDestination = []
-  propOr([], 'items', loggings).forEach((item) => {
-    if (item.spec.type === 'elasticsearch') {
-      logStorage.push('ElasticSearch')
-      const urlParam = item.spec.params.find((param) => param.name === 'url')
-      logDestination.push(urlParam.value)
-    } else if (item.spec.type === 's3') {
-      logStorage.push('AWS-S3')
-      const bucketParam = item.spec.params.find((param) => param.name === 's3_bucket')
-      logDestination.push(bucketParam.value)
-    }
-  })
-
-  return {
-    id: cluster.uuid,
-    cluster: cluster.uuid,
-    clusterName: cluster.name,
-    status: cluster.status,
-    logStorage,
-    logDestination,
-  }
-}
-
 const loggingActions = createCRUDActions(DataKeys.Loggings, {
-  listFn: async (params, loadFromContext) => {
-    const clusters = await loadFromContext(clustersCacheKey)
-
-    const loggings = await mapAsync(async (cluster) => {
-      const response = await qbert.getLoggings(cluster.uuid)
-      return response ? mapLoggings(cluster, response) : null
+  listFn: async (params) => {
+    const clusters = await clusterActions.list()
+    return mapAsync(async (cluster) => {
+      return {
+        ...(await qbert.getLoggings(cluster.uuid)),
+        clusterId: cluster.uuid, // FIXME: just making sure the clusterId gets returned here
+      }
     }, clusters)
-
-    return loggings.filter((logStorage) => logStorage != null)
   },
   createFn: async (data) => {
     return qbert.createLogging(data)
