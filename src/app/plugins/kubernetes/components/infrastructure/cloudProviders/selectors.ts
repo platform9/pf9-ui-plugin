@@ -1,13 +1,16 @@
 import { createSelector } from 'reselect'
-import { pipe, filter, map, pluck, propSatisfies, propEq, pathOr } from 'ramda'
+import { filter, map, mergeLeft, pipe, pluck, propEq, propSatisfies } from 'ramda'
 import { capitalizeString } from 'utils/misc'
-import { pathStrOr, emptyArr } from 'utils/fp'
-import { dataStoreKey, cacheStoreKey } from 'core/caching/cacheReducers'
+import { pathStrOr } from 'utils/fp'
 import createSorter from 'core/helpers/createSorter'
 import calcUsageTotalByPath from 'k8s/util/calcUsageTotals'
 import { clustersSelector } from 'k8s/components/infrastructure/clusters/selectors'
 import { combinedHostsSelector } from 'k8s/components/infrastructure/common/selectors'
 import DataKeys from 'k8s/DataKeys'
+import getDataSelector from 'core/utils/getDataSelector'
+import { GetCloudProvider } from 'api-client/qbert.model'
+import { IClusterAction } from 'k8s/components/infrastructure/clusters/model'
+import { ICombinedNode } from 'k8s/components/infrastructure/nodes/model'
 
 const cloudProviderTypes = {
   aws: 'Amazon AWS Provider',
@@ -15,9 +18,20 @@ const cloudProviderTypes = {
   openstack: 'OpenStack',
 }
 
+interface ICloudProvidersSelector extends GetCloudProvider {
+  descriptiveType: string
+  deployedCapacity: {
+    compute: number
+    memory: number
+    disk: number
+  }
+  clusters: IClusterAction[]
+  nodes: ICombinedNode[]
+}
+
 export const cloudProvidersSelector = createSelector(
   [
-    pathOr(emptyArr, [cacheStoreKey, dataStoreKey, DataKeys.CloudProviders]),
+    getDataSelector<DataKeys.CloudProviders>(DataKeys.CloudProviders),
     clustersSelector,
     combinedHostsSelector,
   ],
@@ -26,8 +40,8 @@ export const cloudProvidersSelector = createSelector(
       combinedHosts.filter(propSatisfies((id) => nodeIds.includes(id), 'id'))
     const usagePathStr = 'resmgr.extensions.resource_usage.data'
 
-    return pipe(
-      filter(({ type }) => type !== 'local'),
+    return pipe<GetCloudProvider[], GetCloudProvider[], ICloudProvidersSelector[]>(
+      filter<GetCloudProvider>(({ type }) => type !== 'local'),
       map((cloudProvider) => {
         const descriptiveType =
           cloudProviderTypes[cloudProvider.type] || capitalizeString(cloudProvider.type)
@@ -46,7 +60,6 @@ export const cloudProvidersSelector = createSelector(
           ),
           disk: calcDeployedCapacity(`${usagePathStr}.disk.used`, `${usagePathStr}.disk.total`),
         }
-
         return {
           ...cloudProvider,
           descriptiveType,

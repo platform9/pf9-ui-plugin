@@ -11,8 +11,8 @@ import { storageClassSelector } from './selectors'
 const { qbert } = ApiClient.getInstance()
 
 const storageClassActions = createCRUDActions(DataKeys.StorageClasses, {
-  listFn: async (params, loadFromContext) => {
-    const [clusterId, clusters] = await parseClusterParams(params, loadFromContext)
+  listFn: async (params) => {
+    const [clusterId, clusters] = await parseClusterParams(params)
     if (clusterId === allKey) {
       return someAsync(pluck('uuid', clusters).map(qbert.getClusterStorageClasses)).then(flatten)
     }

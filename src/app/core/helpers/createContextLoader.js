@@ -1,32 +1,11 @@
-import {
-  pick,
-  assoc,
-  find,
-  whereEq,
-  isNil,
-  reject,
-  filter,
-  pipe,
-  pickAll,
-  has,
-  equals,
-  values,
-  either,
-  mergeLeft,
-  map,
-  prop,
-} from 'ramda'
-import moize from 'moize'
-import { ensureFunction, ensureArray, emptyObj, emptyArr, arrayIfEmpty, arrayIfNil } from 'utils/fp'
-import { memoizePromise, uncamelizeString } from 'utils/misc'
-import { defaultUniqueIdentifier, allKey } from 'app/constants'
-import {
-  paramsStoreKey,
-  dataStoreKey,
-  cacheActions,
-  cacheStoreKey,
-} from 'core/caching/cacheReducers'
+import { allKey, defaultUniqueIdentifier } from 'app/constants'
 import store from 'app/store'
+import { cacheActions, cacheStoreKey, dataStoreKey, paramsStoreKey } from 'core/caching/cacheReducers'
+import { getDefaultSelectorCreator } from 'core/hooks/useDataLoader'
+import moize from 'moize'
+import { assoc, either, equals, filter, find, has, isNil, map, mergeLeft, pathOr, pick, pickAll, pipe, prop, reject, values, whereEq } from 'ramda'
+import { arrayIfEmpty, arrayIfNil, emptyArr, emptyObj, ensureArray } from 'utils/fp'
+import { memoizePromise, uncamelizeString } from 'utils/misc'
 
 let loaders = {}
 export const getContextLoader = (key) => {
@@ -80,8 +59,8 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
     indexBy,
     requiredParams = indexBy,
     fetchErrorMessage = (catchedErr, params) => `Unable to fetch ${entityName} items`,
-    selector,
-    selectorCreator,
+    selector = pathOr(emptyArr, [cacheStoreKey, dataStoreKey, cacheKey]),
+    selectorCreator = getDefaultSelectorCreator(indexBy, cacheKey, selector),
   } = options
   const allIndexKeys = indexBy ? ensureArray(indexBy) : emptyArr
   const allRequiredParams = requiredParams ? ensureArray(requiredParams) : emptyArr
@@ -128,10 +107,7 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
    * @returns {Promise<array>} Fetched or cached items
    */
   const contextLoaderFn = memoizePromise(
-    async (
-      params = emptyObj,
-      refetch = contextLoaderFn[invalidateCacheSymbol],
-    ) => {
+    async (params = emptyObj, refetch = contextLoaderFn[invalidateCacheSymbol]) => {
       const { dispatch, getState } = store
       const cache = prop(cacheStoreKey, getState())
       const { [dataStoreKey]: cachedData, [paramsStoreKey]: cachedParams } = cache
@@ -212,11 +188,9 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
    */
   contextLoaderFn.cacheKey = cacheKey
   contextLoaderFn.indexBy = allIndexKeys
-  contextLoaderFn.getDataFilter = getDataFilter
   contextLoaderFn.fetchErrorMessage = fetchErrorMessage
-  contextLoaderFn.selector = selector
   contextLoaderFn.selectorCreator = selectorCreator
-  
+
   if (has(cacheKey, loaders)) {
     console.warn(`Context Loader function with key ${cacheKey} already exists`)
   }

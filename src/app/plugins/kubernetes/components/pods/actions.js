@@ -17,8 +17,8 @@ import DataKeys from 'k8s/DataKeys'
 const { qbert } = ApiClient.getInstance()
 
 export const podActions = createCRUDActions(DataKeys.Pods, {
-  listFn: async (params, loadFromContext) => {
-    const [clusterId, clusters] = await parseClusterParams(params, loadFromContext)
+  listFn: async (params) => {
+    const [clusterId, clusters] = await parseClusterParams(params)
     const podsPromise =
       clusterId === allKey
         ? someAsync(pluck('uuid', clusters).map(qbert.getClusterPods)).then(flatten)
@@ -63,8 +63,8 @@ export const deploymentActions = createCRUDActions(DataKeys.Deployments, {
 })
 
 export const serviceActions = createCRUDActions(DataKeys.KubeServices, {
-  listFn: async (params, loadFromContext) => {
-    const [clusterId, clusters] = await parseClusterParams(params, loadFromContext)
+  listFn: async (params) => {
+    const [clusterId, clusters] = await parseClusterParams(params)
     if (clusterId === allKey) {
       return someAsync(pluck('uuid', clusters).map(qbert.getClusterKubeServices)).then(flatten)
     }

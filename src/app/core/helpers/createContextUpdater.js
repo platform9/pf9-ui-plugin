@@ -1,30 +1,10 @@
-import {
-  hasPath,
-  path,
-  assocPath,
-  isNil,
-  pipe,
-  pickAll,
-  reject,
-  either,
-  equals,
-  head,
-  split,
-  prop,
-} from 'ramda'
-import {
-  emptyObj,
-  ensureFunction,
-  switchCase,
-  objSwitchCase,
-  emptyArr,
-  ensureArray,
-} from 'utils/fp'
-import { getContextLoader } from 'core/helpers/createContextLoader'
-import { memoizePromise, uncamelizeString } from 'utils/misc'
-import { defaultUniqueIdentifier, notFoundErr, allKey } from 'app/constants'
-import { cacheActions, cacheStoreKey, dataStoreKey } from 'core/caching/cacheReducers'
+import { allKey, defaultUniqueIdentifier, notFoundErr } from 'app/constants'
 import store from 'app/store'
+import { cacheActions } from 'core/caching/cacheReducers'
+import { getContextLoader } from 'core/helpers/createContextLoader'
+import { assocPath, either, equals, hasPath, head, isNil, path, pickAll, pipe, reject, split } from 'ramda'
+import { emptyArr, emptyObj, ensureArray, ensureFunction, objSwitchCase, switchCase } from 'utils/fp'
+import { memoizePromise, uncamelizeString } from 'utils/misc'
 
 let updaters = {}
 export const getContextUpdater = (key, operation) => {
@@ -136,8 +116,6 @@ function createContextUpdater(cacheKey, dataUpdaterFn, options = {}) {
   const contextUpdaterFn = memoizePromise(
     async (params = emptyObj, additionalOptions = emptyObj) => {
       const { dispatch, getState } = store
-      const cache = prop(cacheStoreKey, getState())
-      const { [dataStoreKey]: cachedData } = cache
       const indexedParams = pipe(
         pickAll(allIndexKeys),
         reject(either(isNil, equals(allKey))),
@@ -152,17 +130,12 @@ function createContextUpdater(cacheKey, dataUpdaterFn, options = {}) {
       }
       const loaderAdditionalOptions = { onError }
 
-      const { getDataFilter, dataMapper } = loader
-      const loadFromContext = (key, params = emptyObj, refetch) => {
-        const loaderFn = getContextLoader(key)
-        return loaderFn(params, refetch, loaderAdditionalOptions)
-      }
-      const filterData = getDataFilter(params)
-      const cachedItems = filterData(cachedData)
-      const prevItems = await dataMapper(cachedItems, params, loadFromContext)
+      const { selectorCreator } = loader
+      const propsSelector = selectorCreator()
+      const prevItems = propsSelector(getState(), params)
 
       try {
-        const output = await dataUpdaterFn(params, prevItems, loadFromContext)
+        const output = await dataUpdaterFn(params, prevItems)
         switch (operation) {
           case 'create':
             dispatch(
