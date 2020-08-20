@@ -146,7 +146,7 @@ export const mngmUserActions = createCRUDActions(DataKeys.ManagementUsers, {
 })
 
 export const mngmUserRoleAssignmentsLoader = createContextLoader(
-  DataKeys.ManagementUserRoleAssignments,
+  DataKeys.ManagementUsersRoleAssignments,
   async ({ userId }) => (await keystone.getUserRoleAssignments(userId)) || emptyArr,
   {
     uniqueIdentifier: ['user.id', 'role.id'],

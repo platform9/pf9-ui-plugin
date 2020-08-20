@@ -122,7 +122,7 @@ export const mngmTenantActions = createCRUDActions(DataKeys.ManagementTenants, {
 })
 
 export const mngmTenantRoleAssignmentsLoader = createContextLoader(
-  DataKeys.ManagementRoleAssignments,
+  DataKeys.ManagementTenantsRoleAssignments,
   async ({ tenantId }) => (await keystone.getTenantRoleAssignments(tenantId)) || emptyArr,
   {
     uniqueIdentifier: ['user.id', 'role.id', 'scope.project.id'],

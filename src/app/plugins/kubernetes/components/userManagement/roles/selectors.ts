@@ -1,12 +1,12 @@
 import { createSelector } from 'reselect'
-import { pathOr, mergeLeft, pipe } from 'ramda'
-import { emptyArr, filterIf } from 'utils/fp'
-import { dataStoreKey, cacheStoreKey } from 'core/caching/cacheReducers'
-import { mngmRolesCacheKey } from './actions'
+import { mergeLeft, pipe } from 'ramda'
+import { filterIf } from 'utils/fp'
 import createSorter from 'core/helpers/createSorter'
+import DataKeys from 'k8s/DataKeys'
+import getDataSelector from 'core/utils/getDataSelector'
 
 export const rolesSelector = createSelector(
-  pathOr(emptyArr, [cacheStoreKey, dataStoreKey, mngmRolesCacheKey]),
+  [getDataSelector<DataKeys.ManagementRoles>(DataKeys.ManagementRoles)],
   (rawRoles) => {
     // associate nodes with the combinedHost entry
     return rawRoles.map((role) => ({

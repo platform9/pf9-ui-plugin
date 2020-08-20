@@ -42,6 +42,7 @@ export interface IDataKeys {
   ClusterRoles: Array<IGenericClusterizedResponse<GetClusterRolesItem>>
   PrometheusInstances: Array<IGenericClusterizedResponse<any>>
   ServiceAccounts: any // no model for this yet
+  Services: any // no model for this yet
   PrometheusRules: Array<IGenericClusterizedResponse<any>> // no model for this yet
   PrometheusServiceMonitors: Array<IGenericClusterizedResponse<any>> // no model for this yet
   PrometheusAlertManagers: Array<IGenericClusterizedResponse<any>> // no model for this yet
@@ -59,7 +60,9 @@ export interface IDataKeys {
   ManagementUsers: User[]
   ManagementTenants: Tenant[]
   ManagementRoles: Role[]
-  ManagementRoleAssignments: RoleAssignment[]
+  ManagementTenantsRoleAssignments: RoleAssignment[]
+  ManagementUsersRoleAssignments: RoleAssignment[]
+  ManagementCredentials: any // no model for this yet
   ManagementGroups: any // no model for this yet
   ManagementGroupsMappings: any // no model for this yet
   Tenants: any // is this needed? only in openstack
