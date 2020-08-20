@@ -69,6 +69,15 @@ const getK8sDashboardLinkFromVersion = (version, qbertEndpoint, cluster) => {
   }/services/https:kubernetes-dashboard:443/proxy/`
 }
 
+const getCsiDrivers = async (clusterUiid) => {
+  try {
+    return await qbert.getClusterCsiDrivers(clusterUiid)
+  } catch (e) {
+    console.warn(e)
+    return null
+  }
+}
+
 const getEtcdBackupPayload = (path, data) =>
   pathStrOr(0, path, data)
     ? {
@@ -327,12 +336,15 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
       const version = hasMasterNode ? await getKubernetesVersion(cluster.uuid) : null
       const dashboardLink = getK8sDashboardLinkFromVersion(version, qbertEndpoint, cluster)
 
+      const csiDrivers = await getCsiDrivers(cluster.uuid)
+
       return {
         ...cluster,
         pkgs: clusterWithTasks ? clusterWithTasks.pkgs : [],
         usage,
         version: version || 'N/A',
         nodes: nodesInCluster,
+        csiDrivers,
         masterNodes,
         workerNodes,
         progressPercent,

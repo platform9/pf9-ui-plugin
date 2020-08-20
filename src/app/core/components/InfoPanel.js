@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/styles'
-import { Card, CardHeader, CardContent, Divider } from '@material-ui/core'
+import { Card, CardHeader, CardContent, Divider, Typography } from '@material-ui/core'
 import { DetailRow } from 'k8s/components/infrastructure/nodes/NodeDetailsPage'
 
 const styles = (theme) => ({
@@ -18,6 +18,10 @@ const styles = (theme) => ({
   },
 })
 
+const renderDetailRow = (items) => (<div style={{marginBottom: 16}}>{Object.entries(items).map(([name, { value, helpMessage }]) => (
+<DetailRow label={name} value={value} helpMessage={helpMessage} />
+))}</div>)
+
 const InfoPanel = withStyles(styles)(({ classes, items, title }) => (
   <Card className={classes.card}>
     <CardHeader title={title} titleTypographyProps={{ variant: 'h6' }} />
@@ -25,9 +29,11 @@ const InfoPanel = withStyles(styles)(({ classes, items, title }) => (
     <CardContent>
       <table>
         <tbody>
-          {Object.entries(items).map(([name, { value, helpMessage }]) => (
-            <DetailRow label={name} value={value} helpMessage={helpMessage} />
-          ))}
+          { Array.isArray(items)
+            ? items.map(renderDetailRow)
+            : renderDetailRow(items)
+          }
+          
         </tbody>
       </table>
     </CardContent>
