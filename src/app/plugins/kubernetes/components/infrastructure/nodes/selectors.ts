@@ -1,16 +1,17 @@
 import { createSelector } from 'reselect'
-import { pathOr, find, propEq, prop, mergeLeft, pipe } from 'ramda'
-import { emptyArr, pathStrOrNull, pipeWhenTruthy } from 'utils/fp'
-import { dataStoreKey, cacheStoreKey } from 'core/caching/cacheReducers'
-import { nodesCacheKey } from 'k8s/components/infrastructure/nodes/actions'
+import { find, mergeLeft, pipe, prop, propEq } from 'ramda'
+import { pathStrOrNull, pipeWhenTruthy } from 'utils/fp'
 import { combinedHostsSelector } from 'k8s/components/infrastructure/common/selectors'
-import { serviceCatalogContextKey } from 'openstack/components/api-access/actions'
 import createSorter from 'core/helpers/createSorter'
+import DataKeys from 'k8s/DataKeys'
+import getDataSelector from 'core/utils/getDataSelector'
 
 export const nodesSelector = createSelector(
-  pathOr(emptyArr, [cacheStoreKey, dataStoreKey, nodesCacheKey]),
-  combinedHostsSelector,
-  pathOr(emptyArr, [cacheStoreKey, dataStoreKey, serviceCatalogContextKey]),
+  [
+    getDataSelector<DataKeys.Nodes>(DataKeys.Nodes),
+    combinedHostsSelector,
+    getDataSelector<DataKeys.ServiceCatalog>(DataKeys.ServiceCatalog),
+  ],
   (rawNodes, combinedHosts, serviceCatalog) => {
     const combinedHostsObj = combinedHosts.reduce((accum, host) => {
       const id = pathStrOrNull('resmgr.id')(host) || pathStrOrNull('qbert.uuid')(host)

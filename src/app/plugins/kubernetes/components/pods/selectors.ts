@@ -1,14 +1,34 @@
 import { createSelector } from 'reselect'
-import { find, propEq, prop, pipe, pathEq, map, mergeLeft, any } from 'ramda'
-import { emptyArr, pathStrOrNull, pipeWhenTruthy, filterIf, pathStr, pathStrOr } from 'utils/fp'
+import {
+  any,
+  find,
+  head,
+  map,
+  mergeLeft,
+  pathEq,
+  pipe,
+  pluck,
+  prop,
+  propEq,
+  toPairs,
+} from 'ramda'
+import {
+  emptyArr,
+  emptyObj,
+  filterIf,
+  pathStr,
+  pathStrOr,
+  pathStrOrNull,
+  pipeWhenTruthy,
+} from 'utils/fp'
 import { allKey } from 'app/constants'
 import { pathJoin } from 'utils/misc'
 import DataKeys from 'k8s/DataKeys'
 import getDataSelector from 'core/utils/getDataSelector'
 import { combinedHostsSelector } from '../infrastructure/common/selectors'
 import { GetClusterPodsItem, IGenericResource } from 'api-client/qbert.model'
-import ApiClient from 'api-client/'
 import createSorter from 'core/helpers/createSorter'
+import { clustersSelector } from 'k8s/components/infrastructure/clusters/selectors'
 
 const k8sDocUrl = 'namespaces/kube-system/qbertservices/https:kubernetes-dashboard:443/proxy/#'
 
@@ -40,12 +60,12 @@ export const nodesSelector = createSelector(
 
 export const podsSelector = createSelector([
     getDataSelector<DataKeys.Pods>(DataKeys.Pods),
-    getDataSelector<DataKeys.Clusters>(DataKeys.Clusters),
+    clustersSelector,
 ], (rawPods, clusters) => {
     // associate nodes with the combinedHost entry
     return pipe(
       // Filter by namespace
-      map(async (pod: IGenericResource<GetClusterPodsItem>) => {
+      map((pod: IGenericResource<GetClusterPodsItem>) => {
         const { clusterId } = pod
         const cluster = find(propEq('uuid', clusterId), clusters)
         const dashboardUrl = pathJoin(
@@ -85,23 +105,22 @@ export const makeParamsPodsSelector = (defaultParams = {}) => {
 export const deploymentsSelector = createSelector(
   [
     getDataSelector<DataKeys.Deployments>(DataKeys.Deployments),
-    getDataSelector<DataKeys.Pods>(DataKeys.Pods),
-    getDataSelector<DataKeys.Clusters>(DataKeys.Clusters),
+    podsSelector,
+    clustersSelector,
   ],
-  (rawDeployments, rawPods, clusters) => {
-    return rawDeployments.map((deployment) => {
-      const { clusterId } = deployment
+  (rawDeployments, pods, clusters) => {
+    return rawDeployments.map((rawDeployment) => {
+      const { clusterId } = rawDeployment
       const cluster = find(propEq('uuid', clusterId), clusters)
       const dashboardUrl = pathJoin(
         cluster.baseUrl,
         k8sDocUrl,
         'deployment',
-        pathStr('metadata.namespace', deployment),
-        pathStr('metadata.name', deployment),
+        pathStr('metadata.namespace', rawDeployment),
+        pathStr('metadata.name', rawDeployment),
       )
-      const selectors = pathStrOr(emptyObj, 'spec.selector.matchLabels', deployment)
-      const clusterId = prop('clusterId', deployment)
-      const namespace = pathStr('metadata.namespace', deployment)
+      const selectors = pathStrOr(emptyObj, 'spec.selector.matchLabels', rawDeployment)
+      const namespace = pathStr('metadata.namespace', rawDeployment)
       const [labelKey, labelValue] = head(toPairs(selectors)) || emptyArr
 
       // Check if any pod label matches the first deployment match label key
@@ -114,12 +133,12 @@ export const deploymentsSelector = createSelector(
         return any(([key, value]) => key === labelKey && value === labelValue, toPairs(podLabels))
       })
       return {
-        ...deployment,
+        ...rawDeployment,
         dashboardUrl,
-        id: pathStr('metadata.uid', deployment),
-        name: pathStr('metadata.name', deployment),
-        created: pathStr('metadata.creationTimestamp', deployment),
-        labels: pathStr('metadata.labels', deployment),
+        id: pathStr('metadata.uid', rawDeployment),
+        name: pathStr('metadata.name', rawDeployment),
+        created: pathStr('metadata.creationTimestamp', rawDeployment),
+        labels: pathStr('metadata.labels', rawDeployment),
         selectors,
         pods: deploymentPods.length,
         namespace,
@@ -144,7 +163,7 @@ export const makeParamsDeploymentsSelector = (defaultParams = {}) => {
 
 export const serviceSelectors = createSelector(
   [getDataSelector<DataKeys.Services>(DataKeys.Services, 'clusterId'), clustersSelector],
-  (rawDeployments, clusters) => {
+  (rawServices, clusters) => {
     return map((service) => {
       const { clusterId } = service
       const cluster = find(propEq('uuid', clusterId), clusters)
@@ -187,7 +206,7 @@ export const serviceSelectors = createSelector(
         namespace: pathStr('metadata.namespace', service),
         clusterName: cluster.name,
       }
-    })(rawDeployments)
+    })(rawServices)
   },
 )
 

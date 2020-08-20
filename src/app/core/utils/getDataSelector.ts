@@ -7,7 +7,7 @@ import { ParametricSelector } from 'reselect'
 
 const getDataSelector = <T extends keyof IDataKeys>(
   dataKey: T,
-  indexBy = [],
+  indexBy: string[] | string = [],
 ): ParametricSelector<IDataKeys, any, IDataKeys[T]> => {
   return (store, params) => {
     const providedIndexedParams = pipe(

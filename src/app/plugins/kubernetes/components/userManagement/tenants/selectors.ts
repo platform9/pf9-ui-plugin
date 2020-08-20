@@ -4,7 +4,7 @@ import { filterIf } from 'utils/fp'
 import getDataSelector from 'core/utils/getDataSelector'
 import DataKeys from 'k8s/DataKeys'
 import { Tenant } from 'api-client/keystone.model'
-import createSorter, { SortConfig } from 'core/helpers/createSorter'
+import createSorter from 'core/helpers/createSorter'
 import { namespacesSelector } from 'k8s/components/namespaces/selectors'
 
 const reservedTenantNames = ['admin', 'services', 'Default', 'heat']
@@ -18,7 +18,7 @@ export const tenantsSelector = createSelector(
       prop('id'),
     )(allTenantsAllUsers)
     return pipe<Tenant[], Tenant[], Tenant[]>(
-      filter((tenant: Tenant) => tenant.domain_id !== heatTenantId),
+      filter((tenant) => tenant.domain_id !== heatTenantId),
       map((tenant) => ({
         ...tenant,
         users: tenant.users.filter((user) => user.username !== 'admin@platform9.net'),
@@ -32,7 +32,7 @@ export const tenantsSelector = createSelector(
 )
 
 export const makeFilteredTenantsSelector = (
-  defaultParams: SortConfig = {
+  defaultParams = {
     orderBy: 'created_at',
     orderDirection: 'desc',
   },
@@ -40,10 +40,10 @@ export const makeFilteredTenantsSelector = (
   return createSelector(
     [tenantsSelector, (_, params) => mergeLeft(params, defaultParams)],
     (tenants, params) => {
-      const { includeBlacklisted } = params
+      const { includeBlacklisted, orderBy, orderDirection } = params
       return pipe<Tenant[], Tenant[], Tenant[]>(
         filterIf(!includeBlacklisted, filterValidTenants),
-        createSorter(defaultParams),
+        createSorter({ orderBy, orderDirection }),
       )(tenants)
     },
   )
