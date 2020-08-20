@@ -11,14 +11,21 @@ const uniqueIdentifier = 'id'
 const apiDateFormat = 'ddd MMM D HH:mm:ss YYYY'
 
 export const appDetailsSelector = createSelector(
-  getDataSelector(DataKeys.AppDetail, ['clusterId', 'id', 'release', 'version']),
+  [
+    getDataSelector<DataKeys.AppDetail>(DataKeys.AppDetail, [
+      'clusterId',
+      'id',
+      'release',
+      'version',
+    ]),
+  ],
   (items) => {
     return map(({ id, ...item }) => {
       const chartId = id.substring(0, id.indexOf(':')) // Remove the version from the ID
       return {
         ...item,
         id: chartId,
-        name: chartId.substring(`${chartId.indexOf('/')} 1`),
+        name: chartId.substring(`${chartId.indexOf('/').toString()} 1`),
         home: pathStr('relationships.chart.data.home', item),
         sources: pathStr('relationships.chart.data.sources', item),
         maintainers: pathStr('relationships.chart.data.maintainers', item),
@@ -43,7 +50,7 @@ export const makeAppDetailsSelector = (
 }
 
 export const deploymentDetailsSelector = createSelector(
-  getDataSelector(DataKeys.ReleaseDetail, ['clusterId', 'release']),
+  getDataSelector<DataKeys.ReleaseDetail>(DataKeys.ReleaseDetail, ['clusterId', 'release']),
   (items) => {
     return map((item) => ({
       ...item,
@@ -76,7 +83,7 @@ export const makeDeploymentDetailsSelector = (
 }
 
 export const appVersionSelector = createSelector(
-  getDataSelector(DataKeys.AppVersions, ['clusterId', 'appId', 'release']),
+  getDataSelector<DataKeys.AppVersions>(DataKeys.AppVersions, ['clusterId', 'appId', 'release']),
   (items) => {
     return map((item) => ({
       ...item,
@@ -114,7 +121,7 @@ export const makeAppsSelector = (
 ) => {
   return createSelector(
     [
-      getDataSelector(DataKeys.Apps, ['clusterId']),
+      getDataSelector<DataKeys.Apps>(DataKeys.Apps, ['clusterId']),
       (_, params) => mergeLeft(params, defaultParams),
     ],
     (items, params) => {
@@ -145,7 +152,7 @@ export const makeReleasesSelector = (
 ) => {
   return createSelector(
     [
-      getDataSelector(DataKeys.Releases, ['clusterId']),
+      getDataSelector<DataKeys.Releases>(DataKeys.Releases, ['clusterId']),
       (_, params) => mergeLeft(params, defaultParams),
     ],
     (items, params) => {
@@ -165,7 +172,10 @@ export const makeReleasesSelector = (
 }
 
 export const repositoriesSelector = createSelector(
-  [getDataSelector(DataKeys.Repositories), getDataSelector(DataKeys.RepositoriesWithClusters)],
+  [
+    getDataSelector<DataKeys.Repositories>(DataKeys.Repositories),
+    getDataSelector(DataKeys.RepositoriesWithClusters),
+  ],
   (rawRepos, reposWithClusters) => {
     return map(({ id, type, attributes }) => ({
       id,

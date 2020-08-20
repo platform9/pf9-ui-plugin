@@ -1,17 +1,5 @@
 import { createSelector } from 'reselect'
-import {
-  any,
-  find,
-  head,
-  map,
-  mergeLeft,
-  pathEq,
-  pipe,
-  pluck,
-  prop,
-  propEq,
-  toPairs,
-} from 'ramda'
+import { any, find, head, map, mergeLeft, pathEq, pipe, pluck, prop, propEq, toPairs } from 'ramda'
 import {
   emptyArr,
   emptyObj,
@@ -58,10 +46,9 @@ export const nodesSelector = createSelector(
   },
 )
 
-export const podsSelector = createSelector([
-    getDataSelector<DataKeys.Pods>(DataKeys.Pods),
-    clustersSelector,
-], (rawPods, clusters) => {
+export const podsSelector = createSelector(
+  [getDataSelector<DataKeys.Pods>(DataKeys.Pods), clustersSelector],
+  (rawPods, clusters) => {
     // associate nodes with the combinedHost entry
     return pipe(
       // Filter by namespace
@@ -103,11 +90,7 @@ export const makeParamsPodsSelector = (defaultParams = {}) => {
 }
 
 export const deploymentsSelector = createSelector(
-  [
-    getDataSelector<DataKeys.Deployments>(DataKeys.Deployments),
-    podsSelector,
-    clustersSelector,
-  ],
+  [getDataSelector<DataKeys.Deployments>(DataKeys.Deployments), podsSelector, clustersSelector],
   (rawDeployments, pods, clusters) => {
     return rawDeployments.map((rawDeployment) => {
       const { clusterId } = rawDeployment
