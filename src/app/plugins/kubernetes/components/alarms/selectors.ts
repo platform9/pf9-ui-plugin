@@ -3,13 +3,18 @@ import { pathOr, path, pipe, find, propEq, prop, mergeLeft } from 'ramda'
 import { emptyArr, pathStr } from 'utils/fp'
 import moment from 'moment'
 import { cacheStoreKey, dataStoreKey } from 'core/caching/cacheReducers'
-import { alertsCacheKey, alertsTimeSeriesCacheKey } from 'k8s/components/alarms/actions'
 import { clustersSelector } from 'k8s/components/infrastructure/clusters/selectors'
+import DataKeys from 'k8s/DataKeys'
+import { IAlert, IAlertOverTime, ISeverityCount } from './model'
+import { IClusterAction } from '../infrastructure/clusters/model'
 
 const getQbertUrl = (qbertEndpoint) => {
   // Trim the uri after "/qbert" from the qbert endpoint
-  return qbertEndpoint.match(/(.*?)\/qbert/)[1]
+  return `${qbertEndpoint.match(/(.*?)\/qbert/)[1]}/k8s/v1/clusters/`
 }
+
+const getGrafanaUrl = (baseUrl: string) => ({ clusterId }: IAlert) =>
+  `${baseUrl}${clusterId}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:grafana-ui:80/proxy/`
 
 // Used to calculate the timestamps on the chart
 // Each period (represented by key name) is split into
@@ -24,24 +29,27 @@ const timestampSteps = {
   '1.h': [10, 'm'],
 }
 
+// TODO check cluster typings with cluster selector. get generics to work on create selector
+// TODO update IClusterAction type with actual cluster type from its selector
 export const alertsSelector = createSelector(
   [
-    pathOr(emptyArr, [cacheStoreKey, dataStoreKey, alertsCacheKey]),
+    pathOr(emptyArr, [cacheStoreKey, dataStoreKey, DataKeys.Alerts]),
     clustersSelector,
-    pathOr(emptyArr, ['qbert', 'endpoint']),
+    pathOr('', ['qbert', 'endpoint']),
   ],
-  (alerts, clusters, qbertEndpoint) => {
-    const qbertPath = getQbertUrl(qbertEndpoint)
+  (alerts: IAlert[], clusters, qbertEndpoint: string) => {
+    const grafanaUrlBuilder = getGrafanaUrl(getQbertUrl(qbertEndpoint))
     return alerts.map((alert) => ({
       ...alert,
       severity: pathStr('labels.severity', alert),
       summary: pathStr('annotations.message', alert),
       activeAt: path(['alerts', 0, 'activeAt'], alert),
       status: alert.alerts.length ? 'Active' : 'Closed',
-      clusterName: pipe(find(propEq('uuid', alert.clusterId)), prop('name'))(clusters),
-      grafanaLink:
-        `${qbertPath}/k8s/v1/clusters/${alert.clusterId}/k8sapi/api/v1/namespaces` +
-        `/pf9-monitoring/services/http:grafana-ui:80/proxy/`,
+      clusterName: pipe(
+        find<IClusterAction>(propEq('uuid', alert.clusterId)),
+        prop('name'),
+      )(clusters),
+      grafanaLink: grafanaUrlBuilder(alert),
     }))
   },
 )
@@ -54,10 +62,10 @@ export const makeTimeSeriesSelector = (
 ) => {
   return createSelector(
     [
-      pathOr(emptyArr, [cacheStoreKey, dataStoreKey, alertsTimeSeriesCacheKey]),
+      pathOr(emptyArr, [cacheStoreKey, dataStoreKey, DataKeys.AlertsTimeSeries]),
       (_, params) => mergeLeft(params, defaultParams),
     ],
-    (timeSeriesRaw, params) => {
+    (timeSeriesRaw: IAlertOverTime[], params) => {
       const { chartTime } = params
       const timeNow = moment().unix()
       const [number, period] = chartTime.split('.')
@@ -94,22 +102,25 @@ const getTimestamps = (startTime, period) => {
   return [
     momentObj.unix(),
     ...Array(6)
-      .fill()
+      .fill(undefined)
       .map(() => momentObj.add(...momentArgs).unix()),
   ]
 }
 
-const getSeverityCounts = (alertData, timestamps) => {
+const getSeverityCounts = (alertData: IAlertOverTime[], timestamps: number[]) => {
   // Use timestamps to create starting template bc not certain if
   // alertData results will contain all timestamps
-  const startingTemplate = timestamps.reduce((accum, current) => {
-    accum[current] = {
-      warning: 0,
-      critical: 0,
-      fatal: 0,
-    }
-    return accum
-  }, {})
+  const startingTemplate: { [key: number]: ISeverityCount } = timestamps.reduce(
+    (accum, current) => {
+      accum[current] = {
+        warning: 0,
+        critical: 0,
+        fatal: 0,
+      }
+      return accum
+    },
+    {},
+  )
 
   // Strip out warning, critical, and fatal alerts for chart
   const importantAlerts = alertData.filter((alert) =>
