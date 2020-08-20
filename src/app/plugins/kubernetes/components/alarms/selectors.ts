@@ -1,12 +1,19 @@
 import { createSelector } from 'reselect'
-import { pathOr, path, pipe, find, propEq, prop, mergeLeft } from 'ramda'
-import { emptyArr, pathStr } from 'utils/fp'
+import { pathOr, pipe, find, propEq, prop, mergeLeft } from 'ramda'
+import { emptyArr } from 'utils/fp'
 import moment from 'moment'
 import { cacheStoreKey, dataStoreKey } from 'core/caching/cacheReducers'
 import { clustersSelector } from 'k8s/components/infrastructure/clusters/selectors'
 import DataKeys from 'k8s/DataKeys'
-import { IAlert, IAlertOverTime, ISeverityCount } from './model'
+import {
+  IAlert,
+  IAlertOverTime,
+  ISeverityCount,
+  IAlertSelector,
+  IAlertOverTimeSelector,
+} from './model'
 import { IClusterAction } from '../infrastructure/clusters/model'
+import { IDataKeys } from 'k8s/datakeys.model'
 
 const getQbertUrl = (qbertEndpoint) => {
   // Trim the uri after "/qbert" from the qbert endpoint
@@ -29,21 +36,27 @@ const timestampSteps = {
   '1.h': [10, 'm'],
 }
 
-// TODO check cluster typings with cluster selector. get generics to work on create selector
-// TODO update IClusterAction type with actual cluster type from its selector
-export const alertsSelector = createSelector(
+// TODO replace IDataKeys with an actual whole store state model
+// TODO replace IClusterAction typings with cluster selector return types.
+export const alertsSelector = createSelector<
+  IDataKeys,
+  Readonly<IAlert[]>,
+  IClusterAction[],
+  string,
+  IAlertSelector[]
+>(
   [
-    pathOr(emptyArr, [cacheStoreKey, dataStoreKey, DataKeys.Alerts]),
+    (state) => pathOr(emptyArr, [cacheStoreKey, dataStoreKey, DataKeys.Alerts])(state),
     clustersSelector,
-    pathOr('', ['qbert', 'endpoint']),
+    (state) => pathOr('', ['qbert', 'endpoint'])(state),
   ],
-  (alerts: IAlert[], clusters, qbertEndpoint: string) => {
+  (alerts, clusters, qbertEndpoint) => {
     const grafanaUrlBuilder = getGrafanaUrl(getQbertUrl(qbertEndpoint))
     return alerts.map((alert) => ({
       ...alert,
-      severity: pathStr('labels.severity', alert),
-      summary: pathStr('annotations.message', alert),
-      activeAt: path(['alerts', 0, 'activeAt'], alert),
+      severity: alert?.labels?.severity,
+      summary: alert?.annotations?.message, // pathStr('annotations.message', alert),
+      activeAt: alert?.alerts?.[0]?.activeAt, // path(['alerts', 0, 'activeAt'], alert),
       status: alert.alerts.length ? 'Active' : 'Closed',
       clusterName: pipe(
         find<IClusterAction>(propEq('uuid', alert.clusterId)),
@@ -54,18 +67,19 @@ export const alertsSelector = createSelector(
   },
 )
 
+// TODO typings for params
 export const makeTimeSeriesSelector = (
   defaultParams = {
     orderBy: 'created_at',
     orderDirection: 'desc',
   },
 ) => {
-  return createSelector(
+  return createSelector<IDataKeys, IAlertOverTime[], any, IAlertOverTimeSelector[]>(
     [
-      pathOr(emptyArr, [cacheStoreKey, dataStoreKey, DataKeys.AlertsTimeSeries]),
+      (state) => pathOr(emptyArr, [cacheStoreKey, dataStoreKey, DataKeys.AlertsTimeSeries])(state),
       (_, params) => mergeLeft(params, defaultParams),
     ],
-    (timeSeriesRaw: IAlertOverTime[], params) => {
+    (timeSeriesRaw, params) => {
       const { chartTime } = params
       const timeNow = moment().unix()
       const [number, period] = chartTime.split('.')
