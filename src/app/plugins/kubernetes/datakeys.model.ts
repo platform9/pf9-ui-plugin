@@ -16,6 +16,10 @@ import { IClusterAction } from './components/infrastructure/clusters/model'
 import { ClusterTag } from 'api-client/appbert.model'
 import { IAlert, IAlertOverTime } from './components/alarms/model'
 
+export interface GlobalState {
+  cachedData: IDataKeys
+}
+
 export interface IDataKeys {
   Nodes: Node[]
   Clusters: IClusterAction[]

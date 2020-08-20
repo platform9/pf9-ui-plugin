@@ -632,6 +632,7 @@ export interface FluffySpec {
   type: SpecType
   sessionAffinity: SessionAffinity
   selector?: FluffySelector
+  externalName?: string
 }
 
 export interface SpecPort {
@@ -639,6 +640,7 @@ export interface SpecPort {
   protocol: Protocol
   port: number
   targetPort: number | string
+  nodePort?: number | string
 }
 
 export interface FluffySelector {
@@ -655,6 +657,8 @@ export enum SessionAffinity {
 
 export enum SpecType {
   ClusterIP = 'ClusterIP',
+  NodePort = 'NodePort',
+  LoadBalancer = 'LoadBalancer',
 }
 
 export interface FluffyStatus {

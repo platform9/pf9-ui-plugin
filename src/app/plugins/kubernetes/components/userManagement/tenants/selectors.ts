@@ -18,7 +18,7 @@ export const tenantsSelector = createSelector(
       prop('id'),
     )(allTenantsAllUsers)
     return pipe<Tenant[], Tenant[], Tenant[]>(
-      filter((tenant) => tenant.domain_id !== heatTenantId),
+      filter<Tenant>((tenant) => tenant.domain_id !== heatTenantId),
       map((tenant) => ({
         ...tenant,
         users: tenant.users.filter((user) => user.username !== 'admin@platform9.net'),

@@ -1,11 +1,54 @@
 import { ICombinedNode } from '../nodes/model'
 import { CloudProviders } from '../cloudProviders/model'
-import { ClusterElement, INormalizedCluster } from 'api-client/qbert.model'
+import { ClusterElement, INormalizedCluster, Node } from 'api-client/qbert.model'
+import { ConnectionStatus, TransientStatus } from './ClusterStatusUtils'
+import { Pkg } from 'api-client/appbert.model'
 
 export type HealthStatus = 'healthy' | 'partially_healthy' | 'unhealthy' | 'unknown'
 
-export type IClusterAction = ClusterElement & INormalizedCluster
+interface IClusterAsyncAction {
+  progressPercent: any
+  version: string
+  baseUrl: string
+}
+export interface IClusterAction extends ClusterElement, INormalizedCluster, IClusterAsyncAction {}
 
+// progressPercent,
+//         version,
+//         baseUrl
+export interface IClusterSelector extends IClusterAction {
+  hasVpn: boolean
+  hasLoadBalancer: boolean
+  etcdBackupEnabled: boolean
+  tasks: Pkg[]
+  usage: {
+    compute: any
+    memory: any
+    disk: any
+    grafanaLink: string
+  }
+  nodes: Node[]
+  masterNodes: Node[]
+  workerNodes: Node[]
+  healthyMasterNodes: Node[]
+  healthyWorkerNodes: Node[]
+  masterNodesHealthStatus: HealthStatus | TransientStatus
+  workerNodesHealthStatus: HealthStatus | TransientStatus
+  connectionStatus: ConnectionStatus | TransientStatus
+  healthStatus: HealthStatus | TransientStatus
+  hasMasterNode: boolean
+  highlyAvailable: boolean
+  links: {
+    dashboard: string
+    kubeconfig: {
+      cluster: IClusterAction
+    }
+    cli: {
+      host: string
+      cluster: IClusterAction
+    }
+  }
+}
 export interface ICluster {
   name: string
   uuid: string

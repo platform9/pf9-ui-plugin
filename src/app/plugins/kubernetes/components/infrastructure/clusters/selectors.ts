@@ -1,4 +1,4 @@
-import { createSelector } from 'reselect'
+import { createSelector, OutputSelector } from 'reselect'
 import {
   pathOr,
   pluck,
@@ -11,7 +11,6 @@ import {
   mergeLeft,
 } from 'ramda'
 import { emptyArr, filterIf, isTruthy } from 'utils/fp'
-import { dataStoreKey, cacheStoreKey } from 'core/caching/cacheReducers'
 import createSorter from 'core/helpers/createSorter'
 import calcUsageTotalByPath from 'k8s/util/calcUsageTotals'
 import { hasPrometheusEnabled } from 'k8s/components/prometheus/actions'
@@ -22,29 +21,34 @@ import {
   getHealthStatus,
 } from 'k8s/components/infrastructure/clusters/ClusterStatusUtils'
 import { castFuzzyBool } from 'utils/misc'
-import ApiClient from 'api-client/ApiClient'
 import DataKeys from 'k8s/DataKeys'
-
-const { qbert } = ApiClient.getInstance()
+import getDataSelector from 'core/utils/getDataSelector'
+import { GlobalState } from 'k8s/datakeys.model'
+import { IClusterSelector } from './model'
+import { Node } from 'api-client/qbert.model'
 
 export const hasMasterNode = propSatisfies(isTruthy, 'hasMasterNode')
 export const hasHealthyMasterNodes = propSatisfies(
-  (healthyMasterNodes) => healthyMasterNodes.length > 0,
+  (healthyMasterNodes: Node[]) => healthyMasterNodes.length > 0,
   'healthyMasterNodes',
 )
 export const masterlessCluster = propSatisfies(isTruthy, 'masterless')
 export const hasPrometheusTag = compose(castFuzzyBool, path(['tags', 'pf9-system:monitoring']))
 export const hasAppCatalogEnabled = propSatisfies(isTruthy, 'appCatalogEnabled')
 
-export const clustersSelector = createSelector(
+export const clustersSelector: OutputSelector<
+  GlobalState,
+  IClusterSelector[],
+  any
+> = createSelector(
   [
-    pathOr(emptyArr, [cacheStoreKey, dataStoreKey, DataKeys.Clusters]),
-    pathOr(emptyArr, [cacheStoreKey, dataStoreKey, DataKeys.ClusterTags]),
-    pathOr(emptyArr, [cacheStoreKey, dataStoreKey, DataKeys.Nodes]),
-    pathOr(emptyArr, [cacheStoreKey, dataStoreKey, DataKeys.CombinedHosts]),
-    pathOr(emptyArr, ['qbert', 'endpoint']),
+    getDataSelector<DataKeys.Clusters>(DataKeys.Clusters),
+    getDataSelector<DataKeys.ClusterTags>(DataKeys.ClusterTags),
+    getDataSelector<DataKeys.Nodes>(DataKeys.Nodes),
+    getDataSelector<DataKeys.CombinedHosts>(DataKeys.CombinedHosts),
+    (state) => pathOr(emptyArr, ['qbert', 'endpoint'])(state),
   ],
-  (rawClusters, clustersWithTasks, rawNodes, combinedHosts, qbertEndpoint) => {
+  (rawClusters, clustersWithTasks, rawNodes, combinedHosts, qbertEndpoint: string) => {
     return rawClusters.map((cluster) => {
       const clusterWithTasks = clustersWithTasks.find(({ uuid }) => cluster.uuid === uuid)
       const nodesInCluster = rawNodes.filter((node) => node.clusterUuid === cluster.uuid)
@@ -89,9 +93,8 @@ export const clustersSelector = createSelector(
 
       return {
         ...cluster,
-        tasks: clusterWithTasks ? clusterWithTasks.tasks : [],
+        tasks: clusterWithTasks ? clusterWithTasks.pkgs : [],
         version: (hasMasterNode && cluster.version) || 'N/A',
-        baseUrl: qbert.clusterBaseUrl(cluster.uuid),
         usage,
         nodes: nodesInCluster,
         masterNodes,
@@ -143,7 +146,16 @@ export const makeParamsClustersSelector = (
         orderBy,
         orderDirection,
       } = params
-      return pipe(
+      return pipe<
+        IClusterSelector[],
+        IClusterSelector[],
+        IClusterSelector[],
+        IClusterSelector[],
+        IClusterSelector[],
+        IClusterSelector[],
+        IClusterSelector[],
+        IClusterSelector[]
+      >(
         filterIf(masterNodeClusters, hasMasterNode),
         filterIf(masterlessClusters, masterlessCluster),
         filterIf(prometheusClusters, hasPrometheusTag),

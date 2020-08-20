@@ -5,8 +5,8 @@ import { IGenericResource, GetClusterNamespacesItem } from 'api-client/qbert.mod
 export interface Namespace {
   id: string
 }
-type INamespaceApi = Array<IGenericResource<GetClusterNamespacesItem>>
-export interface INamespace extends INamespaceApi {
+type INamespaceApi = IGenericResource<GetClusterNamespacesItem>
+export interface INamespace extends Omit<INamespaceApi, 'status'> {
   clusterName: string
   status: string
 }

@@ -54,7 +54,7 @@ export const alertsSelector = createSelector<
     const grafanaUrlBuilder = getGrafanaUrl(getQbertUrl(qbertEndpoint))
     return alerts.map((alert) => ({
       ...alert,
-      severity: alert?.labels?.severity,
+      severity: alert?.labels?.severity, // pathStr('labels.severity', alert)
       summary: alert?.annotations?.message, // pathStr('annotations.message', alert),
       activeAt: alert?.alerts?.[0]?.activeAt, // path(['alerts', 0, 'activeAt'], alert),
       status: alert.alerts.length ? 'Active' : 'Closed',

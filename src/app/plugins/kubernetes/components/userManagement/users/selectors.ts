@@ -28,10 +28,17 @@ import { tenantsSelector } from 'k8s/components/userManagement/tenants/selectors
 import createParamsFilter from 'core/helpers/createParamsFilter'
 import getDataSelector from 'core/utils/getDataSelector'
 import DataKeys from 'k8s/DataKeys'
+import { Tenant, TenantUser } from 'api-client/keystone.model'
+import { IUsersSelector } from './model'
 
 const reservedTenantNames = ['admin', 'services', 'Default', 'heat']
 export const isValidTenant = (tenant) => !reservedTenantNames.includes(tenant.name)
 const adminUserNames = ['heatadmin', 'admin@platform9.net']
+
+interface PluckedTenantUsers extends TenantUser {
+  tenantId: string
+}
+type UnifiedTenantUsers = Omit<TenantUser, 'tenantId'> & { tenants: Tenant[] }
 
 export const usersSelector = createSelector(
   [
@@ -40,10 +47,10 @@ export const usersSelector = createSelector(
     tenantsSelector,
   ],
   (rawUsers, credentials, allTenants) => {
-    const validTenants = filter(isValidTenant, allTenants)
+    const validTenants = filter<Tenant>(isValidTenant, allTenants)
 
     // Get all tenant users and assign their corresponding tenant ID
-    const pluckUsers = map((tenant) =>
+    const pluckUsers = map<Tenant, PluckedTenantUsers[]>((tenant) =>
       tenant.users.map((user) => ({
         ...user,
         tenantId: tenant.id,
@@ -51,14 +58,16 @@ export const usersSelector = createSelector(
     )
 
     // Unify all users with the same ID and group the tenants
-    const unifyTenantUsers = map((groupedUsers) => ({
-      ...omit(['tenantId'], head(groupedUsers)),
-      tenants: innerJoin(
-        (tenant, id) => tenant.id === id,
-        validTenants,
-        uniq(pluck('tenantId', groupedUsers)),
-      ),
-    }))
+    const unifyTenantUsers = map<PluckedTenantUsers[], UnifiedTenantUsers>(
+      (groupedUsers: PluckedTenantUsers[]) => ({
+        ...omit<PluckedTenantUsers, 'tenantId'>(['tenantId'], head(groupedUsers)),
+        tenants: innerJoin(
+          (tenant, id) => tenant.id === id,
+          validTenants,
+          uniq(pluck<'tenantId', PluckedTenantUsers>('tenantId', groupedUsers)),
+        ),
+      }),
+    )
 
     const allUsers = rawUsers.map((user) => ({
       id: user.id,
@@ -74,7 +83,17 @@ export const usersSelector = createSelector(
       )(credentials),
     }))
 
-    return pipe(
+    return pipe<
+      Tenant[],
+      PluckedTenantUsers[][],
+      PluckedTenantUsers[],
+      {
+        [index: string]: PluckedTenantUsers[]
+      },
+      PluckedTenantUsers[][],
+      UnifiedTenantUsers[],
+      IUsersSelector[]
+    >(
       pluckUsers,
       flatten,
       groupBy(prop('id')),
@@ -92,7 +111,7 @@ export const makeFilteredTenantsSelector = (defaultParams = {}) => {
       const { systemUsers, orderBy, orderDirection } = params
       const blacklistedTenants = reject(isValidTenant, allTenants)
       const blacklistedTenantIds = pluck('id', blacklistedTenants)
-      const filterUsers = filter((user) => {
+      const filterUsers = filter<IUsersSelector>((user) => {
         return (
           (systemUsers || !isSystemUser(user)) &&
           user.username &&
@@ -100,7 +119,7 @@ export const makeFilteredTenantsSelector = (defaultParams = {}) => {
           !blacklistedTenantIds.includes(user.defaultProject)
         )
       })
-      return pipe(
+      return pipe<IUsersSelector[], IUsersSelector[], IUsersSelector[], IUsersSelector[]>(
         filterUsers,
         createParamsFilter(['tenantId'], params),
         createSorter({ orderBy, orderDirection }),

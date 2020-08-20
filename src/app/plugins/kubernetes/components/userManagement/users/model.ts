@@ -1,6 +1,7 @@
 // TODO: fix these typings
 
-import { TenantWithUsers, Tenant } from 'k8s/components/userManagement/tenants/model'
+import { Tenant } from 'api-client/keystone.model'
+
 export interface IUsersSelector {
   id: string
   username: string
