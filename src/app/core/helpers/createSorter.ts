@@ -10,6 +10,7 @@ export enum OrderDirection {
 type OrderDirectionString = keyof typeof OrderDirection
 
 export interface SortConfig {
+  [key: string]: string | boolean
   orderBy?: string
   orderDirection?: OrderDirection | OrderDirectionString
 }

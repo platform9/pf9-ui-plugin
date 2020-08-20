@@ -13,7 +13,7 @@ import {
   IAlertOverTimeSelector,
 } from './model'
 import { IClusterAction } from '../infrastructure/clusters/model'
-import { IDataKeys } from 'k8s/datakeys.model'
+import { IDataKeys, GlobalState } from 'k8s/datakeys.model'
 
 const getQbertUrl = (qbertEndpoint) => {
   // Trim the uri after "/qbert" from the qbert endpoint
@@ -39,7 +39,7 @@ const timestampSteps = {
 // TODO replace IDataKeys with an actual whole store state model
 // TODO replace IClusterAction typings with cluster selector return types.
 export const alertsSelector = createSelector<
-  IDataKeys,
+  GlobalState,
   Readonly<IAlert[]>,
   IClusterAction[],
   string,

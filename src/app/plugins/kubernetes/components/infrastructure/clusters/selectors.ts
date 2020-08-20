@@ -11,7 +11,7 @@ import {
   mergeLeft,
 } from 'ramda'
 import { emptyArr, filterIf, isTruthy } from 'utils/fp'
-import createSorter from 'core/helpers/createSorter'
+import createSorter, { SortConfig } from 'core/helpers/createSorter'
 import calcUsageTotalByPath from 'k8s/util/calcUsageTotals'
 import { hasPrometheusEnabled } from 'k8s/components/prometheus/actions'
 import {
@@ -128,7 +128,7 @@ export const clustersSelector: OutputSelector<
 )
 
 export const makeParamsClustersSelector = (
-  defaultParams = {
+  defaultParams: SortConfig = {
     orderBy: 'created_at',
     orderDirection: 'desc',
   },
