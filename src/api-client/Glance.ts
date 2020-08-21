@@ -19,7 +19,7 @@ class Glance extends ApiService {
 
   async getImages() {
     const url = `${await this.imagesUrl()}?limit=1000`
-    const response = await this.client.basicGet('Glance', 'getImages', url)
+    const response = await this.client.basicGet<any>('Glance', 'getImages', url)
     return response.images
   }
 
@@ -41,7 +41,7 @@ class Glance extends ApiService {
 
   async getImageSchema() {
     const url = `${await this.v2()}/schemas/images`
-    const response = await this.client.basicGet('Glance', 'getImageSchema', url)
+    const response = await this.client.basicGet<any>('Glance', 'getImageSchema', url)
     return response.properties.images
   }
 

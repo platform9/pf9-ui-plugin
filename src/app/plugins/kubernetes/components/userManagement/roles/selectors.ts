@@ -4,23 +4,26 @@ import { filterIf } from 'utils/fp'
 import createSorter from 'core/helpers/createSorter'
 import DataKeys from 'k8s/DataKeys'
 import getDataSelector from 'core/utils/getDataSelector'
+import { GlobalState, IDataKeys } from 'k8s/datakeys.model'
+import { IRolesSelector } from './model'
 
-export const rolesSelector = createSelector(
-  [getDataSelector<DataKeys.ManagementRoles>(DataKeys.ManagementRoles)],
-  (rawRoles) => {
-    // associate nodes with the combinedHost entry
-    return rawRoles.map((role) => ({
-      ...role,
-      name:
-        role.displayName || ['admin', '_member_'].includes(role.name)
-          ? hardcodedKubeRolesNames[role.name]
-          : role.name,
-      description: ['admin', '_member_'].includes(role.name)
-        ? hardcodedKubeRolesDescriptions[role.name]
-        : role.description,
-    }))
-  },
-)
+export const rolesSelector = createSelector<
+  GlobalState,
+  IDataKeys[DataKeys.ManagementRoles],
+  IRolesSelector[]
+>([getDataSelector<DataKeys.ManagementRoles>(DataKeys.ManagementRoles)], (rawRoles) => {
+  // associate nodes with the combinedHost entry
+  return rawRoles.map((role) => ({
+    ...role,
+    name:
+      role.displayName || ['admin', '_member_'].includes(role.name)
+        ? hardcodedKubeRolesNames[role.name]
+        : role.name,
+    description: ['admin', '_member_'].includes(role.name)
+      ? hardcodedKubeRolesDescriptions[role.name]
+      : role.description,
+  }))
+})
 
 export const makeParamsrolesSelector = (
   defaultParams = {
@@ -32,7 +35,7 @@ export const makeParamsrolesSelector = (
     [rolesSelector, (_, params) => mergeLeft(params, defaultParams)],
     (roles, params) => {
       const { orderBy, orderDirection } = params
-      return pipe(
+      return pipe<IRolesSelector[], IRolesSelector[], IRolesSelector[]>(
         filterIf(!params.allRoles, (role) => ['admin', '_member_'].includes(role.name)),
         createSorter({ orderBy, orderDirection }),
       )(roles)

@@ -9,7 +9,7 @@ enum DataKeys {
   Deployments = 'Deployments',
   KubeServices = 'KubeServices',
   Namespaces = 'Namespaces',
-  AppDetail = 'AppDetails',
+  AppDetails = 'AppDetails',
   Apps = 'Apps',
   AppVersions = 'AppVersions',
   ApiGroups = 'ApiGroups',

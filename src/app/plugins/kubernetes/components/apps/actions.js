@@ -38,7 +38,7 @@ const { qbert } = ApiClient.getInstance()
 const uniqueIdentifier = 'id'
 
 export const appDetailLoader = createContextLoader(
-  DataKeys.AppDetail,
+  DataKeys.AppDetails,
   async ({ clusterId, id, release, version }) => {
     const chart = await qbert.getChart(clusterId, id, release, version)
     const monocularUrl = await qbert.clusterMonocularBaseUrl(clusterId, null)
@@ -272,5 +272,5 @@ export const repositoryActions = createCRUDActions(DataKeys.Repositories, {
       )(catchedErr.message),
     })(operation),
   defaultOrderBy: 'name',
-  selector: repositoriesSelector
+  selector: repositoriesSelector,
 })

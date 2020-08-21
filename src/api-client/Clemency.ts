@@ -43,7 +43,7 @@ class Clemency extends ApiService {
   }
 
   createUser = async (body): Promise<any> => {
-    const response = await this.client.basicPost(
+    const response = await this.client.basicPost<any>(
       'Clemency',
       'createUser',
       `${this.baseUrl}/createacct`,

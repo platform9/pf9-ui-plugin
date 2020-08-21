@@ -62,6 +62,7 @@ export interface GetCluster {
 }
 
 export interface GetClusterClusterRoleBindingsItem {
+  parameters: { type: string }
   metadata: PurpleMetadata
   subjects?: RoleRef[]
   roleRef: RoleRef

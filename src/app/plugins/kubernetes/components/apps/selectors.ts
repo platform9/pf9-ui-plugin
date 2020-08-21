@@ -1,18 +1,17 @@
 import { createSelector } from 'reselect'
 import { map, mergeLeft, pipe, filter, pathEq, identity, find, propOr, propEq } from 'ramda'
-import { emptyArr, pathStr, filterIf } from 'utils/fp'
+import { emptyArr, pathStr, filterIf, pathStrOr } from 'utils/fp'
 import DataKeys from 'k8s/DataKeys'
 import getDataSelector from 'core/utils/getDataSelector'
 import createSorter from 'core/helpers/createSorter'
-import { imageUrlRoot, allKey } from 'app/constants'
+import { allKey, imageUrlRoot } from 'app/constants'
 import moment from 'moment'
-
 const uniqueIdentifier = 'id'
 const apiDateFormat = 'ddd MMM D HH:mm:ss YYYY'
 
 export const appDetailsSelector = createSelector(
   [
-    getDataSelector<DataKeys.AppDetail>(DataKeys.AppDetail, [
+    getDataSelector<DataKeys.AppDetails>(DataKeys.AppDetails, [
       'clusterId',
       'id',
       'release',
@@ -52,7 +51,7 @@ export const makeAppDetailsSelector = (
 export const deploymentDetailsSelector = createSelector(
   getDataSelector<DataKeys.ReleaseDetail>(DataKeys.ReleaseDetail, ['clusterId', 'release']),
   (items) => {
-    return map((item) => ({
+    return map((item: any) => ({
       ...item,
       name: pathStr('attributes.name', item),
       chartName: pathStr('attributes.chartName', item),
@@ -85,7 +84,7 @@ export const makeDeploymentDetailsSelector = (
 export const appVersionSelector = createSelector(
   getDataSelector<DataKeys.AppVersions>(DataKeys.AppVersions, ['clusterId', 'appId', 'release']),
   (items) => {
-    return map((item) => ({
+    return map((item: any) => ({
       ...item,
       version: pathStr('attributes.version', item),
       appVersion: pathStr('attributes.app_version', item),
@@ -131,7 +130,7 @@ export const makeAppsSelector = (
           ? filter(pathEq(['attributes', 'repo', 'name'], repositoryId))
           : identity
 
-      const normalize = map((item) => {
+      const normalize = map((item: any) => {
         return {
           ...item,
           name: pathStr('attributes.name', item),
@@ -157,9 +156,9 @@ export const makeReleasesSelector = (
     ],
     (items, params) => {
       const { namespace, orderBy, orderDirection } = params
-      return pipe(
+      return pipe<any, any, any, any>(
         filterIf(namespace && namespace !== allKey, pathEq(['attributes', 'namespace'], namespace)),
-        map((item) => ({
+        map((item: any) => ({
           ...item,
           name: pathStr('attributes.name', item),
           logoUrl: pathStrOr(`${imageUrlRoot}/default-app-logo.png`, 'attributes.chartIcon', item),

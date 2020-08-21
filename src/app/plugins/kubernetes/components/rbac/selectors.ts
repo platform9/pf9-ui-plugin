@@ -4,7 +4,6 @@ import DataKeys from 'k8s/DataKeys'
 import getDataSelector from 'core/utils/getDataSelector'
 import { whereEq, pipe, mergeLeft } from 'ramda'
 import { makeParamsClustersSelector } from '../infrastructure/clusters/selectors'
-import { pathStr } from 'utils/fp'
 
 export const apiGroupsSelector = createSelector(
   [
@@ -52,20 +51,18 @@ export const makGroupseParamsapiSelector = (
   )
 }
 
-// TODO: Xan
 export const rolesSelector = createSelector(
-  // [clustersSelector({ healthyClusters: true })], // do you mean to use `makeParamsClustersSelector({ healthyClusters: true })` here?
   [makeParamsClustersSelector({ healthyClusters: true })], // do you mean to use `makeParamsClustersSelector({ healthyClusters: true })` here?
   (items) => {
     return items.map((item) => ({
       ...item,
-      id: pathStr('metadata.uid', item),
-      name: pathStr('metadata.name', item),
-      namespace: pathStr('metadata.namespace', item),
+      id: item?.metadata?.uid,
+      name: item?.metadata?.name,
+      namespace: item?.metadata?.namespace,
       clusterName: pipe(find(propEq('uuid', item.clusterId)), prop('name'))(items),
-      created: pathStr('metadata.creationTimestamp', item),
-      pickerLabel: `Role: ${item.metadata.name}`,
-      pickerValue: `Role:${item.metadata.name}`,
+      created: item?.metadata?.creationTimestamp,
+      pickerLabel: `Role: ${item?.metadata?.name}`,
+      pickerValue: `Role:${item?.metadata?.name}`,
     }))
   },
 )

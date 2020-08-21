@@ -1,13 +1,13 @@
 import { createSelector } from 'reselect'
-import { propOr } from 'ramda'
 import { clustersSelector } from 'k8s/components/infrastructure/clusters/selectors'
 import getDataSelector from 'core/utils/getDataSelector'
 import DataKeys from 'k8s/DataKeys'
 
-const parseLoggings = (cluster, loggings) => {
+const parseLoggings = (cluster, loggings: any) => {
   const logStorage = []
   const logDestination = []
-  propOr([], 'items', loggings).forEach((item) => {
+  const items = loggings?.items || []
+  items.forEach((item) => {
     if (item.spec.type === 'elasticsearch') {
       logStorage.push('ElasticSearch')
       const urlParam = item.spec.params.find((param) => param.name === 'url')

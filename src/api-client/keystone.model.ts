@@ -321,10 +321,11 @@ export interface IFace {
   iface: Interface
 }
 
+export type IInterfaceByName = {
+  [key in Interface]: IFace
+}
 export interface ServicesByName {
-  [key: string]: {
-    [key in Interface]: IFace
-  }
+  [key: string]: IInterfaceByName
 }
 
 export type ServicesByRegion = {

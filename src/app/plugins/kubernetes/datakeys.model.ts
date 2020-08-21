@@ -31,12 +31,12 @@ export interface IDataKeys {
   Deployments: Array<IGenericResource<GetClusterDeploymentsItem>>
   KubeServices: Array<IGenericResource<GetClusterKubeServicesItem>>
   Namespaces: Array<IGenericResource<GetClusterNamespacesItem>>
-  AppDetail: any // no model for this yet
+  AppDetails: any // no model for this yet
   Apps: any // no model for this yet
   AppVersions: any // no model for this yet
   ApiGroups: any // no model for this yet
   Releases: any // no model for this yet
-  ReleaseDetail: any // no model for this yet
+  ReleaseDetail: any[] // no model for this yet
   RepositoriesWithClusters: any // no model for this yet
   Repositories: any // no model for this yet
   CloudProviders: GetCloudProvider[]
