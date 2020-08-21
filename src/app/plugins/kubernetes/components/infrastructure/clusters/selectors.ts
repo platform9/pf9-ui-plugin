@@ -25,6 +25,7 @@ import getDataSelector from 'core/utils/getDataSelector'
 import { GlobalState } from 'k8s/datakeys.model'
 import { IClusterSelector } from './model'
 import { Node } from 'api-client/qbert.model'
+import { clientStoreKey } from 'core/client/clientReducers'
 
 const monitoringTask = 'pf9-mon'
 const isMonitoringTask = (task: any = {}) =>
@@ -57,7 +58,7 @@ export const clustersSelector: OutputSelector<
     getDataSelector<DataKeys.ClusterTags>(DataKeys.ClusterTags),
     getDataSelector<DataKeys.Nodes>(DataKeys.Nodes),
     getDataSelector<DataKeys.CombinedHosts>(DataKeys.CombinedHosts),
-    (state) => pathOr(emptyArr, ['qbert', 'endpoint'])(state),
+    (state) => pathOr(emptyArr, [clientStoreKey, 'endpoints', 'qbert'])(state),
   ],
   (rawClusters, clustersWithTasks, rawNodes, combinedHosts, qbertEndpoint: string) => {
     return rawClusters.map((cluster) => {

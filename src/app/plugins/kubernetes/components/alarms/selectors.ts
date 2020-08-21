@@ -14,6 +14,7 @@ import {
 } from './model'
 import { IClusterAction } from '../infrastructure/clusters/model'
 import { IDataKeys, GlobalState } from 'k8s/datakeys.model'
+import { clientStoreKey } from 'core/client/clientReducers'
 
 const getQbertUrl = (qbertEndpoint) => {
   // Trim the uri after "/qbert" from the qbert endpoint
@@ -48,7 +49,7 @@ export const alertsSelector = createSelector<
   [
     (state) => pathOr(emptyArr, [cacheStoreKey, dataStoreKey, DataKeys.Alerts])(state),
     clustersSelector,
-    (state) => pathOr('', ['qbert', 'endpoint'])(state),
+    (state) => pathOr('', [clientStoreKey, 'endpoints', 'qbert'])(state),
   ],
   (alerts, clusters, qbertEndpoint) => {
     const grafanaUrlBuilder = getGrafanaUrl(getQbertUrl(qbertEndpoint))
