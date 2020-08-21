@@ -1,7 +1,5 @@
 import { createSelector } from 'reselect'
-import { pathOr, toPairs } from 'ramda'
-import { emptyArr } from 'utils/fp'
-import { dataStoreKey, cacheStoreKey } from 'core/caching/cacheReducers'
+import { toPairs } from 'ramda'
 import { combineHost } from 'k8s/components/infrastructure/common/combineHosts'
 import DataKeys from 'k8s/DataKeys'
 import getDataSelector from 'core/utils/getDataSelector'

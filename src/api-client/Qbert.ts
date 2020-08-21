@@ -276,7 +276,7 @@ class Qbert extends ApiService {
   }
 
   getCliToken = async (clusterId, namespace) => {
-    const response = await this.client.basicPost(
+    const response = await this.client.basicPost<any>(
       'Qbert',
       'getCliToken',
       `${await this.baseUrl()}/webcli/${clusterId}`,
@@ -325,7 +325,7 @@ class Qbert extends ApiService {
   }
 
   createNamespace = async (clusterId, body) => {
-    const raw = await this.client.basicPost(
+    const raw = await this.client.basicPost<any>(
       'Qbert',
       'createNamespace',
       `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces`,
@@ -601,7 +601,7 @@ class Qbert extends ApiService {
   }
 
   getServiceAccounts = async (clusterId, namespace) => {
-    const response = await this.client.basicGet(
+    const response = await this.client.basicGet<any>(
       'Qbert',
       'getServiceAccounts',
       `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/serviceaccounts`,
@@ -760,7 +760,7 @@ class Qbert extends ApiService {
 
   /* Managed Apps */
   getPrometheusInstances = async (clusterUuid) => {
-    const response = await this.client.basicGet(
+    const response = await this.client.basicGet<any>(
       'Qbert',
       'getPrometheusInstances',
       `${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/prometheuses`,
@@ -934,7 +934,7 @@ class Qbert extends ApiService {
   }
 
   getPrometheusServiceMonitors = async (clusterUuid) => {
-    const response = await this.client.basicGet(
+    const response = await this.client.basicGet<any>(
       'Qbert',
       'getPrometheusServiceMonitors',
       `${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/servicemonitors`,
@@ -969,7 +969,7 @@ class Qbert extends ApiService {
   }
 
   getPrometheusRules = async (clusterUuid) => {
-    const response = await this.client.basicGet(
+    const response = await this.client.basicGet<any>(
       'Qbert',
       'getPrometheusRules',
       `${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/prometheusrules`,
@@ -1004,7 +1004,7 @@ class Qbert extends ApiService {
   }
 
   getPrometheusAlertManagers = async (clusterUuid) => {
-    const response = await this.client.basicGet(
+    const response = await this.client.basicGet<any>(
       'Qbert',
       'getPrometheusAlertManagers',
       `${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/alertmanagers`,

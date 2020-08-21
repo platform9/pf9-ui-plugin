@@ -69,7 +69,7 @@ export const annotateUiState = (hosts: IAnnotateResmgrFields) => {
    * what is going on.
    *
    * We have a spreadsheet at:
-   *   https://docs.google.com/spreadsheets/d/1JZ6dCGtnMIyabLD0MD3YklsqGDafZfdoUEMRFeSqUB0/edit#gid=0
+   * https://docs.google.com/spreadsheets/d/1JZ6dCGtnMIyabLD0MD3YklsqGDafZfdoUEMRFeSqUB0/edit#gid=0
    *
    * Unfortunately it is not up to date.
    *
