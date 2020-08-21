@@ -15,7 +15,7 @@ import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
 import NamespacePicklist from 'k8s/components/common/NamespacePicklist'
 import ServiceAccountPicklist from 'k8s/components/prometheus/ServiceAccountPicklist'
 import useParams from 'core/hooks/useParams'
-import DataKeys from 'k8s/DataKeys'
+import { ActionDataKeys } from 'k8s/DataKeys'
 
 const initialContext = {
   replicas: 1,
@@ -146,7 +146,7 @@ const AddPrometheusInstanceForm = ({ onComplete }) => {
 }
 
 export const options = {
-  cacheKey: DataKeys.PrometheusInstances,
+  cacheKey: ActionDataKeys.PrometheusInstances,
   FormComponent: AddPrometheusInstanceForm,
   listUrl: '/ui/kubernetes/prometheus#instances',
   name: 'AddPrometheusInstance',

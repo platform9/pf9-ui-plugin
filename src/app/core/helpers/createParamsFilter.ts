@@ -14,11 +14,8 @@ import { allKey } from 'app/constants'
 import { arrayIfEmpty } from 'utils/fp'
 
 const createParamsFilter = curry(
-  (keys: string[], params: Dictionary<number | string>) => {
-    const providedIndexedParams = pipe(
-      pickAll(keys),
-      reject(either(isNil, equals(allKey))),
-    )(params)
+  (keys: string[] = [], params: Dictionary<number | string> = {}) => {
+    const providedIndexedParams = pipe(pickAll(keys), reject(either(isNil, equals(allKey))))(params)
 
     return pipe(
       // Filter the data by the provided params
@@ -27,7 +24,7 @@ const createParamsFilter = curry(
       // Return the constant emptyArr to avoid unnecessary re-renderings
       arrayIfEmpty,
     )
-  }
+  },
 )
 
 export default createParamsFilter

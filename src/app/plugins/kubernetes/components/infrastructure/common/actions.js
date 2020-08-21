@@ -2,12 +2,12 @@ import createContextLoader from 'core/helpers/createContextLoader'
 import ApiClient from 'api-client/ApiClient'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import createContextUpdater from 'core/helpers/createContextUpdater'
-import DataKeys from 'k8s/DataKeys'
+import { ActionDataKeys } from 'k8s/DataKeys'
 
 const { resmgr } = ApiClient.getInstance()
 
 export const loadResMgrHosts = createContextLoader(
-  DataKeys.ResMgrHosts,
+  ActionDataKeys.ResMgrHosts,
   async () => {
     return resmgr.getHosts()
   },
@@ -21,7 +21,7 @@ export const flavorActions = createCRUDActions('flavors', { service: 'nova' })
 export const regionActions = createCRUDActions('regions', { service: 'keystone' })
 
 export const updateRemoteSupport = createContextUpdater(
-  DataKeys.ResMgrHosts,
+  ActionDataKeys.ResMgrHosts,
   async (data) => {
     const { id, enableSupport } = data
     const supportRoleName = 'pf9-support'

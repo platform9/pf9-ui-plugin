@@ -9,7 +9,7 @@ import TextField from 'core/components/validatedForm/TextField'
 import useParams from 'core/hooks/useParams'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import NoContentMessage from 'core/components/NoContentMessage'
-import DataKeys from 'k8s/DataKeys'
+import { ActionDataKeys } from 'k8s/DataKeys'
 
 const defaultParams = {
   rbac: {},
@@ -55,7 +55,7 @@ export const AddClusterRoleForm = ({ onComplete }) => {
 }
 
 export const options = {
-  cacheKey: DataKeys.ClusterRoles,
+  cacheKey: ActionDataKeys.ClusterRoles,
   FormComponent: AddClusterRoleForm,
   listUrl: '/ui/kubernetes/rbac#clusterRoles',
   name: 'AddClusterRole',

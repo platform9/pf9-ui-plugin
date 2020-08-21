@@ -5,11 +5,11 @@ import createCRUDActions from 'core/helpers/createCRUDActions'
 import { parseClusterParams } from 'k8s/components/infrastructure/clusters/actions'
 import { someAsync } from 'utils/async'
 import { namespacesSelector } from 'k8s/components/namespaces/selectors'
-import DataKeys from 'k8s/DataKeys'
+import { ActionDataKeys } from 'k8s/DataKeys'
 
 const { qbert } = ApiClient.getInstance()
 
-const namespaceActions = createCRUDActions(DataKeys.Namespaces, {
+const namespaceActions = createCRUDActions(ActionDataKeys.Namespaces, {
   listFn: async (params) => {
     const [clusterId, clusters] = await parseClusterParams(params)
     if (clusterId === allKey) {

@@ -5,7 +5,7 @@ import { makeStyles, createStyles } from '@material-ui/styles'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import loggingActions from './actions'
-import DataKeys from 'k8s/DataKeys'
+import { ActionDataKeys } from 'k8s/DataKeys'
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -54,7 +54,7 @@ const LoggingListPage = () => {
 
   // TODO: onEdit and onDelete
   const options = {
-    cacheKey: DataKeys.Loggings,
+    cacheKey: ActionDataKeys.Loggings,
     addText: 'New Logging',
     uniqueIdentifier: 'cluster',
     loaderFn: loggingActions.list,

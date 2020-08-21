@@ -21,7 +21,7 @@ import ExternalLink from 'core/components/ExternalLink'
 import { clusterActions } from '../infrastructure/clusters/actions'
 import { propEq } from 'ramda'
 import { CloudProvidersFriendlyName } from '../infrastructure/cloudProviders/model'
-import DataKeys from 'k8s/DataKeys'
+import { ActionDataKeys } from 'k8s/DataKeys'
 
 const initialContext = {
   isDefault: false,
@@ -213,7 +213,7 @@ const getInitialStorageClassYaml = (wizardContext) => {
 }
 
 export const options = {
-  cacheKey: DataKeys.StorageClasses,
+  cacheKey: ActionDataKeys.StorageClasses,
   FormComponent: AddStorageClassForm,
   listUrl: '/ui/kubernetes/storage_classes',
   name: 'AddStorageClass',

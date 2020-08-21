@@ -16,7 +16,7 @@ import { makeStyles } from '@material-ui/styles'
 import DateCell from 'core/components/listTable/cells/DateCell'
 import Loading from 'core/components/Loading'
 import ExternalLink from 'core/components/ExternalLink'
-import DataKeys from 'k8s/DataKeys'
+import { ActionDataKeys } from 'k8s/DataKeys'
 
 const useStyles = makeStyles((theme) => ({
   header: {
@@ -199,7 +199,7 @@ export const options = {
     },
     { id: 'clusterName', label: 'Cluster' },
   ],
-  cacheKey: DataKeys.Alerts,
+  cacheKey: ActionDataKeys.Alerts,
   name: 'Alarms',
   title: 'Alarms',
   showCheckboxes: false,

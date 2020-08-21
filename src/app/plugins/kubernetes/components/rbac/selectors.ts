@@ -2,14 +2,15 @@ import { createSelector } from 'reselect'
 import createSorter from 'core/helpers/createSorter'
 import DataKeys from 'k8s/DataKeys'
 import getDataSelector from 'core/utils/getDataSelector'
-import { whereEq, pipe, mergeLeft } from 'ramda'
-import { makeParamsClustersSelector } from '../infrastructure/clusters/selectors'
+import { whereEq, pipe, mergeLeft, find, propEq, prop } from 'ramda'
+// import { makeParamsClustersSelector } from '../infrastructure/clusters/selectors'
+// import { GetClusterRolesItem, IGenericClusterizedResponse } from 'api-client/qbert.model'
 
 export const apiGroupsSelector = createSelector(
   [
-    getDataSelector(DataKeys.ApiGroups, 'clusterId'),
-    getDataSelector(DataKeys.CoreApiResources, 'clusterId'),
-    getDataSelector(DataKeys.ApiResources, 'clusterId'),
+    getDataSelector<DataKeys.ApiGroups>(DataKeys.ApiGroups, 'clusterId'),
+    getDataSelector<DataKeys.CoreApiResources>(DataKeys.CoreApiResources, 'clusterId'),
+    getDataSelector<DataKeys.ApiResources>(DataKeys.ApiResources, 'clusterId'),
   ],
   (apiGroups, coreApiResources, apiResources) => {
     const coreApiGroupWithResources = {
@@ -52,14 +53,15 @@ export const makGroupseParamsapiSelector = (
 }
 
 export const rolesSelector = createSelector(
-  [makeParamsClustersSelector({ healthyClusters: true })], // do you mean to use `makeParamsClustersSelector({ healthyClusters: true })` here?
+  // [makeParamsClustersSelector({ healthyClusters: true })], // do you mean to use `makeParamsClustersSelector({ healthyClusters: true })` here?
+  [getDataSelector<DataKeys.KubeRoles>(DataKeys.KubeRoles)],
   (items) => {
     return items.map((item) => ({
       ...item,
       id: item?.metadata?.uid,
       name: item?.metadata?.name,
       namespace: item?.metadata?.namespace,
-      clusterName: pipe(find(propEq('uuid', item.clusterId)), prop('name'))(items),
+      clusterName: pipe(find(propEq('uuid', item.clusterId)), prop<any>('name'))(items as any),
       created: item?.metadata?.creationTimestamp,
       pickerLabel: `Role: ${item?.metadata?.name}`,
       pickerValue: `Role:${item?.metadata?.name}`,

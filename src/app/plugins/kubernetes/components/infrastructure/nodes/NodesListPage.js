@@ -26,7 +26,7 @@ import ResourceUsageTable from '../common/ResourceUsageTable'
 import { makeStyles } from '@material-ui/styles'
 import { routes } from 'core/utils/routes'
 import { ToolbarActionIcon } from 'core/components/listTable/ListTableBatchActions'
-import DataKeys from 'k8s/DataKeys'
+import { ActionDataKeys } from 'k8s/DataKeys'
 
 const useStyles = makeStyles((theme) => ({
   title: {
@@ -277,7 +277,7 @@ export const options = {
   addText: 'Onboard a Node',
   addUrl: '/ui/kubernetes/infrastructure/nodes/cli/download',
   columns,
-  cacheKey: DataKeys.Nodes,
+  cacheKey: ActionDataKeys.Nodes,
   name: 'Nodes',
   title: 'Nodes',
   uniqueIdentifier: 'uuid',

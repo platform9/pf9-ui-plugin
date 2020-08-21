@@ -6,11 +6,11 @@ import { mngmUserActions } from 'k8s/components/userManagement/users/actions'
 import { always, find, isNil, keys, pipe, prop, propEq, reject } from 'ramda'
 import { tryCatchAsync } from 'utils/async'
 import { emptyArr, objSwitchCase, pathStr } from 'utils/fp'
-import DataKeys from 'k8s/DataKeys'
+import { ActionDataKeys } from 'k8s/DataKeys'
 
 const { keystone } = ApiClient.getInstance()
 
-export const mngmTenantActions = createCRUDActions(DataKeys.ManagementTenants, {
+export const mngmTenantActions = createCRUDActions(ActionDataKeys.ManagementTenants, {
   listFn: async () => {
     const [allTenantsAllUsers] = await Promise.all([
       keystone.getAllTenantsAllUsers(),
@@ -51,7 +51,7 @@ export const mngmTenantActions = createCRUDActions(DataKeys.ManagementTenants, {
   },
   updateFn: async ({ id: tenantId, name, description, roleAssignments }) => {
     const [users, prevRoleAssignmentsArr] = await Promise.all([
-      mngmUserActions.list(DataKeys.ManagementUsers),
+      mngmUserActions.list(ActionDataKeys.ManagementUsers),
       mngmTenantRoleAssignmentsLoader({
         tenantId,
       }),
@@ -122,7 +122,7 @@ export const mngmTenantActions = createCRUDActions(DataKeys.ManagementTenants, {
 })
 
 export const mngmTenantRoleAssignmentsLoader = createContextLoader(
-  DataKeys.ManagementTenantsRoleAssignments,
+  ActionDataKeys.ManagementTenantsRoleAssignments,
   async ({ tenantId }) => (await keystone.getTenantRoleAssignments(tenantId)) || emptyArr,
   {
     uniqueIdentifier: ['user.id', 'role.id', 'scope.project.id'],

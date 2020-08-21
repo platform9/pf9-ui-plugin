@@ -6,7 +6,7 @@ import createContextLoader from 'core/helpers/createContextLoader'
 import { pathStr } from 'utils/fp'
 import { allKey } from 'app/constants'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
-import DataKeys from 'k8s/DataKeys'
+import { ActionDataKeys } from 'k8s/DataKeys'
 
 const { qbert } = ApiClient.getInstance()
 
@@ -32,7 +32,7 @@ const getSubjectsOfKind = (subjects, kind) =>
   subjects.filter((subject) => subject.kind === kind).map((user) => user.name)
 
 const loadCoreApiResources = createContextLoader(
-  DataKeys.CoreApiResources,
+  ActionDataKeys.CoreApiResources,
   async ({ clusterId }) => {
     return qbert.getCoreApiResourcesList(clusterId)
   },
@@ -43,7 +43,7 @@ const loadCoreApiResources = createContextLoader(
 )
 
 const loadApiResources = createContextLoader(
-  DataKeys.ApiResources,
+  ActionDataKeys.ApiResources,
   async ({ clusterId, apiGroup }) => {
     return qbert.getApiResourcesList({ clusterId, apiGroup })
   },
@@ -54,7 +54,7 @@ const loadApiResources = createContextLoader(
 )
 
 export const apiGroupsLoader = createContextLoader(
-  DataKeys.ApiGroups,
+  ActionDataKeys.ApiGroups,
   async ({ clusterId }) => {
     const apiGroups = await qbert.getApiGroupList(clusterId)
     const groupVersions = uniq(apiGroups.map((apiGroup) => apiGroup.preferredVersion.groupVersion))
@@ -72,7 +72,7 @@ export const apiGroupsLoader = createContextLoader(
   },
 )
 
-export const roleActions = createCRUDActions(DataKeys.KubeRoles, {
+export const roleActions = createCRUDActions(ActionDataKeys.KubeRoles, {
   listFn: async (params) => {
     const { clusterId } = params
     const clusters = await clusterActions.list({ healthyClusters: true })
@@ -120,7 +120,7 @@ export const roleActions = createCRUDActions(DataKeys.KubeRoles, {
   indexBy: 'clusterId',
 })
 
-export const clusterRoleActions = createCRUDActions(DataKeys.ClusterRoles, {
+export const clusterRoleActions = createCRUDActions(ActionDataKeys.ClusterRoles, {
   listFn: async (params) => {
     const { clusterId } = params
     const clusters = await clusterActions.list({ healthyClusters: true })
@@ -179,7 +179,7 @@ export const clusterRoleActions = createCRUDActions(DataKeys.ClusterRoles, {
   indexBy: 'clusterId',
 })
 
-export const roleBindingActions = createCRUDActions(DataKeys.RoleBindings, {
+export const roleBindingActions = createCRUDActions(ActionDataKeys.RoleBindings, {
   listFn: async (params) => {
     const { clusterId } = params
     const clusters = await clusterActions.list({ healthyClusters: true })
@@ -273,7 +273,7 @@ export const roleBindingActions = createCRUDActions(DataKeys.RoleBindings, {
   indexBy: 'clusterId',
 })
 
-export const clusterRoleBindingActions = createCRUDActions(DataKeys.ClusterRoleBindings, {
+export const clusterRoleBindingActions = createCRUDActions(ActionDataKeys.ClusterRoleBindings, {
   listFn: async (params) => {
     const { clusterId } = params
     const clusters = await clusterActions.list({ healthyClusters: true })

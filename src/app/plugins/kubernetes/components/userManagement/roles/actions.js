@@ -1,10 +1,10 @@
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import ApiClient from 'api-client/ApiClient'
-import DataKeys from 'k8s/DataKeys'
+import { ActionDataKeys } from 'k8s/DataKeys'
 
 const { keystone } = ApiClient.getInstance()
 
-export const mngmRoleActions = createCRUDActions(DataKeys.ManagementRoles, {
+export const mngmRoleActions = createCRUDActions(ActionDataKeys.ManagementRoles, {
   listFn: async () => {
     return keystone.getRoles()
   },

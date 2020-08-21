@@ -1,11 +1,11 @@
 import ApiClient from 'api-client/ApiClient'
 import createContextLoader from 'core/helpers/createContextLoader'
 import createCRUDActions from 'core/helpers/createCRUDActions'
-import DataKeys from 'k8s/DataKeys'
+import { ActionDataKeys } from 'k8s/DataKeys'
 
 const { keystone } = ApiClient.getInstance()
 
-export const mngmGroupActions = createCRUDActions(DataKeys.ManagementGroups, {
+export const mngmGroupActions = createCRUDActions(ActionDataKeys.ManagementGroups, {
   listFn: async () => {
     const [groups] = await Promise.all([
       keystone.getGroups(),
@@ -18,6 +18,6 @@ export const mngmGroupActions = createCRUDActions(DataKeys.ManagementGroups, {
 })
 
 export const mngmGroupMappingActions = createContextLoader(
-  DataKeys.ManagementGroupsMappings,
+  ActionDataKeys.ManagementGroupsMappings,
   async () => keystone.getGroupMappings(),
 )

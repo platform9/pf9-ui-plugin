@@ -1,7 +1,7 @@
 // import React from 'react'
 // import ExternalLink from 'core/components/ExternalLink'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import DataKeys from 'k8s/DataKeys'
+import { ActionDataKeys } from 'k8s/DataKeys'
 
 const renderKeyValues = (obj) =>
   Object.entries(obj)
@@ -31,7 +31,7 @@ export const columns = [
 ]
 
 export const options = {
-  cacheKey: DataKeys.PrometheusInstances,
+  cacheKey: ActionDataKeys.PrometheusInstances,
   addUrl: '/ui/kubernetes/prometheus/instances/add',
   addText: 'New Monitoring Stack',
   emptyText: 'Please enable monitoring on at least one cluster',

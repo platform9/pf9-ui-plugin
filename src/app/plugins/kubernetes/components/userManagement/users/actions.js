@@ -6,7 +6,7 @@ import { always, find, head, isNil, keys, pipe, prop, propEq, reject } from 'ram
 import { tryCatchAsync } from 'utils/async'
 import { emptyArr, objSwitchCase, pathStr } from 'utils/fp'
 import { uuidRegex, originUsernameRegex } from 'app/constants'
-import DataKeys from 'k8s/DataKeys'
+import { ActionDataKeys } from 'k8s/DataKeys'
 
 const { keystone, clemency } = ApiClient.getInstance()
 
@@ -19,7 +19,7 @@ export const isSystemUser = ({ username }) => {
   return isOriginUsername || isUuid || username === 'kplane-clustmgr'
 }
 export const loadCredentials = createContextLoader(
-  DataKeys.ManagementCredentials,
+  ActionDataKeys.ManagementCredentials,
   () => {
     return keystone.getCredentials()
   },
@@ -28,7 +28,7 @@ export const loadCredentials = createContextLoader(
   },
 )
 
-export const mngmUserActions = createCRUDActions(DataKeys.ManagementUsers, {
+export const mngmUserActions = createCRUDActions(ActionDataKeys.ManagementUsers, {
   listFn: async () => {
     const [users] = await Promise.all([
       keystone.getUsers(),
@@ -146,7 +146,7 @@ export const mngmUserActions = createCRUDActions(DataKeys.ManagementUsers, {
 })
 
 export const mngmUserRoleAssignmentsLoader = createContextLoader(
-  DataKeys.ManagementUsersRoleAssignments,
+  ActionDataKeys.ManagementUsersRoleAssignments,
   async ({ userId }) => (await keystone.getUserRoleAssignments(userId)) || emptyArr,
   {
     uniqueIdentifier: ['user.id', 'role.id'],

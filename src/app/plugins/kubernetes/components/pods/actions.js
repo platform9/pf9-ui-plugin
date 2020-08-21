@@ -12,11 +12,11 @@ import {
   serviceSelectors,
   makeServiceSelector,
 } from './selectors'
-import DataKeys from 'k8s/DataKeys'
+import { ActionDataKeys } from 'k8s/DataKeys'
 
 const { qbert } = ApiClient.getInstance()
 
-export const podActions = createCRUDActions(DataKeys.Pods, {
+export const podActions = createCRUDActions(ActionDataKeys.Pods, {
   listFn: async (params) => {
     const [clusterId, clusters] = await parseClusterParams(params)
     const podsPromise =
@@ -43,7 +43,7 @@ export const podActions = createCRUDActions(DataKeys.Pods, {
   selector: nodesSelector,
 })
 
-export const deploymentActions = createCRUDActions(DataKeys.Deployments, {
+export const deploymentActions = createCRUDActions(ActionDataKeys.Deployments, {
   listFn: async (params) => {
     const [clusterId, clusters] = await parseClusterParams(params)
     if (clusterId === allKey) {
@@ -62,7 +62,7 @@ export const deploymentActions = createCRUDActions(DataKeys.Deployments, {
   selector: deploymentsSelector,
 })
 
-export const serviceActions = createCRUDActions(DataKeys.KubeServices, {
+export const serviceActions = createCRUDActions(ActionDataKeys.KubeServices, {
   listFn: async (params) => {
     const [clusterId, clusters] = await parseClusterParams(params)
     if (clusterId === allKey) {

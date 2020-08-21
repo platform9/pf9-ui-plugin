@@ -9,7 +9,7 @@ import {
   prometheusServiceMonitorSelector,
   serviceAccountSelector,
 } from 'k8s/components/prometheus/selectors'
-import DataKeys from 'k8s/DataKeys'
+import { ActionDataKeys } from 'k8s/DataKeys'
 import { find, flatten, last, pathEq, pipe, pluck, prop, propEq } from 'ramda'
 import { someAsync } from 'utils/async'
 import { objSwitchCase } from 'utils/fp'
@@ -29,7 +29,7 @@ export const hasPrometheusEnabled = (cluster) => {
 
   return installedMonitoringTask.status === 'Complete'
 }
-export const clusterTagActions = createCRUDActions(DataKeys.ClusterTags, {
+export const clusterTagActions = createCRUDActions(ActionDataKeys.ClusterTags, {
   listFn: async () => {
     const [clusterTags] = Promise.all([
       appbert.getClusterTags(),
@@ -43,7 +43,7 @@ export const clusterTagActions = createCRUDActions(DataKeys.ClusterTags, {
 
 /* Prometheus Instances */
 
-export const prometheusInstanceActions = createCRUDActions(DataKeys.PrometheusInstances, {
+export const prometheusInstanceActions = createCRUDActions(ActionDataKeys.PrometheusInstances, {
   listFn: async () => {
     const clusterTags = await clusterTagActions.list()
     const clusterUuids = pluck('uuid', clusterTags.filter(hasPrometheusEnabled))
@@ -70,7 +70,7 @@ export const prometheusInstanceActions = createCRUDActions(DataKeys.PrometheusIn
 
 /* Service Accounts */
 
-export const serviceAccountActions = createCRUDActions(DataKeys.ServiceAccounts, {
+export const serviceAccountActions = createCRUDActions(ActionDataKeys.ServiceAccounts, {
   listFn: async (params) => {
     return qbert.getServiceAccounts(params.clusterId, params.namespace)
   },
@@ -81,7 +81,7 @@ export const serviceAccountActions = createCRUDActions(DataKeys.ServiceAccounts,
 
 /* Rules */
 
-export const prometheusRuleActions = createCRUDActions(DataKeys.PrometheusRules, {
+export const prometheusRuleActions = createCRUDActions(ActionDataKeys.PrometheusRules, {
   listFn: async () => {
     const clusterTags = await clusterTagActions.list()
     const clusterUuids = pluck('uuid', clusterTags.filter(hasPrometheusEnabled))
@@ -108,7 +108,7 @@ export const prometheusRuleActions = createCRUDActions(DataKeys.PrometheusRules,
 
 /* Service Monitors */
 export const prometheusServiceMonitorActions = createCRUDActions(
-  DataKeys.PrometheusServiceMonitors,
+  ActionDataKeys.PrometheusServiceMonitors,
   {
     listFn: async () => {
       const clusterTags = await clusterTagActions.list()
@@ -140,27 +140,30 @@ export const prometheusServiceMonitorActions = createCRUDActions(
 
 /* Alert Managers */
 
-export const prometheusAlertManagerActions = createCRUDActions(DataKeys.PrometheusAlertManagers, {
-  listFn: async () => {
-    const clusterTags = await clusterTagActions.list()
-    const clusterUuids = pluck('uuid', clusterTags.filter(hasPrometheusEnabled))
-    return someAsync(clusterUuids.map(qbert.getPrometheusAlertManagers)).then(flatten)
+export const prometheusAlertManagerActions = createCRUDActions(
+  ActionDataKeys.PrometheusAlertManagers,
+  {
+    listFn: async () => {
+      const clusterTags = await clusterTagActions.list()
+      const clusterUuids = pluck('uuid', clusterTags.filter(hasPrometheusEnabled))
+      return someAsync(clusterUuids.map(qbert.getPrometheusAlertManagers)).then(flatten)
+    },
+    updateFn: async (data) => {
+      return qbert.updatePrometheusAlertManager(data)
+    },
+    deleteFn: async ({ id }, currentItems) => {
+      const am = currentItems.find(propEq('uid', id))
+      if (!am) {
+        throw new Error(notFoundErr)
+      }
+      await qbert.deletePrometheusAlertManager(am.clusterUuid, am.namespace, am.name)
+    },
+    successMessage: (updatedItems, prevItems, { uid }, operation) =>
+      objSwitchCase({
+        create: `Successfully created Prometheus Alert Manager ${prop('name', last(updatedItems))}`,
+        delete: `Successfully deleted Prometheus Alert Manager ${getName(uid, prevItems)}`,
+      })(operation),
+    selector: prometheusAlertManagersSelector,
+    uniqueIdentifier,
   },
-  updateFn: async (data) => {
-    return qbert.updatePrometheusAlertManager(data)
-  },
-  deleteFn: async ({ id }, currentItems) => {
-    const am = currentItems.find(propEq('uid', id))
-    if (!am) {
-      throw new Error(notFoundErr)
-    }
-    await qbert.deletePrometheusAlertManager(am.clusterUuid, am.namespace, am.name)
-  },
-  successMessage: (updatedItems, prevItems, { uid }, operation) =>
-    objSwitchCase({
-      create: `Successfully created Prometheus Alert Manager ${prop('name', last(updatedItems))}`,
-      delete: `Successfully deleted Prometheus Alert Manager ${getName(uid, prevItems)}`,
-    })(operation),
-  selector: prometheusAlertManagersSelector,
-  uniqueIdentifier,
-})
+)

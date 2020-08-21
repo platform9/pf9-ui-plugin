@@ -15,11 +15,11 @@ import { mapAsync } from 'utils/async'
 import { clusterTagActions } from 'k8s/components/prometheus/actions'
 import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
 import { clustersSelector, makeParamsClustersSelector } from './selectors'
-import DataKeys from 'k8s/DataKeys'
+import { ActionDataKeys } from 'k8s/DataKeys'
 
 const { qbert } = ApiClient.getInstance()
 
-export const clusterActions = createCRUDActions(DataKeys.Clusters, {
+export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
   listFn: async () => {
     const [rawClusters] = await Promise.all([
       qbert.getClusters(),

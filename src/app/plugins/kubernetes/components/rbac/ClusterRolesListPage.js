@@ -2,12 +2,12 @@ import React from 'react'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
 import useDataLoader from 'core/hooks/useDataLoader'
-import { clusterRolesCacheKey, clusterRoleActions } from './actions'
+import { clusterRoleActions } from './actions'
 import { createUsePrefParamsHook } from 'core/hooks/useParams'
 import { listTablePrefs, allKey } from 'app/constants'
 import { pick } from 'ramda'
 import DateCell from 'core/components/listTable/cells/DateCell'
-import DataKeys from 'k8s/DataKeys'
+import { ActionDataKeys } from 'k8s/DataKeys'
 
 const defaultParams = {
   masterNodeClusters: true,
@@ -47,7 +47,7 @@ export const options = {
     { id: 'clusterName', label: 'Cluster' },
     { id: 'created', label: 'Created', render: (value) => <DateCell value={value} /> },
   ],
-  cacheKey: DataKeys.ClusterRoles,
+  cacheKey: ActionDataKeys.ClusterRoles,
   deleteFn: clusterRoleActions.delete,
   editUrl: '/ui/kubernetes/rbac/clusterroles/edit',
   customEditUrlFn: (item, itemId) =>

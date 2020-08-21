@@ -23,7 +23,7 @@ import CodeBlock from 'core/components/CodeBlock'
 import DateCell from 'core/components/listTable/cells/DateCell'
 import { sessionStoreKey } from 'core/session/sessionReducers'
 import { useSelector } from 'react-redux'
-import DataKeys from 'k8s/DataKeys'
+import { ActionDataKeys } from 'k8s/DataKeys'
 
 const useStyles = makeStyles((theme) => ({
   links: {
@@ -208,7 +208,7 @@ export const options = {
     // since we use it in a few places for tags / metadata.
     { id: 'tags', label: 'Metadata', render: renderMetaData },
   ],
-  cacheKey: DataKeys.Clusters,
+  cacheKey: ActionDataKeys.Clusters,
   editUrl: '/ui/kubernetes/infrastructure/clusters/edit',
   name: 'Clusters',
   title: 'Clusters',

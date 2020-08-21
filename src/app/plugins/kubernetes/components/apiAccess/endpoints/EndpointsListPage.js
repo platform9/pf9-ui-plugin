@@ -6,7 +6,7 @@ import ExternalLink from 'core/components/ExternalLink'
 import { qbertApiLink } from 'k8s/links'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
-import DataKeys from 'k8s/DataKeys'
+import { ActionDataKeys } from 'k8s/DataKeys'
 
 const useStyles = makeStyles((theme) => ({
   blueIcon: {
@@ -18,7 +18,7 @@ const EndpointsListPage = () => {
   const classes = useStyles()
 
   const options = {
-    cacheKey: DataKeys.Endpoints,
+    cacheKey: ActionDataKeys.Endpoints,
     uniqueIdentifier: 'name',
     loaderFn: endpointsActions.list,
     columns,

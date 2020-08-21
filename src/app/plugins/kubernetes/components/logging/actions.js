@@ -1,12 +1,12 @@
 import ApiClient from 'api-client/ApiClient'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
-import DataKeys from 'k8s/DataKeys'
+import { ActionDataKeys } from 'k8s/DataKeys'
 import { mapAsync } from 'utils/async'
 
 const { qbert } = ApiClient.getInstance()
 
-const loggingActions = createCRUDActions(DataKeys.Loggings, {
+const loggingActions = createCRUDActions(ActionDataKeys.Loggings, {
   listFn: async (params) => {
     const clusters = await clusterActions.list()
     return mapAsync(async (cluster) => {

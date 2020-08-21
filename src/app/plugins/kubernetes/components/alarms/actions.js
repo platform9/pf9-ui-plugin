@@ -5,7 +5,7 @@ import { someAsync } from 'utils/async'
 import moment from 'moment'
 import { allKey } from 'app/constants'
 import { alertsSelector, makeTimeSeriesSelector } from 'k8s/components/alarms/selectors'
-import DataKeys from 'k8s/DataKeys'
+import { ActionDataKeys } from 'k8s/DataKeys'
 import {
   hasPrometheusTag,
   hasHealthyMasterNodes,
@@ -17,7 +17,7 @@ export const alertsCacheKey = 'alerts'
 export const alertsTimeSeriesCacheKey = 'alertsTimeSeries'
 
 export const loadAlerts = createContextLoader(
-  DataKeys.Alerts,
+  ActionDataKeys.Alerts,
   async ({ clusterId }) => {
     return qbert.getPrometheusAlerts(clusterId)
   },
@@ -43,7 +43,7 @@ const timestampSteps = {
 }
 
 export const loadTimeSeriesAlerts = createContextLoader(
-  DataKeys.AlertsTimeSeries,
+  ActionDataKeys.AlertsTimeSeries,
   async ({ clusterId, chartTime }) => {
     // Invalidate cache -- can't get cache working properly for this
     // collection. Collection is somewhat different from all other

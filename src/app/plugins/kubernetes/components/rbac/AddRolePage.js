@@ -10,7 +10,7 @@ import TextField from 'core/components/validatedForm/TextField'
 import useParams from 'core/hooks/useParams'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import NoContentMessage from 'core/components/NoContentMessage'
-import DataKeys from 'k8s/DataKeys'
+import { ActionDataKeys } from 'k8s/DataKeys'
 
 const defaultParams = {
   rbac: {},
@@ -66,7 +66,7 @@ export const AddRoleForm = ({ onComplete }) => {
 }
 
 export const options = {
-  cacheKey: DataKeys.Roles,
+  cacheKey: ActionDataKeys.Roles,
   FormComponent: AddRoleForm,
   listUrl: '/ui/kubernetes/rbac',
   name: 'AddRole',

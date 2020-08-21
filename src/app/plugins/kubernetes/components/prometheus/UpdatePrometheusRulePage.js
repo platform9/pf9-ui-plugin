@@ -5,7 +5,7 @@ import PrometheusRulesTable from './PrometheusRulesTable'
 import createUpdateComponents from 'core/helpers/createUpdateComponents'
 import uuid from 'uuid'
 import { withStyles } from '@material-ui/styles'
-import DataKeys from 'k8s/DataKeys'
+import { ActionDataKeys } from 'k8s/DataKeys'
 
 @withStyles((theme) => ({
   submit: { marginTop: theme.spacing(3) },
@@ -43,7 +43,7 @@ class UpdatePrometheusRuleForm extends React.PureComponent {
 
 export const options = {
   FormComponent: UpdatePrometheusRuleForm,
-  cacheKey: DataKeys.PrometheusRules,
+  cacheKey: ActionDataKeys.PrometheusRules,
   routeParamKey: 'id',
   uniqueIdentifier: 'uid',
   listUrl: '/ui/kubernetes/prometheus#rules',

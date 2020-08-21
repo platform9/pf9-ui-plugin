@@ -7,7 +7,7 @@ import { createUsePrefParamsHook } from 'core/hooks/useParams'
 import { listTablePrefs, allKey } from 'app/constants'
 import { pick } from 'ramda'
 import DateCell from 'core/components/listTable/cells/DateCell'
-import DataKeys from 'k8s/DataKeys'
+import { ActionDataKeys } from 'k8s/DataKeys'
 
 const defaultParams = {
   clusterId: allKey,
@@ -46,7 +46,7 @@ export const options = {
     { id: 'clusterName', label: 'Cluster' },
     { id: 'created', label: 'Created', render: (value) => <DateCell value={value} /> },
   ],
-  cacheKey: DataKeys.RoleBindings,
+  cacheKey: ActionDataKeys.RoleBindings,
   deleteFn: roleBindingActions.delete,
   editUrl: '/ui/kubernetes/rbac/rolebindings/edit',
   customEditUrlFn: (item, itemId) =>

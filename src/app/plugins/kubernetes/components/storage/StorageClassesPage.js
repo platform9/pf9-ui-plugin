@@ -9,7 +9,7 @@ import { pick } from 'ramda'
 import { createUsePrefParamsHook } from 'core/hooks/useParams'
 import Tabs from 'core/components/tabs/Tabs'
 import Tab from 'core/components/tabs/Tab'
-import DataKeys from 'k8s/DataKeys'
+import { ActionDataKeys } from 'k8s/DataKeys'
 
 const defaultParams = {
   healthyClusters: true,
@@ -51,7 +51,7 @@ export const options = {
     { id: 'provisioner', label: 'Provisioner' },
     { id: 'created', label: 'Created' },
   ],
-  cacheKey: DataKeys.StorageClasses,
+  cacheKey: ActionDataKeys.StorageClasses,
   name: 'StorageClasses',
   title: 'Storage Classes',
   ListPage,
