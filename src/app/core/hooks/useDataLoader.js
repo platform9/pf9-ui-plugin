@@ -5,7 +5,7 @@ import moize from 'moize'
 import { pathOr } from 'ramda'
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { emptyArr, emptyObj, ensureFunction, isNilOrEmpty } from 'utils/fp'
+import { emptyObj, ensureFunction, isNilOrEmpty } from 'utils/fp'
 import { memoizedDep } from 'utils/misc'
 
 const onErrorHandler = moize(
@@ -30,10 +30,9 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
   // Memoize the params dependency as we want to make sure it really changed and not just got a new reference
   const memoizedParams = memoizedDep(params)
 
-  const loadingSelector = useMemo(
-    () => pathOr(emptyArr, [cacheStoreKey, loadingStoreKey, cacheKey]),
-    [cacheKey],
-  )
+  const loadingSelector = useMemo(() => pathOr(false, [cacheStoreKey, loadingStoreKey, cacheKey]), [
+    cacheKey,
+  ])
 
   const selector = useMemo(() => selectorCreator(defaultParams), [defaultParams])
   const loading = useSelector(loadingSelector)
