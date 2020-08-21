@@ -1,24 +1,23 @@
 import { createSelector, OutputSelector } from 'reselect'
 import {
-  pathOr,
-  pluck,
-  partition,
-  either,
-  pipe,
-  propSatisfies,
   compose,
-  path,
+  either,
   mergeLeft,
+  partition,
+  path,
+  pathOr,
+  pipe,
+  pluck,
+  propSatisfies,
 } from 'ramda'
 import { emptyArr, filterIf, isTruthy } from 'utils/fp'
 import createSorter, { SortConfig } from 'core/helpers/createSorter'
 import calcUsageTotalByPath from 'k8s/util/calcUsageTotals'
-import { hasPrometheusEnabled } from 'k8s/components/prometheus/actions'
 import {
-  getMasterNodesHealthStatus,
-  getWorkerNodesHealthStatus,
   getConnectionStatus,
   getHealthStatus,
+  getMasterNodesHealthStatus,
+  getWorkerNodesHealthStatus,
 } from 'k8s/components/infrastructure/clusters/ClusterStatusUtils'
 import { castFuzzyBool } from 'utils/misc'
 import DataKeys from 'k8s/DataKeys'
@@ -27,6 +26,18 @@ import { GlobalState } from 'k8s/datakeys.model'
 import { IClusterSelector } from './model'
 import { Node } from 'api-client/qbert.model'
 
+const monitoringTask = 'pf9-mon'
+const isMonitoringTask = (task: any = {}) =>
+  task.pkg_id === monitoringTask && task.type === 'Install'
+const getMostRecentTask = (prev, curr) => (prev.task_id > curr.task_id ? prev : curr)
+const hasPrometheusEnabled = (cluster) => {
+  if (!cluster) return false
+  const installedMonitoringTask = (cluster.tasks || [])
+    .filter(isMonitoringTask)
+    .reduce(getMostRecentTask, {})
+
+  return installedMonitoringTask.status === 'Complete'
+}
 export const hasMasterNode = propSatisfies(isTruthy, 'hasMasterNode')
 export const hasHealthyMasterNodes = propSatisfies(
   (healthyMasterNodes: Node[]) => healthyMasterNodes.length > 0,

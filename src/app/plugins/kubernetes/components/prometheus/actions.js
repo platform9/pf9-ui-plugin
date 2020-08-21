@@ -2,13 +2,7 @@ import ApiClient from 'api-client/ApiClient'
 import { notFoundErr } from 'app/constants'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
-import {
-  prometheusAlertManagersSelector,
-  prometheusRuleSelector,
-  prometheusSelector,
-  prometheusServiceMonitorSelector,
-  serviceAccountSelector,
-} from 'k8s/components/prometheus/selectors'
+import { prometheusAlertManagersSelector, prometheusRuleSelector, prometheusSelector, prometheusServiceMonitorSelector, serviceAccountSelector } from 'k8s/components/prometheus/selectors'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import { find, flatten, last, pathEq, pipe, pluck, prop, propEq } from 'ramda'
 import { someAsync } from 'utils/async'
@@ -21,7 +15,7 @@ const getName = (id, items) => pipe(find(propEq('uid', id)), prop('name'))(items
 
 const isMonitoringTask = (task = {}) => task.pkg_id === monitoringTask && task.type === 'Install'
 const getMostRecentTask = (prev, curr) => (prev.task_id > curr.task_id ? prev : curr)
-export const hasPrometheusEnabled = (cluster) => {
+const hasPrometheusEnabled = (cluster) => {
   if (!cluster) return false
   const installedMonitoringTask = (cluster.tasks || [])
     .filter(isMonitoringTask)

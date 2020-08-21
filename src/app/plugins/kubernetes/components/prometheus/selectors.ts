@@ -6,6 +6,7 @@ import { find, pathOr, pipe, prop } from 'ramda'
 import { pathStrOrNull } from 'utils/fp'
 import { IClusterAction } from 'k8s/components/infrastructure/clusters/model'
 
+console.log('clustersSelector', clustersSelector)
 export const prometheusSelector = createSelector(
   [getDataSelector<DataKeys.PrometheusInstances>(DataKeys.PrometheusInstances), clustersSelector],
   (rawDeployments, clusters) => {

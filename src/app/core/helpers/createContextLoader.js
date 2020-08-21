@@ -1,9 +1,11 @@
 import { allKey, defaultUniqueIdentifier } from 'app/constants'
 import store from 'app/store'
 import { cacheActions, cacheStoreKey, dataStoreKey, paramsStoreKey } from 'core/caching/cacheReducers'
-import { getDefaultSelectorCreator } from 'core/hooks/useDataLoader'
+import createParamsFilter from 'core/helpers/createParamsFilter'
+import createSorter from 'core/helpers/createSorter'
 import moize from 'moize'
 import { assoc, either, equals, filter, find, has, isNil, map, mergeLeft, pathOr, pick, pickAll, pipe, prop, reject, values, whereEq } from 'ramda'
+import { createSelector } from 'reselect'
 import { arrayIfEmpty, arrayIfNil, emptyArr, emptyObj, ensureArray } from 'utils/fp'
 import { memoizePromise, uncamelizeString } from 'utils/misc'
 
@@ -14,6 +16,13 @@ export const getContextLoader = (key) => {
 export const invalidateLoadersCache = () => {
   Object.values(loaders).forEach((loader) => loader.invalidateCache())
 }
+
+export const getDefaultSelectorCreator = moize((indexBy, cacheKey, selector) => {
+  return () =>
+    createSelector([selector, (_, params) => params], (items, params) => {
+      return pipe(createParamsFilter(indexBy, params), createSorter(params))(items)
+    })
+})
 
 /**
  * Context Loader options

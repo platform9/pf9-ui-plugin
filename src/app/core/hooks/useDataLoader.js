@@ -1,13 +1,10 @@
-import { cacheActions, loadingStoreKey } from 'core/caching/cacheReducers'
-import createParamsFilter from 'core/helpers/createParamsFilter'
-import createSorter from 'core/helpers/createSorter'
+import { cacheActions, cacheStoreKey, loadingStoreKey } from 'core/caching/cacheReducers'
 import { notificationActions } from 'core/notifications/notificationReducers'
 import { useToast } from 'core/providers/ToastProvider'
 import moize from 'moize'
-import { pathOr, pipe } from 'ramda'
+import { pathOr } from 'ramda'
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { createSelector } from 'reselect'
 import { emptyArr, emptyObj, ensureFunction, isNilOrEmpty } from 'utils/fp'
 import { memoizedDep } from 'utils/misc'
 
@@ -19,13 +16,6 @@ const onErrorHandler = moize(
     registerNotification(errorMessage, catchedErr.message || catchedErr, 'error')
   },
 )
-
-export const getDefaultSelectorCreator = moize((indexBy, cacheKey, selector) => {
-  return () =>
-    createSelector([selector, (_, params) => params], (items, params) => {
-      return pipe(createParamsFilter(indexBy, params), createSorter(params))(items)
-    })
-})
 
 /**
  * Hook to load data using the specified loader function
@@ -40,10 +30,14 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
   // Memoize the params dependency as we want to make sure it really changed and not just got a new reference
   const memoizedParams = memoizedDep(params)
 
-  const loadingSelector = useMemo(() => pathOr(emptyArr, [loadingStoreKey, cacheKey]), [cacheKey])
+  const loadingSelector = useMemo(
+    () => pathOr(emptyArr, [cacheStoreKey, loadingStoreKey, cacheKey]),
+    [cacheKey],
+  )
 
   const selector = useMemo(() => selectorCreator(defaultParams), [defaultParams])
   const loading = useSelector(loadingSelector)
+
   // Try to retrieve the data from the store with the provided parameters
   const data = useSelector((state) => selector(state, memoizedParams))
 
