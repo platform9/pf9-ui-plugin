@@ -46,6 +46,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     textDecoration: 'underline',
     color: theme.palette.primary.main,
   },
+  headerDiv: {
+    marginTop: theme.spacing(2),
+  },
   externalLink: {
     float: 'right',
     margin: theme.spacing(1),
@@ -59,7 +62,7 @@ export const DownloadCliOnboardNodeWalkthrough = (): JSX.Element => {
   const classes = useStyles({})
   return (
     <>
-      <div>
+      <div className={classes.headerDiv}>
         <ExternalLink
           className={classes.externalLink}
           url={nodePrerequisitesDocumentationLink}
@@ -67,7 +70,7 @@ export const DownloadCliOnboardNodeWalkthrough = (): JSX.Element => {
         >
           Pre-requisites Documentation
         </ExternalLink>
-        <Typography variant="h6">Pre-requisites</Typography>
+        <Typography variant="h6">OS Requirements</Typography>
       </div>
       <p>
         <Typography component="span">
