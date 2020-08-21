@@ -1,10 +1,33 @@
 import { allKey, defaultUniqueIdentifier } from 'app/constants'
 import store from 'app/store'
-import { cacheActions, cacheStoreKey, dataStoreKey, paramsStoreKey } from 'core/caching/cacheReducers'
-import createParamsFilter from 'core/helpers/createParamsFilter'
+import {
+  cacheActions,
+  cacheStoreKey,
+  dataStoreKey,
+  paramsStoreKey,
+} from 'core/caching/cacheReducers'
 import createSorter from 'core/helpers/createSorter'
+import getDataSelector from 'core/utils/getDataSelector'
 import moize from 'moize'
-import { assoc, either, equals, filter, find, has, isNil, map, mergeLeft, pathOr, pick, pickAll, pipe, prop, reject, values, whereEq } from 'ramda'
+import {
+  assoc,
+  either,
+  equals,
+  filter,
+  find,
+  has,
+  isNil,
+  map,
+  mergeLeft,
+  pathOr,
+  pick,
+  pickAll,
+  pipe,
+  prop,
+  reject,
+  values,
+  whereEq,
+} from 'ramda'
 import { createSelector } from 'reselect'
 import { arrayIfEmpty, arrayIfNil, emptyArr, emptyObj, ensureArray } from 'utils/fp'
 import { memoizePromise, uncamelizeString } from 'utils/misc'
@@ -20,7 +43,7 @@ export const invalidateLoadersCache = () => {
 export const getDefaultSelectorCreator = moize((indexBy, cacheKey, selector) => {
   return () =>
     createSelector([selector, (_, params) => params], (items, params) => {
-      return pipe(createParamsFilter(indexBy, params), createSorter(params))(items)
+      return pipe(getDataSelector(params, indexBy), createSorter(params))(items)
     })
 })
 
@@ -144,6 +167,7 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
 
       contextLoaderFn[invalidateCacheSymbol] = false
 
+      // TODO remove this filtering as it should be already being done in the selectors
       if (!refetch && !invalidateCache) {
         // If the provided params are already cached
         if (find(equals(providedIndexedParams), currentCachedParams)) {

@@ -12,7 +12,7 @@ import {
 } from 'ramda'
 import { emptyArr, arrayIfNil, arrayIfEmpty, ensureArray } from 'app/utils/fp'
 import { allKey } from 'app/constants'
-import { dataStoreKey } from 'core/caching/cacheReducers'
+import { cacheStoreKey, dataStoreKey } from 'core/caching/cacheReducers'
 import { IDataKeys, GlobalState } from 'k8s/datakeys.model'
 import { Selector } from 'reselect'
 
@@ -36,7 +36,7 @@ const getDataSelector = <T extends keyof IDataKeys>(
       IDataKeys[T] | [],
       IDataKeys[T] | []
     >(
-      pathOr(emptyArr, [dataStoreKey, dataKey]),
+      pathOr(emptyArr, [cacheStoreKey, dataStoreKey, dataKey]),
       arrayIfNil,
       // Filter the data by the provided params
       // @ts-ignore

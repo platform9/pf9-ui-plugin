@@ -23,7 +23,7 @@ export const podActions = createCRUDActions(ActionDataKeys.Pods, {
       clusterId === allKey
         ? someAsync(pluck('uuid', clusters).map(qbert.getClusterPods)).then(flatten)
         : qbert.getClusterPods(clusterId)
-    const [pods] = Promise.all([
+    const [pods] = await Promise.all([
       podsPromise,
       // Make sure the derived data gets loaded as well
       clusterActions.list(),

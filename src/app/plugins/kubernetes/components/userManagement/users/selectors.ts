@@ -25,7 +25,6 @@ import createSorter from 'core/helpers/createSorter'
 import { castBoolToStr } from 'utils/misc'
 import { isSystemUser } from 'k8s/components/userManagement/users/actions'
 import { tenantsSelector } from 'k8s/components/userManagement/tenants/selectors'
-import createParamsFilter from 'core/helpers/createParamsFilter'
 import getDataSelector from 'core/utils/getDataSelector'
 import DataKeys from 'k8s/DataKeys'
 import { Tenant, TenantUser } from 'api-client/keystone.model'
@@ -119,9 +118,8 @@ export const makeFilteredTenantsSelector = (defaultParams = {}) => {
           !blacklistedTenantIds.includes(user.defaultProject)
         )
       })
-      return pipe<IUsersSelector[], IUsersSelector[], IUsersSelector[], IUsersSelector[]>(
+      return pipe<IUsersSelector[], IUsersSelector[], IUsersSelector[]>(
         filterUsers,
-        createParamsFilter(['tenantId'], params),
         createSorter({ orderBy, orderDirection }),
       )(users)
     },
