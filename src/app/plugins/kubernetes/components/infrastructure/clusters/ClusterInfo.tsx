@@ -23,6 +23,23 @@ interface IClusterDetailFields {
   render?: (value: string | boolean) => string | React.ReactNode
 }
 
+const useStyles = makeStyles<Theme>((theme) => ({
+  root: {
+    flexGrow: 1,
+  },
+  text: {
+    color: theme.palette.common.white,
+  },
+  link: {
+    color: theme.palette.primary.light,
+  },
+  ul: {
+    listStyleType: 'none',
+    paddingInlineStart: theme.spacing(0),
+    margin: theme.spacing(0),
+  },
+}))
+
 const getFieldsForCard = (fields: IClusterDetailFields[], cluster: ICluster) => {
   const fieldsToDisplay = {}
   fields.forEach((field) => {
@@ -165,21 +182,24 @@ const azureCloudFields = [
   { id: 'cloudProperties.loadbalancerIP', title: 'Load Balancer IP', required: true },
 ]
 
+const CsiDriversList = (props) => {
+  const classes = useStyles({})
+  return (
+    <ul className={classes.ul}>
+      {props.modes.map((val) => (
+        <li key={val}>{val}</li>
+      ))}
+    </ul>
+  )
+}
+
 const csiDriverFields = [
   { id: 'metadata.name', title: 'Driver Name', required: true },
   {
     id: 'spec.volumeLifecycleModes',
     title: 'Capabilities',
     required: true,
-    render: (modes) => {
-      return (
-        <ul style={{ listStyleType: 'none', paddingInlineStart: '0px', margin: '0px' }}>
-          {modes.map((val) => (
-            <li key={val}>{val}</li>
-          ))}
-        </ul>
-      )
-    },
+    render: (modes) => <CsiDriversList modes={modes} />,
   },
 ]
 
@@ -201,18 +221,6 @@ const renderCloudInfo = (cluster) => {
       return <InfoPanel title="Cloud Properties" items={{ 'Data not found': '' }} />
   }
 }
-
-const useStyles = makeStyles<Theme>((theme) => ({
-  root: {
-    flexGrow: 1,
-  },
-  text: {
-    color: theme.palette.common.white,
-  },
-  link: {
-    color: theme.palette.primary.light,
-  },
-}))
 
 const ClusterInfo = () => {
   const { match } = useReactRouter()
