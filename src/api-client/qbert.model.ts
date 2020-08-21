@@ -264,6 +264,7 @@ export interface PurpleSelector {
 }
 
 export interface MatchLabelsClass {
+  [key: string]: string
   app?: string
   'k8s-app'?: string
   version?: string

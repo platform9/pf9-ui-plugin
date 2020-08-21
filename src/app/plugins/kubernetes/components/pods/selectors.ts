@@ -1,14 +1,6 @@
 import { createSelector } from 'reselect'
 import { any, find, head, map, mergeLeft, pathEq, pipe, pluck, prop, propEq, toPairs } from 'ramda'
-import {
-  emptyArr,
-  emptyObj,
-  filterIf,
-  pathStr,
-  pathStrOr,
-  pathStrOrNull,
-  pipeWhenTruthy,
-} from 'utils/fp'
+import { emptyArr, emptyObj, filterIf, pipeWhenTruthy } from 'utils/fp'
 import { allKey } from 'app/constants'
 import { pathJoin } from 'utils/misc'
 import DataKeys from 'k8s/DataKeys'
@@ -17,13 +9,21 @@ import { combinedHostsSelector } from '../infrastructure/common/selectors'
 import createSorter from 'core/helpers/createSorter'
 import { clustersSelector } from 'k8s/components/infrastructure/clusters/selectors'
 import { IClusterSelector } from '../infrastructure/clusters/model'
-import { IPodSelector, IServicesSelector } from './model'
+import { IPodSelector, IServicesSelector, ICombinedNodesSelector } from './model'
 import { IDataKeys, GlobalState } from 'k8s/datakeys.model'
-import { FluffySelector } from 'api-client/qbert.model'
+import { FluffySelector, MatchLabelsClass, Node } from 'api-client/qbert.model'
+import { ICombinedHost } from '../infrastructure/common/model'
+import { IFace } from 'api-client/keystone.model'
 
 const k8sDocUrl = 'namespaces/kube-system/qbertservices/https:kubernetes-dashboard:443/proxy/#'
 
-export const nodesSelector = createSelector(
+export const nodesSelector = createSelector<
+  GlobalState,
+  Node[],
+  ICombinedHost[],
+  Array<IFace & { name: string }>,
+  ICombinedNodesSelector[]
+>(
   [
     getDataSelector<DataKeys.Nodes>(DataKeys.Nodes),
     combinedHostsSelector,
@@ -31,10 +31,11 @@ export const nodesSelector = createSelector(
   ],
   (rawNodes, combinedHosts, rawServiceCatalog) => {
     const combinedHostsObj = combinedHosts.reduce((accum, host) => {
-      const id = pathStrOrNull('resmgr.id')(host) || pathStrOrNull('qbert.uuid')(host)
+      const id = host?.resmgr?.id || host?.qbert?.uuid || null
       accum[id] = host
       return accum
-    }, {})
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    }, {} as { [key: string]: ICombinedHost })
 
     const qbertUrl =
       pipeWhenTruthy(find(propEq('name', 'qbert')), prop('url'))(rawServiceCatalog) || ''
@@ -62,16 +63,16 @@ export const podsSelector = createSelector(
           cluster.baseUrl,
           k8sDocUrl,
           'pod',
-          pathStr('metadata.namespace', pod),
-          pathStr('metadata.name', pod),
+          pod?.metadata?.namespace, // pathStr('metadata.namespace', pod),
+          pod?.metadata?.name, // pathStr('metadata.name', pod),
         )
         return {
           ...pod,
           dashboardUrl,
-          id: pathStr('metadata.uid', pod),
-          name: pathStr('metadata.name', pod),
-          namespace: pathStr('metadata.namespace', pod),
-          labels: pathStr('metadata.labels', pod),
+          id: pod?.metadata?.uid, // pathStr('metadata.uid', pod),
+          name: pod?.metadata?.name, // pathStr('metadata.name', pod),
+          namespace: pod?.metadata?.namespace, // pathStr('metadata.namespace', pod),
+          labels: pod?.metadata?.labels, // pathStr('metadata.labels', pod),
           clusterName: cluster.name,
         }
       }),
@@ -102,11 +103,11 @@ export const deploymentsSelector = createSelector(
         cluster.baseUrl,
         k8sDocUrl,
         'deployment',
-        pathStr('metadata.namespace', rawDeployment),
-        pathStr('metadata.name', rawDeployment),
+        rawDeployment?.metadata.namespace,
+        rawDeployment?.metadata.name,
       )
-      const selectors = pathStrOr(emptyObj, 'spec.selector.matchLabels', rawDeployment)
-      const namespace = pathStr('metadata.namespace', rawDeployment)
+      const selectors = rawDeployment?.spec?.selector?.matchLabels || (emptyObj as MatchLabelsClass)
+      const namespace = rawDeployment?.metadata?.namespace
       const [labelKey, labelValue] = head(toPairs(selectors)) || emptyArr
 
       // Check if any pod label matches the first deployment match label key
@@ -115,16 +116,16 @@ export const deploymentsSelector = createSelector(
         if (pod.namespace !== namespace || pod.clusterId !== clusterId) {
           return false
         }
-        const podLabels = pathStr('metadata.labels', pod)
+        const podLabels = pod?.metadata?.labels // pathStr('metadata.labels', pod)
         return any(([key, value]) => key === labelKey && value === labelValue, toPairs(podLabels))
       })
       return {
         ...rawDeployment,
         dashboardUrl,
-        id: pathStr('metadata.uid', rawDeployment),
-        name: pathStr('metadata.name', rawDeployment),
-        created: pathStr('metadata.creationTimestamp', rawDeployment),
-        labels: pathStr('metadata.labels', rawDeployment),
+        id: rawDeployment?.metadata?.uid,
+        name: rawDeployment?.metadata?.name,
+        created: rawDeployment?.metadata?.creationTimestamp,
+        labels: rawDeployment?.metadata?.labels,
         selectors,
         pods: deploymentPods.length,
         namespace,
@@ -182,7 +183,7 @@ export const serviceSelectors = createSelector<
           ...pluck<any, string>('hostname', loadBalancerEndpoints),
           ...(type === 'NodePort' ? ['&lt;nodes&gt;'] : []),
         ]
-        const clusterIp = pathStr('spec.clusterIP', service)
+        const clusterIp = service?.spec?.clusterIP
         const status =
           clusterIp && (type !== 'LoadBalancer' || externalEndpoints.length > 0) ? 'OK' : 'Pending'
         return {

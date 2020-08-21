@@ -5,6 +5,7 @@
 
 export enum RoleStatus {
   Ok = 'ok',
+  Failed = 'failed',
 }
 
 export interface Host {
@@ -14,7 +15,7 @@ export interface Host {
   role_status?: RoleStatus
   hypervisor_info: HypervisorInfoClass | string
   extensions: ExtensionsClass | string
-  message: string
+  message: string | { warn: string }
 }
 
 export interface ExtensionsClass {
@@ -30,6 +31,7 @@ export interface ExtensionsClass {
   ip_address: IPAddress
   cpu_stats: CPUStats
   node_metadata?: NodeMetadata
+  hypervisor_details?: any
 }
 
 export interface CloudMetadata {
