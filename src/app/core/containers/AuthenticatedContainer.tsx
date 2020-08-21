@@ -179,17 +179,17 @@ const AuthenticatedContainer = () => {
         const features = await keystone.getFeatures()
 
         setRegionFeatures({
-          kubernetes: features.experimental.containervisor,
+          kubernetes: features?.experimental?.containervisor,
           ironic: false, // Keep this false until ironic supported by the new UI
-          // ironic: features.experimental.ironic,
-          openstack: features.experimental.openstackEnabled,
-          intercom: features.experimental.intercom,
+          // ironic: features?.experimental?.ironic,
+          openstack: features?.experimental?.openstackEnabled,
+          intercom: features?.experimental?.intercom,
         })
 
         redirectToAppropriateStack(
           false, // Keep this false until ironic supported by the new UI
-          // features.experimental.ironic,
-          features.experimental.containervisor,
+          // features?.experimental?.ironic,
+          features?.experimental?.containervisor,
           history,
         )
       } catch (err) {
