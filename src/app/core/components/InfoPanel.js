@@ -16,11 +16,20 @@ const styles = (theme) => ({
   card: {
     overflow: 'inherit',
   },
+  detailRowDiv: {
+    marginBottom: theme.spacing(2),
+  },
 })
 
-const renderDetailRow = (items) => (<div style={{marginBottom: 16}}>{Object.entries(items).map(([name, { value, helpMessage }]) => (
-<DetailRow label={name} value={value} helpMessage={helpMessage} />
-))}</div>)
+const DetailRowDiv = withStyles(styles)(({ classes, items }) => (
+  <div className={classes.detailRowDiv}>
+    {Object.entries(items).map(([name, { value, helpMessage }]) => (
+      <DetailRow label={name} value={value} helpMessage={helpMessage} />
+    ))}
+  </div>
+))
+
+const renderDetailRow = (items) => <DetailRowDiv items={items} />
 
 const InfoPanel = withStyles(styles)(({ classes, items, title }) => (
   <Card className={classes.card}>
@@ -28,13 +37,7 @@ const InfoPanel = withStyles(styles)(({ classes, items, title }) => (
     <Divider />
     <CardContent>
       <table>
-        <tbody>
-          { Array.isArray(items)
-            ? items.map(renderDetailRow)
-            : renderDetailRow(items)
-          }
-          
-        </tbody>
+        <tbody>{Array.isArray(items) ? items.map(renderDetailRow) : renderDetailRow(items)}</tbody>
       </table>
     </CardContent>
   </Card>
