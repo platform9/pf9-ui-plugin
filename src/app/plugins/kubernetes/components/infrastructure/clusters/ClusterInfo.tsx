@@ -3,7 +3,7 @@ import InfoPanel from 'core/components/InfoPanel'
 
 import useReactRouter from 'use-react-router'
 import { Grid, Typography } from '@material-ui/core'
-import { makeStyles } from '@material-ui/styles'
+import { makeStyles, withStyles } from '@material-ui/styles'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import { path } from 'ramda'
@@ -22,23 +22,6 @@ interface IClusterDetailFields {
   condition?: (cluster: ICluster) => boolean
   render?: (value: string | boolean) => string | React.ReactNode
 }
-
-const useStyles = makeStyles<Theme>((theme) => ({
-  root: {
-    flexGrow: 1,
-  },
-  text: {
-    color: theme.palette.common.white,
-  },
-  link: {
-    color: theme.palette.primary.light,
-  },
-  ul: {
-    listStyleType: 'none',
-    paddingInlineStart: theme.spacing(0),
-    margin: theme.spacing(0),
-  },
-}))
 
 const getFieldsForCard = (fields: IClusterDetailFields[], cluster: ICluster) => {
   const fieldsToDisplay = {}
@@ -182,16 +165,28 @@ const azureCloudFields = [
   { id: 'cloudProperties.loadbalancerIP', title: 'Load Balancer IP', required: true },
 ]
 
-const CsiDriversList = (props) => {
-  const classes = useStyles({})
+type Props = {
+  classes: any
+  items: Array<string>
+}
+
+const styles = (theme) => ({
+  ul: {
+    listStyleType: 'none',
+    paddingInlineStart: theme.spacing(0),
+    margin: theme.spacing(0),
+  },
+})
+
+const CsiDriversList = withStyles(styles)(({ classes, items }: Props) => {
   return (
     <ul className={classes.ul}>
-      {props.modes.map((val) => (
+      {items.map((val) => (
         <li key={val}>{val}</li>
       ))}
     </ul>
   )
-}
+})
 
 const csiDriverFields = [
   { id: 'metadata.name', title: 'Driver Name', required: true },
@@ -199,7 +194,7 @@ const csiDriverFields = [
     id: 'spec.volumeLifecycleModes',
     title: 'Capabilities',
     required: true,
-    render: (modes) => <CsiDriversList modes={modes} />,
+    render: (modes) => <CsiDriversList items={modes} />,
   },
 ]
 
@@ -221,6 +216,18 @@ const renderCloudInfo = (cluster) => {
       return <InfoPanel title="Cloud Properties" items={{ 'Data not found': '' }} />
   }
 }
+
+const useStyles = makeStyles<Theme>((theme) => ({
+  root: {
+    flexGrow: 1,
+  },
+  text: {
+    color: theme.palette.common.white,
+  },
+  link: {
+    color: theme.palette.primary.light,
+  },
+}))
 
 const ClusterInfo = () => {
   const { match } = useReactRouter()
