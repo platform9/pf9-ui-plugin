@@ -12,7 +12,7 @@ import { trackEvent } from 'utils/tracking'
 
 const { qbert } = ApiClient.getInstance()
 
-const k8sDocUrl = 'namespaces/kube-system/services/https:kubernetes-dashboard:443/proxy/#'
+const k8sDashboardUrl = 'namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:443/proxy/#'
 export const podsCacheKey = 'pods'
 export const deploymentsCacheKey = 'deployments'
 export const kubeServicesCacheKey = 'kubeServices'
@@ -50,10 +50,11 @@ export const podActions = createCRUDActions(podsCacheKey, {
         const clusterId = prop('clusterId', pod)
         const dashboardUrl = pathJoin(
           await qbert.clusterBaseUrl(pod.clusterId),
-          k8sDocUrl,
+          k8sDashboardUrl,
           'pod',
           pathStr('metadata.namespace', pod),
           pathStr('metadata.name', pod),
+          `?namespace=${pathStr('metadata.namespace', pod)}`,
         )
         return {
           ...pod,
@@ -103,10 +104,11 @@ export const deploymentActions = createCRUDActions(deploymentsCacheKey, {
       mapAsync(async (deployment) => {
         const dashboardUrl = pathJoin(
           await qbert.clusterBaseUrl(deployment.clusterId),
-          k8sDocUrl,
+          k8sDashboardUrl,
           'deployment',
           pathStr('metadata.namespace', deployment),
           pathStr('metadata.name', deployment),
+          `?namespace=${pathStr('metadata.namespace', deployment)}`,
         )
         const selectors = pathStrOr(emptyObj, 'spec.selector.matchLabels', deployment)
         const clusterId = prop('clusterId', deployment)
@@ -183,10 +185,11 @@ export const serviceActions = createCRUDActions(kubeServicesCacheKey, {
       mapAsync(async (service) => {
         const dashboardUrl = pathJoin(
           await qbert.clusterBaseUrl(service.clusterId),
-          k8sDocUrl,
+          k8sDashboardUrl,
           'service',
           pathStr('metadata.namespace', service),
           pathStr('metadata.name', service),
+          `?namespace=${pathStr('metadata.namespace', service)}`,
         )
         const clusterId = prop('clusterId', service)
         const type = pathStr('spec.type', service)
