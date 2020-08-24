@@ -43,6 +43,7 @@ export const bareOSSetupDocumentationLink = `${k8sBaseUrl}/create-multimaster-ba
 
 // Clusters
 export const remoteMonitoringDocsLink = `${k8sBaseUrl}/enable-remote-monitoring/`
+export const kubectlInstallationDocumentationLink = 'https://docs.platform9.com/kubernetes/kubectl/'
 
 // Nodes
 export const nodeInstallTroubleshooting = `${k8sBaseUrl}/troubleshooting/node-install-status-check/`
