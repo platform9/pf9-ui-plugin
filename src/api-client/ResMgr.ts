@@ -37,7 +37,7 @@ export const localizeRoles = (roles: string[] = []) => {
 }
 
 class ResMgr extends ApiService {
-  protected getClassName() {
+  public getClassName() {
     return 'resmgr'
   }
 

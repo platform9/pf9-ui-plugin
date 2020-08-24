@@ -9,7 +9,7 @@ const renameKey = (srcKey, destKey) => (obj) =>
   )
 
 class Nova extends ApiService {
-  protected getClassName() {
+  public getClassName() {
     return 'nova'
   }
 

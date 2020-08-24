@@ -8,7 +8,7 @@ const replaceOp = op('replace')
 */
 
 class Glance extends ApiService {
-  protected getClassName() {
+  public getClassName() {
     return 'glance'
   }
 

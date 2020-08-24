@@ -3,12 +3,11 @@ import ApiService from 'api-client/ApiService'
 import { ClusterTag } from './appbert.model'
 
 class Appbert extends ApiService {
-  protected getClassName() {
+  public getClassName() {
     return 'appbert'
   }
 
   protected async getEndpoint() {
-    console.log(this.client)
     return this.client.keystone.getServiceEndpoint('appbert', 'admin')
   }
 
@@ -26,7 +25,7 @@ class Appbert extends ApiService {
   getPackages = async () => {
     // return this.client.basicGet(`${this.apiEndpoint}/packages`)
     const data = await this.client.basicGet(
-      'Appbert',
+      this.getClassName(),
       'getPackages',
       `${await this.getEndpoint()}/packages`,
     )

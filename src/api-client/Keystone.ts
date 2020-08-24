@@ -74,7 +74,7 @@ const groupByRegion = (catalog: Catalog[]): ServicesByRegion => {
 }
 
 class Keystone extends ApiService {
-  protected getClassName() {
+  public getClassName() {
     return 'keystone'
   }
 

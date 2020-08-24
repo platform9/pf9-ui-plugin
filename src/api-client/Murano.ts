@@ -1,7 +1,7 @@
 import ApiService from 'api-client/ApiService'
 
 class Murano extends ApiService {
-  protected getClassName() {
+  public getClassName() {
     return 'murano'
   }
 

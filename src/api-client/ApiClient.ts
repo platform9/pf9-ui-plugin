@@ -17,7 +17,7 @@ import { ID } from './keystone.model'
 import { normalizeResponse } from 'api-client/helpers'
 import { hasPathStr, pathStr } from 'utils/fp'
 import { prop, has, cond, T, identity, when } from 'ramda'
-import { isPlainObject } from 'utils/misc'
+import { isPlainObject, pathJoin } from 'utils/misc'
 // import { IApiClient } from './model'
 import ApiCache from './cache-client'
 
@@ -88,6 +88,8 @@ class ApiClient {
     instance.clemency.initialize()
   }
 
+  clients = {}
+
   constructor(options: ApiClientOptions) {
     this.options = options
     if (!options.keystoneEndpoint) {
@@ -107,6 +109,7 @@ class ApiClient {
     )
 
     // Keystone is used by the rest of the services so it must be initialized first
+
     this.keystone = new Keystone(this)
     this.cinder = new Cinder(this)
     this.glance = new Glance(this)
@@ -117,6 +120,19 @@ class ApiClient {
     this.resmgr = new ResMgr(this)
     this.qbert = new Qbert(this)
     this.clemency = new Clemency(this)
+
+    this.clients = {
+      [this.keystone.getClassName()]: this.keystone,
+      [this.cinder.getClassName()]: this.cinder,
+      [this.glance.getClassName()]: this.glance,
+      [this.appbert.getClassName()]: this.appbert,
+      [this.neutron.getClassName()]: this.neutron,
+      [this.nova.getClassName()]: this.nova,
+      [this.murano.getClassName()]: this.murano,
+      [this.resmgr.getClassName()]: this.resmgr,
+      [this.qbert.getClassName()]: this.qbert,
+      [this.clemency.getClassName()]: this.clemency,
+    }
 
     this.catalog = {}
     this.activeRegion = null
@@ -151,36 +167,42 @@ class ApiClient {
   }
 
   rawGet = async <T extends any>(clsName, mthdName, url, config = undefined) => {
-    const response = await this.axiosInstance.get<T>(url, config)
+    const endpoint = await this.clients[clsName].getApiEndpoint()
+    const response = await this.axiosInstance.get<T>(pathJoin(endpoint, url), config)
     ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return response
   }
 
   rawPost = async <T extends any>(clsName, mthdName, url, data, config = undefined) => {
+    const endpoint = await this.clients[clsName].getApiEndpoint()
     const response = await this.axiosInstance.post<T>(url, data, config)
     ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return response
   }
 
   rawPut = async <T extends any>(clsName, mthdName, url, data, config = undefined) => {
+    const endpoint = await this.clients[clsName].getApiEndpoint()
     const response = await this.axiosInstance.put<T>(url, data, config)
     ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return response
   }
 
   rawPatch = async <T extends any>(clsName, mthdName, url, data, config = undefined) => {
+    const endpoint = await this.clients[clsName].getApiEndpoint()
     const response = await this.axiosInstance.patch<T>(url, data, config)
     ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return response
   }
 
   rawDelete = async <T extends any>(clsName, mthdName, url, config = undefined) => {
+    const endpoint = await this.clients[clsName].getApiEndpoint()
     const response = await this.axiosInstance.delete<T>(url, config)
     ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return response
   }
 
   basicGet = async <T extends any>(clsName, mthdName, url, params = undefined) => {
+    const endpoint = await this.clients[clsName].getApiEndpoint()
     const response = await this.axiosInstance.get<T>(url, {
       params,
       ...this.getAuthHeaders(),
@@ -190,24 +212,28 @@ class ApiClient {
   }
 
   basicPost = async <T extends any>(clsName, mthdName, url, body = undefined) => {
+    const endpoint = await this.clients[clsName].getApiEndpoint()
     const response = await this.axiosInstance.post<T>(url, body, this.getAuthHeaders())
     ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return normalizeResponse<T>(response)
   }
 
   basicPatch = async <T extends any>(clsName, mthdName, url, body = undefined) => {
+    const endpoint = await this.clients[clsName].getApiEndpoint()
     const response = await this.axiosInstance.patch<T>(url, body, this.getAuthHeaders())
     ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return normalizeResponse<T>(response)
   }
 
   basicPut = async <T extends any>(clsName, mthdName, url, body = undefined) => {
+    const endpoint = await this.clients[clsName].getApiEndpoint()
     const response = await this.axiosInstance.put<T>(url, body, this.getAuthHeaders())
     ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return normalizeResponse<T>(response)
   }
 
   basicDelete = async <T extends any>(clsName, mthdName, url) => {
+    const endpoint = await this.clients[clsName].getApiEndpoint()
     const response = await this.axiosInstance.delete<T>(url, this.getAuthHeaders())
     ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return normalizeResponse<T>(response)

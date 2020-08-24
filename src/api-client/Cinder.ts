@@ -2,7 +2,7 @@
 import ApiService from 'api-client/ApiService'
 
 class Cinder extends ApiService {
-  protected getClassName() {
+  public getClassName() {
     return 'cinder'
   }
 

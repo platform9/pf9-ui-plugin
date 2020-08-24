@@ -1,7 +1,7 @@
 import ApiService from 'api-client/ApiService'
 
 class Neutron extends ApiService {
-  protected getClassName() {
+  public getClassName() {
     return 'neutron'
   }
 

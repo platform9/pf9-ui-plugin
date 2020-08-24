@@ -54,7 +54,7 @@ const normalizeCluster = <T>(baseUrl) => (cluster): T & INormalizedCluster => ({
 
 /* eslint-disable camelcase */
 class Qbert extends ApiService {
-  protected getClassName() {
+  public getClassName() {
     return 'qbert'
   }
 

@@ -5,7 +5,7 @@ import store from 'app/store'
 abstract class ApiService {
   protected apiEndpoint: string = ''
   private readonly clsName: string
-  protected abstract getClassName(): string
+  public abstract getClassName(): string
   protected abstract getEndpoint(): Promise<string>
   private endpointPromise: Promise<string>
 

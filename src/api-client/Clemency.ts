@@ -10,7 +10,7 @@ export interface IApiData {
 type IResetPassword = ({ secret, username, password }: IApiData) => Promise<any>
 
 class Clemency extends ApiService {
-  protected getClassName() {
+  public getClassName() {
     return 'clemency'
   }
 
