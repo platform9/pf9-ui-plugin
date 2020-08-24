@@ -4,12 +4,12 @@ import createCRUDActions from 'core/helpers/createCRUDActions'
 import createContextUpdater from 'core/helpers/createContextUpdater'
 import { ActionDataKeys } from 'k8s/DataKeys'
 
-const { resmgr } = ApiClient.getInstance()
+const { resMgr } = ApiClient.getInstance()
 
 export const loadResMgrHosts = createContextLoader(
   ActionDataKeys.ResMgrHosts,
   async () => {
-    return resmgr.getHosts()
+    return resMgr.getHosts()
   },
   {
     uniqueIdentifier: 'id',
@@ -28,9 +28,9 @@ export const updateRemoteSupport = createContextUpdater(
 
     // If the role push/delete fails, how do I handle that?
     if (enableSupport) {
-      await resmgr.addRole(id, supportRoleName)
+      await resMgr.addRole(id, supportRoleName)
     } else {
-      await resmgr.removeRole(id, supportRoleName)
+      await resMgr.removeRole(id, supportRoleName)
     }
     // Reload the resMgrHosts
     await loadResMgrHosts(true)

@@ -1,6 +1,5 @@
 import React from 'react'
 import 'app/app.css'
-import HotKeysProvider from 'core/providers/HotKeysProvider'
 import ThemeManager from 'core/themes/ThemeManager'
 import ToastProvider from 'core/providers/ToastProvider'
 import { decorateAction } from '@storybook/addon-actions'
@@ -22,13 +21,11 @@ export const jsonDetailLogger = decorateAction([
 export const appDecorators = (storyFn) => (
   <div style={{ padding: '16px', backgroundColor: '#FFF' }}>
     <Provider store={store}>
-      <HotKeysProvider>
-        <PreferencesProvider>
-          <ThemeManager>
-            <ToastProvider>{storyFn()}</ToastProvider>
-          </ThemeManager>
-        </PreferencesProvider>
-      </HotKeysProvider>
+      <PreferencesProvider>
+        <ThemeManager>
+          <ToastProvider>{storyFn()}</ToastProvider>
+        </ThemeManager>
+      </PreferencesProvider>
     </Provider>
   </div>
 )

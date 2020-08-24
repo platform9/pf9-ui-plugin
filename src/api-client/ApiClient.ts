@@ -26,6 +26,7 @@ import {
   IBasicRequestGetParams,
   IBasicRequestPostParams,
 } from './model'
+import ApiService from 'api-client/ApiService'
 
 let _instance: ApiClient = null
 
@@ -45,11 +46,11 @@ class ApiClient {
   public neutron: Neutron
   public nova: Nova
   public murano: Murano
-  public resmgr: ResMgr
+  public resMgr: ResMgr
   public qbert: Qbert
   public clemency: Clemency
-  public catalog = null
-  public activeRegion: ID
+  public catalog = {}
+  public activeRegion: ID = null
   unscopedToken = null
   scopedToken = null
   activeProjectId = null
@@ -59,7 +60,9 @@ class ApiClient {
   private readonly axiosInstance: AxiosInstance
 
   static init(options: ApiClientOptions) {
-    _instance = new ApiClient(options)
+    if (!_instance) {
+      _instance = new ApiClient(options)
+    }
     return _instance
   }
 
@@ -89,12 +92,12 @@ class ApiClient {
     instance.neutron.initialize()
     instance.nova.initialize()
     instance.murano.initialize()
-    instance.resmgr.initialize()
+    instance.resMgr.initialize()
     instance.qbert.initialize()
     instance.clemency.initialize()
   }
 
-  clientsByName = {}
+  apiServices = {}
 
   constructor(options: ApiClientOptions) {
     this.options = options
@@ -114,36 +117,22 @@ class ApiClient {
       async (error) => Promise.reject(getResponseError(error)),
     )
 
-    // Keystone is used by the rest of the services so it must be initialized first
+    // Keystone is used by all the other services so it must be initialized first
+    this.keystone = this.addApiService(new Keystone(this))
+    this.cinder = this.addApiService(new Cinder(this))
+    this.glance = this.addApiService(new Glance(this))
+    this.appbert = this.addApiService(new Appbert(this))
+    this.neutron = this.addApiService(new Neutron(this))
+    this.nova = this.addApiService(new Nova(this))
+    this.murano = this.addApiService(new Murano(this))
+    this.resMgr = this.addApiService(new ResMgr(this))
+    this.qbert = this.addApiService(new Qbert(this))
+    this.clemency = this.addApiService(new Clemency(this))
+  }
 
-    this.keystone = new Keystone(this)
-    this.cinder = new Cinder(this)
-    this.glance = new Glance(this)
-    this.appbert = new Appbert(this)
-    this.neutron = new Neutron(this)
-    this.nova = new Nova(this)
-    this.murano = new Murano(this)
-    this.resmgr = new ResMgr(this)
-    this.qbert = new Qbert(this)
-    this.clemency = new Clemency(this)
-
-    this.clientsByName = {
-      [this.keystone.getClassName()]: this.keystone,
-      [this.cinder.getClassName()]: this.cinder,
-      [this.glance.getClassName()]: this.glance,
-      [this.appbert.getClassName()]: this.appbert,
-      [this.neutron.getClassName()]: this.neutron,
-      [this.nova.getClassName()]: this.nova,
-      [this.murano.getClassName()]: this.murano,
-      [this.resmgr.getClassName()]: this.resmgr,
-      [this.qbert.getClassName()]: this.qbert,
-      [this.clemency.getClassName()]: this.clemency,
-    }
-
-    this.catalog = {}
-    this.activeRegion = null
-
-    // ApiClient.refreshApiEndpoints(this)
+  addApiService = <T extends ApiService>(apiClientInstance: T) => {
+    this.apiServices[apiClientInstance.getClassName()] = apiClientInstance
+    return apiClientInstance
   }
 
   serialize = () => {
@@ -179,7 +168,7 @@ class ApiClient {
     options: { clsName, mthdName },
   }: IRawRequestGetParams) => {
     if (!endpoint) {
-      endpoint = await this.clientsByName[clsName].getApiEndpoint()
+      endpoint = await this.apiServices[clsName].getApiEndpoint()
     }
     const response = await this.axiosInstance.get<T>(pathJoin(endpoint, url), config)
     ApiCache.instance.cacheItem(clsName, mthdName, response.data)
@@ -194,7 +183,7 @@ class ApiClient {
     options: { clsName, mthdName },
   }: IRawRequestPostParams) => {
     if (!endpoint) {
-      endpoint = await this.clientsByName[clsName].getApiEndpoint()
+      endpoint = await this.apiServices[clsName].getApiEndpoint()
     }
     const response = await this.axiosInstance.post<T>(pathJoin(endpoint, url), data, config)
     ApiCache.instance.cacheItem(clsName, mthdName, response.data)
@@ -209,7 +198,7 @@ class ApiClient {
     options: { clsName, mthdName },
   }: IRawRequestPostParams) => {
     if (!endpoint) {
-      endpoint = await this.clientsByName[clsName].getApiEndpoint()
+      endpoint = await this.apiServices[clsName].getApiEndpoint()
     }
     const response = await this.axiosInstance.put<T>(pathJoin(endpoint, url), data, config)
     ApiCache.instance.cacheItem(clsName, mthdName, response.data)
@@ -224,7 +213,7 @@ class ApiClient {
     options: { clsName, mthdName },
   }: IRawRequestPostParams) => {
     if (!endpoint) {
-      endpoint = await this.clientsByName[clsName].getApiEndpoint()
+      endpoint = await this.apiServices[clsName].getApiEndpoint()
     }
     const response = await this.axiosInstance.patch<T>(pathJoin(endpoint, url), data, config)
     ApiCache.instance.cacheItem(clsName, mthdName, response.data)
@@ -238,7 +227,7 @@ class ApiClient {
     options: { clsName, mthdName },
   }: IRawRequestGetParams) => {
     if (!endpoint) {
-      endpoint = await this.clientsByName[clsName].getApiEndpoint()
+      endpoint = await this.apiServices[clsName].getApiEndpoint()
     }
     const response = await this.axiosInstance.delete<T>(pathJoin(endpoint, url), config)
     ApiCache.instance.cacheItem(clsName, mthdName, response.data)
@@ -252,7 +241,7 @@ class ApiClient {
     options: { clsName, mthdName },
   }: IBasicRequestGetParams) => {
     if (!endpoint) {
-      endpoint = await this.clientsByName[clsName].getApiEndpoint()
+      endpoint = await this.apiServices[clsName].getApiEndpoint()
     }
     const response = await this.axiosInstance.get<T>(pathJoin(endpoint, url), {
       params,
@@ -269,7 +258,7 @@ class ApiClient {
     options: { clsName, mthdName },
   }: IBasicRequestPostParams) => {
     if (!endpoint) {
-      endpoint = await this.clientsByName[clsName].getApiEndpoint()
+      endpoint = await this.apiServices[clsName].getApiEndpoint()
     }
     const response = await this.axiosInstance.post<T>(
       pathJoin(endpoint, url),
@@ -287,7 +276,7 @@ class ApiClient {
     options: { clsName, mthdName },
   }: IBasicRequestPostParams) => {
     if (!endpoint) {
-      endpoint = await this.clientsByName[clsName].getApiEndpoint()
+      endpoint = await this.apiServices[clsName].getApiEndpoint()
     }
     const response = await this.axiosInstance.patch<T>(
       pathJoin(endpoint, url),
@@ -305,7 +294,7 @@ class ApiClient {
     options: { clsName, mthdName },
   }: IBasicRequestPostParams) => {
     if (!endpoint) {
-      endpoint = await this.clientsByName[clsName].getApiEndpoint()
+      endpoint = await this.apiServices[clsName].getApiEndpoint()
     }
     const response = await this.axiosInstance.put<T>(
       pathJoin(endpoint, url),
@@ -322,7 +311,7 @@ class ApiClient {
     options: { clsName, mthdName },
   }: IBasicRequestGetParams) => {
     if (!endpoint) {
-      endpoint = await this.clientsByName[clsName].getApiEndpoint()
+      endpoint = await this.apiServices[clsName].getApiEndpoint()
     }
     const response = await this.axiosInstance.delete<T>(
       pathJoin(endpoint, url),

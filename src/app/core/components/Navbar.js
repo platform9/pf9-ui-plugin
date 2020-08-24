@@ -19,7 +19,6 @@ import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'
 import { except } from 'app/utils/fp'
 import clsx from 'clsx'
-import { withHotKeys } from 'core/providers/HotKeysProvider'
 import moize from 'moize'
 import { assoc, flatten, pluck, prop, propEq, propOr, where, equals } from 'ramda'
 import { matchPath, withRouter } from 'react-router'
@@ -272,18 +271,8 @@ const styles = (theme) => ({
 })
 
 @withStyles(styles, { withTheme: true })
-@withHotKeys
 @withRouter
 class Navbar extends PureComponent {
-  constructor(props) {
-    super(props)
-    // The following events will be triggered even when focusing an editable input
-    props.setHotKeyHandler('Enter', this.handleEnterKey, { whileEditing: true })
-    props.setHotKeyHandler('ArrowUp', this.handleArrowKeys('ArrowUp'), { whileEditing: true })
-    props.setHotKeyHandler('ArrowDown', this.handleArrowKeys('ArrowDown'), { whileEditing: true })
-    props.setHotKeyHandler('Escape', this.handleEscKey, { whileEditing: true })
-  }
-
   state = {
     expandedSection: null,
     anchor: 'left',

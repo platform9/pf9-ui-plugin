@@ -6,7 +6,7 @@ import createContextUpdater from 'core/helpers/createContextUpdater'
 import { nodesSelector, makeParamsNodesSelector } from './selectors'
 import { ActionDataKeys } from 'k8s/DataKeys'
 
-const { qbert, resmgr } = ApiClient.getInstance()
+const { qbert, resMgr } = ApiClient.getInstance()
 
 export const loadNodes = createContextLoader(
   ActionDataKeys.Nodes,
@@ -29,7 +29,7 @@ export const loadNodes = createContextLoader(
 export const deAuthNode = createContextUpdater(
   ActionDataKeys.Nodes,
   async (node) => {
-    await resmgr.unauthorizeHost(node.uuid)
+    await resMgr.unauthorizeHost(node.uuid)
     await loadNodes()
     // TODO: Show success message
   },
