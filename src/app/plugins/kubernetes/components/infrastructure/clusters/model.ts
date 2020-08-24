@@ -1,7 +1,6 @@
 import { ICombinedNode } from '../nodes/model'
 import { CloudProviders } from '../cloudProviders/model'
 import { ClusterElement, INormalizedCluster, Node } from 'api-client/qbert.model'
-import { ConnectionStatus, TransientStatus } from './ClusterStatusUtils'
 import { Pkg } from 'api-client/appbert.model'
 
 export type HealthStatus = 'healthy' | 'partially_healthy' | 'unhealthy' | 'unknown'
@@ -12,6 +11,10 @@ interface IClusterAsyncAction {
   baseUrl: string
 }
 export interface IClusterAction extends ClusterElement, INormalizedCluster, IClusterAsyncAction {}
+
+export type TransientStatus = 'creating' | 'deleting' | 'updating' | 'upgrading' | 'converging'
+
+export type ConnectionStatus = 'connected' | 'partially_connected' | 'disconnected'
 
 // progressPercent,
 //         version,
@@ -194,3 +197,5 @@ interface Metric {
   max: number
   percent: number
 }
+
+export type IClusterStatus = 'ok' | 'pause' | 'fail' | 'unknown' | 'error' | 'loading'

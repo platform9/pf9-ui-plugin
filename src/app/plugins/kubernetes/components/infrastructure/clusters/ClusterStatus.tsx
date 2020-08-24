@@ -7,9 +7,8 @@ import {
   isTransientStatus,
   getClusterHealthStatus,
   getClusterConnectionStatus,
-  IClusterStatus,
 } from './ClusterStatusUtils'
-import { ICluster } from './model'
+import { ICluster, IClusterStatus } from './model'
 import { capitalizeString } from 'utils/misc'
 import Theme from 'core/themes/model'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'

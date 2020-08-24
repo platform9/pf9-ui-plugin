@@ -1,11 +1,6 @@
-import { ICluster, HealthStatus } from './model'
+import { ConnectionStatus, HealthStatus, ICluster, IClusterStatus, TransientStatus } from './model'
 import { routes } from 'core/utils/routes'
 import { ICombinedNode } from '../nodes/model'
-
-export type TransientStatus = 'creating' | 'deleting' | 'updating' | 'upgrading' | 'converging'
-export type ConnectionStatus = 'connected' | 'partially_connected' | 'disconnected'
-
-export type IClusterStatus = 'ok' | 'pause' | 'fail' | 'unknown' | 'error' | 'loading'
 
 interface INodeCount {
   total: number
