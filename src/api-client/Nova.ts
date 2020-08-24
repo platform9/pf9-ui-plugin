@@ -24,7 +24,7 @@ class Nova extends ApiService {
 
   getFlavors = async () => {
     const url = `${await this.flavorsUrl()}/detail?is_public=no`
-    const response = await this.client.basicGet<any>('Nova', 'getFlavors', url)
+    const response = await this.client.basicGet<any>(this.getClassName(), 'getFlavors', url)
     return response.flavors
   }
 
@@ -33,13 +33,18 @@ class Nova extends ApiService {
     const converted = renameKey('public', 'os-flavor-access:is_public')(params)
     const body = { flavor: converted }
     const url = await this.flavorsUrl()
-    const response = await this.client.basicPost<any>('Nova', 'createFlavor', url, body)
+    const response = await this.client.basicPost<any>(
+      this.getClassName(),
+      'createFlavor',
+      url,
+      body,
+    )
     return response.flavor
   }
 
   deleteFlavor = async (id) => {
     const url = `${await this.flavorsUrl()}/${id}`
-    return this.client.basicDelete<any>('Nova', 'deleteFlavor', url)
+    return this.client.basicDelete<any>(this.getClassName(), 'deleteFlavor', url)
   }
 
   // Allow these methods to be accessed programatically as well.
@@ -51,25 +56,25 @@ class Nova extends ApiService {
 
   async getInstances() {
     const url = `${await this.instancesUrl()}/detail`
-    const response = await this.client.basicGet<any>('Nova', 'getInstances', url)
+    const response = await this.client.basicGet<any>(this.getClassName(), 'getInstances', url)
     return response.servers.map((instance) => renameKey('OS-EXT-STS:vm_state', 'state')(instance))
   }
 
   async getHypervisors() {
     const url = `${await this.hypervisorsUrl()}/detail`
-    const response = await this.client.basicGet<any>('Nova', 'getHypervisors', url)
+    const response = await this.client.basicGet<any>(this.getClassName(), 'getHypervisors', url)
     return response.hypervisors
   }
 
   async getSshKeys() {
     const url = `${await this.sshKeysUrl()}`
-    const response = await this.client.basicGet<any>('Nova', 'getSshKeys', url)
+    const response = await this.client.basicGet<any>(this.getClassName(), 'getSshKeys', url)
     return response.keypairs.map((x) => x.keypair)
   }
 
   async createSshKey(params) {
     const url = await this.sshKeysUrl()
-    const response = await this.client.basicPost<any>('Nova', 'createSshKey', url, {
+    const response = await this.client.basicPost<any>(this.getClassName(), 'createSshKey', url, {
       keypair: params,
     })
     return response.keypair
@@ -77,7 +82,7 @@ class Nova extends ApiService {
 
   async deleteSshKey(id) {
     const url = `${await this.sshKeysUrl()}/${id}`
-    return this.client.basicDelete<any>('Nova', 'deleteSshKey', url)
+    return this.client.basicDelete<any>(this.getClassName(), 'deleteSshKey', url)
   }
 }
 

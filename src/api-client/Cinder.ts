@@ -10,7 +10,7 @@ class Cinder extends ApiService {
     return this.client.keystone.getServiceEndpoint('cinderv3', 'admin')
   }
 
-  volumesUrl = async () => `${await this.getEndpoint()}/volumes`
+  volumesUrl = () => '/volumes'
 
   async getRegionUrls() {
     const services = (await this.client.keystone.getServiceCatalog()).find(
@@ -24,59 +24,103 @@ class Cinder extends ApiService {
   }
 
   async getVolume(id) {
-    const url = `${await this.volumesUrl()}/${id}`
-    const response = await this.client.basicGet<any>('Cinder', 'getVolume', url)
+    const response = await this.client.basicGet<any>({
+      url: `${this.volumesUrl()}/${id}`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getVolume',
+      },
+    })
     return response.volume
   }
 
   // Get volumes with details
   async getVolumes() {
-    const url = `${await this.volumesUrl()}/detail`
-    const response = await this.client.basicGet<any>('Cinder', 'getVolumes', url)
+    const response = await this.client.basicGet<any>({
+      url: `${this.volumesUrl()}/detail`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getVolumes',
+      },
+    })
     return response.volumes
   }
 
   async getAllVolumes() {
-    const url = `${await this.volumesUrl()}/detail?all_tenants=1`
-    const response = await this.client.basicGet<any>('Cinder', 'getAllVolumes', url)
+    const response = await this.client.basicGet<any>({
+      url: `${this.volumesUrl()}/detail?all_tenants=1`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getAllVolumes',
+      },
+    })
     return response.volumes
   }
 
   async getAllVolumesCount(limit, allTenants, markerId) {
-    const baseUrl = `${await this.volumesUrl()}/detail`
+    const baseUrl = `${this.volumesUrl()}/detail`
     const limitUrl = `?limit=${limit}`
     const projectUrl = allTenants ? '&all_tenants=1' : ''
     const markerUrl = markerId ? `&marker=${markerId}` : ''
     const url = baseUrl + limitUrl + projectUrl + markerUrl
-    const response = await this.client.basicGet<any>('Cinder', 'getAllVolumesCount', url)
+    const response = await this.client.basicGet<any>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getAllVolumesCount',
+      },
+    })
     return response.volumes
   }
 
   async createVolume(params) {
-    const url = await this.volumesUrl()
-    const response = await this.client.basicPost<any>('Cinder', 'getAllVolumesCount', url, {
-      volume: params,
+    const response = await this.client.basicPost<any>({
+      url: this.volumesUrl(),
+      body: {
+        volume: params,
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createVolume',
+      },
     })
     return response.volume
   }
 
   async deleteVolume(id) {
-    const url = `${await this.volumesUrl()}/${id}`
-    return this.client.basicDelete<any>('Cinder', 'deleteVolume', url)
+    return this.client.basicDelete<any>({
+      url: `${this.volumesUrl()}/${id}`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteVolume',
+      },
+    })
   }
 
   async updateVolume(id, params) {
-    const url = `${await this.volumesUrl()}/${id}`
-    const response = await this.client.basicPut<any>('Cinder', 'updateVolume', url, {
-      volume: params,
+    const response = await this.client.basicPut<any>({
+      url: `${this.volumesUrl()}/${id}`,
+      body: {
+        volume: params,
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'updateVolume',
+      },
     })
     return response.volume
   }
 
   async setBootable(id, bool) {
-    const url = `${await this.volumesUrl()}/${id}/action`
-    const response = await this.client.basicPost<any>('Cinder', 'setBootable', url, {
-      'os-set_bootable': { bootable: bool },
+    const response = await this.client.basicPost<any>({
+      url: `${this.volumesUrl()}/${id}/action`,
+      body: {
+        'os-set_bootable': { bootable: bool },
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'setBootable',
+      },
     })
     return response.volume
   }
@@ -84,20 +128,32 @@ class Cinder extends ApiService {
   // TODO: Test case for extend function
   // TODO: Current API doesn't work on AWS. Need to implement check logic in test.
   async extendVolume(id, size) {
-    const url = `${await this.volumesUrl()}/${id}/action`
-    const response = await this.client.basicPost<any>('Cinder', 'extendVolume', url, {
-      'os-extend': { 'new-size': size },
+    const response = await this.client.basicPost<any>({
+      url: `${this.volumesUrl()}/${id}/action`,
+      body: {
+        'os-extend': { 'new-size': size },
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'extendVolume',
+      },
     })
     return response.volume
   }
 
   // TODO: test case for reset function (Instance implement needed. Attach function needed?)
   async resetVolumeStatus(id) {
-    const url = `${await this.volumesUrl()}/${id}/action`
-    const response = await this.client.basicPost<any>('Cinder', 'resetVolumeStatus', url, {
-      'os-reset_status': {
-        status: 'available',
-        attach_status: 'detached',
+    const response = await this.client.basicPost<any>({
+      url: `${this.volumesUrl()}/${id}/action`,
+      body: {
+        'os-reset_status': {
+          status: 'available',
+          attach_status: 'detached',
+        },
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'resetVolumeStatus',
       },
     })
     return response.volume
@@ -105,49 +161,66 @@ class Cinder extends ApiService {
 
   // TODO: test case for upload function (Image implement needed)
   async uploadVolumeAsImage(id, image) {
-    const url = `${await this.volumesUrl()}/${id}/action`
-    const response = await this.client.basicPost<any>('Cinder', 'uploadVolumeAsImage', url, {
-      'os-volume_upload_image': {
-        container_format: 'bare',
-        force: image.force,
-        image_name: image.name,
-        disk_format: image.diskFormat || 'raw',
+    const response = await this.client.basicPost<any>({
+      url: `${this.volumesUrl()}/${id}/action`,
+      body: {
+        'os-volume_upload_image': {
+          container_format: 'bare',
+          force: image.force,
+          image_name: image.name,
+          disk_format: image.diskFormat || 'raw',
+        },
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'uploadVolumeAsImage',
       },
     })
     return response.volume
   }
 
   async getVolumeTypes() {
-    const url = `${await this.getEndpoint()}/types`
-    const response = await this.client.basicGet<any>('Cinder', 'getVolumeTypes', url)
+    const response = await this.client.basicGet<any>({
+      url: `/types`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getVolumeTypes',
+      },
+    })
     return response.volume_types
   }
 
   async getVolumeType(name) {
-    const url = `${await this.getEndpoint()}/types`
-    const response = await this.client.basicGet<any>('Cinder', 'getVolumeType', url)
-    return response.volume_types.find((x) => x.name === name)
+    const volumeTypes = await this.getVolumeTypes()
+    return volumeTypes.find((x) => x.name === name)
   }
 
   async createVolumeType(params) {
-    const url = `${await this.getEndpoint()}/types`
-    await this.client.basicPost<any>('Cinder', 'createVolumeType', url, { volume_type: params })
+    const url = `/types`
+    await this.client.basicPost<any>(this.getClassName(), 'createVolumeType', url, {
+      volume_type: params,
+    })
     return this.getVolumeType(params.name)
   }
 
   async deleteVolumeType(id) {
-    const url = `${await this.getEndpoint()}/types/${id}`
-    await this.client.basicDelete<any>('Cinder', 'deleteVolumeType', url)
+    const url = `/types/${id}`
+    await this.client.basicDelete<any>(this.getClassName(), 'deleteVolumeType', url)
   }
 
   async updateVolumeType(id, params, keysToDelete = []) {
-    const url = `${await this.getEndpoint()}/types/${id}`
+    const url = `/types/${id}`
     const { extra_specs: extraSpecs, ...rest } = params
-    const baseResponse = await this.client.basicPut<any>('Cinder', 'updateVolumeType', url, {
-      volume_type: rest,
-    })
+    const baseResponse = await this.client.basicPut<any>(
+      this.getClassName(),
+      'updateVolumeType',
+      url,
+      {
+        volume_type: rest,
+      },
+    )
     await this.client.basicPost<any>(
-      'Cinder',
+      this.getClassName(),
       'updateVolumeType/extra_specs',
       `${url}/extra_specs`,
       {
@@ -157,7 +230,7 @@ class Cinder extends ApiService {
     await Promise.all(
       keysToDelete.map(async (key) => {
         return this.client.basicDelete<any>(
-          'Cinder',
+          this.getClassName(),
           `updateVolumeType/extra_specs/${key}`,
           `${url}/extra_specs/${key}`,
         )
@@ -167,81 +240,90 @@ class Cinder extends ApiService {
   }
 
   async unsetVolumeTypeTag(id, tag) {
-    const url = `${await this.getEndpoint()}/types/${id}/extra_specs/${tag}`
-    await this.client.basicDelete<any>('Cinder', 'unsetVolumeTypeTag', url)
+    const url = `/types/${id}/extra_specs/${tag}`
+    await this.client.basicDelete<any>(this.getClassName(), 'unsetVolumeTypeTag', url)
   }
 
   async getSnapshots() {
-    const url = `${await this.getEndpoint()}/snapshots/detail`
-    const response = await this.client.basicGet<any>('Cinder', 'getSnapshots', url)
+    const url = `/snapshots/detail`
+    const response = await this.client.basicGet<any>(this.getClassName(), 'getSnapshots', url)
     return response.snapshots
   }
 
   async getAllSnapshots() {
-    const url = `${await this.getEndpoint()}/snapshots/detail?all_tenants=1`
-    const response = await this.client.basicGet<any>('Cinder', 'getAllSnapshots', url)
+    const url = `/snapshots/detail?all_tenants=1`
+    const response = await this.client.basicGet<any>(this.getClassName(), 'getAllSnapshots', url)
     return response.snapshots
   }
 
   async snapshotVolume(params) {
-    const url = `${await this.getEndpoint()}/snapshots`
-    const response = await this.client.basicPost<any>('Cinder', 'snapshotVolume', url, {
+    const url = `/snapshots`
+    const response = await this.client.basicPost<any>(this.getClassName(), 'snapshotVolume', url, {
       snapshot: params,
     })
     return response.snapshot
   }
 
   async deleteSnapshot(id) {
-    const url = `${await this.getEndpoint()}/snapshots/${id}`
-    await this.client.basicDelete<any>('Cinder', 'deleteSnapshot', url)
+    const url = `/snapshots/${id}`
+    await this.client.basicDelete<any>(this.getClassName(), 'deleteSnapshot', url)
   }
 
   async updateSnapshot(id, params) {
-    const url = `${await this.getEndpoint()}/snapshots/${id}`
-    const response = await this.client.basicPut<any>('Cinder', 'updateSnapshot', url, {
+    const url = `/snapshots/${id}`
+    const response = await this.client.basicPut<any>(this.getClassName(), 'updateSnapshot', url, {
       snapshot: params,
     })
     return response.snapshot
   }
 
   async updateSnapshotMetadata(id, params) {
-    const url = `${await this.getEndpoint()}/snapshots/${id}/metadata`
-    const response = await this.client.basicPut<any>('Cinder', 'updateSnapshotMetadata', url, {
-      metadata: params,
-    })
+    const url = `/snapshots/${id}/metadata`
+    const response = await this.client.basicPut<any>(
+      this.getClassName(),
+      'updateSnapshotMetadata',
+      url,
+      {
+        metadata: params,
+      },
+    )
     return response.metadata
   }
 
   async getDefaultQuotas() {
-    const url = `${await this.getEndpoint()}/os-quota-class-sets/defaults`
+    const url = `/os-quota-class-sets/defaults`
 
-    const quotas = await this.client.basicGet<any>('Cinder', 'getDefaultQuotas', url)
+    const quotas = await this.client.basicGet<any>(this.getClassName(), 'getDefaultQuotas', url)
     return quotas.quota_class_set
   }
 
   async getDefaultQuotasForRegion(region) {
     const urls = await this.getRegionUrls()
     const url = `${urls[region]}/os-quota-class-sets/defaults`
-    const quotas = await this.client.basicGet<any>('Cinder', 'getDefaultQuotasForRegion', url)
+    const quotas = await this.client.basicGet<any>(
+      this.getClassName(),
+      'getDefaultQuotasForRegion',
+      url,
+    )
     return quotas.quota_class_set
   }
 
   async getQuotas(projectId) {
-    const url = `${await this.getEndpoint()}/os-quota-sets/${projectId}?usage=true`
-    const quota = await this.client.basicGet<any>('Cinder', 'getQuotas', url)
+    const url = `/os-quota-sets/${projectId}?usage=true`
+    const quota = await this.client.basicGet<any>(this.getClassName(), 'getQuotas', url)
     return quota.quota_set
   }
 
   async getQuotasForRegion(projectId, region) {
     const urls = await this.getRegionUrls()
     const url = `${urls[region]}/os-quota-sets/${projectId}?usage=true`
-    const quota = await this.client.basicGet<any>('Cinder', 'getQuotasForRegion', url)
+    const quota = await this.client.basicGet<any>(this.getClassName(), 'getQuotasForRegion', url)
     return quota.quota_set
   }
 
   async setQuotas(params, projectId) {
-    const url = `${await this.getEndpoint()}/os-quota-sets/${projectId}`
-    const quotas = await this.client.basicPut<any>('Cinder', 'setQuotas', url, {
+    const url = `/os-quota-sets/${projectId}`
+    const quotas = await this.client.basicPut<any>(this.getClassName(), 'setQuotas', url, {
       quota_set: params,
     })
     return quotas.quota_set
@@ -250,7 +332,7 @@ class Cinder extends ApiService {
   async setQuotasForRegion(params, projectId, region) {
     const urls = await this.getRegionUrls()
     const url = `${urls[region]}/os-quota-sets/${projectId}`
-    const quotas = await this.client.basicPut<any>('Cinder', 'setQuotasForRegion', url, {
+    const quotas = await this.client.basicPut<any>(this.getClassName(), 'setQuotasForRegion', url, {
       quota_set: params,
     })
     return quotas.quota_set

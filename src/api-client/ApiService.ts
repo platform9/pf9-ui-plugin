@@ -15,7 +15,12 @@ abstract class ApiService {
   }
 
   async initialize() {
+    // reset the endpoint
+    this.apiEndpoint = ''
+
+    // cache the promise incase it is accessed before resolution
     this.endpointPromise = this.getEndpoint()
+
     this.apiEndpoint = await this.endpointPromise
     store.dispatch(
       clientActions.updateClient({
@@ -27,6 +32,7 @@ abstract class ApiService {
 
   async getApiEndpoint(): Promise<string> {
     if (this.apiEndpoint !== '') {
+      // we already have the endpoint dont need to
       return Promise.resolve(this.apiEndpoint)
     }
     return this.endpointPromise

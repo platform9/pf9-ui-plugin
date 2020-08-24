@@ -13,23 +13,27 @@ class Appbert extends ApiService {
 
   getClusterTags = async () => {
     // return this.client.basicGet(`${this.apiEndpoint}/clusters`)
-    const data = await this.client.basicGet<ClusterTag[]>(
-      'Appbert',
-      'getClusterTags',
-      `${await this.getEndpoint()}/clusters`,
-    )
-    // ApiCache.instance.cacheItem('Appbert', 'getClusterTags', data)
+    const data = await this.client.basicGet<ClusterTag[]>({
+      url: '/clusters',
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getClusterTags',
+      },
+    })
+    // ApiCache.instance.cacheItem(this.getClassName(), 'getClusterTags', data)
     return data
   }
 
   getPackages = async () => {
     // return this.client.basicGet(`${this.apiEndpoint}/packages`)
-    const data = await this.client.basicGet(
-      this.getClassName(),
-      'getPackages',
-      `${await this.getEndpoint()}/packages`,
-    )
-    // ApiCache.instance.cacheItem('Appbert', 'getPackages', data)
+    const data = await this.client.basicGet({
+      url: '/packages',
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getPackages',
+      },
+    })
+    // ApiCache.instance.cacheItem(this.getClassName(), 'getPackages', data)
     return data
   }
 
@@ -41,22 +45,26 @@ class Appbert extends ApiService {
   }
 
   addPkg = async (clusterUuid, pkgId) => {
-    const data = await this.client.basicPut(
-      'Appbert',
-      'addPkg',
-      `${await this.getEndpoint()}/clusters/${clusterUuid}/${pkgId}`,
-    )
-    // ApiCache.instance.cacheItem('Appbert', 'addPkg', data)
+    const data = await this.client.basicPut({
+      url: `/clusters/${clusterUuid}/${pkgId}`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'addPkg',
+      },
+    })
+    // ApiCache.instance.cacheItem(this.getClassName(), 'addPkg', data)
     return data
   }
 
   removePkg = async (clusterUuid, pkgId) => {
-    const data = await this.client.basicDelete(
-      'Appbert',
-      'addPkg',
-      `${await this.getEndpoint()}/clusters/${clusterUuid}/${pkgId}`,
-    )
-    // ApiCache.instance.cacheItem('Appbert', 'addremovePkgPkg', data)
+    const data = await this.client.basicDelete({
+      url: `/clusters/${clusterUuid}/${pkgId}`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'removePkg',
+      },
+    })
+    // ApiCache.instance.cacheItem(this.getClassName(), 'addremovePkgPkg', data)
     return data
   }
 }

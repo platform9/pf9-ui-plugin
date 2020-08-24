@@ -22,7 +22,7 @@ class Glance extends ApiService {
 
   async getImages() {
     const url = `${await this.imagesUrl()}?limit=1000`
-    const response = await this.client.basicGet<any>('Glance', 'getImages', url)
+    const response = await this.client.basicGet<any>(this.getClassName(), 'getImages', url)
     return response.images
   }
 
@@ -30,7 +30,7 @@ class Glance extends ApiService {
     const url = await this.imagesUrl()
     // TODO: support adding additional user properties
     try {
-      const response = await this.client.basicPost('Glance', 'createImage', url, params)
+      const response = await this.client.basicPost(this.getClassName(), 'createImage', url, params)
       return response
     } catch (err) {
       console.log(err)
@@ -39,12 +39,12 @@ class Glance extends ApiService {
 
   async deleteImage(id) {
     const url = `${await this.imagesUrl()}/${id}`
-    return this.client.basicDelete('Glance', 'deleteImage', url)
+    return this.client.basicDelete(this.getClassName(), 'deleteImage', url)
   }
 
   async getImageSchema() {
     const url = `${await this.v2()}/schemas/images`
-    const response = await this.client.basicGet<any>('Glance', 'getImageSchema', url)
+    const response = await this.client.basicGet<any>(this.getClassName(), 'getImageSchema', url)
     return response.properties.images
   }
 
@@ -54,7 +54,9 @@ class Glance extends ApiService {
       ...this.client.getAuthHeaders().headers,
       'Content-Type': 'application/openstack-images-v2.1-json-patch',
     }
-    const response = await this.client.rawPatch('Glance', 'updateImage', url, image, { headers })
+    const response = await this.client.rawPatch(this.getClassName(), 'updateImage', url, image, {
+      headers,
+    })
     return response.data
   }
 

@@ -48,13 +48,13 @@ class ResMgr extends ApiService {
 
   async getHosts() {
     const url = `${await this.getEndpoint()}/hosts`
-    const response = await this.client.basicGet<Host[]>('ResMgr', 'getHosts', url)
+    const response = await this.client.basicGet<Host[]>(this.getClassName(), 'getHosts', url)
     return response
   }
 
   async addRole(hostId, role, body) {
     return this.client.basicPut(
-      'ResMgr',
+      this.getClassName(),
       'addRole',
       `${await this.getEndpoint()}/hosts/${hostId}/roles/${role}`,
       body,
@@ -63,7 +63,7 @@ class ResMgr extends ApiService {
 
   async removeRole(hostId, role): Promise<void> {
     await this.client.basicDelete(
-      'ResMgr',
+      this.getClassName(),
       'removeRole',
       `${await this.getEndpoint()}/hosts/${hostId}/roles/${role}`,
     )
@@ -71,7 +71,7 @@ class ResMgr extends ApiService {
 
   async getRole(hostId, role) {
     return this.client.basicGet(
-      'ResMgr',
+      this.getClassName(),
       'getRole',
       `${await this.getEndpoint()}/hosts/${hostId}/roles/${role}`,
     )
@@ -79,12 +79,12 @@ class ResMgr extends ApiService {
 
   async unauthorizeHost(id) {
     const url = `${await this.getEndpoint()}/hosts/${id}`
-    return this.client.basicDelete('ResMgr', 'unauthorizeHost', url)
+    return this.client.basicDelete(this.getClassName(), 'unauthorizeHost', url)
   }
 
   async getService(service) {
     return this.client.basicGet(
-      'ResMgr',
+      this.getClassName(),
       'getService',
       `${await this.getEndpoint()}/services/${service}`,
     )
@@ -92,7 +92,7 @@ class ResMgr extends ApiService {
 
   async updateService(service, body) {
     return this.client.basicPut(
-      'ResMgr',
+      this.getClassName(),
       'updateService',
       `${await this.getEndpoint()}/services/${service}`,
       body,

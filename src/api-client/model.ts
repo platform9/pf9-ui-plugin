@@ -1,5 +1,37 @@
+import { AxiosRequestConfig } from 'axios'
+
 export interface CustomerMetadata {
   [key: string]: any
+}
+
+interface IRequestOptions {
+  clsName: string
+  mthdName: string
+}
+export interface IRawRequestGetParams {
+  url: string
+  endpoint?: string
+  config?: AxiosRequestConfig
+  options: IRequestOptions
+}
+export interface IRawRequestPostParams extends IRawRequestGetParams {
+  data: any
+}
+
+export interface IBasicRequestGetParams {
+  url: string
+  params?: AxiosRequestConfig['params']
+  endpoint?: string
+  config?: AxiosRequestConfig
+  options: IRequestOptions
+}
+
+export interface IBasicRequestPostParams {
+  url: string
+  body?: any
+  endpoint?: string
+  config?: AxiosRequestConfig
+  options: IRequestOptions
 }
 
 // import { AxiosResponse, AxiosRequestConfig } from 'axios'

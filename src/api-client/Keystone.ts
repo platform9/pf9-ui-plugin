@@ -83,11 +83,11 @@ class Keystone extends ApiService {
   }
 
   get v3() {
-    return `${this.client.options.keystoneEndpoint}/v3`
+    return `/v3`
   }
 
   get adminV3() {
-    return `${this.client.options.keystoneEndpoint}/v3`
+    return `/v3`
   }
 
   get catalogUrl() {
@@ -144,7 +144,7 @@ class Keystone extends ApiService {
 
   getProject = async (id) => {
     const data = await this.client.basicGet<any>(
-      'Keystone',
+      this.getClassName(),
       'getProject',
       `${this.projectsUrl}/${id}`,
     )
@@ -153,7 +153,7 @@ class Keystone extends ApiService {
 
   getProjectsAuth = async () => {
     const response = await this.client.rawGet<GetProjectsAuth>(
-      'Keystone',
+      this.getClassName(),
       'getProjectsAuth',
       this.projectsAuthUrl,
       this.client.getAuthHeaders(false),
@@ -163,7 +163,7 @@ class Keystone extends ApiService {
 
   getProjects = async (scoped = false) => {
     const response = await this.client.rawGet<any>(
-      'Keystone',
+      this.getClassName(),
       'getProjects',
       this.projectsUrl,
       this.client.getAuthHeaders(scoped),
@@ -173,7 +173,7 @@ class Keystone extends ApiService {
 
   getAllTenantsAllUsers = async () => {
     const data = await this.client.basicGet<GetAllTenantsAllUsers>(
-      'Keystone',
+      this.getClassName(),
       'getAllTenantsAllUsers',
       this.allTenantsAllUsersUrl,
     )
@@ -182,7 +182,7 @@ class Keystone extends ApiService {
 
   getTenantRoleAssignments = async (tenantId) => {
     const data = await this.client.basicGet<GetUserRoleAssignments>(
-      'Keystone',
+      this.getClassName(),
       'getTenantRoleAssignments',
       this.roleAssignments,
       {
@@ -195,7 +195,7 @@ class Keystone extends ApiService {
 
   getUserRoleAssignments = async (userId) => {
     const data = await this.client.basicGet<GetUserRoleAssignments>(
-      'Keystone',
+      this.getClassName(),
       'getUserRoleAssignments',
       this.roleAssignments,
       {
@@ -208,7 +208,7 @@ class Keystone extends ApiService {
 
   addUserRole = async ({ tenantId, userId, roleId }) => {
     await this.client.basicPut<string>(
-      'Keystone',
+      this.getClassName(),
       'addUserRole',
       pathJoin(this.projectsUrl, `${tenantId}/users/${userId}/roles/${roleId}`),
       null,
@@ -219,7 +219,7 @@ class Keystone extends ApiService {
   deleteUserRole = async ({ tenantId, userId, roleId }) => {
     try {
       await this.client.basicDelete<any>(
-        'Keystone',
+        this.getClassName(),
         'deleteUserRole',
         pathJoin(this.projectsUrl, `${tenantId}/users/${userId}/roles/${roleId}`),
       )
@@ -230,13 +230,13 @@ class Keystone extends ApiService {
   }
 
   getGroups = async () => {
-    const data = await this.client.basicGet<any>('Keystone', 'getGroups', this.groupsUrl)
+    const data = await this.client.basicGet<any>(this.getClassName(), 'getGroups', this.groupsUrl)
     return data.groups
   }
 
   getGroupMappings = async () => {
     const data = await this.client.basicGet<any>(
-      'Keystone',
+      this.getClassName(),
       'getGroupMappings',
       this.groupMappingsUrl,
     )
@@ -244,14 +244,18 @@ class Keystone extends ApiService {
   }
 
   getRoles = async () => {
-    const data = await this.client.basicGet<GetRoles>('Keystone', 'getRoles', this.rolesUrl)
+    const data = await this.client.basicGet<GetRoles>(
+      this.getClassName(),
+      'getRoles',
+      this.rolesUrl,
+    )
     return data.roles
   }
 
   createProject = async (params) => {
     const body = { project: params }
     const data = await this.client.basicPost<any>(
-      'Keystone',
+      this.getClassName(),
       'createProject',
       this.projectsUrl,
       body,
@@ -262,14 +266,19 @@ class Keystone extends ApiService {
   updateProject = async (id, params) => {
     const body = { project: params }
     const url = `${this.projectsUrl}/${id}`
-    const data = await this.client.basicPatch<UpdateProject>('Keystone', 'updateProject', url, body)
+    const data = await this.client.basicPatch<UpdateProject>(
+      this.getClassName(),
+      'updateProject',
+      url,
+      body,
+    )
     return data.project
   }
 
   deleteProject = async (projectId) => {
     try {
       await this.client.basicDelete<any>(
-        'Keystone',
+        this.getClassName(),
         'deleteProject',
         `${this.projectsUrl}/${projectId}`,
       )
@@ -283,7 +292,7 @@ class Keystone extends ApiService {
     const body = constructAuthFromToken(this.client.unscopedToken, projectId)
     try {
       const response = await this.client.rawPost<AuthToken>(
-        'Keystone',
+        this.getClassName(),
         'changeProjectScope',
         this.tokensUrl,
         body,
@@ -319,7 +328,7 @@ class Keystone extends ApiService {
     const body = constructAuthFromCredentials(username, password)
     try {
       const response = await this.client.rawPost<AuthToken>(
-        'Keystone',
+        this.getClassName(),
         'authenticate',
         this.tokensUrl,
         body,
@@ -345,7 +354,7 @@ class Keystone extends ApiService {
     }
     try {
       const response = await this.client.rawPost<AuthToken>(
-        'Keystone',
+        this.getClassName(),
         'getUnscopedTokenWithToken',
         this.tokensUrl,
         body,
@@ -364,7 +373,7 @@ class Keystone extends ApiService {
     const body = constructAuthFromToken(currUnscopedToken)
     try {
       const response = await this.client.rawPost<AuthToken>(
-        'Keystone',
+        this.getClassName(),
         'renewToken',
         this.tokensUrl,
         body,
@@ -384,7 +393,7 @@ class Keystone extends ApiService {
     const body = constructAuthFromToken(this.client.unscopedToken, projectId)
     try {
       const response = await this.client.rawPost<AuthToken>(
-        'Keystone',
+        this.getClassName(),
         'renewScopedToken',
         this.tokensUrl,
         body,
@@ -403,14 +412,14 @@ class Keystone extends ApiService {
     try {
       const linksUrl = await this.getServiceEndpoint('regioninfo', 'public')
       const { links } = await this.client.basicGet<GetFeatureLinks>(
-        'Keystone',
+        this.getClassName(),
         'getFeatures',
         linksUrl,
       )
       const featuresUrl = links.features
       const timestamp = new Date().getTime()
       const features = await this.client.basicGet<GetFeatures>(
-        'Keystone',
+        this.getClassName(),
         'getFeatures/featuresUrl',
         `${featuresUrl}?tag=${timestamp}`,
       )
@@ -424,7 +433,11 @@ class Keystone extends ApiService {
   getDownloadLinks = async () => {
     try {
       const linksUrl = await this.getServiceEndpoint('regioninfo', 'internal')
-      const { links } = await this.client.basicGet<any>('Keystone', 'getDownloadLinks', linksUrl)
+      const { links } = await this.client.basicGet<any>(
+        this.getClassName(),
+        'getDownloadLinks',
+        linksUrl,
+      )
       return links
     } catch (err) {
       console.error(err)
@@ -437,13 +450,13 @@ class Keystone extends ApiService {
     try {
       const linksUrl = await this.getServiceEndpoint('regioninfo', 'public')
       const { links } = await this.client.basicGet<GetFeatureLinks>(
-        'Keystone',
+        this.getClassName(),
         'resetCookie/links',
         linksUrl,
       )
       const token2cookieUrl = links.token2cookie
       const authHeaders = this.client.getAuthHeaders()
-      await this.client.rawGet<string>('Keystone', 'resetCookie', token2cookieUrl, {
+      await this.client.rawGet<string>(this.getClassName(), 'resetCookie', token2cookieUrl, {
         ...authHeaders,
         withCredentials: true,
       })
@@ -453,7 +466,11 @@ class Keystone extends ApiService {
   }
 
   getRegions = async () => {
-    const data = await this.client.basicGet<GetRegions>('Keystone', 'getRegions', this.regionsUrl)
+    const data = await this.client.basicGet<GetRegions>(
+      this.getClassName(),
+      'getRegions',
+      this.regionsUrl,
+    )
     return data.regions
   }
 
@@ -464,7 +481,7 @@ class Keystone extends ApiService {
 
   getServiceCatalog = async () => {
     const data = await this.client.basicGet<GetServiceCatalog>(
-      'Keystone',
+      this.getClassName(),
       'getServiceCatalog',
       this.catalogUrl,
     )
@@ -473,7 +490,11 @@ class Keystone extends ApiService {
   }
 
   getEndpoints = async () => {
-    const data = await this.client.basicGet<any>('Keystone', 'getEndpoints', this.endpointsUrl)
+    const data = await this.client.basicGet<any>(
+      this.getClassName(),
+      'getEndpoints',
+      this.endpointsUrl,
+    )
     this.client.endpoints = data.endpoints
     return data.endpoints
   }
@@ -504,7 +525,7 @@ class Keystone extends ApiService {
 
   getCredentials = async () => {
     const data = await this.client.basicGet<GetCredentials>(
-      'Keystone',
+      this.getClassName(),
       'getCredentials',
       this.credentialsUrl,
     )
@@ -512,38 +533,65 @@ class Keystone extends ApiService {
   }
 
   getUser = async (id) => {
-    const data = await this.client.basicGet<any>('Keystone', 'getUser', `${this.usersUrl}/${id}`)
+    const data = await this.client.basicGet<any>(
+      this.getClassName(),
+      'getUser',
+      `${this.usersUrl}/${id}`,
+    )
     return data.user
   }
 
   getUsers = async () => {
-    const data = await this.client.basicGet<GetUsers>('Keystone', 'getUsers', this.usersUrl)
+    const data = await this.client.basicGet<GetUsers>(
+      this.getClassName(),
+      'getUsers',
+      this.usersUrl,
+    )
     return data.users
   }
 
   createUser = async (params) => {
     const body = { user: params }
-    const data = await this.client.basicPost<any>('Keystone', 'createUser', this.usersUrl, body)
+    const data = await this.client.basicPost<any>(
+      this.getClassName(),
+      'createUser',
+      this.usersUrl,
+      body,
+    )
     return data.user
   }
 
   updateUser = async (id, params) => {
     const body = { user: params }
     const url = `${this.usersUrl}/${id}`
-    const data = await this.client.basicPatch<UpdateUser>('Keystone', 'updateUser', url, body)
+    const data = await this.client.basicPatch<UpdateUser>(
+      this.getClassName(),
+      'updateUser',
+      url,
+      body,
+    )
     return data.user
   }
 
   updateUserPassword = async (id, params) => {
     const body = { user: params }
     const url = `${this.usersUrl}/${id}/password`
-    const data = await this.client.basicPost<any>('Keystone', 'updateUserPassword', url, body)
+    const data = await this.client.basicPost<any>(
+      this.getClassName(),
+      'updateUserPassword',
+      url,
+      body,
+    )
     return data.user
   }
 
   deleteUser = async (userId) => {
     try {
-      await this.client.basicDelete<any>('Keystone', 'deleteUser', `${this.usersUrl}/${userId}`)
+      await this.client.basicDelete<any>(
+        this.getClassName(),
+        'deleteUser',
+        `${this.usersUrl}/${userId}`,
+      )
       return userId
     } catch (err) {
       throw new Error('Unable to delete non-existant user')

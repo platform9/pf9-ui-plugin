@@ -19,53 +19,75 @@ class Clemency extends ApiService {
   }
 
   get baseUrl(): string {
-    return `${this.getEndpoint()}/clemency`
+    return `/clemency`
   }
 
   requestNewPassword = async (username: string): Promise<any> => {
     const body = { username }
-    return this.client.basicPost('Clemency', 'requestNewPassword', `${this.baseUrl}/request`, body)
+    return this.client.basicPost({
+      url: `${this.baseUrl}/request`,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'requestNewPassword',
+      },
+    })
   }
 
   verifyPasswordReset = async (secret: string): Promise<any> => {
-    return this.client.basicGet(
-      'Clemency',
-      'verifyPasswordReset',
-      `${this.baseUrl}/reset/password/${secret}`,
-    )
+    return this.client.basicGet({
+      url: `${this.baseUrl}/reset/password/${secret}`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'verifyPasswordReset',
+      },
+    })
   }
 
   resetPassword: IResetPassword = async ({ secret, username, password }) => {
     const body = { username, password }
-    return this.client.basicPost(
-      'Clemency',
-      'resetPassword',
-      `${this.baseUrl}/reset/password/${secret}`,
+    return this.client.basicPost({
+      url: `${this.baseUrl}/reset/password/${secret}`,
       body,
-    )
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'resetPassword',
+      },
+    })
   }
 
   createUser = async (body): Promise<any> => {
-    const response = await this.client.basicPost<any>(
-      'Clemency',
-      'createUser',
-      `${this.baseUrl}/createacct`,
+    const response = await this.client.basicPost<any>({
+      url: `${this.baseUrl}/createacct`,
       body,
-    )
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createUser',
+      },
+    })
     return response.user
   }
 
   // this url format is strange but is a requirement for the API
   verifyActivateLink = async (username, otp): Promise<any> => {
-    return this.client.basicGet(
-      'Clemency',
-      'verifyActivateLink',
-      `${this.baseUrl}/activate/username=${username}&otp=${otp}`,
-    )
+    return this.client.basicGet({
+      url: `${this.baseUrl}/activate/username=${username}&otp=${otp}`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'verifyActivateLink',
+      },
+    })
   }
 
   updateUser = async (body): Promise<any> => {
-    return this.client.basicPost('Clemency', 'updateUser', `${this.baseUrl}/updateuser`, body)
+    return this.client.basicPost({
+      url: `${this.baseUrl}/updateuser`,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'updateUser',
+      },
+    })
   }
 }
 
