@@ -7,6 +7,7 @@ abstract class ApiService {
   private readonly clsName: string
   protected abstract getClassName(): string
   protected abstract getEndpoint(): Promise<string>
+  private endpointPromise: Promise<string>
 
   constructor(protected client: ApiClient) {
     this.clsName = this.getClassName()
@@ -14,14 +15,21 @@ abstract class ApiService {
   }
 
   async initialize() {
-    const endpoint = await this.getEndpoint()
+    this.endpointPromise = this.getEndpoint()
+    this.apiEndpoint = await this.endpointPromise
     store.dispatch(
       clientActions.updateClient({
         clientKey: this.clsName,
-        value: endpoint,
+        value: this.apiEndpoint,
       }),
     )
-    this.apiEndpoint = endpoint
+  }
+
+  async getApiEndpoint(): Promise<string> {
+    if (this.apiEndpoint !== '') {
+      return Promise.resolve(this.apiEndpoint)
+    }
+    return this.endpointPromise
   }
 }
 
