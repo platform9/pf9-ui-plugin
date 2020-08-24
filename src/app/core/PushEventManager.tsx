@@ -74,6 +74,9 @@ class PushEventManager {
 
   public readonly connect = () => {
     const wsUrl = getWebSocketUrl()
+    if (!wsUrl) {
+      return this
+    }
     this.socket = new WebSocket(wsUrl)
     this.socket.addEventListener('open', this.handleOpen)
     this.socket.addEventListener('close', this.handleClose)

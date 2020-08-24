@@ -23,15 +23,13 @@ const App = () => {
           loading={<Progress renderLoadingImage={false} loading message={'Loading app...'} />}
           persistor={persistor}
         >
-          <HotKeysProvider>
-            <ThemeManager>
-              <ToastProvider>
-                <BannerProvider>
-                  <AppContainer />
-                </BannerProvider>
-              </ToastProvider>
-            </ThemeManager>
-          </HotKeysProvider>
+          <ThemeManager>
+            <ToastProvider>
+              <BannerProvider>
+                <AppContainer />
+              </BannerProvider>
+            </ToastProvider>
+          </ThemeManager>
         </PersistGate>
       </Provider>
     </Router>
