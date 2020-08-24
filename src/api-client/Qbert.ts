@@ -139,6 +139,12 @@ class Qbert extends ApiService {
     return normalizeCluster(baseUrl)(cluster)
   }
 
+  getClusterCsiDrivers = async (clusterUuid) => {
+    return this.client.basicGet(
+      `${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/api/v1/namespaces/platform9-system/services/pf9-sentry/proxy/v1/storage`
+      )
+  }
+
   createCluster = async (params) => {
     // Note: This API response only returns new `uuid` in the response.
     // You might want to do a GET afterwards if you need any of the cluster information.
