@@ -10,13 +10,16 @@ export interface IApiData {
 type IResetPassword = ({ secret, username, password }: IApiData) => Promise<any>
 
 class Clemency extends ApiService {
-  clsName = 'clemency'
-  async endpoint() {
+  protected getClassName() {
+    return 'clemency'
+  }
+
+  protected async getEndpoint() {
     return Promise.resolve(config.apiHost)
   }
 
   get baseUrl(): string {
-    return `${this.endpoint()}/clemency`
+    return `${this.getEndpoint()}/clemency`
   }
 
   requestNewPassword = async (username: string): Promise<any> => {

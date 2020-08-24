@@ -3,10 +3,13 @@ import ApiService from 'api-client/ApiService'
 import { ClusterTag } from './appbert.model'
 
 class Appbert extends ApiService {
-  clsName = 'appbert'
-  endpoint = async () => {
-    const tmp = await this.client.keystone.getServiceEndpoint('appbert', 'admin')
-    return tmp
+  protected getClassName() {
+    return 'appbert'
+  }
+
+  protected async getEndpoint() {
+    console.log(this.client)
+    return this.client.keystone.getServiceEndpoint('appbert', 'admin')
   }
 
   getClusterTags = async () => {
@@ -14,7 +17,7 @@ class Appbert extends ApiService {
     const data = await this.client.basicGet<ClusterTag[]>(
       'Appbert',
       'getClusterTags',
-      `${await this.endpoint()}/clusters`,
+      `${await this.getEndpoint()}/clusters`,
     )
     // ApiCache.instance.cacheItem('Appbert', 'getClusterTags', data)
     return data
@@ -25,7 +28,7 @@ class Appbert extends ApiService {
     const data = await this.client.basicGet(
       'Appbert',
       'getPackages',
-      `${await this.endpoint()}/packages`,
+      `${await this.getEndpoint()}/packages`,
     )
     // ApiCache.instance.cacheItem('Appbert', 'getPackages', data)
     return data
@@ -42,7 +45,7 @@ class Appbert extends ApiService {
     const data = await this.client.basicPut(
       'Appbert',
       'addPkg',
-      `${await this.endpoint()}/clusters/${clusterUuid}/${pkgId}`,
+      `${await this.getEndpoint()}/clusters/${clusterUuid}/${pkgId}`,
     )
     // ApiCache.instance.cacheItem('Appbert', 'addPkg', data)
     return data
@@ -52,7 +55,7 @@ class Appbert extends ApiService {
     const data = await this.client.basicDelete(
       'Appbert',
       'addPkg',
-      `${await this.endpoint()}/clusters/${clusterUuid}/${pkgId}`,
+      `${await this.getEndpoint()}/clusters/${clusterUuid}/${pkgId}`,
     )
     // ApiCache.instance.cacheItem('Appbert', 'addremovePkgPkg', data)
     return data

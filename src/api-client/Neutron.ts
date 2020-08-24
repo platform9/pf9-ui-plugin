@@ -1,12 +1,15 @@
 import ApiService from 'api-client/ApiService'
 
 class Neutron extends ApiService {
-  clsName = 'neutron'
-  async endpoint() {
+  protected getClassName() {
+    return 'neutron'
+  }
+
+  protected async getEndpoint() {
     return this.client.keystone.getServiceEndpoint('neutron', 'admin')
   }
 
-  networkUrl = async () => `${await this.endpoint()}/v2.0/networks`
+  networkUrl = async () => `${await this.getEndpoint()}/v2.0/networks`
 
   async setRegionUrls() {
     const services = (await this.client.keystone.getServiceCatalog()).find(
@@ -59,13 +62,13 @@ class Neutron extends ApiService {
   }
 
   async getSubnets() {
-    const url = `${await this.endpoint()}/v2.0/subnets`
+    const url = `${await this.getEndpoint()}/v2.0/subnets`
     const response = await this.client.basicGet<any>('Neutron', 'getSubnets', url)
     return response.subnets
   }
 
   async createSubnet(params) {
-    const url = `${await this.endpoint()}/v2.0/subnets`
+    const url = `${await this.getEndpoint()}/v2.0/subnets`
     const response = await this.client.basicPost<any>('Neutron', 'createSubnet', url, {
       subnet: params,
     })
@@ -73,12 +76,12 @@ class Neutron extends ApiService {
   }
 
   async deleteSubnet(id) {
-    const url = `${await this.endpoint()}/v2.0/subnets/${id}`
+    const url = `${await this.getEndpoint()}/v2.0/subnets/${id}`
     await this.client.basicDelete<any>('Neutron', 'deleteSubnet', url)
   }
 
   async updateSubnet(id, params) {
-    const url = `${await this.endpoint()}/v2.0/subnets/${id}`
+    const url = `${await this.getEndpoint()}/v2.0/subnets/${id}`
     const response = await this.client.basicPut<any>('Neutron', 'updateSubnet', url, {
       subnet: params,
     })
@@ -86,13 +89,13 @@ class Neutron extends ApiService {
   }
 
   async getPorts() {
-    const url = `${await this.endpoint()}/v2.0/ports`
+    const url = `${await this.getEndpoint()}/v2.0/ports`
     const response = await this.client.basicGet<any>('Neutron', 'getPorts', url)
     return response.ports
   }
 
   async createPort(params) {
-    const url = `${await this.endpoint()}/v2.0/ports`
+    const url = `${await this.getEndpoint()}/v2.0/ports`
     const response = await this.client.basicPost<any>('Neutron', 'createPort', url, {
       port: params,
     })
@@ -100,24 +103,24 @@ class Neutron extends ApiService {
   }
 
   async deletePort(id) {
-    const url = `${await this.endpoint()}/v2.0/ports/${id}`
+    const url = `${await this.getEndpoint()}/v2.0/ports/${id}`
     await this.client.basicDelete<any>('Neutron', 'deletePort', url)
   }
 
   async updatePort(id, params) {
-    const url = `${await this.endpoint()}/v2.0/ports/${id}`
+    const url = `${await this.getEndpoint()}/v2.0/ports/${id}`
     const response = await this.client.basicPut<any>('Neutron', 'updatePort', url, { port: params })
     return response.port
   }
 
   async getFloatingIps() {
-    const url = `${await this.endpoint()}/v2.0/floatingips`
+    const url = `${await this.getEndpoint()}/v2.0/floatingips`
     const response = await this.client.basicGet<any>('Neutron', 'getFloatingIps', url)
     return response.floatingips
   }
 
   async createFloatingIp(params) {
-    const url = `${await this.endpoint()}/v2.0/floatingips`
+    const url = `${await this.getEndpoint()}/v2.0/floatingips`
     const response = await this.client.basicPost<any>('Neutron', 'createFloatingIp', url, {
       floatingip: params,
     })
@@ -125,7 +128,7 @@ class Neutron extends ApiService {
   }
 
   async detachFloatingIp(id) {
-    const url = `${await this.endpoint()}/v2.0/floatingips/${id}`
+    const url = `${await this.getEndpoint()}/v2.0/floatingips/${id}`
     const response = await this.client.basicPut<any>('Neutron', 'detachFloatingIp', url, {
       floatingip: { port_id: null },
     })
@@ -133,24 +136,24 @@ class Neutron extends ApiService {
   }
 
   async deleteFloatingIp(id) {
-    const url = `${await this.endpoint()}/v2.0/floatingips/${id}`
+    const url = `${await this.getEndpoint()}/v2.0/floatingips/${id}`
     await this.client.basicDelete<any>('Neutron', 'deleteFloatingIp', url)
   }
 
   async networkIpAvailability(id) {
-    const url = `${await this.endpoint()}/v2.0/network-ip-availabilities/${id}`
+    const url = `${await this.getEndpoint()}/v2.0/network-ip-availabilities/${id}`
     const response = await this.client.basicGet<any>('Neutron', 'networkIpAvailability', url)
     return response.network_ip_availability
   }
 
   async getSecurityGroups() {
-    const url = `${await this.endpoint()}/v2.0/security-groups`
+    const url = `${await this.getEndpoint()}/v2.0/security-groups`
     const response = await this.client.basicGet<any>('Neutron', 'getSecurityGroups', url)
     return response.security_groups
   }
 
   async createSecurityGroup(params) {
-    const url = `${await this.endpoint()}/v2.0/security-groups`
+    const url = `${await this.getEndpoint()}/v2.0/security-groups`
     const response = await this.client.basicPost<any>('Neutron', 'createSecurityGroup', url, {
       security_group: params,
     })
@@ -158,7 +161,7 @@ class Neutron extends ApiService {
   }
 
   async updateSecurityGroup(id, params) {
-    const url = `${await this.endpoint()}/v2.0/security-groups/${id}`
+    const url = `${await this.getEndpoint()}/v2.0/security-groups/${id}`
     const response = await this.client.basicPut<any>('Neutron', 'updateSecurityGroup', url, {
       security_group: params,
     })
@@ -166,18 +169,18 @@ class Neutron extends ApiService {
   }
 
   async deleteSecurityGroup(id) {
-    const url = `${await this.endpoint()}/v2.0/security-groups/${id}`
+    const url = `${await this.getEndpoint()}/v2.0/security-groups/${id}`
     await this.client.basicDelete<any>('Neutron', 'deleteSecurityGroup', url)
   }
 
   async getSecurityGroupRules() {
-    const url = `${await this.endpoint()}/v2.0/security-group-rules`
+    const url = `${await this.getEndpoint()}/v2.0/security-group-rules`
     const response = await this.client.basicGet<any>('Neutron', 'getSecurityGroupRules', url)
     return response.security_group_rules
   }
 
   async createSecurityGroupRule(params) {
-    const url = `${await this.endpoint()}/v2.0/security-group-rules`
+    const url = `${await this.getEndpoint()}/v2.0/security-group-rules`
     const response = await this.client.basicPost<any>('Neutron', 'createSecurityGroupRule', url, {
       security_group_rule: params,
     })
@@ -185,18 +188,18 @@ class Neutron extends ApiService {
   }
 
   async deleteSecurityGroupRule(id) {
-    const url = `${await this.endpoint()}/v2.0/security-group-rules/${id}`
+    const url = `${await this.getEndpoint()}/v2.0/security-group-rules/${id}`
     await this.client.basicDelete<any>('Neutron', 'deleteSecurityGroupRule', url)
   }
 
   async getRouters() {
-    const url = `${await this.endpoint()}/v2.0/routers`
+    const url = `${await this.getEndpoint()}/v2.0/routers`
     const response = await this.client.basicGet<any>('Neutron', 'getRouters', url)
     return response.routers
   }
 
   async createRouter(params) {
-    const url = `${await this.endpoint()}/v2.0/routers`
+    const url = `${await this.getEndpoint()}/v2.0/routers`
     const response = await this.client.basicPost<any>('Neutron', 'createRouter', url, {
       router: params,
     })
@@ -204,7 +207,7 @@ class Neutron extends ApiService {
   }
 
   async updateRouter(id, params) {
-    const url = `${await this.endpoint()}/v2.0/routers/${id}`
+    const url = `${await this.getEndpoint()}/v2.0/routers/${id}`
     const response = await this.client.basicPut<any>('Neutron', 'updateRouter', url, {
       router: params,
     })
@@ -212,30 +215,30 @@ class Neutron extends ApiService {
   }
 
   async deleteRouter(id) {
-    const url = `${await this.endpoint()}/v2.0/routers/${id}`
+    const url = `${await this.getEndpoint()}/v2.0/routers/${id}`
     await this.client.basicDelete<any>('Neutron', 'deleteRouter', url)
   }
 
   async addInterface(id, params) {
-    const url = `${await this.endpoint()}/v2.0/routers/${id}/add_router_interface`
+    const url = `${await this.getEndpoint()}/v2.0/routers/${id}/add_router_interface`
     const response = await this.client.basicPut<any>('Neutron', 'addInterface', url, params)
     return response.data
   }
 
   async removeInterface(routerId, params) {
-    const url = `${await this.endpoint()}/v2.0/routers/${routerId}/remove_router_interface`
+    const url = `${await this.getEndpoint()}/v2.0/routers/${routerId}/remove_router_interface`
     const response = await this.client.basicPut<any>('Neutron', 'removeInterface', url, params)
     return response.data
   }
 
   async getAllQuotas() {
-    const url = `${await this.endpoint()}/v2.0/quotas`
+    const url = `${await this.getEndpoint()}/v2.0/quotas`
     const response = await this.client.basicGet<any>('Neutron', 'getAllQuotas', url)
     return response.quotas
   }
 
   async getProjectQuota(id) {
-    const url = `${await this.endpoint()}/v2.0/quotas/${id}`
+    const url = `${await this.getEndpoint()}/v2.0/quotas/${id}`
     const response = await this.client.basicGet<any>('Neutron', 'getProjectQuota', url)
     return response.quota
   }
@@ -256,7 +259,7 @@ class Neutron extends ApiService {
   }
 
   async setQuotas(projectId, params) {
-    const url = `${await this.endpoint()}/v2.0/quotas/${projectId}`
+    const url = `${await this.getEndpoint()}/v2.0/quotas/${projectId}`
     const response = await this.client.basicPut<any>('Neutron', 'setQuotas', url, { quota: params })
     return response.quota
   }

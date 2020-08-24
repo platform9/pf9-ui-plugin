@@ -54,10 +54,13 @@ const normalizeCluster = <T>(baseUrl) => (cluster): T & INormalizedCluster => ({
 
 /* eslint-disable camelcase */
 class Qbert extends ApiService {
-  clsName = 'qbert'
+  protected getClassName() {
+    return 'qbert'
+  }
+
   cachedEndpoint = ''
 
-  endpoint = async () => {
+  protected async getEndpoint() {
     const endpoint = await this.client.keystone.getServiceEndpoint('qbert', 'admin')
     const mappedEndpoint = endpoint.replace(/v(1|2|3)$/, `v3/${this.client.activeProjectId}`)
 
@@ -73,7 +76,7 @@ class Qbert extends ApiService {
     return this.client.keystone.getServiceEndpoint('monocular', 'public')
   }
 
-  baseUrl = async () => `${await this.endpoint()}`
+  baseUrl = async () => `${await this.getEndpoint()}`
 
   clusterBaseUrl = async (clusterId) =>
     `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1`

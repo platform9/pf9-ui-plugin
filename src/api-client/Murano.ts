@@ -1,12 +1,15 @@
 import ApiService from 'api-client/ApiService'
 
 class Murano extends ApiService {
-  clsName = 'murano'
-  async endpoint() {
+  protected getClassName() {
+    return 'murano'
+  }
+
+  protected async getEndpoint() {
     return this.client.keystone.getServiceEndpoint('murano', 'internal')
   }
 
-  v1 = async () => `${await this.endpoint()}/v1`
+  v1 = async () => `${await this.getEndpoint()}/v1`
 
   applicationUrl = async () => `${await this.v1()}/catalog/packages`
 

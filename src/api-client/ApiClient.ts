@@ -93,20 +93,6 @@ class ApiClient {
     if (!options.keystoneEndpoint) {
       throw new Error('keystoneEndpoint required')
     }
-    this.appbert = new Appbert(this)
-    this.cinder = new Cinder(this)
-    this.glance = new Glance(this)
-    this.keystone = new Keystone(this)
-    this.neutron = new Neutron(this)
-    this.nova = new Nova(this)
-    this.murano = new Murano(this)
-    this.resmgr = new ResMgr(this)
-    this.qbert = new Qbert(this)
-    this.clemency = new Clemency(this)
-
-    this.catalog = {}
-    this.activeRegion = null
-
     const getResponseError: any = (cond as any)([
       [hasPathStr('response.data.error'), pathStr('response.data.error')],
       [hasPathStr('response.data.message'), pathStr('response.data.message')],
@@ -119,6 +105,21 @@ class ApiClient {
       (response) => response,
       async (error) => Promise.reject(getResponseError(error)),
     )
+
+    // Keystone is used by the rest of the services so it must be initialized first
+    this.keystone = new Keystone(this)
+    this.cinder = new Cinder(this)
+    this.glance = new Glance(this)
+    this.appbert = new Appbert(this)
+    this.neutron = new Neutron(this)
+    this.nova = new Nova(this)
+    this.murano = new Murano(this)
+    this.resmgr = new ResMgr(this)
+    this.qbert = new Qbert(this)
+    this.clemency = new Clemency(this)
+
+    this.catalog = {}
+    this.activeRegion = null
 
     // ApiClient.refreshApiEndpoints(this)
   }

@@ -9,15 +9,18 @@ const renameKey = (srcKey, destKey) => (obj) =>
   )
 
 class Nova extends ApiService {
-  clsName = 'nova'
-  async endpoint() {
+  protected getClassName() {
+    return 'nova'
+  }
+
+  protected async getEndpoint() {
     return this.client.keystone.getServiceEndpoint('nova', 'internal')
   }
 
-  flavorsUrl = async () => `${await this.endpoint()}/flavors`
-  instancesUrl = async () => `${await this.endpoint()}/servers`
-  hypervisorsUrl = async () => `${await this.endpoint()}/os-hypervisors`
-  sshKeysUrl = async () => `${await this.endpoint()}/os-keypairs`
+  flavorsUrl = async () => `${await this.getEndpoint()}/flavors`
+  instancesUrl = async () => `${await this.getEndpoint()}/servers`
+  hypervisorsUrl = async () => `${await this.getEndpoint()}/os-hypervisors`
+  sshKeysUrl = async () => `${await this.getEndpoint()}/os-keypairs`
 
   getFlavors = async () => {
     const url = `${await this.flavorsUrl()}/detail?is_public=no`

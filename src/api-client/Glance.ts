@@ -8,12 +8,15 @@ const replaceOp = op('replace')
 */
 
 class Glance extends ApiService {
-  clsName = 'glance'
-  async endpoint() {
+  protected getClassName() {
+    return 'glance'
+  }
+
+  protected async getEndpoint() {
     return this.client.keystone.getServiceEndpoint('glance', 'admin')
   }
 
-  v2 = async () => `${await this.endpoint()}/v2`
+  v2 = async () => `${await this.getEndpoint()}/v2`
 
   imagesUrl = async () => `${await this.v2()}/images`
 

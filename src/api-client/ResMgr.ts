@@ -37,14 +37,17 @@ export const localizeRoles = (roles: string[] = []) => {
 }
 
 class ResMgr extends ApiService {
-  clsName = 'resmgr'
-  async endpoint() {
+  protected getClassName() {
+    return 'resmgr'
+  }
+
+  protected async getEndpoint() {
     const endpoint = await this.client.keystone.getServiceEndpoint('resmgr', 'internal')
     return `${endpoint}/v1`
   }
 
   async getHosts() {
-    const url = `${await this.endpoint()}/hosts`
+    const url = `${await this.getEndpoint()}/hosts`
     const response = await this.client.basicGet<Host[]>('ResMgr', 'getHosts', url)
     return response
   }
@@ -53,7 +56,7 @@ class ResMgr extends ApiService {
     return this.client.basicPut(
       'ResMgr',
       'addRole',
-      `${await this.endpoint()}/hosts/${hostId}/roles/${role}`,
+      `${await this.getEndpoint()}/hosts/${hostId}/roles/${role}`,
       body,
     )
   }
@@ -62,7 +65,7 @@ class ResMgr extends ApiService {
     await this.client.basicDelete(
       'ResMgr',
       'removeRole',
-      `${await this.endpoint()}/hosts/${hostId}/roles/${role}`,
+      `${await this.getEndpoint()}/hosts/${hostId}/roles/${role}`,
     )
   }
 
@@ -70,12 +73,12 @@ class ResMgr extends ApiService {
     return this.client.basicGet(
       'ResMgr',
       'getRole',
-      `${await this.endpoint()}/hosts/${hostId}/roles/${role}`,
+      `${await this.getEndpoint()}/hosts/${hostId}/roles/${role}`,
     )
   }
 
   async unauthorizeHost(id) {
-    const url = `${await this.endpoint()}/hosts/${id}`
+    const url = `${await this.getEndpoint()}/hosts/${id}`
     return this.client.basicDelete('ResMgr', 'unauthorizeHost', url)
   }
 
@@ -83,7 +86,7 @@ class ResMgr extends ApiService {
     return this.client.basicGet(
       'ResMgr',
       'getService',
-      `${await this.endpoint()}/services/${service}`,
+      `${await this.getEndpoint()}/services/${service}`,
     )
   }
 
@@ -91,7 +94,7 @@ class ResMgr extends ApiService {
     return this.client.basicPut(
       'ResMgr',
       'updateService',
-      `${await this.endpoint()}/services/${service}`,
+      `${await this.getEndpoint()}/services/${service}`,
       body,
     )
   }

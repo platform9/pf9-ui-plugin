@@ -2,12 +2,15 @@
 import ApiService from 'api-client/ApiService'
 
 class Cinder extends ApiService {
-  clsName = 'cinder'
-  endpoint = async () => {
+  protected getClassName() {
+    return 'cinder'
+  }
+
+  protected async getEndpoint() {
     return this.client.keystone.getServiceEndpoint('cinderv3', 'admin')
   }
 
-  volumesUrl = async () => `${await this.endpoint()}/volumes`
+  volumesUrl = async () => `${await this.getEndpoint()}/volumes`
 
   async getRegionUrls() {
     const services = (await this.client.keystone.getServiceCatalog()).find(
@@ -115,30 +118,30 @@ class Cinder extends ApiService {
   }
 
   async getVolumeTypes() {
-    const url = `${await this.endpoint()}/types`
+    const url = `${await this.getEndpoint()}/types`
     const response = await this.client.basicGet<any>('Cinder', 'getVolumeTypes', url)
     return response.volume_types
   }
 
   async getVolumeType(name) {
-    const url = `${await this.endpoint()}/types`
+    const url = `${await this.getEndpoint()}/types`
     const response = await this.client.basicGet<any>('Cinder', 'getVolumeType', url)
     return response.volume_types.find((x) => x.name === name)
   }
 
   async createVolumeType(params) {
-    const url = `${await this.endpoint()}/types`
+    const url = `${await this.getEndpoint()}/types`
     await this.client.basicPost<any>('Cinder', 'createVolumeType', url, { volume_type: params })
     return this.getVolumeType(params.name)
   }
 
   async deleteVolumeType(id) {
-    const url = `${await this.endpoint()}/types/${id}`
+    const url = `${await this.getEndpoint()}/types/${id}`
     await this.client.basicDelete<any>('Cinder', 'deleteVolumeType', url)
   }
 
   async updateVolumeType(id, params, keysToDelete = []) {
-    const url = `${await this.endpoint()}/types/${id}`
+    const url = `${await this.getEndpoint()}/types/${id}`
     const { extra_specs: extraSpecs, ...rest } = params
     const baseResponse = await this.client.basicPut<any>('Cinder', 'updateVolumeType', url, {
       volume_type: rest,
@@ -164,24 +167,24 @@ class Cinder extends ApiService {
   }
 
   async unsetVolumeTypeTag(id, tag) {
-    const url = `${await this.endpoint()}/types/${id}/extra_specs/${tag}`
+    const url = `${await this.getEndpoint()}/types/${id}/extra_specs/${tag}`
     await this.client.basicDelete<any>('Cinder', 'unsetVolumeTypeTag', url)
   }
 
   async getSnapshots() {
-    const url = `${await this.endpoint()}/snapshots/detail`
+    const url = `${await this.getEndpoint()}/snapshots/detail`
     const response = await this.client.basicGet<any>('Cinder', 'getSnapshots', url)
     return response.snapshots
   }
 
   async getAllSnapshots() {
-    const url = `${await this.endpoint()}/snapshots/detail?all_tenants=1`
+    const url = `${await this.getEndpoint()}/snapshots/detail?all_tenants=1`
     const response = await this.client.basicGet<any>('Cinder', 'getAllSnapshots', url)
     return response.snapshots
   }
 
   async snapshotVolume(params) {
-    const url = `${await this.endpoint()}/snapshots`
+    const url = `${await this.getEndpoint()}/snapshots`
     const response = await this.client.basicPost<any>('Cinder', 'snapshotVolume', url, {
       snapshot: params,
     })
@@ -189,12 +192,12 @@ class Cinder extends ApiService {
   }
 
   async deleteSnapshot(id) {
-    const url = `${await this.endpoint()}/snapshots/${id}`
+    const url = `${await this.getEndpoint()}/snapshots/${id}`
     await this.client.basicDelete<any>('Cinder', 'deleteSnapshot', url)
   }
 
   async updateSnapshot(id, params) {
-    const url = `${await this.endpoint()}/snapshots/${id}`
+    const url = `${await this.getEndpoint()}/snapshots/${id}`
     const response = await this.client.basicPut<any>('Cinder', 'updateSnapshot', url, {
       snapshot: params,
     })
@@ -202,7 +205,7 @@ class Cinder extends ApiService {
   }
 
   async updateSnapshotMetadata(id, params) {
-    const url = `${await this.endpoint()}/snapshots/${id}/metadata`
+    const url = `${await this.getEndpoint()}/snapshots/${id}/metadata`
     const response = await this.client.basicPut<any>('Cinder', 'updateSnapshotMetadata', url, {
       metadata: params,
     })
@@ -210,7 +213,7 @@ class Cinder extends ApiService {
   }
 
   async getDefaultQuotas() {
-    const url = `${await this.endpoint()}/os-quota-class-sets/defaults`
+    const url = `${await this.getEndpoint()}/os-quota-class-sets/defaults`
 
     const quotas = await this.client.basicGet<any>('Cinder', 'getDefaultQuotas', url)
     return quotas.quota_class_set
@@ -224,7 +227,7 @@ class Cinder extends ApiService {
   }
 
   async getQuotas(projectId) {
-    const url = `${await this.endpoint()}/os-quota-sets/${projectId}?usage=true`
+    const url = `${await this.getEndpoint()}/os-quota-sets/${projectId}?usage=true`
     const quota = await this.client.basicGet<any>('Cinder', 'getQuotas', url)
     return quota.quota_set
   }
@@ -237,7 +240,7 @@ class Cinder extends ApiService {
   }
 
   async setQuotas(params, projectId) {
-    const url = `${await this.endpoint()}/os-quota-sets/${projectId}`
+    const url = `${await this.getEndpoint()}/os-quota-sets/${projectId}`
     const quotas = await this.client.basicPut<any>('Cinder', 'setQuotas', url, {
       quota_set: params,
     })
