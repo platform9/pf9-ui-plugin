@@ -90,6 +90,7 @@ const duplicatedSlashesRegexp = new RegExp('(^\\/|[^:\\/]+\\/)\\/+', 'g')
 export const pathJoin = (...pathParts) =>
   []
     .concat(...pathParts) // Flatten
+    .filter((segment) => !!segment) // Remove empty parts
     .join('/')
     .replace(duplicatedSlashesRegexp, '$1')
 

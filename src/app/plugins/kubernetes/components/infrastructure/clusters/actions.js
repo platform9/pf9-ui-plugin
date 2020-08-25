@@ -1,23 +1,29 @@
 import ApiClient from 'api-client/ApiClient'
-import createCRUDActions from 'core/helpers/createCRUDActions'
 import { allKey } from 'app/constants'
-import { updateWith, adjustWith } from 'utils/fp'
-import { pathOr, pick, propEq, mergeLeft } from 'ramda'
+import createCRUDActions from 'core/helpers/createCRUDActions'
 import {
-  createBareOSCluster,
-  createAzureCluster,
   createAwsCluster,
+  createAzureCluster,
+  createBareOSCluster,
   getEtcdBackupPayload,
-  getProgressPercent,
   getKubernetesVersion,
+  getProgressPercent,
 } from 'k8s/components/infrastructure/clusters/helpers'
-import { mapAsync } from 'utils/async'
-import { clusterTagActions } from 'k8s/components/prometheus/actions'
 import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
-import { clustersSelector, makeParamsClustersSelector } from './selectors'
 import { ActionDataKeys } from 'k8s/DataKeys'
+import { mergeLeft, pathOr, pick, propEq } from 'ramda'
+import { mapAsync } from 'utils/async'
+import { adjustWith, updateWith } from 'utils/fp'
+import { clustersSelector, makeParamsClustersSelector } from './selectors'
 
-const { qbert } = ApiClient.getInstance()
+const { appbert, qbert } = ApiClient.getInstance()
+
+export const clusterTagActions = createCRUDActions(ActionDataKeys.ClusterTags, {
+  listFn: async () => {
+    return appbert.getClusterTags()
+  },
+  uniqueIdentifier: 'uuid',
+})
 
 export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
   listFn: async () => {

@@ -19,7 +19,7 @@ import { hasPathStr, pathStr } from 'utils/fp'
 import { prop, has, cond, T, identity, when } from 'ramda'
 import { isPlainObject, pathJoin } from 'utils/misc'
 // import { IApiClient } from './model'
-import ApiCache from './cache-client'
+// import ApiCache from './cache-client'
 import {
   IRawRequestGetParams,
   IRawRequestPostParams,
@@ -150,7 +150,12 @@ class ApiClient {
   }
 
   getAuthHeaders = (scoped = true) => {
+    console.log(scoped, this.scopedToken, this.unscopedToken)
     const token = scoped ? this.scopedToken : this.unscopedToken
+    if (!token) {
+      console.warn('Auth token not initialized')
+      return {}
+    }
     // It's not necessary to send both headers but it's easier since we don't
     // need to pass around the url and have conditional logic.
     // Both APIs will ignore any headers they don't understand.
@@ -167,11 +172,11 @@ class ApiClient {
     config = undefined,
     options: { clsName, mthdName },
   }: IRawRequestGetParams) => {
-    if (!endpoint) {
+    if (endpoint === undefined) {
       endpoint = await this.apiServices[clsName].getApiEndpoint()
     }
     const response = await this.axiosInstance.get<T>(pathJoin(endpoint, url), config)
-    ApiCache.instance.cacheItem(clsName, mthdName, response.data)
+    // ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return response
   }
 
@@ -182,11 +187,11 @@ class ApiClient {
     config = undefined,
     options: { clsName, mthdName },
   }: IRawRequestPostParams) => {
-    if (!endpoint) {
+    if (endpoint === undefined) {
       endpoint = await this.apiServices[clsName].getApiEndpoint()
     }
     const response = await this.axiosInstance.post<T>(pathJoin(endpoint, url), data, config)
-    ApiCache.instance.cacheItem(clsName, mthdName, response.data)
+    // ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return response
   }
 
@@ -197,11 +202,11 @@ class ApiClient {
     config = undefined,
     options: { clsName, mthdName },
   }: IRawRequestPostParams) => {
-    if (!endpoint) {
+    if (endpoint === undefined) {
       endpoint = await this.apiServices[clsName].getApiEndpoint()
     }
     const response = await this.axiosInstance.put<T>(pathJoin(endpoint, url), data, config)
-    ApiCache.instance.cacheItem(clsName, mthdName, response.data)
+    // ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return response
   }
 
@@ -212,11 +217,11 @@ class ApiClient {
     config = undefined,
     options: { clsName, mthdName },
   }: IRawRequestPostParams) => {
-    if (!endpoint) {
+    if (endpoint === undefined) {
       endpoint = await this.apiServices[clsName].getApiEndpoint()
     }
     const response = await this.axiosInstance.patch<T>(pathJoin(endpoint, url), data, config)
-    ApiCache.instance.cacheItem(clsName, mthdName, response.data)
+    // ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return response
   }
 
@@ -226,11 +231,11 @@ class ApiClient {
     config = undefined,
     options: { clsName, mthdName },
   }: IRawRequestGetParams) => {
-    if (!endpoint) {
+    if (endpoint === undefined) {
       endpoint = await this.apiServices[clsName].getApiEndpoint()
     }
     const response = await this.axiosInstance.delete<T>(pathJoin(endpoint, url), config)
-    ApiCache.instance.cacheItem(clsName, mthdName, response.data)
+    // ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return response
   }
 
@@ -240,14 +245,14 @@ class ApiClient {
     params = undefined,
     options: { clsName, mthdName },
   }: IBasicRequestGetParams) => {
-    if (!endpoint) {
+    if (endpoint === undefined) {
       endpoint = await this.apiServices[clsName].getApiEndpoint()
     }
     const response = await this.axiosInstance.get<T>(pathJoin(endpoint, url), {
       params,
       ...this.getAuthHeaders(),
     })
-    ApiCache.instance.cacheItem(clsName, mthdName, response.data)
+    // ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return normalizeResponse<T>(response)
   }
 
@@ -257,7 +262,7 @@ class ApiClient {
     body = undefined,
     options: { clsName, mthdName },
   }: IBasicRequestPostParams) => {
-    if (!endpoint) {
+    if (endpoint === undefined) {
       endpoint = await this.apiServices[clsName].getApiEndpoint()
     }
     const response = await this.axiosInstance.post<T>(
@@ -265,7 +270,7 @@ class ApiClient {
       body,
       this.getAuthHeaders(),
     )
-    ApiCache.instance.cacheItem(clsName, mthdName, response.data)
+    // ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return normalizeResponse<T>(response)
   }
 
@@ -275,7 +280,7 @@ class ApiClient {
     body = undefined,
     options: { clsName, mthdName },
   }: IBasicRequestPostParams) => {
-    if (!endpoint) {
+    if (endpoint === undefined) {
       endpoint = await this.apiServices[clsName].getApiEndpoint()
     }
     const response = await this.axiosInstance.patch<T>(
@@ -283,7 +288,7 @@ class ApiClient {
       body,
       this.getAuthHeaders(),
     )
-    ApiCache.instance.cacheItem(clsName, mthdName, response.data)
+    // ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return normalizeResponse<T>(response)
   }
 
@@ -293,7 +298,7 @@ class ApiClient {
     body = undefined,
     options: { clsName, mthdName },
   }: IBasicRequestPostParams) => {
-    if (!endpoint) {
+    if (endpoint === undefined) {
       endpoint = await this.apiServices[clsName].getApiEndpoint()
     }
     const response = await this.axiosInstance.put<T>(
@@ -301,7 +306,7 @@ class ApiClient {
       body,
       this.getAuthHeaders(),
     )
-    ApiCache.instance.cacheItem(clsName, mthdName, response.data)
+    // ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return normalizeResponse<T>(response)
   }
 
@@ -310,14 +315,14 @@ class ApiClient {
     endpoint = undefined,
     options: { clsName, mthdName },
   }: IBasicRequestGetParams) => {
-    if (!endpoint) {
+    if (endpoint === undefined) {
       endpoint = await this.apiServices[clsName].getApiEndpoint()
     }
     const response = await this.axiosInstance.delete<T>(
       pathJoin(endpoint, url),
       this.getAuthHeaders(),
     )
-    ApiCache.instance.cacheItem(clsName, mthdName, response.data)
+    // ApiCache.instance.cacheItem(clsName, mthdName, response.data)
     return normalizeResponse<T>(response)
   }
 }

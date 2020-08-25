@@ -1,7 +1,7 @@
 import ApiClient from 'api-client/ApiClient'
 import { notFoundErr } from 'app/constants'
 import createCRUDActions from 'core/helpers/createCRUDActions'
-import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
+import { clusterTagActions } from 'k8s/components/infrastructure/clusters/actions'
 import {
   prometheusAlertManagersSelector,
   prometheusRuleSelector,
@@ -14,7 +14,7 @@ import { find, flatten, last, pathEq, pipe, pluck, prop, propEq } from 'ramda'
 import { someAsync } from 'utils/async'
 import { objSwitchCase } from 'utils/fp'
 
-const { appbert, qbert } = ApiClient.getInstance()
+const { qbert } = ApiClient.getInstance()
 const uniqueIdentifier = 'metadata.uid'
 const monitoringTask = 'pf9-mon'
 const getName = (id, items) => pipe(find(propEq('uid', id)), prop('name'))(items)
@@ -29,17 +29,6 @@ const hasPrometheusEnabled = (cluster) => {
 
   return installedMonitoringTask.status === 'Complete'
 }
-export const clusterTagActions = createCRUDActions(ActionDataKeys.ClusterTags, {
-  listFn: async () => {
-    const [clusterTags] = await Promise.all([
-      appbert.getClusterTags(),
-      // Make sure the derived data gets loaded as well
-      clusterActions.list(),
-    ])
-    return clusterTags
-  },
-  uniqueIdentifier: 'uuid',
-})
 
 /* Prometheus Instances */
 
