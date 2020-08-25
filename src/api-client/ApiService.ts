@@ -7,27 +7,24 @@ abstract class ApiService {
   private readonly clsName: string
   public abstract getClassName(): string
   protected abstract getEndpoint(): Promise<string>
-  private endpointPromise: Promise<string>
 
   constructor(protected client: ApiClient) {
     this.clsName = this.getClassName()
-    this.initialize()
   }
 
   async initialize() {
     // reset the endpoint
     this.apiEndpoint = ''
 
-    // cache the promise incase it is accessed before resolution
-    this.endpointPromise = this.getEndpoint()
-
-    this.apiEndpoint = await this.endpointPromise
+    this.apiEndpoint = await this.getEndpoint()
     store.dispatch(
-      clientActions.updateClient({
+      clientActions.setEndpoint({
         clientKey: this.clsName,
         value: this.apiEndpoint,
       }),
     )
+
+    return this.apiEndpoint
   }
 
   async getApiEndpoint(): Promise<string> {
@@ -35,7 +32,7 @@ abstract class ApiService {
       // we already have the endpoint dont need to
       return Promise.resolve(this.apiEndpoint)
     }
-    return this.endpointPromise
+    return this.initialize()
   }
 }
 

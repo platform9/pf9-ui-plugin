@@ -28,8 +28,6 @@ import {
 } from './model'
 import ApiService from 'api-client/ApiService'
 
-let _instance: ApiClient = null
-
 interface ApiClientOptions {
   [key: string]: any
   keystoneEndpoint: string
@@ -38,7 +36,6 @@ interface ApiClientOptions {
 class ApiClient {
   public options: ApiClientOptions
 
-  public instance: ApiClient
   public appbert: Appbert
   public cinder: Cinder
   public glance: Glance
@@ -58,21 +55,22 @@ class ApiClient {
   endpoints = null
 
   private readonly axiosInstance: AxiosInstance
+  private static instance: ApiClient
 
   static init(options: ApiClientOptions) {
-    if (!_instance) {
-      _instance = new ApiClient(options)
+    if (!ApiClient.instance) {
+      ApiClient.instance = new ApiClient(options)
     }
-    return _instance
+    return ApiClient.instance
   }
 
   static getInstance() {
-    if (!_instance) {
+    if (!ApiClient.instance) {
       throw new Error(
         'ApiClient instance has not been initialized, please call ApiClient.init to instantiate it',
       )
     }
-    return _instance
+    return ApiClient.instance
   }
 
   static hydrate(state) {

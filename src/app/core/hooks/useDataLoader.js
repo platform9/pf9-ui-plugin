@@ -77,7 +77,7 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
         dispatch(cacheActions.setLoading(false))
       }
     },
-    [loaderFn, memoizedParams, data],
+    [loaderFn, memoizedParams],
   )
 
   // Load the data on component mount and every time the params

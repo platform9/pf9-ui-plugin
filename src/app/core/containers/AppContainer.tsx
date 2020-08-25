@@ -19,7 +19,7 @@ import { sessionStoreKey, sessionActions, SessionState } from 'core/session/sess
 import { cacheActions } from 'core/caching/cacheReducers'
 import { notificationActions } from 'core/notifications/notificationReducers'
 import { prop, propEq, head } from 'ramda'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Redirect, Route, Switch } from 'react-router'
 import useReactRouter from 'use-react-router'
@@ -107,7 +107,57 @@ const AppContainer = () => {
   const session = useSelector(selectSessionState)
   const [, updatePrefs, getUserPrefs] = useScopedPreferences()
   const dispatch = useDispatch()
+  const validateSession = useCallback(async () => {
+    // Bypass the session check if we are accessing a whitelisted url
+    if (isWhitelistedUrl(pathname) || hash.includes(resetPasswordThroughEmailUrl)) {
+      return setSessionChecked(true)
+    }
 
+    // Validate and "refresh" the existing session
+    const {
+      issuedAt,
+      username = session.username,
+      unscopedToken,
+      expiresAt,
+    } = await restoreSession(pathname, session)
+
+    if (unscopedToken) {
+      const timeDiff = moment(expiresAt).diff(issuedAt)
+      const localExpiresAt = moment()
+        .add(timeDiff)
+        .format()
+
+      const { currentTenant, currentRegion } = getUserPrefs(username)
+      const tenants = await loadUserTenants()
+      if (isNilOrEmpty(tenants)) {
+        throw new Error('No tenants found, please contact support')
+      }
+      const activeTenant = tenants.find(propEq('name', currentTenant || 'service')) || head(tenants)
+      if (!currentTenant && activeTenant) {
+        updatePrefs({ currentTenant: activeTenant.id })
+      }
+      if (currentRegion) {
+        setActiveRegion(currentRegion)
+      }
+      const userDetails = await getUserDetails(activeTenant)
+      // Order matters
+      setSessionChecked(true)
+      dispatch(
+        sessionActions.updateSession({
+          username,
+          unscopedToken,
+          expiresAt: localExpiresAt,
+          userDetails,
+        }),
+      )
+    } else {
+      // Order matters
+      setSessionChecked(true)
+      dispatch(sessionActions.destroySession())
+      dispatch(cacheActions.clearCache())
+      dispatch(notificationActions.clearNotifications())
+    }
+  }, [pathname])
   useEffect(() => {
     const unlisten = history.listen((location) => {
       trackPage(`${location.pathname}${location.hash}`)
@@ -116,58 +166,6 @@ const AppContainer = () => {
     // This is to send page event for the first page the user lands on
     trackPage(`${pathname}${hash}`)
 
-    const validateSession = async () => {
-      // Bypass the session check if we are accessing a whitelisted url
-      if (isWhitelistedUrl(pathname) || hash.includes(resetPasswordThroughEmailUrl)) {
-        return setSessionChecked(true)
-      }
-
-      // Validate and "refresh" the existing session
-      const {
-        issuedAt,
-        username = session.username,
-        unscopedToken,
-        expiresAt,
-      } = await restoreSession(pathname, session)
-
-      if (unscopedToken) {
-        const timeDiff = moment(expiresAt).diff(issuedAt)
-        const localExpiresAt = moment()
-          .add(timeDiff)
-          .format()
-
-        const { currentTenant, currentRegion } = getUserPrefs(username)
-        const tenants = await loadUserTenants()
-        if (isNilOrEmpty(tenants)) {
-          throw new Error('No tenants found, please contact support')
-        }
-        const activeTenant =
-          tenants.find(propEq('name', currentTenant || 'service')) || head(tenants)
-        if (!currentTenant && activeTenant) {
-          updatePrefs({ currentTenant: activeTenant.id })
-        }
-        if (currentRegion) {
-          setActiveRegion(currentRegion)
-        }
-        const userDetails = await getUserDetails(activeTenant)
-        // Order matters
-        setSessionChecked(true)
-        dispatch(
-          sessionActions.updateSession({
-            username,
-            unscopedToken,
-            expiresAt: localExpiresAt,
-            userDetails,
-          }),
-        )
-      } else {
-        // Order matters
-        setSessionChecked(true)
-        dispatch(sessionActions.destroySession())
-        dispatch(cacheActions.clearCache())
-        dispatch(notificationActions.clearNotifications())
-      }
-    }
     validateSession()
 
     // TODO: Need to fix this code after synching up with backend.
@@ -193,7 +191,7 @@ const AppContainer = () => {
         <Route path={forgotPasswordUrl} component={ForgotPasswordPage} />
         <Route path={activateUserUrl} component={ActivateUserPage} />
         <Route path={loginUrl}>
-          <LoginPage onAuthSuccess={() => setSessionChecked(true)} />
+          <LoginPage onAuthSuccess={() => validateSession()} />
         </Route>
         <Route>
           {sessionChecked ? (
