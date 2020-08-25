@@ -196,144 +196,225 @@ class Cinder extends ApiService {
   }
 
   async createVolumeType(params) {
-    const url = `/types`
-    await this.client.basicPost<any>(this.getClassName(), 'createVolumeType', url, {
-      volume_type: params,
+    await this.client.basicPost<any>({
+      url: `/types`,
+      body: {
+        volume_type: params,
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createVolumeType',
+      },
     })
     return this.getVolumeType(params.name)
   }
 
   async deleteVolumeType(id) {
-    const url = `/types/${id}`
-    await this.client.basicDelete<any>(this.getClassName(), 'deleteVolumeType', url)
+    await this.client.basicDelete<any>({
+      url: `/types/${id}`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteVolumeType',
+      },
+    })
   }
 
   async updateVolumeType(id, params, keysToDelete = []) {
-    const url = `/types/${id}`
     const { extra_specs: extraSpecs, ...rest } = params
-    const baseResponse = await this.client.basicPut<any>(
-      this.getClassName(),
-      'updateVolumeType',
-      url,
-      {
+    const baseResponse = await this.client.basicPut<any>({
+      url: `/types/${id}`,
+      body: {
         volume_type: rest,
       },
-    )
-    await this.client.basicPost<any>(
-      this.getClassName(),
-      'updateVolumeType/extra_specs',
-      `${url}/extra_specs`,
-      {
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'updateVolumeType',
+      },
+    })
+    await this.client.basicPost<any>({
+      url: `/types/${id}/extra_specs`,
+      body: {
         extra_specs: extraSpecs,
       },
-    )
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'updateVolumeType/extra_specs',
+      },
+    })
     await Promise.all(
       keysToDelete.map(async (key) => {
-        return this.client.basicDelete<any>(
-          this.getClassName(),
-          `updateVolumeType/extra_specs/${key}`,
-          `${url}/extra_specs/${key}`,
-        )
+        return this.client.basicDelete<any>({
+          url: `/types/${id}/extra_specs/${key}`,
+          options: {
+            clsName: this.getClassName(),
+            mthdName: `updateVolumeType/delete/${key}`,
+          },
+        })
       }),
     )
     return baseResponse
   }
 
   async unsetVolumeTypeTag(id, tag) {
-    const url = `/types/${id}/extra_specs/${tag}`
-    await this.client.basicDelete<any>(this.getClassName(), 'unsetVolumeTypeTag', url)
+    await this.client.basicDelete<any>({
+      url: `/types/${id}/extra_specs/${tag}`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: `unsetVolumeTypeTag`,
+      },
+    })
   }
 
   async getSnapshots() {
-    const url = `/snapshots/detail`
-    const response = await this.client.basicGet<any>(this.getClassName(), 'getSnapshots', url)
+    const response = await this.client.basicGet<any>({
+      url: `/snapshots/detail`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: `getSnapshots`,
+      },
+    })
     return response.snapshots
   }
 
   async getAllSnapshots() {
-    const url = `/snapshots/detail?all_tenants=1`
-    const response = await this.client.basicGet<any>(this.getClassName(), 'getAllSnapshots', url)
+    const response = await this.client.basicGet<any>({
+      url: `/snapshots/detail?all_tenants=1`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: `getAllSnapshots`,
+      },
+    })
     return response.snapshots
   }
 
   async snapshotVolume(params) {
-    const url = `/snapshots`
-    const response = await this.client.basicPost<any>(this.getClassName(), 'snapshotVolume', url, {
-      snapshot: params,
+    const response = await this.client.basicPost<any>({
+      url: `/snapshots`,
+      body: {
+        snapshot: params,
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: `snapshotVolume`,
+      },
     })
     return response.snapshot
   }
 
   async deleteSnapshot(id) {
-    const url = `/snapshots/${id}`
-    await this.client.basicDelete<any>(this.getClassName(), 'deleteSnapshot', url)
+    await this.client.basicDelete<any>({
+      url: `/snapshots/${id}`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: `deleteSnapshot`,
+      },
+    })
   }
 
   async updateSnapshot(id, params) {
-    const url = `/snapshots/${id}`
-    const response = await this.client.basicPut<any>(this.getClassName(), 'updateSnapshot', url, {
-      snapshot: params,
+    const response = await this.client.basicPut<any>({
+      url: `/snapshots/${id}`,
+      body: {
+        snapshot: params,
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: `updateSnapshot`,
+      },
     })
     return response.snapshot
   }
 
   async updateSnapshotMetadata(id, params) {
-    const url = `/snapshots/${id}/metadata`
-    const response = await this.client.basicPut<any>(
-      this.getClassName(),
-      'updateSnapshotMetadata',
-      url,
-      {
+    const response = await this.client.basicPut<any>({
+      url: `/snapshots/${id}/metadata`,
+      body: {
         metadata: params,
       },
-    )
+      options: {
+        clsName: this.getClassName(),
+        mthdName: `updateSnapshotMetadata`,
+      },
+    })
     return response.metadata
   }
 
   async getDefaultQuotas() {
-    const url = `/os-quota-class-sets/defaults`
+    const quotas = await this.client.basicGet<any>({
+      url: `/os-quota-class-sets/defaults`,
 
-    const quotas = await this.client.basicGet<any>(this.getClassName(), 'getDefaultQuotas', url)
+      options: {
+        clsName: this.getClassName(),
+        mthdName: `getDefaultQuotas`,
+      },
+    })
     return quotas.quota_class_set
   }
 
   async getDefaultQuotasForRegion(region) {
     const urls = await this.getRegionUrls()
-    const url = `${urls[region]}/os-quota-class-sets/defaults`
-    const quotas = await this.client.basicGet<any>(
-      this.getClassName(),
-      'getDefaultQuotasForRegion',
-      url,
-    )
+    const quotas = await this.client.basicGet<any>({
+      endpoint: urls[region],
+      url: `/os-quota-class-sets/defaults`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: `getDefaultQuotasForRegion`,
+      },
+    })
     return quotas.quota_class_set
   }
 
   async getQuotas(projectId) {
-    const url = `/os-quota-sets/${projectId}?usage=true`
-    const quota = await this.client.basicGet<any>(this.getClassName(), 'getQuotas', url)
+    const quota = await this.client.basicGet<any>({
+      endpoint: `/os-quota-sets/${projectId}?usage=true`,
+      url: `/os-quota-class-sets/defaults`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: `getQuotas`,
+      },
+    })
     return quota.quota_set
   }
 
   async getQuotasForRegion(projectId, region) {
     const urls = await this.getRegionUrls()
-    const url = `${urls[region]}/os-quota-sets/${projectId}?usage=true`
-    const quota = await this.client.basicGet<any>(this.getClassName(), 'getQuotasForRegion', url)
+    const quota = await this.client.basicGet<any>({
+      endpoint: urls[region],
+      url: `/os-quota-sets/${projectId}?usage=true`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: `getQuotasForRegion`,
+      },
+    })
     return quota.quota_set
   }
 
   async setQuotas(params, projectId) {
-    const url = `/os-quota-sets/${projectId}`
-    const quotas = await this.client.basicPut<any>(this.getClassName(), 'setQuotas', url, {
-      quota_set: params,
+    const quotas = await this.client.basicPut<any>({
+      url: `/os-quota-sets/${projectId}`,
+      body: {
+        quota_set: params,
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: `setQuotas`,
+      },
     })
     return quotas.quota_set
   }
 
   async setQuotasForRegion(params, projectId, region) {
     const urls = await this.getRegionUrls()
-    const url = `${urls[region]}/os-quota-sets/${projectId}`
-    const quotas = await this.client.basicPut<any>(this.getClassName(), 'setQuotasForRegion', url, {
-      quota_set: params,
+    const quotas = await this.client.basicPut<any>({
+      endpoint: urls[region],
+      url: `/os-quota-sets/${projectId}`,
+      body: {
+        quota_set: params,
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: `setQuotasForRegion`,
+      },
     })
     return quotas.quota_set
   }

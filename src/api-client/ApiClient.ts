@@ -85,10 +85,10 @@ class ApiClient {
   }
 
   static refreshApiEndpoints(instance = ApiClient.getInstance()) {
-    instance.appbert.initialize()
+    instance.keystone.initialize()
     instance.cinder.initialize()
     instance.glance.initialize()
-    instance.keystone.initialize()
+    instance.appbert.initialize()
     instance.neutron.initialize()
     instance.nova.initialize()
     instance.murano.initialize()

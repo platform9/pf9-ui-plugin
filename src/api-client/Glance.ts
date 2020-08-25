@@ -16,21 +16,32 @@ class Glance extends ApiService {
     return this.client.keystone.getServiceEndpoint('glance', 'admin')
   }
 
-  v2 = async () => `${await this.getEndpoint()}/v2`
+  v2 = () => `/v2`
 
-  imagesUrl = async () => `${await this.v2()}/images`
+  imagesUrl = () => `${this.v2()}/images`
 
   async getImages() {
-    const url = `${await this.imagesUrl()}?limit=1000`
-    const response = await this.client.basicGet<any>(this.getClassName(), 'getImages', url)
+    const response = await this.client.basicGet<any>({
+      url: `${this.imagesUrl()}?limit=1000`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getImages',
+      },
+    })
     return response.images
   }
 
   async createImage(params) {
-    const url = await this.imagesUrl()
     // TODO: support adding additional user properties
     try {
-      const response = await this.client.basicPost(this.getClassName(), 'createImage', url, params)
+      const response = await this.client.basicPost({
+        url: this.imagesUrl(),
+        body: params,
+        options: {
+          clsName: this.getClassName(),
+          mthdName: 'createImage',
+        },
+      })
       return response
     } catch (err) {
       console.log(err)
@@ -38,24 +49,44 @@ class Glance extends ApiService {
   }
 
   async deleteImage(id) {
-    const url = `${await this.imagesUrl()}/${id}`
-    return this.client.basicDelete(this.getClassName(), 'deleteImage', url)
+    const url = `${this.imagesUrl()}/${id}`
+    return this.client.basicDelete({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteImage',
+      },
+    })
   }
 
   async getImageSchema() {
-    const url = `${await this.v2()}/schemas/images`
-    const response = await this.client.basicGet<any>(this.getClassName(), 'getImageSchema', url)
+    const url = `${this.v2()}/schemas/images`
+    const response = await this.client.basicGet<any>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getImageSchema',
+      },
+    })
     return response.properties.images
   }
 
   async updateImage(image, imageId) {
-    const url = `${await this.imagesUrl()}/${imageId}`
+    const url = `${this.imagesUrl()}/${imageId}`
     const headers = {
       ...this.client.getAuthHeaders().headers,
       'Content-Type': 'application/openstack-images-v2.1-json-patch',
     }
-    const response = await this.client.rawPatch(this.getClassName(), 'updateImage', url, image, {
-      headers,
+    const response = await this.client.rawPatch({
+      url,
+      data: image,
+      config: {
+        headers,
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'updateImage',
+      },
     })
     return response.data
   }

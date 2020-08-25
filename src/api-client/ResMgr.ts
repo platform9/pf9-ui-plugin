@@ -47,56 +47,83 @@ class ResMgr extends ApiService {
   }
 
   async getHosts() {
-    const url = `${await this.getEndpoint()}/hosts`
-    const response = await this.client.basicGet<Host[]>(this.getClassName(), 'getHosts', url)
+    const url = `/hosts`
+    const response = await this.client.basicGet<Host[]>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getHosts',
+      },
+    })
     return response
   }
 
   async addRole(hostId, role, body) {
-    return this.client.basicPut(
-      this.getClassName(),
-      'addRole',
-      `${await this.getEndpoint()}/hosts/${hostId}/roles/${role}`,
+    const url = `/hosts/${hostId}/roles/${role}`
+    return this.client.basicPut({
+      url,
       body,
-    )
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'addRole',
+      },
+    })
   }
 
   async removeRole(hostId, role): Promise<void> {
-    await this.client.basicDelete(
-      this.getClassName(),
-      'removeRole',
-      `${await this.getEndpoint()}/hosts/${hostId}/roles/${role}`,
-    )
+    const url = `/hosts/${hostId}/roles/${role}`
+    await this.client.basicDelete({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'removeRole',
+      },
+    })
   }
 
   async getRole(hostId, role) {
-    return this.client.basicGet(
-      this.getClassName(),
-      'getRole',
-      `${await this.getEndpoint()}/hosts/${hostId}/roles/${role}`,
-    )
+    const url = `/hosts/${hostId}/roles/${role}`
+    return this.client.basicGet({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getRole',
+      },
+    })
   }
 
   async unauthorizeHost(id) {
-    const url = `${await this.getEndpoint()}/hosts/${id}`
-    return this.client.basicDelete(this.getClassName(), 'unauthorizeHost', url)
+    const url = `/hosts/${id}`
+    return this.client.basicDelete({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'unauthorizeHost',
+      },
+    })
   }
 
   async getService(service) {
-    return this.client.basicGet(
-      this.getClassName(),
-      'getService',
-      `${await this.getEndpoint()}/services/${service}`,
-    )
+    const url = `/services/${service}`
+    return this.client.basicGet({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getService',
+      },
+    })
   }
 
   async updateService(service, body) {
-    return this.client.basicPut(
-      this.getClassName(),
-      'updateService',
-      `${await this.getEndpoint()}/services/${service}`,
+    const url = `/services/${service}`
+    return this.client.basicPut({
+      url,
       body,
-    )
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'updateService',
+      },
+    })
   }
 }
 
