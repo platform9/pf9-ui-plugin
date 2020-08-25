@@ -3,13 +3,17 @@ import ExpansionPanel from 'core/components/expansionPanel/ExpansionPanel'
 import OnboardWizard from 'k8s/components/onboarding/OnboardWizard'
 import NextButton from 'core/components/buttons/NextButton'
 import useReactRouter from 'use-react-router'
-import { onboardingPodSetup } from 'app/constants'
+import { onboardingPodSetup, allKey } from 'app/constants'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { podActions } from '../pods/actions'
 import { Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
 import { routes } from 'core/utils/routes'
+import PollingData from 'core/components/PollingData'
+import { IUseDataLoader, IPod } from '../infrastructure/nodes/model'
+
+const oneSecond = 1000
 
 const useStyles = makeStyles<Theme>((theme) => ({
   container: {
@@ -35,7 +39,6 @@ const PodSetup = ({ onComplete, initialPanel }: Props) => {
 
   const handleCreatePod = useCallback(() => {
     history.push(routes.pods.add.path())
-    localStorage.setItem(onboardingPodSetup, 'true')
   }, [])
 
   const handleSkipPods = useCallback(() => {
@@ -46,7 +49,10 @@ const PodSetup = ({ onComplete, initialPanel }: Props) => {
   const [activePanels, setActivePanels] = useState(
     new Set(initialPanel !== undefined ? [initialPanel] : []),
   )
-  const [pods, loadingPods] = useDataLoader(podActions.list)
+
+  const [pods, loadingPods, reloadPods]: IUseDataLoader<IPod> = useDataLoader(podActions.list, {
+    clusterId: allKey,
+  }) as any
   const hasPods = podSetupComplete(pods)
 
   useEffect(() => {
@@ -71,6 +77,12 @@ const PodSetup = ({ onComplete, initialPanel }: Props) => {
 
   return (
     <div className={classes.container}>
+      <PollingData
+        hidden
+        loading={loadingPods}
+        onReload={reloadPods}
+        refreshDuration={oneSecond * 10}
+      />
       <OnboardWizard
         title="Launch your first container on the cluster"
         body="Launch a container on your newly created cluster to run a sample application."

@@ -39,6 +39,16 @@ export interface ICombinedNode {
   logs?: string
 }
 
+export interface IPod {
+  clusterId: string
+  clusterName: string
+  created: string
+  dashboardUrl: string
+  id: string
+  name: string
+  namespace: string
+}
+
 export interface Resmgr {
   info: Info
   hypervisor_info: HypervisorInfo
