@@ -35,6 +35,7 @@ const PodSetup = ({ onComplete, initialPanel }: Props) => {
 
   const handleCreatePod = useCallback(() => {
     history.push(routes.pods.add.path())
+    localStorage.setItem(onboardingPodSetup, 'true')
   }, [])
 
   const handleSkipPods = useCallback(() => {
