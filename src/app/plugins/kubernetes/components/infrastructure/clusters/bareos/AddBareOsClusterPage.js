@@ -535,7 +535,7 @@ const AddBareOsClusterPage = () => {
                             for help on VIP operations and configuration
                           </div>
                         }
-                        required={(wizardContext.masterNodes || []).length > 1}
+                        required
                       />
 
                       <PicklistField
