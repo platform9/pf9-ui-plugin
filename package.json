@@ -1,6 +1,6 @@
 {
   "name": "pf9-ui-plugin",
-  "version": "4.3.0",
+  "version": "4.4.0",
   "description": "Platform9 UI",
   "main": "src/app/index.js",
   "dependencies": {
@@ -27,12 +27,12 @@
     "react-codemirror2": "^6.0.0",
     "react-color": "^2.17.3",
     "react-dom": "^16.9.0",
-    "react-intercom": "^1.0.15",
     "react-json-view": "^1.19.1",
     "react-router": "^5.0.1",
     "react-router-dom": "^5.0.1",
     "recharts": "^2.0.0-beta.1",
     "ssh-pub-key-validation": "^1.0.0",
+    "url-pattern": "^1.0.3",
     "use-react-router": "^1.0.7",
     "uuid": "^3.2.1"
   },

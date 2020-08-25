@@ -25,6 +25,10 @@ export const cloudProviderActions = createCRUDActions(cloudProvidersCacheKey, {
   listFn: () => qbert.getCloudProviders(),
   createFn: async (params) => {
     const result = await qbert.createCloudProvider(params)
+    trackEvent('Create Cloud Provider', {
+      cloud_provider_name: params.name,
+      cloud_provider_type: params.type,
+    })
     const { uuid } = result || {}
 
     // TODO why does the detail request not return the nodepooluuid?
@@ -32,10 +36,15 @@ export const cloudProviderActions = createCRUDActions(cloudProvidersCacheKey, {
     const cloudProvider = data.find((cp) => cp.uuid === uuid) || {}
     return { ...cloudProvider }
   },
-  updateFn: ({ uuid, ...data }) => qbert.updateCloudProvider(uuid, data),
+  updateFn: async ({ uuid, ...data }) => {
+    const result = await qbert.updateCloudProvider(uuid, data)
+    trackEvent('Update Cloud Provider', { uuid })
+    return result
+  },
   deleteFn: async ({ uuid, name, type }) => {
     const result = await qbert.deleteCloudProvider(uuid)
     trackEvent('Delete Cloud Provider', {
+      uuid,
       cloud_provider_name: name,
       cloud_provider_type: type,
     })
@@ -45,6 +54,7 @@ export const cloudProviderActions = createCRUDActions(cloudProvidersCacheKey, {
     attachNodesToCluster: async ({ clusterUuid, nodes }, currentItems) => {
       const nodeUuids = pluck('uuid', nodes)
       await qbert.attach(clusterUuid, nodes)
+      trackEvent('Attach node(s) to cluster', { clusterUuid, numNodes: (nodes || []).length })
       // Assign nodes to their clusters in the context as well so the user
       // can't add the same node to another cluster.
       return currentItems.map((node) =>
@@ -53,6 +63,7 @@ export const cloudProviderActions = createCRUDActions(cloudProvidersCacheKey, {
     },
     detachNodesFromCluster: async ({ clusterUuid, nodeUuids }, currentItems) => {
       await qbert.detach(clusterUuid, nodeUuids)
+      trackEvent('Detach node(s) from cluster', { clusterUuid, numNodes: (nodeUuids || []).length })
       return currentItems.map((node) =>
         nodeUuids.includes(node.uuid) ? { ...node, clusterUuid: null } : node,
       )

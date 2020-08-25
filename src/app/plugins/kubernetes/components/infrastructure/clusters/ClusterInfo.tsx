@@ -3,7 +3,7 @@ import InfoPanel from 'core/components/InfoPanel'
 
 import useReactRouter from 'use-react-router'
 import { Grid, Typography } from '@material-ui/core'
-import { makeStyles } from '@material-ui/styles'
+import { makeStyles, withStyles } from '@material-ui/styles'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import { path } from 'ramda'
@@ -20,7 +20,7 @@ interface IClusterDetailFields {
   required?: boolean
   helpMessage?: string | React.ReactNode
   condition?: (cluster: ICluster) => boolean
-  render?: (value: string | boolean) => string
+  render?: (value: string | boolean) => string | React.ReactNode
 }
 
 const getFieldsForCard = (fields: IClusterDetailFields[], cluster: ICluster) => {
@@ -165,10 +165,44 @@ const azureCloudFields = [
   { id: 'cloudProperties.loadbalancerIP', title: 'Load Balancer IP', required: true },
 ]
 
+type Props = {
+  classes: any
+  items: Array<string>
+}
+
+const styles = (theme) => ({
+  ul: {
+    listStyleType: 'none',
+    paddingInlineStart: theme.spacing(0),
+    margin: theme.spacing(0),
+  },
+})
+
+const CsiDriversList = withStyles(styles)(({ classes, items }: Props) => {
+  return (
+    <ul className={classes.ul}>
+      {items.map((val) => (
+        <li key={val}>{val}</li>
+      ))}
+    </ul>
+  )
+})
+
+const csiDriverFields = [
+  { id: 'metadata.name', title: 'Driver Name', required: true },
+  {
+    id: 'spec.volumeLifecycleModes',
+    title: 'Capabilities',
+    required: true,
+    render: (modes) => <CsiDriversList items={modes} />,
+  },
+]
+
 const overviewStats = (cluster) => getFieldsForCard(clusterOverviewFields, cluster)
 const bareOsNetworkingProps = (cluster) => getFieldsForCard(bareOsNetworkingFields, cluster)
 const awsCloudProps = (cluster) => getFieldsForCard(awsCloudFields, cluster)
 const azureCloudProps = (cluster) => getFieldsForCard(azureCloudFields, cluster)
+const csiDriverProps = (driver: any) => getFieldsForCard(csiDriverFields, driver)
 
 const renderCloudInfo = (cluster) => {
   switch (cluster.cloudProviderType) {
@@ -202,14 +236,20 @@ const ClusterInfo = () => {
   const cluster = clusters.find((x) => x.uuid === match.params.id) || {}
 
   const overview = overviewStats(cluster)
+  const csiDrivers = cluster?.csiDrivers?.drivers || []
 
   return (
     <Grid container spacing={4} className={classes.root}>
       <Grid item xs={6}>
         <InfoPanel title="Overview" items={overview} />
       </Grid>
-      <Grid item xs={6}>
-        {renderCloudInfo(cluster)}
+      <Grid container item xs={6} spacing={4} direction="column">
+        <Grid item>{renderCloudInfo(cluster)}</Grid>
+        {csiDrivers.length > 0 && (
+          <Grid item>
+            <InfoPanel title="CSI Driver Details" items={csiDrivers.map(csiDriverProps)} />
+          </Grid>
+        )}
       </Grid>
     </Grid>
   )

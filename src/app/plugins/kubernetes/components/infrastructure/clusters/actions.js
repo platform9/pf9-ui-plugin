@@ -69,6 +69,15 @@ const getK8sDashboardLinkFromVersion = (version, qbertEndpoint, cluster) => {
   }/services/https:kubernetes-dashboard:443/proxy/`
 }
 
+const getCsiDrivers = async (clusterUiid) => {
+  try {
+    return await qbert.getClusterCsiDrivers(clusterUiid)
+  } catch (e) {
+    console.warn(e)
+    return null
+  }
+}
+
 const getEtcdBackupPayload = (path, data) =>
   pathStrOr(0, path, data)
     ? {
@@ -327,12 +336,15 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
       const version = hasMasterNode ? await getKubernetesVersion(cluster.uuid) : null
       const dashboardLink = getK8sDashboardLinkFromVersion(version, qbertEndpoint, cluster)
 
+      const csiDrivers = await getCsiDrivers(cluster.uuid)
+
       return {
         ...cluster,
         pkgs: clusterWithTasks ? clusterWithTasks.pkgs : [],
         usage,
         version: version || 'N/A',
         nodes: nodesInCluster,
+        csiDrivers,
         masterNodes,
         workerNodes,
         progressPercent,
@@ -381,6 +393,8 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
     const body = pick(updateableParams, params)
 
     await qbert.updateCluster(uuid, body)
+    trackEvent('Update Cluster', { uuid })
+
     // Doing this will help update the table, but the cache remains incorrect...
     // Same issue regarding cache applies to anything else updated this function
     // body.etcdBackupEnabled = !!body.etcdBackup
@@ -389,6 +403,9 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
   },
   deleteFn: async ({ uuid }) => {
     await qbert.deleteCluster(uuid)
+    // Delete cluster Segment tracking is done in ClusterDeleteDialog.tsx because that code
+    // has more context about the cluster name, etc.
+
     // Refresh clusters since combinedHosts will still
     // have references to the deleted cluster.
     loadCombinedHosts.invalidateCache()
@@ -402,6 +419,7 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
         spotWorkerFlavor: cluster.cloudProperties.workerFlavor,
       }
       await qbert.updateCluster(cluster.uuid, body)
+      trackEvent('Scale Cluster', { clusterUuid: cluster.uuid, numSpotWorkers, numWorkers })
 
       // Update the cluster in the cache
       return updateWith(
@@ -415,6 +433,7 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
     },
     upgradeCluster: async ({ uuid }, prevItems) => {
       await qbert.upgradeCluster(uuid)
+      trackEvent('Upgrade Cluster', { clusterUuid: uuid })
 
       // Update the cluster in the cache
       return adjustWith(
@@ -443,11 +462,19 @@ export const clusterActions = createCRUDActions(clustersCacheKey, {
     },
     attachNodes: async ({ cluster, nodes }, prevItems) => {
       await qbert.attach(cluster.uuid, nodes)
+      trackEvent('Cluster Attach Nodes', {
+        numNodes: (nodes || []).length,
+        clusterUuid: cluster.uuid,
+      })
       loadCombinedHosts.invalidateCache()
       return prevItems
     },
     detachNodes: async ({ cluster, nodes }, prevItems) => {
       await qbert.detach(cluster.uuid, nodes)
+      trackEvent('Cluster Detach Nodes', {
+        numNodes: (nodes || []).length,
+        clusterUuid: cluster.uuid,
+      })
       loadCombinedHosts.invalidateCache()
       return prevItems
     },

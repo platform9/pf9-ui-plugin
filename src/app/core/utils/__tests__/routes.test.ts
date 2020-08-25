@@ -2,10 +2,19 @@ import { Route } from '../routes'
 
 describe('Route', () => {
   test('url', () => {
-    const route = new Route('/ui/kubernetes/infrastructure')
+    const route = new Route({ url: '/ui/kubernetes/infrastructure', name: 'Infrastructure' })
     expect(route.url).toBe('/ui/kubernetes/infrastructure')
     // expect(route.toString()).toBe('/ui/kubernetes/infrastructure')
     // expect(route.path()).toBe('/ui/kubernetes/infrastructure')
+  })
+
+  test('finding a registered route', () => {
+    Route.register({
+      url: '/ui/kubernetes/infrastructure#clusters',
+      name: 'Infrastructure:Clusters:List'
+    })
+    const route = Route.find('/ui/kubernetes/infrastructure#clusters')
+    expect(route.name).toEqual('Infrastructure:Clusters:List')
   })
 
   // test('path', () => {
