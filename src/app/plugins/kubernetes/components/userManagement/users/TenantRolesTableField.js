@@ -1,7 +1,7 @@
 import withFormContext from 'core/components/validatedForm/withFormContext'
 import React, { useState, useCallback, useMemo } from 'react'
 import { noop, emptyArr } from 'utils/fp'
-import { pluck, pickAll, prop, assoc, partition } from 'ramda'
+import { pluck, pickAll, prop, assoc, partition, differenceWith } from 'ramda'
 import RolesPicklist from 'k8s/components/userManagement/common/RolesPicklist'
 import { FormControl, FormHelperText } from '@material-ui/core'
 import ListTable from 'core/components/listTable/ListTable'
@@ -46,13 +46,19 @@ const TenantRolesTableField = withFormContext(
     const rows = useMemo(() => [...initialSelectedRows, ...unselectedRows], [initialSelectedRows])
     const [selectedRows, setSelectedRows] = useState(initialSelectedRows)
     const handleSelectedRowsChange = useCallback(
-      (selectedRows) => {
-        const selectedTenantIds = pluck('id', selectedRows)
+      (newSelectedRows, tmp) => {
+        const diff = differenceWith((rows, compareRows) => rows.id === compareRows.id)
+        const mismatchs = diff(selectedRows, newSelectedRows)
+        const serviceMismatch = mismatchs.find((mismatch) => mismatch.name === 'service')
+        if (serviceMismatch && serviceMismatch.users.length < 2) {
+          return false
+        }
+        const selectedTenantIds = pluck('id', newSelectedRows)
         const tenantsObj = getCurrentValue(pickAll(selectedTenantIds))
         onChange(tenantsObj)
-        setSelectedRows(selectedRows)
+        setSelectedRows(newSelectedRows)
       },
-      [getCurrentValue, onChange],
+      [getCurrentValue, onChange, selectedRows],
     )
 
     const columns = useMemo(
