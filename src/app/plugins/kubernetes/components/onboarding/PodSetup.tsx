@@ -11,7 +11,8 @@ import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
 import { routes } from 'core/utils/routes'
 import PollingData from 'core/components/PollingData'
-import { IUseDataLoader, IPod } from '../infrastructure/nodes/model'
+import { IUseDataLoader } from '../infrastructure/nodes/model'
+import { IPod } from '../pods/models'
 
 const oneSecond = 1000
 
