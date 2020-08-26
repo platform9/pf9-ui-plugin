@@ -235,10 +235,21 @@ const reviewOnNext = (context) => {
   })
 }
 
-const canFinishAndReview = ({ masterNodes, workerNodes, allowWorkloadsOnMaster }) => {
+const canFinishAndReview = ({
+  masterNodes,
+  workerNodes,
+  allowWorkloadsOnMaster,
+  masterVipIpv4,
+  masterVipIface,
+}) => {
   const hasMasters = !!masterNodes && masterNodes.length > 0
+  const hasOneMaster = hasMasters && masterNodes.length === 1
+  const hasMultipleMasters = hasMasters && masterNodes.length >= 1
   const hasWorkers = !!workerNodes && workerNodes.length > 0
-  return hasMasters && (!!allowWorkloadsOnMaster || hasWorkers)
+  return (
+    (hasOneMaster && (!!allowWorkloadsOnMaster || hasWorkers)) ||
+    (hasMultipleMasters && !!masterVipIpv4 && !!masterVipIface)
+  )
 }
 
 const AddBareOsClusterPage = () => {
@@ -535,7 +546,8 @@ const AddBareOsClusterPage = () => {
                             for help on VIP operations and configuration
                           </div>
                         }
-                        required
+                        onChange={(value) => setWizardContext({ masterVipIpv4: value })}
+                        required={(wizardContext.masterNodes || []).length > 1}
                       />
 
                       <PicklistField
@@ -545,6 +557,7 @@ const AddBareOsClusterPage = () => {
                         infoPlacement="right-end"
                         info="The name of the network interface that the virtual IP will be bound. The virtual IP must be reachable from the network the interface connects to. All master nodes must use the same interface (eg: ens3)."
                         masterNodes={wizardContext.masterNodes}
+                        onChange={(value) => setWizardContext({ masterVipIface: value })}
                         required={(wizardContext.masterNodes || []).length > 1}
                       />
 
