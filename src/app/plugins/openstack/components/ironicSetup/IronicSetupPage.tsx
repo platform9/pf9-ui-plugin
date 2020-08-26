@@ -47,7 +47,7 @@ const networkConfigured = async (networks) => {
     finished: alreadyConfigured && provisioningNetwork,
     step: 0,
     data: {
-      provisioningNetwork: provisioningNetwork.id,
+      provisioningNetwork: provisioningNetwork?.id,
       dnsDomain: dnsDomain,
       dnsForwardingAddresses: dnsForwardingAddresses,
       networkName: provisioningNetwork?.name,
