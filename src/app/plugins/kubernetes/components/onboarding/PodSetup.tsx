@@ -38,6 +38,8 @@ const PodSetup = ({ onComplete, initialPanel }: Props) => {
   const classes = useStyles({})
   const { history } = useReactRouter()
 
+  const [loadedOnce, setLoadedOnce] = useState(false)
+
   const handleCreatePod = useCallback(() => {
     history.push(routes.pods.add.path())
   }, [])
@@ -72,7 +74,14 @@ const PodSetup = ({ onComplete, initialPanel }: Props) => {
     [activePanels],
   )
 
-  if (loadingPods) {
+  const handleReload = (ignoreCache) => {
+    if (!loadedOnce) {
+      setLoadedOnce(true)
+    }
+    return reloadPods(ignoreCache)
+  }
+
+  if (!loadedOnce && loadingPods) {
     return null
   }
 
@@ -81,7 +90,7 @@ const PodSetup = ({ onComplete, initialPanel }: Props) => {
       <PollingData
         hidden
         loading={loadingPods}
-        onReload={reloadPods}
+        onReload={handleReload}
         refreshDuration={oneSecond * 10}
       />
       <OnboardWizard
