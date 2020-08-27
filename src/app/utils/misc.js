@@ -190,16 +190,12 @@ export const getCookieValue = (name) => {
   return val ? val.pop() : ''
 }
 
-export const normalizeUsername = (emailAddress = '') => {
-  if (!emailAddress) return emailAddress
+export const normalizeUsername = (name = '') => {
+  if (!name) return name
 
   // split emails from @ sign and take the left hand side
-  const [username] = emailAddress.split('@')
-
-  // split username from  '.' for emails in this format: first.last@domain.tld => [first, last]
-  const name = username.split('.')
-
-  return name.map((n) => capitalizeString(n)).join(' ')
+  const [username] = name.split('@')
+  return username
 }
 
 // Really simple indefinite article function, does not account for special

@@ -14,7 +14,6 @@ import { cloudProviderActions } from '../infrastructure/cloudProviders/actions'
 // Components
 import StatusCard, { StatusCardProps } from './StatusCard'
 import { Typography } from '@material-ui/core'
-import { capitalizeString, normalizeUsername } from 'utils/misc'
 
 import ClusterSetup, {
   clustersHaveMonitoring,
@@ -313,7 +312,6 @@ const DashboardPage = () => {
   const [users, loadingUsers] = useDataLoader(mngmUserActions.list)
   const user = users.find((x) => x.username === session.username)
   const displayname = user?.displayname
-  const username = capitalizeString(normalizeUsername(session.username))
 
   if (loadingUsers) {
     return null
@@ -321,7 +319,7 @@ const DashboardPage = () => {
 
   return (
     <section className={classes.cardColumn}>
-      <Typography variant="h5">Welcome {displayname ? displayname : username}!</Typography>
+      <Typography variant="h5">Welcome{displayname ? ' ' + displayname : ''}!</Typography>
       {isLoading ? (
         <Progress loading={isLoading} overlay renderContentOnMount />
       ) : (
