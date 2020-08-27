@@ -290,7 +290,7 @@ const DashboardPage = () => {
   const classes = useStyles({})
   const { getContext, session } = useContext(AppContext)
   const isAdmin = isAdminRole(getContext)
-  const username = capitalizeString(normalizeUsername(session.username))
+
   const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
   const [pods, loadingPods] = useDataLoader(podActions.list)
   const hasClusters = !!clusters.length
@@ -310,9 +310,18 @@ const DashboardPage = () => {
     return [hasClusters, hasAccess, hasMonitoring].findIndex((item) => !item)
   }, [hasClusters, hasMonitoring, hasAccess])
 
+  const [users, loadingUsers] = useDataLoader(mngmUserActions.list)
+  const user = users.find((x) => x.username === session.username)
+  const displayname = user?.displayname
+  const username = capitalizeString(normalizeUsername(session.username))
+
+  if (loadingUsers) {
+    return null
+  }
+
   return (
     <section className={classes.cardColumn}>
-      <Typography variant="h5">Welcome {username}!</Typography>
+      <Typography variant="h5">Welcome {displayname ? displayname : username}!</Typography>
       {isLoading ? (
         <Progress loading={isLoading} overlay renderContentOnMount />
       ) : (
