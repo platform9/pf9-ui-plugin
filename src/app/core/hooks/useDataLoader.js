@@ -1,4 +1,3 @@
-import { cache } from 'awesome-typescript-loader/dist/cache'
 import { cacheActions, cacheStoreKey, loadingStoreKey } from 'core/caching/cacheReducers'
 import { notificationActions } from 'core/notifications/notificationReducers'
 import { useToast } from 'core/providers/ToastProvider'
@@ -31,19 +30,20 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
   // Memoize the params dependency as we want to make sure it really changed and not just got a new reference
   const memoizedParams = memoizedDep(params)
 
-  const loadingSelector = useMemo(
-    () => pathOr(!loadOnDemand, [cacheStoreKey, loadingStoreKey, cacheKey]),
-    [cacheKey],
-  )
-
-  const selector = useMemo(() => selectorCreator(defaultParams), [defaultParams])
-  const loading = useSelector(loadingSelector)
+  const selector = useMemo(() => {
+    return selectorCreator(defaultParams)
+  }, [])
 
   // Try to retrieve the data from the store with the provided parameters
-  const data = useSelector((state) => selector(state, memoizedParams))
+  const data = useSelector((state) => {
+    return selector(state, memoizedParams)
+  })
 
-  // const cache = useSelector(prop(cacheStoreKey))
-  // const cachedData = cache[dataCacheKey]
+  const loadingSelector = useMemo(() => pathOr(false, [cacheStoreKey, loadingStoreKey, cacheKey]), [
+    cacheKey,
+  ])
+  const loading = useSelector(loadingSelector)
+
   const dispatch = useDispatch()
 
   // We use this ref to flag when the component has been unmounted so we prevent further state updates
@@ -83,14 +83,11 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
   )
 
   // Load the data on component mount and every time the params
+  // When unmounted, set the unmounted ref to true to prevent further state updates
   useEffect(() => {
     if (!loadOnDemand) {
       loadData()
     }
-  }, [loadData, loadOnDemand])
-
-  // When unmounted, set the unmounted ref to true to prevent further state updates
-  useEffect(() => {
     return () => {
       unmounted.current = true
     }

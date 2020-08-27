@@ -87,7 +87,7 @@ export const serviceActions = createCRUDActions(ActionDataKeys.KubeServices, {
     await qbert.deleteService(clusterId, namespace, name)
   },
   service: 'qbert',
-  entity: 'services',
+  entity: ActionDataKeys.KubeServices,
   indexBy: 'clusterId',
   selector: serviceSelectors,
   selectorCreator: makeServiceSelector,

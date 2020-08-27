@@ -181,7 +181,7 @@ Progress.defaultProps = {
   loading: false,
   overlay: true,
   inline: false,
-  renderContentOnMount: false,
+  renderContentOnMount: true,
   renderLoadingImage: true,
   message: 'Loading...',
   minHeight: 400,

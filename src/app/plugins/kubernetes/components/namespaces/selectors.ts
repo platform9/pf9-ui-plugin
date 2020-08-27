@@ -1,8 +1,6 @@
 import { createSelector } from 'reselect'
 import { pathOr } from 'ramda'
-import { IDataKeys, GlobalState } from 'k8s/datakeys.model'
 import DataKeys from 'k8s/DataKeys'
-import { INamespace } from './model'
 import getDataSelector from 'core/utils/getDataSelector'
 
 const findClusterName = (clusters, clusterId) => {
@@ -10,12 +8,7 @@ const findClusterName = (clusters, clusterId) => {
   return (cluster && cluster.name) || ''
 }
 
-export const namespacesSelector = createSelector<
-  GlobalState,
-  IDataKeys[DataKeys.Clusters],
-  IDataKeys[DataKeys.Namespaces],
-  INamespace[]
->(
+export const namespacesSelector = createSelector(
   getDataSelector<DataKeys.Clusters>(DataKeys.Clusters),
   getDataSelector<DataKeys.Namespaces>(DataKeys.Namespaces, ['clusterId']),
   (rawClusters, rawNamespaces) => {

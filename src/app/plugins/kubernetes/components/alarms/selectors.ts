@@ -1,19 +1,13 @@
 import { createSelector } from 'reselect'
-import { pathOr, pipe, find, propEq, prop, mergeLeft } from 'ramda'
+import { find, mergeLeft, pathOr, pipe, prop, propEq } from 'ramda'
 import { emptyArr } from 'utils/fp'
 import moment from 'moment'
 import { cacheStoreKey, dataStoreKey } from 'core/caching/cacheReducers'
 import { clustersSelector } from 'k8s/components/infrastructure/clusters/selectors'
 import DataKeys from 'k8s/DataKeys'
-import {
-  IAlert,
-  IAlertOverTime,
-  ISeverityCount,
-  IAlertSelector,
-  IAlertOverTimeSelector,
-} from './model'
+import { IAlert, IAlertOverTime, IAlertOverTimeSelector, ISeverityCount } from './model'
 import { IClusterAction } from '../infrastructure/clusters/model'
-import { IDataKeys, GlobalState } from 'k8s/datakeys.model'
+import { IDataKeys } from 'k8s/datakeys.model'
 import { clientStoreKey } from 'core/client/clientReducers'
 
 const getQbertUrl = (qbertEndpoint) => {
@@ -39,13 +33,7 @@ const timestampSteps = {
 
 // TODO replace IDataKeys with an actual whole store state model
 // TODO replace IClusterAction typings with cluster selector return types.
-export const alertsSelector = createSelector<
-  GlobalState,
-  Readonly<IAlert[]>,
-  IClusterAction[],
-  string,
-  IAlertSelector[]
->(
+export const alertsSelector = createSelector(
   [
     (state) => pathOr(emptyArr, [cacheStoreKey, dataStoreKey, DataKeys.Alerts])(state),
     clustersSelector,

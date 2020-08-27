@@ -1,17 +1,15 @@
 import createContextLoader from 'core/helpers/createContextLoader'
 import ApiClient from 'api-client/ApiClient'
 import createCRUDActions from 'core/helpers/createCRUDActions'
-
-export const tenantsCacheKey = 'tenants'
-export const userTenantsCacheKey = 'userTenants'
+import { ActionDataKeys } from 'k8s/DataKeys'
 
 const { keystone } = ApiClient.getInstance()
 
-export const loadUserTenants = createContextLoader(userTenantsCacheKey, async () => {
+export const loadUserTenants = createContextLoader(ActionDataKeys.UserTenants, async () => {
   return keystone.getProjectsAuth()
 })
 
-const tenantActions = createCRUDActions(tenantsCacheKey, {
+const tenantActions = createCRUDActions(ActionDataKeys.Tenants, {
   listFn: async () => keystone.getProjects(),
   createFn: async (data) => {
     return keystone.createTenant(data)

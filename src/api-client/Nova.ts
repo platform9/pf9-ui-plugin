@@ -1,4 +1,5 @@
 import ApiService from 'api-client/ApiService'
+import DataKeys from 'k8s/DataKeys'
 
 // Returns a transducer function instead being passed the obj directly
 // so it can be used in Array#map/filter/etc as well.
@@ -59,10 +60,10 @@ class Nova extends ApiService {
         mthdName: 'deleteFlavor',
       },
     })
-  }
+  };
 
   // Allow these methods to be accessed programatically as well.
-  flavors = {
+  [DataKeys.Flavors] = {
     create: this.createFlavor.bind(this),
     list: this.getFlavors.bind(this),
     delete: this.deleteFlavor.bind(this),

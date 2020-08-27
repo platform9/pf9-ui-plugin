@@ -1,4 +1,4 @@
-import { createSelector, OutputSelector } from 'reselect'
+import { createSelector } from 'reselect'
 import {
   compose,
   either,
@@ -22,7 +22,6 @@ import {
 import { castFuzzyBool } from 'utils/misc'
 import DataKeys from 'k8s/DataKeys'
 import getDataSelector from 'core/utils/getDataSelector'
-import { GlobalState } from 'k8s/datakeys.model'
 import { IClusterSelector } from './model'
 import { Node } from 'api-client/qbert.model'
 import { clientStoreKey } from 'core/client/clientReducers'
@@ -48,11 +47,7 @@ export const masterlessCluster = propSatisfies(isTruthy, 'masterless')
 export const hasPrometheusTag = compose(castFuzzyBool, path(['tags', 'pf9-system:monitoring']))
 export const hasAppCatalogEnabled = propSatisfies(isTruthy, 'appCatalogEnabled')
 
-export const clustersSelector: OutputSelector<
-  GlobalState,
-  IClusterSelector[],
-  any
-> = createSelector(
+export const clustersSelector = createSelector(
   [
     getDataSelector<DataKeys.Clusters>(DataKeys.Clusters),
     getDataSelector<DataKeys.ClusterTags>(DataKeys.ClusterTags),

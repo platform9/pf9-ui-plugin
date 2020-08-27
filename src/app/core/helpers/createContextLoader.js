@@ -1,11 +1,6 @@
 import { allKey, defaultUniqueIdentifier } from 'app/constants'
 import store from 'app/store'
-import {
-  cacheActions,
-  cacheStoreKey,
-  dataStoreKey,
-  paramsStoreKey,
-} from 'core/caching/cacheReducers'
+import { cacheActions } from 'core/caching/cacheReducers'
 import createSorter from 'core/helpers/createSorter'
 import getDataSelector from 'core/utils/getDataSelector'
 import moize from 'moize'
@@ -13,23 +8,18 @@ import {
   assoc,
   either,
   equals,
-  filter,
-  find,
   has,
   isNil,
   map,
   mergeLeft,
-  pathOr,
   pick,
   pickAll,
   pipe,
-  prop,
   reject,
   values,
-  whereEq,
 } from 'ramda'
 import { createSelector } from 'reselect'
-import { arrayIfEmpty, arrayIfNil, emptyArr, emptyObj, ensureArray } from 'utils/fp'
+import { arrayIfEmpty, emptyArr, emptyObj, ensureArray } from 'utils/fp'
 import { memoizePromise, uncamelizeString } from 'utils/misc'
 
 let loaders = {}
@@ -40,10 +30,10 @@ export const invalidateLoadersCache = () => {
   Object.values(loaders).forEach((loader) => loader.invalidateCache())
 }
 
-export const getDefaultSelectorCreator = moize((indexBy, cacheKey, selector) => {
+export const getDefaultSelectorCreator = moize((selector) => {
   return () =>
     createSelector([selector, (_, params) => params], (items, params) => {
-      return pipe(getDataSelector(params, indexBy), createSorter(params))(items)
+      return pipe(createSorter(params), arrayIfEmpty)(items)
     })
 })
 
@@ -88,32 +78,14 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
   const {
     uniqueIdentifier = defaultUniqueIdentifier,
     entityName = uncamelizeString(cacheKey).replace(/s$/, ''), // Remove trailing "s"
-    indexBy,
+    indexBy = emptyArr,
     requiredParams = indexBy,
     fetchErrorMessage = (catchedErr, params) => `Unable to fetch ${entityName} items`,
-    selector = pathOr(emptyArr, [cacheStoreKey, dataStoreKey, cacheKey]),
-    selectorCreator = getDefaultSelectorCreator(indexBy, cacheKey, selector),
+    selector = getDataSelector(cacheKey, indexBy),
+    selectorCreator = getDefaultSelectorCreator(selector),
   } = options
   const allIndexKeys = indexBy ? ensureArray(indexBy) : emptyArr
   const allRequiredParams = requiredParams ? ensureArray(requiredParams) : emptyArr
-  const getDataFilter = moize(
-    (params) => {
-      const providedIndexedParams = pipe(
-        pickAll(allIndexKeys),
-        reject(either(isNil, equals(allKey))),
-      )(params)
-
-      return pipe(
-        prop(cacheKey),
-        arrayIfNil,
-        // Filter the data by the provided params
-        filter(whereEq(providedIndexedParams)),
-        // Return the constant emptyArr to avoid unnecessary re-renderings
-        arrayIfEmpty,
-      )
-    },
-    { equals },
-  )
   const invalidateCacheSymbol = Symbol('invalidateCache')
 
   /**
@@ -140,11 +112,7 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
    */
   const contextLoaderFn = memoizePromise(
     async (params = emptyObj, refetch = contextLoaderFn[invalidateCacheSymbol]) => {
-      const { dispatch, getState } = store
-      const cache = prop(cacheStoreKey, getState())
-      const { [dataStoreKey]: cachedData, [paramsStoreKey]: cachedParams } = cache
-      const currentCachedParams = cachedParams[cacheKey] || emptyArr
-      const filterData = getDataFilter(params)
+      const { dispatch } = store
       const invalidateCache = contextLoaderFn[invalidateCacheSymbol]
 
       // Get the required values from the provided params
@@ -167,14 +135,6 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
 
       contextLoaderFn[invalidateCacheSymbol] = false
 
-      // TODO remove this filtering as it should be already being done in the selectors
-      if (!refetch && !invalidateCache) {
-        // If the provided params are already cached
-        if (find(equals(providedIndexedParams), currentCachedParams)) {
-          // Return the cached data filtering by the provided params
-          return filterData(cachedData)
-        }
-      }
       // if refetch = true or no cached params have been found, fetch the items
       const items = await dataFetchFn(params, refetch)
 

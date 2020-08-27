@@ -1,4 +1,6 @@
 enum DataKeys {
+  Regions = 'Regions',
+  Flavors = 'Flavors',
   Nodes = 'Nodes',
   Clusters = 'Clusters',
   Pods = 'Pods',
@@ -49,11 +51,14 @@ enum DataKeys {
   ManagementCredentials = 'ManagementCredentials',
   Tenants = 'Tenants',
   Users = 'Users',
+  UserTenants = 'UserTenants',
 }
 
 export default DataKeys
 
 export const ActionDataKeys = {
+  Regions: 'Regions',
+  Flavors: 'Flavors',
   Nodes: 'Nodes',
   Clusters: 'Clusters',
   Pods: 'Pods',
@@ -104,4 +109,5 @@ export const ActionDataKeys = {
   ManagementCredentials: 'ManagementCredentials',
   Tenants: 'Tenants',
   Users: 'Users',
+  UserTenants: 'UserTenants',
 }

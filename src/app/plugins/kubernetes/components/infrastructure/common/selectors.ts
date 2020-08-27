@@ -3,10 +3,8 @@ import { toPairs } from 'ramda'
 import { combineHost } from 'k8s/components/infrastructure/common/combineHosts'
 import DataKeys from 'k8s/DataKeys'
 import getDataSelector from 'core/utils/getDataSelector'
-import { HostByService, HostType, ICombinedHost, IResMgrHostsSelector } from './model'
-import { Node } from 'api-client/qbert.model'
-import { Host, ExtensionsClass } from 'api-client/resmgr.model'
-import { GlobalState } from 'k8s/datakeys.model'
+import { HostByService, HostType } from './model'
+import { ExtensionsClass, Host } from 'api-client/resmgr.model'
 
 const getIpPreview = (ips: string[] = []) =>
   // Get first IP that does not start with 192
@@ -31,7 +29,7 @@ const getNetworkInterfaces = (node: Host) => {
   return ifaceList.flat() // [[interface, ip], [interface2, ip2], ...]
 }
 
-export const combinedHostsSelector = createSelector<GlobalState, Node[], Host[], ICombinedHost[]>(
+export const combinedHostsSelector = createSelector(
   getDataSelector<DataKeys.Nodes>(DataKeys.Nodes),
   getDataSelector<DataKeys.ResMgrHosts>(DataKeys.ResMgrHosts),
   (rawNodes, resMgrHosts) => {
@@ -52,7 +50,7 @@ export const combinedHostsSelector = createSelector<GlobalState, Node[], Host[],
   },
 )
 
-export const resMgrHostsSelector = createSelector<GlobalState, Host[], IResMgrHostsSelector[]>(
+export const resMgrHostsSelector = createSelector(
   getDataSelector<DataKeys.ResMgrHosts>(DataKeys.ResMgrHosts),
   (hosts) =>
     hosts.map((item) => {

@@ -26,6 +26,7 @@ import {
   GetClusterRolesItem,
   IGenericClusterizedResponse,
 } from './qbert.model'
+import DataKeys from 'k8s/DataKeys'
 
 // TODO: Fix these typings
 const normalizeClusterizedResponse = <T>(
@@ -156,9 +157,9 @@ class Qbert extends ApiService {
         mthdName: 'deleteCloudProvider',
       },
     })
-  }
+  };
 
-  cloudProviders = {
+  [DataKeys.CloudProviders] = {
     create: this.createCloudProvider.bind(this),
     list: this.getCloudProviders.bind(this),
     details: this.getCloudProviderDetails.bind(this),
@@ -203,9 +204,9 @@ class Qbert extends ApiService {
       },
     })
     return nodes
-  }
+  };
 
-  nodes = {
+  [DataKeys.Nodes] = {
     list: this.getNodes,
   }
 
@@ -295,9 +296,9 @@ class Qbert extends ApiService {
         mthdName: 'deleteCluster',
       },
     })
-  }
+  };
 
-  clusters = {
+  [DataKeys.Clusters] = {
     list: this.getClusters,
   }
 
@@ -529,9 +530,9 @@ class Qbert extends ApiService {
         mthdName: 'deletePod',
       },
     })
-  }
+  };
 
-  pods = {
+  [DataKeys.Pods] = {
     create: this.createPod.bind(this),
     list: this.getClusterPods.bind(this),
     delete: this.deletePod.bind(this),
@@ -547,9 +548,9 @@ class Qbert extends ApiService {
         mthdName: 'createDeployment',
       },
     })
-  }
+  };
 
-  deployments = {
+  [DataKeys.Deployments] = {
     create: this.createDeployment.bind(this),
     list: this.getClusterDeployments.bind(this),
     delete: this.deleteDeployment.bind(this),
@@ -576,9 +577,9 @@ class Qbert extends ApiService {
         mthdName: 'deleteService',
       },
     })
-  }
+  };
 
-  services = {
+  [DataKeys.KubeServices] = {
     create: this.createService.bind(this),
     list: this.getClusterKubeServices.bind(this),
     delete: this.deleteService.bind(this),

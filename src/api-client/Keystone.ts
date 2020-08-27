@@ -22,6 +22,7 @@ import {
   ServicesByName,
   IInterfaceByName,
 } from './keystone.model'
+import DataKeys from 'k8s/DataKeys'
 
 const constructAuthFromToken = (token: string, projectId?: string) => {
   return {
@@ -536,11 +537,13 @@ class Keystone extends ApiService {
       },
     })
     return data.regions
-  }
+  };
 
   // Allow programmatic access
-  regions = {
-    list: async () => this.getRegions(),
+  [DataKeys.Regions] = {
+    list: async () => {
+      return this.getRegions()
+    },
   }
 
   getServiceCatalog = async () => {

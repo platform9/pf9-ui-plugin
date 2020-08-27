@@ -9,21 +9,14 @@ import { combinedHostsSelector } from '../infrastructure/common/selectors'
 import createSorter from 'core/helpers/createSorter'
 import { clustersSelector } from 'k8s/components/infrastructure/clusters/selectors'
 import { IClusterSelector } from '../infrastructure/clusters/model'
-import { IPodSelector, IServicesSelector, ICombinedNodesSelector } from './model'
-import { IDataKeys, GlobalState } from 'k8s/datakeys.model'
-import { FluffySelector, MatchLabelsClass, Node } from 'api-client/qbert.model'
+import { IPodSelector, IServicesSelector } from './model'
+import { IDataKeys } from 'k8s/datakeys.model'
+import { FluffySelector, MatchLabelsClass } from 'api-client/qbert.model'
 import { ICombinedHost } from '../infrastructure/common/model'
-import { IFace } from 'api-client/keystone.model'
 
 const k8sDocUrl = 'namespaces/kube-system/qbertservices/https:kubernetes-dashboard:443/proxy/#'
 
-export const nodesSelector = createSelector<
-  GlobalState,
-  Node[],
-  ICombinedHost[],
-  Array<IFace & { name: string }>,
-  ICombinedNodesSelector[]
->(
+export const nodesSelector = createSelector(
   [
     getDataSelector<DataKeys.Nodes>(DataKeys.Nodes),
     combinedHostsSelector,
@@ -148,12 +141,7 @@ export const makeParamsDeploymentsSelector = (defaultParams = {}) => {
   )
 }
 
-export const serviceSelectors = createSelector<
-  GlobalState,
-  IDataKeys[DataKeys.KubeServices],
-  IClusterSelector[],
-  IServicesSelector[]
->(
+export const serviceSelectors = createSelector(
   [getDataSelector<DataKeys.KubeServices>(DataKeys.KubeServices, 'clusterId'), clustersSelector],
   (rawServices, clusters) => {
     return pipe<IDataKeys[DataKeys.KubeServices], any>(
