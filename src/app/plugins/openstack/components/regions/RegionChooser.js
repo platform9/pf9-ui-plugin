@@ -54,8 +54,8 @@ const RegionChooser = (props) => {
     [regions, pathname, hash],
   )
 
-  const handleTooltipClose = useCallback(() => setTooltipOpen(false))
-  const handleTooltipOpen = useCallback(() => setTooltipOpen(true))
+  const handleTooltipClose = useCallback(() => setTooltipOpen(false), [])
+  const handleTooltipOpen = useCallback(() => setTooltipOpen(true), [])
 
   const regionNames = useMemo(() => pluck('id', regions), [regions])
 

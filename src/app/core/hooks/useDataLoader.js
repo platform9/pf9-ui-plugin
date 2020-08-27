@@ -1,3 +1,4 @@
+import { cache } from 'awesome-typescript-loader/dist/cache'
 import { cacheActions, cacheStoreKey, loadingStoreKey } from 'core/caching/cacheReducers'
 import { notificationActions } from 'core/notifications/notificationReducers'
 import { useToast } from 'core/providers/ToastProvider'
@@ -30,9 +31,10 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
   // Memoize the params dependency as we want to make sure it really changed and not just got a new reference
   const memoizedParams = memoizedDep(params)
 
-  const loadingSelector = useMemo(() => pathOr(false, [cacheStoreKey, loadingStoreKey, cacheKey]), [
-    cacheKey,
-  ])
+  const loadingSelector = useMemo(
+    () => pathOr(!loadOnDemand, [cacheStoreKey, loadingStoreKey, cacheKey]),
+    [cacheKey],
+  )
 
   const selector = useMemo(() => selectorCreator(defaultParams), [defaultParams])
   const loading = useSelector(loadingSelector)
@@ -66,7 +68,7 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
     async (refetch) => {
       if (refetch || isNilOrEmpty(data)) {
         // No need to update loading state if a request is already in progress
-        dispatch(cacheActions.setLoading(true))
+        dispatch(cacheActions.setLoading({ cacheKey, loading: true }))
         try {
           await loaderFn(memoizedParams, refetch)
         } catch (err) {
@@ -74,7 +76,7 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
           // TODO we should be putting these somewhere in the store to allow more control over the errors handling
           await onError(parsedErrorMesssage, err)
         }
-        dispatch(cacheActions.setLoading(false))
+        dispatch(cacheActions.setLoading({ cacheKey, loading: false }))
       }
     },
     [loaderFn, memoizedParams],

@@ -61,7 +61,6 @@ const reducers = {
     {
       payload: { cacheKey, loading },
     }: PayloadAction<{
-      uniqueIdentifier: string | string[]
       cacheKey: DataKeys
       loading: boolean
     }>,

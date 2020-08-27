@@ -148,7 +148,6 @@ class ApiClient {
   }
 
   getAuthHeaders = (scoped = true) => {
-    console.log(scoped, this.scopedToken, this.unscopedToken)
     const token = scoped ? this.scopedToken : this.unscopedToken
     if (!token) {
       console.warn('Auth token not initialized')

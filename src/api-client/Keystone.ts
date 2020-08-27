@@ -400,6 +400,7 @@ class Keystone extends ApiService {
       const username = response.data.token.user.name
       const { expires_at: expiresAt, issued_at: issuedAt } = response.data.token
       const unscopedToken = response.headers['x-subject-token']
+      this.client.scopedToken = token
       this.client.unscopedToken = unscopedToken
       return { unscopedToken, username, expiresAt, issuedAt }
     } catch (err) {
@@ -454,6 +455,7 @@ class Keystone extends ApiService {
     try {
       const linksUrl = await this.getServiceEndpoint('regioninfo', 'public')
       const { links } = await this.client.basicGet<GetFeatureLinks>({
+        endpoint: null,
         url: linksUrl,
         options: {
           clsName: this.getClassName(),
@@ -463,8 +465,8 @@ class Keystone extends ApiService {
       const featuresUrl = links.features
       const timestamp = new Date().getTime()
       const features = await this.client.basicGet<GetFeatures>({
-        endpoint: `${featuresUrl}?tag=${timestamp}`,
-        url: '',
+        endpoint: null,
+        url: `${featuresUrl}?tag=${timestamp}`,
         options: {
           clsName: this.getClassName(),
           mthdName: 'getFeatures/featuresUrl',
@@ -499,6 +501,7 @@ class Keystone extends ApiService {
     try {
       const linksUrl = await this.getServiceEndpoint('regioninfo', 'public')
       const { links } = await this.client.basicGet<GetFeatureLinks>({
+        endpoint: null,
         url: linksUrl,
         options: {
           clsName: this.getClassName(),
@@ -537,7 +540,7 @@ class Keystone extends ApiService {
 
   // Allow programmatic access
   regions = {
-    list: this.getRegions.bind(this),
+    list: async () => this.getRegions(),
   }
 
   getServiceCatalog = async () => {
