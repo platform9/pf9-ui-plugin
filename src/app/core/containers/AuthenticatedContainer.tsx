@@ -26,6 +26,10 @@ import { MessageTypes } from 'core/components/notifications/model'
 import { RootState } from 'app/store'
 import { Dictionary, toPairs, prop, apply } from 'ramda'
 import pluginManager from 'core/utils/pluginManager'
+import useDataLoader from 'core/hooks/useDataLoader'
+import { regionActions } from 'k8s/components/infrastructure/common/actions'
+import { loadUserTenants } from 'openstack/components/tenants/actions'
+import Progress from 'core/components/progress/Progress'
 
 declare let window: CustomWindow
 
@@ -172,6 +176,9 @@ const AuthenticatedContainer = () => {
   const { history } = useReactRouter()
   const showToast = useToast()
   const classes = useStyles({ path: history.location.pathname })
+  // Preload regions and tenants
+  const [, loadingRegions] = useDataLoader(regionActions.list)
+  const [, loadingTenants] = useDataLoader(loadUserTenants)
 
   useEffect(() => {
     const loadRegionFeatures = async () => {
@@ -219,7 +226,14 @@ const AuthenticatedContainer = () => {
   const plugins = pluginManager.getPlugins()
   const sections = getSections(plugins, role)
   const devEnabled = window.localStorage.enableDevPlugin === 'true'
-
+  const authContent = (
+    <Switch>
+      {renderPlugins(plugins, role)}
+      <Route path={helpUrl} component={HelpPage} />
+      <Route path={logoutUrl} component={LogoutPage} />
+      <Redirect to={dashboardUrl} />
+    </Switch>
+  )
   return (
     <>
       <div className={classes.appFrame}>
@@ -242,12 +256,11 @@ const AuthenticatedContainer = () => {
             {/* <BannerContainer /> */}
             <div className={classes.contentMain}>
               {renderRawComponents(plugins)}
-              <Switch>
-                {renderPlugins(plugins, role)}
-                <Route path={helpUrl} component={HelpPage} />
-                <Route path={logoutUrl} component={LogoutPage} />
-                <Redirect to={dashboardUrl} />
-              </Switch>
+              {!loadingRegions && !loadingTenants ? (
+                authContent
+              ) : (
+                <Progress loading message={'Loading Regions and Tenants...'} />
+              )}
               {devEnabled && <DeveloperToolsEmbed />}
             </div>
           </main>
