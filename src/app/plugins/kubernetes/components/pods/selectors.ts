@@ -53,7 +53,7 @@ export const podsSelector = createSelector(
         const { clusterId } = pod
         const cluster = find<IClusterSelector>(propEq('uuid', clusterId), clusters)
         const dashboardUrl = pathJoin(
-          cluster.baseUrl,
+          cluster?.baseUrl,
           k8sDocUrl,
           'pod',
           pod?.metadata?.namespace, // pathStr('metadata.namespace', pod),
@@ -66,7 +66,7 @@ export const podsSelector = createSelector(
           name: pod?.metadata?.name, // pathStr('metadata.name', pod),
           namespace: pod?.metadata?.namespace, // pathStr('metadata.namespace', pod),
           labels: pod?.metadata?.labels, // pathStr('metadata.labels', pod),
-          clusterName: cluster.name,
+          clusterName: cluster?.name,
         }
       }),
     )(rawPods)
@@ -93,11 +93,11 @@ export const deploymentsSelector = createSelector(
       const { clusterId } = rawDeployment
       const cluster = find<IClusterSelector>(propEq('uuid', clusterId), clusters)
       const dashboardUrl = pathJoin(
-        cluster.baseUrl,
+        cluster?.baseUrl,
         k8sDocUrl,
         'deployment',
-        rawDeployment?.metadata.namespace,
-        rawDeployment?.metadata.name,
+        rawDeployment?.metadata?.namespace || '',
+        rawDeployment?.metadata?.name || '',
       )
       const selectors = rawDeployment?.spec?.selector?.matchLabels || (emptyObj as MatchLabelsClass)
       const namespace = rawDeployment?.metadata?.namespace
@@ -122,7 +122,7 @@ export const deploymentsSelector = createSelector(
         selectors,
         pods: deploymentPods.length,
         namespace,
-        clusterName: cluster.name,
+        clusterName: cluster?.name,
       }
     })
   },
@@ -149,7 +149,7 @@ export const serviceSelectors = createSelector(
         const { clusterId } = service
         const cluster = find<IClusterSelector>(propEq('uuid', clusterId), clusters)
         const dashboardUrl = pathJoin(
-          cluster.baseUrl,
+          cluster?.baseUrl,
           k8sDocUrl,
           'service',
           service?.metadata?.namespace || '',
@@ -186,7 +186,7 @@ export const serviceSelectors = createSelector(
           internalEndpoints,
           externalEndpoints,
           namespace: service?.metadata?.namespace, // pathStr('metadata.namespace', service)
-          clusterName: cluster.name,
+          clusterName: cluster?.name,
         }
       }),
     )(rawServices)
