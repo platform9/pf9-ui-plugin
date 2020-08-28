@@ -13,6 +13,8 @@ import { clusterActions } from '../infrastructure/clusters/actions'
 import PrometheusAddonDialog from '../prometheus/PrometheusAddonDialog'
 import { ICluster } from '../infrastructure/clusters/model'
 import { routes } from 'core/utils/routes'
+import { kubectlInstallationDocumentationLink } from 'k8s/links'
+import ExternalLink from 'core/components/ExternalLink'
 
 const useStyles = makeStyles<Theme>((theme) => ({
   container: {
@@ -30,6 +32,9 @@ const useStyles = makeStyles<Theme>((theme) => ({
   centerContent: {
     display: 'flex',
     alignItems: 'center',
+  },
+  externalDocLink: {
+    marginBottom: theme.spacing(1),
   },
 }))
 
@@ -136,8 +141,15 @@ const ClusterSetup = ({ onComplete, initialPanel = Panels.Cluster }: Props) => {
             To access your cluster, you need to download the kubeconfig for your cluster and
             download <CodeBlock>kubectl</CodeBlock>
           </Typography>
+          <ExternalLink
+            className={classes.externalDocLink}
+            url={kubectlInstallationDocumentationLink}
+            icon="file-alt"
+          >
+            Getting Started with Kubectl
+          </ExternalLink>
           <NextButton showForward={false} onClick={handleAccessCluster}>
-            Api Access
+            API Access
           </NextButton>
         </ExpansionPanel>
         <ExpansionPanel

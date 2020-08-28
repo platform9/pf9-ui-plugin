@@ -18,7 +18,8 @@ import { k8sPrefix } from 'app/constants'
 import Wizard from 'core/components/wizard/Wizard'
 import WizardStep from 'core/components/wizard/WizardStep'
 import { requiredValidator } from 'core/utils/fieldValidators'
-import Progress from 'core/components/progress/Progress'
+import { Redirect } from 'react-router'
+import { routes } from 'core/utils/routes'
 
 const listUrl = pathJoin(k8sPrefix, 'user_management')
 
@@ -55,6 +56,10 @@ const EditTenantPage = () => {
     }),
     [tenant, roleAssignments],
   )
+
+  if (tenant.name === 'service') {
+    return <Redirect to={routes.userManagement.tenants.path()} />
+  }
 
   return (
     <FormWrapper
