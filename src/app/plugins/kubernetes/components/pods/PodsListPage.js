@@ -121,7 +121,6 @@ const renderStatus = (phase) => {
 }
 
 export const options = {
-  showCheckboxes: false, // until we have actions to perform, disable this
   deleteFn: podActions.delete,
   addUrl: '/ui/kubernetes/pods/add',
   addText: 'Create New Pod',

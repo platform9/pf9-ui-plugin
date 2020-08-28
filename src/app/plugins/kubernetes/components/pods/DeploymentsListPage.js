@@ -71,7 +71,6 @@ const renderName = (name, { dashboardUrl }) => {
 }
 
 export const options = {
-  showCheckboxes: false, // until we have actions to perform, disable this
   loaderFn: deploymentActions.list,
   deleteFn: deploymentActions.delete,
   deleteCond: () => false,
