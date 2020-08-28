@@ -2,7 +2,7 @@ import { cacheActions, cacheStoreKey, loadingStoreKey } from 'core/caching/cache
 import { notificationActions } from 'core/notifications/notificationReducers'
 import { useToast } from 'core/providers/ToastProvider'
 import moize from 'moize'
-import { pathOr } from 'ramda'
+import { path } from 'ramda'
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { emptyObj, ensureFunction, isNilOrEmpty } from 'utils/fp'
@@ -39,7 +39,7 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
     return selector(state, memoizedParams)
   })
 
-  const loadingSelector = useMemo(() => pathOr(false, [cacheStoreKey, loadingStoreKey, cacheKey]), [
+  const loadingSelector = useMemo(() => path([cacheStoreKey, loadingStoreKey, cacheKey]), [
     cacheKey,
   ])
   const loading = useSelector(loadingSelector)
@@ -65,7 +65,7 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
   // of the sequantialization of multiple concurrent calls
   // It will set the result of the last data loading call to the "data" state variable
   const loadData = useCallback(
-    async (refetch) => {
+    async (refetch = true) => {
       if (refetch || isNilOrEmpty(data)) {
         // No need to update loading state if a request is already in progress
         dispatch(cacheActions.setLoading({ cacheKey, loading: true }))
@@ -74,7 +74,7 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
         } catch (err) {
           const parsedErrorMesssage = ensureFunction(fetchErrorMessage)(err, params)
           // TODO we should be putting these somewhere in the store to allow more control over the errors handling
-          await onError(parsedErrorMesssage, err)
+          onError(parsedErrorMesssage, err)
         }
         dispatch(cacheActions.setLoading({ cacheKey, loading: false }))
       }
@@ -86,7 +86,7 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
   // When unmounted, set the unmounted ref to true to prevent further state updates
   useEffect(() => {
     if (!loadOnDemand) {
-      loadData()
+      loadData(false)
     }
     return () => {
       unmounted.current = true

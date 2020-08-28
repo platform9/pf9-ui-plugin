@@ -1,34 +1,27 @@
-import jsYaml from 'js-yaml'
-import createCRUDActions from 'core/helpers/createCRUDActions'
 import ApiClient from 'api-client/ApiClient'
 import { allKey } from 'app/constants'
-import { pluck, flatten } from 'ramda'
+import createCRUDActions from 'core/helpers/createCRUDActions'
+import jsYaml from 'js-yaml'
+import { parseClusterParams } from 'k8s/components/infrastructure/clusters/actions'
+import { ActionDataKeys } from 'k8s/DataKeys'
+import { flatten, pluck } from 'ramda'
 import { someAsync } from 'utils/async'
-import { parseClusterParams, clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import { pathStr } from 'utils/fp'
 import {
-  nodesSelector,
   deploymentsSelector,
-  serviceSelectors,
   makeServiceSelector,
+  nodesSelector,
+  serviceSelectors,
 } from './selectors'
-import { ActionDataKeys } from 'k8s/DataKeys'
 
 const { qbert } = ApiClient.getInstance()
 
 export const podActions = createCRUDActions(ActionDataKeys.Pods, {
   listFn: async (params) => {
     const [clusterId, clusters] = await parseClusterParams(params)
-    const podsPromise =
-      clusterId === allKey
-        ? someAsync(pluck('uuid', clusters).map(qbert.getClusterPods)).then(flatten)
-        : qbert.getClusterPods(clusterId)
-    const [pods] = await Promise.all([
-      podsPromise,
-      // Make sure the derived data gets loaded as well
-      clusterActions.list(),
-    ])
-    return pods
+    return clusterId === allKey
+      ? someAsync(pluck('uuid', clusters).map(qbert.getClusterPods)).then(flatten)
+      : qbert.getClusterPods(clusterId)
   },
   createFn: async ({ clusterId, namespace, yaml }) => {
     const body = jsYaml.safeLoad(yaml)

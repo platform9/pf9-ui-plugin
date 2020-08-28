@@ -1,7 +1,7 @@
-import React, { useState, useCallback, useMemo } from 'react'
+import React, { useEffect, useState, useCallback, useMemo } from 'react'
 import ApiClient from 'api-client/ApiClient'
 import Selector from 'core/components/Selector'
-import { propEq, prop, pipe, head, find } from 'ramda'
+import { propEq, prop, pipe, head, find, isEmpty } from 'ramda'
 import { Tooltip } from '@material-ui/core'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { loadUserTenants } from 'openstack/components/tenants/actions'
@@ -14,10 +14,10 @@ const TenantChooser = (props) => {
   const { keystone } = ApiClient.getInstance()
   const [tenantSearch, setTenantSearch] = useState('')
   const [loading, setLoading] = useState(false)
-  const [{ currentTenant }, updatePrefs] = useScopedPreferences()
+  const [{ currentTenant, currentRegion }, updatePrefs] = useScopedPreferences()
   const [selectedTenantName, setSelectedTenantName] = useState()
   const [tooltipOpen, setTooltipOpen] = useState(false)
-  const [tenants, loadingTenants] = useDataLoader(loadUserTenants)
+  const [tenants, loadingTenants, reloadTenants] = useDataLoader(loadUserTenants)
   const dispatch = useDispatch()
   const curTenantName = useMemo(() => {
     if (selectedTenantName) {
@@ -28,6 +28,13 @@ const TenantChooser = (props) => {
     }
     return pipe(head, prop('name'))(tenants)
   }, [tenants, currentTenant, selectedTenantName])
+
+  useEffect(() => {
+    // Reload tenants when changing the current region
+    if (isEmpty(tenants) && loadingTenants === undefined) {
+      reloadTenants(true)
+    }
+  }, [currentRegion, tenants])
 
   const updateCurrentTenant = async (tenantName) => {
     setLoading(true)

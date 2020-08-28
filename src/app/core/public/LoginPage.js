@@ -121,7 +121,7 @@ class LoginPage extends React.PureComponent {
       duDomain: window.location.origin,
     })
 
-    onAuthSuccess({ username, unscopedToken, expiresAt, issuedAt })
+    await onAuthSuccess({ username, unscopedToken, expiresAt, issuedAt })
     return this.setState(
       {
         loading: false,

@@ -14,6 +14,10 @@ import {
   of,
   identity,
   Dictionary,
+  whereEq,
+  find,
+  when,
+  isNil,
 } from 'ramda'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import {
@@ -142,7 +146,12 @@ const reducers = {
       over(dataLens, upsertNewItems),
       // I params are provided, add them to cachedParams so that
       // we know this query has already been resolved
-      over(paramsLens, params ? pipe(arrayIfNil, append(params)) : identity),
+      over(
+        paramsLens,
+        params
+          ? pipe(arrayIfNil, when(pipe(find(whereEq(params)), isNil), append(params)))
+          : identity,
+      ),
     )(state)
   },
   replaceAll: <T extends Dictionary<any>>(

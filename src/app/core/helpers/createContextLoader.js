@@ -148,7 +148,7 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
           cacheActions.replaceAll({
             cacheKey,
             items: itemsWithParams,
-            params,
+            params: providedIndexedParams,
           }),
         )
       } else {

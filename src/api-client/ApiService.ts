@@ -17,6 +17,8 @@ abstract class ApiService {
     this.apiEndpoint = ''
 
     this.apiEndpoint = await this.getEndpoint()
+
+    // Make the endpoint available for the selectors
     store.dispatch(
       clientActions.setEndpoint({
         clientKey: this.clsName,

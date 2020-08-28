@@ -1,7 +1,7 @@
-import createContextLoader from 'core/helpers/createContextLoader'
 import ApiClient from 'api-client/ApiClient'
-import createCRUDActions from 'core/helpers/createCRUDActions'
+import createContextLoader from 'core/helpers/createContextLoader'
 import createContextUpdater from 'core/helpers/createContextUpdater'
+import createCRUDActions from 'core/helpers/createCRUDActions'
 import { ActionDataKeys } from 'k8s/DataKeys'
 
 const { resMgr } = ApiClient.getInstance()
