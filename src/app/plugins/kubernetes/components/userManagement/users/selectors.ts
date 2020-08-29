@@ -103,7 +103,7 @@ export const usersSelector = createSelector(
   },
 )
 
-export const makeFilteredTenantsSelector = (defaultParams = {}) => {
+export const makeFilteredUsersSelector = (defaultParams = {}) => {
   return createSelector(
     [usersSelector, tenantsSelector, (_, params) => mergeLeft(params, defaultParams)],
     (users, allTenants, params) => {

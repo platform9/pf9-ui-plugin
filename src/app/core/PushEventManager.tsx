@@ -75,6 +75,7 @@ class PushEventManager {
   public readonly connect = () => {
     const wsUrl = getWebSocketUrl()
     if (!wsUrl) {
+      this.handleClose()
       return this
     }
     this.socket = new WebSocket(wsUrl)
@@ -85,9 +86,13 @@ class PushEventManager {
   }
 
   public readonly disconnect = () => {
+    if (!this.socket) {
+      return
+    }
     this.socket.removeEventListener('open', this.handleOpen)
     this.socket.removeEventListener('close', this.handleClose)
     this.socket.removeEventListener('message', this.handleMessage)
+    this.socket = null
   }
 
   public readonly subscribe = (listener: SubscriberFnType) => {

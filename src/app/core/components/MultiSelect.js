@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) =>
   createStyles({
     container: {
       position: 'relative',
-      display: 'inline-flex',
+      display: 'flex',
       flexDirection: 'column',
       padding: theme.spacing(2, 1, 1, 1),
       borderRadius: 4,
@@ -123,33 +123,35 @@ const MultiSelect = React.forwardRef(
     }
 
     return (
-      <FormControl className={clsx(classes.container, className)} id={id} error={hasError} ref={ref}>
-        <Typography className={classes.label} variant="caption">
-          {required ? `${label} *` : label}
-        </Typography>
-        <SearchField
-          classes={classes}
-          term={term}
-          onSearchChange={setTerm}
-          onHitEnter={onHitEnter}
-        />
-        <Box
-          className={classes.options}
-          style={{ height: maxOptions ? getOptionsHeight(maxOptions) : 'initial' }}
-        >
-          {sortedOptions.map((option) => (
-            <Option
-              classes={classes}
-              key={option.value}
-              label={option.label}
-              value={option.value}
-              checked={values.includes(option.value)}
-              onChange={() => toggleOption(option.value)}
-            />
-          ))}
-        </Box>
-        {errorMessage && <FormHelperText>{errorMessage}</FormHelperText>}
-      </FormControl>
+      <div className={clsx('MuiFormControl-root', className)}>
+        <FormControl className={classes.container} id={id} error={hasError} ref={ref}>
+          <Typography className={classes.label} variant="caption">
+            {required ? `${label} *` : label}
+          </Typography>
+          <SearchField
+            classes={classes}
+            term={term}
+            onSearchChange={setTerm}
+            onHitEnter={onHitEnter}
+          />
+          <Box
+            className={classes.options}
+            style={{ height: maxOptions ? getOptionsHeight(maxOptions) : 'initial' }}
+          >
+            {sortedOptions.map((option) => (
+              <Option
+                classes={classes}
+                key={option.value}
+                label={option.label}
+                value={option.value}
+                checked={values.includes(option.value)}
+                onChange={() => toggleOption(option.value)}
+              />
+            ))}
+          </Box>
+          {errorMessage && <FormHelperText>{errorMessage}</FormHelperText>}
+        </FormControl>
+      </div>
     )
   },
 )

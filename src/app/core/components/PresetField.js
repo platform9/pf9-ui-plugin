@@ -6,11 +6,12 @@ const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
     marginBottom: '10px',
+    marginLeft: theme.spacing(1),
   },
   label: {
     flexGrow: 0,
     fontWeight: 'bold',
-    width: '100px',
+    minWidth: '150px',
   },
 }))
 

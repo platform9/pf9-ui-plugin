@@ -2,6 +2,7 @@ import ApiClient from 'api-client/ApiClient'
 import createContextLoader from 'core/helpers/createContextLoader'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { mngmTenantActions } from 'k8s/components/userManagement/tenants/actions'
+import { makeFilteredUsersSelector } from 'k8s/components/userManagement/users/selectors'
 import { always, find, head, isNil, keys, pipe, prop, propEq, reject } from 'ramda'
 import { tryCatchAsync } from 'utils/async'
 import { emptyArr, objSwitchCase, pathStr } from 'utils/fp'
@@ -143,6 +144,7 @@ export const mngmUserActions = createCRUDActions(ActionDataKeys.ManagementUsers,
         prop('username'),
       )(prevItems)} deleted successfully`,
     })(operation),
+  selectorCreator: makeFilteredUsersSelector,
 })
 
 export const mngmUserRoleAssignmentsLoader = createContextLoader(

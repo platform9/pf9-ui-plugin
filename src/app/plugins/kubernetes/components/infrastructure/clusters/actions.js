@@ -5,16 +5,19 @@ import {
   createAwsCluster,
   createAzureCluster,
   createBareOSCluster,
-  getEtcdBackupPayload,
   getKubernetesVersion,
   getProgressPercent,
 } from 'k8s/components/infrastructure/clusters/helpers'
+import {
+  clustersSelector,
+  makeParamsClustersSelector,
+} from 'k8s/components/infrastructure/clusters/selectors'
 import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import { mergeLeft, pathOr, pick, propEq } from 'ramda'
 import { mapAsync } from 'utils/async'
 import { adjustWith, updateWith } from 'utils/fp'
-import { clustersSelector, makeParamsClustersSelector } from './selectors'
+import { trackEvent } from 'utils/tracking'
 
 const { appbert, qbert } = ApiClient.getInstance()
 
@@ -24,6 +27,15 @@ export const clusterTagActions = createCRUDActions(ActionDataKeys.ClusterTags, {
   },
   uniqueIdentifier: 'uuid',
 })
+
+const getCsiDrivers = async (clusterUiid) => {
+  try {
+    return await qbert.getClusterCsiDrivers(clusterUiid)
+  } catch (e) {
+    console.warn(e)
+    return null
+  }
+}
 
 export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
   listFn: async () => {
@@ -39,9 +51,11 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
         cluster.taskStatus === 'converging' ? await getProgressPercent(cluster.uuid) : null
       const version = await getKubernetesVersion(cluster.uuid)
       const baseUrl = await qbert.clusterBaseUrl(cluster.uuid)
+      const csiDrivers = await getCsiDrivers(cluster.uuid)
 
       return {
         ...cluster,
+        csiDrivers,
         progressPercent,
         version,
         baseUrl,
@@ -60,14 +74,14 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
     }
   },
   updateFn: async ({ uuid, ...params }) => {
-    const updateableParams = 'name tags numWorkers numMinWorkers numMaxWorkers'.split(' ')
+    const updateableParams = 'name tags numWorkers numMinWorkers numMaxWorkers etcdBackup'.split(
+      ' ',
+    )
     const body = pick(updateableParams, params)
 
-    // This is currently supported by all cloud providers except GCP (which we
-    // don't have yet anyways)
-    body.etcdBackup = getEtcdBackupPayload('etcdBackup', params)
-
     await qbert.updateCluster(uuid, body)
+    trackEvent('Update Cluster', { uuid })
+
     // Doing this will help update the table, but the cache remains incorrect...
     // Same issue regarding cache applies to anything else updated this function
     // body.etcdBackupEnabled = !!body.etcdBackup
@@ -76,6 +90,12 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
   },
   deleteFn: async ({ uuid }) => {
     await qbert.deleteCluster(uuid)
+    // Delete cluster Segment tracking is done in ClusterDeleteDialog.tsx because that code
+    // has more context about the cluster name, etc.
+
+    // Refresh clusters since combinedHosts will still
+    // have references to the deleted cluster.
+    // loadCombinedHosts.invalidateCache()
   },
   customOperations: {
     scaleCluster: async ({ cluster, numSpotWorkers, numWorkers, spotPrice }, prevItems) => {
@@ -86,6 +106,7 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
         spotWorkerFlavor: cluster.cloudProperties.workerFlavor,
       }
       await qbert.updateCluster(cluster.uuid, body)
+      trackEvent('Scale Cluster', { clusterUuid: cluster.uuid, numSpotWorkers, numWorkers })
 
       // Update the cluster in the cache
       return updateWith(
@@ -99,6 +120,7 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
     },
     upgradeCluster: async ({ uuid }, prevItems) => {
       await qbert.upgradeCluster(uuid)
+      trackEvent('Upgrade Cluster', { clusterUuid: uuid })
 
       // Update the cluster in the cache
       return adjustWith(
@@ -127,10 +149,20 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
     },
     attachNodes: async ({ cluster, nodes }, prevItems) => {
       await qbert.attach(cluster.uuid, nodes)
+      trackEvent('Cluster Attach Nodes', {
+        numNodes: (nodes || []).length,
+        clusterUuid: cluster.uuid,
+      })
+      // loadCombinedHosts.invalidateCache()
       return prevItems
     },
     detachNodes: async ({ cluster, nodes }, prevItems) => {
       await qbert.detach(cluster.uuid, nodes)
+      trackEvent('Cluster Detach Nodes', {
+        numNodes: (nodes || []).length,
+        clusterUuid: cluster.uuid,
+      })
+      // loadCombinedHosts.invalidateCache()
       return prevItems
     },
   },

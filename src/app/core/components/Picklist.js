@@ -14,10 +14,11 @@ import { isNilOrEmpty, emptyArr, ensureArray } from 'utils/fp'
  */
 const useStyles = makeStyles((theme) => ({
   root: {
-    display: ({ formField }) => (formField ? 'flex' : 'block'),
+    display: ({ formField, inline }) => (formField ? 'flex' : inline ? 'inline-block' : 'block'),
     flexWrap: 'wrap',
     minWidth: 120,
     marginTop: theme.spacing(1),
+    background: '#ffffff',
   },
   list: {
     maxHeight: 400,
@@ -55,7 +56,7 @@ const Picklist = React.forwardRef((props, ref) => {
         showNone ? prepend({ label: noneLabel || 'None', value: noneKey }) : identity,
         showAll ? prepend({ label: 'All', value: allKey }) : identity,
         map((option) => (
-          <MenuItem value={option.value} key={option.value}>
+          <MenuItem value={option.value} key={option.label}>
             {option.label}
           </MenuItem>
         )),
@@ -130,6 +131,7 @@ Picklist.propTypes = {
   value: valuePropType,
   variant: PropTypes.string,
   multiple: PropTypes.bool,
+  inline: PropTypes.bool,
 }
 
 Picklist.defaultProps = {
@@ -140,6 +142,7 @@ Picklist.defaultProps = {
   value: '',
   variant: 'outlined',
   multiple: false,
+  inline: false,
 }
 
 export default Picklist

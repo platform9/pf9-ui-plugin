@@ -36,7 +36,10 @@ export const prometheusSelector = createSelector(
 )
 
 export const serviceAccountSelector = createSelector(
-  [getDataSelector<DataKeys.ServiceAccounts>(DataKeys.ServiceAccounts), clustersSelector],
+  [
+    getDataSelector<DataKeys.ServiceAccounts>(DataKeys.ServiceAccounts, ['clusterId', 'namespace']),
+    clustersSelector,
+  ],
   (rawServiceAccountActions, clusters) => {
     return rawServiceAccountActions.map(({ clusterId, metadata, spec }) => ({
       uid: metadata.uid,

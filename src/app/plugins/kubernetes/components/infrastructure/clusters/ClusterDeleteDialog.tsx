@@ -15,6 +15,8 @@ import DeauthNodeDialog from '../nodes/DeauthNodeDialog'
 import { ICluster } from './model'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import Alert from 'core/components/Alert'
+import { CloudProviders } from '../cloudProviders/model'
+import { trackEvent } from 'utils/tracking'
 
 interface IClusterDeleteDialog {
   rows: ICluster[]
@@ -24,11 +26,17 @@ interface IClusterDeleteDialog {
 const stopPropagation = (e) => e.stopPropagation()
 const ClusterDeleteDialog: React.FC<IClusterDeleteDialog> = ({ rows: [cluster], onClose }) => {
   const [showDeauthNodeDialog, setShowDeauthNodeDialog] = useState(false)
-  const [deleteCluster, deletingCluster] = useDataUpdater(clusterActions.delete, (success) =>
+  const [deleteCluster, deletingCluster] = useDataUpdater(clusterActions.delete, (success) => {
+    trackEvent('Delete Cluster', {
+      cluster_uuid: cluster.uuid,
+      cluster_name: cluster.name,
+      cluster_nodes: cluster.nodes.length,
+      cloud_provider_type: cluster.cloudProviderType,
+    })
     // TODO: If deauth node feature is supported after cluster delete then enable this feature
     // eslint-disable-next-line no-constant-condition
-    false && success && cluster?.nodes?.length > 0 ? setShowDeauthNodeDialog(true) : onClose(),
-  )
+    false && success && cluster?.nodes?.length > 0 ? setShowDeauthNodeDialog(true) : onClose()
+  })
   const title = `Permanently delete cluster "${cluster?.name}"?`
   const handleDelete = useCallback(async () => {
     await deleteCluster(cluster)
@@ -49,11 +57,13 @@ const ClusterDeleteDialog: React.FC<IClusterDeleteDialog> = ({ rows: [cluster], 
                 Please type "<b>{cluster?.name}</b>" to confirm.
               </Typography>
               <TextField id="clusterName" type="text" label="Cluster name" />
-              <Alert
-                small
-                variant="warning"
-                message="When deleting a cluster all nodes will remain connected to Platform9"
-              />
+              {cluster.cloudProviderType === CloudProviders.BareOS && (
+                <Alert
+                  small
+                  variant="warning"
+                  message="When deleting a BareOS cluster all nodes will remain connected to Platform9"
+                />
+              )}
             </DialogContent>
             <DialogActions>
               <Button variant="outlined" color="secondary" onClick={onClose}>

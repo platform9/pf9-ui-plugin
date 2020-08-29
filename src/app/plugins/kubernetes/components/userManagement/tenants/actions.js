@@ -2,15 +2,16 @@ import ApiClient from 'api-client/ApiClient'
 import createContextLoader from 'core/helpers/createContextLoader'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import namespaceActions from 'k8s/components/namespaces/actions'
+import { makeFilteredTenantsSelector } from 'k8s/components/userManagement/tenants/selectors'
 import { mngmUserActions } from 'k8s/components/userManagement/users/actions'
 import { always, find, isNil, keys, pipe, prop, propEq, reject } from 'ramda'
 import { tryCatchAsync } from 'utils/async'
 import { emptyArr, objSwitchCase, pathStr } from 'utils/fp'
-import { ActionDataKeys } from 'k8s/DataKeys'
+import DataKeys from 'k8s/DataKeys'
 
 const { keystone } = ApiClient.getInstance()
 
-export const mngmTenantActions = createCRUDActions(ActionDataKeys.ManagementTenants, {
+export const mngmTenantActions = createCRUDActions(DataKeys.ManagementTenants, {
   listFn: async () => {
     const [allTenantsAllUsers] = await Promise.all([
       keystone.getAllTenantsAllUsers(),
@@ -51,7 +52,7 @@ export const mngmTenantActions = createCRUDActions(ActionDataKeys.ManagementTena
   },
   updateFn: async ({ id: tenantId, name, description, roleAssignments }) => {
     const [users, prevRoleAssignmentsArr] = await Promise.all([
-      mngmUserActions.list(ActionDataKeys.ManagementUsers),
+      mngmUserActions.list(DataKeys.ManagementUsers),
       mngmTenantRoleAssignmentsLoader({
         tenantId,
       }),
@@ -119,10 +120,11 @@ export const mngmTenantActions = createCRUDActions(ActionDataKeys.ManagementTena
         prop('name'),
       )(prevItems)} deleted successfully`,
     })(operation),
+  selectorCreator: makeFilteredTenantsSelector,
 })
 
 export const mngmTenantRoleAssignmentsLoader = createContextLoader(
-  ActionDataKeys.ManagementTenantsRoleAssignments,
+  DataKeys.ManagementTenantsRoleAssignments,
   async ({ tenantId }) => (await keystone.getTenantRoleAssignments(tenantId)) || emptyArr,
   {
     uniqueIdentifier: ['user.id', 'role.id', 'scope.project.id'],

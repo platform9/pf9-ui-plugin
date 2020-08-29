@@ -114,9 +114,14 @@ export function getHealthStatus(
   connectionStatus: ConnectionStatus | TransientStatus,
   masterStatus: HealthStatus | TransientStatus,
   workerStatus: HealthStatus | TransientStatus,
+  canUpgrade,
 ) {
   if (isTransientStatus(connectionStatus)) {
     return connectionStatus as TransientStatus
+  }
+
+  if (canUpgrade) {
+    return 'needs_upgrade'
   }
 
   const healthStatusAndMessage = findClusterHealthValues(masterStatus, workerStatus)
@@ -313,6 +318,10 @@ export const clusterHealthStatusFields: {
   converging: {
     status: 'loading',
     label: 'Converging',
+  },
+  needs_upgrade: {
+    status: 'upgrade',
+    label: 'Upgrade Available',
   },
 }
 

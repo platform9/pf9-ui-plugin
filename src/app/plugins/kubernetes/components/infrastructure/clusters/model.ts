@@ -3,7 +3,12 @@ import { CloudProviders } from '../cloudProviders/model'
 import { ClusterElement, INormalizedCluster, Node } from 'api-client/qbert.model'
 import { Pkg } from 'api-client/appbert.model'
 
-export type HealthStatus = 'healthy' | 'partially_healthy' | 'unhealthy' | 'unknown'
+export type HealthStatus =
+  | 'healthy'
+  | 'partially_healthy'
+  | 'unhealthy'
+  | 'unknown'
+  | 'needs_upgrade'
 
 interface IClusterAsyncAction {
   progressPercent: any
@@ -198,4 +203,4 @@ interface Metric {
   percent: number
 }
 
-export type IClusterStatus = 'ok' | 'pause' | 'fail' | 'unknown' | 'error' | 'loading'
+export type IClusterStatus = 'ok' | 'pause' | 'fail' | 'unknown' | 'error' | 'loading' | 'upgrade'

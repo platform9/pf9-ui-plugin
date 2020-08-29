@@ -1,14 +1,23 @@
 import { createSelector } from 'reselect'
-import { find, mergeLeft, pathOr, pipe, prop, propEq } from 'ramda'
-import { emptyArr } from 'utils/fp'
+import { equals, find, flatten, mergeLeft, pathOr, pipe, prop, propEq } from 'ramda'
+import { emptyArr, filterIf, pathStr } from 'utils/fp'
 import moment from 'moment'
 import { cacheStoreKey, dataStoreKey } from 'core/caching/cacheReducers'
 import { clustersSelector } from 'k8s/components/infrastructure/clusters/selectors'
 import DataKeys from 'k8s/DataKeys'
-import { IAlert, IAlertOverTime, IAlertOverTimeSelector, ISeverityCount } from './model'
+import {
+  IAlert,
+  IAlertOverTime,
+  IAlertOverTimeSelector,
+  IAlertSelector,
+  ISeverityCount,
+} from './model'
 import { IClusterAction } from '../infrastructure/clusters/model'
 import { IDataKeys } from 'k8s/datakeys.model'
 import { clientStoreKey } from 'core/client/clientReducers'
+import getDataSelector from 'core/utils/getDataSelector'
+import createSorter from 'core/helpers/createSorter'
+import { prometheusRuleSelector } from 'k8s/components/prometheus/selectors'
 
 const getQbertUrl = (qbertEndpoint) => {
   // Trim the uri after "/qbert" from the qbert endpoint
@@ -35,13 +44,27 @@ const timestampSteps = {
 // TODO replace IClusterAction typings with cluster selector return types.
 export const alertsSelector = createSelector(
   [
-    (state) => pathOr(emptyArr, [cacheStoreKey, dataStoreKey, DataKeys.Alerts])(state),
+    getDataSelector(DataKeys.Alerts, ['clusterId']),
     clustersSelector,
-    (state) => pathOr('', [clientStoreKey, 'endpoints', 'qbert'])(state),
+    prometheusRuleSelector,
+    pathOr('', [clientStoreKey, 'endpoints', 'qbert']),
   ],
-  (alerts, clusters, qbertEndpoint) => {
+  (rawAlerts, clusters, prometheusRules, qbertEndpoint) => {
     const grafanaUrlBuilder = getGrafanaUrl(getQbertUrl(qbertEndpoint))
-    return alerts.map((alert) => ({
+    // Need to dig into the coreos prometheus rules to fetch the 'for' property
+    const flattenedRules = flatten(
+      prometheusRules.map((cluster) =>
+        flatten(
+          cluster.rules.map((rules) =>
+            rules.rules.map((rule) => ({
+              ...rule,
+              clusterUuid: cluster.clusterUuid,
+            })),
+          ),
+        ),
+      ),
+    )
+    return rawAlerts.map((alert) => ({
       ...alert,
       severity: alert?.labels?.severity, // pathStr('labels.severity', alert)
       summary: alert?.annotations?.message, // pathStr('annotations.message', alert),
@@ -51,10 +74,34 @@ export const alertsSelector = createSelector(
         find<IClusterAction>(propEq('uuid', alert.clusterId)),
         prop('name'),
       )(clusters),
+      for: flattenedRules.find((rule) => {
+        return (
+          equals(rule.alert, alert.name) &&
+          equals(pathStr('labels.severity', rule), pathStr('labels.severity', alert)) &&
+          equals(rule.clusterUuid, alert.clusterId)
+        )
+      }).for,
       grafanaLink: grafanaUrlBuilder(alert),
     }))
   },
 )
+export const makeAlertsSelector = (
+  defaultParams = {
+    orderBy: 'activeAt',
+    orderDirection: 'desc',
+  },
+) => {
+  return createSelector(
+    [alertsSelector, (_, params) => mergeLeft(params, defaultParams)],
+    (alerts, params) => {
+      const { showNeverActive, orderBy, orderDirection } = params
+      return pipe<IAlertSelector[], IAlertSelector[], IAlertSelector[]>(
+        filterIf(showNeverActive, (alert) => alert.activeAt),
+        createSorter({ orderBy, orderDirection }),
+      )(alerts)
+    },
+  )
+}
 
 // TODO typings for params
 export const makeTimeSeriesSelector = (

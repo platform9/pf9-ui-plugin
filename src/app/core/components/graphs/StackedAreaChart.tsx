@@ -1,18 +1,8 @@
-import React from 'react'
-import {
-  AreaChart,
-  Area,
-  XAxis as XAxisT,
-  YAxis as YAxisT,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip as TooltipT,
-} from 'recharts'
+import React, { ReactNode } from 'react'
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from 'recharts'
 import { useTheme } from '@material-ui/core/styles'
 import { pathStr } from 'utils/fp'
-const XAxis: any = XAxisT
-const YAxis: any = YAxisT
-const Tooltip: any = TooltipT
+
 /*
   Usage:
   type IRequiredAreaChartTypes = 'warning' | 'critical' | 'fatal'
@@ -50,6 +40,7 @@ type AreaChartEntry<T extends string, V extends string> = { [P in T | V]: any }
 export interface AreaChartType<T> {
   name: T
   color: string
+  icon?: string
 }
 
 // types should be a list of strings that also show up in AreaChartEntry as a property
@@ -60,6 +51,8 @@ interface Props<T extends string, V extends string> {
   xAxis: T
   keys: Array<AreaChartType<V>>
   responsive?: boolean
+  verticalAxisLines?: boolean
+  CustomTooltip?: ReactNode
 }
 
 // Todo: Instead of a set width and height, also allow for percents
@@ -69,17 +62,27 @@ function StackedAreaChart<Axis extends string, Types extends string>({
   height = 400,
   keys,
   xAxis,
+  verticalAxisLines = false,
   responsive = false,
+  CustomTooltip,
 }: Props<Axis, Types>) {
   const theme: any = useTheme()
 
-  return responsive ? (
-    <ResponsiveContainer width="100%" height={250}>
-      <AreaChart data={values} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey={xAxis} />
-        <YAxis />
-        <Tooltip />
+  const renderAreaChart = () => {
+    return (
+      <AreaChart
+        data={values}
+        margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
+      >
+        <CartesianGrid vertical={verticalAxisLines} strokeDasharray="12 3" stroke="#e6e6e6" dot={{strokeWidth: 4}} />
+        <XAxis tick={{fontSize: 11}} dataKey={xAxis} />
+        <YAxis tick={{fontSize: 11}} />
+        <Tooltip
+          {...{
+            cursor: {stroke: 'rgba(96, 96, 96, 0.5)', strokeWidth: 6},
+            ...(CustomTooltip && { content: CustomTooltip }),
+          }}
+        />
         {keys.map(({ name, color }) => (
           <Area
             key={name}
@@ -87,33 +90,23 @@ function StackedAreaChart<Axis extends string, Types extends string>({
             dataKey={name}
             stackId="1"
             stroke={pathStr(color, theme.palette)}
+            strokeWidth={2}
             fill={pathStr(color, theme.palette)}
+            activeDot={{strokeWidth: 4, r: 8, stroke: "rgba(96, 96, 96, 0.5)"}}
           />
         ))}
       </AreaChart>
+    )
+  }
+
+  return responsive ? (
+    <ResponsiveContainer width="100%" height={250}>
+      {renderAreaChart()}
     </ResponsiveContainer>
   ) : (
-    <AreaChart
-      width={width}
-      height={height}
-      data={values}
-      margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-    >
-      <CartesianGrid strokeDasharray="3 3" />
-      <XAxis dataKey={xAxis} />
-      <YAxis />
-      <Tooltip />
-      {keys.map(({ name, color }) => (
-        <Area
-          key={name}
-          type="monotone"
-          dataKey={name}
-          stackId="1"
-          stroke={pathStr(color, theme.palette)}
-          fill={pathStr(color, theme.palette)}
-        />
-      ))}
-    </AreaChart>
+    <div>
+      {renderAreaChart()}
+    </div>
   )
 }
 

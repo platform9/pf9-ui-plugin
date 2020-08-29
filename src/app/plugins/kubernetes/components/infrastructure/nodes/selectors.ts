@@ -1,10 +1,11 @@
 import { createSelector } from 'reselect'
 import { find, mergeLeft, pipe, prop, propEq } from 'ramda'
-import { pathStrOrNull, pipeWhenTruthy } from 'utils/fp'
+import { pipeWhenTruthy } from 'utils/fp'
 import { combinedHostsSelector } from 'k8s/components/infrastructure/common/selectors'
 import createSorter from 'core/helpers/createSorter'
 import DataKeys from 'k8s/DataKeys'
 import getDataSelector from 'core/utils/getDataSelector'
+import { ICombinedHost } from 'k8s/components/infrastructure/common/model'
 
 export const nodesSelector = createSelector(
   [
@@ -12,15 +13,16 @@ export const nodesSelector = createSelector(
     combinedHostsSelector,
     getDataSelector<DataKeys.ServiceCatalog>(DataKeys.ServiceCatalog),
   ],
-  (rawNodes, combinedHosts, serviceCatalog) => {
+  (rawNodes, combinedHosts, rawServiceCatalog) => {
     const combinedHostsObj = combinedHosts.reduce((accum, host) => {
-      const id = pathStrOrNull('resmgr.id')(host) || pathStrOrNull('qbert.uuid')(host)
+      const id = host?.resmgr?.id || host?.qbert?.uuid || null
       accum[id] = host
       return accum
-    }, {})
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    }, {} as { [key: string]: ICombinedHost })
 
     const qbertUrl =
-      pipeWhenTruthy(find(propEq('name', 'qbert')), prop('url'))(serviceCatalog) || ''
+      pipeWhenTruthy(find(propEq('name', 'qbert')), prop('url'))(rawServiceCatalog) || ''
 
     // associate nodes with the combinedHost entry
     return rawNodes.map((node) => ({

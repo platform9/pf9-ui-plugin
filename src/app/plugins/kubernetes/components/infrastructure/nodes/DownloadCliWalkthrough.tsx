@@ -8,6 +8,8 @@ import { hexToRGBA } from 'core/utils/colorHelpers'
 import { sessionStoreKey, SessionState } from 'core/session/sessionReducers'
 import { prop } from 'ramda'
 import { useSelector } from 'react-redux'
+import ExternalLink from 'core/components/ExternalLink'
+import { nodePrerequisitesDocumentationLink } from 'k8s/links'
 
 const useStyles = makeStyles((theme: Theme) => ({
   paper: {
@@ -46,23 +48,42 @@ const useStyles = makeStyles((theme: Theme) => ({
     textDecoration: 'underline',
     color: theme.palette.primary.main,
   },
+  headerDiv: {
+    marginTop: theme.spacing(2),
+  },
+  externalLink: {
+    float: 'right',
+    margin: theme.spacing(1),
+  },
 }))
 
 const downloadAndInstallCommand = 'bash <(curl -sL http://pf9.io/get_cli)'
 
 // Not super enthused about this. Need to have different content for bareos flow vs landing page.
-export const DownloadCliOnboardNodeWalkthrough = (): JSX.Element => (
-  <>
-    <Typography variant="h6">Pre-requisites</Typography>
-    <p>
-      <Typography component="span">
-        You will need a physical or virtual machine with Ubuntu 16.04 installed. (Support for CentOS
-        is coming soon!)
-      </Typography>
-    </p>
-    <DownloadCliWalkthrough />
-  </>
-)
+export const DownloadCliOnboardNodeWalkthrough = (): JSX.Element => {
+  const classes = useStyles({})
+  return (
+    <>
+      <div className={classes.headerDiv}>
+        <ExternalLink
+          className={classes.externalLink}
+          url={nodePrerequisitesDocumentationLink}
+          icon="file-alt"
+        >
+          Pre-requisites Documentation
+        </ExternalLink>
+        <Typography variant="h6">OS Requirements</Typography>
+      </div>
+      <p>
+        <Typography component="span">
+          You will need a physical or virtual machine with Ubuntu (16.04 / 18.04) or CentOS
+          (7.6/7.7/7.8) installed.
+        </Typography>
+      </p>
+      <DownloadCliWalkthrough />
+    </>
+  )
+}
 
 const DownloadCliWalkthrough = (): JSX.Element => {
   const classes = useStyles({})

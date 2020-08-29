@@ -7,6 +7,7 @@ export interface SessionState {
   username: string
   expiresAt: string
   userDetails: { [key: string]: any }
+  features: { [key: string]: any }
 }
 
 export const initialState: SessionState = {
@@ -15,6 +16,7 @@ export const initialState: SessionState = {
   username: null,
   expiresAt: null,
   userDetails: {},
+  features: {},
 }
 
 const { name: sessionStoreKey, reducer: sessionReducers, actions: sessionActions } = createSlice({

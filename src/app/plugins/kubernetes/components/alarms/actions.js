@@ -1,15 +1,19 @@
-import createContextLoader from 'core/helpers/createContextLoader'
 import ApiClient from 'api-client/ApiClient'
-import { pluck, flatten, pipe, filter } from 'ramda'
-import { someAsync } from 'utils/async'
-import moment from 'moment'
 import { allKey } from 'app/constants'
-import { alertsSelector, makeTimeSeriesSelector } from 'k8s/components/alarms/selectors'
-import { ActionDataKeys } from 'k8s/DataKeys'
+import createContextLoader from 'core/helpers/createContextLoader'
 import {
-  hasPrometheusTag,
+  alertsSelector,
+  makeAlertsSelector,
+  makeTimeSeriesSelector,
+} from 'k8s/components/alarms/selectors'
+import {
   hasHealthyMasterNodes,
+  hasPrometheusTag,
 } from 'k8s/components/infrastructure/clusters/selectors'
+import { ActionDataKeys } from 'k8s/DataKeys'
+import moment from 'moment'
+import { filter, flatten, pipe, pluck } from 'ramda'
+import { someAsync } from 'utils/async'
 
 const { qbert } = ApiClient.getInstance()
 
@@ -24,8 +28,8 @@ export const loadAlerts = createContextLoader(
   {
     entityName: 'Alert',
     uniqueIdentifier: 'id',
-    indexBy: 'clusterId',
     selector: alertsSelector,
+    selectorCreator: makeAlertsSelector,
   },
 )
 
@@ -79,6 +83,6 @@ export const loadTimeSeriesAlerts = createContextLoader(
     // cache does not work properly
     uniqueIdentifier: 'timestamp',
     selectorCreator: makeTimeSeriesSelector,
-    indexBy: ['chartClusterId', 'chartTime'],
+    indexBy: ['clusterId', 'chartTime'],
   },
 )

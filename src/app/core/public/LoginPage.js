@@ -22,6 +22,7 @@ import { imageUrlRoot, dashboardUrl } from 'app/constants'
 import moment from 'moment'
 import { connect } from 'react-redux'
 import { trackEvent } from 'utils/tracking'
+import { MFAHelpLink } from 'k8s/links'
 import { sessionActions } from 'core/session/sessionReducers'
 
 const styles = (theme) => ({
@@ -180,9 +181,7 @@ class LoginPage extends React.PureComponent {
           label={
             <div>
               <span>I have a Multi-Factor Authentication (MFA) token. (</span>
-              <ExternalLink url="https://platform9.com/support/setup-multi-factor-authentication-with-platform9/">
-                more info
-              </ExternalLink>
+              <ExternalLink url={MFAHelpLink}>more info</ExternalLink>
               <span>)</span>
             </div>
           }

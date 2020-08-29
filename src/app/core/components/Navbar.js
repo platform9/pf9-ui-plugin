@@ -11,24 +11,63 @@ import {
   MenuItem,
   MenuList,
   Typography,
+  Button,
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
 import ChevronRightIcon from '@material-ui/icons/ChevronRight'
 import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'
-import { except } from 'app/utils/fp'
+import { except, pathStrOr } from 'app/utils/fp'
 import clsx from 'clsx'
 import moize from 'moize'
-import { assoc, flatten, pluck, prop, propEq, propOr, where, equals } from 'ramda'
+import { assoc, flatten, pluck, prop, propEq, propOr, where, equals, indexOf } from 'ramda'
 import { matchPath, withRouter } from 'react-router'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
-import { imageUrls, clarityDashboardUrl } from 'app/constants'
+import {
+  imageUrls,
+  clarityDashboardUrl,
+  helpUrl,
+  ironicWizardUrl,
+  dashboardUrl
+} from 'app/constants'
 import { routes } from 'core/utils/routes'
+
+import SimpleLink from './SimpleLink'
+import { withAppContext } from 'core/providers/AppProvider'
 
 export const drawerWidth = 180
 
 const styles = (theme) => ({
+  bottomContentClose: {
+    display: 'none !important',
+  },
+  bottomContent: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    padding: theme.spacing(2, 1, 1, 1),
+    backgroundColor: theme.palette.header.background,
+    '& a': {
+      margin: theme.spacing(2, 0),
+      textDecorationColor: '#e6e6e6 !important',
+    },
+    '& span, & i': {
+      color: '#e6e6e6',
+    },
+    '& button': {
+      backgroundColor: '#f3f3f4',
+      '&:hover': {
+        backgroundColor: '#FFFFFF',
+      },
+      '& *': {
+        color: theme.palette.header.background,
+      },
+      '& i': {
+        marginLeft: theme.spacing(),
+      },
+    },
+  },
   logoTitle: {
     backgroundImage: `url(${imageUrls.logo})`,
     backgroundRepeat: 'no-repeat',
@@ -154,6 +193,7 @@ const styles = (theme) => ({
   navMenu: {
     padding: 0,
     width: '100%',
+    flex: 1,
   },
   navMenuItem: {
     display: 'grid',
@@ -236,21 +276,24 @@ const styles = (theme) => ({
     borderRadius: theme.shape.borderRadius,
     boxSizing: 'border-box',
     backgroundRepeat: 'no-repeat',
-    backgroundImage: ({ stack }) =>
-      stack === 'openstack'
-        ? 'url(/ui/images/logo-sidenav-os.svg)'
-        : 'url(/ui/images/logo-kubernetes-h.png)',
+    backgroundImage: ({ stack }) => {
+      if (stack === 'kubernetes') {
+        return 'url(/ui/images/logo-kubernetes-h.png)'
+      } else if (['openstack', 'metalstack'].includes(stack)) {
+        return 'url(/ui/images/logo-sidenav-os.svg)'
+      }
+    },
     backgroundSize: ({ open, stack }) => {
       if (stack === 'kubernetes') {
         return open ? '120px' : '130px'
-      } else if (stack === 'openstack') {
+      } else if (['openstack', 'metalstack'].includes(stack)) {
         return open ? '120px' : '175px'
       }
     },
     backgroundPosition: ({ open, stack }) => {
       if (stack === 'kubernetes') {
         return open ? '7px center' : '9px center'
-      } else if (stack === 'openstack') {
+      } else if (['openstack', 'metalstack'].includes(stack)) {
         return open ? '10px center' : '7px center'
       }
     },
@@ -262,6 +305,7 @@ const styles = (theme) => ({
   sliderArrow: {
     width: '0.8em',
     color: theme.palette.sidebar.text,
+    cursor: 'pointer',
   },
   heavyWeight: {
     '& i': {
@@ -272,6 +316,7 @@ const styles = (theme) => ({
 
 @withStyles(styles, { withTheme: true })
 @withRouter
+@withAppContext
 class Navbar extends PureComponent {
   state = {
     expandedSection: null,
@@ -373,6 +418,10 @@ class Navbar extends PureComponent {
       },
     )
   })
+
+  handleNavigateToClarity = () => {
+    window.location = clarityDashboardUrl
+  }
 
   renderNavFolder = (name, link, subLinks, icon) => {
     const {
@@ -516,19 +565,35 @@ class Navbar extends PureComponent {
     )
   }
 
+  switchStacks = (direction) => {
+    const { stack, stacks, setStack, history } = this.props
+    const newStack = stacks[stack][direction]
+
+    if (newStack === 'metalstack') {
+      setStack('metalstack')
+      return history.push(ironicWizardUrl)
+    } else if (newStack === 'openstack') {
+      this.handleNavigateToClarity()
+    } else if (newStack === 'kubernetes') {
+      setStack('kubernetes')
+      return history.push(dashboardUrl)
+    }
+  }
+
   renderStackSlider = () => {
+    // Todo: Animate the stack slider
     const { classes, open } = this.props
     return (
       <div className={classes.sliderContainer}>
         {open && (
-          <a href={clarityDashboardUrl}>
-            <ChevronLeftIcon className={classes.sliderArrow} />
+          <a>
+            <ChevronLeftIcon className={classes.sliderArrow} onClick={() => this.switchStacks('left')} />
           </a>
         )}
         <div className={classes.sliderLogo} />
         {open && (
-          <a href={clarityDashboardUrl}>
-            <ChevronRightIcon className={classes.sliderArrow} />
+          <a>
+            <ChevronRightIcon className={classes.sliderArrow} onClick={() => this.switchStacks('right')} />
           </a>
         )}
       </div>
@@ -536,11 +601,23 @@ class Navbar extends PureComponent {
   }
 
   render() {
-    const { classes, withStackSlider, sections, open, handleDrawerToggle, stack } = this.props
+    const {
+      classes,
+      withStackSlider,
+      sections,
+      open,
+      handleDrawerToggle,
+      stack,
+      getContext,
+    } = this.props
     // const filteredSections = sections.filter(where({ links: notEmpty }))
     // Because ironic regions will not currently support kubernetes, assume always
     // one filtered section, either openstack (ironic) or kubernetes
     const filteredSections = sections.filter(where({ id: equals(stack) }))
+
+    const { features } = getContext()
+    const isDecco = pathStrOr(false, 'experimental.kplane', features)
+    const version = pathStrOr('4', 'releaseVersion', features)
 
     return (
       <div
@@ -577,6 +654,23 @@ class Navbar extends PureComponent {
           {filteredSections.length > 1
             ? this.renderSections(filteredSections)
             : this.renderSectionLinks(propOr([], 'links', filteredSections[0]))}
+
+          <div
+            className={clsx(classes.bottomContent, {
+              [classes.bottomContentClose]: !open || isDecco,
+            })}
+          >
+            <Button onClick={this.handleNavigateToClarity}>
+              Back to Legacy UI
+              <FontAwesomeIcon size="md">undo</FontAwesomeIcon>
+            </Button>
+            <SimpleLink src={helpUrl} className={classes.helpLink}>
+              <FontAwesomeIcon>question-circle</FontAwesomeIcon> <span>Need Help?</span>
+            </SimpleLink>
+            <Typography variant="body2" component="span">
+              Version {version}
+            </Typography>
+          </div>
         </Drawer>
       </div>
     )
@@ -608,6 +702,7 @@ Navbar.propTypes = {
   handleDrawerToggle: PropTypes.func,
   sections: PropTypes.arrayOf(PropTypes.shape(sectionPropType)).isRequired,
   stack: PropTypes.string,
+  setStack: PropTypes.func,
 }
 
 Navbar.defaultProps = {

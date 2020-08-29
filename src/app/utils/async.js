@@ -70,3 +70,7 @@ export const someAsync = async (promises, errorHandler = (err) => console.warn(e
   // Just return the successful results
   return results.filter(Array.isArray).map(head)
 }
+
+export const sleep = async (ms) => (
+  await new Promise(resolve => setTimeout(resolve, ms))
+)

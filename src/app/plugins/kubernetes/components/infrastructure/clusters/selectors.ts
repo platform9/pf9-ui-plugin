@@ -25,6 +25,7 @@ import getDataSelector from 'core/utils/getDataSelector'
 import { IClusterSelector } from './model'
 import { Node } from 'api-client/qbert.model'
 import { clientStoreKey } from 'core/client/clientReducers'
+import { getK8sDashboardLinkFromVersion } from 'k8s/components/infrastructure/clusters/helpers'
 
 const monitoringTask = 'pf9-mon'
 const isMonitoringTask = (task: any = {}) =>
@@ -62,9 +63,6 @@ export const clustersSelector = createSelector(
       const nodeIds = pluck('uuid', nodesInCluster)
       const combinedNodes = combinedHosts.filter((x) => nodeIds.includes(x.resmgr.id))
       const calcNodesTotals = calcUsageTotalByPath(combinedNodes)
-      const dashboardLink =
-        `${qbertEndpoint}/clusters/${cluster.uuid}/k8sapi/api/v1/` +
-        `namespaces/kube-system/services/https:kubernetes-dashboard:443/proxy/`
       const host = qbertEndpoint.match(/(.*?)\/qbert/)[1]
       const grafanaLink =
         `${host}/k8s/v1/clusters/${cluster.uuid}/k8sapi/api/v1/` +
@@ -87,6 +85,7 @@ export const clustersSelector = createSelector(
         connectionStatus,
         masterNodesHealthStatus,
         workerNodesHealthStatus,
+        cluster.canUpgrade,
       )
       const hasMasterNode = healthyMasterNodes.length > 0
       const clusterOk = nodesInCluster.length > 0 && cluster.status === 'ok'
@@ -97,10 +96,11 @@ export const clustersSelector = createSelector(
         },
         {},
       )
+      const dashboardLink = getK8sDashboardLinkFromVersion(cluster.version, qbertEndpoint, cluster)
 
       return {
         ...cluster,
-        tasks: clusterWithTasks ? clusterWithTasks.pkgs : [],
+        pkgs: clusterWithTasks ? clusterWithTasks.pkgs : [],
         version: (hasMasterNode && cluster.version) || 'N/A',
         usage,
         nodes: nodesInCluster,

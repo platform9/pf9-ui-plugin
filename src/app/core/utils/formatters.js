@@ -34,3 +34,13 @@ export const formattedDate = (str) => {
   if (!str || !moment(str).isValid()) return 'Invalid date input.'
   return moment(str).format('lll')
 }
+
+export const formattedName = (str = '') => {
+  if (!str) return ''
+  return str
+    .toLowerCase()
+    .replace(/_/g, ' ')
+    .split(' ')
+    .map((word) => word.charAt(0).toUpperCase() + word.substring(1))
+    .join(' ')
+}

@@ -1,16 +1,18 @@
+import jsYaml from 'js-yaml'
+import createCRUDActions from 'core/helpers/createCRUDActions'
 import ApiClient from 'api-client/ApiClient'
 import { allKey } from 'app/constants'
-import createCRUDActions from 'core/helpers/createCRUDActions'
-import jsYaml from 'js-yaml'
+import { pluck, pipe, propEq, find, prop, pathEq, any, toPairs, head, flatten } from 'ramda'
+import { mapAsync, pipeAsync, someAsync } from 'utils/async'
 import { parseClusterParams } from 'k8s/components/infrastructure/clusters/actions'
+import { pathJoin } from 'utils/misc'
 import { ActionDataKeys } from 'k8s/DataKeys'
-import { flatten, pluck } from 'ramda'
-import { someAsync } from 'utils/async'
-import { pathStr } from 'utils/fp'
+import { pathStr, filterIf, pathStrOr, emptyObj, emptyArr } from 'utils/fp'
+import { trackEvent } from 'utils/tracking'
 import {
   deploymentsSelector,
   makeServiceSelector,
-  nodesSelector,
+  podsSelector,
   serviceSelectors,
 } from './selectors'
 
@@ -25,15 +27,23 @@ export const podActions = createCRUDActions(ActionDataKeys.Pods, {
   },
   createFn: async ({ clusterId, namespace, yaml }) => {
     const body = jsYaml.safeLoad(yaml)
-    return qbert.createPod(clusterId, namespace, body)
+    const pod = await qbert.createPod(clusterId, namespace, body)
+    trackEvent('Create New Pod', {
+      clusterId,
+      namespace,
+      name: pathStr('metadata.name', pod),
+    })
+    return pod
   },
   deleteFn: async ({ id }, currentItems) => {
     const { clusterId, namespace, name } = await currentItems.find((x) => x.id === id)
-    await qbert.deletePod(clusterId, namespace, name)
+    const result = await qbert.deletePod(clusterId, namespace, name)
+    trackEvent('Delete Pod', { clusterId, namespace, name, id })
+    return result
   },
   uniqueIdentifier: 'metadata.uid',
   indexBy: 'clusterId',
-  selector: nodesSelector,
+  selector: podsSelector,
 })
 
 export const deploymentActions = createCRUDActions(ActionDataKeys.Deployments, {
@@ -48,7 +58,14 @@ export const deploymentActions = createCRUDActions(ActionDataKeys.Deployments, {
     const body = jsYaml.safeLoad(yaml)
     // Also need to refresh the list of pods
     podActions.invalidateCache()
-    return qbert.createDeployment(clusterId, namespace, body)
+    const created = await qbert.createDeployment(clusterId, namespace, body)
+    trackEvent('Create New Deployment', {
+      clusterId,
+      namespace,
+      name: pathStr('metadata.name', created),
+      id: pathStr('metadata.uid', created),
+    })
+    return created
   },
   service: 'qbert',
   indexBy: 'clusterId',
@@ -66,6 +83,12 @@ export const serviceActions = createCRUDActions(ActionDataKeys.KubeServices, {
   createFn: async ({ clusterId, namespace, yaml }) => {
     const body = jsYaml.safeLoad(yaml)
     const created = await qbert.createService(clusterId, namespace, body)
+    trackEvent('Create New Service', {
+      clusterId,
+      namespace,
+      name: pathStr('metadata.name', created),
+      id: pathStr('metadata.uid', created),
+    })
     return {
       ...created,
       clusterId,
@@ -77,7 +100,9 @@ export const serviceActions = createCRUDActions(ActionDataKeys.KubeServices, {
   },
   deleteFn: async ({ id }, currentItems) => {
     const { clusterId, namespace, name } = await currentItems.find((x) => x.id === id)
-    await qbert.deleteService(clusterId, namespace, name)
+    const result = await qbert.deleteService(clusterId, namespace, name)
+    trackEvent('Delete Service', { clusterId, namespace, name, id })
+    return result
   },
   service: 'qbert',
   entity: ActionDataKeys.KubeServices,

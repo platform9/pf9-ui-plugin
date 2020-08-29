@@ -23,12 +23,13 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Redirect, Route, Switch } from 'react-router'
 import useReactRouter from 'use-react-router'
-import { isNilOrEmpty } from 'utils/fp'
+import { isNilOrEmpty, pathStrOr } from 'utils/fp'
 import { getCookieValue } from 'utils/misc'
-import { trackPage } from 'utils/tracking'
+import { injectDrift, trackPage } from 'utils/tracking'
 import moment from 'moment'
 import useScopedPreferences from 'core/session/useScopedPreferences'
 import { loadUserTenants } from 'openstack/components/tenants/actions'
+import axios from 'axios'
 
 const { keystone, setActiveRegion } = ApiClient.getInstance()
 
@@ -80,11 +81,25 @@ const getUserDetails = async (activeTenant) => {
   const { user, role } = await keystone.changeProjectScope(activeTenant.id)
   await keystone.resetCookie()
 
+  /* eslint-disable */
+  // Check for sandbox flag, if false identify the user in Segment using Keystone ID
+  // This needs to be done here bc this needs to be done before login.
+  // Features are requested again later for the specific logged-in region,
+  // whereas this one is done on the master DU from which the UI is served.
+  // Ignore exception if features.json not found (for local development)
+  const features = await axios.get('/clarity/features.json').catch(() => null)
+  const sandbox = pathStrOr(false, 'data.experimental.sandbox', features)
+
   // Identify the user in Segment using Keystone ID
   if (typeof window.analytics !== 'undefined') {
     window.analytics.identify(user.id, {
       email: user.name,
     })
+  }
+
+  // Drift tracking code for live demo
+  if (sandbox) {
+    injectDrift()
   }
 
   return {

@@ -139,6 +139,12 @@ const defaultTheme: AppTheme = {
       main: '#4ADF74',
       dark: '#388E3C',
     },
+    upgrade: {
+      main: '#D82071',
+    },
+    empty: {
+      main: '#EDEFF1',
+    },
     aws: {
       light: '#FFB74D',
       main: '#FF9800',

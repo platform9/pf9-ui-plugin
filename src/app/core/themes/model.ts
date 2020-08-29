@@ -182,6 +182,11 @@ export interface Palette {
   success: DefaultColorSwatch
   aws: DefaultColorSwatch
   azure: DefaultColorSwatch
+  upgrade: Upgrade
+}
+
+export interface Upgrade {
+  main: string
 }
 
 export interface Action {

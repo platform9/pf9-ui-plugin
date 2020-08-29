@@ -24,6 +24,7 @@ import useToggler from 'core/hooks/useToggler'
 import SimpleLink from 'core/components/SimpleLink'
 import makeStyles from '@material-ui/styles/makeStyles'
 import { requiredValidator } from 'core/utils/fieldValidators'
+import Progress from 'core/components/progress/Progress'
 
 const listUrl = pathJoin(k8sPrefix, 'user_management#users')
 
@@ -150,11 +151,17 @@ const EditUserPage = () => {
                 onSubmit={setWizardContext}
                 triggerSubmit={onNext}
               >
-                <TenantRolesTableField
-                  validations={tenantRolesValidations}
-                  id="roleAssignments"
-                  tenants={tenants}
-                />
+                <Progress
+                  renderContentOnMount={!loadingTenants}
+                  loading={loadingTenants}
+                  message={'Loading Tenants...'}
+                >
+                  <TenantRolesTableField
+                    validations={tenantRolesValidations}
+                    id="roleAssignments"
+                    tenants={tenants}
+                  />
+                </Progress>
               </ValidatedForm>
             </WizardStep>
           </>

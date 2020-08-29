@@ -19,7 +19,7 @@ import { makeStyles } from '@material-ui/styles'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import ExternalLink from 'core/components/ExternalLink'
 import { clusterActions } from '../infrastructure/clusters/actions'
-import { propEq } from 'ramda'
+import { propEq, pathOr } from 'ramda'
 import { CloudProvidersFriendlyName } from '../infrastructure/cloudProviders/model'
 import { ActionDataKeys } from 'k8s/DataKeys'
 
@@ -62,7 +62,11 @@ const BasicStep = ({ onSubmit, triggerSubmit, wizardContext }) => {
   const { params, getParamsUpdater } = useParams()
   const defaultStorageClassForCurrentCluster = (storageClass) =>
     storageClass.clusterId === params.clusterId &&
-    storageClass.metadata.annotations['storageclass.kubernetes.io/is-default-class'] === 'true'
+    pathOr(
+      false,
+      ['metadata', 'annotations', 'storageclass.kubernetes.io/is-default-class'],
+      storageClass,
+    ) === 'true'
   const defaultExists = !!storageClasses.find(defaultStorageClassForCurrentCluster)
 
   // We need to know the cloud provider type for the selected cluster because we will conditionally
@@ -201,6 +205,9 @@ const getInitialStorageClassYaml = (wizardContext) => {
         'kubernetes.io/cluster-service': 'true',
       },
     },
+  }
+  if (values.clusterType === 'local') {
+    storageClass.provisioner = `kubernetes.io/${values.provisioner}`
   }
   if (values.clusterType === 'aws') {
     storageClass.provisioner = 'kubernetes.io/aws-ebs'

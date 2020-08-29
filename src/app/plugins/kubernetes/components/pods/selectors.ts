@@ -1,57 +1,27 @@
 import { createSelector } from 'reselect'
-import { any, find, head, map, mergeLeft, pathEq, pipe, pluck, prop, propEq, toPairs } from 'ramda'
-import { emptyArr, emptyObj, filterIf, pipeWhenTruthy } from 'utils/fp'
+import { any, head, map, mergeLeft, pathEq, pipe, pluck, propEq, toPairs } from 'ramda'
+import { emptyArr, emptyObj, filterIf } from 'utils/fp'
 import { allKey } from 'app/constants'
 import { pathJoin } from 'utils/misc'
 import DataKeys from 'k8s/DataKeys'
 import getDataSelector from 'core/utils/getDataSelector'
-import { combinedHostsSelector } from '../infrastructure/common/selectors'
 import createSorter from 'core/helpers/createSorter'
 import { clustersSelector } from 'k8s/components/infrastructure/clusters/selectors'
-import { IClusterSelector } from '../infrastructure/clusters/model'
 import { IPodSelector, IServicesSelector } from './model'
 import { IDataKeys } from 'k8s/datakeys.model'
 import { FluffySelector, MatchLabelsClass } from 'api-client/qbert.model'
-import { ICombinedHost } from '../infrastructure/common/model'
 
 const k8sDocUrl = 'namespaces/kube-system/qbertservices/https:kubernetes-dashboard:443/proxy/#'
 
-export const nodesSelector = createSelector(
-  [
-    getDataSelector<DataKeys.Nodes>(DataKeys.Nodes),
-    combinedHostsSelector,
-    getDataSelector<DataKeys.ServiceCatalog>(DataKeys.ServiceCatalog),
-  ],
-  (rawNodes, combinedHosts, rawServiceCatalog) => {
-    const combinedHostsObj = combinedHosts.reduce((accum, host) => {
-      const id = host?.resmgr?.id || host?.qbert?.uuid || null
-      accum[id] = host
-      return accum
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    }, {} as { [key: string]: ICombinedHost })
-
-    const qbertUrl =
-      pipeWhenTruthy(find(propEq('name', 'qbert')), prop('url'))(rawServiceCatalog) || ''
-
-    // associate nodes with the combinedHost entry
-    return rawNodes.map((node) => ({
-      ...node,
-      combined: combinedHostsObj[node.uuid],
-      // qbert v3 link fails authorization so we have to use v1 link for logs
-      logs: `${qbertUrl}/logs/${node.uuid}`.replace(/v3/, 'v1'),
-    }))
-  },
-)
-
 export const podsSelector = createSelector(
-  [getDataSelector<DataKeys.Pods>(DataKeys.Pods), clustersSelector],
+  [getDataSelector<DataKeys.Pods>(DataKeys.Pods, ['clusterId']), clustersSelector],
   (rawPods, clusters) => {
     // associate nodes with the combinedHost entry
     return pipe<IDataKeys[DataKeys.Pods], IPodSelector[]>(
       // Filter by namespace
       map((pod) => {
         const { clusterId } = pod
-        const cluster = find<IClusterSelector>(propEq('uuid', clusterId), clusters)
+        const cluster = clusters.find(propEq('uuid', clusterId))
         const dashboardUrl = pathJoin(
           cluster?.baseUrl,
           k8sDocUrl,
@@ -87,11 +57,15 @@ export const makeParamsPodsSelector = (defaultParams = {}) => {
 }
 
 export const deploymentsSelector = createSelector(
-  [getDataSelector<DataKeys.Deployments>(DataKeys.Deployments), podsSelector, clustersSelector],
+  [
+    getDataSelector<DataKeys.Deployments>(DataKeys.Deployments, ['clusterId']),
+    podsSelector,
+    clustersSelector,
+  ],
   (rawDeployments, pods, clusters) => {
     return rawDeployments.map((rawDeployment) => {
       const { clusterId } = rawDeployment
-      const cluster = find<IClusterSelector>(propEq('uuid', clusterId), clusters)
+      const cluster = clusters.find(propEq('uuid', clusterId))
       const dashboardUrl = pathJoin(
         cluster?.baseUrl,
         k8sDocUrl,
@@ -147,7 +121,7 @@ export const serviceSelectors = createSelector(
     return pipe<IDataKeys[DataKeys.KubeServices], any>(
       map((service) => {
         const { clusterId } = service
-        const cluster = find<IClusterSelector>(propEq('uuid', clusterId), clusters)
+        const cluster = clusters.find(propEq('uuid', clusterId))
         const dashboardUrl = pathJoin(
           cluster?.baseUrl,
           k8sDocUrl,

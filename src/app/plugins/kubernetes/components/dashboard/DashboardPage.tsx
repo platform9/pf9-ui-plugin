@@ -13,7 +13,6 @@ import { cloudProviderActions } from '../infrastructure/cloudProviders/actions'
 // Components
 import StatusCard, { StatusCardProps } from './StatusCard'
 import { Typography } from '@material-ui/core'
-import { capitalizeString, normalizeUsername } from 'utils/misc'
 
 import ClusterSetup, {
   clustersHaveAccess,
@@ -289,7 +288,6 @@ const DashboardPage = () => {
   const selectSessionState = prop<string, SessionState>(sessionStoreKey)
   const session = useSelector(selectSessionState)
   const isAdmin = isAdminRole(session)
-  const username = capitalizeString(normalizeUsername(session.username))
   const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
   const [pods, loadingPods] = useDataLoader(podActions.list)
   const hasClusters = !!clusters.length
@@ -309,9 +307,17 @@ const DashboardPage = () => {
     return [hasClusters, hasAccess, hasMonitoring].findIndex((item) => !item)
   }, [hasClusters, hasMonitoring, hasAccess])
 
+  const [users, loadingUsers] = useDataLoader(mngmUserActions.list)
+  const user = users.find((x) => x.username === session.username)
+  const displayname = user?.displayname
+
+  if (loadingUsers) {
+    return null
+  }
+
   return (
     <section className={classes.cardColumn}>
-      <Typography variant="h5">Welcome {username}!</Typography>
+      <Typography variant="h5">Welcome{displayname ? ` ${displayname}` : ''}!</Typography>
       <Progress loading={isLoading} overlay renderContentOnMount>
         {showOnboarding && (
           <>

@@ -18,7 +18,11 @@ const RolesPicklist = forwardRef(
       if (selectFirst && !(disabled || value || isEmpty(options))) {
         onChange(propOr(allKey, 'value', head(options)))
       }
-    }, [options, disabled, selectFirst])
+      // workaround for memoized updateFieldValue in TenantRolesTableField component
+      if (value) {
+        onChange(value)
+      }
+    }, [options, disabled, selectFirst, value])
 
     return (
       <Picklist
@@ -29,6 +33,7 @@ const RolesPicklist = forwardRef(
         onChange={onChange}
         loading={loading || rolesLoading}
         options={options}
+        inline
       />
     )
   },

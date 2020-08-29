@@ -11,7 +11,7 @@ export const getApiGroupList = (req, res) => {
 
 export const getExtensionsApiResources = (req, res) => {
   const response = {
-    groupVersion: 'extensions/v1beta1',
+    groupVersion: 'apps/v1',
     kind: 'APIResourceList',
     resources: ApiResources.getExtensionsApiResources(),
   }

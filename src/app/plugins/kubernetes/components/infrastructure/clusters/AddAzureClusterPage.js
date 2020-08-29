@@ -23,7 +23,7 @@ import { runtimePrivilegedLink } from 'k8s/links'
 import { pathJoin } from 'utils/misc'
 import { defaultEtcBackupPath, k8sPrefix } from 'app/constants'
 import ExternalLink from 'core/components/ExternalLink'
-import Code from 'core/components/CodeBlock'
+import CodeBlock from 'core/components/CodeBlock'
 import { cloudProviderActions } from '../cloudProviders/actions'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { PromptToAddProvider } from '../cloudProviders/PromptToAddProvider'
@@ -34,8 +34,14 @@ import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import { routes } from 'core/utils/routes'
 import Alert from 'core/components/Alert'
 import { trackEvent } from 'utils/tracking'
+import { customValidator } from 'core/utils/fieldValidators'
+import { isKeyValid } from 'ssh-pub-key-validation'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
+
+const sshKeyValidator = customValidator((value, formValues) => {
+  return isKeyValid(value)
+}, 'You must enter a valid SSH key')
 
 const useStyles = makeStyles((theme) => ({
   tableWidth: {
@@ -123,9 +129,9 @@ const initialContext = {
 }
 
 const templateOptions = [
-  { label: 'small - 1 node master + worker (Standard_A1_v2)', value: 'small' },
-  { label: 'medium - 1 master + 3 workers (Standard_A2_v2)', value: 'medium' },
-  { label: 'large - 3 masters + 5 workers (Standard_A4_v2)', value: 'large' },
+  { label: 'Sm - Single Node Master & Worker (Standard_A1_v2)', value: 'small' },
+  { label: 'Md - 1 Master + 3 Workers (Standard_A2_v2)', value: 'medium' },
+  { label: 'Lg - 3 Masters + 5 Workers (Standard_A4_v2)', value: 'large' },
   { label: 'custom', value: 'custom' },
 ]
 
@@ -271,7 +277,6 @@ const AddAzureClusterPage = () => {
                           label="Region"
                           cloudProviderId={params.cloudProviderId}
                           onChange={getParamsUpdater('cloudProviderRegionId')}
-                          info="Region "
                           value={params.cloudProviderRegionId}
                           type="azure"
                           required
@@ -281,7 +286,9 @@ const AddAzureClusterPage = () => {
                         <TextField
                           id="sshKey"
                           label="Public SSH key"
-                          info="Copy/paste your public SSH key"
+                          info="Copy/paste your SSH public key"
+                          size="small"
+                          validations={[sshKeyValidator]}
                           multiline
                           rows={3}
                           required
@@ -489,14 +496,14 @@ const AddAzureClusterPage = () => {
                       <TextField
                         id="externalDnsName"
                         label="API FQDN"
-                        info="FQDN (Fully Qualified Domain Name) is used to reference cluster API. To ensure the API can be accessed securely at the FQDN, the FQDN will be included in the API server certificate's Subject Alt Names. If deploying onto a cloud provider, we will automatically create the DNS records for this FQDN using the cloud provider’s DNS service."
+                        info="Fully Qualified Domain Name used to reference the cluster API. The API will be secured by including the FQDN in the API server certificate’s Subject Alt Names. Clusters in Public Cloud will automatically have the DNS records created and registered for the FQDN."
                       />
 
                       {/* Containers CIDR */}
                       <TextField
                         id="containersCidr"
                         label="Containers CIDR"
-                        info="Defines the network CIDR from which the flannel networking layer allocates IP addresses to Docker containers. This CIDR should not overlap with the VPC CIDR. Each node gets a /24 subnet. Choose a CIDR bigger than /23 depending on the number of nodes in your cluster. A /16 CIDR gives you 256 nodes."
+                        info="Network CIDR from which Kubernetes allocates IP addresses to containers. This CIDR shouldn't overlap with the VPC CIDR. A /16 CIDR enables 256 nodes."
                         required
                       />
 
@@ -504,7 +511,7 @@ const AddAzureClusterPage = () => {
                       <TextField
                         id="servicesCidr"
                         label="Services CIDR"
-                        info="Defines the network CIDR from which Kubernetes allocates virtual IP addresses to Services.  This CIDR should not overlap with the VPC CIDR."
+                        info="The network CIDR for Kubernetes virtual IP addresses for Services. This CIDR shouldn't overlap with the VPC CIDR."
                         required
                       />
 
@@ -515,11 +522,11 @@ const AddAzureClusterPage = () => {
                         infoPlacement="right-end"
                         info={
                           <div className={classes.inline}>
-                            (Optional) Specify the HTTP proxy for this cluster. Uses format of{' '}
-                            <Code>
+                            Specify the HTTP proxy for this cluster. Format{' '}
+                            <CodeBlock>
                               <span>{'<scheme>://<username>:<password>@<host>:<port>'}</span>
-                            </Code>{' '}
-                            where username and password are optional.
+                            </CodeBlock>{' '}
+                            username and password are optional.
                           </div>
                         }
                       />
@@ -546,7 +553,7 @@ const AddAzureClusterPage = () => {
                           <div>
                             Allows this cluster to run privileged containers. Read{' '}
                             <ExternalLink url={runtimePrivilegedLink}>this article</ExternalLink>{' '}
-                            for more information.
+                            for more information. This is required for Calico CNI and CSI.
                           </div>
                         }
                       />

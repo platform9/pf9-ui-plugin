@@ -6,10 +6,14 @@ import Theme from 'core/themes/model'
 
 interface Props {
   copyText: string
-  children: any
+  children?: any
   inline?: boolean
   codeBlock?: boolean
   header?: string
+  // fill property for if you want the copy to clipboard container to fill
+  // the entire width of the parent, but still want the copy to clipboard
+  // icon inline
+  fill? : boolean
 }
 
 interface State {
@@ -23,6 +27,7 @@ const defaultParams: State = {
 interface StyleProps {
   codeBlock?: boolean
   inline?: boolean
+  fill?: boolean
 }
 
 const useStyles = makeStyles<Theme, StyleProps>((theme: Theme) => ({
@@ -35,7 +40,7 @@ const useStyles = makeStyles<Theme, StyleProps>((theme: Theme) => ({
     padding: '0 0 0 2px',
   },
   copyContainer: {
-    display: ({ inline }) => (inline ? 'inline-flex' : 'flex'),
+    display: ({ fill, inline }) => (fill ? 'flex' : inline ? 'inline-flex' : 'flex'),
     flexDirection: ({ inline }) => (inline ? 'row' : 'column'),
     background: ({ codeBlock }) => (codeBlock ? theme.palette.code.background : 'transparent'),
   },
@@ -99,10 +104,11 @@ const CopyToClipboard: FunctionComponent<Props> = ({
   inline = true,
   codeBlock = true,
   header = undefined,
+  fill = false,
 }) => {
   const { params, updateParams } = useParams<State>(defaultParams)
   const textAreaRef = useRef<HTMLTextAreaElement>(null)
-  const classes = useStyles({ codeBlock, inline })
+  const classes = useStyles({ codeBlock, inline, fill })
 
   const handleCopy = () => {
     try {

@@ -1,10 +1,10 @@
-import { pathStrOr, keyValueArrToObj } from 'utils/fp'
-import { pick, propEq } from 'ramda'
-import { trackEvent } from 'utils/tracking'
-import { defaultMonitoringTag, onboardingMonitoringSetup } from 'app/constants'
-import { sanitizeUrl } from 'utils/misc'
-import { cloudProviderActions } from 'k8s/components/infrastructure/cloudProviders/actions'
 import ApiClient from 'api-client/ApiClient'
+import { defaultMonitoringTag, onboardingMonitoringSetup } from 'app/constants'
+import { cloudProviderActions } from 'k8s/components/infrastructure/cloudProviders/actions'
+import { compose, path, pick, propEq, propSatisfies } from 'ramda'
+import { isTruthy, keyValueArrToObj, pathStrOr } from 'utils/fp'
+import { castFuzzyBool, sanitizeUrl } from 'utils/misc'
+import { trackEvent } from 'utils/tracking'
 
 const { qbert } = ApiClient.getInstance()
 
@@ -27,20 +27,40 @@ export const getKubernetesVersion = async (clusterId) => {
     return null
   }
 }
+export const getK8sDashboardLinkFromVersion = (version, qbertEndpoint, cluster) => {
+  const matches = /(?<major>\d+).(?<minor>\d+).(?<patch>\d+)/.exec(version)
+  if (!version || !matches) {
+    return null
+  }
+  const { major, minor } = matches.groups || {}
+  const isNewDashboardUrl = major >= 1 && minor >= 16
+  return `${qbertEndpoint}/clusters/${cluster.uuid}/k8sapi/api/v1/namespaces/${
+    isNewDashboardUrl ? 'kubernetes-dashboard' : 'kube-system'
+  }/services/https:kubernetes-dashboard:443/proxy/`
+}
 
 export const getEtcdBackupPayload = (path, data) =>
   pathStrOr(0, path, data)
     ? {
-      storageType: 'local',
-      isEtcdBackupEnabled: 1,
-      storageProperties: {
-        localPath: data.etcdStoragePath,
-      },
-      intervalInMins: data.etcdBackupInterval,
-    }
+        storageType: 'local',
+        isEtcdBackupEnabled: 1,
+        storageProperties: {
+          localPath: data.etcdStoragePath,
+        },
+        intervalInMins: data.etcdBackupInterval,
+      }
     : {
-      isEtcdBackupEnabled: 0,
-    }
+        isEtcdBackupEnabled: 0,
+      }
+
+export const hasMasterNode = propSatisfies(isTruthy, 'hasMasterNode')
+export const hasHealthyMasterNodes = propSatisfies(
+  (healthyMasterNodes) => healthyMasterNodes.length > 0,
+  'healthyMasterNodes',
+)
+export const masterlessCluster = propSatisfies(isTruthy, 'masterless')
+export const hasPrometheusTag = compose(castFuzzyBool, path(['tags', 'pf9-system:monitoring']))
+export const hasAppCatalogEnabled = propSatisfies(isTruthy, 'appCatalogEnabled')
 
 export const createAwsCluster = async (data) => {
   const { domainId, usePf9Domain } = data
@@ -49,17 +69,19 @@ export const createAwsCluster = async (data) => {
     ...pick('name region azs ami sshKey'.split(' '), data),
     // cluster configuration
     ...pick(
-      ('masterFlavor workerFlavor numMasters enableCAS numWorkers allowWorkloadsOnMaster ' +
-        'numSpotWorkers spotPrice').split(' '),
+      (
+        'masterFlavor workerFlavor numMasters enableCAS numWorkers allowWorkloadsOnMaster ' +
+        'numSpotWorkers spotPrice'
+      ).split(' '),
       data,
     ),
 
     // network info
     ...pick(
-      ('vpc isPrivate privateSubnets subnets internalElb serviceFqdn containersCidr ' +
-        'servicesCidr networkPlugin').split(
-        ' ',
-      ),
+      (
+        'vpc isPrivate privateSubnets subnets internalElb serviceFqdn containersCidr ' +
+        'servicesCidr networkPlugin'
+      ).split(' '),
       data,
     ),
 
@@ -108,7 +130,7 @@ export const createAzureCluster = async (data) => {
     // network info
     ...pick(
       'assignPublicIps vnetResourceGroup vnetName masterSubnetName workerSubnetName ' +
-      'externalDnsName serviceFqdn containersCidr servicesCidr networkPlugin'.split(' '),
+        'externalDnsName serviceFqdn containersCidr servicesCidr networkPlugin'.split(' '),
       data,
     ),
 
@@ -191,6 +213,9 @@ const createGenericCluster = async (body, data) => {
   }
   if (data.networkPlugin === 'calico') {
     body.mtuSize = data.mtuSize
+    body.calicoIpIpMode = data.calicoIpIpMode
+    body.calicoNatOutgoing = data.calicoNatOutgoing
+    body.calicoV4BlockSize = data.calicoV4BlockSize
   }
   body.networkPlugin = data.networkPlugin
   body.runtimeConfig = {
