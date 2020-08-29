@@ -14,8 +14,8 @@ export const loadNodes = createContextLoader(
     const [rawNodes] = await Promise.all([
       qbert.getNodes(),
       // Fetch dependent caches
-      loadServiceCatalog(true),
-      loadResMgrHosts(true),
+      loadServiceCatalog(),
+      loadResMgrHosts(),
     ])
     return rawNodes
   },

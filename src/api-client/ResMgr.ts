@@ -48,14 +48,13 @@ class ResMgr extends ApiService {
 
   async getHosts() {
     const url = `/hosts`
-    const response = await this.client.basicGet<Host[]>({
+    return this.client.basicGet<Host[]>({
       url,
       options: {
         clsName: this.getClassName(),
         mthdName: 'getHosts',
       },
     })
-    return response
   }
 
   async addRole(hostId, role, body) {

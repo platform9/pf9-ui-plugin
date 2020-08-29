@@ -51,7 +51,7 @@ const RegionChooser = (props) => {
 
       updatePrefs({ currentRegion: regionId })
       // Clearing the cache will cause all the current loaders to reload its data
-      dispatch(cacheActions.clearCache(['regions']))
+      await dispatch(cacheActions.clearCache())
 
       // Redirect to the root of the current section (there's no need to reload all the app)
       history.push(currentSection)

@@ -183,27 +183,25 @@ class Qbert extends ApiService {
   /* Node Pools */
   getNodePools = async () => {
     const url = `/nodePools`
-    const nodePools = await this.client.basicGet({
+    return this.client.basicGet({
       url,
       options: {
         clsName: this.getClassName(),
         mthdName: 'getNodePools',
       },
     })
-    return nodePools
   }
 
   /* Nodes */
   getNodes = async () => {
     const url = `/nodes`
-    const nodes = await this.client.basicGet<Node[]>({
+    return this.client.basicGet<Node[]>({
       url,
       options: {
         clsName: this.getClassName(),
         mthdName: 'getNodes',
       },
     })
-    return nodes
   };
 
   [DataKeys.Nodes] = {
