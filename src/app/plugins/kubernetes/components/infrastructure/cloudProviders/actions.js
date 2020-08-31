@@ -13,10 +13,11 @@ import ApiClient from 'api-client/ApiClient'
 
 const { qbert } = ApiClient.getInstance()
 
-const cloudProviderTypes = {
+export const cloudProviderTypes = {
   aws: 'AWS',
   azure: 'Azure',
   openstack: 'OpenStack',
+  local: 'BareOS',
 }
 
 export const cloudProvidersCacheKey = 'cloudProviders'

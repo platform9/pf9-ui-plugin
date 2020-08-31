@@ -24,6 +24,7 @@ import { routes } from 'core/utils/routes'
 import CodeBlock from 'core/components/CodeBlock'
 import DateCell from 'core/components/listTable/cells/DateCell'
 import CopyToClipboard from 'core/components/CopyToClipboard'
+import { cloudProviderTypes } from '../cloudProviders/actions'
 
 const useStyles = makeStyles((theme) => ({
   links: {
@@ -39,17 +40,6 @@ const renderUUID = (_, { uuid }) => {
     </CopyToClipboard>
   )
 }
-
-const renderCloudProviderType = (type, cluster) => {
-  if (type === 'local') {
-    return 'BareOS'
-  } else if (type === 'aws') {
-    return 'AWS'
-  } else {
-    return capitalizeString(type)
-  }
-}
-
 const renderConnectionStatus = (_, cluster) => <ClusterConnectionStatus cluster={cluster} />
 const renderHealthStatus = (_, cluster) => <ClusterHealthStatus cluster={cluster} />
 const renderClusterLink = (links, { usage }) => <ClusterLinks links={links} usage={usage} />
@@ -174,7 +164,11 @@ export const options = {
       label: 'Links',
       render: renderClusterLink,
     },
-    { id: 'cloudProviderType', label: 'Deployment Type', render: renderCloudProviderType },
+    {
+      id: 'cloudProviderType',
+      label: 'Deployment Type',
+      render: (type) => cloudProviderTypes[type],
+    },
     { id: 'resource_utilization', label: 'Resource Utilization', render: renderStats },
     { id: 'version', label: 'Kubernetes Version' },
     { id: 'created_at', label: 'Created at', render: (value) => <DateCell value={value} /> },
