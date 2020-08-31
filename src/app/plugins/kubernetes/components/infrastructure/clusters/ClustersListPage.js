@@ -167,7 +167,7 @@ export const options = {
     {
       id: 'cloudProviderType',
       label: 'Deployment Type',
-      render: (type) => cloudProviderTypes[type],
+      render: (type) => cloudProviderTypes[type] || capitalizeString(type),
     },
     { id: 'resource_utilization', label: 'Resource Utilization', render: renderStats },
     { id: 'version', label: 'Kubernetes Version' },
