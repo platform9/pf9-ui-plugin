@@ -43,8 +43,11 @@ const renderUUID = (_, { uuid }) => {
 const renderCloudProviderType = (type, cluster) => {
   if (type === 'local') {
     return 'BareOS'
+  } else if (type === 'aws') {
+    return 'AWS'
+  } else {
+    return capitalizeString(type)
   }
-  return capitalizeString(type)
 }
 
 const renderConnectionStatus = (_, cluster) => <ClusterConnectionStatus cluster={cluster} />

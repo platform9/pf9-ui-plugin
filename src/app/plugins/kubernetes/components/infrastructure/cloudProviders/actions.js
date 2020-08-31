@@ -14,7 +14,7 @@ import ApiClient from 'api-client/ApiClient'
 const { qbert } = ApiClient.getInstance()
 
 const cloudProviderTypes = {
-  aws: 'Amazon AWS Provider',
+  aws: 'AWS Provider',
   azure: 'Microsoft Azure Provider',
   openstack: 'OpenStack',
 }

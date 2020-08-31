@@ -129,11 +129,11 @@ const awsCloudFields = [
   { id: 'cloudProperties.sshKey', title: 'SSH Key', required: true },
   { id: 'cloudProperties.serviceFqdn', title: 'Service FQDN', required: true },
   { id: 'cloudProperties.ami', title: 'AMI', required: true },
-  { id: 'cloudProperties.domainId', title: 'Domain Id', required: true },
+  { id: 'cloudProperties.domainId', title: 'Domain ID', required: true },
   { id: 'cloudProperties.isPrivate', title: 'Is Private', required: true, render: castBoolToStr() },
   {
     id: 'cloudProperties.usePf9Domain',
-    title: 'Use Pf9 Domain',
+    title: 'Use PF9 Domain',
     required: true,
     render: castBoolToStr(),
   },
