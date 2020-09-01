@@ -8,9 +8,9 @@ import { compose } from 'app/utils/fp'
 import { withStyles } from '@material-ui/styles'
 import {
   Button,
-  ExpansionPanel,
-  ExpansionPanelDetails,
-  ExpansionPanelSummary,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Typography,
 } from '@material-ui/core'
 
@@ -47,14 +47,12 @@ class DeveloperToolsEmbed extends React.PureComponent {
   collapse = () => this.setState({ expanded: false })
 
   Panel = ({ title, children }) => (
-    <ExpansionPanel className={this.props.classes.panel}>
-      <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+    <Accordion className={this.props.classes.panel}>
+      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         <Typography className={this.props.classes.heading}>{title}</Typography>
-      </ExpansionPanelSummary>
-      <ExpansionPanelDetails className={this.props.classes.details}>
-        {children}
-      </ExpansionPanelDetails>
-    </ExpansionPanel>
+      </AccordionSummary>
+      <AccordionDetails className={this.props.classes.details}>{children}</AccordionDetails>
+    </Accordion>
   )
 
   render() {

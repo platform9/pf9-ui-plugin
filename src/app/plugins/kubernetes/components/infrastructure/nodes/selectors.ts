@@ -27,6 +27,9 @@ export const nodesSelector = createSelector(
     // associate nodes with the combinedHost entry
     return rawNodes.map((node) => ({
       ...node,
+      // if hostagent is not responding, then the nodes info is outdated
+      // set the status to disconnected manually
+      status: combinedHostsObj[node.uuid].responding ? node.status : 'disconnected',
       combined: combinedHostsObj[node.uuid],
       // qbert v3 link fails authorization so we have to use v1 link for logs
       logs: `${qbertUrl}/logs/${node.uuid}`.replace(/v3/, 'v1'),

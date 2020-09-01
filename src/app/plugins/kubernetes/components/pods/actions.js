@@ -1,13 +1,12 @@
-import jsYaml from 'js-yaml'
-import createCRUDActions from 'core/helpers/createCRUDActions'
 import ApiClient from 'api-client/ApiClient'
 import { allKey } from 'app/constants'
-import { pluck, pipe, propEq, find, prop, pathEq, any, toPairs, head, flatten } from 'ramda'
-import { mapAsync, pipeAsync, someAsync } from 'utils/async'
+import createCRUDActions from 'core/helpers/createCRUDActions'
+import jsYaml from 'js-yaml'
 import { parseClusterParams } from 'k8s/components/infrastructure/clusters/actions'
-import { pathJoin } from 'utils/misc'
 import { ActionDataKeys } from 'k8s/DataKeys'
-import { pathStr, filterIf, pathStrOr, emptyObj, emptyArr } from 'utils/fp'
+import { flatten, pluck } from 'ramda'
+import { someAsync } from 'utils/async'
+import { pathStr } from 'utils/fp'
 import { trackEvent } from 'utils/tracking'
 import {
   deploymentsSelector,

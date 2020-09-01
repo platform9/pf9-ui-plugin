@@ -1,15 +1,22 @@
+import { combinedHostsSelector } from 'k8s/components/infrastructure/common/selectors'
+import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
 import React from 'react'
 import PropTypes from 'prop-types'
 import MultiSelect from 'core/components/MultiSelect'
-import { allPass, compose, propOr } from 'ramda'
+import { allPass, compose } from 'ramda'
 import { withInfoTooltip } from 'core/components/InfoTooltip'
-import { loadCombinedHosts } from 'k8s/components/infrastructure/common/actions'
-import withDataLoader from 'core/hocs/withDataLoader'
-import withDataMapper from 'core/hocs/withDataMapper'
+import { connect } from 'react-redux'
 
+@connect((state) => ({
+  combinedHosts: combinedHostsSelector(state),
+}))
 class NodesChooser extends React.PureComponent {
   state = {
     selected: [],
+  }
+
+  async componentDidMount() {
+    await loadNodes()
   }
 
   handleMultiSelect = (selected) => {
@@ -20,11 +27,7 @@ class NodesChooser extends React.PureComponent {
   validSelection = () => [1, 3, 5].contains(this.state.selected.length)
 
   render() {
-    const {
-      data: { combinedHosts },
-      label,
-      name,
-    } = this.props
+    const { combinedHosts, label, name } = this.props
     const authorized = (x) => x.uiState !== 'unauthorized'
     const validCloudStack = (x) => x.cloudStack === 'k8s' || x.cloudStack === 'both'
     const hasQbert = (x) => !!x.qbert
@@ -58,8 +61,4 @@ NodesChooser.propTypes = {
   onChange: PropTypes.func.isRequired,
 }
 
-export default compose(
-  withDataLoader({ combinedHosts: loadCombinedHosts }),
-  withDataMapper({ combinedHosts: propOr([], 'combinedHosts') }),
-  withInfoTooltip,
-)(NodesChooser)
+export default compose(withInfoTooltip)(NodesChooser)

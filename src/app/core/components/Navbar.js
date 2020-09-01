@@ -3,9 +3,9 @@ import PropTypes from 'prop-types'
 import {
   Collapse,
   Drawer,
-  ExpansionPanel,
-  ExpansionPanelDetails,
-  ExpansionPanelSummary,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   IconButton,
   ListItemText,
   MenuItem,
@@ -541,19 +541,19 @@ class Navbar extends PureComponent {
     const { classes } = this.props
     const { expandedSection } = this.state
     return sections.map((section) => (
-      <ExpansionPanel
+      <Accordion
         key={section.id}
         className={classes.nav}
         expanded={expandedSection === section.id}
         onChange={this.handleExpand(section.id)}
       >
-        <ExpansionPanelSummary className={classes.navHeading} expandIcon={<ExpandMore />}>
+        <AccordionSummary className={classes.navHeading} expandIcon={<ExpandMore />}>
           <Typography className={classes.navHeadingText}>{section.name}</Typography>
-        </ExpansionPanelSummary>
-        <ExpansionPanelDetails className={classes.navBody}>
+        </AccordionSummary>
+        <AccordionDetails className={classes.navBody}>
           {this.renderSectionLinks(section.links)}
-        </ExpansionPanelDetails>
-      </ExpansionPanel>
+        </AccordionDetails>
+      </Accordion>
     ))
   }
 

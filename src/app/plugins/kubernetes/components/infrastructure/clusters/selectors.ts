@@ -26,6 +26,7 @@ import { IClusterSelector } from './model'
 import { Node } from 'api-client/qbert.model'
 import { clientStoreKey } from 'core/client/clientReducers'
 import { getK8sDashboardLinkFromVersion } from 'k8s/components/infrastructure/clusters/helpers'
+import { combinedHostsSelector } from 'k8s/components/infrastructure/common/selectors'
 
 const monitoringTask = 'pf9-mon'
 const isMonitoringTask = (task: any = {}) =>
@@ -53,7 +54,7 @@ export const clustersSelector = createSelector(
     getDataSelector<DataKeys.Clusters>(DataKeys.Clusters),
     getDataSelector<DataKeys.ClusterTags>(DataKeys.ClusterTags),
     getDataSelector<DataKeys.Nodes>(DataKeys.Nodes),
-    getDataSelector<DataKeys.CombinedHosts>(DataKeys.CombinedHosts),
+    combinedHostsSelector,
     (state) => pathOr(emptyArr, [clientStoreKey, 'endpoints', 'qbert'])(state),
   ],
   (rawClusters, clustersWithTasks, rawNodes, combinedHosts, qbertEndpoint: string) => {
@@ -97,7 +98,6 @@ export const clustersSelector = createSelector(
         {},
       )
       const dashboardLink = getK8sDashboardLinkFromVersion(cluster.version, qbertEndpoint, cluster)
-
       return {
         ...cluster,
         tasks: clusterWithTasks ? clusterWithTasks.pkgs : [],
