@@ -21,7 +21,7 @@ import ExpandMore from '@material-ui/icons/ExpandMore'
 import { except, pathStrOr } from 'app/utils/fp'
 import clsx from 'clsx'
 import moize from 'moize'
-import { assoc, flatten, pluck, prop, propEq, propOr, where, equals, indexOf } from 'ramda'
+import { assoc, flatten, pluck, prop, propEq, propOr, where, equals } from 'ramda'
 import { matchPath, withRouter } from 'react-router'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import {
@@ -29,12 +29,14 @@ import {
   clarityDashboardUrl,
   helpUrl,
   ironicWizardUrl,
-  dashboardUrl
+  dashboardUrl,
 } from 'app/constants'
 import { routes } from 'core/utils/routes'
 
 import SimpleLink from './SimpleLink'
-import { withAppContext } from 'core/providers/AppProvider'
+// import { withAppContext } from 'core/providers/AppProvider'
+import { sessionStoreKey } from 'core/session/sessionReducers'
+import { connect } from 'react-redux'
 
 export const drawerWidth = 180
 
@@ -314,9 +316,10 @@ const styles = (theme) => ({
   },
 })
 
+// TODO: @john to verify this connect change works from appContext
 @withStyles(styles, { withTheme: true })
 @withRouter
-@withAppContext
+@connect((state) => prop(sessionStoreKey))
 class Navbar extends PureComponent {
   state = {
     expandedSection: null,
@@ -587,13 +590,19 @@ class Navbar extends PureComponent {
       <div className={classes.sliderContainer}>
         {open && (
           <a>
-            <ChevronLeftIcon className={classes.sliderArrow} onClick={() => this.switchStacks('left')} />
+            <ChevronLeftIcon
+              className={classes.sliderArrow}
+              onClick={() => this.switchStacks('left')}
+            />
           </a>
         )}
         <div className={classes.sliderLogo} />
         {open && (
           <a>
-            <ChevronRightIcon className={classes.sliderArrow} onClick={() => this.switchStacks('right')} />
+            <ChevronRightIcon
+              className={classes.sliderArrow}
+              onClick={() => this.switchStacks('right')}
+            />
           </a>
         )}
       </div>
@@ -608,14 +617,14 @@ class Navbar extends PureComponent {
       open,
       handleDrawerToggle,
       stack,
-      getContext,
+      features,
     } = this.props
     // const filteredSections = sections.filter(where({ links: notEmpty }))
     // Because ironic regions will not currently support kubernetes, assume always
     // one filtered section, either openstack (ironic) or kubernetes
     const filteredSections = sections.filter(where({ id: equals(stack) }))
 
-    const { features } = getContext()
+    // const { features } = getContext()
     const isDecco = pathStrOr(false, 'experimental.kplane', features)
     const version = pathStrOr('4', 'releaseVersion', features)
 

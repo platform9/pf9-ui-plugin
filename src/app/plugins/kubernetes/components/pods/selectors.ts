@@ -133,7 +133,7 @@ export const serviceSelectors = createSelector(
         const externalName = service?.spec?.externalName // pathStr('spec.externalName', service)
         const name = service?.metadata?.name // pathStr('metadata.name', service)
         const ports = service?.spec?.ports || [] // pathStrOr(emptyArr, 'spec.ports', service)
-        const loadBalancerEndpoints = service?.status?.loadBalancer?.ingress
+        const loadBalancerEndpoints = service?.status?.loadBalancer?.ingress || emptyArr
         const internalEndpoints = ports
           .map((port) => [
             `${name}:${port.port} ${port.protocol}`,

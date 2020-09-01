@@ -180,6 +180,7 @@ export interface Palette {
   code: Code
   warning: DefaultColorSwatch
   success: DefaultColorSwatch
+  empty: Upgrade
   aws: DefaultColorSwatch
   azure: DefaultColorSwatch
   upgrade: Upgrade

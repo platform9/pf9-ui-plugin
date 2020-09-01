@@ -100,7 +100,7 @@ export const clustersSelector = createSelector(
 
       return {
         ...cluster,
-        pkgs: clusterWithTasks ? clusterWithTasks.pkgs : [],
+        tasks: clusterWithTasks ? clusterWithTasks.pkgs : [],
         version: (hasMasterNode && cluster.version) || 'N/A',
         usage,
         nodes: nodesInCluster,

@@ -80,9 +80,9 @@ class ResMgr extends ApiService {
     })
   }
 
-  async getRole(hostId, role) {
+  async getRole<T>(hostId, role) {
     const url = `/hosts/${hostId}/roles/${role}`
-    return this.client.basicGet({
+    return this.client.basicGet<T>({
       url,
       options: {
         clsName: this.getClassName(),

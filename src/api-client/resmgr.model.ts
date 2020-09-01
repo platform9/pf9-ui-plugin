@@ -16,6 +16,7 @@ export interface Host {
   hypervisor_info: HypervisorInfoClass | string
   extensions: ExtensionsClass | string
   message: string | { warn: string }
+  ovsBridges?: string[]
 }
 
 export interface ExtensionsClass {
