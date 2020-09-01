@@ -11,7 +11,7 @@ import {
   reject,
   whereEq,
 } from 'ramda'
-import { arrayIfEmpty, arrayIfNil, emptyArr, ensureArray } from 'app/utils/fp'
+import { arrayIfEmpty, arrayIfNil, emptyArr, ensureArray, isNilOrEmpty } from 'app/utils/fp'
 import { allKey } from 'app/constants'
 import { cacheStoreKey, dataStoreKey, paramsStoreKey } from 'core/caching/cacheReducers'
 import { GlobalState, IDataKeys } from 'k8s/datakeys.model'
@@ -45,7 +45,7 @@ const getDataSelector = <T extends keyof IDataKeys>(
       )(params || {})
 
       // If the provided params are already cached
-      if (find(equals(providedIndexedParams), storeParams)) {
+      if (isNilOrEmpty(indexBy) || find(equals(providedIndexedParams), storeParams)) {
         // Return the cached data filtering by the provided params
         return pipe<IDataKeys[T] | [], IDataKeys[T] | [], IDataKeys[T] | [], IDataKeys[T] | []>(
           arrayIfNil,

@@ -1,11 +1,17 @@
-import { cacheActions, cacheStoreKey, loadingStoreKey } from 'core/caching/cacheReducers'
+import {
+  cacheActions,
+  cacheStoreKey,
+  loadingStoreKey,
+  paramsStoreKey,
+} from 'core/caching/cacheReducers'
 import { notificationActions } from 'core/notifications/notificationReducers'
 import { useToast } from 'core/providers/ToastProvider'
+import useScopedPreferences from 'core/session/useScopedPreferences'
 import moize from 'moize'
-import { path } from 'ramda'
+import { find, isNil, path, pipe, whereEq } from 'ramda'
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { emptyObj, ensureFunction, isNilOrEmpty } from 'utils/fp'
+import { arrayIfNil, emptyObj, ensureFunction, isNilOrEmpty } from 'utils/fp'
 import { memoizedDep } from 'utils/misc'
 
 const onErrorHandler = moize(
@@ -26,6 +32,7 @@ const onErrorHandler = moize(
 const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
   const { loadOnDemand = false, defaultParams = emptyObj } = options
   const { cacheKey, fetchErrorMessage, selectorCreator } = loaderFn
+  const [{ currentTenant, currentRegion }] = useScopedPreferences()
 
   // Memoize the params dependency as we want to make sure it really changed and not just got a new reference
   const memoizedParams = memoizedDep(params)
@@ -38,6 +45,18 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
   const data = useSelector((state) => {
     return selector(state, memoizedParams)
   })
+
+  const paramsSelector = useMemo(
+    () =>
+      pipe(
+        path([cacheStoreKey, paramsStoreKey, cacheKey]),
+        arrayIfNil,
+        find(whereEq(memoizedParams)),
+        // when(pipe(find(whereEq(memoizedParams)), isNil), always(identity(null))),
+      ),
+    [cacheKey, memoizedParams],
+  )
+  const cachedParams = useSelector(paramsSelector)
 
   const loadingSelector = useMemo(() => path([cacheStoreKey, loadingStoreKey, cacheKey]), [
     cacheKey,
@@ -66,7 +85,7 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
   // It will set the result of the last data loading call to the "data" state variable
   const loadData = useCallback(
     async (refetch = true) => {
-      if (refetch || isNilOrEmpty(data)) {
+      if (refetch || isNilOrEmpty(data) || isNil(cachedParams)) {
         // No need to update loading state if a request is already in progress
         dispatch(cacheActions.setLoading({ cacheKey, loading: true }))
         try {
@@ -82,12 +101,15 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
     [loaderFn, memoizedParams],
   )
 
-  // Load the data on component mount and every time the params
-  // When unmounted, set the unmounted ref to true to prevent further state updates
+  // Load the data on component mount and every time the params change
   useEffect(() => {
     if (!loadOnDemand) {
       loadData(false)
     }
+  }, [memoizedParams, currentTenant, currentRegion, loadOnDemand])
+
+  // When unmounted, set the unmounted ref to true to prevent further state updates
+  useEffect(() => {
     return () => {
       unmounted.current = true
     }

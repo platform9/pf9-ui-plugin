@@ -12,6 +12,7 @@ import {
   clustersSelector,
   makeParamsClustersSelector,
 } from 'k8s/components/infrastructure/clusters/selectors'
+import { loadResMgrHosts } from 'k8s/components/infrastructure/common/actions'
 import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import { mergeLeft, pathOr, pick, propEq } from 'ramda'
@@ -44,6 +45,7 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
       // Fetch dependent caches
       clusterTagActions.list(),
       loadNodes(),
+      loadResMgrHosts(),
     ])
 
     return mapAsync(async (cluster) => {

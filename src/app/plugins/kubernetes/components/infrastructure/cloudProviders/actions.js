@@ -3,7 +3,6 @@ import createContextLoader from 'core/helpers/createContextLoader'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { makeCloudProvidersSelector } from 'k8s/components/infrastructure/cloudProviders/selectors'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
-import { loadResMgrHosts } from 'k8s/components/infrastructure/common/actions'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import { pluck } from 'ramda'
 import { trackEvent } from 'utils/tracking'
@@ -16,7 +15,6 @@ export const cloudProviderActions = createCRUDActions(ActionDataKeys.CloudProvid
       qbert.getCloudProviders(),
       // Make sure the derived data gets loaded as well
       clusterActions.list(),
-      loadResMgrHosts(),
     ])
     return cloudProviders
   },

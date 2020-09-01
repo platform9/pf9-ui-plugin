@@ -1,18 +1,17 @@
-import createCRUDActions from 'core/helpers/createCRUDActions'
 import ApiClient from 'api-client/ApiClient'
+import { allKey } from 'app/constants'
+import createContextLoader from 'core/helpers/createContextLoader'
+import createCRUDActions from 'core/helpers/createCRUDActions'
+import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import {
   makeRoleActionsSelector,
   makeRoleBindingActionssSelector,
   makeRoleBindingsSelector,
   makeRolesSelector,
 } from 'k8s/components/rbac/selectors'
-import { uniq, propEq, pluck, pipe, find, prop, flatten } from 'ramda'
-import { someAsync } from 'utils/async'
-import createContextLoader from 'core/helpers/createContextLoader'
-import { pathStr } from 'utils/fp'
-import { allKey } from 'app/constants'
-import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import { ActionDataKeys } from 'k8s/DataKeys'
+import { flatten, pluck, propEq, uniq } from 'ramda'
+import { someAsync } from 'utils/async'
 
 const { qbert } = ApiClient.getInstance()
 

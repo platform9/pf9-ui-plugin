@@ -140,7 +140,9 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
 
       // We can't rely on the server to index the data, as sometimes it simply doesn't return the
       // params used for the query, so we will add them to the items in order to be able to find them afterwards
-      const itemsWithParams = arrayIfEmpty(map(mergeLeft(params), ensureArray(items)))
+      const itemsWithParams = arrayIfEmpty(
+        map(mergeLeft(providedIndexedParams), ensureArray(items)),
+      )
 
       // Perfom the cache update operations
       if (invalidateCache || refetch) {

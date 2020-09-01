@@ -29,9 +29,24 @@ const getNetworkInterfaces = (node: Host) => {
   return ifaceList.flat() // [[interface, ip], [interface2, ip2], ...]
 }
 
+export const resMgrHostsSelector = createSelector(
+  [getDataSelector<DataKeys.ResMgrHosts>(DataKeys.ResMgrHosts)],
+  (hosts) => {
+    return hosts.map((item) => {
+      const extensions = item?.extensions as ExtensionsClass
+      return {
+        ...item,
+        ipPreview: getIpPreview(extensions?.ip_address?.data || []),
+        networkInterfaces: getNetworkInterfaces(item),
+        ovsBridges: extensions?.interfaces?.data.ovs_bridges || [],
+      }
+    })
+  },
+)
+
 export const combinedHostsSelector = createSelector(
   getDataSelector<DataKeys.Nodes>(DataKeys.Nodes),
-  getDataSelector<DataKeys.ResMgrHosts>(DataKeys.ResMgrHosts),
+  resMgrHostsSelector,
   (rawNodes, resMgrHosts) => {
     const hostsById: {
       [key: string]: HostByService
@@ -48,18 +63,4 @@ export const combinedHostsSelector = createSelector(
     // Convert it back to array form
     return Object.values(hostsById).map(combineHost)
   },
-)
-
-export const resMgrHostsSelector = createSelector(
-  getDataSelector<DataKeys.ResMgrHosts>(DataKeys.ResMgrHosts),
-  (hosts) =>
-    hosts.map((item) => {
-      const extensions = item?.extensions as ExtensionsClass
-      return {
-        ...item,
-        ipPreview: getIpPreview(extensions?.ip_address?.data || []),
-        networkInterfaces: getNetworkInterfaces(item),
-        ovsBridges: extensions.interfaces.data.ovs_bridges || [],
-      }
-    }),
 )

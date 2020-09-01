@@ -48,6 +48,7 @@ export const options = {
     { id: 'created', label: 'Created', render: (value) => <DateCell value={value} /> },
   ],
   cacheKey: ActionDataKeys.KubeRoles,
+  actions: roleActions,
   deleteFn: roleActions.delete,
   editUrl: '/ui/kubernetes/rbac/roles/edit',
   customEditUrlFn: (item, itemId) =>

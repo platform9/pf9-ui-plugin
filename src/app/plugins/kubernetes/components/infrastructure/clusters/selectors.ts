@@ -62,7 +62,7 @@ export const clustersSelector = createSelector(
       const clusterWithTasks = clustersWithTasks.find(({ uuid }) => cluster.uuid === uuid)
       const nodesInCluster = rawNodes.filter((node) => node.clusterUuid === cluster.uuid)
       const nodeIds = pluck('uuid', nodesInCluster)
-      const combinedNodes = combinedHosts.filter((x) => nodeIds.includes(x.resmgr.id))
+      const combinedNodes = combinedHosts.filter((x) => nodeIds.includes(x?.resmgr?.id))
       const calcNodesTotals = calcUsageTotalByPath(combinedNodes)
       const host = qbertEndpoint.match(/(.*?)\/qbert/)[1]
       const grafanaLink =
