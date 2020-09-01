@@ -2,6 +2,7 @@ import ApiClient from 'api-client/ApiClient'
 import { allKey } from 'app/constants'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { parseClusterParams } from 'k8s/components/infrastructure/clusters/actions'
+import { namespacesSelector } from 'k8s/components/namespaces/selectors'
 import DataKeys from 'k8s/DataKeys'
 import { flatten, pluck } from 'ramda'
 import { someAsync } from 'utils/async'
@@ -50,6 +51,7 @@ const namespaceActions = createCRUDActions(DataKeys.Namespaces, {
   },
   uniqueIdentifier: 'id',
   indexBy: 'clusterId',
+  selector: namespacesSelector,
 })
 
 export default namespaceActions
