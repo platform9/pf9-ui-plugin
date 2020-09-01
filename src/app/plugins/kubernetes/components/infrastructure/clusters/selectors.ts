@@ -10,7 +10,7 @@ import {
   pluck,
   propSatisfies,
 } from 'ramda'
-import { emptyArr, filterIf, isTruthy } from 'utils/fp'
+import { filterIf, isTruthy } from 'utils/fp'
 import createSorter, { SortConfig } from 'core/helpers/createSorter'
 import calcUsageTotalByPath from 'k8s/util/calcUsageTotals'
 import {
@@ -55,7 +55,7 @@ export const clustersSelector = createSelector(
     getDataSelector<DataKeys.ClusterTags>(DataKeys.ClusterTags),
     getDataSelector<DataKeys.Nodes>(DataKeys.Nodes),
     combinedHostsSelector,
-    (state) => pathOr(emptyArr, [clientStoreKey, 'endpoints', 'qbert'])(state),
+    (state) => pathOr('', [clientStoreKey, 'endpoints', 'qbert'])(state),
   ],
   (rawClusters, clustersWithTasks, rawNodes, combinedHosts, qbertEndpoint: string) => {
     return rawClusters.map((cluster) => {
