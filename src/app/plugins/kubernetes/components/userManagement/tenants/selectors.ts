@@ -9,6 +9,7 @@ import { namespacesSelector } from 'k8s/components/namespaces/selectors'
 
 const reservedTenantNames = ['admin', 'services', 'Default', 'heat']
 export const filterValidTenants = (tenant) => !reservedTenantNames.includes(tenant.name)
+export const filterOutDomains = (tenant) => !!tenant.domain_id
 
 export const tenantsSelector = createSelector(
   [getDataSelector<DataKeys.ManagementTenants>(DataKeys.ManagementTenants), namespacesSelector],
@@ -41,8 +42,9 @@ export const makeFilteredTenantsSelector = (
     [tenantsSelector, (_, params) => mergeLeft(params, defaultParams)],
     (tenants, params) => {
       const { includeBlacklisted, orderBy, orderDirection } = params
-      return pipe<Tenant[], Tenant[], Tenant[]>(
+      return pipe<Tenant[], Tenant[], Tenant[], Tenant[]>(
         filterIf(!includeBlacklisted, filterValidTenants),
+        filter(filterOutDomains),
         createSorter({ orderBy, orderDirection }),
       )(tenants)
     },

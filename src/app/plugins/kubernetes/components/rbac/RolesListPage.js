@@ -47,7 +47,7 @@ export const options = {
     { id: 'clusterName', label: 'Cluster' },
     { id: 'created', label: 'Created', render: (value) => <DateCell value={value} /> },
   ],
-  cacheKey: ActionDataKeys.Roles,
+  cacheKey: ActionDataKeys.KubeRoles,
   deleteFn: roleActions.delete,
   editUrl: '/ui/kubernetes/rbac/roles/edit',
   customEditUrlFn: (item, itemId) =>
