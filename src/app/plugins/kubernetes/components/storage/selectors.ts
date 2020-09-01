@@ -6,7 +6,10 @@ import getDataSelector from 'core/utils/getDataSelector'
 import { IClusterSelector } from '../infrastructure/clusters/model'
 
 export const storageClassSelector = createSelector(
-  [getDataSelector<DataKeys.StorageClasses>(DataKeys.StorageClasses), clustersSelector],
+  [
+    getDataSelector<DataKeys.StorageClasses>(DataKeys.StorageClasses, ['clusterId']),
+    clustersSelector,
+  ],
   (rawStorageClasses, clusters) => {
     return map(
       (storageClass) => ({

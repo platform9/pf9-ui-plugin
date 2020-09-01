@@ -52,6 +52,7 @@ export const options = {
     { id: 'created', label: 'Created' },
   ],
   cacheKey: ActionDataKeys.StorageClasses,
+  actions: storageClassActions,
   name: 'StorageClasses',
   title: 'Storage Classes',
   ListPage,
