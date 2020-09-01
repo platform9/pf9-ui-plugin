@@ -8,7 +8,7 @@ import { notificationActions } from 'core/notifications/notificationReducers'
 import { useToast } from 'core/providers/ToastProvider'
 import useScopedPreferences from 'core/session/useScopedPreferences'
 import moize from 'moize'
-import { find, isNil, path, pipe, whereEq } from 'ramda'
+import { find, isNil, path, pickAll, pipe, reject, whereEq } from 'ramda'
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { arrayIfNil, emptyObj, ensureFunction, isNilOrEmpty } from 'utils/fp'
@@ -31,11 +31,12 @@ const onErrorHandler = moize(
  */
 const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
   const { loadOnDemand = false, defaultParams = emptyObj } = options
-  const { cacheKey, fetchErrorMessage, selectorCreator } = loaderFn
+  const { cacheKey, fetchErrorMessage, selectorCreator, indexBy } = loaderFn
   const [{ currentTenant, currentRegion }] = useScopedPreferences()
 
   // Memoize the params dependency as we want to make sure it really changed and not just got a new reference
   const memoizedParams = memoizedDep(params)
+  const memoizedIndexedParams = memoizedDep(pipe(pickAll(indexBy), reject(isNil))(params))
 
   const selector = useMemo(() => {
     return selectorCreator(defaultParams)
@@ -51,10 +52,10 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
       pipe(
         path([cacheStoreKey, paramsStoreKey, cacheKey]),
         arrayIfNil,
-        find(whereEq(memoizedParams)),
+        find(whereEq(memoizedIndexedParams)),
         // when(pipe(find(whereEq(memoizedParams)), isNil), always(identity(null))),
       ),
-    [cacheKey, memoizedParams],
+    [cacheKey, memoizedIndexedParams],
   )
   const cachedParams = useSelector(paramsSelector)
 
@@ -89,7 +90,7 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
         // No need to update loading state if a request is already in progress
         dispatch(cacheActions.setLoading({ cacheKey, loading: true }))
         try {
-          await loaderFn(memoizedParams, refetch)
+          await loaderFn(memoizedIndexedParams, refetch)
         } catch (err) {
           const parsedErrorMesssage = ensureFunction(fetchErrorMessage)(err, params)
           // TODO we should be putting these somewhere in the store to allow more control over the errors handling
@@ -98,7 +99,7 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
         dispatch(cacheActions.setLoading({ cacheKey, loading: false }))
       }
     },
-    [loaderFn, memoizedParams],
+    [loaderFn, memoizedIndexedParams],
   )
 
   // Load the data on component mount and every time the params change
@@ -106,7 +107,7 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
     if (!loadOnDemand) {
       loadData(false)
     }
-  }, [memoizedParams, currentTenant, currentRegion, loadOnDemand])
+  }, [memoizedIndexedParams, currentTenant, currentRegion, loadOnDemand])
 
   // When unmounted, set the unmounted ref to true to prevent further state updates
   useEffect(() => {
