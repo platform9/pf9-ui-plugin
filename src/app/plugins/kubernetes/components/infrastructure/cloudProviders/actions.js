@@ -67,7 +67,7 @@ export const cloudProviderActions = createCRUDActions(ActionDataKeys.CloudProvid
     },
   },
   uniqueIdentifier: 'uuid',
-  selector: makeCloudProvidersSelector,
+  selectorCreator: makeCloudProvidersSelector,
 })
 
 export const loadCloudProviderDetails = createContextLoader(
