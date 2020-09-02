@@ -141,8 +141,8 @@ class Qbert extends ApiService {
 
   getClusterCsiDrivers = async (clusterUuid) => {
     return this.client.basicGet(
-      `${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/api/v1/namespaces/platform9-system/services/pf9-sentry/proxy/v1/storage`
-      )
+      `${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/api/v1/namespaces/platform9-system/services/pf9-sentry/proxy/v1/storage`,
+    )
   }
 
   createCluster = async (params) => {
@@ -670,15 +670,23 @@ class Qbert extends ApiService {
   }
 
   getPrometheusAlerts = async (clusterUuid) => {
+    // const response = await this.client.basicGet(
+    //   `${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/rules`,
+    // )
+    // const alerts = response.groups
+    //   .flatMap((group) => {
+    //     return group.rules
+    //   })
+    //   .filter((rule) => rule.type === 'alerting')
+    // return alerts.map((alert) => ({
+    //   ...alert,
+    //   clusterId: clusterUuid,
+    //   id: `${alert.name}${clusterUuid}${alert.labels.severity}`,
+    // }))
     const response = await this.client.basicGet(
-      `${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/rules`,
+      `${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/alerts`,
     )
-    const alerts = response.groups
-      .flatMap((group) => {
-        return group.rules
-      })
-      .filter((rule) => rule.type === 'alerting')
-    return alerts.map((alert) => ({
+    return response.alerts.map((alert) => ({
       ...alert,
       clusterId: clusterUuid,
       id: `${alert.name}${clusterUuid}${alert.labels.severity}`,

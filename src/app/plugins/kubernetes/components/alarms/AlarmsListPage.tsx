@@ -106,20 +106,20 @@ const ListPage = ({ ListContainer }) => {
     const [
       timeSeriesData,
       // timeSeriesLoading,
-    ] = useDataLoader(loadTimeSeriesAlerts,
-      {
-        chartTime: params.chartTime,
-        clusterId: params.clusterId,
-      }
-    )
+    ] = useDataLoader(loadTimeSeriesAlerts, {
+      chartTime: params.chartTime,
+      clusterId: params.clusterId,
+    })
 
     const filteredChartKeys = chartKeys.filter((key) => {
       return [allKey, key.name].includes(params.severity)
     })
 
     const filteredAlerts = data.filter((alert) => {
-      return [allKey, alert.severity].includes(params.severity)
-        && [allKey, alert.status].includes(params.status)
+      return (
+        [allKey, alert.severity].includes(params.severity) &&
+        [allKey, alert.status].includes(params.status)
+      )
     })
 
     return (
@@ -153,10 +153,7 @@ const ListPage = ({ ListContainer }) => {
             />
           </div>
           <div className={classes.timePicker}>
-            <TimePicklist
-              onChange={getParamsUpdater('chartTime')}
-              value={params.chartTime}
-            />
+            <TimePicklist onChange={getParamsUpdater('chartTime')} value={params.chartTime} />
           </div>
         </div>
         <div className={classes.chartContainer}>
@@ -185,37 +182,44 @@ const ListPage = ({ ListContainer }) => {
 
 export const SeverityTableCell = ({ value }) => {
   const theme: any = useTheme()
-  const key = chartKeys.find(key => key.name === value)
+  const key = chartKeys.find((key) => key.name === value)
   return key ? (
     <div>
-      <FontAwesomeIcon solid style={{ color: pathStr(key.color, theme.palette) }}>{key.icon}</FontAwesomeIcon>
-      {' '}
+      <FontAwesomeIcon solid style={{ color: pathStr(key.color, theme.palette) }}>
+        {key.icon}
+      </FontAwesomeIcon>{' '}
       {value}
     </div>
-  ) : <div>{value}</div>  
+  ) : (
+    <div>{value}</div>
+  )
 }
 
 export const options = {
   columns: [
-    { id: 'name', label: 'Name', render: (value, row) => ( <AlarmDetailsLink display={value} alarm={row} /> )},
-    { id: 'severity', label: 'Severity', render: (value) => (
-        <SeverityTableCell value={value} />
-      )
+    {
+      id: 'name',
+      label: 'Name',
+      render: (value, row) => <AlarmDetailsLink display={value} alarm={row} />,
     },
-    { id: 'activeAt', label: 'Time', render: (value) => {
-        return value ? (
-          <DateCell value={value} />
-        ) : (
-          <div>N/A</div>
-        )
-      }
+    { id: 'severity', label: 'Severity', render: (value) => <SeverityTableCell value={value} /> },
+    {
+      id: 'activeAt',
+      label: 'Time',
+      render: (value) => {
+        return value ? <DateCell value={value} /> : <div>N/A</div>
+      },
     },
     { id: 'summary', label: 'Rule Summary' },
     { id: 'status', label: 'Status' },
     {
       id: 'grafanaLink',
       label: 'Open in Grafana',
-      render: (link) => <ExternalLink className="no-wrap-text" icon="chart-line" url={link}>Grafana</ExternalLink>
+      render: (link) => (
+        <ExternalLink className="no-wrap-text" icon="chart-line" url={link}>
+          Grafana
+        </ExternalLink>
+      ),
     },
     { id: 'clusterName', label: 'Cluster' },
   ],
