@@ -43,32 +43,34 @@ const useDataUpdater = (updaterFn, onComplete) => {
   // The following function will handle the calls to the data updating and
   // set the loading state variable to true in the meantime, while also taking care
   // of the sequantialization of multiple concurrent calls
-  const update = useCallback(async (params = emptyObj) => {
-    // No need to update loading state if a request is already in progress
-    if (isEmpty(updaterPromisesBuffer.current)) {
-      setLoading(true)
-    }
-
-    // Create a new promise that will wait for the previous promises in the buffer before running the new request
-    const currentPromise = (async () => {
-      await Promise.all(updaterPromisesBuffer.current) // Wait for previous promises to resolve
-      const result = await updaterFn(params, additionalOptions)
-      updaterPromisesBuffer.current.shift() // Delete the oldest promise in the sequence (FIFO)
-      return result
-    })()
-    updaterPromisesBuffer.current.push(currentPromise)
-    const successful = await currentPromise
-
-    // With this condition, we ensure that all promises except the last one will be ignored
-    if (isEmpty(updaterPromisesBuffer.current) &&
-      !unmounted.current) {
-      setLoading(false)
-      if (onComplete) {
-        await onComplete(successful)
+  const update = useCallback(
+    async (params = emptyObj) => {
+      // No need to update loading state if a request is already in progress
+      if (isEmpty(updaterPromisesBuffer.current)) {
+        setLoading(true)
       }
-    }
-    return successful
-  }, [updaterFn, onComplete])
+
+      // Create a new promise that will wait for the previous promises in the buffer before running the new request
+      const currentPromise = (async () => {
+        await Promise.all(updaterPromisesBuffer.current) // Wait for previous promises to resolve
+        const result = await updaterFn(params, additionalOptions)
+        updaterPromisesBuffer.current.shift() // Delete the oldest promise in the sequence (FIFO)
+        return result
+      })()
+      updaterPromisesBuffer.current.push(currentPromise)
+      const [successful, result] = await currentPromise
+
+      // With this condition, we ensure that all promises except the last one will be ignored
+      if (isEmpty(updaterPromisesBuffer.current) && !unmounted.current) {
+        setLoading(false)
+        if (onComplete) {
+          await onComplete(successful, result)
+        }
+      }
+      return [successful, result]
+    },
+    [updaterFn, onComplete],
+  )
 
   useEffect(() => {
     return () => {

@@ -2,8 +2,27 @@ import { allKey, defaultUniqueIdentifier, notFoundErr } from 'app/constants'
 import store from 'app/store'
 import { cacheActions } from 'core/caching/cacheReducers'
 import { getContextLoader } from 'core/helpers/createContextLoader'
-import { assocPath, either, equals, hasPath, head, isNil, path, pickAll, pipe, reject, split } from 'ramda'
-import { emptyArr, emptyObj, ensureArray, ensureFunction, objSwitchCase, switchCase } from 'utils/fp'
+import {
+  assocPath,
+  either,
+  equals,
+  hasPath,
+  head,
+  isNil,
+  path,
+  pickAll,
+  pipe,
+  reject,
+  split,
+} from 'ramda'
+import {
+  emptyArr,
+  emptyObj,
+  ensureArray,
+  ensureFunction,
+  objSwitchCase,
+  switchCase,
+} from 'utils/fp'
 import { memoizePromise, uncamelizeString } from 'utils/misc'
 
 let updaters = {}
@@ -185,7 +204,7 @@ function createContextUpdater(cacheKey, dataUpdaterFn, options = {}) {
           )
           await onSuccess(parsedSuccessMesssage, params)
         }
-        return true
+        return [true, output]
       } catch (err) {
         if (onError) {
           const parsedErrorMesssage = ensureFunction(errorMessage)(
@@ -196,7 +215,7 @@ function createContextUpdater(cacheKey, dataUpdaterFn, options = {}) {
           )
           await onError(parsedErrorMesssage, err, params)
         }
-        return false
+        return [false, null]
       }
     },
   )
