@@ -3,6 +3,7 @@
 import ApiClient from 'api-client/ApiClient'
 import createContextLoader from 'core/helpers/createContextLoader'
 import { emptyObj } from 'utils/fp'
+import { ActionDataKeys } from 'k8s/DataKeys'
 
 const serviceMappings = {
   aodh: 'internal',
@@ -27,9 +28,7 @@ const { keystone } = ApiClient.getInstance()
 
 const whichInterface = (serviceName) => serviceMappings[serviceName] || 'internal'
 
-export const serviceCatalogContextKey = 'serviceCatalog'
-
-export const loadServiceCatalog = createContextLoader(serviceCatalogContextKey, async () => {
+export const loadServiceCatalog = createContextLoader(ActionDataKeys.ServiceCatalog, async () => {
   const services = await keystone.getServicesForActiveRegion()
   return Object.entries(services || emptyObj).map(([name, service]) => {
     const iface = whichInterface(service)

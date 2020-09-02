@@ -18,20 +18,18 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import { loadResMgrHosts } from 'k8s/components/infrastructure/common/actions'
 import { clarityDashboardUrl } from 'app/constants'
 import FormWrapperDefault from 'core/components/FormWrapper'
+import { IPf9IronicInspector, IPf9NeutronOvsAgent, IPf9GlanceRole } from './model'
+import { IUseDataLoader } from 'k8s/components/infrastructure/nodes/model'
+import { Host } from 'api-client/resmgr.model'
 const FormWrapper: any = FormWrapperDefault // types on forward ref .js file dont work well.
 
-const getProvisioningNetwork = (networks) => (
-  networks.find(network => (
-    network['provider:physical_network'] === 'provisioning'
-  ))
-)
+const getProvisioningNetwork = (networks) =>
+  networks.find((network) => network['provider:physical_network'] === 'provisioning')
 
 // bridgeMappings looks like 'provisioning:pf9-br,external:pf9-ext'
 const getProvisioningBridge = (bridgeMappings) => {
   const mappings = bridgeMappings.split(',')
-  const provisioningMapping = mappings.find(mapping => (
-    mapping.includes('provisioning')
-  ))
+  const provisioningMapping = mappings.find((mapping) => mapping.includes('provisioning'))
   return provisioningMapping.split(':')[1]
 }
 
@@ -56,18 +54,14 @@ const networkConfigured = async (networks) => {
   }
 }
 
-const nodeAdded = (hosts) => (
-  {
-    finished: hosts.length,
-    step: 1,
-    data: {},
-  }
-)
+const nodeAdded = (hosts) => ({
+  finished: hosts.length,
+  step: 1,
+  data: {},
+})
 
-const onboardingRoleAdded = async (hosts) => {
-  const onboardedHost = hosts.find((host) => (
-    host.roles.includes('pf9-onboarding')
-  ))
+const onboardingRoleAdded = (hosts: Host[]) => {
+  const onboardedHost = hosts.find((host) => host.roles.includes('pf9-onboarding'))
   return {
     finished: !!onboardedHost,
     step: 2,
@@ -78,34 +72,44 @@ const onboardingRoleAdded = async (hosts) => {
 // Check for presence of all roles other than glance (optional)
 const nodeAuthorized = async (hosts) => {
   const ironicController = hosts.find((host) => {
-    return intersection(host.roles, [
-      'pf9-neutron-base',
-      'pf9-ostackhost-neutron-ironic',
-      'pf9-ironic-conductor',
-      'pf9-ironic-inspector',
-      'pf9-neutron-dhcp-agent',
-      'pf9-neutron-metadata-agent',
-      'pf9-neutron-l3-agent',
-      'pf9-neutron-ovs-agent',
-    ]).length === 8
+    return (
+      intersection(host.roles, [
+        'pf9-neutron-base',
+        'pf9-ostackhost-neutron-ironic',
+        'pf9-ironic-conductor',
+        'pf9-ironic-inspector',
+        'pf9-neutron-dhcp-agent',
+        'pf9-neutron-metadata-agent',
+        'pf9-neutron-l3-agent',
+        'pf9-neutron-ovs-agent',
+      ]).length === 8
+    )
   })
 
   if (ironicController) {
-    const { dnsmasq_interface, tftp_server_ip } = await getRole(ironicController.id, 'pf9-ironic-inspector')
-    const { bridge_mappings } = await getRole(ironicController.id, 'pf9-neutron-ovs-agent')
-    const provisioningBridge = getProvisioningBridge(bridge_mappings)
+    const { dnsmasq_interface: DNSMasqInterface, tftp_server_ip: TFTPServerIP } = await getRole<
+      IPf9IronicInspector
+    >(ironicController.id, 'pf9-ironic-inspector')
+    const { bridge_mappings: bridgeMappings } = await getRole<IPf9NeutronOvsAgent>(
+      ironicController.id,
+      'pf9-neutron-ovs-agent',
+    )
+    const provisioningBridge = getProvisioningBridge(bridgeMappings)
 
     // No guarantee that glance role was authorized
     try {
-      const { filesystem_store_datadir } = await getRole(ironicController.id, 'pf9-glance-role')
+      const { filesystem_store_datadir: FSStoreDataDir } = await getRole<IPf9GlanceRole>(
+        ironicController.id,
+        'pf9-glance-role',
+      )
       return {
         finished: true,
         step: 3,
         data: {
           selectedHost: [ironicController],
-          dnsmasq: `${dnsmasq_interface}: ${tftp_server_ip}`,
+          dnsmasq: `${DNSMasqInterface}: ${TFTPServerIP}`,
           bridgeDevice: provisioningBridge,
-          imageStoragePath: filesystem_store_datadir,
+          imageStoragePath: FSStoreDataDir,
           hostImages: true,
         },
       }
@@ -115,7 +119,7 @@ const nodeAuthorized = async (hosts) => {
         step: 3,
         data: {
           selectedHost: [ironicController],
-          dnsmasq: `${dnsmasq_interface}: ${tftp_server_ip}`,
+          dnsmasq: `${DNSMasqInterface}: ${TFTPServerIP}`,
           bridgeDevice: provisioningBridge,
           hostImages: false,
         },
@@ -133,14 +137,12 @@ const nodeAuthorized = async (hosts) => {
 // Check for a subnet in provisioning network
 const subnetExists = (networks, subnets) => {
   const provisioningNetwork = getProvisioningNetwork(networks)
-  const provisioningSubnet = subnets.find((subnet) => (
-    subnet.network_id === provisioningNetwork.id
-  ))
+  const provisioningSubnet = subnets.find((subnet) => subnet.network_id === provisioningNetwork.id)
 
   if (provisioningSubnet) {
-    const allocationPoolsString = provisioningSubnet.allocation_pools.map((pool) => (
-      `${pool.start} - ${pool.end}`
-    )).join(', ')
+    const allocationPoolsString = provisioningSubnet.allocation_pools
+      .map((pool) => `${pool.start} - ${pool.end}`)
+      .join(', ')
 
     return {
       finished: true,
@@ -150,7 +152,7 @@ const subnetExists = (networks, subnets) => {
         networkAddress: provisioningSubnet.cidr,
         allocationPools: allocationPoolsString,
         dnsNameServers: provisioningSubnet.dns_nameservers.join(', '),
-      }
+      },
     }
   }
 
@@ -162,10 +164,11 @@ const subnetExists = (networks, subnets) => {
 }
 
 const ironicImagesExist = (images) => {
-  const ironicImages = images.filter((image) => (
-    (image.name.includes('deploy-initrd') && image.disk_format === 'ari')
-    || (image.name.includes('deploy-vmlinuz') && image.disk_format === 'aki')
-  ))
+  const ironicImages = images.filter(
+    (image) =>
+      (image.name.includes('deploy-initrd') && image.disk_format === 'ari') ||
+      (image.name.includes('deploy-vmlinuz') && image.disk_format === 'aki'),
+  )
   return {
     finished: ironicImages.length >= 2,
     step: 6,
@@ -184,13 +187,12 @@ const SetupWizard = ({ initialContext, startingStep, setSubmittingStep }) => {
       onComplete={submitLastStep}
       context={initialContext}
       startingStep={startingStep}
-      hideBack={true}
+      hideBack
     >
       {/* Hide back button, currently not fully supported */}
       {({ wizardContext, setWizardContext, onNext }) => {
         return (
           <>
-
             {/*
               keepContentMounted={false} is required due to the useEffects
               used in the step components that call onNext. If kept false,
@@ -198,7 +200,11 @@ const SetupWizard = ({ initialContext, startingStep, setSubmittingStep }) => {
               start breaking.
             */}
 
-            <WizardStep stepId="step1" label="Configure Provisioning Network" keepContentMounted={false}>
+            <WizardStep
+              stepId="step1"
+              label="Configure Provisioning Network"
+              keepContentMounted={false}
+            >
               <BareMetalNetworkStep
                 wizardContext={wizardContext}
                 setWizardContext={setWizardContext}
@@ -209,8 +215,8 @@ const SetupWizard = ({ initialContext, startingStep, setSubmittingStep }) => {
             </WizardStep>
             <WizardStep stepId="step2" label="Install Host Agent">
               <div>
-                Install the Platform9 Host Agent on the node that will become the controller
-                for Bare Metal.
+                Install the Platform9 Host Agent on the node that will become the controller for
+                Bare Metal.
               </div>
               <DownloadHostAgentWalkthrough />
             </WizardStep>
@@ -266,7 +272,7 @@ const SetupWizard = ({ initialContext, startingStep, setSubmittingStep }) => {
 const IronicSetupPage = () => {
   const [networks, networksLoading] = useDataLoader(networkActions.list)
   const [subnets, subnetsLoading] = useDataLoader(subnetActions.list)
-  const [hosts, hostsLoading] = useDataLoader(loadResMgrHosts)
+  const [hosts, hostsLoading]: IUseDataLoader<Host> = useDataLoader(loadResMgrHosts) as any
   const [images, imagesLoading] = useDataLoader(loadImages)
   const [startingStep, setStartingStep] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -315,7 +321,12 @@ const IronicSetupPage = () => {
         const hasSubnet = await subnetExists(networks, subnets)
         if (!hasSubnet.finished) {
           setStartingStep(hasSubnet.step)
-          setInitialContext({ ...initialContext, ...netConfig.data, ...nodeAuthed.data, ...hasSubnet.data })
+          setInitialContext({
+            ...initialContext,
+            ...netConfig.data,
+            ...nodeAuthed.data,
+            ...hasSubnet.data,
+          })
           setLoading(false)
           return
         }
@@ -323,33 +334,52 @@ const IronicSetupPage = () => {
         const hasImages = await ironicImagesExist(images)
         if (!hasImages.finished) {
           setStartingStep(hasImages.step)
-          setInitialContext({ ...initialContext, ...netConfig.data, ...nodeAuthed.data, ...hasSubnet.data })
+          setInitialContext({
+            ...initialContext,
+            ...netConfig.data,
+            ...nodeAuthed.data,
+            ...hasSubnet.data,
+          })
           setLoading(false)
           return
         }
 
         setStartingStep(7)
-        setInitialContext({ ...initialContext, ...netConfig.data, ...nodeAuthed.data, ...hasSubnet.data })
+        setInitialContext({
+          ...initialContext,
+          ...netConfig.data,
+          ...nodeAuthed.data,
+          ...hasSubnet.data,
+        })
         setLoading(false)
-        return
       }
     }
     determineStep()
-  }, [networks, networksLoading, hosts, hostsLoading, subnets, subnetsLoading, images, imagesLoading])
+  }, [
+    networks,
+    networksLoading,
+    hosts,
+    hostsLoading,
+    subnets,
+    subnetsLoading,
+    images,
+    imagesLoading,
+  ])
 
   return (
     <FormWrapper
       title="Welcome to Platform9 Managed Bare Metal"
-      loading={submittingStep || loading }
+      loading={submittingStep || loading}
       message={loading ? 'Loading...' : 'Submitting...'}
     >
       {/* Wrap this in loading, initialContext needs to be populated  */}
-      {!loading && <SetupWizard
+      {!loading && (
+        <SetupWizard
           initialContext={initialContext}
           startingStep={startingStep}
           setSubmittingStep={setSubmittingStep}
         />
-      }
+      )}
     </FormWrapper>
   )
 }

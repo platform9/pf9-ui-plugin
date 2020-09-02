@@ -5,10 +5,10 @@ import ListTableField from 'core/components/validatedForm/ListTableField'
 import useDataLoader from 'core/hooks/useDataLoader'
 import PollingData from 'core/components/PollingData'
 import { IUseDataLoader } from 'k8s/components/infrastructure/nodes/model'
-import { ResMgrHost } from 'k8s/components/infrastructure/common/model'
 import { MessageTypes } from 'core/components/notifications/model'
 import { useToast } from 'core/providers/ToastProvider'
 import { addRole } from 'openstack/components/resmgr/actions'
+import { Host } from 'api-client/resmgr.model'
 
 // Put any for now to let me proceed
 interface Props {
@@ -25,11 +25,19 @@ const columns = [
   { id: 'info.os_info', label: 'Operating System' },
 ]
 
-const AuthorizeHostStep = ({ wizardContext, setWizardContext, onNext, title, setSubmitting }: Props) => {
+const AuthorizeHostStep = ({
+  wizardContext,
+  setWizardContext,
+  onNext,
+  title,
+  setSubmitting,
+}: Props) => {
   const showToast = useToast()
   const validatorRef = useRef(null)
 
-  const [hosts, hostsLoading, reloadHosts]: IUseDataLoader<ResMgrHost> = useDataLoader(loadResMgrHosts) as any
+  const [hosts, hostsLoading, reloadHosts]: IUseDataLoader<Host> = useDataLoader(
+    loadResMgrHosts,
+  ) as any
 
   const setupValidator = (validate) => {
     validatorRef.current = { validate }
@@ -79,7 +87,7 @@ const AuthorizeHostStep = ({ wizardContext, setWizardContext, onNext, title, set
               refreshDuration={1000 * 60}
             />
             <ListTableField
-              id='selectedHost'
+              id="selectedHost"
               data={hosts}
               onChange={(value) => setWizardContext({ selectedHost: value })}
               value={wizardContext.selectedHost}

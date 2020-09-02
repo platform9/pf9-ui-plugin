@@ -15,7 +15,7 @@ import {
 import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
 import { makeStyles } from '@material-ui/styles'
 import { identity } from 'ramda'
-import { ICombinedNode, IUseDataLoader } from '../../nodes/model'
+import { INodesSelector, IUseDataLoader } from '../../nodes/model'
 import PollingData from 'core/components/PollingData'
 import {
   UsageBar,
@@ -28,7 +28,7 @@ interface Props extends IValidatedForm {
   errorMessage?: string
   pollForNodes?: boolean
   onChange?: (nodes: string[]) => void
-  filterFn?: (node: ICombinedNode) => boolean
+  filterFn?: (node: INodesSelector) => boolean
   selection?: 'none' | 'single' | 'multiple'
 }
 
@@ -62,16 +62,16 @@ const useStyles = makeStyles<Theme, Partial<Props>>((theme) => ({
   },
 }))
 
-export const isConnected = (node: ICombinedNode) => node.status === 'ok'
-export const isUnassignedNode = (node: ICombinedNode) => !node.clusterUuid
-export const excludeNodes = (excludeList: string[] = []) => (node: ICombinedNode) =>
+export const isConnected = (node: INodesSelector) => node.status === 'ok'
+export const isUnassignedNode = (node: INodesSelector) => !node.clusterUuid
+export const excludeNodes = (excludeList: string[] = []) => (node: INodesSelector) =>
   !excludeList.includes(node.uuid)
-export const isMaster = (node: ICombinedNode) => !!node.isMaster
-export const isNotMaster = (node: ICombinedNode) => !node.isMaster
-export const inCluster = (clusterUuid: string) => (node: ICombinedNode) =>
+export const isMaster = (node: INodesSelector) => !!node.isMaster
+export const isNotMaster = (node: INodesSelector) => !node.isMaster
+export const inCluster = (clusterUuid: string) => (node: INodesSelector) =>
   node.clusterUuid === clusterUuid
 
-const emptyNode: ICombinedNode = {} as any
+const emptyNode: INodesSelector = {} as any
 
 const renderStats = (usage, className) => {
   return (
@@ -85,7 +85,7 @@ const renderStats = (usage, className) => {
 
 // TODO: is forwardRef actually needed here?
 const ClusterHostChooser: React.ComponentType<Props> = forwardRef<HTMLElement, Props>(
-  (props, ref) => {
+  (props, ref: React.Ref<HTMLDivElement>) => {
     const {
       filterFn = identity,
       onChange,
@@ -96,7 +96,7 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef<HTMLElement, P
       selection = 'single',
     } = props
     const { table, tableContainer, errorText, usageContainerClass } = useStyles(props)
-    const [nodes, loading, loadMore]: IUseDataLoader<ICombinedNode> = useDataLoader(
+    const [nodes, loading, loadMore]: IUseDataLoader<INodesSelector> = useDataLoader(
       loadNodes,
     ) as any
 
@@ -123,11 +123,11 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef<HTMLElement, P
 
     // TODO: The <Table> logic should be abstracted in a <TableChooser> that supports both multiple and single.
     return (
-      <div className={tableContainer}>
+      <div ref={ref} className={tableContainer}>
         {pollForNodes && (
           <PollingData loading={loading} onReload={loadMore} pause={!pollForNodes} />
         )}
-        <Table ref={ref} className={table}>
+        <Table className={table}>
           <TableHead>
             <TableRow>
               <TableCell>

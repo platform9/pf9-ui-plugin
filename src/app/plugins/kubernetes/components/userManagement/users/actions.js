@@ -1,38 +1,13 @@
 import ApiClient from 'api-client/ApiClient'
 import createContextLoader from 'core/helpers/createContextLoader'
 import createCRUDActions from 'core/helpers/createCRUDActions'
-import {
-  filterValidTenants,
-  mngmTenantActions,
-  mngmTenantsCacheKey,
-} from 'k8s/components/userManagement/tenants/actions'
-import {
-  always,
-  filter,
-  find,
-  flatten,
-  groupBy,
-  head,
-  innerJoin,
-  isNil,
-  keys,
-  map,
-  omit,
-  partition,
-  pipe,
-  pluck,
-  prop,
-  propEq,
-  reject,
-  uniq,
-  values,
-  when,
-} from 'ramda'
+import { mngmTenantActions } from 'k8s/components/userManagement/tenants/actions'
+import { makeFilteredUsersSelector } from 'k8s/components/userManagement/users/selectors'
+import { always, find, head, isNil, keys, pipe, prop, propEq, reject } from 'ramda'
 import { tryCatchAsync } from 'utils/async'
-import { emptyArr, emptyObj, objSwitchCase, pathStr, upsertAllBy } from 'utils/fp'
-import { castBoolToStr } from 'utils/misc'
+import { emptyArr, objSwitchCase, pathStr } from 'utils/fp'
 import { uuidRegex, originUsernameRegex } from 'app/constants'
-import { trackEvent } from 'utils/tracking'
+import { ActionDataKeys } from 'k8s/DataKeys'
 
 const { keystone, clemency } = ApiClient.getInstance()
 
@@ -44,9 +19,8 @@ export const isSystemUser = ({ username }) => {
   const isUuid = uuidRegex.test(username)
   return isOriginUsername || isUuid || username === 'kplane-clustmgr'
 }
-export const mngmCredentialsCacheKey = 'managementCredentials'
-createContextLoader(
-  mngmCredentialsCacheKey,
+export const loadCredentials = createContextLoader(
+  ActionDataKeys.ManagementCredentials,
   () => {
     return keystone.getCredentials()
   },
@@ -55,11 +29,15 @@ createContextLoader(
   },
 )
 
-const adminUserNames = ['heatadmin', 'admin@platform9.net']
-export const mngmUsersCacheKey = 'managementUsers'
-export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
+export const mngmUserActions = createCRUDActions(ActionDataKeys.ManagementUsers, {
   listFn: async () => {
-    return keystone.getUsers()
+    const [users] = await Promise.all([
+      keystone.getUsers(),
+      // Make sure the derived data gets loaded as well
+      loadCredentials(true),
+      mngmTenantActions.list(),
+    ])
+    return users
   },
   deleteFn: async ({ id }) => {
     await keystone.deleteUser(id)
@@ -68,9 +46,8 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
   },
   createFn: async ({ username, displayname, password, roleAssignments }) => {
     const defaultTenantId = pipe(keys, head)(roleAssignments)
-    let createdUser
-    if (password) {
-      createdUser = await keystone.createUser({
+    const createdUser = password
+      ? await keystone.createUser({
           email: username,
           name: username,
           username,
@@ -78,15 +55,11 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
           password: password || undefined,
           default_project_id: defaultTenantId,
         })
-      trackEvent('User Created', { username, displayname })
-    } else {
-      createdUser = await clemency.createUser({
-        username,
-        displayname,
-        tenants: defaultTenantId,
-      })
-      trackEvent('User Invited', { username, displayname })
-    }
+      : await clemency.createUser({
+          username,
+          displayname,
+          tenants: defaultTenantId,
+        })
     if (createdUser.role === '_member_') {
       return createdUser
     }
@@ -106,12 +79,8 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
     mngmTenantActions.invalidateCache()
     return createdUser
   },
-  updateFn: async (
-    { id: userId, username, displayname, password, roleAssignments },
-    prevItems,
-    loadFromContext,
-  ) => {
-    const prevRoleAssignmentsArr = await loadFromContext(mngmUserRoleAssignmentsCacheKey, {
+  updateFn: async ({ id: userId, username, displayname, password, roleAssignments }, prevItems) => {
+    const prevRoleAssignmentsArr = await mngmUserRoleAssignmentsLoader({
       userId,
     })
     const prevRoleAssignments = prevRoleAssignmentsArr.reduce(
@@ -162,66 +131,6 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
     mngmTenantActions.invalidateCache()
     return updatedUser
   },
-  dataMapper: async (users, { systemUsers }, loadFromContext) => {
-    const [credentials, allTenants] = await Promise.all([
-      loadFromContext(mngmCredentialsCacheKey, {}),
-      loadFromContext(mngmTenantsCacheKey, { includeBlacklisted: true }),
-    ])
-    const [validTenants, blacklistedTenants] = partition(filterValidTenants, allTenants)
-    const blacklistedTenantIds = pluck('id', blacklistedTenants)
-
-    // Get all tenant users and assign their corresponding tenant ID
-    const pluckUsers = map((tenant) =>
-      tenant.users.map((user) => ({
-        ...user,
-        tenantId: tenant.id,
-      })),
-    )
-
-    // Unify all users with the same ID and group the tenants
-    const unifyTenantUsers = map((groupedUsers) => ({
-      ...omit(['tenantId'], head(groupedUsers)),
-      tenants: innerJoin(
-        (tenant, id) => tenant.id === id,
-        validTenants,
-        uniq(pluck('tenantId', groupedUsers)),
-      ),
-    }))
-
-    const allUsers = users.map((user) => ({
-      id: user.id,
-      username: user.name,
-      displayname: user.displayname,
-      email: user.email,
-      defaultProject: user.default_project_id,
-      twoFactor: pipe(
-        find(propEq('user_id', user.id)),
-        when(isNil, always(emptyObj)),
-        propEq('type', 'totp'),
-        castBoolToStr('enabled', 'disabled'),
-      )(credentials),
-    }))
-
-    const filterUsers = filter((user) => {
-      return (
-        (systemUsers || !isSystemUser(user)) &&
-        user.username &&
-        !adminUserNames.includes(user.username) &&
-        !blacklistedTenantIds.includes(user.defaultProject)
-      )
-    })
-
-    return pipe(
-      pluckUsers,
-      flatten,
-      groupBy(prop('id')),
-      values,
-      unifyTenantUsers,
-      upsertAllBy(prop('id'), allUsers),
-      filterUsers,
-    )(validTenants)
-  },
-  refetchCascade: true,
   entityName: 'User',
   successMessage: (updatedItems, prevItems, { id, username, displayname }, operation) =>
     objSwitchCase({
@@ -235,11 +144,11 @@ export const mngmUserActions = createCRUDActions(mngmUsersCacheKey, {
         prop('username'),
       )(prevItems)} deleted successfully`,
     })(operation),
+  selectorCreator: makeFilteredUsersSelector,
 })
 
-export const mngmUserRoleAssignmentsCacheKey = 'managementUserRoleAssignments'
 export const mngmUserRoleAssignmentsLoader = createContextLoader(
-  mngmUserRoleAssignmentsCacheKey,
+  ActionDataKeys.ManagementUsersRoleAssignments,
   async ({ userId }) => (await keystone.getUserRoleAssignments(userId)) || emptyArr,
   {
     uniqueIdentifier: ['user.id', 'role.id'],

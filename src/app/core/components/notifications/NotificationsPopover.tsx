@@ -1,9 +1,15 @@
-import React, { useContext } from 'react'
+import React from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import { Popover, Typography, Tooltip, Button } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
-import { AppContext } from 'core/providers/AppProvider'
 import NotificationItem from 'core/components/notifications/NotificationItem'
+import {
+  notificationActions,
+  NotificationState,
+  notificationStoreKey,
+} from 'core/notifications/notificationReducers'
+import { prop } from 'ramda'
 
 const useStyles = makeStyles((theme) => ({
   title: {
@@ -59,7 +65,10 @@ const usePopoverStyles = makeStyles((theme) => ({
 }))
 
 const NotificationsPopover = ({ className }) => {
-  const { notifications, clearNotifications } = useContext(AppContext)
+  const selectNotificationsState = prop<string, NotificationState>(notificationStoreKey)
+  const notifications = useSelector(selectNotificationsState)
+  const dispatch = useDispatch()
+  const clearNotifications = () => dispatch(notificationActions.clearNotifications())
   const classes = useStyles({})
   const popoverClasses = usePopoverStyles({})
   const [anchorEl, setAnchorEl] = React.useState(null)

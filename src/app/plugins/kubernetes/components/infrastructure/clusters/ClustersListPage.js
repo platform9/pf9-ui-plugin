@@ -1,9 +1,8 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import DownloadKubeConfigLink from './DownloadKubeConfigLink'
 // import KubeCLI from './KubeCLI' // commented out till we support cli links
 import ExternalLink from 'core/components/ExternalLink'
 import SimpleLink from 'core/components/SimpleLink'
-import { clustersCacheKey } from '../common/actions'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { capitalizeString, castBoolToStr } from 'utils/misc'
 import {
@@ -12,8 +11,7 @@ import {
 } from 'k8s/components/infrastructure/clusters/ClusterStatus'
 import ResourceUsageTable from 'k8s/components/infrastructure/common/ResourceUsageTable'
 import CreateButton from 'core/components/buttons/CreateButton'
-import { AppContext } from 'core/providers/AppProvider'
-import { both, path, omit } from 'ramda'
+import { both, path, omit, prop } from 'ramda'
 import PrometheusAddonDialog from 'k8s/components/prometheus/PrometheusAddonDialog'
 import ClusterUpgradeDialog from 'k8s/components/infrastructure/clusters/ClusterUpgradeDialog'
 import ClusterDeleteDialog from './ClusterDeleteDialog'
@@ -23,8 +21,11 @@ import { isAdminRole } from 'k8s/util/helpers'
 import { routes } from 'core/utils/routes'
 import CodeBlock from 'core/components/CodeBlock'
 import DateCell from 'core/components/listTable/cells/DateCell'
+import { sessionStoreKey } from 'core/session/sessionReducers'
+import { useSelector } from 'react-redux'
+import { ActionDataKeys } from 'k8s/DataKeys'
 import CopyToClipboard from 'core/components/CopyToClipboard'
-import { cloudProviderTypes } from '../cloudProviders/actions'
+import { cloudProviderTypes } from '../cloudProviders/selectors'
 
 const useStyles = makeStyles((theme) => ({
   links: {
@@ -129,16 +130,17 @@ const canScaleWorkers = ([cluster]) => cluster.taskStatus === 'success'
 const canUpgradeCluster = ([cluster]) => !!(cluster && cluster.canUpgrade)
 const canDeleteCluster = ([row]) => !['creating', 'deleting'].includes(row.taskStatus)
 
-const isAdmin = (selected, getContext) => {
-  return isAdminRole(getContext)
+const isAdmin = (selected, store) => {
+  return isAdminRole(prop('session', store))
 }
 
 export const options = {
   addUrl: routes.cluster.add.path(),
   addButton: ({ onClick }) => {
+    const session = useSelector(prop(sessionStoreKey))
     const {
       userDetails: { role },
-    } = useContext(AppContext)
+    } = session
     if (role !== 'admin') {
       return null
     }
@@ -213,7 +215,7 @@ export const options = {
     // since we use it in a few places for tags / metadata.
     { id: 'tags', label: 'Metadata', render: renderMetaData },
   ],
-  cacheKey: clustersCacheKey,
+  cacheKey: ActionDataKeys.Clusters,
   editUrl: '/ui/kubernetes/infrastructure/clusters/edit',
   name: 'Clusters',
   title: 'Clusters',

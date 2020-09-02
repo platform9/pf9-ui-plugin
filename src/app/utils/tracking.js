@@ -1,10 +1,11 @@
-import { Route } from "core/utils/routes"
+import { Route } from 'core/utils/routes'
 
 // Data is sent to Segment using window.analytics
 
 // name & body are both optional for both page & event
 export const trackPage = (location, body = {}) => {
-  const route = Route.find(location)
+  // TODO @john fix the location string thats passed to Route.find()
+  const route = Route.find(location.pathname + location.hash)
   if (window.analytics && route) {
     return window.analytics.page(route.name)
   }

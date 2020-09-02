@@ -1,16 +1,16 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import ApiHelper from 'developer/components/ApiHelper'
-import ContextViewer from 'developer/components/ContextViewer'
+import StoreViewer from 'developer/components/StoreViewer'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import SimpleLink from 'core/components/SimpleLink'
 import { compose } from 'app/utils/fp'
 import { withStyles } from '@material-ui/styles'
 import {
   Button,
-  ExpansionPanel,
-  ExpansionPanelDetails,
-  ExpansionPanelSummary,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Typography,
 } from '@material-ui/core'
 
@@ -47,14 +47,12 @@ class DeveloperToolsEmbed extends React.PureComponent {
   collapse = () => this.setState({ expanded: false })
 
   Panel = ({ title, children }) => (
-    <ExpansionPanel className={this.props.classes.panel}>
-      <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+    <Accordion className={this.props.classes.panel}>
+      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         <Typography className={this.props.classes.heading}>{title}</Typography>
-      </ExpansionPanelSummary>
-      <ExpansionPanelDetails className={this.props.classes.details}>
-        {children}
-      </ExpansionPanelDetails>
-    </ExpansionPanel>
+      </AccordionSummary>
+      <AccordionDetails className={this.props.classes.details}>{children}</AccordionDetails>
+    </Accordion>
   )
 
   render() {
@@ -83,7 +81,7 @@ class DeveloperToolsEmbed extends React.PureComponent {
           Developer Tools. V{version}
         </Typography>
         <Panel title="Context Viewer">
-          <ContextViewer />
+          <StoreViewer />
         </Panel>
         <Panel title="API helper">
           <ApiHelper />

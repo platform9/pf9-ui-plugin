@@ -54,7 +54,7 @@ export const waitUntil = async ({ condition, delay, maxRetries }) => {
   }
 }
 
-export const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
+export const sleep = async (delay) => new Promise((resolve) => setTimeout(resolve, delay))
 
 export const getHighestRole = (roleNames) => {
   if (roleNames.includes('admin')) {
@@ -66,7 +66,11 @@ export const getHighestRole = (roleNames) => {
   }
 }
 
-export const normalizeResponse = (response) => {
+interface ResponseWithData {
+  data: any
+}
+
+export const normalizeResponse = <T>(response): T extends ResponseWithData ? T['data'] : T => {
   const data = response && response.hasOwnProperty('data') ? response.data : response
   // Fix nested data.data issue
   return (data && data.hasOwnProperty('data') ? data.data : data) || emptyArr

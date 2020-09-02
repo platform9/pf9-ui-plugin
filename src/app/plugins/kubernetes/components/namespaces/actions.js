@@ -1,33 +1,21 @@
-import { pluck, flatten, pathOr } from 'ramda'
-import { allKey } from 'app/constants'
 import ApiClient from 'api-client/ApiClient'
-import { clustersCacheKey } from 'k8s/components/infrastructure/common/actions'
+import { allKey } from 'app/constants'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import { parseClusterParams } from 'k8s/components/infrastructure/clusters/actions'
+import { namespacesSelector } from 'k8s/components/namespaces/selectors'
+import DataKeys from 'k8s/DataKeys'
+import { flatten, pluck } from 'ramda'
 import { someAsync } from 'utils/async'
-import { trackEvent } from 'utils/tracking'
 import { pathStr } from 'utils/fp'
+import { trackEvent } from 'utils/tracking'
 
 const { qbert } = ApiClient.getInstance()
 
 export const namespacesCacheKey = 'namespaces'
 
-const findClusterName = (clusters, clusterId) => {
-  const cluster = clusters.find((x) => x.uuid === clusterId)
-  return (cluster && cluster.name) || ''
-}
-const namespacesMapper = async (items, params, loadFromContext) => {
-  const clusters = await loadFromContext(clustersCacheKey)
-  return items.map((ns) => ({
-    ...ns,
-    clusterName: findClusterName(clusters, ns.clusterId),
-    status: pathOr('N/A', ['status', 'phase'], ns),
-  }))
-}
-
-const namespaceActions = createCRUDActions(namespacesCacheKey, {
-  listFn: async (params, loadFromContext) => {
-    const [clusterId, clusters] = await parseClusterParams(params, loadFromContext)
+const namespaceActions = createCRUDActions(DataKeys.Namespaces, {
+  listFn: async (params) => {
+    const [clusterId, clusters] = await parseClusterParams(params)
     if (clusterId === allKey) {
       return someAsync(pluck('uuid', clusters).map(qbert.getClusterNamespaces)).then(flatten)
     }
@@ -40,12 +28,12 @@ const namespaceActions = createCRUDActions(namespacesCacheKey, {
       id: pathStr('metadata.uid', created),
       clusterId,
       name,
-      wizard_step:'Create Namespace',
-      wizard_state:'Complete',
-      wizard_progress:'1 of 1',
-      wizard_name:'Create New Namespace',
+      wizard_step: 'Create Namespace',
+      wizard_state: 'Complete',
+      wizard_progress: '1 of 1',
+      wizard_name: 'Create New Namespace',
     })
-    return response
+    return created
   },
   deleteFn: async ({ id }, currentItems) => {
     const { clusterId, name } = currentItems.find((ns) => ns.id === id)
@@ -54,16 +42,16 @@ const namespaceActions = createCRUDActions(namespacesCacheKey, {
       id,
       clusterId,
       name,
-      wizard_step:'Delete Namespace',
-      wizard_state:'Complete',
-      wizard_progress:'1 of 1',
-      wizard_name:'Deleted Namespace',
+      wizard_step: 'Delete Namespace',
+      wizard_state: 'Complete',
+      wizard_progress: '1 of 1',
+      wizard_name: 'Deleted Namespace',
     })
     return response
   },
   uniqueIdentifier: 'id',
   indexBy: 'clusterId',
-  dataMapper: namespacesMapper,
+  selector: namespacesSelector,
 })
 
 export default namespaceActions

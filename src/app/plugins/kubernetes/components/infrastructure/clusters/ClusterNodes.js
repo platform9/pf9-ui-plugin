@@ -29,15 +29,19 @@ const ClusterNodes = () => {
     return emptyArr
   }, [cluster, nodes])
 
-  const NodesTable = useMemo(() => createListTableComponent({
-    title: 'Nodes',
-    name: 'nodes',
-    columns: tableColumns,
-    emptyText: 'Nothing yet, waiting for nodes...',
-    uniqueIdentifier: 'uuid',
-    onReload: handleRefresh,
-    showCheckboxes: false,
-  }), [handleRefresh])
+  const NodesTable = useMemo(
+    () =>
+      createListTableComponent({
+        title: 'Nodes',
+        name: 'nodes',
+        columns: tableColumns,
+        emptyText: 'Nothing yet, waiting for nodes...',
+        uniqueIdentifier: 'uuid',
+        onReload: handleRefresh,
+        showCheckboxes: false,
+      }),
+    [handleRefresh],
+  )
 
   return (
     <Progress loading={loadingClusters || loadingNodes}>

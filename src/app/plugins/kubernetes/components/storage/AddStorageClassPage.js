@@ -12,7 +12,7 @@ import { allKey, codeMirrorOptions } from 'app/constants'
 import { persistVolumesStorageClassesLink } from 'k8s/links'
 import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
 import StorageTypePicklist from './StorageTypePicklist'
-import storageClassesActions, { storageClassesCacheKey } from './actions'
+import storageClassesActions from './actions'
 import useParams from 'core/hooks/useParams'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { makeStyles } from '@material-ui/styles'
@@ -21,6 +21,7 @@ import ExternalLink from 'core/components/ExternalLink'
 import { clusterActions } from '../infrastructure/clusters/actions'
 import { propEq, pathOr } from 'ramda'
 import { CloudProvidersFriendlyName } from '../infrastructure/cloudProviders/model'
+import { ActionDataKeys } from 'k8s/DataKeys'
 
 const initialContext = {
   isDefault: false,
@@ -219,7 +220,7 @@ const getInitialStorageClassYaml = (wizardContext) => {
 }
 
 export const options = {
-  cacheKey: storageClassesCacheKey,
+  cacheKey: ActionDataKeys.StorageClasses,
   FormComponent: AddStorageClassForm,
   listUrl: '/ui/kubernetes/storage_classes',
   name: 'AddStorageClass',

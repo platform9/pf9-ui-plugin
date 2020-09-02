@@ -3,9 +3,9 @@ import PropTypes from 'prop-types'
 import {
   Collapse,
   Drawer,
-  ExpansionPanel,
-  ExpansionPanelDetails,
-  ExpansionPanelSummary,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   IconButton,
   ListItemText,
   MenuItem,
@@ -20,9 +20,8 @@ import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'
 import { except, pathStrOr } from 'app/utils/fp'
 import clsx from 'clsx'
-import { withHotKeys } from 'core/providers/HotKeysProvider'
 import moize from 'moize'
-import { assoc, flatten, pluck, prop, propEq, propOr, where, equals, indexOf } from 'ramda'
+import { assoc, flatten, pluck, prop, propEq, propOr, where, equals } from 'ramda'
 import { matchPath, withRouter } from 'react-router'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import {
@@ -30,12 +29,14 @@ import {
   clarityDashboardUrl,
   helpUrl,
   ironicWizardUrl,
-  dashboardUrl
+  dashboardUrl,
 } from 'app/constants'
 import { routes } from 'core/utils/routes'
 
 import SimpleLink from './SimpleLink'
-import { withAppContext } from 'core/providers/AppProvider'
+// import { withAppContext } from 'core/providers/AppProvider'
+import { sessionStoreKey } from 'core/session/sessionReducers'
+import { connect } from 'react-redux'
 
 export const drawerWidth = 180
 
@@ -315,20 +316,11 @@ const styles = (theme) => ({
   },
 })
 
+// TODO: @john to verify this connect change works from appContext
 @withStyles(styles, { withTheme: true })
-@withHotKeys
 @withRouter
-@withAppContext
+@connect((state) => prop(sessionStoreKey))
 class Navbar extends PureComponent {
-  constructor(props) {
-    super(props)
-    // The following events will be triggered even when focusing an editable input
-    props.setHotKeyHandler('Enter', this.handleEnterKey, { whileEditing: true })
-    props.setHotKeyHandler('ArrowUp', this.handleArrowKeys('ArrowUp'), { whileEditing: true })
-    props.setHotKeyHandler('ArrowDown', this.handleArrowKeys('ArrowDown'), { whileEditing: true })
-    props.setHotKeyHandler('Escape', this.handleEscKey, { whileEditing: true })
-  }
-
   state = {
     expandedSection: null,
     anchor: 'left',
@@ -549,19 +541,19 @@ class Navbar extends PureComponent {
     const { classes } = this.props
     const { expandedSection } = this.state
     return sections.map((section) => (
-      <ExpansionPanel
+      <Accordion
         key={section.id}
         className={classes.nav}
         expanded={expandedSection === section.id}
         onChange={this.handleExpand(section.id)}
       >
-        <ExpansionPanelSummary className={classes.navHeading} expandIcon={<ExpandMore />}>
+        <AccordionSummary className={classes.navHeading} expandIcon={<ExpandMore />}>
           <Typography className={classes.navHeadingText}>{section.name}</Typography>
-        </ExpansionPanelSummary>
-        <ExpansionPanelDetails className={classes.navBody}>
+        </AccordionSummary>
+        <AccordionDetails className={classes.navBody}>
           {this.renderSectionLinks(section.links)}
-        </ExpansionPanelDetails>
-      </ExpansionPanel>
+        </AccordionDetails>
+      </Accordion>
     ))
   }
 
@@ -598,13 +590,19 @@ class Navbar extends PureComponent {
       <div className={classes.sliderContainer}>
         {open && (
           <a>
-            <ChevronLeftIcon className={classes.sliderArrow} onClick={() => this.switchStacks('left')} />
+            <ChevronLeftIcon
+              className={classes.sliderArrow}
+              onClick={() => this.switchStacks('left')}
+            />
           </a>
         )}
         <div className={classes.sliderLogo} />
         {open && (
           <a>
-            <ChevronRightIcon className={classes.sliderArrow} onClick={() => this.switchStacks('right')} />
+            <ChevronRightIcon
+              className={classes.sliderArrow}
+              onClick={() => this.switchStacks('right')}
+            />
           </a>
         )}
       </div>
@@ -619,14 +617,14 @@ class Navbar extends PureComponent {
       open,
       handleDrawerToggle,
       stack,
-      getContext,
+      features,
     } = this.props
     // const filteredSections = sections.filter(where({ links: notEmpty }))
     // Because ironic regions will not currently support kubernetes, assume always
     // one filtered section, either openstack (ironic) or kubernetes
     const filteredSections = sections.filter(where({ id: equals(stack) }))
 
-    const { features } = getContext()
+    // const { features } = getContext()
     const isDecco = pathStrOr(false, 'experimental.kplane', features)
     const version = pathStrOr('4', 'releaseVersion', features)
 

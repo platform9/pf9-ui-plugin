@@ -1,29 +1,23 @@
+import ApiClient from 'api-client/ApiClient'
 import createContextLoader from 'core/helpers/createContextLoader'
 import createCRUDActions from 'core/helpers/createCRUDActions'
-import { pluck, propSatisfies, propEq, pick } from 'ramda'
-import { capitalizeString } from 'utils/misc'
-import calcUsageTotalByPath from 'k8s/util/calcUsageTotals'
-import { pathStrOr } from 'utils/fp'
-import {
-  clustersCacheKey,
-  combinedHostsCacheKey,
-} from 'k8s/components/infrastructure/common/actions'
+import { makeCloudProvidersSelector } from 'k8s/components/infrastructure/cloudProviders/selectors'
+import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
+import { ActionDataKeys } from 'k8s/DataKeys'
+import { pluck } from 'ramda'
 import { trackEvent } from 'utils/tracking'
-import ApiClient from 'api-client/ApiClient'
 
 const { qbert } = ApiClient.getInstance()
 
-export const cloudProviderTypes = {
-  aws: 'AWS',
-  azure: 'Azure',
-  openstack: 'OpenStack',
-  local: 'BareOS',
-}
-
-export const cloudProvidersCacheKey = 'cloudProviders'
-
-export const cloudProviderActions = createCRUDActions(cloudProvidersCacheKey, {
-  listFn: () => qbert.getCloudProviders(),
+export const cloudProviderActions = createCRUDActions(ActionDataKeys.CloudProviders, {
+  listFn: async () => {
+    const [cloudProviders] = await Promise.all([
+      qbert.getCloudProviders(),
+      // Make sure the derived data gets loaded as well
+      clusterActions.list(),
+    ])
+    return cloudProviders
+  },
   createFn: async (params) => {
     const result = await qbert.createCloudProvider(params)
     trackEvent('Create Cloud Provider', {
@@ -70,52 +64,12 @@ export const cloudProviderActions = createCRUDActions(cloudProvidersCacheKey, {
       )
     },
   },
-  refetchCascade: true,
-  dataMapper: async (items, params, loadFromContext) => {
-    const [clusters, combinedHosts] = await Promise.all([
-      loadFromContext(clustersCacheKey),
-      loadFromContext(combinedHostsCacheKey),
-    ])
-    const getNodesHosts = (nodeIds) =>
-      combinedHosts.filter(propSatisfies((id) => nodeIds.includes(id), 'id'))
-    const usagePathStr = 'resmgr.extensions.resource_usage.data'
-
-    return items
-      .filter(({ type }) => type !== 'local')
-      .map((cloudProvider) => {
-        const descriptiveType =
-          cloudProviderTypes[cloudProvider.type] || capitalizeString(cloudProvider.type)
-        const filterCpClusters = propEq('nodePoolUuid', cloudProvider.nodePoolUuid)
-        const cpClusters = clusters.filter(filterCpClusters)
-        const cpNodes = pluck('nodes', cpClusters).flat()
-        const cpHosts = getNodesHosts(pluck('uuid', cpNodes))
-        const calcDeployedCapacity = calcUsageTotalByPath(cpHosts)
-        const deployedCapacity = {
-          compute: calcDeployedCapacity(`${usagePathStr}.cpu.used`, `${usagePathStr}.cpu.total`),
-          memory: calcDeployedCapacity(
-            (item) =>
-              pathStrOr(0, `${usagePathStr}.memory.total`, item) -
-              pathStrOr(0, `${usagePathStr}.memory.available`, item),
-            `${usagePathStr}.memory.total`,
-            true,
-          ),
-          disk: calcDeployedCapacity(`${usagePathStr}.disk.used`, `${usagePathStr}.disk.total`),
-        }
-
-        return {
-          ...cloudProvider,
-          descriptiveType,
-          deployedCapacity,
-          clusters: cpClusters,
-          nodes: cpNodes,
-        }
-      })
-  },
   uniqueIdentifier: 'uuid',
+  selectorCreator: makeCloudProvidersSelector,
 })
 
 export const loadCloudProviderDetails = createContextLoader(
-  'cloudProviderDetails',
+  ActionDataKeys.CloudProviderDetails,
   async ({ cloudProviderId }) => {
     const response = await qbert.getCloudProviderDetails(cloudProviderId)
     return response.Regions
@@ -127,7 +81,7 @@ export const loadCloudProviderDetails = createContextLoader(
 )
 
 export const loadCloudProviderRegionDetails = createContextLoader(
-  'cloudProviderRegionDetails',
+  ActionDataKeys.CloudProviderRegionDetails,
   async ({ cloudProviderId, cloudProviderRegionId }) => {
     return qbert.getCloudProviderRegionDetails(cloudProviderId, cloudProviderRegionId)
   },

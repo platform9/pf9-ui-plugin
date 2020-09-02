@@ -1,4 +1,5 @@
 import createAddComponents from 'core/helpers/createAddComponents'
+import { ActionDataKeys } from 'k8s/DataKeys'
 
 const initialValue = {
   name: '',
@@ -20,7 +21,7 @@ export const options = {
     ],
     submitLabel: 'Add Flavor',
   },
-  actions: { service: 'nova', entity: 'flavors' },
+  actions: { service: 'nova', entity: ActionDataKeys.Flavors },
   listUrl: '/ui/openstack/flavors',
   name: 'AddFlavor',
   title: 'Add Flavor',

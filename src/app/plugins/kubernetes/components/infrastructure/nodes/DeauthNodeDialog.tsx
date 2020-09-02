@@ -11,10 +11,10 @@ import Progress from 'core/components/progress/Progress'
 import { deAuthNode } from 'k8s/components/infrastructure/nodes/actions'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import ListTable from 'core/components/listTable/ListTable'
-import { ICombinedNode } from './model'
+import { INodesSelector } from './model'
 
 interface IDeauthNodeDialogProps {
-  nodeList: ICombinedNode[]
+  nodeList: INodesSelector[]
   onClose: () => void
 }
 

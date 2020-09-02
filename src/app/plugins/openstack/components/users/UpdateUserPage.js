@@ -5,7 +5,7 @@ import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import TextField from 'core/components/validatedForm/TextField'
 import NoAutofillHack from 'core/components/NoAutofillHack'
 import TenantRolesContainer from 'openstack/components/users/TenantRolesContainer'
-import { usersCacheKey } from './actions'
+import { ActionDataKeys } from 'k8s/DataKeys'
 
 const roles = ['None', 'Role1', 'Role2', 'Role3']
 
@@ -28,7 +28,7 @@ export const UpdateUserForm = ({ onComplete, initialValue }) => (
 export const options = {
   FormComponent: UpdateUserForm,
   routeParamKey: 'userId',
-  cacheKey: usersCacheKey,
+  cacheKey: ActionDataKeys.Users,
   listUrl: '/ui/openstack/routers',
   name: 'UpdateUser',
   title: 'Update User',

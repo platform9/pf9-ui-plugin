@@ -1,13 +1,16 @@
 /* eslint-disable camelcase */
-import axios from 'axios'
 import ApiService from 'api-client/ApiService'
 
 class Cinder extends ApiService {
-  endpoint = () => {
+  public getClassName() {
+    return 'cinder'
+  }
+
+  protected async getEndpoint() {
     return this.client.keystone.getServiceEndpoint('cinderv3', 'admin')
   }
 
-  volumesUrl = async () => `${await this.endpoint()}/volumes`
+  volumesUrl = () => '/volumes'
 
   async getRegionUrls() {
     const services = (await this.client.keystone.getServiceCatalog()).find(
@@ -21,95 +24,146 @@ class Cinder extends ApiService {
   }
 
   async getVolume(id) {
-    const url = `${await this.volumesUrl()}/${id}`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.volume
+    const response = await this.client.basicGet<any>({
+      url: `${this.volumesUrl()}/${id}`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getVolume',
+      },
+    })
+    return response.volume
   }
 
   // Get volumes with details
   async getVolumes() {
-    const url = `${await this.volumesUrl()}/detail`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.volumes
+    const response = await this.client.basicGet<any>({
+      url: `${this.volumesUrl()}/detail`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getVolumes',
+      },
+    })
+    return response.volumes
   }
 
   async getAllVolumes() {
-    const url = `${await this.volumesUrl()}/detail?all_tenants=1`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.volumes
+    const response = await this.client.basicGet<any>({
+      url: `${this.volumesUrl()}/detail?all_tenants=1`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getAllVolumes',
+      },
+    })
+    return response.volumes
   }
 
   async getAllVolumesCount(limit, allTenants, markerId) {
-    const baseUrl = `${await this.volumesUrl()}/detail`
+    const baseUrl = `${this.volumesUrl()}/detail`
     const limitUrl = `?limit=${limit}`
     const projectUrl = allTenants ? '&all_tenants=1' : ''
     const markerUrl = markerId ? `&marker=${markerId}` : ''
     const url = baseUrl + limitUrl + projectUrl + markerUrl
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.volumes
+    const response = await this.client.basicGet<any>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getAllVolumesCount',
+      },
+    })
+    return response.volumes
   }
 
   async createVolume(params) {
-    const url = await this.volumesUrl()
-    const response = await axios.post(url, { volume: params }, this.client.getAuthHeaders())
-    return response.data.volume
+    const response = await this.client.basicPost<any>({
+      url: this.volumesUrl(),
+      body: {
+        volume: params,
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createVolume',
+      },
+    })
+    return response.volume
   }
 
   async deleteVolume(id) {
-    const url = `${await this.volumesUrl()}/${id}`
-    return axios.delete(url, this.client.getAuthHeaders())
+    return this.client.basicDelete<any>({
+      url: `${this.volumesUrl()}/${id}`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteVolume',
+      },
+    })
   }
 
   async updateVolume(id, params) {
-    const url = `${await this.volumesUrl()}/${id}`
-    const response = await axios.put(url, { volume: params }, this.client.getAuthHeaders())
-    return response.data.volume
+    const response = await this.client.basicPut<any>({
+      url: `${this.volumesUrl()}/${id}`,
+      body: {
+        volume: params,
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'updateVolume',
+      },
+    })
+    return response.volume
   }
 
   async setBootable(id, bool) {
-    const url = `${await this.volumesUrl()}/${id}/action`
-    const response = await axios.post(
-      url,
-      { 'os-set_bootable': { bootable: bool } },
-      this.client.getAuthHeaders(),
-    )
-    return response.data.volume
+    const response = await this.client.basicPost<any>({
+      url: `${this.volumesUrl()}/${id}/action`,
+      body: {
+        'os-set_bootable': { bootable: bool },
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'setBootable',
+      },
+    })
+    return response.volume
   }
 
   // TODO: Test case for extend function
   // TODO: Current API doesn't work on AWS. Need to implement check logic in test.
   async extendVolume(id, size) {
-    const url = `${await this.volumesUrl()}/${id}/action`
-    const response = await axios.post(
-      url,
-      { 'os-extend': { 'new-size': size } },
-      this.client.getAuthHeaders(),
-    )
-    return response.data.volume
+    const response = await this.client.basicPost<any>({
+      url: `${this.volumesUrl()}/${id}/action`,
+      body: {
+        'os-extend': { 'new-size': size },
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'extendVolume',
+      },
+    })
+    return response.volume
   }
 
   // TODO: test case for reset function (Instance implement needed. Attach function needed?)
   async resetVolumeStatus(id) {
-    const url = `${await this.volumesUrl()}/${id}/action`
-    const response = await axios.post(
-      url,
-      {
+    const response = await this.client.basicPost<any>({
+      url: `${this.volumesUrl()}/${id}/action`,
+      body: {
         'os-reset_status': {
           status: 'available',
           attach_status: 'detached',
         },
       },
-      this.client.getAuthHeaders(),
-    )
-    return response.data.volume
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'resetVolumeStatus',
+      },
+    })
+    return response.volume
   }
 
   // TODO: test case for upload function (Image implement needed)
   async uploadVolumeAsImage(id, image) {
-    const url = `${await this.volumesUrl()}/${id}/action`
-    const response = await axios.post(
-      url,
-      {
+    const response = await this.client.basicPost<any>({
+      url: `${this.volumesUrl()}/${id}/action`,
+      body: {
         'os-volume_upload_image': {
           container_format: 'bare',
           force: image.force,
@@ -117,129 +171,252 @@ class Cinder extends ApiService {
           disk_format: image.diskFormat || 'raw',
         },
       },
-      this.client.getAuthHeaders(),
-    )
-    return response.data.volume
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'uploadVolumeAsImage',
+      },
+    })
+    return response.volume
   }
 
   async getVolumeTypes() {
-    const url = `${await this.endpoint()}/types`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.volume_types
+    const response = await this.client.basicGet<any>({
+      url: `/types`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getVolumeTypes',
+      },
+    })
+    return response.volume_types
   }
 
   async getVolumeType(name) {
-    const url = `${await this.endpoint()}/types`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.volume_types.find((x) => x.name === name)
+    const volumeTypes = await this.getVolumeTypes()
+    return volumeTypes.find((x) => x.name === name)
   }
 
   async createVolumeType(params) {
-    const url = `${await this.endpoint()}/types`
-    await axios.post(url, { volume_type: params }, this.client.getAuthHeaders())
+    await this.client.basicPost<any>({
+      url: `/types`,
+      body: {
+        volume_type: params,
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createVolumeType',
+      },
+    })
     return this.getVolumeType(params.name)
   }
 
   async deleteVolumeType(id) {
-    const url = `${await this.endpoint()}/types/${id}`
-    await axios.delete(url, this.client.getAuthHeaders())
+    await this.client.basicDelete<any>({
+      url: `/types/${id}`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteVolumeType',
+      },
+    })
   }
 
   async updateVolumeType(id, params, keysToDelete = []) {
-    const url = `${await this.endpoint()}/types/${id}`
     const { extra_specs: extraSpecs, ...rest } = params
-    const baseResponse = await axios.put(url, { volume_type: rest }, this.client.getAuthHeaders())
-    await axios.post(
-      `${url}/extra_specs`,
-      { extra_specs: extraSpecs },
-      this.client.getAuthHeaders(),
-    )
+    const baseResponse = await this.client.basicPut<any>({
+      url: `/types/${id}`,
+      body: {
+        volume_type: rest,
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'updateVolumeType',
+      },
+    })
+    await this.client.basicPost<any>({
+      url: `/types/${id}/extra_specs`,
+      body: {
+        extra_specs: extraSpecs,
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'updateVolumeType/extra_specs',
+      },
+    })
     await Promise.all(
       keysToDelete.map(async (key) => {
-        return axios.delete(`${url}/extra_specs/${key}`, this.client.getAuthHeaders())
+        return this.client.basicDelete<any>({
+          url: `/types/${id}/extra_specs/${key}`,
+          options: {
+            clsName: this.getClassName(),
+            mthdName: `updateVolumeType/delete/${key}`,
+          },
+        })
       }),
     )
-    return baseResponse.data
+    return baseResponse
   }
 
   async unsetVolumeTypeTag(id, tag) {
-    const url = `${await this.endpoint()}/types/${id}/extra_specs/${tag}`
-    await axios.delete(url, this.client.getAuthHeaders())
+    await this.client.basicDelete<any>({
+      url: `/types/${id}/extra_specs/${tag}`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: `unsetVolumeTypeTag`,
+      },
+    })
   }
 
   async getSnapshots() {
-    const url = `${await this.endpoint()}/snapshots/detail`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.snapshots
+    const response = await this.client.basicGet<any>({
+      url: `/snapshots/detail`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: `getSnapshots`,
+      },
+    })
+    return response.snapshots
   }
 
   async getAllSnapshots() {
-    const url = `${await this.endpoint()}/snapshots/detail?all_tenants=1`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.snapshots
+    const response = await this.client.basicGet<any>({
+      url: `/snapshots/detail?all_tenants=1`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: `getAllSnapshots`,
+      },
+    })
+    return response.snapshots
   }
 
   async snapshotVolume(params) {
-    const url = `${await this.endpoint()}/snapshots`
-    const response = await axios.post(url, { snapshot: params }, this.client.getAuthHeaders())
-    return response.data.snapshot
+    const response = await this.client.basicPost<any>({
+      url: `/snapshots`,
+      body: {
+        snapshot: params,
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: `snapshotVolume`,
+      },
+    })
+    return response.snapshot
   }
 
   async deleteSnapshot(id) {
-    const url = `${await this.endpoint()}/snapshots/${id}`
-    await axios.delete(url, this.client.getAuthHeaders())
+    await this.client.basicDelete<any>({
+      url: `/snapshots/${id}`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: `deleteSnapshot`,
+      },
+    })
   }
 
   async updateSnapshot(id, params) {
-    const url = `${await this.endpoint()}/snapshots/${id}`
-    const response = await axios.put(url, { snapshot: params }, this.client.getAuthHeaders())
-    return response.data.snapshot
+    const response = await this.client.basicPut<any>({
+      url: `/snapshots/${id}`,
+      body: {
+        snapshot: params,
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: `updateSnapshot`,
+      },
+    })
+    return response.snapshot
   }
 
   async updateSnapshotMetadata(id, params) {
-    const url = `${await this.endpoint()}/snapshots/${id}/metadata`
-    const response = await axios.put(url, { metadata: params }, this.client.getAuthHeaders())
-    return response.data.metadata
+    const response = await this.client.basicPut<any>({
+      url: `/snapshots/${id}/metadata`,
+      body: {
+        metadata: params,
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: `updateSnapshotMetadata`,
+      },
+    })
+    return response.metadata
   }
 
   async getDefaultQuotas() {
-    const url = `${await this.endpoint()}/os-quota-class-sets/defaults`
+    const quotas = await this.client.basicGet<any>({
+      url: `/os-quota-class-sets/defaults`,
 
-    const quotas = await axios.get(url, this.client.getAuthHeaders())
-    return quotas.data.quota_class_set
+      options: {
+        clsName: this.getClassName(),
+        mthdName: `getDefaultQuotas`,
+      },
+    })
+    return quotas.quota_class_set
   }
 
   async getDefaultQuotasForRegion(region) {
     const urls = await this.getRegionUrls()
-    const url = `${urls[region]}/os-quota-class-sets/defaults`
-    const quotas = await axios.get(url, this.client.getAuthHeaders())
-    return quotas.data.quota_class_set
+    const quotas = await this.client.basicGet<any>({
+      endpoint: urls[region],
+      url: `/os-quota-class-sets/defaults`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: `getDefaultQuotasForRegion`,
+      },
+    })
+    return quotas.quota_class_set
   }
 
   async getQuotas(projectId) {
-    const url = `${await this.endpoint()}/os-quota-sets/${projectId}?usage=true`
-    const quota = await axios.get(url, this.client.getAuthHeaders())
-    return quota.data.quota_set
+    const quota = await this.client.basicGet<any>({
+      endpoint: `/os-quota-sets/${projectId}?usage=true`,
+      url: `/os-quota-class-sets/defaults`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: `getQuotas`,
+      },
+    })
+    return quota.quota_set
   }
 
   async getQuotasForRegion(projectId, region) {
     const urls = await this.getRegionUrls()
-    const url = `${urls[region]}/os-quota-sets/${projectId}?usage=true`
-    const quota = await axios.get(url, this.client.getAuthHeaders())
-    return quota.data.quota_set
+    const quota = await this.client.basicGet<any>({
+      endpoint: urls[region],
+      url: `/os-quota-sets/${projectId}?usage=true`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: `getQuotasForRegion`,
+      },
+    })
+    return quota.quota_set
   }
 
   async setQuotas(params, projectId) {
-    const url = `${await this.endpoint()}/os-quota-sets/${projectId}`
-    const quotas = await axios.put(url, { quota_set: params }, this.client.getAuthHeaders())
-    return quotas.data.quota_set
+    const quotas = await this.client.basicPut<any>({
+      url: `/os-quota-sets/${projectId}`,
+      body: {
+        quota_set: params,
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: `setQuotas`,
+      },
+    })
+    return quotas.quota_set
   }
 
   async setQuotasForRegion(params, projectId, region) {
     const urls = await this.getRegionUrls()
-    const url = `${urls[region]}/os-quota-sets/${projectId}`
-    const quotas = await axios.put(url, { quota_set: params }, this.client.getAuthHeaders())
-    return quotas.data.quota_set
+    const quotas = await this.client.basicPut<any>({
+      endpoint: urls[region],
+      url: `/os-quota-sets/${projectId}`,
+      body: {
+        quota_set: params,
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: `setQuotasForRegion`,
+      },
+    })
+    return quotas.quota_set
   }
 
   // TODO: getStorageStats(need to implement host first)

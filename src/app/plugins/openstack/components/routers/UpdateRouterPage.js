@@ -4,7 +4,7 @@ import SubmitButton from 'core/components/SubmitButton'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import Checkbox from 'core/components/validatedForm/CheckboxField'
 import TextField from 'core/components/validatedForm/TextField'
-import { routersCacheKey } from './actions'
+import { ActionDataKeys } from 'k8s/DataKeys'
 
 export const UpdateRouterForm = ({ onComplete, initialValue }) => (
   <ValidatedForm onSubmit={onComplete} initialValues={initialValue}>
@@ -17,7 +17,7 @@ export const UpdateRouterForm = ({ onComplete, initialValue }) => (
 )
 
 export const options = {
-  cacheKey: routersCacheKey,
+  cacheKey: ActionDataKeys.Routers,
   FormComponent: UpdateRouterForm,
   routeParamKey: 'routerId',
   listUrl: '/ui/openstack/routers',

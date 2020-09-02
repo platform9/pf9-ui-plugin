@@ -4,6 +4,7 @@ import SubmitButton from 'core/components/SubmitButton'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import TextField from 'core/components/validatedForm/TextField'
 import { cloudProviderActions } from 'k8s/components/infrastructure/cloudProviders/actions'
+import { ActionDataKeys } from 'k8s/DataKeys'
 
 const AWSFields = () => (
   <React.Fragment>
@@ -59,7 +60,7 @@ export const options = {
   name: 'UpdateCloudProvider',
   title: 'Update Cloud Provider',
   uniqueIdentifier: 'uuid',
-  cacheKey: 'cloudProviders',
+  cacheKey: ActionDataKeys.cloudProviders,
 }
 
 const { UpdatePage } = createUpdateComponents(options)

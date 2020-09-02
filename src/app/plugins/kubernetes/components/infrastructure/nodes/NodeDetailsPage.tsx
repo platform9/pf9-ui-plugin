@@ -9,7 +9,7 @@ import { loadNodes } from './actions'
 // Components
 import PageContainer from 'core/components/pageContainer/PageContainer'
 // Models
-import { ICombinedNode } from './model'
+import { INodesSelector } from './model'
 import SimpleLink from 'core/components/SimpleLink'
 import Progress from 'core/components/progress/Progress'
 import UsageWidget from 'core/components/widgets/UsageWidget'
@@ -59,8 +59,8 @@ const ClusterDetailsPage: FC = () => {
   const { match } = useReactRouter()
   const classes = useStyles({})
   const [nodes, loading] = useDataLoader(loadNodes)
-  const selectedNode: ICombinedNode =
-    nodes.find((x: ICombinedNode) => x.uuid === match.params.id) || {}
+  const selectedNode: INodesSelector =
+    nodes.find((x: INodesSelector) => x.uuid === match.params.id) || {}
 
   const totals = useMemo(
     () => ({
@@ -127,7 +127,7 @@ const ClusterDetailsPage: FC = () => {
   )
 }
 
-const NodeDetail: FC<ICombinedNode> = (node) => {
+const NodeDetail: FC<INodesSelector> = (node) => {
   const { uuid, combined, logs, clusterName, clusterUuid } = node
   const { detailContainer, card } = useStyles({})
   const hostId = uuid

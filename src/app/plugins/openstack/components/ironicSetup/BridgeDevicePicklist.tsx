@@ -5,7 +5,7 @@ import { loadResMgrHosts } from 'k8s/components/infrastructure/common/actions'
 import PicklistDefault from 'core/components/Picklist'
 import Loading from 'core/components/Loading'
 import { IUseDataLoader } from 'k8s/components/infrastructure/nodes/model'
-import { ResMgrHost } from 'k8s/components/infrastructure/common/model'
+import { Host } from 'api-client/resmgr.model'
 const Picklist: any = PicklistDefault // types on forward ref .js file dont work well.
 
 interface Props {
@@ -33,19 +33,22 @@ const BridgeDevicePicklist: React.ComponentType<Props> = forwardRef<HTMLElement,
       ...rest
     } = props
 
-    const [hosts, hostsLoading, reloadHosts]: IUseDataLoader<ResMgrHost> = useDataLoader(loadResMgrHosts) as any
+    const [hosts, hostsLoading, reloadHosts]: IUseDataLoader<Host> = useDataLoader(
+      loadResMgrHosts,
+    ) as any
     const options = useMemo(() => {
-      if (hosts.length < 1) { return [] }
+      if (hosts.length < 1) {
+        return []
+      }
       // Pooja requested we not take choices from those ranges.
       // 192.168.122.1 is a libvirt virtual bridge (virbr0) IP
       // 198.51.100.1 is some private IP that WE assign to an interface for running dnsmasq on ironic host
-      const host = hosts.find(host => host.id === hostId )
-      return host.ovsBridges.map(bridgeDevice => (
-        { label: bridgeDevice, value: bridgeDevice }
-      ))
-    },
-      [hosts],
-    )
+      const host = hosts.find((host) => host.id === hostId)
+      return (
+        host?.ovsBridges?.map((bridgeDevice) => ({ label: bridgeDevice, value: bridgeDevice })) ||
+        []
+      )
+    }, [hosts])
 
     // Select the first item as soon as data is loaded
     useEffect(() => {
@@ -65,7 +68,7 @@ const BridgeDevicePicklist: React.ComponentType<Props> = forwardRef<HTMLElement,
           onChange={onChange}
           options={options}
           showAll={showAll}
-          className='validatedFormInput'
+          className="validatedFormInput"
           loading={hostsLoading}
         />
         <Loading loading={hostsLoading} onClick={reloadHosts}>

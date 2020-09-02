@@ -3,16 +3,42 @@ import { keyValueArrToObj } from 'utils/fp'
 import { pathJoin } from 'utils/misc'
 import { normalizeResponse } from 'api-client/helpers'
 import ApiService from 'api-client/ApiService'
-
-interface GenericObject {
-  [key: string]: any
-}
+import {
+  Node,
+  ClusterElement,
+  GetKubernetesVersion,
+  GetCloudProvider,
+  GetClusterKubeServices,
+  GetClusterPods,
+  GetClusterDeployments,
+  GetClusterNamespaces,
+  GetCluster,
+  GetPrometheusAlerts,
+  GetPrometheusAlertsOverTime,
+  GetClusterRoles,
+  GetClusterClusterRoles,
+  IGenericPayloadWithMetadata,
+  IGenericResource,
+  GetClusterNamespacesItem,
+  INormalizedCluster,
+  GetClusterKubeServicesItem,
+  GCluster,
+  GetClusterRolesItem,
+  IGenericClusterizedResponse,
+  IGetPrometheusAlertsOverTime,
+} from './qbert.model'
+import DataKeys from 'k8s/DataKeys'
 
 // TODO: Fix these typings
-const normalizeClusterizedResponse = (clusterId: string, response: GenericObject) =>
-  pipe<GenericObject, GenericObject[], Array<GenericObject & { clusterId: string }>>(
-    propOr<GenericObject[]>([], 'items'),
-    map(mergeLeft({ clusterId })),
+const normalizeClusterizedResponse = <T>(
+  clusterId: string,
+  response: GCluster<T>,
+): Array<IGenericClusterizedResponse<T>> =>
+  pipe(
+    propOr([], 'items'),
+    map<any, any>(
+      mergeLeft<any>({ clusterId }),
+    ),
   )(response)
 
 const normalizeClusterizedUpdate = (clusterId, response) => ({
@@ -20,7 +46,7 @@ const normalizeClusterizedUpdate = (clusterId, response) => ({
   clusterId,
 })
 
-const normalizeCluster = (baseUrl) => (cluster) => ({
+const normalizeCluster = <T>(baseUrl) => (cluster): T & INormalizedCluster => ({
   ...cluster,
   endpoint: cluster.externalDnsName || cluster.masterIp,
   kubeconfigUrl: `${baseUrl}/kubeconfig/${cluster.uuid}`,
@@ -30,9 +56,13 @@ const normalizeCluster = (baseUrl) => (cluster) => ({
 
 /* eslint-disable camelcase */
 class Qbert extends ApiService {
-  cachedEndpoint = ''
+  public getClassName() {
+    return 'qbert'
+  }
 
-  endpoint = async () => {
+  // cachedEndpoint = ''
+
+  protected async getEndpoint() {
     const endpoint = await this.client.keystone.getServiceEndpoint('qbert', 'admin')
     const mappedEndpoint = endpoint.replace(/v(1|2|3)$/, `v3/${this.client.activeProjectId}`)
 
@@ -40,22 +70,19 @@ class Qbert extends ApiService {
     // sent from the backend.  But getting the endpoint is an async operation so we need to make an
     // sync version.  In theory this should always be set since keystone must get the service
     // catalog before any Qbert API calls are made.
-    this.cachedEndpoint = mappedEndpoint
+    // this.cachedEndpoint = mappedEndpoint
     return mappedEndpoint
   }
 
-  monocularBaseUrl = () => {
+  monocularBaseUrl = async () => {
     return this.client.keystone.getServiceEndpoint('monocular', 'public')
   }
 
-  baseUrl = async () => `${await this.endpoint()}`
+  clusterBaseUrl = (clusterId) => `/clusters/${clusterId}/k8sapi/api/v1`
 
-  clusterBaseUrl = async (clusterId) =>
-    `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1`
-
-  clusterMonocularBaseUrl = async (clusterId, version = 'v1') =>
+  clusterMonocularBaseUrl = (clusterId, version = 'v1') =>
     pathJoin(
-      await this.clusterBaseUrl(clusterId),
+      this.clusterBaseUrl(clusterId),
       'namespaces',
       'kube-system',
       'services',
@@ -66,30 +93,74 @@ class Qbert extends ApiService {
 
   /* Cloud Providers */
   getCloudProviders = async () => {
-    return this.client.basicGet(`${await this.baseUrl()}/cloudProviders`)
+    const url = `/cloudProviders`
+    return this.client.basicGet<GetCloudProvider[]>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getCloudProviders',
+      },
+    })
   }
 
-  createCloudProvider = async (params) => {
-    return this.client.basicPost(`${await this.baseUrl()}/cloudProviders`, params)
+  createCloudProvider = async (body) => {
+    const url = `/cloudProviders`
+    return this.client.basicPost({
+      url,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createCloudProvider',
+      },
+    })
   }
 
   getCloudProviderDetails = async (cpId) => {
-    return this.client.basicGet(`${await this.baseUrl()}/cloudProviders/${cpId}`)
+    const url = `/cloudProviders/${cpId}`
+    return this.client.basicGet({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getCloudProviderDetails',
+      },
+    })
   }
 
   getCloudProviderRegionDetails = async (cpId, regionId) => {
-    return this.client.basicGet(`${await this.baseUrl()}/cloudProviders/${cpId}/region/${regionId}`)
+    const url = `/cloudProviders/${cpId}/region/${regionId}`
+    return this.client.basicGet({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getCloudProviderRegionDetails',
+      },
+    })
   }
 
-  updateCloudProvider = async (cpId, params) => {
-    return this.client.basicPut(`${await this.baseUrl()}/cloudProviders/${cpId}`, params)
+  updateCloudProvider = async (cpId, body) => {
+    const url = `/cloudProviders/${cpId}`
+    return this.client.basicPut({
+      url,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'updateCloudProvider',
+      },
+    })
   }
 
   deleteCloudProvider = async (cpId) => {
-    return this.client.basicDelete(`${await this.baseUrl()}/cloudProviders/${cpId}`)
-  }
+    const url = `/cloudProviders/${cpId}`
+    return this.client.basicDelete({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteCloudProvider',
+      },
+    })
+  };
 
-  cloudProviders = {
+  [DataKeys.CloudProviders] = {
     create: this.createCloudProvider.bind(this),
     list: this.getCloudProviders.bind(this),
     details: this.getCloudProviderDetails.bind(this),
@@ -100,103 +171,221 @@ class Qbert extends ApiService {
 
   /* Cloud Providers Types */
   getCloudProviderTypes = async () => {
-    return this.client.basicGet(`${await this.baseUrl()}/cloudProvider/types`)
+    const url = `/cloudProvider/types`
+    return this.client.basicGet({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getCloudProviderTypes',
+      },
+    })
   }
 
   /* Node Pools */
   getNodePools = async () => {
-    const nodePools = await this.client.basicGet(`${await this.baseUrl()}/nodePools`)
-    return nodePools
+    const url = `/nodePools`
+    return this.client.basicGet({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getNodePools',
+      },
+    })
   }
 
   /* Nodes */
   getNodes = async () => {
-    const nodes = await this.client.basicGet(`${await this.baseUrl()}/nodes`)
-    return nodes
-  }
+    const url = `/nodes`
+    return this.client.basicGet<Node[]>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getNodes',
+      },
+    })
+  };
 
-  nodes = {
+  [DataKeys.Nodes] = {
     list: this.getNodes,
   }
 
   /* SSH Keys */
   importSshKey = async (cpId, regionId, body) => {
-    return this.client.basicPost(
-      `${await this.baseUrl()}/cloudProviders/${cpId}/region/${regionId}`,
-    )
+    const url = `/cloudProviders/${cpId}/region/${regionId}`
+    return this.client.basicPost({
+      url,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'importSshKey',
+      },
+    })
   }
 
   /* Clusters */
   getClusters = async () => {
-    const rawClusters = await this.client.basicGet(`${await this.baseUrl()}/clusters`)
-    const baseUrl = await this.baseUrl()
-    return rawClusters.map(normalizeCluster(baseUrl))
+    const url = `/clusters`
+    const rawClusters = await this.client.basicGet<ClusterElement[]>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getClusters',
+      },
+    })
+    const baseUrl = await this.getApiEndpoint()
+    return rawClusters.map(normalizeCluster<ClusterElement>(baseUrl))
   }
 
   getClusterDetails = async (clusterId) => {
-    const cluster = await this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}`)
-    const baseUrl = await this.baseUrl()
+    const url = `/clusters/${clusterId}`
+    const cluster = await this.client.basicGet({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getClusterDetails',
+      },
+    })
+    const baseUrl = await this.getApiEndpoint()
     return normalizeCluster(baseUrl)(cluster)
   }
 
   getClusterCsiDrivers = async (clusterUuid) => {
-    return this.client.basicGet(
-      `${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/api/v1/namespaces/platform9-system/services/pf9-sentry/proxy/v1/storage`
-      )
+    const url = pathJoin(
+      'clusters',
+      clusterUuid,
+      'k8sapi/api/v1/namespaces/platform9-system/services/pf9-sentry/proxy/v1/storage',
+    )
+    return this.client.basicGet({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getClusterCsiDrivers',
+      },
+    })
   }
 
-  createCluster = async (params) => {
+  createCluster = async (body) => {
     // Note: This API response only returns new `uuid` in the response.
     // You might want to do a GET afterwards if you need any of the cluster information.
-    return this.client.basicPost(`${await this.baseUrl()}/clusters`, params)
+    const url = `/clusters`
+    return this.client.basicPost({
+      url,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createCluster',
+      },
+    })
   }
 
-  updateCluster = async (clusterId, params) => {
-    return this.client.basicPut(`${await this.baseUrl()}/clusters/${clusterId}`, params)
+  updateCluster = async (clusterId, body) => {
+    const url = `/clusters/${clusterId}`
+    return this.client.basicPut({
+      url,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'updateCluster',
+      },
+    })
   }
 
   upgradeCluster = async (clusterId) => {
-    return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/upgrade`)
+    const url = `/clusters/${clusterId}/upgrade`
+    return this.client.basicPost({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'upgradeCluster',
+      },
+    })
   }
 
   deleteCluster = async (clusterId) => {
-    return this.client.basicDelete(`${await this.baseUrl()}/clusters/${clusterId}`)
-  }
+    const url = `/clusters/${clusterId}`
+    return this.client.basicDelete({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteCluster',
+      },
+    })
+  };
 
-  clusters = {
+  [DataKeys.Clusters] = {
     list: this.getClusters,
   }
 
   // @param clusterId = cluster.uuid
   // @param nodes = [{ uuid: node.uuid, isMaster: (true|false) }]
-  attach = async (clusterId, nodes) => {
-    return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/attach`, nodes)
+  attach = async (clusterId, body) => {
+    const url = `/clusters/${clusterId}/attach`
+    return this.client.basicPost({
+      url,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'attach',
+      },
+    })
   }
 
   // @param clusterId = cluster.uuid
   // @param nodes = [node1Uuid, node2Uuid, ...]
   detach = async (clusterId, nodeUuids) => {
     const body = nodeUuids.map((uuid) => ({ uuid }))
-    return this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/detach`, body)
+    const url = `/clusters/${clusterId}/detach`
+    return this.client.basicPost({
+      url,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'detach',
+      },
+    })
   }
 
   getCliToken = async (clusterId, namespace) => {
-    const response = await this.client.basicPost(`${await this.baseUrl()}/webcli/${clusterId}`, {
-      namespace,
+    const url = `/webcli/${clusterId}`
+    const response = await this.client.basicPost<any>({
+      url,
+      body: {
+        namespace,
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getCliToken',
+      },
     })
     return response.token
   }
 
   getKubeConfig = async (clusterId) => {
-    return this.client.basicGet(`${await this.baseUrl()}/kubeconfig/${clusterId}`)
+    const url = `/kubeconfig/${clusterId}`
+    return this.client.basicGet<string>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getKubeConfig',
+      },
+    })
   }
 
   /* k8s API */
   getKubernetesVersion = async (clusterId) => {
-    return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/version`)
+    const url = `/clusters/${clusterId}/k8sapi/version`
+    return this.client.basicGet<GetKubernetesVersion>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getKubernetesVersion',
+      },
+    })
   }
 
-  convertResource = (clusterId) => (item) => ({
+  convertResource = <T extends IGenericPayloadWithMetadata>(clusterId) => (
+    item: T,
+  ): IGenericResource<T> => ({
     ...item,
     clusterId,
     name: item.metadata.name,
@@ -206,342 +395,607 @@ class Qbert extends ApiService {
   })
 
   getClusterNamespaces = async (clusterId) => {
-    const data = await this.client.basicGet(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces`,
-    )
-    return data.items.map(this.convertResource(clusterId))
+    const url = `/clusters/${clusterId}/k8sapi/api/v1/namespaces`
+    const data = await this.client.basicGet<GetClusterNamespaces>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getClusterNamespaces',
+      },
+    })
+    return data.items.map(this.convertResource<GetClusterNamespacesItem>(clusterId))
   }
 
   createNamespace = async (clusterId, body) => {
-    const raw = await this.client.basicPost(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces`,
+    const url = `/clusters/${clusterId}/k8sapi/api/v1/namespaces`
+    const raw = await this.client.basicPost<any>({
+      url,
       body,
-    )
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createNamespace',
+      },
+    })
     return this.convertResource(clusterId)(raw)
   }
 
   deleteNamespace = async (clusterId, namespaceName) => {
-    return this.client.basicDelete(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespaceName}`,
-    )
+    const url = `/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespaceName}`
+    return this.client.basicDelete({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteNamespace',
+      },
+    })
   }
 
   getClusterPods = async (clusterId) => {
-    const data = await this.client.basicGet(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/pods`,
-    )
+    const url = `/clusters/${clusterId}/k8sapi/api/v1/pods`
+    const data = await this.client.basicGet<GetClusterPods>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getClusterPods',
+      },
+    })
     return data.items.map(this.convertResource(clusterId))
   }
 
   getClusterDeployments = async (clusterId) => {
-    const data = await this.client.basicGet(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/apps/v1/deployments`,
-    )
+    const url = `/clusters/${clusterId}/k8sapi/apis/apps/v1/deployments`
+    const data = await this.client.basicGet<GetClusterDeployments>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getClusterDeployments',
+      },
+    })
     return data.items.map(this.convertResource(clusterId))
   }
 
   deleteDeployment = async (clusterId, namespace, name) => {
-    return this.client.basicDelete(
-      `${await this.baseUrl()}}/k8sapi/apis/apps/v1/namespaces/${namespace}/deployments/${name}`,
-    )
+    const url = `}/k8sapi/apis/apps/v1/namespaces/${namespace}/deployments/${name}`
+    return this.client.basicDelete({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteDeployment',
+      },
+    })
   }
 
   getClusterKubeServices = async (clusterId) => {
-    const data = await this.client.basicGet(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/services`,
-    )
-    return data.items.map(this.convertResource(clusterId))
+    const url = `/clusters/${clusterId}/k8sapi/api/v1/services`
+    const data = await this.client.basicGet<GetClusterKubeServices>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getClusterKubeServices',
+      },
+    })
+    return data.items.map(this.convertResource<GetClusterKubeServicesItem>(clusterId))
   }
 
   getClusterStorageClasses = async (clusterId) => {
-    const data = await this.client.basicGet(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/storage.k8s.io/v1/storageclasses`,
-    )
+    const url = `/clusters/${clusterId}/k8sapi/apis/storage.k8s.io/v1/storageclasses`
+    const data = await this.client.basicGet<GetCluster>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getClusterStorageClasses',
+      },
+    })
     return data.items.map(this.convertResource(clusterId))
   }
 
   createStorageClass = async (clusterId, body) => {
-    return this.client.basicPost(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/storage.k8s.io/v1/storageclasses`,
+    const url = `/clusters/${clusterId}/k8sapi/apis/storage.k8s.io/v1/storageclasses`
+    return this.client.basicPost({
+      url,
       body,
-    )
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createStorageClass',
+      },
+    })
   }
 
   deleteStorageClass = async (clusterId, name) => {
-    return this.client.basicDelete(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/storage.k8s.io/v1/storageclasses/${name}`,
-    )
+    const url = `/clusters/${clusterId}/k8sapi/apis/storage.k8s.io/v1/storageclasses/${name}`
+    return this.client.basicDelete({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteStorageClass',
+      },
+    })
   }
 
   getReplicaSets = async (clusterId) => {
-    return this.client.basicGet(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/apps/v1/replicasets`,
-    )
+    const url = `/clusters/${clusterId}/k8sapi/apis/apps/v1/replicasets`
+    return this.client.basicGet({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getReplicaSets',
+      },
+    })
   }
 
-  createPod = async (clusterId, namespace, params) => {
-    return this.client.basicPost(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/pods`,
-      params,
-    )
+  createPod = async (clusterId, namespace, body) => {
+    const url = `/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/pods`
+    return this.client.basicPost({
+      url,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createPod',
+      },
+    })
   }
 
   deletePod = async (clusterId, namespace, name) => {
-    return this.client.basicDelete(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/pods/${name}`,
-    )
-  }
+    const url = `/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/pods/${name}`
+    return this.client.basicDelete({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deletePod',
+      },
+    })
+  };
 
-  pods = {
+  [DataKeys.Pods] = {
     create: this.createPod.bind(this),
     list: this.getClusterPods.bind(this),
     delete: this.deletePod.bind(this),
   }
 
-  createDeployment = async (clusterId, namespace, params) => {
-    return this.client.basicPost(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/apps/v1/namespaces/${namespace}/deployments`,
-      params,
-    )
-  }
+  createDeployment = async (clusterId, namespace, body) => {
+    const url = `/clusters/${clusterId}/k8sapi/apis/apps/v1/namespaces/${namespace}/deployments`
+    return this.client.basicPost({
+      url,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createDeployment',
+      },
+    })
+  };
 
-  deployments = {
+  [DataKeys.Deployments] = {
     create: this.createDeployment.bind(this),
     list: this.getClusterDeployments.bind(this),
     delete: this.deleteDeployment.bind(this),
   }
 
-  createService = async (clusterId, namespace, params) => {
-    return this.client.basicPost(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/services`,
-      params,
-    )
+  createService = async (clusterId, namespace, body) => {
+    const url = `/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/services`
+    return this.client.basicPost({
+      url,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createService',
+      },
+    })
   }
 
   deleteService = async (clusterId, namespace, name) => {
-    return this.client.basicDelete(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/services/${name}`,
-    )
-  }
+    const url = `/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/services/${name}`
+    return this.client.basicDelete({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteService',
+      },
+    })
+  };
 
-  services = {
+  [DataKeys.KubeServices] = {
     create: this.createService.bind(this),
     list: this.getClusterKubeServices.bind(this),
     delete: this.deleteService.bind(this),
   }
 
-  createServiceAccount = async (clusterId, namespace, params) => {
-    return this.client.basicPost(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/serviceaccounts`,
-    )
+  createServiceAccount = async (clusterId, namespace, body) => {
+    const url = `/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/serviceaccounts`
+    return this.client.basicPost({
+      url,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createServiceAccount',
+      },
+    })
   }
 
   /* Monocular endpoints being exposed through Qbert */
   getCharts = async (clusterId) => {
-    const response = await this.client.basicGet(
-      `${await this.clusterMonocularBaseUrl(clusterId)}/charts`,
-    )
+    const url = `${await this.clusterMonocularBaseUrl(clusterId)}/charts`
+    const response = await this.client.basicGet({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getCharts',
+      },
+    })
     return normalizeResponse(response)
   }
 
   getChart = async (clusterId, chart, release, version) => {
     const versionStr = version ? `versions/${version}` : ''
-    return this.client.basicGet(
-      `${await this.clusterMonocularBaseUrl(clusterId)}/charts/${release}/${chart}/${versionStr}`,
-    )
+    const url = `${await this.clusterMonocularBaseUrl(
+      clusterId,
+    )}/charts/${release}/${chart}/${versionStr}`
+    return this.client.basicGet({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getChart',
+      },
+    })
   }
 
   getChartReadmeContents = async (clusterId, readmeUrl) => {
-    return this.client.basicGet(
-      pathJoin(await this.clusterMonocularBaseUrl(clusterId, null), readmeUrl),
-    )
+    const url = pathJoin(await this.clusterMonocularBaseUrl(clusterId, null), readmeUrl)
+    return this.client.basicGet({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getChartReadmeContents',
+      },
+    })
   }
 
   getChartVersions = async (clusterId, chart, release) => {
-    return this.client.basicGet(
-      `${await this.clusterMonocularBaseUrl(clusterId)}/charts/${release}/${chart}/versions`,
-    )
+    const url = `${await this.clusterMonocularBaseUrl(
+      clusterId,
+    )}/charts/${release}/${chart}/versions`
+    return this.client.basicGet({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getChartVersions',
+      },
+    })
   }
 
   getReleases = async (clusterId) => {
-    const response = await this.client.basicGet(
-      `${await this.clusterMonocularBaseUrl(clusterId)}/releases`,
-    )
+    const url = `${await this.clusterMonocularBaseUrl(clusterId)}/releases`
+    const response = await this.client.basicGet({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getReleases',
+      },
+    })
     return normalizeResponse(response)
   }
 
   getRelease = async (clusterId, name) => {
-    const response = await this.client.basicGet(
-      `${await this.clusterMonocularBaseUrl(clusterId)}/releases/${name}`,
-    )
+    const url = `${await this.clusterMonocularBaseUrl(clusterId)}/releases/${name}`
+    const response = await this.client.basicGet({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getRelease',
+      },
+    })
     return normalizeResponse(response)
   }
 
   deleteRelease = async (clusterId, name) => {
-    return this.client.basicDelete(
-      `${await this.clusterMonocularBaseUrl(clusterId)}/releases/${name}`,
-    )
+    const url = `${await this.clusterMonocularBaseUrl(clusterId)}/releases/${name}`
+    return this.client.basicDelete({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteRelease',
+      },
+    })
   }
 
   deployApplication = async (clusterId, body) => {
-    return this.client.basicPost(`${await this.clusterMonocularBaseUrl(clusterId)}/releases`, body)
+    const url = `${await this.clusterMonocularBaseUrl(clusterId)}/releases`
+    return this.client.basicPost({
+      url,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deployApplication',
+      },
+    })
   }
 
   getRepositories = async () => {
-    return this.client.basicGet(`${await this.monocularBaseUrl()}/repos`)
+    const url = `${await this.monocularBaseUrl()}/repos`
+    return this.client.basicGet({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getRepositories',
+      },
+    })
   }
 
   getRepositoriesForCluster = async (clusterId) => {
-    return this.client.basicGet(`${await this.clusterMonocularBaseUrl(clusterId)}/repos`)
+    const url = `${await this.clusterMonocularBaseUrl(clusterId)}/repos`
+    return this.client.basicGet({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getRepositoriesForCluster',
+      },
+    })
   }
 
   createRepository = async (body) => {
-    return this.client.basicPost(`${await this.monocularBaseUrl()}/repos`, body)
+    const url = `${await this.monocularBaseUrl()}/repos`
+    return this.client.basicPost({
+      url,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createRepository',
+      },
+    })
   }
 
   createRepositoryForCluster = async (clusterId, body) => {
-    return this.client.basicPost(`${await this.clusterMonocularBaseUrl(clusterId)}/repos`, body)
+    const url = `${await this.clusterMonocularBaseUrl(clusterId)}/repos`
+    return this.client.basicPost({
+      url,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createRepositoryForCluster',
+      },
+    })
   }
 
   deleteRepository = async (repoId) => {
-    return this.client.basicDelete(`${await this.monocularBaseUrl()}/repos/${repoId}`)
+    const url = `${await this.monocularBaseUrl()}/repos/${repoId}`
+    return this.client.basicDelete({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteRepository',
+      },
+    })
   }
 
   deleteRepositoriesForCluster = async (clusterId, repoId) => {
-    return this.client.basicDelete(
-      `${await this.clusterMonocularBaseUrl(clusterId)}/repos/${repoId}`,
-    )
+    const url = `${await this.clusterMonocularBaseUrl(clusterId)}/repos/${repoId}`
+    return this.client.basicDelete({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteRepositoriesForCluster',
+      },
+    })
   }
 
   getServiceAccounts = async (clusterId, namespace) => {
-    const response = await this.client.basicGet(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/serviceaccounts`,
-    )
+    const url = `/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/serviceaccounts`
+    const response = await this.client.basicGet<any>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getServiceAccounts',
+      },
+    })
     return response && response.items
   }
 
   /* RBAC */
   getClusterRoles = async (clusterId) => {
-    const response = await this.client.basicGet(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/roles`,
-    )
-    return normalizeClusterizedResponse(clusterId, response)
+    const url = `/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/roles`
+    const response = await this.client.basicGet<GetClusterRoles>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getClusterRoles',
+      },
+    })
+    return normalizeClusterizedResponse<GetClusterRolesItem>(clusterId, response)
   }
 
   createClusterRole = async (clusterId, namespace, body) => {
-    const response = await this.client.basicPost(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/${namespace}/roles`,
+    const url = `/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/${namespace}/roles`
+    const response = await this.client.basicPost({
+      url,
       body,
-    )
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createClusterRole',
+      },
+    })
     return normalizeClusterizedUpdate(clusterId, response)
   }
 
   updateClusterRole = async (clusterId, namespace, name, body) => {
-    const response = await this.client.basicPut(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/${namespace}/roles/${name}`,
+    const url = `/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/${namespace}/roles/${name}`
+    const response = await this.client.basicPut({
+      url,
       body,
-    )
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'updateClusterRole',
+      },
+    })
     return normalizeClusterizedUpdate(clusterId, response)
   }
 
   deleteClusterRole = async (clusterId, namespace, name) => {
-    return this.client.basicDelete(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/${namespace}/roles/${name}`,
-    )
+    const url = `/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/${namespace}/roles/${name}`
+    return this.client.basicDelete({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteClusterRole',
+      },
+    })
   }
 
   getClusterClusterRoles = async (clusterId) => {
-    const response = await this.client.basicGet(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterroles`,
-    )
+    const url = `/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterroles`
+    const response = await this.client.basicGet<GetClusterClusterRoles>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getClusterClusterRoles',
+      },
+    })
     return normalizeClusterizedResponse(clusterId, response)
   }
 
   createClusterClusterRole = async (clusterId, body) => {
-    const response = await this.client.basicPost(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterroles`,
+    const url = `/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterroles`
+    const response = await this.client.basicPost({
+      url,
       body,
-    )
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createClusterClusterRole',
+      },
+    })
     return normalizeClusterizedUpdate(clusterId, response)
   }
 
   updateClusterClusterRole = async (clusterId, name, body) => {
-    const response = await this.client.basicPut(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterroles/${name}`,
+    const url = `/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterroles/${name}`
+    const response = await this.client.basicPut({
+      url,
       body,
-    )
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'updateClusterClusterRole',
+      },
+    })
     return normalizeClusterizedUpdate(clusterId, response)
   }
 
   deleteClusterClusterRole = async (clusterId, name) => {
-    return this.client.basicDelete(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterroles/${name}`,
-    )
+    const url = `/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterroles/${name}`
+    return this.client.basicDelete({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteClusterClusterRole',
+      },
+    })
   }
 
   getClusterRoleBindings = async (clusterId) => {
-    const response = await this.client.basicGet(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/rolebindings`,
-    )
+    const url = `/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/rolebindings`
+    const response = await this.client.basicGet<GetCluster>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getClusterRoleBindings',
+      },
+    })
     return normalizeClusterizedResponse(clusterId, response)
   }
 
   createClusterRoleBinding = async (clusterId, namespace, body) => {
-    const response = await this.client.basicPost(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/${namespace}/rolebindings`,
+    const url = `/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/${namespace}/rolebindings`
+    const response = await this.client.basicPost({
+      url,
       body,
-    )
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createClusterRoleBinding',
+      },
+    })
     return normalizeClusterizedUpdate(clusterId, response)
   }
 
   updateClusterRoleBinding = async (clusterId, namespace, name, body) => {
-    const response = await this.client.basicPut(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/${namespace}/rolebindings/${name}`,
+    const url = `/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/${namespace}/rolebindings/${name}`
+    const response = await this.client.basicPut({
+      url,
       body,
-    )
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'updateClusterRoleBinding',
+      },
+    })
     return normalizeClusterizedUpdate(clusterId, response)
   }
 
   deleteClusterRoleBinding = async (clusterId, namespace, name) => {
-    return this.client.basicDelete(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/${namespace}/rolebindings/${name}`,
-    )
+    const url = `/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/${namespace}/rolebindings/${name}`
+    return this.client.basicDelete({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteClusterRoleBinding',
+      },
+    })
   }
 
   getClusterClusterRoleBindings = async (clusterId) => {
-    const response = await this.client.basicGet(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterrolebindings`,
-    )
+    const url = `/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterrolebindings`
+    const response = await this.client.basicGet<GetCluster>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getClusterClusterRoleBindings',
+      },
+    })
     return normalizeClusterizedResponse(clusterId, response)
   }
 
   createClusterClusterRoleBinding = async (clusterId, body) => {
-    const response = await this.client.basicPost(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterrolebindings`,
+    const url = `/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterrolebindings`
+    const response = await this.client.basicPost({
+      url,
       body,
-    )
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createClusterClusterRoleBinding',
+      },
+    })
     return normalizeClusterizedUpdate(clusterId, response)
   }
 
   updateClusterClusterRoleBinding = async (clusterId, name, body) => {
-    const response = await this.client.basicPut(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterrolebindings/${name}`,
+    const url = `/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterrolebindings/${name}`
+    const response = await this.client.basicPut({
+      url,
       body,
-    )
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'updateClusterClusterRoleBinding',
+      },
+    })
     return normalizeClusterizedUpdate(clusterId, response)
   }
 
   deleteClusterClusterRoleBinding = async (clusterId, name) => {
-    return this.client.basicDelete(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterrolebindings/${name}`,
-    )
+    const url = `/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterrolebindings/${name}`
+    return this.client.basicDelete({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteClusterClusterRoleBinding',
+      },
+    })
   }
 
   /* Managed Apps */
   getPrometheusInstances = async (clusterUuid) => {
-    const response = await this.client.basicGet(
-      `${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/prometheuses`,
-    )
+    const url = `/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/prometheuses`
+    const response = await this.client.basicGet<any>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getPrometheusInstances',
+      },
+    })
     return normalizeClusterizedResponse(clusterUuid, response)
   }
 
@@ -553,17 +1007,27 @@ class Qbert extends ApiService {
       { op: 'replace', path: '/spec/resources/requests/cpu', value: data.cpu },
       { op: 'replace', path: '/spec/resources/requests/memory', value: data.memory },
     ]
-    const response = await this.client.basicPatch(
-      `${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${namespace}/prometheuses/${name}`,
+    const url = `/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${namespace}/prometheuses/${name}`
+    const response = await this.client.basicPatch({
+      url,
       body,
-    )
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'updatePrometheusInstance',
+      },
+    })
     return normalizeClusterizedUpdate(clusterUuid, response)
   }
 
   deletePrometheusInstance = async (clusterUuid, namespace, name) => {
-    await this.client.basicDelete(
-      `${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${namespace}/prometheuses/${name}`,
-    )
+    const url = `/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${namespace}/prometheuses/${name}`
+    await this.client.basicDelete({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deletePrometheusInstance',
+      },
+    })
   }
 
   createPrometheusInstance = async (clusterId, data) => {
@@ -647,32 +1111,46 @@ class Qbert extends ApiService {
       },
     }
 
-    const response = await this.client.basicPost(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${
-        data.namespace
-      }/prometheuses`,
-      prometheusBody,
-    )
-    await this.client.basicPost(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${
-        data.namespace
-      }/servicemonitors`,
-      serviceMonitorBody,
-    )
-    await this.client.basicPost(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${
-        data.namespace
-      }/prometheusrules`,
-      prometheusRulesBody,
-    )
-    // this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/alertmanagers`, alertManagerBody)
+    const prometheusUrl = `/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${data.namespace}/prometheuses`
+    const response = await this.client.basicPost({
+      url: prometheusUrl,
+      body: prometheusBody,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createPrometheusInstance',
+      },
+    })
+    const serviceMonitorUrl = `/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${data.namespace}/servicemonitors`
+    await this.client.basicPost({
+      url: serviceMonitorUrl,
+      body: serviceMonitorBody,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createPrometheusInstance/servicemonitors',
+      },
+    })
+    const url = `/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${data.namespace}/prometheusrules`
+    await this.client.basicPost({
+      url,
+      body: prometheusRulesBody,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createPrometheusInstance/prometheusrules',
+      },
+    })
+    // this.client.basicPost(`/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/alertmanagers`, alertManagerBody)
     return response
   }
 
   getPrometheusAlerts = async (clusterUuid) => {
-    const response = await this.client.basicGet(
-      `${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/rules`,
-    )
+    const url = `/clusters/${clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/rules`
+    const response = await this.client.basicGet<GetPrometheusAlerts>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getPrometheusAlerts',
+      },
+    })
     const alerts = response.groups
       .flatMap((group) => {
         return group.rules
@@ -685,21 +1163,38 @@ class Qbert extends ApiService {
     }))
   }
 
-  getPrometheusAlertsOverTime = async (clusterUuid, startTime, endTime, step) => {
-    const response = await this.client.basicGet(
-      `${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/query_range?query=ALERTS&start=${startTime}&end=${endTime}&step=${step}`,
-    )
+  getPrometheusAlertsOverTime = async (
+    clusterUuid,
+    startTime,
+    endTime,
+    step,
+  ): Promise<IGetPrometheusAlertsOverTime[]> => {
+    const url = `/clusters/${clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/query_range?query=ALERTS&start=${startTime}&end=${endTime}&step=${step}`
+    const response = await this.client.basicGet<GetPrometheusAlertsOverTime>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getPrometheusAlertsOverTime',
+      },
+    })
     return response.result.map((alert) => ({
       ...alert,
+      startTime,
+      endTime,
       clusterId: clusterUuid,
       id: `${alert.metric.alertname}${clusterUuid}`,
     }))
   }
 
   getPrometheusServiceMonitors = async (clusterUuid) => {
-    const response = await this.client.basicGet(
-      `${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/servicemonitors`,
-    )
+    const url = `/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/servicemonitors`
+    const response = await this.client.basicGet<any>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getPrometheusServiceMonitors',
+      },
+    })
     return normalizeClusterizedResponse(clusterUuid, response)
   }
 
@@ -712,23 +1207,38 @@ class Qbert extends ApiService {
         value: data.labels,
       },
     ]
-    const response = await this.client.basicPatch(
-      `${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${namespace}/servicemonitors/${name}`,
+    const url = `/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${namespace}/servicemonitors/${name}`
+    const response = await this.client.basicPatch({
+      url,
       body,
-    )
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'updatePrometheusServiceMonitor',
+      },
+    })
     return normalizeClusterizedUpdate(clusterUuid, response)
   }
 
   deletePrometheusServiceMonitor = async (clusterUuid, namespace, name) => {
-    await this.client.basicDelete(
-      `${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${namespace}/servicemonitors/${name}`,
-    )
+    const url = `/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${namespace}/servicemonitors/${name}`
+    await this.client.basicDelete({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deletePrometheusServiceMonitor',
+      },
+    })
   }
 
   getPrometheusRules = async (clusterUuid) => {
-    const response = await this.client.basicGet(
-      `${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/prometheusrules`,
-    )
+    const url = `/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/prometheusrules`
+    const response = await this.client.basicGet<any>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getPrometheusRules',
+      },
+    })
     return normalizeClusterizedResponse(clusterUuid, response)
   }
 
@@ -741,84 +1251,155 @@ class Qbert extends ApiService {
         value: rulesObject.rules,
       },
     ]
-    const response = await this.client.basicPatch(
-      `${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${namespace}/prometheusrules/${name}`,
+    const url = `/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${namespace}/prometheusrules/${name}`
+    const response = await this.client.basicPatch({
+      url,
       body,
-    )
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'updatePrometheusRules',
+      },
+    })
     return normalizeClusterizedUpdate(clusterUuid, response)
   }
 
   deletePrometheusRule = async (clusterUuid, namespace, name) => {
-    await this.client.basicDelete(
-      `${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${namespace}/prometheusrules/${name}`,
-    )
+    const url = `/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${namespace}/prometheusrules/${name}`
+    await this.client.basicDelete({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deletePrometheusRule',
+      },
+    })
   }
 
   getPrometheusAlertManagers = async (clusterUuid) => {
-    const response = await this.client.basicGet(
-      `${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/alertmanagers`,
-    )
+    const url = `/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/alertmanagers`
+    const response = await this.client.basicGet<any>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getPrometheusAlertManagers',
+      },
+    })
     return normalizeClusterizedResponse(clusterUuid, response)
   }
 
   updatePrometheusAlertManager = async (data) => {
     const { clusterUuid, namespace, name } = data
     const body = [{ op: 'replace', path: '/spec/replicas', value: data.replicas }]
-    const response = await this.client.basicPatch(
-      `${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${namespace}/alertmanagers/${name}`,
+    const url = `/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${namespace}/alertmanagers/${name}`
+    const response = await this.client.basicPatch({
+      url,
       body,
-    )
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'updatePrometheusAlertManager',
+      },
+    })
     return normalizeClusterizedUpdate(clusterUuid, response)
   }
 
   deletePrometheusAlertManager = async (clusterUuid, namespace, name) => {
-    await this.client.basicDelete(
-      `${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${namespace}/alertmanagers/${name}`,
-    )
+    const url = `/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${namespace}/alertmanagers/${name}`
+    await this.client.basicDelete({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deletePrometheusAlertManager',
+      },
+    })
   }
 
-  getPrometheusDashboardLink = (instance) =>
-    `${this.cachedEndpoint}/clusters/${instance.clusterUuid}/k8sapi${instance.dashboard}`
+  getPrometheusDashboardLink = async (instance) =>
+    `${await this.getApiEndpoint()}/clusters/${instance.clusterUuid}/k8sapi${instance.dashboard}`
 
   // TODO: Loggings
-  getLoggingsBaseUrl = async (clusterUuid) =>
-    `${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/apis/logging.pf9.io/v1alpha1/outputs`
+  getLoggingsBaseUrl = (clusterUuid) =>
+    `/clusters/${clusterUuid}/k8sapi/apis/logging.pf9.io/v1alpha1/outputs`
 
   getLoggings = async (clusterUuid) => {
-    const url = await this.getLoggingsBaseUrl(clusterUuid)
-    return this.client.basicGet(url)
+    const url = this.getLoggingsBaseUrl(clusterUuid)
+    return this.client.basicGet({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getLoggings',
+      },
+    })
   }
 
-  createLogging = async (clusterUuid, logging) => {
-    const url = await this.getLoggingsBaseUrl(clusterUuid)
-    const response = await this.client.basicPost(url, logging)
+  createLogging = async (clusterUuid, body) => {
+    const url = this.getLoggingsBaseUrl(clusterUuid)
+    const response = await this.client.basicPost({
+      url,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createLogging',
+      },
+    })
     return response
   }
 
-  updateLogging = async (clusterUuid, logging) => {
-    const url = `${await this.getLoggingsBaseUrl(clusterUuid)}/${logging.uuid}`
-    return this.client.basicPut(url, logging)
+  updateLogging = async (clusterUuid, body) => {
+    const url = `${this.getLoggingsBaseUrl(clusterUuid)}/${body.uuid}`
+    return this.client.basicPut<{ id: string }>({
+      url,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'updateLogging',
+      },
+    })
+    // TODO use models on basic methods
   }
 
   deleteLogging = async (clusterUuid, loggingUuid) => {
-    const url = `${await this.getLoggingsBaseUrl(clusterUuid)}/${loggingUuid}`
-    return this.client.basicDelete(url)
+    const url = `${this.getLoggingsBaseUrl(clusterUuid)}/${loggingUuid}`
+    return this.client.basicDelete({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteLogging',
+      },
+    })
   }
 
   // API Resources
   getApiGroupList = async (clusterId) => {
-    return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis`)
+    const url = `/clusters/${clusterId}/k8sapi/apis`
+    return this.client.basicGet({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getApiGroupList',
+      },
+    })
   }
 
   getApiResourcesList = async (config) => {
     const { clusterId, apiGroup } = config
-    return this.client.basicGet(
-      `${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/${apiGroup}`,
-    )
+    const url = `/clusters/${clusterId}/k8sapi/apis/${apiGroup}`
+    return this.client.basicGet({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getApiResourcesList',
+      },
+    })
   }
 
   getCoreApiResourcesList = async (clusterId) => {
-    return this.client.basicGet(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/api/v1`)
+    const url = `/clusters/${clusterId}/k8sapi/api/v1`
+    return this.client.basicGet({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getCoreApiResourcesList',
+      },
+    })
   }
 }
 

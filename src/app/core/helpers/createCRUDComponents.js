@@ -31,8 +31,12 @@ const createCRUDComponents = (options) => {
   const {
     // We can either provide the cacheKey to autoresolve the loader, or the loaderFn/deleteFn functions directly
     cacheKey,
-    loaderFn = cacheKey ? getContextLoader(cacheKey) : null,
-    deleteFn = cacheKey ? getContextUpdater(cacheKey, 'delete') : null,
+    actions = {
+      list: cacheKey ? getContextLoader(cacheKey) : null,
+      delete: cacheKey ? getContextUpdater(cacheKey, 'delete') : null,
+    },
+    loaderFn = actions.list,
+    deleteFn = actions.delete,
     deleteCond,
     deleteDisabledInfo,
     defaultParams = {},

@@ -1,5 +1,5 @@
-import axios from 'axios'
 import ApiService from 'api-client/ApiService'
+import DataKeys from 'k8s/DataKeys'
 
 // Returns a transducer function instead being passed the obj directly
 // so it can be used in Array#map/filter/etc as well.
@@ -10,71 +10,125 @@ const renameKey = (srcKey, destKey) => (obj) =>
   )
 
 class Nova extends ApiService {
-  endpoint() {
+  public getClassName() {
+    return 'nova'
+  }
+
+  protected async getEndpoint() {
     return this.client.keystone.getServiceEndpoint('nova', 'internal')
   }
 
-  flavorsUrl = async () => `${await this.endpoint()}/flavors`
-  instancesUrl = async () => `${await this.endpoint()}/servers`
-  hypervisorsUrl = async () => `${await this.endpoint()}/os-hypervisors`
-  sshKeysUrl = async () => `${await this.endpoint()}/os-keypairs`
+  flavorsUrl = () => `/flavors`
+  instancesUrl = () => `/servers`
+  hypervisorsUrl = () => `/os-hypervisors`
+  sshKeysUrl = () => `/os-keypairs`
 
   getFlavors = async () => {
-    const url = `${await this.flavorsUrl()}/detail?is_public=no`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.flavors
+    const url = `${this.flavorsUrl()}/detail?is_public=no`
+    const response = await this.client.basicGet<any>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getFlavors',
+      },
+    })
+    return response.flavors
   }
 
   createFlavor = async (params) => {
     // The Nova API has an unfortunately horribly named key for public.
     const converted = renameKey('public', 'os-flavor-access:is_public')(params)
     const body = { flavor: converted }
-    const url = await this.flavorsUrl()
-    const response = await axios.post(url, body, this.client.getAuthHeaders())
-    return response.data.flavor
+    const url = this.flavorsUrl()
+    const response = await this.client.basicPost<any>({
+      url,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createFlavor',
+      },
+    })
+    return response.flavor
   }
 
   deleteFlavor = async (id) => {
-    const url = `${await this.flavorsUrl()}/${id}`
-    return axios.delete(url, this.client.getAuthHeaders())
-  }
+    const url = `${this.flavorsUrl()}/${id}`
+    return this.client.basicDelete<any>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteFlavor',
+      },
+    })
+  };
 
   // Allow these methods to be accessed programatically as well.
-  flavors = {
+  [DataKeys.Flavors] = {
     create: this.createFlavor.bind(this),
     list: this.getFlavors.bind(this),
     delete: this.deleteFlavor.bind(this),
   }
 
   async getInstances() {
-    const url = `${await this.instancesUrl()}/detail`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.servers.map((instance) =>
-      renameKey('OS-EXT-STS:vm_state', 'state')(instance),
-    )
+    const url = `${this.instancesUrl()}/detail`
+    const response = await this.client.basicGet<any>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getInstances',
+      },
+    })
+    return response.servers.map((instance) => renameKey('OS-EXT-STS:vm_state', 'state')(instance))
   }
 
   async getHypervisors() {
-    const url = `${await this.hypervisorsUrl()}/detail`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.hypervisors
+    const url = `${this.hypervisorsUrl()}/detail`
+    const response = await this.client.basicGet<any>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getHypervisors',
+      },
+    })
+    return response.hypervisors
   }
 
   async getSshKeys() {
-    const url = `${await this.sshKeysUrl()}`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.keypairs.map((x) => x.keypair)
+    const url = `${this.sshKeysUrl()}`
+    const response = await this.client.basicGet<any>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getSshKeys',
+      },
+    })
+    return response.keypairs.map((x) => x.keypair)
   }
 
   async createSshKey(params) {
-    const url = await this.sshKeysUrl()
-    const response = await axios.post(url, { keypair: params }, this.client.getAuthHeaders())
-    return response.data.keypair
+    const url = this.sshKeysUrl()
+    const response = await this.client.basicPost<any>({
+      url,
+      body: {
+        keypair: params,
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createSshKey',
+      },
+    })
+    return response.keypair
   }
 
   async deleteSshKey(id) {
-    const url = `${await this.sshKeysUrl()}/${id}`
-    return axios.delete(url, this.client.getAuthHeaders())
+    const url = `${this.sshKeysUrl()}/${id}`
+    return this.client.basicDelete<any>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteSshKey',
+      },
+    })
   }
 }
 

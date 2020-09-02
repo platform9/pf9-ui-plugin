@@ -4,9 +4,9 @@ import {
   Dialog,
   DialogContent,
   DialogTitle,
-  ExpansionPanel as MDExpansionPanel,
-  ExpansionPanelDetails,
-  ExpansionPanelSummary,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Typography,
 } from '@material-ui/core'
 import { ChevronRight, ExpandMore } from '@material-ui/icons'
@@ -102,13 +102,8 @@ const ExpansionPanel = ({
   )
 
   return (
-    <MDExpansionPanel
-      className={classes.root}
-      expanded={expanded}
-    >
-      <ExpansionPanelSummary
-        onClick={showOverlay ? undefined : onClick}
-      >
+    <Accordion className={classes.root} expanded={expanded}>
+      <AccordionSummary onClick={showOverlay ? undefined : onClick}>
         {expanded ? <ExpandMore /> : <ChevronRight />}
         <div className={classes.summaryText}>
           {completed ? (
@@ -123,8 +118,8 @@ const ExpansionPanel = ({
         {!!onSkip && !completed && (
           <CloseButton tooltip="Skip Step" onClick={handleToggleOverlay} />
         )}
-      </ExpansionPanelSummary>
-      <ExpansionPanelDetails className={classes.panelDetails}>
+      </AccordionSummary>
+      <AccordionDetails className={classes.panelDetails}>
         {children}
         <Dialog open={showOverlay}>
           <DialogTitle>{skipConfirmTitle}</DialogTitle>
@@ -143,8 +138,8 @@ const ExpansionPanel = ({
             </div>
           </DialogContent>
         </Dialog>
-      </ExpansionPanelDetails>
-    </MDExpansionPanel>
+      </AccordionDetails>
+    </Accordion>
   )
 }
 

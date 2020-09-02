@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import { Typography } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import AnimateValues from 'core/components/AnimateValues'
@@ -93,13 +92,6 @@ class SemiCircleGraph extends React.PureComponent {
 SemiCircleGraph.defaultProps = {
   width: 150,
   duration: 1000,
-}
-
-SemiCircleGraph.propTypes = {
-  width: PropTypes.number,
-  label: PropTypes.string,
-  duration: PropTypes.number,
-  percentage: PropTypes.number.isRequired,
 }
 
 export default SemiCircleGraph

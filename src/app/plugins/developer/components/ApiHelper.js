@@ -8,17 +8,16 @@ import {
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import { compose } from 'app/utils/fp'
-import { withAppContext } from 'core/providers/AppProvider'
 import ListTable from 'core/components/listTable/ListTable'
 import SubmitButton from 'core/components/SubmitButton'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import TextField from 'core/components/validatedForm/TextField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import createFormComponent from 'core/helpers/createFormComponent'
-import { withScopedPreferences } from 'core/providers/PreferencesProvider'
 import { path, pick } from 'ramda'
 import JsonView from 'react-json-view'
 import ServicePicker from './ServicePicker'
+import { withScopedPreferences } from 'core/session/withScopedPreferences'
 
 const methodsWithBody = ['POST', 'PUT', 'PATCH']
 
@@ -355,8 +354,4 @@ class ApiHelper extends React.PureComponent {
   }
 }
 
-export default compose(
-  withAppContext,
-  withScopedPreferences('ApiHelper'),
-  withStyles(styles),
-)(ApiHelper)
+export default compose(withScopedPreferences('ApiHelper'), withStyles(styles))(ApiHelper)

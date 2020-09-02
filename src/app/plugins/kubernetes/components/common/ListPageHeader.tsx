@@ -31,7 +31,9 @@ interface IListPageHeaderProps<T> {
 }
 function ListPageHeader<T>({ loaderFn, report, totalUsageFn }: IListPageHeaderProps<T>) {
   const classes = useStyles({})
-  const [data, loading, reload]: IUseDataLoader<T> = useDataLoader(loaderFn) as any
+  const [data, loading, reload]: IUseDataLoader<T> = useDataLoader(loaderFn, null, {
+    loadingFeedback: false,
+  }) as any
   const totals = totalUsageFn(data)
   return (
     <>
