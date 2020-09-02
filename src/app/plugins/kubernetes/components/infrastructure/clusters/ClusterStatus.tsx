@@ -8,7 +8,7 @@ import {
   getClusterHealthStatus,
   getClusterConnectionStatus,
 } from './ClusterStatusUtils'
-import { ICluster, IClusterStatus } from './model'
+import { IClusterSelector, IClusterStatus } from './model'
 import { capitalizeString } from 'utils/misc'
 import Theme from 'core/themes/model'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
@@ -124,7 +124,7 @@ const renderTransientStatus = ({ uuid, connectionStatus }, variant) => {
 }
 
 interface IClusterStatusProps {
-  cluster: ICluster
+  cluster: IClusterSelector
   variant: StatusVariant
   message?: string
 }

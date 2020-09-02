@@ -13,7 +13,7 @@ import { getUsageTotals } from 'k8s/util/calcUsageTotals'
 
 // Types
 import { cloudStatusCardProps } from 'k8s/components/dashboard/DashboardPage'
-import { ICloudProvider } from './model'
+import { ICloudProvidersSelector } from './model'
 
 const maxUsagePaths = {
   computeMaxPath: 'usage.compute.max',
@@ -28,12 +28,12 @@ const curUsagePaths = {
 }
 
 export const CloudProviderListHeader = () => {
-  const handleGetUsage = useCallback((cloudProviders: ICloudProvider[]) => {
+  const handleGetUsage = useCallback((cloudProviders: ICloudProvidersSelector[]) => {
     const items = flatten(pluck('clusters', cloudProviders))
     return getUsageTotals(items, curUsagePaths, maxUsagePaths)
   }, [])
   return (
-    <ListPageHeader<ICloudProvider>
+    <ListPageHeader<ICloudProvidersSelector>
       report={cloudStatusCardProps}
       loaderFn={cloudProviderActions.list}
       totalUsageFn={handleGetUsage}

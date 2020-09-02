@@ -12,7 +12,7 @@ import { getUsageTotals } from 'k8s/util/calcUsageTotals'
 
 // Types
 import { nodeStatusCardProps } from 'k8s/components/dashboard/DashboardPage'
-import { ICombinedNode } from './model'
+import { INodesSelector } from './model'
 
 const maxUsagePaths = {
   computeMaxPath: 'combined.usage.compute.max',
@@ -27,12 +27,12 @@ const curUsagePaths = {
 }
 
 export const NodeListHeader = () => {
-  const handleGetUsage = useCallback((nodes: ICombinedNode[]) => {
+  const handleGetUsage = useCallback((nodes: INodesSelector[]) => {
     const items = nodes.filter((node) => !!node.clusterUuid)
     return getUsageTotals(items, curUsagePaths, maxUsagePaths)
   }, [])
   return (
-    <ListPageHeader<ICombinedNode>
+    <ListPageHeader<INodesSelector>
       report={nodeStatusCardProps}
       loaderFn={loadNodes}
       totalUsageFn={handleGetUsage}

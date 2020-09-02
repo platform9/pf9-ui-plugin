@@ -12,14 +12,14 @@ import Progress from 'core/components/progress/Progress'
 import TextField from 'core/components/validatedForm/TextField'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import DeauthNodeDialog from '../nodes/DeauthNodeDialog'
-import { ICluster } from './model'
+import { IClusterSelector } from './model'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import Alert from 'core/components/Alert'
 import { CloudProviders } from '../cloudProviders/model'
 import { trackEvent } from 'utils/tracking'
 
 interface IClusterDeleteDialog {
-  rows: ICluster[]
+  rows: IClusterSelector[]
   onClose: () => void
 }
 

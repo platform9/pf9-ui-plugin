@@ -29,6 +29,7 @@ import { getK8sDashboardLinkFromVersion } from 'k8s/components/infrastructure/cl
 import { nodesSelector } from 'k8s/components/infrastructure/nodes/selectors'
 import { combinedHostsSelector } from 'k8s/components/infrastructure/common/selectors'
 import { hasPrometheusEnabled } from 'k8s/components/prometheus/helpers'
+import { INodesSelector } from 'k8s/components/infrastructure/nodes/model'
 
 export const hasMasterNode = propSatisfies(isTruthy, 'hasMasterNode')
 export const hasHealthyMasterNodes = propSatisfies(
@@ -47,7 +48,7 @@ export const clustersSelector = createSelector(
     combinedHostsSelector,
     (state) => pathOr('', [clientStoreKey, 'endpoints', 'qbert'])(state),
   ],
-  (rawClusters, clustersWithTasks, nodes, combinedHosts, qbertEndpoint: string) => {
+  (rawClusters, clustersWithTasks, nodes: INodesSelector[], combinedHosts, qbertEndpoint: string) => {
     return rawClusters.map((cluster) => {
       const clusterWithTasks = clustersWithTasks.find(({ uuid }) => cluster.uuid === uuid)
       const nodesInCluster = nodes.filter((node) => node.clusterUuid === cluster.uuid)

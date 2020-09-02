@@ -1,6 +1,6 @@
-import { ConnectionStatus, HealthStatus, ICluster, IClusterStatus, TransientStatus } from './model'
+import { ConnectionStatus, HealthStatus, IClusterSelector, IClusterStatus, TransientStatus } from './model'
+import { INodesSelector } from 'k8s/components/infrastructure/nodes/model'
 import { routes } from 'core/utils/routes'
-import { ICombinedNode } from '../nodes/model'
 
 interface INodeCount {
   total: number
@@ -25,12 +25,12 @@ interface HealthStatusAndMessage {
   getMessage: (masters: INodeCount, workers: INodeCount) => string
 }
 
-const nodeStatusOkOrFailed = (node: ICombinedNode): boolean =>
+const nodeStatusOkOrFailed = (node: INodesSelector): boolean =>
   node.status === 'ok' || node.status === 'failed'
 
 export function getConnectionStatus(
   taskStatus: string,
-  nodes: ICombinedNode[],
+  nodes: INodesSelector[],
 ): ConnectionStatus | TransientStatus {
   if (isTransientStatus(taskStatus)) {
     return taskStatus as TransientStatus
@@ -79,8 +79,8 @@ export const connectionStatusFieldsTable: {
 }
 
 export function getMasterNodesHealthStatus(
-  masterNodes: ICombinedNode[] = [],
-  healthyMasterNodes: ICombinedNode[] = [],
+  masterNodes: INodesSelector[] = [],
+  healthyMasterNodes: INodesSelector[] = [],
 ): HealthStatus | TransientStatus {
   if (hasConvergingNodes(masterNodes)) {
     return 'converging'
@@ -92,8 +92,8 @@ export function getMasterNodesHealthStatus(
 }
 
 export function getWorkerNodesHealthStatus(
-  workerNodes: ICombinedNode[] = [],
-  healthyWorkerNodes: ICombinedNode[] = [],
+  workerNodes: INodesSelector[] = [],
+  healthyWorkerNodes: INodesSelector[] = [],
 ): HealthStatus | TransientStatus {
   if (hasConvergingNodes(workerNodes)) {
     return 'converging'
@@ -129,7 +129,7 @@ export function getHealthStatus(
   return healthStatusAndMessage.healthStatus
 }
 
-export function getHealthStatusMessage(cluster: ICluster): string {
+export function getHealthStatusMessage(cluster: IClusterSelector): string {
   const {
     masterNodesHealthStatus,
     workerNodesHealthStatus,
@@ -287,10 +287,10 @@ const clusterHealthStatusAndMessageTable: HealthStatusAndMessage[] = [
   },
 ]
 
-export const hasConvergingNodes = (nodes: ICombinedNode[]): boolean =>
+export const hasConvergingNodes = (nodes: INodesSelector[]): boolean =>
   !!nodes.find((node) => node.status === 'converging')
 
-export const isSteadyState = (taskStatus: string, nodes: ICombinedNode[]): boolean =>
+export const isSteadyState = (taskStatus: string, nodes: INodesSelector[]): boolean =>
   !hasConvergingNodes(nodes) && ['success', 'error'].includes(taskStatus)
 
 export const isTransientStatus = (status: string): boolean =>
@@ -330,7 +330,7 @@ interface ClusterHealthStatusFields extends HealthStatusFields {
   nodesDetailsUrl: string
 }
 
-export const getClusterHealthStatus = (cluster: ICluster) => {
+export const getClusterHealthStatus = (cluster: IClusterSelector) => {
   if (
     !cluster.healthStatus ||
     !cluster.masterNodesHealthStatus ||
@@ -344,7 +344,7 @@ export const getClusterHealthStatus = (cluster: ICluster) => {
   return fields
 }
 
-export const getClusterConnectionStatus = (cluster: ICluster) => {
+export const getClusterConnectionStatus = (cluster: IClusterSelector) => {
   if (!cluster.connectionStatus) {
     return null
   }

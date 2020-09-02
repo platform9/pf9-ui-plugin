@@ -18,7 +18,7 @@ import ClusterHostChooser, {
   inCluster,
   isMaster,
 } from './bareos/ClusterHostChooser'
-import { ICluster } from './model'
+import { IClusterSelector } from './model'
 import { allPass } from 'ramda'
 import { customValidator, FieldValidator } from 'core/utils/fieldValidators'
 
@@ -92,7 +92,7 @@ export const scaleConstraints: IConstraint[] = [
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
 interface ScaleMasterProps {
-  cluster: ICluster
+  cluster: IClusterSelector
 
   onSubmit(data): Promise<void> | void
 

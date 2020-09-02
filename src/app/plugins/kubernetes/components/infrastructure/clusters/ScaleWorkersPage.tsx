@@ -20,7 +20,7 @@ import ClusterHostChooser, {
   inCluster,
   isNotMaster,
 } from './bareos/ClusterHostChooser'
-import { ICluster } from './model'
+import { IClusterSelector } from './model'
 import { allPass } from 'ramda'
 
 // Limit the number of workers that can be scaled at a time to prevent overload
@@ -58,7 +58,7 @@ const clusterTypeDisplay = {
 }
 
 interface ScaleWorkersProps {
-  cluster: ICluster
+  cluster: IClusterSelector
 
   onSubmit(data): Promise<void> | void
 

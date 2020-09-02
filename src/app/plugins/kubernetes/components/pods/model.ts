@@ -6,9 +6,7 @@ import {
   SpecType,
   NamespaceEnum,
   GetClusterKubeServicesItem,
-  Node,
 } from 'api-client/qbert.model'
-import { ICombinedHost } from '../infrastructure/common/model'
 
 export interface IPodSelector extends IGenericResource<GetClusterPodsItem> {
   dashboardUrl: string
@@ -31,9 +29,4 @@ export interface IServicesSelector
   externalEndpoints: string[]
   namespace: NamespaceEnum
   clusterName: string
-}
-
-export interface ICombinedNodesSelector extends Node {
-  combined: ICombinedHost
-  logs: string
 }

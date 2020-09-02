@@ -22,8 +22,9 @@ import { clusterActions } from '../clusters/actions'
 import { loadNodes } from './actions'
 import useDataLoader from 'core/hooks/useDataLoader'
 import PollingData from 'core/components/PollingData'
-import { IUseDataLoader, ICombinedNode, IKubeNodeState } from './model'
-import { ICluster } from '../clusters/model'
+import { IUseDataLoader, INodesSelector } from './model'
+import { Pf9KubeStatusData } from 'api-client/resmgr.model'
+import { IClusterSelector } from '../clusters/model'
 import { renderNodeHealthStatus } from './NodesListPage'
 import { nodeInstallTroubleshooting } from 'k8s/links'
 import NoContentMessage from 'core/components/NoContentMessage'
@@ -122,7 +123,7 @@ const getTaskContent = (
 }
 const oneSecond = 1000
 
-const sortNodesByTasks = (prevNode: ICombinedNode, currNode: ICombinedNode) => {
+const sortNodesByTasks = (prevNode: INodesSelector, currNode: INodesSelector) => {
   const { name: prevName = '' } = prevNode
   const { name: currName = '' } = currNode
   return prevName.toLowerCase().localeCompare(currName.toLowerCase())
@@ -134,16 +135,16 @@ export const NodeHealthWithTasksToggler: FC = () => {
   const linkedNodeUUID = searchParams.get('node') || null
 
   const [selectedNode, setSelectedNode] = useState(null)
-  const [clusters, loadingClusters, reloadClusters]: IUseDataLoader<ICluster> = useDataLoader(
+  const [clusters, loadingClusters, reloadClusters]: IUseDataLoader<IClusterSelector> = useDataLoader(
     clusterActions.list,
   ) as any
-  const [nodes, loadingNodes, reloadNodes]: IUseDataLoader<ICombinedNode> = useDataLoader(
+  const [nodes, loadingNodes, reloadNodes]: IUseDataLoader<INodesSelector> = useDataLoader(
     loadNodes,
   ) as any
   const cluster = clusters.find((cluster) => cluster.uuid === match.params.id)
   const nodesInCluster = useMemo(() => {
     if (cluster) {
-      const clusterNodesUids = pluck<'uuid', ICombinedNode>('uuid', cluster.nodes)
+      const clusterNodesUids = pluck<'uuid', INodesSelector>('uuid', cluster.nodes)
       const filteredNodes = nodes
         .filter((node) => clusterNodesUids.includes(node.uuid))
         .sort(sortNodesByTasks)
@@ -177,11 +178,11 @@ export const NodeHealthWithTasksToggler: FC = () => {
     tablePolling,
     linkSpacer,
   } = useStyles({})
-  const kubeStatusData = selectedNode?.combined?.resmgr?.extensions?.pf9_kube_status?.data || {}
+  const kubeStatusData: Pf9KubeStatusData = selectedNode?.combined?.resmgr?.extensions?.pf9_kube_status?.data || {}
   const selectedNodeAllTasks = kubeStatusData.all_tasks || []
   const selectedNodeCompletedTasks = kubeStatusData.completed_tasks || []
   const lastSelectedNodesFailedTask = kubeStatusData.last_failed_task || []
-  const nodeState = kubeStatusData.pf9_kube_node_state as IKubeNodeState
+  const nodeState = kubeStatusData.pf9_kube_node_state
   const selectedNodeTitle = `${selectedNode?.name || 'Choose a node to continue'}${
     selectedNode?.isMaster ? ' (master)' : ''
   }`

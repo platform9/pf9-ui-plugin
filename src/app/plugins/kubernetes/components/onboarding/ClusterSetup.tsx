@@ -11,7 +11,7 @@ import { onboardingAccessSetup, onboardingMonitoringSetup } from 'app/constants'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { clusterActions } from '../infrastructure/clusters/actions'
 import PrometheusAddonDialog from '../prometheus/PrometheusAddonDialog'
-import { ICluster } from '../infrastructure/clusters/model'
+import { IClusterSelector } from '../infrastructure/clusters/model'
 import { routes } from 'core/utils/routes'
 import { kubectlInstallationDocumentationLink } from 'k8s/links'
 import ExternalLink from 'core/components/ExternalLink'
@@ -175,15 +175,15 @@ const ClusterSetup = ({ onComplete, initialPanel = Panels.Cluster }: Props) => {
 }
 
 interface IMonitoringPromptProps {
-  clusters: ICluster[]
+  clusters: IClusterSelector[]
   onComplete: () => void
 }
 
 const MonitoringPrompt = ({ clusters, onComplete }: IMonitoringPromptProps) => {
   const { table } = useStyles({})
-  const [activeCluster, setActiveCluster] = useState<ICluster>()
+  const [activeCluster, setActiveCluster] = useState<IClusterSelector>()
   const toggleDialog = useCallback(
-    (cluster?: ICluster) => (e) => {
+    (cluster?: IClusterSelector) => (e) => {
       setActiveCluster(cluster)
       e && e.stopPropagation()
     },

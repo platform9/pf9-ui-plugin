@@ -9,24 +9,13 @@ import { combinedHostsSelector } from 'k8s/components/infrastructure/common/sele
 import DataKeys from 'k8s/DataKeys'
 import getDataSelector from 'core/utils/getDataSelector'
 import { GetCloudProvider } from 'api-client/qbert.model'
-import { IClusterAction } from 'k8s/components/infrastructure/clusters/model'
-import { ICombinedNode } from 'k8s/components/infrastructure/nodes/model'
+
+import { ICloudProvidersSelector } from './model'
 
 const cloudProviderTypes = {
   aws: 'Amazon AWS Provider',
   azure: 'Microsoft Azure Provider',
   openstack: 'OpenStack',
-}
-
-interface ICloudProvidersSelector extends GetCloudProvider {
-  descriptiveType: string
-  deployedCapacity: {
-    compute: number
-    memory: number
-    disk: number
-  }
-  clusters: IClusterAction[]
-  nodes: ICombinedNode[]
 }
 
 export const cloudProvidersSelector = createSelector(
