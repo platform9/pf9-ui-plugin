@@ -81,6 +81,7 @@ const TenantChooser = (props) => {
   return (
     <Tooltip open={tooltipOpen} title="Tenant" placement="bottom">
       <Selector
+        renderContentOnMount
         loading={loading || loadingTenants}
         onMouseEnter={handleTooltipOpen}
         onMouseLeave={handleTooltipClose}

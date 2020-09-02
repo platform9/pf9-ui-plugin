@@ -77,6 +77,7 @@ const RegionChooser = (props) => {
   return (
     <Tooltip open={tooltipOpen} title="Region" placement="bottom">
       <Selector
+        renderContentOnMount
         loading={loading || loadingRegions}
         onMouseEnter={handleTooltipOpen}
         onMouseLeave={handleTooltipClose}
