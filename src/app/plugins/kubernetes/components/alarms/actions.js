@@ -14,6 +14,7 @@ import { ActionDataKeys } from 'k8s/DataKeys'
 import moment from 'moment'
 import { filter, flatten, pipe, pluck } from 'ramda'
 import { someAsync } from 'utils/async'
+import { parseClusterParams } from '../infrastructure/clusters/actions'
 
 const { qbert } = ApiClient.getInstance()
 
@@ -22,12 +23,17 @@ export const alertsTimeSeriesCacheKey = 'alertsTimeSeries'
 
 export const loadAlerts = createContextLoader(
   ActionDataKeys.Alerts,
-  async ({ clusterId }) => {
+  async (params) => {
+    const [clusterId, clusters] = await parseClusterParams(params)
+    if (clusterId === allKey) {
+      return someAsync(pluck('uuid', clusters).map(qbert.getPrometheusAlerts)).then(flatten)
+    }
     return qbert.getPrometheusAlerts(clusterId)
   },
   {
     entityName: 'Alert',
     uniqueIdentifier: 'id',
+    indexBy: 'clusterId',
     selector: alertsSelector,
     selectorCreator: makeAlertsSelector,
   },
@@ -48,7 +54,7 @@ const timestampSteps = {
 
 export const loadTimeSeriesAlerts = createContextLoader(
   ActionDataKeys.AlertsTimeSeries,
-  async ({ clusterId, chartTime }) => {
+  async ({ chartTime, ...params }) => {
     // Invalidate cache -- can't get cache working properly for this
     // collection. Collection is somewhat different from all other
     // types of collections.
@@ -62,12 +68,8 @@ export const loadTimeSeriesAlerts = createContextLoader(
       .unix()
     const step = timestampSteps[chartTime].join('')
 
+    const [clusterId, clusters] = await parseClusterParams(params)
     if (clusterId === allKey) {
-      const clusters = pipe(
-        filter(hasPrometheusTag),
-        filter(hasHealthyMasterNodes),
-      )(await qbert.getClusters())
-
       return someAsync(
         pluck('uuid', clusters).map((cluster) =>
           qbert.getPrometheusAlertsOverTime(cluster, timePast, timeNow, step),

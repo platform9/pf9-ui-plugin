@@ -13,22 +13,12 @@ import { ActionDataKeys } from 'k8s/DataKeys'
 import { find, flatten, last, pathEq, pipe, pluck, prop, propEq } from 'ramda'
 import { someAsync } from 'utils/async'
 import { objSwitchCase } from 'utils/fp'
+import { hasPrometheusEnabled } from './helpers'
 
 const { qbert } = ApiClient.getInstance()
 const uniqueIdentifier = 'metadata.uid'
-const monitoringTask = 'pf9-mon'
+
 const getName = (id, items) => pipe(find(propEq('uid', id)), prop('name'))(items)
-
-const isMonitoringTask = (task = {}) => task.pkg_id === monitoringTask && task.type === 'Install'
-const getMostRecentTask = (prev, curr) => (prev.task_id > curr.task_id ? prev : curr)
-const hasPrometheusEnabled = (cluster) => {
-  if (!cluster) return false
-  const installedMonitoringTask = (cluster.tasks || [])
-    .filter(isMonitoringTask)
-    .reduce(getMostRecentTask, {})
-
-  return installedMonitoringTask.status === 'Complete'
-}
 
 /* Prometheus Instances */
 

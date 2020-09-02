@@ -80,7 +80,7 @@ export const alertsSelector = createSelector(
           equals(pathStr('labels.severity', rule), pathStr('labels.severity', alert)) &&
           equals(rule.clusterUuid, alert.clusterId)
         )
-      }).for,
+      }),
       grafanaLink: grafanaUrlBuilder(alert),
     }))
   },
@@ -131,10 +131,10 @@ export const makeTimeSeriesSelector = (
       const timestamps = getTimestamps(timePast, chartTime)
 
       const severityCounts = getSeverityCounts(timeSeriesRaw, timestamps)
-      return timestamps.map((timestamp) => ({
-        timestamp,
-        time: moment.unix(timestamp).format('h:mm A'),
-        ...severityCounts[timestamp],
+      return Object.entries(severityCounts).map(([timestamp, counts]) => ({
+        timestamp: parseInt(timestamp),
+        time: moment.unix(parseInt(timestamp)).format('h:mm A'),
+        ...counts,
       }))
     },
   )
@@ -180,9 +180,14 @@ const getSeverityCounts = (alertData: IAlertOverTime[], timestamps: number[]) =>
   // Add count to template
   const severityCountsByTimestamp = importantAlerts.reduce((accum, current) => {
     const severity = current.metric.severity
-    for (const dataPoint of current.values) {
-      if (dataPoint[1] === '1') {
-        accum[dataPoint[0]][severity] += 1
+    for (const [timestamp, value] of current.values) {
+      if (value === '1') {
+        accum[timestamp] = accum[timestamp] || {
+          warning: 0,
+          critical: 0,
+          fatal: 0,
+        }
+        accum[timestamp][severity] += 1
       }
     }
     return accum

@@ -27,22 +27,11 @@ import { Node } from 'api-client/qbert.model'
 import { clientStoreKey } from 'core/client/clientReducers'
 import { getK8sDashboardLinkFromVersion } from 'k8s/components/infrastructure/clusters/helpers'
 import { combinedHostsSelector } from 'k8s/components/infrastructure/common/selectors'
+import { hasPrometheusEnabled } from 'k8s/components/prometheus/helpers'
 
-const monitoringTask = 'pf9-mon'
-const isMonitoringTask = (task: any = {}) =>
-  task.pkg_id === monitoringTask && task.type === 'Install'
-const getMostRecentTask = (prev, curr) => (prev.task_id > curr.task_id ? prev : curr)
-const hasPrometheusEnabled = (cluster) => {
-  if (!cluster) return false
-  const installedMonitoringTask = (cluster.tasks || [])
-    .filter(isMonitoringTask)
-    .reduce(getMostRecentTask, {})
-
-  return installedMonitoringTask.status === 'Complete'
-}
 export const hasMasterNode = propSatisfies(isTruthy, 'hasMasterNode')
 export const hasHealthyMasterNodes = propSatisfies(
-  (healthyMasterNodes: Node[]) => healthyMasterNodes.length > 0,
+  (healthyMasterNodes: Node[] = []) => healthyMasterNodes.length > 0,
   'healthyMasterNodes',
 )
 export const masterlessCluster = propSatisfies(isTruthy, 'masterless')

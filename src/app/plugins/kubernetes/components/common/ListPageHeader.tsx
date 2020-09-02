@@ -37,7 +37,12 @@ function ListPageHeader<T>({ loaderFn, report, totalUsageFn }: IListPageHeaderPr
     <>
       <PollingData hidden loading={loading} onReload={reload} refreshDuration={1000 * 10} />
       <div className={classes.container}>
-        <StatusCard {...report} actionRow={false} className={classes.card} />
+        <StatusCard
+          {...report}
+          loadingFeedback={false}
+          actionRow={false}
+          className={classes.card}
+        />
         <UsageWidget title="Compute" stats={totals.compute} units="GHz" />
         <UsageWidget title="Memory" stats={totals.memory} units="GiB" />
         <UsageWidget title="Storage" stats={totals.disk} units="GiB" />

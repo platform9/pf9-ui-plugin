@@ -100,6 +100,7 @@ export interface IStatusCardQuantity {
   graphType?: 'usage' | 'donut'
 }
 export interface StatusCardProps {
+  loadingFeedback?: boolean
   entity: string
   route: string
   addRoute: string
@@ -120,6 +121,7 @@ const StatusCard: FunctionComponent<StatusCardProps> = ({
   dataLoader,
   quantityFn,
   actionRow = true,
+  loadingFeedback = true,
   className,
 }) => {
   const [data, loading] = useDataLoader(...dataLoader)
@@ -149,7 +151,11 @@ const StatusCard: FunctionComponent<StatusCardProps> = ({
           </Typography>
         </Link>
         <FontAwesomeIcon className={headerIcon}>{icon}</FontAwesomeIcon>
-        {loading ? <CircularProgress size={32} /> : <span className={text}>{quantity}</span>}
+        {loadingFeedback && loading ? (
+          <CircularProgress size={32} />
+        ) : (
+          <span className={text}>{quantity}</span>
+        )}
       </header>
       {actionRow && (
         <div className={links}>
@@ -167,7 +173,7 @@ const StatusCard: FunctionComponent<StatusCardProps> = ({
       )}
       {pieData && (
         <div className={chart}>
-          {loading ? (
+          {loadingFeedback && loading ? (
             <CircularProgress className={spinner} size={64} />
           ) : (
             <GraphComponent sideLength={110} arcWidth={12} primary={piePrimary} data={pieData} />
