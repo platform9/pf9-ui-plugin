@@ -32,7 +32,6 @@ export const makeManagementRolesSelector = (
   return createSelector(
     [managementRolesSelector, (_, params) => mergeLeft(params, defaultParams)],
     (roles, params) => {
-      console.log(roles, params)
       const { allRoles, orderBy, orderDirection } = params
       return pipe<IRolesSelector[], IRolesSelector[], IRolesSelector[]>(
         filterIf(!allRoles, (role) => ['admin', '_member_'].includes(role.name)),

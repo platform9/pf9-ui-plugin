@@ -1,3 +1,4 @@
+import { allKey } from 'app/constants'
 import {
   cacheActions,
   cacheStoreKey,
@@ -8,7 +9,7 @@ import { notificationActions } from 'core/notifications/notificationReducers'
 import { useToast } from 'core/providers/ToastProvider'
 import useScopedPreferences from 'core/session/useScopedPreferences'
 import moize from 'moize'
-import { find, isNil, path, pickAll, pipe, reject, whereEq } from 'ramda'
+import { either, equals, find, isNil, path, pickAll, pipe, reject, whereEq } from 'ramda'
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { arrayIfNil, emptyObj, ensureFunction, isNilOrEmpty } from 'utils/fp'
@@ -36,7 +37,9 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
 
   // Memoize the params dependency as we want to make sure it really changed and not just got a new reference
   const memoizedParams = memoizedDep(params)
-  const memoizedIndexedParams = memoizedDep(pipe(pickAll(indexBy), reject(isNil))(params))
+  const memoizedIndexedParams = memoizedDep(
+    pipe(pickAll(indexBy), reject(either(isNil, equals(allKey))))(memoizedParams),
+  )
 
   const selector = useMemo(() => {
     return selectorCreator(defaultParams)
@@ -53,7 +56,6 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
         path([cacheStoreKey, paramsStoreKey, cacheKey]),
         arrayIfNil,
         find(whereEq(memoizedIndexedParams)),
-        // when(pipe(find(whereEq(memoizedParams)), isNil), always(identity(null))),
       ),
     [cacheKey, memoizedIndexedParams],
   )
@@ -92,7 +94,7 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
           dispatch(cacheActions.setLoading({ cacheKey, loading: true }))
         }
         try {
-          await loaderFn(memoizedIndexedParams, refetch)
+          await loaderFn(memoizedParams, refetch)
         } catch (err) {
           const parsedErrorMesssage = ensureFunction(fetchErrorMessage)(err, params)
           // TODO we should be putting these somewhere in the store to allow more control over the errors handling
