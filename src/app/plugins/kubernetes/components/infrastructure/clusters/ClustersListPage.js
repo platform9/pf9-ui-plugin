@@ -25,7 +25,7 @@ import { sessionStoreKey } from 'core/session/sessionReducers'
 import { useSelector } from 'react-redux'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import CopyToClipboard from 'core/components/CopyToClipboard'
-import { cloudProviderTypes } from '../cloudProviders/actions'
+import { cloudProviderTypes } from '../cloudProviders/selectors'
 
 const useStyles = makeStyles((theme) => ({
   links: {

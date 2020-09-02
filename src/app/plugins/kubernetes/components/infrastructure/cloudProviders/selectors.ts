@@ -12,10 +12,11 @@ import { GetCloudProvider } from 'api-client/qbert.model'
 
 import { ICloudProvidersSelector } from './model'
 
-const cloudProviderTypes = {
-  aws: 'Amazon AWS Provider',
-  azure: 'Microsoft Azure Provider',
+export const cloudProviderTypes = {
+  aws: 'AWS',
+  azure: 'Azure',
   openstack: 'OpenStack',
+  local: 'BareOS',
 }
 
 export const cloudProvidersSelector = createSelector(
