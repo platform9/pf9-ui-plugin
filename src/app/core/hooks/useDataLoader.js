@@ -30,7 +30,7 @@ const onErrorHandler = moize(
  * @returns {[array, boolean, function]} Returns an array with the loaded data, a loading boolean and a function to reload the data
  */
 const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
-  const { loadOnDemand = false, defaultParams = emptyObj } = options
+  const { loadOnDemand = false, defaultParams = emptyObj, loadingFeedback = true } = options
   const { cacheKey, fetchErrorMessage, selectorCreator, indexBy } = loaderFn
   const [{ currentTenant, currentRegion }] = useScopedPreferences()
 
@@ -88,7 +88,9 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
     async (refetch = true) => {
       if (refetch || isNilOrEmpty(data) || isNil(cachedParams)) {
         // No need to update loading state if a request is already in progress
-        dispatch(cacheActions.setLoading({ cacheKey, loading: true }))
+        if (loadingFeedback) {
+          dispatch(cacheActions.setLoading({ cacheKey, loading: true }))
+        }
         try {
           await loaderFn(memoizedIndexedParams, refetch)
         } catch (err) {
@@ -96,7 +98,9 @@ const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
           // TODO we should be putting these somewhere in the store to allow more control over the errors handling
           onError(parsedErrorMesssage, err)
         }
-        dispatch(cacheActions.setLoading({ cacheKey, loading: false }))
+        if (loadingFeedback) {
+          dispatch(cacheActions.setLoading({ cacheKey, loading: false }))
+        }
       }
     },
     [loaderFn, memoizedIndexedParams],

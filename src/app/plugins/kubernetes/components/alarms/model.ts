@@ -1,4 +1,4 @@
-import { GroupRule, Result } from 'api-client/qbert.model'
+import { GroupRule, IGetPrometheusAlertsOverTime } from 'api-client/qbert.model'
 
 export interface IAlertSelector extends IAlert {
   severity: any
@@ -23,7 +23,7 @@ export interface IAlert extends GroupRule {
   id: string
 }
 
-export interface IAlertOverTime extends Result {
+export interface IAlertOverTime extends IGetPrometheusAlertsOverTime {
   clusterId: string
   id: string
 }

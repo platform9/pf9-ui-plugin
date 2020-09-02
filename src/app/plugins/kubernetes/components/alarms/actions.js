@@ -9,12 +9,15 @@ import {
 import {
   hasHealthyMasterNodes,
   hasPrometheusTag,
+  makeParamsClustersSelector,
 } from 'k8s/components/infrastructure/clusters/selectors'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import moment from 'moment'
 import { filter, flatten, pipe, pluck } from 'ramda'
 import { someAsync } from 'utils/async'
 import { parseClusterParams } from '../infrastructure/clusters/actions'
+
+import store from 'app/store'
 
 const { qbert } = ApiClient.getInstance()
 
@@ -68,11 +71,18 @@ export const loadTimeSeriesAlerts = createContextLoader(
       .unix()
     const step = timestampSteps[chartTime].join('')
 
-    const [clusterId, clusters] = await parseClusterParams(params)
+    const [clusterId] = await parseClusterParams(params)
+    const selector = makeParamsClustersSelector()
+    const prometheusClusters = selector(store.getState(), {
+      ...params,
+      healthyClusters: true,
+      prometheusClusters: true,
+    })
+
     if (clusterId === allKey) {
       return someAsync(
-        pluck('uuid', clusters).map((cluster) =>
-          qbert.getPrometheusAlertsOverTime(cluster, timePast, timeNow, step),
+        pluck('uuid', prometheusClusters).map((clusterUuid) =>
+          qbert.getPrometheusAlertsOverTime(clusterUuid, timePast, timeNow, step),
         ),
       ).then(flatten)
     }

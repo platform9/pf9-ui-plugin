@@ -25,6 +25,7 @@ import {
   GCluster,
   GetClusterRolesItem,
   IGenericClusterizedResponse,
+  IGetPrometheusAlertsOverTime,
 } from './qbert.model'
 import DataKeys from 'k8s/DataKeys'
 
@@ -1162,7 +1163,12 @@ class Qbert extends ApiService {
     }))
   }
 
-  getPrometheusAlertsOverTime = async (clusterUuid, startTime, endTime, step) => {
+  getPrometheusAlertsOverTime = async (
+    clusterUuid,
+    startTime,
+    endTime,
+    step,
+  ): Promise<IGetPrometheusAlertsOverTime[]> => {
     const url = `/clusters/${clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/query_range?query=ALERTS&start=${startTime}&end=${endTime}&step=${step}`
     const response = await this.client.basicGet<GetPrometheusAlertsOverTime>({
       url,
@@ -1173,6 +1179,8 @@ class Qbert extends ApiService {
     })
     return response.result.map((alert) => ({
       ...alert,
+      startTime,
+      endTime,
       clusterId: clusterUuid,
       id: `${alert.metric.alertname}${clusterUuid}`,
     }))

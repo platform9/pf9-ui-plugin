@@ -1086,5 +1086,16 @@ export interface GetPrometheusAlertsOverTimeData {
 
 export interface Result {
   metric: { [key: string]: string }
-  values: Array<Array<number | string>>
+  values: Array<[number, string]>
+}
+
+export interface IGetPrometheusAlertsOverTime {
+  startTime: any
+  endTime: any
+  clusterId: any
+  id: string
+  metric: {
+    [key: string]: string
+  }
+  values: Array<[number, string]>
 }

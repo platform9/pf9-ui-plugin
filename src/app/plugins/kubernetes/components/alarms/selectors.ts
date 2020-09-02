@@ -1,19 +1,11 @@
 import { createSelector } from 'reselect'
 import { equals, find, flatten, mergeLeft, pathOr, pipe, prop, propEq } from 'ramda'
-import { emptyArr, filterIf, pathStr } from 'utils/fp'
+import { filterIf, pathStr } from 'utils/fp'
 import moment from 'moment'
-import { cacheStoreKey, dataStoreKey } from 'core/caching/cacheReducers'
 import { clustersSelector } from 'k8s/components/infrastructure/clusters/selectors'
 import DataKeys from 'k8s/DataKeys'
-import {
-  IAlert,
-  IAlertOverTime,
-  IAlertOverTimeSelector,
-  IAlertSelector,
-  ISeverityCount,
-} from './model'
+import { IAlert, IAlertOverTime, IAlertSelector, ISeverityCount } from './model'
 import { IClusterAction } from '../infrastructure/clusters/model'
-import { IDataKeys } from 'k8s/datakeys.model'
 import { clientStoreKey } from 'core/client/clientReducers'
 import getDataSelector from 'core/utils/getDataSelector'
 import createSorter from 'core/helpers/createSorter'
@@ -110,25 +102,23 @@ export const makeTimeSeriesSelector = (
     orderDirection: 'desc',
   },
 ) => {
-  return createSelector<IDataKeys, IAlertOverTime[], any, IAlertOverTimeSelector[]>(
+  return createSelector(
     [
-      (state) => pathOr(emptyArr, [cacheStoreKey, dataStoreKey, DataKeys.AlertsTimeSeries])(state),
+      getDataSelector<DataKeys.AlertsTimeSeries>(DataKeys.AlertsTimeSeries, [
+        'clusterId',
+        'chartTime',
+      ]),
       (_, params) => mergeLeft(params, defaultParams),
     ],
-    (timeSeriesRaw, params) => {
-      const { chartTime } = params
-      const timeNow = moment().unix()
-      const [number, period] = chartTime.split('.')
-      const timePast = moment
-        .unix(timeNow)
-        .subtract(number, period)
-        .unix()
-
+    (timeSeriesRaw = [], params) => {
       // Still need to calculate this manually as well because there
       // is a chance that if no alerts were firing during that time,
       // the API will not return those timestamps.
       // Use unix timestamp to match the prometheus API
-      const timestamps = getTimestamps(timePast, chartTime)
+      // const timestamps = getTimestamps()
+
+      const { startTime } = timeSeriesRaw?.[0] || {}
+      const timestamps = getTimestamps(startTime, params.chartTime)
 
       const severityCounts = getSeverityCounts(timeSeriesRaw, timestamps)
       return Object.entries(severityCounts).map(([timestamp, counts]) => ({
@@ -147,6 +137,7 @@ export const makeTimeSeriesSelector = (
 // [1583458852, 1583466052, 1583473252, 1583480452, 1583487652, 1583494852, 1583502052]
 // Gives unix timestamps for startTime and for every 2 hours until 12 hours
 const getTimestamps = (startTime, period) => {
+  if (!startTime || !period) return []
   const momentObj = moment.unix(startTime)
   const momentArgs = timestampSteps[period]
   return [

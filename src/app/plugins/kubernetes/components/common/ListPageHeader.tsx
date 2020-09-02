@@ -31,18 +31,15 @@ interface IListPageHeaderProps<T> {
 }
 function ListPageHeader<T>({ loaderFn, report, totalUsageFn }: IListPageHeaderProps<T>) {
   const classes = useStyles({})
-  const [data, loading, reload]: IUseDataLoader<T> = useDataLoader(loaderFn) as any
+  const [data, loading, reload]: IUseDataLoader<T> = useDataLoader(loaderFn, null, {
+    loadingFeedback: false,
+  }) as any
   const totals = totalUsageFn(data)
   return (
     <>
       <PollingData hidden loading={loading} onReload={reload} refreshDuration={1000 * 10} />
       <div className={classes.container}>
-        <StatusCard
-          {...report}
-          loadingFeedback={false}
-          actionRow={false}
-          className={classes.card}
-        />
+        <StatusCard {...report} actionRow={false} className={classes.card} />
         <UsageWidget title="Compute" stats={totals.compute} units="GHz" />
         <UsageWidget title="Memory" stats={totals.memory} units="GiB" />
         <UsageWidget title="Storage" stats={totals.disk} units="GiB" />
