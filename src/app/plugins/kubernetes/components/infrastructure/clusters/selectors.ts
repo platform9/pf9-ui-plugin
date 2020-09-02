@@ -26,6 +26,7 @@ import { IClusterSelector } from './model'
 import { Node } from 'api-client/qbert.model'
 import { clientStoreKey } from 'core/client/clientReducers'
 import { getK8sDashboardLinkFromVersion } from 'k8s/components/infrastructure/clusters/helpers'
+import { nodesSelector } from 'k8s/components/infrastructure/nodes/selectors'
 import { combinedHostsSelector } from 'k8s/components/infrastructure/common/selectors'
 
 const monitoringTask = 'pf9-mon'
@@ -53,14 +54,14 @@ export const clustersSelector = createSelector(
   [
     getDataSelector<DataKeys.Clusters>(DataKeys.Clusters),
     getDataSelector<DataKeys.ClusterTags>(DataKeys.ClusterTags),
-    getDataSelector<DataKeys.Nodes>(DataKeys.Nodes),
+    nodesSelector,
     combinedHostsSelector,
     (state) => pathOr('', [clientStoreKey, 'endpoints', 'qbert'])(state),
   ],
-  (rawClusters, clustersWithTasks, rawNodes, combinedHosts, qbertEndpoint: string) => {
+  (rawClusters, clustersWithTasks, nodes, combinedHosts, qbertEndpoint: string) => {
     return rawClusters.map((cluster) => {
       const clusterWithTasks = clustersWithTasks.find(({ uuid }) => cluster.uuid === uuid)
-      const nodesInCluster = rawNodes.filter((node) => node.clusterUuid === cluster.uuid)
+      const nodesInCluster = nodes.filter((node) => node.clusterUuid === cluster.uuid)
       const nodeIds = pluck('uuid', nodesInCluster)
       const combinedNodes = combinedHosts.filter((x) => nodeIds.includes(x?.resmgr?.id))
       const calcNodesTotals = calcUsageTotalByPath(combinedNodes)

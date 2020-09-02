@@ -1,8 +1,10 @@
+import { Host } from 'api-client/resmgr.model'
+
 export type IUseDataLoader<T> = [T[], boolean, (ignoreCache?: boolean) => T[]]
 
 export interface Combined {
   qbert: ICombinedNode
-  resmgr: Resmgr
+  resmgr: Host
   id: string
   roles: string[]
   roleStatus: string
@@ -244,7 +246,7 @@ export interface HypervisorInfo {
 export interface Info {
   responding: boolean
   hostname: string
-  last_response_time: null
+  last_response_time: string
   os_family: string
   arch: string
   os_info: string
@@ -263,8 +265,8 @@ export interface Usage {
 export interface Compute {
   current: number
   max: number
-  units: Units
-  type: ComputeType
+  units: Units | string
+  type: ComputeType | string
 }
 
 export enum ComputeType {
