@@ -45,7 +45,7 @@ const getDataSelector = <T extends keyof IDataKeys>(
       )(params || {})
 
       // If the provided params are already cached
-      if (isNilOrEmpty(indexBy) || find(equals(providedIndexedParams), storeParams)) {
+      if (isNilOrEmpty(indexBy) || find(whereEq(providedIndexedParams), storeParams)) {
         // Return the cached data filtering by the provided params
         return pipe<IDataKeys[T] | [], IDataKeys[T] | [], IDataKeys[T] | [], IDataKeys[T] | []>(
           arrayIfNil,
