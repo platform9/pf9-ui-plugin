@@ -1,11 +1,10 @@
 // libs
-import React, { useContext, useMemo, useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { makeStyles } from '@material-ui/styles'
-import { AppContext } from 'core/providers/AppProvider'
 // Constants
 import { allKey } from 'app/constants'
 // Actions
-import { podActions, deploymentActions, serviceActions } from '../pods/actions'
+import { deploymentActions, podActions, serviceActions } from '../pods/actions'
 import { clusterActions } from '../infrastructure/clusters/actions'
 import { loadNodes } from '../infrastructure/nodes/actions'
 import { mngmUserActions } from '../userManagement/users/actions'
@@ -16,8 +15,8 @@ import StatusCard, { StatusCardProps } from './StatusCard'
 import { Typography } from '@material-ui/core'
 
 import ClusterSetup, {
-  clustersHaveMonitoring,
   clustersHaveAccess,
+  clustersHaveMonitoring,
 } from 'k8s/components/onboarding/ClusterSetup'
 import PodSetup, { podSetupComplete } from 'k8s/components/onboarding/PodSetup'
 import useDataLoader from 'core/hooks/useDataLoader'
@@ -27,6 +26,9 @@ import { isAdminRole } from 'k8s/util/helpers'
 import { routes } from 'core/utils/routes'
 import { CloudProviders } from '../infrastructure/cloudProviders/model'
 import Theme from 'core/themes/model'
+import { prop } from 'ramda'
+import { SessionState, sessionStoreKey } from 'core/session/sessionReducers'
+import { useSelector } from 'react-redux'
 
 export interface IStatusCardWithFilterProps extends StatusCardProps {
   permissions: string[]
@@ -93,7 +95,7 @@ export const clusterStatusCardProps: IStatusCardWithFilterProps = {
       {
         name: 'partially_healthy',
         value: clusters.filter((cluster) => cluster.healthStatus === 'partially_healthy').length,
-        color: 'warning.lighter',
+        color: 'warning.light',
       },
       {
         name: 'converging',
@@ -133,7 +135,7 @@ export const nodeStatusCardProps: IStatusCardWithFilterProps = {
       {
         name: 'converging',
         value: nodes.filter((node) => nodeHealthStatus(node) === 'converging').length,
-        color: 'warning.lighter',
+        color: 'warning.light',
       },
       {
         name: 'unhealthy',
@@ -236,7 +238,7 @@ const reports = [
         {
           name: 'pending',
           value: pods.filter((pod) => pod.status.phase === 'Pending').length,
-          color: 'warning.lighter',
+          color: 'warning.light',
         },
         {
           name: 'unknown',
@@ -256,10 +258,7 @@ const reports = [
   nodeStatusCardProps,
 ]
 
-const reportsWithPerms = (reports) => {
-  const {
-    userDetails: { role },
-  } = useContext(AppContext)
+const reportsWithPerms = (reports, role) => {
   return reports.map((report) => {
     // No permissions property means no restrictions
     if (!report.permissions) {
@@ -285,13 +284,14 @@ const DashboardPage = () => {
   // need to be able to force update because states are captured in local storage :(
   const [, updateState] = React.useState()
   const forceUpdate = useCallback(() => updateState({}), [])
-
   const classes = useStyles({})
-  const { getContext, session } = useContext(AppContext)
-  const isAdmin = isAdminRole(getContext)
+  const selectSessionState = prop<string, SessionState>(sessionStoreKey)
+  const session = useSelector(selectSessionState)
 
-  const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
-  const [pods, loadingPods] = useDataLoader(podActions.list)
+  const displayName = session?.userDetails?.displayName
+  const isAdmin = isAdminRole(session)
+  const [clusters, loadingClusters] = useDataLoader(clusterActions.list, { loadingFeedback: false })
+  const [pods, loadingPods] = useDataLoader(podActions.list, { loadingFeedback: false })
   const hasClusters = !!clusters.length
   const hasMonitoring = clustersHaveMonitoring(clusters)
   const hasAccess = clustersHaveAccess()
@@ -309,39 +309,24 @@ const DashboardPage = () => {
     return [hasClusters, hasAccess, hasMonitoring].findIndex((item) => !item)
   }, [hasClusters, hasMonitoring, hasAccess])
 
-  const [users, loadingUsers] = useDataLoader(mngmUserActions.list)
-  const user = users.find((x) => x.username === session.username)
-  const displayname = user?.displayname
-
-  if (loadingUsers) {
-    return null
-  }
-
   return (
     <section className={classes.cardColumn}>
-      <Typography variant="h5">Welcome{displayname ? ' ' + displayname : ''}!</Typography>
-      {isLoading ? (
-        <Progress loading={isLoading} overlay renderContentOnMount />
-      ) : (
-        <>
-          {showOnboarding && (
-            <>
-              <ClusterSetup
-                initialPanel={initialExpandedClusterPanel}
-                onComplete={handleComplete}
-              />
-              <PodSetup onComplete={handleComplete} initialPanel={showClusters ? undefined : 0} />
-            </>
-          )}
+      <Typography variant="h5">Welcome{displayName ? ` ${displayName}` : ''}!</Typography>
 
-          {!showOnboarding && (
-            <div className={classes.dashboardMosaic}>
-              {reportsWithPerms(reports).map((report) => (
-                <StatusCard key={report.route} {...report} className={classes[report.entity]} />
-              ))}
-            </div>
-          )}
+      {showOnboarding && isLoading && <Progress loading={isLoading} overlay />}
+      {showOnboarding && !isLoading && (
+        <>
+          <ClusterSetup initialPanel={initialExpandedClusterPanel} onComplete={handleComplete} />
+          <PodSetup onComplete={handleComplete} initialPanel={showClusters ? undefined : 0} />
         </>
+      )}
+
+      {!showOnboarding && (
+        <div className={classes.dashboardMosaic}>
+          {reportsWithPerms(reports, session.userDetails.role).map((report) => (
+            <StatusCard key={report.route} {...report} className={classes[report.entity]} />
+          ))}
+        </div>
       )}
     </section>
   )

@@ -1,11 +1,13 @@
-import React, { FC, useContext } from 'react'
+import React, { FC } from 'react'
 import { Typography, Paper } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import CodeBlock from 'core/components/CodeBlock'
 import Theme from 'core/themes/model'
 import CopyToClipboard from 'core/components/CopyToClipboard'
-import { AppContext } from 'core/providers/AppProvider'
 import { hexToRGBA } from 'core/utils/colorHelpers'
+import { sessionStoreKey, SessionState } from 'core/session/sessionReducers'
+import { prop } from 'ramda'
+import { useSelector } from 'react-redux'
 import ExternalLink from 'core/components/ExternalLink'
 import { nodePrerequisitesDocumentationLink } from 'k8s/links'
 
@@ -85,7 +87,8 @@ export const DownloadCliOnboardNodeWalkthrough = (): JSX.Element => {
 
 const DownloadCliWalkthrough = (): JSX.Element => {
   const classes = useStyles({})
-  const { session } = useContext(AppContext)
+  const selectSessionState = prop<string, SessionState>(sessionStoreKey)
+  const session = useSelector(selectSessionState)
   return (
     <Paper className={classes.paper} elevation={0}>
       <Typography variant="h6">
@@ -115,7 +118,9 @@ const DownloadCliWalkthrough = (): JSX.Element => {
       </Typography>
       <NumberedSteps
         step={2}
-        title="Run the PF9 CLI using ‘prep-node’ to attach the Node to the Platform9 Management plane"
+        title={
+          'Run the PF9 CLI using ‘prep-node’ to attach the Node to the Platform9 Management plane'
+        }
         description={
           <CopyToClipboard copyText="pf9ctl cluster prep-node">
             <CodeBlock>pf9ctl cluster prep-node</CodeBlock>

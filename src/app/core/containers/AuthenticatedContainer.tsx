@@ -1,5 +1,7 @@
 import { makeStyles } from '@material-ui/styles'
+import { Button, Theme } from '@material-ui/core'
 import ApiClient from 'api-client/ApiClient'
+import { CustomWindow } from 'app/polyfills/window'
 import {
   clarityDashboardUrl,
   dashboardUrl,
@@ -7,32 +9,39 @@ import {
   ironicWizardUrl,
   logoutUrl,
 } from 'app/constants'
-import { Button } from '@material-ui/core'
 import HelpPage from 'app/plugins/kubernetes/components/common/HelpPage'
 import clsx from 'clsx'
 import Navbar, { drawerWidth } from 'core/components/Navbar'
 import Toolbar from 'core/components/Toolbar'
 import useToggler from 'core/hooks/useToggler'
-import { AppContext } from 'core/providers/AppProvider'
 import LogoutPage from 'core/public/LogoutPage'
-import pluginManager from 'core/utils/pluginManager'
+import { sessionActions, SessionState, sessionStoreKey } from 'core/session/sessionReducers'
 import DeveloperToolsEmbed from 'developer/components/DeveloperToolsEmbed'
 import moize from 'moize'
-import { apply, toPairs, keys, mergeAll } from 'ramda'
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Redirect, Route, Switch } from 'react-router'
 import useReactRouter from 'use-react-router'
 import { emptyObj, ensureArray, isNilOrEmpty, pathStrOr } from 'utils/fp'
 import { pathJoin } from 'utils/misc'
-import PushEventsProvider from '../providers/PushEventsProvider'
+import PushEventsProvider from 'core/providers/PushEventsProvider'
+import moment from 'moment'
+import { useToast } from 'core/providers/ToastProvider'
+import { MessageTypes } from 'core/components/notifications/model'
+import { RootState } from 'app/store'
+import { apply, Dictionary, keys, mergeAll, prop, toPairs } from 'ramda'
+import pluginManager from 'core/utils/pluginManager'
+import useScopedPreferences from 'core/session/useScopedPreferences'
 import BannerContainer from 'core/components/notifications/BannerContainer'
 import BannerContent from 'core/components/notifications/BannerContent'
 import { trackEvent } from 'utils/tracking'
 import ClusterUpgradeBanner from 'core/banners/ClusterUpgradeBanner'
 
+declare let window: CustomWindow
+
 const { keystone } = ApiClient.getInstance()
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   appFrame: {
     zIndex: 1,
     overflow: 'hidden',
@@ -88,7 +97,7 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: '#FFFFFF',
       },
       '& *': {
-        color: theme.palette.header.background,
+        color: theme.palette.background,
       },
       '& i': {
         marginLeft: theme.spacing(),
@@ -127,7 +136,7 @@ const renderPluginRoutes = (role) => (id, plugin) => {
   })
 }
 
-const getSections = moize((plugins, role) =>
+const getSections = moize((plugins: Dictionary<any>, role) =>
   toPairs(plugins).map(([id, plugin]) => ({
     id,
     name: plugin.name,
@@ -157,6 +166,7 @@ const renderPluginComponents = (id, plugin) => {
     </Route>
   )
 }
+
 const renderRawComponents = moize((plugins) =>
   toPairs(plugins)
     .map(apply(renderPluginComponents))
@@ -169,14 +179,13 @@ const redirectToAppropriateStack = (ironicEnabled, kubernetesEnabled, history) =
   // and standard openstack cases, but I don't want to do that yet for development.
   // In fact maybe just never do that for development build since old ui is not running.
   if (!ironicEnabled && !kubernetesEnabled) {
-    window.location = clarityDashboardUrl
+    history.push(clarityDashboardUrl)
   } else if (ironicEnabled && history.location.pathname.includes('kubernetes')) {
     history.push(ironicWizardUrl)
   } else if (!ironicEnabled && history.location.pathname.includes('metalstack')) {
     history.push(dashboardUrl)
   }
 }
-
 
 const determineCurrentStack = (history, features) => {
   if (features.metalstack) {
@@ -185,7 +194,7 @@ const determineCurrentStack = (history, features) => {
   return history.location.pathname.includes('openstack') ? 'openstack' : 'kubernetes'
 }
 
-const linkedStacks = (stacks) => (
+const linkedStacks = (stacks) =>
   // Creates object like
   // {
   //   openstack: {
@@ -194,32 +203,32 @@ const linkedStacks = (stacks) => (
   //   },
   //  ...
   // }
-  mergeAll(stacks.sort().map((stack, index, collection) => (
-    {
+  mergeAll(
+    stacks.sort().map((stack, index, collection) => ({
       [stack]: {
         left: collection[index - 1] || collection.slice(-1)[0],
+        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
         right: collection[index + 1] || collection[0],
-      }
-    }
-  )))
-)
+      },
+    })),
+  )
 
 const determineStacks = (features) => {
   // Returns list of stacks, ensure metalstack and openstack do not show up together
-  const stacks = keys(features).filter(stack => features[stack])
+  const stacks = keys(features).filter((stack) => features[stack])
   if (stacks.includes('metalstack') && stacks.includes('openstack')) {
-    const filteredStacks = stacks.filter(stack => stack !== 'openstack')
+    const filteredStacks = stacks.filter((stack) => stack !== 'openstack')
     return linkedStacks(filteredStacks)
   }
   return linkedStacks(stacks)
 }
 
-const loadRegionFeatures = async (setRegionFeatures, setStack, setStacks, setContext, history) => {
+const loadRegionFeatures = async (setRegionFeatures, setStack, setStacks, dispatch, history) => {
   try {
     const features = await keystone.getFeatures()
 
     // Store entirety of features json in context for global usage
-    await setContext({ features })
+    dispatch(sessionActions.updateSession({ features }))
 
     const regionFeatures = {
       kubernetes: features.experimental.containervisor,
@@ -247,21 +256,44 @@ const getSandboxUrl = (pathPart) => `https://platform9.com/${pathPart}/`
 const AuthenticatedContainer = () => {
   const { history } = useReactRouter()
   const [drawerOpen, toggleDrawer] = useToggler(true)
-  const [regionFeatures, setRegionFeatures] = useState(emptyObj)
+  const [regionFeatures, setRegionFeatures] = useState<{
+    openstack?: boolean
+    kubernetes?: boolean
+    intercom?: boolean
+    ironic?: boolean
+  }>(emptyObj)
+  const [{ currentRegion }] = useScopedPreferences()
   // stack is the name of the plugin (ex. openstack, kubernetes, developer, theme)
   const [currentStack, setStack] = useState(determineCurrentStack(history, regionFeatures))
   const [stacks, setStacks] = useState([])
+  const session = useSelector<RootState, SessionState>(prop(sessionStoreKey))
   const {
     userDetails: { role },
-    currentRegion,
-    setContext,
     features,
-  } = useContext(AppContext)
+  } = session
+  const dispatch = useDispatch()
+  const showToast = useToast()
   const classes = useStyles({ path: history.location.pathname })
+
   useEffect(() => {
     // Pass the `setRegionFeatures` function to update the features as we can't use `await` inside of a `useEffect`
-    loadRegionFeatures(setRegionFeatures, setStack, setStacks, setContext, history)
+    loadRegionFeatures(setRegionFeatures, setStack, setStacks, dispatch, history)
   }, [currentRegion])
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      // Check if session has expired
+      const { expiresAt } = session
+      const sessionExpired = moment().isAfter(expiresAt)
+      if (sessionExpired) {
+        dispatch(sessionActions.destroySession())
+        showToast('The session has expired, please log in again', MessageTypes.warning)
+        clearInterval(id)
+      }
+    }, 1000)
+    // Reset the interval if the session changes
+    return () => clearInterval(id)
+  }, [])
 
   const withStackSlider = regionFeatures.openstack && regionFeatures.kubernetes
 
@@ -300,10 +332,9 @@ const AuthenticatedContainer = () => {
                       component="a"
                       target="_blank"
                       href={getSandboxUrl('signup')}
-                      onClick={() => trackEvent(
-                        'CTA Deploy a Cluster Now',
-                        { 'CTA-Page': 'PMK Live Demo' }
-                      )}
+                      onClick={() =>
+                        trackEvent('CTA Deploy a Cluster Now', { 'CTA-Page': 'PMK Live Demo' })
+                      }
                     >
                       Start your Free Plan Now
                     </Button>{' '}
@@ -312,10 +343,7 @@ const AuthenticatedContainer = () => {
                       component="a"
                       target="_blank"
                       href={getSandboxUrl('contact')}
-                      onClick={() => trackEvent(
-                        'CTA Contact Us',
-                        { 'CTA-Page': 'PMK Live Demo' }
-                      )}
+                      onClick={() => trackEvent('CTA Contact Us', { 'CTA-Page': 'PMK Live Demo' })}
                     >
                       Contact Us
                     </Button>
@@ -323,11 +351,8 @@ const AuthenticatedContainer = () => {
                 </BannerContent>
               </>
             )}
-            {pathStrOr(false, 'experimental.containervisor', features)
-              && currentStack === 'kubernetes'
-              && (
-              <ClusterUpgradeBanner/>
-            )}
+            {pathStrOr(false, 'experimental.containervisor', features) &&
+              currentStack === 'kubernetes' && <ClusterUpgradeBanner />}
             <div className={classes.contentMain}>
               {renderRawComponents(plugins)}
               <Switch>

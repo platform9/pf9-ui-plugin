@@ -1,6 +1,4 @@
 import React, { useCallback } from 'react'
-import { castFuzzyBool } from 'utils/misc'
-import { compose, path } from 'ramda'
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@material-ui/core'
 import ApiClient from 'api-client/ApiClient'
 import useDataUpdater from 'core/hooks/useDataUpdater'
@@ -8,8 +6,7 @@ import { clusterActions } from '../infrastructure/clusters/actions'
 import { onboardingMonitoringSetup } from 'app/constants'
 import { useToast } from 'core/providers/ToastProvider'
 import Alert from 'core/components/Alert'
-
-export const hasPrometheusEnabled = compose(castFuzzyBool, path(['tags', 'pf9-system:monitoring']))
+import { hasPrometheusEnabled } from './helpers'
 
 const { appbert } = ApiClient.getInstance()
 

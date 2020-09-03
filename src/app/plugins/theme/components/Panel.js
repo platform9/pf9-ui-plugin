@@ -1,11 +1,6 @@
 import React from 'react'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
-import {
-  ExpansionPanel,
-  ExpansionPanelDetails,
-  ExpansionPanelSummary,
-  Typography,
-} from '@material-ui/core'
+import { Accordion, AccordionDetails, AccordionSummary, Typography } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 
 const styles = (theme) => ({
@@ -27,17 +22,17 @@ const styles = (theme) => ({
 const Panel = withStyles(styles)(
   ({ classes, title, children, link = null, titleVariant = 'subtitle1', ...rest }) => (
     <div className={classes.root}>
-      <ExpansionPanel defaultExpanded {...rest}>
-        <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+      <Accordion defaultExpanded {...rest}>
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <div className={classes.summary}>
             <Typography variant={titleVariant}>{title}</Typography>
             {link !== null && link}
           </div>
-        </ExpansionPanelSummary>
-        <ExpansionPanelDetails>
+        </AccordionSummary>
+        <AccordionDetails>
           <div style={{ width: '100%' }}>{children}</div>
-        </ExpansionPanelDetails>
-      </ExpansionPanel>
+        </AccordionDetails>
+      </Accordion>
     </div>
   ),
 )

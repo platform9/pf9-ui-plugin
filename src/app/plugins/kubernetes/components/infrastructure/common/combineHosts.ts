@@ -1,7 +1,15 @@
-import { condLiteral, pathStrOrNull, pipe } from 'utils/fp'
-import { __, both, includes, T } from 'ramda'
+import { condLiteral, pathStrOrNull } from 'utils/fp'
+import { __, both, includes, T, pipe } from 'ramda'
 import { localizeRoles } from 'api-client/ResMgr'
 import moment from 'moment'
+import {
+  HostByService,
+  IAnnotateResmgrFields,
+  IAnnotateUiState,
+  IAnnotateCloudStack,
+  ICombinedHost,
+} from './model'
+import { ExtensionsClass } from 'api-client/resmgr.model'
 
 const openstackRoles = [
   'Block Storage',
@@ -18,7 +26,7 @@ const openstackRoles = [
 
 const k8sRoles = ['Containervisor']
 
-export const annotateCloudStack = (host) => {
+export const annotateCloudStack = (host: IAnnotateUiState) => {
   const localizedRoles = localizeRoles(host.roles)
   const isOpenStack = () => localizedRoles.some(includes(__, openstackRoles))
   const isK8s = () => localizedRoles.some(includes(__, k8sRoles))
@@ -31,27 +39,29 @@ export const annotateCloudStack = (host) => {
   return { ...host, cloudStack }
 }
 
-export const annotateResmgrFields = (host) => {
-  const { resmgr = {} } = host
-  const resmgrRoles = resmgr.roles || []
+export const annotateResmgrFields = (host: HostByService) => {
+  const resmgrRoles = host?.resmgr?.roles || []
+  const extensions = host?.resmgr?.extensions as ExtensionsClass
+  const message = host?.resmgr?.message as { warn: string }
   return {
     ...host,
-    id: resmgr.id,
+    id: host?.resmgr?.id,
     roles: resmgrRoles,
-    roleStatus: resmgr.role_status,
+    roleStatus: host?.resmgr?.role_status,
     roleData: {},
-    responding: pathStrOrNull('info.responding', resmgr),
-    hostname: pathStrOrNull('info.hostname', resmgr),
-    osInfo: pathStrOrNull('info.os_info', resmgr),
+    responding: host?.resmgr?.info?.responding,
+    hostname: host?.resmgr?.info?.hostname,
+    osInfo: host?.resmgr?.info?.os_info,
     networks: [],
-    vCenterIP: pathStrOrNull('extensions.hypervisor_details.data.vcenter_ip', resmgr),
+    vCenterIP: extensions?.hypervisor_details?.data.vcenter_ip,
     supportRole: resmgrRoles.includes('pf9-support'),
-    networkInterfaces: pathStrOrNull('extensions.interfaces.data.iface_ip', resmgr),
-    warnings: pathStrOrNull('message.warn', resmgr),
+    networkInterfaces: extensions?.interfaces?.data.iface_ip,
+    warnings: message?.warn,
   }
 }
 
-export const annotateUiState = (host) => {
+export const annotateUiState = (hosts: IAnnotateResmgrFields) => {
+  const host: IAnnotateUiState = hosts as any
   const { resmgr = {} } = host
   /* TODO:
    * This code is very confusing and has too much complected state.  These
@@ -59,7 +69,7 @@ export const annotateUiState = (host) => {
    * what is going on.
    *
    * We have a spreadsheet at:
-   *   https://docs.google.com/spreadsheets/d/1JZ6dCGtnMIyabLD0MD3YklsqGDafZfdoUEMRFeSqUB0/edit#gid=0
+   * https://docs.google.com/spreadsheets/d/1JZ6dCGtnMIyabLD0MD3YklsqGDafZfdoUEMRFeSqUB0/edit#gid=0
    *
    * Unfortunately it is not up to date.
    *
@@ -119,9 +129,10 @@ export const annotateNovaFields = (host) => {
   return { ...host }
 }
 
-export const calcResourceUtilization = (host) => {
-  const usage = pathStrOrNull('resmgr.extensions.resource_usage.data')(host)
-  if (!usage) return { ...host }
+export const calcResourceUtilization = (host: IAnnotateCloudStack): ICombinedHost => {
+  const extensions = host?.resmgr?.extensions as ExtensionsClass
+  const usage = extensions?.resource_usage?.data || null
+  if (!usage) return { ...host, usage: null }
   const { cpu, memory, disk } = usage
 
   const K = 1000
@@ -158,7 +169,14 @@ export const calcResourceUtilization = (host) => {
   }
 }
 
-export const combineHost = pipe(
+export const combineHost = pipe<
+  HostByService,
+  IAnnotateResmgrFields,
+  IAnnotateUiState,
+  IAnnotateUiState,
+  IAnnotateCloudStack,
+  ICombinedHost
+>(
   annotateResmgrFields,
   annotateUiState,
   annotateNovaFields,

@@ -7,7 +7,7 @@ import { makeStyles, withStyles } from '@material-ui/styles'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import { path } from 'ramda'
-import { ICluster } from './model'
+import { IClusterSelector } from './model'
 import { CloudProviders, CloudProvidersFriendlyName } from '../cloudProviders/model'
 import Theme from 'core/themes/model'
 import { castBoolToStr, formatDate } from 'utils/misc'
@@ -19,11 +19,11 @@ interface IClusterDetailFields {
   title: string
   required?: boolean
   helpMessage?: string | React.ReactNode
-  condition?: (cluster: ICluster) => boolean
+  condition?: (cluster: IClusterSelector) => boolean
   render?: (value: string | boolean) => string | React.ReactNode
 }
 
-const getFieldsForCard = (fields: IClusterDetailFields[], cluster: ICluster) => {
+const getFieldsForCard = (fields: IClusterDetailFields[], cluster: IClusterSelector) => {
   const fieldsToDisplay = {}
   fields.forEach((field) => {
     const { id, title, required = false, condition, render, helpMessage } = field

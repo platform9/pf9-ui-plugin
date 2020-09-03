@@ -1,10 +1,10 @@
 import React, { FC } from 'react'
-import { Notification } from 'core/providers/AppProvider'
 import { makeStyles } from '@material-ui/core/styles'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { Typography } from '@material-ui/core'
 import { secondsToString } from 'utils/misc'
 import moment from 'moment'
+import { Notification } from 'core/notifications/notificationReducers'
 
 const useStyles = makeStyles((theme) => ({
   root: {

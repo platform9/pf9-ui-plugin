@@ -1,12 +1,12 @@
 import React from 'react'
 import 'app/app.css'
-import AppContext from 'core/providers/AppProvider'
-import HotKeysProvider from 'core/providers/HotKeysProvider'
-import ThemeManager from 'app/ThemeManager'
+import ThemeManager from 'core/themes/ThemeManager'
 import ToastProvider from 'core/providers/ToastProvider'
 import { decorateAction } from '@storybook/addon-actions'
 import { storiesOf } from '@storybook/react'
-import PreferencesProvider from 'core/providers/PreferencesProvider'
+import PreferencesProvider from 'core/session/PreferencesProvider'
+import store from 'app/store'
+import { Provider } from 'react-redux'
 
 const objToJsonDetails = (obj) => JSON.stringify(obj, null, 4)
 const isArray = (x) => x instanceof Array
@@ -19,16 +19,14 @@ export const jsonDetailLogger = decorateAction([
 // HotKeysProvider has a dependency on AppContext.  It is needed for rendering the sidenav.
 // ToastProvider has a dependency on ThemeManager
 export const appDecorators = (storyFn) => (
-  <div style={{ padding: '16px', backgroundColor: '#fff' }}>
-    <HotKeysProvider>
-      <AppContext>
-        <PreferencesProvider>
-          <ThemeManager>
-            <ToastProvider>{storyFn()}</ToastProvider>
-          </ThemeManager>
-        </PreferencesProvider>
-      </AppContext>
-    </HotKeysProvider>
+  <div style={{ padding: '16px', backgroundColor: '#FFF' }}>
+    <Provider store={store}>
+      <PreferencesProvider>
+        <ThemeManager>
+          <ToastProvider>{storyFn()}</ToastProvider>
+        </ThemeManager>
+      </PreferencesProvider>
+    </Provider>
   </div>
 )
 

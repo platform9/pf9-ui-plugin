@@ -12,7 +12,6 @@ import {
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import { compose } from 'utils/fp'
-import { withAppContext } from 'core/providers/AppProvider'
 import Alert from 'core/components/Alert'
 import { withRouter } from 'react-router'
 import SimpleLink from 'core/components/SimpleLink'
@@ -21,8 +20,10 @@ import { forgotPasswordUrl } from 'app/constants.js'
 import { pathJoin } from 'utils/misc'
 import { imageUrlRoot, dashboardUrl } from 'app/constants'
 import moment from 'moment'
+import { connect } from 'react-redux'
 import { trackEvent } from 'utils/tracking'
 import { MFAHelpLink } from 'k8s/links'
+import { sessionActions } from 'core/session/sessionReducers'
 
 const styles = (theme) => ({
   root: {
@@ -76,7 +77,8 @@ const styles = (theme) => ({
   },
 })
 
-export class LoginPage extends React.PureComponent {
+@connect()
+class LoginPage extends React.PureComponent {
   state = {
     username: '',
     password: '',
@@ -102,16 +104,31 @@ export class LoginPage extends React.PureComponent {
       return this.setState({ loading: false, loginFailed: true })
     }
 
-    const authSuccess = await onAuthSuccess({ username, unscopedToken, expiresAt, issuedAt })
+    const timeDiff = moment(expiresAt).diff(issuedAt)
+    const localExpiresAt = moment()
+      .add(timeDiff)
+      .format()
 
-    if (authSuccess) {
-      trackEvent('PF9 Signed In', {
+    this.props.dispatch(
+      sessionActions.initSession({
         username,
-        duDomain: window.location.origin,
-      })
-      return this.props.history.push(dashboardUrl)
-    }
-    return this.setState({ loginFailed: true, loading: false })
+        unscopedToken,
+        expiresAt: localExpiresAt,
+      }),
+    )
+
+    trackEvent('PF9 Signed In', {
+      username,
+      duDomain: window.location.origin,
+    })
+
+    await onAuthSuccess({ username, unscopedToken, expiresAt, issuedAt })
+    return this.setState(
+      {
+        loading: false,
+      },
+      () => this.props.history.push(dashboardUrl),
+    )
   }
 
   handleChangeBox = (name) => (event) => {
@@ -258,4 +275,4 @@ LoginPage.propTypes = {
   onAuthSuccess: PropTypes.func,
 }
 
-export default compose(withAppContext, withRouter, withStyles(styles))(LoginPage)
+export default compose(withRouter, withStyles(styles))(LoginPage)

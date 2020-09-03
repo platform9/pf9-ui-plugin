@@ -1,12 +1,15 @@
-import axios from 'axios'
 import ApiService from 'api-client/ApiService'
 
 class Neutron extends ApiService {
-  endpoint() {
+  public getClassName() {
+    return 'neutron'
+  }
+
+  protected async getEndpoint() {
     return this.client.keystone.getServiceEndpoint('neutron', 'admin')
   }
 
-  networkUrl = async () => `${await this.endpoint()}/v2.0/networks`
+  networkUrl = () => `/v2.0/networks`
 
   async setRegionUrls() {
     const services = (await this.client.keystone.getServiceCatalog()).find(
@@ -19,237 +22,506 @@ class Neutron extends ApiService {
   }
 
   async getNetwork(id) {
-    const url = `${await this.networkUrl()}/${id}`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.network
+    const url = `${this.networkUrl()}/${id}`
+    const response = await this.client.basicGet<any>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getNetwork',
+      },
+    })
+    return response.network
   }
 
   async getNetworks() {
-    const url = await this.networkUrl()
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.networks
+    const url = this.networkUrl()
+    const response = await this.client.basicGet<any>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getNetworks',
+      },
+    })
+    return response.networks
   }
 
   async getNetworksForRegion(region) {
-    const url = `${(await this.setRegionUrls())[region]}/networks`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.networks
+    const endpoint = `${(await this.setRegionUrls())[region]}`
+    const response = await this.client.basicGet<any>({
+      url: '/networks',
+      endpoint,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getNetworksForRegion',
+      },
+    })
+    return response.networks
   }
 
   async createNetwork(params) {
-    const url = await this.networkUrl()
-    const response = await axios.post(url, { network: params }, this.client.getAuthHeaders())
-    return response.data.network
+    const url = this.networkUrl()
+    const response = await this.client.basicPost<any>({
+      url,
+      body: {
+        network: params,
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createNetwork',
+      },
+    })
+    return response.network
   }
 
   async deleteNetwork(id) {
-    const url = `${await this.networkUrl()}/${id}`
-    const response = await axios.delete(url, this.client.getAuthHeaders())
-    return response.data.network
+    const url = `${this.networkUrl()}/${id}`
+    const response = await this.client.basicDelete<any>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteNetwork',
+      },
+    })
+    return response.network
   }
 
   async updateNetwork(id, params) {
-    const url = `${await this.networkUrl()}/${id}`
-    const response = await axios.put(url, { network: params }, this.client.getAuthHeaders())
-    return response.data.network
+    const url = `${this.networkUrl()}/${id}`
+    const response = await this.client.basicPut<any>({
+      url,
+      body: {
+        network: params,
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'updateNetwork',
+      },
+    })
+    return response.network
   }
 
   async getSubnets() {
-    const url = `${await this.endpoint()}/v2.0/subnets`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.subnets
+    const url = `/v2.0/subnets`
+    const response = await this.client.basicGet<any>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getSubnets',
+      },
+    })
+    return response.subnets
   }
 
   async createSubnet(params) {
-    const url = `${await this.endpoint()}/v2.0/subnets`
-    const response = await axios.post(url, { subnet: params }, this.client.getAuthHeaders())
-    return response.data.subnet
+    const url = `/v2.0/subnets`
+    const response = await this.client.basicPost<any>({
+      url,
+      body: {
+        subnet: params,
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createSubnet',
+      },
+    })
+    return response.subnet
   }
 
   async deleteSubnet(id) {
-    const url = `${await this.endpoint()}/v2.0/subnets/${id}`
-    await axios.delete(url, this.client.getAuthHeaders())
+    const url = `/v2.0/subnets/${id}`
+    await this.client.basicDelete<any>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteSubnet',
+      },
+    })
   }
 
   async updateSubnet(id, params) {
-    const url = `${await this.endpoint()}/v2.0/subnets/${id}`
-    const response = await axios.put(url, { subnet: params }, this.client.getAuthHeaders())
-    return response.data.subnet
+    const url = `/v2.0/subnets/${id}`
+    const response = await this.client.basicPut<any>({
+      url,
+      body: {
+        subnet: params,
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'updateSubnet',
+      },
+    })
+    return response.subnet
   }
 
   async getPorts() {
-    const url = `${await this.endpoint()}/v2.0/ports`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.ports
+    const url = `/v2.0/ports`
+    const response = await this.client.basicGet<any>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getPorts',
+      },
+    })
+    return response.ports
   }
 
   async createPort(params) {
-    const url = `${await this.endpoint()}/v2.0/ports`
-    const response = await axios.post(url, { port: params }, this.client.getAuthHeaders())
-    return response.data.port
+    const url = `/v2.0/ports`
+    const response = await this.client.basicPost<any>({
+      url,
+      body: {
+        port: params,
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createPort',
+      },
+    })
+    return response.port
   }
 
   async deletePort(id) {
-    const url = `${await this.endpoint()}/v2.0/ports/${id}`
-    await axios.delete(url, this.client.getAuthHeaders())
+    const url = `/v2.0/ports/${id}`
+    await this.client.basicDelete<any>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deletePort',
+      },
+    })
   }
 
   async updatePort(id, params) {
-    const url = `${await this.endpoint()}/v2.0/ports/${id}`
-    const response = await axios.put(url, { port: params }, this.client.getAuthHeaders())
-    return response.data.port
+    const url = `/v2.0/ports/${id}`
+    const response = await this.client.basicPut<any>({
+      url,
+      body: { port: params },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'updatePort',
+      },
+    })
+    return response.port
   }
 
   async getFloatingIps() {
-    const url = `${await this.endpoint()}/v2.0/floatingips`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.floatingips
+    const url = `/v2.0/floatingips`
+    const response = await this.client.basicGet<any>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getFloatingIps',
+      },
+    })
+    return response.floatingips
   }
 
   async createFloatingIp(params) {
-    const url = `${await this.endpoint()}/v2.0/floatingips`
-    const response = await axios.post(url, { floatingip: params }, this.client.getAuthHeaders())
-    return response.data.floatingip
+    const url = `/v2.0/floatingips`
+    const response = await this.client.basicPost<any>({
+      url,
+      body: {
+        floatingip: params,
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createFloatingIp',
+      },
+    })
+    return response.floatingip
   }
 
   async detachFloatingIp(id) {
-    const url = `${await this.endpoint()}/v2.0/floatingips/${id}`
-    const response = await axios.put(
+    const url = `/v2.0/floatingips/${id}`
+    const response = await this.client.basicPut<any>({
       url,
-      { floatingip: { port_id: null } },
-      this.client.getAuthHeaders(),
-    )
-    return response.data.floatingip
+      body: {
+        floatingip: { port_id: null },
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'detachFloatingIp',
+      },
+    })
+    return response.floatingip
   }
 
   async deleteFloatingIp(id) {
-    const url = `${await this.endpoint()}/v2.0/floatingips/${id}`
-    await axios.delete(url, this.client.getAuthHeaders())
+    const url = `/v2.0/floatingips/${id}`
+    return this.client.basicDelete<any>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteFloatingIp',
+      },
+    })
   }
 
   async networkIpAvailability(id) {
-    const url = `${await this.endpoint()}/v2.0/network-ip-availabilities/${id}`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.network_ip_availability
+    const url = `/v2.0/network-ip-availabilities/${id}`
+    const response = await this.client.basicGet<any>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'networkIpAvailability',
+      },
+    })
+    return response.network_ip_availability
   }
 
   async getSecurityGroups() {
-    const url = `${await this.endpoint()}/v2.0/security-groups`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.security_groups
+    const url = `/v2.0/security-groups`
+    const response = await this.client.basicGet<any>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getSecurityGroups',
+      },
+    })
+    return response.security_groups
   }
 
   async createSecurityGroup(params) {
-    const url = `${await this.endpoint()}/v2.0/security-groups`
-    const response = await axios.post(url, { security_group: params }, this.client.getAuthHeaders())
-    return response.data.security_group
+    const url = `/v2.0/security-groups`
+    const response = await this.client.basicPost<any>({
+      url,
+      body: {
+        security_group: params,
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createSecurityGroup',
+      },
+    })
+    return response.security_group
   }
 
   async updateSecurityGroup(id, params) {
-    const url = `${await this.endpoint()}/v2.0/security-groups/${id}`
-    const response = await axios.put(url, { security_group: params }, this.client.getAuthHeaders())
-    return response.data.security_group
+    const url = `/v2.0/security-groups/${id}`
+    const response = await this.client.basicPut<any>({
+      url,
+      body: {
+        security_group: params,
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'updateSecurityGroup',
+      },
+    })
+    return response.security_group
   }
 
   async deleteSecurityGroup(id) {
-    const url = `${await this.endpoint()}/v2.0/security-groups/${id}`
-    await axios.delete(url, this.client.getAuthHeaders())
+    const url = `/v2.0/security-groups/${id}`
+    await this.client.basicDelete<any>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteSecurityGroup',
+      },
+    })
   }
 
   async getSecurityGroupRules() {
-    const url = `${await this.endpoint()}/v2.0/security-group-rules`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.security_group_rules
+    const url = `/v2.0/security-group-rules`
+    const response = await this.client.basicGet<any>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getSecurityGroupRules',
+      },
+    })
+    return response.security_group_rules
   }
 
   async createSecurityGroupRule(params) {
-    const url = `${await this.endpoint()}/v2.0/security-group-rules`
-    const response = await axios.post(
+    const url = `/v2.0/security-group-rules`
+    const response = await this.client.basicPost<any>({
       url,
-      { security_group_rule: params },
-      this.client.getAuthHeaders(),
-    )
-    return response.data.security_group_rule
+      body: {
+        security_group_rule: params,
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createSecurityGroupRule',
+      },
+    })
+    return response.security_group_rule
   }
 
   async deleteSecurityGroupRule(id) {
-    const url = `${await this.endpoint()}/v2.0/security-group-rules/${id}`
-    await axios.delete(url, this.client.getAuthHeaders())
+    const url = `/v2.0/security-group-rules/${id}`
+    await this.client.basicDelete<any>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteSecurityGroupRule',
+      },
+    })
   }
 
   async getRouters() {
-    const url = `${await this.endpoint()}/v2.0/routers`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.routers
+    const url = `/v2.0/routers`
+    const response = await this.client.basicGet<any>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getRouters',
+      },
+    })
+    return response.routers
   }
 
   async createRouter(params) {
-    const url = `${await this.endpoint()}/v2.0/routers`
-    const response = await axios.post(url, { router: params }, this.client.getAuthHeaders())
-    return response.data.router
+    const url = `/v2.0/routers`
+    const response = await this.client.basicPost<any>({
+      url,
+      body: {
+        router: params,
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createRouter',
+      },
+    })
+    return response.router
   }
 
   async updateRouter(id, params) {
-    const url = `${await this.endpoint()}/v2.0/routers/${id}`
-    const response = await axios.put(url, { router: params }, this.client.getAuthHeaders())
-    return response.data.router
+    const url = `/v2.0/routers/${id}`
+    const response = await this.client.basicPut<any>({
+      url,
+      body: {
+        router: params,
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'updateRouter',
+      },
+    })
+    return response.router
   }
 
   async deleteRouter(id) {
-    const url = `${await this.endpoint()}/v2.0/routers/${id}`
-    await axios.delete(url, this.client.getAuthHeaders())
+    const url = `/v2.0/routers/${id}`
+    await this.client.basicDelete<any>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'deleteRouter',
+      },
+    })
   }
 
-  async addInterface(id, params) {
-    const url = `${await this.endpoint()}/v2.0/routers/${id}/add_router_interface`
-    const response = await axios.put(url, params, this.client.getAuthHeaders())
+  async addInterface(id, body) {
+    const url = `/v2.0/routers/${id}/add_router_interface`
+    const response = await this.client.basicPut<any>({
+      url,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'addInterface',
+      },
+    })
     return response.data
   }
 
-  async removeInterface(routerId, params) {
-    const url = `${await this.endpoint()}/v2.0/routers/${routerId}/remove_router_interface`
-    const response = await axios.put(url, params, this.client.getAuthHeaders())
+  async removeInterface(routerId, body) {
+    const url = `/v2.0/routers/${routerId}/remove_router_interface`
+    const response = await this.client.basicPut<any>({
+      url,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'removeInterface',
+      },
+    })
     return response.data
   }
 
   async getAllQuotas() {
-    const url = `${await this.endpoint()}/v2.0/quotas`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.quotas
+    const url = `/v2.0/quotas`
+    const response = await this.client.basicGet<any>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getAllQuotas',
+      },
+    })
+    return response.quotas
   }
 
   async getProjectQuota(id) {
-    const url = `${await this.endpoint()}/v2.0/quotas/${id}`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.quota
+    const url = `/v2.0/quotas/${id}`
+    const response = await this.client.basicGet<any>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getProjectQuota',
+      },
+    })
+    return response.quota
   }
 
   async getProjectQuotaForRegion(id, region) {
-    const urls = await this.setRegionUrls()
-    const url = `${urls[region]}/quotas/${id}`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.quota
+    const endpoint = `${(await this.setRegionUrls())[region]}`
+    const url = `/quotas/${id}`
+    const response = await this.client.basicGet<any>({
+      endpoint,
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getProjectQuotaForRegion',
+      },
+    })
+    return response.quota
   }
 
   async getDefaultQuotasForRegion(region) {
     const projectId = (await this.client.keystone.getProjects())[0]
-    const urls = await this.setRegionUrls()
-    const url = `${urls[region]}/quotas/${projectId}`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.quota
+    const endpoint = `${(await this.setRegionUrls())[region]}`
+    const url = `/quotas/${projectId}`
+    const response = await this.client.basicGet<any>({
+      endpoint,
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getDefaultQuotasForRegion',
+      },
+    })
+    return response.quota
   }
 
   async setQuotas(projectId, params) {
-    const url = `${await this.endpoint()}/v2.0/quotas/${projectId}`
-    const response = await axios.put(url, { quota: params }, this.client.getAuthHeaders())
-    return response.data.quota
+    const url = `/v2.0/quotas/${projectId}`
+    const response = await this.client.basicPut<any>({
+      url,
+      body: {
+        quota: params,
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'setQuotas',
+      },
+    })
+    return response.quota
   }
 
   async setQuotasForRegion(projectId, region, params) {
-    const urls = await this.setRegionUrls()
-    const url = `${urls[region]}/quotas/${projectId}`
-    const response = await axios.put(url, { quota: params }, this.client.getAuthHeaders())
-    return response.data.quota
+    const endpoint = `${(await this.setRegionUrls())[region]}`
+    const url = `/quotas/${projectId}`
+    const response = await this.client.basicPut<any>({
+      endpoint,
+      url,
+      body: {
+        quota: params,
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'setQuotasForRegion',
+      },
+    })
+    return response.quota
   }
 }
 

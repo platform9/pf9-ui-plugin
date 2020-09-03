@@ -1,8 +1,8 @@
 import React from 'react'
 import ColorPicker from './ColorPicker'
 import Panel from './Panel'
-import { useTheme } from '@material-ui/core/styles'
 import { Typography } from '@material-ui/core'
+import { useTheme } from '@material-ui/core/styles'
 
 const ColorGroup = ({ title, colors, parent = 'palette' }) => {
   return (

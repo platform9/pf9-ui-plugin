@@ -1,8 +1,7 @@
-import { useMemo, useCallback, useReducer, useEffect, useContext, Reducer } from 'react'
+import { useMemo, useCallback, useReducer, useEffect, Reducer } from 'react'
 import moize from 'moize'
 import { isEmpty, pick, zipObj, Dictionary } from 'ramda'
-import { useScopedPreferences } from 'core/providers/PreferencesProvider'
-import { AppContext } from 'core/providers/AppProvider'
+import useScopedPreferences from 'core/session/useScopedPreferences'
 
 type ValueOf<T> = T[keyof T]
 
@@ -74,7 +73,7 @@ const useParams = <T extends Dictionary<any>>(defaultParams?: T): UseParamsRetur
     })
   }, [])
 
-  const { currentTenant, currentRegion } = useContext(AppContext)
+  const [{ currentTenant, currentRegion }] = useScopedPreferences()
   // Reset the params when the tenant or the region are changed
   useEffect(() => {
     dispatch({ type: 'replace', payload: defaultParams || {} })
@@ -88,17 +87,23 @@ const useParams = <T extends Dictionary<any>>(defaultParams?: T): UseParamsRetur
  * @param storeKey User preferences store key
  * @param userPrefKeys Param keys that will be persisted into the user preferences
  */
-export const createUsePrefParamsHook = (storeKey: string, userPrefKeys: string[]) => {
-  return <T extends Dictionary<any>>(defaultParams?: T): UseParamsReturnType<T> => {
-    const defaultPrefs = pick(userPrefKeys, defaultParams || {})
-    const { prefs, updatePrefs } = useScopedPreferences(storeKey, defaultPrefs)
-    const { params, setParams: setParamsBase, updateParams: updateParamsBase } = useParams<T>({
+export const createUsePrefParamsHook = <T extends Dictionary<any>>(
+  storeKey: string,
+  userPrefKeys: string[],
+) => {
+  return (defaultParams?: T): UseParamsReturnType<T> => {
+    const defaultPrefs = pick(userPrefKeys, defaultParams)
+    const [prefs, updatePrefs] = useScopedPreferences(storeKey, defaultPrefs)
+    const { params, setParams: setParamsBase, updateParams: updateParamsBase } = useParams<
+      Partial<T>
+      // @ts-ignore
+    >({
       ...(defaultParams || {}),
       ...prefs,
     })
     const updateParams = useCallback(
       async (newParams) => {
-        const newPrefs = pick(userPrefKeys, newParams)
+        const newPrefs = pick<T, string>(userPrefKeys, newParams)
         if (!isEmpty(newPrefs)) {
           await updatePrefs(newPrefs)
         }
@@ -109,7 +114,7 @@ export const createUsePrefParamsHook = (storeKey: string, userPrefKeys: string[]
 
     const setParams = useCallback(
       async (newParams) => {
-        const newPrefs = pick(userPrefKeys, newParams)
+        const newPrefs = pick<T, string>(userPrefKeys, newParams)
         if (!isEmpty(newPrefs)) {
           await updatePrefs(newPrefs)
         }

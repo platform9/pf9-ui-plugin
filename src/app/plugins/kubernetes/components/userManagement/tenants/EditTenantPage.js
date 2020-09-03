@@ -56,6 +56,7 @@ const EditTenantPage = () => {
     }),
     [tenant, roleAssignments],
   )
+  const loadingSomething = loadingUsers || loadingTenants || loadingRoleAssignments || updating
 
   if (tenant.name === 'service') {
     return <Redirect to={routes.userManagement.tenants.path()} />
@@ -64,8 +65,8 @@ const EditTenantPage = () => {
   return (
     <FormWrapper
       title={`Edit Tenant ${tenant.name || ''}`}
-      loading={loadingUsers || loadingTenants || loadingRoleAssignments || updating}
-      renderContentOnMount={false}
+      loading={loadingSomething}
+      renderContentOnMount={!loadingSomething}
       message={updating ? 'Submitting form...' : 'Loading Tenant...'}
       backUrl={listUrl}
     >

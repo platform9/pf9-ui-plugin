@@ -6,6 +6,7 @@ import ExternalLink from 'core/components/ExternalLink'
 import { qbertApiLink } from 'k8s/links'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
+import { ActionDataKeys } from 'k8s/DataKeys'
 
 const useStyles = makeStyles((theme) => ({
   blueIcon: {
@@ -17,7 +18,7 @@ const EndpointsListPage = () => {
   const classes = useStyles()
 
   const options = {
-    cacheKey: 'endpoints',
+    cacheKey: ActionDataKeys.Endpoints,
     uniqueIdentifier: 'name',
     loaderFn: endpointsActions.list,
     columns,
@@ -29,19 +30,19 @@ const EndpointsListPage = () => {
   const { ListPage } = createCRUDComponents(options)
 
   return (
-      <FormFieldCard
-        title="API Endpoints"
-        link={
-          <div>
-            <FontAwesomeIcon className={classes.blueIcon} size="md">
-              file-alt
-            </FontAwesomeIcon>{' '}
-            <ExternalLink url={qbertApiLink}>Want to know more about Qbert?</ExternalLink>
-          </div>
-        }
-      >
-        <ListPage />
-      </FormFieldCard>
+    <FormFieldCard
+      title="API Endpoints"
+      link={
+        <div>
+          <FontAwesomeIcon className={classes.blueIcon} size="md">
+            file-alt
+          </FontAwesomeIcon>{' '}
+          <ExternalLink url={qbertApiLink}>Want to know more about Qbert?</ExternalLink>
+        </div>
+      }
+    >
+      <ListPage />
+    </FormFieldCard>
   )
 }
 

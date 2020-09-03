@@ -7,10 +7,10 @@ import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
 import NamespacePicklist from 'k8s/components/common/NamespacePicklist'
 import RbacChecklist from './RbacChecklist'
 import TextField from 'core/components/validatedForm/TextField'
-import { rolesCacheKey } from './actions'
 import useParams from 'core/hooks/useParams'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import NoContentMessage from 'core/components/NoContentMessage'
+import { ActionDataKeys } from 'k8s/DataKeys'
 
 const defaultParams = {
   rbac: {},
@@ -66,7 +66,7 @@ export const AddRoleForm = ({ onComplete }) => {
 }
 
 export const options = {
-  cacheKey: rolesCacheKey,
+  cacheKey: ActionDataKeys.Roles,
   FormComponent: AddRoleForm,
   listUrl: '/ui/kubernetes/rbac',
   name: 'AddRole',

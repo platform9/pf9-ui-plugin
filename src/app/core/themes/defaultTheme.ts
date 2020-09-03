@@ -1,4 +1,6 @@
-const theme = {
+import { AppTheme } from 'core/themes/model'
+
+const defaultTheme: AppTheme = {
   breakpoints: {
     keys: ['xs', 'sm', 'md', 'lg', 'xl'],
     values: {
@@ -128,7 +130,6 @@ const theme = {
       contrastText: '#FFF',
     },
     warning: {
-      lighter: '#FED16C',
       light: '#FFB74D',
       main: '#FF9800',
       dark: '#F57C00',
@@ -145,10 +146,14 @@ const theme = {
       main: '#EDEFF1',
     },
     aws: {
+      light: '#FFB74D',
       main: '#FF9800',
+      dark: '#F57C00',
     },
     azure: {
+      light: '#AEE0FF',
       main: '#4AA3DF',
+      dark: '#1E699C',
     },
     grey: {
       50: '#FAFAFA',
@@ -178,7 +183,6 @@ const theme = {
     background: {
       paper: '#FFF',
       default: '#FFF',
-      dashboard: '#EDEFF1',
     },
     action: {
       active: 'rgba(0, 0, 0, 0.54)',
@@ -219,7 +223,6 @@ const theme = {
       text: '#E5513A',
     },
   },
-  props: {},
   shadows: [
     'none',
     '0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12)',
@@ -253,15 +256,6 @@ const theme = {
     fontWeightLight: 300,
     fontWeightRegular: 400,
     fontWeightMedium: 500,
-    display4: {
-      fontSize: '7rem',
-      fontWeight: 300,
-      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-      letterSpacing: '-.04em',
-      lineHeight: '1.14286em',
-      marginLeft: '-.04em',
-      color: 'rgba(0, 0, 0, 0.54)',
-    },
     display3: {
       fontSize: '3.5rem',
       fontWeight: 400,
@@ -478,4 +472,4 @@ const theme = {
   },
 }
 
-export default theme
+export default defaultTheme

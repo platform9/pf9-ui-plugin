@@ -1,61 +1,71 @@
-import React, { useState, useContext, useCallback, useMemo } from 'react'
+import React, { useEffect, useState, useCallback, useMemo } from 'react'
 import ApiClient from 'api-client/ApiClient'
-import { AppContext } from 'core/providers/AppProvider'
-import { emptyArr } from 'app/utils/fp'
 import Selector from 'core/components/Selector'
-import { useScopedPreferences } from 'core/providers/PreferencesProvider'
-import { propEq, pipe, assoc, propOr } from 'ramda'
+import { propEq, prop, pipe, head, find, isEmpty } from 'ramda'
 import { Tooltip } from '@material-ui/core'
 import useDataLoader from 'core/hooks/useDataLoader'
-import { dataCacheKey, paramsCacheKey } from 'core/helpers/createContextLoader'
 import { loadUserTenants } from 'openstack/components/tenants/actions'
-import { getStorage, setStorage } from 'core/utils/pf9Storage'
+import { useDispatch } from 'react-redux'
+import { cacheActions } from 'core/caching/cacheReducers'
+import { sessionActions } from 'core/session/sessionReducers'
+import useScopedPreferences from 'core/session/useScopedPreferences'
 
 const TenantChooser = (props) => {
   const { keystone } = ApiClient.getInstance()
-  const { updatePrefs } = useScopedPreferences('Tenants')
   const [tenantSearch, setTenantSearch] = useState('')
   const [loading, setLoading] = useState(false)
-  const { setContext, currentTenant } = useContext(AppContext)
-  const [currentTenantName, setCurrentTenantName] = useState(propOr('', 'name', currentTenant))
+  const [{ currentTenant, currentRegion }, updatePrefs] = useScopedPreferences()
+  const [selectedTenantName, setSelectedTenantName] = useState()
   const [tooltipOpen, setTooltipOpen] = useState(false)
-  const [tenants, loadingTenants] = useDataLoader(loadUserTenants)
+  const [tenants, loadingTenants, reloadTenants] = useDataLoader(loadUserTenants)
+  const dispatch = useDispatch()
+  const curTenantName = useMemo(() => {
+    if (selectedTenantName) {
+      return selectedTenantName
+    }
+    if (currentTenant) {
+      return pipe(find(propEq('id', currentTenant)), prop('name'))(tenants)
+    }
+    return pipe(head, prop('name'))(tenants)
+  }, [tenants, currentTenant, selectedTenantName])
+
+  useEffect(() => {
+    // Reload tenants when changing the current region
+    if (isEmpty(tenants) && loadingTenants === undefined) {
+      reloadTenants(true)
+    }
+  }, [currentRegion, tenants])
 
   const updateCurrentTenant = async (tenantName) => {
     setLoading(true)
-    setCurrentTenantName(tenantName)
+    setSelectedTenantName(tenantName)
 
-    const tenant = tenants.find((x) => x.name === tenantName)
+    const tenant = tenants.find(propEq('name', tenantName))
     if (!tenant) {
       return
     }
 
     const { user, role, scopedToken } = await keystone.changeProjectScope(tenant.id)
-    // Update localStorage scopedToken upon changing project scope
-    const existingTokens = getStorage('tokens')
-    setStorage('tokens', { ...existingTokens, currentToken: scopedToken })
-
-    // Clear any data that should change when the user changes tenant.
-    // The data will then be reloaded when it is needed.
-    await setContext(
-      pipe(
-        // Reset all the data cache
-        assoc(dataCacheKey, emptyArr),
-        assoc(paramsCacheKey, emptyArr),
-        // Changing the currentTenant will cause all the current active `useDataLoader`
-        // hooks to reload its data
-        assoc('currentTenant', tenant),
-        assoc('userDetails', { ...user, role }),
-      ),
+    dispatch(
+      sessionActions.updateSession({
+        userDetails: { ...user, role },
+        scopedToken,
+      }),
     )
+    updatePrefs({
+      currentTenant: tenant.id,
+    })
+    // Clearing the cache will cause all the current loaders to reload its data
+    dispatch(cacheActions.clearCache())
+
     setLoading(false)
   }
 
-  const handleChoose = useCallback(
-    async (lastTenant) => {
-      const fullTenantObj = tenants.find(propEq('name', lastTenant))
-      updatePrefs({ lastTenant: fullTenantObj })
-      await updateCurrentTenant(lastTenant)
+  const handleTenantSelect = useCallback(
+    async (currentTenant) => {
+      const fullTenantObj = tenants.find(propEq('name', currentTenant))
+      updatePrefs({ currentTenant: fullTenantObj.id })
+      await updateCurrentTenant(currentTenant)
     },
     [tenants],
   )
@@ -71,14 +81,15 @@ const TenantChooser = (props) => {
   return (
     <Tooltip open={tooltipOpen} title="Tenant" placement="bottom">
       <Selector
+        renderContentOnMount
         loading={loading || loadingTenants}
         onMouseEnter={handleTooltipOpen}
         onMouseLeave={handleTooltipClose}
         onClick={handleTooltipClose}
         className={props.className}
-        name={currentTenantName}
+        name={curTenantName || 'Current Tenant'}
         list={tenantNames}
-        onChoose={handleChoose}
+        onChoose={handleTenantSelect}
         onSearchChange={setTenantSearch}
         searchTerm={tenantSearch}
         type="Tenant"

@@ -1,57 +1,94 @@
-import axios from 'axios'
 import ApiService from 'api-client/ApiService'
 
 class Murano extends ApiService {
-  endpoint() {
+  public getClassName() {
+    return 'murano'
+  }
+
+  protected async getEndpoint() {
     return this.client.keystone.getServiceEndpoint('murano', 'internal')
   }
 
-  v1 = async () => `${await this.endpoint()}/v1`
+  v1 = () => `/v1`
 
-  applicationUrl = async () => `${await this.v1()}/catalog/packages`
+  applicationUrl = () => `${this.v1()}/catalog/packages`
 
-  uploadUrl = async () => `${await this.v1()}/catalog/packagesHot`
+  uploadUrl = () => `${this.v1()}/catalog/packagesHot`
 
   async getApplications() {
-    const url = await this.applicationUrl()
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data.packages
+    const url = this.applicationUrl()
+    const response = await this.client.basicGet<any>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getApplications',
+      },
+    })
+    return response.packages
   }
 
   async getApplication(id) {
-    const url = `${await this.applicationUrl()}/${id}`
+    const url = `${this.applicationUrl()}/${id}`
     try {
-      const response = await axios.get(url, this.client.getAuthHeaders())
-      return response.data.package
+      const response = await this.client.basicGet<any>({
+        url,
+        options: {
+          clsName: this.getClassName(),
+          mthdName: 'getApplication',
+        },
+      })
+      return response.package
     } catch (err) {
       console.log(err)
     }
   }
 
   async uploadApplications(params) {
-    const url = await this.uploadUrl()
+    const url = this.uploadUrl()
     try {
-      const response = await axios.post(url, params, this.client.getAuthHeaders())
-      return response.data
+      const response = await this.client.basicPost<any>({
+        url,
+        body: params,
+        options: {
+          clsName: this.getClassName(),
+          mthdName: 'uploadApplications',
+        },
+      })
+      return response
     } catch (err) {
       console.log(err)
     }
   }
 
   async deleteApplication(id) {
-    const url = `${await this.applicationUrl()}/${id}`
+    const url = `${this.applicationUrl()}/${id}`
     try {
-      await axios.delete(url, this.client.getAuthHeaders())
+      return await this.client.basicDelete<any>({
+        url,
+        options: {
+          clsName: this.getClassName(),
+          mthdName: 'deleteApplication',
+        },
+      })
     } catch (err) {
       console.log(err)
     }
   }
 
   async updateApplication(id, params) {
-    const url = `${await this.applicationUrl()}/${id}`
+    const url = `${this.applicationUrl()}/${id}`
     try {
-      const response = await axios.put(url, { package: params }, this.client.getAuthHeaders())
-      return response.data.package
+      const response = await this.client.basicPut<any>({
+        url,
+        body: {
+          package: params,
+        },
+        options: {
+          clsName: this.getClassName(),
+          mthdName: 'updateApplication',
+        },
+      })
+      return response.package
     } catch (err) {
       console.log(err)
     }

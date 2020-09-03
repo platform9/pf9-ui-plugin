@@ -1,37 +1,29 @@
+import { allKey, defaultUniqueIdentifier, notFoundErr } from 'app/constants'
+import store from 'app/store'
+import { cacheActions } from 'core/caching/cacheReducers'
+import { getContextLoader } from 'core/helpers/createContextLoader'
 import {
-  hasPath,
-  path,
   assocPath,
-  pathEq,
-  always,
-  over,
-  append,
-  lensPath,
-  identity,
-  isNil,
-  pipe,
-  pickAll,
-  reject,
   either,
   equals,
-  mergeLeft,
-  allPass,
-  map,
+  hasPath,
   head,
+  isNil,
+  path,
+  pickAll,
+  pipe,
+  reject,
   split,
 } from 'ramda'
 import {
-  emptyObj,
-  ensureFunction,
-  removeWith,
-  switchCase,
   emptyArr,
+  emptyObj,
   ensureArray,
-  adjustWith,
+  ensureFunction,
+  objSwitchCase,
+  switchCase,
 } from 'utils/fp'
-import { dataCacheKey, getContextLoader } from 'core/helpers/createContextLoader'
 import { memoizePromise, uncamelizeString } from 'utils/misc'
-import { defaultUniqueIdentifier, notFoundErr, allKey } from 'app/constants'
 
 let updaters = {}
 export const getContextUpdater = (key, operation) => {
@@ -86,18 +78,22 @@ function createContextUpdater(cacheKey, dataUpdaterFn, options = {}) {
     operation = 'any',
     contextLoader,
     successMessage = (updatedItems, prevItems, params, operation) =>
-      `${entityName} ${switchCase(
+      `Successfully ${objSwitchCase(
+        {
+          create: 'created',
+          update: 'updated',
+          delete: 'deleted',
+        },
         'updated',
-        ['create', 'created'],
-        ['update', 'updated'],
-        ['delete', 'deleted'],
-      )(operation)} successfully`,
+      )(operation)} ${entityName}`,
     errorMessage = (prevItems, params, catchedErr, operation) => {
-      const action = switchCase(
+      const action = objSwitchCase(
+        {
+          create: 'create',
+          update: 'update',
+          delete: 'delete',
+        },
         'update',
-        ['create', 'create'],
-        ['update', 'update'],
-        ['delete', 'delete'],
       )(operation)
       // Display entity ID if available
       const withId = hasPath(head(uniqueIdentifierPaths), params)
@@ -117,7 +113,6 @@ function createContextUpdater(cacheKey, dataUpdaterFn, options = {}) {
   const uniqueIdentifierPaths = uniqueIdentifier
     ? ensureArray(uniqueIdentifier).map(split('.'))
     : emptyArr
-  const dataLens = lensPath([dataCacheKey, cacheKey])
 
   /**
    * Context updater function, uses a custom updater function to update the data from the cache,
@@ -129,72 +124,78 @@ function createContextUpdater(cacheKey, dataUpdaterFn, options = {}) {
    * @function contextUpdaterFn
    * @async
    *
-   * @param {Object} args Object containing the required arguments
+   * @param {object} [params] Object containing parameters that will be passed to the updaterFn
    *
-   * @param {function} args.getContext
+   * @param {object} [additionalOptions] Additional custom options
    *
-   * @param {function} args.setContext
+   * @param {function} [additionalOptions.onSuccess] Custom logic to perfom after success
    *
-   * @param {object} [args.params] Object containing parameters that will be passed to the updaterFn
-   *
-   * @param {object} [args.additionalOptions] Additional custom options
-   *
-   * @param {function} [args.additionalOptions.onSuccess] Custom logic to perfom after success
-   *
-   * @param {function} [args.additionalOptions.onError] Custom logic to perfom after error
+   * @param {function} [additionalOptions.onError] Custom logic to perfom after error
    */
   const contextUpdaterFn = memoizePromise(
-    async ({ getContext, setContext, params = emptyObj, additionalOptions = emptyObj }) => {
+    async (params = emptyObj, additionalOptions = emptyObj) => {
+      const { dispatch, getState } = store
+      const indexedParams = pipe(
+        pickAll(allIndexKeys),
+        reject(either(isNil, equals(allKey))),
+      )(params)
       const {
         onSuccess = (successMessage, params) => console.info(successMessage),
         onError = (errorMessage, catchedErr, params) => console.error(errorMessage, catchedErr),
       } = additionalOptions
-      const providedIndexedParams = pipe(
-        pickAll(allIndexKeys),
-        reject(either(isNil, equals(allKey))),
-      )(params)
-      const matchIdentifier = (idPath) => pathEq(idPath, path(idPath, params))
-      const matchAllIdentifiers = allPass(map(matchIdentifier, uniqueIdentifierPaths))
       const loader = contextLoader || getContextLoader(cacheKey)
       if (!loader) {
         throw new Error(`Context Loader with key ${cacheKey} not found`)
       }
       const loaderAdditionalOptions = { onError }
-      const prevItems = await loader({
-        getContext,
-        setContext,
-        params,
-        additionalOptions: loaderAdditionalOptions,
-        dumpCache: true,
-      })
-      const loadFromContext = (key, params = emptyObj, refetch) => {
-        const loaderFn = getContextLoader(key)
-        return loaderFn({
-          getContext,
-          setContext,
-          params,
-          refetch,
-          additionalOptions: loaderAdditionalOptions,
-        })
-      }
-      try {
-        const output = await dataUpdaterFn(params, prevItems, loadFromContext)
-        const operationSwitchCase = switchCase(
-          // If no operation is chosen (ie "any" or a custom operation), just replace the whole array with the new output
-          isNil(output) ? identity : always(output),
-          ['create', append(mergeLeft(providedIndexedParams, output))],
-          ['update', adjustWith(matchAllIdentifiers, mergeLeft(output))],
-          ['delete', removeWith(matchAllIdentifiers)],
-        )
-        await setContext(over(dataLens, operationSwitchCase(operation)))
 
+      const { selectorCreator } = loader
+      const propsSelector = selectorCreator()
+      const prevItems = propsSelector(getState(), params)
+
+      try {
+        const output = await dataUpdaterFn(params, prevItems)
+        switch (operation) {
+          case 'create':
+            dispatch(
+              cacheActions.addItem({
+                cacheKey,
+                params: indexedParams,
+                item: output,
+              }),
+            )
+            break
+          case 'update':
+            dispatch(
+              cacheActions.updateItem({
+                uniqueIdentifier,
+                cacheKey,
+                params: indexedParams,
+                item: output,
+              }),
+            )
+            break
+          case 'delete':
+            dispatch(
+              cacheActions.removeItem({
+                uniqueIdentifier,
+                cacheKey,
+                params: indexedParams,
+              }),
+            )
+            break
+          default:
+            // If no operation is chosen (ie "any" or a custom operation),
+            // just replace the whole array with the new output
+            dispatch(
+              cacheActions.replaceAll({
+                cacheKey,
+                items: output,
+              }),
+            )
+        }
         if (onSuccess) {
-          const updatedItems = await loader({
-            getContext,
-            setContext,
-            params,
-            additionalOptions: loaderAdditionalOptions,
-          })
+          const updatedItems = await loader(params, false, loaderAdditionalOptions)
           const parsedSuccessMesssage = ensureFunction(successMessage)(
             updatedItems,
             prevItems,
@@ -218,7 +219,7 @@ function createContextUpdater(cacheKey, dataUpdaterFn, options = {}) {
       }
     },
   )
-  contextUpdaterFn.getKey = () => cacheKey
+  contextUpdaterFn.cacheKey = cacheKey
 
   if (hasPath([cacheKey, operation], updaters)) {
     console.warn(

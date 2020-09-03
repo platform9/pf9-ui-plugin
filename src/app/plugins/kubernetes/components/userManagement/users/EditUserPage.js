@@ -102,12 +102,13 @@ const EditUserPage = () => {
     }),
     [user, roleAssignments],
   )
+  const loadingSomething = loadingUsers || loadingTenants || loadingRoleAssignments || updating
 
   return (
     <FormWrapper
       title={`Edit User ${user.displayname || user.username || ''}`}
-      loading={loadingUsers || loadingTenants || loadingRoleAssignments || updating}
-      renderContentOnMount={false}
+      loading={loadingSomething}
+      renderContentOnMount={!loadingSomething}
       message={updating ? 'Submitting form...' : 'Loading User...'}
       backUrl={listUrl}
     >

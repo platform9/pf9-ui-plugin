@@ -3,6 +3,26 @@ import { getHighestRole } from './helpers'
 import { pathJoin, capitalizeString } from 'utils/misc'
 import { pathStr } from 'utils/fp'
 import ApiService from 'api-client/ApiService'
+import {
+  AuthToken,
+  GetProjectsAuth,
+  GetServiceCatalog,
+  GetRegions,
+  GetFeatureLinks,
+  GetFeatures,
+  GetAllTenantsAllUsers,
+  GetUsers,
+  GetCredentials,
+  GetRoles,
+  GetUserRoleAssignments,
+  UpdateProject,
+  UpdateUser,
+  Catalog,
+  ServicesByRegion,
+  ServicesByName,
+  IInterfaceByName,
+} from './keystone.model'
+import DataKeys from 'k8s/DataKeys'
 
 const constructAuthFromToken = (token: string, projectId?: string) => {
   return {
@@ -33,14 +53,16 @@ const constructAuthFromCredentials = (username, password) => {
   }
 }
 
-const groupByRegion = (catalog) => {
-  const regions = {}
+const groupByRegion = (catalog: Catalog[]): ServicesByRegion => {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  const regions = {} as ServicesByRegion
   catalog.forEach((service) => {
     const { name } = service
     service.endpoints.forEach((endpoint) => {
       const { region } = endpoint
       regions[region] = regions[region] || {}
-      regions[region][name] = regions[region][name] || {}
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      regions[region][name] = regions[region][name] || ({} as IInterfaceByName)
       regions[region][name][endpoint.interface] = {
         id: endpoint.id,
         url: endpoint.url,
@@ -53,16 +75,20 @@ const groupByRegion = (catalog) => {
 }
 
 class Keystone extends ApiService {
-  endpoint = () => {
-    return this.client.options.keystoneEndpoint
+  public getClassName() {
+    return 'keystone'
+  }
+
+  protected async getEndpoint() {
+    return Promise.resolve(this.client.options.keystoneEndpoint)
   }
 
   get v3() {
-    return `${this.endpoint()}/v3`
+    return `/v3`
   }
 
   get adminV3() {
-    return `${this.endpoint()}/v3`
+    return `/v3`
   }
 
   get catalogUrl() {
@@ -118,57 +144,102 @@ class Keystone extends ApiService {
   }
 
   getProject = async (id) => {
-    const data = await this.client.basicGet(`${this.projectsUrl}/${id}`)
+    const data = await this.client.basicGet<any>({
+      url: `${this.projectsUrl}/${id}`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getProject',
+      },
+    })
     return data.project
   }
 
   getProjectsAuth = async () => {
-    const response = await this.client.rawGet(
-      this.projectsAuthUrl,
-      this.client.getAuthHeaders(false),
-    )
+    const response = await this.client.rawGet<GetProjectsAuth>({
+      url: this.projectsAuthUrl,
+      config: this.client.getAuthHeaders(false),
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getProjectsAuth',
+      },
+    })
     return response.data.projects
   }
 
   getProjects = async (scoped = false) => {
-    const response = await this.client.rawGet(this.projectsUrl, this.client.getAuthHeaders(scoped))
+    const response = await this.client.rawGet<any>({
+      url: this.projectsUrl,
+      config: this.client.getAuthHeaders(scoped),
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getProjects',
+      },
+    })
     return response.data.projects
   }
 
   getAllTenantsAllUsers = async () => {
-    const data = await this.client.basicGet(this.allTenantsAllUsersUrl)
+    const data = await this.client.basicGet<GetAllTenantsAllUsers>({
+      url: this.allTenantsAllUsersUrl,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getAllTenantsAllUsers',
+      },
+    })
     return data.tenants
   }
 
   getTenantRoleAssignments = async (tenantId) => {
-    const data = await this.client.basicGet(this.roleAssignments, {
-      'scope.project.id': tenantId,
-      include_names: true,
+    const data = await this.client.basicGet<GetUserRoleAssignments>({
+      url: this.roleAssignments,
+      params: {
+        'scope.project.id': tenantId,
+        include_names: true,
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getTenantRoleAssignments',
+      },
     })
     return data.role_assignments
   }
 
   getUserRoleAssignments = async (userId) => {
-    const data = await this.client.basicGet(this.roleAssignments, {
-      'user.id': userId,
-      include_names: true,
+    const data = await this.client.basicGet<GetUserRoleAssignments>({
+      url: this.roleAssignments,
+      params: {
+        'user.id': userId,
+        include_names: true,
+      },
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getUserRoleAssignments',
+      },
     })
     return data.role_assignments
   }
 
   addUserRole = async ({ tenantId, userId, roleId }) => {
-    await this.client.basicPut(
-      pathJoin(this.projectsUrl, `${tenantId}/users/${userId}/roles/${roleId}`),
-      null,
-    )
+    await this.client.basicPut<string>({
+      url: pathJoin(this.projectsUrl, `${tenantId}/users/${userId}/roles/${roleId}`),
+      body: null,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'addUserRole',
+      },
+    })
     return { tenantId, userId, roleId }
   }
 
   deleteUserRole = async ({ tenantId, userId, roleId }) => {
     try {
-      await this.client.basicDelete(
-        pathJoin(this.projectsUrl, `${tenantId}/users/${userId}/roles/${roleId}`),
-      )
+      await this.client.basicDelete<any>({
+        url: pathJoin(this.projectsUrl, `${tenantId}/users/${userId}/roles/${roleId}`),
+        options: {
+          clsName: this.getClassName(),
+          mthdName: 'deleteUserRole',
+        },
+      })
       return { tenantId, userId, roleId }
     } catch (err) {
       throw new Error('Unable to delete non-existant project')
@@ -176,36 +247,74 @@ class Keystone extends ApiService {
   }
 
   getGroups = async () => {
-    const data = await this.client.basicGet(this.groupsUrl)
+    const data = await this.client.basicGet<any>({
+      url: this.groupsUrl,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getGroups',
+      },
+    })
     return data.groups
   }
 
   getGroupMappings = async () => {
-    const data = await this.client.basicGet(this.groupMappingsUrl)
+    const data = await this.client.basicGet<any>({
+      url: this.groupMappingsUrl,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getGroupMappings',
+      },
+    })
     return data.mappings
   }
 
   getRoles = async () => {
-    const data = await this.client.basicGet(this.rolesUrl)
+    const data = await this.client.basicGet<GetRoles>({
+      url: this.rolesUrl,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getRoles',
+      },
+    })
     return data.roles
   }
 
   createProject = async (params) => {
     const body = { project: params }
-    const data = await this.client.basicPost(this.projectsUrl, body)
+    const data = await this.client.basicPost<any>({
+      url: this.projectsUrl,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createProject',
+      },
+    })
     return data.project
   }
 
   updateProject = async (id, params) => {
     const body = { project: params }
     const url = `${this.projectsUrl}/${id}`
-    const data = await this.client.basicPatch(url, body)
+    const data = await this.client.basicPatch<UpdateProject>({
+      url,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'updateProject',
+      },
+    })
     return data.project
   }
 
   deleteProject = async (projectId) => {
     try {
-      await this.client.basicDelete(`${this.projectsUrl}/${projectId}`)
+      await this.client.basicDelete<any>({
+        url: `${this.projectsUrl}/${projectId}`,
+        options: {
+          clsName: this.getClassName(),
+          mthdName: 'deleteProject',
+        },
+      })
       return projectId
     } catch (err) {
       throw new Error('Unable to delete non-existant project')
@@ -215,10 +324,17 @@ class Keystone extends ApiService {
   changeProjectScope = async (projectId) => {
     const body = constructAuthFromToken(this.client.unscopedToken, projectId)
     try {
-      const response = await this.client.rawPost(this.tokensUrl, body)
+      const response = await this.client.rawPost<AuthToken>({
+        url: this.tokensUrl,
+        data: body,
+        options: {
+          clsName: this.getClassName(),
+          mthdName: 'changeProjectScope',
+        },
+      })
       const scopedToken = response.headers['x-subject-token']
       // FIXME: fix typings here
-      const roles = pathStr('data.token.roles', response) as Array<{ [key: string]: any }>
+      const roles = response?.data?.token?.roles || [] // pathStr('data.token.roles', response) as Array<{ [key: string]: any }>
       const roleNames = pluck('name', roles)
       const role = getHighestRole(roleNames)
       const _user = pathStr('data.token.user', response)
@@ -246,7 +362,14 @@ class Keystone extends ApiService {
   authenticate = async (username, password) => {
     const body = constructAuthFromCredentials(username, password)
     try {
-      const response = await this.client.rawPost(this.tokensUrl, body)
+      const response = await this.client.rawPost<AuthToken>({
+        url: this.tokensUrl,
+        data: body,
+        options: {
+          clsName: this.getClassName(),
+          mthdName: 'authenticate',
+        },
+      })
       const { expires_at: expiresAt, issued_at: issuedAt } = response.data.token
       const unscopedToken = response.headers['x-subject-token']
       this.client.unscopedToken = unscopedToken
@@ -267,10 +390,18 @@ class Keystone extends ApiService {
       },
     }
     try {
-      const response = await this.client.rawPost(this.tokensUrl, body)
+      const response = await this.client.rawPost<AuthToken>({
+        url: this.tokensUrl,
+        data: body,
+        options: {
+          clsName: this.getClassName(),
+          mthdName: 'getUnscopedTokenWithToken',
+        },
+      })
       const username = response.data.token.user.name
       const { expires_at: expiresAt, issued_at: issuedAt } = response.data.token
       const unscopedToken = response.headers['x-subject-token']
+      this.client.scopedToken = token
       this.client.unscopedToken = unscopedToken
       return { unscopedToken, username, expiresAt, issuedAt }
     } catch (err) {
@@ -281,7 +412,14 @@ class Keystone extends ApiService {
   renewToken = async (currUnscopedToken) => {
     const body = constructAuthFromToken(currUnscopedToken)
     try {
-      const response = await this.client.rawPost(this.tokensUrl, body)
+      const response = await this.client.rawPost<AuthToken>({
+        url: this.tokensUrl,
+        data: body,
+        options: {
+          clsName: this.getClassName(),
+          mthdName: 'renewToken',
+        },
+      })
       const { expires_at: expiresAt, issued_at: issuedAt } = response.data.token
       const unscopedToken = response.headers['x-subject-token']
       this.client.unscopedToken = unscopedToken
@@ -296,7 +434,14 @@ class Keystone extends ApiService {
     const projectId = this.client.activeProjectId
     const body = constructAuthFromToken(this.client.unscopedToken, projectId)
     try {
-      const response = await this.client.rawPost(this.tokensUrl, body)
+      const response = await this.client.rawPost<AuthToken>({
+        url: this.tokensUrl,
+        data: body,
+        options: {
+          clsName: this.getClassName(),
+          mthdName: 'renewScopedToken',
+        },
+      })
       const scopedToken = response.headers['x-subject-token']
       this.client.scopedToken = scopedToken
       return scopedToken
@@ -310,10 +455,24 @@ class Keystone extends ApiService {
   getFeatures = async () => {
     try {
       const linksUrl = await this.getServiceEndpoint('regioninfo', 'public')
-      const { links } = await this.client.basicGet(linksUrl)
+      const { links } = await this.client.basicGet<GetFeatureLinks>({
+        endpoint: null,
+        url: linksUrl,
+        options: {
+          clsName: this.getClassName(),
+          mthdName: 'getFeatures',
+        },
+      })
       const featuresUrl = links.features
       const timestamp = new Date().getTime()
-      const features = await this.client.basicGet(`${featuresUrl}?tag=${timestamp}`)
+      const features = await this.client.basicGet<GetFeatures>({
+        endpoint: null,
+        url: `${featuresUrl}?tag=${timestamp}`,
+        options: {
+          clsName: this.getClassName(),
+          mthdName: 'getFeatures/featuresUrl',
+        },
+      })
       return features
     } catch (err) {
       console.error(err)
@@ -324,7 +483,13 @@ class Keystone extends ApiService {
   getDownloadLinks = async () => {
     try {
       const linksUrl = await this.getServiceEndpoint('regioninfo', 'internal')
-      const { links } = await this.client.basicGet(linksUrl)
+      const { links } = await this.client.basicGet<any>({
+        url: linksUrl,
+        options: {
+          clsName: this.getClassName(),
+          mthdName: 'getDownloadLinks',
+        },
+      })
       return links
     } catch (err) {
       console.error(err)
@@ -336,12 +501,27 @@ class Keystone extends ApiService {
   resetCookie = async () => {
     try {
       const linksUrl = await this.getServiceEndpoint('regioninfo', 'public')
-      const { links } = await this.client.basicGet(linksUrl)
+      const { links } = await this.client.basicGet<GetFeatureLinks>({
+        endpoint: null,
+        url: linksUrl,
+        options: {
+          clsName: this.getClassName(),
+          mthdName: 'resetCookie/links',
+        },
+      })
       const token2cookieUrl = links.token2cookie
       const authHeaders = this.client.getAuthHeaders()
-      await this.client.rawGet(token2cookieUrl, {
-        ...authHeaders,
-        withCredentials: true,
+      await this.client.rawGet<string>({
+        endpoint: token2cookieUrl,
+        url: '',
+        config: {
+          ...authHeaders,
+          withCredentials: true,
+        },
+        options: {
+          clsName: this.getClassName(),
+          mthdName: 'resetCookie',
+        },
       })
     } catch (err) {
       console.warn('Setting session cookie for accessing hostagent rpms failed')
@@ -349,34 +529,58 @@ class Keystone extends ApiService {
   }
 
   getRegions = async () => {
-    const data = await this.client.basicGet(this.regionsUrl)
+    const data = await this.client.basicGet<GetRegions>({
+      url: this.regionsUrl,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getRegions',
+      },
+    })
     return data.regions
-  }
+  };
 
   // Allow programmatic access
-  regions = {
-    list: this.getRegions.bind(this),
+  [DataKeys.Regions] = {
+    list: async () => {
+      return this.getRegions()
+    },
   }
 
   getServiceCatalog = async () => {
-    const data = await this.client.basicGet(this.catalogUrl)
+    const data = await this.client.basicGet<GetServiceCatalog>({
+      url: this.catalogUrl,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getServiceCatalog',
+      },
+    })
     this.client.serviceCatalog = data.catalog
     return data.catalog
   }
 
   getEndpoints = async () => {
-    const data = await this.client.basicGet(this.endpointsUrl)
+    const data = await this.client.basicGet<any>({
+      url: this.endpointsUrl,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getEndpoints',
+      },
+    })
     this.client.endpoints = data.endpoints
     return data.endpoints
   }
 
-  getServicesForActiveRegion = async () => {
-    const { activeRegion, serviceCatalog = await this.getServiceCatalog() } = this.client
+  getServicesForActiveRegion = async (): Promise<ServicesByName> => {
+    const catalog = await this.getServiceCatalog()
+    const { activeRegion, serviceCatalog = catalog } = this.client
     const servicesByRegion = groupByRegion(serviceCatalog)
 
     if (!activeRegion || !servicesByRegion.hasOwnProperty(activeRegion)) {
       // Just assume the first region we come across if there isn't one set.
-      return pipe(values, head)(servicesByRegion)
+      return pipe<ServicesByRegion, ServicesByName[], ServicesByName>(
+        values,
+        head,
+      )(servicesByRegion)
     }
     return servicesByRegion[activeRegion]
   }
@@ -391,43 +595,88 @@ class Keystone extends ApiService {
   }
 
   getCredentials = async () => {
-    const data = await this.client.basicGet(this.credentialsUrl)
+    const data = await this.client.basicGet<GetCredentials>({
+      url: this.credentialsUrl,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getCredentials',
+      },
+    })
     return data.credentials
   }
 
   getUser = async (id) => {
-    const data = await this.client.basicGet(`${this.usersUrl}/${id}`)
+    const data = await this.client.basicGet<any>({
+      url: `${this.usersUrl}/${id}`,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getUser',
+      },
+    })
     return data.user
   }
 
   getUsers = async () => {
-    const data = await this.client.basicGet(this.usersUrl)
+    const data = await this.client.basicGet<GetUsers>({
+      url: this.usersUrl,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getUsers',
+      },
+    })
     return data.users
   }
 
   createUser = async (params) => {
     const body = { user: params }
-    const data = await this.client.basicPost(this.usersUrl, body)
+    const data = await this.client.basicPost<any>({
+      url: this.usersUrl,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'createUser',
+      },
+    })
     return data.user
   }
 
   updateUser = async (id, params) => {
     const body = { user: params }
     const url = `${this.usersUrl}/${id}`
-    const data = await this.client.basicPatch(url, body)
+    const data = await this.client.basicPatch<UpdateUser>({
+      url,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'updateUser',
+      },
+    })
     return data.user
   }
 
   updateUserPassword = async (id, params) => {
     const body = { user: params }
     const url = `${this.usersUrl}/${id}/password`
-    const data = await this.client.basicPost(url, body)
+    const data = await this.client.basicPost<any>({
+      url,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'updateUserPassword',
+      },
+    })
     return data.user
   }
 
   deleteUser = async (userId) => {
     try {
-      await this.client.basicDelete(`${this.usersUrl}/${userId}`)
+      await this.client.basicDelete<any>({
+        url: `${this.usersUrl}/${userId}`,
+        options: {
+          clsName: this.getClassName(),
+          mthdName: 'deleteUser',
+        },
+      })
       return userId
     } catch (err) {
       throw new Error('Unable to delete non-existant user')

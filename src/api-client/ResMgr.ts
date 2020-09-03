@@ -1,6 +1,6 @@
-import axios from 'axios'
 import { partition, uniq, includes } from 'ramda'
 import ApiService from 'api-client/ApiService'
+import { Host } from './resmgr.model'
 
 const roleNames = {
   'pf9-ostackhost-neutron': 'Hypervisor',
@@ -37,40 +37,92 @@ export const localizeRoles = (roles: string[] = []) => {
 }
 
 class ResMgr extends ApiService {
-  async endpoint() {
+  public getClassName() {
+    return 'resmgr'
+  }
+
+  protected async getEndpoint() {
     const endpoint = await this.client.keystone.getServiceEndpoint('resmgr', 'internal')
     return `${endpoint}/v1`
   }
 
   async getHosts() {
-    const url = `${await this.endpoint()}/hosts`
-    const response = await axios.get(url, this.client.getAuthHeaders())
-    return response.data
+    const url = `/hosts`
+    return this.client.basicGet<Host[]>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getHosts',
+      },
+    })
   }
 
   async addRole(hostId, role, body) {
-    return this.client.basicPut(`${await this.endpoint()}/hosts/${hostId}/roles/${role}`, body)
+    const url = `/hosts/${hostId}/roles/${role}`
+    return this.client.basicPut({
+      url,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'addRole',
+      },
+    })
   }
 
   async removeRole(hostId, role): Promise<void> {
-    await this.client.basicDelete(`${await this.endpoint()}/hosts/${hostId}/roles/${role}`)
+    const url = `/hosts/${hostId}/roles/${role}`
+    await this.client.basicDelete({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'removeRole',
+      },
+    })
   }
 
-  async getRole(hostId, role) {
-    return await this.client.basicGet(`${await this.endpoint()}/hosts/${hostId}/roles/${role}`)
+  async getRole<T>(hostId, role) {
+    const url = `/hosts/${hostId}/roles/${role}`
+    return this.client.basicGet<T>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getRole',
+      },
+    })
   }
 
   async unauthorizeHost(id) {
-    const url = `${await this.endpoint()}/hosts/${id}`
-    return axios.delete(url, this.client.getAuthHeaders())
+    const url = `/hosts/${id}`
+    return this.client.basicDelete({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'unauthorizeHost',
+      },
+    })
   }
 
   async getService(service) {
-    return await this.client.basicGet(`${await this.endpoint()}/services/${service}`)
+    const url = `/services/${service}`
+    return this.client.basicGet({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getService',
+      },
+    })
   }
 
   async updateService(service, body) {
-    return await this.client.basicPut(`${await this.endpoint()}/services/${service}`, body)
+    const url = `/services/${service}`
+    return this.client.basicPut({
+      url,
+      body,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'updateService',
+      },
+    })
   }
 }
 

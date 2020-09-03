@@ -9,7 +9,6 @@ import {
   TableRow,
   Typography,
 } from '@material-ui/core'
-import kubeConfigActions from './actions'
 import { kubeconfigFileLink } from 'k8s/links'
 import DownloadKubeConfigForm from './DownloadKubeConfigForm'
 import SimpleLink from 'core/components/SimpleLink'
@@ -22,6 +21,7 @@ import CopyToClipboard from 'core/components/CopyToClipboard'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import PollingData from 'core/components/PollingData'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
+import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -76,7 +76,7 @@ const KubeConfigListPage = () => {
   const [selectedCluster, setSelectedCluster] = useState()
   const [downloadedKubeconfigs, setDownloadedKubeconfigs] = useState({})
 
-  const [clusters, loadingClusters, reloadClusters] = useDataLoader(kubeConfigActions.list)
+  const [clusters, loadingClusters, reloadClusters] = useDataLoader(clusterActions.list)
   const classes = useStyles()
 
   const handleDownloadKubeConfig = (cluster) => (kubeconfig) => {
@@ -123,8 +123,8 @@ const KubeConfigListPage = () => {
                     <div>
                       <Typography variant="body1">
                         There are no clusters available. You need to{' '}
-                        <SimpleLink src={routes.cluster.add.path()}>create a cluster</SimpleLink>{' '}
-                        first to continue.
+                        <SimpleLink src={routes.cluster.add.path()}>create a cluster</SimpleLink>
+                        {' '}first to continue.
                       </Typography>
                     </div>
                   </TableCell>

@@ -3,7 +3,7 @@ import SubmitButton from 'core/components/SubmitButton'
 import TextField from 'core/components/validatedForm/TextField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import createUpdateComponents from 'core/helpers/createUpdateComponents'
-import { prometheusAlertManagersCacheKey } from './actions'
+import { ActionDataKeys } from 'k8s/DataKeys'
 
 class UpdatePrometheusAlertManagerForm extends React.PureComponent {
   handleUpdate = (data) => {
@@ -27,7 +27,7 @@ class UpdatePrometheusAlertManagerForm extends React.PureComponent {
 
 export const options = {
   FormComponent: UpdatePrometheusAlertManagerForm,
-  cacheKey: prometheusAlertManagersCacheKey,
+  cacheKey: ActionDataKeys.PrometheusAlertManagers,
   routeParamKey: 'id',
   uniqueIdentifier: 'uid',
   listUrl: '/ui/kubernetes/prometheus#alerts',

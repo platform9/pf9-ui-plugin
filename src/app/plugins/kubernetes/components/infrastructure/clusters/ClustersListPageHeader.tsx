@@ -12,7 +12,7 @@ import { getUsageTotals } from 'k8s/util/calcUsageTotals'
 
 // Types
 import { clusterStatusCardProps } from 'k8s/components/dashboard/DashboardPage'
-import { ICluster } from './model'
+import { IClusterSelector } from './model'
 
 const maxUsagePaths = {
   computeMaxPath: 'usage.compute.max',
@@ -27,12 +27,12 @@ const curUsagePaths = {
 }
 
 export const ClusterListHeader = () => {
-  const handleGetUsage = useCallback((clusters: ICluster[]) => {
+  const handleGetUsage = useCallback((clusters: IClusterSelector[]) => {
     const items = clusters.filter((cluster) => (cluster.nodes || []).length > 0)
     return getUsageTotals(items, curUsagePaths, maxUsagePaths)
   }, [])
   return (
-    <ListPageHeader<ICluster>
+    <ListPageHeader<IClusterSelector>
       report={clusterStatusCardProps}
       loaderFn={clusterActions.list}
       totalUsageFn={handleGetUsage}

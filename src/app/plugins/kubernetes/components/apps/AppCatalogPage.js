@@ -38,6 +38,7 @@ const AppCatalogPage = () => {
   const [showingDownloadDialog, setShowingDownloadDialog] = useState(false)
   const [activeApp, setActiveApp] = useState()
   const [apps, loading, reload] = useDataLoader(appActions.list, params)
+
   const handleRefresh = useCallback(() => reload(true), [reload])
   const handleDeploy = useCallback(
     moize((app) => () => {

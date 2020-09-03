@@ -2,10 +2,9 @@ import React from 'react'
 import Panel from './Panel'
 import ImportDataButton from 'core/components/ImportDataButton'
 import ExportDataButton from 'core/components/ExportDataButton'
-import { compose } from 'ramda'
-import { createMuiTheme } from '@material-ui/core/styles'
-import { withAppContext } from 'core/providers/AppProvider'
 import { withStyles } from '@material-ui/styles'
+import { withTheme } from '@material-ui/core/styles'
+import { compose } from 'ramda'
 
 const styles = (theme) => ({
   marginRight: {
@@ -16,8 +15,7 @@ const styles = (theme) => ({
 class ImportExportPanel extends React.PureComponent {
   handleImport = (themeStr) => {
     const themeJson = JSON.parse(themeStr)
-    const theme = createMuiTheme(themeJson)
-    this.props.setContext({ theme, themeJson })
+    this.props.actions.setCustomTheme(themeJson)
   }
 
   render() {
@@ -42,4 +40,4 @@ class ImportExportPanel extends React.PureComponent {
   }
 }
 
-export default compose(withAppContext, withStyles(styles))(ImportExportPanel)
+export default compose(withStyles(styles), withTheme)(ImportExportPanel)

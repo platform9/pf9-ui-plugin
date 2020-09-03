@@ -86,10 +86,10 @@ const Picklist = React.forwardRef((props, ref) => {
       : value
     : value
 
-  // If loading is undefined, it means we are not performing any async
+  // If loading is different than true, it means we are not performing any async
   // operation to load the options, hence we can render the contents on mount
   return (
-    <Progress inline overlay loading={loading} renderContentOnMount={loading === undefined}>
+    <Progress inline overlay loading={loading} renderContentOnMount={loading !== true}>
       <TextField
         {...restProps}
         ref={ref}
