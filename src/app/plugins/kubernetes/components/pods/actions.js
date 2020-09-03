@@ -3,13 +3,13 @@ import { allKey } from 'app/constants'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import jsYaml from 'js-yaml'
 import { parseClusterParams } from 'k8s/components/infrastructure/clusters/actions'
-import { makeParamsPodsSelector } from 'k8s/components/pods/selectors'
+import { makeDeploymentsSelector, makePodsSelector } from 'k8s/components/pods/selectors'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import { flatten, pluck } from 'ramda'
 import { someAsync } from 'utils/async'
 import { pathStr } from 'utils/fp'
 import { trackEvent } from 'utils/tracking'
-import { deploymentsSelector, makeServiceSelector, serviceSelectors } from './selectors'
+import { makeServiceSelector } from './selectors'
 
 const { qbert } = ApiClient.getInstance()
 
@@ -38,7 +38,7 @@ export const podActions = createCRUDActions(ActionDataKeys.Pods, {
   },
   uniqueIdentifier: 'metadata.uid',
   indexBy: 'clusterId',
-  selectorCreator: makeParamsPodsSelector,
+  selectorCreator: makePodsSelector,
 })
 
 export const deploymentActions = createCRUDActions(ActionDataKeys.Deployments, {
@@ -64,7 +64,7 @@ export const deploymentActions = createCRUDActions(ActionDataKeys.Deployments, {
   },
   service: 'qbert',
   indexBy: 'clusterId',
-  selector: deploymentsSelector,
+  selectorCreator: makeDeploymentsSelector,
 })
 
 export const serviceActions = createCRUDActions(ActionDataKeys.KubeServices, {
@@ -102,6 +102,5 @@ export const serviceActions = createCRUDActions(ActionDataKeys.KubeServices, {
   service: 'qbert',
   entity: ActionDataKeys.KubeServices,
   indexBy: 'clusterId',
-  selector: serviceSelectors,
   selectorCreator: makeServiceSelector,
 })
