@@ -6,14 +6,10 @@ import {
   makeAlertsSelector,
   makeTimeSeriesSelector,
 } from 'k8s/components/alarms/selectors'
-import {
-  hasHealthyMasterNodes,
-  hasPrometheusTag,
-  makeParamsClustersSelector,
-} from 'k8s/components/infrastructure/clusters/selectors'
+import { makeParamsClustersSelector } from 'k8s/components/infrastructure/clusters/selectors'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import moment from 'moment'
-import { filter, flatten, pipe, pluck } from 'ramda'
+import { flatten, pluck } from 'ramda'
 import { someAsync } from 'utils/async'
 import { parseClusterParams } from '../infrastructure/clusters/actions'
 

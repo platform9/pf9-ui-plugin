@@ -287,9 +287,11 @@ const DashboardPage = () => {
   const classes = useStyles({})
   const selectSessionState = prop<string, SessionState>(sessionStoreKey)
   const session = useSelector(selectSessionState)
+
+  const displayName = session?.userDetails?.displayName
   const isAdmin = isAdminRole(session)
-  const [clusters, loadingClusters] = useDataLoader(clusterActions.list)
-  const [pods, loadingPods] = useDataLoader(podActions.list)
+  const [clusters, loadingClusters] = useDataLoader(clusterActions.list, { loadingFeedback: false })
+  const [pods, loadingPods] = useDataLoader(podActions.list, { loadingFeedback: false })
   const hasClusters = !!clusters.length
   const hasMonitoring = clustersHaveMonitoring(clusters)
   const hasAccess = clustersHaveAccess()
@@ -307,33 +309,25 @@ const DashboardPage = () => {
     return [hasClusters, hasAccess, hasMonitoring].findIndex((item) => !item)
   }, [hasClusters, hasMonitoring, hasAccess])
 
-  const [users, loadingUsers] = useDataLoader(mngmUserActions.list)
-  const user = users.find((x) => x.username === session.username)
-  const displayname = user?.displayname
-
-  if (loadingUsers) {
-    return null
-  }
-
   return (
     <section className={classes.cardColumn}>
-      <Typography variant="h5">Welcome{displayname ? ` ${displayname}` : ''}!</Typography>
-      <Progress loading={isLoading} overlay renderContentOnMount>
-        {showOnboarding && (
-          <>
-            <ClusterSetup initialPanel={initialExpandedClusterPanel} onComplete={handleComplete} />
-            <PodSetup onComplete={handleComplete} initialPanel={showClusters ? undefined : 0} />
-          </>
-        )}
+      <Typography variant="h5">Welcome{displayName ? ` ${displayName}` : ''}!</Typography>
 
-        {!showOnboarding && (
-          <div className={classes.dashboardMosaic}>
-            {reportsWithPerms(reports, session.userDetails.role).map((report) => (
-              <StatusCard key={report.route} {...report} className={classes[report.entity]} />
-            ))}
-          </div>
-        )}
-      </Progress>
+      {showOnboarding && isLoading && <Progress loading={isLoading} overlay />}
+      {showOnboarding && !isLoading && (
+        <>
+          <ClusterSetup initialPanel={initialExpandedClusterPanel} onComplete={handleComplete} />
+          <PodSetup onComplete={handleComplete} initialPanel={showClusters ? undefined : 0} />
+        </>
+      )}
+
+      {!showOnboarding && (
+        <div className={classes.dashboardMosaic}>
+          {reportsWithPerms(reports, session.userDetails.role).map((report) => (
+            <StatusCard key={report.route} {...report} className={classes[report.entity]} />
+          ))}
+        </div>
+      )}
     </section>
   )
 }
