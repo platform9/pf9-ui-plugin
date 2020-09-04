@@ -89,7 +89,7 @@ export const loadTimeSeriesAlerts = createContextLoader(
     // make uniqueIdentifier timestamp bc of autosort
     // not sure if this has to do with the reason why the
     // cache does not work properly
-    uniqueIdentifier: 'timestamp',
+    uniqueIdentifier: 'id',
     selectorCreator: makeTimeSeriesSelector,
     indexBy: ['clusterId', 'chartTime'],
   },
