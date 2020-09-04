@@ -29,7 +29,9 @@ interface UseParamsReturnType<T> {
   params: Partial<T>
   updateParams: (newParams: Partial<T>) => void
   setParams: (newParams: T) => void
-  getParamsUpdater: (...keys: Array<keyof T>) => (...values: Array<ValueOf<T>>) => void
+  getParamsUpdater: (
+    ...keys: Array<keyof T>
+  ) => (...values: Array<ValueOf<T>>) => Promise<void> | void
 }
 
 /**
@@ -124,10 +126,12 @@ export const createUsePrefParamsHook = <T extends Dictionary<any>>(
     )
 
     const getParamsUpdater = useMemo(() => {
+      // eslint-disable-next-line @typescript-eslint/require-await
       return moize((...keys: Array<Extract<keyof T, string>>) =>
         // FIXME: zipObj return types are too loose so we are forced to use a type cast here
+        // eslint-disable-next-line @typescript-eslint/promise-function-async
         (...values: Array<ValueOf<T>>) =>
-          updateParamsBase(zipObj<ValueOf<T>>(keys, values) as Partial<T>),
+          updateParams(zipObj<ValueOf<T>>(keys, values) as Partial<T>),
       )
     }, [updateParamsBase])
 
