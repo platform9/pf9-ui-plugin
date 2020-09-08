@@ -287,9 +287,9 @@ const DashboardPage = () => {
   const classes = useStyles({})
   const selectSessionState = prop<string, SessionState>(sessionStoreKey)
   const session = useSelector(selectSessionState)
-
   const displayName = session?.userDetails?.displayName
   const isAdmin = isAdminRole(session)
+
   const [clusters, loadingClusters] = useDataLoader(clusterActions.list, { loadingFeedback: false })
   const [pods, loadingPods] = useDataLoader(podActions.list, { loadingFeedback: false })
   const hasClusters = !!clusters.length

@@ -1,10 +1,10 @@
 import { createMuiTheme } from '@material-ui/core/styles'
 import { ThemeProvider } from '@material-ui/styles'
-import defaultTheme from 'core/themes/defaultTheme'
+import defaultTheme from 'core/themes/relianceLight'
 import * as CSS from 'csstype'
 import React, { useEffect, useMemo, useState, useCallback, useContext } from 'react'
 import useScopedPreferences from 'core/session/useScopedPreferences'
-import { AppTheme } from 'core/themes/model'
+import AppTheme from 'core/themes/model'
 import { Theme } from '@material-ui/core/styles/createMuiTheme'
 
 const CustomThemeContext = React.createContext<{
