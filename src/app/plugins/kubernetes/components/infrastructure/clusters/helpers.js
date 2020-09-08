@@ -129,8 +129,10 @@ export const createAzureCluster = async (data) => {
 
     // network info
     ...pick(
-      'assignPublicIps vnetResourceGroup vnetName masterSubnetName workerSubnetName ' +
-        'externalDnsName serviceFqdn containersCidr servicesCidr networkPlugin'.split(' '),
+      (
+        'assignPublicIps vnetResourceGroup vnetName masterSubnetName workerSubnetName ' +
+        'externalDnsName serviceFqdn containersCidr servicesCidr networkPlugin'
+      ).split(' '),
       data,
     ),
 
@@ -141,7 +143,6 @@ export const createAzureCluster = async (data) => {
   if (data.useAllAvailabilityZones) {
     body.zones = []
   }
-
   const cluster = createGenericCluster(body, data)
 
   // Placed beneath API call -- send the tracking when the request is successful
