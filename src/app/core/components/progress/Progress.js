@@ -137,7 +137,8 @@ class Progress extends PureComponent {
     }
     return (
       <div
-        className={clsx(classes.content, {
+        className={clsx(classes.content, 'progressContent', {
+          loading,
           [classes.hiddenContent]: loading && !overlay,
           [classes.contentLoading]: loading,
         })}

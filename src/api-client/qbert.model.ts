@@ -1093,7 +1093,6 @@ export interface IGetPrometheusAlertsOverTime {
   startTime: any
   endTime: any
   clusterId: any
-  id: string
   metric: {
     [key: string]: string
   }

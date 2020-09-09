@@ -104,10 +104,7 @@ export const makeTimeSeriesSelector = (
 ) => {
   return createSelector(
     [
-      getDataSelector<DataKeys.AlertsTimeSeries>(DataKeys.AlertsTimeSeries, [
-        'clusterId',
-        'chartTime',
-      ]),
+      getDataSelector<DataKeys.AlertsTimeSeries>(DataKeys.AlertsTimeSeries),
       (_, params) => mergeLeft(params, defaultParams),
     ],
     (timeSeriesRaw = [], params) => {

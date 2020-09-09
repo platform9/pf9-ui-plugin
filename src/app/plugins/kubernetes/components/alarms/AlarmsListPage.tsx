@@ -5,9 +5,9 @@ import SeverityPicklist from './SeverityPicklist'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { loadAlerts, loadTimeSeriesAlerts } from './actions'
 import { createUsePrefParamsHook } from 'core/hooks/useParams'
-import { listTablePrefs } from 'app/constants'
+import { listTablePrefs, allKey } from 'app/constants'
 import { pick } from 'ramda'
-import { allKey } from 'app/constants'
+
 import StackedAreaChart from 'core/components/graphs/StackedAreaChart'
 import { makeStyles } from '@material-ui/styles'
 import DateCell from 'core/components/listTable/cells/DateCell'
@@ -21,6 +21,7 @@ import ClusterPicklistDefault from 'k8s/components/common/ClusterPicklist'
 import TimePicklistDefault from './TimePicklist'
 import AlarmDetailsLink from './AlarmDetailsLink'
 import { ActionDataKeys } from 'k8s/DataKeys'
+import Progress from 'core/components/progress/Progress'
 const ClusterPicklist: any = ClusterPicklistDefault
 const TimePicklist: any = TimePicklistDefault
 
@@ -35,6 +36,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     border: `1px solid ${theme.palette.grey['500']}`,
     padding: theme.spacing(2),
     marginTop: theme.spacing(1),
+    '& .progressContent.loading': {
+      display: 'none',
+    },
   },
   chartContainerHeader: {
     fontSize: 11,
@@ -104,10 +108,7 @@ const ListPage = ({ ListContainer }) => {
     const [data, loading, reload] = useDataLoader(loadAlerts, params)
     // Provide specific param properties to timeSeries data loader
     // so that it doesn't reload unless those props are changed
-    const [
-      timeSeriesData,
-      // timeSeriesLoading,
-    ] = useDataLoader(loadTimeSeriesAlerts, {
+    const [timeSeriesData, timeSeriesLoading] = useDataLoader(loadTimeSeriesAlerts, {
       chartTime: params.chartTime,
       clusterId: params.clusterId,
     })
@@ -158,16 +159,18 @@ const ListPage = ({ ListContainer }) => {
           </div>
         </div>
         <div className={classes.chartContainer}>
-          <div className={classes.chartContainerHeader}>Alarms</div>
-          <div className={classes.moveLeft}>
-            <StackedAreaChart
-              values={timeSeriesData}
-              keys={filteredChartKeys}
-              xAxis="time"
-              responsive={true}
-              CustomTooltip={<AlarmsChartTooltip keys={filteredChartKeys} />}
-            />
-          </div>
+          <Progress loading={timeSeriesLoading} overlay={false} maxHeight={160} minHeight={320}>
+            <div className={classes.chartContainerHeader}>Alarms</div>
+            <div className={classes.moveLeft}>
+              <StackedAreaChart
+                values={timeSeriesData}
+                keys={filteredChartKeys}
+                xAxis="time"
+                responsive
+                CustomTooltip={<AlarmsChartTooltip keys={filteredChartKeys} />}
+              />
+            </div>
+          </Progress>
         </div>
         <ListContainer
           loading={loading}
