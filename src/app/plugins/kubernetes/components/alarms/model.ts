@@ -19,6 +19,8 @@ export interface ISeverityCount {
   fatal: number
 }
 export interface IAlert extends GroupRule {
+  activeAt: any
+  state: string
   clusterId: string
   id: string
 }
