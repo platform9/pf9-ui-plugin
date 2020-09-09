@@ -50,15 +50,11 @@ const timestampSteps = {
   '3.h': [30, 'm'],
   '1.h': [10, 'm'],
 }
+const selector = makeParamsClustersSelector()
 
 export const loadTimeSeriesAlerts = createContextLoader(
   ActionDataKeys.AlertsTimeSeries,
   async ({ chartTime, ...params }) => {
-    // Invalidate cache -- can't get cache working properly for this
-    // collection. Collection is somewhat different from all other
-    // types of collections.
-    loadTimeSeriesAlerts.invalidateCache()
-
     const timeNow = moment().unix()
     const [number, period] = chartTime.split('.')
     const timePast = moment
@@ -68,7 +64,6 @@ export const loadTimeSeriesAlerts = createContextLoader(
     const step = timestampSteps[chartTime].join('')
 
     const [clusterId] = await parseClusterParams(params)
-    const selector = makeParamsClustersSelector()
     const prometheusClusters = selector(store.getState(), {
       ...params,
       healthyClusters: true,
@@ -86,11 +81,7 @@ export const loadTimeSeriesAlerts = createContextLoader(
   },
   {
     entityName: 'AlertTimeSeries',
-    // make uniqueIdentifier timestamp bc of autosort
-    // not sure if this has to do with the reason why the
-    // cache does not work properly
-    uniqueIdentifier: 'id',
     selectorCreator: makeTimeSeriesSelector,
-    indexBy: ['clusterId', 'chartTime'],
+    cache: false,
   },
 )

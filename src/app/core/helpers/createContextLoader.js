@@ -83,7 +83,7 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
     fetchErrorMessage = (catchedErr, params) => `Unable to fetch ${entityName} items`,
     selector = getDataSelector(cacheKey, indexBy),
     selectorCreator = getDefaultSelectorCreator(selector),
-    noCache = false,
+    cache = true,
   } = options
   const allIndexKeys = indexBy ? ensureArray(indexBy) : emptyArr
   const allRequiredParams = requiredParams ? ensureArray(requiredParams) : emptyArr
@@ -146,12 +146,12 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
       )
 
       // Perfom the cache update operations
-      if (noCache || invalidateCache || refetch) {
+      if (!cache || invalidateCache || refetch) {
         dispatch(
           cacheActions.replaceAll({
             cacheKey,
             items: itemsWithParams,
-            params: noCache ? null : providedIndexedParams,
+            params: cache ? providedIndexedParams : null,
           }),
         )
       } else {
@@ -184,7 +184,7 @@ const createContextLoader = (cacheKey, dataFetchFn, options = {}) => {
    */
   contextLoaderFn.cacheKey = cacheKey
   contextLoaderFn.indexBy = allIndexKeys
-  contextLoaderFn.noCache = noCache
+  contextLoaderFn.cache = cache
   contextLoaderFn.fetchErrorMessage = fetchErrorMessage
   contextLoaderFn.selectorCreator = selectorCreator
 

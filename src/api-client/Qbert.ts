@@ -1182,7 +1182,6 @@ class Qbert extends ApiService {
       startTime,
       endTime,
       clusterId: clusterUuid,
-      id: `${alert.metric.alertname}${clusterUuid}`,
     }))
   }
 
