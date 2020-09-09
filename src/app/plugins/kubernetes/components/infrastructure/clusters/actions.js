@@ -7,6 +7,7 @@ import {
   createBareOSCluster,
   getKubernetesVersion,
   getProgressPercent,
+  getEtcdBackupPayload,
 } from 'k8s/components/infrastructure/clusters/helpers'
 import {
   clustersSelector,
@@ -79,14 +80,7 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
     const updateableParams = 'name tags numWorkers numMinWorkers numMaxWorkers'.split(' ')
 
     const body = pick(updateableParams, params)
-    body.etcdBackup = {
-      isEtcdBackupEnabled: params.etcdBackup ? 1 : 0,
-      storageType: 'local',
-      storageProperties: {
-        localPath: params.etcdStoragePath,
-      },
-      intervalInMins: params.etcdBackupInterval,
-    }
+    body.etcdBackup = getEtcdBackupPayload('etcdBackup', params)
 
     await qbert.updateCluster(uuid, body)
     trackEvent('Update Cluster', { uuid })
