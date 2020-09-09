@@ -226,6 +226,7 @@ export const options = {
       ),
     },
     { id: 'clusterName', label: 'Cluster' },
+    { id: 'exportedNamespace', label: 'Exported Namespace' },
   ],
   cacheKey: ActionDataKeys.Alerts,
   name: 'Alarms',

@@ -58,17 +58,18 @@ export const alertsSelector = createSelector(
     )
     return rawAlerts.map((alert) => ({
       ...alert,
+      name: alert?.labels.alertname, // pathStr('labels.alertname', alert)
       severity: alert?.labels?.severity, // pathStr('labels.severity', alert)
       summary: alert?.annotations?.message, // pathStr('annotations.message', alert),
-      activeAt: alert?.alerts?.[0]?.activeAt, // path(['alerts', 0, 'activeAt'], alert),
-      status: alert.alerts.length ? 'Active' : 'Closed',
+      status: alert?.state === 'firing' ? 'Active' : 'Closed',
+      exportedNamespace: alert?.labels?.exported_namespace,
       clusterName: pipe(
         find<IClusterAction>(propEq('uuid', alert.clusterId)),
         prop('name'),
       )(clusters),
       for: flattenedRules.find((rule) => {
         return (
-          equals(rule.alert, alert.name) &&
+          equals(rule.alert, pathStr('labels.alertname', alert)) &&
           equals(pathStr('labels.severity', rule), pathStr('labels.severity', alert)) &&
           equals(rule.clusterUuid, alert.clusterId)
         )
