@@ -76,10 +76,17 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
     }
   },
   updateFn: async ({ uuid, ...params }) => {
-    const updateableParams = 'name tags numWorkers numMinWorkers numMaxWorkers etcdBackup'.split(
-      ' ',
-    )
+    const updateableParams = 'name tags numWorkers numMinWorkers numMaxWorkers'.split(' ')
+
     const body = pick(updateableParams, params)
+    body.etcdBackup = {
+      isEtcdBackupEnabled: params.etcdBackup ? 1 : 0,
+      storageType: 'local',
+      storageProperties: {
+        localPath: params.etcdStoragePath,
+      },
+      intervalInMins: params.etcdBackupInterval,
+    }
 
     await qbert.updateCluster(uuid, body)
     trackEvent('Update Cluster', { uuid })
