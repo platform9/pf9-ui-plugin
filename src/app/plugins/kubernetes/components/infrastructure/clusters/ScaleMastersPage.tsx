@@ -219,7 +219,7 @@ const ScaleMastersPage: FunctionComponent = () => {
       title="Scale Masters"
       backUrl={listUrl}
       loading={loading || isUpdating}
-      renderContentOnMount={false}
+      renderContentOnMount={!!cluster}
       message={isUpdating ? 'Scaling cluster...' : 'Loading cluster...'}
     >
       <ScaleMasters

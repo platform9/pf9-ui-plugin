@@ -237,7 +237,7 @@ const ScaleWorkersPage: FunctionComponent = () => {
       title="Scale Workers"
       backUrl={listUrl}
       loading={loading || isUpdating}
-      renderContentOnMount={false}
+      renderContentOnMount={!!cluster}
       message={isUpdating ? 'Scaling cluster...' : 'Loading cluster...'}
     >
       <ScaleWorkers

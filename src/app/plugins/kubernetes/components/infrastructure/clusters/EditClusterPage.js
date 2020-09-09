@@ -73,7 +73,6 @@ const EditClusterPage = () => {
     <FormWrapper
       title={`Edit Cluster ${initialValues.name || ''}`}
       loading={loadingClusters || updating}
-      renderContentOnMount={false}
       message={updating ? 'Submitting form...' : 'Loading Cluster...'}
       backUrl={listUrl}
     >
