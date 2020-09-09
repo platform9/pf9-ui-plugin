@@ -358,12 +358,7 @@ class ListTable extends PureComponent {
     return data.filter((ele) => ele[target].match(new RegExp(searchTerm, 'i')) !== null)
   }
 
-  pluckDataIds = (rows) => {
-    const { uniqueIdentifier } = this.props
-    return rows.map((row) =>
-      uniqueIdentifier instanceof Function ? uniqueIdentifier(row) : row[uniqueIdentifier],
-    )
-  }
+  pluckDataIds = (rows) => rows.map(this.getRowId)
 
   isSelected = (row) => {
     const { selected } = this.state
@@ -454,7 +449,7 @@ class ListTable extends PureComponent {
         }
       : {}
 
-    const uid = uniqueIdentifier instanceof Function ? uniqueIdentifier(row) : row[uniqueIdentifier]
+    const uid = this.getRowId(row)
 
     return (
       <TableRow hover key={uid} {...checkboxProps}>
