@@ -32,14 +32,14 @@ const onErrorHandler = moize(
  */
 const useDataLoader = (loaderFn, params = emptyObj, options = emptyObj) => {
   const { loadOnDemand = false, defaultParams = emptyObj, loadingFeedback = true } = options
-  const { cacheKey, fetchErrorMessage, selectorCreator, indexBy } = loaderFn
+  const { cacheKey, fetchErrorMessage, selectorCreator, indexBy, noCache } = loaderFn
   const [{ currentTenant, currentRegion }] = useScopedPreferences()
 
   // Memoize the params dependency as we want to make sure it really changed and not just got a new reference
   const memoizedParams = memoizedDep(params)
-  const memoizedIndexedParams = memoizedDep(
-    pipe(pickAll(indexBy), reject(either(isNil, equals(allKey))))(memoizedParams),
-  )
+  const memoizedIndexedParams = noCache
+    ? memoizedParams
+    : memoizedDep(pipe(pickAll(indexBy), reject(either(isNil, equals(allKey))))(memoizedParams))
 
   const selector = useMemo(() => {
     return selectorCreator(defaultParams)
