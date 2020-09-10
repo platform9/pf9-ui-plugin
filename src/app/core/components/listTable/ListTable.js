@@ -1,11 +1,8 @@
 /* eslint-disable react/no-did-update-set-state */
 
-import React, { PureComponent } from 'react'
-import PropTypes from 'prop-types'
-import Checkbox from 'core/components/Checkbox'
 import {
-  Radio,
   Grid,
+  Radio,
   Table,
   TableBody,
   TableCell,
@@ -14,13 +11,21 @@ import {
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import { compose, ensureFunction, except } from 'app/utils/fp'
+import clsx from 'clsx'
+import { filterSpecPropType } from 'core/components/cardTable/CardTableToolbar'
+import Checkbox from 'core/components/Checkbox'
+import { listTableActionPropType } from 'core/components/listTable/ListTableBatchActions'
 import MoreMenu from 'core/components/MoreMenu'
+import Progress from 'core/components/progress/Progress'
+import moize from 'moize'
+import PropTypes from 'prop-types'
 import {
-  max,
   any,
   assoc,
   assocPath,
   equals,
+  includes,
+  max,
   pipe,
   pluck,
   prop,
@@ -28,17 +33,12 @@ import {
   propOr,
   uniq,
   update,
-  includes,
 } from 'ramda'
+import React, { PureComponent } from 'react'
+import { emptyArr, emptyObj, isNilOrEmpty, pathStr } from 'utils/fp'
+import NoContentMessage from '../NoContentMessage'
 import ListTableHead from './ListTableHead'
 import ListTableToolbar from './ListTableToolbar'
-import Progress from 'core/components/progress/Progress'
-import { filterSpecPropType } from 'core/components/cardTable/CardTableToolbar'
-import { isNilOrEmpty, emptyArr, pathStr, emptyObj } from 'utils/fp'
-import { listTableActionPropType } from 'core/components/listTable/ListTableBatchActions'
-import moize from 'moize'
-import clsx from 'clsx'
-import NoContentMessage from '../NoContentMessage'
 
 const styles = (theme) => ({
   root: {
@@ -102,11 +102,10 @@ class ListTable extends PureComponent {
   componentDidUpdate(prevProps) {
     const { data } = prevProps
     const { selected } = this.state
-    const ids = this.pluckDataIds(data)
+    const selectedIds = this.pluckDataIds(selected)
+    const existingSelectedRows = data.filter((row) => selectedIds.includes(this.getRowId(row)))
 
-    const existingSelectedRows = selected.filter((row) => ids.includes(this.getRowId(row)))
-
-    if (existingSelectedRows.length !== selected.length) {
+    if (!equals(existingSelectedRows, selected)) {
       this.setState({
         selected: existingSelectedRows,
       })
