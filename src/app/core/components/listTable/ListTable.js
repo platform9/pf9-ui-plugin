@@ -194,23 +194,26 @@ class ListTable extends PureComponent {
         }
         return
       }
-      const selectedIndex = selectedRows.indexOf(row)
-      let newSelected = []
+      const rowId = this.getRowId(row)
+      const selectedIndex = selectedRows.findIndex(
+        (selectedRow) => this.getRowId(selectedRow) === rowId,
+      )
+      const newSelected = []
 
       if (selectedIndex === -1) {
         // not found
-        newSelected = newSelected.concat(selectedRows, row)
+        newSelected.push(...selectedRows, row)
       } else if (selectedIndex === 0) {
         // first
-        newSelected = newSelected.concat(selectedRows.slice(1))
+        newSelected.push(...selectedRows.slice(1))
       } else if (selectedIndex === selectedRows.length - 1) {
         // last
-        newSelected = newSelected.concat(selectedRows.slice(0, -1))
+        newSelected.push(...selectedRows.slice(0, -1))
       } else if (selectedIndex > 0) {
         // somewhere inbetween
-        newSelected = newSelected.concat(
-          selectedRows.slice(0, selectedIndex),
-          selectedRows.slice(selectedIndex + 1),
+        newSelected.push(
+          ...selectedRows.slice(0, selectedIndex),
+          ...selectedRows.slice(selectedIndex + 1),
         )
       }
 
@@ -437,7 +440,7 @@ class ListTable extends PureComponent {
   }
 
   renderRow = (row) => {
-    const { multiSelection, showCheckboxes, uniqueIdentifier, classes } = this.props
+    const { multiSelection, showCheckboxes, classes } = this.props
     const isSelected = this.isSelected(row)
 
     const checkboxProps = showCheckboxes
