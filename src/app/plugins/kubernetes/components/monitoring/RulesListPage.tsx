@@ -2,7 +2,7 @@ import React from 'react'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import SeverityPicklist from 'k8s/components/alarms/SeverityPicklist'
 import useDataLoader from 'core/hooks/useDataLoader'
-import { loadAlerts, alertsCacheKey } from 'k8s/components/alarms/actions'
+import { loadAlertRules, alertRulesCacheKey } from 'k8s/components/monitoring/actions'
 import { createUsePrefParamsHook } from 'core/hooks/useParams'
 import { listTablePrefs } from 'app/constants'
 import { pick } from 'ramda'
@@ -15,7 +15,6 @@ const ClusterPicklist: any = ClusterPicklistDefault
 const defaultParams = {
   severity: allKey,
   clusterId: allKey,
-  showNeverActive: true,
   orderBy: 'name',
   orderDirection: 'asc',
 }
@@ -24,7 +23,7 @@ const usePrefParams = createUsePrefParamsHook('Rules', listTablePrefs)
 const ListPage = ({ ListContainer }) => {
   return () => {
     const { params, getParamsUpdater } = usePrefParams(defaultParams)
-    const [data, loading, reload] = useDataLoader(loadAlerts, params)
+    const [data, loading, reload] = useDataLoader(loadAlertRules, params)
     // Provide specific param properties to timeSeries data loader
     // so that it doesn't reload unless those props are changed
 
@@ -75,7 +74,7 @@ export const options = {
     { id: 'for', label: 'Duration' },
     { id: 'clusterName', label: 'Cluster' },
   ],
-  cacheKey: alertsCacheKey,
+  cacheKey: alertRulesCacheKey,
   name: 'Rules',
   title: 'Rules',
   showCheckboxes: false,

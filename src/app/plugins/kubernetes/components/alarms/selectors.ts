@@ -107,20 +107,6 @@ export const makeAlertsSelector = (
   )
 }
 
-// export const makeAlertRulesSelector = (
-//   defaultParams = {
-//     orderBy: 'name',
-//   },
-// ) => {
-//   return createSelector(
-//     [getDataSelector<DataKeys.AlertRules>(DataKeys.AlertRules), (_, params) => mergeLeft(params, defaultParams)],
-//     (items, params) => {
-//       const { orderBy } = params
-//       return pipe(createSorter({ orderBy }))(items)
-//     },
-//   )
-// }
-
 // TODO typings for params
 export const makeTimeSeriesSelector = (
   defaultParams = {
