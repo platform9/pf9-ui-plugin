@@ -100,14 +100,22 @@ class ListTable extends PureComponent {
   // In the future we may want to look into triggering this
   // only for a subset of above reasons.
   componentDidUpdate(prevProps) {
-    const { data } = this.props
-    if (prevProps.data.length === data.length
-      && equals(prevProps.data, data)
-    ) { return }
+    const { data } = prevProps
+    const { selected } = this.state
+    const ids = this.pluckDataIds(data)
 
-    this.setState({
-      selected: [],
-    })
+    const existingSelectedRows = selected.filter((row) => ids.includes(this.getRowId(row)))
+
+    if (existingSelectedRows.length !== selected.length) {
+      this.setState({
+        selected: existingSelectedRows,
+      })
+    }
+  }
+
+  getRowId = (row) => {
+    const { uniqueIdentifier } = this.props
+    return uniqueIdentifier instanceof Function ? uniqueIdentifier(row) : row[uniqueIdentifier]
   }
 
   handleRequestSort = (event, property) => {
@@ -350,10 +358,14 @@ class ListTable extends PureComponent {
     return data.filter((ele) => ele[target].match(new RegExp(searchTerm, 'i')) !== null)
   }
 
+  pluckDataIds = (rows) => rows.map(this.getRowId)
+
   isSelected = (row) => {
     const { selected } = this.state
     const { selectedRows = selected } = this.props
-    return includes(row, selectedRows)
+    const selectedIds = this.pluckDataIds(selectedRows)
+    const rowId = this.getRowId(row)
+    return selectedIds.includes(rowId)
   }
 
   paginate = (data) => {
@@ -437,7 +449,7 @@ class ListTable extends PureComponent {
         }
       : {}
 
-    const uid = uniqueIdentifier instanceof Function ? uniqueIdentifier(row) : row[uniqueIdentifier]
+    const uid = this.getRowId(row)
 
     return (
       <TableRow hover key={uid} {...checkboxProps}>
@@ -523,7 +535,7 @@ class ListTable extends PureComponent {
       blankFirstColumn,
       extraToolbarContent,
       multiSelection,
-      headless
+      headless,
     } = this.props
 
     if (!data) {
@@ -539,21 +551,23 @@ class ListTable extends PureComponent {
     const tableContent =
       paginatedData && paginatedData.length ? (
         <Table className={classes.table} size={size}>
-          {!headless && <ListTableHead
-            canDragColumns={canDragColumns}
-            columns={this.getSortedVisibleColumns()}
-            onColumnsSwitch={this.handleColumnsSwitch}
-            numSelected={selectedRows.length}
-            order={orderDirection}
-            orderBy={orderBy}
-            onSelectAllClick={this.handleSelectAllClick}
-            onRequestSort={this.handleRequestSort}
-            checked={selectedAll}
-            rowCount={filteredData.length}
-            showCheckboxes={showCheckboxes}
-            blankFirstColumn={blankFirstColumn}
-            multiSelection={multiSelection}
-          />}
+          {!headless && (
+            <ListTableHead
+              canDragColumns={canDragColumns}
+              columns={this.getSortedVisibleColumns()}
+              onColumnsSwitch={this.handleColumnsSwitch}
+              numSelected={selectedRows.length}
+              order={orderDirection}
+              orderBy={orderBy}
+              onSelectAllClick={this.handleSelectAllClick}
+              onRequestSort={this.handleRequestSort}
+              checked={selectedAll}
+              rowCount={filteredData.length}
+              showCheckboxes={showCheckboxes}
+              blankFirstColumn={blankFirstColumn}
+              multiSelection={multiSelection}
+            />
+          )}
           <TableBody>{paginatedData.map(this.renderRow)}</TableBody>
         </Table>
       ) : (
