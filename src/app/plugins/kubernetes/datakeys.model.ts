@@ -11,11 +11,11 @@ import {
   IGenericClusterizedResponse,
   GetClusterRolesItem,
   GetClusterClusterRoleBindingsItem,
-  GroupRule,
 } from 'api-client/qbert.model'
 import { IClusterAction } from './components/infrastructure/clusters/model'
 import { ClusterTag } from 'api-client/appbert.model'
 import { IAlert, IAlertOverTime } from './components/alarms/model'
+import { IAlertRule } from './components/monitoring/model'
 
 export interface GlobalState {
   cachedData: IDataKeys
@@ -54,8 +54,8 @@ export interface IDataKeys {
   StorageClasses: Array<IGenericResource<GetClusterClusterRoleBindingsItem>>
   Loggings: any // no model for this yet
   Alerts: IAlert[]
-  AlertRules: GroupRule[]
   AlertsTimeSeries: IAlertOverTime[]
+  AlertRules: IAlertRule[]
   ApiEndpoints: Array<IFace & { name: string }>
   Ssh: any // ? dont see where we load them
   ServiceCatalog: Array<IFace & { name: string }>
