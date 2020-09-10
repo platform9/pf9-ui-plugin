@@ -1016,6 +1016,10 @@ export interface GetPrometheusAlertsData {
   alerts: Alert[]
 }
 
+export interface GetPrometheusAlertsRules {
+  groups: Group[]
+}
+
 export interface Group {
   name: string
   file: string
