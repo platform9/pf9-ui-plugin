@@ -1,21 +1,22 @@
-import React, { useCallback } from 'react'
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@material-ui/core'
 import ApiClient from 'api-client/ApiClient'
-import useDataUpdater from 'core/hooks/useDataUpdater'
-import { clusterActions } from '../infrastructure/clusters/actions'
 import { onboardingMonitoringSetup } from 'app/constants'
-import { useToast } from 'core/providers/ToastProvider'
 import Alert from 'core/components/Alert'
-import { hasPrometheusEnabled } from './helpers'
+import Progress from 'core/components/progress/Progress'
+import useDataUpdater from 'core/hooks/useDataUpdater'
+import { useToast } from 'core/providers/ToastProvider'
+import { hasPrometheusTag } from 'k8s/components/infrastructure/clusters/helpers'
+import React, { useCallback } from 'react'
+import { clusterActions } from '../infrastructure/clusters/actions'
 
 const { appbert } = ApiClient.getInstance()
 
 const PrometheusAddonDialog = ({ rows: [cluster], onClose }) => {
-  const enabled = hasPrometheusEnabled(cluster)
+  const enabled = hasPrometheusTag(cluster)
   const showToast = useToast()
-  const [tagUpdater] = useDataUpdater(clusterActions.updateTag, (success) => {
+  const [tagUpdater, updatingTag] = useDataUpdater(clusterActions.updateTag, (success) => {
     if (success) {
-      onClose(success)
+      onClose()
     }
   })
 
@@ -47,22 +48,24 @@ const PrometheusAddonDialog = ({ rows: [cluster], onClose }) => {
   return (
     <Dialog open onClose={onClose}>
       <DialogTitle>Monitoring Add-On (Beta)</DialogTitle>
-      <DialogContent>
-        <p>
-          After enabling the monitoring add-on, you will be able to access Prometheus metrics and
-          Grafana dashboards for Kubernetes. In addition, users will be able to spin up their own
-          Prometheus instances for application monitoring.
-        </p>
-        <Alert small variant="warning" message="Monitoring is currently a Beta feature" />
-      </DialogContent>
-      <DialogActions>
-        <Button color="primary" type="submit" variant="contained" onClick={toggleMonitoring}>
-          {enabled ? 'Disable' : 'Enable'}
-        </Button>
-        <Button variant="contained" onClick={onClose}>
-          Cancel
-        </Button>
-      </DialogActions>
+      <Progress loading={updatingTag} minHeight={100} maxHeight={200}>
+        <DialogContent>
+          <p>
+            After enabling the monitoring add-on, you will be able to access Prometheus metrics and
+            Grafana dashboards for Kubernetes. In addition, users will be able to spin up their own
+            Prometheus instances for application monitoring.
+          </p>
+          <Alert small variant="warning" message="Monitoring is currently a Beta feature" />
+        </DialogContent>
+        <DialogActions>
+          <Button color="primary" type="submit" variant="contained" onClick={toggleMonitoring}>
+            {enabled ? 'Disable' : 'Enable'}
+          </Button>
+          <Button variant="contained" onClick={onClose}>
+            Cancel
+          </Button>
+        </DialogActions>
+      </Progress>
     </Dialog>
   )
 }
