@@ -1,4 +1,4 @@
-import { propOr, map, pipe, mergeLeft, equals } from 'ramda'
+import { propOr, map, pipe, mergeLeft } from 'ramda'
 import { keyValueArrToObj } from 'utils/fp'
 import { pathJoin } from 'utils/misc'
 import { normalizeResponse } from 'api-client/helpers'
@@ -1152,21 +1152,11 @@ class Qbert extends ApiService {
         mthdName: 'getPrometheusAlerts',
       },
     })
-    const alertRules = await this.getPrometheusAlertRules(clusterUuid)
-    return response.alerts.map((alert) => {
-      const rule = alertRules.find((ruleAlert) => {
-        return (
-          equals(ruleAlert.name, alert.labels.alertname) &&
-          equals(ruleAlert.labels.severity, alert.labels.severity)
-        )
-      })
-      return {
-        ...alert,
-        clusterId: clusterUuid,
-        id: `${alert.labels.alertname}${clusterUuid}${alert.labels.exported_namespace}${alert.labels.severity}`,
-        query: rule.query,
-      }
-    })
+    return response.alerts.map((alert) => ({
+      ...alert,
+      clusterId: clusterUuid,
+      id: `${alert.labels.alertname}${clusterUuid}${alert.activeAt}`,
+    }))
   }
 
   getPrometheusAlertRules = async (clusterUuid) => {
