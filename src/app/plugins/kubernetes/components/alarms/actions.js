@@ -18,6 +18,7 @@ import store from 'app/store'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { prometheusInstanceActions, prometheusRuleActions } from '../prometheus/actions'
 import { prometheusRuleSelector } from '../prometheus/selectors'
+import { loadAlertRules } from '../monitoring/actions'
 
 const { qbert } = ApiClient.getInstance()
 
@@ -28,15 +29,13 @@ export const loadAlerts = createContextLoader(
   ActionDataKeys.Alerts,
   async (params) => {
     const [clusterId, clusters] = await parseClusterParams(params)
-    await Promise.all([prometheusRuleActions.list(), clusterActions.list()])
+    await Promise.all([prometheusRuleActions.list(), clusterActions.list(), loadAlertRules(params)])
 
     if (clusterId === allKey) {
       const clusterUuids = pluck('uuid', clusters)
-      await someAsync(clusterUuids.map(loadAlertRules)).then(flatten)
       return someAsync(clusterUuids.map(qbert.getPrometheusAlerts)).then(flatten)
     }
 
-    await loadAlertRules(clusterId)
     return qbert.getPrometheusAlerts(clusterId)
   },
   {
@@ -47,10 +46,6 @@ export const loadAlerts = createContextLoader(
     selectorCreator: makeAlertsSelector,
   },
 )
-
-const loadAlertRules = createContextLoader(ActionDataKeys.AlertRules, async (clusterId) => {
-  return qbert.getPrometheusAlertRules(clusterId)
-})
 
 // Used to calculate the timestamps on the chart
 // Each period (represented by key name) is split into
