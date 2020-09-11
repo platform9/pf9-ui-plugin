@@ -1156,11 +1156,7 @@ class Qbert extends ApiService {
     return response.alerts.map((alert) => ({
       ...alert,
       clusterId: clusterUuid,
-<<<<<<< HEAD
       id: uuid.v4(),
-=======
-      id: `${alert.labels.alertname}${clusterUuid}${alert.activeAt}`,
->>>>>>> cc1ddddf9691a3fd6cf47f3c409543a19506da0b
     }))
   }
 
