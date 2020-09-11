@@ -7,7 +7,7 @@ import DataKeys from 'k8s/DataKeys'
 import getDataSelector from 'core/utils/getDataSelector'
 import createSorter from 'core/helpers/createSorter'
 import { clustersSelector } from 'k8s/components/infrastructure/clusters/selectors'
-import { IPodSelector, IServicesSelector } from './model'
+import { IDeploymentSelector, IPodSelector, IServicesSelector } from './model'
 import { IDataKeys } from 'k8s/datakeys.model'
 import { FluffySelector, MatchLabelsClass } from 'api-client/qbert.model'
 
@@ -43,7 +43,7 @@ export const podsSelector = createSelector(
   },
 )
 
-export const makeParamsPodsSelector = (defaultParams = {}) => {
+export const makePodsSelector = (defaultParams = {}) => {
   return createSelector(
     [podsSelector, (_, params) => mergeLeft(params, defaultParams)],
     (pods, params) => {
@@ -102,15 +102,15 @@ export const deploymentsSelector = createSelector(
   },
 )
 
-export const makeParamsDeploymentsSelector = (defaultParams = {}) => {
+export const makeDeploymentsSelector = (defaultParams = {}) => {
   return createSelector(
-    [podsSelector, (_, params) => mergeLeft(params, defaultParams)],
-    (pods, params) => {
+    [deploymentsSelector, (_, params) => mergeLeft(params, defaultParams)],
+    (deployments, params) => {
       const { namespace, orderBy, orderDirection } = params
-      return pipe<IPodSelector[], IPodSelector[], IPodSelector[]>(
+      return pipe<IDeploymentSelector[], IDeploymentSelector[], IDeploymentSelector[]>(
         filterIf(namespace && namespace !== allKey, propEq('namespace', namespace)),
         createSorter({ orderBy, orderDirection }),
-      )(pods)
+      )(deployments)
     },
   )
 }

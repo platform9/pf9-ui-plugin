@@ -1,11 +1,8 @@
 /* eslint-disable react/no-did-update-set-state */
 
-import React, { PureComponent } from 'react'
-import PropTypes from 'prop-types'
-import Checkbox from 'core/components/Checkbox'
 import {
-  Radio,
   Grid,
+  Radio,
   Table,
   TableBody,
   TableCell,
@@ -14,13 +11,21 @@ import {
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import { compose, ensureFunction, except } from 'app/utils/fp'
+import clsx from 'clsx'
+import { filterSpecPropType } from 'core/components/cardTable/CardTableToolbar'
+import Checkbox from 'core/components/Checkbox'
+import { listTableActionPropType } from 'core/components/listTable/ListTableBatchActions'
 import MoreMenu from 'core/components/MoreMenu'
+import Progress from 'core/components/progress/Progress'
+import moize from 'moize'
+import PropTypes from 'prop-types'
 import {
-  max,
   any,
   assoc,
   assocPath,
   equals,
+  includes,
+  max,
   pipe,
   pluck,
   prop,
@@ -28,17 +33,12 @@ import {
   propOr,
   uniq,
   update,
-  includes,
 } from 'ramda'
+import React, { PureComponent } from 'react'
+import { emptyArr, emptyObj, isNilOrEmpty, pathStr } from 'utils/fp'
+import NoContentMessage from '../NoContentMessage'
 import ListTableHead from './ListTableHead'
 import ListTableToolbar from './ListTableToolbar'
-import Progress from 'core/components/progress/Progress'
-import { filterSpecPropType } from 'core/components/cardTable/CardTableToolbar'
-import { isNilOrEmpty, emptyArr, pathStr, emptyObj } from 'utils/fp'
-import { listTableActionPropType } from 'core/components/listTable/ListTableBatchActions'
-import moize from 'moize'
-import clsx from 'clsx'
-import NoContentMessage from '../NoContentMessage'
 
 const styles = (theme) => ({
   root: {
@@ -100,14 +100,21 @@ class ListTable extends PureComponent {
   // In the future we may want to look into triggering this
   // only for a subset of above reasons.
   componentDidUpdate(prevProps) {
-    const { data } = this.props
-    if (prevProps.data.length === data.length
-      && equals(prevProps.data, data)
-    ) { return }
+    const { data } = prevProps
+    const { selected } = this.state
+    const selectedIds = this.pluckDataIds(selected)
+    const existingSelectedRows = data.filter((row) => selectedIds.includes(this.getRowId(row)))
 
-    this.setState({
-      selected: [],
-    })
+    if (!equals(existingSelectedRows, selected)) {
+      this.setState({
+        selected: existingSelectedRows,
+      })
+    }
+  }
+
+  getRowId = (row) => {
+    const { uniqueIdentifier } = this.props
+    return uniqueIdentifier instanceof Function ? uniqueIdentifier(row) : row[uniqueIdentifier]
   }
 
   handleRequestSort = (event, property) => {
@@ -186,23 +193,26 @@ class ListTable extends PureComponent {
         }
         return
       }
-      const selectedIndex = selectedRows.indexOf(row)
-      let newSelected = []
+      const rowId = this.getRowId(row)
+      const selectedIndex = selectedRows.findIndex(
+        (selectedRow) => this.getRowId(selectedRow) === rowId,
+      )
+      const newSelected = []
 
       if (selectedIndex === -1) {
         // not found
-        newSelected = newSelected.concat(selectedRows, row)
+        newSelected.push(...selectedRows, row)
       } else if (selectedIndex === 0) {
         // first
-        newSelected = newSelected.concat(selectedRows.slice(1))
+        newSelected.push(...selectedRows.slice(1))
       } else if (selectedIndex === selectedRows.length - 1) {
         // last
-        newSelected = newSelected.concat(selectedRows.slice(0, -1))
+        newSelected.push(...selectedRows.slice(0, -1))
       } else if (selectedIndex > 0) {
         // somewhere inbetween
-        newSelected = newSelected.concat(
-          selectedRows.slice(0, selectedIndex),
-          selectedRows.slice(selectedIndex + 1),
+        newSelected.push(
+          ...selectedRows.slice(0, selectedIndex),
+          ...selectedRows.slice(selectedIndex + 1),
         )
       }
 
@@ -350,10 +360,14 @@ class ListTable extends PureComponent {
     return data.filter((ele) => ele[target].match(new RegExp(searchTerm, 'i')) !== null)
   }
 
+  pluckDataIds = (rows) => rows.map(this.getRowId)
+
   isSelected = (row) => {
     const { selected } = this.state
     const { selectedRows = selected } = this.props
-    return includes(row, selectedRows)
+    const selectedIds = this.pluckDataIds(selectedRows)
+    const rowId = this.getRowId(row)
+    return selectedIds.includes(rowId)
   }
 
   paginate = (data) => {
@@ -425,7 +439,7 @@ class ListTable extends PureComponent {
   }
 
   renderRow = (row) => {
-    const { multiSelection, showCheckboxes, uniqueIdentifier, classes } = this.props
+    const { multiSelection, showCheckboxes, classes } = this.props
     const isSelected = this.isSelected(row)
 
     const checkboxProps = showCheckboxes
@@ -437,7 +451,7 @@ class ListTable extends PureComponent {
         }
       : {}
 
-    const uid = uniqueIdentifier instanceof Function ? uniqueIdentifier(row) : row[uniqueIdentifier]
+    const uid = this.getRowId(row)
 
     return (
       <TableRow hover key={uid} {...checkboxProps}>
@@ -523,7 +537,7 @@ class ListTable extends PureComponent {
       blankFirstColumn,
       extraToolbarContent,
       multiSelection,
-      headless
+      headless,
     } = this.props
 
     if (!data) {
@@ -539,21 +553,23 @@ class ListTable extends PureComponent {
     const tableContent =
       paginatedData && paginatedData.length ? (
         <Table className={classes.table} size={size}>
-          {!headless && <ListTableHead
-            canDragColumns={canDragColumns}
-            columns={this.getSortedVisibleColumns()}
-            onColumnsSwitch={this.handleColumnsSwitch}
-            numSelected={selectedRows.length}
-            order={orderDirection}
-            orderBy={orderBy}
-            onSelectAllClick={this.handleSelectAllClick}
-            onRequestSort={this.handleRequestSort}
-            checked={selectedAll}
-            rowCount={filteredData.length}
-            showCheckboxes={showCheckboxes}
-            blankFirstColumn={blankFirstColumn}
-            multiSelection={multiSelection}
-          />}
+          {!headless && (
+            <ListTableHead
+              canDragColumns={canDragColumns}
+              columns={this.getSortedVisibleColumns()}
+              onColumnsSwitch={this.handleColumnsSwitch}
+              numSelected={selectedRows.length}
+              order={orderDirection}
+              orderBy={orderBy}
+              onSelectAllClick={this.handleSelectAllClick}
+              onRequestSort={this.handleRequestSort}
+              checked={selectedAll}
+              rowCount={filteredData.length}
+              showCheckboxes={showCheckboxes}
+              blankFirstColumn={blankFirstColumn}
+              multiSelection={multiSelection}
+            />
+          )}
           <TableBody>{paginatedData.map(this.renderRow)}</TableBody>
         </Table>
       ) : (

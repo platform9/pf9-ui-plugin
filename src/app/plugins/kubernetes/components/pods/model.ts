@@ -1,11 +1,13 @@
 import {
+  FluffySelector,
+  GetClusterDeploymentsItem,
+  GetClusterKubeServicesItem,
   GetClusterPodsItem,
   IGenericResource,
-  PurpleLabels,
-  FluffySelector,
-  SpecType,
+  MatchLabelsClass,
   NamespaceEnum,
-  GetClusterKubeServicesItem,
+  PurpleLabels,
+  SpecType,
 } from 'api-client/qbert.model'
 
 export interface IPodSelector extends IGenericResource<GetClusterPodsItem> {
@@ -13,8 +15,18 @@ export interface IPodSelector extends IGenericResource<GetClusterPodsItem> {
   id: string
   name: string
   namespace: string
-  // labels: string
   clusterName: string
+}
+
+export interface IDeploymentSelector extends IGenericResource<GetClusterDeploymentsItem> {
+  dashboardUrl: string
+  id: string
+  name: string
+  namespace: string
+  clusterName: string
+  created: string
+  selectors: MatchLabelsClass
+  pods: number
 }
 
 export interface IServicesSelector

@@ -39,6 +39,7 @@ const Picklist = React.forwardRef((props, ref) => {
     onChange,
     loading,
     formField,
+    inline,
     multiple = false,
     ...restProps
   } = props
@@ -89,7 +90,7 @@ const Picklist = React.forwardRef((props, ref) => {
   // If loading is different than true, it means we are not performing any async
   // operation to load the options, hence we can render the contents on mount
   return (
-    <Progress inline overlay loading={loading} renderContentOnMount={loading !== true}>
+    <Progress inline={inline} overlay loading={loading} renderContentOnMount={loading !== true}>
       <TextField
         {...restProps}
         ref={ref}
@@ -142,7 +143,7 @@ Picklist.defaultProps = {
   value: '',
   variant: 'outlined',
   multiple: false,
-  inline: false,
+  inline: true,
 }
 
 export default Picklist

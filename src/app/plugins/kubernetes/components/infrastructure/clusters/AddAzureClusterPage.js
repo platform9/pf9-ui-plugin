@@ -36,6 +36,8 @@ import Alert from 'core/components/Alert'
 import { trackEvent } from 'utils/tracking'
 import { customValidator } from 'core/utils/fieldValidators'
 import { isKeyValid } from 'ssh-pub-key-validation'
+import { loadCloudProviderRegionDetails } from 'k8s/components/infrastructure/cloudProviders/actions'
+import { pathStrOr } from 'utils/fp'
 
 const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 
@@ -227,6 +229,13 @@ const AddAzureClusterPage = () => {
   const hasAzureProvider = !!cloudProviders.some(
     (provider) => provider.type === CloudProviders.Azure,
   )
+
+  const [details] = useDataLoader(loadCloudProviderRegionDetails, {
+    cloudProviderId: params.cloudProviderId,
+    cloudProviderRegionId: params.cloudProviderRegionId,
+  })
+  const virtualNetworks = pathStrOr([], '0.virtualNetworks', details)
+
   return (
     <FormWrapper
       title="Add Azure Cluster"
@@ -436,7 +445,7 @@ const AddAzureClusterPage = () => {
                         required
                       />
 
-                      {values.network === 'existing' && (
+                      {values.network === 'existing' && virtualNetworks.length > 0 && (
                         <>
                           {/* Resource group */}
                           <PicklistField
@@ -490,6 +499,14 @@ const AddAzureClusterPage = () => {
                             required
                           />
                         </>
+                      )}
+
+                      {values.network === 'existing' && virtualNetworks.length == 0 && (
+                        <Alert
+                          small
+                          variant="error"
+                          message={`No existing virtual networks in location ${params.cloudProviderRegionId}.`}
+                        />
                       )}
 
                       {/* API FQDN */}

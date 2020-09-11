@@ -1,16 +1,6 @@
 import { createSelector } from 'reselect'
-import {
-  compose,
-  either,
-  mergeLeft,
-  partition,
-  path,
-  pathOr,
-  pipe,
-  pluck,
-  propSatisfies,
-} from 'ramda'
-import { filterIf, isTruthy } from 'utils/fp'
+import { either, mergeLeft, partition, pathOr, pipe, pluck } from 'ramda'
+import { filterIf } from 'utils/fp'
 import createSorter, { SortConfig } from 'core/helpers/createSorter'
 import calcUsageTotalByPath from 'k8s/util/calcUsageTotals'
 import {
@@ -23,22 +13,19 @@ import { castFuzzyBool } from 'utils/misc'
 import DataKeys from 'k8s/DataKeys'
 import getDataSelector from 'core/utils/getDataSelector'
 import { IClusterSelector } from './model'
-import { Node } from 'api-client/qbert.model'
 import { clientStoreKey } from 'core/client/clientReducers'
-import { getK8sDashboardLinkFromVersion } from 'k8s/components/infrastructure/clusters/helpers'
+import {
+  getK8sDashboardLinkFromVersion,
+  hasAppCatalogEnabled,
+  hasHealthyMasterNodes,
+  hasMasterNode,
+  hasPrometheusTag,
+  masterlessCluster,
+} from 'k8s/components/infrastructure/clusters/helpers'
 import { nodesSelector } from 'k8s/components/infrastructure/nodes/selectors'
 import { combinedHostsSelector } from 'k8s/components/infrastructure/common/selectors'
 import { hasPrometheusEnabled } from 'k8s/components/prometheus/helpers'
 import { INodesSelector } from 'k8s/components/infrastructure/nodes/model'
-
-export const hasMasterNode = propSatisfies(isTruthy, 'hasMasterNode')
-export const hasHealthyMasterNodes = propSatisfies(
-  (healthyMasterNodes: Node[] = []) => healthyMasterNodes.length > 0,
-  'healthyMasterNodes',
-)
-export const masterlessCluster = propSatisfies(isTruthy, 'masterless')
-export const hasPrometheusTag = compose(castFuzzyBool, path(['tags', 'pf9-system:monitoring']))
-export const hasAppCatalogEnabled = propSatisfies(isTruthy, 'appCatalogEnabled')
 
 export const clustersSelector = createSelector(
   [
@@ -48,7 +35,13 @@ export const clustersSelector = createSelector(
     combinedHostsSelector,
     (state) => pathOr('', [clientStoreKey, 'endpoints', 'qbert'])(state),
   ],
-  (rawClusters, clustersWithTasks, nodes: INodesSelector[], combinedHosts, qbertEndpoint: string) => {
+  (
+    rawClusters,
+    clustersWithTasks,
+    nodes: INodesSelector[],
+    combinedHosts,
+    qbertEndpoint: string,
+  ) => {
     return rawClusters.map((cluster) => {
       const clusterWithTasks = clustersWithTasks.find(({ uuid }) => cluster.uuid === uuid)
       const nodesInCluster = nodes.filter((node) => node.clusterUuid === cluster.uuid)

@@ -137,7 +137,8 @@ class Progress extends PureComponent {
     }
     return (
       <div
-        className={clsx(classes.content, {
+        className={clsx(classes.content, 'progressContent', {
+          loading,
           [classes.hiddenContent]: loading && !overlay,
           [classes.contentLoading]: loading,
         })}
@@ -181,7 +182,7 @@ Progress.defaultProps = {
   loading: false,
   overlay: true,
   inline: false,
-  renderContentOnMount: false,
+  renderContentOnMount: true,
   renderLoadingImage: true,
   message: 'Loading...',
   minHeight: 400,
