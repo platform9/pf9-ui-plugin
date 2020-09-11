@@ -1,4 +1,4 @@
-import { propOr, map, pipe, mergeLeft, equals } from 'ramda'
+import { propOr, map, pipe, mergeLeft } from 'ramda'
 import { keyValueArrToObj } from 'utils/fp'
 import { pathJoin } from 'utils/misc'
 import { normalizeResponse } from 'api-client/helpers'
@@ -26,7 +26,7 @@ import {
   GetClusterRolesItem,
   IGenericClusterizedResponse,
   IGetPrometheusAlertsOverTime,
-  GetPrometheusAlertsRules,
+  GetPrometheusAlertRules,
 } from './qbert.model'
 import DataKeys from 'k8s/DataKeys'
 

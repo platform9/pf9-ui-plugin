@@ -1016,7 +1016,7 @@ export interface GetPrometheusAlertsData {
   alerts: Alert[]
 }
 
-export interface GetPrometheusAlertsRules {
+export interface GetPrometheusAlertRules {
   groups: Group[]
 }
 
