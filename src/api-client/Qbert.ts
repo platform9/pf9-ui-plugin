@@ -29,6 +29,7 @@ import {
   GetPrometheusAlertRules,
 } from './qbert.model'
 import DataKeys from 'k8s/DataKeys'
+import uuid from 'uuid'
 
 // TODO: Fix these typings
 const normalizeClusterizedResponse = <T>(
@@ -1155,7 +1156,7 @@ class Qbert extends ApiService {
     return response.alerts.map((alert) => ({
       ...alert,
       clusterId: clusterUuid,
-      id: `${alert.labels.alertname}${clusterUuid}${alert.activeAt}`,
+      id: uuid.v4(),
     }))
   }
 
