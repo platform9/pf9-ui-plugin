@@ -5,15 +5,19 @@ import {
   alertsSelector,
   makeAlertsSelector,
   makeTimeSeriesSelector,
+  makeAlertRulesSelector,
 } from 'k8s/components/alarms/selectors'
 import { makeParamsClustersSelector } from 'k8s/components/infrastructure/clusters/selectors'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import moment from 'moment'
 import { flatten, pluck } from 'ramda'
 import { someAsync } from 'utils/async'
-import { parseClusterParams } from '../infrastructure/clusters/actions'
+import { parseClusterParams, clusterActions } from '../infrastructure/clusters/actions'
 
 import store from 'app/store'
+import useDataLoader from 'core/hooks/useDataLoader'
+import { prometheusInstanceActions, prometheusRuleActions } from '../prometheus/actions'
+import { prometheusRuleSelector } from '../prometheus/selectors'
 
 const { qbert } = ApiClient.getInstance()
 
@@ -24,9 +28,15 @@ export const loadAlerts = createContextLoader(
   ActionDataKeys.Alerts,
   async (params) => {
     const [clusterId, clusters] = await parseClusterParams(params)
+    await Promise.all([prometheusRuleActions.list(), clusterActions.list()])
+
     if (clusterId === allKey) {
-      return someAsync(pluck('uuid', clusters).map(qbert.getPrometheusAlerts)).then(flatten)
+      const clusterUuids = pluck('uuid', clusters)
+      await someAsync(clusterUuids.map(loadAlertRules)).then(flatten)
+      return someAsync(clusterUuids.map(qbert.getPrometheusAlerts)).then(flatten)
     }
+
+    await loadAlertRules(clusterId)
     return qbert.getPrometheusAlerts(clusterId)
   },
   {
@@ -37,6 +47,10 @@ export const loadAlerts = createContextLoader(
     selectorCreator: makeAlertsSelector,
   },
 )
+
+const loadAlertRules = createContextLoader(ActionDataKeys.AlertRules, async (clusterId) => {
+  return qbert.getPrometheusAlertRules(clusterId)
+})
 
 // Used to calculate the timestamps on the chart
 // Each period (represented by key name) is split into

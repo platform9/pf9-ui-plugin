@@ -1,4 +1,4 @@
-import { propOr, map, pipe, mergeLeft, equals } from 'ramda'
+import { propOr, map, pipe, mergeLeft } from 'ramda'
 import { keyValueArrToObj } from 'utils/fp'
 import { pathJoin } from 'utils/misc'
 import { normalizeResponse } from 'api-client/helpers'
@@ -26,7 +26,7 @@ import {
   GetClusterRolesItem,
   IGenericClusterizedResponse,
   IGetPrometheusAlertsOverTime,
-  GetPrometheusAlertsRules,
+  GetPrometheusAlertRules,
 } from './qbert.model'
 import DataKeys from 'k8s/DataKeys'
 
@@ -1152,38 +1152,28 @@ class Qbert extends ApiService {
         mthdName: 'getPrometheusAlerts',
       },
     })
-    const alertsFromRules = await this.getPrometheusAlertsFromRules(clusterUuid)
-    return response.alerts.map((alert) => {
-      const rule = alertsFromRules.find((ruleAlert) => {
-        return (
-          equals(ruleAlert.name, alert.labels.alertname) &&
-          equals(ruleAlert.labels.severity, alert.labels.severity)
-        )
-      })
-      return {
-        ...alert,
-        clusterId: clusterUuid,
-        id: `${alert.labels.alertname}${clusterUuid}${alert.labels.exported_namespace}${alert.labels.severity}`,
-        query: rule.query,
-      }
-    })
+    return response.alerts.map((alert) => ({
+      ...alert,
+      clusterId: clusterUuid,
+      id: `${alert.labels.alertname}${clusterUuid}${alert.activeAt}`,
+    }))
   }
 
-  getPrometheusAlertsFromRules = async (clusterUuid) => {
+  getPrometheusAlertRules = async (clusterUuid) => {
     const url = `/clusters/${clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/rules`
-    const response = await this.client.basicGet<GetPrometheusAlertsRules>({
+    const response = await this.client.basicGet<GetPrometheusAlertRules>({
       url,
       options: {
         clsName: this.getClassName(),
-        mthdName: 'getPrometheusAlerts',
+        mthdName: 'getPrometheusAlertRules',
       },
     })
-    const alerts = response.groups
+    const alertRules = response.groups
       .flatMap((group) => {
         return group.rules
       })
       .filter((rule) => rule.type === 'alerting')
-    return alerts
+    return alertRules
   }
 
   getPrometheusAlertsOverTime = async (

@@ -37,11 +37,12 @@ const timestampSteps = {
 export const alertsSelector = createSelector(
   [
     getDataSelector(DataKeys.Alerts, ['clusterId']),
+    getDataSelector(DataKeys.AlertRules),
     clustersSelector,
     prometheusRuleSelector,
     pathOr('', [clientStoreKey, 'endpoints', 'qbert']),
   ],
-  (rawAlerts, clusters, prometheusRules, qbertEndpoint) => {
+  (rawAlerts, rawAlertRules, clusters, prometheusRules, qbertEndpoint) => {
     const grafanaUrlBuilder = getGrafanaUrl(getQbertUrl(qbertEndpoint))
     // Need to dig into the coreos prometheus rules to fetch the 'for' property
     const flattenedRules = flatten(
@@ -56,26 +57,36 @@ export const alertsSelector = createSelector(
         ),
       ),
     )
-    return rawAlerts.map((alert) => ({
-      ...alert,
-      name: alert?.labels.alertname, // pathStr('labels.alertname', alert)
-      severity: alert?.labels?.severity, // pathStr('labels.severity', alert)
-      summary: alert?.annotations?.message, // pathStr('annotations.message', alert),
-      status: alert?.state === 'firing' ? 'Active' : 'Closed',
-      exportedNamespace: alert?.labels?.exported_namespace,
-      clusterName: pipe(
-        find<IClusterAction>(propEq('uuid', alert.clusterId)),
-        prop('name'),
-      )(clusters),
-      for: flattenedRules.find((rule) => {
+    return rawAlerts.map((alert) => {
+      const alertRule = rawAlertRules.find((rule) => {
         return (
-          equals(rule.alert, pathStr('labels.alertname', alert)) &&
-          equals(pathStr('labels.severity', rule), pathStr('labels.severity', alert)) &&
-          equals(rule.clusterUuid, alert.clusterId)
+          equals(rule.name, alert.labels.alertname) &&
+          equals(rule.labels.severity, alert.labels.severity)
         )
-      }),
-      grafanaLink: grafanaUrlBuilder(alert),
-    }))
+      })
+      return {
+        ...alert,
+        name: alert?.labels.alertname, // pathStr('labels.alertname', alert)
+        severity: alert?.labels?.severity, // pathStr('labels.severity', alert)
+        summary: alert?.annotations?.summary, // pathStr('annotations.message', alert),
+        description: alert?.annotations?.message,
+        status: alert?.state === 'firing' ? 'Active' : 'Closed',
+        exportedNamespace: alert?.labels?.exported_namespace,
+        query: alertRule?.query,
+        clusterName: pipe(
+          find<IClusterAction>(propEq('uuid', alert.clusterId)),
+          prop('name'),
+        )(clusters),
+        for: flattenedRules.find((rule) => {
+          return (
+            equals(rule.alert, pathStr('labels.alertname', alert)) &&
+            equals(pathStr('labels.severity', rule), pathStr('labels.severity', alert)) &&
+            equals(rule.clusterUuid, alert.clusterId)
+          )
+        }).for,
+        grafanaLink: grafanaUrlBuilder(alert),
+      }
+    })
   },
 )
 export const makeAlertsSelector = (
@@ -95,6 +106,20 @@ export const makeAlertsSelector = (
     },
   )
 }
+
+// export const makeAlertRulesSelector = (
+//   defaultParams = {
+//     orderBy: 'name',
+//   },
+// ) => {
+//   return createSelector(
+//     [getDataSelector<DataKeys.AlertRules>(DataKeys.AlertRules), (_, params) => mergeLeft(params, defaultParams)],
+//     (items, params) => {
+//       const { orderBy } = params
+//       return pipe(createSorter({ orderBy }))(items)
+//     },
+//   )
+// }
 
 // TODO typings for params
 export const makeTimeSeriesSelector = (

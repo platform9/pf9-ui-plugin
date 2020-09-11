@@ -7,6 +7,7 @@ export interface IAlertSelector extends IAlert {
   status: string
   clusterName: string
   grafanaLink: string
+  query: any
 }
 
 export interface IAlertOverTimeSelector extends ISeverityCount {
