@@ -1,13 +1,15 @@
-import { GroupRule, IGetPrometheusAlertsOverTime } from 'api-client/qbert.model'
+import { GroupRule, IGetPrometheusAlertsOverTime, AlertManagerAlert } from 'api-client/qbert.model'
 
-export interface IAlertSelector extends IAlert {
-  severity: any
-  summary: any
-  activeAt: unknown
+export interface IAlertSelector extends Omit<AlertManagerAlert, 'status'> {
+  name: string
+  severity: string
+  summary: string
   status: string
+  exportedNamespace: string
+  query: string
   clusterName: string
+  for: string
   grafanaLink: string
-  query: any
 }
 
 export interface IAlertOverTimeSelector extends ISeverityCount {

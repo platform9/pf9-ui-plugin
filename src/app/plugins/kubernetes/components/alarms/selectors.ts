@@ -4,19 +4,21 @@ import { filterIf, pathStr } from 'utils/fp'
 import moment from 'moment'
 import { clustersSelector } from 'k8s/components/infrastructure/clusters/selectors'
 import DataKeys from 'k8s/DataKeys'
-import { IAlert, IAlertOverTime, IAlertSelector, ISeverityCount } from './model'
+import { IAlertOverTime, IAlertSelector, ISeverityCount } from './model'
 import { IClusterAction } from '../infrastructure/clusters/model'
 import { clientStoreKey } from 'core/client/clientReducers'
 import getDataSelector from 'core/utils/getDataSelector'
 import createSorter from 'core/helpers/createSorter'
 import { prometheusRuleSelector } from 'k8s/components/prometheus/selectors'
+import { AlertManagerAlert } from 'api-client/qbert.model'
+import { capitalizeString } from 'utils/misc'
 
 const getQbertUrl = (qbertEndpoint) => {
   // Trim the uri after "/qbert" from the qbert endpoint
   return `${qbertEndpoint.match(/(.*?)\/qbert/)[1]}/k8s/v1/clusters/`
 }
 
-const getGrafanaUrl = (baseUrl: string) => ({ clusterId }: IAlert) =>
+const getGrafanaUrl = (baseUrl: string) => ({ clusterId }: AlertManagerAlert) =>
   `${baseUrl}${clusterId}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:grafana-ui:80/proxy/`
 
 // Used to calculate the timestamps on the chart
@@ -34,6 +36,7 @@ const timestampSteps = {
 
 // TODO replace IDataKeys with an actual whole store state model
 // TODO replace IClusterAction typings with cluster selector return types.
+
 export const alertsSelector = createSelector(
   [
     getDataSelector(DataKeys.Alerts, ['clusterId']),
@@ -68,9 +71,8 @@ export const alertsSelector = createSelector(
         ...alert,
         name: alert?.labels.alertname, // pathStr('labels.alertname', alert)
         severity: alert?.labels?.severity, // pathStr('labels.severity', alert)
-        summary: alert?.annotations?.summary, // pathStr('annotations.message', alert),
-        description: alert?.annotations?.message,
-        status: alert?.state === 'firing' ? 'Active' : 'Closed',
+        summary: alert?.annotations?.message, // pathStr('annotations.message', alert),
+        status: capitalizeString(alert?.status?.state || 'N/A'),
         exportedNamespace: alert?.labels?.exported_namespace,
         query: alertRule?.query,
         clusterName: pipe(
