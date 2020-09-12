@@ -1013,6 +1013,10 @@ export interface GetPrometheusAlerts {
 }
 
 export interface GetPrometheusAlertsData {
+  alerts: Alert[]
+}
+
+export interface GetPrometheusAlertRules {
   groups: Group[]
 }
 
@@ -1059,6 +1063,8 @@ export enum RoleStatus {
 }
 
 export interface RuleLabels {
+  exported_namespace: any
+  alertname?: string
   severity?: Severity
   workload_type?: string
 }

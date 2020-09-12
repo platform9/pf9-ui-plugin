@@ -26,8 +26,10 @@ import {
   GetClusterRolesItem,
   IGenericClusterizedResponse,
   IGetPrometheusAlertsOverTime,
+  GetPrometheusAlertRules,
 } from './qbert.model'
 import DataKeys from 'k8s/DataKeys'
+import uuid from 'uuid'
 
 // TODO: Fix these typings
 const normalizeClusterizedResponse = <T>(
@@ -1143,7 +1145,7 @@ class Qbert extends ApiService {
   }
 
   getPrometheusAlerts = async (clusterUuid) => {
-    const url = `/clusters/${clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/rules`
+    const url = `/clusters/${clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/alerts`
     const response = await this.client.basicGet<GetPrometheusAlerts>({
       url,
       options: {
@@ -1151,16 +1153,33 @@ class Qbert extends ApiService {
         mthdName: 'getPrometheusAlerts',
       },
     })
-    const alerts = response.groups
+    return response.alerts.map((alert) => ({
+      ...alert,
+      clusterId: clusterUuid,
+      id: uuid.v4(),
+    }))
+  }
+
+  getPrometheusAlertRules = async (clusterUuid) => {
+    const url = `/clusters/${clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/rules`
+    const response = await this.client.basicGet<GetPrometheusAlertRules>({
+      url,
+      options: {
+        clsName: this.getClassName(),
+        mthdName: 'getPrometheusAlertRules',
+      },
+    })
+    const alertRules = response.groups
       .flatMap((group) => {
         return group.rules
       })
       .filter((rule) => rule.type === 'alerting')
-    return alerts.map((alert) => ({
-      ...alert,
-      clusterId: clusterUuid,
-      id: `${alert.name}${clusterUuid}${alert.labels.severity}`,
-    }))
+      .map((rule) => ({
+        ...rule,
+        clusterId: clusterUuid,
+        id: `${rule.name}${clusterUuid}`,
+      }))
+    return alertRules
   }
 
   getPrometheusAlertsOverTime = async (

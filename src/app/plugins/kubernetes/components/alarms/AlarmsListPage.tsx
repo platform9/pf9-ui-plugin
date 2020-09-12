@@ -77,7 +77,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 const chartKeys = [
   {
     name: 'warning',
-    color: 'warning.lighter',
+    color: 'warning.light',
     icon: 'exclamation-triangle',
   },
   {
@@ -214,7 +214,13 @@ export const options = {
         return value ? <DateCell value={value} /> : <div>N/A</div>
       },
     },
-    { id: 'summary', label: 'Rule Summary' },
+    {
+      id: 'summary',
+      label: 'Rule Summary',
+      render: (summary, alert) => {
+        return summary ? summary : alert.description
+      },
+    },
     { id: 'status', label: 'Status' },
     {
       id: 'grafanaLink',
@@ -226,6 +232,7 @@ export const options = {
       ),
     },
     { id: 'clusterName', label: 'Cluster' },
+    { id: 'exportedNamespace', label: 'Exported Namespace' },
   ],
   cacheKey: ActionDataKeys.Alerts,
   name: 'Alarms',
