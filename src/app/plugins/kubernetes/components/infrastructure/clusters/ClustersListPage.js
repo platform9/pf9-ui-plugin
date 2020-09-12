@@ -169,6 +169,7 @@ export const options = {
     { id: 'resource_utilization', label: 'Resource Utilization', render: renderStats },
     { id: 'version', label: 'Kubernetes Version' },
     { id: 'created_at', label: 'Created at', render: (value) => <DateCell value={value} /> },
+    { id: 'lastOp', label: 'Updated at', render: (value) => <DateCell value={value} /> },
     { id: 'nodes', label: 'Nodes', render: renderNodeLink },
     { id: 'networkPlugin', label: 'Network Backend' },
     { id: 'containersCidr', label: 'Containers CIDR' },

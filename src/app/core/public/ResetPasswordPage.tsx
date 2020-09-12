@@ -23,7 +23,6 @@ import {
   hasMinLength,
   requiredValidator,
   passwordValidator,
-  emailValidator,
   matchFieldValidator,
 } from 'core/utils/fieldValidators'
 import Progress from 'core/components/progress/Progress'
@@ -65,7 +64,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   passwordValidation: {
     marginTop: theme.spacing(1),
-  }
+  },
 }))
 
 interface IState {
@@ -106,7 +105,6 @@ const confirmPasswordValidator = [
   passwordValidator,
   matchFieldValidator('newPassword').withMessage('Passwords do not match'),
 ]
-const emailValidators = [requiredValidator, emailValidator]
 const passwordValidatorList: IValidator[] = [
   {
     displayText: 'At least 8 characters long',
@@ -160,7 +158,7 @@ const ResetPasswordPage: React.FC = () => {
   const searchParams = new URLSearchParams(location.search)
   const { params, updateParams, getParamsUpdater } = useParams({
     ...initialState,
-    emailId: searchParams.get('username')
+    emailId: searchParams.get('username'),
   })
   const togglePasswordMask: ITogglePasswordMask = (key) => () =>
     updateParams({ [key]: !params[key] })
@@ -222,13 +220,12 @@ const ResetPasswordPage: React.FC = () => {
                   {!params.isResetPasswordSuccessful ? (
                     <>
                       <TextField
+                        disabled
                         id="email"
                         label="Email"
                         placeholder="Email"
                         type="email"
                         value={params.emailId}
-                        validations={emailValidators}
-                        onChange={getParamsUpdater('emailId')}
                         className={classes.textField}
                       />
                       <TextField
