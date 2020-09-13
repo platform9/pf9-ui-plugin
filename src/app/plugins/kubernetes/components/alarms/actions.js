@@ -58,6 +58,7 @@ export const loadAlerts = createContextLoader(
       const host = await getQbertEndpoint()
       const alerts = items.map((item) => ({
         ...item,
+        exportedNamespace: pathStr('labels.exported_namespace', item),
         name: pathStr('labels.alertname', item),
         severity: pathStr('labels.severity', item),
         summary: pathStr('annotations.message', item),
