@@ -2,12 +2,12 @@ import React from 'react'
 import { Typography } from '@material-ui/core'
 import { toPairs } from 'ramda'
 
-const renderLabels = (type) => (labels) => {
+const renderLabels = (type, variant = 'body2') => (labels) => {
   return (
-    <Typography variant="body2" component="div">
+    <Typography variant={variant} component="div">
       {toPairs(labels).map(([name, value]) => (
         <p key={name}>
-          {name}: {value}
+          <b>{name}</b>: {value}
         </p>
       ))}
     </Typography>

@@ -3,6 +3,7 @@ import { keyValueArrToObj } from 'utils/fp'
 import { pathJoin } from 'utils/misc'
 import { normalizeResponse } from 'api-client/helpers'
 import ApiService from 'api-client/ApiService'
+import { AlertManagerAlert } from 'k8s/components/alarms/model'
 
 interface GenericObject {
   [key: string]: any
@@ -141,8 +142,8 @@ class Qbert extends ApiService {
 
   getClusterCsiDrivers = async (clusterUuid) => {
     return this.client.basicGet(
-      `${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/api/v1/namespaces/platform9-system/services/pf9-sentry/proxy/v1/storage`
-      )
+      `${await this.baseUrl()}/clusters/${clusterUuid}/k8sapi/api/v1/namespaces/platform9-system/services/pf9-sentry/proxy/v1/storage`,
+    )
   }
 
   createCluster = async (params) => {
@@ -667,6 +668,16 @@ class Qbert extends ApiService {
     )
     // this.client.basicPost(`${await this.baseUrl()}/clusters/${clusterId}/k8sapi/apis/monitoring.coreos.com/v1/alertmanagers`, alertManagerBody)
     return response
+  }
+
+  getAlertManagerAlerts = async (uuid): Promise<AlertManagerAlert[]> => {
+    const url = `${await this.baseUrl()}/clusters/${uuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-alertmanager:9093/proxy/api/v2/alerts`
+    const alerts = await this.client.basicGet(url)
+    return alerts?.map((alert) => ({
+      ...alert,
+      clusterId: uuid,
+      id: alert.fingerprint,
+    }))
   }
 
   getPrometheusAlerts = async (clusterUuid) => {

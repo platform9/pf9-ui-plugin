@@ -20,6 +20,8 @@ import AlarmsChartTooltip from './AlarmsChartTooltip'
 import ClusterPicklistDefault from 'k8s/components/common/ClusterPicklist'
 import TimePicklistDefault from './TimePicklist'
 import AlarmDetailsLink from './AlarmDetailsLink'
+import { IUseDataLoader } from '../infrastructure/nodes/model'
+import { IAlertSelector } from './model'
 const ClusterPicklist: any = ClusterPicklistDefault
 const TimePicklist: any = TimePicklistDefault
 
@@ -100,26 +102,29 @@ const ListPage = ({ ListContainer }) => {
   return () => {
     const classes = useStyles({})
     const { params, getParamsUpdater } = usePrefParams(defaultParams)
-    const [data, loading, reload] = useDataLoader(loadAlerts, params)
+    const [data, loading, reload]: IUseDataLoader<IAlertSelector> = useDataLoader(
+      loadAlerts,
+      params,
+    ) as any
     // Provide specific param properties to timeSeries data loader
     // so that it doesn't reload unless those props are changed
     const [
       timeSeriesData,
       // timeSeriesLoading,
-    ] = useDataLoader(loadTimeSeriesAlerts,
-      {
-        chartTime: params.chartTime,
-        clusterId: params.clusterId,
-      }
-    )
+    ] = useDataLoader(loadTimeSeriesAlerts, {
+      chartTime: params.chartTime,
+      clusterId: params.clusterId,
+    })
 
     const filteredChartKeys = chartKeys.filter((key) => {
       return [allKey, key.name].includes(params.severity)
     })
 
     const filteredAlerts = data.filter((alert) => {
-      return [allKey, alert.severity].includes(params.severity)
-        && [allKey, alert.status].includes(params.status)
+      return (
+        [allKey, alert.severity].includes(params.severity) &&
+        [allKey, alert.status].includes(params.status)
+      )
     })
 
     return (
@@ -153,10 +158,7 @@ const ListPage = ({ ListContainer }) => {
             />
           </div>
           <div className={classes.timePicker}>
-            <TimePicklist
-              onChange={getParamsUpdater('chartTime')}
-              value={params.chartTime}
-            />
+            <TimePicklist onChange={getParamsUpdater('chartTime')} value={params.chartTime} />
           </div>
         </div>
         <div className={classes.chartContainer}>
@@ -185,39 +187,101 @@ const ListPage = ({ ListContainer }) => {
 
 export const SeverityTableCell = ({ value }) => {
   const theme: any = useTheme()
-  const key = chartKeys.find(key => key.name === value)
+  const key = chartKeys.find((key) => key.name === value)
   return key ? (
     <div>
-      <FontAwesomeIcon solid style={{ color: pathStr(key.color, theme.palette) }}>{key.icon}</FontAwesomeIcon>
-      {' '}
+      <FontAwesomeIcon solid style={{ color: pathStr(key.color, theme.palette) }}>
+        {key.icon}
+      </FontAwesomeIcon>{' '}
       {value}
     </div>
-  ) : <div>{value}</div>  
+  ) : (
+    <div>{value}</div>
+  )
 }
 
-export const options = {
+interface IOptions {
+  columns: Array<{
+    display?: boolean
+    id: keyof IAlertSelector
+    label: string
+    render?: RenderFn<keyof IAlertSelector>
+  }>
+  cacheKey: string
+  name: string
+  title: string
+  showCheckboxes: boolean
+  ListPage: any
+}
+type RenderFn<T extends keyof IAlertSelector> = (
+  value: IAlertSelector[T],
+  row: IAlertSelector,
+) => any
+const render = <T extends keyof IAlertSelector>(fn: RenderFn<T>) => (
+  value: IAlertSelector[T],
+  row: IAlertSelector,
+) => fn(value, row)
+
+export const options: IOptions = {
   columns: [
-    { id: 'name', label: 'Name', render: (value, row) => ( <AlarmDetailsLink display={value} alarm={row} /> )},
-    { id: 'severity', label: 'Severity', render: (value) => (
-        <SeverityTableCell value={value} />
-      )
+    {
+      display: false,
+      id: 'fingerprint',
+      label: 'Fingerprint',
+      render: render<'fingerprint'>((fingerprint) => fingerprint),
     },
-    { id: 'activeAt', label: 'Time', render: (value) => {
-        return value ? (
-          <DateCell value={value} />
-        ) : (
-          <div>N/A</div>
-        )
-      }
+    {
+      id: 'name',
+      label: 'Name',
+      render: render<'name'>((value, row) => <AlarmDetailsLink display={value} alarm={row} />),
     },
-    { id: 'summary', label: 'Rule Summary' },
-    { id: 'status', label: 'Status' },
+    {
+      id: 'severity',
+      label: 'Severity',
+      render: render<'severity'>((value) => <SeverityTableCell value={value} />),
+    },
+    {
+      id: 'updatedAt',
+      label: 'Time',
+      render: render<'updatedAt'>((value) => (value ? <DateCell value={value} /> : <div>N/A</div>)),
+    },
+    {
+      id: 'summary',
+      label: 'Rule Summary',
+      render: render<'summary'>((summary, alert) => summary || 'N/A'),
+    },
+    { id: 'status', label: 'Status', render: render<'summary'>((status) => status || 'N/A') },
     {
       id: 'grafanaLink',
       label: 'Open in Grafana',
-      render: (link) => <ExternalLink className="no-wrap-text" icon="chart-line" url={link}>Grafana</ExternalLink>
+      render: render<'grafanaLink'>((link) => (
+        <ExternalLink className="no-wrap-text" icon="chart-line" url={link}>
+          Grafana
+        </ExternalLink>
+      )),
     },
-    { id: 'clusterName', label: 'Cluster' },
+    {
+      id: 'clusterName',
+      label: 'Cluster',
+      render: render<'clusterName'>((clusterName) => clusterName || 'N/A'),
+    },
+    {
+      id: 'exportedNamespace',
+      label: 'Exported Namespace',
+      render: render<'exportedNamespace'>((exportedNamespace) => exportedNamespace || 'N/A'),
+    },
+    {
+      display: false,
+      id: 'startsAt',
+      label: 'Starts At',
+      render: render<'startsAt'>((value) => (value ? <DateCell value={value} /> : <div>N/A</div>)),
+    },
+    {
+      display: false,
+      id: 'endsAt',
+      label: 'Ends At',
+      render: render<'endsAt'>((value) => (value ? <DateCell value={value} /> : <div>N/A</div>)),
+    },
   ],
   cacheKey: alertsCacheKey,
   name: 'Alarms',
