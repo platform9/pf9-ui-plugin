@@ -67,7 +67,7 @@ const ListTableAction = withRouter(
             rows={selected}
             open={dialogOpened}
             onClose={(success) => {
-              if (success && onRefresh) {
+              if (success === true && onRefresh) {
                 onRefresh()
               }
               setDialogOpened(false)

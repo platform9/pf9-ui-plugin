@@ -5,9 +5,9 @@ import SeverityPicklist from './SeverityPicklist'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { loadAlerts, loadTimeSeriesAlerts } from './actions'
 import { createUsePrefParamsHook } from 'core/hooks/useParams'
-import { listTablePrefs } from 'app/constants'
+import { listTablePrefs, allKey } from 'app/constants'
 import { pick } from 'ramda'
-import { allKey } from 'app/constants'
+
 import StackedAreaChart from 'core/components/graphs/StackedAreaChart'
 import { makeStyles } from '@material-ui/styles'
 import DateCell from 'core/components/listTable/cells/DateCell'
@@ -21,6 +21,9 @@ import ClusterPicklistDefault from 'k8s/components/common/ClusterPicklist'
 import TimePicklistDefault from './TimePicklist'
 import AlarmDetailsLink from './AlarmDetailsLink'
 import { ActionDataKeys } from 'k8s/DataKeys'
+import Progress from 'core/components/progress/Progress'
+import { IUseDataLoader } from '../infrastructure/nodes/model'
+import { IAlertSelector } from './model'
 const ClusterPicklist: any = ClusterPicklistDefault
 const TimePicklist: any = TimePicklistDefault
 
@@ -35,6 +38,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     border: `1px solid ${theme.palette.grey['500']}`,
     padding: theme.spacing(2),
     marginTop: theme.spacing(1),
+    '& .progressContent.loading': {
+      display: 'none',
+    },
   },
   chartContainerHeader: {
     fontSize: 11,
@@ -73,7 +79,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 const chartKeys = [
   {
     name: 'warning',
-    color: 'warning.lighter',
+    color: 'warning.light',
     icon: 'exclamation-triangle',
   },
   {
@@ -101,13 +107,13 @@ const ListPage = ({ ListContainer }) => {
   return () => {
     const classes = useStyles({})
     const { params, getParamsUpdater } = usePrefParams(defaultParams)
-    const [data, loading, reload] = useDataLoader(loadAlerts, params)
+    const [data, loading, reload]: IUseDataLoader<IAlertSelector> = useDataLoader(
+      loadAlerts,
+      params,
+    ) as any
     // Provide specific param properties to timeSeries data loader
     // so that it doesn't reload unless those props are changed
-    const [
-      timeSeriesData,
-      // timeSeriesLoading,
-    ] = useDataLoader(loadTimeSeriesAlerts, {
+    const [timeSeriesData, timeSeriesLoading] = useDataLoader(loadTimeSeriesAlerts, {
       chartTime: params.chartTime,
       clusterId: params.clusterId,
     })
@@ -158,16 +164,18 @@ const ListPage = ({ ListContainer }) => {
           </div>
         </div>
         <div className={classes.chartContainer}>
-          <div className={classes.chartContainerHeader}>Alarms</div>
-          <div className={classes.moveLeft}>
-            <StackedAreaChart
-              values={timeSeriesData}
-              keys={filteredChartKeys}
-              xAxis="time"
-              responsive={true}
-              CustomTooltip={<AlarmsChartTooltip keys={filteredChartKeys} />}
-            />
-          </div>
+          <Progress loading={timeSeriesLoading} overlay={false} maxHeight={160} minHeight={320}>
+            <div className={classes.chartContainerHeader}>Alarms</div>
+            <div className={classes.moveLeft}>
+              <StackedAreaChart
+                values={timeSeriesData}
+                keys={filteredChartKeys}
+                xAxis="time"
+                responsive
+                CustomTooltip={<AlarmsChartTooltip keys={filteredChartKeys} />}
+              />
+            </div>
+          </Progress>
         </div>
         <ListContainer
           loading={loading}
@@ -195,34 +203,89 @@ export const SeverityTableCell = ({ value }) => {
     <div>{value}</div>
   )
 }
+// TODO expand this options interface to be all the helper supports when we refactor that to TS
+interface IOptions {
+  columns: Array<{
+    display?: boolean
+    id: keyof IAlertSelector
+    label: string
+    render?: RenderFn<keyof IAlertSelector>
+  }>
+  cacheKey: string
+  name: string
+  title: string
+  showCheckboxes: boolean
+  ListPage: any
+}
+type RenderFn<T extends keyof IAlertSelector> = (
+  value: IAlertSelector[T],
+  row: IAlertSelector,
+) => any
+const render = <T extends keyof IAlertSelector>(fn: RenderFn<T>) => (
+  value: IAlertSelector[T],
+  row: IAlertSelector,
+) => fn(value, row)
 
-export const options = {
+export const options: IOptions = {
   columns: [
+    {
+      display: false,
+      id: 'fingerprint',
+      label: 'Fingerprint',
+      render: render<'fingerprint'>((fingerprint) => fingerprint),
+    },
     {
       id: 'name',
       label: 'Name',
-      render: (value, row) => <AlarmDetailsLink display={value} alarm={row} />,
+      render: render<'name'>((value, row) => <AlarmDetailsLink display={value} alarm={row} />),
     },
-    { id: 'severity', label: 'Severity', render: (value) => <SeverityTableCell value={value} /> },
     {
-      id: 'activeAt',
-      label: 'Time',
-      render: (value) => {
-        return value ? <DateCell value={value} /> : <div>N/A</div>
-      },
+      id: 'severity',
+      label: 'Severity',
+      render: render<'severity'>((value) => <SeverityTableCell value={value} />),
     },
-    { id: 'summary', label: 'Rule Summary' },
-    { id: 'status', label: 'Status' },
+    {
+      id: 'updatedAt',
+      label: 'Time',
+      render: render<'updatedAt'>((value) => (value ? <DateCell value={value} /> : <div>N/A</div>)),
+    },
+    {
+      id: 'summary',
+      label: 'Rule Summary',
+      render: render<'summary'>((summary, alert) => summary || 'N/A'),
+    },
+    { id: 'status', label: 'Status', render: render<'summary'>((status) => status || 'N/A') },
     {
       id: 'grafanaLink',
       label: 'Open in Grafana',
-      render: (link) => (
+      render: render<'grafanaLink'>((link) => (
         <ExternalLink className="no-wrap-text" icon="chart-line" url={link}>
           Grafana
         </ExternalLink>
-      ),
+      )),
     },
-    { id: 'clusterName', label: 'Cluster' },
+    {
+      id: 'clusterName',
+      label: 'Cluster',
+      render: render<'clusterName'>((clusterName) => clusterName || 'N/A'),
+    },
+    {
+      id: 'exportedNamespace',
+      label: 'Exported Namespace',
+      render: render<'exportedNamespace'>((exportedNamespace) => exportedNamespace || 'N/A'),
+    },
+    {
+      display: false,
+      id: 'startsAt',
+      label: 'Starts At',
+      render: render<'startsAt'>((value) => (value ? <DateCell value={value} /> : <div>N/A</div>)),
+    },
+    {
+      display: false,
+      id: 'endsAt',
+      label: 'Ends At',
+      render: render<'endsAt'>((value) => (value ? <DateCell value={value} /> : <div>N/A</div>)),
+    },
   ],
   cacheKey: ActionDataKeys.Alerts,
   name: 'Alarms',

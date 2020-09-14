@@ -4,19 +4,21 @@ import { filterIf, pathStr } from 'utils/fp'
 import moment from 'moment'
 import { clustersSelector } from 'k8s/components/infrastructure/clusters/selectors'
 import DataKeys from 'k8s/DataKeys'
-import { IAlert, IAlertOverTime, IAlertSelector, ISeverityCount } from './model'
+import { IAlertOverTime, IAlertSelector, ISeverityCount } from './model'
 import { IClusterAction } from '../infrastructure/clusters/model'
 import { clientStoreKey } from 'core/client/clientReducers'
 import getDataSelector from 'core/utils/getDataSelector'
 import createSorter from 'core/helpers/createSorter'
 import { prometheusRuleSelector } from 'k8s/components/prometheus/selectors'
+import { AlertManagerAlert } from 'api-client/qbert.model'
+import { capitalizeString } from 'utils/misc'
 
 const getQbertUrl = (qbertEndpoint) => {
   // Trim the uri after "/qbert" from the qbert endpoint
   return `${qbertEndpoint.match(/(.*?)\/qbert/)[1]}/k8s/v1/clusters/`
 }
 
-const getGrafanaUrl = (baseUrl: string) => ({ clusterId }: IAlert) =>
+const getGrafanaUrl = (baseUrl: string) => ({ clusterId }: AlertManagerAlert) =>
   `${baseUrl}${clusterId}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:grafana-ui:80/proxy/`
 
 // Used to calculate the timestamps on the chart
@@ -34,14 +36,16 @@ const timestampSteps = {
 
 // TODO replace IDataKeys with an actual whole store state model
 // TODO replace IClusterAction typings with cluster selector return types.
+
 export const alertsSelector = createSelector(
   [
     getDataSelector(DataKeys.Alerts, ['clusterId']),
+    getDataSelector(DataKeys.AlertRules),
     clustersSelector,
     prometheusRuleSelector,
     pathOr('', [clientStoreKey, 'endpoints', 'qbert']),
   ],
-  (rawAlerts, clusters, prometheusRules, qbertEndpoint) => {
+  (rawAlerts, rawAlertRules, clusters, prometheusRules, qbertEndpoint) => {
     const grafanaUrlBuilder = getGrafanaUrl(getQbertUrl(qbertEndpoint))
     // Need to dig into the coreos prometheus rules to fetch the 'for' property
     const flattenedRules = flatten(
@@ -56,25 +60,35 @@ export const alertsSelector = createSelector(
         ),
       ),
     )
-    return rawAlerts.map((alert) => ({
-      ...alert,
-      severity: alert?.labels?.severity, // pathStr('labels.severity', alert)
-      summary: alert?.annotations?.message, // pathStr('annotations.message', alert),
-      activeAt: alert?.alerts?.[0]?.activeAt, // path(['alerts', 0, 'activeAt'], alert),
-      status: alert.alerts.length ? 'Active' : 'Closed',
-      clusterName: pipe(
-        find<IClusterAction>(propEq('uuid', alert.clusterId)),
-        prop('name'),
-      )(clusters),
-      for: flattenedRules.find((rule) => {
+    return rawAlerts.map((alert) => {
+      const alertRule = rawAlertRules.find((rule) => {
         return (
-          equals(rule.alert, alert.name) &&
-          equals(pathStr('labels.severity', rule), pathStr('labels.severity', alert)) &&
-          equals(rule.clusterUuid, alert.clusterId)
+          equals(rule.name, alert.labels.alertname) &&
+          equals(rule.labels.severity, alert.labels.severity)
         )
-      }),
-      grafanaLink: grafanaUrlBuilder(alert),
-    }))
+      })
+      return {
+        ...alert,
+        name: alert?.labels.alertname, // pathStr('labels.alertname', alert)
+        severity: alert?.labels?.severity, // pathStr('labels.severity', alert)
+        summary: alert?.annotations?.message, // pathStr('annotations.message', alert),
+        status: capitalizeString(alert?.status?.state || 'N/A'),
+        exportedNamespace: alert?.labels?.exported_namespace,
+        query: alertRule?.query,
+        clusterName: pipe(
+          find<IClusterAction>(propEq('uuid', alert.clusterId)),
+          prop('name'),
+        )(clusters),
+        for: flattenedRules.find((rule) => {
+          return (
+            equals(rule.alert, pathStr('labels.alertname', alert)) &&
+            equals(pathStr('labels.severity', rule), pathStr('labels.severity', alert)) &&
+            equals(rule.clusterUuid, alert.clusterId)
+          )
+        }).for,
+        grafanaLink: grafanaUrlBuilder(alert),
+      }
+    })
   },
 )
 export const makeAlertsSelector = (
@@ -104,10 +118,7 @@ export const makeTimeSeriesSelector = (
 ) => {
   return createSelector(
     [
-      getDataSelector<DataKeys.AlertsTimeSeries>(DataKeys.AlertsTimeSeries, [
-        'clusterId',
-        'chartTime',
-      ]),
+      getDataSelector<DataKeys.AlertsTimeSeries>(DataKeys.AlertsTimeSeries),
       (_, params) => mergeLeft(params, defaultParams),
     ],
     (timeSeriesRaw = [], params) => {

@@ -1013,6 +1013,10 @@ export interface GetPrometheusAlerts {
 }
 
 export interface GetPrometheusAlertsData {
+  alerts: Alert[]
+}
+
+export interface GetPrometheusAlertRules {
   groups: Group[]
 }
 
@@ -1059,6 +1063,8 @@ export enum RoleStatus {
 }
 
 export interface RuleLabels {
+  exported_namespace: any
+  alertname?: string
   severity?: Severity
   workload_type?: string
 }
@@ -1093,9 +1099,37 @@ export interface IGetPrometheusAlertsOverTime {
   startTime: any
   endTime: any
   clusterId: any
-  id: string
   metric: {
     [key: string]: string
   }
   values: Array<[number, string]>
+}
+
+export interface AlertManagerAlert {
+  clusterId: string
+  id: string
+  annotations: Annotations
+  endsAt: string
+  fingerprint: string
+  receivers: Receiver[]
+  startsAt: string
+  status: Status
+  updatedAt: string
+  generatorURL: string
+  labels: { [key: string]: string }
+}
+
+export interface Annotations {
+  message: string
+  runbook_url?: string
+}
+
+export interface Receiver {
+  name: string
+}
+
+export interface Status {
+  inhibitedBy: any[]
+  silencedBy: any[]
+  state: string
 }

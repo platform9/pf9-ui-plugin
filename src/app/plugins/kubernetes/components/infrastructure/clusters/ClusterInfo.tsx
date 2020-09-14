@@ -48,6 +48,12 @@ const clusterOverviewFields: IClusterDetailFields[] = [
     render: (ts: string) => formatDate(ts),
   },
   {
+    id: 'lastOp',
+    title: 'Cluster Updated',
+    required: true,
+    render: (ts: string) => formatDate(ts),
+  },
+  {
     id: 'cloudProviderName',
     title: 'Cloud Provider',
     required: true,

@@ -1,31 +1,28 @@
-import React from 'react'
-import DownloadKubeConfigLink from './DownloadKubeConfigLink'
+import { Tooltip, Typography } from '@material-ui/core'
+import { makeStyles } from '@material-ui/styles'
+import CreateButton from 'core/components/buttons/CreateButton'
+import CodeBlock from 'core/components/CodeBlock'
+import CopyToClipboard from 'core/components/CopyToClipboard'
 // import KubeCLI from './KubeCLI' // commented out till we support cli links
 import ExternalLink from 'core/components/ExternalLink'
+import DateCell from 'core/components/listTable/cells/DateCell'
 import SimpleLink from 'core/components/SimpleLink'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import { capitalizeString, castBoolToStr } from 'utils/misc'
-import {
-  ClusterConnectionStatus,
-  ClusterHealthStatus,
-} from 'k8s/components/infrastructure/clusters/ClusterStatus'
-import ResourceUsageTable from 'k8s/components/infrastructure/common/ResourceUsageTable'
-import CreateButton from 'core/components/buttons/CreateButton'
-import { both, path, omit, prop } from 'ramda'
-import PrometheusAddonDialog from 'k8s/components/prometheus/PrometheusAddonDialog'
-import ClusterUpgradeDialog from 'k8s/components/infrastructure/clusters/ClusterUpgradeDialog'
-import ClusterDeleteDialog from './ClusterDeleteDialog'
-import { Typography, Tooltip } from '@material-ui/core'
-import { makeStyles } from '@material-ui/styles'
-import { isAdminRole } from 'k8s/util/helpers'
-import { routes } from 'core/utils/routes'
-import CodeBlock from 'core/components/CodeBlock'
-import DateCell from 'core/components/listTable/cells/DateCell'
 import { sessionStoreKey } from 'core/session/sessionReducers'
-import { useSelector } from 'react-redux'
+import { routes } from 'core/utils/routes'
+import { ClusterConnectionStatus, ClusterHealthStatus } from 'k8s/components/infrastructure/clusters/ClusterStatus'
+import ClusterUpgradeDialog from 'k8s/components/infrastructure/clusters/ClusterUpgradeDialog'
+import ResourceUsageTable from 'k8s/components/infrastructure/common/ResourceUsageTable'
+import PrometheusAddonDialog from 'k8s/components/prometheus/PrometheusAddonDialog'
 import { ActionDataKeys } from 'k8s/DataKeys'
-import CopyToClipboard from 'core/components/CopyToClipboard'
+import { isAdminRole } from 'k8s/util/helpers'
+import { both, omit, path, prop } from 'ramda'
+import React from 'react'
+import { useSelector } from 'react-redux'
+import { capitalizeString, castBoolToStr } from 'utils/misc'
 import { cloudProviderTypes } from '../cloudProviders/selectors'
+import ClusterDeleteDialog from './ClusterDeleteDialog'
+import DownloadKubeConfigLink from './DownloadKubeConfigLink'
 
 const useStyles = makeStyles((theme) => ({
   links: {
@@ -128,11 +125,9 @@ const canScaleMasters = ([cluster]) =>
   (cluster.nodes || []).length > 1
 const canScaleWorkers = ([cluster]) => cluster.taskStatus === 'success'
 const canUpgradeCluster = ([cluster]) => !!(cluster && cluster.canUpgrade)
-const canDeleteCluster = ([row]) => !['creating', 'deleting'].includes(row.taskStatus)
-
-const isAdmin = (selected, store) => {
-  return isAdminRole(prop('session', store))
-}
+const canDeleteCluster = ([cluster]) => !['creating', 'deleting'].includes(cluster.taskStatus)
+const notBusy = ([cluster]) => cluster.taskStatus !== 'updating'
+const isAdmin = (selected, store) => isAdminRole(prop('session', store))
 
 export const options = {
   addUrl: routes.cluster.add.path(),
@@ -174,6 +169,7 @@ export const options = {
     { id: 'resource_utilization', label: 'Resource Utilization', render: renderStats },
     { id: 'version', label: 'Kubernetes Version' },
     { id: 'created_at', label: 'Created at', render: (value) => <DateCell value={value} /> },
+    { id: 'lastOp', label: 'Updated at', render: (value) => <DateCell value={value} /> },
     { id: 'nodes', label: 'Nodes', render: renderNodeLink },
     { id: 'networkPlugin', label: 'Network Backend' },
     { id: 'containersCidr', label: 'Containers CIDR' },
@@ -248,7 +244,7 @@ export const options = {
       dialog: ClusterUpgradeDialog,
     },
     {
-      cond: isAdmin,
+      cond: both(isAdmin, notBusy),
       icon: 'chart-bar',
       label: 'Monitoring',
       dialog: PrometheusAddonDialog,
