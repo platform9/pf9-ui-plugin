@@ -8,7 +8,7 @@ import { loadCloudProviderDetails } from 'k8s/components/infrastructure/cloudPro
 // We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
 const CloudProviderRegionPicklist = forwardRef(({ cloudProviderId, ...rest }, ref) => {
   const [details, loading] = useDataLoader(loadCloudProviderDetails, { cloudProviderId })
-  const options = pluck('RegionName', details)
+  const options = pluck('DisplayName', details)
 
   return <Picklist {...rest} ref={ref} loading={loading} options={options} />
 })
