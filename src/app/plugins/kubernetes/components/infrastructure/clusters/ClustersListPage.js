@@ -16,7 +16,7 @@ import ResourceUsageTable from 'k8s/components/infrastructure/common/ResourceUsa
 import PrometheusAddonDialog from 'k8s/components/prometheus/PrometheusAddonDialog'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import { isAdminRole } from 'k8s/util/helpers'
-import { both, omit, path, prop } from 'ramda'
+import { both, omit, path, pathOr, prop } from 'ramda'
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { capitalizeString, castBoolToStr } from 'utils/misc'
@@ -79,17 +79,35 @@ const renderNodeLink = (_, { uuid, nodes }) => {
 }
 
 const toMHz = (value) => value * 1024
-
-const renderStats = (_, { usage }) => {
-  const hasValidStats = !!path(['compute', 'current'], usage)
-  if (!hasValidStats) {
-    return null
+const getEmptyUsage = (usage) => {
+  return {
+    compute: {
+      current: 0,
+      max: pathOr(0, ['compute', 'max'], usage),
+      percent: 0,
+    },
+    memory: {
+      current: 0,
+      max: pathOr(0, ['memory', 'max'], usage),
+      percent: 0,
+    },
+    disk: {
+      current: 0,
+      max: pathOr(0, ['disk', 'max'], usage),
+      percent: 0,
+    },
   }
+}
+
+const renderStats = (_, { usage, connectionStatus }) => {
+  const hasValidStats = !!path(['compute', 'current'], usage)
+  const hasValidConnectionStatus = ['connected', 'partially_connected'].includes(connectionStatus)
+  const stats = !hasValidConnectionStatus || !hasValidStats ? getEmptyUsage(usage) : usage
   return (
     <>
-      <ResourceUsageTable valueConverter={toMHz} units="MHz" label="CPU" stats={usage.compute} />
-      <ResourceUsageTable units="GiB" label="Memory" stats={usage.memory} />
-      <ResourceUsageTable units="GiB" label="Storage" stats={usage.disk} />
+      <ResourceUsageTable valueConverter={toMHz} units="MHz" label="CPU" stats={stats.compute} />
+      <ResourceUsageTable units="GiB" label="Memory" stats={stats.memory} />
+      <ResourceUsageTable units="GiB" label="Storage" stats={stats.disk} />
     </>
   )
 }
