@@ -1,4 +1,9 @@
-import { GroupRule, IGetPrometheusAlertsOverTime, AlertManagerAlert } from 'api-client/qbert.model'
+import {
+  GroupRule,
+  IGetPrometheusAlertsOverTime,
+  AlertManagerAlert,
+  Annotations,
+} from 'api-client/qbert.model'
 
 export interface IAlertSelector extends Omit<AlertManagerAlert, 'status'> {
   name: string
@@ -35,7 +40,7 @@ export interface IAlertOverTime extends IGetPrometheusAlertsOverTime {
 
 export interface Alarm {
   activeAt: string
-  annotations: Annotations
+  annotations: AlarmAnnotations
   clusterId: string
   clusterName: string
   description: string
@@ -53,9 +58,7 @@ export interface Alarm {
   for: string
 }
 
-export interface Annotations {
-  message?: string
-  runbook_url?: string
+export interface AlarmAnnotations extends Annotations {
   summary?: string
 }
 

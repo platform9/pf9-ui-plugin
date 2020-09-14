@@ -338,7 +338,7 @@ class Qbert extends ApiService {
   // @param clusterId = cluster.uuid
   // @param nodes = [node1Uuid, node2Uuid, ...]
   detach = async (clusterId, nodeUuids) => {
-    const body = nodeUuids.map((uuid) => ({ uuid }))
+    const body = nodeUuids.map((nodeUuid) => ({ uuid: nodeUuid }))
     const url = `/clusters/${clusterId}/detach`
     return this.client.basicPost({
       url,
@@ -1147,8 +1147,8 @@ class Qbert extends ApiService {
     return response
   }
 
-  getAlertManagerAlerts = async (uuid): Promise<AlertManagerAlert[]> => {
-    const url = `/clusters/${uuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-alertmanager:9093/proxy/api/v2/alerts`
+  getAlertManagerAlerts = async (clusterUuid): Promise<AlertManagerAlert[]> => {
+    const url = `/clusters/${clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-alertmanager:9093/proxy/api/v2/alerts`
     const alerts = await this.client.basicGet<AlertManagerRaw[]>({
       url,
       options: {
@@ -1158,7 +1158,7 @@ class Qbert extends ApiService {
     })
     return alerts?.map((alert) => ({
       ...alert,
-      clusterId: uuid,
+      clusterId: clusterUuid,
       id: alert.fingerprint,
     }))
   }
