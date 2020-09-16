@@ -626,6 +626,7 @@ class Navbar extends PureComponent {
 
     // const { features } = getContext()
     const isDecco = pathStrOr(false, 'experimental.kplane', features)
+    const isSandbox = pathStrOr(false, 'experimental.sandbox', features)
     const version = pathStrOr('4', 'releaseVersion', features)
 
     return (
@@ -666,13 +667,15 @@ class Navbar extends PureComponent {
 
           <div
             className={clsx(classes.bottomContent, {
-              [classes.bottomContentClose]: !open || isDecco,
+              [classes.bottomContentClose]: !open,
             })}
           >
-            <Button onClick={this.handleNavigateToClarity}>
-              Back to Legacy UI
-              <FontAwesomeIcon size="md">undo</FontAwesomeIcon>
-            </Button>
+            {!(isDecco || isSandbox) && (
+              <Button onClick={this.handleNavigateToClarity}>
+                Back to Legacy UI
+                <FontAwesomeIcon size="md">undo</FontAwesomeIcon>
+              </Button>
+            )}
             <SimpleLink src={helpUrl} className={classes.helpLink}>
               <FontAwesomeIcon>question-circle</FontAwesomeIcon> <span>Need Help?</span>
             </SimpleLink>
