@@ -6,9 +6,10 @@ import { pluck } from 'ramda'
 import { loadCloudProviderDetails } from 'k8s/components/infrastructure/cloudProviders/actions'
 
 // We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
+// TODO use the CloudProviders enum to strongly type this type field once moved to TS
 const CloudProviderRegionPicklist = forwardRef(({ cloudProviderId, type, ...rest }, ref) => {
   const [details, loading] = useDataLoader(loadCloudProviderDetails, { cloudProviderId })
-  const displayField = type === 'aws' ? 'RegionName' : 'DisplayName'
+  const displayField = type === 'azure' ? 'DisplayName' : 'RegionName'
   const options = pluck(displayField, details)
 
   return <Picklist {...rest} ref={ref} loading={loading} options={options} />
