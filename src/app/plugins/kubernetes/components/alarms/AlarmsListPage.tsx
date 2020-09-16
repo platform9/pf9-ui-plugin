@@ -22,6 +22,8 @@ import TimePicklistDefault from './TimePicklist'
 import AlarmDetailsLink from './AlarmDetailsLink'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import Progress from 'core/components/progress/Progress'
+import { IUseDataLoader } from '../infrastructure/nodes/model'
+import { IAlertSelector } from './model'
 const ClusterPicklist: any = ClusterPicklistDefault
 const TimePicklist: any = TimePicklistDefault
 
@@ -105,7 +107,10 @@ const ListPage = ({ ListContainer }) => {
   return () => {
     const classes = useStyles({})
     const { params, getParamsUpdater } = usePrefParams(defaultParams)
-    const [data, loading, reload] = useDataLoader(loadAlerts, params)
+    const [data, loading, reload]: IUseDataLoader<IAlertSelector> = useDataLoader(
+      loadAlerts,
+      params,
+    ) as any
     // Provide specific param properties to timeSeries data loader
     // so that it doesn't reload unless those props are changed
     const [timeSeriesData, timeSeriesLoading] = useDataLoader(loadTimeSeriesAlerts, {
@@ -198,41 +203,89 @@ export const SeverityTableCell = ({ value }) => {
     <div>{value}</div>
   )
 }
+// TODO expand this options interface to be all the helper supports when we refactor that to TS
+interface IOptions {
+  columns: Array<{
+    display?: boolean
+    id: keyof IAlertSelector
+    label: string
+    render?: RenderFn<keyof IAlertSelector>
+  }>
+  cacheKey: string
+  name: string
+  title: string
+  showCheckboxes: boolean
+  ListPage: any
+}
+type RenderFn<T extends keyof IAlertSelector> = (
+  value: IAlertSelector[T],
+  row: IAlertSelector,
+) => any
+const render = <T extends keyof IAlertSelector>(fn: RenderFn<T>) => (
+  value: IAlertSelector[T],
+  row: IAlertSelector,
+) => fn(value, row)
 
-export const options = {
+export const options: IOptions = {
   columns: [
+    {
+      display: false,
+      id: 'fingerprint',
+      label: 'Fingerprint',
+      render: render<'fingerprint'>((fingerprint) => fingerprint),
+    },
     {
       id: 'name',
       label: 'Name',
-      render: (value, row) => <AlarmDetailsLink display={value} alarm={row} />,
+      render: render<'name'>((value, row) => <AlarmDetailsLink display={value} alarm={row} />),
     },
-    { id: 'severity', label: 'Severity', render: (value) => <SeverityTableCell value={value} /> },
     {
-      id: 'activeAt',
+      id: 'severity',
+      label: 'Severity',
+      render: render<'severity'>((value) => <SeverityTableCell value={value} />),
+    },
+    {
+      id: 'updatedAt',
       label: 'Time',
-      render: (value) => {
-        return value ? <DateCell value={value} /> : <div>N/A</div>
-      },
+      render: render<'updatedAt'>((value) => (value ? <DateCell value={value} /> : <div>N/A</div>)),
     },
     {
       id: 'summary',
       label: 'Rule Summary',
-      render: (summary, alert) => {
-        return summary ? summary : alert.description
-      },
+      render: render<'summary'>((summary, alert) => summary || 'N/A'),
     },
-    { id: 'status', label: 'Status' },
+    { id: 'status', label: 'Status', render: render<'summary'>((status) => status || 'N/A') },
     {
       id: 'grafanaLink',
       label: 'Open in Grafana',
-      render: (link) => (
+      render: render<'grafanaLink'>((link) => (
         <ExternalLink className="no-wrap-text" icon="chart-line" url={link}>
           Grafana
         </ExternalLink>
-      ),
+      )),
     },
-    { id: 'clusterName', label: 'Cluster' },
-    { id: 'exportedNamespace', label: 'Exported Namespace' },
+    {
+      id: 'clusterName',
+      label: 'Cluster',
+      render: render<'clusterName'>((clusterName) => clusterName || 'N/A'),
+    },
+    {
+      id: 'exportedNamespace',
+      label: 'Exported Namespace',
+      render: render<'exportedNamespace'>((exportedNamespace) => exportedNamespace || 'N/A'),
+    },
+    {
+      display: false,
+      id: 'startsAt',
+      label: 'Starts At',
+      render: render<'startsAt'>((value) => (value ? <DateCell value={value} /> : <div>N/A</div>)),
+    },
+    {
+      display: false,
+      id: 'endsAt',
+      label: 'Ends At',
+      render: render<'endsAt'>((value) => (value ? <DateCell value={value} /> : <div>N/A</div>)),
+    },
   ],
   cacheKey: ActionDataKeys.Alerts,
   name: 'Alarms',
