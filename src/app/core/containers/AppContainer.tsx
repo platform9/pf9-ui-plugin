@@ -89,12 +89,15 @@ const getUserDetails = async (activeTenant) => {
   // Ignore exception if features.json not found (for local development)
   const features = await axios.get('/clarity/features.json').catch(() => null)
   const sandbox = pathStrOr(false, 'data.experimental.sandbox', features)
-
   // Identify the user in Segment using Keystone ID
   if (typeof window.analytics !== 'undefined') {
-    window.analytics.identify(user.id, {
-      email: user.name,
-    })
+    if (sandbox) {
+      window.analytics.identify()
+    } else {
+      window.analytics.identify(user.id, {
+        email: user.name,
+      })
+    }
   }
 
   // Drift tracking code for live demo
