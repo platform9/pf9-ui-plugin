@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 import Picklist from 'core/components/Picklist'
-import InfoTooltip from 'app/core/components/InfoTooltip'
+import { withInfoTooltip } from 'core/components/InfoTooltip'
 import withFormContext, {
   ValidatedFormInputPropTypes,
 } from 'core/components/validatedForm/withFormContext'
@@ -44,36 +44,25 @@ const PicklistField = React.forwardRef(
     ref,
   ) => {
     const classes = useStyles()
-    const [open, setOpen] = React.useState(false)
-    const openTooltip = useCallback(() => setOpen(true), [])
-    const closeTooltip = useCallback(() => setOpen(false), [])
-    // TODO Implement "interactive" behavior so that tooltip won't be closed when hovering it
 
     return (
-      <InfoTooltip open={open} info={info} placement={placement}>
-        <DropdownComponent
-          {...restProps}
-          InputLabelProps={{
-            classes: {
-              root: classes.label,
-            },
-          }}
-          formField
-          label={required ? `${label} *` : label}
-          onMouseEnter={openTooltip}
-          onMouseLeave={closeTooltip}
-          onFocus={openTooltip}
-          onBlur={closeTooltip}
-          onClick={closeTooltip}
-          ref={ref}
-          id={id}
-          name={id}
-          options={options}
-          value={value !== undefined ? value : ''}
-          error={hasError}
-          helperText={errorMessage}
-        />
-      </InfoTooltip>
+      <DropdownComponent
+        {...restProps}
+        InputLabelProps={{
+          classes: {
+            root: classes.label,
+          },
+        }}
+        formField
+        label={required ? `${label} *` : label}
+        ref={ref}
+        id={id}
+        name={id}
+        options={options}
+        value={value !== undefined ? value : ''}
+        error={hasError}
+        helperText={errorMessage}
+      />
     )
   },
 )
@@ -102,11 +91,9 @@ PicklistField.propTypes = {
   options: PropTypes.arrayOf(optionPropType),
   initialValue: numOrString,
   onChange: PropTypes.func,
-  info: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
-  placement: PropTypes.string,
   showNone: PropTypes.bool,
   showAll: PropTypes.bool,
   ...ValidatedFormInputPropTypes,
 }
 
-export default compose(withFormContext)(PicklistField)
+export default compose(withInfoTooltip, withFormContext)(PicklistField)
