@@ -199,7 +199,8 @@ const ScaleMastersPage: FunctionComponent = () => {
   const cluster = clusters.find((x) => x.uuid === id)
 
   const handleSubmit = async (data): Promise<void> => {
-    await update({ ...cluster, ...data })
+    const uuid = cluster.uuid
+    await update({ uuid, ...data })
   }
 
   const handleAttach = (data: { mastersToAdd: string[] }) => {
