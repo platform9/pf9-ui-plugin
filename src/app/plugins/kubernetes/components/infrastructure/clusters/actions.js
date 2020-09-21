@@ -80,6 +80,9 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
     const updateableParams = 'name tags numWorkers numMinWorkers numMaxWorkers'.split(' ')
 
     const body = pick(updateableParams, params)
+    if (params.etcdBackup !== undefined) {
+      body.etcdBackup = getEtcdBackupPayload('etcdBackup', params)
+    }
 
     await qbert.updateCluster(uuid, body)
     trackEvent('Update Cluster', { uuid })
