@@ -62,6 +62,7 @@ const clusterOverviewFields: IClusterDetailFields[] = [
   { id: 'version', title: 'Kubernetes Version', required: true },
   { id: 'containersCidr', title: 'Containers CIDR', required: true },
   { id: 'servicesCidr', title: 'Services CIDR', required: true },
+  { id: 'externalDnsName', title: 'API FQDN' },
   { id: 'endpoint', title: 'API Endpoint', required: true },
   {
     id: 'allowWorkloadsOnMaster',
