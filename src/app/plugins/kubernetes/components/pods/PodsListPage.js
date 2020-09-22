@@ -1,14 +1,16 @@
-import React, { useCallback } from 'react'
-import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
-import useDataLoader from 'core/hooks/useDataLoader'
-import { podActions } from 'k8s/components/pods/actions'
-import { createUsePrefParamsHook } from 'core/hooks/useParams'
-import { listTablePrefs, allKey } from 'app/constants'
-import { pick } from 'ramda'
+import { makeStyles } from '@material-ui/styles'
+import { allKey, listTablePrefs } from 'app/constants'
 import ExternalLink from 'core/components/ExternalLink'
+import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import NamespacePicklist from 'k8s/components/common/NamespacePicklist'
+import { makeStyles } from '@material-ui/styles'
+import { objSwitchCase } from 'utils/fp'
 import renderLabels from 'k8s/components/pods/renderLabels'
+import { makePodsSelector } from 'k8s/components/pods/selectors'
+import { pick } from 'ramda'
+import React, { useCallback } from 'react'
+import { useSelector } from 'react-redux'
+import { objSwitchCase } from 'utils/fp'
 import { DateAndTime } from 'core/components/listTable/cells/DateCell'
 import ClusterStatusSpan from '../infrastructure/clusters/ClusterStatus'
 import { routes } from 'core/utils/routes'
@@ -35,10 +37,15 @@ const defaultParams = {
 }
 const usePrefParams = createUsePrefParamsHook('Pods', listTablePrefs)
 
+const selector = makePodsSelector()
+
 const ListPage = ({ ListContainer }) => {
   return () => {
     const { params, updateParams, getParamsUpdater } = usePrefParams(defaultParams)
-    const [data, loading, reload] = useDataLoader(podActions.list, params)
+
+    const data = useSelector((store) => selector(store, params))
+    const [loading, reload] = useLoadAction({ action: listClusterPods, selector, params })
+
     const updateClusterId = useCallback((clusterId) => {
       updateParams({
         clusterId,
