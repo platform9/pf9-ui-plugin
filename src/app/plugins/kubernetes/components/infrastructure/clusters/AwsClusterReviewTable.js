@@ -30,6 +30,7 @@ const AwsClusterReviewTable = ({ data }) => {
             label="Enable workloads on all master nodes"
             value={castBoolToStr()(data.allowWorkloadsOnMaster)}
           />
+          <DataRow label="API FQDN" value={data.externalDnsName} />
           <DataRow label="Containers CIDR" value={data.containersCidr} />
           <DataRow label="Services CIDR" value={data.servicesCidr} />
           <DataRow label="Network backend" value={data.networkPlugin} />
