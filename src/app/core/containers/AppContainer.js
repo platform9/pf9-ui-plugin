@@ -90,7 +90,8 @@ const AppContainer = () => {
   const restoreSession = async () => {
     // When trying to login with cookie with pmkft
     if (history.location.pathname === '/ui/pmkft/login') {
-      const scopedToken = getCookieValue('X-Auth-Token')
+      const urlParams = new URLSearchParams(history.location.search)
+      const scopedToken = urlParams.get('token') || getCookieValue('X-Auth-Token')
 
       // Start from scratch to make use of prebuilt functions
       // for standard login page
