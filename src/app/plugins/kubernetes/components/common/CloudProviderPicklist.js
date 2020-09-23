@@ -26,7 +26,7 @@ CloudProviderPicklist.propTypes = {
   type: PropTypes.string,
 }
 
-Picklist.defaultProps = {
+CloudProviderPicklist.defaultProps = {
   showAll: true,
   showNone: false,
   formField: true,

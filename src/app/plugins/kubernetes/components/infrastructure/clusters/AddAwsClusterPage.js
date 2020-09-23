@@ -497,6 +497,7 @@ const AddAwsClusterPage = () => {
                             cloudProviderRegionId={wizardContext.cloudProviderRegionId}
                             onChange={(value) => setWizardContext({ azs: value })}
                             values={wizardContext.azs}
+                            type="aws"
                             required
                           />
                         )}

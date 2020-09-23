@@ -38,7 +38,9 @@ TimePicklist.propTypes = {
   ...Picklist.propTypes,
   name: PropTypes.string,
   label: PropTypes.string,
+  formField: PropTypes.bool,
   selectFirst: PropTypes.bool,
+  showAll: PropTypes.bool,
 }
 
 TimePicklist.defaultProps = {

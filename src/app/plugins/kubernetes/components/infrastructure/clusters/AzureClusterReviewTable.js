@@ -39,6 +39,7 @@ const AzureClusterReviewTable = ({ data }) => {
             value={castBoolToStr()(data.allowWorkloadsOnMaster)}
           />
           <DataRow label="Assign public IP's" value={castBoolToStr()(data.assignPublicIps)} />
+          <DataRow label="API FQDN" value={data.externalDnsName} />
           <DataRow label="Containers CIDR" value={data.containersCidr} />
           <DataRow label="Services CIDR" value={data.servicesCidr} />
           <DataRow label="Privileged" value={castBoolToStr()(data.privileged)} />
