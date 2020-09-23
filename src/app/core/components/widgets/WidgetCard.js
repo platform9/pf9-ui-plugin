@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'center',
     padding: theme.spacing(0, 1),
     '& h6': {
-      color: theme.palette.dashboardCard.text,
+      color: theme.components.dashboardCard.text,
     },
   },
   headerImg: {

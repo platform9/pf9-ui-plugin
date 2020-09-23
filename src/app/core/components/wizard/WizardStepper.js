@@ -20,7 +20,7 @@ const QontoConnector = withStyles((theme) => ({
   },
   completed: {
     '& $line': {
-      borderColor: theme.palette.wizard.medium,
+      borderColor: theme.components.wizard.medium,
     },
   },
   disabled: {
@@ -51,15 +51,15 @@ const useQontoStepIconStyles = makeStyles((theme) => ({
     borderRadius: stepIconsSize / 2,
     textAlign: 'center',
     color: theme.palette.primary.contrastText,
-    backgroundColor: theme.palette.wizard.light,
+    backgroundColor: theme.components.wizard.light,
     '&.active': {
-      backgroundColor: theme.palette.wizard.dark,
+      backgroundColor: theme.components.wizard.dark,
     },
   },
   completed: {
     height: stepIconsSize / 2,
     marginTop: stepIconsSize / 4,
-    color: theme.palette.wizard.dark,
+    color: theme.components.wizard.dark,
     zIndex: 1,
     fontSize: 18,
   },

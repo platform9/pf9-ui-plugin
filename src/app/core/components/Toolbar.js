@@ -12,7 +12,7 @@ const useStyles = makeStyles((theme) => ({
   appBar: {
     position: 'fixed',
     boxShadow: 'none',
-    backgroundColor: theme.palette.header.background,
+    backgroundColor: theme.components.header.background,
   },
   menuButton: {
     marginLeft: theme.spacing(1.5),

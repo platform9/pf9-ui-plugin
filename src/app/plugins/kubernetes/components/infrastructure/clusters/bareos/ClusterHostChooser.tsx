@@ -10,7 +10,6 @@ import {
   TableRow,
   TableBody,
   Typography,
-  Theme,
 } from '@material-ui/core'
 import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
 import { makeStyles } from '@material-ui/styles'
@@ -21,6 +20,7 @@ import {
   UsageBar,
   renderNetworkInterfaces,
 } from 'k8s/components/infrastructure/nodes/NodesListPage'
+import Theme from 'core/themes/model'
 
 interface Props extends IValidatedForm {
   value?: string[]
@@ -46,13 +46,13 @@ const useStyles = makeStyles<Theme, Partial<Props>>((theme) => ({
   table: {
     border: '2px solid',
     borderColor: ({ hasError }) =>
-      hasError ? theme.palette.error.main : theme.palette.text.disabled,
+      hasError ? theme.components.error.main : theme.palette.text.disabled,
   },
   tableContainer: {
     margin: theme.spacing(2, 0),
   },
   errorText: {
-    color: theme.palette.error.main,
+    color: theme.components.error.main,
   },
   usageContainerClass: {
     display: 'grid',

@@ -10,12 +10,13 @@ import {
   notificationStoreKey,
 } from 'core/notifications/notificationReducers'
 import { prop } from 'ramda'
+import Theme from 'core/themes/model'
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles<Theme>((theme) => ({
   title: {
     fontSize: theme.typography.pxToRem(15),
     fontWeight: theme.typography.fontWeightBold,
-    backgroundColor: theme.palette.error.main,
+    backgroundColor: theme.components.error.main,
     color: theme.palette.primary.contrastText,
     padding: theme.spacing(2),
   },
@@ -38,7 +39,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const usePopoverStyles = makeStyles((theme) => ({
+const usePopoverStyles = makeStyles<Theme>((theme) => ({
   paper: {
     overflow: 'visible',
     display: 'flex',
@@ -55,7 +56,7 @@ const usePopoverStyles = makeStyles((theme) => ({
       position: 'absolute',
       top: -20,
       right: 10,
-      borderBottom: `10px solid ${theme.palette.error.main}`,
+      borderBottom: `10px solid ${theme.components.error.main}`,
       borderRight: '10px solid transparent',
       borderLeft: '10px solid transparent',
       borderTop: '10px solid transparent',

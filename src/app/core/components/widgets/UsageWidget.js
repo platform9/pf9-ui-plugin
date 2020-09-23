@@ -11,12 +11,12 @@ const useStyles = makeStyles((theme) => ({
   title: {
     fontWeight: 300,
     textAlign: 'right',
-    color: theme.palette.dashboardCard.text,
+    color: theme.components.dashboardCard.text,
   },
   modifier: {
     fontWeight: 300,
     textAlign: 'left',
-    color: theme.palette.dashboardCard.text,
+    color: theme.components.dashboardCard.text,
   },
   container: {
     marginTop: 20,

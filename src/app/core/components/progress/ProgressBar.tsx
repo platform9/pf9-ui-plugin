@@ -70,10 +70,10 @@ const useStyles = makeStyles<Theme, Props>((theme) => ({
       }
       if (animated) return theme.palette.primary.main
       if (variant === 'health') {
-        if (percent >= 90) return theme.palette.error.main
-        if (percent >= 80) return theme.palette.warning.main
+        if (percent >= 90) return theme.components.error.main
+        if (percent >= 80) return theme.components.warning.main
       }
-      return theme.palette.success.main
+      return theme.components.success.main
     },
     animation: '$stripes 2s linear infinite',
     color: '#FFF',

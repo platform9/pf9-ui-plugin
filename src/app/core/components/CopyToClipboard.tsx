@@ -13,7 +13,7 @@ interface Props {
   // fill property for if you want the copy to clipboard container to fill
   // the entire width of the parent, but still want the copy to clipboard
   // icon inline
-  fill? : boolean
+  fill?: boolean
 }
 
 interface State {
@@ -42,7 +42,7 @@ const useStyles = makeStyles<Theme, StyleProps>((theme: Theme) => ({
   copyContainer: {
     display: ({ fill, inline }) => (fill ? 'flex' : inline ? 'inline-flex' : 'flex'),
     flexDirection: ({ inline }) => (inline ? 'row' : 'column'),
-    background: ({ codeBlock }) => (codeBlock ? theme.palette.code.background : 'transparent'),
+    background: ({ codeBlock }) => (codeBlock ? theme.components.code.background : 'transparent'),
   },
   copyIconContainer: {
     cursor: 'pointer',
@@ -57,12 +57,12 @@ const useStyles = makeStyles<Theme, StyleProps>((theme: Theme) => ({
       bottom: theme.spacing(),
       left: 0,
       width: 1,
-      background: ({ codeBlock }) => (codeBlock ? theme.palette.code.text : 'transparent'),
+      background: ({ codeBlock }) => (codeBlock ? theme.components.code.text : 'transparent'),
     },
   },
   copySvg: {
     verticalAlign: 'top',
-    color: ({ codeBlock }) => (codeBlock ? theme.palette.code.text : 'rgb(38, 139, 210)'),
+    color: ({ codeBlock }) => (codeBlock ? theme.components.code.text : 'rgb(38, 139, 210)'),
     marginLeft: '3px',
     height: '17px',
     width: '17px',
@@ -75,11 +75,11 @@ const useStyles = makeStyles<Theme, StyleProps>((theme: Theme) => ({
     justifyContent: 'center',
   },
   done: {
-    color: theme.palette.wizard.dark,
+    color: theme.components.wizard.dark,
   },
   header: {
     display: 'flex',
-    color: theme.palette.code.text,
+    color: theme.components.code.text,
     position: 'relative',
     '& > p': {
       paddingLeft: 20,
@@ -93,7 +93,7 @@ const useStyles = makeStyles<Theme, StyleProps>((theme: Theme) => ({
       left: theme.spacing(2),
       right: theme.spacing(2),
       height: 1,
-      background: ({ codeBlock }) => (codeBlock ? theme.palette.code.text : 'transparent'),
+      background: ({ codeBlock }) => (codeBlock ? theme.components.code.text : 'transparent'),
     },
   },
 }))

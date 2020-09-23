@@ -5,8 +5,9 @@ import { Typography } from '@material-ui/core'
 import { secondsToString } from 'utils/misc'
 import moment from 'moment'
 import { Notification } from 'core/notifications/notificationReducers'
+import Theme from 'core/themes/model'
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles<Theme>((theme) => ({
   root: {
     display: 'flex',
     flexFlow: 'row nowrap',
@@ -16,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(1),
     minWidth: theme.spacing(6),
     fontWeight: 'bold',
-    color: theme.palette.error.main,
+    color: theme.components.error.main,
   },
   content: {
     display: 'flex',

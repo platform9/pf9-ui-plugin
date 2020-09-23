@@ -17,14 +17,14 @@ import { routes } from 'core/utils/routes'
 
 const getIconOrBubbleColor = (status: IClusterStatus, theme: Theme) =>
   ({
-    ok: theme.palette.success.main,
-    pause: theme.palette.warning.main,
-    fail: theme.palette.error.main,
-    error: theme.palette.error.main,
-    loading: theme.palette.sidebar.text,
+    ok: theme.components.success.main,
+    pause: theme.components.warning.main,
+    fail: theme.components.error.main,
+    error: theme.components.error.main,
+    loading: theme.components.sidebar.text,
     unknown: theme.palette.info.main,
-    upgrade: theme.palette.upgrade.main,
-  }[status] || theme.palette.error.main)
+    upgrade: theme.components.upgrade.main,
+  }[status] || theme.components.error.main)
 
 const useStyles = makeStyles<Theme, Props>((theme: Theme) => ({
   root: {

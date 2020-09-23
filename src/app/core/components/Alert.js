@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: hexToRGBA(theme.palette.primary.main, 0.1),
   },
   success: { color: green[600] },
-  error: { color: theme.palette.error.dark },
+  error: { color: theme.components.error.dark },
   info: { color: theme.palette.primary.dark },
   warning: { color: amber[700] },
   icon: {

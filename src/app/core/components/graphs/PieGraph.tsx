@@ -53,7 +53,7 @@ const PieGraph = ({
         <text
           x={radius + 5}
           y={radius + 5}
-          fill={theme.palette.dashboardCard.text}
+          fill={theme.components.dashboardCard.text}
           fontSize="24px"
           textAnchor="middle"
           dominantBaseline="middle"
@@ -65,7 +65,7 @@ const PieGraph = ({
         <text
           x={radius + 5}
           y={radius + 20}
-          fill={theme.palette.dashboardCard.text}
+          fill={theme.components.dashboardCard.text}
           fontSize="9px"
           textAnchor="middle"
           dominantBaseline="middle"
