@@ -13,7 +13,7 @@ import { kubeconfigFileLink } from 'k8s/links'
 import DownloadKubeConfigForm from './DownloadKubeConfigForm'
 import SimpleLink from 'core/components/SimpleLink'
 import ExternalLink from 'core/components/ExternalLink'
-import { onboardingAccessSetup } from 'app/constants'
+import { codeMirrorOptions, onboardingAccessSetup } from 'app/constants'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { routes } from 'app/core/utils/routes'
 import CodeBlock from 'core/components/CodeBlock'
@@ -22,6 +22,8 @@ import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import PollingData from 'core/components/PollingData'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
+import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
+import CodeMirror from 'core/components/validatedForm/CodeMirror'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -70,6 +72,9 @@ const useStyles = makeStyles((theme) => ({
       },
     },
   },
+  yamlContainer: {
+    width: 675,
+  },
 }))
 
 const KubeConfigListPage = () => {
@@ -84,7 +89,6 @@ const KubeConfigListPage = () => {
       ...downloadedKubeconfigs,
       [cluster.uuid]: kubeconfig,
     })
-
     localStorage.setItem(onboardingAccessSetup, 'true')
   }
   return (
@@ -123,8 +127,8 @@ const KubeConfigListPage = () => {
                     <div>
                       <Typography variant="body1">
                         There are no clusters available. You need to{' '}
-                        <SimpleLink src={routes.cluster.add.path()}>create a cluster</SimpleLink>
-                        {' '}first to continue.
+                        <SimpleLink src={routes.cluster.add.path()}>create a cluster</SimpleLink>{' '}
+                        first to continue.
                       </Typography>
                     </div>
                   </TableCell>
@@ -148,13 +152,21 @@ const KubeConfigListPage = () => {
             />
           )}
           {!!selectedCluster && downloadedKubeconfigs[selectedCluster.uuid] && (
-            <CopyToClipboard
-              copyText={downloadedKubeconfigs[selectedCluster.uuid]}
-              inline={false}
-              header={selectedCluster.name}
-            >
-              <CodeBlock>{downloadedKubeconfigs[selectedCluster.uuid]}</CodeBlock>
-            </CopyToClipboard>
+            <ValidatedForm elevated={false}>
+              <div className={classes.yamlContainer}>
+                <CopyToClipboard
+                  copyText={downloadedKubeconfigs[selectedCluster.uuid]}
+                  inline={false}
+                  header={selectedCluster.name}
+                >
+                  <CodeMirror
+                    id="kubeconfigYaml"
+                    options={codeMirrorOptions}
+                    value={downloadedKubeconfigs[selectedCluster.uuid]}
+                  />
+                </CopyToClipboard>
+              </div>
+            </ValidatedForm>
           )}
         </div>
       </FormFieldCard>
