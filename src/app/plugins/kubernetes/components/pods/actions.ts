@@ -4,10 +4,7 @@ import { allKey } from 'app/constants'
 import ActionsSet from 'core/actions/ActionsSet'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import jsYaml from 'js-yaml'
-import {
-  listClusters,
-  parseClusterParams,
-} from 'k8s/components/infrastructure/clusters/actions'
+import { listClusters, parseClusterParams } from 'k8s/components/infrastructure/clusters/actions'
 import { makeDeploymentsSelector } from 'k8s/components/pods/selectors'
 import DataKeys, { ActionDataKeys } from 'k8s/DataKeys'
 import { flatten, pluck } from 'ramda'

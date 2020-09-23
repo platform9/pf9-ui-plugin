@@ -2,11 +2,11 @@ import Action, { ActionConfig, CallbackType } from 'core/actions/Action'
 import { Dictionary } from 'ramda'
 
 class ActionsSet {
-  private readonly actions = new Set<Action<any, any>>()
+  private readonly actions = new Set<Action<any>>()
 
   constructor(private readonly commonConfig: ActionConfig) {}
 
-  add = <R = any[], P = Dictionary<any>>(
+  add = <R extends any[] = any[], P = Dictionary<any>>(
     callback: CallbackType<R, P>,
     dependencies: Dictionary<Action<any>>,
     config: Partial<ActionConfig> = {},

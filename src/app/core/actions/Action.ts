@@ -1,5 +1,5 @@
 import DataKeys from 'k8s/DataKeys'
-import { Dictionary, isNil, mapObjIndexed, pick, pipe, reject } from 'ramda'
+import { Dictionary, isNil, mapObjIndexed, pick, pipe, reject, ValueOfRecord } from 'ramda'
 import { allKey } from 'app/constants'
 import { emptyArr, ensureArray } from 'utils/fp'
 
@@ -12,15 +12,16 @@ export interface ActionConfig {
   successMessage?: (<D, P>(updatedItems: D[], prevItems: D[], params: P) => string) | string
   errorMessage?: (<P>(err: Error, params: P) => string) | string
 }
+export type ActionDependency = Record<string, Promise<any[]>>
 
-export type CallbackType<R, P, D> = (params: P, depPromises: D) => Promise<R>
+export type CallbackType<R, P, D = ActionDependency> = (params: P, depPromises: D) => Promise<R>
 
 class Action<P, R = any[]> {
   // public readonly callback: (params: P, depPromises: Array<Promise<any>>) => Promise<R>
-  public listAllCallback: (params: P, depPromises) => Promise<R>
+  public listAllCallback: CallbackType<R, P>
 
   constructor(
-    public readonly callback: (params: P, depPromises) => Promise<R>,
+    public readonly callback: CallbackType<R, P>,
     public readonly config: ActionConfig,
     private readonly dependencies: Dictionary<Action<any>>,
   ) {
@@ -32,8 +33,11 @@ class Action<P, R = any[]> {
     }
   }
 
-  public run = async (params: P) => {
-    const depPromises = mapObjIndexed((dep) => dep.run(params), this.dependencies)
+  public run = async (params: P): Promise<R> => {
+    const depPromises: ActionDependency = mapObjIndexed(
+      async (dep) => dep.run(params),
+      this.dependencies,
+    )
     // eslint-disable-next-line @typescript-eslint/require-await
     // const depPromises = this.dependencies.map((dep) => dep.run(params))
     const { indexBy } = this.config
@@ -46,14 +50,12 @@ class Action<P, R = any[]> {
     const whichCallback =
       primaryKey === allKey || isNil(primaryKey) ? this.listAllCallback : this.callback
     const result = await whichCallback(params, depPromises)
-    await Promise.all(depPromises)
+    await Promise.all(Object.values(depPromises))
     return result
   }
 
-  public listAll = (callback: any) => {
-    const myCallback = callback as CallbackType<R, P, infer myDependencies>
-
-    this.listAllCallback = myCallback
+  public listAll = (callback: CallbackType<R, P>) => {
+    this.listAllCallback = callback
   }
 }
 
