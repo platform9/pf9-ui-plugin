@@ -34,7 +34,7 @@ export const deAuthNode = createContextUpdater(
     trackEvent('Deauthorize Node', {
       node_name: node.name,
     })
-    await loadNodes()
+    return await loadNodes()
     // TODO: Show success message
   },
   {

@@ -7,12 +7,12 @@ const NodeDeAuthDialog = ({ rows: [node], onClose }) => {
   const [deauth] = useDataUpdater(deAuthNode, onClose)
   const handleSubmit = useCallback(() => deauth(node), [deauth])
 
-  return node ? (
+  return (
     <ConfirmationDialog
       title="De-authorize node"
       text={
         <>
-          You are about to de-authorize the node {node.name} ({node.primaryIp})
+          You are about to de-authorize the node {node?.name} ({node?.primaryIp})
           <br />
           Are you sure?
         </>
@@ -21,7 +21,7 @@ const NodeDeAuthDialog = ({ rows: [node], onClose }) => {
       onCancel={onClose}
       onConfirm={handleSubmit}
     />
-  ) : null
+  )
 }
 
 export default NodeDeAuthDialog
