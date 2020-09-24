@@ -2,7 +2,9 @@ import React, { useCallback, useEffect, createRef } from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import { FormControl, FormHelperText, FormLabel, Typography } from '@material-ui/core'
-import withFormContext, { ValidatedFormInputPropTypes } from 'core/components/validatedForm/withFormContext'
+import withFormContext, {
+  ValidatedFormInputPropTypes,
+} from 'core/components/validatedForm/withFormContext'
 import { compose } from 'app/utils/fp'
 import InfoTooltip from 'app/core/components/InfoTooltip'
 import { Controlled as BaseCodeMirror } from 'react-codemirror2'
@@ -27,7 +29,7 @@ const defaultOptions = {
 // to re-define their styles so we can use common variables
 const useStyles = makeStyles((theme) => ({
   root: {
-    margin: theme.spacing(1.5, 0)
+    margin: theme.spacing(1.5, 0),
   },
   coderMirrorHeader: {
     position: 'relative',
@@ -93,7 +95,7 @@ const CodeMirror = ({
     <InfoTooltip open={open} info={info} placement={placement}>
       <FormControl id={id} error={hasError} className={classes.root}>
         <FormLabel>
-          <Typography className={classes.coderMirrorHeader} variant="body1">
+          <Typography component={'div'} className={classes.coderMirrorHeader} variant="body1">
             {label}
           </Typography>
         </FormLabel>
@@ -115,7 +117,7 @@ const CodeMirror = ({
 
 CodeMirror.propTypes = {
   id: PropTypes.string.isRequired,
-  label: PropTypes.string,
+  label: PropTypes.node,
   onChange: PropTypes.func,
   options: PropTypes.object,
   value: PropTypes.string,

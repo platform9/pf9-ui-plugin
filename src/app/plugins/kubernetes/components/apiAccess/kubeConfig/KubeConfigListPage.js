@@ -73,7 +73,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   yamlContainer: {
-    width: 675,
+    flexFlow: 'column nowrap',
   },
 }))
 
@@ -152,20 +152,22 @@ const KubeConfigListPage = () => {
             />
           )}
           {!!selectedCluster && downloadedKubeconfigs[selectedCluster.uuid] && (
-            <ValidatedForm elevated={false}>
-              <div className={classes.yamlContainer}>
-                <CopyToClipboard
-                  copyText={downloadedKubeconfigs[selectedCluster.uuid]}
-                  inline={false}
-                  header={selectedCluster.name}
-                >
-                  <CodeMirror
-                    id="kubeconfigYaml"
-                    options={codeMirrorOptions}
-                    value={downloadedKubeconfigs[selectedCluster.uuid]}
-                  />
-                </CopyToClipboard>
-              </div>
+            <ValidatedForm classes={{ root: classes.yamlContainer }} elevated={false}>
+              <CodeMirror
+                id="kubeconfigYaml"
+                label={
+                  <CopyToClipboard
+                    copyText={downloadedKubeconfigs[selectedCluster.uuid]}
+                    inline={true}
+                    codeBlock={false}
+                  >
+                    {selectedCluster.name}
+                  </CopyToClipboard>
+                }
+                copyText={downloadedKubeconfigs[selectedCluster.uuid]}
+                options={codeMirrorOptions}
+                value={downloadedKubeconfigs[selectedCluster.uuid]}
+              />
             </ValidatedForm>
           )}
         </div>
