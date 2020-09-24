@@ -25,7 +25,6 @@ import {
 import { useToast } from 'core/providers/ToastProvider'
 import { notificationActions } from 'core/notifications/notificationReducers'
 import moize from 'moize'
-import { OutputParametricSelector } from 'reselect'
 
 const onErrorHandler = moize(
   (cacheKey, showToast, registerNotification) => (errorMessage, catchedErr) => {
@@ -37,16 +36,18 @@ const onErrorHandler = moize(
 
 interface Options<T, R> {
   action: Action<T, R>
-  selector: OutputParametricSelector<any, Dictionary<any>>
+  selector: <TState, TSelected>(state: TState) => TSelected
   params: T
   loadOnDemand?: boolean
   loadingFeedback?: boolean
 }
 
-const useListAction = <T, R>(options: Options = {}) => {
+const useListAction = <T, R>(options: Options<T, R>) => {
   const { action, selector, params, loadOnDemand = false, loadingFeedback = true } = options
   const { cacheKey, errorMessage, indexBy, cache } = action.config
   const [{ currentTenant, currentRegion }] = useScopedPreferences()
+
+  const selectedData = useSelector(selector)
 
   // Memoize the params dependency as we want to make sure it really changed and not just got a new reference
   const memoizedParams = memoizedDep(params)
