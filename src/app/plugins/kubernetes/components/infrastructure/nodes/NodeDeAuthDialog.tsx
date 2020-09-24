@@ -5,21 +5,21 @@ import ConfirmationDialog from 'core/components/ConfirmationDialog'
 
 const NodeDeAuthDialog = ({ rows: [node], onClose }) => {
   const [deauth] = useDataUpdater(deAuthNode, onClose)
-  const handeSubmit = useCallback(() => deauth(node), [deauth])
+  const handleSubmit = useCallback(() => deauth(node), [deauth])
 
   return (
     <ConfirmationDialog
       title="De-authorize node"
       text={
         <>
-          You are about to de-authorize the node {node.name} ({node.primaryIp})
+          You are about to de-authorize the node {node?.name} ({node?.primaryIp})
           <br />
           Are you sure?
         </>
       }
       open
       onCancel={onClose}
-      onConfirm={handeSubmit}
+      onConfirm={handleSubmit}
     />
   )
 }

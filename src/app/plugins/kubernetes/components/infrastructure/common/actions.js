@@ -33,7 +33,7 @@ export const updateRemoteSupport = createContextUpdater(
       await resMgr.removeRole(id, supportRoleName)
     }
     // Reload the resMgrHosts
-    await loadResMgrHosts()
+    return loadResMgrHosts()
   },
   {
     operation: 'updateRemoteSupport',
