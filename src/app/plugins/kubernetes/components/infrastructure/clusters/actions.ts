@@ -6,12 +6,13 @@ import {
   getKubernetesVersion,
   getProgressPercent,
 } from 'k8s/components/infrastructure/clusters/helpers'
-import { loadResMgrHosts } from 'k8s/components/infrastructure/common/actions'
-import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
 import DataKeys, { ActionDataKeys } from 'k8s/DataKeys'
 import { pathOr } from 'ramda'
 import { mapAsync } from 'utils/async'
 import { ClusterElement, INormalizedCluster } from 'api-client/qbert.model'
+import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
+import { loadResMgrHosts } from 'k8s/components/infrastructure/common/actions'
+import ListAction from 'core/actions/ListAction'
 
 const { appbert, qbert } = ApiClient.getInstance()
 
@@ -44,30 +45,34 @@ export type Cluster = ClusterElement &
     baseUrl: string
   }
 
-export const listClusters = clusterActions.add<Cluster[]>(async () => {
-  const rawClusters = qbert.getClusters()
+// eslint-disable-next-line @typescript-eslint/require-await
+export const listClusters = clusterActions.add(
+  new ListAction<Cluster[]>(async () => {
+    const rawClusters = Promise.all([
+      qbert.getClusters(),
+      // Fetch dependent entities
+      clusterTagActions.list(),
+      loadNodes(),
+      loadResMgrHosts(),
+    ])
 
-  return mapAsync(async (cluster) => {
-    const progressPercent =
-      cluster.taskStatus === 'converging' ? await getProgressPercent(cluster.uuid) : null
-    const version = await getKubernetesVersion(cluster.uuid)
-    const baseUrl = await qbert.clusterBaseUrl(cluster.uuid)
-    const csiDrivers = await getCsiDrivers(cluster.uuid)
+    return mapAsync(async (cluster) => {
+      const progressPercent =
+        cluster.taskStatus === 'converging' ? await getProgressPercent(cluster.uuid) : null
+      const version = await getKubernetesVersion(cluster.uuid)
+      const baseUrl = await qbert.clusterBaseUrl(cluster.uuid)
+      const csiDrivers = await getCsiDrivers(cluster.uuid)
 
-    return {
-      ...cluster,
-      csiDrivers,
-      progressPercent,
-      version,
-      baseUrl,
-    }
-  }, rawClusters)
-}, [
-  // Fetch dependent entities
-  clusterTagActions.list(),
-  loadNodes(),
-  loadResMgrHosts(),
-])
+      return {
+        ...cluster,
+        csiDrivers,
+        progressPercent,
+        version,
+        baseUrl,
+      }
+    }, rawClusters)
+  }),
+)
 
 // export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
 //   listFn: async () => {
@@ -207,8 +212,8 @@ export const listClusters = clusterActions.add<Cluster[]>(async () => {
 // If params.clusterId is not assigned it fetches all clusters
 // and extracts the clusterId from the first cluster
 // It also adds a "clusters" param that contains all the clusters, just for convenience
-export const parseClusterParams = async (params) => {
-  const clusters = await clusterActions.list(params)
+export const parseClusterParams = async (params): Promise<[string, Cluster[]]> => {
+  const clusters = await listClusters.call(params)
   const { clusterId = pathOr(allKey, [0, 'uuid'], clusters) } = params
   return [clusterId, clusters]
 }

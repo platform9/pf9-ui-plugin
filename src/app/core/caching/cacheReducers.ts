@@ -1,33 +1,38 @@
 import {
   __,
-  assocPath,
-  pathEq,
-  over,
-  append,
-  lensPath,
-  pipe,
-  mergeLeft,
   allPass,
+  append,
+  assocPath,
+  Dictionary,
+  find,
+  identity,
+  isNil,
+  lensPath,
   map,
+  mergeLeft,
+  of,
+  over,
   path,
+  pathEq,
+  pipe,
   split,
   of,
   identity,
   Dictionary,
+  whereEq,
   find,
   when,
   isNil,
-  dissocPath,
 } from 'ramda'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import {
+  adjustWith,
   arrayIfNil,
-  upsertAllBy,
+  emptyArr,
   ensureArray,
   pathStr,
-  emptyArr,
-  adjustWith,
   removeWith,
+  upsertAllBy,
 } from 'utils/fp'
 import { defaultUniqueIdentifier } from 'app/constants'
 import DataKeys from 'k8s/DataKeys'
@@ -75,7 +80,6 @@ const reducers = {
     {
       payload: { cacheKey, params, item },
     }: PayloadAction<{
-      uniqueIdentifier: string | string[]
       cacheKey: DataKeys
       params: ParamsType
       item: T

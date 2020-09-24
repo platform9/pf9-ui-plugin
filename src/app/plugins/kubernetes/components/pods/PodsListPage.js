@@ -2,9 +2,15 @@ import { makeStyles } from '@material-ui/styles'
 import { allKey, listTablePrefs } from 'app/constants'
 import ExternalLink from 'core/components/ExternalLink'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
+import DateCell from 'core/components/listTable/cells/DateCell'
+import createCRUDComponents from 'core/helpers/createCRUDComponents'
+import useListAction from 'core/hooks/useListAction'
+import { createUsePrefParamsHook } from 'core/hooks/useParams'
+import ClusterPicklist from 'k8s/components/common/ClusterPicklist'
 import NamespacePicklist from 'k8s/components/common/NamespacePicklist'
 import { makeStyles } from '@material-ui/styles'
 import { objSwitchCase } from 'utils/fp'
+import { listPods, podActions } from 'k8s/components/pods/actions'
 import renderLabels from 'k8s/components/pods/renderLabels'
 import { makePodsSelector } from 'k8s/components/pods/selectors'
 import { pick } from 'ramda'
@@ -44,7 +50,7 @@ const ListPage = ({ ListContainer }) => {
     const { params, updateParams, getParamsUpdater } = usePrefParams(defaultParams)
 
     const data = useSelector((store) => selector(store, params))
-    const [loading, reload] = useLoadAction({ action: listClusterPods, selector, params })
+    const [loading, reload] = useListAction({ action: listPods, selector, params })
 
     const updateClusterId = useCallback((clusterId) => {
       updateParams({

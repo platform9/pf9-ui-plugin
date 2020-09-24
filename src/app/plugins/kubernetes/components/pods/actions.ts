@@ -4,15 +4,19 @@ import { allKey } from 'app/constants'
 import ActionsSet from 'core/actions/ActionsSet'
 import createCRUDActions from 'core/helpers/createCRUDActions'
 import jsYaml from 'js-yaml'
-import { listClusters, parseClusterParams } from 'k8s/components/infrastructure/clusters/actions'
+import { parseClusterParams } from 'k8s/components/infrastructure/clusters/actions'
 import { makeDeploymentsSelector } from 'k8s/components/pods/selectors'
 import DataKeys, { ActionDataKeys } from 'k8s/DataKeys'
-import { flatten, pluck } from 'ramda'
+import { find, flatten, pathOr, pipe, pluck } from 'ramda'
 import { someAsync } from 'utils/async'
-import { pathStr } from 'utils/fp'
+import { emptyArr, pathStr } from 'utils/fp'
 import { trackEvent } from 'utils/tracking'
 import { makeServiceSelector } from './selectors'
-import { GetClusterPodsItem, IGenericResource } from 'api-client/qbert.model'
+import ListAction from 'core/actions/ListAction'
+import CreateAction from 'core/actions/CreateAction'
+import DeleteAction from 'core/actions/DeleteAction'
+import { useSelector } from 'react-redux'
+import { cacheStoreKey, dataStoreKey } from 'core/caching/cacheReducers'
 
 const { qbert } = ApiClient.getInstance()
 
@@ -48,50 +52,51 @@ export const podActions = createCRUDActions(ActionDataKeys.Pods, {
   indexBy: 'clusterId',
 })
 
-export const listClusterPods = podsActions.add<
-  Array<IGenericResource<GetClusterPodsItem>>,
-  { clusterId: string }
->(
-  async ({ clusterId }) => {
-    Bugsnag.leaveBreadcrumb('Attempting to get pods', params)
-    return qbert.getClusterPods(clusterId)
-  },
-  { clusters: listClusters },
+export const listPods = podsActions.add(
+  new ListAction(async (params: { clusterId: string }) => {
+    const [clusterId, clusters] = await parseClusterParams(params)
+    return clusterId === allKey
+      ? someAsync(pluck('uuid', clusters).map(qbert.getClusterPods)).then(flatten)
+      : qbert.getClusterPods(clusterId)
+  }),
 )
 
-listClusterPods.listAll(async (params, depPromises) => {
-  const { clusters: clustersPromise } = depPromises
-  const clusters = await clustersPromise
-  return someAsync(pluck('uuid', clusters).map(qbert.getClusterPods)).then(flatten)
-})
+export const createPod = podsActions.add(
+  new CreateAction(
+    async ({
+      clusterId,
+      namespace,
+      yaml,
+    }: {
+      clusterId: string
+      namespace: string
+      yaml: string
+    }) => {
+      const body = jsYaml.safeLoad(yaml)
+      const pod = await qbert.createPod(clusterId, namespace, body)
+      trackEvent('Create New Pod', {
+        clusterId,
+        namespace,
+        name: pathStr('metadata.name', pod),
+      })
+      return pod
+    },
+  ),
+)
 
-// export const podActions = createCRUDActions(ActionDataKeys.Pods, {
-//   listFn: async (params) => {
-//     const [clusterId, clusters] = await parseClusterParams(params)
-//     return clusterId === allKey
-//       ? someAsync(pluck('uuid', clusters).map(qbert.getClusterPods)).then(flatten)
-//       : qbert.getClusterPods(clusterId)
-//   },
-//   createFn: async ({ clusterId, namespace, yaml }) => {
-//     const body = jsYaml.safeLoad(yaml)
-//     const pod = await qbert.createPod(clusterId, namespace, body)
-//     trackEvent('Create New Pod', {
-//       clusterId,
-//       namespace,
-//       name: pathStr('metadata.name', pod),
-//     })
-//     return pod
-//   },
-//   deleteFn: async ({ id }, currentItems) => {
-//     const { clusterId, namespace, name } = await currentItems.find((x) => x.id === id)
-//     const result = await qbert.deletePod(clusterId, namespace, name)
-//     trackEvent('Delete Pod', { clusterId, namespace, name, id })
-//     return result
-//   },
-//   uniqueIdentifier: 'metadata.uid',
-//   indexBy: 'clusterId',
-//   selectorCreator: makePodsSelector,
-// })
+export const deletePod = podsActions.add(
+  new DeleteAction(async (params: { id: string }) => {
+    const { id } = params
+    const singlePodSelector = pipe(
+      pathOr(emptyArr, [cacheStoreKey, dataStoreKey, DataKeys.Pods]),
+      find((x) => x.id === id),
+    )
+    const { clusterId, namespace, name } = useSelector(singlePodSelector)
+    const result = await qbert.deletePod(clusterId, namespace, name)
+    trackEvent('Delete Pod', { clusterId, namespace, name, id })
+    return result
+  }),
+)
 
 export const deploymentActions = createCRUDActions(ActionDataKeys.Deployments, {
   listFn: async (params) => {

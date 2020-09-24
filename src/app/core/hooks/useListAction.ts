@@ -43,7 +43,7 @@ interface Options<T, R> {
   loadingFeedback?: boolean
 }
 
-const useLoadAction = <T, R>(options: Options = {}) => {
+const useListAction = <T, R>(options: Options = {}) => {
   const { action, selector, params, loadOnDemand = false, loadingFeedback = true } = options
   const { cacheKey, errorMessage, indexBy, cache } = action.config
   const [{ currentTenant, currentRegion }] = useScopedPreferences()
@@ -99,7 +99,7 @@ const useLoadAction = <T, R>(options: Options = {}) => {
           dispatch(cacheActions.setLoading({ cacheKey, loading: true }))
         }
         try {
-          await action.run(memoizedParams)
+          await action.call(memoizedParams)
         } catch (err) {
           const parsedErrorMesssage = ensureFunction(errorMessage)(err, params)
           // TODO we should be putting these somewhere in the store to allow more control over the errors handling
@@ -130,4 +130,4 @@ const useLoadAction = <T, R>(options: Options = {}) => {
   return [loading, loadData]
 }
 
-export default useLoadAction
+export default useListAction
