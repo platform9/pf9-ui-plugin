@@ -1,7 +1,6 @@
 import DataKeys from 'k8s/DataKeys'
-import { Dictionary, isNil, mapObjIndexed, pick, pipe, reject, ValueOfRecord } from 'ramda'
-import { allKey } from 'app/constants'
-import { emptyArr, ensureArray } from 'utils/fp'
+import { Dictionary } from 'ramda'
+import { isNilOrEmpty } from 'utils/fp'
 
 export interface ActionConfig {
   uniqueIdentifier: string | string[]
@@ -12,51 +11,58 @@ export interface ActionConfig {
   successMessage?: (<D, P>(updatedItems: D[], prevItems: D[], params: P) => string) | string
   errorMessage?: (<P>(err: Error, params: P) => string) | string
 }
-export type ActionDependency = Record<string, Promise<any[]>>
 
-export type CallbackType<R, P, D = ActionDependency> = (params: P, depPromises: D) => Promise<R>
+abstract class Action<R, P extends Dictionary<any> = {}> {
+  public abstract get name(): string
 
-class Action<P, R = any[]> {
-  // public readonly callback: (params: P, depPromises: Array<Promise<any>>) => Promise<R>
-  public listAllCallback: CallbackType<R, P>
+  private baseConfig: ActionConfig = {
+    cacheKey: null,
+    uniqueIdentifier: 'id',
+    cache: true,
+  }
 
-  constructor(
-    public readonly callback: CallbackType<R, P>,
-    public readonly config: ActionConfig,
-    private readonly dependencies: Dictionary<Action<any>>,
-  ) {
-    this.callback = callback
-    this.config = {
-      uniqueIdentifier: 'id',
-      cache: true,
-      ...config,
+  constructor(public readonly callback: (params: P) => Promise<R>, config?: Partial<ActionConfig>) {
+    if (config) {
+      this.updateConfig(config)
     }
   }
 
-  public run = async (params: P): Promise<R> => {
-    const depPromises: ActionDependency = mapObjIndexed(
-      async (dep) => dep.run(params),
-      this.dependencies,
-    )
-    // eslint-disable-next-line @typescript-eslint/require-await
-    // const depPromises = this.dependencies.map((dep) => dep.run(params))
-    const { indexBy } = this.config
+  public updateConfig = (config: Partial<ActionConfig>) => {
+    this.baseConfig = Object.freeze({
+      ...this.baseConfig,
+      ...config,
+    })
+  }
 
-    const allIndexKeys = indexBy ? ensureArray(indexBy) : emptyArr
-    const providedRequiredParams = pipe(pick(allIndexKeys), reject(isNil))(params)
-    // @ts-ignore
-    const [primaryKey] = providedRequiredParams
+  public get config() {
+    return this.baseConfig
+  }
 
-    const whichCallback =
-      primaryKey === allKey || isNil(primaryKey) ? this.listAllCallback : this.callback
-    const result = await whichCallback(params, depPromises)
-    await Promise.all(Object.values(depPromises))
+  public get defaultResult(): R {
+    return null
+  }
+
+  public call = async (params: P): Promise<R> => {
+    if (isNilOrEmpty(this.config.cacheKey)) {
+      throw new Error(`'cacheKey' is missing from Action configuration`)
+    }
+
+    if (!this.validateParams(params)) {
+      return this.defaultResult
+    }
+
+    const result = await this.callback(params)
+
+    await this.postProcess(result, params)
+
     return result
   }
 
-  public listAll = (callback: CallbackType<R, P>) => {
-    this.listAllCallback = callback
+  protected validateParams = (params: P): boolean => {
+    return true
   }
+
+  protected abstract postProcess: (result: R, params: P) => Promise<void> | void
 }
 
 export default Action
