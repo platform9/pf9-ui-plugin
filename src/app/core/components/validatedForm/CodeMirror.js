@@ -117,7 +117,7 @@ const CodeMirror = ({
 
 CodeMirror.propTypes = {
   id: PropTypes.string.isRequired,
-  label: PropTypes.node,
+  label: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
   onChange: PropTypes.func,
   options: PropTypes.object,
   value: PropTypes.string,
