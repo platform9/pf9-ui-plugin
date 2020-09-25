@@ -34,6 +34,9 @@ const styles = (theme) => ({
   link: {
     textDecoration: 'none !important',
   },
+  title: {
+    color: theme.palette.grey[200],
+  },
 })
 
 @withStyles(styles)
@@ -43,7 +46,7 @@ class MenuListItem extends React.PureComponent {
     return (
       <MenuItem {...props} className={classes.menuItem}>
         <FontAwesomeIcon>{icon}</FontAwesomeIcon>
-        <Typography variant="subtitle2">{title || children}</Typography>
+        <Typography variant="body2">{title || children}</Typography>
       </MenuItem>
     )
   }
@@ -51,9 +54,7 @@ class MenuListItem extends React.PureComponent {
 
 @withStyles(styles)
 @withRouter
-@connect(
-  store => ({ session: store[sessionStoreKey] }),
-)
+@connect((store) => ({ session: store[sessionStoreKey] }))
 class UserMenu extends React.PureComponent {
   state = { anchorEl: null, showChangePasswordModal: false }
   handleClick = (event) => this.setState({ anchorEl: event.currentTarget })
@@ -75,7 +76,12 @@ class UserMenu extends React.PureComponent {
 
     return (
       <div className={`${classes.avatar} ${className}`}>
-        <Typography color="inherit" variant="subtitle2" onClick={this.handleClick}>
+        <Typography
+          color="inherit"
+          variant="body2"
+          className={classes.title}
+          onClick={this.handleClick}
+        >
           {username} &#9662;
         </Typography>
         <Menu

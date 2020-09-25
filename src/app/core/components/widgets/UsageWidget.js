@@ -47,16 +47,16 @@ const UsageWidget = ({
         percentage={percentStr}
         label={
           <div className={classes.container}>
-            <Typography variant="subtitle2" className={classes.title}>
+            <Typography variant="caption1" className={classes.title}>
               <b>{curStr}</b>
-            </Typography>
-            <Typography variant="subtitle2" className={classes.modifier}>
+            </Typography>{' '}
+            <Typography variant="caption4" className={classes.modifier}>
               {usedText}
             </Typography>
-            <Typography variant="subtitle2" className={classes.title}>
+            <Typography variant="caption1" className={classes.title}>
               <b>{maxStr}</b>
-            </Typography>
-            <Typography variant="subtitle2" className={classes.modifier}>
+            </Typography>{' '}
+            <Typography variant="caption4" className={classes.modifier}>
               available
             </Typography>
           </div>

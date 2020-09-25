@@ -29,6 +29,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
   icon: {
     cursor: 'pointer',
     fontWeight: 900,
+    color: theme.palette.grey[200],
   },
   clearButton: {
     fontSize: theme.typography.pxToRem(12),

@@ -148,7 +148,7 @@ export const typography = {
     lineHeight: '1.43',
     letterSpacing: '-0.21px',
   },
-  InputPlaceholder: {
+  inputPlaceholder: {
     fontFamily: 'Eina04',
     fontSize: '18px',
     fontWeight: 'normal',
@@ -167,7 +167,7 @@ export const typography = {
     letterSpacing: '-0.16px',
     textAlign: 'center',
   },
-  Nav: {
+  nav: {
     fontFamily: 'Eina04',
     fontSize: '16px',
     fontWeight: '600',
@@ -176,7 +176,7 @@ export const typography = {
     lineHeight: 'normal',
     letterSpacing: 'normal',
   },
-  ButtonPrimary: {
+  buttonPrimary: {
     fontFamily: 'Eina04',
     fontSize: '16px',
     fontWeight: '600',
@@ -215,7 +215,7 @@ export const typography = {
     textAlign: 'right',
   },
 
-  ButtonSecondary: {
+  buttonSecondary: {
     fontFamily: 'Eina04',
     fontSize: '14px',
     fontWeight: '600',
@@ -226,7 +226,7 @@ export const typography = {
     textAlign: 'center',
   },
 
-  InputTable: {
+  inputTable: {
     fontFamily: 'Eina04',
     fontSize: '14px',
     fontWeight: 'normal',
@@ -244,7 +244,7 @@ export const typography = {
     lineHeight: 'normal',
     letterSpacing: 'normal',
   },
-  Sidenav: {
+  sidenav: {
     fontFamily: 'Eina04',
     fontSize: '13px',
     fontWeight: '600',
@@ -253,7 +253,7 @@ export const typography = {
     lineHeight: 'normal',
     letterSpacing: '-0.2px',
   },
-  InputLabel: {
+  inputLabel: {
     fontFamily: 'Eina04',
     fontSize: '12px',
     fontWeight: '600',

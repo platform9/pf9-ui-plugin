@@ -5,10 +5,12 @@ import PropTypes from 'prop-types'
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    boxShadow: '0 1px 6px 1px rgba(0, 0, 0, 0.12)',
+    boxShadow: 'none',
     minWidth: 250,
     display: 'flex',
     flexDirection: 'column',
+    borderRadius: 4,
+    border: `1px solid ${theme.palette.gray[300]}`,
   },
   header: {
     padding: theme.spacing(1.5, 2),
@@ -28,13 +30,28 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   headerContent: {
+    position: 'relative',
     display: 'flex',
     flexFlow: 'row nowrap',
-    justifyContent: ({ image }) => (image ? 'space-between' : 'flex-start'),
+    justifyContent: ({ image }) => (image ? 'space-between' : 'center'),
     alignItems: 'center',
     padding: theme.spacing(0, 1),
     '& h6': {
-      color: theme.components.dashboardCard.text,
+      color: theme.palette.gray[700],
+      backgroundColor: theme.palette.gray['000'],
+      padding: '0 12px',
+      zIndex: 1,
+    },
+    '&:before': {
+      content: '""',
+      backgroundColor: theme.palette.gray[300],
+      borderRadius: 4,
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      top: '50%',
+      height: 1,
+      zIndex: 0,
     },
   },
   headerImg: {

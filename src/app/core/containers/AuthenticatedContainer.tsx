@@ -1,5 +1,5 @@
 import { makeStyles } from '@material-ui/styles'
-import { Button, Theme } from '@material-ui/core'
+import { Button, Theme, Typography } from '@material-ui/core'
 import ApiClient from 'api-client/ApiClient'
 import { CustomWindow } from 'app/polyfills/window'
 import {
@@ -53,7 +53,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginTop: 55, // header height is hardcoded to 55px. account for that here.
     overflowX: 'auto',
     flexGrow: 1,
-    backgroundColor: theme.palette.background.default,
+    backgroundColor: theme.palette.grey[100],
     padding: 0,
     transition: theme.transitions.create('margin', {
       easing: theme.transitions.easing.sharp,
@@ -353,6 +353,7 @@ const AuthenticatedContainer = () => {
             )}
             {pathStrOr(false, 'experimental.containervisor', features) &&
               currentStack === 'kubernetes' && <ClusterUpgradeBanner />}
+            <Typography variant="h1">Hi</Typography>
             <div className={classes.contentMain}>
               {renderRawComponents(plugins)}
               <Switch>

@@ -65,8 +65,10 @@ const ThemeManager = ({ children }) => {
   // Until we fix it we have to trick the TS engine to swallow this
   const theme = useMemo(() => createMuiTheme(jsonTheme as unknown), [jsonTheme])
 
+  // @ts-ignore
+  window.theme = theme
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={theme as AppTheme}>
       <CustomThemeProvider value={{ theme, setCustomTheme }}>{children}</CustomThemeProvider>
     </ThemeProvider>
   )

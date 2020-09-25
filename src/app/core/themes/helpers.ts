@@ -1,4 +1,4 @@
-import { Components } from './model'
+import Theme, { Components } from './model'
 
 interface IColor {
   '000'?: string
@@ -106,7 +106,7 @@ export function generateTypography<T>({
   fontWeightRegular = 400,
   fontWeightMedium = 500,
   typography,
-}) {
+}): ITypography<T> {
   const returnTypography = typography
   return {
     fontFamily,
@@ -126,10 +126,12 @@ export function generateTheme<P extends ThemeColors, T>({
   palette: IPalette<P>
   typography: ITypography<T>
   components: Components
-}) {
+}): Theme {
+  const MuiTypography = generateTypography<T>(typography)
+
   return {
     palette: generateColorPalette<P>(palette),
-    typography: generateTypography<T>(typography),
+    typography: MuiTypography,
     components,
     breakpoints: {
       keys: ['xs', 'sm', 'md', 'lg', 'xl'],
@@ -154,6 +156,17 @@ export function generateTheme<P extends ThemeColors, T>({
       },
     },
     overrides: {
+      MuiTypography: {
+        root: {
+          // this is hacky. how else do you get these elements to render correctly?
+          ...Object.fromEntries(
+            Object.entries(typography.typography).map(([key, value]) => [
+              `&.MuiTypography-${key}`,
+              value,
+            ]),
+          ),
+        },
+      },
       MuiSvgIcon: {
         root: {
           fontSize: '22px',

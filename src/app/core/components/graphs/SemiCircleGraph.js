@@ -3,6 +3,7 @@ import { Typography } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import AnimateValues from 'core/components/AnimateValues'
 import { describeArc } from 'core/utils/svgHelpers'
+import { hexToRGBA } from 'core/utils/colorHelpers'
 
 const strokeWidth = 12
 
@@ -15,14 +16,14 @@ const styles = (theme) => ({
   },
   barProgress: {
     fill: 'none',
-    stroke: '#31DA6D',
+    stroke: hexToRGBA(theme.palette.blue[500], 0.5),
     strokeWidth,
     strokeLinecap: 'square',
     strokeLinejoin: 'square',
   },
   barBackground: {
     fill: 'none',
-    stroke: '#D0E7F6',
+    stroke: theme.palette.grey[200],
     strokeWidth: strokeWidth - 1,
     strokeLinecap: 'square',
     strokeLinejoin: 'square',
@@ -30,12 +31,11 @@ const styles = (theme) => ({
   percent: {
     left: 0,
     right: 0,
-    bottom: 0,
+    bottom: -8,
     textAlign: 'center',
     position: 'absolute',
-    fontWeight: 'bold',
-    fill: 'red',
-    color: theme.components.dashboardCard.text,
+    color: theme.palette.blue[700],
+    fontWeight: 600,
   },
   label: {
     paddingTop: 5,
@@ -75,11 +75,11 @@ class SemiCircleGraph extends React.PureComponent {
                   d={describeArc(arcSize, arcSize, arcSize, 0, angle)}
                 />
               </svg>
-              <Typography variant="h6" className={classes.percent}>
+              <Typography variant="h2" className={classes.percent}>
                 {percentage}%
               </Typography>
             </div>
-            <Typography variant="caption" className={classes.label}>
+            <Typography variant="caption1" className={classes.label}>
               {label}
             </Typography>
           </div>

@@ -31,6 +31,8 @@ const useStyles = makeStyles<Theme, { themeColor: string }>((theme: Theme) => ({
         `1px solid ${themeColor === 'dark' ? theme.palette.grey['000'] : theme.palette.grey[900]}`,
     },
     '& input:-webkit-autofill': {
+      background: ({ themeColor }) =>
+        themeColor === 'dark' ? theme.palette.grey[900] : theme.palette.grey['000'],
       'animation-delay': '.5s' /* Safari support - any positive time runs instantly */,
       'animation-name': '$autofill',
       'animation-fill-mode': 'both',
@@ -38,9 +40,9 @@ const useStyles = makeStyles<Theme, { themeColor: string }>((theme: Theme) => ({
   },
 }))
 
-function TextField({ className = undefined, themeColor = 'dark', ...rest }) {
+function Input({ className = undefined, themeColor = 'dark', ...rest }) {
   const { input } = useStyles({ themeColor })
   return <MUITextField {...rest} variant="outlined" className={clsx(input, className)} />
 }
 
-export default TextField
+export default Input

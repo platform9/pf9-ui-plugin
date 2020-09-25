@@ -178,14 +178,14 @@ export interface Palette {
   type: string
   primary: DefaultColorSwatch
   secondary: { [key: string]: string }
-  // grey: { [key: string]: string }
-  contrastThreshold: number
-  tonalOffset: number
-  text: Text
-  divider: string
-  // background: Background
-  // action: Action
-  // empty: Upgrade
+  gray: { [key: string]: string }
+  blue: { [key: string]: string }
+  pink: { [key: string]: string }
+  yellow: { [key: string]: string }
+  k8sBlue: { [key: string]: string }
+  osRed: { [key: string]: string }
+  green: { [key: string]: string }
+  red: { [key: string]: string }
 }
 
 export interface Upgrade {
