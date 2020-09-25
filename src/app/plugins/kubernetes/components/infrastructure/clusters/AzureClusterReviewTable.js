@@ -38,6 +38,7 @@ const AzureClusterReviewTable = ({ data }) => {
             label="Enable workloads on all master nodes"
             value={castBoolToStr()(data.allowWorkloadsOnMaster)}
           />
+          <DataRow label="Auto scaling" value={castBoolToStr()(data.enableCAS)} />
           <DataRow label="Assign public IP's" value={castBoolToStr()(data.assignPublicIps)} />
           <DataRow label="API FQDN" value={data.externalDnsName} />
           <DataRow label="Containers CIDR" value={data.containersCidr} />
