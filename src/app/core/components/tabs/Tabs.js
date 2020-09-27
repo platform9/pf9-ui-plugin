@@ -36,6 +36,7 @@ const tabStyles = (theme) => ({
     cursor: 'default',
     minHeight: ({ compact }) => (compact ? 34 : 38),
     color: theme.palette.grey[500],
+    opacity: 1,
     '&.Mui-selected': {
       color: theme.palette.common.black,
     },
@@ -45,7 +46,7 @@ const tabStyles = (theme) => ({
     },
   },
   wrapper: {
-    padding: ({ compact }) => (compact ? theme.spacing(0.5, 1, 1) : theme.spacing(0.5, 2, 1)),
+    padding: ({ compact }) => (compact ? theme.spacing(0.5, 1, 0) : theme.spacing(0.5, 2, 0)),
     marginBottom: ({ compact }) => (compact ? 0 : theme.spacing(1)),
     transition: 'all .2s',
     lineHeight: 1,

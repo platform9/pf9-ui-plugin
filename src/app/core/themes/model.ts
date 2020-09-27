@@ -178,7 +178,7 @@ export interface Palette {
   type: string
   primary: DefaultColorSwatch
   secondary: { [key: string]: string }
-  gray: { [key: string]: string }
+  grey: { [key: string]: string }
   blue: { [key: string]: string }
   pink: { [key: string]: string }
   yellow: { [key: string]: string }
@@ -397,7 +397,7 @@ export interface RelianceLight {
 }
 
 export interface ReliencePalette {
-  gray: { [key: string]: string }
+  grey: { [key: string]: string }
   black: Black
   blue: { [key: string]: string }
   pink: { [key: string]: string }

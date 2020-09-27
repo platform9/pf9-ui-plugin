@@ -11,18 +11,20 @@ const useStyles = makeStyles((theme) => ({
   title: {
     fontWeight: 300,
     textAlign: 'right',
-    color: theme.components.dashboardCard.text,
+    color: theme.palette.grey[700],
   },
   modifier: {
     fontWeight: 300,
     textAlign: 'left',
-    color: theme.components.dashboardCard.text,
+    color: theme.palette.grey[700],
+    display: 'flex',
+    alignItems: 'center',
   },
   container: {
-    marginTop: 20,
+    marginTop: 13,
     display: 'grid',
     gridTemplateColumns: '1fr 1fr',
-    gridColumnGap: theme.spacing(),
+    gridColumnGap: theme.spacing(0.5),
   },
 }))
 

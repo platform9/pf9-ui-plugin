@@ -2,6 +2,7 @@ import React from 'react'
 import { PieChart, Pie, Cell } from 'recharts'
 import { useTheme } from '@material-ui/core/styles'
 import { pathStr } from 'utils/fp'
+import Theme from 'core/themes/model'
 
 export interface PieDataEntry {
   value: number
@@ -29,7 +30,7 @@ const PieGraph = ({
   empty,
   ...rest
 }: Props) => {
-  const theme: any = useTheme()
+  const theme: Theme = useTheme()
   const radius = Math.floor(sideLength / 2)
   const items = empty ? emptyData : data
 
@@ -51,10 +52,11 @@ const PieGraph = ({
       </Pie>
       {percent !== undefined && (
         <text
+          style={{ ...theme.typography.subtitle1 }}
           x={radius + 5}
-          y={radius + 5}
-          fill={theme.components.dashboardCard.text}
-          fontSize="24px"
+          y={radius + 3}
+          fill={theme.palette.green.main}
+          fontSize="21px"
           textAnchor="middle"
           dominantBaseline="middle"
         >
@@ -63,10 +65,11 @@ const PieGraph = ({
       )}
       {primary && (
         <text
+          style={{ ...theme.typography.caption4, textTransform: 'uppercase' }}
           x={radius + 5}
-          y={radius + 20}
-          fill={theme.components.dashboardCard.text}
-          fontSize="9px"
+          y={radius + 24}
+          fill={theme.palette.green.main}
+          fontSize="11px"
           textAnchor="middle"
           dominantBaseline="middle"
         >

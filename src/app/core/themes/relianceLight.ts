@@ -49,6 +49,9 @@ export const colors = {
   red: {
     '500': '#fc4646',
   },
+  orange: {
+    '500': '#ff8a00',
+  },
 }
 const components = {
   header: {

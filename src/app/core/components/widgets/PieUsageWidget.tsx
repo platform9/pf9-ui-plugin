@@ -1,7 +1,6 @@
 import React from 'react'
 import PieGraph, { PieDataEntry } from 'core/components/graphs/PieGraph'
 import { makeStyles } from '@material-ui/styles'
-import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { useTheme } from '@material-ui/core/styles'
 import { Theme } from '@material-ui/core'
 import Text from 'core/elements/text'
@@ -19,15 +18,22 @@ const useStyles = makeStyles((theme: Theme) => ({
     fontSize: '11px',
     marginLeft: theme.spacing(2),
   },
-  legendCircle: {
-    padding: '6px 0px',
-  },
   legendValue: {
-    padding: '6px 3px',
+    padding: '3px 8px 3px 0px',
     textAlign: 'right',
   },
   legendName: {
-    padding: '6px',
+    color: theme.palette.grey[800],
+    letterSpacing: '0.8px',
+  },
+  legendCount: {
+    color: theme.palette.grey['000'],
+    padding: '0 0 1px 0',
+    borderRadius: 25,
+    minWidth: '20px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 }))
 
@@ -40,7 +46,8 @@ export interface PieUsageWidgetProps {
 
 export const PieLegend = ({ data }) => {
   const theme: any = useTheme()
-  const { pieLegend, legendCircle, legendValue, legendName } = useStyles({})
+  const classes = useStyles({})
+  const { pieLegend, legendValue, legendName } = useStyles({})
 
   return (
     <div className={pieLegend}>
@@ -49,21 +56,19 @@ export const PieLegend = ({ data }) => {
           {data &&
             data.map((entry) => (
               <tr key={entry.name}>
-                <td>
-                  <FontAwesomeIcon
-                    solid
-                    style={{ color: pathStr(entry.color, theme.palette) }}
-                    size="1x"
-                    className={legendCircle}
-                  >
-                    circle
-                  </FontAwesomeIcon>
-                </td>
                 <td className={legendValue}>
-                  <Text variant="body2">{entry.value}</Text>
+                  <Text
+                    variant="caption1"
+                    className={classes.legendCount}
+                    style={{ backgroundColor: pathStr(entry.color, theme.palette) }}
+                  >
+                    {entry.value}
+                  </Text>
                 </td>
-                <td className={legendName}>
-                  <Text variant="body2">{formattedName(entry.name)}</Text>
+                <td>
+                  <Text variant="body2" className={legendName}>
+                    {formattedName(entry.name)}
+                  </Text>
                 </td>
               </tr>
             ))}

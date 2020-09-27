@@ -81,7 +81,7 @@ export const clusterStatusCardProps: IStatusCardWithFilterProps = {
   permissions: ['admin'], // Technically non-admins have read-only access
   route: routes.cluster.list.path(),
   addRoute: routes.cluster.add.path(),
-  title: 'Clusters',
+  title: 'Clusters Total',
   icon: 'project-diagram',
   dataLoader: [clusterActions.list, {}],
   quantityFn: (clusters) => ({
@@ -90,22 +90,22 @@ export const clusterStatusCardProps: IStatusCardWithFilterProps = {
       {
         name: 'healthy',
         value: clusters.filter((cluster) => cluster.healthStatus === 'healthy').length,
-        color: 'success.main',
+        color: 'green.main',
       },
       {
         name: 'partially_healthy',
         value: clusters.filter((cluster) => cluster.healthStatus === 'partially_healthy').length,
-        color: 'warning.light',
+        color: 'yellow.main',
       },
       {
         name: 'converging',
         value: clusters.filter((cluster) => cluster.healthStatus === 'converging').length,
-        color: 'warning.main',
+        color: 'orange.main',
       },
       {
         name: 'unhealthy',
         value: clusters.filter((cluster) => cluster.healthStatus === 'unhealthy').length,
-        color: 'error.main',
+        color: 'red.main',
       },
     ],
     piePrimary: 'healthy',

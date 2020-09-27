@@ -9,7 +9,6 @@ const strokeWidth = 12
 
 const styles = (theme) => ({
   root: {
-    padding: theme.spacing(1),
     width: ({ width }) => width,
     position: 'relative',
     textAlign: 'center',

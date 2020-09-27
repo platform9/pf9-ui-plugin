@@ -4,7 +4,7 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import { makeStyles } from '@material-ui/styles'
 
 // Components
-import StatusCard from '../dashboard/StatusCard'
+import ListPageHeaderCard from './ListPageHeaderCard'
 import UsageWidget from 'core/components/widgets/UsageWidget'
 
 // Types
@@ -39,7 +39,7 @@ function ListPageHeader<T>({ loaderFn, report, totalUsageFn }: IListPageHeaderPr
     <>
       <PollingData hidden loading={loading} onReload={reload} refreshDuration={1000 * 10} />
       <div className={classes.container}>
-        <StatusCard {...report} actionRow={false} className={classes.card} />
+        <ListPageHeaderCard {...report} className={classes.card} />
         <UsageWidget title="Compute" stats={totals.compute} units="GHz" />
         <UsageWidget title="Memory" stats={totals.memory} units="GiB" />
         <UsageWidget title="Storage" stats={totals.disk} units="GiB" />
@@ -53,7 +53,7 @@ export default ListPageHeader
 const useStyles = makeStyles<Theme>((theme) => ({
   container: {
     display: 'grid',
-    gridTemplateColumns: '300px repeat(3, 250px)',
+    gridTemplateColumns: '450px repeat(3, 250px)',
     gridGap: theme.spacing(2),
   },
   card: {
