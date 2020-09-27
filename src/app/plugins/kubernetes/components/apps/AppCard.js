@@ -1,4 +1,5 @@
-import { Button, Card, CardContent, CardMedia, Grid, Tooltip, Typography } from '@material-ui/core'
+import { Button, Card, CardContent, CardMedia, Grid, Tooltip } from '@material-ui/core'
+import Text from 'core/elements/text'
 import PropTypes from 'prop-types'
 import { makeStyles } from '@material-ui/styles'
 import GetAppIcon from '@material-ui/icons/GetApp'
@@ -96,11 +97,11 @@ const AppCard = ({
         <div className={classes.details}>
           <CardContent className={classes.content}>
             <SimpleLink src={detailUrl}>
-              <Typography variant="subtitle1">{name}</Typography>
+              <Text variant="subtitle1">{name}</Text>
             </SimpleLink>
-            <Typography variant="body2" className={classes.text}>
+            <Text variant="body2" className={classes.text}>
               {description}
-            </Typography>
+            </Text>
           </CardContent>
           <div className={classes.actions}>
             <Button component={SimpleLink} src={detailUrl}>

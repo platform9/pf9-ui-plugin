@@ -1,6 +1,7 @@
 import React from 'react'
 import { withStyles } from '@material-ui/styles'
-import { Button, Card, CardContent, CardMedia, Grid, Typography } from '@material-ui/core'
+import { Button, Card, CardContent, CardMedia, Grid } from '@material-ui/core'
+import Text from 'core/elements/text'
 import CloudDownloadIcon from '@material-ui/icons/CloudDownload'
 import { rootPath } from 'core/globals'
 
@@ -41,61 +42,61 @@ class ImageCard extends React.PureComponent {
       <Card className={classes.card}>
         <div align="center">
           <CardMedia className={classes.cover} image={rootPath + image.icon} title="logo" />
-          <Typography variant="subtitle1" color="textSecondary">
+          <Text variant="subtitle1" color="textSecondary">
             {image.os}
-          </Typography>
+          </Text>
           <Button href={image.location}>
             <CloudDownloadIcon color="primary" className={classes.icon} />
-            <Typography>Download</Typography>
+            <Text>Download</Text>
           </Button>
         </div>
         <div className={classes.details}>
           <CardContent className={classes.content}>
-            <Typography variant="h5" paragraph>
+            <Text variant="h5" paragraph>
               {image.name}
-            </Typography>
-            <Typography variant="subtitle1" color="textSecondary" paragraph>
+            </Text>
+            <Text variant="subtitle1" color="textSecondary" paragraph>
               {image.description}
-            </Typography>
+            </Text>
             <br />
             <Grid container className={classes.root} spacing={2}>
               <Grid item sm={3}>
-                <Typography variant="body1" className={classes.text}>
+                <Text variant="body1" className={classes.text}>
                   Disk Format:{' '}
-                </Typography>
-                <Typography variant="body2" className={classes.text} paragraph>
+                </Text>
+                <Text variant="body2" className={classes.text} paragraph>
                   {image.disk_format}
-                </Typography>
+                </Text>
                 <br />
-                <Typography variant="body1" className={classes.text}>
+                <Text variant="body1" className={classes.text}>
                   Image Size:{' '}
-                </Typography>
-                <Typography variant="body2" className={classes.text}>
+                </Text>
+                <Text variant="body2" className={classes.text}>
                   {image.size}
-                </Typography>
+                </Text>
               </Grid>
               <Grid item sm={6}>
-                <Typography variant="body1" className={classes.text}>
+                <Text variant="body1" className={classes.text}>
                   MD5sum:{' '}
-                </Typography>
-                <Typography variant="body2" className={classes.text} paragraph>
+                </Text>
+                <Text variant="body2" className={classes.text} paragraph>
                   {image.md5sum}
-                </Typography>
+                </Text>
                 <br />
-                <Typography variant="body1" className={classes.text}>
+                <Text variant="body1" className={classes.text}>
                   Default User:{' '}
-                </Typography>
-                <Typography variant="body2" className={classes.text}>
+                </Text>
+                <Text variant="body2" className={classes.text}>
                   {image.default_user}{' '}
-                </Typography>
+                </Text>
               </Grid>
               <Grid item sm={3}>
-                <Typography variant="body1" className={classes.text}>
+                <Text variant="body1" className={classes.text}>
                   Default Password:{' '}
-                </Typography>
-                <Typography variant="body2" className={classes.text}>
+                </Text>
+                <Text variant="body2" className={classes.text}>
                   {image.default_password}
-                </Typography>
+                </Text>
               </Grid>
             </Grid>
           </CardContent>

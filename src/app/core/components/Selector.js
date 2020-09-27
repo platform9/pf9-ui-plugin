@@ -1,11 +1,12 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/styles'
-import { Menu, MenuItem, Typography } from '@material-ui/core'
+import { Menu, MenuItem } from '@material-ui/core'
 import SearchBar from './SearchBar'
 import clsx from 'clsx'
 import { pick } from 'ramda'
 import { withProgress } from 'core/components/progress/Progress'
+import Text from 'core/elements/text'
 
 const styles = (theme) => ({
   search: {
@@ -60,10 +61,10 @@ class Selector extends PureComponent {
     const filteredList = searchTerm === '' ? sortedList : this.filterBySearch(sortedList)
     return (
       <div {...mouseEventHandlers} className={clsx(className, classes.selector)}>
-        <Typography variant="body2" className={classes.title} onClick={this.handleClick}>
+        <Text variant="body2" className={classes.title} onClick={this.handleClick}>
           {type && `${type}: `}
           <b>{name}</b> &#9662;
-        </Typography>
+        </Text>
         <Menu
           id={selectorName}
           anchorEl={anchor}

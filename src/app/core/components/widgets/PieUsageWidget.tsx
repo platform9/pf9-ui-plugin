@@ -3,7 +3,8 @@ import PieGraph, { PieDataEntry } from 'core/components/graphs/PieGraph'
 import { makeStyles } from '@material-ui/styles'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { useTheme } from '@material-ui/core/styles'
-import { Theme, Typography } from '@material-ui/core'
+import { Theme } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { pathStr } from 'utils/fp'
 import { formattedName } from 'core/utils/formatters'
 
@@ -59,10 +60,10 @@ export const PieLegend = ({ data }) => {
                   </FontAwesomeIcon>
                 </td>
                 <td className={legendValue}>
-                  <Typography variant="body2">{entry.value}</Typography>
+                  <Text variant="body2">{entry.value}</Text>
                 </td>
                 <td className={legendName}>
-                  <Typography variant="body2">{formattedName(entry.name)}</Typography>
+                  <Text variant="body2">{formattedName(entry.name)}</Text>
                 </td>
               </tr>
             ))}

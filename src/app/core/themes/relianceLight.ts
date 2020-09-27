@@ -1,7 +1,7 @@
 import { generateTheme } from './helpers'
 
 export const colors = {
-  gray: {
+  grey: {
     '000': '#ffffff',
     '100': '#f5f5f9',
     '200': '#e6e6ea',
@@ -52,11 +52,11 @@ export const colors = {
 }
 const components = {
   header: {
-    background: colors.gray[900],
+    background: colors.grey[900],
   },
   sidebar: {
-    background: colors.gray[800],
-    text: colors.gray[200],
+    background: colors.grey[800],
+    text: colors.grey[200],
     activeText: '#000',
     hoverText: '#000',
   },
@@ -142,7 +142,7 @@ export const typography = {
   subtitle1: {
     fontFamily: 'Eina04',
     fontSize: '21px',
-    fontWeight: '600',
+    fontWeight: 600,
     fontStretch: 'normal',
     fontStyle: 'normal',
     lineHeight: '1.43',
@@ -160,7 +160,7 @@ export const typography = {
   subtitle2: {
     fontFamily: 'Eina04',
     fontSize: '16px',
-    fontWeight: '600',
+    fontWeight: 600,
     fontStretch: 'normal',
     fontStyle: 'normal',
     lineHeight: '1.5',
@@ -170,7 +170,7 @@ export const typography = {
   nav: {
     fontFamily: 'Eina04',
     fontSize: '16px',
-    fontWeight: '600',
+    fontWeight: 600,
     fontStretch: 'normal',
     fontStyle: 'normal',
     lineHeight: 'normal',
@@ -179,7 +179,7 @@ export const typography = {
   buttonPrimary: {
     fontFamily: 'Eina04',
     fontSize: '16px',
-    fontWeight: '600',
+    fontWeight: 600,
     fontStretch: 'normal',
     fontStyle: 'normal',
     lineHeight: 'normal',
@@ -198,7 +198,7 @@ export const typography = {
   h4: {
     fontFamily: 'Eina04',
     fontSize: '14px',
-    fontWeight: '600',
+    fontWeight: 600,
     fontStretch: 'normal',
     fontStyle: 'normal',
     lineHeight: 'normal',
@@ -207,7 +207,7 @@ export const typography = {
   caption1: {
     fontFamily: 'Eina04',
     fontSize: '14px',
-    fontWeight: '600',
+    fontWeight: 600,
     fontStretch: 'normal',
     fontStyle: 'normal',
     lineHeight: 'normal',
@@ -218,7 +218,7 @@ export const typography = {
   buttonSecondary: {
     fontFamily: 'Eina04',
     fontSize: '14px',
-    fontWeight: '600',
+    fontWeight: 600,
     fontStretch: 'normal',
     fontStyle: 'normal',
     lineHeight: 'normal',
@@ -247,7 +247,7 @@ export const typography = {
   sidenav: {
     fontFamily: 'Eina04',
     fontSize: '13px',
-    fontWeight: '600',
+    fontWeight: 600,
     fontStretch: 'normal',
     fontStyle: 'normal',
     lineHeight: 'normal',
@@ -256,7 +256,7 @@ export const typography = {
   inputLabel: {
     fontFamily: 'Eina04',
     fontSize: '12px',
-    fontWeight: '600',
+    fontWeight: 600,
     fontStretch: 'normal',
     fontStyle: 'normal',
     lineHeight: 'normal',
@@ -265,7 +265,7 @@ export const typography = {
   caption2: {
     fontFamily: 'Eina04',
     fontSize: '12px',
-    fontWeight: '600',
+    fontWeight: 600,
     fontStretch: 'normal',
     fontStyle: 'normal',
     lineHeight: '1.67',
@@ -274,7 +274,7 @@ export const typography = {
   caption4: {
     fontFamily: 'Eina04',
     fontSize: '11px',
-    fontWeight: '600',
+    fontWeight: 600,
     fontStretch: 'normal',
     fontStyle: 'normal',
     lineHeight: 'normal',

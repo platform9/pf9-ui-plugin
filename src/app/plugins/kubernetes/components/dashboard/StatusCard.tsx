@@ -6,7 +6,8 @@ import { Link } from 'react-router-dom'
 import { makeStyles } from '@material-ui/styles'
 import useDataLoader from 'core/hooks/useDataLoader'
 // Components
-import { Typography, CircularProgress } from '@material-ui/core'
+import { CircularProgress } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { hexToRGBA } from 'core/utils/colorHelpers'
 import CardButton from 'core/components/buttons/CardButton'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
@@ -144,9 +145,9 @@ const StatusCard: FunctionComponent<StatusCardProps> = ({
     <div className={clsx(contentContainer, className)}>
       <header className={header}>
         <Link to={route}>
-          <Typography variant="h6" className={cardTitle}>
+          <Text variant="h6" className={cardTitle}>
             {title}
-          </Typography>
+          </Text>
         </Link>
         <FontAwesomeIcon className={headerIcon}>{icon}</FontAwesomeIcon>
         {loading ? <CircularProgress size={32} /> : <span className={text}>{quantity}</span>}

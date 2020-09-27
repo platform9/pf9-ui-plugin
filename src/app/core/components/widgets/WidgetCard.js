@@ -1,5 +1,6 @@
 import React from 'react'
-import { Card, CardHeader, CardContent, Typography } from '@material-ui/core'
+import { Card, CardHeader, CardContent } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
 import PropTypes from 'prop-types'
 
@@ -10,7 +11,7 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'column',
     borderRadius: 4,
-    border: `1px solid ${theme.palette.gray[300]}`,
+    border: `1px solid ${theme.palette.grey[300]}`,
   },
   header: {
     padding: theme.spacing(1.5, 2),
@@ -37,14 +38,14 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'center',
     padding: theme.spacing(0, 1),
     '& h6': {
-      color: theme.palette.gray[700],
-      backgroundColor: theme.palette.gray['000'],
+      color: theme.palette.grey[700],
+      backgroundColor: theme.palette.grey['000'],
       padding: '0 12px',
       zIndex: 1,
     },
     '&:before': {
       content: '""',
-      backgroundColor: theme.palette.gray[300],
+      backgroundColor: theme.palette.grey[300],
       borderRadius: 4,
       position: 'absolute',
       left: 0,
@@ -66,7 +67,7 @@ const HeaderContent = ({ title, image }) => {
   const { headerContent, headerImg } = useStyles({ image })
   return (
     <div className={headerContent}>
-      <Typography variant="h6">{title}</Typography>
+      <Text variant="h6">{title}</Text>
       {image && (
         <div className={headerImg}>
           {typeof image === 'string' ? <img alt="" src={image} /> : image}

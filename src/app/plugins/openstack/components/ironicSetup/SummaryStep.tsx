@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react'
-import { Typography, Paper } from '@material-ui/core'
+import { Paper } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
 import { hexToRGBA } from 'core/utils/colorHelpers'
@@ -51,11 +52,8 @@ const OpenStackRcStep = ({ wizardContext }: Props): JSX.Element => {
   const [availableIps, setAvailableIps] = useState('')
   const [tenants] = useDataLoader(mngmTenantActions.list)
   const [networks] = useDataLoader(networkActions.list)
-  const provisioningNetwork = useMemo(() => (
-    networks.find((network) => (
-      network['provider:physical_network'] === 'provisioning'
-    ))
-  ),
+  const provisioningNetwork = useMemo(
+    () => networks.find((network) => network['provider:physical_network'] === 'provisioning'),
     [networks],
   )
 
@@ -65,7 +63,7 @@ const OpenStackRcStep = ({ wizardContext }: Props): JSX.Element => {
       return
     }
 
-    (async () => {
+    ;(async () => {
       const ipInfo = await networkIpAvailability(provisioningNetwork.id)
       setAvailableIps(ipInfo.total_ips)
     })()
@@ -77,9 +75,7 @@ const OpenStackRcStep = ({ wizardContext }: Props): JSX.Element => {
       return
     }
 
-    const networkTenant = tenants.find(tenant => (
-      tenant.id === wizardContext.networkTenant
-    ))
+    const networkTenant = tenants.find((tenant) => tenant.id === wizardContext.networkTenant)
     setTenantName(networkTenant?.name)
   }, [tenants])
 
@@ -87,12 +83,10 @@ const OpenStackRcStep = ({ wizardContext }: Props): JSX.Element => {
     <div className={container}>
       <Paper className={paper} elevation={0}>
         <div className={card}>
-          <Typography variant="h6" className={clsx(light, header)}>
+          <Text variant="h6" className={clsx(light, header)}>
             Network Summary
-          </Typography>
-          <Typography className={subheader}>
-            Bare Metal Cloud Network
-          </Typography>
+          </Text>
+          <Text className={subheader}>Bare Metal Cloud Network</Text>
           <div className={field}>
             <span className={light}>Network Name:</span>
             <span>{wizardContext.networkName}</span>
@@ -105,9 +99,7 @@ const OpenStackRcStep = ({ wizardContext }: Props): JSX.Element => {
             <span className={light}>Connected Tenant:</span>
             <span>{tenantName}</span>
           </div>
-          <Typography className={subheader}>
-            Physical Properties
-          </Typography>
+          <Text className={subheader}>Physical Properties</Text>
           <div className={field}>
             <span className={light}>DNS Domain:</span>
             <span>{wizardContext.dnsDomain}</span>
@@ -128,9 +120,9 @@ const OpenStackRcStep = ({ wizardContext }: Props): JSX.Element => {
       </Paper>
       <Paper className={paper} elevation={0}>
         <div className={card}>
-          <Typography variant="h6" className={clsx(light, header)}>
+          <Text variant="h6" className={clsx(light, header)}>
             Controller Summary
-          </Typography>
+          </Text>
           <div className={field}>
             <span className={light}>Controller Host Name:</span>
             <span>{wizardContext.selectedHost[0].info.hostname}</span>
@@ -151,9 +143,9 @@ const OpenStackRcStep = ({ wizardContext }: Props): JSX.Element => {
       </Paper>
       <Paper className={paper} elevation={0}>
         <div className={card}>
-          <Typography variant="h6" className={clsx(light, header)}>
+          <Text variant="h6" className={clsx(light, header)}>
             Bare Metal Cloud IP Range Summary
-          </Typography>
+          </Text>
           <div className={field}>
             <span className={light}>Total Available IPs:</span>
             <span>{availableIps}</span>

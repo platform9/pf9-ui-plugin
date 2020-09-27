@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react'
 import ApiClient from 'api-client/ApiClient'
-import { Button, Checkbox, FormControlLabel, Typography } from '@material-ui/core'
+import { Button, Checkbox, FormControlLabel } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { withStyles } from '@material-ui/styles'
 import { compose } from 'utils/fp'
 import Alert from 'core/components/Alert'
@@ -25,7 +26,7 @@ const styles = (theme) => ({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: theme.palette.gray[900],
+    backgroundColor: theme.palette.grey[900],
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -34,7 +35,7 @@ const styles = (theme) => ({
     width: 1120,
     height: 600,
     borderRadius: 16,
-    border: `solid 1px ${theme.palette.gray[500]}`,
+    border: `solid 1px ${theme.palette.grey[500]}`,
     display: 'grid',
     gridTemplateColumns: '50% 50%',
     overflow: 'hidden',
@@ -47,7 +48,7 @@ const styles = (theme) => ({
   },
   formPane: {
     padding: '40px 40px 20px',
-    backgroundColor: theme.palette.gray[800],
+    backgroundColor: theme.palette.grey[800],
     display: 'grid',
     gridTemplateRows: '30px 1fr 15px',
     alignItems: 'center',
@@ -60,9 +61,9 @@ const styles = (theme) => ({
     alignItems: 'stretch',
   },
   textField: {
-    // border: `solid 1px ${theme.palette.gray['000']}`,
+    // border: `solid 1px ${theme.palette.grey['000']}`,
     '& input': {
-      backgroundColor: `${theme.palette.gray[800]} !important`,
+      backgroundColor: `${theme.palette.grey[800]} !important`,
     },
   },
   emailInput: {
@@ -74,7 +75,7 @@ const styles = (theme) => ({
   },
   paragraph: {
     fontSize: 11,
-    color: theme.palette.gray[300],
+    color: theme.palette.grey[300],
     textAlign: 'center',
   },
   img: {
@@ -93,7 +94,7 @@ const styles = (theme) => ({
     fontWeight: 600,
   },
   mfa: {
-    color: theme.palette.gray[200],
+    color: theme.palette.grey[200],
     ...theme.typography.caption2,
     fontWeight: 'normal',
   },
@@ -291,13 +292,13 @@ class LoginPage extends React.PureComponent<Props> {
     const { classes } = this.props
     return (
       <Fragment>
-        <Typography className={classes.paragraph} variant="caption" color="textSecondary">
+        <Text className={classes.paragraph} variant="caption" color="textSecondary">
           By signing in, you agree to our{' '}
           <ExternalLink url="https://platform9.com/terms-conditions/">
             Terms of Service
           </ExternalLink>
           . © 2014-{moment().year()} Platform9 Systems, Inc.
-        </Typography>
+        </Text>
       </Fragment>
     )
   }
@@ -323,15 +324,15 @@ class LoginPage extends React.PureComponent<Props> {
               className={classes.img}
             />
             <form className={classes.form} onSubmit={this.performLogin}>
-              <Typography variant="h3" className={classes.formTitle} align="center">
+              <Text variant="h3" className={classes.formTitle} align="center">
                 Sign In
-              </Typography>
+              </Text>
               {this.renderInputfield()}
-              <Typography className={classes.forgotPwd} gutterBottom>
+              <Text className={classes.forgotPwd} gutterBottom>
                 <SimpleLink onClick={this.handleForgotPassword()} src={forgotPasswordUrl}>
                   Forgot password?
                 </SimpleLink>
-              </Typography>
+              </Text>
               <div className={classes.mfaContainer}>
                 {this.renderMFACheckbox()}
                 {this.state.MFAcheckbox && this.renderMFAInput()}

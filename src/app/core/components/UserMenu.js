@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Menu, MenuItem, Typography } from '@material-ui/core'
+import { Menu, MenuItem } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import { withRouter } from 'react-router'
 import { logoutUrl, helpUrl } from 'app/constants'
@@ -9,6 +9,7 @@ import { sessionStoreKey } from 'core/session/sessionReducers'
 import ChangePasswordModal from './ChangePasswordModal'
 import FontAwesomeIcon from './FontAwesomeIcon'
 import SimpleLink from './SimpleLink'
+import Text from 'core/elements/text'
 
 const styles = (theme) => ({
   avatar: {
@@ -46,7 +47,7 @@ class MenuListItem extends React.PureComponent {
     return (
       <MenuItem {...props} className={classes.menuItem}>
         <FontAwesomeIcon>{icon}</FontAwesomeIcon>
-        <Typography variant="body2">{title || children}</Typography>
+        <Text variant="body2">{title || children}</Text>
       </MenuItem>
     )
   }
@@ -76,14 +77,9 @@ class UserMenu extends React.PureComponent {
 
     return (
       <div className={`${classes.avatar} ${className}`}>
-        <Typography
-          color="inherit"
-          variant="body2"
-          className={classes.title}
-          onClick={this.handleClick}
-        >
+        <Text color="inherit" variant="body2" className={classes.title} onClick={this.handleClick}>
           {username} &#9662;
-        </Typography>
+        </Text>
         <Menu
           id="user-menu"
           anchorEl={anchorEl}

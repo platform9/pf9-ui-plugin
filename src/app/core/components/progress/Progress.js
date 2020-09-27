@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/core/styles'
 import clsx from 'clsx'
 import { imageUrls } from 'app/constants'
-import Typography from '@material-ui/core/Typography'
+import Text from 'core/elements/text'
 import { pick, omit, keys } from 'ramda'
 
 const styles = (theme) => ({
@@ -114,7 +114,7 @@ class Progress extends PureComponent {
           <img alt="Loading..." src={imageUrls.loading} className={classes.img} />
         )}
         {message && (
-          <Typography
+          <Text
             className={clsx(classes.message, {
               [classes.messageInline]: inline,
             })}
@@ -122,7 +122,7 @@ class Progress extends PureComponent {
             color="textSecondary"
           >
             {message}
-          </Typography>
+          </Text>
         )}
       </div>
     )

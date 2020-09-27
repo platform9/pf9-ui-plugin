@@ -1,8 +1,8 @@
 // Libs
 import React, { FC } from 'react'
 import { makeStyles } from '@material-ui/styles'
-import { Theme, Typography } from '@material-ui/core'
-
+import { Theme } from '@material-ui/core'
+import Text from 'core/elements/text'
 // Helpers
 import { hexToRGBA } from 'core/utils/colorHelpers'
 
@@ -34,9 +34,9 @@ const NoContentMessage: FC<Props> = ({ children, message, defaultHeight = 300 })
   return (
     <div className={messageContainer}>
       {message ? (
-        <Typography className={messageTitle} variant="h6">
+        <Text className={messageTitle} variant="h6">
           {message}
-        </Typography>
+        </Text>
       ) : (
         children
       )}

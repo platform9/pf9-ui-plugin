@@ -1,5 +1,6 @@
 import TextField from 'core/components/validatedForm/TextField'
-import { Typography, List } from '@material-ui/core'
+import { List } from '@material-ui/core'
+import Text from 'core/elements/text'
 import {
   hasMinLength,
   hasOneLowerChar,
@@ -35,7 +36,7 @@ const UserPasswordField = ({ value }) => (
       type="password"
       validations={passwordValidators}
     />
-    <Typography variant="body1" component="div">
+    <Text variant="body1" component="div">
       Password must contain the following:
       <List dense>
         <CheckListItem checked={hasMinLength(8)(value)}>At least 8 characters long</CheckListItem>
@@ -46,7 +47,7 @@ const UserPasswordField = ({ value }) => (
           1 Special character - {specialChars}
         </CheckListItem>
       </List>
-    </Typography>
+    </Text>
   </>
 )
 

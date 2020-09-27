@@ -1,5 +1,5 @@
 import React from 'react'
-import { Typography } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { withStyles } from '@material-ui/styles'
 import AnimateValues from 'core/components/AnimateValues'
 import { describeArc } from 'core/utils/svgHelpers'
@@ -75,13 +75,13 @@ class SemiCircleGraph extends React.PureComponent {
                   d={describeArc(arcSize, arcSize, arcSize, 0, angle)}
                 />
               </svg>
-              <Typography variant="h2" className={classes.percent}>
+              <Text variant="h2" className={classes.percent}>
                 {percentage}%
-              </Typography>
+              </Text>
             </div>
-            <Typography variant="caption1" className={classes.label}>
+            <Text variant="caption1" className={classes.label}>
               {label}
-            </Typography>
+            </Text>
           </div>
         )}
       </AnimateValues>

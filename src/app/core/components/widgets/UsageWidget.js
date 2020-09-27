@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import SemiCircleGraph from 'core/components/graphs/SemiCircleGraph'
 import WidgetCard from 'core/components/widgets/WidgetCard'
-import { Typography } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
 
 const defaultStats = { current: 0, max: 0, percent: 0 }
@@ -47,18 +47,18 @@ const UsageWidget = ({
         percentage={percentStr}
         label={
           <div className={classes.container}>
-            <Typography variant="caption1" className={classes.title}>
+            <Text variant="caption1" className={classes.title}>
               <b>{curStr}</b>
-            </Typography>{' '}
-            <Typography variant="caption4" className={classes.modifier}>
+            </Text>{' '}
+            <Text variant="caption4" className={classes.modifier}>
               {usedText}
-            </Typography>
-            <Typography variant="caption1" className={classes.title}>
+            </Text>
+            <Text variant="caption1" className={classes.title}>
               <b>{maxStr}</b>
-            </Typography>{' '}
-            <Typography variant="caption4" className={classes.modifier}>
+            </Text>{' '}
+            <Text variant="caption4" className={classes.modifier}>
               available
-            </Typography>
+            </Text>
           </div>
         }
         {...rest}

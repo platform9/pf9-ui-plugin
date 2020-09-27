@@ -13,6 +13,7 @@ const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
     flexFlow: 'column nowrap',
+    position: 'relative',
   },
   header: {
     display: 'flex',

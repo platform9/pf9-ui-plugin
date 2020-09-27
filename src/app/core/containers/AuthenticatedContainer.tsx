@@ -1,5 +1,5 @@
 import { makeStyles } from '@material-ui/styles'
-import { Button, Theme, Typography } from '@material-ui/core'
+import { Button } from '@material-ui/core'
 import ApiClient from 'api-client/ApiClient'
 import { CustomWindow } from 'app/polyfills/window'
 import {
@@ -36,6 +36,7 @@ import BannerContainer from 'core/components/notifications/BannerContainer'
 import BannerContent from 'core/components/notifications/BannerContent'
 import { trackEvent } from 'utils/tracking'
 import ClusterUpgradeBanner from 'core/banners/ClusterUpgradeBanner'
+import Theme from 'core/themes/model'
 
 declare let window: CustomWindow
 
@@ -80,7 +81,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     minHeight: theme.spacing(6),
   },
   contentMain: {
-    padding: theme.spacing(3, 3, 3, 5),
+    padding: theme.spacing(3, 3, 3, 3.5),
   },
   sandboxBanner: {
     display: 'flex',
@@ -353,7 +354,6 @@ const AuthenticatedContainer = () => {
             )}
             {pathStrOr(false, 'experimental.containervisor', features) &&
               currentStack === 'kubernetes' && <ClusterUpgradeBanner />}
-            <Typography variant="h1">Hi</Typography>
             <div className={classes.contentMain}>
               {renderRawComponents(plugins)}
               <Switch>

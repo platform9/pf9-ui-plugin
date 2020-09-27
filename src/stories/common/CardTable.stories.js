@@ -1,14 +1,6 @@
 import React from 'react'
-import {
-  TextField,
-  Card,
-  Grid,
-  CardMedia,
-  Button,
-  CardContent,
-  Typography,
-  Tooltip,
-} from '@material-ui/core'
+import { TextField, Card, Grid, CardMedia, Button, CardContent, Tooltip } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { withStyles } from '@material-ui/styles'
 import { action } from '@storybook/addon-actions'
 import GetAppIcon from '@material-ui/icons/GetApp'
@@ -215,12 +207,12 @@ const DefaultListTable = ({ actions }) => (
               </div>
               <div className={classes.details}>
                 <CardContent className={classes.content}>
-                  <Typography component="h6" variant="h6">
+                  <Text component="h6" variant="h6">
                     {item.name}
-                  </Typography>
-                  <Typography variant="body1" className={classes.text}>
+                  </Text>
+                  <Text variant="body1" className={classes.text}>
                     {item.description}
-                  </Typography>
+                  </Text>
                 </CardContent>
                 <div className={classes.actions}>
                   <Button onClick={actions.onDetailClick}>

@@ -2,7 +2,8 @@ import React, { useState } from 'react'
 import Markdown from 'core/components/Markdown'
 import useReactRouter from 'use-react-router'
 import Progress from 'core/components/progress/Progress'
-import { Paper, Grid, Typography, CardMedia, Button, Card } from '@material-ui/core'
+import { Paper, Grid, CardMedia, Button, Card } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
 import useDataLoader from 'core/hooks/useDataLoader'
 import AppVersionPicklist from 'k8s/components/apps/AppVersionPicklist'
@@ -85,27 +86,27 @@ const AppDetailsPage = () => {
               </Card>
             )}
             <Paper className={classes.paper}>
-              <Typography variant="subtitle2">Application Version</Typography>
-              <Typography variant="body2" component="div">
+              <Text variant="subtitle2">Application Version</Text>
+              <Text variant="body2" component="div">
                 {params.version}
-              </Typography>
+              </Text>
               <br />
-              <Typography variant="subtitle2">Home</Typography>
-              <Typography variant="body2" component="div">
+              <Text variant="subtitle2">Home</Text>
+              <Text variant="body2" component="div">
                 {app.home && <ExternalLink url={app.home} />}
-              </Typography>
+              </Text>
               <br />
-              <Typography variant="subtitle2">Source Repository</Typography>
-              <Typography variant="body2" component="div">
+              <Text variant="subtitle2">Source Repository</Text>
+              <Text variant="body2" component="div">
                 {(app.sources || emptyArr).map((source) => (
                   <div key={source}>
                     <ExternalLink url={source} />
                   </div>
                 ))}
-              </Typography>
+              </Text>
               <br />
-              <Typography variant="subtitle2">Maintainers</Typography>
-              <Typography variant="body2" component="div">
+              <Text variant="subtitle2">Maintainers</Text>
+              <Text variant="body2" component="div">
                 {(app.maintainers || emptyArr).map((maintainer) => (
                   <div key={maintainer.email}>
                     <ExternalLink url={`mailto: ${maintainer.email}`}>
@@ -113,7 +114,7 @@ const AppDetailsPage = () => {
                     </ExternalLink>
                   </div>
                 ))}
-              </Typography>
+              </Text>
             </Paper>
           </Grid>
           <Grid item xs={9} lg={10} zeroMinWidth>

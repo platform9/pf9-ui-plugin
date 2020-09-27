@@ -1,7 +1,7 @@
 // Libs
 import React, { useState, useCallback } from 'react'
 import moment from 'moment'
-import { Typography } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { TypographyProps } from '@material-ui/core/Typography'
 // Components
 import Loading from 'core/components/Loading'
@@ -55,9 +55,9 @@ function PollingData<T>({
 
   return (
     <Loading loading={loading} justify="flex-start" onClick={pause ? undefined : reload} reverse>
-      <Typography variant="caption" color={textColor}>
+      <Text variant="caption" color={textColor}>
         {loading ? 'loading...' : moment(lastIntervalTs).fromNow()}
-      </Typography>
+      </Text>
     </Loading>
   )
 }

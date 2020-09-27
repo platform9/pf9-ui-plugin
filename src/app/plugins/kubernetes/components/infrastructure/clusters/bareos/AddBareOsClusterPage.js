@@ -43,14 +43,8 @@ import {
 import { trackEvent } from 'utils/tracking'
 import { loadNodes } from '../../nodes/actions'
 import useDataLoader from 'core/hooks/useDataLoader'
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Typography,
-  Button,
-} from '@material-ui/core'
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { hexToRGBA } from 'core/utils/colorHelpers'
 import PollingData from 'core/components/PollingData'
 
@@ -306,32 +300,32 @@ const AddBareOsClusterPage = () => {
     <FormWrapper title="Add Bare OS Cluster" backUrl={listUrl} loading={creatingBareOSCluster}>
       <Dialog open={showDialog}>
         <DialogTitle>
-          <Typography variant="h5" component="span">
+          <Text variant="h5" component="span">
             No Nodes Ready
-          </Typography>
+          </Text>
         </DialogTitle>
         <DialogContent>
-          <Typography variant="body1">
+          <Text variant="body1">
             To build a BareOS cluster at least one node needs to be attached to the Management Plane
             and not in use by an existing cluster.
-          </Typography>
+          </Text>
           <br />
-          <Typography variant="subtitle2">How do I attach a node?</Typography>
+          <Text variant="subtitle2">How do I attach a node?</Text>
           <div className={classes.alert}>
-            <Typography variant="subtitle2" className="no-wrap-text">
+            <Text variant="subtitle2" className="no-wrap-text">
               The Platform9 CLI
-            </Typography>
-            <Typography variant="body1">
+            </Text>
+            <Text variant="body1">
               The Platform9 CLI is used to prepare and attach nodes to the Management Plane. The CLI
               should be run on each node using the ‘prep-node’ command. ‘prep-node’ authenticates
               the node to the Management Plane and installs all of the required Kubernetes
               prerequisites.
-            </Typography>
+            </Text>
           </div>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setShowDialog(false)} color="primary">
-            <Typography variant="body1">Close</Typography>
+            <Text variant="body1">Close</Text>
           </Button>
         </DialogActions>
       </Dialog>
@@ -388,7 +382,7 @@ const AddBareOsClusterPage = () => {
                 >
                   <div className={classes.innerWrapper}>
                     {/* Master nodes */}
-                    {/* <Typography>Select one or more nodes to add to the cluster as <strong>master</strong> nodes</Typography> */}
+                    {/* <Text>Select one or more nodes to add to the cluster as <strong>master</strong> nodes</Text> */}
                     <ClusterHostChooser
                       selection="none"
                       filterFn={allPass([isConnected, isUnassignedNode])}
@@ -499,7 +493,7 @@ const AddBareOsClusterPage = () => {
                     </div>
                   }
                 >
-                  {/* <Typography>Select one or more nodes to add to the cluster as <strong>worker</strong> nodes</Typography> */}
+                  {/* <Text>Select one or more nodes to add to the cluster as <strong>worker</strong> nodes</Text> */}
                   <div className={classes.innerWrapper}>
                     <ClusterHostChooser
                       className={classes.hostChooser}

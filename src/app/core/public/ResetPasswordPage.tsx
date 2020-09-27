@@ -1,7 +1,8 @@
 import React from 'react'
 import useReactRouter from 'use-react-router'
 import { makeStyles } from '@material-ui/styles'
-import { Button, Grid, Paper, Typography, List, InputAdornment, Theme } from '@material-ui/core'
+import { Button, Grid, Paper, List, InputAdornment, Theme } from '@material-ui/core'
+import Text from 'core/elements/text'
 import ListItem from '@material-ui/core/ListItem'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
 import CheckIcon from '@material-ui/icons/Check'
@@ -137,7 +138,7 @@ const CheckListItem: React.FC<{ checked: boolean }> = ({ children, checked }) =>
 )
 
 const renderPasswordValidationCheck: IPasswordValidationCheck = (passwordValue) => (
-  <Typography variant="body1" component="div">
+  <Text variant="body1" component="div">
     Password must contain the following:
     <List dense>
       {passwordValidatorList.map((record: IValidator) => (
@@ -149,7 +150,7 @@ const renderPasswordValidationCheck: IPasswordValidationCheck = (passwordValue) 
         </CheckListItem>
       ))}
     </List>
-  </Typography>
+  </Text>
 )
 
 const ResetPasswordPage: React.FC = () => {
@@ -211,9 +212,9 @@ const ResetPasswordPage: React.FC = () => {
         <Grid item md={5} lg={4}>
           <Paper className={classes.paper}>
             <img src="/ui/images/logo-color.png" className={classes.img} />
-            <Typography variant="subtitle1" align="center">
+            <Text variant="subtitle1" align="center">
               Password Reset
-            </Typography>
+            </Text>
             <ValidatedForm elevated={false} onSubmit={handleFormSubmit}>
               {({ values }) => (
                 <>
@@ -260,9 +261,9 @@ const ResetPasswordPage: React.FC = () => {
                     </>
                   ) : (
                     <>
-                      <Typography className={classes.paragraph} component="p">
+                      <Text className={classes.paragraph} component="p">
                         Your password has been reset successfully.
-                      </Typography>
+                      </Text>
                       <SubmitButton label="Return to login screen" />
                     </>
                   )}

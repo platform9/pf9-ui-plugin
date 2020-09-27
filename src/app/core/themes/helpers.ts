@@ -158,16 +158,16 @@ export function generateTheme<P extends ThemeColors, T>({
     overrides: {
       MuiTypography: {
         // Why doesn't this apply these as overrides?
-        // ...typography.typography,
-        root: {
-          // this is hacky. how else do you get these elements to render correctly?
-          ...Object.fromEntries(
-            Object.entries(typography.typography).map(([key, value]) => [
-              `&.MuiTypography-${key}`,
-              value,
-            ]),
-          ),
-        },
+        ...typography.typography,
+        // root: {
+        //   // this is hacky. how else do you get these elements to render correctly?
+        //   ...Object.fromEntries(
+        //     Object.entries(typography.typography).map(([key, value]) => [
+        //       `&.MuiTypography-${key}`,
+        //       value,
+        //     ]),
+        //   ),
+        // },
       },
       MuiSvgIcon: {
         root: {

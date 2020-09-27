@@ -11,9 +11,10 @@ import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank'
 import CheckBoxIcon from '@material-ui/icons/CheckBox'
 import SearchIcon from '@material-ui/icons/Search'
 import * as Fuse from 'fuse.js'
-import { Typography, FormHelperText } from '@material-ui/core'
+import { FormHelperText } from '@material-ui/core'
 import { emptyArr } from 'utils/fp'
 import clsx from 'clsx'
+import Text from 'core/elements/text'
 
 const FUSE_OPTIONS = {
   keys: ['value', 'label'],
@@ -125,9 +126,9 @@ const MultiSelect = React.forwardRef(
     return (
       <div className={clsx('MuiFormControl-root', className)}>
         <FormControl className={classes.container} id={id} error={hasError} ref={ref}>
-          <Typography className={classes.label} variant="caption">
+          <Text className={classes.label} variant="caption">
             {required ? `${label} *` : label}
-          </Typography>
+          </Text>
           <SearchField
             classes={classes}
             term={term}

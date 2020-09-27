@@ -1,4 +1,5 @@
-import { Tooltip, Typography } from '@material-ui/core'
+import { Tooltip } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
 import CreateButton from 'core/components/buttons/CreateButton'
 import CodeBlock from 'core/components/CodeBlock'
@@ -10,7 +11,10 @@ import SimpleLink from 'core/components/SimpleLink'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { sessionStoreKey } from 'core/session/sessionReducers'
 import { routes } from 'core/utils/routes'
-import { ClusterConnectionStatus, ClusterHealthStatus } from 'k8s/components/infrastructure/clusters/ClusterStatus'
+import {
+  ClusterConnectionStatus,
+  ClusterHealthStatus,
+} from 'k8s/components/infrastructure/clusters/ClusterStatus'
 import ClusterUpgradeDialog from 'k8s/components/infrastructure/clusters/ClusterUpgradeDialog'
 import ResourceUsageTable from 'k8s/components/infrastructure/common/ResourceUsageTable'
 import PrometheusAddonDialog from 'k8s/components/prometheus/PrometheusAddonDialog'
@@ -117,11 +121,11 @@ const renderClusterDetailLink = (name, cluster) => (
 )
 
 const renderBooleanField = (key) => (_, cluster) => (
-  <Typography variant="body2">{castBoolToStr()(!!cluster[key])}</Typography>
+  <Text variant="body2">{castBoolToStr()(!!cluster[key])}</Text>
 )
 
 const renderCloudProvider = (_, { cloudProviderType, cloudProviderName }) => (
-  <Typography variant="body2">{cloudProviderType === 'local' ? '' : cloudProviderName}</Typography>
+  <Text variant="body2">{cloudProviderType === 'local' ? '' : cloudProviderName}</Text>
 )
 
 const renderMetaData = (_, { tags }) => {

@@ -1,21 +1,14 @@
 import React from 'react'
 import useReactRouter from 'use-react-router'
 import { makeStyles } from '@material-ui/styles'
-import {
-  Typography,
-  List,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  Grid,
-  InputAdornment,
-} from '@material-ui/core'
+import { List, Dialog, DialogTitle, DialogContent, Grid, InputAdornment } from '@material-ui/core'
 import ListItem from '@material-ui/core/ListItem'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
 import CheckIcon from '@material-ui/icons/Check'
 import ClearIcon from '@material-ui/icons/Clear'
 import ListItemText from '@material-ui/core/ListItemText'
 import { propSatisfies, isNil, prop } from 'ramda'
+import Text from 'core/elements/text'
 import useParams from 'core/hooks/useParams'
 import Progress from 'core/components/progress/Progress'
 import TextField from 'core/components/validatedForm/TextField'
@@ -99,7 +92,7 @@ const CheckListItem = ({ children, checked }) => (
 )
 
 const renderPasswordValidationCheck = (values) => (
-  <Typography variant="body1" component="div">
+  <Text variant="body1" component="div">
     Password must contain the following:
     <List dense>
       {passwordValidatorList.map((record) => (
@@ -111,7 +104,7 @@ const renderPasswordValidationCheck = (values) => (
         </CheckListItem>
       ))}
     </List>
-  </Typography>
+  </Text>
 )
 
 const ChangePasswordModal = (props) => {

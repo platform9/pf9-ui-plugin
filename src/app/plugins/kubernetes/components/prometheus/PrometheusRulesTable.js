@@ -1,14 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {
-  Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Typography,
-} from '@material-ui/core'
+import { Button, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { isNilOrEmpty } from 'utils/fp'
 
 const renderKeyValues = (obj) =>
@@ -30,7 +23,7 @@ const PrometheusRulesTable = ({ rules, onDelete }) => {
 
   return (
     <div>
-      <Typography variant="h6">Rules</Typography>
+      <Text variant="h6">Rules</Text>
       <Table>
         <TableHead>
           <TableRow>

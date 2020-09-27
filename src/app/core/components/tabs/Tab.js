@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
-import Typography from '@material-ui/core/Typography'
+import Text from 'core/elements/text'
 import { withTabContext } from 'core/components/tabs/Tabs'
 
 class Tab extends PureComponent {
@@ -10,15 +10,20 @@ class Tab extends PureComponent {
   }
 
   render() {
-    const { activeTab, value, children } = this.props
+    const { activeTab, value, children, className } = this.props
     if (value !== activeTab) {
       return null
     }
-    return <Typography component="div">{children}</Typography>
+    return (
+      <Text component="div" className={className}>
+        {children}
+      </Text>
+    )
   }
 }
 
 Tab.propTypes = {
+  className: PropTypes.string,
   value: PropTypes.string.isRequired,
   label: PropTypes.string,
   children: PropTypes.node.isRequired,

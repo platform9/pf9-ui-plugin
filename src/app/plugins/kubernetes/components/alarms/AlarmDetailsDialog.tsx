@@ -1,5 +1,6 @@
 import React from 'react'
-import { Button, Dialog, DialogActions, Theme, Typography } from '@material-ui/core'
+import { Button, Dialog, DialogActions, Theme } from '@material-ui/core'
+import Text from 'core/elements/text'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { makeStyles } from '@material-ui/styles'
 import DisplayKeyValues from 'core/components/DisplayKeyValues'
@@ -82,7 +83,7 @@ const AlarmDetailsDialog = ({ alarm, onClose }: Props) => {
     <Dialog open onClose={onClose} onClick={stopPropagation}>
       <div className={classes.container}>
         <div className={classes.header}>
-          <Typography variant="subtitle1">Alarm - {alarm.name}</Typography>
+          <Text variant="subtitle1">Alarm - {alarm.name}</Text>
           <FontAwesomeIcon className={classes.icon} onClick={onClose} size="xl">
             times
           </FontAwesomeIcon>

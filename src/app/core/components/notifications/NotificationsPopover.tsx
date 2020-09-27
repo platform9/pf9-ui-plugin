@@ -1,6 +1,6 @@
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Popover, Typography, Tooltip, Button } from '@material-ui/core'
+import { Popover, Tooltip, Button } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import NotificationItem from 'core/components/notifications/NotificationItem'
@@ -9,6 +9,7 @@ import {
   NotificationState,
   notificationStoreKey,
 } from 'core/notifications/notificationReducers'
+import Text from 'core/elements/text'
 import { prop } from 'ramda'
 import Theme from 'core/themes/model'
 
@@ -109,18 +110,18 @@ const NotificationsPopover = ({ className }) => {
           horizontal: 'right',
         }}
       >
-        <Typography component="div" className={classes.title} variant="caption">
+        <Text component="div" className={classes.title} variant="caption">
           Error Notifications
-        </Typography>
+        </Text>
         <div className={classes.notifications}>
           {notifications.length ? (
             notifications.map((notification) => (
               <NotificationItem key={notification.id} notification={notification} />
             ))
           ) : (
-            <Typography className={classes.empty} variant="subtitle2">
+            <Text className={classes.empty} variant="subtitle2">
               There are no errors
-            </Typography>
+            </Text>
           )}
         </div>
         {notifications.length ? (

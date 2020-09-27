@@ -7,6 +7,7 @@ import MaterialToolbar from '@material-ui/core/Toolbar/Toolbar'
 import { AppBar } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import NotificationsPopover from 'core/components/notifications/NotificationsPopover'
+import { imageUrls } from 'app/constants'
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
@@ -32,6 +33,10 @@ const useStyles = makeStyles((theme) => ({
   leftMargin: {
     marginLeft: 28,
   },
+  logo: {
+    height: 29,
+    marginLeft: 25,
+  },
 }))
 
 const Toolbar = ({ open }) => {
@@ -39,6 +44,7 @@ const Toolbar = ({ open }) => {
   return (
     <AppBar className={classes.appBar}>
       <MaterialToolbar variant="dense" disableGutters={!open}>
+        <img src={imageUrls.logoPrimary} alt="Platform9 Logo" className={classes.logo} />
         <div className={classes.rightTools}>
           <RegionChooser className={classes.leftMargin} />
           <TenantChooser className={classes.leftMargin} />

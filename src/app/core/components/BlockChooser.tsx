@@ -1,7 +1,8 @@
 import React, { useState, FunctionComponent } from 'react'
 import { makeStyles } from '@material-ui/styles'
-import { Radio, Typography, Theme } from '@material-ui/core'
+import { Radio, Theme } from '@material-ui/core'
 import clsx from 'clsx'
+import Text from 'core/elements/text'
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -69,8 +70,8 @@ const BlockChooser: FunctionComponent<Props> = ({ options = [], onChange }) => {
             <Radio checked={active} color="primary" />
             <div className={classes.icon}>{option.icon}</div>
             <div className={classes.text}>
-              <Typography variant="subtitle1">{option.title}</Typography>
-              <Typography variant="body1">{option.description}</Typography>
+              <Text variant="subtitle1">{option.title}</Text>
+              <Text variant="body1">{option.description}</Text>
             </div>
           </div>
         )

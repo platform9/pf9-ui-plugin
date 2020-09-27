@@ -446,12 +446,12 @@ export interface RelienceTypography {
 export interface ITypography {
   fontFamily: string
   fontSize: string
-  fontWeight: string
+  fontWeight: any
   fontStretch: string
   fontStyle: string
   lineHeight: string
   letterSpacing: string
-  textAlign?: string
+  textAlign?: any
 }
 
 export enum FontFamily {

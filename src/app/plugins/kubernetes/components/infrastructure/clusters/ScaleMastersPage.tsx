@@ -1,7 +1,8 @@
 import React, { FunctionComponent, useCallback, useRef } from 'react'
 import { k8sPrefix } from 'app/constants'
 import { makeStyles } from '@material-ui/styles'
-import { Theme, Typography } from '@material-ui/core'
+import { Theme } from '@material-ui/core'
+import Text from 'core/elements/text'
 import FormWrapper from 'core/components/FormWrapper'
 import { pathJoin } from 'utils/misc'
 import useReactRouter from 'use-react-router'
@@ -137,7 +138,7 @@ const ScaleMasters: FunctionComponent<ScaleMasterProps> = ({
 
   return (
     <div>
-      <Typography variant="subtitle1">Current Masters: {numMasters}</Typography>
+      <Text variant="subtitle1">Current Masters: {numMasters}</Text>
 
       <BlockChooser
         onChange={getParamsUpdater('scaleType')}

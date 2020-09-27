@@ -1,9 +1,10 @@
 import React, { FC, MouseEventHandler, useCallback } from 'react'
 import BannerContent from 'core/components/notifications/BannerContent'
-import { Theme, Typography } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
 import { range } from 'ramda'
 import { objSwitchCase } from 'utils/fp'
+import Theme from 'core/themes/model'
 
 const stepIconsSize = 20
 
@@ -123,9 +124,9 @@ const BaseOnboardingBanner: FC<OnboardingBannerProps> = (props) => {
 
   return (
     <BannerContent>
-      <Typography variant="subtitle2" className={classes.title}>
+      <Text variant="subtitle2" className={classes.title}>
         {title}
-      </Typography>
+      </Text>
       <div className={classes.body}>{renderContent(currentState)}</div>
       {currentState === 'inProgress' && (
         <div className={classes.inProgress}>In Progress: {inProgressText[activeStep]}</div>

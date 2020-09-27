@@ -10,7 +10,8 @@ import ClusterNodes from './ClusterNodes'
 import PageContainer from 'core/components/pageContainer/PageContainer'
 import SimpleLink from 'core/components/SimpleLink'
 import { makeStyles } from '@material-ui/styles'
-import { Card, Typography } from '@material-ui/core'
+import { Card } from '@material-ui/core'
+import Text from 'core/elements/text'
 import useDataLoader from 'core/hooks/useDataLoader'
 import useReactRouter from 'use-react-router'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
@@ -201,10 +202,10 @@ const HeaderCard = ({ title, subtitle, icon, loading = false, links, children })
   return (
     <Card className={classes.headerCardContainer}>
       <header className={classes.headerCardHeader}>
-        <Typography variant="h6">{title}</Typography>
-        <Typography variant="subtitle1" component="p">
+        <Text variant="h6">{title}</Text>
+        <Text variant="subtitle1" component="p">
           {subtitle}
-        </Typography>
+        </Text>
         <FontAwesomeIcon className={clsx({ 'fa-spin': loading }, classes.headerIcon)}>
           {loading ? 'sync' : icon}
         </FontAwesomeIcon>

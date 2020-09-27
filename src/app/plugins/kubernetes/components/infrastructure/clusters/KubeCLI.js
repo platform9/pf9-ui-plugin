@@ -2,7 +2,8 @@ import React, { forwardRef } from 'react'
 import PropTypes from 'prop-types'
 import ApiClient from 'api-client/ApiClient'
 import { compose } from 'ramda'
-import { AppBar, Dialog, IconButton, Slide, Toolbar, Typography } from '@material-ui/core'
+import { AppBar, Dialog, IconButton, Slide, Toolbar } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { withStyles } from '@material-ui/styles'
 import CloseIcon from '@material-ui/icons/Close'
 import SimpleLink from 'core/components/SimpleLink'
@@ -55,9 +56,9 @@ class KubeCLI extends React.PureComponent {
               <IconButton color="inherit" onClick={this.handleClose}>
                 <CloseIcon />
               </IconButton>
-              <Typography variant="h6" color="inherit" className={classes.flex}>
+              <Text variant="h6" color="inherit" className={classes.flex}>
                 KubeCLI
-              </Typography>
+              </Text>
             </Toolbar>
           </AppBar>
           <iframe className={classes.iframe} src={this.state.url} />
@@ -72,6 +73,4 @@ KubeCLI.propTypes = {
   cluster: PropTypes.object.isRequired,
 }
 
-export default compose(
-  withStyles(styles),
-)(KubeCLI)
+export default compose(withStyles(styles))(KubeCLI)

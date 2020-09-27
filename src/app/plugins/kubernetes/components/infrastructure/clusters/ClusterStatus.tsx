@@ -1,4 +1,5 @@
-import { Tooltip, Typography } from '@material-ui/core'
+import { Tooltip } from '@material-ui/core'
+import Text from 'core/elements/text'
 import React, { FC } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import SimpleLink from 'core/components/SimpleLink'
@@ -85,14 +86,14 @@ const ClusterStatusSpan: FC<Props> = (props) => {
     <div className={root}>
       {label && <span className={labelCls}>{label}:</span>}
       <Tooltip title={title || children}>
-        <Typography className={circle} variant={variant === 'header' ? 'body1' : 'body2'}>
+        <Text className={circle} variant={variant === 'header' ? 'body1' : 'body2'}>
           {!!iconStatus && (
             <FontAwesomeIcon className={clsx(iconColor, iconMap.get(status).classes)}>
               {iconMap.get(status).icon}
             </FontAwesomeIcon>
           )}
           {children}
-        </Typography>
+        </Text>
       </Tooltip>
     </div>
   )

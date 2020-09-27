@@ -3,7 +3,6 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  Typography,
   Table,
   TableBody,
   DialogActions,
@@ -12,6 +11,7 @@ import {
   TableCell,
   Checkbox,
 } from '@material-ui/core'
+import Text from 'core/elements/text'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { except } from 'utils/fp'
 import Progress from 'core/components/progress/Progress'
@@ -67,9 +67,7 @@ export default ({ onClose, rows: [repository] }) => {
       <Progress loading={loadingClusters || updating} inline>
         <DialogContent>
           <p>Select the clusters to add this repository to:</p>
-          {clusters.length === 0 && (
-            <Typography variant="h5">No clusters available to add</Typography>
-          )}
+          {clusters.length === 0 && <Text variant="h5">No clusters available to add</Text>}
           <Table>
             <TableBody>{clusters.map(renderClusterRow)}</TableBody>
           </Table>

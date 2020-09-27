@@ -1,6 +1,6 @@
 // Libs
 import React, { FunctionComponent } from 'react'
-import { Typography, Theme } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
 // Components
 import PageContainer from 'core/components/pageContainer/PageContainer'
@@ -10,6 +10,7 @@ import CopyToClipboard from 'core/components/CopyToClipboard'
 import CodeBlock from 'core/components/CodeBlock'
 import SimpleLink from 'core/components/SimpleLink'
 import { routes } from 'core/utils/routes'
+import Theme from 'core/themes/model'
 
 const useStyles = makeStyles((theme: Theme) => ({
   onBoardNodeContainer: {
@@ -36,23 +37,23 @@ const DownloadCliPage: FunctionComponent = () => {
         </SimpleLink>
       }
     >
-      <Typography variant="h5">Onboard a new node</Typography>
+      <Text variant="h5">Onboard a new node</Text>
       <p> </p>
-      <Typography component="span">
+      <Text component="span">
         In order to add a physical or virtual node to your BareOS cluster, you need to first
         download and install the Platform9 CLI on that node. Follow the instructions below to
         download and install the CLI on your node
-      </Typography>
+      </Text>
       <DownloadCliOnboardNodeWalkthrough />
 
       <p className={spacer} />
-      <Typography variant="h6">CLI Advanced Options</Typography>
+      <Text variant="h6">CLI Advanced Options</Text>
       <p> </p>
-      <Typography component="p" variant="subtitle2">
+      <Text component="p" variant="subtitle2">
         Create clusters and more directly using the CLI
-      </Typography>
+      </Text>
       <p> </p>
-      <Typography component="span" variant="body1">
+      <Text component="span" variant="body1">
         You can use the{' '}
         <CopyToClipboard copyText="pf9ctl">
           <CodeBlock>pf9ctl</CodeBlock>
@@ -62,12 +63,12 @@ const DownloadCliPage: FunctionComponent = () => {
           <CodeBlock>pf9ctl --help</CodeBlock>
         </CopyToClipboard>{' '}
         to see the full features and options the CLI supports
-      </Typography>
+      </Text>
       <p> </p>
-      {/* <Typography variant="body1">
+      {/* <Text variant="body1">
         See <SimpleLink src="">CLI Documentation</SimpleLink> for more info on whats supported with the
         CLI
-      </Typography> */}
+      </Text> */}
     </PageContainer>
   )
 }

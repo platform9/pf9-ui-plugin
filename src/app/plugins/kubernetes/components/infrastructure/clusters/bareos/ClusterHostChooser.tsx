@@ -9,8 +9,8 @@ import {
   TableCell,
   TableRow,
   TableBody,
-  Typography,
 } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
 import { makeStyles } from '@material-ui/styles'
 import { identity } from 'ramda'
@@ -101,9 +101,9 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef<HTMLElement, P
     ) as any
 
     const Warning = ({ children }) => (
-      <Typography variant="body1" className={errorText}>
+      <Text variant="body1" className={errorText}>
         {children}
-      </Typography>
+      </Text>
     )
 
     const selectableNodes = nodes.filter(filterFn)
@@ -145,9 +145,7 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef<HTMLElement, P
             {selectableNodes.length === 0 && (
               <TableRow>
                 <TableCell colSpan={5} align="center">
-                  <Typography variant="body1">
-                    Waiting... Connect Nodes Using the PF9 CLI
-                  </Typography>
+                  <Text variant="body1">Waiting... Connect Nodes Using the PF9 CLI</Text>
                 </TableCell>
               </TableRow>
             )}

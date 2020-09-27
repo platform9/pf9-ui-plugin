@@ -1,18 +1,13 @@
 import React from 'react'
-import PropTypes from 'prop-types'
-import { Typography } from '@material-ui/core'
+import Text from 'core/elements/text'
 
 const TypographyVariant = () => {
   const { variant } = this.props
   return (
     <div>
-      <Typography variant="h6">{variant}</Typography>
+      <Text variant="h6">{variant}</Text>
     </div>
   )
-}
-
-TypographyVariant.propTypes = {
-  variant: PropTypes.string.isRequired,
 }
 
 export default TypographyVariant

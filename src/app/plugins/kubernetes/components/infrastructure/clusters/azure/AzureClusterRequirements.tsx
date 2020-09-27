@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react'
 import { makeStyles } from '@material-ui/styles'
-import { Theme, Typography } from '@material-ui/core'
+import { Theme } from '@material-ui/core'
 import Alert from 'core/components/Alert'
 import SubmitButton from 'core/components/buttons/SubmitButton'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
@@ -9,6 +9,7 @@ import { gettingStartedHelpLink } from 'k8s/links'
 import { routes } from 'core/utils/routes'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import BulletList from 'core/components/BulletList'
+import Text from 'core/elements/text'
 
 const useStyles = makeStyles((theme: Theme) => ({
   alertTitle: {
@@ -52,15 +53,13 @@ const AzureClusterRequirements = ({ onComplete }) => {
         </div>
       }
     >
-      <Typography className={classes.text}>
-        Build a Kubernetes Cluster using Azure VMs Instances
-      </Typography>
+      <Text className={classes.text}>Build a Kubernetes Cluster using Azure VMs Instances</Text>
 
       <Alert variant="info">
-        <Typography className={classes.alertTitle} variant="subtitle2">
+        <Text className={classes.alertTitle} variant="subtitle2">
           The following permissions are required on your Azure account in order to deploy fully
           automated Managed Kubernetes clusters:
-        </Typography>
+        </Text>
         <BulletList className={classes.bulletList} items={azureReqs} />
       </Alert>
       <div>

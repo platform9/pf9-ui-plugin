@@ -2,7 +2,7 @@ import React from 'react'
 import { makeStyles } from '@material-ui/styles'
 import { range } from 'ramda'
 import PropTypes from 'prop-types'
-import { Typography } from '@material-ui/core'
+import Text from 'core/elements/text'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -59,9 +59,9 @@ const SquaresGraph = ({ num, label, ...rest }) => {
           </div>
         ))}
       </div>
-      <Typography variant="caption" className={classes.label}>
+      <Text variant="caption" className={classes.label}>
         {label}
-      </Typography>
+      </Text>
     </div>
   )
 }

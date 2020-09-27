@@ -12,7 +12,7 @@ import { mngmTenantActions } from '../userManagement/tenants/actions'
 import { cloudProviderActions } from '../infrastructure/cloudProviders/actions'
 // Components
 import StatusCard, { StatusCardProps } from './StatusCard'
-import { Typography } from '@material-ui/core'
+import Text from 'core/elements/text'
 
 import ClusterSetup, {
   clustersHaveAccess,
@@ -311,7 +311,7 @@ const DashboardPage = () => {
 
   return (
     <section className={classes.cardColumn}>
-      <Typography variant="h5">Welcome{displayName ? ` ${displayName}` : ''}!</Typography>
+      <Text variant="h5">Welcome{displayName ? ` ${displayName}` : ''}!</Text>
 
       {showOnboarding && isLoading && <Progress loading={isLoading} overlay />}
       {showOnboarding && !isLoading && (

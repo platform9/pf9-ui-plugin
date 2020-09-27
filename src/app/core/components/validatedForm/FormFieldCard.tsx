@@ -1,5 +1,5 @@
 import React from 'react'
-import { Typography } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
 import clsx from 'clsx'
@@ -52,7 +52,7 @@ export const FormFieldCard: React.FC<ContainerProps> = (props) => {
     <div className={clsx(classes.root, className)}>
       {(title || link) && (
         <header className={classes.requirementsTitle}>
-          {!!title && <Typography variant="subtitle1">{title}</Typography>}
+          {!!title && <Text variant="subtitle1">{title}</Text>}
           {!!link && link}
         </header>
       )}
