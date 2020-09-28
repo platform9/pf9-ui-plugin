@@ -23,6 +23,7 @@ const DataRow = ({ label, value }) => {
 
 // TODO: azs, networking info, services/api FQDN auto-generate, MTU size
 const AzureClusterReviewTable = ({ data }) => {
+  const numWorkers = data.enableCAS ? `${data.numWorkers} - ${data.numMaxWorkers}` : data.numWorkers
   return (
     <React.Fragment>
       <Table>
@@ -32,7 +33,7 @@ const AzureClusterReviewTable = ({ data }) => {
           <DataRow label="Master node SKU" value={data.masterSku} />
           <DataRow label="Worker node SKU" value={data.workerSku} />
           <DataRow label="Number of master nodes" value={data.numMasters} />
-          <DataRow label="Number of worker nodes" value={data.numWorkers} />
+          <DataRow label="Number of worker nodes" value={numWorkers} />
           <DataRow label="SSH key" value={data.sshKey} />
           <DataRow
             label="Enable workloads on all master nodes"
