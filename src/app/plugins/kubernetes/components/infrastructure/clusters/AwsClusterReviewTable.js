@@ -12,7 +12,9 @@ const DataRow = ({ label, value }) => (
 
 // TODO: azs, networking info, services/api FQDN auto-generate, MTU size
 const AwsClusterReviewTable = ({ data }) => {
-  const numWorkers = data.enableCAS ? `${data.numWorkers} - ${data.numMaxWorkers}` : data.numWorkers
+  const numWorkers = data.enableCAS
+    ? `Min ${data.numWorkers} - Max ${data.numMaxWorkers}`
+    : data.numWorkers
   return (
     <React.Fragment>
       <Table>
