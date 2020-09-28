@@ -115,6 +115,7 @@ const initialContext = {
   workerSku: 'Standard_A1_v2',
   numMasters: 1,
   numWorkers: 1,
+  enableCAS: false,
   usePf9Domain: true,
   network: 'newNetwork',
   containersCidr: '10.20.0.0/16',
@@ -405,6 +406,24 @@ const AddAzureClusterPage = () => {
                               label="Enable workloads on all master nodes"
                               info="It is highly recommended to not enable workloads on master nodes for production or critical workload clusters."
                             />
+
+                            {/* Enable Auto Scaling */}
+                            <CheckboxField
+                              id="enableCAS"
+                              label="Enable Auto Scaling"
+                              info="The cluster may scale up to the max worker nodes specified. Auto scaling may not be used with spot instances."
+                            />
+
+                            {/* Max num worker nodes (autoscaling) */}
+                            {values.enableCAS && (
+                              <TextField
+                                id="numMaxWorkers"
+                                type="number"
+                                label="Maximum number of worker nodes"
+                                info="Maximum number of worker nodes this cluster may be scaled up to."
+                                required={values.enableCAS}
+                              />
+                            )}
                           </>
                         )}
                       </>

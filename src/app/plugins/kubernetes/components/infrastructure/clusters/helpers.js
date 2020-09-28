@@ -125,7 +125,10 @@ export const createAzureCluster = async (data) => {
     ...pick('name location zones sshKey'.split(' '), data),
 
     // cluster configuration
-    ...pick('masterSku workerSku numMasters numWorkers allowWorkloadsOnMaster'.split(' '), data),
+    ...pick(
+      'masterSku workerSku numMasters numWorkers allowWorkloadsOnMaster enableCAS'.split(' '),
+      data,
+    ),
 
     // network info
     ...pick(
@@ -138,6 +141,11 @@ export const createAzureCluster = async (data) => {
 
     // advanced configuration
     ...pick('privileged appCatalogEnabled'.split(' '), data),
+  }
+
+  if (data.enableCAS) {
+    body.numMinWorkers = data.numWorkers
+    body.numMaxWorkers = data.numMaxWorkers
   }
 
   if (data.useAllAvailabilityZones) {
