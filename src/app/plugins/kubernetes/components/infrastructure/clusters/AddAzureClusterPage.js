@@ -237,11 +237,11 @@ const AddAzureClusterPage = () => {
     cloudProviderId: params.cloudProviderId,
   })
 
-  const [details] = useDataLoader(loadCloudProviderRegionDetails, {
+  const [cloudProviderRegionDetails] = useDataLoader(loadCloudProviderRegionDetails, {
     cloudProviderId: params.cloudProviderId,
     cloudProviderRegionId: params.cloudProviderRegionId,
   })
-  const virtualNetworks = pathStrOr([], '0.virtualNetworks', details)
+  const virtualNetworks = pathStrOr([], '0.virtualNetworks', cloudProviderRegionDetails)
 
   const mapRegionName = (displayName) => {
     return cloudProviderDetails.find((x) => x.DisplayName === displayName).RegionName
