@@ -51,6 +51,7 @@ const isWhitelistedUrl = (pathname): boolean => {
 const restoreSession = async (
   pathname,
   session,
+  history,
 ): Promise<{
   username?: string
   unscopedToken?: string
@@ -62,7 +63,8 @@ const restoreSession = async (
 
   // When trying to login with cookie with pmkft
   if (pathname === loginWithCookieUrl) {
-    const scopedToken = getCookieValue('X-Auth-Token')
+    const urlParams = new URLSearchParams(history.location.search)
+    const scopedToken = urlParams.get('token') || getCookieValue('X-Auth-Token')
 
     // Start from scratch to make use of prebuilt functions
     // for standard login page
@@ -146,7 +148,7 @@ const AppContainer = () => {
         username = session.username,
         unscopedToken,
         expiresAt,
-      } = await restoreSession(pathname, session)
+      } = await restoreSession(pathname, session, history)
 
       if (unscopedToken) {
         await setupSession({ username, unscopedToken, expiresAt, issuedAt })

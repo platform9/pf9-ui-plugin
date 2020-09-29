@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, createRef } from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
+
 import { FormControl, FormHelperText, FormLabel } from '@material-ui/core'
 import Text from 'core/elements/text'
 import withFormContext, {
@@ -97,6 +98,7 @@ const CodeMirror = ({
       <FormControl id={id} error={hasError} className={classes.root}>
         <FormLabel>
           <Text className={classes.coderMirrorHeader} variant="body1">
+          <Typography component={'div'} className={classes.coderMirrorHeader} variant="body1">
             {label}
           </Text>
         </FormLabel>
@@ -118,7 +120,7 @@ const CodeMirror = ({
 
 CodeMirror.propTypes = {
   id: PropTypes.string.isRequired,
-  label: PropTypes.string,
+  label: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
   onChange: PropTypes.func,
   options: PropTypes.object,
   value: PropTypes.string,

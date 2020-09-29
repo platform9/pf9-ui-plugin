@@ -6,15 +6,16 @@ import { kubeconfigFileLink } from 'k8s/links'
 import DownloadKubeConfigForm from './DownloadKubeConfigForm'
 import SimpleLink from 'core/components/SimpleLink'
 import ExternalLink from 'core/components/ExternalLink'
-import { onboardingAccessSetup } from 'app/constants'
+import { codeMirrorOptions, onboardingAccessSetup } from 'app/constants'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { routes } from 'app/core/utils/routes'
-import CodeBlock from 'core/components/CodeBlock'
 import CopyToClipboard from 'core/components/CopyToClipboard'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import PollingData from 'core/components/PollingData'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
+import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
+import CodeMirror from 'core/components/validatedForm/CodeMirror'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -63,6 +64,9 @@ const useStyles = makeStyles((theme) => ({
       },
     },
   },
+  yamlContainer: {
+    flexFlow: 'column nowrap',
+  },
 }))
 
 const KubeConfigListPage = () => {
@@ -77,7 +81,6 @@ const KubeConfigListPage = () => {
       ...downloadedKubeconfigs,
       [cluster.uuid]: kubeconfig,
     })
-
     localStorage.setItem(onboardingAccessSetup, 'true')
   }
   return (
@@ -141,13 +144,23 @@ const KubeConfigListPage = () => {
             />
           )}
           {!!selectedCluster && downloadedKubeconfigs[selectedCluster.uuid] && (
-            <CopyToClipboard
-              copyText={downloadedKubeconfigs[selectedCluster.uuid]}
-              inline={false}
-              header={selectedCluster.name}
-            >
-              <CodeBlock>{downloadedKubeconfigs[selectedCluster.uuid]}</CodeBlock>
-            </CopyToClipboard>
+            <ValidatedForm classes={{ root: classes.yamlContainer }} elevated={false}>
+              <CodeMirror
+                id="kubeconfigYaml"
+                label={
+                  <CopyToClipboard
+                    copyText={downloadedKubeconfigs[selectedCluster.uuid]}
+                    inline={true}
+                    codeBlock={false}
+                  >
+                    {selectedCluster.name}
+                  </CopyToClipboard>
+                }
+                copyText={downloadedKubeconfigs[selectedCluster.uuid]}
+                options={codeMirrorOptions}
+                value={downloadedKubeconfigs[selectedCluster.uuid]}
+              />
+            </ValidatedForm>
           )}
         </div>
       </FormFieldCard>
