@@ -49,12 +49,13 @@ const useStyles = makeStyles((theme: Theme) => ({
     position: 'relative',
     display: 'flex',
     width: '100%',
+    backgroundColor: theme.palette.grey['000'],
   },
   content: {
     marginTop: 55, // header height is hardcoded to 55px. account for that here.
     overflowX: 'auto',
     flexGrow: 1,
-    backgroundColor: theme.palette.grey[100],
+    backgroundColor: theme.palette.grey['000'],
     padding: 0,
     transition: theme.transitions.create('margin', {
       easing: theme.transitions.easing.sharp,

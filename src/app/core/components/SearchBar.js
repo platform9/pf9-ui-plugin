@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/styles'
 import { InputAdornment, TextField } from '@material-ui/core'
 import ClearIcon from '@material-ui/icons/Clear'
-import grey from '@material-ui/core/colors/grey'
 import { compose, pick } from 'ramda'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import clsx from 'clsx'
@@ -11,27 +10,57 @@ import clsx from 'clsx'
 const styles = (theme) => ({
   SearchBar: {
     outline: 'none',
+    margin: [0, '!important'],
+    '& input::placeholder': {
+      ...theme.typography.caption2,
+    },
+    '& input': {
+      ...theme.typography.inputTable,
+      color: theme.palette.grey[900],
+    },
+    '& .Mui-focused .searchIcon': {
+      color: theme.palette.grey[700],
+    },
+    '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
+      borderColor: theme.palette.grey[700],
+    },
     '& .MuiOutlinedInput-input': {
-      padding: theme.spacing(1, 2),
+      padding: theme.spacing(1, 2, 1, 0),
+    },
+    '& .MuiOutlinedInput-notchedOutline': {
+      borderColor: theme.palette.grey[300],
+    },
+    '&:hover': {
+      '& .MuiOutlinedInput-notchedOutline': {
+        borderColor: theme.palette.grey[700],
+      },
+      '& .searchIcon': {
+        color: theme.palette.grey[700],
+      },
     },
   },
   searchIcon: {
     fontSize: 15,
     fontWeight: 'bold',
-    color: '#B7B7B7',
+    color: theme.palette.grey[500],
+    '&:hover': {
+      color: theme.palette.grey[700],
+    },
   },
   clearIcon: {
+    color: theme.palette.grey[700],
     '&:hover': {
-      color: grey[800],
+      color: theme.palette.grey[900],
     },
     '&:active': {
-      color: grey[200],
+      color: theme.palette.grey[700],
     },
   },
 
   // classes for the InputProps
   root: {
-    margin: 0,
+    margin: [0, '!important'],
+    minHeight: 40,
   },
   adornedStart: {
     paddingLeft: 8,
@@ -67,7 +96,9 @@ class SearchBar extends PureComponent {
             classes: pick(['root', 'adornedStart', 'adornedEnd'], classes),
             startAdornment: (
               <InputAdornment position="start">
-                <FontAwesomeIcon className={classes.searchIcon}>{'search'}</FontAwesomeIcon>
+                <FontAwesomeIcon className={`${classes.searchIcon} searchIcon`}>
+                  {'search'}
+                </FontAwesomeIcon>
               </InputAdornment>
             ),
             endAdornment: (

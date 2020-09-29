@@ -125,22 +125,22 @@ export const nodeStatusCardProps: IStatusCardWithFilterProps = {
       {
         name: 'healthy',
         value: nodes.filter((node) => nodeHealthStatus(node) === 'healthy').length,
-        color: 'success.main',
+        color: 'green.main',
       },
       {
         name: 'unknown',
         value: nodes.filter((node) => nodeHealthStatus(node) === 'unknown').length,
-        color: 'warning.main',
+        color: 'yellow.main',
       },
       {
         name: 'converging',
         value: nodes.filter((node) => nodeHealthStatus(node) === 'converging').length,
-        color: 'warning.light',
+        color: 'orange.main',
       },
       {
         name: 'unhealthy',
         value: nodes.filter((node) => nodeHealthStatus(node) === 'unhealthy').length,
-        color: 'error.main',
+        color: 'red.main',
       },
     ],
     piePrimary: 'healthy',
@@ -233,22 +233,22 @@ const reports = [
         {
           name: 'running',
           value: pods.filter((pod) => pod.status.phase === 'Running').length,
-          color: 'success.main',
+          color: 'green.main',
         },
         {
           name: 'pending',
           value: pods.filter((pod) => pod.status.phase === 'Pending').length,
-          color: 'warning.light',
+          color: 'orange.main',
         },
         {
           name: 'unknown',
           value: pods.filter((pod) => pod.status.phase === 'Unknown').length,
-          color: 'warning.main',
+          color: 'yellow.main',
         },
         {
           name: 'failed',
           value: pods.filter((pod) => pod.status.phase === 'Failed').length,
-          color: 'error.main',
+          color: 'red.main',
         },
       ],
       piePrimary: 'running',

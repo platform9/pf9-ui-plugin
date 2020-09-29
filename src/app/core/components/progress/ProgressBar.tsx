@@ -29,17 +29,17 @@ const useStyles = makeStyles<Theme, Props>((theme) => ({
   label: {
     whiteSpace: 'nowrap',
     height: '100%',
-    width: ({ compact }) => (compact ? '100%' : 40),
+    width: ({ compact }) => (compact ? '100%' : 30),
     paddingLeft: ({ compact }) => (compact ? null : theme.spacing(1)),
-    color: 'rgba(0, 0, 0, 0.87)',
-    fontSize: '12px',
-    letterSpacing: 0.1,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
   },
   progressContainer: {
     flexGrow: 1,
     height: ({ compact }) => (compact ? 3 : '100%'),
     minHeight: ({ compact }) => (compact ? 3 : '100%'),
-    backgroundColor: '#D2E1EB',
+    backgroundColor: theme.palette.grey[100],
   },
   '@keyframes stripes': {
     from: {
@@ -59,6 +59,7 @@ const useStyles = makeStyles<Theme, Props>((theme) => ({
     textAlign: 'center',
     textOverflow: 'visible',
     height: '100%',
+    borderRadius: 2,
     backgroundImage: ({ animated }) =>
       animated
         ? 'linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent)'
@@ -70,10 +71,10 @@ const useStyles = makeStyles<Theme, Props>((theme) => ({
       }
       if (animated) return theme.palette.primary.main
       if (variant === 'health') {
-        if (percent >= 90) return theme.components.error.main
-        if (percent >= 80) return theme.components.warning.main
+        if (percent >= 90) return theme.palette.red.main
+        if (percent >= 80) return theme.palette.yellow.main
       }
-      return theme.components.success.main
+      return theme.palette.green.main
     },
     animation: '$stripes 2s linear infinite',
     color: '#FFF',
@@ -86,7 +87,7 @@ const ProgressBar: FC<Props> = ({
   containedPercent = false,
   compact = false,
   width = 145,
-  height = 15,
+  height = 12,
   label = (progress) => `${progress}%`,
   variant = 'progress',
   color = undefined,

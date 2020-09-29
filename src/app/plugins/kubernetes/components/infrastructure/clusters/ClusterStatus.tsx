@@ -39,17 +39,15 @@ const useStyles = makeStyles<Theme, Props>((theme: Theme) => ({
   circle: {
     display: 'grid',
     alignItems: 'center',
-    gridTemplateColumns: '20px 1fr',
+    gridTemplateColumns: '12px 1fr',
     whiteSpace: 'nowrap',
-    gridGap: theme.spacing(),
+    gridGap: 5,
     justifyItems: 'center',
     '&:before': {
       content: '""',
       display: ({ iconStatus }) => (iconStatus === true ? 'none' : 'inherit'),
-      height: ({ variant }) =>
-        variant === 'header' ? theme.typography.body1.fontSize : theme.typography.body2.fontSize,
-      width: ({ variant }) =>
-        variant === 'header' ? theme.typography.body1.fontSize : theme.typography.body2.fontSize,
+      height: ({ variant }) => (variant === 'header' ? 14 : 12),
+      width: ({ variant }) => (variant === 'header' ? 14 : 12),
       borderRadius: '50%',
       backgroundColor: ({ status }) => getIconOrBubbleColor(status, theme),
     },

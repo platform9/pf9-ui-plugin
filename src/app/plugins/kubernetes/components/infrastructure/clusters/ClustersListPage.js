@@ -31,9 +31,31 @@ import DownloadKubeConfigLink from './DownloadKubeConfigLink'
 const useStyles = makeStyles((theme) => ({
   links: {
     display: 'grid',
-    gridGap: '6px',
+    gridGap: '2px',
+  },
+  icon: {
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    display: 'flex',
+    '& i': {
+      fontSize: '12px',
+      height: '11px',
+      width: '14px',
+      alignItems: 'center',
+      justifyContent: 'center',
+      display: 'inline-flex',
+    },
+  },
+  column: {
+    display: 'flex',
+    flexDirection: 'column',
   },
 }))
+
+const Column = ({ children }) => {
+  const classes = useStyles()
+  return <div className={classes.column}>{children}</div>
+}
 
 const renderUUID = (_, { uuid }) => {
   return (
@@ -55,20 +77,28 @@ const ClusterLinks = ({ links, usage }) => {
   return (
     <div className={classes.links}>
       {links.dashboard && (
-        <ExternalLink className="no-wrap-text" icon="tachometer" url={links.dashboard}>
-          Dashboard
+        <ExternalLink
+          className={`${classes.icon} no-wrap-text`}
+          icon="tachometer"
+          url={links.dashboard}
+        >
+          dashboard
         </ExternalLink>
       )}
       {links.kubeconfig && (
         <DownloadKubeConfigLink
-          className="no-wrap-text"
+          className={`${classes.icon} no-wrap-text`}
           icon="lock"
           cluster={links.kubeconfig.cluster}
         />
       )}
       {hasGrafanaLink && (
-        <ExternalLink className="no-wrap-text" icon="chart-line" url={usage.grafanaLink}>
-          Grafana
+        <ExternalLink
+          className={`${classes.icon} no-wrap-text`}
+          icon="chart-line"
+          url={usage.grafanaLink}
+        >
+          grafana
         </ExternalLink>
       )}
     </div>
@@ -165,7 +195,7 @@ export const options = {
   },
   columns: [
     { id: 'uuid', label: 'UUID', render: renderUUID, display: false },
-    { id: 'name', label: 'Cluster name', render: renderClusterDetailLink },
+    { id: 'name', label: 'Name', render: renderClusterDetailLink },
     {
       id: 'connectionStatus',
       label: 'Connection status',
@@ -185,13 +215,31 @@ export const options = {
     },
     {
       id: 'cloudProviderType',
-      label: 'Deployment Type',
+      label: 'Deployment',
       render: (type) => cloudProviderTypes[type] || capitalizeString(type),
     },
     { id: 'resource_utilization', label: 'Resource Utilization', render: renderStats },
-    { id: 'version', label: 'Kubernetes Version' },
-    { id: 'created_at', label: 'Created at', render: (value) => <DateCell value={value} /> },
-    { id: 'lastOp', label: 'Updated at', render: (value) => <DateCell value={value} /> },
+    { id: 'version', label: 'K8 Version' },
+    {
+      id: 'created_at',
+      label: 'Created at',
+      render: (value) => (
+        <Column>
+          <DateCell value={value} format="MM/DD/YYYY" />
+          <DateCell value={value} format="hh:mm A z" />
+        </Column>
+      ),
+    },
+    {
+      id: 'lastOp',
+      label: 'Updated at',
+      render: (value) => (
+        <Column>
+          <DateCell value={value} format="MM/DD/YYYY" />
+          <DateCell value={value} format="hh:mm A z" />
+        </Column>
+      ),
+    },
     { id: 'nodes', label: 'Nodes', render: renderNodeLink },
     { id: 'networkPlugin', label: 'Network Backend' },
     { id: 'containersCidr', label: 'Containers CIDR' },
@@ -243,7 +291,7 @@ export const options = {
   DeleteDialog: ClusterDeleteDialog,
   batchActions: [
     {
-      icon: 'info-square',
+      icon: 'info-circle',
       label: 'Details',
       routeTo: (rows) => `/ui/kubernetes/infrastructure/clusters/${rows[0].uuid}`,
     },

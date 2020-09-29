@@ -41,12 +41,12 @@ const useStyles = makeStyles<Theme, { variant: TextVariant }>((theme) => ({
     // this would throw an exception
     fontFamily: ({ variant }) => theme?.typography?.[variant]?.fontFamily,
     fontSize: ({ variant }) => theme?.typography?.[variant]?.fontSize,
-    fontWeight: ({ variant }) => theme?.typography?.[variant]?.fontWeight as any,
+    fontWeight: ({ variant }) => theme?.typography?.[variant]?.fontWeight,
     fontStretch: ({ variant }) => theme?.typography?.[variant]?.fontStretch,
     fontStyle: ({ variant }) => theme?.typography?.[variant]?.fontStyle,
     lineHeight: ({ variant }) => theme?.typography?.[variant]?.lineHeight,
     letterSpacing: ({ variant }) => theme?.typography?.[variant]?.letterSpacing,
-    textAlign: ({ variant }) => theme?.typography?.[variant]?.textAlign as any,
+    textAlign: ({ variant }) => theme?.typography?.[variant]?.textAlign,
   },
 }))
 

@@ -3,8 +3,6 @@ import React, { FC } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import { Theme } from '@material-ui/core'
 import Text from 'core/elements/text'
-// Helpers
-import { hexToRGBA } from 'core/utils/colorHelpers'
 
 interface Props {
   message?: string
@@ -13,28 +11,25 @@ interface Props {
 
 const useStyles = makeStyles<Theme, { height: number }>((theme) => ({
   messageContainer: {
-    backgroundColor: hexToRGBA(theme.palette.primary.main, 0.1),
+    marginTop: theme.spacing(2),
+    backgroundColor: theme.palette.grey[100],
     minHeight: ({ height }) => `${height}px`,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontWeight: 'bold',
-    fontSize: '1.25rem',
-    border: `1px solid ${hexToRGBA(theme.palette.primary.main, 0.5)}`,
-    borderRadius: '5px',
+    borderRadius: '4px',
   },
   messageTitle: {
-    color: theme.palette.primary.main,
-    fontWeight: 600,
+    color: theme.palette.grey[700],
   },
 }))
 
-const NoContentMessage: FC<Props> = ({ children, message, defaultHeight = 300 }) => {
+const NoContentMessage: FC<Props> = ({ children, message, defaultHeight = 200 }) => {
   const { messageContainer, messageTitle } = useStyles({ height: defaultHeight })
   return (
     <div className={messageContainer}>
       {message ? (
-        <Text className={messageTitle} variant="h6">
+        <Text className={messageTitle} variant="subtitle2">
           {message}
         </Text>
       ) : (
