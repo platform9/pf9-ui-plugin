@@ -31,7 +31,7 @@ import DownloadKubeConfigLink from './DownloadKubeConfigLink'
 const useStyles = makeStyles((theme) => ({
   links: {
     display: 'grid',
-    gridGap: '2px',
+    // gridGap: '2px',
   },
   icon: {
     alignItems: 'center',
@@ -70,7 +70,7 @@ const ClusterLinks = ({ links, usage }) => {
       {links.dashboard && (
         <ExternalLink
           className={`${classes.icon} no-wrap-text`}
-          icon="tachometer"
+          // icon="tachometer"
           url={links.dashboard}
         >
           dashboard
@@ -79,14 +79,14 @@ const ClusterLinks = ({ links, usage }) => {
       {links.kubeconfig && (
         <DownloadKubeConfigLink
           className={`${classes.icon} no-wrap-text`}
-          icon="lock"
+          // icon="lock"
           cluster={links.kubeconfig.cluster}
         />
       )}
       {hasGrafanaLink && (
         <ExternalLink
           className={`${classes.icon} no-wrap-text`}
-          icon="chart-line"
+          // icon="chart-line"
           url={usage.grafanaLink}
         >
           grafana
