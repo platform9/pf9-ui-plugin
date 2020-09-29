@@ -78,7 +78,7 @@ class SemiCircleGraph extends React.PureComponent {
                 {percentage}%
               </Text>
             </div>
-            <Text variant="caption1" className={classes.label}>
+            <Text variant="caption1" component="div" className={classes.label}>
               {label}
             </Text>
           </div>

@@ -186,6 +186,7 @@ export interface Palette {
   osRed: { [key: string]: string }
   green: { [key: string]: string }
   red: { [key: string]: string }
+  orange: { [key: string]: string }
 }
 
 export interface Upgrade {

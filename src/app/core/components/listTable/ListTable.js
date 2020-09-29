@@ -65,7 +65,7 @@ const styles = (theme) => ({
     },
   },
   cell: {
-    padding: theme.spacing(2),
+    padding: theme.spacing(2, 1),
     ...theme.typography.body2,
   },
   emptyList: {

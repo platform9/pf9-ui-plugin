@@ -6,7 +6,7 @@ import CodeBlock from 'core/components/CodeBlock'
 import CopyToClipboard from 'core/components/CopyToClipboard'
 // import KubeCLI from './KubeCLI' // commented out till we support cli links
 import ExternalLink from 'core/components/ExternalLink'
-import DateCell from 'core/components/listTable/cells/DateCell'
+import { DateAndTime } from 'core/components/listTable/cells/DateCell'
 import SimpleLink from 'core/components/SimpleLink'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { sessionStoreKey } from 'core/session/sessionReducers'
@@ -46,16 +46,7 @@ const useStyles = makeStyles((theme) => ({
       display: 'inline-flex',
     },
   },
-  column: {
-    display: 'flex',
-    flexDirection: 'column',
-  },
 }))
-
-const Column = ({ children }) => {
-  const classes = useStyles()
-  return <div className={classes.column}>{children}</div>
-}
 
 const renderUUID = (_, { uuid }) => {
   return (
@@ -223,22 +214,12 @@ export const options = {
     {
       id: 'created_at',
       label: 'Created at',
-      render: (value) => (
-        <Column>
-          <DateCell value={value} format="MM/DD/YYYY" />
-          <DateCell value={value} format="hh:mm A z" />
-        </Column>
-      ),
+      render: (value) => <DateAndTime value={value} />,
     },
     {
       id: 'lastOp',
       label: 'Updated at',
-      render: (value) => (
-        <Column>
-          <DateCell value={value} format="MM/DD/YYYY" />
-          <DateCell value={value} format="hh:mm A z" />
-        </Column>
-      ),
+      render: (value) => <DateAndTime value={value} />,
     },
     { id: 'nodes', label: 'Nodes', render: renderNodeLink },
     { id: 'networkPlugin', label: 'Network Backend' },

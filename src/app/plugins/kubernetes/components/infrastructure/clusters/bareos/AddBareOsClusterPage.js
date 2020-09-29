@@ -297,7 +297,7 @@ const AddBareOsClusterPage = () => {
     return true
   }, [nodes])
   return (
-    <FormWrapper title="Add Bare OS Cluster" backUrl={listUrl} loading={creatingBareOSCluster}>
+    <FormWrapper title="Create a Bare OS Cluster" backUrl={listUrl} loading={creatingBareOSCluster}>
       <Dialog open={showDialog}>
         <DialogTitle>
           <Text variant="h5" component="span">
@@ -393,7 +393,7 @@ const AddBareOsClusterPage = () => {
               </ValidatedForm>
             </WizardStep>
 
-            <WizardStep stepId="masters" label="Select Master Nodes" onNext={mastersOnNext}>
+            <WizardStep stepId="masters" label="Master Nodes" onNext={mastersOnNext}>
               <ValidatedForm
                 fullWidth
                 initialValues={wizardContext}
@@ -469,7 +469,7 @@ const AddBareOsClusterPage = () => {
               </ValidatedForm>
             </WizardStep>
 
-            <WizardStep stepId="workers" label="Select Worker Nodes" onNext={workersOnNext}>
+            <WizardStep stepId="workers" label="Worker Nodes" onNext={workersOnNext}>
               <ValidatedForm
                 fullWidth
                 initialValues={wizardContext}
@@ -515,7 +515,7 @@ const AddBareOsClusterPage = () => {
               </ValidatedForm>
             </WizardStep>
 
-            <WizardStep stepId="network" label="Configure Network" onNext={networkOnNext}>
+            <WizardStep stepId="network" label="Network" onNext={networkOnNext}>
               <ValidatedForm
                 initialValues={wizardContext}
                 onSubmit={setWizardContext}
@@ -676,7 +676,7 @@ const AddBareOsClusterPage = () => {
               </ValidatedForm>
             </WizardStep>
 
-            <WizardStep stepId="advanced" label="Advanced Configuration" onNext={advancedOnNext}>
+            <WizardStep stepId="advanced" label="Advanced" onNext={advancedOnNext}>
               <ValidatedForm
                 initialValues={wizardContext}
                 onSubmit={setWizardContext}
