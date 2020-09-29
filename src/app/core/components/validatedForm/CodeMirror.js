@@ -98,7 +98,6 @@ const CodeMirror = ({
       <FormControl id={id} error={hasError} className={classes.root}>
         <FormLabel>
           <Text className={classes.coderMirrorHeader} variant="body1">
-          <Typography component={'div'} className={classes.coderMirrorHeader} variant="body1">
             {label}
           </Text>
         </FormLabel>
