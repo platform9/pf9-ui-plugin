@@ -3,7 +3,8 @@ import TextField from 'core/components/validatedForm/TextField'
 import CheckboxField from 'core/components/validatedForm/CheckboxField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import { makeStyles } from '@material-ui/styles'
-import { Theme, Typography } from '@material-ui/core'
+import { Theme } from '@material-ui/core'
+import Text from 'core/elements/text'
 import clsx from 'clsx'
 import useDataLoader from 'core/hooks/useDataLoader'
 import networkActions from 'openstack/components/networks/actions'
@@ -18,7 +19,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   bold: {
     fontWeight: 'bold',
-  }
+  },
 }))
 
 // Put any for now to let me proceed
@@ -44,19 +45,27 @@ const allocationPoolsValue = (string) => {
 }
 
 // Split into an array, string expected to be comma separated
-const dnsNameServersValue = (string) => (
-  string.split(',').map(ip => ip.trim()).filter(ip => ip)
-)
+const dnsNameServersValue = (string) =>
+  string
+    .split(',')
+    .map((ip) => ip.trim())
+    .filter((ip) => ip)
 
-const BareMetalSubnetStep = ({ wizardContext, setWizardContext, onNext, title, setSubmitting }: Props) => {
+const BareMetalSubnetStep = ({
+  wizardContext,
+  setWizardContext,
+  onNext,
+  title,
+  setSubmitting,
+}: Props) => {
   const { text, bold } = useStyles({})
   const showToast = useToast()
   const validatorRef = useRef(null)
 
   const [networks, networksLoading] = useDataLoader(networkActions.list)
-  const provisioningNetwork = networks.find((network) => (
-    network['provider:physical_network'] === 'provisioning'
-  ))
+  const provisioningNetwork = networks.find(
+    (network) => network['provider:physical_network'] === 'provisioning',
+  )
 
   const setupValidator = (validate) => {
     validatorRef.current = { validate }
@@ -106,13 +115,11 @@ const BareMetalSubnetStep = ({ wizardContext, setWizardContext, onNext, title, s
     >
       {({ setFieldValue, values }) => (
         <>
-          <Typography className={text}>
+          <Text className={text}>
             Configure the subnet to be created on the provisioning network.
-          </Typography>
+          </Text>
 
-          <Typography className={clsx(text, bold)}>
-            Subnet Settings
-          </Typography>
+          <Text className={clsx(text, bold)}>Subnet Settings</Text>
 
           {/* Subnet Name */}
           <TextField
@@ -134,13 +141,15 @@ const BareMetalSubnetStep = ({ wizardContext, setWizardContext, onNext, title, s
           />
 
           {/* Gateway IP */}
-          {!values.disableGateway && <TextField
-            id="gatewayIp"
-            label="Gateway IP"
-            onChange={(value) => setWizardContext({ gatewayIp: value })}
-            value={wizardContext.gatewayIp}
-            info="Specify the IP address used for the network gateway. If left blank, the first available IP address within your network CIDR will be automatically chosen."
-          />}
+          {!values.disableGateway && (
+            <TextField
+              id="gatewayIp"
+              label="Gateway IP"
+              onChange={(value) => setWizardContext({ gatewayIp: value })}
+              value={wizardContext.gatewayIp}
+              info="Specify the IP address used for the network gateway. If left blank, the first available IP address within your network CIDR will be automatically chosen."
+            />
+          )}
 
           {/* Disable Gateway */}
           <CheckboxField

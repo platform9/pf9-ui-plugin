@@ -29,7 +29,7 @@ const DownloadKubeConfigLink = ({ cluster, icon, className }: Props) => {
     <div>
       {showModal && renderModalContent()}
       <SimpleLink src="" icon={icon} className={className} onClick={handleOpen}>
-        Kubeconfig
+        kubeconfig
       </SimpleLink>
     </div>
   )

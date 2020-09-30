@@ -19,7 +19,6 @@ interface Props {
 const useStyles = makeStyles<Theme>((theme) => ({
   root: {
     alignSelf: 'normal',
-    margin: theme.spacing(1, 0),
   },
   card: {
     marginRight: theme.spacing(),

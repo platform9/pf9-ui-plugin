@@ -1,7 +1,8 @@
 import React, { PureComponent } from 'react'
-import { Card, CardContent, CircularProgress, Typography } from '@material-ui/core'
+import { Card, CardContent, CircularProgress } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import { addComma } from '../../utils/formatters'
+import Text from 'core/elements/text'
 
 const styles = (theme) => ({
   card: {
@@ -46,9 +47,9 @@ class ProgressCard extends PureComponent {
       <div className={classes.card}>
         <Card>
           <CardContent className={classes.title}>
-            <Typography variant="h6" align="center" className={classes.title}>
+            <Text variant="h6" align="center" className={classes.title}>
               {title}
-            </Typography>
+            </Text>
           </CardContent>
           <CardContent>
             <div className={classes.container}>
@@ -58,14 +59,14 @@ class ProgressCard extends PureComponent {
                 size={150}
                 value={completed}
               />
-              <Typography className={classes.percentage} variant="h5">
+              <Text className={classes.percentage} variant="h5">
                 {completed}%
-              </Typography>
+              </Text>
             </div>
             <div className={classes.description}>
-              <Typography variant="subtitle1" align="center" noWrap>
+              <Text variant="subtitle1" align="center" noWrap>
                 {addComma(used, 0)} {unit} used of {addComma(total, 0)} {unit}
-              </Typography>
+              </Text>
             </div>
           </CardContent>
         </Card>

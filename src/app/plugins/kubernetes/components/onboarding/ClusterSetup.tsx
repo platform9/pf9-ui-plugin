@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from 'react'
-import { Table, TableBody, TableCell, TableRow, Typography } from '@material-ui/core'
+import { Table, TableBody, TableCell, TableRow } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
 import ExpansionPanel from 'core/components/expansionPanel/ExpansionPanel'
 import Theme from 'core/themes/model'
@@ -120,10 +121,10 @@ const ClusterSetup = ({ onComplete, initialPanel = Panels.Cluster }: Props) => {
           completed={!!clusters.length}
           summary="Create Your Cluster"
         >
-          <Typography variant="body1">
+          <Text variant="body1">
             Create your first Kubernetes cluster on AWS, Azure or BareOS (Physical or Virtual
             Machines)
-          </Typography>
+          </Text>
           <NextButton showForward={false} onClick={handleCreateCluster}>
             Create Cluster
           </NextButton>
@@ -137,10 +138,10 @@ const ClusterSetup = ({ onComplete, initialPanel = Panels.Cluster }: Props) => {
           onSkip={handleSkipAccess}
           skipConfirmTitle="Skip the API access step in your getting started wizard?"
         >
-          <Typography className={classes.centerContent} variant="body1" component="span">
+          <Text className={classes.centerContent} variant="body1" component="span">
             To access your cluster, you need to download the kubeconfig for your cluster and
             download <CodeBlock>kubectl</CodeBlock>
-          </Typography>
+          </Text>
           <ExternalLink
             className={classes.externalDocLink}
             url={kubectlInstallationDocumentationLink}
@@ -161,10 +162,10 @@ const ClusterSetup = ({ onComplete, initialPanel = Panels.Cluster }: Props) => {
           onSkip={handleSkipMonitoring}
           skipConfirmTitle="Skip the monitoring step in your getting started wizard?"
         >
-          <Typography variant="body1" component="span">
+          <Text variant="body1" component="span">
             Now that your cluster is created, enable monitoring to view the cluster’s health stats
             realtime in a dashboard
-          </Typography>
+          </Text>
           {clusters.length > 0 && (
             <MonitoringPrompt clusters={clusters} onComplete={handleSkipMonitoring} />
           )}
@@ -205,7 +206,7 @@ const MonitoringPrompt = ({ clusters, onComplete }: IMonitoringPromptProps) => {
           {clusters.map((cluster: any = {}) => (
             <TableRow key={cluster.uuid}>
               <TableCell>
-                <Typography variant="subtitle2">{cluster.name}</Typography>
+                <Text variant="subtitle2">{cluster.name}</Text>
               </TableCell>
               <TableCell>
                 <NextButton showForward={false} onClick={toggleDialog(cluster)}>

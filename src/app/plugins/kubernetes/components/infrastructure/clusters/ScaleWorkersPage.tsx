@@ -6,7 +6,8 @@ import { pathJoin } from 'utils/misc'
 import useReactRouter from 'use-react-router'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
-import { Typography, Theme } from '@material-ui/core'
+import { Theme } from '@material-ui/core'
+import Text from 'core/elements/text'
 import BlockChooser from 'core/components/BlockChooser'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
@@ -180,14 +181,14 @@ const ScaleWorkers: FunctionComponent<ScaleWorkersProps> = ({
       {isCloud && (
         <>
           <div>
-            <Typography variant="subtitle1">
+            <Text variant="subtitle1">
               Scale worker nodes for cluster <b>{name}</b> of type <i>{type}</i>
-            </Typography>
+            </Text>
           </div>
           <div className={classes.workerCount}>
-            <Typography variant="subtitle1">
+            <Text variant="subtitle1">
               You currently have <b>{cluster.numWorkers}</b> worker nodes.
-            </Typography>
+            </Text>
           </div>
           {params.scaleType && chooseScaleNum}
         </>

@@ -1,5 +1,6 @@
 import React, { FC, useEffect, useState } from 'react'
-import { Typography, Paper } from '@material-ui/core'
+import { Paper } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
 import CodeBlock from 'core/components/CodeBlock'
 import Theme from 'core/themes/model'
@@ -85,16 +86,14 @@ const DownloadHostAgentWalkthrough = (): JSX.Element => {
 
   return (
     <Paper className={classes.paper} elevation={0}>
-      <Typography variant="h6">
-        Install Platform9 Host Agent
-      </Typography>
+      <Text variant="h6">Install Platform9 Host Agent</Text>
       <NumberedSteps
         step={1}
         description={
           <div className={classes.wrap}>
-            <Typography className={classes.fullRow}>
+            <Text className={classes.fullRow}>
               Download the host agent installer for your host operating system version:
-            </Typography>
+            </Text>
             <SimpleLink
               className={clsx(classes.fullRow, classes.spaceAbove)}
               src={downloadLink}
@@ -102,10 +101,7 @@ const DownloadHostAgentWalkthrough = (): JSX.Element => {
             >
               <Button className={classes.download}>
                 Download Installer
-                <FontAwesomeIcon
-                  className={classes.downloadIcon}
-                  size="sm"
-                  solid>
+                <FontAwesomeIcon className={classes.downloadIcon} size="sm" solid>
                   download
                 </FontAwesomeIcon>
               </Button>
@@ -116,22 +112,19 @@ const DownloadHostAgentWalkthrough = (): JSX.Element => {
       <NumberedSteps
         step={2}
         description={
-          <Typography>
-            Copy the installer to your host operating system, or make it available via a shared folder.
-          </Typography>
+          <Text>
+            Copy the installer to your host operating system, or make it available via a shared
+            folder.
+          </Text>
         }
       />
       <NumberedSteps
         step={3}
         description={
           <div className={classes.wrap}>
-            <Typography className={classes.fullRow}>
-              Install the host agent by invoking:
-            </Typography>
+            <Text className={classes.fullRow}>Install the host agent by invoking:</Text>
             <div className={clsx(classes.fullRow, classes.spaceAbove)}>
-              <CodeBlock>
-                sudo bash &lt;path to installer&gt;
-              </CodeBlock>
+              <CodeBlock>sudo bash &lt;path to installer&gt;</CodeBlock>
             </div>
           </div>
         }
@@ -155,16 +148,12 @@ const NumberedSteps: FC<NumberedStepProps> = ({
   const classes = useStyles({})
   return (
     <div className={classes.column}>
-      {title && <Typography variant="subtitle2">{title}</Typography>}
+      {title && <Text variant="subtitle2">{title}</Text>}
       <div className={classes.row}>
-        <Typography variant="body1" className={classes.step}>
+        <Text variant="body1" className={classes.step}>
           {step}
-        </Typography>
-        {typeof description === 'string' ? (
-          <Typography variant="body1">{description}</Typography>
-        ) : (
-            description
-          )}
+        </Text>
+        {typeof description === 'string' ? <Text variant="body1">{description}</Text> : description}
         {children}
       </div>
     </div>

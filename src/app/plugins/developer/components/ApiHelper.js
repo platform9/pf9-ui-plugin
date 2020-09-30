@@ -1,11 +1,7 @@
 import React from 'react'
 import ApiClient from 'api-client/ApiClient'
-import {
-  Checkbox,
-  FormControlLabel,
-  TextField as BaseTextField,
-  Typography,
-} from '@material-ui/core'
+import { Checkbox, FormControlLabel, TextField as BaseTextField } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { withStyles } from '@material-ui/styles'
 import { compose } from 'app/utils/fp'
 import ListTable from 'core/components/listTable/ListTable'
@@ -111,7 +107,7 @@ class ApiHelper extends React.PureComponent {
     }
     return (
       <div>
-        <Typography variant="subtitle1">Response</Typography>
+        <Text variant="subtitle1">Response</Text>
         <br />
         <JsonView src={response} collapsed={1} />
       </div>
@@ -127,9 +123,9 @@ class ApiHelper extends React.PureComponent {
     return (
       <div>
         <br />
-        <Typography variant="body2">
+        <Text variant="body2">
           Choose a lens ('.' separated) path to drill into the actual data. E.g., "data.itemType.0"
-        </Typography>
+        </Text>
         <BaseTextField
           id="responseLens"
           label="Response path lens"
@@ -158,7 +154,7 @@ class ApiHelper extends React.PureComponent {
     return (
       <div>
         <br />
-        <Typography variant="body1">Choose the fields you want to include in the table</Typography>
+        <Text variant="body1">Choose the fields you want to include in the table</Text>
         {fields.map((field) => {
           return (
             <div key={field} style={{ display: 'flex' }}>
@@ -213,7 +209,7 @@ class ApiHelper extends React.PureComponent {
           onColumnsChange={updatePreferences}
         />
         <br />
-        <Typography variant="body1">Here's the table spec you can use in your code:</Typography>
+        <Text variant="body1">Here's the table spec you can use in your code:</Text>
         <br />
         <pre>{JSON.stringify(columns, null, 4)}</pre>
       </div>
@@ -233,7 +229,7 @@ class ApiHelper extends React.PureComponent {
     return (
       <div>
         <br />
-        <Typography variant="body1">Choose the fields you want to include in the form</Typography>
+        <Text variant="body1">Choose the fields you want to include in the form</Text>
         {fields.map((field) => {
           return (
             <div key={field} style={{ display: 'flex' }}>
@@ -297,9 +293,7 @@ class ApiHelper extends React.PureComponent {
       <div>
         <Form />
         <br />
-        <Typography variant="body1">
-          Here's the "fields" for your formSpec you can use in your code:
-        </Typography>
+        <Text variant="body1">Here's the "fields" for your formSpec you can use in your code:</Text>
         <br />
         <pre>{JSON.stringify(columns, null, 4)}</pre>
       </div>

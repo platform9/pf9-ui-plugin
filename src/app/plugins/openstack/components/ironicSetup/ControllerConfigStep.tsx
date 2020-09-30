@@ -4,7 +4,7 @@ import CheckboxField from 'core/components/validatedForm/CheckboxField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import { makeStyles } from '@material-ui/styles'
-import { Theme, Typography } from '@material-ui/core'
+import Text from 'core/elements/text'
 import DnsmasqPicklist from './DnsmasqPicklist'
 import BridgeDevicePicklist from './BridgeDevicePicklist'
 import { addRole } from 'openstack/components/resmgr/actions'
@@ -13,6 +13,7 @@ import { MessageTypes } from 'core/components/notifications/model'
 import PresetField from 'core/components/PresetField'
 import useDataLoader from 'core/hooks/useDataLoader'
 import networkActions from 'openstack/components/networks/actions'
+import Theme from 'core/themes/model'
 
 const useStyles = makeStyles((theme: Theme) => ({
   subheader: {
@@ -20,7 +21,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginLeft: theme.spacing(1),
     marginBottom: theme.spacing(2),
     fontWeight: 'bold',
-  }
+  },
 }))
 
 // Put any for now to let me proceed
@@ -32,17 +33,20 @@ interface Props {
   setSubmitting: any
 }
 
-const ControllerConfigStep = ({ wizardContext, setWizardContext, onNext, title, setSubmitting }: Props) => {
+const ControllerConfigStep = ({
+  wizardContext,
+  setWizardContext,
+  onNext,
+  title,
+  setSubmitting,
+}: Props) => {
   const { subheader } = useStyles({})
   const showToast = useToast()
   const validatorRef = useRef(null)
 
   const [networks] = useDataLoader(networkActions.list)
-  const provisioningNetwork = useMemo(() => (
-    networks.find((network) => (
-      network['provider:physical_network'] === 'provisioning'
-    ))
-  ),
+  const provisioningNetwork = useMemo(
+    () => networks.find((network) => network['provider:physical_network'] === 'provisioning'),
     [networks],
   )
   const networkName = provisioningNetwork ? provisioningNetwork.name : ''
@@ -125,9 +129,7 @@ const ControllerConfigStep = ({ wizardContext, setWizardContext, onNext, title, 
     >
       {({ setFieldValue, values }) => (
         <>
-          <Typography className={subheader}>
-            Bare Metal Controller Details
-          </Typography>
+          <Text className={subheader}>Bare Metal Controller Details</Text>
 
           {/* Provisioning Network */}
           <PresetField label="Provisioning Network" value={networkName} />
@@ -165,14 +167,16 @@ const ControllerConfigStep = ({ wizardContext, setWizardContext, onNext, title, 
           />
 
           {/* Image Storage Path */}
-          {values.hostImages && <TextField
-            id="imageStoragePath"
-            label="Image Storage Path"
-            onChange={(value) => setWizardContext({ imageStoragePath: value })}
-            info="Specify the path on this node where the OS images are stored."
-            value={wizardContext.imageStoragePath}
-            required
-          />}
+          {values.hostImages && (
+            <TextField
+              id="imageStoragePath"
+              label="Image Storage Path"
+              onChange={(value) => setWizardContext({ imageStoragePath: value })}
+              info="Specify the path on this node where the OS images are stored."
+              value={wizardContext.imageStoragePath}
+              required
+            />
+          )}
         </>
       )}
     </ValidatedForm>

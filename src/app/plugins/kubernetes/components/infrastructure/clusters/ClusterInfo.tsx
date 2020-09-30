@@ -2,7 +2,8 @@ import React from 'react'
 import InfoPanel from 'core/components/InfoPanel'
 
 import useReactRouter from 'use-react-router'
-import { Grid, Typography } from '@material-ui/core'
+import { Grid } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { makeStyles, withStyles } from '@material-ui/styles'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
@@ -107,12 +108,12 @@ const clusterOverviewFields: IClusterDetailFields[] = [
 const LoadbalancerHelp = () => {
   const classes = useStyles()
   return (
-    <Typography className={classes.text} variant="body2">
+    <Text className={classes.text} variant="body2">
       More about PMK application load balancer{' '}
       <ExternalLink className={classes.link} url={applicationLoadBalancer}>
         here
       </ExternalLink>
-    </Typography>
+    </Text>
   )
 }
 const bareOsNetworkingFields = [

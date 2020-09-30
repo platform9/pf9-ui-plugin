@@ -1,4 +1,4 @@
-import { Grid, Paper, TablePagination, Typography } from '@material-ui/core'
+import { Grid, Paper, TablePagination } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import PropTypes from 'prop-types'
 import React, { PureComponent } from 'react'
@@ -8,6 +8,7 @@ import { ensureFunction, compose } from 'utils/fp'
 import moize from 'moize'
 import Progress from 'core/components/progress/Progress'
 import { filterSpecPropType } from 'core/components/cardTable/CardTableToolbar'
+import Text from 'core/elements/text'
 
 const styles = (theme) => ({
   root: {
@@ -165,9 +166,9 @@ class CardTable extends PureComponent {
       return null
     }
     return (
-      <Typography className={this.props.classes.emptyList} variant="h6">
+      <Text className={this.props.classes.emptyList} variant="h6">
         {this.props.emptyText}
-      </Typography>
+      </Text>
     )
   }
 

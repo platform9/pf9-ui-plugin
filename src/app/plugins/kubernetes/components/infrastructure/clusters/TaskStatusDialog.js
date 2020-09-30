@@ -1,5 +1,5 @@
 import React from 'react'
-import { Dialog, DialogTitle, DialogContent, Typography } from '@material-ui/core'
+import { Dialog, DialogTitle, DialogContent } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import CloseIcon from '@material-ui/icons/Close'
 import clsx from 'clsx'
@@ -178,7 +178,7 @@ const TasksTable = createListTableComponent({
   showCheckboxes: false,
   paginate: false,
   compactTable: true,
-  emptyText: <Typography variant="body1">No status information currently available.</Typography>,
+  emptyText: <Text variant="body1">No status information currently available.</Text>,
 })
 
 export const Tasks = ({ allTasks, completedTasks = [], lastFailedTask, logs, nodeState }) => {

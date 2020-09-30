@@ -10,7 +10,7 @@ import NamespacePicklist from 'k8s/components/common/NamespacePicklist'
 import ExternalLink from 'core/components/ExternalLink'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import renderLabels from 'k8s/components/pods/renderLabels'
-import { PodsStatusSpan } from 'k8s/components/pods/PodsListPage'
+import ClusterStatusSpan from '../infrastructure/clusters/ClusterStatus'
 
 const defaultParams = {
   masterNodeClusters: true,
@@ -62,10 +62,7 @@ const renderName = (name, { dashboardUrl }) => {
     <span>
       {name}
       <br />
-      <ExternalLink url={dashboardUrl}>
-        <FontAwesomeIcon size="md">file-alt</FontAwesomeIcon>
-        dashboard
-      </ExternalLink>
+      <ExternalLink url={dashboardUrl}>dashboard</ExternalLink>
     </span>
   )
 }
@@ -75,7 +72,7 @@ const renderStatus = (status) => {
     status: status === 'OK' ? 'ok' : 'pending',
     label: status === 'OK' ? 'Connected' : 'Connecting',
   }
-  return <PodsStatusSpan status={serviceStatus.status}>{serviceStatus.label}</PodsStatusSpan>
+  return <ClusterStatusSpan status={serviceStatus.status}>{serviceStatus.label}</ClusterStatusSpan>
 }
 
 const renderEndpoints = (endpoints) => {

@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import SemiCircleGraph from 'core/components/graphs/SemiCircleGraph'
 import WidgetCard from 'core/components/widgets/WidgetCard'
-import { Typography } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
 
 const defaultStats = { current: 0, max: 0, percent: 0 }
@@ -11,18 +11,20 @@ const useStyles = makeStyles((theme) => ({
   title: {
     fontWeight: 300,
     textAlign: 'right',
-    color: theme.palette.dashboardCard.text,
+    color: theme.palette.grey[700],
   },
   modifier: {
     fontWeight: 300,
     textAlign: 'left',
-    color: theme.palette.dashboardCard.text,
+    color: theme.palette.grey[700],
+    display: 'flex',
+    alignItems: 'center',
   },
   container: {
-    marginTop: 20,
+    marginTop: 13,
     display: 'grid',
     gridTemplateColumns: '1fr 1fr',
-    gridColumnGap: theme.spacing(),
+    gridColumnGap: theme.spacing(0.5),
   },
 }))
 
@@ -47,18 +49,18 @@ const UsageWidget = ({
         percentage={percentStr}
         label={
           <div className={classes.container}>
-            <Typography variant="subtitle2" className={classes.title}>
+            <Text variant="caption1" className={classes.title}>
               <b>{curStr}</b>
-            </Typography>
-            <Typography variant="subtitle2" className={classes.modifier}>
+            </Text>{' '}
+            <Text variant="caption4" className={classes.modifier}>
               {usedText}
-            </Typography>
-            <Typography variant="subtitle2" className={classes.title}>
+            </Text>
+            <Text variant="caption1" className={classes.title}>
               <b>{maxStr}</b>
-            </Typography>
-            <Typography variant="subtitle2" className={classes.modifier}>
+            </Text>{' '}
+            <Text variant="caption4" className={classes.modifier}>
               available
-            </Typography>
+            </Text>
           </div>
         }
         {...rest}

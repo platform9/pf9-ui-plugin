@@ -2,7 +2,8 @@ import React from 'react'
 import ImageCard from './ImageCard'
 import imageCatalog from './image_catalog.json'
 import { withStyles } from '@material-ui/styles'
-import { Paper, Typography } from '@material-ui/core'
+import { Paper } from '@material-ui/core'
+import Text from 'core/elements/text'
 
 const styles = (theme) => ({
   instruction: {
@@ -21,7 +22,7 @@ class ImageCardListPage extends React.PureComponent {
     return (
       <div>
         <Paper className={classes.instruction}>
-          <Typography variant="body1" component="p" style={{ lineHeight: 2 }}>
+          <Text variant="body1" component="p" style={{ lineHeight: 2 }}>
             These are pre-built Virtual Machine Images for commonly used Operating Systems. We have
             built these images with cloud-init pre-installed for ease of use. All you need to do is
             download the Image locally, then copy it over to the appropriate folder on the Host
@@ -34,7 +35,7 @@ class ImageCardListPage extends React.PureComponent {
               Imported Images Tab
             </a>{' '}
             for more details.
-          </Typography>
+          </Text>
         </Paper>
         {imageCatalog.map((image) => (
           <ImageCard image={image} key={image.md5sum} />

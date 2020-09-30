@@ -1,4 +1,4 @@
-import { Toolbar, Typography, Tooltip } from '@material-ui/core'
+import { Toolbar, Tooltip } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import SearchBar from 'core/components/SearchBar'
 import React, { useMemo } from 'react'
@@ -6,6 +6,7 @@ import Picklist from 'core/components/Picklist'
 import PropTypes from 'prop-types'
 import { projectAs } from 'utils/fp'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
+import Text from 'core/elements/text'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -130,7 +131,7 @@ const CardTableToolbar = ({
       {title && (
         <div>
           <div className={classes.title}>
-            <Typography variant="h6">{title}</Typography>
+            <Text variant="h6">{title}</Text>
           </div>
           <div className={classes.spacer} />
         </div>

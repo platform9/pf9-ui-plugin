@@ -1,7 +1,9 @@
 import React, { useCallback, useEffect, createRef } from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
-import { FormControl, FormHelperText, FormLabel, Typography } from '@material-ui/core'
+
+import { FormControl, FormHelperText, FormLabel } from '@material-ui/core'
+import Text from 'core/elements/text'
 import withFormContext, {
   ValidatedFormInputPropTypes,
 } from 'core/components/validatedForm/withFormContext'
@@ -95,9 +97,9 @@ const CodeMirror = ({
     <InfoTooltip open={open} info={info} placement={placement}>
       <FormControl id={id} error={hasError} className={classes.root}>
         <FormLabel>
-          <Typography component={'div'} className={classes.coderMirrorHeader} variant="body1">
+          <Text className={classes.coderMirrorHeader} variant="body1">
             {label}
-          </Typography>
+          </Text>
         </FormLabel>
         <BaseCodeMirror
           {...restProps}

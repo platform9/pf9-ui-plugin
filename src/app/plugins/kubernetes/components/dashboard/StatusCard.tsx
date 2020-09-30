@@ -6,7 +6,8 @@ import { Link } from 'react-router-dom'
 import { makeStyles } from '@material-ui/styles'
 import useDataLoader from 'core/hooks/useDataLoader'
 // Components
-import { Typography, CircularProgress } from '@material-ui/core'
+import { CircularProgress } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { hexToRGBA } from 'core/utils/colorHelpers'
 import CardButton from 'core/components/buttons/CardButton'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
@@ -29,7 +30,7 @@ const useStyles = makeStyles<Theme, { actionRow: boolean; chartRow: boolean }>((
     display: 'grid',
     gridTemplateRows: ({ actionRow, chartRow }) =>
       `85px${actionRow ? ' 76px' : ''}${chartRow ? ' 1fr' : ''}`,
-    backgroundColor: theme.palette.dashboardCard.background,
+    backgroundColor: theme.components.dashboardCard.background,
     minWidth: '270px',
     minHeight: '165px',
     padding: theme.spacing(),
@@ -38,20 +39,20 @@ const useStyles = makeStyles<Theme, { actionRow: boolean; chartRow: boolean }>((
     boxShadow:
       '0 2.5px 1.5px -3.5px rgba(0, 0, 0, 0.2), 0 1.5px 7px 1px rgba(0, 0, 0, 0.12), 0 1px 3px -1.5px rgba(0, 0, 0, 0.14)',
     '&:hover': {
-      backgroundColor: hexToRGBA(theme.palette.dashboardCard.background, 0.95),
+      backgroundColor: hexToRGBA(theme.components.dashboardCard.background, 0.95),
       transform: 'scale(1.025)',
     },
     overflowX: 'hidden',
   },
   text: {
-    color: theme.palette.dashboardCard.primary,
+    color: theme.components.dashboardCard.primary,
     fontSize: '40px',
   },
   cardTitle: {
-    color: theme.palette.dashboardCard.text,
+    color: theme.components.dashboardCard.text,
   },
   arrowIcon: {
-    background: theme.palette.dashboardCard.primary,
+    background: theme.components.dashboardCard.primary,
     height: '32px',
     width: '32px',
     color: theme.palette.primary.contrastText,
@@ -67,7 +68,7 @@ const useStyles = makeStyles<Theme, { actionRow: boolean; chartRow: boolean }>((
     gridTemplateColumns: '1fr 35px',
     alignItems: 'center',
     padding: theme.spacing(0, 1),
-    borderBottom: `1px solid ${theme.palette.dashboardCard.divider}`,
+    borderBottom: `1px solid ${theme.components.dashboardCard.divider}`,
   },
   links: {
     display: 'grid',
@@ -81,7 +82,7 @@ const useStyles = makeStyles<Theme, { actionRow: boolean; chartRow: boolean }>((
     display: 'grid',
     alignContent: 'center',
     borderTop: ({ actionRow }) =>
-      `${actionRow ? 1 : 0}px solid ${theme.palette.dashboardCard.divider}`,
+      `${actionRow ? 1 : 0}px solid ${theme.components.dashboardCard.divider}`,
   },
   addAction: {
     gridArea: 'add-action',
@@ -144,9 +145,9 @@ const StatusCard: FunctionComponent<StatusCardProps> = ({
     <div className={clsx(contentContainer, className)}>
       <header className={header}>
         <Link to={route}>
-          <Typography variant="h6" className={cardTitle}>
+          <Text variant="h6" className={cardTitle}>
             {title}
-          </Typography>
+          </Text>
         </Link>
         <FontAwesomeIcon className={headerIcon}>{icon}</FontAwesomeIcon>
         {loading ? <CircularProgress size={32} /> : <span className={text}>{quantity}</span>}

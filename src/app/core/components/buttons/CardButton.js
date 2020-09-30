@@ -10,9 +10,9 @@ const styles = (theme) => ({
     textTransform: 'uppercase',
     height: 32,
     padding: theme.spacing(0.25, 2),
-    color: theme.palette.dashboardCard.primary,
+    color: theme.components.dashboardCard.primary,
     border: `1px solid ${hexToRGBA(theme.palette.primary.main, 0.5)}`,
-    background: theme.palette.dashboardCard.button,
+    background: theme.components.dashboardCard.button,
     whiteSpace: 'nowrap',
 
     '&:hover': {

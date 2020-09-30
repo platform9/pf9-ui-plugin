@@ -4,7 +4,8 @@ import PicklistField from 'core/components/validatedForm/PicklistField'
 import SubmitButton from 'core/components/buttons/SubmitButton'
 import TextField from 'core/components/validatedForm/TextField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
-import { Card, CardContent, Typography } from '@material-ui/core'
+import { Card, CardContent } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { withStyles } from '@material-ui/styles'
 
 const styles = (theme) => ({
@@ -20,7 +21,7 @@ const PrometheusRuleForm = ({ onDelete, onSubmit, classes }) => {
   return (
     <Card className={classes.root}>
       <CardContent>
-        <Typography variant="h6">Prometheus Rule</Typography>
+        <Text variant="h6">Prometheus Rule</Text>
         <ValidatedForm initialValues={initialValues} onSubmit={onSubmit} clearOnSubmit>
           <TextField id="alert" label="Alert Name" info="Name of the alert " />
           <TextField id="expr" label="Rule" info="Prometheus Rule Expression" />

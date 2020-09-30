@@ -1,5 +1,6 @@
 import React from 'react'
-import { Table, TableBody, TableCell, TableRow, Typography } from '@material-ui/core'
+import { Table, TableBody, TableCell, TableRow } from '@material-ui/core'
+import Text from 'core/elements/text'
 
 import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
 import useDataLoader from 'core/hooks/useDataLoader'
@@ -21,9 +22,9 @@ const DataRow = ({ label, value }) => {
       <TableCell className={classes.cell}>
         {Array.isArray(value)
           ? value.map((val, idx) => (
-              <Typography key={idx} variant="body2">
+              <Text key={idx} variant="body2">
                 {val}
-              </Typography>
+              </Text>
             ))
           : value}
       </TableCell>

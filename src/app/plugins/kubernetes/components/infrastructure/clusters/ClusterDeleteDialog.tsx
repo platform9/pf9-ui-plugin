@@ -1,12 +1,6 @@
 import React, { useCallback, useState } from 'react'
-import {
-  Typography,
-  Dialog,
-  DialogContent,
-  DialogActions,
-  Button,
-  DialogTitle,
-} from '@material-ui/core'
+import Text from 'core/elements/text'
+import { Dialog, DialogContent, DialogActions, Button, DialogTitle } from '@material-ui/core'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import Progress from 'core/components/progress/Progress'
 import TextField from 'core/components/validatedForm/TextField'
@@ -47,15 +41,15 @@ const ClusterDeleteDialog: React.FC<IClusterDeleteDialog> = ({ rows: [cluster], 
   return (
     <Dialog open onClose={onClose} onClick={stopPropagation}>
       <DialogTitle>
-        <Typography variant="subtitle1">{title}</Typography>
+        <Text variant="subtitle1">{title}</Text>
       </DialogTitle>
       <ValidatedForm initialValues={cluster} fullWidth onSubmit={handleDelete} elevated={false}>
         {({ values }) => (
           <Progress loading={deletingCluster} renderContentOnMount maxHeight={60}>
             <DialogContent>
-              <Typography variant="body1" component="div">
+              <Text variant="body1" component="div">
                 Please type "<b>{cluster?.name}</b>" to confirm.
-              </Typography>
+              </Text>
               <TextField id="clusterName" type="text" label="Cluster name" />
               {cluster.cloudProviderType === CloudProviders.BareOS && (
                 <Alert

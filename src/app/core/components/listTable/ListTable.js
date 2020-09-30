@@ -52,8 +52,21 @@ const styles = (theme) => ({
   tableWrapper: {
     overflowX: 'auto',
   },
+  tableRow: {
+    transition: 'background .2s ease',
+    '&:hover': {
+      backgroundColor: [theme.palette.grey[100], '!important'],
+    },
+    '&.Mui-selected': {
+      backgroundColor: theme.palette.blue[100],
+    },
+    '&.Mui-selected:hover': {
+      backgroundColor: [theme.palette.blue[100], '!important'],
+    },
+  },
   cell: {
-    fontSize: '12px',
+    padding: theme.spacing(2, 1),
+    ...theme.typography.body2,
   },
   emptyList: {
     textAlign: 'left',
@@ -454,7 +467,7 @@ class ListTable extends PureComponent {
     const uid = this.getRowId(row)
 
     return (
-      <TableRow hover key={uid} {...checkboxProps}>
+      <TableRow hover key={uid} {...checkboxProps} className={classes.tableRow}>
         {showCheckboxes && (
           <TableCell padding="checkbox">
             {multiSelection ? (
@@ -482,6 +495,8 @@ class ListTable extends PureComponent {
     const { rowsPerPage } = this.state
     return (
       <TablePagination
+        // labelRowsPerPage=""
+        // labelDisplayedRows={() => ''}
         component="div"
         count={count}
         rowsPerPage={rowsPerPage}

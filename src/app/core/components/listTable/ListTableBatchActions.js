@@ -11,32 +11,36 @@ import { withRouter } from 'react-router-dom'
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    minWidth: 50,
+    minWidth: 34,
     display: 'flex',
     flexFlow: 'column nowrap',
     alignItems: 'center',
-    marginTop: theme.spacing(1),
-    marginLeft: theme.spacing(1),
-    marginRight: theme.spacing(1),
+    paddingLeft: theme.spacing(1.5),
+    paddingRight: theme.spacing(1.5),
     cursor: 'pointer',
-    lineHeight: 2,
-    fontSize: theme.typography.fontSize * 0.8,
+    position: 'relative',
+    bottom: -2,
+    ...theme.typography.caption3,
   },
   actionIcon: {
     width: 22,
     height: 22,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
     '& i': {
-      fontSize: 18,
+      fontSize: 22,
     },
   },
   actionLabel: {
     whiteSpace: 'nowrap',
     textAlign: 'center',
     wordWrap: 'break-word',
+    marginTop: 2,
   },
   disabledAction: {
     cursor: 'not-allowed',
-    color: 'rgba(0, 0, 0, .3)',
+    color: theme.palette.grey[300],
     '& i': {
       color: 'inherit',
     },

@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react'
 import { makeStyles } from '@material-ui/styles'
-import { Theme, Typography } from '@material-ui/core'
+import { Theme } from '@material-ui/core'
 import BulletList from 'core/components/BulletList'
 import Alert from 'core/components/Alert'
 import SubmitButton from 'core/components/buttons/SubmitButton'
@@ -9,6 +9,7 @@ import ExternalLink from 'core/components/ExternalLink'
 import { gettingStartedHelpLink } from 'k8s/links'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import { routes } from 'core/utils/routes'
+import Text from 'core/elements/text'
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -86,16 +87,16 @@ const BareOSClusterRequirements = ({ onComplete }) => {
         </div>
       }
     >
-      <Typography className={classes.text}>
+      <Text className={classes.text}>
         Create a BareOS cluster using Ubuntu or CentOS physical or virtual machines
-      </Typography>
-      <Typography className={classes.text}>Cluster comes built in with:</Typography>
+      </Text>
+      <Text className={classes.text}>Cluster comes built in with:</Text>
       <BulletList className={classes.bulletList} items={nodeServices} />
 
       <Alert variant="info">
-        <Typography className={classes.alertTitle} variant="subtitle2">
+        <Text className={classes.alertTitle} variant="subtitle2">
           Minimum Hardware Requirements:
-        </Typography>
+        </Text>
         <div className={classes.requirements}>
           <HardwareSpec title="2 VCPUs" icon="microchip" />
           <HardwareSpec title="5GB RAM" icon="memory" />
@@ -117,7 +118,7 @@ const HardwareSpec = ({ title, icon }) => {
       <span className={classes.harwareSpecIcon}>
         <FontAwesomeIcon className={classes.blueIcon}>{icon}</FontAwesomeIcon>
       </span>
-      <Typography>{title}</Typography>
+      <Text>{title}</Text>
     </div>
   )
 }

@@ -14,7 +14,8 @@ import Theme from 'core/themes/model'
 import { IRbacAPIGroupResourceVerb, IRbacAPIGroup, IRbacAPIGroupResource } from './model'
 import { IUseDataLoader } from '../infrastructure/nodes/model'
 import PicklistDefault from 'core/components/Picklist'
-import { Typography, Chip } from '@material-ui/core'
+import { Chip } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { hexToRGBA } from 'core/utils/colorHelpers'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 const Picklist: any = PicklistDefault // types on forward ref .js file dont work well.
@@ -247,7 +248,7 @@ const AddRbacApiGroup: FC<IAddRbacApiGroupProps> = ({
           showAll={false}
         />
       </div>
-      <Typography variant="subtitle2">Choose which verbs to add to this resource</Typography>
+      <Text variant="subtitle2">Choose which verbs to add to this resource</Text>
       <div className={classes.verbs}>
         {verbs.map((verb) => (
           <FormControlLabel
@@ -282,10 +283,10 @@ const SelectedRbacApiGroups: FC<ISelectedRbacApiGroupProps> = ({ groups, onEdit,
               <div key={`${group}-${resource}`} className={classes.selectedGroup}>
                 <div className={classes.resource}>
                   <div className={classes.resourceGroup}>
-                    <Typography variant="body1" className={classes.groupHeader}>
+                    <Text variant="body1" className={classes.groupHeader}>
                       {group}
-                    </Typography>
-                    <Typography variant="body1">{resource}</Typography>
+                    </Text>
+                    <Text variant="body1">{resource}</Text>
                   </div>
                   <div className={classes.verbContainer}>
                     {Object.entries(verbs).map(([verb, value]) =>

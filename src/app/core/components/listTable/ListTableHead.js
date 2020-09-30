@@ -27,8 +27,17 @@ const styles = (theme) => ({
     paddingRight: 4,
   },
   headLabel: {
-    fontSize: '12px',
+    color: theme.palette.grey[500],
     whiteSpace: 'nowrap',
+    ...theme.typography.caption2,
+
+    '& .MuiTableSortLabel-icon': {
+      opacity: [1, '!important'],
+      color: [theme.palette.grey[500], '!important'],
+    },
+    '&.MuiTableSortLabel-active': {
+      color: theme.palette.grey[700],
+    },
   },
   cellLabel: {
     color: [theme.palette.text.primary, '!important'],
@@ -133,7 +142,7 @@ class ListTableHead extends React.PureComponent {
                     {column.label} {idx === 0 ? `(${rowCount})` : ''}
                   </TableSortLabel>
                 ) : (
-                  <span>
+                  <span className={classes.headLabel}>
                     {column.label} {idx === 0 ? `(${rowCount})` : ''}
                   </span>
                 )}

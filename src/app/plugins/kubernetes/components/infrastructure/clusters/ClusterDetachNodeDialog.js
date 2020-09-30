@@ -11,8 +11,8 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  Typography,
 } from '@material-ui/core'
+import Text from 'core/elements/text'
 import withDataLoader from 'core/hocs/withDataLoader'
 import withDataMapper from 'core/hocs/withDataMapper'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
@@ -31,7 +31,7 @@ const stopPropagation = (e) => {
   e.stopPropagation()
 }
 
-@connect(store => ({ cache: store[cacheStoreKey] }))
+@connect((store) => ({ cache: store[cacheStoreKey] }))
 class ClusterDetachNodeDialog extends React.PureComponent {
   state = {}
 
@@ -94,9 +94,7 @@ class ClusterDetachNodeDialog extends React.PureComponent {
 
           <p>Choose nodes to detach from the cluster</p>
 
-          {attachedNodes.length === 0 && (
-            <Typography variant="h5">No nodes available to detach</Typography>
-          )}
+          {attachedNodes.length === 0 && <Text variant="h5">No nodes available to detach</Text>}
           <Table>
             <TableBody>{attachedNodes.map(this.renderNodeRow)}</TableBody>
           </Table>

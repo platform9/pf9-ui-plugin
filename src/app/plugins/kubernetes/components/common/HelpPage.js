@@ -1,5 +1,6 @@
 import React from 'react'
-import { Divider, Typography } from '@material-ui/core'
+import { Divider } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
 import CardButton from 'core/components/buttons/CardButton'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
@@ -76,15 +77,15 @@ const SupportCard = ({ title, icon, body = '', src, action }) => {
   return (
     <div className={classes.card}>
       <header className={classes.cardHeader}>
-        <Typography variant="subtitle2" className={classes.title}>
+        <Text variant="subtitle2" className={classes.title}>
           {title}
-        </Typography>
+        </Text>
         <FontAwesomeIcon brand={brandIcons.includes(icon)} className={classes.icon}>
           {icon}
         </FontAwesomeIcon>
       </header>
       <article className={classes.cardBody}>
-        <Typography variant="body1">{body}</Typography>
+        <Text variant="body1">{body}</Text>
         {src.indexOf('mailto') >= 0 ? (
           <a href={src}>
             <CardButton showPlus={false}>{action}</CardButton>
@@ -103,9 +104,9 @@ const HelpPage = () => {
   const classes = useStyles()
   return (
     <>
-      <Typography variant="h6" className={classes.pageHeader}>
+      <Text variant="h6" className={classes.pageHeader}>
         Support
-      </Typography>
+      </Text>
       <Divider />
       <div className={classes.cardRow}>
         <SupportCard
@@ -131,9 +132,9 @@ const HelpPage = () => {
         />
       </div>
 
-      <Typography variant="h6" className={classes.pageHeader}>
+      <Text variant="h6" className={classes.pageHeader}>
         Have a question?
-      </Typography>
+      </Text>
       <Divider />
       <div className={classes.cardRow}>
         <SupportCard

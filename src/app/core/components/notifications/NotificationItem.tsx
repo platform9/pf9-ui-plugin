@@ -1,12 +1,13 @@
 import React, { FC } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
-import { Typography } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { secondsToString } from 'utils/misc'
 import moment from 'moment'
 import { Notification } from 'core/notifications/notificationReducers'
+import Theme from 'core/themes/model'
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles<Theme>((theme) => ({
   root: {
     display: 'flex',
     flexFlow: 'row nowrap',
@@ -16,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(1),
     minWidth: theme.spacing(6),
     fontWeight: 'bold',
-    color: theme.palette.error.main,
+    color: theme.components.error.main,
   },
   content: {
     display: 'flex',
@@ -32,11 +33,11 @@ const NotificationItem: FC<{ notification: Notification }> = ({ notification }) 
     <div className={classes.root}>
       <FontAwesomeIcon className={classes.icon}>times-circle</FontAwesomeIcon>
       <div className={classes.content}>
-        <Typography variant="subtitle2">{notification.title}</Typography>
-        <Typography variant="body1">{notification.message}</Typography>
-        <Typography variant="body2" color="textSecondary">
+        <Text variant="subtitle2">{notification.title}</Text>
+        <Text variant="body1">{notification.message}</Text>
+        <Text variant="body2" color="textSecondary">
           {timePassed ? `${timePassed} ago` : 'Just now'}
-        </Typography>
+        </Text>
       </div>
     </div>
   )

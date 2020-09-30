@@ -16,11 +16,21 @@ const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
     flexFlow: 'row nowrap',
-    paddingRight: theme.spacing(1),
-    color: theme.palette.grey[600],
+    padding: theme.spacing(0, 2, 0, 1),
+    color: theme.palette.grey[700],
+    backgroundColor: theme.palette.grey[100],
+    minHeight: 56,
+    borderRadius: 4,
     '& .MuiOutlinedInput-root': {
       marginBottom: theme.spacing(1),
       marginRight: theme.spacing(2),
+      height: 40,
+    },
+    '& .Mui-focused.MuiOutlinedInput-root fieldset': {
+      borderColor: theme.palette.grey[700],
+    },
+    '& .MuiFormLabel-root.Mui-focused': {
+      color: theme.palette.grey[700],
     },
   },
   highlight: {},
@@ -32,10 +42,18 @@ const useStyles = makeStyles((theme) => ({
     cursor: 'pointer',
     fontWeight: 300,
     marginLeft: 25,
+    color: theme.palette.grey[700],
+    width: 22,
+    height: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+    display: 'flex',
   },
   toolbar: {
+    alignItems: 'center',
     justifyContent: 'flex-end',
     paddingRight: 0,
+    minHeight: 56,
     '& .MuiSelect-root': {
       paddingTop: theme.spacing(),
       paddingBottom: theme.spacing(),
@@ -47,6 +65,13 @@ const useStyles = makeStyles((theme) => ({
   },
   rowActions: {
     color: 'inherit',
+  },
+  divider: {
+    width: 1,
+    height: 32,
+    backgroundColor: theme.palette.grey[200],
+    margin: theme.spacing(0, 2),
+    border: 'none',
   },
 }))
 
@@ -142,6 +167,8 @@ const ListTableToolbar = ({
     [numSelected, batchActions, onEdit, onDelete],
   )
 
+  const showDivider = onSearchChange && ((columns && onColumnToggle) || onAdd)
+
   return (
     <Toolbar
       className={clsx(classes.root, {
@@ -171,6 +198,7 @@ const ListTableToolbar = ({
               searchTerm={searchTerm}
             />
           )}
+          {showDivider && <hr className={classes.divider} />}
           {columns && onColumnToggle && (
             <ListTableColumnButton
               columns={columns}

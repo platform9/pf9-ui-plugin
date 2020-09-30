@@ -1,7 +1,9 @@
 import React, { FC, useCallback, useMemo, useState } from 'react'
-import { Button, Theme, Typography } from '@material-ui/core'
+import { Button } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
 import BaseOnboardingBanner from 'core/components/onboarding/BaseOnboardingBanner'
+import Theme from 'core/themes/model'
 
 type NumberType<L extends number> = L
 // The next type defines the number of steps
@@ -32,18 +34,18 @@ const OnboardingBanner: FC = (props) => {
   const stepsContent = useMemo<ArrayFixed<React.ReactElement, NumStepsType>>(
     () => [
       <>
-        <Typography variant="body1">
+        <Text variant="body1">
           Get started now, and you can have your Kubernetes private cloud operational within
           minutes!
-        </Typography>
+        </Text>
         <Button variant="contained" className={classes.button}>
           + Add Host
         </Button>
       </>,
-      <Typography variant="body1">Step 2</Typography>,
-      <Typography variant="body1">Step 3</Typography>,
-      <Typography variant="body1">Step 4</Typography>,
-      <Typography variant="body1">Step 5</Typography>,
+      <Text variant="body1">Step 2</Text>,
+      <Text variant="body1">Step 3</Text>,
+      <Text variant="body1">Step 4</Text>,
+      <Text variant="body1">Step 5</Text>,
     ],
     [classes],
   )

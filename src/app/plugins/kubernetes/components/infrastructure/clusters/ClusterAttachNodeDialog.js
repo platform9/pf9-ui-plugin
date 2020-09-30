@@ -12,8 +12,8 @@ import {
   TableBody,
   TableCell,
   TableRow,
-  Typography,
 } from '@material-ui/core'
+import Text from 'core/elements/text'
 import withDataLoader from 'core/hocs/withDataLoader'
 import withDataMapper from 'core/hocs/withDataMapper'
 import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
@@ -33,7 +33,7 @@ const stopPropagation = (e) => {
   e.stopPropagation()
 }
 
-@connect(store => ({ cache: store[cacheStoreKey] }))
+@connect((store) => ({ cache: store[cacheStoreKey] }))
 class ClusterAttachNodeDialog extends PureComponent {
   state = {}
 
@@ -95,9 +95,7 @@ class ClusterAttachNodeDialog extends PureComponent {
             Choose the nodes you would like to add to this cluster as well as their corresponding
             role.
           </p>
-          {freeNodes.length === 0 && (
-            <Typography variant="h5">No nodes available to attach</Typography>
-          )}
+          {freeNodes.length === 0 && <Text variant="h5">No nodes available to attach</Text>}
           <Table>
             <TableBody>{freeNodes.map(this.renderNodeRow)}</TableBody>
           </Table>

@@ -7,35 +7,28 @@ import { identity } from 'ramda'
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    display: 'flex',
-    flexFlow: 'row nowrap',
-    paddingBottom: theme.spacing(0.5),
+    display: 'grid',
+    gridTemplateColumns: '58px 1fr 138px',
   },
   label: {
-    fontSize: 12,
-    width: 58,
-    fontWeight: 'bold',
+    color: theme.palette.grey[500],
   },
   rightAlign: {
     textAlign: 'right',
+    ...theme.typography.h4,
   },
   value: {
-    fontSize: 12,
     whiteSpace: 'nowrap',
-    width: 135,
     paddingRight: 4,
     display: 'grid',
-    gridTemplateColumns: '1fr 4px 1fr 25px',
+    gridTemplateColumns: '1fr 4px 1fr 35px',
     gridGap: '4px',
   },
   percent: {
-    width: 152,
+    width: 30,
   },
   percentGrid: {
-    display: 'grid',
-    justifyItems: 'end',
-    gridGap: 4,
-    gridTemplateColumns: '25px min-content',
+    padding: theme.spacing(0.5, 0),
   },
 }))
 
@@ -45,12 +38,7 @@ const ResourceUsageTable = ({ label, valueConverter, usedText, units, stats, pre
 
   const curStr = valueConverter(current).toFixed(precision)
   const maxStr = valueConverter(max).toFixed(precision)
-  const percentStr = (
-    <span className={classes.percentGrid}>
-      <span>{Math.round(percent)}%</span>
-      <span>{usedText}</span>
-    </span>
-  )
+  const percentStr = <span className={classes.percent}>{Math.round(percent)}%</span>
   return (
     <Tooltip title={`${curStr} ${units} of ${maxStr} ${units} ${usedText}`}>
       <div className={classes.root}>
@@ -61,8 +49,8 @@ const ResourceUsageTable = ({ label, valueConverter, usedText, units, stats, pre
           <span>{maxStr}</span>
           <span>{units}</span>
         </span>
-        <span className={classes.percent}>
-          <ProgressBar width={140} variant="health" percent={percent} label={percentStr} />
+        <span className={classes.percentGrid}>
+          <ProgressBar width={138} variant="health" percent={percent} label={percentStr} />
         </span>
       </div>
     </Tooltip>

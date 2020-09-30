@@ -1,10 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Checkbox, FormControl, FormControlLabel, FormGroup, Typography } from '@material-ui/core'
+import { Checkbox, FormControl, FormControlLabel, FormGroup } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import { ensureFunction } from 'app/utils/fp'
 import moize from 'moize'
 import { compose } from 'ramda'
+import Text from 'core/elements/text'
 
 const styles = {
   root: {
@@ -49,9 +50,9 @@ class ListTableColumnPopover extends React.PureComponent {
     const { classes, columns, visibleColumns } = this.props
     return (
       <FormControl component="fieldset" className={classes.root} aria-label="Columns">
-        <Typography variant="caption" className={classes.title}>
+        <Text variant="caption" className={classes.title}>
           Columns
-        </Typography>
+        </Text>
         <FormGroup className={classes.formGroup}>
           {columns
             .filter((column) => column.excluded !== true)

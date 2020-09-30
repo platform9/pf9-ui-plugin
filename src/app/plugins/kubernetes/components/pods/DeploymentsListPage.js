@@ -9,8 +9,7 @@ import { pick } from 'ramda'
 import NamespacePicklist from 'k8s/components/common/NamespacePicklist'
 import renderLabels from 'k8s/components/pods/renderLabels'
 import ExternalLink from 'core/components/ExternalLink'
-import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
-import DateCell from 'core/components/listTable/cells/DateCell'
+import { DateAndTime } from 'core/components/listTable/cells/DateCell'
 
 const defaultParams = {
   masterNodeClusters: true,
@@ -62,10 +61,7 @@ const renderName = (name, { dashboardUrl }) => {
     <span>
       {name}
       <br />
-      <ExternalLink url={dashboardUrl}>
-        <FontAwesomeIcon size="md">file-alt</FontAwesomeIcon>
-        dashboard
-      </ExternalLink>
+      <ExternalLink url={dashboardUrl}>dashboard</ExternalLink>
     </span>
   )
 }
@@ -84,7 +80,7 @@ export const options = {
     { id: 'labels', label: 'Labels', render: renderLabels('label') },
     { id: 'selectors', label: 'Selectors', render: renderLabels('selector') },
     { id: 'pods', label: 'Pods' },
-    { id: 'created', label: 'Age', render: (value) => <DateCell value={value} showToolTip /> },
+    { id: 'created', label: 'Age', render: (value) => <DateAndTime value={value} showToolTip /> },
   ],
   name: 'Deployments',
   title: 'Deployments',

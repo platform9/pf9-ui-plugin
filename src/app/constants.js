@@ -51,6 +51,7 @@ export const clarityUrlRoot = '/clarity/index.html#'
 export const clarityDashboardUrl = `${clarityUrlRoot}/dashboard`
 
 export const imageUrls = Object.freeze({
+  logoPrimary: `${imageUrlRoot}/primary-logo.png`,
   logoBlue: `${imageUrlRoot}/logo-color.png`,
   logo: `${imageUrlRoot}/logo.png`,
   loading: `${imageUrlRoot}/loading.gif`,

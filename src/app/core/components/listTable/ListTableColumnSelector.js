@@ -16,6 +16,12 @@ const styles = (theme) => ({
   button: {
     cursor: 'pointer',
     fontWeight: 300,
+    color: theme.palette.grey[700],
+    width: 21,
+    height: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+    display: 'flex',
   },
   clearIcon: {
     '&:hover': {
