@@ -61,7 +61,6 @@ const styles = (theme) => ({
     alignItems: 'stretch',
   },
   textField: {
-    // border: `solid 1px ${theme.palette.grey['000']}`,
     '& input': {
       backgroundColor: `${theme.palette.grey[800]} !important`,
     },
@@ -103,63 +102,11 @@ const styles = (theme) => ({
   },
 })
 
-// const stylesD = (theme) => ({
-//   root: {
-//     padding: theme.spacing(8),
-//     overflow: 'auto',
-//   },
-//   paper: {
-//     padding: theme.spacing(4),
-//   },
-//   img: {
-//     maxHeight: '70%',
-//     maxWidth: '70%',
-//     display: 'block',
-//     marginLeft: 'auto',
-//     marginRight: 'auto',
-//   },
-//   form: {
-//     display: 'flex',
-//     flexFlow: 'column nowrap',
-//     alignItems: 'center',
-//     paddingTop: theme.spacing(3),
-//   },
-//   textField: {
-//     minWidth: '100%',
-//     marginTop: theme.spacing(1),
-//   },
-//   checkbox: {
-//     marginTop: theme.spacing(3),
-//   },
-//   signinButton: {
-//     minWidth: '80%',
-//     marginTop: theme.spacing(3),
-//     display: 'block',
-//     marginLeft: 'auto',
-//     marginRight: 'auto',
-//   },
-//   forgotPwd: {
-//     marginTop: theme.spacing(2),
-//     marginBottom: theme.spacing(3),
-//     textAlign: 'center',
-//   },
-//   paragraph: {
-//     textAlign: 'center',
-//   },
-//   errorContainer: {
-//     width: '90%',
-//     '& .MuiPaper-root': {
-//       width: 'initial',
-//       boxShadow: 'initial',
-//     },
-//   },
-// })
-// declare var classesStyle = styles({})
 interface Props {
   dispatch: any
   onAuthSuccess: any
   history: any
-  classes: any // typeof classesStyle
+  classes: any
 }
 
 @(connect() as any)
@@ -355,12 +302,5 @@ class LoginPage extends React.PureComponent<Props> {
     )
   }
 }
-
-// LoginPage.propTypes = {
-//   /**
-//    * Handler that is invoked upon successful authentication.
-//    */
-//   onAuthSuccess: PropTypes.func,
-// }
 
 export default compose(withRouter, withStyles(styles as any))(LoginPage)

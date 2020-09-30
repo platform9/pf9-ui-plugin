@@ -97,7 +97,7 @@ class SearchBar extends PureComponent {
             startAdornment: (
               <InputAdornment position="start">
                 <FontAwesomeIcon className={`${classes.searchIcon} searchIcon`}>
-                  {'search'}
+                  search
                 </FontAwesomeIcon>
               </InputAdornment>
             ),

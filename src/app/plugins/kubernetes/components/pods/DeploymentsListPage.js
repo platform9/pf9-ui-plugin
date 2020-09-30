@@ -9,7 +9,6 @@ import { pick } from 'ramda'
 import NamespacePicklist from 'k8s/components/common/NamespacePicklist'
 import renderLabels from 'k8s/components/pods/renderLabels'
 import ExternalLink from 'core/components/ExternalLink'
-import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { DateAndTime } from 'core/components/listTable/cells/DateCell'
 
 const defaultParams = {

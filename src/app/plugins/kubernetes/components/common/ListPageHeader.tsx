@@ -34,14 +34,10 @@ function ListPageHeader<T>({ loaderFn, report, totalUsageFn }: IListPageHeaderPr
   const [data, loading, reload]: IUseDataLoader<T> = useDataLoader(loaderFn, null, {
     loadingFeedback: false,
   }) as any
-  function noop(ignoreCache) {
-    console.log(reload, ignoreCache)
-    return []
-  }
   const totals = totalUsageFn(data)
   return (
     <>
-      <PollingData hidden loading={loading} onReload={noop} refreshDuration={1000 * 10} />
+      <PollingData hidden loading={loading} onReload={reload} refreshDuration={1000 * 10} />
       <div className={classes.container}>
         <ListPageHeaderCard {...report} className={classes.card} />
         <UsageWidget title="Compute" stats={totals.compute} units="GHz" />

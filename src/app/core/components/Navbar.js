@@ -6,7 +6,6 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
-  IconButton,
   ListItemText,
   MenuItem,
   MenuList,
@@ -23,14 +22,7 @@ import moize from 'moize'
 import { assoc, flatten, pluck, prop, propEq, propOr, where, equals } from 'ramda'
 import { matchPath, withRouter } from 'react-router'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
-import {
-  imageUrls,
-  clarityDashboardUrl,
-  helpUrl,
-  ironicWizardUrl,
-  dashboardUrl,
-} from 'app/constants'
-import { routes } from 'core/utils/routes'
+import { clarityDashboardUrl, helpUrl, ironicWizardUrl, dashboardUrl } from 'app/constants'
 import Text from 'core/elements/text'
 
 import SimpleLink from './SimpleLink'
@@ -73,30 +65,6 @@ const styles = (theme) => ({
         marginLeft: theme.spacing(),
       },
     },
-  },
-  logoTitle: {
-    backgroundImage: `url(${imageUrls.ffffff})`,
-    backgroundRepeat: 'no-repeat',
-    backgroundSize: 180,
-    height: 20,
-    backgroundPosition: '-55px -12px',
-  },
-  logo: {
-    justifySelf: 'center',
-    maxHeight: 45,
-    backgroundImage: `url(${imageUrls.logoBlue})`,
-    backgroundRepeat: 'no-repeat',
-    transition: `width ${theme.transitions.duration.enteringScreen}ms ease`,
-    width: 40,
-    backgroundSize: 115,
-    height: 24,
-    backgroundPosition: 'center -6px',
-  },
-  logoOpen: {
-    width: drawerWidth,
-  },
-  logoClose: {
-    width: 168,
   },
   drawer: {
     zIndex: 1000,
@@ -328,10 +296,6 @@ class Navbar extends PureComponent {
     expandedItems: [],
     activeNavItem: null,
     filterText: '',
-  }
-
-  handleLogoClick = () => {
-    this.props.history.push(routes.dashboard.path())
   }
 
   handleEscKey = () => {
