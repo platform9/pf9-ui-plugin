@@ -4,20 +4,45 @@ import Theme from 'core/themes/model'
 import clsx from 'clsx'
 import { makeStyles } from '@material-ui/styles'
 
-const colorVariantMap = {
+const colorVariantMap = (theme: Theme) => ({
   light: {
-    color: 800,
-    background: '000',
+    default: {
+      color: theme.palette.grey[900],
+      background: theme.palette.grey['000'],
+    },
+    focus: {
+      color: theme.palette.blue[500],
+      background: theme.palette.grey['000'],
+    },
+    error: {
+      color: theme.palette.osRed[500],
+      background: theme.palette.grey['000'],
+    },
+    disabled: {
+      color: theme.palette.grey[300],
+      background: theme.palette.grey['000'],
+    },
   },
   dark: {
-    color: '000',
-    background: 800,
+    default: {
+      background: theme.palette.grey[900],
+      color: theme.palette.grey['000'],
+    },
+    focus: {
+      color: theme.palette.blue[500],
+      background: theme.palette.grey['900'],
+    },
+    error: {
+      background: theme.palette.grey[900],
+      color: theme.palette.osRed['500'],
+    },
+    disabled: {
+      background: theme.palette.grey[900],
+      color: theme.palette.grey['700'],
+    },
   },
-}
-function getColor(theme, key, variant) {
-  const colorKey = colorVariantMap[variant][key]
-  return theme.palette.grey[colorKey]
-}
+})
+const getColor = (theme, key = 'default', variant) => colorVariantMap(theme)[variant][key]
 
 interface Props extends Omit<OutlinedTextFieldProps, 'onChange' | 'variant'> {
   variant?: 'light' | 'dark'
@@ -36,52 +61,62 @@ const useStyles = makeStyles<Theme, { variant: string }>((theme: Theme) => ({
       top: 3,
       ...theme.typography.inputLabel,
       color: theme.palette.grey[500],
-      backgroundColor: ({ variant }) => getColor(theme, 'background', variant),
+      backgroundColor: ({ variant }) => getColor(theme, 'default', variant).background,
     },
     '& .MuiInputLabel-outlined.MuiInputLabel-shrink': {
       ...theme.typography.inputLabel,
       top: -3,
       fontSize: 15,
       padding: '0 12px 0 5px',
-      color: ({ variant }) => getColor(theme, 'color', variant),
+      color: ({ variant }) => getColor(theme, 'default', variant).color,
     },
     '& input': {
-      ...theme.typography.inputTable,
+      ...theme.typography.inputPlaceholder,
       minHeight: 54,
       padding: theme.spacing(0, 2),
-      color: ({ variant }) => getColor(theme, 'color', variant),
-      background: ({ variant }) => getColor(theme, 'background', variant),
+      color: ({ variant }) => getColor(theme, 'default', variant).color,
+      background: ({ variant }) => getColor(theme, 'default', variant).background,
 
       '&:-webkit-autofill': {
-        '-webkit-text-fill-color': ({ variant }) => getColor(theme, 'color', variant),
+        '-webkit-text-fill-color': ({ variant }) => getColor(theme, 'default', variant).color,
         '-webkit-box-shadow': ({ variant }) =>
-          `0 0 0 30px ${getColor(theme, 'background', variant)} inset !important`,
+          `0 0 0 30px ${getColor(theme, 'default', variant).background} inset !important`,
       },
       '&:-webkit-autofill:hover': {
-        '-webkit-text-fill-color': ({ variant }) => getColor(theme, 'color', variant),
+        '-webkit-text-fill-color': ({ variant }) => getColor(theme, 'default', variant).color,
         '-webkit-box-shadow': ({ variant }) =>
-          `0 0 0 30px ${getColor(theme, 'background', variant)} inset !important`,
+          `0 0 0 30px ${getColor(theme, 'default', variant).background} inset !important`,
       },
       '&:-webkit-autofill:focus': {
-        '-webkit-text-fill-color': ({ variant }) => getColor(theme, 'color', variant),
+        '-webkit-text-fill-color': ({ variant }) => getColor(theme, 'default', variant).color,
         '-webkit-box-shadow': ({ variant }) =>
-          `0 0 0 30px ${getColor(theme, 'background', variant)} inset !important`,
+          `0 0 0 30px ${getColor(theme, 'default', variant).background} inset !important`,
       },
       '&:-webkit-autofill:active': {
-        '-webkit-text-fill-color': ({ variant }) => getColor(theme, 'color', variant),
+        '-webkit-text-fill-color': ({ variant }) => getColor(theme, 'default', variant).color,
         '-webkit-box-shadow': ({ variant }) =>
-          `0 0 0 30px ${getColor(theme, 'background', variant)} inset !important`,
+          `0 0 0 30px ${getColor(theme, 'default', variant).background} inset !important`,
       },
     },
     '& .MuiOutlinedInput-notchedOutline': {
       borderRadius: 0,
-      border: ({ variant }) => `1px solid ${getColor(theme, 'color', variant)}`,
+      border: ({ variant }) => `1px solid ${getColor(theme, 'default', variant).color}`,
     },
     '&:hover .MuiOutlinedInput-notchedOutline': {
-      borderColor: ({ variant }) => getColor(theme, 'color', variant),
+      borderColor: ({ variant }) => getColor(theme, 'default', variant).color,
     },
     '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
-      borderColor: ({ variant }) => getColor(theme, 'color', variant),
+      borderWidth: 1,
+      borderColor: ({ variant }) => `${getColor(theme, 'focus', variant).color} !important`,
+    },
+    '& .Mui-error .MuiOutlinedInput-notchedOutline': {
+      borderColor: ({ variant }) => `${getColor(theme, 'error', variant).color} !important`,
+    },
+    '& .Mui-disabled .MuiOutlinedInput-notchedOutline': {
+      borderColor: ({ variant }) => `${getColor(theme, 'disabled', variant).color} !important`,
+    },
+    '& .Mui-disabled.MuiInputLabel-outlined': {
+      color: ({ variant }) => `${getColor(theme, 'disabled', variant).color} !important`,
     },
   },
 }))
