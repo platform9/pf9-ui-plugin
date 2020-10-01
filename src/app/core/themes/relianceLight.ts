@@ -81,8 +81,8 @@ const components = {
     medium: 'rgba(2, 194, 172, 0.4)',
   },
   code: {
-    background: '#FDF6F5',
-    text: '#E5513A',
+    background: colors.blue[100],
+    text: colors.blue[700],
   },
   error: {
     light: '#E57373',
