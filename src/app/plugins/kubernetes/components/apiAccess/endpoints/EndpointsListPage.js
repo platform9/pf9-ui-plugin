@@ -37,7 +37,7 @@ const EndpointsListPage = () => {
           <FontAwesomeIcon className={classes.blueIcon} size="md">
             file-alt
           </FontAwesomeIcon>{' '}
-          <ExternalLink url={qbertApiLink}>Want to know more about Qbert?</ExternalLink>
+          <ExternalLink url={qbertApiLink}>View Qbert API Swagger Reference</ExternalLink>
         </div>
       }
     >
