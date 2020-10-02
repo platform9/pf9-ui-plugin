@@ -1,7 +1,7 @@
 import React from 'react'
-import Button from '@material-ui/core/Button'
 import Icon from '@material-ui/core/Icon'
 import { withStyles } from '@material-ui/styles'
+import Button from 'core/elements/button'
 
 const styles = (theme) => ({
   baseButton: {
@@ -17,14 +17,12 @@ const styles = (theme) => ({
 const NextButton = ({ children, classes, disabled, showForward = true, ...rest }) => {
   const params = {
     className: classes.baseButton,
-    color: disabled ? 'primary' : 'primary',
-    variant: 'contained',
     disabled,
     ...rest,
   }
 
   return (
-    <Button {...params}>
+    <Button {...params} disabled={disabled}>
       {children || 'Next'}
       {showForward && <Icon className={classes.rightIcon}>arrow_forward</Icon>}
     </Button>

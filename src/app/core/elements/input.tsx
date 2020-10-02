@@ -25,19 +25,19 @@ const colorVariantMap = (theme: Theme) => ({
   },
   dark: {
     default: {
-      background: theme.palette.grey[900],
+      background: theme.palette.grey[800],
       color: theme.palette.grey['000'],
     },
     focus: {
       color: theme.palette.blue[500],
-      background: theme.palette.grey['900'],
+      background: theme.palette.grey['800'],
     },
     error: {
-      background: theme.palette.grey[900],
+      background: theme.palette.grey[800],
       color: theme.palette.osRed['500'],
     },
     disabled: {
-      background: theme.palette.grey[900],
+      background: theme.palette.grey[800],
       color: theme.palette.grey['700'],
     },
   },

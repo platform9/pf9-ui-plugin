@@ -14,17 +14,19 @@ interface Props extends Omit<ButtonProps, 'variant'> {
 }
 
 const Button = ({
-  color,
+  color = 'primary',
   variant = 'light',
   textVariant,
   className = undefined,
   children,
   disabled = false,
+  ...rest
 }: Props) => {
-  const { button } = useStyles({ variant, color })
+  const { button, centerText } = useStyles({ variant, color })
   return (
-    <button className={clsx(button, className, { disabled })}>
+    <button className={clsx(button, className, { disabled })} {...rest}>
       <Text
+        className={centerText}
         component="span"
         variant={textVariant || color === 'primary' ? 'buttonPrimary' : 'buttonSecondary'}
       >
@@ -35,10 +37,15 @@ const Button = ({
 }
 
 const useStyles = makeStyles<Theme, { color: string; variant: string }>((theme: Theme) => ({
+  centerText: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   button: {
     outline: 0,
-    minHeight: 54,
-    minWidth: 150,
+    minHeight: 40,
+    // minWidth: 150,
     transition: 'background 0.2s ease, color 0.2s ease, border-color 0.2s ease',
     padding: theme.spacing(0, 2),
     border: '1px solid transparent',
@@ -71,6 +78,7 @@ const useStyles = makeStyles<Theme, { color: string; variant: string }>((theme: 
     },
     '&.disabled': {
       cursor: 'not-allowed',
+      outline: 0,
       backgroundColor: ({ color, variant }) =>
         `${getColor(theme, 'disabled', color, variant).backgroundColor} !important`,
       borderColor: ({ color, variant }) =>

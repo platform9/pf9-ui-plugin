@@ -82,7 +82,7 @@ const styles = (theme) => ({
     maxWidth: '100%',
   },
   signinButton: {
-    backgroundColor: theme.palette.blue[500],
+    minHeight: 54,
   },
   forgotPwd: {
     marginTop: 4,

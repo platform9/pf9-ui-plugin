@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Button } from '@material-ui/core'
+import Button from 'core/elements/button'
 
 const ImportDataButton = ({ children, id, onImport, ...rest }) => {
   const importData = ({ target }) => {

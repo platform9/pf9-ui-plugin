@@ -1,6 +1,5 @@
 import React from 'react'
 import {
-  Button,
   Dialog,
   DialogActions,
   DialogContent,
@@ -8,6 +7,7 @@ import {
   DialogTitle,
 } from '@material-ui/core'
 import { withProgress } from 'core/components/progress/Progress'
+import Button from 'core/elements/button'
 
 interface IConfirmationDialog {
   open: boolean
