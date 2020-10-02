@@ -1,22 +1,26 @@
 import React from 'react'
 import EnpointsListPage from './endpoints/EndpointsListPage'
-import KubeConfigListPage from './kubeConfig/KubeConfigListPage'
 import { makeStyles } from '@material-ui/core/styles'
-import { Divider } from '@material-ui/core'
+import ApiHelper from 'developer/components/ApiHelper'
+import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 
 const useStyles = makeStyles((theme) => ({
   container: {
     maxWidth: 700,
   },
+  apiHelper: {
+    width: 'auto',
+  },
 }))
 
 const ApiAccessListPage = () => {
-  const { container } = useStyles()
+  const classes = useStyles()
   return (
-    <div className={container}>
+    <div className={classes.container}>
       <EnpointsListPage />
-      <Divider />
-      <KubeConfigListPage />
+      <FormFieldCard title="API Helper">
+        <ApiHelper classes={{ root: classes.apiHelper }} elevated={false} />
+      </FormFieldCard>
     </div>
   )
 }

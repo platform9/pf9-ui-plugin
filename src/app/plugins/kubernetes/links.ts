@@ -48,7 +48,8 @@ export const kubectlInstallationDocumentationLink = `${pf9DocOrigin}/kubernetes/
 
 // Nodes
 export const nodeInstallTroubleshooting = `${k8sBaseUrl}/troubleshooting/node-install-status-check/`
-export const nodePrerequisitesDocumentationLink = 'https://platform9.com/blog/support/managed-container-cloud-requirements-checklist'
+export const nodePrerequisitesDocumentationLink =
+  'https://platform9.com/blog/support/managed-container-cloud-requirements-checklist'
 
 // CLI
 export const pmkCliOverviewLink = `${k8sBaseUrl}/PMK-CLI/`
@@ -70,6 +71,7 @@ export const persistVolumesStorageClassesLink = `${k8sDocBaselUrl}/concepts/stor
 // Api Access
 export const kubeconfigFileLink = `${k8sBaseUrl}/kubeconfig-and-clients/introduction-to-kubeconfig/`
 export const kubectlOverviewLink = `${k8sDocBaselUrl}/user-guide/kubectl-overview/`
+export const konformGithubLink = `${pf9GitHubRepoUrl}/konform`
 
 // Misc
 export const runtimePrivilegedLink = `${dockerDocBaseUrl}/engine/reference/run/#runtime-privilege-and-linux-capabilities`

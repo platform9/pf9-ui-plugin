@@ -48,15 +48,25 @@ class ApiHelper extends React.PureComponent {
   }
 
   performApiCall = async ({ method, url, body }) => {
-    const { baseUrl } = this.state
+    const { service, baseUrl } = this.state
     const apiClient = ApiClient.getInstance()
-    const finalUrl = baseUrl + url
-
     const response = await {
-      GET: () => apiClient.basicGet(finalUrl),
-      POST: () => apiClient.basicPost(finalUrl, JSON.parse(body)),
-      PUT: () => apiClient.basicPut(finalUrl, JSON.parse(body)),
-      DELETE: () => apiClient.basicGet(finalUrl),
+      GET: () => apiClient.basicGet({ url, endpoint: baseUrl, options: { clsName: service } }),
+      POST: () =>
+        apiClient.basicPost({
+          url,
+          endpoint: baseUrl,
+          body: JSON.parse(body),
+          options: { clsName: service },
+        }),
+      PUT: () =>
+        apiClient.basicPut({
+          url,
+          endpoint: baseUrl,
+          body: JSON.parse(body),
+          options: { clsName: service },
+        }),
+      DELETE: () => apiClient.basicGet({ url, endpoint: baseUrl, options: { clsName: service } }),
     }[method]()
 
     this.setState({ response })
@@ -69,8 +79,9 @@ class ApiHelper extends React.PureComponent {
     this.setState({ service })
 
     if (service === 'qbert') {
-      return this.setState({ baseUrl: await apiClient.qbert.baseUrl() })
+      return this.setState({ baseUrl: await apiClient.qbert.getApiEndpoint() })
     }
+
     this.setState({ baseUrl })
   }
 
@@ -316,6 +327,7 @@ class ApiHelper extends React.PureComponent {
           onSubmit={this.performApiCall}
           className={classes.root}
           initialValues={initialValue}
+          elevated={this.props.elevated ? this.props.elevated : false}
         >
           <ServicePicker value={service} onChange={this.handleServiceChange} />
           <PicklistField
@@ -331,7 +343,7 @@ class ApiHelper extends React.PureComponent {
             onChange={(e) => this.setField('baseUrl')(e.target.value)}
             fullWidth
           />
-          <TextField id="url" label="URL" />
+          <TextField id="url" label="Endpoint" />
           {methodsWithBody.includes(method) && (
             <TextField id="body" label="Body" multiline rows={3} />
           )}
