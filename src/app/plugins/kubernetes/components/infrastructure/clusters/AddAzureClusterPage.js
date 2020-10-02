@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import FormWrapper from 'core/components/FormWrapper'
 import AzureAvailabilityZoneChooser from './AzureAvailabilityZoneChooser'
 import AzureClusterReviewTable from './AzureClusterReviewTable'
