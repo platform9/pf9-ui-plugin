@@ -53,7 +53,7 @@ class TextField extends PureComponent {
           },
         }}
         label={required ? `${label} *` : label}
-        variant={variant || 'outlined'}
+        variant={variant}
         error={hasError}
         value={value !== undefined ? value : ''}
         onChange={this.handleChange}

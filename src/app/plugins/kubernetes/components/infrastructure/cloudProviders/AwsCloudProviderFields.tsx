@@ -120,7 +120,6 @@ const AwsCloudProviderFields = ({
         onChange={(value) => setWizardContext({ name: value })}
         value={wizardContext.name}
         info="Name for Cloud Provider"
-        themeColor="light"
         required
       />
       <TextField
@@ -129,7 +128,6 @@ const AwsCloudProviderFields = ({
         onChange={(value) => setWizardContext({ awsAccessKey: value })}
         value={wizardContext.awsAccessKey}
         info="AWS IAM Access Key"
-        themeColor="light"
         required
       />
       <TextField
@@ -139,7 +137,6 @@ const AwsCloudProviderFields = ({
         value={wizardContext.awsSecretKey}
         info="IAM User Secret Key"
         type="password"
-        themeColor="light"
         required
       />
       {showSubmitInCard && (
