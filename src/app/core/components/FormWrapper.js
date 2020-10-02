@@ -14,20 +14,30 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(5),
   },
   title: {
-    marginBottom: theme.spacing(2),
+    marginBottom: ({ isUpdateForm }) => (isUpdateForm ? theme.spacing(1) : theme.spacing(2)),
   },
   buttonBase: {
     textTransform: 'none',
   },
+  gridHeader: {
+    borderBottom: `1px solid ${theme.palette.grey[300]}`,
+  },
 }))
 
-const FormWrapper = ({ backUrl = undefined, children, title, className, ...rest }) => {
-  const classes = useStyles()
+const FormWrapper = ({
+  backUrl = undefined,
+  children,
+  title,
+  className,
+  isUpdateForm = false,
+  ...rest
+}) => {
+  const classes = useStyles({ isUpdateForm })
   const progressProps = pick(keys(Progress.propTypes), rest)
   return (
     <Grid container>
       <Grid item xs={11}>
-        <Grid container justify="space-between">
+        <Grid container justify="space-between" className={isUpdateForm && classes.gridHeader}>
           <Grid item>
             <Text variant="subtitle1" className={classes.title}>
               {title}
