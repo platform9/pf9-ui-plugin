@@ -243,14 +243,20 @@ const AddAzureClusterPage = () => {
   })
   const virtualNetworks = pathStrOr([], '0.virtualNetworks', cloudProviderRegionDetails)
 
-  const mapRegionName = (displayName) => {
-    return cloudProviderDetails.find((x) => x.DisplayName === displayName).RegionName
-  }
+  const mapRegionName = useCallback(
+    (displayName) => {
+      return cloudProviderDetails.find((x) => x.DisplayName === displayName).RegionName
+    },
+    [cloudProviderDetails],
+  )
 
-  const handleRegionChange = useCallback((displayName) => {
-    const regionName = mapRegionName(displayName)
-    updateParams({ cloudProviderRegionId: regionName })
-  })
+  const handleRegionChange = useCallback(
+    (displayName) => {
+      const regionName = mapRegionName(displayName)
+      updateParams({ cloudProviderRegionId: regionName })
+    },
+    [cloudProviderDetails],
+  )
 
   return (
     <FormWrapper
