@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 import FormWrapper from 'core/components/FormWrapper'
 import AzureAvailabilityZoneChooser from './AzureAvailabilityZoneChooser'
 import AzureClusterReviewTable from './AzureClusterReviewTable'
@@ -224,7 +224,7 @@ const AddAzureClusterPage = () => {
     onComplete,
   )
   const handleSubmit = (params) => (data) => {
-    data.location = mapRegionName(data.location)
+    data.location = params.cloudProviderRegionId
     createAzureClusterAction({ ...data, ...params, clusterType: CloudProviders.Azure })
   }
 
@@ -246,6 +246,11 @@ const AddAzureClusterPage = () => {
   const mapRegionName = (displayName) => {
     return cloudProviderDetails.find((x) => x.DisplayName === displayName).RegionName
   }
+
+  const handleRegionChange = useCallback((displayName) => {
+    const regionName = mapRegionName(displayName)
+    updateParams({ cloudProviderRegionId: regionName })
+  })
 
   return (
     <FormWrapper
@@ -296,10 +301,7 @@ const AddAzureClusterPage = () => {
                           id="location"
                           label="Region"
                           cloudProviderId={params.cloudProviderId}
-                          onChange={(displayName) => {
-                            const regionName = mapRegionName(displayName)
-                            updateParams({ cloudProviderRegionId: regionName })
-                          }}
+                          onChange={handleRegionChange}
                           type="azure"
                           required
                         />
