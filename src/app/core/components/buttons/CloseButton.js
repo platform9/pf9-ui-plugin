@@ -4,27 +4,27 @@ import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { Link } from 'react-router-dom'
 import { makeStyles } from '@material-ui/styles'
 import { Tooltip } from '@material-ui/core'
+import IconButton from 'core/elements/icon-button'
 
 const useStyles = makeStyles((theme) => ({
-  icon: {
-    color: theme.palette.primary.main,
-    '&:hover': {
-      color: theme.palette.primary.dark,
-    },
+  link: {
+    display: 'block',
   },
 }))
 
 const CloseButton = ({ tooltip = 'Cancel', ...props }) => {
   const classes = useStyles()
-  const icon = (
-    <FontAwesomeIcon className={classes.icon} size="2x" {...props}>
-      times-circle
-    </FontAwesomeIcon>
-  )
+  const icon = <IconButton icon="times-circle" {...props} />
 
   return (
     <Tooltip title={tooltip} placement="bottom">
-      {props.to ? <Link to={props.to}>{icon}</Link> : icon}
+      {props.to ? (
+        <Link className={classes.link} to={props.to}>
+          {icon}
+        </Link>
+      ) : (
+        icon
+      )}
     </Tooltip>
   )
 }

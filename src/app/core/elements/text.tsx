@@ -28,7 +28,7 @@ type TypographyMetaKeysToOmit =
   | 'fontWeightMedium'
   | 'fontWeightBold'
   | 'pxToRem'
-type TextVariant = keyof Omit<Theme['typography'], TypographyMetaKeysToOmit> | 'inherit'
+export type TextVariant = keyof Omit<Theme['typography'], TypographyMetaKeysToOmit> | 'inherit'
 
 interface TextProps extends Omit<TypographyProps, 'variant'> {
   variant?: TextVariant

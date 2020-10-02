@@ -10,7 +10,7 @@ export const options = {
   addUrl: '/ui/kubernetes/user_management/tenants/add',
   addText: 'Create a New Tenant',
   columns: [
-    { id: 'id', label: 'OpenStack ID', display: false },
+    { id: 'id', label: 'Tenant Uuid' },
     { id: 'name', label: 'Name' },
     { id: 'description', label: 'Description' },
     { id: 'clusters', label: 'Mapped Clusters' },

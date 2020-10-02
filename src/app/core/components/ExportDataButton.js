@@ -1,8 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Button } from '@material-ui/core'
+import Button from 'core/elements/button'
 
-const ExportDataButton = ({ children, color, data, filename, variant }) => {
+const ExportDataButton = ({ children, color = 'primary', data, filename, variant }) => {
   const exportData = () => {
     const dataStr = JSON.stringify(data, null, 4)
     const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr)
@@ -14,7 +14,7 @@ const ExportDataButton = ({ children, color, data, filename, variant }) => {
   }
 
   return (
-    <Button variant={variant} color={color} onClick={exportData}>
+    <Button color={color} onClick={exportData}>
       {children}
     </Button>
   )
@@ -25,10 +25,6 @@ ExportDataButton.propTypes = {
   data: PropTypes.object.isRequired,
   filename: PropTypes.string.isRequired,
   variant: PropTypes.string,
-}
-
-ExportDataButton.defaultProps = {
-  variant: 'contained',
 }
 
 export default ExportDataButton
