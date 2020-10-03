@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react'
 import ApiClient from 'api-client/ApiClient'
-import { Button, Checkbox, FormControlLabel } from '@material-ui/core'
+import { Checkbox, FormControlLabel } from '@material-ui/core'
 import Text from 'core/elements/text'
 import { withStyles } from '@material-ui/styles'
 import { compose } from 'utils/fp'
@@ -17,7 +17,8 @@ import { trackEvent } from 'utils/tracking'
 import { MFAHelpLink } from 'k8s/links'
 import { sessionActions } from 'core/session/sessionReducers'
 import clsx from 'clsx'
-import TextField from 'core/elements/input'
+import Input from 'core/elements/input'
+import Button from 'core/elements/button'
 
 const styles = (theme) => ({
   page: {
@@ -81,12 +82,14 @@ const styles = (theme) => ({
     maxWidth: '100%',
   },
   signinButton: {
-    backgroundColor: theme.palette.blue[500],
+    minHeight: 54,
   },
   forgotPwd: {
     marginTop: 4,
     textAlign: 'right',
-    ...theme.typography.caption2,
+    '& a': {
+      ...theme.typography.caption2,
+    },
   },
   formTitle: {
     color: theme.palette.blue[200],
@@ -98,7 +101,10 @@ const styles = (theme) => ({
     fontWeight: 'normal',
   },
   mfaContainer: {
-    minHeight: 90,
+    minHeight: 80,
+    display: 'flex',
+    flexDirection: 'column',
+    marginBottom: theme.spacing(),
   },
 })
 
@@ -175,16 +181,18 @@ class LoginPage extends React.PureComponent<Props> {
     const { classes } = this.props
     return (
       <Fragment>
-        <TextField
+        <Input
           required
+          variant="dark"
           id="email"
           label="Email"
           placeholder="Email"
           className={clsx(classes.textField, classes.emailInput)}
           onChange={this.updateValue('username')}
         />
-        <TextField
+        <Input
           required
+          variant="dark"
           id="password"
           label="Password"
           className={classes.textField}
@@ -224,8 +232,9 @@ class LoginPage extends React.PureComponent<Props> {
   renderMFAInput = () => {
     const { classes } = this.props
     return (
-      <TextField
+      <Input
         required={this.state.MFAcheckbox}
+        variant="dark"
         id="MFA"
         label="MFA Code"
         className={classes.textField}
@@ -289,7 +298,7 @@ class LoginPage extends React.PureComponent<Props> {
                 type="submit"
                 disabled={loading}
                 className={classes.signinButton}
-                variant="contained"
+                variant="light"
                 color="primary"
               >
                 {loading ? 'Attempting login...' : 'Sign In'}
