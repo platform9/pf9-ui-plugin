@@ -43,6 +43,11 @@ declare let window: CustomWindow
 const { keystone } = ApiClient.getInstance()
 
 const useStyles = makeStyles((theme: Theme) => ({
+  '@global': {
+    'body.form-view #main': {
+      backgroundColor: theme.palette.grey['200'],
+    },
+  },
   appFrame: {
     zIndex: 1,
     overflow: 'hidden',
@@ -319,6 +324,7 @@ const AuthenticatedContainer = () => {
         />
         <PushEventsProvider>
           <main
+            id="main"
             className={clsx(classes.content, classes['content-left'], {
               [classes.contentShift]: drawerOpen,
               [classes['contentShift-left']]: drawerOpen,

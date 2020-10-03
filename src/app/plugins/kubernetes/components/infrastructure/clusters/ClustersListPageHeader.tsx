@@ -13,6 +13,7 @@ import { getUsageTotals } from 'k8s/util/calcUsageTotals'
 // Types
 import { clusterStatusCardProps } from 'k8s/components/dashboard/DashboardPage'
 import { IClusterSelector } from './model'
+import DocumentMeta from 'core/components/DocumentMeta'
 
 const maxUsagePaths = {
   computeMaxPath: 'usage.compute.max',
@@ -36,6 +37,7 @@ export const ClusterListHeader = () => {
       report={clusterStatusCardProps}
       loaderFn={clusterActions.list}
       totalUsageFn={handleGetUsage}
+      documentMeta={<DocumentMeta title="Clusters" />}
     />
   )
 }
