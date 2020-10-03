@@ -38,9 +38,15 @@ const getBodyClassesFromPropsList = (propsList: IPropsList[]) =>
     .reduce((classes, list) => classes.concat(list), [])
 
 const updateTitle = (title = '') => {
+  if (!title || title === document.title) {
+    return
+  }
   document.title = title || document.title
 }
 const updateBodyId = (id = '') => {
+  if (!id || id === document.body.id) {
+    return
+  }
   document.body.setAttribute('id', id)
 }
 const updateBodyClasses = (classes: string[]) => {
