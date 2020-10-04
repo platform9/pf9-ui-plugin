@@ -42,12 +42,12 @@ export const paramsStoreKey = 'cachedParams'
 export const dataStoreKey = 'cachedData'
 export const loadingStoreKey = 'loadingData'
 
-type ParamsType = Array<{ [key: string]: number | string }>
+type ParamsType = Dictionary<any>
 type Optional<T> = T extends null ? void : T
 
 export interface CacheState {
   [dataStoreKey]: any[]
-  [paramsStoreKey]: ParamsType
+  [paramsStoreKey]: ParamsType[]
   [loadingStoreKey]: Dictionary<boolean>
 }
 
@@ -94,7 +94,7 @@ const reducers = {
     {
       payload: { uniqueIdentifier = defaultUniqueIdentifier, cacheKey, params, item },
     }: PayloadAction<{
-      uniqueIdentifier: string | string[]
+      uniqueIdentifier?: string | string[]
       params: ParamsType
       cacheKey: DataKeys
       item: T
@@ -131,7 +131,7 @@ const reducers = {
     {
       payload: { uniqueIdentifier = defaultUniqueIdentifier, cacheKey, params, items },
     }: PayloadAction<{
-      uniqueIdentifier: string | string[]
+      uniqueIdentifier?: string | string[]
       cacheKey: DataKeys
       params?: ParamsType
       items: T[]

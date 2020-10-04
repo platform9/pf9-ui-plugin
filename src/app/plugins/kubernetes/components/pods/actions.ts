@@ -115,7 +115,7 @@ export const deploymentActions = createCRUDActions(ActionDataKeys.Deployments, {
     })
     const body = jsYaml.safeLoad(yaml)
     // Also need to refresh the list of pods
-    podActions.invalidateCache()
+    // podsActions.invalidateCache()
     const created = await qbert.createDeployment(clusterId, namespace, body)
     trackEvent('Create New Deployment', {
       clusterId,
@@ -165,6 +165,7 @@ export const serviceActions = createCRUDActions(ActionDataKeys.KubeServices, {
       id: pathStr('metadata.uid', created),
     })
     return {
+      // @ts-ignore
       ...created,
       clusterId,
       name: pathStr('metadata.name', created),
