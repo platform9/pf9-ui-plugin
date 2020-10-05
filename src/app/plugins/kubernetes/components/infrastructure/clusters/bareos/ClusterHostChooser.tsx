@@ -9,9 +9,8 @@ import {
   TableCell,
   TableRow,
   TableBody,
-  Typography,
-  Theme,
 } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { loadNodes } from 'k8s/components/infrastructure/nodes/actions'
 import { makeStyles } from '@material-ui/styles'
 import { identity } from 'ramda'
@@ -21,6 +20,7 @@ import {
   UsageBar,
   renderNetworkInterfaces,
 } from 'k8s/components/infrastructure/nodes/NodesListPage'
+import Theme from 'core/themes/model'
 
 interface Props extends IValidatedForm {
   value?: string[]
@@ -46,13 +46,13 @@ const useStyles = makeStyles<Theme, Partial<Props>>((theme) => ({
   table: {
     border: '2px solid',
     borderColor: ({ hasError }) =>
-      hasError ? theme.palette.error.main : theme.palette.text.disabled,
+      hasError ? theme.components.error.main : theme.palette.text.disabled,
   },
   tableContainer: {
     margin: theme.spacing(2, 0),
   },
   errorText: {
-    color: theme.palette.error.main,
+    color: theme.components.error.main,
   },
   usageContainerClass: {
     display: 'grid',
@@ -101,9 +101,9 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef<HTMLElement, P
     ) as any
 
     const Warning = ({ children }) => (
-      <Typography variant="body1" className={errorText}>
+      <Text variant="body1" className={errorText}>
         {children}
-      </Typography>
+      </Text>
     )
 
     const selectableNodes = nodes.filter(filterFn)
@@ -145,9 +145,7 @@ const ClusterHostChooser: React.ComponentType<Props> = forwardRef<HTMLElement, P
             {selectableNodes.length === 0 && (
               <TableRow>
                 <TableCell colSpan={5} align="center">
-                  <Typography variant="body1">
-                    Waiting... Connect Nodes Using the PF9 CLI
-                  </Typography>
+                  <Text variant="body1">Waiting... Connect Nodes Using the PF9 CLI</Text>
                 </TableCell>
               </TableRow>
             )}

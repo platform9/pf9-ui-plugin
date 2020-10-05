@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import clsx from 'clsx'
-import { Paper, IconButton, Typography } from '@material-ui/core'
+import { Paper, IconButton } from '@material-ui/core'
 import CheckCircleIcon from '@material-ui/icons/CheckCircle'
 import ErrorIcon from '@material-ui/icons/Error'
 import InfoIcon from '@material-ui/icons/Info'
@@ -11,6 +11,7 @@ import amber from '@material-ui/core/colors/amber'
 import WarningIcon from '@material-ui/icons/Warning'
 import { makeStyles } from '@material-ui/styles'
 import { hexToRGBA } from 'core/utils/colorHelpers'
+import Text from 'core/elements/text'
 
 const variantIcon = {
   success: CheckCircleIcon,
@@ -30,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: hexToRGBA(theme.palette.primary.main, 0.1),
   },
   success: { color: green[600] },
-  error: { color: theme.palette.error.dark },
+  error: { color: theme.components.error.dark },
   info: { color: theme.palette.primary.dark },
   warning: { color: amber[700] },
   icon: {
@@ -72,9 +73,9 @@ const Alert = ({ children, message, variant, small, showClose }) => {
     <Paper className={classes.root} elevation={0}>
       <Icon className={clsx(classes.icon, classes.iconVariant, classes[variant])} />
       {message && (
-        <Typography variant="body1" color="inherit" className={classes.message}>
+        <Text variant="body1" color="inherit" className={classes.message}>
           {message}
-        </Typography>
+        </Text>
       )}
       {children}
       {showClose && (

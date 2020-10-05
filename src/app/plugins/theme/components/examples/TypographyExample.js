@@ -1,6 +1,6 @@
 import React from 'react'
 import Panel from '../Panel'
-import { Typography } from '@material-ui/core'
+import Text from 'core/elements/text'
 
 const typographyVariants = [
   'h1',
@@ -23,7 +23,7 @@ const TypographyExample = ({ expanded = false }) => (
     <div>
       {typographyVariants.map((variant) => (
         <div key={variant}>
-          <Typography variant={variant}>{variant}</Typography>
+          <Text variant={variant}>{variant}</Text>
           <br />
         </div>
       ))}

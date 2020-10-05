@@ -1,14 +1,7 @@
 import React, { useState } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
-import {
-  Radio,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Typography,
-} from '@material-ui/core'
+import { Radio, Table, TableBody, TableCell, TableHead, TableRow } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { kubeconfigFileLink } from 'k8s/links'
 import DownloadKubeConfigForm from './DownloadKubeConfigForm'
 import SimpleLink from 'core/components/SimpleLink'
@@ -16,7 +9,6 @@ import ExternalLink from 'core/components/ExternalLink'
 import { codeMirrorOptions, onboardingAccessSetup } from 'app/constants'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { routes } from 'app/core/utils/routes'
-import CodeBlock from 'core/components/CodeBlock'
 import CopyToClipboard from 'core/components/CopyToClipboard'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import PollingData from 'core/components/PollingData'
@@ -125,11 +117,11 @@ const KubeConfigListPage = () => {
                 <TableRow className={classes.noClusters}>
                   <TableCell colSpan={3} align="left">
                     <div>
-                      <Typography variant="body1">
+                      <Text variant="body1">
                         There are no clusters available. You need to{' '}
                         <SimpleLink src={routes.cluster.add.path()}>create a cluster</SimpleLink>{' '}
                         first to continue.
-                      </Typography>
+                      </Text>
                     </div>
                   </TableCell>
                 </TableRow>

@@ -1,14 +1,17 @@
 import React from 'react'
-import { Card, CardHeader, CardContent, Typography } from '@material-ui/core'
+import { Card, CardHeader, CardContent } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
 import PropTypes from 'prop-types'
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    boxShadow: '0 1px 6px 1px rgba(0, 0, 0, 0.12)',
+    boxShadow: 'none',
     minWidth: 250,
     display: 'flex',
     flexDirection: 'column',
+    borderRadius: 4,
+    border: `1px solid ${theme.palette.grey[300]}`,
   },
   header: {
     padding: theme.spacing(1.5, 2),
@@ -28,13 +31,28 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   headerContent: {
+    position: 'relative',
     display: 'flex',
     flexFlow: 'row nowrap',
-    justifyContent: ({ image }) => (image ? 'space-between' : 'flex-start'),
+    justifyContent: ({ image }) => (image ? 'space-between' : 'center'),
     alignItems: 'center',
     padding: theme.spacing(0, 1),
     '& h6': {
-      color: theme.palette.dashboardCard.text,
+      color: theme.palette.grey[700],
+      backgroundColor: theme.palette.grey['000'],
+      padding: '0 12px',
+      zIndex: 1,
+    },
+    '&:before': {
+      content: '""',
+      backgroundColor: theme.palette.grey[300],
+      borderRadius: 4,
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      top: '50%',
+      height: 1,
+      zIndex: 0,
     },
   },
   headerImg: {
@@ -49,7 +67,7 @@ const HeaderContent = ({ title, image }) => {
   const { headerContent, headerImg } = useStyles({ image })
   return (
     <div className={headerContent}>
-      <Typography variant="h6">{title}</Typography>
+      <Text variant="h6">{title}</Text>
       {image && (
         <div className={headerImg}>
           {typeof image === 'string' ? <img alt="" src={image} /> : image}

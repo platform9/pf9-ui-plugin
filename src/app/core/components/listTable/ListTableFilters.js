@@ -8,10 +8,10 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  Typography,
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
 import { compose, prop, propEq } from 'ramda'
+import Text from 'core/elements/text'
 
 export const styles = {
   root: {
@@ -166,9 +166,9 @@ class ListTableFilters extends React.PureComponent {
       <div className={classes.root}>
         <div className={classes.header}>
           <div className={classes.reset}>
-            <Typography variant="caption" className={classes.title}>
+            <Text variant="caption" className={classes.title}>
               Filters
-            </Typography>
+            </Text>
             <button
               className={classes.resetLink}
               tabIndex={0}

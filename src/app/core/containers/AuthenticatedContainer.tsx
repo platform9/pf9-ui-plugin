@@ -1,5 +1,5 @@
 import { makeStyles } from '@material-ui/styles'
-import { Button, Theme } from '@material-ui/core'
+import { Button } from '@material-ui/core'
 import ApiClient from 'api-client/ApiClient'
 import { CustomWindow } from 'app/polyfills/window'
 import {
@@ -36,6 +36,7 @@ import BannerContainer from 'core/components/notifications/BannerContainer'
 import BannerContent from 'core/components/notifications/BannerContent'
 import { trackEvent } from 'utils/tracking'
 import ClusterUpgradeBanner from 'core/banners/ClusterUpgradeBanner'
+import Theme from 'core/themes/model'
 
 declare let window: CustomWindow
 
@@ -48,12 +49,13 @@ const useStyles = makeStyles((theme: Theme) => ({
     position: 'relative',
     display: 'flex',
     width: '100%',
+    backgroundColor: theme.palette.grey['000'],
   },
   content: {
     marginTop: 55, // header height is hardcoded to 55px. account for that here.
     overflowX: 'auto',
     flexGrow: 1,
-    backgroundColor: theme.palette.background.default,
+    backgroundColor: theme.palette.grey['000'],
     padding: 0,
     transition: theme.transitions.create('margin', {
       easing: theme.transitions.easing.sharp,
@@ -80,7 +82,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     minHeight: theme.spacing(6),
   },
   contentMain: {
-    padding: theme.spacing(3, 3, 3, 5),
+    padding: theme.spacing(3, 3, 3, 3.5),
   },
   sandboxBanner: {
     display: 'flex',

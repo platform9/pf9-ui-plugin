@@ -1,5 +1,5 @@
 import React, { FC } from 'react'
-import { Typography } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
 import SimpleLink from 'core/components/SimpleLink'
@@ -50,9 +50,9 @@ const OnboardWizard: FC<Props> = ({ title, body, children, renderLinks = true })
         </div>
       )}
       <header className={ctaHeader}>
-        <Typography variant="h6">{title}</Typography>
+        <Text variant="h6">{title}</Text>
         <p> </p>
-        <Typography variant="body1">{body}</Typography>
+        <Text variant="body1">{body}</Text>
       </header>
       {children}
     </section>

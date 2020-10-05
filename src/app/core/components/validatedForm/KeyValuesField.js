@@ -1,8 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { withInfoTooltip } from 'app/core/components/InfoTooltip'
-import { Typography, FormControl, FormHelperText } from '@material-ui/core'
+import { FormControl, FormHelperText } from '@material-ui/core'
 import { compose } from 'app/utils/fp'
+import Text from 'core/elements/text'
 import KeyValues, { EntryShape } from 'core/components/KeyValues'
 import withFormContext from 'core/components/validatedForm/withFormContext'
 
@@ -27,7 +28,7 @@ const KeyValuesField = React.forwardRef(
     ref,
   ) => (
     <FormControl id={id} error={hasError} {...restProps} ref={ref}>
-      <Typography variant="caption">{required ? `${label} *` : label}</Typography>
+      <Text variant="caption">{required ? `${label} *` : label}</Text>
       <KeyValues
         entries={value !== undefined ? value : []}
         onChange={onChange}

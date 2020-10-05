@@ -6,7 +6,7 @@ import useReactRouter from 'use-react-router'
 import { onboardingPodSetup, allKey } from 'app/constants'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { podActions } from '../pods/actions'
-import { Typography } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
 import { routes } from 'core/utils/routes'
@@ -107,9 +107,9 @@ const PodSetup = ({ onComplete, initialPanel }: Props) => {
           onSkip={handleSkipPods}
           skipConfirmTitle="Skip the pod creation step in your getting started wizard?"
         >
-          <Typography variant="body1">
+          <Text variant="body1">
             Try out your first Kubernetes app by launching a sample pod on your cluster
-          </Typography>
+          </Text>
           <NextButton showForward={false} onClick={handleCreatePod}>
             Create Pod
           </NextButton>

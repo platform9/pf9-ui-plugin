@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useEffect } from 'react'
 import clsx from 'clsx'
-import { IconButton, SnackbarContent, Theme } from '@material-ui/core'
+import { IconButton, SnackbarContent } from '@material-ui/core'
 import CheckCircleIcon from '@material-ui/icons/CheckCircle'
 import ErrorIcon from '@material-ui/icons/Error'
 import InfoIcon from '@material-ui/icons/Info'
@@ -12,6 +12,7 @@ import { makeStyles } from '@material-ui/styles'
 import { split, reject, pipe, map, toPairs } from 'ramda'
 import { isNilOrEmpty } from 'utils/fp'
 import { MessageTypes } from './model'
+import Theme from 'core/themes/model'
 
 const variantIcon = {
   [MessageTypes.success]: CheckCircleIcon,
@@ -38,7 +39,7 @@ const useStyles = makeStyles<Theme>((theme) => ({
     backgroundColor: green[600],
   },
   error: {
-    backgroundColor: theme.palette.error.dark,
+    backgroundColor: theme.components.error.dark,
   },
   info: {
     backgroundColor: theme.palette.primary.dark,

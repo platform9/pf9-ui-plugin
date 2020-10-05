@@ -12,7 +12,7 @@ import { mngmTenantActions } from '../userManagement/tenants/actions'
 import { cloudProviderActions } from '../infrastructure/cloudProviders/actions'
 // Components
 import StatusCard, { StatusCardProps } from './StatusCard'
-import { Typography } from '@material-ui/core'
+import Text from 'core/elements/text'
 
 import ClusterSetup, {
   clustersHaveAccess,
@@ -81,7 +81,7 @@ export const clusterStatusCardProps: IStatusCardWithFilterProps = {
   permissions: ['admin'], // Technically non-admins have read-only access
   route: routes.cluster.list.path(),
   addRoute: routes.cluster.add.path(),
-  title: 'Clusters',
+  title: 'Clusters Total',
   icon: 'project-diagram',
   dataLoader: [clusterActions.list, {}],
   quantityFn: (clusters) => ({
@@ -90,22 +90,22 @@ export const clusterStatusCardProps: IStatusCardWithFilterProps = {
       {
         name: 'healthy',
         value: clusters.filter((cluster) => cluster.healthStatus === 'healthy').length,
-        color: 'success.main',
+        color: 'green.main',
       },
       {
         name: 'partially_healthy',
         value: clusters.filter((cluster) => cluster.healthStatus === 'partially_healthy').length,
-        color: 'warning.light',
+        color: 'yellow.main',
       },
       {
         name: 'converging',
         value: clusters.filter((cluster) => cluster.healthStatus === 'converging').length,
-        color: 'warning.main',
+        color: 'orange.main',
       },
       {
         name: 'unhealthy',
         value: clusters.filter((cluster) => cluster.healthStatus === 'unhealthy').length,
-        color: 'error.main',
+        color: 'red.main',
       },
     ],
     piePrimary: 'healthy',
@@ -125,22 +125,22 @@ export const nodeStatusCardProps: IStatusCardWithFilterProps = {
       {
         name: 'healthy',
         value: nodes.filter((node) => nodeHealthStatus(node) === 'healthy').length,
-        color: 'success.main',
+        color: 'green.main',
       },
       {
         name: 'unknown',
         value: nodes.filter((node) => nodeHealthStatus(node) === 'unknown').length,
-        color: 'warning.main',
+        color: 'yellow.main',
       },
       {
         name: 'converging',
         value: nodes.filter((node) => nodeHealthStatus(node) === 'converging').length,
-        color: 'warning.light',
+        color: 'orange.main',
       },
       {
         name: 'unhealthy',
         value: nodes.filter((node) => nodeHealthStatus(node) === 'unhealthy').length,
-        color: 'error.main',
+        color: 'red.main',
       },
     ],
     piePrimary: 'healthy',
@@ -233,22 +233,22 @@ const reports = [
         {
           name: 'running',
           value: pods.filter((pod) => pod.status.phase === 'Running').length,
-          color: 'success.main',
+          color: 'green.main',
         },
         {
           name: 'pending',
           value: pods.filter((pod) => pod.status.phase === 'Pending').length,
-          color: 'warning.light',
+          color: 'orange.main',
         },
         {
           name: 'unknown',
           value: pods.filter((pod) => pod.status.phase === 'Unknown').length,
-          color: 'warning.main',
+          color: 'yellow.main',
         },
         {
           name: 'failed',
           value: pods.filter((pod) => pod.status.phase === 'Failed').length,
-          color: 'error.main',
+          color: 'red.main',
         },
       ],
       piePrimary: 'running',
@@ -287,9 +287,9 @@ const DashboardPage = () => {
   const classes = useStyles({})
   const selectSessionState = prop<string, SessionState>(sessionStoreKey)
   const session = useSelector(selectSessionState)
-
   const displayName = session?.userDetails?.displayName
   const isAdmin = isAdminRole(session)
+
   const [clusters, loadingClusters] = useDataLoader(clusterActions.list, { loadingFeedback: false })
   const [pods, loadingPods] = useDataLoader(podActions.list, { loadingFeedback: false })
   const hasClusters = !!clusters.length
@@ -311,7 +311,7 @@ const DashboardPage = () => {
 
   return (
     <section className={classes.cardColumn}>
-      <Typography variant="h5">Welcome{displayName ? ` ${displayName}` : ''}!</Typography>
+      <Text variant="h5">Welcome{displayName ? ` ${displayName}` : ''}!</Text>
 
       {showOnboarding && isLoading && <Progress loading={isLoading} overlay />}
       {showOnboarding && !isLoading && (

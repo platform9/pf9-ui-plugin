@@ -7,10 +7,10 @@ import {
   TableCell,
   TableBody,
   Radio,
-  Typography,
   Card,
   Tooltip,
 } from '@material-ui/core'
+import Text from 'core/elements/text'
 import ProgressBar from 'core/components/progress/ProgressBar'
 import Theme from 'core/themes/model'
 import { makeStyles } from '@material-ui/styles'
@@ -135,9 +135,11 @@ export const NodeHealthWithTasksToggler: FC = () => {
   const linkedNodeUUID = searchParams.get('node') || null
 
   const [selectedNode, setSelectedNode] = useState(null)
-  const [clusters, loadingClusters, reloadClusters]: IUseDataLoader<IClusterSelector> = useDataLoader(
-    clusterActions.list,
-  ) as any
+  const [
+    clusters,
+    loadingClusters,
+    reloadClusters,
+  ]: IUseDataLoader<IClusterSelector> = useDataLoader(clusterActions.list) as any
   const [nodes, loadingNodes, reloadNodes]: IUseDataLoader<INodesSelector> = useDataLoader(
     loadNodes,
   ) as any
@@ -178,7 +180,8 @@ export const NodeHealthWithTasksToggler: FC = () => {
     tablePolling,
     linkSpacer,
   } = useStyles({})
-  const kubeStatusData: Pf9KubeStatusData = selectedNode?.combined?.resmgr?.extensions?.pf9_kube_status?.data || {}
+  const kubeStatusData: Pf9KubeStatusData =
+    selectedNode?.combined?.resmgr?.extensions?.pf9_kube_status?.data || {}
   const selectedNodeAllTasks = kubeStatusData.all_tasks || []
   const selectedNodeCompletedTasks = kubeStatusData.completed_tasks || []
   const lastSelectedNodesFailedTask = kubeStatusData.last_failed_task || []
@@ -281,7 +284,7 @@ export const NodeHealthWithTasksToggler: FC = () => {
         <header className={paneHeader}>
           <div className={paneHeaderTitle}>
             <Tooltip title={selectedNodeTitle || ''}>
-              <Typography variant="h6">{selectedNodeTitle}</Typography>
+              <Text variant="h6">{selectedNodeTitle}</Text>
             </Tooltip>
             {!!selectedNode && (
               <ExternalLink url={selectedNode?.logs || ''} icon="clipboard-list">

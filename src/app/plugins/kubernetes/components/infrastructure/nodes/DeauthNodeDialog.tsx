@@ -1,12 +1,6 @@
 import React, { useState } from 'react'
-import {
-  Typography,
-  DialogActions,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-} from '@material-ui/core'
+import Text from 'core/elements/text'
+import { DialogActions, Button, Dialog, DialogTitle, DialogContent } from '@material-ui/core'
 import Progress from 'core/components/progress/Progress'
 import { deAuthNode } from 'k8s/components/infrastructure/nodes/actions'
 import useDataUpdater from 'core/hooks/useDataUpdater'
@@ -72,9 +66,9 @@ const DeauthNodeDialog: React.FunctionComponent<IDeauthNodeDialogProps> = ({
       <DialogTitle>Deauthorise nodes?</DialogTitle>
       <Progress loading={deAuthingNode} renderContentOnMount maxHeight={60}>
         <DialogContent>
-          <Typography variant="body1" component="div">
+          <Text variant="body1" component="div">
             Please select the node from to list to de-authorise.
-          </Typography>
+          </Text>
           <ListTable
             compactTable
             multiSelection

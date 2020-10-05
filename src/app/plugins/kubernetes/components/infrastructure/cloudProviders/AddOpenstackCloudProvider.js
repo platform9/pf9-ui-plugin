@@ -3,10 +3,10 @@ import TextField from 'core/components/validatedForm/TextField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import SubmitButton from 'core/components/SubmitButton'
 import Alert from 'core/components/Alert'
-import { Typography } from '@material-ui/core'
+import Text from 'core/elements/text'
 
 const helpText = (
-  <Typography variant="body1" component="div">
+  <Text variant="body1" component="div">
     <p>
       Create a new cloud provider to work with an existing OpenStack endpoint. This cloud provider
       will work using your specified credentials for your OpenStack environment.
@@ -29,7 +29,7 @@ const helpText = (
         </ul>
       </div>
     </Alert>
-  </Typography>
+  </Text>
 )
 
 const keyStoneUrlInfo = (

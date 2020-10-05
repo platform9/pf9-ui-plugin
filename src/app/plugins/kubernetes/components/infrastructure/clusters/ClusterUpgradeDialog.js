@@ -2,7 +2,7 @@ import React, { useCallback } from 'react'
 import { clusterActions } from 'k8s/components/infrastructure/clusters/actions'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import ConfirmationDialog from 'core/components/ConfirmationDialog'
-import Typography from '@material-ui/core/Typography'
+import Text from 'core/elements/text'
 
 const ClusterUpgradeDialog = ({ rows: [cluster], onClose }) => {
   const [upgradeCluster, upgradingCluster] = useDataUpdater(clusterActions.upgradeCluster, onClose)
@@ -14,11 +14,9 @@ const ClusterUpgradeDialog = ({ rows: [cluster], onClose }) => {
       title="Upgrade Cluster"
       text={
         <>
-          <Typography variant="body1">
-            You are about to upgrade the cluster named {cluster.name}
-          </Typography>
+          <Text variant="body1">You are about to upgrade the cluster named {cluster.name}</Text>
           <br />
-          <Typography variant="body1">Are you sure?</Typography>
+          <Text variant="body1">Are you sure?</Text>
         </>
       }
       open

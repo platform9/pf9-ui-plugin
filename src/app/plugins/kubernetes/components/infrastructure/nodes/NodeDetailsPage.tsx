@@ -1,7 +1,8 @@
 // Libs
 import React, { useMemo, FC } from 'react'
 import { makeStyles } from '@material-ui/styles'
-import { Typography, Theme, Card, CardHeader, CardContent, Grid } from '@material-ui/core'
+import { Theme, Card, CardHeader, CardContent, Grid } from '@material-ui/core'
+import Text from 'core/elements/text'
 import useReactRouter from 'use-react-router'
 // Actions
 import useDataLoader from 'core/hooks/useDataLoader'
@@ -87,7 +88,7 @@ const ClusterDetailsPage: FC = () => {
     <PageContainer
       header={
         <>
-          <Typography variant="h5">Node {selectedNode.name}</Typography>
+          <Text variant="h5">Node {selectedNode.name}</Text>
           <SimpleLink src={routes.nodes.list.path()} className={classes.backLink}>
             « Back to Node List
           </SimpleLink>
@@ -200,13 +201,11 @@ export const DetailRow: FC<{
   return (
     <tr>
       <td>
-        <Typography className={rowHeader} variant="subtitle2">
+        <Text className={rowHeader} variant="subtitle2">
           {label}:
-        </Typography>
+        </Text>
       </td>
-      <td>
-        {typeof value === 'string' ? <Typography className={rowValue}>{value}</Typography> : value}
-      </td>
+      <td>{typeof value === 'string' ? <Text className={rowValue}>{value}</Text> : value}</td>
       <td className={rowHelp}>
         {!!helpMessage && <HelpContainer title={helpMessage} color="black" />}
       </td>

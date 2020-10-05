@@ -1,5 +1,6 @@
 import React from 'react'
-import { Typography, Paper } from '@material-ui/core'
+import { Paper } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
 import CodeBlock from 'core/components/CodeBlock'
 import Theme from 'core/themes/model'
@@ -55,17 +56,17 @@ const OpenStackRcStep = (): JSX.Element => {
 
   return (
     <Paper className={paper} elevation={0}>
-      <Typography className={clsx(text, bold)}>Configure Bare Metal</Typography>
-      <Typography className={text}>
+      <Text className={clsx(text, bold)}>Configure Bare Metal</Text>
+      <Text className={text}>
         Step 1: Copy and paste the export commands below in an SSH session on the Bare Metal
         controller node.
-      </Typography>
+      </Text>
       <CopyToClipboard copyText={openstackRc(username, projectName, region, keystoneLink)}>
         <CodeBlock>{openstackRc(username, projectName, region, keystoneLink)}</CodeBlock>
       </CopyToClipboard>
-      <Typography className={text}>
+      <Text className={text}>
         Step 2: Run the following command on the controller node to complete the Bare Metal Setup
-      </Typography>
+      </Text>
       <CopyToClipboard copyText="setup-ironic">
         <CodeBlock>setup-ironic</CodeBlock>
       </CopyToClipboard>

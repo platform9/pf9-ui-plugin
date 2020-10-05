@@ -4,13 +4,14 @@ import ImportExportPanel from './ImportExportPanel'
 import KitchenSink from './KitchenSink'
 import MiscPanel from './MiscPanel'
 // import TypographyPanel from './TypographyPanel'
-import { Grid, Typography } from '@material-ui/core'
+import { Grid } from '@material-ui/core'
+import Text from 'core/elements/text'
 
 class ConfigureThemePage extends React.PureComponent {
   render() {
     return (
       <div>
-        <Typography variant="h5">Configure Theme</Typography>
+        <Text variant="h5">Configure Theme</Text>
 
         <Grid container spacing={1}>
           <Grid item xs={8}>

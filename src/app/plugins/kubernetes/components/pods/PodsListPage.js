@@ -7,39 +7,10 @@ import { createUsePrefParamsHook } from 'core/hooks/useParams'
 import { listTablePrefs, allKey } from 'app/constants'
 import { pick } from 'ramda'
 import ExternalLink from 'core/components/ExternalLink'
-import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import NamespacePicklist from 'k8s/components/common/NamespacePicklist'
-import { makeStyles } from '@material-ui/styles'
-import { objSwitchCase } from 'utils/fp'
 import renderLabels from 'k8s/components/pods/renderLabels'
-import DateCell from 'core/components/listTable/cells/DateCell'
-
-const useStyles = makeStyles((theme) => ({
-  status: {
-    display: 'inline-flex',
-    alignItems: 'end',
-    '&:before': {
-      content: "' '",
-      height: 14,
-      width: 14,
-      marginRight: 3,
-      borderRadius: '50%',
-      display: ({ status }) => (!status || status === 'loading' ? 'none' : 'inline-block'),
-      backgroundColor: ({ status }) =>
-        objSwitchCase(
-          {
-            ok: '#31DA6D',
-            pending: '#FEC35D',
-            fail: '#F16E3F',
-          },
-          '#F16E3F',
-        )(status),
-    },
-  },
-  labels: {
-    color: '#31DA6D',
-  },
-}))
+import { DateAndTime } from 'core/components/listTable/cells/DateCell'
+import ClusterStatusSpan from '../infrastructure/clusters/ClusterStatus'
 
 const defaultParams = {
   masterNodeClusters: true,
@@ -90,34 +61,24 @@ const renderName = (name, { dashboardUrl }) => {
     <span>
       {name}
       <br />
-      <ExternalLink url={dashboardUrl}>
-        <FontAwesomeIcon size="md">file-alt</FontAwesomeIcon>
-        dashboard
-      </ExternalLink>
+      <ExternalLink url={dashboardUrl}>dashboard</ExternalLink>
     </span>
   )
 }
 
-export const PodsStatusSpan = (props) => {
-  const { children } = props
-  const { status } = useStyles(props)
-  return <div className={status}>{children}</div>
-}
-
 const renderStatus = (phase) => {
+  let status = 'pending'
   switch (phase) {
     case 'Running':
     case 'Succeeded':
-      return <PodsStatusSpan status="ok">{phase}</PodsStatusSpan>
+      status = 'ok'
+      break
 
     case 'Failed':
-      return <PodsStatusSpan status="fail">{phase}</PodsStatusSpan>
-
-    case 'Pending':
-    case 'Unknown':
-    default:
-      return <PodsStatusSpan status="pending">{phase}</PodsStatusSpan>
+      status = 'fail'
+      break
   }
+  return <ClusterStatusSpan status={status}>{phase}</ClusterStatusSpan>
 }
 
 export const options = {
@@ -131,7 +92,11 @@ export const options = {
     { id: 'labels', label: 'Labels', render: renderLabels('label') },
     { id: 'status.phase', label: 'Status', render: renderStatus },
     { id: 'status.hostIP', label: 'Node IP' },
-    { id: 'created', label: 'Age', render: (value) => <DateCell value={value} showToolTip /> },
+    {
+      id: 'created',
+      label: 'Age',
+      render: (value) => <DateAndTime value={value} />,
+    },
   ],
   name: 'Pods',
   title: 'Pods',

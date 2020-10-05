@@ -1,4 +1,5 @@
-import { Tooltip, Typography } from '@material-ui/core'
+import { Tooltip } from '@material-ui/core'
+import Text from 'core/elements/text'
 import React, { FC } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import SimpleLink from 'core/components/SimpleLink'
@@ -17,14 +18,14 @@ import { routes } from 'core/utils/routes'
 
 const getIconOrBubbleColor = (status: IClusterStatus, theme: Theme) =>
   ({
-    ok: theme.palette.success.main,
-    pause: theme.palette.warning.main,
-    fail: theme.palette.error.main,
-    error: theme.palette.error.main,
-    loading: theme.palette.sidebar.text,
-    unknown: theme.palette.info.main,
-    upgrade: theme.palette.upgrade.main,
-  }[status] || theme.palette.error.main)
+    ok: theme.palette.green.main,
+    pause: theme.palette.yellow.main,
+    fail: theme.palette.red.main,
+    error: theme.palette.red.main,
+    loading: theme.palette.grey.main,
+    unknown: theme.palette.blue.main,
+    upgrade: theme.palette.orange.main,
+  }[status] || theme.palette.red.main)
 
 const useStyles = makeStyles<Theme, Props>((theme: Theme) => ({
   root: {
@@ -38,17 +39,15 @@ const useStyles = makeStyles<Theme, Props>((theme: Theme) => ({
   circle: {
     display: 'grid',
     alignItems: 'center',
-    gridTemplateColumns: '20px 1fr',
+    gridTemplateColumns: '12px 1fr',
     whiteSpace: 'nowrap',
-    gridGap: theme.spacing(),
+    gridGap: 5,
     justifyItems: 'center',
     '&:before': {
       content: '""',
       display: ({ iconStatus }) => (iconStatus === true ? 'none' : 'inherit'),
-      height: ({ variant }) =>
-        variant === 'header' ? theme.typography.body1.fontSize : theme.typography.body2.fontSize,
-      width: ({ variant }) =>
-        variant === 'header' ? theme.typography.body1.fontSize : theme.typography.body2.fontSize,
+      height: ({ variant }) => (variant === 'header' ? 14 : 12),
+      width: ({ variant }) => (variant === 'header' ? 14 : 12),
       borderRadius: '50%',
       backgroundColor: ({ status }) => getIconOrBubbleColor(status, theme),
     },
@@ -85,14 +84,14 @@ const ClusterStatusSpan: FC<Props> = (props) => {
     <div className={root}>
       {label && <span className={labelCls}>{label}:</span>}
       <Tooltip title={title || children}>
-        <Typography className={circle} variant={variant === 'header' ? 'body1' : 'body2'}>
+        <Text className={circle} variant={variant === 'header' ? 'body1' : 'body2'}>
           {!!iconStatus && (
             <FontAwesomeIcon className={clsx(iconColor, iconMap.get(status).classes)}>
               {iconMap.get(status).icon}
             </FontAwesomeIcon>
           )}
           {children}
-        </Typography>
+        </Text>
       </Tooltip>
     </div>
   )

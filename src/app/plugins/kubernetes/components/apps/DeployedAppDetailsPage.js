@@ -1,7 +1,8 @@
 import React, { useState, useCallback } from 'react'
 import useReactRouter from 'use-react-router'
 import Progress from 'core/components/progress/Progress'
-import { Paper, Grid, Typography, CardMedia, Button, Card } from '@material-ui/core'
+import { Paper, Grid, CardMedia, Button, Card } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
 import useDataLoader from 'core/hooks/useDataLoader'
 import useDataUpdater from 'core/hooks/useDataUpdater'
@@ -103,41 +104,41 @@ const DeployedAppDetailsPage = () => {
               </Card>
             )}
             <Paper className={classes.paper}>
-              <Typography variant="subtitle2">Application</Typography>
-              <Typography variant="body2" component="div">
+              <Text variant="subtitle2">Application</Text>
+              <Text variant="body2" component="div">
                 {release.chartName} {release.version}
-              </Typography>
+              </Text>
               <br />
-              <Typography variant="subtitle2">Namespace</Typography>
-              <Typography variant="body2" component="div">
+              <Text variant="subtitle2">Namespace</Text>
+              <Text variant="body2" component="div">
                 {release.namespace}
-              </Typography>
+              </Text>
               <br />
-              <Typography variant="subtitle2">Status</Typography>
-              <Typography variant="body2" component="div">
+              <Text variant="subtitle2">Status</Text>
+              <Text variant="body2" component="div">
                 {release.status}
-              </Typography>
+              </Text>
               <br />
-              <Typography variant="subtitle2">Last Updated</Typography>
-              <Typography variant="body2" component="div">
+              <Text variant="subtitle2">Last Updated</Text>
+              <Text variant="body2" component="div">
                 {release.lastUpdated}
-              </Typography>
+              </Text>
             </Paper>
           </Grid>
           <Grid item xs={9} lg={10} zeroMinWidth>
-            <Typography variant="h4" component="h4">
+            <Text variant="h4" component="h4">
               {release.name}
-            </Typography>
+            </Text>
             <br />
-            <Typography variant="subtitle1">Resources</Typography>
-            <Typography variant="body1" component="pre" className={classes.text}>
+            <Text variant="subtitle1">Resources</Text>
+            <Text variant="body1" component="pre" className={classes.text}>
               {release.resourcesText || ''}
-            </Typography>
+            </Text>
             <br />
-            <Typography variant="subtitle1">Notes</Typography>
-            <Typography variant="body1" component="pre" className={classes.text}>
+            <Text variant="subtitle1">Notes</Text>
+            <Text variant="body1" component="pre" className={classes.text}>
               {release.notesText || ''}
-            </Typography>
+            </Text>
           </Grid>
         </Grid>
       </Progress>

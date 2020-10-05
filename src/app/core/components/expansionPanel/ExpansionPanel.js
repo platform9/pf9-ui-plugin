@@ -7,7 +7,6 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
-  Typography,
 } from '@material-ui/core'
 import { ChevronRight, ExpandMore } from '@material-ui/icons'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
@@ -16,6 +15,7 @@ import NextButton from '../buttons/NextButton'
 import ExternalLink from '../ExternalLink'
 import { gettingStartedLink } from 'k8s/links'
 import CloseButton from '../buttons/CloseButton'
+import Text from 'core/elements/text'
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -124,12 +124,12 @@ const ExpansionPanel = ({
         <Dialog open={showOverlay}>
           <DialogTitle>{skipConfirmTitle}</DialogTitle>
           <DialogContent>
-            <Typography>
+            <Text>
               If you are all set, you can remove this step from your getting started wizard. You can
               always visit the “getting started” section in our support documentation{' '}
               <ExternalLink url={gettingStartedLink}>here</ExternalLink> if you need help in the
               future.
-            </Typography>
+            </Text>
             <div className={classes.actionRow}>
               <CancelButton onClick={handleToggleOverlay} />
               <NextButton showForward={false} onClick={handleConfirm}>

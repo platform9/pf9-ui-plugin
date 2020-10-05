@@ -1,6 +1,6 @@
-import { AppTheme } from 'core/themes/model'
+// import { AppTheme } from 'core/themes/model'
 
-const defaultTheme: AppTheme = {
+const defaultTheme: any = {
   breakpoints: {
     keys: ['xs', 'sm', 'md', 'lg', 'xl'],
     values: {

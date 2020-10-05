@@ -3,13 +3,13 @@ import TextField from 'core/components/validatedForm/TextField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import SubmitButton from 'core/components/SubmitButton'
 import Alert from 'core/components/Alert'
-import { Typography } from '@material-ui/core'
+import Text from 'core/elements/text'
 import ExternalLink from 'core/components/ExternalLink'
 
 const supportUrl =
   'https://docs.platform9.com/getting-started/setup-guide-platform9-openstack-for-vmware-vsphere/'
 const helpText = (
-  <Typography variant="body1" component="div">
+  <Text variant="body1" component="div">
     <p>
       Create a new cloud provider to work with an existing VMware deployment. Prior to creating
       this, Platform9 Managed OpenStack for VMware needs to be setup.
@@ -34,7 +34,7 @@ const helpText = (
         </ul>
       </div>
     </Alert>
-  </Typography>
+  </Text>
 )
 
 const keyStoneUrlInfo = (

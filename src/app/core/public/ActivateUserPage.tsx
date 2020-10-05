@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react'
 import useReactRouter from 'use-react-router'
 import ApiClient from 'api-client/ApiClient'
 import { makeStyles } from '@material-ui/styles'
-import { Button, Grid, Paper, Typography } from '@material-ui/core'
+import { Button, Grid, Paper } from '@material-ui/core'
+import Text from 'core/elements/text'
 import Progress from 'core/components/progress/Progress'
 import { loginUrl, forgotPasswordUrl } from 'app/constants.js'
 import { routes } from 'core/utils/routes'
@@ -63,16 +64,16 @@ export const ActivateUserPage = (props) => {
             <img src="/ui/images/logo-color.png" className={classes.img} />
             {!loading && (
               <div>
-                <Typography variant="subtitle1" align="center">
+                <Text variant="subtitle1" align="center">
                   Password Reset Failed
-                </Typography>
-                <Typography variant="body1" className={classes.paragraph} align="center">
+                </Text>
+                <Text variant="body1" className={classes.paragraph} align="center">
                   Password reset link has expired, or the code is invalid.
-                </Typography>
-                <Typography variant="body1" className={classes.paragraph} align="center">
+                </Text>
+                <Text variant="body1" className={classes.paragraph} align="center">
                   <Link to={forgotPasswordUrl}>Click here</Link> to request a new password reset
                   link.
-                </Typography>
+                </Text>
                 <div className={classes.alignMiddle}>
                   <Link to={loginUrl}>
                     <Button variant="contained" color="primary" className={classes.button}>

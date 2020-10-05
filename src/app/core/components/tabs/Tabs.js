@@ -14,15 +14,18 @@ const styles = (theme) => ({
     flexGrow: 1,
     width: '100%',
     boxShadow: '0 0 0 0',
-    backgroundColor: theme.palette.background.default,
   },
   tabColor: {
     color: theme.palette.text.primary,
   },
+  muiTabRoot: {
+    minHeight: ({ compact }) => (compact ? 34 : 38),
+  },
 })
-
+const tabIndicatorProps = { style: { height: 3 } }
 const tabStyles = (theme) => ({
   root: {
+    ...theme.typography.subtitle1,
     textTransform: 'none',
     fontSize: ({ compact }) => (compact ? 14 : 21),
     minWidth: 100,
@@ -30,19 +33,19 @@ const tabStyles = (theme) => ({
     marginRight: ({ compact }) => (compact ? 10 : 15),
     margin: '0 0 -1px',
     cursor: 'default',
-    minHeight: ({ compact }) => (compact ? 34 : 48),
-    color: theme.palette.text.secondary,
+    minHeight: ({ compact }) => (compact ? 34 : 38),
+    color: theme.palette.grey[500],
+    opacity: 1,
     '&.Mui-selected': {
-      color: theme.palette.text.primary,
+      color: theme.palette.common.black,
     },
     '&:hover:not(.Mui-selected)': {
       cursor: 'pointer',
-      boxShadow: `inset 0 -2px 0 ${theme.palette.primary.main}`,
-      color: theme.palette.primary.main,
+      color: theme.palette.common.black,
     },
   },
   wrapper: {
-    padding: ({ compact }) => (compact ? theme.spacing(0.5, 1, 1) : theme.spacing(0.5, 2, 1)),
+    padding: ({ compact }) => (compact ? theme.spacing(0.5, 1, 0) : theme.spacing(0.5, 2, 0)),
     marginBottom: ({ compact }) => (compact ? 0 : theme.spacing(1)),
     transition: 'all .2s',
     lineHeight: 1,
@@ -89,31 +92,29 @@ class Tabs extends PureComponent {
     const { tabs, value } = this.state
     const { children, classes, useUrlHashes, compact } = this.props
     return (
-      <Grid container justify="center">
-        <Grid item xs={12} zeroMinWidth>
-          <Paper className={this.props.classes.root}>
-            <div className={classes.tabColor}>
-              <MDTabs
-                value={value}
-                onChange={this.handleChange}
-                indicatorColor="primary"
-                textColor="inherit"
-              >
-                {tabs.map((tab) => (
-                  <CustomTab
-                    compact={compact}
-                    key={tab.value}
-                    value={tab.value}
-                    label={tab.label}
-                    href={useUrlHashes ? `#${tab.value}` : null}
-                  />
-                ))}
-              </MDTabs>
-              <Provider value={this.state}>{children}</Provider>
-            </div>
-          </Paper>
-        </Grid>
-      </Grid>
+      <Paper className={this.props.classes.root}>
+        <div className={classes.tabColor}>
+          <MDTabs
+            value={value}
+            className={classes.muiTabRoot}
+            onChange={this.handleChange}
+            indicatorColor="primary"
+            textColor="inherit"
+            TabIndicatorProps={tabIndicatorProps}
+          >
+            {tabs.map((tab) => (
+              <CustomTab
+                compact={compact}
+                key={tab.value}
+                value={tab.value}
+                label={tab.label}
+                href={useUrlHashes ? `#${tab.value}` : null}
+              />
+            ))}
+          </MDTabs>
+          <Provider value={this.state}>{children}</Provider>
+        </div>
+      </Paper>
     )
   }
 }

@@ -6,11 +6,9 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
-  IconButton,
   ListItemText,
   MenuItem,
   MenuList,
-  Typography,
   Button,
 } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles'
@@ -24,14 +22,8 @@ import moize from 'moize'
 import { assoc, flatten, pluck, prop, propEq, propOr, where, equals } from 'ramda'
 import { matchPath, withRouter } from 'react-router'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
-import {
-  imageUrls,
-  clarityDashboardUrl,
-  helpUrl,
-  ironicWizardUrl,
-  dashboardUrl,
-} from 'app/constants'
-import { routes } from 'core/utils/routes'
+import { clarityDashboardUrl, helpUrl, ironicWizardUrl, dashboardUrl } from 'app/constants'
+import Text from 'core/elements/text'
 
 import SimpleLink from './SimpleLink'
 // import { withAppContext } from 'core/providers/AppProvider'
@@ -41,6 +33,9 @@ import { connect } from 'react-redux'
 export const drawerWidth = 180
 
 const styles = (theme) => ({
+  helpLink: {
+    ...theme.typography.caption2,
+  },
   bottomContentClose: {
     display: 'none !important',
   },
@@ -49,7 +44,7 @@ const styles = (theme) => ({
     flexDirection: 'column',
     alignItems: 'center',
     padding: theme.spacing(2, 1, 1, 1),
-    backgroundColor: theme.palette.header.background,
+    backgroundColor: theme.components.header.background,
     '& a': {
       margin: theme.spacing(2, 0),
       textDecorationColor: '#e6e6e6 !important',
@@ -59,50 +54,27 @@ const styles = (theme) => ({
     },
     '& button': {
       backgroundColor: '#f3f3f4',
+      textTransform: 'none',
       '&:hover': {
         backgroundColor: '#FFFFFF',
       },
       '& *': {
-        color: theme.palette.header.background,
+        color: theme.components.header.background,
       },
       '& i': {
         marginLeft: theme.spacing(),
       },
     },
   },
-  logoTitle: {
-    backgroundImage: `url(${imageUrls.logo})`,
-    backgroundRepeat: 'no-repeat',
-    backgroundSize: 180,
-    height: 20,
-    backgroundPosition: '-55px -12px',
-  },
-  logo: {
-    justifySelf: 'center',
-    maxHeight: 45,
-    backgroundImage: `url(${imageUrls.logoBlue})`,
-    backgroundRepeat: 'no-repeat',
-    transition: `width ${theme.transitions.duration.enteringScreen}ms ease`,
-    width: 40,
-    backgroundSize: 115,
-    height: 24,
-    backgroundPosition: 'center -6px',
-  },
-  logoOpen: {
-    width: drawerWidth,
-  },
-  logoClose: {
-    width: 168,
-  },
   drawer: {
-    zIndex: 1200,
+    zIndex: 1000,
     position: 'relative',
     width: drawerWidth,
     flexShrink: 0,
     whiteSpace: 'nowrap',
     height: '100%',
     minHeight: '100vh',
-    backgroundColor: theme.palette.sidebar.background,
+    backgroundColor: theme.components.sidebar.background,
   },
   drawerOpen: {
     width: drawerWidth,
@@ -122,19 +94,12 @@ const styles = (theme) => ({
     // },
   },
   paper: {
-    // marginTop: 55,
+    marginTop: 55,
     backgroundColor: 'inherit',
     overflow: 'hidden',
     borderRight: 0,
-  },
-  drawerHeader: {
-    display: 'grid',
-    gridTemplateColumns: '50px 1fr',
-    height: 55,
-    position: 'relative',
-    alignItems: 'center',
-    cursor: 'pointer',
-    backgroundColor: theme.palette.header.background,
+    bottom: 0,
+    height: 'auto',
   },
   inputRoot: {
     color: 'inherit',
@@ -154,14 +119,14 @@ const styles = (theme) => ({
   },
   activeNavItem: {
     backgroundColor: theme.palette.background.default,
-    color: theme.palette.sidebar.activeText,
+    color: theme.components.sidebar.activeText,
   },
   currentNavLink: {
     backgroundColor: [theme.palette.background.default, '!important'],
-    color: [theme.palette.sidebar.activeText, '!important'],
+    color: [theme.components.sidebar.activeText, '!important'],
 
     '&:hover *': {
-      color: [theme.palette.sidebar.hoverText, '!important'],
+      color: [theme.components.sidebar.hoverText, '!important'],
     },
   },
   navHeading: {
@@ -172,7 +137,7 @@ const styles = (theme) => ({
     paddingLeft: theme.spacing(1),
   },
   navHeadingText: {
-    ...theme.typography.subtitle2,
+    ...theme.typography.sidenav,
     padding: 0,
   },
   navBody: {
@@ -202,8 +167,8 @@ const styles = (theme) => ({
     gridTemplateColumns: '50px 1fr',
     padding: 0,
     minHeight: 45,
-    backgroundColor: theme.palette.sidebar.background,
-    color: theme.palette.sidebar.text,
+    backgroundColor: theme.components.sidebar.background,
+    color: theme.components.sidebar.text,
 
     transition: 'background .2s ease',
 
@@ -214,7 +179,7 @@ const styles = (theme) => ({
       backgroundColor: theme.palette.background.paper,
     },
     '&:hover *': {
-      color: theme.palette.sidebar.hoverText, // override child color styles
+      color: theme.components.sidebar.hoverText, // override child color styles
     },
     borderTop: '2px solid transparent',
     borderBottom: '2px solid transparent',
@@ -226,14 +191,18 @@ const styles = (theme) => ({
     margin: 0,
     display: 'block',
     lineHeight: '14px',
+
+    '& > .MuiTypography-root': {
+      ...theme.typography.sidenav,
+    },
   },
   navMenuText: {
     fontSize: 12,
     fontWeight: 500,
-    color: theme.palette.sidebar.text,
+    color: theme.components.sidebar.text,
   },
   toggleButton: {
-    background: theme.palette.header.background,
+    background: theme.components.header.background,
     borderRadius: 0,
     color: theme.palette.primary.contrastText,
     fontSize: 12,
@@ -253,7 +222,7 @@ const styles = (theme) => ({
   currentNavMenuText: {
     fontSize: 12,
     fontWeight: 500,
-    color: theme.palette.sidebar.activeText,
+    color: theme.components.sidebar.activeText,
   },
   navMenuList: {
     borderLeft: `${theme.spacing(1)}px solid #6dc6fe`,
@@ -306,7 +275,7 @@ const styles = (theme) => ({
   },
   sliderArrow: {
     width: '0.8em',
-    color: theme.palette.sidebar.text,
+    color: theme.components.sidebar.text,
     cursor: 'pointer',
   },
   heavyWeight: {
@@ -327,10 +296,6 @@ class Navbar extends PureComponent {
     expandedItems: [],
     activeNavItem: null,
     filterText: '',
-  }
-
-  handleLogoClick = () => {
-    this.props.history.push(routes.dashboard.path())
   }
 
   handleEscKey = () => {
@@ -548,7 +513,7 @@ class Navbar extends PureComponent {
         onChange={this.handleExpand(section.id)}
       >
         <AccordionSummary className={classes.navHeading} expandIcon={<ExpandMore />}>
-          <Typography className={classes.navHeadingText}>{section.name}</Typography>
+          <Text className={classes.navHeadingText}>{section.name}</Text>
         </AccordionSummary>
         <AccordionDetails className={classes.navBody}>
           {this.renderSectionLinks(section.links)}
@@ -630,61 +595,45 @@ class Navbar extends PureComponent {
     const version = pathStrOr('4', 'releaseVersion', features)
 
     return (
-      <div
+      <Drawer
+        variant="permanent"
         className={clsx(classes.drawer, {
           [classes.drawerOpen]: open,
           [classes.drawerClose]: !open,
         })}
-      >
-        <IconButton className={classes.toggleButton} onClick={handleDrawerToggle}>
-          <FontAwesomeIcon size="xl">
-            {open ? 'angle-double-left' : 'angle-double-right'}
-          </FontAwesomeIcon>
-        </IconButton>
-        <Drawer
-          variant="permanent"
-          className={clsx(classes.drawer, {
+        classes={{
+          paper: clsx(classes.paper, {
             [classes.drawerOpen]: open,
             [classes.drawerClose]: !open,
-          })}
-          classes={{
-            paper: clsx(classes.paper, {
-              [classes.drawerOpen]: open,
-              [classes.drawerClose]: !open,
-            }),
-          }}
-          anchor="left"
-          open={open}
-        >
-          <div className={classes.drawerHeader} onClick={this.handleLogoClick}>
-            <div className={classes.logo} />
-            <div className={classes.logoTitle} />
-          </div>
-          {withStackSlider ? this.renderStackSlider() : null}
-          {filteredSections.length > 1
-            ? this.renderSections(filteredSections)
-            : this.renderSectionLinks(propOr([], 'links', filteredSections[0]))}
+          }),
+        }}
+        anchor="left"
+        open={open}
+      >
+        {withStackSlider ? this.renderStackSlider() : null}
+        {filteredSections.length > 1
+          ? this.renderSections(filteredSections)
+          : this.renderSectionLinks(propOr([], 'links', filteredSections[0]))}
 
-          <div
-            className={clsx(classes.bottomContent, {
-              [classes.bottomContentClose]: !open,
-            })}
-          >
-            {!(isDecco || isSandbox) && (
-              <Button onClick={this.handleNavigateToClarity}>
-                Back to Legacy UI
-                <FontAwesomeIcon size="md">undo</FontAwesomeIcon>
-              </Button>
-            )}
-            <SimpleLink src={helpUrl} className={classes.helpLink}>
-              <FontAwesomeIcon>question-circle</FontAwesomeIcon> <span>Need Help?</span>
-            </SimpleLink>
-            <Typography variant="body2" component="span">
-              Version {version}
-            </Typography>
-          </div>
-        </Drawer>
-      </div>
+        <div
+          className={clsx(classes.bottomContent, {
+            [classes.bottomContentClose]: !open,
+          })}
+        >
+          {!(isDecco || isSandbox) && (
+            <Button onClick={this.handleNavigateToClarity}>
+              <Text variant="caption2">Back to Legacy UI</Text>
+              <FontAwesomeIcon size="md">undo</FontAwesomeIcon>
+            </Button>
+          )}
+          <SimpleLink src={helpUrl} className={classes.helpLink}>
+            <FontAwesomeIcon>question-circle</FontAwesomeIcon> <span>Need Help?</span>
+          </SimpleLink>
+          <Text variant="caption2" component="span">
+            Version {version}
+          </Text>
+        </div>
+      </Drawer>
     )
   }
 }

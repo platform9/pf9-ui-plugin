@@ -2,9 +2,10 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import CloseButton from 'core/components/buttons/CloseButton'
 import { makeStyles } from '@material-ui/styles'
-import { Divider, Grid, Typography } from '@material-ui/core'
+import { Grid } from '@material-ui/core'
 import Progress from 'core/components/progress/Progress'
 import { pick, keys } from 'ramda'
+import Text from 'core/elements/text'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -13,9 +14,6 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(5),
   },
   title: {
-    marginBottom: theme.spacing(2),
-  },
-  divider: {
     marginBottom: theme.spacing(2),
   },
   buttonBase: {
@@ -31,9 +29,9 @@ const FormWrapper = ({ backUrl = undefined, children, title, className, ...rest 
       <Grid item xs={11}>
         <Grid container justify="space-between">
           <Grid item>
-            <Typography variant="h5" className={classes.title}>
+            <Text variant="subtitle1" className={classes.title}>
               {title}
-            </Typography>
+            </Text>
           </Grid>
           {backUrl && (
             <Grid item>
@@ -41,7 +39,6 @@ const FormWrapper = ({ backUrl = undefined, children, title, className, ...rest 
             </Grid>
           )}
         </Grid>
-        <Divider className={classes.divider} />
         <Progress {...progressProps}>
           <div className={className}>{children}</div>
         </Progress>

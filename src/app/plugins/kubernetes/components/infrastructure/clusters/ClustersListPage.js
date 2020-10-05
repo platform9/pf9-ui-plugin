@@ -1,16 +1,20 @@
-import { Tooltip, Typography } from '@material-ui/core'
+import { Tooltip } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
 import CreateButton from 'core/components/buttons/CreateButton'
 import CodeBlock from 'core/components/CodeBlock'
 import CopyToClipboard from 'core/components/CopyToClipboard'
 // import KubeCLI from './KubeCLI' // commented out till we support cli links
 import ExternalLink from 'core/components/ExternalLink'
-import DateCell from 'core/components/listTable/cells/DateCell'
+import { DateAndTime } from 'core/components/listTable/cells/DateCell'
 import SimpleLink from 'core/components/SimpleLink'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import { sessionStoreKey } from 'core/session/sessionReducers'
 import { routes } from 'core/utils/routes'
-import { ClusterConnectionStatus, ClusterHealthStatus } from 'k8s/components/infrastructure/clusters/ClusterStatus'
+import {
+  ClusterConnectionStatus,
+  ClusterHealthStatus,
+} from 'k8s/components/infrastructure/clusters/ClusterStatus'
 import ClusterUpgradeDialog from 'k8s/components/infrastructure/clusters/ClusterUpgradeDialog'
 import ResourceUsageTable from 'k8s/components/infrastructure/common/ResourceUsageTable'
 import PrometheusAddonDialog from 'k8s/components/prometheus/PrometheusAddonDialog'
@@ -27,7 +31,20 @@ import DownloadKubeConfigLink from './DownloadKubeConfigLink'
 const useStyles = makeStyles((theme) => ({
   links: {
     display: 'grid',
-    gridGap: '6px',
+    // gridGap: '2px',
+  },
+  icon: {
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    display: 'flex',
+    '& i': {
+      fontSize: '12px',
+      height: '11px',
+      width: '14px',
+      alignItems: 'center',
+      justifyContent: 'center',
+      display: 'inline-flex',
+    },
   },
 }))
 
@@ -51,20 +68,28 @@ const ClusterLinks = ({ links, usage }) => {
   return (
     <div className={classes.links}>
       {links.dashboard && (
-        <ExternalLink className="no-wrap-text" icon="tachometer" url={links.dashboard}>
-          Dashboard
+        <ExternalLink
+          className={`${classes.icon} no-wrap-text`}
+          // icon="tachometer"
+          url={links.dashboard}
+        >
+          dashboard
         </ExternalLink>
       )}
       {links.kubeconfig && (
         <DownloadKubeConfigLink
-          className="no-wrap-text"
-          icon="lock"
+          className={`${classes.icon} no-wrap-text`}
+          // icon="lock"
           cluster={links.kubeconfig.cluster}
         />
       )}
       {hasGrafanaLink && (
-        <ExternalLink className="no-wrap-text" icon="chart-line" url={usage.grafanaLink}>
-          Grafana
+        <ExternalLink
+          className={`${classes.icon} no-wrap-text`}
+          // icon="chart-line"
+          url={usage.grafanaLink}
+        >
+          grafana
         </ExternalLink>
       )}
     </div>
@@ -117,11 +142,11 @@ const renderClusterDetailLink = (name, cluster) => (
 )
 
 const renderBooleanField = (key) => (_, cluster) => (
-  <Typography variant="body2">{castBoolToStr()(!!cluster[key])}</Typography>
+  <Text variant="body2">{castBoolToStr()(!!cluster[key])}</Text>
 )
 
 const renderCloudProvider = (_, { cloudProviderType, cloudProviderName }) => (
-  <Typography variant="body2">{cloudProviderType === 'local' ? '' : cloudProviderName}</Typography>
+  <Text variant="body2">{cloudProviderType === 'local' ? '' : cloudProviderName}</Text>
 )
 
 const renderMetaData = (_, { tags }) => {
@@ -161,7 +186,7 @@ export const options = {
   },
   columns: [
     { id: 'uuid', label: 'UUID', render: renderUUID, display: false },
-    { id: 'name', label: 'Cluster name', render: renderClusterDetailLink },
+    { id: 'name', label: 'Name', render: renderClusterDetailLink },
     {
       id: 'connectionStatus',
       label: 'Connection status',
@@ -181,13 +206,21 @@ export const options = {
     },
     {
       id: 'cloudProviderType',
-      label: 'Deployment Type',
+      label: 'Deployment',
       render: (type) => cloudProviderTypes[type] || capitalizeString(type),
     },
     { id: 'resource_utilization', label: 'Resource Utilization', render: renderStats },
-    { id: 'version', label: 'Kubernetes Version' },
-    { id: 'created_at', label: 'Created at', render: (value) => <DateCell value={value} /> },
-    { id: 'lastOp', label: 'Updated at', render: (value) => <DateCell value={value} /> },
+    { id: 'version', label: 'K8 Version' },
+    {
+      id: 'created_at',
+      label: 'Created at',
+      render: (value) => <DateAndTime value={value} />,
+    },
+    {
+      id: 'lastOp',
+      label: 'Updated at',
+      render: (value) => <DateAndTime value={value} />,
+    },
     { id: 'nodes', label: 'Nodes', render: renderNodeLink },
     { id: 'networkPlugin', label: 'Network Backend' },
     { id: 'containersCidr', label: 'Containers CIDR' },
@@ -239,7 +272,7 @@ export const options = {
   DeleteDialog: ClusterDeleteDialog,
   batchActions: [
     {
-      icon: 'info-square',
+      icon: 'info-circle',
       label: 'Details',
       routeTo: (rows) => `/ui/kubernetes/infrastructure/clusters/${rows[0].uuid}`,
     },

@@ -1,7 +1,8 @@
 import React, { Fragment } from 'react'
 import { withRouter } from 'react-router-dom'
 import { createMuiTheme } from '@material-ui/core/styles'
-import { Divider, Typography } from '@material-ui/core'
+import { Divider } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { ThemeProvider, withStyles } from '@material-ui/styles'
 import { compose } from 'app/utils/fp'
 import FormWrapper from 'core/components/FormWrapper'
@@ -61,17 +62,17 @@ class AddImagePage extends React.PureComponent {
     const { classes } = this.props
     return (
       <Fragment>
-        <Typography>We support two ways to import images into your Image Catalog:</Typography>
-        <Typography variant="h6"> Manual Import </Typography>
-        <Typography>
+        <Text>We support two ways to import images into your Image Catalog:</Text>
+        <Text variant="h6"> Manual Import </Text>
+        <Text>
           The easiest way to populate your Image Catalog is by copying images into the image library
           watch folder on the host assigned with the Image Library role.
           <br />
           The following host is currently assigned the Image Library role:
-        </Typography>
+        </Text>
         <ListTable title="Host List" columns={columns} data={data} showCheckboxes={false} />
         <br />
-        <Typography>
+        <Text>
           Please <span className={classes.code}>scp</span> the image(s) to this watch folder, and
           they will be automatically imported into your Image Catalog.
           <br />
@@ -94,7 +95,7 @@ class AddImagePage extends React.PureComponent {
           <span className={classes.code}>
             chown company-name:company-group &lt;image-file-name&gt;
           </span>
-        </Typography>
+        </Text>
       </Fragment>
     )
   }
@@ -103,31 +104,31 @@ class AddImagePage extends React.PureComponent {
     const { classes } = this.props
     return (
       <Fragment>
-        <Typography variant="h6">Using OpenStack Glance Client</Typography>
-        <Typography>
+        <Text variant="h6">Using OpenStack Glance Client</Text>
+        <Text>
           Use the OpenStack Glance Client to import images into Platform9.
           <br />
           Example:
-        </Typography>
-        <Typography className={classes.code}>
+        </Text>
+        <Text className={classes.code}>
           &nbsp;&nbsp;glance image-create&nbsp;&nbsp;--disk-format qcow2
-        </Typography>
-        <Typography className={classes.code} style={{ paddingLeft: '18ch' }}>
+        </Text>
+        <Text className={classes.code} style={{ paddingLeft: '18ch' }}>
           --container-format bare \<br />
           --file ~/images/my-qcow2-img.img \<br />
           --visibility public \<br />
           --name myimage \<br />
           --property companyName_description='best image ever' \<br />
           --property virtual_size=41126400
-        </Typography>
-        <Typography>
+        </Text>
+        <Text>
           See the following support article for details:{' '}
           <a href="https://platform9.com/support/managing-images-with-the-openstack-glance-client/">
             {' '}
             Managing Images with the OpenStack Glance Client
           </a>
           .
-        </Typography>
+        </Text>
       </Fragment>
     )
   }
@@ -135,14 +136,14 @@ class AddImagePage extends React.PureComponent {
   renderCreateNewImage() {
     return (
       <Fragment>
-        <Typography variant="h6">Creating a new image</Typography>
-        <Typography>
+        <Text variant="h6">Creating a new image</Text>
+        <Text>
           If you wish to create an image from scratch you may follow this guide:
           <br />
           <a href="https://docs.openstack.org/image-guide/create-images-manually.html">
             Create any Virtual Machine Image from Scratch
           </a>
-        </Typography>
+        </Text>
       </Fragment>
     )
   }

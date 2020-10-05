@@ -1,5 +1,6 @@
 import React, { FC } from 'react'
-import { Typography, Paper } from '@material-ui/core'
+import { Paper } from '@material-ui/core'
+import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
 import CodeBlock from 'core/components/CodeBlock'
 import Theme from 'core/themes/model'
@@ -72,13 +73,13 @@ export const DownloadCliOnboardNodeWalkthrough = (): JSX.Element => {
         >
           Pre-requisites Documentation
         </ExternalLink>
-        <Typography variant="h6">OS Requirements</Typography>
+        <Text variant="h6">OS Requirements</Text>
       </div>
       <p>
-        <Typography component="span">
+        <Text component="span">
           You will need a physical or virtual machine with Ubuntu (16.04 / 18.04) or CentOS
           (7.6/7.7/7.8) installed.
-        </Typography>
+        </Text>
       </p>
       <DownloadCliWalkthrough />
     </>
@@ -91,9 +92,7 @@ const DownloadCliWalkthrough = (): JSX.Element => {
   const session = useSelector(selectSessionState)
   return (
     <Paper className={classes.paper} elevation={0}>
-      <Typography variant="h6">
-        Use the PF9 CLI to connect nodes to the Platform9 Management Plane
-      </Typography>
+      <Text variant="h6">Use the PF9 CLI to connect nodes to the Platform9 Management Plane</Text>
       <NumberedSteps
         step={1}
         title="Download and install the CLI"
@@ -103,19 +102,19 @@ const DownloadCliWalkthrough = (): JSX.Element => {
           </CopyToClipboard>
         }
       />
-      <Typography variant="body1">Here's your info for quick use:</Typography>
-      <Typography component="div" variant="body1">
+      <Text variant="body1">Here's your info for quick use:</Text>
+      <Text component="div" variant="body1">
         Account URL:{' '}
         <CopyToClipboard copyText={window.location.origin} codeBlock={false}>
           <span className={classes.linkText}>{window.location.origin}</span>
         </CopyToClipboard>
-      </Typography>
-      <Typography component="div" variant="body1">
+      </Text>
+      <Text component="div" variant="body1">
         Username:{' '}
         <CopyToClipboard copyText={session.username} codeBlock={false}>
           <span className={classes.linkText}>{session.username}</span>
         </CopyToClipboard>
-      </Typography>
+      </Text>
       <NumberedSteps
         step={2}
         title={
@@ -146,16 +145,12 @@ const NumberedSteps: FC<NumberedStepProps> = ({
   const classes = useStyles({})
   return (
     <div className={classes.column}>
-      <Typography variant="subtitle2">{title}</Typography>
+      <Text variant="subtitle2">{title}</Text>
       <div className={classes.row}>
-        <Typography variant="body1" className={classes.step}>
+        <Text variant="body1" className={classes.step}>
           {step}
-        </Typography>
-        {typeof description === 'string' ? (
-          <Typography variant="body1">{description}</Typography>
-        ) : (
-          description
-        )}
+        </Text>
+        {typeof description === 'string' ? <Text variant="body1">{description}</Text> : description}
         {children}
       </div>
     </div>

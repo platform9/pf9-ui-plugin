@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import useReactRouter from 'use-react-router'
-import Typography from '@material-ui/core/Typography'
+import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
 
 const useStyles = makeStyles((theme) => ({
@@ -74,9 +74,9 @@ const CloudProviderCard = (props) => {
       <div className={classes.logoContainer}>
         <img alt={type} src={image} />
       </div>
-      <Typography className={classes.label} variant="subtitle2">
+      <Text className={classes.label} variant="subtitle2">
         {label}
-      </Typography>
+      </Text>
     </div>
   )
 }

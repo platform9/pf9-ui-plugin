@@ -1,7 +1,8 @@
 import React from 'react'
-import { Theme, Typography } from '@material-ui/core'
+import { Theme } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
 import clsx from 'clsx'
+import Text from 'core/elements/text'
 
 interface Props {
   items: Array<string | JSX.Element>
@@ -24,7 +25,7 @@ export default ({ items = [], type = 'disc', className = undefined }: Props) => 
   return (
     <ul className={clsx(styles.ul, className)}>
       {items.map((item, idx) => (
-        <li key={idx}>{typeof item === 'string' ? <Typography>{item}</Typography> : item}</li>
+        <li key={idx}>{typeof item === 'string' ? <Text>{item}</Text> : item}</li>
       ))}
     </ul>
   )

@@ -4,7 +4,7 @@ import TextField from 'core/components/validatedForm/TextField'
 import Wizard from 'core/components/wizard/Wizard'
 import WizardStep from 'core/components/wizard/WizardStep'
 import FormWrapper from 'core/components/FormWrapper'
-import { Typography } from '@material-ui/core'
+import Text from 'core/elements/text'
 import useReactRouter from 'use-react-router'
 import useDataUpdater from 'core/hooks/useDataUpdater'
 import { k8sPrefix } from 'app/constants'
@@ -42,18 +42,18 @@ const AddUserPage = () => {
   const activationByEmailLabel = (
     <>
       <div>Send activation email to the user.</div>
-      <Typography variant="body2" component="p" color="textSecondary">
+      <Text variant="body2" component="p" color="textSecondary">
         Instructions to create a new password and to activate account will be sent to the email
         provided.
-      </Typography>
+      </Text>
     </>
   )
   const createUserPasswordLabel = (
     <>
       <div>Set password for new user now.</div>
-      <Typography variant="body2" component="p" color="textSecondary">
+      <Text variant="body2" component="p" color="textSecondary">
         Create password for the new user now and activate the account immediately.
-      </Typography>
+      </Text>
     </>
   )
   return (

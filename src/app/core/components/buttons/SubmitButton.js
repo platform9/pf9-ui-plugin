@@ -1,19 +1,17 @@
 import React from 'react'
-import Button from '@material-ui/core/Button'
 import { withStyles } from '@material-ui/styles'
+import Button from 'core/elements/button'
 
 const styles = (theme) => ({
   baseButton: {
     margin: theme.spacing(1),
-    borderRadius: 2,
   },
 })
 
 const SubmitButton = ({ children, classes, disabled, ...rest }) => {
   const params = {
     className: classes.baseButton,
-    color: disabled ? 'secondary' : 'primary',
-    variant: 'contained',
+    color: 'primary',
     disabled,
     ...rest,
   }

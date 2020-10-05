@@ -6,13 +6,8 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import SimpleLink from 'core/components/SimpleLink'
 import { compose } from 'app/utils/fp'
 import { withStyles } from '@material-ui/styles'
-import {
-  Button,
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Typography,
-} from '@material-ui/core'
+import { Button, Accordion, AccordionDetails, AccordionSummary } from '@material-ui/core'
+import Text from 'core/elements/text'
 
 import { version } from '../../../../../package.json'
 
@@ -49,7 +44,7 @@ class DeveloperToolsEmbed extends React.PureComponent {
   Panel = ({ title, children }) => (
     <Accordion className={this.props.classes.panel}>
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-        <Typography className={this.props.classes.heading}>{title}</Typography>
+        <Text className={this.props.classes.heading}>{title}</Text>
       </AccordionSummary>
       <AccordionDetails className={this.props.classes.details}>{children}</AccordionDetails>
     </Accordion>
@@ -77,9 +72,9 @@ class DeveloperToolsEmbed extends React.PureComponent {
     return (
       <div className={classes.root}>
         {/* {<Button onClick={this.collapse}>collapse devtools</Button>} */}
-        <Typography className={classes.title} variant="subtitle1">
+        <Text className={classes.title} variant="subtitle1">
           Developer Tools. V{version}
-        </Typography>
+        </Text>
         <Panel title="Context Viewer">
           <StoreViewer />
         </Panel>

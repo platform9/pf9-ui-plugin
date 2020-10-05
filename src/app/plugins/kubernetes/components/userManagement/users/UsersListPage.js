@@ -41,7 +41,7 @@ const ListPage = ({ ListContainer }) => {
 
 export const options = {
   columns: [
-    { id: 'id', label: 'OpenStack ID', display: false },
+    { id: 'id', label: 'User Uuid', display: false },
     { id: 'username', label: 'Username' },
     { id: 'displayname', label: 'Display Name' },
     { id: 'twoFactor', label: 'Two-Factor Authentication' },

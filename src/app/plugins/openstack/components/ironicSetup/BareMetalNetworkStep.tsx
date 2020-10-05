@@ -3,7 +3,7 @@ import TextField from 'core/components/validatedForm/TextField'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import { makeStyles } from '@material-ui/styles'
-import { Theme, Typography } from '@material-ui/core'
+import Text from 'core/elements/text'
 import clsx from 'clsx'
 import { createNetwork } from 'openstack/components/networks/actions'
 import TenantPicklist from 'openstack/components/common/TenantPicklist'
@@ -11,6 +11,7 @@ import { updateService } from 'openstack/components/resmgr/actions'
 import { useToast } from 'core/providers/ToastProvider'
 import { MessageTypes } from 'core/components/notifications/model'
 import { sleep } from 'utils/async'
+import Theme from 'core/themes/model'
 
 const useStyles = makeStyles((theme: Theme) => ({
   text: {
@@ -19,7 +20,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   bold: {
     fontWeight: 'bold',
-  }
+  },
 }))
 
 // Put any for now to let me proceed
@@ -43,8 +44,13 @@ const createNetworkLoop = async (body) => {
   return
 }
 
-
-const BareMetalNetworkStep = ({ wizardContext, setWizardContext, onNext, title, setSubmitting }: Props) => {
+const BareMetalNetworkStep = ({
+  wizardContext,
+  setWizardContext,
+  onNext,
+  title,
+  setSubmitting,
+}: Props) => {
   const { text, bold } = useStyles({})
   const showToast = useToast()
   const validatorRef = useRef(null)
@@ -65,8 +71,8 @@ const BareMetalNetworkStep = ({ wizardContext, setWizardContext, onNext, title, 
       const neutronServerBody = {
         ml2: {
           ml2: {
-          type_drivers: 'flat,vlan',
-          tenant_network_types: '',
+            type_drivers: 'flat,vlan',
+            tenant_network_types: '',
           },
           ml2_type_vlan: {
             network_vlan_ranges: 'provisioning',
@@ -79,7 +85,7 @@ const BareMetalNetworkStep = ({ wizardContext, setWizardContext, onNext, title, 
           },
         },
         neutron: {
-          'DEFAULT': {
+          DEFAULT: {
             router_distributed: false,
             dns_domain: wizardContext.dnsDomain,
             dhcp_agents_per_network: 1,
@@ -88,7 +94,7 @@ const BareMetalNetworkStep = ({ wizardContext, setWizardContext, onNext, title, 
         extra: {
           dnsmasq_dns_servers: wizardContext.dnsForwardingAddresses.replace(/ /g, ''),
           configured: true,
-        }
+        },
       }
 
       await updateService('neutron-server', neutronServerBody)
@@ -124,19 +130,17 @@ const BareMetalNetworkStep = ({ wizardContext, setWizardContext, onNext, title, 
     >
       {({ setFieldValue, values }) => (
         <>
-          <Typography className={text}>
-            Configure the provisioning network that will be used to allocate IP addresses to deployed bare metal nodes.
-          </Typography>
+          <Text className={text}>
+            Configure the provisioning network that will be used to allocate IP addresses to
+            deployed bare metal nodes.
+          </Text>
           <br />
-          <Typography className={text}>
-            Internally, Platform9 will deploy a flat, VLAN (untagged) virtual
-            network with a DHCP server, that will be connected to your specified
-            physical network.
-          </Typography>
+          <Text className={text}>
+            Internally, Platform9 will deploy a flat, VLAN (untagged) virtual network with a DHCP
+            server, that will be connected to your specified physical network.
+          </Text>
           <br />
-          <Typography className={clsx(text, bold)}>
-            Physical Network Properties
-          </Typography>
+          <Text className={clsx(text, bold)}>Physical Network Properties</Text>
 
           {/* DNS Domain */}
           <TextField
@@ -158,9 +162,7 @@ const BareMetalNetworkStep = ({ wizardContext, setWizardContext, onNext, title, 
             rows="3"
             required
           />
-          <Typography className={clsx(text, bold)}>
-            Bare Metal Virtual Network
-          </Typography>
+          <Text className={clsx(text, bold)}>Bare Metal Virtual Network</Text>
 
           {/* Network Name */}
           <TextField

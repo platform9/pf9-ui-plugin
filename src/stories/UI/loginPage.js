@@ -1,14 +1,7 @@
 import React, { Fragment, PureComponent } from 'react'
 import { withStyles } from '@material-ui/styles'
-import {
-  Button,
-  Checkbox,
-  FormControlLabel,
-  Grid,
-  Paper,
-  TextField,
-  Typography,
-} from '@material-ui/core'
+import { Button, Checkbox, FormControlLabel, Grid, Paper, TextField } from '@material-ui/core'
+import Text from 'core/elements/text'
 import SimpleLink from 'core/components/SimpleLink'
 
 const styles = (theme) => ({
@@ -127,13 +120,13 @@ class LoginPage extends PureComponent {
     const { classes } = this.props
     return (
       <Fragment>
-        <Typography className={classes.paragraph} variant="caption" color="textSecondary">
+        <Text className={classes.paragraph} variant="caption" color="textSecondary">
           By signing in, you agree to our{' '}
           <SimpleLink src="http://www.platform9.com">Terms of Service</SimpleLink>.
-        </Typography>
-        <Typography className={classes.paragraph} variant="caption" color="textSecondary">
+        </Text>
+        <Text className={classes.paragraph} variant="caption" color="textSecondary">
           © 2014-2018 Platform9 Systems, Inc.
-        </Typography>
+        </Text>
       </Fragment>
     )
   }
@@ -150,18 +143,18 @@ class LoginPage extends PureComponent {
                 className={classes.img}
               />
               <form className={classes.form}>
-                <Typography variant="subtitle1" align="center">
+                <Text variant="subtitle1" align="center">
                   Please sign in
-                </Typography>
+                </Text>
                 {this.renderInputfield()}
                 {this.renderMFACheckbox()}
                 {this.state.MFAcheckbox && this.renderMFAInput()}
                 <Button className={classes.signinButton} variant="contained" color="primary">
                   SIGN IN
                 </Button>
-                <Typography className={classes.forgotPwd} gutterBottom>
+                <Text className={classes.forgotPwd} gutterBottom>
                   <SimpleLink src="http://www.platform9.com">Forgot password?</SimpleLink>
-                </Typography>
+                </Text>
               </form>
               {this.renderFooter()}
             </Paper>

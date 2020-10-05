@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react'
 import { makeStyles } from '@material-ui/styles'
-import { Theme, Typography } from '@material-ui/core'
+import { Theme } from '@material-ui/core'
+import Text from 'core/elements/text'
 import BulletList from 'core/components/BulletList'
 import Alert from 'core/components/Alert'
 import SubmitButton from 'core/components/buttons/SubmitButton'
@@ -57,15 +58,13 @@ const AwsClusterRequirements = ({ onComplete }) => {
         </div>
       }
     >
-      <Typography className={classes.text}>
-        Build a Kubernetes Cluster using AWS EC2 Instances
-      </Typography>
+      <Text className={classes.text}>Build a Kubernetes Cluster using AWS EC2 Instances</Text>
 
       <Alert variant="info">
-        <Typography className={classes.alertTitle} variant="subtitle2">
+        <Text className={classes.alertTitle} variant="subtitle2">
           The following permissions are required on your AWS account in order to deploy fully
           automated Managed Kubernetes clusters:
-        </Typography>
+        </Text>
         <div className={classes.requirements}>
           <BulletList className={classes.bulletList} items={AwsReqsLeftSection} />
           <BulletList className={classes.bulletList} items={AwsReqsRightSection} />

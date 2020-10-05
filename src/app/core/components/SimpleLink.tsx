@@ -21,7 +21,7 @@ const useStyles = makeStyles<Theme, { variant: ISimpleLinkVariant }>((theme) => 
   root: {
     cursor: 'pointer',
     color: ({ variant }) =>
-      variant === 'error' ? theme.palette.error.main : theme.palette.primary.main,
+      variant === 'error' ? theme.components.error.main : theme.palette.primary.main,
   },
   icon: {
     marginRight: '6px',
