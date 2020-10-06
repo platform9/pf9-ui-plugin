@@ -11,6 +11,7 @@ import { objSwitchCase } from 'utils/fp'
 import BareosClusterRequirements from './bareos/BareosClusterRequirements'
 import AwsClusterRequirements from './aws/AwsClusterRequirements'
 import AzureClusterRequirements from './azure/AzureClusterRequirements'
+import DocumentMeta from 'core/components/DocumentMeta'
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -48,30 +49,33 @@ const AddClusterPage = () => {
     [activeProvider],
   )
   return (
-    <FormWrapper
-      className={classes.container}
-      title="Select where to deploy your Kubernetes Cluster"
-      backUrl={listUrl}
-    >
-      <div className={classes.root}>
-        <CloudProviderCard
-          active={activeProvider === CloudProviders.BareOS}
-          onClick={setActiveProvider}
-          type={CloudProviders.BareOS}
-        />
-        <CloudProviderCard
-          active={activeProvider === CloudProviders.Aws}
-          onClick={setActiveProvider}
-          type={CloudProviders.Aws}
-        />
-        <CloudProviderCard
-          active={activeProvider === CloudProviders.Azure}
-          onClick={setActiveProvider}
-          type={CloudProviders.Azure}
-        />
-      </div>
-      <ActiveView onComplete={handleNextView} />
-    </FormWrapper>
+    <>
+      <DocumentMeta title="Add Cluster" bodyClasses={['form-view']} />
+      <FormWrapper
+        className={classes.container}
+        title="Select where to deploy your Kubernetes Cluster"
+        backUrl={listUrl}
+      >
+        <div className={classes.root}>
+          <CloudProviderCard
+            active={activeProvider === CloudProviders.BareOS}
+            onClick={setActiveProvider}
+            type={CloudProviders.BareOS}
+          />
+          <CloudProviderCard
+            active={activeProvider === CloudProviders.Aws}
+            onClick={setActiveProvider}
+            type={CloudProviders.Aws}
+          />
+          <CloudProviderCard
+            active={activeProvider === CloudProviders.Azure}
+            onClick={setActiveProvider}
+            type={CloudProviders.Azure}
+          />
+        </div>
+        <ActiveView onComplete={handleNextView} />
+      </FormWrapper>
+    </>
   )
 }
 
