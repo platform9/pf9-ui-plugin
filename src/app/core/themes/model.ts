@@ -168,13 +168,11 @@ export interface Components {
   success: DefaultColorSwatch
   error: DefaultColorSwatch
   upgrade: Upgrade
-  aws: DefaultColorSwatch
-  azure: DefaultColorSwatch
 }
 export interface Palette {
   common: Common
   type: string
-  primary: DefaultColorSwatch
+  primary: { [key: string]: string }
   secondary: { [key: string]: string }
   grey: { [key: string]: string }
   blue: { [key: string]: string }
@@ -185,6 +183,8 @@ export interface Palette {
   green: { [key: string]: string }
   red: { [key: string]: string }
   orange: { [key: string]: string }
+  aws: { [key: string]: string }
+  azure: { [key: string]: string }
 }
 
 export interface Upgrade {

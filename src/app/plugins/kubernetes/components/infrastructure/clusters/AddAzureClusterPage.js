@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import FormWrapper from 'core/components/FormWrapper'
 import AzureAvailabilityZoneChooser from './AzureAvailabilityZoneChooser'
 import AzureClusterReviewTable from './AzureClusterReviewTable'
@@ -24,7 +24,7 @@ import { pathJoin } from 'utils/misc'
 import { defaultEtcBackupPath, k8sPrefix } from 'app/constants'
 import ExternalLink from 'core/components/ExternalLink'
 import CodeBlock from 'core/components/CodeBlock'
-import { cloudProviderActions } from '../cloudProviders/actions'
+import { cloudProviderActions, loadCloudProviderDetails } from '../cloudProviders/actions'
 import useDataLoader from 'core/hooks/useDataLoader'
 import { PromptToAddProvider } from '../cloudProviders/PromptToAddProvider'
 import { CloudProviders } from '../cloudProviders/model'
@@ -206,7 +206,7 @@ const networkOptions = [
 
 const AddAzureClusterPage = () => {
   const classes = useStyles()
-  const { params, getParamsUpdater } = useParams()
+  const { params, updateParams, getParamsUpdater } = useParams()
   const { history } = useReactRouter()
 
   useEffect(() => {
@@ -223,19 +223,40 @@ const AddAzureClusterPage = () => {
     clusterActions.create,
     onComplete,
   )
-  const handleSubmit = (params) => (data) =>
+  const handleSubmit = (params) => (data) => {
+    data.location = params.cloudProviderRegionId
     createAzureClusterAction({ ...data, ...params, clusterType: CloudProviders.Azure })
+  }
 
   const [cloudProviders, loading] = useDataLoader(cloudProviderActions.list)
   const hasAzureProvider = !!cloudProviders.some(
     (provider) => provider.type === CloudProviders.Azure,
   )
 
-  const [details] = useDataLoader(loadCloudProviderRegionDetails, {
+  const [cloudProviderDetails] = useDataLoader(loadCloudProviderDetails, {
+    cloudProviderId: params.cloudProviderId,
+  })
+
+  const [cloudProviderRegionDetails] = useDataLoader(loadCloudProviderRegionDetails, {
     cloudProviderId: params.cloudProviderId,
     cloudProviderRegionId: params.cloudProviderRegionId,
   })
-  const virtualNetworks = pathStrOr([], '0.virtualNetworks', details)
+  const virtualNetworks = pathStrOr([], '0.virtualNetworks', cloudProviderRegionDetails)
+
+  const mapRegionName = useCallback(
+    (displayName) => {
+      return cloudProviderDetails.find((x) => x.DisplayName === displayName).RegionName
+    },
+    [cloudProviderDetails],
+  )
+
+  const handleRegionChange = useCallback(
+    (displayName) => {
+      const regionName = mapRegionName(displayName)
+      updateParams({ cloudProviderRegionId: regionName })
+    },
+    [cloudProviderDetails],
+  )
 
   return (
     <FormWrapper
@@ -286,8 +307,7 @@ const AddAzureClusterPage = () => {
                           id="location"
                           label="Region"
                           cloudProviderId={params.cloudProviderId}
-                          onChange={getParamsUpdater('cloudProviderRegionId')}
-                          value={params.cloudProviderRegionId}
+                          onChange={handleRegionChange}
                           type="azure"
                           required
                         />

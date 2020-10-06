@@ -52,6 +52,16 @@ export const colors = {
   orange: {
     '500': '#ff8a00',
   },
+  aws: {
+    300: '#FFB74D',
+    500: '#FF9800',
+    700: '#F57C00',
+  },
+  azure: {
+    300: '#AEE0FF',
+    500: '#4AA3DF',
+    700: '#1E699C',
+  },
 }
 const components = {
   header: {
@@ -59,9 +69,10 @@ const components = {
   },
   sidebar: {
     background: colors.grey[800],
+    activeBackground: colors.grey['000'],
     text: colors.grey[200],
-    activeText: '#000',
-    hoverText: '#000',
+    activeText: '#000000',
+    hoverText: '#000000',
   },
   dashboardCard: {
     background: '#FFF',
@@ -102,16 +113,6 @@ const components = {
   },
   upgrade: {
     main: '#D82071',
-  },
-  aws: {
-    light: '#FFB74D',
-    main: '#FF9800',
-    dark: '#F57C00',
-  },
-  azure: {
-    light: '#AEE0FF',
-    main: '#4AA3DF',
-    dark: '#1E699C',
   },
 }
 export const typography = {

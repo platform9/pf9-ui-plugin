@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme) =>
       margin: '0px 10px',
     },
     completedStep: {
-      background: '#4adf74 !important',
+      background: [theme.palette.green.main, '!important'],
       color: '#ffffff',
     },
     summaryText: {
@@ -52,7 +52,7 @@ const useStyles = makeStyles((theme) =>
       alignItems: 'center',
     },
     panelDetails: {
-      background: '#f6fafe',
+      background: theme.palette.grey[100],
       border: '1px solid rgba(74, 163, 223, 0.5)',
       borderLeft: '0px',
       borderRight: '0px',
@@ -116,7 +116,7 @@ const ExpansionPanel = ({
           <span>{summary}</span>
         </div>
         {!!onSkip && !completed && (
-          <CloseButton tooltip="Skip Step" onClick={handleToggleOverlay} />
+          <CloseButton tooltip="Skip Step" tabIndex={100} onClick={handleToggleOverlay} />
         )}
       </AccordionSummary>
       <AccordionDetails className={classes.panelDetails}>

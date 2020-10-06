@@ -282,7 +282,7 @@ const nodeHealthStatus = ({ status }) => {
 
 const DashboardPage = () => {
   // need to be able to force update because states are captured in local storage :(
-  const [, updateState] = React.useState()
+  const [, updateState] = React.useState({})
   const forceUpdate = useCallback(() => updateState({}), [])
   const classes = useStyles({})
   const selectSessionState = prop<string, SessionState>(sessionStoreKey)

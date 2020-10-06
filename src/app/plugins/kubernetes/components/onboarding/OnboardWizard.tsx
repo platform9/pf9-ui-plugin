@@ -50,9 +50,9 @@ const OnboardWizard: FC<Props> = ({ title, body, children, renderLinks = true })
         </div>
       )}
       <header className={ctaHeader}>
-        <Text variant="h6">{title}</Text>
+        <Text variant="subtitle1">{title}</Text>
         <p> </p>
-        <Text variant="body1">{body}</Text>
+        <Text variant="body2">{body}</Text>
       </header>
       {children}
     </section>
