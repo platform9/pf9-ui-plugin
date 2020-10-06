@@ -15,6 +15,7 @@ import AwsCloudProviderFields from './AwsCloudProviderFields'
 import AzureCloudProviderFields from './AzureCloudProviderFields'
 import Text from 'core/elements/text'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
+import { CloudProviders } from './model'
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -52,13 +53,13 @@ const useStyles = makeStyles((theme: Theme) => ({
 }))
 
 const formCpBody = (data) => {
-  if (data.type === 'aws') {
+  if (data.type === CloudProviders.Aws) {
     return {
       name: data.name,
       key: data.awsAccessKey,
       secret: data.awsSecretKey,
     }
-  } else if (data.type === 'azure') {
+  } else if (data.type === CloudProviders.Azure) {
     return {
       type: data.type,
       name: data.name,
@@ -88,15 +89,15 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
 
   const VerificationFields = useMemo(() => {
     return objSwitchCaseAny({
-      aws: AwsCloudProviderVerification,
-      azure: AzureCloudProviderVerification,
+      [CloudProviders.Aws]: AwsCloudProviderVerification,
+      [CloudProviders.Azure]: AzureCloudProviderVerification,
     })(initialValues.type)
   }, [initialValues.type])
 
   const UpdateForm = useMemo(() => {
     return objSwitchCaseAny({
-      aws: AwsCloudProviderFields,
-      azure: AzureCloudProviderFields,
+      [CloudProviders.Aws]: AwsCloudProviderFields,
+      [CloudProviders.Azure]: AzureCloudProviderFields,
     })(initialValues.type)
   }, [initialValues.type])
 

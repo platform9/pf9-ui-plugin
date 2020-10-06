@@ -9,7 +9,7 @@ const useStyles = makeStyles<Theme, { error: boolean }>((theme: Theme) => ({
   container: {
     background: theme.palette.grey[100],
     padding: theme.spacing(3),
-    border: ({ error }) => `1px solid ${error ? theme.palette.error.main : 'transparent'}`,
+    border: ({ error }) => `1px solid ${error ? theme.palette.red[500] : 'transparent'}`,
     borderRadius: 4,
     ...theme.typography.body2,
     color: theme.palette.grey[700],
@@ -78,11 +78,9 @@ const Info = ({
               setExpanded(!isExpanded)
             }}
           >
-            {isExpanded ? (
-              <FontAwesomeIcon className={classes.icon}>angle-up</FontAwesomeIcon>
-            ) : (
-              <FontAwesomeIcon className={classes.icon}>angle-down</FontAwesomeIcon>
-            )}
+            <FontAwesomeIcon className={classes.icon}>
+              {`angle-${isExpanded ? 'up' : 'down'}`}
+            </FontAwesomeIcon>
           </div>
         </div>
       )}

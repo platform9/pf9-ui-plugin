@@ -4,13 +4,13 @@ import Info from 'core/components/validatedForm/Info'
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
-import Button from '@material-ui/core/Button'
+import MuiButton from '@material-ui/core/Button'
+import Button from 'core/elements/button'
 import axios from 'axios'
 import downloadFile from 'core/utils/downloadFile'
 import { iamPolicyLink } from 'k8s/links'
 import Alert from 'core/components/Alert'
 import Text from 'core/elements/text'
-import SubmitButton from 'core/components/buttons/SubmitButton'
 
 const useStyles = makeStyles((theme: Theme) => ({
   bullets: {
@@ -102,14 +102,14 @@ const AwsCloudProviderFields = ({
             <span className={bulletText}>VPC Management</span>
           </li>
         </ul>
-        <Button variant="outlined" onClick={() => downloadIAMPolicy(setDownloadState)}>
+        <MuiButton variant="outlined" onClick={() => downloadIAMPolicy(setDownloadState)}>
           <FontAwesomeIcon size="md" className={downloadIcon}>
             download
           </FontAwesomeIcon>
           <Text className="no-text-transform" variant="buttonSecondary">
             Download IAM Policy
           </Text>
-        </Button>
+        </MuiButton>
         {downloadState.status === 'error' && (
           <Alert small variant="error" message={downloadState.message} />
         )}
@@ -141,7 +141,7 @@ const AwsCloudProviderFields = ({
       />
       {showSubmitInCard && (
         <div className={inCardSubmit}>
-          <SubmitButton noMargin>Update Cloud Provider</SubmitButton>
+          <Button type="submit">Update Cloud Provider</Button>
         </div>
       )}
     </>

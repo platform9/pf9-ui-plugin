@@ -12,6 +12,7 @@ import { awsPrerequisitesLink, azurePrerequisitesLink } from 'k8s/links'
 import { objSwitchCase } from 'utils/fp'
 import { cloudProviderActions } from './actions'
 import Text from 'core/elements/text'
+import { CloudProviders } from './model'
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -49,14 +50,14 @@ const links = {
 }
 
 const formCpBody = (wizardContext) => {
-  if (wizardContext.provider === 'aws') {
+  if (wizardContext.provider === CloudProviders.Aws) {
     return {
       type: wizardContext.provider,
       name: wizardContext.name,
       key: wizardContext.awsAccessKey,
       secret: wizardContext.awsSecretKey,
     }
-  } else if (wizardContext.provider === 'azure') {
+  } else if (wizardContext.provider === CloudProviders.Azure) {
     return {
       type: wizardContext.provider,
       name: wizardContext.name,
@@ -116,8 +117,8 @@ const AddCloudProviderCredentialStep = ({
     // Saw this in the original add cp page but what's the main benefit?
     () => {
       return objSwitchCaseAny({
-        aws: AwsCloudProviderFields,
-        azure: AzureCloudProviderFields,
+        [CloudProviders.Aws]: AwsCloudProviderFields,
+        [CloudProviders.Azure]: AzureCloudProviderFields,
       })(wizardContext.provider)
     },
     [wizardContext.provider],
@@ -130,14 +131,14 @@ const AddCloudProviderCredentialStep = ({
       </Text>
       <div className={classes.cloudProviderCards}>
         <CloudProviderCard
-          active={wizardContext.provider === 'aws'}
+          active={wizardContext.provider === CloudProviders.Aws}
           onClick={(value) => setWizardContext({ provider: value })}
-          type="aws"
+          type={CloudProviders.Aws}
         />
         <CloudProviderCard
-          active={wizardContext.provider === 'azure'}
+          active={wizardContext.provider === CloudProviders.Azure}
           onClick={(value) => setWizardContext({ provider: value })}
-          type="azure"
+          type={CloudProviders.Azure}
         />
       </div>
       {wizardContext.provider && (

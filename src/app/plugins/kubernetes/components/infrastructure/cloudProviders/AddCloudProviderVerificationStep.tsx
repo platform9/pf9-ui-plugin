@@ -8,6 +8,7 @@ import { objSwitchCase } from 'utils/fp'
 import Progress from 'core/components/progress/Progress'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import Text from 'core/elements/text'
+import { CloudProviders } from './model'
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -37,8 +38,8 @@ const AddCloudProviderVerificationStep = ({ wizardContext, setWizardContext }: P
   const classes = useStyles({})
 
   const ActiveForm = objSwitchCaseAny({
-    aws: AwsCloudProviderVerification,
-    azure: AzureCloudProviderVerification,
+    [CloudProviders.Aws]: AwsCloudProviderVerification,
+    [CloudProviders.Azure]: AzureCloudProviderVerification,
   })(wizardContext.provider)
 
   return (

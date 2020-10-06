@@ -6,14 +6,11 @@ const styles = (theme) => ({
   baseButton: {
     margin: theme.spacing(1),
   },
-  noMarginButton: {
-    borderRadius: 2,
-  },
 })
 
-const SubmitButton = ({ children, classes, disabled, noMargin = false, ...rest }) => {
+const SubmitButton = ({ children, classes, disabled, ...rest }) => {
   const params = {
-    className: noMargin ? classes.noMarginButton : classes.baseButton,
+    className: classes.baseButton,
     color: 'primary',
     disabled,
     ...rest,

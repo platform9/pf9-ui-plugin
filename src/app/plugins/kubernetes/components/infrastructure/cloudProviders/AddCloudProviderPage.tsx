@@ -7,12 +7,13 @@ import { routes } from 'core/utils/routes'
 import AddCloudProviderCredentialStep from './AddCloudProviderCredentialStep'
 import AddCloudProviderVerificationStep from './AddCloudProviderVerificationStep'
 import FormWrapperDefault from 'core/components/FormWrapper'
+import { CloudProviders } from './model'
 const FormWrapper: any = FormWrapperDefault // types on forward ref .js file dont work well.
 
 const formTitle = ({ provider }) => {
-  if (provider === 'aws') {
+  if (provider === CloudProviders.Aws) {
     return 'Create AWS Cloud Provider'
-  } else if (provider === 'azure') {
+  } else if (provider === CloudProviders.Azure) {
     return 'Create Azure Cloud Provider'
   }
   return 'Create Cloud Provider'
@@ -22,11 +23,11 @@ const AddCloudProviderPage = () => {
   const { history } = useReactRouter()
   const [submittingStep, setSubmittingStep] = useState(false)
   const submitLastStep = (params) => {
-    history.push(routes.cloudProviders.edit.path().replace(':id', params.cloudProviderId))
+    history.push(routes.cloudProviders.edit.path({ id: params.cloudProviderId }))
   }
 
   const initialContext = {
-    provider: new URLSearchParams(location.search).get('type') || 'aws',
+    provider: new URLSearchParams(location.search).get('type') || CloudProviders.Aws,
   }
 
   return (
@@ -44,7 +45,11 @@ const AddCloudProviderPage = () => {
         {({ wizardContext, setWizardContext, onNext }) => {
           return (
             <>
-              <WizardStep stepId="step1" label="Add Cloud Provider Credentials" keepContentMounted={false}>
+              <WizardStep
+                stepId="step1"
+                label="Add Cloud Provider Credentials"
+                keepContentMounted={false}
+              >
                 <AddCloudProviderCredentialStep
                   wizardContext={wizardContext}
                   setWizardContext={setWizardContext}
@@ -53,7 +58,11 @@ const AddCloudProviderPage = () => {
                   setSubmitting={setSubmittingStep}
                 />
               </WizardStep>
-              <WizardStep stepId="step2" label="Cloud Provider Verification" keepContentMounted={false}>
+              <WizardStep
+                stepId="step2"
+                label="Cloud Provider Verification"
+                keepContentMounted={false}
+              >
                 <AddCloudProviderVerificationStep
                   wizardContext={wizardContext}
                   setWizardContext={setWizardContext}

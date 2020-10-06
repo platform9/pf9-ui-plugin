@@ -20,11 +20,11 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginRight: theme.spacing(4),
   },
   checkIcon: {
-    color: theme.palette.success.main,
+    color: theme.palette.green[500],
     marginRight: theme.spacing(1),
   },
   timesIcon: {
-    color: theme.palette.error.main,
+    color: theme.palette.red[500],
     marginRight: theme.spacing(1),
   },
 }))
