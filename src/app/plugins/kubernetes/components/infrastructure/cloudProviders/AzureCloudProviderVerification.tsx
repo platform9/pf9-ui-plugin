@@ -1,7 +1,6 @@
 import React from 'react'
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
-import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import CloudProviderRegionPicklist from 'k8s/components/common/CloudProviderRegionPicklist'
 import ExternalLink from 'core/components/ExternalLink'
@@ -10,6 +9,7 @@ import useDataLoader from 'core/hooks/useDataLoader'
 import { loadCloudProviderDetails } from './actions'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import Text from 'core/elements/text'
+import { RegionAvailability } from './helpers'
 
 const useStyles = makeStyles((theme: Theme) => ({
   field: {
@@ -34,31 +34,6 @@ interface Props {
   setWizardContext: any
 }
 
-const RegionAvailability = ({ regions }) => {
-  const classes = useStyles({})
-  const available = regions?.length
-
-  return (
-    <>
-      {available ? (
-        <Text variant="body2" className={classes.spaceRight}>
-          <FontAwesomeIcon className={classes.checkIcon} solid>
-            check-circle
-          </FontAwesomeIcon>
-          Regions Available
-        </Text>
-      ) : (
-        <Text variant="body2" className={classes.spaceRight}>
-          <FontAwesomeIcon className={classes.timesIcon} solid>
-            times-circle
-          </FontAwesomeIcon>
-          No Regions Available
-        </Text>
-      )}
-    </>
-  )
-}
-
 const AzureCloudProviderVerification = ({ wizardContext, setWizardContext }: Props) => {
   const classes = useStyles({})
 
@@ -73,7 +48,7 @@ const AzureCloudProviderVerification = ({ wizardContext, setWizardContext }: Pro
         middleHeader={
           <>
             {wizardContext.cloudProviderId && !regionsLoading && (
-              <RegionAvailability regions={regions}></RegionAvailability>
+              <RegionAvailability classes={classes} regions={regions}></RegionAvailability>
             )}
           </>
         }

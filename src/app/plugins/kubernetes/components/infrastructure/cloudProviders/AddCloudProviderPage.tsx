@@ -8,6 +8,7 @@ import AddCloudProviderCredentialStep from './AddCloudProviderCredentialStep'
 import AddCloudProviderVerificationStep from './AddCloudProviderVerificationStep'
 import FormWrapperDefault from 'core/components/FormWrapper'
 import { CloudProviders } from './model'
+import DocumentMeta from 'core/components/DocumentMeta'
 const FormWrapper: any = FormWrapperDefault // types on forward ref .js file dont work well.
 
 const formTitle = ({ provider }) => {
@@ -31,48 +32,51 @@ const AddCloudProviderPage = () => {
   }
 
   return (
-    <FormWrapper
-      title="Add New Cloud Provider"
-      backUrl={routes.cloudProviders.list.path()}
-      loading={submittingStep}
-    >
-      <Wizard
-        onComplete={submitLastStep}
-        context={initialContext}
-        hideBack={true}
-        finishAndReviewLabel="Done"
+    <>
+      <DocumentMeta title="Add Cloud Provider" bodyClasses={['form-view']} />
+      <FormWrapper
+        title="Add New Cloud Provider"
+        backUrl={routes.cloudProviders.list.path()}
+        loading={submittingStep}
       >
-        {({ wizardContext, setWizardContext, onNext }) => {
-          return (
-            <>
-              <WizardStep
-                stepId="step1"
-                label="Add Cloud Provider Credentials"
-                keepContentMounted={false}
-              >
-                <AddCloudProviderCredentialStep
-                  wizardContext={wizardContext}
-                  setWizardContext={setWizardContext}
-                  onNext={onNext}
-                  title={formTitle(wizardContext)}
-                  setSubmitting={setSubmittingStep}
-                />
-              </WizardStep>
-              <WizardStep
-                stepId="step2"
-                label="Cloud Provider Verification"
-                keepContentMounted={false}
-              >
-                <AddCloudProviderVerificationStep
-                  wizardContext={wizardContext}
-                  setWizardContext={setWizardContext}
-                />
-              </WizardStep>
-            </>
-          )
-        }}
-      </Wizard>
-    </FormWrapper>
+        <Wizard
+          onComplete={submitLastStep}
+          context={initialContext}
+          hideBack={true}
+          finishAndReviewLabel="Done"
+        >
+          {({ wizardContext, setWizardContext, onNext }) => {
+            return (
+              <>
+                <WizardStep
+                  stepId="step1"
+                  label="Add Cloud Provider Credentials"
+                  keepContentMounted={false}
+                >
+                  <AddCloudProviderCredentialStep
+                    wizardContext={wizardContext}
+                    setWizardContext={setWizardContext}
+                    onNext={onNext}
+                    title={formTitle(wizardContext)}
+                    setSubmitting={setSubmittingStep}
+                  />
+                </WizardStep>
+                <WizardStep
+                  stepId="step2"
+                  label="Cloud Provider Verification"
+                  keepContentMounted={false}
+                >
+                  <AddCloudProviderVerificationStep
+                    wizardContext={wizardContext}
+                    setWizardContext={setWizardContext}
+                  />
+                </WizardStep>
+              </>
+            )
+          }}
+        </Wizard>
+      </FormWrapper>
+    </>
   )
 }
 

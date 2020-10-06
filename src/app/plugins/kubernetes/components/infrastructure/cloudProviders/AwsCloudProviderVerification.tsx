@@ -14,6 +14,7 @@ import { loadCloudProviderDetails, loadCloudProviderRegionDetails } from './acti
 import { pathStrOr } from 'utils/fp'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import Text from 'core/elements/text'
+import { getIcon, getIconClass, RegionAvailability } from './helpers'
 
 const useStyles = makeStyles((theme: Theme) => ({
   field: {
@@ -24,11 +25,11 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginRight: theme.spacing(4),
   },
   checkIcon: {
-    color: theme.palette.success.main,
+    color: theme.palette.green[500],
     marginRight: theme.spacing(1),
   },
   timesIcon: {
-    color: theme.palette.error.main,
+    color: theme.palette.red[500],
     marginRight: theme.spacing(1),
   },
   circleIcon: {
@@ -45,59 +46,30 @@ interface Props {
   setWizardContext: any
 }
 
-const RegionAvailability = ({ regions }) => {
-  const classes = useStyles({})
-  const available = regions?.length
+const getRoute53String = (classes, loading, regionId, available) =>
+  loading || !regionId
+    ? 'Region needed for Route 53'
+    : available
+    ? 'Route 53 Domains Available'
+    : 'Route 53 Domains Unavailable'
 
-  return (
-    <>
-      {available ? (
-        <Text variant="body2" className={classes.spaceRight}>
-          <FontAwesomeIcon className={classes.checkIcon} solid>
-            check-circle
-          </FontAwesomeIcon>
-          Regions Available
-        </Text>
-      ) : (
-        <Text variant="body2" className={classes.spaceRight}>
-          <FontAwesomeIcon className={classes.timesIcon} solid>
-            times-circle
-          </FontAwesomeIcon>
-          No Regions Available
-        </Text>
-      )}
-    </>
-  )
-}
+const getSshKeyString = (classes, loading, regionId, available) =>
+  loading || !regionId
+    ? 'Region needed for SSH keys'
+    : available
+    ? 'SSH Keys Detected'
+    : 'No SSH Keys Detected'
 
 const Route53Availability = ({ domains, loading, regionId }) => {
   const classes = useStyles({})
   const available = domains?.length
   return (
-    <>
-      {!regionId || loading ? (
-        <Text variant="body2" className={classes.spaceRight}>
-          <FontAwesomeIcon className={classes.circleIcon} solid>
-            circle
-          </FontAwesomeIcon>
-          Region needed for Route 53
-        </Text>
-      ) : available ? (
-        <Text variant="body2" className={classes.spaceRight}>
-          <FontAwesomeIcon className={classes.checkIcon} solid>
-            check-circle
-          </FontAwesomeIcon>
-          Route 53 Domains Available
-        </Text>
-      ) : (
-        <Text variant="body2" className={classes.spaceRight}>
-          <FontAwesomeIcon className={classes.timesIcon} solid>
-            times-circle
-          </FontAwesomeIcon>
-          Route 53 Domains Unavailable
-        </Text>
-      )}
-    </>
+    <Text variant="body2" className={classes.spaceRight}>
+      <FontAwesomeIcon className={getIconClass(classes, loading, regionId, available)} solid>
+        {getIcon(classes, loading, regionId, available)}
+      </FontAwesomeIcon>
+      {getRoute53String(classes, loading, regionId, available)}
+    </Text>
   )
 }
 
@@ -106,30 +78,12 @@ const SshKeyAvailability = ({ keypairs, loading, regionId }) => {
   const available = keypairs?.length
 
   return (
-    <>
-      {!regionId || loading ? (
-        <Text variant="body2" className={classes.spaceRight}>
-          <FontAwesomeIcon className={classes.circleIcon} solid>
-            circle
-          </FontAwesomeIcon>
-          Region needed for SSH keys
-        </Text>
-      ) : available ? (
-        <Text variant="body2" className={classes.spaceRight}>
-          <FontAwesomeIcon className={classes.checkIcon} solid>
-            check-circle
-          </FontAwesomeIcon>
-          SSH Keys Detected
-        </Text>
-      ) : (
-        <Text variant="body2" className={classes.spaceRight}>
-          <FontAwesomeIcon className={classes.timesIcon} solid>
-            times-circle
-          </FontAwesomeIcon>
-          No SSH Keys Detected
-        </Text>
-      )}
-    </>
+    <Text variant="body2" className={classes.spaceRight}>
+      <FontAwesomeIcon className={getIconClass(classes, loading, regionId, available)} solid>
+        {getIcon(classes, loading, regionId, available)}
+      </FontAwesomeIcon>
+      {getSshKeyString(classes, loading, regionId, available)}
+    </Text>
   )
 }
 
@@ -155,7 +109,7 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
         middleHeader={
           <>
             {wizardContext.cloudProviderId && !regionsLoading && (
-              <RegionAvailability regions={regions}></RegionAvailability>
+              <RegionAvailability classes={classes} regions={regions}></RegionAvailability>
             )}
           </>
         }
