@@ -118,11 +118,11 @@ const styles = (theme) => ({
     margin: 0,
   },
   activeNavItem: {
-    backgroundColor: theme.palette.background.default,
+    backgroundColor: theme.components.sidebar.activeBackground,
     color: theme.components.sidebar.activeText,
   },
   currentNavLink: {
-    backgroundColor: [theme.palette.background.default, '!important'],
+    backgroundColor: [theme.components.sidebar.activeBackground, '!important'],
     color: [theme.components.sidebar.activeText, '!important'],
 
     '&:hover *': {
@@ -170,13 +170,13 @@ const styles = (theme) => ({
     backgroundColor: theme.components.sidebar.background,
     color: theme.components.sidebar.text,
 
-    transition: 'background .2s ease',
+    transition: 'background .3s ease',
 
     '& i, & span': {
-      transition: 'color .2s ease',
+      transition: 'color .3s ease',
     },
     '&:hover': {
-      backgroundColor: theme.palette.background.paper,
+      backgroundColor: theme.components.sidebar.activeBackground,
     },
     '&:hover *': {
       color: theme.components.sidebar.hoverText, // override child color styles
