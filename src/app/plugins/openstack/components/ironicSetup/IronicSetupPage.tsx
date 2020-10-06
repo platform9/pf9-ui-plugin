@@ -195,7 +195,7 @@ const SetupWizard = ({ initialContext, startingStep, setSubmittingStep }) => {
           <>
             {/*
               keepContentMounted={false} is required due to the useEffects
-              used in the step components that call onNext. If kept false,
+              used in the step components that call onNext. If kept true,
               the onEffect will trigger again on other steps and things
               start breaking.
             */}

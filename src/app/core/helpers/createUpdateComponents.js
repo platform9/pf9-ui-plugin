@@ -63,7 +63,7 @@ const createUpdateComponents = (options) => {
     )
 
     return (
-      <FormWrapper title={title} backUrl={listUrl}>
+      <FormWrapper title={title} backUrl={listUrl} isUpdateForm={true}>
         <Progress
           message={`${updating ? 'Updating data...' : 'Loading data...'}`}
           loading={isEmpty(initialValues) || loading || updating}

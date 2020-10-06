@@ -45,7 +45,7 @@ const { keystone } = ApiClient.getInstance()
 const useStyles = makeStyles((theme: Theme) => ({
   '@global': {
     'body.form-view #main': {
-      backgroundColor: theme.palette.grey['200'],
+      backgroundColor: theme.palette.grey['100'],
     },
   },
   appFrame: {

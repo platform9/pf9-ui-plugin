@@ -4,7 +4,7 @@ import { pf9DocOrigin } from 'app/constants'
 const k8sBaseUrl = `${pf9DocOrigin}/kubernetes`
 const microsoftDocBaseUrl = 'https://docs.microsoft.com/en-us'
 const amazonDocBaseUrl = 'http://docs.aws.amazon.com'
-const pf9GitHubRepoUrl = 'https://github.com/platform9'
+const pf9GitHubRepoUrl = 'https://raw.githubusercontent.com/platform9'
 export const pf9SupportBaseUrl = 'https://support.platform9.com'
 const communityBaseUrl = 'https://community.platform9.com'
 const k8sDocBaselUrl = 'https://kubernetes.io/docs'
@@ -28,10 +28,11 @@ export const pmkDocumentationLink = `${k8sBaseUrl}/introduction/overview`
 export const awsPrerequisitesLink = `${k8sBaseUrl}/aws/`
 export const awsNetworkingConfigurationsLink = `${k8sBaseUrl}/networking/configurations-supported-aws-cloud-provider/`
 export const awsAccessHelpLink = `${amazonDocBaseUrl}/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys`
-export const iamPolicyLink = `${pf9GitHubRepoUrl}/support-locker/blob/master/pmk/aws-policy.json`
+export const iamPolicyLink = `${pf9GitHubRepoUrl}/support-locker/master/pmk/aws-policy.json`
+export const awsRoute53HelpLink = `${amazonDocBaseUrl}/Route53/latest/DeveloperGuide/dns-configuring-new-domain.html`
 
 // Azure
-export const azurePrerequisitesLink = `${k8sBaseUrl}/azure/`
+export const azurePrerequisitesLink = `${k8sBaseUrl}/public-cloud/azure-prerequisites`
 export const azureServicePrincipalPortalLink = `${microsoftDocBaseUrl}/azure/active-directory/develop/howto-create-service-principal-portal`
 export const azureGetValuesForSigninginLink = `${microsoftDocBaseUrl}/azure/active-directory/develop/howto-create-service-principal-portal#get-values-for-signing-in`
 export const azureCreateANewApplicationSecretLink = `${microsoftDocBaseUrl}/azure/active-directory/develop/howto-create-service-principal-portal#create-a-new-application-secret`

@@ -67,6 +67,7 @@ const useQontoStepIconStyles = makeStyles((theme) => ({
 
 const useWizardStepperStyles = makeStyles((theme) => ({
   stepperRoot: {
+    backgroundColor: 'transparent',
     padding: 0,
     '& .MuiStepConnector-root': {
       display: 'none',

@@ -8,36 +8,52 @@ const useStyles = makeStyles((theme) => ({
   root: {
     filter: ({ disabled }) => (disabled ? 'grayscale(100%)' : null),
     opacity: ({ disabled }) => (disabled ? 0.7 : 1),
-    margin: theme.spacing(1, 3),
+    margin: theme.spacing(1, 1.5),
+    padding: theme.spacing(1.5, 0, .5, 0),
     userSelect: 'none',
     textAlign: 'center',
     display: 'flex',
     flexFlow: 'column nowrap',
     alignItems: 'center',
-    justifyContent: 'flex-start',
-    cursor: ({ disabled }) => (disabled ? 'default' : 'pointer'),
-  },
-  logoContainer: {
-    display: 'flex',
     justifyContent: 'center',
-    alignItems: 'center',
-    width: 132,
-    height: 82,
-    margin: ({ active }) => (active ? 0 : 1),
-    border: ({ active }) => (active ? '2px solid #4aa3df' : '1px solid #999'),
-    borderRadius: 10,
-    backgroundColor: '#FFF',
+    cursor: ({ disabled }) => (disabled ? 'default' : 'pointer'),
+    border: ({ active }) => (active ? `1px solid ${theme.palette.blue[500]}` : `1px solid transparent`),
+    borderRadius: 4,
+    backgroundColor: ({ active }) => (active ? theme.palette.blue[100] : theme.palette.grey['000']),
+    width: 240,
+    height: 124,
     '& img': {
-      maxWidth: 100,
-      maxHeight: 60,
+      maxWidth: 160,
+      maxHeight: 100,
+      width: '100%',
     },
     '&:hover': {
-      margin: ({ disabled }) => (!disabled ? 0 : 1),
-      border: ({ disabled }) => (!disabled ? '2px solid #4aa3df' : '1px solid #999'),
+      // margin: ({ disabled }) => (!disabled ? 0 : 1),
+      border: ({ disabled }) => (!disabled ? '1px solid #4aa3df' : '1px solid #999'),
     },
   },
+  // logoContainer: {
+  //   display: 'flex',
+  //   justifyContent: 'center',
+  //   alignItems: 'center',
+  //   width: 132,
+  //   height: 82,
+  //   margin: ({ active }) => (active ? 0 : 1),
+  //   border: ({ active }) => (active ? '2px solid #4aa3df' : '1px solid #999'),
+  //   borderRadius: 10,
+  //   backgroundColor: '#FFF',
+  //   '& img': {
+  //     maxWidth: 100,
+  //     maxHeight: 60,
+  //   },
+  //   '&:hover': {
+  //     margin: ({ disabled }) => (!disabled ? 0 : 1),
+  //     border: ({ disabled }) => (!disabled ? '2px solid #4aa3df' : '1px solid #999'),
+  //   },
+  // },
   label: {
     marginTop: theme.spacing(1),
+    color: theme.palette.grey[700],
   },
 }))
 
@@ -45,11 +61,12 @@ const iconSizes = { small: '', medium: '@2x', large: '@3x' }
 const iconSize = iconSizes.small
 const rootPath = '/ui/images/icon-cloudproviders'
 const icons = {
-  aws: `${rootPath}/icon-cloudproviders-aws${iconSize}.png`,
-  azure: `${rootPath}/icon-cloudproviders-azure${iconSize}.png`,
+  aws: `${rootPath}/cloudaws-default${iconSize}.png`,
+  azure: `${rootPath}/cloudazure-default${iconSize}.png`,
   openstack: `${rootPath}/icon-cloudproviders-openstack${iconSize}.png`,
   vmware: `${rootPath}/icon-cloudproviders-vmware${iconSize}.png`,
-  local: `${rootPath}/icon-cloudproviders-other${iconSize}.png`,
+  // local: `${rootPath}/icon-cloudproviders-other${iconSize}.png`,
+  local: `${rootPath}/bare-metal.svg`,
 }
 
 const labels = {
@@ -74,7 +91,7 @@ const CloudProviderCard = (props) => {
       <div className={classes.logoContainer}>
         <img alt={type} src={image} />
       </div>
-      <Text className={classes.label} variant="subtitle2">
+      <Text className={classes.label} variant="caption4">
         {label}
       </Text>
     </div>
