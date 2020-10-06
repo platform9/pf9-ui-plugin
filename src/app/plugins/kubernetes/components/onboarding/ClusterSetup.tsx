@@ -5,7 +5,7 @@ import { makeStyles } from '@material-ui/styles'
 import ExpansionPanel from 'core/components/expansionPanel/ExpansionPanel'
 import Theme from 'core/themes/model'
 import OnboardWizard from 'k8s/components/onboarding/OnboardWizard'
-import NextButton from 'core/components/buttons/NextButton'
+import Button from 'core/elements/button'
 import useReactRouter from 'use-react-router'
 import CodeBlock from 'core/components/CodeBlock'
 import { onboardingAccessSetup, onboardingMonitoringSetup } from 'app/constants'
@@ -121,13 +121,14 @@ const ClusterSetup = ({ onComplete, initialPanel = Panels.Cluster }: Props) => {
           completed={!!clusters.length}
           summary="Create Your Cluster"
         >
-          <Text variant="body1">
+          <Text variant="body2">
             Create your first Kubernetes cluster on AWS, Azure or BareOS (Physical or Virtual
             Machines)
           </Text>
-          <NextButton showForward={false} onClick={handleCreateCluster}>
+          <br />
+          <Button textVariant="body2" onClick={handleCreateCluster}>
             Create Cluster
-          </NextButton>
+          </Button>
         </ExpansionPanel>
         <ExpansionPanel
           expanded={activePanels.has(Panels.Access)}
@@ -138,7 +139,7 @@ const ClusterSetup = ({ onComplete, initialPanel = Panels.Cluster }: Props) => {
           onSkip={handleSkipAccess}
           skipConfirmTitle="Skip the API access step in your getting started wizard?"
         >
-          <Text className={classes.centerContent} variant="body1" component="span">
+          <Text className={classes.centerContent} variant="body2" component="span">
             To access your cluster, you need to download the kubeconfig for your cluster and
             download <CodeBlock>kubectl</CodeBlock>
           </Text>
@@ -149,9 +150,10 @@ const ClusterSetup = ({ onComplete, initialPanel = Panels.Cluster }: Props) => {
           >
             Getting Started with Kubectl
           </ExternalLink>
-          <NextButton showForward={false} onClick={handleAccessCluster}>
+          <br />
+          <Button textVariant="body2" onClick={handleAccessCluster}>
             API Access
-          </NextButton>
+          </Button>
         </ExpansionPanel>
         <ExpansionPanel
           expanded={activePanels.has(Panels.Monitoring)}
@@ -162,7 +164,7 @@ const ClusterSetup = ({ onComplete, initialPanel = Panels.Cluster }: Props) => {
           onSkip={handleSkipMonitoring}
           skipConfirmTitle="Skip the monitoring step in your getting started wizard?"
         >
-          <Text variant="body1" component="span">
+          <Text variant="body2" component="span">
             Now that your cluster is created, enable monitoring to view the cluster’s health stats
             realtime in a dashboard
           </Text>
@@ -209,9 +211,9 @@ const MonitoringPrompt = ({ clusters, onComplete }: IMonitoringPromptProps) => {
                 <Text variant="subtitle2">{cluster.name}</Text>
               </TableCell>
               <TableCell>
-                <NextButton showForward={false} onClick={toggleDialog(cluster)}>
+                <Button textVariant="body2" onClick={toggleDialog(cluster)}>
                   Enable
-                </NextButton>
+                </Button>
               </TableCell>
             </TableRow>
           ))}

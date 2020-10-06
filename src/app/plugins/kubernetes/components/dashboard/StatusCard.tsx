@@ -8,7 +8,6 @@ import useDataLoader from 'core/hooks/useDataLoader'
 // Components
 import { CircularProgress } from '@material-ui/core'
 import Text from 'core/elements/text'
-import { hexToRGBA } from 'core/utils/colorHelpers'
 import CardButton from 'core/components/buttons/CardButton'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import PieUsageWidget from 'core/components/widgets/PieUsageWidget'
@@ -19,7 +18,7 @@ import Theme from 'core/themes/model'
 const useStyles = makeStyles<Theme, { actionRow: boolean; chartRow: boolean }>((theme) => ({
   headerIcon: {
     fontSize: '30px',
-    color: theme.palette.text.secondary,
+    color: theme.palette.grey[700],
     height: '26px',
     marginTop: '6px',
   },
@@ -29,27 +28,31 @@ const useStyles = makeStyles<Theme, { actionRow: boolean; chartRow: boolean }>((
   contentContainer: {
     display: 'grid',
     gridTemplateRows: ({ actionRow, chartRow }) =>
-      `85px${actionRow ? ' 76px' : ''}${chartRow ? ' 1fr' : ''}`,
-    backgroundColor: theme.components.dashboardCard.background,
-    minWidth: '270px',
-    minHeight: '165px',
-    padding: theme.spacing(),
-    borderRadius: '5px',
-    transition: 'transform .1s ease',
-    boxShadow:
-      '0 2.5px 1.5px -3.5px rgba(0, 0, 0, 0.2), 0 1.5px 7px 1px rgba(0, 0, 0, 0.12), 0 1px 3px -1.5px rgba(0, 0, 0, 0.14)',
-    '&:hover': {
-      backgroundColor: hexToRGBA(theme.components.dashboardCard.background, 0.95),
-      transform: 'scale(1.025)',
-    },
+      `60px${actionRow ? ' 85px' : ''}${chartRow ? ' 1fr' : ''}`,
+    minWidth: '275px',
+    minHeight: '135px',
+    border: `solid 1px ${theme.palette.grey[300]}`,
+    borderRadius: 4,
+    padding: theme.spacing(1, 1, 0, 1),
+    backgroundColor: theme.palette.grey['000'],
     overflowX: 'hidden',
   },
   text: {
-    color: theme.components.dashboardCard.primary,
-    fontSize: '40px',
+    color: theme.palette.grey[900],
+    fontWeight: 100,
+    backgroundColor: theme.palette.grey['000'],
+    position: 'relative',
+    bottom: -23,
+    padding: theme.spacing(0, 3, 0, 2),
   },
   cardTitle: {
-    color: theme.components.dashboardCard.text,
+    color: theme.palette.grey[900],
+    paddingLeft: theme.spacing(0.5),
+  },
+  cardTitleLink: {
+    display: 'grid',
+    gridTemplateColumns: 'minmax(min-content, max-content) 1fr',
+    alignItems: 'baseline',
   },
   arrowIcon: {
     background: theme.components.dashboardCard.primary,
@@ -67,20 +70,21 @@ const useStyles = makeStyles<Theme, { actionRow: boolean; chartRow: boolean }>((
     display: 'grid',
     gridTemplateColumns: '1fr 35px',
     alignItems: 'center',
-    padding: theme.spacing(0, 1),
+    padding: theme.spacing(0, 1, 0, 0),
     borderBottom: `1px solid ${theme.components.dashboardCard.divider}`,
   },
   links: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 35px',
-    gridTemplateAreas: '"add-action list-action"',
-    alignContent: 'center',
-    padding: theme.spacing(0, 1),
+    display: 'flex',
+    alignItems: 'flex-end',
+    justifyContent: 'flex-end',
+    padding: theme.spacing(0, 1, 2, 1),
   },
   chart: {
     minHeight: 150,
     display: 'grid',
     alignContent: 'center',
+    justifyItems: 'center',
+    color: theme.palette.grey[900],
     borderTop: ({ actionRow }) =>
       `${actionRow ? 1 : 0}px solid ${theme.components.dashboardCard.divider}`,
   },
@@ -129,14 +133,13 @@ const StatusCard: FunctionComponent<StatusCardProps> = ({
     contentContainer,
     headerIcon,
     cardTitle,
+    cardTitleLink,
     text,
-    arrowIcon,
     header,
     links,
     chart,
     spinner,
     addAction,
-    listAction,
   } = useStyles({ chartRow: !!pieData, actionRow })
 
   const GraphComponent = graphType === 'donut' ? DonutWidget : PieUsageWidget
@@ -144,32 +147,27 @@ const StatusCard: FunctionComponent<StatusCardProps> = ({
   return (
     <div className={clsx(contentContainer, className)}>
       <header className={header}>
-        <Link to={route}>
-          <Text variant="h6" className={cardTitle}>
+        <Link to={route} className={cardTitleLink}>
+          <Text variant="h1" className={text}>
+            {loading ? <CircularProgress size={38} color="inherit" /> : quantity}
+          </Text>
+          <Text variant="body2" component="h2" className={cardTitle}>
             {title}
           </Text>
         </Link>
         <FontAwesomeIcon className={headerIcon}>{icon}</FontAwesomeIcon>
-        {loading ? <CircularProgress size={32} /> : <span className={text}>{quantity}</span>}
       </header>
-      {actionRow && (
+      {actionRow && addRoute && (
         <div className={links}>
-          {addRoute && (
-            <Link to={addRoute} className={addAction}>
-              <CardButton>Add {entity}</CardButton>
-            </Link>
-          )}
-          <Link to={route} className={listAction}>
-            <FontAwesomeIcon size="2x" className={arrowIcon}>
-              arrow-right
-            </FontAwesomeIcon>
+          <Link to={addRoute} className={addAction}>
+            <CardButton>Add {entity}</CardButton>
           </Link>
         </div>
       )}
       {pieData && (
         <div className={chart}>
           {loading ? (
-            <CircularProgress className={spinner} size={64} />
+            <CircularProgress className={spinner} color="inherit" size={64} />
           ) : (
             <GraphComponent sideLength={110} arcWidth={12} primary={piePrimary} data={pieData} />
           )}
