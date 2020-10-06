@@ -14,6 +14,7 @@ import { getUsageTotals } from 'k8s/util/calcUsageTotals'
 // Types
 import { cloudStatusCardProps } from 'k8s/components/dashboard/DashboardPage'
 import { ICloudProvidersSelector } from './model'
+import DocumentMeta from 'core/components/DocumentMeta'
 
 const maxUsagePaths = {
   computeMaxPath: 'usage.compute.max',
@@ -37,6 +38,7 @@ export const CloudProviderListHeader = () => {
       report={cloudStatusCardProps}
       loaderFn={cloudProviderActions.list}
       totalUsageFn={handleGetUsage}
+      documentMeta={<DocumentMeta title="Cloud Providers" />}
     />
   )
 }

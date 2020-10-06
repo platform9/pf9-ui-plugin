@@ -12,6 +12,7 @@ import { prop } from 'ramda'
 import { useSelector } from 'react-redux'
 import { sessionStoreKey, SessionState } from 'core/session/sessionReducers'
 import Theme from 'core/themes/model'
+import DocumentMeta from 'core/components/DocumentMeta'
 
 const tabTogglerSpacing = {
   [InfrastructureTabs.Clusters]: 185,
@@ -80,6 +81,7 @@ const InfrastructurePage = () => {
   )
   return (
     <PageContainer>
+      <DocumentMeta title="Infrastructure" />
       <Tabs onChange={handleChange}>
         <Tab value={InfrastructureTabs.Clusters} label="Clusters">
           {header}
