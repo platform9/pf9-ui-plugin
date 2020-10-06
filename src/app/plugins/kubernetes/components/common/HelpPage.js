@@ -8,7 +8,6 @@ import {
   gettingStartedHelpLink,
   tutorialsHelpLink,
   slackLink,
-  emailSupportLink,
   forumHelpLink,
 } from 'k8s/links'
 import ExternalLink from 'core/components/ExternalLink'
@@ -142,12 +141,6 @@ const HelpPage = () => {
           icon="comments"
           src={forumHelpLink}
           action="Go to forum"
-        />
-        <SupportCard
-          title="Send us an Email"
-          icon="envelope"
-          src={emailSupportLink}
-          action="Send Email"
         />
         <SupportCard
           title="Reach out on Slack"
