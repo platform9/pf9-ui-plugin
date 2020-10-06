@@ -16,20 +16,17 @@ interface Props extends Omit<ButtonProps, 'variant'> {
 const Button = ({
   color = 'primary',
   variant = 'light',
-  textVariant,
+  textVariant = undefined,
   className = undefined,
   children,
   disabled = false,
   ...rest
 }: Props) => {
   const { button, centerText } = useStyles({ variant, color })
+  const spanTextVariant = textVariant || color === 'primary' ? 'buttonPrimary' : 'buttonSecondary'
   return (
     <button className={clsx(button, className, { disabled })} {...rest}>
-      <Text
-        className={centerText}
-        component="span"
-        variant={textVariant || color === 'primary' ? 'buttonPrimary' : 'buttonSecondary'}
-      >
+      <Text className={centerText} component="span" variant={spanTextVariant}>
         {children}
       </Text>
     </button>

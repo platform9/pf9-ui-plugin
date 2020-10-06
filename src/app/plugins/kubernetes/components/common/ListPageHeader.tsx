@@ -28,8 +28,14 @@ interface IListPageHeaderProps<T> {
   report: IStatusCardWithFilterProps
   totalUsageFn: (items: T[]) => IUsageTotals
   loaderFn: Function
+  documentMeta?: JSX.Element
 }
-function ListPageHeader<T>({ loaderFn, report, totalUsageFn }: IListPageHeaderProps<T>) {
+function ListPageHeader<T>({
+  loaderFn,
+  report,
+  totalUsageFn,
+  documentMeta,
+}: IListPageHeaderProps<T>) {
   const classes = useStyles({})
   const [data, loading, reload]: IUseDataLoader<T> = useDataLoader(loaderFn, null, {
     loadingFeedback: false,
@@ -37,6 +43,7 @@ function ListPageHeader<T>({ loaderFn, report, totalUsageFn }: IListPageHeaderPr
   const totals = totalUsageFn(data)
   return (
     <>
+      {documentMeta && documentMeta}
       <PollingData hidden loading={loading} onReload={reload} refreshDuration={1000 * 10} />
       <div className={classes.container}>
         <ListPageHeaderCard {...report} className={classes.card} />

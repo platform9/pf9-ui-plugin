@@ -13,6 +13,7 @@ import { getUsageTotals } from 'k8s/util/calcUsageTotals'
 // Types
 import { nodeStatusCardProps } from 'k8s/components/dashboard/DashboardPage'
 import { INodesSelector } from './model'
+import DocumentMeta from 'core/components/DocumentMeta'
 
 const maxUsagePaths = {
   computeMaxPath: 'combined.usage.compute.max',
@@ -36,6 +37,7 @@ export const NodeListHeader = () => {
       report={nodeStatusCardProps}
       loaderFn={loadNodes}
       totalUsageFn={handleGetUsage}
+      documentMeta={<DocumentMeta title="Nodes" />}
     />
   )
 }
