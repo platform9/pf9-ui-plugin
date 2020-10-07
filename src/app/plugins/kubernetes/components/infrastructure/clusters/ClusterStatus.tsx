@@ -75,16 +75,17 @@ interface Props {
   status?: IClusterStatus
   variant: StatusVariant
   iconStatus?: boolean
+  className?: any
 }
 
 const ClusterStatusSpan: FC<Props> = (props) => {
-  const { label, title, children, status, variant, iconStatus } = props
+  const { label, title, children, status, iconStatus, className } = props
   const { circle, label: labelCls, root, iconColor } = useStyles(props)
   return (
     <div className={root}>
       {label && <span className={labelCls}>{label}:</span>}
       <Tooltip title={title || children}>
-        <Text className={circle} variant={variant === 'header' ? 'body1' : 'body2'}>
+        <Text className={clsx(circle, className)} variant={'body2'}>
           {!!iconStatus && (
             <FontAwesomeIcon className={clsx(iconColor, iconMap.get(status).classes)}>
               {iconMap.get(status).icon}
@@ -132,6 +133,7 @@ export const ClusterHealthStatus: FC<IClusterStatusProps> = ({
   cluster,
   variant = 'table',
   message = undefined,
+  ...rest
 }) => {
   if (isTransientStatus(cluster.taskStatus)) {
     return renderTransientStatus(cluster, variant)
@@ -142,7 +144,12 @@ export const ClusterHealthStatus: FC<IClusterStatusProps> = ({
   if (cluster.connectionStatus === 'disconnected') {
     return (
       <div>
-        <ClusterStatusSpan title={message || 'Unknown'} status="unknown" variant={variant}>
+        <ClusterStatusSpan
+          title={message || 'Unknown'}
+          status="unknown"
+          variant={variant}
+          {...rest}
+        >
           {message || 'Unknown'}
         </ClusterStatusSpan>
         {cluster.taskError && renderErrorStatus(cluster.taskError, fields.nodesDetailsUrl, variant)}
@@ -153,7 +160,12 @@ export const ClusterHealthStatus: FC<IClusterStatusProps> = ({
   return (
     <div>
       {fields && (
-        <ClusterStatusSpan title={fields.message} status={fields.status} variant={variant}>
+        <ClusterStatusSpan
+          title={fields.message}
+          status={fields.status}
+          variant={variant}
+          {...rest}
+        >
           {variant === 'header' ? (
             fields.label
           ) : (
@@ -170,6 +182,7 @@ export const ClusterConnectionStatus: FC<IClusterStatusProps> = ({
   cluster,
   variant = 'table',
   message = undefined,
+  ...rest
 }) => {
   if (isTransientStatus(cluster.taskStatus)) {
     return renderTransientStatus(cluster, variant)
@@ -178,14 +191,19 @@ export const ClusterConnectionStatus: FC<IClusterStatusProps> = ({
 
   if (!fields) {
     return (
-      <ClusterStatusSpan title={message || 'Unknown'} status="unknown" variant={variant}>
+      <ClusterStatusSpan title={message || 'Unknown'} status="unknown" variant={variant} {...rest}>
         {message || 'Unknown'}
       </ClusterStatusSpan>
     )
   }
 
   return (
-    <ClusterStatusSpan title={fields.message} status={fields.clusterStatus} variant={variant}>
+    <ClusterStatusSpan
+      title={fields.message}
+      status={fields.clusterStatus}
+      variant={variant}
+      {...rest}
+    >
       {variant === 'header' ? (
         fields.label
       ) : (

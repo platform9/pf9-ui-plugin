@@ -37,6 +37,7 @@ import BannerContent from 'core/components/notifications/BannerContent'
 import { trackEvent } from 'utils/tracking'
 import ClusterUpgradeBanner from 'core/banners/ClusterUpgradeBanner'
 import Theme from 'core/themes/model'
+import DocumentMeta from 'core/components/DocumentMeta'
 
 declare let window: CustomWindow
 
@@ -310,6 +311,7 @@ const AuthenticatedContainer = () => {
 
   return (
     <>
+      <DocumentMeta title="Welcome" />
       <div className={classes.appFrame}>
         <Toolbar />
         <Navbar

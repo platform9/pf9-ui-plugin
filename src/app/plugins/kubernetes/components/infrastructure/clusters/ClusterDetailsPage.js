@@ -25,26 +25,20 @@ import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import PollingData from 'core/components/PollingData'
 import DownloadKubeConfigLink from './DownloadKubeConfigLink'
 import ExternalLink from 'core/components/ExternalLink'
+import { capitalizeString } from 'utils/misc'
+import { cloudProviderTypes } from 'k8s/components/infrastructure/cloudProviders/selectors'
 
 const oneSecond = 1000
 
 const useStyles = makeStyles((theme) => ({
-  cardBoarder: {
-    height: 1,
-    display: 'flex',
-    border: 'none',
-    backgroundColor: theme.palette.text.disabled,
-    borderRadius: '100%',
-    margin: theme.spacing(0, 1),
+  pageContainer: {
+    position: 'relative',
   },
   backLink: {
-    marginBottom: theme.spacing(2),
-    marginLeft: 'auto',
-  },
-  row: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    zIndex: 100,
   },
   statsContainer: {
     maxWidth: 1000,
@@ -65,42 +59,48 @@ const useStyles = makeStyles((theme) => ({
     width: 320,
     minHeight: 175,
     display: 'grid',
-    gridTemplateRows: ({ hasLinks }) => `58px 1fr 2px ${hasLinks ? 46 : 12}px`,
+    gridTemplateRows: ({ hasLinks }) => `62px 1fr ${hasLinks ? 56 : 12}px`,
     paddingTop: theme.spacing(),
+    backgroundColor: theme.palette.grey['000'],
+    border: `solid 1px ${theme.palette.grey[300]}`,
+    borderRadius: 4,
   },
   harderCardFooter: {
     display: 'grid',
     alignItems: 'center',
     paddingTop: theme.spacing(0.5),
     gridTemplateColumns: 'repeat(3, 1fr)',
+    background: theme.palette.grey[100],
+    borderTop: `solid 1px ${theme.palette.grey[300]}`,
   },
   headerCardBody: {
     display: 'block',
-    margin: theme.spacing(0, 3),
+    margin: theme.spacing(0, 4),
   },
   headerCardHeader: {
-    margin: theme.spacing(0, 2),
+    margin: theme.spacing(0.5, 3, 0, 3),
     display: 'grid',
     gridTemplateColumns: '1fr 38px',
     gridTemplateAreas: `
       "header icon"
       "cluster cluster"
     `,
-    '& h6': {
+    '& h1': {
       gridArea: 'header',
       margin: 0,
-      fontSize: theme.spacing(2.5),
-      color: theme.palette.text.primary,
+      color: theme.palette.grey[700],
     },
     '& p': {
       gridArea: 'cluster',
       margin: '4px 0 0px 8px',
-      fontSize: theme.spacing(2),
-      color: theme.palette.text.secondary,
+      color: theme.palette.grey[700],
     },
   },
+  statusColor: {
+    color: theme.palette.grey[700],
+  },
   headerIcon: {
-    color: theme.palette.text.secondary,
+    color: theme.palette.grey[700],
     gridArea: 'icon',
     fontSize: '30px',
     display: 'flex',
@@ -111,10 +111,10 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     alignItems: 'center',
     flexDirection: 'column',
-    fontSize: '12px',
+    ...theme.typography.caption3,
     '& i': {
       marginBottom: theme.spacing(0.5),
-      fontSize: theme.spacing(3),
+      fontSize: 22,
     },
   },
   tabContainer: {
@@ -131,37 +131,37 @@ const useStyles = makeStyles((theme) => ({
 const ClusterDetailsPage = () => {
   const { match } = useReactRouter()
   const classes = useStyles()
-  const [clusters, loading, reload] = useDataLoader(clusterActions.list)
+  const [clusters, loading, reload] = useDataLoader(clusterActions.list, undefined, {
+    loadingFeedback: false,
+  })
   const cluster = clusters.find((x) => x.uuid === match.params.id) || {}
+  const clusterHeader = <ClusterStatusAndUsage cluster={cluster} loading={loading} />
   return (
-    <PageContainer
-      header={
-        <SimpleLink src={routes.cluster.list.path()} className={classes.backLink}>
-          « Back to Cluster List
-        </SimpleLink>
-      }
-    >
-      <>
-        <PollingData hidden loading={loading} onReload={reload} refreshDuration={oneSecond * 10} />
-        <ClusterStatusAndUsage cluster={cluster} loading={loading} />
-        <Tabs>
-          <Tab value="nodes" label="Nodes">
-            <div className={classes.tabContainer}>
-              <ClusterNodes />
-            </div>
-          </Tab>
-          <Tab value="nodeHealth" label="Node Health">
-            <div className={classes.tabContainer}>
-              <NodeHealthWithTasksToggler />
-            </div>
-          </Tab>
-          <Tab value="clusterDetails" label="Cluster Details">
-            <div className={classes.tabContainer}>
-              <ClusterInfo />
-            </div>
-          </Tab>
-        </Tabs>
-      </>
+    <PageContainer className={classes.pageContainer}>
+      <PollingData hidden loading={loading} onReload={reload} refreshDuration={oneSecond * 10} />
+      <SimpleLink src={routes.cluster.list.path()} className={classes.backLink}>
+        « Back to Cluster List
+      </SimpleLink>
+      <Tabs>
+        <Tab value="nodes" label="Nodes">
+          <div className={classes.tabContainer}>
+            {clusterHeader}
+            <ClusterNodes />
+          </div>
+        </Tab>
+        <Tab value="nodeHealth" label="Node Health">
+          <div className={classes.tabContainer}>
+            {clusterHeader}
+            <NodeHealthWithTasksToggler />
+          </div>
+        </Tab>
+        <Tab value="clusterDetails" label="Cluster Details">
+          <div className={classes.tabContainer}>
+            {clusterHeader}
+            <ClusterInfo />
+          </div>
+        </Tab>
+      </Tabs>
     </PageContainer>
   )
 }
@@ -169,23 +169,33 @@ const ClusterDetailsPage = () => {
 export default ClusterDetailsPage
 
 const ClusterStatusAndUsage = ({ cluster, loading }) => {
-  const { usage = emptyObj, name, links = emptyObj } = cluster
+  const { usage = emptyObj, name, links = emptyObj, cloudProviderType, version } = cluster
   const classes = useStyles()
   const clusterLinks = {
     grafana: usage.grafanaLink,
     ...links,
   }
+  const deployment = cloudProviderTypes[cloudProviderType] || capitalizeString(cloudProviderType)
   return (
     <div className={classes.detailsHeader}>
-      <HeaderCard title="Cluster" subtitle={name} icon="project-diagram" links={clusterLinks}>
+      <HeaderCard
+        title={name}
+        subtitle={`${deployment} - ${version}`}
+        icon="project-diagram"
+        links={clusterLinks}
+      >
         <ClusterConnectionStatus
-          cluster={cluster}
+          iconStatus
+          className={classes.statusColor}
           variant="header"
+          cluster={cluster}
           message={loading ? 'loading' : undefined}
         />
         <ClusterHealthStatus
-          cluster={cluster}
+          iconStatus
+          className={classes.statusColor}
           variant="header"
+          cluster={cluster}
           message={loading ? 'loading' : undefined}
         />
       </HeaderCard>
@@ -200,18 +210,19 @@ const HeaderCard = ({ title, subtitle, icon, loading = false, links, children })
   const hasLinks = !!links.grafana || !!links.dashboard || !!links.kubeconfig
   const classes = useStyles({ hasLinks })
   return (
-    <Card className={classes.headerCardContainer}>
+    <Card className={classes.headerCardContainer} elevation={0}>
       <header className={classes.headerCardHeader}>
-        <Text variant="h6">{title}</Text>
-        <Text variant="subtitle1" component="p">
-          {subtitle}
+        <Text variant="subtitle1" component="h1">
+          {title}
         </Text>
         <FontAwesomeIcon className={clsx({ 'fa-spin': loading }, classes.headerIcon)}>
           {loading ? 'sync' : icon}
         </FontAwesomeIcon>
+        <Text variant="body2" component="p">
+          {subtitle}
+        </Text>
       </header>
       <div className={classes.headerCardBody}>{children}</div>
-      <hr className={classes.cardBoarder} />
       <footer className={classes.harderCardFooter}>
         {!!links.grafana && (
           <ExternalLink icon="chart-line" className={classes.verticalLink} url={links.grafana}>
