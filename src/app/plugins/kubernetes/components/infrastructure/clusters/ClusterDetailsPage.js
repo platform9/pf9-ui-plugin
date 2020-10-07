@@ -37,8 +37,9 @@ const useStyles = makeStyles((theme) => ({
   backLink: {
     position: 'absolute',
     right: 0,
-    top: 0,
+    top: 8,
     zIndex: 100,
+    ...theme.typography.caption2,
   },
   statsContainer: {
     maxWidth: 1000,
