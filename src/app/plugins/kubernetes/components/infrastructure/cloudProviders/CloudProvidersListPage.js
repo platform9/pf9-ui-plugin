@@ -6,35 +6,28 @@ import { ActionDataKeys } from 'k8s/DataKeys'
 
 const toMHz = (bytes) => bytes / Math.pow(1024, 2)
 const toGB = (bytes) => bytes / Math.pow(1024, 3)
-const renderDeployedCapacity = (_, { deployedCapacity }) => {
-  const hasValidStats =
-    deployedCapacity && deployedCapacity.compute && deployedCapacity.compute.current
-  if (!hasValidStats) {
-    return null
-  }
-  return (
-    <div>
-      <ResourceUsageTable
-        valueConverter={toMHz}
-        units="MHz"
-        label="CPU"
-        stats={deployedCapacity.compute}
-      />
-      <ResourceUsageTable
-        valueConverter={toGB}
-        units="GB"
-        label="Memory"
-        stats={deployedCapacity.memory}
-      />
-      <ResourceUsageTable
-        valueConverter={toGB}
-        units="GB"
-        label="Storage"
-        stats={deployedCapacity.disk}
-      />
-    </div>
-  )
-}
+const renderDeployedCapacity = (_, { deployedCapacity }) => (
+  <div>
+    <ResourceUsageTable
+      valueConverter={toMHz}
+      units="MHz"
+      label="CPU"
+      stats={deployedCapacity.compute}
+    />
+    <ResourceUsageTable
+      valueConverter={toGB}
+      units="GB"
+      label="Memory"
+      stats={deployedCapacity.memory}
+    />
+    <ResourceUsageTable
+      valueConverter={toGB}
+      units="GB"
+      label="Storage"
+      stats={deployedCapacity.disk}
+    />
+  </div>
+)
 const renderClusterLink = ({ uuid, name }) => (
   <div key={uuid}>
     <SimpleLink src={`/ui/kubernetes/infrastructure/clusters/${uuid}`}>{name}</SimpleLink>
