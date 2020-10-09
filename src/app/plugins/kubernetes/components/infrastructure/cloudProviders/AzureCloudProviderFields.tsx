@@ -14,12 +14,14 @@ interface Props {
   wizardContext: any
   setWizardContext: any
   showSubmitInCard: boolean
+  optionalFields: boolean
 }
 
 const AzureCloudProviderFields = ({
   wizardContext,
   setWizardContext,
   showSubmitInCard = false,
+  optionalFields = false,
 }: Props) => {
   const { inCardSubmit } = useStyles({})
 
@@ -38,14 +40,14 @@ const AzureCloudProviderFields = ({
         label="Tenant ID"
         onChange={(value) => setWizardContext({ tenantId: value })}
         info="The tenant ID of the service principal"
-        required
+        required={optionalFields ? false : true}
       />
       <TextField
         id="clientId"
         label="Client ID"
         onChange={(value) => setWizardContext({ clientId: value })}
         info="The client ID of the service principal"
-        required
+        required={optionalFields ? false : true}
       />
       <TextField
         id="clientSecret"
@@ -53,14 +55,14 @@ const AzureCloudProviderFields = ({
         label="Client Secret"
         onChange={(value) => setWizardContext({ clientSecret: value })}
         info="The client secret of the service principal"
-        required
+        required={optionalFields ? false : true}
       />
       <TextField
         id="subscriptionId"
         label="Subscription ID"
         onChange={(value) => setWizardContext({ subscriptionId: value })}
         info="The ID of the subscription that correlates to the service principal"
-        required
+        required={optionalFields ? false : true}
       />
       {showSubmitInCard && (
         <div className={inCardSubmit}>

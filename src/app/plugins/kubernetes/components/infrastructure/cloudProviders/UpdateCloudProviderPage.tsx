@@ -49,20 +49,21 @@ const useStyles = makeStyles((theme: Theme) => ({
 }))
 
 const formCpBody = (data) => {
+  // Do not accept empty strings for these properties
+  // User may type and then delete the input before submitting
   if (data.type === CloudProviders.Aws) {
     return {
       name: data.name,
-      key: data.awsAccessKey,
-      secret: data.awsSecretKey,
+      key: !!data.awsAccessKey ? data.awsAccessKey : undefined,
+      secret: !!data.awsSecretKey ? data.awsSecretKey : undefined,
     }
   } else if (data.type === CloudProviders.Azure) {
     return {
-      type: data.type,
       name: data.name,
-      clientId: data.clientId,
-      clientSecret: data.clientSecret,
-      tenantId: data.tenantId,
-      subscriptionId: data.subscriptionId,
+      clientId: !!data.clientId ? data.clientId : undefined,
+      clientSecret: !!data.clientSecret ? data.clientSecret : undefined,
+      tenantId: !!data.tenantId ? data.tenantId : undefined,
+      subscriptionId: !!data.subscriptionId ? data.subscriptionId : undefined,
     }
   }
   return {}
@@ -132,6 +133,7 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
                           setWizardContext={setWizardContext}
                           toggleIamPolicy
                           showSubmitInCard
+                          optionalFields
                         />
                       </FormFieldCard>
                       <VerificationFields
