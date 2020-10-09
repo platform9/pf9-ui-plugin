@@ -22,8 +22,8 @@ const getIconOrBubbleColor = (status: IClusterStatus, theme: Theme) =>
     pause: theme.palette.yellow.main,
     fail: theme.palette.red.main,
     error: theme.palette.red.main,
-    loading: theme.palette.grey.main,
-    unknown: theme.palette.blue.main,
+    loading: theme.palette.blue.main,
+    unknown: theme.palette.grey.main,
     upgrade: theme.palette.orange.main,
   }[status] || theme.palette.red.main)
 
@@ -31,7 +31,10 @@ const useStyles = makeStyles<Theme, Props>((theme: Theme) => ({
   root: {
     display: 'flex',
     flexFlow: 'row nowrap',
+    borderRadius: '4px 0 0 4px',
     padding: theme.spacing(0.5, 0),
+    backgroundColor: ({ status, inverseStatus }) =>
+      inverseStatus ? getIconOrBubbleColor(status, theme) : 'inherit',
   },
   label: {
     width: 50,
@@ -45,10 +48,13 @@ const useStyles = makeStyles<Theme, Props>((theme: Theme) => ({
     justifyItems: 'center',
     '&:before': {
       content: '""',
-      display: ({ iconStatus }) => (iconStatus === true ? 'none' : 'inherit'),
-      height: ({ variant }) => (variant === 'header' ? 14 : 12),
-      width: ({ variant }) => (variant === 'header' ? 14 : 12),
-      borderRadius: '50%',
+      display: ({ iconStatus, inverseStatus }) =>
+        !inverseStatus && iconStatus === true ? 'none' : 'inherit',
+      height: ({ variant, inverseStatus }) =>
+        variant === 'header' ? 14 : inverseStatus ? 'auto' : 12,
+      width: ({ variant, inverseStatus }) =>
+        variant === 'header' ? 14 : inverseStatus ? 'auto' : 12,
+      borderRadius: ({ inverseStatus }) => (inverseStatus ? '0' : '50%'),
       backgroundColor: ({ status }) => getIconOrBubbleColor(status, theme),
     },
   },
@@ -76,13 +82,15 @@ interface Props {
   variant: StatusVariant
   iconStatus?: boolean
   className?: any
+  inverseStatus?: boolean
+  rootClassName?: any
 }
 
 const ClusterStatusSpan: FC<Props> = (props) => {
-  const { label, title, children, status, iconStatus, className } = props
+  const { label, title, children, status, iconStatus, className, rootClassName } = props
   const { circle, label: labelCls, root, iconColor } = useStyles(props)
   return (
-    <div className={root}>
+    <div className={clsx(root, rootClassName)}>
       {label && <span className={labelCls}>{label}:</span>}
       <Tooltip title={title || children}>
         <Text className={clsx(circle, className)} variant={'body2'}>

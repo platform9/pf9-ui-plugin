@@ -8,7 +8,7 @@ import { identity } from 'ramda'
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'grid',
-    gridTemplateColumns: '58px 1fr 138px',
+    gridTemplateColumns: ({ valueOff }) => (!valueOff ? '58px 1fr 138px' : '58px 138px'),
   },
   label: {
     color: theme.palette.grey[500],
@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
   value: {
     whiteSpace: 'nowrap',
     paddingRight: 4,
-    display: 'grid',
+    display: ({ valueOff }) => (!valueOff ? 'grid' : 'none'),
     gridTemplateColumns: '1fr 4px 1fr 35px',
     gridGap: '4px',
   },
@@ -32,8 +32,16 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const ResourceUsageTable = ({ label, valueConverter, usedText, units, stats, precision }) => {
-  const classes = useStyles()
+const ResourceUsageTable = ({
+  valueOff = false,
+  label,
+  valueConverter,
+  usedText,
+  units,
+  stats,
+  precision,
+}) => {
+  const classes = useStyles({ valueOff })
   const { current, max, percent = (current / max) * 100 } = stats
 
   const curStr = valueConverter(current).toFixed(precision)

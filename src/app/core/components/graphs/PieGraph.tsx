@@ -17,6 +17,7 @@ interface Props {
   percent?: number
   primary?: string
   empty: boolean
+  healthColor?: 'red' | 'orange' | 'yellow' | 'green'
 }
 
 const emptyData = [{ name: 'empty', value: 1, color: 'empty' }]
@@ -28,6 +29,7 @@ const PieGraph = ({
   percent = undefined,
   primary,
   empty,
+  healthColor = 'green',
   ...rest
 }: Props) => {
   const theme: Theme = useTheme()
@@ -55,7 +57,7 @@ const PieGraph = ({
           style={{ ...theme.typography.subtitle1 }}
           x={radius + 5}
           y={radius + 3}
-          fill={theme.palette.green.main}
+          fill={theme.palette[healthColor].main}
           fontSize="21px"
           textAnchor="middle"
           dominantBaseline="middle"
@@ -68,7 +70,7 @@ const PieGraph = ({
           style={{ ...theme.typography.caption4, textTransform: 'uppercase' }}
           x={radius + 5}
           y={radius + 24}
-          fill={theme.palette.green.main}
+          fill={theme.palette[healthColor].main}
           fontSize="11px"
           textAnchor="middle"
           dominantBaseline="middle"
