@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/styles'
 import { Card, CardHeader, CardContent, Divider } from '@material-ui/core'
 import { DetailRow } from 'k8s/components/infrastructure/nodes/NodeDetailsPage'
+import Text from 'core/elements/text'
 
 const styles = (theme) => ({
   root: {},
@@ -13,34 +14,40 @@ const styles = (theme) => ({
     display: 'inline-block',
     width: '50%',
   },
-  card: {
-    overflow: 'inherit',
+  cardContent: {
+    margin: theme.spacing(0, 2, 1),
   },
-  detailRowDiv: {
-    marginBottom: theme.spacing(2),
+  card: {
+    maxWidth: 555,
+    width: 'max-content',
+    border: `solid 1px ${theme.palette.grey[300]}`,
+    borderRadius: 4,
+
+    '& h3.MuiTypography-subtitle2': {
+      color: theme.palette.grey[700],
+      padding: theme.spacing(1, 2),
+      borderBottom: `solid 1px ${theme.palette.grey[300]}`,
+    },
   },
 })
 
-const DetailRowDiv = withStyles(styles)(({ classes, items }) => (
-  <div className={classes.detailRowDiv}>
-    {Object.entries(items).map(([name, { value, helpMessage }]) => (
-      <DetailRow label={name} value={value} helpMessage={helpMessage} />
-    ))}
-  </div>
-))
+const DetailRowDiv = withStyles(styles)(({ classes, items }) =>
+  Object.entries(items).map(([name, { value, helpMessage }]) => (
+    <DetailRow label={name} value={value} helpMessage={helpMessage} />
+  )),
+)
 
 const renderDetailRow = (items) => <DetailRowDiv items={items} />
 
 const InfoPanel = withStyles(styles)(({ classes, items, title }) => (
-  <Card className={classes.card}>
-    <CardHeader title={title} titleTypographyProps={{ variant: 'h6' }} />
-    <Divider />
-    <CardContent>
-      <table>
-        <tbody>{Array.isArray(items) ? items.map(renderDetailRow) : renderDetailRow(items)}</tbody>
-      </table>
-    </CardContent>
-  </Card>
+  <div className={classes.card}>
+    <Text variant="subtitle2" component="h3">
+      {title}
+    </Text>
+    <table className={classes.cardContent}>
+      <tbody>{Array.isArray(items) ? items.map(renderDetailRow) : renderDetailRow(items)}</tbody>
+    </table>
+  </div>
 ))
 
 InfoPanel.propTypes = {
