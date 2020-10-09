@@ -12,18 +12,27 @@ import BareosClusterRequirements from './bareos/BareosClusterRequirements'
 import AwsClusterRequirements from './aws/AwsClusterRequirements'
 import AzureClusterRequirements from './azure/AzureClusterRequirements'
 import DocumentMeta from 'core/components/DocumentMeta'
+import Theme from 'core/themes/model'
 
-const useStyles = makeStyles((theme) => ({
+const switchCase: any = objSwitchCase
+const requirementsMap = {
+  [CloudProviders.VirtualMachine]: BareosClusterRequirements,
+  [CloudProviders.PhysicalMachine]: BareosClusterRequirements,
+  [CloudProviders.Aws]: AwsClusterRequirements,
+  [CloudProviders.Azure]: AzureClusterRequirements,
+}
+type ValueOf<T> = T[keyof T]
+
+const useStyles = makeStyles<Theme>((theme) => ({
   container: {
-    display: 'flex',
-    flexDirection: 'column',
-    maxWidth: '800px',
+    display: 'grid',
+    gridTemplateRows: '142px 1fr',
+    gridGap: theme.spacing(2),
   },
   root: {
-    marginTop: theme.spacing(2),
-    display: 'flex',
-    flexFlow: 'row nowrap',
-    justifyContent: 'space-between',
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, 242px)',
+    gridGap: theme.spacing(3),
   },
 }))
 
@@ -32,20 +41,16 @@ const listUrl = pathJoin(k8sPrefix, 'infrastructure')
 const AddClusterPage = () => {
   const classes = useStyles()
   const { history, location } = useReactRouter()
-  const providerType = new URLSearchParams(location.search).get('type') || CloudProviders.BareOS
+  const providerType =
+    new URLSearchParams(location.search).get('type') || CloudProviders.VirtualMachine
   const [activeProvider, setActiveProvider] = useState(providerType)
 
   const handleNextView = (url) => {
     history.push(url)
   }
 
-  const ActiveView = useMemo(
-    () =>
-      objSwitchCase({
-        [CloudProviders.BareOS]: BareosClusterRequirements,
-        [CloudProviders.Aws]: AwsClusterRequirements,
-        [CloudProviders.Azure]: AzureClusterRequirements,
-      })(activeProvider),
+  const ActiveView: ValueOf<typeof requirementsMap> = useMemo(
+    () => switchCase(requirementsMap)(activeProvider),
     [activeProvider],
   )
   return (
@@ -58,9 +63,14 @@ const AddClusterPage = () => {
       >
         <div className={classes.root}>
           <CloudProviderCard
-            active={activeProvider === CloudProviders.BareOS}
+            active={activeProvider === CloudProviders.VirtualMachine}
             onClick={setActiveProvider}
-            type={CloudProviders.BareOS}
+            type={CloudProviders.VirtualMachine}
+          />
+          <CloudProviderCard
+            active={activeProvider === CloudProviders.PhysicalMachine}
+            onClick={setActiveProvider}
+            type={CloudProviders.PhysicalMachine}
           />
           <CloudProviderCard
             active={activeProvider === CloudProviders.Aws}
@@ -73,7 +83,7 @@ const AddClusterPage = () => {
             type={CloudProviders.Azure}
           />
         </div>
-        <ActiveView onComplete={handleNextView} />
+        <ActiveView onComplete={handleNextView} provider={activeProvider} />
       </FormWrapper>
     </>
   )

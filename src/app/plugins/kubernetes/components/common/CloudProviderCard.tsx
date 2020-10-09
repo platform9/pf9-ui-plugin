@@ -1,15 +1,15 @@
-import React from 'react'
-import PropTypes from 'prop-types'
+import React, { FC } from 'react'
 import useReactRouter from 'use-react-router'
 import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
+import { CloudProviders } from '../infrastructure/cloudProviders/model'
+import Theme from 'core/themes/model'
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles<Theme, Props>((theme) => ({
   root: {
     filter: ({ disabled }) => (disabled ? 'grayscale(100%)' : null),
     opacity: ({ disabled }) => (disabled ? 0.7 : 1),
-    margin: theme.spacing(1, 1.5),
-    padding: theme.spacing(1.5, 0, .5, 0),
+    padding: theme.spacing(1.5, 0, 0.5, 0),
     userSelect: 'none',
     textAlign: 'center',
     display: 'flex',
@@ -17,7 +17,8 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'center',
     justifyContent: 'center',
     cursor: ({ disabled }) => (disabled ? 'default' : 'pointer'),
-    border: ({ active }) => (active ? `1px solid ${theme.palette.blue[500]}` : `1px solid transparent`),
+    border: ({ active }) =>
+      active ? `1px solid ${theme.palette.blue[500]}` : `1px solid transparent`,
     borderRadius: 4,
     backgroundColor: ({ active }) => (active ? theme.palette.blue[100] : theme.palette.grey['000']),
     width: 240,
@@ -32,25 +33,6 @@ const useStyles = makeStyles((theme) => ({
       border: ({ disabled }) => (!disabled ? '1px solid #4aa3df' : '1px solid #999'),
     },
   },
-  // logoContainer: {
-  //   display: 'flex',
-  //   justifyContent: 'center',
-  //   alignItems: 'center',
-  //   width: 132,
-  //   height: 82,
-  //   margin: ({ active }) => (active ? 0 : 1),
-  //   border: ({ active }) => (active ? '2px solid #4aa3df' : '1px solid #999'),
-  //   borderRadius: 10,
-  //   backgroundColor: '#FFF',
-  //   '& img': {
-  //     maxWidth: 100,
-  //     maxHeight: 60,
-  //   },
-  //   '&:hover': {
-  //     margin: ({ disabled }) => (!disabled ? 0 : 1),
-  //     border: ({ disabled }) => (!disabled ? '2px solid #4aa3df' : '1px solid #999'),
-  //   },
-  // },
   label: {
     marginTop: theme.spacing(1),
     color: theme.palette.grey[700],
@@ -61,23 +43,20 @@ const iconSizes = { small: '', medium: '@2x', large: '@3x' }
 const iconSize = iconSizes.small
 const rootPath = '/ui/images/icon-cloudproviders'
 const icons = {
-  aws: `${rootPath}/cloudaws-default${iconSize}.png`,
-  azure: `${rootPath}/cloudazure-default${iconSize}.png`,
-  openstack: `${rootPath}/icon-cloudproviders-openstack${iconSize}.png`,
-  vmware: `${rootPath}/icon-cloudproviders-vmware${iconSize}.png`,
-  // local: `${rootPath}/icon-cloudproviders-other${iconSize}.png`,
-  local: `${rootPath}/bare-metal.svg`,
+  [CloudProviders.Aws]: `${rootPath}/cloudaws-default${iconSize}.png`,
+  [CloudProviders.Azure]: `${rootPath}/cloudazure-default${iconSize}.png`,
+  [CloudProviders.VirtualMachine]: `${rootPath}/vm-default${iconSize}.png`,
+  [CloudProviders.PhysicalMachine]: `${rootPath}/physical-default${iconSize}.png`,
 }
 
 const labels = {
-  aws: 'Amazon AWS',
-  azure: 'Microsoft Azure',
-  openstack: 'OpenStack',
-  vmware: 'VMware',
-  local: 'Bare OS',
+  [CloudProviders.Aws]: 'Amazon Web Services',
+  [CloudProviders.Azure]: 'Microsoft Azure',
+  [CloudProviders.VirtualMachine]: 'BareOS Virtual Machines',
+  [CloudProviders.PhysicalMachine]: 'BareOS Physical Servers',
 }
 
-const CloudProviderCard = (props) => {
+const CloudProviderCard: FC<Props> = (props) => {
   const { type, disabled, image = icons[type], label = labels[type], src, onClick } = props
   const classes = useStyles(props)
   const { history } = useReactRouter()
@@ -98,15 +77,14 @@ const CloudProviderCard = (props) => {
   )
 }
 
-CloudProviderCard.propTypes = {
-  type: PropTypes.oneOf(['aws', 'azure', 'openstack', 'vmware', 'local']).isRequired,
-  src: PropTypes.string,
-  onClick: PropTypes.func,
-  // eslint-disable-next-line react/no-unused-prop-types
-  active: PropTypes.bool,
-  image: PropTypes.string,
-  label: PropTypes.string,
-  disabled: PropTypes.bool,
+interface Props {
+  type: CloudProviders
+  src?: string
+  onClick?: (type: CloudProviders) => any
+  active?: boolean
+  image?: string
+  label?: string
+  disabled?: boolean
 }
 
 export default CloudProviderCard

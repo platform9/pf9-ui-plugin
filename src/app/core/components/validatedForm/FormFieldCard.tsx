@@ -13,7 +13,7 @@ interface ContainerProps {
   inputsWidth?: number
   middleHeader?: JSX.Element
 }
-const defaultMaxWidth = 715
+const defaultMaxWidth = 800
 
 export const useStyles = makeStyles<Theme, ContainerProps>((theme) => ({
   root: {
