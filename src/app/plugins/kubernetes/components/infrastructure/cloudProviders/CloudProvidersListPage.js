@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import createCRUDComponents from 'core/helpers/createCRUDComponents'
-import ResourceUsageTable from 'k8s/components/infrastructure/common/ResourceUsageTable'
 import SimpleLink from 'core/components/SimpleLink'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import ResourceUsageTables from '../common/ResourceUsageTables'

@@ -4,8 +4,8 @@ import CloseIcon from '@material-ui/icons/Close'
 import { makeStyles } from '@material-ui/styles'
 import ClusterStatusSpan from 'k8s/components/infrastructure/clusters/ClusterStatus'
 import useToggler from 'core/hooks/useToggler'
-import ResourceUsageTable from 'k8s/components/infrastructure/common/ResourceUsageTable'
 import { connectionStatusFieldsTable, clusterHealthStatusFields } from './ClusterStatusUtils'
+import ResourceUsageTables from '../common/ResourceUsageTables'
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -160,9 +160,7 @@ const ResourceUtilization = ({ classes, usage }) => {
     <div>
       <div className={classes.title}>Cluster Resource Utilization:</div>
       <div className={classes.resources}>
-        <ResourceUsageTable valueConverter={toMHz} units="MHz" label="CPU" stats={compute} />
-        <ResourceUsageTable units="GiB" label="Memory" stats={memory} />
-        <ResourceUsageTable units="GiB" label="Storage" stats={disk} />
+        <ResourceUsageTables usage={usage} />
       </div>
     </div>
   )
