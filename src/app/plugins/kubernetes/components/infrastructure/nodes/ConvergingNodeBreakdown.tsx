@@ -121,6 +121,7 @@ const useStyles = makeStyles<Theme, {}>((theme) => ({
     marginTop: 8,
     position: 'relative',
     bottom: -4,
+    textAlign: 'center',
   },
   nodeCardSelected: {
     backgroundColor: theme.palette.blue[100],
