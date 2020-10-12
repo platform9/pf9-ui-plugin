@@ -6,6 +6,8 @@ export enum CloudProviders {
   Aws = 'aws',
   Azure = 'azure',
   BareOS = 'local',
+  PhysicalMachine = 'physical',
+  VirtualMachine = 'virtual',
 }
 
 export enum CloudProvidersFriendlyName {

@@ -5,6 +5,7 @@ import { makeStyles } from '@material-ui/styles'
 import clsx from 'clsx'
 import FontAwesomeIcon from './FontAwesomeIcon'
 import Theme from 'core/themes/model'
+import Text, { TextVariant } from 'core/elements/text'
 
 type ISimpleLinkVariant = 'error' | 'primary'
 
@@ -14,6 +15,7 @@ interface Props {
   className?: string
   icon?: string
   variant?: ISimpleLinkVariant
+  textVariant?: TextVariant
   onClick?: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void
 }
 
@@ -33,7 +35,10 @@ const useStyles = makeStyles<Theme, { variant: ISimpleLinkVariant }>((theme) => 
 // work around this issue: https://github.com/ReactTraining/react-router/issues/4683
 // We need to use `forwardRef` as a workaround of an issue with material-ui Tooltip https://github.com/gregnb/mui-datatables/issues/595
 const SimpleLink: ComponentType<Props> = forwardRef<HTMLElement, Props>(
-  ({ onClick, src, children, staticContext, className, icon, variant, ...rest }, ref) => {
+  (
+    { onClick, src, children, staticContext, className, icon, variant, textVariant, ...rest },
+    ref,
+  ) => {
     const classes = useStyles({ variant })
     const { history } = useReactRouter()
     const handleClick = useCallback(
@@ -64,7 +69,13 @@ const SimpleLink: ComponentType<Props> = forwardRef<HTMLElement, Props>(
         {...rest}
       >
         {!!icon && <FontAwesomeIcon className={classes.icon}>{icon}</FontAwesomeIcon>}
-        {children || src}
+        {textVariant ? (
+          <Text variant={textVariant} component="span">
+            {children || src}
+          </Text>
+        ) : (
+          children || src
+        )}
       </Link>
     )
   },
