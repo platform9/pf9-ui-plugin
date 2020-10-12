@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import React from 'react'
 import { Dialog, DialogTitle, DialogContent } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
@@ -6,7 +5,6 @@ import CloseIcon from '@material-ui/icons/Close'
 import clsx from 'clsx'
 import ExternalLink from 'core/components/ExternalLink'
 import ClusterStatusSpan from 'k8s/components/infrastructure/clusters/ClusterStatus'
-// import createListTableComponent from 'core/helpers/createListTableComponent'
 import { pathStrOr } from 'utils/fp'
 import { clusterHealthStatusFields, isTransientStatus } from '../clusters/ClusterStatusUtils'
 import { capitalizeString } from 'utils/misc'
@@ -159,8 +157,6 @@ const statusMap = new Map([
   ['disconnected', 'Unknown'],
 ])
 
-// const renderStatus = (_, { status, logs }) => <RenderNodeStatus status={status} logs={logs} />
-
 const RenderNodeStatus = ({ status, logs }) => {
   // TODO fix this stupid styling dependency so I dont
   // have to make a component anytime i want styles.
@@ -214,20 +210,6 @@ const TaskRow = (props) => {
   )
 }
 
-// const columns = [
-//   { id: 'task', label: 'Task', disableSorting: true },
-//   { id: 'status', label: 'Status', render: renderStatus },
-// ]
-
-// const TasksTable = createListTableComponent({
-//   columns,
-//   uniqueIdentifier: 'task',
-//   showCheckboxes: false,
-//   paginate: false,
-//   compactTable: true,
-//   emptyText: <Text variant="body1">No status information currently available.</Text>,
-// })
-
 export const Tasks = ({ allTasks, completedTasks = [], lastFailedTask, logs, nodeState }) => {
   const classes = useStyles()
   const failedTaskIndex = allTasks.indexOf(lastFailedTask)
@@ -259,7 +241,6 @@ export const Tasks = ({ allTasks, completedTasks = [], lastFailedTask, logs, nod
       {tasksWithStatus.map((item) => (
         <TaskRow key={item.task} {...item} />
       ))}
-      {/* <TasksTable data={tasksWithStatus} onSortChange={noop} /> */}
       <div className={classes.tasksCompleted}>
         {completedTaskCount} out of {allTasks.length} tasks completed
       </div>
@@ -284,6 +265,7 @@ const EmptyStatus = () => {
       <ClusterStatusSpan
         iconStatus
         inverseStatus
+        rootClassName={classes.statusSpanRoot}
         className={classes.statusSpan}
         status="unknown"
         title="Unknown"
