@@ -14,13 +14,18 @@ interface Props {
   link?: string
 }
 
+const colorMap = {
+  white: '100',
+  black: '700',
+}
+
 type IIconColor = Props['color']
 
 const useStyles = makeStyles<Theme, { color: IIconColor; isLink: boolean }>((theme: Theme) => ({
   icon: {
     cursor: ({ isLink }) => (isLink ? 'pointer' : 'default'),
-    fontWeight: 900,
-    color: ({ color }) => theme.palette.common[color],
+    fontWeight: 300,
+    color: ({ color }) => theme.palette.grey[colorMap[color]],
   },
 }))
 

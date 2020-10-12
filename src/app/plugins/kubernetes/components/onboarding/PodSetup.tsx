@@ -53,10 +53,15 @@ const PodSetup = ({ onComplete, initialPanel }: Props) => {
     new Set(initialPanel !== undefined ? [initialPanel] : []),
   )
 
-  const [pods, loadingPods, reloadPods]: IUseDataLoader<IPod> = useDataLoader(podActions.list, {
-    loadingFeedback: false,
-    clusterId: allKey,
-  }) as any
+  const [pods, loadingPods, reloadPods]: IUseDataLoader<IPod> = useDataLoader(
+    podActions.list,
+    {
+      clusterId: allKey,
+    },
+    {
+      loadingFeedback: false,
+    },
+  ) as any
   const hasPods = podSetupComplete(pods)
 
   useEffect(() => {

@@ -169,7 +169,6 @@ export const typography = {
     fontStyle: 'normal',
     lineHeight: '1.5',
     letterSpacing: '-0.16px',
-    textAlign: 'center',
   },
   nav: {
     fontFamily: 'Eina04',
@@ -188,7 +187,6 @@ export const typography = {
     fontStyle: 'normal',
     lineHeight: 'normal',
     letterSpacing: '0.18px',
-    textAlign: 'center',
   },
   body1: {
     fontFamily: 'Eina04',
@@ -227,7 +225,6 @@ export const typography = {
     fontStyle: 'normal',
     lineHeight: 'normal',
     letterSpacing: '0.16px',
-    textAlign: 'center',
   },
 
   inputTable: {
@@ -283,7 +280,6 @@ export const typography = {
     fontStyle: 'normal',
     lineHeight: 'normal',
     letterSpacing: '-0.11px',
-    textAlign: 'center',
   },
   caption3: {
     fontFamily: 'Eina04',
@@ -293,7 +289,6 @@ export const typography = {
     fontStyle: 'normal',
     lineHeight: 'normal',
     letterSpacing: '-0.11px',
-    textAlign: 'center',
   },
 }
 

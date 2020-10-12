@@ -47,9 +47,11 @@ const useStyles = makeStyles((theme: Theme) => ({
   rowHeader: {
     display: 'flex',
     justifyContent: 'flex-end',
+    color: theme.palette.grey[700],
   },
   rowValue: {
     marginLeft: theme.spacing(0.5),
+    color: theme.palette.grey[700],
   },
   card: {
     marginRight: theme.spacing(2),
@@ -201,11 +203,19 @@ export const DetailRow: FC<{
   return (
     <tr>
       <td>
-        <Text className={rowHeader} variant="subtitle2">
+        <Text className={rowHeader} variant="caption1" component="span">
           {label}:
         </Text>
       </td>
-      <td>{typeof value === 'string' ? <Text className={rowValue}>{value}</Text> : value}</td>
+      <td>
+        {typeof value === 'string' ? (
+          <Text className={rowValue} variant="body2" component="span">
+            {value}
+          </Text>
+        ) : (
+          value
+        )}
+      </td>
       <td className={rowHelp}>
         {!!helpMessage && <HelpContainer title={helpMessage} color="black" />}
       </td>

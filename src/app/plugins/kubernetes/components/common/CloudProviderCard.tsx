@@ -26,7 +26,6 @@ const useStyles = makeStyles<Theme, Props>((theme) => ({
     '& img': {
       maxWidth: 160,
       maxHeight: 100,
-      width: '100%',
     },
     '&:hover': {
       // margin: ({ disabled }) => (!disabled ? 0 : 1),

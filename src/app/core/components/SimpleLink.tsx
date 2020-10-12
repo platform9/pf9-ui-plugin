@@ -26,6 +26,7 @@ const useStyles = makeStyles<Theme, { variant: ISimpleLinkVariant }>((theme) => 
       variant === 'error' ? theme.components.error.main : theme.palette.primary.main,
   },
   icon: {
+    fontSize: theme.typography.subtitle2.fontSize,
     marginRight: '6px',
   },
 }))
