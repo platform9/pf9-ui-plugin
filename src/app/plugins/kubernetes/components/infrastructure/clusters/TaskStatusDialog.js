@@ -5,12 +5,25 @@ import CloseIcon from '@material-ui/icons/Close'
 import clsx from 'clsx'
 import ExternalLink from 'core/components/ExternalLink'
 import ClusterStatusSpan from 'k8s/components/infrastructure/clusters/ClusterStatus'
-import createListTableComponent from 'core/helpers/createListTableComponent'
-import { noop, pathStrOr } from 'utils/fp'
+import { pathStrOr } from 'utils/fp'
 import { clusterHealthStatusFields, isTransientStatus } from '../clusters/ClusterStatusUtils'
 import { capitalizeString } from 'utils/misc'
+import Text from 'core/elements/text'
 
 const useStyles = makeStyles((theme) => ({
+  taskRow: {
+    borderRadius: 4,
+    background: theme.palette.grey[100],
+    display: 'flex',
+    alignItems: 'space-between',
+    marginBottom: theme.spacing(),
+    '& .task-value': {
+      padding: theme.spacing(1, 2),
+      display: 'flex',
+      alignItems: 'center',
+      color: theme.palette.grey[700],
+    },
+  },
   root: {
     minWidth: theme.spacing(75),
   },
@@ -60,7 +73,25 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'center',
   },
   linkSpacer: {
-    paddingLeft: theme.spacing(),
+    color: theme.palette.grey[100],
+    textDecoration: 'underline',
+  },
+  statusSpan: {
+    padding: theme.spacing(0, 1),
+    display: 'flex',
+    flexDirection: 'column',
+    color: theme.palette.grey[100],
+
+    ...theme.typography.caption4,
+
+    '& i': {
+      color: theme.palette.grey[100],
+      fontSize: 24,
+    },
+  },
+  statusSpanRoot: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 }))
 
@@ -121,19 +152,17 @@ const statusMap = new Map([
   ['fail', 'Failed'],
   ['ok', 'Completed'],
   ['loading', 'In Progress'],
-  ['retrying', 'Failed... Retrying'],
+  ['retrying', 'Retrying'],
   ['failed', 'Failed'],
   ['disconnected', 'Unknown'],
 ])
-
-const renderStatus = (_, { status, logs }) => <RenderNodeStatus status={status} logs={logs} />
 
 const RenderNodeStatus = ({ status, logs }) => {
   // TODO fix this stupid styling dependency so I dont
   // have to make a component anytime i want styles.
   const classes = useStyles()
   return (
-    <NodeTaskStatus status={status} iconStatus>
+    <NodeTaskStatus status={status} iconStatus inverseStatus>
       {(status.includes('fail') || status === 'retrying') && (
         <ExternalLink className={classes.linkSpacer} url={logs || ''}>
           View Logs
@@ -143,7 +172,7 @@ const RenderNodeStatus = ({ status, logs }) => {
   )
 }
 
-export const NodeTaskStatus = ({ status, iconStatus = false, children }) => {
+export const NodeTaskStatus = ({ status, iconStatus = false, inverseStatus = false, children }) => {
   const classes = useStyles()
   if (status === 'none') {
     return <EmptyStatus />
@@ -156,30 +185,30 @@ export const NodeTaskStatus = ({ status, iconStatus = false, children }) => {
   return (
     <div className={classes.statusRow}>
       <ClusterStatusSpan
+        inverseStatus={inverseStatus}
+        rootClassName={classes.statusSpanRoot}
+        className={classes.statusSpan}
         iconStatus={showIconStatusAlways}
         status={renderStatus}
         title={renderValue}
       >
-        {renderValue}
+        {children || renderValue}
       </ClusterStatusSpan>
-      {children}
     </div>
   )
 }
 
-const columns = [
-  { id: 'task', label: 'Task', disableSorting: true },
-  { id: 'status', label: 'Status', render: renderStatus },
-]
-
-const TasksTable = createListTableComponent({
-  columns,
-  uniqueIdentifier: 'task',
-  showCheckboxes: false,
-  paginate: false,
-  compactTable: true,
-  emptyText: <Text variant="body1">No status information currently available.</Text>,
-})
+const TaskRow = (props) => {
+  const classes = useStyles()
+  return (
+    <div className={classes.taskRow}>
+      <RenderNodeStatus status={props.status} logs={props.logs} />
+      <Text variant="body2" component="span" className="task-value">
+        {props.task}
+      </Text>
+    </div>
+  )
+}
 
 export const Tasks = ({ allTasks, completedTasks = [], lastFailedTask, logs, nodeState }) => {
   const classes = useStyles()
@@ -209,7 +238,9 @@ export const Tasks = ({ allTasks, completedTasks = [], lastFailedTask, logs, nod
 
   return (
     <div>
-      <TasksTable data={tasksWithStatus} onSortChange={noop} />
+      {tasksWithStatus.map((item) => (
+        <TaskRow key={item.task} {...item} />
+      ))}
       <div className={classes.tasksCompleted}>
         {completedTaskCount} out of {allTasks.length} tasks completed
       </div>
@@ -227,11 +258,23 @@ const HealthStatus = ({ healthStatus }) => {
   )
 }
 
-const EmptyStatus = () => (
-  <span style={{ visibility: 'hidden' }}>
-    <ClusterStatusSpan iconStatus status="pause" title="pause" />
-  </span>
-)
+const EmptyStatus = () => {
+  const classes = useStyles()
+  return (
+    <div className={classes.statusRow}>
+      <ClusterStatusSpan
+        iconStatus
+        inverseStatus
+        rootClassName={classes.statusSpanRoot}
+        className={classes.statusSpan}
+        status="unknown"
+        title="Unknown"
+      >
+        Unknown
+      </ClusterStatusSpan>
+    </div>
+  )
+}
 
 const healthStatusMessage = {
   healthy: 'No errors encountered while installing some components on this node',

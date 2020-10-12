@@ -2,7 +2,6 @@ import React from 'react'
 import InfoPanel from 'core/components/InfoPanel'
 
 import useReactRouter from 'use-react-router'
-import { Grid } from '@material-ui/core'
 import Text from 'core/elements/text'
 import { makeStyles, withStyles } from '@material-ui/styles'
 import useDataLoader from 'core/hooks/useDataLoader'
@@ -173,9 +172,9 @@ const azureCloudFields = [
   { id: 'cloudProperties.loadbalancerIP', title: 'Load Balancer IP', required: true },
 ]
 
-type Props = {
+interface Props {
   classes: any
-  items: Array<string>
+  items: string[]
 }
 
 const styles = (theme) => ({
@@ -226,8 +225,12 @@ const renderCloudInfo = (cluster) => {
 }
 
 const useStyles = makeStyles<Theme>((theme) => ({
-  root: {
-    flexGrow: 1,
+  clusterInfo: {
+    display: 'grid',
+    gridTemplateColumns: 'max-content max-content',
+    gridGap: '16px',
+    alignItems: 'start',
+    justifyItems: 'start',
   },
   text: {
     color: theme.palette.common.white,
@@ -247,19 +250,14 @@ const ClusterInfo = () => {
   const csiDrivers = cluster?.csiDrivers?.drivers || []
 
   return (
-    <Grid container spacing={4} className={classes.root}>
-      <Grid item xs={6}>
-        <InfoPanel title="Overview" items={overview} />
-      </Grid>
-      <Grid container item xs={6} spacing={4} direction="column">
-        <Grid item>{renderCloudInfo(cluster)}</Grid>
-        {csiDrivers.length > 0 && (
-          <Grid item>
-            <InfoPanel title="CSI Driver Details" items={csiDrivers.map(csiDriverProps)} />
-          </Grid>
-        )}
-      </Grid>
-    </Grid>
+    <div className={classes.clusterInfo}>
+      <InfoPanel title="Overview" items={overview} />
+
+      {renderCloudInfo(cluster)}
+      {csiDrivers.length > 0 && (
+        <InfoPanel title="CSI Driver Details" items={csiDrivers.map(csiDriverProps)} />
+      )}
+    </div>
   )
 }
 

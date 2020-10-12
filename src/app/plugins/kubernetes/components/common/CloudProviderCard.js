@@ -9,7 +9,7 @@ const useStyles = makeStyles((theme) => ({
     filter: ({ disabled }) => (disabled ? 'grayscale(100%)' : null),
     opacity: ({ disabled }) => (disabled ? 0.7 : 1),
     margin: theme.spacing(1, 1.5),
-    padding: theme.spacing(1.5, 0, .5, 0),
+    padding: theme.spacing(1.5, 0, 0.5, 0),
     userSelect: 'none',
     textAlign: 'center',
     display: 'flex',
@@ -17,7 +17,8 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'center',
     justifyContent: 'center',
     cursor: ({ disabled }) => (disabled ? 'default' : 'pointer'),
-    border: ({ active }) => (active ? `1px solid ${theme.palette.blue[500]}` : `1px solid transparent`),
+    border: ({ active }) =>
+      active ? `1px solid ${theme.palette.blue[500]}` : `1px solid transparent`,
     borderRadius: 4,
     backgroundColor: ({ active }) => (active ? theme.palette.blue[100] : theme.palette.grey['000']),
     width: 240,
@@ -25,7 +26,6 @@ const useStyles = makeStyles((theme) => ({
     '& img': {
       maxWidth: 160,
       maxHeight: 100,
-      width: '100%',
     },
     '&:hover': {
       // margin: ({ disabled }) => (!disabled ? 0 : 1),
@@ -66,7 +66,7 @@ const icons = {
   openstack: `${rootPath}/icon-cloudproviders-openstack${iconSize}.png`,
   vmware: `${rootPath}/icon-cloudproviders-vmware${iconSize}.png`,
   // local: `${rootPath}/icon-cloudproviders-other${iconSize}.png`,
-  local: `${rootPath}/bare-metal.svg`,
+  local: `${rootPath}/bare-metal.png`,
 }
 
 const labels = {

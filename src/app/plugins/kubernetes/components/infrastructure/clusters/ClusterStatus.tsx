@@ -22,8 +22,8 @@ const getIconOrBubbleColor = (status: IClusterStatus, theme: Theme) =>
     pause: theme.palette.yellow.main,
     fail: theme.palette.red.main,
     error: theme.palette.red.main,
-    loading: theme.palette.grey.main,
-    unknown: theme.palette.blue.main,
+    loading: theme.palette.blue.main,
+    unknown: theme.palette.grey.main,
     upgrade: theme.palette.orange.main,
   }[status] || theme.palette.red.main)
 
@@ -31,7 +31,10 @@ const useStyles = makeStyles<Theme, Props>((theme: Theme) => ({
   root: {
     display: 'flex',
     flexFlow: 'row nowrap',
+    borderRadius: '4px 0 0 4px',
     padding: theme.spacing(0.5, 0),
+    backgroundColor: ({ status, inverseStatus }) =>
+      inverseStatus ? getIconOrBubbleColor(status, theme) : 'inherit',
   },
   label: {
     width: 50,
@@ -45,10 +48,13 @@ const useStyles = makeStyles<Theme, Props>((theme: Theme) => ({
     justifyItems: 'center',
     '&:before': {
       content: '""',
-      display: ({ iconStatus }) => (iconStatus === true ? 'none' : 'inherit'),
-      height: ({ variant }) => (variant === 'header' ? 14 : 12),
-      width: ({ variant }) => (variant === 'header' ? 14 : 12),
-      borderRadius: '50%',
+      display: ({ iconStatus, inverseStatus }) =>
+        !inverseStatus && iconStatus === true ? 'none' : 'inherit',
+      height: ({ variant, inverseStatus }) =>
+        variant === 'header' ? 14 : inverseStatus ? 'auto' : 12,
+      width: ({ variant, inverseStatus }) =>
+        variant === 'header' ? 14 : inverseStatus ? 'auto' : 12,
+      borderRadius: ({ inverseStatus }) => (inverseStatus ? '0' : '50%'),
       backgroundColor: ({ status }) => getIconOrBubbleColor(status, theme),
     },
   },
@@ -75,16 +81,19 @@ interface Props {
   status?: IClusterStatus
   variant: StatusVariant
   iconStatus?: boolean
+  className?: any
+  inverseStatus?: boolean
+  rootClassName?: any
 }
 
 const ClusterStatusSpan: FC<Props> = (props) => {
-  const { label, title, children, status, variant, iconStatus } = props
+  const { label, title, children, status, iconStatus, className, rootClassName } = props
   const { circle, label: labelCls, root, iconColor } = useStyles(props)
   return (
-    <div className={root}>
+    <div className={clsx(root, rootClassName)}>
       {label && <span className={labelCls}>{label}:</span>}
       <Tooltip title={title || children}>
-        <Text className={circle} variant={variant === 'header' ? 'body1' : 'body2'}>
+        <Text className={clsx(circle, className)} variant={'body2'}>
           {!!iconStatus && (
             <FontAwesomeIcon className={clsx(iconColor, iconMap.get(status).classes)}>
               {iconMap.get(status).icon}
@@ -132,6 +141,7 @@ export const ClusterHealthStatus: FC<IClusterStatusProps> = ({
   cluster,
   variant = 'table',
   message = undefined,
+  ...rest
 }) => {
   if (isTransientStatus(cluster.taskStatus)) {
     return renderTransientStatus(cluster, variant)
@@ -142,7 +152,12 @@ export const ClusterHealthStatus: FC<IClusterStatusProps> = ({
   if (cluster.connectionStatus === 'disconnected') {
     return (
       <div>
-        <ClusterStatusSpan title={message || 'Unknown'} status="unknown" variant={variant}>
+        <ClusterStatusSpan
+          title={message || 'Unknown'}
+          status="unknown"
+          variant={variant}
+          {...rest}
+        >
           {message || 'Unknown'}
         </ClusterStatusSpan>
         {cluster.taskError && renderErrorStatus(cluster.taskError, fields.nodesDetailsUrl, variant)}
@@ -153,7 +168,12 @@ export const ClusterHealthStatus: FC<IClusterStatusProps> = ({
   return (
     <div>
       {fields && (
-        <ClusterStatusSpan title={fields.message} status={fields.status} variant={variant}>
+        <ClusterStatusSpan
+          title={fields.message}
+          status={fields.status}
+          variant={variant}
+          {...rest}
+        >
           {variant === 'header' ? (
             fields.label
           ) : (
@@ -170,6 +190,7 @@ export const ClusterConnectionStatus: FC<IClusterStatusProps> = ({
   cluster,
   variant = 'table',
   message = undefined,
+  ...rest
 }) => {
   if (isTransientStatus(cluster.taskStatus)) {
     return renderTransientStatus(cluster, variant)
@@ -178,14 +199,19 @@ export const ClusterConnectionStatus: FC<IClusterStatusProps> = ({
 
   if (!fields) {
     return (
-      <ClusterStatusSpan title={message || 'Unknown'} status="unknown" variant={variant}>
+      <ClusterStatusSpan title={message || 'Unknown'} status="unknown" variant={variant} {...rest}>
         {message || 'Unknown'}
       </ClusterStatusSpan>
     )
   }
 
   return (
-    <ClusterStatusSpan title={fields.message} status={fields.clusterStatus} variant={variant}>
+    <ClusterStatusSpan
+      title={fields.message}
+      status={fields.clusterStatus}
+      variant={variant}
+      {...rest}
+    >
       {variant === 'header' ? (
         fields.label
       ) : (

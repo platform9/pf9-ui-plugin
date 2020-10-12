@@ -85,6 +85,8 @@ const PieUsageWidget = ({
   const primaryObj = data.find((x) => x.name === primary)
   const primaryNum = primaryObj.value
   const percent = primaryNum / total || 0
+  const healthColorKey =
+    percent < 0.25 ? 'red' : percent < 0.5 ? 'orange' : percent < 0.75 ? 'yellow' : 'green'
 
   return (
     <div className={container}>
@@ -93,6 +95,7 @@ const PieUsageWidget = ({
         arcWidth={arcWidth}
         data={data}
         percent={percent}
+        healthColor={healthColorKey}
         primary={primary}
         empty={!total}
         {...rest}

@@ -40,6 +40,7 @@ const useStyles = makeStyles<Theme, { color: string; variant: string }>((theme: 
     justifyContent: 'center',
   },
   button: {
+    cursor: 'pointer',
     outline: 0,
     minHeight: 40,
     // minWidth: 150,
