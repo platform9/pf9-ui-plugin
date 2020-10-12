@@ -6,6 +6,7 @@ import createSorter from 'core/helpers/createSorter'
 import DataKeys from 'k8s/DataKeys'
 import getDataSelector from 'core/utils/getDataSelector'
 import { ICombinedHost } from 'k8s/components/infrastructure/common/model'
+import calcUsageTotalByPath from 'k8s/util/calcUsageTotals'
 
 export const nodesSelector = createSelector(
   [
@@ -25,15 +26,24 @@ export const nodesSelector = createSelector(
       pipeWhenTruthy(find(propEq('name', 'qbert')), prop('url'))(rawServiceCatalog) || ''
 
     // associate nodes with the combinedHost entry
-    return rawNodes.map((node) => ({
-      ...node,
-      // if hostagent is not responding, then the nodes info is outdated
-      // set the status to disconnected manually
-      status: combinedHostsObj[node.uuid].responding ? node.status : 'disconnected',
-      combined: combinedHostsObj[node.uuid],
-      // qbert v3 link fails authorization so we have to use v1 link for logs
-      logs: `${qbertUrl}/logs/${node.uuid}`.replace(/v3/, 'v1'),
-    }))
+    return rawNodes.map((node) => {
+      const calcNodeUsage = calcUsageTotalByPath([combinedHostsObj[node.uuid]]) // expects array
+      const usage = {
+        compute: calcNodeUsage('usage.compute.current', 'usage.compute.max'),
+        memory: calcNodeUsage('usage.memory.current', 'usage.memory.max'),
+        disk: calcNodeUsage('usage.disk.current', 'usage.disk.max'),
+      }
+      return {
+        ...node,
+        // if hostagent is not responding, then the nodes info is outdated
+        // set the status to disconnected manually
+        status: combinedHostsObj[node.uuid].responding ? node.status : 'disconnected',
+        combined: combinedHostsObj[node.uuid],
+        // qbert v3 link fails authorization so we have to use v1 link for logs
+        logs: `${qbertUrl}/logs/${node.uuid}`.replace(/v3/, 'v1'),
+        usage,
+      }
+    })
   },
 )
 

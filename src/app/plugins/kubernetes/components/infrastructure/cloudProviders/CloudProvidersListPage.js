@@ -3,30 +3,12 @@ import createCRUDComponents from 'core/helpers/createCRUDComponents'
 import ResourceUsageTable from 'k8s/components/infrastructure/common/ResourceUsageTable'
 import SimpleLink from 'core/components/SimpleLink'
 import { ActionDataKeys } from 'k8s/DataKeys'
+import ResourceUsageTables from '../common/ResourceUsageTables'
 
 const toMHz = (bytes) => bytes / Math.pow(1024, 2)
 const toGB = (bytes) => bytes / Math.pow(1024, 3)
 const renderDeployedCapacity = (_, { deployedCapacity }) => (
-  <div>
-    <ResourceUsageTable
-      valueConverter={toMHz}
-      units="MHz"
-      label="CPU"
-      stats={deployedCapacity.compute}
-    />
-    <ResourceUsageTable
-      valueConverter={toGB}
-      units="GB"
-      label="Memory"
-      stats={deployedCapacity.memory}
-    />
-    <ResourceUsageTable
-      valueConverter={toGB}
-      units="GB"
-      label="Storage"
-      stats={deployedCapacity.disk}
-    />
-  </div>
+  <ResourceUsageTables usage={deployedCapacity} />
 )
 const renderClusterLink = ({ uuid, name }) => (
   <div key={uuid}>
