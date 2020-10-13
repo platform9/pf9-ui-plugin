@@ -17,6 +17,8 @@ import { hasPathStr, pathStr } from 'utils/fp'
 import { prop, has, cond, T, identity, when } from 'ramda'
 import { isPlainObject } from 'utils/misc'
 
+import Bugsnag from '@bugsnag/js'
+
 class ApiClient {
   static init(options = {}) {
     this.instance = new this(options)
@@ -78,7 +80,12 @@ class ApiClient {
     this.axiosInstance = axios.create({ ...defaultAxiosConfig, ...(options.axios || {}) })
     this.axiosInstance.interceptors.response.use(
       (response) => response,
-      (error) => Promise.reject(getResponseError(error)),
+      async (error) => {
+        // We temporarily track the error as is so that in the future
+        // we can improve the errors returned by the backend
+        Bugsnag.notify(error)
+        return Promise.reject(getResponseError(error))
+      },
     )
   }
 
