@@ -20,7 +20,7 @@ import { renderNodeHealthStatus } from './NodesListPage'
 import { nodeInstallTroubleshooting } from 'k8s/links'
 import NoContentMessage from 'core/components/NoContentMessage'
 import clsx from 'clsx'
-import ResourceUsageTable from '../common/ResourceUsageTable'
+import ResourceUsageTables from '../common/ResourceUsageTables'
 
 const useStyles = makeStyles<Theme, {}>((theme) => ({
   gridContainer: {
@@ -133,25 +133,8 @@ const useStyles = makeStyles<Theme, {}>((theme) => ({
   },
 }))
 
-const toMHz = (value) => value * 1024
 const ResourceStats = ({ usage }) => {
-  if (!usage?.compute?.current) {
-    return null
-  }
-
-  return (
-    <>
-      <ResourceUsageTable
-        valueOff
-        valueConverter={toMHz}
-        units="MHz"
-        label="CPU"
-        stats={usage?.compute}
-      />
-      <ResourceUsageTable valueOff units="GiB" label="Memory" stats={usage?.memory} />
-      <ResourceUsageTable valueOff units="GiB" label="Storage" stats={usage?.disk} />
-    </>
-  )
+  return <ResourceUsageTables valueOff usage={usage} />
 }
 
 const getTaskContent = (

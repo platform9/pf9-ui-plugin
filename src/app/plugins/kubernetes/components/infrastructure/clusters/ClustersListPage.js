@@ -16,7 +16,6 @@ import {
   ClusterHealthStatus,
 } from 'k8s/components/infrastructure/clusters/ClusterStatus'
 import ClusterUpgradeDialog from 'k8s/components/infrastructure/clusters/ClusterUpgradeDialog'
-import ResourceUsageTable from 'k8s/components/infrastructure/common/ResourceUsageTable'
 import PrometheusAddonDialog from 'k8s/components/prometheus/PrometheusAddonDialog'
 import { ActionDataKeys } from 'k8s/DataKeys'
 import { isAdminRole } from 'k8s/util/helpers'
@@ -27,6 +26,7 @@ import { capitalizeString, castBoolToStr } from 'utils/misc'
 import { cloudProviderTypes } from '../cloudProviders/selectors'
 import ClusterDeleteDialog from './ClusterDeleteDialog'
 import DownloadKubeConfigLink from './DownloadKubeConfigLink'
+import ResourceUsageTables from '../common/ResourceUsageTables'
 
 const useStyles = makeStyles((theme) => ({
   links: {
@@ -103,39 +103,7 @@ const renderNodeLink = (_, { uuid, nodes }) => {
   return <SimpleLink src={routes.cluster.nodes.path({ id: uuid })}>View {nodes.length}</SimpleLink>
 }
 
-const toMHz = (value) => value * 1024
-const getEmptyUsage = (usage) => {
-  return {
-    compute: {
-      current: 0,
-      max: pathOr(0, ['compute', 'max'], usage),
-      percent: 0,
-    },
-    memory: {
-      current: 0,
-      max: pathOr(0, ['memory', 'max'], usage),
-      percent: 0,
-    },
-    disk: {
-      current: 0,
-      max: pathOr(0, ['disk', 'max'], usage),
-      percent: 0,
-    },
-  }
-}
-
-const renderStats = (_, { usage, connectionStatus }) => {
-  const hasValidStats = !!path(['compute', 'current'], usage)
-  const hasValidConnectionStatus = ['connected', 'partially_connected'].includes(connectionStatus)
-  const stats = !hasValidConnectionStatus || !hasValidStats ? getEmptyUsage(usage) : usage
-  return (
-    <>
-      <ResourceUsageTable valueConverter={toMHz} units="MHz" label="CPU" stats={stats.compute} />
-      <ResourceUsageTable units="GiB" label="Memory" stats={stats.memory} />
-      <ResourceUsageTable units="GiB" label="Storage" stats={stats.disk} />
-    </>
-  )
-}
+const renderStats = (_, { usage }) => <ResourceUsageTables usage={usage} />
 
 const renderClusterDetailLink = (name, cluster) => (
   <SimpleLink src={routes.cluster.nodes.path({ id: cluster.uuid })}>{name}</SimpleLink>

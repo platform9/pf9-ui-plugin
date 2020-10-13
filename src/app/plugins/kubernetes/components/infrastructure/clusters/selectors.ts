@@ -2,7 +2,6 @@ import { createSelector } from 'reselect'
 import { either, mergeLeft, partition, pathOr, pipe, pluck } from 'ramda'
 import { filterIf } from 'utils/fp'
 import createSorter, { SortConfig } from 'core/helpers/createSorter'
-import calcUsageTotalByPath from 'k8s/util/calcUsageTotals'
 import {
   getConnectionStatus,
   getHealthStatus,
@@ -26,6 +25,7 @@ import { nodesSelector } from 'k8s/components/infrastructure/nodes/selectors'
 import { combinedHostsSelector } from 'k8s/components/infrastructure/common/selectors'
 import { hasPrometheusEnabled } from 'k8s/components/prometheus/helpers'
 import { INodesSelector } from 'k8s/components/infrastructure/nodes/model'
+import { calculateNodeUsages } from '../common/helpers'
 
 export const clustersSelector = createSelector(
   [
@@ -47,16 +47,14 @@ export const clustersSelector = createSelector(
       const nodesInCluster = nodes.filter((node) => node.clusterUuid === cluster.uuid)
       const nodeIds = pluck('uuid', nodesInCluster)
       const combinedNodes = combinedHosts.filter((x) => nodeIds.includes(x?.resmgr?.id))
-      const calcNodesTotals = calcUsageTotalByPath(combinedNodes)
       const host = qbertEndpoint.match(/(.*?)\/qbert/)[1]
       const grafanaLink =
         `${host}/k8s/v1/clusters/${cluster.uuid}/k8sapi/api/v1/` +
         `namespaces/pf9-monitoring/services/http:grafana-ui:80/proxy/`
       const isPrometheusEnabled = hasPrometheusEnabled(clusterWithTasks)
+      const _usage = calculateNodeUsages(combinedNodes)
       const usage = {
-        compute: calcNodesTotals('usage.compute.current', 'usage.compute.max'),
-        memory: calcNodesTotals('usage.memory.current', 'usage.memory.max'),
-        disk: calcNodesTotals('usage.disk.current', 'usage.disk.max'),
+        ..._usage,
         grafanaLink: isPrometheusEnabled ? grafanaLink : null,
       }
       const isMasterNode = (node) => node.isMaster === 1
