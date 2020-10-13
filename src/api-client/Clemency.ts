@@ -1,5 +1,6 @@
 import config from '../../config'
 import ApiService from 'api-client/ApiService'
+import { trackApiMethodMetadata } from './helpers'
 
 export interface IApiData {
   username: string
@@ -34,6 +35,11 @@ class Clemency extends ApiService {
     })
   }
 
+  @trackApiMethodMetadata({
+    url: '/clemency/reset/password/{secret}',
+    type: 'GET',
+    params: ['secret'],
+  })
   verifyPasswordReset = async (secret: string): Promise<any> => {
     return this.client.basicGet({
       url: `${this.baseUrl}/reset/password/${secret}`,
@@ -69,6 +75,11 @@ class Clemency extends ApiService {
   }
 
   // this url format is strange but is a requirement for the API
+  @trackApiMethodMetadata({
+    url: '/clemency/activate/username={username}&otp={otp}',
+    type: 'GET',
+    params: ['username', 'otp'],
+  })
   verifyActivateLink = async (username, otp): Promise<any> => {
     return this.client.basicGet({
       url: `${this.baseUrl}/activate/username=${username}&otp=${otp}`,

@@ -97,7 +97,7 @@ const CodeMirror = ({
     <InfoTooltip open={open} info={info} placement={placement}>
       <FormControl id={id} error={hasError} className={classes.root}>
         <FormLabel>
-          <Text className={classes.coderMirrorHeader} variant="body1">
+          <Text className={classes.coderMirrorHeader} variant="body1" component="div">
             {label}
           </Text>
         </FormLabel>

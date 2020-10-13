@@ -1,7 +1,7 @@
 import { propOr, map, pipe, mergeLeft } from 'ramda'
 import { keyValueArrToObj } from 'utils/fp'
 import { pathJoin } from 'utils/misc'
-import { normalizeResponse } from 'api-client/helpers'
+import { normalizeResponse, trackApiMethodMetadata } from 'api-client/helpers'
 import ApiService from 'api-client/ApiService'
 import {
   Node,
@@ -97,6 +97,7 @@ class Qbert extends ApiService {
     )
 
   /* Cloud Providers */
+  @trackApiMethodMetadata({ url: '/cloudProviders', type: 'GET' })
   getCloudProviders = async () => {
     const url = `/cloudProviders`
     return this.client.basicGet<GetCloudProvider[]>({
@@ -120,6 +121,11 @@ class Qbert extends ApiService {
     })
   }
 
+  @trackApiMethodMetadata({
+    url: '/cloudProviders/{cloudProviderId}',
+    type: 'GET',
+    params: ['cloudProviderId'],
+  })
   getCloudProviderDetails = async (cpId) => {
     const url = `/cloudProviders/${cpId}`
     return this.client.basicGet({
@@ -131,6 +137,11 @@ class Qbert extends ApiService {
     })
   }
 
+  @trackApiMethodMetadata({
+    url: '/cloudProviders/{cloudProviderId}/region/{regionId}',
+    type: 'GET',
+    params: ['cloudProviderId', 'regionId'],
+  })
   getCloudProviderRegionDetails = async (cpId, regionId) => {
     const url = `/cloudProviders/${cpId}/region/${regionId}`
     return this.client.basicGet({
@@ -175,6 +186,7 @@ class Qbert extends ApiService {
   }
 
   /* Cloud Providers Types */
+  @trackApiMethodMetadata({ url: '/cloudProvider/types', type: 'GET' })
   getCloudProviderTypes = async () => {
     const url = `/cloudProvider/types`
     return this.client.basicGet({
@@ -187,6 +199,7 @@ class Qbert extends ApiService {
   }
 
   /* Node Pools */
+  @trackApiMethodMetadata({ url: '/nodePools', type: 'GET' })
   getNodePools = async () => {
     const url = `/nodePools`
     return this.client.basicGet({
@@ -199,6 +212,7 @@ class Qbert extends ApiService {
   }
 
   /* Nodes */
+  @trackApiMethodMetadata({ url: '/nodes', type: 'GET' })
   getNodes = async () => {
     const url = `/nodes`
     return this.client.basicGet<Node[]>({
@@ -228,6 +242,7 @@ class Qbert extends ApiService {
   }
 
   /* Clusters */
+  @trackApiMethodMetadata({ url: '/clusters', type: 'GET' })
   getClusters = async () => {
     const url = `/clusters`
     const rawClusters = await this.client.basicGet<ClusterElement[]>({
@@ -241,6 +256,7 @@ class Qbert extends ApiService {
     return rawClusters.map(normalizeCluster<ClusterElement>(baseUrl))
   }
 
+  @trackApiMethodMetadata({ url: '/clusters/{clusterId', type: 'GET', params: ['clusterId'] })
   getClusterDetails = async (clusterId) => {
     const url = `/clusters/${clusterId}`
     const cluster = await this.client.basicGet({
@@ -254,6 +270,12 @@ class Qbert extends ApiService {
     return normalizeCluster(baseUrl)(cluster)
   }
 
+  @trackApiMethodMetadata({
+    url:
+      '/clusters/{clusterUuid}/k8sapi/api/v1/namespaces/platform9-system/services/pf9-sentry/proxy/v1/storage',
+    type: 'GET',
+    params: ['clusterUuid'],
+  })
   getClusterCsiDrivers = async (clusterUuid) => {
     const url = pathJoin(
       'clusters',
@@ -323,21 +345,21 @@ class Qbert extends ApiService {
 
   // @param clusterId = cluster.uuid
   // @param nodes = [{ uuid: node.uuid, isMaster: (true|false) }]
-  attach = async (clusterId, body) => {
+  attachNodes = async (clusterId, body) => {
     const url = `/clusters/${clusterId}/attach`
     return this.client.basicPost({
       url,
       body,
       options: {
         clsName: this.getClassName(),
-        mthdName: 'attach',
+        mthdName: 'attachNodes',
       },
     })
   }
 
   // @param clusterId = cluster.uuid
   // @param nodes = [node1Uuid, node2Uuid, ...]
-  detach = async (clusterId, nodeUuids) => {
+  detachNodes = async (clusterId, nodeUuids) => {
     const body = nodeUuids.map((nodeUuid) => ({ uuid: nodeUuid }))
     const url = `/clusters/${clusterId}/detach`
     return this.client.basicPost({
@@ -345,7 +367,7 @@ class Qbert extends ApiService {
       body,
       options: {
         clsName: this.getClassName(),
-        mthdName: 'detach',
+        mthdName: 'detachNodes',
       },
     })
   }
@@ -365,6 +387,7 @@ class Qbert extends ApiService {
     return response.token
   }
 
+  @trackApiMethodMetadata({ url: '/kubeconfig/{clusterId}', type: 'GET', params: ['clusterId'] })
   getKubeConfig = async (clusterId) => {
     const url = `/kubeconfig/${clusterId}`
     return this.client.basicGet<string>({
@@ -377,6 +400,11 @@ class Qbert extends ApiService {
   }
 
   /* k8s API */
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterId}/k8sapi/version',
+    type: 'GET',
+    params: ['clusterId'],
+  })
   getKubernetesVersion = async (clusterId) => {
     const url = `/clusters/${clusterId}/k8sapi/version`
     return this.client.basicGet<GetKubernetesVersion>({
@@ -399,6 +427,11 @@ class Qbert extends ApiService {
     namespace: item.metadata.namespace,
   })
 
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterId}/k8sapi/api/v1/namespaces',
+    type: 'GET',
+    params: ['clusterId'],
+  })
   getClusterNamespaces = async (clusterId) => {
     const url = `/clusters/${clusterId}/k8sapi/api/v1/namespaces`
     const data = await this.client.basicGet<GetClusterNamespaces>({
@@ -435,6 +468,11 @@ class Qbert extends ApiService {
     })
   }
 
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterId}/k8sapi/api/v1/pods',
+    type: 'GET',
+    params: ['clusterId'],
+  })
   getClusterPods = async (clusterId) => {
     const url = `/clusters/${clusterId}/k8sapi/api/v1/pods`
     const data = await this.client.basicGet<GetClusterPods>({
@@ -447,6 +485,11 @@ class Qbert extends ApiService {
     return data.items.map(this.convertResource(clusterId))
   }
 
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterId}/k8sapi/apis/apps/v1/deployments',
+    type: 'GET',
+    params: ['clusterId'],
+  })
   getClusterDeployments = async (clusterId) => {
     const url = `/clusters/${clusterId}/k8sapi/apis/apps/v1/deployments`
     const data = await this.client.basicGet<GetClusterDeployments>({
@@ -460,7 +503,7 @@ class Qbert extends ApiService {
   }
 
   deleteDeployment = async (clusterId, namespace, name) => {
-    const url = `}/k8sapi/apis/apps/v1/namespaces/${namespace}/deployments/${name}`
+    const url = `/k8sapi/apis/apps/v1/namespaces/${namespace}/deployments/${name}`
     return this.client.basicDelete({
       url,
       options: {
@@ -470,6 +513,11 @@ class Qbert extends ApiService {
     })
   }
 
+  @trackApiMethodMetadata({
+    url: 'clusters/{clusterId}/k8sapi/api/v1/services',
+    type: 'GET',
+    params: ['clusterId'],
+  })
   getClusterKubeServices = async (clusterId) => {
     const url = `/clusters/${clusterId}/k8sapi/api/v1/services`
     const data = await this.client.basicGet<GetClusterKubeServices>({
@@ -482,6 +530,11 @@ class Qbert extends ApiService {
     return data.items.map(this.convertResource<GetClusterKubeServicesItem>(clusterId))
   }
 
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterId}/k8sapi/apis/storage.k8s.io/v1/storageclasses',
+    type: 'GET',
+    params: ['clusterId'],
+  })
   getClusterStorageClasses = async (clusterId) => {
     const url = `/clusters/${clusterId}/k8sapi/apis/storage.k8s.io/v1/storageclasses`
     const data = await this.client.basicGet<GetCluster>({
@@ -517,6 +570,11 @@ class Qbert extends ApiService {
     })
   }
 
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterId}/k8sapi/apis/apps/v1/replicasets',
+    type: 'GET',
+    params: ['clusterId'],
+  })
   getReplicaSets = async (clusterId) => {
     const url = `/clusters/${clusterId}/k8sapi/apis/apps/v1/replicasets`
     return this.client.basicGet({
@@ -528,6 +586,11 @@ class Qbert extends ApiService {
     })
   }
 
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterId}/k8sapi/api/v1/namespaces/{namespace}/pods',
+    type: 'GET',
+    params: ['clusterId', 'namespace'],
+  })
   createPod = async (clusterId, namespace, body) => {
     const url = `/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/pods`
     return this.client.basicPost({
@@ -782,6 +845,11 @@ class Qbert extends ApiService {
     })
   }
 
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterId}/k8sapi/api/v1/namespaces/{namespace}/serviceaccounts',
+    type: 'GET',
+    params: ['clusterId', 'namespace'],
+  })
   getServiceAccounts = async (clusterId, namespace) => {
     const url = `/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/serviceaccounts`
     const response = await this.client.basicGet<any>({
@@ -795,6 +863,11 @@ class Qbert extends ApiService {
   }
 
   /* RBAC */
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/roles',
+    type: 'GET',
+    params: ['clusterId'],
+  })
   getClusterRoles = async (clusterId) => {
     const url = `/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/roles`
     const response = await this.client.basicGet<GetClusterRoles>({
@@ -844,6 +917,11 @@ class Qbert extends ApiService {
     })
   }
 
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterroles',
+    type: 'GET',
+    params: ['clusterId'],
+  })
   getClusterClusterRoles = async (clusterId) => {
     const url = `/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterroles`
     const response = await this.client.basicGet<GetClusterClusterRoles>({
@@ -893,6 +971,11 @@ class Qbert extends ApiService {
     })
   }
 
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/rolebindings',
+    type: 'GET',
+    params: ['clusterId'],
+  })
   getClusterRoleBindings = async (clusterId) => {
     const url = `/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/rolebindings`
     const response = await this.client.basicGet<GetCluster>({
@@ -942,6 +1025,11 @@ class Qbert extends ApiService {
     })
   }
 
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterrolebindings',
+    type: 'GET',
+    params: ['clusterId'],
+  })
   getClusterClusterRoleBindings = async (clusterId) => {
     const url = `/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterrolebindings`
     const response = await this.client.basicGet<GetCluster>({
@@ -992,6 +1080,11 @@ class Qbert extends ApiService {
   }
 
   /* Managed Apps */
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterId}/k8sapi/apis/monitoring.coreos.com/v1/prometheuses',
+    type: 'GET',
+    params: ['clusterId'],
+  })
   getPrometheusInstances = async (clusterUuid) => {
     const url = `/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/prometheuses`
     const response = await this.client.basicGet<any>({
@@ -1147,6 +1240,12 @@ class Qbert extends ApiService {
     return response
   }
 
+  @trackApiMethodMetadata({
+    url:
+      '/clusters/{clusterId}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-alertmanager:9093/proxy/api/v2/alerts',
+    type: 'GET',
+    params: ['clusterId'],
+  })
   getAlertManagerAlerts = async (clusterUuid): Promise<AlertManagerAlert[]> => {
     const url = `/clusters/${clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-alertmanager:9093/proxy/api/v2/alerts`
     const alerts = await this.client.basicGet<AlertManagerRaw[]>({
@@ -1163,6 +1262,12 @@ class Qbert extends ApiService {
     }))
   }
 
+  @trackApiMethodMetadata({
+    url:
+      '/clusters/{clusterId}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/alerts',
+    type: 'GET',
+    params: ['clusterId'],
+  })
   getPrometheusAlerts = async (clusterUuid) => {
     const url = `/clusters/${clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/alerts`
     const response = await this.client.basicGet<GetPrometheusAlerts>({
@@ -1179,6 +1284,12 @@ class Qbert extends ApiService {
     }))
   }
 
+  @trackApiMethodMetadata({
+    url:
+      '/clusters/${clusterId}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/rules',
+    type: 'GET',
+    params: ['clusterId'],
+  })
   getPrometheusAlertRules = async (clusterUuid) => {
     const url = `/clusters/${clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/rules`
     const response = await this.client.basicGet<GetPrometheusAlertRules>({
@@ -1201,6 +1312,12 @@ class Qbert extends ApiService {
     return alertRules
   }
 
+  @trackApiMethodMetadata({
+    url:
+      '/clusters/{clusterId}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/query_range?query=ALERTS&start={startTime}&end={endTime}&step={step}',
+    type: 'GET',
+    params: ['clusterId', 'startTime', 'endTime', 'step'],
+  })
   getPrometheusAlertsOverTime = async (
     clusterUuid,
     startTime,
@@ -1223,6 +1340,11 @@ class Qbert extends ApiService {
     }))
   }
 
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/servicemonitors',
+    type: 'GET',
+    params: ['clusterId'],
+  })
   getPrometheusServiceMonitors = async (clusterUuid) => {
     const url = `/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/servicemonitors`
     const response = await this.client.basicGet<any>({
@@ -1267,6 +1389,11 @@ class Qbert extends ApiService {
     })
   }
 
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterId}/k8sapi/apis/monitoring.coreos.com/v1/prometheusrules',
+    type: 'GET',
+    params: ['clusterId'],
+  })
   getPrometheusRules = async (clusterUuid) => {
     const url = `/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/prometheusrules`
     const response = await this.client.basicGet<any>({
@@ -1311,6 +1438,11 @@ class Qbert extends ApiService {
     })
   }
 
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterId}/k8sapi/apis/monitoring.coreos.com/v1/alertmanagers',
+    type: 'GET',
+    params: ['clusterId'],
+  })
   getPrometheusAlertManagers = async (clusterUuid) => {
     const url = `/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/alertmanagers`
     const response = await this.client.basicGet<any>({
@@ -1356,6 +1488,11 @@ class Qbert extends ApiService {
   getLoggingsBaseUrl = (clusterUuid) =>
     `/clusters/${clusterUuid}/k8sapi/apis/logging.pf9.io/v1alpha1/outputs`
 
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterId}/k8sapi/apis/logging.pf9.io/v1alpha1/outputs',
+    type: 'GET',
+    params: ['clusterId'],
+  })
   getLoggings = async (clusterUuid) => {
     const url = this.getLoggingsBaseUrl(clusterUuid)
     return this.client.basicGet({
@@ -1405,6 +1542,11 @@ class Qbert extends ApiService {
   }
 
   // API Resources
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterId}/k8sapi/apis',
+    type: 'GET',
+    params: ['clusterId'],
+  })
   getApiGroupList = async (clusterId) => {
     const url = `/clusters/${clusterId}/k8sapi/apis`
     return this.client.basicGet({
@@ -1416,6 +1558,11 @@ class Qbert extends ApiService {
     })
   }
 
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterId}/k8sapi/apis/{apiGroup}',
+    type: 'GET',
+    params: ['clusterId', 'apiGroup'],
+  })
   getApiResourcesList = async (config) => {
     const { clusterId, apiGroup } = config
     const url = `/clusters/${clusterId}/k8sapi/apis/${apiGroup}`
@@ -1428,6 +1575,11 @@ class Qbert extends ApiService {
     })
   }
 
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterId}/k8sapi/api/v1',
+    type: 'GET',
+    params: ['clusterId'],
+  })
   getCoreApiResourcesList = async (clusterId) => {
     const url = `/clusters/${clusterId}/k8sapi/api/v1`
     return this.client.basicGet({

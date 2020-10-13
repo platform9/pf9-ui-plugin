@@ -153,7 +153,7 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
       )
     },
     attachNodes: async ({ cluster, nodes }, prevItems) => {
-      await qbert.attach(cluster.uuid, nodes)
+      await qbert.attachNodes(cluster.uuid, nodes)
       trackEvent('Cluster Attach Nodes', {
         numNodes: (nodes || []).length,
         clusterUuid: cluster.uuid,
@@ -162,7 +162,7 @@ export const clusterActions = createCRUDActions(ActionDataKeys.Clusters, {
       return prevItems
     },
     detachNodes: async ({ cluster, nodes }, prevItems) => {
-      await qbert.detach(cluster.uuid, nodes)
+      await qbert.detachNodes(cluster.uuid, nodes)
       trackEvent('Cluster Detach Nodes', {
         numNodes: (nodes || []).length,
         clusterUuid: cluster.uuid,

@@ -18,9 +18,6 @@ const ApiAccessListPage = () => {
   return (
     <div className={classes.container}>
       <EnpointsListPage />
-      <FormFieldCard title="API Helper">
-        <ApiHelper classes={{ root: classes.apiHelper }} elevated={false} />
-      </FormFieldCard>
     </div>
   )
 }
