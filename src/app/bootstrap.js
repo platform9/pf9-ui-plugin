@@ -1,7 +1,14 @@
+import Bugsnag from '@bugsnag/js'
+import BugsnagPluginReact from '@bugsnag/plugin-react'
 import { setupFromConfig } from 'utils/registry'
 import config from '../../config'
 import ApiClient from 'api-client/ApiClient'
 import './app.css'
+
+Bugsnag.start({
+  apiKey: '3eb58c77ada2a9db70fc7a8e81e97b99',
+  plugins: [new BugsnagPluginReact()],
+})
 
 setupFromConfig(config)
 window.process = process

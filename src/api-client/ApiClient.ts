@@ -27,6 +27,7 @@ import {
   IBasicRequestPostParams,
 } from './model'
 import ApiService from 'api-client/ApiService'
+import Bugsnag from '@bugsnag/js'
 
 interface ApiClientOptions {
   [key: string]: any
@@ -112,7 +113,12 @@ class ApiClient {
     this.axiosInstance = axios.create({ ...defaultAxiosConfig, ...(options.axios || {}) })
     this.axiosInstance.interceptors.response.use(
       (response) => response,
-      async (error) => Promise.reject(getResponseError(error)),
+      async (error) => {
+        // We temporarily track the error as is so that in the future
+        // we can improve the errors returned by the backend
+        Bugsnag.notify(error)
+        return Promise.reject(getResponseError(error))
+      },
     )
 
     // Keystone is used by all the other services so it must be initialized first
