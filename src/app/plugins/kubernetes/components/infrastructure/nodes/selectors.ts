@@ -6,7 +6,7 @@ import createSorter from 'core/helpers/createSorter'
 import DataKeys from 'k8s/DataKeys'
 import getDataSelector from 'core/utils/getDataSelector'
 import { ICombinedHost } from 'k8s/components/infrastructure/common/model'
-import calcUsageTotalByPath from 'k8s/util/calcUsageTotals'
+import { calculateNodeUsages } from '../common/helpers'
 
 export const nodesSelector = createSelector(
   [
@@ -27,12 +27,7 @@ export const nodesSelector = createSelector(
 
     // associate nodes with the combinedHost entry
     return rawNodes.map((node) => {
-      const calcNodeUsage = calcUsageTotalByPath([combinedHostsObj[node.uuid]]) // expects array
-      const usage = {
-        compute: calcNodeUsage('usage.compute.current', 'usage.compute.max'),
-        memory: calcNodeUsage('usage.memory.current', 'usage.memory.max'),
-        disk: calcNodeUsage('usage.disk.current', 'usage.disk.max'),
-      }
+      const usage = calculateNodeUsages([combinedHostsObj[node.uuid]]) // expects array
       return {
         ...node,
         // if hostagent is not responding, then the nodes info is outdated

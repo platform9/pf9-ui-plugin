@@ -2,7 +2,6 @@ import { createSelector } from 'reselect'
 import { filter, map, mergeLeft, pipe, pluck, propEq } from 'ramda'
 import { capitalizeString } from 'utils/misc'
 import createSorter from 'core/helpers/createSorter'
-import calcUsageTotalByPath from 'k8s/util/calcUsageTotals'
 import { clustersSelector } from 'k8s/components/infrastructure/clusters/selectors'
 import { combinedHostsSelector } from 'k8s/components/infrastructure/common/selectors'
 import DataKeys from 'k8s/DataKeys'
@@ -10,6 +9,7 @@ import getDataSelector from 'core/utils/getDataSelector'
 import { GetCloudProvider } from 'api-client/qbert.model'
 
 import { ICloudProvidersSelector } from './model'
+import { calculateNodeUsages } from '../common/helpers'
 
 export const cloudProviderTypes = {
   aws: 'AWS',
@@ -33,12 +33,7 @@ export const cloudProvidersSelector = createSelector(
         const filterCpClusters = propEq('nodePoolUuid', cloudProvider.nodePoolUuid)
         const cpClusters = clusters.filter(filterCpClusters)
         const cpNodes = pluck('nodes', cpClusters).flat()
-        const calcNodesTotals = calcUsageTotalByPath(cpNodes)
-        const usage = {
-          compute: calcNodesTotals('usage.compute.current', 'usage.compute.max'),
-          memory: calcNodesTotals('usage.memory.current', 'usage.memory.max'),
-          disk: calcNodesTotals('usage.disk.current', 'usage.disk.max'),
-        }
+        const usage = calculateNodeUsages(cpNodes)
         return {
           ...cloudProvider,
           descriptiveType,

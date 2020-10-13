@@ -134,7 +134,7 @@ const useStyles = makeStyles<Theme, {}>((theme) => ({
 }))
 
 const ResourceStats = ({ usage }) => {
-  return <ResourceUsageTables usage={usage} valueOff={true} />
+  return <ResourceUsageTables valueOff usage={usage} />
 }
 
 const getTaskContent = (
