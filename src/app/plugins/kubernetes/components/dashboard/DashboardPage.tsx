@@ -299,7 +299,9 @@ const DashboardPage = () => {
 
   const showClusters = promptOnboardingSetup([hasClusters, hasAccess, hasMonitoring])
   const showPods = !podSetupComplete(pods)
-  const showOnboarding = isAdmin && (showClusters || showPods)
+  // const showOnboarding = isAdmin && (showClusters || showPods)
+  let showOnboarding = isAdmin && (showClusters || showPods)
+  showOnboarding = false
 
   const handleComplete = useCallback(() => {
     forceUpdate()

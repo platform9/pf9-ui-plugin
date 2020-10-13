@@ -7,6 +7,9 @@ import { qbertApiLink } from 'k8s/links'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import { ActionDataKeys } from 'k8s/DataKeys'
+import { appUrlRoot } from 'app/constants'
+import SimpleLink from 'core/components/SimpleLink'
+import { routes } from 'core/utils/routes'
 
 const useStyles = makeStyles((theme) => ({
   blueIcon: {
@@ -46,10 +49,18 @@ const EndpointsListPage = () => {
   )
 }
 
+const renderApiDetailsLink = (api_name, text = '') => {
+  return <SimpleLink src={routes.apiDetails.path({ api_name })}>{text}</SimpleLink>
+}
+
 const columns = [
-  { id: 'name', label: 'Service' },
-  { id: 'type', label: 'Type' },
+  { id: 'name', label: 'Service', render: (value) => renderApiDetailsLink(value, value) },
   { id: 'url', label: 'URL' },
+  {
+    id: 'apiHelper',
+    label: 'API Helper',
+    render: (value, { name }) => renderApiDetailsLink(name, 'View API Helper'),
+  },
 ]
 
 export default EndpointsListPage

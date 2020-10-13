@@ -1,6 +1,7 @@
 // Appbert provides information about clusters and the managed apps (packages) installed on them.
 import ApiService from 'api-client/ApiService'
 import { ClusterTag } from './appbert.model'
+import { trackApiMethodMetadata } from './helpers'
 
 class Appbert extends ApiService {
   public getClassName() {
@@ -11,6 +12,7 @@ class Appbert extends ApiService {
     return this.client.keystone.getServiceEndpoint('appbert', 'admin')
   }
 
+  @trackApiMethodMetadata({ url: '/clusters', type: 'GET' })
   getClusterTags = async () => {
     // return this.client.basicGet(`${this.apiEndpoint}/clusters`)
     const data = await this.client.basicGet<ClusterTag[]>({
@@ -24,6 +26,7 @@ class Appbert extends ApiService {
     return data
   }
 
+  @trackApiMethodMetadata({ url: '/packages', type: 'GET' })
   getPackages = async () => {
     // return this.client.basicGet(`${this.apiEndpoint}/packages`)
     const data = await this.client.basicGet({

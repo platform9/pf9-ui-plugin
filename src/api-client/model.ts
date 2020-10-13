@@ -34,6 +34,12 @@ export interface IBasicRequestPostParams {
   options: IRequestOptions
 }
 
+export interface MethodMetadata {
+  url: string
+  type: string
+  params?: string[]
+}
+
 // import { AxiosResponse, AxiosRequestConfig } from 'axios'
 
 // type AxiosGetRequest = <T>(

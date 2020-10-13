@@ -1,6 +1,7 @@
 import { partition, uniq, includes } from 'ramda'
 import ApiService from 'api-client/ApiService'
 import { Host } from './resmgr.model'
+import { trackApiMethodMetadata } from './helpers'
 
 const roleNames = {
   'pf9-ostackhost-neutron': 'Hypervisor',
@@ -46,6 +47,7 @@ class ResMgr extends ApiService {
     return `${endpoint}/v1`
   }
 
+  @trackApiMethodMetadata({ url: '/hosts', type: 'GET' })
   async getHosts() {
     const url = `/hosts`
     return this.client.basicGet<Host[]>({
@@ -80,6 +82,11 @@ class ResMgr extends ApiService {
     })
   }
 
+  @trackApiMethodMetadata({
+    url: '/hosts/{hostId}/roles/{role}',
+    type: 'GET',
+    params: ['hostId', 'role'],
+  })
   async getRole<T>(hostId, role) {
     const url = `/hosts/${hostId}/roles/${role}`
     return this.client.basicGet<T>({
@@ -102,6 +109,7 @@ class ResMgr extends ApiService {
     })
   }
 
+  @trackApiMethodMetadata({ url: '/services/{service}', type: 'GET', params: ['service'] })
   async getService(service) {
     const url = `/services/${service}`
     return this.client.basicGet({

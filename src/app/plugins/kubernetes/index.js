@@ -50,6 +50,7 @@ import UpdateClusterRoleBindingPage from './components/rbac/UpdateClusterRoleBin
 // import OnboardingBanner from './components/onboarding/OnboardingBanner'
 // import AlarmsListPage from './components/alarms/AlarmsListPage'
 import MonitoringPage from './components/monitoring/MonitoringPage'
+import ApiDetailsPage from './components/apiAccess/ApiDetailsPage'
 
 class Kubernetes extends React.PureComponent {
   render() {
@@ -221,6 +222,11 @@ Kubernetes.registerPlugin = (pluginManager) => {
       name: 'API Access',
       link: { path: '/api_access', exact: true },
       component: ApiAccessPage,
+    },
+    {
+      name: 'API Endpoint Details',
+      link: { path: '/api_access/api/:api_name', exact: true },
+      component: ApiDetailsPage,
     },
     {
       name: 'Tenants & Users',

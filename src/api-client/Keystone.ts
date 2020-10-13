@@ -1,5 +1,5 @@
 import { pluck, pipe, values, head } from 'ramda'
-import { getHighestRole } from './helpers'
+import { getHighestRole, trackApiMethodMetadata } from './helpers'
 import { pathJoin, capitalizeString } from 'utils/misc'
 import { pathStr } from 'utils/fp'
 import ApiService from 'api-client/ApiService'
@@ -143,6 +143,7 @@ class Keystone extends ApiService {
     return `${this.v3}/roles`
   }
 
+  @trackApiMethodMetadata({ url: '/v3/projects/{projectId}', type: 'GET', params: ['projectId'] })
   getProject = async (id) => {
     const data = await this.client.basicGet<any>({
       url: `${this.projectsUrl}/${id}`,
@@ -178,6 +179,7 @@ class Keystone extends ApiService {
     return response.data.projects
   }
 
+  @trackApiMethodMetadata({ url: '/v3/PF9-KSADM/all_tenants_all_users', type: 'GET' })
   getAllTenantsAllUsers = async () => {
     const data = await this.client.basicGet<GetAllTenantsAllUsers>({
       url: this.allTenantsAllUsersUrl,
@@ -189,6 +191,11 @@ class Keystone extends ApiService {
     return data.tenants
   }
 
+  @trackApiMethodMetadata({
+    url: '/v3/role_assignments?scope.project.id={tenantId}',
+    type: 'GET',
+    params: ['tenantId'],
+  })
   getTenantRoleAssignments = async (tenantId) => {
     const data = await this.client.basicGet<GetUserRoleAssignments>({
       url: this.roleAssignments,
@@ -204,6 +211,11 @@ class Keystone extends ApiService {
     return data.role_assignments
   }
 
+  @trackApiMethodMetadata({
+    url: '/v3/role_assignments?user.id={userId}&include_names={includeNames}',
+    type: 'GET',
+    params: ['userId', 'includeNames'],
+  })
   getUserRoleAssignments = async (userId) => {
     const data = await this.client.basicGet<GetUserRoleAssignments>({
       url: this.roleAssignments,
@@ -219,6 +231,11 @@ class Keystone extends ApiService {
     return data.role_assignments
   }
 
+  @trackApiMethodMetadata({
+    url: '/v3/projects/{tenantId}/users/{userId}/roles/{roleId}',
+    type: 'GET',
+    params: ['tenantId', 'userId', 'roleId'],
+  })
   addUserRole = async ({ tenantId, userId, roleId }) => {
     await this.client.basicPut<string>({
       url: pathJoin(this.projectsUrl, `${tenantId}/users/${userId}/roles/${roleId}`),
@@ -246,6 +263,7 @@ class Keystone extends ApiService {
     }
   }
 
+  @trackApiMethodMetadata({ url: '/v3/groups', type: 'GET' })
   getGroups = async () => {
     const data = await this.client.basicGet<any>({
       url: this.groupsUrl,
@@ -257,6 +275,7 @@ class Keystone extends ApiService {
     return data.groups
   }
 
+  @trackApiMethodMetadata({ url: '/v3/OS-FEDERATION/mappings', type: 'GET' })
   getGroupMappings = async () => {
     const data = await this.client.basicGet<any>({
       url: this.groupMappingsUrl,
@@ -268,6 +287,7 @@ class Keystone extends ApiService {
     return data.mappings
   }
 
+  @trackApiMethodMetadata({ url: '/v3/roles', type: 'GET' })
   getRoles = async () => {
     const data = await this.client.basicGet<GetRoles>({
       url: this.rolesUrl,
@@ -528,6 +548,7 @@ class Keystone extends ApiService {
     }
   }
 
+  @trackApiMethodMetadata({ url: '/v3/regions', type: 'GET' })
   getRegions = async () => {
     const data = await this.client.basicGet<GetRegions>({
       url: this.regionsUrl,
@@ -546,6 +567,7 @@ class Keystone extends ApiService {
     },
   }
 
+  @trackApiMethodMetadata({ url: '/v3/auth/catalog', type: 'GET' })
   getServiceCatalog = async () => {
     const data = await this.client.basicGet<GetServiceCatalog>({
       url: this.catalogUrl,
@@ -558,6 +580,7 @@ class Keystone extends ApiService {
     return data.catalog
   }
 
+  @trackApiMethodMetadata({ url: '/v3/endpoints', type: 'GET' })
   getEndpoints = async () => {
     const data = await this.client.basicGet<any>({
       url: this.endpointsUrl,
@@ -594,6 +617,7 @@ class Keystone extends ApiService {
     return endpoint
   }
 
+  @trackApiMethodMetadata({ url: '/v3/credentials', type: 'GET' })
   getCredentials = async () => {
     const data = await this.client.basicGet<GetCredentials>({
       url: this.credentialsUrl,
@@ -605,6 +629,7 @@ class Keystone extends ApiService {
     return data.credentials
   }
 
+  @trackApiMethodMetadata({ url: '/v3/users/{userId}', type: 'GET', params: ['userId'] })
   getUser = async (id) => {
     const data = await this.client.basicGet<any>({
       url: `${this.usersUrl}/${id}`,
@@ -616,6 +641,7 @@ class Keystone extends ApiService {
     return data.user
   }
 
+  @trackApiMethodMetadata({ url: '/v3/users', type: 'GET' })
   getUsers = async () => {
     const data = await this.client.basicGet<GetUsers>({
       url: this.usersUrl,
