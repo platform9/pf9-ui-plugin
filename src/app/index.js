@@ -2,5 +2,13 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import './bootstrap'
 import App from './App'
+import Bugsnag from '@bugsnag/js'
 
-ReactDOM.render(<App />, document.getElementById('root'))
+const ErrorBoundary = Bugsnag.getPlugin('react').createErrorBoundary(React)
+
+ReactDOM.render(
+  <ErrorBoundary>
+    <App />
+  </ErrorBoundary>,
+  document.getElementById('root'),
+)
