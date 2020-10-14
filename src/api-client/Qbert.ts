@@ -31,6 +31,7 @@ import {
 } from './qbert.model'
 import DataKeys from 'k8s/DataKeys'
 import uuid from 'uuid'
+import { MethodMetadata } from './model'
 
 type AlertManagerRaw = Omit<Omit<AlertManagerAlert, 'clusterId'>, 'id'>
 
@@ -64,6 +65,8 @@ class Qbert extends ApiService {
   public getClassName() {
     return 'qbert'
   }
+
+  static apiMethodsMetadata: MethodMetadata[] = []
 
   // cachedEndpoint = ''
 
@@ -109,6 +112,7 @@ class Qbert extends ApiService {
     })
   }
 
+  @trackApiMethodMetadata({ url: '/cloudProviders', type: 'POST' })
   createCloudProvider = async (body) => {
     const url = `/cloudProviders`
     return this.client.basicPost({
@@ -122,9 +126,9 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/cloudProviders/{cloudProviderId}',
+    url: '/cloudProviders/{cloudProviderUuid}',
     type: 'GET',
-    params: ['cloudProviderId'],
+    params: ['cloudProviderUuid'],
   })
   getCloudProviderDetails = async (cpId) => {
     const url = `/cloudProviders/${cpId}`
@@ -138,9 +142,9 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/cloudProviders/{cloudProviderId}/region/{regionId}',
+    url: '/cloudProviders/{cloudProviderUuid}/region/{regionName}',
     type: 'GET',
-    params: ['cloudProviderId', 'regionId'],
+    params: ['cloudProviderUuid', 'regionName'],
   })
   getCloudProviderRegionDetails = async (cpId, regionId) => {
     const url = `/cloudProviders/${cpId}/region/${regionId}`
@@ -153,6 +157,11 @@ class Qbert extends ApiService {
     })
   }
 
+  @trackApiMethodMetadata({
+    url: '/cloudProviders/{cloudProviderUuid}',
+    type: 'PUT',
+    params: ['cloudProvidersUuid'],
+  })
   updateCloudProvider = async (cpId, body) => {
     const url = `/cloudProviders/${cpId}`
     return this.client.basicPut({
@@ -165,6 +174,11 @@ class Qbert extends ApiService {
     })
   }
 
+  @trackApiMethodMetadata({
+    url: '/cloudProviders/{cloudProviderUuid}',
+    type: 'DELETE',
+    params: ['cloudProvidersUuid'],
+  })
   deleteCloudProvider = async (cpId) => {
     const url = `/cloudProviders/${cpId}`
     return this.client.basicDelete({
@@ -229,6 +243,11 @@ class Qbert extends ApiService {
   }
 
   /* SSH Keys */
+  @trackApiMethodMetadata({
+    url: '/cloudProviders/{cloudProviderUuid}/region/{regionName}',
+    type: 'PUT',
+    params: ['cloudProvidersUuid', 'regionName'],
+  })
   importSshKey = async (cpId, regionId, body) => {
     const url = `/cloudProviders/${cpId}/region/${regionId}`
     return this.client.basicPost({
@@ -256,7 +275,7 @@ class Qbert extends ApiService {
     return rawClusters.map(normalizeCluster<ClusterElement>(baseUrl))
   }
 
-  @trackApiMethodMetadata({ url: '/clusters/{clusterId', type: 'GET', params: ['clusterId'] })
+  @trackApiMethodMetadata({ url: '/clusters/{clusterUuid}', type: 'GET', params: ['clusterUuid'] })
   getClusterDetails = async (clusterId) => {
     const url = `/clusters/${clusterId}`
     const cluster = await this.client.basicGet({
@@ -291,6 +310,7 @@ class Qbert extends ApiService {
     })
   }
 
+  @trackApiMethodMetadata({ url: '/clusters', type: 'POST' })
   createCluster = async (body) => {
     // Note: This API response only returns new `uuid` in the response.
     // You might want to do a GET afterwards if you need any of the cluster information.
@@ -305,6 +325,7 @@ class Qbert extends ApiService {
     })
   }
 
+  @trackApiMethodMetadata({ url: '/clusters/{clusterUuid}', type: 'PUT', params: ['clusterUuid'] })
   updateCluster = async (clusterId, body) => {
     const url = `/clusters/${clusterId}`
     return this.client.basicPut({
@@ -317,6 +338,11 @@ class Qbert extends ApiService {
     })
   }
 
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterUuid}/upgrade',
+    type: 'POST',
+    params: ['clusterUuid'],
+  })
   upgradeCluster = async (clusterId) => {
     const url = `/clusters/${clusterId}/upgrade`
     return this.client.basicPost({
@@ -328,6 +354,11 @@ class Qbert extends ApiService {
     })
   }
 
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterUuid}',
+    type: 'DELETE',
+    params: ['clusterUuid'],
+  })
   deleteCluster = async (clusterId) => {
     const url = `/clusters/${clusterId}`
     return this.client.basicDelete({
@@ -345,6 +376,11 @@ class Qbert extends ApiService {
 
   // @param clusterId = cluster.uuid
   // @param nodes = [{ uuid: node.uuid, isMaster: (true|false) }]
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterUuid}/attach',
+    type: 'POST',
+    params: ['clusterUuid'],
+  })
   attachNodes = async (clusterId, body) => {
     const url = `/clusters/${clusterId}/attach`
     return this.client.basicPost({
@@ -359,6 +395,11 @@ class Qbert extends ApiService {
 
   // @param clusterId = cluster.uuid
   // @param nodes = [node1Uuid, node2Uuid, ...]
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterUuid}/detach',
+    type: 'POST',
+    params: ['clusterUuid'],
+  })
   detachNodes = async (clusterId, nodeUuids) => {
     const body = nodeUuids.map((nodeUuid) => ({ uuid: nodeUuid }))
     const url = `/clusters/${clusterId}/detach`
@@ -372,6 +413,7 @@ class Qbert extends ApiService {
     })
   }
 
+  @trackApiMethodMetadata({ url: '/webcli/{clusterUuid}', type: 'POST', params: ['clusterUuid'] })
   getCliToken = async (clusterId, namespace) => {
     const url = `/webcli/${clusterId}`
     const response = await this.client.basicPost<any>({
@@ -387,7 +429,11 @@ class Qbert extends ApiService {
     return response.token
   }
 
-  @trackApiMethodMetadata({ url: '/kubeconfig/{clusterId}', type: 'GET', params: ['clusterId'] })
+  @trackApiMethodMetadata({
+    url: '/kubeconfig/{clusterUuid}',
+    type: 'GET',
+    params: ['clusterUuid'],
+  })
   getKubeConfig = async (clusterId) => {
     const url = `/kubeconfig/${clusterId}`
     return this.client.basicGet<string>({
@@ -401,9 +447,9 @@ class Qbert extends ApiService {
 
   /* k8s API */
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterId}/k8sapi/version',
+    url: '/clusters/{clusterUuid}/k8sapi/version',
     type: 'GET',
-    params: ['clusterId'],
+    params: ['clusterUuid'],
   })
   getKubernetesVersion = async (clusterId) => {
     const url = `/clusters/${clusterId}/k8sapi/version`
@@ -428,9 +474,9 @@ class Qbert extends ApiService {
   })
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterId}/k8sapi/api/v1/namespaces',
+    url: '/clusters/{clusterUuid}/k8sapi/api/v1/namespaces',
     type: 'GET',
-    params: ['clusterId'],
+    params: ['clusterUuid'],
   })
   getClusterNamespaces = async (clusterId) => {
     const url = `/clusters/${clusterId}/k8sapi/api/v1/namespaces`
@@ -444,6 +490,11 @@ class Qbert extends ApiService {
     return data.items.map(this.convertResource<GetClusterNamespacesItem>(clusterId))
   }
 
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterUuid}/k8sapi/api/v1/namespaces',
+    type: 'POST',
+    params: ['clusterUuid'],
+  })
   createNamespace = async (clusterId, body) => {
     const url = `/clusters/${clusterId}/k8sapi/api/v1/namespaces`
     const raw = await this.client.basicPost<any>({
@@ -457,6 +508,11 @@ class Qbert extends ApiService {
     return this.convertResource(clusterId)(raw)
   }
 
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterUuid}/k8sapi/api/v1/namespaces/{namespace}',
+    type: 'DELETE',
+    params: ['clusterUuid', 'namespace'],
+  })
   deleteNamespace = async (clusterId, namespaceName) => {
     const url = `/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespaceName}`
     return this.client.basicDelete({
@@ -469,9 +525,9 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterId}/k8sapi/api/v1/pods',
+    url: '/clusters/{clusterUuid}/k8sapi/api/v1/pods',
     type: 'GET',
-    params: ['clusterId'],
+    params: ['clusterUuid'],
   })
   getClusterPods = async (clusterId) => {
     const url = `/clusters/${clusterId}/k8sapi/api/v1/pods`
@@ -486,9 +542,9 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterId}/k8sapi/apis/apps/v1/deployments',
+    url: '/clusters/{clusterUuid}/k8sapi/apis/apps/v1/deployments',
     type: 'GET',
-    params: ['clusterId'],
+    params: ['clusterUuid'],
   })
   getClusterDeployments = async (clusterId) => {
     const url = `/clusters/${clusterId}/k8sapi/apis/apps/v1/deployments`
@@ -502,6 +558,11 @@ class Qbert extends ApiService {
     return data.items.map(this.convertResource(clusterId))
   }
 
+  @trackApiMethodMetadata({
+    url: '/k8sapi/apis/apps/v1/namespaces/{namespace}/deployments/{deployment}',
+    type: 'DELETE',
+    params: ['namespace', 'deployment'],
+  })
   deleteDeployment = async (clusterId, namespace, name) => {
     const url = `/k8sapi/apis/apps/v1/namespaces/${namespace}/deployments/${name}`
     return this.client.basicDelete({
@@ -514,9 +575,9 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: 'clusters/{clusterId}/k8sapi/api/v1/services',
+    url: 'clusters/{clusterUuid}/k8sapi/api/v1/services',
     type: 'GET',
-    params: ['clusterId'],
+    params: ['clusterUuid'],
   })
   getClusterKubeServices = async (clusterId) => {
     const url = `/clusters/${clusterId}/k8sapi/api/v1/services`
@@ -531,9 +592,9 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterId}/k8sapi/apis/storage.k8s.io/v1/storageclasses',
+    url: '/clusters/{clusterUuid}/k8sapi/apis/storage.k8s.io/v1/storageclasses',
     type: 'GET',
-    params: ['clusterId'],
+    params: ['clusterUuid'],
   })
   getClusterStorageClasses = async (clusterId) => {
     const url = `/clusters/${clusterId}/k8sapi/apis/storage.k8s.io/v1/storageclasses`
@@ -547,6 +608,11 @@ class Qbert extends ApiService {
     return data.items.map(this.convertResource(clusterId))
   }
 
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterUuid}/k8sapi/apis/storage.k8s.io/v1/storageclasses',
+    type: 'POST',
+    params: ['clusterUuid'],
+  })
   createStorageClass = async (clusterId, body) => {
     const url = `/clusters/${clusterId}/k8sapi/apis/storage.k8s.io/v1/storageclasses`
     return this.client.basicPost({
@@ -559,6 +625,11 @@ class Qbert extends ApiService {
     })
   }
 
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterUuid}/k8sapi/apis/storage.k8s.io/v1/storageclasses/{storageClass}',
+    type: 'DELETE',
+    params: ['clusterUuid', 'storageClass'],
+  })
   deleteStorageClass = async (clusterId, name) => {
     const url = `/clusters/${clusterId}/k8sapi/apis/storage.k8s.io/v1/storageclasses/${name}`
     return this.client.basicDelete({
@@ -571,9 +642,9 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterId}/k8sapi/apis/apps/v1/replicasets',
+    url: '/clusters/{clusterUuid}/k8sapi/apis/apps/v1/replicasets',
     type: 'GET',
-    params: ['clusterId'],
+    params: ['clusterUuid'],
   })
   getReplicaSets = async (clusterId) => {
     const url = `/clusters/${clusterId}/k8sapi/apis/apps/v1/replicasets`
@@ -587,9 +658,9 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterId}/k8sapi/api/v1/namespaces/{namespace}/pods',
-    type: 'GET',
-    params: ['clusterId', 'namespace'],
+    url: '/clusters/{clusterUuid}/k8sapi/api/v1/namespaces/{namespace}/pods',
+    type: 'POST',
+    params: ['clusterUuid', 'namespace'],
   })
   createPod = async (clusterId, namespace, body) => {
     const url = `/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/pods`
@@ -603,6 +674,11 @@ class Qbert extends ApiService {
     })
   }
 
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterUuid}/k8sapi/api/v1/namespaces/{namespace}/pods/{pod}',
+    type: 'DELETE',
+    params: ['clusterUuid', 'namespace', 'pod'],
+  })
   deletePod = async (clusterId, namespace, name) => {
     const url = `/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/pods/${name}`
     return this.client.basicDelete({
@@ -620,6 +696,11 @@ class Qbert extends ApiService {
     delete: this.deletePod.bind(this),
   }
 
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterUuid}/k8sapi/apis/apps/v1/namespaces/{namespace}/deployments',
+    type: 'POST',
+    params: ['clusterUuid', 'namespace'],
+  })
   createDeployment = async (clusterId, namespace, body) => {
     const url = `/clusters/${clusterId}/k8sapi/apis/apps/v1/namespaces/${namespace}/deployments`
     return this.client.basicPost({
@@ -638,6 +719,11 @@ class Qbert extends ApiService {
     delete: this.deleteDeployment.bind(this),
   }
 
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterUuid}/k8sapi/api/v1/namespaces/{namespace}/services',
+    type: 'POST',
+    params: ['clusterUuid', 'namespace'],
+  })
   createService = async (clusterId, namespace, body) => {
     const url = `/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/services`
     return this.client.basicPost({
@@ -650,6 +736,11 @@ class Qbert extends ApiService {
     })
   }
 
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterUuid}/k8sapi/api/v1/namespaces/{namespace}/services/{service}',
+    type: 'DELETE',
+    params: ['clusterUuid', 'namespace', 'service'],
+  })
   deleteService = async (clusterId, namespace, name) => {
     const url = `/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/services/${name}`
     return this.client.basicDelete({
@@ -667,6 +758,11 @@ class Qbert extends ApiService {
     delete: this.deleteService.bind(this),
   }
 
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterUuid}/k8sapi/api/v1/namespaces/{namespace}/serviceaccounts',
+    type: 'POST',
+    params: ['clusterUuid', 'namespace'],
+  })
   createServiceAccount = async (clusterId, namespace, body) => {
     const url = `/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/serviceaccounts`
     return this.client.basicPost({
@@ -846,9 +942,9 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterId}/k8sapi/api/v1/namespaces/{namespace}/serviceaccounts',
+    url: '/clusters/{clusterUuid}/k8sapi/api/v1/namespaces/{namespace}/serviceaccounts',
     type: 'GET',
-    params: ['clusterId', 'namespace'],
+    params: ['clusterUuid', 'namespace'],
   })
   getServiceAccounts = async (clusterId, namespace) => {
     const url = `/clusters/${clusterId}/k8sapi/api/v1/namespaces/${namespace}/serviceaccounts`
@@ -864,9 +960,9 @@ class Qbert extends ApiService {
 
   /* RBAC */
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/roles',
+    url: '/clusters/{clusterUuid}/k8sapi/apis/rbac.authorization.k8s.io/v1/roles',
     type: 'GET',
-    params: ['clusterId'],
+    params: ['clusterUuid'],
   })
   getClusterRoles = async (clusterId) => {
     const url = `/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/roles`
@@ -880,6 +976,12 @@ class Qbert extends ApiService {
     return normalizeClusterizedResponse<GetClusterRolesItem>(clusterId, response)
   }
 
+  @trackApiMethodMetadata({
+    url:
+      '/clusters/{clusterUuid}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/{namespace}/roles',
+    type: 'POST',
+    params: ['clusterUuid', 'namespace'],
+  })
   createClusterRole = async (clusterId, namespace, body) => {
     const url = `/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/${namespace}/roles`
     const response = await this.client.basicPost({
@@ -893,6 +995,12 @@ class Qbert extends ApiService {
     return normalizeClusterizedUpdate(clusterId, response)
   }
 
+  @trackApiMethodMetadata({
+    url:
+      '/clusters/{clusterUuid}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/{namespace}/roles/{role}',
+    type: 'PUT',
+    params: ['clusterUuid', 'namespace', 'role'],
+  })
   updateClusterRole = async (clusterId, namespace, name, body) => {
     const url = `/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/${namespace}/roles/${name}`
     const response = await this.client.basicPut({
@@ -906,6 +1014,12 @@ class Qbert extends ApiService {
     return normalizeClusterizedUpdate(clusterId, response)
   }
 
+  @trackApiMethodMetadata({
+    url:
+      '/clusters/{clusterUuid}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/{namespace}/roles/{role}',
+    type: 'DELETE',
+    params: ['clusterUuid', 'namespace', 'role'],
+  })
   deleteClusterRole = async (clusterId, namespace, name) => {
     const url = `/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/${namespace}/roles/${name}`
     return this.client.basicDelete({
@@ -918,9 +1032,9 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterroles',
+    url: '/clusters/{clusterUuid}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterroles',
     type: 'GET',
-    params: ['clusterId'],
+    params: ['clusterUuid'],
   })
   getClusterClusterRoles = async (clusterId) => {
     const url = `/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterroles`
@@ -934,6 +1048,11 @@ class Qbert extends ApiService {
     return normalizeClusterizedResponse(clusterId, response)
   }
 
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterUuid}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterroles',
+    type: 'POST',
+    params: ['clusterUuid'],
+  })
   createClusterClusterRole = async (clusterId, body) => {
     const url = `/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterroles`
     const response = await this.client.basicPost({
@@ -947,6 +1066,12 @@ class Qbert extends ApiService {
     return normalizeClusterizedUpdate(clusterId, response)
   }
 
+  @trackApiMethodMetadata({
+    url:
+      '/clusters/{clusterUuid}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterroles/{clusterRole}',
+    type: 'PUT',
+    params: ['clusterUuid', 'clusterRole'],
+  })
   updateClusterClusterRole = async (clusterId, name, body) => {
     const url = `/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterroles/${name}`
     const response = await this.client.basicPut({
@@ -960,6 +1085,12 @@ class Qbert extends ApiService {
     return normalizeClusterizedUpdate(clusterId, response)
   }
 
+  @trackApiMethodMetadata({
+    url:
+      '/clusters/{clusterUuid}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterroles/{clusterRole}',
+    type: 'DELETE',
+    params: ['clusterUuid', 'clusterRole'],
+  })
   deleteClusterClusterRole = async (clusterId, name) => {
     const url = `/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterroles/${name}`
     return this.client.basicDelete({
@@ -972,9 +1103,9 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/rolebindings',
+    url: '/clusters/{clusterUuid}/k8sapi/apis/rbac.authorization.k8s.io/v1/rolebindings',
     type: 'GET',
-    params: ['clusterId'],
+    params: ['clusterUuid'],
   })
   getClusterRoleBindings = async (clusterId) => {
     const url = `/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/rolebindings`
@@ -988,6 +1119,12 @@ class Qbert extends ApiService {
     return normalizeClusterizedResponse(clusterId, response)
   }
 
+  @trackApiMethodMetadata({
+    url:
+      '/clusters/{clusterUuid}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/{namespace}/rolebindings',
+    type: 'POST',
+    params: ['clusterUuid', 'namespace'],
+  })
   createClusterRoleBinding = async (clusterId, namespace, body) => {
     const url = `/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/${namespace}/rolebindings`
     const response = await this.client.basicPost({
@@ -1001,6 +1138,12 @@ class Qbert extends ApiService {
     return normalizeClusterizedUpdate(clusterId, response)
   }
 
+  @trackApiMethodMetadata({
+    url:
+      '/clusters/{clusterUuid}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/{namespace}/rolebindings/{roleBinding}',
+    type: 'PUT',
+    params: ['clusterUuid', 'namespace', 'roleBinding'],
+  })
   updateClusterRoleBinding = async (clusterId, namespace, name, body) => {
     const url = `/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/${namespace}/rolebindings/${name}`
     const response = await this.client.basicPut({
@@ -1014,6 +1157,12 @@ class Qbert extends ApiService {
     return normalizeClusterizedUpdate(clusterId, response)
   }
 
+  @trackApiMethodMetadata({
+    url:
+      '/clusters/{clusterUuid}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/{namespace}/rolebindings/{roleBinding}',
+    type: 'DELETE',
+    params: ['clusterUuid', 'namespace', 'roleBinding'],
+  })
   deleteClusterRoleBinding = async (clusterId, namespace, name) => {
     const url = `/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/namespaces/${namespace}/rolebindings/${name}`
     return this.client.basicDelete({
@@ -1026,9 +1175,9 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterrolebindings',
+    url: '/clusters/{clusterUuid}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterrolebindings',
     type: 'GET',
-    params: ['clusterId'],
+    params: ['clusterUuid'],
   })
   getClusterClusterRoleBindings = async (clusterId) => {
     const url = `/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterrolebindings`
@@ -1042,6 +1191,11 @@ class Qbert extends ApiService {
     return normalizeClusterizedResponse(clusterId, response)
   }
 
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterUuid}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterrolebindings',
+    type: 'POST',
+    params: ['clusterUuid'],
+  })
   createClusterClusterRoleBinding = async (clusterId, body) => {
     const url = `/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterrolebindings`
     const response = await this.client.basicPost({
@@ -1055,6 +1209,12 @@ class Qbert extends ApiService {
     return normalizeClusterizedUpdate(clusterId, response)
   }
 
+  @trackApiMethodMetadata({
+    url:
+      '/clusters/{clusterUuid}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterrolebindings/{clusterRoleBinding}',
+    type: 'PUT',
+    params: ['clusterUuid', 'clusterRoleBinding'],
+  })
   updateClusterClusterRoleBinding = async (clusterId, name, body) => {
     const url = `/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterrolebindings/${name}`
     const response = await this.client.basicPut({
@@ -1068,6 +1228,12 @@ class Qbert extends ApiService {
     return normalizeClusterizedUpdate(clusterId, response)
   }
 
+  @trackApiMethodMetadata({
+    url:
+      '/clusters/{clusterUuid}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterrolebindings/{clusterRoleBinding}',
+    type: 'DELETE',
+    params: ['clusterUuid', 'clusterRoleBinding'],
+  })
   deleteClusterClusterRoleBinding = async (clusterId, name) => {
     const url = `/clusters/${clusterId}/k8sapi/apis/rbac.authorization.k8s.io/v1/clusterrolebindings/${name}`
     return this.client.basicDelete({
@@ -1081,9 +1247,9 @@ class Qbert extends ApiService {
 
   /* Managed Apps */
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterId}/k8sapi/apis/monitoring.coreos.com/v1/prometheuses',
+    url: '/clusters/{clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/prometheuses',
     type: 'GET',
-    params: ['clusterId'],
+    params: ['clusterUuid'],
   })
   getPrometheusInstances = async (clusterUuid) => {
     const url = `/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/prometheuses`
@@ -1097,6 +1263,12 @@ class Qbert extends ApiService {
     return normalizeClusterizedResponse(clusterUuid, response)
   }
 
+  @trackApiMethodMetadata({
+    url:
+      '/clusters/{clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/{namespace}/prometheuses/{prometheusInstance}',
+    type: 'PATCH',
+    params: ['clusterUuid', 'namespace', 'prometheusInstance'],
+  })
   updatePrometheusInstance = async (data) => {
     const { clusterUuid, namespace, name } = data
     const body = [
@@ -1117,6 +1289,12 @@ class Qbert extends ApiService {
     return normalizeClusterizedUpdate(clusterUuid, response)
   }
 
+  @trackApiMethodMetadata({
+    url:
+      '/clusters/{clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/{namespace}/prometheuses/{prometheusInstance}',
+    type: 'DELETE',
+    params: ['clusterUuid', 'namespace', 'prometheusInstance'],
+  })
   deletePrometheusInstance = async (clusterUuid, namespace, name) => {
     const url = `/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${namespace}/prometheuses/${name}`
     await this.client.basicDelete({
@@ -1242,9 +1420,9 @@ class Qbert extends ApiService {
 
   @trackApiMethodMetadata({
     url:
-      '/clusters/{clusterId}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-alertmanager:9093/proxy/api/v2/alerts',
+      '/clusters/{clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-alertmanager:9093/proxy/api/v2/alerts',
     type: 'GET',
-    params: ['clusterId'],
+    params: ['clusterUuid'],
   })
   getAlertManagerAlerts = async (clusterUuid): Promise<AlertManagerAlert[]> => {
     const url = `/clusters/${clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-alertmanager:9093/proxy/api/v2/alerts`
@@ -1264,9 +1442,9 @@ class Qbert extends ApiService {
 
   @trackApiMethodMetadata({
     url:
-      '/clusters/{clusterId}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/alerts',
+      '/clusters/{clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/alerts',
     type: 'GET',
-    params: ['clusterId'],
+    params: ['clusterUuid'],
   })
   getPrometheusAlerts = async (clusterUuid) => {
     const url = `/clusters/${clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/alerts`
@@ -1286,9 +1464,9 @@ class Qbert extends ApiService {
 
   @trackApiMethodMetadata({
     url:
-      '/clusters/${clusterId}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/rules',
+      '/clusters/{clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/rules',
     type: 'GET',
-    params: ['clusterId'],
+    params: ['clusterUuid'],
   })
   getPrometheusAlertRules = async (clusterUuid) => {
     const url = `/clusters/${clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/rules`
@@ -1314,9 +1492,9 @@ class Qbert extends ApiService {
 
   @trackApiMethodMetadata({
     url:
-      '/clusters/{clusterId}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/query_range?query=ALERTS&start={startTime}&end={endTime}&step={step}',
+      '/clusters/{clusterUuid}/k8sapi/api/v1/namespaces/pf9-monitoring/services/http:sys-prometheus:9090/proxy/api/v1/query_range?query=ALERTS&start={startTime}&end={endTime}&step={step}',
     type: 'GET',
-    params: ['clusterId', 'startTime', 'endTime', 'step'],
+    params: ['clusterUuid', 'startTime', 'endTime', 'step'],
   })
   getPrometheusAlertsOverTime = async (
     clusterUuid,
@@ -1343,7 +1521,7 @@ class Qbert extends ApiService {
   @trackApiMethodMetadata({
     url: '/clusters/{clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/servicemonitors',
     type: 'GET',
-    params: ['clusterId'],
+    params: ['clusterUuid'],
   })
   getPrometheusServiceMonitors = async (clusterUuid) => {
     const url = `/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/servicemonitors`
@@ -1357,6 +1535,12 @@ class Qbert extends ApiService {
     return normalizeClusterizedResponse(clusterUuid, response)
   }
 
+  @trackApiMethodMetadata({
+    url:
+      '/clusters/{clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/{namespace}/servicemonitors/{serviceMonitor}',
+    type: 'PATCH',
+    params: ['clusterUuid', 'namespace', 'serviceMonitor'],
+  })
   updatePrometheusServiceMonitor = async (data) => {
     const { clusterUuid, namespace, name } = data
     const body = [
@@ -1378,6 +1562,12 @@ class Qbert extends ApiService {
     return normalizeClusterizedUpdate(clusterUuid, response)
   }
 
+  @trackApiMethodMetadata({
+    url:
+      '/clusters/{clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/{namespace}/servicemonitors/{serviceMonitor}',
+    type: 'DELETE',
+    params: ['clusterUuid', 'namespace', 'serviceMonitor'],
+  })
   deletePrometheusServiceMonitor = async (clusterUuid, namespace, name) => {
     const url = `/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${namespace}/servicemonitors/${name}`
     await this.client.basicDelete({
@@ -1390,9 +1580,9 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterId}/k8sapi/apis/monitoring.coreos.com/v1/prometheusrules',
+    url: '/clusters/{clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/prometheusrules',
     type: 'GET',
-    params: ['clusterId'],
+    params: ['clusterUuid'],
   })
   getPrometheusRules = async (clusterUuid) => {
     const url = `/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/prometheusrules`
@@ -1406,6 +1596,12 @@ class Qbert extends ApiService {
     return normalizeClusterizedResponse(clusterUuid, response)
   }
 
+  @trackApiMethodMetadata({
+    url:
+      '/clusters/{clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/{namespace}/prometheusrules/{prometheusRule}',
+    type: 'PATCH',
+    params: ['clusterUuid', 'namespace', 'prometheusRule'],
+  })
   updatePrometheusRules = async (rulesObject) => {
     const { clusterUuid, namespace, name } = rulesObject
     const body = [
@@ -1427,6 +1623,12 @@ class Qbert extends ApiService {
     return normalizeClusterizedUpdate(clusterUuid, response)
   }
 
+  @trackApiMethodMetadata({
+    url:
+      '/clusters/{clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/{namespace}/prometheusrules/{prometheusRule}',
+    type: 'DELETE',
+    params: ['clusterUuid', 'namespace', 'prometheusRule'],
+  })
   deletePrometheusRule = async (clusterUuid, namespace, name) => {
     const url = `/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${namespace}/prometheusrules/${name}`
     await this.client.basicDelete({
@@ -1439,9 +1641,9 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterId}/k8sapi/apis/monitoring.coreos.com/v1/alertmanagers',
+    url: '/clusters/{clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/alertmanagers',
     type: 'GET',
-    params: ['clusterId'],
+    params: ['clusterUuid'],
   })
   getPrometheusAlertManagers = async (clusterUuid) => {
     const url = `/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/alertmanagers`
@@ -1455,6 +1657,12 @@ class Qbert extends ApiService {
     return normalizeClusterizedResponse(clusterUuid, response)
   }
 
+  @trackApiMethodMetadata({
+    url:
+      '/clusters/{clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/{namespace}/alertmanagers/{alertManager}',
+    type: 'PATCH',
+    params: ['clusterUuid', 'namespace', 'alertManager'],
+  })
   updatePrometheusAlertManager = async (data) => {
     const { clusterUuid, namespace, name } = data
     const body = [{ op: 'replace', path: '/spec/replicas', value: data.replicas }]
@@ -1470,6 +1678,12 @@ class Qbert extends ApiService {
     return normalizeClusterizedUpdate(clusterUuid, response)
   }
 
+  @trackApiMethodMetadata({
+    url:
+      '/clusters/{clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/{namespace}/alertmanagers/{alertManager}',
+    type: 'DELETE',
+    params: ['clusterUuid', 'namespace', 'alertManager'],
+  })
   deletePrometheusAlertManager = async (clusterUuid, namespace, name) => {
     const url = `/clusters/${clusterUuid}/k8sapi/apis/monitoring.coreos.com/v1/namespaces/${namespace}/alertmanagers/${name}`
     await this.client.basicDelete({
@@ -1489,9 +1703,9 @@ class Qbert extends ApiService {
     `/clusters/${clusterUuid}/k8sapi/apis/logging.pf9.io/v1alpha1/outputs`
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterId}/k8sapi/apis/logging.pf9.io/v1alpha1/outputs',
+    url: '/clusters/{clusterUuid}/k8sapi/apis/logging.pf9.io/v1alpha1/outputs',
     type: 'GET',
-    params: ['clusterId'],
+    params: ['clusterUuid'],
   })
   getLoggings = async (clusterUuid) => {
     const url = this.getLoggingsBaseUrl(clusterUuid)
@@ -1543,9 +1757,9 @@ class Qbert extends ApiService {
 
   // API Resources
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterId}/k8sapi/apis',
+    url: '/clusters/{clusterUuid}/k8sapi/apis',
     type: 'GET',
-    params: ['clusterId'],
+    params: ['clusterUuid'],
   })
   getApiGroupList = async (clusterId) => {
     const url = `/clusters/${clusterId}/k8sapi/apis`
@@ -1559,9 +1773,9 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterId}/k8sapi/apis/{apiGroup}',
+    url: '/clusters/{clusterUuid}/k8sapi/apis/{apiGroup}',
     type: 'GET',
-    params: ['clusterId', 'apiGroup'],
+    params: ['clusterUuid', 'apiGroup'],
   })
   getApiResourcesList = async (config) => {
     const { clusterId, apiGroup } = config
@@ -1576,9 +1790,9 @@ class Qbert extends ApiService {
   }
 
   @trackApiMethodMetadata({
-    url: '/clusters/{clusterId}/k8sapi/api/v1',
+    url: '/clusters/{clusterUuid}/k8sapi/api/v1',
     type: 'GET',
-    params: ['clusterId'],
+    params: ['clusterUuid'],
   })
   getCoreApiResourcesList = async (clusterId) => {
     const url = `/clusters/${clusterId}/k8sapi/api/v1`

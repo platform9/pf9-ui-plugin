@@ -10,6 +10,7 @@ import { ActionDataKeys } from 'k8s/DataKeys'
 import { appUrlRoot } from 'app/constants'
 import SimpleLink from 'core/components/SimpleLink'
 import { routes } from 'core/utils/routes'
+import SubmitButton from 'core/components/buttons/SubmitButton'
 
 const useStyles = makeStyles((theme) => ({
   blueIcon: {
@@ -45,22 +46,20 @@ const EndpointsListPage = () => {
       }
     >
       <ListPage />
+      <SimpleLink src={routes.apiDetails.path()}>
+        <SubmitButton>View API Helper</SubmitButton>
+      </SimpleLink>
     </FormFieldCard>
   )
 }
 
-const renderApiDetailsLink = (api_name, text = '') => {
-  return <SimpleLink src={routes.apiDetails.path({ api_name })}>{text}</SimpleLink>
+const renderApiDetailsLink = (text = '') => {
+  return <SimpleLink src={routes.apiDetails.path()}>{text}</SimpleLink>
 }
 
 const columns = [
   { id: 'name', label: 'Service', render: (value) => renderApiDetailsLink(value, value) },
   { id: 'url', label: 'URL' },
-  {
-    id: 'apiHelper',
-    label: 'API Helper',
-    render: (value, { name }) => renderApiDetailsLink(name, 'View API Helper'),
-  },
 ]
 
 export default EndpointsListPage

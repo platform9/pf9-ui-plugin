@@ -1,5 +1,4 @@
 import ApiService from 'api-client/ApiService'
-import { trackApiMethodMetadata } from './helpers'
 
 class Murano extends ApiService {
   public getClassName() {
@@ -16,7 +15,6 @@ class Murano extends ApiService {
 
   uploadUrl = () => `${this.v1()}/catalog/packagesHot`
 
-  @trackApiMethodMetadata({ url: '/v1/catalog/packages', type: 'GET' })
   async getApplications() {
     const url = this.applicationUrl()
     const response = await this.client.basicGet<any>({
@@ -29,7 +27,6 @@ class Murano extends ApiService {
     return response.packages
   }
 
-  @trackApiMethodMetadata({ url: '/v1/catalog/packages/{id}', type: 'GET', params: ['id'] })
   async getApplication(id) {
     const url = `${this.applicationUrl()}/${id}`
     try {

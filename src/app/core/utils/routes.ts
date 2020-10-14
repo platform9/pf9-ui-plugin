@@ -144,8 +144,8 @@ export const routes = {
   dashboard: Route.register({ url: `${k8sPrefix}/dashboard`, name: 'Dashboard' }),
   apiAccess: Route.register({ url: `${k8sPrefix}/api_access`, name: 'APIAccess' }),
   apiDetails: Route.register({
-    url: `${k8sPrefix}/api_access/api/:api_name`,
-    name: 'ApiDetails',
+    url: `${k8sPrefix}/api_access/apiHelper`,
+    name: 'ApiHelper',
   }),
   nodes: {
     list: Route.register({ url: `${k8sPrefix}/infrastructure#nodes`, name: 'Nodes:List' }),
