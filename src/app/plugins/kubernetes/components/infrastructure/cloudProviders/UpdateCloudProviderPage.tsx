@@ -114,7 +114,6 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
               <WizardMeta
                 className={classes.updateCloudProvider}
                 fields={wizardContext}
-                calloutFields={['name', 'type', 'descriptiveType']}
                 icon={<CloudProviderCard active type={wizardContext.type} />}
               >
                 <WizardStep stepId="step1" label="Update Cloud Provider">
