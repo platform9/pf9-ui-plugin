@@ -33,21 +33,21 @@ const AzureCloudProviderFields = ({
         onChange={(value) => setWizardContext({ name: value })}
         value={wizardContext.name}
         info="Name of the cloud provider"
-        required
+        required={!optionalFields}
       />
       <TextField
         id="tenantId"
         label="Tenant ID"
         onChange={(value) => setWizardContext({ tenantId: value })}
         info="The tenant ID of the service principal"
-        required={optionalFields ? false : true}
+        required={!optionalFields}
       />
       <TextField
         id="clientId"
         label="Client ID"
         onChange={(value) => setWizardContext({ clientId: value })}
         info="The client ID of the service principal"
-        required={optionalFields ? false : true}
+        required={!optionalFields}
       />
       <TextField
         id="clientSecret"
@@ -55,14 +55,14 @@ const AzureCloudProviderFields = ({
         label="Client Secret"
         onChange={(value) => setWizardContext({ clientSecret: value })}
         info="The client secret of the service principal"
-        required={optionalFields ? false : true}
+        required={!optionalFields}
       />
       <TextField
         id="subscriptionId"
         label="Subscription ID"
         onChange={(value) => setWizardContext({ subscriptionId: value })}
         info="The ID of the subscription that correlates to the service principal"
-        required={optionalFields ? false : true}
+        required={!optionalFields}
       />
       {showSubmitInCard && (
         <div className={inCardSubmit}>

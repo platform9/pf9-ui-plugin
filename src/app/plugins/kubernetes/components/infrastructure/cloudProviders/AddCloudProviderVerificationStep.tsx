@@ -26,6 +26,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     maxWidth: '800px',
     flexGrow: 1,
   },
+  card: {
+    margin: theme.spacing(1, 1.5),
+  },
 }))
 
 interface Props {
@@ -45,7 +48,7 @@ const AddCloudProviderVerificationStep = ({ wizardContext, setWizardContext }: P
   return (
     <Progress loading={!wizardContext.cloudProviderId}>
       <div className={classes.root}>
-        <CloudProviderCard active={true} type={wizardContext.provider} />
+        <CloudProviderCard active={true} type={wizardContext.provider} className={classes.card} />
         <div className={classes.form}>
           <ValidatedForm initialValues={wizardContext} elevated={false}>
             <Text variant="subtitle1" className={classes.cpName}>

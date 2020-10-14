@@ -5,7 +5,7 @@ import { cloudProviderActions } from 'k8s/components/infrastructure/cloudProvide
 import { ActionDataKeys } from 'k8s/DataKeys'
 import AwsCloudProviderVerification from './AwsCloudProviderVerification'
 import AzureCloudProviderVerification from './AzureCloudProviderVerification'
-import { objSwitchCase } from 'utils/fp'
+import { objSwitchCase, onlyDefinedValues } from 'utils/fp'
 import { makeStyles } from '@material-ui/styles'
 import { Theme } from '@material-ui/core'
 import CloudProviderCard from 'k8s/components/common/CloudProviderCard'
@@ -17,7 +17,11 @@ import Text from 'core/elements/text'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import { CloudProviders, ICloudProvidersSelector } from './model'
 import DocumentMeta from 'core/components/DocumentMeta'
+<<<<<<< HEAD
 import WizardMeta from 'core/components/wizard/WizardMeta'
+=======
+import { pick } from 'ramda'
+>>>>>>> Fixed cloud provider card margins and crashing that can occur during form submit errors
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -46,25 +50,21 @@ const useStyles = makeStyles((theme: Theme) => ({
     margin: theme.spacing(2, 0, 1),
     maxWidth: 'none',
   },
+  card: {
+    margin: theme.spacing(1, 1.5),
+  },
 }))
 
 const formCpBody = (data) => {
   // Do not accept empty strings for these properties
   // User may type and then delete the input before submitting
   if (data.type === CloudProviders.Aws) {
-    return {
-      name: data.name,
-      key: !!data.awsAccessKey ? data.awsAccessKey : undefined,
-      secret: !!data.awsSecretKey ? data.awsSecretKey : undefined,
-    }
+    return pick(['name', 'key', 'secret'], onlyDefinedValues(data))
   } else if (data.type === CloudProviders.Azure) {
-    return {
-      name: data.name,
-      clientId: !!data.clientId ? data.clientId : undefined,
-      clientSecret: !!data.clientSecret ? data.clientSecret : undefined,
-      tenantId: !!data.tenantId ? data.tenantId : undefined,
-      subscriptionId: !!data.subscriptionId ? data.subscriptionId : undefined,
-    }
+    return pick(
+      ['name', 'clientId', 'clientSecret', 'tenantId', 'subscriptionId'],
+      onlyDefinedValues(data),
+    )
   }
   return {}
 }

@@ -26,6 +26,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   title: {
     marginTop: theme.spacing(4),
   },
+  card: {
+    margin: theme.spacing(1, 1.5),
+  },
 }))
 
 interface Props {
@@ -54,8 +57,8 @@ const formCpBody = (wizardContext) => {
     return {
       type: wizardContext.provider,
       name: wizardContext.name,
-      key: wizardContext.awsAccessKey,
-      secret: wizardContext.awsSecretKey,
+      key: wizardContext.key,
+      secret: wizardContext.secret,
     }
   } else if (wizardContext.provider === CloudProviders.Azure) {
     return {
@@ -97,12 +100,13 @@ const AddCloudProviderCredentialStep = ({
       const body = formCpBody(wizardContext)
       const [success, newCp] = await cloudProviderActions.create(body)
       if (!success) {
+        // TODO: surface the real API response error -- how to do this properly?
         throw 'Error creating cloud provider'
       }
       setWizardContext({ cloudProviderId: newCp.uuid })
     } catch (err) {
       setSubmitting(false)
-      showToast(err.message, MessageTypes.error)
+      showToast(err, MessageTypes.error)
       return false
     }
     setSubmitting(false)
@@ -134,11 +138,13 @@ const AddCloudProviderCredentialStep = ({
           active={wizardContext.provider === CloudProviders.Aws}
           onClick={(value) => setWizardContext({ provider: value })}
           type={CloudProviders.Aws}
+          className={classes.card}
         />
         <CloudProviderCard
           active={wizardContext.provider === CloudProviders.Azure}
           onClick={(value) => setWizardContext({ provider: value })}
           type={CloudProviders.Azure}
+          className={classes.card}
         />
       </div>
       {wizardContext.provider && (

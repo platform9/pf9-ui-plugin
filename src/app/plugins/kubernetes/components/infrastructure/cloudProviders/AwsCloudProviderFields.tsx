@@ -122,24 +122,24 @@ const AwsCloudProviderFields = ({
         onChange={(value) => setWizardContext({ name: value })}
         value={wizardContext.name}
         info="Name for Cloud Provider"
-        required
+        required={!optionalFields}
       />
       <TextField
-        id="awsAccessKey"
+        id="key"
         label="Access Key ID"
-        onChange={(value) => setWizardContext({ awsAccessKey: value })}
-        value={wizardContext.awsAccessKey}
+        onChange={(value) => setWizardContext({ key: value })}
+        value={wizardContext.key}
         info="AWS IAM Access Key"
-        required={optionalFields ? false : true}
+        required={!optionalFields}
       />
       <TextField
-        id="awsSecretKey"
+        id="secret"
         label="Secret Access Key"
-        onChange={(value) => setWizardContext({ awsSecretKey: value })}
-        value={wizardContext.awsSecretKey}
+        onChange={(value) => setWizardContext({ secret: value })}
+        value={wizardContext.secret}
         info="IAM User Secret Key"
         type="password"
-        required={optionalFields ? false : true}
+        required={!optionalFields}
       />
       {showSubmitInCard && (
         <div className={inCardSubmit}>
