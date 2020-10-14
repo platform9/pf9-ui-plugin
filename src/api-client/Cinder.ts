@@ -1,6 +1,5 @@
 /* eslint-disable camelcase */
 import ApiService from 'api-client/ApiService'
-import { trackApiMethodMetadata } from './helpers'
 
 class Cinder extends ApiService {
   public getClassName() {
@@ -24,7 +23,6 @@ class Cinder extends ApiService {
     return baseUrlsByRegion
   }
 
-  @trackApiMethodMetadata({ url: '/volumes/{volumeId', type: 'GET', params: ['volumeId'] })
   async getVolume(id) {
     const response = await this.client.basicGet<any>({
       url: `${this.volumesUrl()}/${id}`,
@@ -37,7 +35,6 @@ class Cinder extends ApiService {
   }
 
   // Get volumes with details
-  @trackApiMethodMetadata({ url: '/volumes/detail', type: 'GET' })
   async getVolumes() {
     const response = await this.client.basicGet<any>({
       url: `${this.volumesUrl()}/detail`,
@@ -49,7 +46,6 @@ class Cinder extends ApiService {
     return response.volumes
   }
 
-  @trackApiMethodMetadata({ url: '/volumes/detail?all_tenants=1', type: 'GET' })
   async getAllVolumes() {
     const response = await this.client.basicGet<any>({
       url: `${this.volumesUrl()}/detail?all_tenants=1`,
@@ -61,11 +57,6 @@ class Cinder extends ApiService {
     return response.volumes
   }
 
-  @trackApiMethodMetadata({
-    url: '/volumes/detail?limit={limit}&marker={markerId}&{allTenants?}',
-    type: 'GET',
-    params: ['limit', 'allTenants', 'markerId'],
-  })
   async getAllVolumesCount(limit, allTenants, markerId) {
     const baseUrl = `${this.volumesUrl()}/detail`
     const limitUrl = `?limit=${limit}`
@@ -188,7 +179,6 @@ class Cinder extends ApiService {
     return response.volume
   }
 
-  @trackApiMethodMetadata({ url: '/types', type: 'GET' })
   async getVolumeTypes() {
     const response = await this.client.basicGet<any>({
       url: `/types`,
@@ -275,7 +265,6 @@ class Cinder extends ApiService {
     })
   }
 
-  @trackApiMethodMetadata({ url: '/snapshots/detail', type: 'GET' })
   async getSnapshots() {
     const response = await this.client.basicGet<any>({
       url: `/snapshots/detail`,
@@ -287,7 +276,6 @@ class Cinder extends ApiService {
     return response.snapshots
   }
 
-  @trackApiMethodMetadata({ url: '/snapshots/detail?all_tenants=1', type: 'GET' })
   async getAllSnapshots() {
     const response = await this.client.basicGet<any>({
       url: `/snapshots/detail?all_tenants=1`,
@@ -351,7 +339,6 @@ class Cinder extends ApiService {
     return response.metadata
   }
 
-  @trackApiMethodMetadata({ url: '/os-quota-class-sets/defaults', type: 'GET' })
   async getDefaultQuotas() {
     const quotas = await this.client.basicGet<any>({
       url: `/os-quota-class-sets/defaults`,
@@ -364,7 +351,6 @@ class Cinder extends ApiService {
     return quotas.quota_class_set
   }
 
-  @trackApiMethodMetadata({ url: '/os-quota-class-sets/defaults', type: 'GET' })
   async getDefaultQuotasForRegion(region) {
     const urls = await this.getRegionUrls()
     const quotas = await this.client.basicGet<any>({
@@ -378,11 +364,6 @@ class Cinder extends ApiService {
     return quotas.quota_class_set
   }
 
-  @trackApiMethodMetadata({
-    url: '/os-quota-sets/{projectId}?usage=true/os-quota-class-sets/defaults',
-    type: 'GET',
-    params: ['projectId'],
-  })
   async getQuotas(projectId) {
     const quota = await this.client.basicGet<any>({
       endpoint: `/os-quota-sets/${projectId}?usage=true`,

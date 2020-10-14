@@ -1,5 +1,4 @@
 import ApiService from 'api-client/ApiService'
-import { trackApiMethodMetadata } from './helpers'
 
 class Neutron extends ApiService {
   public getClassName() {
@@ -22,7 +21,6 @@ class Neutron extends ApiService {
     }, {})
   }
 
-  @trackApiMethodMetadata({ url: '/v2.0/networks/{networkId}', type: 'GET', params: ['networkId'] })
   async getNetwork(id) {
     const url = `${this.networkUrl()}/${id}`
     const response = await this.client.basicGet<any>({
@@ -35,7 +33,6 @@ class Neutron extends ApiService {
     return response.network
   }
 
-  @trackApiMethodMetadata({ url: '/v2.0/networks', type: 'GET' })
   async getNetworks() {
     const url = this.networkUrl()
     const response = await this.client.basicGet<any>({
@@ -103,7 +100,6 @@ class Neutron extends ApiService {
     return response.network
   }
 
-  @trackApiMethodMetadata({ url: '/v2.0/subnets', type: 'GET' })
   async getSubnets() {
     const url = `/v2.0/subnets`
     const response = await this.client.basicGet<any>({
@@ -157,7 +153,6 @@ class Neutron extends ApiService {
     return response.subnet
   }
 
-  @trackApiMethodMetadata({ url: '/v2.0/ports', type: 'GET' })
   async getPorts() {
     const url = `/v2.0/ports`
     const response = await this.client.basicGet<any>({
@@ -209,7 +204,6 @@ class Neutron extends ApiService {
     return response.port
   }
 
-  @trackApiMethodMetadata({ url: '/v2.0/floatingips', type: 'GET' })
   async getFloatingIps() {
     const url = `/v2.0/floatingips`
     const response = await this.client.basicGet<any>({
@@ -263,11 +257,6 @@ class Neutron extends ApiService {
     })
   }
 
-  @trackApiMethodMetadata({
-    url: '/v2.0/network-ip-availabilities/{networkId}',
-    type: 'GET',
-    params: ['networkId'],
-  })
   async networkIpAvailability(id) {
     const url = `/v2.0/network-ip-availabilities/${id}`
     const response = await this.client.basicGet<any>({
@@ -280,7 +269,6 @@ class Neutron extends ApiService {
     return response.network_ip_availability
   }
 
-  @trackApiMethodMetadata({ url: '/v2.0/security-groups', type: 'GET' })
   async getSecurityGroups() {
     const url = `/v2.0/security-groups`
     const response = await this.client.basicGet<any>({
@@ -334,7 +322,6 @@ class Neutron extends ApiService {
     })
   }
 
-  @trackApiMethodMetadata({ url: '/v2.0/security-group-rules', type: 'GET' })
   async getSecurityGroupRules() {
     const url = `/v2.0/security-group-rules`
     const response = await this.client.basicGet<any>({
@@ -373,7 +360,6 @@ class Neutron extends ApiService {
     })
   }
 
-  @trackApiMethodMetadata({ url: '/v2.0/routers', type: 'GET' })
   async getRouters() {
     const url = `/v2.0/routers`
     const response = await this.client.basicGet<any>({
@@ -453,7 +439,6 @@ class Neutron extends ApiService {
     return response.data
   }
 
-  @trackApiMethodMetadata({ url: '/v2.0/quotas', type: 'GET' })
   async getAllQuotas() {
     const url = `/v2.0/quotas`
     const response = await this.client.basicGet<any>({
@@ -466,7 +451,6 @@ class Neutron extends ApiService {
     return response.quotas
   }
 
-  @trackApiMethodMetadata({ url: '/v2.0/quotas/{projectId}', type: 'GET', params: ['projectId'] })
   async getProjectQuota(id) {
     const url = `/v2.0/quotas/${id}`
     const response = await this.client.basicGet<any>({

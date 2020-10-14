@@ -1,5 +1,4 @@
 import ApiService from 'api-client/ApiService'
-import { trackApiMethodMetadata } from './helpers'
 
 /*
 const op = op => (path, value) => ({ op: 'replace', path, value })
@@ -21,7 +20,6 @@ class Glance extends ApiService {
 
   imagesUrl = () => `${this.v2()}/images`
 
-  @trackApiMethodMetadata({ url: '/v2/images?limit=1000', type: 'GET' })
   async getImages() {
     const response = await this.client.basicGet<any>({
       url: `${this.imagesUrl()}?limit=1000`,
@@ -61,7 +59,6 @@ class Glance extends ApiService {
     })
   }
 
-  @trackApiMethodMetadata({ url: '/v2/schemas/images', type: 'GET' })
   async getImageSchema() {
     const url = `${this.v2()}/schemas/images`
     const response = await this.client.basicGet<any>({

@@ -1,6 +1,5 @@
 import ApiService from 'api-client/ApiService'
 import DataKeys from 'k8s/DataKeys'
-import { trackApiMethodMetadata } from './helpers'
 
 // Returns a transducer function instead being passed the obj directly
 // so it can be used in Array#map/filter/etc as well.
@@ -24,7 +23,6 @@ class Nova extends ApiService {
   hypervisorsUrl = () => `/os-hypervisors`
   sshKeysUrl = () => `/os-keypairs`
 
-  @trackApiMethodMetadata({ url: '/flavors/detail?is_public=no', type: 'GET' })
   getFlavors = async () => {
     const url = `${this.flavorsUrl()}/detail?is_public=no`
     const response = await this.client.basicGet<any>({
@@ -71,7 +69,6 @@ class Nova extends ApiService {
     delete: this.deleteFlavor.bind(this),
   }
 
-  @trackApiMethodMetadata({ url: '/servers/detail', type: 'GET' })
   async getInstances() {
     const url = `${this.instancesUrl()}/detail`
     const response = await this.client.basicGet<any>({
@@ -84,7 +81,6 @@ class Nova extends ApiService {
     return response.servers.map((instance) => renameKey('OS-EXT-STS:vm_state', 'state')(instance))
   }
 
-  @trackApiMethodMetadata({ url: '/os-hypervisors/detail', type: 'GET' })
   async getHypervisors() {
     const url = `${this.hypervisorsUrl()}/detail`
     const response = await this.client.basicGet<any>({
@@ -97,7 +93,6 @@ class Nova extends ApiService {
     return response.hypervisors
   }
 
-  @trackApiMethodMetadata({ url: '/os-keypairs', type: 'GET' })
   async getSshKeys() {
     const url = `${this.sshKeysUrl()}`
     const response = await this.client.basicGet<any>({

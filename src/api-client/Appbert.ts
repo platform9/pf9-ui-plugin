@@ -2,11 +2,14 @@
 import ApiService from 'api-client/ApiService'
 import { ClusterTag } from './appbert.model'
 import { trackApiMethodMetadata } from './helpers'
+import { MethodMetadata } from './model'
 
 class Appbert extends ApiService {
   public getClassName() {
     return 'appbert'
   }
+
+  static apiMethodsMetadata: MethodMetadata[] = []
 
   protected async getEndpoint() {
     return this.client.keystone.getServiceEndpoint('appbert', 'admin')
@@ -47,6 +50,11 @@ class Appbert extends ApiService {
     return this.removePkg(clusterUuid, pkgId)
   }
 
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterUuid}/{packageId}',
+    type: 'PUT',
+    params: ['clusterUuid', 'packageId'],
+  })
   addPkg = async (clusterUuid, pkgId) => {
     const data = await this.client.basicPut({
       url: `/clusters/${clusterUuid}/${pkgId}`,
@@ -59,6 +67,11 @@ class Appbert extends ApiService {
     return data
   }
 
+  @trackApiMethodMetadata({
+    url: '/clusters/{clusterUuid}/{packageId}',
+    type: 'DELETE',
+    params: ['clusterUuid', 'packageId'],
+  })
   removePkg = async (clusterUuid, pkgId) => {
     const data = await this.client.basicDelete({
       url: `/clusters/${clusterUuid}/${pkgId}`,

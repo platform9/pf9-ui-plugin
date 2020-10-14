@@ -1,6 +1,6 @@
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
-import React from 'react'
+import React, { useCallback } from 'react'
 import Text from 'core/elements/text'
 import TextField from 'core/components/validatedForm/TextField'
 import clsx from 'clsx'
@@ -13,6 +13,10 @@ import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import CopyToClipboard from 'core/components/CopyToClipboard'
 import SubmitButton from 'core/components/buttons/SubmitButton'
 import { pathJoin } from 'utils/misc'
+import { replaceTextBetweenCurlyBraces } from 'api-client/helpers'
+import PicklistField from 'core/components/validatedForm/PicklistField'
+import ClusterPicklist from '../common/ClusterPicklist'
+import useParams from 'core/hooks/useParams'
 
 const useStyles = makeStyles<Theme>((theme) => ({
   root: {
@@ -66,19 +70,24 @@ const useStyles = makeStyles<Theme>((theme) => ({
 
 const ApiRequestHelper = ({ api, metadata, className = undefined }) => {
   const classes = useStyles()
+  const { params, getParamsUpdater } = useParams()
   const [apiResponse, setApiResponse] = React.useState('')
+  const apiClient = ApiClient.getInstance()
 
   const [serviceCatalog] = useDataLoader(loadServiceCatalog)
   const catalogMap = arrToObjByKey('name', serviceCatalog)
 
-  const makeApiRequest = async () => {
-    const apiClient = ApiClient.getInstance()
-    const url = metadata.url
-    let endpoint = catalogMap[api].url
+  const makeApiRequest = async (inputValues) => {
+    let url = metadata.url
+    if (metadata.params.length > 0) {
+      url = replaceTextBetweenCurlyBraces(url, inputValues)
+    }
     const methodName = metadata.name
-
+    let endpoint = catalogMap[api].url
     if (api === 'qbert') {
       endpoint = await apiClient.qbert.getApiEndpoint()
+    } else if (api === 'appbert') {
+      endpoint = await apiClient.keystone.getEndpoints()
     }
 
     const response = await apiClient.basicGet({
@@ -89,6 +98,28 @@ const ApiRequestHelper = ({ api, metadata, className = undefined }) => {
 
     setApiResponse(JSON.stringify(response, null, 2))
   }
+
+  const renderParamField = (param) => {
+    if (param === 'clusterUuid') {
+      return (
+        <PicklistField
+          DropdownComponent={ClusterPicklist}
+          className={classes.textField}
+          id="clusterUuid"
+          label="clusterUuid"
+          onChange={getParamsUpdater('clusterUuid')}
+          value={params.clusterUuid}
+          required
+        />
+      )
+    } else {
+      return <TextField className={classes.textField} id={param} label={param} required />
+    }
+  }
+
+  const getRequestUrl = useCallback(() => {
+    return pathJoin(catalogMap[api].url, replaceTextBetweenCurlyBraces(metadata.url, params))
+  }, [metadata, params])
 
   return (
     <div className={clsx(classes.root, className)}>
@@ -113,16 +144,14 @@ const ApiRequestHelper = ({ api, metadata, className = undefined }) => {
               className={classes.urlField}
               id={'url'}
               label={'URL'}
-              value={pathJoin(catalogMap[api].url, metadata.url)}
+              value={getRequestUrl()}
             />
             {metadata.params?.length > 0 && (
               <div className={classes.parameters}>
                 <Text className={classes.text} variant="h6">
                   Parameters:
                 </Text>
-                {metadata.params.map((param) => (
-                  <TextField className={classes.textField} id={param} label={param} />
-                ))}
+                {metadata.params.map((param) => renderParamField(param))}
               </div>
             )}
             <SubmitButton className={classes.button}>Make API Request</SubmitButton>
