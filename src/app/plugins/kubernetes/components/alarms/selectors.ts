@@ -85,7 +85,7 @@ export const alertsSelector = createSelector(
             equals(pathStr('labels.severity', rule), pathStr('labels.severity', alert)) &&
             equals(rule.clusterUuid, alert.clusterId)
           )
-        }).for,
+        })?.for,
         grafanaLink: grafanaUrlBuilder(alert),
       }
     })

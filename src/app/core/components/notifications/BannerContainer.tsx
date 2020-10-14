@@ -1,6 +1,7 @@
 import React, { FC, useEffect } from 'react'
-import { makeStyles, Theme } from '@material-ui/core'
+import { makeStyles } from '@material-ui/core'
 import { BannerContext } from 'core/providers/BannerProvider'
+import Theme from 'core/themes/model'
 
 const useStyles = makeStyles<Theme>((theme) => ({
   root: {
@@ -12,10 +13,10 @@ const useStyles = makeStyles<Theme>((theme) => ({
     top: 55,
     left: 0,
     right: 0,
-    minHeight: 30,
-    padding: theme.spacing(1, 2),
-    color: theme.palette.secondary.contrastText,
-    backgroundColor: '#94B8C9',
+    minHeight: 45,
+    padding: theme.spacing(0, 2),
+    color: theme.palette.grey['000'],
+    backgroundColor: theme.palette.pink.main,
   },
 }))
 
