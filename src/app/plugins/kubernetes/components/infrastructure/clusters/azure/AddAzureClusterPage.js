@@ -24,11 +24,11 @@ import { pathJoin } from 'utils/misc'
 import { defaultEtcBackupPath, k8sPrefix } from 'app/constants'
 import ExternalLink from 'core/components/ExternalLink'
 import CodeBlock from 'core/components/CodeBlock'
-import { cloudProviderActions, loadCloudProviderDetails } from '../cloudProviders/actions'
+import { cloudProviderActions, loadCloudProviderDetails } from '../../cloudProviders/actions'
 import useDataLoader from 'core/hooks/useDataLoader'
-import { PromptToAddProvider } from '../cloudProviders/PromptToAddProvider'
-import { CloudProviders } from '../cloudProviders/model'
-import EtcdBackupFields from './EtcdBackupFields'
+import { PromptToAddProvider } from '../../cloudProviders/PromptToAddProvider'
+import { CloudProviders } from '../../cloudProviders/model'
+import EtcdBackupFields from '../EtcdBackupFields'
 import { makeStyles } from '@material-ui/styles'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import { routes } from 'core/utils/routes'
@@ -540,7 +540,7 @@ const AddAzureClusterPage = () => {
                         </>
                       )}
 
-                      {values.network === 'existing' && virtualNetworks.length == 0 && (
+                      {values.network === 'existing' && virtualNetworks.length === 0 && (
                         <Alert
                           small
                           variant="error"

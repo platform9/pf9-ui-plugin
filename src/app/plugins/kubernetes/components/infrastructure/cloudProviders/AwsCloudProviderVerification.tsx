@@ -5,7 +5,7 @@ import FontAwesomeIcon from 'core/components/FontAwesomeIcon'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import CloudProviderRegionPicklist from 'k8s/components/common/CloudProviderRegionPicklist'
 import ClusterDomainPicklist from '../clusters/ClusterDomainPicklist'
-import AwsClusterSshKeyPicklist from '../clusters/AwsClusterSshKeyPicklist'
+import AwsClusterSshKeyPicklist from '../clusters/aws/AwsClusterSshKeyPicklist'
 import Info from 'core/components/validatedForm/Info'
 import ExternalLink from 'core/components/ExternalLink'
 import { awsPrerequisitesLink, awsRoute53HelpLink } from 'k8s/links'
@@ -109,7 +109,7 @@ const AwsCloudProviderVerification = ({ wizardContext, setWizardContext }: Props
         middleHeader={
           <>
             {wizardContext.cloudProviderId && !regionsLoading && (
-              <RegionAvailability classes={classes} regions={regions}></RegionAvailability>
+              <RegionAvailability classes={classes} regions={regions} />
             )}
           </>
         }
