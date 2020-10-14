@@ -101,21 +101,22 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
     <>
       <DocumentMeta title="Update Cloud Provider" bodyClasses={['form-view']} />
       {updatedInitialValues?.type && (
-        <WizardMeta
-          className={classes.updateCloudProvider}
-          fields={updatedInitialValues}
-          icon={<CloudProviderCard active type={updatedInitialValues.type} />}
+        <Wizard
+          onComplete={updateCloudProvider}
+          context={updatedInitialValues}
+          submitLabel="Save"
+          showSteps={false}
+          showFinishAndReviewButton={false}
+          hideAllButtons
         >
-          <Wizard
-            onComplete={updateCloudProvider}
-            context={updatedInitialValues}
-            submitLabel="Save"
-            showSteps={false}
-            showFinishAndReviewButton={false}
-            hideAllButtons
-          >
-            {({ wizardContext, setWizardContext, onNext, handleNext }) => {
-              return (
+          {({ wizardContext, setWizardContext, onNext, handleNext }) => {
+            return (
+              <WizardMeta
+                className={classes.updateCloudProvider}
+                fields={wizardContext}
+                calloutFields={['name', 'type', 'descriptiveType']}
+                icon={<CloudProviderCard active type={wizardContext.type} />}
+              >
                 <WizardStep stepId="step1" label="Update Cloud Provider">
                   <div className={classes.form}>
                     <ValidatedForm
@@ -141,10 +142,10 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
                     </ValidatedForm>
                   </div>
                 </WizardStep>
-              )
-            }}
-          </Wizard>
-        </WizardMeta>
+              </WizardMeta>
+            )
+          }}
+        </Wizard>
       )}
     </>
   )
