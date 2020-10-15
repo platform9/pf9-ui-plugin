@@ -17,11 +17,8 @@ import Text from 'core/elements/text'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
 import { CloudProviders, ICloudProvidersSelector } from './model'
 import DocumentMeta from 'core/components/DocumentMeta'
-<<<<<<< HEAD
 import WizardMeta from 'core/components/wizard/WizardMeta'
-=======
 import { pick } from 'ramda'
->>>>>>> Fixed cloud provider card margins and crashing that can occur during form submit errors
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -50,21 +47,15 @@ const useStyles = makeStyles((theme: Theme) => ({
     margin: theme.spacing(2, 0, 1),
     maxWidth: 'none',
   },
-  card: {
-    margin: theme.spacing(1, 1.5),
-  },
 }))
 
 const formCpBody = (data) => {
   // Do not accept empty strings for these properties
   // User may type and then delete the input before submitting
   if (data.type === CloudProviders.Aws) {
-    return pick(['name', 'key', 'secret'], onlyDefinedValues(data))
+    return pick(['key', 'secret'], onlyDefinedValues(data))
   } else if (data.type === CloudProviders.Azure) {
-    return pick(
-      ['name', 'clientId', 'clientSecret', 'tenantId', 'subscriptionId'],
-      onlyDefinedValues(data),
-    )
+    return pick(['clientId', 'clientSecret', 'tenantId', 'subscriptionId'], onlyDefinedValues(data))
   }
   return {}
 }
