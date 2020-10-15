@@ -326,10 +326,7 @@ class ListTable extends PureComponent {
   }
 
   handleFilterUpdate = (columnId, selectedValue) => {
-    console.log('selectedValue', selectedValue)
-    console.log(this.state)
     this.setState(assocPath(['filterValues', columnId], selectedValue))
-    console.log(this.state)
   }
 
   handleFiltersReset = () => {
