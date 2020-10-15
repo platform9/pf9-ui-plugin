@@ -33,6 +33,10 @@ const useStyles = makeStyles<Theme>((theme) => ({
     display: 'flex',
     flexFlow: 'column nowrap',
   },
+  request: {
+    display: 'flex',
+    flexFlow: 'column nowrap',
+  },
   header: {
     display: 'flex',
     justifyContent: 'center',
@@ -58,10 +62,6 @@ const useStyles = makeStyles<Theme>((theme) => ({
   urlField: {
     minWidth: '100%',
     backgroundColor: '#FFF',
-  },
-  code: {
-    marginLeft: theme.spacing(2),
-    marginRight: theme.spacing(2),
   },
   parameters: {
     display: 'flex',
@@ -125,6 +125,7 @@ const getServiceEndpoint = async (service, apiClient) => {
 
 const ApiRequestHelper = ({ api, metadata, className = undefined }) => {
   const classes = useStyles()
+  const devEnabled = window.localStorage.enableDevPlugin === 'true'
   const { params, getParamsUpdater } = useParams()
   const [apiResponse, setApiResponse] = React.useState('')
   const [requestUrl, setRequestUrl] = React.useState('')
@@ -213,20 +214,27 @@ const ApiRequestHelper = ({ api, metadata, className = undefined }) => {
                 )}
               </div>
             )}
-            {methodsWithBody.includes(metadata.type) && (
+            {methodsWithBody.includes(metadata.type) && devEnabled && (
               <TextField className={classes.textField} id="body" label="Body" multiline rows={3} />
             )}
-            <SubmitButton className={classes.button}>Make API Request</SubmitButton>
-            <CodeMirror
-              id="jsonResponse"
-              label={
-                <CopyToClipboard copyText={apiResponse} inline={true}>
-                  JSON Response
-                </CopyToClipboard>
-              }
-              value={apiResponse}
-              options={{ mode: 'json' }}
-            ></CodeMirror>
+            {(devEnabled ||
+              (!devEnabled &&
+                !methodsWithBody.includes(metadata.type) &&
+                metadata.type !== 'DELETE')) && (
+              <div className={classes.request}>
+                <SubmitButton className={classes.button}>Make API Request</SubmitButton>
+                <CodeMirror
+                  id="jsonResponse"
+                  label={
+                    <CopyToClipboard copyText={apiResponse} inline={true}>
+                      JSON Response
+                    </CopyToClipboard>
+                  }
+                  value={apiResponse}
+                  options={{ mode: 'json' }}
+                ></CodeMirror>
+              </div>
+            )}
           </ValidatedForm>
         </div>
       </div>

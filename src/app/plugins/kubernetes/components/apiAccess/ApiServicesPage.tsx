@@ -9,8 +9,16 @@ import { capitalizeString } from 'utils/misc'
 import ApiDetailsPage from './ApiDetailsPage'
 
 const ApiServicesPage = () => {
+  const devEnabled = window.localStorage.enableDevPlugin === 'true'
   const [serviceCatalog] = useDataLoader(loadServiceCatalog)
-  const whitelist = ['appbert', 'keystone', 'qbert', 'resmgr']
+  let whitelist = ['keystone', 'qbert']
+
+  // Only expose these services in the dev plugin
+  const devOnlyServices = ['appbert', 'resmgr']
+  if (devEnabled) {
+    whitelist = whitelist.concat(devOnlyServices)
+  }
+
   const services = pluck(
     'name',
     serviceCatalog.filter((service) => whitelist.includes(service.name)),
