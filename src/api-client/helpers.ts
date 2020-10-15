@@ -90,5 +90,5 @@ export const trackApiMethodMetadata = (metadata: MethodMetadata) => (
 }
 
 export const replaceTextBetweenCurlyBraces = (str, replacements) => {
-  return str.replace(/{(.+?)}/g, (_, s) => replacements[s] || s)
+  return str.replace(/{(.+?)}/g, (_, s) => replacements[s] || `{${s}}`)
 }
