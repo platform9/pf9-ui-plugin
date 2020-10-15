@@ -160,7 +160,7 @@ class Qbert extends ApiService {
   @trackApiMethodMetadata({
     url: '/cloudProviders/{cloudProviderUuid}',
     type: 'PUT',
-    params: ['cloudProvidersUuid'],
+    params: ['cloudProviderUuid'],
   })
   updateCloudProvider = async (cpId, body) => {
     const url = `/cloudProviders/${cpId}`
@@ -177,7 +177,7 @@ class Qbert extends ApiService {
   @trackApiMethodMetadata({
     url: '/cloudProviders/{cloudProviderUuid}',
     type: 'DELETE',
-    params: ['cloudProvidersUuid'],
+    params: ['cloudProviderUuid'],
   })
   deleteCloudProvider = async (cpId) => {
     const url = `/cloudProviders/${cpId}`
@@ -246,7 +246,7 @@ class Qbert extends ApiService {
   @trackApiMethodMetadata({
     url: '/cloudProviders/{cloudProviderUuid}/region/{regionName}',
     type: 'PUT',
-    params: ['cloudProvidersUuid', 'regionName'],
+    params: ['cloudProviderUuid', 'regionName'],
   })
   importSshKey = async (cpId, regionId, body) => {
     const url = `/cloudProviders/${cpId}/region/${regionId}`

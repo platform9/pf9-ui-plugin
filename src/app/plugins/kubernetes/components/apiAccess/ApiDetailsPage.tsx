@@ -5,22 +5,13 @@ import BulletList from 'core/components/BulletList'
 import Theme from 'core/themes/model'
 import Qbert from 'api-client/Qbert'
 import Appbert from 'api-client/Appbert'
-import Cinder from 'api-client/Cinder'
-import Clemency from 'api-client/Clemency'
-import Glance from 'api-client/Glance'
 import Keystone from 'api-client/Keystone'
-import Murano from 'api-client/Murano'
-import Neutron from 'api-client/Neutron'
-import Nova from 'api-client/Nova'
 import ResMgr from 'api-client/ResMgr'
 import ApiRequestHelper from './ApiRequestHelper'
-import SearchBar from 'core/components/SearchBar'
-import { Toolbar } from '@material-ui/core'
-import PicklistDefault from 'core/components/Picklist'
-const Picklist: any = PicklistDefault // types on forward ref .js file dont work well.
+import Filter from 'core/components/Filter'
 
 const useStyles = makeStyles<Theme>((theme) => ({
-  root: {
+  apiDetailsPage: {
     marginTop: theme.spacing(2),
     display: 'flex',
     flexFlow: 'row nowrap',
@@ -43,21 +34,6 @@ const useStyles = makeStyles<Theme>((theme) => ({
     alignItems: 'center',
     justifyContent: 'flex-end',
     paddingRight: 0,
-    // '& .MuiOutlinedInput-root': {
-    //   marginBottom: theme.spacing(1),
-    //   marginRight: theme.spacing(2),
-    //   height: 40,
-    // },
-    // '& .Mui-focused.MuiOutlinedInput-root fieldset': {
-    //   borderColor: theme.palette.grey[700],
-    // },
-    // '& .MuiFormLabel-root.Mui-focused': {
-    //   color: theme.palette.grey[700],
-    // },
-  },
-  search: {
-    paddingLeft: theme.spacing(2),
-    maxWidth: 240,
   },
   controls: {
     display: 'flex',
@@ -74,7 +50,6 @@ const useStyles = makeStyles<Theme>((theme) => ({
   },
   card: {
     display: 'grid',
-    // minWidth: '350px',
     minHeight: '135px',
     border: `solid 1px ${theme.palette.grey[300]}`,
     borderRadius: 4,
@@ -118,59 +93,41 @@ const EndpointCard = ({ metadata, onClick }) => {
 
 const apiServices = {
   appbert: Appbert,
-  cinder: Cinder,
-  clemency: Clemency,
-  glance: Glance,
   keystone: Keystone,
-  murano: Murano,
-  neutron: Neutron,
-  nova: Nova,
   qbert: Qbert,
   resmgr: ResMgr,
 }
 
-const requestVerbs = ['GET', 'POST', 'PATCH', 'PUT', 'DELETE']
-
 const ApiDetailsPage = ({ service }) => {
   const [activeCardMetadata, setMetadata] = React.useState(null)
-  const [requestSearch, setRequestSearch] = React.useState('')
-  const [verbFilter, setVerbFilter] = React.useState('')
+  const [filteredMethods, setFilteredMethods] = React.useState([])
   const classes = useStyles()
   const methods = apiServices[service].apiMethodsMetadata
+
+  const filters: Filter[] = [
+    {
+      name: 'Verb',
+      label: 'Verb',
+      options: ['GET', 'PATCH', 'PUT', 'POST', 'DELETE'],
+      target: 'type',
+    },
+  ]
 
   const activateCard = (metadata) => () => {
     setMetadata(metadata)
   }
 
-  console.log(verbFilter)
-
-  const filteredMethods = () => {
-    if (requestSearch !== '') {
-      return methods.filter(
-        (method) => method['name'].match(new RegExp(requestSearch, 'i')) !== null,
-      )
-    } else if (verbFilter !== '' && verbFilter !== 'ALL') {
-      return methods.filter((method) => method['type'] === verbFilter)
-    } else {
-      return methods
-    }
-  }
-
   return (
-    <div className={classes.root}>
+    <div className={classes.apiDetailsPage}>
       <div className={classes.methods}>
-        <Toolbar className={classes.toolbar}>
-          <div className={classes.controls}>
-            <Picklist name="Verb" label="Verb" options={requestVerbs} onChange={setVerbFilter} />
-            <SearchBar
-              className={classes.search}
-              searchTerm={requestSearch}
-              onSearchChange={setRequestSearch}
-            />
-          </div>
-        </Toolbar>
+        <Filter
+          data={methods}
+          setFilteredData={setFilteredMethods}
+          filters={filters}
+          searchTarget="name"
+        />
         <div className={classes.grid}>
-          {filteredMethods().map((metadata) => (
+          {filteredMethods.map((metadata) => (
             <EndpointCard metadata={metadata} onClick={activateCard(metadata)} />
           ))}
         </div>
