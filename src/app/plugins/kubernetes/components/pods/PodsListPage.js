@@ -23,6 +23,7 @@ const ListPage = ({ ListContainer }) => {
     const { params, updateParams, getParamsUpdater } = usePrefParams(defaultParams)
     const [data, loading, reload] = useDataLoader(podActions.list, params)
     const updateClusterId = useCallback((clusterId) => {
+      console.log(clusterId)
       updateParams({
         clusterId,
         namespace: allKey,

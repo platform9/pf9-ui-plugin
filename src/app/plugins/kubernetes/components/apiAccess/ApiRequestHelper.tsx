@@ -1,12 +1,11 @@
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
-import React, { useCallback } from 'react'
+import React, { useEffect } from 'react'
 import Text from 'core/elements/text'
 import TextField from 'core/components/validatedForm/TextField'
 import clsx from 'clsx'
 import { loadServiceCatalog } from 'openstack/components/api-access/actions'
 import { arrToObjByKey } from 'utils/fp'
-import useDataLoader from 'core/hooks/useDataLoader'
 import ApiClient from 'api-client/ApiClient'
 import CodeMirror from 'core/components/validatedForm/CodeMirror'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
@@ -17,9 +16,14 @@ import { replaceTextBetweenCurlyBraces } from 'api-client/helpers'
 import PicklistField from 'core/components/validatedForm/PicklistField'
 import ClusterPicklist from '../common/ClusterPicklist'
 import useParams from 'core/hooks/useParams'
+import CloudProviderPicklist from '../common/CloudProviderPicklist'
+import { useToast } from 'core/providers/ToastProvider'
+import { MessageTypes } from 'core/components/notifications/model'
+
+const methodsWithBody = ['POST', 'PUT', 'PATCH']
 
 const useStyles = makeStyles<Theme>((theme) => ({
-  root: {
+  apiRequestHelper: {
     display: 'flex',
     flexFlow: 'column nowrap',
     backgroundColor: theme.components.header.background,
@@ -45,7 +49,6 @@ const useStyles = makeStyles<Theme>((theme) => ({
     marginBottom: theme.spacing(2),
   },
   form: {
-    // margin: theme.spacing(2),
     flexFlow: 'column nowrap',
   },
   textField: {
@@ -55,7 +58,6 @@ const useStyles = makeStyles<Theme>((theme) => ({
   urlField: {
     minWidth: '100%',
     backgroundColor: '#FFF',
-    // margin: theme.spacing(2, 2),
   },
   code: {
     marginLeft: theme.spacing(2),
@@ -68,61 +70,120 @@ const useStyles = makeStyles<Theme>((theme) => ({
   },
 }))
 
+const renderParamField = ({ classes, paramName, params, getParamsUpdater }) => {
+  if (paramName === 'clusterUuid') {
+    return (
+      <PicklistField
+        DropdownComponent={ClusterPicklist}
+        className={classes.textField}
+        id="clusterUuid"
+        label="clusterUuid"
+        onChange={getParamsUpdater('clusterUuid')}
+        value={params.clusterUuid}
+        required
+      />
+    )
+  } else if (paramName === 'cloudProviderUuid') {
+    return (
+      <PicklistField
+        DropdownComponent={CloudProviderPicklist}
+        className={classes.textField}
+        id="cloudProviderUuid"
+        label="cloudProviderUuid"
+        onChange={getParamsUpdater('cloudProviderUuid')}
+        value={params.cloudProviderUuid}
+        required
+      />
+    )
+  } else {
+    return (
+      <TextField
+        className={classes.textField}
+        id={paramName}
+        label={paramName}
+        onChange={getParamsUpdater(paramName)}
+        required
+      />
+    )
+  }
+}
+
+const getServiceEndpoint = async (service, apiClient) => {
+  if (service === 'keystone') {
+    return apiClient.options.keystoneEndpoint
+  } else if (service === 'qbert') {
+    return await apiClient.qbert.getApiEndpoint()
+  } else if (service === 'resmgr') {
+    const endpoint = await apiClient.keystone.getServiceEndpoint('resmgr', 'internal')
+    return `${endpoint}/v1`
+  } else {
+    const serviceCatalog = await loadServiceCatalog()
+    const catalogMap = arrToObjByKey('name', serviceCatalog)
+    return catalogMap[service].url
+  }
+}
+
 const ApiRequestHelper = ({ api, metadata, className = undefined }) => {
   const classes = useStyles()
   const { params, getParamsUpdater } = useParams()
   const [apiResponse, setApiResponse] = React.useState('')
+  const [requestUrl, setRequestUrl] = React.useState('')
   const apiClient = ApiClient.getInstance()
+  const showToast = useToast()
 
-  const [serviceCatalog] = useDataLoader(loadServiceCatalog)
-  const catalogMap = arrToObjByKey('name', serviceCatalog)
+  useEffect(() => {
+    setApiResponse('')
+    ;(async () => {
+      const serviceEndpoint = await getServiceEndpoint(api, apiClient)
+      const endpoint = replaceTextBetweenCurlyBraces(metadata.url, params)
+      setRequestUrl(pathJoin(serviceEndpoint, endpoint))
+    })()
+  }, [metadata, params])
 
-  const makeApiRequest = async (inputValues) => {
+  const makeApiRequest = async (url, endpoint, body = '') => {
+    const params = {
+      url,
+      endpoint,
+      options: {
+        clsName: api,
+        mthdName: metadata.name,
+      },
+    }
+    if (methodsWithBody.includes(metadata.type)) {
+      params[body] = body
+    }
+    try {
+      const response = await {
+        GET: () => apiClient.basicGet(params),
+        POST: () => apiClient.basicPost(params),
+        PATCH: () => apiClient.basicPatch(params),
+        PUT: () => apiClient.basicPut(params),
+        DELETE: () => apiClient.basicDelete(params),
+      }[metadata.type]()
+
+      return response
+    } catch (e) {
+      typeof e === 'object'
+        ? showToast(e.message, MessageTypes.error)
+        : showToast('Request failed', MessageTypes.error)
+      return null
+    }
+  }
+
+  const handleSubmit = async ({ body, ...inputValues }) => {
     let url = metadata.url
     if (metadata.params.length > 0) {
       url = replaceTextBetweenCurlyBraces(url, inputValues)
     }
-    const methodName = metadata.name
-    let endpoint = catalogMap[api].url
-    if (api === 'qbert') {
-      endpoint = await apiClient.qbert.getApiEndpoint()
-    } else if (api === 'appbert') {
-      endpoint = await apiClient.keystone.getEndpoints()
-    }
-
-    const response = await apiClient.basicGet({
-      url,
-      endpoint,
-      options: { clsName: api, mthdName: methodName },
-    })
-
-    setApiResponse(JSON.stringify(response, null, 2))
-  }
-
-  const renderParamField = (param) => {
-    if (param === 'clusterUuid') {
-      return (
-        <PicklistField
-          DropdownComponent={ClusterPicklist}
-          className={classes.textField}
-          id="clusterUuid"
-          label="clusterUuid"
-          onChange={getParamsUpdater('clusterUuid')}
-          value={params.clusterUuid}
-          required
-        />
-      )
-    } else {
-      return <TextField className={classes.textField} id={param} label={param} required />
+    const endpoint = await getServiceEndpoint(api, apiClient)
+    const response = await makeApiRequest(url, endpoint, body)
+    if (response) {
+      setApiResponse(JSON.stringify(response, null, 2))
     }
   }
-
-  const getRequestUrl = useCallback(() => {
-    return pathJoin(catalogMap[api].url, replaceTextBetweenCurlyBraces(metadata.url, params))
-  }, [metadata, params])
 
   return (
-    <div className={clsx(classes.root, className)}>
+    <div className={clsx(classes.apiRequestHelper, className)}>
       <div className={classes.container}>
         <div className={classes.header}>
           <Text variant="h3" className={classes.text}>
@@ -130,11 +191,7 @@ const ApiRequestHelper = ({ api, metadata, className = undefined }) => {
           </Text>
         </div>
         <div className={classes.container}>
-          <ValidatedForm
-            classes={{ root: classes.form }}
-            elevated={false}
-            onSubmit={makeApiRequest}
-          >
+          <ValidatedForm classes={{ root: classes.form }} elevated={false} onSubmit={handleSubmit}>
             <Text className={classes.text} variant="h6">
               URL:
             </Text>
@@ -144,15 +201,20 @@ const ApiRequestHelper = ({ api, metadata, className = undefined }) => {
               className={classes.urlField}
               id={'url'}
               label={'URL'}
-              value={getRequestUrl()}
+              value={requestUrl}
             />
             {metadata.params?.length > 0 && (
               <div className={classes.parameters}>
                 <Text className={classes.text} variant="h6">
                   Parameters:
                 </Text>
-                {metadata.params.map((param) => renderParamField(param))}
+                {metadata.params.map((paramName) =>
+                  renderParamField({ classes, paramName, params, getParamsUpdater }),
+                )}
               </div>
+            )}
+            {methodsWithBody.includes(metadata.type) && (
+              <TextField className={classes.textField} id="body" label="Body" multiline rows={3} />
             )}
             <SubmitButton className={classes.button}>Make API Request</SubmitButton>
             <CodeMirror
