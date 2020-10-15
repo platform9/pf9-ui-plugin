@@ -28,6 +28,7 @@ import { getCookieValue } from 'utils/misc'
 import moment from 'moment'
 import { useToast } from 'core/providers/ToastProvider'
 import axios from 'axios'
+import Bugsnag from '@bugsnag/js'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -55,6 +56,7 @@ const AppContainer = () => {
     destroySession,
     getContext,
     setContext,
+    userDetails: { id: userId, name, displayName },
   } = useContext(AppContext)
 
   useEffect(() => {
@@ -71,6 +73,7 @@ const AppContainer = () => {
   }, [])
 
   useEffect(() => {
+    Bugsnag.setUser(userId, name, displayName)
     if (!isEmpty(session)) {
       const id = setInterval(() => {
         // Check if session has expired
@@ -83,7 +86,10 @@ const AppContainer = () => {
         }
       }, 1000)
       // Reset the interval if the session changes
-      return () => clearInterval(id)
+      return () => {
+        Bugsnag.setUser()
+        clearInterval(id)
+      }
     }
   }, [session])
 

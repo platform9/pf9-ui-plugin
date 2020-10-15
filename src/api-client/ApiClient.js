@@ -83,6 +83,11 @@ class ApiClient {
       async (error) => {
         // We temporarily track the error as is so that in the future
         // we can improve the errors returned by the backend
+        const url = pathStr('response.config', error)
+        const data = pathStr('response.data', error)
+
+        Bugsnag.addMetadata('Api Url', url)
+        Bugsnag.addMetadata('Api Response', data)
         Bugsnag.notify(error)
         return Promise.reject(getResponseError(error))
       },
