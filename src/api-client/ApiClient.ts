@@ -114,9 +114,13 @@ class ApiClient {
     this.axiosInstance.interceptors.response.use(
       (response) => response,
       async (error) => {
-        // We temporarily track the error as is so that in the future
-        // we can improve the errors returned by the backend
+        const url = error?.response?.config
+        const data = error?.response?.data
+
+        Bugsnag.addMetadata('Api Url', url)
+        Bugsnag.addMetadata('Api Response', data)
         Bugsnag.notify(error)
+
         return Promise.reject(getResponseError(error))
       },
     )
