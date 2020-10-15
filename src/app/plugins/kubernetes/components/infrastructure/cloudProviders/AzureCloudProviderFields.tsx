@@ -1,6 +1,6 @@
 import React from 'react'
 import TextField from 'core/components/validatedForm/TextField'
-import SubmitButton from 'core/components/buttons/SubmitButton'
+import Button from 'core/elements/button'
 import Theme from 'core/themes/model'
 import { makeStyles } from '@material-ui/styles'
 
@@ -14,14 +14,14 @@ interface Props {
   wizardContext: any
   setWizardContext: any
   showSubmitInCard: boolean
-  optionalFields: boolean
+  updateWizard: boolean
 }
 
 const AzureCloudProviderFields = ({
   wizardContext,
   setWizardContext,
   showSubmitInCard = false,
-  optionalFields = false,
+  updateWizard = false,
 }: Props) => {
   const { inCardSubmit } = useStyles({})
 
@@ -33,21 +33,24 @@ const AzureCloudProviderFields = ({
         onChange={(value) => setWizardContext({ name: value })}
         value={wizardContext.name}
         info="Name of the cloud provider"
-        required={!optionalFields}
+        disabled={updateWizard}
+        required
       />
       <TextField
         id="tenantId"
         label="Tenant ID"
         onChange={(value) => setWizardContext({ tenantId: value })}
         info="The tenant ID of the service principal"
-        required={!optionalFields}
+        disabled={updateWizard}
+        required
       />
       <TextField
         id="clientId"
         label="Client ID"
         onChange={(value) => setWizardContext({ clientId: value })}
         info="The client ID of the service principal"
-        required={!optionalFields}
+        disabled={updateWizard}
+        required
       />
       <TextField
         id="clientSecret"
@@ -55,18 +58,22 @@ const AzureCloudProviderFields = ({
         label="Client Secret"
         onChange={(value) => setWizardContext({ clientSecret: value })}
         info="The client secret of the service principal"
-        required={!optionalFields}
+        disabled={updateWizard}
+        required
       />
       <TextField
         id="subscriptionId"
         label="Subscription ID"
         onChange={(value) => setWizardContext({ subscriptionId: value })}
         info="The ID of the subscription that correlates to the service principal"
-        required={!optionalFields}
+        disabled={updateWizard}
+        required
       />
       {showSubmitInCard && (
         <div className={inCardSubmit}>
-          <SubmitButton noMargin>Update Cloud Provider</SubmitButton>
+          <Button disabled type="submit">
+            Update Cloud Provider
+          </Button>
         </div>
       )}
     </>

@@ -133,7 +133,7 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
                           setWizardContext={setWizardContext}
                           toggleIamPolicy
                           showSubmitInCard
-                          optionalFields
+                          updateWizard
                         />
                       </FormFieldCard>
                       <VerificationFields

@@ -43,7 +43,7 @@ interface Props {
   setWizardContext: any
   toggleIamPolicy: boolean
   showSubmitInCard: boolean
-  optionalFields: boolean
+  updateWizard: boolean
 }
 
 const downloadIAMPolicy = async (setState) => {
@@ -65,7 +65,7 @@ const AwsCloudProviderFields = ({
   setWizardContext,
   toggleIamPolicy = false,
   showSubmitInCard = false,
-  optionalFields = false,
+  updateWizard = false,
 }: Props) => {
   const { bullets, bullet, bulletText, downloadIcon, iamInfo, inCardSubmit } = useStyles({})
   const [downloadState, setDownloadState] = useState({ status: '', message: '' })
@@ -122,7 +122,8 @@ const AwsCloudProviderFields = ({
         onChange={(value) => setWizardContext({ name: value })}
         value={wizardContext.name}
         info="Name for Cloud Provider"
-        required={!optionalFields}
+        disabled={updateWizard}
+        required
       />
       <TextField
         id="key"
@@ -130,7 +131,7 @@ const AwsCloudProviderFields = ({
         onChange={(value) => setWizardContext({ key: value })}
         value={wizardContext.key}
         info="AWS IAM Access Key"
-        required={!optionalFields}
+        required
       />
       <TextField
         id="secret"
@@ -139,7 +140,7 @@ const AwsCloudProviderFields = ({
         value={wizardContext.secret}
         info="IAM User Secret Key"
         type="password"
-        required={!optionalFields}
+        required
       />
       {showSubmitInCard && (
         <div className={inCardSubmit}>
