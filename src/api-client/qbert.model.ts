@@ -1,3 +1,4 @@
+import { CloudProviders } from 'k8s/components/infrastructure/cloudProviders/model'
 import { CustomerMetadata } from './model'
 
 // Keep these for now, this way we can easily see which have had types generated
@@ -49,7 +50,7 @@ export type IGenericResource<T> = T & {
 
 export interface GetCloudProvider {
   name: string
-  type: string
+  type: CloudProviders
   uuid: string
   nodePoolUuid: string
 }
