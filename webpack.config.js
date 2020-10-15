@@ -8,10 +8,13 @@ const TerserPlugin = require('terser-webpack-plugin')
 const contextPath = path.resolve(__dirname, './src/app')
 const contentBase = path.resolve(__dirname, './build')
 const outputPath = path.resolve(contentBase, './ui')
+const { BugsnagSourceMapUploaderPlugin } = require('webpack-bugsnag-plugins')
+const { version } = require('./package.json')
 
 const env = process.env.NODE_ENV || 'development'
 const isDev = env === 'development'
 const isProd = env === 'production'
+const bugsnagKey = '3eb58c77ada2a9db70fc7a8e81e97b99'
 
 const extractCSS = new MiniCssExtractPlugin({
   // Options similar to the same options in webpackOptions.output
@@ -109,9 +112,16 @@ module.exports = {
             },
           }),
         ]
-      : []),
+      : [
+          new BugsnagSourceMapUploaderPlugin({
+            apiKey: bugsnagKey,
+            appVersion: version,
+          }),
+        ]),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(env),
+      'process.env.VERSION': JSON.stringify(version),
+      'process.env.BUGSNAG_KEY': JSON.stringify(bugsnagKey),
     }),
     extractCSS,
     new HtmlWebpackPlugin({
