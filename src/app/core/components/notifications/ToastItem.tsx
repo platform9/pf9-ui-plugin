@@ -92,7 +92,7 @@ const ToastItem: FunctionComponent<ToastItemProps> = ({
       message={
         <span className={classes.message}>
           <Icon className={clsx(classes.icon, classes.iconVariant)} />
-          <div className={classes.text}>{renderMessages(message)}</div>
+          <div className={classes.text}>{renderMessages(message || '')}</div>
         </span>
       }
       action={

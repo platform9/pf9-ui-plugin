@@ -15,15 +15,13 @@ import AwsCloudProviderFields from './AwsCloudProviderFields'
 import AzureCloudProviderFields from './AzureCloudProviderFields'
 import Text from 'core/elements/text'
 import { FormFieldCard } from 'core/components/validatedForm/FormFieldCard'
-import { CloudProviders } from './model'
+import { CloudProviders, ICloudProvidersSelector } from './model'
 import DocumentMeta from 'core/components/DocumentMeta'
+import WizardMeta from 'core/components/wizard/WizardMeta'
 const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file dont work well.
 
 const useStyles = makeStyles((theme: Theme) => ({
-  root: {
-    display: 'flex',
-    flexFlow: 'row nowrap',
-    alignItems: 'flex-start',
+  updateCloudProvider: {
     marginTop: 24,
   },
   cpName: {
@@ -43,9 +41,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     color: theme.palette.grey['700'],
     display: 'flex',
     flexFlow: 'column wrap',
-  },
-  container: {
-    flexGrow: 1,
   },
   field: {
     margin: theme.spacing(2, 0, 1),
@@ -76,7 +71,7 @@ const formCpBody = (data) => {
 export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
   const classes = useStyles({})
 
-  const updatedInitialValues = useMemo(() => {
+  const updatedInitialValues: ICloudProvidersSelector = useMemo(() => {
     return {
       ...initialValues,
       cloudProviderId: initialValues.uuid,
@@ -105,53 +100,52 @@ export const UpdateCloudProviderForm = ({ onComplete, initialValues }) => {
   return (
     <>
       <DocumentMeta title="Update Cloud Provider" bodyClasses={['form-view']} />
-      <div className={classes.root}>
-        {updatedInitialValues?.type && (
-          <>
-            <CloudProviderCard active={true} type={updatedInitialValues.type} />
-            <div className={classes.container}>
-              <Wizard
-                onComplete={updateCloudProvider}
-                context={updatedInitialValues}
-                submitLabel="Save"
-                showSteps={false}
-                showFinishAndReviewButton={false}
-                hideAllButtons={true}
+      {updatedInitialValues?.type && (
+        <Wizard
+          onComplete={updateCloudProvider}
+          context={updatedInitialValues}
+          submitLabel="Save"
+          showSteps={false}
+          showFinishAndReviewButton={false}
+          hideAllButtons
+        >
+          {({ wizardContext, setWizardContext, onNext, handleNext }) => {
+            return (
+              <WizardMeta
+                className={classes.updateCloudProvider}
+                fields={wizardContext}
+                icon={<CloudProviderCard active type={wizardContext.type} />}
               >
-                {({ wizardContext, setWizardContext, onNext, handleNext }) => {
-                  return (
-                    <WizardStep stepId="step1" label="Update Cloud Provider">
-                      <div className={classes.form}>
-                        <ValidatedForm
-                          initialValues={wizardContext}
-                          elevated={false}
-                          onSubmit={handleNext}
-                        >
-                          <Text variant="subtitle1" className={classes.cpName}>
-                            {wizardContext.name}
-                          </Text>
-                          <FormFieldCard className={classes.field}>
-                            <UpdateForm
-                              wizardContext={wizardContext}
-                              setWizardContext={setWizardContext}
-                              toggleIamPolicy={true}
-                              showSubmitInCard={true}
-                            />
-                          </FormFieldCard>
-                          <VerificationFields
-                            wizardContext={wizardContext}
-                            setWizardContext={setWizardContext}
-                          />
-                        </ValidatedForm>
-                      </div>
-                    </WizardStep>
-                  )
-                }}
-              </Wizard>
-            </div>
-          </>
-        )}
-      </div>
+                <WizardStep stepId="step1" label="Update Cloud Provider">
+                  <div className={classes.form}>
+                    <ValidatedForm
+                      initialValues={wizardContext}
+                      elevated={false}
+                      onSubmit={handleNext}
+                    >
+                      <Text variant="subtitle1" className={classes.cpName}>
+                        {wizardContext.name}
+                      </Text>
+                      <FormFieldCard className={classes.field}>
+                        <UpdateForm
+                          wizardContext={wizardContext}
+                          setWizardContext={setWizardContext}
+                          toggleIamPolicy
+                          showSubmitInCard
+                        />
+                      </FormFieldCard>
+                      <VerificationFields
+                        wizardContext={wizardContext}
+                        setWizardContext={setWizardContext}
+                      />
+                    </ValidatedForm>
+                  </div>
+                </WizardStep>
+              </WizardMeta>
+            )
+          }}
+        </Wizard>
+      )}
     </>
   )
 }
