@@ -224,8 +224,13 @@ Kubernetes.registerPlugin = (pluginManager) => {
       component: ApiAccessPage,
     },
     {
+<<<<<<< HEAD
       name: 'API Helper',
       link: { path: '/api-access/api-helper', exact: true },
+=======
+      name: 'API Endpoint Details',
+      link: { path: '/api_access/apiHelper', exact: true },
+>>>>>>> 2a8312c32ed3addd9789ca8c29b7a16fbc25b6b2
       component: ApiServicesPage,
     },
     {

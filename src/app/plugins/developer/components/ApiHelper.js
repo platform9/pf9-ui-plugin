@@ -50,7 +50,10 @@ class ApiHelper extends React.PureComponent {
   performApiCall = async ({ method, url, body }) => {
     const { service, baseUrl } = this.state
     const apiClient = ApiClient.getInstance()
+<<<<<<< HEAD
     const bod = JSON.parse(body)
+=======
+>>>>>>> 2a8312c32ed3addd9789ca8c29b7a16fbc25b6b2
     const response = await {
       GET: () => apiClient.basicGet({ url, endpoint: baseUrl, options: { clsName: service } }),
       POST: () =>
@@ -80,7 +83,11 @@ class ApiHelper extends React.PureComponent {
     this.setState({ service })
 
     if (service === 'qbert') {
+<<<<<<< HEAD
       return this.setState({ baseUrl: await apiClient.qbert.getEndpoint() })
+=======
+      return this.setState({ baseUrl: await apiClient.qbert.getApiEndpoint() })
+>>>>>>> 2a8312c32ed3addd9789ca8c29b7a16fbc25b6b2
     }
 
     this.setState({ baseUrl })

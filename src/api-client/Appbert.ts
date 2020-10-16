@@ -2,13 +2,21 @@
 import ApiService from 'api-client/ApiService'
 import { ClusterTag } from './appbert.model'
 import { trackApiMethodMetadata } from './helpers'
+<<<<<<< HEAD
+=======
+import { MethodMetadata } from './model'
+>>>>>>> 2a8312c32ed3addd9789ca8c29b7a16fbc25b6b2
 
 class Appbert extends ApiService {
   public getClassName() {
     return 'appbert'
   }
 
+<<<<<<< HEAD
   static apiMethodsMetadata = []
+=======
+  static apiMethodsMetadata: MethodMetadata[] = []
+>>>>>>> 2a8312c32ed3addd9789ca8c29b7a16fbc25b6b2
 
   protected async getEndpoint() {
     return this.client.keystone.getServiceEndpoint('appbert', 'admin')

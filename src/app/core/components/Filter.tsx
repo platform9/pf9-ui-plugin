@@ -1,13 +1,19 @@
 import { makeStyles } from '@material-ui/styles'
 import Theme from 'core/themes/model'
 import React, { useEffect } from 'react'
+<<<<<<< HEAD
 import useReactRouter from 'use-react-router'
+=======
+>>>>>>> 2a8312c32ed3addd9789ca8c29b7a16fbc25b6b2
 import PicklistDefault from 'core/components/Picklist'
 const Picklist: any = PicklistDefault // types on forward ref .js file dont work well.
 import SearchBar from './SearchBar'
 import { assocPath } from 'ramda'
 import { allKey } from 'app/constants'
+<<<<<<< HEAD
 import { Route } from 'core/utils/routes'
+=======
+>>>>>>> 2a8312c32ed3addd9789ca8c29b7a16fbc25b6b2
 
 interface Props {
   data: Array<String>
@@ -45,6 +51,7 @@ const Filter = ({ data, setFilteredData, filters, searchTarget }: Props) => {
   const [searchTerm, setSearchTerm] = React.useState('')
   const [filterProperties, setFilterProperties] = React.useState({})
 
+<<<<<<< HEAD
   const { history, location } = useReactRouter()
   const url = Route.getCurrentRoute().url
   const route = new Route({ url, name: 'Filter' })
@@ -79,6 +86,13 @@ const Filter = ({ data, setFilteredData, filters, searchTarget }: Props) => {
     history.push(urlWithQueryParams)
   }
 
+=======
+  useEffect(() => {
+    const filteredData = filterByProperty(filterBySearch(data))
+    setFilteredData(filteredData)
+  }, [searchTerm, filterProperties])
+
+>>>>>>> 2a8312c32ed3addd9789ca8c29b7a16fbc25b6b2
   const filterBySearch = (data) => {
     return data.filter((data) => data[searchTarget].match(new RegExp(searchTerm, 'i')) !== null)
   }

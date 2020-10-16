@@ -2,6 +2,10 @@ import { partition, uniq, includes } from 'ramda'
 import ApiService from 'api-client/ApiService'
 import { Host } from './resmgr.model'
 import { trackApiMethodMetadata } from './helpers'
+<<<<<<< HEAD
+=======
+import { MethodMetadata } from './model'
+>>>>>>> 2a8312c32ed3addd9789ca8c29b7a16fbc25b6b2
 
 const roleNames = {
   'pf9-ostackhost-neutron': 'Hypervisor',
@@ -42,7 +46,11 @@ class ResMgr extends ApiService {
     return 'resmgr'
   }
 
+<<<<<<< HEAD
   static apiMethodsMetadata = []
+=======
+  static apiMethodsMetadata: MethodMetadata[] = []
+>>>>>>> 2a8312c32ed3addd9789ca8c29b7a16fbc25b6b2
 
   protected async getEndpoint() {
     const endpoint = await this.client.keystone.getServiceEndpoint('resmgr', 'internal')

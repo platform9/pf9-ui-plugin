@@ -23,6 +23,7 @@ import {
   IInterfaceByName,
 } from './keystone.model'
 import DataKeys from 'k8s/DataKeys'
+import { MethodMetadata } from './model'
 
 const constructAuthFromToken = (token: string, projectId?: string) => {
   return {
@@ -79,7 +80,11 @@ class Keystone extends ApiService {
     return 'keystone'
   }
 
+<<<<<<< HEAD
   static apiMethodsMetadata = []
+=======
+  static apiMethodsMetadata: MethodMetadata[] = []
+>>>>>>> 2a8312c32ed3addd9789ca8c29b7a16fbc25b6b2
 
   protected async getEndpoint() {
     return Promise.resolve(this.client.options.keystoneEndpoint)

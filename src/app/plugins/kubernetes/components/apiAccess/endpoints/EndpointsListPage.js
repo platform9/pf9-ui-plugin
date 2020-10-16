@@ -46,7 +46,11 @@ const EndpointsListPage = () => {
       }
     >
       <ListPage />
+<<<<<<< HEAD
       <SimpleLink src={routes.apiAccess.apiDetails.path()}>
+=======
+      <SimpleLink src={routes.apiDetails.path()}>
+>>>>>>> 2a8312c32ed3addd9789ca8c29b7a16fbc25b6b2
         <SubmitButton>View API Helper</SubmitButton>
       </SimpleLink>
     </FormFieldCard>
@@ -54,7 +58,11 @@ const EndpointsListPage = () => {
 }
 
 const renderApiDetailsLink = (text = '') => {
+<<<<<<< HEAD
   return <SimpleLink src={routes.apiAccess.apiDetails.path()}>{text}</SimpleLink>
+=======
+  return <SimpleLink src={routes.apiDetails.path()}>{text}</SimpleLink>
+>>>>>>> 2a8312c32ed3addd9789ca8c29b7a16fbc25b6b2
 }
 
 const columns = [
