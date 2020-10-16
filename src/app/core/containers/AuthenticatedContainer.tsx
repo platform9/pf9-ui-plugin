@@ -38,6 +38,7 @@ import { trackEvent } from 'utils/tracking'
 import ClusterUpgradeBanner from 'core/banners/ClusterUpgradeBanner'
 import Theme from 'core/themes/model'
 import DocumentMeta from 'core/components/DocumentMeta'
+import Bugsnag from '@bugsnag/js'
 
 declare let window: CustomWindow
 
@@ -276,7 +277,7 @@ const AuthenticatedContainer = () => {
   const [stacks, setStacks] = useState([])
   const session = useSelector<RootState, SessionState>(prop(sessionStoreKey))
   const {
-    userDetails: { role },
+    userDetails: { id: userId, name, displayName, role },
     features,
   } = session
   const dispatch = useDispatch()
@@ -289,6 +290,8 @@ const AuthenticatedContainer = () => {
   }, [currentRegion])
 
   useEffect(() => {
+    Bugsnag.setUser(userId, name, displayName)
+
     const id = setInterval(() => {
       // Check if session has expired
       const { expiresAt } = session
@@ -300,7 +303,10 @@ const AuthenticatedContainer = () => {
       }
     }, 1000)
     // Reset the interval if the session changes
-    return () => clearInterval(id)
+    return () => {
+      Bugsnag.setUser()
+      clearInterval(id)
+    }
   }, [])
 
   const withStackSlider = regionFeatures.openstack && regionFeatures.kubernetes

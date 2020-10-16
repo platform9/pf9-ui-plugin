@@ -6,8 +6,11 @@ import ApiClient from 'api-client/ApiClient'
 import './app.css'
 
 Bugsnag.start({
-  apiKey: '3eb58c77ada2a9db70fc7a8e81e97b99',
+  releaseStage: process.env.NODE_ENV,
+  apiKey: process.env.BUGSNAG_KEY,
   plugins: [new BugsnagPluginReact()],
+  appVersion: process.env.VERSION,
+  enabledReleaseStages: ['production'],
 })
 
 setupFromConfig(config)
