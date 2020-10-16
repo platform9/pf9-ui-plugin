@@ -145,7 +145,7 @@ const AwsCloudProviderFields = ({
         type="password"
         required
       />
-      <ErrorMessage>{errorMessage}</ErrorMessage>
+      {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
       {showSubmitInCard && (
         <div className={inCardSubmit}>
           <Button type="submit">Update Cloud Provider</Button>

@@ -72,7 +72,7 @@ const AzureCloudProviderFields = ({
         disabled={updateWizard}
         required
       />
-      <ErrorMessage>{errorMessage}</ErrorMessage>
+      {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
       {showSubmitInCard && (
         <div className={inCardSubmit}>
           <Button disabled type="submit">

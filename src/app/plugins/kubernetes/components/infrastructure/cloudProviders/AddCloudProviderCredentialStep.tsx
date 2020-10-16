@@ -96,7 +96,8 @@ const AddCloudProviderCredentialStep = ({
       const body = formCpBody(wizardContext)
       const [success, newCp] = await cloudProviderActions.create(body)
       if (!success) {
-        // TODO: surface the real API response error -- how to do this properly?
+        // TODO: surface the real API response error to get exact failure reason
+        // Hopefully will be doable with Xan's error message changes
         throw 'Error creating cloud provider'
       }
       setWizardContext({ cloudProviderId: newCp.uuid })
@@ -113,16 +114,12 @@ const AddCloudProviderCredentialStep = ({
     onNext(submitStep)
   }, [submitStep])
 
-  const ActiveForm = useMemo(
-    // Saw this in the original add cp page but what's the main benefit?
-    () => {
-      return objSwitchCaseAny({
-        [CloudProviders.Aws]: AwsCloudProviderFields,
-        [CloudProviders.Azure]: AzureCloudProviderFields,
-      })(wizardContext.provider)
-    },
-    [wizardContext.provider],
-  )
+  const ActiveForm = useMemo(() => {
+    return objSwitchCaseAny({
+      [CloudProviders.Aws]: AwsCloudProviderFields,
+      [CloudProviders.Azure]: AzureCloudProviderFields,
+    })(wizardContext.provider)
+  }, [wizardContext.provider])
 
   return (
     <>
