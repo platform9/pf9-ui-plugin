@@ -1,11 +1,9 @@
-import React, { useEffect, useCallback, useMemo, useRef } from 'react'
+import React, { useEffect, useCallback, useMemo, useRef, useState } from 'react'
 import { makeStyles } from '@material-ui/styles'
 import { Theme } from '@material-ui/core'
 import ValidatedForm from 'core/components/validatedForm/ValidatedForm'
 import ExternalLink from 'core/components/ExternalLink'
 import CloudProviderCard from 'k8s/components/common/CloudProviderCard'
-import { useToast } from 'core/providers/ToastProvider'
-import { MessageTypes } from 'core/components/notifications/model'
 import AwsCloudProviderFields from './AwsCloudProviderFields'
 import AzureCloudProviderFields from './AzureCloudProviderFields'
 import { awsPrerequisitesLink, azurePrerequisitesLink } from 'k8s/links'
@@ -79,7 +77,7 @@ const AddCloudProviderCredentialStep = ({
   setSubmitting,
 }: Props) => {
   const classes = useStyles({})
-  const showToast = useToast()
+  const [errorMessage, setErrorMessage] = useState('')
 
   const validatorRef = useRef(null)
 
@@ -104,7 +102,7 @@ const AddCloudProviderCredentialStep = ({
       setWizardContext({ cloudProviderId: newCp.uuid })
     } catch (err) {
       setSubmitting(false)
-      showToast(err, MessageTypes.error)
+      setErrorMessage(err)
       return false
     }
     setSubmitting(false)
@@ -152,7 +150,13 @@ const AddCloudProviderCredentialStep = ({
           link={links[wizardContext.provider]}
         >
           {({ setFieldValue, values }) => (
-            <ActiveForm wizardContext={wizardContext} setWizardContext={setWizardContext} />
+            <>
+              <ActiveForm
+                wizardContext={wizardContext}
+                setWizardContext={setWizardContext}
+                errorMessage={errorMessage}
+              />
+            </>
           )}
         </ValidatedForm>
       )}

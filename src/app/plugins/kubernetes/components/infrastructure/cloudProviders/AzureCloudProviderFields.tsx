@@ -3,6 +3,7 @@ import TextField from 'core/components/validatedForm/TextField'
 import Button from 'core/elements/button'
 import Theme from 'core/themes/model'
 import { makeStyles } from '@material-ui/styles'
+import { ErrorMessage } from 'core/components/validatedForm/ErrorMessage'
 
 const useStyles = makeStyles((theme: Theme) => ({
   inCardSubmit: {
@@ -15,6 +16,7 @@ interface Props {
   setWizardContext: any
   showSubmitInCard: boolean
   updateWizard: boolean
+  errorMessage: string
 }
 
 const AzureCloudProviderFields = ({
@@ -22,6 +24,7 @@ const AzureCloudProviderFields = ({
   setWizardContext,
   showSubmitInCard = false,
   updateWizard = false,
+  errorMessage = '',
 }: Props) => {
   const { inCardSubmit } = useStyles({})
 
@@ -69,6 +72,7 @@ const AzureCloudProviderFields = ({
         disabled={updateWizard}
         required
       />
+      <ErrorMessage>{errorMessage}</ErrorMessage>
       {showSubmitInCard && (
         <div className={inCardSubmit}>
           <Button disabled type="submit">
