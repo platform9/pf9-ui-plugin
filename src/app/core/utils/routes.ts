@@ -58,7 +58,7 @@ export class Route<T extends OptionalGenericKVP = null> {
   }
 
   static find(pathname: string = location.pathname): Route | null {
-    return Route.getRoutes().find((r) => !!r.pattern.match(pathname))
+    return Route.getRoutes().find((r) => !!r.pattern.match(pathname + location.hash))
   }
 
   /*
@@ -144,6 +144,10 @@ export const routes = {
   dashboard: Route.register({ url: `${k8sPrefix}/dashboard`, name: 'Dashboard' }),
   apiAccess: {
     api: Route.register({ url: `${k8sPrefix}/api-access#api`, name: 'ApiAccess:API' }),
+    apiDetails: Route.register({
+      url: `${k8sPrefix}/api-access/api-helper`,
+      name: 'ApiAccess:ApiHelper',
+    }),
     kubeConfig: Route.register({
       url: `${k8sPrefix}/api-access#kubeconfig`,
       name: 'ApiAccess:KubeConfig',
@@ -151,10 +155,6 @@ export const routes = {
     terraform: Route.register({
       url: `${k8sPrefix}/api-access#terraform`,
       name: 'ApiAccess:Terraform',
-    }),
-    apiDetails: Route.register({
-      url: `${k8sPrefix}/api-access/api-helper`,
-      name: 'ApiAccess:ApiHelper',
     }),
     appbert: Route.register({
       url: `${k8sPrefix}/api-access/api-helper#appbert`,

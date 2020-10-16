@@ -128,7 +128,11 @@ const ApiDetailsPage = ({ service }) => {
         />
         <div className={classes.grid}>
           {filteredMethods.map((metadata) => (
-            <EndpointCard metadata={metadata} onClick={activateCard(metadata)} />
+            <EndpointCard
+              key={metadata.name + metadata.url}
+              metadata={metadata}
+              onClick={activateCard(metadata)}
+            />
           ))}
         </div>
       </div>

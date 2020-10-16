@@ -28,7 +28,7 @@ const ApiServicesPage = () => {
     <PageContainer>
       <Tabs>
         {services.map((service) => (
-          <Tab value={service} label={capitalizeString(service)}>
+          <Tab key={service} value={service} label={capitalizeString(service)}>
             <ApiDetailsPage service={service}></ApiDetailsPage>
           </Tab>
         ))}

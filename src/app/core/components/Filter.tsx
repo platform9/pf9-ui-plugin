@@ -106,6 +106,7 @@ const Filter = ({ data, setFilteredData, filters, searchTarget }: Props) => {
       <div className={classes.filters}>
         {filters.map(({ name, label, options, target }) => (
           <Picklist
+            key={name}
             name={name}
             label={label}
             options={options}
