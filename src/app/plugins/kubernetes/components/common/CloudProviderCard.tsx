@@ -4,7 +4,6 @@ import Text from 'core/elements/text'
 import { makeStyles } from '@material-ui/styles'
 import { CloudProviders } from '../infrastructure/cloudProviders/model'
 import Theme from 'core/themes/model'
-import clsx from 'clsx'
 
 const useStyles = makeStyles<Theme, Props>((theme) => ({
   root: {
@@ -57,15 +56,7 @@ const labels = {
 }
 
 const CloudProviderCard: FC<Props> = (props) => {
-  const {
-    type,
-    disabled,
-    image = icons[type],
-    label = labels[type],
-    src,
-    onClick,
-    className,
-  } = props
+  const { type, disabled, image = icons[type], label = labels[type], src, onClick } = props
   const classes = useStyles(props)
   const { history } = useReactRouter()
   const handleClick = () => {
@@ -74,7 +65,7 @@ const CloudProviderCard: FC<Props> = (props) => {
     history.push(src)
   }
   return (
-    <div className={clsx(classes.root, className)} onClick={handleClick}>
+    <div className={classes.root} onClick={handleClick}>
       <div className={classes.logoContainer}>
         <img alt={type} src={image} />
       </div>
@@ -93,7 +84,6 @@ interface Props {
   image?: string
   label?: string
   disabled?: boolean
-  className?: string
 }
 
 export default CloudProviderCard

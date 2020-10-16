@@ -18,16 +18,14 @@ const objSwitchCaseAny: any = objSwitchCase // types on forward ref .js file don
 const useStyles = makeStyles((theme: Theme) => ({
   cloudProviderCards: {
     maxWidth: 800,
-    marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(1),
-    display: 'flex',
-    flexFlow: 'row nowrap',
+    marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(2),
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, 242px)',
+    gridGap: theme.spacing(2),
   },
   title: {
     marginTop: theme.spacing(4),
-  },
-  card: {
-    margin: theme.spacing(1, 1.5),
   },
 }))
 
@@ -138,13 +136,11 @@ const AddCloudProviderCredentialStep = ({
           active={wizardContext.provider === CloudProviders.Aws}
           onClick={(value) => setWizardContext({ provider: value })}
           type={CloudProviders.Aws}
-          className={classes.card}
         />
         <CloudProviderCard
           active={wizardContext.provider === CloudProviders.Azure}
           onClick={(value) => setWizardContext({ provider: value })}
           type={CloudProviders.Azure}
-          className={classes.card}
         />
       </div>
       {wizardContext.provider && (
